@@ -46,6 +46,7 @@ local launchThread = false
 local quickRandMap = false
 
 local lastUploadedMap = nil
+local playerRating = tonumber(GetCommandLineArg("/rating", 1)[1]) or ""
 
 -- builds the faction tables, and then adds random faction icon to the end
 local factionBmps = {}
@@ -229,10 +230,10 @@ local function DoSlotBehavior(slot, key, name)
         elseif IsObserver(localPlayerID) then
             if lobbyComm:IsHost() then
 				requestedFaction = Prefs.GetFromCurrentProfile('LastFaction')
-				requestedPL = 1.9
+				requestedPL = playerRating
                 HostConvertObserverToPlayer(hostID, localPlayerName, FindObserverSlotForID(localPlayerID), slot, requestedFaction, requestedPL)
             else
-                lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer', RequestedName = localPlayerName, ObserverSlot = FindObserverSlotForID(localPlayerID), PlayerSlot = slot, requestedFaction = Prefs.GetFromCurrentProfile('LastFaction'), requestedPL = 1.9})
+                lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer', RequestedName = localPlayerName, ObserverSlot = FindObserverSlotForID(localPlayerID), PlayerSlot = slot, requestedFaction = Prefs.GetFromCurrentProfile('LastFaction'), requestedPL = playerRating})
             end
         end
     elseif key == 'pm' then
@@ -453,7 +454,7 @@ function SetSlotInfo(slot, playerInfo)
         slotState = nil
     end
 
-    GUI.slots[slot].name:ClearItems()
+    GUI.slots[slot].name:ClearItems()	
 
     if slotState then
         GUI.slots[slot].name:Enable()
@@ -477,6 +478,9 @@ function SetSlotInfo(slot, playerInfo)
         GUI.slots[slot].name:Disable()
     end
 
+	GUI.slots[slot].ratingGroup:Show()
+    GUI.slots[slot].ratingText:SetText(playerInfo.PL or "")
+	
     GUI.slots[slot].name:Show()
     GUI.slots[slot].name:SetTitleText(LOC(playerInfo.PlayerName))
 
@@ -563,6 +567,7 @@ function ClearSlotInfo(slot)
     end
 
     -- hide these to clear slot of visible data
+	GUI.slots[slot].ratingGroup:Hide()
     GUI.slots[slot].faction:Hide()
     GUI.slots[slot].color:Hide()
     GUI.slots[slot].team:Hide()
@@ -1142,7 +1147,7 @@ local function UpdateGame()
 	local playerSlot = FindSlotForID(localPlayerID)
 	
 	if not gameInfo.PlayerOptions[playerSlot].PL then
-		SetPlayerOption(playerSlot, 'PL', 1.9)
+		SetPlayerOption(playerSlot, 'PL', playerRating)
 	end	
 	
     if not hasSupcom then
@@ -1504,20 +1509,14 @@ function HostTryAddPlayer( senderID, slot, requestedPlayerName, human, aiPersona
 		gameInfo.PlayerOptions[newSlot].PL = requestedPL
 	end	
 	
-	if (not requestedPL or requestedPL < 1.9) and human then
-		local reason = (LOC('<LOC lobui_0718>You were automaticly removed from the lobby because you don\'t have Power Lobby 1.9 or greater.'))
-		lobbyComm:EjectPeer(senderID, reason)
-		UpdateGame()
-	else	
-		lobbyComm:BroadcastData(
-			{
-				Type = 'SlotAssigned',
-				Slot = newSlot,
-				Options = gameInfo.PlayerOptions[newSlot],
-			}
-		)
-		UpdateGame()
-	end
+	lobbyComm:BroadcastData(
+		{
+			Type = 'SlotAssigned',
+			Slot = newSlot,
+			Options = gameInfo.PlayerOptions[newSlot],
+		}
+	)
+	UpdateGame()
 end
 
 function HostTryMovePlayer(senderID, currentSlot, requestedSlot)
@@ -1884,7 +1883,7 @@ function CreateUI(maxPlayers)
     local titleText = UIUtil.CreateText(GUI.panel, title, 26, UIUtil.titleFont)
     LayoutHelpers.AtLeftTopIn(titleText, GUI.panel, 50, 36)
 	
-	local randmapText = UIUtil.CreateText(GUI.panel, "Power Lobby 1.9 by Moritz - www.supremecommander.com.br", 17, UIUtil.titleFont)
+	local randmapText = UIUtil.CreateText(GUI.panel, "Power Lobby 2.0 by Moritz - www.supremecommander.com.br", 17, UIUtil.titleFont)
 	LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
 
     GUI.playerPanel = Group(GUI.panel, "playerPanel")
@@ -2340,7 +2339,8 @@ function CreateUI(maxPlayers)
     local prev = nil
 
     local slotColumnSizes = {
-        player = {x = 48, width = 358},
+		rating = {x = 48, width = 51},
+        player = {x = 104, width = 302},
         color = {x = 417, width = 59},
         faction = {x = 485, width = 59},
         team = {x = 553, width = 60},
@@ -2352,7 +2352,11 @@ function CreateUI(maxPlayers)
     GUI.labelGroup.Width:Set(690)
     GUI.labelGroup.Height:Set(21)
 
-    LayoutHelpers.AtLeftTopIn(GUI.labelGroup, GUI.playerPanel, 5, 5)
+    LayoutHelpers.AtLeftTopIn(GUI.labelGroup, GUI.playerPanel, 5, 5)	
+		
+	GUI.ratingLabel = UIUtil.CreateText(GUI.labelGroup, "<LOC _Rating>Rating", 14, UIUtil.titleFont)
+	LayoutHelpers.AtLeftIn(GUI.ratingLabel, GUI.panel, slotColumnSizes.rating.x)
+	LayoutHelpers.AtVerticalCenterIn(GUI.ratingLabel, GUI.labelGroup, 5)
 
     GUI.nameLabel = UIUtil.CreateText(GUI.labelGroup, "<LOC lobui_0213>Player Name", 14, UIUtil.titleFont)
     LayoutHelpers.AtLeftIn(GUI.nameLabel, GUI.panel, slotColumnSizes.player.x)
@@ -2408,6 +2412,16 @@ function CreateUI(maxPlayers)
         end
 
         local bg = GUI.slots[i]
+		
+        GUI.slots[i].ratingGroup = Group(bg)
+		GUI.slots[i].ratingGroup.Width:Set(slotColumnSizes.rating.width)
+		GUI.slots[i].ratingGroup.Height:Set(GUI.slots[curRow].Height)
+		LayoutHelpers.AtLeftIn(GUI.slots[i].ratingGroup, GUI.panel, slotColumnSizes.rating.x)
+		LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].ratingGroup, GUI.slots[i], 6)
+
+		GUI.slots[i].ratingText = UIUtil.CreateText(GUI.slots[i].ratingGroup, "", 14, UIUtil.bodyFont)
+		LayoutHelpers.AtBottomIn(GUI.slots[i].ratingText, GUI.slots[i].ratingGroup)
+		LayoutHelpers.AtRightIn(GUI.slots[i].ratingText, GUI.slots[i].ratingGroup, 9)
 
         GUI.slots[i].name = Combo(bg, 16, 10, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].name, GUI.slots[i], 8)
@@ -3107,10 +3121,10 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
 						elseif IsObserver(localPlayerID) then
 							if lobbyComm:IsHost() then
 								requestedFaction = Prefs.GetFromCurrentProfile('LastFaction')
-								requestedPL = 1.9
+								requestedPL = playerRating
 								HostConvertObserverToPlayer(hostID, localPlayerName, FindObserverSlotForID(localPlayerID), self.Slot, requestedFaction, requestedPL)
 							else
-								lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer', RequestedName = localPlayerName, ObserverSlot = FindObserverSlotForID(localPlayerID), PlayerSlot = self.Slot, requestedFaction = Prefs.GetFromCurrentProfile('LastFaction'), requestedPL = 1.9})
+								lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer', RequestedName = localPlayerName, ObserverSlot = FindObserverSlotForID(localPlayerID), PlayerSlot = self.Slot, requestedFaction = Prefs.GetFromCurrentProfile('LastFaction'), requestedPL = playerRating})
 							end
 						end
 					end
@@ -3318,7 +3332,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 Human = true, 
                 RequestedColor = Prefs.GetFromCurrentProfile('LastColor'),
                 RequestedFaction = requestedFaction,
-				RequestedPL = 1.9, } )
+				RequestedPL = playerRating, } )
         end
 
         local function KeepAliveThreadFunc()
