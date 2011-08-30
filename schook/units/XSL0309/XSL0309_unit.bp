@@ -1,0 +1,345 @@
+UnitBlueprint {
+    Merge = true,
+    BlueprintId="xsl0309",
+    AI = {
+        TargetBones = {
+            'XSL0309',
+        },
+    },
+    Audio = {
+        AmbientMove = Sound {
+            Bank = 'XSL',
+            Cue = 'XSL0309_Move_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        CaptureLoop = Sound {
+            Bank = 'XSL',
+            Cue = 'XSL0309_Capture_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        Construct = Sound {
+            Bank = 'XSL',
+            Cue = 'XSL0309_Construct_Start',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        ConstructLoop = Sound {
+            Bank = 'XSL',
+            Cue = 'XSL0309_Construct_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        Destroyed = Sound {
+            Bank = 'XSL_Destroy',
+            Cue = 'XSL_Destroy_Land_Lrg',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        HoverKilledOnWater = Sound {
+            Bank = 'Explosions',
+            Cue = 'Expl_Water_Lrg_01',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        ReclaimLoop = Sound {
+            Bank = 'XSL',
+            Cue = 'XSL0309_Reclaim_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        StartCapture = Sound {
+            Bank = 'XSL',
+            Cue = 'XSL0309_Capture_Start',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        StartMove = Sound {
+            Bank = 'XSL',
+            Cue = 'XSL0309_Move_Start',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        StartReclaim = Sound {
+            Bank = 'XSL',
+            Cue = 'XSL0309_Reclaim_Start',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        StopMove = Sound {
+            Bank = 'XSL',
+            Cue = 'XSL0309_Move_Stop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        UISelection = Sound {
+            Bank = 'SeraphimSelect',
+            Cue = 'Seraphim_Select_Vehicle',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+    },
+    BuildIconSortPriority = 10,
+    Categories = {
+        'PRODUCTFA',
+        'SELECTABLE',
+        'BUILTBYTIER3FACTORY',
+        'SERAPHIM',
+        'MOBILE',
+        'LAND',
+        'TECH3',
+        'CONSTRUCTION',
+        'ENGINEER',
+        'REPAIR',
+        'RECLAIM',
+        'CAPTURE',
+        'HOVER',
+        'VISIBLETORECON',
+        'RECLAIMABLE',
+        'PATROLHELPER',
+        'SHOWQUEUE',
+    },
+    CollisionOffsetY = -0.25,
+    Defense = {
+        AirThreatLevel = 0,
+        ArmorType = 'Normal',
+        EconomyThreatLevel = 0,
+        Health = 1230,
+        MaxHealth = 1230,
+        RegenRate = 0,
+        SubThreatLevel = 0,
+        SurfaceThreatLevel = 0,
+    },
+    Description = '<LOC xsl0309_desc>Engineer',
+    Display = {
+        Abilities = {
+            '<LOC ability_hover>Hover',
+            '<LOC ability_engineeringsuite>Engineering Suite',
+        },
+        IdleEffects = {
+            Land = {
+                Effects = {
+                    {
+                        Bones = {
+                            'XSL0309',
+                        },
+                        Offset = {
+                            0,
+                            -0.4,
+                            0,
+                        },
+                        Scale = 0.85,
+                        Type = 'SeraphimGroundFX01',
+                    },
+                },
+            },
+            Water = {
+                Effects = {
+                    {
+                        Bones = {
+                            'XSL0309',
+                        },
+                        Offset = {
+                            0,
+                            -0.4,
+                            0,
+                        },
+                        Scale = 0.85,
+                        Type = 'SeraphimGroundFX01',
+                    },
+                    {
+                        Bones = {
+                            'XSL0309',
+                        },
+                        Scale = 1.4,
+                        Type = 'SeaIdle02',
+                    },
+                },
+            },
+        },
+        Mesh = {
+            IconFadeInZoom = 130,
+            LODs = {
+                {
+                    LODCutoff = 120,
+                    LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
+                    ShaderName = 'Seraphim',
+                },
+                {
+                    AlbedoName = 'xsl0309_lod1_albedo.dds',
+                    LODCutoff = 215,
+                    LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
+                    ShaderName = 'Seraphim',
+                    SpecularName = 'xsl0309_lod1_specteam.dds',
+                },
+            },
+        },
+        MovementEffects = {
+            Land = {
+                Effects = {
+                    {
+                        Bones = {
+                            'XSL0309',
+                        },
+                        Offset = {
+                            0,
+                            -0.4,
+                            0,
+                        },
+                        Scale = 0.85,
+                        Type = 'SeraphimGroundFX01',
+                    },
+                    {
+                        Bones = {
+                            'XSL0309',
+                        },
+                        Offset = {
+                            0,
+                            -0.2,
+                            0,
+                        },
+                        Scale = 0.7,
+                        Type = 'GroundKickup01',
+                    },
+                },
+            },
+            Water = {
+                Effects = {
+                    {
+                        Bones = {
+                            'XSL0309',
+                        },
+                        Offset = {
+                            0,
+                            -0.4,
+                            0,
+                        },
+                        Scale = 0.85,
+                        Type = 'SeraphimGroundFX01',
+                    },
+                    {
+                        Bones = {
+                            'XSL0309',
+                        },
+                        Scale = 0.6,
+                        Type = 'BackWake',
+                    },
+                },
+            },
+        },
+        SpawnRandomRotation = false,
+        UniformScale = 0.07,
+    },
+    Economy = {
+        BuildCostEnergy = 3150,
+        BuildCostMass = 490,
+        BuildRate = 20,
+        BuildTime = 2100,
+        BuildableCategory = {
+            'BUILTBYTIER3ENGINEER SERAPHIM',
+        },
+        NeedToFaceTargetToBuild = true,
+        StorageEnergy = 0,
+        StorageMass = 40,
+        TeleportEnergyMod = 0.15,
+        TeleportMassMod = 1,
+        TeleportTimeMod = 0.01,
+    },
+    General = {
+        BuildBones = {
+            AimBone = 'Turret_Muzzle2',
+            BuildEffectBones = {
+                'Turret_Muzzle',
+                'Turret_Muzzle1',
+                'Turret_Muzzle2',
+            },
+            PitchBone = 'Arm_Pitch',
+            YawBone = 'Arm_Yaw',
+        },
+        BuildBonesAlt1 = {
+            AimBone = 'Turret_Muzzle1',
+            PitchBone = 'Arm_Pitch1',
+            YawBone = 'Arm_Yaw1',
+        },
+        Category = 'Construction',
+        Classification = 'RULEUC_Engineer',
+        CommandCaps = {
+            RULEUCC_Attack = false,
+            RULEUCC_CallTransport = true,
+            RULEUCC_Capture = true,
+            RULEUCC_Guard = true,
+            RULEUCC_Move = true,
+            RULEUCC_Nuke = false,
+            RULEUCC_Patrol = true,
+            RULEUCC_Pause = true,
+            RULEUCC_Reclaim = true,
+            RULEUCC_Repair = true,
+            RULEUCC_RetaliateToggle = false,
+            RULEUCC_Stop = true,
+            RULEUCC_Transport = false,
+        },
+        ConstructionBar = true,
+        FactionName = 'Seraphim',
+        Icon = 'amph',
+        SelectionPriority = 3,
+        TechLevel = 'RULEUTL_Secret',
+        UnitName = '<LOC xsl0309_name>Iyathuum',
+        UnitWeight = 1,
+    },
+    Intel = {
+        VisionRadius = 26,
+    },
+    Interface = {
+        HelpText = '<LOC xsl0309_help>Engineer',
+    },
+    LifeBarHeight = 0.075,
+    LifeBarOffset = 0.6,
+    LifeBarSize = 1,
+    Physics = {
+        BackUpDistance = 4,
+        BankingSlope = 0.5,
+        BuildOnLayerCaps = {
+            LAYER_Air = false,
+            LAYER_Land = true,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
+        DragCoefficient = 0.2,
+        Elevation = 0.5,
+        MaxAcceleration = 1.9,
+        MaxBrake = 1.9,
+        MaxSpeed = 1.9,
+        MaxSpeedReverse = 0,
+        MaxSteerForce = 1000,
+        MeshExtentsX = 1.1,
+        MeshExtentsY = 0.65,
+        MeshExtentsZ = 1.1,
+        MinSpeedPercent = 0,
+        MotionType = 'RULEUMT_Hover',
+        RotateBodyWhileMoving = true,
+        RotateOnSpot = true,
+        RotateOnSpotThreshold = 0.1,
+        TurnFacingRate = 120,
+        TurnRadius = 0,
+        TurnRate = 120,
+        WobbleFactor = 0.015,
+        WobbleSpeed = 0.005,
+    },
+    SelectionCenterOffsetY = -0.5,
+    SelectionSizeX = 0.5,
+    SelectionSizeZ = 0.6,
+    SelectionThickness = 0.65,
+    SizeX = 0.9,
+    SizeY = 0.7,
+    SizeZ = 0.9,
+    StrategicIconName = 'icon_land3_engineer',
+    StrategicIconSortPriority = 85,
+    Transport = {
+        TransportClass = 3,
+    },
+    Wreckage = {
+        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+        EnergyMult = 0,
+        HealthMult = 0.9,
+        MassMult = 0.9,
+        ReclaimTimeMultiplier = 1,
+        WreckageLayers = {
+            Air = false,
+            Land = true,
+            Seabed = false,
+            Sub = false,
+            Water = false,
+        },
+    },
+}

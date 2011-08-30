@@ -1,0 +1,373 @@
+UnitBlueprint {
+    Merge = true,
+    BlueprintId="uas0203", 
+    AI = {
+        GuardReturnRadius = 130,
+    },
+    Audio = {
+        AmbientMove = Sound {
+            Bank = 'UAS',
+            Cue = 'UAS0203_Move_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        AmbientMoveSub = Sound {
+            Bank = 'UAS',
+            Cue = 'UAS0203_Move_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        Killed = Sound {
+            Bank = 'UASDestroy',
+            Cue = 'UAS0203_Destroy',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        StartMove = Sound {
+            Bank = 'UAS',
+            Cue = 'UAS0203_Move_Start',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        StartMoveSub = Sound {
+            Bank = 'UAS',
+            Cue = 'UAS0203_Move_Start',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        StopMove = Sound {
+            Bank = 'UAS',
+            Cue = 'UAS0203_Move_Stop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        StopMoveSub = Sound {
+            Bank = 'UAS',
+            Cue = 'UAS0203_Move_Stop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        SubmergeStart = Sound {
+            Bank = 'UAS',
+            Cue = 'UAS_Sub_Submerge',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        SurfaceStart = Sound {
+            Bank = 'UAS',
+            Cue = 'UAS_Sub_Surface',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        UISelection = Sound {
+            Bank = 'Interface',
+            Cue = 'Aeon_Select_Sub',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+    },
+    Buffs = {
+        Regen = {
+            Level1 = 1,
+            Level2 = 2,
+            Level3 = 3,
+            Level4 = 4,
+            Level5 = 5,
+        },
+    },
+    BuildIconSortPriority = 30,
+    Categories = {
+        'PRODUCTSC1',
+        'SELECTABLE',
+        'BUILTBYTIER1FACTORY',
+        'BUILTBYTIER2FACTORY',
+        'BUILTBYTIER3FACTORY',
+        'BUILTBYEXPERIMENTALSUB',
+        'AEON',
+        'MOBILE',
+        'NAVAL',
+        'TECH1',
+        'ANTINAVY',
+        'SUBMERSIBLE',
+        'VISIBLETORECON',
+        'RECLAIMABLE',
+        'T1SUBMARINE',
+        'OVERLAYSONAR',
+        'OVERLAYANTINAVY',
+    },
+    CollisionOffsetX = 0.05,
+    CollisionOffsetY = -0.25,
+    CollisionOffsetZ = -0.01,
+    Defense = {
+        AirThreatLevel = 0,
+        ArmorType = 'Normal',
+        EconomyThreatLevel = 0,
+        Health = 550,
+        MaxHealth = 550,
+        RegenRate = 0,
+        SubThreatLevel = 3,
+        SurfaceThreatLevel = 0,
+    },
+    Description = '<LOC uas0203_desc>Attack Submarine',
+    Display = {
+        Abilities = {
+            '<LOC ability_sonar>Sonar',
+            '<LOC ability_submersible>Submersible',
+            '<LOC ability_torpedo>Torpedoes',
+        },
+        IdleEffects = {
+            Sub = {
+                Effects = {
+                    {
+                        Bones = {
+                            'Exhaust_01',
+                            'Exhaust_02',
+                            'UAS0203',
+                        },
+                        Type = 'UnderWater01',
+                    },
+                },
+            },
+            Water = {
+                Effects = {
+                    {
+                        Bones = {
+                            'UAS0203',
+                        },
+                        Scale = 0.5,
+                        Type = 'SeaIdle01',
+                    },
+                },
+            },
+        },
+        Mesh = {
+            IconFadeInZoom = 130,
+            LODs = {
+                {
+                    LODCutoff = 100,
+                    ShaderName = 'Aeon',
+                },
+                {
+                    AlbedoName = 'uas0203_lod1_albedo.dds',
+                    LODCutoff = 215,
+                    ShaderName = 'Aeon',
+                    SpecularName = 'uas0203_lod1_specteam.dds',
+                },
+            },
+        },
+        MotionChangeEffects = {
+            SubBottomUp = {
+                Effects = {
+                    {
+                        Bones = {
+                            'UAS0203',
+                        },
+                        Type = 'Surface01',
+                    },
+                },
+            },
+            WaterTopDown = {
+                Effects = {
+                    {
+                        Bones = {
+                            'UAS0203',
+                        },
+                        Type = 'Submerge01',
+                    },
+                },
+            },
+        },
+        MovementEffects = {
+            Sub = {
+                Effects = {
+                    {
+                        Bones = {
+                            'Exhaust_01',
+                            'Exhaust_02',
+                        },
+                        Scale = 1.5,
+                        Type = 'BackWake',
+                    },
+                },
+            },
+            Water = {
+                Effects = {
+                    {
+                        Bones = {
+                            'muzzle_01',
+                        },
+                        Scale = 0.4,
+                        Type = 'LeftFrontWake',
+                    },
+                    {
+                        Bones = {
+                            'Muzzle_02',
+                        },
+                        Scale = 0.4,
+                        Type = 'RightFrontWake',
+                    },
+                    {
+                        Bones = {
+                            'UAS0203',
+                        },
+                        Offset = {
+                            0,
+                            0,
+                            -0.5,
+                        },
+                        Scale = 0.4,
+                        Type = 'BackWake',
+                    },
+                },
+            },
+        },
+        PlaceholderMeshName = 'UXS0001',
+        SpawnRandomRotation = true,
+        UniformScale = 0.06,
+    },
+    Economy = {
+        BuildCostEnergy = 2880,
+        BuildCostMass = 360,
+        BuildTime = 1440,
+    },
+    Footprint = {
+        SizeX = 2,
+        SizeY = 0.5,
+        SizeZ = 3,
+    },
+    General = {
+        Category = 'Submarine',
+        Classification = 'RULEUC_MilitaryShip',
+        CommandCaps = {
+            RULEUCC_Attack = true,
+            RULEUCC_CallTransport = false,
+            RULEUCC_Capture = false,
+            RULEUCC_Dive = true,
+            RULEUCC_Guard = true,
+            RULEUCC_Move = true,
+            RULEUCC_Nuke = false,
+            RULEUCC_Patrol = true,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
+            RULEUCC_RetaliateToggle = true,
+            RULEUCC_Stop = true,
+            RULEUCC_Transport = false,
+        },
+        FactionName = 'Aeon',
+        Icon = 'sea',
+        TechLevel = 'RULEUTL_Basic',
+        UnitName = '<LOC uas0203_name>Sylph',
+        UnitWeight = 1,
+    },
+    Intel = {
+        SonarRadius = 60,
+        VisionRadius = 32,
+        WaterVisionRadius = 32,
+    },
+    Interface = {
+        HelpText = '<LOC uas0203_help>Attack Submarine',
+    },
+    LifeBarHeight = 0.075,
+    LifeBarOffset = 0.8,
+    LifeBarSize = 0.75,
+    Physics = {
+        BackUpDistance = 5,
+        BankingSlope = 0,
+        BuildOnLayerCaps = {
+            LAYER_Air = false,
+            LAYER_Land = false,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = true,
+            LAYER_Water = false,
+        },
+        CatchUpAcc = 10,
+        DragCoefficient = 0.2,
+        Elevation = -1.5,
+        MaxAcceleration = 6,
+        MaxBrake = 6,
+        MaxSpeed = 6,
+        MaxSpeedReverse = 6,
+        MaxSteerForce = 5,
+        MeshExtentsX = 0.6,
+        MeshExtentsY = 0.65,
+        MeshExtentsZ = 2.5,
+        MinSpeedPercent = 0,
+        MotionType = 'RULEUMT_SurfacingSub',
+        TurnRadius = 5,
+        TurnRate = 80,
+    },
+    SelectionSizeX = 0.35,
+    SelectionSizeZ = 1.5,
+    SelectionThickness = 0.25,
+    SizeX = 0.35,
+    SizeY = 0.5,
+    SizeZ = 1.85,
+    StrategicIconName = 'icon_sub1_antinavy',
+    StrategicIconSortPriority = 165,
+    Veteran = {
+        Level1 = 4,
+        Level2 = 8,
+        Level3 = 12,
+        Level4 = 16,
+        Level5 = 20,
+    },
+    Weapon = {
+        {
+            Audio = {
+                Fire = Sound {
+                    Bank = 'UASWeapon',
+                    Cue = 'UAS0203_Torpedo',
+                    LodCutoff = 'Weapon_LodCutoff',
+                },
+            },
+            BallisticArc = 'RULEUBA_None',
+            CollideFriendly = false,
+            Damage = 75,
+            DamageType = 'Normal',
+            DisplayName = 'Chrono Torpedo',
+            FireTargetLayerCapsTable = {
+                Sub = 'Seabed|Sub|Water',
+                Water = 'Seabed|Sub|Water',
+            },
+            FiringTolerance = 2,
+            Label = 'Torpedo01',
+            MaxRadius = 32,
+            MuzzleSalvoDelay = 0.8,
+            MuzzleSalvoSize = 2,
+            MuzzleVelocity = 5,
+            ProjectileId = '/projectiles/AANTorpedo01/AANTorpedo01_proj.bp',
+            ProjectileLifetime = 7,
+            ProjectilesPerOnFire = 2,
+            RackBones = {
+                {
+                    MuzzleBones = {
+                        'muzzle_01',
+                        'Muzzle_02',
+                    },
+                    RackBone = 'muzzle_01',
+                },
+            },
+            RackFireTogether = false,
+            RackRecoilDistance = 0,
+            RackReloadTimeout = 10,
+            RackSalvoChargeTime = 0,
+            RackSalvoReloadTime = 0,
+            RackSalvoSize = 1,
+            RackSlavedToTurret = false,
+            RangeCategory = 'UWRC_AntiNavy',
+            RateOfFire = 0.25,
+            SlavedToBody = true,
+            SlavedToBodyArcRange = 10,
+            TargetCheckInterval = 2,
+            TargetPriorities = {
+                'SPECIALHIGHPRI',
+                'MOBILE',
+                'STRUCTURE DEFENSE',
+                'SPECIALLOWPRI',
+                'ALLUNITS',
+            },
+            TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
+            TrackingRadius = 1.15,
+            TurretDualManipulators = false,
+            TurretPitch = 0,
+            TurretPitchRange = 0,
+            TurretPitchSpeed = 0,
+            TurretYaw = 0,
+            TurretYawRange = 0,
+            TurretYawSpeed = 0,
+            Turreted = false,
+            WeaponCategory = 'Anti Navy',
+        },
+    },
+}
