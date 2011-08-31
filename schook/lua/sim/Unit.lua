@@ -586,30 +586,17 @@ Unit = Class(moho.unit_methods) {
                 SetIgnoreArmyUnitCap(captorArmyIndex, true)
             end
             
-            #bugfix when capturing an enemy it should retain its data
-            local newUnits = import('/lua/SimUtils.lua').TransferUnitsOwnership( {self}, captorArmyIndex)
-           
+            local newUnit = ChangeUnitArmy(self, captorArmyIndex)
+            
             if ScenarioInfo.CampaignMode and not captorBrain.IgnoreArmyCaps then
                 SetIgnoreArmyUnitCap(captorArmyIndex, false)
             end
-
-            # the unit transfer function returns a table of units. since we transfered 1 unit the table contains 1
-            # unit (the new unit).
-            if table.getn(newUnits) != 1 then
-                return
-            end
-            local newUnit
-            for k, unit in newUnits do
-                newUnit = unit
-                break
-            end
             
-            # no need for this anymore
-            #if unitEnh then
-            #    for k,v in unitEnh do
-            #        newUnit:CreateEnhancement(v)
-            #    end
-            #end
+            if unitEnh then
+                for k,v in unitEnh do
+                    newUnit:CreateEnhancement(v)
+                end
+            end
             # Because the old unit is lost we cannot call a member function for newUnit callbacks
             for k,cb in newUnitCallbacks do
                 if cb then
@@ -1073,18 +1060,28 @@ Unit = Class(moho.unit_methods) {
     #
     # Create a unit's wrecked mesh blueprint from its regular mesh blueprint, by changing the shader and albedo
     #
-    CreateWreckage = function( self, overkillRatio )
+    #CreateWreckage = function( self, overkillRatio )
 		# if overkill ratio is high, the wreck is vaporized! No wreackage for you!
-		if overkillRatio then
-			if overkillRatio > 1.0 then
-				return
-			end
-		end
+		#if overkillRatio then
+		#	if overkillRatio > 1.0 then
+		#		return
+		#	end
+		#end
 
 		# generate wreakage in place of the dead unit
-        if self:GetBlueprint().Wreckage.WreckageLayers[self:GetCurrentLayer()] then
-			self:CreateWreckageProp(overkillRatio)
-        end
+        #if self:GetBlueprint().Wreckage.WreckageLayers[self:GetCurrentLayer()] then
+		#	self:CreateWreckageProp(overkillRatio)
+        #end
+    #end,
+	
+	CreateWreckage = function (self, overkillRatio)
+		if overkillRatio and overkillRatio > 1.0 then
+			return
+		end
+
+		if self:GetBlueprint().Wreckage.WreckageLayers[self:GetCurrentLayer()] then
+			return self:CreateWreckageProp(overkillRatio)
+		end
     end,
 
     CreateWreckageProp = function( self, overkillRatio )
@@ -1677,9 +1674,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
-		if order == 'Repair' and unitBeingBuilt.WorkItem != self.WorkItem then
-			self:InheritWork(unitBeingBuilt)
-		end
         local bp = self:GetBlueprint()
         if order != 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
             self:StartBuildingEffects(unitBeingBuilt, order)

@@ -1008,4 +1008,5 @@ UnitBlueprint {
             WeaponUnpacks = true,
         },
     },
+	WatchBone = 1
 }
