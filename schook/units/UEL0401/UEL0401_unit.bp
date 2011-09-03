@@ -19,6 +19,12 @@ UnitBlueprint {
             'Turret_Right02',
             'UEL0401',
         },
+		AddTargetBones = {
+            'Turret_Left01_Barrel02',  # added to make unit targetable even when almost submerged [141]
+            'Turret_Left02_Barrel02',
+            'Turret_Right02_Barrel02',
+            'Turret_Right02_Barrel02',
+        },
     },
     Audio = {
         AmbientMoveLand = Sound {

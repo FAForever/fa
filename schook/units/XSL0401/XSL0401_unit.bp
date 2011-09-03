@@ -318,6 +318,7 @@ UnitBlueprint {
             MuzzleVelocity = 8,
             NotExclusive = true,
             ProjectileId = '/projectiles/SDFExperimentalPhasonProj01/SDFExperimentalPhasonProj01_proj.bp',
+			ProjectileLifetime = 5.52, # needs a projectile lifetime for same reason Megalith needs one [126]
             RackBones = {
                 {
                     MuzzleBones = {
@@ -483,6 +484,7 @@ UnitBlueprint {
             NotExclusive = true,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/SDFSinnuntheWeapon01/SDFSinnuntheWeapon01_proj.bp',
+			ProjectileLifetime = 1.0,
             RackBones = {
                 {
                     MuzzleBones = {

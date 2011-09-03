@@ -256,7 +256,7 @@ UnitBlueprint {
                 Land = 'Air|Land|Seabed|Water',
                 Water = 'Air|Land|Seabed|Water',
             },
-            FiringTolerance = 2,
+            FiringTolerance = 6,
             Label = 'Suicide',
             MaxRadius = 25,
             MuzzleSalvoDelay = 0,

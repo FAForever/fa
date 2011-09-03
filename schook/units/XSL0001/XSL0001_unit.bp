@@ -70,7 +70,7 @@ UnitBlueprint {
         },
         Killed = Sound {
             Bank = 'Impacts',
-            Cue = 'XSB2305_impact',
+            Cue = 'XSB2305_Impact', # fix for ACU killed sound missing [144]
             LodCutoff = 'UnitMove_LodCutoff',
         },
         ReclaimLoop = Sound {
@@ -80,7 +80,7 @@ UnitBlueprint {
         },
         StartCapture = Sound {
             Bank = 'XSL',
-            Cue = 'XSL0001_Capture_Start',
+            Cue = 'XSL0105_Capture_Start', # fix for ACU missing capture sound [144]
             LodCutoff = 'UnitMove_LodCutoff',
         },
         StartMove = Sound {
@@ -112,6 +112,10 @@ UnitBlueprint {
             Level4 = 12,
             Level5 = 15,
         },
+    },
+	BuffFields = {
+        RegenField = 'SeraphimACURegenBuffField',
+        AdvancedRegenField = 'SeraphimAdvancedACURegenBuffField',
     },
     Categories = {
         'PRODUCTFA',
@@ -273,7 +277,7 @@ UnitBlueprint {
         BuildCostEnergy = 5000000,
         BuildCostMass = 18000,
         BuildRate = 10,
-        BuildTime = 60000,
+        BuildTime = 6000000,  #was 60000
         BuildableCategory = {
             'BUILTBYCOMMANDER SERAPHIM',
             'BUILTBYTIER2COMMANDER SERAPHIM',
@@ -670,8 +674,8 @@ UnitBlueprint {
             Icon = 'ees',
             Name = '<LOC enhancements_0018>Tech 3 Engineering Suite',
             NewBuildRate = 90,
-            NewHealth = 4000,
-            NewRegenRate = 15,
+            NewHealth = 7000,
+            NewRegenRate = 35,
             Prerequisite = 'AdvancedEngineering',
             ShowBones = {
                 'Left_Upgrade',

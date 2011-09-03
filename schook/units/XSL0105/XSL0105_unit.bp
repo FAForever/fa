@@ -107,7 +107,7 @@ UnitBlueprint {
             '<LOC ability_hover>Hover',
             '<LOC ability_engineeringsuite>Engineering Suite',
         },
-        AnimationBuild = '/units/ual0105/ual0105_aopen01.sca',
+        #AnimationBuild = '/units/ual0105/ual0105_aopen01.sca',
         IdleEffects = {
             Land = {
                 Effects = {
@@ -225,7 +225,7 @@ UnitBlueprint {
         BuildableCategory = {
             'BUILTBYTIER1ENGINEER SERAPHIM',
         },
-        NeedToFaceTargetToBuild = true,
+        NeedToFaceTargetToBuild = false,  ###changed to make it build faster
         StorageEnergy = 0,
         StorageMass = 10,
         TeleportEnergyMod = 0.15,

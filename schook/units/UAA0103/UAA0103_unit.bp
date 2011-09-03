@@ -286,7 +286,7 @@ UnitBlueprint {
                     Duration = 1.5,
                     Radius = 4,
                     TargetAllow = 'ALLUNITS',
-                    TargetDisallow = 'TECH3,EXPERIMENTAL,COMMAND',
+                    TargetDisallow = 'TECH3,EXPERIMENTAL,COMMAND,WALL',
                 },
             },
             CollideFriendly = false,
@@ -300,7 +300,8 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
             },
             FiringRandomness = 0,
-            FiringTolerance = 3,
+            FiringTolerance = 6,
+			FixBombTrajectory = true, # [152]
             Label = 'Bomb',
             MaxRadius = 40,
             MuzzleSalvoDelay = 0,
@@ -312,9 +313,9 @@ UnitBlueprint {
             RackBones = {
                 {
                     MuzzleBones = {
-                        'Right_Projectile',
+                        'UAA0103',  # [102]
                     },
-                    RackBone = 'Right_Projectile',
+                    RackBone = 'UAA0103',  # [102]
                 },
             },
             RackFireTogether = false,

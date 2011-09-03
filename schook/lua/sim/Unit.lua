@@ -1892,21 +1892,40 @@ Unit = Class(moho.unit_methods) {
         return watchPower    
     end,
 
-
+    #Old and removed, see below
     #Watch the economy.  If this unit doesn't get all it needs, shut off the intel.
+    #IntelWatchThread = function(self)
+    #    local bp = self:GetBlueprint()
+    #    while self:ShouldWatchIntel() do
+    #        WaitSeconds(0.5)
+    #        local fraction = self:GetResourceConsumed()
+    #        while fraction == 1 do
+    #            WaitSeconds(0.5)
+    #            fraction = self:GetResourceConsumed()
+    #        end
+    #        self:DisableUnitIntel(nil)
+    #        local recharge = bp.Intel.ReactivateTime or 10
+    #        WaitSeconds(recharge)
+    #        self:EnableUnitIntel(nil)
+    #    end
+    #    if self.IntelThread then 
+    #        self.IntelThread = nil
+    #    end
+    #end,
+	
+	#FIX BY GOWERLY - Intel should only care about energy, let's not die if we run out of mass while upgrading, ok? 
+    # Brute51: This is bug fix [158] and was present since v1. I've enhanced the Gowerlys code for v4
     IntelWatchThread = function(self)
+        local aiBrain = self:GetAIBrain() 
         local bp = self:GetBlueprint()
+        local recharge = bp.Intel.ReactivateTime or 10
         while self:ShouldWatchIntel() do
             WaitSeconds(0.5)
-            local fraction = self:GetResourceConsumed()
-            while fraction == 1 do
-                WaitSeconds(0.5)
-                fraction = self:GetResourceConsumed()
-            end
-            self:DisableUnitIntel(nil)
-            local recharge = bp.Intel.ReactivateTime or 10
-            WaitSeconds(recharge)
-            self:EnableUnitIntel(nil)
+            if aiBrain:GetEconomyStored( 'ENERGY' ) < 1 then  # checking for less than 1 cause sometimes there's more
+                self:DisableUnitIntel(nil)                    # than 0 and less than 1 in stock and that last bit of
+                WaitSeconds(recharge)                         # energy isn't used. This results in the radar being
+                self:EnableUnitIntel(nil)                     # on even though there's no energy to run it. Shields
+            end                                               # have a similar bug with a similar fix.
         end
         if self.IntelThread then 
             self.IntelThread = nil

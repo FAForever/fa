@@ -20,6 +20,8 @@ local EffectUtil = import('/lua/EffectUtilities.lua')
 local SIFLaanseTacticalMissileLauncher = SWeapons.SIFLaanseTacticalMissileLauncher
 local AIUtils = import('/lua/ai/aiutilities.lua')
 
+local SeraphimBuffField = SWeapons.SeraphimBuffField
+
 # Setup as RemoteViewing child unit rather than SWalkingLandUnit
 local RemoteViewing = import('/lua/RemoteViewing.lua').RemoteViewing
 SWalkingLandUnit = RemoteViewing( SWalkingLandUnit ) 
@@ -27,6 +29,90 @@ SWalkingLandUnit = RemoteViewing( SWalkingLandUnit )
 XSL0001 = Class( SWalkingLandUnit ) {
     DeathThreadDestructionWaitTime = 2,
 
+    BuffFields = {
+
+        # this section is specific to the buff field functions in the CBFP.
+
+        RegenField = Class(SeraphimBuffField) {
+
+            OnCreate = function(self)
+                # adding the buff we'll use in this buff field
+                if not Buffs['SeraphimACURegenAura'] then
+                    local Owner = self:GetOwner()
+                    local bp = Owner:GetBlueprint().Enhancements['RegenAura']
+                    BuffBlueprint {
+                        Name = 'SeraphimACURegenAura',
+                        DisplayName = 'SeraphimACURegenAura',
+                        BuffType = 'COMMANDERAURA',
+                        Stacks = 'REPLACE',
+                        Duration = -1,
+                        Affects = {
+                            RegenPercent = {
+                                Add = 0,
+                                Mult = bp.RegenPerSecond or 0.1,
+                                Ceil = bp.RegenCeiling,
+                                Floor = bp.RegenFloor,
+                            },
+                        },
+                    }
+                end
+                SeraphimBuffField.OnCreate(self)
+            end,
+        },
+
+        AdvancedRegenField = Class(SeraphimBuffField) {
+
+            OnCreate = function(self)
+                # adding the buff we'll use in this buff field
+                if not Buffs['SeraphimAdvancedACURegenAura'] then
+                    local Owner = self:GetOwner()
+                    local bp = Owner:GetBlueprint().Enhancements['AdvancedRegenAura']
+                    BuffBlueprint {
+                        Name = 'SeraphimAdvancedACURegenAura',
+                        DisplayName = 'SeraphimAdvancedACURegenAura',
+                        BuffType = 'COMMANDERAURA',
+                        Stacks = 'REPLACE',
+                        Duration = -1,
+                        Affects = {
+                            RegenPercent = {
+                                Add = 0,
+                                Mult = bp.RegenPerSecond or 0.1,
+                                Ceil = bp.RegenCeiling,
+                                Floor = bp.RegenFloor,
+                            },
+                            MaxHealth = {
+                                Add = 0,
+                                Mult = bp.MaxHealthFactor or 1.0,
+                                DoNoFill = true,
+                            },                        
+                        },
+                    }
+                end
+                SeraphimBuffField.OnCreate(self)
+            end,
+
+            OnPreUnitEntersField = function(self, unit)
+                SeraphimBuffField.OnPreUnitEntersField(self, unit)
+                return (unit:GetHealth() / unit:GetMaxHealth())
+            end,
+
+            OnUnitEntersField = function(self, unit, OnPreUnitEntersFieldData)
+                SeraphimBuffField.OnUnitEntersField(self, unit, OnPreUnitEntersFieldData)
+                unit:SetHealth(unit, (OnPreUnitEntersFieldData * unit:GetMaxHealth()))
+            end,
+
+            OnPreUnitLeavesField = function(self, unit, OnPreUnitEntersFieldData, OnUnitEntersFieldData)
+                SeraphimBuffField.OnPreUnitLeavesField(self, unit, OnPreUnitEntersFieldData, OnUnitEntersFieldData)
+                return (unit:GetHealth() / unit:GetMaxHealth())
+            end,
+
+            OnUnitLeavesField = function(self, unit, OnPreUnitEntersFieldData, OnUnitEntersFieldData, OnPreUnitLeavesField)
+                SeraphimBuffField.OnUnitLeavesField(self, unit, OnPreUnitEntersFieldData, OnUnitEntersFieldData, OnPreUnitLeavesField)
+                unit:SetHealth(unit, (OnPreUnitLeavesField * unit:GetMaxHealth()))
+            end,
+        },
+    },
+	
     Weapons = {
         DeathWeapon = Class(SIFCommanderDeathWeapon) {},
         ChronotronCannon = Class(SDFChronotronCannonWeapon) {},
@@ -289,85 +375,22 @@ XSL0001 = Class( SWalkingLandUnit ) {
         
         # Regenerative Aura
         if enh == 'RegenAura' then
-            local bp = self:GetBlueprint().Enhancements[enh]
-            if not Buffs['SeraphimACURegenAura'] then
-                BuffBlueprint {
-                    Name = 'SeraphimACURegenAura',
-                    DisplayName = 'SeraphimACURegenAura',
-                    BuffType = 'COMMANDERAURA',
-                    Stacks = 'REPLACE',
-                    Duration = 5,
-                    Affects = {
-                        RegenPercent = {
-                            Add = 0,
-                            Mult = bp.RegenPerSecond or 0.1,
-                            Ceil = bp.RegenCeiling,
-                            Floor = bp.RegenFloor,
-                        },
-                    },
-                }
-                
-            end
-                
-            table.insert( self.ShieldEffectsBag, CreateAttachedEmitter( self, 'XSL0001', self:GetArmy(), '/effects/emitters/seraphim_regenerative_aura_01_emit.bp' ) )
-            self.RegenThreadHandle = self:ForkThread(self.RegenBuffThread)
+			SWalkingLandUnit.CreateEnhancement(self, enh) # moved from top to here else this happens twice for some other enhancements
+            self:GetBuffFieldByName('SeraphimACURegenBuffField'):Enable()
                         
         elseif enh == 'RegenAuraRemove' then
-            if self.ShieldEffectsBag then
-                for k, v in self.ShieldEffectsBag do
-                    v:Destroy()
-                end
-		        self.ShieldEffectsBag = {}
-		    end
-            KillThread(self.RegenThreadHandle)
+            SWalkingLandUnit.CreateEnhancement(self, enh) # moved from top to here else this happens twice for some other enhancements
+            self:GetBuffFieldByName('SeraphimACURegenBuffField'):Disable()
             
         elseif enh == 'AdvancedRegenAura' then
-            if self.RegenThreadHandle then
-                if self.ShieldEffectsBag then
-                    for k, v in self.ShieldEffectsBag do
-                        v:Destroy()
-                    end
-		            self.ShieldEffectsBag = {}
-		        end
-                KillThread(self.RegenThreadHandle)
-                
-            end
-            
-            local bp = self:GetBlueprint().Enhancements[enh]
-            if not Buffs['SeraphimAdvancedACURegenAura'] then
-                BuffBlueprint {
-                    Name = 'SeraphimAdvancedACURegenAura',
-                    DisplayName = 'SeraphimAdvancedACURegenAura',
-                    BuffType = 'COMMANDERAURA',
-                    Stacks = 'REPLACE',
-                    Duration = 5,
-                    Affects = {
-                        RegenPercent = {
-                            Add = 0,
-                            Mult = bp.RegenPerSecond or 0.1,
-                            Ceil = bp.RegenCeiling,
-                            Floor = bp.RegenFloor,
-                        },
-                        MaxHealth = {
-                            Add = 0,
-                            Mult = bp.MaxHealthFactor or 1.0,
-                            DoNoFill = true,
-                        },                        
-                    },
-                }
-            end
-            
-            table.insert( self.ShieldEffectsBag, CreateAttachedEmitter( self, 'XSL0001', self:GetArmy(), '/effects/emitters/seraphim_regenerative_aura_01_emit.bp' ) )
-            self.AdvancedRegenThreadHandle = self:ForkThread(self.AdvancedRegenBuffThread)
+            SWalkingLandUnit.CreateEnhancement(self, enh) # moved from top to here else this happens twice for some other enhancements
+            self:GetBuffFieldByName('SeraphimACURegenBuffField'):Disable()
+            self:GetBuffFieldByName('SeraphimAdvancedACURegenBuffField'):Enable()
             
         elseif enh == 'AdvancedRegenAuraRemove' then
-            if self.ShieldEffectsBag then
-                for k, v in self.ShieldEffectsBag do
-                    v:Destroy()
-                end
-		        self.ShieldEffectsBag = {}
-		    end
-            KillThread(self.AdvancedRegenThreadHandle)
+            SWalkingLandUnit.CreateEnhancement(self, enh) # moved from top to here else this happens twice for some other enhancements
+            self:GetBuffFieldByName('SeraphimAdvancedACURegenBuffField'):Disable()
+
             
         #Resource Allocation
         elseif enh == 'ResourceAllocation' then
@@ -547,9 +570,11 @@ XSL0001 = Class( SWalkingLandUnit ) {
             wep:AddDamageRadiusMod(bp.NewDamageRadius or 5)
             wep:AddDamageMod(bp.AdditionalDamage)
         elseif enh == 'BlastAttackRemove' then
+            SWalkingLandUnit.CreateEnhancement(self, enh) # moved from top to here else this happens twice for some other enhancements
             local wep = self:GetWeaponByLabel('ChronotronCannon')
-            wep:AddDamageRadiusMod(bp.NewDamageRadius or 5)
+            wep:AddDamageRadiusMod(-self:GetBlueprint().Enhancements['BlastAttack'].NewDamageRadius) # unlimited AOE bug fix by brute51 [117]
             wep:AddDamageMod(-self:GetBlueprint().Enhancements['BlastAttack'].AdditionalDamage)
+
         #Heat Sink Augmentation
         elseif enh == 'RateOfFire' then
             local wep = self:GetWeaponByLabel('ChronotronCannon')

@@ -285,7 +285,7 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
             },
             FiringRandomness = 3,
-            FiringTolerance = 3,
+            FiringTolerance = 6,
             Label = 'Bomb',
             MaxRadius = 40,
             MuzzleSalvoDelay = 0.2,

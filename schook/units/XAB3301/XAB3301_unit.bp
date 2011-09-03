@@ -44,7 +44,7 @@ UnitBlueprint {
         'INTELLIGENCE',
         'STRUCTURE',
         'TECH3',
-        'SIZE4',
+        'SIZE20',
         'OPTICS',
         'VISIBLETORECON',
         'RECLAIMABLE',

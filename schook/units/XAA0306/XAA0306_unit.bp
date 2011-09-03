@@ -292,7 +292,7 @@ UnitBlueprint {
                 Land = 'Seabed|Sub|Water',
             },
             FiringRandomness = 3,
-            FiringTolerance = 2,
+            FiringTolerance = 6,
             HeadingArcCenter = 0,
             HeadingArcRange = 30,
             Label = 'Bomb',

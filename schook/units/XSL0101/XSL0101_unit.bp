@@ -1,6 +1,7 @@
 UnitBlueprint {
     Merge = true,
     BlueprintId="xsl0101",
+	ResolvePath = true,
     Audio = {
         AmbientMove = Sound {
             Bank = 'XSL',
@@ -138,7 +139,7 @@ UnitBlueprint {
         },
         TransportDropAnimation = {
             {
-                Animation = '/units/XSL0101/XSL0101_aunfold.sca',
+                Animation = '[...]XSL0101_aunfold.sca', # /units/XSL0101/XSL0101_aunfold.sca   [146]
                 Weight = 100,
             },
         },

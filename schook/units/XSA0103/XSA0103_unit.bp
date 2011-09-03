@@ -295,7 +295,8 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
             },
             FiringRandomness = 0,
-            FiringTolerance = 3,
+            FiringTolerance = 6,
+			FixBombTrajectory = true,  # [152]
             Label = 'Bomb',
             MaxRadius = 40,
             MuzzleSalvoDelay = 0,
@@ -303,7 +304,7 @@ UnitBlueprint {
             MuzzleVelocity = 0,
             NeedToComputeBombDrop = true,
             ProjectileId = '/projectiles/SBOOtheTacticalBomb01/SBOOtheTacticalBomb01_proj.bp',
-            ProjectileLifetime = 3,
+            ProjectileLifetime = 30,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {

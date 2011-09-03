@@ -21,7 +21,7 @@ UnitBlueprint {
         MinAirspeed = 25,
         StartTurnDistance = 5,
         TightTurnMultiplier = 1.1,
-        TurnSpeed = 0.8,
+        TurnSpeed = 1,
         Winged = true,
     },
     Audio = {

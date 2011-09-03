@@ -227,7 +227,7 @@ UnitBlueprint {
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER SERAPHIM',
         },
-        NeedToFaceTargetToBuild = true,
+        NeedToFaceTargetToBuild = false,  ##like uef for faster building
         StorageEnergy = 0,
         StorageMass = 40,
         TeleportEnergyMod = 0.15,

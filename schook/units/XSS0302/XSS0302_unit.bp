@@ -28,7 +28,7 @@ UnitBlueprint {
         NukeCharge = Sound { # added for sound bug brute51
             Bank = 'XSB',
             Cue = 'XSB2305_Nuke_Charge',
-            LodCutoff = 'UnitMove_LodCutoff',
+            LodCutoff = 'UnitMove_LodCutoff'
         },                
         StartMove = Sound {
             Bank = 'XSS',

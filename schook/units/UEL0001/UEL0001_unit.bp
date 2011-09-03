@@ -288,7 +288,7 @@ UnitBlueprint {
         BuildCostEnergy = 5000000,
         BuildCostMass = 18000,
         BuildRate = 10,
-        BuildTime = 60000,
+        BuildTime = 6000000,  #was 60000
         BuildableCategory = {
             'BUILTBYCOMMANDER UEF',
             'BUILTBYTIER2COMMANDER UEF',
@@ -640,7 +640,7 @@ UnitBlueprint {
             Name = '<LOC enhancements_0053>Tech 3 Engineering Suite',
             NewBuildRate = 90,
             NewHealth = 6000,
-            NewRegenRate = 15,
+            NewRegenRate = 35, # fixes lower regen rate with t3 suite. this is t2 regen + t3 regen [130]
             Prerequisite = 'AdvancedEngineering',
             Slot = 'LCH',
             UpgradeEffectBones = {

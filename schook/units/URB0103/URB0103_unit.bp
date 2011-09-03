@@ -140,9 +140,7 @@ UnitBlueprint {
         InitialRallyX = 0,
         InitialRallyZ = 10,
         RebuildBonusIds = {
-            'urb0103',
-            'urb0203',
-            'urb0303',
+            'urb1103',       # [163]
         },
         StorageEnergy = 0,
         StorageMass = 80,
