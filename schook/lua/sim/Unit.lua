@@ -118,6 +118,62 @@ Unit = Class(moho.unit_methods) {
                 ProjectileDamaged = {},
                 SpecialToggleEnableFunction = false,
                 SpecialToggleDisableFunction = false,
+				
+                OnKilled = {},
+                OnUnitBuilt = {},
+                OnStartBuild = {},
+                OnReclaimed = {},
+                OnStartReclaim = {},
+                OnStopReclaim = {},
+                OnStopBeingBuilt = {},
+                OnHorizontalStartMove = {},
+                OnCaptured = {},
+                OnCapturedNewUnit = {},
+                OnDamaged = {},
+                OnStartCapture = {},
+                OnStopCapture = {},
+                OnFailedCapture = {},
+                OnStartBeingCaptured = {},
+                OnStopBeingCaptured = {},
+                OnFailedBeingCaptured = {},
+                OnFailedToBuild = {},
+                OnVeteran = {},
+                ProjectileDamaged = {},
+                SpecialToggleEnableFunction = false,
+                SpecialToggleDisableFunction = false,
+
+                # new eventcallbacks. returns only 'self' as argument unless otherwise noted
+                OnCreated = {},
+                OnTransportAttach = {},
+                OnTransportDetach = {},
+                OnShieldIsUp = {},
+                OnShieldIsDown = {},
+                OnShieldIsCharging = {},
+                OnPaused = {}, # pause button
+                OnUnpaused = {},
+                OnProductionPaused = {}, # production button for f.e. mass fab
+                OnProductionUnpaused = {},
+                OnHealthChanged = {}, # returns self, newHP, oldHP   
+                OnTMLAmmoIncrease = {}, # use AddOnMLammoIncreaseCallback function. uses 6 sec interval polling so not accurate
+                OnTMLaunched = {},
+                OnSMLAmmoIncrease = {}, # use AddOnMLammoIncreaseCallback function. uses 6 sec interval polling so not accurate
+                OnSMLaunched = {},
+                OnStartRefueling = {},
+                OnRunOutOfFuel = {},
+                OnGotFuel = {}, # fires when the meter isnt empty anymore.
+                OnCmdrUpgradeFinished = {}, # happens when a commander unit is upgraded. doesnt work for factories
+                OnCmdrUpgradeStart = {},
+                OnTeleportCharging = {}, # returns self, location
+                OnTeleported = {}, # returns self, location
+
+                # new in v3
+                OnTimedEvent = {}, # returns self, variable (can be antyhing, value is determined when adding event callback)
+                OnAttachedToTransport = {}, # returns self, transport unit
+                OnDetachedToTransport = {}, # returns self, transport unit
+
+                # new in v4
+                OnBeforeTransferingOwnership = {},
+                OnAfterTransferingOwnership = {},
         }
     end,
 
@@ -210,7 +266,16 @@ Unit = Class(moho.unit_methods) {
             AIUtils.ApplyCheatBuffs(self)
         end
         
-        self.Dead = false        
+        self.Dead = false      
+
+		###below here added for CBFP
+        local bp = self:GetBlueprint()
+        if bp.Transport and bp.Transport.DontUseForcedAttachPoints then
+            self:RemoveTransportForcedAttachPoints()
+        end
+        self:InitBuffFields()    # buff field initialization changed in v4   (read docs)
+        self:DisableRestrictedWeapons()    # added by brute51 [119]
+        self:OnCreated()		
     end,
 
 
@@ -397,6 +462,10 @@ Unit = Class(moho.unit_methods) {
     OnPaused = function(self)
         self:SetActiveConsumptionInactive()
         self:StopUnitAmbientSound( 'ConstructLoop' )
+		        # added by brute51
+        self:DoUnitCallbacks('OnPaused')
+		        # added by brute51
+        self:DoUnitCallbacks('OnUnpaused')
     end,
 
     OnUnpaused = function(self)
@@ -554,6 +623,7 @@ Unit = Class(moho.unit_methods) {
 
     OnCaptured = function(self, captor)
         if self and not self:IsDead() and captor and not captor:IsDead() and self:GetAIBrain() ~= captor:GetAIBrain() then
+
             if not self:IsCapturable() then
                 self:Kill()
                 return
@@ -585,18 +655,31 @@ Unit = Class(moho.unit_methods) {
                 captorBrain = captor:GetAIBrain()
                 SetIgnoreArmyUnitCap(captorArmyIndex, true)
             end
-            
-            local newUnit = ChangeUnitArmy(self, captorArmyIndex)
-            
+
+             # added by brute51 - bugfix when capturing an enemy it should retain its data [120]
+            local newUnits = import('/lua/SimUtils.lua').TransferUnitsOwnership( {self}, captorArmyIndex)
+           
             if ScenarioInfo.CampaignMode and not captorBrain.IgnoreArmyCaps then
                 SetIgnoreArmyUnitCap(captorArmyIndex, false)
             end
-            
-            if unitEnh then
-                for k,v in unitEnh do
-                    newUnit:CreateEnhancement(v)
-                end
+
+            # the unit transfer function returns a table of units. since we transfered 1 unit the table contains 1
+            # unit (the new unit).
+            if table.getn(newUnits) != 1 then
+                return
             end
+            local newUnit
+            for k, unit in newUnits do
+                newUnit = unit
+                break
+            end
+            
+            # no need for this anymore
+            #if unitEnh then
+            #    for k,v in unitEnh do
+            #        newUnit:CreateEnhancement(v)
+            #    end
+            #end
             # Because the old unit is lost we cannot call a member function for newUnit callbacks
             for k,cb in newUnitCallbacks do
                 if cb then
@@ -647,11 +730,15 @@ Unit = Class(moho.unit_methods) {
     OnProductionPaused = function(self)
         self:SetMaintenanceConsumptionInactive()
         self:SetProductionActive(false)
+		        # added by brute51
+        self:DoUnitCallbacks('OnProductionPaused')
     end,
 
     OnProductionUnpaused = function(self)
         self:SetMaintenanceConsumptionActive()
         self:SetProductionActive(true)
+		        # added by brute51
+        self:DoUnitCallbacks('OnProductionUnpaused')
     end,
 
     SetBuildTimeMultiplier = function(self, time_mult)
@@ -676,10 +763,19 @@ Unit = Class(moho.unit_methods) {
     #
     UpdateConsumptionValues = function(self)
         local myBlueprint = self:GetBlueprint()
+		
 
         local energy_rate = 0
         local mass_rate = 0
         local build_rate = 0
+		
+		        # added by brute51 - to make sure we use the proper consumption values. [132]
+        if self.ActiveConsumption then
+            local focus = self:GetFocusUnit()
+            if focus and self.WorkItem and self.WorkProgress < 1 and (focus:IsUnitState('Enhancing') or focus:IsUnitState('Building')) then
+                self.WorkItem = focus.WorkItem    # set our workitem to the focus unit work item, is specific for enhancing
+            end
+        end
 
         if self.ActiveConsumption then
             local focus = self:GetFocusUnit()
@@ -782,7 +878,7 @@ Unit = Class(moho.unit_methods) {
         local preAdjHealth = self:GetHealth()
         self:AdjustHealth(instigator, -amount)
         local health = self:GetHealth()
-        if( health <= 0 ) then
+        if( health < 1 ) then
             if( damageType == 'Reclaimed' ) then
                 self:Destroy()
             else
@@ -802,7 +898,7 @@ Unit = Class(moho.unit_methods) {
                 aiBrain:OnPlayCommanderUnderAttackVO()
             end
         end
-    end,
+	end,
 
     ManageDamageEffects = function(self, newHealth, oldHealth)
         #LOG('*DEBUG: ManageDamageEffects, New: ', repr(newHealth), ' Old: ', repr(oldHealth))
@@ -863,6 +959,8 @@ Unit = Class(moho.unit_methods) {
 
     OnHealthChanged = function(self, new, old)
         self:ManageDamageEffects(new, old)
+		        # added by brute51
+        self:DoOnHealthChangedCallbacks(self, new, old)
     end,
 
 
@@ -1498,6 +1596,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnStartBeingBuilt = function(self, builder, layer)
+	
         self:StartBeingBuiltEffects(builder, layer)
         local aiBrain = self:GetAIBrain()
         if table.getn(aiBrain.UnitBuiltTriggerList) > 0 then
@@ -1674,6 +1773,8 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
+	        # added by brute51 - to make sure we use the proper consumption values. [132]
+        self:UpdateConsumptionValues()
         local bp = self:GetBlueprint()
         if order != 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
             self:StartBuildingEffects(unitBeingBuilt, order)
@@ -1692,7 +1793,8 @@ Unit = Class(moho.unit_methods) {
             else
                 unitBeingBuilt:CreateTarmac(true, true, true, false, false)
             end
-        end           
+        end     
+        self.CurrentBuildOrder = order		
     end,
 
     OnStopBuild = function(self, unitBeingBuilt)
@@ -1701,6 +1803,16 @@ Unit = Class(moho.unit_methods) {
         self:DoOnUnitBuiltCallbacks(unitBeingBuilt)
         self:StopUnitAmbientSound('ConstructLoop')
         self:PlayUnitSound('ConstructStop')
+		if self.CurrentBuildOrder == 'MobileBuild' then  # prevents false positives by assisted enhancing
+            if self.OnStopBuildWasRun then
+                if unitBeingBuilt and not unitBeingBuilt:BeenDestroyed() then
+                    unitBeingBuilt:Destroy()  # [164]
+                end
+            else
+                self.OnStopBuildWasRun = true
+                self:ForkThread( function(self) WaitTicks(2) self.OnStopBuildWasRun = nil end )
+            end
+        end
     end,
 
     GetUnitBeingBuilt = function(self)
@@ -2683,15 +2795,21 @@ Unit = Class(moho.unit_methods) {
 
     OnStartRefueling = function(self)
         self:PlayUnitSound('Refueling')
+		        #added by brute51
+        self:DoUnitCallbacks('OnStartRefueling')
     end,
 
     OnRunOutOfFuel = function(self)
         self.HasFuel = false
         self:DestroyTopSpeedEffects()
+		        #added by brute51
+        self:DoUnitCallbacks('OnRunOutOfFuel')
     end,
 
     OnGotFuel = function(self)
         self.HasFuel = true
+		        #added by brute51
+        self:DoUnitCallbacks('OnGotFuel')
     end,
 
     GetWeaponClass = function(self, label)
@@ -2983,6 +3101,8 @@ Unit = Class(moho.unit_methods) {
 
     WorkingState = State {
         Main = function(self)
+		            #added by brute51
+            self:OnCmdrUpgradeStart()
             while self.WorkProgress < 1 and not self:IsDead() do
                 WaitSeconds(0.1)
             end
@@ -3001,6 +3121,8 @@ Unit = Class(moho.unit_methods) {
             self:StopUnitAmbientSound('EnhanceLoop')
             self:EnableDefaultToggleCaps()
             ChangeState(self, self.IdleState)
+			            #added by brute51
+            self:OnCmdrUpgradeFinished()
         end,
     },
 
@@ -3454,6 +3576,9 @@ Unit = Class(moho.unit_methods) {
         if not EntityCategoryContains(categories.PODSTAGINGPLATFORM, self) then
             self:RequestRefreshUI()
         end
+		        # added by brute51
+        unit:OnAttachedToTransport(self)
+        self:DoUnitCallbacks( 'OnTransportAttach', unit )
     end,
 
     OnTransportDetach = function(self, attachBone, unit)
@@ -3465,6 +3590,8 @@ Unit = Class(moho.unit_methods) {
             self:RequestRefreshUI()
         end
         unit:TransportAnimation(-1)
+		        unit:OnDetachedToTransport(self)
+        self:DoUnitCallbacks( 'OnTransportDetach', unit )
     end,
 
     OnStartTransportLoading = function(self)
@@ -3593,6 +3720,8 @@ Unit = Class(moho.unit_methods) {
     end,
 
     InitiateTeleportThread = function(self, teleporter, location, orientation)
+	        # added by brute51
+        self:OnTeleportCharging(location)
         local tbp = teleporter:GetBlueprint()
         local ubp = self:GetBlueprint()
         self.UnitBeingTeleported = self
@@ -3638,6 +3767,7 @@ Unit = Class(moho.unit_methods) {
         self:SetImmobile(false)
         self.UnitBeingTeleported = nil
         self.TeleportThread = nil
+		self:OnTeleported(location)
     end,
 
     PlayTeleportChargeEffects = function(self)
@@ -3723,6 +3853,276 @@ Unit = Class(moho.unit_methods) {
             end
         end
     end,
+	
+	
+	##Below this line is more stuff for CBFP
+	
+	OnCreated = function(self)   # new in v3
+        self:DoUnitCallbacks('OnCreated')
+    end,
+	
+	InitBuffFields = function(self)  # buff field stuff
+        # creates all buff fields
+        local bp = self:GetBlueprint()
+        if self.BuffFields and bp.BuffFields then
+            for scriptName, field in self.BuffFields do
+
+                # getting buff field blueprint
+                local BuffFieldBp = BuffFieldBlueprints[bp.BuffFields[scriptName]]
+
+                if not BuffFieldBp or type(BuffFieldBp) != 'table' then
+                    WARN('BuffField: no blueprint data for buff field '..repr(scriptName))
+                    continue
+                end
+
+                # we need a different buff field instance for each unit. this takes care of that.
+                if not self.MyBuffFields then
+                    self.MyBuffFields = {}
+                end
+                self.MyBuffFields[scriptName] = self:CreateBuffField(scriptName, BuffFieldBp)
+
+            end
+        end
+    end,
+	
+	CreateBuffField = function(self, name, buffFieldBP)  # buff field stuff
+        local spec = {
+            Name = buffFieldBP.Name,
+            Owner = self,
+        }
+        return ( self.BuffFields[name](spec) )
+    end,
+	
+	    # removes engine forced attachment bones for transports
+    RemoveTransportForcedAttachPoints = function(self)
+        # this cancels the weird attachment bone manipulations, so transported units attach to the correct positions
+        # (probably only useful for custom transport units only). By brute51, this is not a bug fix.
+        local nBones = self:GetBoneCount() - 1
+        for k = 1, nBones do
+            if string.find(self:GetBoneName(k), 'Attachpoint_') then
+                self:EnableManipulators(k, false)
+            end
+        end
+    end,
+	
+	    # buff field function
+    GetBuffFieldByName = function(self, name)
+        if self.BuffFields and self.MyBuffFields then
+            for k, field in self.MyBuffFields do
+                local fieldBP = field:GetBlueprint()
+                if fieldBP.Name == name then
+                    return field
+                end
+            end
+        end
+    end,
+	
+	
+    # disables some weapons as defined in the unit restriction list, if unit restrictions enabled ofcrouse. [119]
+    # why not do this using a blueprint mod? removing the weapon in the blueprint would break compatibility with other
+    # mods that might change nuke weapons. So I'm just disabling it and removing the icons, the next best thing.
+    DisableRestrictedWeapons = function(self)
+        local noNukes = Game.NukesRestricted()
+        local noTacMsl = Game.TacticalMissilesRestricted()
+        for i = 1, self:GetWeaponCount() do
+            local wep = self:GetWeapon(i)
+            local bp = wep:GetBlueprint()
+            if bp.CountedProjectile then
+                if noNukes and bp.NukeWeapon then
+                    wep:SetWeaponEnabled(false)
+                    self:RemoveCommandCap('RULEUCC_Nuke')
+                    self:RemoveCommandCap('RULEUCC_SiloBuildNuke')
+                elseif noTacMsl then
+                    wep:SetWeaponEnabled(false)
+                    # todo: this may not be sufficient for all units, ACUs with a tactical missile enhancements may by-pass this
+                    self:RemoveCommandCap('RULEUCC_Tactical')
+                    self:RemoveCommandCap('RULEUCC_SiloBuildTactical')
+                end
+            end
+        end
+
+    end,
+	
+	OnTimedEvent = function(self, interval, passData)
+        self:DoOnTimedEventCallbacks(interval, passData)
+    end,
+
+    OnBeforeTransferingOwnership = function(self, ToArmy)
+        self:DoUnitCallbacks('OnBeforeTransferingOwnership')
+    end,
+
+    OnAfterTransferingOwnership = function(self, FromArmy)
+        self:DoUnitCallbacks('OnAfterTransferingOwnership')
+    end,
+	
+	
+	
+	OnCountedMissileLaunch = function(self, missileType)
+        # is called in defaultweapons.lua when a counted missile (tactical, nuke) is launched
+        if missileType == 'nuke' then
+            self:OnSMLaunched()
+        else
+            self:OnTMLaunched()
+        end
+    end,
+	
+	
+	OnTMLaunched = function(self)
+        self:DoUnitCallbacks('OnTMLaunched')
+    end,
+
+    OnSMLaunched = function(self)
+        self:DoUnitCallbacks('OnSMLaunched')
+    end,
+
+	    CheckCountedMissileAmmoIncrease = function(self)  # be sure to fork this
+        # polls the ammo count every 6 secs 
+        local nukeCount = self:GetNukeSiloAmmoCount() or 0
+        local lastTimeNukeCount = nukeCount
+        local tacticalCount = self:GetTacticalSiloAmmoCount() or 0
+        local lastTimeTacticalCount = tacticalCount
+        while not self:IsDead() do
+            nukeCount = self:GetNukeSiloAmmoCount() or 0
+            tacticalCount = self:GetTacticalSiloAmmoCount() or 0
+
+            if nukeCount > lastTimeNukeCount then
+                self:OnSMLAmmoIncrease()
+            end
+            if tacticalCount > lastTimeTacticalCount then
+                self:OnTMLAmmoIncrease()
+            end
+
+            lastTimeNukeCount = nukeCount 
+            lastTimeTacticalCount = tacticalCount 
+            WaitSeconds(6)
+        end
+    end,
+
+    OnTMLAmmoIncrease = function(self)
+        self:DoUnitCallbacks('OnTMLAmmoIncrease')
+    end,
+
+    OnSMLAmmoIncrease = function(self)
+        self:DoUnitCallbacks('OnSMLAmmoIncrease')
+    end,
+	
+	
+	
+	
+	
+    # use addunitcallback and dounitcallback for normal callback handling. these are special cases
+
+    DoOnHealthChangedCallbacks = function(self, newHP, oldHP) # use normal add callback function
+        local type = 'OnHealthChanged'
+        if ( self.EventCallbacks[type] ) then
+            for num,cb in self.EventCallbacks[type] do
+                if cb then
+                    cb( self, newHP, oldHP )
+                end
+            end
+        end
+    end,
+
+    AddOnMLammoIncreaseCallback = function(self, fn) # specialized cause this starts the ammo check thread
+        if not fn then
+            error('*ERROR: Tried to add a callback type - OnTMLAmmoIncrease with a nil function')
+            return
+        end
+        table.insert( self.EventCallbacks.OnTMLAmmoIncrease, fn )
+        if not self.MLAmmoCheckThread then
+            self.MLAmmoCheckThread = self:ForkThread(self.CheckCountedMissileAmmoIncrease)
+        end
+    end,
+
+    AddOnTimedEventCallback = function(self, fn, interval, passData) 
+        # specialized because this starts a timed even thread (interval = secs between events, passData can be
+        # anything, is passed to callback when event is fired)
+        if not fn then
+            error('*ERROR: Tried to add a callback type - OnTimedEvent with a nil function')
+            return
+        end
+        table.insert( self.EventCallbacks.OnTimedEvent, {fn = fn, interval = interval} )
+        self:ForkThread(self.TimedEventThread, interval, passData)
+    end,
+
+    DoOnTimedEventCallbacks = function(self, interval, passData)
+        local type = 'OnTimedEvent'
+        if ( self.EventCallbacks[type] ) then
+            for num,cb in self.EventCallbacks[type] do
+                if cb and cb['fn'] and cb['interval'] == interval then
+                    cb['fn']( self, passData )
+                end
+            end
+        end
+    end,
+
+	
+	
+	
+	    ##########################################################################################
+    ## SHIELDS
+    ##########################################################################################
+
+    # Added by brute51, fires shield events for units. The other shield events dont run at the correct times
+    # (to early)
+
+    OnShieldIsUp = function(self)
+        self:DoUnitCallbacks('OnShieldIsUp')
+    end,
+
+    OnShieldIsDown = function(self)
+        self:DoUnitCallbacks('OnShieldIsDown')
+    end,
+
+    OnShieldIsCharging = function(self)
+        self:DoUnitCallbacks('OnShieldIsCharging')
+    end,
+
+	
+	
+	
+	
+	OnAttachedToTransport = function(self, transport)
+        self:DoUnitCallbacks( 'OnAttachedToTransport', transport )
+    end,
+	
+	OnDetachedToTransport = function(self, transport)
+        self:DoUnitCallbacks( 'OnDetachedToTransport', transport )
+    end,
+
+	
+	OnTeleportCharging = function(self, location)
+        self:DoUnitCallbacks('OnTeleportCharging', location)
+    end,
+
+    OnTeleported = function(self, location)
+        self:DoUnitCallbacks('OnTeleported', self, location)
+    end,
+	
+	    #########################################################################################
+    ## COMMANDER ENHANCING
+    ##########################################################################################
+
+    # Events that happen when a commander unit (ACU or SCU) is enhanced with a new toy
+
+    OnCmdrUpgradeFinished = function(self)
+        self:DoUnitCallbacks('OnCmdrUpgradeFinished')
+    end,
+
+    OnCmdrUpgradeStart = function(self)
+        self:DoUnitCallbacks('OnCmdrUpgradeStart')
+    end,
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 }
 
