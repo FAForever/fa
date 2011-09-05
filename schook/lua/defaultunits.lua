@@ -828,27 +828,56 @@ MassCollectionUnit = Class(StructureUnit) {
     end,
     # band-aid on lack of multiple separate resource requests per unit...  
     # if mass econ is depleted, take all the mass generated and use it for the upgrade
+
+	###Old WatchUpgradeConsumption replaced with this on, enabling mex to not use resources when paused
     WatchUpgradeConsumption = function(self, massConsumption, massProduction)
-        while true do
-            local fraction = self:GetResourceConsumed()
-            # if we're not getting our full request of energy and mass met...
-            if fraction != 1 then
-               #check to see if our aiBrain has energy but no mass
-               local aiBrain = self:GetAIBrain()
-               if aiBrain then
-                   local massStored = aiBrain:GetEconomyStored( 'MASS' )
-                   if massStored <= 1 then
-                       self:SetConsumptionPerSecondMass(massConsumption - massProduction)
-                       self:SetProductionPerSecondMass(0)
-                   end
-               end  
-            elseif not self:IsPaused() then
-               self:SetConsumptionPerSecondMass(massConsumption)
-               self:SetProductionPerSecondMass(massProduction)
+
+        # Fix for weird mex behaviour when upgrading with depleted resource stock or while paused [100]
+        # Replaced Gowerly's fix with this which is very much inspired by his code. My code looks much better and 
+        # seems to work a little better aswell.
+        
+        local aiBrain = self:GetAIBrain()
+
+        local CalcEnergyFraction = function()
+            local fraction = 1
+            if aiBrain:GetEconomyStored( 'ENERGY' ) < self:GetConsumptionPerSecondEnergy() then
+                fraction = math.min( 1, aiBrain:GetEconomyIncome('ENERGY') / aiBrain:GetEconomyRequested('ENERGY') )
             end
-            WaitSeconds(0.2)
+            return fraction
         end
-    end,     
+
+        local CalcMassFraction = function()
+            local fraction = 1
+            if aiBrain:GetEconomyStored( 'MASS' ) < self:GetConsumptionPerSecondMass() then
+                fraction = math.min( 1, aiBrain:GetEconomyIncome('MASS') / aiBrain:GetEconomyRequested('MASS') )
+            end
+            return fraction
+        end
+
+        while not self:IsDead() do
+
+            if self:IsPaused() then
+                # paused mex upgrade (another bug here that caused paused upgrades to continue use resources)
+                self:SetConsumptionPerSecondMass( 0 )
+                self:SetProductionPerSecondMass( massProduction * CalcEnergyFraction() )
+
+            elseif aiBrain:GetEconomyStored( 'MASS' ) < 1 then
+                # mex upgrade while out of mass (this is where the engine code has a bug)
+                self:SetConsumptionPerSecondMass( massConsumption )
+                self:SetProductionPerSecondMass( massProduction / CalcMassFraction() )
+                # to use Gowerly's words; the above division cancels the engine bug like matter and anti-matter.
+                # the engine seems to do the exact opposite of this division.
+
+            else
+                # mex upgrade while enough mass (don't care about energy, that works fine)
+                self:SetConsumptionPerSecondMass( massConsumption )
+                self:SetProductionPerSecondMass( massProduction * CalcEnergyFraction() )
+
+            end
+
+            WaitTicks(1)
+        end
+    end,    
     
     OnPaused = function(self)
         StructureUnit.OnPaused(self)

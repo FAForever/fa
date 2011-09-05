@@ -20,6 +20,11 @@ local AntiArtilleryShield = import('/lua/shield.lua').AntiArtilleryShield
 local Buff = import('/lua/sim/buff.lua')
 local AIUtils = import('/lua/ai/aiutilities.lua')
 
+
+local BuffFieldBlueprints = import('/lua/sim/BuffField.lua').BuffFieldBlueprints
+#local RRBC = import('/lua/sim/RebuildBonusCallback.lua').RegisterRebuildBonusCheck
+
+
 SyncMeta = {
     __index = function(t,key)
         local id = rawget(t,'id')

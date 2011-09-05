@@ -206,12 +206,12 @@ UnitBlueprint {
                 },
             },
             BallisticArc = 'RULEUBA_None',
-            BeamCollisionDelay = 0.1,   #was 0.1
+            BeamCollisionDelay = 0.1,  
             BeamLifetime = 0.1,
             CollideFriendly = false,
-            Damage = 18,
+            Damage = 16, 
             DamageType = 'Normal',
-			DamageRadius = 0,  #was 0
+			DamageRadius = 0, 
             DisplayName = 'Particle Cannon',
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
@@ -219,7 +219,7 @@ UnitBlueprint {
             },
             FiringTolerance = 0,
             Label = 'MainGun',
-            LeadTarget = false,  #was false
+            LeadTarget = false, 
             MaxRadius = 23,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
@@ -242,7 +242,7 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 2,
-            ReTargetOnMiss = true,  #was true
+            ReTargetOnMiss = true,  
             TargetCheckInterval = 0.25,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
