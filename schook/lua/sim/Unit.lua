@@ -22,7 +22,7 @@ local AIUtils = import('/lua/ai/aiutilities.lua')
 
 
 local BuffFieldBlueprints = import('/lua/sim/BuffField.lua').BuffFieldBlueprints
-#local RRBC = import('/lua/sim/RebuildBonusCallback.lua').RegisterRebuildBonusCheck
+local RRBC = import('/lua/sim/RebuildBonusCallback.lua').RegisterRebuildBonusCheck
 
 
 SyncMeta = {
@@ -1601,7 +1601,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnStartBeingBuilt = function(self, builder, layer)
-	
         self:StartBeingBuiltEffects(builder, layer)
         local aiBrain = self:GetAIBrain()
         if table.getn(aiBrain.UnitBuiltTriggerList) > 0 then
@@ -1611,7 +1610,79 @@ Unit = Class(moho.unit_methods) {
                 end
             end
         end
+		 # this section is rebuild bonus check 1 [159]
+        # GPG if you read this I can explain what this does. So if you need me to, contact me (Brute51).
+        local builderUpgradesTo = builder:GetBlueprint().General.UpgradesTo or false
+        if not builderUpgradesTo or self:GetUnitId() != builderUpgradesTo then    # avoid upgrades
+            if EntityCategoryContains( categories.STRUCTURE, self) then
+                builder:ForkThread( builder.CheckFractionComplete, self )  # [159]
+            end
+
+			#This whole section just breaks the rebuild bonus entirely and is NOT necessary to fix the exploid -FunkOff
+			#I may be willing to mess with this if I can find out what the heck bpUnitID is supposed to be
+            # this section is rebuild bonus check 2, it also requires the above IF statement to work OK [159]
+            #if builder.VerifyRebuildBonus then
+            #    builder.VerifyRebuildBonus = nil
+            #    self:ForkThread( self.CheckRebuildBonus )  # [159]
+            #end
+        end
     end,
+	
+	
+    GetRebuildBonus = function(self, rebuildUnitBP)
+        # here 'self' is the engineer building the structure
+        self.InitialFractionComplete = 0.5
+        self.VerifyRebuildBonus = true    # rebuild bonus check 2 [159]
+        return self.InitialFractionComplete
+    end,
+
+    CheckFractionComplete = function(self, unitBeingBuilt, threadCount)
+        # rebuild bonus check 1 [159]
+        # This code checks if the unit is allowed to be accelerate-built. If not the unit is destroyed (for lack 
+        # of a SetFractionComplete() function). Added by brute51
+        local fraction = unitBeingBuilt:GetFractionComplete()
+        if fraction > (self.InitialFractionComplete or 0) then
+            unitBeingBuilt:OnRebuildBonusIsIllegal()
+        end
+        self.InitialFractionComplete = nil
+    end,
+
+    CheckRebuildBonus = function(self)
+        # this section is rebuild bonus check 2 [159]
+        # This code checks if the unit is allowed to be accelerate-built. If not the unit is destroyed (for lack 
+        # of a SetFractionComplete() function). Added by brute51
+        if self:GetFractionComplete() > 0 then
+            local cb = function(bpUnitId)
+                            if self:GetUnitId() == bpUnitId then 
+                                self:OnRebuildBonusIsLegal()
+                            end
+            end
+            RRBC( self:GetPosition(), cb)
+            self.RebuildBonusIllegalThread = self:ForkThread(
+                function(self) 
+                    WaitTicks(1)
+                    self:OnRebuildBonusIsIllegal()
+					WARN ('checkrebuildbonus if')
+                end
+            )
+        end
+    end,
+
+    OnRebuildBonusIsLegal = function(self)
+        # rebuild bonus check 2 [159]
+        # this doesn't always run. In fact, in most of the time it doesn't.
+        if self.RebuildBonusIllegalThread then
+            KillThread(self.RebuildBonusIllegalThread)
+        end
+    end,
+
+    OnRebuildBonusIsIllegal = function(self)
+        # rebuild bonus check 1 and 2 [159]
+        # this doesn't always run. In fact, in most of the time it doesn't.
+        self:Destroy()
+		WARN ('unit killed due to illegal copy')
+    end,
+
 
     UnitBuiltPercentageCallbackThread = function(self, percent, callback)
         while not self:IsDead() and self:GetHealthPercent() < percent do
@@ -2856,10 +2927,10 @@ Unit = Class(moho.unit_methods) {
 
     # Return the Bonus Build Multiplier for the target we are re-building if we are trying to rebuild the same
     # structure that was destroyed earlier.
-    GetRebuildBonus = function(self, rebuildUnitBP)
-        # for now everything is re-built is 50% complete to begin with
-        return 0.5
-    end,
+    #GetRebuildBonus = function(self, rebuildUnitBP)
+    #    # for now everything is re-built is 50% complete to begin with
+    #    return 0.5
+    #end,
 
     SetCaptureTimeMultiplier = function(self, time_mult)
         self.CaptureTimeMultiplier = time_mult

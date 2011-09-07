@@ -16,6 +16,46 @@ VeteranDefault = {
     Level5 = 1000,
 }
 
+
+local BuffFieldBlueprint = import('/lua/sim/BuffField.lua').BuffFieldBlueprint
+##################################################################
+## SERAPHIM BUFF FIELDS
+##################################################################
+
+BuffFieldBlueprint {                         # Seraphim ACU Restoration
+    Name = 'SeraphimACURegenBuffField',
+    AffectsUnitCategories = 'ALLUNITS',
+    AffectsAllies = false,
+    AffectsVisibleEnemies = false,
+    AffectsOwnUnits = true,
+    AffectsSelf = true,
+    DisableInTransport = true,
+    InitiallyEnabled = false,
+    MaintenanceConsumptionPerSecondEnergy = 0,
+    Radius = 15,
+    Buffs = {
+        'SeraphimACURegenAura',
+    },
+}
+
+BuffFieldBlueprint {                         # Seraphim ACU Advanced Restoration
+    Name = 'SeraphimAdvancedACURegenBuffField',
+    AffectsUnitCategories = 'ALLUNITS',
+    AffectsAllies = false,
+    AffectsVisibleEnemies = false,
+    AffectsOwnUnits = true,
+    AffectsSelf = true,
+    DisableInTransport = true,
+    InitiallyEnabled = false,
+    MaintenanceConsumptionPerSecondEnergy = 0,
+    Radius = 15,
+    Buffs = {
+        'SeraphimAdvancedACURegenAura',
+    },
+}
+
+
+
 # Return the total time (in seconds), energy, and mass it will take for the given
 # builder to create a unit of type target_bp.
 #

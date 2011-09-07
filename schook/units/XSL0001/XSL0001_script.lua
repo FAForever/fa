@@ -377,6 +377,7 @@ XSL0001 = Class( SWalkingLandUnit ) {
         if enh == 'RegenAura' then
 			SWalkingLandUnit.CreateEnhancement(self, enh) # moved from top to here else this happens twice for some other enhancements
             self:GetBuffFieldByName('SeraphimACURegenBuffField'):Enable()
+
                         
         elseif enh == 'RegenAuraRemove' then
             SWalkingLandUnit.CreateEnhancement(self, enh) # moved from top to here else this happens twice for some other enhancements
