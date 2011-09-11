@@ -230,7 +230,7 @@ UnitBlueprint {
         MeshExtentsY = 1.25,
         MeshExtentsZ = 1,
         MinSpeedPercent = 0,
-        #MotionType = 'RULEUMT_Hover', #from 'RULEUMT_Land'
+        MotionType = 'RULEUMT_Land', #from 'RULEUMT_Land'
         StandUpright = true,
         TurnRadius = 5,
         TurnRate = 90,

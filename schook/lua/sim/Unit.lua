@@ -1182,7 +1182,8 @@ Unit = Class(moho.unit_methods) {
 			return
 		end
 
-		if self:GetBlueprint().Wreckage.WreckageLayers[self:GetCurrentLayer()] then
+		if self:GetBlueprint().Wreckage.WreckageLayers[self:GetCurrentLayer()] then 
+		#this checks if wreck are allowed... but now we allow all wrecks so it is moot point anyways
 			return self:CreateWreckageProp(overkillRatio)
 		end
     end,
@@ -1202,6 +1203,10 @@ Unit = Class(moho.unit_methods) {
 			    pos[2] = GetSurfaceHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
 			end
 
+			
+			
+			
+			
 			local prop = CreateProp( pos, wreck )
 
 			# We make sure keep only a bounded list of wreckages around so we don't get into perf issues when

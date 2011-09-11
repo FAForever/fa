@@ -555,8 +555,8 @@ UnitBlueprint {
             Air = false,
             Land = true,
             Seabed = true,
-            Sub = false,
-            Water = false,
+            Sub = true, #from false
+            Water = true, #from false
         },
     },
 }

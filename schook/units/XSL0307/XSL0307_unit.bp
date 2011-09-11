@@ -1,0 +1,304 @@
+UnitBlueprint {
+    Audio = {
+        AmbientMove = Sound {
+            Bank = 'XSL',
+            Cue = 'XSL0307_Move_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        Destroyed = Sound {
+            Bank = 'XSL_Destroy',
+            Cue = 'XSL_Destroy_Land_Lrg',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        ShieldOff = Sound {
+            Bank = 'XSL',
+            Cue = 'XSL0307_Shield_Activate',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        ShieldOn = Sound {
+            Bank = 'XSL',
+            Cue = 'XSL0307_Shield_Activate',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        StartMove = Sound {
+            Bank = 'XSL',
+            Cue = 'XSL0307_Move_Start',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        StopMove = Sound {
+            Bank = 'XSL',
+            Cue = 'XSL0307_Move_Stop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        UISelection = Sound {
+            Bank = 'SeraphimSelect',
+            Cue = 'Seraphim_Select_Vehicle',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+    },
+    BuildIconSortPriority = 50,
+    Categories = {
+        'PRODUCTFA',
+        'SELECTABLE',
+        'BUILTBYTIER3FACTORY',
+        'SERAPHIM',
+        'MOBILE',
+        'LAND',
+        'TECH3',
+        'SHIELD',
+        'DEFENSE',
+        'HOVER',
+        'VISIBLETORECON',
+        'RECLAIMABLE',
+        'OVERLAYDEFENSE',
+    },
+    Defense = {
+        AirThreatLevel = 0,
+        ArmorType = 'Normal',
+        EconomyThreatLevel = 0,
+        Health = 400,
+        MaxHealth = 400,
+        RegenRate = 0,
+        Shield = {
+            ImpactEffects = 'SeraphimShieldHit01',
+            ImpactMesh = '/effects/entities/ShieldSection01/ShieldSection01_mesh',
+            Mesh = '/effects/entities/SeraphimShield01/SeraphimShield01_mesh',
+            MeshZ = '/effects/entities/Shield01/Shield01z_mesh',
+            RegenAssistMult = 60,
+            ShieldEnergyDrainRechargeTime = 5,
+            ShieldMaxHealth = 10000,
+            ShieldRechargeTime = 45,
+            ShieldRegenRate = 133,
+            ShieldRegenStartTime = 1,
+            ShieldSize = 20,
+            ShieldVerticalOffset = -3,
+        },
+        SubThreatLevel = 0,
+        SurfaceThreatLevel = 9,
+    },
+    Description = '<LOC xsl0307_desc>Mobile Shield Generator',
+    Display = {
+        Abilities = {
+            '<LOC ability_hover>Hover',
+            '<LOC ability_shielddome>Shield Dome',
+        },
+        IdleEffects = {
+            Land = {
+                Effects = {
+                    {
+                        Bones = {
+                            'XSL0307',
+                        },
+                        Offset = {
+                            0,
+                            -0.25,
+                            0,
+                        },
+                        Type = 'SeraphimGroundFX01',
+                    },
+                },
+            },
+            Water = {
+                Effects = {
+                    {
+                        Bones = {
+                            'XSL0307',
+                        },
+                        Offset = {
+                            0,
+                            -0.25,
+                            0,
+                        },
+                        Type = 'SeraphimGroundFX01',
+                    },
+                    {
+                        Bones = {
+                            'XSL0307',
+                        },
+                        Offset = {
+                            0,
+                            -0.25,
+                            0,
+                        },
+                        Scale = 1.2,
+                        Type = 'SeaIdle02',
+                    },
+                },
+            },
+        },
+        Mesh = {
+            IconFadeInZoom = 130,
+            LODs = {
+                {
+                    LODCutoff = 120,
+                    LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
+                    Scrolling = true,
+                    ShaderName = 'Seraphim',
+                },
+                {
+                    AlbedoName = 'xsl0307_lod1_albedo.dds',
+                    LODCutoff = 180,
+                    LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
+                    ShaderName = 'Seraphim',
+                    SpecularName = 'xsl0307_lod1_specteam.dds',
+                },
+            },
+        },
+        MovementEffects = {
+            Land = {
+                Effects = {
+                    {
+                        Bones = {
+                            'XSL0307',
+                        },
+                        Scale = 0.5,
+                        Type = 'GroundKickup01',
+                    },
+                    {
+                        Bones = {
+                            'XSL0307',
+                        },
+                        Offset = {
+                            0,
+                            -0.25,
+                            0,
+                        },
+                        Type = 'SeraphimGroundFX01',
+                    },
+                },
+            },
+            Water = {
+                Effects = {
+                    {
+                        Bones = {
+                            'XSL0307',
+                        },
+                        Offset = {
+                            0,
+                            -0.25,
+                            0,
+                        },
+                        Type = 'SeraphimGroundFX01',
+                    },
+                    {
+                        Bones = {
+                            'XSL0307',
+                        },
+                        Scale = 0.5,
+                        Type = 'BackWake',
+                    },
+                },
+            },
+        },
+        PlaceholderMeshName = 'UXL0009',
+        SpawnRandomRotation = true,
+        UniformScale = 0.045,
+    },
+    Economy = {
+        BuildCostEnergy = 4800,
+        BuildCostMass = 640,
+        BuildTime = 3200,
+        MaintenanceConsumptionPerSecondEnergy = 300,
+        TeleportEnergyMod = 0.15,
+        TeleportMassMod = 1,
+        TeleportTimeMod = 0.01,
+    },
+    General = {
+        Category = 'Utility',
+        Classification = 'RULEUC_MilitaryVehicle',
+        CommandCaps = {
+            RULEUCC_Attack = false,
+            RULEUCC_CallTransport = true,
+            RULEUCC_Capture = false,
+            RULEUCC_Guard = true,
+            RULEUCC_Move = true,
+            RULEUCC_Nuke = false,
+            RULEUCC_Patrol = true,
+            RULEUCC_Pause = false,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
+            RULEUCC_RetaliateToggle = false,
+            RULEUCC_Stop = true,
+            RULEUCC_Transport = false,
+        },
+        FactionName = 'Seraphim',
+        Icon = 'amph',
+        OrderOverrides = {
+            RULEUTC_ShieldToggle = {
+                bitmapId = 'shield-dome',
+                helpText = 'toggle_shield_dome',
+            },
+        },
+        TechLevel = 'RULEUTL_Advanced',
+        ToggleCaps = {
+            RULEUTC_ShieldToggle = true,
+        },
+        UnitName = '<LOC xsl0307_name>Athanah',
+        UnitWeight = 1,
+    },
+    Intel = {
+        VisionRadius = 20,
+    },
+    Interface = {
+        HelpText = '<LOC xsl0307_help>Mobile Shield Generator',
+    },
+    LifeBarHeight = 0.075,
+    LifeBarOffset = 0.45,
+    LifeBarSize = 0.8,
+    Physics = {
+        BankingSlope = 0.5,
+        BuildOnLayerCaps = {
+            LAYER_Air = false,
+            LAYER_Land = true,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
+        DragCoefficient = 0.2,
+        Elevation = 0.25,
+        MaxAcceleration = 4,
+        MaxBrake = 4,
+        MaxSpeed = 4,
+        MaxSpeedReverse = 0,
+        MaxSteerForce = 1000,
+        MeshExtentsX = 1,
+        MeshExtentsY = 0.65,
+        MeshExtentsZ = 1,
+        MinSpeedPercent = 0,
+        MotionType = 'RULEUMT_Hover',
+        RotateBodyWhileMoving = true,
+        RotateOnSpot = true,
+        RotateOnSpotThreshold = 0.1,
+        TurnFacingRate = 120,
+        TurnRadius = 0,
+        TurnRate = 150,
+        WobbleFactor = 0.015,
+        WobbleSpeed = 0.001,
+    },
+    SelectionSizeX = 0.5,
+    SelectionSizeZ = 0.7,
+    SelectionThickness = 0.58,
+    SizeX = 0.8,
+    SizeY = 0.5,
+    SizeZ = 0.8,
+    StrategicIconName = 'icon_land3_shield',
+    StrategicIconSortPriority = 125,
+    Transport = {
+        TransportClass = 3,
+    },
+    Wreckage = {
+        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+        EnergyMult = 0,
+        HealthMult = 0.9,
+        MassMult = 0.9,
+        ReclaimTimeMultiplier = 1,
+        WreckageLayers = {
+            Air = false,
+            Land = true,
+            Seabed = true, #from false
+            Sub = true, #from false
+            Water = true, #from false
+        },
+    },
+}

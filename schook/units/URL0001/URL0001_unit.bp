@@ -129,6 +129,7 @@ UnitBlueprint {
         'SHOWQUEUE',
         'OVERLAYDIRECTFIRE',
         'OVERLAYOMNI',
+        'OVERLAYDEFENSE',  #for build range overlay
     },
     Defense = {
         AirThreatLevel = 0,
@@ -1043,5 +1044,10 @@ UnitBlueprint {
             Turreted = false,
             WeaponCategory = 'Anti Navy',
         },
+		{ # dummy weapon used to show build radius 
+            EffectiveRadius = 12,             
+            MaxRadius = 12,
+            RangeCategory = 'UWRC_Countermeasure',
+        }, 
     },
 }

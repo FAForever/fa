@@ -713,9 +713,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true,
-            Sub = false,
-            Water = false,
+            Seabed = true, 
+            Sub = true, #from false
+            Water = true, #from false
         },
     },
 }

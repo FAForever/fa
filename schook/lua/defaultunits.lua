@@ -1567,11 +1567,6 @@ AirUnit = Class(MobileUnit) {
 
 
 
-#-------------------------------------------------------------
-#  HOVERING LAND UNITS
-#-------------------------------------------------------------
-HoverLandUnit = Class(MobileUnit){}
-
 
 #-------------------------------------------------------------
 #  LAND UNITS
@@ -1696,6 +1691,26 @@ ConstructionUnit = Class(MobileUnit) {
 
 
 #-------------------------------------------------------------
+#  SHIELD HOVER UNITS
+#-------------------------------------------------------------
+ShieldHoverLandUnit = Class(HoverLandUnit) {
+}
+
+#-------------------------------------------------------------
+#  SHIELD LAND UNITS
+#-------------------------------------------------------------
+ShieldLandUnit = Class(LandUnit) {
+}
+
+#-------------------------------------------------------------
+#  SHIELD SEA UNITS
+#-------------------------------------------------------------
+ShieldSeaUnit = Class(SeaUnit) {
+}
+
+
+
+#-------------------------------------------------------------
 #  SEA UNITS
 #  These units typically float on the water and have wake when they move.
 #-------------------------------------------------------------
@@ -1703,7 +1718,7 @@ ConstructionUnit = Class(MobileUnit) {
 SeaUnit = startClass(SeaUnit)
     DeathThreadDestructionWaitTime = 5
     ShowUnitDestructionDebris = false
-    PlayEndAnimDestructionEffects = false
+    PlayEndestructionEffects = false
 	CollidedBones = 0
 	
 	function OnKilled(self, instigator, type, overkillRatio)
@@ -1735,7 +1750,6 @@ SeaUnit = startClass(SeaUnit)
 endClass()
 
 local OldSubUnit = SubUnit
-
 SubUnit = startClass(OldSubUnit)
 	function DeathThread(self, overkillRatio, instigator)
 		CreateScaledBoom(self, overkillRatio)
@@ -1746,6 +1760,8 @@ SubUnit = startClass(OldSubUnit)
 		local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
 		local DaveyJones = (seafloor - pos[2])*20
 		local numBones = self:GetBoneCount()-1
+		
+
 		
 		self:ForkThread(function()
 			local i = 0
@@ -1821,21 +1837,151 @@ endClass()
 
 
 
-#-------------------------------------------------------------
-#  SHIELD HOVER UNITS
-#-------------------------------------------------------------
-ShieldHoverLandUnit = Class(HoverLandUnit) {
-}
+
+
+
+
+
 
 #-------------------------------------------------------------
-#  SHIELD LAND UNITS
+#  HOVERING LAND UNITS   ##return this entire section to HoverLandUnit = Class(MobileUnit){} if it does not work
 #-------------------------------------------------------------
-ShieldLandUnit = Class(LandUnit) {
-}
+local OldHoverLandUnit = HoverLandUnit
+
+HoverLandUnit = startClass(OldHoverLandUnit)
+
+	function DeathThread(self, overkillRatio, instigator)
+		#CreateScaledBoom(self, overkillRatio)
+        local sx, sy, sz = self:GetUnitSizes()
+        local vol = sx * sy * sz
+		local army = self:GetArmy()
+		local pos = self:GetPosition()
+		local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
+		local DaveyJones = (seafloor - pos[2])*20
+		local numBones = self:GetBoneCount()-1
+		
+		self:ForkThread(function()
+			##LOG("Sinker thread created")
+			local pos = self:GetPosition()
+			local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
+			while self:GetPosition(1)[2] > (seafloor) do  #added 2 because they were sinking into the seafloor
+				WaitSeconds(0.1)
+				##LOG("Sinker: ", repr(self:GetPosition()))
+			end
+			#CreateScaledBoom(self, overkillRatio, watchBone)
+			self:CreateWreckage(overkillRatio, instigator)
+			self:Destroy()
+		end)
+		
+		
+		self:ForkThread(function()
+			local i = 0
+			while true do
+            	local rx, ry, rz = self:GetRandomOffset(0.25)
+            	local rs = Random(vol/2, vol*2) / (vol*2)
+            	local randBone = Util.GetRandomInt( 0, numBones)
+
+            	CreateEmitterAtBone( self, randBone, army, '/effects/emitters/destruction_underwater_explosion_flash_01_emit.bp')
+					:ScaleEmitter(sx)
+					:OffsetEmitter(rx, ry, rz)
+				CreateEmitterAtBone( self, randBone, army, '/effects/emitters/destruction_underwater_sinking_wash_01_emit.bp')
+					:ScaleEmitter(sx/2)
+					:OffsetEmitter(rx, ry, rz)
+				#2 emitters is plenty for smaller hover units
+				#CreateEmitterAtBone( self, 0, army, '/effects/emitters/destruction_underwater_sinking_wash_01_emit.bp')
+				#	:ScaleEmitter(sx)
+				#	:OffsetEmitter(rx, ry, rz)
+					
+            	local rd = Util.GetRandomFloat( 0.4+i, 1.0+i)
+            	WaitSeconds(rd)
+				i = i + 0.3
+			end
+		end)
+		
+		#what does this even do I have no idea
+		local slider = CreateSlider(self, 0)
+		slider:SetGoal(0, DaveyJones+10, 0)  #changed from +5 to +10
+		slider:SetSpeed(8)
+		WaitFor(slider)
+		slider:Destroy()
+			
+		#CreateScaledBoom(self, overkillRatio)
+		self:CreateWreckage(overkillRatio, instigator)
+		self:Destroy()
+	end
+
+    function CreateWreckageProp( self, overkillRatio )
+		local bp = self:GetBlueprint()
+		local wreck = bp.Wreckage.Blueprint
+		#LOG('*DEBUG: Spawning Wreckage = ', repr(wreck), 'overkill = ',repr(overkillRatio))
+		local pos = self:GetPosition()
+		local mass = bp.Economy.BuildCostMass * (bp.Wreckage.MassMult or 0)
+		local energy = bp.Economy.BuildCostEnergy * (bp.Wreckage.EnergyMult or 0)
+		local time = (bp.Wreckage.ReclaimTimeMultiplier or 1)
+
+		--pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
+
+		local prop = CreateProp( pos, wreck )
+
+		prop:SetScale(bp.Display.UniformScale)
+		prop:SetOrientation(self:GetOrientation(), true)
+		prop:SetPropCollision('Box', bp.CollisionOffsetX, bp.CollisionOffsetY, bp.CollisionOffsetZ, bp.SizeX* 0.5, bp.SizeY* 0.5, bp.SizeZ * 0.5)
+		prop:SetMaxReclaimValues(time, time, mass, energy)
+
+		mass = (mass - (mass * (overkillRatio or 1))) * self:GetFractionComplete()
+		energy = (energy - (energy * (overkillRatio or 1))) * self:GetFractionComplete()
+		time = time - (time * (overkillRatio or 1))
+
+		prop:SetReclaimValues(time, time, mass, energy)
+		prop:SetMaxHealth(bp.Defense.Health)
+		prop:SetHealth(self, bp.Defense.Health * (bp.Wreckage.HealthMult or 1))
+
+        if not bp.Wreckage.UseCustomMesh then
+    	    prop:SetMesh(bp.Display.MeshBlueprintWrecked)
+        end
+
+        TryCopyPose(self,prop,false)
+
+        prop.AssociatedBP = self:GetBlueprint().BlueprintId
+
+		return prop
+    end
+	
+	
+	
+endClass()
+
+
+
+#########This entire section is for factory fixes from CBFP.  If no workie, just remove everything below this line to restore
+
+local Game = import('/lua/game.lua')
+local FactoryFixes = import('/lua/FactoryFixes.lua').FactoryFixes
+
+# The altered factory unit class would be ideal except that it doesn't work. The code in this file gets appended at 
+# the end to the existing file from stock FA. Because the air, ground and naval factory classes are generated before 
+# this script is even executed the altered factory class won't be used. I can ofcourse re-generate the factory 
+# classes but that will affect already loaded mods that change this code aswell. So the best sollution to the problem
+# is to apply the bug fix that was originally meant to go in the factory unit class to each dedicated factory class.
+
 
 #-------------------------------------------------------------
-#  SHIELD SEA UNITS
+#  FACTORY  UNITS
 #-------------------------------------------------------------
-ShieldSeaUnit = Class(SeaUnit) {
-}
+FactoryUnit = FactoryFixes(FactoryUnit)
+
+#-------------------------------------------------------------
+#  AIR FACTORY UNITS
+#-------------------------------------------------------------
+AirFactoryUnit = FactoryFixes(AirFactoryUnit)
+
+#-------------------------------------------------------------
+#  LAND FACTORY UNITS
+#-------------------------------------------------------------
+LandFactoryUnit = FactoryFixes(LandFactoryUnit)
+
+#-------------------------------------------------------------
+#  SEA FACTORY UNITS
+#-------------------------------------------------------------
+SeaFactoryUnit = FactoryFixes(SeaFactoryUnit)
 

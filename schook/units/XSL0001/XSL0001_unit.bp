@@ -142,6 +142,7 @@ UnitBlueprint {
         'OVERLAYOMNI',
         'OVERLAYDIRECTFIRE',
         'OVERLAYINDIRECTFIRE',
+		'OVERLAYDEFENSE',#added for build overlay range ring
     },
     Defense = {
         AirThreatLevel = 0,
@@ -1078,5 +1079,10 @@ UnitBlueprint {
             WeaponRepackTimeout = 5,
             WeaponUnpacks = true,
         },
+		{ # dummy weapon used to show build radius 
+            EffectiveRadius = 12,             
+            MaxRadius = 12,
+            RangeCategory = 'UWRC_Countermeasure',
+        }, 
     },
 }
