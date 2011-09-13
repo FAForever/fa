@@ -2,6 +2,7 @@ do
 	local oldCreateUI = CreateUI
 	CreateUI = function(isReplay)
 		oldCreateUI(isReplay)
+		import("/modules/displayrings.lua").Init()	##added for acu and engineer build radius ui mod
 		if SessionIsReplay() then
 			ForkThread(SendChat)
 		end
