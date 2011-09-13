@@ -1884,16 +1884,18 @@ Unit = Class(moho.unit_methods) {
         self:DoOnUnitBuiltCallbacks(unitBeingBuilt)
         self:StopUnitAmbientSound('ConstructLoop')
         self:PlayUnitSound('ConstructStop')
-		if self.CurrentBuildOrder == 'MobileBuild' then  # prevents false positives by assisted enhancing
-            if self.OnStopBuildWasRun then
-                if unitBeingBuilt and not unitBeingBuilt:BeenDestroyed() then
-                    unitBeingBuilt:Destroy()  # [164]
-                end
-            else
-                self.OnStopBuildWasRun = true
-                self:ForkThread( function(self) WaitTicks(2) self.OnStopBuildWasRun = nil end )
-            end
-        end
+		###This part of the CBFP is REMOVED due to incompatibility with NOMADS
+		###This may be re-added at a future point if it can be done while not totally breaking the entire game --FunkOff
+		#if self.CurrentBuildOrder == 'MobileBuild' then  # prevents false positives by assisted enhancing
+        #    if self.OnStopBuildWasRun then
+        #        if unitBeingBuilt and not unitBeingBuilt:BeenDestroyed() then
+        #            unitBeingBuilt:Destroy()  # [164]
+        #        end
+        #    else
+        #        self.OnStopBuildWasRun = true
+        #        self:ForkThread( function(self) WaitTicks(2) self.OnStopBuildWasRun = nil end )
+        #    end
+        #end
     end,
 
     GetUnitBeingBuilt = function(self)
