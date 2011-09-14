@@ -20,7 +20,6 @@ local AntiArtilleryShield = import('/lua/shield.lua').AntiArtilleryShield
 local Buff = import('/lua/sim/buff.lua')
 local AIUtils = import('/lua/ai/aiutilities.lua')
 
-
 local BuffFieldBlueprints = import('/lua/sim/BuffField.lua').BuffFieldBlueprints
 #local RRBC = import('/lua/sim/RebuildBonusCallback.lua').RegisterRebuildBonusCheck
 
@@ -999,6 +998,33 @@ Unit = Class(moho.unit_methods) {
             self:PlayUnitSound('Killed')
         end
         
+        if EntityCategoryContains(categories.COMMAND, self) then
+        	LOG('com is dead') 
+                	# If there is a killer, and it's not me 
+        	if instigator and instigator:GetArmy() != self:GetArmy() then
+        		local brain = ArmyBrains[instigator:GetArmy()]
+        		local mybrain = ArmyBrains[self:GetArmy()]
+        		
+        		brain:AddArmyStat("FAFScore", 1)        		
+        		mybrain:AddArmyStat("FAFScore", -1)
+        		
+
+
+			elseif instigator and instigator:GetArmy() == self:GetArmy() then
+
+        		
+        		local brain = ArmyBrains[self:GetArmy()]
+        		brain:AddArmyStat("FAFScore", -1)
+       		
+        	else    		
+        		local brain = ArmyBrains[self:GetArmy()]      	
+        		brain:AddArmyStat("FAFScore", -1)
+        	end
+	
+
+		
+		
+        end
 
         #If factory, destory what I'm building if I die
         if EntityCategoryContains(categories.FACTORY, self) then
