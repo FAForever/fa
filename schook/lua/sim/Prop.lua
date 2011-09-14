@@ -252,7 +252,7 @@ Prop = Class(moho.prop_methods, Entity) {
 
 local CBFP_oldProp = Prop
 local Game = import('/lua/game.lua')
-local RebuildBonusCheckCallback = import(Game.CBFP_Path..'/lua/sim/RebuildBonusCallback.lua').RunRebuildBonusCallback
+local RebuildBonusCheckCallback = import('/lua/sim/RebuildBonusCallback.lua').RunRebuildBonusCallback
 
 Prop = Class(CBFP_oldProp, Entity) {
 
