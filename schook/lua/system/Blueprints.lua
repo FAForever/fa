@@ -321,8 +321,8 @@ end
 function ModBlueprints(all_bps)
 	
 	##This whole bit added for shipwreck mod
-	if (bp.Categories) then
-		for id,bp in pairs(all_bps.Unit) do				
+	for id,bp in pairs(all_bps.Unit) do	
+		if (bp.Categories) then	
 			local cats = {}
 			for k,cat in pairs(bp.Categories) do
 				cats[cat] = true
