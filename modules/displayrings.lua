@@ -53,7 +53,7 @@ function ShowRanges()
 				local bp = unit:GetBlueprint()
 				if HasCategory(bp, 'ENGINEER') then
 					showRangeTable[id].BuildRangeRing = Decal(GetFrame(0))
-					showRangeTable[id].BuildRangeRing:SetTexture('/mods/BuildRanges/textures/ring_orange.dds')
+					showRangeTable[id].BuildRangeRing:SetTexture('/textures/ring_orange.dds')
 					if bp.Economy.MaxBuildDistance then
 						showRangeTable[id].BuildRangeRing:SetScale({math.floor(2.03*(bp.Economy.MaxBuildDistance+2))+2, 0, math.floor(2.03*(bp.Economy.MaxBuildDistance+2))+2})
 					else
@@ -83,7 +83,7 @@ end
 
 function Init()
 	local ringKeyMap = {
-	['Ctrl-Alt-Num0'] = {action =  'UI_Lua import("/mods/BuildRanges/modules/displayrings.lua").ToggleShowRanges()'}}
+	['Ctrl-Alt-Num0'] = {action =  'UI_Lua import("/modules/displayrings.lua").ToggleShowRanges()'}}
 	IN_AddKeyMapTable(ringKeyMap)
 	ToggleShowRanges()
 end
