@@ -932,6 +932,7 @@ UnitBlueprint {
             BeamLifetime = 0,
             CanFireFromTransport = true,
             CollideFriendly = false,
+			ContinuousBeam = true,  #new
             Damage = 800,
             DamageRadius = 0.5,
             DamageType = 'Normal',
