@@ -252,81 +252,95 @@ function CollectCurrentScores()
 end
 
 
-function TransferUnitsOwnership(units, ToArmyIndex)        
-	# Only allow units not attached to be given. This is because units will give all of it's children over
-	# aswell, so we only want the top level units to be given. Also, don't allow commanders to be given.
-	if units:GetParent() != units or (units.Parent and units.Parent != units) then
-		return
-	end
+function TransferUnitsOwnership(units, ToArmyIndex)
+    local toBrain = GetArmyBrain(ToArmyIndex)
+    if not toBrain or toBrain:IsDefeated() or not units or table.getn(units) < 1 then
+        return
+    end
+    local newUnits = {}
+    for k,v in units do
+        local owner = v:GetArmy()
+        if owner == ToArmyIndex then
+            continue
+            # removed " not IsAlly(owner,ToArmyIndex) or " because else it doesnt work when unit captured
+        end
+        # Only allow units not attached to be given. This is because units will give all of it's children over
+        # aswell, so we only want the top level units to be given. Also, don't allow commanders to be given.
+        if v:GetParent() != v or (v.Parent and v.Parent != v) then
+            continue
+        end
 
-	local unit = units
-	local bp = unit:GetBlueprint()
-	local unitId = unit:GetUnitId()
+        local unit = v
+        local bp = unit:GetBlueprint()
+        local unitId = unit:GetUnitId()
 
-	# B E F O R E
-	local numNukes = unit:GetNukeSiloAmmoCount()  #looks like one of these 2 works for SMDs also
-	local numTacMsl = unit:GetTacticalSiloAmmoCount()
-	local unitKills = unit:GetStat('KILLS', 0).Value   #also takes care of the veteran level
-	local unitHealth = unit:GetHealth()
-	local shieldIsOn = false
-	local ShieldHealth = 0
-	local hasFuel = false
-	local fuelRatio = 0
-	local enh = {} # enhancements
+        # B E F O R E
+        local numNukes = unit:GetNukeSiloAmmoCount()  #looks like one of these 2 works for SMDs also
+        local numTacMsl = unit:GetTacticalSiloAmmoCount()
+        local unitKills = unit:GetStat('KILLS', 0).Value   #also takes care of the veteran level
+        local unitHealth = unit:GetHealth()
+        local shieldIsOn = false
+        local ShieldHealth = 0
+        local hasFuel = false
+        local fuelRatio = 0
+        local enh = {} # enhancements
 
-	if unit.MyShield then
-		shieldIsOn = unit:ShieldIsOn()
-		ShieldHealth = unit.MyShield:GetHealth()
-	end
-	if bp.Physics.FuelUseTime and bp.Physics.FuelUseTime > 0 then   # going through the BP to check for fuel
-		fuelRatio = unit:GetFuelRatio()                             # usage is more reliable then unit.HasFuel
-		hasFuel = true                                              # cause some buildings say they use fuel
-	end
-	local posblEnh = bp.Enhancements
-	if posblEnh then
-		for k,v in posblEnh do
-			if unit:HasEnhancement( k ) then
-				table.insert( enh, k )
-			end
-		end
-	end
+        if unit.MyShield then
+            shieldIsOn = unit:ShieldIsOn()
+            ShieldHealth = unit.MyShield:GetHealth()
+        end
+        if bp.Physics.FuelUseTime and bp.Physics.FuelUseTime > 0 then   # going through the BP to check for fuel
+            fuelRatio = unit:GetFuelRatio()                             # usage is more reliable then unit.HasFuel
+            hasFuel = true                                              # cause some buildings say they use fuel
+        end
+        local posblEnh = bp.Enhancements
+        if posblEnh then
+            for k,v in posblEnh do
+                if unit:HasEnhancement( k ) then
+                   table.insert( enh, k )
+                end
+            end
+        end
 
-	# changing owner
-	unit = ChangeUnitArmy(unit,ToArmyIndex)		
-	if not unit then
-		return
-	end        
+        # changing owner
+        unit = ChangeUnitArmy(unit,ToArmyIndex)		
+        if not unit then
+            continue
+        end
+        table.insert(newUnits, unit)
 
-	# A F T E R
-	if unitKills and unitKills > 0 then # set veterancy first
-		unit:AddKills( unitKills )
-	end
-	if enh and table.getn(enh) > 0 then
-		for k, v in enh do
-			unit:CreateEnhancement( v )
-		end
-	end
-	if unitHealth > unit:GetMaxHealth() then
-		unitHealth = unit:GetMaxHealth()
-	end
-	unit:SetHealth(unit,unitHealth)
-	if hasFuel then
-		unit:SetFuelRatio(fuelRatio)
-	end
-	if numNukes and numNukes > 0 then
-		unit:GiveNukeSiloAmmo( (numNukes - unit:GetNukeSiloAmmoCount()) )
-	end
-	if numTacMsl and numTacMsl > 0 then
-		unit:GiveTacticalSiloAmmo( (numTacMsl - unit:GetTacticalSiloAmmoCount()) )
-	end
-	if unit.MyShield then
-		unit.MyShield:SetHealth( unit, ShieldHealth )
-		if shieldIsOn then
-			unit:EnableShield()
-		else
-			unit:DisableShield()
-		end
-	end
+        # A F T E R
+        if unitKills and unitKills > 0 then # set veterancy first
+            unit:AddKills( unitKills )
+        end
+        if enh and table.getn(enh) > 0 then
+            for k, v in enh do
+                unit:CreateEnhancement( v )
+            end
+        end
+        if unitHealth > unit:GetMaxHealth() then
+            unitHealth = unit:GetMaxHealth()
+        end
+        unit:SetHealth(unit,unitHealth)
+        if hasFuel then
+            unit:SetFuelRatio(fuelRatio)
+        end
+        if numNukes and numNukes > 0 then
+            unit:GiveNukeSiloAmmo( (numNukes - unit:GetNukeSiloAmmoCount()) )
+        end
+        if numTacMsl and numTacMsl > 0 then
+            unit:GiveTacticalSiloAmmo( (numTacMsl - unit:GetTacticalSiloAmmoCount()) )
+        end
+        if unit.MyShield then
+            unit.MyShield:SetHealth( unit, ShieldHealth )
+            if shieldIsOn then
+                unit:EnableShield()
+            else
+                unit:DisableShield()
+            end
+        end
+    end
+    return newUnits
 end
 
 
@@ -866,6 +880,43 @@ AIBrain = Class(moho.aibrain_methods) {
         import('/lua/SimUtils.lua').UpdateUnitCap()
         import('/lua/SimPing.lua').OnArmyDefeat(self:GetArmyIndex())
         local function KillArmy()
+
+			local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+			if table.getn(units) > 0 then
+				for index,unit in units do
+					unit:Kill()				
+				end
+			end
+        end
+        ForkThread(KillArmy)
+    end,
+
+	OnDefeat = function(self)
+        SetArmyOutOfGame(self:GetArmyIndex())
+        table.insert( Sync.GameResult, { self:GetArmyIndex(), "defeat" } )
+        import('/lua/SimUtils.lua').UpdateUnitCap()
+        import('/lua/SimPing.lua').OnArmyDefeat(self:GetArmyIndex())
+        local function KillArmy()
+			local allies = {}
+			local selfIndex = self:GetArmyIndex()
+			for index, brain in ArmyBrains do
+				brain.index = index
+				brain.score = brain:CalculateScore()
+				if IsAlly(selfIndex, brain:GetArmyIndex()) and selfIndex != brain:GetArmyIndex() and not brain:IsDefeated() then
+					table.insert(allies, brain)
+				end
+			end
+			if table.getn(allies) > 0 then
+				table.sort(allies, function(a,b) return a.score > b.score end)
+				for k,v in allies do				
+					local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+					if units and table.getn(units) > 0 then
+						TransferUnitsOwnership(units, v.index)
+					end
+				end
+			end
+			
+			
             WaitSeconds(20)
 			local shareOption = ScenarioInfo.Options.Share or "no"
 			if shareOption == "yes" then
@@ -879,16 +930,16 @@ AIBrain = Class(moho.aibrain_methods) {
 					end
 				end
 			end
-			local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-			if table.getn(units) > 0 then
-				for index,unit in units do
-					unit:Kill()				
+			local killacu = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+			if killacu and table.getn(killacu) > 0 then
+				for index,unit in killacu do
+					unit:Kill()
 				end
 			end
         end
         ForkThread(KillArmy)
     end,
-
+	
     OnVictory = function(self)
     	local result = string.format("%s %i", "victory", math.floor(self:GetArmyStat("FAFScore",0.0).Value) )
         table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )

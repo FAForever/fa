@@ -623,16 +623,30 @@ local function GetPlayersNotPL()
     return notPL
 end
 
+local function GetRandomFactionIndex()
+	local randomfaction = nil
+	local counter = 50
+	while counter > 0 do
+		counter = (counter - 1)
+		randomfaction = math.random(1, table.getn(FactionData.Factions))
+	end
+	return randomfaction
+end
+
+
 local function AssignRandomFactions(gameInfo)
     local randomFactionID = table.getn(FactionData.Factions) + 1
     for index, player in gameInfo.PlayerOptions do
 -- note that this doesn't need to be aware if player has supcom or not since they would only be able to select
 -- the random faction ID if they have supcom
         if player.Faction >= randomFactionID then
-            player.Faction = math.random(1, table.getn(FactionData.Factions))
+            player.Faction = GetRandomFactionIndex()
         end
     end
 end
+
+
+
 
 local function AssignRandomStartSpots(gameInfo)
     if gameInfo.GameOptions['TeamSpawn'] == 'random' then
