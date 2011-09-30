@@ -871,25 +871,7 @@ AIBrain = Class(moho.aibrain_methods) {
         #LOG('===== AI DEBUG: Brain Evaluate Thead killed =====')
     end,
 
-    # I'm defeated, show the defeat screen.
-    OnDefeat = function(self)
-        SetArmyOutOfGame(self:GetArmyIndex())
 
-        local result = string.format("%s %i", "defeat", math.floor(self:GetArmyStat("FAFScore",0.0).Value) )
-        table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
-        import('/lua/SimUtils.lua').UpdateUnitCap()
-        import('/lua/SimPing.lua').OnArmyDefeat(self:GetArmyIndex())
-        local function KillArmy()
-
-			local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-			if table.getn(units) > 0 then
-				for index,unit in units do
-					unit:Kill()				
-				end
-			end
-        end
-        ForkThread(KillArmy)
-    end,
 
 	OnDefeat = function(self)
         SetArmyOutOfGame(self:GetArmyIndex())
@@ -899,27 +881,32 @@ AIBrain = Class(moho.aibrain_methods) {
         local function KillArmy()
 			local allies = {}
 			local selfIndex = self:GetArmyIndex()
-			for index, brain in ArmyBrains do
-				brain.index = index
-				brain.score = brain:CalculateScore()
-				if IsAlly(selfIndex, brain:GetArmyIndex()) and selfIndex != brain:GetArmyIndex() and not brain:IsDefeated() then
-					table.insert(allies, brain)
-				end
-			end
-			if table.getn(allies) > 0 then
-				table.sort(allies, function(a,b) return a.score > b.score end)
-				for k,v in allies do				
-					local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
-					if units and table.getn(units) > 0 then
-						TransferUnitsOwnership(units, v.index)
+            WaitSeconds(20)
+			
+			#this part determiens the share condition			
+			local shareOption = ScenarioInfo.Options.Share or "no"
+			##"no" means full share
+			if shareOption == "no" then			
+				##this part determines who the allies are 
+				for index, brain in ArmyBrains do
+					brain.index = index
+					brain.score = brain:CalculateScore()
+					if IsAlly(selfIndex, brain:GetArmyIndex()) and selfIndex != brain:GetArmyIndex() and not brain:IsDefeated() then
+						table.insert(allies, brain)
 					end
 				end
-			end
-			
-			
-            WaitSeconds(20)
-			local shareOption = ScenarioInfo.Options.Share or "no"
-			if shareOption == "yes" then
+				##This part determines which ally has the highest score and transfers ownership of all units to him
+				if table.getn(allies) > 0 then
+					table.sort(allies, function(a,b) return a.score > b.score end)
+					for k,v in allies do				
+						local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+						if units and table.getn(units) > 0 then
+							TransferUnitsOwnership(units, v.index)
+						end
+					end
+				end			
+			##"yes" means share until death
+			elseif shareOption == "yes" then
 				import('/lua/SimUtils.lua').KillSharedUnits(self:GetArmyIndex())
 				local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
 				for index,unit in units do
@@ -930,6 +917,7 @@ AIBrain = Class(moho.aibrain_methods) {
 					end
 				end
 			end
+
 			local killacu = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
 			if killacu and table.getn(killacu) > 0 then
 				for index,unit in killacu do
