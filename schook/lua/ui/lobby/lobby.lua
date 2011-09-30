@@ -129,10 +129,10 @@ local slotMenuStrings = {
 
 local slotMenuData = {
     open = {
-        host = {
-            'close',
-            'occupy',
+        host = {            
             'ailist',
+			'close',
+            'occupy',
         },
         client = {
             'occupy',
@@ -155,9 +155,9 @@ local slotMenuData = {
         },
     },
     ai = {
-        host = {
-            'remove',
+        host = {            
             'ailist',
+			'remove',
         },
         client = {
         },
