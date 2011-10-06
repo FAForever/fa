@@ -88,6 +88,7 @@ UnitBlueprint {
         'NUKESUB',
         'OVERLAYSONAR',
         'OVERLAYINDIRECTFIRE',
+		'OVERLAYCOUNTERMEASURE',  #for range ring fix
     },
     CollisionOffsetY = -0.375,
     Defense = {
@@ -465,6 +466,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RateOfFire = 1,
+			RangeCategory = 'UWRC_Countermeasure',  #added, missing from 3603
             TargetCheckInterval = 0.5,
             TargetRestrictDisallow = 'UNTARGETABLE',
             WeaponCategory = 'Missile',
