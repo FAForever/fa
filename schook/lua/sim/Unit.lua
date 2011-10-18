@@ -280,7 +280,12 @@ Unit = Class(moho.unit_methods) {
         end
         self:InitBuffFields()    # buff field initialization changed in v4   (read docs)
         self:DisableRestrictedWeapons()    # added by brute51 [119]
-        self:OnCreated()		
+        self:OnCreated()	
+
+		###below here added for FAF by FunkOff
+		self.attachmentBone = nil	
+		self.slotsFree = {}
+		
     end,
 
 
@@ -3635,13 +3640,28 @@ Unit = Class(moho.unit_methods) {
     ## TRANSPORTING
     ##########################################################################################
     OnStartTransportBeamUp = function(self, transport, bone)
-        self:DestroyIdleEffects()
-        self:DestroyMovementEffects()
-        local army =  self:GetArmy()
-        table.insert( self.TransportBeamEffectsBag, AttachBeamEntityToEntity(self, -1, transport, bone, army, EffectTemplate.TTransportBeam01))
-        table.insert( self.TransportBeamEffectsBag, AttachBeamEntityToEntity( transport, bone, self, -1, army, EffectTemplate.TTransportBeam02))
-        table.insert( self.TransportBeamEffectsBag, CreateEmitterAtBone( transport, bone, army, EffectTemplate.TTransportGlow01) )
-        self:TransportAnimation()
+		#added for transport bug fix
+		if transport.slotsFree[bone] == false then
+			WARN('Stop issued due to attachment bone already in use, bone ' .. repr(bone))
+			#IssueStop({self})
+			#IssueStop({transport})
+			self:Kill()
+			return
+		else
+			WARN('Unit is okay to attach on bone ' .. repr(bone))
+			WARN('slotsFree is ' .. repr(transport.slotsFree[bone]))
+			self:DestroyIdleEffects()
+			self:DestroyMovementEffects()
+			local army =  self:GetArmy()
+			table.insert( self.TransportBeamEffectsBag, AttachBeamEntityToEntity(self, -1, transport, bone, army, EffectTemplate.TTransportBeam01))
+			table.insert( self.TransportBeamEffectsBag, AttachBeamEntityToEntity( transport, bone, self, -1, army, EffectTemplate.TTransportBeam02))
+			table.insert( self.TransportBeamEffectsBag, CreateEmitterAtBone( transport, bone, army, EffectTemplate.TTransportGlow01) )
+			self:TransportAnimation()
+			
+		end
+		##end transport bug fix	
+	
+
     end,
 
     OnStopTransportBeamUp = function(self)
@@ -3654,10 +3674,12 @@ Unit = Class(moho.unit_methods) {
 
     OnTransportAborted = function(self)
         #LOG('TransportAborted')
+		WARN('TransportAborted')
     end,
 
     OnTransportOrdered = function(self)
         #LOG('TransportOrdered')
+		WARN('TransportOrdered')
     end,
 
     MarkWeaponsOnTransport = function(self, unit, transport)
@@ -3677,20 +3699,28 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnTransportAttach = function(self, attachBone, unit)
-        self:PlayUnitSound('Load')
-        self:MarkWeaponsOnTransport(unit, true)
-        if unit:ShieldIsOn() then
-            unit:DisableShield()
-            unit:DisableDefaultToggleCaps()
-        end
-        if not EntityCategoryContains(categories.PODSTAGINGPLATFORM, self) then
-            self:RequestRefreshUI()
-        end
-		        # added by brute51
-        unit:OnAttachedToTransport(self)
-        self:DoUnitCallbacks( 'OnTransportAttach', unit )
-    end,
 
+		self:PlayUnitSound('Load')
+		self:MarkWeaponsOnTransport(unit, true)
+		if unit:ShieldIsOn() then
+			unit:DisableShield()
+			unit:DisableDefaultToggleCaps()
+		end
+		if not EntityCategoryContains(categories.PODSTAGINGPLATFORM, self) then
+			self:RequestRefreshUI()
+		end
+				# added by brute51
+		unit:OnAttachedToTransport(self, attachBone)
+		self:DoUnitCallbacks( 'OnTransportAttach', unit )
+		
+    end,
+	
+
+
+
+
+
+	
     OnTransportDetach = function(self, attachBone, unit)
         self:PlayUnitSound('Unload')
         self:MarkWeaponsOnTransport(unit, false)
@@ -3700,14 +3730,17 @@ Unit = Class(moho.unit_methods) {
             self:RequestRefreshUI()
         end
         unit:TransportAnimation(-1)
-		        unit:OnDetachedToTransport(self)
+		 unit:OnDetachedToTransport(self)
         self:DoUnitCallbacks( 'OnTransportDetach', unit )
     end,
 
     OnStartTransportLoading = function(self)
+		#WARN('OnStartTransportLoading with args ' .. repr(self))
+		WARN('OnStartTransportLoading')
     end,
 
     OnStopTransportLoading = function(self)
+		WARN('OnStopTransportLoading')
     end,
 
     OnAddToStorage = function(self, unit)
@@ -4192,12 +4225,22 @@ Unit = Class(moho.unit_methods) {
 	
 	
 	
-	OnAttachedToTransport = function(self, transport)
+	OnAttachedToTransport = function(self, transport, bone)
+
         self:DoUnitCallbacks( 'OnAttachedToTransport', transport )
+		for i=1,transport:GetBoneCount() do
+			if transport:GetBoneName(i) == bone then
+				self.attachmentBone = i
+				WARN('OnAttach bone is ' .. repr(bone))
+				transport.slotsFree[i] = false
+			end
+		end
     end,
 	
 	OnDetachedToTransport = function(self, transport)
         self:DoUnitCallbacks( 'OnDetachedToTransport', transport )
+		transport.slotsFree[self.attachmentBone] = true 
+		self.attachmentBone = nil
     end,
 
 	
