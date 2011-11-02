@@ -505,11 +505,11 @@ UnitBlueprint {
                 Sub = 'Seabed|Sub|Water',
                 Water = 'Seabed|Sub|Water',
             },
-            FiringTolerance = 6, #from 2
+            FiringTolerance = 90, #from 2
             Label = 'AntiTorpedo',
             LeadTarget = false, #from true
             MaxRadius = 45,
-            MinRadius = 0,  #from 15
+            MinRadius = 15,  #from 15
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 80,
