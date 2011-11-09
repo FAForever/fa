@@ -1699,7 +1699,7 @@ Unit = Class(moho.unit_methods) {
                 function(self) 
                     WaitTicks(1)
                     self:OnRebuildBonusIsIllegal()
-					WARN ('checkrebuildbonus if')
+					#WARN ('checkrebuildbonus if')
                 end
             )
         end
@@ -3642,14 +3642,15 @@ Unit = Class(moho.unit_methods) {
     OnStartTransportBeamUp = function(self, transport, bone)
 		#added for transport bug fix
 		if transport.slotsFree[bone] == false then
-			WARN('Stop issued due to attachment bone already in use, bone ' .. repr(bone))
+			#WARN('Stop issued due to attachment bone already in use, bone ' .. repr(bone))
 			#IssueStop({self})
 			#IssueStop({transport})
 			self:Kill()
+			WARN('Unit killed due to attachment bone already in use.')
 			return
 		else
-			WARN('Unit is okay to attach on bone ' .. repr(bone))
-			WARN('slotsFree is ' .. repr(transport.slotsFree[bone]))
+			#WARN('Unit is okay to attach on bone ' .. repr(bone))
+			#WARN('slotsFree is ' .. repr(transport.slotsFree[bone]))
 			self:DestroyIdleEffects()
 			self:DestroyMovementEffects()
 			local army =  self:GetArmy()
@@ -3674,12 +3675,12 @@ Unit = Class(moho.unit_methods) {
 
     OnTransportAborted = function(self)
         #LOG('TransportAborted')
-		WARN('TransportAborted')
+		#WARN('TransportAborted')
     end,
 
     OnTransportOrdered = function(self)
         #LOG('TransportOrdered')
-		WARN('TransportOrdered')
+		#WARN('TransportOrdered')
     end,
 
     MarkWeaponsOnTransport = function(self, unit, transport)
@@ -3736,11 +3737,11 @@ Unit = Class(moho.unit_methods) {
 
     OnStartTransportLoading = function(self)
 		#WARN('OnStartTransportLoading with args ' .. repr(self))
-		WARN('OnStartTransportLoading')
+		#WARN('OnStartTransportLoading')
     end,
 
     OnStopTransportLoading = function(self)
-		WARN('OnStopTransportLoading')
+		#WARN('OnStopTransportLoading')
     end,
 
     OnAddToStorage = function(self, unit)
@@ -4231,7 +4232,7 @@ Unit = Class(moho.unit_methods) {
 		for i=1,transport:GetBoneCount() do
 			if transport:GetBoneName(i) == bone then
 				self.attachmentBone = i
-				WARN('OnAttach bone is ' .. repr(bone))
+				#WARN('OnAttach bone is ' .. repr(bone))
 				transport.slotsFree[i] = false
 			end
 		end
