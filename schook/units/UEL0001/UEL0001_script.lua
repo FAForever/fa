@@ -259,22 +259,60 @@ UEL0001 = Class(TWalkingLandUnit) {
         self.BuildingUnit = false          
     end,
 
+	RebuildPod = function(self, PodNumber)
+		if PodNumber == 1 then
+			local ecobp = self:GetBlueprint().Pod
+			self.RebuildingPod = CreateEconomyEvent(self, 1600, 160, 10, self.SetWorkProgress)
+			self:RequestRefreshUI()
+			WaitFor(self.RebuildingPod)
+			self:SetWorkProgress(0.0)
+            local location = self:GetPosition('AttachSpecial02')
+            local pod = CreateUnitHPR('UEA0001', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+            pod:SetParent(self, 'LeftPod')
+            pod:SetCreator(self)
+            self.Trash:Add(pod)
+            self.HasLeftPod = true
+            self.LeftPod = pod
+		else
+			local ecobp = self:GetBlueprint().Pod
+			self.RebuildingPod = CreateEconomyEvent(self, 1600, 160, 10, self.SetWorkProgress)
+			self:RequestRefreshUI()
+			WaitFor(self.RebuildingPod)
+			self:SetWorkProgress(0.0)
+			
+            local location = self:GetPosition('AttachSpecial01')
+            local pod = CreateUnitHPR('UEA0001', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+            pod:SetParent(self, 'RightPod')
+            pod:SetCreator(self)
+            self.Trash:Add(pod)
+            self.HasRightPod = true
+            self.RightPod = pod		
+		end
+		self:RequestRefreshUI()
+	end,	
+	
     NotifyOfPodDeath = function(self, pod)
-        if pod == 'RightPod' and self.HasLeftPod then
-            self:CreateEnhancement('RightPodRemove')
-            self:CreateEnhancement('LeftPod')
-            self.HasRightPod = false
-            self:RequestRefreshUI()
-        elseif pod == 'RightPod' and not self.HasLeftPod then
-            self:CreateEnhancement('RightPodRemove')
-            self:CreateEnhancement('LeftPodRemove')
-            self.HasRightPod = false
-            self:RequestRefreshUI()
-        elseif pod == 'LeftPod' then
-            self.HasLeftPod = false
-            self:CreateEnhancement('LeftPodRemove')
-            self:RequestRefreshUI()
-        end
+	
+	    if pod == 'LeftPod' then
+			self:ForkThread(self.RebuildPod,1)
+        elseif pod == 'RightPod' then
+			self:ForkThread(self.RebuildPod,2)
+		end
+        #if pod == 'RightPod' and self.HasLeftPod then
+        #    self:CreateEnhancement('RightPodRemove')
+        #    self:CreateEnhancement('LeftPod')
+        #    self.HasRightPod = false
+        #    self:RequestRefreshUI()
+        #elseif pod == 'RightPod' and not self.HasLeftPod then
+        #    self:CreateEnhancement('RightPodRemove')
+        #    self:CreateEnhancement('LeftPodRemove')
+        #    self.HasRightPod = false
+        #    self:RequestRefreshUI()
+        #elseif pod == 'LeftPod' then
+        #    self.HasLeftPod = false
+        #    self:CreateEnhancement('LeftPodRemove')
+        #    self:RequestRefreshUI()
+        #end
     end,
 
     CreateEnhancement = function(self, enh)
@@ -402,26 +440,9 @@ UEL0001 = Class(TWalkingLandUnit) {
             end
             self:AddBuildRestriction( categories.UEF * ( categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
         elseif enh =='DamageStablization' then
-			if not Buffs['UEFACUNanoRegen'] then
-                BuffBlueprint {
-                    Name = 'UEFACUNanoRegen',
-                    DisplayName = 'UEFACUNanoRegen',
-                    BuffType = 'ACUBUILDRATE',
-                    Stacks = 'REPLACE',
-                    Duration = -1,
-                    Affects = {
-                        Regen = {
-                            Add = bp.NewRegenRate,
-                            Mult = 1.0,
-                        },
-                    },
-                }
-            end
-            Buff.ApplyBuff(self, 'UEFACUNanoRegen')
+            self:SetRegenRate(bp.NewRegenRate)
         elseif enh =='DamageStablizationRemove' then
-            if Buff.HasBuff( self, 'UEFACUNanoRegen' ) then
-                Buff.RemoveBuff( self, 'UEFACUNanoRegen' )
-            end
+            self:RevertRegenRate()
         elseif enh =='HeavyAntiMatterCannon' then
             local wep = self:GetWeaponByLabel('RightZephyr')
             wep:AddDamageMod(bp.ZephyrDamageMod)        
