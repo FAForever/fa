@@ -735,6 +735,15 @@ local function AssignRandomTeams(gameInfo)
 			end
 		end
 	end
+	
+	if gameInfo.GameOptions['AutoTeams'] == 'none' then
+		for i = 1, LobbyComm.maxPlayerSlots do
+			if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
+				SetSlotInfo(i, gameInfo.PlayerOptions[i])
+			end
+		end
+	end
+	
 end
 
 local function AssignAINames(gameInfo)
@@ -860,30 +869,6 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         end
     end
 	
-	if gameInfo.GameOptions['RankedGame'] != 'Off' then
-		if not singlePlayer then
-			local notPL = GetPlayersNotPL()
-			if notPL then
-				for k,v in notPL do
-					SendSystemMessage(LOCF("<LOC lobui_0612>You can't start a game in Ranked Mode because %s doesn't have Power Lobby 1.4 or greater.",v))
-				end				
-				return			
-			end
-		end					
-	end
-
-    if gameInfo.GameOptions['RankedGame'] == 'Off' then
-		local clientsMissingMap = ClientsMissingMap()
-		if clientsMissingMap then
-			local names = ""
-			for index, name in clientsMissingMap do
-				names = names .. " " .. name
-			end
-			AddChatText(LOCF("<LOC lobui_0329>The following players do not have the currently selected map, unable to launch:%s", names))
-			return
-		end
-	end
-
     -- make sure there are some players (could all be observers?)
     -- Also count teams. There needs to be at least 2 teams (or all FFA) represented
     local totalPlayers = 0
@@ -979,15 +964,9 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
 				return
 			end
 		end
-		if gameInfo.GameOptions['RankedGame'] != 'Off' then
-			if totalHumanPlayers != 2 then
-				SendSystemMessage(LOC("<LOC lobui_0615>There must be two human players to start a game in Ranked Mode."))
-				return
-			end
-		end
 	end
 	
-    if not gameInfo.GameOptions.AllowObservers or gameInfo.GameOptions['RankedGame'] != 'Off' then
+    if not gameInfo.GameOptions.AllowObservers then
         local hostIsObserver = false
         local anyOtherObservers = false
         for k,observer in gameInfo.Observers do
@@ -1025,9 +1004,6 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
 	numberOfPlayers = totalPlayers
     
     local function LaunchGame()
-		if gameInfo.GameOptions['RankedGame'] != 'Off' then
-			rankedGame()
-		end
 		if gameInfo.GameOptions['RandomMap'] != 'Off' then
 			autoRandMap = true
 			autoMap()
@@ -1038,20 +1014,11 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         AssignRandomFactions(gameInfo)
         AssignRandomStartSpots(gameInfo)
 		--assign the teams just before launch
-		if gameInfo.GameOptions['AutoTeams'] != 'none' then
-			AssignRandomTeams(gameInfo)
-		end
+		AssignRandomTeams(gameInfo)
         randstring = randomString(16, "%l%d")
 		gameInfo.GameOptions['ReplayID'] = randstring
 		AssignAINames(gameInfo)
 		
-		-- kick observers
-		if gameInfo.GameOptions['RankedGame'] != 'Off' then
-			for k,observer in gameInfo.Observers do
-				lobbyComm:EjectPeer(observer.OwnerID, "KickedByHost")
-			end
-			gameInfo.Observers = {}
-		end
     
         -- Tell everyone else to launch and then launch ourselves.
         lobbyComm:BroadcastData( { Type = 'Launch', GameInfo = gameInfo } )
@@ -1272,26 +1239,20 @@ local function UpdateGame()
         end
     end
 
-	if not gameInfo.GameOptions['RankedGame'] or gameInfo.GameOptions['RankedGame'] == 'Off' then
-		if scenarioInfo and scenarioInfo.map and (scenarioInfo.map != "") then
-		
-			if not GUI.mapView:SetTexture(scenarioInfo.preview) then
-				GUI.mapView:SetTextureFromMap(scenarioInfo.map)
-			end
-			GUI.mapName:SetText(LOC(scenarioInfo.name))
 
-			ShowMapPositions(GUI.mapView,scenarioInfo,numPlayers)			
-		else
-			GUI.mapView:ClearTexture()
-			ShowMapPositions(nil, false)			
+	if scenarioInfo and scenarioInfo.map and (scenarioInfo.map != "") then
+	
+		if not GUI.mapView:SetTexture(scenarioInfo.preview) then
+			GUI.mapView:SetTextureFromMap(scenarioInfo.map)
 		end
+		GUI.mapName:SetText(LOC(scenarioInfo.name))
+
+		ShowMapPositions(GUI.mapView,scenarioInfo,numPlayers)			
 	else
-		GUI.LargeMapPreview:Disable()
 		GUI.mapView:ClearTexture()
-		GUI.mapView:SetTexture("/textures/ui/powerlobby/ranked.dds")
-		GUI.mapName:SetText(LOC("<LOC lobui_0602>Ranked Mode"))
-		ShowMapPositions(nil, false)		
+		ShowMapPositions(nil, false)			
 	end
+
 
     -- deal with options display
     if lobbyComm:IsHost() then
@@ -1320,19 +1281,6 @@ local function UpdateGame()
                 
                 GUI.launchGameButton:Disable()
             end
-			if gameInfo.GameOptions['RankedGame'] != 'Off' then
-				local notPL = GetPlayersNotPL()
-				if notPL then
-					for k,v in notPL do
-						SendSystemMessage(LOCF("<LOC lobui_0613>You can't play a game in Ranked Mode because %s doesn't have Power Lobby 1.4 or greater.",v))
-						SetGameOption('RankedGame', 'Off')
-						local scen = Prefs.GetFromCurrentProfile('LastScenario')
-						if scen and scen != "" then
-							SetGameOption('ScenarioFile',scen)
-						end						
-					end
-				end
-			end
 			
 			if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") then
 				if scenarioInfo and scenarioInfo.map and scenarioInfo.map != '' then
@@ -1777,28 +1725,6 @@ function randomString(Length, CharSet)
 	end
 end
 
-function rankedGame()
-	gameInfo.GameOptions['Victory'] = 'demoralization'
-	gameInfo.GameOptions['Timeouts'] = '3'
-	gameInfo.GameOptions['CheatsEnabled'] = 'false'
-	gameInfo.GameOptions['CivilianAlliance'] = 'enemy'
-	gameInfo.GameOptions['GameSpeed'] = 'normal'
-	gameInfo.GameOptions['FogOfWar'] = 'explored'
-	gameInfo.GameOptions['UnitCap'] = '500'
-	gameInfo.GameOptions['PrebuiltUnits'] = 'Off'
-	gameInfo.GameOptions['NoRushOption'] = 'Off'
-	gameInfo.GameOptions['TeamSpawn'] = 'fixed'
-	gameInfo.GameOptions['RandomMap'] = 'Off'	
-	gameInfo.GameOptions['TeamLock'] = 'locked'
-	gameInfo.GameOptions['AutoTeams'] = 'pvsi'
-	gameInfo.GameOptions['Score'] = 'yes'	
-	gameInfo.GameOptions['AllowObservers'] = false	
-	rankedMaps = {'scmp_007', 'scmp_012', 'scmp_016', 'scmp_017', 'scmp_018', 'scmp_019', 'scmp_020', 'scmp_023', 'scmp_025', 'scmp_031', 'scmp_036', 'scmp_038', 'x1mp_001', 'x1mp_002', 'x1mp_004', 'x1mp_017'}
-	rankedMap = math.random(16)
-	mapID = rankedMaps[rankedMap]
-	gameInfo.GameOptions['ScenarioFile'] = '/maps/'..mapID..'/'..mapID..'_scenario.lua'
-	gameInfo.GameOptions['RankedID'] = 1
-end
 
 function HostPlayerMissingMapAlert(id)
     local slot = FindSlotForID(id)
@@ -1986,33 +1912,13 @@ function CreateUI(maxPlayers)
 				mapSelectDialog:Destroy()
 				GUI.chatEdit:AcquireFocus() 
 				for optionKey, data in changedOptions do
-					if (data.pref == 'Lobby_Gen_Cap') then
-						Prefs.SetToCurrentProfile('Lobby_Gen_Cap', 4)
-					else
-						Prefs.SetToCurrentProfile(data.pref, data.index)
-					end
+					Prefs.SetToCurrentProfile(data.pref, data.index)
 					SetGameOption(optionKey, data.value)					
 				end
 				--SendSystemMessage(selectedScenario.file)
-				if gameInfo.GameOptions['RankedGame'] != 'Off' then
-					SetGameOption('Victory', 'demoralization')
-					SetGameOption('Timeouts', '3')
-					SetGameOption('CheatsEnabled', 'false')
-					SetGameOption('CivilianAlliance', 'enemy')
-					SetGameOption('GameSpeed', 'normal')
-					SetGameOption('FogOfWar', 'explored')
-					SetGameOption('UnitCap', '500')
-					SetGameOption('PrebuiltUnits', 'Off')
-					SetGameOption('NoRushOption', 'Off')
-					SetGameOption('RandomMap', 'Off')
-					SetGameOption('TeamSpawn', 'random')
-					SetGameOption('AutoTeams', 'none')
-					SetGameOption('TeamLock', 'locked')
-					SetGameOption('Score', 'yes')
-					SetGameOption('ScenarioFile','/maps/scmp_016/scmp_016_scenario.lua')
-				else
-					SetGameOption('ScenarioFile',selectedScenario.file)
-				end				
+
+				SetGameOption('ScenarioFile',selectedScenario.file)
+			
 				SetGameOption('RestrictedCategories', restrictedCategories, true)
 				ClearBadMapFlags()  -- every new map, clear the flags, and clients will report if a new map is bad
 				HostUpdateMods()
@@ -2555,10 +2461,7 @@ function CreateUI(maxPlayers)
                     if GUI.becomeObserver then
                         GUI.becomeObserver:Disable()						
                     end
-					if gameInfo.GameOptions['RankedGame'] and gameInfo.GameOptions['RankedGame'] != 'Off' then
-						AddChatText(LOC("<LOC lobui_0614>The Ranked Mode is enabled, please check your names before you start the game."))
-						AddChatText(LOC("<LOC lobui_0616>ATTENTION: The names are also case sensitive."))
-					end				
+		
                 else
                     EnableSlot(self.row)
                     if GUI.becomeObserver then
@@ -2750,29 +2653,6 @@ function CreateUI(maxPlayers)
 			
 			Tooltip.AddButtonTooltip(GUI.rankedOptions, 'lob_click_rankedoptions')
 			
-			GUI.rankedOptions.OnClick = function()
-				Prefs.SetToCurrentProfile('Lobby_Gen_Victory', 1)
-				Prefs.SetToCurrentProfile('Lobby_Gen_Timeouts', 2)
-				Prefs.SetToCurrentProfile('Lobby_Gen_CheatsEnabled', 1)
-				Prefs.SetToCurrentProfile('Lobby_Gen_Civilians', 1)
-				Prefs.SetToCurrentProfile('Lobby_Gen_GameSpeed', 1)
-				Prefs.SetToCurrentProfile('Lobby_Gen_Fog', 1)
-				Prefs.SetToCurrentProfile('Lobby_Gen_Cap', 4)
-				Prefs.SetToCurrentProfile('Lobby_Prebuilt_Units', 1)
-				Prefs.SetToCurrentProfile('Lobby_NoRushOption', 1)
-				SetGameOption('Victory', 'demoralization')
-				SetGameOption('Timeouts', '3')
-				SetGameOption('CheatsEnabled', 'false')
-				SetGameOption('CivilianAlliance', 'enemy')
-				SetGameOption('GameSpeed', 'normal')
-				SetGameOption('FogOfWar', 'explored')
-				SetGameOption('UnitCap', '500')
-				SetGameOption('PrebuiltUnits', 'Off')
-				SetGameOption('NoRushOption', 'Off')
-				--gameInfo.GameMods["03D75435-5E6A-11DD-A058-5D6456D89593"] = true
-				--lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }				
-				UpdateGame()
-			end
 		end
 		--end of ranked options code
 		--start of auto kick code
