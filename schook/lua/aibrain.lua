@@ -932,7 +932,8 @@ AIBrain = Class(moho.aibrain_methods) {
 		###end sorian AI bit
 		
         SetArmyOutOfGame(self:GetArmyIndex())
-        table.insert( Sync.GameResult, { self:GetArmyIndex(), "defeat" } )
+        local result = string.format("%s %i", "defeat", math.floor(self:GetArmyStat("FAFScore",0.0).Value) )
+        table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
         import('/lua/SimUtils.lua').UpdateUnitCap()
         import('/lua/SimPing.lua').OnArmyDefeat(self:GetArmyIndex())
         local function KillArmy()
