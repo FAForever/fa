@@ -1521,7 +1521,8 @@ AirUnit = Class(MobileUnit) {
         if with == 'Water' then
             self:PlayUnitSound('AirUnitWaterImpact')
             EffectUtil.CreateEffects( self, self:GetArmy(), EffectTemplate.DefaultProjectileWaterImpact )
-            self:Destroy()
+            #self:Destroy()
+	    self:ForkThread(self.SinkIntoWaterAfterDeath, self.OverKillRatio )   
         else
             # This is a bit of safety to keep us from calling the death thread twice in case we bounce twice quickly
             if not self.DeathBounce then
@@ -1531,6 +1532,74 @@ AirUnit = Class(MobileUnit) {
         end
     end,
 
+    SinkIntoWaterAfterDeath = function(self, overkillRatio)
+	    
+	local sx, sy, sz = self:GetUnitSizes()
+	local vol = sx * sy * sz
+	local army = self:GetArmy()
+	local pos = self:GetPosition()
+	local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
+	local DaveyJones = (seafloor - pos[2])*20
+	local numBones = self:GetBoneCount()-1
+
+
+	self:ForkThread(function()
+		##LOG("Sinker thread created")
+		local pos = self:GetPosition()
+		local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
+		while self:GetPosition(1)[2] > (seafloor) do  #added 2 because they were sinking into the seafloor
+			WaitSeconds(0.1)
+			##LOG("Sinker: ", repr(self:GetPosition()))
+		end
+		#CreateScaledBoom(self, overkillRatio, watchBone)
+		self:CreateWreckage(overkillRatio)  # instigator)
+		self:Destroy()
+	end)
+
+
+	self:ForkThread(function()
+		local i = 0
+		while true do
+			local rx, ry, rz = self:GetRandomOffset(0.25)
+			local rs = Random(vol/2, vol*2) / (vol*2)
+			local randBone = Util.GetRandomInt( 0, numBones)
+
+			CreateEmitterAtBone( self, randBone, army, '/effects/emitters/destruction_underwater_explosion_flash_01_emit.bp')
+				:ScaleEmitter(sx)
+				:OffsetEmitter(rx, ry, rz)
+			CreateEmitterAtBone( self, randBone, army, '/effects/emitters/destruction_underwater_sinking_wash_01_emit.bp')
+				:ScaleEmitter(sx/2)
+				:OffsetEmitter(rx, ry, rz)
+			#2 emitters is plenty for smaller hover units
+			#CreateEmitterAtBone( self, 0, army, '/effects/emitters/destruction_underwater_sinking_wash_01_emit.bp')
+			#	:ScaleEmitter(sx)
+			#	:OffsetEmitter(rx, ry, rz)
+			
+			local rd = Util.GetRandomFloat( 0.4+i, 1.0+i)
+			WaitSeconds(rd)
+			i = i + 0.3
+		end
+	end)
+	local orientation = self:GetOrientation()
+	local SinkOrient = {0,orientation[2],0,orientation[4]}
+	self:SetOrientation(SinkOrient,true)
+
+	#WARN('orientation is ' .. repr (orientation))
+	#what does this even do I have no idea
+	local slider = CreateSlider(self, 0)
+	slider:SetGoal(0, DaveyJones+10, 0)  #changed from +5 to +10
+	#slider:SetGoal(0, seafloor, 0) 
+	slider:SetSpeed(10) #from 8
+	#self:SetOrientation(orientation,true)
+	WaitFor(slider)
+	slider:Destroy()
+	
+	#CreateScaledBoom(self, overkillRatio)
+	self:CreateWreckage(overkillRatio)  #, instigator)
+	self:Destroy()
+    
+    end,
+    
     CreateUnitAirDestructionEffects = function( self, scale )
         explosion.CreateDefaultHitExplosion( self, explosion.GetAverageBoundingXZRadius(self))
         explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {self:GetUnitSizes()})
@@ -1542,8 +1611,8 @@ AirUnit = Class(MobileUnit) {
     # GROUND AND WHEN IT IMPACTS IT WILL DESTROY ITSELF
     OnKilled = function(self, instigator, type, overkillRatio)
         local bp = self:GetBlueprint()
-        if (self:GetCurrentLayer() == 'Air' and Random() < self.DestroyNoFallRandomChance) then
-            
+        #if (self:GetCurrentLayer() == 'Air' and Random() < self.DestroyNoFallRandomChance) then
+        if (self:GetCurrentLayer() == 'Air' ) then       
             self.CreateUnitAirDestructionEffects( self, 1.0 )
             self:DestroyTopSpeedEffects()
             self:DestroyBeamExhaust()

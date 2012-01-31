@@ -1214,10 +1214,10 @@ Unit = Class(moho.unit_methods) {
 			return
 		end
 
-		if self:GetBlueprint().Wreckage.WreckageLayers[self:GetCurrentLayer()] then 
+		#if self:GetBlueprint().Wreckage.WreckageLayers[self:GetCurrentLayer()] then 
 		#this checks if wreck are allowed... but now we allow all wrecks so it is moot point anyways
 			return self:CreateWreckageProp(overkillRatio)
-		end
+		#end
     end,
 
     CreateWreckageProp = function( self, overkillRatio )

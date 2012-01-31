@@ -1345,8 +1345,7 @@ AIBrain = Class(moho.aibrain_methods) {
         self.NumBases = 1
 
         self.BuilderManagers = {}
-	    SUtils.AddCustomUnitSupport(self)
-		
+	  
         self:AddBuilderManagers(self:GetStartVector3f(), 100, 'MAIN', false)
         #self.BuilderManagers.MAIN.StrategyManager = StratManager.CreateStrategyManager(self, 'MAIN', self:GetStartVector3f(), 100)
 
