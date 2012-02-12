@@ -448,9 +448,26 @@ UEL0001 = Class(TWalkingLandUnit) {
             end
             self:AddBuildRestriction( categories.UEF * ( categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
         elseif enh =='DamageStablization' then
-            self:SetRegenRate(bp.NewRegenRate)
+            if not Buffs['UEFACUDamageStablization'] then
+                BuffBlueprint {
+                    Name = 'UEFACUDamageStablization',
+                    DisplayName = 'UEFACUDamageStablization',
+                    BuffType = 'DamageStablization',
+                    Stacks = 'REPLACE',
+                    Duration = -1,
+                    Affects = {
+                        Regen = {
+                            Add = bp.NewRegenRate,
+                            Mult = 1.0,
+                        },
+                    },
+                }
+            end
+            Buff.ApplyBuff(self, 'UEFACUDamageStablization')
         elseif enh =='DamageStablizationRemove' then
-            self:RevertRegenRate()
+            if Buff.HasBuff( self, 'UEFACUDamageStablization' ) then
+                Buff.RemoveBuff( self, 'UEFACUDamageStablization' )
+            end
         elseif enh =='HeavyAntiMatterCannon' then
             local wep = self:GetWeaponByLabel('RightZephyr')
             wep:AddDamageMod(bp.ZephyrDamageMod)        
