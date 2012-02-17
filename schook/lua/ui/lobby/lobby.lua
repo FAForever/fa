@@ -48,6 +48,7 @@ local quickRandMap = false
 local lastUploadedMap = nil
 local playerRating = tonumber(GetCommandLineArg("/rating", 1)[1]) or ""
 
+
 -- builds the faction tables, and then adds random faction icon to the end
 local factionBmps = {}
 local factionTooltips = {}
@@ -688,7 +689,21 @@ local function AssignRandomStartSpots(gameInfo)
     end
 end
 
+-- This fonction is used to double check the observers.
+local function sendObserversList(gameInfo)
+	for k,observer in gameInfo.Observers do
+        
+		GpgNetSend('PlayerOption', string.format("team %s %d %s", observer.PlayerName, -1, 0))
+	
+	
+	end
+end
+
 local function AssignRandomTeams(gameInfo)
+	-- first, send all observers
+	
+	sendObserversList(gameInfo)
+	
 	if gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
 		local midLine = GUI.mapView.Left() + (GUI.mapView.Width() / 2)
 		for i = 1, LobbyComm.maxPlayerSlots do
@@ -984,6 +999,9 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
 
         if anyOtherObservers then
             if skipNoObserversCheck then
+				-- we send the observer list before kicking the players, in case they are not registered as observer
+				-- and won't disconnect correctly before the game launch.
+				sendObserversList(gameInfo)
                 for k,observer in gameInfo.Observers do
                     lobbyComm:EjectPeer(observer.OwnerID, "KickedByHost")
                 end
@@ -1004,6 +1022,10 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
 	numberOfPlayers = totalPlayers
     
     local function LaunchGame()
+	
+		-- Send observer list again, just by precaution.
+		sendObserversList(gameInfo)
+	
 		if gameInfo.GameOptions['RandomMap'] != 'Off' then
 			autoRandMap = true
 			autoMap()
@@ -1302,7 +1324,9 @@ local function UpdateGame()
 		scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
 		CreateBigPreview(501, GUI.mapPanel)
 	end
-    RefreshOptionDisplayData(scenarioInfo)	
+    RefreshOptionDisplayData(scenarioInfo)
+	-- Send autoteams infos to server.
+	AssignRandomTeams(gameInfo)	
 end
 
 -- Update our local gameInfo.GameMods from selected map name and selected mods, then
@@ -2508,6 +2532,7 @@ function CreateUI(maxPlayers)
     GUI.allowObservers = nil
     GUI.observerList = nil
 	
+	-- FIXME : this is not needed anymore.
 	if lobbyComm:IsHost() then
 		SetGameOption('RandomMap', 'Off') --make sure always create lobby with Random Map off
 		SetGameOption('RankedGame', 'Off') --make sure always create lobby with Ranked Game off
