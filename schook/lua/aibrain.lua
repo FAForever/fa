@@ -921,6 +921,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
 
 	OnDefeat = function(self)
+		LOG('DEFEATED')
 		##For Sorian AI
 		if self.BrainType == 'AI' then
 			SUtils.AISendChat('enemies', ArmyBrains[self:GetArmyIndex()].Nickname, 'ilost')
@@ -931,9 +932,19 @@ AIBrain = Class(moho.aibrain_methods) {
 		end
 		###end sorian AI bit
 		
-        SetArmyOutOfGame(self:GetArmyIndex())
+		SetArmyOutOfGame(self:GetArmyIndex())
+		self:AddArmyStat("FAFScore", -1) 
         local result = string.format("%s %i", "defeat", math.floor(self:GetArmyStat("FAFScore",0.0).Value) )
-        table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
+		table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
+		
+		# Score change, we send the score of all other players, yes mam !
+		for index, brain in ArmyBrains do
+				local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFScore",0.0).Value) )
+				table.insert( Sync.GameResult, { index, result } )
+		end
+
+		
+		
         import('/lua/SimUtils.lua').UpdateUnitCap()
         import('/lua/SimPing.lua').OnArmyDefeat(self:GetArmyIndex())
         local function KillArmy()
@@ -1005,8 +1016,17 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 	
     OnVictory = function(self)
-    	local result = string.format("%s %i", "victory", math.floor(self:GetArmyStat("FAFScore",0.0).Value) )
+		self:AddArmyStat("FAFScore", 5) 
+	   	local result = string.format("%s %i", "victory", math.floor(self:GetArmyStat("FAFScore",0.0).Value) )
         table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
+		
+		# Score change, we send the score of all other players, yes mam !
+		for index, brain in ArmyBrains do
+				local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFScore",0.0).Value) )
+				table.insert( Sync.GameResult, { index, result } )
+		end
+		
+
     end,
 
     OnDraw = function(self)

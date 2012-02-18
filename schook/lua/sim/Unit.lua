@@ -1006,30 +1006,21 @@ Unit = Class(moho.unit_methods) {
         
         if EntityCategoryContains(categories.COMMAND, self) then
         	LOG('com is dead') 
-                	# If there is a killer, and it's not me 
+			# If there is a killer, and it's not me 
         	if instigator and instigator:GetArmy() != self:GetArmy() then
         		local brain = ArmyBrains[instigator:GetArmy()]
         		local mybrain = ArmyBrains[self:GetArmy()]
         		
         		brain:AddArmyStat("FAFScore", 1)        		
-        		mybrain:AddArmyStat("FAFScore", -1)
-        		
 
-
-			elseif instigator and instigator:GetArmy() == self:GetArmy() then
-
-        		
-        		local brain = ArmyBrains[self:GetArmy()]
-        		brain:AddArmyStat("FAFScore", -1)
-       		
-        	else    		
-        		local brain = ArmyBrains[self:GetArmy()]      	
-        		brain:AddArmyStat("FAFScore", -1)
         	end
 	
-
-		
-		
+			## Score change, we send the score of all players, yes mam !
+			
+			for index, brain in ArmyBrains do
+				local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFScore",0.0).Value) )
+				table.insert( Sync.GameResult, { index, result } )
+			end
         end
 
         #If factory, destory what I'm building if I die
