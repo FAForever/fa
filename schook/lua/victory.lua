@@ -68,7 +68,7 @@ function CheckVictory(scenarioInfo)
                     return
                 end
             else
-                victoryTime = GetGameTimeSeconds() + 0.5
+                victoryTime = GetGameTimeSeconds() + 5
                 potentialWinners = stillAlive
             end
         elseif draw then
