@@ -2677,9 +2677,37 @@ function CreateUI(maxPlayers)
 			LayoutHelpers.CenteredRightOf(GUI.rankedOptions, GUI.randMap, 5)
 			
 			Tooltip.AddButtonTooltip(GUI.rankedOptions, 'lob_click_rankedoptions')
-			
-		end
+			   
+			GUI.rankedOptions.OnClick = function()
+					Prefs.SetToCurrentProfile('Lobby_Gen_Victory', 1)
+					Prefs.SetToCurrentProfile('Lobby_Gen_Timeouts', 2)
+					Prefs.SetToCurrentProfile('Lobby_Gen_CheatsEnabled', 1)
+					Prefs.SetToCurrentProfile('Lobby_Gen_Civilians', 1)
+					Prefs.SetToCurrentProfile('Lobby_Gen_GameSpeed', 1)
+					Prefs.SetToCurrentProfile('Lobby_Gen_Fog', 1)
+					Prefs.SetToCurrentProfile('Lobby_Gen_Cap', 8)
+					Prefs.SetToCurrentProfile('Lobby_Prebuilt_Units', 1)
+					Prefs.SetToCurrentProfile('Lobby_NoRushOption', 1)
+					SetGameOption('Victory', 'demoralization')
+					SetGameOption('Timeouts', '3')
+					SetGameOption('CheatsEnabled', 'false')
+					SetGameOption('CivilianAlliance', 'enemy')
+					SetGameOption('GameSpeed', 'normal')
+					SetGameOption('FogOfWar', 'explored')
+					SetGameOption('UnitCap', '1000')
+					SetGameOption('PrebuiltUnits', 'Off')
+					SetGameOption('NoRushOption', 'Off')
+					--gameInfo.GameMods["656b7af6-9a56-47c5-8182-3a896dc6f4b7"] = true
+					--lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
+					UpdateGame()
+				end
+			end
 		--end of ranked options code
+		
+		
+		
+		
+		
 		--start of auto kick code
 		GUI.autoKick = UIUtil.CreateCheckboxStd(GUI.observerPanel, '/dialogs/check-box_btn/radio')
 		LayoutHelpers.CenteredRightOf(GUI.autoKick, GUI.rankedOptions, 5)
