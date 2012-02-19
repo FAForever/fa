@@ -38,7 +38,6 @@ function DoGameResult(armyIndex, result)
     local condPos = string.find(result, " ")
     result = string.sub(result, 1, condPos - 1)
 
-
 	if result != 'score' then
 	
 		if not announced[armyIndex] then
