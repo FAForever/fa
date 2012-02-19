@@ -1011,14 +1011,14 @@ Unit = Class(moho.unit_methods) {
         		local brain = ArmyBrains[instigator:GetArmy()]
         		local mybrain = ArmyBrains[self:GetArmy()]
         		
-        		brain:AddArmyStat("FAFScore", 1)        		
+        		brain:AddArmyStat("FAFWin", 1)        		
 
         	end
 	
 			## Score change, we send the score of all players, yes mam !
 			
 			for index, brain in ArmyBrains do
-				local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFScore",0.0).Value) )
+				local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
 				table.insert( Sync.GameResult, { index, result } )
 			end
         end

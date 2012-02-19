@@ -933,13 +933,19 @@ AIBrain = Class(moho.aibrain_methods) {
 		###end sorian AI bit
 		
 		SetArmyOutOfGame(self:GetArmyIndex())
-		self:AddArmyStat("FAFScore", -1) 
-        local result = string.format("%s %i", "defeat", math.floor(self:GetArmyStat("FAFScore",0.0).Value) )
+		
+		# seems that FA send the OnDeath twice : one when losing, the other when disconnecting. But we only want it one time !
+	
+		if math.floor(self:GetArmyStat("FAFLose",0.0).Value) != -1 then
+			self:AddArmyStat("FAFLose", -1)
+		end
+		
+        local result = string.format("%s %i", "score", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
 		table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
 		
 		# Score change, we send the score of all other players, yes mam !
 		for index, brain in ArmyBrains do
-				local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFScore",0.0).Value) )
+				local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
 				table.insert( Sync.GameResult, { index, result } )
 		end
 
@@ -1017,12 +1023,12 @@ AIBrain = Class(moho.aibrain_methods) {
 	
     OnVictory = function(self)
 		self:AddArmyStat("FAFScore", 5) 
-	   	local result = string.format("%s %i", "victory", math.floor(self:GetArmyStat("FAFScore",0.0).Value) )
+	   	local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
         table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
 		
 		# Score change, we send the score of all other players, yes mam !
 		for index, brain in ArmyBrains do
-				local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFScore",0.0).Value) )
+				local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
 				table.insert( Sync.GameResult, { index, result } )
 		end
 		
@@ -1030,7 +1036,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     OnDraw = function(self)
-    	local result = string.format("%s %i", "draw", math.floor(self:GetArmyStat("FAFScore",0.0).Value) )
+    	local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
         table.insert(Sync.GameResult, { self:GetArmyIndex(), result })
     end,
 
