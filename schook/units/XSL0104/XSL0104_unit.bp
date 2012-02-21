@@ -52,6 +52,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'OVERLAYANTIAIR',
     },
+     CollisionOffsetZ = 0.2, # added for beam bug fix
     Defense = {
         AirThreatLevel = 0.33,
         ArmorType = 'Normal',
@@ -87,7 +88,7 @@ UnitBlueprint {
                 Weight = 100,
             },
         },
-        AnimationWalk = '[...]XSL0104_Awalk01.sca', # /units/XSL0104/XSL0104_Awalk01.sca   [116]
+        AnimationWalk = '/units/XSL0104/XSL0104_Awalk01.sca', # /units/XSL0104/XSL0104_Awalk01.sca   [116]
         AnimationWalkRate = 5,
         Mesh = {
             IconFadeInZoom = 130,
@@ -203,7 +204,7 @@ UnitBlueprint {
     SelectionThickness = 0.83,
     SizeX = 0.6,
     SizeY = 0.4,
-    SizeZ = 0.6,
+    SizeZ = 1, # #from 0.6, for beam bug fix
     StrategicIconName = 'icon_land1_antiair',
     StrategicIconSortPriority = 135,
     Transport = {
@@ -258,7 +259,7 @@ UnitBlueprint {
                 },
                 {
                     MuzzleBones = {
-                        'Turret_Muzzle02',
+                        'Turret_Muzzle01', # Turret_Muzzle02 this fixes the shoot to ground bug when moving.... HALF FIX at best
                     },
                     RackBone = 'Turret_Barrel',
                 },
@@ -286,7 +287,7 @@ UnitBlueprint {
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.4,
-            TurretBoneDualMuzzle = 'Turret_Muzzle02',
+            TurretBoneDualMuzzle = 'Turret_Muzzle01', # Turret_Muzzle02
             TurretBoneDualPitch = 'Turret_Barrel',
             TurretBoneMuzzle = 'Turret_Muzzle01',
             TurretBonePitch = 'Turret_Barrel',
