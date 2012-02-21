@@ -336,6 +336,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RateOfFire = 0.1,
+	    RenderFireClock = true, # added
             TargetCheckInterval = 3,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
