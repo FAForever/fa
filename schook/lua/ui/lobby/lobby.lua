@@ -131,9 +131,10 @@ local slotMenuStrings = {
 local slotMenuData = {
     open = {
         host = {            
-            'ailist',
+            #'ailist',  #moved to below
 			'close',
             'occupy',
+            'ailist',  #new	    
         },
         client = {
             'occupy',
