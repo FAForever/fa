@@ -1008,10 +1008,10 @@ Unit = Class(moho.unit_methods) {
         	LOG('com is dead') 
 			# If there is a killer, and it's not me 
         	if instigator and instigator:GetArmy() != self:GetArmy() then
-        		local brain = ArmyBrains[instigator:GetArmy()]
+        		local instigatorBrain = ArmyBrains[instigator:GetArmy()]
         		local mybrain = ArmyBrains[self:GetArmy()]
         		
-        		brain:AddArmyStat("FAFWin", 1)        		
+        		instigatorBrain:AddArmyStat("FAFWin", 1)        		
 
         	end
 	
