@@ -143,6 +143,7 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
         'OVERLAYINDIRECTFIRE',
     },
+    CollisionOffsetZ = 0.2, # added
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Commander',
@@ -814,7 +815,7 @@ UnitBlueprint {
     SelectionYOffset = 0,
     SizeX = 1,
     SizeY = 2.2,
-    SizeZ = 0.7,
+    SizeZ = 1.2, # from 0.7
     StrategicIconName = 'icon_commander_generic',
     StrategicIconSortPriority = 0,
     Transport = {

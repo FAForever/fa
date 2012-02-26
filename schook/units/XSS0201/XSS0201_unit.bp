@@ -532,7 +532,7 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_Countermeasure',
             RateOfFire = 0.26,
-            TargetCheckInterval = 0.5,
+            TargetCheckInterval = 0.2, #from 0.5
             TargetRestrictDisallow = 'UNTARGETABLE',
             TargetRestrictOnlyAllow = 'TORPEDO',
             TargetType = 'RULEWTT_Projectile',
@@ -542,10 +542,10 @@ UnitBlueprint {
             TurretBoneYaw = 'Projectile02',
             TurretDualManipulators = false,
             TurretPitch = 0,
-            TurretPitchRange = 50,
+            TurretPitchRange = 360, #from 50
             TurretPitchSpeed = 360,
             TurretYaw = 0,
-            TurretYawRange = 180,
+            TurretYawRange = 360, #from 180
             TurretYawSpeed = 360,
             Turreted = true,
             WeaponCategory = 'Defense',
