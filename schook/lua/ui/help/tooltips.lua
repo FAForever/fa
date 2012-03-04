@@ -175,4 +175,587 @@ do
         title = "<LOC sorian_0023>AIx: Sorian Adaptive Cheat",
         description = "<LOC sorian_0024>Chooses a Sorian cheating AI based on the map. Use this if you can\'t decide on an AI.",
     }
+
+local CheatOptionTooltips = {
+	########################
+	#   Cheat Multiplyer   #
+	########################
+    ["Lobby_Cheat_Mult"] = {
+        title = "Cheat Multiplyer",
+        description = "Sets the cheating multiplyer for the cheating AIs.",
+    },
+	["lob_CheatMult_1.0"] = {
+        title = "1.0",
+        description = "Cheat Multiplyer of 1.0.",
+    },
+	["lob_CheatMult_1.1"] = {
+        title = "1.1",
+        description = "Cheat Multiplyer of 1.1.",
+    },
+	["lob_CheatMult_1.2"] = {
+        title = "1.2",
+        description = "Cheat Multiplyer of 1.2.",
+    },
+	["lob_CheatMult_1.3"] = {
+        title = "1.3",
+        description = "Cheat Multiplyer of 1.3.",
+    },
+	["lob_CheatMult_1.4"] = {
+        title = "1.4",
+        description = "Cheat Multiplyer of 1.4.",
+    },
+	["lob_CheatMult_1.5"] = {
+        title = "1.5",
+        description = "Cheat Multiplyer of 1.5.",
+    },
+	["lob_CheatMult_1.6"] = {
+        title = "1.6",
+        description = "Cheat Multiplyer of 1.6.",
+    },
+	["lob_CheatMult_1.7"] = {
+        title = "1.7",
+        description = "Cheat Multiplyer of 1.7.",
+    },
+	["lob_CheatMult_1.8"] = {
+        title = "1.8",
+        description = "Cheat Multiplyer of 1.8.",
+    },
+	["lob_CheatMult_1.9"] = {
+        title = "1.9",
+        description = "Cheat Multiplyer of 1.9.",
+    },
+	["lob_CheatMult_2.0"] = {
+        title = "2.0",
+        description = "Cheat Multiplyer of 2.0.",
+    },
+	["lob_CheatMult_2.1"] = {
+        title = "2.1",
+        description = "Cheat Multiplyer of 2.1.",
+    },
+	["lob_CheatMult_2.2"] = {
+        title = "2.2",
+        description = "Cheat Multiplyer of 2.2.",
+    },
+	["lob_CheatMult_2.3"] = {
+        title = "2.3",
+        description = "Cheat Multiplyer of 2.3.",
+    },
+	["lob_CheatMult_2.4"] = {
+        title = "2.4",
+        description = "Cheat Multiplyer of 2.4.",
+    },
+	["lob_CheatMult_2.5"] = {
+        title = "2.5",
+        description = "Cheat Multiplyer of 2.5.",
+    },
+	["lob_CheatMult_2.6"] = {
+        title = "2.6",
+        description = "Cheat Multiplyer of 2.6.",
+    },
+	["lob_CheatMult_2.7"] = {
+        title = "2.7",
+        description = "Cheat Multiplyer of 2.7.",
+    },
+	["lob_CheatMult_2.8"] = {
+        title = "2.8",
+        description = "Cheat Multiplyer of 2.8.",
+    },
+	["lob_CheatMult_2.9"] = {
+        title = "2.9",
+        description = "Cheat Multiplyer of 2.9.",
+    },
+	["lob_CheatMult_3.0"] = {
+        title = "3.0",
+        description = "Cheat Multiplyer of 3.0.",
+    },
+	["lob_CheatMult_3.1"] = {
+        title = "3.1",
+        description = "Cheat Multiplyer of 3.1.",
+    },
+	["lob_CheatMult_3.2"] = {
+        title = "3.2",
+        description = "Cheat Multiplyer of 3.2.",
+    },
+	["lob_CheatMult_3.3"] = {
+        title = "3.3",
+        description = "Cheat Multiplyer of 3.3.",
+    },
+	["lob_CheatMult_3.4"] = {
+        title = "3.4",
+        description = "Cheat Multiplyer of 3.4.",
+    },
+	["lob_CheatMult_3.5"] = {
+        title = "3.5",
+        description = "Cheat Multiplyer of 3.5.",
+    },
+	["lob_CheatMult_3.6"] = {
+        title = "3.6",
+        description = "Cheat Multiplyer of 3.6.",
+    },
+	["lob_CheatMult_3.7"] = {
+        title = "3.7",
+        description = "Cheat Multiplyer of 3.7.",
+    },
+	["lob_CheatMult_3.8"] = {
+        title = "3.8",
+        description = "Cheat Multiplyer of 3.8.",
+    },
+	["lob_CheatMult_3.9"] = {
+        title = "3.9",
+        description = "Cheat Multiplyer of 3.9.",
+    },
+	["lob_CheatMult_4.0"] = {
+        title = "4.0",
+        description = "Cheat Multiplyer of 4.0.",
+    },
+	["lob_CheatMult_4.1"] = {
+        title = "4.1",
+        description = "Cheat Multiplyer of 4.1.",
+    },
+	["lob_CheatMult_4.2"] = {
+        title = "4.2",
+        description = "Cheat Multiplyer of 4.2.",
+    },
+	["lob_CheatMult_4.3"] = {
+        title = "4.3",
+        description = "Cheat Multiplyer of 4.3.",
+    },
+	["lob_CheatMult_4.4"] = {
+        title = "4.4",
+        description = "Cheat Multiplyer of 4.4.",
+    },
+	["lob_CheatMult_4.5"] = {
+        title = "4.5",
+        description = "Cheat Multiplyer of 4.5.",
+    },
+	["lob_CheatMult_4.6"] = {
+        title = "4.6",
+        description = "Cheat Multiplyer of 4.6.",
+    },
+	["lob_CheatMult_4.7"] = {
+        title = "4.7",
+        description = "Cheat Multiplyer of 4.7.",
+    },
+	["lob_CheatMult_4.8"] = {
+        title = "4.8",
+        description = "Cheat Multiplyer of 4.8.",
+    },
+	["lob_CheatMult_4.9"] = {
+        title = "4.9",
+        description = "Cheat Multiplyer of 4.9.",
+    },
+	["lob_CheatMult_5.0"] = {
+        title = "5.0",
+        description = "Cheat Multiplyer of 5.0.",
+    },
+	["lob_CheatMult_5.1"] = {
+        title = "5.1",
+        description = "Cheat Multiplyer of 5.1.",
+    },
+	["lob_CheatMult_5.2"] = {
+        title = "5.2",
+        description = "Cheat Multiplyer of 5.2.",
+    },
+	["lob_CheatMult_5.3"] = {
+        title = "5.3",
+        description = "Cheat Multiplyer of 5.3.",
+    },
+	["lob_CheatMult_5.4"] = {
+        title = "5.4",
+        description = "Cheat Multiplyer of 5.4.",
+    },
+	["lob_CheatMult_5.5"] = {
+        title = "5.5",
+        description = "Cheat Multiplyer of 5.5.",
+    },
+	["lob_CheatMult_5.6"] = {
+        title = "5.6",
+        description = "Cheat Multiplyer of 5.6.",
+    },
+	["lob_CheatMult_5.7"] = {
+        title = "5.7",
+        description = "Cheat Multiplyer of 5.7.",
+    },
+	["lob_CheatMult_5.8"] = {
+        title = "5.8",
+        description = "Cheat Multiplyer of 5.8.",
+    },
+	["lob_CheatMult_5.9"] = {
+        title = "5.9",
+        description = "Cheat Multiplyer of 5.9.",
+    },
+	["lob_CheatMult_6.0"] = {
+        title = "6.0",
+        description = "Cheat Multiplyer of 6.0.",
+    },
+	########################
+	#   Build Multiplyer   #
+	########################
+    ["Lobby_Build_Mult"] = {
+        title = "Build Multiplyer",
+        description = "Sets the build multiplyer for the cheating AIs.",
+    },
+	["lob_BuildMult_1.0"] = {
+        title = "1.0",
+        description = "Build Multiplyer of 1.0.",
+    },
+	["lob_BuildMult_1.1"] = {
+        title = "1.1",
+        description = "Build Multiplyer of 1.1.",
+    },
+	["lob_BuildMult_1.2"] = {
+        title = "1.2",
+        description = "Build Multiplyer of 1.2.",
+    },
+	["lob_BuildMult_1.3"] = {
+        title = "1.3",
+        description = "Build Multiplyer of 1.3.",
+    },
+	["lob_BuildMult_1.4"] = {
+        title = "1.4",
+        description = "Build Multiplyer of 1.4.",
+    },
+	["lob_BuildMult_1.5"] = {
+        title = "1.5",
+        description = "Build Multiplyer of 1.5.",
+    },
+	["lob_BuildMult_1.6"] = {
+        title = "1.6",
+        description = "Build Multiplyer of 1.6.",
+    },
+	["lob_BuildMult_1.7"] = {
+        title = "1.7",
+        description = "Build Multiplyer of 1.7.",
+    },
+	["lob_BuildMult_1.8"] = {
+        title = "1.8",
+        description = "Build Multiplyer of 1.8.",
+    },
+	["lob_BuildMult_1.9"] = {
+        title = "1.9",
+        description = "Build Multiplyer of 1.9.",
+    },
+	["lob_BuildMult_2.0"] = {
+        title = "2.0",
+        description = "Build Multiplyer of 2.0.",
+    },
+	["lob_BuildMult_2.1"] = {
+        title = "2.1",
+        description = "Build Multiplyer of 2.1.",
+    },
+	["lob_BuildMult_2.2"] = {
+        title = "2.2",
+        description = "Build Multiplyer of 2.2.",
+    },
+	["lob_BuildMult_2.3"] = {
+        title = "2.3",
+        description = "Build Multiplyer of 2.3.",
+    },
+	["lob_BuildMult_2.4"] = {
+        title = "2.4",
+        description = "Build Multiplyer of 2.4.",
+    },
+	["lob_BuildMult_2.5"] = {
+        title = "2.5",
+        description = "Build Multiplyer of 2.5.",
+    },
+	["lob_BuildMult_2.6"] = {
+        title = "2.6",
+        description = "Build Multiplyer of 2.6.",
+    },
+	["lob_BuildMult_2.7"] = {
+        title = "2.7",
+        description = "Build Multiplyer of 2.7.",
+    },
+	["lob_BuildMult_2.8"] = {
+        title = "2.8",
+        description = "Build Multiplyer of 2.8.",
+    },
+	["lob_BuildMult_2.9"] = {
+        title = "2.9",
+        description = "Build Multiplyer of 2.9.",
+    },
+	["lob_BuildMult_3.0"] = {
+        title = "3.0",
+        description = "Build Multiplyer of 3.0.",
+    },
+	["lob_BuildMult_3.1"] = {
+        title = "3.1",
+        description = "Build Multiplyer of 3.1.",
+    },
+	["lob_BuildMult_3.2"] = {
+        title = "3.2",
+        description = "Build Multiplyer of 3.2.",
+    },
+	["lob_BuildMult_3.3"] = {
+        title = "3.3",
+        description = "Build Multiplyer of 3.3.",
+    },
+	["lob_BuildMult_3.4"] = {
+        title = "3.4",
+        description = "Build Multiplyer of 3.4.",
+    },
+	["lob_BuildMult_3.5"] = {
+        title = "3.5",
+        description = "Build Multiplyer of 3.5.",
+    },
+	["lob_BuildMult_3.6"] = {
+        title = "3.6",
+        description = "Build Multiplyer of 3.6.",
+    },
+	["lob_BuildMult_3.7"] = {
+        title = "3.7",
+        description = "Build Multiplyer of 3.7.",
+    },
+	["lob_BuildMult_3.8"] = {
+        title = "3.8",
+        description = "Build Multiplyer of 3.8.",
+    },
+	["lob_BuildMult_3.9"] = {
+        title = "3.9",
+        description = "Build Multiplyer of 3.9.",
+    },
+	["lob_BuildMult_4.0"] = {
+        title = "4.0",
+        description = "Build Multiplyer of 4.0.",
+    },
+	["lob_BuildMult_4.1"] = {
+        title = "4.1",
+        description = "Build Multiplyer of 4.1.",
+    },
+	["lob_BuildMult_4.2"] = {
+        title = "4.2",
+        description = "Build Multiplyer of 4.2.",
+    },
+	["lob_BuildMult_4.3"] = {
+        title = "4.3",
+        description = "Build Multiplyer of 4.3.",
+    },
+	["lob_BuildMult_4.4"] = {
+        title = "4.4",
+        description = "Build Multiplyer of 4.4.",
+    },
+	["lob_BuildMult_4.5"] = {
+        title = "4.5",
+        description = "Build Multiplyer of 4.5.",
+    },
+	["lob_BuildMult_4.6"] = {
+        title = "4.6",
+        description = "Build Multiplyer of 4.6.",
+    },
+	["lob_BuildMult_4.7"] = {
+        title = "4.7",
+        description = "Build Multiplyer of 4.7.",
+    },
+	["lob_BuildMult_4.8"] = {
+        title = "4.8",
+        description = "Build Multiplyer of 4.8.",
+    },
+	["lob_BuildMult_4.9"] = {
+        title = "4.9",
+        description = "Build Multiplyer of 4.9.",
+    },
+	["lob_BuildMult_5.0"] = {
+        title = "5.0",
+        description = "Build Multiplyer of 5.0.",
+    },
+	["lob_BuildMult_5.1"] = {
+        title = "5.1",
+        description = "Build Multiplyer of 5.1.",
+    },
+	["lob_BuildMult_5.2"] = {
+        title = "5.2",
+        description = "Build Multiplyer of 5.2.",
+    },
+	["lob_BuildMult_5.3"] = {
+        title = "5.3",
+        description = "Build Multiplyer of 5.3.",
+    },
+	["lob_BuildMult_5.4"] = {
+        title = "5.4",
+        description = "Build Multiplyer of 5.4.",
+    },
+	["lob_BuildMult_5.5"] = {
+        title = "5.5",
+        description = "Build Multiplyer of 5.5.",
+    },
+	["lob_BuildMult_5.6"] = {
+        title = "5.6",
+        description = "Build Multiplyer of 5.6.",
+    },
+	["lob_BuildMult_5.7"] = {
+        title = "5.7",
+        description = "Build Multiplyer of 5.7.",
+    },
+	["lob_BuildMult_5.8"] = {
+        title = "5.8",
+        description = "Build Multiplyer of 5.8.",
+    },
+	["lob_BuildMult_5.9"] = {
+        title = "5.9",
+        description = "Build Multiplyer of 5.9.",
+    },
+	["lob_BuildMult_6.0"] = {
+        title = "6.0",
+        description = "Build Multiplyer of 6.0.",
+    },
+	########################
+	#     Omni Setting     #
+	########################
+    ["Lobby_Omni_Cheat"] = {
+        title = "Omni Setting",
+        description = "Sets whether the cheating AIs have full map vision or not.",
+    },
+	["lob_OmniCheat_on"] = {
+        title = "On",
+        description = "Cheating AIs will have full map vision.",
+    },
+	["lob_OmniCheat_off"] = {
+        title = "Off",
+        description = "Cheating AIs will not have full map vision.",
+    },
+	########################
+	#    Land Expansion    #
+	########################
+    ["Lobby_Land_Expansions_Allowed"] = {
+        title = "Land Expansion Limit",
+        description = "Sets a limit on the number of land expansions the AI is allowed to have.",
+    },
+	["lob_LandExpansionsAllowed_0"] = {
+        title = "None",
+        description = "No land expansions allowed.",
+    },
+	["lob_LandExpansionsAllowed_1"] = {
+        title = "1",
+        description = "1 land expansion allowed.",
+    },
+	["lob_LandExpansionsAllowed_2"] = {
+        title = "2",
+        description = "2 land expansions allowed.",
+    },
+	["lob_LandExpansionsAllowed_3"] = {
+        title = "3",
+        description = "3 land expansions allowed.",
+    },
+	["lob_LandExpansionsAllowed_4"] = {
+        title = "4",
+        description = "4 land expansions allowed.",
+    },
+	["lob_LandExpansionsAllowed_5"] = {
+        title = "5",
+        description = "5 land expansions allowed.",
+    },
+	["lob_LandExpansionsAllowed_6"] = {
+        title = "6",
+        description = "6 land expansions allowed.",
+    },
+	["lob_LandExpansionsAllowed_7"] = {
+        title = "7",
+        description = "7 land expansions allowed.",
+    },
+	["lob_LandExpansionsAllowed_8"] = {
+        title = "8",
+        description = "8 land expansions allowed.",
+    },
+	["lob_LandExpansionsAllowed_Unlimited"] = {
+        title = "Unlimited",
+        description = "Unlimited land expansions allowed.",
+    },
+	#########################
+	#    Naval Expansion    #
+	#########################
+    ["Lobby_Naval_Expansions_Allowed"] = {
+        title = "Naval Expansion Limit",
+        description = "Sets a limit on the number of naval expansions the AI is allowed to have.",
+    },
+	["lob_NavalExpansionsAllowed_0"] = {
+        title = "None",
+        description = "No naval expansions allowed.",
+    },
+	["lob_NavalExpansionsAllowed_1"] = {
+        title = "1",
+        description = "1 naval expansion allowed.",
+    },
+	["lob_NavalExpansionsAllowed_2"] = {
+        title = "2",
+        description = "2 naval expansions allowed.",
+    },
+	["lob_NavalExpansionsAllowed_3"] = {
+        title = "3",
+        description = "3 naval expansions allowed.",
+    },
+	["lob_NavalExpansionsAllowed_4"] = {
+        title = "4",
+        description = "4 naval expansions allowed.",
+    },
+	["lob_NavalExpansionsAllowed_5"] = {
+        title = "5",
+        description = "5 naval expansions allowed.",
+    },
+	["lob_NavalExpansionsAllowed_6"] = {
+        title = "6",
+        description = "6 naval expansions allowed.",
+    },
+	["lob_NavalExpansionsAllowed_7"] = {
+        title = "7",
+        description = "7 naval expansions allowed.",
+    },
+	["lob_NavalExpansionsAllowed_8"] = {
+        title = "8",
+        description = "8 naval expansions allowed.",
+    },
+	["lob_NavalExpansionsAllowed_Unlimited"] = {
+        title = "Unlimited",
+        description = "Unlimited naval expansions allowed.",
+    },
+	#########################
+	#   TML Randomization   #
+	#########################
+    ["Lobby_TML_Randomization"] = {
+        title = "TML Randomization",
+        description = "Sets a randomiztion factor for AI TMLs to give them a bigger chance to miss.",
+    },
+	["lob_TMLRandom_0"] = {
+        title = "None",
+        description = "No randomization.",
+    },
+	["lob_TMLRandom_2.5"] = {
+        title = "2.5",
+        description = "2.5% randomization.",
+    },
+	["lob_TMLRandom_5"] = {
+        title = "5",
+        description = "5% randomization.",
+    },
+	["lob_TMLRandom_7.5"] = {
+        title = "7.5",
+        description = "7.5% randomization.",
+    },
+	["lob_TMLRandom_10"] = {
+        title = "10",
+        description = "10% randomization.",
+    },
+	["lob_TMLRandom_12.5"] = {
+        title = "12.5",
+        description = "12.5% randomization.",
+    },
+	["lob_TMLRandom_15"] = {
+        title = "15",
+        description = "15% randomization.",
+    },
+	["lob_TMLRandom_17.5"] = {
+        title = "17.5",
+        description = "17.5% randomization.",
+    },
+	["lob_TMLRandom_20"] = {
+        title = "20",
+        description = "20% randomization.",
+    },
+	
+}
+
+for k,v in pairs(CheatOptionTooltips) do 
+   Tooltips[k] = v 
+end
+
 end
