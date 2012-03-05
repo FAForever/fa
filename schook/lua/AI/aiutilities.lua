@@ -835,7 +835,7 @@ function AIEngineersAssistFactories( aiBrain, engineers, factories )
         tempActive = false
 
         for j,v in factories do
-            # We only want factories that are actively doin stuff and aren't like dead
+            # We only want factories that are actively doin stuff and aren\'t like dead
             local guards = v:GetGuards()
             local tempNum = 0
             for n,g in guards do
@@ -1696,7 +1696,7 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
 
     local bUsedTransports = false
     if not result or VDist2(pos[1], pos[3], destination[1], destination[3]) > 200 and unit.PlatoonHandle then
-        # if we can't path to our destination, we need, rather than want, transports
+        # if we can\'t path to our destination, we need, rather than want, transports
         local needTransports = not result
         if VDist2( pos[1], pos[3], destination[1], destination[3] ) > 512 then
             needTransports = true
@@ -1721,8 +1721,8 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
                 end
             end  
         end
-        # if there wasn't a *safe* path (but dest was pathable), then the last move would have been to go there directly
-        # so don't bother... the build/capture/reclaim command will take care of that after we return
+        # if there wasn\'t a *safe* path (but dest was pathable), then the last move would have been to go there directly
+        # so don\'t bother... the build/capture/reclaim command will take care of that after we return
         return true
     end
     
@@ -1790,6 +1790,17 @@ function SetupCheat(aiBrain, cheatBool)
     if cheatBool then
         aiBrain.CheatEnabled = true
         
+        local buffDef = Buffs['CheatBuildRate']
+        local buffAffects = buffDef.Affects
+        buffAffects.BuildRate.Mult = tonumber(ScenarioInfo.Options.BuildMult)
+        #LOG('*AI DEBUG: Build Rate Modified to: '..tonumber(ScenarioInfo.Options.BuildMult))
+
+        buffDef = Buffs['CheatIncome']
+        buffAffects = buffDef.Affects
+        buffAffects.EnergyProduction.Mult = tonumber(ScenarioInfo.Options.CheatMult)
+        buffAffects.MassProduction.Mult = tonumber(ScenarioInfo.Options.CheatMult)
+        #LOG('*AI DEBUG: Resource Rate Modified to: '..tonumber(ScenarioInfo.Options.CheatMult))
+
         local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
         for k,v in pool:GetPlatoonUnits() do
             # Apply build rate and income buffs
@@ -1800,13 +1811,13 @@ function SetupCheat(aiBrain, cheatBool)
 end
 
 function ApplyCheatBuffs(unit)
-    if EntityCategoryContains( categories.COMMAND, unit ) then
+    if EntityCategoryContains( categories.COMMAND, unit ) and ScenarioInfo.Options.OmniCheat == "on" then
         Buff.ApplyBuff(unit, 'IntelCheat')
+        #LOG('*AI DEBUG: Omni Cheat is: '..ScenarioInfo.Options.OmniCheat)
     end
     Buff.ApplyBuff(unit, 'CheatIncome')
     Buff.ApplyBuff(unit, 'CheatBuildRate')
 end
-
 
 #########################################
 #below this line is sorian AI functions
