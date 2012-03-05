@@ -944,8 +944,10 @@ AIBrain = Class(moho.aibrain_methods) {
 		
 		# Score change, we send the score of all other players, yes mam !
 		for index, brain in ArmyBrains do
-				local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
-				table.insert( Sync.GameResult, { index, result } )
+				if brain and not brain:IsDefeated() then
+					local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
+					table.insert( Sync.GameResult, { index, result } )
+				end
 		end
 
 		
@@ -1023,19 +1025,23 @@ AIBrain = Class(moho.aibrain_methods) {
     OnVictory = function(self)
 		self:AddArmyStat("FAFWin", 5) 
 	   	local result = string.format("%s %i", "victory", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
-        table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
+        
+		table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
 		
 		# Score change, we send the score of all other players, yes mam !
-		for index, brain in ArmyBrains do
-				local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
-				table.insert( Sync.GameResult, { index, result } )
+		
+		for index, brain in ArmyBrains do		
+				if brain and not brain:IsDefeated() then
+					local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
+					table.insert( Sync.GameResult, { index, result } )
+				end
 		end
 		
 
     end,
 
     OnDraw = function(self)
-    	local result = string.format("%s %i", "draw", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
+    	local result = string.format("%s %i", "draw", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
         table.insert(Sync.GameResult, { self:GetArmyIndex(), result })
     end,
 
