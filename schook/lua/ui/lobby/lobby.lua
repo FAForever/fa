@@ -169,6 +169,9 @@ local slotMenuData = {
 local function GetAITooltipList()
     local aitypes = import('/lua/ui/lobby/aitypes.lua').aitypes
     local retTable = {}
+	table.insert(retTable,"Close")
+	table.insert(retTable,"Occupy")
+	
     for i, v in aitypes do
         table.insert(retTable, 'aitype_'..v.key)
     end
