@@ -1,4 +1,6 @@
 UnitBlueprint {
+    Merge = true,
+    BlueprintId="xsl0103", # sera t1 arty
     Audio = {
         AmbientMove = Sound {
             Bank = 'XSL',
@@ -261,7 +263,7 @@ UnitBlueprint {
     SelectionThickness = 0.75,
     SizeX = 0.55,
     SizeY = 0.35,
-    SizeZ = 0.6,
+    SizeZ = 1, #0.6
     StrategicIconName = 'icon_land1_artillery',
     StrategicIconSortPriority = 135,
     Veteran = {

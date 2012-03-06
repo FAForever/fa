@@ -1,4 +1,6 @@
 UnitBlueprint {
+    Merge = true,
+    BlueprintId="uas0103", # aeon t1 frigate
     AI = {
         AttackAngle = 60,
     },

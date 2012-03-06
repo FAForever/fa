@@ -1,4 +1,6 @@
 UnitBlueprint {
+    Merge = true,
+    BlueprintId="url0001", # cyrban ACU
     AI = {
         GuardRadius = 10,
         TargetBones = {
@@ -701,9 +703,9 @@ UnitBlueprint {
     SelectionSizeZ = 0.6,
     SelectionThickness = 0.9,
     SelectionYOffset = 0,
-    SizeX = 1,
+    SizeX = 1.2,
     SizeY = 2.2,
-    SizeZ = 0.7,
+    SizeZ = 1.2, # 0.7
     StrategicIconName = 'icon_commander_generic',
     StrategicIconSortPriority = 0,
     Transport = {

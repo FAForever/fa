@@ -799,9 +799,9 @@ UnitBlueprint {
     SelectionSizeZ = 0.6,
     SelectionThickness = 0.9,
     SelectionYOffset = 0,
-    SizeX = 1,
-    SizeY = 2,
-    SizeZ = 0.7,
+    SizeX = 1.2, #from 1
+    SizeY = 2.2, #from 2
+    SizeZ = 1.2, # 0.7
     StrategicIconName = 'icon_commander_generic',
     StrategicIconSortPriority = 0,
     Transport = {
