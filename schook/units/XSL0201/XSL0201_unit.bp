@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="xsl0201",
     Audio = {
         AmbientMove = Sound {
             Bank = 'XSL',

@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="xab3301",
     Abilities = {
         TargetLocation = {
             bitmapId = 'skry-target',

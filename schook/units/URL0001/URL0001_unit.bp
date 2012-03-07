@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="url0001", # cyrban ACU
     AI = {
         GuardRadius = 10,
         TargetBones = {

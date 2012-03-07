@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="uel0105",
     AI = {
         TargetBones = {
             'Turret',
@@ -285,7 +283,7 @@ UnitBlueprint {
     SelectionSizeX = 0.4,
     SelectionSizeZ = 0.4,
     SelectionThickness = 0.95,
-     SizeX = 0.7,
+    SizeX = 0.7,
     SizeY = 0.8,
     SizeZ = 0.9, #from 0.6
     StrategicIconName = 'icon_land1_engineer',

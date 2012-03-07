@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="xel0306",
     AI = {
         InitialAutoMode = true,
     },

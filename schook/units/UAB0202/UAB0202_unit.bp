@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="uab0202", 
     Audio = {
         Construct = Sound {
             Bank = 'UAB',

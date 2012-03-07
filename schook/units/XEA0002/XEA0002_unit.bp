@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="xea0002",
     Air = {
         BankFactor = 0,
         BankForward = false,

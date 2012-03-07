@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="uel0401",
     AI = {
         AttackAngle = 10,
         GuardScanRadius = 300,

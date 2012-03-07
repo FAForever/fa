@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="uel0103",
     Audio = {
         AmbientMove = Sound {
             Bank = 'UEL',

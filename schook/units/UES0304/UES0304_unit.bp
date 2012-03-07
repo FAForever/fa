@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="ues0304",
     AI = {
         InitialAutoMode = false,
     },

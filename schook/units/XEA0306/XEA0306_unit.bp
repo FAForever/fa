@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="xea0306",
     AI = {
         BeaconName = 'UEB5102',
         TargetBones = {

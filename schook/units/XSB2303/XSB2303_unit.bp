@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="xsb2303",
     Audio = {
         Destroyed = Sound {
             Bank = 'XSL_Destroy',

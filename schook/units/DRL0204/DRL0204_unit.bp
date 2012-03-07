@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="drl0204", 
     Audio = {
         AmbientMove = Sound {
             Bank = 'URL',

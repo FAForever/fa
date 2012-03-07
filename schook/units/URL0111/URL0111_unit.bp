@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="url0111",
     AI = {
         InitialAutoMode = true,
         TargetBones = {

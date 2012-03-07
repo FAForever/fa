@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="xsb0201",
     AI = {
         TargetBones = {
             'Left_Hardpoint01',

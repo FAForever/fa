@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="url0103", # cybran t1 arty
     Audio = {
         AmbientMove = Sound {
             Bank = 'URL',

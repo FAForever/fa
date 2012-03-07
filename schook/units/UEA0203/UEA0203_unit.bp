@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="uea0203",
     AI = {
         BeaconName = 'UEB5102',
     },

@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="ura0304",
     AI = {
         GuardReturnRadius = 125,
         GuardScanRadius = 100,

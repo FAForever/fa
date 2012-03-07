@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="xrb0204",
     AI = {
         GuardScanRadius = 20,
         InitialAutoMode = true,

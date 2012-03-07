@@ -1,6 +1,4 @@
-UnitBlueprint {
-    Merge = true,
-    BlueprintId="ual0401", 
+UnitBlueprint { 
     AI = {
         TargetBones = {
             'Head_Muzzle',
