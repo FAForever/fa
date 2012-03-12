@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="uab2204",
     Audio = {
         Destroyed = Sound {
             Bank = 'UALDestroy',

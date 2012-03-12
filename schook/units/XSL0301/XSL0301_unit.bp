@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="xsl0301",
     AI = {
         TargetBones = {
             'Back_Upgrade',

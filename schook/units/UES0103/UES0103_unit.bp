@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="ues0103",
     AI = {
         TargetBones = {
             'Front_Turret',

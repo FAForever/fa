@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="xes0307",
     AI = {
         AttackAngle = 60,
         GuardReturnRadius = 130,

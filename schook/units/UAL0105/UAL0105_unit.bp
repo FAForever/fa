@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="ual0105", 
     AI = {
         TargetBones = {
             'Panel_01',

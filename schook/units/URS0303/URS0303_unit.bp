@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="urs0303",
     AI = {
         RefuelingMultiplier = 50,
         RefuelingRepairAmount = 500,

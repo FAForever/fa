@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="xsb1104",
     Adjacency = 'T1MassFabricatorAdjacencyBuffs',
     Audio = {
         ActiveLoop = Sound {

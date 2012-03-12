@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="urb4207",
     Audio = {
         DeathExplosion = Sound {
             Bank = 'URLDestroy',

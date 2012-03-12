@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="urb0101",
     AI = {
         TargetBones = {
             'URB0101',

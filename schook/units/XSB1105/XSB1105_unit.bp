@@ -1,6 +1,4 @@
 UnitBlueprint {
-    Merge = true,
-    BlueprintId="xsb1105",
     Adjacency = 'T1EnergyStorageAdjacencyBuffs',
     Audio = {
         ActiveLoop = Sound {
