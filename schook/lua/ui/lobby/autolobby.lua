@@ -14,6 +14,10 @@ local MenuCommon = import('/lua/ui/menus/menucommon.lua')
 local LobbyComm = import('/lua/ui/lobby/lobbyComm.lua')
 local gameColors = import('/lua/gameColors.lua').GameColors
 
+
+
+
+
 local connectdialog = false
 local parent = false
 local localPlayerName = false
@@ -197,7 +201,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
             connectingDialog:Destroy()
         end
 
-        local failedDlg = UIUtil.ShowInfoDialog(controlGroup, LOCF(Strings.LaunchFailed,LOC(Strings[reasonKey])), "<LOC _OK>", CleanupAndExit)
+        local failedDlg = UIUtil.ShowInfoDialog(controlGroup, LOCF(Strings.LaunchFailed,LOC(reasonKey)), "<LOC _OK>", CleanupAndExit)
     end
 
     lobbyComm.Ejected = function(self)
@@ -301,7 +305,11 @@ function HostGame(gameName, scenarioFileName, singlePlayer)
         #LOG("requiredPlayers was set to: "..requiredPlayers)
     end
 
-    lobbyComm.desiredScenario = scenarioFileName
+	
+	-- The guys at GPG were unable to make a standard for map. We dirty-solve it.
+	lobbyComm.desiredScenario = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
+
+
     lobbyComm:HostGame()
 end
 
