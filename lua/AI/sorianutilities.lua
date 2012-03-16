@@ -588,7 +588,7 @@ function AddCustomUnitSupport(aiBrain)
 	#Loop through active mods
 	for i, m in __active_mods do
 		#If mod has a CustomUnits folder
-		local CustomUnitFiles = DiskFindFiles(m.location..'/lua/CustomUnits', '*.lua')
+		local CustomUnitFiles = DiskFindFiles(m.location..'/lua/CustomUnits', '*.lua') 
 		#Loop through files in CustomUnits folder
 		for k, v in CustomUnitFiles do
 			local tempfile = import(v).UnitList
@@ -608,7 +608,28 @@ function AddCustomUnitSupport(aiBrain)
 				end
 			end
 		end
+	end 
+	#FAF addition start, adds custom unit support to .scd mods
+	local CustomUnitFiles = DiskFindFiles('/lua/CustomUnits', '*.lua')
+	for k, v in CustomUnitFiles do
+		local tempfile = import(v).UnitList
+		#Add each files entry into the appropriate table
+		for plat, tbl in tempfile do
+			for fac, entry in tbl do
+				if aiBrain.CustomUnits[plat] and aiBrain.CustomUnits[plat][fac] then
+					table.insert(aiBrain.CustomUnits[plat][fac], { entry[1], entry[2] } )
+				elseif aiBrain.CustomUnits[plat] then
+					aiBrain.CustomUnits[plat][fac] = {}
+					table.insert(aiBrain.CustomUnits[plat][fac], { entry[1], entry[2] } )
+				else
+					aiBrain.CustomUnits[plat] = {}
+					aiBrain.CustomUnits[plat][fac] = {}
+					table.insert(aiBrain.CustomUnits[plat][fac], { entry[1], entry[2] } )
+				end
+			end
+		end
 	end
+	#FAF addition end
 end
 
 #Unused
