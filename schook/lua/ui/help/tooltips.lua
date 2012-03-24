@@ -175,4 +175,12 @@ do
         title = "<LOC sorian_0023>AIx: Sorian Adaptive Cheat",
         description = "<LOC sorian_0024>Chooses a Sorian cheating AI based on the map. Use this if you can\'t decide on an AI.",
     }
+	Tooltips.lob_team_five = {
+        title = '<LOC lobui_0746>Team 5',
+        description = '',
+    }
+	Tooltips.lob_team_six = {
+        title = '<LOC lobui_0747>Team 6',
+        description = '',
+    }
 end

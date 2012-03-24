@@ -64,6 +64,8 @@ local teamTooltips = {
     'lob_team_two',
     'lob_team_three',
     'lob_team_four',
+	'lob_team_five',
+	'lob_team_six',
 }
 table.insert(factionBmps, "/faction_icon-sm/random_ico.dds")
 table.insert(factionTooltips, 'lob_random')
