@@ -47,6 +47,8 @@ local quickRandMap = false
 
 local lastUploadedMap = nil
 local playerRating = tonumber(GetCommandLineArg("/rating", 1)[1]) or ""
+local ratingColor = tostring(GetCommandLineArg("/ratingcolor", 1)[1]) or "ffffffff"
+local numGames = tonumber(GetCommandLineArg("/numgames", 1)[1]) or ""
 
 
 -- builds the faction tables, and then adds random faction icon to the end
@@ -238,9 +240,10 @@ local function DoSlotBehavior(slot, key, name)
             if lobbyComm:IsHost() then
 				requestedFaction = Prefs.GetFromCurrentProfile('LastFaction')
 				requestedPL = playerRating
-                HostConvertObserverToPlayer(hostID, localPlayerName, FindObserverSlotForID(localPlayerID), slot, requestedFaction, requestedPL)
+				requestedRC = ratingColor
+                HostConvertObserverToPlayer(hostID, localPlayerName, FindObserverSlotForID(localPlayerID), slot, requestedFaction, requestedPL, requestedRC)
             else
-                lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer', RequestedName = localPlayerName, ObserverSlot = FindObserverSlotForID(localPlayerID), PlayerSlot = slot, requestedFaction = Prefs.GetFromCurrentProfile('LastFaction'), requestedPL = playerRating})
+                lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer', RequestedName = localPlayerName, ObserverSlot = FindObserverSlotForID(localPlayerID), PlayerSlot = slot, requestedFaction = Prefs.GetFromCurrentProfile('LastFaction'), requestedPL = playerRating, requestedRC = ratingColor})
             end
         end
     elseif key == 'pm' then
@@ -487,6 +490,7 @@ function SetSlotInfo(slot, playerInfo)
 
 	GUI.slots[slot].ratingGroup:Show()
     GUI.slots[slot].ratingText:SetText(playerInfo.PL or "")
+	GUI.slots[slot].ratingText:SetColor(playerInfo.RC or "ffffffff")
 	
     GUI.slots[slot].name:Show()
     GUI.slots[slot].name:SetTitleText(LOC(playerInfo.PlayerName))
@@ -615,19 +619,6 @@ local function GetPlayersNotReady()
         end
     end
     return notReady
-end
-
-local function GetPlayersNotPL()
-    local notPL = false
-    for k,v in gameInfo.PlayerOptions do
-        if v.Human and not v.PL and v.PL < 1.4 then
-            if not notPL then
-                notPL = {}
-            end
-            table.insert(notPL,v.PlayerName)
-        end
-    end
-    return notPL
 end
 
 local function GetRandomFactionIndex()
@@ -1157,6 +1148,10 @@ local function UpdateGame()
 	
 	if not gameInfo.PlayerOptions[playerSlot].PL then
 		SetPlayerOption(playerSlot, 'PL', playerRating)
+	end
+	
+	if not gameInfo.PlayerOptions[playerSlot].RC then
+		SetPlayerOption(playerSlot, 'RC', ratingColor)
 	end	
 	
     if not hasSupcom then
@@ -1310,7 +1305,7 @@ local function UpdateGame()
                 GUI.launchGameButton:Disable()
             end
 			
-			if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") then
+			if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") and 2 < 1 then -- 2 < 1 is to disable the button
 				if scenarioInfo and scenarioInfo.map and scenarioInfo.map != '' then
 					if (lastUploadedMap != gameInfo.GameOptions.ScenarioFile) then
 						GUI.uploadMapButton:Show()
@@ -1440,7 +1435,7 @@ function HostOpenSlot(senderID, slot)
 end
 
 -- slot less than 1 means try to find a slot
-function HostTryAddPlayer( senderID, slot, requestedPlayerName, human, aiPersonality, requestedColor, requestedFaction, requestedTeam, requestedPL )	
+function HostTryAddPlayer( senderID, slot, requestedPlayerName, human, aiPersonality, requestedColor, requestedFaction, requestedTeam, requestedPL, requestedRC )	
 
     local newSlot = slot
 
@@ -1500,6 +1495,10 @@ function HostTryAddPlayer( senderID, slot, requestedPlayerName, human, aiPersona
 	if requestedPL then
 		gameInfo.PlayerOptions[newSlot].PL = requestedPL
 	end	
+	
+	if requestedRC then
+		gameInfo.PlayerOptions[newSlot].RC = requestedRC
+	end
 	
 	lobbyComm:BroadcastData(
 		{
@@ -1614,7 +1613,7 @@ function HostConvertPlayerToObserver(senderID, name, playerSlot)
     UpdateGame()
 end
 
-function HostConvertObserverToPlayer(senderID, name, fromObserverSlot, toPlayerSlot, requestedFaction, requestedPL)
+function HostConvertObserverToPlayer(senderID, name, fromObserverSlot, toPlayerSlot, requestedFaction, requestedPL, requestedRC)
     if gameInfo.Observers[fromObserverSlot] == nil then
         return
     end
@@ -1636,6 +1635,10 @@ function HostConvertObserverToPlayer(senderID, name, fromObserverSlot, toPlayerS
 	
 	if requestedPL then
 		gameInfo.PlayerOptions[toPlayerSlot].PL = requestedPL
+	end
+	
+	if requestedRC then
+		gameInfo.PlayerOptions[toPlayerSlot].RC = requestedRC
 	end
 
     for colorIndex,colorVal in gameColors.PlayerColors do
@@ -1712,8 +1715,7 @@ function uploadNewMap()
 		local scenarioInfo = import('/lua/ui/maputil.lua').LoadScenario(gameInfo.GameOptions.ScenarioFile)				
 		#LOG("scbserverhostuploadmap"..gameInfo.GameOptions.ScenarioFile)
 		#GpgNetSend("uploadmap", string.format("%s", gameInfo.GameOptions.ScenarioFile))
-		#SendSystemMessage(LOCF("<LOC lobui_0735>The host is uploading the map %s to server.", scenarioInfo.name))
-		SendSystemMessage(LOCF("<LOC lobui_0735>Not working yet."))
+		#SendSystemMessage(LOCF("<LOC lobui_0735>The host is uploading the map %s to server.", scenarioInfo.name))		
 	end
 end
 
@@ -2759,7 +2761,7 @@ function CreateUI(maxPlayers)
 				uploadNewMap()
 				UpdateGame()
 			end		
-		end		
+		end
 
     else
 
@@ -3075,9 +3077,10 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
 							if lobbyComm:IsHost() then
 								requestedFaction = Prefs.GetFromCurrentProfile('LastFaction')
 								requestedPL = playerRating
-								HostConvertObserverToPlayer(hostID, localPlayerName, FindObserverSlotForID(localPlayerID), self.Slot, requestedFaction, requestedPL)
+								requestedRC = ratingColor
+								HostConvertObserverToPlayer(hostID, localPlayerName, FindObserverSlotForID(localPlayerID), self.Slot, requestedFaction, requestedPL, requestedRC)
 							else
-								lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer', RequestedName = localPlayerName, ObserverSlot = FindObserverSlotForID(localPlayerID), PlayerSlot = self.Slot, requestedFaction = Prefs.GetFromCurrentProfile('LastFaction'), requestedPL = playerRating})
+								lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer', RequestedName = localPlayerName, ObserverSlot = FindObserverSlotForID(localPlayerID), PlayerSlot = self.Slot, requestedFaction = Prefs.GetFromCurrentProfile('LastFaction'), requestedPL = playerRating, requestedRC = ratingColor})
 							end
 						end
 					end
@@ -3285,7 +3288,8 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 Human = true, 
                 RequestedColor = Prefs.GetFromCurrentProfile('LastColor'),
                 RequestedFaction = requestedFaction,
-				RequestedPL = playerRating, } )
+				RequestedPL = playerRating, 
+				RequestedRC = ratingColor, } )
         end
 
         local function KeepAliveThreadFunc()
@@ -3345,7 +3349,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
             elseif data.Type == 'AddPlayer' then
                 -- create empty slot if possible and give it to the player
-                HostTryAddPlayer( data.SenderID, data.RequestedSlot, data.RequestedPlayerName, data.Human, data.AIPersonality, data.RequestedColor, data.RequestedFaction, nil, data.RequestedPL )
+                HostTryAddPlayer( data.SenderID, data.RequestedSlot, data.RequestedPlayerName, data.Human, data.AIPersonality, data.RequestedColor, data.RequestedFaction, nil, data.RequestedPL, data.RequestedRC )
 				PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
             elseif data.Type == 'MovePlayer' then
                 -- attempt to move a player from current slot to empty slot
@@ -3363,7 +3367,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 HostConvertPlayerToObserver(data.SenderID, data.RequestedName, data.RequestedSlot)
 
             elseif data.Type == 'RequestConvertToPlayer' then				
-                HostConvertObserverToPlayer(data.SenderID, data.RequestedName, data.ObserverSlot, data.PlayerSlot, data.requestedFaction, data.requestedPL)
+                HostConvertObserverToPlayer(data.SenderID, data.RequestedName, data.ObserverSlot, data.PlayerSlot, data.requestedFaction, data.requestedPL, data.requestedRC)
 
             elseif data.Type == 'RequestColor' then
                 if IsColorFree(data.Color) then
