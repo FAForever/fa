@@ -1853,7 +1853,7 @@ function CreateUI(maxPlayers)
     local titleText = UIUtil.CreateText(GUI.panel, title, 26, UIUtil.titleFont)
     LayoutHelpers.AtLeftTopIn(titleText, GUI.panel, 50, 36)
 	
-	local randmapText = UIUtil.CreateText(GUI.panel, "Power Lobby 2.0 by Moritz - www.supremecommander.com.br", 17, UIUtil.titleFont)
+	local randmapText = UIUtil.CreateText(GUI.panel, "Power Lobby 2.0 by Moritz - www.forgedalliance.com.br", 17, UIUtil.titleFont)
 	LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
 
     GUI.playerPanel = Group(GUI.panel, "playerPanel")
