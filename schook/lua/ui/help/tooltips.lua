@@ -183,4 +183,12 @@ do
         title = '<LOC lobui_0747>Team 6',
         description = '',
     }
+	Tooltips.num_games = {
+        title = '<LOC lobui_0748>Number of Games',
+        description = '<LOC lobui_0749>Number of games played in global ladder.',
+    }
+	Tooltips.rating = {
+        title = '<LOC lobui_0750>Rating',
+        description = '<LOC lobui_0751>Global ladder rating.',
+    }
 end
