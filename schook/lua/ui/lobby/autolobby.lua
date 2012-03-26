@@ -136,6 +136,14 @@ local function CheckForLaunch()
     if playercount < requiredPlayers then
        return
     end
+	
+	local allRatings = {}
+	for k,v in gameInfo.PlayerOptions do
+		if v.Human and v.PL then
+			allRatings[v.PlayerName] = v.PL
+		end
+	end
+	gameInfo.GameOptions['Ratings'] = allRatings
 
     LOG("Host launching game.")
     lobbyComm:BroadcastData( { Type = 'Launch', GameInfo = gameInfo } )
