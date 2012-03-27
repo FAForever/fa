@@ -26,6 +26,9 @@ local SeraphimBuffField = SWeapons.SeraphimBuffField
 local RemoteViewing = import('/lua/RemoteViewing.lua').RemoteViewing
 SWalkingLandUnit = RemoteViewing( SWalkingLandUnit ) 
 
+#for recall
+local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+
 XSL0001 = Class( SWalkingLandUnit ) {
     DeathThreadDestructionWaitTime = 2,
 
@@ -195,6 +198,7 @@ XSL0001 = Class( SWalkingLandUnit ) {
             },  
         },
     },
+
 
 
     OnCreate = function(self)
@@ -617,7 +621,139 @@ XSL0001 = Class( SWalkingLandUnit ) {
         end
         SWalkingLandUnit.OnUnpaused(self)
     end,
+	
+	
+	
+	#recalls the commander
+	#new for recall mod
+	
+		####below this line is new stuff for recall
+	
+		##new for recall, lets me know if I have an enhancement
+	DoIHaveAnEnhancement = function(self)
+		WARN('DoIHaveanEnhancement')
+	    local enh = self:GetBlueprint().Enhancements
+		if enh then
+			for k,v in enh do
+				if self:HasEnhancement(k) then
+					return true
+				end
+			end
+		end
+	end,
+	
+	Recall = function(self)
+		#WARN('recalling')
+		self:SetCanTakeDamage(false)
+		self:PlayTeleportOutEffects()
+		self:SetBusy(true)  
 
+        self:SetWeaponEnabledByLabel('ChronotronCannon', false)
+		
+		local aiBrain = self:GetAIBrain()
+		local armyIndex = aiBrain:GetArmyIndex()
+		local POS = ScenarioUtils.MarkerToPosition("ARMY_" .. armyIndex)
+
+		Warp(self, {-100,0,-100}, self:GetOrientation())
+		#self:DestroyAllDamageEffects()		
+		self:SetUnSelectable(true)
+		self:SetImmobile(true)
+		self:HideBone(0, true)		
+		self:StunAllMyArmyUnits()
+
+		
+		WaitSeconds(30)
+		self:RemoveAllEnhancements()
+
+		#self:WarpInEffectThread()
+		Warp(self, POS, self:GetOrientation())
+		self:PlayCommanderWarpInEffect()
+		self:SetUnSelectable(false)
+		self:SetImmobile(false)
+		self:HideBone(0, false)	
+		self:SetCanTakeDamage(true)
+        self:SetWeaponEnabledByLabel('ChronotronCannon', true)
+		self:SetBusy(false)  
+		
+		self.RecallThread = nil
+		WaitTicks(5)
+		IssueStop({self})
+	end,
+	
+	#stuns all the units in the army
+	StunAllMyArmyUnits = function(self)
+		#WARN('stunning all my units')
+		local aiBrain = self:GetAIBrain()
+		local units = aiBrain:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+		for i,u in units do
+			u:SetStunned(30)
+		end
+	end,
+	
+	RemoveAllEnhancements = function(self)
+		#WARN('removingenhancements')
+
+		local enh = self:WhatEnhancementsDoIHave()
+		local enhbp = self:GetBlueprint().Enhancements
+		for m,n in enhbp do
+			for o,p in enh do
+				if n.RemoveEnhancements and n.Prerequisite == p then
+					#WARN('removing enhancement ' .. repr(m))
+					self:CreateEnhancement(m)
+				end
+			end
+		
+		end
+
+	end,
+	
+	WhatEnhancementsDoIHave = function(self)
+		#WARN('whatenhancementdoIhave')
+		local enh = self:GetBlueprint().Enhancements
+		local TheOnesIHave = {}
+		if enh then
+			for k,v in enh do
+				if self:HasEnhancement(k) then
+					WARN('hasenhancement ' .. repr(k))
+					table.insert(TheOnesIHave, k)
+				end
+			end
+		end
+		return TheOnesIHave
+	end,
+	
+		#new for recall mod
+    DoTakeDamage = function(self, instigator, amount, vector, damageType)
+		#WARN('acu take damage')
+        local preAdjHealth = self:GetHealth()
+        self:AdjustHealth(instigator, -amount)
+        local health = self:GetHealth()
+        if( health <= 0 ) then
+			if self:DoIHaveAnEnhancement() and not self.RecallThread and ScenarioInfo.Options.Recall == 'yes' then
+				self.RecallThread = self:ForkThread(self.Recall)
+				return
+            elseif self:DoIHaveAnEnhancement() and ScenarioInfo.Options.Recall == 'yes' then
+                return
+            else
+                local excessDamageRatio = 0.0
+                # Calculate the excess damage amount
+                local excess = preAdjHealth - amount
+                local maxHealth = self:GetMaxHealth()
+                if(excess < 0 and maxHealth > 0) then
+                    excessDamageRatio = -excess / maxHealth
+                end
+                self:Kill(instigator, damageType, excessDamageRatio)
+            end
+        end
+        if EntityCategoryContains(categories.COMMAND, self) then
+            local aiBrain = self:GetAIBrain()
+            if aiBrain then
+                aiBrain:OnPlayCommanderUnderAttackVO()
+            end
+        end
+    end,
+
+	
 }
 
 TypeClass = XSL0001
