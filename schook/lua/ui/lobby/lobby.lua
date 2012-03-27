@@ -1042,8 +1042,14 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         randstring = randomString(16, "%l%d")
 		gameInfo.GameOptions['ReplayID'] = randstring
 		AssignAINames(gameInfo)
+		local allRatings = {}
+		for k,v in gameInfo.PlayerOptions do
+			if v.Human and v.PL then
+				allRatings[v.PlayerName] = v.PL
+			end
+		end
+		gameInfo.GameOptions['Ratings'] = allRatings		
 		
-    
         -- Tell everyone else to launch and then launch ourselves.
         lobbyComm:BroadcastData( { Type = 'Launch', GameInfo = gameInfo } )
 		
@@ -1051,17 +1057,6 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
 		gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
 		
 		scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-		local scbServerLog = "scbserverhostlaunched=" .. gameInfo.GameOptions.ScenarioFile .. "=" .. scenarioInfo.name
-		for index, player in gameInfo.PlayerOptions do		
-			scbServerLog = scbServerLog .. "=" .. player.PlayerName
-		end
-		scbServerLog = scbServerLog .. "=scbmods"
-		for k, v in gameInfo.GameMods do			
-			scbServerLog = scbServerLog .. "=" .. v.name
-		end
-		
-		LOG(scbServerLog)
-        
         lobbyComm:LaunchGame(gameInfo)		
     end
 
