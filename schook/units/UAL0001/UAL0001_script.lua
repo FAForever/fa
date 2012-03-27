@@ -453,9 +453,9 @@ UAL0001 = Class(AWalkingLandUnit) {
 		self:HideBone(0, true)		
 		self:StunAllMyArmyUnits()
 
-		
-		WaitSeconds(30)
 		self:RemoveAllEnhancements()
+		WaitSeconds(30)
+		
 
 		#self:WarpInEffectThread()
 		Warp(self, POS, self:GetOrientation())
