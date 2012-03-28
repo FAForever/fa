@@ -3719,9 +3719,17 @@ function SetGameOption(key, val, ignoreNilValue)
                 end
             end
             GpgNetSend('GameOption', key, restrictionsEnabled)
-        else
-            GpgNetSend('GameOption', key, val)
-        end
+        elseif key == 'ScenarioFile' then
+			GpgNetSend('GameOption', key, val)
+			 if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") then
+				scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+				if scenarioInfo then
+					GpgNetSend('GameOption', 'Slots', table.getsize(scenarioInfo.Configurations.standard.teams[1].armies))
+				end
+			end
+		else
+			GpgNetSend('GameOption', key, val)
+		end
 
         UpdateGame()
     else
