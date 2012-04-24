@@ -1008,18 +1008,21 @@ Unit = Class(moho.unit_methods) {
         	LOG('com is dead') 
 			# If there is a killer, and it's not me 
         	if instigator and instigator:GetArmy() != self:GetArmy() then
-        		local brain = ArmyBrains[instigator:GetArmy()]
-        		local mybrain = ArmyBrains[self:GetArmy()]
-        		
-        		brain:AddArmyStat("FAFWin", 1)        		
+        		local instigatorBrain = ArmyBrains[instigator:GetArmy()]
+        		if instigatorBrain and not instigatorBrain:IsDefeated() then
+					instigatorBrain:AddArmyStat("FAFWin", 1)        		
+				end      		
 
         	end
 	
 			## Score change, we send the score of all players, yes mam !
 			
 			for index, brain in ArmyBrains do
-				local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
-				table.insert( Sync.GameResult, { index, result } )
+				if brain and not brain:IsDefeated() then
+					local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
+					table.insert( Sync.GameResult, { index, result } )
+				end
+
 			end
         end
 
