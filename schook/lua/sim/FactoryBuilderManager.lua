@@ -274,8 +274,8 @@ FactoryBuilderManager = Class(BuilderManager) {
             return 'Cybran'
         elseif EntityCategoryContains( categories.SERAPHIM, factory ) then
             return 'Seraphim'
-		elseif self.Brain.CustomFactions then
-			return self:UnitFromCustomFaction( factory )
+		elseif self.UnitFromCustomFaction( factory ) then
+			return self.UnitFromCustomFaction( factory )
         end
         return false
     end,

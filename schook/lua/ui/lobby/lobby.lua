@@ -46,29 +46,11 @@ local launchThread = false
 local quickRandMap = false
 
 local lastUploadedMap = nil
+local playerRating = tonumber(GetCommandLineArg("/rating", 1)[1]) or ""
+local ratingColor = tostring(GetCommandLineArg("/ratingcolor", 1)[1]) or "ffffffff"
+local numGames = tonumber(GetCommandLineArg("/numgames", 1)[1]) or ""
 
-local playerRating = GetCommandLineArg("/rating", 1)
-local ratingColor = GetCommandLineArg("/ratingcolor", 1)
-local numGames = GetCommandLineArg("/numgames", 1)
 
-if ratingColor then 
-	ratingColor = tostring(ratingColor[1])
-else
-	ratingColor = "ffffffff"
- end
-
-if numGames then
-	numGames = tonumber(numGames[1])
-else
-	numGames = 0
-end
-
-if playerRating then
-	playerRating = tonumber(playerRating[1])
-else
-	playerRating = 0
-end
- 
 -- builds the faction tables, and then adds random faction icon to the end
 local factionBmps = {}
 local factionTooltips = {}
@@ -1374,26 +1356,6 @@ local function HostUpdateMods(newPlayerID)
         if not table.equal(gameInfo.GameMods, newmods) and (not newPlayerID or not autoKick) then
             gameInfo.GameMods = newmods			
             lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
-			
-			local nummods = 0
-			local uids = ""
-			
-			for k in gameInfo.GameMods do
-				nummods = nummods + 1
-				if uids == "" then
-					uids =  k
-				else
-					uids = string.format("%s %s", uids, k)
-				end
-				
-			end
-			GpgNetSend('GameMods', "activated", nummods)
-			
-			if nummods > 0 then
-				GpgNetSend('GameMods', "uids", uids)
-			end
-
-
         elseif not table.equal(gameInfo.GameMods, newmods) and newPlayerID and autoKick then
 			local modnames = ""
 			local totalMissing = table.getn(missingmods)
@@ -3757,17 +3719,9 @@ function SetGameOption(key, val, ignoreNilValue)
                 end
             end
             GpgNetSend('GameOption', key, restrictionsEnabled)
-        elseif key == 'ScenarioFile' then
-			GpgNetSend('GameOption', key, val)
-			 if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") then
-				scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-				if scenarioInfo then
-					GpgNetSend('GameOption', 'Slots', table.getsize(scenarioInfo.Configurations.standard.teams[1].armies))
-				end
-			end
-		else
-			GpgNetSend('GameOption', key, val)
-		end
+        else
+            GpgNetSend('GameOption', key, val)
+        end
 
         UpdateGame()
     else
