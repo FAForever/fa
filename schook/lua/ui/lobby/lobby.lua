@@ -382,7 +382,7 @@ end
 function HostGame(desiredGameName, scenarioFileName, inSinglePlayer)
     singlePlayer = inSinglePlayer
     gameName = lobbyComm:MakeValidGameName(desiredGameName)
-    lobbyComm.desiredScenario = scenarioFileName
+	lobbyComm.desiredScenario = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
     lobbyComm:HostGame()
 end
 

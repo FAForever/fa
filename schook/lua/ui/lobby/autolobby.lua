@@ -273,6 +273,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         HostAddPlayer(hostID, MakeLocalPlayerInfo(localPlayerName))
 
         # Fill in the desired scenario.
+
         gameInfo.GameOptions.ScenarioFile = self.desiredScenario
     end
 
