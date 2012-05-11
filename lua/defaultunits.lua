@@ -22,15 +22,14 @@ local AdjacencyBuffs = import('/lua/sim/AdjacencyBuffs.lua')
 
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
 local CreateAeonBuildBaseThread = EffectUtil.CreateAeonBuildBaseThread
-local OldSeaUnit = SeaUnit
 
 
-local function CreateScaledBoom(unit, overkill, bone)
+local CreateScaledBoom = function(unit, overkill, bone)
 	
-explosion.CreateDefaultHitExplosionAtBone(
+	explosion.CreateDefaultHitExplosionAtBone(
 		unit,
 		bone or 0,
- explosion.CreateUnitExplosionEntity(unit, overkill).Spec.BoundingXZRadius
+		explosion.CreateUnitExplosionEntity(unit, overkill).Spec.BoundingXZRadius
 	)
 end
 
@@ -1412,6 +1411,90 @@ SubUnit = Class(MobileUnit) {
             WaitTicks(rd + d)
         end
     end,
+    
+	DeathThread = function(self, overkillRatio, instigator)
+		CreateScaledBoom(self, overkillRatio)
+		local sx, sy, sz = self:GetUnitSizes()
+		local vol = sx * sy * sz
+		local army = self:GetArmy()
+		local pos = self:GetPosition()
+		local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
+		local DaveyJones = (seafloor - pos[2])*20
+		local numBones = self:GetBoneCount()-1
+		
+
+		
+		self:ForkThread(function()
+			local i = 0
+			while true do
+			local rx, ry, rz = self:GetRandomOffset(0.25)
+			local rs = Random(vol/2, vol*2) / (vol*2)
+			local randBone = Util.GetRandomInt( 0, numBones)
+
+			CreateEmitterAtBone( self, randBone, army, '/effects/emitters/destruction_underwater_explosion_flash_01_emit.bp')
+					:ScaleEmitter(sx)
+					:OffsetEmitter(rx, ry, rz)
+			CreateEmitterAtBone( self, randBone, army, '/effects/emitters/destruction_underwater_sinking_wash_01_emit.bp')
+					:ScaleEmitter(sx/2)
+					:OffsetEmitter(rx, ry, rz)
+			CreateEmitterAtBone( self, 0, army, '/effects/emitters/destruction_underwater_sinking_wash_01_emit.bp')
+					:ScaleEmitter(sx)
+					:OffsetEmitter(rx, ry, rz)
+					
+			local rd = Util.GetRandomFloat( 0.4+i, 1.0+i)
+			WaitSeconds(rd)
+				i = i + 0.3
+			end
+		end)
+
+		local slider = CreateSlider(self, 0)
+		slider:SetGoal(0, DaveyJones+5, 0)
+		slider:SetSpeed(8)
+		WaitFor(slider)
+		slider:Destroy()
+			
+		CreateScaledBoom(self, overkillRatio)
+		self:CreateWreckage(overkillRatio, instigator)
+		self:Destroy()
+	end,
+
+	CreateWreckageProp = function( self, overkillRatio )
+		local bp = self:GetBlueprint()
+		local wreck = bp.Wreckage.Blueprint
+		#LOG('*DEBUG: Spawning Wreckage = ', repr(wreck), 'overkill = ',repr(overkillRatio))
+		local pos = self:GetPosition()
+		local mass = bp.Economy.BuildCostMass * (bp.Wreckage.MassMult or 0)
+		local energy = bp.Economy.BuildCostEnergy * (bp.Wreckage.EnergyMult or 0)
+		local time = (bp.Wreckage.ReclaimTimeMultiplier or 1)
+
+		--pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
+
+		local prop = CreateProp( pos, wreck )
+
+		prop:SetScale(bp.Display.UniformScale)
+		prop:SetOrientation(self:GetOrientation(), true)
+		prop:SetPropCollision('Box', bp.CollisionOffsetX, bp.CollisionOffsetY, bp.CollisionOffsetZ, bp.SizeX* 0.5, bp.SizeY* 0.5, bp.SizeZ * 0.5)
+		prop:SetMaxReclaimValues(time, time, mass, energy)
+
+		mass = (mass - (mass * (overkillRatio or 1))) * self:GetFractionComplete()
+		energy = (energy - (energy * (overkillRatio or 1))) * self:GetFractionComplete()
+		time = time - (time * (overkillRatio or 1))
+
+		prop:SetReclaimValues(time, time, mass, energy)
+		prop:SetMaxHealth(bp.Defense.Health)
+		prop:SetHealth(self, bp.Defense.Health * (bp.Wreckage.HealthMult or 1))
+
+		if not bp.Wreckage.UseCustomMesh then
+			prop:SetMesh(bp.Display.MeshBlueprintWrecked)
+		end
+
+		TryCopyPose(self,prop,false)
+
+		prop.AssociatedBP = self:GetBlueprint().BlueprintId
+
+		return prop
+	end,
+    
 }
 
 
@@ -1689,11 +1772,11 @@ ConstructionUnit = Class(MobileUnit) {
     
     OnStartBuild = function(self, unitBeingBuilt, order )
 
-		if unitBeingBuilt.WorkItem.Slot and unitBeingBuilt.WorkProgress == 0 then
-			return
-		else
-			MobileUnit.OnStartBuild(self,unitBeingBuilt, order)
-		end
+	if unitBeingBuilt.WorkItem.Slot and unitBeingBuilt.WorkProgress == 0 then
+		return
+	else
+		MobileUnit.OnStartBuild(self,unitBeingBuilt, order)
+	end
         #Fix up info on the unit id from the blueprint and see if it matches the 'UpgradeTo' field in the BP.
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
@@ -1763,6 +1846,108 @@ ConstructionUnit = Class(MobileUnit) {
     end,
 	
 	
+	DeathThread = function(self, overkillRatio, instigator)
+	
+		if self:GetCurrentLayer() == 'Water' then
+			#CreateScaledBoom(self, overkillRatio)
+			local sx, sy, sz = self:GetUnitSizes()
+			local vol = sx * sy * sz
+			local army = self:GetArmy()
+			local pos = self:GetPosition()
+			local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
+			local DaveyJones = (seafloor - pos[2])*20
+			local numBones = self:GetBoneCount()-1
+		
+			self:ForkThread(function()
+				##LOG("Sinker thread created")
+				local pos = self:GetPosition()
+				local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
+				while self:GetPosition(1)[2] > (seafloor) do  #added 2 because they were sinking into the seafloor
+					WaitSeconds(0.1)
+					##LOG("Sinker: ", repr(self:GetPosition()))
+				end
+				#CreateScaledBoom(self, overkillRatio, watchBone)
+				self:CreateWreckage(overkillRatio, instigator)
+				self:Destroy()
+			end)
+		
+		
+			self:ForkThread(function()
+				local i = 0
+				while true do
+					local rx, ry, rz = self:GetRandomOffset(0.25)
+					local rs = Random(vol/2, vol*2) / (vol*2)
+					local randBone = Util.GetRandomInt( 0, numBones)
+
+					CreateEmitterAtBone( self, randBone, army, '/effects/emitters/destruction_underwater_explosion_flash_01_emit.bp')
+						:ScaleEmitter(sx)
+						:OffsetEmitter(rx, ry, rz)
+					CreateEmitterAtBone( self, randBone, army, '/effects/emitters/destruction_underwater_sinking_wash_01_emit.bp')
+						:ScaleEmitter(sx/2)
+						:OffsetEmitter(rx, ry, rz)
+					#2 emitters is plenty for smaller hover units
+					#CreateEmitterAtBone( self, 0, army, '/effects/emitters/destruction_underwater_sinking_wash_01_emit.bp')
+					#	:ScaleEmitter(sx)
+					#	:OffsetEmitter(rx, ry, rz)
+					
+					local rd = Util.GetRandomFloat( 0.4+i, 1.0+i)
+					WaitSeconds(rd)
+					i = i + 0.3
+				end
+			end)
+		
+			#what does this even do I have no idea
+			local slider = CreateSlider(self, 0)
+			slider:SetGoal(0, DaveyJones+10, 0)  #changed from +5 to +10
+			slider:SetSpeed(8)
+			WaitFor(slider)
+			slider:Destroy()
+			
+			#CreateScaledBoom(self, overkillRatio)
+			self:CreateWreckage(overkillRatio, instigator)
+			self:Destroy()
+		else
+			MobileUnit.DeathThread(self, overkillRatio, instigator)
+		end
+				
+	end,
+
+	CreateWreckageProp = function( self, overkillRatio )
+		local bp = self:GetBlueprint()
+		local wreck = bp.Wreckage.Blueprint
+		#LOG('*DEBUG: Spawning Wreckage = ', repr(wreck), 'overkill = ',repr(overkillRatio))
+		local pos = self:GetPosition()
+		local mass = bp.Economy.BuildCostMass * (bp.Wreckage.MassMult or 0)
+		local energy = bp.Economy.BuildCostEnergy * (bp.Wreckage.EnergyMult or 0)
+		local time = (bp.Wreckage.ReclaimTimeMultiplier or 1)
+
+		--pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
+
+		local prop = CreateProp( pos, wreck )
+
+		prop:SetScale(bp.Display.UniformScale)
+		prop:SetOrientation(self:GetOrientation(), true)
+		prop:SetPropCollision('Box', bp.CollisionOffsetX, bp.CollisionOffsetY, bp.CollisionOffsetZ, bp.SizeX* 0.5, bp.SizeY* 0.5, bp.SizeZ * 0.5)
+		prop:SetMaxReclaimValues(time, time, mass, energy)
+
+		mass = (mass - (mass * (overkillRatio or 1))) * self:GetFractionComplete()
+		energy = (energy - (energy * (overkillRatio or 1))) * self:GetFractionComplete()
+		time = time - (time * (overkillRatio or 1))
+
+		prop:SetReclaimValues(time, time, mass, energy)
+		prop:SetMaxHealth(bp.Defense.Health)
+		prop:SetHealth(self, bp.Defense.Health * (bp.Wreckage.HealthMult or 1))
+
+		if not bp.Wreckage.UseCustomMesh then
+			prop:SetMesh(bp.Display.MeshBlueprintWrecked)
+		end
+
+		TryCopyPose(self,prop,false)
+
+		prop.AssociatedBP = self:GetBlueprint().BlueprintId
+	
+		return prop
+	end,
 }
 
 
@@ -1772,13 +1957,18 @@ ConstructionUnit = Class(MobileUnit) {
 #  These units typically float on the water and have wake when they move.
 #-------------------------------------------------------------
 
-SeaUnit = startClass(SeaUnit)
-    DeathThreadDestructionWaitTime = 5
-    ShowUnitDestructionDebris = false
-    PlayEndestructionEffects = false
-	CollidedBones = 0
+SeaUnit = Class(MobileUnit){
+	DeathThreadDestructionWaitTime = 5,
+	ShowUnitDestructionDebris = false,
+	PlayEndestructionEffects = false,
+	CollidedBones = 0,
 	
-	function OnKilled(self, instigator, type, overkillRatio)
+	OnStopBeingBuilt = function(self,builder,layer)
+		MobileUnit.OnStopBeingBuilt(self,builder,layer)
+		self:SetMaintenanceConsumptionActive()
+	end,
+		
+	OnKilled = function(self, instigator, type, overkillRatio)
 		local nrofBones = self:GetBoneCount() -1
 		local watchBone = self:GetBlueprint().WatchBone or 0
 		LOG(self:GetBlueprint().Description, " watchbone is ", watchBone)
@@ -1796,103 +1986,84 @@ SeaUnit = startClass(SeaUnit)
 			self:Destroy()
 		end)
          
-        local layer = self:GetCurrentLayer()
+		local layer = self:GetCurrentLayer()
         self:DestroyIdleEffects()
         if (layer == 'Water' or layer == 'Seabed' or layer == 'Sub') then
             self.SinkExplosionThread = self:ForkThread(self.ExplosionThread)
             self.SinkThread = self:ForkThread(self.SinkingThread)
         end
-		OldSeaUnit.OnKilled(self, instigator, type, overkillRatio)
-    end
-endClass()
-
-local OldSubUnit = SubUnit
-SubUnit = startClass(OldSubUnit)
-	function DeathThread(self, overkillRatio, instigator)
-		CreateScaledBoom(self, overkillRatio)
+	
+	local layer = self:GetCurrentLayer()
+        self:DestroyIdleEffects()
+        
+	if(layer == 'Water' or layer == 'Seabed' or layer == 'Sub')then
+            self.SinkExplosionThread = self:ForkThread(self.ExplosionThread)
+            self.SinkThread = self:ForkThread(self.SinkingThread)
+        end
+        MobileUnit.OnKilled(self, instigator, type, overkillRatio)
+    end,
+    
+    
+    ExplosionThread = function(self)
+        local maxcount = Util.GetRandomInt(6,20) # max number of above surface explosions. timed to animation
+        local i = maxcount # initializing the above surface counter
+        local d = 0 # delay offset after surface explosions cease
         local sx, sy, sz = self:GetUnitSizes()
         local vol = sx * sy * sz
-		local army = self:GetArmy()
-		local pos = self:GetPosition()
-		local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
-		local DaveyJones = (seafloor - pos[2])*20
-		local numBones = self:GetBoneCount()-1
-		
+        local army = self:GetArmy()
+        local numBones = self:GetBoneCount() - 1
 
-		
-		self:ForkThread(function()
-			local i = 0
-			while true do
-            	local rx, ry, rz = self:GetRandomOffset(0.25)
-            	local rs = Random(vol/2, vol*2) / (vol*2)
-            	local randBone = Util.GetRandomInt( 0, numBones)
+        while true do
+            if i > 0 then
+                local rx, ry, rz = self:GetRandomOffset(1)
+                local rs = Random(vol/2, vol*2) / (vol*2)
+                explosion.CreateDefaultHitExplosionAtBone( self, Util.GetRandomInt( 0, numBones), 1.0 )
+            else
+                d = d + 1 # if submerged, increase delay offset
+                self:DestroyAllDamageEffects()
+            end
+            i = i - 1
 
-            	CreateEmitterAtBone( self, randBone, army, '/effects/emitters/destruction_underwater_explosion_flash_01_emit.bp')
-					:ScaleEmitter(sx)
-					:OffsetEmitter(rx, ry, rz)
-				CreateEmitterAtBone( self, randBone, army, '/effects/emitters/destruction_underwater_sinking_wash_01_emit.bp')
-					:ScaleEmitter(sx/2)
-					:OffsetEmitter(rx, ry, rz)
-				CreateEmitterAtBone( self, 0, army, '/effects/emitters/destruction_underwater_sinking_wash_01_emit.bp')
-					:ScaleEmitter(sx)
-					:OffsetEmitter(rx, ry, rz)
-					
-            	local rd = Util.GetRandomFloat( 0.4+i, 1.0+i)
-            	WaitSeconds(rd)
-				i = i + 0.3
-			end
-		end)
+            local rx, ry, rz = self:GetRandomOffset(0.25)
+            local rs = Random(vol/2, vol*2) / (vol*2)
+            local randBone = Util.GetRandomInt( 0, numBones)
+            
+            CreateEmitterAtBone( self, randBone, army, '/effects/emitters/destruction_underwater_explosion_flash_01_emit.bp'):OffsetEmitter(rx, ry, rz):ScaleEmitter(rs)
+            CreateEmitterAtBone( self, randBone, army, '/effects/emitters/destruction_underwater_explosion_splash_01_emit.bp'):OffsetEmitter(rx, ry, rz):ScaleEmitter(rs)
 
-		local slider = CreateSlider(self, 0)
-		slider:SetGoal(0, DaveyJones+5, 0)
-		slider:SetSpeed(8)
-		WaitFor(slider)
-		slider:Destroy()
-			
-		CreateScaledBoom(self, overkillRatio)
-		self:CreateWreckage(overkillRatio, instigator)
-		self:Destroy()
-	end
-
-    function CreateWreckageProp( self, overkillRatio )
-		local bp = self:GetBlueprint()
-		local wreck = bp.Wreckage.Blueprint
-		#LOG('*DEBUG: Spawning Wreckage = ', repr(wreck), 'overkill = ',repr(overkillRatio))
-		local pos = self:GetPosition()
-		local mass = bp.Economy.BuildCostMass * (bp.Wreckage.MassMult or 0)
-		local energy = bp.Economy.BuildCostEnergy * (bp.Wreckage.EnergyMult or 0)
-		local time = (bp.Wreckage.ReclaimTimeMultiplier or 1)
-
-		--pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
-
-		local prop = CreateProp( pos, wreck )
-
-		prop:SetScale(bp.Display.UniformScale)
-		prop:SetOrientation(self:GetOrientation(), true)
-		prop:SetPropCollision('Box', bp.CollisionOffsetX, bp.CollisionOffsetY, bp.CollisionOffsetZ, bp.SizeX* 0.5, bp.SizeY* 0.5, bp.SizeZ * 0.5)
-		prop:SetMaxReclaimValues(time, time, mass, energy)
-
-		mass = (mass - (mass * (overkillRatio or 1))) * self:GetFractionComplete()
-		energy = (energy - (energy * (overkillRatio or 1))) * self:GetFractionComplete()
-		time = time - (time * (overkillRatio or 1))
-
-		prop:SetReclaimValues(time, time, mass, energy)
-		prop:SetMaxHealth(bp.Defense.Health)
-		prop:SetHealth(self, bp.Defense.Health * (bp.Wreckage.HealthMult or 1))
-
-        if not bp.Wreckage.UseCustomMesh then
-    	    prop:SetMesh(bp.Display.MeshBlueprintWrecked)
+            local rd = Util.GetRandomFloat( 0.4, 1.0)
+            WaitSeconds(rd)
         end
+    end,
+    
+   SinkingThread = function(self)
+        local i = 8 # initializing the above surface counter
+        local sx, sy, sz = self:GetUnitSizes()
+        local vol = sx * sy * sz
+        local army = self:GetArmy()
 
-        TryCopyPose(self,prop,false)
+        while true do
+            if i > 0 then
+                local rx, ry, rz = self:GetRandomOffset(1)
+                local rs = Random(vol/2, vol*2) / (vol*2) 
+                CreateAttachedEmitter(self,-1,army,'/effects/emitters/destruction_water_sinking_ripples_01_emit.bp'):OffsetEmitter(rx, 0, rz):ScaleEmitter(rs)
 
-        prop.AssociatedBP = self:GetBlueprint().BlueprintId
+                local rx, ry, rz = self:GetRandomOffset(1)
+                CreateAttachedEmitter(self,self.LeftFrontWakeBone,army, '/effects/emitters/destruction_water_sinking_wash_01_emit.bp'):OffsetEmitter(rx, 0, rz):ScaleEmitter(rs)
 
-		return prop
-    end
-endClass()
+                local rx, ry, rz = self:GetRandomOffset(1)
+                CreateAttachedEmitter(self,self.RightFrontWakeBone,army, '/effects/emitters/destruction_water_sinking_wash_01_emit.bp'):OffsetEmitter(rx, 0, rz):ScaleEmitter(rs)
+            end
 
+            local rx, ry, rz = self:GetRandomOffset(1)
+            local rs = Random(vol/2, vol*2) / (vol*2)
+            CreateAttachedEmitter(self,-1,army,'/effects/emitters/destruction_underwater_sinking_wash_01_emit.bp'):OffsetEmitter(rx, 0, rz):ScaleEmitter(rs)
 
+            i = i - 1
+            WaitSeconds(1)
+        end
+    end,
+}
 
 
 
@@ -1903,11 +2074,10 @@ endClass()
 #-------------------------------------------------------------
 #  HOVERING LAND UNITS   ##return this entire section to HoverLandUnit = Class(MobileUnit){} if it does not work
 #-------------------------------------------------------------
-local OldHoverLandUnit = HoverLandUnit
 
-HoverLandUnit = startClass(OldHoverLandUnit)
+HoverLandUnit = Class(MobileUnit){
 
-	function DeathThread(self, overkillRatio, instigator)
+	DeathThread = function(self, overkillRatio, instigator)
 
 		
 		if self:GetCurrentLayer() == 'Water' then
@@ -1970,12 +2140,12 @@ HoverLandUnit = startClass(OldHoverLandUnit)
 			self:CreateWreckage(overkillRatio, instigator)
 			self:Destroy()
 			else
-			OldHoverLandUnit.DeathThread(self, overkillRatio, instigator)
+				MobileUnit.DeathThread(self, overkillRatio, instigator)
 			end
 				
-	end
+	end,
 
-    function CreateWreckageProp( self, overkillRatio )
+	CreateWreckageProp = function( self, overkillRatio )
 		local bp = self:GetBlueprint()
 		local wreck = bp.Wreckage.Blueprint
 		#LOG('*DEBUG: Spawning Wreckage = ', repr(wreck), 'overkill = ',repr(overkillRatio))
@@ -2001,130 +2171,22 @@ HoverLandUnit = startClass(OldHoverLandUnit)
 		prop:SetMaxHealth(bp.Defense.Health)
 		prop:SetHealth(self, bp.Defense.Health * (bp.Wreckage.HealthMult or 1))
 
-        if not bp.Wreckage.UseCustomMesh then
-    	    prop:SetMesh(bp.Display.MeshBlueprintWrecked)
-        end
+		if not bp.Wreckage.UseCustomMesh then
+			prop:SetMesh(bp.Display.MeshBlueprintWrecked)
+		end
 
-        TryCopyPose(self,prop,false)
+		TryCopyPose(self,prop,false)
 
-        prop.AssociatedBP = self:GetBlueprint().BlueprintId
-
-		return prop
-    end
-
-endClass()
-
-
-local OldConstructionUnit = ConstructionUnit
-
-ConstructionUnit = startClass(OldConstructionUnit)
-
-	function DeathThread(self, overkillRatio, instigator)
-	
-		if self:GetCurrentLayer() == 'Water' then
-			#CreateScaledBoom(self, overkillRatio)
-			local sx, sy, sz = self:GetUnitSizes()
-			local vol = sx * sy * sz
-			local army = self:GetArmy()
-			local pos = self:GetPosition()
-			local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
-			local DaveyJones = (seafloor - pos[2])*20
-			local numBones = self:GetBoneCount()-1
-		
-			self:ForkThread(function()
-				##LOG("Sinker thread created")
-				local pos = self:GetPosition()
-				local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
-				while self:GetPosition(1)[2] > (seafloor) do  #added 2 because they were sinking into the seafloor
-					WaitSeconds(0.1)
-					##LOG("Sinker: ", repr(self:GetPosition()))
-				end
-				#CreateScaledBoom(self, overkillRatio, watchBone)
-				self:CreateWreckage(overkillRatio, instigator)
-				self:Destroy()
-			end)
-		
-		
-			self:ForkThread(function()
-				local i = 0
-				while true do
-					local rx, ry, rz = self:GetRandomOffset(0.25)
-					local rs = Random(vol/2, vol*2) / (vol*2)
-					local randBone = Util.GetRandomInt( 0, numBones)
-
-					CreateEmitterAtBone( self, randBone, army, '/effects/emitters/destruction_underwater_explosion_flash_01_emit.bp')
-						:ScaleEmitter(sx)
-						:OffsetEmitter(rx, ry, rz)
-					CreateEmitterAtBone( self, randBone, army, '/effects/emitters/destruction_underwater_sinking_wash_01_emit.bp')
-						:ScaleEmitter(sx/2)
-						:OffsetEmitter(rx, ry, rz)
-					#2 emitters is plenty for smaller hover units
-					#CreateEmitterAtBone( self, 0, army, '/effects/emitters/destruction_underwater_sinking_wash_01_emit.bp')
-					#	:ScaleEmitter(sx)
-					#	:OffsetEmitter(rx, ry, rz)
-					
-					local rd = Util.GetRandomFloat( 0.4+i, 1.0+i)
-					WaitSeconds(rd)
-					i = i + 0.3
-				end
-			end)
-		
-			#what does this even do I have no idea
-			local slider = CreateSlider(self, 0)
-			slider:SetGoal(0, DaveyJones+10, 0)  #changed from +5 to +10
-			slider:SetSpeed(8)
-			WaitFor(slider)
-			slider:Destroy()
-			
-			#CreateScaledBoom(self, overkillRatio)
-			self:CreateWreckage(overkillRatio, instigator)
-			self:Destroy()
-			else
-			OldConstructionUnit.DeathThread(self, overkillRatio, instigator)
-			end
-				
-	end
-
-    function CreateWreckageProp( self, overkillRatio )
-		local bp = self:GetBlueprint()
-		local wreck = bp.Wreckage.Blueprint
-		#LOG('*DEBUG: Spawning Wreckage = ', repr(wreck), 'overkill = ',repr(overkillRatio))
-		local pos = self:GetPosition()
-		local mass = bp.Economy.BuildCostMass * (bp.Wreckage.MassMult or 0)
-		local energy = bp.Economy.BuildCostEnergy * (bp.Wreckage.EnergyMult or 0)
-		local time = (bp.Wreckage.ReclaimTimeMultiplier or 1)
-
-		--pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
-
-		local prop = CreateProp( pos, wreck )
-
-		prop:SetScale(bp.Display.UniformScale)
-		prop:SetOrientation(self:GetOrientation(), true)
-		prop:SetPropCollision('Box', bp.CollisionOffsetX, bp.CollisionOffsetY, bp.CollisionOffsetZ, bp.SizeX* 0.5, bp.SizeY* 0.5, bp.SizeZ * 0.5)
-		prop:SetMaxReclaimValues(time, time, mass, energy)
-
-		mass = (mass - (mass * (overkillRatio or 1))) * self:GetFractionComplete()
-		energy = (energy - (energy * (overkillRatio or 1))) * self:GetFractionComplete()
-		time = time - (time * (overkillRatio or 1))
-
-		prop:SetReclaimValues(time, time, mass, energy)
-		prop:SetMaxHealth(bp.Defense.Health)
-		prop:SetHealth(self, bp.Defense.Health * (bp.Wreckage.HealthMult or 1))
-
-        if not bp.Wreckage.UseCustomMesh then
-    	    prop:SetMesh(bp.Display.MeshBlueprintWrecked)
-        end
-
-        TryCopyPose(self,prop,false)
-
-        prop.AssociatedBP = self:GetBlueprint().BlueprintId
+		prop.AssociatedBP = self:GetBlueprint().BlueprintId
 
 		return prop
     end
 	
-	
-	
-endClass()
+
+}
+
+
+
 
 
 #########This entire section is for factory fixes from CBFP.  If no workie, just remove everything below this line to restore
