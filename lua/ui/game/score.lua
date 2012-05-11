@@ -24,8 +24,11 @@ local Tooltip = import('/lua/ui/game/tooltip.lua')
 controls = {}
 savedParent = false
 local observerLine = false
+
+##  I switched the order of these because it was causing error, originally, the scoreoption line was first
+local sessionInfo = SessionGetScenarioInfo()   
 local scoreOption = sessionInfo.Options.Score or "yes"
-local sessionInfo = SessionGetScenarioInfo()
+
 local lastUnitWarning = false
 local unitWarningUsed = false
 local issuedNoRushWarning = false
