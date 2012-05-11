@@ -8,7 +8,7 @@
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
-local TSubUnit = import('/lua/terranunits.lua').TSubUnit
+local TSeaUnit = import('/lua/terranunits.lua').TSeaUnit
 local TANTorpedoAngler = import('/lua/terranweapons.lua').TANTorpedoAngler
 local TSAMLauncher = import('/lua/terranweapons.lua').TSAMLauncher
 
@@ -19,7 +19,7 @@ local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
 #we're gonna make it a ship unit and see how that works
 local TSeaUnit = import('/lua/terranunits.lua').TSeaUnit
 
-UES0401 = Class(TSubUnit) {
+UES0401 = Class(TSeaUnit) {
 
     Weapons = {
         Torpedo01 = Class(TANTorpedoAngler) {},
@@ -37,7 +37,7 @@ UES0401 = Class(TSubUnit) {
 	end,
 
     OnCreate = function(self)
-        TSubUnit.OnCreate(self)
+        TSeaUnit.OnCreate(self)
         self.OpenAnimManips = {}
         self.OpenAnimManips[1] = CreateAnimator(self):PlayAnim('/units/ues0401/ues0401_aopen.sca'):SetRate(-1)
         for i = 2, 6 do
@@ -71,7 +71,7 @@ UES0401 = Class(TSubUnit) {
     end,
 
     OnMotionVertEventChange = function( self, new, old )
-        TSubUnit.OnMotionVertEventChange(self, new, old)
+        TSeaUnit.OnMotionVertEventChange(self, new, old)
         if new == 'Down' then
             self:PlayAllOpenAnims(false)
         elseif new == 'Top' then
@@ -82,12 +82,12 @@ UES0401 = Class(TSubUnit) {
     BuildAttachBone = 'UES0401',
 
     OnStopBeingBuilt = function(self,builder,layer)
-        TSubUnit.OnStopBeingBuilt(self,builder,layer)
+        TSeaUnit.OnStopBeingBuilt(self,builder,layer)
         ChangeState(self, self.IdleState)
     end,
 
     OnFailedToBuild = function(self)
-        TSubUnit.OnFailedToBuild(self)
+        TSeaUnit.OnFailedToBuild(self)
         ChangeState(self, self.IdleState)
     end,
 
@@ -98,7 +98,7 @@ UES0401 = Class(TSubUnit) {
         end,
 
         OnStartBuild = function(self, unitBuilding, order)
-            TSubUnit.OnStartBuild(self, unitBuilding, order)
+            TSeaUnit.OnStartBuild(self, unitBuilding, order)
             self.UnitBeingBuilt = unitBuilding
             ChangeState(self, self.BuildingState)
         end,
@@ -115,7 +115,7 @@ UES0401 = Class(TSubUnit) {
         end,
 
         OnStopBuild = function(self, unitBeingBuilt)
-            TSubUnit.OnStopBuild(self, unitBeingBuilt)
+            TSeaUnit.OnStopBuild(self, unitBeingBuilt)
             ChangeState(self, self.FinishedBuildingState)
         end,
     },
