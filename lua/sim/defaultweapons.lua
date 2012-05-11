@@ -138,6 +138,11 @@ DefaultProjectileWeapon = Class(Weapon) {
         elseif bp.Audio.Fire then
             self:PlaySound(bp.Audio.Fire)
         end
+	
+	#new for CBFP
+	self:CheckBallisticAcceleration( proj)  # if weapon BP specifies fix bomb trajectory then that's what happens
+        self:CheckCountedMissileLaunch()  # added by brute51 - provides a unit event function
+
         return proj
     end,
 
@@ -779,12 +784,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         end
     end,
 
-    CreateProjectileAtMuzzle = function(self, muzzle)                          # [152]
-        local proj = CBFP_DefaultProjectileWeapon.CreateProjectileAtMuzzle(self, muzzle)
-        self:CheckBallisticAcceleration( proj)  # if weapon BP specifies fix bomb trajectory then that's what happens
-        self:CheckCountedMissileLaunch()  # added by brute51 - provides a unit event function
-        return proj
-    end,
+
 
     CheckCountedMissileLaunch = function(self)
         # takes care of a unit event function added in CBFP v2. MOved it to here in v4, that way I can get rid of
@@ -875,6 +875,8 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
         elseif bp.Audio.Fire then
             self:PlaySound(bp.Audio.Fire)
         end
+	
+
 
     end,
 
