@@ -389,15 +389,20 @@ end
 -- join an already existing lobby
 function JoinGame(address, asObserver, playerName, uid)
     wantToBeObserver = asObserver
+	LOG("DEBUG : JoinGame " .. playerName .. " Uid "..uid .. " Address:port " .. address)
     lobbyComm:JoinGame(address, playerName, uid);
 end
 
 function ConnectToPeer(addressAndPort,name,uid)
+	LOG("DEBUG : Connecting to peer " .. name .. " Uid "..uid .. " Address:port " .. addressAndPort)
     lobbyComm:ConnectToPeer(addressAndPort,name,uid)
+	LOG("DEBUG : Connecting to peer command done")
 end
 
 function DisconnectFromPeer(uid)
+	LOG("DEBUG : Disconnect from peer " .. uid)
     lobbyComm:DisconnectFromPeer(uid)
+	LOG("DEBUG : Diuonnecting to peer command done")
 end
 
 function SetHasSupcom(supcomInstalled)
