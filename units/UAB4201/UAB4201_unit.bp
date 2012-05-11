@@ -224,7 +224,7 @@ UnitBlueprint {
             RackSalvoChargeTime = 0,
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
-            RangeCategory = '',
+            #RangeCategory = '',  #removed this line so there is no error about the range category
             RateOfFire = 0.32,
             TargetCheckInterval = 0.5,
             TargetRestrictDisallow = 'UNTARGETABLE',

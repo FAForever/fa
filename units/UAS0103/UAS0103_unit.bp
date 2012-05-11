@@ -90,7 +90,7 @@ UnitBlueprint {
                 Weight = 100,
             },
             {
-                Animation = '/units/uas00103/uas0103_adeath03.sca',
+                Animation = '/units/uas0103/uas0103_adeath02.sca',  #from                 Animation = '/units/uas0103/uas0103_adeath03.sca',
                 Weight = 100,
             },
         },
