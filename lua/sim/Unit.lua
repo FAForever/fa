@@ -3637,9 +3637,9 @@ Unit = Class(moho.unit_methods) {
 		#added for transport bug fix
 		if transport.slotsFree[bone] == false then
 			#WARN('Stop issued due to attachment bone already in use, bone ' .. repr(bone))
-			#IssueStop({self})
-			#IssueStop({transport})
-			self:Kill()
+			IssueClearCommands({self})
+			IssueClearCommands({transport})
+			#self:Kill()
 			WARN('Unit killed due to attachment bone already in use.')
 			return
 		else
