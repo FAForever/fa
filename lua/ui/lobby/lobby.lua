@@ -3161,7 +3161,7 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
 					if gameInfo.GameOptions['AutoTeams'] and lobbyComm:IsHost() then
 						if gameInfo.GameOptions['AutoTeams'] == 'manual' then							
 							if not gameInfo.ClosedSlots[slot] and (gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] == 'random') then
-								if gameInfo.AutoTeams[slot] == 5 then
+								if gameInfo.AutoTeams[slot] == 7 then
 									GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[2]))
 									gameInfo.AutoTeams[slot] = 2
 								elseif gameInfo.AutoTeams[slot] == 2 then
@@ -3173,6 +3173,12 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
 								elseif gameInfo.AutoTeams[slot] == 4 then									
 									GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[5]))
 									gameInfo.AutoTeams[slot] = 5
+								elseif gameInfo.AutoTeams[slot] == 5 then									
+									GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[6]))
+									gameInfo.AutoTeams[slot] = 6
+								elseif gameInfo.AutoTeams[slot] == 6 then									
+									GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[7]))
+									gameInfo.AutoTeams[slot] = 7
 								end
 								lobbyComm:BroadcastData(
 									{
