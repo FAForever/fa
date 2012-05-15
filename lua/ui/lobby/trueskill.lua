@@ -377,18 +377,18 @@ end
 local function getMinorMatrix(mtx, rowToRemove, columnToRemove) 
 
 	result = {}
-	actualRow = 0
+	actualRow = 1
 
 	for currentRow=1,mtx.rowCount do
 
 		if not currentRow == rowToRemove then
 
-		actualCol = 0
+		actualCol = 1
 			table.insert(result, actualRow, {})
 			
 			for currentColumn=1, mtx.columnCount do
 
-				table.insert(result[actualRow],actualCol,0)
+				table.insert(result[actualRow],actualCol,1)
 				if not currentColumn == columnToRemove then
 
 					result[actualRow][actualCol] = mtx.matrix[currentRow][currentColumn]
@@ -443,7 +443,7 @@ local function getDeterminant(mtx)
 
 	for currentColumn=1, mtx.columnCount do
 		firstRowColValue =  mtx.matrix[1][currentColumn]
-		cofactor = self.getCofactor(0, currentColumn)
+		cofactor = self.getCofactor(1, currentColumn)
 		itemToAdd = firstRowColValue*cofactor
 		result = result + itemToAdd
 	end
@@ -457,10 +457,10 @@ end
 local function getAdjugate(mtx)
 
 	if (mtx.rowCount == 2) then
-	        a = mtx.matrix[0][0]
-            b = mtx.matrix[0][1]
-            c = mtx.matrix[1][0]
-            d = mtx.matrix[1][1]
+	        a = mtx.matrix[1][1]
+            b = mtx.matrix[1][2]
+            c = mtx.matrix[2][1]
+            d = mtx.matrix[2][2]
 			
 			allValues = {a,b,c,d}
 			
@@ -523,9 +523,6 @@ player2 = Player.create("play2", Rating.create(1500,500))
 
 player3 = Player.create("play3", Rating.create(1500,500))
 player4 = Player.create("play4", Rating.create(1500,500))
-
---print (player1:getName())
---print (player1:getRating():getMean())
 
 team =  Teams.create(1, player1)
 team:addPlayer(1, player2)
