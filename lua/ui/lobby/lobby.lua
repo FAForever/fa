@@ -22,6 +22,10 @@ local Mods = import('/lua/mods.lua')
 local ModManager = import('/lua/ui/dialogs/modmanager.lua')
 local FactionData = import('/lua/factions.lua')
 local Text = import('/lua/maui/text.lua').Text
+local Trueskill = import('/lua/ui/lobby/trueskill.lua')
+
+
+Trueskill.testTs()
 
 local teamOpts = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
 local globalOpts = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts

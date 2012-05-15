@@ -1,13 +1,63 @@
-local matrix = require "matrix"
-
-
+	
 local Teams = {}
 local Rating = {}
 local Player = {}
+local Matrix = {}
 
+
+Teams.__index = Teams
 Rating.__index = Rating
 Player.__index = Player
-Teams.__index = Teams
+Matrix.__index = Matrix
+
+local function make_list(size)
+    	mylist = {}
+    	for i=1,size do
+
+        	mylist[i] = 0
+	end
+    
+	return mylist
+end
+
+
+local function make_matrix(rows, cols)
+    -- Create a 2D >matrix as a list of rows number of lists
+    -- where the lists are cols in size
+    -- resulting matrix contains zeros
+ 
+    local mmatrix= {}
+    for i =1,rows do
+
+        mmatrix[i] = make_list(cols)
+    end
+    return mmatrix
+end
+
+
+function Matrix.create(rows, colums)
+ 	local mtx = {}
+	setmetatable(mtx,Matrix)
+	mtx.rowCount = rows
+	mtx.columnCount = colums
+	mtx.matrix = make_matrix(rows, colums)
+	return mtx
+end
+
+
+function Matrix:transpose()
+	transposeMatrix =  Matrix.create(self.columnCount, self.rowCount)
+	
+	for currentRowTransposeMatrix =1,self.columnCount do
+		for currentColumnTransposeMatrix=1,self.rowCount do
+			transposeMatrix.matrix[currentRowTransposeMatrix][currentColumnTransposeMatrix] = self.matrix[currentColumnTransposeMatrix][currentRowTransposeMatrix]
+		end
+	end
+
+	return transposeMatrix
+	
+	
+end
 
 function Rating.create(mean, deviation)
  	local rtg = {}
@@ -69,7 +119,6 @@ end
 function Teams:getTeam(num)
 	local j = 0
 
-	print ("getting " .. num)
 	for i,v in ipairs(self.players) do
 
 		if j == num then
@@ -81,44 +130,27 @@ function Teams:getTeam(num)
 end
 
 
-local function make_list(size)
-    	mylist = {}
-    	for i=0,size do
-        	mylist[i] = 0
-	end
-    
-	return mylist
-end
 
-
-local function make_matrix(rows, cols)
-    -- Create a 2D >matrix as a list of rows number of lists
-    -- where the lists are cols in size
-    -- resulting matrix contains zeros
- 
-    local mmatrix= {}
-    for i =0,rows do
-        mmatrix[i] = make_list(cols)
-    end
-    return mmatrix
-end
 
 local function DiagonalMatrix(diagonalValues)
 
 	local diagonalCount = table.getn(diagonalValues)
-	local mmatrix = make_matrix(diagonalCount,diagonalCount)
 	
-	for currentRow = 0,diagonalCount do
-		for currentCol = 0, diagonalCount do
-		
+	
+	
+
+	local mmatrix = Matrix.create(diagonalCount,diagonalCount)
+	
+	for currentRow = 1,diagonalCount do
+		for currentCol = 1, diagonalCount do
 			if currentRow == currentCol then
-				mmatrix[currentRow][currentCol] = diagonalValues[currentRow]
+				mmatrix.matrix[currentRow][currentCol] = diagonalValues[currentRow]
 			end
 
 		end 
 	end
 	
-	return matrix:new(mmatrix)
+	return mmatrix
 	
 end
 
@@ -126,14 +158,16 @@ end
 
 local function Vector(vectorValues)
 	local columnValues = {}
-
+	local vector = Matrix.create(table.getn(vectorValues),1)
+	
 	for i,v in ipairs(vectorValues) do
-		local list = {v}
-		columnValues[i] = list
+		vector.matrix[i][1] =  v
+		
 	end
 
-
-	return matrix:new( columnValues )
+	
+	
+	return vector
 
 end
 
@@ -142,12 +176,12 @@ local function fromColumnValues(rows, columns, columnValues)
 	
 	for i,v in ipairs(columnValues) do 
 		for j,w in ipairs(v) do
-			print(w)
+
 		end 
 	end	
 
 
-       	result =  matrix (rows,columns)
+       	result =  Matrix.create(rows,columns)
 	
 	for currentColumn=1,columns do
 		local currentColumnData = columnValues[currentColumn]
@@ -155,8 +189,7 @@ local function fromColumnValues(rows, columns, columnValues)
             
 		for currentRow=1,rows do
 
-			print (currentColumnData[currentRow])
-			matrix.setelement(result, currentRow, currentColumn, currentColumnData[currentRow])
+			result.matrix[currentRow][currentColumn] = currentColumnData[currentRow]
 
 		end
 	end
@@ -245,7 +278,6 @@ local function createPlayerTeamAssignmentMatrix(teamAssignmentsList, totalPlayer
 	end
 
 
-
 	return fromColumnValues(totalPlayers, teamAssignmentsListCount - 1, playerAssignments)
 
 
@@ -293,6 +325,198 @@ local function getPlayerMeansVector(teamAssignmentsList)
 
 end
 
+local function matrixmult(left, right)
+
+
+	resultRows = left.rowCount
+	resultColumns = right.columnCount
+
+	
+	resultMatrix = Matrix.create(resultRows, resultColumns)
+	
+	for currentRow=1, resultRows do
+		for currentColumn=1, resultColumns do
+			
+			productValue = 0
+			for vectorIndex = 1,left.columnCount do 
+			
+				leftValue = left.matrix[currentRow][vectorIndex]
+				rightValue = right.matrix[vectorIndex][currentColumn]
+				
+				
+				
+				vectorIndexProduct = leftValue*rightValue
+				productValue = productValue + vectorIndexProduct
+				
+			end
+			
+			resultMatrix.matrix[currentRow][currentColumn] = productValue
+			
+		end
+	end
+	
+	return resultMatrix
+end
+
+local function scalarMultiply(mtx, scalarValue)
+
+        rows = mtx.rowCount
+        columns = mtx.columnCount
+        newValues = Matrix.create(rows, columns)
+
+        for currentRow=1, rows do
+            for currentColumn=1,columns do
+                newValues.matrix[currentRow][currentColumn] = scalarValue*mtx.matrix[currentRow][currentColumn]
+			end
+		end
+
+        return newValues
+
+end
+
+local function getMinorMatrix(mtx, rowToRemove, columnToRemove) 
+
+	result = {}
+	actualRow = 0
+
+	for currentRow=1,mtx.rowCount do
+
+		if not currentRow == rowToRemove then
+
+		actualCol = 0
+			table.insert(result, actualRow, {})
+			
+			for currentColumn=1, mtx.columnCount do
+
+				table.insert(result[actualRow],actualCol,0)
+				if not currentColumn == columnToRemove then
+
+					result[actualRow][actualCol] = mtx.matrix[currentRow][currentColumn]
+
+					actualCol = actualCol + 1
+
+					actualRow = actualRow + 1 
+				end
+			end
+		end
+		
+	end
+	
+	val = Matrix.create(mtx.rowCount - 1, mtx.columnCount - 1)
+	val.matrix =  result
+	
+	return val
+
+end
+
+
+local function getCofactor(mtx, rowToRemove, columnToRemove) 
+        
+        sum = rowToRemove + columnToRemove
+
+		local modulo = sum - math.floor(sum/2)*2
+		
+		if modulo == 0 then
+            return mtx.getMinorMatrix(rowToRemove, columnToRemove).getDeterminant()
+			
+        else 
+            return -1.0* mtx.getMinorMatrix(rowToRemove, columnToRemove).getDeterminant()
+		end
+			
+end
+			
+local function getDeterminant(mtx)
+	if mtx.rowCount == 1 then
+		return mtx.matrix[1][1]
+	end
+	
+	if mtx.rowCount == 2 then
+		a = mtx.matrix[1][1]
+		b = mtx.matrix[1][2]
+		c = mtx.matrix[2][1]
+		d = mtx.matrix[2][2]
+		return a*d - b*c
+	end
+	
+	result = 0.0
+
+
+	for currentColumn=1, mtx.columnCount do
+		firstRowColValue =  mtx.matrix[1][currentColumn]
+		cofactor = self.getCofactor(0, currentColumn)
+		itemToAdd = firstRowColValue*cofactor
+		result = result + itemToAdd
+	end
+	
+	return result
+	
+end
+
+
+
+local function getAdjugate(mtx)
+
+	if (mtx.rowCount == 2) then
+	        a = mtx.matrix[0][0]
+            b = mtx.matrix[0][1]
+            c = mtx.matrix[1][0]
+            d = mtx.matrix[1][1]
+			
+			allValues = {a,b,c,d}
+			
+			rows = 2
+			cols = 2
+			
+			matrixData = Matrix.create(rows, cols)
+			allValuesIndex = 1
+			for currentRow=1,rows do
+				for currentColumn=1,cols do
+					 matrixData.matrix[currentRow][currentColumn] = allValues[allValuesIndex]
+					 allValuesIndex  = allValuesIndex + 1
+				end
+			end
+			
+			return matrixData
+	end
+
+end
+
+local function matrixInvert(mtx)
+
+
+        if mtx.rowCount == 1 and mtx.columnCount == 1 then
+			result = Matrix.create(1,1)
+			result.matrix[1][1] = 1.0/mtx.matrix[1][1]
+			return result
+
+		
+		end
+        
+		determinantInverse = 1.0 / getDeterminant(mtx)
+        adjugate = mtx.getAdjugate()
+
+		return scalarMultiply(determinantInverse, adjugate)
+		
+end
+
+
+local function matrixAdd(left, right)
+
+	resultMatrix = Matrix.create(left.rowCount, right.columnCount)
+
+	 for currentRow=1,left.rowCount do
+		 for currentColumn=1, right.columnCount do
+			resultMatrix.matrix[currentRow][currentColumn] = left.matrix[currentRow][currentColumn] + right.matrix[currentRow][currentColumn]
+		 
+		 
+		 end
+	end
+	
+	return resultMatrix
+
+end
+
+function testTs()
 
 player1 = Player.create("play1", Rating.create(1500,500))
 player2 = Player.create("play2", Rating.create(1500,500))
@@ -304,39 +528,38 @@ player4 = Player.create("play4", Rating.create(1500,500))
 --print (player1:getRating():getMean())
 
 team =  Teams.create(1, player1)
---team:addPlayer(1, player2)
+team:addPlayer(1, player2)
 team:addPlayer(2, player2)
---team:addPlayer(2, player4)
+team:addPlayer(2, player4)
 
 
 
 local skillsMatrix = getPlayerCovarianceMatrix(team)
 local meanVector = getPlayerMeansVector(team)
 
-print (skillsMatrix)
-print (meanVector)
+local meanVectorTranspose = meanVector:transpose()
 
-local meanVectorTranspose = matrix.transpose(meanVector)
-
-local playerTeamAssignmentsMatrix = createPlayerTeamAssignmentMatrix(team, matrix.rows(meanVector))
+local playerTeamAssignmentsMatrix = createPlayerTeamAssignmentMatrix(team, meanVector.rowCount)
  
-
-local  playerTeamAssignmentsMatrixTranspose = matrix.transpose(playerTeamAssignmentsMatrix)
+local  playerTeamAssignmentsMatrixTranspose = playerTeamAssignmentsMatrix:transpose()
 
 local betaSquared = 250 * 250
-local start = matrix.mul(meanVectorTranspose, playerTeamAssignmentsMatrix)
-local aTa = matrix.mul(matrix.mulnum(playerTeamAssignmentsMatrixTranspose, betaSquared), playerTeamAssignmentsMatrix)
-local aTSA =  matrix.mul((matrix.mul(playerTeamAssignmentsMatrixTranspose, skillsMatrix)), playerTeamAssignmentsMatrix)
-local middle = matrix.add(aTa, aTSA)
-local middleInverse = matrix.invert(middle)
-local theend = matrix.mul(playerTeamAssignmentsMatrixTranspose, meanVector)
-local expPartMatrix = matrix.mulnum((matrix.mul(matrix.mul(start, middleInverse), theend)), -0.5)
-local expPart = matrix.det (expPartMatrix)
+local start = matrixmult(meanVectorTranspose, playerTeamAssignmentsMatrix)
+local aTa = matrixmult(scalarMultiply(playerTeamAssignmentsMatrixTranspose, betaSquared), playerTeamAssignmentsMatrix)
+local tmp = matrixmult(playerTeamAssignmentsMatrixTranspose, skillsMatrix)
+local aTSA =  matrixmult(tmp, playerTeamAssignmentsMatrix)
+local middle = matrixAdd(aTa, aTSA)
+local middleInverse = matrixInvert(middle)
+local theend = matrixmult(playerTeamAssignmentsMatrixTranspose, meanVector)
+local expPartMatrix = scalarMultiply((matrixmult(matrixmult(start, middleInverse), theend)), -0.5)
+local expPart = getDeterminant(expPartMatrix)
 
-local sqrtPartNumerator = matrix.det(aTa)
-local sqrtPartDenominator = matrix.det(middle)
+local sqrtPartNumerator = getDeterminant(aTa)
+local sqrtPartDenominator = getDeterminant(middle)
 local sqrtPart = sqrtPartNumerator / sqrtPartDenominator
 
 local result = math.exp(expPart) * math.sqrt(sqrtPart)
 
-print (result)
+	LOG ("result " .. result)
+	
+end
