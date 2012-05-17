@@ -1210,7 +1210,9 @@ Unit = Class(moho.unit_methods) {
 
 		#if self:GetBlueprint().Wreckage.WreckageLayers[self:GetCurrentLayer()] then 
 		#this checks if wreck are allowed... but now we allow all wrecks so it is moot point anyways
-			return self:CreateWreckageProp(overkillRatio)
+		local wreckage = self:CreateWreckageProp(overkillRatio)
+		wreckage.bpid = self:GetBlueprint().BlueprintId
+		return wreckage
 		#end
     end,
 
@@ -1661,12 +1663,24 @@ Unit = Class(moho.unit_methods) {
 	
 	
     GetRebuildBonus = function(self, rebuildUnitBP)
+	#LOG('getrebuildbonus')
         # here 'self' is the engineer building the structure
-        self.InitialFractionComplete = 0.5
-        self.VerifyRebuildBonus = true    # rebuild bonus check 2 [159]
-        return self.InitialFractionComplete
+	self.InitialFractionComplete = 0.5
+	self.VerifyRebuildBonus = true    # rebuild bonus check 2 [159]
+	self.IAmBuildingSomethingWithReBuildBonus = true
+	self:ForkThread(self.DefeatTheExploit)
+	return self.InitialFractionComplete
+
     end,
 
+	DefeathTheExploit = function(self)
+		self:SetUnSelectable(true)
+		WaitTicks(5)
+		self.IAmBuildingSomethingWithReBuildBonus = false
+		self:SetUnSelectable(false)
+	
+	end,
+    
     CheckFractionComplete = function(self, unitBeingBuilt, threadCount)
         # rebuild bonus check 1 [159]
         # This code checks if the unit is allowed to be accelerate-built. If not the unit is destroyed (for lack 
@@ -1711,7 +1725,7 @@ Unit = Class(moho.unit_methods) {
         # rebuild bonus check 1 and 2 [159]
         # this doesn't always run. In fact, in most of the time it doesn't.
         self:Destroy()
-		WARN ('unit killed due to illegal copy')
+	LOG ('unit killed due to illegal copy')
     end,
 
 
@@ -1880,7 +1894,49 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
-	        # added by brute51 - to make sure we use the proper consumption values. [132]
+	#LOG('onstartbuild and order is ' .. repr(order))
+	
+
+	
+	if self.IAmBuildingSomethingWithReBuildBonus == true and order == 'MobileBuild' then
+	
+	
+		if not unitBeingBuilt.RebuildCounter then 
+			unitBeingBuilt.RebuildCounter = 1
+		else
+			unitBeingBuilt.RebuildCounter = (unitBeingBuilt.RebuildCounter + 1)
+		end
+		if unitBeingBuilt.RebuildCounter > 1 then 
+			IssueClearCommands(self)
+			LOG('i am a bad player and I tried to insta-build exploit')
+			unitBeingBuilt:Destroy()
+			return
+		end
+		
+		local position = unitBeingBuilt:GetPosition()
+		local x1 = position[1] - 1
+		local x2 = position[1] + 1
+		local z1 = position[3] - 1
+		local z2 = position[3] + 1
+		local rect = Rect( x1, z1, x2, z2 )
+		#LOG('rect is ' .. repr(rect)) 
+		local NearbyReclaimables = GetReclaimablesInRect(rect)
+		local CanIBuildHere = false
+		for name,entity in NearbyReclaimables do
+			#WARN('entity is ' .. repr(entity))
+			if IsProp(entity) and entity.bpid and entity.bpid == unitBeingBuilt:GetBlueprint().BlueprintId then
+				CanIBuildHere = true
+
+			end
+		end
+		if not CanIBuildHere then
+			unitBeingBuilt:Destroy()
+			LOG('I tried to build something on a wreck away from the wreck, and failed')
+		end
+		
+	end
+	        
+	# added by brute51 - to make sure we use the proper consumption values. [132]
         self:UpdateConsumptionValues()
         local bp = self:GetBlueprint()
         if order != 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
@@ -3640,7 +3696,7 @@ Unit = Class(moho.unit_methods) {
 			IssueClearCommands({self})
 			IssueClearCommands({transport})
 			#self:Kill()
-			WARN('Unit killed due to attachment bone already in use.')
+			LOG('Unit load order stopped to attachment bone already in use.')
 			return
 		else
 			#WARN('Unit is okay to attach on bone ' .. repr(bone))
@@ -4263,7 +4319,7 @@ Unit = Class(moho.unit_methods) {
 	
 	
 	
-	
+	 
 	
 	
 	
