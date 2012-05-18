@@ -219,7 +219,49 @@ function SetupPlayerLines()
         observerLine.speedSlider:SetValue(gameSpeed)
         controls.armyLines[index] = observerLine
         index = index + 1
-    end
+    end	
+	local function CreateMapNameLine(data, armyIndex)
+		local group = Group(controls.bgStretch)	
+		        
+		local mapnamesize = string.len(data.mapname)
+		local mapoffset = 105 - (mapnamesize * 2.7)
+		if (sessionInfo.Options.Ranked) then
+			mapoffset = mapoffset + 10
+		end
+		group.name = UIUtil.CreateText(group, data.mapname, 10, UIUtil.bodyFont)
+		group.name:DisableHitTest()
+		LayoutHelpers.AtLeftIn(group.name, group, mapoffset)
+		LayoutHelpers.AtVerticalCenterIn(group.name, group, 1)
+		group.name:SetColor('ffffffff')
+		
+		if (sessionInfo.Options.Ranked) then
+			group.faction = Bitmap(group)
+			group.faction:SetTexture("/textures/ui/powerlobby/rankedscore.dds")        
+			group.faction.Height:Set(14)
+			group.faction.Width:Set(14)
+			group.faction:DisableHitTest()
+			LayoutHelpers.AtLeftTopIn(group.faction, group.name, -15)
+		end
+		
+		group.score = UIUtil.CreateText(group, '', 10, UIUtil.bodyFont)
+		group.score:DisableHitTest()
+		LayoutHelpers.AtRightIn(group.score, group)
+		LayoutHelpers.AtVerticalCenterIn(group.score, group)
+		group.score:SetColor('ffffffff')
+		
+		group.name.Right:Set(group.score.Left)
+		group.name:SetClipToWidth(true)
+		
+		group.Height:Set(18)
+		group.Width:Set(210)        
+		
+		group:DisableHitTest()
+		
+		return group
+	end
+	mapData = {}	
+	mapData.mapname = LOCF("<LOC gamesel_0002>Map: %s", sessionInfo.name)
+	controls.armyLines[index] = CreateMapNameLine(mapData, 0)
 end
 	function _OnBeat()
 		if sessionInfo.Options.GameSpeed and sessionInfo.Options.GameSpeed == 'adjustable' then
