@@ -412,7 +412,11 @@ function CreateCybranBuildBeams( builder, unitBeingBuilt, BuildEffectBones, Buil
 end
 
 function SpawnBuildBots( builder, unitBeingBuilt, numBots,  BuildEffectsBag )
-    local army = builder:GetArmy()
+    local builderArmy = builder:GetArmy()
+    
+    #new
+    local unitBeingBuiltArmy = unitBeingBuilt:GetArmy()
+    
     local BeamBuildEmtBp = '/effects/emitters/build_beam_02_emit.bp'
     local x, y, z = unpack(builder:GetPosition())
     local qx, qy, qz, qw = unpack(builder:GetOrientation())
@@ -427,23 +431,29 @@ function SpawnBuildBots( builder, unitBeingBuilt, numBots,  BuildEffectsBag )
     local zVec = 0
     local BuilderUnits = {}
     local tunit = nil
+	
+	#if is new, won't spawn build bots if they might accidentally capture the unit
+	if builderArmy == unitBeingBuiltArmy or IsHumanUnit(unitBeingBuilt)  then 
+    
+	    # Launch projectiles at semi-random angles away from the sphere, with enough
+	    # initial velocity to escape sphere core
+	    for i = 0, (numUnits - 1) do
+		xVec = math.sin(angleInitial + (i*angle)) * VecMul
+		zVec = math.cos(angleInitial + (i*angle)) * VecMul
+		tunit = CreateUnit('ura0001', builderArmy, x + xVec, y + yVec, z + zVec, qx, qy, qz, qw, 'Air' )
 
-    # Launch projectiles at semi-random angles away from the sphere, with enough
-    # initial velocity to escape sphere core
-    for i = 0, (numUnits - 1) do
-        xVec = math.sin(angleInitial + (i*angle)) * VecMul
-        zVec = math.cos(angleInitial + (i*angle)) * VecMul
-        tunit = CreateUnit('ura0001', army, x + xVec, y + yVec, z + zVec, qx, qy, qz, qw, 'Air' )
-
-        # Make build bots unkillable
-        tunit:SetCanTakeDamage(false)
-        tunit:SetCanBeKilled(false)
-        
-        table.insert( BuilderUnits, tunit )
-        BuildEffectsBag:Add(tunit)
-    end
-    IssueGuard( BuilderUnits, unitBeingBuilt )
-    return BuilderUnits
+		# Make build bots unkillable
+		tunit:SetCanTakeDamage(false)
+		tunit:SetCanBeKilled(false)
+		
+		table.insert( BuilderUnits, tunit )
+		BuildEffectsBag:Add(tunit)
+	    end
+	    IssueGuard( BuilderUnits, unitBeingBuilt )
+	    return BuilderUnits
+	else
+		return  
+	end
 end
 
 function CreateCybranEngineerBuildEffects( builder, BuildBones, BuildBots, BuildEffectsBag )
@@ -1378,4 +1388,24 @@ function AeonHackACU( unit )
 	for k, v in EffectTemplate.AeonOpHackACU do
 		CreateAttachedEmitter ( unit, -1, unit:GetArmy(), v )
 	end		
+end
+
+
+#new function for insta capture fix
+IsHumanUnit = function(self)
+	local ArmyTable = ScenarioInfo.ArmySetup
+	local ArmyIndex = self:GetArmy()
+	
+	for ArmyName,Army in ArmyTable do
+		if Army.ArmyIndex == ArmyIndex then
+			if Army.Human == true then
+				return true
+			else
+				return false
+			end
+			
+		end
+	end
+
+
 end

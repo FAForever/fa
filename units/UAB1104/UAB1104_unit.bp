@@ -2,40 +2,35 @@ UnitBlueprint {
     Adjacency = 'T1MassFabricatorAdjacencyBuffs',
     Audio = {
         ActiveLoop = Sound {
-            Bank = 'XSB',
-            Cue = 'XSB1104_Active',
+            Bank = 'UAB',
+            Cue = 'UAB1104_Active',
             LodCutoff = 'UnitMove_LodCutoff',
         },
         Destroyed = Sound {
-            Bank = 'XSL_Destroy',
-            Cue = 'XSB_Destroy_Huge',
+            Bank = 'UALDestroy',
+            Cue = 'UAB_Destroy_Land',
             LodCutoff = 'UnitMove_LodCutoff',
         },
         DoneBeingBuilt = Sound {
-            Bank = 'XSB',
-            Cue = 'XSB1104_Activate',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        Killed = Sound {
-            Bank = 'XSL_Destroy',
-            Cue = 'XSB_Destroy_Lrg_PreDestroy',
+            Bank = 'UAB',
+            Cue = 'UAB1104_Activate',
             LodCutoff = 'UnitMove_LodCutoff',
         },
         UISelection = Sound {
-            Bank = 'SeraphimSelect',
-            Cue = 'Seraphim_Select_Resource',
+            Bank = 'Interface',
+            Cue = 'Aeon_Select_Resource',
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
     BuildIconSortPriority = 50,
     Categories = {
-        'PRODUCTFA',
+        'PRODUCTSC1',
         'SELECTABLE',
         'BUILTBYTIER2ENGINEER',
         'BUILTBYTIER2COMMANDER',
         'BUILTBYTIER3ENGINEER',
         'BUILTBYTIER3COMMANDER',
-        'SERAPHIM',
+        'AEON',
         'STRUCTURE',
         'ECONOMIC',
         'TECH2',
@@ -58,25 +53,24 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC xsb1104_desc>Mass Fabricator',
+    Description = '<LOC uab1104_desc>Mass Fabricator',
     Display = {
         Abilities = {
             '<LOC ability_deathaoe>Volatile',
         },
+        AnimationOpen = '/units/UAB1104/UAB1104_AOpen01.sca',
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
                 {
                     LODCutoff = 120,
-                    LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
-                    ShaderName = 'Seraphim',
+                    ShaderName = 'Aeon',
                 },
                 {
-                    AlbedoName = 'xsb1104_lod1_albedo.dds',
+                    AlbedoName = 'uab1104_lod1_albedo.dds',
                     LODCutoff = 215,
-                    LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
-                    ShaderName = 'Seraphim',
-                    SpecularName = 'xsb1104_lod1_specteam.dds',
+                    ShaderName = 'Aeon',
+                    SpecularName = 'uab1104_lod1_specteam.dds',
                 },
             },
         },
@@ -84,11 +78,11 @@ UnitBlueprint {
         SpawnRandomRotation = true,
         Tarmacs = {
             {
-                Albedo = 'Tarmacs/Tar6x_seraphim_01_albedo',
+                Albedo = 'Tarmacs/Tar6x_aeon_01_albedo',
                 DeathLifetime = 300,
                 FadeOut = 150,
                 Length = 6.4,
-                Normal = 'Tarmacs/Tar6x_seraphim_01_normals',
+                Normal = 'Tarmacs/Tar6x_aeon_01_normals',
                 Orientations = {
                     0,
                     90,
@@ -99,7 +93,7 @@ UnitBlueprint {
                 Width = 6.4,
             },
         },
-        UniformScale = 0.055,
+        UniformScale = 0.085,
     },
     Economy = {
         BuildCostEnergy = 4000,
@@ -108,7 +102,7 @@ UnitBlueprint {
         MaintenanceConsumptionPerSecondEnergy = 150,
         ProductionPerSecondMass = 1,
         RebuildBonusIds = {
-            'xsb1104',
+            'uab1104',
         },
     },
     General = {
@@ -129,23 +123,22 @@ UnitBlueprint {
             RULEUCC_Stop = false,
             RULEUCC_Transport = false,
         },
-        FactionName = 'Seraphim',
+        FactionName = 'Aeon',
         Icon = 'land',
         SelectionPriority = 5,
         TechLevel = 'RULEUTL_Basic',
         ToggleCaps = {
             RULEUTC_ProductionToggle = true,
         },
-        UnitName = '<LOC xsb1104_name>Hyaliya',
         UnitWeight = 1,
-        UpgradesTo = nil, #from the T3 massfab
+        UpgradesTo = nil, #from t3 massfab
     },
     Interface = {
-        HelpText = '<LOC xsb1104_help>Mass Fabricator',
+        HelpText = '<LOC uab1104_help>Mass Fabricator',
     },
     LifeBarHeight = 0.075,
-    LifeBarOffset = 0.5,
-    LifeBarSize = 1.1,
+    LifeBarOffset = 0.3,
+    LifeBarSize = 0.9,
     Physics = {
         BankingSlope = 0,
         BuildOnLayerCaps = {

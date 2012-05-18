@@ -293,17 +293,21 @@ UEL0001 = Class(TWalkingLandUnit) {
 	
     NotifyOfPodDeath = function(self, pod)
 	
-	    if pod == 'LeftPod' then
-	    	if self.HasLeftPod == false then #for fixing bug!
-			return
-		end
+	if pod == 'LeftPod' then
+	    	if self.HasLeftPod == true then #for fixing bug!
 			self:ForkThread(self.RebuildPod,1)
-        elseif pod == 'RightPod' then
-		if self.HasRightPod == false then #for fixing bug!
+		else
 			return
 		end
+
+        elseif pod == 'RightPod' then
+		if self.HasRightPod == true then #for fixing bug!
 			self:ForkThread(self.RebuildPod,2)
+		else
+			return
 		end
+
+	end
         #if pod == 'RightPod' and self.HasLeftPod then
         #    self:CreateEnhancement('RightPodRemove')
         #    self:CreateEnhancement('LeftPod')
