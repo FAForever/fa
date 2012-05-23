@@ -104,6 +104,7 @@ UnitBlueprint {
         BuildCostEnergy = 8000,
         BuildCostMass = 800,
         BuildTime = 400,
+	MaintenanceConsumptionPerSecondEnergy = 1000,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -134,7 +135,8 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        VisionRadius = 10,
+        RadarRadius = 65,
+        VisionRadius = 32,
     },
     Interface = {
         HelpText = '<LOC xea0002_help>Defense Satellite',
@@ -200,7 +202,7 @@ UnitBlueprint {
             BeamCollisionDelay = 0.1,
             BeamLifetime = 8,
             CollideFriendly = false,
-            Damage = 75,
+            Damage = 100,
             DamageFriendly = true,
             DamageRadius = 1,
             DamageType = 'Normal',
@@ -212,7 +214,7 @@ UnitBlueprint {
             },
             FiringTolerance = 1.5,
             Label = 'OrbitalDeathLaserWeapon',
-            MaxRadius = 30,
+            MaxRadius = 32,
             MaximumBeamLength = 200,
             MuzzleChargeDelay = 0,
             MuzzleSalvoDelay = 0,
