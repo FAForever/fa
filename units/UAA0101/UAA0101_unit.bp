@@ -96,14 +96,18 @@ UnitBlueprint {
         AirThreatLevel = 0.1,
         ArmorType = 'Light',
         EconomyThreatLevel = 0,
-        Health = 29,
-        MaxHealth = 29,
+        Health = 55,
+        MaxHealth = 55,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
     Description = '<LOC uaa0101_desc>Air Scout',
     Display = {
+	Abilities = {
+            '<LOC ability_radar>Radar',
+            '<LOC ability_sonar>Sonar',
+	},
         LayerChangeEffects = {
             AirLand = {
                 Effects = {
@@ -174,9 +178,9 @@ UnitBlueprint {
         UniformScale = 0.1,
     },
     Economy = {
-        BuildCostEnergy = 1300,
-        BuildCostMass = 40,
-        BuildTime = 340,
+        BuildCostEnergy = 420,
+        BuildCostMass = 16,
+        BuildTime = 145,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -209,6 +213,8 @@ UnitBlueprint {
     },
     Intel = {
         VisionRadius = 42,
+	RadarRadius = 65,
+	SonarRadius = 30,
     },
     Interface = {
         HelpText = '<LOC uaa0101_help>Air Scout',

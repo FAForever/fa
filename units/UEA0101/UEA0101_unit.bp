@@ -98,6 +98,10 @@ UnitBlueprint {
     },
     Description = '<LOC uea0101_desc>Air Scout',
     Display = {
+	Abilities = {
+            '<LOC ability_radar>Radar',
+            '<LOC ability_sonar>Sonar',
+	},
         LayerChangeEffects = {
             AirLand = {
                 Effects = {
@@ -144,9 +148,9 @@ UnitBlueprint {
         UniformScale = 0.08,
     },
     Economy = {
-        BuildCostEnergy = 1300,
-        BuildCostMass = 40,
-        BuildTime = 340,
+        BuildCostEnergy = 420,
+        BuildCostMass = 16,
+        BuildTime = 145,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -179,6 +183,8 @@ UnitBlueprint {
     },
     Intel = {
         VisionRadius = 42,
+	RadarRadius = 65,
+	SonarRadius = 30,
     },
     Interface = {
         HelpText = '<LOC uea0101_help>Air Scout',
