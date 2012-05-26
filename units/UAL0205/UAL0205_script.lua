@@ -30,7 +30,7 @@ UAL0205 = Class(AHoverLandUnit) {
     },
     
     OnCreate = function(self)
-        ALandUnit.OnCreate(self)
+        AHoverLandUnit.OnCreate(self)
         self.Trash:Add(CreateSlaver(self, 'Barrel_L', 'Barrel_R'))
     end,    
 }
