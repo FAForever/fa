@@ -15,7 +15,7 @@ local ADFCannonOblivionWeapon = WeaponsFile.ADFCannonOblivionWeapon02
 local AANChronoTorpedoWeapon = WeaponsFile.AANChronoTorpedoWeapon
 local AIFQuasarAntiTorpedoWeapon = WeaponsFile.AIFQuasarAntiTorpedoWeapon
 
-UAS0401 = Class(ASubUnit) {
+UAS0401 = Class(ASeaUnit) {
     Weapons = {
         MainGun = Class(ADFCannonOblivionWeapon) {},
         Torpedo01 = Class(AANChronoTorpedoWeapon) {},
@@ -33,7 +33,7 @@ UAS0401 = Class(ASubUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         self:SetWeaponEnabledByLabel('MainGun', true)
-        ASubUnit.OnStopBeingBuilt(self,builder,layer)
+        ASeaUnit.OnStopBeingBuilt(self,builder,layer)
         if layer == 'Water' then
             self:RestoreBuildRestrictions()
             self:RequestRefreshUI()
@@ -45,12 +45,12 @@ UAS0401 = Class(ASubUnit) {
     end,
 
     OnFailedToBuild = function(self)
-        ASubUnit.OnFailedToBuild(self)
+        ASeaUnit.OnFailedToBuild(self)
         ChangeState(self, self.IdleState)
     end,
 
     OnMotionVertEventChange = function( self, new, old )
-        ASubUnit.OnMotionVertEventChange(self, new, old)
+        ASeaUnit.OnMotionVertEventChange(self, new, old)
         if new == 'Top' then
             self:RestoreBuildRestrictions()
             self:RequestRefreshUI()
@@ -71,7 +71,7 @@ UAS0401 = Class(ASubUnit) {
         end,
 
         OnStartBuild = function(self, unitBuilding, order)
-            ASubUnit.OnStartBuild(self, unitBuilding, order)
+            ASeaUnit.OnStartBuild(self, unitBuilding, order)
             self.UnitBeingBuilt = unitBuilding
             ChangeState(self, self.BuildingState)
         end,
@@ -99,7 +99,7 @@ UAS0401 = Class(ASubUnit) {
         end,
 
         OnStopBuild = function(self, unitBeingBuilt)
-            ASubUnit.OnStopBuild(self, unitBeingBuilt)
+            ASeaUnit.OnStopBuild(self, unitBeingBuilt)
             ChangeState(self, self.FinishedBuildingState)
         end,
     },
@@ -141,7 +141,7 @@ UAS0401 = Class(ASubUnit) {
             self.SinkExplosionThread = self:ForkThread(self.ExplosionThread)
             self.SinkThread = self:ForkThread(self.SinkingThread)
         end
-		ASubUnit.OnKilled(self, instigator, type, overkillRatio)
+		ASeaUnit.OnKilled(self, instigator, type, overkillRatio)
     end
 }
 
