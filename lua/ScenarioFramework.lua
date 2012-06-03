@@ -2098,7 +2098,7 @@ function IAmOffMap(self)
 		
 		if self.TimeIHaveBeenOffMap > self.TimeIAmAllowedToBeOffMap then
 			self:ForkThread(IAmABadUnit)
-			return
+			
 		end
 		
 		WaitSeconds(1)
@@ -2140,7 +2140,7 @@ function IAmABadUnit(self)
 end
 
 function GetTimeIAmAllowedToBeOffMap(self)
-	local myWeapons = self:GetBlueprint().Weapons 
+	local myWeapons = self:GetBlueprint().Weapon
 	#if it has more weapons than just the death weapon
 	if myWeapons and table.getn(myWeapons) > 1  then
 		local PrimaryWeapon = self:GetWeapon(1)
