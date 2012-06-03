@@ -2098,6 +2098,7 @@ function IAmOffMap(self)
 		
 		if self.TimeIHaveBeenOffMap > self.TimeIAmAllowedToBeOffMap then
 			self:ForkThread(IAmABadUnit)
+			
 		end
 		
 		WaitSeconds(1)
@@ -2139,7 +2140,12 @@ function IAmABadUnit(self)
 end
 
 function GetTimeIAmAllowedToBeOffMap(self)
-	local PrimaryWeapon = self:GetWeapon(1)
+	local myWeapons = self:GetBlueprint().Weapon
+	#if it has more weapons than just the death weapon
+	if myWeapons and table.getn(myWeapons) > 1  then
+		local PrimaryWeapon = self:GetWeapon(1)
+	end
+
 	if PrimaryWeapon and PrimaryWeapon:GetCurrentTarget() then
 		#WARN('the air unit has a target, allowed to be off map for 20 seconds')
 		return 20
