@@ -2147,6 +2147,8 @@ function GetTimeIAmAllowedToBeOffMap(self)
 		if PrimaryWeapon:GetCurrentTarget()  then
 			return 20
 		
+		else 
+			return 2
 		end
 		
 	else 
