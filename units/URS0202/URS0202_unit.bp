@@ -297,7 +297,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_LowArc',
             CollideFriendly = false,
-            Damage = 80,
+            Damage = 92,
             DamageRadius = 1,
             DamageType = 'Normal',
             DisplayName = 'Proton Cannon',
