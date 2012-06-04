@@ -2144,17 +2144,14 @@ function GetTimeIAmAllowedToBeOffMap(self)
 	#if it has more weapons than just the death weapon
 	if myWeapons and table.getn(myWeapons) > 1  then
 		local PrimaryWeapon = self:GetWeapon(1)
-	end
-
-	if PrimaryWeapon and PrimaryWeapon:GetCurrentTarget() then
-		#WARN('the air unit has a target, allowed to be off map for 20 seconds')
-		return 20
-	else
-		#WARN('the air unit does not have a target, allowed to be off map for 2 seconds')
-		#WARN('the primary weapon is  ' .. repr(PrimaryWeapon))
+		if PrimaryWeapon:GetCurrentTarget()  then
+			return 20
+		
+		end
+		
+	else 
 		return 2
 	end
-
 end
 
 function KillIAmOffMapThread(self)
