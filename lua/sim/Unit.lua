@@ -1211,7 +1211,10 @@ Unit = Class(moho.unit_methods) {
 		#if self:GetBlueprint().Wreckage.WreckageLayers[self:GetCurrentLayer()] then 
 		#this checks if wreck are allowed... but now we allow all wrecks so it is moot point anyways
 		local wreckage = self:CreateWreckageProp(overkillRatio)
-
+		#this is for stopping an exploit
+		if wreckage then
+			wreckage.bpid = self:GetBlueprint().BlueprintId
+		end
 		return wreckage
 		#end
     end,
@@ -1673,7 +1676,7 @@ Unit = Class(moho.unit_methods) {
 
     end,
 
-	DefeathTheExploit = function(self)
+	DefeatTheExploit = function(self)
 		self:SetUnSelectable(true)
 		WaitTicks(5)
 		self.IAmBuildingSomethingWithReBuildBonus = false
@@ -1922,9 +1925,10 @@ Unit = Class(moho.unit_methods) {
 		#LOG('rect is ' .. repr(rect)) 
 		local NearbyReclaimables = GetReclaimablesInRect(rect)
 		local CanIBuildHere = false
+		local unitBeingBuiltbpID =  unitBeingBuilt:GetBlueprint().BlueprintId
 		for name,entity in NearbyReclaimables do
 			#WARN('entity is ' .. repr(entity))
-			if IsProp(entity) and entity.bpid and entity.bpid == unitBeingBuilt:GetBlueprint().BlueprintId then
+			if IsProp(entity) and entity.bpid and entity.bpid == unitBeingBuiltbpID then
 				CanIBuildHere = true
 
 			end
