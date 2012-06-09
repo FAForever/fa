@@ -50,6 +50,7 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
+	MaxHealthNotAffectHealth = true,
     Buffs = {
         Regen = {
             Level1 = 10,

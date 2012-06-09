@@ -3457,7 +3457,14 @@ Unit = Class(moho.unit_methods) {
         self.VeteranLevel = level
 
         # Apply default veterancy buffs
-        local buffTypes = { 'Regen', 'Health', }
+		
+		local buffTypes = { 'Regen', 'Health', }
+		
+		local notUsingMaxHealth = self:GetBlueprint().MaxHealthNotAffectHealth
+		if notUsingMaxHealth then
+				buffTypes = { 'Regen', 'MaxHealth', }
+		end
+
         for k,bType in buffTypes do
             Buff.ApplyBuff( self, 'Veterancy' .. bType .. level )
         end
@@ -3498,7 +3505,11 @@ Unit = Class(moho.unit_methods) {
     },
     
     CreateVeterancyBuff = function(self, levelName, levelValue, buffType)
-        if buffType == 'Damage' then
+        if buffType == 'MaxHealthAffectHealth' then
+            return false
+        end
+
+		if buffType == 'Damage' then
             return false
         end
     
