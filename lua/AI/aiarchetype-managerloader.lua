@@ -104,6 +104,30 @@ end
 
 #Modeled after GPGs LowMass and LowEnergy functions.
 #Runs the whole game and kills off units when the AI hits unit cap.
+
+function UnitCapWatchThread(aiBrain)
+    KillPD = false
+    while true do
+        WaitSeconds(60)
+        if GetArmyUnitCostTotal(aiBrain:GetArmyIndex()) > (GetArmyUnitCap(aiBrain:GetArmyIndex()) - 10) then
+            if not KillPD then
+                local units = aiBrain:GetListOfUnits(categories.TECH1 * categories.ENERGYPRODUCTION * categories.STRUCTURE, true)
+                for k, v in units do
+                    v:Kill()
+                end
+                KillPD = true
+            else
+
+                local units = aiBrain:GetListOfUnits(categories.TECH1 * categories.DEFENSE * categories.DIRECTFIRE * categories.STRUCTURE, true)
+                for k, v in units do
+                    v:Kill()
+                end
+                KillPD = false
+            end
+        end
+    end
+end
+
 function UnitCapWatchThreadSorian(aiBrain)
 	#LOG('*AI DEBUG: UnitCapWatchThreadSorian started')
 	while true do
