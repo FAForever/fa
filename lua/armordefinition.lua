@@ -56,4 +56,12 @@ armordefinition = {
         # Armor Definition
         'ExperimentalFootfall 0.0',        
     },
+    {
+        # Armor Type name
+        'FireBeetle',
+        
+        # Armor Definition
+        'Normal 1.0',        
+		'FireBeetle 0.1',        
+    },
 }
