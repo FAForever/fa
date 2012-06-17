@@ -1224,8 +1224,16 @@ Unit = Class(moho.unit_methods) {
 		if wreck then
 			#LOG('*DEBUG: Spawning Wreckage = ', repr(wreck), 'overkill = ',repr(overkillRatio))
 			local pos = self:GetPosition()
+			
 			local mass = bp.Economy.BuildCostMass * (bp.Wreckage.MassMult or 0)
-			local energy = bp.Economy.BuildCostEnergy * (bp.Wreckage.EnergyMult or 0)
+			local energy = bp.Economy.BuildCostEnergy * (bp.Wreckage.EnergyMult or 0)	
+			
+			# if wreck is in water, some of his mass is removed.
+			if self:GetCurrentLayer() == 'Water' then
+				mass = mass * 0.5 
+				energy = energy * 0.5 
+			end
+			
 			local time = (bp.Wreckage.ReclaimTimeMultiplier or 1)
 			if self:GetCurrentLayer() == 'Seabed' or self:GetCurrentLayer() == 'Land' then
 			    pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
