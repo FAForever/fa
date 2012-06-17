@@ -48,6 +48,7 @@ UnitBlueprint {
         'BUILTBYTIER1FACTORY',
         'BUILTBYTIER2FACTORY',
         'BUILTBYTIER3FACTORY',
+		'HOLOGRAMGENERATOR',
         'UEF',
         'MOBILE',
         'NAVAL',
@@ -161,7 +162,7 @@ UnitBlueprint {
         BuildCostEnergy = 2600,
         BuildCostMass = 260,
         BuildTime = 1300,
-        MaintenanceConsumptionPerSecondEnergy = 5,
+        MaintenanceConsumptionPerSecondEnergy = 20,
     },
     Footprint = {
         SizeX = 2,
@@ -188,17 +189,26 @@ UnitBlueprint {
         Icon = 'sea',
         TechLevel = 'RULEUTL_Basic',
         ToggleCaps = {
-            RULEUTC_JammingToggle = true,
+            RULEUTC_IntelToggle = true, # abusing the intel toggle here, so we can use the onintelenabled events
         },
+		OrderOverrides = {
+            RULEUTC_IntelToggle = { # faking the jamming icon
+                bitmapId = 'jamming',
+                helpText = 'toggle_jamming',
+            },
+		},
         UnitName = '<LOC ues0103_name>Thunderhead Class',
         UnitWeight = 1,
     },
     Intel = {
-        JamRadius = {
-            Max = 70,
-            Min = 70,
+        AltJamming = {
+            DisabledInTransport = false,
+            MaxDistance = 32,
+            NumAirBlips = 4,
+            NumGroundBlips = 0,
+            NumSeaBlips = 4,
+            StartEnabled = true,
         },
-        JammerBlips = 5,
         RadarRadius = 80,
         SonarRadius = 82,
         VisionRadius = 32,

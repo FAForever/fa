@@ -76,6 +76,7 @@ UnitBlueprint {
         'SELECTABLE',
         'BUILTBYLANDTIER2FACTORY',
         'BUILTBYLANDTIER3FACTORY',
+		'HOLOGRAMGENERATOR',
         'UEF',
         'MOBILE',
         'LAND',
@@ -236,26 +237,29 @@ UnitBlueprint {
         ConstructionBar = true,
         FactionName = 'UEF',
         Icon = 'amph',
+        ToggleCaps = {
+            RULEUTC_IntelToggle = true, # abusing the intel toggle here, so we can use the onintelenabled events
+        },
         OrderOverrides = {
-            RULEUTC_JammingToggle = {
+            RULEUTC_IntelToggle = { # faking the jamming icon
                 bitmapId = 'jamming',
                 helpText = 'toggle_jamming',
             },
         },
         SelectionPriority = 3,
         TechLevel = 'RULEUTL_Advanced',
-        ToggleCaps = {
-            RULEUTC_JammingToggle = true,
-        },
         UnitName = '<LOC xel0209_name>Sparky',
         UnitWeight = 1,
     },
     Intel = {
-        JamRadius = {
-            Max = 12,
-            Min = 12,
+        AltJamming = {
+            DisabledInTransport = true,
+            MaxDistance = 20,
+            NumAirBlips = 2,
+            NumGroundBlips = 4,
+            NumSeaBlips = 0,
+            StartEnabled = true,
         },
-        JammerBlips = 5,
         RadarRadius = 30,
         VisionRadius = 20,
     },
