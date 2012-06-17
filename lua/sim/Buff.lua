@@ -200,7 +200,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             else
                 unit:AdjustHealth(instigator, healthadj)
             
-                LOG('*BUFF: Unit ', repr(unit:GetEntityId()), ' buffed health to ', repr(val))
+                #LOG('*BUFF: Unit ', repr(unit:GetEntityId()), ' buffed health to ', repr(val))
             end
         
         elseif atype == 'MaxHealth' then
@@ -220,7 +220,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
                 end
             end            
             
-            LOG('*BUFF: Unit ', repr(unit:GetEntityId()), ' buffed max health to ', repr(val))
+            #LOG('*BUFF: Unit ', repr(unit:GetEntityId()), ' buffed max health to ', repr(val))
         
         elseif atype == 'Regen' then
             
