@@ -2140,20 +2140,17 @@ function IAmABadUnit(self)
 end
 
 function GetTimeIAmAllowedToBeOffMap(self)
-	local myWeapons = self:GetBlueprint().Weapon
-	#if it has more weapons than just the death weapon
-	if myWeapons and table.getn(myWeapons) > 1  then
-		local PrimaryWeapon = self:GetWeapon(1)
-		if PrimaryWeapon:GetCurrentTarget()  then
-			return 20
-		
-		else 
-			return 2
+	local value = 2
+	for i = 1, self:GetWeaponCount() do
+		local wep = self:GetWeapon(i)
+		if wep.Label != 'DeathWeapon' and wep.Label != 'DeathImpact' then
+			if wep:GetCurrentTarget()  then
+				value = 20
+			end
+			
 		end
-		
-	else 
-		return 2
 	end
+	return value
 end
 
 function KillIAmOffMapThread(self)
