@@ -2135,7 +2135,7 @@ function IAmABadUnit(self)
 	
 	IssueClearCommands({self})
 	IssueMove({self},position)
-	WARN('Unit was off map too long, so has been cleared of all orders')
+	#WARN('Unit was off map too long, so has been cleared of all orders')
 	
 end
 
