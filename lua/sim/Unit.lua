@@ -1207,16 +1207,15 @@ Unit = Class(moho.unit_methods) {
 		if overkillRatio and overkillRatio > 1.0 then
 			return
 		end
-
-		#if self:GetBlueprint().Wreckage.WreckageLayers[self:GetCurrentLayer()] then 
-		#this checks if wreck are allowed... but now we allow all wrecks so it is moot point anyways
-		local wreckage = self:CreateWreckageProp(overkillRatio)
-		#this is for stopping an exploit
-		if wreckage then
-			wreckage.bpid = self:GetBlueprint().BlueprintId
+		if self:GetBlueprint().Wreckage.WreckageLayers[self:GetCurrentLayer()] then 
+			#this checks if wreck are allowed... 
+			local wreckage = self:CreateWreckageProp(overkillRatio)
+			#this is for stopping an exploit
+			if wreckage then
+				wreckage.bpid = self:GetBlueprint().BlueprintId
+			end
+			return wreckage
 		end
-		return wreckage
-		#end
     end,
 
     CreateWreckageProp = function( self, overkillRatio )
