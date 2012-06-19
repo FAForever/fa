@@ -13,6 +13,7 @@ UnitBlueprint {
         'UEF',          
         'VISIBLETORECON',
     },
+	CollisionOffsetY = 5000,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
@@ -115,6 +116,6 @@ UnitBlueprint {
     SizeX = 0.45,
     SizeY = 0.4,
     SizeZ = 0.8,
-    StrategicIconName = 'icon_land1_artillery',
+    --StrategicIconName = 'icon_land1_artillery',
     StrategicIconSortPriority = 135,
 }

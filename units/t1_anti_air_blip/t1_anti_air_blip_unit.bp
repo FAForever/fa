@@ -13,6 +13,7 @@ UnitBlueprint {
         'UEF',            
         'VISIBLETORECON',
     },
+	CollisionOffsetY = 5000,
     Defense = {
         AirThreatLevel = 0.33,
         ArmorType = 'Normal',
@@ -51,8 +52,8 @@ UnitBlueprint {
         UniformScale = 0.065,
     },
     Footprint = { # Footprint set so unit can ignore structures ans pass thru them
-        SizeX = 6,
-        SizeZ = 6,
+        SizeX = 0,
+        SizeZ = 0,
     },
     General = {
         CapCost = 0,
@@ -111,9 +112,9 @@ UnitBlueprint {
     SelectionSizeX = 0.001,
     SelectionSizeZ = 0.001,
     SelectionThickness = 0.001,
-    SizeX = 0.5,
-    SizeY = 0.4,
-    SizeZ = 0.7,
-    StrategicIconName = 'icon_land1_antiair',
+    SizeX = 0,
+    SizeY = 0,
+    SizeZ = 0,
+    --StrategicIconName = 'icon_land1_antiair',
     StrategicIconSortPriority = 135,
 }

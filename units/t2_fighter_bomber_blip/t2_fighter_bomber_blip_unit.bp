@@ -133,6 +133,6 @@ UnitBlueprint {
     SizeX = 2,
     SizeY = 0.3,
     SizeZ = 1,
-    StrategicIconName = 'icon_fighter2_directfire',
+    --StrategicIconName = 'icon_fighter2_directfire',
     StrategicIconSortPriority = 55,
 }

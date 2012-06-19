@@ -127,6 +127,6 @@ UnitBlueprint {
     SizeX = 1,
     SizeY = 0.5,
     SizeZ = 1,
-    StrategicIconName = 'icon_gunship2_directfire',
+    --StrategicIconName = 'icon_gunship2_directfire',
     StrategicIconSortPriority = 75,
 }

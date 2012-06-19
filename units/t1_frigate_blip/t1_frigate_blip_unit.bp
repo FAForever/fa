@@ -11,12 +11,13 @@ UnitBlueprint {
         'UEF',
         'VISIBLETORECON',
     },
+	CollisionOffsetY = 5000,
     Defense = {
         AirThreatLevel = 1,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 2120,
-        MaxHealth = 2120,
+        Health = 1,
+        MaxHealth = 1,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 9,
@@ -49,8 +50,8 @@ UnitBlueprint {
         UniformScale = 0.09,
     },
     Footprint = {
-        SizeX = 0,
-        SizeZ = 0,
+        SizeX = 2,
+        SizeZ = 6,
     },
     General = {
         CapCost = 0,
@@ -102,7 +103,7 @@ UnitBlueprint {
         MeshExtentsY = 1.55,
         MeshExtentsZ = 5,
         MinSpeedPercent = 0,
-        MotionType = 'RULEUMT_Water',
+        MotionType = 'RULEUMT_Amphibious',
         TurnRadius = 10,
         TurnRate = 60,
     },    
@@ -112,6 +113,6 @@ UnitBlueprint {
     SizeX = 0.6,
     SizeY = 1.1,
     SizeZ = 4.3,
-    StrategicIconName = 'icon_ship1_intel',
+    --StrategicIconName = 'icon_ship1_intel',
     StrategicIconSortPriority = 165,
 }

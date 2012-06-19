@@ -114,6 +114,6 @@ UnitBlueprint {
     SizeX = 0.35,
     SizeY = 0.5,
     SizeZ = 1.85,
-    StrategicIconName = 'icon_sub1_antinavy',
+    --StrategicIconName = 'icon_sub1_antinavy',
     StrategicIconSortPriority = 165,
 }
