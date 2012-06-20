@@ -203,7 +203,6 @@ function AdvancedJamming(SuperClass)
     
     ReplaceHologram = function(self, hologram)
         if not self:IsDead() then
-            LOG('Current unit ID: ', hologram)
             local spawnHologram
             local bp = self:GetBlueprint().Intel.AltJamming
             local basePos = self:GetPosition()
