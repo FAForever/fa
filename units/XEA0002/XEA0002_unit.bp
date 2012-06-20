@@ -135,8 +135,8 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        RadarRadius = 65,
-        VisionRadius = 32,
+        RadarRadius = 70,
+        VisionRadius = 40,
     },
     Interface = {
         HelpText = '<LOC xea0002_help>Defense Satellite',
