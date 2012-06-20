@@ -45,6 +45,7 @@ UnitBlueprint {
                 },
             },
         }, 
+
         PlaceholderMeshName = 'UXS0003',
         SpawnRandomRotation = false,
         UniformScale = 0.09,
@@ -103,7 +104,7 @@ UnitBlueprint {
         MeshExtentsY = 1.55,
         MeshExtentsZ = 5,
         MinSpeedPercent = 0,
-        MotionType = 'RULEUMT_Amphibious',
+        MotionType = 'RULEUMT_SurfacingSub',
         TurnRadius = 10,
         TurnRate = 60,
     },    
