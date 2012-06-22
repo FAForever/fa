@@ -1214,51 +1214,6 @@ function GetArmyData(army)
     return result
 end
 
-function ReceiveChat(sender, msg)
-    sender = sender or "nil sender"
-    if msg.ConsoleOutput then
-        print(LOCF("%s %s", sender, msg.ConsoleOutput))
-        return
-    end
-    if not msg.Chat then return end
-    if type(msg) == 'string' then
-        msg = { text = msg }
-    elseif type(msg) != 'table' then
-        msg = { text = repr(msg) }
-    end
-    local armyData = GetArmyData(sender)
-    local towho = LOC(ToStrings[msg.to].text) or LOC(ToStrings['private'].text)
-    local tokey = ToStrings[msg.to].colorkey or ToStrings['private'].colorkey
-    local name = sender .. ' ' .. towho
-    if msg.echo then
-        name = string.format("%s %s:", LOC(ToStrings.to.caps), sender)
-    end
-    local tempText = WrapText({text = msg.text, name = name})
-    -- if text wrap produces no lines (ie text is all white space) then add a blank line
-    if table.getn(tempText) == 0 then
-        tempText = {""}
-    end
-    local entry = {name = name,
-        tokey = tokey,
-        color = armyData.color,
-        armyID = armyData.ArmyID,
-        faction = (armyData.faction or 0)+1,
-        text = msg.text,
-        wrappedtext = tempText,
-        new = true}
-    if msg.camera then
-        entry.camera = msg.camera
-    end
-    table.insert(chatHistory, entry)
-    if ChatOptions[entry.armyID] then
-        if table.getsize(chatHistory) == 1 then
-            GUI.chatContainer:CalcVisible()
-        else
-            GUI.chatContainer:ScrollToBottom()
-        end
-    end
-end
-
 function CloseChat()
     if not GUI.bg:IsHidden() then
         ToggleChat()
