@@ -995,9 +995,8 @@ Unit = Class(moho.unit_methods) {
     OnKilled = function(self, instigator, type, overkillRatio)
         
         self.Dead = true
-		
+    
         local bp = self:GetBlueprint()
-
         if self:GetCurrentLayer() == 'Water' and bp.Physics.MotionType == 'RULEUMT_Hover' then
             self:PlayUnitSound('HoverKilledOnWater')
         end
@@ -1082,8 +1081,6 @@ Unit = Class(moho.unit_methods) {
 		elseif bp.General.TechLevel == 'RULEUTL_Experimental' then	
 			self:AddXP(100)	
 		end
-
-
     end,
 
     DoDeathWeapon = function(self)
@@ -1690,21 +1687,28 @@ Unit = Class(moho.unit_methods) {
 	
 	
     GetRebuildBonus = function(self, rebuildUnitBP)
-	#LOG('getrebuildbonus')
-        # here 'self' is the engineer building the structure
-	self.InitialFractionComplete = 0.5
-	self.VerifyRebuildBonus = true    # rebuild bonus check 2 [159]
-	self.IAmBuildingSomethingWithReBuildBonus = true
-	self:ForkThread(self.DefeatTheExploit)
+		#LOG('getrebuildbonus')
+		# here 'self' is the engineer building the structure
+		self.InitialFractionComplete = 0.5
+		self.VerifyRebuildBonus = true    # rebuild bonus check 2 [159]
+		self.IAmBuildingSomethingWithReBuildBonus = true
+		self:ForkThread(self.DefeatTheExploit)
 	return self.InitialFractionComplete
 
     end,
 
 	DefeatTheExploit = function(self)
-		self:SetUnSelectable(true)
+	
+		#LOG('start isUnitMoving is ' .. repr(self:IsMoving()))
+		#LOG('defeattheexploit')
+		#self:SetUnSelectable(true)
 		WaitTicks(5)
+		while self:IsMoving() do  #while is new
+			WaitTicks(5)
+		end
 		self.IAmBuildingSomethingWithReBuildBonus = false
-		self:SetUnSelectable(false)
+		#self:SetUnSelectable(false)
+		#LOG('end isUnitMoving is ' .. repr(self:IsMoving()))
 	
 	end,
     
@@ -1922,7 +1926,7 @@ Unit = Class(moho.unit_methods) {
 
     OnStartBuild = function(self, unitBeingBuilt, order)
 	#LOG('onstartbuild and order is ' .. repr(order))
-	
+	#LOG('and IAmBuildingSomethingWithReBuildBonus is ' .. repr(self.IAmBuildingSomethingWithReBuildBonus))
 
 	
 	if self.IAmBuildingSomethingWithReBuildBonus == true and order == 'MobileBuild' then
@@ -1935,7 +1939,7 @@ Unit = Class(moho.unit_methods) {
 		end
 		if unitBeingBuilt.RebuildCounter > 1 then 
 			IssueClearCommands(self)
-			LOG('i am a bad player and I tried to insta-build exploit')
+			LOG('i am a bad player and I tried replicate a structure exploit')
 			unitBeingBuilt:Destroy()
 			return
 		end
@@ -3408,12 +3412,7 @@ Unit = Class(moho.unit_methods) {
     ## VETERANCY
     ##########################################################################################
     
-	GetXP =  function(self)
-		return self.xp
-	end,
-	
-    AddXP = function(self,amount)
-		LOG("Amount :" .. amount)
+	AddXP = function(self,amount)
 		self.xp = self.xp + (amount)
 		self.Sync.xp = self.xp
 		self:CheckVeteranLevel()
@@ -3421,7 +3420,7 @@ Unit = Class(moho.unit_methods) {
     end,
 	
     #This function should be used for kills made through the script, since kills through the engine (projectiles etc...) are already counted.
-	AddKills = function(self, numKills)
+    AddKills = function(self, numKills)
         #Add the kills, then check veterancy junk.
         local unitKills = self:GetStat('KILLS', 0).Value + numKills
         self:SetStat('KILLS', unitKills)
