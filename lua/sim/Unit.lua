@@ -3474,10 +3474,10 @@ Unit = Class(moho.unit_methods) {
         if not bp then
             bp = Game.VeteranDefault
         end
-        LOG('*DEBUG: Vet Table = ', repr(bp))
+        #LOG('*DEBUG: Vet Table = ', repr(bp))
         #We add 1 because we get this before the stat gets updated
         local unitKills = self.xp
-        LOG('*DEBUG: Veteran Kills = ', repr(unitKills))
+        #LOG('*DEBUG: Veteran Kills = ', repr(unitKills))
         #We are already at the highest veteran level, return
         if self.VeteranLevel == table.getsize(bp) then
             return
