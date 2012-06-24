@@ -40,7 +40,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-	MaxHealthNotAffectHealth = true,
     Buffs = {
         Regen = {
             Level1 = 15,
@@ -272,11 +271,11 @@ UnitBlueprint {
         TransportClass = 4,
     },
     Veteran = {
-        Level1 = 25,
-        Level2 = 50,
-        Level3 = 75,
-        Level4 = 100,
-        Level5 = 125,
+        Level1 = 75,
+        Level2 = 125,
+        Level3 = 200,
+        Level4 = 275,
+        Level5 = 350,
     },
     Weapon = {
         {   

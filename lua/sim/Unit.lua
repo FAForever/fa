@@ -224,6 +224,10 @@ Unit = Class(moho.unit_methods) {
 
         self.HasFuel = true
 
+		--for new vet system
+		self.xp = 0
+		self.Sync.xp = self.xp
+		
         local bpEcon = self:GetBlueprint().Economy
 
         self:SetConsumptionPerSecondEnergy(bpEcon.MaintenanceConsumptionPerSecondEnergy or 0)
@@ -991,8 +995,9 @@ Unit = Class(moho.unit_methods) {
     OnKilled = function(self, instigator, type, overkillRatio)
         
         self.Dead = true
-    
+		
         local bp = self:GetBlueprint()
+
         if self:GetCurrentLayer() == 'Water' and bp.Physics.MotionType == 'RULEUMT_Hover' then
             self:PlayUnitSound('HoverKilledOnWater')
         end
@@ -1066,7 +1071,19 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnKilledUnit = function(self, unitKilled)
-        self:CheckVeteranLevel()
+		-- new vet system
+		local bp = unitKilled:GetBlueprint()
+		if bp.General.TechLevel == 'RULEUTL_Basic' then 
+			self:AddXP(1)	
+		elseif bp.General.TechLevel == 'RULEUTL_Advanced' then
+			self:AddXP(5)	
+		elseif bp.General.TechLevel == 'RULEUTL_Secret' then
+			self:AddXP(10)	
+		elseif bp.General.TechLevel == 'RULEUTL_Experimental' then	
+			self:AddXP(100)	
+		end
+
+
     end,
 
     DoDeathWeapon = function(self)
@@ -3391,8 +3408,20 @@ Unit = Class(moho.unit_methods) {
     ## VETERANCY
     ##########################################################################################
     
+	GetXP =  function(self)
+		return self.xp
+	end,
+	
+    AddXP = function(self,amount)
+		LOG("Amount :" .. amount)
+		self.xp = self.xp + (amount)
+		self.Sync.xp = self.xp
+		self:CheckVeteranLevel()
+		
+    end,
+	
     #This function should be used for kills made through the script, since kills through the engine (projectiles etc...) are already counted.
-    AddKills = function(self, numKills)
+	AddKills = function(self, numKills)
         #Add the kills, then check veterancy junk.
         local unitKills = self:GetStat('KILLS', 0).Value + numKills
         self:SetStat('KILLS', unitKills)
@@ -3424,9 +3453,9 @@ Unit = Class(moho.unit_methods) {
         end
         local bp = self:GetBlueprint()
         if bp.Veteran['Level'..veteranLevel] then
-            self:AddKills(bp.Veteran['Level'..veteranLevel])
+            self:AddXP(bp.Veteran['Level'..veteranLevel])
         elseif import('/lua/game.lua').VeteranDefault['Level'..veteranLevel] then
-            self:AddKills(import('/lua/game.lua').VeteranDefault['Level'..veteranLevel])
+            self:AddXP(import('/lua/game.lua').VeteranDefault['Level'..veteranLevel])
         else
             error('Invalid veteran level - ' .. veteranLevel)
         end 
@@ -3445,10 +3474,10 @@ Unit = Class(moho.unit_methods) {
         if not bp then
             bp = Game.VeteranDefault
         end
-        #LOG('*DEBUG: Vet Table = ', repr(bp))
+        LOG('*DEBUG: Vet Table = ', repr(bp))
         #We add 1 because we get this before the stat gets updated
-        local unitKills = self:GetStat('KILLS', 0).Value + 1
-        #LOG('*DEBUG: Veteran Kills = ', repr(unitKills))
+        local unitKills = self.xp
+        LOG('*DEBUG: Veteran Kills = ', repr(unitKills))
         #We are already at the highest veteran level, return
         if self.VeteranLevel == table.getsize(bp) then
             return
@@ -3458,6 +3487,8 @@ Unit = Class(moho.unit_methods) {
         local nextKills = bp[('Level' .. nextLvl)]
         if unitKills >= nextKills then
             self:SetVeteranLevel(nextLvl)
+			self.xp = nextKills
+			self.Sync.xp = nextKills
         end
     end,
 
