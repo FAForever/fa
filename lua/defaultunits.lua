@@ -1627,13 +1627,20 @@ AirUnit = Class(MobileUnit) {
 
 
 	self:ForkThread(function()
-		##LOG("Sinker thread created")
+		#LOG("Sinker thread created")
 		local pos = self:GetPosition()
 		local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
-		while self:GetPosition(1)[2] > (seafloor) do  #added 2 because they were sinking into the seafloor
-			WaitSeconds(0.1)
-			##LOG("Sinker: ", repr(self:GetPosition()))
+		if self:GetBoneCount() > 1 then
+			while self:GetPosition(1)[2] > (seafloor) do  #added 2 because they were sinking into the seafloor
+				WaitSeconds(0.1)
+			end
+		else
+			while self:GetPosition()[2] > (seafloor) do  #added 2 because they were sinking into the seafloor
+				WaitSeconds(0.1)
+			end
 		end
+		
+		
 		#CreateScaledBoom(self, overkillRatio, watchBone)
 		self:CreateWreckage(overkillRatio)  # instigator)
 		self:Destroy()
