@@ -69,6 +69,7 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'UNTARGETABLE',
+		'OVERLAYRADAR',
     },
     CollisionOffsetY = -0.65,
     Defense = {

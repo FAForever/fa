@@ -90,6 +90,7 @@ UnitBlueprint {
         'SCOUT',
         'VISIBLETORECON',
         'RECLAIMABLE',
+		'OVERLAYRADAR',
     },
     CollisionOffsetY = 0,
     Defense = {
