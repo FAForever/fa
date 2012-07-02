@@ -208,17 +208,6 @@ UnitBlueprint {
             Turreted = false,
             WeaponCategory = 'Kamikaze',
         },
-		{
-            AboveWaterTargetsOnly = true,
-            Damage = 4500,
-            DamageFriendly = false,
-            DamageRadius = 3.5,
-            DamageType = 'FireBeetle',
-            DisplayName = 'Death Weapon',
-            DummyWeapon = true,
-            Label = 'DeathWeapon',
-            WeaponCategory = 'Death',
-        },
     },
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
