@@ -207,7 +207,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 24000,
         BuildCostMass = 3000,
-        BuildTime = 12000,
+        BuildTime = 2000,
     },
     Footprint = {
         SizeX = 2,
@@ -311,7 +311,7 @@ UnitBlueprint {
             FiringTolerance = 2,
             Label = 'TorpedoFront',
             MaxRadius = 70,
-            MuzzleSalvoDelay = 1,
+            MuzzleSalvoDelay = 1.5,
             MuzzleSalvoSize = 4,
             MuzzleVelocity = 5,
             ProjectileId = '/projectiles/SANUallCavitationTorpedo04/SANUallCavitationTorpedo04_proj.bp',
