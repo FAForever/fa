@@ -1,5 +1,4 @@
 UnitBlueprint {
-    BlueprintId="ual0103", # aeon t1 arty
     Audio = {
         AmbientMove = Sound {
             Bank = 'UAL',

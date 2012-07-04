@@ -1,5 +1,4 @@
 UnitBlueprint {
-    BlueprintId="uel0106", # uef t1 lab
     Audio = {
         AmbientMove = Sound {
             Bank = 'UEL',

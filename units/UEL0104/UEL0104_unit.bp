@@ -1,5 +1,4 @@
 UnitBlueprint {
-    BlueprintId="uel0104", # uef t1 mobile aa
     Audio = {
         AmbientMove = Sound {
             Bank = 'UEL',
