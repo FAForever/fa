@@ -1,5 +1,4 @@
 UnitBlueprint {
-    Merge = true,
     BlueprintId="uel0106", # uef t1 lab
     Audio = {
         AmbientMove = Sound {

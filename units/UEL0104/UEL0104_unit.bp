@@ -1,5 +1,4 @@
 UnitBlueprint {
-    Merge = true,
     BlueprintId="uel0104", # uef t1 mobile aa
     Audio = {
         AmbientMove = Sound {
