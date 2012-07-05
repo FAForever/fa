@@ -479,7 +479,7 @@ function assignToTeam(num)
    -- return the team of the player based on his place/rating
       local even = 0
      while num>0 do
-       rest=math.fmod(num,2)
+       rest=math.mod(num,2)
    if rest == 1 then
            even = even + 1
        end
@@ -487,7 +487,7 @@ function assignToTeam(num)
        num=(num-rest)/2
 
    end
-   if math.fmod(even,2) == 0 then
+   if math.mod(even,2) == 0 then
    return 1
    else
        return 2
@@ -495,15 +495,6 @@ function assignToTeam(num)
 
 end
 
-
-print((assignToTeam(0)))
-print((assignToTeam(2)))
-print((assignToTeam(3)))
-print((assignToTeam(4)))
-print((assignToTeam(5)))
-print((assignToTeam(6)))
-print((assignToTeam(7)))
-print((assignToTeam(8)))
 
 function testTs()
 

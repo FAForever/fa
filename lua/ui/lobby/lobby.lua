@@ -675,9 +675,6 @@ local function AssignRandomFactions(gameInfo)
     end
 end
 
-
-
-
 local function AssignRandomStartSpots(gameInfo)
     if gameInfo.GameOptions['TeamSpawn'] == 'random' then
         local numAvailStartSpots = nil
@@ -699,6 +696,31 @@ local function AssignRandomStartSpots(gameInfo)
             return
         end
         
+		local ratingTable = {}
+		for i = 1, numAvailStartSpots do
+			if gameInfo.PlayerOptions[i] then
+		
+			LOG("rating :" .. gameInfo.PlayerOptions[i].PL)
+			rating = gameInfo.PlayerOptions[i].PL
+			ratingTable[rating] = i
+			end
+		end
+		
+		rating = 1000
+		ratingTable[rating] = 2
+		rating = 2000
+		ratingTable[rating] = 8
+
+		
+    a = {}
+    for n in pairs(ratingTable) do table.insert(a, n) end
+    table.sort(a)
+	
+    for i,n in ipairs(a) do 
+		LOG("player " .. ratingTable[n] .. " is in team " .. Trueskill.assignToTeam(i-1) )
+	end
+		
+		
         for i = 1, numAvailStartSpots do
             if gameInfo.PlayerOptions[i] then
                 -- don't select closed slots for random pick
