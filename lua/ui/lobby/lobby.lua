@@ -699,45 +699,97 @@ local function AssignRandomStartSpots(gameInfo)
 		local ratingTable = {}
 		for i = 1, numAvailStartSpots do
 			if gameInfo.PlayerOptions[i] then
-		
-			LOG("rating :" .. gameInfo.PlayerOptions[i].PL)
-			rating = gameInfo.PlayerOptions[i].PL
-			ratingTable[rating] = i
+				LOG("Rating  of player " .. i .. " : " .. gameInfo.PlayerOptions[i].PL)
+				rating = gameInfo.PlayerOptions[i].PL
+				ratingTable[rating] = i
 			end
 		end
-		
-		rating = 1000
-		ratingTable[rating] = 2
-		rating = 2000
-		ratingTable[rating] = 8
 
-		
-    a = {}
-    for n in pairs(ratingTable) do table.insert(a, n) end
-    table.sort(a)
-	
-    for i,n in ipairs(a) do 
-		LOG("player " .. ratingTable[n] .. " is in team " .. Trueskill.assignToTeam(i-1) )
+		a = {}
+		for n in pairs(ratingTable) do table.insert(a, n) end
+		table.sort(a)
+
+		for i = 1, numAvailStartSpots do
+			if gameInfo.PlayerOptions[i] then
+				-- don't select closed slots for random pick
+				local randSlot
+				local goodteam = nil
+				for k,n in ipairs(a) do
+					if ratingTable[n] == i then
+						goodteam = Trueskill.assignToTeam(k-1)
+						
+						LOG("player " .. i .. " is assigned to team " .. goodteam)
+						
+					end
+				end
+				
+				repeat
+
+					randSlot = nil
+					local randSlotTmp = math.random(1,numAvailStartSpots)
+					
+					if goodteam then
+
+						if gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
+							
+							local midLine = GUI.mapView.Left() + (GUI.mapView.Width() / 2)
+							local markerPos = GUI.markers[randSlotTmp].marker.Left()
+						
+							if goodteam == 1 and markerPos < midLine then
+								randSlot = randSlotTmp
+							end
+							if goodteam == 2 and markerPos > midLine then
+								randSlot = randSlotTmp
+							end
+
+						
+						elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
+							local midLine = GUI.mapView.Top() + (GUI.mapView.Height() / 2)
+							local markerPos = GUI.markers[i].marker.Top()
+							
+							if goodteam == 1 and markerPos < midLine then
+								randSlot = randSlotTmp
+							end
+							if goodteam == 2 and markerPos > midLine then
+								randSlot = randSlotTmp
+							end
+						
+						elseif gameInfo.GameOptions['AutoTeams'] == 'manual' and gameInfo.GameOptions['TeamSpawn'] == 'random' then
+							randSlot = randSlotTmp
+						end
+						
+						if gameInfo.GameOptions['AutoTeams'] == 'pvsi' or gameInfo.GameOptions['RandomMap'] != 'Off' then
+						
+							if goodteam == 1 then 
+								if i == 1 or i == 3 or i == 5 or i == 7 or i == 9 or i == 11 then
+									randSlot = randSlotTmp
+								end
+							else
+								if i == 2 or i == 4 or i == 6 or i == 8 or i == 10 or i == 12 then
+									randSlot = randSlotTmp
+								end
+							end
+						
+						end
+					else
+						randSlot = randSlotTmp
+					end
+
+
+				until gameInfo.ClosedSlots[randSlot] == nil
+				
+				
+				local temp = nil
+				if gameInfo.PlayerOptions[randSlot] then
+					temp = table.deepcopy(gameInfo.PlayerOptions[randSlot])
+				end
+				LOG ("slot " .. randSlot .. " for player " .. i)
+				gameInfo.PlayerOptions[randSlot] = table.deepcopy(gameInfo.PlayerOptions[i])
+				gameInfo.PlayerOptions[i] = temp
+			end
+		end
 	end
-		
-		
-        for i = 1, numAvailStartSpots do
-            if gameInfo.PlayerOptions[i] then
-                -- don't select closed slots for random pick
-                local randSlot
-                repeat
-                    randSlot = math.random(1,numAvailStartSpots)
-                until gameInfo.ClosedSlots[randSlot] == nil
-                
-                local temp = nil
-                if gameInfo.PlayerOptions[randSlot] then
-                    temp = table.deepcopy(gameInfo.PlayerOptions[randSlot])
-                end
-                gameInfo.PlayerOptions[randSlot] = table.deepcopy(gameInfo.PlayerOptions[i])
-                gameInfo.PlayerOptions[i] = temp
-            end
-        end
-    end
+
 end
 
 -- This fonction is used to double check the observers.

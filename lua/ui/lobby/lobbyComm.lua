@@ -3,7 +3,7 @@
 #
 quietTimeout = 10000.0 # milliseconds to wait before booting people
 maxPlayerSlots = 12
-maxConnections = 25 # count doesn't include ourself.
+maxConnections = 16 # count doesn't include ourself.
 
 Strings = {
     # General info strings
@@ -72,7 +72,7 @@ LobbyComm = Class(moho.lobby_methods) {
     SystemMessage = function(self, text) LOG('System: ' .. text) end,
     DataReceived = function(self, data)  end,
     GameConfigRequested = function(self) end,
-    PeerDisconnected = function(self,peerName,uid) LOG('Disconnect: ' .. peerName .. ' (' .. uid ..')' ) end,
+    PeerDisconnected = function(self,peerName,uid) end,
     LaunchFailed = function(self,reasonKey) end,
 
     # native void SendData(self, targetID, data)
