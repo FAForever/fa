@@ -23,9 +23,10 @@ local ModManager = import('/lua/ui/dialogs/modmanager.lua')
 local FactionData = import('/lua/factions.lua')
 local Text = import('/lua/maui/text.lua').Text
 local Trueskill = import('/lua/ui/lobby/trueskill.lua')
+local Player = import('/lua/ui/lobby/trueskill.lua').Player
+local Rating = import('/lua/ui/lobby/trueskill.lua').Rating
+local Teams = import('/lua/ui/lobby/trueskill.lua').Teams
 
-
-Trueskill.testTs()
 
 local teamOpts = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
 local globalOpts = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
@@ -51,9 +52,12 @@ local quickRandMap = false
 
 local lastUploadedMap = nil
 
-local playerRating = GetCommandLineArg("/rating", 1)
+local playerMean = GetCommandLineArg("/mean", 1)
+local playerDeviation = GetCommandLineArg("/deviation", 1)
+
 local ratingColor = GetCommandLineArg("/ratingcolor", 1)
 local numGames = GetCommandLineArg("/numgames", 1)
+
 
 if ratingColor then 
 	ratingColor = tostring(ratingColor[1])
@@ -67,11 +71,19 @@ else
 	numGames = 0
 end
 
-if playerRating then
-	playerRating = tonumber(playerRating[1])
+if playerMean then
+	playerMean = tonumber(playerMean[1])
 else
-	playerRating = 0
+	playerMean = 1500
 end
+
+if playerDeviation then
+	playerDeviation = tonumber(playerDeviation[1])
+else
+	playerDeviation = 500
+end
+ 
+local playerRating = math.floor(playerMean - 3 * playerDeviation)
  
 -- builds the faction tables, and then adds random faction icon to the end
 local factionBmps = {}
@@ -1254,6 +1266,14 @@ end
 local function UpdateGame()
     -- if anything happens to switch a no SupCom player to a faction other than Seraphim, switch them back
 	local playerSlot = FindSlotForID(localPlayerID)
+
+	if not gameInfo.PlayerOptions[playerSlot].MEAN then
+		SetPlayerOption(playerSlot, 'MEAN', playerMean)
+	end
+
+	if not gameInfo.PlayerOptions[playerSlot].DEV then
+		SetPlayerOption(playerSlot, 'DEV', playerDeviation)
+	end
 	
 	if not gameInfo.PlayerOptions[playerSlot].PL then
 		SetPlayerOption(playerSlot, 'PL', playerRating)
@@ -1355,6 +1375,7 @@ local function UpdateGame()
     
     local numPlayers = GetPlayerCount()
 
+	
     local numAvailStartSpots = LobbyComm.maxPlayerSlots
     if scenarioInfo then
         local armyTable = MapUtil.GetArmies(scenarioInfo)
@@ -1441,6 +1462,60 @@ local function UpdateGame()
     RefreshOptionDisplayData(scenarioInfo)
 	-- Send autoteams infos to server.
 	AssignRandomTeams(gameInfo)	
+	
+	
+
+	if gameInfo.GameOptions['TeamSpawn'] != 'random' and math.mod(numPlayers,2) == 0 and gameInfo.GameOptions['AutoTeams'] != 'manual' and gameInfo.GameOptions['AutoTeams'] != 'none' then
+		
+		local teams = nil
+		local teamcreated = false
+		correct = true
+	
+		for i = 1, LobbyComm.maxPlayerSlots do
+			if gameInfo.PlayerOptions[i] then
+			
+				if  gameInfo.PlayerOptions[i].Human then
+					if gameInfo.PlayerOptions[i].MEAN and gameInfo.PlayerOptions[i].DEV then
+						player = Player.create(gameInfo.PlayerOptions[i].PlayerName, Rating.create(gameInfo.PlayerOptions[i].MEAN, gameInfo.PlayerOptions[i].DEV))
+						team = gameInfo.PlayerOptions[i].Team
+						if team == 2 then
+							if teamcreated then
+								teams:addPlayer(1, player)
+							else
+								teams = Teams.create(1, player)
+								teamcreated = true
+							end
+						else
+							if teamcreated then
+								teams:addPlayer(2, player)
+							else
+								teams = Teams.create(2, player)
+								teamcreated = true
+							end					
+						end
+					end
+				else
+					correct = false
+				
+				end
+				
+			
+			end
+		end
+		if correct and teams != nil then
+			local quality = Trueskill.computeQuality(teams)
+			if quality and quality > 0 then
+				gameInfo.GameOptions['Quality'] = quality
+				LOG("current game quality : " .. quality .. " %")
+				--local randmapText = UIUtil.CreateText(GUI.panel, "current game quality : " .. quality .. " %", 17, UIUtil.titleFont)
+				randmapText:SetText("current game quality : " .. quality .. " %")
+				--LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
+			else
+				randmapText:SetText("current game quality : unknown")
+			end
+		end
+	end
+	
 end
 
 -- Update our local gameInfo.GameMods from selected map name and selected mods, then
@@ -1568,7 +1643,7 @@ function HostOpenSlot(senderID, slot)
 end
 
 -- slot less than 1 means try to find a slot
-function HostTryAddPlayer( senderID, slot, requestedPlayerName, human, aiPersonality, requestedColor, requestedFaction, requestedTeam, requestedPL, requestedRC, requestedNG )	
+function HostTryAddPlayer( senderID, slot, requestedPlayerName, human, aiPersonality, requestedColor, requestedFaction, requestedTeam, requestedPL, requestedRC, requestedNG, requestedMEAN, requestedDEV )	
 
     local newSlot = slot
 
@@ -1624,6 +1699,14 @@ function HostTryAddPlayer( senderID, slot, requestedPlayerName, human, aiPersona
             end
         end
     end	
+
+	if requestedMEAN then
+		gameInfo.PlayerOptions[newSlot].MEAN = requestedMEAN
+	end	
+	
+	if requestedDEV then
+		gameInfo.PlayerOptions[newSlot].DEV = requestedDEV
+	end	
 	
 	if requestedPL then
 		gameInfo.PlayerOptions[newSlot].PL = requestedPL
@@ -1996,7 +2079,7 @@ function CreateUI(maxPlayers)
     local titleText = UIUtil.CreateText(GUI.panel, title, 26, UIUtil.titleFont)
     LayoutHelpers.AtLeftTopIn(titleText, GUI.panel, 50, 36)
 	
-	local randmapText = UIUtil.CreateText(GUI.panel, "Power Lobby 2.0 by Moritz - www.forgedalliance.com.br", 17, UIUtil.titleFont)
+	randmapText = UIUtil.CreateText(GUI.panel, "Power Lobby 2.0 by Moritz - www.forgedalliance.com.br", 17, UIUtil.titleFont)
 	LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
 
     GUI.playerPanel = Group(GUI.panel, "playerPanel")
@@ -3455,7 +3538,10 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 RequestedFaction = requestedFaction,
 				RequestedPL = playerRating, 
 				RequestedRC = ratingColor, 
-				RequestedNG = numGames, } )
+				RequestedNG = numGames,
+				RequestedMEAN = playerMean,
+				RequestedDEV = playerDev
+				} )
         end
 
         local function KeepAliveThreadFunc()
@@ -3515,7 +3601,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
             elseif data.Type == 'AddPlayer' then
                 -- create empty slot if possible and give it to the player
-                HostTryAddPlayer( data.SenderID, data.RequestedSlot, data.RequestedPlayerName, data.Human, data.AIPersonality, data.RequestedColor, data.RequestedFaction, nil, data.RequestedPL, data.RequestedRC, data.RequestedNG )
+                HostTryAddPlayer( data.SenderID, data.RequestedSlot, data.RequestedPlayerName, data.Human, data.AIPersonality, data.RequestedColor, data.RequestedFaction, nil, data.RequestedPL, data.RequestedRC, data.RequestedNG, data.RequestedMEAN, data.RequestDEV )
 				PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
             elseif data.Type == 'MovePlayer' then
                 -- attempt to move a player from current slot to empty slot

@@ -1,8 +1,8 @@
 
-local Teams = {}
-local Rating = {}
-local Player = {}
-local Matrix = {}
+Teams = {}
+Rating = {}
+Player = {}
+Matrix = {}
 
 
 Teams.__index = Teams
@@ -495,58 +495,49 @@ function assignToTeam(num)
 
 end
 
+local function round(num, idp)
+  local mult = 10^(idp or 0)
+  return math.floor(num * mult + 0.5) / mult
+end
 
-function testTs()
+function computeQuality(team)
 
-player1 = Player.create("play1", Rating.create(1600,200))
-player2 = Player.create("play2", Rating.create(1600,200))
+	local skillsMatrix = getPlayerCovarianceMatrix(team)
 
-player3 = Player.create("play3", Rating.create(1500,500))
-player4 = Player.create("play4", Rating.create(1500,500))
+	local meanVector = getPlayerMeansVector(team)
 
-team =  Teams.create(1, player1)
-team:addPlayer(1, player2)
-team:addPlayer(2, player3)
-team:addPlayer(2, player4)
-
-
-
-local skillsMatrix = getPlayerCovarianceMatrix(team)
-
-local meanVector = getPlayerMeansVector(team)
-
-local meanVectorTranspose = meanVector:transpose()
+	local meanVectorTranspose = meanVector:transpose()
 
 
 
-local playerTeamAssignmentsMatrix = createPlayerTeamAssignmentMatrix(team, meanVector.rowCount)
+	local playerTeamAssignmentsMatrix = createPlayerTeamAssignmentMatrix(team, meanVector.rowCount)
 
 
-local  playerTeamAssignmentsMatrixTranspose = playerTeamAssignmentsMatrix:transpose()
+	local  playerTeamAssignmentsMatrixTranspose = playerTeamAssignmentsMatrix:transpose()
 
-local betaSquared = 250 * 250
-local start = matrixmult(meanVectorTranspose, playerTeamAssignmentsMatrix)
-local aTa = matrixmult(scalarMultiply(playerTeamAssignmentsMatrixTranspose, betaSquared), playerTeamAssignmentsMatrix)
-local tmp = matrixmult(playerTeamAssignmentsMatrixTranspose, skillsMatrix)
-local aTSA =  matrixmult(tmp, playerTeamAssignmentsMatrix)
-local middle = matrixAdd(aTa, aTSA)
-local middleInverse = matrixInvert(middle)
+	local betaSquared = 250 * 250
+	local start = matrixmult(meanVectorTranspose, playerTeamAssignmentsMatrix)
+	local aTa = matrixmult(scalarMultiply(playerTeamAssignmentsMatrixTranspose, betaSquared), playerTeamAssignmentsMatrix)
+	local tmp = matrixmult(playerTeamAssignmentsMatrixTranspose, skillsMatrix)
+	local aTSA =  matrixmult(tmp, playerTeamAssignmentsMatrix)
+	local middle = matrixAdd(aTa, aTSA)
+	local middleInverse = matrixInvert(middle)
 
-local theend = matrixmult(playerTeamAssignmentsMatrixTranspose, meanVector)
-local part1 = matrixmult(start, middleInverse)
-local part2 = matrixmult(part1, theend)
-local expPartMatrix = scalarMultiply(part2, -0.5)
-local expPart = expPartMatrix:getDeterminant()
+	local theend = matrixmult(playerTeamAssignmentsMatrixTranspose, meanVector)
+	local part1 = matrixmult(start, middleInverse)
+	local part2 = matrixmult(part1, theend)
+	local expPartMatrix = scalarMultiply(part2, -0.5)
+	local expPart = expPartMatrix:getDeterminant()
 
-local sqrtPartNumerator = aTa:getDeterminant()
-local sqrtPartDenominator = middle:getDeterminant()
-local sqrtPart = sqrtPartNumerator / sqrtPartDenominator
+	local sqrtPartNumerator = aTa:getDeterminant()
+	local sqrtPartDenominator = middle:getDeterminant()
+	local sqrtPart = sqrtPartNumerator / sqrtPartDenominator
 
 
-local result = math.exp(expPart) * math.sqrt(sqrtPart)
+	local result = math.exp(expPart) * math.sqrt(sqrtPart)
 
-print ("result " .. result*100)
-       end
+	--print ("result " .. result*100)
+	return round((result * 100), 2)
+end
 
-testTs()
 
