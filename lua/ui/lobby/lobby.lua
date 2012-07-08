@@ -695,13 +695,19 @@ local function AssignRandomStartSpots(gameInfo)
             WARN("Can't assign random start spots, no scenario selected.")
             return
         end
-        
+
+		local norating = false
 		local ratingTable = {}
+		
 		for i = 1, numAvailStartSpots do
 			if gameInfo.PlayerOptions[i] then
-				LOG("Rating  of player " .. i .. " : " .. gameInfo.PlayerOptions[i].PL)
-				rating = gameInfo.PlayerOptions[i].PL
-				ratingTable[rating] = i
+				if gameInfo.PlayerOptions[i].PL then
+					LOG("Rating  of player " .. i .. " : " .. gameInfo.PlayerOptions[i].PL)
+					rating = gameInfo.PlayerOptions[i].PL
+					ratingTable[rating] = i
+				else
+					norating = true
+				end
 			end
 		end
 
@@ -728,7 +734,7 @@ local function AssignRandomStartSpots(gameInfo)
 					randSlot = nil
 					local randSlotTmp = math.random(1,numAvailStartSpots)
 					
-					if goodteam then
+					if goodteam and norating == false then
 
 						if gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
 							
@@ -769,7 +775,9 @@ local function AssignRandomStartSpots(gameInfo)
 									randSlot = randSlotTmp
 								end
 							end
-						
+						end
+						if gameInfo.GameOptions['AutoTeams'] == 'none' then
+							randSlot = randSlotTmp
 						end
 					else
 						randSlot = randSlotTmp
