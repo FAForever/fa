@@ -687,6 +687,15 @@ local function AssignRandomFactions(gameInfo)
     end
 end
 
+local function shuffle( a )
+        local c = table.getn(a)
+        for i = 1, c do
+                local ndx0 = math.random( 1, c )
+                a[ ndx0 ], a[ i ] = a[ i ], a[ ndx0 ]
+        end
+        return a
+end
+
 local function AssignRandomStartSpots(gameInfo)
     if gameInfo.GameOptions['TeamSpawn'] == 'random' then
         local numAvailStartSpots = nil
@@ -727,6 +736,48 @@ local function AssignRandomStartSpots(gameInfo)
 		for n in pairs(ratingTable) do table.insert(a, n) end
 		table.sort(a)
 
+		team1 = {}
+		team2 = {}
+		for i = 1, numAvailStartSpots do
+			if gameInfo.ClosedSlots[i] == nil then
+				if gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
+				
+					local midLine = GUI.mapView.Left() + (GUI.mapView.Width() / 2)
+					local markerPos = GUI.markers[i].marker.Left()
+				
+					if markerPos < midLine then
+						table.insert(team1, i)
+					else
+						table.insert(team2, i)
+					end
+				
+				elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
+					local midLine = GUI.mapView.Top() + (GUI.mapView.Height() / 2)
+					local markerPos = GUI.markers[i].marker.Top()
+					
+					if markerPos < midLine then
+						table.insert(team1, i)
+					else
+						table.insert(team2, i)
+					end
+				
+				elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' then
+					if i == 1 or i == 3 or i == 5 or i == 7 or i == 9 or i == 11 then
+						table.insert(team1, i)
+					else
+						table.insert(team2, i)
+					end
+				end
+			end
+		end
+
+		-- shuffle the array for randomness.
+		team1 = shuffle(team1)
+		team2 = shuffle(team2)
+
+		local team1Increment = 1
+		local team2Increment = 1
+		
 		for i = 1, numAvailStartSpots do
 			if gameInfo.PlayerOptions[i] then
 				-- don't select closed slots for random pick
@@ -743,59 +794,23 @@ local function AssignRandomStartSpots(gameInfo)
 				
 				repeat
 
-					randSlot = nil
-					local randSlotTmp = math.random(1,numAvailStartSpots)
-					
-					if goodteam and norating == false then
-
-						if gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
-							
-							local midLine = GUI.mapView.Left() + (GUI.mapView.Width() / 2)
-							local markerPos = GUI.markers[randSlotTmp].marker.Left()
-						
-							if goodteam == 1 and markerPos < midLine then
-								randSlot = randSlotTmp
-							end
-							if goodteam == 2 and markerPos > midLine then
-								randSlot = randSlotTmp
-							end
-
-						
-						elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
-							local midLine = GUI.mapView.Top() + (GUI.mapView.Height() / 2)
-							local markerPos = GUI.markers[i].marker.Top()
-							
-							if goodteam == 1 and markerPos < midLine then
-								randSlot = randSlotTmp
-							end
-							if goodteam == 2 and markerPos > midLine then
-								randSlot = randSlotTmp
-							end
-						
-						elseif gameInfo.GameOptions['AutoTeams'] == 'manual' and gameInfo.GameOptions['TeamSpawn'] == 'random' then
-							randSlot = randSlotTmp
-						end
-						
-						if gameInfo.GameOptions['AutoTeams'] == 'pvsi' or gameInfo.GameOptions['RandomMap'] != 'Off' then
-						
-							if goodteam == 1 then 
-								if i == 1 or i == 3 or i == 5 or i == 7 or i == 9 or i == 11 then
-									randSlot = randSlotTmp
-								end
-							else
-								if i == 2 or i == 4 or i == 6 or i == 8 or i == 10 or i == 12 then
-									randSlot = randSlotTmp
-								end
-							end
-						end
-						if gameInfo.GameOptions['AutoTeams'] == 'none' then
-							randSlot = randSlotTmp
-						end
+					if gameInfo.GameOptions['AutoTeams'] == 'manual' or gameInfo.GameOptions['AutoTeams'] == 'none' then
+						randSlot = math.random(1,numAvailStartSpots)
 					else
-						randSlot = randSlotTmp
+						if goodteam and norating == false then
+							if goodteam == 1 then
+								randSlot = team1[team1Increment]
+								team1Increment = team1Increment + 1
+							else
+								randSlot = team2[team2Increment]
+								team2Increment = team2Increment + 2
+							end
+						else
+							randSlot = math.random(1,numAvailStartSpots)
+						end
 					end
-
-
+					
+					
 				until gameInfo.ClosedSlots[randSlot] == nil
 				
 				
@@ -2057,7 +2072,7 @@ function CreateUI(maxPlayers)
 
     local title
     if GpgNetActive() then
-        title = LOCF("<LOC lobui_0087>%s GAME LOBBY","GPGNet")
+        title = "FA FOREVER GAME LOBBY"
         GUI.background = MenuCommon.SetupBackground(GetFrame(0))
     elseif singlePlayer then
         title = "<LOC _Skirmish_Setup>"
@@ -3540,7 +3555,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 				RequestedRC = ratingColor, 
 				RequestedNG = numGames,
 				RequestedMEAN = playerMean,
-				RequestedDEV = playerDev
+				RequestedDEV = playerDeviation
 				} )
         end
 
