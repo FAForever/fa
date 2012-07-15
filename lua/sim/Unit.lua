@@ -1048,15 +1048,19 @@ Unit = Class(moho.unit_methods) {
 
     OnKilledUnit = function(self, unitKilled)
 		-- new vet system
-		local bp = unitKilled:GetBlueprint()
-		if bp.General.TechLevel == 'RULEUTL_Basic' then 
-			self:AddXP(1)	
-		elseif bp.General.TechLevel == 'RULEUTL_Advanced' then
-			self:AddXP(5)	
-		elseif bp.General.TechLevel == 'RULEUTL_Secret' then
-			self:AddXP(10)	
-		elseif bp.General.TechLevel == 'RULEUTL_Experimental' then	
-			self:AddXP(100)	
+		
+		if not ArmyIsCivilian(unitKilled:GetArmy()) then
+			if EntityCategoryContains( categories.TECH1, unitKilled )  then 
+				self:AddXP(1)	
+			elseif EntityCategoryContains( categories.TECH2, unitKilled ) then
+				self:AddXP(3)	
+			elseif EntityCategoryContains( categories.TECH3, unitKilled ) then
+				self:AddXP(6)	
+			elseif EntityCategoryContains( categories.EXPERIMENTAL, unitKilled ) then	
+				self:AddXP(50)	
+			else
+				self:AddXP(1)
+			end
 		end
     end,
 
