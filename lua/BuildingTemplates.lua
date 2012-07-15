@@ -773,7 +773,7 @@ BuildingTemplates =
         {
             'T4LandExperimental3',
             'xrl0403',
-        },
+        },        
         {
             'T4AirExperimental1',
             'ura0401',

@@ -42,3 +42,4 @@ GameColors = {
 
     UnidentifiedColor = "FF808080",
 }
+
