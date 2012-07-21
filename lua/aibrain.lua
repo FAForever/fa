@@ -826,10 +826,21 @@ AIBrain = Class(moho.aibrain_methods) {
     #   val: true or false
     # calls callback function with blip it saw.
     OnIntelChange = function(self, blip, reconType, val)
-        #LOG('*AI DEBUG: ONINTELCHANGED: Blip = ', repr(blip), ' ReconType = ', repr(reconType), ' Value = ', repr(val))
-        #LOG('*AI DEBUG: IntelTriggerList = ', repr(self.IntelTriggerList))
-        #LOG('*AI DEBUG: BlipID = ', repr(blip:GetBlueprint().BlueprintId))
-        if self.IntelTriggerList then
+        
+		if blip and reconType and val != nil then 
+			local BlipSource = blip:GetSource()
+			if BlipSource then
+				if IsUnit(BlipSource) then 
+					if not val and reconType == "Radar" then 
+						LOG("Unit going out of radar - Clearing attackers")
+							BlipSource:clearAttackers()
+					end
+				end
+			end
+			
+		end
+		
+		if self.IntelTriggerList then
             for k, v in self.IntelTriggerList do
                 if EntityCategoryContains(v.Category, blip:GetBlueprint().BlueprintId)
                     and v.Type == reconType and (not v.Blip or v.Blip == blip:GetSource())

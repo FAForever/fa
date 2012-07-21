@@ -803,7 +803,7 @@ local function AssignRandomStartSpots(gameInfo)
 								team1Increment = team1Increment + 1
 							else
 								randSlot = team2[team2Increment]
-								team2Increment = team2Increment + 2
+								team2Increment = team2Increment + 1
 							end
 						else
 							randSlot = math.random(1,numAvailStartSpots)
@@ -3188,6 +3188,8 @@ function RefreshOptionDisplayData(scenarioInfo)
 end
 
 function CalcConnectionStatus(peer)
+	LOG("peer.status " .. peer.status)
+	LOG("peer.id " .. peer.id)
     if peer.status != 'Established' then
         return 'red'
     else

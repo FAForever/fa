@@ -201,6 +201,10 @@ Unit = Class(moho.unit_methods) {
 
         self.HasFuel = true
 
+		-- issue#43 for better stealth
+		self.Attackers = {}
+		
+		
 		--for new vet system
 		self.xp = 0
 		self.Sync.xp = self.xp
@@ -269,7 +273,44 @@ Unit = Class(moho.unit_methods) {
 		
     end,
 
+	
+	##########################################################################################
+    ## TARGET AND ATTACKERS FUNCTIONS
+    ##########################################################################################
+	-- issue:#43 : better stealth
+	
+	OnGotTarget = function(self, Weapon)
+		local Target = Weapon:GetCurrentTarget()
+		if Target and not Target:IsDead() then 
+			LOG("adding attackers")
+			Target:addAttacker(self)
+		end
+	
+	end,
+	
+	OnLostTarget = function(self, Weapon)
 
+	end,
+	
+	addAttacker = function(self, attacker)
+		if not attacker:IsDead() then
+			if not table.find(self.Attackers, attacker) then
+				LOG("attacker added")
+				table.insert(self.Attackers, attacker) 	
+			end
+		end
+	end,
+
+	clearAttackers = function(self)
+		for k, ent in self.Attackers do
+			LOG("this unit : " .. repr(ent))
+			if ent and not ent:IsDead() then
+				LOG("must stop attacking current unit !")
+					IssueClearCommands({ent})
+			end
+		end
+	end,
+	
     ##########################################################################################
     ## MISC FUNCTIONS
     ##########################################################################################

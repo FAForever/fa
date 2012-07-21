@@ -110,3 +110,28 @@ Callbacks.OnPlayerQuery = SimPlayerQuery.OnPlayerQuery
 Callbacks.OnPlayerQueryResult = SimPlayerQuery.OnPlayerQueryResult
 
 Callbacks.PingGroupClick = import('/lua/SimPingGroup.lua').OnClickCallback
+
+
+-- issue:#43
+Callbacks.AddCacheTarget = function(data, units)
+	
+	if type(data.target) == 'string' then
+		local entity = GetEntityById(data.target)
+		entity = entity:GetSource()
+		if IsUnit(entity) then
+			for id, unit in units or {} do
+				entity:addAttacker(unit)
+			end
+		end
+	end
+
+
+end
+
+Callbacks.ClearCacheTargets = function(data, units)
+	
+	for id, unit in units or {} do			
+
+	end
+	
+end
