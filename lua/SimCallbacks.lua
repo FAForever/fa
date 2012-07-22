@@ -113,7 +113,7 @@ Callbacks.PingGroupClick = import('/lua/SimPingGroup.lua').OnClickCallback
 
 
 -- issue:#43
-Callbacks.AddCacheTarget = function(data, units)
+Callbacks.AddTarget = function(data, units)
 	
 	if type(data.target) == 'string' then
 		local entity = GetEntityById(data.target)
@@ -121,6 +121,7 @@ Callbacks.AddCacheTarget = function(data, units)
 		if IsUnit(entity) then
 			for id, unit in units or {} do
 				entity:addAttacker(unit)
+				unit:addTarget(entity)
 			end
 		end
 	end
@@ -128,10 +129,10 @@ Callbacks.AddCacheTarget = function(data, units)
 
 end
 
-Callbacks.ClearCacheTargets = function(data, units)
+Callbacks.ClearTargets = function(data, units)
 	
 	for id, unit in units or {} do			
-
+		unit:clearTarget()
 	end
 	
 end

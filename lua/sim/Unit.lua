@@ -202,7 +202,10 @@ Unit = Class(moho.unit_methods) {
         self.HasFuel = true
 
 		-- issue#43 for better stealth
+		self.Targets = {}
 		self.Attackers = {}
+		self.WeaponTargets = {}
+		self.WeaponAttackers = {}
 		
 		
 		--for new vet system
@@ -279,36 +282,130 @@ Unit = Class(moho.unit_methods) {
     ##########################################################################################
 	-- issue:#43 : better stealth
 	
+	-- when we fire on something, we tell that unit that we attack it.
 	OnGotTarget = function(self, Weapon)
 		local Target = Weapon:GetCurrentTarget()
-		if Target and not Target:IsDead() then 
-			LOG("adding attackers")
-			Target:addAttacker(self)
+		if Target and IsUnit(Target) then 
+			--LOG("adding weapon attackers")
+			Target:addAttackerWeapon(self)
+			--LOG("adding this unit in our list of attack")
+			self:addTargetWeapon(Target)
 		end
 	
 	end,
 	
+	-- we lost focus, so we remove this unit from the list of threat
 	OnLostTarget = function(self, Weapon)
+		for k, ent in self.WeaponTargets do
+			if not ent:IsDead() then
+				ent:removeWeaponAttacker(self)
+			end
+		
+		end
+	end,
 
+	-- add a list of units attacking this unit with a weapon
+	addAttackerWeapon = function(self, attacker)
+		if not attacker:IsDead() then
+			if not table.find(self.WeaponAttackers, attacker) then
+				--LOG("weapon attacker added")
+				table.insert(self.WeaponAttackers, attacker) 	
+			end
+		end
 	end,
 	
+	-- add a list of units attacking this unit with an order
 	addAttacker = function(self, attacker)
 		if not attacker:IsDead() then
 			if not table.find(self.Attackers, attacker) then
-				LOG("attacker added")
+				--LOG("attacker added")
 				table.insert(self.Attackers, attacker) 	
 			end
 		end
 	end,
 
-	clearAttackers = function(self)
+	-- that weapon is not longer attacking us.
+	removeWeaponAttacker = function(self, attacker)
 		for k, ent in self.Attackers do
-			LOG("this unit : " .. repr(ent))
-			if ent and not ent:IsDead() then
-				LOG("must stop attacking current unit !")
-					IssueClearCommands({ent})
+			if ent == attacker then
+				--LOG("removing this weapon attacker")
+				table.remove(self.WeaponAttackers, k)
 			end
 		end
+	end,
+	
+	-- that unit is not longer attacking us.
+	removeAttacker = function(self, attacker)
+		for k, ent in self.Attackers do
+			if ent == attacker then
+				--LOG("removing this attacker")
+				table.remove(self.Attackers, k)
+			end
+		end
+	end,
+	
+	-- clear the attack orders if the units got out of sight.
+	stopAttackers = function(self)
+		for k, ent in self.Attackers do
+			--LOG("this unit : " .. repr(ent))
+			if ent and not ent:IsDead() then
+				--LOG("must stop attacking current unit !")
+				if EntityCategoryContains( categories.BOMBER, ent ) then				
+					IssueClearCommands({ent})	
+					--WaitTicks(5)
+					IssueAttack({ent}, self:GetPosition()) 
+				else
+					IssueClearCommands({ent})
+				end
+			end
+			-- and we remove it from the list of attackers
+			self:removeAttacker(ent)
+		end
+		
+		for k, ent in self.WeaponAttackers do
+			if ent and not ent:IsDead() then
+				--LOG("must stop attacking current WEAPON unit !")
+				local numWep = self:GetWeaponCount()
+				if numWep > 0 then
+					 for w = 1, numWep do
+						local wep = self:GetWeapon(w)
+						if wep:GetCurrentTarget() == self then
+							wep:ResetTarget()
+						end
+					 end
+				end
+				
+			end
+		end
+		
+	end,
+
+
+	-- Add a target to the weapon list for this unit
+	addTargetWeapon = function(self, target)
+		if not target:IsDead() then
+			table.insert(self.WeaponTargets, target)
+		end
+	end,
+	
+	-- Add a target to the list for this unit
+	addTarget = function(self, target)
+		if not target:IsDead() then
+			table.insert(self.Targets, target)
+		end
+	end,
+	
+	-- Remove all the target for this unit
+	clearTarget = function(self)
+		-- first, we must also tell the unit we were attacking that we are no longer a threat
+		for k, ent in self.Targets do
+			if not ent:IsDead() then
+				ent:removeAttacker(self)
+			end
+		end
+		-- now we clear the list
+		self.Targets = {}
+	
 	end,
 	
     ##########################################################################################

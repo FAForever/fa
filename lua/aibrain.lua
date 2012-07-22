@@ -569,6 +569,10 @@ AIBrain = Class(moho.aibrain_methods) {
         self.VeterancyTriggerList = {}
         self.PingCallbackList = {}
         self.UnitBuiltTriggerList = {}
+		
+		-- issue:#43 : Better stealth
+		self.UnitIntelList = {}
+		
     end,
 
 	OnSpawnPreBuiltUnits = function(self)
@@ -818,6 +822,61 @@ AIBrain = Class(moho.aibrain_methods) {
         table.insert(self.IntelTriggerList, triggerSpec)
     end,
 
+	
+	IsUnitTargeatable = function(self, unit)
+		if unit and IsUnit(unit) then
+		
+			local UnitId = unit:GetEntityId()
+			if not self.UnitIntelList[UnitId] then
+				return false
+			else
+				-- if we've got a LOS, then we can fire.
+				if self.UnitIntelList[UnitId]["LOSNow"] then
+					return true
+				else
+					-- if we have a least one type of blip...
+					if self.UnitIntelList[UnitId]["Radar"] or self.UnitIntelList[UnitId]["Sonar"] or self.UnitIntelList[UnitId]["Omni"] then
+						return true
+					else
+						return false
+					end
+				end			 
+			end
+		end
+	end,
+	
+	SetUnitIntelTable = function(self, unit, reconType, val)
+		if unit and IsUnit(unit) then
+			if not unit:IsDead() then
+				local UnitId = unit:GetEntityId()
+				if not self.UnitIntelList[UnitId] and val then
+					self.UnitIntelList[UnitId] = {}
+					self.UnitIntelList[UnitId][reconType] = 1			
+				else
+					if not self.UnitIntelList[UnitId][reconType] then
+						if val then
+							self.UnitIntelList[UnitId][reconType] = 1
+						end
+					else
+						if val then
+							self.UnitIntelList[UnitId][reconType] = self.UnitIntelList[UnitId][reconType] + 1
+						else
+							if self.UnitIntelList[UnitId][reconType] == 1 then
+								self.UnitIntelList[UnitId][reconType] = nil
+							else
+								self.UnitIntelList[UnitId][reconType] = self.UnitIntelList[UnitId][reconType] - 1
+							end
+						end
+					end
+				end
+				
+			else
+				if self.UnitIntelList[UnitId] then
+					self.UnitIntelList[UnitId] = nil
+				end
+			end		
+		end
+	end,
 
     # Called when recon data changes for enemy units (e.g. A unit comes into line of sight)
     # Params
@@ -825,15 +884,27 @@ AIBrain = Class(moho.aibrain_methods) {
     #   type: 'LOSNow', 'Radar', 'Sonar', or 'Omni'
     #   val: true or false
     # calls callback function with blip it saw.
+
+
+
+	
     OnIntelChange = function(self, blip, reconType, val)
-        
+        #LOG('*AI DEBUG: ONINTELCHANGED: Blip = ', repr(blip), ' ReconType = ', repr(reconType), ' Value = ', repr(val))
+        #LOG('*AI DEBUG: IntelTriggerList = ', repr(self.IntelTriggerList))
+        #LOG('*AI DEBUG: BlipID = ', repr(blip:GetBlueprint().BlueprintId))    
 		if blip and reconType and val != nil then 
 			local BlipSource = blip:GetSource()
 			if BlipSource then
 				if IsUnit(BlipSource) then 
-					if not val and reconType == "Radar" then 
-						LOG("Unit going out of radar - Clearing attackers")
-							BlipSource:clearAttackers()
+					if val then
+						self:SetUnitIntelTable(BlipSource, reconType, true)
+					else
+						self:SetUnitIntelTable(BlipSource, reconType, false)
+					end
+					
+					if not self:IsUnitTargeatable(BlipSource) then
+						--LOG("Unit going out of radar - Clearing attackers")
+						BlipSource:stopAttackers()
 					end
 				end
 			end
