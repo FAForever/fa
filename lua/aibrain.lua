@@ -871,6 +871,7 @@ AIBrain = Class(moho.aibrain_methods) {
 				end
 				
 			else
+				local UnitId = unit:GetEntityId()
 				if self.UnitIntelList[UnitId] then
 					self.UnitIntelList[UnitId] = nil
 				end
