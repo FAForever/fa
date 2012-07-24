@@ -896,7 +896,7 @@ AIBrain = Class(moho.aibrain_methods) {
 		if blip and reconType and val != nil then 
 			local BlipSource = blip:GetSource()
 			if BlipSource then
-				if IsUnit(BlipSource) then 
+				if IsUnit(BlipSource) and EntityCategoryContains( categories.MOBILE, BlipSource ) then 
 					if val then
 						self:SetUnitIntelTable(BlipSource, reconType, true)
 					else
