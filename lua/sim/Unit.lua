@@ -1194,6 +1194,8 @@ Unit = Class(moho.unit_methods) {
 				self:AddXP(3)	
 			elseif EntityCategoryContains( categories.TECH3, unitKilled ) then
 				self:AddXP(6)	
+			elseif EntityCategoryContains( categories.COMMAND, unitKilled ) then	
+				self:AddXP(6)	
 			elseif EntityCategoryContains( categories.EXPERIMENTAL, unitKilled ) then	
 				self:AddXP(50)	
 			else
