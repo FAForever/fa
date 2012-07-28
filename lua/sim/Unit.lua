@@ -349,17 +349,80 @@ Unit = Class(moho.unit_methods) {
 		for k, ent in self.Attackers do
 			--LOG("this unit : " .. repr(ent))
 			if ent and not ent:IsDead() then
-				--LOG("must stop attacking current unit !")
-				if EntityCategoryContains( categories.BOMBER, ent ) then				
-					IssueClearCommands({ent})	
-					--WaitTicks(5)
-					IssueAttack({ent}, self:GetPosition()) 
+				
+				if EntityCategoryContains( categories.AIR, ent ) then	
+					
+					local vax, vay, vaz =  self:GetVelocity()
+					
+					if vax == 0 and vaz == 0 then
+						IssueClearCommands({ent})
+						IssueMove({ent}, self:GetPosition())
+					else
+					
+						-- getting attacker/target pos
+						local tempa = self:GetPosition()
+						local tempb = ent:GetPosition()
+						local pa = VDiff(tempa, tempb)
+
+						local tempa = self:GetPosition()
+						local tempb = ent:GetPosition()						
+
+						
+						local vb = ent:GetBlueprint().Air.MaxAirspeed / 10
+						
+						local a = (math.pow(vax,2) + math.pow(vaz,2) - math.pow(vb,2))
+						local b = ( 2 * pa.x * vax + 2 * pa.x * vax)
+						local c  = (math.pow(pa.x,2) +math.pow(pa.z, 2))
+						
+						discriminant =	math.pow(b,2) - (4 * a * c)
+						
+						if discriminant < 0 then
+							IssueClearCommands({ent})
+						
+						elseif discriminant == 0 then
+							t = (-b - sqrt(discriminant)) / (2*a)
+							tempa.x = tempa.x + (vax * t)
+							tempa.y = tempa.y
+							tempa.z = tempa.z + (vaz * t)
+
+							IssueClearCommands({ent})
+							IssueMove({ent}, tempa)							
+							
+						else
+							local t1 = (-b - math.sqrt(discriminant)) / (2*a)
+							local t2 = (-b + math.sqrt(discriminant)) / (2*a)
+							local t
+
+							if t1 < 0 then 
+								t = t2
+							elseif t2 < 0 then
+								t = t1
+							else
+								if t1 < t2 then
+									t = t1
+								else
+									t = t2
+								end
+							end
+
+							
+							tempa.x = tempa.x + (vax * t)
+							tempa.y = tempa.y
+							tempa.z = tempa.z + (vaz * t)
+
+							IssueClearCommands({ent})
+							IssueMove({ent}, tempa)
+							
+						end
+					end
+					
 				else
 					IssueClearCommands({ent})
 				end
+
 			end
 			-- and we remove it from the list of attackers
-			self:removeAttacker(ent)
+			--self:removeAttacker(ent)
 		end
 		
 		for k, ent in self.WeaponAttackers do
@@ -380,6 +443,21 @@ Unit = Class(moho.unit_methods) {
 		
 	end,
 
+	-- This function make units target again if the unit got an attacker.
+	resumeAttackers = function(self)
+		for k, attacker in self.Attackers do
+			if attacker and not attacker:IsDead() then
+				for j, target in attacker.Targets do
+					if target == self then
+						IssueAttack({attacker}, self)
+					end
+				
+				end
+			
+			end
+		end
+	
+	end,
 
 	-- Add a target to the weapon list for this unit
 	addTargetWeapon = function(self, target)
@@ -387,6 +465,8 @@ Unit = Class(moho.unit_methods) {
 			table.insert(self.WeaponTargets, target)
 		end
 	end,
+	
+	
 	
 	-- Add a target to the list for this unit
 	addTarget = function(self, target)

@@ -906,7 +906,11 @@ AIBrain = Class(moho.aibrain_methods) {
 					if not self:IsUnitTargeatable(BlipSource) then
 						--LOG("Unit going out of radar - Clearing attackers")
 						BlipSource:stopAttackers()
+					else
+						BlipSource:resumeAttackers()
+					
 					end
+					
 				end
 			end
 			

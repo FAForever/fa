@@ -113,6 +113,7 @@ Callbacks.PingGroupClick = import('/lua/SimPingGroup.lua').OnClickCallback
 
 
 -- issue:#43
+
 Callbacks.AddTarget = function(data, units)
 	
 	if type(data.target) == 'string' then

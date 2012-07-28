@@ -151,6 +151,7 @@ function OnCommandIssued(command)
 	end
 	
 	-- issue:#43
+	
 	if command.CommandType == 'Attack' then
 		if command.Clear then
 			local cb = { Func = 'ClearTargets', Args = { } }
@@ -160,9 +161,9 @@ function OnCommandIssued(command)
 		local cb = { Func = 'AddTarget', Args = { target = command.Target.EntityId, position = command.Target.Position } } 
 		SimCallback(cb, true)
 
-	else
-		local cc = { Func = 'ClearTargets', Args = { } }
-		SimCallback(cc, true)
+	--else
+	--	local cc = { Func = 'ClearTargets', Args = { } }
+	--	SimCallback(cc, true)
 	end
 	
 	-- end of issue:#43
