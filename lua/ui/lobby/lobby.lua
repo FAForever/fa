@@ -405,20 +405,15 @@ end
 -- join an already existing lobby
 function JoinGame(address, asObserver, playerName, uid)
     wantToBeObserver = asObserver
-	LOG("DEBUG : JoinGame " .. playerName .. " Uid "..uid .. " Address:port " .. address)
     lobbyComm:JoinGame(address, playerName, uid);
 end
 
 function ConnectToPeer(addressAndPort,name,uid)
-	LOG("DEBUG : Connecting to peer " .. name .. " Uid "..uid .. " Address:port " .. addressAndPort)
     lobbyComm:ConnectToPeer(addressAndPort,name,uid)
-	LOG("DEBUG : Connecting to peer command done")
 end
 
 function DisconnectFromPeer(uid)
-	LOG("DEBUG : Disconnect from peer " .. uid)
     lobbyComm:DisconnectFromPeer(uid)
-	LOG("DEBUG : Diuonnecting to peer command done")
 end
 
 function SetHasSupcom(supcomInstalled)
@@ -723,7 +718,6 @@ local function AssignRandomStartSpots(gameInfo)
 		for i = 1, numAvailStartSpots do
 			if gameInfo.PlayerOptions[i] then
 				if gameInfo.PlayerOptions[i].PL then
-					LOG("Rating  of player " .. i .. " : " .. gameInfo.PlayerOptions[i].PL)
 					rating = gameInfo.PlayerOptions[i].PL
 					ratingTable[rating] = i
 				else
@@ -786,9 +780,7 @@ local function AssignRandomStartSpots(gameInfo)
 				for k,n in ipairs(a) do
 					if ratingTable[n] == i then
 						goodteam = Trueskill.assignToTeam(k-1)
-						
-						LOG("player " .. i .. " is assigned to team " .. goodteam)
-						
+
 					end
 				end
 				
@@ -818,7 +810,7 @@ local function AssignRandomStartSpots(gameInfo)
 				if gameInfo.PlayerOptions[randSlot] then
 					temp = table.deepcopy(gameInfo.PlayerOptions[randSlot])
 				end
-				LOG ("slot " .. randSlot .. " for player " .. i)
+
 				gameInfo.PlayerOptions[randSlot] = table.deepcopy(gameInfo.PlayerOptions[i])
 				gameInfo.PlayerOptions[i] = temp
 			end
@@ -1037,7 +1029,6 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
             end
             if not moreThanOneTeam and lastTeam and lastTeam != player.Team then
                 moreThanOneTeam = true
-                LOG('team = ', player.Team, ' last = ',lastTeam)
             end
             if player.Team != 1 then
                 allFFA = false
@@ -1521,7 +1512,6 @@ local function UpdateGame()
 			local quality = Trueskill.computeQuality(teams)
 			if quality and quality > 0 then
 				gameInfo.GameOptions['Quality'] = quality
-				LOG("current game quality : " .. quality .. " %")
 				--local randmapText = UIUtil.CreateText(GUI.panel, "current game quality : " .. quality .. " %", 17, UIUtil.titleFont)
 				randmapText:SetText("current game quality : " .. quality .. " %")
 				--LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
@@ -3188,8 +3178,6 @@ function RefreshOptionDisplayData(scenarioInfo)
 end
 
 function CalcConnectionStatus(peer)
-	LOG("peer.status " .. peer.status)
-	LOG("peer.id " .. peer.id)
     if peer.status != 'Established' then
         return 'red'
     else
