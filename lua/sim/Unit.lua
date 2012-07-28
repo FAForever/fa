@@ -1187,19 +1187,24 @@ Unit = Class(moho.unit_methods) {
     OnKilledUnit = function(self, unitKilled)
 		-- new vet system
 		
-		if not ArmyIsCivilian(unitKilled:GetArmy()) then
-			if EntityCategoryContains( categories.TECH1, unitKilled )  then 
-				self:AddXP(1)	
-			elseif EntityCategoryContains( categories.TECH2, unitKilled ) then
-				self:AddXP(3)	
-			elseif EntityCategoryContains( categories.TECH3, unitKilled ) then
-				self:AddXP(6)	
-			elseif EntityCategoryContains( categories.COMMAND, unitKilled ) then	
-				self:AddXP(6)	
-			elseif EntityCategoryContains( categories.EXPERIMENTAL, unitKilled ) then	
-				self:AddXP(50)	
-			else
-				self:AddXP(1)
+		if not IsAlly(self:GetArmy(), unitKilled:GetArmy()) then
+			if unitKilled:GetFractionComplete() == 1 then
+				
+				if EntityCategoryContains( categories.STRUCTURE, unitKilled ) then
+					self:AddXP(1)
+				elseif EntityCategoryContains( categories.TECH1, unitKilled )  then 
+					self:AddXP(1)	
+				elseif EntityCategoryContains( categories.TECH2, unitKilled ) then
+					self:AddXP(3)	
+				elseif EntityCategoryContains( categories.TECH3, unitKilled ) then
+					self:AddXP(6)	
+				elseif EntityCategoryContains( categories.COMMAND, unitKilled ) then	
+					self:AddXP(6)	
+				elseif EntityCategoryContains( categories.EXPERIMENTAL, unitKilled ) then	
+					self:AddXP(50)	
+				else
+					self:AddXP(1)
+				end
 			end
 		end
     end,
