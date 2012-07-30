@@ -350,79 +350,52 @@ Unit = Class(moho.unit_methods) {
 			--LOG("this unit : " .. repr(ent))
 			if ent and not ent:IsDead() then
 				
+	
 				if EntityCategoryContains( categories.AIR, ent ) then	
-					
-					local vax, vay, vaz =  self:GetVelocity()
-					
-					if vax == 0 and vaz == 0 then
+					if self:IsIntelEnabled("Cloak") or self:IsIntelEnabled("CloakField") then 
 						IssueClearCommands({ent})
-						IssueMove({ent}, self:GetPosition())
+					elseif self:GetCurrentLayer() == "Water" and  self:IsIntelEnabled("SonarStealth") or self:IsIntelEnabled("SonarStealthField") then
+						IssueClearCommands({ent})					
+					elseif self:GetCurrentLayer() == "Land" and  self:IsIntelEnabled("RadarStealth") or self:IsIntelEnabled("RadarStealthField") then
+						IssueClearCommands({ent})
 					else
-					
-						-- getting attacker/target pos
-						local tempa = self:GetPosition()
-						local tempb = ent:GetPosition()
-						local pa = VDiff(tempa, tempb)
-
-						local tempa = self:GetPosition()
-						local tempb = ent:GetPosition()						
-
+						local aiBrain = self:GetAIBrain()
 						
-						local vb = ent:GetBlueprint().Air.MaxAirspeed / 10
-						
-						local a = (math.pow(vax,2) + math.pow(vaz,2) - math.pow(vb,2))
-						local b = ( 2 * pa.x * vax + 2 * pa.x * vax)
-						local c  = (math.pow(pa.x,2) +math.pow(pa.z, 2))
-						
-						discriminant =	math.pow(b,2) - (4 * a * c)
-						
-						if discriminant < 0 then
-							IssueClearCommands({ent})
-						
-						elseif discriminant == 0 then
-							t = (-b - sqrt(discriminant)) / (2*a)
-							tempa.x = tempa.x + (vax * t)
-							tempa.y = tempa.y
-							tempa.z = tempa.z + (vaz * t)
-
-							IssueClearCommands({ent})
-							IssueMove({ent}, tempa)							
-							
-						else
-							local t1 = (-b - math.sqrt(discriminant)) / (2*a)
-							local t2 = (-b + math.sqrt(discriminant)) / (2*a)
-							local t
-
-							if t1 < 0 then 
-								t = t2
-							elseif t2 < 0 then
-								t = t1
-							else
-								if t1 < t2 then
-									t = t1
-								else
-									t = t2
+						if self:GetCurrentLayer() == "Land" then
+							local units = aiBrain:GetUnitsAroundPoint( categories.OVERLAYCOUNTERINTEL, self:GetPosition(),  50)
+							local stop = false
+							for k,v in units do
+								if v:IsIntelEnabled("RadarStealthField") and  VDist3(self:GetPosition(), v:GetPosition()) < v:GetBlueprint().Intel.SonarStealthFieldRadius then
+									stop = true
 								end
 							end
-
 							
-							tempa.x = tempa.x + (vax * t)
-							tempa.y = tempa.y
-							tempa.z = tempa.z + (vaz * t)
+							if stop == true then
+								IssueClearCommands({ent})
+							end
 
-							IssueClearCommands({ent})
-							IssueMove({ent}, tempa)
+						elseif self:GetCurrentLayer() == "Water" then
+							local units = aiBrain:GetUnitsAroundPoint( categories.OVERLAYCOUNTERINTEL, self:GetPosition(),  100)
 							
-						end
+							local stop = false
+							for k,v in units do
+								if v:IsIntelEnabled("SonarStealthField") and  VDist3(self:GetPosition(), v:GetPosition()) < v:GetBlueprint().Intel.RadarStealthFieldRadius then
+									stop = true
+								end
+							end
+							if stop == true then
+								IssueClearCommands({ent})
+							end	
+						end	
 					end
-					
+
 				else
 					IssueClearCommands({ent})
 				end
 
 			end
 			-- and we remove it from the list of attackers
-			--self:removeAttacker(ent)
+			self:removeAttacker(ent)
 		end
 		
 		for k, ent in self.WeaponAttackers do

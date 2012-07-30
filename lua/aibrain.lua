@@ -824,7 +824,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
 	
 	IsUnitTargeatable = function(self, unit)
-		if unit and IsUnit(unit) then
+		if unit and not unit:IsDead() and IsUnit(unit) then
 		
 			local UnitId = unit:GetEntityId()
 			if not self.UnitIntelList[UnitId] then
@@ -846,37 +846,37 @@ AIBrain = Class(moho.aibrain_methods) {
 	end,
 	
 	SetUnitIntelTable = function(self, unit, reconType, val)
-		if unit and IsUnit(unit) then
-			if not unit:IsDead() then
-				local UnitId = unit:GetEntityId()
-				if not self.UnitIntelList[UnitId] and val then
-					self.UnitIntelList[UnitId] = {}
-					self.UnitIntelList[UnitId][reconType] = 1			
+		if unit and not unit:IsDead() and IsUnit(unit) then
+			
+			local UnitId = unit:GetEntityId()
+			if not self.UnitIntelList[UnitId] and val then
+				self.UnitIntelList[UnitId] = {}
+				self.UnitIntelList[UnitId][reconType] = 1			
+			else
+				if not self.UnitIntelList[UnitId][reconType] then
+					if val then
+						self.UnitIntelList[UnitId][reconType] = 1
+					end
 				else
-					if not self.UnitIntelList[UnitId][reconType] then
-						if val then
-							self.UnitIntelList[UnitId][reconType] = 1
-						end
+					if val then
+						self.UnitIntelList[UnitId][reconType] = self.UnitIntelList[UnitId][reconType] + 1
 					else
-						if val then
-							self.UnitIntelList[UnitId][reconType] = self.UnitIntelList[UnitId][reconType] + 1
+						if self.UnitIntelList[UnitId][reconType] == 1 then
+							self.UnitIntelList[UnitId][reconType] = nil
 						else
-							if self.UnitIntelList[UnitId][reconType] == 1 then
-								self.UnitIntelList[UnitId][reconType] = nil
-							else
-								self.UnitIntelList[UnitId][reconType] = self.UnitIntelList[UnitId][reconType] - 1
-							end
+							self.UnitIntelList[UnitId][reconType] = self.UnitIntelList[UnitId][reconType] - 1
 						end
 					end
 				end
-				
-			else
-				local UnitId = unit:GetEntityId()
-				if self.UnitIntelList[UnitId] then
-					self.UnitIntelList[UnitId] = nil
-				end
-			end		
-		end
+			end
+			
+		else
+			local UnitId = unit:GetEntityId()
+			if self.UnitIntelList[UnitId] then
+				self.UnitIntelList[UnitId] = nil
+			end
+		end		
+
 	end,
 
     # Called when recon data changes for enemy units (e.g. A unit comes into line of sight)
@@ -906,9 +906,6 @@ AIBrain = Class(moho.aibrain_methods) {
 					if not self:IsUnitTargeatable(BlipSource) then
 						--LOG("Unit going out of radar - Clearing attackers")
 						BlipSource:stopAttackers()
-					else
-						BlipSource:resumeAttackers()
-					
 					end
 					
 				end

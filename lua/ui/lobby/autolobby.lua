@@ -65,8 +65,10 @@ local function MakeLocalPlayerInfo(name)
     end
     
     result.Team = tonumber(GetCommandLineArg("/team", 1)[1])
-	result.PL = tonumber(GetCommandLineArg("/rating", 1)[1]) or ""	
+	result.DEV = tonumber(GetCommandLineArg("/deviation", 1)[1]) or ""	
+	result.MEAN = tonumber(GetCommandLineArg("/mean", 1)[1]) or ""	
 	result.NG = tonumber(GetCommandLineArg("/numgames", 1)[1]) or ""
+	result.PL = result.MEAN - 3 * result.DEV
     LOG('Local player info: ' .. repr(result))
     return result
 end

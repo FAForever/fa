@@ -131,7 +131,6 @@ Callbacks.AddTarget = function(data, units)
 end
 
 Callbacks.ClearTargets = function(data, units)
-	
 	for id, unit in units or {} do			
 		unit:clearTarget()
 	end
