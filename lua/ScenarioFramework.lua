@@ -2140,12 +2140,21 @@ function IAmABadUnit(self)
 end
 
 function GetTimeIAmAllowedToBeOffMap(self)
-	local value = 2
+	
+	local airspeed = self:GetBlueprint().Air.MaxAirspeed
+	local value = airspeed
+
+	if EntityCategoryContains( categories.BOMBER, self ) then
+		value = airspeed / 5
+	elseif EntityCategoryContains( categories.TRANSPORTATION, self ) then
+		value = 2	
+	end
+	
 	for i = 1, self:GetWeaponCount() do
 		local wep = self:GetWeapon(i)
 		if wep.Label != 'DeathWeapon' and wep.Label != 'DeathImpact' then
 			if wep:GetCurrentTarget()  then
-				value = 20
+				value = airspeed * 2
 			end
 			
 		end
