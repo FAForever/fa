@@ -346,10 +346,12 @@ Unit = Class(moho.unit_methods) {
 	
 	-- clear the attack orders if the units got out of sight.
 	stopAttackers = function(self)
+
+			
 		for k, ent in self.Attackers do
-			--LOG("this unit : " .. repr(ent))
+	
 			if ent and not ent:IsDead() then
-				
+				--LOG("this unit : " .. k)
 	
 				if EntityCategoryContains( categories.AIR, ent ) then	
 					if self:IsIntelEnabled("Cloak") or self:IsIntelEnabled("CloakField") then 
@@ -394,9 +396,11 @@ Unit = Class(moho.unit_methods) {
 				end
 
 			end
-			-- and we remove it from the list of attackers
-			self:removeAttacker(ent)
+			
+			
 		end
+		-- and we remove them from the list of attackers
+		self.Attackers = {}
 		
 		for k, ent in self.WeaponAttackers do
 			if ent and not ent:IsDead() then
