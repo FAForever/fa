@@ -356,7 +356,8 @@ Unit = Class(moho.unit_methods) {
 				if EntityCategoryContains( categories.AIR, ent ) then	
 					if self:IsIntelEnabled("Cloak") or self:IsIntelEnabled("CloakField") then 
 						IssueClearCommands({ent})
-					elseif self:GetCurrentLayer() == "Water" and  self:IsIntelEnabled("SonarStealth") or self:IsIntelEnabled("SonarStealthField") then
+					elseif self:GetCurrentLayer() == "Seabed" and  self:IsIntelEnabled("SonarStealth") or self:IsIntelEnabled("SonarStealthField") then
+
 						IssueClearCommands({ent})					
 					elseif self:GetCurrentLayer() == "Land" and  self:IsIntelEnabled("RadarStealth") or self:IsIntelEnabled("RadarStealthField") then
 						IssueClearCommands({ent})
@@ -376,7 +377,7 @@ Unit = Class(moho.unit_methods) {
 								IssueClearCommands({ent})
 							end
 
-						elseif self:GetCurrentLayer() == "Water" then
+						elseif self:GetCurrentLayer() == "Seabed" then
 							local units = aiBrain:GetUnitsAroundPoint( categories.OVERLAYCOUNTERINTEL, self:GetPosition(),  100)
 							
 							local stop = false
