@@ -351,7 +351,7 @@ Unit = Class(moho.unit_methods) {
 		for k, ent in self.Attackers do
 	
 			if ent and not ent:IsDead() then
-				--LOG("this unit : " .. k)
+
 	
 				if EntityCategoryContains( categories.AIR, ent ) then	
 					if self:IsIntelEnabled("Cloak") or self:IsIntelEnabled("CloakField") then 
