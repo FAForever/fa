@@ -185,7 +185,7 @@ UnitBlueprint {
         BuildCostEnergy = 3150,
         BuildCostMass = 490,
         BuildRate = 15,
-        BuildTime = 2100,
+        BuildTime = 1750,
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER CYBRAN',
         },
