@@ -2208,6 +2208,49 @@ float4 NormalMappedPS( NORMALMAPPED_VERTEX vertex,
 	return float4( color.rgb, alpha );
 }
 
+/// New UEF PS
+float4 NormalMappedPS_02( NORMALMAPPED_VERTEX vertex, 
+					   uniform bool maskAlbedo, 
+					   uniform bool glow, 
+					   uniform bool hiDefShadows,
+					   uniform bool alphaTestEnable, 
+					   uniform int alphaFunc, 
+					   uniform int alphaRef ) : COLOR0
+{
+    if ( 1 == mirrored ) clip(vertex.depth.x);
+		
+  float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
+  float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
+  float dotLightNormal = dot(sunDirection,normal);
+
+  float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
+  float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
+	float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+    
+  if ( maskAlbedo )
+  	albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
+  else
+        albedo.rgb = albedo.rgb * vertex.color.rgb;
+  float3 light = ComputeLight( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
+  light = light * (0.9 - (light * 0.125));
+	float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
+	float3 phongAdditive = NormalMappedPhongCoeff * pow( phongAmount, 15) * specular.g * light * 2.5;
+	float3 phongMultiplicative = phongAmount * environment * specular.r * light * 2.5;
+  
+	
+	float emissive = glowMultiplier * specular.b;
+  
+  float3 color = albedo.rgb * ( emissive.r + ((pow(light, 1.6) * 1.0) ) + phongMultiplicative) + (phongAdditive);
+  float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a )) + (phongMultiplicative + phongAdditive) * 0.13;
+	//float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a ));
+
+#ifdef DIRECT3D10
+	if( alphaTestEnable )
+		AlphaTestD3D10( alpha, alphaFunc, alphaRef );
+#endif
+	return float4( color.rgb, alpha );
+}
+
 /// MapImagerPS0
 ///
 ///
@@ -2596,6 +2639,44 @@ float4 AeonPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
 	return float4( color, alpha );
 }
 
+//NewAeonPS
+float4 AeonPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
+{
+    if ( 1 == mirrored ) clip(vertex.depth.x);
+
+    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
+    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
+    float dotLightNormal = dot(sunDirection,normal);
+
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
+    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
+	   float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+
+  	// Calculate lighting and shadows
+    float3 light = ComputeLight( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
+    light = (pow(light, 4) + (shadowFill * 1)) * 0.5 * pow((1 - specular.a), 8);
+    light.rgb = (light.r + light.g + light.b) / 3;
+    light = light * (0.8 - (light * 0.125));
+    
+    // Calculate Specular and Reflection
+    float3 reflection = reflect( sunDirection, normal);
+    float phongAmount = saturate( dot( reflection, -vertex.viewDirection));
+  	float3 phongAdditive = AeonPhongCoeff * pow( phongAmount, 20) *  specular.g * pow((1 - (specular.a * 0.5) ), 8) * 3;
+    float3 phongMultiplicative = phongAmount * specular.r * environment * light * pow((1 - (specular.a * 0.5) ), 8) * 0.4;
+    float phongMultiplicativeGlow = (phongMultiplicative.r + phongMultiplicative.g + phongMultiplicative.b)/3;
+    float phongAdditiveGlow = (phongAdditive.r + phongAdditive.g + phongAdditive.b)/3;
+    
+    // Does the rest of the stuff
+  	float emissive = glowMultiplier * specular.b;
+  	float3 color = albedo.rgb * (emissive + light) + phongAdditive + phongMultiplicative;
+    color += vertex.color.rgb * specular.a;
+    float teamColGlowCompensation = ((vertex.color.r + vertex.color.g + vertex.color.b) / 3);
+    float alpha = mirrored ? 0.5 : specular.b + glowMinimum + (pow(specular.a * 1.5, 2) * 0.1 * (1.4 - teamColGlowCompensation)) + ((phongMultiplicativeGlow + phongAdditiveGlow) * 0.05);
+    //alpha = 0;
+    //color = (pow(specular.a * 1.5, 1.5) * 0.4 * (1.0 - teamColGlowCompensation));
+  	return float4( color, alpha );
+}
+
 /// AeonCZARPS
 ///
 ///
@@ -2683,6 +2764,55 @@ float4 UnitFalloffPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : C
     
 	float alpha = mirrored ? 0.5 : specular.b + glowMinimum; 
 	return float4( color, alpha );
+}
+
+//New SeraPS
+float4 UnitFalloffPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
+{
+    if ( 1 == mirrored ) clip(vertex.depth.x);
+
+    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
+    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
+    float dotLightNormal = dot(sunDirection,normal);
+    
+    float4 diffuse = tex2D( albedoSampler, vertex.texcoord0.xy);
+    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
+	  float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal)) * specular.r;
+	
+  	// Calculate lookup into falloff ramp
+  	float NdotV = pow(1 - saturate(dot( normalize(vertex.viewDirection), normal )), 0.6);
+  	//float4 fallOff = tex2D( falloffSampler, float2(NdotV,vertex.material.x)); 
+	  
+    // Calculate lighting and shadows
+    float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
+    
+    float3 light = sunDiffuse * saturate( dotLightNormal ) * shadow + sunAmbient;
+    light = light * (0.8 - (light * 0.125)) * (1 - diffuse.a) * 0.125;
+    
+	  // Calculate specular highlights based on current sun direction
+    float reflection = reflect( sunDirection, normal);
+    float specularAmount = saturate( dot( reflection, -vertex.viewDirection));
+	  float3 phongAdditive = pow( specularAmount, 30) * specular.g * light * pow(diffuse.rgb * 5, 2) * 2.0;
+    float phongMultiplicativeAmount = (diffuse.r + diffuse.g + diffuse.b) / 3;
+    phongMultiplicativeAmount = pow(phongMultiplicativeAmount * 10, 0.3) * 2; 
+	  float3 phongMultiplicative = (light + 0.03) * specular.r * (1.0 - (phongMultiplicativeAmount * 0.25)) * environment * (1 - (diffuse.a * 0.5) ) * 15;
+  	float3 defaultphongMultiplicative = (phongMultiplicative.r + phongMultiplicative.b + phongMultiplicative.b) / 3;
+    defaultphongMultiplicative *= (float3(0.5, 0.7, 0.9) + phongMultiplicative) * 1;
+    float phongMultiplicativeGlow = (phongMultiplicative.r + phongMultiplicative.g + phongMultiplicative.b) / 3;
+    float phongAdditiveGlow = (phongAdditive.r + phongAdditive.g + phongAdditive.b) / 3;
+	
+    float3 teamColSpec = (NdotV * vertex.color.rgb) * 1;
+    float3 fallOff = lerp( teamColSpec, 0, 1 - diffuse.a );
+    
+  	// Determine our final output color
+  	float3 color = (fallOff.rgb * 2) + defaultphongMultiplicative + phongAdditive + specular.b;															
+    //color = teamColSpec;
+    float teamColGlow = (vertex.color.r + vertex.color.g + vertex.color.b) / 3;
+    teamColGlow = (pow(diffuse.a * 1.5, 2) * (1.0 - teamColGlow)) * 0.05;
+    //float alpha = mirrored ? 0.5 : specular.b + glowMinimum + (pow(specular.a * 1.5, 2) * 0.6 * (1.4 - teamColGlowCompensation)) + (phongMultiplicativeGlow + phongAdditiveGlow) * 0.2;  
+  	float alpha = mirrored ? 0.5 : specular.b + glowMinimum + teamColGlow +((phongMultiplicativeGlow + phongAdditiveGlow) * 0.07);
+    //alpha = 0; 
+  	return float4( color, alpha );
 }
 
 float4 LowFiUnitFalloffPS( NORMALMAPPED_VERTEX vertex) : COLOR0
@@ -3068,6 +3198,40 @@ float4 NormalMappedInsectPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShado
 	float alpha = mirrored ? 0.5 : specular.b + glowMinimum;
 
 	return float4( color, alpha);
+}
+
+//New CybranPS
+float4 NormalMappedInsectPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
+{
+    if ( 1 == mirrored ) clip(vertex.depth);
+
+    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
+    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
+    float dotLightNormal = dot(sunDirection,normal);
+
+    //Textures'n Stuff
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
+    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
+  	float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+  
+    albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
+    
+    //Lighting, Specularity and Reflection
+    float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
+    float3 light = ComputeLight( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
+    light = light * (0.9 - (light * 0.125));
+    float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
+  	float3 phongAdditive = pow( phongAmount, 3) * specular.g * light * 4;
+    float3 phongMultiplicative = (phongAmount * environment * specular.r * light * 3) * phongAdditive;       
+  	 
+  	float emissive = glowMultiplier * specular.b;
+  
+    //Finish it
+    float3 color = (albedo.rgb * 2) * ( emissive + ((pow(light, 1.6) * 1.0) ) + (phongAdditive * 0.4)) + phongMultiplicative;   
+  	//color = specular.r;
+    float alpha = mirrored ? 0.5 : specular.b + glowMinimum + (phongAdditive * 0.05) + (phongMultiplicative * 0.05);
+    //alpha = 0;
+  	return float4( color, alpha);
 }
 
 /// ShieldPS
@@ -4719,7 +4883,8 @@ technique Unit_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
         
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
+        //PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
+        PixelShader = compile ps_2_a NormalMappedPS_02(true,true,true, false,0,0 );
     }
 }
 
@@ -4739,7 +4904,8 @@ technique Unit_MedFidelity
 		RasterizerState( Rasterizer_Cull_CW )
         
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_0 NormalMappedPS(true,true,false, false,0,0 );
+        //PixelShader = compile ps_2_0 NormalMappedPS(true,true,false, false,0,0 );
+        PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
     }
 }
 
@@ -5093,7 +5259,8 @@ technique Insect_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
         
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NormalMappedInsectPS(true);
+        //PixelShader = compile ps_2_a NormalMappedInsectPS(true);
+        PixelShader = compile ps_2_a NormalMappedInsectPS_02(true);
     }
 }
 
@@ -5113,7 +5280,8 @@ technique Insect_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
         
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_0 NormalMappedInsectPS(false);
+        //PixelShader = compile ps_2_0 NormalMappedInsectPS(false);
+        PixelShader = compile ps_2_a NormalMappedInsectPS(true);
     }
 }
 
@@ -5159,7 +5327,8 @@ technique Aeon_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
         
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a AeonPS(true);
+        //PixelShader = compile ps_2_a AeonPS(true);
+        PixelShader = compile ps_2_a AeonPS_02(true);
     }
 }
 
@@ -5179,7 +5348,8 @@ technique Aeon_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
         
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_0 AeonPS(false);
+        //PixelShader = compile ps_2_0 AeonPS(false);
+        PixelShader = compile ps_2_a AeonPS(true);
     }
 }
 
@@ -5228,7 +5398,8 @@ technique Seraphim_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
         
         VertexShader = compile vs_1_1 UnitFalloffVS();
-        PixelShader = compile ps_2_a UnitFalloffPS(true);
+        //PixelShader = compile ps_2_a UnitFalloffPS(true);
+        PixelShader = compile ps_2_a UnitFalloffPS_02(true);
     }
 }
 
@@ -5251,7 +5422,8 @@ technique Seraphim_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
         
         VertexShader = compile vs_1_1 UnitFalloffVS();
-        PixelShader = compile ps_2_0 UnitFalloffPS(false);
+        //PixelShader = compile ps_2_0 UnitFalloffPS(false);
+        PixelShader = compile ps_2_a UnitFalloffPS(true);
     }
 }
 
