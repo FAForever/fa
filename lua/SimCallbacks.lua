@@ -118,11 +118,13 @@ Callbacks.AddTarget = function(data, units)
 	
 	if type(data.target) == 'string' then
 		local entity = GetEntityById(data.target)
-		entity = entity:GetSource()
-		if IsUnit(entity) then
-			for id, unit in units or {} do
-				entity:addAttacker(unit)
-				unit:addTarget(entity)
+		if entity then
+			entity = entity:GetSource()
+			if IsUnit(entity) then
+				for id, unit in units or {} do
+					entity:addAttacker(unit)
+					unit:addTarget(entity)
+				end
 			end
 		end
 	end
@@ -131,8 +133,10 @@ Callbacks.AddTarget = function(data, units)
 end
 
 Callbacks.ClearTargets = function(data, units)
-	for id, unit in units or {} do			
-		unit:clearTarget()
+	for id, unit in units or {} do	
+		if unit then 
+			unit:clearTarget()
+		end
 	end
 	
 end

@@ -282,6 +282,11 @@ Unit = Class(moho.unit_methods) {
     ##########################################################################################
 	-- issue:#43 : better stealth
 	
+	
+
+	
+	
+	
 	-- when we fire on something, we tell that unit that we attack it.
 	OnGotTarget = function(self, Weapon)
 		local Target = Weapon:GetCurrentTarget()
@@ -346,59 +351,50 @@ Unit = Class(moho.unit_methods) {
 	
 	-- clear the attack orders if the units got out of sight.
 	stopAttackers = function(self)
-
-			
+	
 		for k, ent in self.Attackers do
 	
 			if ent and not ent:IsDead() then
 
-	
-				if EntityCategoryContains( categories.AIR, ent ) then	
-					if self:IsIntelEnabled("Cloak") or self:IsIntelEnabled("CloakField") then 
-						IssueClearCommands({ent})
-					elseif self:GetCurrentLayer() == "Seabed" and  self:IsIntelEnabled("SonarStealth") or self:IsIntelEnabled("SonarStealthField") then
-
-						IssueClearCommands({ent})					
-					elseif self:GetCurrentLayer() == "Land" and  self:IsIntelEnabled("RadarStealth") or self:IsIntelEnabled("RadarStealthField") then
-						IssueClearCommands({ent})
-					else
-						local aiBrain = self:GetAIBrain()
-						
-						if self:GetCurrentLayer() == "Land" then
-							local units = aiBrain:GetUnitsAroundPoint( categories.OVERLAYCOUNTERINTEL, self:GetPosition(),  50)
-							local stop = false
-							for k,v in units do
-								if v:IsIntelEnabled("RadarStealthField") and  VDist3(self:GetPosition(), v:GetPosition()) < v:GetBlueprint().Intel.SonarStealthFieldRadius then
-									stop = true
-								end
-							end
-							
-							if stop == true then
-								IssueClearCommands({ent})
-							end
-
-						elseif self:GetCurrentLayer() == "Seabed" then
-							local units = aiBrain:GetUnitsAroundPoint( categories.OVERLAYCOUNTERINTEL, self:GetPosition(),  100)
-							
-							local stop = false
-							for k,v in units do
-								if v:IsIntelEnabled("SonarStealthField") and  VDist3(self:GetPosition(), v:GetPosition()) < v:GetBlueprint().Intel.RadarStealthFieldRadius then
-									stop = true
-								end
-							end
-							if stop == true then
-								IssueClearCommands({ent})
-							end	
-						end	
-					end
-
-				else
+				if self:IsIntelEnabled("Cloak") or self:IsIntelEnabled("CloakField") then 
 					IssueClearCommands({ent})
-				end
+				elseif self:GetCurrentLayer() == "Seabed" and  self:IsIntelEnabled("SonarStealth") or self:IsIntelEnabled("SonarStealthField") then
 
+					IssueClearCommands({ent})					
+				elseif self:GetCurrentLayer() == "Land" and  self:IsIntelEnabled("RadarStealth") or self:IsIntelEnabled("RadarStealthField") then
+					IssueClearCommands({ent})
+				else
+					local aiBrain = self:GetAIBrain()
+					
+					if self:GetCurrentLayer() == "Land" then
+						local units = aiBrain:GetUnitsAroundPoint( categories.OVERLAYCOUNTERINTEL, self:GetPosition(),  50)
+						local stop = false
+						for k,v in units do
+							if v:IsIntelEnabled("RadarStealthField") and  VDist3(self:GetPosition(), v:GetPosition()) < v:GetBlueprint().Intel.SonarStealthFieldRadius then
+								stop = true
+							end
+						end
+						
+						if stop == true then
+							IssueClearCommands({ent})
+						end
+
+					elseif self:GetCurrentLayer() == "Seabed" then
+						local units = aiBrain:GetUnitsAroundPoint( categories.OVERLAYCOUNTERINTEL, self:GetPosition(),  100)
+						
+						local stop = false
+						for k,v in units do
+							if v:IsIntelEnabled("SonarStealthField") and  VDist3(self:GetPosition(), v:GetPosition()) < v:GetBlueprint().Intel.RadarStealthFieldRadius then
+								stop = true
+							end
+						end
+						if stop == true then
+							IssueClearCommands({ent})
+						end	
+					end	
+				end
 			end
-			
-			
+		
 		end
 		-- and we remove them from the list of attackers
 		self.Attackers = {}
