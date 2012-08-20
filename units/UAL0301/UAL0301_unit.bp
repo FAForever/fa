@@ -262,11 +262,12 @@ UnitBlueprint {
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER AEON',
         },
-        NaturalProducer = true,
+        MaxBuildDistance = 10,
+	NaturalProducer = true,
         ProductionPerSecondEnergy = 200,
         ProductionPerSecondMass = 2,
-        SacrificeEnergyMult = 0.6,
-        SacrificeMassMult = 0.6,
+        SacrificeEnergyMult = 0.9,
+        SacrificeMassMult = 0.9,
         StorageEnergy = 5000,
         StorageMass = 275,
         TeleportEnergyMod = 3,
@@ -454,7 +455,7 @@ UnitBlueprint {
             BuildTime = 4800,
             Icon = 'ss',
             Name = '<LOC enhancements_0031>Reacton Refractor',
-            NewDamageRadiusMod = 4,
+            NewDamageRadiusMod = 3,
             Slot = 'RCH',
             UpgradeUnitAmbientBones = {
                 'UAL0301',
@@ -637,11 +638,11 @@ UnitBlueprint {
         TransportClass = 3,
     },
     Veteran = {
-		Level1 = 20,
-		Level2 = 50,
-		Level3 = 90,
-		Level4 = 140,
-		Level5 = 200,
+        Level1 = 20,
+        Level2 = 50,
+        Level3 = 90,
+        Level4 = 140,
+        Level5 = 200,
     },
     Weapon = {
         {

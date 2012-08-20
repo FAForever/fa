@@ -254,13 +254,14 @@ UnitBlueprint {
     },
     Economy = {
         BuildCostEnergy = 38000,
-        BuildCostMass = 3100,
+        BuildCostMass = 3200,
         BuildRate = 40,
         BuildTime = 21600,
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER UEF',
         },
         MaintenanceConsumptionPerSecondEnergy = 0,
+	MaxBuildDistance = 10,
         NaturalProducer = true,
         ProductionPerSecondEnergy = 150,
         ProductionPerSecondMass = 1,
@@ -300,9 +301,9 @@ UnitBlueprint {
             Slot = 'LCH',
         },
         HighExplosiveOrdnance = {
-            BuildCostEnergy = 60000,
-            BuildCostMass = 1500,
-            BuildTime = 3000,
+            BuildCostEnergy = 45000,
+            BuildCostMass = 1000,
+            BuildTime = 2400,
             Icon = 'heo',
             Name = '<LOC enhancements_0063>Heavy Plasma Refractor',
             NewDamageRadius = 2.5,
@@ -669,11 +670,11 @@ UnitBlueprint {
         TransportClass = 3,
     },
     Veteran = {
-		Level1 = 20,
-		Level2 = 50,
-		Level3 = 90,
-		Level4 = 140,
-		Level5 = 200,
+        Level1 = 20,
+        Level2 = 50,
+        Level3 = 90,
+        Level4 = 140,
+        Level5 = 200,
     },
     Weapon = {
         {

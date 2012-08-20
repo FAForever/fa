@@ -266,7 +266,8 @@ UnitBlueprint {
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER SERAPHIM',
         },
-        NaturalProducer = true,
+        MaxBuildDistance = 10,
+	NaturalProducer = true,
         ProductionPerSecondEnergy = 300,
         ProductionPerSecondMass = 3,
         StorageEnergy = 5000,
@@ -412,7 +413,7 @@ UnitBlueprint {
         Overcharge = {
             BuildCostEnergy = 270000,
             BuildCostMass = 3500,
-            BuildTime = 15000,
+            BuildTime = 12000,
             Icon = 'oc',
             Name = '<LOC enhancements_0139>Overcharge',
             Slot = 'RCH',
@@ -623,11 +624,11 @@ UnitBlueprint {
         TransportClass = 3,
     },
     Veteran = {
-		Level1 = 20,
-		Level2 = 50,
-		Level3 = 90,
-		Level4 = 140,
-		Level5 = 200,
+        Level1 = 20,
+        Level2 = 50,
+        Level3 = 90,
+        Level4 = 140,
+        Level5 = 200,
     },
     Weapon = {
         {
