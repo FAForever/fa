@@ -897,7 +897,7 @@ AIBrain = Class(moho.aibrain_methods) {
 			self.TimeIHaveBeenNotSeen = 0
 			
 			while not self:IsDead() and self.TimeIHaveBeenNotSeen < 3 do
-				LOG(self.TimeIHaveBeenNotSeen)
+				--LOG(self.TimeIHaveBeenNotSeen)
 				self.TimeIHaveBeenNotSeen = (self.TimeIHaveBeenNotSeen + 1)
 				WaitSeconds(1)
 			end		
@@ -911,7 +911,7 @@ AIBrain = Class(moho.aibrain_methods) {
 	
 		-- If we are seen, we kill the "I not seen" counter.
 		local function  KillNotSeenThread(self)
-			LOG("killthread.")
+			--LOG("killthread.")
 			KillThread(self.IAmNotSeenThread)
 			self.IAmNotSeenThread = nil
 			self.TimeIHaveBeenNotSeen = 0
