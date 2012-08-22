@@ -111,7 +111,7 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 35000,
+        Health = 50000,
         MaxHealth = 35000,
         RegenRate = 0,
         SubThreatLevel = 81,
@@ -251,7 +251,7 @@ UnitBlueprint {
     },
     Economy = {
         BuildCostEnergy = 350000,
-        BuildCostMass = 13000,
+        BuildCostMass = 28000,
         BuildRate = 240,
         BuildTime = 25200,
         BuildableCategory = {
@@ -389,7 +389,7 @@ UnitBlueprint {
             MuzzleChargeDelay = 2.5,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 30,
+            MuzzleVelocity = 40,
             MuzzleVelocityReduceDistance = 130,
             NotExclusive = true,
             ProjectileId = '/projectiles/ADFOblivionCannon04/ADFOblivionCannon04_proj.bp',
