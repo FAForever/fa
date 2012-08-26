@@ -221,7 +221,7 @@ UnitBlueprint {
         BuildCostEnergy = 3150,
         BuildCostMass = 490,
         BuildRate = 20,
-        BuildTime = 1750,
+        BuildTime = 2100,
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER SERAPHIM',
         },
