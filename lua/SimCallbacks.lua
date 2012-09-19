@@ -119,11 +119,13 @@ Callbacks.AddTarget = function(data, units)
 	if type(data.target) == 'string' then
 		local entity = GetEntityById(data.target)
 		if entity then
-			entity = entity:GetSource()
-			if IsUnit(entity) then
-				for id, unit in units or {} do
-					entity:addAttacker(unit)
-					unit:addTarget(entity)
+			blipentity = entity:GetSource()
+			if blipentity then
+				if IsUnit(blipentity) then
+					for id, unit in units or {} do
+						blipentity:addAttacker(unit)
+						unit:addTarget(blipentity)
+					end
 				end
 			end
 		end
