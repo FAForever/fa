@@ -268,7 +268,7 @@ UnitBlueprint {
                 Water = 'Land|Water|Seabed',
             },
             FiringRandomness = 0.2,
-            FiringTolerance = 2,
+            FiringTolerance = 100,
             HeadingArcCenter = 0,
             HeadingArcRange = 160,
             Label = 'FrontTurret',
