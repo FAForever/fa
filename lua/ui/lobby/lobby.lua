@@ -778,7 +778,7 @@ local function AssignRandomStartSpots(gameInfo)
 				local randSlot
 				local goodteam = nil
 				for k,n in ipairs(a) do
-					if ratingTable[n] == i then
+					if a[n] == i then
 						goodteam = Trueskill.assignToTeam(k-1)
 
 					end
