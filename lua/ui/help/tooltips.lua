@@ -1311,6 +1311,12 @@ Tooltips = {
         title = '<LOC lobui_0750>Rating',
         description = '<LOC lobui_0751>Global ladder rating.',
     },
+	###New - Start
+	map_ai_markers = {
+        title = '<LOC lobui_0585>AI Markers',
+        description = '<LOC lobui_0586>Select maps with AI Markers.',
+    },
+	###New - End
 	
     #**********************
     #** Profile Strings
