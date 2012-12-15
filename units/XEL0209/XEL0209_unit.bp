@@ -200,7 +200,7 @@ UnitBlueprint {
             'BUILTBYTIER2ENGINEER DEFENSE UEF',
             'BUILTBYTIER2ENGINEER INDIRECTFIRE UEF',
         },
-        MaintenanceConsumptionPerSecondEnergy = 15,
+        MaintenanceConsumptionPerSecondEnergy = 0, -- from 15 to counter build bug
         StorageEnergy = 200,
         StorageMass = 30,
         TeleportEnergyMod = 0.15,
@@ -242,7 +242,7 @@ UnitBlueprint {
                 helpText = 'toggle_jamming',
             },
         },
-        SelectionPriority = 3,
+        -- SelectionPriority = 3,
         TechLevel = 'RULEUTL_Advanced',
         ToggleCaps = {
             RULEUTC_JammingToggle = true,
@@ -253,10 +253,10 @@ UnitBlueprint {
     Intel = {
         JamRadius = {
             Max = 12,
-            Min = 12,
+            Min = 18,
         },
-        JammerBlips = 5,
-        RadarRadius = 30,
+        JammerBlips = 8,
+        RadarRadius = 45,
         VisionRadius = 20,
     },
     Interface = {
