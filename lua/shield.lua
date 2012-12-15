@@ -183,7 +183,11 @@ Shield = Class(moho.shield_methods,Entity) {
 
 					local overlapOffset =  (90 *(surfaceRadius + otherSurfaceRadius)) / 100
 					if self.Owner != v and VDist3(position, otherPosition) < (overlapOffset) then
-						Damage(self.Owner, position, v.MyShield, amount * 0.5, "shieldOverlap")
+						if v and v.MyShield  then
+							if not v:IsDead() then
+								Damage(self.Owner, position, v.MyShield, amount * 0.5, "shieldOverlap")
+							end
+						end
 						
 					end
 				end
