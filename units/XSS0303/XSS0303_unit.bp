@@ -157,7 +157,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 44000,
         BuildCostMass = 4400,
-        BuildRate = 150,
+        BuildRate = 180,
         BuildTime = 13200,
         BuildableCategory = {
             'BUILTBYTIER3FACTORY SERAPHIM MOBILE AIR ANTINAVY',
@@ -327,7 +327,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 25,
+            Damage = 60,
             DamageType = 'Normal',
             DisplayName = 'Losaare AA Autocannon',
             FireTargetLayerCapsTable = {
@@ -335,7 +335,7 @@ UnitBlueprint {
             },
             FiringTolerance = 2,
             Label = 'AntiAirRight',
-            MaxRadius = 75,
+            MaxRadius = 100,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 2,
             MuzzleVelocity = 90,
@@ -398,7 +398,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 25,
+            Damage = 60,
             DamageType = 'Normal',
             DisplayName = 'Losaare AA Autocannon',
             FireTargetLayerCapsTable = {
@@ -406,7 +406,7 @@ UnitBlueprint {
             },
             FiringTolerance = 2,
             Label = 'AntiAirLeft',
-            MaxRadius = 75,
+            MaxRadius = 100,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 2,
             MuzzleVelocity = 90,

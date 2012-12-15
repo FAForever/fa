@@ -152,7 +152,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 40000,
         BuildCostMass = 4000,
-        BuildRate = 150,
+        BuildRate = 180,
         BuildTime = 12000,
         BuildableCategory = {
             'BUILTBYTIER3FACTORY AEON MOBILE AIR ANTINAVY',
@@ -266,7 +266,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 120,
+            Damage = 300,
             DamageType = 'Normal',
             DisplayName = 'Zealot AA Missile',
             FireTargetLayerCapsTable = {
@@ -274,7 +274,7 @@ UnitBlueprint {
             },
             FiringTolerance = 50,
             Label = 'AntiAirMissiles01',
-            MaxRadius = 75,
+            MaxRadius = 100,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 30,
@@ -336,7 +336,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 120,
+            Damage = 300,
             DamageType = 'Normal',
             DisplayName = 'Zealot AA Missile',
             FireTargetLayerCapsTable = {
@@ -344,7 +344,7 @@ UnitBlueprint {
             },
             FiringTolerance = 50,
             Label = 'AntiAirMissiles01',
-            MaxRadius = 75,
+            MaxRadius = 100,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 30,
