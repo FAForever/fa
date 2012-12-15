@@ -144,6 +144,7 @@ Shield = Class(moho.shield_methods,Entity) {
     end,    
 
     OnDamage =  function(self,instigator,amount,vector,type)
+
         local absorbed = self:OnGetDamageAbsorption(instigator,amount,type) 
         
         if self.PassOverkillDamage then
@@ -153,6 +154,44 @@ Shield = Class(moho.shield_methods,Entity) {
             end             
         end
         
+		if type != "shieldOverlap" then
+			###### This code is to pass damage over overlapping shields.
+			###### The biggest shield in the game is the UEF shield boat. This code must be adapted if there is a bigger one
+			local position = self.Owner:GetPosition()
+			local shieldbp = self.Owner:GetBlueprint().Defense.Shield
+			local shieldRadius = (shieldbp.ShieldSize) / 2.0
+			local offsetY = GetSurfaceHeight(position[1],position[3]) + GetTerrainTypeOffset(position[1], position[3])
+			local shieldOffset = shieldRadius + shieldbp.ShieldVerticalOffset + offsetY
+			local aiBrain = self.Owner:GetAIBrain()
+			local otherShields = aiBrain:GetUnitsAroundPoint(( categories.SHIELD * categories.DEFENSE), position, 120, 'Ally' )
+			
+			## the shield can have an offset, making it visually and effectively smaller than it really is.
+			local surfaceRadius = math.sqrt((shieldRadius*(2*shieldOffset)) - (shieldOffset * shieldOffset))
+		
+			
+			for k,v in otherShields do
+				if self.Owner != v and v != instigator then
+					local otherPosition 	= v:GetPosition()
+					local otherShieldRadius = (v:GetBlueprint().Defense.Shield.ShieldSize) / 2.0
+					
+					local otherOffsetY = GetSurfaceHeight(otherPosition[1],otherPosition[3]) + GetTerrainTypeOffset(otherPosition[1], otherPosition[3])
+
+					
+					local otherShieldOffset = otherShieldRadius + shieldbp.ShieldVerticalOffset + otherOffsetY
+					local otherSurfaceRadius = math.sqrt((otherShieldRadius*(2*otherShieldOffset)) - (otherShieldOffset * otherShieldOffset))
+					### Checking if the other shield is overlapping us.
+
+					local overlapOffset =  (90 *(surfaceRadius + otherSurfaceRadius)) / 100
+					if self.Owner != v and VDist3(position, otherPosition) < (overlapOffset) then
+						Damage(self.Owner, position, v.MyShield, amount * 0.5, "shieldOverlap")
+						
+					end
+				end
+
+			end
+		end
+
+		
         self:AdjustHealth(instigator, -absorbed) 
         self:UpdateShieldRatio(-1)
 
