@@ -60,3 +60,34 @@ function GetAIList()
 	return aitypes
 end
 
+###New Items - Begin
+#-----------------------------------------------------
+#   Function: CheckMapHasMarkers
+#   Args:
+#       scenario	- scenario info
+#   Description:
+#       Checks a map for Land Path nodes.
+#   Returns:  
+#       true or false
+#-----------------------------------------------------
+function CheckMapHasMarkers(scenario)
+	if not DiskGetFileInfo(scenario.save) then
+		return false
+	end
+    local saveData = {}
+    doscript('/lua/dataInit.lua', saveData)
+    doscript(scenario.save, saveData)
+
+	if saveData and saveData.Scenario and saveData.Scenario.MasterChain and
+	saveData.Scenario.MasterChain['_MASTERCHAIN_'] and saveData.Scenario.MasterChain['_MASTERCHAIN_'].Markers then
+		for marker,data in saveData.Scenario.MasterChain['_MASTERCHAIN_'].Markers do
+			if string.find( string.lower(marker), 'landpn') then
+				return true
+			end
+		end
+	else
+		WARN('Map '..scenario.name..' has no marker chain')
+	end
+	return false
+end
+###New Items - End

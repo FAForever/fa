@@ -23,6 +23,9 @@ local Mods = import('/lua/mods.lua')
 local Combo = import('/lua/ui/controls/combo.lua').Combo
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local ModManager = import('/lua/ui/dialogs/modmanager.lua')
+###New local - Start
+local EnhancedLobby = import('/lua/EnhancedLobby.lua')
+###New local - End
 
 local scenarios = MapUtil.EnumerateSkirmishScenarios()
 local selectedScenario = false
@@ -43,6 +46,9 @@ local currentFilters = {
     ['map_select_supportedplayers_limiter'] = "equal", 
     ['map_select_size_limiter'] = "equal", 
 	['map_type'] = 0, 
+	###New - Start
+	['map_ai_markers'] = 0,
+	###New - End
 }
 
 local scenarioKeymap = {}
@@ -93,7 +99,19 @@ mapFilters = {
             {text = "<LOC lobui_0576>Official", key = 1},
             {text = "<LOC lobui_0577>Custom", key = 2},
         }
-    },	
+    },
+	###New mapFilters - Start
+	{
+        FilterName = "<LOC lobui_0585>AI Markers",
+        FilterKey = 'map_ai_markers',
+		NoDelimiter = true,
+        Options = {
+			{text = "<LOC MAPSEL_0025>All", key = 0},
+            {text = "<LOC lobui_0587>Yes", key = 1},
+            {text = "<LOC lobui_0588>No", key = 2},
+        }
+    },
+	###New mapFilters - End
 }
 
 -- Create a filter dropdown and title from the table above
@@ -162,7 +180,8 @@ local function ResetFilters()
         ['map_select_size'] = 0, 
         ['map_select_supportedplayers_limiter'] = "equal", 
         ['map_select_size_limiter'] = "equal", 
-		['map_type'] = 0, 
+		['map_type'] = 0,
+		['map_ai_markers'] = 0,
     }
     changedOptions = {}
     selectedScenario = nil
@@ -371,15 +390,15 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     UIUtil.MakeInputModal(panel)
 
     mapListTitle = UIUtil.CreateText(panel, "<LOC sel_map_0005>Maps", 18)
-    LayoutHelpers.AtLeftTopIn(mapListTitle, panel, 360, 177)
+    LayoutHelpers.AtLeftTopIn(mapListTitle, panel, 360, 207)###New - Change value, originals: 360, 177--Notes: Title movement down
 
     mapList = ItemList(panel, "mapselect:mapList")
     mapList:SetFont(UIUtil.bodyFont, 14)
     mapList:SetColors(UIUtil.fontColor, "00000000", "FF000000",  UIUtil.highlightColor, "ffbcfffe")
     mapList:ShowMouseoverItem(true)
     mapList.Width:Set(258)
-    mapList.Height:Set(438)
-    LayoutHelpers.AtLeftTopIn(mapList, panel, 360, 202)
+    mapList.Height:Set(409)###New - Change value, original: 438--Notes: Height of map selection scroll
+    LayoutHelpers.AtLeftTopIn(mapList, panel, 360, 232)###New - Change value, originals: 360, 202--Notes: Masp selection scroll move down
     mapList.Depth:Set(function() return panel.Depth() + 10 end) --TODO what is this getting under when it's in over state?
     mapList:AcquireKeyboardFocus(true)
     mapList.OnDestroy = function(control)
@@ -765,6 +784,13 @@ function SetDescription(scen)
         description:AddItem(LOCF("<LOC map_select_0005>NO START SPOTS DEFINED"))
         errors = true
     end
+	###New SetDescription - Start
+	if EnhancedLobby.CheckMapHasMarkers(scen) then
+		description:AddItem("AI Markers: Yes")
+	else
+		description:AddItem("AI Markers: No")
+	end
+	###New SetDescription - End
     description:AddItem("")
     if scen.description then
         local textBoxWidth = description.Width()
@@ -816,7 +842,17 @@ function PopulateMapList()
 			if officialMap and currentFilters.map_type == 2 then
 				continue
 			end
-		end		
+		end
+		###New scenario - Start
+		if currentFilters.map_ai_markers != 0 then
+			if not EnhancedLobby.CheckMapHasMarkers(sceninfo) and currentFilters.map_ai_markers == 1 then
+				continue
+			end
+			if EnhancedLobby.CheckMapHasMarkers(sceninfo) and currentFilters.map_ai_markers == 2 then
+				continue
+			end
+		end
+		###New scenario - End
         if validMapSize and validMapPlayers then
             table.insert(tempMaps, sceninfo)
             scenarioKeymap[count] = index
