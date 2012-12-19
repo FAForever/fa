@@ -946,15 +946,13 @@ Unit = Class(moho.unit_methods) {
     #
     UpdateConsumptionValues = function(self)
         local myBlueprint = self:GetBlueprint()
-		
-
+	
         local energy_rate = 0
         local mass_rate = 0
         local build_rate = 0
 		
 		        # added by brute51 - to make sure we use the proper consumption values. [132]
-        if self.ActiveConsumption then
-	
+        if self.ActiveConsumption then		
             local focus = self:GetFocusUnit()
             if focus and self.WorkItem and self.WorkProgress < 1 and (focus:IsUnitState('Enhancing') or focus:IsUnitState('Building')) then
                 self.WorkItem = focus.WorkItem    # set our workitem to the focus unit work item, is specific for enhancing
@@ -968,6 +966,15 @@ Unit = Class(moho.unit_methods) {
             local energy = 0
             if self.WorkItem then
                 time, energy, mass = Game.GetConstructEconomyModel(self, self.WorkItem)
+				local guards = self:GetGuards()
+				## We need to check all the unit assisting.
+                for k,v in guards do
+                    if not v:IsDead() then
+						v:UpdateConsumptionValues()
+                    end
+                end
+				
+				
             elseif focus and focus:IsUnitState('SiloBuildingAmmo') then
                 # If building silo ammo; create the energy and mass costs based on build rate of the silo
                 #     against the build rate of the assisting unit
@@ -981,6 +988,7 @@ Unit = Class(moho.unit_methods) {
 					# If the unit is assisting an enhancement, we must know how much it costs.
 					time, energy, mass = Game.GetConstructEconomyModel(self, focus.WorkItem)
 				else
+				
 					# bonuses are already factored in by GetBuildCosts
 					time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
 				end
