@@ -143,8 +143,15 @@ Shield = Class(moho.shield_methods,Entity) {
         return finalVal
     end,    
 
+	
+	MakeOverlapDamage = function(self,  position, shield, amount)
+		WaitSeconds(0.25)
+		Damage(self.Owner, position, shield, amount * 0.5, "shieldOverlap")
+	end,
+	
     OnDamage =  function(self,instigator,amount,vector,type)
-
+		
+	
         local absorbed = self:OnGetDamageAbsorption(instigator,amount,type) 
         
         if self.PassOverkillDamage then
@@ -153,8 +160,12 @@ Shield = Class(moho.shield_methods,Entity) {
                 self.Owner:DoTakeDamage(instigator, overkill, vector, type)
             end             
         end
-        
-		if type != "shieldOverlap" then
+		if type != "shieldOverlap" then		
+			if self.MakeOverlapDamageThread then
+				KillThread(self.MakeOverlapDamageThread)
+				self.MakeOverlapDamageThread = nil
+			end
+			
 			###### This code is to pass damage over overlapping shields.
 			###### The biggest shield in the game is the UEF shield boat. This code must be adapted if there is a bigger one
 			local position 		= self.Owner:GetPosition()
@@ -190,7 +201,8 @@ Shield = Class(moho.shield_methods,Entity) {
 					if self.Owner != v and VDist3(position, otherPosition) < (overlapOffset) then
 						if v and v.MyShield  then
 							if not v:IsDead() then
-								Damage(self.Owner, position, v.MyShield, amount * 0.5, "shieldOverlap")
+								self.MakeOverlapDamageThread = ForkThread(self.MakeOverlapDamage, self, position, v.MyShield, amount * 0.5, "shieldOverlap")
+
 							end
 						end
 						
