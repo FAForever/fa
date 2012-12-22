@@ -150,8 +150,7 @@ Shield = Class(moho.shield_methods,Entity) {
 	end,
 	
     OnDamage =  function(self,instigator,amount,vector,type)
-		
-	
+
         local absorbed = self:OnGetDamageAbsorption(instigator,amount,type) 
         
         if self.PassOverkillDamage then
@@ -160,6 +159,7 @@ Shield = Class(moho.shield_methods,Entity) {
                 self.Owner:DoTakeDamage(instigator, overkill, vector, type)
             end             
         end
+
 		if type != "shieldOverlap" then		
 			if self.MakeOverlapDamageThread then
 				KillThread(self.MakeOverlapDamageThread)
@@ -172,9 +172,13 @@ Shield = Class(moho.shield_methods,Entity) {
 			local shieldbp 		= self.Owner:GetBlueprint().Defense.Shield
 			local shieldRadius 	= (shieldbp.ShieldSize) / 2.0
 			local offsetY 		= GetSurfaceHeight(position[1],position[3]) + GetTerrainTypeOffset(position[1], position[3])
-			local shieldOffset 	= shieldRadius + offsetY
-			if shieldbp.ShieldVerticalOffset then
-				shieldOffset = shieldOffset + shieldbp.ShieldVerticalOffset
+			local shieldOffset 	= shieldRadius
+			if (shieldRadius > offsetY) then
+				shieldOffset 	= shieldOffset + offsetY			
+				if shieldbp.ShieldVerticalOffset then
+					shieldOffset = shieldOffset + shieldbp.ShieldVerticalOffset
+				end
+			
 			end
 			local aiBrain 		= self.Owner:GetAIBrain()
 			local otherShields 	= aiBrain:GetUnitsAroundPoint(( categories.SHIELD * categories.DEFENSE), position, 120, 'Ally' )
@@ -187,17 +191,23 @@ Shield = Class(moho.shield_methods,Entity) {
 				if self.Owner != v and v != instigator then
 					local otherPosition 	= v:GetPosition()
 					local othershieldbp 	= v:GetBlueprint().Defense.Shield
-					local otherShieldRadius = (othershieldbp.ShieldSize) / 2.0
-					local otherOffsetY 		= GetSurfaceHeight(otherPosition[1],otherPosition[3]) + GetTerrainTypeOffset(otherPosition[1], otherPosition[3])
-					local otherShieldOffset 	= otherShieldRadius + otherOffsetY
 
-					if othershieldbp.ShieldVerticalOffset then
-						otherShieldOffset = otherShieldOffset + othershieldbp.ShieldVerticalOffset
+					
+					local otherShieldRadius = (othershieldbp.ShieldSize) / 2.0
+					
+					local otherOffsetY 		= GetSurfaceHeight(otherPosition[1],otherPosition[3]) + GetTerrainTypeOffset(otherPosition[1], otherPosition[3])
+					local otherShieldOffset 	= otherShieldRadius
+					if (otherShieldRadius > otherOffsetY) then			
+						otherShieldOffset 	= otherShieldOffset + otherOffsetY					
+						if othershieldbp.ShieldVerticalOffset then
+							otherShieldOffset = otherShieldOffset + othershieldbp.ShieldVerticalOffset
+						end
 					end
-	
+
 					local otherSurfaceRadius 	= math.sqrt((otherShieldRadius*(2*otherShieldOffset)) - (otherShieldOffset * otherShieldOffset))
+
 					### Checking if the other shield is overlapping us.
-					local overlapOffset =  (90 *(surfaceRadius + otherSurfaceRadius)) / 100
+					local overlapOffset =  (98*(surfaceRadius + otherSurfaceRadius)) / 100
 					if self.Owner != v and VDist3(position, otherPosition) < (overlapOffset) then
 						if v and v.MyShield  then
 							if not v:IsDead() then
