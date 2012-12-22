@@ -548,7 +548,7 @@ XSL0001 = Class( SWalkingLandUnit ) {
             wep:AddDamageMod(bp.AdditionalDamage)
         elseif enh == 'BlastAttackRemove' then
             local wep = self:GetWeaponByLabel('ChronotronCannon')
-            wep:AddDamageRadiusMod(bp.NewDamageRadius or 5)
+            wep:AddDamageRadiusMod(-self:GetBlueprint().Enhancements['BlastAttack'].NewDamageRadius) # unlimited AOE bug fix by brute51 [117]
             wep:AddDamageMod(-self:GetBlueprint().Enhancements['BlastAttack'].AdditionalDamage)
         #Heat Sink Augmentation
         elseif enh == 'RateOfFire' then
