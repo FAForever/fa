@@ -242,7 +242,7 @@ UnitBlueprint {
                 helpText = 'toggle_jamming',
             },
         },
-        -- SelectionPriority = 3,
+        SelectionPriority = 3,
         TechLevel = 'RULEUTL_Advanced',
         ToggleCaps = {
             RULEUTC_JammingToggle = true,
@@ -252,7 +252,7 @@ UnitBlueprint {
     },
     Intel = {
         JamRadius = {
-            Max = 12,
+            Max = 18,
             Min = 18,
         },
         JammerBlips = 8,
