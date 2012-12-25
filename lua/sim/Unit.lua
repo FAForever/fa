@@ -966,13 +966,24 @@ Unit = Class(moho.unit_methods) {
             local energy = 0
             if self.WorkItem then
                 time, energy, mass = Game.GetConstructEconomyModel(self, self.WorkItem)
-				local guards = self:GetGuards()
-				## We need to check all the unit assisting.
-                for k,v in guards do
-                    if not v:IsDead() then
-						v:UpdateConsumptionValues()
-                    end
-                end
+				if self:IsUnitState('Enhancing') or self:IsUnitState('Upgrading') then
+					local guards = self:GetGuards()
+					## We need to check all the unit assisting.
+					for k,v in guards do
+						if not v:IsDead() then
+							v:UpdateConsumptionValues()
+						end
+					end
+					
+					## and if there is any unit repairing ...
+					local workers = self:GetAIBrain():GetUnitsAroundPoint(( categories.REPAIR), self:GetPosition(), 50, 'Ally' )
+					for k,v in workers do
+						if not v:IsDead() and v:IsUnitState('Repairing')  then
+							v:UpdateConsumptionValues()
+						end
+					end				
+				end
+
 				
 				
             elseif focus and focus:IsUnitState('SiloBuildingAmmo') then
@@ -984,11 +995,10 @@ Unit = Class(moho.unit_methods) {
                 energy = (energy / siloBuildRate) * (self:GetBuildRate() or 1)
                 mass = (mass / siloBuildRate) * (self:GetBuildRate() or 1)
             elseif focus then
-				if focus:IsUnitState('Enhancing') then
+				if focus:IsUnitState('Enhancing') or focus:IsUnitState('Upgrading') then
 					# If the unit is assisting an enhancement, we must know how much it costs.
-					time, energy, mass = Game.GetConstructEconomyModel(self, focus.WorkItem)
+					time, energy, mass = Game.GetConstructEconomyModel(self, focus.WorkItem)	
 				else
-				
 					# bonuses are already factored in by GetBuildCosts
 					time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
 				end
@@ -1005,7 +1015,7 @@ Unit = Class(moho.unit_methods) {
             energy_rate = energy / time
             mass_rate = mass / time
         end
-
+		
         if self.MaintenanceConsumption then
             local mai_energy = (self.EnergyMaintenanceConsumptionOverride or myBlueprint.Economy.MaintenanceConsumptionPerSecondEnergy)  or 0
             local mai_mass = myBlueprint.Economy.MaintenanceConsumptionPerSecondMass or 0
@@ -1017,7 +1027,7 @@ Unit = Class(moho.unit_methods) {
             energy_rate = energy_rate + mai_energy
             mass_rate = mass_rate + mai_mass
         end
-
+	
         # apply minimum rates
         energy_rate = math.max(energy_rate, myBlueprint.Economy.MinConsumptionPerSecondEnergy or 0)
         mass_rate = math.max(mass_rate, myBlueprint.Economy.MinConsumptionPerSecondMass or 0)
