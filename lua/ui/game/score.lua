@@ -104,6 +104,21 @@ function CreateScoreUI(parent)
         self.Right:Set(newRight)
     end
     controls.collapseArrow:SetCheck(true, true)
+	
+	if not SessionIsReplay() then 
+		if controls.time then 
+			controls.time:Destroy()
+			-- Change the font size of the time, from 14 to 12.
+			controls.time = UIUtil.CreateText(controls.bgTop, '0', 12, UIUtil.bodyFont)
+		end	
+
+		if controls.units then 
+			controls.units:Destroy()
+		   -- Change the font size of the unit count, from 14 to 12.
+		   controls.units = UIUtil.CreateText(controls.bgTop, '0', 12, UIUtil.bodyFont)		
+		end	
+	end
+	
 end
 function SetLayout()
     if controls.bg then
@@ -357,6 +372,15 @@ end
 	
 		end)
 		import(UIUtil.GetLayoutFilename('score')).LayoutArmyLines()
+		
+	if not SessionIsReplay() then 
+		if sessionInfo.Options.GameSpeed and sessionInfo.Options.GameSpeed == 'adjustable' then
+			controls.time:SetText(string.format("%s (%+d / %+d)", GetGameTime(), gameSpeed, GetSimRate() ))        
+		else
+			controls.time:SetText(string.format("%s (%+d / %+d)", GetGameTime(), gameSpeed, GetSimRate() )) 
+		end
+	end
+		
 	end	
 function SetUnitText(current, cap)
     controls.units:SetText(string.format("%d/%d", current, cap))
