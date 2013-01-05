@@ -113,7 +113,7 @@ end
 function SetupPlayerLines()
     local function CreateArmyLine(data, armyIndex)
         local group = Group(controls.bgStretch)
-        
+
         group.faction = Bitmap(group)
         if armyIndex != 0 then
             group.faction:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(data.faction)))
@@ -259,6 +259,16 @@ function SetupPlayerLines()
 		
 		return group
 	end
+
+	for _, line in controls.armyLines do		
+		local playerName = line.name:GetText()
+		local playerRating = sessionInfo.Options.Ratings[playerName]
+		if (playerRating) then			
+			playerNameLine = playerName..' ['..math.floor(playerRating+0.5)..']'
+			line.name:SetText(playerNameLine)
+		end
+	end
+	
 	mapData = {}	
 	mapData.mapname = LOCF("<LOC gamesel_0002>Map: %s", sessionInfo.name)
 	controls.armyLines[index] = CreateMapNameLine(mapData, 0)
