@@ -1,4 +1,6 @@
 UnitBlueprint {
+	BlueprintId='dal0310',
+	
     Audio = {
         AmbientMove = Sound {
             Bank = 'UAL',
@@ -271,8 +273,7 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.5,
-            SlavedToBody = true,
-            SlavedToBodyArcRange = 5,
+			SlavedToBody = false,
             TargetCheckInterval = 0.75,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
@@ -283,7 +284,7 @@ UnitBlueprint {
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,
-            TurretBoneMuzzle = 'Turret_Barrel',
+            TurretBoneMuzzle = 'Turret_Barrel_Muzzle',
             TurretBonePitch = 'Turret_Barrel',
             TurretBoneYaw = 'Turret',
             TurretDualManipulators = false,
@@ -291,7 +292,7 @@ UnitBlueprint {
             TurretPitchRange = 20,
             TurretPitchSpeed = 60,
             TurretYaw = 0,
-            TurretYawRange = 10,
+            TurretYawRange = 180,
             TurretYawSpeed = 60,
             Turreted = true,
             WeaponCategory = 'Direct Fire',
