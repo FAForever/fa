@@ -130,6 +130,16 @@ UnitBlueprint {
         },
         FactionName = 'Cybran',
         Icon = 'land',
+        InstantDeathOnSelfDestruct = true,   # custom variable
+        OrderOverrides = {
+            RULEUTC_ProductionToggle = {
+                bitmapId = 'overcharge', # more options in textures.scd\textures\ui\common\game\orders
+                helpText = 'detonate', # detonate
+            },
+        },
+        ToggleCaps = {
+            RULEUTC_ProductionToggle = true,
+        },
         TechLevel = 'RULEUTL_Basic',
         UnitName = '<LOC xrl0302_name>Fire Beetle',
         UnitWeight = 1,
@@ -183,19 +193,20 @@ UnitBlueprint {
         {
             AboveWaterTargetsOnly = true,
             CollideFriendly = false,
-            Damage = 4500,
+            Damage = 3000,
             DamageFriendly = true,
-            DamageRadius = 3.5,
-            DamageType = 'FireBeetle',
+            DamageRadius = 4.5,
+            DamageType = 'FireBeetleExplosion',
             DisplayName = 'Suicide',
+            FireOnSelfDestruct = true,   # custom variable
             FireTargetLayerCapsTable = {
                 Air = 'Land|Water|Seabed',
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 4,
+            FiringTolerance = 180,
             Label = 'Suicide',
-            MaxRadius = 4.5,
+            MaxRadius = 4.4,
             TargetCheckInterval = 999999,
             TargetPriorities = {
                 'SPECIALHIGHPRI',

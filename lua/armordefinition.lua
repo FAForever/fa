@@ -62,6 +62,6 @@ armordefinition = {
         
         # Armor Definition
         'Normal 1.0',        
-		'FireBeetle 0.1',        
+		'FireBeetleExplosion 0.0',        
     },
 }
