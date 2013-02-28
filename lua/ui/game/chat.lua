@@ -1,12 +1,3 @@
---*****************************************************************************
---* File: lua/modules/ui/game/chat.lua
---* Author: Chris Blackwell
---* Summary: In game chat ui
---*
---* Copyright © :005 Gas Powered Games, Inc.  All rights reserved.
---*****************************************************************************
-
-#for sorian ai
 local UiUtilsS = import('/lua/UiUtilsSorian.lua')
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
@@ -55,13 +46,13 @@ GUI = {
     config = false,
 }
 
-local FactionsIcon = {
-	"/widgets/faction-icons-alpha_bmp/uef_ico.dds",
-	"/widgets/faction-icons-alpha_bmp/aeon_ico.dds",
-	"/widgets/faction-icons-alpha_bmp/cybran_ico.dds",
-	"/widgets/faction-icons-alpha_bmp/seraphim_ico.dds",
-	"/widgets/faction-icons-alpha_bmp/observer_ico.dds",		
-}
+local FactionsIcon = {}
+local Factions = import('/lua/factions.lua').Factions
+for k, FactionData in Factions do
+    table.insert( FactionsIcon, FactionData.Icon )
+end
+table.insert( FactionsIcon, '/widgets/faction-icons-alpha_bmp/observer_ico.dds' )
+
 	
 local chatColors = {'ffffffff', 'ffff4242', 'ffefff42','ff4fff42', 'ff42fff8', 'ff424fff', 'ffff42eb'}
 
@@ -842,7 +833,7 @@ end
 			tokey = "link_color"			
 		end
 		if msg.Observer and armyData.faction then
-			armyData.faction = 4
+			armyData.faction = table.getn(FactionsIcon) - 1
 		end
 		if type(msg.to) == 'number' and SessionIsReplay() then
 			towho = string.format("%s %s:", LOC(ToStrings.to.text), GetArmyData(msg.to).nickname)
@@ -865,7 +856,7 @@ end
 			tokey = tokey,
 			color = (armyData.color or "ffffffff"),
 			armyID = (armyData.ArmyID or 1),
-			faction = (armyData.faction or 4)+1,
+			faction = (armyData.faction or (table.getn(FactionsIcon)-1))+1,
 			text = msg.text,
 			wrappedtext = tempText,
 			new = true}
