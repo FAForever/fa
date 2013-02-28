@@ -13,7 +13,10 @@ GameColors = {
 	"FF66FFCC",
 	"FFFF88FF",
 	"FFFFFFCC",
-    },
+	"FFe80a0a", ##Original FA Red
+	"FF131cd3", ##Original FA Blue
+	"FF202020", ##Original FA Black     
+	},
 
     ArmyColors = {
 	"ffff3431",
@@ -29,7 +32,10 @@ GameColors = {
 	"FF66FFCC",
 	"FFFF88FF",
 	"FFFFFFCC",
-    },
+	"FFe80a0a", ##Original FA Red
+	"FF131cd3", ##Original FA Blue
+	"FF202020", ##Original FA Black
+	},
 
     CivilianArmyColor = "BurlyWood",
 
