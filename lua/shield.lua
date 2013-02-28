@@ -211,7 +211,11 @@ Shield = Class(moho.shield_methods,Entity) {
 					if self.Owner != v and VDist3(position, otherPosition) < (overlapOffset) then
 						if v and v.MyShield  then
 							if not v:IsDead() then
-								self.MakeOverlapDamageThread = ForkThread(self.MakeOverlapDamage, self, position, v.MyShield, amount * 0.5, "shieldOverlap")
+								damage = 0.5
+								if EntityCategoryContains(categories.STRUCTURE, v) then
+									damage = 0.15
+								end
+								self.MakeOverlapDamageThread = ForkThread(self.MakeOverlapDamage, self, position, v.MyShield, amount * damage , "shieldOverlap")
 
 							end
 						end
