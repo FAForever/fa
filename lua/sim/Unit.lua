@@ -4545,6 +4545,12 @@ Unit = Class(moho.unit_methods) {
     end,
 	
 	OnDetachedToTransport = function(self, transport)
+		if not transport.slotsFree then
+			transport.slotsFree = {}
+		end
+		if not self.attachmentBone then
+			self.attachmentBone = -100
+		end
         self:DoUnitCallbacks( 'OnDetachedToTransport', transport )
 		transport.slotsFree[self.attachmentBone] = true 
 		self.attachmentBone = nil
