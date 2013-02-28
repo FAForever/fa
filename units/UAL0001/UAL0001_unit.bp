@@ -319,9 +319,9 @@
             Slot = 'LCH',
         },
         ChronoDampener = {
-            BuildCostEnergy = 125000,
-            BuildCostMass = 2500,
-            BuildTime = 1250,
+            BuildCostEnergy = 52500,
+            BuildCostMass = 1750,
+            BuildTime = 875,
             Icon = 'cd',
             Name = '<LOC enhancements_0002>Chrono Dampener',
             ShowBones = {
