@@ -257,7 +257,7 @@ UnitBlueprint {
                 Water = 'Land|Water|Seabed',
             },
             FiringRandomness = 0.25,
-            FiringTolerance = 75,
+            FiringTolerance = 2,
             Label = 'FrontTurret',
             MaxRadius = 80,
             MuzzleChargeDelay = 2.5,
