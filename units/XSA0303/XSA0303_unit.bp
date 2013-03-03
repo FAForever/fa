@@ -110,8 +110,8 @@ UnitBlueprint {
         AirThreatLevel = 9,
         ArmorType = 'Light',
         EconomyThreatLevel = 0,
-        Health = 1275,
-        MaxHealth = 1275,
+        Health = 2550,
+        MaxHealth = 2550,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -185,8 +185,8 @@ UnitBlueprint {
         UniformScale = 0.17,
     },
     Economy = {
-        BuildCostEnergy = 20000,
-        BuildCostMass = 200,
+        BuildCostEnergy = 40000,
+        BuildCostMass = 400,
         BuildTime = 3000,
     },
     Footprint = {
@@ -279,7 +279,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 67,
+            Damage = 135,
             DamageFriendly = false,
             DamageType = 'Normal',
             DisplayName = 'Losaare AA Autocannon',
@@ -345,7 +345,7 @@ UnitBlueprint {
             WeaponCategory = 'Anti Air',
         },
         {
-            Damage = 100,
+            Damage = 200,
             DamageFriendly = true,
             DamageRadius = 1,
             DamageType = 'Normal',
@@ -360,7 +360,7 @@ UnitBlueprint {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
         EnergyMult = 0,
         HealthMult = 0.9,
-        MassMult = .45,
+        MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
             Air = false,
