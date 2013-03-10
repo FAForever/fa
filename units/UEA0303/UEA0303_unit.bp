@@ -10,7 +10,7 @@ UnitBlueprint {
         BreakOffDistance = 15,
         BreakOffTrigger = 20,
         CanFly = true,
-        CombatTurnSpeed = 1.9,
+        CombatTurnSpeed = 1.4, #from 1.9
         EngageDistance = 50,
         KLift = 3,
         KLiftDamping = 2.5,
@@ -21,11 +21,11 @@ UnitBlueprint {
         KTurn = 1.5,
         KTurnDamping = 2.3,
         LiftFactor = 7,
-        MaxAirspeed = 25,
+        MaxAirspeed = 30, #from 25
         MinAirspeed = 8,
         StartTurnDistance = 5,
         TightTurnMultiplier = 1.03,
-        TurnSpeed = 1.9,
+        TurnSpeed = 1.4, #from 1.9
         Winged = true,
     },
     Audio = {
@@ -109,8 +109,8 @@ UnitBlueprint {
         AirThreatLevel = 9,
         ArmorType = 'Light',
         EconomyThreatLevel = 0,
-        Health = 1850,
-        MaxHealth = 1850,
+        Health = 2600,
+        MaxHealth = 2600,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -189,7 +189,7 @@ UnitBlueprint {
     },
     Economy = {
         BuildCostEnergy = 40000,
-        BuildCostMass = 400,
+        BuildCostMass = 1000, #from 400
         BuildTime = 3000,
     },
     Footprint = {
@@ -222,7 +222,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        VisionRadius = 32,
+        VisionRadius = 20, #from 32
     },
     Interface = {
         HelpText = '<LOC uea0303_help>Air-Superiority Fighter',
@@ -241,7 +241,7 @@ UnitBlueprint {
         },
         Elevation = 20,
         FuelRechargeRate = 15,
-        FuelUseTime = 1000,
+        FuelUseTime = 400, #from 1000
         GroundCollisionOffset = 2,
         MaxSpeed = 0.5,
         MeshExtentsX = 2,
@@ -282,7 +282,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 200,
+            Damage = 600, #from 200
             DamageFriendly = false,
             DamageRadius = 0,
             DamageType = 'Normal',
@@ -315,7 +315,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
-            RateOfFire = 1,
+            RateOfFire = 0.5, #from 1
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
             TargetCheckInterval = 0.3,
@@ -355,7 +355,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 200,
+            Damage = 600, #from 200
             DamageFriendly = false,
             DamageRadius = 0,
             DamageType = 'Normal',
@@ -389,7 +389,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
-            RateOfFire = 1,
+            RateOfFire = 0.5, #from 1
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
             TargetCheckInterval = 0.3,
@@ -433,7 +433,7 @@ UnitBlueprint {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
         EnergyMult = 0,
         HealthMult = 0.9,
-        MassMult = .45,
+        MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
             Air = false,

@@ -472,7 +472,7 @@ UnitBlueprint {
             },
             FiringTolerance = 100,
             Label = 'MissileRack01',
-            MaxRadius = 100,
+            MaxRadius = 150, #from 100
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 30,
@@ -539,7 +539,7 @@ UnitBlueprint {
             },
             FiringTolerance = 100,
             Label = 'MissileRack02',
-            MaxRadius = 100,
+			MaxRadius = 150, #from 100
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 30,
@@ -607,7 +607,7 @@ UnitBlueprint {
             },
             FiringTolerance = 100,
             Label = 'MissileRack03',
-            MaxRadius = 100,
+			MaxRadius = 150, #from 100
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 30,
@@ -675,7 +675,7 @@ UnitBlueprint {
             },
             FiringTolerance = 100,
             Label = 'MissileRack03',
-            MaxRadius = 100,
+			MaxRadius = 150, #from 100
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 30,
