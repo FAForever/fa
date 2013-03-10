@@ -1,6 +1,4 @@
 UnitBlueprint {
-	BlueprintId='uel0203',
-	
     Audio = {
         AmbientMoveLand = Sound {
             Bank = 'UEL',
@@ -342,10 +340,11 @@ UnitBlueprint {
             RackSalvoChargeTime = 0,
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
-            RackSlavedToTurret = false,
+            RackSlavedToTurret = true,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 3,
-			SlavedToBody = false,
+            SlavedToBody = true,
+            SlavedToBodyArcRange = 5,
             TargetCheckInterval = 0.16,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
@@ -366,7 +365,7 @@ UnitBlueprint {
             TurretPitchRange = 40,
             TurretPitchSpeed = 180,
             TurretYaw = 0,
-            TurretYawRange = 180,
+            TurretYawRange = 10,
             TurretYawSpeed = 90,
             Turreted = true,
             WeaponCategory = 'Direct Fire',
