@@ -279,7 +279,7 @@ UnitBlueprint {
     Enhancements = {
         DamageStabilization = {
             BuildCostEnergy = 75000,
-            BuildCostMass = 1500,
+            BuildCostMass = 2500,
             BuildTime = 4800,
             Icon = 'dss',
             Name = '<LOC enhancements_0131>Nano-Repair System',
@@ -411,9 +411,9 @@ UnitBlueprint {
             Slot = 'Back',
         },
         Overcharge = {
-            BuildCostEnergy = 200000,
-            BuildCostMass = 3000,
-            BuildTime = 9000,
+            BuildCostEnergy = 300000,
+            BuildCostMass = 4500,
+            BuildTime = 10000,
             Icon = 'oc',
             Name = '<LOC enhancements_0139>Overcharge',
             Slot = 'RCH',

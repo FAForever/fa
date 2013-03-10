@@ -307,6 +307,7 @@ UnitBlueprint {
             Icon = 'heo',
             Name = '<LOC enhancements_0063>Heavy Plasma Refractor',
             NewDamageRadius = 2.5,
+            NewMaxRadius = 35,
             ShowBones = {
                 'SAM',
             },

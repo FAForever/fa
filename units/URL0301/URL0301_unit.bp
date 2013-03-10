@@ -299,8 +299,8 @@ UnitBlueprint {
         },
         EMPCharge = {
             BuildCostEnergy = 60000,
-            BuildCostMass = 1500,
-            BuildTime = 4800,
+            BuildCostMass = 1000,
+            BuildTime = 2400,
             Icon = 'emp',
             Name = '<LOC enhancements_0091>EMP Burst',
             Slot = 'LCH',
@@ -328,6 +328,7 @@ UnitBlueprint {
             Icon = 'fc',
             Name = '<LOC enhancements_0093>Disintegrator Amplifier',
             NewDamageMod = 250,
+            NewMaxRadius = 35,
             Slot = 'RCH',
             UpgradeUnitAmbientBones = {
                 'URL0301',
@@ -603,8 +604,8 @@ UnitBlueprint {
                     },
                     AppliedToTarget = true,
                     BuffType = 'STUN',
-                    Duration = 3,
-                    Radius = 2.5,
+                    Duration = 4,
+                    Radius = 3,
                     TargetAllow = 'MOBILE',
                     TargetDisallow = 'EXPERIMENTAL,COMMAND,SUBCOMMANDER',
                 },
@@ -627,7 +628,7 @@ UnitBlueprint {
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 18,
             ProjectileId = '/projectiles/CDFLaserDisintegrator03/CDFLaserDisintegrator03_proj.bp',
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.30,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
