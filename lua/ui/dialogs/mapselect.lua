@@ -40,12 +40,12 @@ local mapplayers = false
 local mapInfo = false
 local selectButton = false
 
-local currentFilters = { 
-    ['map_select_supportedplayers'] = 0, 
-    ['map_select_size'] = 0, 
-    ['map_select_supportedplayers_limiter'] = "equal", 
-    ['map_select_size_limiter'] = "equal", 
-	['map_type'] = 0, 
+local currentFilters = {
+    ['map_select_supportedplayers'] = 0,
+    ['map_select_size'] = 0,
+    ['map_select_supportedplayers_limiter'] = "equal",
+    ['map_select_size_limiter'] = "equal",
+	['map_type'] = 0,
 	###New - Start
 	['map_ai_markers'] = 0,
 	###New - End
@@ -119,17 +119,17 @@ function CreateFilter(parent, filterData)
     local group = Group(parent)
     group.Depth:Set(function() return parent.Depth() + 10 end)
     group.Width:Set(286)
-    
+
     local tempname = filterData.FilterName
     group.title = UIUtil.CreateText(group, tempname, 16, UIUtil.bodyFont)
     LayoutHelpers.AtLeftTopIn(group.title, group, 2)
     Tooltip.AddControlTooltip(group.title, filterData.FilterKey)
-    
+
     group.combo = Combo(group, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
     LayoutHelpers.AtVerticalCenterIn(group.combo, group.title)
     group.combo.Right:Set(group.Right)
     group.combo.Width:Set(80)
-    
+
     local itemArray = {}
     group.combo.keyMap = {}
     for index, val in filterData.Options do
@@ -138,18 +138,18 @@ function CreateFilter(parent, filterData)
     end
     group.combo.Key = filterData.FilterKey
     group.combo:AddItems(itemArray, 1)
-    
+
     group.combo.OnClick = function(self, index, text)
         currentFilters[self.Key] = self.keyMap[index]
         PopulateMapList()
     end
-	
+
     if not filterData.NoDelimiter then
 		group.comboFilter = Combo(group, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
 		LayoutHelpers.AtVerticalCenterIn(group.comboFilter, group.title)
 		group.comboFilter.Right:Set(function() return group.combo.Left() - 5 end)
 		group.comboFilter.Width:Set(60)
-    
+
 		local filterArray = {
 			{text = "=", key = "equal"},
 			{text = ">=", key = "greater"},
@@ -162,30 +162,30 @@ function CreateFilter(parent, filterData)
 		end
 		group.comboFilter.Key = filterData.FilterKey.."_limiter"
 		group.comboFilter:AddItems(tempText, 1)
-    
+
 		group.comboFilter.OnClick = function(self, index, text)
 			currentFilters[self.Key] = self.keyMap[index]
 			PopulateMapList()
 		end
     end
-	
+
     group.Height:Set(group.title.Height())
-    
+
     return group
 end
 
 local function ResetFilters()
-    currentFilters = { 
-        ['map_select_supportedplayers'] = 0, 
-        ['map_select_size'] = 0, 
-        ['map_select_supportedplayers_limiter'] = "equal", 
-        ['map_select_size_limiter'] = "equal", 
+    currentFilters = {
+        ['map_select_supportedplayers'] = 0,
+        ['map_select_size'] = 0,
+        ['map_select_supportedplayers_limiter'] = "equal",
+        ['map_select_size_limiter'] = "equal",
 		['map_type'] = 0,
 		['map_ai_markers'] = 0,
     }
     changedOptions = {}
     selectedScenario = nil
-    restrictedCategories = nil    
+    restrictedCategories = nil
 end
 
 local function ShowMapPositions(mapCtrl, scenario)
@@ -212,19 +212,19 @@ local function ShowMapPositions(mapCtrl, scenario)
 
     for army, pos in startPos do
         local marker = Bitmap(posGroup, UIUtil.UIFile('/dialogs/mapselect02/commander.dds'))
-        LayoutHelpers.AtLeftTopIn(marker, posGroup, 
-            ((pos[1] / mWidth) * cWidth) - (marker.Width() / 2), 
+        LayoutHelpers.AtLeftTopIn(marker, posGroup,
+            ((pos[1] / mWidth) * cWidth) - (marker.Width() / 2),
             ((pos[2] / mHeight) * cHeight) - (marker.Height() / 2))
     end
 end
 
 --function to check if the map is a official map
 function CheckMapIsOfficial(scenario)
-	local mapsList = {'Burial Mounds', 'Concord Lake', "Drake's Ravine", 'Emerald Crater', "Gentleman's Reef", "Ian's Cross", 'Open Palms', 'Seraphim Glaciers', 
-		"Seton's Clutch", 'Sung Island', 'The Great Void', 'Theta Passage', 'Winter Duel', 'The Bermuda Locket', 'Fields of Isis', 'Canis River', 'Syrtis Major', 
-		'Sentry Point', "Finn's Revenge", 'Roanoke Abyss', 'Alpha 7 Quarantine', 'Arctic Refuge', 'Varga Pass', 'Crossfire Canal', 'Saltrock Colony', 
-		'Vya-3 Protectorate', 'The Scar', 'Hanna Oasis', 'Betrayal Ocean', 'Frostmill Ruins', 'Four-Leaf Clover', 'The Wilderness', 'White Fire', 'High Noon', 
-		'Paradise', 'Blasted Rock', 'Sludge', 'Ambush Pass', 'Four-Corners', 'The Ditch', 'Crag Dunes', "Williamson's Bridge", 'Snoey Triangle', 'Haven Reef', 
+	local mapsList = {'Burial Mounds', 'Concord Lake', "Drake's Ravine", 'Emerald Crater', "Gentleman's Reef", "Ian's Cross", 'Open Palms', 'Seraphim Glaciers',
+		"Seton's Clutch", 'Sung Island', 'The Great Void', 'Theta Passage', 'Winter Duel', 'The Bermuda Locket', 'Fields of Isis', 'Canis River', 'Syrtis Major',
+		'Sentry Point', "Finn's Revenge", 'Roanoke Abyss', 'Alpha 7 Quarantine', 'Arctic Refuge', 'Varga Pass', 'Crossfire Canal', 'Saltrock Colony',
+		'Vya-3 Protectorate', 'The Scar', 'Hanna Oasis', 'Betrayal Ocean', 'Frostmill Ruins', 'Four-Leaf Clover', 'The Wilderness', 'White Fire', 'High Noon',
+		'Paradise', 'Blasted Rock', 'Sludge', 'Ambush Pass', 'Four-Corners', 'The Ditch', 'Crag Dunes', "Williamson's Bridge", 'Snoey Triangle', 'Haven Reef',
 		'The Dark Heart', "Daroza's Sanctuary", 'Strip Mine', 'Thawing Glacier', 'Liberiam Battles', 'Shards', 'Shuriken Island', 'Debris', 'Flooded Strip Mine', 'Eye of the Storm'}
 	for i, map in mapsList do
 		if scenario.name == map then
@@ -265,12 +265,12 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
 
     local cancelButton = UIUtil.CreateButtonStd(panel, '/scx_menu/small-btn/small', "<LOC _Cancel>", 16, 2, 0, "UI_Menu_Cancel_02")
     LayoutHelpers.AtRightTopIn(cancelButton, panel, 15, 645)
-    
+
     selectButton = UIUtil.CreateButtonStd(panel, '/scx_menu/small-btn/small', "<LOC _OK>", 16, 2)
     LayoutHelpers.AtRightTopIn(selectButton, panel, 200, 645)
-    
+
     selectButton.Depth:Set(function() return panel.Depth() + 10 end) --TODO what is this getting under when it's in over state?
-    
+
     local modButton = UIUtil.CreateButtonStd(panel, '/scx_menu/small-btn/small', "<LOC tooltipui0145>", 16, 2)
     LayoutHelpers.AtLeftTopIn(modButton, panel, 15, 645)
     selectButton.Depth:Set(function() return panel.Depth() + 10 end)
@@ -279,27 +279,27 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
         modstatus = ModManager.HostModStatus(availableMods)
         mapList:AbandonKeyboardFocus()
         ModManager.CreateDialog(
-            panel, 
-            true, 
+            panel,
+            true,
             function(modsSelected)
                 mapList:AcquireKeyboardFocus(true)
                 OnModsChanged(modsSelected)
-            end, 
-            true, 
+            end,
+            true,
             modstatus)
     end
 
     local restrictedUnitsButton = UIUtil.CreateButtonStd(modButton, '/scx_menu/small-btn/small', "<LOC sel_map_0006>Unit Manager", 16, 2)
     LayoutHelpers.AtLeftTopIn(restrictedUnitsButton, panel, 200, 645)
     Tooltip.AddButtonTooltip(restrictedUnitsButton, "lob_RestrictedUnits")
-   
+
     if not restrictedCategories then restrictedCategories = curOptions.RestrictedCategories end
     restrictedUnitsButton.OnClick = function(self, modifiers)
         mapList:AbandonKeyboardFocus()
-        import('/lua/ui/lobby/restrictedUnitsDlg.lua').CreateDialog(parent, 
-            restrictedCategories, 
-            function(rc) 
-                restrictedCategories = rc 
+        import('/lua/ui/lobby/restrictedUnitsDlg.lua').CreateDialog(parent,
+            restrictedCategories,
+            function(rc)
+                restrictedCategories = rc
                 mapList:AcquireKeyboardFocus(true)
             end,
             function()
@@ -307,13 +307,13 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
             end,
             true)
     end
-	
+
 	--start of random map code by Moritz
 	local doNotRepeatMap
 	local randomMapButton = UIUtil.CreateButtonStd(modButton, '/scx_menu/small-btn/small', "<LOC lobui_0503>Random Map", 16, 2)
 	LayoutHelpers.AtLeftTopIn(randomMapButton, panel, 385, 645)
 	Tooltip.AddButtonTooltip(randomMapButton, 'lob_click_randmap')
-	
+
 	randomMapButton.OnClick = function(self, modifiers)
 		if randMapList != 0 then
 			local randomMapMessage
@@ -353,7 +353,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
 				repeat
 					nummapa = math.random(1, randMapList)
 				until nummapa != doNotRepeatMap
-			end	
+			end
 			doNotRepeatMap = nummapa
 			local scen = scenarios[scenarioKeymap[nummapa]]
 			selectedScenario = scen
@@ -365,15 +365,15 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
 			randomMapMessage = import('/lua/ui/lobby/lobby.lua').sendRandMapMessage()
 		end
 	end
-	function randomAutoMap(official)			
+	function randomAutoMap(official)
 		local nummapa
 		nummapa = math.random(1, randMapList)
 		if randMapList >= 2 and nummapa == doNotRepeatMap then
 			repeat
 				nummapa = math.random(1, randMapList)
 			until nummapa != doNotRepeatMap
-		end	
-		doNotRepeatMap = nummapa			
+		end
+		doNotRepeatMap = nummapa
 		local scen = scenarios[scenarioKeymap[nummapa]]
 		if official then
 			local officialMap = CheckMapIsOfficial(scen)
@@ -381,12 +381,12 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
 				return randomAutoMap(true)
 			end
 		end
-		selectedScenario = scen			
+		selectedScenario = scen
 		selectBehavior(selectedScenario, changedOptions, restrictedCategories)
-		ResetFilters()			
+		ResetFilters()
 	end
 	--end of random map code
-	
+
     UIUtil.MakeInputModal(panel)
 
     mapListTitle = UIUtil.CreateText(panel, "<LOC sel_map_0005>Maps", 18)
@@ -405,7 +405,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
         mapList:AbandonKeyboardFocus()
         ItemList.OnDestroy(control)
     end
-    
+
     mapList.HandleEvent = function(self,event)
         if event.Type == 'KeyDown' then
             if event.KeyCode == UIUtil.VK_ESCAPE then
@@ -416,7 +416,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
                 return true
             end
         end
-        
+
         return ItemList.HandleEvent(self,event)
     end
 
@@ -426,7 +426,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     preview.Width:Set(290)
     preview.Height:Set(288)
     LayoutHelpers.AtLeftTopIn(preview, panel, 37, 102)
-    
+
     local previewOverlay = Bitmap(preview, UIUtil.UIFile('/dialogs/mapselect03/map-panel-glow_bmp.dds'))
     LayoutHelpers.AtCenterIn(previewOverlay, preview)
 
@@ -436,7 +436,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
 
     descriptionTitle = UIUtil.CreateText(panel, "<LOC sel_map_0000>Map Info", 18)
     LayoutHelpers.AtLeftTopIn(descriptionTitle, panel, 35, 420)
-    
+
     description = ItemList(panel, "mapselect:description")
     description:SetFont(UIUtil.bodyFont, 14)
     description:SetColors(UIUtil.fontColor, "00000000", UIUtil.fontColor, "00000000")
@@ -444,10 +444,10 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     description.Height:Set(180)
     LayoutHelpers.AtLeftTopIn(description, panel, 33, 450)
     UIUtil.CreateVertScrollbarFor(description)
-    
+
     filterTitle = UIUtil.CreateText(panel, "<LOC sel_map_0003>Filters", 18)
     LayoutHelpers.AtLeftTopIn(filterTitle, panel, 360, 60)
-    
+
     for i, filterData in mapFilters do
         local index = i
         filters[index] = CreateFilter(filterTitle, filterData)
@@ -461,7 +461,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
 -- initialize controls
     PopulateMapList()
     SetupOptionsPanel(panel, singlePlayer, curOptions)
-    
+
 --  control behvaior
     if exitButton then
         exitButton.OnClick = function(self)
@@ -483,7 +483,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
         exitBehavior()
         ResetFilters()
     end
-    
+
     function PreloadMap(row)
         local scen = scenarios[scenarioKeymap[row+1]]
         if scen == selectedScenario then
@@ -514,14 +514,14 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
             selectButton:Disable()
         end
     end
-	
+
     mapList.OnKeySelect = function(self,row)
         mapList:SetSelection(row)
         PreloadMap(row)
         local sound = Sound({Cue = "UI_Skirmish_Map_Select", Bank = "Interface",})
         PlaySound(sound)
     end
-    
+
     mapList.OnClick = function(self, row, noSound)
         mapList:SetSelection(row)
         PreloadMap(row)
@@ -530,7 +530,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
             PlaySound(sound)
         end
     end
-    
+
     mapList.OnDoubleClick = function(self, row)
         mapList:SetSelection(row)
         PreloadMap(row)
@@ -550,7 +550,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
             end
         end
     end
-	
+
     mapList:OnClick(defaultRow, true)
     mapList:ShowItem(defaultRow)
 
@@ -562,17 +562,18 @@ function RefreshOptions(skipRefresh, singlePlayer)
     -- it also means it's a flag that tells you this is the first time the dialog has been opened
     -- so we'll used this flag to reset the options sources so they can set up for multiplayer
     if skipRefresh then
-        OptionSource[2] = {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts}
         OptionSource[1] = {title = "<LOC uilobby_0001>Team Options", options = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions}
-
-        table.sort(OptionSource[2].options, function(a, b) return LOC(a.label) < LOC(b.label) end)
-        table.sort(OptionSource[1].options, function(a, b) return LOC(a.label) < LOC(b.label) end)
+		OptionSource[2] = {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts}
+		OptionSource[3] = {title = "AI Options", options = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts}
+--~         table.sort(OptionSource[1].options, function(a, b) return LOC(a.label) < LOC(b.label) end)
+--~         table.sort(OptionSource[2].options, function(a, b) return LOC(a.label) < LOC(b.label) end)
+--~         table.sort(OptionSource[3].options, function(a, b) return LOC(a.label) < LOC(b.label) end)
     end
-    OptionSource[3] = {}
-    OptionSource[3] = {title = "<LOC lobui_0164>Advanced", options = advOptions or {}}
-    
+	OptionSource[4] = {}
+	OptionSource[4] = {title = "<LOC lobui_0164>Advanced", options = advOptions or {}}
+
     Options = {}
-    
+
     for _, OptionTable in OptionSource do
         if table.getsize(OptionTable.options) > 0 then
             table.insert(Options, {type = 'title', text = OptionTable.title})
@@ -594,16 +595,16 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
     ---------------------------------------------
     local title = UIUtil.CreateText(parent, '<LOC PROFILE_0012>', 18)
     LayoutHelpers.AtLeftTopIn(title, parent, 660, 60)
-    
+
     OptionContainer = Group(parent)
     OptionContainer.Height:Set(556)
     OptionContainer.Width:Set(260)
     OptionContainer.top = 0
     LayoutHelpers.AtLeftTopIn(OptionContainer, parent, 670, 84)
-    
+
     local OptionDisplay = {}
     RefreshOptions(true, singlePlayer)
-    
+
     local function CreateOptionCombo(parent, optionData, width)
         local combo = Combo(parent, nil, nil, nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         combo.Width:Set(240)
@@ -618,29 +619,29 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
 
         return combo
     end
-    
+
     local function CreateOptionElements()
         local function CreateElement(index)
             OptionDisplay[index] = Group(OptionContainer)
             OptionDisplay[index].Height:Set(46)
             OptionDisplay[index].Width:Set(OptionContainer.Width)
-        
+
             OptionDisplay[index].bg = Bitmap(OptionDisplay[index])
             OptionDisplay[index].bg.Depth:Set(OptionDisplay[index].Depth)
             LayoutHelpers.FillParent(OptionDisplay[index].bg, OptionDisplay[index])
             OptionDisplay[index].bg.Right:Set(function() return OptionDisplay[index].Right() - 10 end)
-        
+
             OptionDisplay[index].text = UIUtil.CreateText(OptionContainer, '', 14, "Arial")
             OptionDisplay[index].text:DisableHitTest()
             LayoutHelpers.AtLeftTopIn(OptionDisplay[index].text, OptionDisplay[index], 10)
-            
+
             OptionDisplay[index].combo = CreateOptionCombo(OptionDisplay[index])
             LayoutHelpers.AtLeftTopIn(OptionDisplay[index].combo, OptionDisplay[index], 5, 22)
         end
-        
+
         CreateElement(1)
         LayoutHelpers.AtLeftTopIn(OptionDisplay[1], OptionContainer)
-            
+
         local index = 2
         while OptionDisplay[table.getsize(OptionDisplay)].Bottom() + OptionDisplay[1].Height() < OptionContainer.Bottom() do
             CreateElement(index)
@@ -649,13 +650,13 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
         end
     end
     CreateOptionElements()
-            
+
     local numLines = function() return table.getsize(OptionDisplay) end
-    
+
     local function DataSize()
         return table.getn(Options)
     end
-    
+
     -- called when the scrollbar for the control requires data to size itself
     -- GetScrollValues must return 4 values in this order:
     -- rangeMin, rangeMax, visibleMin, visibleMax
@@ -742,9 +743,9 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
             end
         end
     end
-    
+
     OptionContainer:CalcVisible()
-    
+
     OptionContainer.HandleEvent = function(self, event)
         if event.Type == 'WheelRotation' then
             local lines = 1
@@ -754,7 +755,7 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
             self:ScrollLines(nil, lines)
         end
     end
-    
+
     UIUtil.CreateVertScrollbarFor(OptionContainer)
 end
 
@@ -762,7 +763,7 @@ function SetDescription(scen)
     local errors = false
     description:DeleteAllItems()
     if scen.name then
-        description:AddItem(scen.name) 
+        description:AddItem(scen.name)
     else
         description:AddItem(LOC("<LOC map_select_0006>No Scenario Name"))
         errors = true
@@ -794,11 +795,11 @@ function SetDescription(scen)
     description:AddItem("")
     if scen.description then
         local textBoxWidth = description.Width()
-        local wrapped = import('/lua/maui/text.lua').WrapText(LOC(scen.description), textBoxWidth, 
+        local wrapped = import('/lua/maui/text.lua').WrapText(LOC(scen.description), textBoxWidth,
             function(curText) return description:GetStringAdvance(curText) end)
         for i, line in wrapped do
             description:AddItem(line)
-        end 
+        end
     else
         description:AddItem(LOC("<LOC map_select_0007>No Scenario Description"))
         errors = true
@@ -810,7 +811,7 @@ function SetDescription(scen)
     end
 end
 
-function PopulateMapList()    
+function PopulateMapList()
     mapList:DeleteAllItems()
     local tempMaps = {}
     local count = 1
@@ -819,8 +820,8 @@ function PopulateMapList()
         local validMapPlayers = false
         local index = i
         if currentFilters.map_select_supportedplayers != 0 then
-            if CompareFunc(table.getsize(sceninfo.Configurations.standard.teams[1].armies), 
-                currentFilters.map_select_supportedplayers, 
+            if CompareFunc(table.getsize(sceninfo.Configurations.standard.teams[1].armies),
+                currentFilters.map_select_supportedplayers,
                 currentFilters.map_select_supportedplayers_limiter) then
                 validMapSize = true
             end
@@ -856,10 +857,10 @@ function PopulateMapList()
         if validMapSize and validMapPlayers then
             table.insert(tempMaps, sceninfo)
             scenarioKeymap[count] = index
-            count = count + 1 
-        end		
+            count = count + 1
+        end
     end
-    
+
     for i,sceninfo in tempMaps do
         local name = sceninfo.name
 		local officialMap = CheckMapIsOfficial(sceninfo)
@@ -868,9 +869,9 @@ function PopulateMapList()
 		end
         mapList:AddItem(LOC(name))
     end
-	
+
 	randMapList = count - 1
-	
+
 	if randMapList == 0 then
 		mapListTitle:SetText(LOCF("<LOC lobui_0579>No Map Available", randMapList))
 	elseif randMapList == 1 then
