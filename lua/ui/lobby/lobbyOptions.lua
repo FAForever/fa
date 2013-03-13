@@ -57,7 +57,7 @@ teamOptions =
                 text = "<LOC lobui_0244>None",
                 help = "<LOC lobui_0534>No automatic teams",
                 key = 'none',
-            },		
+            },
             {
                 text = "<LOC lobui_0530>Top vs Bottom",
                 help = "<LOC lobui_0535>The game will be Top vs Bottom",
@@ -79,7 +79,7 @@ teamOptions =
                 key = 'manual',
             },
         },
-    },	
+    },
 }
 
 globalOpts = {
@@ -90,7 +90,7 @@ globalOpts = {
         key = 'UnitCap',
         pref = 'Lobby_Gen_Cap',
         values = {
-		    {
+          {
                 text = "<LOC lobui_0719>125",
                 help = "<LOC lobui_0720>125 units per player may be in play",
                 key = '125',
@@ -332,11 +332,11 @@ globalOpts = {
                 help = "<LOC lobui_0556>No random map",
                 key = 'Off',
             },
-			{
+         {
                 text = "<LOC lobui_0553>Official Maps Only",
                 help = "<LOC lobui_0555>Random map set",
                 key = 'Official',
-            },			
+            },
             {
                 text = "<LOC lobui_0554>All Maps",
                 help = "<LOC lobui_0555>Random map set",
@@ -344,7 +344,7 @@ globalOpts = {
             },
         },
     },
-	{
+   {
         default = 1,
         label = "<LOC lobui_0727>Score",
         help = "<LOC lobui_0728>Set score on or off during the game",
@@ -360,10 +360,10 @@ globalOpts = {
                 text = "<LOC _Off>Off",
                 help = "<LOC lobui_0730>Score is disabled",
                 key = 'no',
-            },			
+            },
         },
     },
-	{
+   {
         default = 1,
         label = "<LOC lobui_0740>Share Conditions",
         help = "<LOC lobui_0741>Kill all the units you shared to your allies and send back the units your allies shared with you when you die",
@@ -382,7 +382,11 @@ globalOpts = {
             },
         },
     },
-	{
+}
+
+
+AIOpts = {
+   {
         default = 11,
         label = "AIx Cheat Multiplier",
         help = "Set the cheat multiplier for the cheating AIs.",
@@ -645,8 +649,8 @@ globalOpts = {
                 key = '6.0',
             },
         },
-	},
-	{   default = 11,
+   },
+   {   default = 11,
         label = "AIx Build Multiplier",
         help = "Set the build rate multiplier for the cheating AIs.",
         key = 'BuildMult',
@@ -908,8 +912,8 @@ globalOpts = {
                 key = '6.0',
             },
         },
-	},
-	{   default = 1,
+   },
+   {   default = 1,
         label = "AIx Omni Setting",
         help = "Set the build rate multiplier for the cheating AIs.",
         key = 'OmniCheat',
@@ -926,8 +930,8 @@ globalOpts = {
                 key = 'off',
             },
         },
-	},
-	{   default = 6,
+   },
+   {   default = 6,
         label = "AI Land Expansion Limit",
         help = "Set the limit for the number of land expansions that each AI can have (will still be modified by the number of AIs).",
         key = 'LandExpansionsAllowed',
@@ -943,7 +947,7 @@ globalOpts = {
                 help = "1 Land Expansion Allowed",
                 key = '1',
             },
-			{
+         {
                 text = "2",
                 help = "2 Land Expansions Allowed",
                 key = '2',
@@ -984,8 +988,8 @@ globalOpts = {
                 key = '99999',
             },
         },
-	},
-	{   default = 5,
+   },
+   {   default = 5,
         label = "AI Naval Expansion Limit",
         help = "Set the limit for the number of naval expansions that each AI can have.",
         key = 'NavalExpansionsAllowed',
@@ -1001,7 +1005,7 @@ globalOpts = {
                 help = "1 Naval Expansion Allowed",
                 key = '1',
             },
-			{
+         {
                 text = "2",
                 help = "2 Naval Expansions Allowed",
                 key = '2',
@@ -1042,8 +1046,8 @@ globalOpts = {
                 key = '99999',
             },
         },
-	},
-	{   default = 1,
+   },
+   {   default = 1,
         label = "AI TML Randomization",
         help = "Sets the randomization for the AI\'s TMLs making them miss more. Higher means less accurate.",
         key = 'TMLRandom',
@@ -1095,6 +1099,5 @@ globalOpts = {
                 key = '20',
             },
         },
-	},
-
+   },
 }
