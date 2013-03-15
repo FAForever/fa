@@ -274,7 +274,7 @@ UnitBlueprint {
             },
             FiringTolerance = 50,
             Label = 'AntiAirMissiles01',
-            MaxRadius = 150, #from 75
+            MaxRadius = 100,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 30,
@@ -344,7 +344,7 @@ UnitBlueprint {
             },
             FiringTolerance = 50,
             Label = 'AntiAirMissiles01',
-            MaxRadius = 150, #from 75
+            MaxRadius = 100,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 30,

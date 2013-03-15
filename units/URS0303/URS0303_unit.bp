@@ -290,7 +290,7 @@ UnitBlueprint {
             HeadingArcRange = 120,
             Label = 'AAGun01',
             LeadTarget = true,
-            MaxRadius = 150, #from 100
+            MaxRadius = 100,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 90,
@@ -362,7 +362,7 @@ UnitBlueprint {
             HeadingArcRange = 120,
             Label = 'AAGun02',
             LeadTarget = true,
-            MaxRadius = 150, #from 100
+            MaxRadius = 100,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 90,
@@ -440,7 +440,7 @@ UnitBlueprint {
             HeadingArcRange = 120,
             Label = 'AAGun03',
             LeadTarget = true,
-            MaxRadius = 150, #from 100
+            MaxRadius = 100,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 90,
@@ -518,7 +518,7 @@ UnitBlueprint {
             HeadingArcRange = 120,
             Label = 'AAGun04',
             LeadTarget = true,
-            MaxRadius = 150, #from 100
+            MaxRadius = 100,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 90,

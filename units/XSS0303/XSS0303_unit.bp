@@ -335,7 +335,7 @@ UnitBlueprint {
             },
             FiringTolerance = 2,
             Label = 'AntiAirRight',
-            MaxRadius = 145, #from 100
+            MaxRadius = 100,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 2,
             MuzzleVelocity = 90,
@@ -406,7 +406,7 @@ UnitBlueprint {
             },
             FiringTolerance = 2,
             Label = 'AntiAirLeft',
-            MaxRadius = 145, #from 100
+            MaxRadius = 100,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 2,
             MuzzleVelocity = 90,
