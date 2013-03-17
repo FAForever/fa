@@ -563,8 +563,8 @@ function RefreshOptions(skipRefresh, singlePlayer)
     -- so we'll used this flag to reset the options sources so they can set up for multiplayer
     if skipRefresh then
         OptionSource[1] = {title = "<LOC uilobby_0001>Team Options", options = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions}
-		OptionSource[2] = {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts}
-		OptionSource[3] = {title = "AI Options", options = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts}
+	OptionSource[2] = {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts}
+	OptionSource[3] = {title = "AI Options", options = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts}
 --~         table.sort(OptionSource[1].options, function(a, b) return LOC(a.label) < LOC(b.label) end)
 --~         table.sort(OptionSource[2].options, function(a, b) return LOC(a.label) < LOC(b.label) end)
 --~         table.sort(OptionSource[3].options, function(a, b) return LOC(a.label) < LOC(b.label) end)
@@ -718,7 +718,7 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
                 for index, val in data.data.values do
                     itemArray[index] = val.text
                     line.combo.keyMap[val.key] = index
-                    tooltipTable[index] = 'lob_'..data.data.key..'_'..val.key
+                    tooltipTable[index]={text=val.text,body=val.help}
                 end
                 local defValue = changedOptions[data.data.key].index or line.combo.keyMap[curOptions[data.data.key]] or 1
                 line.combo:AddItems(itemArray, defValue)
@@ -726,7 +726,7 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
                     changedOptions[data.data.key] = {value = data.data.values[index].key, pref = data.data.pref, index = index}
                 end
                 line.HandleEvent = Group.HandleEvent
-                Tooltip.AddControlTooltip(line, data.data.pref)
+                Tooltip.AddControlTooltip(line, {text=data.data.label,body=data.data.help})
                 Tooltip.AddComboTooltip(line.combo, tooltipTable, line.combo._list)
                 line.combo.UpdateValue = function(key)
                     line.combo:SetItem(line.combo.keyMap[key])
