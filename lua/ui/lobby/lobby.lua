@@ -2815,13 +2815,9 @@ function CreateUI(maxPlayers)
         Tooltip.AddControlTooltip(GUI.observerLabel, 'lob_describe_observers')
 
         GUI.allowObservers = UIUtil.CreateCheckboxStd(GUI.observerPanel, '/dialogs/check-box_btn/radio')
-        LayoutHelpers.CenteredRightOf(GUI.allowObservers, GUI.observerLabel, 5)
-
-        GUI.allowObserversLabel = UIUtil.CreateText(GUI.observerPanel, "<LOC lobui_0276>Allow", 14, UIUtil.bodyFont)
-        LayoutHelpers.CenteredRightOf(GUI.allowObserversLabel, GUI.allowObservers)
+        LayoutHelpers.CenteredRightOf(GUI.allowObservers, GUI.observerLabel, 0)
 
         Tooltip.AddControlTooltip(GUI.allowObservers, 'lob_observers_allowed')
-        Tooltip.AddControlTooltip(GUI.allowObserversLabel, 'lob_observers_allowed')
 
         GUI.allowObservers:SetCheck(false)
         if lobbyComm:IsHost() then
@@ -2831,14 +2827,9 @@ function CreateUI(maxPlayers)
             end
 		end
 
-        GUI.allowObservers.OnHide = function(self, hidden)
-            GUI.allowObserversLabel:SetHidden(hidden)
-        end
-        GUI.allowObservers:Hide()
-
         GUI.becomeObserver = UIUtil.CreateButtonStd(GUI.observerPanel, '/lobby/lan-game-lobby/toggle', "<LOC lobui_0228>Observe", 10, 0)
-        LayoutHelpers.CenteredRightOf(GUI.becomeObserver, GUI.allowObserversLabel, 5)
-        
+        LayoutHelpers.CenteredRightOf(GUI.becomeObserver, GUI.allowObservers, 5)
+
         Tooltip.AddButtonTooltip(GUI.becomeObserver, 'lob_become_observer')
         
         GUI.becomeObserver.OnClick = function(self, modifiers)
@@ -2973,9 +2964,12 @@ function CreateUI(maxPlayers)
 		
 		
 		--start of auto kick code
+		GUI.autoKickLabel = UIUtil.CreateText(GUI.observerPanel, "Auto kick", 14, UIUtil.bodyFont)
+			LayoutHelpers.CenteredRightOf(GUI.autoKickLabel, GUI.rankedOptions, 5)
+			Tooltip.AddControlTooltip(GUI.autoKickLabel, 'lob_auto_kick')
 		GUI.autoKick = UIUtil.CreateCheckboxStd(GUI.observerPanel, '/dialogs/check-box_btn/radio')
-		LayoutHelpers.CenteredRightOf(GUI.autoKick, GUI.rankedOptions, 5)
-		Tooltip.AddControlTooltip(GUI.autoKick, 'lob_auto_kick')
+			LayoutHelpers.CenteredRightOf(GUI.autoKick, GUI.autoKickLabel, 0)
+			Tooltip.AddControlTooltip(GUI.autoKick, 'lob_auto_kick')
 		GUI.autoKick:SetCheck(false)
 		autoKick = false
 		GUI.autoKick.OnCheck = function(self, checked)
