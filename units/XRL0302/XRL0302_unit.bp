@@ -41,7 +41,7 @@ UnitBlueprint {
         'MOBILE',
         'LAND',
         'TECH2',
-		'COUNTERINTELLIGENCE',
+	'COUNTERINTELLIGENCE',
         'DIRECTFIRE',
         'VISIBLETORECON',
         'RECLAIMABLE',
@@ -193,7 +193,7 @@ UnitBlueprint {
         {
             AboveWaterTargetsOnly = true,
             CollideFriendly = false,
-            Damage = 3000,
+            Damage = 3500,
             DamageFriendly = true,
             DamageRadius = 4.5,
             DamageType = 'FireBeetleExplosion',
@@ -206,7 +206,7 @@ UnitBlueprint {
             },
             FiringTolerance = 180,
             Label = 'Suicide',
-            MaxRadius = 4.4,
+            MaxRadius = 4,
             TargetCheckInterval = 999999,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
