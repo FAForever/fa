@@ -1187,7 +1187,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         lobbyComm:LaunchGame(gameInfo)		
     end
 
-    if singlePlayer or HasCommandLineArg('/gpgnet') then
+    if singlePlayer then--or HasCommandLineArg('/gpgnet') then
         LaunchGame()
     else
         launchThread = ForkThread(function()
@@ -1232,7 +1232,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
 				end
 				SendSystemMessage("-------------------------------------------------------------------------------------------------------------------")			
 			end
-            local timer = 5
+			local timer = 5
             while timer > 0 do
                 local text = LOCF('%s %d', "<LOC lobby_0001>Game will launch in", timer)
                 SendSystemMessage(text)
