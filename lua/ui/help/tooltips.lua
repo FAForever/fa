@@ -762,7 +762,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0211>Use Factional UI Skin",
         description = "<LOC OPTIONS_0220>When on, the UI skin will change to match the faction you are playing",
     },
-
+    options_advanced_statistics = {
+        title = "<LOC OPTIONS_0213>Advanced Statistics",
+        description = "<LOC OPTIONS_0221>If enabled, you will have advanced statistics of your game in the score screen.",
+    },
     #**********************
     #** Lobby Strings
     #**********************

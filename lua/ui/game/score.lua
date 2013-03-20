@@ -71,14 +71,14 @@ function CreateScoreUI(parent)
     
     SetupPlayerLines()
     
-    controls.time = UIUtil.CreateText(controls.bgTop, '0', 14, UIUtil.bodyFont)
+    controls.time = UIUtil.CreateText(controls.bgTop, '0', 12, UIUtil.bodyFont)
     controls.time:SetColor('ff00dbff')
     controls.timeIcon = Bitmap(controls.bgTop)
     Tooltip.AddControlTooltip(controls.timeIcon, 'score_time')
     Tooltip.AddControlTooltip(controls.time, 'score_time')
     controls.unitIcon = Bitmap(controls.bgTop)
     Tooltip.AddControlTooltip(controls.unitIcon, 'score_units')
-    controls.units = UIUtil.CreateText(controls.bgTop, '0', 14, UIUtil.bodyFont)
+    controls.units = UIUtil.CreateText(controls.bgTop, '0', 12, UIUtil.bodyFont)
     controls.units:SetColor('ffff9900')
     Tooltip.AddControlTooltip(controls.units, 'score_units')
     
@@ -105,20 +105,7 @@ function CreateScoreUI(parent)
     end
     controls.collapseArrow:SetCheck(true, true)
 	
-	if not SessionIsReplay() then 
-		if controls.time then 
-			controls.time:Destroy()
-			-- Change the font size of the time, from 14 to 12.
-			controls.time = UIUtil.CreateText(controls.bgTop, '0', 12, UIUtil.bodyFont)
-		end	
 
-		if controls.units then 
-			controls.units:Destroy()
-		   -- Change the font size of the unit count, from 14 to 12.
-		   controls.units = UIUtil.CreateText(controls.bgTop, '0', 12, UIUtil.bodyFont)		
-		end	
-	end
-	
 end
 function SetLayout()
     if controls.bg then
@@ -289,11 +276,9 @@ function SetupPlayerLines()
 	controls.armyLines[index] = CreateMapNameLine(mapData, 0)
 end
 	function _OnBeat()
-		if sessionInfo.Options.GameSpeed and sessionInfo.Options.GameSpeed == 'adjustable' then
-			controls.time:SetText(string.format("%s (%+d)", GetGameTime(), gameSpeed))
-		else
-			controls.time:SetText(GetGameTime())
-		end
+
+		controls.time:SetText(string.format("%s (%+d / %+d)", GetGameTime(), gameSpeed, GetSimRate() ))        
+
 		if sessionInfo.Options.NoRushOption and sessionInfo.Options.NoRushOption != 'Off' then
 			if tonumber(sessionInfo.Options.NoRushOption) * 60 > GetGameTimeSeconds() then
 				local time = (tonumber(sessionInfo.Options.NoRushOption) * 60) - GetGameTimeSeconds()
@@ -310,7 +295,7 @@ end
 				for _, line in controls.armyLines do
 					if line.armyID == index then
 						if line.OOG then break end
-						if scoreOption == "no" then
+						if scoreData.general.score == -1 then
 							line.score:SetText(LOC("<LOC _Playing>Playing"))
 						else
 							line.score:SetText(scoreData.general.score)
@@ -372,14 +357,6 @@ end
 	
 		end)
 		import(UIUtil.GetLayoutFilename('score')).LayoutArmyLines()
-		
-	if not SessionIsReplay() then 
-		if sessionInfo.Options.GameSpeed and sessionInfo.Options.GameSpeed == 'adjustable' then
-			controls.time:SetText(string.format("%s (%+d / %+d)", GetGameTime(), gameSpeed, GetSimRate() ))        
-		else
-			controls.time:SetText(string.format("%s (%+d / %+d)", GetGameTime(), gameSpeed, GetSimRate() )) 
-		end
-	end
 		
 	end	
 function SetUnitText(current, cap)

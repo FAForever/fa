@@ -1,5 +1,4 @@
 # Here's an opportunity for user side script to examine the Sync table for the new tick
-LOG("our shook")
 local baseOnSync = OnSync
 OnSync = function()
     baseOnSync()
@@ -89,7 +88,9 @@ OnSync = function()
     end
     
     if Sync.FullScoreSync then
-        import('/lua/ui/game/scoreaccum.lua').OnFullSync()
+		if not table.empty(Sync.ScoreAccum) then
+			import('/lua/ui/game/scoreaccum.lua').OnFullSync(Sync.ScoreAccum)
+		end
     end
 
     for k,gameResult in Sync.GameResult do
