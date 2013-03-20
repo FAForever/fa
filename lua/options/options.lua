@@ -397,6 +397,20 @@ options = {
                     },
                 },
             },
+            {
+                title = "<LOC OPTIONS_0213>Advanced Statistics",
+                key = 'advanced_statistics',
+                type = 'toggle',
+                default = 'no',
+                set = function(key,value,startup)
+                end,
+                custom = {
+                    states = {
+                        {text = "<LOC _On>", key = 'yes' },
+                        {text = "<LOC _Off>", key = 'no' },
+                    },
+                },
+            },
         },
     },
     video = {

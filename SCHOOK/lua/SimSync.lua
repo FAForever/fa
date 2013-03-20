@@ -12,6 +12,7 @@ ResetSyncTable = function()
 
     # contains the current score for each army
     Sync.Score = {}
+	Sync.ScoreAccum = {}
 
     # Table of army indices set to "victory" or "defeat".
     # It's the user layer's job to determine if any UI needs to be shown
