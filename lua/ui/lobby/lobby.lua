@@ -2458,7 +2458,17 @@ function CreateUI(maxPlayers)
                 line.text:SetColor('ffff7777')
                 LayoutHelpers.AtHorizontalCenterIn(line.text, line, 5)
                 LayoutHelpers.AtHorizontalCenterIn(line.value, line, 5, 16) 
-                LayoutHelpers.ResetRight(line.value) 
+                LayoutHelpers.ResetRight(line.value)
+			elseif data.red then
+				line.text:SetColor('ff7777')
+				LayoutHelpers.AtHorizontalCenterIn(line.text, line, 5)
+				LayoutHelpers.AtHorizontalCenterIn(line.value, line, 5, 16)
+				LayoutHelpers.ResetRight(line.value)
+			elseif data.green then
+				line.text:SetColor('77ff77')
+				LayoutHelpers.AtHorizontalCenterIn(line.text, line, 5)
+				LayoutHelpers.AtHorizontalCenterIn(line.value, line, 5, 16)
+				LayoutHelpers.ResetRight(line.value)
             else
                 line.text:SetColor(UIUtil.fontColor)
                 LayoutHelpers.AtLeftTopIn(line.text, line, 5)
@@ -2953,18 +2963,20 @@ function CreateUI(maxPlayers)
 		
 		
 		
-		--start of auto kick code
-		GUI.autoKickLabel = UIUtil.CreateText(GUI.observerPanel, "Auto kick", 14, UIUtil.bodyFont)
-			LayoutHelpers.CenteredRightOf(GUI.autoKickLabel, GUI.rankedOptions, 5)
-			Tooltip.AddControlTooltip(GUI.autoKickLabel, 'lob_auto_kick')
-		GUI.autoKick = UIUtil.CreateCheckboxStd(GUI.observerPanel, '/dialogs/check-box_btn/radio')
-			LayoutHelpers.CenteredRightOf(GUI.autoKick, GUI.autoKickLabel, 0)
-			Tooltip.AddControlTooltip(GUI.autoKick, 'lob_auto_kick')
-		GUI.autoKick:SetCheck(false)
-		autoKick = false
-		GUI.autoKick.OnCheck = function(self, checked)
-			autoKick = checked
-			UpdateGame()
+		--start of auto kick code -- Modified by Xinnony
+		if lobbyComm:IsHost() then
+			GUI.autoKickLabel = UIUtil.CreateText(GUI.observerPanel, "Auto kick", 14, UIUtil.bodyFont)
+				LayoutHelpers.CenteredRightOf(GUI.autoKickLabel, GUI.rankedOptions, 5)
+				Tooltip.AddControlTooltip(GUI.autoKickLabel, 'lob_auto_kick')
+			GUI.autoKick = UIUtil.CreateCheckboxStd(GUI.observerPanel, '/dialogs/check-box_btn/radio')
+				LayoutHelpers.CenteredRightOf(GUI.autoKick, GUI.autoKickLabel, 0)
+				Tooltip.AddControlTooltip(GUI.autoKick, 'lob_auto_kick')
+			GUI.autoKick:SetCheck(false)
+			autoKick = false
+			GUI.autoKick.OnCheck = function(self, checked)
+				autoKick = checked
+				UpdateGame()
+			end
 		end
 		--end of auto kick code
 		
@@ -3072,16 +3084,71 @@ function RefreshOptionDisplayData(scenarioInfo)
     local teamOptions = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
     formattedOptions = {}
     
-    if scenarioInfo then
-        table.insert(formattedOptions, {text = '<LOC MAPSEL_0024>', 
-            value = LOCF("<LOC map_select_0008>%dkm x %dkm", scenarioInfo.size[1]/50, scenarioInfo.size[2]/50),
-            tooltip = 'map_select_sizeoption',
-            valueTooltip = 'map_select_sizeoption'})
-        table.insert(formattedOptions, {text = '<LOC MAPSEL_0031>Max Players', 
-            value = LOCF("<LOC map_select_0009>%d", table.getsize(scenarioInfo.Configurations.standard.teams[1].armies)),
-            tooltip = 'map_select_maxplayers',
-            valueTooltip = 'map_select_maxplayers'})
-    end
+--// Check Ranked active -- Xinnony & Vicarian
+ 	local getInit = GetCommandLineArg("/init", 1)
+	getInit = tostring(getInit[1])
+	if getInit == "init_faf.lua" then
+		--AddChatText('Welcome to Forged Alliance Forever MOD')
+		local getVictory = gameInfo.GameOptions['Victory'] -- 'demoralization'
+		local getTimeo = gameInfo.GameOptions['Timeouts'] -- '3'
+		local getCheat = gameInfo.GameOptions['CheatsEnabled'] -- 'false'
+		local getCivil = gameInfo.GameOptions['CivilianAlliance'] -- 'enemy'
+		local getSpeed = gameInfo.GameOptions['GameSpeed'] -- 'normal'
+		local getFog = gameInfo.GameOptions['FogOfWar'] -- 'explored'
+		local getUnitc = gameInfo.GameOptions['UnitCap'] -- '1000'
+		local getPrebui = gameInfo.GameOptions['PrebuiltUnits'] -- 'Off'
+		local getNorush = gameInfo.GameOptions['NoRushOption'] -- 'Off'
+		local getNumbMod = table.getn(Mods.GetGameMods(gameInfo.GameMods)) -- 0 for the purposes of this function
+		local getRstric = gameInfo.GameOptions.RestrictedCategories -- can be nil or a table, even if no unit restrictions are present
+--		LOG(getVictory..' // '..getTimeo..' // '..getCheat..' // '..getCivil..' // '..getSpeed..' // '..getFog..' // '..getUnitc..' // '..getPrebui..' // '..getNorush..' // '..getNumbMod..' // '..tostring(getRstric))
+		if getVictory == 'demoralization' and getTimeo == '3' and getCheat == 'false' and getCivil == 'enemy' 
+			and getSpeed == 'normal' and getFog == 'explored' and getUnitc == '1000' and getPrebui == 'Off' 
+			and getNorush == 'Off' and getNumbMod == 0 --and tostring(getRstric) == 'nil'
+			-- if all the conditions are present for a ranked game, except unit restrictions (special case)
+		then
+			if getRstric != nil then
+				if table.getn(getRstric) == 0 then -- if getRstric has been populated and then unit restrictions disabled
+					--AddChatText('First major if statement reached - If FAF launched and ranked conditions exist...')
+					table.insert(formattedOptions, {text = 'Rank',
+						value = 'Ranked',
+						green = true,
+						tooltip = 'Ranked',
+						valuetooltip = 'This part is Ranked'})
+				end
+				if table.getn(getRstric) > 0 then -- if getRstric has been populated cleared and repopulated
+					--AddChatText("Unit Restriction readded")
+					table.insert(formattedOptions, {text = 'Rank',
+						value = 'Not ranked',
+						red = true,
+						tooltip = 'Not ranked',
+						valuetooltip = 'This part is NOT Ranked'})
+				end
+			else
+				if getRstric == nil then -- Unit restrictions not found (equals none or the behavior for initially launching the lobby)
+					table.insert(formattedOptions, {text = 'Rank',
+						value = 'Ranked',
+						green = true,
+						tooltip = 'Ranked',
+						valuetooltip = 'This part is Ranked'})
+				end 
+			end
+		else
+			table.insert(formattedOptions, {text = 'Rank',
+				value = 'Not ranked',
+				red = true,
+				tooltip = 'Not ranked',
+				valuetooltip = 'This part is NOT Ranked'})
+		end
+	else
+		--AddChatText('NO FAF MOD, Unranked !')
+		table.insert(formattedOptions, {text = 'Rank',
+			value = 'Not ranked',
+			red = true,
+			tooltip = 'Not ranked',
+			valuetooltip = 'This part is NOT Ranked'})
+	end
+--\\ Stop
+--// Check Mod active
     local modNum = table.getn(Mods.GetGameMods(gameInfo.GameMods))
     if modNum > 0 then
         local modStr = '<LOC lobby_0002>%d Mods Enabled'
@@ -3094,7 +3161,8 @@ function RefreshOptionDisplayData(scenarioInfo)
             tooltip = 'Lobby_Mod_Option',
             valueTooltip = 'Lobby_Mod_Option'})
     end
-    
+--\\ Stop
+--// Check RestrictedUnit active
     if gameInfo.GameOptions.RestrictedCategories != nil then
         if table.getn(gameInfo.GameOptions.RestrictedCategories) != 0 then
             table.insert(formattedOptions, {text = LOC("<LOC lobby_0005>Build Restrictions Enabled"), 
@@ -3103,8 +3171,21 @@ function RefreshOptionDisplayData(scenarioInfo)
             tooltip = 'Lobby_BuildRestrict_Option',
             valueTooltip = 'Lobby_BuildRestrict_Option'})
         end
-    end 
-    
+    end
+--\\ Stop
+--// Check MapSize & MaxPlayer active
+    if scenarioInfo then
+        table.insert(formattedOptions, {text = '<LOC MAPSEL_0024>', 
+            value = LOCF("<LOC map_select_0008>%dkm x %dkm", scenarioInfo.size[1]/50, scenarioInfo.size[2]/50),
+            tooltip = 'map_select_sizeoption',
+            valueTooltip = 'map_select_sizeoption'})
+        table.insert(formattedOptions, {text = '<LOC MAPSEL_0031>Max Players', 
+            value = LOCF("<LOC map_select_0009>%d", table.getsize(scenarioInfo.Configurations.standard.teams[1].armies)),
+            tooltip = 'map_select_maxplayers',
+            valueTooltip = 'map_select_maxplayers'})
+    end
+--\\ Stop
+--// Check other options active
     for i, v in gameInfo.GameOptions do
         local option = false
         local mpOnly = false
@@ -3158,14 +3239,14 @@ function RefreshOptionDisplayData(scenarioInfo)
             end
         end
     end
-    table.sort(formattedOptions, 
-        function(a, b)
-            if a.mod or b.mod then
-                return a.mod or false
-            else
-                return LOC(a.text) < LOC(b.text) 
-            end
-        end)
+--    table.sort(formattedOptions, 
+--        function(a, b)
+--            if a.mod or b.mod then
+--                return a.mod or false
+--            else
+--                return LOC(a.text) < LOC(b.text) 
+--            end
+--        end)
     if GUI.OptionContainer.CalcVisible then
         GUI.OptionContainer:CalcVisible()
     end

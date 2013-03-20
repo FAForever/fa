@@ -384,7 +384,6 @@ globalOpts = {
     },
 }
 
-
 AIOpts = {
    {
         default = 11,

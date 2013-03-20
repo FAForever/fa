@@ -563,8 +563,8 @@ function RefreshOptions(skipRefresh, singlePlayer)
     -- so we'll used this flag to reset the options sources so they can set up for multiplayer
     if skipRefresh then
         OptionSource[1] = {title = "<LOC uilobby_0001>Team Options", options = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions}
-	OptionSource[2] = {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts}
-	OptionSource[3] = {title = "AI Options", options = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts}
+		OptionSource[2] = {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts}
+		OptionSource[3] = {title = "AI Options", options = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts}
 --~         table.sort(OptionSource[1].options, function(a, b) return LOC(a.label) < LOC(b.label) end)
 --~         table.sort(OptionSource[2].options, function(a, b) return LOC(a.label) < LOC(b.label) end)
 --~         table.sort(OptionSource[3].options, function(a, b) return LOC(a.label) < LOC(b.label) end)
@@ -579,7 +579,7 @@ function RefreshOptions(skipRefresh, singlePlayer)
             table.insert(Options, {type = 'title', text = OptionTable.title})
             for optionIndex, optionData in OptionTable.options do
                 if not(singlePlayer and optionData.mponly == true) then
-                    table.insert(Options, {type = 'option', text = optionData.label, data = optionData})
+                    table.insert(Options, {type = 'option', text = optionData.label, data = optionData, default = optionData.default})
                 end
             end
         end
@@ -717,16 +717,31 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
                 local tooltipTable = {}
                 for index, val in data.data.values do
                     itemArray[index] = val.text
-                    line.combo.keyMap[val.key] = index
-                    tooltipTable[index]={text=val.text,body=val.help}
+                    line.combo.keyMap[val.key] = index -- = 1 ou 2 ..
+                    tooltipTable[index]={text=val.text,body=val.help}--= 'lob_'..data.data.key..'_'..val.key
                 end
-                local defValue = changedOptions[data.data.key].index or line.combo.keyMap[curOptions[data.data.key]] or 1
+
+--				LOG("XINNONY number of Values : "..table.getsize(data.data.values))
+				if data.default ~= nil and data.default <= table.getsize(data.data.values) then
+--					LOG("XINNONY IF name of Option : "..data.data.key)
+--					LOG("XINNONY IF default : "..data.default)
+					defValue = data.default or changedOptions[data.data.key].index or line.combo.keyMap[curOptions[data.data.key]] or 1
+					if data.default == 0 then
+--						LOG("XINNONY ELSE name of Option : .")--..data.data.key)
+--						LOG("XINNONY ELSE default : 0 to 1")--..data.default)
+						defValue = 1
+					end
+				else
+--					LOG("XINNONY ELSE name of Option : .")--..data.data.key)
+--					LOG("XINNONY ELSE default : Not default")--..data.default)
+					defValue = changedOptions[data.data.key].index or line.combo.keyMap[curOptions[data.data.key]] or 1
+				end
                 line.combo:AddItems(itemArray, defValue)
                 line.combo.OnClick = function(self, index, text)
                     changedOptions[data.data.key] = {value = data.data.values[index].key, pref = data.data.pref, index = index}
                 end
                 line.HandleEvent = Group.HandleEvent
-                Tooltip.AddControlTooltip(line, {text=data.data.label,body=data.data.help})
+                Tooltip.AddControlTooltip(line, {text=data.data.label,body=data.data.help})--(line, data.data.pref)
                 Tooltip.AddComboTooltip(line.combo, tooltipTable, line.combo._list)
                 line.combo.UpdateValue = function(key)
                     line.combo:SetItem(line.combo.keyMap[key])
