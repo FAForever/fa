@@ -3100,52 +3100,51 @@ function RefreshOptionDisplayData(scenarioInfo)
 		local getNorush = gameInfo.GameOptions['NoRushOption'] -- 'Off'
 		local getNumbMod = table.getn(Mods.GetGameMods(gameInfo.GameMods)) -- 0 for the purposes of this function
 		local getRstric = gameInfo.GameOptions.RestrictedCategories -- can be nil or a table, even if no unit restrictions are present
---		LOG(getVictory..' // '..getTimeo..' // '..getCheat..' // '..getCivil..' // '..getSpeed..' // '..getFog..' // '..getUnitc..' // '..getPrebui..' // '..getNorush..' // '..getNumbMod..' // '..tostring(getRstric))
-		if getVictory == 'demoralization' and getTimeo == '3' and getCheat == 'false' and getCivil == 'enemy' 
-			and getSpeed == 'normal' and getFog == 'explored' and getUnitc == '1000' and getPrebui == 'Off' 
-			and getNorush == 'Off' and getNumbMod == 0 --and tostring(getRstric) == 'nil'
-			-- if all the conditions are present for a ranked game, except unit restrictions (special case)
-		then
-			if getRstric != nil then
-				if table.getn(getRstric) == 0 then -- if getRstric has been populated and then unit restrictions disabled
-					--AddChatText('First major if statement reached - If FAF launched and ranked conditions exist...')
-					table.insert(formattedOptions, {text = 'Rank',
-						value = 'Ranked',
-						green = true,
-						tooltip = 'Ranked',
-						valuetooltip = 'This part is Ranked'})
-				end
-				if table.getn(getRstric) > 0 then -- if getRstric has been populated cleared and repopulated
-					--AddChatText("Unit Restriction readded")
-					table.insert(formattedOptions, {text = 'Rank',
-						value = 'Not ranked',
-						red = true,
-						tooltip = 'Not ranked',
-						valuetooltip = 'This part is NOT Ranked'})
-				end
-			else
-				if getRstric == nil then -- Unit restrictions not found (equals none or the behavior for initially launching the lobby)
-					table.insert(formattedOptions, {text = 'Rank',
-						value = 'Ranked',
-						green = true,
-						tooltip = 'Ranked',
-						valuetooltip = 'This part is Ranked'})
-				end 
-			end
+--~ 			AddChatText(tostring(cRstr))
+		if getVictory == 'demoralization' and getTimeo == '3' and getCheat == 'false' and getCivil == 'enemy' and getSpeed == 'normal'
+		and getFog == 'explored' and getUnitc == '1000' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and getRstric == nil then
+			table.insert(formattedOptions, {text = 'Ranking',
+				value = 'Ranked',
+				green = true,
+				tooltip = 'Ranked',
+				valuetooltip = 'This part is Ranked !'})
 		else
-			table.insert(formattedOptions, {text = 'Rank',
-				value = 'Not ranked',
-				red = true,
-				tooltip = 'Not ranked',
-				valuetooltip = 'This part is NOT Ranked'})
+			if getVictory == 'demoralization' and getTimeo == '3' and getCheat == 'false' and getCivil == 'enemy' and getSpeed == 'normal'
+			and getFog == 'explored' and getUnitc == '1000' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and table.getn(getRstric) == 0 then
+				table.insert(formattedOptions, {text = 'Ranking',
+					value = 'Ranked',
+					green = true,
+					tooltip = 'Ranked',
+					valuetooltip = 'This part is Ranked !'})
+			else
+				table.insert(formattedOptions, {text = 'Ranking',
+					value = 'Unranked',
+					red = true,
+					tooltip = 'Not ranked',
+					valuetooltip = 'This part is NOT Ranked !'})
+			end
 		end
 	else
-		--AddChatText('NO FAF MOD, Unranked !')
-		table.insert(formattedOptions, {text = 'Rank',
-			value = 'Not ranked',
+--~ 		if cLimit == "init_blackops.lua" then
+--~ 			AddChatText('Welcome to BlackOps MOD')
+--~ 		elseif cLimit == "init_labwars.lua" then
+--~ 			AddChatText('Welcome to Labwars MOD')
+--~ 		elseif cLimit == "init_ladder1v1.lua" then
+--~ 			AddChatText('Welcome to Ladder 1v1 MOD')
+--~ 		elseif cLimit == "init_nomads.lua" then
+--~ 			AddChatText('Welcome to Nomads MOD')
+--~ 		elseif cLimit == "init_phantomx.lua" then
+--~ 			AddChatText('Welcome to PhantomX MOD')
+--~ 		elseif cLimit == "init_supremeDestruction.lua" then
+--~ 			AddChatText('Welcome to SupremeDestruction MOD')
+--~ 		elseif cLimit == "init_xtremewars.lua" then
+--~ 			AddChatText('Welcome to XtremeWars MOD')
+--~ 		end
+		table.insert(formattedOptions, {text = 'Ranking',
+			value = 'Unranked',
 			red = true,
 			tooltip = 'Not ranked',
-			valuetooltip = 'This part is NOT Ranked'})
+			valuetooltip = 'This part is NOT Ranked !'})
 	end
 --\\ Stop
 --// Check Mod active
