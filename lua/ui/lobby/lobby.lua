@@ -3174,6 +3174,7 @@ function RefreshOptionDisplayData(scenarioInfo)
 --\\ Stop
 --// Check MapSize & MaxPlayer active
     if scenarioInfo then
+		randmapText:SetText(scenarioInfo.name) -- Set the map name at the top right corner in lobby -- Xinnony
         table.insert(formattedOptions, {text = '<LOC MAPSEL_0024>', 
             value = LOCF("<LOC map_select_0008>%dkm x %dkm", scenarioInfo.size[1]/50, scenarioInfo.size[2]/50),
             tooltip = 'map_select_sizeoption',
