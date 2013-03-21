@@ -112,6 +112,8 @@ scoreData {
 -- global score data can be read from directly
 scoreData = {}
 scoreData.current = {}
+scoreData.historical = {}
+
 fullSyncOccured = false
 
 --[[
@@ -122,15 +124,19 @@ scoreData.historical = {}
 scoreInterval = 10
 
 function UpdateScoreData(newData)
-    scoreData.current = table.deepcopy(newData)
-	fullSyncOccured = false
+	if fullSyncOccured == false then
+		scoreData.current = table.deepcopy(newData)
+	end
+
 end
 
 function OnFullSync(accumData)
-	LOG("doing full sim")
-	scoreData = table.deepcopy(accumData)
-    fullSyncOccured = true
-	LOG(repr(scoreData))
+	if fullSyncOccured == false then
+		LOG("doing full sim")
+		scoreData = table.deepcopy(accumData)
+		
+		fullSyncOccured = true
+	end
 end
 
 --[[
