@@ -29,6 +29,7 @@ local connectionFailedDialog = false
 local localPlayerID = false
 local gameInfo = {
     GameOptions = {
+        Score = 'no',
         TeamSpawn = 'fixed',
         TeamLock = 'locked',
         Victory = 'demoralization',
