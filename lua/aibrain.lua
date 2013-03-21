@@ -35,21 +35,19 @@ local scoreOption = ScenarioInfo.Options.Score or "no"
 
 scoreData = {}
 scoreData.current = {}
-local advanced_stats =  "yes"
 
-if advanced_stats != 'no' then
-	scoreInterval = 10
-	scoreData.historical = {} 
+scoreInterval = 10
+scoreData.historical = {} 
 -- copy data over to historical
-	local curInterval = 1
-	local historicalUpdateThread = ForkThread(function()
-		while true do
-			WaitSeconds(scoreInterval)
-			scoreData.historical[curInterval] = table.deepcopy(scoreData.current)
-			curInterval = curInterval + 1
-		end  
-	end)
-end
+local curInterval = 1
+local historicalUpdateThread = ForkThread(function()
+	while true do
+		WaitSeconds(scoreInterval)
+		scoreData.historical[curInterval] = table.deepcopy(scoreData.current)
+		curInterval = curInterval + 1
+	end  
+end)
+
 
 
 
@@ -400,32 +398,38 @@ function SyncScores()
 	if GetFocusArmy() == -1 or ArmyIsOutOfGame(GetFocusArmy()) then
 		Sync.FullScoreSync = true
 		Sync.ScoreAccum = table.deepcopy(scoreData)
-		LOG(repr(scoreData))
 		LOG("full sim")
-	else 
+	elseif Sync.FullScoreSync == false then 
 		LOG("partial sim")
 		for index, brain in ArmyBrains do
-		
-		   Sync.Score[index] = {}
-
-		   Sync.Score[index].general = {}
-		   Sync.Score[index].general.currentunits = {}
-		   Sync.Score[index].general.currentunits.count = ArmyScore[index].general.currentunits.count
-		   Sync.Score[index].general.currentcap = {}
-		   Sync.Score[index].general.currentcap.count = ArmyScore[index].general.currentcap.count
-
-		   ####################
-		   ## General scores ##
-		   ####################
-		   Sync.Score[index].general.score = ArmyScore[index].general.score
+	
+			Sync.Score[index] = {}
+			Sync.Score[index].general = {}
+			if GetFocusArmy() == index then
+				Sync.Score[index].general.currentunits = {}
+			   
+				Sync.Score[index].general.currentunits.count = ArmyScore[index].general.currentunits.count
+				Sync.Score[index].general.currentcap = {}
+				Sync.Score[index].general.currentcap.count = ArmyScore[index].general.currentcap.count
+			end
+			
+			####################
+			## General scores ##
+			####################
+			if scoreOption != 'no' then 
+				Sync.Score[index].general.score = ArmyScore[index].general.score
+			else
+				Sync.Score[index].general.score = -1
+			end
 		end
-		Sync.FullScoreSync = false
+
 	end
 	
 	
 end
 
 function SyncCurrentScores()
+	Sync.FullScoreSync = false
 	# Sync the score at 1 sec intervals
     while true do
         SyncScores()
@@ -729,10 +733,6 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     CalculateScore = function(self)
-		if scoreOption == "no" then
-			return -1
-		end
-		
         local commanderKills = self:GetArmyStat("Enemies_Commanders_Destroyed",0).Value
         local massSpent = self:GetArmyStat("Economy_TotalConsumed_Mass",0.0).Value
         local massProduced = self:GetArmyStat("Economy_TotalProduced_Mass",0.0).Value -- not currently being used
