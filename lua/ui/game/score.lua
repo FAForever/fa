@@ -27,7 +27,7 @@ local observerLine = false
 
 ##  I switched the order of these because it was causing error, originally, the scoreoption line was first
 local sessionInfo = SessionGetScenarioInfo()   
-local scoreOption = sessionInfo.Options.Score or "yes"
+
 
 local lastUnitWarning = false
 local unitWarningUsed = false
@@ -107,6 +107,45 @@ function CreateScoreUI(parent)
 	
 
 end
+
+function round(number, precision)
+	precision = precision or 0
+
+	local decimal = string.find(tostring(number), ".", nil, true);
+	
+	if ( decimal ) then	
+		local power = 10 ^ precision;
+		
+		if ( number >= 0 ) then 
+			number = math.floor(number * power + 0.5) / power;
+		else 
+			number = math.ceil(number * power - 0.5) / power;		
+		end
+		
+		-- convert number to string for formatting
+		number = tostring(number);			
+		
+		-- set cutoff
+		local cutoff = number:sub(decimal + 1 + precision);
+			
+		-- delete everything after the cutoff
+		number = number:gsub(cutoff, "");
+	else
+		-- number is an integer
+		if ( precision > 0 ) then
+			number = tostring(number);
+			
+			number = number .. ".";
+			
+			for i = 1,precision
+			do
+				number = number .. "0";
+			end
+		end
+	end		
+	return number;
+end
+
 function SetLayout()
     if controls.bg then
         import(UIUtil.GetLayoutFilename('score')).SetLayout()
@@ -138,6 +177,20 @@ function SetupPlayerLines()
         LayoutHelpers.AtLeftIn(group.name, group, 16)
         LayoutHelpers.AtVerticalCenterIn(group.name, group)
         group.name:SetColor('ffffffff')
+
+		if SessionIsReplay() then
+			group.mass = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
+			group.mass:DisableHitTest()
+			LayoutHelpers.AtLeftIn(group.mass, group, 150)
+			LayoutHelpers.AtVerticalCenterIn(group.mass, group)
+			group.mass:SetColor('ffb7e75f')
+
+			group.energy = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
+			group.energy:DisableHitTest()
+			LayoutHelpers.AtLeftIn(group.energy, group, 170)
+			LayoutHelpers.AtVerticalCenterIn(group.energy, group)
+			group.energy:SetColor('fff7c70f')
+		end
         
         group.score = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
         group.score:DisableHitTest()
@@ -262,10 +315,10 @@ function SetupPlayerLines()
 		return group
 	end
 
-	for _, line in controls.armyLines do		
+	for _, line in controls.armyLines do
 		local playerName = line.name:GetText()
 		local playerRating = sessionInfo.Options.Ratings[playerName]
-		if (playerRating) then			
+		if (playerRating) then
 			playerNameLine = playerName..' ['..math.floor(playerRating+0.5)..']'
 			line.name:SetText(playerNameLine)
 		end
@@ -295,10 +348,33 @@ end
 				for _, line in controls.armyLines do
 					if line.armyID == index then
 						if line.OOG then break end
+						if SessionIsReplay() then
+							massin 		= math.ceil(scoreData.resources.massin.rate * 10)
+							energyin	= math.ceil(scoreData.resources.energyin.rate * 10)
+							if massin >= 1000 then
+								massin = massin / 1000
+								line.mass:SetText(string.format("%.1fk", massin))
+							else
+								line.mass:SetText(string.format("%d", massin))
+							end
+							if energyin >= 1000 then
+								energyin = energyin / 1000
+								line.energy:SetText(string.format("%.1fk", energyin))
+							else
+								line.energy:SetText(string.format("%d", energyin))
+							end
+						end
 						if scoreData.general.score == -1 then
 							line.score:SetText(LOC("<LOC _Playing>Playing"))
 						else
-							line.score:SetText(scoreData.general.score)
+							score = scoreData.general.score
+							if score >= 100 then
+								score = score / 1000
+								line.score:SetText(string.format("%.1fk", score))
+							else
+								line.score:SetText(string.format("%d", score))
+							end
+							
 						end
 						if GetFocusArmy() == index then
 							line.name:SetColor('ffff7f00')
@@ -315,7 +391,7 @@ end
 							line.score:SetFont(UIUtil.bodyFont, 14)
 						end
 						if armiesInfo[index].outOfGame then
-							if scoreOption == "no" then
+							if scoreData.general.score == -1 then
 								line.score:SetText(LOC("<LOC _Defeated>Defeated"))
 							end
 							line.OOG = true
@@ -339,21 +415,34 @@ end
 			end
 		end
 		table.sort(controls.armyLines, function(a,b)
-		if scoreOption == "no" then
-			return a.armyID >= b.armyID
+
+		if a.armyID == 0 or b.armyID == 0 then
+			return a.armyID >= b.armyID		
 		else
-		        if a.armyID == 0 or b.armyID == 0 then
-		            return a.armyID >= b.armyID		
-		        else
-		            if a.score:GetText() == b.score:GetText() then
-			            return a.name:GetText() < b.name:GetText()
-		            else
-			            return tonumber(a.score:GetText()) > tonumber(b.score:GetText())
-		            end
-		        end
-		    
-		    
+			if a.score:GetText() == b.score:GetText() then
+				return a.name:GetText() < b.name:GetText()
+			else
+				local score1 = a.score:GetText()
+				local score2 = b.score:GetText()
+				if string.find(score1, "k") then 
+					score1 = score1:gsub("%k", "")
+					score1 = tonumber(score1) * 1000
+				else
+					score1 = tonumber(score1)
+				end
+				if string.find(score2, "k") then 
+					score2 = score2:gsub("%k", "")
+					score2 = tonumber(score2) * 1000
+				else
+					score2 = tonumber(score2)
+				end
+
+				return score1 > score2
+			end
 		end
+	
+		    
+
 	
 		end)
 		import(UIUtil.GetLayoutFilename('score')).LayoutArmyLines()

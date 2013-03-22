@@ -131,12 +131,8 @@ function UpdateScoreData(newData)
 end
 
 function OnFullSync(accumData)
-	if fullSyncOccured == false then
-		LOG("doing full sim")
-		scoreData = table.deepcopy(accumData)
-		
+		scoreData = accumData
 		fullSyncOccured = true
-	end
 end
 
 --[[

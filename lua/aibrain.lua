@@ -33,6 +33,7 @@ local StratManager = import('/lua/sim/StrategyManager.lua')
 
 local scoreOption = ScenarioInfo.Options.Score or "no"
 
+local observer = false
 scoreData = {}
 scoreData.current = {}
 
@@ -179,6 +180,7 @@ function CollectCurrentScores()
        ArmyScore[index].resources.energyout.total = 0
        ArmyScore[index].resources.energyout.rate = 0
        ArmyScore[index].resources.energyover = 0
+       UpdateScoreData(ArmyScore)
     end
 
 	# Collect the various scores at regular intervals
@@ -296,7 +298,6 @@ function CollectCurrentScores()
         end
 	    WaitSeconds(0.5)  -- update scores every second
 		UpdateScoreData(ArmyScore)
-		#LOG(repr(scoreData))
 	end
 
 end
@@ -395,19 +396,18 @@ end
 
 
 function SyncScores()
-	if GetFocusArmy() == -1 or ArmyIsOutOfGame(GetFocusArmy()) then
+	if GetFocusArmy() == -1 or observer == true then
+		observer = true
 		Sync.FullScoreSync = true
-		Sync.ScoreAccum = table.deepcopy(scoreData)
-		LOG("full sim")
+		Sync.ScoreAccum = scoreData
+		Sync.Score = scoreData.current
+		
 	elseif Sync.FullScoreSync == false then 
-		LOG("partial sim")
 		for index, brain in ArmyBrains do
-	
 			Sync.Score[index] = {}
 			Sync.Score[index].general = {}
-			if GetFocusArmy() == index then
+			if GetFocusArmy() == index or GetFocusArmy() == -1 then
 				Sync.Score[index].general.currentunits = {}
-			   
 				Sync.Score[index].general.currentunits.count = ArmyScore[index].general.currentunits.count
 				Sync.Score[index].general.currentcap = {}
 				Sync.Score[index].general.currentcap.count = ArmyScore[index].general.currentcap.count
