@@ -3088,7 +3088,7 @@ function RefreshOptionDisplayData(scenarioInfo)
 --// Check Ranked active -- Xinnony & Vicarian
  	local getInit = GetCommandLineArg("/init", 1)
 	getInit = tostring(getInit[1])
-	if getInit == "init_faf.lua" then
+	if getInit == "init_faf.lua" or "init_balanceTesting.lua" then
 		--AddChatText('Welcome to Forged Alliance Forever MOD')
 		local getVictory = gameInfo.GameOptions['Victory'] -- 'demoralization'
 		local getTimeo = gameInfo.GameOptions['Timeouts'] -- '3'
@@ -3104,6 +3104,13 @@ function RefreshOptionDisplayData(scenarioInfo)
 --~ 			AddChatText(tostring(cRstr))
 		if getVictory == 'demoralization' and getTimeo == '3' and getCheat == 'false' and getCivil == 'enemy' and getSpeed == 'normal'
 		and getFog == 'explored' and getUnitc == '1000' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and getRstric == nil then
+			if getInit == "init_balanceTesting.lua" then
+				table.insert(formattedOptions, {text = 'Ranking TEST',
+				value = 'Ranked TEST',
+				green = true,
+				tooltip = 'Ranked TEST',
+				valuetooltip = 'This part is Ranked TEST !'})
+			end
 			table.insert(formattedOptions, {text = 'Ranking',
 				value = 'Ranked',
 				green = true,
@@ -3112,12 +3119,26 @@ function RefreshOptionDisplayData(scenarioInfo)
 		else
 			if getVictory == 'demoralization' and getTimeo == '3' and getCheat == 'false' and getCivil == 'enemy' and getSpeed == 'normal'
 			and getFog == 'explored' and getUnitc == '1000' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and table.getn(getRstric) == 0 then
+				if getInit == "init_balanceTesting.lua" then
+					table.insert(formattedOptions, {text = 'Ranking TEST',
+					value = 'Ranked TEST',
+					green = true,
+					tooltip = 'Ranked TEST',
+					valuetooltip = 'This part is Ranked TEST !'})
+				end
 				table.insert(formattedOptions, {text = 'Ranking',
 					value = 'Ranked',
 					green = true,
 					tooltip = 'Ranked',
 					valuetooltip = 'This part is Ranked !'})
 			else
+				if getInit == "init_balanceTesting.lua" then
+					table.insert(formattedOptions, {text = 'Ranking TEST',
+					value = 'Unranked TEST',
+					green = true,
+					tooltip = 'Not ranked TEST',
+					valuetooltip = 'This part is NOT Ranked TEST !'})
+				end
 				table.insert(formattedOptions, {text = 'Ranking',
 					value = 'Unranked',
 					red = true,
