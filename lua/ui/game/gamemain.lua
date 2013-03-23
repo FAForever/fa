@@ -33,6 +33,7 @@ local waitingDialog = false
 ###variables for FAF
 local sendChat = import('/lua/ui/game/chat.lua').ReceiveChatFromSim
 local oldData = {}
+local lastObserving
 ##end faf variables
 
 -- check this flag to see if it's valid to show the exit dialog
@@ -200,8 +201,12 @@ function CreateUI(isReplay)
 	import("/modules/displayrings.lua").Init()	##added for acu and engineer build radius ui mod
 	if SessionIsReplay() then
 		ForkThread(SendChat)
+		lastObserving = true
+        import('/lua/ui/game/avatars.lua').ToggleAvatars(false)
+        import('/lua/ui/game/economy.lua').ToggleEconPanel(false)
+		AddBeatFunction(UiBeat)
 	end
-	###End FAF added
+	
 end
 
 local provider = false
@@ -266,11 +271,15 @@ function CreateWldUIProvider()
         local function InitialAnimations()
             import('/lua/ui/game/tabs.lua').InitialAnimation()
             WaitSeconds(.15)
-            import('/lua/ui/game/economy.lua').InitialAnimation()
+			if not SessionIsReplay() then
+				import('/lua/ui/game/economy.lua').InitialAnimation()
+			end
             import('/lua/ui/game/score.lua').InitialAnimation()
             WaitSeconds(.15)
             import('/lua/ui/game/multifunction.lua').InitialAnimation()
-            import('/lua/ui/game/avatars.lua').InitialAnimation()
+            if not SessionIsReplay() then
+				import('/lua/ui/game/avatars.lua').InitialAnimation()
+			end
             import('/lua/ui/game/controlgroups.lua').InitialAnimation()
             WaitSeconds(.15)
             HideGameUI('off')
@@ -723,6 +732,15 @@ function SimChangeCameraZoom(newMult)
 end
 
 ####below is FAF function
+
+function UiBeat()
+    local observing = (GetFocusArmy() == -1)
+    if (observing ~= lastObserving) then
+        lastObserving = observing
+        import('/lua/ui/game/avatars.lua').ToggleAvatars(not observing)
+        import('/lua/ui/game/economy.lua').ToggleEconPanel(not observing)
+    end
+end
 
 SendChat = function()
 	while true do

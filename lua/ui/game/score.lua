@@ -108,90 +108,124 @@ function CreateScoreUI(parent)
 
 end
 
-function round(number, precision)
-	precision = precision or 0
-
-	local decimal = string.find(tostring(number), ".", nil, true);
-	
-	if ( decimal ) then	
-		local power = 10 ^ precision;
-		
-		if ( number >= 0 ) then 
-			number = math.floor(number * power + 0.5) / power;
-		else 
-			number = math.ceil(number * power - 0.5) / power;		
-		end
-		
-		-- convert number to string for formatting
-		number = tostring(number);			
-		
-		-- set cutoff
-		local cutoff = number:sub(decimal + 1 + precision);
-			
-		-- delete everything after the cutoff
-		number = number:gsub(cutoff, "");
-	else
-		-- number is an integer
-		if ( precision > 0 ) then
-			number = tostring(number);
-			
-			number = number .. ".";
-			
-			for i = 1,precision
-			do
-				number = number .. "0";
-			end
-		end
-	end		
-	return number;
+function fmtnum(ns)
+    if (ns < 1000) then         -- 0 to 999
+        return string.format("%01.0f", ns)
+    elseif (ns < 10000) then   -- 1.0K to 9.9K
+        return string.format("%01.1fk", ns / 1000)
+    elseif (ns < 1000000) then -- 10K to 999K
+        return string.format("%01.0fk", ns / 1000)
+    else                       -- 1.0M to ....
+        return string.format("%01.1fk", ns / 1000000)
+    end
 end
+
 
 function SetLayout()
     if controls.bg then
         import(UIUtil.GetLayoutFilename('score')).SetLayout()
     end
 end
+
 function SetupPlayerLines()
     local function CreateArmyLine(data, armyIndex)
         local group = Group(controls.bgStretch)
-
-        group.faction = Bitmap(group)
-        if armyIndex != 0 then
-            group.faction:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(data.faction)))
-        else
-            group.faction:SetTexture(UIUtil.UIFile('/widgets/faction-icons-alpha_bmp/observer_ico.dds'))
-        end
-        group.faction.Height:Set(14)
-        group.faction.Width:Set(14)
-        group.faction:DisableHitTest()
-        LayoutHelpers.AtLeftTopIn(group.faction, group)
+        local sw = 42
         
-        group.color = Bitmap(group.faction)
-        group.color:SetSolidColor(data.color)
-        group.color.Depth:Set(function() return group.faction.Depth() - 1 end)
-        group.color:DisableHitTest()
-        LayoutHelpers.FillParent(group.color, group.faction)
-        
-        group.name = UIUtil.CreateText(group, data.nickname, 12, UIUtil.bodyFont)
-        group.name:DisableHitTest()
-        LayoutHelpers.AtLeftIn(group.name, group, 16)
-        LayoutHelpers.AtVerticalCenterIn(group.name, group)
-        group.name:SetColor('ffffffff')
+        if (armyIndex != 0 and SessionIsReplay()) then
+             group.faction = Bitmap(group)
+	        if armyIndex != 0 then
+	            group.faction:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(data.faction)))
+	        else
+	            group.faction:SetTexture(UIUtil.UIFile('/widgets/faction-icons-alpha_bmp/observer_ico.dds'))
+	        end
+	        group.faction.Height:Set(14)
+	        group.faction.Width:Set(14)
+	        group.faction:DisableHitTest()
+	        LayoutHelpers.AtLeftTopIn(group.faction, group, -4)
+	        
+	        group.color = Bitmap(group.faction)
+	        group.color:SetSolidColor(data.color)
+	        group.color.Depth:Set(function() return group.faction.Depth() - 1 end)
+	        group.color:DisableHitTest()
+	        LayoutHelpers.FillParent(group.color, group.faction)
+	
+	        group.name = UIUtil.CreateText(group, data.nickname, 12, UIUtil.bodyFont)
+	        group.name:DisableHitTest()
+	--        LayoutHelpers.AtLeftIn(group.name, group, 16)
+	        LayoutHelpers.AtLeftIn(group.name, group, 12)
+	        LayoutHelpers.AtVerticalCenterIn(group.name, group)
+	        group.name:SetColor('ffffffff')
+	        
+	        group.score = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
+	        group.score:DisableHitTest()
+	        LayoutHelpers.AtRightIn(group.score, group, sw * 2)
+	        LayoutHelpers.AtVerticalCenterIn(group.score, group)
+	        group.score:SetColor('ffffffff')
+	        
+	        group.name.Right:Set(group.score.Left)
+	        group.name:SetClipToWidth(true)
+	        
+	        group.mass = Bitmap(group)
+	        group.mass:SetTexture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
+	        LayoutHelpers.AtRightIn(group.mass, group, sw * 1)
+	        LayoutHelpers.AtVerticalCenterIn(group.mass, group)
+	        group.mass.Height:Set(14)
+	        group.mass.Width:Set(14)
 
-		if SessionIsReplay() then
-			group.mass = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
-			group.mass:DisableHitTest()
-			LayoutHelpers.AtLeftIn(group.mass, group, 150)
-			LayoutHelpers.AtVerticalCenterIn(group.mass, group)
-			group.mass:SetColor('ffb7e75f')
-
-			group.energy = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
-			group.energy:DisableHitTest()
-			LayoutHelpers.AtLeftIn(group.energy, group, 170)
-			LayoutHelpers.AtVerticalCenterIn(group.energy, group)
-			group.energy:SetColor('fff7c70f')
-		end
-        
+	        group.mass_in = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
+	        group.mass_in:DisableHitTest()
+	        LayoutHelpers.AtRightIn(group.mass_in, group, sw * 1+14)
+	        LayoutHelpers.AtVerticalCenterIn(group.mass_in, group)
+	        group.mass_in:SetColor('ffb7e75f')
+	
+	        group.energy = Bitmap(group)
+	        group.energy:SetTexture(UIUtil.UIFile('/game/build-ui/icon-energy_bmp.dds'))
+	        LayoutHelpers.AtRightIn(group.energy, group, sw * 0)
+	        LayoutHelpers.AtVerticalCenterIn(group.energy, group)
+	        group.energy.Height:Set(14)
+	        group.energy.Width:Set(14)
+	                
+	        group.energy_in = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
+	        group.energy_in:DisableHitTest()
+	        LayoutHelpers.AtRightIn(group.energy_in, group, sw * 0+14)
+	        LayoutHelpers.AtVerticalCenterIn(group.energy_in, group)
+	        group.energy_in:SetColor('fff7c70f')
+	
+	   else
+	        group.faction = Bitmap(group)
+	        if armyIndex != 0 then
+	            group.faction:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(data.faction)))
+	        else
+	            group.faction:SetTexture(UIUtil.UIFile('/widgets/faction-icons-alpha_bmp/observer_ico.dds'))
+	        end
+	        group.faction.Height:Set(14)
+	        group.faction.Width:Set(14)
+	        group.faction:DisableHitTest()
+	        LayoutHelpers.AtLeftTopIn(group.faction, group)
+	        
+	        group.color = Bitmap(group.faction)
+	        group.color:SetSolidColor(data.color)
+	        group.color.Depth:Set(function() return group.faction.Depth() - 1 end)
+	        group.color:DisableHitTest()
+	        LayoutHelpers.FillParent(group.color, group.faction)
+	
+	        group.name = UIUtil.CreateText(group, data.nickname, 12, UIUtil.bodyFont)
+	        group.name:DisableHitTest()
+             LayoutHelpers.AtLeftIn(group.name, group, 16)
+	        LayoutHelpers.AtVerticalCenterIn(group.name, group)
+	        group.name:SetColor('ffffffff')
+	        
+	        group.score = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
+	        group.score:DisableHitTest()
+	        LayoutHelpers.AtRightIn(group.score, group)
+	        LayoutHelpers.AtVerticalCenterIn(group.score, group)
+	        group.score:SetColor('ffffffff')
+	        
+	        group.name.Right:Set(group.score.Left)
+	        group.name:SetClipToWidth(true)
+	   end
+--[[
         group.score = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
         group.score:DisableHitTest()
         LayoutHelpers.AtRightIn(group.score, group)
@@ -200,12 +234,12 @@ function SetupPlayerLines()
         
         group.name.Right:Set(group.score.Left)
         group.name:SetClipToWidth(true)
-        
+]]--        
         group.Height:Set(group.faction.Height)
-        group.Width:Set(210)
-        
+        group.Width:Set(262)
         group.armyID = armyIndex
-        
+
+
         if SessionIsReplay() then
             group.bg = Bitmap(group)
             group.bg:SetSolidColor('00000000')
@@ -308,7 +342,7 @@ function SetupPlayerLines()
 		group.name:SetClipToWidth(true)
 		
 		group.Height:Set(18)
-		group.Width:Set(210)        
+		group.Width:Set(262)        
 		
 		group:DisableHitTest()
 		
@@ -349,31 +383,17 @@ end
 					if line.armyID == index then
 						if line.OOG then break end
 						if SessionIsReplay() then
-							massin 		= math.ceil(scoreData.resources.massin.rate * 10)
-							energyin	= math.ceil(scoreData.resources.energyin.rate * 10)
-							if massin >= 1000 then
-								massin = massin / 1000
-								line.mass:SetText(string.format("%.1fk", massin))
-							else
-								line.mass:SetText(string.format("%d", massin))
-							end
-							if energyin >= 1000 then
-								energyin = energyin / 1000
-								line.energy:SetText(string.format("%.1fk", energyin))
-							else
-								line.energy:SetText(string.format("%d", energyin))
+							if (scoreData.resources.massin.rate) then
+								line.mass_in:SetText(fmtnum(scoreData.resources.massin.rate * 10))
+								line.energy_in:SetText(fmtnum(scoreData.resources.energyin.rate * 10))
 							end
 						end
 						if scoreData.general.score == -1 then
 							line.score:SetText(LOC("<LOC _Playing>Playing"))
+							line.scoreNumber = -1
 						else
-							score = scoreData.general.score
-							if score >= 100 then
-								score = score / 1000
-								line.score:SetText(string.format("%.1fk", score))
-							else
-								line.score:SetText(string.format("%d", score))
-							end
+							line.score:SetText(fmtnum(scoreData.general.score))
+							line.scoreNumber = scoreData.general.score
 							
 						end
 						if GetFocusArmy() == index then
@@ -393,12 +413,18 @@ end
 						if armiesInfo[index].outOfGame then
 							if scoreData.general.score == -1 then
 								line.score:SetText(LOC("<LOC _Defeated>Defeated"))
+								line.scoreNumber = -1
 							end
 							line.OOG = true
 							line.faction:SetTexture(UIUtil.UIFile('/game/unit-over/icon-skull_bmp.dds'))
 							line.color:SetSolidColor('ff000000')
 							line.name:SetColor('ffa0a0a0')
 							line.score:SetColor('ffa0a0a0')
+							if SessionIsReplay() then
+								line.mass_in:SetColor('ffa0a0a0')
+								line.energy_in:SetColor('ffa0a0a0')	
+							end
+							
 						end
 						break
 					end
@@ -415,39 +441,19 @@ end
 			end
 		end
 		table.sort(controls.armyLines, function(a,b)
-
-		if a.armyID == 0 or b.armyID == 0 then
-			return a.armyID >= b.armyID		
-		else
-			if a.score:GetText() == b.score:GetText() then
-				return a.name:GetText() < b.name:GetText()
+			if a.armyID == 0 or b.armyID == 0 then
+				return a.armyID >= b.armyID
 			else
-				local score1 = a.score:GetText()
-				local score2 = b.score:GetText()
-				if string.find(score1, "k") then 
-					score1 = score1:gsub("%k", "")
-					score1 = tonumber(score1) * 1000
+				if tonumber(a.scoreNumber) == tonumber(b.scoreNumber) then
+					return a.name:GetText() < b.name:GetText()
 				else
-					score1 = tonumber(score1)
+					return tonumber(a.scoreNumber) > tonumber(b.scoreNumber)
 				end
-				if string.find(score2, "k") then 
-					score2 = score2:gsub("%k", "")
-					score2 = tonumber(score2) * 1000
-				else
-					score2 = tonumber(score2)
-				end
-
-				return score1 > score2
 			end
-		end
-	
-		    
-
-	
 		end)
 		import(UIUtil.GetLayoutFilename('score')).LayoutArmyLines()
-		
-	end	
+end
+
 function SetUnitText(current, cap)
     controls.units:SetText(string.format("%d/%d", current, cap))
     if current == cap then
@@ -523,6 +529,7 @@ function ToggleScoreControl(state)
         end
     end
 end
+
 function Expand()
     if needExpand then
         controls.bg:Show()
@@ -532,6 +539,7 @@ function Expand()
         needExpand = false
     end
 end
+
 function Contract()
     if controls.bg then
         if not controls.bg:IsHidden() then
