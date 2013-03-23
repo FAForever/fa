@@ -1,0 +1,53 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    CollisionOffsetX = -0.1,
+    CollisionOffsetY = 0,
+    CollisionOffsetZ = 1.1,
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = '../cypress01_s1_albedo.dds',
+                    LODCutoff = 30,
+                    NormalsName = '../cypress01_s1_normalsTS.dds',
+                    ShaderName = 'TMeshAlpha',
+                },
+                {
+                    AlbedoName = '../cypress01_s1_albedo.dds',
+                    LODCutoff = 175,
+                    NormalsName = '../cypress01_s1_normalsTS.dds',
+                    ShaderName = 'TMeshAlpha',
+                },
+                {
+                    AlbedoName = 'cypress01_Group1_LOD2_albedo.dds',
+                    LODCutoff = 700,
+                    ShaderName = 'VertexNormal',
+                },
+            },
+        },
+        UniformScale = 0.05,
+    },
+    Economy = {
+        ReclaimEnergyMax = 150,
+        ReclaimMassMax = 8,
+        ReclaimTime = 5,
+    },
+    Interface = {
+        HelpText = 'Group of Large Trees - Swamp',
+    },
+    Physics = {
+        BlockPath = false,
+    },
+    ScriptClass = 'TreeGroup',
+    ScriptModule = '/lua/proptree.lua',
+    SizeX = 5,
+    SizeY = 1.5,
+    SizeZ = 5.5,
+}
