@@ -3088,8 +3088,8 @@ function RefreshOptionDisplayData(scenarioInfo)
 --// Check Ranked active -- Xinnony & Vicarian
  	local getInit = GetCommandLineArg("/init", 1)
 	getInit = tostring(getInit[1])
-	if getInit = "init_faf.lua" then
-		AddChatText('Welcome to Forged Alliance Forever MOD'..getInit)
+	if getInit == "init_faf.lua" then
+--		AddChatText('Welcome to Forged Alliance Forever MOD'..getInit)
 		local getVictory = gameInfo.GameOptions['Victory'] -- 'demoralization'
 		local getTimeo = gameInfo.GameOptions['Timeouts'] -- '3'
 		local getCheat = gameInfo.GameOptions['CheatsEnabled'] -- 'false'

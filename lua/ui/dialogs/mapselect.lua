@@ -726,11 +726,11 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
 				if data.default ~= nil and data.default <= table.getsize(data.data.values) then
 --					LOG("XINNONY IF name of Option : "..data.data.key)
 --					LOG("XINNONY IF default : "..data.default)
-					if line.combo.keyMap[curOptions[data.data.key]] != nil then
+--					if line.combo.keyMap[curOptions[data.data.key]] != nil then
 --						LOG("XINNONY IF changedOptions : "..line.combo.keyMap[curOptions[data.data.key]])
-					else
+--					else
 --						LOG("XINNONY IF changedOptions : RIEN")
-					end
+--					end
 					defValue = changedOptions[data.data.key].index or line.combo.keyMap[curOptions[data.data.key]] or data.default or 1
 					if data.default == 0 then
 --						LOG("XINNONY ELSE name of Option : .")--..data.data.key)
