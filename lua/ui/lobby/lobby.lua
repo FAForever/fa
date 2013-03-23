@@ -3089,7 +3089,7 @@ function RefreshOptionDisplayData(scenarioInfo)
  	local getInit = GetCommandLineArg("/init", 1)
 	getInit = tostring(getInit[1])
 	if getInit == "init_faf.lua" then
-		--AddChatText('Welcome to Forged Alliance Forever MOD')
+--		AddChatText('Welcome to Forged Alliance Forever MOD'..getInit)
 		local getVictory = gameInfo.GameOptions['Victory'] -- 'demoralization'
 		local getTimeo = gameInfo.GameOptions['Timeouts'] -- '3'
 		local getCheat = gameInfo.GameOptions['CheatsEnabled'] -- 'false'
@@ -3126,19 +3126,19 @@ function RefreshOptionDisplayData(scenarioInfo)
 			end
 		end
 	else
---~ 		if cLimit == "init_blackops.lua" then
+--~ 		if getInit == "init_blackops.lua" then
 --~ 			AddChatText('Welcome to BlackOps MOD')
---~ 		elseif cLimit == "init_labwars.lua" then
+--~ 		elseif getInit == "init_labwars.lua" then
 --~ 			AddChatText('Welcome to Labwars MOD')
---~ 		elseif cLimit == "init_ladder1v1.lua" then
+--~ 		elseif getInit == "init_ladder1v1.lua" then
 --~ 			AddChatText('Welcome to Ladder 1v1 MOD')
---~ 		elseif cLimit == "init_nomads.lua" then
+--~ 		elseif getInit == "init_nomads.lua" then
 --~ 			AddChatText('Welcome to Nomads MOD')
---~ 		elseif cLimit == "init_phantomx.lua" then
+--~ 		elseif getInit == "init_phantomx.lua" then
 --~ 			AddChatText('Welcome to PhantomX MOD')
---~ 		elseif cLimit == "init_supremeDestruction.lua" then
+--~ 		elseif getInit == "init_supremeDestruction.lua" then
 --~ 			AddChatText('Welcome to SupremeDestruction MOD')
---~ 		elseif cLimit == "init_xtremewars.lua" then
+--~ 		elseif getInit == "init_xtremewars.lua" then
 --~ 			AddChatText('Welcome to XtremeWars MOD')
 --~ 		end
 		table.insert(formattedOptions, {text = 'Ranking',

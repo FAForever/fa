@@ -720,16 +720,22 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
                     line.combo.keyMap[val.key] = index -- = 1 ou 2 ..
                     tooltipTable[index]={text=val.text,body=val.help}--= 'lob_'..data.data.key..'_'..val.key
                 end
-
+--// Set SelectedOption or Default Option or ... -- Fix AdvancedOption by Xinnony
+--				LOG("XINNONY //////////////////////////////////////////")
 --				LOG("XINNONY number of Values : "..table.getsize(data.data.values))
 				if data.default ~= nil and data.default <= table.getsize(data.data.values) then
 --					LOG("XINNONY IF name of Option : "..data.data.key)
 --					LOG("XINNONY IF default : "..data.default)
-					defValue = data.default or changedOptions[data.data.key].index or line.combo.keyMap[curOptions[data.data.key]] or 1
+--					if line.combo.keyMap[curOptions[data.data.key]] != nil then
+--						LOG("XINNONY IF changedOptions : "..line.combo.keyMap[curOptions[data.data.key]])
+--					else
+--						LOG("XINNONY IF changedOptions : RIEN")
+--					end
+					defValue = changedOptions[data.data.key].index or line.combo.keyMap[curOptions[data.data.key]] or data.default or 1
 					if data.default == 0 then
 --						LOG("XINNONY ELSE name of Option : .")--..data.data.key)
 --						LOG("XINNONY ELSE default : 0 to 1")--..data.default)
-						defValue = 1
+						defValue = line.combo.keyMap[curOptions[data.data.key]] or 1
 					end
 				else
 --					LOG("XINNONY ELSE name of Option : .")--..data.data.key)
@@ -758,6 +764,7 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
             end
         end
     end
+--\\ Stop
 
     OptionContainer:CalcVisible()
 
