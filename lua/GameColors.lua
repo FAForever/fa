@@ -2,44 +2,33 @@
 GameColors = {
     CivilianArmyColor = "BurlyWood",
     ArmyColors = {
-        # faction colors
-	"ff343fff",      # light blue*
-	"ff00d900",      # light green*
-	"ffff3431",      # light red*
-	"fffeff00",      # bright yellow*
-        'FFFF873E',      # Nomads orange
-
-        # white and grey
- 	"FFFFFFFF",      # white
-	"ffb4ffd4",      # white-ish-blue*
- 	"FFA7A7A7",      # grey
-
-        # yellow
-	"FFFFC513",      # yellow
-	"FFC1FF2B",      # light yellow/green
-
-        # red
-	"FFD4000F",      # red
-	"FF4d0505",      # dark red
-	"FF5C0417",      # dark red
-
-        # blue
- 	"ff00bcd6",      # teal*
-	"FF2936B5",      # dark blue
-
-        # green
-	"FF396D1F",      # dark green
+        #Faction colours
+	"ff436eee",      # new blue1
+	"ffa7a7a7",      # new grey
+	"ffee2c2c",      # new red
+	"fffafa00",      # new yellow
+	"ffff873e",      # new orange
+	"ffffffff",      # white
+	"ff999666",      # army
  	"FF2F4F4F",      # olive (dark green)
-	"FF383935",      # olive brown (dark green/brown)
-
-        # pink / purple
-        'FFFB93FF',      # pink
-	"BlueViolet",    # purple
+	"ff2e8b57",      # new green
+	"ff40bf40",      # mid green
+	"ffc1ffc1",      # lt green
+	"ff66ffcc",      # aqua
+	"ff00bcd6",      # new blue2
+	"ff0430bf",      # Dark blue*
 	"FF5F01A7",      # dark purple
+	"ff9161ff",      # purple
+	"ffff32ff",      # new fuschia
+	"ffff88ff",      # pink
+	"ffffbf80",      # lt orange
+	"ffb76518",      # new brown
+	"ff901427",      # dark red
+
 
 #	"FF131cd3",      # UEF blue
 #	"DarkGreen",     # Aeon green
-#	"FFe80a0a",      # Cybran red
+#	"ffff3431",      # Light red
 #	"Goldenrod",     # Seraphim yellow
 # 	"Darkslategray",
 #	"FF2E8B57",
@@ -54,27 +43,28 @@ GameColors = {
     },
     PlayerColors = {
         # same as above
-	"ff343fff",      # light blue*
-	"ff00d900",      # light green*
-	"ffff3431",      # light red*
-	"fffeff00",      # bright yellow*
-        'FFFF873E',      # Nomads orange
- 	"FFFFFFFF",      # white
-	"ffb4ffd4",      # white-ish-blue*
- 	"FFA7A7A7",      # grey
-	"FFFFC513",      # yellow
-	"FFC1FF2B",      # light yellow/green
-	"FFD4000F",      # red
-	"FF4d0505",      # dark red
-	"FF5C0417",      # dark red
- 	"ff00bcd6",      # teal*
-	"FF2936B5",      # dark blue
-	"FF396D1F",      # dark green
+	"ff436eee",      # new blue1
+	"ffa7a7a7",      # new grey
+	"ffee2c2c",      # new red
+	"fffafa00",      # new yellow
+	"ffff873e",      # new orange
+	"ffffffff",      # white
+	"ff999666",      # army
  	"FF2F4F4F",      # olive (dark green)
-	"FF383935",      # olive brown (dark green/brown)
-        'FFFB93FF',      # pink
-	"BlueViolet",    # purple
+	"ff2e8b57",      # new green
+	"ff40bf40",      # mid green
+	"ffc1ffc1",      # lt green
+	"ff66ffcc",      # aqua
+	"ff00bcd6",      # new blue2
+	"ff0430bf",      # Dark blue*
 	"FF5F01A7",      # dark purple
+	"ff9161ff",      # purple
+	"ffff32ff",      # new fuschia
+	"ffff88ff",      # pink
+	"ffffbf80",      # lt orange
+	"ffb76518",      # new brown
+	"ff901427",      # dark red
+
     },
     TeamColorMode = {
         Self = "RoyalBlue",
