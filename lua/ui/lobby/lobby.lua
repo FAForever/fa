@@ -3088,8 +3088,8 @@ function RefreshOptionDisplayData(scenarioInfo)
 --// Check Ranked active -- Xinnony & Vicarian
  	local getInit = GetCommandLineArg("/init", 1)
 	getInit = tostring(getInit[1])
-	if getInit == "init_faf.lua" or "init_balanceTesting.lua" then
-		--AddChatText('Welcome to Forged Alliance Forever MOD')
+	if getInit = "init_faf.lua" then
+		AddChatText('Welcome to Forged Alliance Forever MOD'..getInit)
 		local getVictory = gameInfo.GameOptions['Victory'] -- 'demoralization'
 		local getTimeo = gameInfo.GameOptions['Timeouts'] -- '3'
 		local getCheat = gameInfo.GameOptions['CheatsEnabled'] -- 'false'
@@ -3104,13 +3104,6 @@ function RefreshOptionDisplayData(scenarioInfo)
 --~ 			AddChatText(tostring(cRstr))
 		if getVictory == 'demoralization' and getTimeo == '3' and getCheat == 'false' and getCivil == 'enemy' and getSpeed == 'normal'
 		and getFog == 'explored' and getUnitc == '1000' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and getRstric == nil then
-			if getInit == "init_balanceTesting.lua" then
-				table.insert(formattedOptions, {text = 'Ranking TEST',
-				value = 'Ranked TEST',
-				green = true,
-				tooltip = 'Ranked TEST',
-				valuetooltip = 'This part is Ranked TEST !'})
-			end
 			table.insert(formattedOptions, {text = 'Ranking',
 				value = 'Ranked',
 				green = true,
@@ -3119,26 +3112,12 @@ function RefreshOptionDisplayData(scenarioInfo)
 		else
 			if getVictory == 'demoralization' and getTimeo == '3' and getCheat == 'false' and getCivil == 'enemy' and getSpeed == 'normal'
 			and getFog == 'explored' and getUnitc == '1000' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and table.getn(getRstric) == 0 then
-				if getInit == "init_balanceTesting.lua" then
-					table.insert(formattedOptions, {text = 'Ranking TEST',
-					value = 'Ranked TEST',
-					green = true,
-					tooltip = 'Ranked TEST',
-					valuetooltip = 'This part is Ranked TEST !'})
-				end
 				table.insert(formattedOptions, {text = 'Ranking',
 					value = 'Ranked',
 					green = true,
 					tooltip = 'Ranked',
 					valuetooltip = 'This part is Ranked !'})
 			else
-				if getInit == "init_balanceTesting.lua" then
-					table.insert(formattedOptions, {text = 'Ranking TEST',
-					value = 'Unranked TEST',
-					green = true,
-					tooltip = 'Not ranked TEST',
-					valuetooltip = 'This part is NOT Ranked TEST !'})
-				end
 				table.insert(formattedOptions, {text = 'Ranking',
 					value = 'Unranked',
 					red = true,
@@ -3147,19 +3126,19 @@ function RefreshOptionDisplayData(scenarioInfo)
 			end
 		end
 	else
---~ 		if cLimit == "init_blackops.lua" then
+--~ 		if getInit == "init_blackops.lua" then
 --~ 			AddChatText('Welcome to BlackOps MOD')
---~ 		elseif cLimit == "init_labwars.lua" then
+--~ 		elseif getInit == "init_labwars.lua" then
 --~ 			AddChatText('Welcome to Labwars MOD')
---~ 		elseif cLimit == "init_ladder1v1.lua" then
+--~ 		elseif getInit == "init_ladder1v1.lua" then
 --~ 			AddChatText('Welcome to Ladder 1v1 MOD')
---~ 		elseif cLimit == "init_nomads.lua" then
+--~ 		elseif getInit == "init_nomads.lua" then
 --~ 			AddChatText('Welcome to Nomads MOD')
---~ 		elseif cLimit == "init_phantomx.lua" then
+--~ 		elseif getInit == "init_phantomx.lua" then
 --~ 			AddChatText('Welcome to PhantomX MOD')
---~ 		elseif cLimit == "init_supremeDestruction.lua" then
+--~ 		elseif getInit == "init_supremeDestruction.lua" then
 --~ 			AddChatText('Welcome to SupremeDestruction MOD')
---~ 		elseif cLimit == "init_xtremewars.lua" then
+--~ 		elseif getInit == "init_xtremewars.lua" then
 --~ 			AddChatText('Welcome to XtremeWars MOD')
 --~ 		end
 		table.insert(formattedOptions, {text = 'Ranking',
