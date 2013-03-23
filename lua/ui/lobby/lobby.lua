@@ -3145,7 +3145,7 @@ function RefreshOptionDisplayData(scenarioInfo)
 			value = 'Unranked',
 			red = true,
 			tooltip = 'Not ranked',
-			valuetooltip = 'This part is NOT Ranked !'})
+			valuetooltip = 'This game is NOT Ranked !'})
 	end
 --\\ Stop
 --// Check Mod active
