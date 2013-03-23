@@ -3108,7 +3108,7 @@ function RefreshOptionDisplayData(scenarioInfo)
 				value = 'Ranked',
 				green = true,
 				tooltip = 'Ranked',
-				valuetooltip = 'This part is Ranked !'})
+				valuetooltip = 'This game is Ranked !'})
 		else
 			if getVictory == 'demoralization' and getTimeo == '3' and getCheat == 'false' and getCivil == 'enemy' and getSpeed == 'normal'
 			and getFog == 'explored' and getUnitc == '1000' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and table.getn(getRstric) == 0 then
@@ -3116,13 +3116,13 @@ function RefreshOptionDisplayData(scenarioInfo)
 					value = 'Ranked',
 					green = true,
 					tooltip = 'Ranked',
-					valuetooltip = 'This part is Ranked !'})
+					valuetooltip = 'This game is Ranked !'})
 			else
 				table.insert(formattedOptions, {text = 'Ranking',
 					value = 'Unranked',
 					red = true,
 					tooltip = 'Not ranked',
-					valuetooltip = 'This part is NOT Ranked !'})
+					valuetooltip = 'This game is NOT Ranked !'})
 			end
 		end
 	else
