@@ -27,9 +27,9 @@ local Player = import('/lua/ui/lobby/trueskill.lua').Player
 local Rating = import('/lua/ui/lobby/trueskill.lua').Rating
 local Teams = import('/lua/ui/lobby/trueskill.lua').Teams
 
-
-local teamOpts = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
 local globalOpts = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
+local teamOpts = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
+local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
 local gameColors = import('/lua/gameColors.lua').GameColors
 local numOpenSlots = LobbyComm.maxPlayerSlots
 local formattedOptions = {}
@@ -3082,6 +3082,7 @@ end
 function RefreshOptionDisplayData(scenarioInfo)
     local globalOpts = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
     local teamOptions = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
+	local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
     formattedOptions = {}
     
 --// Check Ranked active -- Xinnony & Vicarian
@@ -3205,6 +3206,21 @@ function RefreshOptionDisplayData(scenarioInfo)
         end
         if not option then
             for index, optData in teamOptions do
+                if i == optData.key then
+                    option = {text = optData.label, tooltip = optData.pref}
+                    for _, val in optData.values do
+                        if val.key == v then
+                            option.value = val.text
+                            option.valueTooltip = 'lob_'..optData.key..'_'..val.key
+                            break
+                        end
+                    end
+                    break
+                end
+            end
+        end
+		if not option then
+            for index, optData in AIOpts do
                 if i == optData.key then
                     option = {text = optData.label, tooltip = optData.pref}
                     for _, val in optData.values do
@@ -3888,12 +3904,17 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         end
 
         -- set default lobby values
-        for index, option in teamOpts do
+        for index, option in globalOpts do
             local defValue = Prefs.GetFromCurrentProfile(option.pref) or option.default
             SetGameOption(option.key,option.values[defValue].key)
         end
-
-        for index, option in globalOpts do
+		
+		for index, option in teamOpts do
+            local defValue = Prefs.GetFromCurrentProfile(option.pref) or option.default
+            SetGameOption(option.key,option.values[defValue].key)
+        end
+		
+		for index, option in AIOpts do
             local defValue = Prefs.GetFromCurrentProfile(option.pref) or option.default
             SetGameOption(option.key,option.values[defValue].key)
         end
