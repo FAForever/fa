@@ -313,7 +313,7 @@ function SetupPlayerLines()
 		local group = Group(controls.bgStretch)	
 		        
 		local mapnamesize = string.len(data.mapname)
-		local mapoffset = 105 - (mapnamesize * 2.7)
+		local mapoffset = 131 - (mapnamesize * 2.7)
 		if (sessionInfo.Options.Ranked) then
 			mapoffset = mapoffset + 10
 		end
@@ -399,16 +399,16 @@ end
 						if GetFocusArmy() == index then
 							line.name:SetColor('ffff7f00')
 							line.score:SetColor('ffff7f00')
-							line.name:SetFont('Arial Bold', 14)
-							line.score:SetFont('Arial Bold', 14)
+							line.name:SetFont('Arial Bold', 12)
+							line.score:SetFont('Arial Bold', 12)
 							if scoreData.general.currentcap.count > 0 then
 								SetUnitText(scoreData.general.currentunits.count, scoreData.general.currentcap.count)
 							end
 						else
 							line.name:SetColor('ffffffff')
 							line.score:SetColor('ffffffff')
-							line.name:SetFont(UIUtil.bodyFont, 14)
-							line.score:SetFont(UIUtil.bodyFont, 14)
+							line.name:SetFont(UIUtil.bodyFont, 12)
+							line.score:SetFont(UIUtil.bodyFont, 12)
 						end
 						if armiesInfo[index].outOfGame then
 							if scoreData.general.score == -1 then
