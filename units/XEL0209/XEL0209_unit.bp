@@ -76,7 +76,6 @@ UnitBlueprint {
         'SELECTABLE',
         'BUILTBYLANDTIER2FACTORY',
         'BUILTBYLANDTIER3FACTORY',
-		'HOLOGRAMGENERATOR',
         'UEF',
         'MOBILE',
         'LAND',
@@ -201,7 +200,7 @@ UnitBlueprint {
             'BUILTBYTIER2ENGINEER DEFENSE UEF',
             'BUILTBYTIER2ENGINEER INDIRECTFIRE UEF',
         },
-        MaintenanceConsumptionPerSecondEnergy = 15,
+        MaintenanceConsumptionPerSecondEnergy = 0, -- from 15 to counter build bug
         StorageEnergy = 200,
         StorageMass = 30,
         TeleportEnergyMod = 0.15,
@@ -237,30 +236,27 @@ UnitBlueprint {
         ConstructionBar = true,
         FactionName = 'UEF',
         Icon = 'amph',
-        ToggleCaps = {
-            RULEUTC_IntelToggle = true, # abusing the intel toggle here, so we can use the onintelenabled events
-        },
         OrderOverrides = {
-            RULEUTC_IntelToggle = { # faking the jamming icon
+            RULEUTC_JammingToggle = {
                 bitmapId = 'jamming',
                 helpText = 'toggle_jamming',
             },
         },
         SelectionPriority = 3,
         TechLevel = 'RULEUTL_Advanced',
+        ToggleCaps = {
+            RULEUTC_JammingToggle = true,
+        },
         UnitName = '<LOC xel0209_name>Sparky',
         UnitWeight = 1,
     },
     Intel = {
-        AltJamming = {
-            DisabledInTransport = true,
-            MaxDistance = 20,
-            NumAirBlips = 2,
-            NumGroundBlips = 4,
-            NumSeaBlips = 0,
-            StartEnabled = true,
+        JamRadius = {
+            Max = 18,
+            Min = 18,
         },
-        RadarRadius = 30,
+        JammerBlips = 8,
+        RadarRadius = 45,
         VisionRadius = 20,
     },
     Interface = {
@@ -302,7 +298,7 @@ UnitBlueprint {
     SizeX = 0.7,
     SizeY = 1,
     SizeZ = 0.7,
-    StrategicIconName = 'icon_land2_intel', #from engineer
+    StrategicIconName = 'icon_land2_engineer',
     StrategicIconSortPriority = 95,
     Transport = {
         TransportClass = 2,

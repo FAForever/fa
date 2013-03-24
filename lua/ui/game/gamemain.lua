@@ -33,6 +33,7 @@ local waitingDialog = false
 ###variables for FAF
 local sendChat = import('/lua/ui/game/chat.lua').ReceiveChatFromSim
 local oldData = {}
+local lastObserving
 ##end faf variables
 
 -- check this flag to see if it's valid to show the exit dialog
@@ -62,6 +63,7 @@ function SetLayout(layout)
     import('/lua/ui/game/multifunction.lua').SetLayout(layout)
     if not isReplay then
         import('/lua/ui/game/orders.lua').SetLayout(layout)
+		import('/lua/ui/game/avatars.lua').SetLayout()
     end
     import('/lua/ui/game/unitview.lua').SetLayout(layout)
     import('/lua/ui/game/objectives2.lua').SetLayout(layout)
@@ -70,7 +72,6 @@ function SetLayout(layout)
     import('/lua/ui/game/missiontext.lua').SetLayout()
     import('/lua/ui/game/helptext.lua').SetLayout()
     import('/lua/ui/game/score.lua').SetLayout()
-    import('/lua/ui/game/avatars.lua').SetLayout()
     import('/lua/ui/game/economy.lua').SetLayout()
     import('/lua/ui/game/score.lua').SetLayout()
     import('/lua/ui/game/tabs.lua').SetLayout()
@@ -153,11 +154,11 @@ function CreateUI(isReplay)
     mfdControl = import('/lua/ui/game/multifunction.lua').Create(controlClusterGroup)
     if not isReplay then
         ordersControl = import('/lua/ui/game/orders.lua').SetupOrdersControl(controlClusterGroup, mfdControl)
+        import('/lua/ui/game/avatars.lua').CreateAvatarUI(mapGroup)
     end
     import('/lua/ui/game/construction.lua').SetupConstructionControl(controlClusterGroup, mfdControl, ordersControl)
     import('/lua/ui/game/unitview.lua').SetupUnitViewLayout(mapGroup, ordersControl)
     import('/lua/ui/game/unitviewDetail.lua').SetupUnitViewLayout(mapGroup, mapGroup)
-    import('/lua/ui/game/avatars.lua').CreateAvatarUI(mapGroup)
     import('/lua/ui/game/controlgroups.lua').CreateUI(mapGroup)
     import('/lua/ui/game/transmissionlog.lua').CreateTransmissionLog()
     import('/lua/ui/game/helptext.lua').CreateHelpText(mapGroup)
@@ -200,8 +201,11 @@ function CreateUI(isReplay)
 	import("/modules/displayrings.lua").Init()	##added for acu and engineer build radius ui mod
 	if SessionIsReplay() then
 		ForkThread(SendChat)
+		lastObserving = true
+        import('/lua/ui/game/economy.lua').ToggleEconPanel(false)
+		AddBeatFunction(UiBeat)
 	end
-	###End FAF added
+	
 end
 
 local provider = false
@@ -266,11 +270,15 @@ function CreateWldUIProvider()
         local function InitialAnimations()
             import('/lua/ui/game/tabs.lua').InitialAnimation()
             WaitSeconds(.15)
-            import('/lua/ui/game/economy.lua').InitialAnimation()
+			if not SessionIsReplay() then
+				import('/lua/ui/game/economy.lua').InitialAnimation()
+			end
             import('/lua/ui/game/score.lua').InitialAnimation()
             WaitSeconds(.15)
             import('/lua/ui/game/multifunction.lua').InitialAnimation()
-            import('/lua/ui/game/avatars.lua').InitialAnimation()
+            if not SessionIsReplay() then
+				import('/lua/ui/game/avatars.lua').InitialAnimation()
+			end
             import('/lua/ui/game/controlgroups.lua').InitialAnimation()
             WaitSeconds(.15)
             HideGameUI('off')
@@ -474,7 +482,6 @@ function HideGameUI(state)
             import('/lua/ui/game/worldview.lua').Contract()
             import('/lua/ui/game/borders.lua').HideBorder(false)
             import('/lua/ui/game/unitview.lua').Expand()
-            import('/lua/ui/game/avatars.lua').Expand()
             import('/lua/ui/game/economy.lua').Expand()
             import('/lua/ui/game/score.lua').Expand()
             import('/lua/ui/game/objectives2.lua').Expand()
@@ -486,6 +493,7 @@ function HideGameUI(state)
             import('/lua/ui/game/minimap.lua').Expand()
             import('/lua/ui/game/construction.lua').Expand()
             if not SessionIsReplay() then
+                import('/lua/ui/game/avatars.lua').Expand()
                 import('/lua/ui/game/orders.lua').Expand()
             end
         else
@@ -496,7 +504,6 @@ function HideGameUI(state)
             import('/lua/ui/game/borders.lua').HideBorder(true)
             import('/lua/ui/game/unitview.lua').Contract()
             import('/lua/ui/game/unitviewDetail.lua').Contract()
-            import('/lua/ui/game/avatars.lua').Contract()
             import('/lua/ui/game/economy.lua').Contract()
             import('/lua/ui/game/score.lua').Contract()
             import('/lua/ui/game/objectives2.lua').Contract()
@@ -507,7 +514,8 @@ function HideGameUI(state)
             import('/lua/ui/game/minimap.lua').Contract()
             import('/lua/ui/game/construction.lua').Contract()
             if not SessionIsReplay() then
-                import('/lua/ui/game/orders.lua').Contract()
+               import('/lua/ui/game/avatars.lua').Contract()
+               import('/lua/ui/game/orders.lua').Contract()
             end
         end
     end
@@ -723,6 +731,14 @@ function SimChangeCameraZoom(newMult)
 end
 
 ####below is FAF function
+
+function UiBeat()
+    local observing = (GetFocusArmy() == -1)
+    if (observing ~= lastObserving) then
+        lastObserving = observing
+        import('/lua/ui/game/economy.lua').ToggleEconPanel(not observing)
+    end
+end
 
 SendChat = function()
 	while true do

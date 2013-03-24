@@ -83,9 +83,11 @@ UnitBlueprint {
         SurfaceThreatLevel = 0,
     },
     Description = '<LOC url0401_desc>Experimental Mobile Rapid-Fire Artillery',
+
     Display = {
         Abilities = {
             '<LOC ability_deploys>Deploys',
+            '<LOC ability_amphibious>Amphibious',
         },
         AnimationOpen = '/units/URL0401/URL0401_aopen.sca',
         Mesh = {
@@ -168,8 +170,8 @@ UnitBlueprint {
         UniformScale = 0.1,
     },
     Economy = {
-        BuildCostEnergy = 780000,
-        BuildCostMass = 63000,
+        BuildCostEnergy = 1500000,
+        BuildCostMass = 85000,
         BuildTime = 31500,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
@@ -204,6 +206,7 @@ UnitBlueprint {
     },
     Intel = {
         VisionRadius = 26,
+        WaterVisionRadius = 26,
     },
     Interface = {
         HelpText = '<LOC url0401_help>Experimental Mobile Rapid-Fire Artillery',
@@ -217,19 +220,19 @@ UnitBlueprint {
             LAYER_Air = false,
             LAYER_Land = true,
             LAYER_Orbit = false,
-            LAYER_Seabed = false,
+            LAYER_Seabed = true,
             LAYER_Sub = false,
             LAYER_Water = false,
         },
         DragCoefficient = 0.2,
         LayerChangeOffsetHeight = -1,
-        MaxAcceleration = 1,
-        MaxBrake = 1,
-        MaxSpeed = 1,
+        MaxAcceleration = 1.5,
+        MaxBrake = 1.5,
+        MaxSpeed = 1.5,
         MaxSpeedReverse = 0,
         MaxSteerForce = 10,
         MinSpeedPercent = 0,
-        MotionType = 'RULEUMT_Land',
+        MotionType = 'RULEUMT_Amphibious',
         RotateOnSpot = true,
         RotateOnSpotThreshold = 0.5,
         SkirtOffsetX = -1.5,
@@ -354,9 +357,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
+            Seabed = true,
+            Sub = true,
+            Water = true,
         },
     },
 }

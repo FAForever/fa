@@ -443,7 +443,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 2,
+            Damage = 10,
             DamageType = 'Normal',
             DisplayName = 'Electron Autocannon',
             FireTargetLayerCapsTable = {
@@ -640,9 +640,8 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, #from false
-            Seabed = true, #from false
-            Seabed = true, #from false
+            Seabed = true,
+            Water = true,
         },
     },
 }

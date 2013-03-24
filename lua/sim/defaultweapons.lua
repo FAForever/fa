@@ -342,6 +342,12 @@ DefaultProjectileWeapon = Class(Weapon) {
 
     #General State-less event handling
     OnLostTarget = function(self)
+	
+		-- issue#43 for better stealth
+		if self.unit then 
+			self.unit:OnLostTarget(self)
+		end
+	
         Weapon.OnLostTarget(self)
         local bp = self:GetBlueprint()
         if bp.WeaponUnpacks == true then
@@ -398,6 +404,14 @@ DefaultProjectileWeapon = Class(Weapon) {
 
     #Weapon is in idle state when it does not have a target and is done with any animations or unpacking.
     IdleState = State {
+	
+		-- issue#43 for better stealth
+		OnGotTarget = function(self)
+			if self.unit then 
+				self.unit:OnGotTarget(self)
+			end
+		end,
+	
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
@@ -429,6 +443,12 @@ DefaultProjectileWeapon = Class(Weapon) {
 
         OnGotTarget = function(self)
             local bp = self:GetBlueprint()
+			
+			-- issue#43 for better stealth
+			if self.unit then
+				self.unit:OnGotTarget(self)
+			end
+			
             if (bp.WeaponUnpackLockMotion != true or (bp.WeaponUnpackLocksMotion == true and not self.unit:IsUnitState('Moving'))) then
                 if bp.CountedProjectile == true and not self:CanFire() then
                     return
@@ -751,6 +771,12 @@ DefaultProjectileWeapon = Class(Weapon) {
         end,
 
         OnGotTarget = function(self)
+			
+			-- issue#43 for better stealth
+			if self.unit then 
+				self.unit:OnGotTarget(self)
+			end
+		
             if not self:GetBlueprint().ForceSingleFire then
                 ChangeState(self, self.WeaponUnpackingState)
             end

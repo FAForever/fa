@@ -245,9 +245,9 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
             CountedProjectile = false,
-            Damage = 1000,
+            Damage = 800,
             DamageFriendly = true,
-            DamageRadius = 5,
+            DamageRadius = 1.5,
             DamageType = 'Normal',
             DisplayName = 'Serpentine Tactical Missile Rack',
             FireTargetLayerCapsTable = {
@@ -325,9 +325,9 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
             CountedProjectile = false,
-            Damage = 1000,
+            Damage = 800,
             DamageFriendly = true,
-            DamageRadius = 5,
+            DamageRadius = 1.5,
             DamageType = 'Normal',
             DisplayName = 'Serpentine Tactical Missile Rack',
             FireTargetLayerCapsTable = {

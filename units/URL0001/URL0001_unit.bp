@@ -136,7 +136,7 @@ UnitBlueprint {
         EconomyThreatLevel = 5,
         Health = 10000,
         MaxHealth = 10000,
-        RegenRate = 15,
+        RegenRate = 18,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 75,
     },
@@ -714,9 +714,9 @@ UnitBlueprint {
     Veteran = {
         Level1 = 20,
         Level2 = 40,
-        Level3 = 60,
-        Level4 = 80,
-        Level5 = 100,
+        Level3 = 65,
+        Level4 = 90,
+        Level5 = 120,
     },
     Weapon = {
         {

@@ -1,0 +1,48 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    CollisionOffsetX = 0.1,
+    CollisionOffsetY = 0,
+    CollisionOffsetZ = 0.2,
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = '../Cactus01_s1_albedo.dds',
+                    LODCutoff = 30,
+                    NormalsName = '../Cactus01_s1_normalsTS.dds',
+                    ShaderName = 'NormalMappedAlpha',
+                },
+                {
+                    AlbedoName = '../Cactus01_s1_albedo.dds',
+                    LODCutoff = 200,
+                    NormalsName = '../Cactus01_s1_normalsTS.dds',
+                    ShaderName = 'NormalMappedAlpha',
+                },
+            },
+        },
+        UniformScale = 0.018,
+    },
+    Economy = {
+        ReclaimEnergyMax = 7.5,
+        ReclaimMassMax = 0,
+        ReclaimTime = 5,
+    },
+    Interface = {
+        HelpText = 'Group of Cactus',
+    },
+    Physics = {
+        BlockPath = false,
+    },
+    ScriptClass = 'TreeGroup',
+    ScriptModule = '/lua/proptree.lua',
+    SizeX = 0.7,
+    SizeY = 0.25,
+    SizeZ = 1,
+}

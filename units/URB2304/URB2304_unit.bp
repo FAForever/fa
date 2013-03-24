@@ -53,8 +53,8 @@ UnitBlueprint {
         AirThreatLevel = 27,
         ArmorType = 'Structure',
         EconomyThreatLevel = 17,
-        Health = 10500,
-        MaxHealth = 10500,
+        Health = 7000,
+        MaxHealth = 7000,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -175,11 +175,11 @@ UnitBlueprint {
     StrategicIconName = 'icon_structure3_antiair',
     StrategicIconSortPriority = 195,
     Veteran = {
-        Level1 = 12,
-        Level2 = 24,
-        Level3 = 36,
-        Level4 = 48,
-        Level5 = 60,
+        Level1 = 24,
+        Level2 = 48,
+        Level3 = 72,
+        Level4 = 96,
+        Level5 = 120,
     },
     Weapon = {
         {
@@ -195,7 +195,7 @@ UnitBlueprint {
             CannotAttackGround = true,
             CollideFriendly = false,
             Damage = 300,
-            DamageRadius = 0,
+            DamageRadius = 1.5,
             DamageType = 'Normal',
             DisplayName = 'Nanite Missile System',
             FireTargetLayerCapsTable = {
@@ -207,7 +207,7 @@ UnitBlueprint {
             MaxRadius = 60,
             MuzzleSalvoDelay = 0.3,
             MuzzleSalvoSize = 4,
-            MuzzleVelocity = 30,
+            MuzzleVelocity = 45,
             ProjectileId = '/projectiles/CAAMissileNanite02/CAAMissileNanite02_proj.bp',
             ProjectileLifetime = 3,
             ProjectilesPerOnFire = 4,
@@ -243,6 +243,7 @@ UnitBlueprint {
             TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
+                'EXPERIMENTAL',
                 'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',

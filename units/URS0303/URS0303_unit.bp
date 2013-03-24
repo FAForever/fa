@@ -170,7 +170,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 36000,
         BuildCostMass = 3600,
-        BuildRate = 150,
+        BuildRate = 180,
         BuildTime = 10800,
         BuildableCategory = {
             'BUILTBYTIER3FACTORY CYBRAN MOBILE AIR ANTINAVY',
@@ -279,7 +279,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 10,
+            Damage = 20,
             DamageType = 'Normal',
             DisplayName = 'Electron Autocannon',
             FireTargetLayerCapsTable = {
@@ -290,7 +290,7 @@ UnitBlueprint {
             HeadingArcRange = 120,
             Label = 'AAGun01',
             LeadTarget = true,
-            MaxRadius = 75,
+            MaxRadius = 100,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 90,
@@ -351,7 +351,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 10,
+            Damage = 20,
             DamageType = 'Normal',
             DisplayName = 'Electron Autocannon',
             FireTargetLayerCapsTable = {
@@ -362,7 +362,7 @@ UnitBlueprint {
             HeadingArcRange = 120,
             Label = 'AAGun02',
             LeadTarget = true,
-            MaxRadius = 75,
+            MaxRadius = 100,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 90,
@@ -393,6 +393,7 @@ UnitBlueprint {
             TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
+                'EXPERIMENTAL',
                 'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
@@ -429,7 +430,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 10,
+            Damage = 20,
             DamageType = 'Normal',
             DisplayName = 'Electron Autocannon',
             FireTargetLayerCapsTable = {
@@ -440,7 +441,7 @@ UnitBlueprint {
             HeadingArcRange = 120,
             Label = 'AAGun03',
             LeadTarget = true,
-            MaxRadius = 75,
+            MaxRadius = 100,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 90,
@@ -471,6 +472,7 @@ UnitBlueprint {
             TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
+                'EXPERIMENTAL',
                 'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
@@ -507,7 +509,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 10,
+            Damage = 20,
             DamageType = 'Normal',
             DisplayName = 'Electron Autocannon',
             FireTargetLayerCapsTable = {
@@ -518,7 +520,7 @@ UnitBlueprint {
             HeadingArcRange = 120,
             Label = 'AAGun04',
             LeadTarget = true,
-            MaxRadius = 75,
+            MaxRadius = 100,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 90,
@@ -549,6 +551,7 @@ UnitBlueprint {
             TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
+                'EXPERIMENTAL',
                 'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',

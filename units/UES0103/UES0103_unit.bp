@@ -48,7 +48,6 @@ UnitBlueprint {
         'BUILTBYTIER1FACTORY',
         'BUILTBYTIER2FACTORY',
         'BUILTBYTIER3FACTORY',
-		'HOLOGRAMGENERATOR',
         'UEF',
         'MOBILE',
         'NAVAL',
@@ -159,10 +158,10 @@ UnitBlueprint {
         UniformScale = 0.09,
     },
     Economy = {
-        BuildCostEnergy = 2600,
-        BuildCostMass = 260,
-        BuildTime = 1300,
-        MaintenanceConsumptionPerSecondEnergy = 20,
+        BuildCostEnergy = 2800,
+        BuildCostMass = 280,
+        BuildTime = 1400,
+        MaintenanceConsumptionPerSecondEnergy = 5,
     },
     Footprint = {
         SizeX = 2,
@@ -189,26 +188,17 @@ UnitBlueprint {
         Icon = 'sea',
         TechLevel = 'RULEUTL_Basic',
         ToggleCaps = {
-            RULEUTC_IntelToggle = true, # abusing the intel toggle here, so we can use the onintelenabled events
+            RULEUTC_JammingToggle = true,
         },
-		OrderOverrides = {
-            RULEUTC_IntelToggle = { # faking the jamming icon
-                bitmapId = 'jamming',
-                helpText = 'toggle_jamming',
-            },
-		},
         UnitName = '<LOC ues0103_name>Thunderhead Class',
         UnitWeight = 1,
     },
     Intel = {
-        AltJamming = {
-            DisabledInTransport = false,
-            MaxDistance = 32,
-            NumAirBlips = 4,
-            NumGroundBlips = 0,
-            NumSeaBlips = 4,
-            StartEnabled = true,
+        JamRadius = {
+            Max = 70,
+            Min = 70,
         },
+        JammerBlips = 5,
         RadarRadius = 80,
         SonarRadius = 82,
         VisionRadius = 32,
@@ -355,7 +345,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 7,
+            Damage = 5,
             DamageType = 'Normal',
             DisplayName = 'Linked Railgun',
             EffectiveRadius = 0,

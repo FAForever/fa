@@ -310,10 +310,10 @@ UnitBlueprint {
     },
     Veteran = {
         Level1 = 75,
-        Level2 = 125,
-        Level3 = 200,
-        Level4 = 275,
-        Level5 = 350,
+        Level2 = 150,
+        Level3 = 225,
+        Level4 = 300,
+        Level5 = 375,
     },
     Weapon = {
         {
@@ -385,6 +385,8 @@ UnitBlueprint {
             TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
+                'EXPERIMENTAL',
+                'SUBCOMMANDER',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',

@@ -872,9 +872,9 @@ UnitBlueprint {
     Veteran = {
         Level1 = 20,
         Level2 = 40,
-        Level3 = 60,
-        Level4 = 80,
-        Level5 = 100,
+        Level3 = 65,
+        Level4 = 90,
+        Level5 = 120,
     },
     Weapon = {
         {

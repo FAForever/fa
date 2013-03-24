@@ -109,8 +109,8 @@ UnitBlueprint {
         AirThreatLevel = 9,
         ArmorType = 'Light',
         EconomyThreatLevel = 0,
-        Health = 2450,
-        MaxHealth = 2450,
+        Health = 1700,
+        MaxHealth = 1700,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -182,7 +182,7 @@ UnitBlueprint {
     },
     Economy = {
         BuildCostEnergy = 40000,
-        BuildCostMass = 400,
+        BuildCostMass = 350,
         BuildTime = 3000,
         MaintenanceConsumptionPerSecondEnergy = 25,
     },
@@ -435,7 +435,7 @@ UnitBlueprint {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
         EnergyMult = 0,
         HealthMult = 0.9,
-        MassMult = 0.9,
+        MassMult = .45,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
             Air = false,

@@ -22,6 +22,7 @@ local Tooltip = import('/lua/ui/game/tooltip.lua')
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local CampaignManager = import('/lua/ui/campaign/campaignmanager.lua')
 local Prefs = import('/lua/user/prefs.lua')
+local hotstats = import('/lua/ui/dialogs/hotstats.lua')
 
 dialog = false
 local currentPage = false
@@ -124,7 +125,7 @@ local function UpdateDisplay()
         return    
     end
 
-    if not curInfo or not curInfo.scoreData then
+    if not curInfo or not curInfo.scoreData or not curInfo.scoreData.historical then
         return
     end
 
@@ -220,6 +221,28 @@ function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
     DisableWorldSounds()
     StopAllSounds()
     UpdateData()
+	
+	if table.empty(curInfo.scoreData.historical) then
+		LOG("warning")
+		if HasCommandLineArg("/online") or HasCommandLineArg("/gpgnet") then
+			UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0007>The game is not finished !\nYou can't have access to scores now.\nYou will be able to see them from the replay.",
+				"<LOC _OK>", ExitApplication,
+				nil,  nil, 
+				nil, nil,
+				true,
+				{escapeButton = 1, enterButton = 1, worldCover = true})
+        else
+			UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0007>The game is not finished !\nYou can't have access to scores now.\nYou will be able to see them from the replay.",
+				"<LOC _OK>", ExitGame,
+				nil,  nil, 
+				nil, nil,
+				true,
+				{escapeButton = 1, enterButton = 1, worldCover = true})
+		
+        end
+		return 
+	end
+	
     campaignScore = tostring(curInfo.scoreData.current[1].general.score)
 
     if showCampaign then
@@ -350,6 +373,7 @@ function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
     end
 end
 
+
 function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
     if dialog then return end
 
@@ -428,6 +452,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
 	end
     
     bg.continueBtn.OnClick = function(self, modifiers)
+	    hotstats.clean_view()
         ConExecute("ren_Oblivion false")
         if showCampaign then
             operationVictoryTable.allPrimary = true
@@ -507,11 +532,6 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
     if SessionIsReplay() then
         bg.replayButton:Disable()
     end
-
-	#this is new, for FAF and should disable the button under all circumstances #FunkOff
-	bg.replayButton:Disable()
-
-	
     
     -- when a new page is selected, create the page and deal with the tab correctly
     function SetNewPage(tabControl)
@@ -1078,7 +1098,10 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
         curButton.tabData = value
     end
     SetNewPage(defaultTab)
+	
+    hotstats.Set_graph(victory, showCampaign, operationVictoryTable, dialog, bg)
 end
+
 
 function CreateBorderGroup(parent)
     local group = Group(parent)

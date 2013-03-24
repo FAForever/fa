@@ -31,6 +31,27 @@ local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
 local SUtils = import('/lua/AI/sorianutilities.lua')
 local StratManager = import('/lua/sim/StrategyManager.lua')
 
+local scoreOption = ScenarioInfo.Options.Score or "no"
+
+local observer = false
+scoreData = {}
+scoreData.current = {}
+
+scoreInterval = 10
+scoreData.historical = {} 
+-- copy data over to historical
+local curInterval = 1
+local historicalUpdateThread = ForkThread(function()
+	while true do
+		WaitSeconds(scoreInterval)
+		scoreData.historical[curInterval] = table.deepcopy(scoreData.current)
+		curInterval = curInterval + 1
+	end  
+end)
+
+
+
+
 #Support for Handicap mod
 local Handicaps = {-5,-4,-3,-2,-1,0,1,2,3,4,5}
 local HCapUtils
@@ -69,6 +90,19 @@ local VOReplayTime = {
 ###### Runtime score update sync loop  ######
 #############################################
 local ArmyScore = {}
+
+function UpdateScoreData(newData)
+    scoreData.current = table.deepcopy(newData)
+	fullSyncOccured = false
+end
+
+
+function StopScoreUpdate()
+    if historicalUpdateThread then
+        KillThread(historicalUpdateThread)
+    end
+end
+
 
 function CollectCurrentScores()
 	# Initialize the score data stucture
@@ -146,6 +180,7 @@ function CollectCurrentScores()
        ArmyScore[index].resources.energyout.total = 0
        ArmyScore[index].resources.energyout.rate = 0
        ArmyScore[index].resources.energyover = 0
+       UpdateScoreData(ArmyScore)
     end
 
 	# Collect the various scores at regular intervals
@@ -262,7 +297,9 @@ function CollectCurrentScores()
            ArmyScore[index].resources.energyover = brain:GetArmyStat("Economy_AccumExcess_Energy", 0.0).Value
         end
 	    WaitSeconds(0.5)  -- update scores every second
-    end
+		UpdateScoreData(ArmyScore)
+	end
+
 end
 
 
@@ -359,86 +396,40 @@ end
 
 
 function SyncScores()
-    for index, brain in ArmyBrains do
-	   Sync.Score[index] = {}
+	if GetFocusArmy() == -1 or observer == true then
+		observer = true
+		Sync.FullScoreSync = true
+		Sync.ScoreAccum = scoreData
+		Sync.Score = scoreData.current
+		
+	elseif observer == false then 
+		for index, brain in ArmyBrains do
+			Sync.Score[index] = {}
+			Sync.Score[index].general = {}
+			if GetFocusArmy() == index or GetFocusArmy() == -1 then
+				Sync.Score[index].general.currentunits = {}
+				Sync.Score[index].general.currentunits.count = ArmyScore[index].general.currentunits.count
+				Sync.Score[index].general.currentcap = {}
+				Sync.Score[index].general.currentcap.count = ArmyScore[index].general.currentcap.count
+			end
+			
+			####################
+			## General scores ##
+			####################
+			if scoreOption != 'no' then 
+				Sync.Score[index].general.score = ArmyScore[index].general.score
+			else
+				Sync.Score[index].general.score = -1
+			end
+		end
 
-       Sync.Score[index].general = {}
-	   Sync.Score[index].general.currentunits = {}
-	   Sync.Score[index].general.currentunits.count = ArmyScore[index].general.currentunits.count
-	   Sync.Score[index].general.currentcap = {}
-	   Sync.Score[index].general.currentcap.count = ArmyScore[index].general.currentcap.count
-
-	   ####################
-	   ## General scores ##
-	   ####################
-	   Sync.Score[index].general.score = ArmyScore[index].general.score
-	   Sync.Score[index].general.mass = ArmyScore[index].general.mass
-	   Sync.Score[index].general.energy = ArmyScore[index].general.energy
-	   Sync.Score[index].general.kills = {}
-	   Sync.Score[index].general.kills.count = ArmyScore[index].general.kills.count
-	   Sync.Score[index].general.kills.mass = ArmyScore[index].general.kills.mass
-	   Sync.Score[index].general.kills.energy = ArmyScore[index].general.kills.energy
-	   Sync.Score[index].general.built = {}
-	   Sync.Score[index].general.built.count = ArmyScore[index].general.built.count
-	   Sync.Score[index].general.built.mass = ArmyScore[index].general.built.mass
-	   Sync.Score[index].general.built.energy = ArmyScore[index].general.built.energy
-	   Sync.Score[index].general.lost = {}
-	   Sync.Score[index].general.lost.count = ArmyScore[index].general.lost.count
-	   Sync.Score[index].general.lost.mass = ArmyScore[index].general.lost.mass
-	   Sync.Score[index].general.lost.energy = ArmyScore[index].general.lost.energy
-
-	   #################
-	   ## unit scores ##
-	   #################
-	   Sync.Score[index].units = {}
-	   Sync.Score[index].units.cdr = {}
-	   Sync.Score[index].units.cdr.kills = ArmyScore[index].units.cdr.kills
-	   Sync.Score[index].units.cdr.built = ArmyScore[index].units.cdr.built
-	   Sync.Score[index].units.cdr.lost = ArmyScore[index].units.cdr.lost
-	   Sync.Score[index].units.land = {}
-	   Sync.Score[index].units.land.kills =ArmyScore[index].units.land.kills
-	   Sync.Score[index].units.land.built = ArmyScore[index].units.land.built
-	   Sync.Score[index].units.land.lost = ArmyScore[index].units.land.lost
-	   Sync.Score[index].units.air = {}
-	   Sync.Score[index].units.air.kills = ArmyScore[index].units.air.kills
-	   Sync.Score[index].units.air.built = ArmyScore[index].units.air.built
-	   Sync.Score[index].units.air.lost = ArmyScore[index].units.air.lost
-	   Sync.Score[index].units.naval = {}
-	   Sync.Score[index].units.naval.kills = ArmyScore[index].units.naval.kills
-	   Sync.Score[index].units.naval.built = ArmyScore[index].units.naval.built
-	   Sync.Score[index].units.naval.lost = ArmyScore[index].units.naval.lost
-	   Sync.Score[index].units.structures = {}
-	   Sync.Score[index].units.structures.kills = ArmyScore[index].units.structures.kills
-	   Sync.Score[index].units.structures.built = ArmyScore[index].units.structures.built
-	   Sync.Score[index].units.structures.lost = ArmyScore[index].units.structures.lost
-	   Sync.Score[index].units.experimental = {}
-	   Sync.Score[index].units.experimental.kills = ArmyScore[index].units.experimental.kills
-	   Sync.Score[index].units.experimental.built = ArmyScore[index].units.experimental.built
-	   Sync.Score[index].units.experimental.lost = ArmyScore[index].units.experimental.lost
-
-	   #####################
-	   ## resource scores ##
-	   #####################
-	   Sync.Score[index].resources = {}
-	   Sync.Score[index].resources.massin = {}
-	   Sync.Score[index].resources.massin.total = ArmyScore[index].resources.massin.total
-	   Sync.Score[index].resources.massin.rate = ArmyScore[index].resources.massin.rate
-	   Sync.Score[index].resources.massout = {}
-	   Sync.Score[index].resources.massout.total = ArmyScore[index].resources.massout.total
-	   Sync.Score[index].resources.massout.rate = ArmyScore[index].resources.massout.rate
-	   Sync.Score[index].resources.massover = ArmyScore[index].resources.massover
-	   Sync.Score[index].resources.energyin = {}
-	   Sync.Score[index].resources.energyin.total = ArmyScore[index].resources.energyin.total
-	   Sync.Score[index].resources.energyin.rate = ArmyScore[index].resources.energyin.rate
-	   Sync.Score[index].resources.energyout = {}
-	   Sync.Score[index].resources.energyout.total = ArmyScore[index].resources.energyout.total
-	   Sync.Score[index].resources.energyout.rate = ArmyScore[index].resources.energyout.rate
-	   Sync.Score[index].resources.energyover = ArmyScore[index].resources.energyover
-       Sync.FullScoreSync = true
-    end
+	end
+	
+	
 end
 
 function SyncCurrentScores()
+	Sync.FullScoreSync = false
 	# Sync the score at 1 sec intervals
     while true do
         SyncScores()
@@ -569,6 +560,10 @@ AIBrain = Class(moho.aibrain_methods) {
         self.VeterancyTriggerList = {}
         self.PingCallbackList = {}
         self.UnitBuiltTriggerList = {}
+		
+		-- issue:#43 : Better stealth
+		self.UnitIntelList = {}
+		
     end,
 
 	OnSpawnPreBuiltUnits = function(self)
@@ -738,7 +733,6 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     CalculateScore = function(self)
-
         local commanderKills = self:GetArmyStat("Enemies_Commanders_Destroyed",0).Value
         local massSpent = self:GetArmyStat("Economy_TotalConsumed_Mass",0.0).Value
         local massProduced = self:GetArmyStat("Economy_TotalProduced_Mass",0.0).Value -- not currently being used
@@ -818,6 +812,63 @@ AIBrain = Class(moho.aibrain_methods) {
         table.insert(self.IntelTriggerList, triggerSpec)
     end,
 
+	
+	IsUnitTargeatable = function(self, blip, unit)
+		if unit and not unit:IsDead() and IsUnit(unit) then
+			-- if we've got a LOS, then we can fire.
+			if blip:IsSeenNow(self:GetArmyIndex()) then
+				return true
+			else
+				local UnitId = unit:GetEntityId()
+				if not self.UnitIntelList[UnitId] then
+					return false
+				else
+					-- if we have a least one type of blip...
+					if self.UnitIntelList[UnitId]["Radar"] or blip:IsOnSonar(self:GetArmyIndex()) or blip:IsOnOmni(self:GetArmyIndex()) then
+						return true
+					else
+						return false
+					end
+				end			 
+			end
+		end
+	end,
+	
+	SetUnitIntelTable = function(self, unit, reconType, val)
+		if unit and not unit:IsDead() and IsUnit(unit) then
+			
+			local UnitId = unit:GetEntityId()
+			if not self.UnitIntelList[UnitId] and val then
+				self.UnitIntelList[UnitId] = {}
+				self.UnitIntelList[UnitId][reconType] = 1			
+			else
+				if not self.UnitIntelList[UnitId][reconType] then
+					if val then
+						self.UnitIntelList[UnitId][reconType] = 1
+					end
+				else
+					if val then
+						self.UnitIntelList[UnitId][reconType] = self.UnitIntelList[UnitId][reconType] + 1
+					else
+						if self.UnitIntelList[UnitId][reconType] == 1 then
+							self.UnitIntelList[UnitId][reconType] = nil
+						else
+							self.UnitIntelList[UnitId][reconType] = self.UnitIntelList[UnitId][reconType] - 1
+						end
+					end
+				end
+			end
+			
+		else
+			local UnitId = unit:GetEntityId()
+			if self.UnitIntelList[UnitId] then
+				self.UnitIntelList[UnitId] = nil
+			end
+		end		
+
+	end,
+
+
 
     # Called when recon data changes for enemy units (e.g. A unit comes into line of sight)
     # Params
@@ -825,11 +876,74 @@ AIBrain = Class(moho.aibrain_methods) {
     #   type: 'LOSNow', 'Radar', 'Sonar', or 'Omni'
     #   val: true or false
     # calls callback function with blip it saw.
+
+
+
+	
     OnIntelChange = function(self, blip, reconType, val)
+	
+		-- Count how many seconds this unit is not seen..-- Count how many seconds this unit is not seen..
+		local function IAmNotSeen(self)
+			self.TimeIHaveBeenNotSeen = 0
+			
+			while not self:IsDead() and self.TimeIHaveBeenNotSeen < 3 do
+				--LOG(self.TimeIHaveBeenNotSeen)
+				self.TimeIHaveBeenNotSeen = (self.TimeIHaveBeenNotSeen + 1)
+				WaitSeconds(1)
+			end		
+			
+			if not self:IsDead() then
+				self:stopAttackers()
+			end
+			
+			self.IAmNotSeenThread = nil
+		end
+	
+		-- If we are seen, we kill the "I not seen" counter.
+		local function  KillNotSeenThread(self)
+			--LOG("killthread.")
+			KillThread(self.IAmNotSeenThread)
+			self.IAmNotSeenThread = nil
+			self.TimeIHaveBeenNotSeen = 0
+
+		end
+	
+	
         #LOG('*AI DEBUG: ONINTELCHANGED: Blip = ', repr(blip), ' ReconType = ', repr(reconType), ' Value = ', repr(val))
         #LOG('*AI DEBUG: IntelTriggerList = ', repr(self.IntelTriggerList))
-        #LOG('*AI DEBUG: BlipID = ', repr(blip:GetBlueprint().BlueprintId))
-        if self.IntelTriggerList then
+        #LOG('*AI DEBUG: BlipID = ', repr(blip:GetBlueprint().BlueprintId))    
+		if blip and reconType and val != nil then 
+			local BlipSource = blip:GetSource()
+			if BlipSource then
+				if reconType == 'Radar' then
+					if IsUnit(BlipSource) and EntityCategoryContains( categories.MOBILE, BlipSource ) then 
+						if val then
+							self:SetUnitIntelTable(BlipSource, reconType, true)
+						else
+							self:SetUnitIntelTable(BlipSource, reconType, false)
+						end
+					end
+			
+			
+				if not self:IsUnitTargeatable(blip, BlipSource) then
+					--LOG("Unit going out of radar - Clearing attackers")
+					if not BlipSource.IAmNotSeenThread then
+						BlipSource.IAmNotSeenThread = BlipSource:ForkThread(IAmNotSeen)
+					end
+					--BlipSource:stopAttackers()
+				else
+					if BlipSource.IAmNotSeenThread then
+						BlipSource:ForkThread(KillNotSeenThread)
+					end
+				
+				end
+					
+			end
+		end
+			
+	end
+		
+		if self.IntelTriggerList then
             for k, v in self.IntelTriggerList do
                 if EntityCategoryContains(v.Category, blip:GetBlueprint().BlueprintId)
                     and v.Type == reconType and (not v.Blip or v.Blip == blip:GetSource())

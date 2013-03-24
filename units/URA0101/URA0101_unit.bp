@@ -91,6 +91,7 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
 		'OVERLAYRADAR',
+		'OVERLAYSONAR',
     },
     CollisionOffsetY = 0,
     CollisionOffsetZ = 0,

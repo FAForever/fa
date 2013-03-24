@@ -1,0 +1,53 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    CollisionOffsetX = -0.05,
+    CollisionOffsetY = 0,
+    CollisionOffsetZ = 0,
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = '../Pine06_V1_albedo.dds',
+                    LODCutoff = 30,
+                    NormalsName = '../Pine06_normalsTS.dds',
+                    ShaderName = 'UndulatingNormalMappedAlpha',
+                },
+                {
+                    AlbedoName = '../Pine06_V1_albedo.dds',
+                    LODCutoff = 175,
+                    NormalsName = '../Pine06_normalsTS.dds',
+                    ShaderName = 'NormalMappedAlpha',
+                },
+                {
+                    AlbedoName = 'Pine06_GroupA_LOD2_albedo.dds',
+                    LODCutoff = 700,
+                    ShaderName = 'VertexNormal',
+                },
+            },
+        },
+        UniformScale = 0.05,
+    },
+    Economy = {
+        ReclaimEnergyMax = 68.4,
+        ReclaimMassMax = 6,
+        ReclaimTime = 5,
+    },
+    Interface = {
+        HelpText = 'Group of Small Trees - Pine',
+    },
+    Physics = {
+        BlockPath = false,
+    },
+    ScriptClass = 'TreeGroup',
+    ScriptModule = '/lua/proptree.lua',
+    SizeX = 2.7,
+    SizeY = 1.25,
+    SizeZ = 5.5,
+}

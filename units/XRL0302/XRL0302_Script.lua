@@ -25,6 +25,11 @@ XRL0302 = Class(CWalkingLandUnit) {
 			end,
         },
     },
+
+	OnProductionPaused = function(self)
+        local wep = self:GetWeapon(1)
+        wep.OnFire(wep)
+    end,
 	
 	OnKilled = function(self, instigator, type, overkillRatio)
         CWalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)

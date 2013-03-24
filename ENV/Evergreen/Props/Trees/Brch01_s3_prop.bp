@@ -1,0 +1,67 @@
+PropBlueprint {
+    Audio = {
+        BurnLoop = Sound {
+            Bank = 'AmbientTest',
+            Cue = 'Gen_Fire_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        BurnStart = Sound {
+            Bank = 'AmbientTest',
+            Cue = 'Gen_Fire_Start',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TreeFall = Sound {
+            Bank = 'AmbientTest',
+            Cue = 'Gen_Tree_Crush',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+    },
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = 'Brch01_s1_albedo.dds',
+                    LODCutoff = 30,
+                    NormalsName = 'Brch01_s1_normalsTS.dds',
+                    ShaderName = 'UndulatingNormalMappedAlpha',
+                },
+                {
+                    AlbedoName = 'Brch01_s1_albedo.dds',
+                    LODCutoff = 200,
+                    NormalsName = 'Brch01_s1_normalsTS.dds',
+                    ShaderName = 'TMeshAlpha',
+                },
+                {
+                    AlbedoName = 'Brch01_s1_albedo.dds',
+                    LODCutoff = 750,
+                    ShaderName = 'VertexNormal',
+                },
+            },
+        },
+        UniformScale = 0.05,
+    },
+    Economy = {
+        ReclaimEnergyMax = 3.3,
+        ReclaimMassMax = 0.66,
+        ReclaimTime = 5,
+    },
+    Interface = {
+        HelpText = 'Small Tree - Decidous ',
+    },
+    Physics = {
+        BlockPath = false,
+    },
+    ScriptClass = 'Tree',
+    ScriptModule = '/lua/proptree.lua',
+    SizeX = 0.1,
+    SizeY = 1,
+    SizeZ = 0.1,
+}

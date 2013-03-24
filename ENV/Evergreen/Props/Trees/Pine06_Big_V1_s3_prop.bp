@@ -1,0 +1,70 @@
+PropBlueprint {
+    Audio = {
+        BurnLoop = Sound {
+            Bank = 'AmbientTest',
+            Cue = 'Gen_Fire_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        BurnStart = Sound {
+            Bank = 'AmbientTest',
+            Cue = 'Gen_Fire_Start',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TreeFall = Sound {
+            Bank = 'AmbientTest',
+            Cue = 'Gen_Tree_Crush',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+    },
+    Categories = {
+        'RECLAIMABLE',
+    },
+    CollisionOffsetX = 0,
+    CollisionOffsetY = 0,
+    CollisionOffsetZ = 0,
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = 'Pine06_V1_albedo.dds',
+                    LODCutoff = 30,
+                    NormalsName = 'Pine06_normalsTS.dds',
+                    ShaderName = 'UndulatingNormalMappedAlpha',
+                },
+                {
+                    AlbedoName = 'Pine06_V1_albedo.dds',
+                    LODCutoff = 175,
+                    NormalsName = 'Pine06_normalsTS.dds',
+                    ShaderName = 'NormalMappedAlpha',
+                },
+                {
+                    AlbedoName = 'Pine06_LOD2_albedo.dds',
+                    LODCutoff = 700,
+                    ShaderName = 'VertexNormal',
+                },
+            },
+        },
+        UniformScale = 0.08,
+    },
+    Economy = {
+        ReclaimEnergyMax = 2.85,
+        ReclaimMassMax = 0.27,
+        ReclaimTime = 5,
+    },
+    Interface = {
+        HelpText = 'Medium Tree - Pine',
+    },
+    Physics = {
+        BlockPath = false,
+    },
+    ScriptClass = 'Tree',
+    ScriptModule = '/lua/proptree.lua',
+    SizeX = 0.1,
+    SizeY = 1.5,
+    SizeZ = 0.1,
+}

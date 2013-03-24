@@ -40,7 +40,7 @@ UnitBlueprint {
         'COUNTERINTELLIGENCE',
         'VISIBLETORECON',
         'RECLAIMABLE',
-        'OVERLAYCOUNTERINTEL',
+        'REPAIR',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -111,6 +111,7 @@ UnitBlueprint {
         BuildCostMass = 80,
         BuildTime = 400,
         MaintenanceConsumptionPerSecondEnergy = 25,
+		MaxBuildDistance = 17.5,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -151,8 +152,8 @@ UnitBlueprint {
     Intel = {
         RadarStealth = true,
         RadarStealthField = true,
-        RadarStealthFieldRadius = 18,
-        SonarStealthFieldRadius = 18,
+        RadarStealthFieldRadius = 20,
+        SonarStealthFieldRadius = 20,
         VisionRadius = 16,
     },
     Interface = {

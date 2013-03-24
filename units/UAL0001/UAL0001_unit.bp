@@ -1,4 +1,4 @@
-UnitBlueprint {
+	UnitBlueprint {
     AI = {
         GuardRadius = 10,
         TargetBones = {
@@ -319,9 +319,9 @@ UnitBlueprint {
             Slot = 'LCH',
         },
         ChronoDampener = {
-            BuildCostEnergy = 125000,
-            BuildCostMass = 2500,
-            BuildTime = 1250,
+            BuildCostEnergy = 52500,
+            BuildCostMass = 1750,
+            BuildTime = 875,
             Icon = 'cd',
             Name = '<LOC enhancements_0002>Chrono Dampener',
             ShowBones = {
@@ -812,9 +812,9 @@ UnitBlueprint {
     Veteran = {
         Level1 = 20,
         Level2 = 40,
-        Level3 = 60,
-        Level4 = 80,
-        Level5 = 100,
+        Level3 = 65,
+        Level4 = 90,
+        Level5 = 120,
     },
     Weapon = {
         {
@@ -969,7 +969,7 @@ UnitBlueprint {
                     },
                     BuffType = 'STUN',
                     Duration = 3.5,
-                    Radius = 22,
+                    Radius = 35,
                     TargetAllow = 'MOBILE',
                     TargetDisallow = 'EXPERIMENTAL,COMMAND',
                 },
@@ -991,7 +991,7 @@ UnitBlueprint {
             },
             FiringTolerance = 360,
             Label = 'ChronoDampener',
-            MaxRadius = 22,
+            MaxRadius = 35,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 30,

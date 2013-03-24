@@ -7,11 +7,9 @@
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
-local TConstructionUnit = import('/lua/terranunits.lua').TConstructionUnit
 local EffectTemplate = import('/lua/EffectTemplates.lua')
+local TConstructionUnit = import('/lua/terranunits.lua').TConstructionUnit
 local TDFRiotWeapon = import('/lua/terranweapons.lua').TDFRiotWeapon
-
-TConstructionUnit = import('/lua/AdvancedJamming.lua').AdvancedJamming( TConstructionUnit )
 
 XEL0209 = Class(TConstructionUnit) {
     Weapons = {
@@ -22,7 +20,7 @@ XEL0209 = Class(TConstructionUnit) {
     },
 
     OnStopBeingBuilt = function(self)
-        #self:SetMaintenanceConsumptionActive()
+        self:SetMaintenanceConsumptionActive()
         TConstructionUnit.OnStopBeingBuilt(self)
         --Rotate the antenna
         self.Rotator = CreateRotator(self, 'Antenna', 'y')
@@ -32,7 +30,7 @@ XEL0209 = Class(TConstructionUnit) {
         self.Rotator:SetAccel(20)
     end,
 
-    OnStartBuild = function(self, unitBeingBuilt, order)
+    --[[OnStartBuild = function(self, unitBeingBuilt, order)
         --Disable the gun while building something
         self:SetWeaponEnabledByLabel('Riotgun01', false)
         TConstructionUnit.OnStartBuild(self, unitBeingBuilt, order)
@@ -52,7 +50,7 @@ XEL0209 = Class(TConstructionUnit) {
     OnStopReclaim = function(self, target)
         TConstructionUnit.OnStopReclaim(self, target)
         self:SetAllWeaponsEnabled( true)
-    end,
+    end,--]]
 }
 
 TypeClass = XEL0209

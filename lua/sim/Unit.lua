@@ -201,6 +201,13 @@ Unit = Class(moho.unit_methods) {
 
         self.HasFuel = true
 
+		-- issue#43 for better stealth
+		self.Targets = {}
+		self.Attackers = {}
+		self.WeaponTargets = {}
+		self.WeaponAttackers = {}
+		
+		
 		--for new vet system
 		self.xp = 0
 		self.Sync.xp = self.xp
@@ -269,7 +276,192 @@ Unit = Class(moho.unit_methods) {
 		
     end,
 
+	
+	##########################################################################################
+    ## TARGET AND ATTACKERS FUNCTIONS
+    ##########################################################################################
+	-- issue:#43 : better stealth
+	
+	
 
+	
+	
+	
+	-- when we fire on something, we tell that unit that we attack it.
+	OnGotTarget = function(self, Weapon)
+		local Target = Weapon:GetCurrentTarget()
+		if Target and IsUnit(Target) then 
+			--LOG("adding weapon attackers")
+			Target:addAttackerWeapon(self)
+			--LOG("adding this unit in our list of attack")
+			self:addTargetWeapon(Target)
+		end
+	
+	end,
+	
+	-- we lost focus, so we remove this unit from the list of threat
+	OnLostTarget = function(self, Weapon)
+		for k, ent in self.WeaponTargets do
+			if not ent:IsDead() then
+				ent:removeWeaponAttacker(self)
+			end
+		
+		end
+	end,
+
+	-- add a list of units attacking this unit with a weapon
+	addAttackerWeapon = function(self, attacker)
+		if not attacker:IsDead() then
+			if not table.find(self.WeaponAttackers, attacker) then
+				--LOG("weapon attacker added")
+				table.insert(self.WeaponAttackers, attacker) 	
+			end
+		end
+	end,
+	
+	-- add a list of units attacking this unit with an order
+	addAttacker = function(self, attacker)
+		if not attacker:IsDead() then
+			if not table.find(self.Attackers, attacker) then
+				--LOG("attacker added")
+				table.insert(self.Attackers, attacker) 	
+			end
+		end
+	end,
+
+	-- that weapon is not longer attacking us.
+	removeWeaponAttacker = function(self, attacker)
+		for k, ent in self.Attackers do
+			if ent == attacker then
+				--LOG("removing this weapon attacker")
+				table.remove(self.WeaponAttackers, k)
+			end
+		end
+	end,
+	
+	-- that unit is not longer attacking us.
+	removeAttacker = function(self, attacker)
+		for k, ent in self.Attackers do
+			if ent == attacker then
+				--LOG("removing this attacker")
+				table.remove(self.Attackers, k)
+			end
+		end
+	end,
+	
+	-- clear the attack orders if the units got out of sight.
+	stopAttackers = function(self)
+	
+		for k, ent in self.Attackers do
+	
+			if ent and not ent:IsDead() then
+
+				if self:IsIntelEnabled("Cloak") or self:IsIntelEnabled("CloakField") then 
+					IssueClearCommands({ent})
+				elseif self:GetCurrentLayer() == "Seabed" and  self:IsIntelEnabled("SonarStealth") or self:IsIntelEnabled("SonarStealthField") then
+
+					IssueClearCommands({ent})					
+				elseif self:GetCurrentLayer() == "Land" and  self:IsIntelEnabled("RadarStealth") or self:IsIntelEnabled("RadarStealthField") then
+					IssueClearCommands({ent})
+				else
+					local aiBrain = self:GetAIBrain()
+					
+					if self:GetCurrentLayer() == "Land" then
+						local units = aiBrain:GetUnitsAroundPoint( categories.OVERLAYCOUNTERINTEL, self:GetPosition(),  50)
+						local stop = false
+						for k,v in units do
+							if v:IsIntelEnabled("RadarStealthField") and  VDist3(self:GetPosition(), v:GetPosition()) < v:GetBlueprint().Intel.SonarStealthFieldRadius then
+								stop = true
+							end
+						end
+						
+						if stop == true then
+							IssueClearCommands({ent})
+						end
+
+					elseif self:GetCurrentLayer() == "Seabed" then
+						local units = aiBrain:GetUnitsAroundPoint( categories.OVERLAYCOUNTERINTEL, self:GetPosition(),  100)
+						
+						local stop = false
+						for k,v in units do
+							if v:IsIntelEnabled("SonarStealthField") and  VDist3(self:GetPosition(), v:GetPosition()) < v:GetBlueprint().Intel.RadarStealthFieldRadius then
+								stop = true
+							end
+						end
+						if stop == true then
+							IssueClearCommands({ent})
+						end	
+					end	
+				end
+			end
+		
+		end
+		-- and we remove them from the list of attackers
+		self.Attackers = {}
+		
+		for k, ent in self.WeaponAttackers do
+			if ent and not ent:IsDead() then
+				--LOG("must stop attacking current WEAPON unit !")
+				local numWep = self:GetWeaponCount()
+				if numWep > 0 then
+					 for w = 1, numWep do
+						local wep = self:GetWeapon(w)
+						if wep:GetCurrentTarget() == self then
+							wep:ResetTarget()
+						end
+					 end
+				end
+				
+			end
+		end
+		
+	end,
+
+	-- This function make units target again if the unit got an attacker.
+	resumeAttackers = function(self)
+		for k, attacker in self.Attackers do
+			if attacker and not attacker:IsDead() then
+				for j, target in attacker.Targets do
+					if target == self then
+						IssueAttack({attacker}, self)
+					end
+				
+				end
+			
+			end
+		end
+	
+	end,
+
+	-- Add a target to the weapon list for this unit
+	addTargetWeapon = function(self, target)
+		if not target:IsDead() then
+			table.insert(self.WeaponTargets, target)
+		end
+	end,
+	
+	
+	
+	-- Add a target to the list for this unit
+	addTarget = function(self, target)
+		if not target:IsDead() then
+			table.insert(self.Targets, target)
+		end
+	end,
+	
+	-- Remove all the target for this unit
+	clearTarget = function(self)
+		-- first, we must also tell the unit we were attacking that we are no longer a threat
+		for k, ent in self.Targets do
+			if not ent:IsDead() then
+				ent:removeAttacker(self)
+			end
+		end
+		-- now we clear the list
+		self.Targets = {}
+	
+	end,
+	
     ##########################################################################################
     ## MISC FUNCTIONS
     ##########################################################################################
@@ -754,14 +946,13 @@ Unit = Class(moho.unit_methods) {
     #
     UpdateConsumptionValues = function(self)
         local myBlueprint = self:GetBlueprint()
-		
-
+	
         local energy_rate = 0
         local mass_rate = 0
         local build_rate = 0
 		
 		        # added by brute51 - to make sure we use the proper consumption values. [132]
-        if self.ActiveConsumption then
+        if self.ActiveConsumption then		
             local focus = self:GetFocusUnit()
             if focus and self.WorkItem and self.WorkProgress < 1 and (focus:IsUnitState('Enhancing') or focus:IsUnitState('Building')) then
                 self.WorkItem = focus.WorkItem    # set our workitem to the focus unit work item, is specific for enhancing
@@ -775,6 +966,26 @@ Unit = Class(moho.unit_methods) {
             local energy = 0
             if self.WorkItem then
                 time, energy, mass = Game.GetConstructEconomyModel(self, self.WorkItem)
+				if self:IsUnitState('Enhancing') or self:IsUnitState('Upgrading') then
+					local guards = self:GetGuards()
+					## We need to check all the unit assisting.
+					for k,v in guards do
+						if not v:IsDead() then
+							v:UpdateConsumptionValues()
+						end
+					end
+					
+					## and if there is any unit repairing ...
+					local workers = self:GetAIBrain():GetUnitsAroundPoint(( categories.REPAIR), self:GetPosition(), 50, 'Ally' )
+					for k,v in workers do
+						if not v:IsDead() and v:IsUnitState('Repairing')  then
+							v:UpdateConsumptionValues()
+						end
+					end				
+				end
+
+				
+				
             elseif focus and focus:IsUnitState('SiloBuildingAmmo') then
                 # If building silo ammo; create the energy and mass costs based on build rate of the silo
                 #     against the build rate of the assisting unit
@@ -784,8 +995,13 @@ Unit = Class(moho.unit_methods) {
                 energy = (energy / siloBuildRate) * (self:GetBuildRate() or 1)
                 mass = (mass / siloBuildRate) * (self:GetBuildRate() or 1)
             elseif focus then
-                # bonuses are already factored in by GetBuildCosts
-                time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
+				if focus:IsUnitState('Enhancing') or focus:IsUnitState('Upgrading') then
+					# If the unit is assisting an enhancement, we must know how much it costs.
+					time, energy, mass = Game.GetConstructEconomyModel(self, focus.WorkItem)	
+				else
+					# bonuses are already factored in by GetBuildCosts
+					time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
+				end
             end
             energy = energy * (self.EnergyBuildAdjMod or 1)
             if energy < 1 then
@@ -799,7 +1015,7 @@ Unit = Class(moho.unit_methods) {
             energy_rate = energy / time
             mass_rate = mass / time
         end
-
+		
         if self.MaintenanceConsumption then
             local mai_energy = (self.EnergyMaintenanceConsumptionOverride or myBlueprint.Economy.MaintenanceConsumptionPerSecondEnergy)  or 0
             local mai_mass = myBlueprint.Economy.MaintenanceConsumptionPerSecondMass or 0
@@ -811,7 +1027,7 @@ Unit = Class(moho.unit_methods) {
             energy_rate = energy_rate + mai_energy
             mass_rate = mass_rate + mai_mass
         end
-
+	
         # apply minimum rates
         energy_rate = math.max(energy_rate, myBlueprint.Economy.MinConsumptionPerSecondEnergy or 0)
         mass_rate = math.max(mass_rate, myBlueprint.Economy.MinConsumptionPerSecondMass or 0)
@@ -1048,15 +1264,26 @@ Unit = Class(moho.unit_methods) {
 
     OnKilledUnit = function(self, unitKilled)
 		-- new vet system
-		local bp = unitKilled:GetBlueprint()
-		if bp.General.TechLevel == 'RULEUTL_Basic' then 
-			self:AddXP(1)	
-		elseif bp.General.TechLevel == 'RULEUTL_Advanced' then
-			self:AddXP(5)	
-		elseif bp.General.TechLevel == 'RULEUTL_Secret' then
-			self:AddXP(10)	
-		elseif bp.General.TechLevel == 'RULEUTL_Experimental' then	
-			self:AddXP(100)	
+		
+		if not IsAlly(self:GetArmy(), unitKilled:GetArmy()) then
+			if unitKilled:GetFractionComplete() == 1 then
+				
+				if EntityCategoryContains( categories.STRUCTURE, unitKilled ) then
+					self:AddXP(1)
+				elseif EntityCategoryContains( categories.TECH1, unitKilled )  then 
+					self:AddXP(1)	
+				elseif EntityCategoryContains( categories.TECH2, unitKilled ) then
+					self:AddXP(3)	
+				elseif EntityCategoryContains( categories.TECH3, unitKilled ) then
+					self:AddXP(6)	
+				elseif EntityCategoryContains( categories.COMMAND, unitKilled ) then	
+					self:AddXP(6)	
+				elseif EntityCategoryContains( categories.EXPERIMENTAL, unitKilled ) then	
+					self:AddXP(50)	
+				else
+					self:AddXP(1)
+				end
+			end
 		end
     end,
 
@@ -1668,8 +1895,8 @@ Unit = Class(moho.unit_methods) {
 		# here 'self' is the engineer building the structure
 		self.InitialFractionComplete = 0.5
 		self.VerifyRebuildBonus = true    # rebuild bonus check 2 [159]
-		self.IAmBuildingSomethingWithReBuildBonus = true
-		self:ForkThread(self.DefeatTheExploit)
+		--self.IAmBuildingSomethingWithReBuildBonus = true
+		--self:ForkThread(self.DefeatTheExploit)
 	return self.InitialFractionComplete
 
     end,
@@ -1906,44 +2133,44 @@ Unit = Class(moho.unit_methods) {
 	#LOG('and IAmBuildingSomethingWithReBuildBonus is ' .. repr(self.IAmBuildingSomethingWithReBuildBonus))
 
 	
-	if self.IAmBuildingSomethingWithReBuildBonus == true and order == 'MobileBuild' then
+	--if self.IAmBuildingSomethingWithReBuildBonus == true and order == 'MobileBuild' then
 	
 	
-		if not unitBeingBuilt.RebuildCounter then 
-			unitBeingBuilt.RebuildCounter = 1
-		else
-			unitBeingBuilt.RebuildCounter = (unitBeingBuilt.RebuildCounter + 1)
-		end
-		if unitBeingBuilt.RebuildCounter > 1 then 
-			IssueClearCommands(self)
-			LOG('i am a bad player and I tried replicate a structure exploit')
-			unitBeingBuilt:Destroy()
-			return
-		end
+		--if not unitBeingBuilt.RebuildCounter then 
+		--	unitBeingBuilt.RebuildCounter = 1
+		--else
+		--	unitBeingBuilt.RebuildCounter = (unitBeingBuilt.RebuildCounter + 1)
+		--end
+		--if unitBeingBuilt.RebuildCounter > 1 then 
+		--	IssueClearCommands(self)
+		--	LOG('i am a bad player and I tried replicate a structure exploit')
+		--	unitBeingBuilt:Destroy()
+		--	return
+	--	end
 		
-		local position = unitBeingBuilt:GetPosition()
-		local x1 = position[1] - 1
-		local x2 = position[1] + 1
-		local z1 = position[3] - 1
-		local z2 = position[3] + 1
-		local rect = Rect( x1, z1, x2, z2 )
-		#LOG('rect is ' .. repr(rect)) 
-		local NearbyReclaimables = GetReclaimablesInRect(rect)
-		local CanIBuildHere = false
-		local unitBeingBuiltbpID =  unitBeingBuilt:GetBlueprint().BlueprintId
-		for name,entity in NearbyReclaimables do
-			#WARN('entity is ' .. repr(entity))
-			if IsProp(entity) and entity.bpid and entity.bpid == unitBeingBuiltbpID then
-				CanIBuildHere = true
+		--local position = unitBeingBuilt:GetPosition()
+	--	local x1 = position[1] - 1
+	--	local x2 = position[1] + 1
+	--	local z1 = position[3] - 1
+	--	local z2 = position[3] + 1
+	--	local rect = Rect( x1, z1, x2, z2 )
+	--	#LOG('rect is ' .. repr(rect)) 
+	--	local NearbyReclaimables = GetReclaimablesInRect(rect)
+	--	local CanIBuildHere = false
+	--	local unitBeingBuiltbpID =  unitBeingBuilt:GetBlueprint().BlueprintId
+	--	for name,entity in NearbyReclaimables do
+	--		#WARN('entity is ' .. repr(entity))
+	--	if IsProp(entity) and entity.bpid and entity.bpid == unitBeingBuiltbpID then
+	--			CanIBuildHere = true
 
-			end
-		end
-		if not CanIBuildHere then
-			unitBeingBuilt:Destroy()
-			LOG('I tried to build something on a wreck away from the wreck, and failed')
-		end
+	--		end
+	--	end
+	--	if not CanIBuildHere then
+	--		unitBeingBuilt:Destroy()
+	--		LOG('I tried to build something on a wreck away from the wreck, and failed')
+	--	end
 		
-	end
+	--end
 	        
 	# added by brute51 - to make sure we use the proper consumption values. [132]
         self:UpdateConsumptionValues()
@@ -4318,6 +4545,12 @@ Unit = Class(moho.unit_methods) {
     end,
 	
 	OnDetachedToTransport = function(self, transport)
+		if not transport.slotsFree then
+			transport.slotsFree = {}
+		end
+		if not self.attachmentBone then
+			self.attachmentBone = -100
+		end
         self:DoUnitCallbacks( 'OnDetachedToTransport', transport )
 		transport.slotsFree[self.attachmentBone] = true 
 		self.attachmentBone = nil
