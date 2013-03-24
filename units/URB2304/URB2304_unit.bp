@@ -175,11 +175,11 @@ UnitBlueprint {
     StrategicIconName = 'icon_structure3_antiair',
     StrategicIconSortPriority = 195,
     Veteran = {
-        Level1 = 12,
-        Level2 = 24,
-        Level3 = 36,
-        Level4 = 48,
-        Level5 = 60,
+        Level1 = 24,
+        Level2 = 48,
+        Level3 = 72,
+        Level4 = 96,
+        Level5 = 120,
     },
     Weapon = {
         {
