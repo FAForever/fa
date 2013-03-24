@@ -376,6 +376,8 @@ UnitBlueprint {
             TargetCheckInterval = 0.625,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
+                'EXPERIMENTAL',
+                'SUBCOMMANDER',
                 'NAVAL MOBILE',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
@@ -464,6 +466,8 @@ UnitBlueprint {
             TargetCheckInterval = 0.625,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
+                'EXPERIMENTAL',
+                'SUBCOMMANDER',
                 'NAVAL MOBILE',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
