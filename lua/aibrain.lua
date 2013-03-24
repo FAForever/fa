@@ -402,7 +402,7 @@ function SyncScores()
 		Sync.ScoreAccum = scoreData
 		Sync.Score = scoreData.current
 		
-	elseif Sync.FullScoreSync == false then 
+	elseif observer == false then 
 		for index, brain in ArmyBrains do
 			Sync.Score[index] = {}
 			Sync.Score[index].general = {}
