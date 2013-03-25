@@ -161,9 +161,34 @@ UAL0301 = Class(AWalkingLandUnit) {
             end
         #SystemIntegrityCompensator
         elseif enh == 'SystemIntegrityCompensator' then
-            self:SetRegenRate(bp.NewRegenRate or 0)
+            # added by brute51 - fix for bug SCU regen upgrade doesnt stack with veteran bonus [140]
+            AWalkingLandUnit.CreateEnhancement(self, enh)
+            local bpRegenRate = bp.NewRegenRate or 0
+            if not Buffs['AeonSCURegenerateBonus'] then
+               BuffBlueprint {
+                    Name = 'AeonSCURegenerateBonus',
+                    DisplayName = 'AeonSCURegenerateBonus',
+                    BuffType = 'SCUREGENERATEBONUS',
+                    Stacks = 'ALWAYS',
+                    Duration = -1,
+                    Affects = {
+                        Regen = {
+                            Add = bpRegenRate,
+                            Mult = 1.0,
+                        },
+                    },
+                } 
+            end
+            if Buff.HasBuff( self, 'AeonSCURegenerateBonus' ) then
+                Buff.RemoveBuff( self, 'AeonSCURegenerateBonus' )
+            end  
+            Buff.ApplyBuff(self, 'AeonSCURegenerateBonus')
         elseif enh == 'SystemIntegrityCompensatorRemove' then
-            self:RevertRegenRate()
+            # added by brute51 - fix for bug SCU regen upgrade doesnt stack with veteran bonus [140]
+            AWalkingLandUnit.CreateEnhancement(self, enh)
+            if Buff.HasBuff( self, 'AeonSCURegenerateBonus' ) then
+                Buff.RemoveBuff( self, 'AeonSCURegenerateBonus' )
+            end
         #Sacrifice
         elseif enh == 'Sacrifice' then
             self:AddCommandCap('RULEUCC_Sacrifice')

@@ -227,10 +227,34 @@ URL0301 = Class(CWalkingLandUnit) {
             self:HideBone('AA_Gun', true)
             self:SetWeaponEnabledByLabel('NMissile', false)
         elseif enh == 'SelfRepairSystem' then
-            local bpRegenRate = self:GetBlueprint().Enhancements.SelfRepairSystem.NewRegenRate 
-            self:SetRegenRate(bpRegenRate or 0)
+            # added by brute51 - fix for bug SCU regen upgrade doesnt stack with veteran bonus [140]
+            CWalkingLandUnit.CreateEnhancement(self, enh)
+            local bpRegenRate = self:GetBlueprint().Enhancements.SelfRepairSystem.NewRegenRate or 0
+            if not Buffs['CybranSCURegenerateBonus'] then
+               BuffBlueprint {
+                    Name = 'CybranSCURegenerateBonus',
+                    DisplayName = 'CybranSCURegenerateBonus',
+                    BuffType = 'SCUREGENERATEBONUS',
+                    Stacks = 'ALWAYS',
+                    Duration = -1,
+                    Affects = {
+                        Regen = {
+                            Add = bpRegenRate,
+                            Mult = 1.0,
+                        },
+                    },
+                } 
+            end
+            if Buff.HasBuff( self, 'CybranSCURegenerateBonus' ) then
+                Buff.RemoveBuff( self, 'CybranSCURegenerateBonus' )
+            end  
+            Buff.ApplyBuff(self, 'CybranSCURegenerateBonus')
         elseif enh == 'SelfRepairSystemRemove' then
-            self:RevertRegenRate()
+            # added by brute51 - fix for bug SCU regen upgrade doesnt stack with veteran bonus [140]
+            CWalkingLandUnit.CreateEnhancement(self, enh)
+            if Buff.HasBuff( self, 'CybranSCURegenerateBonus' ) then
+                Buff.RemoveBuff( self, 'CybranSCURegenerateBonus' )
+            end
         elseif enh =='ResourceAllocation' then
             local bpEcon = self:GetBlueprint().Economy
             self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
