@@ -1409,7 +1409,6 @@ local function UpdateGame()
 			GUI.mapView:SetTextureFromMap(scenarioInfo.map)
 		end
 		GUI.mapName:SetText(LOC(scenarioInfo.name))
-
 		ShowMapPositions(GUI.mapView,scenarioInfo,numPlayers)			
 	else
 		GUI.mapView:ClearTexture()
@@ -1504,8 +1503,6 @@ local function UpdateGame()
 					correct = false
 				
 				end
-				
-			
 			end
 		end
 		if correct and teams != nil then
@@ -1513,14 +1510,17 @@ local function UpdateGame()
 			if quality and quality > 0 then
 				gameInfo.GameOptions['Quality'] = quality
 				--local randmapText = UIUtil.CreateText(GUI.panel, "current game quality : " .. quality .. " %", 17, UIUtil.titleFont)
-				randmapText:SetText("current game quality : " .. quality .. " %")
+				randmapText:SetText(scenarioInfo.name.. " (Game quality : "..quality.."%)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
 				--LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
 			else
-				randmapText:SetText("current game quality : unknown")
+				randmapText:SetText(scenarioInfo.name.. " (Game quality : N/A)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
 			end
+		else
+			randmapText:SetText(scenarioInfo.name) -- Set the map name and quality at the top right corner in lobby -- Xinnony
 		end
+	else
+		randmapText:SetText(scenarioInfo.name) -- Set the map name and quality at the top right corner in lobby -- Xinnony
 	end
-	
 end
 
 -- Update our local gameInfo.GameMods from selected map name and selected mods, then
@@ -2084,8 +2084,38 @@ function CreateUI(maxPlayers)
     local titleText = UIUtil.CreateText(GUI.panel, title, 26, UIUtil.titleFont)
     LayoutHelpers.AtLeftTopIn(titleText, GUI.panel, 50, 36)
 	
-	randmapText = UIUtil.CreateText(GUI.panel, "Power Lobby 2.0 by Moritz - www.forgedalliance.com.br", 17, UIUtil.titleFont)
+	randmapText = UIUtil.CreateText(GUI.panel, "", 17, UIUtil.titleFont)
 	LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
+	
+	--// Credits -- Xinnony
+	local Credits = "New functions added by Xinnony | Power Lobby 2.0 by Moritz"
+	--***********************
+	Credits_Shadows1 = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
+    Credits_Shadows1:SetFont(UIUtil.titleFont, 12)
+    Credits_Shadows1:SetColor("000000")
+	LayoutHelpers.AtBottomIn(Credits_Shadows1, GUI.panel, 1)
+	LayoutHelpers.AtRightIn(Credits_Shadows1, GUI.panel, 99)
+	Credits_Shadows2 = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
+    Credits_Shadows2:SetFont(UIUtil.titleFont, 12)
+    Credits_Shadows2:SetColor("000000")
+	LayoutHelpers.AtBottomIn(Credits_Shadows2, GUI.panel, -1)
+	LayoutHelpers.AtRightIn(Credits_Shadows2, GUI.panel, 101)
+	Credits_Shadows3 = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
+    Credits_Shadows3:SetFont(UIUtil.titleFont, 12)
+    Credits_Shadows3:SetColor("000000")
+	LayoutHelpers.AtBottomIn(Credits_Shadows3, GUI.panel, -1)
+	LayoutHelpers.AtRightIn(Credits_Shadows3, GUI.panel, 99)
+	Credits_Shadows4 = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
+    Credits_Shadows4:SetFont(UIUtil.titleFont, 12)
+    Credits_Shadows4:SetColor("000000")
+	LayoutHelpers.AtBottomIn(Credits_Shadows4, GUI.panel, 1)
+	LayoutHelpers.AtRightIn(Credits_Shadows4, GUI.panel, 101)
+	Credits_Text = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
+    Credits_Text:SetFont(UIUtil.titleFont, 12)
+    Credits_Text:SetColor("FFFFFF")
+	LayoutHelpers.AtBottomIn(Credits_Text, GUI.panel, 0)
+	LayoutHelpers.AtRightIn(Credits_Text, GUI.panel, 100)
+	--\\ Stop
 
     GUI.playerPanel = Group(GUI.panel, "playerPanel")
     LayoutHelpers.AtLeftTopIn(GUI.playerPanel, GUI.panel, 40, 66)
@@ -3091,38 +3121,32 @@ function RefreshOptionDisplayData(scenarioInfo)
 	if getInit == "init_faf.lua" then
 --		AddChatText('Welcome to Forged Alliance Forever MOD'..getInit)
 		local getVictory = gameInfo.GameOptions['Victory'] -- 'demoralization'
-		local getTimeo = gameInfo.GameOptions['Timeouts'] -- '3'
 		local getCheat = gameInfo.GameOptions['CheatsEnabled'] -- 'false'
-		local getCivil = gameInfo.GameOptions['CivilianAlliance'] -- 'enemy'
 		local getSpeed = gameInfo.GameOptions['GameSpeed'] -- 'normal'
 		local getFog = gameInfo.GameOptions['FogOfWar'] -- 'explored'
-		local getUnitc = gameInfo.GameOptions['UnitCap'] -- '1000'
 		local getPrebui = gameInfo.GameOptions['PrebuiltUnits'] -- 'Off'
 		local getNorush = gameInfo.GameOptions['NoRushOption'] -- 'Off'
 		local getNumbMod = table.getn(Mods.GetGameMods(gameInfo.GameMods)) -- 0 for the purposes of this function
 		local getRstric = gameInfo.GameOptions.RestrictedCategories -- can be nil or a table, even if no unit restrictions are present
 --~ 			AddChatText(tostring(cRstr))
-		if getVictory == 'demoralization' and getTimeo == '3' and getCheat == 'false' and getCivil == 'enemy' and getSpeed == 'normal'
-		and getFog == 'explored' and getUnitc == '1000' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and getRstric == nil then
+		if getVictory == 'demoralization' and getCheat == 'false' and getSpeed == 'normal'
+		and getFog == 'explored' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and getRstric == nil then
 			table.insert(formattedOptions, {text = 'Ranking',
 				value = 'Ranked',
 				green = true,
-				tooltip = 'Ranked',
-				valuetooltip = 'This game is Ranked !'})
+				tooltip = {text='Ranked',body='This game is Ranked !'}})
 		else
-			if getVictory == 'demoralization' and getTimeo == '3' and getCheat == 'false' and getCivil == 'enemy' and getSpeed == 'normal'
-			and getFog == 'explored' and getUnitc == '1000' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and table.getn(getRstric) == 0 then
+			if getVictory == 'demoralization' and getCheat == 'false' and getSpeed == 'normal'
+			and getFog == 'explored' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and table.getn(getRstric) == 0 then
 				table.insert(formattedOptions, {text = 'Ranking',
 					value = 'Ranked',
 					green = true,
-					tooltip = 'Ranked',
-					valuetooltip = 'This game is Ranked !'})
+					tooltip = {text='Ranked',body='This game is Ranked !'}})
 			else
 				table.insert(formattedOptions, {text = 'Ranking',
 					value = 'Unranked',
 					red = true,
-					tooltip = 'Not ranked',
-					valuetooltip = 'This game is NOT Ranked !'})
+					tooltip = {text='Unranked',body='This game is NOT Ranked !'}})
 			end
 		end
 	else
@@ -3144,8 +3168,7 @@ function RefreshOptionDisplayData(scenarioInfo)
 		table.insert(formattedOptions, {text = 'Ranking',
 			value = 'Unranked',
 			red = true,
-			tooltip = 'Not ranked',
-			valuetooltip = 'This game is NOT Ranked !'})
+			tooltip = {text='Unranked',body='This game is NOT Ranked !'}})
 	end
 --\\ Stop
 --// Check Mod active
@@ -3175,7 +3198,6 @@ function RefreshOptionDisplayData(scenarioInfo)
 --\\ Stop
 --// Check MapSize & MaxPlayer active
     if scenarioInfo then
-		randmapText:SetText(scenarioInfo.name) -- Set the map name at the top right corner in lobby -- Xinnony
         table.insert(formattedOptions, {text = '<LOC MAPSEL_0024>', 
             value = LOCF("<LOC map_select_0008>%dkm x %dkm", scenarioInfo.size[1]/50, scenarioInfo.size[2]/50),
             tooltip = 'map_select_sizeoption',
