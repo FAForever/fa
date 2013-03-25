@@ -33,6 +33,7 @@ local StratManager = import('/lua/sim/StrategyManager.lua')
 
 local scoreOption = ScenarioInfo.Options.Score or "no"
 
+
 local observer = false
 scoreData = {}
 scoreData.current = {}
@@ -396,7 +397,7 @@ end
 
 
 function SyncScores()
-	if GetFocusArmy() == -1 or observer == true then
+	if GetFocusArmy() == -1 or import('/lua/victory.lua').gameOver == true or observer == true then
 		observer = true
 		Sync.FullScoreSync = true
 		Sync.ScoreAccum = scoreData
