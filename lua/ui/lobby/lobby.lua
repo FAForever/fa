@@ -158,12 +158,12 @@ local hasFA = true
 
 
 local slotMenuStrings = {
-    open = "<LOC lobui_0219>Open",
-    close = "<LOC lobui_0220>Close",
-    closed = "<LOC lobui_0221>Closed",
-    occupy = "<LOC lobui_0222>Occupy",
-    pm = "<LOC lobui_0223>Private Message",
-    remove_to_observer = "Remove to Observer",
+	open = "<LOC lobui_0219>Open",
+	close = "<LOC lobui_0220>Close",
+	closed = "<LOC lobui_0221>Closed",
+	occupy = "<LOC lobui_0222>Occupy",
+	pm = "<LOC lobui_0223>Private Message",
+	remove_to_observer = "Remove to Observer",
 	remove_to_kik = "Remove to Kik",
 	move_slot_to_slot1 = "Move player to slot 1",
 	move_slot_to_slot2 = "Move player to slot 2",
@@ -183,25 +183,25 @@ local slotMenuData = {
     open = {
         host = {
 			'close',
-            'occupy',
-            'ailist',
+			'occupy',
+			'ailist',
         },
         client = {
-            'occupy',
+			'occupy',
         },
     },
     closed = {
         host = {
-            'open',
+			'open',
         },
         client = {
         },
     },
     player = {
         host = {
-            'pm',
+			'pm',
 			'remove_to_observer',
-            'remove_to_kik',
+			'remove_to_kik',
 			'move_slot_to_slot1',
 			'move_slot_to_slot2',
 			'move_slot_to_slot3',
@@ -216,13 +216,13 @@ local slotMenuData = {
 			'move_slot_to_slot12',
         },
         client = {
-            'pm',
+			'pm',
         },
     },
     ai = {
         host = {
 			'remove_to_kik',
-            'ailist',
+			'ailist',
         },
         client = {
         },
