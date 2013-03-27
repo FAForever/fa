@@ -163,20 +163,20 @@ local slotMenuStrings = {
 	closed = "<LOC lobui_0221>Closed",
 	occupy = "<LOC lobui_0222>Occupy",
 	pm = "<LOC lobui_0223>Private Message",
-	remove_to_observer = "Remove to Observer",
-	remove_to_kik = "Remove to Kik",
-	move_slot_to_slot1 = "Move player to slot 1",
-	move_slot_to_slot2 = "Move player to slot 2",
-	move_slot_to_slot3 = "Move player to slot 3",
-	move_slot_to_slot4 = "Move player to slot 4",
-	move_slot_to_slot5 = "Move player to slot 5",
-	move_slot_to_slot6 = "Move player to slot 6",
-	move_slot_to_slot7 = "Move player to slot 7",
-	move_slot_to_slot8 = "Move player to slot 8",
-	move_slot_to_slot9 = "Move player to slot 9",
-	move_slot_to_slot10 = "Move player to slot 10",
-	move_slot_to_slot11 = "Move player to slot 11",
-	move_slot_to_slot12 = "Move player to slot 12",
+	remove_to_kik = "Remove Player",
+	remove_to_observer = "Move Player to Observer",
+	move_slot_to_slot1 = "Move Player to slot 1",
+	move_slot_to_slot2 = "Move Player to slot 2",
+	move_slot_to_slot3 = "Move Player to slot 3",
+	move_slot_to_slot4 = "Move Player to slot 4",
+	move_slot_to_slot5 = "Move Player to slot 5",
+	move_slot_to_slot6 = "Move Player to slot 6",
+	move_slot_to_slot7 = "Move Player to slot 7",
+	move_slot_to_slot8 = "Move Player to slot 8",
+	move_slot_to_slot9 = "Move Player to slot 9",
+	move_slot_to_slot10 = "Move Player to slot 10",
+	move_slot_to_slot11 = "Move Player to slot 11",
+	move_slot_to_slot12 = "Move Player to slot 12",
 }
 
 local slotMenuData = {
@@ -312,7 +312,8 @@ local function DoSlotBehavior(slot, key, name)
         if gameInfo.PlayerOptions[slot].Human then
             GUI.chatEdit:SetText(string.format("/whisper %s:", gameInfo.PlayerOptions[slot].PlayerName))
         end
-	elseif key == 'move_slot_to_slot1' then --// Move player slot to slot -- Xinnony
+--// Move player slot to slot -- Xinnony
+	elseif key == 'move_slot_to_slot1' then
 		if gameInfo.PlayerOptions[slot].Human then
 			if gameInfo.PlayerOptions[1].Human then -- If destination slot player exist
 				LAST_name = gameInfo.PlayerOptions[1].PlayerName
@@ -336,7 +337,7 @@ local function DoSlotBehavior(slot, key, name)
 				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 1)
 			end
 		end
-	elseif key == 'move_slot_to_slot2' then --// Move player slot to slot -- Xinnony
+	elseif key == 'move_slot_to_slot2' then
 		if gameInfo.PlayerOptions[slot].Human then
 			if gameInfo.PlayerOptions[2].Human then -- If destination slot player exist
 				LAST_name = gameInfo.PlayerOptions[2].PlayerName
@@ -360,7 +361,7 @@ local function DoSlotBehavior(slot, key, name)
 				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 2)
 			end
 		end
-	elseif key == 'move_slot_to_slot3' then --// Move player slot to slot -- Xinnony
+	elseif key == 'move_slot_to_slot3' then
 		if gameInfo.PlayerOptions[slot].Human then
 			if gameInfo.PlayerOptions[3].Human then -- If destination slot player exist
 				LAST_name = gameInfo.PlayerOptions[3].PlayerName
@@ -384,7 +385,7 @@ local function DoSlotBehavior(slot, key, name)
 				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 3)
 			end
 		end
-	elseif key == 'move_slot_to_slot4' then --// Move player slot to slot -- Xinnony
+	elseif key == 'move_slot_to_slot4' then
 		if gameInfo.PlayerOptions[slot].Human then
 			if gameInfo.PlayerOptions[4].Human then -- If destination slot player exist
 				LAST_name = gameInfo.PlayerOptions[4].PlayerName
@@ -408,7 +409,7 @@ local function DoSlotBehavior(slot, key, name)
 				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 4)
 			end
 		end
-	elseif key == 'move_slot_to_slot5' then --// Move player slot to slot -- Xinnony
+	elseif key == 'move_slot_to_slot5' then
 		if gameInfo.PlayerOptions[slot].Human then
 			if gameInfo.PlayerOptions[5].Human then -- If destination slot player exist
 				LAST_name = gameInfo.PlayerOptions[5].PlayerName
@@ -432,7 +433,7 @@ local function DoSlotBehavior(slot, key, name)
 				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 5)
 			end
 		end
-	elseif key == 'move_slot_to_slot6' then --// Move player slot to slot -- Xinnony
+	elseif key == 'move_slot_to_slot6' then
 		if gameInfo.PlayerOptions[slot].Human then
 			if gameInfo.PlayerOptions[6].Human then -- If destination slot player exist
 				LAST_name = gameInfo.PlayerOptions[6].PlayerName
@@ -456,7 +457,7 @@ local function DoSlotBehavior(slot, key, name)
 				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 6)
 			end
 		end
-	elseif key == 'move_slot_to_slot7' then --// Move player slot to slot -- Xinnony
+	elseif key == 'move_slot_to_slot7' then
 		if gameInfo.PlayerOptions[slot].Human then
 			if gameInfo.PlayerOptions[7].Human then -- If destination slot player exist
 				LAST_name = gameInfo.PlayerOptions[7].PlayerName
@@ -480,7 +481,7 @@ local function DoSlotBehavior(slot, key, name)
 				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 7)
 			end
 		end
-	elseif key == 'move_slot_to_slot8' then --// Move player slot to slot -- Xinnony
+	elseif key == 'move_slot_to_slot8' then
 		if gameInfo.PlayerOptions[slot].Human then
 			if gameInfo.PlayerOptions[8].Human then -- If destination slot player exist
 				LAST_name = gameInfo.PlayerOptions[8].PlayerName
@@ -504,7 +505,7 @@ local function DoSlotBehavior(slot, key, name)
 				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 8)
 			end
 		end
-	elseif key == 'move_slot_to_slot9' then --// Move player slot to slot -- Xinnony
+	elseif key == 'move_slot_to_slot9' then
 		if gameInfo.PlayerOptions[slot].Human then
 			if gameInfo.PlayerOptions[9].Human then -- If destination slot player exist
 				LAST_name = gameInfo.PlayerOptions[9].PlayerName
@@ -528,7 +529,7 @@ local function DoSlotBehavior(slot, key, name)
 				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 9)
 			end
 		end
-	elseif key == 'move_slot_to_slot10' then --// Move player slot to slot -- Xinnony
+	elseif key == 'move_slot_to_slot10' then
 		if gameInfo.PlayerOptions[slot].Human then
 			if gameInfo.PlayerOptions[10].Human then -- If destination slot player exist
 				LAST_name = gameInfo.PlayerOptions[10].PlayerName
@@ -552,7 +553,7 @@ local function DoSlotBehavior(slot, key, name)
 				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 10)
 			end
 		end
-	elseif key == 'move_slot_to_slot11' then --// Move player slot to slot -- Xinnony
+	elseif key == 'move_slot_to_slot11' then
 		if gameInfo.PlayerOptions[slot].Human then
 			if gameInfo.PlayerOptions[11].Human then -- If destination slot player exist
 				LAST_name = gameInfo.PlayerOptions[11].PlayerName
@@ -576,7 +577,7 @@ local function DoSlotBehavior(slot, key, name)
 				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 11)
 			end
 		end
-	elseif key == 'move_slot_to_slot12' then --// Move player slot to slot -- Xinnony
+	elseif key == 'move_slot_to_slot12' then
 		if gameInfo.PlayerOptions[slot].Human then
 			if gameInfo.PlayerOptions[12].Human then -- If destination slot player exist
 				LAST_name = gameInfo.PlayerOptions[12].PlayerName
@@ -600,17 +601,20 @@ local function DoSlotBehavior(slot, key, name)
 				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 12)
 			end
 		end
-    elseif key == 'remove_to_observer' then --// Move player slot to Observer -- Xinnony
+--\\ Stop Move player slot to slot
+--// Move Player slot to Observer -- Xinnony
+    elseif key == 'remove_to_observer' then
 		if gameInfo.PlayerOptions[slot].Human then
-            UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
-				"Move", function()
+            --UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
+				--"Move", function()
 				HostConvertPlayerToObserver(gameInfo.PlayerOptions[slot].OwnerID, gameInfo.PlayerOptions[slot].PlayerName, slot)
-				end,
-                "<LOC _Cancel>", nil, 
-                nil, nil, 
-                true,
-                {worldCover = false, enterButton = 1, escapeButton = 2})
+				--end,
+                --"<LOC _Cancel>", nil, 
+                --nil, nil, 
+                --true,
+                --{worldCover = false, enterButton = 1, escapeButton = 2})
         end
+--\\ Stop Move Player slot to Observer
 	elseif key == 'remove_to_kik' then
         if gameInfo.PlayerOptions[slot].Human then
             UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
@@ -1732,7 +1736,7 @@ local function UpdateGame()
 		if not GUI.mapView:SetTexture(scenarioInfo.preview) then
 			GUI.mapView:SetTextureFromMap(scenarioInfo.map)
 		end
-		GUI.mapName:SetText(LOC(scenarioInfo.name))
+		--GUI.mapName:SetText(LOC(scenarioInfo.name)) -- Add mapname above option lobby (replace with Ranked Label)
 		ShowMapPositions(GUI.mapView,scenarioInfo,numPlayers)			
 	else
 		GUI.mapView:ClearTexture()
@@ -1834,16 +1838,16 @@ local function UpdateGame()
 			if quality and quality > 0 then
 				gameInfo.GameOptions['Quality'] = quality
 				--local randmapText = UIUtil.CreateText(GUI.panel, "current game quality : " .. quality .. " %", 17, UIUtil.titleFont)
-				randmapText:SetText(scenarioInfo.name.. " (Game quality : "..quality.."%)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
+				randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."] (Game quality : "..quality.."%)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
 				--LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
 			else
-				randmapText:SetText(scenarioInfo.name.. " (Game quality : N/A)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
+				randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."] (Game quality : N/A)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
 			end
 		else
-			randmapText:SetText(scenarioInfo.name) -- Set the map name and quality at the top right corner in lobby -- Xinnony
+			randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."]") -- Set the map name and quality at the top right corner in lobby -- Xinnony
 		end
 	else
-		randmapText:SetText(scenarioInfo.name) -- Set the map name and quality at the top right corner in lobby -- Xinnony
+		randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."]") -- Set the map name and quality at the top right corner in lobby -- Xinnony
 	end
 end
 
@@ -2439,7 +2443,7 @@ function CreateUI(maxPlayers)
     Credits_Text:SetColor("FFFFFF")
 	LayoutHelpers.AtBottomIn(Credits_Text, GUI.panel, 0)
 	LayoutHelpers.AtRightIn(Credits_Text, GUI.panel, 100)
-	--\\ Stop
+	--\\ Stop Credits
 
     GUI.playerPanel = Group(GUI.panel, "playerPanel")
     LayoutHelpers.AtLeftTopIn(GUI.playerPanel, GUI.panel, 40, 66)
@@ -2934,10 +2938,12 @@ function CreateUI(maxPlayers)
         GUI.pingLabel = UIUtil.CreateText(GUI.labelGroup, "<LOC lobui_0217>Ping", 14, UIUtil.titleFont)
         LayoutHelpers.AtLeftIn(GUI.pingLabel, GUI.panel, slotColumnSizes.ping.x)
         LayoutHelpers.AtVerticalCenterIn(GUI.pingLabel, GUI.labelGroup, 5)
+		--Tooltip.AddControlTooltip(GUI.pingLabel, '') -- NEED INFO (write tooltip in "\lua\ui\help\tooltips.lua")
 
         GUI.readyLabel = UIUtil.CreateText(GUI.labelGroup, "<LOC lobui_0218>Ready", 14, UIUtil.titleFont)
         LayoutHelpers.AtLeftIn(GUI.readyLabel, GUI.panel, slotColumnSizes.ready.x)
         LayoutHelpers.AtVerticalCenterIn(GUI.readyLabel, GUI.labelGroup, 5)
+		--Tooltip.AddControlTooltip(GUI.readyLabel, '') -- NEED INFO (write tooltip in "\lua\ui\help\tooltips.lua")
     end
 
     for i= 1, LobbyComm.maxPlayerSlots do
@@ -3455,22 +3461,31 @@ function RefreshOptionDisplayData(scenarioInfo)
 --~ 			AddChatText(tostring(cRstr))
 		if getVictory == 'demoralization' and getCheat == 'false' and getSpeed == 'normal'
 		and getFog == 'explored' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and getRstric == nil then
-			table.insert(formattedOptions, {text = 'Ranking',
-				value = 'Ranked',
-				green = true,
-				tooltip = {text='Ranked',body='This game is Ranked !'}})
+			--table.insert(formattedOptions, {text = 'Ranking',
+				--value = 'Ranked',
+				--green = true,
+				--tooltip = {text='Ranked',body='This game is Ranked !'}})
+			GUI.mapName:SetText("Game is Ranked")
+			GUI.mapName:SetColor("77ff77")
+			--Tooltip.AddControlTooltip(GUI.mapName, '')
 		else
 			if getVictory == 'demoralization' and getCheat == 'false' and getSpeed == 'normal'
 			and getFog == 'explored' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and table.getn(getRstric) == 0 then
-				table.insert(formattedOptions, {text = 'Ranking',
-					value = 'Ranked',
-					green = true,
-					tooltip = {text='Ranked',body='This game is Ranked !'}})
+				--table.insert(formattedOptions, {text = 'Ranking',
+					--value = 'Ranked',
+					--green = true,
+					--tooltip = {text='Ranked',body='This game is Ranked !'}})
+				GUI.mapName:SetText("Game is Ranked")
+				GUI.mapName:SetColor("77ff77")
+				--Tooltip.AddControlTooltip(GUI.mapName, '')
 			else
-				table.insert(formattedOptions, {text = 'Ranking',
-					value = 'Unranked',
-					red = true,
-					tooltip = {text='Unranked',body='This game is NOT Ranked !'}})
+				--table.insert(formattedOptions, {text = 'Ranking',
+					--value = 'Unranked',
+					--red = true,
+					--tooltip = {text='Unranked',body='This game is NOT Ranked !'}})
+				GUI.mapName:SetText("Game is not Ranked")
+				GUI.mapName:SetColor("ff7777")
+				--Tooltip.AddControlTooltip(GUI.mapName, '')
 			end
 		end
 	else
@@ -3489,12 +3504,15 @@ function RefreshOptionDisplayData(scenarioInfo)
 --~ 		elseif getInit == "init_xtremewars.lua" then
 --~ 			AddChatText('Welcome to XtremeWars MOD')
 --~ 		end
-		table.insert(formattedOptions, {text = 'Ranking',
-			value = 'Unranked',
-			red = true,
-			tooltip = {text='Unranked',body='This game is NOT Ranked !'}})
+		--table.insert(formattedOptions, {text = 'Ranking',
+			--value = 'Unranked',
+			--red = true,
+			--tooltip = {text='Unranked',body='This game is NOT Ranked !'}})
+		GUI.mapName:SetText("Game is not Ranked")
+		GUI.mapName:SetColor("ff7777")
+		--Tooltip.AddControlTooltip(GUI.mapName, '')
 	end
---\\ Stop
+--\\ Stop Check Ranked active
 --// Check Mod active
     local modNum = table.getn(Mods.GetGameMods(gameInfo.GameMods))
     if modNum > 0 then
@@ -3508,7 +3526,7 @@ function RefreshOptionDisplayData(scenarioInfo)
             tooltip = 'Lobby_Mod_Option',
             valueTooltip = 'Lobby_Mod_Option'})
     end
---\\ Stop
+--\\ Stop Check Mod active
 --// Check RestrictedUnit active
     if gameInfo.GameOptions.RestrictedCategories != nil then
         if table.getn(gameInfo.GameOptions.RestrictedCategories) != 0 then
@@ -3519,7 +3537,7 @@ function RefreshOptionDisplayData(scenarioInfo)
             valueTooltip = 'Lobby_BuildRestrict_Option'})
         end
     end
---\\ Stop
+--\\ Stop Check RestrictedUnit active
 --// Check MapSize & MaxPlayer active
     if scenarioInfo then
         table.insert(formattedOptions, {text = '<LOC MAPSEL_0024>', 
@@ -3531,7 +3549,7 @@ function RefreshOptionDisplayData(scenarioInfo)
             tooltip = 'map_select_maxplayers',
             valueTooltip = 'map_select_maxplayers'})
     end
---\\ Stop
+--\\ Stop Check MapSize & MaxPlayer active
 --// Check other options active
     for i, v in gameInfo.GameOptions do
         local option = false
