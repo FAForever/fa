@@ -163,16 +163,28 @@ local slotMenuStrings = {
     closed = "<LOC lobui_0221>Closed",
     occupy = "<LOC lobui_0222>Occupy",
     pm = "<LOC lobui_0223>Private Message",
-    remove = "<LOC lobui_0224>Remove",
+    remove_to_observer = "Remove to Observer",
+	remove_to_kik = "Remove to Kik",
+	move_slot_to_slot1 = "Move player to slot 1",
+	move_slot_to_slot2 = "Move player to slot 2",
+	move_slot_to_slot3 = "Move player to slot 3",
+	move_slot_to_slot4 = "Move player to slot 4",
+	move_slot_to_slot5 = "Move player to slot 5",
+	move_slot_to_slot6 = "Move player to slot 6",
+	move_slot_to_slot7 = "Move player to slot 7",
+	move_slot_to_slot8 = "Move player to slot 8",
+	move_slot_to_slot9 = "Move player to slot 9",
+	move_slot_to_slot10 = "Move player to slot 10",
+	move_slot_to_slot11 = "Move player to slot 11",
+	move_slot_to_slot12 = "Move player to slot 12",
 }
 
 local slotMenuData = {
     open = {
-        host = {            
-            #'ailist',  #moved to below
+        host = {
 			'close',
             'occupy',
-            'ailist',  #new	    
+            'ailist',
         },
         client = {
             'occupy',
@@ -188,16 +200,29 @@ local slotMenuData = {
     player = {
         host = {
             'pm',
-            'remove',
+			'remove_to_observer',
+            'remove_to_kik',
+			'move_slot_to_slot1',
+			'move_slot_to_slot2',
+			'move_slot_to_slot3',
+			'move_slot_to_slot4',
+			'move_slot_to_slot5',
+			'move_slot_to_slot6',
+			'move_slot_to_slot7',
+			'move_slot_to_slot8',
+			'move_slot_to_slot9',
+			'move_slot_to_slot10',
+			'move_slot_to_slot11',
+			'move_slot_to_slot12',
         },
         client = {
             'pm',
         },
     },
     ai = {
-        host = {            
+        host = {
+			'remove_to_kik',
             'ailist',
-			'remove',
         },
         client = {
         },
@@ -260,7 +285,7 @@ local function DoSlotBehavior(slot, key, name)
     if key == 'open' then
         if lobbyComm:IsHost() then
             HostOpenSlot(hostID, slot)
-        end 
+        end
     elseif key == 'close' then
         if lobbyComm:IsHost() then
             HostCloseSlot(hostID, slot)
@@ -286,8 +311,307 @@ local function DoSlotBehavior(slot, key, name)
     elseif key == 'pm' then
         if gameInfo.PlayerOptions[slot].Human then
             GUI.chatEdit:SetText(string.format("/whisper %s:", gameInfo.PlayerOptions[slot].PlayerName))
-        end		
-    elseif key == 'remove' then
+        end
+	elseif key == 'move_slot_to_slot1' then --// Move player slot to slot -- Xinnony
+		if gameInfo.PlayerOptions[slot].Human then
+			if gameInfo.PlayerOptions[1].Human then -- If destination slot player exist
+				LAST_name = gameInfo.PlayerOptions[1].PlayerName
+				LAST_id = gameInfo.PlayerOptions[1].OwnerID
+				tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
+				LAST_rating_color = tostring(tmpLAST_rating_color[1])
+				tmpLAST_mean = GetCommandLineArg("/mean", 1)
+				LAST_mean = tonumber(tmpLAST_mean[1])
+				tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
+				LAST_deviation = tonumber(tmpLAST_deviation[1])
+				LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
+                LAST_faction = gameInfo.PlayerOptions[1].Faction
+				LAST_numgame = gameInfo.PlayerOptions[1].NG
+				--***
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[1].OwnerID, gameInfo.PlayerOptions[1].PlayerName, 1) -- move slot 1 to observer
+				ClearSlotInfo(1)
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 1) -- move select slot to slot 1
+				ClearSlotInfo(slot)
+                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+			else -- destination slot is empty
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 1)
+			end
+		end
+	elseif key == 'move_slot_to_slot2' then --// Move player slot to slot -- Xinnony
+		if gameInfo.PlayerOptions[slot].Human then
+			if gameInfo.PlayerOptions[2].Human then -- If destination slot player exist
+				LAST_name = gameInfo.PlayerOptions[2].PlayerName
+				LAST_id = gameInfo.PlayerOptions[2].OwnerID
+				tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
+				LAST_rating_color = tostring(tmpLAST_rating_color[1])
+				tmpLAST_mean = GetCommandLineArg("/mean", 1)
+				LAST_mean = tonumber(tmpLAST_mean[1])
+				tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
+				LAST_deviation = tonumber(tmpLAST_deviation[1])
+				LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
+                LAST_faction = gameInfo.PlayerOptions[2].Faction
+				LAST_numgame = gameInfo.PlayerOptions[2].NG
+				--***
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[2].OwnerID, gameInfo.PlayerOptions[2].PlayerName, 2) -- move slot 1 to observer
+				ClearSlotInfo(2)
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 2) -- move select slot to slot 1
+				ClearSlotInfo(slot)
+                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+			else -- destination slot is empty
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 2)
+			end
+		end
+	elseif key == 'move_slot_to_slot3' then --// Move player slot to slot -- Xinnony
+		if gameInfo.PlayerOptions[slot].Human then
+			if gameInfo.PlayerOptions[3].Human then -- If destination slot player exist
+				LAST_name = gameInfo.PlayerOptions[3].PlayerName
+				LAST_id = gameInfo.PlayerOptions[3].OwnerID
+				tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
+				LAST_rating_color = tostring(tmpLAST_rating_color[1])
+				tmpLAST_mean = GetCommandLineArg("/mean", 1)
+				LAST_mean = tonumber(tmpLAST_mean[1])
+				tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
+				LAST_deviation = tonumber(tmpLAST_deviation[1])
+				LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
+                LAST_faction = gameInfo.PlayerOptions[3].Faction
+				LAST_numgame = gameInfo.PlayerOptions[3].NG
+				--***
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[3].OwnerID, gameInfo.PlayerOptions[3].PlayerName, 3) -- move slot 1 to observer
+				ClearSlotInfo(3)
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 3) -- move select slot to slot 1
+				ClearSlotInfo(slot)
+                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+			else -- destination slot is empty
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 3)
+			end
+		end
+	elseif key == 'move_slot_to_slot4' then --// Move player slot to slot -- Xinnony
+		if gameInfo.PlayerOptions[slot].Human then
+			if gameInfo.PlayerOptions[4].Human then -- If destination slot player exist
+				LAST_name = gameInfo.PlayerOptions[4].PlayerName
+				LAST_id = gameInfo.PlayerOptions[4].OwnerID
+				tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
+				LAST_rating_color = tostring(tmpLAST_rating_color[1])
+				tmpLAST_mean = GetCommandLineArg("/mean", 1)
+				LAST_mean = tonumber(tmpLAST_mean[1])
+				tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
+				LAST_deviation = tonumber(tmpLAST_deviation[1])
+				LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
+                LAST_faction = gameInfo.PlayerOptions[4].Faction
+				LAST_numgame = gameInfo.PlayerOptions[4].NG
+				--***
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[4].OwnerID, gameInfo.PlayerOptions[4].PlayerName, 4) -- move slot 1 to observer
+				ClearSlotInfo(4)
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 4) -- move select slot to slot 1
+				ClearSlotInfo(slot)
+                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+			else -- destination slot is empty
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 4)
+			end
+		end
+	elseif key == 'move_slot_to_slot5' then --// Move player slot to slot -- Xinnony
+		if gameInfo.PlayerOptions[slot].Human then
+			if gameInfo.PlayerOptions[5].Human then -- If destination slot player exist
+				LAST_name = gameInfo.PlayerOptions[5].PlayerName
+				LAST_id = gameInfo.PlayerOptions[5].OwnerID
+				tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
+				LAST_rating_color = tostring(tmpLAST_rating_color[1])
+				tmpLAST_mean = GetCommandLineArg("/mean", 1)
+				LAST_mean = tonumber(tmpLAST_mean[1])
+				tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
+				LAST_deviation = tonumber(tmpLAST_deviation[1])
+				LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
+                LAST_faction = gameInfo.PlayerOptions[5].Faction
+				LAST_numgame = gameInfo.PlayerOptions[5].NG
+				--***
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[5].OwnerID, gameInfo.PlayerOptions[5].PlayerName, 5) -- move slot 1 to observer
+				ClearSlotInfo(5)
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 5) -- move select slot to slot 1
+				ClearSlotInfo(slot)
+                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+			else -- destination slot is empty
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 5)
+			end
+		end
+	elseif key == 'move_slot_to_slot6' then --// Move player slot to slot -- Xinnony
+		if gameInfo.PlayerOptions[slot].Human then
+			if gameInfo.PlayerOptions[6].Human then -- If destination slot player exist
+				LAST_name = gameInfo.PlayerOptions[6].PlayerName
+				LAST_id = gameInfo.PlayerOptions[6].OwnerID
+				tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
+				LAST_rating_color = tostring(tmpLAST_rating_color[1])
+				tmpLAST_mean = GetCommandLineArg("/mean", 1)
+				LAST_mean = tonumber(tmpLAST_mean[1])
+				tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
+				LAST_deviation = tonumber(tmpLAST_deviation[1])
+				LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
+                LAST_faction = gameInfo.PlayerOptions[6].Faction
+				LAST_numgame = gameInfo.PlayerOptions[6].NG
+				--***
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[6].OwnerID, gameInfo.PlayerOptions[6].PlayerName, 6) -- move slot 1 to observer
+				ClearSlotInfo(6)
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 6) -- move select slot to slot 1
+				ClearSlotInfo(slot)
+                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+			else -- destination slot is empty
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 6)
+			end
+		end
+	elseif key == 'move_slot_to_slot7' then --// Move player slot to slot -- Xinnony
+		if gameInfo.PlayerOptions[slot].Human then
+			if gameInfo.PlayerOptions[7].Human then -- If destination slot player exist
+				LAST_name = gameInfo.PlayerOptions[7].PlayerName
+				LAST_id = gameInfo.PlayerOptions[7].OwnerID
+				tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
+				LAST_rating_color = tostring(tmpLAST_rating_color[1])
+				tmpLAST_mean = GetCommandLineArg("/mean", 1)
+				LAST_mean = tonumber(tmpLAST_mean[1])
+				tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
+				LAST_deviation = tonumber(tmpLAST_deviation[1])
+				LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
+                LAST_faction = gameInfo.PlayerOptions[7].Faction
+				LAST_numgame = gameInfo.PlayerOptions[7].NG
+				--***
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[7].OwnerID, gameInfo.PlayerOptions[7].PlayerName, 7) -- move slot 1 to observer
+				ClearSlotInfo(7)
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 7) -- move select slot to slot 1
+				ClearSlotInfo(slot)
+                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+			else -- destination slot is empty
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 7)
+			end
+		end
+	elseif key == 'move_slot_to_slot8' then --// Move player slot to slot -- Xinnony
+		if gameInfo.PlayerOptions[slot].Human then
+			if gameInfo.PlayerOptions[8].Human then -- If destination slot player exist
+				LAST_name = gameInfo.PlayerOptions[8].PlayerName
+				LAST_id = gameInfo.PlayerOptions[8].OwnerID
+				tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
+				LAST_rating_color = tostring(tmpLAST_rating_color[1])
+				tmpLAST_mean = GetCommandLineArg("/mean", 1)
+				LAST_mean = tonumber(tmpLAST_mean[1])
+				tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
+				LAST_deviation = tonumber(tmpLAST_deviation[1])
+				LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
+                LAST_faction = gameInfo.PlayerOptions[8].Faction
+				LAST_numgame = gameInfo.PlayerOptions[8].NG
+				--***
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[8].OwnerID, gameInfo.PlayerOptions[8].PlayerName, 8) -- move slot 1 to observer
+				ClearSlotInfo(8)
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 8) -- move select slot to slot 1
+				ClearSlotInfo(slot)
+                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+			else -- destination slot is empty
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 8)
+			end
+		end
+	elseif key == 'move_slot_to_slot9' then --// Move player slot to slot -- Xinnony
+		if gameInfo.PlayerOptions[slot].Human then
+			if gameInfo.PlayerOptions[9].Human then -- If destination slot player exist
+				LAST_name = gameInfo.PlayerOptions[9].PlayerName
+				LAST_id = gameInfo.PlayerOptions[9].OwnerID
+				tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
+				LAST_rating_color = tostring(tmpLAST_rating_color[1])
+				tmpLAST_mean = GetCommandLineArg("/mean", 1)
+				LAST_mean = tonumber(tmpLAST_mean[1])
+				tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
+				LAST_deviation = tonumber(tmpLAST_deviation[1])
+				LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
+                LAST_faction = gameInfo.PlayerOptions[9].Faction
+				LAST_numgame = gameInfo.PlayerOptions[9].NG
+				--***
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[9].OwnerID, gameInfo.PlayerOptions[9].PlayerName, 9) -- move slot 1 to observer
+				ClearSlotInfo(9)
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 9) -- move select slot to slot 1
+				ClearSlotInfo(slot)
+                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+			else -- destination slot is empty
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 9)
+			end
+		end
+	elseif key == 'move_slot_to_slot10' then --// Move player slot to slot -- Xinnony
+		if gameInfo.PlayerOptions[slot].Human then
+			if gameInfo.PlayerOptions[10].Human then -- If destination slot player exist
+				LAST_name = gameInfo.PlayerOptions[10].PlayerName
+				LAST_id = gameInfo.PlayerOptions[10].OwnerID
+				tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
+				LAST_rating_color = tostring(tmpLAST_rating_color[1])
+				tmpLAST_mean = GetCommandLineArg("/mean", 1)
+				LAST_mean = tonumber(tmpLAST_mean[1])
+				tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
+				LAST_deviation = tonumber(tmpLAST_deviation[1])
+				LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
+                LAST_faction = gameInfo.PlayerOptions[10].Faction
+				LAST_numgame = gameInfo.PlayerOptions[10].NG
+				--***
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[10].OwnerID, gameInfo.PlayerOptions[10].PlayerName, 10) -- move slot 1 to observer
+				ClearSlotInfo(10)
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 10) -- move select slot to slot 1
+				ClearSlotInfo(slot)
+                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+			else -- destination slot is empty
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 10)
+			end
+		end
+	elseif key == 'move_slot_to_slot11' then --// Move player slot to slot -- Xinnony
+		if gameInfo.PlayerOptions[slot].Human then
+			if gameInfo.PlayerOptions[11].Human then -- If destination slot player exist
+				LAST_name = gameInfo.PlayerOptions[11].PlayerName
+				LAST_id = gameInfo.PlayerOptions[11].OwnerID
+				tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
+				LAST_rating_color = tostring(tmpLAST_rating_color[1])
+				tmpLAST_mean = GetCommandLineArg("/mean", 1)
+				LAST_mean = tonumber(tmpLAST_mean[1])
+				tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
+				LAST_deviation = tonumber(tmpLAST_deviation[1])
+				LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
+                LAST_faction = gameInfo.PlayerOptions[11].Faction
+				LAST_numgame = gameInfo.PlayerOptions[11].NG
+				--***
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[11].OwnerID, gameInfo.PlayerOptions[11].PlayerName, 11) -- move slot 1 to observer
+				ClearSlotInfo(11)
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 11) -- move select slot to slot 1
+				ClearSlotInfo(slot)
+                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+			else -- destination slot is empty
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 11)
+			end
+		end
+	elseif key == 'move_slot_to_slot12' then --// Move player slot to slot -- Xinnony
+		if gameInfo.PlayerOptions[slot].Human then
+			if gameInfo.PlayerOptions[12].Human then -- If destination slot player exist
+				LAST_name = gameInfo.PlayerOptions[12].PlayerName
+				LAST_id = gameInfo.PlayerOptions[12].OwnerID
+				tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
+				LAST_rating_color = tostring(tmpLAST_rating_color[1])
+				tmpLAST_mean = GetCommandLineArg("/mean", 1)
+				LAST_mean = tonumber(tmpLAST_mean[1])
+				tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
+				LAST_deviation = tonumber(tmpLAST_deviation[1])
+				LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
+                LAST_faction = gameInfo.PlayerOptions[12].Faction
+				LAST_numgame = gameInfo.PlayerOptions[12].NG
+				--***
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[12].OwnerID, gameInfo.PlayerOptions[12].PlayerName, 12) -- move slot 1 to observer
+				ClearSlotInfo(12)
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 12) -- move select slot to slot 1
+				ClearSlotInfo(slot)
+                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+			else -- destination slot is empty
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 12)
+			end
+		end
+    elseif key == 'remove_to_observer' then --// Move player slot to Observer -- Xinnony
+		if gameInfo.PlayerOptions[slot].Human then
+            UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
+				"Move", function()
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[slot].OwnerID, gameInfo.PlayerOptions[slot].PlayerName, slot)
+				end,
+                "<LOC _Cancel>", nil, 
+                nil, nil, 
+                true,
+                {worldCover = false, enterButton = 1, escapeButton = 2})
+        end
+	elseif key == 'remove_to_kik' then
         if gameInfo.PlayerOptions[slot].Human then
             UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
                 "<LOC lobui_0167>Kick Player", function() lobbyComm:EjectPeer(gameInfo.PlayerOptions[slot].OwnerID, "KickedByHost") end,
