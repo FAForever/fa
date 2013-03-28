@@ -1841,16 +1841,32 @@ local function UpdateGame()
 			if quality and quality > 0 then
 				gameInfo.GameOptions['Quality'] = quality
 				--local randmapText = UIUtil.CreateText(GUI.panel, "current game quality : " .. quality .. " %", 17, UIUtil.titleFont)
-				randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."] (Game quality : "..quality.."%)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
+				if scenarioInfo.map_version then
+					randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."] (Game quality : "..quality.."%)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
+				else
+					randmapText:SetText(scenarioInfo.name.." (Game quality : "..quality.."%)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
+				end
 				--LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
 			else
-				randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."] (Game quality : N/A)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
+				if scenarioInfo.map_version then
+					randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."] (Game quality : N/A)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
+				else
+					randmapText:SetText(scenarioInfo.name.." (Game quality : N/A)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
+				end
 			end
 		else
-			randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."]") -- Set the map name and quality at the top right corner in lobby -- Xinnony
+			if scenarioInfo.map_version then
+				randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."]") -- Set the map name and quality at the top right corner in lobby -- Xinnony
+			else
+				randmapText:SetText(scenarioInfo.name) -- Set the map name and quality at the top right corner in lobby -- Xinnony
+			end
 		end
 	else
-		randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."]") -- Set the map name and quality at the top right corner in lobby -- Xinnony
+		if scenarioInfo.map_version then
+			randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."]") -- Set the map name and quality at the top right corner in lobby -- Xinnony
+		else
+			randmapText:SetText(scenarioInfo.name) -- Set the map name and quality at the top right corner in lobby -- Xinnony
+		end
 	end
 end
 
