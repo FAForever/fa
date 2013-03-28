@@ -3640,6 +3640,7 @@ function wasConnected(peer)
 		if v == peer then
 			return true
 		end
+	end
 	return false
 end
 
