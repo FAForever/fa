@@ -41,6 +41,8 @@ local teamIcons = {'/lobby/team_icons/team_no_icon.dds',
 	'/lobby/team_icons/team_5_icon.dds',
 	'/lobby/team_icons/team_6_icon.dds'}
 
+local connectedTo = {}	
+	
 local availableMods = {} # map from peer ID to set of available mods; each set is a map from "mod id"->true
 local selectedMods = nil
 
@@ -741,6 +743,7 @@ function ConnectToPeer(addressAndPort,name,uid)
 end
 
 function DisconnectFromPeer(uid)
+	if wasConnected(uid) then table.remove(connectedTo, uid) end
     lobbyComm:DisconnectFromPeer(uid)
 end
 
@@ -3632,10 +3635,23 @@ function RefreshOptionDisplayData(scenarioInfo)
     end
 end
 
+function wasConnected(peer)
+	for _,v in pairs(connectedTo) do
+		if v == peer then
+			return true
+		end
+	return false
+end
+
 function CalcConnectionStatus(peer)
     if peer.status != 'Established' then
         return 'red'
     else
+		if not wasConnected(peer.id) then
+			table.insert(connectedTo, peer.id)
+			GpgNetSend('Connected', string.format("%d", peer.id))
+		end
+
         if not table.find(peer.establishedPeers, lobbyComm:GetLocalPlayerID()) then
             -- they haven't reported that they can talk to us?
             return 'yellow'
