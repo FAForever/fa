@@ -203,7 +203,7 @@ function CreateUI(isReplay)
 		ForkThread(SendChat)
 		lastObserving = true
         import('/lua/ui/game/economy.lua').ToggleEconPanel(false)
-		AddBeatFunction(UiBeat)
+		AddBeatFunction(self.UiBeat)
 	end
 	
 end
