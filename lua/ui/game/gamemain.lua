@@ -63,8 +63,9 @@ function SetLayout(layout)
     import('/lua/ui/game/multifunction.lua').SetLayout(layout)
     if not isReplay then
         import('/lua/ui/game/orders.lua').SetLayout(layout)
-		import('/lua/ui/game/avatars.lua').SetLayout()
+		
     end
+	import('/lua/ui/game/avatars.lua').SetLayout()
     import('/lua/ui/game/unitview.lua').SetLayout(layout)
     import('/lua/ui/game/objectives2.lua').SetLayout(layout)
     import('/lua/ui/game/unitviewDetail.lua').SetLayout(layout, mapGroup)
@@ -154,8 +155,9 @@ function CreateUI(isReplay)
     mfdControl = import('/lua/ui/game/multifunction.lua').Create(controlClusterGroup)
     if not isReplay then
         ordersControl = import('/lua/ui/game/orders.lua').SetupOrdersControl(controlClusterGroup, mfdControl)
-        import('/lua/ui/game/avatars.lua').CreateAvatarUI(mapGroup)
+        
     end
+	import('/lua/ui/game/avatars.lua').CreateAvatarUI(mapGroup)
     import('/lua/ui/game/construction.lua').SetupConstructionControl(controlClusterGroup, mfdControl, ordersControl)
     import('/lua/ui/game/unitview.lua').SetupUnitViewLayout(mapGroup, ordersControl)
     import('/lua/ui/game/unitviewDetail.lua').SetupUnitViewLayout(mapGroup, mapGroup)
@@ -203,7 +205,8 @@ function CreateUI(isReplay)
 		ForkThread(SendChat)
 		lastObserving = true
         import('/lua/ui/game/economy.lua').ToggleEconPanel(false)
-		AddBeatFunction(self.UiBeat)
+		import('/lua/ui/game/avatars.lua').ToggleAvatars(false)
+		AddBeatFunction(UiBeat)
 	end
 	
 end
