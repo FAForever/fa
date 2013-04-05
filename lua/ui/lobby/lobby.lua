@@ -41,6 +41,8 @@ local teamIcons = {'/lobby/team_icons/team_no_icon.dds',
 	'/lobby/team_icons/team_5_icon.dds',
 	'/lobby/team_icons/team_6_icon.dds'}
 
+local connectedTo = {}	
+	
 local availableMods = {} # map from peer ID to set of available mods; each set is a map from "mod id"->true
 local selectedMods = nil
 
@@ -158,46 +160,71 @@ local hasFA = true
 
 
 local slotMenuStrings = {
-    open = "<LOC lobui_0219>Open",
-    close = "<LOC lobui_0220>Close",
-    closed = "<LOC lobui_0221>Closed",
-    occupy = "<LOC lobui_0222>Occupy",
-    pm = "<LOC lobui_0223>Private Message",
-    remove = "<LOC lobui_0224>Remove",
+	open = "<LOC lobui_0219>Open",
+	close = "<LOC lobui_0220>Close",
+	closed = "<LOC lobui_0221>Closed",
+	occupy = "<LOC lobui_0222>Occupy",
+	pm = "<LOC lobui_0223>Private Message",
+	remove_to_kik = "Remove Player",
+	remove_to_observer = "Move Player to Observer",
+	move_slot_to_slot1 = "Move Player to slot 1",
+	move_slot_to_slot2 = "Move Player to slot 2",
+	move_slot_to_slot3 = "Move Player to slot 3",
+	move_slot_to_slot4 = "Move Player to slot 4",
+	move_slot_to_slot5 = "Move Player to slot 5",
+	move_slot_to_slot6 = "Move Player to slot 6",
+	move_slot_to_slot7 = "Move Player to slot 7",
+	move_slot_to_slot8 = "Move Player to slot 8",
+	move_slot_to_slot9 = "Move Player to slot 9",
+	move_slot_to_slot10 = "Move Player to slot 10",
+	move_slot_to_slot11 = "Move Player to slot 11",
+	move_slot_to_slot12 = "Move Player to slot 12",
 }
 
 local slotMenuData = {
     open = {
-        host = {            
-            #'ailist',  #moved to below
+        host = {
 			'close',
-            'occupy',
-            'ailist',  #new	    
+			'occupy',
+			'ailist',
         },
         client = {
-            'occupy',
+			'occupy',
         },
     },
     closed = {
         host = {
-            'open',
+			'open',
         },
         client = {
         },
     },
     player = {
         host = {
-            'pm',
-            'remove',
+			'pm',
+			'remove_to_observer',
+			'remove_to_kik',
+			'move_slot_to_slot1',
+			'move_slot_to_slot2',
+			'move_slot_to_slot3',
+			'move_slot_to_slot4',
+			'move_slot_to_slot5',
+			'move_slot_to_slot6',
+			'move_slot_to_slot7',
+			'move_slot_to_slot8',
+			'move_slot_to_slot9',
+			'move_slot_to_slot10',
+			'move_slot_to_slot11',
+			'move_slot_to_slot12',
         },
         client = {
-            'pm',
+			'pm',
         },
     },
     ai = {
-        host = {            
-            'ailist',
-			'remove',
+        host = {
+			'remove_to_kik',
+			'ailist',
         },
         client = {
         },
@@ -260,7 +287,7 @@ local function DoSlotBehavior(slot, key, name)
     if key == 'open' then
         if lobbyComm:IsHost() then
             HostOpenSlot(hostID, slot)
-        end 
+        end
     elseif key == 'close' then
         if lobbyComm:IsHost() then
             HostCloseSlot(hostID, slot)
@@ -286,8 +313,311 @@ local function DoSlotBehavior(slot, key, name)
     elseif key == 'pm' then
         if gameInfo.PlayerOptions[slot].Human then
             GUI.chatEdit:SetText(string.format("/whisper %s:", gameInfo.PlayerOptions[slot].PlayerName))
-        end		
-    elseif key == 'remove' then
+        end
+--// Move player slot to slot -- Xinnony
+	elseif key == 'move_slot_to_slot1' then
+		if gameInfo.PlayerOptions[slot].Human then
+			if gameInfo.PlayerOptions[1].Human then -- If destination slot player exist
+				LAST_name = gameInfo.PlayerOptions[1].PlayerName
+				LAST_id = gameInfo.PlayerOptions[1].OwnerID
+				tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
+				LAST_rating_color = tostring(tmpLAST_rating_color[1])
+				tmpLAST_mean = GetCommandLineArg("/mean", 1)
+				LAST_mean = tonumber(tmpLAST_mean[1])
+				tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
+				LAST_deviation = tonumber(tmpLAST_deviation[1])
+				LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
+                LAST_faction = gameInfo.PlayerOptions[1].Faction
+				LAST_numgame = gameInfo.PlayerOptions[1].NG
+				--***
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[1].OwnerID, gameInfo.PlayerOptions[1].PlayerName, 1) -- move slot 1 to observer
+				ClearSlotInfo(1)
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 1) -- move select slot to slot 1
+				ClearSlotInfo(slot)
+                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+			else -- destination slot is empty
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 1)
+			end
+		end
+	elseif key == 'move_slot_to_slot2' then
+		if gameInfo.PlayerOptions[slot].Human then
+			if gameInfo.PlayerOptions[2].Human then -- If destination slot player exist
+				LAST_name = gameInfo.PlayerOptions[2].PlayerName
+				LAST_id = gameInfo.PlayerOptions[2].OwnerID
+				tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
+				LAST_rating_color = tostring(tmpLAST_rating_color[1])
+				tmpLAST_mean = GetCommandLineArg("/mean", 1)
+				LAST_mean = tonumber(tmpLAST_mean[1])
+				tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
+				LAST_deviation = tonumber(tmpLAST_deviation[1])
+				LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
+                LAST_faction = gameInfo.PlayerOptions[2].Faction
+				LAST_numgame = gameInfo.PlayerOptions[2].NG
+				--***
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[2].OwnerID, gameInfo.PlayerOptions[2].PlayerName, 2) -- move slot 1 to observer
+				ClearSlotInfo(2)
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 2) -- move select slot to slot 1
+				ClearSlotInfo(slot)
+                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+			else -- destination slot is empty
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 2)
+			end
+		end
+	elseif key == 'move_slot_to_slot3' then
+		if gameInfo.PlayerOptions[slot].Human then
+			if gameInfo.PlayerOptions[3].Human then -- If destination slot player exist
+				LAST_name = gameInfo.PlayerOptions[3].PlayerName
+				LAST_id = gameInfo.PlayerOptions[3].OwnerID
+				tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
+				LAST_rating_color = tostring(tmpLAST_rating_color[1])
+				tmpLAST_mean = GetCommandLineArg("/mean", 1)
+				LAST_mean = tonumber(tmpLAST_mean[1])
+				tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
+				LAST_deviation = tonumber(tmpLAST_deviation[1])
+				LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
+                LAST_faction = gameInfo.PlayerOptions[3].Faction
+				LAST_numgame = gameInfo.PlayerOptions[3].NG
+				--***
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[3].OwnerID, gameInfo.PlayerOptions[3].PlayerName, 3) -- move slot 1 to observer
+				ClearSlotInfo(3)
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 3) -- move select slot to slot 1
+				ClearSlotInfo(slot)
+                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+			else -- destination slot is empty
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 3)
+			end
+		end
+	elseif key == 'move_slot_to_slot4' then
+		if gameInfo.PlayerOptions[slot].Human then
+			if gameInfo.PlayerOptions[4].Human then -- If destination slot player exist
+				LAST_name = gameInfo.PlayerOptions[4].PlayerName
+				LAST_id = gameInfo.PlayerOptions[4].OwnerID
+				tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
+				LAST_rating_color = tostring(tmpLAST_rating_color[1])
+				tmpLAST_mean = GetCommandLineArg("/mean", 1)
+				LAST_mean = tonumber(tmpLAST_mean[1])
+				tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
+				LAST_deviation = tonumber(tmpLAST_deviation[1])
+				LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
+                LAST_faction = gameInfo.PlayerOptions[4].Faction
+				LAST_numgame = gameInfo.PlayerOptions[4].NG
+				--***
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[4].OwnerID, gameInfo.PlayerOptions[4].PlayerName, 4) -- move slot 1 to observer
+				ClearSlotInfo(4)
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 4) -- move select slot to slot 1
+				ClearSlotInfo(slot)
+                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+			else -- destination slot is empty
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 4)
+			end
+		end
+	elseif key == 'move_slot_to_slot5' then
+		if gameInfo.PlayerOptions[slot].Human then
+			if gameInfo.PlayerOptions[5].Human then -- If destination slot player exist
+				LAST_name = gameInfo.PlayerOptions[5].PlayerName
+				LAST_id = gameInfo.PlayerOptions[5].OwnerID
+				tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
+				LAST_rating_color = tostring(tmpLAST_rating_color[1])
+				tmpLAST_mean = GetCommandLineArg("/mean", 1)
+				LAST_mean = tonumber(tmpLAST_mean[1])
+				tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
+				LAST_deviation = tonumber(tmpLAST_deviation[1])
+				LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
+                LAST_faction = gameInfo.PlayerOptions[5].Faction
+				LAST_numgame = gameInfo.PlayerOptions[5].NG
+				--***
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[5].OwnerID, gameInfo.PlayerOptions[5].PlayerName, 5) -- move slot 1 to observer
+				ClearSlotInfo(5)
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 5) -- move select slot to slot 1
+				ClearSlotInfo(slot)
+                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+			else -- destination slot is empty
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 5)
+			end
+		end
+	elseif key == 'move_slot_to_slot6' then
+		if gameInfo.PlayerOptions[slot].Human then
+			if gameInfo.PlayerOptions[6].Human then -- If destination slot player exist
+				LAST_name = gameInfo.PlayerOptions[6].PlayerName
+				LAST_id = gameInfo.PlayerOptions[6].OwnerID
+				tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
+				LAST_rating_color = tostring(tmpLAST_rating_color[1])
+				tmpLAST_mean = GetCommandLineArg("/mean", 1)
+				LAST_mean = tonumber(tmpLAST_mean[1])
+				tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
+				LAST_deviation = tonumber(tmpLAST_deviation[1])
+				LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
+                LAST_faction = gameInfo.PlayerOptions[6].Faction
+				LAST_numgame = gameInfo.PlayerOptions[6].NG
+				--***
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[6].OwnerID, gameInfo.PlayerOptions[6].PlayerName, 6) -- move slot 1 to observer
+				ClearSlotInfo(6)
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 6) -- move select slot to slot 1
+				ClearSlotInfo(slot)
+                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+			else -- destination slot is empty
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 6)
+			end
+		end
+	elseif key == 'move_slot_to_slot7' then
+		if gameInfo.PlayerOptions[slot].Human then
+			if gameInfo.PlayerOptions[7].Human then -- If destination slot player exist
+				LAST_name = gameInfo.PlayerOptions[7].PlayerName
+				LAST_id = gameInfo.PlayerOptions[7].OwnerID
+				tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
+				LAST_rating_color = tostring(tmpLAST_rating_color[1])
+				tmpLAST_mean = GetCommandLineArg("/mean", 1)
+				LAST_mean = tonumber(tmpLAST_mean[1])
+				tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
+				LAST_deviation = tonumber(tmpLAST_deviation[1])
+				LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
+                LAST_faction = gameInfo.PlayerOptions[7].Faction
+				LAST_numgame = gameInfo.PlayerOptions[7].NG
+				--***
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[7].OwnerID, gameInfo.PlayerOptions[7].PlayerName, 7) -- move slot 1 to observer
+				ClearSlotInfo(7)
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 7) -- move select slot to slot 1
+				ClearSlotInfo(slot)
+                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+			else -- destination slot is empty
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 7)
+			end
+		end
+	elseif key == 'move_slot_to_slot8' then
+		if gameInfo.PlayerOptions[slot].Human then
+			if gameInfo.PlayerOptions[8].Human then -- If destination slot player exist
+				LAST_name = gameInfo.PlayerOptions[8].PlayerName
+				LAST_id = gameInfo.PlayerOptions[8].OwnerID
+				tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
+				LAST_rating_color = tostring(tmpLAST_rating_color[1])
+				tmpLAST_mean = GetCommandLineArg("/mean", 1)
+				LAST_mean = tonumber(tmpLAST_mean[1])
+				tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
+				LAST_deviation = tonumber(tmpLAST_deviation[1])
+				LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
+                LAST_faction = gameInfo.PlayerOptions[8].Faction
+				LAST_numgame = gameInfo.PlayerOptions[8].NG
+				--***
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[8].OwnerID, gameInfo.PlayerOptions[8].PlayerName, 8) -- move slot 1 to observer
+				ClearSlotInfo(8)
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 8) -- move select slot to slot 1
+				ClearSlotInfo(slot)
+                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+			else -- destination slot is empty
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 8)
+			end
+		end
+	elseif key == 'move_slot_to_slot9' then
+		if gameInfo.PlayerOptions[slot].Human then
+			if gameInfo.PlayerOptions[9].Human then -- If destination slot player exist
+				LAST_name = gameInfo.PlayerOptions[9].PlayerName
+				LAST_id = gameInfo.PlayerOptions[9].OwnerID
+				tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
+				LAST_rating_color = tostring(tmpLAST_rating_color[1])
+				tmpLAST_mean = GetCommandLineArg("/mean", 1)
+				LAST_mean = tonumber(tmpLAST_mean[1])
+				tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
+				LAST_deviation = tonumber(tmpLAST_deviation[1])
+				LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
+                LAST_faction = gameInfo.PlayerOptions[9].Faction
+				LAST_numgame = gameInfo.PlayerOptions[9].NG
+				--***
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[9].OwnerID, gameInfo.PlayerOptions[9].PlayerName, 9) -- move slot 1 to observer
+				ClearSlotInfo(9)
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 9) -- move select slot to slot 1
+				ClearSlotInfo(slot)
+                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+			else -- destination slot is empty
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 9)
+			end
+		end
+	elseif key == 'move_slot_to_slot10' then
+		if gameInfo.PlayerOptions[slot].Human then
+			if gameInfo.PlayerOptions[10].Human then -- If destination slot player exist
+				LAST_name = gameInfo.PlayerOptions[10].PlayerName
+				LAST_id = gameInfo.PlayerOptions[10].OwnerID
+				tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
+				LAST_rating_color = tostring(tmpLAST_rating_color[1])
+				tmpLAST_mean = GetCommandLineArg("/mean", 1)
+				LAST_mean = tonumber(tmpLAST_mean[1])
+				tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
+				LAST_deviation = tonumber(tmpLAST_deviation[1])
+				LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
+                LAST_faction = gameInfo.PlayerOptions[10].Faction
+				LAST_numgame = gameInfo.PlayerOptions[10].NG
+				--***
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[10].OwnerID, gameInfo.PlayerOptions[10].PlayerName, 10) -- move slot 1 to observer
+				ClearSlotInfo(10)
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 10) -- move select slot to slot 1
+				ClearSlotInfo(slot)
+                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+			else -- destination slot is empty
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 10)
+			end
+		end
+	elseif key == 'move_slot_to_slot11' then
+		if gameInfo.PlayerOptions[slot].Human then
+			if gameInfo.PlayerOptions[11].Human then -- If destination slot player exist
+				LAST_name = gameInfo.PlayerOptions[11].PlayerName
+				LAST_id = gameInfo.PlayerOptions[11].OwnerID
+				tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
+				LAST_rating_color = tostring(tmpLAST_rating_color[1])
+				tmpLAST_mean = GetCommandLineArg("/mean", 1)
+				LAST_mean = tonumber(tmpLAST_mean[1])
+				tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
+				LAST_deviation = tonumber(tmpLAST_deviation[1])
+				LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
+                LAST_faction = gameInfo.PlayerOptions[11].Faction
+				LAST_numgame = gameInfo.PlayerOptions[11].NG
+				--***
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[11].OwnerID, gameInfo.PlayerOptions[11].PlayerName, 11) -- move slot 1 to observer
+				ClearSlotInfo(11)
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 11) -- move select slot to slot 1
+				ClearSlotInfo(slot)
+                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+			else -- destination slot is empty
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 11)
+			end
+		end
+	elseif key == 'move_slot_to_slot12' then
+		if gameInfo.PlayerOptions[slot].Human then
+			if gameInfo.PlayerOptions[12].Human then -- If destination slot player exist
+				LAST_name = gameInfo.PlayerOptions[12].PlayerName
+				LAST_id = gameInfo.PlayerOptions[12].OwnerID
+				tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
+				LAST_rating_color = tostring(tmpLAST_rating_color[1])
+				tmpLAST_mean = GetCommandLineArg("/mean", 1)
+				LAST_mean = tonumber(tmpLAST_mean[1])
+				tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
+				LAST_deviation = tonumber(tmpLAST_deviation[1])
+				LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
+                LAST_faction = gameInfo.PlayerOptions[12].Faction
+				LAST_numgame = gameInfo.PlayerOptions[12].NG
+				--***
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[12].OwnerID, gameInfo.PlayerOptions[12].PlayerName, 12) -- move slot 1 to observer
+				ClearSlotInfo(12)
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 12) -- move select slot to slot 1
+				ClearSlotInfo(slot)
+                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+			else -- destination slot is empty
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 12)
+			end
+		end
+--\\ Stop Move player slot to slot
+--// Move Player slot to Observer -- Xinnony
+    elseif key == 'remove_to_observer' then
+		if gameInfo.PlayerOptions[slot].Human then
+            --UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
+				--"Move", function()
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[slot].OwnerID, gameInfo.PlayerOptions[slot].PlayerName, slot)
+				--end,
+                --"<LOC _Cancel>", nil, 
+                --nil, nil, 
+                --true,
+                --{worldCover = false, enterButton = 1, escapeButton = 2})
+        end
+--\\ Stop Move Player slot to Observer
+	elseif key == 'remove_to_kik' then
         if gameInfo.PlayerOptions[slot].Human then
             UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
                 "<LOC lobui_0167>Kick Player", function() lobbyComm:EjectPeer(gameInfo.PlayerOptions[slot].OwnerID, "KickedByHost") end,
@@ -413,6 +743,7 @@ function ConnectToPeer(addressAndPort,name,uid)
 end
 
 function DisconnectFromPeer(uid)
+	if wasConnected(uid) then table.remove(connectedTo, uid) end
     lobbyComm:DisconnectFromPeer(uid)
 end
 
@@ -1408,7 +1739,7 @@ local function UpdateGame()
 		if not GUI.mapView:SetTexture(scenarioInfo.preview) then
 			GUI.mapView:SetTextureFromMap(scenarioInfo.map)
 		end
-		GUI.mapName:SetText(LOC(scenarioInfo.name))
+		--GUI.mapName:SetText(LOC(scenarioInfo.name)) -- Add mapname above option lobby (replace with Ranked Label)
 		ShowMapPositions(GUI.mapView,scenarioInfo,numPlayers)			
 	else
 		GUI.mapView:ClearTexture()
@@ -1510,16 +1841,32 @@ local function UpdateGame()
 			if quality and quality > 0 then
 				gameInfo.GameOptions['Quality'] = quality
 				--local randmapText = UIUtil.CreateText(GUI.panel, "current game quality : " .. quality .. " %", 17, UIUtil.titleFont)
-				randmapText:SetText(scenarioInfo.name.. " (Game quality : "..quality.."%)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
+				if scenarioInfo.map_version then
+					randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."] (Game quality : "..quality.."%)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
+				else
+					randmapText:SetText(scenarioInfo.name.." (Game quality : "..quality.."%)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
+				end
 				--LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
 			else
-				randmapText:SetText(scenarioInfo.name.. " (Game quality : N/A)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
+				if scenarioInfo.map_version then
+					randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."] (Game quality : N/A)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
+				else
+					randmapText:SetText(scenarioInfo.name.." (Game quality : N/A)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
+				end
 			end
+		else
+			if scenarioInfo.map_version then
+				randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."]") -- Set the map name and quality at the top right corner in lobby -- Xinnony
+			else
+				randmapText:SetText(scenarioInfo.name) -- Set the map name and quality at the top right corner in lobby -- Xinnony
+			end
+		end
+	else
+		if scenarioInfo.map_version then
+			randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."]") -- Set the map name and quality at the top right corner in lobby -- Xinnony
 		else
 			randmapText:SetText(scenarioInfo.name) -- Set the map name and quality at the top right corner in lobby -- Xinnony
 		end
-	else
-		randmapText:SetText(scenarioInfo.name) -- Set the map name and quality at the top right corner in lobby -- Xinnony
 	end
 end
 
@@ -2115,7 +2462,7 @@ function CreateUI(maxPlayers)
     Credits_Text:SetColor("FFFFFF")
 	LayoutHelpers.AtBottomIn(Credits_Text, GUI.panel, 0)
 	LayoutHelpers.AtRightIn(Credits_Text, GUI.panel, 100)
-	--\\ Stop
+	--\\ Stop Credits
 
     GUI.playerPanel = Group(GUI.panel, "playerPanel")
     LayoutHelpers.AtLeftTopIn(GUI.playerPanel, GUI.panel, 40, 66)
@@ -2610,10 +2957,12 @@ function CreateUI(maxPlayers)
         GUI.pingLabel = UIUtil.CreateText(GUI.labelGroup, "<LOC lobui_0217>Ping", 14, UIUtil.titleFont)
         LayoutHelpers.AtLeftIn(GUI.pingLabel, GUI.panel, slotColumnSizes.ping.x)
         LayoutHelpers.AtVerticalCenterIn(GUI.pingLabel, GUI.labelGroup, 5)
+		--Tooltip.AddControlTooltip(GUI.pingLabel, '') -- NEED INFO (write tooltip in "\lua\ui\help\tooltips.lua")
 
         GUI.readyLabel = UIUtil.CreateText(GUI.labelGroup, "<LOC lobui_0218>Ready", 14, UIUtil.titleFont)
         LayoutHelpers.AtLeftIn(GUI.readyLabel, GUI.panel, slotColumnSizes.ready.x)
         LayoutHelpers.AtVerticalCenterIn(GUI.readyLabel, GUI.labelGroup, 5)
+		--Tooltip.AddControlTooltip(GUI.readyLabel, '') -- NEED INFO (write tooltip in "\lua\ui\help\tooltips.lua")
     end
 
     for i= 1, LobbyComm.maxPlayerSlots do
@@ -3131,22 +3480,31 @@ function RefreshOptionDisplayData(scenarioInfo)
 --~ 			AddChatText(tostring(cRstr))
 		if getVictory == 'demoralization' and getCheat == 'false' and getSpeed == 'normal'
 		and getFog == 'explored' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and getRstric == nil then
-			table.insert(formattedOptions, {text = 'Ranking',
-				value = 'Ranked',
-				green = true,
-				tooltip = {text='Ranked',body='This game is Ranked !'}})
+			--table.insert(formattedOptions, {text = 'Ranking',
+				--value = 'Ranked',
+				--green = true,
+				--tooltip = {text='Ranked',body='This game is Ranked !'}})
+			GUI.mapName:SetText("Game is Ranked")
+			GUI.mapName:SetColor("77ff77")
+			--Tooltip.AddControlTooltip(GUI.mapName, '')
 		else
 			if getVictory == 'demoralization' and getCheat == 'false' and getSpeed == 'normal'
 			and getFog == 'explored' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and table.getn(getRstric) == 0 then
-				table.insert(formattedOptions, {text = 'Ranking',
-					value = 'Ranked',
-					green = true,
-					tooltip = {text='Ranked',body='This game is Ranked !'}})
+				--table.insert(formattedOptions, {text = 'Ranking',
+					--value = 'Ranked',
+					--green = true,
+					--tooltip = {text='Ranked',body='This game is Ranked !'}})
+				GUI.mapName:SetText("Game is Ranked")
+				GUI.mapName:SetColor("77ff77")
+				--Tooltip.AddControlTooltip(GUI.mapName, '')
 			else
-				table.insert(formattedOptions, {text = 'Ranking',
-					value = 'Unranked',
-					red = true,
-					tooltip = {text='Unranked',body='This game is NOT Ranked !'}})
+				--table.insert(formattedOptions, {text = 'Ranking',
+					--value = 'Unranked',
+					--red = true,
+					--tooltip = {text='Unranked',body='This game is NOT Ranked !'}})
+				GUI.mapName:SetText("Game is not Ranked")
+				GUI.mapName:SetColor("ff7777")
+				--Tooltip.AddControlTooltip(GUI.mapName, '')
 			end
 		end
 	else
@@ -3165,12 +3523,15 @@ function RefreshOptionDisplayData(scenarioInfo)
 --~ 		elseif getInit == "init_xtremewars.lua" then
 --~ 			AddChatText('Welcome to XtremeWars MOD')
 --~ 		end
-		table.insert(formattedOptions, {text = 'Ranking',
-			value = 'Unranked',
-			red = true,
-			tooltip = {text='Unranked',body='This game is NOT Ranked !'}})
+		--table.insert(formattedOptions, {text = 'Ranking',
+			--value = 'Unranked',
+			--red = true,
+			--tooltip = {text='Unranked',body='This game is NOT Ranked !'}})
+		GUI.mapName:SetText("Game is not Ranked")
+		GUI.mapName:SetColor("ff7777")
+		--Tooltip.AddControlTooltip(GUI.mapName, '')
 	end
---\\ Stop
+--\\ Stop Check Ranked active
 --// Check Mod active
     local modNum = table.getn(Mods.GetGameMods(gameInfo.GameMods))
     if modNum > 0 then
@@ -3184,7 +3545,7 @@ function RefreshOptionDisplayData(scenarioInfo)
             tooltip = 'Lobby_Mod_Option',
             valueTooltip = 'Lobby_Mod_Option'})
     end
---\\ Stop
+--\\ Stop Check Mod active
 --// Check RestrictedUnit active
     if gameInfo.GameOptions.RestrictedCategories != nil then
         if table.getn(gameInfo.GameOptions.RestrictedCategories) != 0 then
@@ -3195,7 +3556,7 @@ function RefreshOptionDisplayData(scenarioInfo)
             valueTooltip = 'Lobby_BuildRestrict_Option'})
         end
     end
---\\ Stop
+--\\ Stop Check RestrictedUnit active
 --// Check MapSize & MaxPlayer active
     if scenarioInfo then
         table.insert(formattedOptions, {text = '<LOC MAPSEL_0024>', 
@@ -3207,7 +3568,7 @@ function RefreshOptionDisplayData(scenarioInfo)
             tooltip = 'map_select_maxplayers',
             valueTooltip = 'map_select_maxplayers'})
     end
---\\ Stop
+--\\ Stop Check MapSize & MaxPlayer active
 --// Check other options active
     for i, v in gameInfo.GameOptions do
         local option = false
@@ -3290,10 +3651,24 @@ function RefreshOptionDisplayData(scenarioInfo)
     end
 end
 
+function wasConnected(peer)
+	for _,v in pairs(connectedTo) do
+		if v == peer then
+			return true
+		end
+	end
+	return false
+end
+
 function CalcConnectionStatus(peer)
     if peer.status != 'Established' then
         return 'red'
     else
+		if not wasConnected(peer.id) then
+			table.insert(connectedTo, peer.id)
+			GpgNetSend('Connected', string.format("%d", peer.id))
+		end
+
         if not table.find(peer.establishedPeers, lobbyComm:GetLocalPlayerID()) then
             -- they haven't reported that they can talk to us?
             return 'yellow'
