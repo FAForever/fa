@@ -54,6 +54,8 @@ local quickRandMap = false
 
 local lastUploadedMap = nil
 
+local CPU_BenchmarkList = {} -- Stores CPU benchmark data
+
 local playerMean = GetCommandLineArg("/mean", 1)
 local playerDeviation = GetCommandLineArg("/deviation", 1)
 
@@ -868,6 +870,10 @@ function SetSlotInfo(slot, playerInfo)
 		Prefs.SetToCurrentProfile('LastColor', playerInfo.PlayerColor)
         Prefs.SetToCurrentProfile('LastFaction', playerInfo.Faction)
     end
+	
+	--CPU Benchmark code
+	SetSlotCPUBar(slot, playerInfo) --Update the slot CPU bar
+	--End CPU Benchmark code
 end
 
 function ClearSlotInfo(slot)
@@ -1728,14 +1734,14 @@ local function UpdateGame()
 				GUI.rankedOptions:Disable()
                 GUI.becomeObserver:Disable()
 				GUI.randMap:Disable()
-				GUI.randTeam:Disable()
+				--GUI.randTeam:Disable()
                 GUI.launchGameButton:Enable()				
             else
 				GUI.allowObservers:Enable()
                 GUI.changeMapButton:Enable()
 				GUI.rankedOptions:Enable()
                 GUI.becomeObserver:Enable()
-				GUI.randTeam:Enable()              
+				--GUI.randTeam:Enable()              
                 if launchThread then CancelLaunch() end
                 
                 GUI.launchGameButton:Disable()
@@ -1965,7 +1971,15 @@ end
 
 -- slot less than 1 means try to find a slot
 function HostTryAddPlayer( senderID, slot, requestedPlayerName, human, aiPersonality, requestedColor, requestedFaction, requestedTeam, requestedPL, requestedRC, requestedNG, requestedMEAN, requestedDEV )	
-
+	-- CPU benchmark code
+	if human and not singlePlayer then
+		for i,benchmark in CPU_BenchmarkList do
+			-- If we're getting a new player, send them all our benchmark data for players who have joined already
+			lobbyComm:SendData(senderID, { Type = 'CPUBenchmark', PlayerName=benchmark.PlayerName, Result = benchmark.Result} )
+		end
+	end
+	-- End CPU benchmark code
+	
     local newSlot = slot
 
     if not slot or slot < 1 then
@@ -3192,33 +3206,40 @@ function CreateUI(maxPlayers)
 		
 		if lobbyComm:IsHost() then
 			--start of auto teams code by Moritz	
-			GUI.randTeam = UIUtil.CreateButtonStd(GUI.observerPanel, '/lobby/lan-game-lobby/toggle', "<LOC lobui_0506>Auto Teams", 10, 0)
-			LayoutHelpers.CenteredRightOf(GUI.randTeam, GUI.becomeObserver, 5)
 			
-			Tooltip.AddButtonTooltip(GUI.randTeam, 'lob_click_randteam')
+			-- Removed random teams button (needed this spot for the CPU test button)
+			-- This option can still be set in game options (Duck_42)
 			
-			GUI.randTeam.OnClick = function(self, modifiers)								
-				if gameInfo.GameOptions['AutoTeams'] == 'none' then
-					Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 2)
-					SetGameOption('AutoTeams', 'tvsb')
-				elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
-					Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 3)
-					SetGameOption('AutoTeams', 'lvsr')
-				elseif gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
-					Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 4)
-					SetGameOption('AutoTeams', 'pvsi')
-				elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' then
-					Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 5)
-					SetGameOption('AutoTeams', 'manual')
-				else
-					Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 1)
-					SetGameOption('AutoTeams', 'none')
-				end				
-			end
+			--START REMOVED CODE
+			-- GUI.randTeam = UIUtil.CreateButtonStd(GUI.observerPanel, '/lobby/lan-game-lobby/toggle', "<LOC lobui_0506>Auto Teams", 10, 0)
+			-- LayoutHelpers.CenteredRightOf(GUI.randTeam, GUI.becomeObserver, 5)
+			
+			-- Tooltip.AddButtonTooltip(GUI.randTeam, 'lob_click_randteam')
+			
+			-- GUI.randTeam.OnClick = function(self, modifiers)								
+				-- if gameInfo.GameOptions['AutoTeams'] == 'none' then
+					-- Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 2)
+					-- SetGameOption('AutoTeams', 'tvsb')
+				-- elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
+					-- Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 3)
+					-- SetGameOption('AutoTeams', 'lvsr')
+				-- elseif gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
+					-- Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 4)
+					-- SetGameOption('AutoTeams', 'pvsi')
+				-- elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' then
+					-- Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 5)
+					-- SetGameOption('AutoTeams', 'manual')
+				-- else
+					-- Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 1)
+					-- SetGameOption('AutoTeams', 'none')
+				-- end				
+			-- end
+			--END REMOVED CODE
+			
 			--end of auto teams code
 			--start of random map code by Moritz
 			GUI.randMap = UIUtil.CreateButtonStd(GUI.observerPanel, '/lobby/lan-game-lobby/toggle', "<LOC lobui_0503>Random Map", 10, 0)
-			LayoutHelpers.CenteredRightOf(GUI.randMap, GUI.randTeam, 5)
+			LayoutHelpers.CenteredRightOf(GUI.randMap, GUI.becomeObserver, 130)
 			
 			Tooltip.AddButtonTooltip(GUI.randMap, 'lob_click_randmap')
 			
@@ -3416,13 +3437,35 @@ function CreateUI(maxPlayers)
                     if observer and (observer.OwnerID != localPlayerID) and observer.ObserverListIndex then
                         local peer = lobbyComm:GetPeer(observer.OwnerID)
                         local ping = math.floor(peer.ping)
-                        GUI.observerList:ModifyItem(observer.ObserverListIndex, observer.PlayerName  .. LOC("<LOC lobui_0240> (Ping = ") .. tostring(ping) .. ")")
+						-- CPU benchmark modified code
+						local score_CPU =  FindBenchmarkForName(observer.PlayerName)
+						local cputext = ""
+						if score_CPU then
+							cputext = ", CPU = "..tostring(score_CPU.Result)
+						end
+                        GUI.observerList:ModifyItem(observer.ObserverListIndex, observer.PlayerName  .. LOC("<LOC lobui_0240> (Ping = ") .. tostring(ping) .. cputext .. ")")
+					elseif observer.OwnerID == localPlayerID then
+						
+						local score_CPU =  FindBenchmarkForName(observer.PlayerName)
+						local cputext = ""
+						if score_CPU then
+							cputext = " (CPU = "..tostring(score_CPU.Result)..")"
+						end
+                        GUI.observerList:ModifyItem(observer.ObserverListIndex, observer.PlayerName  .. cputext)
+						-- End CPU benchmark modified code
                     end
                 end
                 WaitSeconds(1)
             end
         end
     )
+	
+	-- CPU Benchmark code
+	if not singlePlayer then
+		CreateCPUMetricUI()
+		ForkThread(function() StressCPU(10) end)
+	end
+	-- End CPU Benchmark code
 
     GUI.uiCreated = true
 end
@@ -4053,6 +4096,16 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             AddChatText("["..data.SenderName.."] "..data.Text)
         elseif data.Type == 'PrivateChat' then
             AddChatText("<<"..data.SenderName..">> "..data.Text)
+		-- CPU benchmark code
+		elseif data.Type == 'CPUBenchmark' then
+			LOG("CPU Data: "..(data.PlayerName or "?")..", ".. (data.Result or "?"))
+			AddPlayerBenchmark(data)
+			local playerId = FindIDForName(data.PlayerName)
+			local playerSlot = FindSlotForID(playerId)
+			if playerSlot != nil then
+				 SetSlotCPUBar(playerSlot, gameInfo.PlayerOptions[playerSlot])
+			end			
+		-- End CPU benchmark code
         end
 
         if lobbyComm:IsHost() then
@@ -4671,3 +4724,205 @@ function NewShowMapPositions(mapCtrl, scenario, numPlayers)
 		end
 	end
 end -- NewShowMapPositions(...)
+
+
+--******************************************************************************************************
+-- CPU Benchmark Code
+-- Author: Duck_42
+-- Date: 2013.04.05
+--******************************************************************************************************
+local benchmarkLength = 5 --5.0 Seconds
+
+--CPU Status Bar Configuration
+local barMax = 450
+local barMin = 150
+local greenBarMax = 300
+local yellowBarMax = 375
+local scoreSkew = 0 --Skews all CPU scores up or down by the amount specified
+
+--Variables for CPU Test
+local running
+local loopCount
+
+--------------------------------------------------
+--  CPU Benchmark Storage and Retrieval Functions
+--------------------------------------------------
+function AddPlayerBenchmark(data)
+	--This function stores CPU benchmark results from the host 
+	--and/or other players in the appropriate table.
+	--	data: The benchamark data to store {PlayerName, Result}
+	local alreadyExists = false
+	for i,benchmark in CPU_BenchmarkList do
+		if data.PlayerName == benchmark.PlayerName then
+			alreadyExists = true
+			CPU_BenchmarkList[i].Result = data.Result
+		end
+	end
+	if not alreadyExists then
+		table.insert(CPU_BenchmarkList, {PlayerName = data.PlayerName, Result = data.Result})
+	end
+end
+
+function FindBenchmarkForName(name)
+	--Given a playername, this function looks up the corresponding benchmark in the table and returns it
+	--A value of false is returned if the name is not in the benchmark table
+	for i,benchmark in CPU_BenchmarkList do
+		if name == benchmark.PlayerName then
+			return benchmark
+		end
+	end
+	return false
+end
+
+--------------------------------------------------
+--  CPU Benchmarking Functions
+--------------------------------------------------
+function CPUBenchmark()
+	--This function gives the CPU some busy work to do.
+	--CPU score is determined by how many times it can loop through
+	--the set of busy work before the timer in the CPUTimer function expires.
+	while running do
+ 		for i = 1.0, 2.0, .000008 do 
+	 		j = i + i
+	 		k = i * i
+	 		l = k / j
+	 		m = j - i
+	 	end
+	 	loopCount = loopCount + 1
+	 	WaitSeconds(0) --This is necessary in order to make this 'thread' yield so other things can be done (namely the CPUTimer function).
+	 end
+end
+
+function CPUTimer()
+	--This function handles the benchmark timer.  When this function completes, the benchmark is stopped. 
+	WaitSeconds(benchmarkLength)
+	running = false
+end
+
+--------------------------------------------------
+--  CPU GUI Functions
+--------------------------------------------------
+function CreateCPUMetricUI()
+	--This function handles creation of the CPU benchmark UI elements (statusbars, buttons, tooltips, etc)
+	local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
+	if not singlePlayer then
+		for i= 1, LobbyComm.maxPlayerSlots do
+	            GUI.slots[i].CPUSpeedBar = StatusBar(GUI.slots[i].pingGroup, barMin, barMax, false, false,
+	                UIUtil.SkinnableFile('/game/unit_bmp/bar-back_bmp.dds'),
+	                UIUtil.SkinnableFile('/game/unit_bmp/bar-02_bmp.dds'),
+	                true)           
+	            --GUI.slots[i].CPUSpeedBar.Top:Set(GUI.slots[i].pingGroup.Bottom() - 2)
+	            
+	            LayoutHelpers.AtBottomIn(GUI.slots[i].CPUSpeedBar, GUI.slots[i].pingGroup)
+	            LayoutHelpers.AtLeftIn(GUI.slots[i].CPUSpeedBar, GUI.slots[i].pingGroup, 5)
+	            LayoutHelpers.AtRightIn(GUI.slots[i].CPUSpeedBar, GUI.slots[i].pingGroup, 5)
+	            GUI.slots[i].CPUSpeedBar.Height:Set(2)
+	            CPU_AddControlTooltip(GUI.slots[i].CPUSpeedBar, 0, i)
+	            
+		end
+		
+		GUI.rerunBenchmark = UIUtil.CreateButtonStd(GUI.observerPanel, '/lobby/lan-game-lobby/toggle', 'Run CPU Test', 10, 0)
+		GUI.rerunBenchmark:Disable()
+		
+	    LayoutHelpers.CenteredRightOf(GUI.rerunBenchmark, GUI.becomeObserver, 5)        
+	    Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text='Run CPU Benchmark Test', body='Recalculates your CPU rating.'})
+	    
+	    GUI.rerunBenchmark.OnClick = function(self, modifiers)
+	    	GUI.rerunBenchmark:Disable()
+	    	ForkThread(function() StressCPU(1) end)
+	    end
+	end
+end
+
+function CPU_AddControlTooltip(control, delay, slotNumber)
+	--This function creates the benchmark tooltip for a slot along with necessary mouseover function.
+	--It is called during the UI creation.
+	--	control: The control to which the tooltip is to be added.
+	--	delay: Amount of time to delay before showing tooltip.  See Tooltip.CreateMouseoverDisplay for info.
+	--  slotNumber: The slot number associated with the control.
+    if not control.oldHandleEvent then
+        control.oldHandleEvent = control.HandleEvent
+    end
+    control.HandleEvent = function(self, event)
+        if event.Type == 'MouseEnter' then
+        	local slot = slotNumber
+            Tooltip.CreateMouseoverDisplay(self, {text='CPU Rating: '..GUI.slots[slot].CPUSpeedBar._value(), body='150=Fastest, 450=Slowest'}, delay, true)
+        elseif event.Type == 'MouseExit' then
+            Tooltip.DestroyMouseoverDisplay()
+        end
+        return self.oldHandleEvent(self, event)
+    end
+end
+
+function StressCPU(waitTime)
+	--This function instructs the PC to do a CPU score benchmark.
+	--It handles the necessary UI updates during the benchmark, sends
+	--the benchmark result to other players when finished, and it updates the local
+	--user's UI with their new result.
+	--	waitTime: The delay in seconds that this function should wait before starting the benchmark.
+	
+	for i = waitTime, 1, -1 do
+		GUI.rerunBenchmark.label:SetText('Run in '..i..'s')
+		WaitSeconds(1)
+	end
+	
+	LOG('Beginning CPU benchmark')
+	GUI.rerunBenchmark.label:SetText('In Progress...')
+	loopCount = 0
+	running = true
+	ForkThread(CPUTimer)
+	CPUBenchmark()
+	
+	--Invert scale for display purposes
+	--With .01 sec wait intervals the max number of loops should be 100 * benchmarkLength
+	loopCount = (benchmarkLength * 100) - math.min(loopCount + scoreSkew, (benchmarkLength * 100))
+
+	LOG('CPU benchmark complete: '.. loopCount )
+
+	--Send update other players
+	lobbyComm:BroadcastData( { Type = 'CPUBenchmark', PlayerName = localPlayerName, Result = loopCount} )
+	
+	--Add benchmark to my local benchmark table
+	AddPlayerBenchmark({PlayerName = localPlayerName, Result = loopCount})
+	
+	--Update UI
+	GUI.rerunBenchmark:Enable()
+	GUI.rerunBenchmark.label:SetText('Run CPU Test')
+	UpdateCPUBar(localPlayerName)
+end
+
+function UpdateCPUBar(playerName)
+	--This function updates the UI with a CPU benchmark bar for the specified playerName.
+	--	playerName: The name of the player whose benchmark should be updated.	
+	local playerId = FindIDForName(playerName)
+	local playerSlot = FindSlotForID(playerId)
+	if playerSlot != nil then
+		 SetSlotCPUBar(playerSlot, gameInfo.PlayerOptions[playerSlot])
+	end	
+end
+
+function SetSlotCPUBar(slot, playerInfo)
+	--This function updates the UI with a CPU benchmark bar for the specified slot/playerInfo.	
+	--	slot: a numbered slot (1-however many slots there are for this map)
+	--	playerInfo: The corresponding playerInfo object from gameInfo.PlayerOptions[slot].
+	
+	if GUI.slots[slot].CPUSpeedBar then
+		GUI.slots[slot].CPUSpeedBar:Hide()
+		if playerInfo.Human then
+			local b = FindBenchmarkForName(playerInfo.PlayerName)
+			if b then
+		    	local clampedResult =  math.max(math.min(b.Result, barMax), barMin)
+		    	GUI.slots[slot].CPUSpeedBar:SetValue(clampedResult)
+		    	GUI.slots[slot].CPUSpeedBar:Show()
+		    	
+		    	if clampedResult <= greenBarMax then
+		    		GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-02_bmp.dds'))
+		    	elseif clampedResult <= yellowBarMax then
+		    		GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-01_bmp.dds'))
+		    	else
+		    		GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-03_bmp.dds'))
+		    	end
+	    	end
+		end
+	end
+end
