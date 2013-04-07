@@ -161,34 +161,9 @@ UAL0301 = Class(AWalkingLandUnit) {
             end
         #SystemIntegrityCompensator
         elseif enh == 'SystemIntegrityCompensator' then
-            # added by brute51 - fix for bug SCU regen upgrade doesnt stack with veteran bonus [140]
-            AWalkingLandUnit.CreateEnhancement(self, enh)
-            local bpRegenRate = bp.NewRegenRate or 0
-            if not Buffs['AeonSCURegenerateBonus'] then
-               BuffBlueprint {
-                    Name = 'AeonSCURegenerateBonus',
-                    DisplayName = 'AeonSCURegenerateBonus',
-                    BuffType = 'SCUREGENERATEBONUS',
-                    Stacks = 'ALWAYS',
-                    Duration = -1,
-                    Affects = {
-                        Regen = {
-                            Add = bpRegenRate,
-                            Mult = 1.0,
-                        },
-                    },
-                } 
-            end
-            if Buff.HasBuff( self, 'AeonSCURegenerateBonus' ) then
-                Buff.RemoveBuff( self, 'AeonSCURegenerateBonus' )
-            end  
-            Buff.ApplyBuff(self, 'AeonSCURegenerateBonus')
+            self:SetRegenRate(bp.NewRegenRate or 0)
         elseif enh == 'SystemIntegrityCompensatorRemove' then
-            # added by brute51 - fix for bug SCU regen upgrade doesnt stack with veteran bonus [140]
-            AWalkingLandUnit.CreateEnhancement(self, enh)
-            if Buff.HasBuff( self, 'AeonSCURegenerateBonus' ) then
-                Buff.RemoveBuff( self, 'AeonSCURegenerateBonus' )
-            end
+            self:RevertRegenRate()
         #Sacrifice
         elseif enh == 'Sacrifice' then
             self:AddCommandCap('RULEUCC_Sacrifice')
@@ -225,7 +200,38 @@ UAL0301 = Class(AWalkingLandUnit) {
             AWalkingLandUnit.StartBuildingEffects(self, self:GetUnitBeingBuilt(), self.UnitBuildOrder)
         end
         AWalkingLandUnit.OnUnpaused(self)
-    end,         
+    end,
+    #Teleport animation
+    PlayTeleportInEffects = function(self)
+
+    self:BlockCommands(11)
+    self:PlayUnitSound('CommanderArrival')
+    self:CreateProjectile( '/effects/entities/UnitTeleport01/UnitTeleport01_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
+
+    WaitSeconds(2.1)    
+
+    local totalBones = self:GetBoneCount() - 1
+    local army = self:GetArmy()
+    for k, v in EffectTemplate.UnitTeleportSteam01 do
+        for bone = 1, totalBones do
+            CreateAttachedEmitter(self,bone,army, v)
+        end
+    end
+    end,
+
+    BlockCommands = function(self, duration)
+    local fn = function(self, duration)
+        self:SetUnSelectable(true)
+        self:SetBusy(true)
+        self:SetBlockCommandQueue(true)
+        self:SetStunned(duration)
+        WaitSeconds(duration)
+        self:SetBlockCommandQueue(false)
+        self:SetBusy(false)
+        self:SetUnSelectable(false)
+    end
+    self:ForkThread(fn, duration)
+end,
 }
 
 TypeClass = UAL0301

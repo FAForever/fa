@@ -12,6 +12,11 @@ UnitBlueprint {
             Cue = 'XSL0301_Capture_Loop',
             LodCutoff = 'UnitMove_LodCutoff',
         },
+        CommanderArrival = Sound {
+            Bank = 'UAL',
+            Cue = 'UAL0001_Gate_In',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
         Construct = Sound {
             Bank = 'XSL',
             Cue = 'XSL0301_Construct_Start',

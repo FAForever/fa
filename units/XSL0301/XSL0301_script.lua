@@ -200,6 +200,28 @@ XSL0301 = Class(SWalkingLandUnit) {
         if not bp then return end
         #Teleporter
         if enh == 'Teleporter' then
+        WarpInEffectThread = function(self)
+        self:PlayUnitSound('CommanderArrival')
+        self:CreateProjectile( '/effects/entities/UnitTeleport01/UnitTeleport01_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
+        WaitSeconds(2.1)
+        self:ShowBone(0, true)
+        self:HideBone('Back_Upgrade', true)
+        self:HideBone('Right_Upgrade', true)
+        self:HideBone('Left_Upgrade', true)
+        self:SetUnSelectable(false)
+        self:SetBusy(false)
+        self:SetBlockCommandQueue(false)
+
+        local totalBones = self:GetBoneCount() - 1
+        local army = self:GetArmy()
+        for k, v in EffectTemplate.UnitTeleportSteam01 do
+            for bone = 1, totalBones do
+                CreateAttachedEmitter(self,bone,army, v)
+            end
+        end
+
+        WaitSeconds(6)
+    end,
             self:AddCommandCap('RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
             self:RemoveCommandCap('RULEUCC_Teleport')
@@ -307,7 +329,39 @@ XSL0301 = Class(SWalkingLandUnit) {
             SWalkingLandUnit.StartBuildingEffects(self, self:GetUnitBeingBuilt(), self.UnitBuildOrder)
         end
         SWalkingLandUnit.OnUnpaused(self)
-    end,         
+    end,    
+
+        #Teleport animation
+    PlayTeleportInEffects = function(self)
+
+    self:BlockCommands(11)
+    self:PlayUnitSound('CommanderArrival')
+    self:CreateProjectile( '/effects/entities/UnitTeleport01/UnitTeleport01_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
+
+    WaitSeconds(2.1)    
+
+    local totalBones = self:GetBoneCount() - 1
+    local army = self:GetArmy()
+    for k, v in EffectTemplate.UnitTeleportSteam01 do
+        for bone = 1, totalBones do
+            CreateAttachedEmitter(self,bone,army, v)
+        end
+    end
+    end,
+
+    BlockCommands = function(self, duration)
+    local fn = function(self, duration)
+        self:SetUnSelectable(true)
+        self:SetBusy(true)
+        self:SetBlockCommandQueue(true)
+        self:SetStunned(duration)
+        WaitSeconds(duration)
+        self:SetBlockCommandQueue(false)
+        self:SetBusy(false)
+        self:SetUnSelectable(false)
+    end
+    self:ForkThread(fn, duration)
+end,
 }
 
 TypeClass = XSL0301

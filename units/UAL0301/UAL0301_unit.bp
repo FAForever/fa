@@ -13,6 +13,11 @@ UnitBlueprint {
             Cue = 'UAL0301_Capture_Loop',
             LodCutoff = 'UnitMove_LodCutoff',
         },
+        CommanderArrival = Sound {
+            Bank = 'UAL',
+            Cue = 'UAL0001_Gate_In',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
         Construct = Sound {
             Bank = 'UAL',
             Cue = 'UAL0301_Construct_Start',
@@ -302,12 +307,12 @@ UnitBlueprint {
         },
         ResourceAllocation = {
             BuildCostEnergy = 60000,
-            BuildCostMass = 4500,
+            BuildCostMass = 5000,
             BuildTime = 6000,
             Icon = 'ras',
             Name = '<LOC enhancements_0024>Resource Allocation System',
             ProductionPerSecondEnergy = 1000,
-            ProductionPerSecondMass = 11,
+            ProductionPerSecondMass = 10,
             Slot = 'RCH',
             UpgradeUnitAmbientBones = {
                 'UAL0301',
@@ -659,7 +664,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_LowArc',
             ChargeDelay = 0.3,
             CollideFriendly = false,
-            Damage = 400,
+            Damage = 300,
             DamageType = 'Normal',
             DisplayName = 'Reacton Cannon',
             FireTargetLayerCapsTable = {

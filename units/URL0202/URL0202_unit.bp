@@ -61,7 +61,7 @@ UnitBlueprint {
         MaxHealth = 1150,
         RegenRate = 0,
         SubThreatLevel = 0,
-        SurfaceThreatLevel = 4.5,
+        SurfaceThreatLevel = 3,
     },
     Description = '<LOC url0202_desc>Heavy Tank',
     Display = {
@@ -162,7 +162,7 @@ UnitBlueprint {
         },
         DragCoefficient = 0.2,
         MaxAcceleration = 3.2,
-        MaxBrake = 3.2,
+        MaxBrake = 2.7,
         MaxSpeed = 3.2,
         MaxSpeedReverse = 0,
         MaxSteerForce = 3,
@@ -205,7 +205,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_LowArc',
             CollideFriendly = false,
-            Damage = 30, 
+            Damage = 16, 
             DamageType = 'Normal',
             DisplayName = 'Particle Cannon',
             FireTargetLayerCapsTable = {
