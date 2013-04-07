@@ -209,7 +209,7 @@ UnitBlueprint {
             MuzzleSalvoSize = 4,
             MuzzleVelocity = 45,
             ProjectileId = '/projectiles/CAAMissileNanite02/CAAMissileNanite02_proj.bp',
-            ProjectileLifetime = 3,
+            ProjectileLifetime = 4,
             ProjectilesPerOnFire = 4,
             RackBones = {
                 {

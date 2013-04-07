@@ -17,32 +17,40 @@ ProjectileBlueprint {
         },
     },
     Categories = {
-        'SERAPHIM',
+        'UEF',
         'PROJECTILE',
         'ANTIAIR',
+        'MISSILE',
     },
     Display = {
-        ImpactEffects = {
-            Type = 'Small01',
+        Mesh = {
+            LODs = {
+                {
+                    ShaderName = 'NormalMappedAlpha',
+                },
+            },
         },
         StrategicIconSize = 2,
+        UniformScale = 0.03,
     },
     General = {
         Category = 'Anti Air',
-        Faction = 'Seraphim',
-        TechLevel = 1,
-        Weapon = 'Losaare AA Autocannon',
+        Faction = 'UEF',
+        TechLevel = 3,
+        Weapon = 'Flayer SAM Launcher',
     },
     Interface = {
         HelpText = 0,
     },
     Physics = {
+        Acceleration = 6,
         DestroyOnWater = true,
-        InitialSpeed = 120,
+        InitialSpeed = 30,
         LeadTarget = true,
         Lifetime = 4,
+        MaxSpeed = 50,
         OnLostTargetLifetime = 0.7,
-	TrackTarget = true,
+        TrackTarget = true,
         TurnRate = 240,
         UseGravity = false,
         VelocityAlign = true,
