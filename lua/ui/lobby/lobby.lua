@@ -3436,23 +3436,27 @@ function CreateUI(maxPlayers)
                 for slot, observer in gameInfo.Observers do
                     if observer and (observer.OwnerID != localPlayerID) and observer.ObserverListIndex then
                         local peer = lobbyComm:GetPeer(observer.OwnerID)
-                        local ping = math.floor(peer.ping)
-						-- CPU benchmark modified code
-						local score_CPU =  FindBenchmarkForName(observer.PlayerName)
-						local cputext = ""
-						if score_CPU then
-							cputext = ", CPU = "..tostring(score_CPU.Result)
-						end
+                        
+                        --Lobby "bug" fix.  This should fix the problem where the lobby pings get bugged.
+                        -- -Duck42
+                        local ping = peer.ping and math.floor(peer.ping)
+                        
+                        -- CPU benchmark modified code
+                        local score_CPU =  FindBenchmarkForName(observer.PlayerName)
+                        local cputext = ""
+                        if score_CPU then
+                            cputext = ", CPU = "..tostring(score_CPU.Result)
+                        end
                         GUI.observerList:ModifyItem(observer.ObserverListIndex, observer.PlayerName  .. LOC("<LOC lobui_0240> (Ping = ") .. tostring(ping) .. cputext .. ")")
-					elseif observer.OwnerID == localPlayerID then
-						
-						local score_CPU =  FindBenchmarkForName(observer.PlayerName)
-						local cputext = ""
-						if score_CPU then
-							cputext = " (CPU = "..tostring(score_CPU.Result)..")"
-						end
+                    elseif observer.OwnerID == localPlayerID then
+                        
+                        local score_CPU =  FindBenchmarkForName(observer.PlayerName)
+                        local cputext = ""
+                        if score_CPU then
+                            cputext = " (CPU = "..tostring(score_CPU.Result)..")"
+                        end
                         GUI.observerList:ModifyItem(observer.ObserverListIndex, observer.PlayerName  .. cputext)
-						-- End CPU benchmark modified code
+                        -- End CPU benchmark modified code
                     end
                 end
                 WaitSeconds(1)
@@ -4816,7 +4820,7 @@ function CreateCPUMetricUI()
 	            LayoutHelpers.AtBottomIn(GUI.slots[i].CPUSpeedBar, GUI.slots[i].pingGroup)
 	            LayoutHelpers.AtLeftIn(GUI.slots[i].CPUSpeedBar, GUI.slots[i].pingGroup, 5)
 	            LayoutHelpers.AtRightIn(GUI.slots[i].CPUSpeedBar, GUI.slots[i].pingGroup, 5)
-	            GUI.slots[i].CPUSpeedBar.Height:Set(2)
+	            GUI.slots[i].CPUSpeedBar.Height:Set(3)
 	            CPU_AddControlTooltip(GUI.slots[i].CPUSpeedBar, 0, i)
 	            
 		end
@@ -4915,13 +4919,15 @@ function SetSlotCPUBar(slot, playerInfo)
 		    	GUI.slots[slot].CPUSpeedBar:SetValue(clampedResult)
 		    	GUI.slots[slot].CPUSpeedBar:Show()
 		    	
-		    	if clampedResult <= greenBarMax then
-		    		GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-02_bmp.dds'))
-		    	elseif clampedResult <= yellowBarMax then
-		    		GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-01_bmp.dds'))
-		    	else
-		    		GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-03_bmp.dds'))
-		    	end
+				GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-02_bmp.dds'))
+				
+		    	-- if clampedResult <= greenBarMax then
+		    		-- GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-02_bmp.dds'))
+		    	-- elseif clampedResult <= yellowBarMax then
+		    		-- GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-01_bmp.dds'))
+		    	-- else
+		    		-- GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-03_bmp.dds'))
+		    	-- end
 	    	end
 		end
 	end
