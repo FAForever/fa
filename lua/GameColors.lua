@@ -4,26 +4,23 @@ GameColors = {
     ArmyColors = {
         #Faction colours
 	"ff436eee",      # new blue1
-	"ffa7a7a7",      # new grey
-	"ffee2c2c",      # new red
+	"FFe80a0a",      # Cybran red
+	"ff616d7e",      # grey
 	"fffafa00",      # new yellow
-	"ffff873e",      # new orange
+        'FFFF873E',      # Nomads orange
 	"ffffffff",      # white
-	"ff999666",      # army
- 	"FF2F4F4F",      # olive (dark green)
-	"ff2e8b57",      # new green
-	"ff40bf40",      # mid green
-	"ffc1ffc1",      # lt green
-	"ff66ffcc",      # aqua
-	"ff00bcd6",      # new blue2
-	"ff0430bf",      # Dark blue*
-	"FF5F01A7",      # dark purple
 	"ff9161ff",      # purple
-	"ffff32ff",      # new fuschia
 	"ffff88ff",      # pink
+	"ff2e8b57",      # new green
+        "FF131cd3",      # UEF blue
+	"FF5F01A7",      # dark purple
+	"ffff32ff",      # new fuschia
 	"ffffbf80",      # lt orange
 	"ffb76518",      # new brown
 	"ff901427",      # dark red
+ 	"FF2F4F4F",      # olive (dark green)
+	"ff40bf40",      # mid green
+	"ff66ffcc",      # aqua
 
 
 #	"FF131cd3",      # UEF blue
@@ -44,26 +41,23 @@ GameColors = {
     PlayerColors = {
         # same as above
 	"ff436eee",      # new blue1
-	"ffa7a7a7",      # new grey
-	"ffee2c2c",      # new red
+	"FFe80a0a",      # Cybran red
+	"ff616d7e",      # grey
 	"fffafa00",      # new yellow
-	"ffff873e",      # new orange
+        'FFFF873E',      # Nomads orange
 	"ffffffff",      # white
-	"ff999666",      # army
- 	"FF2F4F4F",      # olive (dark green)
-	"ff2e8b57",      # new green
-	"ff40bf40",      # mid green
-	"ffc1ffc1",      # lt green
-	"ff66ffcc",      # aqua
-	"ff00bcd6",      # new blue2
-	"ff0430bf",      # Dark blue*
-	"FF5F01A7",      # dark purple
 	"ff9161ff",      # purple
-	"ffff32ff",      # new fuschia
 	"ffff88ff",      # pink
+	"ff2e8b57",      # new green
+        "FF131cd3",      # UEF blue
+	"FF5F01A7",      # dark purple
+	"ffff32ff",      # new fuschia
 	"ffffbf80",      # lt orange
 	"ffb76518",      # new brown
 	"ff901427",      # dark red
+ 	"FF2F4F4F",      # olive (dark green)
+	"ff40bf40",      # mid green
+	"ff66ffcc",      # aqua
 
     },
     TeamColorMode = {
