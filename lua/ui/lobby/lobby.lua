@@ -3439,7 +3439,11 @@ function CreateUI(maxPlayers)
                         
                         --Lobby "bug" fix.  This should fix the problem where the lobby pings get bugged.
                         -- -Duck42
-                        local ping = peer.ping and math.floor(peer.ping)
+                        local ping = 0
+						if peer.ping != nil then
+							ping = math.floor(peer.ping)
+						end
+						
                         
                         -- CPU benchmark modified code
                         local score_CPU =  FindBenchmarkForName(observer.PlayerName)
