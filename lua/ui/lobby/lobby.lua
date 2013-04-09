@@ -4751,6 +4751,7 @@ local scoreSkew = 0 --Skews all CPU scores up or down by the amount specified
 --Variables for CPU Test
 local running
 local loopCount
+local firstCPUTest = true
 
 --------------------------------------------------
 --  CPU Benchmark Storage and Retrieval Functions
@@ -4874,29 +4875,59 @@ function StressCPU(waitTime)
 		WaitSeconds(1)
 	end
 	
+	--Get our last benchmark (if there was one)
+	local currentBestBenchmark = FindBenchmarkForName(localPlayerName)
+	if currentBestBenchmark == false then
+		currentBestBenchmark = 10000
+	end
+	
 	LOG('Beginning CPU benchmark')
 	GUI.rerunBenchmark.label:SetText('In Progress...')
-	loopCount = 0
-	running = true
-	ForkThread(CPUTimer)
-	CPUBenchmark()
 	
-	--Invert scale for display purposes
-	--With .01 sec wait intervals the max number of loops should be 100 * benchmarkLength
-	loopCount = (benchmarkLength * 100) - math.min(loopCount + scoreSkew, (benchmarkLength * 100))
+	--Run three benchmarks and keep the best one
+	for i=1, 3, 1 do
+		loopCount = 0
+		running = true
+		ForkThread(CPUTimer)
+		CPUBenchmark()
+	
+		--Invert scale for display purposes
+		--With .01 sec wait intervals the max number of loops should be 100 * benchmarkLength
+		loopCount = (benchmarkLength * 100) - math.min(loopCount + scoreSkew, (benchmarkLength * 100))
 
-	LOG('CPU benchmark complete: '.. loopCount )
+		LOG('CPU benchmark #'..i..' complete: '.. loopCount )
+		
+		--If this benchmark was better than our best so far...
+		if loopCount < currentBestBenchmark then
+			--Make this our best benchmark
+			currentBestBenchmark = loopCount
+			
+			--Send it to the other players
+			lobbyComm:BroadcastData( { Type = 'CPUBenchmark', PlayerName = localPlayerName, Result = currentBestBenchmark} )
+	
+			--Add the benchmark to the local benchmark table
+			AddPlayerBenchmark({PlayerName = localPlayerName, Result = currentBestBenchmark})
+			
+			--Update the UI bar
+			UpdateCPUBar(localPlayerName)
+		end
+	end
+	
+	--Show message if player's score is very low
+	if currentBestBenchmark >= 450 and firstCPUTest then
+		AddChatText(LOCF('<LOC lobui_0901>SYSTEM: Your CPU score is unusually low.'))
+		AddChatText(LOCF('<LOC lobui_0902>SYSTEM: This can be caused by using ALT-TAB or minimizing the game after joining.'))
+		AddChatText(LOCF('<LOC lobui_0903>SYSTEM: Certain CPU power saving features can also cause this.'))
+		AddChatText(LOCF('<LOC lobui_0903>SYSTEM: After joining the lobby, please wait 15 seconds before using ALT-TAB or minimizing.'))
+		AddChatText(LOCF('<LOC lobui_0903>SYSTEM: If you continue to see this message anyway, please let us know on the FAF forums.'))
+	end
 
-	--Send update other players
-	lobbyComm:BroadcastData( { Type = 'CPUBenchmark', PlayerName = localPlayerName, Result = loopCount} )
+	--Set this flag so we'll know later
+	firstCPUTest = false
 	
-	--Add benchmark to my local benchmark table
-	AddPlayerBenchmark({PlayerName = localPlayerName, Result = loopCount})
-	
-	--Update UI
+	--Reset Button UI
 	GUI.rerunBenchmark:Enable()
-	GUI.rerunBenchmark.label:SetText('Run CPU Test')
-	UpdateCPUBar(localPlayerName)
+	GUI.rerunBenchmark.label:SetText('Run CPU Test')	
 end
 
 function UpdateCPUBar(playerName)
