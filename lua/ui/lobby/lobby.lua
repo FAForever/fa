@@ -46,7 +46,7 @@ local PrefLanguage = GetCommandLineArg("/country", 1)
 if PrefLanguage then 
 	PrefLanguage = tostring(string.lower(PrefLanguage[1]))
 else
-	PrefLanguage = "nothing"
+	PrefLanguage = "world"
 end
 --\\ Stop Get a value on /Country CommandLine in FA.exe
 
@@ -3100,7 +3100,7 @@ function CreateUI(maxPlayers)
 		--// COUNTY - Xinnony
 		-- Added a bitmap on the left of Rating, the bitmap is a Flag of Country
 		-- PS : I love KinderCountry !, if you have, you can send your chocolate for me.
-		GUI.slots[i].KinderCountry = Bitmap(bg, UIUtil.SkinnableFile("/countries/nothing.dds"))
+		GUI.slots[i].KinderCountry = Bitmap(bg, UIUtil.SkinnableFile("/countries/world.dds"))
 		GUI.slots[i].KinderCountry.Width:Set(16)
 		GUI.slots[i].KinderCountry.Height:Set(16)
 		LayoutHelpers.AtBottomIn(GUI.slots[i].KinderCountry, GUI.slots[i], -6)
