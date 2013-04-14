@@ -54,4 +54,8 @@ function OnSync()
     for id,v in Sync.ReleaseIds do
         UnitData[id] = nil
     end
+    
+    if Sync.NukeLaunchData then
+		import('/modules/nukelaunchping.lua').DoNukePing(Sync.NukeLaunchData)
+	end
 end

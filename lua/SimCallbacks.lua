@@ -40,6 +40,9 @@ Callbacks.SetOfferDraw = SimUtils.SetOfferDraw
 
 Callbacks.SpawnPing = SimPing.SpawnPing
 
+--Nuke Ping
+Callbacks.SpawnSpecialPing = SimPing.SpawnSpecialPing
+
 Callbacks.UpdateMarker = SimPing.UpdateMarker
 
 Callbacks.FactionSelection = import('/lua/ScenarioFramework.lua').OnFactionSelect

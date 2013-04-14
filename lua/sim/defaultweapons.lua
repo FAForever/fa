@@ -621,6 +621,11 @@ DefaultProjectileWeapon = Class(Weapon) {
                     if bp.CountedProjectile == true then
                         if bp.NukeWeapon == true then
                             self.unit:NukeCreatedAtUnit()
+                            
+                            #Generate ui notification for automatic nuke ping
+        					local launchData = { army = self.unit:GetArmy()-1, location = self:GetCurrentTargetPos()}
+							Sync.NukeLaunchData = launchData    
+							    
                             self.unit:RemoveNukeSiloAmmo(1)
                         else
                             self.unit:RemoveTacticalSiloAmmo(1)
