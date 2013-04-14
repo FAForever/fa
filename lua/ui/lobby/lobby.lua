@@ -4975,6 +4975,7 @@ function CreateCPUMetricUI()
 	            LayoutHelpers.AtRightIn(GUI.slots[i].CPUSpeedBar, GUI.slots[i].pingGroup, 5)
 	            GUI.slots[i].CPUSpeedBar.Height:Set(3)
 	            CPU_AddControlTooltip(GUI.slots[i].CPUSpeedBar, 0, i)
+				GUI.slots[i].CPUSpeedBar.CPUActualValue = 450
 	            
 		end
 		
@@ -5003,7 +5004,7 @@ function CPU_AddControlTooltip(control, delay, slotNumber)
     control.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
         	local slot = slotNumber
-            Tooltip.CreateMouseoverDisplay(self, {text='CPU Rating: '..GUI.slots[slot].CPUSpeedBar._value(), body='150=Fastest, 450=Slowest'}, delay, true)
+            Tooltip.CreateMouseoverDisplay(self, {text='CPU Rating: '..GUI.slots[slot].CPUSpeedBar.CPUActualValue, body='150=Fastest, 450=Slowest'}, delay, true)
         elseif event.Type == 'MouseExit' then
             Tooltip.DestroyMouseoverDisplay()
         end
@@ -5098,8 +5099,13 @@ function SetSlotCPUBar(slot, playerInfo)
 		if playerInfo.Human then
 			local b = FindBenchmarkForName(playerInfo.PlayerName)
 			if b then
-		    	local clampedResult =  math.max(math.min(b.Result, barMax), barMin)
+				-- For display purposes, the bas has a higher minimum that the actual barMin value.
+				-- This is to ensure that the bar is visible for very small values
+		    	local clampedResult =  math.max(math.min(b.Result, barMax), barMin + math.floor(.04 * (barMax - barMin)))
 		    	GUI.slots[slot].CPUSpeedBar:SetValue(clampedResult)
+				
+				--For the tooltip, we use the actual clamped value
+				GUI.slots[slot].CPUSpeedBar.CPUActualValue = math.max(math.min(b.Result, barMax), barMin)
 		    	GUI.slots[slot].CPUSpeedBar:Show()
 		    	
 				GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-02_bmp.dds'))
