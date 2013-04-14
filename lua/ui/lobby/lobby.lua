@@ -41,6 +41,15 @@ local teamIcons = {'/lobby/team_icons/team_no_icon.dds',
 	'/lobby/team_icons/team_5_icon.dds',
 	'/lobby/team_icons/team_6_icon.dds'}
 
+--// Get a value on /Country CommandLine in FA.exe - Xinnony
+local PrefLanguage = GetCommandLineArg("/country", 1)
+if PrefLanguage then 
+	PrefLanguage = tostring(string.lower(PrefLanguage[1]))
+else
+	PrefLanguage = "world"
+end
+--\\ Stop Get a value on /Country CommandLine in FA.exe
+
 local connectedTo = {}	
 	
 local availableMods = {} # map from peer ID to set of available mods; each set is a map from "mod id"->true
@@ -55,6 +64,7 @@ local quickRandMap = false
 local lastUploadedMap = nil
 
 local CPU_BenchmarkList = {} -- Stores CPU benchmark data
+local Country_List = {} -- Stores playername and country data
 
 local playerMean = GetCommandLineArg("/mean", 1)
 local playerDeviation = GetCommandLineArg("/deviation", 1)
@@ -170,19 +180,24 @@ function FuncSlotMenuData()
 		pm = "<LOC lobui_0223>Private Message",
 		remove_to_kik = "Remove Player",
 		remove_to_observer = "Move Player to Observer",
-		move_slot_to_slot1 = "Move Player to slot 1",
-		move_slot_to_slot2 = "Move Player to slot 2",
-		move_slot_to_slot3 = "Move Player to slot 3",
-		move_slot_to_slot4 = "Move Player to slot 4",
-		move_slot_to_slot5 = "Move Player to slot 5",
-		move_slot_to_slot6 = "Move Player to slot 6",
-		move_slot_to_slot7 = "Move Player to slot 7",
-		move_slot_to_slot8 = "Move Player to slot 8",
-		move_slot_to_slot9 = "Move Player to slot 9",
-		move_slot_to_slot10 = "Move Player to slot 10",
-		move_slot_to_slot11 = "Move Player to slot 11",
-		move_slot_to_slot12 = "Move Player to slot 12",
+		move_player_to_slot1 = "Move Player to slot 1",
+		move_player_to_slot2 = "Move Player to slot 2",
+		move_player_to_slot3 = "Move Player to slot 3",
+		move_player_to_slot4 = "Move Player to slot 4",
+		move_player_to_slot5 = "Move Player to slot 5",
+		move_player_to_slot6 = "Move Player to slot 6",
+		move_player_to_slot7 = "Move Player to slot 7",
+		move_player_to_slot8 = "Move Player to slot 8",
+		move_player_to_slot9 = "Move Player to slot 9",
+		move_player_to_slot10 = "Move Player to slot 10",
+		move_player_to_slot11 = "Move Player to slot 11",
+		move_player_to_slot12 = "Move Player to slot 12",
 	}
+--// XinnonyWork TEMPORARY, I DELETE OR FIX IN THE NEXT PATCH
+--	for i = 1, numOpenSlots, 1 do
+--		table.insert(slotMenuStrings.player.host, move_player_to_slot..i = 'move_player_to_slot'..i)
+--	end
+--\\ XinnonyWork TEMPORARY, I DELETE OR FIX IN THE NEXT PATCH
 	--***
 	slotMenuData = {
 		open = {
@@ -222,7 +237,7 @@ function FuncSlotMenuData()
 		},
 	}
 	for i = 1, numOpenSlots, 1 do
-		table.insert(slotMenuData.player.host, 'move_slot_to_slot'..i)
+		table.insert(slotMenuData.player.host, 'move_player_to_slot'..i)
 	end
 end
 FuncSlotMenuData()
@@ -281,6 +296,34 @@ local function GetSlotMenuTables(stateKey, hostKey)
 end
 
 local function DoSlotBehavior(slot, key, name)
+--// XinnonyWork TEMPORARY, I DELETE OR FIX IN THE NEXT PATCH
+--	for i = 1, 12 do
+--		if key == 'move_player_to_slot'..i then
+--			if gameInfo.PlayerOptions[slot].Human and slot != i and not gameInfo.PlayerOptions[slot].Ready and not gameInfo.PlayerOptions[i].Ready then
+--				if gameInfo.PlayerOptions[i].Human then -- If destination slot player exist
+--					LAST_name = gameInfo.PlayerOptions[i].PlayerName
+--					LAST_id = gameInfo.PlayerOptions[i].OwnerID
+--					LAST_rating_color = gameInfo.PlayerOptions[i].RC
+--					LAST_rating = gameInfo.PlayerOptions[i].PL
+--					LAST_faction = gameInfo.PlayerOptions[i].Faction
+--					LAST_numgame = gameInfo.PlayerOptions[i].NG
+--					--***
+--					HostConvertPlayerToObserver(gameInfo.PlayerOptions[i].OwnerID, gameInfo.PlayerOptions[i].PlayerName, i) -- move slot 1 to observer
+--					ClearSlotInfo(i)
+--					HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, i) -- move select slot to slot 1
+--					ClearSlotInfo(slot)
+--					HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
+--				else -- destination slot is empty
+--					HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, i)
+--				end
+--			elseif gameInfo.PlayerOptions[slot].Ready or gameInfo.PlayerOptions[i].Ready then
+--				AddChatText('The Player is ready, you cannot move the Player '..slot..' to Slot '..i..' ! (for the moment (reasons: hide bug))')
+--			else
+--				AddChatText('You cannot move the Player '..slot..' to Slot '..i..' !')
+--			end
+--		end
+--	end
+--\\ XinnonyWork TEMPORARY, I DELETE OR FIX IN THE NEXT PATCH
     if key == 'open' then
         if lobbyComm:IsHost() then
             HostOpenSlot(hostID, slot)
@@ -312,37 +355,36 @@ local function DoSlotBehavior(slot, key, name)
             GUI.chatEdit:SetText(string.format("/whisper %s:", gameInfo.PlayerOptions[slot].PlayerName))
         end
 	--// Move player slot to slot -- Xinnony
-	elseif key == 'move_slot_to_slot1' then
-		if gameInfo.PlayerOptions[slot].Human and slot != 1 then
-			if gameInfo.PlayerOptions[1].Human then -- If destination slot player exist
+	elseif key == 'move_player_to_slot1' then
+		if gameInfo.PlayerOptions[slot].Human and slot != 1 then -- IF Player X is Human and Player Slot NOT a Slot 1
+			if gameInfo.PlayerOptions[1].Human and not gameInfo.PlayerOptions[1].Ready and not gameInfo.PlayerOptions[slot].Ready then -- IF Slot 1 is Human and NOT Ready, AND IF Player X is NOT Ready
 				LAST_name = gameInfo.PlayerOptions[1].PlayerName
 				LAST_id = gameInfo.PlayerOptions[1].OwnerID
-				--tmpLAST_rating_color = GetCommandLineArg("/ratingcolor", 1)
-				--LAST_rating_color = tostring(tmpLAST_rating_color[1])
-				--tmpLAST_mean = GetCommandLineArg("/mean", 1)
-				--LAST_mean = tonumber(tmpLAST_mean[1])
-				--tmpLAST_deviation = GetCommandLineArg("/deviation", 1)
-				--LAST_deviation = tonumber(tmpLAST_deviation[1])
-				--LAST_rating = math.floor(LAST_mean - 3 * LAST_deviation)
 				LAST_rating_color = gameInfo.PlayerOptions[1].RC
 				LAST_rating = gameInfo.PlayerOptions[1].PL
                 LAST_faction = gameInfo.PlayerOptions[1].Faction
 				LAST_numgame = gameInfo.PlayerOptions[1].NG
 				--***
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[1].OwnerID, gameInfo.PlayerOptions[1].PlayerName, 1) -- move slot 1 to observer
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[1].OwnerID, gameInfo.PlayerOptions[1].PlayerName, 1) -- Move Slot 1 to Observer
 				ClearSlotInfo(1)
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 1) -- move select slot to slot 1
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 1) -- Move Player X to Slot 1
 				ClearSlotInfo(slot)
                 HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
-			else -- destination slot is empty
+			elseif gameInfo.PlayerOptions[slot].Human and gameInfo.PlayerOptions[slot].Ready then -- IF Player X is Human and Ready
+				AddChatText('You cannot move the Player '..slot..' to Slot 1 because the Slot 1 is Ready (for the moment (reasons: hide bug))')
+			elseif gameInfo.PlayerOptions[1].Human and gameInfo.PlayerOptions[1].Ready then -- IF Slot 1 is Human and Ready
+				AddChatText('You cannot move the Player '..slot..' to Slot 1 because the Player '..slot..' is Ready (for the moment (reasons: hide bug))')
+			elseif not gameInfo.PlayerOptions[1].Human and not gameInfo.PlayerOptions[1].Ready then -- IF Slot 1 is NOT Human and NOT Ready
 				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 1)
+			else
+				AddChatText('You cannot move the Player '..slot..' !')
 			end
 		else
-			AddChatText('You cannot move the Player 1 to Slot 1 !')
+			AddChatText('You cannot move the Player '..slot..' to Slot 1 !')
 		end
-	elseif key == 'move_slot_to_slot2' then
-		if gameInfo.PlayerOptions[slot].Human and slot != 2 then
-			if gameInfo.PlayerOptions[2].Human then -- If destination slot player exist
+	elseif key == 'move_player_to_slot2' then
+		if gameInfo.PlayerOptions[slot].Human and slot != 2 then -- IF Player X is Human and Player Slot NOT a Slot 2
+			if gameInfo.PlayerOptions[2].Human and not gameInfo.PlayerOptions[2].Ready and not gameInfo.PlayerOptions[slot].Ready then -- IF Slot 2 is Human and NOT Ready, AND IF Player X is NOT Ready
 				LAST_name = gameInfo.PlayerOptions[2].PlayerName
 				LAST_id = gameInfo.PlayerOptions[2].OwnerID
 				LAST_rating_color = gameInfo.PlayerOptions[2].RC
@@ -350,20 +392,26 @@ local function DoSlotBehavior(slot, key, name)
                 LAST_faction = gameInfo.PlayerOptions[2].Faction
 				LAST_numgame = gameInfo.PlayerOptions[2].NG
 				--***
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[2].OwnerID, gameInfo.PlayerOptions[2].PlayerName, 2) -- move slot 2 to observer
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[2].OwnerID, gameInfo.PlayerOptions[2].PlayerName, 2) -- Move Slot 2 to Observer
 				ClearSlotInfo(2)
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 2) -- move select slot to slot 2
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 2) -- Move Player X to Slot 2
 				ClearSlotInfo(slot)
                 HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
-			else -- destination slot is empty
+			elseif gameInfo.PlayerOptions[slot].Human and gameInfo.PlayerOptions[slot].Ready then -- IF Player X is Human and Ready
+				AddChatText('You cannot move the Player '..slot..' to Slot 2 because the Slot 2 is Ready (for the moment (reasons: hide bug))')
+			elseif gameInfo.PlayerOptions[2].Human and gameInfo.PlayerOptions[2].Ready then -- IF Slot 2 is Human and Ready
+				AddChatText('You cannot move the Player '..slot..' to Slot 2 because the Player '..slot..' is Ready (for the moment (reasons: hide bug))')
+			elseif not gameInfo.PlayerOptions[2].Human and not gameInfo.PlayerOptions[2].Ready then -- IF Slot 2 is NOT Human and NOT Ready
 				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 2)
+			else
+				AddChatText('You cannot move the Player '..slot..' !')
 			end
 		else
-			AddChatText('You cannot move the Player 2 to Slot 2 !')
+			AddChatText('You cannot move the Player '..slot..' to Slot 2 !')
 		end
-	elseif key == 'move_slot_to_slot3' then
-		if gameInfo.PlayerOptions[slot].Human and slot != 3 then
-			if gameInfo.PlayerOptions[3].Human then -- If destination slot player exist
+	elseif key == 'move_player_to_slot3' then
+		if gameInfo.PlayerOptions[slot].Human and slot != 3 then -- IF Player X is Human and Player Slot NOT a Slot 3
+			if gameInfo.PlayerOptions[3].Human and not gameInfo.PlayerOptions[3].Ready and not gameInfo.PlayerOptions[slot].Ready then -- IF Slot 3 is Human and NOT Ready, AND IF Player X is NOT Ready
 				LAST_name = gameInfo.PlayerOptions[3].PlayerName
 				LAST_id = gameInfo.PlayerOptions[3].OwnerID
 				LAST_rating_color = gameInfo.PlayerOptions[3].RC
@@ -371,20 +419,26 @@ local function DoSlotBehavior(slot, key, name)
                 LAST_faction = gameInfo.PlayerOptions[3].Faction
 				LAST_numgame = gameInfo.PlayerOptions[3].NG
 				--***
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[3].OwnerID, gameInfo.PlayerOptions[3].PlayerName, 3) -- move slot 3 to observer
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[3].OwnerID, gameInfo.PlayerOptions[3].PlayerName, 3) -- Move Slot 3 to Observer
 				ClearSlotInfo(3)
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 3) -- move select slot to slot 3
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 3) -- Move Player X to Slot 3
 				ClearSlotInfo(slot)
                 HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
-			else -- destination slot is empty
+			elseif gameInfo.PlayerOptions[slot].Human and gameInfo.PlayerOptions[slot].Ready then -- IF Player X is Human and Ready
+				AddChatText('You cannot move the Player '..slot..' to Slot 3 because the Slot 3 is Ready (for the moment (reasons: hide bug))')
+			elseif gameInfo.PlayerOptions[3].Human and gameInfo.PlayerOptions[3].Ready then -- IF Slot 3 is Human and Ready
+				AddChatText('You cannot move the Player '..slot..' to Slot 3 because the Player '..slot..' is Ready (for the moment (reasons: hide bug))')
+			elseif not gameInfo.PlayerOptions[3].Human and not gameInfo.PlayerOptions[3].Ready then -- IF Slot 3 is NOT Human and NOT Ready
 				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 3)
+			else
+				AddChatText('You cannot move the Player '..slot..' !')
 			end
 		else
-			AddChatText('You cannot move the Player 3 to Slot 3 !')
+			AddChatText('You cannot move the Player '..slot..' to Slot 3 !')
 		end
-	elseif key == 'move_slot_to_slot4' then
-		if gameInfo.PlayerOptions[slot].Human and slot != 4 then
-			if gameInfo.PlayerOptions[4].Human then -- If destination slot player exist
+	elseif key == 'move_player_to_slot4' then
+		if gameInfo.PlayerOptions[slot].Human and slot != 4 then -- IF Player X is Human and Player Slot NOT a Slot 4
+			if gameInfo.PlayerOptions[4].Human and not gameInfo.PlayerOptions[4].Ready and not gameInfo.PlayerOptions[slot].Ready then -- IF Slot 4 is Human and NOT Ready, AND IF Player X is NOT Ready
 				LAST_name = gameInfo.PlayerOptions[4].PlayerName
 				LAST_id = gameInfo.PlayerOptions[4].OwnerID
 				LAST_rating_color = gameInfo.PlayerOptions[4].RC
@@ -392,20 +446,26 @@ local function DoSlotBehavior(slot, key, name)
                 LAST_faction = gameInfo.PlayerOptions[4].Faction
 				LAST_numgame = gameInfo.PlayerOptions[4].NG
 				--***
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[4].OwnerID, gameInfo.PlayerOptions[4].PlayerName, 4) -- move slot 4 to observer
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[4].OwnerID, gameInfo.PlayerOptions[4].PlayerName, 4) -- Move Slot 4 to Observer
 				ClearSlotInfo(4)
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 4) -- move select slot to slot 4
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 4) -- Move Player X to Slot 4
 				ClearSlotInfo(slot)
                 HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
-			else -- destination slot is empty
+			elseif gameInfo.PlayerOptions[slot].Human and gameInfo.PlayerOptions[slot].Ready then -- IF Player X is Human and Ready
+				AddChatText('You cannot move the Player '..slot..' to Slot 4 because the Slot 4 is Ready (for the moment (reasons: hide bug))')
+			elseif gameInfo.PlayerOptions[4].Human and gameInfo.PlayerOptions[4].Ready then -- IF Slot 4 is Human and Ready
+				AddChatText('You cannot move the Player '..slot..' to Slot 4 because the Player '..slot..' is Ready (for the moment (reasons: hide bug))')
+			elseif not gameInfo.PlayerOptions[4].Human and not gameInfo.PlayerOptions[4].Ready then -- IF Slot 4 is NOT Human and NOT Ready
 				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 4)
+			else
+				AddChatText('You cannot move the Player '..slot..' !')
 			end
 		else
-			AddChatText('You cannot move the Player 4 to Slot 4 !')
+			AddChatText('You cannot move the Player '..slot..' to Slot 4 !')
 		end
-	elseif key == 'move_slot_to_slot5' then
-		if gameInfo.PlayerOptions[slot].Human and slot != 5 then
-			if gameInfo.PlayerOptions[5].Human then -- If destination slot player exist
+	elseif key == 'move_player_to_slot5' then
+		if gameInfo.PlayerOptions[slot].Human and slot != 5 then -- IF Player X is Human and Player Slot NOT a Slot 5
+			if gameInfo.PlayerOptions[5].Human and not gameInfo.PlayerOptions[5].Ready and not gameInfo.PlayerOptions[slot].Ready then -- IF Slot 5 is Human and NOT Ready, AND IF Player X is NOT Ready
 				LAST_name = gameInfo.PlayerOptions[5].PlayerName
 				LAST_id = gameInfo.PlayerOptions[5].OwnerID
 				LAST_rating_color = gameInfo.PlayerOptions[5].RC
@@ -413,20 +473,26 @@ local function DoSlotBehavior(slot, key, name)
                 LAST_faction = gameInfo.PlayerOptions[5].Faction
 				LAST_numgame = gameInfo.PlayerOptions[5].NG
 				--***
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[5].OwnerID, gameInfo.PlayerOptions[5].PlayerName, 5) -- move slot 5 to observer
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[5].OwnerID, gameInfo.PlayerOptions[5].PlayerName, 5) -- Move Slot 5 to Observer
 				ClearSlotInfo(5)
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 5) -- move select slot to slot 5
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 5) -- Move Player X to Slot 5
 				ClearSlotInfo(slot)
                 HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
-			else -- destination slot is empty
+			elseif gameInfo.PlayerOptions[slot].Human and gameInfo.PlayerOptions[slot].Ready then -- IF Player X is Human and Ready
+				AddChatText('You cannot move the Player '..slot..' to Slot 5 because the Slot 5 is Ready (for the moment (reasons: hide bug))')
+			elseif gameInfo.PlayerOptions[5].Human and gameInfo.PlayerOptions[5].Ready then -- IF Slot 5 is Human and Ready
+				AddChatText('You cannot move the Player '..slot..' to Slot 5 because the Player '..slot..' is Ready (for the moment (reasons: hide bug))')
+			elseif not gameInfo.PlayerOptions[5].Human and not gameInfo.PlayerOptions[5].Ready then -- IF Slot 5 is NOT Human and NOT Ready
 				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 5)
+			else
+				AddChatText('You cannot move the Player '..slot..' !')
 			end
 		else
-			AddChatText('You cannot move the Player 5 to Slot 5 !')
+			AddChatText('You cannot move the Player '..slot..' to Slot 5 !')
 		end
-	elseif key == 'move_slot_to_slot6' then
-		if gameInfo.PlayerOptions[slot].Human and slot != 6 then
-			if gameInfo.PlayerOptions[6].Human then -- If destination slot player exist
+	elseif key == 'move_player_to_slot6' then
+		if gameInfo.PlayerOptions[slot].Human and slot != 6 then -- IF Player X is Human and Player Slot NOT a Slot 6
+			if gameInfo.PlayerOptions[6].Human and not gameInfo.PlayerOptions[6].Ready and not gameInfo.PlayerOptions[slot].Ready then -- IF Slot 6 is Human and NOT Ready, AND IF Player X is NOT Ready
 				LAST_name = gameInfo.PlayerOptions[6].PlayerName
 				LAST_id = gameInfo.PlayerOptions[6].OwnerID
 				LAST_rating_color = gameInfo.PlayerOptions[6].RC
@@ -434,20 +500,26 @@ local function DoSlotBehavior(slot, key, name)
                 LAST_faction = gameInfo.PlayerOptions[6].Faction
 				LAST_numgame = gameInfo.PlayerOptions[6].NG
 				--***
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[6].OwnerID, gameInfo.PlayerOptions[6].PlayerName, 6) -- move slot 6 to observer
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[6].OwnerID, gameInfo.PlayerOptions[6].PlayerName, 6) -- Move Slot 6 to Observer
 				ClearSlotInfo(6)
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 6) -- move select slot to slot 6
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 6) -- Move Player X to Slot 6
 				ClearSlotInfo(slot)
                 HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
-			else -- destination slot is empty
+			elseif gameInfo.PlayerOptions[slot].Human and gameInfo.PlayerOptions[slot].Ready then -- IF Player X is Human and Ready
+				AddChatText('You cannot move the Player '..slot..' to Slot 6 because the Slot 6 is Ready (for the moment (reasons: hide bug))')
+			elseif gameInfo.PlayerOptions[6].Human and gameInfo.PlayerOptions[6].Ready then -- IF Slot 6 is Human and Ready
+				AddChatText('You cannot move the Player '..slot..' to Slot 6 because the Player '..slot..' is Ready (for the moment (reasons: hide bug))')
+			elseif not gameInfo.PlayerOptions[6].Human and not gameInfo.PlayerOptions[6].Ready then -- IF Slot 6 is NOT Human and NOT Ready
 				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 6)
+			else
+				AddChatText('You cannot move the Player '..slot..' !')
 			end
 		else
-			AddChatText('You cannot move the Player 6 to Slot 6 !')
+			AddChatText('You cannot move the Player '..slot..' to Slot 6 !')
 		end
-	elseif key == 'move_slot_to_slot7' then
-		if gameInfo.PlayerOptions[slot].Human and slot != 7 then
-			if gameInfo.PlayerOptions[7].Human then -- If destination slot player exist
+	elseif key == 'move_player_to_slot7' then
+		if gameInfo.PlayerOptions[slot].Human and slot != 7 then -- IF Player X is Human and Player Slot NOT a Slot 7
+			if gameInfo.PlayerOptions[7].Human and not gameInfo.PlayerOptions[7].Ready and not gameInfo.PlayerOptions[slot].Ready then -- IF Slot 7 is Human and NOT Ready, AND IF Player X is NOT Ready
 				LAST_name = gameInfo.PlayerOptions[7].PlayerName
 				LAST_id = gameInfo.PlayerOptions[7].OwnerID
 				LAST_rating_color = gameInfo.PlayerOptions[7].RC
@@ -455,20 +527,26 @@ local function DoSlotBehavior(slot, key, name)
                 LAST_faction = gameInfo.PlayerOptions[7].Faction
 				LAST_numgame = gameInfo.PlayerOptions[7].NG
 				--***
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[7].OwnerID, gameInfo.PlayerOptions[7].PlayerName, 7) -- move slot 7 to observer
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[7].OwnerID, gameInfo.PlayerOptions[7].PlayerName, 7) -- Move Slot 7 to Observer
 				ClearSlotInfo(7)
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 7) -- move select slot to slot 7
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 7) -- Move Player X to Slot 7
 				ClearSlotInfo(slot)
                 HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
-			else -- destination slot is empty
+			elseif gameInfo.PlayerOptions[slot].Human and gameInfo.PlayerOptions[slot].Ready then -- IF Player X is Human and Ready
+				AddChatText('You cannot move the Player '..slot..' to Slot 7 because the Slot 7 is Ready (for the moment (reasons: hide bug))')
+			elseif gameInfo.PlayerOptions[7].Human and gameInfo.PlayerOptions[7].Ready then -- IF Slot 7 is Human and Ready
+				AddChatText('You cannot move the Player '..slot..' to Slot 7 because the Player '..slot..' is Ready (for the moment (reasons: hide bug))')
+			elseif not gameInfo.PlayerOptions[7].Human and not gameInfo.PlayerOptions[7].Ready then -- IF Slot 7 is NOT Human and NOT Ready
 				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 7)
+			else
+				AddChatText('You cannot move the Player '..slot..' !')
 			end
 		else
-			AddChatText('You cannot move the Player 7 to Slot 7 !')
+			AddChatText('You cannot move the Player '..slot..' to Slot 7 !')
 		end
-	elseif key == 'move_slot_to_slot8' then
-		if gameInfo.PlayerOptions[slot].Human and slot != 8 then
-			if gameInfo.PlayerOptions[8].Human then -- If destination slot player exist
+	elseif key == 'move_player_to_slot8' then
+		if gameInfo.PlayerOptions[slot].Human and slot != 8 then -- IF Player X is Human and Player Slot NOT a Slot 8
+			if gameInfo.PlayerOptions[8].Human and not gameInfo.PlayerOptions[8].Ready and not gameInfo.PlayerOptions[slot].Ready then -- IF Slot 8 is Human and NOT Ready, AND IF Player X is NOT Ready
 				LAST_name = gameInfo.PlayerOptions[8].PlayerName
 				LAST_id = gameInfo.PlayerOptions[8].OwnerID
 				LAST_rating_color = gameInfo.PlayerOptions[8].RC
@@ -476,20 +554,26 @@ local function DoSlotBehavior(slot, key, name)
                 LAST_faction = gameInfo.PlayerOptions[8].Faction
 				LAST_numgame = gameInfo.PlayerOptions[8].NG
 				--***
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[8].OwnerID, gameInfo.PlayerOptions[8].PlayerName, 8) -- move slot 8 to observer
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[8].OwnerID, gameInfo.PlayerOptions[8].PlayerName, 8) -- Move Slot 8 to Observer
 				ClearSlotInfo(8)
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 8) -- move select slot to slot 8
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 8) -- Move Player X to Slot 8
 				ClearSlotInfo(slot)
                 HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
-			else -- destination slot is empty
+			elseif gameInfo.PlayerOptions[slot].Human and gameInfo.PlayerOptions[slot].Ready then -- IF Player X is Human and Ready
+				AddChatText('You cannot move the Player '..slot..' to Slot 8 because the Slot 8 is Ready (for the moment (reasons: hide bug))')
+			elseif gameInfo.PlayerOptions[8].Human and gameInfo.PlayerOptions[8].Ready then -- IF Slot 8 is Human and Ready
+				AddChatText('You cannot move the Player '..slot..' to Slot 8 because the Player '..slot..' is Ready (for the moment (reasons: hide bug))')
+			elseif not gameInfo.PlayerOptions[8].Human and not gameInfo.PlayerOptions[8].Ready then -- IF Slot 8 is NOT Human and NOT Ready
 				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 8)
+			else
+				AddChatText('You cannot move the Player '..slot..' !')
 			end
 		else
-			AddChatText('You cannot move the Player 8 to Slot 8 !')
+			AddChatText('You cannot move the Player '..slot..' to Slot 8 !')
 		end
-	elseif key == 'move_slot_to_slot9' then
-		if gameInfo.PlayerOptions[slot].Human and slot != 9 then
-			if gameInfo.PlayerOptions[9].Human then -- If destination slot player exist
+	elseif key == 'move_player_to_slot9' then
+		if gameInfo.PlayerOptions[slot].Human and slot != 9 then -- IF Player X is Human and Player Slot NOT a Slot 9
+			if gameInfo.PlayerOptions[9].Human and not gameInfo.PlayerOptions[9].Ready and not gameInfo.PlayerOptions[slot].Ready then -- IF Slot 9 is Human and NOT Ready, AND IF Player X is NOT Ready
 				LAST_name = gameInfo.PlayerOptions[9].PlayerName
 				LAST_id = gameInfo.PlayerOptions[9].OwnerID
 				LAST_rating_color = gameInfo.PlayerOptions[9].RC
@@ -497,20 +581,26 @@ local function DoSlotBehavior(slot, key, name)
                 LAST_faction = gameInfo.PlayerOptions[9].Faction
 				LAST_numgame = gameInfo.PlayerOptions[9].NG
 				--***
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[9].OwnerID, gameInfo.PlayerOptions[9].PlayerName, 9) -- move slot 9 to observer
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[9].OwnerID, gameInfo.PlayerOptions[9].PlayerName, 9) -- Move Slot 9 to Observer
 				ClearSlotInfo(9)
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 9) -- move select slot to slot 9
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 9) -- Move Player X to Slot 9
 				ClearSlotInfo(slot)
                 HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
-			else -- destination slot is empty
+			elseif gameInfo.PlayerOptions[slot].Human and gameInfo.PlayerOptions[slot].Ready then -- IF Player X is Human and Ready
+				AddChatText('You cannot move the Player '..slot..' to Slot 9 because the Slot 9 is Ready (for the moment (reasons: hide bug))')
+			elseif gameInfo.PlayerOptions[9].Human and gameInfo.PlayerOptions[9].Ready then -- IF Slot 9 is Human and Ready
+				AddChatText('You cannot move the Player '..slot..' to Slot 9 because the Player '..slot..' is Ready (for the moment (reasons: hide bug))')
+			elseif not gameInfo.PlayerOptions[9].Human and not gameInfo.PlayerOptions[9].Ready then -- IF Slot 9 is NOT Human and NOT Ready
 				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 9)
+			else
+				AddChatText('You cannot move the Player '..slot..' !')
 			end
 		else
-			AddChatText('You cannot move the Player 9 to Slot 9 !')
+			AddChatText('You cannot move the Player '..slot..' to Slot 9 !')
 		end
-	elseif key == 'move_slot_to_slot10' then
-		if gameInfo.PlayerOptions[slot].Human and slot != 10 then
-			if gameInfo.PlayerOptions[10].Human then -- If destination slot player exist
+	elseif key == 'move_player_to_slot10' then
+		if gameInfo.PlayerOptions[slot].Human and slot != 10 then -- IF Player X is Human and Player Slot NOT a Slot 10
+			if gameInfo.PlayerOptions[10].Human and not gameInfo.PlayerOptions[10].Ready and not gameInfo.PlayerOptions[slot].Ready then -- IF Slot 10 is Human and NOT Ready, AND IF Player X is NOT Ready
 				LAST_name = gameInfo.PlayerOptions[10].PlayerName
 				LAST_id = gameInfo.PlayerOptions[10].OwnerID
 				LAST_rating_color = gameInfo.PlayerOptions[10].RC
@@ -518,20 +608,26 @@ local function DoSlotBehavior(slot, key, name)
                 LAST_faction = gameInfo.PlayerOptions[10].Faction
 				LAST_numgame = gameInfo.PlayerOptions[10].NG
 				--***
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[10].OwnerID, gameInfo.PlayerOptions[10].PlayerName, 10) -- move slot 10 to observer
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[10].OwnerID, gameInfo.PlayerOptions[10].PlayerName, 10) -- Move Slot 10 to Observer
 				ClearSlotInfo(10)
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 10) -- move select slot to slot 10
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 10) -- Move Player X to Slot 10
 				ClearSlotInfo(slot)
                 HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
-			else -- destination slot is empty
+			elseif gameInfo.PlayerOptions[slot].Human and gameInfo.PlayerOptions[slot].Ready then -- IF Player X is Human and Ready
+				AddChatText('You cannot move the Player '..slot..' to Slot 10 because the Slot 10 is Ready (for the moment (reasons: hide bug))')
+			elseif gameInfo.PlayerOptions[10].Human and gameInfo.PlayerOptions[10].Ready then -- IF Slot 10 is Human and Ready
+				AddChatText('You cannot move the Player '..slot..' to Slot 10 because the Player '..slot..' is Ready (for the moment (reasons: hide bug))')
+			elseif not gameInfo.PlayerOptions[10].Human and not gameInfo.PlayerOptions[10].Ready then -- IF Slot 10 is NOT Human and NOT Ready
 				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 10)
+			else
+				AddChatText('You cannot move the Player '..slot..' !')
 			end
 		else
-			AddChatText('You cannot move the Player 10 to Slot 10 !')
+			AddChatText('You cannot move the Player '..slot..' to Slot 10 !')
 		end
-	elseif key == 'move_slot_to_slot11' then
-		if gameInfo.PlayerOptions[slot].Human and slot != 11 then
-			if gameInfo.PlayerOptions[11].Human then -- If destination slot player exist
+	elseif key == 'move_player_to_slot11' then
+		if gameInfo.PlayerOptions[slot].Human and slot != 11 then -- IF Player X is Human and Player Slot NOT a Slot 11
+			if gameInfo.PlayerOptions[11].Human and not gameInfo.PlayerOptions[11].Ready and not gameInfo.PlayerOptions[slot].Ready then -- IF Slot 11 is Human and NOT Ready, AND IF Player X is NOT Ready
 				LAST_name = gameInfo.PlayerOptions[11].PlayerName
 				LAST_id = gameInfo.PlayerOptions[11].OwnerID
 				LAST_rating_color = gameInfo.PlayerOptions[11].RC
@@ -539,20 +635,26 @@ local function DoSlotBehavior(slot, key, name)
                 LAST_faction = gameInfo.PlayerOptions[11].Faction
 				LAST_numgame = gameInfo.PlayerOptions[11].NG
 				--***
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[11].OwnerID, gameInfo.PlayerOptions[11].PlayerName, 11) -- move slot 11 to observer
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[11].OwnerID, gameInfo.PlayerOptions[11].PlayerName, 11) -- Move Slot 11 to Observer
 				ClearSlotInfo(11)
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 11) -- move select slot to slot 11
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 11) -- Move Player X to Slot 11
 				ClearSlotInfo(slot)
                 HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
-			else -- destination slot is empty
+			elseif gameInfo.PlayerOptions[slot].Human and gameInfo.PlayerOptions[slot].Ready then -- IF Player X is Human and Ready
+				AddChatText('You cannot move the Player '..slot..' to Slot 11 because the Slot 11 is Ready (for the moment (reasons: hide bug))')
+			elseif gameInfo.PlayerOptions[11].Human and gameInfo.PlayerOptions[11].Ready then -- IF Slot 11 is Human and Ready
+				AddChatText('You cannot move the Player '..slot..' to Slot 11 because the Player '..slot..' is Ready (for the moment (reasons: hide bug))')
+			elseif not gameInfo.PlayerOptions[11].Human and not gameInfo.PlayerOptions[11].Ready then -- IF Slot 11 is NOT Human and NOT Ready
 				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 11)
+			else
+				AddChatText('You cannot move the Player '..slot..' !')
 			end
 		else
-			AddChatText('You cannot move the Player 11 to Slot 11 !')
+			AddChatText('You cannot move the Player '..slot..' to Slot 11 !')
 		end
-	elseif key == 'move_slot_to_slot12' then
-		if gameInfo.PlayerOptions[slot].Human and slot != 12 then
-			if gameInfo.PlayerOptions[12].Human then -- If destination slot player exist
+	elseif key == 'move_player_to_slot12' then
+		if gameInfo.PlayerOptions[slot].Human and slot != 12 then -- IF Player X is Human and Player Slot NOT a Slot 12
+			if gameInfo.PlayerOptions[12].Human and not gameInfo.PlayerOptions[12].Ready and not gameInfo.PlayerOptions[slot].Ready then -- IF Slot 12 is Human and NOT Ready, AND IF Player X is NOT Ready
 				LAST_name = gameInfo.PlayerOptions[12].PlayerName
 				LAST_id = gameInfo.PlayerOptions[12].OwnerID
 				LAST_rating_color = gameInfo.PlayerOptions[12].RC
@@ -560,16 +662,22 @@ local function DoSlotBehavior(slot, key, name)
                 LAST_faction = gameInfo.PlayerOptions[12].Faction
 				LAST_numgame = gameInfo.PlayerOptions[12].NG
 				--***
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[12].OwnerID, gameInfo.PlayerOptions[12].PlayerName, 12) -- move slot 12 to observer
+				HostConvertPlayerToObserver(gameInfo.PlayerOptions[12].OwnerID, gameInfo.PlayerOptions[12].PlayerName, 12) -- Move Slot 12 to Observer
 				ClearSlotInfo(12)
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 12) -- move select slot to slot 12
+				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 12) -- Move Player X to Slot 12
 				ClearSlotInfo(slot)
                 HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
-			else -- destination slot is empty
+			elseif gameInfo.PlayerOptions[slot].Human and gameInfo.PlayerOptions[slot].Ready then -- IF Player X is Human and Ready
+				AddChatText('You cannot move the Player '..slot..' to Slot 12 because the Slot 12 is Ready (for the moment (reasons: hide bug))')
+			elseif gameInfo.PlayerOptions[12].Human and gameInfo.PlayerOptions[12].Ready then -- IF Slot 12 is Human and Ready
+				AddChatText('You cannot move the Player '..slot..' to Slot 12 because the Player '..slot..' is Ready (for the moment (reasons: hide bug))')
+			elseif not gameInfo.PlayerOptions[12].Human and not gameInfo.PlayerOptions[12].Ready then -- IF Slot 12 is NOT Human and NOT Ready
 				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 12)
+			else
+				AddChatText('You cannot move the Player '..slot..' !')
 			end
 		else
-			AddChatText('You cannot move the Player 12 to Slot 12 !')
+			AddChatText('You cannot move the Player '..slot..' to Slot 12 !')
 		end
 	--\\ Stop Move player slot to slot
 	--// Move Player slot to Observer -- Xinnony
@@ -871,6 +979,10 @@ function SetSlotInfo(slot, playerInfo)
         Prefs.SetToCurrentProfile('LastFaction', playerInfo.Faction)
     end
 	
+	--// Show the Country Flag in slot - Xinnony
+	SetSlotCountryFlag(slot, playerInfo)
+	--\\ Stop - Show the Country Flag in slot
+	
 	--CPU Benchmark code
 	SetSlotCPUBar(slot, playerInfo) --Update the slot CPU bar
 	--End CPU Benchmark code
@@ -919,6 +1031,7 @@ function ClearSlotInfo(slot)
     end
 
     -- hide these to clear slot of visible data
+	GUI.slots[slot].KinderCountry:Hide() -- Hide the Country Flag
 	GUI.slots[slot].ratingGroup:Hide()
 	GUI.slots[slot].numGamesGroup:Hide()
     GUI.slots[slot].faction:Hide()
@@ -1490,79 +1603,81 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         lobbyComm:LaunchGame(gameInfo)		
     end
 
-    if singlePlayer or HasCommandLineArg('/gpgnet') then
-        LaunchGame()
-    else
-        launchThread = ForkThread(function()
-            GUI.launchGameButton.label:SetText(LOC("<LOC PROFILE_0005>"))
-            GUI.launchGameButton.OnClick = function(self)
-                CancelLaunch()
-                self.OnClick = function(self) TryLaunch(false) end
-                GUI.launchGameButton.label:SetText(LOC("<LOC lobui_0212>Launch"))
-            end
-			if gameInfo.GameOptions['RandomMap'] != 'Off' then
-				local rMapSizeFil = import('/lua/ui/dialogs/mapselect.lua').rMapSizeFil
-				local rMapSizeFilLim = import('/lua/ui/dialogs/mapselect.lua').rMapSizeFilLim
-				local rMapPlayersFil = import('/lua/ui/dialogs/mapselect.lua').rMapPlayersFil
-				local rMapPlayersFilLim = import('/lua/ui/dialogs/mapselect.lua').rMapPlayersFilLim
-				SendSystemMessage("-------------------------------------------------------------------------------------------------------------------")
-				if rMapSizeFilLim == 'equal' then
-					rMapSizeFilLim = '='
-				end
-				if rMapSizeFilLim == 'less' then
-					rMapSizeFilLim = '<='
-				end
-				if rMapSizeFilLim == 'greater' then
-					rMapSizeFilLim = '>='
-				end
-				if rMapPlayersFilLim == 'equal' then
-					rMapPlayersFilLim = '='
-				end
-				if rMapPlayersFilLim == 'less' then
-					rMapPlayersFilLim = '<='
-				end
-				if rMapPlayersFilLim == 'greater' then
-					rMapPlayersFilLim = '>='
-				end
-				if rMapSizeFil != 0 and rMapPlayersFil != 0 then
-					SendSystemMessage(LOCF("<LOC lobui_0558>Random Map enabled: Map Size is %s %dkm and Number of Players are %s %d", rMapSizeFilLim, rMapSizeFil, rMapPlayersFilLim, rMapPlayersFil))
-				elseif rMapSizeFil != 0 then
-					SendSystemMessage(LOCF("<LOC lobui_0559>Random Map enabled: Map Size is %s %dkm and Number of Players are ALL", rMapSizeFilLim, rMapSizeFil))
-				elseif rMapPlayersFil != 0 then
-					SendSystemMessage(LOCF("<LOC lobui_0560>Random Map enabled: Map Size is ALL and Number of Players are %s %d", rMapPlayersFilLim, rMapPlayersFil))
-				else
-					SendSystemMessage(LOC("<LOC lobui_0561>Random Map enabled: Map Size is ALL and Number of Players are ALL"))
-				end
-				SendSystemMessage("-------------------------------------------------------------------------------------------------------------------")			
-			end
-            local timer = 5
-            while timer > 0 do
-                local text = LOCF('%s %d', "<LOC lobby_0001>Game will launch in", timer)
-                SendSystemMessage(text)
-                timer = timer - 1
-                WaitSeconds(1)
-            end			
-            LaunchGame()
-        end)
-    end
+    --if singlePlayer then--or HasCommandLineArg('/gpgnet') then
+		LaunchGame()
+    --else
+	--// This code is a pre-launch timer, disable by a community
+        --launchThread = ForkThread(function()
+            --GUI.launchGameButton.label:SetText(LOC("<LOC PROFILE_0005>"))
+            --GUI.launchGameButton.OnClick = function(self)
+                --CancelLaunch()
+                --self.OnClick = function(self) TryLaunch(false) end
+                --GUI.launchGameButton.label:SetText(LOC("<LOC lobui_0212>Launch"))
+            --end
+			--if gameInfo.GameOptions['RandomMap'] != 'Off' then
+				--local rMapSizeFil = import('/lua/ui/dialogs/mapselect.lua').rMapSizeFil
+				--local rMapSizeFilLim = import('/lua/ui/dialogs/mapselect.lua').rMapSizeFilLim
+				--local rMapPlayersFil = import('/lua/ui/dialogs/mapselect.lua').rMapPlayersFil
+				--local rMapPlayersFilLim = import('/lua/ui/dialogs/mapselect.lua').rMapPlayersFilLim
+				--SendSystemMessage("-------------------------------------------------------------------------------------------------------------------")
+				--if rMapSizeFilLim == 'equal' then
+					--rMapSizeFilLim = '='
+				--end
+				--if rMapSizeFilLim == 'less' then
+					--rMapSizeFilLim = '<='
+				--end
+				--if rMapSizeFilLim == 'greater' then
+					--rMapSizeFilLim = '>='
+				--end
+				--if rMapPlayersFilLim == 'equal' then
+					--rMapPlayersFilLim = '='
+				--end
+				--if rMapPlayersFilLim == 'less' then
+					--rMapPlayersFilLim = '<='
+				--end
+				--if rMapPlayersFilLim == 'greater' then
+					--rMapPlayersFilLim = '>='
+				--end
+				--if rMapSizeFil != 0 and rMapPlayersFil != 0 then
+					--SendSystemMessage(LOCF("<LOC lobui_0558>Random Map enabled: Map Size is %s %dkm and Number of Players are %s %d", rMapSizeFilLim, rMapSizeFil, rMapPlayersFilLim, rMapPlayersFil))
+				--elseif rMapSizeFil != 0 then
+					--SendSystemMessage(LOCF("<LOC lobui_0559>Random Map enabled: Map Size is %s %dkm and Number of Players are ALL", rMapSizeFilLim, rMapSizeFil))
+				--elseif rMapPlayersFil != 0 then
+					--SendSystemMessage(LOCF("<LOC lobui_0560>Random Map enabled: Map Size is ALL and Number of Players are %s %d", rMapPlayersFilLim, rMapPlayersFil))
+				--else
+					--SendSystemMessage(LOC("<LOC lobui_0561>Random Map enabled: Map Size is ALL and Number of Players are ALL"))
+				--end
+				--SendSystemMessage("-------------------------------------------------------------------------------------------------------------------")			
+			--end
+            --local timer = 5
+            --while timer > 0 do
+                --local text = LOCF('%s %d', "<LOC lobby_0001>Game will launch in", timer)
+                --SendSystemMessage(text)
+                --timer = timer - 1
+                --WaitSeconds(1)
+            --end			
+            --LaunchGame()
+        --end)
+    --end
 end
 
-function CancelLaunch()
-    if launchThread then 
-        KillThread(launchThread)
-        launchThread = false
-        GUI.launchGameButton.label:SetText(LOC("<LOC lobui_0212>Launch"))
-        GUI.launchGameButton.OnClick = function(self)
-            TryLaunch(false)
-        end
-        if GetPlayersNotReady() then
-            local msg = LOCF('<LOC lobui_0308>Launch sequence has been aborted by %s.', GetPlayersNotReady()[1])
-            SendSystemMessage(msg)
-        else
-            SendSystemMessage(LOC('<LOC lobui_0309>Host has cancelled the launch sequence.'))
-        end
-    end
-end
+--// This code is a pre-launch timer, disable by a community
+--function CancelLaunch()
+    --if launchThread then 
+        --KillThread(launchThread)
+        --launchThread = false
+        --GUI.launchGameButton.label:SetText(LOC("<LOC lobui_0212>Launch"))
+        --GUI.launchGameButton.OnClick = function(self)
+            --TryLaunch(false)
+        --end
+        --if GetPlayersNotReady() then
+            --local msg = LOCF('<LOC lobui_0308>Launch sequence has been aborted by %s.', GetPlayersNotReady()[1])
+            --SendSystemMessage(msg)
+        --else
+            --SendSystemMessage(LOC('<LOC lobui_0309>Host has cancelled the launch sequence.'))
+        --end
+    --end
+--end
 
 local function AlertHostMapMissing()
     if lobbyComm:IsHost() then
@@ -1820,24 +1935,30 @@ local function UpdateGame()
 				end
 				--LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
 			else
-				if scenarioInfo.map_version then
-					randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."] (Game quality : N/A)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
-				else
-					randmapText:SetText(scenarioInfo.name.." (Game quality : N/A)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
+				if randmapText then
+					if scenarioInfo.map_version then
+						randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."] (Game quality : N/A)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
+					else
+						randmapText:SetText(scenarioInfo.name.." (Game quality : N/A)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
+					end
 				end
 			end
 		else
+			if randmapText then
+				if scenarioInfo.map_version then
+					randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."]") -- Set the map name and quality at the top right corner in lobby -- Xinnony
+				else
+					randmapText:SetText(scenarioInfo.name) -- Set the map name and quality at the top right corner in lobby -- Xinnony
+				end
+			end
+		end
+	else
+		if randmapText then
 			if scenarioInfo.map_version then
 				randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."]") -- Set the map name and quality at the top right corner in lobby -- Xinnony
 			else
 				randmapText:SetText(scenarioInfo.name) -- Set the map name and quality at the top right corner in lobby -- Xinnony
 			end
-		end
-	else
-		if scenarioInfo.map_version then
-			randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."]") -- Set the map name and quality at the top right corner in lobby -- Xinnony
-		else
-			randmapText:SetText(scenarioInfo.name) -- Set the map name and quality at the top right corner in lobby -- Xinnony
 		end
 	end
 	--// For refresh menu in slot -- Xinnony
@@ -1971,6 +2092,14 @@ end
 
 -- slot less than 1 means try to find a slot
 function HostTryAddPlayer( senderID, slot, requestedPlayerName, human, aiPersonality, requestedColor, requestedFaction, requestedTeam, requestedPL, requestedRC, requestedNG, requestedMEAN, requestedDEV )	
+	--// COUNTRY - Xinnony
+	--If new player join, send the Country to all player already joined
+	if human and not singlePlayer then
+		for i, Country in Country_List do
+			lobbyComm:SendData(senderID, { Type = 'Country', PlayerName = Country.PlayerName, Result = Country.Result } )
+		end
+	end
+	--\\ Stop COUNTRY
 	-- CPU benchmark code
 	if human and not singlePlayer then
 		for i,benchmark in CPU_BenchmarkList do
@@ -2143,6 +2272,7 @@ function HostConvertPlayerToObserver(senderID, name, playerSlot)
     gameInfo.Observers[index] = {
         PlayerName = name,
         OwnerID = senderID,
+		PL = gameInfo.PlayerOptions[playerSlot].PL,
     }
     
     if lobbyComm:IsHost() then
@@ -2418,7 +2548,7 @@ function CreateUI(maxPlayers)
 	LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
 	
 	--// Credits -- Xinnony
-	local Credits = "New functions added by Xinnony | Power Lobby 2.0 by Moritz"
+	local Credits = "Lot of changes and functions by Xinnony | Power Lobby 2.0 by Moritz"
 	--***********************
 	Credits_Shadows1 = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
     Credits_Shadows1:SetFont(UIUtil.titleFont, 12)
@@ -2452,7 +2582,17 @@ function CreateUI(maxPlayers)
     GUI.playerPanel.Width:Set(706)
     GUI.playerPanel.Height:Set(307)
 
-    GUI.observerPanel = Group(GUI.panel, "observerPanel")
+    GUI.buttonPanelTop = Group(GUI.panel, "buttonPanelTop") -- Added group for Button - Xinnony
+	LayoutHelpers.AtLeftTopIn(GUI.buttonPanelTop, GUI.panel, 40, 383)
+    GUI.buttonPanelTop.Width:Set(706)
+    GUI.buttonPanelTop.Height:Set(19)
+	
+	GUI.buttonPanelRight = Group(GUI.panel, "buttonPanelRight") -- Added group for Button - Xinnony
+	LayoutHelpers.AtLeftTopIn(GUI.buttonPanelRight, GUI.panel, 481, 401)
+    GUI.buttonPanelRight.Width:Set(265)
+    GUI.buttonPanelRight.Height:Set(89)
+	
+	GUI.observerPanel = Group(GUI.panel, "observerPanel")
     LayoutHelpers.AtLeftTopIn(GUI.observerPanel, GUI.panel, 40, 378)
     GUI.observerPanel.Width:Set(706)
     GUI.observerPanel.Height:Set(114)
@@ -2890,51 +3030,50 @@ function CreateUI(maxPlayers)
     local prev = nil
 
     local slotColumnSizes = {
-		rating = {x = 48, width = 51},
-		games = {x = 103, width = 51},
-        player = {x = 157, width = 251},
-        color = {x = 417, width = 59},
-        faction = {x = 485, width = 59},
-        team = {x = 553, width = 60},
-        ping = {x = 620, width = 62},
-        ready = {x = 685, width = 51},
+		rating = {x = 25+48, width = 51},
+		games = {x = 25+103, width = 51},
+        player = {x = 25+157, width = 251},
+        color = {x = 25+417, width = 59},
+        faction = {x = 25+485, width = 59},
+        team = {x = 25+553, width = 60},
+        ping = {x = 25+620, width = 62},
+        ready = {x = 25+685, width = 51},
     }
 
     GUI.labelGroup = Group(GUI.playerPanel)
-    GUI.labelGroup.Width:Set(690)
-    GUI.labelGroup.Height:Set(21)
-
-    LayoutHelpers.AtLeftTopIn(GUI.labelGroup, GUI.playerPanel, 5, 5)	
+		GUI.labelGroup.Width:Set(690)
+		GUI.labelGroup.Height:Set(21)
+		LayoutHelpers.AtLeftTopIn(GUI.labelGroup, GUI.playerPanel, 5, 5)	
 		
 	GUI.ratingLabel = UIUtil.CreateText(GUI.labelGroup, "<LOC _Rating>Rating", 14, UIUtil.titleFont)
-	LayoutHelpers.AtLeftIn(GUI.ratingLabel, GUI.panel, slotColumnSizes.rating.x)
-	LayoutHelpers.AtVerticalCenterIn(GUI.ratingLabel, GUI.labelGroup, 5)
-	Tooltip.AddControlTooltip(GUI.ratingLabel, 'rating')
+		LayoutHelpers.AtLeftIn(GUI.ratingLabel, GUI.panel, slotColumnSizes.rating.x)
+		LayoutHelpers.AtVerticalCenterIn(GUI.ratingLabel, GUI.labelGroup, 5)
+		Tooltip.AddControlTooltip(GUI.ratingLabel, 'rating')
 	
 	GUI.numGamesLabel = UIUtil.CreateText(GUI.labelGroup, "<LOC _Games>Games", 14, UIUtil.titleFont)
-	LayoutHelpers.AtLeftIn(GUI.numGamesLabel, GUI.panel, slotColumnSizes.games.x - 4)
-	LayoutHelpers.AtVerticalCenterIn(GUI.numGamesLabel, GUI.labelGroup, 5)
-	Tooltip.AddControlTooltip(GUI.numGamesLabel, 'num_games')
+		LayoutHelpers.AtLeftIn(GUI.numGamesLabel, GUI.panel, slotColumnSizes.games.x - 4)
+		LayoutHelpers.AtVerticalCenterIn(GUI.numGamesLabel, GUI.labelGroup, 5)
+		Tooltip.AddControlTooltip(GUI.numGamesLabel, 'num_games')
 
     GUI.nameLabel = UIUtil.CreateText(GUI.labelGroup, "<LOC lobui_0213>Player Name", 14, UIUtil.titleFont)
-    LayoutHelpers.AtLeftIn(GUI.nameLabel, GUI.panel, slotColumnSizes.player.x)
-    LayoutHelpers.AtVerticalCenterIn(GUI.nameLabel, GUI.labelGroup, 5)
-    Tooltip.AddControlTooltip(GUI.nameLabel, 'lob_slot')
+		LayoutHelpers.AtLeftIn(GUI.nameLabel, GUI.panel, slotColumnSizes.player.x)
+		LayoutHelpers.AtVerticalCenterIn(GUI.nameLabel, GUI.labelGroup, 5)
+		Tooltip.AddControlTooltip(GUI.nameLabel, 'lob_slot')
 
     GUI.colorLabel = UIUtil.CreateText(GUI.labelGroup, "<LOC lobui_0214>Color", 14, UIUtil.titleFont)
-    LayoutHelpers.AtLeftIn(GUI.colorLabel, GUI.panel, slotColumnSizes.color.x)
-    LayoutHelpers.AtVerticalCenterIn(GUI.colorLabel, GUI.labelGroup, 5)
-    Tooltip.AddControlTooltip(GUI.colorLabel, 'lob_color')
+		LayoutHelpers.AtLeftIn(GUI.colorLabel, GUI.panel, slotColumnSizes.color.x)
+		LayoutHelpers.AtVerticalCenterIn(GUI.colorLabel, GUI.labelGroup, 5)
+		Tooltip.AddControlTooltip(GUI.colorLabel, 'lob_color')
 
     GUI.factionLabel = UIUtil.CreateText(GUI.labelGroup, "<LOC lobui_0215>Faction", 14, UIUtil.titleFont)
-    LayoutHelpers.AtLeftIn(GUI.factionLabel, GUI.panel, slotColumnSizes.faction.x)
-    LayoutHelpers.AtVerticalCenterIn(GUI.factionLabel, GUI.labelGroup, 5)
-    Tooltip.AddControlTooltip(GUI.factionLabel, 'lob_faction')
+		LayoutHelpers.AtLeftIn(GUI.factionLabel, GUI.panel, slotColumnSizes.faction.x)
+		LayoutHelpers.AtVerticalCenterIn(GUI.factionLabel, GUI.labelGroup, 5)
+		Tooltip.AddControlTooltip(GUI.factionLabel, 'lob_faction')
 
     GUI.teamLabel = UIUtil.CreateText(GUI.labelGroup, "<LOC lobui_0216>Team", 14, UIUtil.titleFont)
-    LayoutHelpers.AtLeftIn(GUI.teamLabel, GUI.panel, slotColumnSizes.team.x)
-    LayoutHelpers.AtVerticalCenterIn(GUI.teamLabel, GUI.labelGroup, 5)
-    Tooltip.AddControlTooltip(GUI.teamLabel, 'lob_team')
+		LayoutHelpers.AtLeftIn(GUI.teamLabel, GUI.panel, slotColumnSizes.team.x)
+		LayoutHelpers.AtVerticalCenterIn(GUI.teamLabel, GUI.labelGroup, 5)
+		Tooltip.AddControlTooltip(GUI.teamLabel, 'lob_team')
 
     if not singlePlayer then
         GUI.pingLabel = UIUtil.CreateText(GUI.labelGroup, "<LOC lobui_0217>Ping", 14, UIUtil.titleFont)
@@ -2943,8 +3082,8 @@ function CreateUI(maxPlayers)
 		--Tooltip.AddControlTooltip(GUI.pingLabel, '') -- NEED INFO (write tooltip in "\lua\ui\help\tooltips.lua")
 
         GUI.readyLabel = UIUtil.CreateText(GUI.labelGroup, "<LOC lobui_0218>Ready", 14, UIUtil.titleFont)
-        LayoutHelpers.AtLeftIn(GUI.readyLabel, GUI.panel, slotColumnSizes.ready.x)
-        LayoutHelpers.AtVerticalCenterIn(GUI.readyLabel, GUI.labelGroup, 5)
+        LayoutHelpers.AtLeftIn(GUI.readyLabel, GUI.panel, slotColumnSizes.ready.x-3)
+        LayoutHelpers.AtVerticalCenterIn(GUI.readyLabel, GUI.labelGroup, 5) -- XinnonyWork
 		--Tooltip.AddControlTooltip(GUI.readyLabel, '') -- NEED INFO (write tooltip in "\lua\ui\help\tooltips.lua")
     end
 
@@ -2972,6 +3111,17 @@ function CreateUI(maxPlayers)
         end
 
         local bg = GUI.slots[i]
+		
+		--// COUNTRY - Xinnony
+		-- Added a bitmap on the left of Rating, the bitmap is a Flag of Country
+		-- PS : I love KinderCountry !, if you have, you can send your chocolate for me.
+		GUI.slots[i].KinderCountry = Bitmap(bg, UIUtil.SkinnableFile("/countries/world.dds"))
+		GUI.slots[i].KinderCountry.Width:Set(20)
+		GUI.slots[i].KinderCountry.Height:Set(16)
+		LayoutHelpers.AtBottomIn(GUI.slots[i].KinderCountry, GUI.slots[i], -6)
+		LayoutHelpers.AtLeftIn(GUI.slots[i].KinderCountry, GUI.slots[i], 0) --XinnonyWork (last -8)
+		--Tooltip.AddControlTooltip(GUI.slots[i].KinderCountry, '')
+		--\\ Stop COUNTRY
 		
         GUI.slots[i].ratingGroup = Group(bg)
 		GUI.slots[i].ratingGroup.Width:Set(slotColumnSizes.rating.width)
@@ -3104,7 +3254,7 @@ function CreateUI(maxPlayers)
             GUI.slots[i].ready = UIUtil.CreateCheckboxStd(GUI.slots[i].multiSpace, '/dialogs/check-box_btn/radio')
             GUI.slots[i].ready.row = i
             LayoutHelpers.AtVerticalCenterIn(GUI.slots[curRow].ready, GUI.slots[curRow].multiSpace, 8)
-            LayoutHelpers.AtLeftIn(GUI.slots[curRow].ready, GUI.slots[curRow].multiSpace, 10)
+            LayoutHelpers.AtLeftIn(GUI.slots[curRow].ready, GUI.slots[curRow].multiSpace, 0) -- XinnonyWork (last 10 value)
             GUI.slots[i].ready.OnCheck = function(self, checked)	
                 if checked then
                     DisableSlot(self.row, true)
@@ -3154,7 +3304,7 @@ function CreateUI(maxPlayers)
     ---------------------------------------------------------------------------
     -- set up observer and limbo grid
     ---------------------------------------------------------------------------
-
+	
     GUI.allowObservers = nil
     GUI.observerList = nil
 	
@@ -3165,22 +3315,17 @@ function CreateUI(maxPlayers)
 	end
 
     if not singlePlayer then
-	
 		uef = true
 		aeon = true
 		cybran = true
 		seraphim = true	
-	
-        GUI.observerLabel = UIUtil.CreateText(GUI.observerPanel, "<LOC lobui_0275>Observers", 14, UIUtil.bodyFont)
-        LayoutHelpers.AtLeftTopIn(GUI.observerLabel, GUI.observerPanel, 5, 6)
 
-        Tooltip.AddControlTooltip(GUI.observerLabel, 'lob_describe_observers')
-
-        GUI.allowObservers = UIUtil.CreateCheckboxStd(GUI.observerPanel, '/dialogs/check-box_btn/radio')
-        LayoutHelpers.CenteredRightOf(GUI.allowObservers, GUI.observerLabel, 0)
-
-        Tooltip.AddControlTooltip(GUI.allowObservers, 'lob_observers_allowed')
-
+        GUI.allowObservers = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/dialogs/check-box_btn/radio')
+			LayoutHelpers.CenteredLeftOf(GUI.allowObservers, GUI.buttonPanelTop, -30)
+			Tooltip.AddControlTooltip(GUI.allowObservers, 'lob_observers_allowed')
+		GUI.observerLabel = UIUtil.CreateText(GUI.buttonPanelTop, "<LOC lobui_0275>Observers", 14, UIUtil.bodyFont)
+			LayoutHelpers.CenteredRightOf(GUI.observerLabel, GUI.allowObservers, 0)
+			Tooltip.AddControlTooltip(GUI.observerLabel, 'lob_describe_observers')
         GUI.allowObservers:SetCheck(false)
         if lobbyComm:IsHost() then
             SetGameOption("AllowObservers",false)
@@ -3189,11 +3334,9 @@ function CreateUI(maxPlayers)
             end
 		end
 
-        GUI.becomeObserver = UIUtil.CreateButtonStd(GUI.observerPanel, '/lobby/lan-game-lobby/toggle', "<LOC lobui_0228>Observe", 10, 0)
-        LayoutHelpers.CenteredRightOf(GUI.becomeObserver, GUI.allowObservers, 5)
-
-        Tooltip.AddButtonTooltip(GUI.becomeObserver, 'lob_become_observer')
-        
+		GUI.becomeObserver = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/lobby/lan-game-lobby/toggle', "<LOC lobui_0228>Observe", 10, 0)
+			LayoutHelpers.AtLeftTopIn(GUI.becomeObserver, GUI.buttonPanelRight, 10)
+			Tooltip.AddButtonTooltip(GUI.becomeObserver, 'lob_become_observer')
         GUI.becomeObserver.OnClick = function(self, modifiers)
             if IsPlayer(localPlayerID) then
                 if lobbyComm:IsHost() then
@@ -3205,44 +3348,33 @@ function CreateUI(maxPlayers)
         end		
 		
 		if lobbyComm:IsHost() then
-			--start of auto teams code by Moritz	
-			
-			-- Removed random teams button (needed this spot for the CPU test button)
-			-- This option can still be set in game options (Duck_42)
-			
-			--START REMOVED CODE
-			-- GUI.randTeam = UIUtil.CreateButtonStd(GUI.observerPanel, '/lobby/lan-game-lobby/toggle', "<LOC lobui_0506>Auto Teams", 10, 0)
-			-- LayoutHelpers.CenteredRightOf(GUI.randTeam, GUI.becomeObserver, 5)
-			
-			-- Tooltip.AddButtonTooltip(GUI.randTeam, 'lob_click_randteam')
-			
-			-- GUI.randTeam.OnClick = function(self, modifiers)								
-				-- if gameInfo.GameOptions['AutoTeams'] == 'none' then
-					-- Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 2)
-					-- SetGameOption('AutoTeams', 'tvsb')
-				-- elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
-					-- Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 3)
-					-- SetGameOption('AutoTeams', 'lvsr')
-				-- elseif gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
-					-- Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 4)
-					-- SetGameOption('AutoTeams', 'pvsi')
-				-- elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' then
-					-- Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 5)
-					-- SetGameOption('AutoTeams', 'manual')
-				-- else
-					-- Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 1)
-					-- SetGameOption('AutoTeams', 'none')
-				-- end				
-			-- end
-			--END REMOVED CODE
-			
+			--start of auto teams code by Moritz
+			GUI.randTeam = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/lobby/lan-game-lobby/toggle', "<LOC lobui_0506>Auto Teams", 10, 0)
+				LayoutHelpers.AtLeftTopIn(GUI.randTeam, GUI.buttonPanelRight, 10, 25)
+				Tooltip.AddButtonTooltip(GUI.randTeam, 'lob_click_randteam')
+			GUI.randTeam.OnClick = function(self, modifiers)								
+				if gameInfo.GameOptions['AutoTeams'] == 'none' then
+					Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 2)
+					SetGameOption('AutoTeams', 'tvsb')
+				elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
+					Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 3)
+					SetGameOption('AutoTeams', 'lvsr')
+				elseif gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
+					Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 4)
+					SetGameOption('AutoTeams', 'pvsi')
+				elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' then
+					Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 5)
+					SetGameOption('AutoTeams', 'manual')
+				else
+					Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 1)
+					SetGameOption('AutoTeams', 'none')
+				end				
+			end
 			--end of auto teams code
 			--start of random map code by Moritz
-			GUI.randMap = UIUtil.CreateButtonStd(GUI.observerPanel, '/lobby/lan-game-lobby/toggle', "<LOC lobui_0503>Random Map", 10, 0)
-			LayoutHelpers.CenteredRightOf(GUI.randMap, GUI.becomeObserver, 130)
-			
-			Tooltip.AddButtonTooltip(GUI.randMap, 'lob_click_randmap')
-			
+			GUI.randMap = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/lobby/lan-game-lobby/toggle', "<LOC lobui_0503>Random Map", 10, 0)
+				LayoutHelpers.CenteredRightOf(GUI.randMap, GUI.randTeam, 5)
+				Tooltip.AddButtonTooltip(GUI.randMap, 'lob_click_randmap')
 			GUI.randMap.OnClick = function()
 				local randomMap
 				randomMap = import('/lua/ui/dialogs/mapselect.lua').randomLobbyMap()
@@ -3298,10 +3430,8 @@ function CreateUI(maxPlayers)
 		--end of random map code
 		--start of ranked options code
 			GUI.rankedOptions = UIUtil.CreateButtonStd(GUI.observerPanel, '/lobby/lan-game-lobby/toggle', "<LOC lobui_0522>Default Settings", 10, 0)
-			LayoutHelpers.CenteredRightOf(GUI.rankedOptions, GUI.randMap, 5)
-			
-			Tooltip.AddButtonTooltip(GUI.rankedOptions, 'lob_click_rankedoptions')
-			   
+				LayoutHelpers.AtLeftTopIn(GUI.rankedOptions, GUI.buttonPanelRight, 10, 50)
+				Tooltip.AddButtonTooltip(GUI.rankedOptions, 'lob_click_rankedoptions')
 			GUI.rankedOptions.OnClick = function()
 					Prefs.SetToCurrentProfile('Lobby_Gen_Victory', 1)
 					Prefs.SetToCurrentProfile('Lobby_Gen_Timeouts', 2)
@@ -3328,18 +3458,14 @@ function CreateUI(maxPlayers)
 			end
 		--end of ranked options code
 		
-		
-		
-		
-		
 		--start of auto kick code -- Modified by Xinnony
 		if lobbyComm:IsHost() then
-			GUI.autoKickLabel = UIUtil.CreateText(GUI.observerPanel, "Auto kick", 14, UIUtil.bodyFont)
-				LayoutHelpers.CenteredRightOf(GUI.autoKickLabel, GUI.rankedOptions, 5)
-				Tooltip.AddControlTooltip(GUI.autoKickLabel, 'lob_auto_kick')
-			GUI.autoKick = UIUtil.CreateCheckboxStd(GUI.observerPanel, '/dialogs/check-box_btn/radio')
-				LayoutHelpers.CenteredRightOf(GUI.autoKick, GUI.autoKickLabel, 0)
+			GUI.autoKick = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/dialogs/check-box_btn/radio')
+				LayoutHelpers.CenteredRightOf(GUI.autoKick, GUI.observerLabel, 10)
 				Tooltip.AddControlTooltip(GUI.autoKick, 'lob_auto_kick')
+			GUI.autoKickLabel = UIUtil.CreateText(GUI.buttonPanelTop, "Auto kick", 14, UIUtil.bodyFont)
+				LayoutHelpers.CenteredRightOf(GUI.autoKickLabel, GUI.autoKick, 0)
+				Tooltip.AddControlTooltip(GUI.autoKickLabel, 'lob_auto_kick')
 			GUI.autoKick:SetCheck(false)
 			autoKick = false
 			GUI.autoKick.OnCheck = function(self, checked)
@@ -3350,13 +3476,13 @@ function CreateUI(maxPlayers)
 		--end of auto kick code
 		
         GUI.observerList = ItemList(GUI.observerPanel, "observer list")
-        GUI.observerList:SetFont(UIUtil.bodyFont, 14)
-        GUI.observerList:SetColors(UIUtil.fontColor, "00000000", UIUtil.fontOverColor, UIUtil.highlightColor, "ffbcfffe")
-        LayoutHelpers.Below(GUI.observerList, GUI.observerLabel, 8)
-        GUI.observerList.Left:Set(function() return GUI.observerLabel.Left() + 5 end)
-        GUI.observerList.Bottom:Set(function() return GUI.observerPanel.Bottom() - 12 end)
-        GUI.observerList.Right:Set(function() return GUI.observerPanel.Right() - 40 end)
-        
+			GUI.observerList:SetFont(UIUtil.bodyFont, 14)
+			GUI.observerList:SetColors(UIUtil.fontColor, "00000000", UIUtil.fontOverColor, UIUtil.highlightColor, "ffbcfffe")
+			LayoutHelpers.Below(GUI.observerList, GUI.observerLabel, 8)
+			GUI.observerList.Left:Set(function() return GUI.observerLabel.Left() + 5 end)
+			GUI.observerList.Bottom:Set(function() return GUI.observerPanel.Bottom() - 12 end)
+			GUI.observerList.Top:Set(function() return GUI.observerPanel.Top() + 27 end)
+			GUI.observerList.Right:Set(function() return GUI.observerPanel.Right() - 299 end)
         GUI.observerList.OnClick = function(self, row, event)
             if lobbyComm:IsHost() and event.Modifiers.Right then
                 UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
@@ -3369,20 +3495,19 @@ function CreateUI(maxPlayers)
                     {worldCover = false, enterButton = 1, escapeButton = 2})
             end
         end
-
         UIUtil.CreateVertScrollbarFor(GUI.observerList)
 		
-		if lobbyComm:IsHost() then
-			GUI.uploadMapButton = UIUtil.CreateButtonStd(GUI.launchPanel, '/scx_menu/small-btn/small', "", 14, 2)
-			GUI.uploadMapButton.label:SetText(LOC("<LOC lobui_0734>Upload Map"))
-			Tooltip.AddControlTooltip(GUI.uploadMapButton, 'lob_upload_map')
-			LayoutHelpers.CenteredRightOf(GUI.uploadMapButton, GUI.exitButton)    
-
-			GUI.uploadMapButton.OnClick = function()
-				uploadNewMap()
-				UpdateGame()
-			end		
-		end
+		--// Upload button not work with FAF for the moment (old GPGnet) -- Xinnony
+		--if lobbyComm:IsHost() then
+			--GUI.uploadMapButton = UIUtil.CreateButtonStd(GUI.launchPanel, '/scx_menu/small-btn/small', "", 14, 2)
+			--GUI.uploadMapButton.label:SetText(LOC("<LOC lobui_0734>Upload Map"))
+			--Tooltip.AddControlTooltip(GUI.uploadMapButton, 'lob_upload_map')
+			--LayoutHelpers.CenteredRightOf(GUI.uploadMapButton, GUI.exitButton)    
+			--GUI.uploadMapButton.OnClick = function()
+				--uploadNewMap()
+				--UpdateGame()
+			--end		
+		--end
 
     else
 
@@ -3451,15 +3576,21 @@ function CreateUI(maxPlayers)
                         if score_CPU then
                             cputext = ", CPU = "..tostring(score_CPU.Result)
                         end
-                        GUI.observerList:ModifyItem(observer.ObserverListIndex, observer.PlayerName  .. LOC("<LOC lobui_0240> (Ping = ") .. tostring(ping) .. cputext .. ")")
+						pingtext = LOC("<LOC lobui_0240> (Ping = ")..tostring(ping)
+						ratingtext = ", Rating = " .. tostring(observer.PL)
+						--PlayerName (Ping = xxx, Rating = xxx, CPU = xxx)
+                        GUI.observerList:ModifyItem(observer.ObserverListIndex, observer.PlayerName  .. pingtext .. ratingtext .. cputext .. ")")
                     elseif observer.OwnerID == localPlayerID then
                         
                         local score_CPU =  FindBenchmarkForName(observer.PlayerName)
                         local cputext = ""
                         if score_CPU then
-                            cputext = " (CPU = "..tostring(score_CPU.Result)..")"
+                            cputext = ", CPU = "..tostring(score_CPU.Result)
                         end
-                        GUI.observerList:ModifyItem(observer.ObserverListIndex, observer.PlayerName  .. cputext)
+						pingtext = ""
+						ratingtext = " (Rating = "..tostring(observer.PL)
+						--PlayerName (Rating = xxx, CPU = xxx)
+                        GUI.observerList:ModifyItem(observer.ObserverListIndex, observer.PlayerName .. ratingtext .. cputext..")")
                         -- End CPU benchmark modified code
                     end
                 end
@@ -3468,6 +3599,11 @@ function CreateUI(maxPlayers)
         end
     )
 	
+	--// COUNTRY - Xinnony
+	if not singlePlayer then
+		CountryScript()
+	end
+	--\\ Stop COUNTRY
 	-- CPU Benchmark code
 	if not singlePlayer then
 		CreateCPUMetricUI()
@@ -3658,7 +3794,8 @@ function RefreshOptionDisplayData(scenarioInfo)
             end
         end
     end
---    table.sort(formattedOptions, 
+-- Disable before separate AI option on GlobalOption, but the order can set on lobbyOptions.lua - Xinnony
+--    table.sort(formattedOptions,
 --        function(a, b)
 --            if a.mod or b.mod then
 --                return a.mod or false
@@ -4104,6 +4241,16 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             AddChatText("["..data.SenderName.."] "..data.Text)
         elseif data.Type == 'PrivateChat' then
             AddChatText("<<"..data.SenderName..">> "..data.Text)
+		--// COUNTRY - Xinnony
+		elseif data.Type == 'Country' then
+			LOG("Country Data: name="..(data.PlayerName or "?")..", result="..(data.Result or "?"))
+			AddPlayerCountry(data)
+			local playerId = FindIDForName(data.PlayerName)
+			local playerSlot = FindSlotForID(playerId)
+			if playerSlot != nil then
+				SetSlotCountryFlag(playerSlot, gameInfo.PlayerOptions[playerSlot])
+			end
+		--\\ Stop COUNTRY
 		-- CPU benchmark code
 		elseif data.Type == 'CPUBenchmark' then
 			LOG("CPU Data: "..(data.PlayerName or "?")..", ".. (data.Result or "?"))
@@ -4382,6 +4529,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
     lobbyComm.PeerDisconnected = function(self,peerName,peerID)
         --LOG('PeerDisconnected : ', peerName, ' ', peerID)
+		--AddChatText('PeerDisconnected : peerName='..peerName..' peerID='..peerID) -- XINNONYWORK -- Here this message always show the player quit !!! TEMPORARY
         --LOG('GameInfo = ', repr(gameInfo))
 
         local slot = FindSlotForID(peerID)
@@ -4967,3 +5115,69 @@ function SetSlotCPUBar(slot, playerInfo)
 		end
 	end
 end
+
+--------------------------------------------------
+-- CountryFlag Functions
+-- Author : Xinnony
+--------------------------------------------------
+--// COUNTRY - Xinnony
+function CountryScript()
+	--LOG('XINNONY - Country is ='..PrefLanguage)
+	-- Send update other players
+	lobbyComm:BroadcastData( { Type = 'Country', PlayerName = localPlayerName, Result = PrefLanguage} )
+	-- Add country to my local country table
+	AddPlayerCountry({PlayerName = localPlayerName, Result = PrefLanguage})
+	-- Update Bitmap
+	local playerId = FindIDForName(localPlayerName)
+	local playerSlot = FindSlotForID(playerId)
+	if playerSlot != nil then
+		SetSlotCountryFlag(playerSlot, gameInfo.PlayerOptions[playerSlot])
+	end	
+end
+function AddPlayerCountry(data)
+	local alreadyExists = false
+	for i, Country in Country_List do
+		if data.PlayerName == Country.PlayerName then
+			alreadyExists = true
+			--AddChatText('XINNONYWORK : data.PlayerName='..data.PlayerName)
+			--AddChatText('XINNONYWORK : Country.PlayerName='..Country.PlayerName)
+			--AddChatText('XINNONYWORK : Country[i]='..Country[i]) = NIL !!!
+			--AddChatText('XINNONYWORK : "C_List.PName[i]='..Country_List[i].PlayerName..'C_List.Result[i]='..Country_List[i].Result)
+			--table.remove(Country_List.PlayerName, i)
+			--table.remove(Country_List.Result, i)
+			--AddChatText('XINNONYWORK : "C_List.PName[i]='..Country_List[i].PlayerName..'C_List.Result[i]='..Country_List[i].Result)
+			Country_List[i].Result = data.Result
+		end
+	end
+	if not alreadyExists then
+		table.insert(Country_List, {PlayerName = data.PlayerName, Result = data.Result})
+	end
+	--if alreadyExists then
+		--table.remove(Country_List, i)
+	--end
+end
+function FindCountryForName(name)
+	for i, Country in Country_List do
+		if name == Country.PlayerName then
+			return Country
+		end
+	end
+	return false
+end
+function SetSlotCountryFlag(slot, playerInfo)
+	--LOG("XINNONY - Country slot="..slot)--..", country="..)
+	--end
+	if GUI.slots[slot].KinderCountry then
+		GUI.slots[slot].KinderCountry:Hide()
+		if playerInfo.Human then
+			local b = FindCountryForName(playerInfo.PlayerName)
+			if b then
+		    	local CountryResult = b.Result
+				LOG('XINNONY - Country is : '.. CountryResult )
+		    	GUI.slots[slot].KinderCountry:Show()
+				GUI.slots[slot].KinderCountry:SetTexture(UIUtil.UIFile('/countries/'..CountryResult..'.dds'))
+	    	end
+		end
+	end
+end
+--\\ Stop COUNTRY
