@@ -2586,6 +2586,9 @@ Unit = Class(moho.unit_methods) {
 
     CreateEnhancementEffects = function( self, enhancement )
         local bp = self:GetBlueprint().Enhancements[enhancement]
+        local effects = TrashBag()  
+        local scale = math.min(4, math.max(1, (bp.BuildCostEnergy / bp.BuildTime or 1) / 50))
+
         if bp.UpgradeEffectBones then
             for k, v in bp.UpgradeEffectBones do
                 if self:IsValidBone(v) then
@@ -2599,6 +2602,11 @@ Unit = Class(moho.unit_methods) {
                     EffectUtilities.CreateEnhancementUnitAmbient(self, v, self.UpgradeEffectsBag )
                 end
             end
+        end
+
+        for _, e in effects do
+            e:ScaleEmitter(scale)
+            self.UpgradeEffectsBag:Add(e)
         end
     end,
 
@@ -4191,7 +4199,7 @@ Unit = Class(moho.unit_methods) {
         self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
 
         # create teleport charge effect
-        self:PlayTeleportChargeEffects()
+        self:PlayTeleportChargeEffects(location)
 
         WaitFor( self.TeleportDrain  ) # Perform fancy Teleportation FX here
 
@@ -4220,16 +4228,24 @@ Unit = Class(moho.unit_methods) {
 		self:OnTeleported(location)
     end,
 
-    PlayTeleportChargeEffects = function(self)
+    PlayTeleportChargeEffects = function(self, location)
         local army = self:GetArmy()
         local bp = self:GetBlueprint()
+        local fx
+        local beacon = Entity()
 
         self.TeleportChargeBag = {}
         for k, v in EffectTemplate.GenericTeleportCharge01 do
-            local fx = CreateEmitterAtEntity(self,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
+            fx = CreateEmitterAtEntity(self,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
             self.Trash:Add(fx)
             table.insert( self.TeleportChargeBag, fx)
         end
+
+        location[2] = GetSurfaceHeight(location[1], location[3])
+        Warp(beacon, location)
+        fx = CreateEmitterAtEntity(beacon, army, '/effects/emitters/_test_swirl_01_emit.bp') -- other effect maybe?
+        self.Trash:Add(fx)
+        table.insert(self.TeleportChargeBag, fx)
     end,
 
     CleanupTeleportChargeEffects = function( self )

@@ -330,38 +330,25 @@ XSL0301 = Class(SWalkingLandUnit) {
         end
         SWalkingLandUnit.OnUnpaused(self)
     end,    
-
-        #Teleport animation
+#Teleport animation
     PlayTeleportInEffects = function(self)
-
-    self:BlockCommands(11)
-    self:PlayUnitSound('CommanderArrival')
-    self:CreateProjectile( '/effects/entities/UnitTeleport01/UnitTeleport01_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
-
-    WaitSeconds(2.1)    
-
-    local totalBones = self:GetBoneCount() - 1
-    local army = self:GetArmy()
-    for k, v in EffectTemplate.UnitTeleportSteam01 do
-        for bone = 1, totalBones do
-            CreateAttachedEmitter(self,bone,army, v)
-        end
-    end
-    end,
-
-    BlockCommands = function(self, duration)
-    local fn = function(self, duration)
-        self:SetUnSelectable(true)
-        self:SetBusy(true)
-        self:SetBlockCommandQueue(true)
-        self:SetStunned(duration)
-        WaitSeconds(duration)
-        self:SetBlockCommandQueue(false)
-        self:SetBusy(false)
+        self:PlayUnitSound('CommanderArrival')
+        self:CreateProjectile( '/effects/entities/UnitTeleport01/UnitTeleport01_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
+        WaitSeconds(2.1)
         self:SetUnSelectable(false)
-    end
-    self:ForkThread(fn, duration)
-end,
+        self:SetBusy(false)
+        self:SetBlockCommandQueue(false)
+        
+        local totalBones = self:GetBoneCount() - 1
+        local army = self:GetArmy()
+        for k, v in EffectTemplate.UnitTeleportSteam01 do
+            for bone = 1, totalBones do
+                CreateAttachedEmitter(self,bone,army, v)
+            end
+        end
+
+        WaitSeconds(6)
+    end, 
 }
 
 TypeClass = XSL0301
