@@ -181,13 +181,13 @@ UnitBlueprint {
             Audio = {
                 Fire = Sound {
                     Bank = 'URLWeapon',
-                    Cue = 'URB2301_Laser_Auto',
+                    Cue = 'URB2301_Cannon_Sgl',
                     LodCutoff = 'Weapon_LodCutoff',
                 },
             },
             BallisticArc = 'RULEUBA_LowArc',
             CollideFriendly = false,
-            Damage = 13,
+            Damage = 11,
             DamageType = 'Normal',
             DisplayName = 'Particle Cannon',
             FireTargetLayerCapsTable = {
@@ -198,11 +198,11 @@ UnitBlueprint {
             Label = 'MainGun',
             MaxRadius = 50,
             MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 3,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 100,
             ProjectileId = '/projectiles/CDFLaserHeavy02/CDFLaserHeavy02_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.15,
-            ProjectilesPerOnFire = 3,
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
