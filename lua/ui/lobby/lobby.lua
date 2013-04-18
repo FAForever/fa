@@ -1708,8 +1708,8 @@ local function UpdateGame()
 		end
 		--
 		if scenarioInfo.size then
-			TTips_descriptionX = scenarioInfo.size[1]
-			TTips_descriptionY = scenarioInfo.size[2]
+			TTips_descriptionX = scenarioInfo.size[1]/51.2
+			TTips_descriptionY = scenarioInfo.size[2]/51.2
 		else
 			TTips_descriptionX = "N/A"
 			TTips_descriptionY = "N/A"
@@ -1729,7 +1729,7 @@ local function UpdateGame()
 	end
 	Tooltip.AddButtonTooltip(randmapText,{text=scenarioInfo.name, body='- Map version : '..TTips_map_version..'\n '..
 		'- Max Players : '..TTips_army..' max'..'\n '..
-		'- Map Size : '..TTips_descriptionX/51.2 ..'km x '..TTips_descriptionY/51.2 ..'km'..'\n\n '..
+		'- Map Size : '..TTips_descriptionX..'km x '..TTips_descriptionY..'km'..'\n\n '..
 		'- Map Description :\n'..TTips_description})
 	--\\ Stop -- Add Tooltip info on Map Name Label
     --// For refresh menu in slot -- Xinnony
