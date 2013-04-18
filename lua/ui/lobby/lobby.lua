@@ -3539,22 +3539,29 @@ function RefreshOptionDisplayData(scenarioInfo)
         end
     end
 --\\ Stop Check RestrictedUnit active
---// Check MapSize & MaxPlayer active
-    if scenarioInfo then
-        table.insert(formattedOptions, {text = '<LOC MAPSEL_0024>',
-            value = LOCF("<LOC map_select_0008>%dkm x %dkm", scenarioInfo.size[1]/50, scenarioInfo.size[2]/50),
-            tooltip = 'map_select_sizeoption',
-            valueTooltip = 'map_select_sizeoption'})
-        table.insert(formattedOptions, {text = '<LOC MAPSEL_0031>Max Players',
-            value = LOCF("<LOC map_select_0009>%d", table.getsize(scenarioInfo.Configurations.standard.teams[1].armies)),
-            tooltip = 'map_select_maxplayers',
-            valueTooltip = 'map_select_maxplayers'})
-    end
+--// Check MapSize & MaxPlayer active -- Disable because is Added in Tooltip on MapNane Label (randmapText)
+    --if scenarioInfo then
+        --table.insert(formattedOptions, {text = '<LOC MAPSEL_0024>',
+            --value = LOCF("<LOC map_select_0008>%dkm x %dkm", scenarioInfo.size[1]/50, scenarioInfo.size[2]/50),
+            --tooltip = 'map_select_sizeoption',
+            --valueTooltip = 'map_select_sizeoption'})
+        --table.insert(formattedOptions, {text = '<LOC MAPSEL_0031>Max Players',
+            --value = LOCF("<LOC map_select_0009>%d", table.getsize(scenarioInfo.Configurations.standard.teams[1].armies)),
+            --tooltip = 'map_select_maxplayers',
+            --valueTooltip = 'map_select_maxplayers'})
+    --end
 --\\ Stop Check MapSize & MaxPlayer active
 --// Check other options active
     for i, v in gameInfo.GameOptions do
         local option = false
         local mpOnly = false
+		--RankedOptions
+		--Mod Options
+		--Unit Manager
+		--globalOpts
+		--teamOptions
+		--AIOpts
+		--AdvancedOptions
         for index, optData in globalOpts do
             if i == optData.key then
                 mpOnly = optData.mponly or false
