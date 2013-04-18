@@ -691,7 +691,7 @@ function SetSlotInfo(slot, playerInfo)
         if isLocallyOwned or not playerInfo.Human then
             GUI.slots[slot].pingGroup:Hide()
         else
-            GUI.slots[slot].pingGroup:Show()
+            GUI.slots[slot].pingGroup:Hide() -- Temporary - Should be show - request by ZePilOt
         end
     end
 
