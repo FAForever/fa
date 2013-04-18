@@ -1664,53 +1664,50 @@ local function UpdateGame()
             local quality = Trueskill.computeQuality(teams)
             if quality and quality > 0 then
                 gameInfo.GameOptions['Quality'] = quality
-                --local randmapText = UIUtil.CreateText(GUI.panel, "current game quality : " .. quality .. " %", 17,
-                --UIUtil.titleFont)
-                if scenarioInfo.map_version then
-                    -- Set the map name and quality at the top right corner in lobby -- Xinnony
-                    randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."] (Game quality : "
-                                        ..quality.."%)")
-                else
-                    -- Set the map name and quality at the top right corner in lobby -- Xinnony
-                    randmapText:SetText(scenarioInfo.name.." (Game quality : "..quality.."%)")
-                end
-                --LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
+                --#local randmapText = UIUtil.CreateText(GUI.panel, "current game quality : " .. quality .. " %", 17, UIUtil.titleFont)
+				--#LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
+                -- Set the map name and quality at the top right corner in lobby -- Xinnony
+                randmapText:SetText(scenarioInfo.name.." (Game quality : "..quality.."%)")
             else
                 if randmapText then
-                    if scenarioInfo.map_version then
-                        -- Set the map name and quality at the top right corner in lobby -- Xinnony
-                        randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."] (Game quality : N/A)")
-                    else
-                        -- Set the map name and quality at the top right corner in lobby -- Xinnony
-                        randmapText:SetText(scenarioInfo.name.." (Game quality : N/A)")
-                    end
+                    -- Set the map name and quality at the top right corner in lobby -- Xinnony
+                    randmapText:SetText(scenarioInfo.name.." (Game quality : N/A)")
                 end
             end
         else
             if randmapText then
-                if scenarioInfo.map_version then
-                    -- Set the map name and quality at the top right corner in lobby -- Xinnony
-                    randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."]")
-                else
-                    -- Set the map name and quality at the top right corner in lobby -- Xinnony
-                    randmapText:SetText(scenarioInfo.name)
-                end
-            end
-        end
-    else
-        if randmapText then
-            if scenarioInfo.map_version then
-                -- Set the map name and quality at the top right corner in lobby -- Xinnony
-                randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."]")
-            else
                 -- Set the map name and quality at the top right corner in lobby -- Xinnony
                 randmapText:SetText(scenarioInfo.name)
             end
         end
+    else
+        if randmapText then
+            -- Set the map name and quality at the top right corner in lobby -- Xinnony
+            randmapText:SetText(scenarioInfo.name)
+        end
     end
+	--// Add Tooltip info on Map Name Label -- Xinnony
+	if not scenarioInfo.map_version then
+		scenarioInfo.map_version = "N/A"
+	end
+	local ArmySize = table.getsize(scenarioInfo.Configurations.standard.teams[1].armies)
+	if not ArmySize then
+		ArmySize = "N/A"
+	end
+	if not scenarioInfo.size then
+		scenarioInfo.size = {"N/A", "N/A"}
+	end
+	if not scenarioInfo.description then
+		scenarioInfo.description = "N/A"
+	end
+	Tooltip.AddButtonTooltip(randmapText,{text=scenarioInfo.name, body='- Map version : '..scenarioInfo.map_version..'\n '..
+		'- Max Players : '..ArmySize..' max'..'\n '..
+		'- Map Size : '..scenarioInfo.size[1]/51.2 ..'km x '..scenarioInfo.size[2]/51.2 ..'km'..'\n '..
+		'- Map Description :\n'..scenarioInfo.description})
+	--\\ Stop -- Add Tooltip info on Map Name Label
     --// For refresh menu in slot -- Xinnony
     FuncSlotMenuData()
-    --\\ Stop For refresh menu in slot
+    --\\ Stop -- For refresh menu in slot
 end
 
 -- Update our local gameInfo.GameMods from selected map name and selected mods, then
@@ -2153,15 +2150,16 @@ function autoMap()
     end
 end
 
-function uploadNewMap()
-    if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") then
-        lastUploadedMap = gameInfo.GameOptions.ScenarioFile
-        local scenarioInfo = import('/lua/ui/maputil.lua').LoadScenario(gameInfo.GameOptions.ScenarioFile)
-        #LOG("scbserverhostuploadmap"..gameInfo.GameOptions.ScenarioFile)
-        #GpgNetSend("uploadmap", string.format("%s", gameInfo.GameOptions.ScenarioFile))
-        #SendSystemMessage(LOCF("<LOC lobui_0735>The host is uploading the map %s to server.", scenarioInfo.name))
-    end
-end
+--// Upload button not work with FAF for the moment (old GPGnet) -- Xinnony
+--function uploadNewMap()
+    --if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") then
+        --lastUploadedMap = gameInfo.GameOptions.ScenarioFile
+        --local scenarioInfo = import('/lua/ui/maputil.lua').LoadScenario(gameInfo.GameOptions.ScenarioFile)
+        --#LOG("scbserverhostuploadmap"..gameInfo.GameOptions.ScenarioFile)
+        --#GpgNetSend("uploadmap", string.format("%s", gameInfo.GameOptions.ScenarioFile))
+        --#SendSystemMessage(LOCF("<LOC lobui_0735>The host is uploading the map %s to server.", scenarioInfo.name))
+    --end
+--end
 
 function randomString(Length, CharSet)
    -- Length (number)
@@ -2301,6 +2299,7 @@ function CreateUI(maxPlayers)
 
     randmapText = UIUtil.CreateText(GUI.panel, "RandMapText", 17, UIUtil.titleFont)
     LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
+	Tooltip.AddButtonTooltip(randmapText,{text='', body=''})
 
     --// Credits -- Xinnony
     local Credits = "Lot of changes and functions by Xinnony | Power Lobby 2.0 by Moritz"
@@ -2880,7 +2879,7 @@ function CreateUI(maxPlayers)
         GUI.slots[i].KinderCountry.Width:Set(20)
         GUI.slots[i].KinderCountry.Height:Set(16)
         LayoutHelpers.AtBottomIn(GUI.slots[i].KinderCountry, GUI.slots[i], -6)
-        LayoutHelpers.AtLeftIn(GUI.slots[i].KinderCountry, GUI.slots[i], 0) --XinnonyWork (last -8)
+        LayoutHelpers.AtLeftIn(GUI.slots[i].KinderCountry, GUI.slots[i], 0)
         --Tooltip.AddControlTooltip(GUI.slots[i].KinderCountry, '')
         --\\ Stop COUNTRY
 
@@ -3016,7 +3015,7 @@ function CreateUI(maxPlayers)
             GUI.slots[i].ready = UIUtil.CreateCheckboxStd(GUI.slots[i].multiSpace, '/dialogs/check-box_btn/radio')
             GUI.slots[i].ready.row = i
             LayoutHelpers.AtVerticalCenterIn(GUI.slots[curRow].ready, GUI.slots[curRow].multiSpace, 8)
-            LayoutHelpers.AtLeftIn(GUI.slots[curRow].ready, GUI.slots[curRow].multiSpace, 0) -- XinnonyWork (last 10 value)
+            LayoutHelpers.AtLeftIn(GUI.slots[curRow].ready, GUI.slots[curRow].multiSpace, 0)
             GUI.slots[i].ready.OnCheck = function(self, checked)
                 if checked then
                     DisableSlot(self.row, true)
@@ -5037,7 +5036,7 @@ function SetSlotCountryFlag(slot, playerInfo)
         end
     end
 end
-function Country_AddControlTooltip(control, waitDelay, slotNumber) -- XinnonyWork
+function Country_AddControlTooltip(control, waitDelay, slotNumber)
     if not control.oldHandleEvent then
         control.oldHandleEvent = control.HandleEvent
     end
