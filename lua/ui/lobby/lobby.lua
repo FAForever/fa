@@ -298,8 +298,6 @@ local function GetSlotMenuTables(stateKey, hostKey)
     return keys, strings
 end
 
-local pOpts = gameInfo.PlayerOptions -- rename for readability
-
 local function HandleSlotSwitches(moveFromSlot, moveToSlot) -- Xinnony (Factored by Vicarian)
     local pOpts = gameInfo.PlayerOptions -- rename for readability
     local toName = pOpts[moveTo].PlayerName
