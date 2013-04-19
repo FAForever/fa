@@ -1693,7 +1693,7 @@ local function UpdateGame()
         end
     end
 	--// Add Tooltip info on Map Name Label -- Xinnony
-	if scenarioInfo then
+	if randmapText and scenarioInfo then
 		if scenarioInfo.map_version then
 			TTips_map_version = scenarioInfo.map_version
 		else
@@ -1708,29 +1708,30 @@ local function UpdateGame()
 		end
 		--
 		if scenarioInfo.size then
-			TTips_descriptionX = scenarioInfo.size[1]/51.2
-			TTips_descriptionY = scenarioInfo.size[2]/51.2
+			TTips_sizeX = scenarioInfo.size[1]/51.2
+			TTips_sizeY = scenarioInfo.size[2]/51.2
 		else
-			TTips_descriptionX = "N/A"
-			TTips_descriptionY = "N/A"
+			TTips_sizeX = "N/A"
+			TTips_sizeY = "N/A"
 		end
 		--
-		if scenarioInfo.description then
-			TTips_description = scenarioInfo.description
-		else
-			TTips_description = "N/A"
-		end
+		--if scenarioInfo.description then
+			--TTips_description = scenarioInfo.description
+		--else
+			--TTips_description = "N/A"
+		--end
+		--
+		Tooltip.AddControlTooltip(randmapText,{text=scenarioInfo.name, body='- Map version : '..TTips_map_version..'\n '..
+			'- Max Players : '..TTips_army..' max'..'\n '..
+			'- Map Size : '..TTips_sizeX..'km x '..TTips_sizeY..'km'})
+			--'- Map Description :\n'..TTips_description})
 	else
-		TTips_map_version = "N/A"
-		TTips_army = "N/A"
-		TTips_descriptionX = "N/A"
-		TTips_descriptionY = "N/A"
-		TTips_description = "N/A"
+		if randmapText then
+			Tooltip.AddControlTooltip(randmapText,{text="N/A", body='- Map version : N/A'..'\n '..
+				'- Max Players : N/A max'..'\n '..
+				'- Map Size : N/Akm x N/Akm'})
+		end
 	end
-	Tooltip.AddButtonTooltip(randmapText,{text=scenarioInfo.name, body='- Map version : '..TTips_map_version..'\n '..
-		'- Max Players : '..TTips_army..' max'..'\n '..
-		'- Map Size : '..TTips_descriptionX..'km x '..TTips_descriptionY..'km'..'\n\n '..
-		'- Map Description :\n'..TTips_description})
 	--\\ Stop -- Add Tooltip info on Map Name Label
     --// For refresh menu in slot -- Xinnony
     FuncSlotMenuData()
@@ -2326,7 +2327,7 @@ function CreateUI(maxPlayers)
 
     randmapText = UIUtil.CreateText(GUI.panel, "RandMapText", 17, UIUtil.titleFont)
     LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
-	Tooltip.AddButtonTooltip(randmapText,{text='', body=''})
+	--Tooltip.AddButtonTooltip(randmapText,{text='', body=''})
 
     --// Credits -- Xinnony
     local Credits = "Lot of changes and functions by Xinnony | Power Lobby 2.0 by Moritz"
