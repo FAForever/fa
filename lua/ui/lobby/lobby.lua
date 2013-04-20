@@ -666,6 +666,25 @@ function SetSlotInfo(slot, playerInfo)
 
     GUI.slots[slot].name:Show()
     GUI.slots[slot].name:SetTitleText(LOC(playerInfo.PlayerName))
+	
+	--// Color the Name in Slot by State - Xinnony & Vicarian
+	if slotState == 'ai' then
+		GUI.slots[slot].name:SetTitleTextColor("dbdbb9") -- Beige Color for AI
+	elseif slotState == 'player' then
+		GUI.slots[slot].name:SetTitleTextColor("64d264") -- Green Color for Players
+	elseif slotState == 'open' then
+		GUI.slots[slot].name:SetTitleTextColor(UIUtil.fontColor) -- Normal Color for Open Slot
+	elseif isLocallyOwned then
+		GUI.slots[slot].name:SetTitleTextColor("6363d2") -- Blue Color for You
+	--elseif FindSlotForID(hostID) then
+		--GUI.slots[FindSlotForID(hostID)].name:SetTitleTextColor("ffc726") -- Orange Color for Host
+	else
+		GUI.slots[slot].name:SetTitleTextColor(UIUtil.fontColor) -- Normal Color for Other
+	end
+	if FindSlotForID(hostID) then
+		GUI.slots[FindSlotForID(hostID)].name:SetTitleTextColor("ffc726") -- Orange Color for Host
+	end
+	--\\ Stop - Color the Name in Slot by State
 
     GUI.slots[slot].faction:Show()
     GUI.slots[slot].faction:SetItem(playerInfo.Faction)
@@ -747,7 +766,7 @@ function ClearSlotInfo(slot)
     if stateKey == 'closed' then
         GUI.slots[slot].name:SetTitleTextColor("Crimson")
     else
-        GUI.slots[slot].name:SetTitleTextColor(UIUtil.fontColor)
+		GUI.slots[slot].name:SetTitleTextColor(UIUtil.fontColor)
     end
     if lobbyComm:IsHost() and (stateKey == 'open' or stateKey == 'ai') then
         Tooltip.AddComboTooltip(GUI.slots[slot].name, GetAITooltipList())
@@ -5088,16 +5107,19 @@ end
 function Country_GetTooltipValue(CountryResult, slot)
 	local CountryOverrideTooltip = import('/lua/ui/help/tooltips-country.lua').tooltip
 	local CountryOverrideTooltipSpecial = import('/lua/ui/help/tooltips-country.lua').tooltipSpecial
+		local find = 0
 		for index, option in CountryOverrideTooltip do
-			if option.value == CountryResult then
+			if option.value == CountryResult and find == 0 then
 				PrefLanguageTooltipTitle[slot] = option.title
 				PrefLanguageTooltipText[slot] = option.text
+				find = 1
 			end
 		end
 		for index, option in CountryOverrideTooltipSpecial do
-			if option.value == CountryResult then
+			if option.value == CountryResult and find == 0 then
 				PrefLanguageTooltipTitle[slot] = option.title
 				PrefLanguageTooltipText[slot] = option.text
+				find = 1
 			end
 		end
 end
