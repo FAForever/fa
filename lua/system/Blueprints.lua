@@ -334,7 +334,7 @@ function ModBlueprints(all_bps)
 				cats[cat] = true
 			end
 			if cats.NAVAL and not bp.Wreckage then
-				LOG("Adding wreckage information to ", bp.Description)
+				--LOG("Adding wreckage information to ", bp.Description)
 				bp.Wreckage = {
 					Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
 					EnergyMult = 0,

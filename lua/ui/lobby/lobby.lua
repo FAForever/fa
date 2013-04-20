@@ -244,7 +244,6 @@ function FuncSlotMenuData()
     }
     for i = 1, numOpenSlots, 1 do
         table.insert(slotMenuData.player.host, 'move_player_to_slot'..i)
-        LOG(slotMenuData.player.host[i])
     end
 end
 FuncSlotMenuData()
@@ -4136,7 +4135,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             AddChatText("<<"..data.SenderName..">> "..data.Text)
         --// COUNTRY - Xinnony
         elseif data.Type == 'Country' then
-            LOG("Country Data: name="..(data.PlayerName or "?")..", result="..(data.Result or "?"))
+            --LOG("Country Data: name="..(data.PlayerName or "?")..", result="..(data.Result or "?"))
             AddPlayerCountry(data)
             local playerId = FindIDForName(data.PlayerName)
             local playerSlot = FindSlotForID(playerId)
@@ -4146,7 +4145,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         --\\ Stop COUNTRY
         -- CPU benchmark code
         elseif data.Type == 'CPUBenchmark' then
-            LOG("CPU Data: "..(data.PlayerName or "?")..", ".. (data.Result or "?"))
+            --LOG("CPU Data: "..(data.PlayerName or "?")..", ".. (data.Result or "?"))
             AddPlayerBenchmark(data)
             local playerId = FindIDForName(data.PlayerName)
             local playerSlot = FindSlotForID(playerId)
@@ -4940,7 +4939,7 @@ function StressCPU(waitTime)
         currentBestBenchmark = 10000
     end
 
-    LOG('Beginning CPU benchmark')
+    --LOG('Beginning CPU benchmark')
     GUI.rerunBenchmark.label:SetText('In Progress...')
 
     --Run three benchmarks and keep the best one
@@ -4954,7 +4953,7 @@ function StressCPU(waitTime)
         --With .01 sec wait intervals the max number of loops should be 100 * benchmarkLength
         loopCount = (benchmarkLength * 100) - math.min(loopCount + scoreSkew, (benchmarkLength * 100))
 
-        LOG('CPU benchmark #'..i..' complete: '.. loopCount )
+        --LOG('CPU benchmark #'..i..' complete: '.. loopCount )
 
         --If this benchmark was better than our best so far...
         if loopCount < currentBestBenchmark then
@@ -5079,7 +5078,7 @@ function SetSlotCountryFlag(slot, playerInfo)
             local b = FindCountryForName(playerInfo.PlayerName)
             if b then
                 local CountryResult = b.Result
-                LOG('XINNONY - Country is : '.. CountryResult .. ' (for : ' .. playerInfo.PlayerName .. ')')
+                --LOG('XINNONY - Country is : '.. CountryResult .. ' (for : ' .. playerInfo.PlayerName .. ')')
                 GUI.slots[slot].KinderCountry:Show()
                 GUI.slots[slot].KinderCountry:SetTexture(UIUtil.UIFile('/countries/'..CountryResult..'.dds'))
 				Country_GetTooltipValue(CountryResult, slot)
