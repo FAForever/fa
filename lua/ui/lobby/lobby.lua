@@ -2029,7 +2029,6 @@ function HostTryMovePlayer(senderID, currentSlot, requestedSlot)
 end
 
 function HostTryAddObserver( senderID, requestedObserverName )
-
     local index = 1
     while gameInfo.Observers[index] do
         index = index + 1
@@ -2068,6 +2067,7 @@ function HostConvertPlayerToObserver(senderID, name, playerSlot)
         PlayerName = name,
         OwnerID = senderID,
         PL = gameInfo.PlayerOptions[playerSlot].PL,
+        oldColor = gameInfo.PlayerOptions[playerSlot].PlayerColor,
     }
 
     if lobbyComm:IsHost() then
@@ -2128,7 +2128,7 @@ function HostConvertObserverToPlayer(senderID, name, fromObserverSlot, toPlayerS
 
     for colorIndex,colorVal in gameColors.PlayerColors do
         if IsColorFree(colorIndex) then
-            gameInfo.PlayerOptions[toPlayerSlot].PlayerColor = colorIndex
+            gameInfo.PlayerOptions[toPlayerSlot].PlayerColor = gameInfo.Observers[fromObserverSlot].oldColor or colorIndex
             break
         end
     end
