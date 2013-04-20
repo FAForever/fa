@@ -676,8 +676,6 @@ function SetSlotInfo(slot, playerInfo)
 		GUI.slots[slot].name:SetTitleTextColor(UIUtil.fontColor) -- Normal Color for Open Slot
 	elseif isLocallyOwned then
 		GUI.slots[slot].name:SetTitleTextColor("6363d2") -- Blue Color for You
-	--elseif FindSlotForID(hostID) then
-		--GUI.slots[FindSlotForID(hostID)].name:SetTitleTextColor("ffc726") -- Orange Color for Host
 	else
 		GUI.slots[slot].name:SetTitleTextColor(UIUtil.fontColor) -- Normal Color for Other
 	end
