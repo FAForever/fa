@@ -4894,7 +4894,8 @@ local barMax = 450
 local barMin = 150
 local greenBarMax = 300
 local yellowBarMax = 375
-local scoreSkew = 0 --Skews all CPU scores up or down by the amount specified
+local scoreSkew1 = 0 --Skews all CPU scores up or down by the amount specified (0 = no skew)
+local scoreSkew2 = 4.0 --Skews all CPU scores specified coefficient (1.0 = no skew)
 
 --Variables for CPU Test
 local running
@@ -4939,7 +4940,7 @@ function CPUBenchmark()
 	--CPU score is determined by how many times it can loop through
 	--the set of busy work before the timer in the CPUTimer function expires.
 	while running do
- 		for i = 1.0, 2.0, .000008 do 
+ 		for i = 1.0, 6.0, .000008 do 
 	 		j = i + i
 	 		k = i * i
 	 		l = k / j
@@ -5042,7 +5043,7 @@ function StressCPU(waitTime)
 	
 		--Invert scale for display purposes
 		--With .01 sec wait intervals the max number of loops should be 100 * benchmarkLength
-		loopCount = (benchmarkLength * 100) - math.min(loopCount + scoreSkew, (benchmarkLength * 100))
+		loopCount = (benchmarkLength * 100) - math.min(scoreSkew2 * loopCount + scoreSkew1, (benchmarkLength * 100))
 
 		LOG('CPU benchmark #'..i..' complete: '.. loopCount )
 		
