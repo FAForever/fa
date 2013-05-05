@@ -43,6 +43,10 @@ local teamIcons = {
     '/lobby/team_icons/team_6_icon.dds',
 }
 
+--// Table of Tooltip Country - Xinnony
+local PrefLanguageTooltipTitle={}
+local PrefLanguageTooltipText={}
+--\\ Stop - Table of Tooltip Country
 --// Get a value on /Country CommandLine in FA.exe - Xinnony
 local PrefLanguage = GetCommandLineArg("/country", 1)
 if PrefLanguage then
@@ -50,7 +54,7 @@ if PrefLanguage then
 else
     PrefLanguage = "world"
 end
---\\ Stop Get a value on /Country CommandLine in FA.exe
+--\\ Stop - Get a value on /Country CommandLine in FA.exe
 
 local connectedTo = {}
 
@@ -662,6 +666,23 @@ function SetSlotInfo(slot, playerInfo)
 
     GUI.slots[slot].name:Show()
     GUI.slots[slot].name:SetTitleText(LOC(playerInfo.PlayerName))
+	
+	--// Color the Name in Slot by State - Xinnony & Vicarian
+	if slotState == 'ai' then
+		GUI.slots[slot].name:SetTitleTextColor("dbdbb9") -- Beige Color for AI
+	elseif slotState == 'player' then
+		GUI.slots[slot].name:SetTitleTextColor("64d264") -- Green Color for Players
+	elseif slotState == 'open' then
+		GUI.slots[slot].name:SetTitleTextColor(UIUtil.fontColor) -- Normal Color for Open Slot
+	elseif isLocallyOwned then
+		GUI.slots[slot].name:SetTitleTextColor("6363d2") -- Blue Color for You
+	else
+		GUI.slots[slot].name:SetTitleTextColor(UIUtil.fontColor) -- Normal Color for Other
+	end
+	if FindSlotForID(hostID) then
+		GUI.slots[FindSlotForID(hostID)].name:SetTitleTextColor("ffc726") -- Orange Color for Host
+	end
+	--\\ Stop - Color the Name in Slot by State
 
     GUI.slots[slot].faction:Show()
     GUI.slots[slot].faction:SetItem(playerInfo.Faction)
@@ -743,7 +764,7 @@ function ClearSlotInfo(slot)
     if stateKey == 'closed' then
         GUI.slots[slot].name:SetTitleTextColor("Crimson")
     else
-        GUI.slots[slot].name:SetTitleTextColor(UIUtil.fontColor)
+		GUI.slots[slot].name:SetTitleTextColor(UIUtil.fontColor)
     end
     if lobbyComm:IsHost() and (stateKey == 'open' or stateKey == 'ai') then
         Tooltip.AddComboTooltip(GUI.slots[slot].name, GetAITooltipList())
@@ -1666,44 +1687,68 @@ local function UpdateGame()
                 gameInfo.GameOptions['Quality'] = quality
                 --#local randmapText = UIUtil.CreateText(GUI.panel, "current game quality : " .. quality .. " %", 17, UIUtil.titleFont)
 				--#LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
-                -- Set the map name and quality at the top right corner in lobby -- Xinnony
-                randmapText:SetText(scenarioInfo.name.." (Game quality : "..quality.."%)")
+                if randmapText and scenarioInfo.name then
+					-- Set the map name and quality at the top right corner in lobby -- Xinnony
+					randmapText:SetText(scenarioInfo.name.." (Game quality : "..quality.."%)")
+				end
             else
-                if randmapText then
+                if randmapText and scenarioInfo.name then
                     -- Set the map name and quality at the top right corner in lobby -- Xinnony
                     randmapText:SetText(scenarioInfo.name.." (Game quality : N/A)")
                 end
             end
         else
-            if randmapText then
+            if randmapText and scenarioInfo.name then
                 -- Set the map name and quality at the top right corner in lobby -- Xinnony
                 randmapText:SetText(scenarioInfo.name)
             end
         end
     else
-        if randmapText then
+        if randmapText and scenarioInfo.name then
             -- Set the map name and quality at the top right corner in lobby -- Xinnony
             randmapText:SetText(scenarioInfo.name)
         end
     end
 	--// Add Tooltip info on Map Name Label -- Xinnony
-	if not scenarioInfo.map_version then
-		scenarioInfo.map_version = "N/A"
+	if randmapText and scenarioInfo then
+		if scenarioInfo.map_version then
+			TTips_map_version = scenarioInfo.map_version
+		else
+			TTips_map_version = "N/A"
+		end
+		--
+		local ArmySize = table.getsize(scenarioInfo.Configurations.standard.teams[1].armies)
+		if ArmySize then
+			TTips_army = ArmySize
+		else
+			TTips_army = "N/A"
+		end
+		--
+		if scenarioInfo.size then
+			TTips_sizeX = scenarioInfo.size[1]/51.2
+			TTips_sizeY = scenarioInfo.size[2]/51.2
+		else
+			TTips_sizeX = "N/A"
+			TTips_sizeY = "N/A"
+		end
+		--
+		--if scenarioInfo.description then
+			--TTips_description = scenarioInfo.description
+		--else
+			--TTips_description = "N/A"
+		--end
+		--
+		Tooltip.AddControlTooltip(randmapText,{text=scenarioInfo.name, body='- Map version : '..TTips_map_version..'\n '..
+			'- Max Players : '..TTips_army..' max'..'\n '..
+			'- Map Size : '..TTips_sizeX..'km x '..TTips_sizeY..'km'})
+			--'- Map Description :\n'..TTips_description})
+	else
+		if randmapText then
+			Tooltip.AddControlTooltip(randmapText,{text="N/A", body='- Map version : N/A'..'\n '..
+				'- Max Players : N/A max'..'\n '..
+				'- Map Size : N/Akm x N/Akm'})
+		end
 	end
-	local ArmySize = table.getsize(scenarioInfo.Configurations.standard.teams[1].armies)
-	if not ArmySize then
-		ArmySize = "N/A"
-	end
-	if not scenarioInfo.size then
-		scenarioInfo.size = {"N/A", "N/A"}
-	end
-	if not scenarioInfo.description then
-		scenarioInfo.description = "N/A"
-	end
-	Tooltip.AddButtonTooltip(randmapText,{text=scenarioInfo.name, body='- Map version : '..scenarioInfo.map_version..'\n '..
-		'- Max Players : '..ArmySize..' max'..'\n '..
-		'- Map Size : '..scenarioInfo.size[1]/51.2 ..'km x '..scenarioInfo.size[2]/51.2 ..'km'..'\n '..
-		'- Map Description :\n'..scenarioInfo.description})
 	--\\ Stop -- Add Tooltip info on Map Name Label
     --// For refresh menu in slot -- Xinnony
     FuncSlotMenuData()
@@ -2299,7 +2344,7 @@ function CreateUI(maxPlayers)
 
     randmapText = UIUtil.CreateText(GUI.panel, "RandMapText", 17, UIUtil.titleFont)
     LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
-	Tooltip.AddButtonTooltip(randmapText,{text='', body=''})
+	--Tooltip.AddButtonTooltip(randmapText,{text='', body=''})
 
     --// Credits -- Xinnony
     local Credits = "Lot of changes and functions by Xinnony | Power Lobby 2.0 by Moritz"
@@ -5035,10 +5080,10 @@ function SetSlotCountryFlag(slot, playerInfo)
             local b = FindCountryForName(playerInfo.PlayerName)
             if b then
                 local CountryResult = b.Result
-                LOG('XINNONY - Country is : '.. CountryResult )
+                LOG('XINNONY - Country is : '.. CountryResult .. ' (for : ' .. playerInfo.PlayerName .. ')')
                 GUI.slots[slot].KinderCountry:Show()
                 GUI.slots[slot].KinderCountry:SetTexture(UIUtil.UIFile('/countries/'..CountryResult..'.dds'))
-				Country_GetTooltipValue(CountryResult)
+				Country_GetTooltipValue(CountryResult, slot)
 				Country_AddControlTooltip(GUI.slots[slot].KinderCountry, 0, slot)
             end
         end
@@ -5051,28 +5096,29 @@ function Country_AddControlTooltip(control, waitDelay, slotNumber)
     control.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
             local slot = slotNumber
-            Tooltip.CreateMouseoverDisplay(self, {text=PrefLanguageTooltipTitle, body=PrefLanguageTooltipText}, waitDelay, true)
+            Tooltip.CreateMouseoverDisplay(self, {text=PrefLanguageTooltipTitle[slot], body=PrefLanguageTooltipText[slot]}, waitDelay, true)
         elseif event.Type == 'MouseExit' then
             Tooltip.DestroyMouseoverDisplay()
         end
         return self.oldHandleEvent(self, event)
     end
 end
-function Country_GetTooltipValue(CountryResult)
+function Country_GetTooltipValue(CountryResult, slot)
 	local CountryOverrideTooltip = import('/lua/ui/help/tooltips-country.lua').tooltip
 	local CountryOverrideTooltipSpecial = import('/lua/ui/help/tooltips-country.lua').tooltipSpecial
-		PrefLanguageTooltipTitle="Country"
-		PrefLanguageTooltipText=""
+		local find = 0
 		for index, option in CountryOverrideTooltip do
-			if option.value == CountryResult then
-				PrefLanguageTooltipTitle = option.title
-				PrefLanguageTooltipText = option.text
+			if option.value == CountryResult and find == 0 then
+				PrefLanguageTooltipTitle[slot] = option.title
+				PrefLanguageTooltipText[slot] = option.text
+				find = 1
 			end
 		end
 		for index, option in CountryOverrideTooltipSpecial do
-			if option.value == CountryResult then
-				PrefLanguageTooltipTitle = option.title
-				PrefLanguageTooltipText = option.text
+			if option.value == CountryResult and find == 0 then
+				PrefLanguageTooltipTitle[slot] = option.title
+				PrefLanguageTooltipText[slot] = option.text
+				find = 1
 			end
 		end
 end
