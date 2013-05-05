@@ -33,25 +33,27 @@ local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
 local gameColors = import('/lua/gameColors.lua').GameColors
 local numOpenSlots = LobbyComm.maxPlayerSlots
 local formattedOptions = {}
-local teamIcons = {'/lobby/team_icons/team_no_icon.dds',
+local teamIcons = {
+    '/lobby/team_icons/team_no_icon.dds',
     '/lobby/team_icons/team_1_icon.dds',
     '/lobby/team_icons/team_2_icon.dds',
     '/lobby/team_icons/team_3_icon.dds',
     '/lobby/team_icons/team_4_icon.dds',
-	'/lobby/team_icons/team_5_icon.dds',
-	'/lobby/team_icons/team_6_icon.dds'}
+    '/lobby/team_icons/team_5_icon.dds',
+    '/lobby/team_icons/team_6_icon.dds',
+}
 
 --// Get a value on /Country CommandLine in FA.exe - Xinnony
 local PrefLanguage = GetCommandLineArg("/country", 1)
-if PrefLanguage then 
+if PrefLanguage then
 	PrefLanguage = tostring(string.lower(PrefLanguage[1]))
 else
-	PrefLanguage = "world"
+    PrefLanguage = "world"
 end
 --\\ Stop Get a value on /Country CommandLine in FA.exe
 
-local connectedTo = {}	
-	
+local connectedTo = {}
+
 local availableMods = {} # map from peer ID to set of available mods; each set is a map from "mod id"->true
 local selectedMods = nil
 
@@ -59,7 +61,7 @@ local commandQueueIndex = 0
 local commandQueue = {}
 
 local launchThread = false
-local quickRandMap = false
+local quickRandMap = true
 
 local lastUploadedMap = nil
 
@@ -73,32 +75,32 @@ local ratingColor = GetCommandLineArg("/ratingcolor", 1)
 local numGames = GetCommandLineArg("/numgames", 1)
 
 
-if ratingColor then 
-	ratingColor = tostring(ratingColor[1])
+if ratingColor then
+    ratingColor = tostring(ratingColor[1])
 else
-	ratingColor = "ffffffff"
+    ratingColor = "ffffffff"
  end
 
 if numGames then
-	numGames = tonumber(numGames[1])
+    numGames = tonumber(numGames[1])
 else
-	numGames = 0
+    numGames = 0
 end
 
 if playerMean then
-	playerMean = tonumber(playerMean[1])
+    playerMean = tonumber(playerMean[1])
 else
-	playerMean = 1500
+    playerMean = 1500
 end
 
 if playerDeviation then
-	playerDeviation = tonumber(playerDeviation[1])
+    playerDeviation = tonumber(playerDeviation[1])
 else
-	playerDeviation = 500
+    playerDeviation = 500
 end
- 
+
 local playerRating = math.floor(playerMean - 3 * playerDeviation)
- 
+
 -- builds the faction tables, and then adds random faction icon to the end
 local factionBmps = {}
 local factionTooltips = {}
@@ -112,8 +114,8 @@ local teamTooltips = {
     'lob_team_two',
     'lob_team_three',
     'lob_team_four',
-	'lob_team_five',
-	'lob_team_six',
+    'lob_team_five',
+    'lob_team_six',
 }
 table.insert(factionBmps, "/faction_icon-sm/random_ico.dds")
 table.insert(factionTooltips, 'lob_random')
@@ -124,12 +126,12 @@ local teamNumbers = {
     "2",
     "3",
     "4",
-	"5",
-	"6",
+    "5",
+    "6",
 }
 
 local function ParseWhisper(params)
-    local delimStart = string.find(params, ":")
+    local delimStart = string.find(params, " ")
     if delimStart then
         local name = string.sub(params, 1, delimStart-1)
         local targID = FindIDForName(name)
@@ -138,12 +140,18 @@ local function ParseWhisper(params)
         else
             AddChatText(LOC("<LOC lobby_0007>Invalid whisper target."))
         end
-    else
-        AddChatText(LOC("<LOC lobby_0008>You must have a colon (:) after the whisper target's name."))
     end
 end
 
 local commands = {
+    {
+        key = 'pm',
+        action = ParseWhisper,
+    },
+    {
+        key = 'private',
+        action = ParseWhisper,
+    },
     {
         key = 'w',
         action = ParseWhisper,
@@ -172,73 +180,68 @@ local hasFA = true
 
 --// Menu in Slot select -- Add new function by Xinnony
 function FuncSlotMenuData()
-	slotMenuStrings = {
-		open = "<LOC lobui_0219>Open",
-		close = "<LOC lobui_0220>Close",
-		closed = "<LOC lobui_0221>Closed",
-		occupy = "<LOC lobui_0222>Occupy",
-		pm = "<LOC lobui_0223>Private Message",
-		remove_to_kik = "Remove Player",
-		remove_to_observer = "Move Player to Observer",
-		move_player_to_slot1 = "Move Player to slot 1",
-		move_player_to_slot2 = "Move Player to slot 2",
-		move_player_to_slot3 = "Move Player to slot 3",
-		move_player_to_slot4 = "Move Player to slot 4",
-		move_player_to_slot5 = "Move Player to slot 5",
-		move_player_to_slot6 = "Move Player to slot 6",
-		move_player_to_slot7 = "Move Player to slot 7",
-		move_player_to_slot8 = "Move Player to slot 8",
-		move_player_to_slot9 = "Move Player to slot 9",
-		move_player_to_slot10 = "Move Player to slot 10",
-		move_player_to_slot11 = "Move Player to slot 11",
-		move_player_to_slot12 = "Move Player to slot 12",
-	}
---// XinnonyWork TEMPORARY, I DELETE OR FIX IN THE NEXT PATCH
---	for i = 1, numOpenSlots, 1 do
---		table.insert(slotMenuStrings.player.host, move_player_to_slot..i = 'move_player_to_slot'..i)
---	end
---\\ XinnonyWork TEMPORARY, I DELETE OR FIX IN THE NEXT PATCH
-	--***
-	slotMenuData = {
-		open = {
-			host = {
-				'close',
-				'occupy',
-				'ailist',
-			},
-			client = {
-				'occupy',
-			},
-		},
-		closed = {
-			host = {
-				'open',
-			},
-			client = {
-			},
-		},
-		player = {
-			host = {
-				'pm',
-				'remove_to_observer',
-				'remove_to_kik',
-			},
-			client = {
-				'pm',
-			},
-		},
-		ai = {
-			host = {
-				'remove_to_kik',
-				'ailist',
-			},
-			client = {
-			},
-		},
-	}
-	for i = 1, numOpenSlots, 1 do
-		table.insert(slotMenuData.player.host, 'move_player_to_slot'..i)
-	end
+    slotMenuStrings = {
+        open = "<LOC lobui_0219>Open",
+        close = "<LOC lobui_0220>Close",
+        closed = "<LOC lobui_0221>Closed",
+        occupy = "<LOC lobui_0222>Occupy",
+        pm = "<LOC lobui_0223>Private Message",
+        remove_to_kik = "Remove Player",
+        remove_to_observer = "Move Player to Observer",
+        move_player_to_slot1 = "Move Player to slot 1",
+        move_player_to_slot2 = "Move Player to slot 2",
+        move_player_to_slot3 = "Move Player to slot 3",
+        move_player_to_slot4 = "Move Player to slot 4",
+        move_player_to_slot5 = "Move Player to slot 5",
+        move_player_to_slot6 = "Move Player to slot 6",
+        move_player_to_slot7 = "Move Player to slot 7",
+        move_player_to_slot8 = "Move Player to slot 8",
+        move_player_to_slot9 = "Move Player to slot 9",
+        move_player_to_slot10 = "Move Player to slot 10",
+        move_player_to_slot11 = "Move Player to slot 11",
+        move_player_to_slot12 = "Move Player to slot 12",
+    }
+    slotMenuData = {
+        open = {
+            host = {
+                'close',
+                'occupy',
+                'ailist',
+            },
+            client = {
+                'occupy',
+            },
+        },
+        closed = {
+            host = {
+                'open',
+            },
+            client = {
+            },
+        },
+        player = {
+            host = {
+                'pm',
+                'remove_to_observer',
+                'remove_to_kik',
+            },
+            client = {
+                'pm',
+            },
+        },
+        ai = {
+            host = {
+                'remove_to_kik',
+                'ailist',
+            },
+            client = {
+            },
+        },
+    }
+    for i = 1, numOpenSlots, 1 do
+        table.insert(slotMenuData.player.host, 'move_player_to_slot'..i)
+        LOG(slotMenuData.player.host[i])
+    end
 end
 FuncSlotMenuData()
 --\\ Stop Menu in Slot select
@@ -246,11 +249,11 @@ FuncSlotMenuData()
 local function GetAITooltipList()
     local aitypes = import('/lua/ui/lobby/aitypes.lua').aitypes
     local retTable = {}
-	#this is to fix tooltip problem
-	for i = 1, 2 do
-	        table.insert(retTable, nil)
-	end
-	#end new faf part
+    #this is to fix tooltip problem
+    for i = 1, 2 do
+            table.insert(retTable, nil)
+    end
+    #end new faf part
     for i, v in aitypes do
         table.insert(retTable, 'aitype_'..v.key)
     end
@@ -273,10 +276,10 @@ local function GetSlotMenuTables(stateKey, hostKey)
     local localPlayerSlot = FindSlotForID(localPlayerID)
     if localPlayerSlot then
         if gameInfo.PlayerOptions[localPlayerSlot].Ready then
-            isPlayerReady = true        
+            isPlayerReady = true
         end
     end
-	
+
     for index, key in slotMenuData[stateKey][hostKey] do
         if key == 'ailist' then
             local aitypes = import('/lua/ui/lobby/aitypes.lua').aitypes
@@ -295,35 +298,52 @@ local function GetSlotMenuTables(stateKey, hostKey)
     return keys, strings
 end
 
+local function HandleSlotSwitches(moveFrom, moveTo) -- Xinnony (Factored by Vicarian)
+    local pOpts = gameInfo.PlayerOptions -- rename for readability
+    local toName = pOpts[moveTo].PlayerName
+    local toID = pOpts[moveTo].OwnerID
+    local toRatingColor = pOpts[moveTo].RC
+    local toRating = pOpts[moveTo].PL
+    local toFaction = pOpts[moveTo].Faction
+    local toNumGame = pOpts[moveTo].NG
+
+    local fromName = pOpts[moveFrom].PlayerName
+    local fromID = pOpts[moveFrom].OwnerID
+    local fromRatingColor = pOpts[moveFrom].RC
+    local fromRating = pOpts[moveFrom].PL
+    local fromFaction = pOpts[moveFrom].Faction
+    local fromNumGame = pOpts[moveFrom].NG
+
+    if pOpts[moveFrom].Human and moveFrom != moveTo then -- IF Player moveFrom is Human and Player moveFrom NOT in moveTo
+        -- IF Slot moveToSlot is Human and NOT Ready, AND IF Player moveFromSlot is NOT Ready
+        if pOpts[moveTo].Human and not pOpts[moveTo].Ready and not pOpts[moveFrom].Ready then
+            HostConvertPlayerToObserver(toID, toName, moveTo) -- Move Slot moveTo to Observer
+            ClearSlotInfo(moveTo)
+            HostTryMovePlayer(fromID, moveFrom, moveTo) -- Move Player moveFrom to Slot moveTo
+            ClearSlotInfo(moveFrom)
+            HostConvertObserverToPlayer(toID, toName, FindObserverSlotForID(toID), moveFrom, toFaction, toRating,
+                                        toRatingColor, toNumGame)
+        -- IF Player X is Human and Ready and Slot Ready
+        elseif pOpts[moveFrom].Human and pOpts[moveTo].Human and pOpts[moveFrom].Ready and pOpts[moveTo].Ready then
+            AddChatText('You cannot move the player in slot '..moveFrom..' to slot '..moveTo..' because the players in slots '
+                        ..moveFrom..' and '..moveTo..' are ready.') -- (for the moment (reasons: hide bug))')
+        elseif pOpts[moveFrom].Human and pOpts[moveFrom].Ready then -- IF Player X is Human and Ready
+            AddChatText('You cannot move the player in slot '..moveFrom..' to slot '..moveTo..' because the player in slot '
+                        ..moveFrom..' is ready.') -- (for the moment (reasons: hide bug))')
+        elseif pOpts[moveTo].Human and pOpts[moveTo].Ready then -- IF Slot 1 is Human and Ready
+            AddChatText('You cannot move the player in slot '..moveFrom..' to slot '..moveTo..' because the player in slot '
+                        ..moveTo..' is ready.') -- (for the moment (reasons: hide bug))')
+        elseif not pOpts[moveTo].Human and not pOpts[moveTo].Ready then -- IF Slot 1 is NOT Human and NOT Ready
+            HostTryMovePlayer(pOpts[moveFrom].OwnerID, moveFrom, moveTo)
+        else
+            AddChatText('You cannot move the player in slot '..moveFrom..'.')
+        end
+    else
+        AddChatText('You cannot move the Player in slot '..moveFrom..' to Slot '..moveTo..'.')
+    end
+end
+
 local function DoSlotBehavior(slot, key, name)
---// XinnonyWork TEMPORARY, I DELETE OR FIX IN THE NEXT PATCH
---	for i = 1, 12 do
---		if key == 'move_player_to_slot'..i then
---			if gameInfo.PlayerOptions[slot].Human and slot != i and not gameInfo.PlayerOptions[slot].Ready and not gameInfo.PlayerOptions[i].Ready then
---				if gameInfo.PlayerOptions[i].Human then -- If destination slot player exist
---					LAST_name = gameInfo.PlayerOptions[i].PlayerName
---					LAST_id = gameInfo.PlayerOptions[i].OwnerID
---					LAST_rating_color = gameInfo.PlayerOptions[i].RC
---					LAST_rating = gameInfo.PlayerOptions[i].PL
---					LAST_faction = gameInfo.PlayerOptions[i].Faction
---					LAST_numgame = gameInfo.PlayerOptions[i].NG
---					--***
---					HostConvertPlayerToObserver(gameInfo.PlayerOptions[i].OwnerID, gameInfo.PlayerOptions[i].PlayerName, i) -- move slot 1 to observer
---					ClearSlotInfo(i)
---					HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, i) -- move select slot to slot 1
---					ClearSlotInfo(slot)
---					HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
---				else -- destination slot is empty
---					HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, i)
---				end
---			elseif gameInfo.PlayerOptions[slot].Ready or gameInfo.PlayerOptions[i].Ready then
---				AddChatText('The Player is ready, you cannot move the Player '..slot..' to Slot '..i..' ! (for the moment (reasons: hide bug))')
---			else
---				AddChatText('You cannot move the Player '..slot..' to Slot '..i..' !')
---			end
---		end
---	end
---\\ XinnonyWork TEMPORARY, I DELETE OR FIX IN THE NEXT PATCH
     if key == 'open' then
         if lobbyComm:IsHost() then
             HostOpenSlot(hostID, slot)
@@ -337,368 +357,68 @@ local function DoSlotBehavior(slot, key, name)
             if lobbyComm:IsHost() then
                 HostTryMovePlayer(hostID, FindSlotForID(localPlayerID), slot)
             else
-                lobbyComm:SendData(hostID, {Type = 'MovePlayer', CurrentSlot = FindSlotForID(localPlayerID), RequestedSlot =  slot})
+                lobbyComm:SendData(hostID, {Type = 'MovePlayer', CurrentSlot = FindSlotForID(localPlayerID),
+                                   RequestedSlot = slot})
             end
         elseif IsObserver(localPlayerID) then
             if lobbyComm:IsHost() then
-				requestedFaction = Prefs.GetFromCurrentProfile('LastFaction')
-				requestedPL = playerRating
-				requestedRC = ratingColor
-				requestedNG = numGames
-                HostConvertObserverToPlayer(hostID, localPlayerName, FindObserverSlotForID(localPlayerID), slot, requestedFaction, requestedPL, requestedRC, requestedNG)
+                requestedFaction = Prefs.GetFromCurrentProfile('LastFaction')
+                requestedPL = playerRating
+                requestedRC = ratingColor
+                requestedNG = numGames
+                HostConvertObserverToPlayer(hostID, localPlayerName, FindObserverSlotForID(localPlayerID), slot,
+                                            requestedFaction, requestedPL, requestedRC, requestedNG)
             else
-                lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer', RequestedName = localPlayerName, ObserverSlot = FindObserverSlotForID(localPlayerID), PlayerSlot = slot, requestedFaction = Prefs.GetFromCurrentProfile('LastFaction'), requestedPL = playerRating, requestedRC = ratingColor, requestedNG = numGames})
+                lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer', RequestedName = localPlayerName, ObserverSlot =
+                                            FindObserverSlotForID(localPlayerID), PlayerSlot = slot, requestedFaction =
+                                            Prefs.GetFromCurrentProfile('LastFaction'), requestedPL = playerRating,
+                                            requestedRC = ratingColor, requestedNG = numGames})
             end
         end
     elseif key == 'pm' then
         if gameInfo.PlayerOptions[slot].Human then
-            GUI.chatEdit:SetText(string.format("/whisper %s:", gameInfo.PlayerOptions[slot].PlayerName))
+            GUI.chatEdit:SetText(string.format("/whisper %s ", gameInfo.PlayerOptions[slot].PlayerName))
         end
-	--// Move player slot to slot -- Xinnony
-	elseif key == 'move_player_to_slot1' then
-		if gameInfo.PlayerOptions[slot].Human and slot != 1 then -- IF Player X is Human and Player Slot NOT a Slot 1
-			if gameInfo.PlayerOptions[1].Human and not gameInfo.PlayerOptions[1].Ready and not gameInfo.PlayerOptions[slot].Ready then -- IF Slot 1 is Human and NOT Ready, AND IF Player X is NOT Ready
-				LAST_name = gameInfo.PlayerOptions[1].PlayerName
-				LAST_id = gameInfo.PlayerOptions[1].OwnerID
-				LAST_rating_color = gameInfo.PlayerOptions[1].RC
-				LAST_rating = gameInfo.PlayerOptions[1].PL
-                LAST_faction = gameInfo.PlayerOptions[1].Faction
-				LAST_numgame = gameInfo.PlayerOptions[1].NG
-				--***
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[1].OwnerID, gameInfo.PlayerOptions[1].PlayerName, 1) -- Move Slot 1 to Observer
-				ClearSlotInfo(1)
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 1) -- Move Player X to Slot 1
-				ClearSlotInfo(slot)
-                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
-			elseif gameInfo.PlayerOptions[slot].Human and gameInfo.PlayerOptions[slot].Ready then -- IF Player X is Human and Ready
-				AddChatText('You cannot move the Player '..slot..' to Slot 1 because the Slot 1 is Ready (for the moment (reasons: hide bug))')
-			elseif gameInfo.PlayerOptions[1].Human and gameInfo.PlayerOptions[1].Ready then -- IF Slot 1 is Human and Ready
-				AddChatText('You cannot move the Player '..slot..' to Slot 1 because the Player '..slot..' is Ready (for the moment (reasons: hide bug))')
-			elseif not gameInfo.PlayerOptions[1].Human and not gameInfo.PlayerOptions[1].Ready then -- IF Slot 1 is NOT Human and NOT Ready
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 1)
-			else
-				AddChatText('You cannot move the Player '..slot..' !')
-			end
-		else
-			AddChatText('You cannot move the Player '..slot..' to Slot 1 !')
-		end
-	elseif key == 'move_player_to_slot2' then
-		if gameInfo.PlayerOptions[slot].Human and slot != 2 then -- IF Player X is Human and Player Slot NOT a Slot 2
-			if gameInfo.PlayerOptions[2].Human and not gameInfo.PlayerOptions[2].Ready and not gameInfo.PlayerOptions[slot].Ready then -- IF Slot 2 is Human and NOT Ready, AND IF Player X is NOT Ready
-				LAST_name = gameInfo.PlayerOptions[2].PlayerName
-				LAST_id = gameInfo.PlayerOptions[2].OwnerID
-				LAST_rating_color = gameInfo.PlayerOptions[2].RC
-				LAST_rating = gameInfo.PlayerOptions[2].PL
-                LAST_faction = gameInfo.PlayerOptions[2].Faction
-				LAST_numgame = gameInfo.PlayerOptions[2].NG
-				--***
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[2].OwnerID, gameInfo.PlayerOptions[2].PlayerName, 2) -- Move Slot 2 to Observer
-				ClearSlotInfo(2)
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 2) -- Move Player X to Slot 2
-				ClearSlotInfo(slot)
-                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
-			elseif gameInfo.PlayerOptions[slot].Human and gameInfo.PlayerOptions[slot].Ready then -- IF Player X is Human and Ready
-				AddChatText('You cannot move the Player '..slot..' to Slot 2 because the Slot 2 is Ready (for the moment (reasons: hide bug))')
-			elseif gameInfo.PlayerOptions[2].Human and gameInfo.PlayerOptions[2].Ready then -- IF Slot 2 is Human and Ready
-				AddChatText('You cannot move the Player '..slot..' to Slot 2 because the Player '..slot..' is Ready (for the moment (reasons: hide bug))')
-			elseif not gameInfo.PlayerOptions[2].Human and not gameInfo.PlayerOptions[2].Ready then -- IF Slot 2 is NOT Human and NOT Ready
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 2)
-			else
-				AddChatText('You cannot move the Player '..slot..' !')
-			end
-		else
-			AddChatText('You cannot move the Player '..slot..' to Slot 2 !')
-		end
-	elseif key == 'move_player_to_slot3' then
-		if gameInfo.PlayerOptions[slot].Human and slot != 3 then -- IF Player X is Human and Player Slot NOT a Slot 3
-			if gameInfo.PlayerOptions[3].Human and not gameInfo.PlayerOptions[3].Ready and not gameInfo.PlayerOptions[slot].Ready then -- IF Slot 3 is Human and NOT Ready, AND IF Player X is NOT Ready
-				LAST_name = gameInfo.PlayerOptions[3].PlayerName
-				LAST_id = gameInfo.PlayerOptions[3].OwnerID
-				LAST_rating_color = gameInfo.PlayerOptions[3].RC
-				LAST_rating = gameInfo.PlayerOptions[3].PL
-                LAST_faction = gameInfo.PlayerOptions[3].Faction
-				LAST_numgame = gameInfo.PlayerOptions[3].NG
-				--***
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[3].OwnerID, gameInfo.PlayerOptions[3].PlayerName, 3) -- Move Slot 3 to Observer
-				ClearSlotInfo(3)
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 3) -- Move Player X to Slot 3
-				ClearSlotInfo(slot)
-                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
-			elseif gameInfo.PlayerOptions[slot].Human and gameInfo.PlayerOptions[slot].Ready then -- IF Player X is Human and Ready
-				AddChatText('You cannot move the Player '..slot..' to Slot 3 because the Slot 3 is Ready (for the moment (reasons: hide bug))')
-			elseif gameInfo.PlayerOptions[3].Human and gameInfo.PlayerOptions[3].Ready then -- IF Slot 3 is Human and Ready
-				AddChatText('You cannot move the Player '..slot..' to Slot 3 because the Player '..slot..' is Ready (for the moment (reasons: hide bug))')
-			elseif not gameInfo.PlayerOptions[3].Human and not gameInfo.PlayerOptions[3].Ready then -- IF Slot 3 is NOT Human and NOT Ready
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 3)
-			else
-				AddChatText('You cannot move the Player '..slot..' !')
-			end
-		else
-			AddChatText('You cannot move the Player '..slot..' to Slot 3 !')
-		end
-	elseif key == 'move_player_to_slot4' then
-		if gameInfo.PlayerOptions[slot].Human and slot != 4 then -- IF Player X is Human and Player Slot NOT a Slot 4
-			if gameInfo.PlayerOptions[4].Human and not gameInfo.PlayerOptions[4].Ready and not gameInfo.PlayerOptions[slot].Ready then -- IF Slot 4 is Human and NOT Ready, AND IF Player X is NOT Ready
-				LAST_name = gameInfo.PlayerOptions[4].PlayerName
-				LAST_id = gameInfo.PlayerOptions[4].OwnerID
-				LAST_rating_color = gameInfo.PlayerOptions[4].RC
-				LAST_rating = gameInfo.PlayerOptions[4].PL
-                LAST_faction = gameInfo.PlayerOptions[4].Faction
-				LAST_numgame = gameInfo.PlayerOptions[4].NG
-				--***
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[4].OwnerID, gameInfo.PlayerOptions[4].PlayerName, 4) -- Move Slot 4 to Observer
-				ClearSlotInfo(4)
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 4) -- Move Player X to Slot 4
-				ClearSlotInfo(slot)
-                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
-			elseif gameInfo.PlayerOptions[slot].Human and gameInfo.PlayerOptions[slot].Ready then -- IF Player X is Human and Ready
-				AddChatText('You cannot move the Player '..slot..' to Slot 4 because the Slot 4 is Ready (for the moment (reasons: hide bug))')
-			elseif gameInfo.PlayerOptions[4].Human and gameInfo.PlayerOptions[4].Ready then -- IF Slot 4 is Human and Ready
-				AddChatText('You cannot move the Player '..slot..' to Slot 4 because the Player '..slot..' is Ready (for the moment (reasons: hide bug))')
-			elseif not gameInfo.PlayerOptions[4].Human and not gameInfo.PlayerOptions[4].Ready then -- IF Slot 4 is NOT Human and NOT Ready
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 4)
-			else
-				AddChatText('You cannot move the Player '..slot..' !')
-			end
-		else
-			AddChatText('You cannot move the Player '..slot..' to Slot 4 !')
-		end
-	elseif key == 'move_player_to_slot5' then
-		if gameInfo.PlayerOptions[slot].Human and slot != 5 then -- IF Player X is Human and Player Slot NOT a Slot 5
-			if gameInfo.PlayerOptions[5].Human and not gameInfo.PlayerOptions[5].Ready and not gameInfo.PlayerOptions[slot].Ready then -- IF Slot 5 is Human and NOT Ready, AND IF Player X is NOT Ready
-				LAST_name = gameInfo.PlayerOptions[5].PlayerName
-				LAST_id = gameInfo.PlayerOptions[5].OwnerID
-				LAST_rating_color = gameInfo.PlayerOptions[5].RC
-				LAST_rating = gameInfo.PlayerOptions[5].PL
-                LAST_faction = gameInfo.PlayerOptions[5].Faction
-				LAST_numgame = gameInfo.PlayerOptions[5].NG
-				--***
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[5].OwnerID, gameInfo.PlayerOptions[5].PlayerName, 5) -- Move Slot 5 to Observer
-				ClearSlotInfo(5)
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 5) -- Move Player X to Slot 5
-				ClearSlotInfo(slot)
-                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
-			elseif gameInfo.PlayerOptions[slot].Human and gameInfo.PlayerOptions[slot].Ready then -- IF Player X is Human and Ready
-				AddChatText('You cannot move the Player '..slot..' to Slot 5 because the Slot 5 is Ready (for the moment (reasons: hide bug))')
-			elseif gameInfo.PlayerOptions[5].Human and gameInfo.PlayerOptions[5].Ready then -- IF Slot 5 is Human and Ready
-				AddChatText('You cannot move the Player '..slot..' to Slot 5 because the Player '..slot..' is Ready (for the moment (reasons: hide bug))')
-			elseif not gameInfo.PlayerOptions[5].Human and not gameInfo.PlayerOptions[5].Ready then -- IF Slot 5 is NOT Human and NOT Ready
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 5)
-			else
-				AddChatText('You cannot move the Player '..slot..' !')
-			end
-		else
-			AddChatText('You cannot move the Player '..slot..' to Slot 5 !')
-		end
-	elseif key == 'move_player_to_slot6' then
-		if gameInfo.PlayerOptions[slot].Human and slot != 6 then -- IF Player X is Human and Player Slot NOT a Slot 6
-			if gameInfo.PlayerOptions[6].Human and not gameInfo.PlayerOptions[6].Ready and not gameInfo.PlayerOptions[slot].Ready then -- IF Slot 6 is Human and NOT Ready, AND IF Player X is NOT Ready
-				LAST_name = gameInfo.PlayerOptions[6].PlayerName
-				LAST_id = gameInfo.PlayerOptions[6].OwnerID
-				LAST_rating_color = gameInfo.PlayerOptions[6].RC
-				LAST_rating = gameInfo.PlayerOptions[6].PL
-                LAST_faction = gameInfo.PlayerOptions[6].Faction
-				LAST_numgame = gameInfo.PlayerOptions[6].NG
-				--***
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[6].OwnerID, gameInfo.PlayerOptions[6].PlayerName, 6) -- Move Slot 6 to Observer
-				ClearSlotInfo(6)
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 6) -- Move Player X to Slot 6
-				ClearSlotInfo(slot)
-                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
-			elseif gameInfo.PlayerOptions[slot].Human and gameInfo.PlayerOptions[slot].Ready then -- IF Player X is Human and Ready
-				AddChatText('You cannot move the Player '..slot..' to Slot 6 because the Slot 6 is Ready (for the moment (reasons: hide bug))')
-			elseif gameInfo.PlayerOptions[6].Human and gameInfo.PlayerOptions[6].Ready then -- IF Slot 6 is Human and Ready
-				AddChatText('You cannot move the Player '..slot..' to Slot 6 because the Player '..slot..' is Ready (for the moment (reasons: hide bug))')
-			elseif not gameInfo.PlayerOptions[6].Human and not gameInfo.PlayerOptions[6].Ready then -- IF Slot 6 is NOT Human and NOT Ready
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 6)
-			else
-				AddChatText('You cannot move the Player '..slot..' !')
-			end
-		else
-			AddChatText('You cannot move the Player '..slot..' to Slot 6 !')
-		end
-	elseif key == 'move_player_to_slot7' then
-		if gameInfo.PlayerOptions[slot].Human and slot != 7 then -- IF Player X is Human and Player Slot NOT a Slot 7
-			if gameInfo.PlayerOptions[7].Human and not gameInfo.PlayerOptions[7].Ready and not gameInfo.PlayerOptions[slot].Ready then -- IF Slot 7 is Human and NOT Ready, AND IF Player X is NOT Ready
-				LAST_name = gameInfo.PlayerOptions[7].PlayerName
-				LAST_id = gameInfo.PlayerOptions[7].OwnerID
-				LAST_rating_color = gameInfo.PlayerOptions[7].RC
-				LAST_rating = gameInfo.PlayerOptions[7].PL
-                LAST_faction = gameInfo.PlayerOptions[7].Faction
-				LAST_numgame = gameInfo.PlayerOptions[7].NG
-				--***
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[7].OwnerID, gameInfo.PlayerOptions[7].PlayerName, 7) -- Move Slot 7 to Observer
-				ClearSlotInfo(7)
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 7) -- Move Player X to Slot 7
-				ClearSlotInfo(slot)
-                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
-			elseif gameInfo.PlayerOptions[slot].Human and gameInfo.PlayerOptions[slot].Ready then -- IF Player X is Human and Ready
-				AddChatText('You cannot move the Player '..slot..' to Slot 7 because the Slot 7 is Ready (for the moment (reasons: hide bug))')
-			elseif gameInfo.PlayerOptions[7].Human and gameInfo.PlayerOptions[7].Ready then -- IF Slot 7 is Human and Ready
-				AddChatText('You cannot move the Player '..slot..' to Slot 7 because the Player '..slot..' is Ready (for the moment (reasons: hide bug))')
-			elseif not gameInfo.PlayerOptions[7].Human and not gameInfo.PlayerOptions[7].Ready then -- IF Slot 7 is NOT Human and NOT Ready
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 7)
-			else
-				AddChatText('You cannot move the Player '..slot..' !')
-			end
-		else
-			AddChatText('You cannot move the Player '..slot..' to Slot 7 !')
-		end
-	elseif key == 'move_player_to_slot8' then
-		if gameInfo.PlayerOptions[slot].Human and slot != 8 then -- IF Player X is Human and Player Slot NOT a Slot 8
-			if gameInfo.PlayerOptions[8].Human and not gameInfo.PlayerOptions[8].Ready and not gameInfo.PlayerOptions[slot].Ready then -- IF Slot 8 is Human and NOT Ready, AND IF Player X is NOT Ready
-				LAST_name = gameInfo.PlayerOptions[8].PlayerName
-				LAST_id = gameInfo.PlayerOptions[8].OwnerID
-				LAST_rating_color = gameInfo.PlayerOptions[8].RC
-				LAST_rating = gameInfo.PlayerOptions[8].PL
-                LAST_faction = gameInfo.PlayerOptions[8].Faction
-				LAST_numgame = gameInfo.PlayerOptions[8].NG
-				--***
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[8].OwnerID, gameInfo.PlayerOptions[8].PlayerName, 8) -- Move Slot 8 to Observer
-				ClearSlotInfo(8)
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 8) -- Move Player X to Slot 8
-				ClearSlotInfo(slot)
-                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
-			elseif gameInfo.PlayerOptions[slot].Human and gameInfo.PlayerOptions[slot].Ready then -- IF Player X is Human and Ready
-				AddChatText('You cannot move the Player '..slot..' to Slot 8 because the Slot 8 is Ready (for the moment (reasons: hide bug))')
-			elseif gameInfo.PlayerOptions[8].Human and gameInfo.PlayerOptions[8].Ready then -- IF Slot 8 is Human and Ready
-				AddChatText('You cannot move the Player '..slot..' to Slot 8 because the Player '..slot..' is Ready (for the moment (reasons: hide bug))')
-			elseif not gameInfo.PlayerOptions[8].Human and not gameInfo.PlayerOptions[8].Ready then -- IF Slot 8 is NOT Human and NOT Ready
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 8)
-			else
-				AddChatText('You cannot move the Player '..slot..' !')
-			end
-		else
-			AddChatText('You cannot move the Player '..slot..' to Slot 8 !')
-		end
-	elseif key == 'move_player_to_slot9' then
-		if gameInfo.PlayerOptions[slot].Human and slot != 9 then -- IF Player X is Human and Player Slot NOT a Slot 9
-			if gameInfo.PlayerOptions[9].Human and not gameInfo.PlayerOptions[9].Ready and not gameInfo.PlayerOptions[slot].Ready then -- IF Slot 9 is Human and NOT Ready, AND IF Player X is NOT Ready
-				LAST_name = gameInfo.PlayerOptions[9].PlayerName
-				LAST_id = gameInfo.PlayerOptions[9].OwnerID
-				LAST_rating_color = gameInfo.PlayerOptions[9].RC
-				LAST_rating = gameInfo.PlayerOptions[9].PL
-                LAST_faction = gameInfo.PlayerOptions[9].Faction
-				LAST_numgame = gameInfo.PlayerOptions[9].NG
-				--***
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[9].OwnerID, gameInfo.PlayerOptions[9].PlayerName, 9) -- Move Slot 9 to Observer
-				ClearSlotInfo(9)
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 9) -- Move Player X to Slot 9
-				ClearSlotInfo(slot)
-                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
-			elseif gameInfo.PlayerOptions[slot].Human and gameInfo.PlayerOptions[slot].Ready then -- IF Player X is Human and Ready
-				AddChatText('You cannot move the Player '..slot..' to Slot 9 because the Slot 9 is Ready (for the moment (reasons: hide bug))')
-			elseif gameInfo.PlayerOptions[9].Human and gameInfo.PlayerOptions[9].Ready then -- IF Slot 9 is Human and Ready
-				AddChatText('You cannot move the Player '..slot..' to Slot 9 because the Player '..slot..' is Ready (for the moment (reasons: hide bug))')
-			elseif not gameInfo.PlayerOptions[9].Human and not gameInfo.PlayerOptions[9].Ready then -- IF Slot 9 is NOT Human and NOT Ready
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 9)
-			else
-				AddChatText('You cannot move the Player '..slot..' !')
-			end
-		else
-			AddChatText('You cannot move the Player '..slot..' to Slot 9 !')
-		end
-	elseif key == 'move_player_to_slot10' then
-		if gameInfo.PlayerOptions[slot].Human and slot != 10 then -- IF Player X is Human and Player Slot NOT a Slot 10
-			if gameInfo.PlayerOptions[10].Human and not gameInfo.PlayerOptions[10].Ready and not gameInfo.PlayerOptions[slot].Ready then -- IF Slot 10 is Human and NOT Ready, AND IF Player X is NOT Ready
-				LAST_name = gameInfo.PlayerOptions[10].PlayerName
-				LAST_id = gameInfo.PlayerOptions[10].OwnerID
-				LAST_rating_color = gameInfo.PlayerOptions[10].RC
-				LAST_rating = gameInfo.PlayerOptions[10].PL
-                LAST_faction = gameInfo.PlayerOptions[10].Faction
-				LAST_numgame = gameInfo.PlayerOptions[10].NG
-				--***
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[10].OwnerID, gameInfo.PlayerOptions[10].PlayerName, 10) -- Move Slot 10 to Observer
-				ClearSlotInfo(10)
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 10) -- Move Player X to Slot 10
-				ClearSlotInfo(slot)
-                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
-			elseif gameInfo.PlayerOptions[slot].Human and gameInfo.PlayerOptions[slot].Ready then -- IF Player X is Human and Ready
-				AddChatText('You cannot move the Player '..slot..' to Slot 10 because the Slot 10 is Ready (for the moment (reasons: hide bug))')
-			elseif gameInfo.PlayerOptions[10].Human and gameInfo.PlayerOptions[10].Ready then -- IF Slot 10 is Human and Ready
-				AddChatText('You cannot move the Player '..slot..' to Slot 10 because the Player '..slot..' is Ready (for the moment (reasons: hide bug))')
-			elseif not gameInfo.PlayerOptions[10].Human and not gameInfo.PlayerOptions[10].Ready then -- IF Slot 10 is NOT Human and NOT Ready
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 10)
-			else
-				AddChatText('You cannot move the Player '..slot..' !')
-			end
-		else
-			AddChatText('You cannot move the Player '..slot..' to Slot 10 !')
-		end
-	elseif key == 'move_player_to_slot11' then
-		if gameInfo.PlayerOptions[slot].Human and slot != 11 then -- IF Player X is Human and Player Slot NOT a Slot 11
-			if gameInfo.PlayerOptions[11].Human and not gameInfo.PlayerOptions[11].Ready and not gameInfo.PlayerOptions[slot].Ready then -- IF Slot 11 is Human and NOT Ready, AND IF Player X is NOT Ready
-				LAST_name = gameInfo.PlayerOptions[11].PlayerName
-				LAST_id = gameInfo.PlayerOptions[11].OwnerID
-				LAST_rating_color = gameInfo.PlayerOptions[11].RC
-				LAST_rating = gameInfo.PlayerOptions[11].PL
-                LAST_faction = gameInfo.PlayerOptions[11].Faction
-				LAST_numgame = gameInfo.PlayerOptions[11].NG
-				--***
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[11].OwnerID, gameInfo.PlayerOptions[11].PlayerName, 11) -- Move Slot 11 to Observer
-				ClearSlotInfo(11)
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 11) -- Move Player X to Slot 11
-				ClearSlotInfo(slot)
-                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
-			elseif gameInfo.PlayerOptions[slot].Human and gameInfo.PlayerOptions[slot].Ready then -- IF Player X is Human and Ready
-				AddChatText('You cannot move the Player '..slot..' to Slot 11 because the Slot 11 is Ready (for the moment (reasons: hide bug))')
-			elseif gameInfo.PlayerOptions[11].Human and gameInfo.PlayerOptions[11].Ready then -- IF Slot 11 is Human and Ready
-				AddChatText('You cannot move the Player '..slot..' to Slot 11 because the Player '..slot..' is Ready (for the moment (reasons: hide bug))')
-			elseif not gameInfo.PlayerOptions[11].Human and not gameInfo.PlayerOptions[11].Ready then -- IF Slot 11 is NOT Human and NOT Ready
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 11)
-			else
-				AddChatText('You cannot move the Player '..slot..' !')
-			end
-		else
-			AddChatText('You cannot move the Player '..slot..' to Slot 11 !')
-		end
-	elseif key == 'move_player_to_slot12' then
-		if gameInfo.PlayerOptions[slot].Human and slot != 12 then -- IF Player X is Human and Player Slot NOT a Slot 12
-			if gameInfo.PlayerOptions[12].Human and not gameInfo.PlayerOptions[12].Ready and not gameInfo.PlayerOptions[slot].Ready then -- IF Slot 12 is Human and NOT Ready, AND IF Player X is NOT Ready
-				LAST_name = gameInfo.PlayerOptions[12].PlayerName
-				LAST_id = gameInfo.PlayerOptions[12].OwnerID
-				LAST_rating_color = gameInfo.PlayerOptions[12].RC
-				LAST_rating = gameInfo.PlayerOptions[12].PL
-                LAST_faction = gameInfo.PlayerOptions[12].Faction
-				LAST_numgame = gameInfo.PlayerOptions[12].NG
-				--***
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[12].OwnerID, gameInfo.PlayerOptions[12].PlayerName, 12) -- Move Slot 12 to Observer
-				ClearSlotInfo(12)
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 12) -- Move Player X to Slot 12
-				ClearSlotInfo(slot)
-                HostConvertObserverToPlayer(LAST_id, LAST_name, FindObserverSlotForID(LAST_id), slot, LAST_faction, LAST_rating, LAST_rating_color, LAST_numgame)
-			elseif gameInfo.PlayerOptions[slot].Human and gameInfo.PlayerOptions[slot].Ready then -- IF Player X is Human and Ready
-				AddChatText('You cannot move the Player '..slot..' to Slot 12 because the Slot 12 is Ready (for the moment (reasons: hide bug))')
-			elseif gameInfo.PlayerOptions[12].Human and gameInfo.PlayerOptions[12].Ready then -- IF Slot 12 is Human and Ready
-				AddChatText('You cannot move the Player '..slot..' to Slot 12 because the Player '..slot..' is Ready (for the moment (reasons: hide bug))')
-			elseif not gameInfo.PlayerOptions[12].Human and not gameInfo.PlayerOptions[12].Ready then -- IF Slot 12 is NOT Human and NOT Ready
-				HostTryMovePlayer(gameInfo.PlayerOptions[slot].OwnerID, slot, 12)
-			else
-				AddChatText('You cannot move the Player '..slot..' !')
-			end
-		else
-			AddChatText('You cannot move the Player '..slot..' to Slot 12 !')
-		end
-	--\\ Stop Move player slot to slot
-	--// Move Player slot to Observer -- Xinnony
+
+    --// Move player slot to slot -- Xinnony (Factored by Vicarian)
+    elseif key == 'move_player_to_slot1' then
+        HandleSlotSwitches(slot, 1)
+    elseif key == 'move_player_to_slot2' then
+        HandleSlotSwitches(slot, 2)
+    elseif key == 'move_player_to_slot3' then
+        HandleSlotSwitches(slot,3)
+    elseif key == 'move_player_to_slot4' then
+        HandleSlotSwitches(slot,4)
+    elseif key == 'move_player_to_slot5' then
+        HandleSlotSwitches(slot,5)
+    elseif key == 'move_player_to_slot6' then
+        HandleSlotSwitches(slot,6)
+    elseif key == 'move_player_to_slot7' then
+        HandleSlotSwitches(slot,7)
+    elseif key == 'move_player_to_slot8' then
+        HandleSlotSwitches(slot,8)
+    elseif key == 'move_player_to_slot9' then
+        HandleSlotSwitches(slot,9)
+    elseif key == 'move_player_to_slot10' then
+        HandleSlotSwitches(slot,10)
+    elseif key == 'move_player_to_slot11' then
+        HandleSlotSwitches(slot,11)
+    elseif key == 'move_player_to_slot12' then
+        HandleSlotSwitches(slot,12)
+    --\\ Stop Move player slot to slot
+    --// Move Player slot to Observer -- Xinnony
     elseif key == 'remove_to_observer' then
-		if gameInfo.PlayerOptions[slot].Human then
-            --UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
-				--"Move", function()
-				HostConvertPlayerToObserver(gameInfo.PlayerOptions[slot].OwnerID, gameInfo.PlayerOptions[slot].PlayerName, slot)
-				--end,
-                --"<LOC _Cancel>", nil, 
-                --nil, nil, 
-                --true,
-                --{worldCover = false, enterButton = 1, escapeButton = 2})
+        if gameInfo.PlayerOptions[slot].Human then
+            HostConvertPlayerToObserver(gameInfo.PlayerOptions[slot].OwnerID, gameInfo.PlayerOptions[slot].PlayerName, slot)
         end
-	--\\ Stop Move Player slot to Observer
-	elseif key == 'remove_to_kik' then
+    --\\ Stop Move Player slot to Observer
+    elseif key == 'remove_to_kik' then
         if gameInfo.PlayerOptions[slot].Human then
             UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
-                "<LOC lobui_0167>Kick Player", function() lobbyComm:EjectPeer(gameInfo.PlayerOptions[slot].OwnerID, "KickedByHost") end,
-                "<LOC _Cancel>", nil, 
-                nil, nil, 
+                "<LOC lobui_0167>Kick Player",
+                function() lobbyComm:EjectPeer(gameInfo.PlayerOptions[slot].OwnerID, "KickedByHost") end,
+                "<LOC _Cancel>", nil,
+                nil, nil,
                 true,
                 {worldCover = false, enterButton = 1, escapeButton = 2})
         else
@@ -721,7 +441,7 @@ local function DoSlotBehavior(slot, key, name)
             HostTryAddPlayer(hostID, slot, name, false, key, color, faction, team)
         end
     end
-end
+end --\\ End DoSlotBehavior()
 
 local function GetLocallyAvailableMods()
     local result = {}
@@ -761,20 +481,21 @@ function Reset()
         Observers = {},
         ClosedSlots = {},
         GameMods = {},
-		AutoTeams = {},
+        AutoTeams = {},
     }
 end
 
 -- Create a new unconnected lobby.
-function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider, over, exitBehavior, playerHasSupcom)
-    
+function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider, over, exitBehavior,
+                     playerHasSupcom)
+
     -- default to true, if the param is nil, then not playing through GPGnet
     if playerHasSupcom == nil or playerHasSupcom == true then
         hasSupcom = true
     else
         hasSupcom = true
     end
-    
+
     Reset()
 
     if GUI then
@@ -783,7 +504,7 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
     end
 
     GUI = UIUtil.CreateScreenGroup(over, "CreateLobby ScreenGroup")
-	
+
 
     GUI.exitBehavior = exitBehavior
 
@@ -793,7 +514,7 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
 
     GUI.connectdialog = UIUtil.ShowInfoDialog(GUI, Strings.TryingToConnect, Strings.AbortConnect, ReturnToMenu)
 
-	InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
+    InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
 
     -- Store off the validated playername
     localPlayerName = lobbyComm:GetLocalPlayerName()
@@ -804,7 +525,7 @@ end
 function HostGame(desiredGameName, scenarioFileName, inSinglePlayer)
     singlePlayer = inSinglePlayer
     gameName = lobbyComm:MakeValidGameName(desiredGameName)
-	lobbyComm.desiredScenario = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
+    lobbyComm.desiredScenario = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
     lobbyComm:HostGame()
 end
 
@@ -819,7 +540,7 @@ function ConnectToPeer(addressAndPort,name,uid)
 end
 
 function DisconnectFromPeer(uid)
-	if wasConnected(uid) then table.remove(connectedTo, uid) end
+    if wasConnected(uid) then table.remove(connectedTo, uid) end
     lobbyComm:DisconnectFromPeer(uid)
 end
 
@@ -908,7 +629,7 @@ function SetSlotInfo(slot, playerInfo)
         slotState = nil
     end
 
-    GUI.slots[slot].name:ClearItems()	
+    GUI.slots[slot].name:ClearItems()
 
     if slotState then
         GUI.slots[slot].name:Enable()
@@ -932,13 +653,13 @@ function SetSlotInfo(slot, playerInfo)
         GUI.slots[slot].name:Disable()
     end
 
-	GUI.slots[slot].ratingGroup:Show()
+    GUI.slots[slot].ratingGroup:Show()
     GUI.slots[slot].ratingText:SetText(playerInfo.PL or "")
-	GUI.slots[slot].ratingText:SetColor(playerInfo.RC or "ffffffff")
-	
-	GUI.slots[slot].numGamesGroup:Show()
+    GUI.slots[slot].ratingText:SetColor(playerInfo.RC or "ffffffff")
+
+    GUI.slots[slot].numGamesGroup:Show()
     GUI.slots[slot].numGamesText:SetText(playerInfo.NG or "")
-	
+
     GUI.slots[slot].name:Show()
     GUI.slots[slot].name:SetTitleText(LOC(playerInfo.PlayerName))
 
@@ -970,22 +691,22 @@ function SetSlotInfo(slot, playerInfo)
         if isLocallyOwned or not playerInfo.Human then
             GUI.slots[slot].pingGroup:Hide()
         else
-            GUI.slots[slot].pingGroup:Show()
+            GUI.slots[slot].pingGroup:Hide() -- Temporary - Should be show - request by ZePilOt
         end
     end
 
     if isLocallyOwned and playerInfo.Human then
-		Prefs.SetToCurrentProfile('LastColor', playerInfo.PlayerColor)
+        Prefs.SetToCurrentProfile('LastColor', playerInfo.PlayerColor)
         Prefs.SetToCurrentProfile('LastFaction', playerInfo.Faction)
     end
-	
-	--// Show the Country Flag in slot - Xinnony
-	SetSlotCountryFlag(slot, playerInfo)
-	--\\ Stop - Show the Country Flag in slot
-	
-	--CPU Benchmark code
-	SetSlotCPUBar(slot, playerInfo) --Update the slot CPU bar
-	--End CPU Benchmark code
+
+    --// Show the Country Flag in slot - Xinnony
+    SetSlotCountryFlag(slot, playerInfo)
+    --\\ Stop - Show the Country Flag in slot
+
+    --CPU Benchmark code
+    SetSlotCPUBar(slot, playerInfo) --Update the slot CPU bar
+    --End CPU Benchmark code
 end
 
 function ClearSlotInfo(slot)
@@ -1031,9 +752,9 @@ function ClearSlotInfo(slot)
     end
 
     -- hide these to clear slot of visible data
-	GUI.slots[slot].KinderCountry:Hide() -- Hide the Country Flag
-	GUI.slots[slot].ratingGroup:Hide()
-	GUI.slots[slot].numGamesGroup:Hide()
+    GUI.slots[slot].KinderCountry:Hide() -- Hide the Country Flag
+    GUI.slots[slot].ratingGroup:Hide()
+    GUI.slots[slot].numGamesGroup:Hide()
     GUI.slots[slot].faction:Hide()
     GUI.slots[slot].color:Hide()
     GUI.slots[slot].team:Hide()
@@ -1077,13 +798,13 @@ local function GetPlayersNotReady()
 end
 
 local function GetRandomFactionIndex()
-	local randomfaction = nil
-	local counter = 50
-	while counter > 0 do
-		counter = (counter - 1)
-		randomfaction = math.random(1, table.getn(FactionData.Factions))
-	end
-	return randomfaction
+    local randomfaction = nil
+    local counter = 50
+    while counter > 0 do
+        counter = (counter - 1)
+        randomfaction = math.random(1, table.getn(FactionData.Factions))
+    end
+    return randomfaction
 end
 
 
@@ -1117,194 +838,194 @@ local function AssignRandomStartSpots(gameInfo)
         if scenarioInfo then
             local armyTable = MapUtil.GetArmies(scenarioInfo)
             if armyTable then
-				if gameInfo.GameOptions['RandomMap'] == 'Off' then
-					numAvailStartSpots = table.getn(armyTable)
-				else					
-					numAvailStartSpots = numberOfPlayers
-				end
+                if gameInfo.GameOptions['RandomMap'] == 'Off' then
+                    numAvailStartSpots = table.getn(armyTable)
+                else
+                    numAvailStartSpots = numberOfPlayers
+                end
             end
         else
             WARN("Can't assign random start spots, no scenario selected.")
             return
         end
 
-		local norating = false
-		local ratingTable = {}
-		
-		for i = 1, numAvailStartSpots do
-			if gameInfo.PlayerOptions[i] then
-				if gameInfo.PlayerOptions[i].PL then
-					rating = gameInfo.PlayerOptions[i].PL
-					ratingTable[rating] = i
-				else
-					norating = true
-				end
-			end
-		end
+        local norating = false
+        local ratingTable = {}
 
-		a = {}
-		for n in pairs(ratingTable) do table.insert(a, n) end
-		table.sort(a)
+        for i = 1, numAvailStartSpots do
+            if gameInfo.PlayerOptions[i] then
+                if gameInfo.PlayerOptions[i].PL then
+                    rating = gameInfo.PlayerOptions[i].PL
+                    ratingTable[rating] = i
+                else
+                    norating = true
+                end
+            end
+        end
 
-		team1 = {}
-		team2 = {}
-		for i = 1, numAvailStartSpots do
-			if gameInfo.ClosedSlots[i] == nil then
-				if gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
-				
-					local midLine = GUI.mapView.Left() + (GUI.mapView.Width() / 2)
-					local markerPos = GUI.markers[i].marker.Left()
-				
-					if markerPos < midLine then
-						table.insert(team1, i)
-					else
-						table.insert(team2, i)
-					end
-				
-				elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
-					local midLine = GUI.mapView.Top() + (GUI.mapView.Height() / 2)
-					local markerPos = GUI.markers[i].marker.Top()
-					
-					if markerPos < midLine then
-						table.insert(team1, i)
-					else
-						table.insert(team2, i)
-					end
-				
-				elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' then
-					if i == 1 or i == 3 or i == 5 or i == 7 or i == 9 or i == 11 then
-						table.insert(team1, i)
-					else
-						table.insert(team2, i)
-					end
-				end
-			end
-		end
+        a = {}
+        for n in pairs(ratingTable) do table.insert(a, n) end
+        table.sort(a)
 
-		-- shuffle the array for randomness.
-		team1 = shuffle(team1)
-		team2 = shuffle(team2)
+        team1 = {}
+        team2 = {}
+        for i = 1, numAvailStartSpots do
+            if gameInfo.ClosedSlots[i] == nil then
+                if gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
 
-		local team1Increment = 1
-		local team2Increment = 1
-		
-		for i = 1, numAvailStartSpots do
-			if gameInfo.PlayerOptions[i] then
-				-- don't select closed slots for random pick
-				local randSlot
-				local goodteam = nil
-				for k,n in ipairs(a) do
-					if a[n] == i then
-						goodteam = Trueskill.assignToTeam(k-1)
+                    local midLine = GUI.mapView.Left() + (GUI.mapView.Width() / 2)
+                    local markerPos = GUI.markers[i].marker.Left()
 
-					end
-				end
-				
-				repeat
+                    if markerPos < midLine then
+                        table.insert(team1, i)
+                    else
+                        table.insert(team2, i)
+                    end
 
-					if gameInfo.GameOptions['AutoTeams'] == 'manual' or gameInfo.GameOptions['AutoTeams'] == 'none' then
-						randSlot = math.random(1,numAvailStartSpots)
-					else
-						if goodteam and norating == false then
-							if goodteam == 1 then
-								randSlot = team1[team1Increment]
-								team1Increment = team1Increment + 1
-							else
-								randSlot = team2[team2Increment]
-								team2Increment = team2Increment + 1
-							end
-						else
-							randSlot = math.random(1,numAvailStartSpots)
-						end
-					end
-					
-					
-				until gameInfo.ClosedSlots[randSlot] == nil
-				
-				
-				local temp = nil
-				if gameInfo.PlayerOptions[randSlot] then
-					temp = table.deepcopy(gameInfo.PlayerOptions[randSlot])
-				end
+                elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
+                    local midLine = GUI.mapView.Top() + (GUI.mapView.Height() / 2)
+                    local markerPos = GUI.markers[i].marker.Top()
 
-				gameInfo.PlayerOptions[randSlot] = table.deepcopy(gameInfo.PlayerOptions[i])
-				gameInfo.PlayerOptions[i] = temp
-			end
-		end
-	end
+                    if markerPos < midLine then
+                        table.insert(team1, i)
+                    else
+                        table.insert(team2, i)
+                    end
+
+                elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' then
+                    if i == 1 or i == 3 or i == 5 or i == 7 or i == 9 or i == 11 then
+                        table.insert(team1, i)
+                    else
+                        table.insert(team2, i)
+                    end
+                end
+            end
+        end
+
+        -- shuffle the array for randomness.
+        team1 = shuffle(team1)
+        team2 = shuffle(team2)
+
+        local team1Increment = 1
+        local team2Increment = 1
+
+        for i = 1, numAvailStartSpots do
+            if gameInfo.PlayerOptions[i] then
+                -- don't select closed slots for random pick
+                local randSlot
+                local goodteam = nil
+                for k,n in ipairs(a) do
+                    if a[n] == i then
+                        goodteam = Trueskill.assignToTeam(k-1)
+
+                    end
+                end
+
+                repeat
+
+                    if gameInfo.GameOptions['AutoTeams'] == 'manual' or gameInfo.GameOptions['AutoTeams'] == 'none' then
+                        randSlot = math.random(1,numAvailStartSpots)
+                    else
+                        if goodteam and norating == false then
+                            if goodteam == 1 then
+                                randSlot = team1[team1Increment]
+                                team1Increment = team1Increment + 1
+                            else
+                                randSlot = team2[team2Increment]
+                                team2Increment = team2Increment + 1
+                            end
+                        else
+                            randSlot = math.random(1,numAvailStartSpots)
+                        end
+                    end
+
+
+                until gameInfo.ClosedSlots[randSlot] == nil
+
+
+                local temp = nil
+                if gameInfo.PlayerOptions[randSlot] then
+                    temp = table.deepcopy(gameInfo.PlayerOptions[randSlot])
+                end
+
+                gameInfo.PlayerOptions[randSlot] = table.deepcopy(gameInfo.PlayerOptions[i])
+                gameInfo.PlayerOptions[i] = temp
+            end
+        end
+    end
 
 end
 
 -- This fonction is used to double check the observers.
 local function sendObserversList(gameInfo)
-	for k,observer in gameInfo.Observers do
-        
-		GpgNetSend('PlayerOption', string.format("team %s %d %s", observer.PlayerName, -1, 0))
-	
-	
-	end
+    for k,observer in gameInfo.Observers do
+
+        GpgNetSend('PlayerOption', string.format("team %s %d %s", observer.PlayerName, -1, 0))
+
+
+    end
 end
 
 local function AssignRandomTeams(gameInfo)
-	-- first, send all observers
-	
-	sendObserversList(gameInfo)
-	
-	if gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
-		local midLine = GUI.mapView.Left() + (GUI.mapView.Width() / 2)
-		for i = 1, LobbyComm.maxPlayerSlots do
-			if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
-				local markerPos = GUI.markers[i].marker.Left()
-				if markerPos < midLine then
-					gameInfo.PlayerOptions[i].Team = 2					
-				else
-					gameInfo.PlayerOptions[i].Team = 3					
-				end
-			SetSlotInfo(i, gameInfo.PlayerOptions[i])
-			end
-		end
-	elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
-		local midLine = GUI.mapView.Top() + (GUI.mapView.Height() / 2)
-		for i = 1, LobbyComm.maxPlayerSlots do
-			if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
-				local markerPos = GUI.markers[i].marker.Top()
-				if markerPos < midLine then
-					gameInfo.PlayerOptions[i].Team = 2					
-				else
-					gameInfo.PlayerOptions[i].Team = 3				
-				end
-			SetSlotInfo(i, gameInfo.PlayerOptions[i])
-			end
-		end
-	elseif gameInfo.GameOptions['AutoTeams'] == 'manual' and gameInfo.GameOptions['TeamSpawn'] == 'random' then
-		for i = 1, LobbyComm.maxPlayerSlots do
-			if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
-				gameInfo.PlayerOptions[i].Team = gameInfo.AutoTeams[i]
-				SetSlotInfo(i, gameInfo.PlayerOptions[i])
-			end
-		end
-	end
-	if gameInfo.GameOptions['AutoTeams'] == 'pvsi' or gameInfo.GameOptions['RandomMap'] != 'Off' then
-		for i = 1, LobbyComm.maxPlayerSlots do
-			if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
-				if i == 1 or i == 3 or i == 5 or i == 7 or i == 9 or i == 11 then
-					gameInfo.PlayerOptions[i].Team = 2
-				else
-					gameInfo.PlayerOptions[i].Team = 3
-				end
-			SetSlotInfo(i, gameInfo.PlayerOptions[i])
-			end
-		end
-	end
-	
-	if gameInfo.GameOptions['AutoTeams'] == 'none' then
-		for i = 1, LobbyComm.maxPlayerSlots do
-			if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
-				SetSlotInfo(i, gameInfo.PlayerOptions[i])
-			end
-		end
-	end
-	
+    -- first, send all observers
+
+    sendObserversList(gameInfo)
+
+    if gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
+        local midLine = GUI.mapView.Left() + (GUI.mapView.Width() / 2)
+        for i = 1, LobbyComm.maxPlayerSlots do
+            if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
+                local markerPos = GUI.markers[i].marker.Left()
+                if markerPos < midLine then
+                    gameInfo.PlayerOptions[i].Team = 2
+                else
+                    gameInfo.PlayerOptions[i].Team = 3
+                end
+            SetSlotInfo(i, gameInfo.PlayerOptions[i])
+            end
+        end
+    elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
+        local midLine = GUI.mapView.Top() + (GUI.mapView.Height() / 2)
+        for i = 1, LobbyComm.maxPlayerSlots do
+            if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
+                local markerPos = GUI.markers[i].marker.Top()
+                if markerPos < midLine then
+                    gameInfo.PlayerOptions[i].Team = 2
+                else
+                    gameInfo.PlayerOptions[i].Team = 3
+                end
+            SetSlotInfo(i, gameInfo.PlayerOptions[i])
+            end
+        end
+    elseif gameInfo.GameOptions['AutoTeams'] == 'manual' and gameInfo.GameOptions['TeamSpawn'] == 'random' then
+        for i = 1, LobbyComm.maxPlayerSlots do
+            if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
+                gameInfo.PlayerOptions[i].Team = gameInfo.AutoTeams[i]
+                SetSlotInfo(i, gameInfo.PlayerOptions[i])
+            end
+        end
+    end
+    if gameInfo.GameOptions['AutoTeams'] == 'pvsi' or gameInfo.GameOptions['RandomMap'] != 'Off' then
+        for i = 1, LobbyComm.maxPlayerSlots do
+            if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
+                if i == 1 or i == 3 or i == 5 or i == 7 or i == 9 or i == 11 then
+                    gameInfo.PlayerOptions[i].Team = 2
+                else
+                    gameInfo.PlayerOptions[i].Team = 3
+                end
+            SetSlotInfo(i, gameInfo.PlayerOptions[i])
+            end
+        end
+    end
+
+    if gameInfo.GameOptions['AutoTeams'] == 'none' then
+        for i = 1, LobbyComm.maxPlayerSlots do
+            if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
+                SetSlotInfo(i, gameInfo.PlayerOptions[i])
+            end
+        end
+    end
+
 end
 
 local function AssignAINames(gameInfo)
@@ -1341,11 +1062,11 @@ function ReturnToMenu(reconnect)
     GUI = false
 
     if not reconnect then
-		exitfn()
-	else		
-		local ipnumber = GetCommandLineArg("/joincustom", 1)[1]
-		import('/lua/ui/uimain.lua').StartJoinLobbyUI("UDP", ipnumber, localPlayerName)
-	end
+        exitfn()
+    else
+        local ipnumber = GetCommandLineArg("/joincustom", 1)[1]
+        import('/lua/ui/uimain.lua').StartJoinLobbyUI("UDP", ipnumber, localPlayerName)
+    end
 end
 
 local function SendSystemMessage(text)
@@ -1398,7 +1119,7 @@ function UpdateAvailableSlots( numAvailStartSpots )
                     end
                     if not gameInfo.PlayerOptions[i]['Ready'] then
                         EnableSlot(i)
-					end
+                    end
                 end
             else
                 if not GUI.slots[i].closed then
@@ -1429,7 +1150,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
             return
         end
     end
-	
+
     -- make sure there are some players (could all be observers?)
     -- Also count teams. There needs to be at least 2 teams (or all FFA) represented
     local totalPlayers = 0
@@ -1451,7 +1172,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
             end
             lastTeam = player.Team
         end
-    end		
+    end
 
     if gameInfo.GameOptions['Victory'] != 'sandbox' then
         local valid = true
@@ -1461,12 +1182,13 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         if not allFFA and not moreThanOneTeam then
             valid = false
         end
-        if not valid then 
-            AddChatText(LOC("<LOC lobui_0241>There must be more than one player or team or the Victory Condition must be set to Sandbox. "))
+        if not valid then
+            AddChatText(LOC("<LOC lobui_0241>There must be more than one player or team or the Victory Condition must be set "..
+                             "to Sandbox."))
             return
         end
-    end 
-        
+    end
+
     if totalPlayers == 0 then
         AddChatText(LOC("<LOC lobui_0233>There are no players assigned to player slots, can not continue"))
         return
@@ -1482,50 +1204,53 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
     if not EveryoneHasEstablishedConnections() then
         return
     end
-	
-	if not singlePlayer then		
-		if gameInfo.GameOptions.AllowObservers then
-			if totalPlayers > 3 and not stillAllowObservers then
-				UIUtil.QuickDialog(GUI, "<LOC lobui_0521>There are players for a team game and allow observers is enabled.  Do you still wish to launch?",
-					"<LOC _Yes>", function()
-						TryLaunch(true, false, false)
-						stillAllowObservers = true 
-						end,
-					"<LOC _No>",
-						nil,
-					nil, nil, 
-					true,
-					{worldCover = false, enterButton = 1, escapeButton = 2}
-				)
-				return
-			end
-		end
-		if gameInfo.GameOptions['TeamLock'] == 'locked' then
-			local i = 1
-			local n = 0
-			repeat
-				if gameInfo.PlayerOptions[i].Team != 1 and gameInfo.PlayerOptions[i].Team != nil then			
-					n = n + 1
-				end
-				i = i + 1
-			until i == 9
-			if totalPlayers > 3 and not stillAllowLockedTeams and totalPlayers != n and gameInfo.GameOptions['AutoTeams'] == 'none' then
-				UIUtil.QuickDialog(GUI, "<LOC lobui_0526>There are players for a team game and teams are locked.  Do you still wish to launch?",
-					"<LOC _Yes>", function()
-						TryLaunch(true, true, false)
-						stillAllowLockedTeams = true 
-						end,
-					"<LOC _No>",
-						nil,
-					nil, nil, 
-					true,
-					{worldCover = false, enterButton = 1, escapeButton = 2}
-				)
-				return
-			end
-		end
-	end
-	
+
+    if not singlePlayer then
+        if gameInfo.GameOptions.AllowObservers then
+            if totalPlayers > 3 and not stillAllowObservers then
+                UIUtil.QuickDialog(GUI, "<LOC lobui_0521>There are players for a team game and allow observers is enabled. "..
+                                        "Do you still wish to launch?",
+                    "<LOC _Yes>", function()
+                        TryLaunch(true, false, false)
+                        stillAllowObservers = true
+                        end,
+                    "<LOC _No>",
+                        nil,
+                    nil, nil,
+                    true,
+                    {worldCover = false, enterButton = 1, escapeButton = 2}
+                )
+                return
+            end
+        end
+        if gameInfo.GameOptions['TeamLock'] == 'locked' then
+            local i = 1
+            local n = 0
+            repeat
+                if gameInfo.PlayerOptions[i].Team != 1 and gameInfo.PlayerOptions[i].Team != nil then
+                    n = n + 1
+                end
+                i = i + 1
+            until i == 9
+            if totalPlayers > 3 and not stillAllowLockedTeams and totalPlayers != n and gameInfo.GameOptions['AutoTeams']
+                    == 'none' then
+                UIUtil.QuickDialog(GUI, "<LOC lobui_0526>There are players for a team game and teams are locked.  Do you " ..
+                                        "still wish to launch?",
+                    "<LOC _Yes>", function()
+                        TryLaunch(true, true, false)
+                        stillAllowLockedTeams = true
+                        end,
+                    "<LOC _No>",
+                        nil,
+                    nil, nil,
+                    true,
+                    {worldCover = false, enterButton = 1, escapeButton = 2}
+                )
+                return
+            end
+        end
+    end
+
     if not gameInfo.GameOptions.AllowObservers then
         local hostIsObserver = false
         local anyOtherObservers = false
@@ -1544,18 +1269,19 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
 
         if anyOtherObservers then
             if skipNoObserversCheck then
-				-- we send the observer list before kicking the players, in case they are not registered as observer
-				-- and won't disconnect correctly before the game launch.
-				sendObserversList(gameInfo)
+                -- we send the observer list before kicking the players, in case they are not registered as observer
+                -- and won't disconnect correctly before the game launch.
+                sendObserversList(gameInfo)
                 for k,observer in gameInfo.Observers do
                     lobbyComm:EjectPeer(observer.OwnerID, "KickedByHost")
                 end
                 gameInfo.Observers = {}
             else
-                UIUtil.QuickDialog(GUI, "<LOC lobui_0278>There are players who are not assigned slots and observers are not allowed.  Launching will cause them to be ejected.  Do you still wish to launch?",
+                UIUtil.QuickDialog(GUI, "<LOC lobui_0278>There are players who are not assigned slots and observers are not " ..
+                                        "allowed.  Launching will cause them to be ejected.  Do you still wish to launch?",
                                    "<LOC _Yes>", function() TryLaunch(true, true, true) end,
                                    "<LOC _No>", nil,
-                                   nil, nil, 
+                                   nil, nil,
                                    true,
                                    {worldCover = false, enterButton = 1, escapeButton = 2}
                                )
@@ -1563,50 +1289,50 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
             end
         end
     end
-	
-	numberOfPlayers = totalPlayers
-    
+
+    numberOfPlayers = totalPlayers
+
     local function LaunchGame()
-	
-		-- Send observer list again, just by precaution.
-		sendObserversList(gameInfo)
-	
-		if gameInfo.GameOptions['RandomMap'] != 'Off' then
-			autoRandMap = true
-			autoMap()
-		end		
-		
+
+        -- Send observer list again, just by precaution.
+        sendObserversList(gameInfo)
+
+        if gameInfo.GameOptions['RandomMap'] != 'Off' then
+            autoRandMap = true
+            autoMap()
+        end
+
         SetFrontEndData('NextOpBriefing', nil)
         -- assign random factions just as game is launched
         AssignRandomFactions(gameInfo)
         AssignRandomStartSpots(gameInfo)
-		--assign the teams just before launch
-		AssignRandomTeams(gameInfo)
+        --assign the teams just before launch
+        AssignRandomTeams(gameInfo)
         randstring = randomString(16, "%l%d")
-		gameInfo.GameOptions['ReplayID'] = randstring
-		AssignAINames(gameInfo)
-		local allRatings = {}
-		for k,v in gameInfo.PlayerOptions do
-			if v.Human and v.PL then
-				allRatings[v.PlayerName] = v.PL
-			end
-		end
-		gameInfo.GameOptions['Ratings'] = allRatings		
-		
+        gameInfo.GameOptions['ReplayID'] = randstring
+        AssignAINames(gameInfo)
+        local allRatings = {}
+        for k,v in gameInfo.PlayerOptions do
+            if v.Human and v.PL then
+                allRatings[v.PlayerName] = v.PL
+            end
+        end
+        gameInfo.GameOptions['Ratings'] = allRatings
+
         -- Tell everyone else to launch and then launch ourselves.
         lobbyComm:BroadcastData( { Type = 'Launch', GameInfo = gameInfo } )
-		
-		-- set the mods
-		gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
-		
-		scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-        lobbyComm:LaunchGame(gameInfo)		
+
+        -- set the mods
+        gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
+
+        scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+        lobbyComm:LaunchGame(gameInfo)
     end
 
     --if singlePlayer then--or HasCommandLineArg('/gpgnet') then
-		LaunchGame()
+        LaunchGame()
     --else
-	--// This code is a pre-launch timer, disable by a community
+    --// This code is a pre-launch timer, disable by a community
         --launchThread = ForkThread(function()
             --GUI.launchGameButton.label:SetText(LOC("<LOC PROFILE_0005>"))
             --GUI.launchGameButton.OnClick = function(self)
@@ -1614,48 +1340,53 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
                 --self.OnClick = function(self) TryLaunch(false) end
                 --GUI.launchGameButton.label:SetText(LOC("<LOC lobui_0212>Launch"))
             --end
-			--if gameInfo.GameOptions['RandomMap'] != 'Off' then
-				--local rMapSizeFil = import('/lua/ui/dialogs/mapselect.lua').rMapSizeFil
-				--local rMapSizeFilLim = import('/lua/ui/dialogs/mapselect.lua').rMapSizeFilLim
-				--local rMapPlayersFil = import('/lua/ui/dialogs/mapselect.lua').rMapPlayersFil
-				--local rMapPlayersFilLim = import('/lua/ui/dialogs/mapselect.lua').rMapPlayersFilLim
-				--SendSystemMessage("-------------------------------------------------------------------------------------------------------------------")
-				--if rMapSizeFilLim == 'equal' then
-					--rMapSizeFilLim = '='
-				--end
-				--if rMapSizeFilLim == 'less' then
-					--rMapSizeFilLim = '<='
-				--end
-				--if rMapSizeFilLim == 'greater' then
-					--rMapSizeFilLim = '>='
-				--end
-				--if rMapPlayersFilLim == 'equal' then
-					--rMapPlayersFilLim = '='
-				--end
-				--if rMapPlayersFilLim == 'less' then
-					--rMapPlayersFilLim = '<='
-				--end
-				--if rMapPlayersFilLim == 'greater' then
-					--rMapPlayersFilLim = '>='
-				--end
-				--if rMapSizeFil != 0 and rMapPlayersFil != 0 then
-					--SendSystemMessage(LOCF("<LOC lobui_0558>Random Map enabled: Map Size is %s %dkm and Number of Players are %s %d", rMapSizeFilLim, rMapSizeFil, rMapPlayersFilLim, rMapPlayersFil))
-				--elseif rMapSizeFil != 0 then
-					--SendSystemMessage(LOCF("<LOC lobui_0559>Random Map enabled: Map Size is %s %dkm and Number of Players are ALL", rMapSizeFilLim, rMapSizeFil))
-				--elseif rMapPlayersFil != 0 then
-					--SendSystemMessage(LOCF("<LOC lobui_0560>Random Map enabled: Map Size is ALL and Number of Players are %s %d", rMapPlayersFilLim, rMapPlayersFil))
-				--else
-					--SendSystemMessage(LOC("<LOC lobui_0561>Random Map enabled: Map Size is ALL and Number of Players are ALL"))
-				--end
-				--SendSystemMessage("-------------------------------------------------------------------------------------------------------------------")			
-			--end
+            --if gameInfo.GameOptions['RandomMap'] != 'Off' then
+                --local rMapSizeFil = import('/lua/ui/dialogs/mapselect.lua').rMapSizeFil
+                --local rMapSizeFilLim = import('/lua/ui/dialogs/mapselect.lua').rMapSizeFilLim
+                --local rMapPlayersFil = import('/lua/ui/dialogs/mapselect.lua').rMapPlayersFil
+                --local rMapPlayersFilLim = import('/lua/ui/dialogs/mapselect.lua').rMapPlayersFilLim
+                --SendSystemMessage("-------------------------------------------------------------------------------------------------------------------")
+                --if rMapSizeFilLim == 'equal' then
+                    --rMapSizeFilLim = '='
+                --end
+                --if rMapSizeFilLim == 'less' then
+                    --rMapSizeFilLim = '<='
+                --end
+                --if rMapSizeFilLim == 'greater' then
+                    --rMapSizeFilLim = '>='
+                --end
+                --if rMapPlayersFilLim == 'equal' then
+                    --rMapPlayersFilLim = '='
+                --end
+                --if rMapPlayersFilLim == 'less' then
+                    --rMapPlayersFilLim = '<='
+                --end
+                --if rMapPlayersFilLim == 'greater' then
+                    --rMapPlayersFilLim = '>='
+                --end
+                --if rMapSizeFil != 0 and rMapPlayersFil != 0 then
+                    --SendSystemMessage(LOCF("<LOC lobui_0558>Random Map enabled: Map Size is %s %dkm and Number of Players" ..
+                    --                       " are %s %d", rMapSizeFilLim, rMapSizeFil, rMapPlayersFilLim, rMapPlayersFil))
+                --elseif rMapSizeFil != 0 then
+                    --SendSystemMessage(LOCF("<LOC lobui_0559>Random Map enabled: Map Size is %s %dkm and Number of Players" ..
+                    --                       " are ALL", rMapSizeFilLim, rMapSizeFil))
+                --elseif rMapPlayersFil != 0 then
+                    --SendSystemMessage(LOCF("<LOC lobui_0560>Random Map enabled: Map Size is ALL and Number of Players " ..
+                    --                       "are %s %d", rMapPlayersFilLim, rMapPlayersFil))
+                --else
+                    --SendSystemMessage(LOC("<LOC lobui_0561>Random Map enabled: Map Size is ALL and Number of Players are " ..
+                    --                      " ALL"))
+                --end
+                --SendSystemMessage("-------------------------------------------------------------------------------------" ..
+                --                  "------------------------------")
+            --end
             --local timer = 5
             --while timer > 0 do
                 --local text = LOCF('%s %d', "<LOC lobby_0001>Game will launch in", timer)
                 --SendSystemMessage(text)
                 --timer = timer - 1
                 --WaitSeconds(1)
-            --end			
+            --end
             --LaunchGame()
         --end)
     --end
@@ -1663,7 +1394,7 @@ end
 
 --// This code is a pre-launch timer, disable by a community
 --function CancelLaunch()
-    --if launchThread then 
+    --if launchThread then
         --KillThread(launchThread)
         --launchThread = false
         --GUI.launchGameButton.label:SetText(LOC("<LOC lobui_0212>Launch"))
@@ -1683,37 +1414,38 @@ local function AlertHostMapMissing()
     if lobbyComm:IsHost() then
         HostPlayerMissingMapAlert(localPlayerID)
     else
-        lobbyComm:SendData(hostID, {Type = 'MissingMap', Id = localPlayerID})    
+        lobbyComm:SendData(hostID, {Type = 'MissingMap', Id = localPlayerID})
     end
 end
 
 local function UpdateGame()
     -- if anything happens to switch a no SupCom player to a faction other than Seraphim, switch them back
-	local playerSlot = FindSlotForID(localPlayerID)
+    local playerSlot = FindSlotForID(localPlayerID)
 
-	if not gameInfo.PlayerOptions[playerSlot].MEAN then
-		SetPlayerOption(playerSlot, 'MEAN', playerMean)
-	end
+    if not gameInfo.PlayerOptions[playerSlot].MEAN then
+        SetPlayerOption(playerSlot, 'MEAN', playerMean)
+    end
 
-	if not gameInfo.PlayerOptions[playerSlot].DEV then
-		SetPlayerOption(playerSlot, 'DEV', playerDeviation)
-	end
-	
-	if not gameInfo.PlayerOptions[playerSlot].PL then
-		SetPlayerOption(playerSlot, 'PL', playerRating)
-	end
-	
-	if not gameInfo.PlayerOptions[playerSlot].RC then
-		SetPlayerOption(playerSlot, 'RC', ratingColor)
-	end
-	
-	if not gameInfo.PlayerOptions[playerSlot].NG then
-		SetPlayerOption(playerSlot, 'NG', numGames)
-	end	
-	
+    if not gameInfo.PlayerOptions[playerSlot].DEV then
+        SetPlayerOption(playerSlot, 'DEV', playerDeviation)
+    end
+
+    if not gameInfo.PlayerOptions[playerSlot].PL then
+        SetPlayerOption(playerSlot, 'PL', playerRating)
+    end
+
+    if not gameInfo.PlayerOptions[playerSlot].RC then
+        SetPlayerOption(playerSlot, 'RC', ratingColor)
+    end
+
+    if not gameInfo.PlayerOptions[playerSlot].NG then
+        SetPlayerOption(playerSlot, 'NG', numGames)
+    end
+
     if not hasSupcom then
         local playerSlot = FindSlotForID(localPlayerID)
-        if gameInfo.PlayerOptions[playerSlot] and gameInfo.PlayerOptions[playerSlot].Faction != 4 and not IsObserver(localPlayerID) then
+        if gameInfo.PlayerOptions[playerSlot] and gameInfo.PlayerOptions[playerSlot].Faction != 4 and not
+               IsObserver(localPlayerID) then
             SetPlayerOption(playerSlot, 'Faction', 4)
             return
         end
@@ -1731,23 +1463,23 @@ local function UpdateGame()
             AlertHostMapMissing()
         end
     end
-    
+
     if not GUI.uiCreated then return end
 
     if lobbyComm:IsHost() then
         GUI.changeMapButton:Show()
-		GUI.launchGameButton:Show()
-		
+        GUI.launchGameButton:Show()
+
         if GUI.allowObservers then
             GUI.allowObservers:Show()
         end
-		if not singlePlayer then
-			if quickRandMap then				
-				GUI.randMap:Enable()
-			else
-				GUI.randMap:Disable()
-			end
-		end
+        if not singlePlayer then
+            if quickRandMap then
+                GUI.randMap:Enable()
+            else
+                GUI.randMap:Disable()
+            end
+        end
     else
         GUI.changeMapButton.label:SetText(LOC('<LOC tooltipui0145>'))
         GUI.changeMapButton.OnClick = function(self, modifiers)
@@ -1758,34 +1490,34 @@ local function UpdateGame()
         GUI.launchGameButton:Hide()
         if GUI.allowObservers then
             GUI.allowObservers:Show()
-			GUI.allowObservers:Disable()
+            GUI.allowObservers:Disable()
         end
-		if gameInfo.GameOptions.AllowObservers then
-			GUI.allowObservers:SetCheck(true)
-		else
-			GUI.allowObservers:SetCheck(false)
-		end		
+        if gameInfo.GameOptions.AllowObservers then
+            GUI.allowObservers:SetCheck(true)
+        else
+            GUI.allowObservers:SetCheck(false)
+        end
     end
-	
+
     if GUI.becomeObserver then
         if IsObserver(localPlayerID) then
-			GUI.becomeObserver:Hide()
+            GUI.becomeObserver:Hide()
             GUI.becomeObserver:Disable()
         else
             GUI.becomeObserver:Show()
             GUI.becomeObserver:Enable()
         end
     end
-	
+
     local localPlayerSlot = FindSlotForID(localPlayerID)
     if localPlayerSlot then
         if gameInfo.PlayerOptions[localPlayerSlot].Ready then
             GUI.becomeObserver:Disable()
-			GUI.LargeMapPreview:Disable()
+            GUI.LargeMapPreview:Disable()
         else
-			GUI.LargeMapPreview:Enable()
-		end		
-    end	
+            GUI.LargeMapPreview:Enable()
+        end
+    end
 
     if GUI.observerList then
         -- clear every update and repopulate
@@ -1796,10 +1528,10 @@ local function UpdateGame()
             GUI.observerList:AddItem(observer.PlayerName)
         end
     end
-    
+
     local numPlayers = GetPlayerCount()
 
-	
+
     local numAvailStartSpots = LobbyComm.maxPlayerSlots
     if scenarioInfo then
         local armyTable = MapUtil.GetArmies(scenarioInfo)
@@ -1821,17 +1553,17 @@ local function UpdateGame()
     end
 
 
-	if scenarioInfo and scenarioInfo.map and (scenarioInfo.map != "") then
-	
-		if not GUI.mapView:SetTexture(scenarioInfo.preview) then
-			GUI.mapView:SetTextureFromMap(scenarioInfo.map)
-		end
-		--GUI.mapName:SetText(LOC(scenarioInfo.name)) -- Add mapname above option lobby (replace with Ranked Label)
-		ShowMapPositions(GUI.mapView,scenarioInfo,numPlayers)			
-	else
-		GUI.mapView:ClearTexture()
-		ShowMapPositions(nil, false)			
-	end
+    if scenarioInfo and scenarioInfo.map and (scenarioInfo.map != "") then
+
+        if not GUI.mapView:SetTexture(scenarioInfo.preview) then
+            GUI.mapView:SetTextureFromMap(scenarioInfo.map)
+        end
+        --GUI.mapName:SetText(LOC(scenarioInfo.name)) -- Add mapname above option lobby (replace with Ranked Label)
+        ShowMapPositions(GUI.mapView,scenarioInfo,numPlayers)
+    else
+        GUI.mapView:ClearTexture()
+        ShowMapPositions(nil, false)
+    end
 
 
     -- deal with options display
@@ -1843,197 +1575,213 @@ local function UpdateGame()
                 allPlayersReady = false
             end
 
-            if allPlayersReady then				
-				GUI.allowObservers:Disable()
+            if allPlayersReady then
+                GUI.allowObservers:Disable()
                 GUI.changeMapButton:Disable()
-				GUI.rankedOptions:Disable()
+                GUI.rankedOptions:Disable()
                 GUI.becomeObserver:Disable()
-				GUI.randMap:Disable()
-				--GUI.randTeam:Disable()
-                GUI.launchGameButton:Enable()				
+                GUI.randMap:Disable()
+                --GUI.randTeam:Disable()
+                GUI.launchGameButton:Enable()
             else
-				GUI.allowObservers:Enable()
+                GUI.allowObservers:Enable()
                 GUI.changeMapButton:Enable()
-				GUI.rankedOptions:Enable()
+                GUI.rankedOptions:Enable()
                 GUI.becomeObserver:Enable()
-				--GUI.randTeam:Enable()              
+                GUI.randMap:Enable()
+                --GUI.randTeam:Enable()
                 if launchThread then CancelLaunch() end
-                
+
                 GUI.launchGameButton:Disable()
             end
-			
-			if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") and 2 < 1 then -- 2 < 1 is to disable the button
-				if scenarioInfo and scenarioInfo.map and scenarioInfo.map != '' then
-					if (lastUploadedMap != gameInfo.GameOptions.ScenarioFile) then
-						GUI.uploadMapButton:Show()
-					else
-						GUI.uploadMapButton:Hide()
-					end
-				else
-					GUI.uploadMapButton:Hide()
-				end
-			else
-				GUI.uploadMapButton:Hide()
-			end
-			
+
+            --uploadMapButton no longer exists, therefore, this code was the source of script failures.
+            -- 2 < 1 is to disable the button
+            --if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") and 2 < 1 then
+            --    if scenarioInfo and scenarioInfo.map and scenarioInfo.map != '' then
+            --        if (lastUploadedMap != gameInfo.GameOptions.ScenarioFile) then
+            --            GUI.uploadMapButton:Show()
+            --        else
+            --            GUI.uploadMapButton:Hide()
+            --        end
+            --    else
+            --        GUI.uploadMapButton:Hide()
+            --    end
+            --else
+            --    GUI.uploadMapButton:Hide()
+            --end
+
         end
     end
-	if LrgMap then
-		scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-		CreateBigPreview(501, GUI.mapPanel)
-	end
+    if LrgMap then
+        scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+        CreateBigPreview(501, GUI.mapPanel)
+    end
     RefreshOptionDisplayData(scenarioInfo)
-	-- Send autoteams infos to server.
-	AssignRandomTeams(gameInfo)	
-	
-	
+    -- Send autoteams infos to server.
+    AssignRandomTeams(gameInfo)
 
-	if gameInfo.GameOptions['TeamSpawn'] != 'random' and math.mod(numPlayers,2) == 0 and gameInfo.GameOptions['AutoTeams'] != 'manual' and gameInfo.GameOptions['AutoTeams'] != 'none' then
-		
-		local teams = nil
-		local teamcreated = false
-		correct = true
-	
-		for i = 1, LobbyComm.maxPlayerSlots do
-			if gameInfo.PlayerOptions[i] then
-			
-				if  gameInfo.PlayerOptions[i].Human then
-					if gameInfo.PlayerOptions[i].MEAN and gameInfo.PlayerOptions[i].DEV then
-						player = Player.create(gameInfo.PlayerOptions[i].PlayerName, Rating.create(gameInfo.PlayerOptions[i].MEAN, gameInfo.PlayerOptions[i].DEV))
-						team = gameInfo.PlayerOptions[i].Team
-						if team == 2 then
-							if teamcreated then
-								teams:addPlayer(1, player)
-							else
-								teams = Teams.create(1, player)
-								teamcreated = true
-							end
-						else
-							if teamcreated then
-								teams:addPlayer(2, player)
-							else
-								teams = Teams.create(2, player)
-								teamcreated = true
-							end					
-						end
-					end
-				else
-					correct = false
-				
-				end
-			end
-		end
-		if correct and teams != nil then
-			local quality = Trueskill.computeQuality(teams)
-			if quality and quality > 0 then
-				gameInfo.GameOptions['Quality'] = quality
-				--local randmapText = UIUtil.CreateText(GUI.panel, "current game quality : " .. quality .. " %", 17, UIUtil.titleFont)
-				if scenarioInfo.map_version then
-					randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."] (Game quality : "..quality.."%)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
-				else
-					randmapText:SetText(scenarioInfo.name.." (Game quality : "..quality.."%)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
-				end
-				--LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
-			else
-				if randmapText then
-					if scenarioInfo.map_version then
-						randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."] (Game quality : N/A)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
-					else
-						randmapText:SetText(scenarioInfo.name.." (Game quality : N/A)") -- Set the map name and quality at the top right corner in lobby -- Xinnony
-					end
-				end
-			end
-		else
-			if randmapText then
-				if scenarioInfo.map_version then
-					randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."]") -- Set the map name and quality at the top right corner in lobby -- Xinnony
-				else
-					randmapText:SetText(scenarioInfo.name) -- Set the map name and quality at the top right corner in lobby -- Xinnony
-				end
-			end
-		end
-	else
-		if randmapText then
-			if scenarioInfo.map_version then
-				randmapText:SetText(scenarioInfo.name.." [v."..scenarioInfo.map_version.."]") -- Set the map name and quality at the top right corner in lobby -- Xinnony
-			else
-				randmapText:SetText(scenarioInfo.name) -- Set the map name and quality at the top right corner in lobby -- Xinnony
-			end
-		end
+
+
+    if gameInfo.GameOptions['TeamSpawn'] != 'random' and math.mod(numPlayers,2) == 0 and gameInfo.GameOptions['AutoTeams'] !=
+        'manual' and gameInfo.GameOptions['AutoTeams'] != 'none' then
+
+        local teams = nil
+        local teamcreated = false
+        correct = true
+
+        for i = 1, LobbyComm.maxPlayerSlots do
+            if gameInfo.PlayerOptions[i] then
+
+                if  gameInfo.PlayerOptions[i].Human then
+                    if gameInfo.PlayerOptions[i].MEAN and gameInfo.PlayerOptions[i].DEV then
+                        player = Player.create(gameInfo.PlayerOptions[i].PlayerName,
+                                 Rating.create(gameInfo.PlayerOptions[i].MEAN, gameInfo.PlayerOptions[i].DEV))
+                        team = gameInfo.PlayerOptions[i].Team
+                        if team == 2 then
+                            if teamcreated then
+                                teams:addPlayer(1, player)
+                            else
+                                teams = Teams.create(1, player)
+                                teamcreated = true
+                            end
+                        else
+                            if teamcreated then
+                                teams:addPlayer(2, player)
+                            else
+                                teams = Teams.create(2, player)
+                                teamcreated = true
+                            end
+                        end
+                    end
+                else
+                    correct = false
+
+                end
+            end
+        end
+        if correct and teams != nil then
+            local quality = Trueskill.computeQuality(teams)
+            if quality and quality > 0 then
+                gameInfo.GameOptions['Quality'] = quality
+                --#local randmapText = UIUtil.CreateText(GUI.panel, "current game quality : " .. quality .. " %", 17, UIUtil.titleFont)
+				--#LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
+                -- Set the map name and quality at the top right corner in lobby -- Xinnony
+                randmapText:SetText(scenarioInfo.name.." (Game quality : "..quality.."%)")
+            else
+                if randmapText then
+                    -- Set the map name and quality at the top right corner in lobby -- Xinnony
+                    randmapText:SetText(scenarioInfo.name.." (Game quality : N/A)")
+                end
+            end
+        else
+            if randmapText then
+                -- Set the map name and quality at the top right corner in lobby -- Xinnony
+                randmapText:SetText(scenarioInfo.name)
+            end
+        end
+    else
+        if randmapText then
+            -- Set the map name and quality at the top right corner in lobby -- Xinnony
+            randmapText:SetText(scenarioInfo.name)
+        end
+    end
+	--// Add Tooltip info on Map Name Label -- Xinnony
+	if not scenarioInfo.map_version then
+		scenarioInfo.map_version = "N/A"
 	end
-	--// For refresh menu in slot -- Xinnony
-	FuncSlotMenuData()
-	--\\ Stop For refresh menu in slot
+	local ArmySize = table.getsize(scenarioInfo.Configurations.standard.teams[1].armies)
+	if not ArmySize then
+		ArmySize = "N/A"
+	end
+	if not scenarioInfo.size then
+		scenarioInfo.size = {"N/A", "N/A"}
+	end
+	if not scenarioInfo.description then
+		scenarioInfo.description = "N/A"
+	end
+	Tooltip.AddButtonTooltip(randmapText,{text=scenarioInfo.name, body='- Map version : '..scenarioInfo.map_version..'\n '..
+		'- Max Players : '..ArmySize..' max'..'\n '..
+		'- Map Size : '..scenarioInfo.size[1]/51.2 ..'km x '..scenarioInfo.size[2]/51.2 ..'km'..'\n '..
+		'- Map Description :\n'..scenarioInfo.description})
+	--\\ Stop -- Add Tooltip info on Map Name Label
+    --// For refresh menu in slot -- Xinnony
+    FuncSlotMenuData()
+    --\\ Stop -- For refresh menu in slot
 end
 
 -- Update our local gameInfo.GameMods from selected map name and selected mods, then
 -- notify other clients about the change.
 local function HostUpdateMods(newPlayerID)
     if lobbyComm:IsHost() then
-		if gameInfo.GameOptions['RankedGame'] and gameInfo.GameOptions['RankedGame'] != 'Off' then
-			gameInfo.GameMods = {}
-			gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
-			lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
-			return
-		end
+        if gameInfo.GameOptions['RankedGame'] and gameInfo.GameOptions['RankedGame'] != 'Off' then
+            gameInfo.GameMods = {}
+            gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
+            lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
+            return
+        end
         local newmods = {}
-		local missingmods = {}
+        local missingmods = {}
         for k,modId in selectedMods do
             if IsModAvailable(modId) then
                 newmods[modId] = true
             else
-				table.insert(missingmods, modId)
-			end
+                table.insert(missingmods, modId)
+            end
         end
         if not table.equal(gameInfo.GameMods, newmods) and (not newPlayerID or not autoKick) then
-            gameInfo.GameMods = newmods			
+            gameInfo.GameMods = newmods
             lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
-			
-			local nummods = 0
-			local uids = ""
-			
-			for k in gameInfo.GameMods do
-				nummods = nummods + 1
-				if uids == "" then
-					uids =  k
-				else
-					uids = string.format("%s %s", uids, k)
-				end
-				
-			end
-			GpgNetSend('GameMods', "activated", nummods)
-			
-			if nummods > 0 then
-				GpgNetSend('GameMods', "uids", uids)
-			end
+
+            local nummods = 0
+            local uids = ""
+
+            for k in gameInfo.GameMods do
+                nummods = nummods + 1
+                if uids == "" then
+                    uids =  k
+                else
+                    uids = string.format("%s %s", uids, k)
+                end
+
+            end
+            GpgNetSend('GameMods', "activated", nummods)
+
+            if nummods > 0 then
+                GpgNetSend('GameMods', "uids", uids)
+            end
 
 
         elseif not table.equal(gameInfo.GameMods, newmods) and newPlayerID and autoKick then
-			local modnames = ""
-			local totalMissing = table.getn(missingmods)
-			local totalListed = 0
-			if totalMissing > 0 then
-				for index, id in missingmods do
-					for k,mod in Mods.GetGameMods() do						
-						if mod.uid == id then
-							totalListed = totalListed + 1
-							if totalMissing == totalListed then
-								modnames = modnames .. " " .. mod.name
-							else
-								modnames = modnames .. " " .. mod.name .. " + "
-							end
-						end						
-					end					
-				end
-			end
-			local reason = ""			
-			if table.getn(missingmods) == 1 then
-				reason = (LOCF('<LOC lobui_0588>You were automaticly removed from the lobby because you don\'t have the following mod:\n%s \nPlease, install the mod before you join the game lobby', modnames))				
-			else
-				reason = (LOCF('<LOC lobui_0589>You were automaticly removed from the lobby because you don\'t have the following mods:\n%s \nPlease, install the mods before you join the game lobby', modnames))
-			end						
-			lobbyComm:EjectPeer(newPlayerID, reason)
-		end
+            local modnames = ""
+            local totalMissing = table.getn(missingmods)
+            local totalListed = 0
+            if totalMissing > 0 then
+                for index, id in missingmods do
+                    for k,mod in Mods.GetGameMods() do
+                        if mod.uid == id then
+                            totalListed = totalListed + 1
+                            if totalMissing == totalListed then
+                                modnames = modnames .. " " .. mod.name
+                            else
+                                modnames = modnames .. " " .. mod.name .. " + "
+                            end
+                        end
+                    end
+                end
+            end
+            local reason = ""
+            if table.getn(missingmods) == 1 then
+                reason = (LOCF('<LOC lobui_0588>You were automaticly removed from the lobby because you ' ..
+                               'don\'t have the following mod:\n%s \nPlease, install the mod before you join the game lobby',
+                               modnames))
+            else
+                reason = (LOCF('<LOC lobui_0589>You were automaticly removed from the lobby because you ' ..
+                               'don\'t have the following mods:\n%s \nPlease, install the mods before you join the game lobby',
+                               modnames))
+            end
+            lobbyComm:EjectPeer(newPlayerID, reason)
+        end
     end
 end
 
@@ -2091,24 +1839,25 @@ function HostOpenSlot(senderID, slot)
 end
 
 -- slot less than 1 means try to find a slot
-function HostTryAddPlayer( senderID, slot, requestedPlayerName, human, aiPersonality, requestedColor, requestedFaction, requestedTeam, requestedPL, requestedRC, requestedNG, requestedMEAN, requestedDEV )	
-	--// COUNTRY - Xinnony
-	--If new player join, send the Country to all player already joined
-	if human and not singlePlayer then
-		for i, Country in Country_List do
-			lobbyComm:SendData(senderID, { Type = 'Country', PlayerName = Country.PlayerName, Result = Country.Result } )
-		end
-	end
-	--\\ Stop COUNTRY
-	-- CPU benchmark code
-	if human and not singlePlayer then
-		for i,benchmark in CPU_BenchmarkList do
-			-- If we're getting a new player, send them all our benchmark data for players who have joined already
-			lobbyComm:SendData(senderID, { Type = 'CPUBenchmark', PlayerName=benchmark.PlayerName, Result = benchmark.Result} )
-		end
-	end
-	-- End CPU benchmark code
-	
+function HostTryAddPlayer( senderID, slot, requestedPlayerName, human, aiPersonality, requestedColor, requestedFaction,
+                           requestedTeam, requestedPL, requestedRC, requestedNG, requestedMEAN, requestedDEV )
+    --// COUNTRY - Xinnony
+    --If new player join, send the Country to all player already joined
+    if human and not singlePlayer then
+        for i, Country in Country_List do
+            lobbyComm:SendData(senderID, { Type = 'Country', PlayerName = Country.PlayerName, Result = Country.Result } )
+        end
+    end
+    --\\ Stop COUNTRY
+    -- CPU benchmark code
+    if human and not singlePlayer then
+        for i,benchmark in CPU_BenchmarkList do
+            -- If we're getting a new player, send them all our benchmark data for players who have joined already
+            lobbyComm:SendData(senderID, { Type = 'CPUBenchmark', PlayerName=benchmark.PlayerName, Result = benchmark.Result} )
+        end
+    end
+    -- End CPU benchmark code
+
     local newSlot = slot
 
     if not slot or slot < 1 then
@@ -2140,7 +1889,8 @@ function HostTryAddPlayer( senderID, slot, requestedPlayerName, human, aiPersona
     gameInfo.PlayerOptions[newSlot].Human = human
     gameInfo.PlayerOptions[newSlot].OwnerID = senderID
     if hasSupcom then
-        gameInfo.PlayerOptions[newSlot].Faction = requestedFaction or gameInfo.PlayerOptions[newSlot].Faction -- already assigned a default, but use requested if avail
+        -- already assigned a default, but use requested if avail
+        gameInfo.PlayerOptions[newSlot].Faction = requestedFaction or gameInfo.PlayerOptions[newSlot].Faction
     else
         gameInfo.PlayerOptions[newSlot].Faction = 4
     end
@@ -2152,7 +1902,8 @@ function HostTryAddPlayer( senderID, slot, requestedPlayerName, human, aiPersona
     end
 
     -- if a color is requested, attempt to use that color if available, otherwise, assign first available
-    gameInfo.PlayerOptions[newSlot].PlayerColor = nil   -- clear out player color first so default color isn't blocked from color free list
+    -- clear out player color first so default color isn't blocked from color free list
+    gameInfo.PlayerOptions[newSlot].PlayerColor = nil
     if requestedColor and IsColorFree(requestedColor) then
         gameInfo.PlayerOptions[newSlot].PlayerColor = requestedColor
     else
@@ -2162,36 +1913,36 @@ function HostTryAddPlayer( senderID, slot, requestedPlayerName, human, aiPersona
                 break
             end
         end
-    end	
+    end
 
-	if requestedMEAN then
-		gameInfo.PlayerOptions[newSlot].MEAN = requestedMEAN
-	end	
-	
-	if requestedDEV then
-		gameInfo.PlayerOptions[newSlot].DEV = requestedDEV
-	end	
-	
-	if requestedPL then
-		gameInfo.PlayerOptions[newSlot].PL = requestedPL
-	end	
-	
-	if requestedRC then
-		gameInfo.PlayerOptions[newSlot].RC = requestedRC
-	end
-	
-	if requestedNG then
-		gameInfo.PlayerOptions[newSlot].NG = requestedNG
-	end
-	
-	lobbyComm:BroadcastData(
-		{
-			Type = 'SlotAssigned',
-			Slot = newSlot,
-			Options = gameInfo.PlayerOptions[newSlot],
-		}
-	)
-	UpdateGame()
+    if requestedMEAN then
+        gameInfo.PlayerOptions[newSlot].MEAN = requestedMEAN
+    end
+
+    if requestedDEV then
+        gameInfo.PlayerOptions[newSlot].DEV = requestedDEV
+    end
+
+    if requestedPL then
+        gameInfo.PlayerOptions[newSlot].PL = requestedPL
+    end
+
+    if requestedRC then
+        gameInfo.PlayerOptions[newSlot].RC = requestedRC
+    end
+
+    if requestedNG then
+        gameInfo.PlayerOptions[newSlot].NG = requestedNG
+    end
+
+    lobbyComm:BroadcastData(
+        {
+            Type = 'SlotAssigned',
+            Slot = newSlot,
+            Options = gameInfo.PlayerOptions[newSlot],
+        }
+    )
+    UpdateGame()
 end
 
 function HostTryMovePlayer(senderID, currentSlot, requestedSlot)
@@ -2201,15 +1952,15 @@ function HostTryMovePlayer(senderID, currentSlot, requestedSlot)
         LOG("HostTryMovePlayer: player is marked ready and can not move")
         return
     end
-    
+
     if gameInfo.PlayerOptions[requestedSlot] then
         LOG("HostTryMovePlayer: requested slot " .. requestedSlot .. " already occupied")
         return
     end
-    
+
     if gameInfo.ClosedSlots[requestedSlot] != nil then
         LOG("HostTryMovePlayer: requested slot " .. requestedSlot .. " is closed")
-        return    
+        return
     end
 
     if requestedSlot > numOpenSlots or requestedSlot < 1 then
@@ -2272,15 +2023,15 @@ function HostConvertPlayerToObserver(senderID, name, playerSlot)
     gameInfo.Observers[index] = {
         PlayerName = name,
         OwnerID = senderID,
-		PL = gameInfo.PlayerOptions[playerSlot].PL,
+        PL = gameInfo.PlayerOptions[playerSlot].PL,
     }
-    
+
     if lobbyComm:IsHost() then
-	    GpgNetSend('PlayerOption', string.format("team %s %d %s", name, -1, 0))
+        GpgNetSend('PlayerOption', string.format("team %s %d %s", name, -1, 0))
 
     end
-    
-    
+
+
     gameInfo.PlayerOptions[playerSlot] = nil
     ClearSlotInfo(playerSlot)
 
@@ -2294,11 +2045,12 @@ function HostConvertPlayerToObserver(senderID, name, playerSlot)
     )
 
     SendSystemMessage(LOCF("<LOC lobui_0226>%s has switched from a player to an observer.", name))
-    
+
     UpdateGame()
 end
 
-function HostConvertObserverToPlayer(senderID, name, fromObserverSlot, toPlayerSlot, requestedFaction, requestedPL, requestedRC, requestedNG)
+function HostConvertObserverToPlayer(senderID, name, fromObserverSlot, toPlayerSlot, requestedFaction,
+                                     requestedPL, requestedRC, requestedNG)
     if gameInfo.Observers[fromObserverSlot] == nil then
         return
     end
@@ -2306,29 +2058,29 @@ function HostConvertObserverToPlayer(senderID, name, fromObserverSlot, toPlayerS
     if gameInfo.PlayerOptions[toPlayerSlot] != nil then
         return
     end
-    
+
     if gameInfo.ClosedSlots[toPlayerSlot] != nil then
-        return 
+        return
     end
 
     gameInfo.PlayerOptions[toPlayerSlot] = LobbyComm.GetDefaultPlayerOptions(name)
     gameInfo.PlayerOptions[toPlayerSlot].OwnerID = senderID
-	
-	if requestedFaction then
-		gameInfo.PlayerOptions[toPlayerSlot].Faction = requestedFaction
-	end
-	
-	if requestedPL then
-		gameInfo.PlayerOptions[toPlayerSlot].PL = requestedPL
-	end
-	
-	if requestedRC then
-		gameInfo.PlayerOptions[toPlayerSlot].RC = requestedRC
-	end
-	
-	if requestedNG then
-		gameInfo.PlayerOptions[toPlayerSlot].NG = requestedNG
-	end
+
+    if requestedFaction then
+        gameInfo.PlayerOptions[toPlayerSlot].Faction = requestedFaction
+    end
+
+    if requestedPL then
+        gameInfo.PlayerOptions[toPlayerSlot].PL = requestedPL
+    end
+
+    if requestedRC then
+        gameInfo.PlayerOptions[toPlayerSlot].RC = requestedRC
+    end
+
+    if requestedNG then
+        gameInfo.PlayerOptions[toPlayerSlot].NG = requestedNG
+    end
 
     for colorIndex,colorVal in gameColors.PlayerColors do
         if IsColorFree(colorIndex) then
@@ -2390,60 +2142,61 @@ function HostRemoveAI( slot )
 end
 
 function autoMap()
-	local randomAutoMap
-	if gameInfo.GameOptions['RandomMap'] == 'Official' then
-		randomAutoMap = import('/lua/ui/dialogs/mapselect.lua').randomAutoMap(true)
-	else
-		randomAutoMap = import('/lua/ui/dialogs/mapselect.lua').randomAutoMap(false)
-	end
+    local randomAutoMap
+    if gameInfo.GameOptions['RandomMap'] == 'Official' then
+        randomAutoMap = import('/lua/ui/dialogs/mapselect.lua').randomAutoMap(true)
+    else
+        randomAutoMap = import('/lua/ui/dialogs/mapselect.lua').randomAutoMap(false)
+    end
 end
 
-function uploadNewMap()
-	if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") then
-		lastUploadedMap = gameInfo.GameOptions.ScenarioFile		
-		local scenarioInfo = import('/lua/ui/maputil.lua').LoadScenario(gameInfo.GameOptions.ScenarioFile)				
-		#LOG("scbserverhostuploadmap"..gameInfo.GameOptions.ScenarioFile)
-		#GpgNetSend("uploadmap", string.format("%s", gameInfo.GameOptions.ScenarioFile))
-		#SendSystemMessage(LOCF("<LOC lobui_0735>The host is uploading the map %s to server.", scenarioInfo.name))		
-	end
-end
+--// Upload button not work with FAF for the moment (old GPGnet) -- Xinnony
+--function uploadNewMap()
+    --if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") then
+        --lastUploadedMap = gameInfo.GameOptions.ScenarioFile
+        --local scenarioInfo = import('/lua/ui/maputil.lua').LoadScenario(gameInfo.GameOptions.ScenarioFile)
+        --#LOG("scbserverhostuploadmap"..gameInfo.GameOptions.ScenarioFile)
+        --#GpgNetSend("uploadmap", string.format("%s", gameInfo.GameOptions.ScenarioFile))
+        --#SendSystemMessage(LOCF("<LOC lobui_0735>The host is uploading the map %s to server.", scenarioInfo.name))
+    --end
+--end
 
 function randomString(Length, CharSet)
    -- Length (number)
    -- CharSet (string, optional); e.g. %l%d for lower case letters and digits
-	local Chars = {}
-	for Loop = 0, 255 do
-		Chars[Loop+1] = string.char(Loop)
-	end
-	local String = table.concat(Chars)
+    local Chars = {}
+    for Loop = 0, 255 do
+        Chars[Loop+1] = string.char(Loop)
+    end
+    local String = table.concat(Chars)
 
-	local Built = {['.'] = Chars}
+    local Built = {['.'] = Chars}
 
-	local AddLookup = function(CharSet)
-		local Substitute = string.gsub(String, '[^'..CharSet..']', '')
-		local Lookup = {}
-		for Loop = 1, string.len(Substitute) do
-			Lookup[Loop] = string.sub(Substitute, Loop, Loop)
-		end		
-		Built[CharSet] = Lookup
-		return Lookup
-	end
-   
-	local CharSet = CharSet or '.'
+    local AddLookup = function(CharSet)
+        local Substitute = string.gsub(String, '[^'..CharSet..']', '')
+        local Lookup = {}
+        for Loop = 1, string.len(Substitute) do
+            Lookup[Loop] = string.sub(Substitute, Loop, Loop)
+        end
+        Built[CharSet] = Lookup
+        return Lookup
+    end
 
-	if CharSet == '' then
-		return ''
-	else
-		local Result = {}
-		local Lookup = Built[CharSet] or AddLookup(CharSet)
-		local Range = table.getn(Lookup)
+    local CharSet = CharSet or '.'
 
-		for Loop = 1,Length do
-			Result[Loop] = Lookup[math.random(1, Range)]
-		end
+    if CharSet == '' then
+        return ''
+    else
+        local Result = {}
+        local Lookup = Built[CharSet] or AddLookup(CharSet)
+        local Range = table.getn(Lookup)
 
-		return table.concat(Result)
-	end
+        for Loop = 1,Length do
+            Result[Loop] = Lookup[math.random(1, Range)]
+        end
+
+        return table.concat(Result)
+    end
 end
 
 
@@ -2466,7 +2219,7 @@ function HostPlayerMissingMapAlert(id)
 
     if needMessage then
         SendSystemMessage(LOCF("<LOC lobui_0330>%s is missing map %s.", name, gameInfo.GameOptions.ScenarioFile))
-    end        
+    end
 end
 
 function ClientsMissingMap()
@@ -2485,7 +2238,7 @@ function ClientsMissingMap()
             table.insert(ret, observer.PlayerName)
         end
     end
-    
+
     return ret
 end
 
@@ -2513,7 +2266,7 @@ function CreateUI(maxPlayers)
     local Prefs = import('/lua/user/prefs.lua')
 
     UIUtil.SetCurrentSkin('uef')
-    
+
     if (GUI.connectdialog != false) then
         MenuCommon.MenuCleanup()
         GUI.connectdialog:Destroy()
@@ -2543,39 +2296,40 @@ function CreateUI(maxPlayers)
 
     local titleText = UIUtil.CreateText(GUI.panel, title, 26, UIUtil.titleFont)
     LayoutHelpers.AtLeftTopIn(titleText, GUI.panel, 50, 36)
-	
-	randmapText = UIUtil.CreateText(GUI.panel, "", 17, UIUtil.titleFont)
-	LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
-	
-	--// Credits -- Xinnony
-	local Credits = "Lot of changes and functions by Xinnony | Power Lobby 2.0 by Moritz"
-	--***********************
-	Credits_Shadows1 = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
+
+    randmapText = UIUtil.CreateText(GUI.panel, "RandMapText", 17, UIUtil.titleFont)
+    LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
+	Tooltip.AddButtonTooltip(randmapText,{text='', body=''})
+
+    --// Credits -- Xinnony
+    local Credits = "Lot of changes and functions by Xinnony | Power Lobby 2.0 by Moritz"
+    --***********************
+    Credits_Shadows1 = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
     Credits_Shadows1:SetFont(UIUtil.titleFont, 12)
     Credits_Shadows1:SetColor("000000")
-	LayoutHelpers.AtBottomIn(Credits_Shadows1, GUI.panel, 1)
-	LayoutHelpers.AtRightIn(Credits_Shadows1, GUI.panel, 99)
-	Credits_Shadows2 = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
+    LayoutHelpers.AtBottomIn(Credits_Shadows1, GUI.panel, 1)
+    LayoutHelpers.AtRightIn(Credits_Shadows1, GUI.panel, 99)
+    Credits_Shadows2 = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
     Credits_Shadows2:SetFont(UIUtil.titleFont, 12)
     Credits_Shadows2:SetColor("000000")
-	LayoutHelpers.AtBottomIn(Credits_Shadows2, GUI.panel, -1)
-	LayoutHelpers.AtRightIn(Credits_Shadows2, GUI.panel, 101)
-	Credits_Shadows3 = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
+    LayoutHelpers.AtBottomIn(Credits_Shadows2, GUI.panel, -1)
+    LayoutHelpers.AtRightIn(Credits_Shadows2, GUI.panel, 101)
+    Credits_Shadows3 = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
     Credits_Shadows3:SetFont(UIUtil.titleFont, 12)
     Credits_Shadows3:SetColor("000000")
-	LayoutHelpers.AtBottomIn(Credits_Shadows3, GUI.panel, -1)
-	LayoutHelpers.AtRightIn(Credits_Shadows3, GUI.panel, 99)
-	Credits_Shadows4 = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
+    LayoutHelpers.AtBottomIn(Credits_Shadows3, GUI.panel, -1)
+    LayoutHelpers.AtRightIn(Credits_Shadows3, GUI.panel, 99)
+    Credits_Shadows4 = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
     Credits_Shadows4:SetFont(UIUtil.titleFont, 12)
     Credits_Shadows4:SetColor("000000")
-	LayoutHelpers.AtBottomIn(Credits_Shadows4, GUI.panel, 1)
-	LayoutHelpers.AtRightIn(Credits_Shadows4, GUI.panel, 101)
-	Credits_Text = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
+    LayoutHelpers.AtBottomIn(Credits_Shadows4, GUI.panel, 1)
+    LayoutHelpers.AtRightIn(Credits_Shadows4, GUI.panel, 101)
+    Credits_Text = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
     Credits_Text:SetFont(UIUtil.titleFont, 12)
     Credits_Text:SetColor("FFFFFF")
-	LayoutHelpers.AtBottomIn(Credits_Text, GUI.panel, 0)
-	LayoutHelpers.AtRightIn(Credits_Text, GUI.panel, 100)
-	--\\ Stop Credits
+    LayoutHelpers.AtBottomIn(Credits_Text, GUI.panel, 0)
+    LayoutHelpers.AtRightIn(Credits_Text, GUI.panel, 100)
+    --\\ Stop Credits
 
     GUI.playerPanel = Group(GUI.panel, "playerPanel")
     LayoutHelpers.AtLeftTopIn(GUI.playerPanel, GUI.panel, 40, 66)
@@ -2583,16 +2337,16 @@ function CreateUI(maxPlayers)
     GUI.playerPanel.Height:Set(307)
 
     GUI.buttonPanelTop = Group(GUI.panel, "buttonPanelTop") -- Added group for Button - Xinnony
-	LayoutHelpers.AtLeftTopIn(GUI.buttonPanelTop, GUI.panel, 40, 383)
+    LayoutHelpers.AtLeftTopIn(GUI.buttonPanelTop, GUI.panel, 40, 383)
     GUI.buttonPanelTop.Width:Set(706)
     GUI.buttonPanelTop.Height:Set(19)
-	
-	GUI.buttonPanelRight = Group(GUI.panel, "buttonPanelRight") -- Added group for Button - Xinnony
-	LayoutHelpers.AtLeftTopIn(GUI.buttonPanelRight, GUI.panel, 481, 401)
+
+    GUI.buttonPanelRight = Group(GUI.panel, "buttonPanelRight") -- Added group for Button - Xinnony
+    LayoutHelpers.AtLeftTopIn(GUI.buttonPanelRight, GUI.panel, 481, 401)
     GUI.buttonPanelRight.Width:Set(265)
     GUI.buttonPanelRight.Height:Set(89)
-	
-	GUI.observerPanel = Group(GUI.panel, "observerPanel")
+
+    GUI.observerPanel = Group(GUI.panel, "observerPanel")
     LayoutHelpers.AtLeftTopIn(GUI.observerPanel, GUI.panel, 40, 378)
     GUI.observerPanel.Width:Set(706)
     GUI.observerPanel.Height:Set(114)
@@ -2625,35 +2379,37 @@ function CreateUI(maxPlayers)
     mapOverlay:DisableHitTest()
 
     GUI.mapView = MapPreview(GUI.mapPanel)
-	LayoutHelpers.AtCenterIn(GUI.mapView, mapOverlay)
-	GUI.mapView.Width:Set(195)
-	GUI.mapView.Height:Set(195)
+    LayoutHelpers.AtCenterIn(GUI.mapView, mapOverlay)
+    GUI.mapView.Width:Set(195)
+    GUI.mapView.Height:Set(195)
 
     mapOverlay.Depth:Set(function() return GUI.mapView.Depth() + 10 end)
-	
-	--if lobbyComm:IsHost() then
-		--start of close slots code by Moritz	
-		GUI.LargeMapPreview = UIUtil.CreateButtonStd(GUI.observerPanel, '/lobby/lan-game-lobby/toggle', "<LOC lobui_0617>Large Preview", 10, 0)
-		LayoutHelpers.CenteredBelow(GUI.LargeMapPreview, GUI.mapView, 6)
-		
-		Tooltip.AddButtonTooltip(GUI.LargeMapPreview, 'lob_click_LargeMapPreview')
-		
-		GUI.LargeMapPreview.OnClick = function()
-			--for i = 1, LobbyComm.maxPlayerSlots do
-				--if not gameInfo.ClosedSlots[i] and not gameInfo.PlayerOptions[i] then
-					--HostCloseSlot(localPlayerID, i)
-				--end
-			--end
-			CreateBigPreview(501, GUI.mapPanel)
-		end
-		--end of close slots code
-	--end
+
+    --if lobbyComm:IsHost() then
+        --start of close slots code by Moritz
+        GUI.LargeMapPreview = UIUtil.CreateButtonStd(GUI.observerPanel, '/lobby/lan-game-lobby/toggle',
+                                                     "<LOC lobui_0617>Large Preview", 10, 0)
+        LayoutHelpers.CenteredBelow(GUI.LargeMapPreview, GUI.mapView, 6)
+
+        Tooltip.AddButtonTooltip(GUI.LargeMapPreview, 'lob_click_LargeMapPreview')
+
+        GUI.LargeMapPreview.OnClick = function()
+            --for i = 1, LobbyComm.maxPlayerSlots do
+                --if not gameInfo.ClosedSlots[i] and not gameInfo.PlayerOptions[i] then
+                    --HostCloseSlot(localPlayerID, i)
+                --end
+            --end
+            CreateBigPreview(501, GUI.mapPanel)
+        end
+        --end of close slots code
+    --end
 
     GUI.mapName = UIUtil.CreateText(GUI.mapPanel, "", 16, UIUtil.titleFont)
     GUI.mapName:SetColor(UIUtil.bodyColor)
     LayoutHelpers.CenteredBelow(GUI.mapName, mapOverlay, 10)
 
-    GUI.changeMapButton = UIUtil.CreateButtonStd(GUI.mapPanel, '/scx_menu/small-btn/small', "<LOC map_sel_0000>Game Options", 12, 2)
+    GUI.changeMapButton = UIUtil.CreateButtonStd(GUI.mapPanel, '/scx_menu/small-btn/small', "<LOC map_sel_0000>Game Options",
+                                                 12, 2)
     LayoutHelpers.AtBottomIn(GUI.changeMapButton, GUI.mapPanel, -6)
     LayoutHelpers.AtHorizontalCenterIn(GUI.changeMapButton, GUI.mapPanel)
 
@@ -2661,36 +2417,36 @@ function CreateUI(maxPlayers)
 
     GUI.changeMapButton.OnClick = function(self)
         local mapSelectDialog
-		
-		autoRandMap = false
-		quickRandMap = false
-        local function selectBehavior(selectedScenario, changedOptions, restrictedCategories)
-			if autoRandMap then
-				Prefs.SetToCurrentProfile('LastScenario', selectedScenario.file)
-				gameInfo.GameOptions['ScenarioFile'] = selectedScenario.file
-			else
-				Prefs.SetToCurrentProfile('LastScenario', selectedScenario.file)
-				mapSelectDialog:Destroy()
-				GUI.chatEdit:AcquireFocus() 
-				for optionKey, data in changedOptions do
-					Prefs.SetToCurrentProfile(data.pref, data.index)
-					SetGameOption(optionKey, data.value)					
-				end
-				--SendSystemMessage(selectedScenario.file)
 
-				SetGameOption('ScenarioFile',selectedScenario.file)
-			
-				SetGameOption('RestrictedCategories', restrictedCategories, true)
-				ClearBadMapFlags()  -- every new map, clear the flags, and clients will report if a new map is bad
-				HostUpdateMods()
-				UpdateGame()
-			end
+        autoRandMap = false
+        quickRandMap = false
+        local function selectBehavior(selectedScenario, changedOptions, restrictedCategories)
+            if autoRandMap then
+                Prefs.SetToCurrentProfile('LastScenario', selectedScenario.file)
+                gameInfo.GameOptions['ScenarioFile'] = selectedScenario.file
+            else
+                Prefs.SetToCurrentProfile('LastScenario', selectedScenario.file)
+                mapSelectDialog:Destroy()
+                GUI.chatEdit:AcquireFocus()
+                for optionKey, data in changedOptions do
+                    Prefs.SetToCurrentProfile(data.pref, data.index)
+                    SetGameOption(optionKey, data.value)
+                end
+                --SendSystemMessage(selectedScenario.file)
+
+                SetGameOption('ScenarioFile',selectedScenario.file)
+
+                SetGameOption('RestrictedCategories', restrictedCategories, true)
+                ClearBadMapFlags()  -- every new map, clear the flags, and clients will report if a new map is bad
+                HostUpdateMods()
+                UpdateGame()
+            end
         end
 
         local function exitBehavior()
             mapSelectDialog:Destroy()
             GUI.chatEdit:AcquireFocus()
-			UpdateGame()
+            UpdateGame()
         end
 
         GUI.chatEdit:AbandonFocus()
@@ -2709,8 +2465,9 @@ function CreateUI(maxPlayers)
 
     ---------------------------------------------------------------------------
     -- set up launch panel
-    ---------------------------------------------------------------------------	
-    GUI.launchGameButton = UIUtil.CreateButtonStd(GUI.launchPanel, '/scx_menu/large-no-bracket-btn/large', "<LOC lobui_0212>Launch", 18, 4)
+    ---------------------------------------------------------------------------
+    GUI.launchGameButton = UIUtil.CreateButtonStd(GUI.launchPanel, '/scx_menu/large-no-bracket-btn/large',
+                                                  "<LOC lobui_0212>Launch", 18, 4)
     GUI.exitButton = UIUtil.CreateButtonStd(GUI.launchPanel, '/scx_menu/small-btn/small', "", 18, 4)
 
     if GpgNetActive() then
@@ -2718,7 +2475,7 @@ function CreateUI(maxPlayers)
     else
         GUI.exitButton.label:SetText(LOC("<LOC _Back>"))
     end
-    
+
     import('/lua/ui/uimain.lua').SetEscapeHandler(function() GUI.exitButton.OnClick(GUI.exitButton) end)
 
     LayoutHelpers.AtCenterIn(GUI.launchGameButton, GUI.launchPanel, -1, -22)
@@ -2730,7 +2487,7 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtCenterIn(GUI.launchGameButton.glow, GUI.launchGameButton)
     GUI.launchGameButton.glow:SetAlpha(0)
     GUI.launchGameButton.glow:DisableHitTest()
-    GUI.launchGameButton.OnRolloverEvent = function(self, event) 
+    GUI.launchGameButton.OnRolloverEvent = function(self, event)
            if event == 'enter' then
             EffectHelpers.FadeIn(self.glow, .25, 0, 1)
             self.label:SetColor('black')
@@ -2741,13 +2498,13 @@ function CreateUI(maxPlayers)
             self.label:SetColor(UIUtil.fontColor)
         end
     end
-    
+
     GUI.launchGameButton.pulse = Bitmap(GUI.launchGameButton, UIUtil.UIFile('/menus/main03/large_btn_glow.dds'))
     LayoutHelpers.AtCenterIn(GUI.launchGameButton.pulse, GUI.launchGameButton)
     GUI.launchGameButton.pulse:DisableHitTest()
     GUI.launchGameButton.pulse:SetAlpha(.5)
     EffectHelpers.Pulse(GUI.launchGameButton.pulse, 2, .5, 1)
-    
+
     Tooltip.AddButtonTooltip(GUI.launchGameButton, 'Lobby_Launch')
 
 
@@ -2784,7 +2541,7 @@ function CreateUI(maxPlayers)
     GUI.chatDisplayScroll = UIUtil.CreateVertScrollbarFor(GUI.chatDisplay)
 
     # OnlineProvider.RegisterChatDisplay(GUI.chatDisplay)
-    
+
     GUI.chatEdit:SetMaxChars(200)
     GUI.chatEdit.OnCharPressed = function(self, charcode)
         if charcode == UIUtil.VK_TAB then
@@ -2796,13 +2553,13 @@ function CreateUI(maxPlayers)
             PlaySound(sound)
         end
     end
-    
+
     GUI.chatEdit.OnLoseKeyboardFocus = function(self)
-        GUI.chatEdit:AcquireFocus()    
+        GUI.chatEdit:AcquireFocus()
     end
-    
+
     GUI.chatEdit.OnEnterPressed = function(self, text)
-        if text != "" then            
+        if text != "" then
             GpgNetSend('Chat', text)
             table.insert(commandQueue, 1, text)
             commandQueueIndex = 0
@@ -2855,16 +2612,16 @@ function CreateUI(maxPlayers)
 
     ---------------------------------------------------------------------------
     -- Option display
-    ---------------------------------------------------------------------------        
+    ---------------------------------------------------------------------------
     GUI.OptionContainer = Group(GUI.optionsPanel)
     GUI.OptionContainer.Height:Set(254)
     GUI.OptionContainer.Width:Set(182)
     GUI.OptionContainer.top = 0
     LayoutHelpers.AtLeftTopIn(GUI.OptionContainer, GUI.mapPanel, 15, 280)
-    
+
     GUI.OptionDisplay = {}
     RefreshOptionDisplayData()
-    
+
     local function CreateOptionElements()
         local function CreateElement(index)
             GUI.OptionDisplay[index] = Group(GUI.OptionContainer)
@@ -2876,13 +2633,13 @@ function CreateUI(maxPlayers)
             GUI.OptionDisplay[index].text = UIUtil.CreateText(GUI.OptionDisplay[index], '', 14, "Arial")
             GUI.OptionDisplay[index].text:SetColor(UIUtil.fontColor)
             GUI.OptionDisplay[index].text:DisableHitTest()
-            LayoutHelpers.AtLeftTopIn(GUI.OptionDisplay[index].text, GUI.OptionDisplay[index], 5)        
-               
+            LayoutHelpers.AtLeftTopIn(GUI.OptionDisplay[index].text, GUI.OptionDisplay[index], 5)
+
             GUI.OptionDisplay[index].value = UIUtil.CreateText(GUI.OptionDisplay[index], '', 14, "Arial")
             GUI.OptionDisplay[index].value:SetColor(UIUtil.fontOverColor)
             GUI.OptionDisplay[index].value:DisableHitTest()
-            LayoutHelpers.AtRightTopIn(GUI.OptionDisplay[index].value, GUI.OptionDisplay[index], 5, 16)   
-            
+            LayoutHelpers.AtRightTopIn(GUI.OptionDisplay[index].value, GUI.OptionDisplay[index], 5, 16)
+
             GUI.OptionDisplay[index].value.bg = Bitmap(GUI.OptionDisplay[index])
             GUI.OptionDisplay[index].value.bg:SetSolidColor('ff333333')
             GUI.OptionDisplay[index].value.bg.Left:Set(GUI.OptionDisplay[index].Left)
@@ -2890,7 +2647,7 @@ function CreateUI(maxPlayers)
             GUI.OptionDisplay[index].value.bg.Bottom:Set(function() return GUI.OptionDisplay[index].value.Bottom() + 2 end)
             GUI.OptionDisplay[index].value.bg.Top:Set(GUI.OptionDisplay[index].Top)
             GUI.OptionDisplay[index].value.bg.Depth:Set(function() return GUI.OptionDisplay[index].Depth() - 2 end)
-            
+
             GUI.OptionDisplay[index].value.bg2 = Bitmap(GUI.OptionDisplay[index])
             GUI.OptionDisplay[index].value.bg2:SetSolidColor('ff000000')
             GUI.OptionDisplay[index].value.bg2.Left:Set(function() return GUI.OptionDisplay[index].value.bg.Left() + 1 end)
@@ -2899,25 +2656,26 @@ function CreateUI(maxPlayers)
             GUI.OptionDisplay[index].value.bg2.Top:Set(function() return GUI.OptionDisplay[index].value.Top() + 0 end)
             GUI.OptionDisplay[index].value.bg2.Depth:Set(function() return GUI.OptionDisplay[index].value.bg.Depth() + 1 end)
         end
-        
+
         CreateElement(1)
         LayoutHelpers.AtLeftTopIn(GUI.OptionDisplay[1], GUI.OptionContainer)
-            
+
         local index = 2
-        while GUI.OptionDisplay[table.getsize(GUI.OptionDisplay)].Bottom() + GUI.OptionDisplay[1].Height() < GUI.OptionContainer.Bottom() do
+        while GUI.OptionDisplay[table.getsize(GUI.OptionDisplay)].Bottom() + GUI.OptionDisplay[1].Height() <
+              GUI.OptionContainer.Bottom() do
             CreateElement(index)
             LayoutHelpers.Below(GUI.OptionDisplay[index], GUI.OptionDisplay[index-1])
             index = index + 1
         end
     end
     CreateOptionElements()
-            
+
     local numLines = function() return table.getsize(GUI.OptionDisplay) end
-    
+
     local function DataSize()
         return table.getn(formattedOptions)
     end
-    
+
     -- called when the scrollbar for the control requires data to size itself
     -- GetScrollValues must return 4 values in this order:
     -- rangeMin, rangeMax, visibleMin, visibleMax
@@ -2957,22 +2715,22 @@ function CreateUI(maxPlayers)
             if data.mod then
                 line.text:SetColor('ffff7777')
                 LayoutHelpers.AtHorizontalCenterIn(line.text, line, 5)
-                LayoutHelpers.AtHorizontalCenterIn(line.value, line, 5, 16) 
+                LayoutHelpers.AtHorizontalCenterIn(line.value, line, 5, 16)
                 LayoutHelpers.ResetRight(line.value)
-			elseif data.red then
-				line.text:SetColor('ff7777')
-				LayoutHelpers.AtHorizontalCenterIn(line.text, line, 5)
-				LayoutHelpers.AtHorizontalCenterIn(line.value, line, 5, 16)
-				LayoutHelpers.ResetRight(line.value)
-			elseif data.green then
-				line.text:SetColor('77ff77')
-				LayoutHelpers.AtHorizontalCenterIn(line.text, line, 5)
-				LayoutHelpers.AtHorizontalCenterIn(line.value, line, 5, 16)
-				LayoutHelpers.ResetRight(line.value)
+            elseif data.red then
+                line.text:SetColor('ff7777')
+                LayoutHelpers.AtHorizontalCenterIn(line.text, line, 5)
+                LayoutHelpers.AtHorizontalCenterIn(line.value, line, 5, 16)
+                LayoutHelpers.ResetRight(line.value)
+            elseif data.green then
+                line.text:SetColor('77ff77')
+                LayoutHelpers.AtHorizontalCenterIn(line.text, line, 5)
+                LayoutHelpers.AtHorizontalCenterIn(line.value, line, 5, 16)
+                LayoutHelpers.ResetRight(line.value)
             else
                 line.text:SetColor(UIUtil.fontColor)
                 LayoutHelpers.AtLeftTopIn(line.text, line, 5)
-                LayoutHelpers.AtRightTopIn(line.value, line, 5, 16)  
+                LayoutHelpers.AtRightTopIn(line.value, line, 5, 16)
                 LayoutHelpers.ResetLeft(line.value)
             end
             line.text:SetText(LOC(data.text))
@@ -2990,9 +2748,9 @@ function CreateUI(maxPlayers)
             end
         end
     end
-    
+
     GUI.OptionContainer:CalcVisible()
-    
+
     GUI.OptionContainer.HandleEvent = function(self, event)
         if event.Type == 'WheelRotation' then
             local lines = 1
@@ -3002,9 +2760,9 @@ function CreateUI(maxPlayers)
             self:ScrollLines(nil, lines)
         end
     end
-    
+
     UIUtil.CreateVertScrollbarFor(GUI.OptionContainer)
-    
+
     if singlePlayer then
         GUI.loadButton = UIUtil.CreateButtonStd(GUI.optionsPanel, '/scx_menu/small-btn/small', "<LOC lobui_0176>Load", 18, 2)
         LayoutHelpers.LeftOf(GUI.loadButton, GUI.launchGameButton, 10)
@@ -3014,11 +2772,13 @@ function CreateUI(maxPlayers)
         end
         Tooltip.AddButtonTooltip(GUI.loadButton, 'Lobby_Load')
     elseif not lobbyComm:IsHost() then
-        GUI.restrictedUnitsButton = UIUtil.CreateButtonStd(GUI.optionsPanel, '/scx_menu/small-btn/small', "<LOC lobui_0376>Unit Manager", 14, 2)
+        GUI.restrictedUnitsButton = UIUtil.CreateButtonStd(GUI.optionsPanel, '/scx_menu/small-btn/small',
+                                                           "<LOC lobui_0376>Unit Manager", 14, 2)
         LayoutHelpers.LeftOf(GUI.restrictedUnitsButton, GUI.launchGameButton, 10)
         LayoutHelpers.AtVerticalCenterIn(GUI.restrictedUnitsButton, GUI.launchGameButton)
         GUI.restrictedUnitsButton.OnClick = function(self, modifiers)
-            import('/lua/ui/lobby/restrictedUnitsDlg.lua').CreateDialog(GUI.panel, gameInfo.GameOptions.RestrictedCategories, function() end, function() end, false)
+            import('/lua/ui/lobby/restrictedUnitsDlg.lua').CreateDialog(GUI.panel, gameInfo.GameOptions.RestrictedCategories,
+                                                                        function() end, function() end, false)
         end
         Tooltip.AddButtonTooltip(GUI.restrictedUnitsButton, 'lob_RestrictedUnitsClient')
     end
@@ -3030,8 +2790,8 @@ function CreateUI(maxPlayers)
     local prev = nil
 
     local slotColumnSizes = {
-		rating = {x = 25+48, width = 51},
-		games = {x = 25+103, width = 51},
+        rating = {x = 25+48, width = 51},
+        games = {x = 25+103, width = 51},
         player = {x = 25+157, width = 251},
         color = {x = 25+417, width = 59},
         faction = {x = 25+485, width = 59},
@@ -3041,50 +2801,50 @@ function CreateUI(maxPlayers)
     }
 
     GUI.labelGroup = Group(GUI.playerPanel)
-		GUI.labelGroup.Width:Set(690)
-		GUI.labelGroup.Height:Set(21)
-		LayoutHelpers.AtLeftTopIn(GUI.labelGroup, GUI.playerPanel, 5, 5)	
-		
-	GUI.ratingLabel = UIUtil.CreateText(GUI.labelGroup, "<LOC _Rating>Rating", 14, UIUtil.titleFont)
-		LayoutHelpers.AtLeftIn(GUI.ratingLabel, GUI.panel, slotColumnSizes.rating.x)
-		LayoutHelpers.AtVerticalCenterIn(GUI.ratingLabel, GUI.labelGroup, 5)
-		Tooltip.AddControlTooltip(GUI.ratingLabel, 'rating')
-	
-	GUI.numGamesLabel = UIUtil.CreateText(GUI.labelGroup, "<LOC _Games>Games", 14, UIUtil.titleFont)
-		LayoutHelpers.AtLeftIn(GUI.numGamesLabel, GUI.panel, slotColumnSizes.games.x - 4)
-		LayoutHelpers.AtVerticalCenterIn(GUI.numGamesLabel, GUI.labelGroup, 5)
-		Tooltip.AddControlTooltip(GUI.numGamesLabel, 'num_games')
+        GUI.labelGroup.Width:Set(690)
+        GUI.labelGroup.Height:Set(21)
+        LayoutHelpers.AtLeftTopIn(GUI.labelGroup, GUI.playerPanel, 5, 5)
+
+    GUI.ratingLabel = UIUtil.CreateText(GUI.labelGroup, "<LOC _Rating>Rating", 14, UIUtil.titleFont)
+        LayoutHelpers.AtLeftIn(GUI.ratingLabel, GUI.panel, slotColumnSizes.rating.x)
+        LayoutHelpers.AtVerticalCenterIn(GUI.ratingLabel, GUI.labelGroup, 5)
+        Tooltip.AddControlTooltip(GUI.ratingLabel, 'rating')
+
+    GUI.numGamesLabel = UIUtil.CreateText(GUI.labelGroup, "<LOC _Games>Games", 14, UIUtil.titleFont)
+        LayoutHelpers.AtLeftIn(GUI.numGamesLabel, GUI.panel, slotColumnSizes.games.x - 4)
+        LayoutHelpers.AtVerticalCenterIn(GUI.numGamesLabel, GUI.labelGroup, 5)
+        Tooltip.AddControlTooltip(GUI.numGamesLabel, 'num_games')
 
     GUI.nameLabel = UIUtil.CreateText(GUI.labelGroup, "<LOC lobui_0213>Player Name", 14, UIUtil.titleFont)
-		LayoutHelpers.AtLeftIn(GUI.nameLabel, GUI.panel, slotColumnSizes.player.x)
-		LayoutHelpers.AtVerticalCenterIn(GUI.nameLabel, GUI.labelGroup, 5)
-		Tooltip.AddControlTooltip(GUI.nameLabel, 'lob_slot')
+        LayoutHelpers.AtLeftIn(GUI.nameLabel, GUI.panel, slotColumnSizes.player.x)
+        LayoutHelpers.AtVerticalCenterIn(GUI.nameLabel, GUI.labelGroup, 5)
+        Tooltip.AddControlTooltip(GUI.nameLabel, 'lob_slot')
 
     GUI.colorLabel = UIUtil.CreateText(GUI.labelGroup, "<LOC lobui_0214>Color", 14, UIUtil.titleFont)
-		LayoutHelpers.AtLeftIn(GUI.colorLabel, GUI.panel, slotColumnSizes.color.x)
-		LayoutHelpers.AtVerticalCenterIn(GUI.colorLabel, GUI.labelGroup, 5)
-		Tooltip.AddControlTooltip(GUI.colorLabel, 'lob_color')
+        LayoutHelpers.AtLeftIn(GUI.colorLabel, GUI.panel, slotColumnSizes.color.x)
+        LayoutHelpers.AtVerticalCenterIn(GUI.colorLabel, GUI.labelGroup, 5)
+        Tooltip.AddControlTooltip(GUI.colorLabel, 'lob_color')
 
     GUI.factionLabel = UIUtil.CreateText(GUI.labelGroup, "<LOC lobui_0215>Faction", 14, UIUtil.titleFont)
-		LayoutHelpers.AtLeftIn(GUI.factionLabel, GUI.panel, slotColumnSizes.faction.x)
-		LayoutHelpers.AtVerticalCenterIn(GUI.factionLabel, GUI.labelGroup, 5)
-		Tooltip.AddControlTooltip(GUI.factionLabel, 'lob_faction')
+        LayoutHelpers.AtLeftIn(GUI.factionLabel, GUI.panel, slotColumnSizes.faction.x)
+        LayoutHelpers.AtVerticalCenterIn(GUI.factionLabel, GUI.labelGroup, 5)
+        Tooltip.AddControlTooltip(GUI.factionLabel, 'lob_faction')
 
     GUI.teamLabel = UIUtil.CreateText(GUI.labelGroup, "<LOC lobui_0216>Team", 14, UIUtil.titleFont)
-		LayoutHelpers.AtLeftIn(GUI.teamLabel, GUI.panel, slotColumnSizes.team.x)
-		LayoutHelpers.AtVerticalCenterIn(GUI.teamLabel, GUI.labelGroup, 5)
-		Tooltip.AddControlTooltip(GUI.teamLabel, 'lob_team')
+        LayoutHelpers.AtLeftIn(GUI.teamLabel, GUI.panel, slotColumnSizes.team.x)
+        LayoutHelpers.AtVerticalCenterIn(GUI.teamLabel, GUI.labelGroup, 5)
+        Tooltip.AddControlTooltip(GUI.teamLabel, 'lob_team')
 
     if not singlePlayer then
         GUI.pingLabel = UIUtil.CreateText(GUI.labelGroup, "<LOC lobui_0217>Ping", 14, UIUtil.titleFont)
         LayoutHelpers.AtLeftIn(GUI.pingLabel, GUI.panel, slotColumnSizes.ping.x)
         LayoutHelpers.AtVerticalCenterIn(GUI.pingLabel, GUI.labelGroup, 5)
-		--Tooltip.AddControlTooltip(GUI.pingLabel, '') -- NEED INFO (write tooltip in "\lua\ui\help\tooltips.lua")
+        --Tooltip.AddControlTooltip(GUI.pingLabel, '') -- NEED INFO (write tooltip in "\lua\ui\help\tooltips.lua")
 
         GUI.readyLabel = UIUtil.CreateText(GUI.labelGroup, "<LOC lobui_0218>Ready", 14, UIUtil.titleFont)
         LayoutHelpers.AtLeftIn(GUI.readyLabel, GUI.panel, slotColumnSizes.ready.x-3)
         LayoutHelpers.AtVerticalCenterIn(GUI.readyLabel, GUI.labelGroup, 5) -- XinnonyWork
-		--Tooltip.AddControlTooltip(GUI.readyLabel, '') -- NEED INFO (write tooltip in "\lua\ui\help\tooltips.lua")
+        --Tooltip.AddControlTooltip(GUI.readyLabel, '') -- NEED INFO (write tooltip in "\lua\ui\help\tooltips.lua")
     end
 
     for i= 1, LobbyComm.maxPlayerSlots do
@@ -3111,37 +2871,37 @@ function CreateUI(maxPlayers)
         end
 
         local bg = GUI.slots[i]
-		
-		--// COUNTRY - Xinnony
-		-- Added a bitmap on the left of Rating, the bitmap is a Flag of Country
-		-- PS : I love KinderCountry !, if you have, you can send your chocolate for me.
-		GUI.slots[i].KinderCountry = Bitmap(bg, UIUtil.SkinnableFile("/countries/world.dds"))
-		GUI.slots[i].KinderCountry.Width:Set(20)
-		GUI.slots[i].KinderCountry.Height:Set(16)
-		LayoutHelpers.AtBottomIn(GUI.slots[i].KinderCountry, GUI.slots[i], -6)
-		LayoutHelpers.AtLeftIn(GUI.slots[i].KinderCountry, GUI.slots[i], 0) --XinnonyWork (last -8)
-		--Tooltip.AddControlTooltip(GUI.slots[i].KinderCountry, '')
-		--\\ Stop COUNTRY
-		
+
+        --// COUNTRY - Xinnony
+        -- Added a bitmap on the left of Rating, the bitmap is a Flag of Country
+        -- PS : I love KinderCountry !, if you have, you can send your chocolate for me.
+        GUI.slots[i].KinderCountry = Bitmap(bg, UIUtil.SkinnableFile("/countries/world.dds"))
+        GUI.slots[i].KinderCountry.Width:Set(20)
+        GUI.slots[i].KinderCountry.Height:Set(16)
+        LayoutHelpers.AtBottomIn(GUI.slots[i].KinderCountry, GUI.slots[i], -6)
+        LayoutHelpers.AtLeftIn(GUI.slots[i].KinderCountry, GUI.slots[i], 0)
+        --Tooltip.AddControlTooltip(GUI.slots[i].KinderCountry, '')
+        --\\ Stop COUNTRY
+
         GUI.slots[i].ratingGroup = Group(bg)
-		GUI.slots[i].ratingGroup.Width:Set(slotColumnSizes.rating.width)
-		GUI.slots[i].ratingGroup.Height:Set(GUI.slots[curRow].Height)
-		LayoutHelpers.AtLeftIn(GUI.slots[i].ratingGroup, GUI.panel, slotColumnSizes.rating.x)
-		LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].ratingGroup, GUI.slots[i], 6)
+        GUI.slots[i].ratingGroup.Width:Set(slotColumnSizes.rating.width)
+        GUI.slots[i].ratingGroup.Height:Set(GUI.slots[curRow].Height)
+        LayoutHelpers.AtLeftIn(GUI.slots[i].ratingGroup, GUI.panel, slotColumnSizes.rating.x)
+        LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].ratingGroup, GUI.slots[i], 6)
 
-		GUI.slots[i].ratingText = UIUtil.CreateText(GUI.slots[i].ratingGroup, "", 14, UIUtil.bodyFont)
-		LayoutHelpers.AtBottomIn(GUI.slots[i].ratingText, GUI.slots[i].ratingGroup)
-		LayoutHelpers.AtRightIn(GUI.slots[i].ratingText, GUI.slots[i].ratingGroup, 9)
-		
-		GUI.slots[i].numGamesGroup = Group(bg)
-		GUI.slots[i].numGamesGroup.Width:Set(slotColumnSizes.games.width)
-		GUI.slots[i].numGamesGroup.Height:Set(GUI.slots[curRow].Height)
-		LayoutHelpers.AtLeftIn(GUI.slots[i].numGamesGroup, GUI.panel, slotColumnSizes.games.x)
-		LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].numGamesGroup, GUI.slots[i], 6)
+        GUI.slots[i].ratingText = UIUtil.CreateText(GUI.slots[i].ratingGroup, "", 14, UIUtil.bodyFont)
+        LayoutHelpers.AtBottomIn(GUI.slots[i].ratingText, GUI.slots[i].ratingGroup)
+        LayoutHelpers.AtRightIn(GUI.slots[i].ratingText, GUI.slots[i].ratingGroup, 9)
 
-		GUI.slots[i].numGamesText = UIUtil.CreateText(GUI.slots[i].numGamesGroup, "", 14, UIUtil.bodyFont)
-		LayoutHelpers.AtBottomIn(GUI.slots[i].numGamesText, GUI.slots[i].numGamesGroup)
-		LayoutHelpers.AtRightIn(GUI.slots[i].numGamesText, GUI.slots[i].numGamesGroup, 9)
+        GUI.slots[i].numGamesGroup = Group(bg)
+        GUI.slots[i].numGamesGroup.Width:Set(slotColumnSizes.games.width)
+        GUI.slots[i].numGamesGroup.Height:Set(GUI.slots[curRow].Height)
+        LayoutHelpers.AtLeftIn(GUI.slots[i].numGamesGroup, GUI.panel, slotColumnSizes.games.x)
+        LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].numGamesGroup, GUI.slots[i], 6)
+
+        GUI.slots[i].numGamesText = UIUtil.CreateText(GUI.slots[i].numGamesGroup, "", 14, UIUtil.bodyFont)
+        LayoutHelpers.AtBottomIn(GUI.slots[i].numGamesText, GUI.slots[i].numGamesGroup)
+        LayoutHelpers.AtRightIn(GUI.slots[i].numGamesText, GUI.slots[i].numGamesGroup, 9)
 
         GUI.slots[i].name = Combo(bg, 16, 10, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].name, GUI.slots[i], 8)
@@ -3190,10 +2950,11 @@ function CreateUI(maxPlayers)
         end
         GUI.slots[i].color.OnEvent = GUI.slots[curRow].name.OnEvent
         Tooltip.AddControlTooltip(GUI.slots[i].color, 'lob_color')
-        
+
         GUI.slots[i].color.row = i
 
-        GUI.slots[i].faction = BitmapCombo(bg, factionBmps, table.getn(factionBmps), nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+        GUI.slots[i].faction = BitmapCombo(bg, factionBmps, table.getn(factionBmps), nil, nil, "UI_Tab_Rollover_01",
+                                                                       "UI_Tab_Click_01")
         LayoutHelpers.AtLeftIn(GUI.slots[i].faction, GUI.panel, slotColumnSizes.faction.x)
         LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].faction, GUI.slots[i], 8)
         GUI.slots[i].faction.Width:Set(slotColumnSizes.faction.width)
@@ -3254,21 +3015,21 @@ function CreateUI(maxPlayers)
             GUI.slots[i].ready = UIUtil.CreateCheckboxStd(GUI.slots[i].multiSpace, '/dialogs/check-box_btn/radio')
             GUI.slots[i].ready.row = i
             LayoutHelpers.AtVerticalCenterIn(GUI.slots[curRow].ready, GUI.slots[curRow].multiSpace, 8)
-            LayoutHelpers.AtLeftIn(GUI.slots[curRow].ready, GUI.slots[curRow].multiSpace, 0) -- XinnonyWork (last 10 value)
-            GUI.slots[i].ready.OnCheck = function(self, checked)	
+            LayoutHelpers.AtLeftIn(GUI.slots[curRow].ready, GUI.slots[curRow].multiSpace, 0)
+            GUI.slots[i].ready.OnCheck = function(self, checked)
                 if checked then
                     DisableSlot(self.row, true)
                     if GUI.becomeObserver then
-                        GUI.becomeObserver:Disable()						
+                        GUI.becomeObserver:Disable()
                     end
-		
+
                 else
                     EnableSlot(self.row)
                     if GUI.becomeObserver then
-                        GUI.becomeObserver:Enable()						
+                        GUI.becomeObserver:Enable()
                     end
                 end
-				SetPlayerOption(self.row,'Ready',checked)
+                SetPlayerOption(self.row,'Ready',checked)
             end
         end
 
@@ -3304,210 +3065,273 @@ function CreateUI(maxPlayers)
     ---------------------------------------------------------------------------
     -- set up observer and limbo grid
     ---------------------------------------------------------------------------
-	
+
     GUI.allowObservers = nil
     GUI.observerList = nil
-	
-	-- FIXME : this is not needed anymore.
-	if lobbyComm:IsHost() then
-		SetGameOption('RandomMap', 'Off') --make sure always create lobby with Random Map off
-		SetGameOption('RankedGame', 'Off') --make sure always create lobby with Ranked Game off
-	end
+
+    -- FIXME : this is not needed anymore.
+    if lobbyComm:IsHost() then
+        SetGameOption('RandomMap', 'Off') --make sure always create lobby with Random Map off
+        SetGameOption('RankedGame', 'Off') --make sure always create lobby with Ranked Game off
+    end
 
     if not singlePlayer then
-		uef = true
-		aeon = true
-		cybran = true
-		seraphim = true	
+        uef = true
+        aeon = true
+        cybran = true
+        seraphim = true
 
         GUI.allowObservers = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/dialogs/check-box_btn/radio')
-			LayoutHelpers.CenteredLeftOf(GUI.allowObservers, GUI.buttonPanelTop, -30)
-			Tooltip.AddControlTooltip(GUI.allowObservers, 'lob_observers_allowed')
-		GUI.observerLabel = UIUtil.CreateText(GUI.buttonPanelTop, "<LOC lobui_0275>Observers", 14, UIUtil.bodyFont)
-			LayoutHelpers.CenteredRightOf(GUI.observerLabel, GUI.allowObservers, 0)
-			Tooltip.AddControlTooltip(GUI.observerLabel, 'lob_describe_observers')
+            LayoutHelpers.CenteredLeftOf(GUI.allowObservers, GUI.buttonPanelTop, -30)
+            Tooltip.AddControlTooltip(GUI.allowObservers, 'lob_observers_allowed')
+        GUI.observerLabel = UIUtil.CreateText(GUI.buttonPanelTop, "<LOC lobui_0275>Observers", 14, UIUtil.bodyFont)
+            LayoutHelpers.CenteredRightOf(GUI.observerLabel, GUI.allowObservers, 0)
+            Tooltip.AddControlTooltip(GUI.observerLabel, 'lob_describe_observers')
         GUI.allowObservers:SetCheck(false)
         if lobbyComm:IsHost() then
             SetGameOption("AllowObservers",false)
             GUI.allowObservers.OnCheck = function(self, checked)
                 SetGameOption("AllowObservers",checked)
             end
-		end
+        end
 
-		GUI.becomeObserver = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/lobby/lan-game-lobby/toggle', "<LOC lobui_0228>Observe", 10, 0)
-			LayoutHelpers.AtLeftTopIn(GUI.becomeObserver, GUI.buttonPanelRight, 10)
-			Tooltip.AddButtonTooltip(GUI.becomeObserver, 'lob_become_observer')
+        GUI.becomeObserver = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/lobby/lan-game-lobby/toggle',
+                                                    "<LOC lobui_0228>Observe", 10, 0)
+            LayoutHelpers.AtLeftTopIn(GUI.becomeObserver, GUI.buttonPanelRight, 10)
+            Tooltip.AddButtonTooltip(GUI.becomeObserver, 'lob_become_observer')
         GUI.becomeObserver.OnClick = function(self, modifiers)
             if IsPlayer(localPlayerID) then
                 if lobbyComm:IsHost() then
                     HostConvertPlayerToObserver(hostID, localPlayerName, FindSlotForID(localPlayerID))
                 else
-                    lobbyComm:SendData(hostID, {Type = 'RequestConvertToObserver', RequestedName = localPlayerName, RequestedSlot =  FindSlotForID(localPlayerID)})
+                    lobbyComm:SendData(hostID, {Type = 'RequestConvertToObserver', RequestedName = localPlayerName,
+                                                RequestedSlot = FindSlotForID(localPlayerID)})
                 end
             end
-        end		
-		
-		if lobbyComm:IsHost() then
-			--start of auto teams code by Moritz
-			GUI.randTeam = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/lobby/lan-game-lobby/toggle', "<LOC lobui_0506>Auto Teams", 10, 0)
-				LayoutHelpers.AtLeftTopIn(GUI.randTeam, GUI.buttonPanelRight, 10, 25)
-				Tooltip.AddButtonTooltip(GUI.randTeam, 'lob_click_randteam')
-			GUI.randTeam.OnClick = function(self, modifiers)								
-				if gameInfo.GameOptions['AutoTeams'] == 'none' then
-					Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 2)
-					SetGameOption('AutoTeams', 'tvsb')
-				elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
-					Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 3)
-					SetGameOption('AutoTeams', 'lvsr')
-				elseif gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
-					Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 4)
-					SetGameOption('AutoTeams', 'pvsi')
-				elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' then
-					Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 5)
-					SetGameOption('AutoTeams', 'manual')
-				else
-					Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 1)
-					SetGameOption('AutoTeams', 'none')
-				end				
-			end
-			--end of auto teams code
-			--start of random map code by Moritz
-			GUI.randMap = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/lobby/lan-game-lobby/toggle', "<LOC lobui_0503>Random Map", 10, 0)
-				LayoutHelpers.CenteredRightOf(GUI.randMap, GUI.randTeam, 5)
-				Tooltip.AddButtonTooltip(GUI.randMap, 'lob_click_randmap')
-			GUI.randMap.OnClick = function()
-				local randomMap
-				randomMap = import('/lua/ui/dialogs/mapselect.lua').randomLobbyMap()
-			end
-			
-			function sendRandMapMessage()
-				local rMapName = import('/lua/ui/dialogs/mapselect.lua').rMapName	
-				local rMapSize1 = import('/lua/ui/dialogs/mapselect.lua').rMapSize1
-				local rMapSize2 = import('/lua/ui/dialogs/mapselect.lua').rMapSize2
-				local rMapSizeFil = import('/lua/ui/dialogs/mapselect.lua').rMapSizeFil
-				local rMapSizeFilLim = import('/lua/ui/dialogs/mapselect.lua').rMapSizeFilLim
-				local rMapPlayersFil = import('/lua/ui/dialogs/mapselect.lua').rMapPlayersFil
-				local rMapPlayersFilLim = import('/lua/ui/dialogs/mapselect.lua').rMapPlayersFilLim
-				local rMapTypeFil = import('/lua/ui/dialogs/mapselect.lua').rMapTypeFil
-				SendSystemMessage("---------------------------------------------------------------------------------------------------")			
-				SendSystemMessage(LOCF('%s %s', "<LOC lobui_0504>Randomly selected map: ", rMapName))
-				SendSystemMessage(LOCF("<LOC map_select_0000>Map Size: %dkm x %dkm", rMapSize1, rMapSize2))
-				if rMapSizeFilLim == 'equal' then
-					rMapSizeFilLim = '='
-				elseif rMapSizeFilLim == 'less' then
-					rMapSizeFilLim = '<='
-				elseif rMapSizeFilLim == 'greater' then
-					rMapSizeFilLim = '>='
-				end
-				if rMapPlayersFilLim == 'equal' then
-					rMapPlayersFilLim = '='
-				elseif rMapPlayersFilLim == 'less' then
-					rMapPlayersFilLim = '<='
-				elseif rMapPlayersFilLim == 'greater' then
-					rMapPlayersFilLim = '>='
-				end
-				if rMapTypeFil == 1 then
-					rMapTypeFil = "<LOC lobui_0576>Official"					
-				elseif rMapTypeFil == 2 then
-					rMapTypeFil = "<LOC lobui_0577>Custom"					
-				end
-				if rMapSizeFil != 0 and rMapPlayersFil != 0 then
-					SendSystemMessage(LOCF("<LOC lobui_0516>Filters: Map Size is %s %dkm and Number of Players are %s %d", rMapSizeFilLim, rMapSizeFil, rMapPlayersFilLim, rMapPlayersFil))
-				elseif rMapSizeFil != 0 then
-					SendSystemMessage(LOCF("<LOC lobui_0517>Filters: Map Size is %s %dkm and Number of Players are ALL", rMapSizeFilLim, rMapSizeFil))
-				elseif rMapPlayersFil != 0 then
-					SendSystemMessage(LOCF("<LOC lobui_0518>Filters: Map Size is ALL and Number of Players are %s %d", rMapPlayersFilLim, rMapPlayersFil))
-				end
-				if rMapTypeFil != 0 then
-					SendSystemMessage(LOCF("<LOC lobui_0578>Map Type: %s", rMapTypeFil))
-				end
-				SendSystemMessage("---------------------------------------------------------------------------------------------------")
-				if not quickRandMap then
-					quickRandMap = true
-					UpdateGame()
-				end
-			end		
-		--end of random map code
-		--start of ranked options code
-			GUI.rankedOptions = UIUtil.CreateButtonStd(GUI.observerPanel, '/lobby/lan-game-lobby/toggle', "<LOC lobui_0522>Default Settings", 10, 0)
-				LayoutHelpers.AtLeftTopIn(GUI.rankedOptions, GUI.buttonPanelRight, 10, 50)
-				Tooltip.AddButtonTooltip(GUI.rankedOptions, 'lob_click_rankedoptions')
-			GUI.rankedOptions.OnClick = function()
-					Prefs.SetToCurrentProfile('Lobby_Gen_Victory', 1)
-					Prefs.SetToCurrentProfile('Lobby_Gen_Timeouts', 2)
-					Prefs.SetToCurrentProfile('Lobby_Gen_CheatsEnabled', 1)
-					Prefs.SetToCurrentProfile('Lobby_Gen_Civilians', 1)
-					Prefs.SetToCurrentProfile('Lobby_Gen_GameSpeed', 1)
-					Prefs.SetToCurrentProfile('Lobby_Gen_Fog', 1)
-					Prefs.SetToCurrentProfile('Lobby_Gen_Cap', 8)
-					Prefs.SetToCurrentProfile('Lobby_Prebuilt_Units', 1)
-					Prefs.SetToCurrentProfile('Lobby_NoRushOption', 1)
-					SetGameOption('Victory', 'demoralization')
-					SetGameOption('Timeouts', '3')
-					SetGameOption('CheatsEnabled', 'false')
-					SetGameOption('CivilianAlliance', 'enemy')
-					SetGameOption('GameSpeed', 'normal')
-					SetGameOption('FogOfWar', 'explored')
-					SetGameOption('UnitCap', '1000')
-					SetGameOption('PrebuiltUnits', 'Off')
-					SetGameOption('NoRushOption', 'Off')
-					--gameInfo.GameMods["656b7af6-9a56-47c5-8182-3a896dc6f4b7"] = true
-					--lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
-					UpdateGame()
-				end
-			end
-		--end of ranked options code
-		
-		--start of auto kick code -- Modified by Xinnony
-		if lobbyComm:IsHost() then
-			GUI.autoKick = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/dialogs/check-box_btn/radio')
-				LayoutHelpers.CenteredRightOf(GUI.autoKick, GUI.observerLabel, 10)
-				Tooltip.AddControlTooltip(GUI.autoKick, 'lob_auto_kick')
-			GUI.autoKickLabel = UIUtil.CreateText(GUI.buttonPanelTop, "Auto kick", 14, UIUtil.bodyFont)
-				LayoutHelpers.CenteredRightOf(GUI.autoKickLabel, GUI.autoKick, 0)
-				Tooltip.AddControlTooltip(GUI.autoKickLabel, 'lob_auto_kick')
-			GUI.autoKick:SetCheck(false)
-			autoKick = false
-			GUI.autoKick.OnCheck = function(self, checked)
-				autoKick = checked
-				UpdateGame()
-			end
-		end
-		--end of auto kick code
-		
+        end
+
+        if lobbyComm:IsHost() then
+            --start of auto teams code by Moritz
+            GUI.randTeam = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/lobby/lan-game-lobby/toggle',
+                                                  "<LOC lobui_0506>Auto Teams", 10, 0)
+                LayoutHelpers.AtLeftTopIn(GUI.randTeam, GUI.buttonPanelRight, 10, 25)
+                Tooltip.AddButtonTooltip(GUI.randTeam, 'lob_click_randteam')
+            GUI.randTeam.OnClick = function(self, modifiers)
+                if gameInfo.GameOptions['AutoTeams'] == 'none' then
+                    Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 2)
+                    SetGameOption('AutoTeams', 'tvsb')
+                    SendSystemMessage("Auto Teams option set: Top vs Bottom")
+                elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
+                    Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 3)
+                    SetGameOption('AutoTeams', 'lvsr')
+                    SendSystemMessage("Auto Teams option set: Left vs Right")
+                elseif gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
+                    Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 4)
+                    SetGameOption('AutoTeams', 'pvsi')
+                    SendSystemMessage("Auto Teams option set: Even Slots vs Odd Slots")
+                elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' then
+                    Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 5)
+                    SetGameOption('AutoTeams', 'manual')
+                    SendSystemMessage("Auto Teams option set: Manual Select")
+                else
+                    Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 1)
+                    SetGameOption('AutoTeams', 'none')
+                    SendSystemMessage("Auto Teams option set: None")
+                end
+            end
+            --end of auto teams code
+            --start of random map code by Moritz
+            GUI.randMap = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/lobby/lan-game-lobby/toggle',
+                                                 "<LOC lobui_0503>Random Map", 10, 0)
+                LayoutHelpers.CenteredRightOf(GUI.randMap, GUI.randTeam, 5)
+                Tooltip.AddButtonTooltip(GUI.randMap, 'lob_click_randmap')
+            GUI.randMap.OnClick = function()
+                local randomMap
+                local mapSelectDialog
+
+                --In order for the RandMap button to work on lobby init, the PC needs a copy of the mapSelectDialog in memory.
+                --Destroy the window after it's loaded, so the player never sees it when clicking the random map button.
+                autoRandMap = false
+                quickRandMap = false
+                local function selectBehavior(selectedScenario, changedOptions, restrictedCategories)
+                    if autoRandMap then
+                        Prefs.SetToCurrentProfile('LastScenario', selectedScenario.file)
+                        gameInfo.GameOptions['ScenarioFile'] = selectedScenario.file
+                    else
+                        Prefs.SetToCurrentProfile('LastScenario', selectedScenario.file)
+                        mapSelectDialog:Destroy()
+                        GUI.chatEdit:AcquireFocus()
+                        for optionKey, data in changedOptions do
+                            Prefs.SetToCurrentProfile(data.pref, data.index)
+                            SetGameOption(optionKey, data.value)
+                        end
+                        --SendSystemMessage(selectedScenario.file)
+
+                        SetGameOption('ScenarioFile',selectedScenario.file)
+
+                        SetGameOption('RestrictedCategories', restrictedCategories, true)
+                        ClearBadMapFlags()  -- every new map, clear the flags, and clients will report if a new map is bad
+                        HostUpdateMods()
+                        UpdateGame()
+                    end
+                end
+
+                local function exitBehavior()
+                    mapSelectDialog:Destroy()
+                    GUI.chatEdit:AcquireFocus()
+                    UpdateGame()
+                end
+
+                GUI.chatEdit:AbandonFocus()
+
+                mapSelectDialog = import('/lua/ui/dialogs/mapselect.lua').CreateDialog(
+                        selectBehavior,
+                        exitBehavior,
+                        GUI,
+                        singlePlayer,
+                        gameInfo.GameOptions.ScenarioFile,
+                        gameInfo.GameOptions,
+                        availableMods,
+                        OnModsChanged
+                )
+                mapSelectDialog:Destroy()
+                GUI.chatEdit:AcquireFocus()
+                randomMap = import('/lua/ui/dialogs/mapselect.lua').randomLobbyMap()
+            end
+
+            function sendRandMapMessage()
+                local rMapName = import('/lua/ui/dialogs/mapselect.lua').rMapName
+                local rMapSize1 = import('/lua/ui/dialogs/mapselect.lua').rMapSize1
+                local rMapSize2 = import('/lua/ui/dialogs/mapselect.lua').rMapSize2
+                local rMapSizeFil = import('/lua/ui/dialogs/mapselect.lua').rMapSizeFil
+                local rMapSizeFilLim = import('/lua/ui/dialogs/mapselect.lua').rMapSizeFilLim
+                local rMapPlayersFil = import('/lua/ui/dialogs/mapselect.lua').rMapPlayersFil
+                local rMapPlayersFilLim = import('/lua/ui/dialogs/mapselect.lua').rMapPlayersFilLim
+                local rMapTypeFil = import('/lua/ui/dialogs/mapselect.lua').rMapTypeFil
+                SendSystemMessage("-------------------------------------------------------------------------------"..
+                                  "--------------------")
+                SendSystemMessage(LOCF('%s %s', "<LOC lobui_0504>Randomly selected map: ", rMapName))
+                SendSystemMessage(LOCF("<LOC map_select_0000>Map Size: %dkm x %dkm", rMapSize1, rMapSize2))
+                if rMapSizeFilLim == 'equal' then
+                    rMapSizeFilLim = '='
+                elseif rMapSizeFilLim == 'less' then
+                    rMapSizeFilLim = '<='
+                elseif rMapSizeFilLim == 'greater' then
+                    rMapSizeFilLim = '>='
+                end
+                if rMapPlayersFilLim == 'equal' then
+                    rMapPlayersFilLim = '='
+                elseif rMapPlayersFilLim == 'less' then
+                    rMapPlayersFilLim = '<='
+                elseif rMapPlayersFilLim == 'greater' then
+                    rMapPlayersFilLim = '>='
+                end
+                if rMapTypeFil == 1 then
+                    rMapTypeFil = "<LOC lobui_0576>Official"
+                elseif rMapTypeFil == 2 then
+                    rMapTypeFil = "<LOC lobui_0577>Custom"
+                end
+                if rMapSizeFil != 0 and rMapPlayersFil != 0 then
+                    SendSystemMessage(LOCF("<LOC lobui_0516>Filters: Map Size is %s %dkm and Number of Players are %s %d",
+                                           rMapSizeFilLim, rMapSizeFil, rMapPlayersFilLim, rMapPlayersFil))
+                elseif rMapSizeFil != 0 then
+                    SendSystemMessage(LOCF("<LOC lobui_0517>Filters: Map Size is %s %dkm and Number of Players are ALL",
+                                           rMapSizeFilLim, rMapSizeFil))
+                elseif rMapPlayersFil != 0 then
+                    SendSystemMessage(LOCF("<LOC lobui_0518>Filters: Map Size is ALL and Number of Players are %s %d",
+                                           rMapPlayersFilLim, rMapPlayersFil))
+                end
+                if rMapTypeFil != 0 then
+                    SendSystemMessage(LOCF("<LOC lobui_0578>Map Type: %s", rMapTypeFil))
+                end
+                SendSystemMessage("---------------------------------------------------------------------------------------"..
+                                  "------------")
+                if not quickRandMap then
+                    quickRandMap = true
+                    UpdateGame()
+                end
+            end
+        --end of random map code
+        --start of ranked options code
+            GUI.rankedOptions = UIUtil.CreateButtonStd(GUI.observerPanel, '/lobby/lan-game-lobby/toggle',
+                                                       "<LOC lobui_0522>Default Settings", 10, 0)
+                LayoutHelpers.AtLeftTopIn(GUI.rankedOptions, GUI.buttonPanelRight, 10, 50)
+                Tooltip.AddButtonTooltip(GUI.rankedOptions, 'lob_click_rankedoptions')
+            GUI.rankedOptions.OnClick = function()
+                    Prefs.SetToCurrentProfile('Lobby_Gen_Victory', 1)
+                    Prefs.SetToCurrentProfile('Lobby_Gen_Timeouts', 2)
+                    Prefs.SetToCurrentProfile('Lobby_Gen_CheatsEnabled', 1)
+                    Prefs.SetToCurrentProfile('Lobby_Gen_Civilians', 1)
+                    Prefs.SetToCurrentProfile('Lobby_Gen_GameSpeed', 1)
+                    Prefs.SetToCurrentProfile('Lobby_Gen_Fog', 1)
+                    Prefs.SetToCurrentProfile('Lobby_Gen_Cap', 8)
+                    Prefs.SetToCurrentProfile('Lobby_Prebuilt_Units', 1)
+                    Prefs.SetToCurrentProfile('Lobby_NoRushOption', 1)
+                    SetGameOption('Victory', 'demoralization')
+                    SetGameOption('Timeouts', '3')
+                    SetGameOption('CheatsEnabled', 'false')
+                    SetGameOption('CivilianAlliance', 'enemy')
+                    SetGameOption('GameSpeed', 'normal')
+                    SetGameOption('FogOfWar', 'explored')
+                    SetGameOption('UnitCap', '1000')
+                    SetGameOption('PrebuiltUnits', 'Off')
+                    SetGameOption('NoRushOption', 'Off')
+                    --gameInfo.GameMods["656b7af6-9a56-47c5-8182-3a896dc6f4b7"] = true
+                    --lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
+                    UpdateGame()
+                end
+            end
+        --end of ranked options code
+
+        --start of auto kick code -- Modified by Xinnony
+        if lobbyComm:IsHost() then
+            GUI.autoKick = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/dialogs/check-box_btn/radio')
+                LayoutHelpers.CenteredRightOf(GUI.autoKick, GUI.observerLabel, 10)
+                Tooltip.AddControlTooltip(GUI.autoKick, 'lob_auto_kick')
+            GUI.autoKickLabel = UIUtil.CreateText(GUI.buttonPanelTop, "Auto kick", 14, UIUtil.bodyFont)
+                LayoutHelpers.CenteredRightOf(GUI.autoKickLabel, GUI.autoKick, 0)
+                Tooltip.AddControlTooltip(GUI.autoKickLabel, 'lob_auto_kick')
+            GUI.autoKick:SetCheck(false)
+            autoKick = false
+            GUI.autoKick.OnCheck = function(self, checked)
+                autoKick = checked
+                UpdateGame()
+            end
+        end
+        --end of auto kick code
+
         GUI.observerList = ItemList(GUI.observerPanel, "observer list")
-			GUI.observerList:SetFont(UIUtil.bodyFont, 14)
-			GUI.observerList:SetColors(UIUtil.fontColor, "00000000", UIUtil.fontOverColor, UIUtil.highlightColor, "ffbcfffe")
-			LayoutHelpers.Below(GUI.observerList, GUI.observerLabel, 8)
-			GUI.observerList.Left:Set(function() return GUI.observerLabel.Left() + 5 end)
-			GUI.observerList.Bottom:Set(function() return GUI.observerPanel.Bottom() - 12 end)
-			GUI.observerList.Top:Set(function() return GUI.observerPanel.Top() + 27 end)
-			GUI.observerList.Right:Set(function() return GUI.observerPanel.Right() - 299 end)
+            GUI.observerList:SetFont(UIUtil.bodyFont, 14)
+            GUI.observerList:SetColors(UIUtil.fontColor, "00000000", UIUtil.fontOverColor, UIUtil.highlightColor, "ffbcfffe")
+            GUI.observerList.Left:Set(function() return GUI.observerPanel.Left() + 11 end)
+            GUI.observerList.Bottom:Set(function() return GUI.observerPanel.Bottom() - 12 end)
+            GUI.observerList.Top:Set(function() return GUI.observerPanel.Top() + 27 end)
+            GUI.observerList.Right:Set(function() return GUI.observerPanel.Right() - 299 end)
         GUI.observerList.OnClick = function(self, row, event)
             if lobbyComm:IsHost() and event.Modifiers.Right then
                 UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
-                    "<LOC lobui_0167>Kick Player", function() 
-                            lobbyComm:EjectPeer(gameInfo.Observers[row+1].OwnerID, "KickedByHost") 
+                    "<LOC lobui_0167>Kick Player", function()
+                            lobbyComm:EjectPeer(gameInfo.Observers[row+1].OwnerID, "KickedByHost")
                         end,
-                    "<LOC _Cancel>", nil, 
-                    nil, nil, 
+                    "<LOC _Cancel>", nil,
+                    nil, nil,
                     true,
                     {worldCover = false, enterButton = 1, escapeButton = 2})
             end
         end
         UIUtil.CreateVertScrollbarFor(GUI.observerList)
-		
-		--// Upload button not work with FAF for the moment (old GPGnet) -- Xinnony
-		--if lobbyComm:IsHost() then
-			--GUI.uploadMapButton = UIUtil.CreateButtonStd(GUI.launchPanel, '/scx_menu/small-btn/small', "", 14, 2)
-			--GUI.uploadMapButton.label:SetText(LOC("<LOC lobui_0734>Upload Map"))
-			--Tooltip.AddControlTooltip(GUI.uploadMapButton, 'lob_upload_map')
-			--LayoutHelpers.CenteredRightOf(GUI.uploadMapButton, GUI.exitButton)    
-			--GUI.uploadMapButton.OnClick = function()
-				--uploadNewMap()
-				--UpdateGame()
-			--end		
-		--end
+
+        --// Upload button not work with FAF for the moment (old GPGnet) -- Xinnony
+        --if lobbyComm:IsHost() then
+            --GUI.uploadMapButton = UIUtil.CreateButtonStd(GUI.launchPanel, '/scx_menu/small-btn/small', "", 14, 2)
+            --GUI.uploadMapButton.label:SetText(LOC("<LOC lobui_0734>Upload Map"))
+            --Tooltip.AddControlTooltip(GUI.uploadMapButton, 'lob_upload_map')
+            --LayoutHelpers.CenteredRightOf(GUI.uploadMapButton, GUI.exitButton)
+            --GUI.uploadMapButton.OnClick = function()
+                --uploadNewMap()
+                --UpdateGame()
+            --end
+        --end
 
     else
 
@@ -3515,8 +3339,8 @@ function CreateUI(maxPlayers)
         SetGameOption("AllowObservers",true)
 
     end
-	
-	
+
+
 
     ---------------------------------------------------------------------------
     -- other logic, including lobby callbacks
@@ -3528,16 +3352,16 @@ function CreateUI(maxPlayers)
         GUI.chatEdit:AbandonFocus()
         UIUtil.QuickDialog(GUI,
             "<LOC lobby_0000>Exit game lobby?",
-            "<LOC _Yes>", function() 
+            "<LOC _Yes>", function()
                     ReturnToMenu(false)
                 end,
             "<LOC _Cancel>", function()
                     GUI.chatEdit:AcquireFocus()
-                end, 
-            nil, nil, 
+                end,
+            nil, nil,
             true,
             {worldCover = true, enterButton = 1, escapeButton = 2})
-        
+
     end
 
 -- get ping times
@@ -3561,36 +3385,37 @@ function CreateUI(maxPlayers)
                 for slot, observer in gameInfo.Observers do
                     if observer and (observer.OwnerID != localPlayerID) and observer.ObserverListIndex then
                         local peer = lobbyComm:GetPeer(observer.OwnerID)
-                        
+
                         --Lobby "bug" fix.  This should fix the problem where the lobby pings get bugged.
                         -- -Duck42
                         local ping = 0
-						if peer.ping != nil then
-							ping = math.floor(peer.ping)
-						end
-						
-                        
+                        if peer.ping != nil then
+                            ping = math.floor(peer.ping)
+                        end
+
+
                         -- CPU benchmark modified code
                         local score_CPU =  FindBenchmarkForName(observer.PlayerName)
                         local cputext = ""
                         if score_CPU then
                             cputext = ", CPU = "..tostring(score_CPU.Result)
                         end
-						pingtext = LOC("<LOC lobui_0240> (Ping = ")..tostring(ping)
-						ratingtext = ", Rating = " .. tostring(observer.PL)
-						--PlayerName (Ping = xxx, Rating = xxx, CPU = xxx)
-                        GUI.observerList:ModifyItem(observer.ObserverListIndex, observer.PlayerName  .. pingtext .. ratingtext .. cputext .. ")")
+                        pingtext = LOC("<LOC lobui_0240> (Ping = ")..tostring(ping)
+                        ratingtext = ", Rating = " .. tostring(observer.PL)
+                        --PlayerName (Ping = xxx, Rating = xxx, CPU = xxx)
+                        GUI.observerList:ModifyItem(observer.ObserverListIndex, observer.PlayerName .. pingtext ..
+                                                    ratingtext .. cputext .. ")")
                     elseif observer.OwnerID == localPlayerID then
-                        
+
                         local score_CPU =  FindBenchmarkForName(observer.PlayerName)
                         local cputext = ""
                         if score_CPU then
                             cputext = ", CPU = "..tostring(score_CPU.Result)
                         end
-						pingtext = ""
-						ratingtext = " (Rating = "..tostring(observer.PL)
-						--PlayerName (Rating = xxx, CPU = xxx)
-                        GUI.observerList:ModifyItem(observer.ObserverListIndex, observer.PlayerName .. ratingtext .. cputext..")")
+                        pingtext = ""
+                        ratingtext = " (Rating = "..tostring(observer.PL)
+                        --PlayerName (Rating = xxx, CPU = xxx)
+                        GUI.observerList:ModifyItem(observer.ObserverListIndex, observer.PlayerName..ratingtext .. cputext..")")
                         -- End CPU benchmark modified code
                     end
                 end
@@ -3598,18 +3423,18 @@ function CreateUI(maxPlayers)
             end
         end
     )
-	
-	--// COUNTRY - Xinnony
-	if not singlePlayer then
-		CountryScript()
-	end
-	--\\ Stop COUNTRY
-	-- CPU Benchmark code
-	if not singlePlayer then
-		CreateCPUMetricUI()
-		ForkThread(function() StressCPU(10) end)
-	end
-	-- End CPU Benchmark code
+
+    --// COUNTRY - Xinnony
+    if not singlePlayer then
+        CountryScript()
+    end
+    --\\ Stop COUNTRY
+    -- CPU Benchmark code
+    if not singlePlayer then
+        CreateCPUMetricUI()
+        ForkThread(function() StressCPU(10) end)
+    end
+    -- End CPU Benchmark code
 
     GUI.uiCreated = true
 end
@@ -3617,76 +3442,77 @@ end
 function RefreshOptionDisplayData(scenarioInfo)
     local globalOpts = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
     local teamOptions = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
-	local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
+    local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
     formattedOptions = {}
-    
+
 --// Check Ranked active -- Xinnony & Vicarian
- 	local getInit = GetCommandLineArg("/init", 1)
-	getInit = tostring(getInit[1])
-	if getInit == "init_faf.lua" then
---		AddChatText('Welcome to Forged Alliance Forever MOD'..getInit)
-		local getVictory = gameInfo.GameOptions['Victory'] -- 'demoralization'
-		local getCheat = gameInfo.GameOptions['CheatsEnabled'] -- 'false'
-		local getSpeed = gameInfo.GameOptions['GameSpeed'] -- 'normal'
-		local getFog = gameInfo.GameOptions['FogOfWar'] -- 'explored'
-		local getPrebui = gameInfo.GameOptions['PrebuiltUnits'] -- 'Off'
-		local getNorush = gameInfo.GameOptions['NoRushOption'] -- 'Off'
-		local getNumbMod = table.getn(Mods.GetGameMods(gameInfo.GameMods)) -- 0 for the purposes of this function
-		local getRstric = gameInfo.GameOptions.RestrictedCategories -- can be nil or a table, even if no unit restrictions are present
---~ 			AddChatText(tostring(cRstr))
-		if getVictory == 'demoralization' and getCheat == 'false' and getSpeed == 'normal'
-		and getFog == 'explored' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and getRstric == nil then
-			--table.insert(formattedOptions, {text = 'Ranking',
-				--value = 'Ranked',
-				--green = true,
-				--tooltip = {text='Ranked',body='This game is Ranked !'}})
-			GUI.mapName:SetText("Game is Ranked")
-			GUI.mapName:SetColor("77ff77")
-			--Tooltip.AddControlTooltip(GUI.mapName, '')
-		else
-			if getVictory == 'demoralization' and getCheat == 'false' and getSpeed == 'normal'
-			and getFog == 'explored' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and table.getn(getRstric) == 0 then
-				--table.insert(formattedOptions, {text = 'Ranking',
-					--value = 'Ranked',
-					--green = true,
-					--tooltip = {text='Ranked',body='This game is Ranked !'}})
-				GUI.mapName:SetText("Game is Ranked")
-				GUI.mapName:SetColor("77ff77")
-				--Tooltip.AddControlTooltip(GUI.mapName, '')
-			else
-				--table.insert(formattedOptions, {text = 'Ranking',
-					--value = 'Unranked',
-					--red = true,
-					--tooltip = {text='Unranked',body='This game is NOT Ranked !'}})
-				GUI.mapName:SetText("Game is not Ranked")
-				GUI.mapName:SetColor("ff7777")
-				--Tooltip.AddControlTooltip(GUI.mapName, '')
-			end
-		end
-	else
---~ 		if getInit == "init_blackops.lua" then
---~ 			AddChatText('Welcome to BlackOps MOD')
---~ 		elseif getInit == "init_labwars.lua" then
---~ 			AddChatText('Welcome to Labwars MOD')
---~ 		elseif getInit == "init_ladder1v1.lua" then
---~ 			AddChatText('Welcome to Ladder 1v1 MOD')
---~ 		elseif getInit == "init_nomads.lua" then
---~ 			AddChatText('Welcome to Nomads MOD')
---~ 		elseif getInit == "init_phantomx.lua" then
---~ 			AddChatText('Welcome to PhantomX MOD')
---~ 		elseif getInit == "init_supremeDestruction.lua" then
---~ 			AddChatText('Welcome to SupremeDestruction MOD')
---~ 		elseif getInit == "init_xtremewars.lua" then
---~ 			AddChatText('Welcome to XtremeWars MOD')
---~ 		end
-		--table.insert(formattedOptions, {text = 'Ranking',
-			--value = 'Unranked',
-			--red = true,
-			--tooltip = {text='Unranked',body='This game is NOT Ranked !'}})
-		GUI.mapName:SetText("Game is not Ranked")
-		GUI.mapName:SetColor("ff7777")
-		--Tooltip.AddControlTooltip(GUI.mapName, '')
-	end
+    local getInit = GetCommandLineArg("/init", 1)
+    getInit = tostring(getInit[1])
+    if getInit == "init_faf.lua" then
+--        AddChatText('Welcome to Forged Alliance Forever MOD'..getInit)
+        local getVictory = gameInfo.GameOptions['Victory'] -- 'demoralization'
+        local getCheat = gameInfo.GameOptions['CheatsEnabled'] -- 'false'
+        local getSpeed = gameInfo.GameOptions['GameSpeed'] -- 'normal'
+        local getFog = gameInfo.GameOptions['FogOfWar'] -- 'explored'
+        local getPrebui = gameInfo.GameOptions['PrebuiltUnits'] -- 'Off'
+        local getNorush = gameInfo.GameOptions['NoRushOption'] -- 'Off'
+        local getNumbMod = table.getn(Mods.GetGameMods(gameInfo.GameMods)) -- 0 for the purposes of this function
+        local getRstric = gameInfo.GameOptions.RestrictedCategories --can be nil or a table, even if no restrictions are present
+--~             AddChatText(tostring(cRstr))
+        if getVictory == 'demoralization' and getCheat == 'false' and getSpeed == 'normal'
+        and getFog == 'explored' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and getRstric == nil then
+            --table.insert(formattedOptions, {text = 'Ranking',
+                --value = 'Ranked',
+                --green = true,
+                --tooltip = {text='Ranked',body='This game is Ranked !'}})
+            GUI.mapName:SetText("Game is Ranked")
+            GUI.mapName:SetColor("77ff77")
+            --Tooltip.AddControlTooltip(GUI.mapName, '')
+        else
+            if getVictory == 'demoralization' and getCheat == 'false' and getSpeed == 'normal' and
+            getFog == 'explored' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and
+            table.getn(getRstric) == 0 then
+                --table.insert(formattedOptions, {text = 'Ranking',
+                    --value = 'Ranked',
+                    --green = true,
+                    --tooltip = {text='Ranked',body='This game is Ranked !'}})
+                GUI.mapName:SetText("Game is Ranked")
+                GUI.mapName:SetColor("77ff77")
+                --Tooltip.AddControlTooltip(GUI.mapName, '')
+            else
+                --table.insert(formattedOptions, {text = 'Ranking',
+                    --value = 'Unranked',
+                    --red = true,
+                    --tooltip = {text='Unranked',body='This game is NOT Ranked !'}})
+                GUI.mapName:SetText("Game is not Ranked")
+                GUI.mapName:SetColor("ff7777")
+                --Tooltip.AddControlTooltip(GUI.mapName, '')
+            end
+        end
+    else
+--~         if getInit == "init_blackops.lua" then
+--~             AddChatText('Welcome to BlackOps MOD')
+--~         elseif getInit == "init_labwars.lua" then
+--~             AddChatText('Welcome to Labwars MOD')
+--~         elseif getInit == "init_ladder1v1.lua" then
+--~             AddChatText('Welcome to Ladder 1v1 MOD')
+--~         elseif getInit == "init_nomads.lua" then
+--~             AddChatText('Welcome to Nomads MOD')
+--~         elseif getInit == "init_phantomx.lua" then
+--~             AddChatText('Welcome to PhantomX MOD')
+--~         elseif getInit == "init_supremeDestruction.lua" then
+--~             AddChatText('Welcome to SupremeDestruction MOD')
+--~         elseif getInit == "init_xtremewars.lua" then
+--~             AddChatText('Welcome to XtremeWars MOD')
+--~         end
+        --table.insert(formattedOptions, {text = 'Ranking',
+            --value = 'Unranked',
+            --red = true,
+            --tooltip = {text='Unranked',body='This game is NOT Ranked !'}})
+        GUI.mapName:SetText("Game is not Ranked")
+        GUI.mapName:SetColor("ff7777")
+        --Tooltip.AddControlTooltip(GUI.mapName, '')
+    end
 --\\ Stop Check Ranked active
 --// Check Mod active
     local modNum = table.getn(Mods.GetGameMods(gameInfo.GameMods))
@@ -3695,8 +3521,8 @@ function RefreshOptionDisplayData(scenarioInfo)
         if modNum == 1 then
             modStr = '<LOC lobby_0004>%d Mod Enabled'
         end
-        table.insert(formattedOptions, {text = LOCF(modStr, modNum), 
-            value = LOC('<LOC lobby_0003>Check Mod Manager'), 
+        table.insert(formattedOptions, {text = LOCF(modStr, modNum),
+            value = LOC('<LOC lobby_0003>Check Mod Manager'),
             mod = true,
             tooltip = 'Lobby_Mod_Option',
             valueTooltip = 'Lobby_Mod_Option'})
@@ -3705,30 +3531,37 @@ function RefreshOptionDisplayData(scenarioInfo)
 --// Check RestrictedUnit active
     if gameInfo.GameOptions.RestrictedCategories != nil then
         if table.getn(gameInfo.GameOptions.RestrictedCategories) != 0 then
-            table.insert(formattedOptions, {text = LOC("<LOC lobby_0005>Build Restrictions Enabled"), 
-            value = LOC("<LOC lobby_0006>Check Unit Manager"), 
+            table.insert(formattedOptions, {text = LOC("<LOC lobby_0005>Build Restrictions Enabled"),
+            value = LOC("<LOC lobby_0006>Check Unit Manager"),
             mod = true,
             tooltip = 'Lobby_BuildRestrict_Option',
             valueTooltip = 'Lobby_BuildRestrict_Option'})
         end
     end
 --\\ Stop Check RestrictedUnit active
---// Check MapSize & MaxPlayer active
-    if scenarioInfo then
-        table.insert(formattedOptions, {text = '<LOC MAPSEL_0024>', 
-            value = LOCF("<LOC map_select_0008>%dkm x %dkm", scenarioInfo.size[1]/50, scenarioInfo.size[2]/50),
-            tooltip = 'map_select_sizeoption',
-            valueTooltip = 'map_select_sizeoption'})
-        table.insert(formattedOptions, {text = '<LOC MAPSEL_0031>Max Players', 
-            value = LOCF("<LOC map_select_0009>%d", table.getsize(scenarioInfo.Configurations.standard.teams[1].armies)),
-            tooltip = 'map_select_maxplayers',
-            valueTooltip = 'map_select_maxplayers'})
-    end
+--// Check MapSize & MaxPlayer active -- Disable because is Added in Tooltip on MapNane Label (randmapText)
+    --if scenarioInfo then
+        --table.insert(formattedOptions, {text = '<LOC MAPSEL_0024>',
+            --value = LOCF("<LOC map_select_0008>%dkm x %dkm", scenarioInfo.size[1]/50, scenarioInfo.size[2]/50),
+            --tooltip = 'map_select_sizeoption',
+            --valueTooltip = 'map_select_sizeoption'})
+        --table.insert(formattedOptions, {text = '<LOC MAPSEL_0031>Max Players',
+            --value = LOCF("<LOC map_select_0009>%d", table.getsize(scenarioInfo.Configurations.standard.teams[1].armies)),
+            --tooltip = 'map_select_maxplayers',
+            --valueTooltip = 'map_select_maxplayers'})
+    --end
 --\\ Stop Check MapSize & MaxPlayer active
 --// Check other options active
     for i, v in gameInfo.GameOptions do
         local option = false
         local mpOnly = false
+		--RankedOptions
+		--Mod Options
+		--Unit Manager
+		--globalOpts
+		--teamOptions
+		--AIOpts
+		--AdvancedOptions
         for index, optData in globalOpts do
             if i == optData.key then
                 mpOnly = optData.mponly or false
@@ -3758,7 +3591,7 @@ function RefreshOptionDisplayData(scenarioInfo)
                 end
             end
         end
-		if not option then
+        if not option then
             for index, optData in AIOpts do
                 if i == optData.key then
                     option = {text = optData.label, tooltip = optData.pref}
@@ -3800,7 +3633,7 @@ function RefreshOptionDisplayData(scenarioInfo)
 --            if a.mod or b.mod then
 --                return a.mod or false
 --            else
---                return LOC(a.text) < LOC(b.text) 
+--                return LOC(a.text) < LOC(b.text)
 --            end
 --        end)
     if GUI.OptionContainer.CalcVisible then
@@ -3809,22 +3642,22 @@ function RefreshOptionDisplayData(scenarioInfo)
 end
 
 function wasConnected(peer)
-	for _,v in pairs(connectedTo) do
-		if v == peer then
-			return true
-		end
-	end
-	return false
+    for _,v in pairs(connectedTo) do
+        if v == peer then
+            return true
+        end
+    end
+    return false
 end
 
 function CalcConnectionStatus(peer)
     if peer.status != 'Established' then
         return 'red'
     else
-		if not wasConnected(peer.id) then
-			table.insert(connectedTo, peer.id)
-			GpgNetSend('Connected', string.format("%d", peer.id))
-		end
+        if not wasConnected(peer.id) then
+            table.insert(connectedTo, peer.id)
+            GpgNetSend('Connected', string.format("%d", peer.id))
+        end
 
         if not table.find(peer.establishedPeers, lobbyComm:GetLocalPlayerID()) then
             -- they haven't reported that they can talk to us?
@@ -3937,17 +3770,17 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
         GUI.markers[slot].marker.Width:Set(8)
         GUI.markers[slot].marker.Depth:Set(function() return GUI.posGroup.Depth() + 10 end)
         GUI.markers[slot].marker:SetSolidColor('ff777777')
-        
+
         GUI.markers[slot].teamIndicator = Bitmap(GUI.markers[slot].marker)
         LayoutHelpers.AnchorToRight(GUI.markers[slot].teamIndicator, GUI.markers[slot].marker, 1)
         LayoutHelpers.AtTopIn(GUI.markers[slot].teamIndicator, GUI.markers[slot].marker, 5)
-        GUI.markers[slot].teamIndicator:DisableHitTest()		
-       
-		if gameInfo.GameOptions['AutoTeams'] and not gameInfo.AutoTeams[slot] and lobbyComm:IsHost() then
-			gameInfo.AutoTeams[slot] = 2			
-		end
-	   
-        GUI.markers[slot].markerOverlay = Button(GUI.markers[slot].marker, 
+        GUI.markers[slot].teamIndicator:DisableHitTest()
+
+        if gameInfo.GameOptions['AutoTeams'] and not gameInfo.AutoTeams[slot] and lobbyComm:IsHost() then
+            gameInfo.AutoTeams[slot] = 2
+        end
+
+        GUI.markers[slot].markerOverlay = Button(GUI.markers[slot].marker,
             UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds'),
             UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds'),
             UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds'),
@@ -3956,92 +3789,101 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
         GUI.markers[slot].markerOverlay.Slot = slot
         GUI.markers[slot].markerOverlay.OnClick = function(self, modifiers)
             if modifiers.Left then
-				if gameInfo.GameOptions['TeamSpawn'] != 'random' then
-					if FindSlotForID(localPlayerID) != self.Slot and gameInfo.PlayerOptions[self.Slot] == nil then
-						if IsPlayer(localPlayerID) then
-							if lobbyComm:IsHost() then
-								HostTryMovePlayer(hostID, FindSlotForID(localPlayerID), self.Slot)
-							else
-								lobbyComm:SendData(hostID, {Type = 'MovePlayer', CurrentSlot = FindSlotForID(localPlayerID), RequestedSlot =  self.Slot})
-							end
-						elseif IsObserver(localPlayerID) then
-							if lobbyComm:IsHost() then
-								requestedFaction = Prefs.GetFromCurrentProfile('LastFaction')
-								requestedPL = playerRating
-								requestedRC = ratingColor
-								requestedNG = numGames
-								HostConvertObserverToPlayer(hostID, localPlayerName, FindObserverSlotForID(localPlayerID), self.Slot, requestedFaction, requestedPL, requestedRC, requestedNG)
-							else
-								lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer', RequestedName = localPlayerName, ObserverSlot = FindObserverSlotForID(localPlayerID), PlayerSlot = self.Slot, requestedFaction = Prefs.GetFromCurrentProfile('LastFaction'), requestedPL = playerRating, requestedRC = ratingColor, requestedNG = numGames})
-							end
-						end
-					end
-				else
-					if gameInfo.GameOptions['AutoTeams'] and lobbyComm:IsHost() then
-						if gameInfo.GameOptions['AutoTeams'] == 'manual' then							
-							if not gameInfo.ClosedSlots[slot] and (gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] == 'random') then
-								if gameInfo.AutoTeams[slot] == 7 then
-									GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[2]))
-									gameInfo.AutoTeams[slot] = 2
-								elseif gameInfo.AutoTeams[slot] == 2 then
-									GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[3]))
-									gameInfo.AutoTeams[slot] = 3
-								elseif gameInfo.AutoTeams[slot] == 3 then									
-									GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[4]))
-									gameInfo.AutoTeams[slot] = 4
-								elseif gameInfo.AutoTeams[slot] == 4 then									
-									GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[5]))
-									gameInfo.AutoTeams[slot] = 5
-								elseif gameInfo.AutoTeams[slot] == 5 then									
-									GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[6]))
-									gameInfo.AutoTeams[slot] = 6
-								elseif gameInfo.AutoTeams[slot] == 6 then									
-									GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[7]))
-									gameInfo.AutoTeams[slot] = 7
-								end
-								lobbyComm:BroadcastData(
-									{
-										Type = 'AutoTeams',
-										Slot = slot,
-										Team = gameInfo.AutoTeams[slot],
-									}
-								)
-								UpdateGame()
-							end		
-						end
-					end
-				end
+                if gameInfo.GameOptions['TeamSpawn'] != 'random' then
+                    if FindSlotForID(localPlayerID) != self.Slot and gameInfo.PlayerOptions[self.Slot] == nil then
+                        if IsPlayer(localPlayerID) then
+                            if lobbyComm:IsHost() then
+                                HostTryMovePlayer(hostID, FindSlotForID(localPlayerID), self.Slot)
+                            else
+                                lobbyComm:SendData(hostID, {Type = 'MovePlayer', CurrentSlot = FindSlotForID(localPlayerID),
+                                                            RequestedSlot =  self.Slot})
+                            end
+                        elseif IsObserver(localPlayerID) then
+                            if lobbyComm:IsHost() then
+                                requestedFaction = Prefs.GetFromCurrentProfile('LastFaction')
+                                requestedPL = playerRating
+                                requestedRC = ratingColor
+                                requestedNG = numGames
+                                HostConvertObserverToPlayer(hostID, localPlayerName, FindObserverSlotForID(localPlayerID),
+                                                            self.Slot, requestedFaction, requestedPL, requestedRC, requestedNG)
+                            else
+                                lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer', RequestedName = localPlayerName,
+                                                            ObserverSlot = FindObserverSlotForID(localPlayerID), PlayerSlot =
+                                                            self.Slot, requestedFaction =
+                                                            Prefs.GetFromCurrentProfile('LastFaction'),
+                                                            requestedPL = playerRating, requestedRC = ratingColor,
+                                                            requestedNG = numGames})
+                            end
+                        end
+                    end
+                else
+                    if gameInfo.GameOptions['AutoTeams'] and lobbyComm:IsHost() then
+                        if gameInfo.GameOptions['AutoTeams'] == 'manual' then
+                            if not gameInfo.ClosedSlots[slot] and (gameInfo.PlayerOptions[slot] or
+                                                                   gameInfo.GameOptions['TeamSpawn'] == 'random') then
+                                if gameInfo.AutoTeams[slot] == 7 then
+                                    GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[2]))
+                                    gameInfo.AutoTeams[slot] = 2
+                                elseif gameInfo.AutoTeams[slot] == 2 then
+                                    GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[3]))
+                                    gameInfo.AutoTeams[slot] = 3
+                                elseif gameInfo.AutoTeams[slot] == 3 then
+                                    GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[4]))
+                                    gameInfo.AutoTeams[slot] = 4
+                                elseif gameInfo.AutoTeams[slot] == 4 then
+                                    GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[5]))
+                                    gameInfo.AutoTeams[slot] = 5
+                                elseif gameInfo.AutoTeams[slot] == 5 then
+                                    GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[6]))
+                                    gameInfo.AutoTeams[slot] = 6
+                                elseif gameInfo.AutoTeams[slot] == 6 then
+                                    GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[7]))
+                                    gameInfo.AutoTeams[slot] = 7
+                                end
+                                lobbyComm:BroadcastData(
+                                    {
+                                        Type = 'AutoTeams',
+                                        Slot = slot,
+                                        Team = gameInfo.AutoTeams[slot],
+                                    }
+                                )
+                                UpdateGame()
+                            end
+                        end
+                    end
+                end
             elseif modifiers.Right then
                 if lobbyComm:IsHost() then
                     if gameInfo.ClosedSlots[self.Slot] == nil then
                         HostCloseSlot(hostID, self.Slot)
                     else
                         HostOpenSlot(hostID, self.Slot)
-                    end    
+                    end
                 end
             end
         end
         GUI.markers[slot].markerOverlay.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then
                 if gameInfo.GameOptions['TeamSpawn'] != 'random' then
-                    GUI.slots[self.Slot].name.HandleEvent(self, event)					
+                    GUI.slots[self.Slot].name.HandleEvent(self, event)
                 elseif gameInfo.GameOptions['AutoTeams'] == 'manual' and lobbyComm:IsHost() then
-					GUI.markers[slot].Indicator:Play()
-				end
+                    GUI.markers[slot].Indicator:Play()
+                end
             elseif event.Type == 'MouseExit' then
                 GUI.slots[self.Slot].name.HandleEvent(self, event)
-				if gameInfo.GameOptions['AutoTeams'] == 'manual' and lobbyComm:IsHost() then
-					GUI.markers[slot].Indicator:Stop()
-				end
+                if gameInfo.GameOptions['AutoTeams'] == 'manual' and lobbyComm:IsHost() then
+                    GUI.markers[slot].Indicator:Stop()
+                end
             end
             Button.HandleEvent(self, event)
         end
-        LayoutHelpers.AtLeftTopIn(GUI.markers[slot].marker, GUI.posGroup, 
-            ((pos[1] / mWidth) * cWidth) - (GUI.markers[slot].marker.Width() / 2), 
+        LayoutHelpers.AtLeftTopIn(GUI.markers[slot].marker, GUI.posGroup,
+            ((pos[1] / mWidth) * cWidth) - (GUI.markers[slot].marker.Width() / 2),
             ((pos[2] / mHeight) * cHeight) - (GUI.markers[slot].marker.Height() / 2))
-        
+
         local index = slot
-        GUI.markers[slot].Indicator = Bitmap(GUI.markers[slot].marker, UIUtil.UIFile('/game/beacons/beacon-quantum-gate_btn_up.dds'))
+        GUI.markers[slot].Indicator = Bitmap(GUI.markers[slot].marker, UIUtil.UIFile(
+                                                                                '/game/beacons/beacon-quantum-gate_btn_up.dds'))
         LayoutHelpers.AtCenterIn(GUI.markers[slot].Indicator, GUI.markers[slot].marker)
         GUI.markers[slot].Indicator.Height:Set(function() return GUI.markers[index].Indicator.BitmapHeight() * .3 end)
         GUI.markers[slot].Indicator.Width:Set(function() return GUI.markers[index].Indicator.BitmapWidth() * .3 end)
@@ -4080,44 +3922,48 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
             end
         end
         if gameInfo.GameOptions['AutoTeams'] then
-			if gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
-				local midLine = GUI.mapView.Left() + (GUI.mapView.Width() / 2)
-				if not gameInfo.ClosedSlots[slot] and (gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] == 'random') then
-					local markerPos = GUI.markers[slot].marker.Left()
-					if markerPos < midLine then
-						GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[2]))
-					else
-						GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[3]))
-					end
-				end					
-			elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
-				local midLine = GUI.mapView.Top() + (GUI.mapView.Height() / 2)
-				if not gameInfo.ClosedSlots[slot] and (gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] == 'random') then
-					local markerPos = GUI.markers[slot].marker.Top()
-					if markerPos < midLine then
-						GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[2]))	
-					else
-						GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[3]))
-					end
-				end
-			elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' then
-				if not gameInfo.ClosedSlots[slot] and (gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] == 'random') then
-					if slot == 1 or slot == 3 or slot == 5 or slot == 7 or slot == 9 or slot == 11 then
-						GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[2]))
-					else
-						GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[3]))
-					end
-				end
-			elseif gameInfo.GameOptions['AutoTeams'] == 'manual' and gameInfo.GameOptions['TeamSpawn'] == 'random' then
-				if not gameInfo.ClosedSlots[slot] and (gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] == 'random') then
-					if gameInfo.AutoTeams[slot] then						
-						GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[gameInfo.AutoTeams[slot]]))						
-					else				
-						GUI.markers[slot].teamIndicator:SetSolidColor('00000000')
-					end
-				end
-			end
-		end  
+            if gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
+                local midLine = GUI.mapView.Left() + (GUI.mapView.Width() / 2)
+                if not gameInfo.ClosedSlots[slot] and (gameInfo.PlayerOptions[slot] or
+                                                       gameInfo.GameOptions['TeamSpawn'] == 'random') then
+                    local markerPos = GUI.markers[slot].marker.Left()
+                    if markerPos < midLine then
+                        GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[2]))
+                    else
+                        GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[3]))
+                    end
+                end
+            elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
+                local midLine = GUI.mapView.Top() + (GUI.mapView.Height() / 2)
+                if not gameInfo.ClosedSlots[slot] and (gameInfo.PlayerOptions[slot] or
+                                                       gameInfo.GameOptions['TeamSpawn'] == 'random') then
+                    local markerPos = GUI.markers[slot].marker.Top()
+                    if markerPos < midLine then
+                        GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[2]))
+                    else
+                        GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[3]))
+                    end
+                end
+            elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' then
+                if not gameInfo.ClosedSlots[slot] and (gameInfo.PlayerOptions[slot] or
+                                                       gameInfo.GameOptions['TeamSpawn'] == 'random') then
+                    if slot == 1 or slot == 3 or slot == 5 or slot == 7 or slot == 9 or slot == 11 then
+                        GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[2]))
+                    else
+                        GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[3]))
+                    end
+                end
+            elseif gameInfo.GameOptions['AutoTeams'] == 'manual' and gameInfo.GameOptions['TeamSpawn'] == 'random' then
+                if not gameInfo.ClosedSlots[slot] and (gameInfo.PlayerOptions[slot] or
+                                                       gameInfo.GameOptions['TeamSpawn'] == 'random') then
+                    if gameInfo.AutoTeams[slot] then
+                        GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[gameInfo.AutoTeams[slot]]))
+                    else
+                        GUI.markers[slot].teamIndicator:SetSolidColor('00000000')
+                    end
+                end
+            end
+        end
 
         if gameInfo.ClosedSlots[slot] != nil then
             local textOverlay = Text(GUI.markers[slot].markerOverlay)
@@ -4139,7 +3985,8 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     lobbyComm.ConnectionFailed = function(self, reason)
         LOG("CONNECTION FAILED ",reason)
 
-        GUI.connectionFailedDialog = UIUtil.ShowInfoDialog(GUI.panel, LOCF(Strings.ConnectionFailed, Strings[reason] or reason), "<LOC _OK>", ReturnToMenu)
+        GUI.connectionFailedDialog = UIUtil.ShowInfoDialog(GUI.panel, LOCF(Strings.ConnectionFailed, Strings[reason] or reason),
+                                                           "<LOC _OK>", ReturnToMenu)
 
         lobbyComm:Destroy()
         lobbyComm = nil
@@ -4152,12 +3999,13 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     lobbyComm.Ejected = function(self,reason)
         LOG("EJECTED ",reason)
 
-        GUI.connectionFailedDialog = UIUtil.ShowInfoDialog(GUI, LOCF(Strings.Ejected, Strings[reason] or reason), "<LOC _OK>", ReturnToMenu)
+        GUI.connectionFailedDialog = UIUtil.ShowInfoDialog(GUI, LOCF(Strings.Ejected, Strings[reason] or reason),
+                                                           "<LOC _OK>", ReturnToMenu)
         lobbyComm:Destroy()
         lobbyComm = nil
     end
 
-    lobbyComm.ConnectionToHostEstablished = function(self,myID,myName,theHostID)		
+    lobbyComm.ConnectionToHostEstablished = function(self,myID,myName,theHostID)
 
         hostID = theHostID
         localPlayerID = myID
@@ -4174,24 +4022,24 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             if (requestedFaction == nil) or (requestedFaction > table.getn(FactionData.Factions)) then
                 requestedFaction = table.getn(FactionData.Factions) + 1
             end
-            
+
             if hasSupcom == false then
                 requestedFaction = 4
             end
-           
-            lobbyComm:SendData( hostID, { 
-                Type = 'AddPlayer', 
-                RequestedSlot = -1, 
-                RequestedPlayerName = localPlayerName, 
-                Human = true, 
+
+            lobbyComm:SendData( hostID, {
+                Type = 'AddPlayer',
+                RequestedSlot = -1,
+                RequestedPlayerName = localPlayerName,
+                Human = true,
                 RequestedColor = Prefs.GetFromCurrentProfile('LastColor'),
                 RequestedFaction = requestedFaction,
-				RequestedPL = playerRating, 
-				RequestedRC = ratingColor, 
-				RequestedNG = numGames,
-				RequestedMEAN = playerMean,
-				RequestedDEV = playerDeviation
-				} )
+                RequestedPL = playerRating,
+                RequestedRC = ratingColor,
+                RequestedNG = numGames,
+                RequestedMEAN = playerMean,
+                RequestedDEV = playerDeviation
+                } )
         end
 
         local function KeepAliveThreadFunc()
@@ -4209,7 +4057,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                     end
                     UIUtil.QuickDialog(GUI, "<LOC lobui_0266>Connection to host timed out.",
                                        "<LOC lobui_0267>Keep Trying", OnRetry,
-                                       "<LOC lobui_0268>Give Up", ReturnToMenu, 
+                                       "<LOC lobui_0268>Give Up", ReturnToMenu,
                                        nil, nil,
                                        true,
                                        {worldCover = false, escapeButton = 2})
@@ -4241,26 +4089,26 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             AddChatText("["..data.SenderName.."] "..data.Text)
         elseif data.Type == 'PrivateChat' then
             AddChatText("<<"..data.SenderName..">> "..data.Text)
-		--// COUNTRY - Xinnony
-		elseif data.Type == 'Country' then
-			LOG("Country Data: name="..(data.PlayerName or "?")..", result="..(data.Result or "?"))
-			AddPlayerCountry(data)
-			local playerId = FindIDForName(data.PlayerName)
-			local playerSlot = FindSlotForID(playerId)
-			if playerSlot != nil then
-				SetSlotCountryFlag(playerSlot, gameInfo.PlayerOptions[playerSlot])
-			end
-		--\\ Stop COUNTRY
-		-- CPU benchmark code
-		elseif data.Type == 'CPUBenchmark' then
-			LOG("CPU Data: "..(data.PlayerName or "?")..", ".. (data.Result or "?"))
-			AddPlayerBenchmark(data)
-			local playerId = FindIDForName(data.PlayerName)
-			local playerSlot = FindSlotForID(playerId)
-			if playerSlot != nil then
-				 SetSlotCPUBar(playerSlot, gameInfo.PlayerOptions[playerSlot])
-			end			
-		-- End CPU benchmark code
+        --// COUNTRY - Xinnony
+        elseif data.Type == 'Country' then
+            LOG("Country Data: name="..(data.PlayerName or "?")..", result="..(data.Result or "?"))
+            AddPlayerCountry(data)
+            local playerId = FindIDForName(data.PlayerName)
+            local playerSlot = FindSlotForID(playerId)
+            if playerSlot != nil then
+                SetSlotCountryFlag(playerSlot, gameInfo.PlayerOptions[playerSlot])
+            end
+        --\\ Stop COUNTRY
+        -- CPU benchmark code
+        elseif data.Type == 'CPUBenchmark' then
+            LOG("CPU Data: "..(data.PlayerName or "?")..", ".. (data.Result or "?"))
+            AddPlayerBenchmark(data)
+            local playerId = FindIDForName(data.PlayerName)
+            local playerSlot = FindSlotForID(playerId)
+            if playerSlot != nil then
+                 SetSlotCPUBar(playerSlot, gameInfo.PlayerOptions[playerSlot])
+            end
+        -- End CPU benchmark code
         end
 
         if lobbyComm:IsHost() then
@@ -4271,8 +4119,10 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
             elseif data.Type == 'AddPlayer' then
                 -- create empty slot if possible and give it to the player
-                HostTryAddPlayer( data.SenderID, data.RequestedSlot, data.RequestedPlayerName, data.Human, data.AIPersonality, data.RequestedColor, data.RequestedFaction, nil, data.RequestedPL, data.RequestedRC, data.RequestedNG, data.RequestedMEAN, data.RequestDEV )
-				PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
+                HostTryAddPlayer( data.SenderID, data.RequestedSlot, data.RequestedPlayerName, data.Human, data.AIPersonality,
+                                  data.RequestedColor, data.RequestedFaction, nil, data.RequestedPL, data.RequestedRC,
+                                  data.RequestedNG, data.RequestedMEAN, data.RequestDEV )
+                PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
             elseif data.Type == 'MovePlayer' then
                 -- attempt to move a player from current slot to empty slot
                 HostTryMovePlayer(data.SenderID, data.CurrentSlot, data.RequestedSlot)
@@ -4288,8 +4138,9 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             elseif data.Type == 'RequestConvertToObserver' then
                 HostConvertPlayerToObserver(data.SenderID, data.RequestedName, data.RequestedSlot)
 
-            elseif data.Type == 'RequestConvertToPlayer' then				
-                HostConvertObserverToPlayer(data.SenderID, data.RequestedName, data.ObserverSlot, data.PlayerSlot, data.requestedFaction, data.requestedPL, data.requestedRC, data.requestedNG)
+            elseif data.Type == 'RequestConvertToPlayer' then
+                HostConvertObserverToPlayer(data.SenderID, data.RequestedName, data.ObserverSlot, data.PlayerSlot,
+                                            data.requestedFaction, data.requestedPL, data.requestedRC, data.requestedNG)
 
             elseif data.Type == 'RequestColor' then
                 if IsColorFree(data.Color) then
@@ -4299,7 +4150,8 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                     UpdateGame()
                 else
                     -- Sorry, it's not free. Force the player back to the color we have for him.
-                    lobbyComm:SendData( data.SenderID, { Type = 'SetColor', Color = gameInfo.PlayerOptions[data.Slot].PlayerColor, Slot = data.Slot } )
+                    lobbyComm:SendData( data.SenderID, { Type = 'SetColor', Color =
+                                                         gameInfo.PlayerOptions[data.Slot].PlayerColor, Slot = data.Slot } )
                 end
             elseif data.Type == 'ClearSlot' then
                 if gameInfo.PlayerOptions[data.Slot].OwnerID == data.SenderID then
@@ -4308,7 +4160,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                     WARN("Attempt to clear unowned slot")
                 end
             elseif data.Type == 'SetAvailableMods' then
-                availableMods[data.SenderID] = data.Mods				
+                availableMods[data.SenderID] = data.Mods
                 HostUpdateMods(data.SenderID)
             elseif data.Type == 'MissingMap' then
                 HostPlayerMissingMapAlert(data.Id)
@@ -4326,7 +4178,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 else
                     -- The new slot was someone else, just add that info.
                     gameInfo.PlayerOptions[data.Slot] = data.Options
-					PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
+                    PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
                 end
                 UpdateGame()
 
@@ -4388,7 +4240,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
             elseif data.Type == 'Launch' then
                 local info = data.GameInfo
-                info.GameMods = Mods.GetGameMods(info.GameMods)				
+                info.GameMods = Mods.GetGameMods(info.GameMods)
                 lobbyComm:LaunchGame(info)
 
             elseif data.Type == 'ClearSlot' then
@@ -4404,15 +4256,15 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 gameInfo.GameMods = data.GameMods
                 UpdateGame()
                 ModManager.UpdateClientModStatus(gameInfo.GameMods)
-            
+
             elseif data.Type == 'SlotClose' then
                 gameInfo.ClosedSlots[data.Slot] = true
                 UpdateGame()
-            
+
             elseif data.Type == 'SlotOpen' then
                 gameInfo.ClosedSlots[data.Slot] = nil
                 UpdateGame()
-			
+
             elseif data.Type == 'AutoTeams' then
                 gameInfo.AutoTeams[data.Slot] = data.Team
                 UpdateGame()
@@ -4424,7 +4276,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         AddChatText(text)
     end
 
-    lobbyComm.GameLaunched = function(self) 
+    lobbyComm.GameLaunched = function(self)
         local player = lobbyComm:GetLocalPlayerID()
         for i, v in gameInfo.PlayerOptions do
             if v.Human and v.OwnerID == player then
@@ -4448,7 +4300,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         -- determine if cheat keys should be mapped
         if not DebugFacilitiesEnabled() then
             IN_ClearKeyMap()
-            IN_AddKeyMapTable(import('/lua/keymap/keymapper.lua').GetKeyMappings(gameInfo.GameOptions['CheatsEnabled'] == 'true'))
+            IN_AddKeyMapTable(import('/lua/keymap/keymapper.lua').GetKeyMappings(gameInfo.GameOptions['CheatsEnabled']=='true'))
         end
 
     end
@@ -4482,13 +4334,13 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             local defValue = Prefs.GetFromCurrentProfile(option.pref) or option.default
             SetGameOption(option.key,option.values[defValue].key)
         end
-		
-		for index, option in teamOpts do
+
+        for index, option in teamOpts do
             local defValue = Prefs.GetFromCurrentProfile(option.pref) or option.default
             SetGameOption(option.key,option.values[defValue].key)
         end
-		
-		for index, option in AIOpts do
+
+        for index, option in AIOpts do
             local defValue = Prefs.GetFromCurrentProfile(option.pref) or option.default
             SetGameOption(option.key,option.values[defValue].key)
         end
@@ -4502,7 +4354,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 SetGameOption('ScenarioFile',scen)
             end
         end
-        
+
         GUI.keepAliveThread = ForkThread(
             -- Eject players who haven't sent a heartbeat in a while
             function()
@@ -4529,12 +4381,13 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
     lobbyComm.PeerDisconnected = function(self,peerName,peerID)
         --LOG('PeerDisconnected : ', peerName, ' ', peerID)
-		--AddChatText('PeerDisconnected : peerName='..peerName..' peerID='..peerID) -- XINNONYWORK -- Here this message always show the player quit !!! TEMPORARY
+        -- XINNONYWORK -- Here this message always show the player quit !!! TEMPORARY
+        --AddChatText('PeerDisconnected : peerName='..peerName..' peerID='..peerID)
         --LOG('GameInfo = ', repr(gameInfo))
 
         local slot = FindSlotForID(peerID)
         if slot then
-			PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04717'}, true)
+            PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04717'}, true)
             ClearSlotInfo( slot )
             gameInfo.PlayerOptions[slot] = nil
             UpdateGame()
@@ -4574,7 +4427,7 @@ function SetPlayerOption(slot, key, val)
     end
 
     gameInfo.PlayerOptions[slot][key] = val
-   
+
     lobbyComm:BroadcastData(
         {
             Type = 'PlayerOption',
@@ -4583,17 +4436,17 @@ function SetPlayerOption(slot, key, val)
             Slot = slot,
         }
     )
-	UpdateGame()
+    UpdateGame()
 end
 
 function SetGameOption(key, val, ignoreNilValue)
     ignoreNilValue = ignoreNilValue or false
-    
+
     if (not ignoreNilValue) and ((key == nil) or (val == nil)) then
         WARN('Attempt to set nil lobby game option: ' .. tostring(key) .. ' ' .. tostring(val))
         return
     end
-    
+
     if lobbyComm:IsHost() then
         gameInfo.GameOptions[key] = val
 
@@ -4604,7 +4457,7 @@ function SetGameOption(key, val, ignoreNilValue)
         }
 
         LOG('SetGameOption(key='..repr(key)..',val='..repr(val))
-        
+
         -- don't want to send all restricted categories to gpgnet, so just send bool
         -- note if more things need to be translated to gpgnet, a translation table would be a better implementation
         -- but since there's only one, we'll call it out here
@@ -4617,16 +4470,16 @@ function SetGameOption(key, val, ignoreNilValue)
             end
             GpgNetSend('GameOption', key, restrictionsEnabled)
         elseif key == 'ScenarioFile' then
-			GpgNetSend('GameOption', key, val)
-			 if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") then
-				scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-				if scenarioInfo then
-					GpgNetSend('GameOption', 'Slots', table.getsize(scenarioInfo.Configurations.standard.teams[1].armies))
-				end
-			end
-		else
-			GpgNetSend('GameOption', key, val)
-		end
+            GpgNetSend('GameOption', key, val)
+             if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") then
+                scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+                if scenarioInfo then
+                    GpgNetSend('GameOption', 'Slots', table.getsize(scenarioInfo.Configurations.standard.teams[1].armies))
+                end
+            end
+        else
+            GpgNetSend('GameOption', key, val)
+        end
 
         UpdateGame()
     else
@@ -4641,244 +4494,254 @@ function DebugDump()
 end
 
 
---------------------------------------------------------------------  Big Map Preview  --------------------------------------------------------------------
--------------------------------------------------------------------- (Code by ThaPear) --------------------------------------------------------------------
+-------------------------------------------------------  Big Map Preview  ------------------------------------------------------
+------------------------------------------------------- (Code by ThaPear) ------------------------------------------------------
 
 LrgMap = false
 function CreateBigPreview(depth, parent)
-	local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
-	
-	if LrgMap then
-		CloseBigPreview()
-	end
-	LrgMap = MapPreview(parent)
-	LrgMap.OnDestroy = function(self) LrgMap = false end
-	LrgMap.Width:Set(710)
-	LrgMap.Height:Set(710)
-	LrgMap.Depth:Set(depth)
-	LrgMap:Show() -- for accessibility from mapselect.lua
-	LrgMap.Overlay = Bitmap(LrgMap, UIUtil.SkinnableFile("/lobby/lan-game-lobby/map-pane-border_bmp.dds"))
-	LrgMap.Overlay.Height:Set(830)
-	LrgMap.Overlay.Width:Set(830)
-	
-	LrgMap.Top:Set(function() return GetFrame(0).Height()/2-LrgMap.Overlay.Height()/2 + 60 end)
-	LrgMap.Left:Set(function() return GetFrame(0).Width()/2-LrgMap.Overlay.Width()/2 + 60 end)
-	LrgMap.Overlay.Top:Set(function() return LrgMap.Top() - 60 end)
-	LrgMap.Overlay.Left:Set(function() return LrgMap.Left() - 60 end)
-	
-	LrgMap.Overlay.Depth:Set(function() return LrgMap.Depth()+1 end)
-	
-	LrgMap.CloseBtn = UIUtil.CreateButtonStd(LrgMap, '/dialogs/close_btn/close', "", 12, 2, 0, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
-	LayoutHelpers.AtRightTopIn(LrgMap.CloseBtn, LrgMap, -15, -10)
-	LrgMap.CloseBtn.Depth:Set(function() return LrgMap.Overlay.Depth()+1 end)
-	LrgMap.CloseBtn.OnClick = function()
-		CloseBigPreview()
-	end	
-	
-	scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-	if scenarioInfo and scenarioInfo.map and (scenarioInfo.map != "") then
-		if not LrgMap:SetTexture(scenarioInfo.preview) then
-			LrgMap:SetTextureFromMap(scenarioInfo.map)
-		end
-	end
-	
-	local mapdata = {}
-	doscript('/lua/dataInit.lua', mapdata) -- needed for the format of _save files
-	doscript(scenarioInfo.save, mapdata) -- ...
-	
-	local allmarkers = mapdata.Scenario.MasterChain['_MASTERCHAIN_'].Markers -- get the markers from the save file
-	local massmarkers = {}
-	local hydromarkers = {}
-	
-	for markname in allmarkers do
-		if allmarkers[markname]['type'] == "Mass" then
-			table.insert(massmarkers, allmarkers[markname])
-		elseif allmarkers[markname]['type'] == "Hydrocarbon" then
-			table.insert(hydromarkers, allmarkers[markname])
-		end
-	end
-	
-	LrgMap.massmarkers = {}
-	for i = 1, table.getn(massmarkers) do
-		LrgMap.massmarkers[i] = Bitmap(LrgMap, UIUtil.SkinnableFile("/game/build-ui/icon-mass_bmp.dds"))
-		LrgMap.massmarkers[i].Width:Set(10)
-		LrgMap.massmarkers[i].Height:Set(10)
-		LrgMap.massmarkers[i].Left:Set(LrgMap.Left() + massmarkers[i].position[1]/scenarioInfo.size[1]*LrgMap.Width() - LrgMap.massmarkers[i].Width()/2)
-		LrgMap.massmarkers[i].Top:Set(LrgMap.Top() + massmarkers[i].position[3]/scenarioInfo.size[2]*LrgMap.Height() - LrgMap.massmarkers[i].Height()/2)
-	end
-	LrgMap.hydros = {}
-	for i = 1, table.getn(hydromarkers) do
-		LrgMap.hydros[i] = Bitmap(LrgMap, UIUtil.SkinnableFile("/game/build-ui/icon-energy_bmp.dds"))
-		LrgMap.hydros[i].Width:Set(14)
-		LrgMap.hydros[i].Height:Set(14)
-		LrgMap.hydros[i].Left:Set(LrgMap.Left() + hydromarkers[i].position[1]/scenarioInfo.size[1]*LrgMap.Width() - LrgMap.hydros[i].Width()/2)
-		LrgMap.hydros[i].Top:Set(LrgMap.Top() + hydromarkers[i].position[3]/scenarioInfo.size[2]*LrgMap.Height() - LrgMap.hydros[i].Height()/2)
-	end
-	
-	-- start positions
-	LrgMap.markers = {}
-	NewShowMapPositions(LrgMap,scenarioInfo,GetPlayerCount())
+    local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
+
+    if LrgMap then
+        CloseBigPreview()
+    end
+    LrgMap = MapPreview(parent)
+    LrgMap.OnDestroy = function(self) LrgMap = false end
+    LrgMap.Width:Set(710)
+    LrgMap.Height:Set(710)
+    LrgMap.Depth:Set(depth)
+    LrgMap:Show() -- for accessibility from mapselect.lua
+    LrgMap.Overlay = Bitmap(LrgMap, UIUtil.SkinnableFile("/lobby/lan-game-lobby/map-pane-border_bmp.dds"))
+    LrgMap.Overlay.Height:Set(830)
+    LrgMap.Overlay.Width:Set(830)
+
+    LrgMap.Top:Set(function() return GetFrame(0).Height()/2-LrgMap.Overlay.Height()/2 + 60 end)
+    LrgMap.Left:Set(function() return GetFrame(0).Width()/2-LrgMap.Overlay.Width()/2 + 60 end)
+    LrgMap.Overlay.Top:Set(function() return LrgMap.Top() - 60 end)
+    LrgMap.Overlay.Left:Set(function() return LrgMap.Left() - 60 end)
+
+    LrgMap.Overlay.Depth:Set(function() return LrgMap.Depth()+1 end)
+
+    LrgMap.CloseBtn = UIUtil.CreateButtonStd(LrgMap, '/dialogs/close_btn/close', "", 12, 2, 0, "UI_Tab_Click_01",
+                                             "UI_Tab_Rollover_01")
+    LayoutHelpers.AtRightTopIn(LrgMap.CloseBtn, LrgMap, -15, -10)
+    LrgMap.CloseBtn.Depth:Set(function() return LrgMap.Overlay.Depth()+1 end)
+    LrgMap.CloseBtn.OnClick = function()
+        CloseBigPreview()
+    end
+
+    scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+    if scenarioInfo and scenarioInfo.map and (scenarioInfo.map != "") then
+        if not LrgMap:SetTexture(scenarioInfo.preview) then
+            LrgMap:SetTextureFromMap(scenarioInfo.map)
+        end
+    end
+
+    local mapdata = {}
+    doscript('/lua/dataInit.lua', mapdata) -- needed for the format of _save files
+    doscript(scenarioInfo.save, mapdata) -- ...
+
+    local allmarkers = mapdata.Scenario.MasterChain['_MASTERCHAIN_'].Markers -- get the markers from the save file
+    local massmarkers = {}
+    local hydromarkers = {}
+
+    for markname in allmarkers do
+        if allmarkers[markname]['type'] == "Mass" then
+            table.insert(massmarkers, allmarkers[markname])
+        elseif allmarkers[markname]['type'] == "Hydrocarbon" then
+            table.insert(hydromarkers, allmarkers[markname])
+        end
+    end
+
+    LrgMap.massmarkers = {}
+    for i = 1, table.getn(massmarkers) do
+        LrgMap.massmarkers[i] = Bitmap(LrgMap, UIUtil.SkinnableFile("/game/build-ui/icon-mass_bmp.dds"))
+        LrgMap.massmarkers[i].Width:Set(10)
+        LrgMap.massmarkers[i].Height:Set(10)
+        LrgMap.massmarkers[i].Left:Set(LrgMap.Left() + massmarkers[i].position[1]/scenarioInfo.size[1]*LrgMap.Width() -
+                                       LrgMap.massmarkers[i].Width()/2)
+        LrgMap.massmarkers[i].Top:Set(LrgMap.Top() + massmarkers[i].position[3]/scenarioInfo.size[2]*LrgMap.Height() -
+                                      LrgMap.massmarkers[i].Height()/2)
+    end
+    LrgMap.hydros = {}
+    for i = 1, table.getn(hydromarkers) do
+        LrgMap.hydros[i] = Bitmap(LrgMap, UIUtil.SkinnableFile("/game/build-ui/icon-energy_bmp.dds"))
+        LrgMap.hydros[i].Width:Set(14)
+        LrgMap.hydros[i].Height:Set(14)
+        LrgMap.hydros[i].Left:Set(LrgMap.Left() + hydromarkers[i].position[1]/scenarioInfo.size[1]*LrgMap.Width() -
+                                  LrgMap.hydros[i].Width()/2)
+        LrgMap.hydros[i].Top:Set(LrgMap.Top() + hydromarkers[i].position[3]/scenarioInfo.size[2]*LrgMap.Height() -
+                                 LrgMap.hydros[i].Height()/2)
+    end
+
+    -- start positions
+    LrgMap.markers = {}
+    NewShowMapPositions(LrgMap,scenarioInfo,GetPlayerCount())
 end -- CreateBigPreview(...)
 
 function CloseBigPreview()
-	if LrgMap then
-		LrgMap.CloseBtn:Destroy()
-		LrgMap.Overlay:Destroy()
-		for i = 1, table.getn(LrgMap.massmarkers) do
-			LrgMap.massmarkers[i]:Destroy()
-		end
-		for i = 1, table.getn(LrgMap.hydros) do
-			LrgMap.hydros[i]:Destroy()
-		end
-		LrgMap:Destroy()
-		LrgMap = false
-	end
+    if LrgMap then
+        LrgMap.CloseBtn:Destroy()
+        LrgMap.Overlay:Destroy()
+        for i = 1, table.getn(LrgMap.massmarkers) do
+            LrgMap.massmarkers[i]:Destroy()
+        end
+        for i = 1, table.getn(LrgMap.hydros) do
+            LrgMap.hydros[i]:Destroy()
+        end
+        LrgMap:Destroy()
+        LrgMap = false
+    end
 end -- CloseBigPreview()
 
 local posGroup = false
  -- copied from the old lobby.lua, needed to change GUI. into LrgMap. for a separately handled set of markers
 function NewShowMapPositions(mapCtrl, scenario, numPlayers)
-	if scenario.starts == nil then scenario.starts = true end
+    if scenario.starts == nil then scenario.starts = true end
 
-	if posGroup then
-		posGroup:Destroy()
-		posGroup = false
-	end
+    if posGroup then
+        posGroup:Destroy()
+        posGroup = false
+    end
 
-	if LrgMap.markers and table.getn(LrgMap.markers) > 0 then
-		for i, v in LrgMap.markers do
-			v.marker:Destroy()
-		end
-	end
+    if LrgMap.markers and table.getn(LrgMap.markers) > 0 then
+        for i, v in LrgMap.markers do
+            v.marker:Destroy()
+        end
+    end
 
-	if not scenario.starts or not scenario.size then return end
+    if not scenario.starts or not scenario.size then return end
 
-	local posGroup = Group(mapCtrl)
-	LayoutHelpers.FillParent(posGroup, mapCtrl)
+    local posGroup = Group(mapCtrl)
+    LayoutHelpers.FillParent(posGroup, mapCtrl)
 
-	local startPos = MapUtil.GetStartPositions(scenario)
+    local startPos = MapUtil.GetStartPositions(scenario)
 
-	local cHeight = posGroup:Height()
-	local cWidth = posGroup:Width()
+    local cHeight = posGroup:Height()
+    local cWidth = posGroup:Width()
 
-	local mWidth = scenario.size[1]
-	local mHeight = scenario.size[2]
+    local mWidth = scenario.size[1]
+    local mHeight = scenario.size[2]
 
-	local playerArmyArray = MapUtil.GetArmies(scenario)
+    local playerArmyArray = MapUtil.GetArmies(scenario)
 
-	for inSlot, army in playerArmyArray do
-		local pos = startPos[army]
-		local slot = inSlot
-		LrgMap.markers[slot] = {}
-		LrgMap.markers[slot].marker = Bitmap(posGroup)
-		LrgMap.markers[slot].marker.Height:Set(10)
-		LrgMap.markers[slot].marker.Width:Set(8)
-		LrgMap.markers[slot].marker.Depth:Set(function() return posGroup.Depth() + 10 end)
-		LrgMap.markers[slot].marker:SetSolidColor('ff777777')
-		
-		LrgMap.markers[slot].teamIndicator = Bitmap(LrgMap.markers[slot].marker)
-		LayoutHelpers.AnchorToRight(LrgMap.markers[slot].teamIndicator, LrgMap.markers[slot].marker, 1)
-		LayoutHelpers.AtTopIn(LrgMap.markers[slot].teamIndicator, LrgMap.markers[slot].marker, 5)
-		LrgMap.markers[slot].teamIndicator:DisableHitTest()
-		
-		LrgMap.markers[slot].markerOverlay = Button(LrgMap.markers[slot].marker, 
-			UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds'),
-			UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds'),
-			UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds'),
-			UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds'))
-		LayoutHelpers.AtCenterIn(LrgMap.markers[slot].markerOverlay, LrgMap.markers[slot].marker)
-		LrgMap.markers[slot].markerOverlay.Slot = slot
-		LrgMap.markers[slot].markerOverlay.OnClick = function(self, modifiers)
-			if modifiers.Left then
-				if FindSlotForID(localPlayerID) != self.Slot and gameInfo.PlayerOptions[self.Slot] == nil then
-					if IsPlayer(localPlayerID) then
-						if lobbyComm:IsHost() then
-							HostTryMovePlayer(hostID, FindSlotForID(localPlayerID), self.Slot)
-						else
-							lobbyComm:SendData(hostID, {Type = 'MovePlayer', CurrentSlot = FindSlotForID(localPlayerID), RequestedSlot =  self.Slot})
-						end
-					elseif IsObserver(localPlayerID) then
-						if lobbyComm:IsHost() then
-							HostConvertObserverToPlayer(hostID, localPlayerName, FindObserverSlotForID(localPlayerID), self.Slot)
-						else
-							lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer', RequestedName = localPlayerName, ObserverSlot = FindObserverSlotForID(localPlayerID), PlayerSlot = self.Slot})
-						end
-					end
-				end
-			elseif modifiers.Right then
-				if lobbyComm:IsHost() then
-					if gameInfo.ClosedSlots[self.Slot] == nil then
-						HostCloseSlot(hostID, self.Slot)
-					else
-						HostOpenSlot(hostID, self.Slot)
-					end	
-				end
-			end
-		end
-		LrgMap.markers[slot].markerOverlay.HandleEvent = function(self, event)
-			if event.Type == 'MouseEnter' then
-				if gameInfo.GameOptions['TeamSpawn'] != 'random' then
-					GUI.slots[self.Slot].name.HandleEvent(self, event)
-					LrgMap.markers[self.Slot].Indicator:Play()
-				end
-			elseif event.Type == 'MouseExit' then
-				GUI.slots[self.Slot].name.HandleEvent(self, event)
-				LrgMap.markers[self.Slot].Indicator:Stop()
-			end
-			Button.HandleEvent(self, event)
-		end
-		LayoutHelpers.AtLeftTopIn(LrgMap.markers[slot].marker, posGroup, 
-			((pos[1] / mWidth) * cWidth) - (LrgMap.markers[slot].marker.Width() / 2), 
-			((pos[2] / mHeight) * cHeight) - (LrgMap.markers[slot].marker.Height() / 2))
-		
-		local index = slot
-		LrgMap.markers[slot].Indicator = Bitmap(LrgMap.markers[slot].marker, UIUtil.UIFile('/game/beacons/beacon-quantum-gate_btn_up.dds'))
-		LayoutHelpers.AtCenterIn(LrgMap.markers[slot].Indicator, LrgMap.markers[slot].marker)
-		LrgMap.markers[slot].Indicator.Height:Set(function() return LrgMap.markers[index].Indicator.BitmapHeight() * .3 end)
-		LrgMap.markers[slot].Indicator.Width:Set(function() return LrgMap.markers[index].Indicator.BitmapWidth() * .3 end)
-		LrgMap.markers[slot].Indicator.Depth:Set(function() return LrgMap.markers[index].marker.Depth() - 1 end)
-		LrgMap.markers[slot].Indicator:Hide()
-		LrgMap.markers[slot].Indicator:DisableHitTest()
-		LrgMap.markers[slot].Indicator.Play = function(self)
-			self:SetAlpha(1)
-			self:Show()
-			self:SetNeedsFrameUpdate(true)
-			self.time = 0
-			self.OnFrame = function(control, time)
-				control.time = control.time + (time*4)
-				control:SetAlpha(MATH_Lerp(math.sin(control.time), -.5, .5, 0.3, 0.5))
-			end
-		end
-		LrgMap.markers[slot].Indicator.Stop = function(self)
-			self:SetAlpha(0)
-			self:Hide()
-			self:SetNeedsFrameUpdate(false)
-		end
+    for inSlot, army in playerArmyArray do
+        local pos = startPos[army]
+        local slot = inSlot
+        LrgMap.markers[slot] = {}
+        LrgMap.markers[slot].marker = Bitmap(posGroup)
+        LrgMap.markers[slot].marker.Height:Set(10)
+        LrgMap.markers[slot].marker.Width:Set(8)
+        LrgMap.markers[slot].marker.Depth:Set(function() return posGroup.Depth() + 10 end)
+        LrgMap.markers[slot].marker:SetSolidColor('ff777777')
 
-		if gameInfo.GameOptions['TeamSpawn'] == 'random' then
-			LrgMap.markers[slot].marker:SetSolidColor("ff777777")
-		else
-			if gameInfo.PlayerOptions[slot] then
-				LrgMap.markers[slot].marker:SetSolidColor(gameColors.PlayerColors[gameInfo.PlayerOptions[slot].PlayerColor])
-				if gameInfo.PlayerOptions[slot].Team == 1 then
-					LrgMap.markers[slot].teamIndicator:SetSolidColor('00000000')
-				else
-					LrgMap.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[gameInfo.PlayerOptions[slot].Team]))
-				end
-			else
-				LrgMap.markers[slot].marker:SetSolidColor("ff777777")
-				LrgMap.markers[slot].teamIndicator:SetSolidColor('00000000')
-			end
-		end
+        LrgMap.markers[slot].teamIndicator = Bitmap(LrgMap.markers[slot].marker)
+        LayoutHelpers.AnchorToRight(LrgMap.markers[slot].teamIndicator, LrgMap.markers[slot].marker, 1)
+        LayoutHelpers.AtTopIn(LrgMap.markers[slot].teamIndicator, LrgMap.markers[slot].marker, 5)
+        LrgMap.markers[slot].teamIndicator:DisableHitTest()
 
-		if gameInfo.ClosedSlots[slot] != nil then
-			local textOverlay = Text(LrgMap.markers[slot].markerOverlay)
-			textOverlay:SetFont(UIUtil.bodyFont, 14)
-			textOverlay:SetColor("Crimson")
-			textOverlay:SetText("X")
-			LayoutHelpers.AtCenterIn(textOverlay, LrgMap.markers[slot].markerOverlay)
-		end
-	end
+        LrgMap.markers[slot].markerOverlay = Button(LrgMap.markers[slot].marker,
+            UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds'),
+            UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds'),
+            UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds'),
+            UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds'))
+        LayoutHelpers.AtCenterIn(LrgMap.markers[slot].markerOverlay, LrgMap.markers[slot].marker)
+        LrgMap.markers[slot].markerOverlay.Slot = slot
+        LrgMap.markers[slot].markerOverlay.OnClick = function(self, modifiers)
+            if modifiers.Left then
+                if FindSlotForID(localPlayerID) != self.Slot and gameInfo.PlayerOptions[self.Slot] == nil then
+                    if IsPlayer(localPlayerID) then
+                        if lobbyComm:IsHost() then
+                            HostTryMovePlayer(hostID, FindSlotForID(localPlayerID), self.Slot)
+                        else
+                            lobbyComm:SendData(hostID, {Type = 'MovePlayer', CurrentSlot = FindSlotForID(localPlayerID),
+                                               RequestedSlot =  self.Slot})
+                        end
+                    elseif IsObserver(localPlayerID) then
+                        if lobbyComm:IsHost() then
+                            HostConvertObserverToPlayer(hostID, localPlayerName, FindObserverSlotForID(localPlayerID),
+                                                        self.Slot)
+                        else
+                            lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer', RequestedName = localPlayerName,
+                                                        ObserverSlot = FindObserverSlotForID(localPlayerID),
+                                                        PlayerSlot = self.Slot})
+                        end
+                    end
+                end
+            elseif modifiers.Right then
+                if lobbyComm:IsHost() then
+                    if gameInfo.ClosedSlots[self.Slot] == nil then
+                        HostCloseSlot(hostID, self.Slot)
+                    else
+                        HostOpenSlot(hostID, self.Slot)
+                    end
+                end
+            end
+        end
+        LrgMap.markers[slot].markerOverlay.HandleEvent = function(self, event)
+            if event.Type == 'MouseEnter' then
+                if gameInfo.GameOptions['TeamSpawn'] != 'random' then
+                    GUI.slots[self.Slot].name.HandleEvent(self, event)
+                    LrgMap.markers[self.Slot].Indicator:Play()
+                end
+            elseif event.Type == 'MouseExit' then
+                GUI.slots[self.Slot].name.HandleEvent(self, event)
+                LrgMap.markers[self.Slot].Indicator:Stop()
+            end
+            Button.HandleEvent(self, event)
+        end
+        LayoutHelpers.AtLeftTopIn(LrgMap.markers[slot].marker, posGroup,
+            ((pos[1] / mWidth) * cWidth) - (LrgMap.markers[slot].marker.Width() / 2),
+            ((pos[2] / mHeight) * cHeight) - (LrgMap.markers[slot].marker.Height() / 2))
+
+        local index = slot
+        LrgMap.markers[slot].Indicator = Bitmap(LrgMap.markers[slot].marker,
+                                         UIUtil.UIFile('/game/beacons/beacon-quantum-gate_btn_up.dds'))
+        LayoutHelpers.AtCenterIn(LrgMap.markers[slot].Indicator, LrgMap.markers[slot].marker)
+        LrgMap.markers[slot].Indicator.Height:Set(function() return LrgMap.markers[index].Indicator.BitmapHeight() * .3 end)
+        LrgMap.markers[slot].Indicator.Width:Set(function() return LrgMap.markers[index].Indicator.BitmapWidth() * .3 end)
+        LrgMap.markers[slot].Indicator.Depth:Set(function() return LrgMap.markers[index].marker.Depth() - 1 end)
+        LrgMap.markers[slot].Indicator:Hide()
+        LrgMap.markers[slot].Indicator:DisableHitTest()
+        LrgMap.markers[slot].Indicator.Play = function(self)
+            self:SetAlpha(1)
+            self:Show()
+            self:SetNeedsFrameUpdate(true)
+            self.time = 0
+            self.OnFrame = function(control, time)
+                control.time = control.time + (time*4)
+                control:SetAlpha(MATH_Lerp(math.sin(control.time), -.5, .5, 0.3, 0.5))
+            end
+        end
+        LrgMap.markers[slot].Indicator.Stop = function(self)
+            self:SetAlpha(0)
+            self:Hide()
+            self:SetNeedsFrameUpdate(false)
+        end
+
+        if gameInfo.GameOptions['TeamSpawn'] == 'random' then
+            LrgMap.markers[slot].marker:SetSolidColor("ff777777")
+        else
+            if gameInfo.PlayerOptions[slot] then
+                LrgMap.markers[slot].marker:SetSolidColor(gameColors.PlayerColors[gameInfo.PlayerOptions[slot].PlayerColor])
+                if gameInfo.PlayerOptions[slot].Team == 1 then
+                    LrgMap.markers[slot].teamIndicator:SetSolidColor('00000000')
+                else
+                    LrgMap.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[gameInfo.PlayerOptions[slot].Team]))
+                end
+            else
+                LrgMap.markers[slot].marker:SetSolidColor("ff777777")
+                LrgMap.markers[slot].teamIndicator:SetSolidColor('00000000')
+            end
+        end
+
+        if gameInfo.ClosedSlots[slot] != nil then
+            local textOverlay = Text(LrgMap.markers[slot].markerOverlay)
+            textOverlay:SetFont(UIUtil.bodyFont, 14)
+            textOverlay:SetColor("Crimson")
+            textOverlay:SetText("X")
+            LayoutHelpers.AtCenterIn(textOverlay, LrgMap.markers[slot].markerOverlay)
+        end
+    end
 end -- NewShowMapPositions(...)
 
 
@@ -4906,106 +4769,108 @@ local firstCPUTest = true
 --  CPU Benchmark Storage and Retrieval Functions
 --------------------------------------------------
 function AddPlayerBenchmark(data)
-	--This function stores CPU benchmark results from the host 
-	--and/or other players in the appropriate table.
-	--	data: The benchamark data to store {PlayerName, Result}
-	local alreadyExists = false
-	for i,benchmark in CPU_BenchmarkList do
-		if data.PlayerName == benchmark.PlayerName then
-			alreadyExists = true
-			CPU_BenchmarkList[i].Result = data.Result
-		end
-	end
-	if not alreadyExists then
-		table.insert(CPU_BenchmarkList, {PlayerName = data.PlayerName, Result = data.Result})
-	end
+    --This function stores CPU benchmark results from the host
+    --and/or other players in the appropriate table.
+    --    data: The benchamark data to store {PlayerName, Result}
+    local alreadyExists = false
+    for i,benchmark in CPU_BenchmarkList do
+        if data.PlayerName == benchmark.PlayerName then
+            alreadyExists = true
+            CPU_BenchmarkList[i].Result = data.Result
+        end
+    end
+    if not alreadyExists then
+        table.insert(CPU_BenchmarkList, {PlayerName = data.PlayerName, Result = data.Result})
+    end
 end
 
 function FindBenchmarkForName(name)
-	--Given a playername, this function looks up the corresponding benchmark in the table and returns it
-	--A value of false is returned if the name is not in the benchmark table
-	for i,benchmark in CPU_BenchmarkList do
-		if name == benchmark.PlayerName then
-			return benchmark
-		end
-	end
-	return false
+    --Given a playername, this function looks up the corresponding benchmark in the table and returns it
+    --A value of false is returned if the name is not in the benchmark table
+    for i,benchmark in CPU_BenchmarkList do
+        if name == benchmark.PlayerName then
+            return benchmark
+        end
+    end
+    return false
 end
 
 --------------------------------------------------
 --  CPU Benchmarking Functions
 --------------------------------------------------
 function CPUBenchmark()
-	--This function gives the CPU some busy work to do.
-	--CPU score is determined by how many times it can loop through
-	--the set of busy work before the timer in the CPUTimer function expires.
-	while running do
+    --This function gives the CPU some busy work to do.
+    --CPU score is determined by how many times it can loop through
+    --the set of busy work before the timer in the CPUTimer function expires.
+    while running do
  		for i = 1.0, 6.0, .000008 do 
-	 		j = i + i
-	 		k = i * i
-	 		l = k / j
-	 		m = j - i
-	 	end
-	 	loopCount = loopCount + 1
-	 	WaitSeconds(0) --This is necessary in order to make this 'thread' yield so other things can be done (namely the CPUTimer function).
-	 end
+            j = i + i
+            k = i * i
+            l = k / j
+            m = j - i
+        end
+        loopCount = loopCount + 1
+        --This is necessary in order to make this 'thread' yield so other things can be done (namely the CPUTimer function).
+        WaitSeconds(0)
+     end
 end
 
 function CPUTimer()
-	--This function handles the benchmark timer.  When this function completes, the benchmark is stopped. 
-	WaitSeconds(benchmarkLength)
-	running = false
+    --This function handles the benchmark timer.  When this function completes, the benchmark is stopped.
+    WaitSeconds(benchmarkLength)
+    running = false
 end
 
 --------------------------------------------------
 --  CPU GUI Functions
 --------------------------------------------------
 function CreateCPUMetricUI()
-	--This function handles creation of the CPU benchmark UI elements (statusbars, buttons, tooltips, etc)
-	local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
-	if not singlePlayer then
-		for i= 1, LobbyComm.maxPlayerSlots do
-	            GUI.slots[i].CPUSpeedBar = StatusBar(GUI.slots[i].pingGroup, barMin, barMax, false, false,
-	                UIUtil.SkinnableFile('/game/unit_bmp/bar-back_bmp.dds'),
-	                UIUtil.SkinnableFile('/game/unit_bmp/bar-02_bmp.dds'),
-	                true)           
-	            --GUI.slots[i].CPUSpeedBar.Top:Set(GUI.slots[i].pingGroup.Bottom() - 2)
-	            
-	            LayoutHelpers.AtBottomIn(GUI.slots[i].CPUSpeedBar, GUI.slots[i].pingGroup)
-	            LayoutHelpers.AtLeftIn(GUI.slots[i].CPUSpeedBar, GUI.slots[i].pingGroup, 5)
-	            LayoutHelpers.AtRightIn(GUI.slots[i].CPUSpeedBar, GUI.slots[i].pingGroup, 5)
-	            GUI.slots[i].CPUSpeedBar.Height:Set(3)
+    --This function handles creation of the CPU benchmark UI elements (statusbars, buttons, tooltips, etc)
+    local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
+    if not singlePlayer then
+        for i= 1, LobbyComm.maxPlayerSlots do
+                GUI.slots[i].CPUSpeedBar = StatusBar(GUI.slots[i].pingGroup, barMin, barMax, false, false,
+                    UIUtil.SkinnableFile('/game/unit_bmp/bar-back_bmp.dds'),
+                    UIUtil.SkinnableFile('/game/unit_bmp/bar-02_bmp.dds'),
+                    true)
+                --GUI.slots[i].CPUSpeedBar.Top:Set(GUI.slots[i].pingGroup.Bottom() - 2)
+
+                LayoutHelpers.AtBottomIn(GUI.slots[i].CPUSpeedBar, GUI.slots[i].pingGroup)
+                LayoutHelpers.AtLeftIn(GUI.slots[i].CPUSpeedBar, GUI.slots[i].pingGroup, 5)
+                LayoutHelpers.AtRightIn(GUI.slots[i].CPUSpeedBar, GUI.slots[i].pingGroup, 5)
+                GUI.slots[i].CPUSpeedBar.Height:Set(3)
 	            CPU_AddControlTooltip(GUI.slots[i].CPUSpeedBar, 0, i)
 				GUI.slots[i].CPUSpeedBar.CPUActualValue = 450
 	            
 		end
-		
-		GUI.rerunBenchmark = UIUtil.CreateButtonStd(GUI.observerPanel, '/lobby/lan-game-lobby/toggle', 'Run CPU Test', 10, 0)
-		GUI.rerunBenchmark:Disable()
-		
-	    LayoutHelpers.CenteredRightOf(GUI.rerunBenchmark, GUI.becomeObserver, 5)        
-	    Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text='Run CPU Benchmark Test', body='Recalculates your CPU rating.'})
-	    
-	    GUI.rerunBenchmark.OnClick = function(self, modifiers)
-	    	GUI.rerunBenchmark:Disable()
-	    	ForkThread(function() StressCPU(1) end)
-	    end
-	end
+
+        GUI.rerunBenchmark = UIUtil.CreateButtonStd(GUI.observerPanel, '/lobby/lan-game-lobby/toggle', 'Run CPU Test', 10, 0)
+        GUI.rerunBenchmark:Disable()
+
+        LayoutHelpers.CenteredRightOf(GUI.rerunBenchmark, GUI.becomeObserver, 5)
+        Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text='Run CPU Benchmark Test', body='Recalculates your CPU rating.'})
+
+        GUI.rerunBenchmark.OnClick = function(self, modifiers)
+            GUI.rerunBenchmark:Disable()
+            ForkThread(function() StressCPU(1) end)
+        end
+    end
 end
 
 function CPU_AddControlTooltip(control, delay, slotNumber)
-	--This function creates the benchmark tooltip for a slot along with necessary mouseover function.
-	--It is called during the UI creation.
-	--	control: The control to which the tooltip is to be added.
-	--	delay: Amount of time to delay before showing tooltip.  See Tooltip.CreateMouseoverDisplay for info.
-	--  slotNumber: The slot number associated with the control.
+    --This function creates the benchmark tooltip for a slot along with necessary mouseover function.
+    --It is called during the UI creation.
+    --    control: The control to which the tooltip is to be added.
+    --    delay: Amount of time to delay before showing tooltip.  See Tooltip.CreateMouseoverDisplay for info.
+    --  slotNumber: The slot number associated with the control.
     if not control.oldHandleEvent then
         control.oldHandleEvent = control.HandleEvent
     end
     control.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
-        	local slot = slotNumber
-            Tooltip.CreateMouseoverDisplay(self, {text='CPU Rating: '..GUI.slots[slot].CPUSpeedBar.CPUActualValue, body='150=Fastest, 450=Slowest'}, delay, true)
+            local slot = slotNumber
+            Tooltip.CreateMouseoverDisplay(self, {text='CPU Rating: '..GUI.slots[slot].CPUSpeedBar._value(),
+                                           body='150=Fastest, 450=Slowest'}, delay, true)
         elseif event.Type == 'MouseExit' then
             Tooltip.DestroyMouseoverDisplay()
         end
@@ -5014,113 +4879,115 @@ function CPU_AddControlTooltip(control, delay, slotNumber)
 end
 
 function StressCPU(waitTime)
-	--This function instructs the PC to do a CPU score benchmark.
-	--It handles the necessary UI updates during the benchmark, sends
-	--the benchmark result to other players when finished, and it updates the local
-	--user's UI with their new result.
-	--	waitTime: The delay in seconds that this function should wait before starting the benchmark.
-	
-	for i = waitTime, 1, -1 do
-		GUI.rerunBenchmark.label:SetText('Run in '..i..'s')
-		WaitSeconds(1)
-	end
-	
-	--Get our last benchmark (if there was one)
-	local currentBestBenchmark = FindBenchmarkForName(localPlayerName)
-	if currentBestBenchmark == false then
-		currentBestBenchmark = 10000
-	end
-	
-	LOG('Beginning CPU benchmark')
-	GUI.rerunBenchmark.label:SetText('In Progress...')
-	
-	--Run three benchmarks and keep the best one
-	for i=1, 3, 1 do
-		loopCount = 0
-		running = true
-		ForkThread(CPUTimer)
-		CPUBenchmark()
-	
-		--Invert scale for display purposes
-		--With .01 sec wait intervals the max number of loops should be 100 * benchmarkLength
+    --This function instructs the PC to do a CPU score benchmark.
+    --It handles the necessary UI updates during the benchmark, sends
+    --the benchmark result to other players when finished, and it updates the local
+    --user's UI with their new result.
+    --    waitTime: The delay in seconds that this function should wait before starting the benchmark.
+
+    for i = waitTime, 1, -1 do
+        GUI.rerunBenchmark.label:SetText('Run in '..i..'s')
+        WaitSeconds(1)
+    end
+
+    --Get our last benchmark (if there was one)
+    local currentBestBenchmark = FindBenchmarkForName(localPlayerName)
+    if currentBestBenchmark == false then
+        currentBestBenchmark = 10000
+    end
+
+    LOG('Beginning CPU benchmark')
+    GUI.rerunBenchmark.label:SetText('In Progress...')
+
+    --Run three benchmarks and keep the best one
+    for i=1, 3, 1 do
+        loopCount = 0
+        running = true
+        ForkThread(CPUTimer)
+        CPUBenchmark()
+
+        --Invert scale for display purposes
+        --With .01 sec wait intervals the max number of loops should be 100 * benchmarkLength
 		loopCount = (benchmarkLength * 100) - math.min(scoreSkew2 * loopCount + scoreSkew1, (benchmarkLength * 100))
 
-		LOG('CPU benchmark #'..i..' complete: '.. loopCount )
-		
-		--If this benchmark was better than our best so far...
-		if loopCount < currentBestBenchmark then
-			--Make this our best benchmark
-			currentBestBenchmark = loopCount
-			
-			--Send it to the other players
-			lobbyComm:BroadcastData( { Type = 'CPUBenchmark', PlayerName = localPlayerName, Result = currentBestBenchmark} )
-	
-			--Add the benchmark to the local benchmark table
-			AddPlayerBenchmark({PlayerName = localPlayerName, Result = currentBestBenchmark})
-			
-			--Update the UI bar
-			UpdateCPUBar(localPlayerName)
-		end
-	end
-	
-	--Show message if player's score is very low
-	if currentBestBenchmark >= 450 and firstCPUTest then
-		AddChatText(LOCF('<LOC lobui_0901>SYSTEM: Your CPU score is unusually low.'))
-		AddChatText(LOCF('<LOC lobui_0902>SYSTEM: This can be caused by using ALT-TAB or minimizing the game after joining.'))
-		AddChatText(LOCF('<LOC lobui_0903>SYSTEM: Certain CPU power saving features can also cause this.'))
-		AddChatText(LOCF('<LOC lobui_0903>SYSTEM: After joining the lobby, please wait 15 seconds before using ALT-TAB or minimizing.'))
-		AddChatText(LOCF('<LOC lobui_0903>SYSTEM: If you continue to see this message anyway, please let us know on the FAF forums.'))
-	end
+        LOG('CPU benchmark #'..i..' complete: '.. loopCount )
 
-	--Set this flag so we'll know later
-	firstCPUTest = false
-	
-	--Reset Button UI
-	GUI.rerunBenchmark:Enable()
-	GUI.rerunBenchmark.label:SetText('Run CPU Test')	
+        --If this benchmark was better than our best so far...
+        if loopCount < currentBestBenchmark then
+            --Make this our best benchmark
+            currentBestBenchmark = loopCount
+
+            --Send it to the other players
+            lobbyComm:BroadcastData( { Type = 'CPUBenchmark', PlayerName = localPlayerName, Result = currentBestBenchmark} )
+
+            --Add the benchmark to the local benchmark table
+            AddPlayerBenchmark({PlayerName = localPlayerName, Result = currentBestBenchmark})
+
+            --Update the UI bar
+            UpdateCPUBar(localPlayerName)
+        end
+    end
+
+    --Show message if player's score is very low
+    if currentBestBenchmark >= 450 and firstCPUTest then
+        AddChatText(LOCF('<LOC lobui_0901>SYSTEM: Your CPU score is unusually low.'))
+        AddChatText(LOCF('<LOC lobui_0902>SYSTEM: This can be caused by using ALT-TAB or minimizing the game after joining.'))
+        AddChatText(LOCF('<LOC lobui_0903>SYSTEM: Certain CPU power saving features can also cause this.'))
+        AddChatText(LOCF('<LOC lobui_0903>SYSTEM: After joining the lobby, please wait 15 seconds before using ALT-TAB or '..
+                         'minimizing.'))
+        AddChatText(LOCF('<LOC lobui_0903>SYSTEM: If you continue to see this message anyway, please let us know on the FAF '..
+                         'forums.'))
+    end
+
+    --Set this flag so we'll know later
+    firstCPUTest = false
+
+    --Reset Button UI
+    GUI.rerunBenchmark:Enable()
+    GUI.rerunBenchmark.label:SetText('Run CPU Test')
 end
 
 function UpdateCPUBar(playerName)
-	--This function updates the UI with a CPU benchmark bar for the specified playerName.
-	--	playerName: The name of the player whose benchmark should be updated.	
-	local playerId = FindIDForName(playerName)
-	local playerSlot = FindSlotForID(playerId)
-	if playerSlot != nil then
-		 SetSlotCPUBar(playerSlot, gameInfo.PlayerOptions[playerSlot])
-	end	
+    --This function updates the UI with a CPU benchmark bar for the specified playerName.
+    --    playerName: The name of the player whose benchmark should be updated.
+    local playerId = FindIDForName(playerName)
+    local playerSlot = FindSlotForID(playerId)
+    if playerSlot != nil then
+         SetSlotCPUBar(playerSlot, gameInfo.PlayerOptions[playerSlot])
+    end
 end
 
 function SetSlotCPUBar(slot, playerInfo)
-	--This function updates the UI with a CPU benchmark bar for the specified slot/playerInfo.	
-	--	slot: a numbered slot (1-however many slots there are for this map)
-	--	playerInfo: The corresponding playerInfo object from gameInfo.PlayerOptions[slot].
-	
-	if GUI.slots[slot].CPUSpeedBar then
-		GUI.slots[slot].CPUSpeedBar:Hide()
-		if playerInfo.Human then
-			local b = FindBenchmarkForName(playerInfo.PlayerName)
-			if b then
+    --This function updates the UI with a CPU benchmark bar for the specified slot/playerInfo.
+    --    slot: a numbered slot (1-however many slots there are for this map)
+    --    playerInfo: The corresponding playerInfo object from gameInfo.PlayerOptions[slot].
+
+    if GUI.slots[slot].CPUSpeedBar then
+        GUI.slots[slot].CPUSpeedBar:Hide()
+        if playerInfo.Human then
+            local b = FindBenchmarkForName(playerInfo.PlayerName)
+            if b then
 				-- For display purposes, the bas has a higher minimum that the actual barMin value.
 				-- This is to ensure that the bar is visible for very small values
 		    	local clampedResult =  math.max(math.min(b.Result, barMax), barMin + math.floor(.04 * (barMax - barMin)))
-		    	GUI.slots[slot].CPUSpeedBar:SetValue(clampedResult)
+                GUI.slots[slot].CPUSpeedBar:SetValue(clampedResult)
 				
 				--For the tooltip, we use the actual clamped value
 				GUI.slots[slot].CPUSpeedBar.CPUActualValue = math.max(math.min(b.Result, barMax), barMin)
-		    	GUI.slots[slot].CPUSpeedBar:Show()
-		    	
-				GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-02_bmp.dds'))
-				
-		    	-- if clampedResult <= greenBarMax then
-		    		-- GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-02_bmp.dds'))
-		    	-- elseif clampedResult <= yellowBarMax then
-		    		-- GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-01_bmp.dds'))
-		    	-- else
-		    		-- GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-03_bmp.dds'))
-		    	-- end
-	    	end
-		end
-	end
+                GUI.slots[slot].CPUSpeedBar:Show()
+
+                GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-02_bmp.dds'))
+
+                -- if clampedResult <= greenBarMax then
+                    -- GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-02_bmp.dds'))
+                -- elseif clampedResult <= yellowBarMax then
+                    -- GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-01_bmp.dds'))
+                -- else
+                    -- GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-03_bmp.dds'))
+                -- end
+            end
+        end
+    end
 end
 
 --------------------------------------------------
@@ -5129,62 +4996,84 @@ end
 --------------------------------------------------
 --// COUNTRY - Xinnony
 function CountryScript()
-	--LOG('XINNONY - Country is ='..PrefLanguage)
-	-- Send update other players
-	lobbyComm:BroadcastData( { Type = 'Country', PlayerName = localPlayerName, Result = PrefLanguage} )
-	-- Add country to my local country table
-	AddPlayerCountry({PlayerName = localPlayerName, Result = PrefLanguage})
-	-- Update Bitmap
-	local playerId = FindIDForName(localPlayerName)
-	local playerSlot = FindSlotForID(playerId)
-	if playerSlot != nil then
-		SetSlotCountryFlag(playerSlot, gameInfo.PlayerOptions[playerSlot])
-	end	
+    --LOG('XINNONY - Country is ='..PrefLanguage)
+    -- Send update other players
+    lobbyComm:BroadcastData( { Type = 'Country', PlayerName = localPlayerName, Result = PrefLanguage} )
+    -- Add country to my local country table
+    AddPlayerCountry({PlayerName = localPlayerName, Result = PrefLanguage})
+    -- Update Bitmap
+    local playerId = FindIDForName(localPlayerName)
+    local playerSlot = FindSlotForID(playerId)
+    if playerSlot != nil then
+        SetSlotCountryFlag(playerSlot, gameInfo.PlayerOptions[playerSlot])
+    end
 end
 function AddPlayerCountry(data)
-	local alreadyExists = false
-	for i, Country in Country_List do
-		if data.PlayerName == Country.PlayerName then
-			alreadyExists = true
-			--AddChatText('XINNONYWORK : data.PlayerName='..data.PlayerName)
-			--AddChatText('XINNONYWORK : Country.PlayerName='..Country.PlayerName)
-			--AddChatText('XINNONYWORK : Country[i]='..Country[i]) = NIL !!!
-			--AddChatText('XINNONYWORK : "C_List.PName[i]='..Country_List[i].PlayerName..'C_List.Result[i]='..Country_List[i].Result)
-			--table.remove(Country_List.PlayerName, i)
-			--table.remove(Country_List.Result, i)
-			--AddChatText('XINNONYWORK : "C_List.PName[i]='..Country_List[i].PlayerName..'C_List.Result[i]='..Country_List[i].Result)
-			Country_List[i].Result = data.Result
-		end
-	end
-	if not alreadyExists then
-		table.insert(Country_List, {PlayerName = data.PlayerName, Result = data.Result})
-	end
-	--if alreadyExists then
-		--table.remove(Country_List, i)
-	--end
+    local alreadyExists = false
+    for i, Country in Country_List do
+        if data.PlayerName == Country.PlayerName then
+            alreadyExists = true
+            Country_List[i].Result = data.Result
+        end
+    end
+    if not alreadyExists then
+        table.insert(Country_List, {PlayerName = data.PlayerName, Result = data.Result})
+    end
 end
 function FindCountryForName(name)
-	for i, Country in Country_List do
-		if name == Country.PlayerName then
-			return Country
-		end
-	end
-	return false
+    for i, Country in Country_List do
+        if name == Country.PlayerName then
+            return Country
+        end
+    end
+    return false
 end
 function SetSlotCountryFlag(slot, playerInfo)
-	--LOG("XINNONY - Country slot="..slot)--..", country="..)
-	--end
-	if GUI.slots[slot].KinderCountry then
-		GUI.slots[slot].KinderCountry:Hide()
-		if playerInfo.Human then
-			local b = FindCountryForName(playerInfo.PlayerName)
-			if b then
-		    	local CountryResult = b.Result
-				LOG('XINNONY - Country is : '.. CountryResult )
-		    	GUI.slots[slot].KinderCountry:Show()
-				GUI.slots[slot].KinderCountry:SetTexture(UIUtil.UIFile('/countries/'..CountryResult..'.dds'))
-	    	end
+    if GUI.slots[slot].KinderCountry then
+        GUI.slots[slot].KinderCountry:Hide()
+        if playerInfo.Human then
+            local b = FindCountryForName(playerInfo.PlayerName)
+            if b then
+                local CountryResult = b.Result
+                LOG('XINNONY - Country is : '.. CountryResult )
+                GUI.slots[slot].KinderCountry:Show()
+                GUI.slots[slot].KinderCountry:SetTexture(UIUtil.UIFile('/countries/'..CountryResult..'.dds'))
+				Country_GetTooltipValue(CountryResult)
+				Country_AddControlTooltip(GUI.slots[slot].KinderCountry, 0, slot)
+            end
+        end
+    end
+end
+function Country_AddControlTooltip(control, waitDelay, slotNumber)
+    if not control.oldHandleEvent then
+        control.oldHandleEvent = control.HandleEvent
+    end
+    control.HandleEvent = function(self, event)
+        if event.Type == 'MouseEnter' then
+            local slot = slotNumber
+            Tooltip.CreateMouseoverDisplay(self, {text=PrefLanguageTooltipTitle, body=PrefLanguageTooltipText}, waitDelay, true)
+        elseif event.Type == 'MouseExit' then
+            Tooltip.DestroyMouseoverDisplay()
+        end
+        return self.oldHandleEvent(self, event)
+    end
+end
+function Country_GetTooltipValue(CountryResult)
+	local CountryOverrideTooltip = import('/lua/ui/help/tooltips-country.lua').tooltip
+	local CountryOverrideTooltipSpecial = import('/lua/ui/help/tooltips-country.lua').tooltipSpecial
+		PrefLanguageTooltipTitle="Country"
+		PrefLanguageTooltipText=""
+		for index, option in CountryOverrideTooltip do
+			if option.value == CountryResult then
+				PrefLanguageTooltipTitle = option.title
+				PrefLanguageTooltipText = option.text
+			end
 		end
-	end
+		for index, option in CountryOverrideTooltipSpecial do
+			if option.value == CountryResult then
+				PrefLanguageTooltipTitle = option.title
+				PrefLanguageTooltipText = option.text
+			end
+		end
 end
 --\\ Stop COUNTRY
