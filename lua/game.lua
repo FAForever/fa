@@ -68,7 +68,7 @@ function GetConstructEconomyModel(builder, targetData)
     # 'rate' here is how fast we build relative to a unit with build rate of 1
     local rate = builder:GetBuildRate()
 
-    local time = targetData.BuildTime
+    local time = targetData.BuildTime or 0.1
     local mass = targetData.BuildCostMass
     local energy = targetData.BuildCostEnergy
 
