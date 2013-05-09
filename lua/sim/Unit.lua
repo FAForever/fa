@@ -995,7 +995,7 @@ Unit = Class(moho.unit_methods) {
                 energy = (energy / siloBuildRate) * (self:GetBuildRate() or 1)
                 mass = (mass / siloBuildRate) * (self:GetBuildRate() or 1)
             elseif focus then
-				if focus:IsUnitState('Enhancing') or focus:IsUnitState('Upgrading') then
+				if focus.WorkItem and focus:IsUnitState('Enhancing') or focus:IsUnitState('Upgrading') then
 					# If the unit is assisting an enhancement, we must know how much it costs.
 					time, energy, mass = Game.GetConstructEconomyModel(self, focus.WorkItem)	
 				else

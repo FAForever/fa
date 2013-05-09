@@ -63,14 +63,14 @@ BuffFieldBlueprint {                         # Seraphim ACU Advanced Restoration
 # a full blueprint.
 function GetConstructEconomyModel(builder, targetData)
 
-    local builder_bp = builder:GetBlueprint()
+	local builder_bp = builder:GetBlueprint()
     
     # 'rate' here is how fast we build relative to a unit with build rate of 1
     local rate = builder:GetBuildRate()
 
     local time = targetData.BuildTime or 0.1
-    local mass = targetData.BuildCostMass
-    local energy = targetData.BuildCostEnergy
+    local mass = targetData.BuildCostMass or 0
+    local energy = targetData.BuildCostEnergy or 0
 
     # apply penalties/bonuses to effective time
     local time_mod = builder.BuildTimeModifier or 0
