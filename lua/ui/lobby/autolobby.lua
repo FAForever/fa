@@ -66,7 +66,7 @@ local function MakeLocalPlayerInfo(name)
     end
     
     result.Team = tonumber(GetCommandLineArg("/team", 1)[1])
-	tonumber(GetCommandLineArg("/rank", 1)[1])
+	result.Rank = tonumber(GetCommandLineArg("/rank", 1)[1])
     LOG('Local player info: ' .. repr(result))
     return result
 end
