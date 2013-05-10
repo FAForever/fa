@@ -136,14 +136,14 @@ local function CheckForLaunch()
     if playercount < requiredPlayers then
        return
     end
-	
-	local allRanks = {}
-	for k,v in gameInfo.PlayerOptions do
-		if v.Human and v.Rank then
-			allRanks[v.PlayerName] = v.Rank
-		end
-	end
-	gameInfo.GameOptions['Ranks'] = allRanks
+    
+    local allRanks = {}
+    for k,v in gameInfo.PlayerOptions do
+        if v.Human and v.Rank then
+            allRanks[v.PlayerName] = v.Rank
+        end
+    end
+    gameInfo.GameOptions['Ranks'] = allRanks
 
     LOG("Host launching game.")
     lobbyComm:BroadcastData( { Type = 'Launch', GameInfo = gameInfo } )
@@ -316,9 +316,9 @@ function HostGame(gameName, scenarioFileName, singlePlayer)
         #LOG("requiredPlayers was set to: "..requiredPlayers)
     end
 
-	
-	-- The guys at GPG were unable to make a standard for map. We dirty-solve it.
-	lobbyComm.desiredScenario = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
+    
+    -- The guys at GPG were unable to make a standard for map. We dirty-solve it.
+    lobbyComm.desiredScenario = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
 
 
     lobbyComm:HostGame()

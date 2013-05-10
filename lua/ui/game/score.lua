@@ -221,8 +221,13 @@ function SetupPlayerLines()
             group.color.Depth:Set(function() return group.faction.Depth() - 1 end)
             group.color:DisableHitTest()
             LayoutHelpers.FillParent(group.color, group.faction)
-    
-            group.name = UIUtil.CreateText(group, data.nickname, 12, UIUtil.bodyFont)
+
+            local playerName = data.nickname
+            local playerRank = sessionInfo.Options.Ranks[playerName]
+            if (playerRank) then
+                playerName = ranks[data.faction][playerRank+1] .. " " .. playerName
+            end            
+            group.name = UIUtil.CreateText(group, playerName, 12, UIUtil.bodyFont)
             group.name:DisableHitTest()
              LayoutHelpers.AtLeftIn(group.name, group, 16)
             LayoutHelpers.AtVerticalCenterIn(group.name, group)
