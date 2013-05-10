@@ -66,7 +66,7 @@ local function MakeLocalPlayerInfo(name)
     end
     
     result.Team = tonumber(GetCommandLineArg("/team", 1)[1])
-	result.Rank = tonumber(GetCommandLineArg("/rank", 1)[1])
+    result.Rank = tonumber(GetCommandLineArg("/rank", 1)[1])
     LOG('Local player info: ' .. repr(result))
     return result
 end
@@ -137,13 +137,13 @@ local function CheckForLaunch()
        return
     end
 	
-	local allRatings = {}
+	local allRanks = {}
 	for k,v in gameInfo.PlayerOptions do
-		if v.Human and v.PL then
-			allRatings[v.PlayerName] = v.PL
+		if v.Human and v.Rank then
+			allRanks[v.PlayerName] = v.Rank
 		end
 	end
-	gameInfo.GameOptions['Ratings'] = allRatings
+	gameInfo.GameOptions['Ranks'] = allRanks
 
     LOG("Host launching game.")
     lobbyComm:BroadcastData( { Type = 'Launch', GameInfo = gameInfo } )

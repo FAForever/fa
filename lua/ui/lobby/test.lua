@@ -1,13 +1,11 @@
-team1 = {}
-
-if not team1["test"] then
-	print("no test")
-	team1["test"] = {}
-	team1["test"]["youpi"] = team1["test"]["youpi"] + 1
-end
+local ranks = {}
+ranks[0] = {"Private", "Corporal", "Sergeant", "Captain", "Major", "Colonel", "General", "Supreme Commander"}
+ranks[1] = {"Crusader", "Legate", "Avatar-of-War", "Priest", "Centurion", "Executor", "Evaluator", "Supreme Commander"}
+ranks[2] = {"Ensign", "Drone", "Agent", "Inspector", "Starshina", "Commandarm" ,"Elite Commander", "Supreme Commander"}
+ranks[3] = {"SouIstle", "Sou", "SouThuum", "YthiIstle", "Ythi", "YthiThuum", "Azeel", "Supreme Commander"}
 
 
 
 
+print((ranks[0][1]))
 
- for k,v in pairs(team1) do  for i,j in pairs(v) do print(k,i,j) end end
