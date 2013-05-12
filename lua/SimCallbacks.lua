@@ -59,6 +59,9 @@ Callbacks.DiplomacyHandler = import('/lua/SimDiplomacy.lua').DiplomacyHandler
 
 --Callbacks.GetUnitHandle = import('/lua/debugai.lua').GetHandle
 
+-- For galactic War.
+Callbacks.ToggleRecall = import('/lua/recall.lua').ToggleRecall
+
 function Callbacks.OnMovieFinished(name)
     ScenarioInfo.DialogueFinished[name] = true
 end

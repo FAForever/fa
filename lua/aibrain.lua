@@ -1033,99 +1033,107 @@ AIBrain = Class(moho.aibrain_methods) {
         #LOG('===== AI DEBUG: Brain Evaluate Thead killed =====')
     end,
 
+    OnRecall = function(self)
+        local result = string.format("%s %i", "recall", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
+        table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
+        self:AddArmyStat("Recall", 1)
+    end,
 
+    OnDefeat = function(self)
+        ##For Sorian AI
+        if self.BrainType == 'AI' then
+            SUtils.AISendChat('enemies', ArmyBrains[self:GetArmyIndex()].Nickname, 'ilost')
+        end
+        local per = ScenarioInfo.ArmySetup[self.Name].AIPersonality
+        if string.find(per, 'sorian') then
+            SUtils.GiveAwayMyCrap(self)
+        end
+        ###end sorian AI bit
+        
+        SetArmyOutOfGame(self:GetArmyIndex())
+        
+        # seems that FA send the OnDeath twice : one when losing, the other when disconnecting. But we only want it one time !
+        
+        if math.floor(self:GetArmyStat("Recall",0.0).Value) != 1 then
+        
+            if math.floor(self:GetArmyStat("FAFLose",0.0).Value) != -1 then
+                self:AddArmyStat("FAFLose", -1)
+            end
+            
+            
+            local result = string.format("%s %i", "defeat", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
+            table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
+            
+            # Score change, we send the score of all other players, yes mam !
+            for index, brain in ArmyBrains do
+                if brain and not brain:IsDefeated() then
+                    local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
+                    table.insert( Sync.GameResult, { index, result } )
+                end
+            end       
+        end
 
-	OnDefeat = function(self)
-		##For Sorian AI
-		if self.BrainType == 'AI' then
-			SUtils.AISendChat('enemies', ArmyBrains[self:GetArmyIndex()].Nickname, 'ilost')
-		end
-		local per = ScenarioInfo.ArmySetup[self.Name].AIPersonality
-		if string.find(per, 'sorian') then
-			SUtils.GiveAwayMyCrap(self)
-		end
-		###end sorian AI bit
-		
-		SetArmyOutOfGame(self:GetArmyIndex())
-		
-		# seems that FA send the OnDeath twice : one when losing, the other when disconnecting. But we only want it one time !
-	
-		if math.floor(self:GetArmyStat("FAFLose",0.0).Value) != -1 then
-			self:AddArmyStat("FAFLose", -1)
-		end
-		
-        local result = string.format("%s %i", "defeat", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
-		table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
-		
-		# Score change, we send the score of all other players, yes mam !
-		for index, brain in ArmyBrains do
-			if brain and not brain:IsDefeated() then
-				local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
-				table.insert( Sync.GameResult, { index, result } )
-			end
-		end
-
-		
-		
+        
+        
         import('/lua/SimUtils.lua').UpdateUnitCap()
         import('/lua/SimPing.lua').OnArmyDefeat(self:GetArmyIndex())
         local function KillArmy()
-			local allies = {}
-			local selfIndex = self:GetArmyIndex()
+            local allies = {}
+            local selfIndex = self:GetArmyIndex()
             WaitSeconds(20)
-			
-			#this part determiens the share condition			
-			local shareOption = ScenarioInfo.Options.Share or "no"
-			##"no" means full share
-			if shareOption == "no" then			
-				##this part determines who the allies are 
-				for index, brain in ArmyBrains do
-					brain.index = index
-					brain.score = brain:CalculateScore()
-					if IsAlly(selfIndex, brain:GetArmyIndex()) and selfIndex != brain:GetArmyIndex() and not brain:IsDefeated() then
-						table.insert(allies, brain)
-					end
-				end
-				##This part determines which ally has the highest score and transfers ownership of all units to him
-				if table.getn(allies) > 0 then
-					table.sort(allies, function(a,b) return a.score > b.score end)
-					for k,v in allies do				
-						local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
-						if units and table.getn(units) > 0 then
-							TransferUnitsOwnership(units, v.index)
-						end
-					end
-				end			
-			##"yes" means share until death
-			elseif shareOption == "yes" then
-				import('/lua/SimUtils.lua').KillSharedUnits(self:GetArmyIndex())
-				local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-				for index,unit in units do
-					if unit.oldowner and unit.oldowner != self:GetArmyIndex() then
-						TransferUnitsOwnership(unit, unit.oldowner)
-					else
-						unit:Kill()
-					end
-				end
-			end
+            
+            #this part determiens the share condition            
+            local shareOption = ScenarioInfo.Options.Share or "no"
+            ##"no" means full share
+            if shareOption == "no" then            
+                ##this part determines who the allies are 
+                for index, brain in ArmyBrains do
+                    brain.index = index
+                    brain.score = brain:CalculateScore()
+                    if IsAlly(selfIndex, brain:GetArmyIndex()) and selfIndex != brain:GetArmyIndex() and not brain:IsDefeated() then
+                        table.insert(allies, brain)
+                    end
+                end
+                ##This part determines which ally has the highest score and transfers ownership of all units to him
+                if table.getn(allies) > 0 then
+                    table.sort(allies, function(a,b) return a.score > b.score end)
+                    for k,v in allies do                
+                        local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+                        if units and table.getn(units) > 0 then
+                            TransferUnitsOwnership(units, v.index)
+                        end
+                    end
+                end            
+            ##"yes" means share until death
+            elseif shareOption == "yes" then
+                import('/lua/SimUtils.lua').KillSharedUnits(self:GetArmyIndex())
+                local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+                for index,unit in units do
+                    if unit.oldowner and unit.oldowner != self:GetArmyIndex() then
+                        TransferUnitsOwnership(unit, unit.oldowner)
+                    else
+                        unit:Kill()
+                    end
+                end
+            end
 
-			local killacu = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-			if killacu and table.getn(killacu) > 0 then
-				for index,unit in killacu do
-					unit:Kill()
-				end
-			end
+            local killacu = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+            if killacu and table.getn(killacu) > 0 then
+                for index,unit in killacu do
+                    unit:Kill()
+                end
+            end
         end
         ForkThread(KillArmy)
-		##For Sorian AI bit 2
-		if self.BuilderManagers then
-			self.ConditionsMonitor:Destroy()
+        ##For Sorian AI bit 2
+        if self.BuilderManagers then
+            self.ConditionsMonitor:Destroy()
             for k,v in self.BuilderManagers do
-				v.EngineerManager:SetEnabled(false)
-				v.FactoryManager:SetEnabled(false)
-				v.PlatoonFormManager:SetEnabled(false)
-				v.StrategyManager:SetEnabled(false)
-				v.FactoryManager:Destroy()
+                v.EngineerManager:SetEnabled(false)
+                v.FactoryManager:SetEnabled(false)
+                v.PlatoonFormManager:SetEnabled(false)
+                v.StrategyManager:SetEnabled(false)
+                v.FactoryManager:Destroy()
                 v.PlatoonFormManager:Destroy()
                 v.EngineerManager:Destroy()
                 v.StrategyManager:Destroy()
@@ -1134,27 +1142,27 @@ AIBrain = Class(moho.aibrain_methods) {
         if self.Trash then
             self.Trash:Destroy()
         end
-		###end Sorian AI bit 2
+        ###end Sorian AI bit 2
     end,
-	
+    
     OnVictory = function(self)
-		self:AddArmyStat("FAFWin", 5) 
-	   	local result = string.format("%s %i", "victory", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
+        self:AddArmyStat("FAFWin", 5) 
+           local result = string.format("%s %i", "victory", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
         table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
-		
-		# Score change, we send the score of all other players, yes mam !
-		for index, brain in ArmyBrains do
-			if brain and not brain:IsDefeated() then
-				local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
-				table.insert( Sync.GameResult, { index, result } )
-			end
-		end
-		
+        
+        # Score change, we send the score of all other players, yes mam !
+        for index, brain in ArmyBrains do
+            if brain and not brain:IsDefeated() then
+                local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
+                table.insert( Sync.GameResult, { index, result } )
+            end
+        end
+        
 
     end,
 
     OnDraw = function(self)
-    	local result = string.format("%s %i", "draw", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
+        local result = string.format("%s %i", "draw", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
         table.insert(Sync.GameResult, { self:GetArmyIndex(), result })
     end,
 
@@ -1489,44 +1497,44 @@ AIBrain = Class(moho.aibrain_methods) {
         self.NumBases = 1
 
         self.BuilderManagers = {}
-	SUtils.AddCustomUnitSupport(self)
-	 
+    SUtils.AddCustomUnitSupport(self)
+     
         self:AddBuilderManagers(self:GetStartVector3f(), 100, 'MAIN', false)
         #self.BuilderManagers.MAIN.StrategyManager = StratManager.CreateStrategyManager(self, 'MAIN', self:GetStartVector3f(), 100)
 
         #changed for sorian ai
         # Begin the base monitor process
-		local per = ScenarioInfo.ArmySetup[self.Name].AIPersonality
-		
-		if string.find(per, 'sorian') then
-			local spec = {
-				DefaultDistressRange = 200,
-				AlertLevel = 8,
-			}
-			self:BaseMonitorInitializationSorian(spec)
-		else		
-			self:BaseMonitorInitialization()
-		end
-		###end sorian ai change
-		
+        local per = ScenarioInfo.ArmySetup[self.Name].AIPersonality
+        
+        if string.find(per, 'sorian') then
+            local spec = {
+                DefaultDistressRange = 200,
+                AlertLevel = 8,
+            }
+            self:BaseMonitorInitializationSorian(spec)
+        else        
+            self:BaseMonitorInitialization()
+        end
+        ###end sorian ai change
+        
         local plat = self:GetPlatoonUniquelyNamed('ArmyPool')
         
         plat:ForkThread( plat.BaseManagersDistressAI )
         
         self.EnemyPickerThread = self:ForkThread( self.PickEnemy )
-		
-		##for sorian
-		self.DeadBaseThread = self:ForkThread( self.DeadBaseMonitor )
+        
+        ##for sorian
+        self.DeadBaseThread = self:ForkThread( self.DeadBaseMonitor )
         if string.find(per, 'sorian') then
-			self.EnemyPickerThread = self:ForkThread( self.PickEnemySorian )
-		else
-			self.EnemyPickerThread = self:ForkThread( self.PickEnemy )
-		end
-		#end sorian
+            self.EnemyPickerThread = self:ForkThread( self.PickEnemySorian )
+        else
+            self.EnemyPickerThread = self:ForkThread( self.PickEnemy )
+        end
+        #end sorian
     end,
-	
-	#sorian AI function
-	AddInitialEnemyThreatSorian = function(self, amount, decay, threatType)
+    
+    #sorian AI function
+    AddInitialEnemyThreatSorian = function(self, amount, decay, threatType)
         local aiBrain = self
         local myArmy = ScenarioInfo.ArmySetup[self.Name]
             
@@ -1546,49 +1554,49 @@ AIBrain = Class(moho.aibrain_methods) {
             end
         end
     end,
-	
+    
     #Removes bases that have no engineers or factories.  This is a sorian AI function
-	#Helps reduce the load on the game.
-	DeadBaseMonitor = function(self)
-		while true do
-			WaitSeconds(5)
-			local changed = false
-			for k,v in self.BuilderManagers do
-				if k != 'MAIN' and v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) <= 0 and v.FactoryManager:GetNumCategoryFactories(categories.ALLUNITS) <= 0 then
-					v.EngineerManager:SetEnabled(false)
-					v.FactoryManager:SetEnabled(false)
-					v.PlatoonFormManager:SetEnabled(false)
-					v.StrategyManager:SetEnabled(false)
-					v.FactoryManager:Destroy()
-					v.PlatoonFormManager:Destroy()
-					v.EngineerManager:Destroy()
-					v.StrategyManager:Destroy()
-					self.BuilderManagers[k] = nil
-					self.NumBases = self.NumBases - 1
-					changed = true
-				end
-			end
-			if changed then
-				self.BuilderManagers = self:RebuildTable(self.BuilderManagers)
-			end
-		end
-	end,
-	
-	#Used to get rid of nil table entries  #sorian ai function
-	RebuildTable = function(self, oldtable)
-		local temptable = {}
-		for k,v in oldtable do
-			if v != nil then
-				if type(k) == 'string' then
-					temptable[k] = v
-				else
-					table.insert(temptable, v)
-				end
-			end
-		end
-		return temptable
-	end,
-	
+    #Helps reduce the load on the game.
+    DeadBaseMonitor = function(self)
+        while true do
+            WaitSeconds(5)
+            local changed = false
+            for k,v in self.BuilderManagers do
+                if k != 'MAIN' and v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) <= 0 and v.FactoryManager:GetNumCategoryFactories(categories.ALLUNITS) <= 0 then
+                    v.EngineerManager:SetEnabled(false)
+                    v.FactoryManager:SetEnabled(false)
+                    v.PlatoonFormManager:SetEnabled(false)
+                    v.StrategyManager:SetEnabled(false)
+                    v.FactoryManager:Destroy()
+                    v.PlatoonFormManager:Destroy()
+                    v.EngineerManager:Destroy()
+                    v.StrategyManager:Destroy()
+                    self.BuilderManagers[k] = nil
+                    self.NumBases = self.NumBases - 1
+                    changed = true
+                end
+            end
+            if changed then
+                self.BuilderManagers = self:RebuildTable(self.BuilderManagers)
+            end
+        end
+    end,
+    
+    #Used to get rid of nil table entries  #sorian ai function
+    RebuildTable = function(self, oldtable)
+        local temptable = {}
+        for k,v in oldtable do
+            if v != nil then
+                if type(k) == 'string' then
+                    temptable[k] = v
+                else
+                    table.insert(temptable, v)
+                end
+            end
+        end
+        return temptable
+    end,
+    
     GetLocationPosition = function(self, locationType)
         if not self.BuilderManagers[locationType] then
             WARN('*AI ERROR: Invalid location type - ' .. locationType )
@@ -1649,8 +1657,8 @@ AIBrain = Class(moho.aibrain_methods) {
         end
         return count
     end,
-	
-	#sorian ai function
+    
+    #sorian ai function
     BaseMonitorInitializationSorian = function(self, spec)
         self.BaseMonitor = {
             BaseMonitorStatus = 'ACTIVE',
@@ -1688,87 +1696,87 @@ AIBrain = Class(moho.aibrain_methods) {
             PlatoonDistressThread = false,
             PlatoonAlertSounded = false,
         }
-		self.SelfMonitor = {
-			CheckRadius = spec.SelfCheckRadius or 150,
-			ArtyCheckRadius = spec.SelfArtyCheckRadius or 300,
-			ThreatRadiusThreshold = spec.SelfThreatRadiusThreshold or 8,
-		}
+        self.SelfMonitor = {
+            CheckRadius = spec.SelfCheckRadius or 150,
+            ArtyCheckRadius = spec.SelfArtyCheckRadius or 300,
+            ThreatRadiusThreshold = spec.SelfThreatRadiusThreshold or 8,
+        }
         self:ForkThread( self.BaseMonitorThreadSorian )
     end,
-	
-	#sorian ai function
+    
+    #sorian ai function
     BaseMonitorThreadSorian = function(self)
         while true do
             if self.BaseMonitor.BaseMonitorStatus == 'ACTIVE' then
-				self:SelfMonitorCheck()
+                self:SelfMonitorCheck()
                 self:BaseMonitorCheck()
             end
             WaitSeconds( self.BaseMonitor.BaseMonitorTime )
         end
     end,
-	
-	#sorian AI function
-	SelfMonitorCheck = function(self)
-		if not self.BaseMonitor.AlertSounded then
-			local startlocx, startlocz = self:GetArmyStartPos()
-			local threatTable = self:GetThreatsAroundPosition({startlocx, 0, startlocz}, 16, true, 'AntiSurface')
-			local artyThreatTable = self:GetThreatsAroundPosition({startlocx, 0, startlocz}, 16, true, 'Artillery')
-			local highThreat = false
-			local highThreatPos = false
-			local radius = self.SelfMonitor.CheckRadius * self.SelfMonitor.CheckRadius
-			local artyRadius = self.SelfMonitor.ArtyCheckRadius * self.SelfMonitor.ArtyCheckRadius
-			for tIndex,threat in threatTable do
-				local enemyThreat = self:GetThreatAtPosition( {threat[1], 0, threat[2]}, 0, true, 'AntiSurface')
-				local dist = VDist2Sq(threat[1], threat[2], startlocx, startlocz)
-				if (not highThreat or enemyThreat > highThreat) and enemyThreat > self.SelfMonitor.ThreatRadiusThreshold and dist < radius then
-					highThreat = enemyThreat
-					highThreatPos = {threat[1], 0, threat[2]}
-				end
-			end
-			if highThreat then
-				table.insert( self.BaseMonitor.AlertsTable,
-					{
-					Position = highThreatPos,
-					Threat = highThreat,
-					}
-				)
-				self:ForkThread(self.BaseMonitorAlertTimeout, highThreatPos)
-				self.BaseMonitor.ActiveAlerts = self.BaseMonitor.ActiveAlerts + 1
-				self.BaseMonitor.AlertSounded = true
-			end
-			highThreat = false
-			highThreatPos = false
-			for tIndex,threat in artyThreatTable do
-				local enemyThreat = self:GetThreatAtPosition( {threat[1], 0, threat[2]}, 0, true, 'Artillery')
-				local dist = VDist2Sq(threat[1], threat[2], startlocx, startlocz)
-				if (not highThreat or enemyThreat > highThreat) and enemyThreat > self.SelfMonitor.ThreatRadiusThreshold and dist < artyRadius then
-					highThreat = enemyThreat
-					highThreatPos = {threat[1], 0, threat[2]}
-				end
-			end
-			if highThreat then
-				table.insert( self.BaseMonitor.AlertsTable,
-					{
-					Position = highThreatPos,
-					Threat = highThreat,
-					}
-				)
-				self:ForkThread(self.BaseMonitorAlertTimeout, highThreatPos, 'Artillery')
-				self.BaseMonitor.ActiveAlerts = self.BaseMonitor.ActiveAlerts + 1
-				self.BaseMonitor.AlertSounded = true
-			end
-		end
-	end,
-	
+    
+    #sorian AI function
+    SelfMonitorCheck = function(self)
+        if not self.BaseMonitor.AlertSounded then
+            local startlocx, startlocz = self:GetArmyStartPos()
+            local threatTable = self:GetThreatsAroundPosition({startlocx, 0, startlocz}, 16, true, 'AntiSurface')
+            local artyThreatTable = self:GetThreatsAroundPosition({startlocx, 0, startlocz}, 16, true, 'Artillery')
+            local highThreat = false
+            local highThreatPos = false
+            local radius = self.SelfMonitor.CheckRadius * self.SelfMonitor.CheckRadius
+            local artyRadius = self.SelfMonitor.ArtyCheckRadius * self.SelfMonitor.ArtyCheckRadius
+            for tIndex,threat in threatTable do
+                local enemyThreat = self:GetThreatAtPosition( {threat[1], 0, threat[2]}, 0, true, 'AntiSurface')
+                local dist = VDist2Sq(threat[1], threat[2], startlocx, startlocz)
+                if (not highThreat or enemyThreat > highThreat) and enemyThreat > self.SelfMonitor.ThreatRadiusThreshold and dist < radius then
+                    highThreat = enemyThreat
+                    highThreatPos = {threat[1], 0, threat[2]}
+                end
+            end
+            if highThreat then
+                table.insert( self.BaseMonitor.AlertsTable,
+                    {
+                    Position = highThreatPos,
+                    Threat = highThreat,
+                    }
+                )
+                self:ForkThread(self.BaseMonitorAlertTimeout, highThreatPos)
+                self.BaseMonitor.ActiveAlerts = self.BaseMonitor.ActiveAlerts + 1
+                self.BaseMonitor.AlertSounded = true
+            end
+            highThreat = false
+            highThreatPos = false
+            for tIndex,threat in artyThreatTable do
+                local enemyThreat = self:GetThreatAtPosition( {threat[1], 0, threat[2]}, 0, true, 'Artillery')
+                local dist = VDist2Sq(threat[1], threat[2], startlocx, startlocz)
+                if (not highThreat or enemyThreat > highThreat) and enemyThreat > self.SelfMonitor.ThreatRadiusThreshold and dist < artyRadius then
+                    highThreat = enemyThreat
+                    highThreatPos = {threat[1], 0, threat[2]}
+                end
+            end
+            if highThreat then
+                table.insert( self.BaseMonitor.AlertsTable,
+                    {
+                    Position = highThreatPos,
+                    Threat = highThreat,
+                    }
+                )
+                self:ForkThread(self.BaseMonitorAlertTimeout, highThreatPos, 'Artillery')
+                self.BaseMonitor.ActiveAlerts = self.BaseMonitor.ActiveAlerts + 1
+                self.BaseMonitor.AlertSounded = true
+            end
+        end
+    end,
+    
     AddBuilderManagers = function(self, position, radius, baseName, useCenter )
         self.BuilderManagers[baseName] = {
             FactoryManager = FactoryManager.CreateFactoryBuilderManager(self, baseName, position, radius, useCenter),
             PlatoonFormManager = PlatoonFormManager.CreatePlatoonFormManager(self, baseName, position, radius, useCenter),
             EngineerManager = EngineerManager.CreateEngineerManager(self, baseName, position, radius),
-			#for sorian ai
-			StrategyManager = StratManager.CreateStrategyManager(self, baseName, position, radius),
-			#end sorian ai
-			
+            #for sorian ai
+            StrategyManager = StratManager.CreateStrategyManager(self, baseName, position, radius),
+            #end sorian ai
+            
             # Table to track consumption
             MassConsumption = {
                 Resources = { Units = {}, Drain = 0, },
@@ -3745,17 +3753,17 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-	#Sorian AI
-	BaseMonitorPlatoonDistressThread = function(self)
+    #Sorian AI
+    BaseMonitorPlatoonDistressThread = function(self)
         self.BaseMonitor.PlatoonAlertSounded = true
         while true do
             local numPlatoons = 0
             for k,v in self.BaseMonitor.PlatoonDistressTable do
                 if self:PlatoonExists(v.Platoon) then
                     local threat = self:GetThreatAtPosition( v.Platoon:GetPlatoonPosition(), 0, true, 'AntiSurface')
-					local myThreat = self:GetThreatAtPosition( v.Platoon:GetPlatoonPosition(), 0, true, 'Overall', self:GetArmyIndex())
+                    local myThreat = self:GetThreatAtPosition( v.Platoon:GetPlatoonPosition(), 0, true, 'Overall', self:GetArmyIndex())
                     # Platoons still threatened
-				if threat and threat > (myThreat * 1.5) then
+                if threat and threat > (myThreat * 1.5) then
                         v.Threat = threat
                         numPlatoons = numPlatoons + 1
                     # Platoon not threatened
@@ -3777,8 +3785,8 @@ AIBrain = Class(moho.aibrain_methods) {
             WaitSeconds(self.BaseMonitor.BaseMonitorTime)
         end
     end,
-	
-	
+    
+    
     BaseMonitorDistressLocation = function(self, position, radius, threshold)
         local returnPos = false
         local highThreat = false
@@ -3859,22 +3867,22 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-	#changed for sorian ai
+    #changed for sorian ai
     BaseMonitorAlertTimeout = function(self, pos, threattype)
         local timeout = self.BaseMonitor.DefaultAlertTimeout
         local threat
         local threshold = self.BaseMonitor.AlertLevel
-		local myThreat
+        local myThreat
         repeat
             WaitSeconds(timeout)
             threat = self:GetThreatAtPosition( pos, 0, true, threattype or 'AntiSurface' )
-			myThreat = self:GetThreatAtPosition( pos, 0, true, 'Overall', self:GetArmyIndex())
-			if threat - myThreat < 1 then
-				local eEngies = self:GetNumUnitsAroundPoint( categories.ENGINEER, pos, 10, 'Enemy' )
-				if eEngies > 0 then
-					threat = threat + (eEngies * 10)
-				end
-			end	
+            myThreat = self:GetThreatAtPosition( pos, 0, true, 'Overall', self:GetArmyIndex())
+            if threat - myThreat < 1 then
+                local eEngies = self:GetNumUnitsAroundPoint( categories.ENGINEER, pos, 10, 'Enemy' )
+                if eEngies > 0 then
+                    threat = threat + (eEngies * 10)
+                end
+            end    
         until threat - myThreat <= threshold
         for k,v in self.BaseMonitor.AlertsTable do
             if pos[1] == v.Position[1] and pos[3] == v.Position[3] then
@@ -3933,13 +3941,13 @@ AIBrain = Class(moho.aibrain_methods) {
             for k,v in self.BaseMonitor.BaseMonitorPoints do
                 if not v.Alert then
                     v.Threat = self:GetThreatAtPosition( v.Position, 0, true, 'AntiSurface' )
-					local myThreat = self:GetThreatAtPosition( v.Position, 0, true, 'AntiSurface', self:GetArmyIndex())
-					if v.Threat - myThreat < 1 then
-						local eEngies = self:GetNumUnitsAroundPoint( categories.ENGINEER, v.Position, 10, 'Enemy' )
-						if eEngies > 0 then
-							v.Threat = v.Threat + (eEngies * 10)
-						end
-					end						
+                    local myThreat = self:GetThreatAtPosition( v.Position, 0, true, 'AntiSurface', self:GetArmyIndex())
+                    if v.Threat - myThreat < 1 then
+                        local eEngies = self:GetNumUnitsAroundPoint( categories.ENGINEER, v.Position, 10, 'Enemy' )
+                        if eEngies > 0 then
+                            v.Threat = v.Threat + (eEngies * 10)
+                        end
+                    end                        
                     if v.Threat - myThreat > alertThreat then
                         v.Alert = true
                         table.insert( self.BaseMonitor.AlertsTable,
@@ -3957,139 +3965,139 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-	#Sorian AI function
+    #Sorian AI function
     ParseIntelThreadSorian = function(self)
         if not self.InterestList or not self.InterestList.MustScout then
             error('Scouting areas must be initialized before calling AIBrain:ParseIntelThread.',2)
         end
-		if not self.T4ThreatFound then
-			self.T4ThreatFound = {}
-		end
-		if not self.AttackPoints then
-			self.AttackPoints = {}
-		end
-		if not self.AirAttackPoints then
-			self.AirAttackPoints = {}
-		end
-		if not self.TacticalBases then
-			self.TacticalBases = {}
-		end
-		local intelChecks = {
-			#ThreatType	= {max dist to merge points, threat minimum, timeout (-1 = never timeout), try for exact pos, category to use for exact pos}
-			StructuresNotMex = { 100, 0, 60, true, categories.STRUCTURE - categories.MASSEXTRACTION },
-			Commander = { 50, 0, 120, true, categories.COMMAND },
-			Experimental = { 50, 0, 120, true, categories.EXPERIMENTAL },
-			Artillery = { 50, 1150, 120, true, categories.ARTILLERY * categories.TECH3 },
-			Land = { 100, 50, 120, false, nil },
-		}
-		local numchecks = 0
-		local checkspertick = 5
+        if not self.T4ThreatFound then
+            self.T4ThreatFound = {}
+        end
+        if not self.AttackPoints then
+            self.AttackPoints = {}
+        end
+        if not self.AirAttackPoints then
+            self.AirAttackPoints = {}
+        end
+        if not self.TacticalBases then
+            self.TacticalBases = {}
+        end
+        local intelChecks = {
+            #ThreatType    = {max dist to merge points, threat minimum, timeout (-1 = never timeout), try for exact pos, category to use for exact pos}
+            StructuresNotMex = { 100, 0, 60, true, categories.STRUCTURE - categories.MASSEXTRACTION },
+            Commander = { 50, 0, 120, true, categories.COMMAND },
+            Experimental = { 50, 0, 120, true, categories.EXPERIMENTAL },
+            Artillery = { 50, 1150, 120, true, categories.ARTILLERY * categories.TECH3 },
+            Land = { 100, 50, 120, false, nil },
+        }
+        local numchecks = 0
+        local checkspertick = 5
         while true do
-			local changed = false
-			for threatType, v in intelChecks do
-			
-	            local threats = self:GetThreatsAroundPosition(self.BuilderManagers.MAIN.Position, 16, true, threatType)
+            local changed = false
+            for threatType, v in intelChecks do
+            
+                local threats = self:GetThreatsAroundPosition(self.BuilderManagers.MAIN.Position, 16, true, threatType)
 
-	            for _,threat in threats do
-	                local dupe = false
-	                local newPos = {threat[1], 0, threat[2]}
-	                numchecks = numchecks + 1
-	                for _,loc in self.InterestList.HighPriority do
-	                    if loc.Type == threatType and VDist2Sq(newPos[1], newPos[3], loc.Position[1], loc.Position[3]) < v[1] * v[1] then
-	                        dupe = true
-							loc.LastUpdate = GetGameTimeSeconds()
-	                        break
-	                    end
-	                end
-	                
-	                if not dupe then
-	                    #Is it in the low priority list?
-	                    for i=1, table.getn(self.InterestList.LowPriority) do
-	                        local loc = self.InterestList.LowPriority[i]
-	                        if VDist2Sq(newPos[1], newPos[3], loc.Position[1], loc.Position[3]) < v[1] * v[1] and threat[3] > v[2] then
-	                            #Found it in the low pri list. Remove it so we can add it to the high priority list.
-	                            table.remove(self.InterestList.LowPriority, i)
-	                            break
-	                        end
-	                    end
-						#Check for exact position?
-						if threat[3] > v[2] and v[4] and v[5] then
-							local nearUnits = self:GetUnitsAroundPoint(v[5], newPos, v[1], 'Enemy')
-							if table.getn(nearUnits) > 0 then
-								local unitPos = nearUnits[1]:GetPosition()
-								if unitPos then
-									newPos = {unitPos[1], 0, unitPos[3]}
-								end
-							end
-						end
-						#Threat high enough?
-	                    if threat[3] > v[2] then
-							changed = true
-							table.insert(self.InterestList.HighPriority,
-								{
-									Position = newPos,
-									Type = threatType,
-									Threat = threat[3],
-									LastUpdate = GetGameTimeSeconds(),
-									LastScouted = GetGameTimeSeconds(),
-								}
-							)
-						end
-					end
-					#Reduce load on game
-					if numchecks > checkspertick then
-						WaitTicks(1)
-						numchecks = 0
-					end
-	            end
-			end
-			numchecks = 0
-			#Get rid of outdated intel
-			for k, v in self.InterestList.HighPriority do
-				if not v.Permanent and intelChecks[v.Type][3] > 0 and v.LastUpdate + intelChecks[v.Type][3] < GetGameTimeSeconds() then
-					self.InterestList.HighPriority[k] = nil
-					changed = true
-				end
-			end
-			#Rebuild intel table if there was a change
-			if changed then
-				self.InterestList.HighPriority = self:RebuildTable(self.InterestList.HighPriority)
-			end
-			#Sort the list based on low long it has been since it was scouted
-			table.sort(self.InterestList.HighPriority, function(a,b) 
-				if a.LastScouted == b.LastScouted then
-					local MainPos = self.BuilderManagers.MAIN.Position
-					local distA = VDist2(MainPos[1], MainPos[3], a.Position[1], a.Position[3])
-					local distB = VDist2(MainPos[1], MainPos[3], b.Position[1], b.Position[3])
-					
-					return distA < distB
-				else
-					return a.LastScouted < b.LastScouted
-				end
-			end)
-			#Draw intel data on map
-			#if not self.IntelDebugThread then
-			#	self.IntelDebugThread = self:ForkThread( SUtils.DrawIntel )
-			#end
-			#Handle intel data if there was a change
-			if changed then
-				SUtils.AIHandleIntelData(self)
-			end
-			
-			SUtils.AICheckForWeakEnemyBase(self)
+                for _,threat in threats do
+                    local dupe = false
+                    local newPos = {threat[1], 0, threat[2]}
+                    numchecks = numchecks + 1
+                    for _,loc in self.InterestList.HighPriority do
+                        if loc.Type == threatType and VDist2Sq(newPos[1], newPos[3], loc.Position[1], loc.Position[3]) < v[1] * v[1] then
+                            dupe = true
+                            loc.LastUpdate = GetGameTimeSeconds()
+                            break
+                        end
+                    end
+                    
+                    if not dupe then
+                        #Is it in the low priority list?
+                        for i=1, table.getn(self.InterestList.LowPriority) do
+                            local loc = self.InterestList.LowPriority[i]
+                            if VDist2Sq(newPos[1], newPos[3], loc.Position[1], loc.Position[3]) < v[1] * v[1] and threat[3] > v[2] then
+                                #Found it in the low pri list. Remove it so we can add it to the high priority list.
+                                table.remove(self.InterestList.LowPriority, i)
+                                break
+                            end
+                        end
+                        #Check for exact position?
+                        if threat[3] > v[2] and v[4] and v[5] then
+                            local nearUnits = self:GetUnitsAroundPoint(v[5], newPos, v[1], 'Enemy')
+                            if table.getn(nearUnits) > 0 then
+                                local unitPos = nearUnits[1]:GetPosition()
+                                if unitPos then
+                                    newPos = {unitPos[1], 0, unitPos[3]}
+                                end
+                            end
+                        end
+                        #Threat high enough?
+                        if threat[3] > v[2] then
+                            changed = true
+                            table.insert(self.InterestList.HighPriority,
+                                {
+                                    Position = newPos,
+                                    Type = threatType,
+                                    Threat = threat[3],
+                                    LastUpdate = GetGameTimeSeconds(),
+                                    LastScouted = GetGameTimeSeconds(),
+                                }
+                            )
+                        end
+                    end
+                    #Reduce load on game
+                    if numchecks > checkspertick then
+                        WaitTicks(1)
+                        numchecks = 0
+                    end
+                end
+            end
+            numchecks = 0
+            #Get rid of outdated intel
+            for k, v in self.InterestList.HighPriority do
+                if not v.Permanent and intelChecks[v.Type][3] > 0 and v.LastUpdate + intelChecks[v.Type][3] < GetGameTimeSeconds() then
+                    self.InterestList.HighPriority[k] = nil
+                    changed = true
+                end
+            end
+            #Rebuild intel table if there was a change
+            if changed then
+                self.InterestList.HighPriority = self:RebuildTable(self.InterestList.HighPriority)
+            end
+            #Sort the list based on low long it has been since it was scouted
+            table.sort(self.InterestList.HighPriority, function(a,b) 
+                if a.LastScouted == b.LastScouted then
+                    local MainPos = self.BuilderManagers.MAIN.Position
+                    local distA = VDist2(MainPos[1], MainPos[3], a.Position[1], a.Position[3])
+                    local distB = VDist2(MainPos[1], MainPos[3], b.Position[1], b.Position[3])
+                    
+                    return distA < distB
+                else
+                    return a.LastScouted < b.LastScouted
+                end
+            end)
+            #Draw intel data on map
+            #if not self.IntelDebugThread then
+            #    self.IntelDebugThread = self:ForkThread( SUtils.DrawIntel )
+            #end
+            #Handle intel data if there was a change
+            if changed then
+                SUtils.AIHandleIntelData(self)
+            end
+            
+            SUtils.AICheckForWeakEnemyBase(self)
             
             WaitSeconds(5)
         end
     end,
-	
-	#sorian ai function
-	T4ThreatMonitorTimeout = function(self, threattypes)
-		WaitSeconds(180)
-		for k,v in threattypes do
-			self.T4ThreatFound[v] = false
-		end
-	end,
-	
+    
+    #sorian ai function
+    T4ThreatMonitorTimeout = function(self, threattypes)
+        WaitSeconds(180)
+        for k,v in threattypes do
+            self.T4ThreatFound[v] = false
+        end
+    end,
+    
     GetBaseVectors = function(self)
         local enemy = self:GetCurrentEnemy()
         local index = self:GetArmyIndex()
@@ -4663,8 +4671,8 @@ AIBrain = Class(moho.aibrain_methods) {
 
 
 
-	
-		
+    
+        
     BuildScoutLocationsSorian = function(self)
         local aiBrain = self
         
@@ -4702,11 +4710,11 @@ AIBrain = Class(moho.aibrain_methods) {
                         table.insert(aiBrain.InterestList.HighPriority,
                             {
                                 Position = startPos,
-								Type = 'StructuresNotMex',
+                                Type = 'StructuresNotMex',
                                 LastScouted = 0,
-								LastUpdate = 0,
-								Threat = 75,
-								Permanent = true,
+                                LastUpdate = 0,
+                                Threat = 75,
+                                Permanent = true,
                             }
                         )
                         else 
@@ -4748,11 +4756,11 @@ AIBrain = Class(moho.aibrain_methods) {
                             table.insert(aiBrain.InterestList.LowPriority,
                                 {
                                     Position = loc.Position,
-									Type = 'StructuresNotMex',
+                                    Type = 'StructuresNotMex',
                                     LastScouted = 0,
-									LastUpdate = 0,
-									Threat = 0,
-									Permanent = true,
+                                    LastUpdate = 0,
+                                    Threat = 0,
+                                    Permanent = true,
                                 }
                             )
                         end
@@ -4786,9 +4794,9 @@ AIBrain = Class(moho.aibrain_methods) {
                                 {
                                     Position = loc.Position,
                                     LastScouted = 0,
-									LastUpdate = 0,
-									Threat = 0,
-									Permanent = true,
+                                    LastUpdate = 0,
+                                    Threat = 0,
+                                    Permanent = true,
                                 }
                             )
                     end
@@ -4800,13 +4808,13 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     PickEnemySorian = function(self)
-		self.targetoveride = false
+        self.targetoveride = false
         while true do
             self:PickEnemyLogicSorian(true)
             WaitSeconds(120)
         end
     end,
-	
+    
     PickEnemyLogicSorian = function(self, brainbool)
         local armyStrengthTable = {}
         
@@ -4871,28 +4879,28 @@ AIBrain = Class(moho.aibrain_methods) {
                     
                     #LOG('*AI DEBUG: Army ' .. v.Brain:GetArmyIndex() .. ' - Weighted enemy threat = ' .. threatWeight)
                     if not enemy or threatWeight > enemyStrength then
-						enemyStrength = threatWeight
+                        enemyStrength = threatWeight
                         enemy = v.Brain
                     end
                 end
                 
                 if enemy then
-					if not self:GetCurrentEnemy() or self:GetCurrentEnemy() != enemy then
-						SUtils.AISendChat('allies', ArmyBrains[self:GetArmyIndex()].Nickname, 'targetchat', ArmyBrains[enemy:GetArmyIndex()].Nickname)
-					end
+                    if not self:GetCurrentEnemy() or self:GetCurrentEnemy() != enemy then
+                        SUtils.AISendChat('allies', ArmyBrains[self:GetArmyIndex()].Nickname, 'targetchat', ArmyBrains[enemy:GetArmyIndex()].Nickname)
+                    end
                     self:SetCurrentEnemy( enemy )
                     #LOG('*AI DEBUG: Choosing enemy - ' .. enemy:GetArmyIndex())
                 end
             end
         end
     end,
-	
+    
     UnderEnergyThresholdSorian = function(self)
         self:SetupOverEnergyStatTriggerSorian(0.15)
         #for k,v in self.BuilderManagers do
         #   v.EngineerManager:LowEnergySorian()
         #end
-		self.LowEnergyMode = true
+        self.LowEnergyMode = true
     end,
 
     OverEnergyThresholdSorian = function(self)
@@ -4900,7 +4908,7 @@ AIBrain = Class(moho.aibrain_methods) {
         #for k,v in self.BuilderManagers do
         #    v.EngineerManager:RestoreEnergySorian()
         #end
-		self.LowEnergyMode = false
+        self.LowEnergyMode = false
     end,
 
     UnderMassThresholdSorian = function(self)
@@ -4908,7 +4916,7 @@ AIBrain = Class(moho.aibrain_methods) {
         #for k,v in self.BuilderManagers do
         #    v.EngineerManager:LowMassSorian()
         #end
-		self.LowMassMode = true
+        self.LowMassMode = true
     end,
 
     OverMassThresholdSorian = function(self)
@@ -4916,9 +4924,9 @@ AIBrain = Class(moho.aibrain_methods) {
         #for k,v in self.BuilderManagers do
         #    v.EngineerManager:RestoreMassSorian()
         #end
-		self.LowMassMode = false
+        self.LowMassMode = false
     end,
-	
+    
     SetupUnderEnergyStatTriggerSorian = function(self, threshold)
         import('/lua/scenariotriggers.lua').CreateArmyStatTrigger( self.UnderEnergyThresholdSorian, self, 'SkirmishUnderEnergyThresholdSorian',
             {
@@ -4966,20 +4974,20 @@ AIBrain = Class(moho.aibrain_methods) {
             }
         )
     end,
-	
-	
-	DoAIPing = function(self, pingData)
-		local per = ScenarioInfo.ArmySetup[self.Name].AIPersonality
-		
-		if string.find(per, 'sorian') then
-			if pingData.Type then
-				SUtils.AIHandlePing(self, pingData)
-			end
-		end
+    
+    
+    DoAIPing = function(self, pingData)
+        local per = ScenarioInfo.ArmySetup[self.Name].AIPersonality
+        
+        if string.find(per, 'sorian') then
+            if pingData.Type then
+                SUtils.AIHandlePing(self, pingData)
+            end
+        end
     end,
-	
-	AttackPointsTimeout = function(self, pos)
-		WaitSeconds(300)
+    
+    AttackPointsTimeout = function(self, pos)
+        WaitSeconds(300)
         for k,v in self.AttackPoints do
             if pos[1] == v.Position[1] and pos[3] == v.Position[3] then
                 self.AttackPoints[k] = nil
@@ -4987,20 +4995,20 @@ AIBrain = Class(moho.aibrain_methods) {
             end
         end
     end,
-	
+    
     AirAttackPointsTimeout = function(self, pos, enemy)
         local threat
-		local myThreat
-		local overallThreat
+        local myThreat
+        local overallThreat
         repeat
             WaitSeconds(30)
-			myThreat = 0
+            myThreat = 0
             threat = self:GetThreatAtPosition( pos, 1, true, 'AntiAir', enemy:GetArmyIndex())
-			overallThreat = self:GetThreatAtPosition( pos, 1, true, 'Overall', enemy:GetArmyIndex())
-			local bombers = AIUtils.GetOwnUnitsAroundPoint( self, categories.AIR * (categories.BOMBER + categories.GROUNDATTACK), pos, 10000 )
-			for k, unit in bombers do
-				myThreat = myThreat + unit:GetBlueprint().Defense.SurfaceThreatLevel
-			end
+            overallThreat = self:GetThreatAtPosition( pos, 1, true, 'Overall', enemy:GetArmyIndex())
+            local bombers = AIUtils.GetOwnUnitsAroundPoint( self, categories.AIR * (categories.BOMBER + categories.GROUNDATTACK), pos, 10000 )
+            for k, unit in bombers do
+                myThreat = myThreat + unit:GetBlueprint().Defense.SurfaceThreatLevel
+            end
         until threat > myThreat or overallThreat <= 0
         for k,v in self.AirAttackPoints do
             if pos[1] == v.Position[1] and pos[3] == v.Position[3] then
@@ -5008,6 +5016,6 @@ AIBrain = Class(moho.aibrain_methods) {
                 break
             end
         end
-    end,	
+    end,    
 
 }

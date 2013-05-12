@@ -4138,7 +4138,80 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    ##########################################################################################
+    ## RECALL (for Galactic War)
+    ##########################################################################################
 
+    Recall  = function(self)
+        self:CleanupTeleportChargeEffects()
+        if self.RecallTime then
+            RemoveEconomyEvent( self, self.RecallTime)
+            self.RecallTime = nil
+        end
+        if self.RecallThread then
+            self:SetImmobile(false)
+            self:SetBusy(false)        
+            self:SetBlockCommandQueue(false)   
+            self:SetWorkProgress(0.0)
+            KillThread(self.RecallThread)
+            self.RecallThread = nil
+
+        else
+            self.RecallThread = self:ForkThread(self.InitiateRecallThread)
+        end   
+    
+    end,
+    
+    InitiateRecallThread = function(self)
+        local aiBrain = self:GetAIBrain()
+        local distance = utilities.XZDistanceTwoVectors(self:GetPosition(), aiBrain:GetStartVector3f())        
+        local recall = 10 + math.pow(math.sqrt(distance), 1.7)
+        self:SetImmobile(true)
+        self:SetBusy(true)        
+        self:SetBlockCommandQueue(true)        
+        self:PlayUnitSound('TeleportStart')
+        self:PlayUnitAmbientSound('TeleportLoop')
+        self:PlayRecallChargeEffects()
+        self.RecallTime = CreateEconomyEvent(self, 0, 0, recall, self.UpdateRecallProgress)
+        WaitFor( self.RecallTime )
+
+        if self.RecallTime then
+            RemoveEconomyEvent(self, self.RecallTime )
+            self.RecallTime = nil
+        end        
+        
+        self:PlayTeleportOutEffects()
+        self:CleanupTeleportChargeEffects()
+        
+        WaitSeconds( 0.1 )
+        self:SetWorkProgress(0.0)
+        self:StopUnitAmbientSound('TeleportLoop')
+        self:PlayUnitSound('TeleportEnd')
+        aiBrain:OnRecall()
+        self:Destroy()
+     
+        
+    end,
+    
+    PlayRecallChargeEffects = function(self)
+        local army = self:GetArmy()
+        local bp = self:GetBlueprint()
+        local fx
+
+        self.TeleportChargeBag = {}
+        for k, v in EffectTemplate.GenericTeleportCharge01 do
+            fx = CreateEmitterAtEntity(self,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
+            self.Trash:Add(fx)
+            table.insert( self.TeleportChargeBag, fx)
+        end
+
+    end,    
+
+    UpdateRecallProgress = function(self, progress)
+        #LOG(' UpdatingTeleportProgress ')
+        self:SetWorkProgress(progress)
+    end,    
+    
 
     ##########################################################################################
     ## TELEPORTING

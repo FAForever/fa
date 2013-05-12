@@ -16,6 +16,7 @@ local OtherArmyResultStrings = {
     defeat = '<LOC usersync_0002>%s has been defeated!',
     draw = '<LOC usersync_0003>%s receives a draw.',
     gameOver = '<LOC usersync_0004>Game Over.',
+    recall = '<LOC usersync_0005>%s has fled the battle.',
 }
 
 local MyArmyResultStrings = {
@@ -23,6 +24,7 @@ local MyArmyResultStrings = {
     defeat = "<LOC GAMERESULT_0001>You have been defeated!",
     draw = "<LOC GAMERESULT_0002>It's a draw.",
     replay = "<LOC GAMERESULT_0003>Replay Finished.",
+    recall = "<LOC GAMERESULT_0004>You have left the battle!",
 }
 
 function OnReplayEnd()
@@ -45,7 +47,7 @@ function DoGameResult(armyIndex, result)
 		if not announced[armyIndex] then
 			if armyIndex == GetFocusArmy() then
 				local armies = GetArmiesTable().armiesTable
-				if result == 'defeat' then
+				if result == 'defeat' or result == 'recall' then
 					SimCallback({Func="GiveResourcesToPlayer", Args={ From=GetFocusArmy(), To=GetFocusArmy(), Mass=0, Energy=0, Loser=armies[armyIndex].nickname},} , true)
 				elseif result == 'victory' then
 					SimCallback({Func="GiveResourcesToPlayer", Args={ From=GetFocusArmy(), To=GetFocusArmy(), Mass=0, Energy=0, Winner=armies[armyIndex].nickname},} , true)
@@ -54,7 +56,7 @@ function DoGameResult(armyIndex, result)
 				end
 			else
 				local armies = GetArmiesTable().armiesTable
-				if result == 'defeat' then
+				if result == 'defeat' or result == 'recall' then
 					SimCallback({Func="GiveResourcesToPlayer", Args={ From=GetFocusArmy(), To=GetFocusArmy(), Mass=0, Energy=0, Loser=armies[armyIndex].nickname},} , true)
 				elseif result == 'victory' then
 					SimCallback({Func="GiveResourcesToPlayer", Args={ From=GetFocusArmy(), To=GetFocusArmy(), Mass=0, Energy=0, Winner=armies[armyIndex].nickname},} , true)
@@ -76,7 +78,7 @@ function DoGameResult(armyIndex, result)
 				end
 				
 				local victory = true
-				if result == 'defeat' then
+				if result == 'defeat' or result == 'recall' then
 					victory = false
 				end
 				

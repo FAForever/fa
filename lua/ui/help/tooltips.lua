@@ -1382,6 +1382,11 @@ Tooltips = {
         description = "<LOC tooltipui0065>Access all Diplomacy Options",
         keyID = "toggle_diplomacy_screen",
     },
+    recall = {
+        title = "<LOC tooltipgw0001>Recall",
+        description = "<LOC tooltipgw0002>Flee off the battlefield",
+        keyID = "recall",
+    },
     options_Pause = {
         title = "<LOC tooltipui0066>Pause",
         description = "",
