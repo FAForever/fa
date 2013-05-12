@@ -233,6 +233,7 @@ UAL0001 = Class(AWalkingLandUnit) {
     end,
 
     CreateEnhancement = function(self, enh)
+        AWalkingLandUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
         #Resource Allocation
         if enh == 'ResourceAllocation' then
@@ -313,6 +314,8 @@ UAL0001 = Class(AWalkingLandUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'AeonACUT2BuildRate')
+	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+	    self:updateBuildRestrictions()
         elseif enh =='AdvancedEngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -320,7 +323,9 @@ UAL0001 = Class(AWalkingLandUnit) {
             self:AddBuildRestriction( categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
             if Buff.HasBuff( self, 'AeonACUT2BuildRate' ) then
                 Buff.RemoveBuff( self, 'AeonACUT2BuildRate' )
-            end
+	     end
+	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+	    self:updateBuildRestrictions()
         #T3 Engineering
         elseif enh =='T3Engineering' then
             local bp = self:GetBlueprint().Enhancements[enh]
@@ -351,6 +356,8 @@ UAL0001 = Class(AWalkingLandUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'AeonACUT3BuildRate')
+	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+	    self:updateBuildRestrictions()
         elseif enh =='T3EngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -358,7 +365,9 @@ UAL0001 = Class(AWalkingLandUnit) {
             self:AddBuildRestriction( categories.AEON * ( categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
             if Buff.HasBuff( self, 'AeonACUT3BuildRate' ) then
                 Buff.RemoveBuff( self, 'AeonACUT3BuildRate' )
-            end
+	     end
+	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+	    self:updateBuildRestrictions()
         #Crysalis Beam
         elseif enh == 'CrysalisBeam' then
             local wep = self:GetWeaponByLabel('RightDisruptor')
@@ -387,9 +396,7 @@ UAL0001 = Class(AWalkingLandUnit) {
             local bpIntel = self:GetBlueprint().Intel
             self:SetIntelRadius('Vision', bpIntel.VisionRadius or 26)
             self:SetIntelRadius('Omni', bpIntel.OmniRadius or 26)
-	end
-	
-        AWalkingLandUnit.CreateEnhancement(self, enh)
+      end
     end,
 
     CreateHeavyShield = function(self, bp)

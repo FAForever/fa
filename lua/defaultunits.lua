@@ -1300,7 +1300,7 @@ MobileUnit = Class(Unit) {
 
     -- Added for engymod. When created, units must re-check their build restrictions
     OnCreate = function(self)
-        MobileUnit.OnCreate(self)
+        Unit.OnCreate(self)
         self:updateBuildRestrictions()
     end,
 

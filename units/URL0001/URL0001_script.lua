@@ -294,6 +294,7 @@ URL0001 = Class(CWalkingLandUnit) {
     end,
 
     CreateEnhancement = function(self, enh)
+        CWalkingLandUnit.CreateEnhancement(self, enh)
         if enh == 'Teleporter' then
             self:AddCommandCap('RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
@@ -390,6 +391,8 @@ URL0001 = Class(CWalkingLandUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'CybranACUT2BuildRate')
+	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+	    self:updateBuildRestrictions()
         elseif enh =='AdvancedEngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -398,6 +401,8 @@ URL0001 = Class(CWalkingLandUnit) {
             if Buff.HasBuff( self, 'CybranACUT2BuildRate' ) then
                 Buff.RemoveBuff( self, 'CybranACUT2BuildRate' )
             end
+	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+	    self:updateBuildRestrictions()
         #T3 Engineering
         elseif enh =='T3Engineering' then
             local bp = self:GetBlueprint().Enhancements[enh]
@@ -428,6 +433,8 @@ URL0001 = Class(CWalkingLandUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'CybranACUT3BuildRate')
+	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+	    self:updateBuildRestrictions()
         elseif enh =='T3EngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -436,6 +443,9 @@ URL0001 = Class(CWalkingLandUnit) {
                 Buff.RemoveBuff( self, 'CybranACUT3BuildRate' )
             end
             self:AddBuildRestriction( categories.CYBRAN * ( categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
+
+	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+	    self:updateBuildRestrictions()
         elseif enh =='CoolingUpgrade' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local wep = self:GetWeaponByLabel('RightRipper')
@@ -466,7 +476,6 @@ URL0001 = Class(CWalkingLandUnit) {
             self:SetWeaponEnabledByLabel('Torpedo', false)
 			self:DisableUnitIntel('Sonar')
         end             
-        CWalkingLandUnit.CreateEnhancement(self, enh)
     end,
     
     # **********
