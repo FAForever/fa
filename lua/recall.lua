@@ -6,14 +6,14 @@
 #*****************************************************************************
 
 function ToggleRecall(data)
+    if not OkayToMessWithArmy(data.From) then return end
+    local aiBrain = GetArmyBrain(data.From)
 
-    local aiBrain = GetArmyBrain(GetFocusArmy())
-
+    if aiBrain:IsDefeated() then return end
+    
     local units = aiBrain:GetListOfUnits( categories.COMMAND, false )
     
     for _, unit in units do
-        if OkayToMessWithArmy(unit:GetArmy()) then
-            unit:Recall()
-        end
+        unit:Recall()
     end
 end

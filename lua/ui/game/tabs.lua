@@ -420,7 +420,7 @@ function CommonLogic()
         end
         if tab.Data.recall then
             tab.OnCheck = function(self, checked)
-                    SimCallback({Func = 'ToggleRecall', Args = {owner = GetFocusArmy()}})
+                    SimCallback({Func = 'ToggleRecall', Args = { From=GetFocusArmy()}})
 
             end
             tab.OnClick = function(self, modifiers)
