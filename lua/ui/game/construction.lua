@@ -980,15 +980,16 @@ function OnClickHandler(button, modifiers)
             IssueCommand("UNITCOMMAND_Script", orderData, true)
         end
     elseif item.type == 'queuestack' then
+       LOG("clicked a queuestack in construction.lua")
         local count = 1
         if modifiers.Shift or modifiers.Ctrl then
             count = 5
         end
         if modifiers.Left then
-	   LOG("unit++")
+	   --LOG("unit++")
             IncreaseBuildCountInQueue(item.position, count)
         elseif modifiers.Right then
-	   LOG("unit--")
+	   --LOG("unit--")
             DecreaseBuildCountInQueue(item.position, count)
         end
     end

@@ -232,7 +232,7 @@ StructureUnit = Class(Unit) {
         Unit.OnStartBuild(self,unitBeingBuilt, order)
         self.UnitBeingBuilt = unitBeingBuilt
 	
-	LOG("structure onstartbuild")
+	--LOG("structure onstartbuild")
 	
 	local builderBp = self:GetBlueprint()
 	local targetBp = unitBeingBuilt:GetBlueprint()
@@ -467,11 +467,11 @@ FactoryUnit = Class(StructureUnit) {
 
     -- Added to add engymod logic
     OnDestroy = function(self)
-        LOG("Something ondestroy")
+        --LOG("Something ondestroy")
 		   
 	-- Figure out if we're a research station
 	if EntityCategoryContains(categories.RESEARCH, self) then
-	   LOG("Research station Destroyed")
+	   --LOG("Research station Destroyed")
 	   
 	   local aiBrain = self:GetAIBrain()
 	   local buildRestrictionVictims = aiBrain:GetListOfUnits(categories.FACTORY+categories.ENGINEER, false)
@@ -516,7 +516,7 @@ FactoryUnit = Class(StructureUnit) {
 	
 	-- If we're a research station, update build restrictions for all factories
 	if EntityCategoryContains(categories.RESEARCH, self) then
-	   LOG("Research station OnStopBeingBuilt")
+	   --LOG("Research station OnStopBeingBuilt")
 	   
 	   local buildRestrictionVictims = aiBrain:GetListOfUnits(categories.FACTORY + categories.ENGINEER, false)
 	   for id, unit in buildRestrictionVictims do
@@ -1292,7 +1292,7 @@ MobileUnit = Class(Unit) {
 
     -- Added for engymod. After creating an enhancement, units must re-check their build restrictions
     CreateEnhancement = function(self, enh) 
-	LOG("CreateEnhancement in defaultunits called")
+	--LOG("CreateEnhancement in defaultunits called")
 	Unit.CreateEnhancement(self, enh)
 
 	self:updateBuildRestrictions()
@@ -2052,7 +2052,7 @@ SeaUnit = Class(MobileUnit){
 	OnKilled = function(self, instigator, type, overkillRatio)
 		local nrofBones = self:GetBoneCount() -1
 		local watchBone = self:GetBlueprint().WatchBone or 0
-		LOG(self:GetBlueprint().Description, " watchbone is ", watchBone)
+		--LOG(self:GetBlueprint().Description, " watchbone is ", watchBone)
 
  		self:ForkThread(function()
 			-- LOG("Sinker thread created")

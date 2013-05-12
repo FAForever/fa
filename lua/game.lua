@@ -85,8 +85,8 @@ function GetConstructEconomyModel(builder, targetData, upgradeBaseData)
    
    if upgradeBaseData and targetData.DifferentialUpgradeCostCalculation then
 
-      LOG("Doing differential upgrade cost calculation")
-      LOG(time, " ", mass, " ", energy)
+      --LOG("Doing differential upgrade cost calculation")
+      --LOG(time, " ", mass, " ", energy)
 
       # We cant make a differential on buildtime. Not sure why but if we do it yields incorrect results. So just mass and energy
       mass = mass - upgradeBaseData.BuildCostMass
@@ -95,7 +95,7 @@ function GetConstructEconomyModel(builder, targetData, upgradeBaseData)
       if mass < 0 then mass = 0 end
       if energy < 0 then energy = 0 end
 
-      LOG(time, " ", mass, " ", energy)
+      --LOG(time, " ", mass, " ", energy)
    end
 
    # apply penalties/bonuses to effective time

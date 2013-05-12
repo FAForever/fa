@@ -558,7 +558,7 @@ Unit = Class(moho.unit_methods) {
     -- Engymod helper function: updates build restrictions of the passed unit.
     -- Added by Rien
     updateBuildRestrictions = function(self)
-	LOG("updateBuildRestrictions called")
+	--LOG("updateBuildRestrictions called")
 
 	local faction = nil
 	local type = nil
@@ -595,7 +595,7 @@ Unit = Class(moho.unit_methods) {
 
 	-- Sanity check. 
 	if not faction then 
-	   LOG("updateBuildRestrictions: Faction unset")
+	   --LOG("updateBuildRestrictions: Faction unset")
 	   return 
 	end
 
@@ -603,42 +603,42 @@ Unit = Class(moho.unit_methods) {
 	if EntityCategoryContains(categories.FACTORY, self) then
 	   if EntityCategoryContains(categories.SUPPORTFACTORY, self) then
 	      -- Add support factory cannot build higher tech units at all, until there is a HQ factory
-	      LOG("Adding build restrictions for tech2mobile tech3mobile tech3factory")
+	      --LOG("Adding build restrictions for tech2mobile tech3mobile tech3factory")
 	      self:AddBuildRestriction(categories.TECH2 * categories.MOBILE)
 	      self:AddBuildRestriction(categories.TECH3 * categories.MOBILE)
 	      self:AddBuildRestriction(categories.TECH3 * categories.FACTORY)
 	      supportfactory = true
 	   else
 	      -- A normal factory cannot build a support factory until there is a HQ factory
-	      LOG("Adding build restrictions for supportfactory for factory")
+	      --LOG("Adding build restrictions for supportfactory for factory")
 	      self:AddBuildRestriction(categories.SUPPORTFACTORY)
 	      supportfactory = false
 	   end
 	elseif EntityCategoryContains(categories.ENGINEER, self) then
 	   -- Engineers also cannot build a support factory until there is a HQ factory
-	   LOG("Adding build restrictions for supportfactory for engineer")
+	   --LOG("Adding build restrictions for supportfactory for engineer")
 	   self:AddBuildRestriction(categories.SUPPORTFACTORY)
 	else
-	   LOG("Cowardly doing nothing")
+	   --LOG("Cowardly doing nothing")
 	end
 	
 	if supportfactory then 
 	   if not type then 
-	      LOG("updateBuildRestrictions: Type unset")
+	      --LOG("updateBuildRestrictions: Type unset")
 	      return 
 	   end
 	   
 	   -- Gather statistics about the amount of research stations we have 
 	   for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH2 * faction, false, true) do
 	      if not unit:IsDead() and not unit:IsBeingBuilt() then
-		 LOG("Removing restriction tech2construction")
+		 --LOG("Removing restriction tech2construction")
 		 self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE * categories.CONSTRUCTION)
 	      end
 	   end
 	   
 	   for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH3 * faction, false, true) do
 	      if not unit:IsDead() and not unit:IsBeingBuilt() then
-		 LOG("Removing restriction tech2construction and tech3construction")
+		 --LOG("Removing restriction tech2construction and tech3construction")
 		 self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE * categories.CONSTRUCTION)
 		 self:RemoveBuildRestriction(categories.TECH3 * categories.MOBILE * categories.CONSTRUCTION)
 		 break
@@ -647,7 +647,7 @@ Unit = Class(moho.unit_methods) {
 	   
 	   for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH2 * faction * type, false, true) do
 	      if not unit:IsDead() and not unit:IsBeingBuilt() then
-		 LOG("Removing restriction tech2mobile")
+		 --LOG("Removing restriction tech2mobile")
 		 self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE)
 		 break
 	      end
@@ -655,7 +655,7 @@ Unit = Class(moho.unit_methods) {
 	   
 	   for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH3 * faction * type, false, true) do
 	      if not unit:IsDead() and not unit:IsBeingBuilt() then
-		 LOG("Removing restriction tech2 and tech 3 mobile tech 3 support factory")
+		 --LOG("Removing restriction tech2 and tech 3 mobile tech 3 support factory")
 		 self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE)
 		 self:RemoveBuildRestriction(categories.TECH3 * categories.MOBILE)
 		 self:RemoveBuildRestriction(categories.TECH3 * categories.FACTORY * categories.SUPPORTFACTORY)
@@ -687,11 +687,11 @@ Unit = Class(moho.unit_methods) {
 
 		    if EntityCategoryContains(categories.COMMAND, self) then
 		       if self:HasEnhancement('AdvancedEngineering') or self:HasEnhancement('T3Engineering') then
-			  LOG("Removing restriction tech2 support factory for commander")
+			  --LOG("Removing restriction tech2 support factory for commander")
 			  self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
 		       end
 		    else
-		       LOG("Removing restriction tech2 support factory for non-supfacs")
+		       --LOG("Removing restriction tech2 support factory for non-supfacs")
 		       self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
 		    end
 
@@ -705,16 +705,16 @@ Unit = Class(moho.unit_methods) {
 		    -- Special case for the commander, since its engineering upgrades are implemented using build restrictions
 		    if EntityCategoryContains(categories.COMMAND, self) then
 		       if self:HasEnhancement('AdvancedEngineering') then
-			  LOG("Removing restriction tech2 support factory for commander")
+			  --LOG("Removing restriction tech2 support factory for commander")
 			  self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
 
 		       elseif self:HasEnhancement('T3Engineering') then
-			  LOG("Removing restriction tech2 and tech3 support factory for commander")
+			  --LOG("Removing restriction tech2 and tech3 support factory for commander")
 			  self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
 			  self:RemoveBuildRestriction(categories.TECH3 * categories.SUPPORTFACTORY * faction * researchType)
 		       end
 		    else
-		       LOG("Removing restriction tech2 and t3 support factory for non-supfacs")
+		       --LOG("Removing restriction tech2 and t3 support factory for non-supfacs")
 		       self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
 		       self:RemoveBuildRestriction(categories.TECH3 * categories.SUPPORTFACTORY * faction * researchType)
 		    end
@@ -1177,14 +1177,14 @@ Unit = Class(moho.unit_methods) {
 	       #
 	       if focus:IsUnitState('Enhancing') or focus:IsUnitState('Upgrading') then
 		  # If the unit is assisting an enhancement, we must know how much it costs.
-		  LOG("Focusunit is upgrading")
+		  --LOG("Focusunit is upgrading")
 		  time, energy, mass = Game.GetConstructEconomyModel(self, focus.WorkItem)
 
 	       else
-		  LOG("Focus Unit is not upgrading")
+		  --LOG("Focus Unit is not upgrading")
 		  
 		  if self:IsUnitState('Upgrading') then
-		     LOG("Self is upgrading")
+		     --LOG("Self is upgrading")
 		     # If we are upgrading ourselves, add our own economy blueprint to the upgrade cost calculation 
 		     # GetConstructEconomyModel can use this to substract the cost of the unit that is upgrading from the cost of the unit that it is upgrading to
 		     time, energy, mass = Game.GetConstructEconomyModel(self, focus:GetBlueprint().Economy, self:GetBlueprint().Economy)
@@ -1192,10 +1192,10 @@ Unit = Class(moho.unit_methods) {
 		  else
 		     # Check if the builder of our focusUnit is upgrading. If it is, we are assisting an upgrade.
 		     if focus.originalBuilder and not focus.originalBuilder:IsDead() and focus.originalBuilder:IsUnitState('Upgrading') then
-			LOG("Focusunit is an upgrade")
+			--LOG("Focusunit is an upgrade")
 			time, energy, mass = Game.GetConstructEconomyModel(self, focus:GetBlueprint().Economy, focus.originalBuilder:GetBlueprint().Economy)
 		     else
-			LOG("Focusunit is not an upgrade")
+			--LOG("Focusunit is not an upgrade")
 			time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
 		     end
 		  end
