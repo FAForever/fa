@@ -854,7 +854,7 @@ function OnClickHandler(button, modifiers)
                 performUpgrade = false
             else
                 for i,v in sortedOptions.selection do
-                    if v then   # it's possible that your unit will have died by the time this gets to it
+                    if v then   # its possible that your unit will have died by the time this gets to it
                         local unitBp = v:GetBlueprint()
                         if blueprint.General.UpgradesFrom == unitBp.BlueprintId then
                             performUpgrade = true
@@ -980,7 +980,7 @@ function OnClickHandler(button, modifiers)
             IssueCommand("UNITCOMMAND_Script", orderData, true)
         end
     elseif item.type == 'queuestack' then
-       LOG("clicked a queuestack in construction.lua")
+       --LOG("clicked a queuestack in construction.lua")
         local count = 1
         if modifiers.Shift or modifiers.Ctrl then
             count = 5
@@ -989,8 +989,27 @@ function OnClickHandler(button, modifiers)
 	   --LOG("unit++")
             IncreaseBuildCountInQueue(item.position, count)
         elseif modifiers.Right then
-	   --LOG("unit--")
-            DecreaseBuildCountInQueue(item.position, count)
+	   --LOG("unit-- attempt")
+
+	   local supportfactory = false
+	   local tech3 = false
+
+	   -- Engymod: Engine bug workaround. Make t3 support factories uncancelable
+	   local blueprint = __blueprints[item.id]
+	   for i,v in ipairs(blueprint.Categories) do
+	      if v == 'SUPPORTFACTORY' then
+		 supportfactory = true
+	      elseif v == 'TECH3' then
+		 tech3 = true
+	      end
+	      if tech3 and supportfactory then break end
+	   end
+	   
+	   if not (tech3 and supportfactory) then
+	      DecreaseBuildCountInQueue(item.position, count)
+	   else
+	      LOG("Not canceling t3 support factory")
+	   end
         end
     end
 end
