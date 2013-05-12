@@ -77,6 +77,51 @@ local whatIfBlueprintID = nil
 local selectedwhatIfBuilder = nil
 local selectedwhatIfBlueprintID = nil
 
+
+--
+-- Workaround for an apparent engine bug that appeared when engymod was deployed (by Rienzilla)
+-- 
+-- When we queue a t2 and t3 support factory (or, any upgrade, in which the upgrades
+-- are not defined by the UpgradesTo and UpgradesFrom blueprint field, but by the 
+-- UpgradesFromBase field), and then cancel the t3 factory, the call to DecreaseBuildCountInQueue
+-- will not only remove all t3 units queued, but also all t2 units, including the factory
+--
+-- Now if the factory was already in the process of being built when that happens, the
+-- game crashes as soon as it finishes a unit that is not in its queue.
+--
+-- So, we override DecreaseBuildCountInQueue, and make t3 support factories uncancellable.
+--
+-- TODO: make the factory cancelable, but re-add the rest of the queue once the engine has removed it
+
+local oldDecreaseBuildCountInQueue = DecreaseBuildCountInQueue
+function DecreaseBuildCountInQueue(unitIndex, count)
+
+   --   LOG("Called DecreaseBuildCountInQueue hook")
+
+   -- FIXME: maybe add some sanity checking?
+   local unitStack = currentCommandQueue[unitIndex]
+   local blueprint = __blueprints[unitStack.id]
+
+   local tech3 = false
+   local supportfactory = false
+
+   for i,v in ipairs(blueprint.Categories) do
+      if v == 'SUPPORTFACTORY' then
+	 supportfactory = true
+      elseif v == 'TECH3' then
+	 tech3 = true
+      end
+      if tech3 and supportfactory then break end
+   end
+   
+   if not (tech3 and supportfactory) then
+      --LOG("DecreaseBuildCountInQueue: calling super()")
+      oldDecreaseBuildCountInQueue(unitIndex, count)
+   else
+      LOG("Not canceling t3 support factory")
+   end
+end
+
 function CreateTab(parent, id, onCheckFunc)
     local btn = Checkbox(parent)
     btn.Depth:Set(function() return parent.Depth() + 10 end)
@@ -990,26 +1035,7 @@ function OnClickHandler(button, modifiers)
             IncreaseBuildCountInQueue(item.position, count)
         elseif modifiers.Right then
 	   --LOG("unit-- attempt")
-
-	   local supportfactory = false
-	   local tech3 = false
-
-	   -- Engymod: Engine bug workaround. Make t3 support factories uncancelable
-	   local blueprint = __blueprints[item.id]
-	   for i,v in ipairs(blueprint.Categories) do
-	      if v == 'SUPPORTFACTORY' then
-		 supportfactory = true
-	      elseif v == 'TECH3' then
-		 tech3 = true
-	      end
-	      if tech3 and supportfactory then break end
-	   end
-	   
-	   if not (tech3 and supportfactory) then
-	      DecreaseBuildCountInQueue(item.position, count)
-	   else
-	      LOG("Not canceling t3 support factory")
-	   end
+	   DecreaseBuildCountInQueue(item.position, count)
         end
     end
 end
