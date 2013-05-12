@@ -58,6 +58,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
+	'RESEARCH',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -69,7 +70,7 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC ueb0202_desc>Air Factory',
+    Description = '<LOC ueb0202_desc>Air Factory HQ',
     Display = {
         Abilities = {
             '<LOC ability_upgradable>Upgradeable',
@@ -127,10 +128,14 @@ UnitBlueprint {
         UniformScale = 0.1,
     },
     Economy = {
-        BuildCostEnergy = 11700,
-        BuildCostMass = 630,
+        BuildCostEnergy = 14100,
+        BuildCostMass = 840,
         BuildRate = 40,
         BuildTime = 1800,
+	DifferentialUpgradeCostCalculation = true, 
+        RebuildBonusIds = {
+            'ueb0202',
+        },
         BuildableCategory = {
             'BUILTBYTIER2FACTORY UEF MOBILE CONSTRUCTION',
             'BUILTBYTIER2FACTORY UEF STRUCTURE AIR',
@@ -174,13 +179,14 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Advanced',
         UnitWeight = 1,
         UpgradesFrom = 'ueb0102',
+        UpgradesFromBase = 'ueb0102',
         UpgradesTo = 'ueb0302',
     },
     Intel = {
         VisionRadius = 20,
     },
     Interface = {
-        HelpText = '<LOC ueb0202_help>Air Factory',
+        HelpText = '<LOC ueb0202_help>Air Factory HQ',
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 1.65,
@@ -352,7 +358,7 @@ UnitBlueprint {
     SizeX = 3.5,
     SizeY = 0.75,
     SizeZ = 3.5,
-    StrategicIconName = 'icon_factory2_air',
+    StrategicIconName = 'icon_factoryhq2_air',
     StrategicIconSortPriority = 215,
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',

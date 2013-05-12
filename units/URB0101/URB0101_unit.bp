@@ -64,8 +64,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 3,
-        Health = 4200,
-        MaxHealth = 4200,
+        Health = 3500,
+        MaxHealth = 3500,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -140,6 +140,7 @@ UnitBlueprint {
         BuildCostMass = 240,
         BuildRate = 20,
         BuildTime = 300,
+	DifferentialUpgradeCostCalculation = true,
         BuildableCategory = {
             'BUILTBYTIER1FACTORY CYBRAN MOBILE CONSTRUCTION',
             'BUILTBYTIER1FACTORY CYBRAN STRUCTURE LAND',
@@ -147,8 +148,6 @@ UnitBlueprint {
         },
         RebuildBonusIds = {
             'urb0101',
-            'urb0201',
-            'urb0301',
         },
         StorageEnergy = 0,
         StorageMass = 80,
@@ -188,6 +187,7 @@ UnitBlueprint {
         SelectionPriority = 5,
         TechLevel = 'RULEUTL_Basic',
         UnitWeight = 1,
+        UpgradesFromBase = 'urb0101',
         UpgradesTo = 'urb0201',
     },
     Intel = {

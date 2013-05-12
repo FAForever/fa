@@ -284,7 +284,6 @@ XSL0001 = Class( SWalkingLandUnit ) {
     end,
 
     CreateEnhancement = function(self, enh)
-        SWalkingLandUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
         
         # Regenerative Aura
@@ -576,6 +575,8 @@ XSL0001 = Class( SWalkingLandUnit ) {
         #    self.RemoteViewingData.VisibleLocation = false
         #    self:DisableRemoteViewingButtons()
         end
+
+        SWalkingLandUnit.CreateEnhancement(self, enh)
     end,
 
     OnPaused = function(self)

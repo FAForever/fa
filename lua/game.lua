@@ -59,36 +59,63 @@ BuffFieldBlueprint {                         # Seraphim ACU Advanced Restoration
 # Return the total time (in seconds), energy, and mass it will take for the given
 # builder to create a unit of type target_bp.
 #
-# targetData may also be an "Enhancement" section of a unit's blueprint rather than
+# targetData may also be an "Enhancement" section of a units blueprint rather than
 # a full blueprint.
-function GetConstructEconomyModel(builder, targetData)
 
-	local builder_bp = builder:GetBlueprint()
-    
-    # 'rate' here is how fast we build relative to a unit with build rate of 1
-    local rate = builder:GetBuildRate()
+#
+# Modified by Rienzilla 2/5/2013
+#
+# Modified to calculate the cost of an upgrade. The third argument is the economy section of 
+# the unit that is currently upgrading into the new unit. We substract that cost from the cost 
+# of the unit that is being built
+#
+# In order to keep backwards compatibility, there is a new option in the blueprint economy section.
+# if DifferentialUpgradeCostCalculation is set to true, the base upgrade cost will be substracted
 
-    local time = targetData.BuildTime or 0.1
-    local mass = targetData.BuildCostMass or 0
-    local energy = targetData.BuildCostEnergy or 0
+function GetConstructEconomyModel(builder, targetData, upgradeBaseData)
 
-    # apply penalties/bonuses to effective time
-    local time_mod = builder.BuildTimeModifier or 0
-    time = time * (100 + time_mod)*.01
-    if time<.1 then time = .1 end
+   local builder_bp = builder:GetBlueprint()
+   
+   # 'rate' here is how fast we build relative to a unit with build rate of 1
+   local rate = builder:GetBuildRate()
+   
+   local time = targetData.BuildTime
+   local mass = targetData.BuildCostMass
+   local energy = targetData.BuildCostEnergy
+   
+   if upgradeBaseData and targetData.DifferentialUpgradeCostCalculation then
 
-    # apply penalties/bonuses to effective energy cost
-    local energy_mod = builder.EnergyModifier or 0
-    energy = energy * (100 + energy_mod)*.01
-    if energy<0 then energy = 0 end
+      LOG("Doing differential upgrade cost calculation")
+      LOG(time, " ", mass, " ", energy)
 
-    # apply penalties/bonuses to effective mass cost
-    local mass_mod = builder.MassModifier or 0
-    mass = mass * (100 + mass_mod)*.01
-    if mass<0 then mass = 0 end
+      # We cant make a differential on buildtime. Not sure why but if we do it yields incorrect results. So just mass and energy
+      mass = mass - upgradeBaseData.BuildCostMass
+      energy = energy - upgradeBaseData.BuildCostEnergy
 
-    return time/rate, energy, mass
+      if mass < 0 then mass = 0 end
+      if energy < 0 then energy = 0 end
+
+      LOG(time, " ", mass, " ", energy)
+   end
+
+   # apply penalties/bonuses to effective time
+   local time_mod = builder.BuildTimeModifier or 0
+   time = time * (100 + time_mod)*.01
+   if time<.1 then time = .1 end
+   
+   # apply penalties/bonuses to effective energy cost
+   local energy_mod = builder.EnergyModifier or 0
+   energy = energy * (100 + energy_mod)*.01
+   if energy<0 then energy = 0 end
+   
+   # apply penalties/bonuses to effective mass cost
+   local mass_mod = builder.MassModifier or 0
+   mass = mass * (100 + mass_mod)*.01
+   if mass<0 then mass = 0 end
+   
+   return time/rate, energy, mass
 end
+
 
 
 ###added for CBFP

@@ -33,7 +33,6 @@ local CreateScaledBoom = function(unit, overkill, bone)
 	)
 end
 
-
 #################################################################
 ##  MISC UNITS
 #################################################################
@@ -228,15 +227,37 @@ StructureUnit = Class(Unit) {
         end
     end,
 
+    -- Modified to use same upgrade logic as the ui. This adds more upgrade options via General.UpgradesFromBase blueprint option
     OnStartBuild = function(self, unitBeingBuilt, order )
         Unit.OnStartBuild(self,unitBeingBuilt, order)
-        #Fix up info on the unit id from the blueprint and see if it matches the 'UpgradeTo' field in the BP.
-        local unitid = self:GetBlueprint().General.UpgradesTo
         self.UnitBeingBuilt = unitBeingBuilt
-        if unitBeingBuilt:GetUnitId() == unitid and order == 'Upgrade' then
-            ChangeState(self, self.UpgradingState)
-        end
-    end,
+	
+	LOG("structure onstartbuild")
+	
+	local builderBp = self:GetBlueprint()
+	local targetBp = unitBeingBuilt:GetBlueprint()
+	local performUpgrade = false
+	
+	if targetBp.General.UpgradesFrom == builderBp.BlueprintId then
+	   performUpgrade = true
+	elseif targetBp.General.UpgradesFrom == builderBp.General.UpgradesTo then
+	   performUpgrade = true
+	elseif targetBp.General.UpgradesFromBase != "none" then
+	   # try testing against the base
+	   if targetBp.General.UpgradesFromBase == builderBp.BlueprintId then
+	      performUpgrade = true
+	   elseif targetBp.General.UpgradesFromBase == builderBp.General.UpgradesFromBase then
+	      performUpgrade = true
+	   end
+	end
+	
+	--if unitBeingBuilt:GetUnitId() != builderBp.General.UpgradesTo then
+	if performUpgrade and order == 'Upgrade' then
+	   ChangeState(self, self.UpgradingState)
+	end
+	--end
+     end,
+    
     
     IdleState = State {
         Main = function(self)
@@ -434,9 +455,37 @@ StructureUnit = Class(Unit) {
 #-------------------------------------------------------------
 FactoryUnit = Class(StructureUnit) {
     OnCreate = function(self)
+
+	-- Engymod addition: If a normal factory is created, we should check for research stations
+	if EntityCategoryContains(categories.FACTORY, self) then
+	   self:updateBuildRestrictions()
+	end
+
         StructureUnit.OnCreate(self)
         self.BuildingUnit = false
     end,
+
+    -- Added to add engymod logic
+    OnDestroy = function(self)
+        LOG("Something ondestroy")
+		   
+	-- Figure out if we're a research station
+	if EntityCategoryContains(categories.RESEARCH, self) then
+	   LOG("Research station Destroyed")
+	   
+	   local aiBrain = self:GetAIBrain()
+	   local buildRestrictionVictims = aiBrain:GetListOfUnits(categories.FACTORY+categories.ENGINEER, false)
+	   
+	   for id, unit in buildRestrictionVictims do
+	      unit:updateBuildRestrictions()
+	   end
+
+	   
+	end
+	
+	StructureUnit.OnDestroy(self)
+     end,
+
     
     OnPaused = function(self)
         #When factory is paused take some action
@@ -464,8 +513,19 @@ FactoryUnit = Class(StructureUnit) {
             self:CreateBlinkingLights('Red')
             self.BlinkingLightsState = 'Red'
         end
-        StructureUnit.OnStopBeingBuilt(self,builder,layer)
-    end,
+	
+	-- If we're a research station, update build restrictions for all factories
+	if EntityCategoryContains(categories.RESEARCH, self) then
+	   LOG("Research station OnStopBeingBuilt")
+	   
+	   local buildRestrictionVictims = aiBrain:GetListOfUnits(categories.FACTORY + categories.ENGINEER, false)
+	   for id, unit in buildRestrictionVictims do
+	      unit:updateBuildRestrictions()
+	   end
+	end
+     
+	StructureUnit.OnStopBeingBuilt(self,builder,layer)
+     end,
 
     ChangeBlinkingLights = function(self, state)
         local bls = self.BlinkingLightsState
@@ -1229,6 +1289,20 @@ QuantumGateUnit = Class(FactoryUnit) {
 ##  MOBILE UNITS
 #################################################################
 MobileUnit = Class(Unit) {
+
+    -- Added for engymod. After creating an enhancement, units must re-check their build restrictions
+    CreateEnhancement = function(self, enh) 
+	LOG("CreateEnhancement in defaultunits called")
+	Unit.CreateEnhancement(self, enh)
+
+	self:updateBuildRestrictions()
+     end,
+
+    -- Added for engymod. When created, units must re-check their build restrictions
+    OnCreate = function(self)
+        MobileUnit.OnCreate(self)
+        self:updateBuildRestrictions()
+    end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
         #Add unit's threat to our influence map

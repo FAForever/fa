@@ -59,6 +59,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
+	'RESEARCH',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -70,7 +71,7 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC urb0302_desc>Air Factory',
+    Description = '<LOC urb0302_desc>Air Factory HQ',
     Display = {
         AnimationBuild = '/units/urb0302/urb0302_abuild.sca',
         AnimationFinishBuildLand = '/units/urb0302/urb0302_aplatform.sca',
@@ -133,10 +134,14 @@ UnitBlueprint {
         UniformScale = 0.09,
     },
     Economy = {
-        BuildCostEnergy = 72000,
-        BuildCostMass = 2750,
-        BuildRate = 60,
-        BuildTime = 8400,
+        BuildCostEnergy = 99191,
+        BuildCostMass = 4090,
+        BuildRate = 120,
+        BuildTime = 10400,
+	DifferentialUpgradeCostCalculation = true, 
+        RebuildBonusIds = {
+            'urb0302',
+        },
         BuildableCategory = {
             'BUILTBYTIER3FACTORY CYBRAN MOBILE CONSTRUCTION',
             'BUILTBYTIER3FACTORY CYBRAN STRUCTURE AIR',
@@ -185,12 +190,13 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Secret',
         UnitWeight = 1,
         UpgradesFrom = 'urb0202',
+        UpgradesFromBase = 'urb0102',
     },
     Intel = {
         VisionRadius = 20,
     },
     Interface = {
-        HelpText = '<LOC urb0302_help>Air Factory',
+        HelpText = '<LOC urb0302_help>Air Factory HQ',
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 2,
@@ -362,7 +368,7 @@ UnitBlueprint {
     SizeX = 3.5,
     SizeY = 0.75,
     SizeZ = 3.5,
-    StrategicIconName = 'icon_factory3_air',
+    StrategicIconName = 'icon_factoryhq3_air',
     StrategicIconSortPriority = 210,
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',

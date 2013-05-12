@@ -326,7 +326,6 @@ UEL0001 = Class(TWalkingLandUnit) {
     end,
 
     CreateEnhancement = function(self, enh)
-        TWalkingLandUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
         if not bp then return end
         if enh == 'LeftPod' then
@@ -525,6 +524,8 @@ UEL0001 = Class(TWalkingLandUnit) {
             self:RemoveNukeSiloAmmo(amt or 0)
             self:StopSiloBuild()
         end
+
+        TWalkingLandUnit.CreateEnhancement(self, enh)
     end,
     
     OnPaused = function(self)
