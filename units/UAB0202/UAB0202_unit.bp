@@ -50,6 +50,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
+	'RESEARCH',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -126,10 +127,14 @@ UnitBlueprint {
         UniformScale = 0.35,
     },
     Economy = {
-        BuildCostEnergy = 11700,
-        BuildCostMass = 630,
+        BuildCostEnergy = 14100,
+        BuildCostMass = 840,
         BuildRate = 40,
         BuildTime = 1800,
+	DifferentialUpgradeCostCalculation = true,
+	RebuildBonusIds = {
+		'uab0202',
+        },
         BuildableCategory = {
             'BUILTBYTIER2FACTORY AEON MOBILE CONSTRUCTION',
             'BUILTBYTIER2FACTORY AEON STRUCTURE AIR',
@@ -173,6 +178,7 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Advanced',
         UnitWeight = 1,
         UpgradesFrom = 'uab0102',
+        UpgradesFromBase = 'uab0102',
         UpgradesTo = 'uab0302',
     },
     Intel = {
@@ -354,7 +360,7 @@ UnitBlueprint {
     SizeX = 4,
     SizeY = 0.7,
     SizeZ = 4,
-    StrategicIconName = 'icon_factory2_air',
+    StrategicIconName = 'icon_factoryhq2_air',
     StrategicIconSortPriority = 215,
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',

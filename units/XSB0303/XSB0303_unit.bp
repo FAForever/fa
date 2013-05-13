@@ -31,7 +31,7 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    BuildIconSortPriority = 40,
+    BuildIconSortPriority = 60,
     Categories = {
         'PRODUCTFA',
         'SELECTABLE',
@@ -50,6 +50,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
+	'RESEARCH',
     },
     CollisionOffsetY = -1,
     Defense = {
@@ -135,10 +136,14 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 23400,
-        BuildCostMass = 5150,
-        BuildRate = 60,
-        BuildTime = 7200,
+        BuildCostEnergy = 32572,
+        BuildCostMass = 7120,
+        BuildRate = 120,
+        BuildTime = 9200,
+	DifferentialUpgradeCostCalculation = true, 
+        RebuildBonusIds = {
+            'xsb0303',
+        },
         BuildableCategory = {
             'BUILTBYTIER3FACTORY SERAPHIM MOBILE CONSTRUCTION',
             'BUILTBYTIER3FACTORY SERAPHIM STRUCTURE NAVAL',
@@ -184,6 +189,7 @@ UnitBlueprint {
         UnitName = '<LOC xsb0303_name>Uosiya',
         UnitWeight = 1,
         UpgradesFrom = 'xsb0203',
+        UpgradesFromBase = 'xsb0103',
     },
     Intel = {
         VisionRadius = 20,
@@ -239,7 +245,7 @@ UnitBlueprint {
     SizeX = 4,
     SizeY = 3, #from 2, for beam weapons
     SizeZ = 10,
-    StrategicIconName = 'icon_factory3_naval',
+    StrategicIconName = 'icon_factoryhq3_naval',
     StrategicIconSortPriority = 210,
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',

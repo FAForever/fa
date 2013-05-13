@@ -38,7 +38,7 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    BuildIconSortPriority = 40,
+    BuildIconSortPriority = 70,
     Categories = {
         'PRODUCTSC1',
         'SELECTABLE',
@@ -57,6 +57,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
+	'RESEARCH',
     },
     CollisionOffsetX = 0,
     CollisionOffsetY = -1,
@@ -71,7 +72,7 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC urb0203_desc>Naval Factory',
+    Description = '<LOC urb0203_desc>Naval Factory HQ',
     Display = {
         Abilities = {
             '<LOC ability_upgradable>Upgradeable',
@@ -131,10 +132,14 @@ UnitBlueprint {
         UniformScale = 0.1,
     },
     Economy = {
-        BuildCostEnergy = 5400,
-        BuildCostMass = 1170,
+        BuildCostEnergy = 6900,
+        BuildCostMass = 1470,
         BuildRate = 40,
         BuildTime = 1800,
+	DifferentialUpgradeCostCalculation = true, 
+        RebuildBonusIds = {
+            'urb0203',
+        },
         BuildableCategory = {
             'BUILTBYTIER2FACTORY CYBRAN MOBILE CONSTRUCTION',
             'BUILTBYTIER2FACTORY CYBRAN STRUCTURE NAVAL',
@@ -179,13 +184,14 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Advanced',
         UnitWeight = 1,
         UpgradesFrom = 'urb0103',
+        UpgradesFromBase = 'urb0103',
         UpgradesTo = 'urb0303',
     },
     Intel = {
         VisionRadius = 20,
     },
     Interface = {
-        HelpText = '<LOC urb0203_help>Naval Factory',
+        HelpText = '<LOC urb0203_help>Naval Factory HQ',
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 6,
@@ -231,7 +237,7 @@ UnitBlueprint {
     SizeX = 4,
     SizeY = 3, #from 2, for beam weapons
     SizeZ = 10,
-    StrategicIconName = 'icon_factory2_naval',
+    StrategicIconName = 'icon_factoryhq2_naval',
     StrategicIconSortPriority = 215,
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',

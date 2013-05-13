@@ -58,6 +58,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
+	'RESEARCH',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -69,7 +70,7 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC urb0202_desc>Air Factory',
+    Description = '<LOC urb0202_desc>Air Factory HQ',
     Display = {
         Abilities = {
             '<LOC ability_upgradable>Upgradeable',
@@ -136,10 +137,14 @@ UnitBlueprint {
         UniformScale = 0.09,
     },
     Economy = {
-        BuildCostEnergy = 11700,
-        BuildCostMass = 630,
+        BuildCostEnergy = 14100,
+        BuildCostMass = 840,
         BuildRate = 40,
         BuildTime = 1800,
+	DifferentialUpgradeCostCalculation = true, 
+        RebuildBonusIds = {
+            'urb0202',
+        },
         BuildableCategory = {
             'BUILTBYTIER2FACTORY CYBRAN MOBILE CONSTRUCTION',
             'BUILTBYTIER2FACTORY CYBRAN STRUCTURE AIR',
@@ -186,13 +191,14 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Advanced',
         UnitWeight = 1,
         UpgradesFrom = 'urb0102',
+        UpgradesFromBase = 'urb0102',
         UpgradesTo = 'urb0302',
     },
     Intel = {
         VisionRadius = 20,
     },
     Interface = {
-        HelpText = '<LOC urb0202_help>Air Factory',
+        HelpText = '<LOC urb0202_help>Air Factory HQ',
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 2,
@@ -364,7 +370,7 @@ UnitBlueprint {
     SizeX = 3.5,
     SizeY = 0.75,
     SizeZ = 3.5,
-    StrategicIconName = 'icon_factory2_air',
+    StrategicIconName = 'icon_factoryhq2_air',
     StrategicIconSortPriority = 215,
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',

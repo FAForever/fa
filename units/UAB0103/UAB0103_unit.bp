@@ -132,8 +132,6 @@ UnitBlueprint {
         InitialRallyZ = 10,
         RebuildBonusIds = {
             'uab0103',
-            'uab0203',
-            'uab0303',
         },
         StorageEnergy = 0,
         StorageMass = 80,
@@ -170,6 +168,7 @@ UnitBlueprint {
         SelectionPriority = 5,
         TechLevel = 'RULEUTL_Basic',
         UnitWeight = 1,
+        UpgradesFromBase = 'uab0103',
         UpgradesTo = 'uab0203',
     },
     Intel = {

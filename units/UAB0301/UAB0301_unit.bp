@@ -39,7 +39,7 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    BuildIconSortPriority = 60,
+    BuildIconSortPriority = 40,
     Categories = {
         'PRODUCTSC1',
         'SELECTABLE',
@@ -58,6 +58,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
+	'RESEARCH',
     },
     CollisionOffsetY = 0,
     Defense = {
@@ -143,10 +144,14 @@ UnitBlueprint {
         UniformScale = 0.275,
     },
     Economy = {
-        BuildCostEnergy = 28350,
-        BuildCostMass = 3150,
-        BuildRate = 60,
-        BuildTime = 8400,
+        BuildCostEnergy = 39900,
+        BuildCostMass = 4440,
+        BuildRate = 90,
+        BuildTime = 9400,
+	DifferentialUpgradeCostCalculation = true,
+	RebuildBonusIds = {
+            'uab0301',
+        },
         BuildableCategory = {
             'BUILTBYTIER3FACTORY AEON MOBILE CONSTRUCTION',
             'BUILTBYTIER3FACTORY AEON STRUCTURE LAND',
@@ -190,6 +195,7 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Secret',
         UnitWeight = 1,
         UpgradesFrom = 'uab0201',
+        UpgradesFromBase = 'uab0101',
     },
     Intel = {
         VisionRadius = 20,
@@ -326,7 +332,7 @@ UnitBlueprint {
     SizeX = 3.6,
     SizeY = 1,
     SizeZ = 3.6,
-    StrategicIconName = 'icon_factory3_land',
+    StrategicIconName = 'icon_factoryhq3_land',
     StrategicIconSortPriority = 210,
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',

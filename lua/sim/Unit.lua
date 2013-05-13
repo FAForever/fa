@@ -84,6 +84,10 @@ Unit = Class(moho.unit_methods) {
         return Sync.UnitData[self:GetEntityId()]
     end,
 
+    # The original builder of this unit. Is set by OnStartBeingBuilt so we can refer to it later
+    # Used for calculating differential upgrade costs (Added by Rienzilla)
+    originalBuilder = nil,
+
     ##########################################################################################
     ## INITIALIZATION
     ##########################################################################################
@@ -551,6 +555,177 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    -- Engymod helper function: updates build restrictions of the passed unit.
+    -- Added by Rien
+    updateBuildRestrictions = function(self)
+	--LOG("updateBuildRestrictions called")
+
+	local faction = nil
+	local type = nil
+	local techlevel = nil
+
+	if EntityCategoryContains(categories.AEON, self) then
+	   faction = categories.AEON
+	elseif EntityCategoryContains(categories.UEF, self) then
+	   faction = categories.UEF
+	elseif EntityCategoryContains(categories.CYBRAN, self) then
+	   faction = categories.CYBRAN
+	elseif EntityCategoryContains(categories.SERAPHIM, self) then
+	   faction = categories.SERAPHIM
+	end
+
+	if EntityCategoryContains(categories.LAND, self) then
+	   type = categories.LAND
+	elseif EntityCategoryContains(categories.AIR, self) then
+	   type = categories.AIR
+	elseif EntityCategoryContains(categories.NAVAL, self) then
+	   type = categories.NAVAL
+	end
+
+	if EntityCategoryContains(categories.TECH1, self) then
+	   techlevel = categories.TECH1
+	elseif EntityCategoryContains(categories.TECH2, self) then
+	   techlevel = categories.TECH2
+	elseif EntityCategoryContains(categories.TECH3, self) then
+	   techlevel = categories.TECH3
+	end
+
+	local aiBrain = self:GetAIBrain()
+	local supportfactory = false
+
+	-- Sanity check. 
+	if not faction then 
+	   --LOG("updateBuildRestrictions: Faction unset")
+	   return 
+	end
+
+	-- Phase one: add build restrictions
+	if EntityCategoryContains(categories.FACTORY, self) then
+	   if EntityCategoryContains(categories.SUPPORTFACTORY, self) then
+	      -- Add support factory cannot build higher tech units at all, until there is a HQ factory
+	      --LOG("Adding build restrictions for tech2mobile tech3mobile tech3factory")
+	      self:AddBuildRestriction(categories.TECH2 * categories.MOBILE)
+	      self:AddBuildRestriction(categories.TECH3 * categories.MOBILE)
+	      self:AddBuildRestriction(categories.TECH3 * categories.FACTORY)
+	      supportfactory = true
+	   else
+	      -- A normal factory cannot build a support factory until there is a HQ factory
+	      --LOG("Adding build restrictions for supportfactory for factory")
+	      self:AddBuildRestriction(categories.SUPPORTFACTORY)
+	      supportfactory = false
+	   end
+	elseif EntityCategoryContains(categories.ENGINEER, self) then
+	   -- Engineers also cannot build a support factory until there is a HQ factory
+	   --LOG("Adding build restrictions for supportfactory for engineer")
+	   self:AddBuildRestriction(categories.SUPPORTFACTORY)
+	else
+	   --LOG("Cowardly doing nothing")
+	end
+	
+	if supportfactory then 
+	   if not type then 
+	      --LOG("updateBuildRestrictions: Type unset")
+	      return 
+	   end
+	   
+	   -- Gather statistics about the amount of research stations we have 
+	   for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH2 * faction, false, true) do
+	      if not unit:IsDead() and not unit:IsBeingBuilt() then
+		 --LOG("Removing restriction tech2construction")
+		 self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE * categories.CONSTRUCTION)
+	      end
+	   end
+	   
+	   for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH3 * faction, false, true) do
+	      if not unit:IsDead() and not unit:IsBeingBuilt() then
+		 --LOG("Removing restriction tech2construction and tech3construction")
+		 self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE * categories.CONSTRUCTION)
+		 self:RemoveBuildRestriction(categories.TECH3 * categories.MOBILE * categories.CONSTRUCTION)
+		 break
+	      end
+	   end
+	   
+	   for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH2 * faction * type, false, true) do
+	      if not unit:IsDead() and not unit:IsBeingBuilt() then
+		 --LOG("Removing restriction tech2mobile")
+		 self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE)
+		 break
+	      end
+	   end
+	   
+	   for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH3 * faction * type, false, true) do
+	      if not unit:IsDead() and not unit:IsBeingBuilt() then
+		 --LOG("Removing restriction tech2 and tech 3 mobile tech 3 support factory")
+		 self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE)
+		 self:RemoveBuildRestriction(categories.TECH3 * categories.MOBILE)
+		 self:RemoveBuildRestriction(categories.TECH3 * categories.FACTORY * categories.SUPPORTFACTORY)
+		 break
+	      end
+	   end
+
+	else
+	   for i,researchType in ipairs({categories.LAND, categories.AIR, categories.NAVAL}) do
+
+	      -- If there is a (tech 2 of tech 3) research station of this faction and type, enable building of tech 2 supportfactories
+	      for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH2 * faction * researchType, false, true) do
+		 if not unit:IsDead() and not unit:IsBeingBuilt() then
+
+		    -- Special case for the commander, since its engineering upgrades are implemented using build restrictions
+		    -- My preferred implementation would be: Check if the unit currently can build any t2 units, and if so, also unlock the t2 support factory, like this:
+		    --
+		    -- buildableCategories = /get the units current buildablecats. .... With GetUnitCommandData??/
+		    -- local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
+		    -- if table.getn(EntityCategoryFilterDown(categories.TECH2, buildableUnits)) > 0 then
+		    --     LOG("Removing restriction tech2 support factory for commander")
+		    --     self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
+		    --  end
+		    --
+		    -- This would be a generic solution that works for all units, but since I don't know where I can get the list of 
+		    -- currently buildablecategories (the blueprint listing is incorrect) I have to make special case for the commander 
+		    -- and rely on the enhancement names :(
+		    -- Rien
+
+		    if EntityCategoryContains(categories.COMMAND, self) then
+		       if self:HasEnhancement('AdvancedEngineering') or self:HasEnhancement('T3Engineering') then
+			  --LOG("Removing restriction tech2 support factory for commander")
+			  self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
+		       end
+		    else
+		       --LOG("Removing restriction tech2 support factory for non-supfacs")
+		       self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
+		    end
+
+		    break
+		 end
+	      end
+	      
+	      for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH3 * faction * researchType, false, true) do
+		 if not unit:IsDead() and not unit:IsBeingBuilt() then
+
+		    -- Special case for the commander, since its engineering upgrades are implemented using build restrictions
+		    if EntityCategoryContains(categories.COMMAND, self) then
+		       if self:HasEnhancement('AdvancedEngineering') then
+			  --LOG("Removing restriction tech2 support factory for commander")
+			  self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
+
+		       elseif self:HasEnhancement('T3Engineering') then
+			  --LOG("Removing restriction tech2 and tech3 support factory for commander")
+			  self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
+			  self:RemoveBuildRestriction(categories.TECH3 * categories.SUPPORTFACTORY * faction * researchType)
+		       end
+		    else
+		       --LOG("Removing restriction tech2 and t3 support factory for non-supfacs")
+		       self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
+		       self:RemoveBuildRestriction(categories.TECH3 * categories.SUPPORTFACTORY * faction * researchType)
+		    end
+
+		    break
+		 end
+	      end
+	   end
+	end
+     end,
+
     ##########################################################################################
     ## TOGGLES
     ##########################################################################################
@@ -964,44 +1139,67 @@ Unit = Class(moho.unit_methods) {
             local time = 1
             local mass = 0
             local energy = 0
-            if self.WorkItem then
-                time, energy, mass = Game.GetConstructEconomyModel(self, self.WorkItem)
-				if self:IsUnitState('Enhancing') or self:IsUnitState('Upgrading') then
-					local guards = self:GetGuards()
-					## We need to check all the unit assisting.
-					for k,v in guards do
-						if not v:IsDead() then
-							v:UpdateConsumptionValues()
-						end
-					end
-					
-					## and if there is any unit repairing ...
-					local workers = self:GetAIBrain():GetUnitsAroundPoint(( categories.REPAIR), self:GetPosition(), 50, 'Ally' )
-					for k,v in workers do
-						if not v:IsDead() and v:IsUnitState('Repairing')  then
-							v:UpdateConsumptionValues()
-						end
-					end				
-				end
-
-				
-				
+            
+	    if self.WorkItem then
+	       time, energy, mass = Game.GetConstructEconomyModel(self, self.WorkItem)
+	       
+	       if self:IsUnitState('Enhancing') or self:IsUnitState('Upgrading') then
+		  local guards = self:GetGuards()
+		  ## We need to check all the unit assisting.
+		  for k,v in guards do
+		     if not v:IsDead() then
+			v:UpdateConsumptionValues()
+		     end
+		  end
+		  
+		  ## and if there is any unit repairing ...
+		  local workers = self:GetAIBrain():GetUnitsAroundPoint(( categories.REPAIR), self:GetPosition(), 50, 'Ally' )
+		  for k,v in workers do
+		     if not v:IsDead() and v:IsUnitState('Repairing')  then
+			v:UpdateConsumptionValues()
+		     end
+		  end				
+	       end
+	       
             elseif focus and focus:IsUnitState('SiloBuildingAmmo') then
-                # If building silo ammo; create the energy and mass costs based on build rate of the silo
-                #     against the build rate of the assisting unit
-                time, energy, mass = focus:GetBuildCosts(focus.SiloProjectile)
-                
-                local siloBuildRate = focus:GetBuildRate() or 1
-                energy = (energy / siloBuildRate) * (self:GetBuildRate() or 1)
-                mass = (mass / siloBuildRate) * (self:GetBuildRate() or 1)
+	       # If building silo ammo; create the energy and mass costs based on build rate of the silo
+	       #     against the build rate of the assisting unit
+	       time, energy, mass = focus:GetBuildCosts(focus.SiloProjectile)
+	       
+	       local siloBuildRate = focus:GetBuildRate() or 1
+	       energy = (energy / siloBuildRate) * (self:GetBuildRate() or 1)
+	       mass = (mass / siloBuildRate) * (self:GetBuildRate() or 1)
+	       
             elseif focus then
-				if focus.WorkItem and focus:IsUnitState('Enhancing') or focus:IsUnitState('Upgrading') then
-					# If the unit is assisting an enhancement, we must know how much it costs.
-					time, energy, mass = Game.GetConstructEconomyModel(self, focus.WorkItem)	
-				else
-					# bonuses are already factored in by GetBuildCosts
-					time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
-				end
+
+	       #
+	       # Modified to allow for differential upgrade cost calculation (Added by Rienzilla)
+	       #
+	       if focus:IsUnitState('Enhancing') or focus:IsUnitState('Upgrading') then
+		  # If the unit is assisting an enhancement, we must know how much it costs.
+		  --LOG("Focusunit is upgrading")
+		  time, energy, mass = Game.GetConstructEconomyModel(self, focus.WorkItem)
+
+	       else
+		  --LOG("Focus Unit is not upgrading")
+		  
+		  if self:IsUnitState('Upgrading') then
+		     --LOG("Self is upgrading")
+		     # If we are upgrading ourselves, add our own economy blueprint to the upgrade cost calculation 
+		     # GetConstructEconomyModel can use this to substract the cost of the unit that is upgrading from the cost of the unit that it is upgrading to
+		     time, energy, mass = Game.GetConstructEconomyModel(self, focus:GetBlueprint().Economy, self:GetBlueprint().Economy)
+
+		  else
+		     # Check if the builder of our focusUnit is upgrading. If it is, we are assisting an upgrade.
+		     if focus.originalBuilder and not focus.originalBuilder:IsDead() and focus.originalBuilder:IsUnitState('Upgrading') then
+			--LOG("Focusunit is an upgrade")
+			time, energy, mass = Game.GetConstructEconomyModel(self, focus:GetBlueprint().Economy, focus.originalBuilder:GetBlueprint().Economy)
+		     else
+			--LOG("Focusunit is not an upgrade")
+			time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
+		     end
+		  end
+	       end
             end
             energy = energy * (self.EnergyBuildAdjMod or 1)
             if energy < 1 then
@@ -1871,7 +2069,11 @@ Unit = Class(moho.unit_methods) {
                 end
             end
         end
-		 # this section is rebuild bonus check 1 [159]
+
+	-- Added by Rienzilla. Remember who originally started building us
+	self.originalBuilder = builder
+	
+	# this section is rebuild bonus check 1 [159]
         # GPG if you read this I can explain what this does. So if you need me to, contact me (Brute51).
         local builderUpgradesTo = builder:GetBlueprint().General.UpgradesTo or false
         if not builderUpgradesTo or self:GetUnitId() != builderUpgradesTo then    # avoid upgrades

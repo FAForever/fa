@@ -38,7 +38,7 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    BuildIconSortPriority = 40,
+    BuildIconSortPriority = 60,
     Categories = {
         'PRODUCTSC1',
         'SELECTABLE',
@@ -57,6 +57,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
+	'RESEARCH',
     },
     CollisionOffsetX = 0,
     CollisionOffsetY = -1,
@@ -71,7 +72,7 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC urb0303_desc>Naval Factory',
+    Description = '<LOC urb0303_desc>Naval Factory HQ',
     Display = {
         BlinkingLights = {
             {
@@ -133,10 +134,14 @@ UnitBlueprint {
         UniformScale = 0.1,
     },
     Economy = {
-        BuildCostEnergy = 23400,
-        BuildCostMass = 5150,
-        BuildRate = 60,
-        BuildTime = 7200,
+        BuildCostEnergy = 32572,
+        BuildCostMass = 7120,
+        BuildRate = 120,
+        BuildTime = 9200,
+	DifferentialUpgradeCostCalculation = true, 
+        RebuildBonusIds = {
+            'urb0303',
+        },
         BuildableCategory = {
             'BUILTBYTIER3FACTORY CYBRAN MOBILE CONSTRUCTION',
             'BUILTBYTIER3FACTORY CYBRAN STRUCTURE NAVAL',
@@ -181,12 +186,13 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Secret',
         UnitWeight = 1,
         UpgradesFrom = 'urb0203',
+        UpgradesFromBase = 'urb0103',
     },
     Intel = {
         VisionRadius = 20,
     },
     Interface = {
-        HelpText = '<LOC urb0303_help>Naval Factory',
+        HelpText = '<LOC urb0303_help>Naval Factory HQ',
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 6,
@@ -233,7 +239,7 @@ UnitBlueprint {
     SizeX = 4,
     SizeY = 3, #from 2, for beam weapons
     SizeZ = 10,
-    StrategicIconName = 'icon_factory3_naval',
+    StrategicIconName = 'icon_factoryhq3_naval',
     StrategicIconSortPriority = 210,
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',

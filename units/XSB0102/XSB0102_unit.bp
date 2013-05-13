@@ -64,8 +64,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 3,
-        Health = 4600,
-        MaxHealth = 4600,
+        Health = 3900,
+        MaxHealth = 3900,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -181,8 +181,6 @@ UnitBlueprint {
         },
         RebuildBonusIds = {
             'xsb0102',
-            'xsb0202',
-            'xsb0302',
         },
         StorageEnergy = 0,
         StorageMass = 80,
@@ -221,6 +219,7 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Basic',
         UnitName = '<LOC xsb0102_name>Ia-iya',
         UnitWeight = 1,
+        UpgradesFromBase = 'xsb0102',
         UpgradesTo = 'xsb0202',
     },
     Intel = {

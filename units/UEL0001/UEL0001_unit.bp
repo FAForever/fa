@@ -313,7 +313,7 @@ UnitBlueprint {
             BuildableCategoryAdds = 'BUILTBYTIER2COMMANDER UEF',
             Icon = 'aes',
             Name = '<LOC enhancements_0037>Tech 2 Engineering Suite',
-            NewBuildRate = 30,
+            NewBuildRate = 42,
             NewHealth = 3000,
             NewRegenRate = 20,
             ShowBones = {
@@ -349,7 +349,7 @@ UnitBlueprint {
         DamageStablization = {
             BuildCostEnergy = 225000,
             BuildCostMass = 3000,
-            BuildTime = 2000,
+            BuildTime = 2800,
             Icon = 'dsu',
             Name = '<LOC enhancements_0039>Nano-Repair System',
             NewRegenRate = 200,
@@ -457,7 +457,7 @@ UnitBlueprint {
         ResourceAllocation = {
             BuildCostEnergy = 150000,
             BuildCostMass = 5000,
-            BuildTime = 1000,
+            BuildTime = 1400,
             Icon = 'isb',
             Name = '<LOC enhancements_0045>Resource Allocation System',
             ProductionPerSecondEnergy = 3300,
@@ -527,7 +527,7 @@ UnitBlueprint {
         Shield = {
             BuildCostEnergy = 112500,
             BuildCostMass = 1500,
-            BuildTime = 1500,
+            BuildTime = 2100,
             Icon = 'psg',
             ImpactEffects = 'UEFShieldHit01',
             MaintenanceConsumptionPerSecondEnergy = 250,
@@ -556,7 +556,7 @@ UnitBlueprint {
         ShieldGeneratorField = {
             BuildCostEnergy = 450000,
             BuildCostMass = 3000,
-            BuildTime = 2000,
+            BuildTime = 2800,
             Icon = 'sgf',
             ImpactEffects = 'UEFShieldHit01',
             ImpactMesh = '/effects/entities/ShieldSection01/ShieldSection01_mesh',
@@ -634,11 +634,11 @@ UnitBlueprint {
         T3Engineering = {
             BuildCostEnergy = 50000,
             BuildCostMass = 2400,
-            BuildTime = 6000,
+            BuildTime = 8400,
             BuildableCategoryAdds = 'BUILTBYTIER3COMMANDER UEF',
             Icon = 'ees',
             Name = '<LOC enhancements_0053>Tech 3 Engineering Suite',
-            NewBuildRate = 90,
+            NewBuildRate = 126,
             NewHealth = 6000,
             NewRegenRate = 35, # fixes lower regen rate with t3 suite. this is t2 regen + t3 regen [130]
             Prerequisite = 'AdvancedEngineering',
@@ -673,7 +673,7 @@ UnitBlueprint {
         TacticalMissile = {
             BuildCostEnergy = 50000,
             BuildCostMass = 1000,
-            BuildTime = 1000,
+            BuildTime = 1400,
             Icon = 'tm',
             Name = '<LOC enhancements_0055>Tactical Missile Launcher',
             ShowBones = {
@@ -706,7 +706,7 @@ UnitBlueprint {
         TacticalNukeMissile = {
             BuildCostEnergy = 315000,
             BuildCostMass = 5400,
-            BuildTime = 4000,
+            BuildTime = 5600,
             Icon = 'srtn',
             Name = '<LOC enhancements_0057>The \'Billy\': Advanced Tactical Missile Launcher',
             Prerequisite = 'TacticalMissile',
@@ -741,7 +741,7 @@ UnitBlueprint {
         Teleporter = {
             BuildCostEnergy = 1500000,
             BuildCostMass = 15000,
-            BuildTime = 3000,
+            BuildTime = 4200,
             Icon = 'pqt',
             MaintenanceConsumptionPerSecondEnergy = 10000,
             Name = '<LOC enhancements_0059>Personal Teleporter',

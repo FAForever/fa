@@ -65,8 +65,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 3,
-        Health = 4800,
-        MaxHealth = 4800,
+        Health = 4100,
+        MaxHealth = 4100,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -141,8 +141,6 @@ UnitBlueprint {
         },
         RebuildBonusIds = {
             'ueb0102',
-            'ueb0202',
-            'ueb0302',
         },
         StorageEnergy = 0,
         StorageMass = 80,
@@ -181,6 +179,7 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Basic',
         UnitWeight = 1,
         UpgradesTo = 'ueb0202',
+        UpgradesFromBase = 'ueb0102',
     },
     Intel = {
         VisionRadius = 20,
