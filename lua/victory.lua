@@ -87,9 +87,6 @@ function CheckVictory(scenarioInfo)
 end
 
 function CallEndGame(callEndGame, submitXMLStats)
-    if submitXMLStats then
-        SubmitXMLArmyStats()
-    end
     if callEndGame then
         gameOver = true
         ForkThread(function()
