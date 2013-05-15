@@ -57,6 +57,7 @@ UnitBlueprint {
         'DIRECTFIRE',
         'REPAIR',
         'RECLAIM',
+        'PATROLHELPER',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'BOT',
