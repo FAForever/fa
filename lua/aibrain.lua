@@ -436,7 +436,7 @@ function UpdateReclaimStat()
         for index, brain in ArmyBrains do
             
             local reclaimedMass     = brain:GetArmyStat("Economy_Reclaimed_Mass", 0.0).Value
-            local oldReclaimedMass  = brain:GetArmyStat("Economy_old_Reclaimed_Mass", 0.0).Value           
+            local oldReclaimedMass  = brain:GetArmyStat("Economy_old_Reclaimed_Mass", 0.0).Value
             brain:SetArmyStat("Economy_income_reclaimed_Mass", reclaimedMass - oldReclaimedMass)
             brain:SetArmyStat("Economy_old_Reclaimed_Mass", reclaimedMass)
 
@@ -446,7 +446,7 @@ function UpdateReclaimStat()
             brain:SetArmyStat("Economy_old_Reclaimed_Energy", reclaimedEnergy)            
 
         end
-       WaitSeconds(1)  -- update the stat every second
+       WaitSeconds(.1)  -- update the stat every tick
     end
 end
 
