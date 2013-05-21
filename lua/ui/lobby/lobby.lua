@@ -720,6 +720,9 @@ function SetSlotInfo(slot, playerInfo)
         Prefs.SetToCurrentProfile('LastFaction', playerInfo.Faction)
     end
 
+	--//XinnonyWork
+	ChangeBackgroundLobby(slot, Prefs.GetFromCurrentProfile('LastFaction'))
+	--\\XinnonyWork
     --// Show the Country Flag in slot - Xinnony
     SetSlotCountryFlag(slot, playerInfo)
     --\\ Stop - Show the Country Flag in slot
@@ -2375,45 +2378,51 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtRightIn(Credits_Text, GUI.panel, 100)
     --\\ Stop Credits
 
-    GUI.playerPanel = Group(GUI.panel, "playerPanel")
+	-- FOR SEE THE GROUP POSITION, LOOK THIS SCREENSHOOT : http://img402.imageshack.us/img402/8826/falobbygroup.png - Xinnony
+    GUI.playerPanel = Group(GUI.panel, "playerPanel") -- RED Square in Screenshoot
     LayoutHelpers.AtLeftTopIn(GUI.playerPanel, GUI.panel, 40, 66)
     GUI.playerPanel.Width:Set(706)
     GUI.playerPanel.Height:Set(307)
 
-    GUI.buttonPanelTop = Group(GUI.panel, "buttonPanelTop") -- Added group for Button - Xinnony
+    GUI.buttonPanelTop = Group(GUI.panel, "buttonPanelTop") -- GREEN Square in Screenshoot - Added group for Button - Xinnony
     LayoutHelpers.AtLeftTopIn(GUI.buttonPanelTop, GUI.panel, 40, 383)
     GUI.buttonPanelTop.Width:Set(706)
     GUI.buttonPanelTop.Height:Set(19)
 
-    GUI.buttonPanelRight = Group(GUI.panel, "buttonPanelRight") -- Added group for Button - Xinnony
+    GUI.buttonPanelRight = Group(GUI.panel, "buttonPanelRight") -- PURPLE Square in Screenshoot - Added group for Button - Xinnony
     LayoutHelpers.AtLeftTopIn(GUI.buttonPanelRight, GUI.panel, 481, 401)
     GUI.buttonPanelRight.Width:Set(265)
     GUI.buttonPanelRight.Height:Set(89)
 
-    GUI.observerPanel = Group(GUI.panel, "observerPanel")
+    GUI.observerPanel = Group(GUI.panel, "observerPanel") -- PINK Square in Screenshoot
     LayoutHelpers.AtLeftTopIn(GUI.observerPanel, GUI.panel, 40, 378)
     GUI.observerPanel.Width:Set(706)
     GUI.observerPanel.Height:Set(114)
 
-    GUI.chatPanel = Group(GUI.panel, "chatPanel")
+    GUI.chatPanel = Group(GUI.panel, "chatPanel") -- BLUE Square in Screenshoot
     LayoutHelpers.AtLeftTopIn(GUI.chatPanel, GUI.panel, 40, 521)
     GUI.chatPanel.Width:Set(705)
     GUI.chatPanel.Height:Set(150)
 
-    GUI.mapPanel = Group(GUI.panel, "mapPanel")
+    GUI.mapPanel = Group(GUI.panel, "mapPanel") -- YELLOW Square in Screenshoot
     LayoutHelpers.AtLeftTopIn(GUI.mapPanel, GUI.panel, 750, 68)
     GUI.mapPanel.Width:Set(238)
     GUI.mapPanel.Height:Set(600)
 
-    GUI.optionsPanel = Group(GUI.panel, "optionsPanel")
+    GUI.optionsPanel = Group(GUI.panel, "optionsPanel") -- ORANGE Square in Screenshoot
     LayoutHelpers.AtLeftTopIn(GUI.optionsPanel, GUI.panel, 746, 600)
     GUI.optionsPanel.Width:Set(238)
     GUI.optionsPanel.Height:Set(260)
 
-    GUI.launchPanel = Group(GUI.panel, "controlGroup")
+    GUI.launchPanel = Group(GUI.panel, "controlGroup") -- BROWN Square in Screenshoot
     LayoutHelpers.AtLeftTopIn(GUI.launchPanel, GUI.panel, 735, 668)
     GUI.launchPanel.Width:Set(238)
     GUI.launchPanel.Height:Set(66)
+	
+	GUI.NEWlaunchPanel = Group(GUI.panel, "NEWlaunchPanel") -- BLACK Square in Screenshoot - Added group for Button - Xinnony
+	LayoutHelpers.AtLeftTopIn(GUI.NEWlaunchPanel, GUI.panel, 40, 667)
+    GUI.NEWlaunchPanel.Width:Set(948)
+    GUI.NEWlaunchPanel.Height:Set(68)
 
     ---------------------------------------------------------------------------
     -- set up map panel
@@ -5121,3 +5130,23 @@ function Country_GetTooltipValue(CountryResult, slot)
 		end
 end
 --\\ Stop COUNTRY
+
+--------------------------------------------------
+-- Change the wallpaper according to the chosen Faction Functions
+-- Author : Xinnony
+--------------------------------------------------
+function ChangeBackgroundLobby(slot, faction)
+	if GUI.background and FindSlotForID(localPlayerID) == slot then
+		if faction == 1 then
+			GUI.background:SetTexture(UIUtil.SkinnableFile("/menus02/background-paint_uef_bmp.dds"))
+		elseif faction == 2 then
+			GUI.background:SetTexture(UIUtil.SkinnableFile("/menus02/background-paint_aion_bmp.dds"))
+		elseif faction == 3 then
+			GUI.background:SetTexture(UIUtil.SkinnableFile("/menus02/background-paint_cybran_bmp.dds"))
+		elseif faction == 4 then
+			GUI.background:SetTexture(UIUtil.SkinnableFile("/menus02/background-paint_seraphim_bmp.dds"))
+		else
+			GUI.background:SetTexture(UIUtil.SkinnableFile("/menus02/background-paint_random_bmp.dds"))
+		end
+	end
+end
