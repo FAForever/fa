@@ -720,9 +720,9 @@ function SetSlotInfo(slot, playerInfo)
         Prefs.SetToCurrentProfile('LastFaction', playerInfo.Faction)
     end
 
-	--//XinnonyWork
+	--// Change the background according to the chosen Faction - Xinnony
 	ChangeBackgroundLobby(slot, Prefs.GetFromCurrentProfile('LastFaction'))
-	--\\XinnonyWork
+	--\\ Stop - Change the background according to the chosen Faction
     --// Show the Country Flag in slot - Xinnony
     SetSlotCountryFlag(slot, playerInfo)
     --\\ Stop - Show the Country Flag in slot
