@@ -287,7 +287,7 @@ UnitBlueprint {
             MuzzleChargeDelay = 0,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 0,
-            MuzzleVelocity = 30,
+            MuzzleVelocity = 45,
             ProjectileId = '/projectiles/ADFQuatumAutoGun01/ADFQuatumAutoGun01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.15,
             ProjectilesPerOnFire = 1,
