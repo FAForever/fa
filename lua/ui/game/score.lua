@@ -116,7 +116,7 @@ function fmtnum(ns)
     elseif (ns < 1000000) then -- 10K to 999K
         return string.format("%01.0fk", ns / 1000)
     else                       -- 1.0M to ....
-        return string.format("%01.1fk", ns / 1000000)
+        return string.format("%01.1fm", ns / 1000000)
     end
 end
 
