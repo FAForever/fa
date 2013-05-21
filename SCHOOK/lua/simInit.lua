@@ -20,7 +20,8 @@ function BeginSession()
     baseBeginSession()
 
     #start the runtime score loop
-    ForkThread(import('/lua/aibrain.lua').CollectCurrentScores)
+    ForkThread(import('/lua/aibrain.lua').UpdateReclaimStat) # this is for adding a reclaim income stat.
+    ForkThread(import('/lua/aibrain.lua').CollectCurrentScores)    
     ForkThread(import('/lua/aibrain.lua').SyncCurrentScores)
 
     #start watching for victory conditions
