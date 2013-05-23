@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Game selection UI
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -1889,10 +1889,10 @@ end
 function HostTryAddPlayer( senderID, slot, requestedPlayerName, human, aiPersonality, requestedColor, requestedFaction,
                            requestedTeam, requestedPL, requestedRC, requestedNG, requestedMEAN, requestedDEV )
     --// COUNTRY - Xinnony
-    --If new player join, send the Country to all player already joined
+    --If new player join, the host send the Country to all player already joined
     if human and not singlePlayer then
         for i, Country in Country_List do
-            lobbyComm:SendData(senderID, { Type = 'Country', PlayerName = Country.PlayerName, Result = Country.Result } )
+            lobbyComm:BroadcastData( { Type = 'Country', PlayerName = Country.PlayerName, Result = Country.Result } )
         end
     end
     --\\ Stop COUNTRY
@@ -2070,7 +2070,7 @@ function HostConvertPlayerToObserver(senderID, name, playerSlot)
         PlayerName = name,
         OwnerID = senderID,
         PL = gameInfo.PlayerOptions[playerSlot].PL,
-        oldColor = gameInfo.PlayerOptions[playerSlot].PlayerColor,
+        oldColor = gameInfo.PlayerOptions[playerSlot].PlayerColor, -- Vicarian
     }
 
     if lobbyComm:IsHost() then
@@ -5092,6 +5092,8 @@ function SetSlotCountryFlag(slot, playerInfo)
                 GUI.slots[slot].KinderCountry:SetTexture(UIUtil.UIFile('/countries/'..CountryResult..'.dds'))
 				Country_GetTooltipValue(CountryResult, slot)
 				Country_AddControlTooltip(GUI.slots[slot].KinderCountry, 0, slot)
+			else
+				LOG('XINNONY - Country is : ELSE (for : ELSE) and the PlayerName is : '..playerInfo.PlayerName)
             end
         end
     end
