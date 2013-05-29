@@ -46,7 +46,7 @@ UnitBlueprint {
 		#'HOVER', #added to reflect hover
         'TECH3',
         'DIRECTFIRE',
-		'INDIRECTFIRE', #New, for range ring
+        'INDIRECTFIRE', #New, for range ring
         'VISIBLETORECON',
         'RECLAIMABLE',
         'BOT',
@@ -65,10 +65,10 @@ UnitBlueprint {
     },
     Description = '<LOC xsl0305_desc>Sniper Bot',
     Display = {
-        Abilities = {
-            '<LOC ability_deploys>Deploys',
+        #Abilities = {
+        #    '<LOC ability_deploys>Deploys',
 			#'<LOC ability_hover>Hover', #added to reflect hover
-        },
+        #},
         AnimationDeath = {
             {
                 Animation = '/units/xsl0305/xsl0305_ADeath.sca',
@@ -223,7 +223,7 @@ UnitBlueprint {
         LandSpeedMultiplier = 1,
         MaxAcceleration = 4,
         MaxBrake = 4,
-        MaxSpeed = 3,
+        MaxSpeed = 4,
         MaxSpeedReverse = 0,
         MaxSteerForce = 10,
         MeshExtentsX = 1,
@@ -303,17 +303,17 @@ UnitBlueprint {
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.15,
             RenderFireClock = true,
-            SlavedToBody = true,
-            SlavedToBodyArcRange = 5,
+            SlavedToBody = false,#from true ; in order to allow better micro
+            #SlavedToBodyArcRange = 5,
             TargetCheckInterval = 3,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'STRUCTURE DEFENSE',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
-                'TECH1 MOBILE',
+                'NAVAL',
                 'SPECIALLOWPRI',
-                'ALLUNITS',
+                'STRUCTURE',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,
@@ -325,12 +325,11 @@ UnitBlueprint {
             TurretPitchRange = 50,
             TurretPitchSpeed = 30,
             TurretYaw = 0,
-            TurretYawRange = 10,
+            TurretYawRange = 180,#from 10 ; in order to allow better micro
             TurretYawSpeed = 90,
             Turreted = true,
             WeaponCategory = 'Direct Fire',
             WeaponRepackTimeout = 0,
-
             # WeaponUnpackLocksMotion = true, --This was causing the unit not to fire until its weapons had been toggled. *shrug*
             WeaponUnpacks = false,
         },
@@ -372,19 +371,20 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RangeCategory = 'UWRC_IndirectFire', #From diect, so the range ring will show
+            RangeCategory = 'UWRC_IndirectFire', #From direct, so the range ring will show
             RateOfFire = 0.05,
             RenderFireClock = true,
-            SlavedToBody = true,
-            SlavedToBodyArcRange = 5,
+            SlavedToBody = false,#from true ; in order to allow better micro
+            #SlavedToBodyArcRange = 5,
             TargetCheckInterval = 3,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'STRUCTURE DEFENSE',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
+                'NAVAL',
                 'SPECIALLOWPRI',
-                'ALLUNITS',
+                'STRUCTURE',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,
@@ -396,12 +396,11 @@ UnitBlueprint {
             TurretPitchRange = 50,
             TurretPitchSpeed = 30,
             TurretYaw = 0,
-            TurretYawRange = 10,
+            TurretYawRange = 180,#from 10 ; in order to allow better micro
             TurretYawSpeed = 90,
             Turreted = true,
             WeaponCategory = 'Direct Fire',
             WeaponRepackTimeout = 0,
-
             # WeaponUnpackLocksMotion = true, --This was causing the unit not to fire until its weapons had been toggled. *shrug*
             WeaponUnpacks = false,
         },

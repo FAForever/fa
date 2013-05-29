@@ -187,7 +187,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_LowArc',
             CollideFriendly = false,
-            Damage = 6,
+            Damage = 10,
             DamageType = 'Normal',
             DisplayName = 'Particle Cannon',
             FireTargetLayerCapsTable = {

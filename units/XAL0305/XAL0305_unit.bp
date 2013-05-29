@@ -1,8 +1,7 @@
 UnitBlueprint {
     AI = {
-
         # GuardScanRadius = 30,
-        NeedUnpack = true,
+        NeedUnpack = false,#from true
     },
     Audio = {
         AmbientMove = Sound {
@@ -60,7 +59,7 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 450,
+        Health = 550,
         MaxHealth = 550,
         RegenRate = 0,
         SubThreatLevel = 0,
@@ -68,9 +67,9 @@ UnitBlueprint {
     },
     Description = '<LOC xal0305_desc>Sniper Bot',
     Display = {
-        Abilities = {
-            '<LOC ability_deploys>Deploys',
-        },
+        #Abilities = {
+        #    '<LOC ability_deploys>Deploys',
+        #},
         AnimationDeath = {
             {
                 Animation = '/units/xal0305/xal0305_adeath01.sca',
@@ -187,9 +186,9 @@ UnitBlueprint {
             LAYER_Water = false,
         },
         DragCoefficient = 0.2,
-        MaxAcceleration = 4,
+        MaxAcceleration = 3,
         MaxBrake = 3,
-        MaxSpeed = 4,
+        MaxSpeed = 3,
         MaxSpeedReverse = 0,
         MaxSteerForce = 10,
         MeshExtentsX = 1,
@@ -276,8 +275,9 @@ UnitBlueprint {
                 'STRUCTURE DEFENSE',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
+                'NAVAL',
                 'SPECIALLOWPRI',
-                'ALLUNITS',
+                'STRUCTURE',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,
@@ -295,9 +295,9 @@ UnitBlueprint {
             WeaponCategory = 'Direct Fire',
             WeaponRepackTimeout = 0,
             WeaponUnpackAnimation = '/units/xal0305/xal0305_asetup.sca',
-            WeaponUnpackAnimationRate = 1,
-            WeaponUnpackLocksMotion = true,
-            WeaponUnpacks = true,
+            WeaponUnpackAnimationRate = 0,#from 1
+            WeaponUnpackLocksMotion = false,#from true
+            WeaponUnpacks = false,# from true
         },
     },
     Wreckage = {

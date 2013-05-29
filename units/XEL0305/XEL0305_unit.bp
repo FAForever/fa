@@ -217,11 +217,11 @@ UnitBlueprint {
         TransportClass = 3,
     },
     Veteran = {
-        Level1 = 9,
-        Level2 = 18,
-        Level3 = 27,
-        Level4 = 36,
-        Level5 = 45,
+        Level1 = 20,
+        Level2 = 40,
+        Level3 = 60,
+        Level4 = 80,
+        Level5 = 100,
     },
     Weapon = {
         {
@@ -247,7 +247,7 @@ UnitBlueprint {
             },
             FiringTolerance = 2,
             Label = 'PlasmaCannon01',
-            MaxRadius = 26,
+            MaxRadius = 35,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 35,

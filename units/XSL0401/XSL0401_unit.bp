@@ -271,11 +271,11 @@ UnitBlueprint {
         TransportClass = 4,
     },
     Veteran = {
-        Level1 = 75,
-        Level2 = 150,
-        Level3 = 225,
-        Level4 = 300,
-        Level5 = 375,
+        Level1 = 60,
+        Level2 = 120,
+        Level3 = 180,
+        Level4 = 240,
+        Level5 = 300,
     },
     Weapon = {
         {   
