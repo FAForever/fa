@@ -1,0 +1,389 @@
+UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'ZRB9602',
+            'B05',
+            'B07',
+            'B08',
+            'B10',
+        },
+    },
+    Audio = {
+        Construct = Sound {
+            Bank = 'URB',
+            Cue = 'URB0302_Construct_Start',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        ConstructLoop = Sound {
+            Bank = 'URB',
+            Cue = 'URB0302_Construct_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        DeathExplosion = Sound {
+            Bank = 'URLDestroy',
+            Cue = 'URB_Destroy_Lrg_PreDestroy',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        Destroyed = Sound {
+            Bank = 'URLDestroy',
+            Cue = 'URB_Destroy_Huge',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        DoneBeingBuilt = Sound {
+            Bank = 'URB',
+            Cue = 'URB0302_Activate',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        UISelection = Sound {
+            Bank = 'Interface',
+            Cue = 'Cybran_Select_Factory',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+    },
+    BuildIconSortPriority = 51,
+    Categories = {
+        'PRODUCTSC1',
+        'SELECTABLE',
+        'BUILTBYTIER2SUPPORTFACTORY',
+        'BUILTBYTIER3ENGINEER',
+        'BUILTBYTIER3COMMANDER',
+        'CYBRAN',
+        'STRUCTURE',
+        'AIR',
+        'TECH3',
+        'CONSTRUCTION',
+        'FACTORY',
+        'RALLYPOINT',
+        'DRAGBUILD',
+        'CONSTRUCTIONSORTDOWN',
+        'SIZE16',
+        'VISIBLETORECON',
+        'RECLAIMABLE',
+        'SHOWQUEUE',
+        'SORTCONSTRUCTION',
+	'SUPPORTFACTORY',
+    },
+    Defense = {
+        AirThreatLevel = 0,
+        ArmorType = 'Structure',
+        EconomyThreatLevel = 34,
+        Health = 9500,
+        MaxHealth = 9500,
+        RegenRate = 0,
+        SubThreatLevel = 0,
+        SurfaceThreatLevel = 0,
+    },
+    Description = '<LOC zrb9602_desc>Air Factory',
+    Display = {
+        AnimationBuild = '/units/zrb9602/zrb9602_abuild.sca',
+        AnimationFinishBuildLand = '/units/zrb9602/zrb9602_aplatform.sca',
+        BlinkingLights = {
+            {
+                BLBone = 0,
+                BLOffsetX = 1.1,
+                BLOffsetY = 1.4,
+                BLOffsetZ = -1.9,
+                BLScale = 1,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = -1.1,
+                BLOffsetY = 1.4,
+                BLOffsetZ = -1.9,
+                BLScale = 1,
+            },
+        },
+        BlinkingLightsFx = {
+            Green = '/effects/emitters/light_green_03_emit.bp',
+            Red = '/effects/emitters/light_red_03_emit.bp',
+            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+        },
+        BuildAttachBone = 'Build_Point',
+        Mesh = {
+            IconFadeInZoom = 130,
+            LODs = {
+                {
+                    LODCutoff = 200,
+                    ShaderName = 'Insect',
+                },
+                {
+                    AlbedoName = 'zrb9602_lod1_albedo.dds',
+                    LODCutoff = 500,
+                    ShaderName = 'Insect',
+                    SpecularName = 'zrb9602_lod1_specteam.dds',
+                },
+            },
+        },
+        PlaceholderMeshName = 'UXB0007',
+        SpawnRandomRotation = true,
+        Tarmacs = {
+            {
+                Albedo = 'Tarmacs/Tar12x_cybran_01_albedo',
+                DeathLifetime = 300,
+                FadeOut = 150,
+                Length = 12.8,
+                Normal = 'Tarmacs/Tar12x_cybran_01_normals',
+                Orientations = {
+                    0,
+                    90,
+                    180,
+                    270,
+                },
+                RemoveWhenDead = false,
+                Width = 12.8,
+            },
+        },
+        UniformScale = 0.09,
+    },
+    Economy = {
+        BuildCostEnergy = 34153,
+        BuildCostMass = 1510,
+        BuildRate = 120,
+        BuildTime = 4000,
+	DifferentialUpgradeCostCalculation = true, 
+        RebuildBonusIds = {
+            'zrb9602',
+        },
+        BuildableCategory = {
+            'BUILTBYTIER3FACTORY CYBRAN MOBILE CONSTRUCTION',
+            'BUILTBYTIER3FACTORY CYBRAN STRUCTURE AIR',
+            'BUILTBYTIER3FACTORY CYBRAN MOBILE AIR',
+            'TRANSPORTBUILTBYTIER3FACTORY CYBRAN MOBILE AIR',
+        },
+        StorageEnergy = 0,        StorageMass = 320,
+    },
+    Footprint = {
+        SizeX = 5,
+        SizeZ = 5,
+    },
+    General = {
+        BuildBones = {
+            BuildAttachBone = 'Build_Point',
+            BuildEffectBones = {
+                'Arm01_Muzzle',
+                'Arm02_Muzzle',
+                'Arm03_Muzzle',
+                'Arm04_Muzzle',
+                'Arm05_Muzzle',
+                'Arm06_Muzzle',
+            },
+        },
+        Category = 'Factory',
+        Classification = 'RULEUC_Factory',
+        CommandCaps = {
+            RULEUCC_Attack = false,
+            RULEUCC_CallTransport = false,
+            RULEUCC_Capture = false,
+            RULEUCC_Guard = true,
+            RULEUCC_Move = true,
+            RULEUCC_Nuke = false,
+            RULEUCC_Patrol = true,
+            RULEUCC_Pause = true,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
+            RULEUCC_RetaliateToggle = true,
+            RULEUCC_Stop = true,
+            RULEUCC_Transport = false,
+        },
+        ConstructionBar = true,
+        FactionName = 'Cybran',
+        Icon = 'air',
+        SelectionPriority = 5,
+        TechLevel = 'RULEUTL_Secret',
+        UnitWeight = 1,
+        UpgradesFromBase = 'urb0102',
+        UpgradesFrom = 'zrb9502',
+    },
+    Intel = {
+        VisionRadius = 20,
+    },
+    Interface = {
+        HelpText = '<LOC zrb9602_help>Air Factory',
+    },
+    LifeBarHeight = 0.075,
+    LifeBarOffset = 2,
+    LifeBarSize = 4.5,
+    Physics = {
+        BankingSlope = 0,
+        BuildOnLayerCaps = {
+            LAYER_Air = false,
+            LAYER_Land = true,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
+        DragCoefficient = 0.2,
+        FlattenSkirt = true,
+        MaxSteerForce = 0,
+        MinSpeedPercent = 0,
+        MotionType = 'RULEUMT_None',
+        RaisedPlatforms = {
+
+            # Platform 1
+            # TopLeft Offset From Center
+            -1.4,
+
+            # x
+            -2,
+
+            # z
+            0.03,
+
+            # height
+            # TopRight Offset From Center
+            1.4,
+
+            # x
+            -2,
+
+            # z
+            0.03,
+
+            # height
+            # BottomLeft Offset From Center
+            -1.4,
+
+            # x
+            1.6,
+
+            # z
+            0.03,
+
+            # height
+            # BottomRight Offset From Center
+            1.4,
+
+            # x
+            1.6,
+
+            # z
+            0.03,
+
+            # height
+            # Platform 2
+            # TopLeft Offset From Center
+            -2.3,
+
+            # x
+            -2,
+
+            # z
+            0,
+
+            # height
+            # TopRight Offset From Center
+            -1.4,
+
+            # x
+            -2,
+
+            # z
+            0.03,
+
+            # height
+            # BottomLeft Offset From Center
+            -2.3,
+
+            # x
+            1.6,
+
+            # z
+            0,
+
+            # height
+            # BottomRight Offset From Center
+            -1.4,
+
+            # x
+            1.6,
+
+            # z
+            0.03,
+
+            # height
+            # Platform 3
+            # TopLeft Offset From Center
+            1.4,
+
+            # x
+            -2,
+
+            # z
+            0.03,
+
+            # height
+            # TopRight Offset From Center
+            2.4,
+
+            # x
+            -2,
+
+            # z
+            0,
+
+            # height
+            # BottomLeft Offset From Center
+            1.4,
+
+            # x
+            1.6,
+
+            # z
+            0.03,
+
+            # height
+            # BottomRight Offset From Center
+            2.3,
+
+            # x
+            1.6,
+
+            # z
+            0,
+        },
+        RollOffPoints = {
+            {
+                UnitSpin = 90,
+                X = 2.75,
+                Y = 0,
+                Z = 0.35,
+            },
+            {
+                UnitSpin = -90,
+                X = -2.75,
+                Y = 0,
+                Z = 0.35,
+            },
+        },
+        SkirtOffsetX = -1.5,
+        SkirtOffsetZ = -1.5,
+        SkirtSizeX = 8,
+        SkirtSizeZ = 8,
+        TurnRate = 0,
+    },
+    SelectionSizeX = 3,
+    SelectionSizeZ = 3,
+    SelectionThickness = 0.33,
+
+    # height
+    SizeX = 3.5,
+    SizeY = 0.75,
+    SizeZ = 3.5,
+    StrategicIconName = 'icon_factory3_air',
+    StrategicIconSortPriority = 210,
+    Wreckage = {
+        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+        EnergyMult = 0,
+        HealthMult = 0.9,
+        MassMult = 0.9,
+        ReclaimTimeMultiplier = 1,
+        WreckageLayers = {
+            Air = false,
+            Land = true,
+            Seabed = false,
+            Sub = false,
+            Water = false,
+        },
+    },
+}

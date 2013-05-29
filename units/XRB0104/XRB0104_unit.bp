@@ -139,10 +139,10 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 2500,
-        BuildCostMass = 500,
-        BuildRate = 15,
-        BuildTime = 900,
+        BuildCostEnergy = 1750,
+        BuildCostMass = 350,
+        BuildRate = 25,
+        BuildTime = 1171,
         BuildableCategory = {
             'xrb0204',
         },

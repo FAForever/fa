@@ -87,7 +87,7 @@ UnitBlueprint {
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
         Health = 710,
-        MaxHealth = 710,
+        MaxHealth = 290,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -185,7 +185,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 840,
         BuildCostMass = 160,
-        BuildRate = 10,
+        BuildRate = 12.5,
         BuildTime = 800,
         BuildableCategory = {
             'BUILTBYTIER2ENGINEER CYBRAN',
@@ -252,7 +252,7 @@ UnitBlueprint {
         DragCoefficient = 0.2,
         MaxAcceleration = 1.9,
         MaxBrake = 1.9,
-        MaxSpeed = 1.9,
+        MaxSpeed = 1.7,
         MaxSpeedReverse = 1.6,
         MaxSteerForce = 15,
         MinSpeedPercent = 0,

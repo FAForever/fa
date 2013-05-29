@@ -56,6 +56,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
+	'RESEARCH',
     },
     CollisionOffsetY = 0,
     Defense = {
@@ -142,10 +143,14 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 11700,
-        BuildCostMass = 630,
+        BuildCostEnergy = 14100,
+        BuildCostMass = 840,
         BuildRate = 40,
         BuildTime = 1800,
+	DifferentialUpgradeCostCalculation = true, 
+        RebuildBonusIds = {
+            'xsb0202',
+        },
         BuildableCategory = {
             'BUILTBYTIER2FACTORY SERAPHIM MOBILE CONSTRUCTION',
             'BUILTBYTIER2FACTORY SERAPHIM STRUCTURE AIR',
@@ -189,6 +194,7 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC xsb0202_name>Ia-iya',
         UnitWeight = 1,
+        UpgradesFromBase = 'xsb0102',
         UpgradesFrom = 'xsb0102',
         UpgradesTo = 'xsb0302',
     },
@@ -247,7 +253,7 @@ UnitBlueprint {
     SizeX = 3.5,
     SizeY = 2.7,
     SizeZ = 3.5,
-    StrategicIconName = 'icon_factory2_air',
+    StrategicIconName = 'icon_factoryhq2_air',
     StrategicIconSortPriority = 215,
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',

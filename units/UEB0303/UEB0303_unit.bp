@@ -39,7 +39,7 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    BuildIconSortPriority = 40,
+    BuildIconSortPriority = 60,
     Categories = {
         'PRODUCTSC1',
         'SELECTABLE',
@@ -58,6 +58,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
+	'RESEARCH',
     },
     CollisionOffsetX = 0,
     CollisionOffsetY = -1,
@@ -72,7 +73,7 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC ueb0303_desc>Naval Factory',
+    Description = '<LOC ueb0303_desc>Naval Factory HQ',
     Display = {
         BlinkingLights = {
             {
@@ -136,10 +137,14 @@ UnitBlueprint {
         UniformScale = 0.083,
     },
     Economy = {
-        BuildCostEnergy = 23400,
-        BuildCostMass = 5150,
-        BuildRate = 60,
-        BuildTime = 7200,
+        BuildCostEnergy = 32572,
+        BuildCostMass = 7120,
+        BuildRate = 120,
+        BuildTime = 9200,
+	DifferentialUpgradeCostCalculation = true, 
+        RebuildBonusIds = {
+            'ueb0303',
+        },
         BuildableCategory = {
             'BUILTBYTIER3FACTORY UEF MOBILE CONSTRUCTION',
             'BUILTBYTIER3FACTORY UEF STRUCTURE NAVAL',
@@ -184,12 +189,13 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Secret',
         UnitWeight = 1,
         UpgradesFrom = 'ueb0203',
+        UpgradesFromBase = 'ueb0103',
     },
     Intel = {
         VisionRadius = 20,
     },
     Interface = {
-        HelpText = '<LOC ueb0303_help>Naval Factory',
+        HelpText = '<LOC ueb0303_help>Naval Factory HQ',
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 4.75,
@@ -238,7 +244,7 @@ UnitBlueprint {
     SizeX = 4,
     SizeY = 3, #from 2, for beam weapons
     SizeZ = 10,
-    StrategicIconName = 'icon_factory3_naval',
+    StrategicIconName = 'icon_factoryhq3_naval',
     StrategicIconSortPriority = 210,
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',

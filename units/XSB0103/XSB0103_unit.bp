@@ -142,8 +142,6 @@ UnitBlueprint {
         InitialRallyZ = 10,
         RebuildBonusIds = {
             'xsb0103',
-            'xsb0203',
-            'xsb0303',
         },
         StorageEnergy = 0,
         StorageMass = 80,
@@ -181,6 +179,7 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Basic',
         UnitName = '<LOC xsb0103_name>Uosiya',
         UnitWeight = 1,
+        UpgradesFromBase = 'xsb0103',
         UpgradesTo = 'xsb0203',
     },
     Intel = {

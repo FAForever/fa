@@ -255,7 +255,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 25200,
         BuildCostMass = 2100,
-        BuildRate = 40,
+        BuildRate = 56,
         BuildTime = 14400,
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER UEF',
@@ -275,7 +275,7 @@ UnitBlueprint {
         AdvancedCoolingUpgrade = {
             BuildCostEnergy = 45000,
             BuildCostMass = 1000,
-            BuildTime = 3600,
+            BuildTime = 5040,
             Icon = 'acu',
             Name = '<LOC enhancements_0061>Energy Accelerator',
             NewRateOfFire = 2.5,
@@ -303,7 +303,7 @@ UnitBlueprint {
         HighExplosiveOrdnance = {
             BuildCostEnergy = 30000,
             BuildCostMass = 800,
-            BuildTime = 2400,
+            BuildTime = 3360,
             Icon = 'heo',
             Name = '<LOC enhancements_0063>Heavy Plasma Refractor',
             NewDamageRadius = 2.5,
@@ -340,7 +340,7 @@ UnitBlueprint {
         Pod = {
             BuildCostEnergy = 9000,
             BuildCostMass = 480,
-            BuildTime = 1800,
+            BuildTime = 2520,
             Icon = 'ed',
             Name = '<LOC enhancements_0065>C-D2 Engineering Drone',
             Slot = 'Back',
@@ -367,7 +367,7 @@ UnitBlueprint {
         RadarJammer = {
             BuildCostEnergy = 18000,
             BuildCostMass = 600,
-            BuildTime = 1800,
+            BuildTime = 2520,
             Icon = 'rj',
             MaintenanceConsumptionPerSecondEnergy = 100,
             Name = '<LOC enhancements_0067>Radar Jammer',
@@ -402,7 +402,7 @@ UnitBlueprint {
         ResourceAllocation = {
             BuildCostEnergy = 60000,
             BuildCostMass = 4500,
-            BuildTime = 6000,
+            BuildTime = 8400,
             Icon = 'isb',
             Name = '<LOC enhancements_0069>Resource Allocation System',
             ProductionPerSecondEnergy = 1000,
@@ -437,7 +437,7 @@ UnitBlueprint {
         SensorRangeEnhancer = {
             BuildCostEnergy = 20000,
             BuildCostMass = 1000,
-            BuildTime = 2400,
+            BuildTime = 3360,
             Icon = 'sre',
             Name = '<LOC enhancements_0071>Enhanced Sensor System',
             NewOmniRadius = 80,
@@ -472,7 +472,7 @@ UnitBlueprint {
         Shield = {
             BuildCostEnergy = 93750,
             BuildCostMass = 2000,
-            BuildTime = 5000,
+            BuildTime = 7000,
             Icon = 'psg',
             ShowBones = {
                 'Jetpack',
@@ -503,7 +503,7 @@ UnitBlueprint {
         ShieldGeneratorField = {
             BuildCostEnergy = 400000,
             BuildCostMass = 3500,
-            BuildTime = 8000,
+            BuildTime = 11200,
             Icon = 'sgf',
             HideBones = {
                 'Jetpack',

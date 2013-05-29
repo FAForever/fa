@@ -1339,7 +1339,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.075,#-0.025
+            Add = -0.075, #-0.025
             Mult = 1.0,
         },
     },
@@ -1357,7 +1357,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.075,#-0.02
+            Add = -0.075, #-0.02
             Mult = 1.0,
         },
     },
@@ -1449,7 +1449,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.15,#-0.0375
+            Add = -0.1,#-0.0375
             Mult = 1.0,
         },
     },
@@ -1467,7 +1467,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.15,#-0.03
+            Add = -0.1,#-0.03
             Mult = 1.0,
         },
     },
@@ -1559,7 +1559,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.25,#-0.05
+            Add = -0.125, #-0.05
             Mult = 1.0,
         },
     },
@@ -1577,7 +1577,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.20,#-0.04
+            Add = -0.125,#-0.04
             Mult = 1.0,
         },
     },
@@ -1669,7 +1669,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.02 ,#-0.00625
+            Add = -0.0125 ,#-0.00625
             Mult = 1.0,
         },
     },
@@ -1687,7 +1687,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.015,#-0.005
+            Add = -0.0125,#-0.005
             Mult = 1.0,
         },
     },
