@@ -5146,14 +5146,19 @@ function ChangeBackgroundLobby(slot, faction)
 	if GUI.background and FindSlotForID(localPlayerID) == slot then
 		if faction == 1 then
 			GUI.background:SetTexture(UIUtil.SkinnableFile("/menus02/background-paint_uef_bmp.dds"))
+			UIUtil.SetCurrentSkin('uef')
 		elseif faction == 2 then
 			GUI.background:SetTexture(UIUtil.SkinnableFile("/menus02/background-paint_aion_bmp.dds"))
+			UIUtil.SetCurrentSkin('aeon')
 		elseif faction == 3 then
 			GUI.background:SetTexture(UIUtil.SkinnableFile("/menus02/background-paint_cybran_bmp.dds"))
+			UIUtil.SetCurrentSkin('cybran')
 		elseif faction == 4 then
 			GUI.background:SetTexture(UIUtil.SkinnableFile("/menus02/background-paint_seraphim_bmp.dds"))
+			UIUtil.SetCurrentSkin('seraphim')
 		else
 			GUI.background:SetTexture(UIUtil.SkinnableFile("/menus02/background-paint_random_bmp.dds"))
+			--UIUtil.SetCurrentSkin('random')
 		end
 	end
 end
