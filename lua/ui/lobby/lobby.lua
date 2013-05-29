@@ -2348,7 +2348,7 @@ function CreateUI(maxPlayers)
     local titleText = UIUtil.CreateText(GUI.panel, title, 26, UIUtil.titleFont)
     LayoutHelpers.AtLeftTopIn(titleText, GUI.panel, 50, 36)
 
-    randmapText = UIUtil.CreateText(GUI.panel, "RandMapText", 17, UIUtil.titleFont)
+    randmapText = UIUtil.CreateText(GUI.panel, "Loading ...", 17, UIUtil.titleFont)
     LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
 	--Tooltip.AddButtonTooltip(randmapText,{text='', body=''})
 
@@ -5158,7 +5158,7 @@ function ChangeBackgroundLobby(slot, faction)
 			UIUtil.SetCurrentSkin('seraphim')
 		else
 			GUI.background:SetTexture(UIUtil.SkinnableFile("/menus02/background-paint_random_bmp.dds"))
-			--UIUtil.SetCurrentSkin('random')
+			UIUtil.SetCurrentSkin('randomfaction')
 		end
 	end
 end
