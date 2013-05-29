@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Game selection UI
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -244,7 +244,6 @@ function FuncSlotMenuData()
     }
     for i = 1, numOpenSlots, 1 do
         table.insert(slotMenuData.player.host, 'move_player_to_slot'..i)
-        LOG(slotMenuData.player.host[i])
     end
 end
 FuncSlotMenuData()
@@ -721,6 +720,9 @@ function SetSlotInfo(slot, playerInfo)
         Prefs.SetToCurrentProfile('LastFaction', playerInfo.Faction)
     end
 
+	--// Change the background according to the chosen Faction - Xinnony
+	ChangeBackgroundLobby(slot, Prefs.GetFromCurrentProfile('LastFaction'))
+	--\\ Stop - Change the background according to the chosen Faction
     --// Show the Country Flag in slot - Xinnony
     SetSlotCountryFlag(slot, playerInfo)
     --\\ Stop - Show the Country Flag in slot
@@ -1887,10 +1889,10 @@ end
 function HostTryAddPlayer( senderID, slot, requestedPlayerName, human, aiPersonality, requestedColor, requestedFaction,
                            requestedTeam, requestedPL, requestedRC, requestedNG, requestedMEAN, requestedDEV )
     --// COUNTRY - Xinnony
-    --If new player join, send the Country to all player already joined
+    --If new player join, the host send the Country to all player already joined
     if human and not singlePlayer then
         for i, Country in Country_List do
-            lobbyComm:SendData(senderID, { Type = 'Country', PlayerName = Country.PlayerName, Result = Country.Result } )
+            lobbyComm:BroadcastData( { Type = 'Country', PlayerName = Country.PlayerName, Result = Country.Result } )
         end
     end
     --\\ Stop COUNTRY
@@ -2030,7 +2032,6 @@ function HostTryMovePlayer(senderID, currentSlot, requestedSlot)
 end
 
 function HostTryAddObserver( senderID, requestedObserverName )
-
     local index = 1
     while gameInfo.Observers[index] do
         index = index + 1
@@ -2069,6 +2070,7 @@ function HostConvertPlayerToObserver(senderID, name, playerSlot)
         PlayerName = name,
         OwnerID = senderID,
         PL = gameInfo.PlayerOptions[playerSlot].PL,
+        oldColor = gameInfo.PlayerOptions[playerSlot].PlayerColor, -- Vicarian
     }
 
     if lobbyComm:IsHost() then
@@ -2129,7 +2131,7 @@ function HostConvertObserverToPlayer(senderID, name, fromObserverSlot, toPlayerS
 
     for colorIndex,colorVal in gameColors.PlayerColors do
         if IsColorFree(colorIndex) then
-            gameInfo.PlayerOptions[toPlayerSlot].PlayerColor = colorIndex
+            gameInfo.PlayerOptions[toPlayerSlot].PlayerColor = gameInfo.Observers[fromObserverSlot].oldColor or colorIndex
             break
         end
     end
@@ -2376,45 +2378,51 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtRightIn(Credits_Text, GUI.panel, 100)
     --\\ Stop Credits
 
-    GUI.playerPanel = Group(GUI.panel, "playerPanel")
+	-- FOR SEE THE GROUP POSITION, LOOK THIS SCREENSHOOT : http://img402.imageshack.us/img402/8826/falobbygroup.png - Xinnony
+    GUI.playerPanel = Group(GUI.panel, "playerPanel") -- RED Square in Screenshoot
     LayoutHelpers.AtLeftTopIn(GUI.playerPanel, GUI.panel, 40, 66)
     GUI.playerPanel.Width:Set(706)
     GUI.playerPanel.Height:Set(307)
 
-    GUI.buttonPanelTop = Group(GUI.panel, "buttonPanelTop") -- Added group for Button - Xinnony
+    GUI.buttonPanelTop = Group(GUI.panel, "buttonPanelTop") -- GREEN Square in Screenshoot - Added group for Button - Xinnony
     LayoutHelpers.AtLeftTopIn(GUI.buttonPanelTop, GUI.panel, 40, 383)
     GUI.buttonPanelTop.Width:Set(706)
     GUI.buttonPanelTop.Height:Set(19)
 
-    GUI.buttonPanelRight = Group(GUI.panel, "buttonPanelRight") -- Added group for Button - Xinnony
+    GUI.buttonPanelRight = Group(GUI.panel, "buttonPanelRight") -- PURPLE Square in Screenshoot - Added group for Button - Xinnony
     LayoutHelpers.AtLeftTopIn(GUI.buttonPanelRight, GUI.panel, 481, 401)
     GUI.buttonPanelRight.Width:Set(265)
     GUI.buttonPanelRight.Height:Set(89)
 
-    GUI.observerPanel = Group(GUI.panel, "observerPanel")
+    GUI.observerPanel = Group(GUI.panel, "observerPanel") -- PINK Square in Screenshoot
     LayoutHelpers.AtLeftTopIn(GUI.observerPanel, GUI.panel, 40, 378)
     GUI.observerPanel.Width:Set(706)
     GUI.observerPanel.Height:Set(114)
 
-    GUI.chatPanel = Group(GUI.panel, "chatPanel")
+    GUI.chatPanel = Group(GUI.panel, "chatPanel") -- BLUE Square in Screenshoot
     LayoutHelpers.AtLeftTopIn(GUI.chatPanel, GUI.panel, 40, 521)
     GUI.chatPanel.Width:Set(705)
     GUI.chatPanel.Height:Set(150)
 
-    GUI.mapPanel = Group(GUI.panel, "mapPanel")
+    GUI.mapPanel = Group(GUI.panel, "mapPanel") -- YELLOW Square in Screenshoot
     LayoutHelpers.AtLeftTopIn(GUI.mapPanel, GUI.panel, 750, 68)
     GUI.mapPanel.Width:Set(238)
     GUI.mapPanel.Height:Set(600)
 
-    GUI.optionsPanel = Group(GUI.panel, "optionsPanel")
+    GUI.optionsPanel = Group(GUI.panel, "optionsPanel") -- ORANGE Square in Screenshoot
     LayoutHelpers.AtLeftTopIn(GUI.optionsPanel, GUI.panel, 746, 600)
     GUI.optionsPanel.Width:Set(238)
     GUI.optionsPanel.Height:Set(260)
 
-    GUI.launchPanel = Group(GUI.panel, "controlGroup")
+    GUI.launchPanel = Group(GUI.panel, "controlGroup") -- BROWN Square in Screenshoot
     LayoutHelpers.AtLeftTopIn(GUI.launchPanel, GUI.panel, 735, 668)
     GUI.launchPanel.Width:Set(238)
     GUI.launchPanel.Height:Set(66)
+	
+	GUI.NEWlaunchPanel = Group(GUI.panel, "NEWlaunchPanel") -- BLACK Square in Screenshoot - Added group for Button - Xinnony
+	LayoutHelpers.AtLeftTopIn(GUI.NEWlaunchPanel, GUI.panel, 40, 667)
+    GUI.NEWlaunchPanel.Width:Set(948)
+    GUI.NEWlaunchPanel.Height:Set(68)
 
     ---------------------------------------------------------------------------
     -- set up map panel
@@ -4136,7 +4144,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             AddChatText("<<"..data.SenderName..">> "..data.Text)
         --// COUNTRY - Xinnony
         elseif data.Type == 'Country' then
-            LOG("Country Data: name="..(data.PlayerName or "?")..", result="..(data.Result or "?"))
+            --LOG("Country Data: name="..(data.PlayerName or "?")..", result="..(data.Result or "?"))
             AddPlayerCountry(data)
             local playerId = FindIDForName(data.PlayerName)
             local playerSlot = FindSlotForID(playerId)
@@ -4146,7 +4154,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         --\\ Stop COUNTRY
         -- CPU benchmark code
         elseif data.Type == 'CPUBenchmark' then
-            LOG("CPU Data: "..(data.PlayerName or "?")..", ".. (data.Result or "?"))
+            --LOG("CPU Data: "..(data.PlayerName or "?")..", ".. (data.Result or "?"))
             AddPlayerBenchmark(data)
             local playerId = FindIDForName(data.PlayerName)
             local playerSlot = FindSlotForID(playerId)
@@ -4941,7 +4949,7 @@ function StressCPU(waitTime)
         currentBestBenchmark = 10000
     end
 
-    LOG('Beginning CPU benchmark')
+    --LOG('Beginning CPU benchmark')
     GUI.rerunBenchmark.label:SetText('In Progress...')
 
     --Run three benchmarks and keep the best one
@@ -4955,7 +4963,7 @@ function StressCPU(waitTime)
         --With .01 sec wait intervals the max number of loops should be 100 * benchmarkLength
 		loopCount = (benchmarkLength * 100) - math.min(scoreSkew2 * loopCount + scoreSkew1, (benchmarkLength * 100))
 
-        LOG('CPU benchmark #'..i..' complete: '.. loopCount )
+        --LOG('CPU benchmark #'..i..' complete: '.. loopCount )
 
         --If this benchmark was better than our best so far...
         if loopCount < currentBestBenchmark then
@@ -5080,11 +5088,13 @@ function SetSlotCountryFlag(slot, playerInfo)
             local b = FindCountryForName(playerInfo.PlayerName)
             if b then
                 local CountryResult = b.Result
-                LOG('XINNONY - Country is : '.. CountryResult .. ' (for : ' .. playerInfo.PlayerName .. ')')
+                --LOG('XINNONY - Country is : '.. CountryResult .. ' (for : ' .. playerInfo.PlayerName .. ')')
                 GUI.slots[slot].KinderCountry:Show()
                 GUI.slots[slot].KinderCountry:SetTexture(UIUtil.UIFile('/countries/'..CountryResult..'.dds'))
 				Country_GetTooltipValue(CountryResult, slot)
 				Country_AddControlTooltip(GUI.slots[slot].KinderCountry, 0, slot)
+			else
+				LOG('XINNONY - Country is : ELSE (for : ELSE) and the PlayerName is : '..playerInfo.PlayerName)
             end
         end
     end
@@ -5123,3 +5133,23 @@ function Country_GetTooltipValue(CountryResult, slot)
 		end
 end
 --\\ Stop COUNTRY
+
+--------------------------------------------------
+-- Change the wallpaper according to the chosen Faction Functions
+-- Author : Xinnony
+--------------------------------------------------
+function ChangeBackgroundLobby(slot, faction)
+	if GUI.background and FindSlotForID(localPlayerID) == slot then
+		if faction == 1 then
+			GUI.background:SetTexture(UIUtil.SkinnableFile("/menus02/background-paint_uef_bmp.dds"))
+		elseif faction == 2 then
+			GUI.background:SetTexture(UIUtil.SkinnableFile("/menus02/background-paint_aion_bmp.dds"))
+		elseif faction == 3 then
+			GUI.background:SetTexture(UIUtil.SkinnableFile("/menus02/background-paint_cybran_bmp.dds"))
+		elseif faction == 4 then
+			GUI.background:SetTexture(UIUtil.SkinnableFile("/menus02/background-paint_seraphim_bmp.dds"))
+		else
+			GUI.background:SetTexture(UIUtil.SkinnableFile("/menus02/background-paint_random_bmp.dds"))
+		end
+	end
+end
