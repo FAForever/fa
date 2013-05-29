@@ -247,7 +247,7 @@ UnitBlueprint {
             },
             FiringTolerance = 2,
             Label = 'PlasmaCannon01',
-            MaxRadius = 26,
+            MaxRadius = 35,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 35,
