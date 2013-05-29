@@ -233,7 +233,7 @@ UnitBlueprint {
         BuildCostEnergy = 29531,
         BuildCostMass = 1400,
         BuildTime = 5250,
-        MaintenanceConsumptionPerSecondEnergy = 250,
+        MaintenanceConsumptionPerSecondEnergy = 400,
     },
     Footprint = {
         MaxSlope = 0.25,
