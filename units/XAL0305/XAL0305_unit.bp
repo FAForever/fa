@@ -278,6 +278,7 @@ UnitBlueprint {
                 'NAVAL',
                 'SPECIALLOWPRI',
                 'STRUCTURE',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,
