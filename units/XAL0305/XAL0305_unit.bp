@@ -235,6 +235,7 @@ UnitBlueprint {
             CollideFriendly = false,
             Damage = 1300,
             DamageRadius = 0,
+            DamageFriendly = false,
             DamageType = 'Normal',
             DisplayName = 'Heavy Disruptor Cannon',
             FireTargetLayerCapsTable = {
