@@ -349,6 +349,7 @@ UnitBlueprint {
             IgnoreIfDisabled = true,
             Label = 'SniperGun',
             MaxRadius = 75,
+            FiringRandomnessWhileMoving = 0.2,
             MuzzleChargeDelay = 0.5,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
