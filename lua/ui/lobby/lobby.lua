@@ -4810,8 +4810,8 @@ local barMax = 450
 local barMin = 150
 local greenBarMax = 300
 local yellowBarMax = 375
-local scoreSkew1 = 0 --Skews all CPU scores up or down by the amount specified (0 = no skew)
-local scoreSkew2 = 4.0 --Skews all CPU scores specified coefficient (1.0 = no skew)
+local scoreSkew1 = -25 --Skews all CPU scores up or down by the amount specified (0 = no skew)
+local scoreSkew2 = 1.0 --Skews all CPU scores specified coefficient (1.0 = no skew)
 
 --Variables for CPU Test
 local running
@@ -4856,7 +4856,7 @@ function CPUBenchmark()
     --CPU score is determined by how many times it can loop through
     --the set of busy work before the timer in the CPUTimer function expires.
     while running do
- 		for i = 1.0, 6.0, .000008 do 
+ 		for i = 1.0, 2.0, .000008 do 
             j = i + i
             k = i * i
             l = k / j
@@ -4922,8 +4922,8 @@ function CPU_AddControlTooltip(control, delay, slotNumber)
     control.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
             local slot = slotNumber
-            Tooltip.CreateMouseoverDisplay(self, {text='CPU Rating: '..GUI.slots[slot].CPUSpeedBar._value(),
-                                           body='150=Fastest, 450=Slowest'}, delay, true)
+            Tooltip.CreateMouseoverDisplay(self, {text='CPU Rating: '..GUI.slots[slot].CPUSpeedBar.CPUActualValue,
+                                           body='0=Fastest, 450=Slowest'}, delay, true)
         elseif event.Type == 'MouseExit' then
             Tooltip.DestroyMouseoverDisplay()
         end
@@ -5020,13 +5020,13 @@ function SetSlotCPUBar(slot, playerInfo)
         if playerInfo.Human then
             local b = FindBenchmarkForName(playerInfo.PlayerName)
             if b then
-				-- For display purposes, the bas has a higher minimum that the actual barMin value.
+				-- For display purposes, the bar has a higher minimum that the actual barMin value.
 				-- This is to ensure that the bar is visible for very small values
 		    	local clampedResult =  math.max(math.min(b.Result, barMax), barMin + math.floor(.04 * (barMax - barMin)))
                 GUI.slots[slot].CPUSpeedBar:SetValue(clampedResult)
 				
 				--For the tooltip, we use the actual clamped value
-				GUI.slots[slot].CPUSpeedBar.CPUActualValue = math.max(math.min(b.Result, barMax), barMin)
+				GUI.slots[slot].CPUSpeedBar.CPUActualValue = b.Result
                 GUI.slots[slot].CPUSpeedBar:Show()
 
                 GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-02_bmp.dds'))
