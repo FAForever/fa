@@ -4347,7 +4347,7 @@ Unit = Class(moho.unit_methods) {
     InitiateActivation = function(self, initTime) 
         self.initTime = initTime
 
-        self:SetStunned(initTime)
+        #self:SetStunned(initTime)
         self:SetImmobile(true)
         self:SetBusy(true)        
         self:SetBlockCommandQueue(true)
@@ -4359,6 +4359,17 @@ Unit = Class(moho.unit_methods) {
         self:SetConsumptionActive(false)
         self:SetActiveConsumptionInactive()
         self:SetMaintenanceConsumptionInactive()
+        self:DisableUnitIntel('RadarStealth')
+        self:DisableUnitIntel('RadarStealthField')
+        self:DisableUnitIntel('SonarStealth')
+        self:DisableUnitIntel('SonarStealthField')
+        self:DisableUnitIntel('Sonar')
+        self:DisableUnitIntel('Omni')
+        self:DisableUnitIntel('Cloak')
+        self:DisableUnitIntel('CloakField')
+        self:DisableUnitIntel('Spoof')
+        self:DisableUnitIntel('Jammer')
+        self:DisableUnitIntel('Radar')
 
         self.InitThread = self:ForkThread(self.InitiateActivationThread)
     end,
@@ -4382,7 +4393,17 @@ Unit = Class(moho.unit_methods) {
         self:SetConsumptionActive(true)      
         self:SetMaintenanceConsumptionActive()
         self:SetActiveConsumptionActive()
-
+        self:EnableUnitIntel('RadarStealth')
+        self:EnableUnitIntel('RadarStealthField')
+        self:EnableUnitIntel('SonarStealth')
+        self:EnableUnitIntel('SonarStealthField')
+        self:EnableUnitIntel('Sonar')
+        self:EnableUnitIntel('Omni')
+        self:EnableUnitIntel('Cloak')
+        self:EnableUnitIntel('CloakField')
+        self:EnableUnitIntel('Spoof')
+        self:EnableUnitIntel('Jammer')
+        self:EnableUnitIntel('Radar')
 
     end,
 
