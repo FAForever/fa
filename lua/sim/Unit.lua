@@ -4341,6 +4341,48 @@ Unit = Class(moho.unit_methods) {
     end,
 
     ##########################################################################################
+    ## Activation (for Galactic War)
+    ##########################################################################################
+
+    InitiateActivation = function(self, initTime)
+        self.initTime = initTime
+        self:SetStunned(initTime)
+        self:SetImmobile(true)
+        self:SetBusy(true)        
+        self:SetBlockCommandQueue(true)
+        self:SetUnSelectable(true)
+        self:SetReclaimable(false)
+        self:SetPaused(true)
+        self:SetProductionActive(false)
+        self:SetWorkProgress(0.0)        
+        self.RecallThread = self:ForkThread(self.InitiateActivationThread)
+    end,
+
+    InitiateActivationThread = function(self) 
+        self.ActivationTime = CreateEconomyEvent(self, 0, 0, self.initTime, self.UpdateActivationProgress)
+        WaitFor( self.ActivationTime )
+
+        if self.ActivationTime then
+            RemoveEconomyEvent(self, self.ActivationTime )
+            self.ActivationTime = nil
+        end    
+        self:SetWorkProgress(0.0)
+        self:SetImmobile(false)
+        self:SetBusy(false)
+        self:SetReclaimable(true)
+        self:SetUnSelectable(false) 
+        self:SetPaused(false) 
+        self:SetProductionActive(true)
+        self:SetBlockCommandQueue(false)            
+
+    end,
+
+    UpdateActivationProgress = function(self, progress)
+        #LOG(' UpdateActivationProgress ')
+        self:SetWorkProgress(progress)
+    end,  
+
+    ##########################################################################################
     ## RECALL (for Galactic War)
     ##########################################################################################
 

@@ -222,6 +222,8 @@ function BeginSession()
 #for off-map prevention
     OnStartOffMapPreventionThread()
     
+	ForkThread(import('/lua/gwReinforcements.lua').gwReinforcementsMainThread)
+
 end
 
 ###for off-map prevention
