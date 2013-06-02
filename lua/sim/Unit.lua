@@ -4347,7 +4347,7 @@ Unit = Class(moho.unit_methods) {
     InitiateActivation = function(self, initTime) 
         self.initTime = initTime
 
-        #self:SetStunned(initTime)
+        self:SetStunned(initTime)
         self:SetImmobile(true)
         self:SetBusy(true)        
         self:SetBlockCommandQueue(true)
