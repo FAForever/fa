@@ -4344,8 +4344,9 @@ Unit = Class(moho.unit_methods) {
     ## Activation (for Galactic War)
     ##########################################################################################
 
-    InitiateActivation = function(self, initTime)
+    InitiateActivation = function(self, initTime) 
         self.initTime = initTime
+
         self:SetStunned(initTime)
         self:SetImmobile(true)
         self:SetBusy(true)        
@@ -4354,8 +4355,12 @@ Unit = Class(moho.unit_methods) {
         self:SetReclaimable(false)
         self:SetPaused(true)
         self:SetProductionActive(false)
-        self:SetWorkProgress(0.0)        
-        self.RecallThread = self:ForkThread(self.InitiateActivationThread)
+        self:SetWorkProgress(0.0)
+        self:SetConsumptionActive(false)
+        self:SetActiveConsumptionInactive()
+        self:SetMaintenanceConsumptionInactive()
+
+        self.InitThread = self:ForkThread(self.InitiateActivationThread)
     end,
 
     InitiateActivationThread = function(self) 
@@ -4373,7 +4378,11 @@ Unit = Class(moho.unit_methods) {
         self:SetUnSelectable(false) 
         self:SetPaused(false) 
         self:SetProductionActive(true)
-        self:SetBlockCommandQueue(false)            
+        self:SetBlockCommandQueue(false)      
+        self:SetConsumptionActive(true)      
+        self:SetMaintenanceConsumptionActive()
+        self:SetActiveConsumptionActive()
+
 
     end,
 
