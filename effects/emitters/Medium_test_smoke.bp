@@ -1,6 +1,6 @@
 EmitterBlueprint {
 	BlueprintId = 'Medium_test',
-	Lifetime = 6.00,
+	Lifetime = 3.00,
 	Repeattime = 50.00,
 	TextureFramecount = 1.00,
 	Blendmode = 0.00,
@@ -10,7 +10,7 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = false,
 	Flat = false,
-	LODCutoff = 800.00,
+	LODCutoff = 1600.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
@@ -18,12 +18,12 @@ EmitterBlueprint {
 	OnlyEmitOnWater = false,
 	ParticleResistance = false,
 	InterpolateEmission = true,
-	TextureStripcount = 1.00,
+	TextureStripcount = 4.00,
 	SortOrder = 0.00,
 	LowFidelity = true,
 	MedFidelity = true,
 	HighFidelity = true,
-	Texture = [[/textures/particles/cloud_smoke_alpha_black.dds]],
+	Texture = [[/textures/particles/bluesmoke.dds]],
 	RampTexture = [[/textures/particles/ramp_white_27.dds]],
 	XDirectionCurve = {
 		XRange = 50.00,
@@ -88,7 +88,7 @@ EmitterBlueprint {
 	SizeCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=25.000,y=6.000,z=4.000 },
+			{ x=25.000,y=5.500,z=4.000 },
 		},
 	},
 	XPosCurve = {
@@ -130,7 +130,7 @@ EmitterBlueprint {
 	RotationRateCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=25.000,y=0.000,z=10.000 },
+			{ x=25.000,y=0.000,z=2.000 },
 		},
 	},
 	FrameRateCurve = {
@@ -142,7 +142,7 @@ EmitterBlueprint {
 	TextureSelectionCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=25.000,y=0.000,z=0.000 },
+			{ x=25.000,y=2.000,z=4.000 },
 		},
 	},
 	RampSelectionCurve = {
