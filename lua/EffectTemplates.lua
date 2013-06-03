@@ -694,6 +694,9 @@ ADepthChargeHitUnderWaterUnit01 = TableCat( ADepthCharge01, DefaultProjectileUnd
 
 ADisruptorCannonMuzzle01 = {
 	EmtBpPath .. 'adisruptor_cannon_muzzle_01_emit.bp',		
+    EmtBpPath .. 'disruptor_cannon_muzzle_01_emit.bp',  
+    EmtBpPath .. 'disruptor_cannon_muzzle_02_emit.bp',      
+    EmtBpPath .. 'disruptor_cannon_muzzle_03_emit.bp', 
 }
 
 ADisruptorMunition01 = { 
