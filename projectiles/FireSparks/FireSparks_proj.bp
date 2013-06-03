@@ -1,0 +1,18 @@
+ProjectileBlueprint {
+    Display = {
+        ImpactEffects = {
+            Type = 'Small01',
+        },
+        StrategicIconSize = 1,
+    },
+    Physics = {
+        MinBounceCount = 1,
+        MaxBounceCount = 3,    
+        DestroyOnWater = true,
+        InitialSpeed = 8,
+        Lifetime = 0.8,
+        InitialSpeedRange = 0,
+        VelocityAlign = true,
+        UseGravity = true,
+    },
+}

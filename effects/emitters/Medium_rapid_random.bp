@@ -1,9 +1,9 @@
 EmitterBlueprint {
-	BlueprintId = 'small_test',
-	Lifetime = 2.00,
+	BlueprintId = 'Medium_rapid',
+	Lifetime = 1.00,
 	Repeattime = 50.00,
 	TextureFramecount = 1.00,
-	Blendmode = 0.00,
+	Blendmode = 3.00,
 	LocalVelocity = false,
 	LocalAcceleration = false,
 	Gravity = false,
@@ -18,41 +18,41 @@ EmitterBlueprint {
 	OnlyEmitOnWater = false,
 	ParticleResistance = false,
 	InterpolateEmission = true,
-	TextureStripcount = 4.00,
+	TextureStripcount = 1.00,
 	SortOrder = 0.00,
 	LowFidelity = true,
 	MedFidelity = true,
 	HighFidelity = true,
-	Texture = [[/textures/particles/bluesmoke.dds]],
-	RampTexture = [[/textures/particles/ramp_white_27.dds]],
+	Texture = [[/textures/particles/sparkle_03.dds]],
+	RampTexture = [[/textures/particles/ramp_white_02.dds]],
 	XDirectionCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=25.000,y=0.000,z=0.020 },
+			{ x=25.000,y=0.000,z=0.000 },
 		},
 	},
 	YDirectionCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=25.000,y=0.005,z=0.030 },
+			{ x=25.000,y=0.000,z=0.000 },
 		},
 	},
 	ZDirectionCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=25.000,y=0.000,z=0.020 },
+			{ x=25.000,y=0.000,z=0.000 },
 		},
 	},
 	EmitRateCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=25.000,y=8.000,z=0.000 },
+			{ x=25.000,y=3.000,z=0.000 },
 		},
 	},
 	LifetimeCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=25.000,y=60.000,z=20.000 },
+			{ x=25.000,y=3.000,z=0.000 },
 		},
 	},
 	VelocityCurve = {
@@ -88,7 +88,7 @@ EmitterBlueprint {
 	SizeCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=25.000,y=1.500,z=1.000 },
+			{ x=25.000,y=0.000,z=0.000 },
 		},
 	},
 	XPosCurve = {
@@ -100,7 +100,7 @@ EmitterBlueprint {
 	YPosCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=25.000,y=0.500,z=0.250 },
+			{ x=25.000,y=0.300,z=0.000 },
 		},
 	},
 	ZPosCurve = {
@@ -112,13 +112,13 @@ EmitterBlueprint {
 	StartSizeCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=25.000,y=0.500,z=0.000 },
+			{ x=25.000,y=1.000,z=0.000 },
 		},
 	},
 	EndSizeCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=25.000,y=0.800,z=1.000 },
+			{ x=25.000,y=4.000,z=0.100 },
 		},
 	},
 	InitialRotationCurve = {
@@ -130,7 +130,7 @@ EmitterBlueprint {
 	RotationRateCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=25.000,y=0.000,z=2.000 },
+			{ x=25.000,y=0.000,z=0.000 },
 		},
 	},
 	FrameRateCurve = {
@@ -142,7 +142,7 @@ EmitterBlueprint {
 	TextureSelectionCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=25.000,y=2.000,z=4.000 },
+			{ x=25.000,y=0.000,z=0.000 },
 		},
 	},
 	RampSelectionCurve = {
