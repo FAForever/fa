@@ -105,6 +105,7 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_stun>EMP Weapon',
             '<LOC ability_manuallaunch>Manual Launch',
+            '<LOC ability_personalstealth>Personal Stealth',
             '<LOC ability_sonar>Sonar',
             '<LOC ability_submersible>Submersible',
             '<LOC ability_torpedo>Torpedoes',
@@ -246,6 +247,7 @@ UnitBlueprint {
         BuildCostMass = 11000,
         BuildRate = 1080,
         BuildTime = 20000,
+        MaintenanceConsumptionPerSecondEnergy = 200,
     },
     Footprint = {
         SizeX = 2,
@@ -275,11 +277,21 @@ UnitBlueprint {
         },
         FactionName = 'Cybran',
         Icon = 'sea',
+        OrderOverrides = {
+            RULEUTC_StealthToggle = {
+                bitmapId = 'stealth-personal',
+                helpText = 'toggle_stealth_personal',
+            },
+        },
         TechLevel = 'RULEUTL_Secret',
+        ToggleCaps = {
+            RULEUTC_StealthToggle = true,
+        },
         UnitName = '<LOC urs0304_name>Plan B',
         UnitWeight = 1,
     },
     Intel = {
+        RadarStealth = true,
         SonarRadius = 60,
         VisionRadius = 16,
         WaterVisionRadius = 35,
@@ -356,7 +368,7 @@ UnitBlueprint {
             },
             FiringTolerance = 2,
             Label = 'CruiseMissile',
-            MaxRadius = 150,
+            MaxRadius = 200,
             MinRadius = 15,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
@@ -498,8 +510,8 @@ UnitBlueprint {
             Label = 'NukeMissile',
             ManualFire = 1,
             MaxProjectileStorage = 3,
-            MaxRadius = 1024,
-            MinRadius = 128,
+            MaxRadius = 410,
+            MinRadius = 90,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 0,
