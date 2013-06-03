@@ -389,9 +389,9 @@
             Slot = 'LCH',
         },
         EnhancedSensors = {
-            BuildCostEnergy = 12500,
-            BuildCostMass = 750,
-            BuildTime = 625,
+            BuildCostEnergy = 10000,
+            BuildCostMass = 400,
+            BuildTime = 500,
             Icon = 'ess',
             Name = '<LOC enhancements_0006>Enhanced Sensor System',
             NewOmniRadius = 100,
