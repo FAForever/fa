@@ -279,6 +279,7 @@ UnitBlueprint {
             IgnoreIfDisabled = true,
             Label = 'MainGun',
             MaxRadius = 65,
+            FiringRandomnessWhileMoving = 0.8,
             MuzzleChargeDelay = 0,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
