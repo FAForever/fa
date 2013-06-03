@@ -136,14 +136,40 @@ function _CreateScalableUnitExplosion( obj )
 
     # Determine effect table to use, based on unit bounding box scale
     #LOG(scale)
-    if scale < 0.5 then   ## Small units
-        BaseEffectTable = EffectTemplate.ExplosionEffectsSml01
-    elseif scale > 4 then ## Large units
-        BaseEffectTable = EffectTemplate.ExplosionEffectsLrg01
-        ShakeTimeModifier = 1.0
-        ShakeMaxMul = 0.25
-    else                  ## Medium units
-        BaseEffectTable = EffectTemplate.ExplosionEffectsMed01
+    if layer == 'Land' then 
+        if scale < 1.1 then   ## Small units
+             BaseEffectTable = EffectTemplate.ExplosionSmall   
+        elseif scale > 3.75 then ## Large units
+            BaseEffectTable = EffectTemplate.ExplosionLarge
+            ShakeTimeModifier = 1.0
+            ShakeMaxMul = 0.25
+        else                  ## Medium units
+            BaseEffectTable = EffectTemplate.ExplosionMedium
+        end
+    end
+    
+    if layer == 'Air' then 
+        if scale < 1.1 then   ## Small units
+             BaseEffectTable = EffectTemplate.ExplosionSmallAir  
+        elseif scale > 3 then ## Large units
+            BaseEffectTable = EffectTemplate.ExplosionLarge
+            ShakeTimeModifier = 1.0
+            ShakeMaxMul = 0.25
+        else                  ## Medium units
+            BaseEffectTable = EffectTemplate.ExplosionMedium
+        end
+    end
+    
+    if layer == 'Water' then 
+        if scale < 1 then   ## Small units
+             BaseEffectTable = EffectTemplate.ExplosionSmallWater 
+        elseif scale > 3 then ## Large units
+            BaseEffectTable = EffectTemplate.ExplosionMediumWater
+            ShakeTimeModifier = 1.0
+            ShakeMaxMul = 0.25
+        else                  ## Medium units
+            BaseEffectTable = EffectTemplate.ExplosionMediumWater
+        end
     end
 
     # Get Environmental effects for current layer
@@ -189,11 +215,11 @@ function GetUnitEnvironmentalExplosionEffects( layer, scale )
     local EffectTable = {}
     if layer == 'Water' then
         if scale < 0.5 then
-            EffectTable = EffectTemplate.WaterSplash01      
+            EffectTable = EffectTemplate.Splashy      
         elseif scale > 1.5 then
-            EffectTable = EffectTemplate.DefaultProjectileWaterImpact      
+            EffectTable = EffectTemplate.ExplosionMediumWater      
         else
-            EffectTable = EffectTemplate.DefaultProjectileWaterImpact      
+            EffectTable = EffectTemplate.ExplosionSmallWater      
         end
     end 
     return EffectTable

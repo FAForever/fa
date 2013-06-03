@@ -566,7 +566,8 @@ float3 ComputeLight_02( float dotLightNormal, float attenuation)
     /// This considers the absence of light due to shadows and surface normals pointing away from the light.
     /// This way all dark areas match (very cool.)
     //return lightMultiplier * light + ( 1 - light ) * shadowFill;
-    return (saturate(lightMultiplier) * light + ( 0.4 - light * 0.4) * shadowFill) * 1.4;
+    //return (saturate(lightMultiplier) * light + ( 0.4 - light * 0.4) * shadowFill) * 1.4;
+    return (saturate(lightMultiplier) * light + ( 0.1 - light * 0.1) * (shadowFill + 1)) * 1.2;
 }
 
 /// ComputeNormal
@@ -2247,14 +2248,14 @@ float4 NormalMappedPS_02( NORMALMAPPED_VERTEX vertex,
   //light = light * lightpow;
 	float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
 	float3 phongAdditive = NormalMappedPhongCoeff * pow( phongAmount, 12) * specular.g * light * 1.4;
-	float3 phongMultiplicative = phongAmount * environment * specular.r * light * 1.4;
+	float3 phongMultiplicative = environment * specular.r * light * 0.5;
 	
 	float emissive = glowMultiplier * specular.b * 0.02;
   
   float3 color = (albedo.rgb * 0.125) + ( emissive.r + (light * albedo.rgb) ) + phongMultiplicative + (phongAdditive);
   float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a )) + (phongAdditive * 0.13);
 	//float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a ));
-  //color = light;
+  //color = phongMultiplicative;
   
 	#ifdef DIRECT3D10
 	if( alphaTestEnable )
@@ -2663,11 +2664,13 @@ float4 AeonPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR
     float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
 	  float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
-
+    
+    //albedo.rgb = (0.8 * specular.r) -  albedo.rgb;
+    
   	// Calculate lighting and shadows
     float3 light = ComputeLight_02( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
     
-    light = (light * 0.6) * pow((1 - specular.a), 8);
+    light = (light * 0.5) * pow((1 - specular.a), 8);
     //light = light * (0.8 - (light * 0.125));
     //float3 lightpow = (light.r + light.g + light.b) / 3;
     //light = light * lightpow * lightpow * lightpow;  
@@ -3235,15 +3238,15 @@ float4 NormalMappedInsectPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefSh
     float3 light = ComputeLight_02( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
     light = light * 1.2;
     float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
-  	float3 phongAdditive = pow( phongAmount, 3) * specular.g * light * 0.8;
+  	float3 phongAdditive = pow( phongAmount, 3) * specular.g * light * 0.5;
     float3 phongMultiplicative = (phongAmount * environment * specular.r * light * 2);       
   	 
   	float emissive = glowMultiplier * specular.b;
   
     //Finish it
     float3 color = (albedo.rgb * 0.125) + emissive + (light * albedo.rgb) + (phongAdditive) + phongMultiplicative;   
-    float alpha = mirrored ? 0.5 : specular.b + glowMinimum + (phongAdditive * 0.05);
-    //color = light;
+    float alpha = mirrored ? 0.5 : specular.b + glowMinimum + (phongAdditive * 0.04);
+    //color = phongAdditive;
     //alpha = 0;
   	return float4( color, alpha);
 }

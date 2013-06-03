@@ -1677,7 +1677,7 @@ AirUnit = Class(MobileUnit) {
 
         if with == 'Water' then
             self:PlayUnitSound('AirUnitWaterImpact')
-            EffectUtil.CreateEffects( self, self:GetArmy(), EffectTemplate.DefaultProjectileWaterImpact )
+            EffectUtil.CreateEffects( self, self:GetArmy(), EffectTemplate.Splashy )
             #self:Destroy()
 	    self:ForkThread(self.SinkIntoWaterAfterDeath, self.OverKillRatio )   
         else
