@@ -1,4 +1,4 @@
--- This file defines skin directories as well as certain skin settings like fonts and colors
+﻿-- This file defines skin directories as well as certain skin settings like fonts and colors
 -- Each skin is a table entry in the skins table
 -- it contains the following fields:
 --  default: The skin to look at if we can't find a needed component in the current skin. Note that this cascades,
@@ -152,7 +152,7 @@ skins = {
         dialogButtonColor = "FFff0000", -- ??
         dialogButtonFont = "Zeroes Three", -- ??
 		highlightColor = "FF767676", -- Cadre de selection
-        disabledColor = "FF767676", -- Couleur de texte dans sa été désactivé
+        disabledColor = "FF767676", -- Couleur de texte dont sa été désactivée
 		tooltipBorderColor = "FF3b3b3b", -- Bordure du Tooltip
         tooltipTitleColor = "FF767676", -- Haut du Tooltip
         tooltipBackgroundColor = "FF000000", -- Bas du Tooltip
