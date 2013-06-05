@@ -43,6 +43,13 @@ local teamIcons = {
     '/lobby/team_icons/team_6_icon.dds',
 }
 
+--// Xinnony DEBUG
+XinnonyDebug = 0
+-- 0 = NO DEBUG (Default)
+-- 1 = DEBUG Country
+-- 2 = DEBUG RuleTitle
+-- 3 = DEBUG PeerDisconnected
+--\\ Xinnony DEBUG
 --// Table of Tooltip Country - Xinnony
 local PrefLanguageTooltipTitle={}
 local PrefLanguageTooltipText={}
@@ -1897,9 +1904,15 @@ function HostTryAddPlayer( senderID, slot, requestedPlayerName, human, aiPersona
     if human and not singlePlayer then
         for i, Country in Country_List do
             lobbyComm:BroadcastData( { Type = 'Country', PlayerName = Country.PlayerName, Result = Country.Result } )
+			if XinnonyDebug == 1 then AddChatText(">> BROADCAST SENDING MSG Country : PlayerName="..Country.PlayerName..", Result="..Country.Result) end
         end
     end
     --\\ Stop COUNTRY
+	--// RULE TITLE - Xinnony
+    if not singlePlayer then
+        RuleTitle_SendMSG()
+    end
+    --\\ Stop RULE TITLE
     -- CPU benchmark code
     if human and not singlePlayer then
         for i,benchmark in CPU_BenchmarkList do
@@ -2344,10 +2357,11 @@ function CreateUI(maxPlayers)
     end
     LayoutHelpers.AtCenterIn(GUI.panel, GUI)
     GUI.panel.brackets = UIUtil.CreateDialogBrackets(GUI.panel, 18, 17, 18, 15)
-
-    local titleText = UIUtil.CreateText(GUI.panel, title, 26, UIUtil.titleFont)
-    LayoutHelpers.AtLeftTopIn(titleText, GUI.panel, 50, 36)
-
+	
+	--// RULE TITLE -- Xinnony
+	RuleTitle_HostCanEditTitle()
+	--\\ Stop RULE TITLE
+	
     randmapText = UIUtil.CreateText(GUI.panel, "Loading ...", 17, UIUtil.titleFont)
     LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
 	--Tooltip.AddButtonTooltip(randmapText,{text='', body=''})
@@ -4037,8 +4051,12 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     lobbyComm = LobbyComm.CreateLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
     if not lobbyComm then
         error('Failed to create lobby using port ' .. tostring(localPort))
+	--else
+		--if GUI.chatDisplay then
+			--AddChatText(">> InitLobbyComm : OK !")
+		--end
     end
-
+	
     lobbyComm.ConnectionFailed = function(self, reason)
         LOG("CONNECTION FAILED ",reason)
 
@@ -4148,7 +4166,8 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             AddChatText("<<"..data.SenderName..">> "..data.Text)
         --// COUNTRY - Xinnony
         elseif data.Type == 'Country' then
-            --LOG("Country Data: name="..(data.PlayerName or "?")..", result="..(data.Result or "?"))
+            if XinnonyDebug == 1 then LOG(">> RECEIVE MSG Country : name="..(data.PlayerName or "?")..", result="..(data.Result or "?")) end
+			if XinnonyDebug == 1 then AddChatText(">> RECEIVE MSG Country : name="..(data.PlayerName or "?")..", result="..(data.Result or "?")) end
             AddPlayerCountry(data)
             local playerId = FindIDForName(data.PlayerName)
             local playerSlot = FindSlotForID(playerId)
@@ -4156,6 +4175,12 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 SetSlotCountryFlag(playerSlot, gameInfo.PlayerOptions[playerSlot])
             end
         --\\ Stop COUNTRY
+		--// RULE TITLE - Xinnony
+        elseif data.Type == 'Rule_Title_MSG' then
+            if XinnonyDebug == 2 then LOG(">> RECEIVE MSG Rule_Title_MSG : result="..(data.Result or "?")) end
+            if XinnonyDebug == 2 then AddChatText(">> RECEIVE MSG Rule_Title_MSG : result="..data.Result) end
+			RuleTitle_SetText(data.Result or "")
+        --\\ Stop RULE TITLE
         -- CPU benchmark code
         elseif data.Type == 'CPUBenchmark' then
             --LOG("CPU Data: "..(data.PlayerName or "?")..", ".. (data.Result or "?"))
@@ -4431,15 +4456,19 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         CreateUI(LobbyComm.maxPlayerSlots)
         UpdateGame()
 
-        if not singlePlayer and not GpgNetActive() then
-            AddChatText(LOCF('<LOC lobui_0290>Hosting on port %d', lobbyComm:GetLocalPort()))
-        end
+        --if not singlePlayer and not GpgNetActive() then
+			--AddChatText('Hosting on port :'..lobbyComm:GetLocalPort())
+			--AddChatText('protocol : '..protocol)
+			--AddChatText('localPort : '..localPort)
+			--AddChatText('desiredPlayerName : '..desiredPlayerName)
+			--AddChatText('localPlayerUID : '..localPlayerUID)
+			--AddChatText('NatTraversalProvider : '..natTraversalProvider) -- Bug here
+        --end
     end
 
     lobbyComm.PeerDisconnected = function(self,peerName,peerID)
         --LOG('PeerDisconnected : ', peerName, ' ', peerID)
-        -- XINNONYWORK -- Here this message always show the player quit !!! TEMPORARY
-        --AddChatText('PeerDisconnected : peerName='..peerName..' peerID='..peerID)
+        if XinnonyDebug == 3 then AddChatText('PeerDisconnected : peerName='..peerName..' peerID='..peerID) end -- XINNONY -- Here this message always show the player quit !!!
         --LOG('GameInfo = ', repr(gameInfo))
 
         local slot = FindSlotForID(peerID)
@@ -4801,7 +4830,8 @@ function NewShowMapPositions(mapCtrl, scenario, numPlayers)
     end
 end -- NewShowMapPositions(...)
 
-
+--------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------  Duck_42 Wall  --------------------------------------------------------
 --******************************************************************************************************
 -- CPU Benchmark Code
 -- Author: Duck_42
@@ -4814,8 +4844,8 @@ local barMax = 450
 local barMin = 150
 local greenBarMax = 300
 local yellowBarMax = 375
-local scoreSkew1 = -25 --Skews all CPU scores up or down by the amount specified (0 = no skew)
-local scoreSkew2 = 1.0 --Skews all CPU scores specified coefficient (1.0 = no skew)
+local scoreSkew1 = 0 --Skews all CPU scores up or down by the amount specified (0 = no skew)
+local scoreSkew2 = 4.0 --Skews all CPU scores specified coefficient (1.0 = no skew)
 
 --Variables for CPU Test
 local running
@@ -4860,7 +4890,7 @@ function CPUBenchmark()
     --CPU score is determined by how many times it can loop through
     --the set of busy work before the timer in the CPUTimer function expires.
     while running do
- 		for i = 1.0, 2.0, .000008 do 
+ 		for i = 1.0, 6.0, .000008 do 
             j = i + i
             k = i * i
             l = k / j
@@ -4926,8 +4956,8 @@ function CPU_AddControlTooltip(control, delay, slotNumber)
     control.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
             local slot = slotNumber
-            Tooltip.CreateMouseoverDisplay(self, {text='CPU Rating: '..GUI.slots[slot].CPUSpeedBar.CPUActualValue,
-                                           body='0=Fastest, 450=Slowest'}, delay, true)
+            Tooltip.CreateMouseoverDisplay(self, {text='CPU Rating: '..GUI.slots[slot].CPUSpeedBar._value(),
+                                           body='150=Fastest, 450=Slowest'}, delay, true)
         elseif event.Type == 'MouseExit' then
             Tooltip.DestroyMouseoverDisplay()
         end
@@ -5024,13 +5054,13 @@ function SetSlotCPUBar(slot, playerInfo)
         if playerInfo.Human then
             local b = FindBenchmarkForName(playerInfo.PlayerName)
             if b then
-				-- For display purposes, the bar has a higher minimum that the actual barMin value.
+				-- For display purposes, the bas has a higher minimum that the actual barMin value.
 				-- This is to ensure that the bar is visible for very small values
 		    	local clampedResult =  math.max(math.min(b.Result, barMax), barMin + math.floor(.04 * (barMax - barMin)))
                 GUI.slots[slot].CPUSpeedBar:SetValue(clampedResult)
 				
 				--For the tooltip, we use the actual clamped value
-				GUI.slots[slot].CPUSpeedBar.CPUActualValue = b.Result
+				GUI.slots[slot].CPUSpeedBar.CPUActualValue = math.max(math.min(b.Result, barMax), barMin)
                 GUI.slots[slot].CPUSpeedBar:Show()
 
                 GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-02_bmp.dds'))
@@ -5047,15 +5077,18 @@ function SetSlotCPUBar(slot, playerInfo)
     end
 end
 
+--------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------  Xinnony Wall  --------------------------------------------------------
+
 --------------------------------------------------
 -- CountryFlag Functions
 -- Author : Xinnony
 --------------------------------------------------
---// COUNTRY - Xinnony
 function CountryScript()
     --LOG('XINNONY - Country is ='..PrefLanguage)
     -- Send update other players
-    lobbyComm:BroadcastData( { Type = 'Country', PlayerName = localPlayerName, Result = PrefLanguage} )
+	if XinnonyDebug == 1 then AddChatText(">> BROADCAST SENDING MSG Country : PlayerName="..localPlayerName..", Result="..PrefLanguage) end
+	lobbyComm:BroadcastData( { Type = 'Country', PlayerName = localPlayerName, Result = PrefLanguage} )
     -- Add country to my local country table
     AddPlayerCountry({PlayerName = localPlayerName, Result = PrefLanguage})
     -- Update Bitmap
@@ -5136,7 +5169,6 @@ function Country_GetTooltipValue(CountryResult, slot)
 			end
 		end
 end
---\\ Stop COUNTRY
 
 --------------------------------------------------
 -- Change the wallpaper according to the chosen Faction Functions
@@ -5159,6 +5191,122 @@ function ChangeBackgroundLobby(slot, faction)
 		else
 			GUI.background:SetTexture(UIUtil.SkinnableFile("/menus02/background-paint_random_bmp.dds"))
 			UIUtil.SetCurrentSkin('randomfaction')
+		end
+	end
+end
+
+
+--------------------------------------------------
+-- Change the title for to say the rule
+-- Author : Xinnony
+--------------------------------------------------
+function RuleTitle_SendMSG()
+	if titleText and lobbyComm:IsHost() then
+		if XinnonyDebug == 2 then AddChatText(">> SENDING MSG Rule_Title_MSG : "..titleText:GetText()) end
+		lobbyComm:BroadcastData( { Type = 'Rule_Title_MSG', Result = titleText:GetText() } )
+	end
+end
+function RuleTitle_SetText(Title_Data)
+	if titleText and not lobbyComm:IsHost() then
+		titleText:SetText(Title_Data)
+	end
+end
+function RuleTitle_HostCanEditTitle()
+	-- TITRE de la Rule
+	local First_Rule_Change = 0
+	titleText = UIUtil.CreateText(GUI.panel, "", 22, UIUtil.titleFont) -- 26
+		if lobbyComm:IsHost() then
+			LayoutHelpers.AtLeftTopIn(titleText, GUI.panel, 50+24, 36+3) -- Décaler pour le Bouton
+			titleText:SetText("FA FOREVER GAME LOBBY (RULE Title)")
+		else
+			LayoutHelpers.AtLeftTopIn(titleText, GUI.panel, 50, 36+3) -- Caler a gauche
+			titleText:SetText("FA FOREVER GAME LOBBY")
+		end
+		
+	-- BOUTON
+	if lobbyComm:IsHost() then
+		NoteBTN = UIUtil.CreateButtonStd(GUI.panel, '/dialogs/config_btn/config', "", 0, 0)
+		LayoutHelpers.AtLeftTopIn(NoteBTN, GUI.panel, 50, 36+4)
+		Tooltip.AddButtonTooltip(NoteBTN, 'Click for set the Ruler label')
+	end
+	
+	-- EDITBOX
+	if lobbyComm:IsHost() then
+		GUI.RuleEdit = Edit(GUI.panel)
+			LayoutHelpers.AtLeftTopIn(GUI.RuleEdit, GUI.panel, 50+23, 36+2)
+			--LayoutHelpers.AtLeftTopIn(GUI.RuleEdit, GUI.panel, 50, 36+2)
+			GUI.RuleEdit.Width:Set(640)
+			GUI.RuleEdit.Height:Set(14+6+6)
+			--GUI.RuleEdit:SetFont(UIUtil.bodyFont, 16)
+			GUI.RuleEdit:SetFont(UIUtil.titleFont, 22)
+			GUI.RuleEdit:SetForegroundColor('FFFFFF')--UIUtil.fontColor) -- Couleur de Text
+			GUI.RuleEdit:SetBackgroundColor('000000')--UIUtil.fontColor) -- Couleur de Fond
+			GUI.RuleEdit:SetHighlightBackgroundColor('000000') -- Fond de Selection
+			GUI.RuleEdit:SetHighlightForegroundColor('FFFFFF')--UIUtil.fontColor) -- Text de Selection
+			GUI.RuleEdit:ShowBackground(false)
+			--GUI.RuleEdit:AcquireFocus()
+			GUI.RuleEdit:SetMaxChars(60)
+			GUI.RuleEdit:Hide() -- TEST
+		
+		-- FONCTION
+		GUI.RuleEdit.OnLoseKeyboardFocus = function(self)
+			titleText:Show()
+			NoteBTN:Show()
+			GUI.RuleEdit:Hide()
+			GUI.RuleEdit:ShowBackground(false)
+		end
+		
+		NoteBTN.OnClick = function(self, modifiers)
+			titleText:Hide()
+			NoteBTN:Hide()
+			GUI.RuleEdit:Show()
+			GUI.RuleEdit:ShowBackground(true)
+			if First_Rule_Change == 0 then
+				GUI.RuleEdit:SetText('RULE:')
+			else
+				GUI.RuleEdit:SetText(titleText:GetText())
+			end
+			GUI.RuleEdit:AcquireFocus()
+		end
+		
+		GUI.RuleEdit.OnCharPressed = function(self, charcode)
+			--titleText:Hide()
+			--NoteBTN:Hide()
+			--GUI.RuleEdit:Show()
+			--GUI.RuleEdit:ShowBackground(true)
+			--GUI.RuleEdit:SetText(titleText:GetText())
+			--GUI.RuleEdit:SetText('RULER:')
+			if charcode == UIUtil.VK_TAB then
+				return true
+			end
+			local charLim = self:GetMaxChars()
+			if STR_Utf8Len(self:GetText()) >= charLim then
+				local sound = Sound({Cue = 'UI_Menu_Error_01', Bank = 'Interface',})
+				PlaySound(sound)
+			end
+		end
+		
+		GUI.RuleEdit.OnEscPressed = function(self, text)
+			titleText:Show()
+			NoteBTN:Show()
+			GUI.RuleEdit:Hide()
+			GUI.RuleEdit:ShowBackground(false)
+		end
+		
+		GUI.RuleEdit.OnEnterPressed = function(self, text)
+			titleText:Show()
+			NoteBTN:Show()
+			GUI.RuleEdit:Hide()
+			GUI.RuleEdit:ShowBackground(false)
+			First_Rule_Change = 1
+			if text != "" then
+				--GpgNetSend('Chat', text)
+				titleText:SetText(""..text)
+				RuleTitle_SendMSG()
+				GUI.ChatEdit:AcquireFocus()
+			--elseif text == 'RULE:' then -- Not Work ??...
+				--titleText:SetText("FA FOREVER GAME LOBBY (RULE Title)")
+			end
 		end
 	end
 end
