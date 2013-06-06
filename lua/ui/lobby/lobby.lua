@@ -5217,7 +5217,7 @@ function RuleTitle_HostCanEditTitle()
 	titleText = UIUtil.CreateText(GUI.panel, "", 22, UIUtil.titleFont) -- 26
 		if lobbyComm:IsHost() then
 			LayoutHelpers.AtLeftTopIn(titleText, GUI.panel, 50+24, 36+3) -- Décaler pour le Bouton
-			titleText:SetText("FA FOREVER GAME LOBBY (RULE Title)")
+			titleText:SetText("FA FOREVER GAME LOBBY")
 		else
 			LayoutHelpers.AtLeftTopIn(titleText, GUI.panel, 50, 36+3) -- Caler a gauche
 			titleText:SetText("FA FOREVER GAME LOBBY")
@@ -5227,7 +5227,7 @@ function RuleTitle_HostCanEditTitle()
 	if lobbyComm:IsHost() then
 		NoteBTN = UIUtil.CreateButtonStd(GUI.panel, '/dialogs/config_btn/config', "", 0, 0)
 		LayoutHelpers.AtLeftTopIn(NoteBTN, GUI.panel, 50, 36+4)
-		Tooltip.AddButtonTooltip(NoteBTN, 'Click for set the Ruler label')
+		Tooltip.AddButtonTooltip(NoteBTN, {text='Click for set the Ruler label', body='This will allow you to view other players you want the rule to apply'})
 	end
 	
 	-- EDITBOX
@@ -5244,7 +5244,6 @@ function RuleTitle_HostCanEditTitle()
 			GUI.RuleEdit:SetHighlightBackgroundColor('000000') -- Fond de Selection
 			GUI.RuleEdit:SetHighlightForegroundColor('FFFFFF')--UIUtil.fontColor) -- Text de Selection
 			GUI.RuleEdit:ShowBackground(false)
-			--GUI.RuleEdit:AcquireFocus()
 			GUI.RuleEdit:SetMaxChars(60)
 			GUI.RuleEdit:Hide() -- TEST
 		
@@ -5254,6 +5253,7 @@ function RuleTitle_HostCanEditTitle()
 			NoteBTN:Show()
 			GUI.RuleEdit:Hide()
 			GUI.RuleEdit:ShowBackground(false)
+			GUI.chatEdit:AcquireFocus()
 		end
 		
 		NoteBTN.OnClick = function(self, modifiers)
@@ -5261,12 +5261,12 @@ function RuleTitle_HostCanEditTitle()
 			NoteBTN:Hide()
 			GUI.RuleEdit:Show()
 			GUI.RuleEdit:ShowBackground(true)
+			GUI.RuleEdit:AcquireFocus()
 			if First_Rule_Change == 0 then
 				GUI.RuleEdit:SetText('RULE:')
 			else
 				GUI.RuleEdit:SetText(titleText:GetText())
 			end
-			GUI.RuleEdit:AcquireFocus()
 		end
 		
 		GUI.RuleEdit.OnCharPressed = function(self, charcode)
@@ -5303,7 +5303,7 @@ function RuleTitle_HostCanEditTitle()
 				--GpgNetSend('Chat', text)
 				titleText:SetText(""..text)
 				RuleTitle_SendMSG()
-				GUI.ChatEdit:AcquireFocus()
+				GUI.chatEdit:AcquireFocus()
 			--elseif text == 'RULE:' then -- Not Work ??...
 				--titleText:SetText("FA FOREVER GAME LOBBY (RULE Title)")
 			end
