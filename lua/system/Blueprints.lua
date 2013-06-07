@@ -294,12 +294,6 @@ function ExtractAllMeshBlueprints()
     end
 
     for id,bp in original_blueprints.Projectile do
-		--just to remove the "Warning: \000/projectiles/tananglertorpedo06/tananglertorpedo06_proj.bp\000 has mesh defined both inline and by reference" error
-		if bp and bp.BlueprintId and bp.BlueprintId == '/projectiles/tananglertorpedo06/tananglertorpedo06_proj.bp' then
-			if bp.Display.MeshBlueprint then 
-				bp.Display.MeshBlueprint = nil
-			end
-		end
         ExtractMeshBlueprint(bp)
     end
 end

@@ -270,7 +270,7 @@ UnitBlueprint {
             RateOfFire = 0.66,
             SlavedToBody = true,
             SlavedToBodyArcRange = 10,
-            TargetCheckInterval = 0.75,
+            TargetCheckInterval = 0.35,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'TECH1 MOBILE',
