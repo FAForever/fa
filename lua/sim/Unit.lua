@@ -4370,8 +4370,29 @@ Unit = Class(moho.unit_methods) {
         self:DisableUnitIntel('Spoof')
         self:DisableUnitIntel('Jammer')
         self:DisableUnitIntel('Radar')
+        local unitWeaponBPs = self:GetBlueprint().Weapon 
+        if unitWeaponBPs then 
+            for index, weaponBP in unitWeaponBPs do
+                if weaponBP.EnergyRequired and weaponBP.EnergyDrainPerSecond then
+                WARN('nrgreq and drain')
+                self:ForkThread(self.CompensateForWeaponCharging, weaponBP.EnergyRequired, weaponBP.EnergyDrainPerSecond, index)
+                end
+            end
+        end
 
         self.InitThread = self:ForkThread(self.InitiateActivationThread)
+
+
+    end,
+
+    CompensateForWeaponCharging = function(self, EnergyAmount, EnergyRate, index)
+        WARN('setting production offset')
+        self:SetProductionActive(true)
+        self:SetProductionPerSecondEnergy(EnergyRate)
+        WaitSeconds(EnergyAmount/EnergyRate)
+        WARN('end offset')
+        self:SetProductionPerSecondEnergy(0)
+        self:SetProductionActive(false)
     end,
 
     InitiateActivationThread = function(self) 
