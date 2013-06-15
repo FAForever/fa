@@ -18,6 +18,7 @@ local EffectUtil = import('/lua/EffectUtilities.lua')
 local ADFOverchargeWeapon = AWeapons.ADFOverchargeWeapon
 local ADFChronoDampener = AWeapons.ADFChronoDampener
 local Buff = import('/lua/sim/Buff.lua')
+local utilities = import('/lua/utilities.lua')
 
 UAL0001 = Class(AWalkingLandUnit) {
 
@@ -112,6 +113,24 @@ UAL0001 = Class(AWalkingLandUnit) {
         self:HideBone('Left_Upgrade', true)            
         # Restrict what enhancements will enable later
         self:AddBuildRestriction( categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
+        self.Idling = true
+        self:ForkThread(self.checkIdling)
+    end,
+
+    ### Checking idling for auto-recall.
+    checkIdling = function(self)
+        WaitSeconds(20)
+        local aiBrain = self:GetAIBrain()
+        local distance = utilities.XZDistanceTwoVectors(self:GetPosition(), aiBrain:GetStartVector3f())
+        if distance == 0 and self.Idling then
+            self:PlayTeleportOutEffects()
+            self:CleanupTeleportChargeEffects()
+            WaitSeconds( 0.1 )
+            self:StopUnitAmbientSound('TeleportLoop')
+            self:PlayUnitSound('TeleportEnd')
+            aiBrain:OnRecall()
+            self:Destroy()
+        end
     end,
 
     OnPrepareArmToBuild = function(self)
@@ -174,7 +193,8 @@ UAL0001 = Class(AWalkingLandUnit) {
         AWalkingLandUnit.OnStartBuild(self, unitBeingBuilt, order)
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
-        self.BuildingUnit = true     
+        self.BuildingUnit = true 
+        self.Idling = false
     end,
 
     OnStopBuild = function(self, unitBeingBuilt)

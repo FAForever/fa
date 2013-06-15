@@ -20,6 +20,7 @@ local CDFHeavyMicrowaveLaserGeneratorCom = CWeapons.CDFHeavyMicrowaveLaserGenera
 local CDFOverchargeWeapon = CWeapons.CDFOverchargeWeapon
 local CANTorpedoLauncherWeapon = CWeapons.CANTorpedoLauncherWeapon
 local Entity = import('/lua/sim/Entity.lua').Entity
+local utilities = import('/lua/utilities.lua')
 
 URL0001 = Class(CWalkingLandUnit) {
     DeathThreadDestructionWaitTime = 2,
@@ -131,8 +132,25 @@ URL0001 = Class(CWalkingLandUnit) {
         end
         # Restrict what enhancements will enable later
         self:AddBuildRestriction( categories.CYBRAN * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
+        self.Idling = true
+        self:ForkThread(self.checkIdling)        
     end,
 
+    ### Checking idling for auto-recall.
+    checkIdling = function(self)
+        WaitSeconds(20)
+        local aiBrain = self:GetAIBrain()
+        local distance = utilities.XZDistanceTwoVectors(self:GetPosition(), aiBrain:GetStartVector3f())
+        if distance == 0 and self.Idling then
+            self:PlayTeleportOutEffects()
+            self:CleanupTeleportChargeEffects()
+            WaitSeconds( 0.1 )
+            self:StopUnitAmbientSound('TeleportLoop')
+            self:PlayUnitSound('TeleportEnd')
+            aiBrain:OnRecall()
+            self:Destroy()
+        end
+    end,
 
     OnPrepareArmToBuild = function(self)
         CWalkingLandUnit.OnPrepareArmToBuild(self)
@@ -203,7 +221,8 @@ URL0001 = Class(CWalkingLandUnit) {
         CWalkingLandUnit.OnStartBuild(self, unitBeingBuilt, order)
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
-        self.BuildingUnit = true        
+        self.BuildingUnit = true   
+        self.Idling = false     
     end,    
 
     OnStopBuild = function(self, unitBeingBuilt)

@@ -18,6 +18,7 @@ local TIFCruiseMissileLauncher = TerranWeaponFile.TIFCruiseMissileLauncher
 local TDFOverchargeWeapon = TerranWeaponFile.TDFOverchargeWeapon
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local Buff = import('/lua/sim/Buff.lua')
+local utilities = import('/lua/utilities.lua')
 
 UEL0001 = Class(TWalkingLandUnit) {    
     DeathThreadDestructionWaitTime = 2,
@@ -115,6 +116,24 @@ UEL0001 = Class(TWalkingLandUnit) {
         self.HasRightPod = false
         # Restrict what enhancements will enable later
         self:AddBuildRestriction( categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
+        self.Idling = true
+        self:ForkThread(self.checkIdling)        
+    end,
+
+    ### Checking idling for auto-recall.
+    checkIdling = function(self)
+        WaitSeconds(20)
+        local aiBrain = self:GetAIBrain()
+        local distance = utilities.XZDistanceTwoVectors(self:GetPosition(), aiBrain:GetStartVector3f())
+        if distance == 0 and self.Idling then
+            self:PlayTeleportOutEffects()
+            self:CleanupTeleportChargeEffects()
+            WaitSeconds( 0.1 )
+            self:StopUnitAmbientSound('TeleportLoop')
+            self:PlayUnitSound('TeleportEnd')
+            aiBrain:OnRecall()
+            self:Destroy()
+        end
     end,
 
     OnPrepareArmToBuild = function(self)
@@ -221,6 +240,7 @@ UEL0001 = Class(TWalkingLandUnit) {
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
         self.BuildingUnit = true        
+        self.Idling = false
     end,
 
     OnFailedToBuild = function(self)
