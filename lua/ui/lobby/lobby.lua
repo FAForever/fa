@@ -2487,7 +2487,7 @@ function CreateUI(maxPlayers)
                 end
                 --SendSystemMessage(selectedScenario.file)
 
-                SetGameOption('ScenarioFile',selectedScenario.file)
+                SetGameOption('ScenarioFile','/maps/test/testing_scenario.lua')
 
                 SetGameOption('RestrictedCategories', restrictedCategories, true)
                 ClearBadMapFlags()  -- every new map, clear the flags, and clients will report if a new map is bad
@@ -3220,7 +3220,7 @@ function CreateUI(maxPlayers)
                         end
                         --SendSystemMessage(selectedScenario.file)
 
-                        SetGameOption('ScenarioFile',selectedScenario.file)
+                        SetGameOption('ScenarioFile','/maps/test/testing_scenario.lua')
 
                         SetGameOption('RestrictedCategories', restrictedCategories, true)
                         ClearBadMapFlags()  -- every new map, clear the flags, and clients will report if a new map is bad
@@ -4400,11 +4400,11 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
         if self.desiredScenario and self.desiredScenario != "" then
             Prefs.SetToCurrentProfile('LastScenario', self.desiredScenario)
-            SetGameOption('ScenarioFile',self.desiredScenario)
+            SetGameOption('ScenarioFile','/maps/test/testing_scenario.lua')
         else
             local scen = Prefs.GetFromCurrentProfile('LastScenario')
             if scen and scen != "" then
-                SetGameOption('ScenarioFile',scen)
+                SetGameOption('ScenarioFile','/maps/test/testing_scenario.lua')
             end
         end
 

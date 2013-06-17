@@ -493,13 +493,17 @@ AIBrain = Class(moho.aibrain_methods) {
         #LOG('*AI DEBUG: AI planName = ', repr(planName))
         #LOG('*AI DEBUG: SCENARIO AI PLAN LIST = ', repr(aiScenarioPlans))
         local civilian = false
+        local support  = false
         for name,data in ScenarioInfo.ArmySetup do
             if name == self.Name then
                 civilian = data.Civilian
+                if data.Support then
+                  support = data.Support
+                end                
                 break
             end
         end
-        if not civilian then
+        if not civilian and not support  then
             local per = ScenarioInfo.ArmySetup[self.Name].AIPersonality
             
             # Flag this brain as a possible brain to have skirmish systems enabled on

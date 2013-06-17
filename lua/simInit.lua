@@ -97,9 +97,9 @@ function SetupSession()
 
     LOG('Loading script file: ',ScenarioInfo.script)
     doscript(ScenarioInfo.script, ScenarioInfo.Env)
-
+    # alter ai teams for galactic War
+    import('/lua/gwReinforcements.lua').assignSupports()
     ResetSyncTable()
-
 end
 
 
@@ -145,6 +145,8 @@ function BeginSession()
     # Pass ScenarioInfo into OnPopulate() and OnStart() for backwards compatibility
     ScenarioInfo.Env.OnPopulate(ScenarioInfo)
     ScenarioInfo.Env.OnStart(ScenarioInfo)
+
+
 
     # Look for teams
     local teams = {}
@@ -196,12 +198,17 @@ function BeginSession()
     for team,armyIndices in teams do
         for k,index in armyIndices do
             for k2,index2 in armyIndices do
+
                 SetAlliance(index,index2,"Ally")
             end
             ArmyBrains[index].RequestingAlliedVictory = true
         end
     end
     
+
+    SetArmyShowScore("SUPPORT_1", false)
+    SetArmyShowScore("SUPPORT_2", false)
+
     # Create any effect markers on map
     local markers = import('/lua/sim/ScenarioUtilities.lua').GetMarkers()
     local Entity = import('/lua/sim/Entity.lua').Entity
