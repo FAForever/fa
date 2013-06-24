@@ -25,6 +25,7 @@
 #
 
 
+
 #===================================================================================
 # Do global init and set up common global functions
 #===================================================================================
@@ -146,7 +147,19 @@ function BeginSession()
     ScenarioInfo.Env.OnPopulate(ScenarioInfo)
     ScenarioInfo.Env.OnStart(ScenarioInfo)
 
-
+    # Get the right color!
+    local ScenarioFramework = import('/lua/ScenarioFramework.lua')
+    for name,army in ScenarioInfo.ArmySetup do
+        if army.Faction == 1 then
+            ScenarioFramework.SetUEFColor(army.ArmyIndex)
+        elseif army.Faction == 2 then
+            ScenarioFramework.SetAeonColor(army.ArmyIndex)
+        elseif army.Faction == 3 then
+            ScenarioFramework.SetCybranColor(army.ArmyIndex)
+        elseif army.Faction == 4 then
+            ScenarioFramework.SetSeraphimColor(army.ArmyIndex)
+        end
+    end
 
     # Look for teams
     local teams = {}

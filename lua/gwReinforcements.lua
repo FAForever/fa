@@ -1,5 +1,6 @@
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
+local SimUtils = import('/lua/SimUtils.lua')
 
 local UEF = 1
 local AEON = 2
@@ -27,42 +28,84 @@ TransportInfo[SERA][2] = 8
 TransportInfo[SERA][1] = 16
 TransportInfo[SERA].Name = 'XSA0104'
 
-armySupport = {}
+local armySupport = {}
+local armySupportIndex = {}
+
+local factions = {}
 
 assignSupports = function()
 	local ArmiesList = ScenarioInfo.ArmySetup
+
+    for name,army in ScenarioInfo.ArmySetup do
+    	if army.ArmyIndex == 1 then
+    		factions[1] = army.Faction
+
+    	elseif army.ArmyIndex == 2 then
+    		factions[2] = army.Faction
+    	end
+    end
 
     for name,army in ScenarioInfo.ArmySetup do
     	if army.ArmyName == "SUPPORT_1" then
     		army.Team = 2
     		army.Civilian = false
     		army.ArmyColor = 1
-    		army.PlayerColor=1
-    		army.Faction = 1
+    		army.PlayerColor= 1
+    		army.Faction = factions[1]
     		army.PlayerName="gw_support_1"
     		armySupport[1] = army.ArmyName
+    		armySupportIndex[1] = army.ArmyIndex
     		army.Support = true
 		elseif army.ArmyName == "SUPPORT_2" then
 			army.Team = 3
 			army.ArmyColor = 2
 			army.PlayerColor=2
 			army.Civilian = false
-			army.Faction = 2
+			army.Faction = factions[2]
 			army.PlayerName="gw_support_2"
 			army.Support = true
 			armySupport[2] = army.ArmyName
+			armySupportIndex[2] = army.ArmyIndex
 
 		end
-    	LOG("army", repr(army))
     end
 
 
 end 
 
+
+
+gwSetAiColor = function(index, faction)
+    if faction == 1 then
+        ScenarioFramework.SetUEFNeutralColor(index)
+    elseif faction == 2 then
+        ScenarioFramework.SetAeonNeutralColor(index)
+    elseif faction == 3 then
+        ScenarioFramework.SetCybranNeutralColor(index)
+    elseif faction == 4 then
+        ScenarioFramework.SetNeutralColor(index)
+    end
+end
+
 gwReinforcementsMainThread = function()
 
 	local gwReinforcementList =  import('/lua/gwReinforcementList.lua').gwReinforcements
 	
+	GetArmyBrain(armySupportIndex[1]):GiveStorage('MASS', 2000)
+	GetArmyBrain(armySupportIndex[1]):GiveStorage('ENERGY', 10000)
+
+	GetArmyBrain(armySupportIndex[2]):GiveStorage('MASS', 2000)
+	GetArmyBrain(armySupportIndex[2]):GiveStorage('ENERGY', 10000)
+
+	GetArmyBrain(armySupportIndex[1]):SetResourceSharing(false)
+	GetArmyBrain(armySupportIndex[2]):SetResourceSharing(false)
+
+
+	gwSetAiColor( armySupportIndex[1], factions[1] )
+	gwSetAiColor( armySupportIndex[2], factions[2] )
+
+
+
 	WaitTicks(10)
 	
 	local ArmiesList = ScenarioInfo.ArmySetup
@@ -430,6 +473,15 @@ SpawnTransportAndIssueDrop = function(transportBPid, units, NearestOffMapLocatio
 
 	#WARN('spawning transport, bpid and army are ' .. repr(transportBPid) .. ' and ' .. repr(beacon.ArmyName))
 	local transport = CreateUnitHPR(transportBPid, armySupport[beacon.ArmyIndex], NearestOffMapLocation[1], NearestOffMapLocation[2], NearestOffMapLocation[3],0,0,0)
+
+	transport.OldOnTransportDetach = transport.OnTransportDetach
+
+	transport.OnTransportDetach = function(self, attachBone, unit)
+		SimUtils.TransferUnitsOwnership( {unit}, beacon.ArmyIndex)
+		self.OldOnTransportDetach(self, attachBone, unit)
+
+	end	
+
 	transport.OffMapExcempt = true
 
 	local aiBrain = transport:GetAIBrain()
@@ -462,7 +514,7 @@ end
 
 IsUnitCloseToPoint = function(unit, point)
 	local position = unit:GetPosition()
-	if VDist3(position, point) < 5 then
+	if VDist2(position[1], position[3], point[1], point[3]) < 5 then
 		return true
 	else
 		return false
@@ -477,6 +529,12 @@ spawnOutEffect = function(unit)
    WaitSeconds( 0.1 ) 
    unit:StopUnitAmbientSound('TeleportLoop') 
    unit:PlayUnitSound('TeleportEnd') 
+   	local cargo = unit:GetCargo()
+	for _,v in cargo do
+		if not v:IsDead() then
+			v:Destroy()
+		end
+	end   
    unit:Destroy()
 end 
 
@@ -531,6 +589,13 @@ SpawnEngineerAndTransportAndBuildTheStructure = function(EngineerBPid, Structure
 	local NearestOffMapLocation = CalculateNearestOffMapLocation(beacon)
 	local engineer = CreateUnitHPR(EngineerBPid, armySupport[beacon.ArmyIndex], NearestOffMapLocation[1], NearestOffMapLocation[2], NearestOffMapLocation[3],0,0,0)
 	engineer.ArmyName = armySupport[beacon.ArmyIndex]
+	engineer.PlayerArmyName = beacon.ArmyIndex
+	engineer:SetProductionActive(true)
+	WaitSeconds( 0.1 )
+	engineer:SetProductionPerSecondEnergy(10000)
+	engineer:SetProductionPerSecondMass(500)
+	WaitSeconds( 0.1 )
+
 	local transport = CreateUnitHPR(TransportBPid, armySupport[beacon.ArmyIndex], NearestOffMapLocation[1], NearestOffMapLocation[2], NearestOffMapLocation[3],0,0,0)
 	local aiBrain = engineer:GetAIBrain()
 	local Transports = aiBrain:MakePlatoon( '', '' )
@@ -582,15 +647,13 @@ ModEngineer = function(engineer, transportBPid)
 	engineer.spawnOutEffect = spawnOutEffect
 	engineer.RemindMyTransportToPickMeUp = RemindMyTransportToPickMeUp
 	engineer.OnStopBuild = function(self, unitBeingBuilt)
-		
+		SimUtils.TransferUnitsOwnership( {unitBeingBuilt}, self.PlayerArmyName)
 		if not self.HaveCalledTransport then
 			self.HaveCalledTransport = true
 			self:ForkThread(self.CallTransportToCarryMeAway, self.transportBPid)
 		else
 			#self:ForkThread(self.RemindMyTransportToPickMeUp, self.myTransport)
 		end
-		self:SetProductionPerSecondEnergy(0)
-		self:SetProductionPerSecondMass(0)
 		self.OldOnStopBuild(self,unitBeingBuilt)
 	end
 	engineer.OldOnStartBuild = engineer.OnStartBuild
@@ -606,8 +669,6 @@ ModEngineer = function(engineer, transportBPid)
 		self.CanIBuild = false
 		#unitBeingBuilt:SetUnSelectable(true)
 		self.OldOnStartBuild(self, unitBeingBuilt, order)
-		self:SetProductionPerSecondEnergy(engineer:GetConsumptionPerSecondEnergy())
-		self:SetProductionPerSecondMass(engineer:GetConsumptionPerSecondMass())
 		#engineer:SetActiveConsumptionInactive()
 	end
 	 
