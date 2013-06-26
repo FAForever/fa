@@ -12,20 +12,13 @@ gwReinforcements = {
 		{
 			playerName = "Ze_PilOt",
 			called = false,
-			delay = 0,
+			delay = 10,
 			unitNames = {
 				"UEB4201",
 			},
 		},
 	},
 	initialUnitWarp = {
-		{
-			playerName = "Ze_PilOt",
-			delay = 10,
-			unitNames = {
-				"DEL0204",
-			},
-		},
 	},
 	periodicUnitWarp = {
 	},

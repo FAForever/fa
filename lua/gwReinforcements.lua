@@ -33,6 +33,8 @@ local armySupportIndex = {}
 
 local factions = {}
 
+local beaconTime = 0
+
 assignSupports = function()
 	local ArmiesList = ScenarioInfo.ArmySetup
 
@@ -289,20 +291,48 @@ ModBeacon = function(ACU, beacon)
 	beacon.OldOnKilled = beacon.OnKilled
 	beacon.OnKilled = function(self, instigator, type, overkillRatio)
 	###ADD HERE
+		if self.RecallThread then
+			KillThread(self.timerThread)
+			self.timerThread = nil
+		end
 		beacon.OldOnKilled(self, instigator, type, overkillRatio)
 	end
-	#beacon.Faction = ScenarioInfo.CivilianDefenseInfo.PlayerObjectiveList[beacon.ArmyIndex].Faction
-	#WARN("army is " .. repr(ACU:GetArmy()))
 	beacon.OldOnStopBeingBuilt = beacon.OnStopBeingBuilt
 	beacon.OnStopBeingBuilt = function(self, builder, layer)
-		beacon.ReinforcementsThread = CallReinforcementsToBeacon(beacon)
-		beacon.EngineersThread = CallEngineersToBeacon(beacon)
+		#beacon.ReinforcementsThread = CallReinforcementsToBeacon(beacon)
+		#beacon.EngineersThread = CallEngineersToBeacon(beacon)
+		
+		CheckEngineersDelay(self)
+		CheckUnitsDelay(self)
+		if table.getn( self.unitsDelays ) != 0 or table.getn( self.engineersDelays ) != 0 then
+			self.timerThread = self:ForkThread(timerBeacon)
+		end
 		beacon.OldOnStopBeingBuilt(self, builder, layer)
+		
 	end
 
 
 end
 
+#this function check all the engineers delay to spawn them.
+CheckEngineersDelay = function(beacon)
+	beacon.engineersDelays = {}
+	for index, List in ScenarioInfo.gwReinforcementList.builtByEngineerStructure do
+		if List.playerName == beacon:GetAIBrain().Nickname and List.delay >= beaconTime then
+			table.insert(beacon.engineersDelays, List)
+		end 
+	end
+end
+
+#this function check all the units delay to spawn them.
+CheckUnitsDelay = function(beacon)
+	beacon.unitsDelays = {}
+	for index, List in ScenarioInfo.gwReinforcementList.transportedUnits do
+		if List.playerName == beacon:GetAIBrain().Nickname and List.delay >= beaconTime then
+			table.insert(beacon.unitsDelays, List)
+		end 
+	end
+end
 
 DespawnBeacon = function(ACU)
 	#WARN("despawning beacon, beacon is " .. repr(ACU.ReinforcementsBeacon))
@@ -312,18 +342,49 @@ DespawnBeacon = function(ACU)
 		end
 		local BeaconPosition = ACU.ReinforcementsBeacon:GetPosition()
 		local TeleportToPosition = {-1000,BeaconPosition[2],-1000}  #far off-map
-		#ACU.ReinforcementsBeacon:SetInvincible(ACU.ReinforcementsBeacon, true)
-		#ACU.ReinforcementsBeacon:HideBone(0, true)
 		ACU.ReinforcementsBeacon:PlayTeleportOutEffects()
 		Warp(ACU.ReinforcementsBeacon,	TeleportToPosition, ACU.ReinforcementsBeacon:GetOrientation())
-		#WaitTicks(5)
 		ACU.ReinforcementsBeacon:Destroy()
 	end
 	ACU.ReinforcementsBeacon = nil
 	return
 end
 
-CallEngineersToBeacon = function(beacon)
+timerBeacon = function(self)
+	while true do
+		beaconTime = beaconTime + 1
+		local toRemove = {}
+		for index, List in self.engineersDelays do
+			if List.delay == beaconTime then
+				CallEngineersToBeacon(self, List)
+				table.insert(toRemove, index)
+			end
+		end
+
+		for _, index in toRemove do
+			table.remove(self.engineersDelays, index)
+		end
+
+		local toRemove = {}
+		for index, List in self.unitsDelays do
+			if List.delay == beaconTime then
+				CallReinforcementsToBeacon(self, List)
+				table.insert(toRemove, index)
+			end
+		end
+
+		for _, index in toRemove do
+			table.remove(self.unitsDelays, index)
+		end
+
+		if table.getn( self.unitsDelays ) == 0 and table.getn( self.engineersDelays ) == 0 then
+			break
+		end
+	 	WaitSeconds(1)
+	end
+end
+
+CallEngineersToBeacon = function(beacon, List)
 	#bring in units + engineers + etc
 	#beacon.Army = nil
 	#for x, Army in ListArmies() do
@@ -337,22 +398,18 @@ CallEngineersToBeacon = function(beacon)
 	beacon.Nickname = beacon.AiBrain.Nickname
 	beacon.ArmyName = beacon.AiBrain.Name
 
-	for index, List in ScenarioInfo.gwReinforcementList.builtByEngineerStructure do
-		if List.playerName == beacon.Nickname and List.called == false then
-			beacon.StructureReinforcementsToCall = List.unitNames
-			beacon.StructureReinforcementsToCallIndex = index
-		end 
-	end
+
+	beacon.StructureReinforcementsToCall = List.unitNames
+
 	beacon.NearestOffMapLocation = CalculateNearestOffMapLocation(beacon)
 
 	WARN('beacon.StructureReinforcementsToCall is ' .. repr(beacon.StructureReinforcementsToCall))
-	if beacon.StructureReinforcementsToCall and not ScenarioInfo.gwReinforcementList.builtByEngineerStructure[beacon.StructureReinforcementsToCallIndex].called then
-		ScenarioInfo.gwReinforcementList.builtByEngineerStructure[beacon.StructureReinforcementsToCallIndex].called = true
+	if beacon.StructureReinforcementsToCall then
 		SpawnBuildByEngineerReinforcements(beacon, beacon.StructureReinforcementsToCall)
 	end
 end
 
-CallReinforcementsToBeacon = function(beacon)
+CallReinforcementsToBeacon = function(beacon, List)
 	#bring in units + engineers + etc
 	#beacon.Army = nil
 	#for x, Army in ListArmies() do
@@ -366,19 +423,12 @@ CallReinforcementsToBeacon = function(beacon)
 	beacon.Nickname = beacon.AiBrain.Nickname
 	beacon.ArmyName = beacon.AiBrain.Name
 	WARN('gwReinforcementList.TransportedUnits is ' .. repr(ScenarioInfo.gwReinforcementList.transportedUnits))
+	
+	beacon.UnitReinforcementsToCall = List.unitNames
 
-	for index, List in ScenarioInfo.gwReinforcementList.transportedUnits do
-		WARN('List.playerName is ' .. repr(List.playerName))
-		WARN('beacon.Nickname is ' .. repr(beacon.Nickname))
-		if List.playerName == beacon.Nickname and List.called == false then
-			beacon.UnitReinforcementsToCall = List.unitNames
-			beacon.UnitReinforcementsToCallIndex = index
-		end
-	end
 	beacon.NearestOffMapLocation = CalculateNearestOffMapLocation(beacon)
 	WARN('beacon.UnitReinforcementsToCall is ' .. repr(beacon.UnitReinforcementsToCall))
-	if beacon.UnitReinforcementsToCall and not ScenarioInfo.gwReinforcementList.transportedUnits[beacon.UnitReinforcementsToCallIndex].called then
-		ScenarioInfo.gwReinforcementList.transportedUnits[beacon.UnitReinforcementsToCallIndex].called = true
+	if beacon.UnitReinforcementsToCall then
 		SpawnTransportedReinforcements(beacon, beacon.UnitReinforcementsToCall)
 	end
 end
