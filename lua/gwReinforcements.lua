@@ -32,6 +32,8 @@ local armySupport = {}
 local armySupportIndex = {}
 
 local factions = {}
+factions[1] = 1
+factions[2] = 1
 
 local beaconTime = 0
 

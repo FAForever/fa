@@ -317,8 +317,8 @@ function HostGame(gameName, scenarioFileName, singlePlayer)
     end
 
     
-    -- The guys at GPG were unable to make a standard for map. We dirty-solve it.
-    lobbyComm.desiredScenario = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
+    -- For GW, the scenario file is automatically generated.
+    lobbyComm.desiredScenario = '/maps/gwScenario/gw_scenario.lua'
 
 
     lobbyComm:HostGame()
