@@ -21,11 +21,19 @@ XRB0304 = Class(CConstructionStructureUnit)
     end,   
     
     OnStartBuild = function(self, unitBeingBuilt, order)
-        self:ForkThread(self.OpenState, unitBeingBuilt, order )
+        if self.buildingThread then
+            KillThread( self.buildingThread)
+        end
+
+        self.buildingThread = self:ForkThread(self.OpenState, unitBeingBuilt, order )
+
     end,
     
     OnStopBuild = function(self, unitBeingBuilt)
-        self:ForkThread(self.CloseState, unitBeingBuilt)        
+        if self.buildingThread then
+            KillThread( self.buildingThread)
+        end
+        self.buildingThread = self:ForkThread(self.CloseState, unitBeingBuilt)        
     end,
 
     OpenState = function(self, unitBeingBuilt, order)
