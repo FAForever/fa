@@ -311,6 +311,7 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         return
     end
     local newUnits = {}
+    table.sort(units, function (a, b) return a:GetBlueprint().Economy.BuildCostMass > b:GetBlueprint().Economy.BuildCostMass end)
     for k,v in units do
         local owner = v:GetArmy()
         if owner == ToArmyIndex then
