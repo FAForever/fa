@@ -10,7 +10,7 @@ local sharedUnits = {}
 
 function BreakAlliance( data )
 
-    # You can't change alliances in a team game
+    # You cannot change alliances in a team game
     if ScenarioInfo.TeamGame then
         return
     end
@@ -27,7 +27,7 @@ function BreakAlliance( data )
 end
 
 function OnAllianceResult( resultData )
-    # You can't change alliances in a team game
+    # You cannot change alliances in a team game
     if ScenarioInfo.TeamGame then
         return
     end
@@ -184,7 +184,8 @@ function SetResourceSharing( data )
 end
 
 function RequestAlliedVictory( data )
-    # You can't change this in a team game
+    # You cannot change this in a team game
+
     if ScenarioInfo.TeamGame then
         return
     end
@@ -206,23 +207,45 @@ end
 #==============================================================================
 # UNIT CAP
 #==============================================================================
-function UpdateUnitCap()
+function UpdateUnitCap(deadArmy)
     # If we are asked to share out unit cap for the defeated army, do the following...
-    if not ScenarioInfo.Options.DoNotShareUnitCap then
-        local aliveCount = 0
-        for k,brain in ArmyBrains do
-            if not brain:IsDefeated() then
-                aliveCount = aliveCount + 1
-            end
+    local mode = ScenarioInfo.Options.ShareUnitCap
+    
+    if(not mode or mode == 'none') then
+        return
+    end
+
+    local totalCount = 0
+    local aliveCount = 0
+    local alive = {}
+
+    for k,brain in ArmyBrains do
+        local index = brain:GetArmyIndex()
+        local eligible
+
+        if(mode == 'all' or (mode == 'allies' and IsAlly(deadArmy, index))) then
+            eligible = true
+        else
+            eligible = false
         end
-        if aliveCount > 0 then
-            local initialCap = tonumber(ScenarioInfo.Options.UnitCap)
-            local totalCap = aliveCount * initialCap
-            for k,brain in ArmyBrains do
-                if not brain:IsDefeated() then
-                    SetArmyUnitCap(brain:GetArmyIndex(),math.floor(totalCap / aliveCount))
-                end
+
+        if eligible then 
+            if not brain:IsDefeated() then
+                table.insert(alive, brain)
             end
+
+            totalCount = totalCount + 1
+        end
+    end
+
+    aliveCount = table.getsize(alive)
+    if aliveCount > 0 then
+        local initialCap = tonumber(ScenarioInfo.Options.UnitCap)
+        local totalCap = totalCount * initialCap
+        local newCap = math.floor(totalCap / aliveCount)
+
+        for _, brain in alive do
+            SetArmyUnitCap(brain:GetArmyIndex(), newCap)
         end
     end
 end

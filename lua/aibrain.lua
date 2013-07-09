@@ -1085,11 +1085,10 @@ AIBrain = Class(moho.aibrain_methods) {
                 table.insert( Sync.GameResult, { index, result } )
             end
         end
-
         
-        
-        import('/lua/SimUtils.lua').UpdateUnitCap()
+        import('/lua/SimUtils.lua').UpdateUnitCap(self:GetArmyIndex())
         import('/lua/SimPing.lua').OnArmyDefeat(self:GetArmyIndex())
+        
         local function KillArmy()
             local allies = {}
             local selfIndex = self:GetArmyIndex()
