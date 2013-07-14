@@ -74,25 +74,25 @@ UEL0001 = Class(TWalkingLandUnit) {
             end,
             
             OnFire = function(self)
-                if not self.unit:IsOverchargePaused() then
+                if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
                     TDFOverchargeWeapon.OnFire(self)
                 end
             end,
             IdleState = State(TDFOverchargeWeapon.IdleState) {
                 OnGotTarget = function(self)
-                    if not self.unit:IsOverchargePaused() then
+                    if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
                         TDFOverchargeWeapon.IdleState.OnGotTarget(self)
                     end
                 end,            
                 OnFire = function(self)
-                    if not self.unit:IsOverchargePaused() then
+                    if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
                         ChangeState(self, self.RackSalvoFiringState)
                     end
                 end,
             },
             RackSalvoFireReadyState = State(TDFOverchargeWeapon.RackSalvoFireReadyState) {
                 OnFire = function(self)
-                    if not self.unit:IsOverchargePaused() then
+                    if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
                         TDFOverchargeWeapon.RackSalvoFireReadyState.OnFire(self)
                     end
                 end,

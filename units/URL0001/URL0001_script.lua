@@ -93,25 +93,25 @@ URL0001 = Class(CWalkingLandUnit) {
             end,
             
             OnFire = function(self)
-                if not self.unit:IsOverchargePaused() then
+                if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
                     CDFOverchargeWeapon.OnFire(self)
                 end
             end,
             IdleState = State(CDFOverchargeWeapon.IdleState) {
                 OnGotTarget = function(self)
-                    if not self.unit:IsOverchargePaused() then
+                    if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
                         CDFOverchargeWeapon.IdleState.OnGotTarget(self)
                     end
                 end,            
                 OnFire = function(self)
-                    if not self.unit:IsOverchargePaused() then
+                    if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
                         ChangeState(self, self.RackSalvoFiringState)
                     end
                 end,
             },
             RackSalvoFireReadyState = State(CDFOverchargeWeapon.RackSalvoFireReadyState) {
                 OnFire = function(self)
-                    if not self.unit:IsOverchargePaused() then
+                    if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
                         CDFOverchargeWeapon.RackSalvoFireReadyState.OnFire(self)
                     end
                 end,
