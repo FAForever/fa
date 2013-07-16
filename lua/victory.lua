@@ -25,7 +25,7 @@ function CheckVictory(scenarioInfo)
         # Look for newly defeated brains and tell them they're dead
         local stillAlive = {}
         for index,brain in ArmyBrains do
-            if not brain:IsDefeated() and not ArmyIsCivilian(brain:GetArmyIndex()) then
+            if not brain:IsDefeated() and not ArmyIsCivilian(brain:GetArmyIndex()) and not brain:IsSupport() then
                 if brain:GetCurrentUnits(categoryCheck) == 0 then
                     brain:OnDefeat()
                     CallEndGame(false, true)

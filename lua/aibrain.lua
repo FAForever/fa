@@ -466,6 +466,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ## ------------- HUMAN BRAIN FUNCTIONS HANDLED HERE  ------------- ##
     #####################################################################
     OnCreateHuman = function(self, planName)
+		self.support  = false
         self:CreateBrainShared(planName)
 
         ####For handicap mod compatibility
@@ -493,17 +494,17 @@ AIBrain = Class(moho.aibrain_methods) {
         #LOG('*AI DEBUG: AI planName = ', repr(planName))
         #LOG('*AI DEBUG: SCENARIO AI PLAN LIST = ', repr(aiScenarioPlans))
         local civilian = false
-        local support  = false
+        self.support  = false
         for name,data in ScenarioInfo.ArmySetup do
             if name == self.Name then
                 civilian = data.Civilian
                 if data.Support then
-                  support = data.Support
+                  self.support = data.Support
                 end                
                 break
             end
         end
-        if not civilian and not support  then
+        if not civilian and not self.support  then
             local per = ScenarioInfo.ArmySetup[self.Name].AIPersonality
             
             # Flag this brain as a possible brain to have skirmish systems enabled on
@@ -1194,7 +1195,10 @@ AIBrain = Class(moho.aibrain_methods) {
     IsDefeated = function(self)
         return ArmyIsOutOfGame(self:GetArmyIndex())
     end,
-
+	
+	IsSupport = function(self)
+		return self.support
+	end,
 
     SetCurrentPlan = function(self, bestPlan)
         if not bestPlan then
