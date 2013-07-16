@@ -35,6 +35,11 @@ local factions = {}
 factions[1] = 1
 factions[2] = 1
 
+local teams = {}
+teams[1] = 1
+teams[2] = 1
+
+
 local beaconTime = 0
 
 assignSupports = function()
@@ -43,15 +48,17 @@ assignSupports = function()
     for name,army in ScenarioInfo.ArmySetup do
     	if army.ArmyIndex == 1 then
     		factions[1] = army.Faction
+			teams[1] = army.Team
 
     	elseif army.ArmyIndex == 2 then
     		factions[2] = army.Faction
+			teams[2] = army.Team
     	end
     end
 
     for name,army in ScenarioInfo.ArmySetup do
     	if army.ArmyName == "SUPPORT_1" then
-    		army.Team = 2
+    		army.Team = teams[1]
     		army.Civilian = false
     		army.ArmyColor = 1
     		army.PlayerColor= 1
@@ -61,7 +68,7 @@ assignSupports = function()
     		armySupportIndex[1] = army.ArmyIndex
     		army.Support = true
 		elseif army.ArmyName == "SUPPORT_2" then
-			army.Team = 3
+			army.Team = teams[2]
 			army.ArmyColor = 2
 			army.PlayerColor=2
 			army.Civilian = false
