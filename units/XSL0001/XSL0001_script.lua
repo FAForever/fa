@@ -89,6 +89,7 @@ XSL0001 = Class( SWalkingLandUnit ) {
                 end
             end,
             IdleState = State(SDFChronotronOverChargeCannonWeapon.IdleState) {
+				OnGotTarget = function(self)
                 if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
                     if not self.unit:IsOverchargePaused() then
                         SDFChronotronOverChargeCannonWeapon.IdleState.OnGotTarget(self)
