@@ -196,4 +196,5 @@ function OnCommandIssued(command)
 			}, 0.75)		
 		end		
 	end
+	import('/lua/spreadattack.lua').MakeShadowCopyOrders(command)
 end
