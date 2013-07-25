@@ -46,7 +46,7 @@ UnitBlueprint {
 		#'HOVER', #added to reflect hover
         'TECH3',
         'DIRECTFIRE',
-		'INDIRECTFIRE', #New, for range ring
+        'INDIRECTFIRE', #New, for range ring
         'VISIBLETORECON',
         'RECLAIMABLE',
         'BOT',
@@ -65,10 +65,10 @@ UnitBlueprint {
     },
     Description = '<LOC xsl0305_desc>Sniper Bot',
     Display = {
-        Abilities = {
-            '<LOC ability_deploys>Deploys',
+        #Abilities = {
+        #    '<LOC ability_deploys>Deploys',
 			#'<LOC ability_hover>Hover', #added to reflect hover
-        },
+        #},
         AnimationDeath = {
             {
                 Animation = '/units/xsl0305/xsl0305_ADeath.sca',
@@ -162,8 +162,8 @@ UnitBlueprint {
     },
     Economy = {
         BuildCostEnergy = 8000,
-        BuildCostMass = 800,
-        BuildTime = 4800,
+        BuildCostMass = 640,
+        BuildTime = 3600,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -241,7 +241,7 @@ UnitBlueprint {
     SizeX = 0.35,
     SizeY = 1.2,
     SizeZ = 0.7,
-    StrategicIconName = 'icon_bot3_directfire',
+    StrategicIconName = 'icon_bot3_sniper',
     StrategicIconSortPriority = 115,
     Transport = {
         CanFireFromTransport = false,
@@ -266,8 +266,9 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 750,
+            Damage = 775,
             DamageRadius = 0,
+            DamageFriendly = false,
             DamageType = 'Normal',
             DisplayName = 'Sih Energy Rifle',
             FireTargetLayerCapsTable = {
@@ -278,6 +279,7 @@ UnitBlueprint {
             IgnoreIfDisabled = true,
             Label = 'MainGun',
             MaxRadius = 65,
+            FiringRandomnessWhileMoving = 0.8,
             MuzzleChargeDelay = 0,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
@@ -303,17 +305,17 @@ UnitBlueprint {
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.15,
             RenderFireClock = true,
-            SlavedToBody = true,
-            SlavedToBodyArcRange = 5,
+            SlavedToBody = false,#from true ; in order to allow better micro
+            #SlavedToBodyArcRange = 5,
             TargetCheckInterval = 3,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
-                'STRUCTURE DEFENSE',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
-                'TECH1 MOBILE',
+                'STRUCTURE DEFENSE',
                 'SPECIALLOWPRI',
-                'ALLUNITS',
+                'STRUCTURE',
+                'ALLUNITS', 
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,
@@ -325,12 +327,11 @@ UnitBlueprint {
             TurretPitchRange = 50,
             TurretPitchSpeed = 30,
             TurretYaw = 0,
-            TurretYawRange = 10,
+            TurretYawRange = 180,#from 10 ; in order to allow better micro
             TurretYawSpeed = 90,
             Turreted = true,
             WeaponCategory = 'Direct Fire',
             WeaponRepackTimeout = 0,
-
             # WeaponUnpackLocksMotion = true, --This was causing the unit not to fire until its weapons had been toggled. *shrug*
             WeaponUnpacks = false,
         },
@@ -340,6 +341,7 @@ UnitBlueprint {
             CollideFriendly = false,
             Damage = 2800,
             DamageRadius = 0,
+            DamageFriendly = false,
             DamageType = 'Normal',
             DisplayName = 'Sih Energy Rifle',
             FireTargetLayerCapsTable = {
@@ -350,6 +352,7 @@ UnitBlueprint {
             IgnoreIfDisabled = true,
             Label = 'SniperGun',
             MaxRadius = 75,
+            FiringRandomnessWhileMoving = 0.8,
             MuzzleChargeDelay = 0.5,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
@@ -372,20 +375,20 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RangeCategory = 'UWRC_IndirectFire', #From diect, so the range ring will show
+            RangeCategory = 'UWRC_IndirectFire', #From direct, so the range ring will show
             RateOfFire = 0.05,
             RenderFireClock = true,
-            SlavedToBody = true,
-            SlavedToBodyArcRange = 5,
+            SlavedToBody = false,#from true ; in order to allow better micro
+            #SlavedToBodyArcRange = 5,
             TargetCheckInterval = 3,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
-                'STRUCTURE DEFENSE',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
-                'TECH1 MOBILE',
+                'STRUCTURE DEFENSE',
                 'SPECIALLOWPRI',
-                'ALLUNITS',
+                'STRUCTURE',
+                'ALLUNITS',                
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,
@@ -397,12 +400,11 @@ UnitBlueprint {
             TurretPitchRange = 50,
             TurretPitchSpeed = 30,
             TurretYaw = 0,
-            TurretYawRange = 10,
+            TurretYawRange = 180,#from 10 ; in order to allow better micro
             TurretYawSpeed = 90,
             Turreted = true,
             WeaponCategory = 'Direct Fire',
             WeaponRepackTimeout = 0,
-
             # WeaponUnpackLocksMotion = true, --This was causing the unit not to fire until its weapons had been toggled. *shrug*
             WeaponUnpacks = false,
         },

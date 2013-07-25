@@ -84,25 +84,26 @@ XSL0001 = Class( SWalkingLandUnit ) {
             end,
             
             OnFire = function(self)
-                if not self.unit:IsOverchargePaused() then
+                if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
                     SDFChronotronOverChargeCannonWeapon.OnFire(self)
                 end
             end,
             IdleState = State(SDFChronotronOverChargeCannonWeapon.IdleState) {
-                OnGotTarget = function(self)
+				OnGotTarget = function(self)
+                if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
                     if not self.unit:IsOverchargePaused() then
                         SDFChronotronOverChargeCannonWeapon.IdleState.OnGotTarget(self)
                     end
                 end,            
                 OnFire = function(self)
-                    if not self.unit:IsOverchargePaused() then
+                    if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
                         ChangeState(self, self.RackSalvoFiringState)
                     end
                 end,
             },
             RackSalvoFireReadyState = State(SDFChronotronOverChargeCannonWeapon.RackSalvoFireReadyState) {
                 OnFire = function(self)
-                    if not self.unit:IsOverchargePaused() then
+                    if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
                         SDFChronotronOverChargeCannonWeapon.RackSalvoFireReadyState.OnFire(self)
                     end
                 end,
@@ -285,6 +286,7 @@ XSL0001 = Class( SWalkingLandUnit ) {
 
     CreateEnhancement = function(self, enh)
         SWalkingLandUnit.CreateEnhancement(self, enh)
+
         local bp = self:GetBlueprint().Enhancements[enh]
         
         # Regenerative Aura
@@ -440,7 +442,7 @@ XSL0001 = Class( SWalkingLandUnit ) {
             end  
             Buff.ApplyBuff(self, 'SeraphimACUDamageStabilizationAdv')     	    
         elseif enh == 'DamageStabilizationAdvancedRemove' then
-            # since there's no way to just remove an upgrade anymore, if we're remove adv, we're removing both
+            # since there's no way to just remove an upgrade anymore, if we're remove adv, were removing both
             if Buff.HasBuff( self, 'SeraphimACUDamageStabilizationAdv' ) then
                 Buff.RemoveBuff( self, 'SeraphimACUDamageStabilizationAdv' )
             end
@@ -495,6 +497,9 @@ XSL0001 = Class( SWalkingLandUnit ) {
                 }
             end
             Buff.ApplyBuff(self, 'SeraphimACUT2BuildRate')
+	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+	    self:updateBuildRestrictions()
+
         elseif enh =='AdvancedEngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -502,7 +507,10 @@ XSL0001 = Class( SWalkingLandUnit ) {
             self:AddBuildRestriction( categories.SERAPHIM * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
             if Buff.HasBuff( self, 'SeraphimACUT2BuildRate' ) then
                 Buff.RemoveBuff( self, 'SeraphimACUT2BuildRate' )
-            end
+	     end
+	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+	    self:updateBuildRestrictions()
+
         #T3 Engineering
         elseif enh =='T3Engineering' then
             local bp = self:GetBlueprint().Enhancements[enh]
@@ -533,6 +541,8 @@ XSL0001 = Class( SWalkingLandUnit ) {
                 }
             end
             Buff.ApplyBuff(self, 'SeraphimACUT3BuildRate')
+	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+	    self:updateBuildRestrictions()
         elseif enh =='T3EngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -541,6 +551,8 @@ XSL0001 = Class( SWalkingLandUnit ) {
                 Buff.RemoveBuff( self, 'SeraphimACUT3BuildRate' )
             end
             self:AddBuildRestriction( categories.SERAPHIM * ( categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
+	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+	    self:updateBuildRestrictions()
         #Blast Attack
         elseif enh == 'BlastAttack' then
             local wep = self:GetWeaponByLabel('ChronotronCannon')

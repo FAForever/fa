@@ -93,8 +93,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 1180,
-        MaxHealth = 1180,
+        Health = 480,
+        MaxHealth = 480,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -192,7 +192,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 3150,
         BuildCostMass = 490,
-        BuildRate = 20,
+        BuildRate = 40,
         BuildTime = 2100,
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER AEON',
@@ -255,7 +255,7 @@ UnitBlueprint {
         Elevation = 0.5,
         MaxAcceleration = 1.9,
         MaxBrake = 1.9,
-        MaxSpeed = 1.9,
+        MaxSpeed = 1.4,
         MaxSpeedReverse = 0,
         MaxSteerForce = 1000,
         MeshExtentsX = 1.1,

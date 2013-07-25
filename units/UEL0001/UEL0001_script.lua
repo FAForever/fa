@@ -73,25 +73,25 @@ UEL0001 = Class(TWalkingLandUnit) {
             end,
             
             OnFire = function(self)
-                if not self.unit:IsOverchargePaused() then
+                if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
                     TDFOverchargeWeapon.OnFire(self)
                 end
             end,
             IdleState = State(TDFOverchargeWeapon.IdleState) {
                 OnGotTarget = function(self)
-                    if not self.unit:IsOverchargePaused() then
+                    if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
                         TDFOverchargeWeapon.IdleState.OnGotTarget(self)
                     end
                 end,            
                 OnFire = function(self)
-                    if not self.unit:IsOverchargePaused() then
+                    if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
                         ChangeState(self, self.RackSalvoFiringState)
                     end
                 end,
             },
             RackSalvoFireReadyState = State(TDFOverchargeWeapon.RackSalvoFireReadyState) {
                 OnFire = function(self)
-                    if not self.unit:IsOverchargePaused() then
+                    if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
                         TDFOverchargeWeapon.RackSalvoFireReadyState.OnFire(self)
                     end
                 end,
@@ -327,6 +327,7 @@ UEL0001 = Class(TWalkingLandUnit) {
 
     CreateEnhancement = function(self, enh)
         TWalkingLandUnit.CreateEnhancement(self, enh)
+
         local bp = self:GetBlueprint().Enhancements[enh]
         if not bp then return end
         if enh == 'LeftPod' then
@@ -407,6 +408,8 @@ UEL0001 = Class(TWalkingLandUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'UEFACUT2BuildRate')
+	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+	    self:updateBuildRestrictions()
         elseif enh =='AdvancedEngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -415,7 +418,10 @@ UEL0001 = Class(TWalkingLandUnit) {
             self:AddBuildRestriction( categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
             if Buff.HasBuff( self, 'UEFACUT2BuildRate' ) then
                 Buff.RemoveBuff( self, 'UEFACUT2BuildRate' )
-            end
+	     end
+	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+	    self:updateBuildRestrictions()
+
         elseif enh =='T3Engineering' then
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
             self:RemoveBuildRestriction(cat)
@@ -443,6 +449,8 @@ UEL0001 = Class(TWalkingLandUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'UEFACUT3BuildRate')
+	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+	    self:updateBuildRestrictions()
         elseif enh =='T3EngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -451,6 +459,8 @@ UEL0001 = Class(TWalkingLandUnit) {
                 Buff.RemoveBuff( self, 'UEFACUT3BuildRate' )
             end
             self:AddBuildRestriction( categories.UEF * ( categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
+	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+	    self:updateBuildRestrictions()
         elseif enh =='DamageStablization' then
             if not Buffs['UEFACUDamageStablization'] then
                 BuffBlueprint {

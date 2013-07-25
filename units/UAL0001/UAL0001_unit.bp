@@ -287,7 +287,7 @@
             BuildableCategoryAdds = 'BUILTBYTIER2COMMANDER AEON',
             Icon = 'aes',
             Name = '<LOC enhancements_0000>Tech 2 Engineering Suite',
-            NewBuildRate = 30,
+            NewBuildRate = 42,
             NewHealth = 3000,
             NewRegenRate = 20,
             ShowBones = {
@@ -321,7 +321,7 @@
         ChronoDampener = {
             BuildCostEnergy = 52500,
             BuildCostMass = 1750,
-            BuildTime = 875,
+            BuildTime = 1225,
             Icon = 'cd',
             Name = '<LOC enhancements_0002>Chrono Dampener',
             ShowBones = {
@@ -389,9 +389,9 @@
             Slot = 'LCH',
         },
         EnhancedSensors = {
-            BuildCostEnergy = 12500,
-            BuildCostMass = 750,
-            BuildTime = 625,
+            BuildCostEnergy = 10000,
+            BuildCostMass = 400,
+            BuildTime = 500,
             Icon = 'ess',
             Name = '<LOC enhancements_0006>Enhanced Sensor System',
             NewOmniRadius = 100,
@@ -462,7 +462,7 @@
         ResourceAllocation = {
             BuildCostEnergy = 150000,
             BuildCostMass = 5000,
-            BuildTime = 1000,
+            BuildTime = 1400,
             Icon = 'ras',
             Name = '<LOC enhancements_0010>Resource Allocation System',
             ProductionPerSecondEnergy = 2700,
@@ -483,7 +483,7 @@
         ResourceAllocationAdvanced = {
             BuildCostEnergy = 150000,
             BuildCostMass = 5000,
-            BuildTime = 1000,
+            BuildTime = 1400,
             Icon = 'eras',
             Name = '<LOC enhancements_0011>Advanced Resource Allocation System',
             Prerequisite = 'ResourceAllocation',
@@ -538,7 +538,7 @@
         Shield = {
             BuildCostEnergy = 93750,
             BuildCostMass = 1500,
-            BuildTime = 1250,
+            BuildTime = 1750,
             Icon = 'ptsg',
             ImpactEffects = 'AeonShieldHit01',
             MaintenanceConsumptionPerSecondEnergy = 250,
@@ -566,7 +566,7 @@
         ShieldHeavy = {
             BuildCostEnergy = 1000000,
             BuildCostMass = 4500,
-            BuildTime = 2500,
+            BuildTime = 3500,
             Icon = 'phtsg',
             ImpactEffects = 'AeonShieldHit01',
             MaintenanceConsumptionPerSecondEnergy = 500,
@@ -644,11 +644,11 @@
         T3Engineering = {
             BuildCostEnergy = 50000,
             BuildCostMass = 2400,
-            BuildTime = 6000,
+            BuildTime = 8400,
             BuildableCategoryAdds = 'BUILTBYTIER3COMMANDER AEON',
             Icon = 'ees',
             Name = '<LOC enhancements_0018>Tech 3 Engineering Suite',
-            NewBuildRate = 90,
+            NewBuildRate = 126,
             NewHealth = 6000,
             NewRegenRate = 35,
             Prerequisite = 'AdvancedEngineering',
@@ -684,7 +684,7 @@
         Teleporter = {
             BuildCostEnergy = 1500000,
             BuildCostMass = 15000,
-            BuildTime = 3000,
+            BuildTime = 4200,
             Icon = 'pqt',
             MaintenanceConsumptionPerSecondEnergy = 10000,
             Name = '<LOC enhancements_0020>Personal Teleporter',

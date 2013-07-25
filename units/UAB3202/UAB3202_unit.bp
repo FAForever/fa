@@ -91,7 +91,7 @@ UnitBlueprint {
         BuildCostEnergy = 3600,
         BuildCostMass = 120,
         BuildRate = 15,
-        BuildTime = 600,
+        BuildTime = 845,
         BuildableCategory = {
             'uas0305',
         },

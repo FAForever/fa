@@ -252,7 +252,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 26400,
         BuildCostMass = 2000,
-        BuildRate = 40,
+        BuildRate = 56,
         BuildTime = 14400,
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER CYBRAN',
@@ -272,7 +272,7 @@ UnitBlueprint {
         CloakingGenerator = {
             BuildCostEnergy = 500000,
             BuildCostMass = 5000,
-            BuildTime = 10000,
+            BuildTime = 14000,
             Icon = 'cfs',
             MaintenanceConsumptionPerSecondEnergy = 3500,
             Name = '<LOC enhancements_0089>Personal Cloaking Generator',
@@ -300,7 +300,7 @@ UnitBlueprint {
         EMPCharge = {
             BuildCostEnergy = 60000,
             BuildCostMass = 1000,
-            BuildTime = 2400,
+            BuildTime = 3360,
             Icon = 'emp',
             Name = '<LOC enhancements_0091>EMP Burst',
             Slot = 'LCH',
@@ -324,7 +324,7 @@ UnitBlueprint {
         FocusConvertor = {
             BuildCostEnergy = 24000,
             BuildCostMass = 800,
-            BuildTime = 2400,
+            BuildTime = 3360,
             Icon = 'fc',
             Name = '<LOC enhancements_0093>Disintegrator Amplifier',
             NewDamageMod = 250,
@@ -350,7 +350,7 @@ UnitBlueprint {
         NaniteMissileSystem = {
             BuildCostEnergy = 30000,
             BuildCostMass = 800,
-            BuildTime = 2400,
+            BuildTime = 3360,
             Icon = 'nms',
             Name = '<LOC enhancements_0095>Nanite Missile System',
             Slot = 'Back',
@@ -374,7 +374,7 @@ UnitBlueprint {
         ResourceAllocation = {
             BuildCostEnergy = 60000,
             BuildCostMass = 4500,
-            BuildTime = 6000,
+            BuildTime = 8400,
             Icon = 'ras',
             Name = '<LOC enhancements_0097>Resource Allocation System',
             ProductionPerSecondEnergy = 1000,
@@ -400,7 +400,7 @@ UnitBlueprint {
         SelfRepairSystem = {
             BuildCostEnergy = 105000,
             BuildCostMass = 2000,
-            BuildTime = 4800,
+            BuildTime = 6720,
             Icon = 'srs',
             Name = '<LOC enhancements_0099>Nano-Repair System',
             NewRegenRate = 400,
@@ -442,7 +442,7 @@ UnitBlueprint {
         StealthGenerator = {
             BuildCostEnergy = 18000,
             BuildCostMass = 600,
-            BuildTime = 1600,
+            BuildTime = 2240,
             Icon = 'sfs',
             MaintenanceConsumptionPerSecondEnergy = 100,
             Name = '<LOC enhancements_0101>Personal Stealth Generator',
@@ -467,10 +467,10 @@ UnitBlueprint {
         Switchback = {
             BuildCostEnergy = 50000,
             BuildCostMass = 1000,
-            BuildTime = 3600,
+            BuildTime = 5040,
             Icon = 'ses',
             Name = '<LOC enhancements_0109>Rapid Fabricator',
-            NewBuildRate = 70,
+            NewBuildRate = 98,
             Slot = 'LCH',
             UpgradeUnitAmbientBones = {
                 'URL0301',

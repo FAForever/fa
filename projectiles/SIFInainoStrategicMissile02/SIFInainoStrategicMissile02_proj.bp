@@ -7,17 +7,17 @@ ProjectileBlueprint {
         },
         ImpactTerrain = Sound {
             Bank = 'Impacts',
-            Cue = 'XSB2305_Impact',
+            Cue = 'XSB2305_impact',
             LodCutoff = 'Weapon_LodCutoff',
         },
         ImpactWater = Sound {
             Bank = 'Impacts',
-            Cue = 'XSB2305_Impact',
+            Cue = 'XSB2305_impact',
             LodCutoff = 'Weapon_LodCutoff',
         },
         NukeExplosion = Sound {
             Bank = 'Impacts',
-            Cue = 'XSB2305_Impact',
+            Cue = 'XSB2305_impact',
             LodCutoff = 'Weapon_LodCutoff',
         },
     },
@@ -51,9 +51,9 @@ ProjectileBlueprint {
         UniformScale = 0.015,
     },
     Economy = {
-        BuildCostEnergy = 1920000,
-        BuildCostMass = 19200,
-        BuildTime = 518400,
+        BuildCostEnergy = 1764000,
+        BuildCostMass = 16800,
+        BuildTime = 453600,
     },
     General = {
         Category = 'Missile',

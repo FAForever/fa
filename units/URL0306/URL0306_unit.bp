@@ -40,7 +40,7 @@ UnitBlueprint {
         'COUNTERINTELLIGENCE',
         'VISIBLETORECON',
         'RECLAIMABLE',
-        'REPAIR',
+        'OVERLAYCOUNTERINTEL',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -111,7 +111,6 @@ UnitBlueprint {
         BuildCostMass = 80,
         BuildTime = 400,
         MaintenanceConsumptionPerSecondEnergy = 25,
-		MaxBuildDistance = 17.5,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,

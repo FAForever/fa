@@ -39,7 +39,7 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    BuildIconSortPriority = 70,
+    BuildIconSortPriority = 50,
     Categories = {
         'PRODUCTFA',
         'SELECTABLE',
@@ -58,6 +58,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
+	'RESEARCH',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -159,10 +160,14 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 7200,
-        BuildCostMass = 800,
+        BuildCostEnergy = 9300,
+        BuildCostMass = 1040,
         BuildRate = 40,
         BuildTime = 1600,
+	DifferentialUpgradeCostCalculation = true, 
+        RebuildBonusIds = {
+            'xsb0201',
+        },
         BuildableCategory = {
             'BUILTBYTIER2FACTORY SERAPHIM MOBILE CONSTRUCTION',
             'BUILTBYTIER2FACTORY SERAPHIM STRUCTURE LAND',
@@ -206,6 +211,7 @@ UnitBlueprint {
         UnitName = '<LOC xsb0201_name>Hethiya',
         UnitWeight = 1,
         UpgradesFrom = 'xsb0101',
+        UpgradesFromBase = 'xsb0101',
         UpgradesTo = 'xsb0301',
     },
     Intel = {
@@ -387,7 +393,7 @@ UnitBlueprint {
     SizeX = 3.1,
     SizeY = 0.8,
     SizeZ = 3.6,
-    StrategicIconName = 'icon_factory2_land',
+    StrategicIconName = 'icon_factoryhq2_land',
     StrategicIconSortPriority = 215,
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',

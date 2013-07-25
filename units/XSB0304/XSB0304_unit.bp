@@ -1,0 +1,400 @@
+UnitBlueprint {
+    Audio = {
+        ActiveLoop = Sound {
+            Bank = 'XSB',
+            Cue = 'XSB0304_Active',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        Construct = Sound {
+            Bank = 'XSB',
+            Cue = 'XSB0304_Construct_Start',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        ConstructLoop = Sound {
+            Bank = 'XSB',
+            Cue = 'XSB0304_Construct_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        DeathExplosion = Sound {
+            Bank = 'XSL_Destroy',
+            Cue = 'XSB_Destroy_Lrg_PreDestroy',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        Destroyed = Sound {
+            Bank = 'XSL_Destroy',
+            Cue = 'XSB_Destroy_Huge',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        DoneBeingBuilt = Sound {
+            Bank = 'XSB',
+            Cue = 'XSB0304_Activate',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        UISelection = Sound {
+            Bank = 'SeraphimSelect',
+            Cue = 'Seraphim_Select_Structure',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+    },
+    BuildIconSortPriority = 220,
+    Categories = {
+        'PRODUCTFA',
+        'SELECTABLE',
+        'BUILTBYTIER3ENGINEER',
+        'BUILTBYTIER3COMMANDER',
+        'SERAPHIM',
+        'STRUCTURE',
+        'TECH3',
+        'FACTORY',
+        'GATE',
+        'RALLYPOINT',
+        'DRAGBUILD',
+        'SIZE20',
+        'VISIBLETORECON',
+        'RECLAIMABLE',
+        'SHOWQUEUE',
+        'SORTSTRATEGIC',
+    },
+    CollisionOffsetZ = 0,
+    Defense = {
+        AirThreatLevel = 0,
+        ArmorType = 'Structure',
+        EconomyThreatLevel = 79,
+        Health = 10000,
+        MaxHealth = 10000,
+        RegenRate = 0,
+        SubThreatLevel = 0,
+        SurfaceThreatLevel = 0,
+    },
+    Description = '<LOC xsb0304_desc>Quantum Gateway',
+    Display = {
+        AnimationDeath = {
+            {
+                Animation = '/units/xsb0304/xsb0304_ADeath.sca',
+                AnimationRateMax = 1,
+                AnimationRateMin = 1,
+                Weight = 1,
+            },
+        },
+        BlinkingLights = {
+            {
+                BLBone = 0,
+                BLOffsetX = -0.9,
+                BLOffsetY = 0.15,
+                BLOffsetZ = -3,
+                BLScale = 1,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = 0.9,
+                BLOffsetY = 0.15,
+                BLOffsetZ = -3,
+                BLScale = 1,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = -0.9,
+                BLOffsetY = 0.15,
+                BLOffsetZ = 3,
+                BLScale = 1,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = 0.9,
+                BLOffsetY = 0.15,
+                BLOffsetZ = 3,
+                BLScale = 1,
+            },
+        },
+        BlinkingLightsFx = {
+            Green = '/effects/emitters/light_green_03_emit.bp',
+            Red = '/effects/emitters/light_red_03_emit.bp',
+            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+        },
+        BuildAttachBone = 'Attachpoint',
+        DamageEffects = {
+            {
+                Bone = 0,
+                OffsetX = 0.75,
+                OffsetY = 0,
+                OffsetZ = 2.75,
+            },
+            {
+                Bone = 0,
+                OffsetX = 0.75,
+                OffsetY = 0,
+                OffsetZ = -2.75,
+            },
+            {
+                Bone = 0,
+                OffsetX = -0.75,
+                OffsetY = 0,
+                OffsetZ = 2.75,
+            },
+            {
+                Bone = 0,
+                OffsetX = -0.75,
+                OffsetY = 0,
+                OffsetZ = -2.75,
+            },
+            {
+                Bone = 0,
+                OffsetX = 1.5,
+                OffsetY = 2,
+                OffsetZ = 0,
+            },
+            {
+                Bone = 0,
+                OffsetX = -1.5,
+                OffsetY = 2,
+                OffsetZ = 0,
+            },
+        },
+        Mesh = {
+            IconFadeInZoom = 130,
+            LODs = {
+                {
+                    LODCutoff = 200,
+                    LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
+                    ShaderName = 'Seraphim',
+                },
+                {
+                    AlbedoName = 'xsb0304_lod1_albedo.dds',
+                    LODCutoff = 500,
+                    LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
+                    ShaderName = 'Seraphim',
+                    SpecularName = 'xsb0304_lod1_specteam.dds',
+                },
+            },
+        },
+        PlaceholderMeshName = 'UAB0304',
+        SpawnRandomRotation = false,
+        Tarmacs = {
+            {
+                Albedo = 'Tarmacs/Tar12x_seraphim_01_albedo',
+                DeathLifetime = 300,
+                FadeOut = 150,
+                Length = 12.8,
+                Normal = 'Tarmacs/Tar12x_seraphim_01_normals',
+                Orientations = {
+                    0,
+                    90,
+                    180,
+                    270,
+                },
+                RemoveWhenDead = false,
+                Width = 12.8,
+            },
+        },
+        UniformScale = 0.05,
+    },
+    Economy = {
+        BuildCostEnergy = 30000,
+        BuildCostMass = 3000,
+        BuildRate = 120,
+        BuildTime = 4097,
+        BuildableCategory = {
+            'BUILTBYQUANTUMGATE SERAPHIM',
+        },
+        RebuildBonusIds = {
+            'xsb0304',
+        },
+    },
+    Footprint = {
+        SizeX = 7,
+        SizeZ = 7,
+    },
+    General = {
+        Category = 'Strategic',
+        Classification = 'RULEUC_Factory',
+        CommandCaps = {
+            RULEUCC_Attack = false,
+            RULEUCC_CallTransport = false,
+            RULEUCC_Capture = false,
+            RULEUCC_Guard = false,
+            RULEUCC_Move = true,
+            RULEUCC_Nuke = false,
+            RULEUCC_Patrol = true,
+            RULEUCC_Pause = true,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
+            RULEUCC_RetaliateToggle = true,
+            RULEUCC_Stop = true,
+            RULEUCC_Transport = false,
+        },
+        ConstructionBar = true,
+        FactionName = 'Seraphim',
+        Icon = 'land',
+        SelectionPriority = 5,
+        TechLevel = 'RULEUTL_Secret',
+        UnitName = '<LOC xsb0304_name>Aezthu-uhthe',
+        UnitWeight = 1,
+    },
+    Intel = {
+        VisionRadius = 20,
+    },
+    Interface = {
+        HelpText = '<LOC xsb0304_help>Quantum Gateway',
+    },
+    LifeBarHeight = 0.075,
+    LifeBarOffset = 2.65,
+    LifeBarSize = 5.5,
+    Physics = {
+        BankingSlope = 0,
+        BuildOnLayerCaps = {
+            LAYER_Air = false,
+            LAYER_Land = true,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
+        DragCoefficient = 0.2,
+        FlattenSkirt = true,
+        MaxSteerForce = 0,
+        MeshExtentsX = 7.5,
+        MeshExtentsY = 2.5,
+        MeshExtentsZ = 7.5,
+        MinSpeedPercent = 0,
+        MotionType = 'RULEUMT_None',
+        OccupyRects = {
+
+            # offsetX offsetZ  sizeX sizeZ, offset from center of unit
+            -3,
+            0,
+            1,
+            3.5,
+            2,
+            0,
+            1,
+            3.5,
+            0,
+            -3,
+            1.5,
+            1,
+        },
+        RaisedPlatforms = {
+
+            # The main ramp
+            # TopLeft Offset From Center
+            -1,
+
+            # x
+            -1,
+
+            # z
+            0.4,
+
+            # height
+            # TopRight Offset From Center
+            1,
+
+            # x
+            -1,
+
+            # z
+            0.4,
+
+            # height
+            # BottomLeft Offset From Center
+            -1,
+
+            # x
+            1,
+
+            # z
+            0.4,
+
+            # height
+            # BottomRight Offset From Center
+            1,
+
+            # x
+            1,
+
+            # z
+            0.4,
+
+            # height
+            # South side
+            # TopLeft Offset From Center
+            -1,
+
+            # x
+            1,
+
+            # z
+            0.4,
+
+            # height
+            # TopRight Offset From Center
+            1,
+
+            # x
+            1,
+
+            # z
+            0.4,
+
+            # height
+            # BottomLeft Offset From Center
+            -0.4,
+
+            # x
+            2.4,
+
+            # z
+            0,
+
+            # height
+            # BottomRight Offset From Center
+            0.4,
+
+            # x
+            2.4,
+
+            # z
+            0,
+        },
+        RollOffPoints = {
+            {
+                UnitSpin = 0,
+                X = 0,
+                Y = 0,
+                Z = 3,
+            },
+        },
+        SkirtOffsetX = -1.5,
+        SkirtOffsetZ = -1.5,
+        SkirtSizeX = 10,
+        SkirtSizeZ = 10,
+        TurnRate = 0,
+    },
+    SelectionSizeX = 3.75,
+    SelectionSizeZ = 3.5,
+    SelectionThickness = 0.27,
+    SizeX = 5,
+    SizeY = 1.5,
+    SizeZ = 5,
+    StrategicIconName = 'icon_structure3_transport',
+    StrategicIconSortPriority = 175,
+    Transport = {
+        Class2AttachSize = 1,
+        Class3AttachSize = 1,
+        ClassGenericUpTo = 3,
+    },
+    Wreckage = {
+        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+        EnergyMult = 0,
+        HealthMult = 0.9,
+        MassMult = 0.9,
+        ReclaimTimeMultiplier = 1,
+        WreckageLayers = {
+            Air = false,
+            Land = true,
+            Seabed = false,
+            Sub = false,
+            Water = false,
+        },
+    },
+}

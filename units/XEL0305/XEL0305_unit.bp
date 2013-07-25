@@ -139,7 +139,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 14000,
         BuildCostMass = 1280,
-        BuildTime = 4800,
+        BuildTime = 6000,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -210,18 +210,18 @@ UnitBlueprint {
     SizeX = 0.8,
     SizeY = 1.6,
     SizeZ = 0.8,
-    StrategicIconName = 'icon_bot3_directfire',
+    StrategicIconName = 'icon_bot3_armored',
     StrategicIconSortPriority = 115,
     Transport = {
         CanFireFromTransport = false,
         TransportClass = 3,
     },
     Veteran = {
-        Level1 = 9,
-        Level2 = 18,
-        Level3 = 27,
-        Level4 = 36,
-        Level5 = 45,
+        Level1 = 20,
+        Level2 = 40,
+        Level3 = 60,
+        Level4 = 80,
+        Level5 = 100,
     },
     Weapon = {
         {

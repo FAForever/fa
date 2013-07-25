@@ -273,7 +273,7 @@ UnitBlueprint {
             HeadingArcRange = 160,
             Label = 'FrontTurret',
             MaxRadius = 100,
-            MuzzleChargeDelay = 0.5,
+            MuzzleChargeDelay = 0.1,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 50,

@@ -38,7 +38,7 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    BuildIconSortPriority = 40,
+    BuildIconSortPriority = 70,
     Categories = {
         'PRODUCTSC1',
         'SELECTABLE',
@@ -57,6 +57,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
+	'RESEARCH',
     },
     CollisionOffsetY = -1,
     CollisionOffsetZ = 0,
@@ -70,7 +71,7 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC ueb0203_desc>Naval Factory',
+    Description = '<LOC ueb0203_desc>Naval Factory HQ',
     Display = {
         Abilities = {
             '<LOC ability_upgradable>Upgradeable',
@@ -92,7 +93,7 @@ UnitBlueprint {
         },
         BuildAttachBone = 'Attachpoint01',
         IdleEffects = {
-            Water = {
+            Water = {	
                 Effects = {
                     {
                         Bones = {
@@ -124,10 +125,14 @@ UnitBlueprint {
         UniformScale = 0.083,
     },
     Economy = {
-        BuildCostEnergy = 5400,
-        BuildCostMass = 1170,
-        BuildRate = 40,
-        BuildTime = 1800,
+        BuildCostEnergy = 8100,
+        BuildCostMass = 1670,
+        BuildRate = 60,
+        BuildTime = 2400,
+	DifferentialUpgradeCostCalculation = true, 
+        RebuildBonusIds = {
+            'ueb0203',
+        },
         BuildableCategory = {
             'BUILTBYTIER2FACTORY UEF MOBILE CONSTRUCTION',
             'BUILTBYTIER2FACTORY UEF STRUCTURE NAVAL',
@@ -172,13 +177,14 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Advanced',
         UnitWeight = 1,
         UpgradesFrom = 'ueb0103',
+        UpgradesFromBase = 'ueb0103',
         UpgradesTo = 'ueb0303',
     },
     Intel = {
         VisionRadius = 20,
     },
     Interface = {
-        HelpText = '<LOC ueb0203_help>Naval Factory',
+        HelpText = '<LOC ueb0203_help>Naval Factory HQ',
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 4.75,
@@ -227,7 +233,7 @@ UnitBlueprint {
     SizeX = 4,
     SizeY = 3, #from 2, for beam weapons
     SizeZ = 10,
-    StrategicIconName = 'icon_factory2_naval',
+    StrategicIconName = 'icon_factoryhq2_naval',
     StrategicIconSortPriority = 215,
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',

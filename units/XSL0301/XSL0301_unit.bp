@@ -266,7 +266,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 25800,
         BuildCostMass = 2050,
-        BuildRate = 40,
+        BuildRate = 56,
         BuildTime = 14400,
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER SERAPHIM',
@@ -285,7 +285,7 @@ UnitBlueprint {
         DamageStabilization = {
             BuildCostEnergy = 75000,
             BuildCostMass = 2500,
-            BuildTime = 4800,
+            BuildTime = 6720,
             Icon = 'dss',
             Name = '<LOC enhancements_0131>Nano-Repair System',
             NewHealth = 14000,
@@ -321,10 +321,10 @@ UnitBlueprint {
         EngineeringThroughput = {
             BuildCostEnergy = 50000,
             BuildCostMass = 1000,
-            BuildTime = 3600,
+            BuildTime = 5040,
             Icon = 'efm',
             Name = '<LOC enhancements_0143>Rapid Fabricator',
-            NewBuildRate = 70,
+            NewBuildRate = 98,
             Slot = 'LCH',
             UpgradeEffectBones = {
                 'Left_Arm_Muzzle',
@@ -350,7 +350,7 @@ UnitBlueprint {
         EnhancedSensors = {
             BuildCostEnergy = 36000,
             BuildCostMass = 800,
-            BuildTime = 2400,
+            BuildTime = 3360,
             Icon = 'sre',
             Name = '<LOC enhancements_0141>Enhanced Sensor System',
             NewMaxRadius = 35,
@@ -386,7 +386,7 @@ UnitBlueprint {
         Missile = {
             BuildCostEnergy = 50000,
             BuildCostMass = 1000,
-            BuildTime = 3000,
+            BuildTime = 4200,
             Icon = 'tmu',
             Name = '<LOC enhancements_0145>Tactical Missile Launcher',
             ShowBones = {
@@ -419,7 +419,7 @@ UnitBlueprint {
         Overcharge = {
             BuildCostEnergy = 270000,
             BuildCostMass = 4500,
-            BuildTime = 9000,
+            BuildTime = 12600,
             Icon = 'oc',
             Name = '<LOC enhancements_0139>Overcharge',
             Slot = 'RCH',
@@ -447,7 +447,7 @@ UnitBlueprint {
         Shield = {
             BuildCostEnergy = 105000,
             BuildCostMass = 1500,
-            BuildTime = 4800,
+            BuildTime = 6720,
             Icon = 'sp',
             ImpactEffects = 'SeraphimShieldHit01',
             MaintenanceConsumptionPerSecondEnergy = 300,
@@ -506,7 +506,7 @@ UnitBlueprint {
         Teleporter = {
             BuildCostEnergy = 1500000,
             BuildCostMass = 15000,
-            BuildTime = 15000,
+            BuildTime = 21000,
             Icon = 'pqt',
             MaintenanceConsumptionPerSecondEnergy = 10000,
             Name = '<LOC enhancements_0035>Personal Teleporter',

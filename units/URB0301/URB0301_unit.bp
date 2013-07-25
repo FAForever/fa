@@ -38,7 +38,7 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    BuildIconSortPriority = 70,
+    BuildIconSortPriority = 40,
     Categories = {
         'PRODUCTSC1',
         'SELECTABLE',
@@ -57,6 +57,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
+	'RESEARCH',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -68,7 +69,7 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC urb0301_desc>Land Factory',
+    Description = '<LOC urb0301_desc>Land Factory HQ',
     Display = {
         AnimationBuild = '/units/urb0301/urb0301_abuild.sca',
         BlinkingLights = {
@@ -127,10 +128,14 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 28350,
-        BuildCostMass = 3150,
-        BuildRate = 60,
-        BuildTime = 8400,
+        BuildCostEnergy = 39900,
+        BuildCostMass = 4440,
+        BuildRate = 90,
+        BuildTime = 9400,
+	DifferentialUpgradeCostCalculation = true, 
+        RebuildBonusIds = {
+            'urb0301',
+        },
         BuildableCategory = {
             'BUILTBYTIER3FACTORY CYBRAN MOBILE CONSTRUCTION',
             'BUILTBYTIER3FACTORY CYBRAN STRUCTURE LAND',
@@ -178,12 +183,13 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Secret',
         UnitWeight = 1,
         UpgradesFrom = 'urb0201',
+        UpgradesFromBase = 'urb0101',
     },
     Intel = {
         VisionRadius = 20,
     },
     Interface = {
-        HelpText = '<LOC urb0301_help>Land Factory',
+        HelpText = '<LOC urb0301_help>Land Factory HQ',
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 2.25,
@@ -351,7 +357,7 @@ UnitBlueprint {
     SizeX = 2.9,
     SizeY = 1,
     SizeZ = 4.2,
-    StrategicIconName = 'icon_factory3_land',
+    StrategicIconName = 'icon_factoryhq3_land',
     StrategicIconSortPriority = 210,
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',

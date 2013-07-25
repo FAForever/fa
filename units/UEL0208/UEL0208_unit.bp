@@ -92,8 +92,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 730,
-        MaxHealth = 730,
+        Health = 300,
+        MaxHealth = 300,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -198,7 +198,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 840,
         BuildCostMass = 160,
-        BuildRate = 10,
+        BuildRate = 12.5,
         BuildTime = 800,
         BuildableCategory = {
             'BUILTBYTIER2ENGINEER UEF',
@@ -266,7 +266,7 @@ UnitBlueprint {
         DragCoefficient = 0.2,
         MaxAcceleration = 1.9,
         MaxBrake = 1.9,
-        MaxSpeed = 1.9,
+        MaxSpeed = 1.7,
         MaxSpeedReverse = 1.4,
         MaxSteerForce = 15,
         MeshExtentsX = 0.75,

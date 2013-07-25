@@ -97,7 +97,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 3400,
         BuildCostMass = 480,
-        BuildTime = 400,
+        BuildTime = 600,
         RebuildBonusIds = {
             'urb2301',
         },
@@ -187,7 +187,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_LowArc',
             CollideFriendly = false,
-            Damage = 11,
+            Damage = 10,
             DamageType = 'Normal',
             DisplayName = 'Particle Cannon',
             FireTargetLayerCapsTable = {

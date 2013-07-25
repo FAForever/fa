@@ -39,7 +39,7 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    BuildIconSortPriority = 70,
+    BuildIconSortPriority = 40,
     Categories = {
         'PRODUCTSC1',
         'SELECTABLE',
@@ -58,6 +58,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
+	'RESEARCH',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -69,7 +70,7 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC ueb0301_desc>Land Factory',
+    Description = '<LOC ueb0301_desc>Land Factory HQ',
     Display = {
         BlinkingLights = {
             {
@@ -134,10 +135,14 @@ UnitBlueprint {
         UniformScale = 0.1,
     },
     Economy = {
-        BuildCostEnergy = 28350,
-        BuildCostMass = 3150,
-        BuildRate = 60,
-        BuildTime = 8400,
+        BuildCostEnergy = 39900,
+        BuildCostMass = 4440,
+        BuildRate = 90,
+        BuildTime = 9400,
+	DifferentialUpgradeCostCalculation = true, 
+        RebuildBonusIds = {
+            'ueb0301',
+        },
         BuildableCategory = {
             'BUILTBYTIER3FACTORY UEF MOBILE CONSTRUCTION',
             'BUILTBYTIER3FACTORY UEF STRUCTURE LAND',
@@ -182,12 +187,13 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Secret',
         UnitWeight = 1,
         UpgradesFrom = 'ueb0201',
+	UpgradesFromBase = 'ueb0101',
     },
     Intel = {
         VisionRadius = 20,
     },
     Interface = {
-        HelpText = '<LOC ueb0301_help>Land Factory',
+        HelpText = '<LOC ueb0301_help>Land Factory HQ. Builds units and enables tech for normal land factories',
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 2.5,
@@ -443,9 +449,9 @@ UnitBlueprint {
     SizeX = 4.8,
     SizeY = 0.6,
     SizeZ = 4.8,
-    StrategicIconName = 'icon_factory3_land',
+    StrategicIconName = 'icon_factoryhq3_land',
     StrategicIconSortPriority = 210,
-    UpgradeDesc = '<LOC ueb0301_upgradedesc>Upgrading to Tech 3 Land Factory',
+    UpgradeDesc = '<LOC ueb0301_upgradedesc>Upgrading to Tech 3 Land Factory HQ',
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
         EnergyMult = 0,

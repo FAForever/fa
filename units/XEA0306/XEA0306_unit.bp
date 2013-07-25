@@ -230,10 +230,10 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 29531,
+        BuildCostEnergy = 52500,
         BuildCostMass = 1400,
         BuildTime = 5250,
-        MaintenanceConsumptionPerSecondEnergy = 250,
+        MaintenanceConsumptionPerSecondEnergy = 400,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -317,11 +317,11 @@ UnitBlueprint {
     },
     UseOOBTestZoom = 200,
     Veteran = {
-        Level1 = 3,
-        Level2 = 6,
-        Level3 = 9,
-        Level4 = 12,
-        Level5 = 15,
+        Level1 = 12,
+        Level2 = 24,
+        Level3 = 36,
+        Level4 = 48,
+        Level5 = 60,
     },
     Weapon = {
         {

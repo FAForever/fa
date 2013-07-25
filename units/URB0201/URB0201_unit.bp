@@ -38,7 +38,7 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    BuildIconSortPriority = 70,
+    BuildIconSortPriority = 50,
     Categories = {
         'PRODUCTSC1',
         'SELECTABLE',
@@ -57,6 +57,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
+	'RESEARCH',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -68,7 +69,7 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC urb0201_desc>Land Factory',
+    Description = '<LOC urb0201_desc>Land Factory HQ',
     Display = {
         Abilities = {
             '<LOC ability_upgradable>Upgradeable',
@@ -134,10 +135,14 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 7200,
-        BuildCostMass = 800,
+        BuildCostEnergy = 9300,
+        BuildCostMass = 1040,
         BuildRate = 40,
         BuildTime = 1600,
+	DifferentialUpgradeCostCalculation = true,
+        RebuildBonusIds = {
+            'urb0201',
+        },
         BuildableCategory = {
             'BUILTBYTIER2FACTORY CYBRAN MOBILE CONSTRUCTION',
             'BUILTBYTIER2FACTORY CYBRAN STRUCTURE LAND',
@@ -183,13 +188,14 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Advanced',
         UnitWeight = 1,
         UpgradesFrom = 'urb0101',
+        UpgradesFromBase = 'urb0101',
         UpgradesTo = 'urb0301',
     },
     Intel = {
         VisionRadius = 20,
     },
     Interface = {
-        HelpText = '<LOC urb0201_help>Land Factory',
+        HelpText = '<LOC urb0201_help>Land Factory HQ',
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 2.15,
@@ -357,7 +363,7 @@ UnitBlueprint {
     SizeX = 2.9,
     SizeY = 1,
     SizeZ = 4.2,
-    StrategicIconName = 'icon_factory2_land',
+    StrategicIconName = 'icon_factoryhq2_land',
     StrategicIconSortPriority = 215,
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',

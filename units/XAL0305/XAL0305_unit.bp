@@ -1,8 +1,7 @@
 UnitBlueprint {
     AI = {
-
         # GuardScanRadius = 30,
-        NeedUnpack = true,
+        NeedUnpack = false,#from true
     },
     Audio = {
         AmbientMove = Sound {
@@ -68,9 +67,9 @@ UnitBlueprint {
     },
     Description = '<LOC xal0305_desc>Sniper Bot',
     Display = {
-        Abilities = {
-            '<LOC ability_deploys>Deploys',
-        },
+        #Abilities = {
+        #    '<LOC ability_deploys>Deploys',
+        #},
         AnimationDeath = {
             {
                 Animation = '/units/xal0305/xal0305_adeath01.sca',
@@ -138,8 +137,8 @@ UnitBlueprint {
     },
     Economy = {
         BuildCostEnergy = 8000,
-        BuildCostMass = 800,
-        BuildTime = 4800,
+        BuildCostMass = 640,
+        BuildTime = 3600,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -209,7 +208,7 @@ UnitBlueprint {
     SizeX = 0.8,
     SizeY = 1,
     SizeZ = 0.6,
-    StrategicIconName = 'icon_bot3_directfire',
+    StrategicIconName = 'icon_bot3_sniper',
     StrategicIconSortPriority = 115,
     Transport = {
         CanFireFromTransport = false,
@@ -234,8 +233,9 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 1300,
+            Damage = 1350,
             DamageRadius = 0,
+            DamageFriendly = false,
             DamageType = 'Normal',
             DisplayName = 'Heavy Disruptor Cannon',
             FireTargetLayerCapsTable = {
@@ -245,6 +245,7 @@ UnitBlueprint {
             FiringTolerance = 2,
             Label = 'MainGun',
             MaxRadius = 70,
+            FiringRandomnessWhileMoving = 0.8,
             MuzzleChargeDelay = 1,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
@@ -273,11 +274,11 @@ UnitBlueprint {
             TargetCheckInterval = 3,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
-                'STRUCTURE DEFENSE',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
-                'TECH1 MOBILE',
+                'STRUCTURE DEFENSE',
                 'SPECIALLOWPRI',
+                'STRUCTURE',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
@@ -296,9 +297,9 @@ UnitBlueprint {
             WeaponCategory = 'Direct Fire',
             WeaponRepackTimeout = 0,
             WeaponUnpackAnimation = '/units/xal0305/xal0305_asetup.sca',
-            WeaponUnpackAnimationRate = 1,
-            WeaponUnpackLocksMotion = true,
-            WeaponUnpacks = true,
+            WeaponUnpackAnimationRate = 0,#from 1
+            WeaponUnpackLocksMotion = false,#from true
+            WeaponUnpacks = false,# from true
         },
     },
     Wreckage = {

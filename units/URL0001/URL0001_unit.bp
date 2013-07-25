@@ -100,11 +100,11 @@ UnitBlueprint {
     },
     Buffs = {
         Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
+            Level1 = 4,
+            Level2 = 7,
+            Level3 = 10,
+            Level4 = 13,
+            Level5 = 16,
         },
     },
     Categories = {
@@ -136,7 +136,7 @@ UnitBlueprint {
         EconomyThreatLevel = 5,
         Health = 10000,
         MaxHealth = 10000,
-        RegenRate = 18,
+        RegenRate = 17,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 75,
     },
@@ -293,7 +293,7 @@ UnitBlueprint {
             BuildableCategoryAdds = 'BUILTBYTIER2COMMANDER CYBRAN',
             Icon = 'aes',
             Name = '<LOC enhancements_0077>Tech 2 Engineering Suite',
-            NewBuildRate = 30,
+            NewBuildRate = 42,
             NewHealth = 3500,
             NewRegenRate = 20,
             ShowBones = {
@@ -328,7 +328,7 @@ UnitBlueprint {
         CloakingGenerator = {
             BuildCostEnergy = 750000,
             BuildCostMass = 6000,
-            BuildTime = 3000,
+            BuildTime = 4200,
             Icon = 'pcg',
             MaintenanceConsumptionPerSecondEnergy = 3000,
             Name = '<LOC enhancements_0079>Personal Cloaking Generator',
@@ -393,7 +393,7 @@ UnitBlueprint {
         MicrowaveLaserGenerator = {
             BuildCostEnergy = 500000,
             BuildCostMass = 4000,
-            BuildTime = 2000,
+            BuildTime = 2800,
             HideBones = {
                 'Chest_Right',
                 'Chest_Left',
@@ -468,7 +468,7 @@ UnitBlueprint {
         ResourceAllocation = {
             BuildCostEnergy = 150000,
             BuildCostMass = 5000,
-            BuildTime = 1000,
+            BuildTime = 1400,
             Icon = 'ras',
             Name = '<LOC enhancements_0087>Resource Allocation System',
             ProductionPerSecondEnergy = 3500,
@@ -555,11 +555,11 @@ UnitBlueprint {
         T3Engineering = {
             BuildCostEnergy = 50000,
             BuildCostMass = 2400,
-            BuildTime = 6000,
+            BuildTime = 8400,
             BuildableCategoryAdds = 'BUILTBYTIER3COMMANDER CYBRAN',
             Icon = 'ees',
             Name = '<LOC enhancements_0103>Tech 3 Engineering Suite',
-            NewBuildRate = 90,
+            NewBuildRate = 126,
             NewHealth = 7000,
             NewRegenRate = 35, # fixes lower regen rate with t3 suite. this is t2 regen + t3 regen [130]
             Prerequisite = 'AdvancedEngineering',
@@ -590,7 +590,7 @@ UnitBlueprint {
         Teleporter = {
             BuildCostEnergy = 1500000,
             BuildCostMass = 15000,
-            BuildTime = 3000,
+            BuildTime = 4200,
             Icon = 'pqt',
             MaintenanceConsumptionPerSecondEnergy = 10000,
             Name = '<LOC enhancements_0105>Personal Teleporter',

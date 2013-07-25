@@ -37,7 +37,7 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    BuildIconSortPriority = 40,
+    BuildIconSortPriority = 50,
     Categories = {
         'PRODUCTFA',
         'SELECTABLE',
@@ -56,6 +56,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
+	'RESEARCH',
     },
     CollisionOffsetY = 0,
     Defense = {
@@ -145,10 +146,14 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 72000,
-        BuildCostMass = 2750,
-        BuildRate = 60,
-        BuildTime = 8400,
+        BuildCostEnergy = 99191,
+        BuildCostMass = 4090,
+        BuildRate = 120,
+        BuildTime = 10400,
+	DifferentialUpgradeCostCalculation = true, 
+        RebuildBonusIds = {
+            'xsb0302',
+        },
         BuildableCategory = {
             'BUILTBYTIER3FACTORY SERAPHIM MOBILE CONSTRUCTION',
             'BUILTBYTIER3FACTORY SERAPHIM STRUCTURE AIR',
@@ -194,6 +199,7 @@ UnitBlueprint {
         UnitName = '<LOC xsb0302_name>Ia-iya',
         UnitWeight = 1,
         UpgradesFrom = 'xsb0202',
+        UpgradesFromBase = 'xsb0102',
     },
     Intel = {
         VisionRadius = 20,
@@ -250,7 +256,7 @@ UnitBlueprint {
     SizeX = 4,
     SizeY = 2.8,
     SizeZ = 4,
-    StrategicIconName = 'icon_factory3_air',
+    StrategicIconName = 'icon_factoryhq3_air',
     StrategicIconSortPriority = 210,
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',

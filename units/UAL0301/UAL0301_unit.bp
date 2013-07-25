@@ -262,7 +262,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 27100,
         BuildCostMass = 1950,
-        BuildRate = 40,
+        BuildRate = 56,
         BuildTime = 14400,
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER AEON',
@@ -282,11 +282,11 @@ UnitBlueprint {
     Enhancements = {
         EngineeringFocusingModule = {
             BuildCostEnergy = 50000,
-            BuildCostMass = 1000,
-            BuildTime = 3600,
+            BuildCostMass = 1400,
+            BuildTime = 5040,
             Icon = 'efm',
             Name = '<LOC enhancements_0022>Rapid Fabricator',
-            NewBuildRate = 70,
+            NewBuildRate = 98,
             Slot = 'LCH',
             UpgradeUnitAmbientBones = {
                 'UAL0301',
@@ -307,8 +307,8 @@ UnitBlueprint {
         },
         ResourceAllocation = {
             BuildCostEnergy = 60000,
-            BuildCostMass = 5000,
-            BuildTime = 6000,
+            BuildCostMass = 4500,
+            BuildTime = 8400,
             Icon = 'ras',
             Name = '<LOC enhancements_0024>Resource Allocation System',
             ProductionPerSecondEnergy = 1000,
@@ -334,7 +334,7 @@ UnitBlueprint {
         Sacrifice = {
             BuildCostEnergy = 2500,
             BuildCostMass = 150,
-            BuildTime = 500,
+            BuildTime = 700,
             Icon = 'sp',
             Name = '<LOC enhancements_0026>Sacrificial System',
             Slot = 'LCH',
@@ -358,7 +358,7 @@ UnitBlueprint {
         Shield = {
             BuildCostEnergy = 60000,
             BuildCostMass = 1200,
-            BuildTime = 3600,
+            BuildTime = 5040,
             Icon = 'tsg',
             ImpactEffects = 'AeonShieldHit01',
             MaintenanceConsumptionPerSecondEnergy = 300,
@@ -384,7 +384,7 @@ UnitBlueprint {
         ShieldHeavy = {
             BuildCostEnergy = 100000,
             BuildCostMass = 1500,
-            BuildTime = 5000,
+            BuildTime = 7000,
             Icon = 'htsg',
             ImpactEffects = 'AeonShieldHit01',
             MaintenanceConsumptionPerSecondEnergy = 600,
@@ -457,7 +457,7 @@ UnitBlueprint {
         StabilitySuppressant = {
             BuildCostEnergy = 36000,
             BuildCostMass = 1250,
-            BuildTime = 3600,
+            BuildTime = 5040,
             Icon = 'ss',
             Name = '<LOC enhancements_0031>Reacton Refractor',
             NewDamageRadiusMod = 3.5,
@@ -484,7 +484,7 @@ UnitBlueprint {
         SystemIntegrityCompensator = {
             BuildCostEnergy = 75000,
             BuildCostMass = 1500,
-            BuildTime = 4800,
+            BuildTime = 6720,
             Icon = 'sic',
             Name = '<LOC enhancements_0033>Nano-Repair System',
             NewRegenRate = 300,
@@ -518,7 +518,7 @@ UnitBlueprint {
         Teleporter = {
             BuildCostEnergy = 1500000,
             BuildCostMass = 15000,
-            BuildTime = 15000,
+            BuildTime = 21000,
             Icon = 'pqt',
             MaintenanceConsumptionPerSecondEnergy = 10000,
             Name = '<LOC enhancements_0035>Personal Teleporter',

@@ -72,12 +72,15 @@ UnitBlueprint {
         'DIRECTFIRE',
         'ANTIAIR',
         'NEEDMOBILEBUILD',
+        'INTELLIGENCE',
+        'COUNTERINTELLIGENCE',
         'SONAR',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'DRAGBUILD',
         'OVERLAYDIRECTFIRE',
         'OVERLAYSONAR',
+        'OVERLAYCOUNTERINTEL',
         'OVERLAYANTIAIR',
         'OVERLAYANTINAVY',
 		'OVERLAYINDIRECTFIRE',   # Added for range ring issue [155]
@@ -99,7 +102,7 @@ UnitBlueprint {
             '<LOC ability_amphibious>Amphibious',
             '<LOC ability_aa>Anti-Air',
             '<LOC ability_massive>Massive',
-            '<LOC ability_personalstealth>Personal Stealth',
+            '<LOC ability_stealthfield>Stealth Field',
             '<LOC ability_sonar>Sonar',
             '<LOC ability_torpedo>Torpedoes',
             '<LOC ability_deathaoe>Volatile',
@@ -220,9 +223,9 @@ UnitBlueprint {
     },
     Economy = {
         BuildCostEnergy = 260000,
-        BuildCostMass = 21000,
+        BuildCostMass = 19000,
         BuildTime = 15750, 
-        MaintenanceConsumptionPerSecondEnergy = 250,
+        MaintenanceConsumptionPerSecondEnergy = 400,
     },
     General = {
         Category = 'Experimental',
@@ -245,8 +248,8 @@ UnitBlueprint {
         Icon = 'amph',
         OrderOverrides = {
             RULEUTC_StealthToggle = {
-                bitmapId = 'stealth-personal',
-                helpText = 'toggle_stealth_personal',
+                bitmapId = 'stealth-field',
+                helpText = 'toggle_stealth_field',
             },
         },
         TechLevel = 'RULEUTL_Secret',
@@ -258,8 +261,11 @@ UnitBlueprint {
     },
     Intel = {
         RadarStealth = true,
+        RadarStealthField = true,
+        RadarStealthFieldRadius = 30,
         SonarRadius = 76,
         SonarStealth = true,
+        SonarStealthFieldRadius = 30,
         VisionRadius = 32,
         WaterVisionRadius = 32,
     },
@@ -309,11 +315,11 @@ UnitBlueprint {
         TransportClass = 10,
     },
     Veteran = {
-        Level1 = 75,
-        Level2 = 150,
-        Level3 = 225,
-        Level4 = 300,
-        Level5 = 375,
+        Level1 = 45,
+        Level2 = 90,
+        Level3 = 135,
+        Level4 = 180,
+        Level5 = 225,
     },
     Weapon = {
         {
