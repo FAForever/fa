@@ -109,6 +109,11 @@ restrictedUnits = {
         name = "<LOC restricted_units_data_0019>No Mass Fabrication",
         tooltip = "restricted_units_massfab",
     },
+    SUPPFAC = {
+        categories = {"SUPPORTFACTORY",},
+        name = "<LOC restricted_units_data_0020>No Support Factories",
+        tooltip = "restricted_units_supportfactory",
+    },
 }
 
 sortOrder = {
@@ -132,4 +137,5 @@ sortOrder = {
     "INTEL",
     "SUPCOM",
     "FABS",
+    "SUPPFAC",
 }
