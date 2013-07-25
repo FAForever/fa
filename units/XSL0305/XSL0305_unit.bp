@@ -241,7 +241,7 @@ UnitBlueprint {
     SizeX = 0.35,
     SizeY = 1.2,
     SizeZ = 0.7,
-    StrategicIconName = 'icon_bot3_directfire',
+    StrategicIconName = 'icon_bot3_sniper',
     StrategicIconSortPriority = 115,
     Transport = {
         CanFireFromTransport = false,
@@ -266,7 +266,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 750,
+            Damage = 775,
             DamageRadius = 0,
             DamageFriendly = false,
             DamageType = 'Normal',
