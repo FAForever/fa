@@ -307,7 +307,7 @@ UnitBlueprint {
         },
         ResourceAllocation = {
             BuildCostEnergy = 60000,
-            BuildCostMass = 5000,
+            BuildCostMass = 4500,
             BuildTime = 8400,
             Icon = 'ras',
             Name = '<LOC enhancements_0024>Resource Allocation System',

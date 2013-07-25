@@ -80,7 +80,7 @@ UnitBlueprint {
             ShieldRechargeTime = 24,
             ShieldRegenRate = 55,
             ShieldRegenStartTime = 3,
-            ShieldSize = 16,
+            ShieldSize = 17,
             ShieldVerticalOffset = -3,
         },
         SubThreatLevel = 0,

@@ -139,10 +139,10 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 2885,
-        BuildCostMass = 600,
-        BuildRate = 40,
-        BuildTime = 1300,
+        BuildCostEnergy = 4000,
+        BuildCostMass = 800,
+        BuildRate = 60,
+        BuildTime = 2000,
 	DifferentialUpgradeCostCalculation = true, 
         RebuildBonusIds = {
             'zsb9503',

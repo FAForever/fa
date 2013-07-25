@@ -96,7 +96,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 4000,
         BuildCostMass = 320,
-        BuildTime = 600,
+        BuildTime = 400,
         MaintenanceConsumptionPerSecondEnergy = 100,
         RebuildBonusIds = {
             'urb4203',
@@ -141,9 +141,9 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        RadarStealthFieldRadius = 30,
+        RadarStealthFieldRadius = 32,
         ReactivateTime = 5,
-        SonarStealthFieldRadius = 30,
+        SonarStealthFieldRadius = 32,
         VisionRadius = 20,
     },
     Interface = {
