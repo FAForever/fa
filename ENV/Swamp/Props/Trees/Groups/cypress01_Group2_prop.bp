@@ -37,7 +37,7 @@ PropBlueprint {
     Economy = {
         ReclaimEnergyMax = 150,
         ReclaimMassMax = 8,
-        ReclaimTime = 5,
+        ReclaimTime = 75,
     },
     Interface = {
         HelpText = 'Group of Large Trees - Swamp',
