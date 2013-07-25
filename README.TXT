@@ -1,6 +1,6 @@
 This is the LUA code for Forged Alliance Forever.
 
-Current patch is : 3622
+Current patch is : 3626
 
 Changelog is available here : http://www.faforever.com/mediawiki/index.php/Main_Page
 
