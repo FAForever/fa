@@ -106,6 +106,7 @@ UnitBlueprint {
         'TARGETCHASER',
         'SHOWATTACKRETICLE',
         'SHOWQUEUE',
+        'SPECIALHIGHPRI',
         'OVERLAYANTIAIR',
         'OVERLAYANTINAVY',
         'OVERLAYRADAR',
