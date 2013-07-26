@@ -208,7 +208,6 @@ function CreateUI(isReplay)
 		import('/lua/ui/game/avatars.lua').ToggleAvatars(false)
 		AddBeatFunction(UiBeat)
 	end
-	import('/lua/spreadattack.lua').Init()
 end
 
 local provider = false
