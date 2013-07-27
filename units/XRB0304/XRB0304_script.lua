@@ -57,5 +57,4 @@ XRB0304 = Class(CConstructionStructureUnit)
         end,
 
 }
-}
 TypeClass = XRB0304
