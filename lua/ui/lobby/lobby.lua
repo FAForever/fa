@@ -550,10 +550,12 @@ function JoinGame(address, asObserver, playerName, uid)
 end
 
 function ConnectToPeer(addressAndPort,name,uid)
+	LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..")")
     lobbyComm:ConnectToPeer(addressAndPort,name,uid)
 end
 
 function DisconnectFromPeer(uid)
+	LOG("DisconnectFromPeer (uid=" .. uid ..")")
     if wasConnected(uid) then table.remove(connectedTo, uid) end
     lobbyComm:DisconnectFromPeer(uid)
 end
