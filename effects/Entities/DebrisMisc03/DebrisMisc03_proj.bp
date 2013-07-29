@@ -5,7 +5,7 @@ ProjectileBlueprint {
             Scale = 1.0,
         },
         MeshBlueprint = '/meshes/projectiles/debris_misc_03_mesh.bp',
-        UniformScale = 0.3,
+        UniformScale = 0.6,
     },
     Physics = {
         MinBounceCount = 3,

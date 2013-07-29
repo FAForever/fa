@@ -303,12 +303,19 @@ end
 # DEBRIS PROJECTILES EFFECTS
 #---------------------------------------------------------------
 function CreateDebrisProjectiles( obj, volume, dimensions )
-    local partamounts = GetRandomInt( 1 + (volume * 5), (volume * 10) ) 
+    local partamounts = GetRandomInt( 1 + (volume * 100), (volume * 200) ) 
     local sx, sy, sz = unpack(dimensions)
+	local vector = obj.Spec.OverKillRatio.debris_Vector
 
     for i = 1, partamounts do
         local xpos, xpos, zpos = GetRandomOffset( sx, sy, sz, 1 )
-        local xdir,ydir,zdir = GetRandomOffset( sx, sy, sz, 10 )
+		local xdir,ydir,zdir = GetRandomOffset( sx, sy, sz, 10 )
+		if vector then
+			xdir = (vector[1] * 10) + GetRandomOffset( sx, sy, sz, 1 )
+			ydir = (math.abs(vector[2] * 10 )) + GetRandomOffset( sx, sy, sz, 1 )
+			zdir = (vector[3] * 10) + GetRandomOffset( sx, sy, sz, 1 )
+		end
+		
         local rand = 4#Random(1,5)
         obj:CreateProjectile('/effects/entities/DebrisMisc0' .. rand .. '/DebrisMisc0' .. rand .. '_proj.bp',xpos,xpos,zpos,xdir,ydir + 4.5,zdir)
     end
