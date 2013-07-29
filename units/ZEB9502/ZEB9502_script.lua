@@ -45,10 +45,12 @@ ZEB9502 = Class(TAirFactoryUnit) {
     
     StopArmsMoving = function(self)
         TAirFactoryUnit.StopArmsMoving(self)
+		if not self.ArmSlider1 then return end
+		if not self.ArmSlider2 then return end
         self.ArmSlider1:SetGoal(0, 0, 0)
-            self.ArmSlider1:SetSpeed(40)
-            self.ArmSlider2:SetGoal(0, 0, 0)
-            self.ArmSlider2:SetSpeed(40)
+		self.ArmSlider1:SetSpeed(40)
+		self.ArmSlider2:SetGoal(0, 0, 0)
+		self.ArmSlider2:SetSpeed(40)
     end,
 }
 

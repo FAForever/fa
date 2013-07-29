@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
-            'UEB0303',
+            'UEB0203',
             'Center_Deck',
             'Left_BottomDeck',
         },
@@ -101,7 +101,7 @@ UnitBlueprint {
                 Effects = {
                     {
                         Bones = {
-                            'UEB0303',
+                            'UEB0203',
                         },
                         Scale = 3,
                         Type = 'SeaIdle01',
@@ -129,10 +129,10 @@ UnitBlueprint {
         UniformScale = 0.083,
     },
     Economy = {
-        BuildCostEnergy = 2885,
-        BuildCostMass = 600,
-        BuildRate = 40,
-        BuildTime = 1300,
+        BuildCostEnergy = 4000,
+        BuildCostMass = 800,
+        BuildRate = 60,
+        BuildTime = 2000,
 	DifferentialUpgradeCostCalculation = true, 
         RebuildBonusIds = {
             'zeb9503',

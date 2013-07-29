@@ -79,9 +79,9 @@ function GetConstructEconomyModel(builder, targetData, upgradeBaseData)
    # 'rate' here is how fast we build relative to a unit with build rate of 1
    local rate = builder:GetBuildRate()
    
-   local time = targetData.BuildTime
-   local mass = targetData.BuildCostMass
-   local energy = targetData.BuildCostEnergy
+   local buildtime = targetData.BuildTime or 0.1
+   local mass = targetData.BuildCostMass or 0
+   local energy = targetData.BuildCostEnergy or 0
    
    if upgradeBaseData and targetData.DifferentialUpgradeCostCalculation then
 
@@ -98,10 +98,10 @@ function GetConstructEconomyModel(builder, targetData, upgradeBaseData)
       --LOG(time, " ", mass, " ", energy)
    end
 
-   # apply penalties/bonuses to effective time
+   # apply penalties/bonuses to effective buildtime
    local time_mod = builder.BuildTimeModifier or 0
-   time = time * (100 + time_mod)*.01
-   if time<.1 then time = .1 end
+   buildtime = buildtime * (100 + time_mod)*.01
+   if buildtime<.1 then buildtime = .1 end
    
    # apply penalties/bonuses to effective energy cost
    local energy_mod = builder.EnergyModifier or 0
@@ -113,7 +113,7 @@ function GetConstructEconomyModel(builder, targetData, upgradeBaseData)
    mass = mass * (100 + mass_mod)*.01
    if mass<0 then mass = 0 end
    
-   return time/rate, energy, mass
+   return buildtime/rate, energy, mass
 end
 
 

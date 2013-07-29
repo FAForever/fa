@@ -247,7 +247,7 @@ UnitBlueprint {
             CountedProjectile = false,
             Damage = 800,
             DamageFriendly = true,
-            DamageRadius = 1.5,
+            DamageRadius = 2,
             DamageType = 'Normal',
             DisplayName = 'Serpentine Tactical Missile Rack',
             FireTargetLayerCapsTable = {
@@ -327,7 +327,7 @@ UnitBlueprint {
             CountedProjectile = false,
             Damage = 800,
             DamageFriendly = true,
-            DamageRadius = 1.5,
+            DamageRadius = 2,
             DamageType = 'Normal',
             DisplayName = 'Serpentine Tactical Missile Rack',
             FireTargetLayerCapsTable = {

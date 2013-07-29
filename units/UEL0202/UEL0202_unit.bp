@@ -165,7 +165,7 @@ UnitBlueprint {
         },
         DragCoefficient = 0.2,
         MaxAcceleration = 3,
-        MaxBrake = 2.7,
+        MaxBrake = 3,
         MaxSpeed = 3,
         MaxSpeedReverse = 0,
         MaxSteerForce = 3,
@@ -243,7 +243,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = 'UWRC_DirectFire',
-            RateOfFire = 0.75,
+            RateOfFire = 0.8,
             TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'SPECIALHIGHPRI',

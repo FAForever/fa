@@ -1,8 +1,8 @@
 UnitBlueprint { 
     AI = {
         TargetBones = {
-            'Head_Muzzle',
             'Torso',
+            'Head_Muzzle',
             'Projectile01',
             'Left_Leg_B01',
             'Right_Leg_B01',
@@ -261,11 +261,11 @@ UnitBlueprint {
         TransportClass = 4,
     },
     Veteran = {
-        Level1 = 80,
-        Level2 = 160,
-        Level3 = 240,
-        Level4 = 320,
-        Level5 = 400,
+        Level1 = 90,
+        Level2 = 180,
+        Level3 = 270,
+        Level4 = 360,
+        Level5 = 450,
     },
     Weapon = {
         {

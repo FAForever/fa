@@ -148,3 +148,5 @@ Callbacks.ClearTargets = function(data, units)
 	end
 	
 end
+
+Callbacks.GiveOrders = import('/lua/spreadattack.lua').GiveOrders

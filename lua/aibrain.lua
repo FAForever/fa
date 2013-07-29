@@ -311,6 +311,7 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         return
     end
     local newUnits = {}
+    table.sort(units, function (a, b) return a:GetBlueprint().Economy.BuildCostMass > b:GetBlueprint().Economy.BuildCostMass end)
     for k,v in units do
         local owner = v:GetArmy()
         if owner == ToArmyIndex then
@@ -1098,11 +1099,10 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
             end       
         end
-
         
-        
-        import('/lua/SimUtils.lua').UpdateUnitCap()
+        import('/lua/SimUtils.lua').UpdateUnitCap(self:GetArmyIndex())
         import('/lua/SimPing.lua').OnArmyDefeat(self:GetArmyIndex())
+        
         local function KillArmy()
             local allies = {}
             local selfIndex = self:GetArmyIndex()

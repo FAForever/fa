@@ -37,7 +37,7 @@ PropBlueprint {
     Economy = {
         ReclaimEnergyMax = 30,
         ReclaimMassMax = 8,
-        ReclaimTime = 5,
+        ReclaimTime = 100,
     },
     Interface = {
         HelpText = 'Very Large Tree - Bug',

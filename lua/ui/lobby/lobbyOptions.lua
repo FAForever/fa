@@ -134,6 +134,30 @@ globalOpts = {
     },
     {
         default = 1,
+        label = "Share Unit Cap at Death",
+        help = "Enable this to share unitcap when a player dies",
+        key = 'ShareUnitCap',
+        pref = 'Lobby_Gen_Share_Cap',
+        values = {
+          {
+                text = "None",
+                help = "Do not share unitcap",
+                key = 'none',
+            },
+            {
+                text = "Allies",
+                help = "Share unitcap with allies only",
+                key = 'allies',
+            },
+            {
+                text = "All",
+                help = "Share unitcap with all players",
+                key = 'all',
+            },
+        },
+    },
+    {
+        default = 1,
         label = "<LOC lobui_0112>Fog of War",
         help = "<LOC lobui_0113>Set up how fog of war will be visualized",
         key = 'FogOfWar',

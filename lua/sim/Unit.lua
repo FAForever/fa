@@ -2332,56 +2332,16 @@ Unit = Class(moho.unit_methods) {
 
     OnStartBuild = function(self, unitBeingBuilt, order)
 	#LOG('onstartbuild and order is ' .. repr(order))
-	#LOG('and IAmBuildingSomethingWithReBuildBonus is ' .. repr(self.IAmBuildingSomethingWithReBuildBonus))
-
-	
-	--if self.IAmBuildingSomethingWithReBuildBonus == true and order == 'MobileBuild' then
-	
-	
-		--if not unitBeingBuilt.RebuildCounter then 
-		--	unitBeingBuilt.RebuildCounter = 1
-		--else
-		--	unitBeingBuilt.RebuildCounter = (unitBeingBuilt.RebuildCounter + 1)
-		--end
-		--if unitBeingBuilt.RebuildCounter > 1 then 
-		--	IssueClearCommands(self)
-		--	LOG('i am a bad player and I tried replicate a structure exploit')
-		--	unitBeingBuilt:Destroy()
-		--	return
-	--	end
-		
-		--local position = unitBeingBuilt:GetPosition()
-	--	local x1 = position[1] - 1
-	--	local x2 = position[1] + 1
-	--	local z1 = position[3] - 1
-	--	local z2 = position[3] + 1
-	--	local rect = Rect( x1, z1, x2, z2 )
-	--	#LOG('rect is ' .. repr(rect)) 
-	--	local NearbyReclaimables = GetReclaimablesInRect(rect)
-	--	local CanIBuildHere = false
-	--	local unitBeingBuiltbpID =  unitBeingBuilt:GetBlueprint().BlueprintId
-	--	for name,entity in NearbyReclaimables do
-	--		#WARN('entity is ' .. repr(entity))
-	--	if IsProp(entity) and entity.bpid and entity.bpid == unitBeingBuiltbpID then
-	--			CanIBuildHere = true
-
-	--		end
-	--	end
-	--	if not CanIBuildHere then
-	--		unitBeingBuilt:Destroy()
-	--		LOG('I tried to build something on a wreck away from the wreck, and failed')
-	--	end
-		
-	--end
+		if order == 'Repair' and unitBeingBuilt.WorkItem != self.WorkItem then
+			self:InheritWork(unitBeingBuilt)
+		end	
 	        
-	# added by brute51 - to make sure we use the proper consumption values. [132]
-        self:UpdateConsumptionValues()
         local bp = self:GetBlueprint()
         if order != 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
             self:StartBuildingEffects(unitBeingBuilt, order)
         end
-        self:DoOnStartBuildCallbacks(unitBeingBuilt)
         self:SetActiveConsumptionActive()
+		self:DoOnStartBuildCallbacks(unitBeingBuilt)
         self:PlayUnitSound('Construct')
         self:PlayUnitAmbientSound('ConstructLoop')
         if bp.General.UpgradesTo and unitBeingBuilt:GetUnitId() == bp.General.UpgradesTo and order == 'Upgrade' then
@@ -2395,7 +2355,7 @@ Unit = Class(moho.unit_methods) {
                 unitBeingBuilt:CreateTarmac(true, true, true, false, false)
             end
         end     
-        self.CurrentBuildOrder = order		
+        #self.CurrentBuildOrder = order		
     end,
 
     OnStopBuild = function(self, unitBeingBuilt)
