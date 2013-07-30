@@ -63,7 +63,7 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC xsb0303_desc>Naval Factory',
+    Description = '<LOC xsb0303_desc>Naval Factory HQ',
     Display = {
         AnimationDeath = {
             {

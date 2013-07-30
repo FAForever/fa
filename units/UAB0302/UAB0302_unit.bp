@@ -62,7 +62,7 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC uab0302_desc>Air Factory',
+    Description = '<LOC uab0302_desc>Air Factory HQ',
     Display = {
         BlinkingLights = {
             {

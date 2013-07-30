@@ -64,7 +64,7 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC xsb0203_desc>Naval Factory',
+    Description = '<LOC xsb0203_desc>Naval Factory HQ',
     Display = {
         Abilities = {
             '<LOC ability_upgradable>Upgradeable',

@@ -71,7 +71,7 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC xsb0301_desc>Land Factory',
+    Description = '<LOC xsb0301_desc>Land Factory HQ',
     Display = {
         AnimationDeath = {
             {
