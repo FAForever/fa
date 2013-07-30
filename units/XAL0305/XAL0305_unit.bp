@@ -1,7 +1,6 @@
 UnitBlueprint {
     AI = {
-        # GuardScanRadius = 30,
-        NeedUnpack = false,#from true
+        NeedUnpack = false,
     },
     Audio = {
         AmbientMove = Sound {
@@ -67,9 +66,6 @@ UnitBlueprint {
     },
     Description = '<LOC xal0305_desc>Sniper Bot',
     Display = {
-        #Abilities = {
-        #    '<LOC ability_deploys>Deploys',
-        #},
         AnimationDeath = {
             {
                 Animation = '/units/xal0305/xal0305_adeath01.sca',
