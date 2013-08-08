@@ -684,7 +684,20 @@ options = {
                         {text = "<LOC _On>", key = 1 },
                     },
                 },
-            }
+            },
+            {
+                title = "<LOC OPTIONS_1170>Amount of Debris",
+                key = 'debris_amount',
+                type = 'slider',
+                default = 100,
+				set = function(key,value,startup)
+                custom = {
+                    min = 0,
+                    max = 100,
+                    inc = 1,
+                },
+
+            }			
         },
     },
     sound = {
