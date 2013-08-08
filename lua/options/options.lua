@@ -505,7 +505,7 @@ options = {
                         logic.SetValue('texture_level',0,true)
                         logic.SetValue('antialiasing',aamed,true)
                         logic.SetValue('level_of_detail',2,true)
-                        logic.SetValue('bloom_render',1,true)
+                        logic.SetValue('bloom_render',0,true)
                         logic.SetValue('render_skydome',1,true)
                     elseif 3 == value then
                         logic.SetValue('fidelity',2,true)
@@ -513,7 +513,7 @@ options = {
                         logic.SetValue('texture_level',0,true)
                         logic.SetValue('antialiasing',aahigh,true)
                         logic.SetValue('level_of_detail',2,true)
-                        logic.SetValue('bloom_render',1,true)
+                        logic.SetValue('bloom_render',0,true)
                         logic.SetValue('render_skydome',1,true)
                     else
                     end

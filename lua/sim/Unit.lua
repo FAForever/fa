@@ -1315,22 +1315,9 @@ Unit = Class(moho.unit_methods) {
 		if health < 1 or self:IsDead() then
 			if vector then
 				self.debris_Vector = vector
-			elseif instigator and IsUnit(instigator) then
-				-- determine impact angle by (current) position of the instigator. This is not the best way but, without real vector, the best what we can do
-				local pos1 = instigator:GetPosition()
-				local pos2 = self:GetPosition()
-				self.debris_Vector = Vector( pos1[1] - pos2[1], pos1[2] - pos2[2], pos1[3] - pos2[3] )
-			elseif instigator and IsProjectile(instigator) and instigator:GetLauncher() and IsUnit( instigator:GetLauncher() ) then
-				-- In case the instigator is a projectile. Same as above, basically.
-				local pos1 = instigator:GetLauncher():GetPosition()
-				local pos2 = self:GetPosition()
-				self.debris_Vector = Vector( pos1[1] - pos2[1], pos1[2] - pos2[2], pos1[3] - pos2[3] )
 			else
-				-- no way to get the correct vector. Just making one up then!
-				self.debris_Vector = Vector( utilities.GetRandomFloat( -1, 1 ), utilities.GetRandomFloat( -1, 1 ), utilities.GetRandomFloat( -1, 1 ) )
+				self.debris_Vector = ''
 			end
-		LOG("debris Vector")
-		LOG(repr(self.debris_Vector))
 		end
 
 	end,
