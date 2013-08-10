@@ -305,7 +305,6 @@ end
 #---------------------------------------------------------------
 function CreateDebrisProjectiles( obj, volume, dimensions )
 	LOG(volume)
-	LOG(repr(obj.Spec))
     local partamounts = math.min(GetRandomInt( 1 + (volume * 50), (volume * 100) ) , 300)
     local sx, sy, sz = unpack(dimensions)
 	local vector = obj.Spec.OverKillRatio.debris_Vector
@@ -318,7 +317,10 @@ function CreateDebrisProjectiles( obj, volume, dimensions )
 			zdir = (vector[3] * 5) + GetRandomOffset2( sx, sy, sz, 1 )
 		end
 		
-        local rand = 4#Random(1,5)
+        local rand = 4
+		if volume < 0.3 then
+			rand = 9
+		end
         obj:CreateProjectile('/effects/entities/DebrisMisc0' .. rand .. '/DebrisMisc0' .. rand .. '_proj.bp',xpos,xpos,zpos,xdir,ydir + 4.5,zdir)
     end
 end
