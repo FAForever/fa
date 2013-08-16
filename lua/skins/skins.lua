@@ -137,7 +137,7 @@ skins = {
     },
 	randomfaction = {
         default = "default",
-        texturesPath = "/textures/ui/uef",
+        texturesPath = "/textures/ui/random",
         imagerMesh = "/meshes/game/map-border_squ_uef_mesh",
         imagerMeshHorz = "/meshes/game/map-border_hor_uef_mesh",
         buttonFont = "Zeroes Three",
