@@ -2451,7 +2451,7 @@ function CreateUI(maxPlayers)
 							'- Moritz : Power Lobby 2.0.', 'Thanks you !')
 	end
     --// Credits footer -- Xinnony
-	local Credits = 'New Skin by Xinnony and Barlots (v1)'--Lot of changes and functions by Xinnony | Power Lobby 2.0 by Moritz"
+	local Credits = 'New Skin by Xinnony and Barlots (v1a)'--Lot of changes and functions by Xinnony | Power Lobby 2.0 by Moritz"
 	local Credits_Text_X = 11
     Credits_Shadows1 = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
     Credits_Shadows1:SetFont(UIUtil.titleFont, 12)
