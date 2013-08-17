@@ -177,7 +177,7 @@ UnitBlueprint {
         SelectionPriority = 5,
         TechLevel = 'RULEUTL_Secret',
         UnitWeight = 1,
-        UpgradesFrom = 'zeb9602',
+        UpgradesFrom = 'zeb9502',
         UpgradesFromBase = 'ueb0102',
     },
     Intel = {

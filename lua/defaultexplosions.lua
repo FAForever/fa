@@ -14,6 +14,7 @@ local util = import('utilities.lua')
 local GetRandomFloat = util.GetRandomFloat
 local GetRandomInt = util.GetRandomInt
 local GetRandomOffset = util.GetRandomOffset
+local GetRandomOffset2 = util.GetRandomOffset2
 local EfctUtil = import('EffectUtilities.lua')
 local CreateEffects = EfctUtil.CreateEffects
 local CreateEffectsWithOffset = EfctUtil.CreateEffectsWithOffset
@@ -303,13 +304,24 @@ end
 # DEBRIS PROJECTILES EFFECTS
 #---------------------------------------------------------------
 function CreateDebrisProjectiles( obj, volume, dimensions )
-    local partamounts = GetRandomInt( 1 + (volume * 5), (volume * 10) ) 
+    local partamounts = math.min(GetRandomInt( 1 + (volume * 50), (volume * 100) ) , 250)
     local sx, sy, sz = unpack(dimensions)
-
+	local vector = obj.Spec.OverKillRatio.debris_Vector
     for i = 1, partamounts do
         local xpos, xpos, zpos = GetRandomOffset( sx, sy, sz, 1 )
-        local xdir,ydir,zdir = GetRandomOffset( sx, sy, sz, 10 )
-        local rand = 4#Random(1,5)
+		local xdir,ydir,zdir = GetRandomOffset( sx, sy, sz, 10 )
+		if vector then
+			xdir = (vector[1] * 5) + GetRandomOffset2( sx, sy, sz, 3 )
+			ydir = math.abs((vector[2] * 5 )) + GetRandomOffset( sx, sy, sz, 3 )
+			zdir = (vector[3] * 5) + GetRandomOffset2( sx, sy, sz, 1 )
+		end
+
+        local rand = 4
+		if volume < 0.2 then
+			rand = 9
+		elseif volume > 2 then
+			rand = 10
+		end
         obj:CreateProjectile('/effects/entities/DebrisMisc0' .. rand .. '/DebrisMisc0' .. rand .. '_proj.bp',xpos,xpos,zpos,xdir,ydir + 4.5,zdir)
     end
 end

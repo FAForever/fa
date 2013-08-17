@@ -12,18 +12,6 @@
 ShadowOrders = {}
 
 
-------------------
--- Function Init()
-------------------
-
--- This function hooks the 'G' key, so we can use it.
--- Adding Shift-G makes it possible to hold Shift while ordering the function.
-function Init()
-  IN_AddKeyMapTable({['G']       = {action =  'ui_lua import("/lua/spreadattack.lua").SpreadAttack()'},})
-  IN_AddKeyMapTable({['Shift-G'] = {action =  'ui_lua import("/lua/spreadattack.lua").SpreadAttack()'},})
-end
-
-
 -----------------------------------------
 -- Function MakeShadowCopyOrders(command)
 -----------------------------------------

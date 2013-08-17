@@ -72,7 +72,7 @@ LobbyComm = Class(moho.lobby_methods) {
     SystemMessage = function(self, text) LOG('System: ' .. text) end,
     DataReceived = function(self, data)  end,
     GameConfigRequested = function(self) end,
-    PeerDisconnected = function(self,peerName,uid) end,
+    PeerDisconnected = function(self,peerName,uid) LOG ('Peer Disconnected : (name=' .. peerName .. ', uid=' .. uid .. ')') end,
     LaunchFailed = function(self,reasonKey) end,
 
     # native void SendData(self, targetID, data)

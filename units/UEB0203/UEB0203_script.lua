@@ -56,6 +56,8 @@ UEB0203 = Class(TSeaFactoryUnit) {
     
     StopArmsMoving = function(self)
         TSeaFactoryUnit.StopArmsMoving(self)
+        if not self.ArmSlider1 then return end
+        if not self.ArmSlider2 then return end		
         self.ArmSlider1:SetGoal(0, 0, 0)
         self.ArmSlider2:SetGoal(0, 0, 0)
         self.ArmSlider1:SetSpeed(40)
