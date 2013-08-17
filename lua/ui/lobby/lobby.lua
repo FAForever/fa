@@ -2707,7 +2707,7 @@ function CreateUI(maxPlayers)
     GUI.chatDisplay.Height:Set(function() return GUI.chatDisplay.Bottom() - GUI.chatDisplay.Top() end)
     GUI.chatDisplay.Width:Set(function() return GUI.chatDisplay.Right() - GUI.chatDisplay.Left() end)
 
-    GUI.chatDisplayScroll = UIUtil.CreateVertScrollbarFor(GUI.chatDisplay, -21, nil, 30)
+    GUI.chatDisplayScroll = UIUtil.CreateVertScrollbarFor2(GUI.chatDisplay, -21, nil, 30)
 
     # OnlineProvider.RegisterChatDisplay(GUI.chatDisplay)
 
@@ -2930,7 +2930,7 @@ function CreateUI(maxPlayers)
         end
     end
 
-    UIUtil.CreateVertScrollbarFor(GUI.OptionContainer, 1, nil, -9, -24)
+    UIUtil.CreateVertScrollbarFor2(GUI.OptionContainer, 1, nil, -9, -24)
 
     if singlePlayer then
         GUI.loadButton = UIUtil.CreateButtonStd(GUI.optionsPanel, '/scx_menu/small-btn/small',"<LOC lobui_0176>Load", 18, 2)
@@ -3510,7 +3510,7 @@ function CreateUI(maxPlayers)
                     {worldCover = false, enterButton = 1, escapeButton = 2})
             end
         end
-        UIUtil.CreateVertScrollbarFor(GUI.observerList, -15, nil, -1)
+        UIUtil.CreateVertScrollbarFor2(GUI.observerList, -15, nil, -1)
 
         --// Upload button not work with FAF for the moment (old GPGnet) -- Xinnony
         --if lobbyComm:IsHost() then
