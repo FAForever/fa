@@ -1551,8 +1551,18 @@ local function UpdateGame()
         if gameInfo.PlayerOptions[localPlayerSlot].Ready then
             GUI.becomeObserver:Disable()
             GUI.LargeMapPreview:Disable()
+			TEST1factionPanel:Disable()
+			TEST2factionPanel:Disable()
+			TEST3factionPanel:Disable()
+			TEST4factionPanel:Disable()
+			TEST5factionPanel:Disable()
         else
             GUI.LargeMapPreview:Enable()
+			TEST1factionPanel:Enable()
+			TEST2factionPanel:Enable()
+			TEST3factionPanel:Enable()
+			TEST4factionPanel:Enable()
+			TEST5factionPanel:Enable()
         end
     end
 
