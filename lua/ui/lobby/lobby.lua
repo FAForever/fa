@@ -50,8 +50,11 @@ XinnonyDebug = 0
 -- 1 = DEBUG Country
 -- 2 = DEBUG RuleTitle
 -- 3 = DEBUG PeerDisconnected
+-- 4 = DEBUG Background
 --\\ Xinnony DEBUG
 --// Table of Tooltip Country - Xinnony
+BackgroundSelected = 'faction'
+LASTBackgroundSelected = ''
 local PrefLanguageTooltipTitle={}
 local PrefLanguageTooltipText={}
 --\\ Stop - Table of Tooltip Country
@@ -735,7 +738,7 @@ function SetSlotInfo(slot, playerInfo)
     end
 
 	--// Change the background according to the chosen Faction - Xinnony
-	ChangeBackgroundLobby(slot, Prefs.GetFromCurrentProfile('LastFaction'))
+	--ChangeBackgroundLobby(slot, Prefs.GetFromCurrentProfile('LastFaction'))
 	--\\ Stop - Change the background according to the chosen Faction
     --// Show the Country Flag in slot - Xinnony
     SetSlotCountryFlag(slot, playerInfo)
@@ -2405,13 +2408,14 @@ function CreateUI(maxPlayers)
     local title
     if GpgNetActive() then
         title = "FA FOREVER GAME LOBBY"
-        --GUI.background = MenuCommon.SetupBackground(GetFrame(0))
-		-- TEST Map Background -- XinnonyWork
-		--GUI.background = Bitmap(GUI, "")
-		--LayoutHelpers.AtCenterIn(GUI.background, GUI)
-		--GUI.background.Width:Set(1024)
-		--GUI.background.Height:Set(768)
-		--GUI.background:SetTexture(UIUtil.SkinnableFile('/map.dds'))
+		GUI.background = Bitmap(GUI, UIUtil.SkinnableFile('')) -- Background faction or art
+			LayoutHelpers.AtCenterIn(GUI.background, GUI)
+			LayoutHelpers.FillParentPreserveAspectRatio(GUI.background, GUI)
+		GUI.background2 = MapPreview(GUI) -- Background map
+			LayoutHelpers.AtCenterIn(GUI.background2, GUI)
+			GUI.background2.Width:Set(400)
+			GUI.background2.Height:Set(400)
+			LayoutHelpers.FillParentPreserveAspectRatio(GUI.background2, GUI)
     elseif singlePlayer then
         title = "<LOC _Skirmish_Setup>"
     else
@@ -2424,7 +2428,7 @@ function CreateUI(maxPlayers)
     --if singlePlayer then
         --GUI.panel = Bitmap(GUI, UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/power_panel-skirmish_bmp.dds"))
     --else
-        GUI.panel = Bitmap(GUI, UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[xxx]power_panel_bmp.dds"))
+        GUI.panel = Bitmap(GUI, UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[ran]power_panel_bmp.dds"))
     --end
 	LayoutHelpers.AtCenterIn(GUI.panel, GUI)
     --GUI.panel.brackets = UIUtil.CreateDialogBrackets(GUI.panel, 18, 17, 18, 15)
@@ -2439,12 +2443,172 @@ function CreateUI(maxPlayers)
 	LayoutHelpers.AtRightTopIn(randmapText2, GUI.panel, 50, 61)
 	--Tooltip.AddButtonTooltip(randmapText,{text='', body=''})
 
+	--// Option background select -- Xinnony
+	GUI.BackgroundSelectMap = UIUtil.CreateCheckboxStd(GUI.panel, '/BUTTON/backgroundselect/map')
+		LayoutHelpers.AtBottomIn(GUI.BackgroundSelectMap, GUI.panel, 30)
+		LayoutHelpers.AtRightIn(GUI.BackgroundSelectMap, GUI.panel, 11)
+	GUI.BackgroundSelectFaction = UIUtil.CreateCheckboxStd(GUI.panel, '/BUTTON/backgroundselect/faction')
+		LayoutHelpers.AtBottomIn(GUI.BackgroundSelectFaction, GUI.panel, 50-1)
+		LayoutHelpers.AtRightIn(GUI.BackgroundSelectFaction, GUI.panel, 11)
+	GUI.BackgroundSelectNothing = UIUtil.CreateCheckboxStd(GUI.panel, '/BUTTON/backgroundselect/nothing')
+		LayoutHelpers.AtBottomIn(GUI.BackgroundSelectNothing, GUI.panel, 70-2)
+		LayoutHelpers.AtRightIn(GUI.BackgroundSelectNothing, GUI.panel, 11)
+	GUI.BackgroundSelectArt = UIUtil.CreateCheckboxStd(GUI.panel, '/BUTTON/backgroundselect/art')
+		LayoutHelpers.AtBottomIn(GUI.BackgroundSelectArt, GUI.panel, 90-3)
+		LayoutHelpers.AtRightIn(GUI.BackgroundSelectArt, GUI.panel, 11)
+		-- TOOLTIP not work !!! why ???
+		--Tooltip.AddButtonTooltip(GUI.BackgroundSelectMap, {text='Background image', body='Show a map preview in background'})
+		--Tooltip.AddButtonTooltip(GUI.BackgroundSelectFaction, {text='Background image', body='Show a faction logo in background'})
+		-- Tooltip.AddButtonTooltip(GUI.BackgroundSelectNothing, {text='Background image', body='Not show a background'})
+	GUI.BackgroundSelectMap.OnClick = function(self, checked)
+		if checked then
+			GUI.BackgroundSelectMap:Disable()
+			GUI.BackgroundSelectFaction:Enable()
+			GUI.BackgroundSelectNothing:Enable()
+			GUI.BackgroundSelectArt:Enable()
+			BackgroundSelected = 'map'
+			ChangeBackgroundLobby(nil, nil)
+			GUI.BackgroundSelectFaction:ToggleCheck()
+			GUI.BackgroundSelectNothing:ToggleCheck()
+			GUI.BackgroundSelectArt:ToggleCheck()
+		else
+			GUI.BackgroundSelectMap:Enable()
+			GUI.BackgroundSelectFaction:Disable()
+			GUI.BackgroundSelectNothing:Disable()
+			GUI.BackgroundSelectArt:Disable()
+		end
+	end
+	GUI.BackgroundSelectFaction.OnClick = function(self, checked)
+		if checked then
+			GUI.BackgroundSelectFaction:Disable()
+			GUI.BackgroundSelectMap:Enable()
+			GUI.BackgroundSelectNothing:Enable()
+			GUI.BackgroundSelectArt:Enable()
+			BackgroundSelected = 'faction'
+			ChangeBackgroundLobby(nil, nil)
+			GUI.BackgroundSelectMap:ToggleCheck()
+			GUI.BackgroundSelectNothing:ToggleCheck()
+			GUI.BackgroundSelectArt:ToggleCheck()
+		else
+			GUI.BackgroundSelectFaction:Enable()
+			GUI.BackgroundSelectMap:Disable()
+			GUI.BackgroundSelectNothing:Disable()
+			GUI.BackgroundSelectArt:Disable()
+		end
+	end
+	GUI.BackgroundSelectNothing.OnClick = function(self, checked)
+		if checked then
+			GUI.BackgroundSelectNothing:Disable()
+			GUI.BackgroundSelectMap:Enable()
+			GUI.BackgroundSelectFaction:Enable()
+			GUI.BackgroundSelectArt:Enable()
+			BackgroundSelected = 'nothing'
+			ChangeBackgroundLobby(nil, nil)
+			GUI.BackgroundSelectMap:ToggleCheck()
+			GUI.BackgroundSelectFaction:ToggleCheck()
+			GUI.BackgroundSelectArt:ToggleCheck()
+		else
+			GUI.BackgroundSelectNothing:Enable()
+			GUI.BackgroundSelectMap:Disable()
+			GUI.BackgroundSelectFaction:Disable()
+			GUI.BackgroundSelectArt:Disable()
+		end
+	end
+	GUI.BackgroundSelectArt.OnClick = function(self, checked)
+		if checked then
+			GUI.BackgroundSelectArt:Disable()
+			GUI.BackgroundSelectMap:Enable()
+			GUI.BackgroundSelectFaction:Enable()
+			GUI.BackgroundSelectNothing:Enable()
+			BackgroundSelected = 'art'
+			ChangeBackgroundLobby(nil, nil)
+			GUI.BackgroundSelectMap:ToggleCheck()
+			GUI.BackgroundSelectFaction:ToggleCheck()
+			GUI.BackgroundSelectNothing:ToggleCheck()
+		else
+			GUI.BackgroundSelectArt:Enable()
+			GUI.BackgroundSelectMap:Disable()
+			GUI.BackgroundSelectFaction:Disable()
+			GUI.BackgroundSelectNothing:Disable()
+		end
+	end
+	-- Is for pre-activate
+	if BackgroundSelected == 'map' then
+		GUI.BackgroundSelectMap:Disable()
+		GUI.BackgroundSelectMap:ToggleCheck()
+		ChangeBackgroundLobby(nil, nil)
+	elseif BackgroundSelected == 'faction' then
+		GUI.BackgroundSelectFaction:Disable()
+		GUI.BackgroundSelectFaction:ToggleCheck()
+		ChangeBackgroundLobby(nil, nil)
+	elseif BackgroundSelected == 'nothing' then
+		GUI.BackgroundSelectNothing:Disable()
+		GUI.BackgroundSelectNothing:ToggleCheck()
+		ChangeBackgroundLobby(nil, nil)
+	elseif BackgroundSelected == 'art' then
+		GUI.BackgroundSelectArt:Disable()
+		GUI.BackgroundSelectArt:ToggleCheck()
+		ChangeBackgroundLobby(nil, nil)
+	end
+	--[[ TEST WITH BUTTON not checkbox (possible work with tooltip ?)
+																	-- parent, up, down, over, disabled
+																	-- parent, normal, active, highlight, disabled, clickCue, rolloverCue, frameRate, debugname)
+	--GUI.BackgroundSelectMap = UIUtil.CreateButton(GUI.panel, UIUtil.UIFile('/BUTTON/backgroundselect/map.dds'), UIUtil.UIFile('/BUTTON/backgroundselect/map_active.dds'), UIUtil.UIFile('/BUTTON/backgroundselect/map_hover.dds'), UIUtil.UIFile('/BUTTON/backgroundselect/map_active.dds'))
+	GUI.BackgroundSelectMap = UIUtil.CreateButtonStd2(GUI.panel, '/BUTTON/backgroundselect/map')
+	GUI.BackgroundSelectNothing = UIUtil.CreateButton(GUI.panel, UIUtil.UIFile('/BUTTON/backgroundselect/nothing.dds'), UIUtil.UIFile('/BUTTON/backgroundselect/nothing_active.dds'), UIUtil.UIFile('/BUTTON/backgroundselect/nothing_hover.dds'), UIUtil.UIFile('/BUTTON/backgroundselect/nothing_active.dds'))
+	GUI.BackgroundSelectFaction = UIUtil.CreateButton(GUI.panel, UIUtil.UIFile('/BUTTON/backgroundselect/faction.dds'), UIUtil.UIFile('/BUTTON/backgroundselect/faction_active.dds'), UIUtil.UIFile('/BUTTON/backgroundselect/faction_hover.dds'), UIUtil.UIFile('/BUTTON/backgroundselect/faction_active.dds'))
+		LayoutHelpers.AtBottomIn(GUI.BackgroundSelectMap, GUI.panel, 30)
+		LayoutHelpers.AtRightIn(GUI.BackgroundSelectMap, GUI.panel, 11)
+		GUI.BackgroundSelectMap.OnClick = function()
+			BackgroundSelected = 'map'
+			--GUI.BackgroundSelectMap:Disable()
+			--SetNewButtonTextures(GUI.BackgroundSelectMap, UIUtil.UIFile('/BUTTON/backgroundselect/map_active.dds'), UIUtil.UIFile('/BUTTON/backgroundselect/map_active.dds'), UIUtil.UIFile('/BUTTON/backgroundselect/map_active.dds'), UIUtil.UIFile('/BUTTON/backgroundselect/map_active.dds'))
+			--GUI.BackgroundSelectMap:SetTexture(UIUtil.UIFile('/BUTTON/backgroundselect/map_active.dds'))
+			--GUI.BackgroundSelectFaction:Enable()
+			--GUI.BackgroundSelectFaction:SetTexture(UIUtil.UIFile('/BUTTON/backgroundselect/faction.dds'))
+			--GUI.BackgroundSelectNothing:Enable()
+			--GUI.BackgroundSelectNothing:SetTexture(UIUtil.UIFile('/BUTTON/backgroundselect/nothing.dds'))
+		end
+		LayoutHelpers.AtBottomIn(GUI.BackgroundSelectFaction, GUI.panel, 60)
+		LayoutHelpers.AtRightIn(GUI.BackgroundSelectFaction, GUI.panel, 11)
+		GUI.BackgroundSelectFaction.OnClick = function()
+			BackgroundSelected = 'faction'
+			--GUI.BackgroundSelectMap:Enable()
+			--GUI.BackgroundSelectMap:SetTexture(UIUtil.UIFile('/BUTTON/backgroundselect/map.dds'))
+			GUI.BackgroundSelectFaction:Disable()
+			--GUI.BackgroundSelectFaction:SetTexture(UIUtil.UIFile('/BUTTON/backgroundselect/faction_active.dds'))
+			--GUI.BackgroundSelectNothing:Enable()
+			--GUI.BackgroundSelectNothing:SetTexture(UIUtil.UIFile('/BUTTON/backgroundselect/nothing.dds'))
+		end
+		LayoutHelpers.AtBottomIn(GUI.BackgroundSelectNothing, GUI.panel, 90)
+		LayoutHelpers.AtRightIn(GUI.BackgroundSelectNothing, GUI.panel, 11)
+		GUI.BackgroundSelectNothing.OnClick = function()
+			BackgroundSelected = 'nothing'
+			--GUI.BackgroundSelectMap:Enable()
+			--GUI.BackgroundSelectMap:SetTexture(UIUtil.UIFile('/BUTTON/backgroundselect/map.dds'))
+			--GUI.BackgroundSelectFaction:Enable()
+			--GUI.BackgroundSelectFaction:SetTexture(UIUtil.UIFile('/BUTTON/backgroundselect/faction.dds'))
+			GUI.BackgroundSelectNothing:Disable()
+			--GUI.BackgroundSelectNothing:SetTexture(UIUtil.UIFile('/BUTTON/backgroundselect/nothing_active.dds'))
+		end
+	--if BackgroundSelected == 'map' then
+		--GUI.BackgroundSelectMap:Disable()
+		--GUI.BackgroundSelectMap:SetTexture(UIUtil.UIFile('/BUTTON/backgroundselect/map_active.dds'))
+	--elseif BackgroundSelected == 'faction' then
+		--GUI.BackgroundSelectFaction:Disable()
+		--GUI.BackgroundSelectFaction:SetTexture(UIUtil.UIFile('/BUTTON/backgroundselect/faction_active.dds'))
+	--elseif BackgroundSelected == 'nothing' then
+		--GUI.BackgroundSelectNothing:Disable()
+		--GUI.BackgroundSelectNothing:SetTexture(UIUtil.UIFile('/BUTTON/backgroundselect/nothing_active.dds'))
+	--end
+	--]]
+	
     --// Credits panel -- Xinnony
 	GUI.Credits = UIUtil.CreateButtonStd(GUI.panel, '/lobby/lan-game-lobby/toggle', "About", 10, 0)
 	    LayoutHelpers.AtTopIn(GUI.Credits, GUI.panel, 0)
-	LayoutHelpers.AtHorizontalCenterIn(GUI.Credits, GUI, 0)
+		LayoutHelpers.AtHorizontalCenterIn(GUI.Credits, GUI, 0)
 	GUI.Credits.OnClick = function()
-		local test = UIUtil.QuickDialog2(GUI, 'Devlopper in Lobby :\n\n '..
+		local test = UIUtil.QuickDialog2(GUI, 'Devloppers for Lobby :\n\n '..
 							'- Xinnony : New Skin (with Barlots), Faction Selector, Country Flag, Move Player to, Color State in Nickname, Custom Title, Sort option, Game is/not Ranked label, fix lot of bugs.'..'\n '..
 							'- Vicarian : Contribute with Xinnony, Rating Observer,  and fix lot of bugs.'..'\n '..
 							'- Duck_42 : CPU Bench, Ping Nuke.'..'\n '..
@@ -5298,23 +5462,58 @@ end
 -- Author : Xinnony																		--
 ----------------------------------------------------------------------------------
 function ChangeBackgroundLobby(slot, faction)
-	--if GUI.background and FindSlotForID(localPlayerID) == slot then
-	if 1 == 2 then -- FOR DISABLED (next : replace with map background) -- XinnonyWork
-		if faction == 1 then
-			--GUI.background:SetTexture(UIUtil.SkinnableFile("/menus02/background-paint_uef_bmp.dds"))
-			UIUtil.SetCurrentSkin('uef')
-		elseif faction == 2 then
-			--GUI.background:SetTexture(UIUtil.SkinnableFile("/menus02/background-paint_aion_bmp.dds"))
-			UIUtil.SetCurrentSkin('aeon')
-		elseif faction == 3 then
-			--GUI.background:SetTexture(UIUtil.SkinnableFile("/menus02/background-paint_cybran_bmp.dds"))
-			UIUtil.SetCurrentSkin('cybran')
-		elseif faction == 4 then
-			--GUI.background:SetTexture(UIUtil.SkinnableFile("/menus02/background-paint_seraphim_bmp.dds"))
-			UIUtil.SetCurrentSkin('seraphim')
-		else
-			--GUI.background:SetTexture(UIUtil.SkinnableFile("/menus02/background-paint_random_bmp.dds"))
-			UIUtil.SetCurrentSkin('randomfaction')
+	if GUI.background and GUI.background2 then--and FindSlotForID(localPlayerID) == slot then
+	--if 1 == 2 then -- FOR DISABLED (next : replace with map background) -- XinnonyWork
+		if BackgroundSelected == 'faction' then--and LASTBackgroundSelected != BackgroundSelected then
+			if XinnonyDebug == 4 then AddChatText(">> Background FACTION") end
+			GUI.background:Show()
+			GUI.background2:Hide()
+			faction = faction or Prefs.GetFromCurrentProfile('LastFaction')
+			if faction == 1 then
+				GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/faction-background-paint_uef_bmp.dds"))
+			elseif faction == 2 then
+				GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/faction-background-paint_aion_bmp.dds"))
+			elseif faction == 3 then
+				GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/faction-background-paint_cybran_bmp.dds"))
+			elseif faction == 4 then
+				GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/faction-background-paint_seraphim_bmp.dds"))
+			elseif faction == 5 then
+				GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/faction-background-paint_random_bmp.dds"))
+			else
+				GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/faction-background-paint_black_bmp.dds"))
+			end
+			LASTBackgroundSelected = 'faction'
+		
+		elseif BackgroundSelected == 'map' and LASTBackgroundSelected != BackgroundSelected then -- LASTBac... is for avoided loop set texture, when you change faction
+			if XinnonyDebug == 4 then AddChatText(">> Background MAP") end
+			GUI.background:Hide()
+			GUI.background2:Show()
+			local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
+			if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") then
+				scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+			end
+			if scenarioInfo and scenarioInfo.map and (scenarioInfo.map != "") then
+				if not GUI.background2:SetTexture(scenarioInfo.preview) then
+					GUI.background2:SetTextureFromMap(scenarioInfo.map)
+				end
+			else
+				GUI.background2:ClearTexture()
+			end
+			LASTBackgroundSelected = 'map'
+		
+		elseif BackgroundSelected == 'nothing' and LASTBackgroundSelected != BackgroundSelected then -- LASTBac... is for avoided loop set texture, when you change faction
+			if XinnonyDebug == 4 then AddChatText(">> Background NOTHING") end
+			GUI.background:Hide()
+			GUI.background2:Hide()
+			GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/background-paint_black_bmp.dds"))
+			LASTBackgroundSelected = 'nothing'
+		
+		elseif BackgroundSelected == 'art' then--and LASTBackgroundSelected != BackgroundSelected then
+			if XinnonyDebug == 4 then AddChatText(">> Background ART") end
+			GUI.background:Show()
+			GUI.background2:Hide()
+			GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/art-background-paint0"..math.random(1, 5).."_bmp.dds"))
+			LASTBackgroundSelected = 'art'
 		end
 	end
 end
@@ -5624,6 +5823,7 @@ function SetCurrentFactionTo_Faction_Selector(input_faction)
 		if faction == 1 then
 			ChangeSkinByFaction(1)
 			ChangeSkinButtonByFaction(1)
+			ChangeBackgroundLobby(nil, 1)
 			TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico-large.dds"))
 			TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico.dds"))
 				LayoutHelpers.AtLeftIn(TEST1factionPanel, GUI.factionPanel, 0)
@@ -5636,6 +5836,7 @@ function SetCurrentFactionTo_Faction_Selector(input_faction)
 		elseif faction == 2 then
 			ChangeSkinByFaction(2)
 			ChangeSkinButtonByFaction(2)
+			ChangeBackgroundLobby(nil, 2)
 			TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico-large.dds"))
 				LayoutHelpers.AtLeftIn(TEST1factionPanel, GUI.factionPanel, -15)
 			TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico.dds"))
@@ -5648,6 +5849,7 @@ function SetCurrentFactionTo_Faction_Selector(input_faction)
 		elseif faction == 3 then
 			ChangeSkinByFaction(3)
 			ChangeSkinButtonByFaction(3)
+			ChangeBackgroundLobby(nil, 3)
 			TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico-large.dds"))
 				LayoutHelpers.AtLeftIn(TEST2factionPanel, GUI.factionPanel, 45-15)
 			TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico.dds"))
@@ -5660,6 +5862,7 @@ function SetCurrentFactionTo_Faction_Selector(input_faction)
 		elseif faction == 4 then
 			ChangeSkinByFaction(4)
 			ChangeSkinButtonByFaction(4)
+			ChangeBackgroundLobby(nil, 4)
 			TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico-large.dds"))
 				LayoutHelpers.AtRightIn(TEST4factionPanel, GUI.factionPanel, 45-15)
 			TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico.dds"))
@@ -5672,6 +5875,7 @@ function SetCurrentFactionTo_Faction_Selector(input_faction)
 		elseif faction == 5 then
 			ChangeSkinByFaction(5)
 			ChangeSkinButtonByFaction(5)
+			ChangeBackgroundLobby(nil, 5)
 			TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico-large.dds"))
 				LayoutHelpers.AtRightIn(TEST5factionPanel, GUI.factionPanel, -15)
 			TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico.dds"))
