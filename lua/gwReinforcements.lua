@@ -40,7 +40,7 @@ teams[1] = 1
 teams[2] = 1
 
 
-local beaconTime = 0
+local beaconTime = {}
 
 assignSupports = function()
 	local ArmiesList = ScenarioInfo.ArmySetup
@@ -49,10 +49,12 @@ assignSupports = function()
     	if army.ArmyIndex == 1 then
     		factions[1] = army.Faction
 			teams[1] = army.Team
+			beaconTime[1] = 0
 
     	elseif army.ArmyIndex == 2 then
     		factions[2] = army.Faction
 			teams[2] = army.Team
+			beaconTime[2] = 0
     	end
     end
 
@@ -130,8 +132,8 @@ gwReinforcementsMainThread = function()
 	ScenarioInfo.gwReinforcementSpawnThreads = {}
 	ScenarioInfo.gwReinforcementList = gwReinforcementList
 
-	LOG("ScenarioInfo.gwReinforcementList")
-	LOG(repr(ScenarioInfo.gwReinforcementList))
+	#LOG("ScenarioInfo.gwReinforcementList")
+	#LOG(repr(ScenarioInfo.gwReinforcementList))
 
 	SpawnInitialStructures(ScenarioInfo.gwReinforcementList.initialStructure,ArmiesList)
 	SpawnInitialReinforcements(ScenarioInfo.gwReinforcementList.initialUnitWarp,ArmiesList)
@@ -194,7 +196,7 @@ InitialStructuresSpawnThread = function(List, Army)
 	WaitSeconds(1)
 	
 	for index, v in UnitsToSpawn do
-		WARN('unit and pos is ' .. repr(v) .. ' and ' .. repr(posX) .. ' and ' .. repr(posY))
+		#WARN('unit and pos is ' .. repr(v) .. ' and ' .. repr(posX) .. ' and ' .. repr(posY))
         local unit = aiBrain:CreateUnitNearSpot(v, posX, posY)
         if delay > 0 then
         	unit:InitiateActivation(delay)
@@ -260,7 +262,7 @@ GetACUs = function(armies)
 			for index,ArmyUnit in units do
 				if EntityCategoryContains(categories.COMMAND,ArmyUnit) then
 					ACUs[ArmyUnit:GetArmy()] = ArmyUnit
-					LOG('found an ACU near marker ' .. repr(ArmyName))
+					#LOG('found an ACU near marker ' .. repr(ArmyName))
 				end
 			end
 		end
@@ -288,7 +290,7 @@ ModHumanACU =  function(ACU)
 end
 
 ModBeacon = function(ACU, beacon)
-	WARN("Modding beacon")
+
 	beacon.ArmyIndex  = ACU:GetArmy()
 	
 	if EntityCategoryContains(categories.UEF, ACU) then beacon.Faction = 1
@@ -314,7 +316,7 @@ ModBeacon = function(ACU, beacon)
 		CheckEngineersDelay(self)
 		CheckUnitsDelay(self)
 		if table.getn( self.unitsDelays ) != 0 or table.getn( self.engineersDelays ) != 0 then
-			self.timerThread = self:ForkThread(timerBeacon)
+			beacon.timerThread = self:ForkThread(timerBeacon)
 		end
 		beacon.OldOnStopBeingBuilt(self, builder, layer)
 		
@@ -327,7 +329,7 @@ end
 CheckEngineersDelay = function(beacon)
 	beacon.engineersDelays = {}
 	for index, List in ScenarioInfo.gwReinforcementList.builtByEngineerStructure do
-		if List.playerName == beacon:GetAIBrain().Nickname and List.delay >= beaconTime then
+		if List.playerName == beacon:GetAIBrain().Nickname and List.delay >= beaconTime[beacon.ArmyIndex] then
 			table.insert(beacon.engineersDelays, List)
 		end 
 	end
@@ -337,7 +339,7 @@ end
 CheckUnitsDelay = function(beacon)
 	beacon.unitsDelays = {}
 	for index, List in ScenarioInfo.gwReinforcementList.transportedUnits do
-		if List.playerName == beacon:GetAIBrain().Nickname and List.delay >= beaconTime then
+		if List.playerName == beacon:GetAIBrain().Nickname and List.delay >= beaconTime[beacon.ArmyIndex] then
 			table.insert(beacon.unitsDelays, List)
 		end 
 	end
@@ -361,10 +363,10 @@ end
 
 timerBeacon = function(self)
 	while true do
-		beaconTime = beaconTime + 1
+		beaconTime[self.ArmyIndex] = beaconTime[self.ArmyIndex] + 1
 		local toRemove = {}
 		for index, List in self.engineersDelays do
-			if List.delay == beaconTime then
+			if List.delay == beaconTime[self.ArmyIndex] then
 				CallEngineersToBeacon(self, List)
 				table.insert(toRemove, index)
 			end
@@ -376,7 +378,7 @@ timerBeacon = function(self)
 
 		local toRemove = {}
 		for index, List in self.unitsDelays do
-			if List.delay == beaconTime then
+			if List.delay == beaconTime[self.ArmyIndex] then
 				CallReinforcementsToBeacon(self, List)
 				table.insert(toRemove, index)
 			end
@@ -412,7 +414,7 @@ CallEngineersToBeacon = function(beacon, List)
 
 	beacon.NearestOffMapLocation = CalculateNearestOffMapLocation(beacon)
 
-	WARN('beacon.StructureReinforcementsToCall is ' .. repr(beacon.StructureReinforcementsToCall))
+	#WARN('beacon.StructureReinforcementsToCall is ' .. repr(beacon.StructureReinforcementsToCall))
 	if beacon.StructureReinforcementsToCall then
 		SpawnBuildByEngineerReinforcements(beacon, beacon.StructureReinforcementsToCall)
 	end
@@ -431,12 +433,12 @@ CallReinforcementsToBeacon = function(beacon, List)
 	beacon.AiBrain = beacon:GetAIBrain()
 	beacon.Nickname = beacon.AiBrain.Nickname
 	beacon.ArmyName = beacon.AiBrain.Name
-	WARN('gwReinforcementList.TransportedUnits is ' .. repr(ScenarioInfo.gwReinforcementList.transportedUnits))
+	#WARN('gwReinforcementList.TransportedUnits is ' .. repr(ScenarioInfo.gwReinforcementList.transportedUnits))
 	
 	beacon.UnitReinforcementsToCall = List.unitNames
 
 	beacon.NearestOffMapLocation = CalculateNearestOffMapLocation(beacon)
-	WARN('beacon.UnitReinforcementsToCall is ' .. repr(beacon.UnitReinforcementsToCall))
+	#WARN('beacon.UnitReinforcementsToCall is ' .. repr(beacon.UnitReinforcementsToCall))
 	if beacon.UnitReinforcementsToCall then
 		SpawnTransportedReinforcements(beacon, beacon.UnitReinforcementsToCall)
 	end
@@ -489,8 +491,8 @@ SpawnTransportedReinforcements = function(beacon, unitsToSpawn)
 	
 	#this spawns our units
 	for index, unitBPid in unitsToSpawn do
-		WARN('spawning reinforcement unit bpid is ' .. repr(unitBPid))
-		WARN('spawning beacon.ArmyName unit bpid is ' .. repr(beacon.ArmyIndex))
+		#WARN('spawning reinforcement unit bpid is ' .. repr(unitBPid))
+		#WARN('spawning beacon.ArmyName unit bpid is ' .. repr(beacon.ArmyIndex))
 		
 		
 
@@ -735,7 +737,7 @@ ModEngineer = function(engineer, transportBPid)
 end
 
 CallTransportToCarryMeAway = function(self, transportBPid)
-	WARN('starting carry me away function with transportID and name ' .. repr(transportBPid) .. ' and ' .. repr(self:GetAIBrain().Name))
+	#WARN('starting carry me away function with transportID and name ' .. repr(transportBPid) .. ' and ' .. repr(self:GetAIBrain().Name))
 	local NearestOffMapLocation = CalculateNearestOffMapLocation(self)
 	local transport = CreateUnitHPR(transportBPid, self:GetAIBrain().Name, NearestOffMapLocation[1], NearestOffMapLocation[2], NearestOffMapLocation[3],0,0,0)
 	transport:SetCanTakeDamage(false)
