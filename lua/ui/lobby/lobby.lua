@@ -1698,11 +1698,11 @@ local function UpdateGame()
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
         CreateBigPreview(501, GUI.mapPanel)
     end
-    RefreshOptionDisplayData(scenarioInfo)
+	RefreshOptionDisplayData(scenarioInfo)
     -- Send autoteams infos to server.
     AssignRandomTeams(gameInfo)
 
-
+	if BackgroundSelected == 'map' then ChangeBackgroundLobby(nil, nil) end-- For update map background
 
     if gameInfo.GameOptions['TeamSpawn'] != 'random' and math.mod(numPlayers,2) == 0 and gameInfo.GameOptions['AutoTeams'] !=
         'manual' and gameInfo.GameOptions['AutoTeams'] != 'none' then
@@ -2615,7 +2615,7 @@ function CreateUI(maxPlayers)
 							'- Moritz : Power Lobby 2.0.', 'Thanks you !')
 	end
     --// Credits footer -- Xinnony
-	local Credits = 'New Skin by Xinnony and Barlots (v1a)'--Lot of changes and functions by Xinnony | Power Lobby 2.0 by Moritz"
+	local Credits = 'New Skin by Xinnony and Barlots (v1b)'--Lot of changes and functions by Xinnony | Power Lobby 2.0 by Moritz"
 	local Credits_Text_X = 11
     Credits_Shadows1 = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
     Credits_Shadows1:SetFont(UIUtil.titleFont, 12)
@@ -5484,7 +5484,7 @@ function ChangeBackgroundLobby(slot, faction)
 			end
 			LASTBackgroundSelected = 'faction'
 		
-		elseif BackgroundSelected == 'map' and LASTBackgroundSelected != BackgroundSelected then -- LASTBac... is for avoided loop set texture, when you change faction
+		elseif BackgroundSelected == 'map' then--and LASTBackgroundSelected != BackgroundSelected then -- LASTBac... is for avoided loop set texture, when you change faction
 			if XinnonyDebug == 4 then AddChatText(">> Background MAP") end
 			GUI.background:Hide()
 			GUI.background2:Show()
