@@ -1,4 +1,4 @@
---*****************************************************************************
+﻿--*****************************************************************************
 --* File: lua/modules/ui/lobby/lobby.lua
 --* Author: Chris Blackwell
 --* Summary: Game selection UI
@@ -2424,7 +2424,7 @@ function CreateUI(maxPlayers)
     --if singlePlayer then
         --GUI.panel = Bitmap(GUI, UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/power_panel-skirmish_bmp.dds"))
     --else
-        GUI.panel = Bitmap(GUI, UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[xxx]power_panel_bmp.dds"))
+        GUI.panel = Bitmap(GUI, UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/power_panel_bmp.dds"))
     --end
 	LayoutHelpers.AtCenterIn(GUI.panel, GUI)
     --GUI.panel.brackets = UIUtil.CreateDialogBrackets(GUI.panel, 18, 17, 18, 15)
