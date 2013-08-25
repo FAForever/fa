@@ -259,10 +259,12 @@ GetACUs = function(armies)
 			local StartingPosition = ScenarioUtils.MarkerToPosition(Army.ArmyName)
 			local rect = Rect((StartingPosition[1] + 1), (StartingPosition[3] + 1),(StartingPosition[1] - 1),( StartingPosition[3] + 1))
 			local units = GetUnitsInRect(rect)
-			for index,ArmyUnit in units do
-				if EntityCategoryContains(categories.COMMAND,ArmyUnit) then
-					ACUs[ArmyUnit:GetArmy()] = ArmyUnit
-					#LOG('found an ACU near marker ' .. repr(ArmyName))
+			if units then
+				for index,ArmyUnit in units do
+					if EntityCategoryContains(categories.COMMAND,ArmyUnit) then
+						ACUs[ArmyUnit:GetArmy()] = ArmyUnit
+						#LOG('found an ACU near marker ' .. repr(ArmyName))
+					end
 				end
 			end
 		end
@@ -455,25 +457,36 @@ CalculateNearestOffMapLocation = function(beacon)
 	local BeaconPosition = beacon:GetPosition()
 	local NearestOffMapLocation = {}
 	
-	#below calculates the distances from each of the four playable area borders, and finds out which one is closest
-	local NearestOffMapLocation = {( ScenarioInfo.PlayableArea[1] + 1), BeaconPosition[2], BeaconPosition[3]} 
-	local ClosestDistance = (BeaconPosition[1] - ScenarioInfo.PlayableArea[1])
-	#x0Distance, distance from left  compared to x1Distance, right
-	if ClosestDistance > (ScenarioInfo.PlayableArea[3] - BeaconPosition[1]) then
-		NearestOffMapLocation = {( ScenarioInfo.PlayableArea[3] - 1), BeaconPosition[2], BeaconPosition[3]} 
-		ClosestDistance = (ScenarioInfo.PlayableArea[3] - BeaconPosition[1])
+	
+	local corner1 = {ScenarioInfo.PlayableArea[1], ScenarioInfo.PlayableArea[2], 0}
+	local corner2 = {ScenarioInfo.PlayableArea[3], ScenarioInfo.PlayableArea[2], 0}
+	local corner3 = {ScenarioInfo.PlayableArea[3], ScenarioInfo.PlayableArea[4], 0}
+	local corner4 = {ScenarioInfo.PlayableArea[1], ScenarioInfo.PlayableArea[4], 0}
+	
+	# Are we closer to top or bottom?
+	local vert = {}
+	local hori = {}
+	vert = {BeaconPosition[1], BeaconPosition[2], ScenarioInfo.PlayableArea[4]}
+	if VDist3(corner1,BeaconPosition) < VDist3(corner4,BeaconPosition) then
+		#we are closer to top
+		vert = {BeaconPosition[1], BeaconPosition[2], ScenarioInfo.PlayableArea[2]}
+		
 	end
-	# x1 distance (right) compared to y0 distance (top)
-	if ClosestDistance > (BeaconPosition[3] - ScenarioInfo.PlayableArea[2]) then
-		NearestOffMapLocation = {BeaconPosition[1], BeaconPosition[2], ( ScenarioInfo.PlayableArea[2] + 1)} 
-		ClosestDistance = (BeaconPosition[3] - ScenarioInfo.PlayableArea[2])
+	
+	# Are we closer to left or right?
+	hori = {ScenarioInfo.PlayableArea[3], BeaconPosition[2], BeaconPosition[3]}
+	if VDist3(corner1,BeaconPosition) < VDist3(corner2,BeaconPosition) then
+		#we are closer to left
+		hori = {ScenarioInfo.PlayableArea[1], BeaconPosition[2], BeaconPosition[3]}
+	end	
+	
+	# what is the closer spawn location, horizontal or vertical?
+	NearestOffMapLocation = hori
+	if VDist3(vert,BeaconPosition) < VDist3(hori,BeaconPosition) then
+		#we are closer to the computed vertical
+		NearestOffMapLocation = vert
 	end
-	#y0 (top) compared to y1 (bottom)
-	if ClosestDistance >  (ScenarioInfo.PlayableArea[4] - BeaconPosition[3]) then
-		NearestOffMapLocation = {BeaconPosition[1], BeaconPosition[2], ( ScenarioInfo.PlayableArea[2] - 1)}
-		ClosestDistance = (ScenarioInfo.PlayableArea[4] - BeaconPosition[3])
-	end
-
+	
 	#WARN('calculated nearestoffmaplocation, it is ' .. repr(NearestOffMapLocation))
 	return NearestOffMapLocation
 end
@@ -552,10 +565,20 @@ SpawnTransportAndIssueDrop = function(transportBPid, units, NearestOffMapLocatio
 	ScenarioFramework.AttachUnitsToTransports(units, {transport})
 	local beaconPosition = beacon:GetPosition()
 	
+	
+	
+	cmd = Transports:MoveToLocation(beaconPosition, false)
+	if cmd then
+		while Transports:IsCommandsActive(cmd) do
+			WaitSeconds(1)
+			if not aiBrain:PlatoonExists(Transports) then
+				break
+			end
+		end
+	end
+		
 	Transports:UnloadAllAtLocation(beaconPosition)
 	transport:SetUnSelectable(true)
-	
-
 	
 	WaitSeconds(5)
 	if not transport:IsDead() then
@@ -664,11 +687,18 @@ SpawnEngineerAndTransportAndBuildTheStructure = function(EngineerBPid, Structure
 	ScenarioFramework.AttachUnitsToTransports({engineer}, {transport})
 
 	local beaconPosition = beacon:GetPosition()
-	
-	
-	Transports:UnloadAllAtLocation(beaconPosition)
 
-	#IssueTransportUnload({transport}, beaconPosition)
+	cmd = Transports:MoveToLocation(beaconPosition, false)
+	if cmd then
+		while Transports:IsCommandsActive(cmd) do
+			WaitSeconds(1)
+			if not aiBrain:PlatoonExists(Transports) then
+				break
+			end
+		end
+	end
+		
+	Transports:UnloadAllAtLocation(beaconPosition)
 	
 	transport:SetUnSelectable(true)
 	
