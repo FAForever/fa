@@ -2408,14 +2408,24 @@ function CreateUI(maxPlayers)
     local title
     if GpgNetActive() then
         title = "FA FOREVER GAME LOBBY"
+		XinnoBackgroundStretch = Prefs.GetFromCurrentProfile('XinnoBackgroundStretch') or 'true'
+		--
 		GUI.background = Bitmap(GUI, UIUtil.SkinnableFile('')) -- Background faction or art
 			LayoutHelpers.AtCenterIn(GUI.background, GUI)
-			LayoutHelpers.FillParentPreserveAspectRatio(GUI.background, GUI)
+			if XinnoBackgroundStretch == 'true' then
+				LayoutHelpers.FillParent(GUI.background, GUI)
+			else
+				LayoutHelpers.FillParentPreserveAspectRatio(GUI.background, GUI)
+			end
 		GUI.background2 = MapPreview(GUI) -- Background map
 			LayoutHelpers.AtCenterIn(GUI.background2, GUI)
 			GUI.background2.Width:Set(400)
 			GUI.background2.Height:Set(400)
-			LayoutHelpers.FillParentPreserveAspectRatio(GUI.background2, GUI)
+			if XinnoBackgroundStretch == 'true' then
+				LayoutHelpers.FillParent(GUI.background2, GUI)
+			else
+				LayoutHelpers.FillParentPreserveAspectRatio(GUI.background2, GUI)
+			end
     elseif singlePlayer then
         title = "<LOC _Skirmish_Setup>"
     else
@@ -2451,7 +2461,7 @@ function CreateUI(maxPlayers)
 		CreateOptionLobbyDialog()
 	end
     --// Credits footer -- Xinnony
-	local Credits = 'New Skin by Xinnony and Barlots (v1d)'
+	local Credits = 'New Skin by Xinnony and Barlots (v1.5)'
 	local Credits_Text_X = 11
     Credits_Shadows1 = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
     Credits_Shadows1:SetFont(UIUtil.titleFont, 12)
@@ -3288,191 +3298,207 @@ function CreateUI(maxPlayers)
             end
         end
 
-        GUI.becomeObserver = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/lobby/lan-game-lobby/toggle', "Go Observer", 10, 0)--"<LOC lobui_0228>Observe", 10, 0)
-            LayoutHelpers.AtLeftTopIn(GUI.becomeObserver, GUI.buttonPanelRight, 10)
+		-- GO OBSERVER BUTTON --
+        GUI.becomeObserver = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/observer/toggle', "", 10, 0) -- XinnonyWork
+            LayoutHelpers.AtLeftTopIn(GUI.becomeObserver, GUI.buttonPanelRight, -40+4, 25)
             Tooltip.AddButtonTooltip(GUI.becomeObserver, 'lob_become_observer')
-        GUI.becomeObserver.OnClick = function(self, modifiers)
-            if IsPlayer(localPlayerID) then
-                if lobbyComm:IsHost() then
-                    HostConvertPlayerToObserver(hostID, localPlayerName, FindSlotForID(localPlayerID))
-                else
-                    lobbyComm:SendData(hostID, {Type = 'RequestConvertToObserver', RequestedName = localPlayerName, RequestedSlot = FindSlotForID(localPlayerID)})
-                end
-            end
-        end
+			GUI.becomeObserver.OnClick = function(self, modifiers)
+				if IsPlayer(localPlayerID) then
+					if lobbyComm:IsHost() then
+						HostConvertPlayerToObserver(hostID, localPlayerName, FindSlotForID(localPlayerID))
+					else
+						lobbyComm:SendData(hostID, {Type = 'RequestConvertToObserver', RequestedName = localPlayerName, RequestedSlot = FindSlotForID(localPlayerID)})
+					end
+				end
+			end
 
-        if lobbyComm:IsHost() then
-            --start of auto teams code by Moritz
-            GUI.randTeam = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/lobby/lan-game-lobby/toggle',
-                                                  "<LOC lobui_0506>Auto Teams", 10, 0)
-                LayoutHelpers.AtLeftTopIn(GUI.randTeam, GUI.buttonPanelRight, 10, 25)
-                Tooltip.AddButtonTooltip(GUI.randTeam, 'lob_click_randteam')
-            GUI.randTeam.OnClick = function(self, modifiers)
-                if gameInfo.GameOptions['AutoTeams'] == 'none' then
-                    Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 2)
-                    SetGameOption('AutoTeams', 'tvsb')
-                    SendSystemMessage("Auto Teams option set: Top vs Bottom")
-                elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
-                    Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 3)
-                    SetGameOption('AutoTeams', 'lvsr')
-                    SendSystemMessage("Auto Teams option set: Left vs Right")
-                elseif gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
-                    Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 4)
-                    SetGameOption('AutoTeams', 'pvsi')
-                    SendSystemMessage("Auto Teams option set: Even Slots vs Odd Slots")
-                elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' then
-                    Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 5)
-                    SetGameOption('AutoTeams', 'manual')
-                    SendSystemMessage("Auto Teams option set: Manual Select")
-                else
-                    Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 1)
-                    SetGameOption('AutoTeams', 'none')
-                    SendSystemMessage("Auto Teams option set: None")
-                end
-            end
-            --end of auto teams code
-            --start of random map code by Moritz
-            GUI.randMap = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/lobby/lan-game-lobby/toggle',
-                                                 "<LOC lobui_0503>Random Map", 10, 0)
-                LayoutHelpers.CenteredRightOf(GUI.randMap, GUI.randTeam, 5)
-                Tooltip.AddButtonTooltip(GUI.randMap, 'lob_click_randmap')
-            GUI.randMap.OnClick = function()
-                local randomMap
-                local mapSelectDialog
+		-- AUTO TEAM BUTTON -- start of auto teams code by Moritz
+		GUI.randTeam = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/autoteam/toggle') -- XinnonyWork
+			LayoutHelpers.AtLeftTopIn(GUI.randTeam, GUI.buttonPanelRight, 40+8, 25)
+			Tooltip.AddButtonTooltip(GUI.randTeam, 'lob_click_randteam')
+			if not lobbyComm:IsHost() then
+				GUI.randTeam:Disable()
+			else
+				GUI.randTeam.OnClick = function(self, modifiers)
+					if gameInfo.GameOptions['AutoTeams'] == 'none' then
+						Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 2)
+						SetGameOption('AutoTeams', 'tvsb')
+						SendSystemMessage("Auto Teams option set: Top vs Bottom")
+					elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
+						Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 3)
+						SetGameOption('AutoTeams', 'lvsr')
+						SendSystemMessage("Auto Teams option set: Left vs Right")
+					elseif gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
+						Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 4)
+						SetGameOption('AutoTeams', 'pvsi')
+						SendSystemMessage("Auto Teams option set: Even Slots vs Odd Slots")
+					elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' then
+						Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 5)
+						SetGameOption('AutoTeams', 'manual')
+						SendSystemMessage("Auto Teams option set: Manual Select")
+					else
+						Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 1)
+						SetGameOption('AutoTeams', 'none')
+						SendSystemMessage("Auto Teams option set: None")
+					end
+				end
+			end
+		--end of auto teams code
 
-                --In order for the RandMap button to work on lobby init, the PC needs a copy of the mapSelectDialog in memory.
-                --Destroy the window after it's loaded, so the player never sees it when clicking the random map button.
-                autoRandMap = false
-                quickRandMap = false
-                local function selectBehavior(selectedScenario, changedOptions, restrictedCategories)
-                    if autoRandMap then
-                        Prefs.SetToCurrentProfile('LastScenario', selectedScenario.file)
-                        gameInfo.GameOptions['ScenarioFile'] = selectedScenario.file
-                    else
-                        Prefs.SetToCurrentProfile('LastScenario', selectedScenario.file)
-                        mapSelectDialog:Destroy()
-                        GUI.chatEdit:AcquireFocus()
-                        for optionKey, data in changedOptions do
-                            Prefs.SetToCurrentProfile(data.pref, data.index)
-                            SetGameOption(optionKey, data.value)
-                        end
-                        --SendSystemMessage(selectedScenario.file)
+		-- DEFAULT OPTION BUTTON -- start of ranked options code
+		GUI.rankedOptions = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/defaultoption/toggle') -- XinnonyWork
+			LayoutHelpers.CenteredRightOf(GUI.rankedOptions, GUI.randTeam, 0)
+			Tooltip.AddButtonTooltip(GUI.rankedOptions, 'lob_click_rankedoptions')
+			if not lobbyComm:IsHost() then
+				GUI.rankedOptions:Disable()
+			else
+				GUI.rankedOptions.OnClick = function()
+					Prefs.SetToCurrentProfile('Lobby_Gen_Victory', 1)
+					Prefs.SetToCurrentProfile('Lobby_Gen_Timeouts', 2)
+					Prefs.SetToCurrentProfile('Lobby_Gen_CheatsEnabled', 1)
+					Prefs.SetToCurrentProfile('Lobby_Gen_Civilians', 1)
+					Prefs.SetToCurrentProfile('Lobby_Gen_GameSpeed', 1)
+					Prefs.SetToCurrentProfile('Lobby_Gen_Fog', 1)
+					Prefs.SetToCurrentProfile('Lobby_Gen_Cap', 8)
+					Prefs.SetToCurrentProfile('Lobby_Prebuilt_Units', 1)
+					Prefs.SetToCurrentProfile('Lobby_NoRushOption', 1)
+					SetGameOption('Victory', 'demoralization')
+					SetGameOption('Timeouts', '3')
+					SetGameOption('CheatsEnabled', 'false')
+					SetGameOption('CivilianAlliance', 'enemy')
+					SetGameOption('GameSpeed', 'normal')
+					SetGameOption('FogOfWar', 'explored')
+					SetGameOption('UnitCap', '1000')
+					SetGameOption('PrebuiltUnits', 'Off')
+					SetGameOption('NoRushOption', 'Off')
+					--gameInfo.GameMods["656b7af6-9a56-47c5-8182-3a896dc6f4b7"] = true
+					--lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
+					UpdateGame()
+				end
+			end
+		--end of ranked options code
 
-                        SetGameOption('ScenarioFile',selectedScenario.file)
+		-- CPU BENCH BUTTON --
+		GUI.rerunBenchmark = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/cputest/toggle', '', 10, 0)
+			GUI.rerunBenchmark:Disable()
+			LayoutHelpers.CenteredRightOf(GUI.rerunBenchmark, GUI.rankedOptions, 0)
+			Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text='Run CPU Benchmark Test', body='Recalculates your CPU rating.'})
 
-                        SetGameOption('RestrictedCategories', restrictedCategories, true)
-                        ClearBadMapFlags()  -- every new map, clear the flags, and clients will report if a new map is bad
-                        HostUpdateMods()
-                        UpdateGame()
-                    end
-                end
+		-- RANDOM MAP BUTTON -- start of random map code by Moritz
+		GUI.randMap = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/randommap/toggle', '', 10, 0) -- XinnonyWork
+			LayoutHelpers.CenteredRightOf(GUI.randMap, GUI.rerunBenchmark, 0)
+			Tooltip.AddButtonTooltip(GUI.randMap, 'lob_click_randmap')
+			if not lobbyComm:IsHost() then
+				GUI.randMap:Disable()
+			else
+				GUI.randMap.OnClick = function()
+					local randomMap
+					local mapSelectDialog
 
-                local function exitBehavior()
-                    mapSelectDialog:Destroy()
-                    GUI.chatEdit:AcquireFocus()
-                    UpdateGame()
-                end
+					--In order for the RandMap button to work on lobby init, the PC needs a copy of the mapSelectDialog in memory.
+					--Destroy the window after it's loaded, so the player never sees it when clicking the random map button.
+					autoRandMap = false
+					quickRandMap = false
+					local function selectBehavior(selectedScenario, changedOptions, restrictedCategories)
+						if autoRandMap then
+							Prefs.SetToCurrentProfile('LastScenario', selectedScenario.file)
+							gameInfo.GameOptions['ScenarioFile'] = selectedScenario.file
+						else
+							Prefs.SetToCurrentProfile('LastScenario', selectedScenario.file)
+							mapSelectDialog:Destroy()
+							GUI.chatEdit:AcquireFocus()
+							for optionKey, data in changedOptions do
+								Prefs.SetToCurrentProfile(data.pref, data.index)
+								SetGameOption(optionKey, data.value)
+							end
+							--SendSystemMessage(selectedScenario.file)
 
-                GUI.chatEdit:AbandonFocus()
+							SetGameOption('ScenarioFile',selectedScenario.file)
 
-                mapSelectDialog = import('/lua/ui/dialogs/mapselect.lua').CreateDialog(
-                        selectBehavior,
-                        exitBehavior,
-                        GUI,
-                        singlePlayer,
-                        gameInfo.GameOptions.ScenarioFile,
-                        gameInfo.GameOptions,
-                        availableMods,
-                        OnModsChanged
-                )
-                mapSelectDialog:Destroy()
-                GUI.chatEdit:AcquireFocus()
-                randomMap = import('/lua/ui/dialogs/mapselect.lua').randomLobbyMap()
-            end
+							SetGameOption('RestrictedCategories', restrictedCategories, true)
+							ClearBadMapFlags()  -- every new map, clear the flags, and clients will report if a new map is bad
+							HostUpdateMods()
+							UpdateGame()
+						end
+					end
 
-            function sendRandMapMessage()
-                local rMapName = import('/lua/ui/dialogs/mapselect.lua').rMapName
-                local rMapSize1 = import('/lua/ui/dialogs/mapselect.lua').rMapSize1
-                local rMapSize2 = import('/lua/ui/dialogs/mapselect.lua').rMapSize2
-                local rMapSizeFil = import('/lua/ui/dialogs/mapselect.lua').rMapSizeFil
-                local rMapSizeFilLim = import('/lua/ui/dialogs/mapselect.lua').rMapSizeFilLim
-                local rMapPlayersFil = import('/lua/ui/dialogs/mapselect.lua').rMapPlayersFil
-                local rMapPlayersFilLim = import('/lua/ui/dialogs/mapselect.lua').rMapPlayersFilLim
-                local rMapTypeFil = import('/lua/ui/dialogs/mapselect.lua').rMapTypeFil
-                SendSystemMessage("-------------------------------------------------------------------------------"..
-                                  "--------------------")
-                SendSystemMessage(LOCF('%s %s', "<LOC lobui_0504>Randomly selected map: ", rMapName))
-                SendSystemMessage(LOCF("<LOC map_select_0000>Map Size: %dkm x %dkm", rMapSize1, rMapSize2))
-                if rMapSizeFilLim == 'equal' then
-                    rMapSizeFilLim = '='
-                elseif rMapSizeFilLim == 'less' then
-                    rMapSizeFilLim = '<='
-                elseif rMapSizeFilLim == 'greater' then
-                    rMapSizeFilLim = '>='
-                end
-                if rMapPlayersFilLim == 'equal' then
-                    rMapPlayersFilLim = '='
-                elseif rMapPlayersFilLim == 'less' then
-                    rMapPlayersFilLim = '<='
-                elseif rMapPlayersFilLim == 'greater' then
-                    rMapPlayersFilLim = '>='
-                end
-                if rMapTypeFil == 1 then
-                    rMapTypeFil = "<LOC lobui_0576>Official"
-                elseif rMapTypeFil == 2 then
-                    rMapTypeFil = "<LOC lobui_0577>Custom"
-                end
-                if rMapSizeFil != 0 and rMapPlayersFil != 0 then
-                    SendSystemMessage(LOCF("<LOC lobui_0516>Filters: Map Size is %s %dkm and Number of Players are %s %d",
-                                           rMapSizeFilLim, rMapSizeFil, rMapPlayersFilLim, rMapPlayersFil))
-                elseif rMapSizeFil != 0 then
-                    SendSystemMessage(LOCF("<LOC lobui_0517>Filters: Map Size is %s %dkm and Number of Players are ALL",
-                                           rMapSizeFilLim, rMapSizeFil))
-                elseif rMapPlayersFil != 0 then
-                    SendSystemMessage(LOCF("<LOC lobui_0518>Filters: Map Size is ALL and Number of Players are %s %d",
-                                           rMapPlayersFilLim, rMapPlayersFil))
-                end
-                if rMapTypeFil != 0 then
-                    SendSystemMessage(LOCF("<LOC lobui_0578>Map Type: %s", rMapTypeFil))
-                end
-                SendSystemMessage("---------------------------------------------------------------------------------------"..
-                                  "------------")
-                if not quickRandMap then
-                    quickRandMap = true
-                    UpdateGame()
-                end
-            end
+					local function exitBehavior()
+						mapSelectDialog:Destroy()
+						GUI.chatEdit:AcquireFocus()
+						UpdateGame()
+					end
+
+					GUI.chatEdit:AbandonFocus()
+
+					mapSelectDialog = import('/lua/ui/dialogs/mapselect.lua').CreateDialog(
+							selectBehavior,
+							exitBehavior,
+							GUI,
+							singlePlayer,
+							gameInfo.GameOptions.ScenarioFile,
+							gameInfo.GameOptions,
+							availableMods,
+							OnModsChanged
+					)
+					mapSelectDialog:Destroy()
+					GUI.chatEdit:AcquireFocus()
+					randomMap = import('/lua/ui/dialogs/mapselect.lua').randomLobbyMap()
+				end
+				--
+				function sendRandMapMessage()
+					local rMapName = import('/lua/ui/dialogs/mapselect.lua').rMapName
+					local rMapSize1 = import('/lua/ui/dialogs/mapselect.lua').rMapSize1
+					local rMapSize2 = import('/lua/ui/dialogs/mapselect.lua').rMapSize2
+					local rMapSizeFil = import('/lua/ui/dialogs/mapselect.lua').rMapSizeFil
+					local rMapSizeFilLim = import('/lua/ui/dialogs/mapselect.lua').rMapSizeFilLim
+					local rMapPlayersFil = import('/lua/ui/dialogs/mapselect.lua').rMapPlayersFil
+					local rMapPlayersFilLim = import('/lua/ui/dialogs/mapselect.lua').rMapPlayersFilLim
+					local rMapTypeFil = import('/lua/ui/dialogs/mapselect.lua').rMapTypeFil
+					SendSystemMessage("-------------------------------------------------------------------------------"..
+									  "--------------------")
+					SendSystemMessage(LOCF('%s %s', "<LOC lobui_0504>Randomly selected map: ", rMapName))
+					SendSystemMessage(LOCF("<LOC map_select_0000>Map Size: %dkm x %dkm", rMapSize1, rMapSize2))
+					if rMapSizeFilLim == 'equal' then
+						rMapSizeFilLim = '='
+					elseif rMapSizeFilLim == 'less' then
+						rMapSizeFilLim = '<='
+					elseif rMapSizeFilLim == 'greater' then
+						rMapSizeFilLim = '>='
+					end
+					if rMapPlayersFilLim == 'equal' then
+						rMapPlayersFilLim = '='
+					elseif rMapPlayersFilLim == 'less' then
+						rMapPlayersFilLim = '<='
+					elseif rMapPlayersFilLim == 'greater' then
+						rMapPlayersFilLim = '>='
+					end
+					if rMapTypeFil == 1 then
+						rMapTypeFil = "<LOC lobui_0576>Official"
+					elseif rMapTypeFil == 2 then
+						rMapTypeFil = "<LOC lobui_0577>Custom"
+					end
+					if rMapSizeFil != 0 and rMapPlayersFil != 0 then
+						SendSystemMessage(LOCF("<LOC lobui_0516>Filters: Map Size is %s %dkm and Number of Players are %s %d",
+											   rMapSizeFilLim, rMapSizeFil, rMapPlayersFilLim, rMapPlayersFil))
+					elseif rMapSizeFil != 0 then
+						SendSystemMessage(LOCF("<LOC lobui_0517>Filters: Map Size is %s %dkm and Number of Players are ALL",
+											   rMapSizeFilLim, rMapSizeFil))
+					elseif rMapPlayersFil != 0 then
+						SendSystemMessage(LOCF("<LOC lobui_0518>Filters: Map Size is ALL and Number of Players are %s %d",
+											   rMapPlayersFilLim, rMapPlayersFil))
+					end
+					if rMapTypeFil != 0 then
+						SendSystemMessage(LOCF("<LOC lobui_0578>Map Type: %s", rMapTypeFil))
+					end
+					SendSystemMessage("---------------------------------------------------------------------------------------"..
+									  "------------")
+					if not quickRandMap then
+						quickRandMap = true
+						UpdateGame()
+					end
+				end
+			end
         --end of random map code
-        --start of ranked options code
-            GUI.rankedOptions = UIUtil.CreateButtonStd(GUI.observerPanel, '/lobby/lan-game-lobby/toggle',
-                                                       "<LOC lobui_0522>Default Settings", 10, 0)
-                LayoutHelpers.AtLeftTopIn(GUI.rankedOptions, GUI.buttonPanelRight, 10, 50)
-                Tooltip.AddButtonTooltip(GUI.rankedOptions, 'lob_click_rankedoptions')
-            GUI.rankedOptions.OnClick = function()
-                    Prefs.SetToCurrentProfile('Lobby_Gen_Victory', 1)
-                    Prefs.SetToCurrentProfile('Lobby_Gen_Timeouts', 2)
-                    Prefs.SetToCurrentProfile('Lobby_Gen_CheatsEnabled', 1)
-                    Prefs.SetToCurrentProfile('Lobby_Gen_Civilians', 1)
-                    Prefs.SetToCurrentProfile('Lobby_Gen_GameSpeed', 1)
-                    Prefs.SetToCurrentProfile('Lobby_Gen_Fog', 1)
-                    Prefs.SetToCurrentProfile('Lobby_Gen_Cap', 8)
-                    Prefs.SetToCurrentProfile('Lobby_Prebuilt_Units', 1)
-                    Prefs.SetToCurrentProfile('Lobby_NoRushOption', 1)
-                    SetGameOption('Victory', 'demoralization')
-                    SetGameOption('Timeouts', '3')
-                    SetGameOption('CheatsEnabled', 'false')
-                    SetGameOption('CivilianAlliance', 'enemy')
-                    SetGameOption('GameSpeed', 'normal')
-                    SetGameOption('FogOfWar', 'explored')
-                    SetGameOption('UnitCap', '1000')
-                    SetGameOption('PrebuiltUnits', 'Off')
-                    SetGameOption('NoRushOption', 'Off')
-                    --gameInfo.GameMods["656b7af6-9a56-47c5-8182-3a896dc6f4b7"] = true
-                    --lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
-                    UpdateGame()
-                end
-            end
-        --end of ranked options code
 
         --start of auto kick code -- Modified by Xinnony
         if lobbyComm:IsHost() then
@@ -5048,12 +5074,6 @@ function CreateCPUMetricUI()
 	            
 		end
 
-        GUI.rerunBenchmark = UIUtil.CreateButtonStd(GUI.observerPanel, '/lobby/lan-game-lobby/toggle', 'Run CPU Test', 10, 0)
-        GUI.rerunBenchmark:Disable()
-
-        LayoutHelpers.CenteredRightOf(GUI.rerunBenchmark, GUI.becomeObserver, 5)
-        Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text='Run CPU Benchmark Test', body='Recalculates your CPU rating.'})
-
         GUI.rerunBenchmark.OnClick = function(self, modifiers)
             GUI.rerunBenchmark:Disable()
             ForkThread(function() StressCPU(1) end)
@@ -5090,7 +5110,7 @@ function StressCPU(waitTime)
     --    waitTime: The delay in seconds that this function should wait before starting the benchmark.
 
     for i = waitTime, 1, -1 do
-        GUI.rerunBenchmark.label:SetText('Run in '..i..'s')
+        GUI.rerunBenchmark.label:SetText(i..'s')
         WaitSeconds(1)
     end
 
@@ -5101,7 +5121,7 @@ function StressCPU(waitTime)
     end
 
     --LOG('Beginning CPU benchmark')
-    GUI.rerunBenchmark.label:SetText('In Progress...')
+    GUI.rerunBenchmark.label:SetText('. . .')
 
     --Run three benchmarks and keep the best one
     for i=1, 3, 1 do
@@ -5148,7 +5168,7 @@ function StressCPU(waitTime)
 
     --Reset Button UI
     GUI.rerunBenchmark:Enable()
-    GUI.rerunBenchmark.label:SetText('Run CPU Test')
+    GUI.rerunBenchmark.label:SetText('')
 end
 
 function UpdateCPUBar(playerName)
@@ -5693,6 +5713,7 @@ end
 --------------------------------------------------
 
 function ForceApplyNewSkin()
+	-- Exit button
 	if GUI.exitButton:IsDisabled() then
 		GUI.exitButton:SetTexture(UIUtil.UIFile('/BUTTON/exit/exit_dis.dds'))
 	else
@@ -5731,6 +5752,42 @@ function ForceApplyNewSkin()
 			GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/restrictedunits/restrictedunits_up.dds'))
 		elseif GUI.restrictedUnitsButton:IsDisabled() then
 			GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/restrictedunits/restrictedunits_dis.dds'))
+		end
+	end
+	-- Observer, AutoTeam, RankedOpts, CPUBench, RandomMap
+	if GUI.becomeObserver then
+		if not GUI.becomeObserver:IsDisabled() then
+			GUI.becomeObserver:SetTexture(UIUtil.UIFile('/BUTTON/observer/toggle_btn_up.dds'))
+		elseif GUI.becomeObserver:IsDisabled() then
+			GUI.becomeObserver:SetTexture(UIUtil.UIFile('/BUTTON/observer/toggle_btn_dis.dds'))
+		end
+	end
+	if GUI.randTeam then
+		if not GUI.randTeam:IsDisabled() then
+			GUI.randTeam:SetTexture(UIUtil.UIFile('/BUTTON/autoteam/toggle_btn_up.dds'))
+		elseif GUI.randTeam:IsDisabled() then
+			GUI.randTeam:SetTexture(UIUtil.UIFile('/BUTTON/autoteam/toggle_btn_dis.dds'))
+		end
+	end
+	if GUI.rankedOptions then
+		if not GUI.rankedOptions:IsDisabled() then
+			GUI.rankedOptions:SetTexture(UIUtil.UIFile('/BUTTON/defaultoption/toggle_btn_up.dds'))
+		elseif GUI.rankedOptions:IsDisabled() then
+			GUI.rankedOptions:SetTexture(UIUtil.UIFile('/BUTTON/defaultoption/toggle_btn_dis.dds'))
+		end
+	end
+	if GUI.rerunBenchmark then
+		if not GUI.rerunBenchmark:IsDisabled() then
+			GUI.rerunBenchmark:SetTexture(UIUtil.UIFile('/BUTTON/cputest/toggle_btn_up.dds'))
+		elseif GUI.rerunBenchmark:IsDisabled() then
+			GUI.rerunBenchmark:SetTexture(UIUtil.UIFile('/BUTTON/cputest/toggle_btn_dis.dds'))
+		end
+	end
+	if GUI.randMap then
+		if not GUI.randMap:IsDisabled() then
+			GUI.randMap:SetTexture(UIUtil.UIFile('/BUTTON/randommap/toggle_btn_up.dds'))
+		elseif GUI.randMap:IsDisabled() then
+			GUI.randMap:SetTexture(UIUtil.UIFile('/BUTTON/randommap/toggle_btn_dis.dds'))
 		end
 	end
 end
@@ -5830,7 +5887,7 @@ end
 function CreateOptionLobbyDialog()
 	local dialog = Group(GUI)
 		LayoutHelpers.AtCenterIn(dialog, GUI)
-		dialog.Depth:Set(999)
+		dialog.Depth:Set(999) -- :GetTopmostDepth() + 1
     local background = Bitmap(dialog, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby.dds'))
 		dialog.Width:Set(background.Width)
 		dialog.Height:Set(background.Height)
@@ -5839,6 +5896,8 @@ function CreateOptionLobbyDialog()
 		dialog2.Width:Set(536)
 		dialog2.Height:Set(400)
 		LayoutHelpers.AtCenterIn(dialog2, dialog)
+		
+		
 	---------------------------
 	-- CheckBox Options --
 	cbox_BG_Factions = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
@@ -5962,16 +6021,23 @@ function CreateOptionLobbyDialog()
 				cbox6_0:SetCheck(false, true)
 			end
 	--
-	local cbox7_0 = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
-		LayoutHelpers.AtRightIn(cbox7_0, dialog2, 20)
-		LayoutHelpers.AtTopIn(cbox7_0, dialog2, 80)
-		local cbox7_1 = UIUtil.CreateText(cbox7_0, 'Stretch Background', 14, 'Arial')
-			LayoutHelpers.AtRightIn(cbox7_1, cbox7_0, 25)
-			LayoutHelpers.AtVerticalCenterIn(cbox7_1, cbox7_0)
-			Tooltip.AddButtonTooltip(cbox7_1, {text='Stretch Background', body='The Stretch Background is not devlopped for the moment'})
-			cbox7_0:Disable()
-			cbox7_0.OnClick = function(self, checked)
-				cbox7_0:SetCheck(false, true)
+	local cbox_StretchBG = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
+		LayoutHelpers.AtRightIn(cbox_StretchBG, dialog2, 20)
+		LayoutHelpers.AtTopIn(cbox_StretchBG, dialog2, 80)
+		local cbox_StretchBG_TEXT = UIUtil.CreateText(cbox_StretchBG, 'Stretch Background', 14, 'Arial')
+			LayoutHelpers.AtRightIn(cbox_StretchBG_TEXT, cbox_StretchBG, 25)
+			LayoutHelpers.AtVerticalCenterIn(cbox_StretchBG_TEXT, cbox_StretchBG)
+			Tooltip.AddButtonTooltip(cbox_StretchBG_TEXT, {text='Stretch Background', body='...'})
+			cbox_StretchBG.OnCheck = function(self, checked)
+				if checked then
+					Prefs.SetToCurrentProfile('XinnoBackgroundStretch', 'true')
+					LayoutHelpers.FillParent(GUI.background, GUI)
+					LayoutHelpers.FillParent(GUI.background2, GUI)
+				else
+					Prefs.SetToCurrentProfile('XinnoBackgroundStretch', 'false')
+					LayoutHelpers.FillParentPreserveAspectRatio(GUI.background, GUI)
+					LayoutHelpers.FillParentPreserveAspectRatio(GUI.background2, GUI)
+				end
 			end
 	--------------------
 	-- Warning text --
@@ -6052,6 +6118,13 @@ function CreateOptionLobbyDialog()
 		cbox_Skin_Dark:SetCheck(true, true)
 	else
 		cbox_Skin_Dark:SetCheck(false, true)
+	end
+	--
+	local XinnoBackgroundStretch = Prefs.GetFromCurrentProfile('XinnoBackgroundStretch') or 'true'
+	if XinnoBackgroundStretch == 'true' then
+		cbox_StretchBG:SetCheck(true, true)
+	else
+		cbox_StretchBG:SetCheck(false, true)
 	end
 end
 
