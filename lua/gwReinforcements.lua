@@ -101,23 +101,10 @@ gwSetAiColor = function(index, faction)
 end
 
 gwReinforcementsMainThread = function()
-
 	local gwReinforcementList =  import('/lua/gwReinforcementList.lua').gwReinforcements
-	
-	GetArmyBrain(armySupportIndex[1]):GiveStorage('MASS', 2000)
-	GetArmyBrain(armySupportIndex[1]):GiveStorage('ENERGY', 10000)
-
-	GetArmyBrain(armySupportIndex[2]):GiveStorage('MASS', 2000)
-	GetArmyBrain(armySupportIndex[2]):GiveStorage('ENERGY', 10000)
-
-	GetArmyBrain(armySupportIndex[1]):SetResourceSharing(false)
-	GetArmyBrain(armySupportIndex[2]):SetResourceSharing(false)
-
 
 	gwSetAiColor( armySupportIndex[1], factions[1] )
 	gwSetAiColor( armySupportIndex[2], factions[2] )
-
-
 
 	WaitTicks(10)
 	
@@ -128,7 +115,17 @@ gwReinforcementsMainThread = function()
 	for index, HumanACU in HumanPlayerACUs do
 		ModHumanACU(HumanACU)
 	end	
+	
+	GetArmyBrain(armySupportIndex[1]):GiveStorage('MASS', 2000)
+	GetArmyBrain(armySupportIndex[1]):GiveStorage('ENERGY', 10000)
 
+	GetArmyBrain(armySupportIndex[2]):GiveStorage('MASS', 2000)
+	GetArmyBrain(armySupportIndex[2]):GiveStorage('ENERGY', 10000)
+
+	GetArmyBrain(armySupportIndex[1]):SetResourceSharing(false)
+	GetArmyBrain(armySupportIndex[2]):SetResourceSharing(false)
+	
+	
 	ScenarioInfo.gwReinforcementSpawnThreads = {}
 	ScenarioInfo.gwReinforcementList = gwReinforcementList
 
