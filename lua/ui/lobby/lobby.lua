@@ -695,17 +695,23 @@ function SetSlotInfo(slot, playerInfo)
 	--// Color the Name in Slot by State - Xinnony & Vicarian
 	if slotState == 'ai' then
 		GUI.slots[slot].name:SetTitleTextColor("dbdbb9") -- Beige Color for AI
+		GUI.slots[slot].name._text:SetFont('Arial Gras', 12)
 	elseif slotState == 'player' then
 		GUI.slots[slot].name:SetTitleTextColor("64d264") -- Green Color for Players
+		GUI.slots[slot].name._text:SetFont('Arial Gras', 15)
 	elseif slotState == 'open' then
-		GUI.slots[slot].name:SetTitleTextColor(UIUtil.fontColor) -- Normal Color for Open Slot
+		GUI.slots[slot].name:SetTitleTextColor('B9BFB9')--UIUtil.fontColor) -- Normal Color for Open Slot
+		GUI.slots[slot].name._text:SetFont('Arial Gras', 12)
 	elseif isLocallyOwned then
 		GUI.slots[slot].name:SetTitleTextColor("6363d2") -- Blue Color for You
+		GUI.slots[slot].name._text:SetFont('Arial Gras', 15)
 	else
 		GUI.slots[slot].name:SetTitleTextColor(UIUtil.fontColor) -- Normal Color for Other
+		GUI.slots[slot].name._text:SetFont('Arial Gras', 12)
 	end
 	if FindSlotForID(hostID) then
 		GUI.slots[FindSlotForID(hostID)].name:SetTitleTextColor("ffc726") -- Orange Color for Host
+		GUI.slots[FindSlotForID(hostID)].name._text:SetFont('Arial Gras', 15)
 	end
 	--\\ Stop - Color the Name in Slot by State
 
@@ -791,8 +797,10 @@ function ClearSlotInfo(slot)
     end
     if stateKey == 'closed' then
         GUI.slots[slot].name:SetTitleTextColor("Crimson")
+		GUI.slots[slot].name._text:SetFont('Arial Gras', 12)
     else
-		GUI.slots[slot].name:SetTitleTextColor(UIUtil.fontColor)
+		GUI.slots[slot].name:SetTitleTextColor('B9BFB9')--UIUtil.fontColor)
+		GUI.slots[slot].name._text:SetFont('Arial Gras', 12)
     end
     if lobbyComm:IsHost() and (stateKey == 'open' or stateKey == 'ai') then
         Tooltip.AddComboTooltip(GUI.slots[slot].name, GetAITooltipList())
@@ -2393,9 +2401,9 @@ function CreateUI(maxPlayers)
     local Text = import('/lua/maui/text.lua').Text
     local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
     local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
-    local Combo = import('/lua/ui/controls/combo.lua').Combo
+    local Combo = import('/lua/ui/controls/combo.lua').Combo2
     local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
-    local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo
+    local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo2
     local EffectHelpers = import('/lua/maui/effecthelpers.lua')
     local ItemList = import('/lua/maui/itemlist.lua').ItemList
     local Prefs = import('/lua/user/prefs.lua')
@@ -3056,27 +3064,31 @@ function CreateUI(maxPlayers)
 			GUI.slots[i].ratingGroup.Height:Set(GUI.slots[curRow].Height)
 			LayoutHelpers.AtLeftIn(GUI.slots[i].ratingGroup, GUI.panel, slotColumnSizes.rating.x)
 			LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].ratingGroup, GUI.slots[i], 6)
-        GUI.slots[i].ratingText = UIUtil.CreateText(GUI.slots[i].ratingGroup, "", 14, UIUtil.bodyFont)
-			LayoutHelpers.AtBottomIn(GUI.slots[i].ratingText, GUI.slots[i].ratingGroup)
+        GUI.slots[i].ratingText = UIUtil.CreateText(GUI.slots[i].ratingGroup, "", 14, 'Arial')--14, UIUtil.bodyFont)
+			LayoutHelpers.AtBottomIn(GUI.slots[i].ratingText, GUI.slots[i].ratingGroup, 2)
 			LayoutHelpers.AtRightIn(GUI.slots[i].ratingText, GUI.slots[i].ratingGroup, 9)
 			GUI.slots[i].tooltiprating = Tooltip.AddControlTooltip(GUI.slots[i].ratingText, '')
 
 		--// NumGame
         GUI.slots[i].numGamesGroup = Group(bg)
-        GUI.slots[i].numGamesGroup.Width:Set(slotColumnSizes.games.width)
-        GUI.slots[i].numGamesGroup.Height:Set(GUI.slots[curRow].Height)
-        LayoutHelpers.AtLeftIn(GUI.slots[i].numGamesGroup, GUI.panel, slotColumnSizes.games.x)
-        LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].numGamesGroup, GUI.slots[i], 6)
-        GUI.slots[i].numGamesText = UIUtil.CreateText(GUI.slots[i].numGamesGroup, "", 14, UIUtil.bodyFont)
-        LayoutHelpers.AtBottomIn(GUI.slots[i].numGamesText, GUI.slots[i].numGamesGroup)
-        LayoutHelpers.AtRightIn(GUI.slots[i].numGamesText, GUI.slots[i].numGamesGroup, 9)
+			GUI.slots[i].numGamesGroup.Width:Set(slotColumnSizes.games.width)
+			GUI.slots[i].numGamesGroup.Height:Set(GUI.slots[curRow].Height)
+			LayoutHelpers.AtLeftIn(GUI.slots[i].numGamesGroup, GUI.panel, slotColumnSizes.games.x)
+			LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].numGamesGroup, GUI.slots[i], 6)
+        GUI.slots[i].numGamesText = UIUtil.CreateText(GUI.slots[i].numGamesGroup, "", 14, 'Arial')--14, UIUtil.bodyFont)
+			GUI.slots[i].numGamesText:SetColor('B9BFB9')
+			GUI.slots[i].numGamesText:SetDropShadow(true)
+			LayoutHelpers.AtBottomIn(GUI.slots[i].numGamesText, GUI.slots[i].numGamesGroup, 2)
+			LayoutHelpers.AtRightIn(GUI.slots[i].numGamesText, GUI.slots[i].numGamesGroup, 9)
 
 		--// Name
-        GUI.slots[i].name = Combo(bg, 16, 10, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
-        LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].name, GUI.slots[i], 8)
-        LayoutHelpers.AtLeftIn(GUI.slots[i].name, GUI.panel, slotColumnSizes.player.x)
-        GUI.slots[i].name.Width:Set(slotColumnSizes.player.width)
-        GUI.slots[i].name.row = i
+        GUI.slots[i].name = Combo(bg, 15, 10, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+			GUI.slots[i].name._text:SetFont('Arial Gras', 15)
+			GUI.slots[i].name._text:SetDropShadow(true)
+			LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].name, GUI.slots[i], 8)
+			LayoutHelpers.AtLeftIn(GUI.slots[i].name, GUI.panel, slotColumnSizes.player.x)
+			GUI.slots[i].name.Width:Set(slotColumnSizes.player.width)
+			GUI.slots[i].name.row = i
         -- left deal with name clicks
         GUI.slots[i].name.OnClick = function(self, index, text)
             DoSlotBehavior(self.row, self.slotKeys[index], text)
