@@ -581,6 +581,15 @@ function FindSlotForID(id)
     return nil
 end
 
+function FindNameForID(id) -- Xinnony
+    for k,player in gameInfo.PlayerOptions do
+        if player.OwnerID == id and player.Human then
+            return player.PlayerName
+        end
+    end
+    return nil
+end
+
 function FindIDForName(name)
     for k,player in gameInfo.PlayerOptions do
         if player.PlayerName == name and player.Human then
@@ -1510,9 +1519,9 @@ local function UpdateGame()
         GUI.gameoptionsButton:Show()
         GUI.launchGameButton:Show()
 
-        if GUI.allowObservers then
-            GUI.allowObservers:Show()
-        end
+        --if GUI.allowObservers then
+            --GUI.allowObservers:Show()
+        --end
         if not singlePlayer then
             if quickRandMap then
                 GUI.randMap:Enable()
@@ -1528,23 +1537,24 @@ local function UpdateGame()
         end
         Tooltip.AddButtonTooltip(GUI.gameoptionsButton, 'Lobby_Mods')
         GUI.launchGameButton:Hide()
-        if GUI.allowObservers then
-            GUI.allowObservers:Show()
-            GUI.allowObservers:Disable()
-        end
+        --if GUI.allowObservers then
+            --GUI.allowObservers:Show()
+            --GUI.allowObservers:Disable()
+			--GUI.observerLabel:Disable()
+        --end
         if gameInfo.GameOptions.AllowObservers then
-            GUI.allowObservers:SetCheck(true)
+            GUI.allowObservers:SetCheck(true, true) -- XinnoTest
         else
-            GUI.allowObservers:SetCheck(false)
+            GUI.allowObservers:SetCheck(false, true) -- XinnoTest
         end
     end
 
     if GUI.becomeObserver then
         if IsObserver(localPlayerID) then
-            GUI.becomeObserver:Hide()
+            --GUI.becomeObserver:Hide()
             GUI.becomeObserver:Disable()
         else
-            GUI.becomeObserver:Show()
+			--GUI.becomeObserver:Show()
             GUI.becomeObserver:Enable()
         end
     end
@@ -1560,6 +1570,7 @@ local function UpdateGame()
 			TEST4factionPanel:Disable()
 			TEST5factionPanel:Disable()
         else
+			GUI.becomeObserver:Enable()
             GUI.LargeMapPreview:Enable()
 			TEST1factionPanel:Enable()
 			TEST2factionPanel:Enable()
@@ -1639,7 +1650,7 @@ local function UpdateGame()
         if not GUI.mapView:SetTexture(scenarioInfo.preview) then
             GUI.mapView:SetTextureFromMap(scenarioInfo.map)
         end
-        --GUI.mapName:SetText(LOC(scenarioInfo.name)) -- Add mapname above option lobby (replace with Ranked Label)
+        --GUI.RankedLabel:SetText(LOC(scenarioInfo.name)) -- Add RankedLabel above option lobby (replace with Ranked Label)
         ShowMapPositions(GUI.mapView,scenarioInfo,numPlayers)
     else
         GUI.mapView:ClearTexture()
@@ -1657,41 +1668,24 @@ local function UpdateGame()
             end
 
             if allPlayersReady then
-                GUI.allowObservers:Disable()
+                --GUI.allowObservers:Disable()
                 GUI.gameoptionsButton:Disable()
                 GUI.rankedOptions:Disable()
-                GUI.becomeObserver:Disable()
+                --GUI.becomeObserver:Disable()
                 GUI.randMap:Disable()
                 --GUI.randTeam:Disable()
                 GUI.launchGameButton:Enable()
             else
-                GUI.allowObservers:Enable()
+                --GUI.allowObservers:Enable()
                 GUI.gameoptionsButton:Enable()
                 GUI.rankedOptions:Enable()
-                GUI.becomeObserver:Enable()
+				--GUI.becomeObserver:Enable()
                 GUI.randMap:Enable()
                 --GUI.randTeam:Enable()
                 if launchThread then CancelLaunch() end
 
                 GUI.launchGameButton:Disable()
             end
-
-            --uploadMapButton no longer exists, therefore, this code was the source of script failures.
-            -- 2 < 1 is to disable the button
-            --if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") and 2 < 1 then
-            --    if scenarioInfo and scenarioInfo.map and scenarioInfo.map != '' then
-            --        if (lastUploadedMap != gameInfo.GameOptions.ScenarioFile) then
-            --            GUI.uploadMapButton:Show()
-            --        else
-            --            GUI.uploadMapButton:Hide()
-            --        end
-            --    else
-            --        GUI.uploadMapButton:Hide()
-            --    end
-            --else
-            --    GUI.uploadMapButton:Hide()
-            --end
-
         end
     end
     if LrgMap then
@@ -1836,7 +1830,7 @@ end
 
 -- Update our local gameInfo.GameMods from selected map name and selected mods, then
 -- notify other clients about the change.
-local function HostUpdateMods(newPlayerID)
+local function HostUpdateMods(newPlayerID, newPlayerName)
     if lobbyComm:IsHost() then
         if gameInfo.GameOptions['RankedGame'] and gameInfo.GameOptions['RankedGame'] != 'Off' then
             gameInfo.GameMods = {}
@@ -1904,7 +1898,16 @@ local function HostUpdateMods(newPlayerID)
                                'don\'t have the following mods:\n%s \nPlease, install the mods before you join the game lobby',
                                modnames))
             end
-            lobbyComm:EjectPeer(newPlayerID, reason)
+			if FindNameForID(newPlayerID) then
+				AddChatText(FindNameForID(newPlayerID)..' is Auto Kicked because he not have this mod : '..modnames) -- Not Work ? -- XinnonyTest
+			else
+				if newPlayerName then
+					AddChatText(newPlayerName..' is Auto Kicked because he not have this mod : '..modnames) -- Not Work ? -- XinnonyTest
+				else
+					AddChatText('The last player is Auto Kicked because he not have this mod : '..modnames)
+				end
+			end
+			lobbyComm:EjectPeer(newPlayerID, reason)
         end
     end
 end
@@ -2408,8 +2411,8 @@ function CreateUI(maxPlayers)
     local title
     if GpgNetActive() then
         title = "FA FOREVER GAME LOBBY"
-		XinnoBackgroundStretch = Prefs.GetFromCurrentProfile('XinnoBackgroundStretch') or 'true'
 		--
+		XinnoBackgroundStretch = Prefs.GetFromCurrentProfile('XinnoBackgroundStretch') or 'true'
 		GUI.background = Bitmap(GUI, UIUtil.SkinnableFile('')) -- Background faction or art
 			LayoutHelpers.AtCenterIn(GUI.background, GUI)
 			if XinnoBackgroundStretch == 'true' then
@@ -2447,10 +2450,14 @@ function CreateUI(maxPlayers)
 	RuleTitle_HostCanEditTitle()
 	--\\ Stop RULE TITLE
 	
-    randmapText = UIUtil.CreateText(GUI.panel, "Loading ...", 17, UIUtil.titleFont)
-    LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
-	randmapText2 = UIUtil.CreateText(GUI.panel, "", 13, UIUtil.titleFont)
-	LayoutHelpers.AtRightTopIn(randmapText2, GUI.panel, 50, 61)
+    randmapText = UIUtil.CreateText(GUI.panel, "Loading ...", 17, 'Arial Gras')--UIUtil.titleFont)
+		LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
+		randmapText:SetColor('B9BFB9')
+		randmapText:SetDropShadow(true)
+	randmapText2 = UIUtil.CreateText(GUI.panel, "", 13, 'Arial Gras')--UIUtil.titleFont)
+		LayoutHelpers.AtRightTopIn(randmapText2, GUI.panel, 50, 61)
+		randmapText2:SetColor('B9BFB9')
+		randmapText2:SetDropShadow(true)
 	--Tooltip.AddButtonTooltip(randmapText,{text='', body=''})
 	
     --// Credits panel -- Xinnony
@@ -2461,33 +2468,14 @@ function CreateUI(maxPlayers)
 		CreateOptionLobbyDialog()
 	end
     --// Credits footer -- Xinnony
-	local Credits = 'New Skin by Xinnony and Barlots (v1.5)'
+	local Credits = 'New Skin by Xinnony and Barlots (v1.6)'
 	local Credits_Text_X = 11
-    Credits_Shadows1 = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
-    Credits_Shadows1:SetFont(UIUtil.titleFont, 12)
-    Credits_Shadows1:SetColor("000000")
-    LayoutHelpers.AtBottomIn(Credits_Shadows1, GUI.panel, 1)
-    LayoutHelpers.AtRightIn(Credits_Shadows1, GUI.panel, Credits_Text_X-1)
-    Credits_Shadows2 = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
-    Credits_Shadows2:SetFont(UIUtil.titleFont, 12)
-    Credits_Shadows2:SetColor("000000")
-    LayoutHelpers.AtBottomIn(Credits_Shadows2, GUI.panel, -1)
-    LayoutHelpers.AtRightIn(Credits_Shadows2, GUI.panel, Credits_Text_X+1)
-    Credits_Shadows3 = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
-    Credits_Shadows3:SetFont(UIUtil.titleFont, 12)
-    Credits_Shadows3:SetColor("000000")
-    LayoutHelpers.AtBottomIn(Credits_Shadows3, GUI.panel, -1)
-    LayoutHelpers.AtRightIn(Credits_Shadows3, GUI.panel, Credits_Text_X-1)
-    Credits_Shadows4 = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
-    Credits_Shadows4:SetFont(UIUtil.titleFont, 12)
-    Credits_Shadows4:SetColor("000000")
-    LayoutHelpers.AtBottomIn(Credits_Shadows4, GUI.panel, 1)
-    LayoutHelpers.AtRightIn(Credits_Shadows4, GUI.panel, Credits_Text_X+1)
     Credits_Text = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
     Credits_Text:SetFont(UIUtil.titleFont, 12)
     Credits_Text:SetColor("FFFFFF")
     LayoutHelpers.AtBottomIn(Credits_Text, GUI.panel, 0)
     LayoutHelpers.AtRightIn(Credits_Text, GUI.panel, Credits_Text_X)
+	Credits_Text:SetDropShadow(true)
     --\\ Stop Credits
 
 	-- FOR SEE THE GROUP POSITION, LOOK THIS SCREENSHOOT : http://img402.imageshack.us/img402/8826/falobbygroup.png - Xinnony
@@ -2544,55 +2532,41 @@ function CreateUI(maxPlayers)
     ---------------------------------------------------------------------------
     -- set up map panel
     ---------------------------------------------------------------------------
-    --local mapOverlay = Bitmap(GUI.mapPanel, UIUtil.SkinnableFile(""))--lobby/lan-game-lobby/map-pane-border_bmp.dds"))
-    --LayoutHelpers.AtLeftTopIn(mapOverlay, GUI.panel, 0, 0)
-    --mapOverlay:DisableHitTest()
-
     GUI.mapView = MapPreview(GUI.mapPanel)
-    LayoutHelpers.AtLeftTopIn(GUI.mapView, GUI.mapPanel, 5, 6)--mapOverlay)
-    GUI.mapView.Width:Set(196+2)
-    GUI.mapView.Height:Set(194)
+		LayoutHelpers.AtLeftTopIn(GUI.mapView, GUI.mapPanel, 5, 6)--mapOverlay)
+		GUI.mapView.Width:Set(196+2)
+		GUI.mapView.Height:Set(194)
 
-    --mapOverlay.Depth:Set(function() return GUI.mapView.Depth() + 10 end)
-
-    --if lobbyComm:IsHost() then
-        --start of close slots code by Moritz
-		GUI.LargeMapPreview = UIUtil.CreateButtonStd2(GUI.mapView, '/BUTTON/zoom/zoom', "", 8, 0)
+    --start of close slots code by Moritz
+	GUI.LargeMapPreview = UIUtil.CreateButtonStd2(GUI.mapView, '/BUTTON/zoom/', "", 8, 0)
         LayoutHelpers.AtRightIn(GUI.LargeMapPreview, GUI.mapView, -3)
 		LayoutHelpers.AtBottomIn(GUI.LargeMapPreview, GUI.mapView, -3)
         Tooltip.AddButtonTooltip(GUI.LargeMapPreview, 'lob_click_LargeMapPreview')
+		GUI.LargeMapPreview.OnClick = function()
+			--for i = 1, LobbyComm.maxPlayerSlots do
+				--if not gameInfo.ClosedSlots[i] and not gameInfo.PlayerOptions[i] then
+					--HostCloseSlot(localPlayerID, i)
+				--end
+			--end
+			CreateBigPreview(501, GUI.mapPanel)
+		end
+	--end of close slots code
 
-        GUI.LargeMapPreview.OnClick = function()
-            --for i = 1, LobbyComm.maxPlayerSlots do
-                --if not gameInfo.ClosedSlots[i] and not gameInfo.PlayerOptions[i] then
-                    --HostCloseSlot(localPlayerID, i)
-                --end
-            --end
-            CreateBigPreview(501, GUI.mapPanel)
-        end
-        --end of close slots code
-    --end
+    -- Ranked label --
+	GUI.RankedLabel = UIUtil.CreateText(GUI.mapPanel, "", 16, UIUtil.titleFont)
+		GUI.RankedLabel:SetColor(UIUtil.bodyColor)
+		LayoutHelpers.AtTopIn(GUI.RankedLabel, GUI.optionsPanel, 5)
+		LayoutHelpers.AtHorizontalCenterIn(GUI.RankedLabel, GUI.optionsPanel, -8)
 
-    GUI.mapName = UIUtil.CreateText(GUI.mapPanel, "", 16, UIUtil.titleFont)
-    GUI.mapName:SetColor(UIUtil.bodyColor)
-    --LayoutHelpers.CenteredBelow(GUI.mapName, GUI.optionsPanel, 0)
-	--LayoutHelpers.AtHorizontalCenterIn(GUI.mapName, GUI.optionsPanel)
-	LayoutHelpers.AtTopIn(GUI.mapName, GUI.optionsPanel, 5)
-	--LayoutHelpers.LeftOf(GUI.mapName, GUI.optionsPanel)
-    LayoutHelpers.AtHorizontalCenterIn(GUI.mapName, GUI.optionsPanel, -8)
-
+	-- GAME OPTIONS // MODS MANAGER BUTTON --
     if lobbyComm:IsHost() then 	-- GAME OPTION
-		GUI.gameoptionsButton = UIUtil.CreateButtonStd2(GUI.optionsPanel, '/BUTTON/gameoptions/gameoptions', "", 8, 0)
+		GUI.gameoptionsButton = UIUtil.CreateButtonStd2(GUI.optionsPanel, '/BUTTON/medium/', "Game Options", 12, -1)
 	else										-- MODS MANAGER
-		GUI.gameoptionsButton = UIUtil.CreateButtonStd2(GUI.optionsPanel, '/BUTTON/modsmanager/modsmanager', "", 8, 0)
+		GUI.gameoptionsButton = UIUtil.CreateButtonStd2(GUI.optionsPanel, '/BUTTON/medium/', "Mods Manager", 12, -1)
 	end
 	LayoutHelpers.AtBottomIn(GUI.gameoptionsButton, GUI.optionsPanel, -55)
-	--LayoutHelpers.AtTopIn(GUI.gameoptionsButton, GUI.optionsPanel, 5)
 	LayoutHelpers.AtHorizontalCenterIn(GUI.gameoptionsButton, GUI.optionsPanel)
-    --LayoutHelpers.AtHorizontalCenterIn(GUI.gameoptionsButton, GUI.optionsPanel)
-
     Tooltip.AddButtonTooltip(GUI.gameoptionsButton, 'lob_select_map')
-
     GUI.gameoptionsButton.OnClick = function(self)
         local mapSelectDialog
 
@@ -2644,78 +2618,62 @@ function CreateUI(maxPlayers)
     ---------------------------------------------------------------------------
     -- set up launch panel
     ---------------------------------------------------------------------------
-    GUI.launchGameButton = UIUtil.CreateButtonStd2(GUI.launchPanel, '/BUTTON/startgame/startgame', "", 8, 0)
-		LayoutHelpers.AtCenterIn(GUI.launchGameButton, GUI.launchPanel, 20, -345)--22)
-	--GUI.launchGameButton = UIUtil.CreateButtonStd(GUI.launchPanel, '/scx_menu/large-no-bracket-btn/large',
-                                                  --"<LOC lobui_0212>Launch", 18, 4)
-	GUI.exitButton = UIUtil.CreateButton(GUI.launchPanel, UIUtil.SkinnableFile('/BUTTON/exit/exit_up.dds'), UIUtil.SkinnableFile('/BUTTON/exit/exit_down.dds'), UIUtil.SkinnableFile('/BUTTON/exit/exit_over.dds'), UIUtil.SkinnableFile('/BUTTON/exit/exit_dis.dds'), '', 8, 0)
-
-    --if GpgNetActive() then
-        --GUI.exitButton.label:SetText(LOC("<LOC _Exit>"))
-    --else
-        --GUI.exitButton.label:SetText(LOC("<LOC _Back>"))
-    --end
-
-    import('/lua/ui/uimain.lua').SetEscapeHandler(function() GUI.exitButton.OnClick(GUI.exitButton) end)
-
-    LayoutHelpers.AtLeftIn(GUI.exitButton, GUI.chatPanel, 22)
-    LayoutHelpers.AtVerticalCenterIn(GUI.exitButton, GUI.launchGameButton)
-
-    --GUI.launchGameButton:UseAlphaHitTest(false)
-    --GUI.launchGameButton.glow = Bitmap(GUI.launchGameButton, UIUtil.UIFile('/menus/main03/large_btn_glow.dds'))
-    --LayoutHelpers.AtCenterIn(GUI.launchGameButton.glow, GUI.launchGameButton)
-    --GUI.launchGameButton.glow:SetAlpha(0)
-    --GUI.launchGameButton.glow:DisableHitTest()
-    --GUI.launchGameButton.OnRolloverEvent = function(self, event)
-           --if event == 'enter' then
-            --EffectHelpers.FadeIn(self.glow, .25, 0, 1)
-            --self.label:SetColor('black')
-        --elseif event == 'down' then
-            --self.label:SetColor('black')
-        --else
-            --EffectHelpers.FadeOut(self.glow, .4, 1, 0)
-            --self.label:SetColor(UIUtil.fontColor)
-        --end
-    --end
-
-    --GUI.launchGameButton.pulse = Bitmap(GUI.launchGameButton, UIUtil.UIFile('/menus/main03/large_btn_glow.dds'))
-    --LayoutHelpers.AtCenterIn(GUI.launchGameButton.pulse, GUI.launchGameButton)
-    --GUI.launchGameButton.pulse:DisableHitTest()
-    --GUI.launchGameButton.pulse:SetAlpha(.5)
-    --EffectHelpers.Pulse(GUI.launchGameButton.pulse, 2, .5, 1)
-
-    Tooltip.AddButtonTooltip(GUI.launchGameButton, 'Lobby_Launch')
-
-    -- hide unless we're the game host
-    GUI.launchGameButton:Hide()
-
-    GUI.launchGameButton.OnClick = function(self)
-                                       TryLaunch(false)
-                                   end
+    -- LAUNCH THE GAME BUTTON --
+	GUI.launchGameButton = UIUtil.CreateButtonStd2(GUI.launchPanel, '/BUTTON/large/', "Launch the Game", 16, -1)
+		LayoutHelpers.AtCenterIn(GUI.launchGameButton, GUI.launchPanel, 20, -345)
+		Tooltip.AddButtonTooltip(GUI.launchGameButton, 'Lobby_Launch')
+		GUI.launchGameButton:Hide() -- hide unless we're the game host
+		GUI.launchGameButton.OnClick = function(self)
+			TryLaunch(false)
+		end
+	
+	-- EXIT BUTTON --
+	GUI.exitButton = UIUtil.CreateButtonStd2(GUI.launchPanel, '/BUTTON/medium/','Exit', 11, -1)--, textOffsetHorz, clickCue, rolloverCue)
+		if GpgNetActive() then
+			GUI.exitButton.label:SetText(LOC("<LOC _Exit>"))
+		else
+			GUI.exitButton.label:SetText(LOC("<LOC _Back>"))
+		end
+		import('/lua/ui/uimain.lua').SetEscapeHandler(function() GUI.exitButton.OnClick(GUI.exitButton) end)
+		LayoutHelpers.AtLeftIn(GUI.exitButton, GUI.chatPanel, 22)
+		LayoutHelpers.AtVerticalCenterIn(GUI.exitButton, GUI.launchGameButton)
+	GUI.exitButton.OnClick = function(self)
+		GUI.chatEdit:AbandonFocus()
+		UIUtil.QuickDialog(GUI,
+			"<LOC lobby_0000>Exit game lobby?",
+			"<LOC _Yes>", function()
+					ReturnToMenu(false)
+				end,
+			"<LOC _Cancel>", function()
+					GUI.chatEdit:AcquireFocus()
+				end,
+			nil, nil,
+			true,
+			{worldCover = true, enterButton = 1, escapeButton = 2})
+	end
 
     ---------------------------------------------------------------------------
     -- set up chat display
     ---------------------------------------------------------------------------
     GUI.chatEdit = Edit(GUI.chatPanel)
-    LayoutHelpers.AtLeftTopIn(GUI.chatEdit, GUI.chatPanel, 0+13, 184+7)
-    GUI.chatEdit.Width:Set(334)--388)
-    GUI.chatEdit.Height:Set(24)--14)
-    GUI.chatEdit:SetFont(UIUtil.bodyFont, 16)
-    GUI.chatEdit:SetForegroundColor(UIUtil.fontColor)
-    GUI.chatEdit:SetHighlightBackgroundColor('00000000')
-    GUI.chatEdit:SetHighlightForegroundColor(UIUtil.fontColor)
-    GUI.chatEdit:ShowBackground(false)
-    GUI.chatEdit:AcquireFocus()
+		LayoutHelpers.AtLeftTopIn(GUI.chatEdit, GUI.chatPanel, 0+13, 184+7)
+		GUI.chatEdit.Width:Set(334)
+		GUI.chatEdit.Height:Set(24)
+		GUI.chatEdit:SetFont(UIUtil.bodyFont, 16)
+		GUI.chatEdit:SetForegroundColor(UIUtil.fontColor)
+		GUI.chatEdit:SetHighlightBackgroundColor('00000000')
+		GUI.chatEdit:SetHighlightForegroundColor(UIUtil.fontColor)
+		GUI.chatEdit:ShowBackground(false)
+		GUI.chatEdit:AcquireFocus()
 
     GUI.chatDisplay = ItemList(GUI.chatPanel)
-    GUI.chatDisplay:SetFont(UIUtil.bodyFont, 14)
-    GUI.chatDisplay:SetColors(UIUtil.fontColor(), "00000000", UIUtil.fontColor(), "00000000")
-    LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.chatPanel, 8, 4) --Right, Top
-	--GUI.chatDisplay.Top:Set(function() return 184 end)
-    GUI.chatDisplay.Bottom:Set(function() return GUI.chatEdit.Top() -6 end)
-    GUI.chatDisplay.Right:Set(function() return GUI.chatPanel.Right() -0 end)
-    GUI.chatDisplay.Height:Set(function() return GUI.chatDisplay.Bottom() - GUI.chatDisplay.Top() end)
-    GUI.chatDisplay.Width:Set(function() return GUI.chatDisplay.Right() - GUI.chatDisplay.Left() end)
+		GUI.chatDisplay:SetFont(UIUtil.bodyFont, 14)
+		GUI.chatDisplay:SetColors(UIUtil.fontColor(), "00000000", UIUtil.fontColor(), "00000000")
+		LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.chatPanel, 8, 4) --Right, Top
+		GUI.chatDisplay.Bottom:Set(function() return GUI.chatEdit.Top() -6 end)
+		GUI.chatDisplay.Right:Set(function() return GUI.chatPanel.Right() -0 end)
+		GUI.chatDisplay.Height:Set(function() return GUI.chatDisplay.Bottom() - GUI.chatDisplay.Top() end)
+		GUI.chatDisplay.Width:Set(function() return GUI.chatDisplay.Right() - GUI.chatDisplay.Left() end)
 
     GUI.chatDisplayScroll = UIUtil.CreateVertScrollbarFor2(GUI.chatDisplay, -21, nil, 30)
 
@@ -2793,8 +2751,8 @@ function CreateUI(maxPlayers)
     -- Option display
     ---------------------------------------------------------------------------
     GUI.OptionContainer = Group(GUI.optionsPanel)
-    GUI.OptionContainer.Height:Set(260)--280-5)--254)
-    GUI.OptionContainer.Width:Set(209-9-17-1)--182)
+    GUI.OptionContainer.Height:Set(260)
+    GUI.OptionContainer.Width:Set(209-9-17-1)
     GUI.OptionContainer.top = 0
     LayoutHelpers.AtLeftTopIn(GUI.OptionContainer, GUI.optionsPanel, 0+4+1, 30-2)
 
@@ -2944,24 +2902,23 @@ function CreateUI(maxPlayers)
 
     if singlePlayer then
         GUI.loadButton = UIUtil.CreateButtonStd(GUI.optionsPanel, '/scx_menu/small-btn/small',"<LOC lobui_0176>Load", 18, 2)
-        LayoutHelpers.LeftOf(GUI.loadButton, GUI.launchGameButton, 10)
-        LayoutHelpers.AtVerticalCenterIn(GUI.loadButton, GUI.launchGameButton)
-        GUI.loadButton.OnClick = function(self, modifiers)
-            import('/lua/ui/dialogs/saveload.lua').CreateLoadDialog(GUI)
-        end
-        Tooltip.AddButtonTooltip(GUI.loadButton, 'Lobby_Load')
+			LayoutHelpers.LeftOf(GUI.loadButton, GUI.launchGameButton, 10)
+			LayoutHelpers.AtVerticalCenterIn(GUI.loadButton, GUI.launchGameButton)
+			GUI.loadButton.OnClick = function(self, modifiers)
+				import('/lua/ui/dialogs/saveload.lua').CreateLoadDialog(GUI)
+			end
+			Tooltip.AddButtonTooltip(GUI.loadButton, 'Lobby_Load')
     elseif not lobbyComm:IsHost() then
 		--GUI.gameoptionsButton = UIUtil.CreateButtonStd2(GUI.optionsPanel, '/BUTTON/gameoptions/gameoptions', "", 8, 0)
-        GUI.restrictedUnitsButton = UIUtil.CreateButtonStd2(GUI.optionsPanel, '/BUTTON/restrictedunits/restrictedunits', "", 14, 2)--"<LOC lobui_0376>Unit Manager", 14, 2)
-        --LayoutHelpers.LeftOf(GUI.restrictedUnitsButton, GUI.launchGameButton, 10)
-        --LayoutHelpers.AtVerticalCenterIn(GUI.restrictedUnitsButton, GUI.launchGameButton)
---		LayoutHelpers.AtTopIn(GUI.restrictedUnitsButton, GUI.gameoptionsButton, 20)
-		LayoutHelpers.AtHorizontalCenterIn(GUI.restrictedUnitsButton, GUI.gameoptionsButton)
-		LayoutHelpers.AtVerticalCenterIn(GUI.restrictedUnitsButton, GUI.exitButton)
-        GUI.restrictedUnitsButton.OnClick = function(self, modifiers)
-            import('/lua/ui/lobby/restrictedUnitsDlg.lua').CreateDialog(GUI.panel, gameInfo.GameOptions.RestrictedCategories, function() end, function() end, false)
-        end
-        Tooltip.AddButtonTooltip(GUI.restrictedUnitsButton, 'lob_RestrictedUnitsClient')
+        GUI.restrictedUnitsButton = UIUtil.CreateButtonStd2(GUI.optionsPanel, '/BUTTON/medium/', "Unit Manager", 14, 0)--"<LOC lobui_0376>Unit Manager", 14, 2)
+			GUI.restrictedUnitsButton.label:SetColor('B9BFB9')
+			GUI.restrictedUnitsButton.label:SetDropShadow(true)
+			LayoutHelpers.AtHorizontalCenterIn(GUI.restrictedUnitsButton, GUI.gameoptionsButton)
+			LayoutHelpers.AtVerticalCenterIn(GUI.restrictedUnitsButton, GUI.exitButton)
+			GUI.restrictedUnitsButton.OnClick = function(self, modifiers)
+				import('/lua/ui/lobby/restrictedUnitsDlg.lua').CreateDialog(GUI.panel, gameInfo.GameOptions.RestrictedCategories, function() end, function() end, false)
+			end
+			Tooltip.AddButtonTooltip(GUI.restrictedUnitsButton, 'lob_RestrictedUnitsClient')
     end
     
 	---------------------------------------------------------------------------
@@ -2994,46 +2951,62 @@ function CreateUI(maxPlayers)
         GUI.labelGroup.Height:Set(21)
         LayoutHelpers.AtLeftTopIn(GUI.labelGroup, GUI.playerPanel, 5, 5)
 
-    GUI.ratingLabel = UIUtil.CreateText(GUI.labelGroup, "R", 14, UIUtil.titleFont)
+    GUI.ratingLabel = UIUtil.CreateText(GUI.labelGroup, "R", 14, 'Arial Gras')--UIUtil.titleFont) 14 SIZE
+		GUI.ratingLabel:SetColor('B9BFB9')
+		GUI.ratingLabel:SetDropShadow(true)
         LayoutHelpers.AtLeftIn(GUI.ratingLabel, GUI.panel, slotColumnSizes.rating.x+20) -- Offset Right
         LayoutHelpers.AtVerticalCenterIn(GUI.ratingLabel, GUI.labelGroup, 5) -- Offset Down
         Tooltip.AddControlTooltip(GUI.ratingLabel, 'rating')
 
-    GUI.numGamesLabel = UIUtil.CreateText(GUI.labelGroup, "G", 14, UIUtil.titleFont)
+    GUI.numGamesLabel = UIUtil.CreateText(GUI.labelGroup, "G", 14, 'Arial Gras')--UIUtil.titleFont)
+		GUI.numGamesLabel:SetColor('B9BFB9')
+		GUI.numGamesLabel:SetDropShadow(true)
         LayoutHelpers.AtLeftIn(GUI.numGamesLabel, GUI.panel, slotColumnSizes.games.x - 4 + 24)
         LayoutHelpers.AtVerticalCenterIn(GUI.numGamesLabel, GUI.labelGroup, 5)
         Tooltip.AddControlTooltip(GUI.numGamesLabel, 'num_games')
 
-    GUI.nameLabel = UIUtil.CreateText(GUI.labelGroup, "Nickname", 14, UIUtil.titleFont)
+    GUI.nameLabel = UIUtil.CreateText(GUI.labelGroup, "Nickname", 14, 'Arial Gras')--UIUtil.titleFont)
+		GUI.nameLabel:SetColor('B9BFB9')
+		GUI.nameLabel:SetDropShadow(true)
         LayoutHelpers.AtLeftIn(GUI.nameLabel, GUI.panel, slotColumnSizes.player.x)
         LayoutHelpers.AtVerticalCenterIn(GUI.nameLabel, GUI.labelGroup, 5)
         Tooltip.AddControlTooltip(GUI.nameLabel, 'lob_slot')
 
-    GUI.colorLabel = UIUtil.CreateText(GUI.labelGroup, "Color", 14, UIUtil.titleFont)
+    GUI.colorLabel = UIUtil.CreateText(GUI.labelGroup, "Color", 14, 'Arial Gras')--UIUtil.titleFont)
+		GUI.colorLabel:SetColor('B9BFB9')
+		GUI.colorLabel:SetDropShadow(true)
         LayoutHelpers.AtLeftIn(GUI.colorLabel, GUI.panel, slotColumnSizes.color.x)
         LayoutHelpers.AtVerticalCenterIn(GUI.colorLabel, GUI.labelGroup, 5)
         Tooltip.AddControlTooltip(GUI.colorLabel, 'lob_color')
 
-    GUI.factionLabel = UIUtil.CreateText(GUI.labelGroup, "Faction", 14, UIUtil.titleFont)
+    GUI.factionLabel = UIUtil.CreateText(GUI.labelGroup, "Faction", 14, 'Arial Gras')--UIUtil.titleFont)
+		GUI.factionLabel:SetColor('B9BFB9')
+		GUI.factionLabel:SetDropShadow(true)
         LayoutHelpers.AtLeftIn(GUI.factionLabel, GUI.panel, slotColumnSizes.faction.x)
         LayoutHelpers.AtVerticalCenterIn(GUI.factionLabel, GUI.labelGroup, 5)
         Tooltip.AddControlTooltip(GUI.factionLabel, 'lob_faction')
 
-    GUI.teamLabel = UIUtil.CreateText(GUI.labelGroup, "Team", 14, UIUtil.titleFont)
+    GUI.teamLabel = UIUtil.CreateText(GUI.labelGroup, "Team", 14, 'Arial Gras')--UIUtil.titleFont)
+		GUI.teamLabel:SetColor('B9BFB9')
+		GUI.teamLabel:SetDropShadow(true)
         LayoutHelpers.AtLeftIn(GUI.teamLabel, GUI.panel, slotColumnSizes.team.x)
         LayoutHelpers.AtVerticalCenterIn(GUI.teamLabel, GUI.labelGroup, 5)
         Tooltip.AddControlTooltip(GUI.teamLabel, 'lob_team')
 
     if not singlePlayer then
-        GUI.pingLabel = UIUtil.CreateText(GUI.labelGroup, "Ping/CPU", 14, UIUtil.titleFont)
-        LayoutHelpers.AtLeftIn(GUI.pingLabel, GUI.panel, slotColumnSizes.ping.x-18+3)
-        LayoutHelpers.AtVerticalCenterIn(GUI.pingLabel, GUI.labelGroup, 5)
-        --Tooltip.AddControlTooltip(GUI.pingLabel, '') -- NEED INFO (write tooltip in "\lua\ui\help\tooltips.lua")
+        GUI.pingLabel = UIUtil.CreateText(GUI.labelGroup, "Ping/CPU", 14, 'Arial Gras')--UIUtil.titleFont)
+			GUI.pingLabel:SetColor('B9BFB9')
+			GUI.pingLabel:SetDropShadow(true)
+			LayoutHelpers.AtLeftIn(GUI.pingLabel, GUI.panel, slotColumnSizes.ping.x-18+3)
+			LayoutHelpers.AtVerticalCenterIn(GUI.pingLabel, GUI.labelGroup, 5)
+			--Tooltip.AddControlTooltip(GUI.pingLabel, '') -- NEED INFO (write tooltip in "\lua\ui\help\tooltips.lua")
 
-        GUI.readyLabel = UIUtil.CreateText(GUI.labelGroup, "Ready", 14, UIUtil.titleFont)
-        LayoutHelpers.AtLeftIn(GUI.readyLabel, GUI.panel, slotColumnSizes.ready.x-3+3)
-        LayoutHelpers.AtVerticalCenterIn(GUI.readyLabel, GUI.labelGroup, 5)
-        --Tooltip.AddControlTooltip(GUI.readyLabel, '') -- NEED INFO (write tooltip in "\lua\ui\help\tooltips.lua")
+        GUI.readyLabel = UIUtil.CreateText(GUI.labelGroup, "Ready", 14, 'Arial Gras')--UIUtil.titleFont)
+			GUI.readyLabel:SetColor('B9BFB9')
+			GUI.readyLabel:SetDropShadow(true)
+			LayoutHelpers.AtLeftIn(GUI.readyLabel, GUI.panel, slotColumnSizes.ready.x-3+3)
+			LayoutHelpers.AtVerticalCenterIn(GUI.readyLabel, GUI.labelGroup, 5)
+			--Tooltip.AddControlTooltip(GUI.readyLabel, '') -- NEED INFO (write tooltip in "\lua\ui\help\tooltips.lua")
     end
 	
     for i= 1, LobbyComm.maxPlayerSlots do
@@ -3287,33 +3260,54 @@ function CreateUI(maxPlayers)
         GUI.allowObservers = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/radio')
             LayoutHelpers.CenteredLeftOf(GUI.allowObservers, GUI.buttonPanelTop, -30)
             Tooltip.AddControlTooltip(GUI.allowObservers, 'lob_observers_allowed')
-        GUI.observerLabel = UIUtil.CreateText(GUI.buttonPanelTop, 'Observers in Game', 14, UIUtil.bodyFont)--"<LOC lobui_0275>Observers", 14, UIUtil.bodyFont)
+        GUI.observerLabel = UIUtil.CreateText(GUI.allowObservers, 'Observers in Game', 11, 'Arial')--14, UIUtil.bodyFont)--"<LOC lobui_0275>Observers", 14, UIUtil.bodyFont)
+			GUI.observerLabel:SetColor('B9BFB9')
+			GUI.observerLabel:SetDropShadow(true)
             LayoutHelpers.CenteredRightOf(GUI.observerLabel, GUI.allowObservers, 0)
             Tooltip.AddControlTooltip(GUI.observerLabel, 'lob_describe_observers')
         GUI.allowObservers:SetCheck(false)
         if lobbyComm:IsHost() then
-            SetGameOption("AllowObservers",false)
+            SetGameOption("AllowObservers", false)
             GUI.allowObservers.OnCheck = function(self, checked)
-                SetGameOption("AllowObservers",checked)
+                SetGameOption("AllowObservers", checked)
             end
+		else
+			GUI.allowObservers:Disable()
+			GUI.observerLabel:Disable()
         end
 
 		-- GO OBSERVER BUTTON --
-        GUI.becomeObserver = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/observer/toggle', "", 10, 0) -- XinnonyWork
-            LayoutHelpers.AtLeftTopIn(GUI.becomeObserver, GUI.buttonPanelRight, -40+4, 25)
+        GUI.becomeObserver = UIUtil.CreateButtonStd2(GUI.buttonPanelRight, '/BUTTON/observer/', '', 11, 19)
+            GUI.becomeObserver.label:SetFont('Arial', 11)
+			LayoutHelpers.AtLeftTopIn(GUI.becomeObserver, GUI.buttonPanelRight, -40+4, 25)
             Tooltip.AddButtonTooltip(GUI.becomeObserver, 'lob_become_observer')
-			GUI.becomeObserver.OnClick = function(self, modifiers)
+			GUI.becomeObserver.OnClick = function()
 				if IsPlayer(localPlayerID) then
 					if lobbyComm:IsHost() then
 						HostConvertPlayerToObserver(hostID, localPlayerName, FindSlotForID(localPlayerID))
+						GUI.becomeObserver:Disable()
 					else
 						lobbyComm:SendData(hostID, {Type = 'RequestConvertToObserver', RequestedName = localPlayerName, RequestedSlot = FindSlotForID(localPlayerID)})
+						GUI.becomeObserver:Disable()
+					end
+				end
+			end
+			GUI.becomeObserver.OnRolloverEvent = function(self, state)
+				if state == 'enter' then
+					GUI.becomeObserver.label:SetText('Go Observer')
+					if GUI.becomeObserver:IsDisabled() then
+						GUI.becomeObserver:Disable()
+					end
+				elseif state == 'exit' then
+					GUI.becomeObserver.label:SetText('')
+					if GUI.becomeObserver:IsDisabled() then
+						GUI.becomeObserver:Disable()
 					end
 				end
 			end
 
 		-- AUTO TEAM BUTTON -- start of auto teams code by Moritz
-		GUI.randTeam = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/autoteam/toggle') -- XinnonyWork
+		GUI.randTeam = UIUtil.CreateButtonStd2(GUI.buttonPanelRight, '/BUTTON/autoteam/')
 			LayoutHelpers.AtLeftTopIn(GUI.randTeam, GUI.buttonPanelRight, 40+8, 25)
 			Tooltip.AddButtonTooltip(GUI.randTeam, 'lob_click_randteam')
 			if not lobbyComm:IsHost() then
@@ -3346,7 +3340,7 @@ function CreateUI(maxPlayers)
 		--end of auto teams code
 
 		-- DEFAULT OPTION BUTTON -- start of ranked options code
-		GUI.rankedOptions = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/defaultoption/toggle') -- XinnonyWork
+		GUI.rankedOptions = UIUtil.CreateButtonStd2(GUI.buttonPanelRight, '/BUTTON/defaultoption/')
 			LayoutHelpers.CenteredRightOf(GUI.rankedOptions, GUI.randTeam, 0)
 			Tooltip.AddButtonTooltip(GUI.rankedOptions, 'lob_click_rankedoptions')
 			if not lobbyComm:IsHost() then
@@ -3379,13 +3373,13 @@ function CreateUI(maxPlayers)
 		--end of ranked options code
 
 		-- CPU BENCH BUTTON --
-		GUI.rerunBenchmark = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/cputest/toggle', '', 10, 0)
+		GUI.rerunBenchmark = UIUtil.CreateButtonStd2(GUI.observerPanel, '/BUTTON/cputest/', '', 10, 0)
 			GUI.rerunBenchmark:Disable()
 			LayoutHelpers.CenteredRightOf(GUI.rerunBenchmark, GUI.rankedOptions, 0)
 			Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text='Run CPU Benchmark Test', body='Recalculates your CPU rating.'})
 
 		-- RANDOM MAP BUTTON -- start of random map code by Moritz
-		GUI.randMap = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/randommap/toggle', '', 10, 0) -- XinnonyWork
+		GUI.randMap = UIUtil.CreateButtonStd2(GUI.buttonPanelRight, '/BUTTON/randommap/', '', 10, 0)
 			LayoutHelpers.CenteredRightOf(GUI.randMap, GUI.rerunBenchmark, 0)
 			Tooltip.AddButtonTooltip(GUI.randMap, 'lob_click_randmap')
 			if not lobbyComm:IsHost() then
@@ -3446,7 +3440,7 @@ function CreateUI(maxPlayers)
 				end
 				--
 				function sendRandMapMessage()
-					local rMapName = import('/lua/ui/dialogs/mapselect.lua').rMapName
+					local rRankedLabel = import('/lua/ui/dialogs/mapselect.lua').rRankedLabel
 					local rMapSize1 = import('/lua/ui/dialogs/mapselect.lua').rMapSize1
 					local rMapSize2 = import('/lua/ui/dialogs/mapselect.lua').rMapSize2
 					local rMapSizeFil = import('/lua/ui/dialogs/mapselect.lua').rMapSizeFil
@@ -3456,7 +3450,7 @@ function CreateUI(maxPlayers)
 					local rMapTypeFil = import('/lua/ui/dialogs/mapselect.lua').rMapTypeFil
 					SendSystemMessage("-------------------------------------------------------------------------------"..
 									  "--------------------")
-					SendSystemMessage(LOCF('%s %s', "<LOC lobui_0504>Randomly selected map: ", rMapName))
+					SendSystemMessage(LOCF('%s %s', "<LOC lobui_0504>Randomly selected map: ", rRankedLabel))
 					SendSystemMessage(LOCF("<LOC map_select_0000>Map Size: %dkm x %dkm", rMapSize1, rMapSize2))
 					if rMapSizeFilLim == 'equal' then
 						rMapSizeFilLim = '='
@@ -3499,22 +3493,64 @@ function CreateUI(maxPlayers)
 				end
 			end
         --end of random map code
+		
+		-- TEXT for DefaultOpt, CPUBench, RandomMap, AutoTeam --
+		ButtonsPanelText = UIUtil.CreateText(GUI.buttonPanelTop, '', 11, 'Arial')--Open Sans Bold')--'Zeroes Three')
+			ButtonsPanelText:SetColor('B9BFB9')
+			ButtonsPanelText:SetDropShadow(true)
+			ButtonsPanelText.Left:Set(math.floor(GUI.rerunBenchmark.Left() - (ButtonsPanelText.Width() / 2)))
+			LayoutHelpers.AtVerticalCenterIn(ButtonsPanelText, GUI.randTeam, 25)
+			GUI.randTeam.OnRolloverEvent = function(self, state)
+				if state == 'enter' then
+					ButtonsPanelText:SetText('Random Team')
+					ButtonsPanelText.Left:Set(math.floor(GUI.rerunBenchmark.Left() - (ButtonsPanelText.Width() / 2)))
+				elseif state == 'exit' then
+					ButtonsPanelText:SetText('')
+				end
+			end
+			GUI.rankedOptions.OnRolloverEvent = function(self, state)
+				if state == 'enter' then
+					ButtonsPanelText:SetText('Set Ranked Options')
+					ButtonsPanelText.Left:Set(math.floor(GUI.rerunBenchmark.Left() - (ButtonsPanelText.Width() / 2)))
+				elseif state == 'exit' then
+					ButtonsPanelText:SetText('')
+				end
+			end
+			GUI.rerunBenchmark.OnRolloverEvent = function(self, state)
+				if state == 'enter' then
+					ButtonsPanelText:SetText('Re-run CPU Benchmark')
+					ButtonsPanelText.Left:Set(math.floor(GUI.rerunBenchmark.Left() - (ButtonsPanelText.Width() / 2)))
+				elseif state == 'exit' then
+					ButtonsPanelText:SetText('')
+				end
+			end
+			GUI.randMap.OnRolloverEvent = function(self, state)
+				if state == 'enter' then
+					ButtonsPanelText:SetText('Random Map')
+					ButtonsPanelText.Left:Set(math.floor(GUI.rerunBenchmark.Left() - (ButtonsPanelText.Width() / 2)))
+				elseif state == 'exit' then
+					ButtonsPanelText:SetText('')
+				end
+			end
 
         --start of auto kick code -- Modified by Xinnony
-        if lobbyComm:IsHost() then
-            GUI.autoKick = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/radio')
-                LayoutHelpers.CenteredRightOf(GUI.autoKick, GUI.observerLabel, 10)
-                Tooltip.AddControlTooltip(GUI.autoKick, 'lob_auto_kick')
-            GUI.autoKickLabel = UIUtil.CreateText(GUI.buttonPanelTop, "Auto kick", 14, UIUtil.bodyFont)
-                LayoutHelpers.CenteredRightOf(GUI.autoKickLabel, GUI.autoKick, 0)
-                Tooltip.AddControlTooltip(GUI.autoKickLabel, 'lob_auto_kick')
-            GUI.autoKick:SetCheck(false)
-            autoKick = false
-            GUI.autoKick.OnCheck = function(self, checked)
-                autoKick = checked
-                UpdateGame()
-            end
-        end
+		if lobbyComm:IsHost() then
+			GUI.autoKick = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/radio')
+				LayoutHelpers.CenteredRightOf(GUI.autoKick, GUI.observerLabel, 10)
+				Tooltip.AddControlTooltip(GUI.autoKick, 'lob_auto_kick')
+			GUI.autoKickLabel = UIUtil.CreateText(GUI.autoKick, "Auto kick", 11, 'Arial')--14, UIUtil.bodyFont)
+				GUI.autoKickLabel:SetColor('B9BFB9')
+				GUI.autoKickLabel:SetDropShadow(true)
+				GUI.autoKickLabel:SetDropShadow(true)
+				LayoutHelpers.CenteredRightOf(GUI.autoKickLabel, GUI.autoKick, 0)
+				Tooltip.AddControlTooltip(GUI.autoKickLabel, 'lob_auto_kick')
+				autoKick = true
+				GUI.autoKick.OnCheck = function(self, checked)
+					autoKick = checked
+					UpdateGame()
+				end
+				GUI.autoKick:SetCheck(true)
+		end
         --end of auto kick code
 
         GUI.observerList = ItemList(GUI.observerPanel, "observer list")
@@ -3538,18 +3574,6 @@ function CreateUI(maxPlayers)
         end
         UIUtil.CreateVertScrollbarFor2(GUI.observerList, -15, nil, -1)
 
-        --// Upload button not work with FAF for the moment (old GPGnet) -- Xinnony
-        --if lobbyComm:IsHost() then
-            --GUI.uploadMapButton = UIUtil.CreateButtonStd(GUI.launchPanel, '/scx_menu/small-btn/small', "", 14, 2)
-            --GUI.uploadMapButton.label:SetText(LOC("<LOC lobui_0734>Upload Map"))
-            --Tooltip.AddControlTooltip(GUI.uploadMapButton, 'lob_upload_map')
-            --LayoutHelpers.CenteredRightOf(GUI.uploadMapButton, GUI.exitButton)
-            --GUI.uploadMapButton.OnClick = function()
-                --uploadNewMap()
-                --UpdateGame()
-            --end
-        --end
-
     else
 
         -- observers are always allowed in skirmish games.
@@ -3564,24 +3588,7 @@ function CreateUI(maxPlayers)
     ---------------------------------------------------------------------------
     GUI.posGroup = false
 
---  control behvaior
-    GUI.exitButton.OnClick = function(self)
-        GUI.chatEdit:AbandonFocus()
-        UIUtil.QuickDialog(GUI,
-            "<LOC lobby_0000>Exit game lobby?",
-            "<LOC _Yes>", function()
-                    ReturnToMenu(false)
-                end,
-            "<LOC _Cancel>", function()
-                    GUI.chatEdit:AcquireFocus()
-                end,
-            nil, nil,
-            true,
-            {worldCover = true, enterButton = 1, escapeButton = 2})
-
-    end
-
--- get ping times
+	-- get ping times
     GUI.pingThread = ForkThread(
         function()
             while true and lobbyComm do
@@ -3682,9 +3689,9 @@ function RefreshOptionDisplayData(scenarioInfo)
                 --value = 'Ranked',
                 --green = true,
                 --tooltip = {text='Ranked',body='This game is Ranked !'}})
-            GUI.mapName:SetText("Game is Ranked")
-            GUI.mapName:SetColor("77ff77")
-            --Tooltip.AddControlTooltip(GUI.mapName, '')
+            GUI.RankedLabel:SetText("Game is Ranked")
+            GUI.RankedLabel:SetColor("77ff77")
+            --Tooltip.AddControlTooltip(GUI.RankedLabel, '')
         else
             if getVictory == 'demoralization' and getCheat == 'false' and getSpeed == 'normal' and
             getFog == 'explored' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and
@@ -3693,17 +3700,17 @@ function RefreshOptionDisplayData(scenarioInfo)
                     --value = 'Ranked',
                     --green = true,
                     --tooltip = {text='Ranked',body='This game is Ranked !'}})
-                GUI.mapName:SetText("Game is Ranked")
-                GUI.mapName:SetColor("77ff77")
-                --Tooltip.AddControlTooltip(GUI.mapName, '')
+                GUI.RankedLabel:SetText("Game is Ranked")
+                GUI.RankedLabel:SetColor("77ff77")
+                --Tooltip.AddControlTooltip(GUI.RankedLabel, '')
             else
                 --table.insert(formattedOptions, {text = 'Ranking',
                     --value = 'Unranked',
                     --red = true,
                     --tooltip = {text='Unranked',body='This game is NOT Ranked !'}})
-                GUI.mapName:SetText("Game is not Ranked")
-                GUI.mapName:SetColor("ff7777")
-                --Tooltip.AddControlTooltip(GUI.mapName, '')
+                GUI.RankedLabel:SetText("Game is not Ranked")
+                GUI.RankedLabel:SetColor("ff7777")
+                --Tooltip.AddControlTooltip(GUI.RankedLabel, '')
             end
         end
     else
@@ -3726,9 +3733,9 @@ function RefreshOptionDisplayData(scenarioInfo)
             --value = 'Unranked',
             --red = true,
             --tooltip = {text='Unranked',body='This game is NOT Ranked !'}})
-        GUI.mapName:SetText("Game is not Ranked")
-        GUI.mapName:SetColor("ff7777")
-        --Tooltip.AddControlTooltip(GUI.mapName, '')
+        GUI.RankedLabel:SetText("Game is not Ranked")
+        GUI.RankedLabel:SetColor("ff7777")
+        --Tooltip.AddControlTooltip(GUI.RankedLabel, '')
     end
 --\\ Stop Check Ranked active
 --// Check Mod active
@@ -3756,7 +3763,7 @@ function RefreshOptionDisplayData(scenarioInfo)
         end
     end
 --\\ Stop Check RestrictedUnit active
---// Check MapSize & MaxPlayer active -- Disable because is Added in Tooltip on MapName Label (randmapText)
+--// Check MapSize & MaxPlayer active -- Disable because is Added in Tooltip on RankedLabel Label (randmapText)
     --if scenarioInfo then
         --table.insert(formattedOptions, {text = '<LOC MAPSEL_0024>',
             --value = LOCF("<LOC map_select_0008>%dkm x %dkm", scenarioInfo.size[1]/50, scenarioInfo.size[2]/50),
@@ -4232,7 +4239,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         localPlayerID = myID
         localPlayerName = myName
 
-        lobbyComm:SendData(hostID, { Type = 'SetAvailableMods', Mods = GetLocallyAvailableMods() } )
+        lobbyComm:SendData(hostID, { Type = 'SetAvailableMods', Mods = GetLocallyAvailableMods(), Name = localPlayerName} )
 
         if wantToBeObserver then
             -- Ok, I'm connected to the host. Now request to become an observer
@@ -4389,7 +4396,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 end
             elseif data.Type == 'SetAvailableMods' then
                 availableMods[data.SenderID] = data.Mods
-                HostUpdateMods(data.SenderID)
+                HostUpdateMods(data.SenderID, data.Name)
             elseif data.Type == 'MissingMap' then
                 HostPlayerMissingMapAlert(data.Id)
             end
@@ -5333,14 +5340,15 @@ end
 function RuleTitle_HostCanEditTitle()
 	-- TITRE de la Rule
 	local First_Rule_Change = 0
-	titleText = UIUtil.CreateText(GUI.panel, "", 22, UIUtil.titleFont)
+	titleText = UIUtil.CreateText(GUI.panel, "", 22, 'Arial Gras')--UIUtil.titleFont)
 		if lobbyComm:IsHost() then
 			LayoutHelpers.AtLeftTopIn(titleText, GUI.panel, 50+24, 36+3) -- Décaler pour le Bouton
-			titleText:SetText("FA FOREVER GAME LOBBY")
 		else
 			LayoutHelpers.AtLeftTopIn(titleText, GUI.panel, 50, 36+3) -- Caler a gauche
-			titleText:SetText("FA FOREVER GAME LOBBY")
 		end
+		titleText:SetText("FA FOREVER GAME LOBBY")
+		titleText:SetColor('B9BFB9')
+		titleText:SetDropShadow(true)
 		
 	-- BOUTON
 	if lobbyComm:IsHost() then
@@ -5715,79 +5723,79 @@ end
 function ForceApplyNewSkin()
 	-- Exit button
 	if GUI.exitButton:IsDisabled() then
-		GUI.exitButton:SetTexture(UIUtil.UIFile('/BUTTON/exit/exit_dis.dds'))
+		GUI.exitButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_dis.dds'))
 	else
-		GUI.exitButton:SetTexture(UIUtil.UIFile('/BUTTON/exit/exit_up.dds'))
+		GUI.exitButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_up.dds'))
 	end
 	-- StartGame show only if you Host and Enable only if All Player is Ready.
 	if lobbyComm:IsHost() then
 		if not GUI.launchGameButton:IsDisabled() then--and GetPlayersNotReady() then
 			if GetPlayersNotReady() then
-				GUI.launchGameButton:SetTexture(UIUtil.UIFile('/BUTTON/startgame/startgame_dis.dds'))
+				GUI.launchGameButton:SetTexture(UIUtil.UIFile('/BUTTON/large/_dis.dds'))
 			else
-				GUI.launchGameButton:SetTexture(UIUtil.UIFile('/BUTTON/startgame/startgame_up.dds'))
+				GUI.launchGameButton:SetTexture(UIUtil.UIFile('/BUTTON/large/_up.dds'))
 			end
 		elseif GUI.launchGameButton:IsDisabled() then--and not GetPlayersNotReady() then
-			GUI.launchGameButton:SetTexture(UIUtil.UIFile('/BUTTON/startgame/startgame_dis.dds'))
+			GUI.launchGameButton:SetTexture(UIUtil.UIFile('/BUTTON/large/_dis.dds'))
 		end
 	end
 	-- GameOption show only if you Host, else ModManager is show.
 	if lobbyComm:IsHost() then
 		if not GUI.gameoptionsButton:IsDisabled() then
-			GUI.gameoptionsButton:SetTexture(UIUtil.UIFile('/BUTTON/gameoptions/gameoptions_up.dds'))
+			GUI.gameoptionsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_up.dds'))
 		elseif GUI.gameoptionsButton:IsDisabled() then
-			GUI.gameoptionsButton:SetTexture(UIUtil.UIFile('/BUTTON/gameoptions/gameoptions_dis.dds'))
+			GUI.gameoptionsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_dis.dds'))
 		end
 	end
 	if not lobbyComm:IsHost() then
 		if not GUI.gameoptionsButton:IsDisabled() then
-			GUI.gameoptionsButton:SetTexture(UIUtil.UIFile('/BUTTON/modsmanager/modsmanager_up.dds'))
+			GUI.gameoptionsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_up.dds'))
 		elseif GUI.gameoptionsButton:IsDisabled() then
-			GUI.gameoptionsButton:SetTexture(UIUtil.UIFile('/BUTTON/modsmanager/modsmanager_dis.dds'))
+			GUI.gameoptionsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_dis.dds'))
 		end
 	end
 	-- Restricted Unit show only if not Your Host
 	if not lobbyComm:IsHost() then
 		if not GUI.restrictedUnitsButton:IsDisabled() then
-			GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/restrictedunits/restrictedunits_up.dds'))
+			GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_up.dds'))
 		elseif GUI.restrictedUnitsButton:IsDisabled() then
-			GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/restrictedunits/restrictedunits_dis.dds'))
+			GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_dis.dds'))
 		end
 	end
 	-- Observer, AutoTeam, RankedOpts, CPUBench, RandomMap
 	if GUI.becomeObserver then
 		if not GUI.becomeObserver:IsDisabled() then
-			GUI.becomeObserver:SetTexture(UIUtil.UIFile('/BUTTON/observer/toggle_btn_up.dds'))
+			GUI.becomeObserver:SetTexture(UIUtil.UIFile('/BUTTON/observer/_up.dds'))
 		elseif GUI.becomeObserver:IsDisabled() then
-			GUI.becomeObserver:SetTexture(UIUtil.UIFile('/BUTTON/observer/toggle_btn_dis.dds'))
+			GUI.becomeObserver:SetTexture(UIUtil.UIFile('/BUTTON/observer/_dis.dds'))
 		end
 	end
 	if GUI.randTeam then
 		if not GUI.randTeam:IsDisabled() then
-			GUI.randTeam:SetTexture(UIUtil.UIFile('/BUTTON/autoteam/toggle_btn_up.dds'))
+			GUI.randTeam:SetTexture(UIUtil.UIFile('/BUTTON/autoteam/_up.dds'))
 		elseif GUI.randTeam:IsDisabled() then
-			GUI.randTeam:SetTexture(UIUtil.UIFile('/BUTTON/autoteam/toggle_btn_dis.dds'))
+			GUI.randTeam:SetTexture(UIUtil.UIFile('/BUTTON/autoteam/_dis.dds'))
 		end
 	end
 	if GUI.rankedOptions then
 		if not GUI.rankedOptions:IsDisabled() then
-			GUI.rankedOptions:SetTexture(UIUtil.UIFile('/BUTTON/defaultoption/toggle_btn_up.dds'))
+			GUI.rankedOptions:SetTexture(UIUtil.UIFile('/BUTTON/defaultoption/_up.dds'))
 		elseif GUI.rankedOptions:IsDisabled() then
-			GUI.rankedOptions:SetTexture(UIUtil.UIFile('/BUTTON/defaultoption/toggle_btn_dis.dds'))
+			GUI.rankedOptions:SetTexture(UIUtil.UIFile('/BUTTON/defaultoption/_dis.dds'))
 		end
 	end
 	if GUI.rerunBenchmark then
 		if not GUI.rerunBenchmark:IsDisabled() then
-			GUI.rerunBenchmark:SetTexture(UIUtil.UIFile('/BUTTON/cputest/toggle_btn_up.dds'))
+			GUI.rerunBenchmark:SetTexture(UIUtil.UIFile('/BUTTON/cputest/_up.dds'))
 		elseif GUI.rerunBenchmark:IsDisabled() then
-			GUI.rerunBenchmark:SetTexture(UIUtil.UIFile('/BUTTON/cputest/toggle_btn_dis.dds'))
+			GUI.rerunBenchmark:SetTexture(UIUtil.UIFile('/BUTTON/cputest/_dis.dds'))
 		end
 	end
 	if GUI.randMap then
 		if not GUI.randMap:IsDisabled() then
-			GUI.randMap:SetTexture(UIUtil.UIFile('/BUTTON/randommap/toggle_btn_up.dds'))
+			GUI.randMap:SetTexture(UIUtil.UIFile('/BUTTON/randommap/_up.dds'))
 		elseif GUI.randMap:IsDisabled() then
-			GUI.randMap:SetTexture(UIUtil.UIFile('/BUTTON/randommap/toggle_btn_dis.dds'))
+			GUI.randMap:SetTexture(UIUtil.UIFile('/BUTTON/randommap/_dis.dds'))
 		end
 	end
 end

@@ -19,19 +19,19 @@ local defaultBitmaps = {
         left = {
             up = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_up_l.dds'),
             down = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_up_l.dds'),
-            over = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_up_l.dds'),
+            over = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_over_l.dds'),
             dis = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_dis_l.dds'),
         },
         mid = {
             up = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_up_m.dds'),
             down = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_up_m.dds'),
-            over = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_up_m.dds'),
+            over = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_over_m.dds'),
             dis = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_dis_m.dds'),
         },
         right = {
             up = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_up_r.dds'),
             down = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_up_r.dds'),
-            over = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_up_r.dds'),
+            over = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_over_r.dds'),
             dis = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_dis_r.dds'),
         }
     },

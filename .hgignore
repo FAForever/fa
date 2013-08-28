@@ -16,3 +16,5 @@ textures/ui/common/BUTTON/backgroundselect/test/
 textures/ui/common/countries/original/
 textures/ui/common/BUTTON/TEST/
 textures/ui/common/BACKGROUND/test/
+lua/ui/lobby/test/
+textures/ui/common/BUTTON/BACKUP/
