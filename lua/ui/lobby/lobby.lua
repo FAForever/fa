@@ -4339,6 +4339,9 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             if playerSlot != nil then
                 SetSlotCountryFlag(playerSlot, gameInfo.PlayerOptions[playerSlot])
             end
+			-- Send update other players
+			if XinnonyDebug == 1 then AddChatText(">> BROADCAST SENDING MSG Country : PlayerName="..data.PlayerName..", Result="..data.Result) end
+			lobbyComm:BroadcastData( { Type = 'Country', PlayerName = data.PlayerName, Result = data.Result} )
         --\\ Stop COUNTRY
 		--// RULE TITLE - Xinnony
         elseif data.Type == 'Rule_Title_MSG' then
@@ -5243,11 +5246,11 @@ end
 --------------------------------------------------
 function CountryScript()
     --LOG('XINNONY - Country is ='..PrefLanguage)
-    -- Send update other players
-	if XinnonyDebug == 1 then AddChatText(">> BROADCAST SENDING MSG Country : PlayerName="..localPlayerName..", Result="..PrefLanguage) end
-	lobbyComm:BroadcastData( { Type = 'Country', PlayerName = localPlayerName, Result = PrefLanguage} )
     -- Add country to my local country table
     AddPlayerCountry({PlayerName = localPlayerName, Result = PrefLanguage})
+	-- Send update other players
+	if XinnonyDebug == 1 then AddChatText(">> BROADCAST SENDING MSG Country : PlayerName="..localPlayerName..", Result="..PrefLanguage) end
+	lobbyComm:BroadcastData( { Type = 'Country', PlayerName = localPlayerName, Result = PrefLanguage} )
     -- Update Bitmap
     local playerId = FindIDForName(localPlayerName)
     local playerSlot = FindSlotForID(playerId)
