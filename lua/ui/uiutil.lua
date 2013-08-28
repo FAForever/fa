@@ -525,6 +525,7 @@ function CreateButton2(parent, up, down, over, disabled, label, pointSize, textO
         LayoutHelpers.AtCenterIn(button.label, button, textOffsetVert, textOffsetHorz)
         button.label:DisableHitTest()
 		button.label:SetFont('Arial', 11)
+		button.label:SetColor('B9BFB9')
 		button.label:SetDropShadow(true)
 
         -- if text exists, set up to grey it out
