@@ -491,6 +491,66 @@ function CreateButton(parent, up, down, over, disabled, label, pointSize, textOf
 
     return button
 end
+function CreateButton2(parent, up, down, over, disabled, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue)
+    textOffsetVert = textOffsetVert or 0
+    textOffsetHorz = textOffsetHorz or 0
+    if clickCue == "NO_SOUND" then
+        clickCue = nil
+    else
+        clickCue = clickCue or "UI_Menu_MouseDown_Sml"
+    end
+    if rolloverCue == "NO_SOUND" then
+        rolloverCue = nil
+    else
+        rolloverCue = rolloverCue or "UI_Menu_Rollover_Sml"
+    end
+    if type(up) == 'string' then
+        up = SkinnableFile(up)
+    end
+    if type(down) == 'string' then
+        down = SkinnableFile(down)
+    end
+    if type(over) == 'string' then
+        over = SkinnableFile(over)
+    end
+    if type(disabled) == 'string' then
+        disabled = SkinnableFile(disabled)
+    end
+
+    local button = Button(parent, up, down, over, disabled, clickCue, rolloverCue)
+    button:UseAlphaHitTest(true)
+
+    if label and pointSize then
+        button.label = CreateText(button, label, pointSize)
+        LayoutHelpers.AtCenterIn(button.label, button, textOffsetVert, textOffsetHorz)
+        button.label:DisableHitTest()
+		button.label:SetFont('Arial', 11)
+		button.label:SetColor('B9BFB9')
+		button.label:SetDropShadow(true)
+
+        -- if text exists, set up to grey it out
+        button.OnDisable = function(self)
+            Button.OnDisable(self)
+            button.label:SetColor('7B7F7B')
+        end
+
+        button.OnEnable = function(self)
+            Button.OnEnable(self)
+            button.label:SetColor('B9BFB9')
+        end
+        button.OnRolloverEvent = function(self, event)
+            if event == 'enter' then
+                button.label:SetColor('DEE5DE')
+            elseif event == 'exit' then
+                button.label:SetColor('B9BFB9')
+            elseif event == 'down' then
+                button.label:SetColor('FFFFFF')
+            end
+        end
+    end
+
+    return button
+end
 
 function SetNewButtonTextures(button, up, down, over, disabled)
     -- if strings passed in, make them skinnables, otherwise assume they are already skinnables
@@ -528,7 +588,7 @@ function CreateButtonStd(parent, filename, label, pointSize, textOffsetVert, tex
 end
 
 function CreateButtonStd2(parent, filename, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue) -- XinnonyWork
-    return CreateButton(parent
+    return CreateButton2(parent
         , filename .. "_up.dds"
         , filename .. "_down.dds"
         , filename .. "_over.dds"
