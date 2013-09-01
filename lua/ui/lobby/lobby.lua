@@ -58,14 +58,11 @@ local PrefLanguageTooltipText={}
 --\\ Stop - Table of Tooltip Country
 --// Get a value on /Country CommandLine in FA.exe - Xinnony
 local PrefLanguage = GetCommandLineArg("/country", 1)
-if PrefLanguage == '' then
+if PrefLanguage == (nil or '') then
 	LOG('COUNTRY - Country has not been found')
 	PrefLanguage = "world"
-elseif PrefLanguage then
-	PrefLanguage = tostring(string.lower(PrefLanguage[1]))
 else
-	LOG('COUNTRY - Problem with the command line (/Country)')
-    PrefLanguage = "world"
+	PrefLanguage = tostring(string.lower(PrefLanguage[1]))
 end
 --\\ Stop - Get a value on /Country CommandLine in FA.exe
 
@@ -4380,9 +4377,8 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 AddChatText(data.Text)
 
 			elseif data.Type == 'Peer_Really_Disconnected' then
-                LOG('DATA RECEIVE : Peer_Really_Disconnected')--data.Text)
-				AddChatText('DATA RECEIVE : Peer_Really_Disconnected')--data.Text)
-			
+				if XinnonyDebug == 3 then AddChatText('DATA RECEIVE : Peer_Really_Disconnected') end--data.Text)
+				if XinnonyDebug == 3 then LOG('DATA RECEIVE : Peer_Really_Disconnected') end--data.Text)
 				if not data.Observ then
 					gameInfo.PlayerOptions[data.Slot] = nil
 				else
@@ -4607,7 +4603,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     lobbyComm.PeerDisconnected = function(self,peerName,peerID)
         LOG('PeerDisconnected : ', peerName, ' ', peerID)
         if XinnonyDebug == 3 then AddChatText('>> PeerDisconnected : peerName='..peerName..' peerID='..peerID) end -- XINNONY -- Here this message always show the player quit !!!
-        LOG('GameInfo = ', repr(gameInfo))
+        if XinnonyDebug == 3 then LOG('GameInfo = ', repr(gameInfo)) end
 
         local slot = FindSlotForID(peerID)
         if slot then
