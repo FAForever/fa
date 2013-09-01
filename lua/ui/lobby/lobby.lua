@@ -85,7 +85,6 @@ local quickRandMap = true
 local lastUploadedMap = nil
 
 local CPU_BenchmarkList = {} -- Stores CPU benchmark data
-local Country_List = {} -- Stores playername and country data
 
 local playerMean = GetCommandLineArg("/mean", 1)
 local playerDeviation = GetCommandLineArg("/deviation", 1)
@@ -683,8 +682,13 @@ function SetSlotInfo(slot, playerInfo)
     end
 
     GUI.slots[slot].ratingGroup:Show()
-    GUI.slots[slot].ratingText:SetText(playerInfo.PL or "")
-    GUI.slots[slot].ratingText:SetColor(playerInfo.RC or "ffffffff")
+	--if playerInfo.MEAN == '-9999' then -- The player is a Smurf (Banned)
+		--GUI.slots[slot].ratingText:SetText('Banned')
+		--GUI.slots[slot].ratingText:SetColor('Crimson') --= #dc143c
+	--else
+		GUI.slots[slot].ratingText:SetText(playerInfo.PL or '')
+	--end
+	GUI.slots[slot].ratingText:SetColor(playerInfo.RC or 'ffffffff')
 
     GUI.slots[slot].numGamesGroup:Show()
     GUI.slots[slot].numGamesText:SetText(playerInfo.NG or "")
@@ -756,7 +760,7 @@ function SetSlotInfo(slot, playerInfo)
 	--ChangeBackgroundLobby(slot, Prefs.GetFromCurrentProfile('LastFaction'))
 	--\\ Stop - Change the background according to the chosen Faction
     --// Show the Country Flag in slot - Xinnony
-    SetSlotCountryFlag(slot, playerInfo)
+    SetSlotCountryFlag(slot, playerInfo.COUNTRY)
     --\\ Stop - Show the Country Flag in slot
 
     --CPU Benchmark code
@@ -1449,24 +1453,6 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
     --end
 end
 
---// This code is a pre-launch timer, disable by a community
---function CancelLaunch()
-    --if launchThread then
-        --KillThread(launchThread)
-        --launchThread = false
-        --GUI.launchGameButton.label:SetText(LOC("<LOC lobui_0212>Launch"))
-        --GUI.launchGameButton.OnClick = function(self)
-            --TryLaunch(false)
-        --end
-        --if GetPlayersNotReady() then
-            --local msg = LOCF('<LOC lobui_0308>Launch sequence has been aborted by %s.', GetPlayersNotReady()[1])
-            --SendSystemMessage(msg)
-        --else
-            --SendSystemMessage(LOC('<LOC lobui_0309>Host has cancelled the launch sequence.'))
-        --end
-    --end
---end
-
 local function AlertHostMapMissing()
     if lobbyComm:IsHost() then
         HostPlayerMissingMapAlert(localPlayerID)
@@ -1486,6 +1472,10 @@ local function UpdateGame()
     if not gameInfo.PlayerOptions[playerSlot].DEV then
         SetPlayerOption(playerSlot, 'DEV', playerDeviation)
     end
+
+	if not gameInfo.PlayerOptions[playerSlot].COUNTRY then
+		SetPlayerOption(playerSlot, 'COUNTRY', PrefLanguage)
+	end
 
     if not gameInfo.PlayerOptions[playerSlot].PL then
         SetPlayerOption(playerSlot, 'PL', playerRating)
@@ -1974,17 +1964,7 @@ function HostOpenSlot(senderID, slot)
 end
 
 -- slot less than 1 means try to find a slot
-function HostTryAddPlayer( senderID, slot, requestedPlayerName, human, aiPersonality, requestedColor, requestedFaction,
-                           requestedTeam, requestedPL, requestedRC, requestedNG, requestedMEAN, requestedDEV )
-    --// COUNTRY - Xinnony
-    --If new player join, the host send the Country to all player already joined
-    if human and not singlePlayer then
-        for i, Country in Country_List do
-            lobbyComm:BroadcastData( { Type = 'Country', PlayerName = Country.PlayerName, Result = Country.Result } )
-			if XinnonyDebug == 1 then AddChatText(">> BROADCAST SENDING MSG Country : PlayerName="..Country.PlayerName..", Result="..Country.Result) end
-        end
-    end
-    --\\ Stop COUNTRY
+function HostTryAddPlayer(senderID, slot, requestedPlayerName, human, aiPersonality, requestedColor, requestedFaction, requestedTeam, requestedPL, requestedRC, requestedNG, requestedMEAN, requestedDEV, requestedCOUNTRY)
 	--// RULE TITLE - Xinnony
     if not singlePlayer then
         RuleTitle_SendMSG()
@@ -2292,17 +2272,6 @@ function autoMap()
         randomAutoMap = import('/lua/ui/dialogs/mapselect.lua').randomAutoMap(false)
     end
 end
-
---// Upload button not work with FAF for the moment (old GPGnet) -- Xinnony
---function uploadNewMap()
-    --if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") then
-        --lastUploadedMap = gameInfo.GameOptions.ScenarioFile
-        --local scenarioInfo = import('/lua/ui/maputil.lua').LoadScenario(gameInfo.GameOptions.ScenarioFile)
-        --#LOG("scbserverhostuploadmap"..gameInfo.GameOptions.ScenarioFile)
-        --#GpgNetSend("uploadmap", string.format("%s", gameInfo.GameOptions.ScenarioFile))
-        --#SendSystemMessage(LOCF("<LOC lobui_0735>The host is uploading the map %s to server.", scenarioInfo.name))
-    --end
---end
 
 function randomString(Length, CharSet)
    -- Length (number)
@@ -3608,10 +3577,18 @@ function CreateUI(maxPlayers)
                     if player.Human and player.OwnerID != localPlayerID then
                         local peer = lobbyComm:GetPeer(player.OwnerID)
                         local ping = peer.ping and math.floor(peer.ping)
+                        local pingcolor = CalcConnectionStatus(peer, slot)
                         GUI.slots[slot].pingText:SetText(tostring(ping))
-                        GUI.slots[slot].pingText:SetColor(CalcConnectionStatus(peer))
+                        GUI.slots[slot].pingText:SetColor(pingcolor)
                         if ping then
                             GUI.slots[slot].pingStatus:SetValue(ping)
+							if pingcolor == 'red' then
+								GUI.slots[slot].pingStatus._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-03_bmp.dds'))
+							elseif pingcolor == 'green' then
+								GUI.slots[slot].pingStatus._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-02_bmp.dds'))
+							elseif pingcolor == 'yellow' then
+								GUI.slots[slot].pingStatus._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-01_bmp.dds'))
+							end
                             GUI.slots[slot].pingStatus:Show()
                         else
                             GUI.slots[slot].pingStatus:Hide()
@@ -3660,11 +3637,6 @@ function CreateUI(maxPlayers)
         end
     )
 
-    --// COUNTRY - Xinnony
-    if not singlePlayer then
-        CountryScript()
-    end
-    --\\ Stop COUNTRY
     -- CPU Benchmark code
     if not singlePlayer then
         CreateCPUMetricUI()
@@ -4278,7 +4250,8 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 RequestedRC = ratingColor,
                 RequestedNG = numGames,
                 RequestedMEAN = playerMean,
-                RequestedDEV = playerDeviation
+                RequestedDEV = playerDeviation,
+				RequestedCOUNTRY = PrefLanguage
                 } )
         end
 
@@ -4329,20 +4302,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             AddChatText("["..data.SenderName.."] "..data.Text)
         elseif data.Type == 'PrivateChat' then
             AddChatText("<<"..data.SenderName..">> "..data.Text)
-        --// COUNTRY - Xinnony
-        elseif data.Type == 'Country' then
-            if XinnonyDebug == 1 then LOG(">> RECEIVE MSG Country : name="..(data.PlayerName or "?")..", result="..(data.Result or "?")) end
-			if XinnonyDebug == 1 then AddChatText(">> RECEIVE MSG Country : name="..(data.PlayerName or "?")..", result="..(data.Result or "?")) end
-            AddPlayerCountry(data)
-            local playerId = FindIDForName(data.PlayerName)
-            local playerSlot = FindSlotForID(playerId)
-            if playerSlot != nil then
-                SetSlotCountryFlag(playerSlot, gameInfo.PlayerOptions[playerSlot])
-            end
-			-- Send update other players
-			if XinnonyDebug == 1 then AddChatText(">> BROADCAST SENDING MSG Country : PlayerName="..data.PlayerName..", Result="..data.Result) end
-			lobbyComm:BroadcastData( { Type = 'Country', PlayerName = data.PlayerName, Result = data.Result} )
-        --\\ Stop COUNTRY
 		--// RULE TITLE - Xinnony
         elseif data.Type == 'Rule_Title_MSG' then
             if XinnonyDebug == 2 then LOG(">> RECEIVE MSG Rule_Title_MSG : result="..(data.Result or "?")) end
@@ -4369,9 +4328,9 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
             elseif data.Type == 'AddPlayer' then
                 -- create empty slot if possible and give it to the player
-                HostTryAddPlayer( data.SenderID, data.RequestedSlot, data.RequestedPlayerName, data.Human, data.AIPersonality,
+                HostTryAddPlayer(data.SenderID, data.RequestedSlot, data.RequestedPlayerName, data.Human, data.AIPersonality,
                                   data.RequestedColor, data.RequestedFaction, nil, data.RequestedPL, data.RequestedRC,
-                                  data.RequestedNG, data.RequestedMEAN, data.RequestDEV )
+                                  data.RequestedNG, data.RequestedMEAN, data.RequestDEV, data.RequestedCOUNTRY)
                 PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
             elseif data.Type == 'MovePlayer' then
                 -- attempt to move a player from current slot to empty slot
@@ -4419,6 +4378,17 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             -- Non-host only messages
             if data.Type == 'SystemMessage' then
                 AddChatText(data.Text)
+
+			elseif data.Type == 'Peer_Really_Disconnected' then
+                LOG('DATA RECEIVE : Peer_Really_Disconnected')--data.Text)
+				AddChatText('DATA RECEIVE : Peer_Really_Disconnected')--data.Text)
+			
+				if not data.Observ then
+					gameInfo.PlayerOptions[data.Slot] = nil
+				else
+					gameInfo.Observers[data.Slot] = nil
+				end
+				UpdateGame()
 
             elseif data.Type == 'SlotAssigned' then
                 if data.Options.OwnerID == localPlayerID and data.Options.Human then
@@ -4637,18 +4607,36 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     lobbyComm.PeerDisconnected = function(self,peerName,peerID)
         LOG('PeerDisconnected : ', peerName, ' ', peerID)
         if XinnonyDebug == 3 then AddChatText('>> PeerDisconnected : peerName='..peerName..' peerID='..peerID) end -- XINNONY -- Here this message always show the player quit !!!
-        --LOG('GameInfo = ', repr(gameInfo))
+        LOG('GameInfo = ', repr(gameInfo))
 
         local slot = FindSlotForID(peerID)
         if slot then
             PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04717'}, true)
             ClearSlotInfo( slot )
-            gameInfo.PlayerOptions[slot] = nil
+			if lobbyComm:IsHost() then
+				gameInfo.PlayerOptions[slot] = nil
+				lobbyComm:BroadcastData(
+					{
+						Type = 'Peer_Really_Disconnected',
+						Slot = slot,
+						Observ = false,
+					}
+				)
+			end
             UpdateGame()
         else
             slot = FindObserverSlotForID(peerID)
             if slot then
-                gameInfo.Observers[slot] = nil
+                if lobbyComm:IsHost() then
+					gameInfo.PlayerOptions[slot] = nil
+					lobbyComm:BroadcastData(
+						{
+							Type = 'Peer_Really_Disconnected',
+							Slot = slot,
+							Observ = true,
+						}
+					)
+				end
                 UpdateGame()
             end
         end
@@ -5086,7 +5074,7 @@ function CreateCPUMetricUI()
         for i= 1, LobbyComm.maxPlayerSlots do
                 GUI.slots[i].CPUSpeedBar = StatusBar(GUI.slots[i].pingGroup, barMin, barMax, false, false,
                     UIUtil.SkinnableFile('/game/unit_bmp/bar-back_bmp.dds'),
-                    UIUtil.SkinnableFile('/game/unit_bmp/bar-02_bmp.dds'),
+                    UIUtil.SkinnableFile('/game/unit_bmp/bar02_bmp.dds'),
                     true)
 				LayoutHelpers.AtBottomIn(GUI.slots[i].CPUSpeedBar, GUI.slots[i].pingGroup, 1)
 				LayoutHelpers.AtLeftIn(GUI.slots[i].CPUSpeedBar, GUI.slots[i].pingGroup, 0)
@@ -5222,7 +5210,7 @@ function SetSlotCPUBar(slot, playerInfo)
 				GUI.slots[slot].CPUSpeedBar.CPUActualValue = b.Result
                 GUI.slots[slot].CPUSpeedBar:Show()
 
-                GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-02_bmp.dds'))
+                GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar02_bmp.dds'))
 
                 -- if clampedResult <= greenBarMax then
                     -- GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-02_bmp.dds'))
@@ -5244,63 +5232,25 @@ end
 -- CountryFlag Functions							--
 -- Author : Xinnony								--
 --------------------------------------------------
-function CountryScript()
-    --LOG('XINNONY - Country is ='..PrefLanguage)
-    -- Add country to my local country table
-    AddPlayerCountry({PlayerName = localPlayerName, Result = PrefLanguage})
-	-- Send update other players
-	if XinnonyDebug == 1 then AddChatText(">> BROADCAST SENDING MSG Country : PlayerName="..localPlayerName..", Result="..PrefLanguage) end
-	lobbyComm:BroadcastData( { Type = 'Country', PlayerName = localPlayerName, Result = PrefLanguage} )
-    -- Update Bitmap
-    local playerId = FindIDForName(localPlayerName)
-    local playerSlot = FindSlotForID(playerId)
-    if playerSlot != nil then
-        SetSlotCountryFlag(playerSlot, gameInfo.PlayerOptions[playerSlot])
-    end
-end
-
-function AddPlayerCountry(data)
-    local alreadyExists = false
-    for i, Country in Country_List do
-        if data.PlayerName == Country.PlayerName then
-            alreadyExists = true
-            Country_List[i].Result = data.Result
-        end
-    end
-    if not alreadyExists then
-        table.insert(Country_List, {PlayerName = data.PlayerName, Result = data.Result})
-    end
-end
-
-function FindCountryForName(name)
-    for i, Country in Country_List do
-        if name == Country.PlayerName then
-            return Country
-        end
-    end
-    return false
-end
-
-function SetSlotCountryFlag(slot, playerInfo)
+function SetSlotCountryFlag(slot, COUNTRY)
     if GUI.slots[slot].KinderCountry then
-        GUI.slots[slot].KinderCountry:Hide()
-        if playerInfo.Human then
-            local b = FindCountryForName(playerInfo.PlayerName)
-            if b then
-                local CountryResult = b.Result
-                --LOG('XINNONY - Country is : '.. CountryResult .. ' (for : ' .. playerInfo.PlayerName .. ')')
-                GUI.slots[slot].KinderCountry:Show()
-                GUI.slots[slot].KinderCountry:SetTexture(UIUtil.UIFile('/countries/'..CountryResult..'.dds'))
-				Country_GetTooltipValue(CountryResult, slot)
-				Country_AddControlTooltip(GUI.slots[slot].KinderCountry, 0, slot)
-			else
-				LOG('XINNONY - Country is : ELSE (for : ELSE) and the PlayerName is : '..playerInfo.PlayerName)
-            end
-        end
+        if COUNTRY == nil then -- No flag
+			GUI.slots[slot].KinderCountry:Hide()
+		elseif COUNTRY == '' then -- No flag
+			GUI.slots[slot].KinderCountry:Show()
+			GUI.slots[slot].KinderCountry:SetTexture(UIUtil.UIFile('/countries/'..'world'..'.dds'))
+		--elseif COUNTRY == ('xxx' or 'xxx') then -- Here you can put the missing texture Flag
+			--GUI.slots[slot].KinderCountry:Show()
+			--GUI.slots[slot].KinderCountry:SetTexture(UIUtil.UIFile('/countries/'..'world'..'.dds'))
+		else
+			GUI.slots[slot].KinderCountry:Show()
+			GUI.slots[slot].KinderCountry:SetTexture(UIUtil.UIFile('/countries/'..COUNTRY..'.dds'))
+		end
     end
 end
 
 function Country_AddControlTooltip(control, waitDelay, slotNumber)
+end --[[
     if not control.oldHandleEvent then
         control.oldHandleEvent = control.HandleEvent
     end
@@ -5333,7 +5283,7 @@ function Country_GetTooltipValue(CountryResult, slot)
 				find = 1
 			end
 		end
-end
+end--]]
 
 --------------------------------------------------
 -- Change the title for to say the rule		--
