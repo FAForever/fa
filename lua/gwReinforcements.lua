@@ -44,7 +44,7 @@ local beaconTime = {}
 
 assignSupports = function()
 	local ArmiesList = ScenarioInfo.ArmySetup
-
+	
     for name,army in ScenarioInfo.ArmySetup do
     	if army.ArmyIndex == 1 then
     		factions[1] = army.Faction
@@ -129,12 +129,13 @@ gwReinforcementsMainThread = function()
 	ScenarioInfo.gwReinforcementSpawnThreads = {}
 	ScenarioInfo.gwReinforcementList = gwReinforcementList
 
-	#LOG("ScenarioInfo.gwReinforcementList")
-	#LOG(repr(ScenarioInfo.gwReinforcementList))
+	LOG("ScenarioInfo.gwReinforcementList")
+	LOG(repr(ScenarioInfo.gwReinforcementList))
 
 	SpawnInitialStructures(ScenarioInfo.gwReinforcementList.initialStructure,ArmiesList)
 	SpawnInitialReinforcements(ScenarioInfo.gwReinforcementList.initialUnitWarp,ArmiesList)
 	SpawnPeriodicReinforcements(ScenarioInfo.gwReinforcementList.periodicUnitWarp,ArmiesList)
+
 end
 
 SpawnInitialStructures = function (gwSpawnList, Armies)
@@ -253,15 +254,14 @@ GetACUs = function(armies)
 	
 	for ArmyName,Army in armies do
 		if Army.Human then 
-			local StartingPosition = ScenarioUtils.MarkerToPosition(Army.ArmyName)
-			local rect = Rect((StartingPosition[1] + 1), (StartingPosition[3] + 1),(StartingPosition[1] - 1),( StartingPosition[3] + 1))
-			local units = GetUnitsInRect(rect)
+			local brain = GetArmyBrain(Army.ArmyIndex)
+			local units = brain:GetListOfUnits(categories.COMMAND, false)
 			if units then
-				for index,ArmyUnit in units do
-					if EntityCategoryContains(categories.COMMAND,ArmyUnit) then
-						ACUs[ArmyUnit:GetArmy()] = ArmyUnit
-						#LOG('found an ACU near marker ' .. repr(ArmyName))
-					end
+				for index, unit in units do
+					ACUs[unit:GetArmy()] = unit
+					brain:AddSpecialAbilityUnit( unit, 'Recall', true )
+					LOG('found an ACU near marker ' .. repr(ArmyName))
+
 				end
 			end
 		end
@@ -273,6 +273,7 @@ end
 
 
 ModHumanACU =  function(ACU)
+	LOG("mod human")
 	ACU.OldOnStartBuild = ACU.OnStartBuild 
 	ACU.OldOnStopBuild = ACU.OnStopBuild
 	ACU.DespawnBeacon = DespawnBeacon
@@ -311,9 +312,11 @@ ModBeacon = function(ACU, beacon)
 	beacon.OnStopBeingBuilt = function(self, builder, layer)
 		#beacon.ReinforcementsThread = CallReinforcementsToBeacon(beacon)
 		#beacon.EngineersThread = CallEngineersToBeacon(beacon)
-		
 		CheckEngineersDelay(self)
 		CheckUnitsDelay(self)
+		local brain = self:GetAIBrain()
+		brain:AddSpecialAbilityUnit( self, 'CallReinforcement', true )
+
 		if table.getn( self.unitsDelays ) != 0 or table.getn( self.engineersDelays ) != 0 then
 			beacon.timerThread = self:ForkThread(timerBeacon)
 		end
@@ -336,10 +339,13 @@ end
 
 #this function check all the units delay to spawn them.
 CheckUnitsDelay = function(beacon)
+	LOG("doing this")
 	beacon.unitsDelays = {}
 	for index, List in ScenarioInfo.gwReinforcementList.transportedUnits do
+		LOG(repr(List))
 		if List.playerName == beacon:GetAIBrain().Nickname and List.delay >= beaconTime[beacon.ArmyIndex] then
 			table.insert(beacon.unitsDelays, List)
+			LOG(repr(List))
 		end 
 	end
 end
@@ -432,7 +438,7 @@ CallReinforcementsToBeacon = function(beacon, List)
 	beacon.AiBrain = beacon:GetAIBrain()
 	beacon.Nickname = beacon.AiBrain.Nickname
 	beacon.ArmyName = beacon.AiBrain.Name
-	#WARN('gwReinforcementList.TransportedUnits is ' .. repr(ScenarioInfo.gwReinforcementList.transportedUnits))
+	WARN('gwReinforcementList.TransportedUnits is ' .. repr(ScenarioInfo.gwReinforcementList.transportedUnits))
 	
 	beacon.UnitReinforcementsToCall = List.unitNames
 
