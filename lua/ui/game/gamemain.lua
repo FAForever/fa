@@ -152,10 +152,10 @@ function CreateUI(isReplay)
     local massGroup, energyGroup = import('/lua/ui/game/economy.lua').CreateEconomyBar(statusClusterGroup)
     import('/lua/ui/game/tabs.lua').Create(mapGroup)
 
+	import('/lua/ui/ability_panel/abilities.lua').SetupOrdersControl(gameParent)
     mfdControl = import('/lua/ui/game/multifunction.lua').Create(controlClusterGroup)
     if not isReplay then
         ordersControl = import('/lua/ui/game/orders.lua').SetupOrdersControl(controlClusterGroup, mfdControl)
-        
     end
 	import('/lua/ui/game/avatars.lua').CreateAvatarUI(mapGroup)
     import('/lua/ui/game/construction.lua').SetupConstructionControl(controlClusterGroup, mfdControl, ordersControl)
@@ -411,6 +411,7 @@ function OnPause(pausedBy, timeoutsRemaining)
     PauseVoice("VO",true)
     import('/lua/ui/game/tabs.lua').OnPause(true, pausedBy, timeoutsRemaining, isOwner)
     import('/lua/ui/game/missiontext.lua').OnGamePause(true)
+	import('/lua/ui/ability_panel/abilities.lua').KillTimers()
 end
 
 # Called after the Sim has confirmed that the game has resumed.
@@ -420,6 +421,7 @@ function OnResume()
     PauseVoice("VO",false)
     import('/lua/ui/game/tabs.lua').OnPause(false)
     import('/lua/ui/game/missiontext.lua').OnGamePause(false)
+	import('/lua/ui/ability_panel/abilities.lua').RestartTimers()
 end
 
 # Called immediately when the user hits the pause button. This only ever gets

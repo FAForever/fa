@@ -9,6 +9,14 @@ OnSync = function()
         import('/lua/ui/game/multifunction.lua').FocusArmyChanged()
     end
 
+
+	for k, v in Sync.AddSpecialAbility do
+        local army = v.Army
+        if army == GetFocusArmy() then
+            import('/lua/ui/ability_panel/abilities.lua').AddSpecialAbility(v)
+        end
+    end
+	
     if Sync.CampaignMode then
         import('/lua/ui/campaign/campaignmanager.lua').campaignMode = Sync.CampaignMode
     end

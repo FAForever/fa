@@ -10,6 +10,17 @@ ResetSyncTable = function()
     Sync.Sounds = {}
     Sync.Voice = {}
 
+    Sync.AddSpecialAbility = {}
+    Sync.RemoveSpecialAbility = {}
+    Sync.EnableSpecialAbility = {}
+    Sync.DisableSpecialAbility = {}
+    Sync.StartAbilityCoolDown = {}
+    Sync.StopAbilityCoolDown = {}
+    Sync.SetInitialUnit = {}
+    Sync.RemoveInitialUnit = {}
+    Sync.SetAbilityUnits = {}
+    Sync.RemoveStaticDecal = {}	
+	
     # contains the current score for each army
     Sync.Score = {}
 	Sync.ScoreAccum = {}
@@ -25,6 +36,19 @@ ResetSyncTable = function()
 end
 
 SimUnitEnhancements = {}
+
+function AddSpecialAbility (army, ability)
+    if army != nil and ability then
+		LOG("adding ability")
+        table.insert(Sync.AddSpecialAbility, { AbilityName = ability, Army = army })
+    end
+end
+
+function SetAbilityUnits(army, ability, units)
+    if army != nil and ability and units then
+        table.insert(Sync.SetAbilityUnits, { Army = army, AbilityName = ability, UnitIds = units })
+    end
+end
 
 function AddUnitEnhancement(unit, enhancement, slot)
     if not slot then return end

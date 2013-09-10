@@ -31,6 +31,8 @@ local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
 local SUtils = import('/lua/AI/sorianutilities.lua')
 local StratManager = import('/lua/sim/StrategyManager.lua')
 
+local AbilityDefinition = import('/lua/abilitydefinition.lua').abilities
+
 local scoreOption = ScenarioInfo.Options.Score or "no"
 
 
@@ -470,6 +472,7 @@ AIBrain = Class(moho.aibrain_methods) {
 		self.support  = false
         self:CreateBrainShared(planName)
 
+		
         ####For handicap mod compatibility
         if DiskGetFileInfo('/lua/HandicapUtilities.lua') then
             for name,data in ScenarioInfo.ArmySetup do
@@ -487,8 +490,130 @@ AIBrain = Class(moho.aibrain_methods) {
         self:InitializeEconomyState()
         self:InitializeVO()
         self.BrainType = 'Human'
+
     end,
 
+	SpecialAbilities = {},
+    SpecialAbilityUnits = {},
+
+    AddSpecialAbilityUnit = function(self, unit, type, autoEnable)
+		LOG("Doing this")
+        local unitId = unit:GetEntityId()
+        if AbilityDefinition[ type ] then
+			LOG("got a definition")
+            if not self.SpecialAbilityUnits[type] then
+                self.SpecialAbilityUnits[type] = {}
+            end
+            table.insert( self.SpecialAbilityUnits[type], unitId )
+            SetAbilityUnits( self:GetArmyIndex(), type, self:GetSpecialAbilityUnitIds(type) )
+            LOG(autoEnable)
+			if autoEnable and table.getn( self.SpecialAbilityUnits[type] ) == 1 then
+				LOG("autoEnable")
+                self:EnableSpecialAbility( type, true )
+            end
+        end
+    end,
+	
+	
+    RemoveSpecialAbilityUnit = function(self, unit, type, autoDisable)
+        if self.SpecialAbilityUnits[type] then
+            local unitId = unit:GetEntityId()
+            table.removeByValue( self.SpecialAbilityUnits[type], unitId )
+            SetAbilityUnits( self:GetArmyIndex(), type, self:GetSpecialAbilityUnitIds(type) )
+            if autoDisable and table.getn( self.SpecialAbilityUnits[type] ) < 1 then
+                self:EnableSpecialAbility( type, false )
+            end
+        end
+    end,
+	
+    EnableSpecialAbility = function(self, type, enable)
+        if AbilityDefinition[type].enabled == false then
+            #WARN('Ability "'..repr(type)..'" is disabled in abilitydefinition file')
+            return false
+        else
+            if not self.SpecialAbilities[ type ] then
+                self.SpecialAbilities[ type ] = {}
+                if AbilityDefinition[type]['ExtraInfo'] then
+                    for k, v in AbilityDefinition[type]['ExtraInfo'] do
+                        self:SetSpecialAbilityParam( type, k, v )
+                    end
+                end
+            end
+            enable = enable and true
+            if self:IsSpecialAbilityEnabled( type ) == nil or self:IsSpecialAbilityEnabled( type ) != enable then
+                local army = self:GetArmyIndex()
+                self.SpecialAbilities[ type ][ 'enabled' ] = enable
+                if enable then
+                    AddSpecialAbility( army, type )
+                else
+                    RemoveSpecialAbility( army, type )
+                end
+            end
+        end
+    end,	
+
+    GetSpecialAbilityUnits = function(self, type)
+        if self.SpecialAbilityUnits[type] then
+            local units = {}
+            local remove = {}
+
+            # compile list of units in this type of special ability
+            for k, v in self.SpecialAbilityUnits[type] do
+                local unit = GetEntityById(v)
+                if unit and not unit:BeenDestroyed() then
+                    table.insert( units, unit )
+                else
+                    table.insert( remove, v )
+                end
+            end
+
+            # remove bad entries from the table so we won't get them next time
+            for k, v in remove do
+                table.removeByValue( self.SpecialAbilityUnits[type], v )
+            end
+
+            return units
+        end
+    end,	
+	
+    GetSpecialAbilityUnitIds = function(self, type)
+        self:GetSpecialAbilityUnits(type)  # only for cleaning up the table, not interested in the results of this call
+        return self.SpecialAbilityUnits[type]
+    end,
+
+   IsSpecialAbilityEnabled = function(self, type)
+         if self.SpecialAbilities[ type ] then
+             return self.SpecialAbilities[ type ][ 'enabled' ]
+         end
+    end,
+
+    SetSpecialAbilityParam = function(self, type, parameter, value)
+
+        # set and/or change a parameter for the special ability. Returns old value (could be nil if previously not set)
+        if parameter != 'enabled' then
+            local old
+            if self.SpecialAbilities[ type ][ parameter ] then
+                old = self.SpecialAbilities[ type ][ parameter ]
+            end
+            self.SpecialAbilities[ type ][ parameter ] = value
+            return old
+        else
+            WARN('AIBrain: SetSpecialAbilityParam(): cant set parameter "'..parameter..'" this way!')
+        end
+    end,
+
+    GetSpecialAbilityParam = function(self, type, param1, param2)
+        local r
+        if type and param1 and self.SpecialAbilities[ type ][ param1 ] then
+            if param2 and self.SpecialAbilities[ type ][ param1 ][ param2 ] then
+                r = self.SpecialAbilities[ type ][ param1 ][ param2 ]
+            else
+                r = self.SpecialAbilities[ type ][ param1 ]
+            end
+        end
+        return r
+    end,	
+	
     OnCreateAI = function(self, planName)
         self:CreateBrainShared(planName)
 

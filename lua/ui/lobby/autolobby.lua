@@ -67,6 +67,7 @@ local function MakeLocalPlayerInfo(name)
     
     result.Team = tonumber(GetCommandLineArg("/team", 1)[1])
     result.Rank = tonumber(GetCommandLineArg("/rank", 1)[1])
+	result.StartSpot = tonumber(GetCommandLineArg("/StartSpot", 1)[1])
     LOG('Local player info: ' .. repr(result))
     return result
 end
@@ -224,6 +225,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
 
     lobbyComm.ConnectionToHostEstablished = function(self,myID,newLocalName,theHostID)
         LOG('********** ConnectionToHostEstablished() called')
+		
         if connectingDialog then
             connectingDialog:Destroy()
         end
@@ -231,6 +233,8 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         localPlayerName = newLocalName
         localPlayerID = myID
 
+		GpgNetSend('connectedToHost', string.format("%d", hostID))
+		
         # Ok, I'm connected to the host. Now request to become a player
         lobbyComm:SendData( hostID, { Type = 'AddPlayer', PlayerInfo = MakeLocalPlayerInfo(newLocalName), } )
     end
@@ -278,6 +282,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
     end
 
     lobbyComm.EstablishedPeers = function(self, uid, peers)
+		GpgNetSend('Connected', string.format("%d", uid))
         if self:IsHost() then
             CheckForLaunch()
         end
