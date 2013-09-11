@@ -109,6 +109,7 @@ local function CheckForLaunch()
 
     local important = {}
     for slot,player in gameInfo.PlayerOptions do
+        GpgNetSend('PlayerOption', string.format("startspot %s %d %s", player.PlayerName, slot, slot))
         if not table.find(important, player.OwnerID) then
             table.insert(important, player.OwnerID)
         end
