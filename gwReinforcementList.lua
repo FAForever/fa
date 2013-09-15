@@ -12,7 +12,7 @@ gwReinforcements = {
 		{
 			playerName = "Ze_PilOt",
 			called = false,
-			delay = 10,
+			delay = 100,
 			unitNames = {
 				"UEB4201",
 			},
@@ -26,7 +26,7 @@ gwReinforcements = {
 		{
 			playerName = "Ze_PilOt",
 			called = false,
-			delay = 20,
+			delay = 100,
 			unitNames = {
 				"UEL0202","UEL0202","UEL0202","UEL0202","UEL0202","UEL0202",  #six pillars
 			},

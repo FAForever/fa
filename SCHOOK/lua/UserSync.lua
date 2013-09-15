@@ -9,11 +9,17 @@ OnSync = function()
         import('/lua/ui/game/multifunction.lua').FocusArmyChanged()
     end
 
-
-	for k, v in Sync.AddSpecialAbility do
+		for k, v in Sync.AddSpecialAbility do
         local army = v.Army
         if army == GetFocusArmy() then
             import('/lua/ui/ability_panel/abilities.lua').AddSpecialAbility(v)
+        end
+    end
+
+	for k, v in Sync.AddReinforcementList do
+        local army = v.Army
+        if army == GetFocusArmy() then
+            import('/lua/ui/ability_panel/abilities.lua').AddReinforcements(v)
         end
     end
 	

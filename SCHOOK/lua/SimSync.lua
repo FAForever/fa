@@ -10,6 +10,7 @@ ResetSyncTable = function()
     Sync.Sounds = {}
     Sync.Voice = {}
 
+	Sync.AddReinforcementList = {}
     Sync.AddSpecialAbility = {}
     Sync.RemoveSpecialAbility = {}
     Sync.EnableSpecialAbility = {}
@@ -36,6 +37,13 @@ ResetSyncTable = function()
 end
 
 SimUnitEnhancements = {}
+
+function AddReinforcementList (army, list)
+    if army != nil and list then
+		LOG("adding reinforcement!")
+        table.insert(Sync.AddReinforcementList, { List = list, Army = army })
+    end
+end
 
 function AddSpecialAbility (army, ability)
     if army != nil and ability then
