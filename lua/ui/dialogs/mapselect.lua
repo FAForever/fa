@@ -27,7 +27,7 @@ local ModManager = import('/lua/ui/dialogs/modmanager.lua')
 local EnhancedLobby = import('/lua/EnhancedLobby.lua')
 ###New local - End
 
-local scenarios = MapUtil.EnumerateSkirmishScenarios()
+local scenarios = MapUtil.EnumerateCampaignScenarios()
 local selectedScenario = false
 local description = false
 local descText = false

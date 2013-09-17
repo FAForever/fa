@@ -901,7 +901,7 @@ local function AssignRandomStartSpots(gameInfo)
             scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
         end
         if scenarioInfo then
-            local armyTable = MapUtil.GetArmies(scenarioInfo)
+            local armyTable = {"Player", "Coop1", "Coop2", "Coop3"}
             if armyTable then
                 if gameInfo.GameOptions['RandomMap'] == 'Off' then
                     numAvailStartSpots = table.getn(armyTable)
@@ -1370,7 +1370,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         SetFrontEndData('NextOpBriefing', nil)
         -- assign random factions just as game is launched
         AssignRandomFactions(gameInfo)
-        AssignRandomStartSpots(gameInfo)
+        --AssignRandomStartSpots(gameInfo)
         --assign the teams just before launch
         AssignRandomTeams(gameInfo)
         randstring = randomString(16, "%l%d")
@@ -1390,71 +1390,55 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         -- set the mods
         gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
 
+		-- Set up options for campaign
+
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+
+		gameInfo.GameOptions['Difficulty'] = 2
+	
+		LOG(repr(gameInfo))
+		
+		scenarioArmies = {}
+		for index, teamConfig in scenarioInfo.Configurations.standard.teams do
+			if teamConfig.name and (teamConfig.name == 'FFA') then
+				scenarioArmies =teamConfig.armies
+				break
+			end
+		end
+		
+		--local maxDefaultArmies = table.getn(scenarioArmies)
+		local addedArmies = {}
+		for spot, army in gameInfo.PlayerOptions do
+			if spot != 1 then
+				table.insert(addedArmies, army)
+			end			
+		end
+		LOG(repr(addedArmies))
+		add = 1
+		for armyIndex, armyName in scenarioArmies do
+			LOG(armyName)
+			LOG(stringstarts(armyName, "Coop"))
+			if armyName != "Player" and stringstarts(armyName, "Coop") == false then
+				LOG("editing " .. armyName)
+				gameInfo.PlayerOptions[armyIndex] = LobbyComm.GetDefaultPlayerOptions(armyName)
+				gameInfo.PlayerOptions[armyIndex].Human = false
+				gameInfo.PlayerOptions[armyIndex].Faction = 1
+			elseif stringstarts(armyName, "Coop") == true and table.getn(addedArmies) >= add then
+					gameInfo.PlayerOptions[armyIndex] = addedArmies[add]
+					add = add + 1				
+			end
+		end
+		
+		LOG(repr(gameInfo))
+
+		
         lobbyComm:LaunchGame(gameInfo)
+
     end
 
     --if singlePlayer then--or HasCommandLineArg('/gpgnet') then
         LaunchGame()
-    --else
-    --// This code is a pre-launch timer, disable by a community
-        --launchThread = ForkThread(function()
-            --GUI.launchGameButton.label:SetText(LOC("<LOC PROFILE_0005>"))
-            --GUI.launchGameButton.OnClick = function(self)
-                --CancelLaunch()
-                --self.OnClick = function(self) TryLaunch(false) end
-                --GUI.launchGameButton.label:SetText(LOC("<LOC lobui_0212>Launch"))
-            --end
-            --if gameInfo.GameOptions['RandomMap'] != 'Off' then
-                --local rMapSizeFil = import('/lua/ui/dialogs/mapselect.lua').rMapSizeFil
-                --local rMapSizeFilLim = import('/lua/ui/dialogs/mapselect.lua').rMapSizeFilLim
-                --local rMapPlayersFil = import('/lua/ui/dialogs/mapselect.lua').rMapPlayersFil
-                --local rMapPlayersFilLim = import('/lua/ui/dialogs/mapselect.lua').rMapPlayersFilLim
-                --SendSystemMessage("-------------------------------------------------------------------------------------------------------------------")
-                --if rMapSizeFilLim == 'equal' then
-                    --rMapSizeFilLim = '='
-                --end
-                --if rMapSizeFilLim == 'less' then
-                    --rMapSizeFilLim = '<='
-                --end
-                --if rMapSizeFilLim == 'greater' then
-                    --rMapSizeFilLim = '>='
-                --end
-                --if rMapPlayersFilLim == 'equal' then
-                    --rMapPlayersFilLim = '='
-                --end
-                --if rMapPlayersFilLim == 'less' then
-                    --rMapPlayersFilLim = '<='
-                --end
-                --if rMapPlayersFilLim == 'greater' then
-                    --rMapPlayersFilLim = '>='
-                --end
-                --if rMapSizeFil != 0 and rMapPlayersFil != 0 then
-                    --SendSystemMessage(LOCF("<LOC lobui_0558>Random Map enabled: Map Size is %s %dkm and Number of Players" ..
-                    --                       " are %s %d", rMapSizeFilLim, rMapSizeFil, rMapPlayersFilLim, rMapPlayersFil))
-                --elseif rMapSizeFil != 0 then
-                    --SendSystemMessage(LOCF("<LOC lobui_0559>Random Map enabled: Map Size is %s %dkm and Number of Players" ..
-                    --                       " are ALL", rMapSizeFilLim, rMapSizeFil))
-                --elseif rMapPlayersFil != 0 then
-                    --SendSystemMessage(LOCF("<LOC lobui_0560>Random Map enabled: Map Size is ALL and Number of Players " ..
-                    --                       "are %s %d", rMapPlayersFilLim, rMapPlayersFil))
-                --else
-                    --SendSystemMessage(LOC("<LOC lobui_0561>Random Map enabled: Map Size is ALL and Number of Players are " ..
-                    --                      " ALL"))
-                --end
-                --SendSystemMessage("-------------------------------------------------------------------------------------" ..
-                --                  "------------------------------")
-            --end
-            --local timer = 5
-            --while timer > 0 do
-                --local text = LOCF('%s %d', "<LOC lobby_0001>Game will launch in", timer)
-                --SendSystemMessage(text)
-                --timer = timer - 1
-                --WaitSeconds(1)
-            --end
-            --LaunchGame()
-        --end)
-    --end
+
 end
 
 local function AlertHostMapMissing()
@@ -1574,9 +1558,9 @@ local function UpdateGame()
             TEST4factionPanel:Disable()
             TEST5factionPanel:Disable()
         else
-            if GUI.becomeObserver then
-                GUI.becomeObserver:Enable()
-            end
+			if GUI.becomeObserver then
+			GUI.becomeObserver:Enable()
+			end
             GUI.LargeMapPreview:Enable()
             TEST1factionPanel:Enable()
             TEST2factionPanel:Enable()
@@ -1601,7 +1585,7 @@ local function UpdateGame()
 
     local numAvailStartSpots = LobbyComm.maxPlayerSlots
     if scenarioInfo then
-        local armyTable = MapUtil.GetArmies(scenarioInfo)
+        local armyTable = {"Player", "Coop1", "Coop2", "Coop3"}
         if armyTable then
             numAvailStartSpots = table.getn(armyTable)
         end
@@ -4007,7 +3991,7 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
     local mWidth = scenario.size[1]
     local mHeight = scenario.size[2]
 
-    local playerArmyArray = MapUtil.GetArmies(scenario)
+    local playerArmyArray = {"Player", "Coop1", "Coop2", "Coop3"}
 
     for inSlot, army in playerArmyArray do
         local pos = startPos[army]
