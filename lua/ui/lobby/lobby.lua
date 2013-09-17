@@ -1901,10 +1901,10 @@ local function HostUpdateMods(newPlayerID, newPlayerName)
                                modnames))
             end
 			if FindNameForID(newPlayerID) then
-				AddChatText(FindNameForID(newPlayerID)..' is Auto Kicked because he not have this mod : '..modnames) -- Not Work ? -- XinnonyTest
+				AddChatText(FindNameForID(newPlayerID)..' is Auto Kicked because he not have this mod : '..modnames) -- not working ? -- XinnonyTest
 			else
 				if newPlayerName then
-					AddChatText(newPlayerName..' is Auto Kicked because he not have this mod : '..modnames) -- Not Work ? -- XinnonyTest
+					AddChatText(newPlayerName..' is Auto Kicked because he not have this mod : '..modnames) -- not working ? -- XinnonyTest
 				else
 					AddChatText('The last player is Auto Kicked because he not have this mod : '..modnames)
 				end
@@ -2560,7 +2560,7 @@ function CreateUI(maxPlayers)
 			LayoutHelpers.AtLeftIn(cbox_ShowChangedOption_TEXT, cbox_ShowChangedOption, 25)
 			LayoutHelpers.AtVerticalCenterIn(cbox_ShowChangedOption_TEXT, cbox_ShowChangedOption)
 			cbox_ShowChangedOption:Disable()
-			Tooltip.AddButtonTooltip(cbox_ShowChangedOption_TEXT, {text='Show only changed Options', body='Not work, coming soon !'})
+			Tooltip.AddButtonTooltip(cbox_ShowChangedOption_TEXT, {text='Show only changed Options', body='Not working yet, coming soon!'})
 			cbox_ShowChangedOption.OnCheck = function(self, checked)
 				if checked then
 					cbox_ShowChangedOption:SetCheck(false, true)
@@ -5443,7 +5443,7 @@ function RuleTitle_HostCanEditTitle()
 				SetText2(titleText, ""..text, 10)
 				RuleTitle_SendMSG()
 				GUI.chatEdit:AcquireFocus()
-			--elseif text == 'RULE:' then -- Not Work ??...
+			--elseif text == 'RULE:' then -- not working ??...
 				--titleText:SetText("FA FOREVER GAME LOBBY (RULE Title)")
 			end
 		end
