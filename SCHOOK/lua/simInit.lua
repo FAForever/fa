@@ -17,7 +17,7 @@ function BeginSession()
     ScenarioUtils.CreateProps()
     ScenarioUtils.CreateResources()
 
-    baseBeginSession()
+#    baseBeginSession()
 
     #start the runtime score loop
     ForkThread(import('/lua/aibrain.lua').UpdateReclaimStat) # this is for adding a reclaim income stat.
@@ -25,7 +25,7 @@ function BeginSession()
     ForkThread(import('/lua/aibrain.lua').SyncCurrentScores)
 
     #start watching for victory conditions
-    ForkThread(import('/lua/victory.lua').CheckVictory, ScenarioInfo)
+#    ForkThread(import('/lua/victory.lua').CheckVictory, ScenarioInfo)
 end
 
 local basePostLoad = OnPostLoad

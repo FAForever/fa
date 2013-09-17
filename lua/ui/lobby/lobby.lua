@@ -1239,21 +1239,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         end
     end
 
-    if gameInfo.GameOptions['Victory'] != 'sandbox' then
-        local valid = true
-        if totalPlayers == 1 then
-            valid = false
-        end
-        if not allFFA and not moreThanOneTeam then
-            valid = false
-        end
-        if not valid then
-            AddChatText(LOC("<LOC lobui_0241>There must be more than one player or team or the Victory Condition must be set "..
-                             "to Sandbox."))
-            return
-        end
-    end
-
+ 
     if totalPlayers == 0 then
         AddChatText(LOC("<LOC lobui_0233>There are no players assigned to player slots, can not continue"))
         return
@@ -1413,7 +1399,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
 				table.insert(addedArmies, army)
 			end			
 		end
-		LOG(repr(addedArmies))
+		SetGameOption('Victory', 'sandbox')
 		add = 1
 		for armyIndex, armyName in scenarioArmies do
 			LOG(armyName)
@@ -1439,6 +1425,10 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
     --if singlePlayer then--or HasCommandLineArg('/gpgnet') then
         LaunchGame()
 
+end
+
+function stringstarts(String,Start)
+   return string.sub(String,1,string.len(Start))==Start
 end
 
 local function AlertHostMapMissing()

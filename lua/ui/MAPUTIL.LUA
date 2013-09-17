@@ -127,7 +127,7 @@ function EnumerateCampaignScenarios(nameFilter, sortFunc)
     local scenarios = {}
     for index, fileName in scenFiles do
         local scen = LoadScenario(fileName)
-        if IsScenarioPlayable(scen) and scen.type == "coop_campaign" then
+        if IsScenarioPlayable(scen) and scen.type == "campaign_coop" then
             table.insert(scenarios, scen)
         end
     end
