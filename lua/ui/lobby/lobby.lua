@@ -58,10 +58,11 @@ local PrefLanguageTooltipText={}
 --\\ Stop - Table of Tooltip Country
 --// Get a value on /Country CommandLine in FA.exe - Xinnony
 local PrefLanguage = GetCommandLineArg("/country", 1)
-if PrefLanguage == '' then
+LOG(PrefLanguage)
+if PrefLanguage[1] == '' then
 	LOG('COUNTRY - Country has not been found')
-	PrefLanguage = "world"
-elseif PrefLanguage == nil then
+	PrefLanguage[1] = "world"
+elseif PrefLanguage[1] == nil then
 	LOG('COUNTRY - Country has not been found')
 	PrefLanguage = "world"
 else
