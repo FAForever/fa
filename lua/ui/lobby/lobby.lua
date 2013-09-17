@@ -58,7 +58,10 @@ local PrefLanguageTooltipText={}
 --\\ Stop - Table of Tooltip Country
 --// Get a value on /Country CommandLine in FA.exe - Xinnony
 local PrefLanguage = GetCommandLineArg("/country", 1)
-if PrefLanguage == (nil or '') then
+if PrefLanguage == '' then
+	LOG('COUNTRY - Country has not been found')
+	PrefLanguage = "world"
+elseif PrefLanguage == nil then
 	LOG('COUNTRY - Country has not been found')
 	PrefLanguage = "world"
 else
@@ -550,8 +553,12 @@ function JoinGame(address, asObserver, playerName, uid)
 end
 
 function ConnectToPeer(addressAndPort,name,uid)
-	LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..")")
-    lobbyComm:ConnectToPeer(addressAndPort,name,uid)
+	if string.find(addressAndPort, '127.0.0.1') then
+		LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..")")
+	else
+		LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..", USE PROXY)")
+	end
+	lobbyComm:ConnectToPeer(addressAndPort,name,uid)
 end
 
 function DisconnectFromPeer(uid)
@@ -1738,24 +1745,24 @@ local function UpdateGame()
 				--#LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
                 if randmapText and scenarioInfo.name then
 					-- Set the map name and quality at the top right corner in lobby -- Xinnony
-					randmapText:SetText(scenarioInfo.name)
+					SetText2(randmapText, scenarioInfo.name, 10)
 				end
 				if randmapText2 then
-					randmapText2:SetText("Game quality : "..quality.."%")
+					SetText2(randmapText2, "Game quality : "..quality.."%", 10)
 				end
             else
                 if randmapText and scenarioInfo.name then
                     -- Set the map name and quality at the top right corner in lobby -- Xinnony
-                    randmapText:SetText(scenarioInfo.name)
+                    SetText2(randmapText, scenarioInfo.name, 10)
 				end
 				if randmapText2 then
-					randmapText2:SetText("Game quality N/A")
+					SetText2(randmapText2, "Game quality N/A", 10)
                 end
             end
         else
             if randmapText and scenarioInfo.name then
                 -- Set the map name and quality at the top right corner in lobby -- Xinnony
-                randmapText:SetText(scenarioInfo.name)
+                SetText2(randmapText, scenarioInfo.name, 10)
             end
 			if randmapText2 then
 				randmapText2:SetText("")
@@ -1764,7 +1771,7 @@ local function UpdateGame()
     else
         if randmapText and scenarioInfo.name then
             -- Set the map name and quality at the top right corner in lobby -- Xinnony
-            randmapText:SetText(scenarioInfo.name)
+            SetText2(randmapText, scenarioInfo.name, 10)
         end
 		if randmapText2 then
 			randmapText2:SetText("")
@@ -2424,15 +2431,20 @@ function CreateUI(maxPlayers)
 	RuleTitle_HostCanEditTitle()
 	--\\ Stop RULE TITLE
 	
-    randmapText = UIUtil.CreateText(GUI.panel, "Loading ...", 17, 'Arial Gras')--UIUtil.titleFont)
+    randmapText = UIUtil.CreateText(GUI.panel, "", 17, 'Arial Gras') -- Map Name Label
+		SetText2(randmapText, "Loading ...", 10)
 		LayoutHelpers.AtRightTopIn(randmapText, GUI.panel, 50, 41)
 		randmapText:SetColor('B9BFB9')
 		randmapText:SetDropShadow(true)
-	randmapText2 = UIUtil.CreateText(GUI.panel, "", 13, 'Arial Gras')--UIUtil.titleFont)
+	randmapText2 = UIUtil.CreateText(GUI.panel, "", 13, 'Arial Gras') -- Game Quality Label
 		LayoutHelpers.AtRightTopIn(randmapText2, GUI.panel, 50, 61)
 		randmapText2:SetColor('B9BFB9')
 		randmapText2:SetDropShadow(true)
 	--Tooltip.AddButtonTooltip(randmapText,{text='', body=''})
+	randmapText3 = UIUtil.CreateText(GUI.panel, "", 13, 'Arial Gras') -- MOD Label
+		LayoutHelpers.AtLeftTopIn(randmapText3, GUI.panel, 50, 61)
+		randmapText3:SetColor('B9BFB9')
+		randmapText3:SetDropShadow(true)
 	
     --// Credits panel -- Xinnony
 	GUI.Credits = UIUtil.CreateButtonStd2(GUI.panel, '/BUTTON/small/', "Lobby Options", 10, -1)
@@ -2442,9 +2454,10 @@ function CreateUI(maxPlayers)
 		CreateOptionLobbyDialog()
 	end
     --// Credits footer -- Xinnony
-	local Credits = 'New Skin by Xinnony and Barlots (v1.7)'
+	local Credits = 'New Skin by Xinnony and Barlots (v1.9)'
 	local Credits_Text_X = 11
-    Credits_Text = UIUtil.CreateText(GUI.panel, Credits, 17, UIUtil.titleFont)
+    Credits_Text = UIUtil.CreateText(GUI.panel, '', 17, UIUtil.titleFont)
+	SetText2(Credits_Text, Credits, 10)
     Credits_Text:SetFont(UIUtil.titleFont, 12)
     Credits_Text:SetColor("FFFFFF")
     LayoutHelpers.AtBottomIn(Credits_Text, GUI.panel, 0)
@@ -2531,6 +2544,30 @@ function CreateUI(maxPlayers)
 		GUI.RankedLabel:SetColor(UIUtil.bodyColor)
 		LayoutHelpers.AtTopIn(GUI.RankedLabel, GUI.optionsPanel, 5)
 		LayoutHelpers.AtHorizontalCenterIn(GUI.RankedLabel, GUI.optionsPanel, -8)
+		GUI.RankedLabel:SetFont('Arial Gras', 13)
+		LayoutHelpers.AtRightTopIn(GUI.RankedLabel, randmapText3, 0, 0)--GUI.panel, 50, 61+14)
+		LayoutHelpers.RightOf(GUI.RankedLabel, randmapText3, 0)
+		--GUI.RankedLabel:SetColor('ff7777') -- 77ff77
+		GUI.RankedLabel:SetDropShadow(true)
+	
+	-- XinnonyWork -- Checkbox Show changed Options
+	cbox_ShowChangedOption = UIUtil.CreateCheckboxStd(GUI.optionsPanel, '/CHECKBOX/radio')
+		LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel, 3, 0)
+		--LayoutHelpers.AtHorizontalCenterIn(cbox_ShowChangedOption, GUI.optionsPanel, -8)
+		cbox_ShowChangedOption_TEXT = UIUtil.CreateText(cbox_ShowChangedOption, 'Hide unchanged Options', 11, 'Arial')
+			cbox_ShowChangedOption_TEXT:SetColor('B9BFB9')
+			cbox_ShowChangedOption_TEXT:SetDropShadow(true)
+			LayoutHelpers.AtLeftIn(cbox_ShowChangedOption_TEXT, cbox_ShowChangedOption, 25)
+			LayoutHelpers.AtVerticalCenterIn(cbox_ShowChangedOption_TEXT, cbox_ShowChangedOption)
+			cbox_ShowChangedOption:Disable()
+			Tooltip.AddButtonTooltip(cbox_ShowChangedOption_TEXT, {text='Show only changed Options', body='Not work, coming soon !'})
+			cbox_ShowChangedOption.OnCheck = function(self, checked)
+				if checked then
+					cbox_ShowChangedOption:SetCheck(false, true)
+				else
+				end
+			end
+	-- XinnonyWork -- Checkbox Show changed Options
 
 	-- GAME OPTIONS // MODS MANAGER BUTTON --
     if lobbyComm:IsHost() then 	-- GAME OPTION
@@ -2647,7 +2684,7 @@ function CreateUI(maxPlayers)
 		GUI.chatDisplay.Bottom:Set(function() return GUI.chatEdit.Top() -6 end)
 		GUI.chatDisplay.Right:Set(function() return GUI.chatPanel.Right() -0 end)
 		GUI.chatDisplay.Height:Set(function() return GUI.chatDisplay.Bottom() - GUI.chatDisplay.Top() end)
-		GUI.chatDisplay.Width:Set(function() return GUI.chatDisplay.Right() - GUI.chatDisplay.Left() end)
+		GUI.chatDisplay.Width:Set(function() return GUI.chatDisplay.Right() - GUI.chatDisplay.Left() -20 end)
 
     GUI.chatDisplayScroll = UIUtil.CreateVertScrollbarFor2(GUI.chatDisplay, -21, nil, 30)
 
@@ -2728,7 +2765,7 @@ function CreateUI(maxPlayers)
     GUI.OptionContainer.Height:Set(260)
     GUI.OptionContainer.Width:Set(209-9-17-1)
     GUI.OptionContainer.top = 0
-    LayoutHelpers.AtLeftTopIn(GUI.OptionContainer, GUI.optionsPanel, 0+4+1, 30-2)
+    LayoutHelpers.AtLeftTopIn(GUI.OptionContainer, GUI.optionsPanel, 0+4+1, 30-2) -- -24
 
     GUI.OptionDisplay = {}
     RefreshOptionDisplayData()
@@ -3057,7 +3094,7 @@ function CreateUI(maxPlayers)
 			GUI.slots[i].name.row = i
         -- left deal with name clicks
         GUI.slots[i].name.OnClick = function(self, index, text)
-            DoSlotBehavior(self.row, self.slotKeys[index], text)
+			DoSlotBehavior(self.row, self.slotKeys[index], text)
         end
         GUI.slots[i].name.OnEvent = function(self, event)
             if event.Type == 'MouseEnter' then
@@ -3570,15 +3607,16 @@ function CreateUI(maxPlayers)
     GUI.pingThread = ForkThread(
         function()
             while true and lobbyComm do
-                for slot,player in gameInfo.PlayerOptions do
+                for slot, player in gameInfo.PlayerOptions do
                     if player.Human and player.OwnerID != localPlayerID then
                         local peer = lobbyComm:GetPeer(player.OwnerID)
                         local ping = peer.ping and math.floor(peer.ping)
-                        local pingcolor = CalcConnectionStatus(peer, slot)
-                        GUI.slots[slot].pingText:SetText(tostring(ping))
-                        GUI.slots[slot].pingText:SetColor(pingcolor)
-                        if ping then
+                        local pingcolor = CalcConnectionStatus(peer)
+                        --GUI.slots[slot].pingText:SetText(tostring(ping))
+                        --GUI.slots[slot].pingText:SetColor(pingcolor)
+                        if ping and GUI.slots[slot].pingStatus then
                             GUI.slots[slot].pingStatus:SetValue(ping)
+							GUI.slots[slot].pingStatus:Show()
 							if pingcolor == 'red' then
 								GUI.slots[slot].pingStatus._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-03_bmp.dds'))
 							elseif pingcolor == 'green' then
@@ -3586,7 +3624,6 @@ function CreateUI(maxPlayers)
 							elseif pingcolor == 'yellow' then
 								GUI.slots[slot].pingStatus._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-01_bmp.dds'))
 							end
-                            GUI.slots[slot].pingStatus:Show()
                         else
                             GUI.slots[slot].pingStatus:Hide()
                         end
@@ -3654,7 +3691,8 @@ function RefreshOptionDisplayData(scenarioInfo)
     local getInit = GetCommandLineArg("/init", 1)
     getInit = tostring(getInit[1])
     if getInit == "init_faf.lua" then
---        AddChatText('Welcome to Forged Alliance Forever MOD'..getInit)
+		SetText2(randmapText3, 'FA Forever - ', 10)
+		--AddChatText('Welcome to Forged Alliance Forever MOD'..getInit)
         local getVictory = gameInfo.GameOptions['Victory'] -- 'demoralization'
         local getCheat = gameInfo.GameOptions['CheatsEnabled'] -- 'false'
         local getSpeed = gameInfo.GameOptions['GameSpeed'] -- 'normal'
@@ -3664,57 +3702,51 @@ function RefreshOptionDisplayData(scenarioInfo)
         local getNumbMod = table.getn(Mods.GetGameMods(gameInfo.GameMods)) -- 0 for the purposes of this function
         local getRstric = gameInfo.GameOptions.RestrictedCategories --can be nil or a table, even if no restrictions are present
 --~             AddChatText(tostring(cRstr))
-        if getVictory == 'demoralization' and getCheat == 'false' and getSpeed == 'normal'
-        and getFog == 'explored' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and getRstric == nil then
+        if getVictory == 'demoralization' and getCheat == 'false' and getSpeed == 'normal' and getFog == 'explored' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and getRstric == (nil or 0) then
             --table.insert(formattedOptions, {text = 'Ranking',
                 --value = 'Ranked',
                 --green = true,
                 --tooltip = {text='Ranked',body='This game is Ranked !'}})
-            GUI.RankedLabel:SetText("Game is Ranked")
+            SetText2(GUI.RankedLabel, "game is Ranked", 10)
             GUI.RankedLabel:SetColor("77ff77")
             --Tooltip.AddControlTooltip(GUI.RankedLabel, '')
         else
-            if getVictory == 'demoralization' and getCheat == 'false' and getSpeed == 'normal' and
-            getFog == 'explored' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and
-            table.getn(getRstric) == 0 then
-                --table.insert(formattedOptions, {text = 'Ranking',
-                    --value = 'Ranked',
-                    --green = true,
-                    --tooltip = {text='Ranked',body='This game is Ranked !'}})
-                GUI.RankedLabel:SetText("Game is Ranked")
-                GUI.RankedLabel:SetColor("77ff77")
-                --Tooltip.AddControlTooltip(GUI.RankedLabel, '')
-            else
-                --table.insert(formattedOptions, {text = 'Ranking',
-                    --value = 'Unranked',
-                    --red = true,
-                    --tooltip = {text='Unranked',body='This game is NOT Ranked !'}})
-                GUI.RankedLabel:SetText("Game is not Ranked")
-                GUI.RankedLabel:SetColor("ff7777")
-                --Tooltip.AddControlTooltip(GUI.RankedLabel, '')
-            end
+			--table.insert(formattedOptions, {text = 'Ranking',
+				--value = 'Unranked',
+				--red = true,
+				--tooltip = {text='Unranked',body='This game is NOT Ranked !'}})
+			SetText2(GUI.RankedLabel, "not Ranked", 10)
+			GUI.RankedLabel:SetColor("ff7777")
+			--Tooltip.AddControlTooltip(GUI.RankedLabel, '')
         end
     else
---~         if getInit == "init_blackops.lua" then
---~             AddChatText('Welcome to BlackOps MOD')
---~         elseif getInit == "init_labwars.lua" then
---~             AddChatText('Welcome to Labwars MOD')
---~         elseif getInit == "init_ladder1v1.lua" then
---~             AddChatText('Welcome to Ladder 1v1 MOD')
---~         elseif getInit == "init_nomads.lua" then
---~             AddChatText('Welcome to Nomads MOD')
---~         elseif getInit == "init_phantomx.lua" then
---~             AddChatText('Welcome to PhantomX MOD')
---~         elseif getInit == "init_supremeDestruction.lua" then
---~             AddChatText('Welcome to SupremeDestruction MOD')
---~         elseif getInit == "init_xtremewars.lua" then
---~             AddChatText('Welcome to XtremeWars MOD')
---~         end
+		if getInit == "init_blackops.lua" then
+			SetText2(randmapText3, 'BlackOps MOD - ', 10)
+		elseif getInit == "init_balancetesting.lua" then
+			SetText2(randmapText3, 'Balance Testing - ', 10)
+		elseif getInit == "init_gw.lua" then
+			SetText2(randmapText3, 'Galactic War - ', 10)
+		elseif getInit == "init_labwars.lua" then
+			SetText2(randmapText3, 'Labwars MOD - ', 10)
+		elseif getInit == "init_ladder1v1.lua" then
+			SetText2(randmapText3, 'Ladder 1v1 - ', 10)
+		elseif getInit == "init_nomads.lua" then
+			SetText2(randmapText3, 'Nomads MOD - ', 10)
+		elseif getInit == "init_phantomx.lua" then
+			SetText2(randmapText3, 'PhantomX MOD - ', 10)
+		elseif getInit == "init_supremedestruction.lua" then
+			SetText2(randmapText3, 'SupremeDestruction MOD - ', 10)
+		elseif getInit == "init_xtremewars.lua" then
+			SetText2(randmapText3, 'XtremeWars MOD - ', 10)
+		--else
+			--randmapText3:SetText('')
+		end
         --table.insert(formattedOptions, {text = 'Ranking',
             --value = 'Unranked',
             --red = true,
             --tooltip = {text='Unranked',body='This game is NOT Ranked !'}})
-        GUI.RankedLabel:SetText("Game is not Ranked")
+        SetText2(GUI.RankedLabel, "not Ranked", 10)
+	
         GUI.RankedLabel:SetColor("ff7777")
         --Tooltip.AddControlTooltip(GUI.RankedLabel, '')
     end
@@ -3772,7 +3804,7 @@ function RefreshOptionDisplayData(scenarioInfo)
                 mpOnly = optData.mponly or false
                 option = {text = optData.label, tooltip = optData.pref}
                 for _, val in optData.values do
-                    if val.key == v then
+					if val.key == v then
                         option.value = val.text
                             option.valueTooltip = 'lob_'..optData.key..'_'..val.key
                         break
@@ -3816,7 +3848,7 @@ function RefreshOptionDisplayData(scenarioInfo)
                 if i == optData.key then
                     option = {text = optData.label, tooltip = optData.pref}
                     for _, val in optData.values do
-                        if val.key == v then
+						if val.key == v then
                             option.value = val.text
                             option.valueTooltip = 'lob_'..optData.key..'_'..val.key
                             break
@@ -3829,9 +3861,16 @@ function RefreshOptionDisplayData(scenarioInfo)
         if option then
             if not mpOnly or not singlePlayer then
                 table.insert(formattedOptions, option)
+				--table.removeByValue(formattedOptions, option.value)
+				--AddChatText("__opt__"..option.value)
             end
         end
     end
+
+	-- XinnonyWork
+	--Remove_Unchanged_Options()
+	-- XinnonyWork
+
 -- Disable before separate AI option on GlobalOption, but the order can set on lobbyOptions.lua - Xinnony
 --    table.sort(formattedOptions,
 --        function(a, b)
@@ -4215,7 +4254,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     end
 
     lobbyComm.ConnectionToHostEstablished = function(self,myID,myName,theHostID)
-
+		LOG("CONNECTED TO HOST")
         hostID = theHostID
         localPlayerID = myID
         localPlayerName = myName
@@ -4377,13 +4416,20 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 AddChatText(data.Text)
 
 			elseif data.Type == 'Peer_Really_Disconnected' then
-				if XinnonyDebug == 3 then AddChatText('DATA RECEIVE : Peer_Really_Disconnected') end--data.Text)
-				if XinnonyDebug == 3 then LOG('DATA RECEIVE : Peer_Really_Disconnected') end--data.Text)
-				if not data.Observ then
-					gameInfo.PlayerOptions[data.Slot] = nil
-				else
-					gameInfo.Observers[data.Slot] = nil
-				end
+				if XinnonyDebug == 3 then AddChatText('>> DATA RECEIVE : Peer_Really_Disconnected (slot:'..data.Slot..')') end
+				if XinnonyDebug == 3 then LOG('>> DATA RECEIVE : Peer_Really_Disconnected (slot:'..data.Slot..')') end
+				if data.Options.OwnerID == localPlayerID then
+                    lobbyComm:SendData( hostID, {Type = "GetGameInfo"} )
+                else
+                    if data.Observ == false then
+						gameInfo.PlayerOptions[data.Slot] = nil
+					elseif data.Observ == true then
+						gameInfo.Observers[data.Slot] = nil
+					end
+					--gameInfo.Observers[data.NewSlot] = data.Options
+                    --gameInfo.PlayerOptions[data.OldSlot] = nil
+                end
+                ClearSlotInfo(data.Slot)
 				UpdateGame()
 
             elseif data.Type == 'SlotAssigned' then
@@ -4578,8 +4624,8 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                     local peers = lobbyComm:GetPeers()
                     for k,peer in peers do
                         if peer.quiet > LobbyComm.quietTimeout then
-                            SendSystemMessage(LOCF(Strings.TimedOut,peer.name))
                             lobbyComm:EjectPeer(peer.id,'TimedOutToHost')
+							SendSystemMessage(LOCF(Strings.TimedOut,peer.name))
                         end
                     end
                     WaitSeconds(1)
@@ -4601,39 +4647,39 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     end
 
     lobbyComm.PeerDisconnected = function(self,peerName,peerID)
-        LOG('PeerDisconnected : ', peerName, ' ', peerID)
+        LOG('>DEBUG> PeerDisconnected : peerName='..peerName..' peerID='..peerID)
+		--AddChatText('>debug> PeerDisconnected : peerName='..peerName..' peerID='..peerID) -- XINNONY -- Here this message always show the player quit !!!
         if XinnonyDebug == 3 then AddChatText('>> PeerDisconnected : peerName='..peerName..' peerID='..peerID) end -- XINNONY -- Here this message always show the player quit !!!
         if XinnonyDebug == 3 then LOG('GameInfo = ', repr(gameInfo)) end
-
-        local slot = FindSlotForID(peerID)
-        if slot then
-            PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04717'}, true)
-            ClearSlotInfo( slot )
-			if lobbyComm:IsHost() then
-				gameInfo.PlayerOptions[slot] = nil
+		if IsPlayer(peerID) then
+			local slot = FindSlotForID(peerID)
+			if slot and lobbyComm:IsHost() then
+				PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04717'}, true)
 				lobbyComm:BroadcastData(
 					{
 						Type = 'Peer_Really_Disconnected',
+						Options =  gameInfo.PlayerOptions[slot],
 						Slot = slot,
 						Observ = false,
 					}
 				)
+				ClearSlotInfo( slot )
+				gameInfo.PlayerOptions[slot] = nil
+				UpdateGame()
 			end
-            UpdateGame()
-        else
-            slot = FindObserverSlotForID(peerID)
-            if slot then
-                if lobbyComm:IsHost() then
-					gameInfo.PlayerOptions[slot] = nil
-					lobbyComm:BroadcastData(
-						{
-							Type = 'Peer_Really_Disconnected',
-							Slot = slot,
-							Observ = true,
-						}
-					)
-				end
-                UpdateGame()
+        elseif IsObserver(peerID) then
+            local slot2 = FindObserverSlotForID(peerID)
+            if slot2 and lobbyComm:IsHost() then
+				lobbyComm:BroadcastData(
+					{
+						Type = 'Peer_Really_Disconnected',
+						Options =  gameInfo.PlayerOptions[slot2], -- Possible BUG, gameInfo.Observers[slot2] ???
+						Slot = slot2,
+						Observ = true,
+					}
+				)
+				gameInfo.Observers[slot2] = nil
+				UpdateGame()
             end
         end
 
@@ -5235,19 +5281,23 @@ function SetSlotCountryFlag(slot, COUNTRY)
 		elseif COUNTRY == '' then -- No flag
 			GUI.slots[slot].KinderCountry:Show()
 			GUI.slots[slot].KinderCountry:SetTexture(UIUtil.UIFile('/countries/'..'world'..'.dds'))
+			Country_GetTooltipValue(COUNTRY, slot)
+			Country_AddControlTooltip(GUI.slots[slot].KinderCountry, 0, slot)
 		--elseif COUNTRY == ('xxx' or 'xxx') then -- Here you can put the missing texture Flag
 			--GUI.slots[slot].KinderCountry:Show()
 			--GUI.slots[slot].KinderCountry:SetTexture(UIUtil.UIFile('/countries/'..'world'..'.dds'))
 		else
 			GUI.slots[slot].KinderCountry:Show()
 			GUI.slots[slot].KinderCountry:SetTexture(UIUtil.UIFile('/countries/'..COUNTRY..'.dds'))
+			Country_GetTooltipValue(COUNTRY, slot)
+			Country_AddControlTooltip(GUI.slots[slot].KinderCountry, 0, slot)
 		end
     end
 end
 
 function Country_AddControlTooltip(control, waitDelay, slotNumber)
-end --[[
-    if not control.oldHandleEvent then
+    local self = control
+	if not control.oldHandleEvent then
         control.oldHandleEvent = control.HandleEvent
     end
     control.HandleEvent = function(self, event)
@@ -5300,14 +5350,15 @@ end
 
 function RuleTitle_HostCanEditTitle()
 	-- TITRE de la Rule
-	local First_Rule_Change = 0
-	titleText = UIUtil.CreateText(GUI.panel, "", 22, 'Arial Gras')--UIUtil.titleFont)
+	--local First_Rule_Change = 0
+	titleText = UIUtil.CreateText(GUI.panel, "", 17, 'Arial Gras')--UIUtil.titleFont)
 		if lobbyComm:IsHost() then
-			LayoutHelpers.AtLeftTopIn(titleText, GUI.panel, 50+24, 36+3) -- Décaler pour le Bouton
+			LayoutHelpers.AtLeftTopIn(titleText, GUI.panel, 50+24, 41)--36+3) -- Décaler pour le Bouton
 		else
-			LayoutHelpers.AtLeftTopIn(titleText, GUI.panel, 50, 36+3) -- Caler a gauche
+			LayoutHelpers.AtLeftTopIn(titleText, GUI.panel, 50, 41)--36+3) -- Caler a gauche
 		end
-		titleText:SetText("FA FOREVER GAME LOBBY")
+		titleText.Width:Set(20)
+		SetText2(titleText, "FA FOREVER GAME LOBBY", 10)
 		titleText:SetColor('B9BFB9')
 		titleText:SetDropShadow(true)
 		
@@ -5350,11 +5401,11 @@ function RuleTitle_HostCanEditTitle()
 			GUI.RuleEdit:Show()
 			GUI.RuleEdit:ShowBackground(true)
 			GUI.RuleEdit:AcquireFocus()
-			if First_Rule_Change == 0 then
-				GUI.RuleEdit:SetText('RULE:')
-			else
+			--if First_Rule_Change == 0 then
+				--GUI.RuleEdit:SetText('RULE:') -- First change, the text 'FA FOREVER GAME LOBBY' replace with 'RULE:'
+			--else
 				GUI.RuleEdit:SetText(titleText:GetText())
-			end
+			--end
 		end
 		
 		GUI.RuleEdit.OnCharPressed = function(self, charcode)
@@ -5386,10 +5437,10 @@ function RuleTitle_HostCanEditTitle()
 			NoteBTN:Show()
 			GUI.RuleEdit:Hide()
 			GUI.RuleEdit:ShowBackground(false)
-			First_Rule_Change = 1
+			--First_Rule_Change = 1
 			if text != "" then
 				--GpgNetSend('Chat', text)
-				titleText:SetText(""..text)
+				SetText2(titleText, ""..text, 10)
 				RuleTitle_SendMSG()
 				GUI.chatEdit:AcquireFocus()
 			--elseif text == 'RULE:' then -- Not Work ??...
@@ -6128,3 +6179,21 @@ end
 
 ##########################################################################
 #####################################.#####################################
+
+function Remove_Unchanged_Options()
+	--table.find(formattedOptions, VAL) -- Table, Val
+	--table.remove()
+end
+
+SetText2 = function(self, text, delay)
+	--// Faire une variable qui evite deux droit SetText2 sur le même control de text en même temps.
+	if self:GetText() == text then
+		--self:SetText(text)
+	else
+		--if ANIM_TEXT_ALLOWED then
+			self:StreamText(text, delay)
+		--else
+			--self:SetText(text)
+		--end
+	end
+end
