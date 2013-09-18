@@ -2432,7 +2432,7 @@ function CreateUI(maxPlayers)
         CreateOptionLobbyDialog()
     end
     --// Credits footer -- Xinnony
-    local Credits = 'New Skin by Xinnony and Barlots (v1.9)'
+    local Credits = 'New Skin by Xinnony and Barlots (v1.9b)'
     local Credits_Text_X = 11
     Credits_Text = UIUtil.CreateText(GUI.panel, '', 17, UIUtil.titleFont)
     SetText2(Credits_Text, Credits, 10)
@@ -3680,7 +3680,7 @@ function RefreshOptionDisplayData(scenarioInfo)
         local getNumbMod = table.getn(Mods.GetGameMods(gameInfo.GameMods)) -- 0 for the purposes of this function
         local getRstric = gameInfo.GameOptions.RestrictedCategories --can be nil or a table, even if no restrictions are present
 --~             AddChatText(tostring(cRstr))
-        if getVictory == 'demoralization' and getCheat == 'false' and getSpeed == 'normal' and getFog == 'explored' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and getRstric == (nil or 0) then
+        if getVictory == 'demoralization' and getCheat == 'false' and getSpeed == 'normal' and getFog == 'explored' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and (getRstric == nil or table.getn(getRstric) == 0) then
             --table.insert(formattedOptions, {text = 'Ranking',
                 --value = 'Ranked',
                 --green = true,
@@ -3700,6 +3700,8 @@ function RefreshOptionDisplayData(scenarioInfo)
     else
         if getInit == "init_blackops.lua" then
             SetText2(randmapText3, 'BlackOps MOD - ', 10)
+		elseif getInit == "init_coop.lua" then
+            SetText2(randmapText3, 'COOP - ', 10)
         elseif getInit == "init_balancetesting.lua" then
             SetText2(randmapText3, 'Balance Testing - ', 10)
         elseif getInit == "init_gw.lua" then
