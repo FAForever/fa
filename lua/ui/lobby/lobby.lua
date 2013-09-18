@@ -1370,8 +1370,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         end
         gameInfo.GameOptions['Ratings'] = allRatings
 
-        -- Tell everyone else to launch and then launch ourselves.
-        lobbyComm:BroadcastData( { Type = 'Launch', GameInfo = gameInfo } )
+        
 
         -- set the mods
         gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
@@ -1402,10 +1401,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
 		SetGameOption('Victory', 'sandbox')
 		add = 1
 		for armyIndex, armyName in scenarioArmies do
-			LOG(armyName)
-			LOG(stringstarts(armyName, "Coop"))
 			if armyName != "Player" and stringstarts(armyName, "Coop") == false then
-				LOG("editing " .. armyName)
 				gameInfo.PlayerOptions[armyIndex] = LobbyComm.GetDefaultPlayerOptions(armyName)
 				gameInfo.PlayerOptions[armyIndex].Human = false
 				gameInfo.PlayerOptions[armyIndex].Faction = 1
@@ -1417,7 +1413,8 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
 		
 		LOG(repr(gameInfo))
 
-		
+        -- Tell everyone else to launch and then launch ourselves.
+        lobbyComm:BroadcastData( { Type = 'Launch', GameInfo = gameInfo } )		
         lobbyComm:LaunchGame(gameInfo)
 
     end
