@@ -1370,8 +1370,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         end
         gameInfo.GameOptions['Ratings'] = allRatings
 
-        -- Tell everyone else to launch and then launch ourselves.
-        lobbyComm:BroadcastData( { Type = 'Launch', GameInfo = gameInfo } )
+
 
         -- set the mods
         gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
@@ -1417,6 +1416,8 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
 		
 		LOG(repr(gameInfo))
 
+		-- Tell everyone else to launch and then launch ourselves.
+        lobbyComm:BroadcastData( { Type = 'Launch', GameInfo = gameInfo } )
 		
         lobbyComm:LaunchGame(gameInfo)
 
