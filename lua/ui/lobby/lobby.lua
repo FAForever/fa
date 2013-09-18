@@ -2458,7 +2458,7 @@ function CreateUI(maxPlayers)
         CreateOptionLobbyDialog()
     end
     --// Credits footer -- Xinnony
-    local Credits = 'New Skin by Xinnony and Barlots (v1.9)'
+    local Credits = 'New Skin by Xinnony and Barlots (v1.9b)'
     local Credits_Text_X = 11
     Credits_Text = UIUtil.CreateText(GUI.panel, '', 17, UIUtil.titleFont)
     SetText2(Credits_Text, Credits, 10)
