@@ -220,7 +220,7 @@ function BeginSession()
     end
 
 #for off-map prevention
-    OnStartOffMapPreventionThread()
+    --OnStartOffMapPreventionThread()
     
 end
 
