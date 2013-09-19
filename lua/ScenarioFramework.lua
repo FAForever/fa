@@ -103,7 +103,7 @@ function CreateTimerTriggerUnlockCoop(cb, faction, seconds, displayBool)
         if iArmy >= ScenarioInfo.Coop1 then
             factionIdx = GetArmyBrain(strArmy):GetFactionIndex()
             if(factionIdx == faction) then
-                ScenarioFramework.CreateTimerTrigger(cb, seconds, displayBool)
+                CreateTimerTrigger(cb, seconds, displayBool)
             end
         end
     end
@@ -983,7 +983,7 @@ function RemoveRestrictionCoop(faction, categories, isSilent)
                     if not Sync.NewTech then Sync.NewTech = {} end
                     table.insert(Sync.NewTech, EntityCategoryGetUnitList(categories))
                 end
-                RemoveBuildRestriction(army, categories)
+                RemoveBuildRestriction(iArmy, categories)
             end
         end
     end
