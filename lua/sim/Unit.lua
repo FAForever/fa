@@ -4357,8 +4357,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     InitiateTeleportThread = function(self, teleporter, location, orientation)
-	        # added by brute51
-        self:OnTeleportCharging(location)
         local tbp = teleporter:GetBlueprint()
         local ubp = self:GetBlueprint()
         self.UnitBeingTeleported = self
@@ -4378,7 +4376,7 @@ Unit = Class(moho.unit_methods) {
         self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
 
         # create teleport charge effect
-        self:PlayTeleportChargeEffects(location)
+        self:PlayTeleportChargeEffects()
 
         WaitFor( self.TeleportDrain  ) # Perform fancy Teleportation FX here
 
@@ -4404,27 +4402,18 @@ Unit = Class(moho.unit_methods) {
         self:SetImmobile(false)
         self.UnitBeingTeleported = nil
         self.TeleportThread = nil
-		self:OnTeleported(location)
     end,
 
-    PlayTeleportChargeEffects = function(self, location)
+    PlayTeleportChargeEffects = function(self)
         local army = self:GetArmy()
         local bp = self:GetBlueprint()
-        local fx
-        local beacon = Entity()
 
         self.TeleportChargeBag = {}
         for k, v in EffectTemplate.GenericTeleportCharge01 do
-            fx = CreateEmitterAtEntity(self,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
+            local fx = CreateEmitterAtEntity(self,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
             self.Trash:Add(fx)
             table.insert( self.TeleportChargeBag, fx)
         end
-
-        location[2] = GetSurfaceHeight(location[1], location[3])
-        Warp(beacon, location)
-        fx = CreateEmitterAtEntity(beacon, army, '/effects/emitters/_test_swirl_01_emit.bp') -- other effect maybe?
-        self.Trash:Add(fx)
-        table.insert(self.TeleportChargeBag, fx)
     end,
 
     CleanupTeleportChargeEffects = function( self )
