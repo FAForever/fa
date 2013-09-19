@@ -1088,7 +1088,7 @@ end
 function PlayableRectCameraThread( rect )
 #    local cam = import('/lua/simcamera.lua').SimCamera('WorldCamera')
 #    LockInput()
-#    cam:UseSystemClock()
+#    cam:UseGameClock()
 #    cam:SyncPlayableRect(rect)
 #    cam:MoveTo(rect, 1)
 #    cam:WaitFor()
@@ -1589,7 +1589,7 @@ end
 function OperationCameraThread(location, heading, faction, track, unit, unlock, time)
     local cam = import('/lua/simcamera.lua').SimCamera('WorldCamera')
     LockInput()
-    cam:UseSystemClock()
+    cam:UseGameClock()
     WaitTicks(1)
     # Track the unit; not totally working properly yet
     if track and unit then
@@ -1672,7 +1672,7 @@ function MissionNISCameraThread( unit, blendtime, holdtime, orientationoffset, p
         ScenarioInfo.NIS = true
         local cam = import('/lua/simcamera.lua').SimCamera('WorldCamera')
         LockInput()
-        cam:UseSystemClock()
+        cam:UseGameClock()
         WaitTicks(1)
 
         local position = unit:GetPosition()
@@ -1765,7 +1765,7 @@ function OperationNISCameraThread( unitInfo, camInfo )
         ScenarioInfo.NIS = true
 
         LockInput()
-        cam:UseSystemClock()
+        cam:UseGameClock()
         Sync.NISMode = 'on'
 
         if (camInfo.vizRadius) then
@@ -1776,7 +1776,7 @@ function OperationNISCameraThread( unitInfo, camInfo )
                 LifeTime = -1,
                 Omni = false,
                 Vision = true,
-                Army = GetFocusArmy(),
+                Army = 1,
             }
             vizmarker = VizMarker(spec)
             WaitTicks(3) # this seems to be needed to prevent them from popping in

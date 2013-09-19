@@ -16,17 +16,8 @@ local pauseBtn = false
 
 timeoutsRemaining = false
 
-if SessionIsMultiplayer() then
-    local scenInfo = SessionGetScenarioInfo()
-    timeoutsRemaining = tonumber(scenInfo.Options.Timeouts)
-end
-
 function CanUserPause()
-    if timeoutsRemaining == false or timeoutsRemaining == -1 or timeoutsRemaining > 0 then
         return true
-    else
-        return false
-    end
 end
 
 local pauseGlow = {
