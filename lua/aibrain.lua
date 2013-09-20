@@ -1071,22 +1071,7 @@ AIBrain = Class(moho.aibrain_methods) {
         SetArmyOutOfGame(self:GetArmyIndex())
         
         # seems that FA send the OnDeath twice : one when losing, the other when disconnecting. But we only want it one time !
-    
-        if math.floor(self:GetArmyStat("FAFLose",0.0).Value) != -1 then
-            self:AddArmyStat("FAFLose", -1)
-        end
-        
-        local result = string.format("%s %i", "defeat", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
-        table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
-        
-        # Score change, we send the score of all other players, yes mam !
-        for index, brain in ArmyBrains do
-            if brain and not brain:IsDefeated() then
-                local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
-                table.insert( Sync.GameResult, { index, result } )
-            end
-        end
-        
+           
         import('/lua/SimUtils.lua').UpdateUnitCap(self:GetArmyIndex())
         import('/lua/SimPing.lua').OnArmyDefeat(self:GetArmyIndex())
         
@@ -1159,24 +1144,9 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
     
     OnVictory = function(self)
-        self:AddArmyStat("FAFWin", 5) 
-           local result = string.format("%s %i", "victory", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
-        table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
-        
-        # Score change, we send the score of all other players, yes mam !
-        for index, brain in ArmyBrains do
-            if brain and not brain:IsDefeated() then
-                local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
-                table.insert( Sync.GameResult, { index, result } )
-            end
-        end
-        
-
     end,
 
     OnDraw = function(self)
-        local result = string.format("%s %i", "draw", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
-        table.insert(Sync.GameResult, { self:GetArmyIndex(), result })
     end,
 
     IsDefeated = function(self)
