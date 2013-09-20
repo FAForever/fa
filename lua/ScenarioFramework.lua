@@ -25,6 +25,16 @@ function ExitGame()
     Sync.RequestingExit = true
 end
 
+#fill the human table
+function fillCoop()    
+    local tblArmy = ListArmies()
+    for iArmy, strArmy in pairs(tblArmy) do
+        if iArmy >= ScenarioInfo.Coop1 then
+            table.insert(ScenarioInfo.HumanPlayers, iArmy)
+        end
+    end
+end
+
 # Call to end an operation
 #   bool _success - instructs UI which dialog to show
 #   bool _allPrimary - true if all primary objectives completed, otherwise, false
