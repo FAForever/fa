@@ -1346,11 +1346,15 @@ function AddObjective(Type,         # 'primary', 'bonus', etc
         # Add a detectedBy callback to notify the user layer when our recon
         # on the target comes in and out.
         local detectedByCB = function(cbunit,armyindex)
-            LOG('detected by ',armyindex, ' focus = ',GetFocusArmy())
+            
+            if armyindex != 1 then
+                return
+            end
+            
             if not obj.Active then
                 return
             end
-
+            LOG('detected by ',armyindex, ' focus = ',GetFocusArmy())
             # now if we've been detected by the focus army ...
             if armyindex == GetFocusArmy() then
                 # get the blip that is associated with the unit
@@ -1604,8 +1608,12 @@ function AddObjective(Type,         # 'primary', 'bonus', etc
     objective.AddUnitTarget = function(self,unit)
         self.NextTargetTag = self.NextTargetTag + 1
         if unit:GetArmy() == GetFocusArmy() then
-            SetupFocusNotify(self,unit,self.NextTargetTag)
+            --it's our unit
+            if GetFocusArmy() == 1 then
+                SetupFocusNotify(self,unit,self.NextTargetTag)
+            end
         else
+            --it's someone else unit
             SetupNotify(self,unit,self.NextTargetTag)
         end
         if Target.AlwaysVisible then
