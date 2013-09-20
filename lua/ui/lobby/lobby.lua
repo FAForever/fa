@@ -1379,7 +1379,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
 
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
 
-		gameInfo.GameOptions['Difficulty'] = 2
+		gameInfo.GameOptions['Difficulty'] = 3
 	
 		LOG(repr(gameInfo))
 		
