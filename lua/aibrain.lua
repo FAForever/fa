@@ -572,7 +572,7 @@ AIBrain = Class(moho.aibrain_methods) {
             AMPlatoonCount = { DefaultGroupAir = 0, DefaultGroupLand = 0, DefaultGroupSea = 0, },
         }
         
-        if ScenarioInfo.type == 'campaign' then
+        if self.BrainType == 'AI' then
             self:SetResourceSharing(false)
         end
                 
