@@ -544,7 +544,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     defaultRow = 0
     if defaultScenarioName then
         for i, scenario in scenarios do
-            if scenario.file == defaultScenarioName then
+            if string.lower(scenario.file) == string.lower(defaultScenarioName) then
                 defaultRow = i - 1
                 break
             end
