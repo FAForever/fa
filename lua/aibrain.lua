@@ -555,6 +555,7 @@ AIBrain = Class(moho.aibrain_methods) {
         self.UnitBuiltTriggerList = {}
         self.FactoryAssistList = {}
         self.BrainType = 'AI'
+		self:SetResourceSharing(false)
     end,
 
     CreateBrainShared = function(self,planName)
@@ -571,11 +572,7 @@ AIBrain = Class(moho.aibrain_methods) {
             NeedSort = false,
             AMPlatoonCount = { DefaultGroupAir = 0, DefaultGroupLand = 0, DefaultGroupSea = 0, },
         }
-        
-        if ScenarioInfo.type == 'campaign' then
-            self:SetResourceSharing(false)
-        end
-                
+       
         self.ConstantEval = true
         self.IgnoreArmyCaps = false
         self.TriggerList = {}

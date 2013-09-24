@@ -844,6 +844,73 @@ function CreateArmyGroupAsPlatoonBalanced(strArmy, strGroup, formation, OnFinish
     OnFinishedCallback(units)
 end
 
+
+# CreateArmyGroupAsPlatoonCoopBalanced
+#
+# Returns a platoon that is created out of all units in a group and its sub groups.
+function CreateArmyGroupAsPlatoonCoopBalanced(strArmy, strGroup, formation, tblNode, platoon, balance)
+    if ScenarioInfo.LoadBalance.Enabled then
+        --note that tblNode in this case is actually the callback function
+        table.insert(ScenarioInfo.LoadBalance.PlatoonGroups, {strArmy, strGroup, formation, tblNode})
+        return
+    end
+    
+    local tblNode = tblNode or FindUnitGroup(strGroup, Scenario.Armies[strArmy].Units)
+    if not tblNode then
+        error('*SCENARIO UTILS ERROR: No group named- ' .. strGroup .. ' found for army- ' .. strArmy, 2)
+    end
+    if not formation then
+        error('*SCENARIO UTILS ERROR: No formation given to CreateArmyGroupAsPlatoon')
+    end
+    local brain = GetArmyBrain(strArmy)
+    if not brain.IgnoreArmyCaps then
+        SetIgnoreArmyUnitCap(brain:GetArmyIndex(), true)
+    end
+    local platoon = platoon or brain:MakePlatoon('','')
+    local armyIndex = brain:GetArmyIndex()
+
+    local unit = nil
+    for strName, tblData in pairs(tblNode.Units) do
+		for k, player in ScenarioInfo.HumanPlayers do
+			if 'GROUP' == tblData.type then
+				platoon = CreateArmyGroupAsPlatoon(strArmy, strGroup, formation, tblData, platoon)
+				if not brain.IgnoreArmyCaps then
+					SetIgnoreArmyUnitCap(brain:GetArmyIndex(), true)
+				end
+			else
+				unit = CreateUnitHPR( tblData.type,
+									 strArmy,
+									 tblData.Position[1], tblData.Position[2], tblData.Position[3],
+									 tblData.Orientation[1], tblData.Orientation[2], tblData.Orientation[3]
+								 )
+				if unit:GetBlueprint().Physics.FlattenSkirt then
+					unit:CreateTarmac(true, true, true, false, false)
+				end                               
+				if ScenarioInfo.UnitNames[armyIndex] then
+					ScenarioInfo.UnitNames[armyIndex][strName] = unit
+				end
+				unit.UnitName = strName
+				brain:AssignUnitsToPlatoon(platoon, {unit}, 'Attack', formation)
+				
+				if balance then
+					ScenarioInfo.LoadBalance.Accumulator = ScenarioInfo.LoadBalance.Accumulator + 1
+					
+					if ScenarioInfo.LoadBalance.Accumulator > ScenarioInfo.LoadBalance.UnitThreshold/5 then
+						WaitSeconds(0)
+						ScenarioInfo.LoadBalance.Accumulator = 0
+					end
+				end
+			end
+		end
+    end
+    if not brain.IgnoreArmyCaps then
+        SetIgnoreArmyUnitCap(brain:GetArmyIndex(), false)
+    end
+    return platoon
+end
+
+
+
 # CreateArmyGroupAsPlatoon
 #
 # Returns a platoon that is created out of all units in a group and its sub groups.
