@@ -906,6 +906,16 @@ function CreateArmyGroupAsPlatoon(strArmy, strGroup, formation, tblNode, platoon
     return platoon
 end
 
+# Creates an army group at a certain veteran level for coop
+function CreateArmyGroupAsPlatoonCoopBalancedVeteran(strArmy, strGroup, formation, veteranLevel)
+    local plat = CreateArmyGroupAsPlatoonCoopBalanced(strArmy, strGroup, formation)
+    veteranLevel = veteranLevel or 5
+    for k,v in plat:GetPlatoonUnits() do
+        v:SetVeterancy(veteranLevel)
+    end
+    return plat
+end  
+
 # Creates an army group at a certain veteran level
 function CreateArmyGroupAsPlatoonVeteran(strArmy, strGroup, formation, veteranLevel)
     local plat = CreateArmyGroupAsPlatoon(strArmy, strGroup, formation)
