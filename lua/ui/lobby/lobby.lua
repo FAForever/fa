@@ -5041,20 +5041,21 @@ end -- NewShowMapPositions(...)
 -- CPU Benchmark Code
 -- Author: Duck_42
 -- Date: 2013.04.05
+-- 
+-- 2013.09.24 - Significant change to benchmark logic.  This should improve accuracy and eliminate some
+--              problems.
 --******************************************************************************************************
-local benchmarkLength = 5 --5.0 Seconds
 
 --CPU Status Bar Configuration
 local barMax = 450
 local barMin = 150
 local greenBarMax = 300
 local yellowBarMax = 375
-local scoreSkew1 = -25 --Skews all CPU scores up or down by the amount specified (0 = no skew)
+local scoreSkew1 = 0 --Skews all CPU scores up or down by the amount specified (0 = no skew)
 local scoreSkew2 = 1.0 --Skews all CPU scores specified coefficient (1.0 = no skew)
 
 --Variables for CPU Test
-local running
-local loopCount
+local benchTime
 local firstCPUTest = true
 
 --------------------------------------------------
@@ -5092,25 +5093,35 @@ end
 --------------------------------------------------
 function CPUBenchmark()
     --This function gives the CPU some busy work to do.
-    --CPU score is determined by how many times it can loop through
-    --the set of busy work before the timer in the CPUTimer function expires.
-    while running do
-         for i = 1.0, 2.0, .000008 do 
+    --CPU score is determined by how quickly the work is completed.
+    local totalTime = 0
+    local lastTime
+    local currTime
+    
+    --Make everything a local variable
+    --This is necessary because we don't want LUA searching through the globals as part of the benchmark
+    local h
+    local i
+    local j
+    local k
+    local l
+    local m
+    for h = 1, 225, 1 do 
+        lastTime = GetSystemTimeSeconds()
+        for i = 1.0, 4.0, 0.000008 do 
             j = i + i
             k = i * i
             l = k / j
             m = j - i
         end
-        loopCount = loopCount + 1
-        --This is necessary in order to make this 'thread' yield so other things can be done (namely the CPUTimer function).
-        WaitSeconds(0)
-     end
-end
+        currTime = GetSystemTimeSeconds()
+        totalTime = totalTime + currTime - lastTime
 
-function CPUTimer()
-    --This function handles the benchmark timer.  When this function completes, the benchmark is stopped.
-    WaitSeconds(benchmarkLength)
-    running = false
+        --This is necessary in order to make this 'thread' yield so other things can be done.
+        WaitSeconds(0)
+    end
+
+    benchTime = math.ceil(totalTime * 100)
 end
 
 --------------------------------------------------
@@ -5184,21 +5195,18 @@ function StressCPU(waitTime)
 
     --Run three benchmarks and keep the best one
     for i=1, 3, 1 do
-        loopCount = 0
-        running = true
-        ForkThread(CPUTimer)
+        benchTime = 0
+
         CPUBenchmark()
 
-        --Invert scale for display purposes
-        --With .01 sec wait intervals the max number of loops should be 100 * benchmarkLength
-        loopCount = (benchmarkLength * 100) - math.min(scoreSkew2 * loopCount + scoreSkew1, (benchmarkLength * 100))
+        benchTime = scoreSkew2 * benchTime + scoreSkew1
 
-        --LOG('CPU benchmark #'..i..' complete: '.. loopCount )
+        --LOG('CPU benchmark #'..i..' complete: '.. benchTime )
 
         --If this benchmark was better than our best so far...
-        if loopCount < currentBestBenchmark then
+        if benchTime < currentBestBenchmark then
             --Make this our best benchmark
-            currentBestBenchmark = loopCount
+            currentBestBenchmark = benchTime
 
             --Send it to the other players
             lobbyComm:BroadcastData( { Type = 'CPUBenchmark', PlayerName = localPlayerName, Result = currentBestBenchmark} )
@@ -5212,7 +5220,7 @@ function StressCPU(waitTime)
     end
 
     --Show message if player's score is very low
-    if currentBestBenchmark >= 450 and firstCPUTest then
+    if currentBestBenchmark >= 475 and firstCPUTest then
         AddChatText(LOCF('<LOC lobui_0901>SYSTEM: Your CPU score is unusually low.'))
         AddChatText(LOCF('<LOC lobui_0902>SYSTEM: This can be caused by using ALT-TAB or minimizing the game after joining.'))
         AddChatText(LOCF('<LOC lobui_0903>SYSTEM: Certain CPU power saving features can also cause this.'))
