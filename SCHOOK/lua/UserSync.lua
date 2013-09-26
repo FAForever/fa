@@ -97,7 +97,6 @@ OnSync = function()
 
     for k,gameResult in Sync.GameResult do
         local armyIndex, result = unpack(gameResult)
-        GpgNetSend('GameResult', armyIndex, result)
         import('/lua/ui/game/gameresult.lua').DoGameResult(armyIndex, result)
     end
 
@@ -125,7 +124,7 @@ OnSync = function()
 
     if Sync.OperationComplete then
         if Sync.OperationComplete.success then
-            GpgNetSend('OperationComplete', Sync.OperationComplete.difficulty, Sync.OperationComplete.allPrimary, Sync.OperationComplete.allSecondary, GetGameTime())
+            GpgNetSend('OperationComplete', Sync.OperationComplete.allPrimary, Sync.OperationComplete.allSecondary, GetGameTime())
         end
         import('/lua/ui/campaign/campaignmanager.lua').OperationVictory(Sync.OperationComplete)
     end

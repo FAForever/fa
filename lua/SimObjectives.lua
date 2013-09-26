@@ -1342,11 +1342,13 @@ function AddObjective(Type,         # 'primary', 'bonus', etc
     # Takes a unit that is an objective target and uses its recon detect
     # event to notify the objectives that we have a blip for the unit.
     local function SetupNotify(obj,unit,targetTag)
-
+		if GetFocusArmy() == -1 then
+			return
+		end
         # Add a detectedBy callback to notify the user layer when our recon
         # on the target comes in and out.
         local detectedByCB = function(cbunit,armyindex)
-            
+            			
             if armyindex != 1 then
                 return
             end

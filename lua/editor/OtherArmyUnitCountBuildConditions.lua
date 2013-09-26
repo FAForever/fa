@@ -29,8 +29,9 @@ function BrainGreaterThanNumCategory( aiBrain, targetBrain, numReq, category )
             break
         end
     end
-    local numUnits = 0    
-    if v.Name == 'Player' then
+    local numUnits = 0   
+	
+    if testBrain.Name == 'Player' then
         local tblArmy = ListArmies()
         for iArmy, strArmy in pairs(tblArmy) do
             if ScenarioInfo.ArmySetup[strArmy].Human then
@@ -68,7 +69,7 @@ function BrainLessThanNumCategory( aiBrain, targetBrain, numReq, category )
     end
     
     local numUnits = 0    
-    if v.Name == 'Player' then
+    if testBrain.Name == 'Player' then
         local tblArmy = ListArmies()
         for iArmy, strArmy in pairs(tblArmy) do
             if ScenarioInfo.ArmySetup[strArmy].Human then
@@ -107,7 +108,7 @@ function BrainGreaterThanOrEqualNumCategory( aiBrain, targetBrain, numReq, categ
     end
     
     local numUnits = 0    
-    if v.Name == 'Player' then
+    if testBrain.Name == 'Player' then
         local tblArmy = ListArmies()
         for iArmy, strArmy in pairs(tblArmy) do
             if ScenarioInfo.ArmySetup[strArmy].Human then
@@ -147,7 +148,7 @@ function BrainLessThanOrEqualNumCategory( aiBrain, targetBrain, numReq, category
     end
     
     local numUnits = 0    
-    if v.Name == 'Player' then
+    if testBrain.Name == 'Player' then
         local tblArmy = ListArmies()
         for iArmy, strArmy in pairs(tblArmy) do
             if ScenarioInfo.ArmySetup[strArmy].Human then
