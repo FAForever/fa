@@ -29,7 +29,18 @@ function BrainGreaterThanNumCategory( aiBrain, targetBrain, numReq, category )
             break
         end
     end
-    local numUnits = testBrain:GetCurrentUnits(category)
+    local numUnits = 0    
+    if v.Name == 'Player' then
+        local tblArmy = ListArmies()
+        for iArmy, strArmy in pairs(tblArmy) do
+            if ScenarioInfo.ArmySetup[strArmy].Human then
+                testBrain = GetArmyBrain(strArmy)
+                numUnits = numUnits + testBrain:GetCurrentUnits(category)
+            end
+        end    
+    else
+        numUnits = testBrain:GetCurrentUnits(category)
+    end
     if numUnits > numReq then
         return true
     else
@@ -55,7 +66,20 @@ function BrainLessThanNumCategory( aiBrain, targetBrain, numReq, category )
             break
         end
     end
-    local numUnits = testBrain:GetCurrentUnits(category)
+    
+    local numUnits = 0    
+    if v.Name == 'Player' then
+        local tblArmy = ListArmies()
+        for iArmy, strArmy in pairs(tblArmy) do
+            if ScenarioInfo.ArmySetup[strArmy].Human then
+                testBrain = GetArmyBrain(strArmy)
+                numUnits = numUnits + testBrain:GetCurrentUnits(category)
+            end
+        end    
+    else
+        numUnits = testBrain:GetCurrentUnits(category)
+    end
+    
     if numUnits < numReq then
         return true
     else
@@ -81,7 +105,21 @@ function BrainGreaterThanOrEqualNumCategory( aiBrain, targetBrain, numReq, categ
             break
         end
     end
-    local numUnits = testBrain:GetCurrentUnits(category)
+    
+    local numUnits = 0    
+    if v.Name == 'Player' then
+        local tblArmy = ListArmies()
+        for iArmy, strArmy in pairs(tblArmy) do
+            if ScenarioInfo.ArmySetup[strArmy].Human then
+                testBrain = GetArmyBrain(strArmy)
+                numUnits = numUnits + testBrain:GetCurrentUnits(category)
+            end
+        end    
+    else
+        numUnits = testBrain:GetCurrentUnits(category)
+    end
+    
+    
     if numUnits >= numReq then
         return true
     else
@@ -107,7 +145,20 @@ function BrainLessThanOrEqualNumCategory( aiBrain, targetBrain, numReq, category
             break
         end
     end
-    local numUnits = testBrain:GetCurrentUnits(category)
+    
+    local numUnits = 0    
+    if v.Name == 'Player' then
+        local tblArmy = ListArmies()
+        for iArmy, strArmy in pairs(tblArmy) do
+            if ScenarioInfo.ArmySetup[strArmy].Human then
+                testBrain = GetArmyBrain(strArmy)
+                numUnits = numUnits + testBrain:GetCurrentUnits(category)
+            end
+        end    
+    else
+        numUnits = testBrain:GetCurrentUnits(category)
+    end    
+
     if numUnits <= numReq then
         return true
     else
