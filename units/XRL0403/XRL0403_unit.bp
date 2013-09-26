@@ -8,9 +8,7 @@ UnitBlueprint {
             'Left_Leg01_B01',
             'Right_Leg02_B01',
             'Right_Leg01_B01',
-            'URL0403',
-            'Right_Turret_Barrel',
-            'Left_Turret_Barrel',            
+            'URL0403',       
         },
     },
     Audio = {
@@ -132,13 +130,13 @@ UnitBlueprint {
             LODs = {
                 {
                     LODCutoff = 200,
-                    MeshName = '/Units/xrl0404/xrl0404_LOD0.scm',
+                    MeshName = '/Units/xrl0403/xrl0403_LOD0.scm',
                     ShaderName = 'Insect',
                 },
                 {
                     AlbedoName = 'xrl0403_lod1_albedo.dds',
                     LODCutoff = 400,
-                    MeshName = '/Units/xrl0404/xrl0404_LOD1.scm',
+                    MeshName = '/Units/xrl0403/xrl0403_LOD1.scm',
                     ShaderName = 'Insect',
                     SpecularName = 'xrl0403_lod1_specteam.dds',
                 },
@@ -264,7 +262,7 @@ UnitBlueprint {
     LifeBarOffset = 3.7,
     LifeBarSize = 9,
     Physics = {
-        BackUpDistance = 12,
+        BackUpDistance = 10,
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
@@ -277,7 +275,7 @@ UnitBlueprint {
         DragCoefficient = 0.2,
         MaxAcceleration = 2,
         MaxSpeed = 2,
-        MaxSpeedReverse = 1,
+        MaxSpeedReverse = 2,
         MaxSteerForce = 0,
         MinSpeedPercent = 0,
         MotionType = 'RULEUMT_Amphibious',
@@ -329,7 +327,7 @@ UnitBlueprint {
                     LodCutoff = 'Weapon_LodCutoff',
                 },
             },
-            AutoInitiateAttackCommand = false,
+            AutoInitiateAttackCommand = true,
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
             Damage = 750,
@@ -352,7 +350,7 @@ UnitBlueprint {
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 65,
             ProjectileId = '/projectiles/CDFProtonCannon05/CDFProtonCannon05_proj.bp',
-			ProjectileLifetime = 0.9, # fix for Megalith huge range bug [126]
+            ProjectileLifetime = 0.9, # fix for Megalith huge range bug [126]
             RackBones = {
                 {
                     MuzzleBones = {
@@ -442,7 +440,7 @@ UnitBlueprint {
             MuzzleVelocity = 65,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/CDFProtonCannon05/CDFProtonCannon05_proj.bp',
-			ProjectileLifetime = 0.9, # fix for Megalith huge range bug [126]
+            ProjectileLifetime = 0.9, # fix for Megalith huge range bug [126]
             RackBones = {
                 {
                     MuzzleBones = {
@@ -746,13 +744,8 @@ UnitBlueprint {
             MuzzleVelocityReduceDistance = 28,
             ProjectileId = '/projectiles/CIFBrackmanHackPegs01/CIFBrackmanHackPegs01_proj.bp',
             ProjectilesPerOnFire = 5,
-            RackBones = {
-                {
-                    MuzzleBones = {
-                        'XRL0403',
-                    },
-                    RackBone = 'XRL0403',
-                },
+            RackBones={
+                { MuzzleBones={ "Missile_Muzzle" }, RackBone="Missile_Barrel" }
             },
             RackFireTogether = false,
             RackRecoilDistance = -1,
