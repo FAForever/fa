@@ -123,11 +123,11 @@ OnSync = function()
     end
 
     if Sync.OperationComplete then
+        import('/lua/ui/campaign/campaignmanager.lua').OperationVictory(Sync.OperationComplete)
         if Sync.OperationComplete.success then
             GpgNetSend('OperationComplete', Sync.OperationComplete.allPrimary, Sync.OperationComplete.allSecondary, GetGameTime())
         end
-        import('/lua/ui/campaign/campaignmanager.lua').OperationVictory(Sync.OperationComplete)
-    end
+	end
 
     if Sync.Cheaters then
         # Ted, this is where you would hook in better cheater reporting.
