@@ -125,7 +125,11 @@ OnSync = function()
     if Sync.OperationComplete then
         import('/lua/ui/campaign/campaignmanager.lua').OperationVictory(Sync.OperationComplete)
         if Sync.OperationComplete.success then
-            GpgNetSend('OperationComplete', Sync.OperationComplete.allPrimary, Sync.OperationComplete.allSecondary, GetGameTime())
+			local secondary = 0
+			if Sync.OperationComplete.allSecondary == 1 then
+				secondary = 1
+			end
+            GpgNetSend('OperationComplete', Sync.OperationComplete.allPrimary, secondary, GetGameTime())
         end
 	end
 
