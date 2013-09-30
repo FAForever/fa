@@ -7,6 +7,7 @@
 #--[                                                                             ]--
 #--[  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.             ]--
 local Entity = import('/lua/sim/Entity.lua').Entity
+local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 
 function EnableLoadBalance(enabled, unitThreshold) --distributeTime)
     if not ScenarioInfo.LoadBalance then 
@@ -538,6 +539,7 @@ function InitializeScenarioArmies()
             if tblData.faction != nil then
                 
                 if ScenarioInfo.ArmySetup[strArmy].Human then
+					ScenarioFramework.AddRestriction(strArmy, (categories.WALL))
                     local factionIndex = math.min(math.max(ScenarioInfo.ArmySetup[strArmy].Faction, 1), table.getsize(factions.Factions))
                     SetArmyFactionIndex( strArmy, factionIndex - 1 )
                 else
