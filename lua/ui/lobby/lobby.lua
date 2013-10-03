@@ -6,6 +6,8 @@
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
 
+LOBBYversion = 'v1.9d'
+
 local UIUtil = import('/lua/ui/uiutil.lua')
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
 local Prefs = import('/lua/user/prefs.lua')
@@ -32,7 +34,8 @@ local teamOpts = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
 local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
 local gameColors = import('/lua/gameColors.lua').GameColors
 local numOpenSlots = LobbyComm.maxPlayerSlots
-local formattedOptions = {}
+formattedOptions = {''}
+FormOpt2 = {''}
 local teamIcons = {
     '/lobby/team_icons/team_no_icon.dds',
     '/lobby/team_icons/team_1_icon.dds',
@@ -45,6 +48,7 @@ local teamIcons = {
 
 --// Xinnony DEBUG
 XinnonyDebug = 0
+XinnonyOption = 0
 -- 0 = NO DEBUG (Default)
 -- -1 = DEBUG OTHER
 -- 1 = DEBUG Country
@@ -2458,7 +2462,7 @@ function CreateUI(maxPlayers)
         CreateOptionLobbyDialog()
     end
     --// Credits footer -- Xinnony
-    local Credits = 'New Skin by Xinnony and Barlots (v1.9c)'
+    local Credits = 'New Skin by Xinnony and Barlots ('..LOBBYversion..')'
     local Credits_Text_X = 11
     Credits_Text = UIUtil.CreateText(GUI.panel, '', 17, UIUtil.titleFont)
     SetText2(Credits_Text, Credits, 10)
@@ -2554,7 +2558,7 @@ function CreateUI(maxPlayers)
         --GUI.RankedLabel:SetColor('ff7777') -- 77ff77
         GUI.RankedLabel:SetDropShadow(true)
     
-    -- XinnonyWork -- Checkbox Show changed Options
+    -- Checkbox Show changed Options
     cbox_ShowChangedOption = UIUtil.CreateCheckboxStd(GUI.optionsPanel, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel, 3, 0)
         --LayoutHelpers.AtHorizontalCenterIn(cbox_ShowChangedOption, GUI.optionsPanel, -8)
@@ -2563,15 +2567,26 @@ function CreateUI(maxPlayers)
             cbox_ShowChangedOption_TEXT:SetDropShadow(true)
             LayoutHelpers.AtLeftIn(cbox_ShowChangedOption_TEXT, cbox_ShowChangedOption, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox_ShowChangedOption_TEXT, cbox_ShowChangedOption)
-            cbox_ShowChangedOption:Disable()
+            --cbox_ShowChangedOption:Disable()
             Tooltip.AddButtonTooltip(cbox_ShowChangedOption_TEXT, {text='Show only changed Options', body='Not working yet, coming soon!'})
             cbox_ShowChangedOption.OnCheck = function(self, checked)
                 if checked then
-                    cbox_ShowChangedOption:SetCheck(false, true)
+                    XinnonyOption = 1
+					RefreshOptionDisplayData()
+					GUI.OptionContainer.ScrollSetTop('Vert', 0)
+					if GUI.OptionContainer.CalcVisible then
+						GUI.OptionContainer:CalcVisible()
+					end
                 else
+					XinnonyOption = 0
+					RefreshOptionDisplayData()
+					GUI.OptionContainer.ScrollSetTop('Vert', 0)
+					if GUI.OptionContainer.CalcVisible then
+						GUI.OptionContainer:CalcVisible()
+					end
                 end
             end
-    -- XinnonyWork -- Checkbox Show changed Options
+    -- Checkbox Show changed Options
 
     -- GAME OPTIONS // MODS MANAGER BUTTON --
     if lobbyComm:IsHost() then     -- GAME OPTION
@@ -2774,7 +2789,7 @@ function CreateUI(maxPlayers)
     GUI.OptionDisplay = {}
     RefreshOptionDisplayData()
 
-    local function CreateOptionElements()
+    function CreateOptionElements()
         local function CreateElement(index)
             GUI.OptionDisplay[index] = Group(GUI.OptionContainer)
             GUI.OptionDisplay[index].Height:Set(36)
@@ -2813,8 +2828,8 @@ function CreateUI(maxPlayers)
         LayoutHelpers.AtLeftTopIn(GUI.OptionDisplay[1], GUI.OptionContainer)
 
         local index = 2
-        while GUI.OptionDisplay[table.getsize(GUI.OptionDisplay)].Bottom() + GUI.OptionDisplay[1].Height() <
-              GUI.OptionContainer.Bottom() do
+        while index != 8 do
+		--while GUI.OptionDisplay[table.getsize(GUI.OptionDisplay)].Bottom() + GUI.OptionDisplay[1].Height() < GUI.OptionContainer.Bottom() do
             CreateElement(index)
             LayoutHelpers.Below(GUI.OptionDisplay[index], GUI.OptionDisplay[index-1])
             index = index + 1
@@ -2825,7 +2840,11 @@ function CreateUI(maxPlayers)
     local numLines = function() return table.getsize(GUI.OptionDisplay) end
 
     local function DataSize()
-        return table.getn(formattedOptions)
+		if XinnonyOption == 0 then
+			return table.getn(formattedOptions)
+		elseif XinnonyOption == 1 then
+			return table.getn(FormOpt2)
+		end
     end
 
     -- called when the scrollbar for the control requires data to size itself
@@ -2886,7 +2905,9 @@ function CreateUI(maxPlayers)
                 LayoutHelpers.ResetLeft(line.value)
             end
             line.text:SetText(LOC(data.text))
+			line.value.bg:Show()
             line.value:SetText(LOC(data.value))
+			line.value.bg2:Show()
             line.value.bg.HandleEvent = Group.HandleEvent
             line.value.bg2.HandleEvent = Bitmap.HandleEvent
             if data.tooltip then
@@ -2894,11 +2915,29 @@ function CreateUI(maxPlayers)
                 Tooltip.AddControlTooltip(line.value.bg2, data.valueTooltip)
             end
         end
-        for i, v in GUI.OptionDisplay do
-            if formattedOptions[i + self.top] then
-                SetTextLine(v, formattedOptions[i + self.top], i + self.top)
-            end
+        
+		for i, v in GUI.OptionDisplay do
+            if XinnonyOption == 0 then
+				if formattedOptions[i + self.top] then
+					SetTextLine(v, formattedOptions[i + self.top], i + self.top)
+				else
+					v.text:SetText('')
+					v.value:SetText('')
+					v.value.bg:Hide()
+					v.value.bg2:Hide()
+				end
+			elseif XinnonyOption == 1 then
+				if FormOpt2[i + self.top] then
+					SetTextLine(v, FormOpt2[i + self.top], i + self.top)
+				else
+					v.text:SetText('')
+					v.value:SetText('')
+					v.value.bg:Hide()
+					v.value.bg2:Hide()
+				end
+			end
         end
+		
     end
 
     GUI.OptionContainer:CalcVisible()
@@ -3690,6 +3729,7 @@ function RefreshOptionDisplayData(scenarioInfo)
     local teamOptions = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
     local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
     formattedOptions = {}
+	FormOpt2 = {}
 
 --// Check Ranked active -- Xinnony & Vicarian
     local getInit = GetCommandLineArg("/init", 1)
@@ -3769,16 +3809,26 @@ function RefreshOptionDisplayData(scenarioInfo)
             mod = true,
             tooltip = 'Lobby_Mod_Option',
             valueTooltip = 'Lobby_Mod_Option'})
+		table.insert(FormOpt2, {text = LOCF(modStr, modNum),
+            value = LOC('<LOC lobby_0003>Check Mod Manager'),
+            mod = true,
+            tooltip = 'Lobby_Mod_Option',
+            valueTooltip = 'Lobby_Mod_Option'})
     end
 --\\ Stop Check Mod active
 --// Check RestrictedUnit active
     if gameInfo.GameOptions.RestrictedCategories != nil then
         if table.getn(gameInfo.GameOptions.RestrictedCategories) != 0 then
             table.insert(formattedOptions, {text = LOC("<LOC lobby_0005>Build Restrictions Enabled"),
-            value = LOC("<LOC lobby_0006>Check Unit Manager"),
-            mod = true,
-            tooltip = 'Lobby_BuildRestrict_Option',
-            valueTooltip = 'Lobby_BuildRestrict_Option'})
+				value = LOC("<LOC lobby_0006>Check Unit Manager"),
+				mod = true,
+				tooltip = 'Lobby_BuildRestrict_Option',
+				valueTooltip = 'Lobby_BuildRestrict_Option'})
+			table.insert(FormOpt2, {text = LOC("<LOC lobby_0005>Build Restrictions Enabled"),
+				value = LOC("<LOC lobby_0006>Check Unit Manager"),
+				mod = true,
+				tooltip = 'Lobby_BuildRestrict_Option',
+				valueTooltip = 'Lobby_BuildRestrict_Option'})
         end
     end
 --\\ Stop Check RestrictedUnit active
@@ -3810,8 +3860,15 @@ function RefreshOptionDisplayData(scenarioInfo)
                 mpOnly = optData.mponly or false
                 option = {text = optData.label, tooltip = optData.pref}
                 for _, val in optData.values do
-                    if val.key == v then
-                        option.value = val.text
+					if val.key == v then
+						if optData.default and _ != optData.default then -- If the option is not default value, insert. - Xinnony
+							table.insert(FormOpt2, {
+								text = optData.label,
+								value = val.text,
+								tooltip = {text = optData.label, body = optData.help},
+								valueTooltip = {text = optData.label, body = val.help}})
+						end
+						option.value = val.text
                             option.valueTooltip = 'lob_'..optData.key..'_'..val.key
                         break
                     end
@@ -3825,7 +3882,14 @@ function RefreshOptionDisplayData(scenarioInfo)
                     option = {text = optData.label, tooltip = optData.pref}
                     for _, val in optData.values do
                         if val.key == v then
-                            option.value = val.text
+							if optData.default and _ != optData.default then -- If the option is not default value, insert. - Xinnony
+								table.insert(FormOpt2, {
+									text = optData.label,
+									value = val.text,
+									tooltip = {text = optData.label, body = optData.help},
+									valueTooltip = {text = optData.label, body = val.help}})
+							end
+							option.value = val.text
                             option.valueTooltip = 'lob_'..optData.key..'_'..val.key
                             break
                         end
@@ -3840,7 +3904,14 @@ function RefreshOptionDisplayData(scenarioInfo)
                     option = {text = optData.label, tooltip = optData.pref}
                     for _, val in optData.values do
                         if val.key == v then
-                            option.value = val.text
+							if optData.default and _ != optData.default then -- If the option is not default value, insert. - Xinnony
+								table.insert(FormOpt2, {
+									text = optData.label,
+									value = val.text,
+									tooltip = {text = optData.label, body = optData.help},
+									valueTooltip = {text = optData.label, body = val.help}})
+							end
+							option.value = val.text
                             option.valueTooltip = 'lob_'..optData.key..'_'..val.key
                             break
                         end
@@ -3855,7 +3926,14 @@ function RefreshOptionDisplayData(scenarioInfo)
                     option = {text = optData.label, tooltip = optData.pref}
                     for _, val in optData.values do
                         if val.key == v then
-                            option.value = val.text
+							if optData.default and _ != optData.default then -- If the option is not default value, insert. - Xinnony
+								table.insert(FormOpt2, {
+									text = optData.label,
+									value = val.text,
+									tooltip = {text = optData.label, body = optData.help},
+									valueTooltip = {text = optData.label, body = val.help}})
+							end
+							option.value = val.text
                             option.valueTooltip = 'lob_'..optData.key..'_'..val.key
                             break
                         end
@@ -3867,15 +3945,9 @@ function RefreshOptionDisplayData(scenarioInfo)
         if option then
             if not mpOnly or not singlePlayer then
                 table.insert(formattedOptions, option)
-                --table.removeByValue(formattedOptions, option.value)
-                --AddChatText("__opt__"..option.value)
             end
         end
     end
-
-    -- XinnonyWork
-    --Remove_Unchanged_Options()
-    -- XinnonyWork
 
 -- Disable before separate AI option on GlobalOption, but the order can set on lobbyOptions.lua - Xinnony
 --    table.sort(formattedOptions,
@@ -5041,20 +5113,21 @@ end -- NewShowMapPositions(...)
 -- CPU Benchmark Code
 -- Author: Duck_42
 -- Date: 2013.04.05
+-- 
+-- 2013.09.24 - Significant change to benchmark logic.  This should improve accuracy and eliminate some
+--              problems.
 --******************************************************************************************************
-local benchmarkLength = 5 --5.0 Seconds
 
 --CPU Status Bar Configuration
 local barMax = 450
 local barMin = 150
 local greenBarMax = 300
 local yellowBarMax = 375
-local scoreSkew1 = -25 --Skews all CPU scores up or down by the amount specified (0 = no skew)
+local scoreSkew1 = 0 --Skews all CPU scores up or down by the amount specified (0 = no skew)
 local scoreSkew2 = 1.0 --Skews all CPU scores specified coefficient (1.0 = no skew)
 
 --Variables for CPU Test
-local running
-local loopCount
+local benchTime
 local firstCPUTest = true
 
 --------------------------------------------------
@@ -5092,25 +5165,35 @@ end
 --------------------------------------------------
 function CPUBenchmark()
     --This function gives the CPU some busy work to do.
-    --CPU score is determined by how many times it can loop through
-    --the set of busy work before the timer in the CPUTimer function expires.
-    while running do
-         for i = 1.0, 2.0, .000008 do 
+    --CPU score is determined by how quickly the work is completed.
+    local totalTime = 0
+    local lastTime
+    local currTime
+    
+    --Make everything a local variable
+    --This is necessary because we don't want LUA searching through the globals as part of the benchmark
+    local h
+    local i
+    local j
+    local k
+    local l
+    local m
+    for h = 1, 225, 1 do 
+        lastTime = GetSystemTimeSeconds()
+        for i = 1.0, 4.0, 0.000008 do 
             j = i + i
             k = i * i
             l = k / j
             m = j - i
         end
-        loopCount = loopCount + 1
-        --This is necessary in order to make this 'thread' yield so other things can be done (namely the CPUTimer function).
-        WaitSeconds(0)
-     end
-end
+        currTime = GetSystemTimeSeconds()
+        totalTime = totalTime + currTime - lastTime
 
-function CPUTimer()
-    --This function handles the benchmark timer.  When this function completes, the benchmark is stopped.
-    WaitSeconds(benchmarkLength)
-    running = false
+        --This is necessary in order to make this 'thread' yield so other things can be done.
+        WaitSeconds(0)
+    end
+
+    benchTime = math.ceil(totalTime * 100)
 end
 
 --------------------------------------------------
@@ -5184,21 +5267,18 @@ function StressCPU(waitTime)
 
     --Run three benchmarks and keep the best one
     for i=1, 3, 1 do
-        loopCount = 0
-        running = true
-        ForkThread(CPUTimer)
+        benchTime = 0
+
         CPUBenchmark()
 
-        --Invert scale for display purposes
-        --With .01 sec wait intervals the max number of loops should be 100 * benchmarkLength
-        loopCount = (benchmarkLength * 100) - math.min(scoreSkew2 * loopCount + scoreSkew1, (benchmarkLength * 100))
+        benchTime = scoreSkew2 * benchTime + scoreSkew1
 
-        --LOG('CPU benchmark #'..i..' complete: '.. loopCount )
+        --LOG('CPU benchmark #'..i..' complete: '.. benchTime )
 
         --If this benchmark was better than our best so far...
-        if loopCount < currentBestBenchmark then
+        if benchTime < currentBestBenchmark then
             --Make this our best benchmark
-            currentBestBenchmark = loopCount
+            currentBestBenchmark = benchTime
 
             --Send it to the other players
             lobbyComm:BroadcastData( { Type = 'CPUBenchmark', PlayerName = localPlayerName, Result = currentBestBenchmark} )
@@ -5212,7 +5292,7 @@ function StressCPU(waitTime)
     end
 
     --Show message if player's score is very low
-    if currentBestBenchmark >= 450 and firstCPUTest then
+    if currentBestBenchmark >= 475 and firstCPUTest then
         AddChatText(LOCF('<LOC lobui_0901>SYSTEM: Your CPU score is unusually low.'))
         AddChatText(LOCF('<LOC lobui_0902>SYSTEM: This can be caused by using ALT-TAB or minimizing the game after joining.'))
         AddChatText(LOCF('<LOC lobui_0903>SYSTEM: Certain CPU power saving features can also cause this.'))
@@ -6061,7 +6141,7 @@ function CreateOptionLobbyDialog()
             cbox6_1:SetDropShadow(true)
             LayoutHelpers.AtRightIn(cbox6_1, cbox6_0, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox6_1, cbox6_0)
-            Tooltip.AddButtonTooltip(cbox6_1, {text='White Skin', body='White Skin is not available yet'})
+            Tooltip.AddButtonTooltip(cbox6_1, {text='White Skin', body='White Skin is not available yet, Need a Graphic Artist !!!'})
             cbox6_0:Disable()
             cbox6_0.OnClick = function(self, checked)
                 cbox6_0:SetCheck(false, true)
@@ -6075,7 +6155,7 @@ function CreateOptionLobbyDialog()
             cbox_StretchBG_TEXT:SetDropShadow(true)
             LayoutHelpers.AtRightIn(cbox_StretchBG_TEXT, cbox_StretchBG, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox_StretchBG_TEXT, cbox_StretchBG)
-            Tooltip.AddButtonTooltip(cbox_StretchBG_TEXT, {text='Stretch Background', body='...'})
+            Tooltip.AddButtonTooltip(cbox_StretchBG_TEXT, {text='Stretch Background', body='You can stretch the background over the entire surface of this game.'})
             cbox_StretchBG.OnCheck = function(self, checked)
                 if checked then
                     Prefs.SetToCurrentProfile('XinnoBackgroundStretch', 'true')
@@ -6108,8 +6188,8 @@ function CreateOptionLobbyDialog()
         LayoutHelpers.AtBottomIn(text0, dialog2, 130)
         -- Ask to Xinnony for add your name and work correctly
     local text = {}
-    local ttext = {'- Xinnony : New Skin (with Barlots), Faction Selector, Country Flag, Move Player to,',
-                        'Color State in Nickname, Custom Title, Sort option, Game is/not Ranked label, bugs fixing.',
+    local ttext = {'- Xinnony : New Skin (with Barlots), Faction Selector, Country Flag, Move Player to, Hide Unchanged option,',
+                        'Color State in Nickname, Custom Title, Sort option, Game is/not Ranked label and Bugs Fixing.',
                         '- Vicarian : Contribute with Xinnony, Rating Observer, bugs fixing.',
                         '- Duck_42 : CPU Bench, Ping Nuke.',
                         '- Moritz : Power Lobby 2.0.',}
@@ -6187,12 +6267,7 @@ end
 ##########################################################################
 #####################################.#####################################
 
-function Remove_Unchanged_Options()
-    --table.find(formattedOptions, VAL) -- Table, Val
-    --table.remove()
-end
-
-SetText2 = function(self, text, delay)
+SetText2 = function(self, text, delay) -- Set Text with Animation
     --// Faire une variable qui evite deux droit SetText2 sur le même control de text en même temps.
     if self:GetText() == text then
         --self:SetText(text)
