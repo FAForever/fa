@@ -2232,24 +2232,24 @@ end
 
 function HostConvertObserverToPlayerWithoutSlot(senderID, name, fromObserverSlot, requestedFaction, requestedPL, requestedRC, requestedNG) -- Xinnony
     
-	AddChatText('Go Observer to Player without Slot')
-	AddChatText('nomOpenSlots : '..numOpenSlots)
+	--AddChatText('Go Observer to Player without Slot')
+	--AddChatText('nomOpenSlots : '..numOpenSlots)
 	
 	local newSlot = -1
 	for i = 1, numOpenSlots do
 		if gameInfo.PlayerOptions[i] == nil and gameInfo.ClosedSlots[i] == nil then
-			AddChatText('Index EMPTY : '..i)
+			--AddChatText('Index EMPTY : '..i)
 			newSlot = i
 			break
 		else
-			AddChatText('Index LOCK : '..i)
+			--AddChatText('Index LOCK : '..i)
 		end
 	end
 	if newSlot == -1 then
-		AddChatText('No Slot available')
+		--AddChatText('No Slot available')
 		return
 	else
-		AddChatText('New Slot : '..newSlot)
+		--AddChatText('New Slot : '..newSlot)
 	end
 	local toPlayerSlot = newSlot
 	
