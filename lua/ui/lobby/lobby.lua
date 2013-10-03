@@ -1555,22 +1555,12 @@ local function UpdateGame()
         end
     end
 
-    if GUI.becomeObserver then
-        if IsObserver(localPlayerID) then
-            --GUI.becomeObserver:Hide()
-            GUI.becomeObserver:Disable()
-        else
-            --GUI.becomeObserver:Show()
-            GUI.becomeObserver:Enable()
-        end
-    end
-
     local localPlayerSlot = FindSlotForID(localPlayerID)
     if localPlayerSlot then
         if gameInfo.PlayerOptions[localPlayerSlot].Ready then
             if GUI.becomeObserver then
-                GUI.becomeObserver:Disable()
-            end
+				GUI.becomeObserver:Disable()
+			end
             GUI.LargeMapPreview:Disable()
             TEST1factionPanel:Disable()
             TEST2factionPanel:Disable()
@@ -1579,8 +1569,8 @@ local function UpdateGame()
             TEST5factionPanel:Disable()
         else
             if GUI.becomeObserver then
-                GUI.becomeObserver:Enable()
-            end
+				GUI.becomeObserver:Enable()
+			end
             GUI.LargeMapPreview:Enable()
             TEST1factionPanel:Enable()
             TEST2factionPanel:Enable()
@@ -2187,6 +2177,84 @@ end
 function HostConvertObserverToPlayer(senderID, name, fromObserverSlot, toPlayerSlot, requestedFaction,
                                      requestedPL, requestedRC, requestedNG)
     if gameInfo.Observers[fromObserverSlot] == nil then
+        return
+    end
+
+    if gameInfo.PlayerOptions[toPlayerSlot] != nil then
+        return
+    end
+
+    if gameInfo.ClosedSlots[toPlayerSlot] != nil then
+        return
+    end
+
+    gameInfo.PlayerOptions[toPlayerSlot] = LobbyComm.GetDefaultPlayerOptions(name)
+    gameInfo.PlayerOptions[toPlayerSlot].OwnerID = senderID
+
+    if requestedFaction then
+        --gameInfo.PlayerOptions[toPlayerSlot].Faction = gameInfo.Observers[fromObserverSlot].oldFaction or requestedFaction
+        gameInfo.PlayerOptions[toPlayerSlot].Faction = requestedFaction
+    end
+
+    if requestedPL then
+        gameInfo.PlayerOptions[toPlayerSlot].PL = requestedPL
+    end
+
+    if requestedRC then
+        gameInfo.PlayerOptions[toPlayerSlot].RC = requestedRC
+    end
+
+    if requestedNG then
+        gameInfo.PlayerOptions[toPlayerSlot].NG = requestedNG
+    end
+
+    for colorIndex,colorVal in gameColors.PlayerColors do
+        if IsColorFree(colorIndex) then
+            gameInfo.PlayerOptions[toPlayerSlot].PlayerColor = gameInfo.Observers[fromObserverSlot].oldColor or colorIndex
+            break
+        end
+    end
+
+    gameInfo.Observers[fromObserverSlot] = nil
+
+    lobbyComm:BroadcastData(
+        {
+            Type = 'ConvertObserverToPlayer',
+            OldSlot = fromObserverSlot,
+            NewSlot = toPlayerSlot,
+            Options =  gameInfo.PlayerOptions[toPlayerSlot],
+        }
+    )
+
+    SendSystemMessage(LOCF("<LOC lobui_0227>%s has switched from an observer to player.", name))
+    UpdateGame()
+end
+
+function HostConvertObserverToPlayerWithoutSlot(senderID, name, fromObserverSlot, requestedFaction, requestedPL, requestedRC, requestedNG) -- Xinnony
+    
+	AddChatText('Go Observer to Player without Slot')
+	AddChatText('nomOpenSlots : '..numOpenSlots)
+	
+	local newSlot = -1
+	for i = 1, numOpenSlots do
+		if gameInfo.PlayerOptions[i] == nil and gameInfo.ClosedSlots[i] == nil then
+			AddChatText('Index EMPTY : '..i)
+			newSlot = i
+			break
+		else
+			AddChatText('Index LOCK : '..i)
+		end
+	end
+	if newSlot == -1 then
+		AddChatText('No Slot available')
+		return
+	else
+		AddChatText('New Slot : '..newSlot)
+	end
+	local toPlayerSlot = newSlot
+	
+	
+	if gameInfo.Observers[fromObserverSlot] == nil then
         return
     end
 
@@ -3254,14 +3322,13 @@ function CreateUI(maxPlayers)
                 if checked then
                     DisableSlot(self.row, true)
                     if GUI.becomeObserver then
-                        GUI.becomeObserver:Disable()
-                    end
-
+						GUI.becomeObserver:Disable()
+					end
                 else
                     EnableSlot(self.row)
                     if GUI.becomeObserver then
-                        GUI.becomeObserver:Enable()
-                    end
+						GUI.becomeObserver:Enable()
+					end
                 end
                 SetPlayerOption(self.row,'Ready',checked)
             end
@@ -3343,16 +3410,26 @@ function CreateUI(maxPlayers)
                 if IsPlayer(localPlayerID) then
                     if lobbyComm:IsHost() then
                         HostConvertPlayerToObserver(hostID, localPlayerName, FindSlotForID(localPlayerID))
-                        GUI.becomeObserver:Disable()
                     else
                         lobbyComm:SendData(hostID, {Type = 'RequestConvertToObserver', RequestedName = localPlayerName, RequestedSlot = FindSlotForID(localPlayerID)})
-                        GUI.becomeObserver:Disable()
                     end
+					GUI.becomeObserver.label:SetText('Go Player')
+				elseif IsObserver(localPlayerID) then
+					if lobbyComm:IsHost() then
+                        HostConvertObserverToPlayerWithoutSlot(hostID, localPlayerName, FindObserverSlotForID(localPlayerID))
+                    else
+                        lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayerWithoutSlot', RequestedName = localPlayerName})
+                    end
+					GUI.becomeObserver.label:SetText('Go Observer')
                 end
             end
             GUI.becomeObserver.OnRolloverEvent = function(self, state)
                 if state == 'enter' then
-                    GUI.becomeObserver.label:SetText('Go Observer')
+                    if IsPlayer(localPlayerID) then
+						GUI.becomeObserver.label:SetText('Go Observer')
+					else
+						GUI.becomeObserver.label:SetText('Go Player')
+					end
                     if GUI.becomeObserver:IsDisabled() then
                         GUI.becomeObserver:Disable()
                     end
@@ -4464,6 +4541,10 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
             elseif data.Type == 'RequestConvertToPlayer' then
                 HostConvertObserverToPlayer(data.SenderID, data.RequestedName, data.ObserverSlot, data.PlayerSlot,
+                                            data.requestedFaction, data.requestedPL, data.requestedRC, data.requestedNG)
+
+			elseif data.Type == 'RequestConvertToPlayerWithoutSlot' then
+                HostConvertObserverToPlayerWithoutSlot(data.SenderID, data.RequestedName, data.ObserverSlot,
                                             data.requestedFaction, data.requestedPL, data.requestedRC, data.requestedNG)
 
             elseif data.Type == 'RequestColor' then
