@@ -6055,15 +6055,17 @@ function ChangeBackgroundLobby(slot, faction)
             GUI.background:Hide()
             GUI.background2:Show()
             local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
-            if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") then
+            if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != '') then
                 scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-            end
-            if scenarioInfo and scenarioInfo.map and (scenarioInfo.map != "") then
-                if not GUI.background2:SetTexture(scenarioInfo.preview) then
-                    GUI.background2:SetTextureFromMap(scenarioInfo.map)
-                end
-            else
-                GUI.background2:ClearTexture()
+				if scenarioInfo and scenarioInfo.map and (scenarioInfo.map != '') and scenarioInfo.preview then
+					if not GUI.background2:SetTexture(scenarioInfo.preview) then
+						GUI.background2:SetTextureFromMap(scenarioInfo.map)
+					end
+				else
+					GUI.background2:ClearTexture()
+				end
+			else
+				GUI.background2:ClearTexture()
             end
             LASTXinnoBackground = 'Map'
         
