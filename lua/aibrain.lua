@@ -1093,7 +1093,7 @@ AIBrain = Class(moho.aibrain_methods) {
         local function KillArmy()
             local allies = {}
             local selfIndex = self:GetArmyIndex()
-            WaitSeconds(20)
+            WaitSeconds(10)
             
             #this part determiens the share condition            
             local shareOption = ScenarioInfo.Options.Share or "no"
@@ -1130,6 +1130,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
             end
 
+	    WaitSeconds(1)
             local killacu = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
             if killacu and table.getn(killacu) > 0 then
                 for index,unit in killacu do
