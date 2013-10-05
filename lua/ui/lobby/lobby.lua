@@ -6,7 +6,7 @@
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
 
-LOBBYversion = 'v1.9d'
+LOBBYversion = 'v1.9e'
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
@@ -2410,7 +2410,12 @@ function HostPlayerMissingMapAlert(id)
     end
 
     if needMessage then
-        SendSystemMessage(LOCF("<LOC lobui_0330>%s is missing map %s.", name, gameInfo.GameOptions.ScenarioFile))
+		SendSystemMessage(LOCF("<LOC lobui_0330>%s is missing map %s.", name, gameInfo.GameOptions.ScenarioFile))
+		LOG('>> '..name..' is missing map '..gameInfo.GameOptions.ScenarioFile)
+		if name == localPlayerName then
+			LOG('>> '..gameInfo.GameOptions.ScenarioFile..' replaced with '..'SCMP_009')
+			SetGameOption('ScenarioFile', '/maps/scmp_009/scmp_009_scenario.lua')
+		end
     end
 end
 
@@ -2641,17 +2646,17 @@ function CreateUI(maxPlayers)
                 if checked then
                     XinnonyOption = 1
 					RefreshOptionDisplayData()
-					GUI.OptionContainer.ScrollSetTop('Vert', 0)
 					if GUI.OptionContainer.CalcVisible then
 						GUI.OptionContainer:CalcVisible()
 					end
+					GUI.OptionContainer.ScrollSetTop(GUI.OptionContainer, 'Vert', 0)
                 else
 					XinnonyOption = 0
 					RefreshOptionDisplayData()
-					GUI.OptionContainer.ScrollSetTop('Vert', 0)
 					if GUI.OptionContainer.CalcVisible then
 						GUI.OptionContainer:CalcVisible()
 					end
+					GUI.OptionContainer.ScrollSetTop(GUI.OptionContainer, 'Vert', 0)
                 end
             end
     -- Checkbox Show changed Options
@@ -2684,7 +2689,7 @@ function CreateUI(maxPlayers)
                 end
                 --SendSystemMessage(selectedScenario.file)
 
-                SetGameOption('ScenarioFile',selectedScenario.file)
+				SetGameOption('ScenarioFile',selectedScenario.file)
 
                 SetGameOption('RestrictedCategories', restrictedCategories, true)
                 ClearBadMapFlags()  -- every new map, clear the flags, and clients will report if a new map is bad
@@ -3542,7 +3547,7 @@ function CreateUI(maxPlayers)
                             end
                             --SendSystemMessage(selectedScenario.file)
 
-                            SetGameOption('ScenarioFile',selectedScenario.file)
+							SetGameOption('ScenarioFile',selectedScenario.file)
 
                             SetGameOption('RestrictedCategories', restrictedCategories, true)
                             ClearBadMapFlags()  -- every new map, clear the flags, and clients will report if a new map is bad
@@ -4767,9 +4772,9 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             SetGameOption(option.key,option.values[defValue].key)
         end
 
-        if self.desiredScenario and self.desiredScenario != "" then
+		if self.desiredScenario and self.desiredScenario != "" then
             Prefs.SetToCurrentProfile('LastScenario', self.desiredScenario)
-            SetGameOption('ScenarioFile',self.desiredScenario)
+			SetGameOption('ScenarioFile',self.desiredScenario)
         else
             local scen = Prefs.GetFromCurrentProfile('LastScenario')
             if scen and scen != "" then
@@ -4884,7 +4889,8 @@ function SetPlayerOption(slot, key, val)
 end
 
 function SetGameOption(key, val, ignoreNilValue)
-    ignoreNilValue = ignoreNilValue or false
+    local scenarioInfo = nil
+	ignoreNilValue = ignoreNilValue or false
 
     if (not ignoreNilValue) and ((key == nil) or (val == nil)) then
         WARN('Attempt to set nil lobby game option: ' .. tostring(key) .. ' ' .. tostring(val))
@@ -4915,9 +4921,9 @@ function SetGameOption(key, val, ignoreNilValue)
             GpgNetSend('GameOption', key, restrictionsEnabled)
         elseif key == 'ScenarioFile' then
             GpgNetSend('GameOption', key, val)
-             if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") then
-                scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-                if scenarioInfo then
+             if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != '') then
+				scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+                if scenarioInfo and scenarioInfo.map and (scenarioInfo.map != '') then
                     GpgNetSend('GameOption', 'Slots', table.getsize(scenarioInfo.Configurations.standard.teams[1].armies))
                 end
             end
@@ -4974,7 +4980,7 @@ function CreateBigPreview(depth, parent)
     end
 
     scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-    if scenarioInfo and scenarioInfo.map and (scenarioInfo.map != "") then
+    if scenarioInfo and scenarioInfo.map and (scenarioInfo.map != '') then
         if not LrgMap:SetTexture(scenarioInfo.preview) then
             LrgMap:SetTextureFromMap(scenarioInfo.map)
         end
