@@ -3325,7 +3325,7 @@ function CreateUI(maxPlayers)
             LayoutHelpers.AtLeftIn(GUI.slots[curRow].ready, GUI.slots[curRow].multiSpace, 0)
             GUI.slots[i].ready.OnCheck = function(self, checked)
                 if checked then
-                    DisableSlot(self.row, true)
+					DisableSlot(self.row, true)
                     if GUI.becomeObserver then
 						GUI.becomeObserver:Disable()
 					end
@@ -3507,7 +3507,8 @@ function CreateUI(maxPlayers)
                     SetGameOption('NoRushOption', 'Off')
                     --gameInfo.GameMods["656b7af6-9a56-47c5-8182-3a896dc6f4b7"] = true
                     --lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
-                    UpdateGame()
+					lobbyComm:BroadcastData( { Type = "SetAllPlayerNotReady" } )
+					UpdateGame()
                 end
             end
         --end of ranked options code
@@ -4499,7 +4500,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             AddChatText("["..data.SenderName.."] "..data.Text)
         elseif data.Type == 'PrivateChat' then
             AddChatText("<<"..data.SenderName..">> "..data.Text)
-        --// RULE TITLE - Xinnony
+		--// RULE TITLE - Xinnony
         elseif data.Type == 'Rule_Title_MSG' then
             if XinnonyDebug == 2 then LOG(">> RECEIVE MSG Rule_Title_MSG : result="..(data.Result or "?")) end
             if XinnonyDebug == 2 then AddChatText(">> RECEIVE MSG Rule_Title_MSG : result="..data.Result) end
@@ -4580,7 +4581,15 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             if data.Type == 'SystemMessage' then
                 AddChatText(data.Text)
 
-            elseif data.Type == 'Peer_Really_Disconnected' then
+            elseif data.Type == 'SetAllPlayerNotReady' then -- Xinnony
+				EnableSlot(FindSlotForID(FindIDForName(localPlayerName)))
+				if GUI.becomeObserver then
+					GUI.becomeObserver:Enable()
+				end
+				SetPlayerOption(FindSlotForID(FindIDForName(localPlayerName)), 'Ready', false)
+				--UpdateGame()
+
+			elseif data.Type == 'Peer_Really_Disconnected' then
                 if XinnonyDebug == 3 then AddChatText('>> DATA RECEIVE : Peer_Really_Disconnected (slot:'..data.Slot..')') end
                 if XinnonyDebug == 3 then LOG('>> DATA RECEIVE : Peer_Really_Disconnected (slot:'..data.Slot..')') end
                 if data.Options.OwnerID == localPlayerID then
