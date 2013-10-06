@@ -355,7 +355,7 @@ function LoadBlueprints()
     LOG('Loading blueprints...')
     InitOriginalBlueprints()
 
-    for i,dir in {'/effects', '/env', '/meshes', '/projectiles', '/props', '/units'} do
+    for i,dir in {'/effects', '/env', '/meshes', '/projectiles', '/props', '/units', '/maps'} do
         for k,file in DiskFindFiles(dir, '*.bp') do
             BlueprintLoaderUpdateProgress()
             safecall("loading blueprint "..file, doscript, file)
