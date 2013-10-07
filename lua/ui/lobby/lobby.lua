@@ -6,7 +6,7 @@
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
 
-LOBBYversion = 'v1.9e'
+LOBBYversion = 'v1.9f'
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
@@ -2634,7 +2634,7 @@ function CreateUI(maxPlayers)
     -- Checkbox Show changed Options
     cbox_ShowChangedOption = UIUtil.CreateCheckboxStd(GUI.optionsPanel, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel, 3, 0)
-        Tooltip.AddCheckboxTooltip(cbox_ShowChangedOption, {text='Show only changed Options', body='Not working yet, coming soon!'})
+        Tooltip.AddCheckboxTooltip(cbox_ShowChangedOption, {text='Hide unchanged Options', body='Show only changed Options'})
 		cbox_ShowChangedOption_TEXT = UIUtil.CreateText(cbox_ShowChangedOption, 'Hide unchanged Options', 11, 'Arial')
             cbox_ShowChangedOption_TEXT:SetColor('B9BFB9')
             cbox_ShowChangedOption_TEXT:SetDropShadow(true)
