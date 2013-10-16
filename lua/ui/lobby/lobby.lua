@@ -1373,8 +1373,13 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         
 
         -- set the mods
-        gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
-
+		
+		if gameInfo.GameOptions.ScenarioFile == '/maps/scca_coop_e02_v02/scca_coop_e02_v02_scenario.lua' then
+			LOG("loading special mission mod")
+			gameInfo.GameMods["e7846e9b-23a4-4b95-ae3a-fb69b289a585"] = true
+			lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
+		end
+		gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
 		-- Set up options for campaign
 
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)

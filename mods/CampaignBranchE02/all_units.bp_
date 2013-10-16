@@ -1,0 +1,19 @@
+UnitBlueprint {
+  Merge=true,
+  BlueprintId="uea0107",
+  Categories={
+    "SELECTABLE",
+    "UEF",
+    "MOBILE",
+    "AIR",
+    "TECH1",
+    "TRANSPORTATION",
+    "TRANSPORTBUILTBYTIER1FACTORY",
+    "TRANSPORTBUILTBYTIER2FACTORY",
+    "TRANSPORTBUILTBYTIER3FACTORY",
+    "VISIBLETORECON",
+    "RECLAIMABLE",
+    "TRANSPORTFOCUS",
+    "CANTRANSPORTCOMMANDER"
+  },
+}
