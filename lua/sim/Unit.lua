@@ -98,6 +98,7 @@ Unit = Class(moho.unit_methods) {
         # in the global sync table to copy to the user layer at sync time.
         self.Sync = {}
         self.Sync.id = self:GetEntityId()
+		
         self.Sync.army = self:GetArmy()
         setmetatable(self.Sync,SyncMeta)
 
@@ -167,13 +168,14 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnCreate = function(self)
+		
         Entity.OnCreate(self)
         # Turn off land bones if this unit has them.
         self:HideLandBones()
         # Set number of effects per damage depending on its volume
         local x, y, z = self:GetUnitSizes()
         local vol = x*y*z
-        #print('Created ' .. self:GetBlueprint().Display.DisplayName .. ': Volume:' .. vol)
+		
         local damageamounts = 1
         if vol >= 20 then
             damageamounts = 6
@@ -1432,7 +1434,7 @@ Unit = Class(moho.unit_methods) {
 			for index, brain in ArmyBrains do
 				if brain and not brain:IsDefeated() then
 					local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
-					table.insert( Sync.GameResult, { index, result } )
+					--table.insert( Sync.GameResult, { index, result } )
 				end
 
 			end
@@ -4357,8 +4359,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     InitiateTeleportThread = function(self, teleporter, location, orientation)
-	        # added by brute51
-        self:OnTeleportCharging(location)
         local tbp = teleporter:GetBlueprint()
         local ubp = self:GetBlueprint()
         self.UnitBeingTeleported = self
@@ -4378,7 +4378,7 @@ Unit = Class(moho.unit_methods) {
         self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
 
         # create teleport charge effect
-        self:PlayTeleportChargeEffects(location)
+        self:PlayTeleportChargeEffects()
 
         WaitFor( self.TeleportDrain  ) # Perform fancy Teleportation FX here
 
@@ -4404,27 +4404,18 @@ Unit = Class(moho.unit_methods) {
         self:SetImmobile(false)
         self.UnitBeingTeleported = nil
         self.TeleportThread = nil
-		self:OnTeleported(location)
     end,
 
-    PlayTeleportChargeEffects = function(self, location)
+    PlayTeleportChargeEffects = function(self)
         local army = self:GetArmy()
         local bp = self:GetBlueprint()
-        local fx
-        local beacon = Entity()
 
         self.TeleportChargeBag = {}
         for k, v in EffectTemplate.GenericTeleportCharge01 do
-            fx = CreateEmitterAtEntity(self,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
+            local fx = CreateEmitterAtEntity(self,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
             self.Trash:Add(fx)
             table.insert( self.TeleportChargeBag, fx)
         end
-
-        location[2] = GetSurfaceHeight(location[1], location[3])
-        Warp(beacon, location)
-        fx = CreateEmitterAtEntity(beacon, army, '/effects/emitters/_test_swirl_01_emit.bp') -- other effect maybe?
-        self.Trash:Add(fx)
-        table.insert(self.TeleportChargeBag, fx)
     end,
 
     CleanupTeleportChargeEffects = function( self )
