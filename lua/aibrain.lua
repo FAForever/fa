@@ -1069,6 +1069,7 @@ AIBrain = Class(moho.aibrain_methods) {
         ###end sorian AI bit
         
         SetArmyOutOfGame(self:GetArmyIndex())
+		LOG("Army " .. self:GetArmyIndex() .. " is out of game")
         
         # seems that FA send the OnDeath twice : one when losing, the other when disconnecting. But we only want it one time !
     

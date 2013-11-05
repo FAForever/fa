@@ -102,8 +102,9 @@ local function CreateDialog(clients)
     function parent.Update(self, clients)
         for index, client in clients do
             local slot = slots[index]
+			local armiesInfo = GetArmiesTable().armiesTable
             if client.connected then
-                if client.quiet < 5000 then
+                if client.quiet < 5000 and armiesInfo[index].outOfGame == false then
 					if canEject then
 						slot.eject:Disable()
 					end
@@ -112,7 +113,7 @@ local function CreateDialog(clients)
                     slot.ping:SetColor('FFbadbdb')
                     slot.quiet:SetColor('FFbadbdb')					
                 else
-					if canEject then
+					if canEject or armiesInfo[index].outOfGame then
 						slot.eject:Enable()
 					end
                     slot.ping:SetText(LOCF("%s: ---", "<LOC UI_Disco0003>Ping (ms)"))

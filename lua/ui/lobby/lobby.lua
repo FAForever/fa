@@ -6,7 +6,7 @@
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
 
-LOBBYversion = 'v1.9d'
+LOBBYversion = 'v1.9f'
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
@@ -2410,7 +2410,12 @@ function HostPlayerMissingMapAlert(id)
     end
 
     if needMessage then
-        SendSystemMessage(LOCF("<LOC lobui_0330>%s is missing map %s.", name, gameInfo.GameOptions.ScenarioFile))
+		SendSystemMessage(LOCF("<LOC lobui_0330>%s is missing map %s.", name, gameInfo.GameOptions.ScenarioFile))
+		LOG('>> '..name..' is missing map '..gameInfo.GameOptions.ScenarioFile)
+		if name == localPlayerName then
+			LOG('>> '..gameInfo.GameOptions.ScenarioFile..' replaced with '..'SCMP_009')
+			SetGameOption('ScenarioFile', '/maps/scmp_009/scmp_009_scenario.lua')
+		end
     end
 end
 
@@ -2629,29 +2634,27 @@ function CreateUI(maxPlayers)
     -- Checkbox Show changed Options
     cbox_ShowChangedOption = UIUtil.CreateCheckboxStd(GUI.optionsPanel, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel, 3, 0)
-        --LayoutHelpers.AtHorizontalCenterIn(cbox_ShowChangedOption, GUI.optionsPanel, -8)
-        cbox_ShowChangedOption_TEXT = UIUtil.CreateText(cbox_ShowChangedOption, 'Hide unchanged Options', 11, 'Arial')
+        Tooltip.AddCheckboxTooltip(cbox_ShowChangedOption, {text='Hide unchanged Options', body='Show only changed Options'})
+		cbox_ShowChangedOption_TEXT = UIUtil.CreateText(cbox_ShowChangedOption, 'Hide unchanged Options', 11, 'Arial')
             cbox_ShowChangedOption_TEXT:SetColor('B9BFB9')
             cbox_ShowChangedOption_TEXT:SetDropShadow(true)
             LayoutHelpers.AtLeftIn(cbox_ShowChangedOption_TEXT, cbox_ShowChangedOption, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox_ShowChangedOption_TEXT, cbox_ShowChangedOption)
-            --cbox_ShowChangedOption:Disable()
-            Tooltip.AddButtonTooltip(cbox_ShowChangedOption_TEXT, {text='Show only changed Options', body='Not working yet, coming soon!'})
             cbox_ShowChangedOption.OnCheck = function(self, checked)
                 if checked then
                     XinnonyOption = 1
 					RefreshOptionDisplayData()
-					GUI.OptionContainer.ScrollSetTop('Vert', 0)
 					if GUI.OptionContainer.CalcVisible then
 						GUI.OptionContainer:CalcVisible()
 					end
+					GUI.OptionContainer.ScrollSetTop(GUI.OptionContainer, 'Vert', 0)
                 else
 					XinnonyOption = 0
 					RefreshOptionDisplayData()
-					GUI.OptionContainer.ScrollSetTop('Vert', 0)
 					if GUI.OptionContainer.CalcVisible then
 						GUI.OptionContainer:CalcVisible()
 					end
+					GUI.OptionContainer.ScrollSetTop(GUI.OptionContainer, 'Vert', 0)
                 end
             end
     -- Checkbox Show changed Options
@@ -2684,7 +2687,7 @@ function CreateUI(maxPlayers)
                 end
                 --SendSystemMessage(selectedScenario.file)
 
-                SetGameOption('ScenarioFile',selectedScenario.file)
+				SetGameOption('ScenarioFile',selectedScenario.file)
 
                 SetGameOption('RestrictedCategories', restrictedCategories, true)
                 ClearBadMapFlags()  -- every new map, clear the flags, and clients will report if a new map is bad
@@ -3320,7 +3323,7 @@ function CreateUI(maxPlayers)
             LayoutHelpers.AtLeftIn(GUI.slots[curRow].ready, GUI.slots[curRow].multiSpace, 0)
             GUI.slots[i].ready.OnCheck = function(self, checked)
                 if checked then
-                    DisableSlot(self.row, true)
+					DisableSlot(self.row, true)
                     if GUI.becomeObserver then
 						GUI.becomeObserver:Disable()
 					end
@@ -3502,7 +3505,8 @@ function CreateUI(maxPlayers)
                     SetGameOption('NoRushOption', 'Off')
                     --gameInfo.GameMods["656b7af6-9a56-47c5-8182-3a896dc6f4b7"] = true
                     --lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
-                    UpdateGame()
+					lobbyComm:BroadcastData( { Type = "SetAllPlayerNotReady" } )
+					UpdateGame()
                 end
             end
         --end of ranked options code
@@ -3542,7 +3546,7 @@ function CreateUI(maxPlayers)
                             end
                             --SendSystemMessage(selectedScenario.file)
 
-                            SetGameOption('ScenarioFile',selectedScenario.file)
+							SetGameOption('ScenarioFile',selectedScenario.file)
 
                             SetGameOption('RestrictedCategories', restrictedCategories, true)
                             ClearBadMapFlags()  -- every new map, clear the flags, and clients will report if a new map is bad
@@ -4494,7 +4498,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             AddChatText("["..data.SenderName.."] "..data.Text)
         elseif data.Type == 'PrivateChat' then
             AddChatText("<<"..data.SenderName..">> "..data.Text)
-        --// RULE TITLE - Xinnony
+		--// RULE TITLE - Xinnony
         elseif data.Type == 'Rule_Title_MSG' then
             if XinnonyDebug == 2 then LOG(">> RECEIVE MSG Rule_Title_MSG : result="..(data.Result or "?")) end
             if XinnonyDebug == 2 then AddChatText(">> RECEIVE MSG Rule_Title_MSG : result="..data.Result) end
@@ -4575,7 +4579,15 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             if data.Type == 'SystemMessage' then
                 AddChatText(data.Text)
 
-            elseif data.Type == 'Peer_Really_Disconnected' then
+            elseif data.Type == 'SetAllPlayerNotReady' then -- Xinnony
+				EnableSlot(FindSlotForID(FindIDForName(localPlayerName)))
+				if GUI.becomeObserver then
+					GUI.becomeObserver:Enable()
+				end
+				SetPlayerOption(FindSlotForID(FindIDForName(localPlayerName)), 'Ready', false)
+				--UpdateGame()
+
+			elseif data.Type == 'Peer_Really_Disconnected' then
                 if XinnonyDebug == 3 then AddChatText('>> DATA RECEIVE : Peer_Really_Disconnected (slot:'..data.Slot..')') end
                 if XinnonyDebug == 3 then LOG('>> DATA RECEIVE : Peer_Really_Disconnected (slot:'..data.Slot..')') end
                 if data.Options.OwnerID == localPlayerID then
@@ -4767,9 +4779,9 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             SetGameOption(option.key,option.values[defValue].key)
         end
 
-        if self.desiredScenario and self.desiredScenario != "" then
+		if self.desiredScenario and self.desiredScenario != "" then
             Prefs.SetToCurrentProfile('LastScenario', self.desiredScenario)
-            SetGameOption('ScenarioFile',self.desiredScenario)
+			SetGameOption('ScenarioFile',self.desiredScenario)
         else
             local scen = Prefs.GetFromCurrentProfile('LastScenario')
             if scen and scen != "" then
@@ -4884,7 +4896,8 @@ function SetPlayerOption(slot, key, val)
 end
 
 function SetGameOption(key, val, ignoreNilValue)
-    ignoreNilValue = ignoreNilValue or false
+    local scenarioInfo = nil
+	ignoreNilValue = ignoreNilValue or false
 
     if (not ignoreNilValue) and ((key == nil) or (val == nil)) then
         WARN('Attempt to set nil lobby game option: ' .. tostring(key) .. ' ' .. tostring(val))
@@ -4915,9 +4928,9 @@ function SetGameOption(key, val, ignoreNilValue)
             GpgNetSend('GameOption', key, restrictionsEnabled)
         elseif key == 'ScenarioFile' then
             GpgNetSend('GameOption', key, val)
-             if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") then
-                scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-                if scenarioInfo then
+             if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != '') then
+				scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+                if scenarioInfo and scenarioInfo.map and (scenarioInfo.map != '') then
                     GpgNetSend('GameOption', 'Slots', table.getsize(scenarioInfo.Configurations.standard.teams[1].armies))
                 end
             end
@@ -4974,7 +4987,7 @@ function CreateBigPreview(depth, parent)
     end
 
     scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-    if scenarioInfo and scenarioInfo.map and (scenarioInfo.map != "") then
+    if scenarioInfo and scenarioInfo.map and (scenarioInfo.map != '') then
         if not LrgMap:SetTexture(scenarioInfo.preview) then
             LrgMap:SetTextureFromMap(scenarioInfo.map)
         end
@@ -6095,12 +6108,12 @@ function CreateOptionLobbyDialog()
     cbox_BG_Factions = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftIn(cbox_BG_Factions, dialog2, 20)
         LayoutHelpers.AtTopIn(cbox_BG_Factions, dialog2, 20)
-        cbox_BG_Factions_TEXT = UIUtil.CreateText(cbox_BG_Factions, 'Factions Backgrounds', 14, 'Arial')
+        Tooltip.AddCheckboxTooltip(cbox_BG_Factions, {text='Factions Background', body='Show the Factions Backgrounds in the Lobby'})
+		cbox_BG_Factions_TEXT = UIUtil.CreateText(cbox_BG_Factions, 'Factions Backgrounds', 14, 'Arial')
             cbox_BG_Factions_TEXT:SetColor('B9BFB9')
             cbox_BG_Factions_TEXT:SetDropShadow(true)
             LayoutHelpers.AtLeftIn(cbox_BG_Factions_TEXT, cbox_BG_Factions, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox_BG_Factions_TEXT, cbox_BG_Factions)
-            Tooltip.AddButtonTooltip(cbox_BG_Factions_TEXT, {text='Factions Background', body='Show the Factions Backgrounds in the Lobby'})
             cbox_BG_Factions.OnCheck = function(self, checked)
                 if checked then
                     Prefs.SetToCurrentProfile('XinnoBackground', 'Factions')
@@ -6116,12 +6129,12 @@ function CreateOptionLobbyDialog()
     cbox_BG_ConceptArt = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftIn(cbox_BG_ConceptArt, dialog2, 20)
         LayoutHelpers.AtTopIn(cbox_BG_ConceptArt, dialog2, 40)
-        cbox_BG_ConceptArt_TEXT = UIUtil.CreateText(cbox_BG_ConceptArt, 'Concept Art Backgrounds', 14, 'Arial')
+        Tooltip.AddCheckboxTooltip(cbox_BG_Factions, {text='Factions Background', body='Show the Factions Backgrounds in the Lobby'})
+		cbox_BG_ConceptArt_TEXT = UIUtil.CreateText(cbox_BG_ConceptArt, 'Concept Art Backgrounds', 14, 'Arial')
             cbox_BG_ConceptArt_TEXT:SetColor('B9BFB9')
             cbox_BG_ConceptArt_TEXT:SetDropShadow(true)
             LayoutHelpers.AtLeftIn(cbox_BG_ConceptArt_TEXT, cbox_BG_ConceptArt, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox_BG_ConceptArt_TEXT, cbox_BG_ConceptArt)
-            Tooltip.AddButtonTooltip(cbox_BG_ConceptArt_TEXT, {text='ConceptArt Background', body='Show the Concept Art Backgrounds in the Lobby'})
             cbox_BG_ConceptArt.OnCheck = function(self, checked)
                 if checked then
                     Prefs.SetToCurrentProfile('XinnoBackground', 'ConceptArt')
@@ -6137,12 +6150,12 @@ function CreateOptionLobbyDialog()
     cbox_BG_Screenshoot = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftIn(cbox_BG_Screenshoot, dialog2, 20)
         LayoutHelpers.AtTopIn(cbox_BG_Screenshoot, dialog2, 60)
-        cbox_BG_Screenshoot_TEXT = UIUtil.CreateText(cbox_BG_Screenshoot, 'Screenshot Backgrounds', 14, 'Arial')
+        Tooltip.AddCheckboxTooltip(cbox_BG_Screenshoot, {text='Screenshoot Background', body='Show some Screenshot Backgrounds in the Lobby'})
+		cbox_BG_Screenshoot_TEXT = UIUtil.CreateText(cbox_BG_Screenshoot, 'Screenshot Backgrounds', 14, 'Arial')
             cbox_BG_Screenshoot_TEXT:SetColor('B9BFB9')
             cbox_BG_Screenshoot_TEXT:SetDropShadow(true)
             LayoutHelpers.AtLeftIn(cbox_BG_Screenshoot_TEXT, cbox_BG_Screenshoot, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox_BG_Screenshoot_TEXT, cbox_BG_Screenshoot)
-            Tooltip.AddButtonTooltip(cbox_BG_Screenshoot_TEXT, {text='Screenshoot Background', body='Show some Screenshot Backgrounds in the Lobby'})
             cbox_BG_Screenshoot.OnCheck = function(self, checked)
                 if checked then
                     Prefs.SetToCurrentProfile('XinnoBackground', 'Screenshoot')
@@ -6158,12 +6171,12 @@ function CreateOptionLobbyDialog()
     cbox_BG_Map = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftIn(cbox_BG_Map, dialog2, 20)
         LayoutHelpers.AtTopIn(cbox_BG_Map, dialog2, 80)
-        cbox_BG_Map_TEXT = UIUtil.CreateText(cbox_BG_Map, 'Map Preview', 14, 'Arial')
+        Tooltip.AddCheckboxTooltip(cbox_BG_Map, {text='Map Background', body='Show the Map Preview in the Lobby'})
+		cbox_BG_Map_TEXT = UIUtil.CreateText(cbox_BG_Map, 'Map Preview', 14, 'Arial')
             cbox_BG_Map_TEXT:SetColor('B9BFB9')
             cbox_BG_Map_TEXT:SetDropShadow(true)
             LayoutHelpers.AtLeftIn(cbox_BG_Map_TEXT, cbox_BG_Map, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox_BG_Map_TEXT, cbox_BG_Map)
-            Tooltip.AddButtonTooltip(cbox_BG_Map_TEXT, {text='Map Background', body='Show the Map Preview in the Lobby'})
             cbox_BG_Map.OnCheck = function(self, checked)
                 if checked then
                     Prefs.SetToCurrentProfile('XinnoBackground', 'Map')
@@ -6179,12 +6192,12 @@ function CreateOptionLobbyDialog()
     cbox_BG_No = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftIn(cbox_BG_No, dialog2, 20)
         LayoutHelpers.AtTopIn(cbox_BG_No, dialog2, 100)
-        cbox_BG_No_TEXT = UIUtil.CreateText(cbox_BG_No, 'No Background', 14, 'Arial')
+        Tooltip.AddCheckboxTooltip(cbox_BG_No, {text='No Background', body='No background in the Lobby'})
+		cbox_BG_No_TEXT = UIUtil.CreateText(cbox_BG_No, 'No Background', 14, 'Arial')
             cbox_BG_No_TEXT:SetColor('B9BFB9')
             cbox_BG_No_TEXT:SetDropShadow(true)
             LayoutHelpers.AtLeftIn(cbox_BG_No_TEXT, cbox_BG_No, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox_BG_No_TEXT, cbox_BG_No)
-            Tooltip.AddButtonTooltip(cbox_BG_No_TEXT, {text='No Background', body='No background in the Lobby'})
             cbox_BG_No.OnCheck = function(self, checked)
                 if checked then
                     Prefs.SetToCurrentProfile('XinnoBackground', 'No')
@@ -6201,12 +6214,12 @@ function CreateOptionLobbyDialog()
     cbox_Skin_Dark = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtRightIn(cbox_Skin_Dark, dialog2, 20)
         LayoutHelpers.AtTopIn(cbox_Skin_Dark, dialog2, 20)
-        cbox_Skin_Dark_TEXT = UIUtil.CreateText(cbox_Skin_Dark, 'Dark Skin', 14, 'Arial')
+        Tooltip.AddCheckboxTooltip(cbox_Skin_Dark, {text='Dark Skin', body='Apply the Dark Skin in the Lobby'})
+		cbox_Skin_Dark_TEXT = UIUtil.CreateText(cbox_Skin_Dark, 'Dark Skin', 14, 'Arial')
             cbox_Skin_Dark_TEXT:SetColor('B9BFB9')
             cbox_Skin_Dark_TEXT:SetDropShadow(true)
             LayoutHelpers.AtRightIn(cbox_Skin_Dark_TEXT, cbox_Skin_Dark, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox_Skin_Dark_TEXT, cbox_Skin_Dark)
-            Tooltip.AddButtonTooltip(cbox_Skin_Dark_TEXT, {text='Dark Skin', body='Apply the Dark Skin in the Lobby'})
             cbox_Skin_Dark.OnCheck = function(self, checked)
                 if checked then
                 else
@@ -6216,12 +6229,12 @@ function CreateOptionLobbyDialog()
     local cbox6_0 = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtRightIn(cbox6_0, dialog2, 20)
         LayoutHelpers.AtTopIn(cbox6_0, dialog2, 40)
+		Tooltip.AddCheckboxTooltip(cbox6_0, {text='White Skin', body='White Skin is not available yet, Need a Graphic Artist !!!'})
         local cbox6_1 = UIUtil.CreateText(cbox6_0, 'White Skin', 14, 'Arial')
             cbox6_1:SetColor('B9BFB9')
             cbox6_1:SetDropShadow(true)
             LayoutHelpers.AtRightIn(cbox6_1, cbox6_0, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox6_1, cbox6_0)
-            Tooltip.AddButtonTooltip(cbox6_1, {text='White Skin', body='White Skin is not available yet, Need a Graphic Artist !!!'})
             cbox6_0:Disable()
             cbox6_0.OnClick = function(self, checked)
                 cbox6_0:SetCheck(false, true)
@@ -6230,12 +6243,12 @@ function CreateOptionLobbyDialog()
     local cbox_StretchBG = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtRightIn(cbox_StretchBG, dialog2, 20)
         LayoutHelpers.AtTopIn(cbox_StretchBG, dialog2, 80)
-        local cbox_StretchBG_TEXT = UIUtil.CreateText(cbox_StretchBG, 'Stretch Background', 14, 'Arial')
+        Tooltip.AddCheckboxTooltip(cbox_StretchBG, {text='Stretch Background', body='You can stretch the background over the entire surface of this game.'})
+		local cbox_StretchBG_TEXT = UIUtil.CreateText(cbox_StretchBG, 'Stretch Background', 14, 'Arial')
             cbox_StretchBG_TEXT:SetColor('B9BFB9')
             cbox_StretchBG_TEXT:SetDropShadow(true)
             LayoutHelpers.AtRightIn(cbox_StretchBG_TEXT, cbox_StretchBG, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox_StretchBG_TEXT, cbox_StretchBG)
-            Tooltip.AddButtonTooltip(cbox_StretchBG_TEXT, {text='Stretch Background', body='You can stretch the background over the entire surface of this game.'})
             cbox_StretchBG.OnCheck = function(self, checked)
                 if checked then
                     Prefs.SetToCurrentProfile('XinnoBackgroundStretch', 'true')
