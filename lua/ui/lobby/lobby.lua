@@ -5212,21 +5212,21 @@ end -- NewShowMapPositions(...)
 --              problems.
 -- 2013.10.04 - Reverting back to previous CPU benchmark.  The new one doesn't appear to be 
 --              as accurate as the old one.
+-- 2013.11.04 - Second attempt at improving the CPU benchmark.  This one has been tested much more and
+--              should produce the desired results.
 --******************************************************************************************************
-local benchmarkLength = 5 --5.0 Seconds
 
 --CPU Status Bar Configuration
 local barMax = 450
 local barMin = 150
 local greenBarMax = 300
 local yellowBarMax = 375
-local scoreSkew1 = -25 --Skews all CPU scores up or down by the amount specified (0 = no skew)
+local scoreSkew1 = 0 --Skews all CPU scores up or down by the amount specified (0 = no skew)
 local scoreSkew2 = 1.0 --Skews all CPU scores specified coefficient (1.0 = no skew)
 
 --Variables for CPU Test
-local running
-local loopCount
 local firstCPUTest = true
+local BenchTime
 
 --------------------------------------------------
 --  CPU Benchmark Storage and Retrieval Functions
@@ -5263,25 +5263,48 @@ end
 --------------------------------------------------
 function CPUBenchmark()
     --This function gives the CPU some busy work to do.
-    --CPU score is determined by how many times it can loop through
-    --the set of busy work before the timer in the CPUTimer function expires.
-    while running do
-         for i = 1.0, 2.0, .000008 do 
-            j = i + i
-            k = i * i
-            l = k / j
-            m = j - i
+    --CPU score is determined by how quickly the work is completed.
+    local totalTime = 0
+    local lastTime
+    local currTime
+    local countTime = 0    
+    --Make everything a local variable
+    --This is necessary because we don't want LUA searching through the globals as part of the benchmark
+    local h
+    local i
+    local j
+    local k
+    local l
+    local m
+    for h = 1, 48, 1 do
+        lastTime = GetSystemTimeSeconds()
+        for i = 1.0, 25.0, 0.0008 do 
+            --This instruction set should cover most LUA operators
+            j = i + i   --Addition
+            k = i * i   --Multiplication
+            l = k / j   --Division 
+            m = j - i   --Subtraction
+            j = i ^ 4   --Power
+            l = -i      --Negation
+            m = {'One', 'Two', 'Three'} --Create Table
+            table.insert(m, 'Four')     --Insert Table Value
+            table.remove(m, 1)          --Remove Table Value           
+            l = table.getn(m)           --Get Table Length
+            k = i < j   --Less Than        
+            k = i == j  --Equality
+            k = i <= j  --Less Than or Equal to
+            k = not k
         end
-        loopCount = loopCount + 1
-        --This is necessary in order to make this 'thread' yield so other things can be done (namely the CPUTimer function).
-        WaitSeconds(0)
-     end
-end
-
-function CPUTimer()
-    --This function handles the benchmark timer.  When this function completes, the benchmark is stopped.
-    WaitSeconds(benchmarkLength)
-    running = false
+        currTime = GetSystemTimeSeconds()
+        totalTime = totalTime + currTime - lastTime
+        
+        if totalTime > countTime then
+            --This is necessary in order to make this 'thread' yield so other things can be done.
+            countTime = totalTime + .125
+            WaitSeconds(0)
+        end
+    end
+    BenchTime = math.ceil(totalTime * 100)
 end
 
 --------------------------------------------------
@@ -5355,21 +5378,15 @@ function StressCPU(waitTime)
 
     --Run three benchmarks and keep the best one
     for i=1, 3, 1 do
-        loopCount = 0
-        running = true
-        ForkThread(CPUTimer)
+        BenchTime = 0
         CPUBenchmark()
 
-        --Invert scale for display purposes
-        --With .01 sec wait intervals the max number of loops should be 100 * benchmarkLength
-        loopCount = (benchmarkLength * 100) - math.min(scoreSkew2 * loopCount + scoreSkew1, (benchmarkLength * 100))
-
-        --LOG('CPU benchmark #'..i..' complete: '.. loopCount )
+        BenchTime = scoreSkew2 * BenchTime + scoreSkew1
 
         --If this benchmark was better than our best so far...
-        if loopCount < currentBestBenchmark then
+        if BenchTime < currentBestBenchmark then
             --Make this our best benchmark
-            currentBestBenchmark = loopCount
+            currentBestBenchmark = BenchTime
 
             --Send it to the other players
             lobbyComm:BroadcastData( { Type = 'CPUBenchmark', PlayerName = localPlayerName, Result = currentBestBenchmark} )
@@ -5380,17 +5397,6 @@ function StressCPU(waitTime)
             --Update the UI bar
             UpdateCPUBar(localPlayerName)
         end
-    end
-
-    --Show message if player's score is very low
-    if currentBestBenchmark >= 450 and firstCPUTest then
-        AddChatText(LOCF('<LOC lobui_0901>SYSTEM: Your CPU score is unusually low.'))
-        AddChatText(LOCF('<LOC lobui_0902>SYSTEM: This can be caused by using ALT-TAB or minimizing the game after joining.'))
-        AddChatText(LOCF('<LOC lobui_0903>SYSTEM: Certain CPU power saving features can also cause this.'))
-        AddChatText(LOCF('<LOC lobui_0903>SYSTEM: After joining the lobby, please wait 15 seconds before using ALT-TAB or '..
-                         'minimizing.'))
-        AddChatText(LOCF('<LOC lobui_0903>SYSTEM: If you continue to see this message anyway, please let us know on the FAF '..
-                         'forums.'))
     end
 
     --Set this flag so we'll know later
