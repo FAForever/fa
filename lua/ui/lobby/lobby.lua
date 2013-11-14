@@ -6,6 +6,8 @@
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
 
+LOBBYversion = 'v1.9f'
+
 local UIUtil = import('/lua/ui/uiutil.lua')
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
 local Prefs = import('/lua/user/prefs.lua')
@@ -32,7 +34,8 @@ local teamOpts = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
 local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
 local gameColors = import('/lua/gameColors.lua').GameColors
 local numOpenSlots = LobbyComm.maxPlayerSlots
-local formattedOptions = {}
+formattedOptions = {''}
+FormOpt2 = {''}
 local teamIcons = {
     '/lobby/team_icons/team_no_icon.dds',
     '/lobby/team_icons/team_1_icon.dds',
@@ -45,6 +48,7 @@ local teamIcons = {
 
 --// Xinnony DEBUG
 XinnonyDebug = 0
+XinnonyOption = 0
 -- 0 = NO DEBUG (Default)
 -- -1 = DEBUG OTHER
 -- 1 = DEBUG Country
@@ -1551,22 +1555,12 @@ local function UpdateGame()
         end
     end
 
-    if GUI.becomeObserver then
-        if IsObserver(localPlayerID) then
-            --GUI.becomeObserver:Hide()
-            GUI.becomeObserver:Disable()
-        else
-            --GUI.becomeObserver:Show()
-            GUI.becomeObserver:Enable()
-        end
-    end
-
     local localPlayerSlot = FindSlotForID(localPlayerID)
     if localPlayerSlot then
         if gameInfo.PlayerOptions[localPlayerSlot].Ready then
             if GUI.becomeObserver then
-                GUI.becomeObserver:Disable()
-            end
+				GUI.becomeObserver:Disable()
+			end
             GUI.LargeMapPreview:Disable()
             TEST1factionPanel:Disable()
             TEST2factionPanel:Disable()
@@ -1575,8 +1569,8 @@ local function UpdateGame()
             TEST5factionPanel:Disable()
         else
             if GUI.becomeObserver then
-                GUI.becomeObserver:Enable()
-            end
+				GUI.becomeObserver:Enable()
+			end
             GUI.LargeMapPreview:Enable()
             TEST1factionPanel:Enable()
             TEST2factionPanel:Enable()
@@ -2236,6 +2230,84 @@ function HostConvertObserverToPlayer(senderID, name, fromObserverSlot, toPlayerS
     UpdateGame()
 end
 
+function HostConvertObserverToPlayerWithoutSlot(senderID, name, fromObserverSlot, requestedFaction, requestedPL, requestedRC, requestedNG) -- Xinnony
+    
+	--AddChatText('Go Observer to Player without Slot')
+	--AddChatText('nomOpenSlots : '..numOpenSlots)
+	
+	local newSlot = -1
+	for i = 1, numOpenSlots do
+		if gameInfo.PlayerOptions[i] == nil and gameInfo.ClosedSlots[i] == nil then
+			--AddChatText('Index EMPTY : '..i)
+			newSlot = i
+			break
+		else
+			--AddChatText('Index LOCK : '..i)
+		end
+	end
+	if newSlot == -1 then
+		--AddChatText('No Slot available')
+		return
+	else
+		--AddChatText('New Slot : '..newSlot)
+	end
+	local toPlayerSlot = newSlot
+	
+	
+	if gameInfo.Observers[fromObserverSlot] == nil then
+        return
+    end
+
+    if gameInfo.PlayerOptions[toPlayerSlot] != nil then
+        return
+    end
+
+    if gameInfo.ClosedSlots[toPlayerSlot] != nil then
+        return
+    end
+
+    gameInfo.PlayerOptions[toPlayerSlot] = LobbyComm.GetDefaultPlayerOptions(name)
+    gameInfo.PlayerOptions[toPlayerSlot].OwnerID = senderID
+
+    if requestedFaction then
+        --gameInfo.PlayerOptions[toPlayerSlot].Faction = gameInfo.Observers[fromObserverSlot].oldFaction or requestedFaction
+        gameInfo.PlayerOptions[toPlayerSlot].Faction = requestedFaction
+    end
+
+    if requestedPL then
+        gameInfo.PlayerOptions[toPlayerSlot].PL = requestedPL
+    end
+
+    if requestedRC then
+        gameInfo.PlayerOptions[toPlayerSlot].RC = requestedRC
+    end
+
+    if requestedNG then
+        gameInfo.PlayerOptions[toPlayerSlot].NG = requestedNG
+    end
+
+    for colorIndex,colorVal in gameColors.PlayerColors do
+        if IsColorFree(colorIndex) then
+            gameInfo.PlayerOptions[toPlayerSlot].PlayerColor = gameInfo.Observers[fromObserverSlot].oldColor or colorIndex
+            break
+        end
+    end
+
+    gameInfo.Observers[fromObserverSlot] = nil
+
+    lobbyComm:BroadcastData(
+        {
+            Type = 'ConvertObserverToPlayer',
+            OldSlot = fromObserverSlot,
+            NewSlot = toPlayerSlot,
+            Options =  gameInfo.PlayerOptions[toPlayerSlot],
+        }
+    )
+
+    SendSystemMessage(LOCF("<LOC lobui_0227>%s has switched from an observer to player.", name))
+    UpdateGame()
+end
+
 function HostClearPlayer(uid)
 
     local slot = FindSlotForID(peerID)
@@ -2338,7 +2410,12 @@ function HostPlayerMissingMapAlert(id)
     end
 
     if needMessage then
-        SendSystemMessage(LOCF("<LOC lobui_0330>%s is missing map %s.", name, gameInfo.GameOptions.ScenarioFile))
+		SendSystemMessage(LOCF("<LOC lobui_0330>%s is missing map %s.", name, gameInfo.GameOptions.ScenarioFile))
+		LOG('>> '..name..' is missing map '..gameInfo.GameOptions.ScenarioFile)
+		if name == localPlayerName then
+			LOG('>> '..gameInfo.GameOptions.ScenarioFile..' replaced with '..'SCMP_009')
+			SetGameOption('ScenarioFile', '/maps/scmp_009/scmp_009_scenario.lua')
+		end
     end
 end
 
@@ -2458,7 +2535,7 @@ function CreateUI(maxPlayers)
         CreateOptionLobbyDialog()
     end
     --// Credits footer -- Xinnony
-    local Credits = 'New Skin by Xinnony and Barlots (v1.9c)'
+    local Credits = 'New Skin by Xinnony and Barlots ('..LOBBYversion..')'
     local Credits_Text_X = 11
     Credits_Text = UIUtil.CreateText(GUI.panel, '', 17, UIUtil.titleFont)
     SetText2(Credits_Text, Credits, 10)
@@ -2554,24 +2631,33 @@ function CreateUI(maxPlayers)
         --GUI.RankedLabel:SetColor('ff7777') -- 77ff77
         GUI.RankedLabel:SetDropShadow(true)
     
-    -- XinnonyWork -- Checkbox Show changed Options
+    -- Checkbox Show changed Options
     cbox_ShowChangedOption = UIUtil.CreateCheckboxStd(GUI.optionsPanel, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel, 3, 0)
-        --LayoutHelpers.AtHorizontalCenterIn(cbox_ShowChangedOption, GUI.optionsPanel, -8)
-        cbox_ShowChangedOption_TEXT = UIUtil.CreateText(cbox_ShowChangedOption, 'Hide unchanged Options', 11, 'Arial')
+        Tooltip.AddCheckboxTooltip(cbox_ShowChangedOption, {text='Hide unchanged Options', body='Show only changed Options'})
+		cbox_ShowChangedOption_TEXT = UIUtil.CreateText(cbox_ShowChangedOption, 'Hide unchanged Options', 11, 'Arial')
             cbox_ShowChangedOption_TEXT:SetColor('B9BFB9')
             cbox_ShowChangedOption_TEXT:SetDropShadow(true)
             LayoutHelpers.AtLeftIn(cbox_ShowChangedOption_TEXT, cbox_ShowChangedOption, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox_ShowChangedOption_TEXT, cbox_ShowChangedOption)
-            cbox_ShowChangedOption:Disable()
-            Tooltip.AddButtonTooltip(cbox_ShowChangedOption_TEXT, {text='Show only changed Options', body='Not working yet, coming soon!'})
             cbox_ShowChangedOption.OnCheck = function(self, checked)
                 if checked then
-                    cbox_ShowChangedOption:SetCheck(false, true)
+                    XinnonyOption = 1
+					RefreshOptionDisplayData()
+					if GUI.OptionContainer.CalcVisible then
+						GUI.OptionContainer:CalcVisible()
+					end
+					GUI.OptionContainer.ScrollSetTop(GUI.OptionContainer, 'Vert', 0)
                 else
+					XinnonyOption = 0
+					RefreshOptionDisplayData()
+					if GUI.OptionContainer.CalcVisible then
+						GUI.OptionContainer:CalcVisible()
+					end
+					GUI.OptionContainer.ScrollSetTop(GUI.OptionContainer, 'Vert', 0)
                 end
             end
-    -- XinnonyWork -- Checkbox Show changed Options
+    -- Checkbox Show changed Options
 
     -- GAME OPTIONS // MODS MANAGER BUTTON --
     if lobbyComm:IsHost() then     -- GAME OPTION
@@ -2601,7 +2687,7 @@ function CreateUI(maxPlayers)
                 end
                 --SendSystemMessage(selectedScenario.file)
 
-                SetGameOption('ScenarioFile',selectedScenario.file)
+				SetGameOption('ScenarioFile',selectedScenario.file)
 
                 SetGameOption('RestrictedCategories', restrictedCategories, true)
                 ClearBadMapFlags()  -- every new map, clear the flags, and clients will report if a new map is bad
@@ -2774,7 +2860,7 @@ function CreateUI(maxPlayers)
     GUI.OptionDisplay = {}
     RefreshOptionDisplayData()
 
-    local function CreateOptionElements()
+    function CreateOptionElements()
         local function CreateElement(index)
             GUI.OptionDisplay[index] = Group(GUI.OptionContainer)
             GUI.OptionDisplay[index].Height:Set(36)
@@ -2813,8 +2899,8 @@ function CreateUI(maxPlayers)
         LayoutHelpers.AtLeftTopIn(GUI.OptionDisplay[1], GUI.OptionContainer)
 
         local index = 2
-        while GUI.OptionDisplay[table.getsize(GUI.OptionDisplay)].Bottom() + GUI.OptionDisplay[1].Height() <
-              GUI.OptionContainer.Bottom() do
+        while index != 8 do
+		--while GUI.OptionDisplay[table.getsize(GUI.OptionDisplay)].Bottom() + GUI.OptionDisplay[1].Height() < GUI.OptionContainer.Bottom() do
             CreateElement(index)
             LayoutHelpers.Below(GUI.OptionDisplay[index], GUI.OptionDisplay[index-1])
             index = index + 1
@@ -2825,7 +2911,11 @@ function CreateUI(maxPlayers)
     local numLines = function() return table.getsize(GUI.OptionDisplay) end
 
     local function DataSize()
-        return table.getn(formattedOptions)
+		if XinnonyOption == 0 then
+			return table.getn(formattedOptions)
+		elseif XinnonyOption == 1 then
+			return table.getn(FormOpt2)
+		end
     end
 
     -- called when the scrollbar for the control requires data to size itself
@@ -2886,7 +2976,9 @@ function CreateUI(maxPlayers)
                 LayoutHelpers.ResetLeft(line.value)
             end
             line.text:SetText(LOC(data.text))
+			line.value.bg:Show()
             line.value:SetText(LOC(data.value))
+			line.value.bg2:Show()
             line.value.bg.HandleEvent = Group.HandleEvent
             line.value.bg2.HandleEvent = Bitmap.HandleEvent
             if data.tooltip then
@@ -2894,11 +2986,29 @@ function CreateUI(maxPlayers)
                 Tooltip.AddControlTooltip(line.value.bg2, data.valueTooltip)
             end
         end
-        for i, v in GUI.OptionDisplay do
-            if formattedOptions[i + self.top] then
-                SetTextLine(v, formattedOptions[i + self.top], i + self.top)
-            end
+        
+		for i, v in GUI.OptionDisplay do
+            if XinnonyOption == 0 then
+				if formattedOptions[i + self.top] then
+					SetTextLine(v, formattedOptions[i + self.top], i + self.top)
+				else
+					v.text:SetText('')
+					v.value:SetText('')
+					v.value.bg:Hide()
+					v.value.bg2:Hide()
+				end
+			elseif XinnonyOption == 1 then
+				if FormOpt2[i + self.top] then
+					SetTextLine(v, FormOpt2[i + self.top], i + self.top)
+				else
+					v.text:SetText('')
+					v.value:SetText('')
+					v.value.bg:Hide()
+					v.value.bg2:Hide()
+				end
+			end
         end
+		
     end
 
     GUI.OptionContainer:CalcVisible()
@@ -3213,16 +3323,15 @@ function CreateUI(maxPlayers)
             LayoutHelpers.AtLeftIn(GUI.slots[curRow].ready, GUI.slots[curRow].multiSpace, 0)
             GUI.slots[i].ready.OnCheck = function(self, checked)
                 if checked then
-                    DisableSlot(self.row, true)
+					DisableSlot(self.row, true)
                     if GUI.becomeObserver then
-                        GUI.becomeObserver:Disable()
-                    end
-
+						GUI.becomeObserver:Disable()
+					end
                 else
                     EnableSlot(self.row)
                     if GUI.becomeObserver then
-                        GUI.becomeObserver:Enable()
-                    end
+						GUI.becomeObserver:Enable()
+					end
                 end
                 SetPlayerOption(self.row,'Ready',checked)
             end
@@ -3304,16 +3413,26 @@ function CreateUI(maxPlayers)
                 if IsPlayer(localPlayerID) then
                     if lobbyComm:IsHost() then
                         HostConvertPlayerToObserver(hostID, localPlayerName, FindSlotForID(localPlayerID))
-                        GUI.becomeObserver:Disable()
                     else
                         lobbyComm:SendData(hostID, {Type = 'RequestConvertToObserver', RequestedName = localPlayerName, RequestedSlot = FindSlotForID(localPlayerID)})
-                        GUI.becomeObserver:Disable()
                     end
+					GUI.becomeObserver.label:SetText('Go Player')
+				elseif IsObserver(localPlayerID) then
+					if lobbyComm:IsHost() then
+                        HostConvertObserverToPlayerWithoutSlot(hostID, localPlayerName, FindObserverSlotForID(localPlayerID))
+                    else
+                        lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayerWithoutSlot', RequestedName = localPlayerName})
+                    end
+					GUI.becomeObserver.label:SetText('Go Observer')
                 end
             end
             GUI.becomeObserver.OnRolloverEvent = function(self, state)
                 if state == 'enter' then
-                    GUI.becomeObserver.label:SetText('Go Observer')
+                    if IsPlayer(localPlayerID) then
+						GUI.becomeObserver.label:SetText('Go Observer')
+					else
+						GUI.becomeObserver.label:SetText('Go Player')
+					end
                     if GUI.becomeObserver:IsDisabled() then
                         GUI.becomeObserver:Disable()
                     end
@@ -3386,7 +3505,8 @@ function CreateUI(maxPlayers)
                     SetGameOption('NoRushOption', 'Off')
                     --gameInfo.GameMods["656b7af6-9a56-47c5-8182-3a896dc6f4b7"] = true
                     --lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
-                    UpdateGame()
+					lobbyComm:BroadcastData( { Type = "SetAllPlayerNotReady" } )
+					UpdateGame()
                 end
             end
         --end of ranked options code
@@ -3426,7 +3546,7 @@ function CreateUI(maxPlayers)
                             end
                             --SendSystemMessage(selectedScenario.file)
 
-                            SetGameOption('ScenarioFile',selectedScenario.file)
+							SetGameOption('ScenarioFile',selectedScenario.file)
 
                             SetGameOption('RestrictedCategories', restrictedCategories, true)
                             ClearBadMapFlags()  -- every new map, clear the flags, and clients will report if a new map is bad
@@ -3690,6 +3810,7 @@ function RefreshOptionDisplayData(scenarioInfo)
     local teamOptions = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
     local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
     formattedOptions = {}
+	FormOpt2 = {}
 
 --// Check Ranked active -- Xinnony & Vicarian
     local getInit = GetCommandLineArg("/init", 1)
@@ -3769,16 +3890,26 @@ function RefreshOptionDisplayData(scenarioInfo)
             mod = true,
             tooltip = 'Lobby_Mod_Option',
             valueTooltip = 'Lobby_Mod_Option'})
+		table.insert(FormOpt2, {text = LOCF(modStr, modNum),
+            value = LOC('<LOC lobby_0003>Check Mod Manager'),
+            mod = true,
+            tooltip = 'Lobby_Mod_Option',
+            valueTooltip = 'Lobby_Mod_Option'})
     end
 --\\ Stop Check Mod active
 --// Check RestrictedUnit active
     if gameInfo.GameOptions.RestrictedCategories != nil then
         if table.getn(gameInfo.GameOptions.RestrictedCategories) != 0 then
             table.insert(formattedOptions, {text = LOC("<LOC lobby_0005>Build Restrictions Enabled"),
-            value = LOC("<LOC lobby_0006>Check Unit Manager"),
-            mod = true,
-            tooltip = 'Lobby_BuildRestrict_Option',
-            valueTooltip = 'Lobby_BuildRestrict_Option'})
+				value = LOC("<LOC lobby_0006>Check Unit Manager"),
+				mod = true,
+				tooltip = 'Lobby_BuildRestrict_Option',
+				valueTooltip = 'Lobby_BuildRestrict_Option'})
+			table.insert(FormOpt2, {text = LOC("<LOC lobby_0005>Build Restrictions Enabled"),
+				value = LOC("<LOC lobby_0006>Check Unit Manager"),
+				mod = true,
+				tooltip = 'Lobby_BuildRestrict_Option',
+				valueTooltip = 'Lobby_BuildRestrict_Option'})
         end
     end
 --\\ Stop Check RestrictedUnit active
@@ -3810,8 +3941,15 @@ function RefreshOptionDisplayData(scenarioInfo)
                 mpOnly = optData.mponly or false
                 option = {text = optData.label, tooltip = optData.pref}
                 for _, val in optData.values do
-                    if val.key == v then
-                        option.value = val.text
+					if val.key == v then
+						if optData.default and _ != optData.default then -- If the option is not default value, insert. - Xinnony
+							table.insert(FormOpt2, {
+								text = optData.label,
+								value = val.text,
+								tooltip = {text = optData.label, body = optData.help},
+								valueTooltip = {text = optData.label, body = val.help}})
+						end
+						option.value = val.text
                             option.valueTooltip = 'lob_'..optData.key..'_'..val.key
                         break
                     end
@@ -3825,7 +3963,14 @@ function RefreshOptionDisplayData(scenarioInfo)
                     option = {text = optData.label, tooltip = optData.pref}
                     for _, val in optData.values do
                         if val.key == v then
-                            option.value = val.text
+							if optData.default and _ != optData.default then -- If the option is not default value, insert. - Xinnony
+								table.insert(FormOpt2, {
+									text = optData.label,
+									value = val.text,
+									tooltip = {text = optData.label, body = optData.help},
+									valueTooltip = {text = optData.label, body = val.help}})
+							end
+							option.value = val.text
                             option.valueTooltip = 'lob_'..optData.key..'_'..val.key
                             break
                         end
@@ -3840,7 +3985,14 @@ function RefreshOptionDisplayData(scenarioInfo)
                     option = {text = optData.label, tooltip = optData.pref}
                     for _, val in optData.values do
                         if val.key == v then
-                            option.value = val.text
+							if optData.default and _ != optData.default then -- If the option is not default value, insert. - Xinnony
+								table.insert(FormOpt2, {
+									text = optData.label,
+									value = val.text,
+									tooltip = {text = optData.label, body = optData.help},
+									valueTooltip = {text = optData.label, body = val.help}})
+							end
+							option.value = val.text
                             option.valueTooltip = 'lob_'..optData.key..'_'..val.key
                             break
                         end
@@ -3855,7 +4007,14 @@ function RefreshOptionDisplayData(scenarioInfo)
                     option = {text = optData.label, tooltip = optData.pref}
                     for _, val in optData.values do
                         if val.key == v then
-                            option.value = val.text
+							if optData.default and _ != optData.default then -- If the option is not default value, insert. - Xinnony
+								table.insert(FormOpt2, {
+									text = optData.label,
+									value = val.text,
+									tooltip = {text = optData.label, body = optData.help},
+									valueTooltip = {text = optData.label, body = val.help}})
+							end
+							option.value = val.text
                             option.valueTooltip = 'lob_'..optData.key..'_'..val.key
                             break
                         end
@@ -3867,15 +4026,9 @@ function RefreshOptionDisplayData(scenarioInfo)
         if option then
             if not mpOnly or not singlePlayer then
                 table.insert(formattedOptions, option)
-                --table.removeByValue(formattedOptions, option.value)
-                --AddChatText("__opt__"..option.value)
             end
         end
     end
-
-    -- XinnonyWork
-    --Remove_Unchanged_Options()
-    -- XinnonyWork
 
 -- Disable before separate AI option on GlobalOption, but the order can set on lobbyOptions.lua - Xinnony
 --    table.sort(formattedOptions,
@@ -4345,7 +4498,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             AddChatText("["..data.SenderName.."] "..data.Text)
         elseif data.Type == 'PrivateChat' then
             AddChatText("<<"..data.SenderName..">> "..data.Text)
-        --// RULE TITLE - Xinnony
+		--// RULE TITLE - Xinnony
         elseif data.Type == 'Rule_Title_MSG' then
             if XinnonyDebug == 2 then LOG(">> RECEIVE MSG Rule_Title_MSG : result="..(data.Result or "?")) end
             if XinnonyDebug == 2 then AddChatText(">> RECEIVE MSG Rule_Title_MSG : result="..data.Result) end
@@ -4394,6 +4547,10 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 HostConvertObserverToPlayer(data.SenderID, data.RequestedName, data.ObserverSlot, data.PlayerSlot,
                                             data.requestedFaction, data.requestedPL, data.requestedRC, data.requestedNG)
 
+			elseif data.Type == 'RequestConvertToPlayerWithoutSlot' then
+                HostConvertObserverToPlayerWithoutSlot(data.SenderID, data.RequestedName, data.ObserverSlot,
+                                            data.requestedFaction, data.requestedPL, data.requestedRC, data.requestedNG)
+
             elseif data.Type == 'RequestColor' then
                 if IsColorFree(data.Color) then
                     -- Color is available, let everyone else know
@@ -4422,7 +4579,15 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             if data.Type == 'SystemMessage' then
                 AddChatText(data.Text)
 
-            elseif data.Type == 'Peer_Really_Disconnected' then
+            elseif data.Type == 'SetAllPlayerNotReady' then -- Xinnony
+				EnableSlot(FindSlotForID(FindIDForName(localPlayerName)))
+				if GUI.becomeObserver then
+					GUI.becomeObserver:Enable()
+				end
+				SetPlayerOption(FindSlotForID(FindIDForName(localPlayerName)), 'Ready', false)
+				--UpdateGame()
+
+			elseif data.Type == 'Peer_Really_Disconnected' then
                 if XinnonyDebug == 3 then AddChatText('>> DATA RECEIVE : Peer_Really_Disconnected (slot:'..data.Slot..')') end
                 if XinnonyDebug == 3 then LOG('>> DATA RECEIVE : Peer_Really_Disconnected (slot:'..data.Slot..')') end
                 if data.Options.OwnerID == localPlayerID then
@@ -4614,9 +4779,9 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             SetGameOption(option.key,option.values[defValue].key)
         end
 
-        if self.desiredScenario and self.desiredScenario != "" then
+		if self.desiredScenario and self.desiredScenario != "" then
             Prefs.SetToCurrentProfile('LastScenario', self.desiredScenario)
-            SetGameOption('ScenarioFile',self.desiredScenario)
+			SetGameOption('ScenarioFile',self.desiredScenario)
         else
             local scen = Prefs.GetFromCurrentProfile('LastScenario')
             if scen and scen != "" then
@@ -4731,7 +4896,8 @@ function SetPlayerOption(slot, key, val)
 end
 
 function SetGameOption(key, val, ignoreNilValue)
-    ignoreNilValue = ignoreNilValue or false
+    local scenarioInfo = nil
+	ignoreNilValue = ignoreNilValue or false
 
     if (not ignoreNilValue) and ((key == nil) or (val == nil)) then
         WARN('Attempt to set nil lobby game option: ' .. tostring(key) .. ' ' .. tostring(val))
@@ -4762,9 +4928,9 @@ function SetGameOption(key, val, ignoreNilValue)
             GpgNetSend('GameOption', key, restrictionsEnabled)
         elseif key == 'ScenarioFile' then
             GpgNetSend('GameOption', key, val)
-             if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") then
-                scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-                if scenarioInfo then
+             if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != '') then
+				scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+                if scenarioInfo and scenarioInfo.map and (scenarioInfo.map != '') then
                     GpgNetSend('GameOption', 'Slots', table.getsize(scenarioInfo.Configurations.standard.teams[1].armies))
                 end
             end
@@ -4821,7 +4987,7 @@ function CreateBigPreview(depth, parent)
     end
 
     scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-    if scenarioInfo and scenarioInfo.map and (scenarioInfo.map != "") then
+    if scenarioInfo and scenarioInfo.map and (scenarioInfo.map != '') then
         if not LrgMap:SetTexture(scenarioInfo.preview) then
             LrgMap:SetTextureFromMap(scenarioInfo.map)
         end
@@ -5041,21 +5207,26 @@ end -- NewShowMapPositions(...)
 -- CPU Benchmark Code
 -- Author: Duck_42
 -- Date: 2013.04.05
+-- 
+-- 2013.09.24 - Significant change to benchmark logic.  This should improve accuracy and eliminate some
+--              problems.
+-- 2013.10.04 - Reverting back to previous CPU benchmark.  The new one doesn't appear to be 
+--              as accurate as the old one.
+-- 2013.11.04 - Second attempt at improving the CPU benchmark.  This one has been tested much more and
+--              should produce the desired results.
 --******************************************************************************************************
-local benchmarkLength = 5 --5.0 Seconds
 
 --CPU Status Bar Configuration
 local barMax = 450
 local barMin = 150
 local greenBarMax = 300
 local yellowBarMax = 375
-local scoreSkew1 = -25 --Skews all CPU scores up or down by the amount specified (0 = no skew)
+local scoreSkew1 = 0 --Skews all CPU scores up or down by the amount specified (0 = no skew)
 local scoreSkew2 = 1.0 --Skews all CPU scores specified coefficient (1.0 = no skew)
 
 --Variables for CPU Test
-local running
-local loopCount
 local firstCPUTest = true
+local BenchTime
 
 --------------------------------------------------
 --  CPU Benchmark Storage and Retrieval Functions
@@ -5092,25 +5263,48 @@ end
 --------------------------------------------------
 function CPUBenchmark()
     --This function gives the CPU some busy work to do.
-    --CPU score is determined by how many times it can loop through
-    --the set of busy work before the timer in the CPUTimer function expires.
-    while running do
-         for i = 1.0, 2.0, .000008 do 
-            j = i + i
-            k = i * i
-            l = k / j
-            m = j - i
+    --CPU score is determined by how quickly the work is completed.
+    local totalTime = 0
+    local lastTime
+    local currTime
+    local countTime = 0    
+    --Make everything a local variable
+    --This is necessary because we don't want LUA searching through the globals as part of the benchmark
+    local h
+    local i
+    local j
+    local k
+    local l
+    local m
+    for h = 1, 48, 1 do
+        lastTime = GetSystemTimeSeconds()
+        for i = 1.0, 25.0, 0.0008 do 
+            --This instruction set should cover most LUA operators
+            j = i + i   --Addition
+            k = i * i   --Multiplication
+            l = k / j   --Division 
+            m = j - i   --Subtraction
+            j = i ^ 4   --Power
+            l = -i      --Negation
+            m = {'One', 'Two', 'Three'} --Create Table
+            table.insert(m, 'Four')     --Insert Table Value
+            table.remove(m, 1)          --Remove Table Value           
+            l = table.getn(m)           --Get Table Length
+            k = i < j   --Less Than        
+            k = i == j  --Equality
+            k = i <= j  --Less Than or Equal to
+            k = not k
         end
-        loopCount = loopCount + 1
-        --This is necessary in order to make this 'thread' yield so other things can be done (namely the CPUTimer function).
-        WaitSeconds(0)
-     end
-end
-
-function CPUTimer()
-    --This function handles the benchmark timer.  When this function completes, the benchmark is stopped.
-    WaitSeconds(benchmarkLength)
-    running = false
+        currTime = GetSystemTimeSeconds()
+        totalTime = totalTime + currTime - lastTime
+        
+        if totalTime > countTime then
+            --This is necessary in order to make this 'thread' yield so other things can be done.
+            countTime = totalTime + .125
+            WaitSeconds(0)
+        end
+    end
+    BenchTime = math.ceil(totalTime * 100)
 end
 
 --------------------------------------------------
@@ -5184,21 +5378,15 @@ function StressCPU(waitTime)
 
     --Run three benchmarks and keep the best one
     for i=1, 3, 1 do
-        loopCount = 0
-        running = true
-        ForkThread(CPUTimer)
+        BenchTime = 0
         CPUBenchmark()
 
-        --Invert scale for display purposes
-        --With .01 sec wait intervals the max number of loops should be 100 * benchmarkLength
-        loopCount = (benchmarkLength * 100) - math.min(scoreSkew2 * loopCount + scoreSkew1, (benchmarkLength * 100))
-
-        --LOG('CPU benchmark #'..i..' complete: '.. loopCount )
+        BenchTime = scoreSkew2 * BenchTime + scoreSkew1
 
         --If this benchmark was better than our best so far...
-        if loopCount < currentBestBenchmark then
+        if BenchTime < currentBestBenchmark then
             --Make this our best benchmark
-            currentBestBenchmark = loopCount
+            currentBestBenchmark = BenchTime
 
             --Send it to the other players
             lobbyComm:BroadcastData( { Type = 'CPUBenchmark', PlayerName = localPlayerName, Result = currentBestBenchmark} )
@@ -5209,17 +5397,6 @@ function StressCPU(waitTime)
             --Update the UI bar
             UpdateCPUBar(localPlayerName)
         end
-    end
-
-    --Show message if player's score is very low
-    if currentBestBenchmark >= 450 and firstCPUTest then
-        AddChatText(LOCF('<LOC lobui_0901>SYSTEM: Your CPU score is unusually low.'))
-        AddChatText(LOCF('<LOC lobui_0902>SYSTEM: This can be caused by using ALT-TAB or minimizing the game after joining.'))
-        AddChatText(LOCF('<LOC lobui_0903>SYSTEM: Certain CPU power saving features can also cause this.'))
-        AddChatText(LOCF('<LOC lobui_0903>SYSTEM: After joining the lobby, please wait 15 seconds before using ALT-TAB or '..
-                         'minimizing.'))
-        AddChatText(LOCF('<LOC lobui_0903>SYSTEM: If you continue to see this message anyway, please let us know on the FAF '..
-                         'forums.'))
     end
 
     --Set this flag so we'll know later
@@ -5894,15 +6071,17 @@ function ChangeBackgroundLobby(slot, faction)
             GUI.background:Hide()
             GUI.background2:Show()
             local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
-            if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") then
+            if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != '') then
                 scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-            end
-            if scenarioInfo and scenarioInfo.map and (scenarioInfo.map != "") then
-                if not GUI.background2:SetTexture(scenarioInfo.preview) then
-                    GUI.background2:SetTextureFromMap(scenarioInfo.map)
-                end
-            else
-                GUI.background2:ClearTexture()
+				if scenarioInfo and scenarioInfo.map and (scenarioInfo.map != '') and scenarioInfo.preview then
+					if not GUI.background2:SetTexture(scenarioInfo.preview) then
+						GUI.background2:SetTextureFromMap(scenarioInfo.map)
+					end
+				else
+					GUI.background2:ClearTexture()
+				end
+			else
+				GUI.background2:ClearTexture()
             end
             LASTXinnoBackground = 'Map'
         
@@ -5935,12 +6114,12 @@ function CreateOptionLobbyDialog()
     cbox_BG_Factions = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftIn(cbox_BG_Factions, dialog2, 20)
         LayoutHelpers.AtTopIn(cbox_BG_Factions, dialog2, 20)
-        cbox_BG_Factions_TEXT = UIUtil.CreateText(cbox_BG_Factions, 'Factions Backgrounds', 14, 'Arial')
+        Tooltip.AddCheckboxTooltip(cbox_BG_Factions, {text='Factions Background', body='Show the Factions Backgrounds in the Lobby'})
+		cbox_BG_Factions_TEXT = UIUtil.CreateText(cbox_BG_Factions, 'Factions Backgrounds', 14, 'Arial')
             cbox_BG_Factions_TEXT:SetColor('B9BFB9')
             cbox_BG_Factions_TEXT:SetDropShadow(true)
             LayoutHelpers.AtLeftIn(cbox_BG_Factions_TEXT, cbox_BG_Factions, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox_BG_Factions_TEXT, cbox_BG_Factions)
-            Tooltip.AddButtonTooltip(cbox_BG_Factions_TEXT, {text='Factions Background', body='Show the Factions Backgrounds in the Lobby'})
             cbox_BG_Factions.OnCheck = function(self, checked)
                 if checked then
                     Prefs.SetToCurrentProfile('XinnoBackground', 'Factions')
@@ -5956,12 +6135,12 @@ function CreateOptionLobbyDialog()
     cbox_BG_ConceptArt = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftIn(cbox_BG_ConceptArt, dialog2, 20)
         LayoutHelpers.AtTopIn(cbox_BG_ConceptArt, dialog2, 40)
-        cbox_BG_ConceptArt_TEXT = UIUtil.CreateText(cbox_BG_ConceptArt, 'Concept Art Backgrounds', 14, 'Arial')
+        Tooltip.AddCheckboxTooltip(cbox_BG_Factions, {text='Factions Background', body='Show the Factions Backgrounds in the Lobby'})
+		cbox_BG_ConceptArt_TEXT = UIUtil.CreateText(cbox_BG_ConceptArt, 'Concept Art Backgrounds', 14, 'Arial')
             cbox_BG_ConceptArt_TEXT:SetColor('B9BFB9')
             cbox_BG_ConceptArt_TEXT:SetDropShadow(true)
             LayoutHelpers.AtLeftIn(cbox_BG_ConceptArt_TEXT, cbox_BG_ConceptArt, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox_BG_ConceptArt_TEXT, cbox_BG_ConceptArt)
-            Tooltip.AddButtonTooltip(cbox_BG_ConceptArt_TEXT, {text='ConceptArt Background', body='Show the Concept Art Backgrounds in the Lobby'})
             cbox_BG_ConceptArt.OnCheck = function(self, checked)
                 if checked then
                     Prefs.SetToCurrentProfile('XinnoBackground', 'ConceptArt')
@@ -5977,12 +6156,12 @@ function CreateOptionLobbyDialog()
     cbox_BG_Screenshoot = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftIn(cbox_BG_Screenshoot, dialog2, 20)
         LayoutHelpers.AtTopIn(cbox_BG_Screenshoot, dialog2, 60)
-        cbox_BG_Screenshoot_TEXT = UIUtil.CreateText(cbox_BG_Screenshoot, 'Screenshot Backgrounds', 14, 'Arial')
+        Tooltip.AddCheckboxTooltip(cbox_BG_Screenshoot, {text='Screenshoot Background', body='Show some Screenshot Backgrounds in the Lobby'})
+		cbox_BG_Screenshoot_TEXT = UIUtil.CreateText(cbox_BG_Screenshoot, 'Screenshot Backgrounds', 14, 'Arial')
             cbox_BG_Screenshoot_TEXT:SetColor('B9BFB9')
             cbox_BG_Screenshoot_TEXT:SetDropShadow(true)
             LayoutHelpers.AtLeftIn(cbox_BG_Screenshoot_TEXT, cbox_BG_Screenshoot, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox_BG_Screenshoot_TEXT, cbox_BG_Screenshoot)
-            Tooltip.AddButtonTooltip(cbox_BG_Screenshoot_TEXT, {text='Screenshoot Background', body='Show some Screenshot Backgrounds in the Lobby'})
             cbox_BG_Screenshoot.OnCheck = function(self, checked)
                 if checked then
                     Prefs.SetToCurrentProfile('XinnoBackground', 'Screenshoot')
@@ -5998,12 +6177,12 @@ function CreateOptionLobbyDialog()
     cbox_BG_Map = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftIn(cbox_BG_Map, dialog2, 20)
         LayoutHelpers.AtTopIn(cbox_BG_Map, dialog2, 80)
-        cbox_BG_Map_TEXT = UIUtil.CreateText(cbox_BG_Map, 'Map Preview', 14, 'Arial')
+        Tooltip.AddCheckboxTooltip(cbox_BG_Map, {text='Map Background', body='Show the Map Preview in the Lobby'})
+		cbox_BG_Map_TEXT = UIUtil.CreateText(cbox_BG_Map, 'Map Preview', 14, 'Arial')
             cbox_BG_Map_TEXT:SetColor('B9BFB9')
             cbox_BG_Map_TEXT:SetDropShadow(true)
             LayoutHelpers.AtLeftIn(cbox_BG_Map_TEXT, cbox_BG_Map, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox_BG_Map_TEXT, cbox_BG_Map)
-            Tooltip.AddButtonTooltip(cbox_BG_Map_TEXT, {text='Map Background', body='Show the Map Preview in the Lobby'})
             cbox_BG_Map.OnCheck = function(self, checked)
                 if checked then
                     Prefs.SetToCurrentProfile('XinnoBackground', 'Map')
@@ -6019,12 +6198,12 @@ function CreateOptionLobbyDialog()
     cbox_BG_No = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftIn(cbox_BG_No, dialog2, 20)
         LayoutHelpers.AtTopIn(cbox_BG_No, dialog2, 100)
-        cbox_BG_No_TEXT = UIUtil.CreateText(cbox_BG_No, 'No Background', 14, 'Arial')
+        Tooltip.AddCheckboxTooltip(cbox_BG_No, {text='No Background', body='No background in the Lobby'})
+		cbox_BG_No_TEXT = UIUtil.CreateText(cbox_BG_No, 'No Background', 14, 'Arial')
             cbox_BG_No_TEXT:SetColor('B9BFB9')
             cbox_BG_No_TEXT:SetDropShadow(true)
             LayoutHelpers.AtLeftIn(cbox_BG_No_TEXT, cbox_BG_No, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox_BG_No_TEXT, cbox_BG_No)
-            Tooltip.AddButtonTooltip(cbox_BG_No_TEXT, {text='No Background', body='No background in the Lobby'})
             cbox_BG_No.OnCheck = function(self, checked)
                 if checked then
                     Prefs.SetToCurrentProfile('XinnoBackground', 'No')
@@ -6041,12 +6220,12 @@ function CreateOptionLobbyDialog()
     cbox_Skin_Dark = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtRightIn(cbox_Skin_Dark, dialog2, 20)
         LayoutHelpers.AtTopIn(cbox_Skin_Dark, dialog2, 20)
-        cbox_Skin_Dark_TEXT = UIUtil.CreateText(cbox_Skin_Dark, 'Dark Skin', 14, 'Arial')
+        Tooltip.AddCheckboxTooltip(cbox_Skin_Dark, {text='Dark Skin', body='Apply the Dark Skin in the Lobby'})
+		cbox_Skin_Dark_TEXT = UIUtil.CreateText(cbox_Skin_Dark, 'Dark Skin', 14, 'Arial')
             cbox_Skin_Dark_TEXT:SetColor('B9BFB9')
             cbox_Skin_Dark_TEXT:SetDropShadow(true)
             LayoutHelpers.AtRightIn(cbox_Skin_Dark_TEXT, cbox_Skin_Dark, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox_Skin_Dark_TEXT, cbox_Skin_Dark)
-            Tooltip.AddButtonTooltip(cbox_Skin_Dark_TEXT, {text='Dark Skin', body='Apply the Dark Skin in the Lobby'})
             cbox_Skin_Dark.OnCheck = function(self, checked)
                 if checked then
                 else
@@ -6056,12 +6235,12 @@ function CreateOptionLobbyDialog()
     local cbox6_0 = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtRightIn(cbox6_0, dialog2, 20)
         LayoutHelpers.AtTopIn(cbox6_0, dialog2, 40)
+		Tooltip.AddCheckboxTooltip(cbox6_0, {text='White Skin', body='White Skin is not available yet, Need a Graphic Artist !!!'})
         local cbox6_1 = UIUtil.CreateText(cbox6_0, 'White Skin', 14, 'Arial')
             cbox6_1:SetColor('B9BFB9')
             cbox6_1:SetDropShadow(true)
             LayoutHelpers.AtRightIn(cbox6_1, cbox6_0, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox6_1, cbox6_0)
-            Tooltip.AddButtonTooltip(cbox6_1, {text='White Skin', body='White Skin is not available yet'})
             cbox6_0:Disable()
             cbox6_0.OnClick = function(self, checked)
                 cbox6_0:SetCheck(false, true)
@@ -6070,12 +6249,12 @@ function CreateOptionLobbyDialog()
     local cbox_StretchBG = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtRightIn(cbox_StretchBG, dialog2, 20)
         LayoutHelpers.AtTopIn(cbox_StretchBG, dialog2, 80)
-        local cbox_StretchBG_TEXT = UIUtil.CreateText(cbox_StretchBG, 'Stretch Background', 14, 'Arial')
+        Tooltip.AddCheckboxTooltip(cbox_StretchBG, {text='Stretch Background', body='You can stretch the background over the entire surface of this game.'})
+		local cbox_StretchBG_TEXT = UIUtil.CreateText(cbox_StretchBG, 'Stretch Background', 14, 'Arial')
             cbox_StretchBG_TEXT:SetColor('B9BFB9')
             cbox_StretchBG_TEXT:SetDropShadow(true)
             LayoutHelpers.AtRightIn(cbox_StretchBG_TEXT, cbox_StretchBG, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox_StretchBG_TEXT, cbox_StretchBG)
-            Tooltip.AddButtonTooltip(cbox_StretchBG_TEXT, {text='Stretch Background', body='...'})
             cbox_StretchBG.OnCheck = function(self, checked)
                 if checked then
                     Prefs.SetToCurrentProfile('XinnoBackgroundStretch', 'true')
@@ -6108,8 +6287,8 @@ function CreateOptionLobbyDialog()
         LayoutHelpers.AtBottomIn(text0, dialog2, 130)
         -- Ask to Xinnony for add your name and work correctly
     local text = {}
-    local ttext = {'- Xinnony : New Skin (with Barlots), Faction Selector, Country Flag, Move Player to,',
-                        'Color State in Nickname, Custom Title, Sort option, Game is/not Ranked label, bugs fixing.',
+    local ttext = {'- Xinnony : New Skin (with Barlots), Faction Selector, Country Flag, Move Player to, Hide Unchanged option,',
+                        'Color State in Nickname, Custom Title, Sort option, Game is/not Ranked label and Bugs Fixing.',
                         '- Vicarian : Contribute with Xinnony, Rating Observer, bugs fixing.',
                         '- Duck_42 : CPU Bench, Ping Nuke.',
                         '- Moritz : Power Lobby 2.0.',}
@@ -6187,12 +6366,7 @@ end
 ##########################################################################
 #####################################.#####################################
 
-function Remove_Unchanged_Options()
-    --table.find(formattedOptions, VAL) -- Table, Val
-    --table.remove()
-end
-
-SetText2 = function(self, text, delay)
+SetText2 = function(self, text, delay) -- Set Text with Animation
     --// Faire une variable qui evite deux droit SetText2 sur le même control de text en même temps.
     if self:GetText() == text then
         --self:SetText(text)
