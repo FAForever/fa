@@ -6,7 +6,7 @@
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
 
-LOBBYversion = 'v1.9f'
+LOBBYversion = 'v2.0'
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
@@ -3044,6 +3044,16 @@ function CreateUI(maxPlayers)
                 import('/lua/ui/lobby/restrictedUnitsDlg.lua').CreateDialog(GUI.panel, gameInfo.GameOptions.RestrictedCategories, function() end, function() end, false)
             end
             Tooltip.AddButtonTooltip(GUI.restrictedUnitsButton, 'lob_RestrictedUnitsClient')
+	elseif lobbyComm:IsHost() then
+		GUI.restrictedUnitsButton = UIUtil.CreateButtonStd2(GUI.optionsPanel, '/BUTTON/medium/', "Preset Lobby", 14, 0)
+		GUI.restrictedUnitsButton.label:SetColor('B9BFB9')
+            GUI.restrictedUnitsButton.label:SetDropShadow(true)
+            LayoutHelpers.AtHorizontalCenterIn(GUI.restrictedUnitsButton, GUI.gameoptionsButton)
+            LayoutHelpers.AtVerticalCenterIn(GUI.restrictedUnitsButton, GUI.exitButton)
+            GUI.restrictedUnitsButton.OnClick = function(self, modifiers)
+                GUI_PRESET()
+            end
+            Tooltip.AddButtonTooltip(GUI.restrictedUnitsButton, 'Load and Save Preset Lobby')
     end
     
     ---------------------------------------------------------------------------
@@ -5666,7 +5676,7 @@ function SetEvent_Faction_Selector()
         --if not IsObserver(localPlayerID) then
         --if IsPlayer(localPlayerID) then
         TEST1factionPanel.HandleEvent = function(ctrl, event)
-        local faction = Prefs.GetFromCurrentProfile('LastFaction')
+        local faction = Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
             local eventHandled = false
             if faction == 2 then
                 TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico-large.dds"))
@@ -5698,7 +5708,7 @@ function SetEvent_Faction_Selector()
         
         --if IsPlayer(localPlayerID) then
         TEST2factionPanel.HandleEvent = function(ctrl, event)
-        local faction = Prefs.GetFromCurrentProfile('LastFaction')
+        local faction = Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
             local eventHandled = false
             if faction == 3 then
                 TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico-large.dds"))
@@ -5730,7 +5740,7 @@ function SetEvent_Faction_Selector()
         
         --if IsPlayer(localPlayerID) then
         TEST3factionPanel.HandleEvent = function(ctrl, event)
-        local faction = Prefs.GetFromCurrentProfile('LastFaction')
+        local faction = Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
             local eventHandled = false
             if faction == 1 then
                 TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico-large.dds"))
@@ -5759,7 +5769,7 @@ function SetEvent_Faction_Selector()
         
         --if IsPlayer(localPlayerID) then
         TEST4factionPanel.HandleEvent = function(ctrl, event)
-        local faction = Prefs.GetFromCurrentProfile('LastFaction')
+        local faction = Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
             local eventHandled = false
             if faction == 4 then
                 TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico-large.dds"))
@@ -5791,7 +5801,7 @@ function SetEvent_Faction_Selector()
         
         --if IsPlayer(localPlayerID) then
         TEST5factionPanel.HandleEvent = function(ctrl, event)
-        local faction = Prefs.GetFromCurrentProfile('LastFaction')
+        local faction = Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
             local eventHandled = false
             if faction == 5 then
                 TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico-large.dds"))
@@ -5822,7 +5832,7 @@ function SetEvent_Faction_Selector()
     end
 
 function SetCurrentFactionTo_Faction_Selector(input_faction)
-    local faction = input_faction or Prefs.GetFromCurrentProfile('LastFaction')
+    local faction = input_faction or Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
         if TEST1factionPanel and TEST2factionPanel and TEST3factionPanel and TEST4factionPanel and TEST5factionPanel then
         if faction == 1 then
             ChangeSkinByFaction(1)
@@ -5894,7 +5904,7 @@ function SetCurrentFactionTo_Faction_Selector(input_faction)
     end
     
 function ChangeSkinByFaction(input_faction)
-    local faction = input_faction or Prefs.GetFromCurrentProfile('LastFaction')
+    local faction = input_faction or Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
     if GUI.panel then
     if faction == 1 then
         GUI.panel:SetTexture(UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[uef]power_panel_bmp.dds"))
@@ -5955,15 +5965,15 @@ function ForceApplyNewSkin()
             GUI.gameoptionsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_dis.dds'))
         end
     end
-    -- Restricted Unit show only if not Your Host
-    if not lobbyComm:IsHost() then
+    -- Restricted Unit show only if not you Host, else Preset Lobby is show.
+    --if not lobbyComm:IsHost() then
         if not GUI.restrictedUnitsButton:IsDisabled() then
             GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_up.dds'))
         elseif GUI.restrictedUnitsButton:IsDisabled() then
             GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_dis.dds'))
         end
-    end
-    -- Observer, AutoTeam, RankedOpts, CPUBench, RandomMap
+    --end
+    -- Observer, AutoTeam, RankedOpts, CPUBench, RandomMap.
     if GUI.becomeObserver then
         if not GUI.becomeObserver:IsDisabled() then
             GUI.becomeObserver:SetTexture(UIUtil.UIFile('/BUTTON/observer/_up.dds'))
@@ -6002,7 +6012,7 @@ function ForceApplyNewSkin()
 end
 
 function ChangeSkinButtonByFaction(input_faction)
-    local faction = input_faction or Prefs.GetFromCurrentProfile('LastFaction')
+    local faction = input_faction or Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
     if GUI.panel then
     local skins = import('/lua/skins/skins.lua').skins
     
@@ -6036,7 +6046,7 @@ function ChangeBackgroundLobby(slot, faction)
             if XinnonyDebug == 4 then AddChatText(">> Background FACTION") end
             GUI.background:Show()
             GUI.background2:Hide()
-            faction = faction or Prefs.GetFromCurrentProfile('LastFaction')
+            faction = faction or Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
             if faction == 1 then
                 GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/faction-background-paint_uef_bmp.dds"))
             elseif faction == 2 then
@@ -6364,7 +6374,7 @@ function CreateOptionLobbyDialog()
 end
 
 ##########################################################################
-#####################################.#####################################
+######################### TEST Text Animation (Experimental) ######################### -- Xinnony
 
 SetText2 = function(self, text, delay) -- Set Text with Animation
     --// Faire une variable qui evite deux droit SetText2 sur le même control de text en même temps.
@@ -6376,5 +6386,509 @@ SetText2 = function(self, text, delay) -- Set Text with Animation
         --else
             --self:SetText(text)
         --end
+    end
+end
+
+##########################################################################
+######################### TEST Save/Load Preset Game Lobby ######################### -- Xinnony
+----------
+-- GUI --
+function GUI_PRESET()
+	GUI_Preset = Group(GUI)
+        LayoutHelpers.AtCenterIn(GUI_Preset, GUI)
+        GUI_Preset.Depth:Set(998) -- :GetTopmostDepth() + 1
+    local background = Bitmap(GUI_Preset, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby.dds'))
+        GUI_Preset.Width:Set(background.Width)
+        GUI_Preset.Height:Set(background.Height)
+        LayoutHelpers.FillParent(background, GUI_Preset)
+    local dialog2 = Group(GUI_Preset)
+        dialog2.Width:Set(536)
+        dialog2.Height:Set(400)
+        LayoutHelpers.AtCenterIn(dialog2, GUI_Preset)
+	-----------
+    -- Title --
+    local text0 = UIUtil.CreateText(dialog2, 'Preset Lobby :', 17, 'Arial')
+        text0:SetColor('B9BFB9') -- 808080
+        text0:SetDropShadow(true)
+        LayoutHelpers.AtHorizontalCenterIn(text0, dialog2, 0)
+        LayoutHelpers.AtTopIn(text0, dialog2, 10)
+	---------------
+    -- Info text --
+    local text1 = UIUtil.CreateText(dialog2, 'Note : Double click in the list for Edit', 9, 'Arial')
+        text1:SetColor('808080')
+        text1:SetDropShadow(true)
+		text1:Hide()
+	--------------------
+    -- LOAD button --
+	local LoadButton = UIUtil.CreateButtonStd2(dialog2, '/BUTTON/medium/', "Load preset", 12, -1)
+        LayoutHelpers.AtLeftIn(LoadButton, dialog2, 0)
+        LayoutHelpers.AtBottomIn(LoadButton, dialog2, 10)
+        LoadButton.OnClick = function(self)
+			LOAD_PRESET_IN_PREF2()
+        end
+	------------------
+    -- Preset List --
+	PresetList = ItemList(dialog2)
+		PresetList:SetFont(UIUtil.bodyFont, 14)
+		--InfoList:SetColors(UIUtil.fontColor, "00000000", "FF000000",  UIUtil.highlightColor, "ffbcfffe")
+		PresetList:ShowMouseoverItem(true)
+		PresetList.Width:Set(210)
+		PresetList.Height:Set(310)
+		LayoutHelpers.DepthOverParent(PresetList, dialog2, 10)
+		LayoutHelpers.AtLeftIn(PresetList, dialog2, 10)
+        LayoutHelpers.AtTopIn(PresetList, dialog2, 38)
+		UIUtil.CreateVertScrollbarFor2(PresetList)
+		--
+		LOAD_PresetProfils_For_PresetList()
+		PresetList:SetSelection(0)
+		PresetList.OnClick = function(self, row)
+			if PresetList:GetItemCount() == (row+1) then
+				PresetList:SetSelection(row)
+				LoadButton.label:SetText('New preset')
+				LoadButton.OnClick = function(self)
+					CREATE_PRESET_IN_PREF()
+				end
+				--
+				InfoList:DeleteAllItems()
+			else
+				LoadButton.label:SetText('Load preset')
+				LoadButton.OnClick = function(self)
+					LOAD_PRESET_IN_PREF()
+				end
+				--
+				PresetList:SetSelection(row)
+				local profiles = GetPreference("UserPresetLobby")
+				--AddChatText('> '..table.KeyByIndex(profiles, row)) -- Selected Profils : Preset1
+				--AddChatText('> '..PresetList:GetItem(row)..' , '..(PresetList:GetSelection()+1)..' / '..PresetList:GetItemCount()) -- (itemname) , (currentitem) / (maxitem)
+				--LOG('> '..(PresetList:GetSelection()+1)..' / '..PresetList:GetItemCount())
+				LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, row)) -- Charge les infos sur la InfoList
+			end
+		end
+	---------------
+    -- Info List --
+	InfoList = ItemList(dialog2)
+		InfoList:SetFont(UIUtil.bodyFont, 11)
+		--									foreground, background, selected_foreground, selected_background, mouseover_foreground, mouseover_background)
+		InfoList:SetColors(nil, "00000000")--, "FF000000",  UIUtil.highlightColor, "ffbcfffe")
+		InfoList:ShowMouseoverItem(true)
+		InfoList.Width:Set(262)-- -16
+		InfoList.Height:Set(300)
+		LayoutHelpers.AtRightIn(InfoList, dialog2, 10+16)
+        LayoutHelpers.AtTopIn(InfoList, dialog2, 38)
+		LayoutHelpers.Below(text1, InfoList, 0)
+        LayoutHelpers.AtHorizontalCenterIn(text1, InfoList, 0)
+		--SetColors = function(self, foreground, background, selected_foreground, selected_background, mouseover_foreground, mouseover_background)
+		UIUtil.CreateVertScrollbarFor2(InfoList)
+		--
+		local profiles = GetPreference("UserPresetLobby")
+		LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, 0))
+		InfoList.OnDoubleClick = function(self, row)
+			if row == 0 then
+				GUI_PRESET_INPUT(1)
+			elseif row == 1 then
+				GUI_PRESET_INPUT(2)
+			elseif row == 2 then
+				GUI_PRESET_INPUT(3)
+			end
+		end
+		InfoList.OnMouseoverItem = function(self, row) -- Show notice or Hide
+			if row == 0 or row == 1 or row == 2 then
+				text1:Show()
+			else
+				text1:Hide()
+			end
+		end
+	-------------------
+    -- QUIT button --
+	local QuitButton = UIUtil.CreateButtonStd2(dialog2, '/BUTTON/medium/', "Exit", 12, -1)
+        LayoutHelpers.CenteredRightOf(QuitButton, LoadButton, -16)
+        QuitButton.OnClick = function(self)
+            GUI_Preset:Destroy()
+        end
+	--------------------
+    -- SAVE button --
+	local SaveButton = UIUtil.CreateButtonStd2(dialog2, '/BUTTON/small/', "Save preset", 12, -1)
+        LayoutHelpers.AtRightIn(SaveButton, dialog2, 0)
+        LayoutHelpers.AtBottomIn(SaveButton, dialog2, 10)
+		LayoutHelpers.AtVerticalCenterIn(SaveButton, LoadButton)
+        SaveButton.OnClick = function(self)
+            SAVE_PRESET_IN_PREF()
+			local last_selected = PresetList:GetSelection()
+			local profiles = GetPreference("UserPresetLobby")
+			LOAD_PresetProfils_For_PresetList()
+			PresetList:SetSelection(last_selected)
+			LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, last_selected))
+			SavePreferences()
+        end
+	-------------------
+    -- Delete button --
+	local DeleteButton = UIUtil.CreateButtonStd2(dialog2, '/BUTTON/small/', "Delete preset", 12, -1)
+        LayoutHelpers.CenteredLeftOf(DeleteButton, SaveButton, -10)
+		LayoutHelpers.AtVerticalCenterIn(DeleteButton, LoadButton)
+        DeleteButton.OnClick = function(self)
+			local profiles = GetPreference("UserPresetLobby")
+			local last_selected = table.KeyByIndex(profiles, PresetList:GetSelection()) -- Preset4
+			profiles[last_selected] = nil -- Efface le Preset selectioner
+			SetPreference('UserPresetLobby', profiles) -- ReInsert all preset without last deleted
+			LOAD_PresetProfils_For_PresetList()
+			PresetList:SetSelection(0)
+			LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
+			SavePreferences()
+        end
+	-------------
+    -- Credit --
+    local text99 = UIUtil.CreateText(dialog2, 'Xinnony', 9, 'Arial')
+        text99:SetColor('808080')
+        text99:SetDropShadow(true)
+        LayoutHelpers.AtRightIn(text99, dialog2, 0)
+        LayoutHelpers.AtBottomIn(text99, dialog2, 2)
+end
+
+function GUI_PRESET_INPUT(tyype)
+	local GUI_Preset_InputBox = Group(GUI)
+        LayoutHelpers.AtCenterIn(GUI_Preset_InputBox, GUI)
+        GUI_Preset_InputBox.Depth:Set(1999)
+    local background2 = Bitmap(GUI_Preset_InputBox, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby-small.dds'))
+        GUI_Preset_InputBox.Width:Set(background2.Width)
+        GUI_Preset_InputBox.Height:Set(background2.Height)
+        LayoutHelpers.FillParent(background2, GUI_Preset_InputBox)
+    local GUI_Preset_InputBox2 = Group(GUI_Preset_InputBox)
+        GUI_Preset_InputBox2.Width:Set(536)
+        GUI_Preset_InputBox2.Height:Set(400-240)
+        LayoutHelpers.AtCenterIn(GUI_Preset_InputBox2, GUI_Preset_InputBox)
+	-----------
+    -- Title --
+    local text09 = UIUtil.CreateText(GUI_Preset_InputBox2, '', 17, 'Arial')
+        text09:SetColor('B9BFB9') -- 808080
+        text09:SetDropShadow(true)
+        LayoutHelpers.AtHorizontalCenterIn(text09, GUI_Preset_InputBox2)
+        LayoutHelpers.AtTopIn(text09, GUI_Preset_InputBox2, 10)
+	----------
+    -- Edit --
+	local nameEdit = Edit(GUI_Preset_InputBox2)
+		LayoutHelpers.AtHorizontalCenterIn(nameEdit, GUI_Preset_InputBox2)
+		LayoutHelpers.AtVerticalCenterIn(nameEdit, GUI_Preset_InputBox2)
+        nameEdit.Width:Set(334)
+        nameEdit.Height:Set(24)
+        nameEdit:AcquireFocus()
+	-------------------
+    -- Ok button --
+	local OKButton = UIUtil.CreateButtonStd2(GUI_Preset_InputBox2, '/BUTTON/medium/', "Ok", 12, -1)
+        LayoutHelpers.AtHorizontalCenterIn(OKButton, GUI_Preset_InputBox2)
+		LayoutHelpers.AtBottomIn(OKButton, GUI_Preset_InputBox2, 10)
+        if tyype == 0 then
+			text09:SetText('Set your Preset name :')
+			OKButton.OnClick = function(self)
+				local result = nameEdit:GetText()
+				if result == '' then
+					-- No word in nameEdit
+				else
+					applyCREATE_PRESET_IN_PREF(result)
+					GUI_Preset_InputBox:Destroy()
+				end
+			end
+		elseif tyype == 1 then
+			text09:SetText('Rename your Preset :')
+			OKButton.OnClick = function(self)
+				local result = nameEdit:GetText()
+				if result == '' then
+					-- No word in nameEdit
+				else
+					local profiles = GetPreference("UserPresetLobby")
+					SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.PresetName', tostring(result))
+					local lastselect = PresetList:GetSelection()
+					LOAD_PresetProfils_For_PresetList()
+					PresetList:SetSelection(lastselect)
+					LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
+					GUI_Preset_InputBox:Destroy()
+				end
+			end
+		elseif tyype == 2 then
+			text09:SetText('Rename your FAF Title :')
+			OKButton.OnClick = function(self)
+				local result = nameEdit:GetText()
+				if result == '' then
+					-- No word in nameEdit
+				else
+					local profiles = GetPreference("UserPresetLobby")
+					SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.FAF_Title', tostring(result))
+					LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
+					GUI_Preset_InputBox:Destroy()
+				end
+			end
+		elseif tyype == 3 then
+			text09:SetText('Rename your Rule :')
+			OKButton.OnClick = function(self)
+				local result = nameEdit:GetText()
+				if result == '' then
+					-- No word in nameEdit
+				else
+					local profiles = GetPreference("UserPresetLobby")
+					--AddChatText('rename> Profil?:'..table.KeyByIndex(profiles, PresetList:GetSelection())..' // selection:'..PresetList:GetSelection())
+					SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', tostring(result))
+					LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
+					GUI_Preset_InputBox:Destroy()
+				end
+			end
+        end
+end
+
+----------------------
+-- Other function --
+function table.KeyByIndex(tablle, index)
+	local num = -1
+	for k, v in tablle do
+		num = num + 1
+		--LOG('k : '..k) -- Preset1 / Preset2
+		--LOG('v : '..v) -- Error : Table value
+		if num == index then
+			return k
+		end
+	end
+	return false -- or maybe call error() here
+end
+
+function GetModNameWithUid(uid)
+	local allMods = Mods.AllMods()
+	return allMods[uid].name
+end
+
+
+-------------------
+-- Refresh List --
+function LOAD_PresetProfils_For_PresetList()
+	local profiles = GetPreference("UserPresetLobby")
+	PresetList:DeleteAllItems()
+	--
+	if profiles then
+		for k, v in profiles do
+			PresetList:AddItem(tostring(profiles[k].PresetName))
+		end
+	end
+	PresetList:AddItem('> New Preset')
+end
+
+function LOAD_PresetSettings_For_InfoList(Selected_Preset)
+	local profiles = GetPreference("UserPresetLobby")
+	InfoList:DeleteAllItems()
+	--
+	--if Selected_Preset == '' then
+		--AddChatText('ERROR !, Selected_Preset is nul')
+	--elseif Selected_Preset == nil then
+		--AddChatText('ERROR !, Selected_Preset is nul')
+	--else
+		--AddChatText('ERROR !, Selected_Preset is :'..Selected_Preset)
+	--end
+	InfoList:AddItem('Preset Name : '..profiles[Selected_Preset].PresetName)
+	InfoList:AddItem('FAF Title : '..profiles[Selected_Preset].FAF_Title)
+	InfoList:AddItem('Rule : '..profiles[Selected_Preset].Rule)
+	InfoList:AddItem('Map : '..profiles[Selected_Preset].MapName)
+	if profiles[Selected_Preset].Mods then
+		InfoList:AddItem('')
+		InfoList:AddItem('Mod :')
+		for k, v in profiles[Selected_Preset].Mods do
+			--k = (uids), v = true
+			InfoList:AddItem('- '..GetModNameWithUid(k))
+		end
+	end
+	if profiles[Selected_Preset].UnitsRestricts then
+		InfoList:AddItem('')
+		InfoList:AddItem('Units Restricts :')
+		for k, v in profiles[Selected_Preset].UnitsRestricts do
+			--k = (uids), v = true
+			InfoList:AddItem('- '..k)
+		end
+	end
+	if profiles[Selected_Preset].Settings then
+		InfoList:AddItem('')
+		InfoList:AddItem('Settings :')
+		for k, v in profiles[Selected_Preset].Settings do
+			--k = (uids), v = true
+			InfoList:AddItem('- '..k..' : '..v)
+		end
+	end
+end
+
+
+------------------------------
+-- Create Preset in Pref --
+function CREATE_PRESET_IN_PREF()
+	GUI_PRESET_INPUT(0)
+end
+
+function applyCREATE_PRESET_IN_PREF(presetname)
+	local profiles = GetPreference("UserPresetLobby")
+	local num = 0
+	while profiles do
+		num = num + 1
+		if not GetPreference("UserPresetLobby.Preset"..num) then
+			--AddChatText('> UserPresetLobby.Preset'..num)
+			SetPreference('UserPresetLobby.Preset'..num..'.PresetName', tostring(presetname))
+			SetPreference('UserPresetLobby.Preset'..num..'.MapName', tostring(MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).name))
+			SetPreference('UserPresetLobby.Preset'..num..'.FAF_Title', '')
+			SetPreference('UserPresetLobby.Preset'..num..'.Rule', '')
+			SetPreference('UserPresetLobby.Preset'..num..'.MapPath', tostring(gameInfo.GameOptions.ScenarioFile))
+			SavePreferences()
+			break
+		else
+			--AddChatText('> UserPresetLobby.Preset'..num)
+		end
+	end
+	LOAD_PresetProfils_For_PresetList()
+	PresetList:SetSelection(0)
+end
+
+
+---------------------------------------------------------
+-- Load or Save Preset and Set or Get to Lobby --
+function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
+	local profiles = GetPreference("UserPresetLobby")
+	if profiles then
+		local Selected_Preset = table.KeyByIndex(profiles, PresetList:GetSelection())
+		--AddChatText('> PRESET > Name : '..Selected_Preset) -- Preset1
+		--AddChatText('> PRESET > PresetName : '..profiles[Selected_Preset].PresetName)
+			-- Set PresetName in list on Preset GUI
+		--AddChatText('> PRESET > MapName : '..profiles[Selected_Preset].MapName)
+			-- Set MapName in text on Preset GUI
+		--AddChatText('> PRESET > FAF_Title : '..profiles[Selected_Preset].FAF_Title)
+			-- Set Title on FAF Client
+		--AddChatText('> PRESET > Rule : '..profiles[Selected_Preset].Rule)
+			-- Set Rule Title in TextBox
+		--AddChatText('> PRESET > MapPath : '..profiles[Selected_Preset].MapPath)
+			SetGameOption('ScenarioFile', profiles[Selected_Preset].MapPath)
+		
+		--
+		
+		if profiles[Selected_Preset].UnitsRestricts then
+			local urestrict = {}
+			for k, v in profiles[Selected_Preset].UnitsRestricts do
+				--k = (restric name), v = true
+				--AddChatText('> PRESET > UnitsRestricts : '..k..' // v : '..tostring(v)) -- > PRESET > UnitsRestricts : NAVAL // v : true
+				--AddChatText('> PRESET > UnitsRestricts : '..k..' // '..tostring(profiles[Selected_Preset].UnitsRestricts[k])) -->>> PRESET UnitsRestricts : AIR = true
+				table.insert(urestrict, k)
+			end
+			SetGameOption('RestrictedCategories', urestrict)
+		end
+		
+		--
+		
+		if profiles[Selected_Preset].Mods then
+			selectedMods = {}
+			for k, v in profiles[Selected_Preset].Mods do
+				--k = (uids), v = true
+				--AddChatText('> PRESET > Mods : '..k..' // v : '..tostring(v)) -->>> PRESET Mods : ['d5c7af75-6944-490b-b647-47dc1efffdc7'] = true
+				SetPreference('active_mods.'..k, true)
+				selectedMods[k] = true
+			end
+			OnModsChanged(selectedMods)
+			UpdateGame() -- Rafraichie les mods (utile)
+		end
+		
+		--
+		
+		if profiles[Selected_Preset].Settings then
+			for k, v in profiles[Selected_Preset].Settings do
+				-- k = (setting name), v = (value name), profiles[Selected_Preset].Settings[k] = (value name)
+				--AddChatText('> PRESET > Settings : '..k..' // v : '..tostring(v)) -->>> PRESET Settings : UnitCap = disabled
+				SetGameOption(k, tostring(v))
+			end
+		end
+    end
+end
+
+function SAVE_PRESET_IN_PREF() -- GET OPTIONS ON LOBBY AND SAVE TO PRESET
+	local profiles = GetPreference("UserPresetLobby")
+	
+	local Selected_Preset = table.KeyByIndex(profiles, PresetList:GetSelection())
+	--AddChatText('> PRESET > Name : '..Selected_Preset) -- Preset1
+	
+	local Preset_Name = profiles[Selected_Preset].PresetName or 'ERROR, Set preset name here' -- Nom du PresetLobby
+	local Title_FAF = profiles[Selected_Preset].Title_FAF or '' -- Title is for FAF Client title in "Find Games" tabs
+	local Rule_Text = profiles[Selected_Preset].Rule_Text or '' -- Rule text showing in top of Lobby and (coming soon) in Game
+	
+	SetPreference('UserPresetLobby.'..Selected_Preset, {}) -- Delete all value
+	
+	SetPreference('UserPresetLobby.'..Selected_Preset..'.PresetName', tostring(Preset_Name))
+	SetPreference('UserPresetLobby.'..Selected_Preset..'.MapName', tostring(MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).name))
+	SetPreference('UserPresetLobby.'..Selected_Preset..'.FAF_Title', tostring(Title_FAF))
+	SetPreference('UserPresetLobby.'..Selected_Preset..'.Rule', tostring(Rule_Text))
+	
+	for k, v in gameInfo.GameOptions do
+		if k == 'ScenarioFile' then -- MAP
+			--AddChatText('<<< gameInfo.GameOptions : '..k..' = '..tostring(gameInfo.GameOptions[k])) --EX: gameInfo.GameOptions : UnitCap = 500
+			SetPreference('UserPresetLobby.'..Selected_Preset..'.MapPath', tostring(gameInfo.GameOptions[k]))
+		
+		elseif k == 'RestrictedCategories' then -- RESTRICTED UNITS
+			for kk, vv in gameInfo.GameOptions['RestrictedCategories'] do
+				--AddChatText('<<< ... RestrictedCategories : '..kk..' = '..tostring(gameInfo.GameOptions['RestrictedCategories'][kk])) --EX: ... RestrictedCategories : 2 = SERAPHIM
+				SetPreference('UserPresetLobby.'..Selected_Preset..'.UnitsRestricts.'..vv, true) -- Enregistre les Restriction dans le Game.prefs
+				--SetPreference('UserPresetLobby.'..Selected_Preset..'.UnitsRestricts.'..kk, tostring(gameInfo.GameOptions['RestrictedCategories'][kk])) -- Enregistre les Restriction dans le Game.prefs
+				--SetPreference('UserPresetLobby.'..Selected_Preset..'.UnitsRestricts', tostring(gameInfo.GameOptions[kk])) -- Enregistre les Restriction dans le Game.prefs
+			end
+		
+		--elseif k == 'Mods' then -- MODS
+			--for kk, vv in gameInfo.GameOptions['Mods'] do
+				--AddChatText('<<< ... Mods : '..kk..' = '..tostring(gameInfo.GameOptions['Mods'][kk]))
+				--SetPreference('UserPresetLobby.'..Selected_Preset..'.UnitsRestricts.'..k, tostring(gameInfo.GameOptions[k]))
+			--end
+		
+		else -- SETTINGS
+			--AddChatText('<<< gameInfo.GameOptions : '..k..' = '..tostring(gameInfo.GameOptions[k])) --EX: gameInfo.GameOptions : UnitCap = 500
+			SetPreference('UserPresetLobby.'..Selected_Preset..'.Settings.'..k, tostring(gameInfo.GameOptions[k])) -- Enregistre les Options dans le Game.prefs
+		end
+	end
+	
+	local mods = Mods.GetGameMods(gameInfo.GameMods)
+	local nummods = 0
+	local uids = ""
+	for k in gameInfo.GameMods do
+		nummods = nummods + 1
+		--AddChatText('Mod : '..k)
+		--LOG('> k : '..k)
+		SetPreference('UserPresetLobby.'..Selected_Preset..'.Mods.'..k, true)
+	end
+	--LOG('> Num mods : '..nummods)
+end
+
+
+
+###############################################################
+######################### Other Debug Funct ######################### -- Xinnony
+
+function table_print (tt, indent, done)
+  done = done or {}
+  indent = indent or 0
+  if type(tt) == "table" then
+    local sb = {}
+    for key, value in pairs (tt) do
+      table.insert(sb, string.rep (" ", indent)) -- indent it
+      if type (value) == "table" and not done [value] then
+        done [value] = true
+        table.insert(sb, "{\n");
+        table.insert(sb, table_print (value, indent + 2, done))
+        table.insert(sb, string.rep (" ", indent)) -- indent it
+        table.insert(sb, "}\n");
+      elseif "number" == type(key) then
+        table.insert(sb, string.format("\"%s\"\n", tostring(value)))
+      else
+        table.insert(sb, string.format(
+            "%s = \"%s\"\n", tostring (key), tostring(value)))
+       end
+    end
+    return table.concat(sb)
+  else
+    return tt .. "\n"
+  end
+end
+
+function to_string( tbl )
+    if  "nil"       == type( tbl ) then
+        return tostring(nil)
+    elseif  "table" == type( tbl ) then
+        return table_print(tbl)
+    elseif  "string" == type( tbl ) then
+        return tbl
+    else
+        return tostring(tbl)
     end
 end

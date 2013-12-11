@@ -99,10 +99,13 @@ local function CreateDialog(clients)
     end
 	
 	local canEject = false
+	local ForceEject = false
 
     parent.OnFrame = function(self, delta)
         self.time = self.time + delta
-        if self.time > 45 then
+        if self.time > 180 then
+			ForceEject = true
+		elseif self.time > 45 then
 			canEject = true
         end
     end
@@ -144,12 +147,16 @@ local function CreateDialog(clients)
                     slot.ping:SetColor('FFbadbdb')
                     slot.quiet:SetColor('FFbadbdb')					
                 else																										-- IF client Lag --or Observer ...
-					if armiesInfo[Your_index].outOfGame and canEject then						-- IF ME is Observer
-						--LOG('>>> CanEject and outOfGame')
-						EjectSessionClient(index)																		-- Autokick the player lag
-						slot.eject:Disable()																					-- and Hide + Disable the Eject button
+					if ForceEject then																				-- IF client lag timeout (+3 minute), kick !
+						EjectSessionClient(index)
+						slot.eject:Disable()
 						slot.eject:Hide()
-					elseif canEject then--or armiesInfo[index].outOfGame then 						-- IF client Lag --or Observer ...
+					elseif armiesInfo[Your_index].outOfGame and canEject then				-- IF ME is Observer
+						--LOG('>>> CanEject and outOfGame')
+						EjectSessionClient(index)																-- Autokick the player lag
+						slot.eject:Disable()																			-- and Hide + Disable the Eject button
+						slot.eject:Hide()
+					elseif canEject then--or armiesInfo[index].outOfGame then 				-- IF client Lag --or Observer ...
 						--LOG('>>> CanEject')
 						slot.eject:Enable()
 					end
@@ -161,8 +168,10 @@ local function CreateDialog(clients)
                     slot.quiet:SetText(LOCF("%s: %d:%02d", "<LOC UI_Disco0004>Quiet (m:s)",min,sec))					
                 end
             else
-                slot.ping:SetText('')
-                slot.quiet:SetText('')				
+                slot.ping:SetText(LOC("<LOC connectivity_0003>Not Connected"))
+				slot.ping:SetColor('FFff0000')
+				--slot.ping:SetText('')
+                --slot.quiet:SetText('')
             end
 			
 			if armiesInfo[index].outOfGame then -- Show the Skull if the player is Dead
