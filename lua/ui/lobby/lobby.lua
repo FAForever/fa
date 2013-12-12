@@ -348,6 +348,7 @@ local function HandleSlotSwitches(moveFrom, moveTo) -- Xinnony (Factored by Vica
         elseif pOpts[moveFrom].Human and pOpts[moveTo].Human and pOpts[moveFrom].Ready and pOpts[moveTo].Ready then
             AddChatText('You cannot move the player in slot '..moveFrom..' to slot '..moveTo..' because the players in slots '
                         ..moveFrom..' and '..moveTo..' are ready.') -- (for the moment (reasons: hide bug))')
+						--SetPlayerOption(FindSlotForID(FindIDForName(localPlayerName)), 'Ready', false) -- PROBABLY THIS FUNCTION RESOLVE THE PROBLEM -- XinnonyWork
         elseif pOpts[moveFrom].Human and pOpts[moveFrom].Ready then -- IF Player X is Human and Ready
             AddChatText('You cannot move the player in slot '..moveFrom..' to slot '..moveTo..' because the player in slot '
                         ..moveFrom..' is ready.') -- (for the moment (reasons: hide bug))')
@@ -1915,14 +1916,16 @@ end
 -- callback when Mod Manager dialog finishes (modlist==nil on cancel)
 -- FIXME: The mod manager should be given a list of game mods set by the host, which
 -- clients can look at but not changed, and which don't get saved in our local prefs.
-function OnModsChanged(modlist)
+function OnModsChanged(modlist, ignoreRefresh)
     if modlist then
         Mods.SetSelectedMods(modlist)
         if lobbyComm:IsHost() then
             selectedMods = table.map(function (m) return m.uid end, Mods.GetGameMods())
             HostUpdateMods()
         end
-        UpdateGame()
+        if not ignoreRefresh then
+			UpdateGame()
+		end
     end
 end
 
@@ -2975,7 +2978,7 @@ function CreateUI(maxPlayers)
                 LayoutHelpers.AtRightTopIn(line.value, line, 5, 16)
                 LayoutHelpers.ResetLeft(line.value)
             end
-            line.text:SetText(LOC(data.text))
+			line.text:SetText(LOC(data.text))
 			line.value.bg:Show()
             line.value:SetText(LOC(data.value))
 			line.value.bg2:Show()
@@ -3836,8 +3839,13 @@ function RefreshOptionDisplayData(scenarioInfo)
         local getNorush = gameInfo.GameOptions['NoRushOption'] -- 'Off'
         local getNumbMod = table.getn(Mods.GetGameMods(gameInfo.GameMods)) -- 0 for the purposes of this function
         local getRstric = gameInfo.GameOptions.RestrictedCategories --can be nil or a table, even if no restrictions are present
+		local getMapIsBlacklist = false
+		if gameInfo.GameOptions.ScenarioFile == '/maps/battle of thermopylae official/battle of thermopylae official_scenario.lua' then -- Check if the current map is Battle of Thermo OFFICIAL, this map is blacklisted to ranked
+			LOG('Map blacklisted to ranked : /maps/battle of thermopylae official/battle of thermopylae official_scenario.lua')
+			getMapIsBlacklist = true
+		end
 --~             AddChatText(tostring(cRstr))
-        if getVictory == 'demoralization' and getCheat == 'false' and getSpeed == 'normal' and getFog == 'explored' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and (getRstric == nil or table.getn(getRstric) == 0) then
+        if getVictory == 'demoralization' and getCheat == 'false' and getSpeed == 'normal' and getFog == 'explored' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and (getRstric == nil or table.getn(getRstric) == 0) and getMapIsBlacklist == false then
             --table.insert(formattedOptions, {text = 'Ranking',
                 --value = 'Ranked',
                 --green = true,
@@ -3889,23 +3897,45 @@ function RefreshOptionDisplayData(scenarioInfo)
     end
 --\\ Stop Check Ranked active
 --// Check Mod active
-    local modNum = table.getn(Mods.GetGameMods(gameInfo.GameMods))
-    if modNum > 0 then
-        local modStr = '<LOC lobby_0002>%d Mods Enabled'
-        if modNum == 1 then
-            modStr = '<LOC lobby_0004>%d Mod Enabled'
-        end
-        table.insert(formattedOptions, {text = LOCF(modStr, modNum),
+    local modStr = false
+	local modNum = table.getn(Mods.GetGameMods(gameInfo.GameMods)) or 0
+	local modNumUI = table.getn(Mods.GetUiMods()) or 0
+	--LOG('>>>>>>> MOD : '..modNum)
+	--LOG('>>>>>>> MOD.UI : '..modNumUI)
+    if modNum > 0 and modNumUI > 0 then
+		modStr = modNum..' Mods (and '..modNumUI..' Mods UI)'
+		if modNum == 1 and modNumUI > 1 then
+			modStr = modNum..' Mod (and '..modNumUI..' Mods UI)'
+		elseif modNum > 1 and modNumUI == 1 then
+			modStr = modNum..' Mods (and '..modNumUI..' Mod UI)'
+		elseif modNum == 1 and modNumUI == 1 then
+			modStr = modNum..' Mod (and '..modNumUI..' Mod UI)'
+		else
+			modStr = modNum..' Mods (and '..modNumUI..' Mods UI)'
+		end
+	elseif modNum > 0 and modNumUI == 0 then
+		modStr = modNum..' Mods'
+		if modNum == 1 then
+			modStr = modNum..' Mod'
+		end
+	elseif modNum == 0 and modNumUI > 0 then
+		modStr = modNumUI..' Mods UI'
+		if modNum == 1 then
+			modStr = modNumUI..' Mod UI'
+		end
+	end
+	if modStr then
+		table.insert(formattedOptions, {text = modStr,
             value = LOC('<LOC lobby_0003>Check Mod Manager'),
             mod = true,
             tooltip = 'Lobby_Mod_Option',
             valueTooltip = 'Lobby_Mod_Option'})
-		table.insert(FormOpt2, {text = LOCF(modStr, modNum),
+		table.insert(FormOpt2, {text = modStr,
             value = LOC('<LOC lobby_0003>Check Mod Manager'),
             mod = true,
             tooltip = 'Lobby_Mod_Option',
             valueTooltip = 'Lobby_Mod_Option'})
-    end
+	end
 --\\ Stop Check Mod active
 --// Check RestrictedUnit active
     if gameInfo.GameOptions.RestrictedCategories != nil then
@@ -3960,7 +3990,8 @@ function RefreshOptionDisplayData(scenarioInfo)
 								valueTooltip = {text = optData.label, body = val.help}})
 						end
 						option.value = val.text
-                            option.valueTooltip = 'lob_'..optData.key..'_'..val.key
+						option.tooltip = {text = optData.label, body = optData.help}
+						option.valueTooltip = {text = optData.label, body = val.help}
                         break
                     end
                 end
@@ -3981,7 +4012,8 @@ function RefreshOptionDisplayData(scenarioInfo)
 									valueTooltip = {text = optData.label, body = val.help}})
 							end
 							option.value = val.text
-                            option.valueTooltip = 'lob_'..optData.key..'_'..val.key
+							option.tooltip = {text = optData.label, body = optData.help}
+                            option.valueTooltip = {text = optData.label, body = val.help}
                             break
                         end
                     end
@@ -4003,7 +4035,8 @@ function RefreshOptionDisplayData(scenarioInfo)
 									valueTooltip = {text = optData.label, body = val.help}})
 							end
 							option.value = val.text
-                            option.valueTooltip = 'lob_'..optData.key..'_'..val.key
+							option.tooltip = {text = optData.label, body = optData.help}
+                            option.valueTooltip = {text = optData.label, body = val.help}
                             break
                         end
                     end
@@ -4016,7 +4049,7 @@ function RefreshOptionDisplayData(scenarioInfo)
                 if i == optData.key then
                     option = {text = optData.label, tooltip = optData.pref}
                     for _, val in optData.values do
-                        if val.key == v then
+						if tostring(val.key) == tostring(v) then
 							if optData.default and _ != optData.default then -- If the option is not default value, insert. - Xinnony
 								table.insert(FormOpt2, {
 									text = optData.label,
@@ -4025,7 +4058,8 @@ function RefreshOptionDisplayData(scenarioInfo)
 									valueTooltip = {text = optData.label, body = val.help}})
 							end
 							option.value = val.text
-                            option.valueTooltip = 'lob_'..optData.key..'_'..val.key
+							option.tooltip = {text = optData.label, body = optData.help}
+                            option.valueTooltip = {text = optData.label, body = val.help}
                             break
                         end
                     end
@@ -4035,7 +4069,7 @@ function RefreshOptionDisplayData(scenarioInfo)
         end
         if option then
             if not mpOnly or not singlePlayer then
-                table.insert(formattedOptions, option)
+				table.insert(formattedOptions, option)
             end
         end
     end
@@ -4905,9 +4939,10 @@ function SetPlayerOption(slot, key, val)
     UpdateGame()
 end
 
-function SetGameOption(key, val, ignoreNilValue)
+function SetGameOption(key, val, ignoreNilValue, ignoreRefresh)
     local scenarioInfo = nil
 	ignoreNilValue = ignoreNilValue or false
+	ignoreRefresh = ignoreRefresh or false
 
     if (not ignoreNilValue) and ((key == nil) or (val == nil)) then
         WARN('Attempt to set nil lobby game option: ' .. tostring(key) .. ' ' .. tostring(val))
@@ -4923,7 +4958,7 @@ function SetGameOption(key, val, ignoreNilValue)
             Value = val,
         }
 
-        LOG('SetGameOption(key='..repr(key)..',val='..repr(val))
+        LOG('SetGameOption(key='..repr(key)..',val='..repr(val)..')')
 
         -- don't want to send all restricted categories to gpgnet, so just send bool
         -- note if more things need to be translated to gpgnet, a translation table would be a better implementation
@@ -4948,7 +4983,9 @@ function SetGameOption(key, val, ignoreNilValue)
             GpgNetSend('GameOption', key, val)
         end
 
-        UpdateGame()
+        if not ignoreRefresh then
+			UpdateGame()
+		end
     else
         WARN('Attempt to set game option by a non-host')
     end
@@ -6297,8 +6334,9 @@ function CreateOptionLobbyDialog()
         LayoutHelpers.AtBottomIn(text0, dialog2, 130)
         -- Ask to Xinnony for add your name and work correctly
     local text = {}
-    local ttext = {'- Xinnony : New Skin (with Barlots), Faction Selector, Country Flag, Move Player to, Hide Unchanged option,',
-                        'Color State in Nickname, Custom Title, Sort option, Game is/not Ranked label and Bugs Fixing.',
+    local ttext = {'- Xinnony : New Skin (with Barlots), Preset Lobby, Faction Selector, Country Flag, Move Player to,',
+						'Hide Unchanged option, Color State in Nickname, Custom Title, Sort option, Game Ranked label,',
+						'Enhance Connectivity/Disconnect window and Bugs Fixing.',
                         '- Vicarian : Contribute with Xinnony, Rating Observer, bugs fixing.',
                         '- Duck_42 : CPU Bench, Ping Nuke.',
                         '- Moritz : Power Lobby 2.0.',}
@@ -6309,6 +6347,9 @@ function CreateOptionLobbyDialog()
         if i == 2 then
             LayoutHelpers.AtLeftIn(text[2], dialog2, 40) -- Manual set the SubLine position
             LayoutHelpers.AtBottomIn(text[2], dialog2, 95)
+		elseif i == 3 then
+            LayoutHelpers.AtLeftIn(text[3], dialog2, 40) -- Manual set the SubLine position
+            LayoutHelpers.AtBottomIn(text[3], dialog2, 85)
         else
             LayoutHelpers.AtLeftIn(text[i], dialog2, 20)
             LayoutHelpers.AtBottomIn(text[i], dialog2, 120-(15*i))
@@ -6424,7 +6465,7 @@ function GUI_PRESET()
         LayoutHelpers.AtLeftIn(LoadButton, dialog2, 0)
         LayoutHelpers.AtBottomIn(LoadButton, dialog2, 10)
         LoadButton.OnClick = function(self)
-			LOAD_PRESET_IN_PREF2()
+			LOAD_PRESET_IN_PREF()
         end
 	------------------
     -- Preset List --
@@ -6755,7 +6796,9 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
 		--AddChatText('> PRESET > Rule : '..profiles[Selected_Preset].Rule)
 			-- Set Rule Title in TextBox
 		--AddChatText('> PRESET > MapPath : '..profiles[Selected_Preset].MapPath)
-			SetGameOption('ScenarioFile', profiles[Selected_Preset].MapPath)
+			SetGameOption('ScenarioFile', profiles[Selected_Preset].MapPath, nil, true)
+			--gameInfo.GameOptions['ScenarioFile'] = profiles[Selected_Preset].MapPath
+			--Prefs.SetToCurrentProfile('LastScenario', profiles[Selected_Preset].MapPath)
 		
 		--
 		
@@ -6767,7 +6810,7 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
 				--AddChatText('> PRESET > UnitsRestricts : '..k..' // '..tostring(profiles[Selected_Preset].UnitsRestricts[k])) -->>> PRESET UnitsRestricts : AIR = true
 				table.insert(urestrict, k)
 			end
-			SetGameOption('RestrictedCategories', urestrict)
+			SetGameOption('RestrictedCategories', urestrict, nil, true)
 		end
 		
 		--
@@ -6780,8 +6823,8 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
 				SetPreference('active_mods.'..k, true)
 				selectedMods[k] = true
 			end
-			OnModsChanged(selectedMods)
-			UpdateGame() -- Rafraichie les mods (utile)
+			OnModsChanged(selectedMods, true)
+			--UpdateGame() -- Rafraichie les mods (utile)
 		end
 		
 		--
@@ -6790,9 +6833,14 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
 			for k, v in profiles[Selected_Preset].Settings do
 				-- k = (setting name), v = (value name), profiles[Selected_Preset].Settings[k] = (value name)
 				--AddChatText('> PRESET > Settings : '..k..' // v : '..tostring(v)) -->>> PRESET Settings : UnitCap = disabled
-				SetGameOption(k, tostring(v))
+				--LOG('> PRESET > Settings : '..k..' // v : '..tostring(v)) -->>> PRESET Settings : UnitCap = disabled
+				SetGameOption(k, tostring(v), nil, true)
 			end
 		end
+		
+		--
+		
+		UpdateGame()
     end
 end
 
