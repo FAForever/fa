@@ -337,31 +337,38 @@ local function HandleSlotSwitches(moveFrom, moveTo) -- Xinnony (Factored by Vica
 
     if pOpts[moveFrom].Human and moveFrom != moveTo then -- IF Player moveFrom is Human and Player moveFrom NOT in moveTo
         -- IF Slot moveToSlot is Human and NOT Ready, AND IF Player moveFromSlot is NOT Ready
-        if pOpts[moveTo].Human and not pOpts[moveTo].Ready and not pOpts[moveFrom].Ready then
-            HostConvertPlayerToObserver(toID, toName, moveTo) -- Move Slot moveTo to Observer
-            ClearSlotInfo(moveTo)
-            HostTryMovePlayer(fromID, moveFrom, moveTo) -- Move Player moveFrom to Slot moveTo
-            ClearSlotInfo(moveFrom)
-            HostConvertObserverToPlayer(toID, toName, FindObserverSlotForID(toID), moveFrom, toFaction, toRating,
-                                        toRatingColor, toNumGame)
-        -- IF Player X is Human and Ready and Slot Ready
-        elseif pOpts[moveFrom].Human and pOpts[moveTo].Human and pOpts[moveFrom].Ready and pOpts[moveTo].Ready then
-            AddChatText('You cannot move the player in slot '..moveFrom..' to slot '..moveTo..' because the players in slots '
-                        ..moveFrom..' and '..moveTo..' are ready.') -- (for the moment (reasons: hide bug))')
-						--SetPlayerOption(FindSlotForID(FindIDForName(localPlayerName)), 'Ready', false) -- PROBABLY THIS FUNCTION RESOLVE THE PROBLEM -- XinnonyWork
-        elseif pOpts[moveFrom].Human and pOpts[moveFrom].Ready then -- IF Player X is Human and Ready
-            AddChatText('You cannot move the player in slot '..moveFrom..' to slot '..moveTo..' because the player in slot '
-                        ..moveFrom..' is ready.') -- (for the moment (reasons: hide bug))')
-        elseif pOpts[moveTo].Human and pOpts[moveTo].Ready then -- IF Slot 1 is Human and Ready
-            AddChatText('You cannot move the player in slot '..moveFrom..' to slot '..moveTo..' because the player in slot '
-                        ..moveTo..' is ready.') -- (for the moment (reasons: hide bug))')
-        elseif not pOpts[moveTo].Human and not pOpts[moveTo].Ready then -- IF Slot 1 is NOT Human and NOT Ready
-            HostTryMovePlayer(pOpts[moveFrom].OwnerID, moveFrom, moveTo)
+		if pOpts[moveTo].Human then
+			if pOpts[moveTo].Ready then
+				--SetPlayerOption(moveTo, 'Ready', false)
+				if not IsLocallyOwned(moveTo) then
+					lobbyComm:SendData(toID, {Type = 'SetPlayerNotReady', Slot = moveTo})
+				end
+				gameInfo.PlayerOptions[moveTo]['Ready'] = false
+			end
+			if pOpts[moveFrom].Ready then
+				--SetPlayerOption(moveFrom, 'Ready', false)
+				if not IsLocallyOwned(moveTo) then
+					lobbyComm:SendData(fromID, {Type = 'SetPlayerNotReady', Slot = moveFrom})
+				end
+				gameInfo.PlayerOptions[moveFrom]['Ready'] = false
+			end
+			HostConvertPlayerToObserver(toID, toName, moveTo) -- Move Slot moveTo to Observer
+			--ClearSlotInfo(moveTo)
+			HostTryMovePlayer(fromID, moveFrom, moveTo) -- Move Player moveFrom to Slot moveTo
+			--ClearSlotInfo(moveFrom)
+			HostConvertObserverToPlayer(toID, toName, FindObserverSlotForID(toID), moveFrom, toFaction, toRating, toRatingColor, toNumGame)
+        elseif not pOpts[moveTo].Human then -- IF moveTo is AI
+            HostRemoveAI(moveTo)
+			HostTryMovePlayer(pOpts[moveFrom].OwnerID, moveFrom, moveTo)
         else
             AddChatText('You cannot move the player in slot '..moveFrom..'.')
         end
     else
-        AddChatText('You cannot move the Player in slot '..moveFrom..' to Slot '..moveTo..'.')
+		if not pOpts[moveFrom].Human then
+			AddChatText('You cannot move the Player in slot '..moveFrom..' to slot '..moveTo..' because '..pOpts[moveFrom].PlayerName..' is not human.')
+		elseif moveFrom == moveTo then
+			AddChatText('You cannot move the Player in slot '..moveFrom..' to slot '..moveTo..' is equal.')
+		end
     end
 end
 
@@ -445,7 +452,7 @@ local function DoSlotBehavior(slot, key, name)
                 {worldCover = false, enterButton = 1, escapeButton = 2})
         else
             if lobbyComm:IsHost() then
-                HostRemoveAI( slot)
+                HostRemoveAI(slot)
             else
                 lobbyComm:SendData( hostID, { Type = 'ClearSlot', Slot = slot } )
             end
@@ -617,7 +624,7 @@ function FindObserverSlotForID(id)
 end
 
 function IsLocallyOwned(slot)
-    return (gameInfo.PlayerOptions[slot].OwnerID == localPlayerID)
+	return (gameInfo.PlayerOptions[slot].OwnerID == localPlayerID)
 end
 
 function IsPlayer(id)
@@ -2315,7 +2322,7 @@ function HostClearPlayer(uid)
 
     local slot = FindSlotForID(peerID)
     if slot then
-        ClearSlotInfo( slot )
+        ClearSlotInfo(slot)
         gameInfo.PlayerOptions[slot] = nil
         UpdateGame()
     else
@@ -2330,7 +2337,7 @@ function HostClearPlayer(uid)
     HostUpdateMods()
 end
 
-function HostRemoveAI( slot )
+function HostRemoveAI(slot)
     if gameInfo.PlayerOptions[slot].Human then
         WARN('Use EjectPlayer to remove humans')
         return
@@ -3358,9 +3365,9 @@ function CreateUI(maxPlayers)
     end
 
     function EnableSlot(slot)
-        GUI.slots[slot].team:Enable()
-        GUI.slots[slot].color:Enable()
-        GUI.slots[slot].faction:Enable()
+		GUI.slots[slot].team:Enable()
+		GUI.slots[slot].color:Enable()
+		GUI.slots[slot].faction:Enable()
         if GUI.slots[slot].ready then
             GUI.slots[slot].ready:Enable()
         end
@@ -4558,6 +4565,13 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                  SetSlotCPUBar(playerSlot, gameInfo.PlayerOptions[playerSlot])
             end
         -- End CPU benchmark code
+		elseif data.Type == 'SetPlayerNotReady' then -- Xinnony
+			EnableSlot(data.Slot)
+			if GUI.becomeObserver then
+				GUI.becomeObserver:Enable()
+			end
+			SetPlayerOption(data.Slot, 'Ready', false)
+			--UpdateGame()
         end
 
         if lobbyComm:IsHost() then
@@ -4879,7 +4893,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                         Observ = false,
                     }
                 )
-                ClearSlotInfo( slot )
+                ClearSlotInfo(slot)
                 gameInfo.PlayerOptions[slot] = nil
                 UpdateGame()
             end
@@ -4916,7 +4930,7 @@ end
 
 function SetPlayerOption(slot, key, val)
     if not IsLocallyOwned(slot) then
-        WARN("Hey you can't set a player option on a slot you don't own.")
+        WARN("Hey you can't set a player option on a slot you don't own. (slot:"..tostring(slot).." / key:"..tostring(key).." / val:"..tostring(val)..")")
         return
     end
 
