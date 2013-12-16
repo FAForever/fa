@@ -2485,7 +2485,7 @@ function CreateUI(maxPlayers)
         title = "FA FOREVER GAME LOBBY"
         --
         XinnoBackgroundStretch = Prefs.GetFromCurrentProfile('XinnoBackgroundStretch') or 'true'
-        GUI.background = Bitmap(GUI, UIUtil.SkinnableFile('')) -- Background faction or art
+        GUI.background = Bitmap(GUI, UIUtil.SkinnableFile('/BACKGROUND/faction-background-paint_black_bmp.dds')) -- Background faction or art
             LayoutHelpers.AtCenterIn(GUI.background, GUI)
             if XinnoBackgroundStretch == 'true' then
                 LayoutHelpers.FillParent(GUI.background, GUI)
