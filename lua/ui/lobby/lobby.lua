@@ -6809,6 +6809,12 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
 			-- Set Title on FAF Client
 		--AddChatText('> PRESET > Rule : '..profiles[Selected_Preset].Rule)
 			-- Set Rule Title in TextBox
+			if profiles[Selected_Preset].Rule == '' then
+				SetText2(titleText, 'FA FOREVER GAME LOBBY', 10)
+			else
+				SetText2(titleText, profiles[Selected_Preset].Rule, 10)
+			end
+			RuleTitle_SendMSG()
 		--AddChatText('> PRESET > MapPath : '..profiles[Selected_Preset].MapPath)
 			SetGameOption('ScenarioFile', profiles[Selected_Preset].MapPath, nil, true)
 			--gameInfo.GameOptions['ScenarioFile'] = profiles[Selected_Preset].MapPath
