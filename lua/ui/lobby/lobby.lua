@@ -2485,7 +2485,7 @@ function CreateUI(maxPlayers)
         title = "FA FOREVER GAME LOBBY"
         --
         XinnoBackgroundStretch = Prefs.GetFromCurrentProfile('XinnoBackgroundStretch') or 'true'
-        GUI.background = Bitmap(GUI, UIUtil.SkinnableFile('/BACKGROUND/faction-background-paint_black_bmp.dds')) -- Background faction or art
+        GUI.background = Bitmap(GUI, UIUtil.SkinnableFile('/BACKGROUND/background-paint_black_bmp.dds')) -- Background faction or art
             LayoutHelpers.AtCenterIn(GUI.background, GUI)
             if XinnoBackgroundStretch == 'true' then
                 LayoutHelpers.FillParent(GUI.background, GUI)
@@ -6109,7 +6109,7 @@ function ChangeBackgroundLobby(slot, faction)
             elseif faction == 5 then
                 GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/faction-background-paint_random_bmp.dds"))
             else
-                GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/faction-background-paint_black_bmp.dds"))
+                GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/background-paint_black_bmp.dds"))
             end
             LASTXinnoBackground = 'Factions'
         
@@ -6449,6 +6449,12 @@ end
 ----------
 -- GUI --
 function GUI_PRESET()
+	
+	local profiles = GetPreference("UserPresetLobby")
+	if not profiles then
+		GUI_PRESET_INPUT(-1)
+	end
+	
 	GUI_Preset = Group(GUI)
         LayoutHelpers.AtCenterIn(GUI_Preset, GUI)
         GUI_Preset.Depth:Set(998) -- :GetTopmostDepth() + 1
@@ -6536,7 +6542,9 @@ function GUI_PRESET()
 		UIUtil.CreateVertScrollbarFor2(InfoList)
 		--
 		local profiles = GetPreference("UserPresetLobby")
-		LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, 0))
+		if profiles then
+			LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, 0))
+		end
 		InfoList.OnDoubleClick = function(self, row)
 			if row == 0 then
 				GUI_PRESET_INPUT(1)
@@ -6631,7 +6639,18 @@ function GUI_PRESET_INPUT(tyype)
 	local OKButton = UIUtil.CreateButtonStd2(GUI_Preset_InputBox2, '/BUTTON/medium/', "Ok", 12, -1)
         LayoutHelpers.AtHorizontalCenterIn(OKButton, GUI_Preset_InputBox2)
 		LayoutHelpers.AtBottomIn(OKButton, GUI_Preset_InputBox2, 10)
-        if tyype == 0 then
+        if tyype == -1 then
+			text09:SetText('No Preset exist, set your first Preset name :')
+			OKButton.OnClick = function(self)
+				local result = nameEdit:GetText()
+				if result == '' then
+					-- No word in nameEdit
+				else
+					applyCREATE_PRESET_IN_PREF(result)
+					GUI_Preset_InputBox:Destroy()
+				end
+			end
+		elseif tyype == 0 then
 			text09:SetText('Set your Preset name :')
 			OKButton.OnClick = function(self)
 				local result = nameEdit:GetText()
@@ -6773,24 +6792,35 @@ end
 
 function applyCREATE_PRESET_IN_PREF(presetname)
 	local profiles = GetPreference("UserPresetLobby")
-	local num = 0
-	while profiles do
-		num = num + 1
-		if not GetPreference("UserPresetLobby.Preset"..num) then
-			--AddChatText('> UserPresetLobby.Preset'..num)
-			SetPreference('UserPresetLobby.Preset'..num..'.PresetName', tostring(presetname))
-			SetPreference('UserPresetLobby.Preset'..num..'.MapName', tostring(MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).name))
-			SetPreference('UserPresetLobby.Preset'..num..'.FAF_Title', '')
-			SetPreference('UserPresetLobby.Preset'..num..'.Rule', '')
-			SetPreference('UserPresetLobby.Preset'..num..'.MapPath', tostring(gameInfo.GameOptions.ScenarioFile))
-			SavePreferences()
-			break
-		else
-			--AddChatText('> UserPresetLobby.Preset'..num)
+	if not profiles then -- SI aucun profils, création du premier
+		SetPreference('UserPresetLobby.Preset1.PresetName', tostring(presetname))
+		SetPreference('UserPresetLobby.Preset1.MapName', tostring(MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).name))
+		SetPreference('UserPresetLobby.Preset1.FAF_Title', '')
+		SetPreference('UserPresetLobby.Preset1.Rule', '')
+		SetPreference('UserPresetLobby.Preset1.MapPath', tostring(gameInfo.GameOptions.ScenarioFile))
+		SavePreferences()
+	else
+		local num = 0
+		while profiles do
+			num = num + 1
+			if not GetPreference("UserPresetLobby.Preset"..num) then -- SI preset n'existe pas avec cette index suivant, crée le nouveau avec cette index
+				--AddChatText('> UserPresetLobby.Preset'..num)
+				SetPreference('UserPresetLobby.Preset'..num..'.PresetName', tostring(presetname))
+				SetPreference('UserPresetLobby.Preset'..num..'.MapName', tostring(MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).name))
+				SetPreference('UserPresetLobby.Preset'..num..'.FAF_Title', '')
+				SetPreference('UserPresetLobby.Preset'..num..'.Rule', '')
+				SetPreference('UserPresetLobby.Preset'..num..'.MapPath', tostring(gameInfo.GameOptions.ScenarioFile))
+				SavePreferences()
+				break
+			else
+				--AddChatText('> UserPresetLobby.Preset'..num)
+			end
 		end
 	end
 	LOAD_PresetProfils_For_PresetList()
 	PresetList:SetSelection(0)
+	local profiles = GetPreference("UserPresetLobby")
+	LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, 0))
 end
 
 
