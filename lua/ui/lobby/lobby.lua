@@ -5422,8 +5422,10 @@ function StressCPU(waitTime)
     --the benchmark result to other players when finished, and it updates the local
     --user's UI with their new result.
     --    waitTime: The delay in seconds that this function should wait before starting the benchmark.
+	
+	if waitTime == nil then waitTime = 10 end
 
-    for i = waitTime, 1, -1 do
+	for i = waitTime, 1, -1 do
         GUI.rerunBenchmark.label:SetText(i..'s')
         WaitSeconds(1)
     end
@@ -5450,7 +5452,9 @@ function StressCPU(waitTime)
             currentBestBenchmark = BenchTime
 
             --Send it to the other players
-            lobbyComm:BroadcastData( { Type = 'CPUBenchmark', PlayerName = localPlayerName, Result = currentBestBenchmark} )
+            if lobbyComm then
+				lobbyComm:BroadcastData( { Type = 'CPUBenchmark', PlayerName = localPlayerName, Result = currentBestBenchmark} )
+			end
 
             --Add the benchmark to the local benchmark table
             AddPlayerBenchmark({PlayerName = localPlayerName, Result = currentBestBenchmark})
@@ -6778,7 +6782,7 @@ function LOAD_PresetSettings_For_InfoList(Selected_Preset)
 		InfoList:AddItem('Settings :')
 		for k, v in profiles[Selected_Preset].Settings do
 			--k = (uids), v = true
-			InfoList:AddItem('- '..k..' : '..v)
+			InfoList:AddItem('- '..k..' : '..tostring(v))
 		end
 	end
 end
@@ -6846,7 +6850,7 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
 			end
 			RuleTitle_SendMSG()
 		--AddChatText('> PRESET > MapPath : '..profiles[Selected_Preset].MapPath)
-			SetGameOption('ScenarioFile', profiles[Selected_Preset].MapPath, nil, true)
+			SetGameOption('ScenarioFile', profiles[Selected_Preset].MapPath, false, true)
 			--gameInfo.GameOptions['ScenarioFile'] = profiles[Selected_Preset].MapPath
 			--Prefs.SetToCurrentProfile('LastScenario', profiles[Selected_Preset].MapPath)
 		
@@ -6860,7 +6864,7 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
 				--AddChatText('> PRESET > UnitsRestricts : '..k..' // '..tostring(profiles[Selected_Preset].UnitsRestricts[k])) -->>> PRESET UnitsRestricts : AIR = true
 				table.insert(urestrict, k)
 			end
-			SetGameOption('RestrictedCategories', urestrict, nil, true)
+			SetGameOption('RestrictedCategories', urestrict, false, true)
 		end
 		
 		--
@@ -6884,13 +6888,18 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
 				-- k = (setting name), v = (value name), profiles[Selected_Preset].Settings[k] = (value name)
 				--AddChatText('> PRESET > Settings : '..k..' // v : '..tostring(v)) -->>> PRESET Settings : UnitCap = disabled
 				--LOG('> PRESET > Settings : '..k..' // v : '..tostring(v)) -->>> PRESET Settings : UnitCap = disabled
-				SetGameOption(k, tostring(v), nil, true)
+				if k == "AllowObservers" then
+					SetGameOption("AllowObservers", v, false, true)
+				else
+					SetGameOption(k, v, false, true)
+				end
 			end
 		end
 		
 		--
 		
 		UpdateGame()
+		GUI_Preset:Destroy()
     end
 end
 
@@ -6916,6 +6925,9 @@ function SAVE_PRESET_IN_PREF() -- GET OPTIONS ON LOBBY AND SAVE TO PRESET
 			--AddChatText('<<< gameInfo.GameOptions : '..k..' = '..tostring(gameInfo.GameOptions[k])) --EX: gameInfo.GameOptions : UnitCap = 500
 			SetPreference('UserPresetLobby.'..Selected_Preset..'.MapPath', tostring(gameInfo.GameOptions[k]))
 		
+		elseif k == 'AllowObservers' then
+			SetPreference('UserPresetLobby.'..Selected_Preset..'.Settings.AllowObservers', gameInfo.GameOptions[k])
+		
 		elseif k == 'RestrictedCategories' then -- RESTRICTED UNITS
 			for kk, vv in gameInfo.GameOptions['RestrictedCategories'] do
 				--AddChatText('<<< ... RestrictedCategories : '..kk..' = '..tostring(gameInfo.GameOptions['RestrictedCategories'][kk])) --EX: ... RestrictedCategories : 2 = SERAPHIM
@@ -6924,7 +6936,7 @@ function SAVE_PRESET_IN_PREF() -- GET OPTIONS ON LOBBY AND SAVE TO PRESET
 				--SetPreference('UserPresetLobby.'..Selected_Preset..'.UnitsRestricts', tostring(gameInfo.GameOptions[kk])) -- Enregistre les Restriction dans le Game.prefs
 			end
 		
-		--elseif k == 'Mods' then -- MODS
+		elseif k == 'Mods' then -- MODS
 			--for kk, vv in gameInfo.GameOptions['Mods'] do
 				--AddChatText('<<< ... Mods : '..kk..' = '..tostring(gameInfo.GameOptions['Mods'][kk]))
 				--SetPreference('UserPresetLobby.'..Selected_Preset..'.UnitsRestricts.'..k, tostring(gameInfo.GameOptions[k]))
