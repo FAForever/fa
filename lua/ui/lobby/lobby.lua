@@ -62,10 +62,7 @@ local PrefLanguageTooltipText={}
 --\\ Stop - Table of Tooltip Country
 --// Get a value on /Country CommandLine in FA.exe - Xinnony
 local PrefLanguage = GetCommandLineArg("/country", 1)
-if PrefLanguage[1] == '' then
-    LOG('COUNTRY - Country has not been found')
-    PrefLanguage[1] = "world"
-elseif PrefLanguage[1] == nil then
+if PrefLanguage[1] == '' or PrefLanguage[1] == nil then
     LOG('COUNTRY - Country has not been found')
     PrefLanguage = "world"
 else
@@ -565,7 +562,7 @@ function JoinGame(address, asObserver, playerName, uid)
 end
 
 function ConnectToPeer(addressAndPort,name,uid)
-    if string.find(addressAndPort, '127.0.0.1') then
+    if not string.find(addressAndPort, '127.0.0.1') then
         LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..")")
     else
         LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..", USE PROXY)")
@@ -776,7 +773,14 @@ function SetSlotInfo(slot, playerInfo)
     --ChangeBackgroundLobby(slot, Prefs.GetFromCurrentProfile('LastFaction'))
     --\\ Stop - Change the background according to the chosen Faction
     --// Show the Country Flag in slot - Xinnony
-    SetSlotCountryFlag(slot, playerInfo.COUNTRY)
+	if PrefLanguage == nil or PrefLanguage == '' then
+		GUI.slots[slot].KinderCountry:Hide()
+	else
+		GUI.slots[slot].KinderCountry:Show()
+		GUI.slots[slot].KinderCountry:SetTexture(UIUtil.UIFile('/countries/'..PrefLanguage..'.dds'))
+		Country_GetTooltipValue(PrefLanguage, slot)
+		Country_AddControlTooltip(GUI.slots[slot].KinderCountry, 0, slot)
+	end
     --\\ Stop - Show the Country Flag in slot
 
     --CPU Benchmark code
@@ -2068,6 +2072,10 @@ function HostTryAddPlayer(senderID, slot, requestedPlayerName, human, aiPersonal
 
     if requestedNG then
         gameInfo.PlayerOptions[newSlot].NG = requestedNG
+    end
+	
+	if requestedCOUNTRY then
+        gameInfo.PlayerOptions[newSlot].Country = requestedCOUNTRY
     end
 
     lobbyComm:BroadcastData(
@@ -4842,6 +4850,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         gameInfo.PlayerOptions[1].Human = true
         gameInfo.PlayerOptions[1].PlayerColor = Prefs.GetFromCurrentProfile('LastColor') or 1
         gameInfo.PlayerOptions[1].ArmyColor = Prefs.GetFromCurrentProfile('LastColor') or 1
+		gameInfo.PlayerOptions[1].Country = PrefLanguage or 'world'
 
         local requestedFaction = Prefs.GetFromCurrentProfile('LastFaction')
         if (requestedFaction == nil) or (requestedFaction > table.getn(FactionData.Factions)) then
@@ -5552,30 +5561,9 @@ end
 ##########################################################################
 ################################  Xinnony Wall  ################################
 --------------------------------------------------
--- CountryFlag Functions                            --
+-- CountryFlag Functions                         --
 -- Author : Xinnony                                --
 --------------------------------------------------
-function SetSlotCountryFlag(slot, COUNTRY)
-    if GUI.slots[slot].KinderCountry then
-        if COUNTRY == nil then -- No flag
-            GUI.slots[slot].KinderCountry:Hide()
-        elseif COUNTRY == '' then -- No flag
-            GUI.slots[slot].KinderCountry:Show()
-            GUI.slots[slot].KinderCountry:SetTexture(UIUtil.UIFile('/countries/'..'world'..'.dds'))
-            Country_GetTooltipValue(COUNTRY, slot)
-            Country_AddControlTooltip(GUI.slots[slot].KinderCountry, 0, slot)
-        --elseif COUNTRY == ('xxx' or 'xxx') then -- Here you can put the missing texture Flag
-            --GUI.slots[slot].KinderCountry:Show()
-            --GUI.slots[slot].KinderCountry:SetTexture(UIUtil.UIFile('/countries/'..'world'..'.dds'))
-        else
-            GUI.slots[slot].KinderCountry:Show()
-            GUI.slots[slot].KinderCountry:SetTexture(UIUtil.UIFile('/countries/'..COUNTRY..'.dds'))
-            Country_GetTooltipValue(COUNTRY, slot)
-            Country_AddControlTooltip(GUI.slots[slot].KinderCountry, 0, slot)
-        end
-    end
-end
-
 function Country_AddControlTooltip(control, waitDelay, slotNumber)
     local self = control
     if not control.oldHandleEvent then
@@ -5613,7 +5601,7 @@ function Country_GetTooltipValue(CountryResult, slot)
 end--]]
 
 --------------------------------------------------
--- Change the title for to say the rule        --
+-- Change the title for to say the rule       --
 -- Author : Xinnony                                --
 --------------------------------------------------
 function RuleTitle_SendMSG()
@@ -6746,7 +6734,7 @@ function LOAD_PresetSettings_For_InfoList(Selected_Preset)
 		--AddChatText('ERROR !, Selected_Preset is :'..Selected_Preset)
 	--end
 	InfoList:AddItem('Preset Name : '..profiles[Selected_Preset].PresetName)
-	InfoList:AddItem('FAF Title : '..profiles[Selected_Preset].FAF_Title)
+	InfoList:AddItem('FAF Title : '..'(not working for the moment)')--profiles[Selected_Preset].FAF_Title)
 	InfoList:AddItem('Rule : '..profiles[Selected_Preset].Rule)
 	InfoList:AddItem('Map : '..profiles[Selected_Preset].MapName)
 	if profiles[Selected_Preset].Mods then
@@ -6904,7 +6892,7 @@ function SAVE_PRESET_IN_PREF() -- GET OPTIONS ON LOBBY AND SAVE TO PRESET
 	
 	local Preset_Name = profiles[Selected_Preset].PresetName or 'ERROR, Set preset name here' -- Nom du PresetLobby
 	local Title_FAF = profiles[Selected_Preset].Title_FAF or '' -- Title is for FAF Client title in "Find Games" tabs
-	local Rule_Text = profiles[Selected_Preset].Rule_Text or '' -- Rule text showing in top of Lobby and (coming soon) in Game
+	local Rule_Text = string.gsub(RuleLabel:GetItem(0)..RuleLabel:GetItem(1), 'Rule : ', '') or profiles[Selected_Preset].Rule_Text or '' -- Rule text showing in top of Lobby
 	
 	SetPreference('UserPresetLobby.'..Selected_Preset, {}) -- Delete all value
 	
