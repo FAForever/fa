@@ -333,51 +333,54 @@ end
 --* given a path and name relative to the skin path, returns the full path based on the current skin
 function UIFile(filespec)
     local skins = import('/lua/skins/skins.lua').skins
-    local skin = currentSkin()
-    local currentPath = skins[skin].texturesPath
+    local visitingSkin = currentSkin()
+    local currentPath = skins[visitingSkin].texturesPath
 
-    if skin == nil or currentPath == nil then
+    if visitingSkin == nil or currentPath == nil then
         return nil
     end
 
-    if(not UIFileCache[skin][filespec])  then
-        local found = false
+    if UIFileCache[currentPath..filespec] == true then
+		LOG('[[ UIFileCache['..currentPath..filespec..'] == true')
+		return currentPath..filespec
+	else
+		if UIFileCache[currentPath..filespec] == false then
+			LOG('[[ UIFileCache['..currentPath..filespec..'] == false')
+		else
+			LOG('[[ UIFileCache['..currentPath..filespec..'] == not exist')
+		end
+	--if not UIFileCache[currentPath..filespec] or UIFileCache[currentPath..filespec] != curFile then
+		-- if current skin is default, then don't bother trying to look for it, just append the default dir
+		if visitingSkin == 'default' then
+			return currentPath .. filespec
+		else
+			while visitingSkin do
+				local curFile = currentPath .. filespec
+				if DiskGetFileInfo(curFile) then
+					LOG('[[ File finded ('..visitingSkin..') : '..curFile)
+					UIFileCache[curFile] = true
+					--break
+					return curFile
+				else
+					LOG('[[ File not finded ('..visitingSkin..') : '..curFile)
+					UIFileCache[curFile] = false
+					visitingSkin = skins[visitingSkin].default
+					if visitingSkin then
+						currentPath = skins[visitingSkin].texturesPath
+					end
+				end
+				
+			end
+		end
+	--else
+		--if UIFileCache[visitingSkin][filespec] == curFile then
+			--return curFile	
+		--end
+	end
 
-        if skin == 'default' then
-            -- if current skin is default, then don't bother trying to look for it, just append the default dir
-            found = currentPath .. filespec
-        else
-            local nextSkin = skin
-
-            while not found and nextSkin do
-                local curFile = currentPath .. filespec
-
-                if DiskGetFileInfo(curFile) then
-                    found = curFile
-                else
-                    nextSkin = skins[nextSkin].default
-                    if nextSkin then
-                        currentPath = skins[nextSkin].texturesPath
-                    end
-                end
-            end
-
-            if not found then
-                -- pass out the final string anyway so resource loader can gracefully fail
-                LOG("Warning: Unable to find file ", filespec)
-                found = filespec
-                skin = 'notfound'
-            end
-        end
-
-        if(not UIFileCache[skin]) then
-            UIFileCache[skin] = {}
-        end
-
-        UIFileCache[skin][filespec] = found
-    end
-
-    return UIFileCache[skin][filespec]
+    LOG("Warning: Unable to find file ", filespec)
+    -- pass out the final string anyway so resource loader can gracefully fail
+    return filespec
 end
 
 --* return the filename as a lazy var function to allow triggering of OnDirty
@@ -615,6 +618,20 @@ function CreateButtonStd2(parent, filename, label, pointSize, textOffsetVert, te
         , filename .. "_down.dds"
         , filename .. "_over.dds"
         , filename .. "_dis.dds"
+        , label
+        , pointSize
+        , textOffsetVert
+        , textOffsetHorz
+        , clickCue
+        , rolloverCue
+        )
+end
+function CreateButtonStd2PNG(parent, filename, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue) -- XinnonyWork
+    return CreateButton2(parent
+        , filename .. "_up.png"
+        , filename .. "_down.png"
+        , filename .. "_over.png"
+        , filename .. "_dis.png"
         , label
         , pointSize
         , textOffsetVert

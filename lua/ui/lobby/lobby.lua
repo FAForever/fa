@@ -1629,12 +1629,12 @@ local function UpdateGame()
     -- Change the Slot Background by Slot State -- Xinnony
     for i = 1, LobbyComm.maxPlayerSlots do
         if GUI.slots[i].closed then
-            GUI.slots[i].SlotBackground:SetTexture(UIUtil.UIFile('/SLOT/slot-dis.dds'))
+            GUI.slots[i].SlotBackground:SetTexture(UIUtil.UIFile('/SLOT/slot-dis.png'))
         else
             if gameInfo.PlayerOptions[i] then
-                GUI.slots[i].SlotBackground:SetTexture(UIUtil.UIFile('/SLOT/slot-player.dds'))
+                GUI.slots[i].SlotBackground:SetTexture(UIUtil.UIFile('/SLOT/slot-player.png'))
             else
-                GUI.slots[i].SlotBackground:SetTexture(UIUtil.UIFile('/SLOT/slot-player_other.dds'))
+                GUI.slots[i].SlotBackground:SetTexture(UIUtil.UIFile('/SLOT/slot-player_other.png'))
             end
         end
     end
@@ -2494,7 +2494,7 @@ function CreateUI(maxPlayers)
         title = "FA FOREVER GAME LOBBY"
         --
         XinnoBackgroundStretch = Prefs.GetFromCurrentProfile('XinnoBackgroundStretch') or 'true'
-        GUI.background = Bitmap(GUI, UIUtil.SkinnableFile('/BACKGROUND/background-paint_black_bmp.dds')) -- Background faction or art
+        GUI.background = Bitmap(GUI, UIUtil.SkinnableFile('/BACKGROUND/background-paint_black_bmp.png')) -- Background faction or art
             LayoutHelpers.AtCenterIn(GUI.background, GUI)
             if XinnoBackgroundStretch == 'true' then
                 LayoutHelpers.FillParent(GUI.background, GUI)
@@ -2522,7 +2522,7 @@ function CreateUI(maxPlayers)
     --if singlePlayer then
         --GUI.panel = Bitmap(GUI, UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/power_panel-skirmish_bmp.dds"))
     --else
-        GUI.panel = Bitmap(GUI, UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[ran]power_panel_bmp.dds"))
+        GUI.panel = Bitmap(GUI, UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[random]lobby.png"))
     --end
     LayoutHelpers.AtCenterIn(GUI.panel, GUI)
     --GUI.panel.brackets = UIUtil.CreateDialogBrackets(GUI.panel, 18, 17, 18, 15)
@@ -2711,9 +2711,9 @@ function CreateUI(maxPlayers)
 
     -- GAME OPTIONS // MODS MANAGER BUTTON --
     if lobbyComm:IsHost() then     -- GAME OPTION
-        GUI.gameoptionsButton = UIUtil.CreateButtonStd2(GUI.optionsPanel, '/BUTTON/medium/', "Game Options", 12, -1)
+        GUI.gameoptionsButton = UIUtil.CreateButtonStd2PNG(GUI.optionsPanel, '/BUTTON/medium/', "Game Options", 12, -1)
     else                                        -- MODS MANAGER
-        GUI.gameoptionsButton = UIUtil.CreateButtonStd2(GUI.optionsPanel, '/BUTTON/medium/', "Mods Manager", 12, -1)
+        GUI.gameoptionsButton = UIUtil.CreateButtonStd2PNG(GUI.optionsPanel, '/BUTTON/medium/', "Mods Manager", 12, -1)
     end
     LayoutHelpers.AtBottomIn(GUI.gameoptionsButton, GUI.optionsPanel, -55)
     LayoutHelpers.AtHorizontalCenterIn(GUI.gameoptionsButton, GUI.optionsPanel)
@@ -2779,7 +2779,7 @@ function CreateUI(maxPlayers)
         end
     
     -- EXIT BUTTON --
-    GUI.exitButton = UIUtil.CreateButtonStd2(GUI.launchPanel, '/BUTTON/medium/','Exit', 11, -1)--, textOffsetHorz, clickCue, rolloverCue)
+    GUI.exitButton = UIUtil.CreateButtonStd2PNG(GUI.launchPanel, '/BUTTON/medium/','Exit', 11, -1)--, textOffsetHorz, clickCue, rolloverCue)
         if GpgNetActive() then
             GUI.exitButton.label:SetText(LOC("<LOC _Exit>"))
         else
@@ -3085,7 +3085,7 @@ function CreateUI(maxPlayers)
             Tooltip.AddButtonTooltip(GUI.loadButton, 'Lobby_Load')
     elseif not lobbyComm:IsHost() then
         --GUI.gameoptionsButton = UIUtil.CreateButtonStd2(GUI.optionsPanel, '/BUTTON/gameoptions/gameoptions', "", 8, 0)
-        GUI.restrictedUnitsButton = UIUtil.CreateButtonStd2(GUI.optionsPanel, '/BUTTON/medium/', "Unit Manager", 14, 0)--"<LOC lobui_0376>Unit Manager", 14, 2)
+        GUI.restrictedUnitsButton = UIUtil.CreateButtonStd2PNG(GUI.optionsPanel, '/BUTTON/medium/', "Unit Manager", 14, 0)--"<LOC lobui_0376>Unit Manager", 14, 2)
             GUI.restrictedUnitsButton.label:SetColor('B9BFB9')
             GUI.restrictedUnitsButton.label:SetDropShadow(true)
             LayoutHelpers.AtHorizontalCenterIn(GUI.restrictedUnitsButton, GUI.gameoptionsButton)
@@ -3095,7 +3095,7 @@ function CreateUI(maxPlayers)
             end
             Tooltip.AddButtonTooltip(GUI.restrictedUnitsButton, 'lob_RestrictedUnitsClient')
 	elseif lobbyComm:IsHost() then
-		GUI.restrictedUnitsButton = UIUtil.CreateButtonStd2(GUI.optionsPanel, '/BUTTON/medium/', "Preset Lobby", 14, 0)
+		GUI.restrictedUnitsButton = UIUtil.CreateButtonStd2PNG(GUI.optionsPanel, '/BUTTON/medium/', "Preset Lobby", 14, 0)
 		GUI.restrictedUnitsButton.label:SetColor('B9BFB9')
             GUI.restrictedUnitsButton.label:SetDropShadow(true)
             LayoutHelpers.AtHorizontalCenterIn(GUI.restrictedUnitsButton, GUI.gameoptionsButton)
@@ -3220,7 +3220,7 @@ function CreateUI(maxPlayers)
         local bg = GUI.slots[i]
         
         --// Slot Background
-        GUI.slots[i].SlotBackground = Bitmap(GUI, UIUtil.SkinnableFile("/SLOT/slot-dis.dds"))
+        GUI.slots[i].SlotBackground = Bitmap(GUI, UIUtil.SkinnableFile("/SLOT/slot-dis.png"))
             LayoutHelpers.AtBottomIn(GUI.slots[i].SlotBackground, GUI.slots[i], -6)
             LayoutHelpers.AtLeftIn(GUI.slots[i].SlotBackground, GUI.slots[i], 0)
         --\\ Stop Slot Background
@@ -5624,7 +5624,7 @@ function RuleTitle_INPUT()
 		local GUI_Preset_InputBox = Group(GUI)
 			LayoutHelpers.AtCenterIn(GUI_Preset_InputBox, GUI)
 			GUI_Preset_InputBox.Depth:Set(1999)
-		local background2 = Bitmap(GUI_Preset_InputBox, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby-small.dds'))
+		local background2 = Bitmap(GUI_Preset_InputBox, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby-small.png'))
 			GUI_Preset_InputBox.Width:Set(background2.Width)
 			GUI_Preset_InputBox.Height:Set(background2.Height)
 			LayoutHelpers.FillParent(background2, GUI_Preset_InputBox)
@@ -5649,7 +5649,7 @@ function RuleTitle_INPUT()
 			nameEdit:AcquireFocus()
 		-------------------
 		-- Ok button --
-		local OKButton = UIUtil.CreateButtonStd2(GUI_Preset_InputBox2, '/BUTTON/medium/', "Ok", 12, -1)
+		local OKButton = UIUtil.CreateButtonStd2PNG(GUI_Preset_InputBox2, '/BUTTON/medium/', "Ok", 12, -1)
 			LayoutHelpers.AtHorizontalCenterIn(OKButton, GUI_Preset_InputBox2)
 			LayoutHelpers.AtBottomIn(OKButton, GUI_Preset_InputBox2, 10)
 			text09:SetText('Edit the Rule :')
@@ -5680,23 +5680,23 @@ function RuleTitle_INPUT()
 -- Author : Xinnony                                --
 --------------------------------------------------
 function CreateUI_Faction_Selector()
-        TEST1factionPanel = Bitmap(GUI.factionPanel, UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico.dds"))
+        TEST1factionPanel = Bitmap(GUI.factionPanel, UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico.png"))
             --LayoutHelpers.AtTopIn(TEST1factionPanel, GUI.factionPanel, 0)
             LayoutHelpers.AtLeftIn(TEST1factionPanel, GUI.factionPanel)
             LayoutHelpers.AtVerticalCenterIn(TEST1factionPanel, GUI.factionPanel)
-        TEST2factionPanel = Bitmap(GUI.factionPanel, UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico.dds"))
+        TEST2factionPanel = Bitmap(GUI.factionPanel, UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico.png"))
             --LayoutHelpers.AtTopIn(TEST2factionPanel, GUI.factionPanel, 10)
             LayoutHelpers.AtLeftIn(TEST2factionPanel, GUI.factionPanel, 45)
             LayoutHelpers.AtVerticalCenterIn(TEST2factionPanel, GUI.factionPanel, 0)
-        TEST3factionPanel = Bitmap(GUI.factionPanel, UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico.dds"))
+        TEST3factionPanel = Bitmap(GUI.factionPanel, UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico.png"))
             --LayoutHelpers.AtTopIn(TEST3factionPanel, GUI.factionPanel, 0)
             LayoutHelpers.AtHorizontalCenterIn(TEST3factionPanel, GUI.factionPanel, 0)
             LayoutHelpers.AtVerticalCenterIn(TEST3factionPanel, GUI.factionPanel, 0)
-        TEST4factionPanel = Bitmap(GUI.factionPanel, UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico.dds"))
+        TEST4factionPanel = Bitmap(GUI.factionPanel, UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico.png"))
             --LayoutHelpers.AtTopIn(TEST4factionPanel, GUI.factionPanel, 10)
             LayoutHelpers.AtRightIn(TEST4factionPanel, GUI.factionPanel, 45)
             LayoutHelpers.AtVerticalCenterIn(TEST4factionPanel, GUI.factionPanel, 0)
-        TEST5factionPanel = Bitmap(GUI.factionPanel, UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico.dds"))
+        TEST5factionPanel = Bitmap(GUI.factionPanel, UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico.png"))
             --LayoutHelpers.AtTopIn(TEST5factionPanel, GUI.factionPanel, 0)
             LayoutHelpers.AtRightIn(TEST5factionPanel, GUI.factionPanel, 0)
             LayoutHelpers.AtVerticalCenterIn(TEST5factionPanel, GUI.factionPanel, 0)
@@ -5710,15 +5710,15 @@ function SetEvent_Faction_Selector()
         local faction = Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
             local eventHandled = false
             if faction == 2 then
-                TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico-large.dds"))
+                TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico-large.png"))
                 LayoutHelpers.AtLeftIn(TEST1factionPanel, GUI.factionPanel, -15)
             elseif IsPlayer(localPlayerID) then
                 if event.Type == 'MouseEnter' then
-                        TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico-hover.dds"))
+                        TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico-hover.png"))
                         LayoutHelpers.AtLeftIn(TEST1factionPanel, GUI.factionPanel, 0)
                     eventHandled = true
                 elseif event.Type == 'MouseExit' then
-                        TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico.dds"))
+                        TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico.png"))
                         LayoutHelpers.AtLeftIn(TEST1factionPanel, GUI.factionPanel, 0)
                     eventHandled = true
                 elseif event.Type == 'ButtonPress' then
@@ -5742,15 +5742,15 @@ function SetEvent_Faction_Selector()
         local faction = Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
             local eventHandled = false
             if faction == 3 then
-                TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico-large.dds"))
+                TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico-large.png"))
                 LayoutHelpers.AtLeftIn(TEST2factionPanel, GUI.factionPanel, 45-15)
             elseif IsPlayer(localPlayerID) then
                 if event.Type == 'MouseEnter' then
-                        TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico-hover.dds"))
+                        TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico-hover.png"))
                         LayoutHelpers.AtLeftIn(TEST2factionPanel, GUI.factionPanel, 45)
                     eventHandled = true
                 elseif event.Type == 'MouseExit' then
-                        TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico.dds"))
+                        TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico.png"))
                         LayoutHelpers.AtLeftIn(TEST2factionPanel, GUI.factionPanel, 45)
                     eventHandled = true
                 elseif event.Type == 'ButtonPress' then
@@ -5774,13 +5774,13 @@ function SetEvent_Faction_Selector()
         local faction = Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
             local eventHandled = false
             if faction == 1 then
-                TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico-large.dds"))
+                TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico-large.png"))
             elseif IsPlayer(localPlayerID) then
                 if event.Type == 'MouseEnter' then
-                        TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico-hover.dds"))
+                        TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico-hover.png"))
                     eventHandled = true
                 elseif event.Type == 'MouseExit' then
-                        TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico.dds"))
+                        TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico.png"))
                     eventHandled = true
                 elseif event.Type == 'ButtonPress' then
                     eventHandled = true
@@ -5803,15 +5803,15 @@ function SetEvent_Faction_Selector()
         local faction = Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
             local eventHandled = false
             if faction == 4 then
-                TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico-large.dds"))
+                TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico-large.png"))
                 LayoutHelpers.AtRightIn(TEST4factionPanel, GUI.factionPanel, 45-15)
             elseif IsPlayer(localPlayerID) then
                 if event.Type == 'MouseEnter' then
-                        TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico-hover.dds"))
+                        TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico-hover.png"))
                         LayoutHelpers.AtRightIn(TEST4factionPanel, GUI.factionPanel, 45)
                     eventHandled = true
                 elseif event.Type == 'MouseExit' then
-                        TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico.dds"))
+                        TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico.png"))
                         LayoutHelpers.AtRightIn(TEST4factionPanel, GUI.factionPanel, 45)
                     eventHandled = true
                 elseif event.Type == 'ButtonPress' then
@@ -5835,15 +5835,15 @@ function SetEvent_Faction_Selector()
         local faction = Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
             local eventHandled = false
             if faction == 5 then
-                TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico-large.dds"))
+                TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico-large.png"))
                 LayoutHelpers.AtRightIn(TEST5factionPanel, GUI.factionPanel, -15)
             elseif IsPlayer(localPlayerID) then
                 if event.Type == 'MouseEnter' then
-                        TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico-hover.dds"))
+                        TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico-hover.png"))
                         LayoutHelpers.AtRightIn(TEST5factionPanel, GUI.factionPanel, 0)
                     eventHandled = true
                 elseif event.Type == 'MouseExit' then
-                        TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico.dds"))
+                        TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico.png"))
                         LayoutHelpers.AtRightIn(TEST5factionPanel, GUI.factionPanel, 0)
                     eventHandled = true
                 elseif event.Type == 'ButtonPress' then
@@ -5869,66 +5869,66 @@ function SetCurrentFactionTo_Faction_Selector(input_faction)
             ChangeSkinByFaction(1)
             ChangeSkinButtonByFaction(1)
             ChangeBackgroundLobby(nil, 1)
-            TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico-large.dds"))
-            TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico.dds"))
+            TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico-large.png"))
+            TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico.png"))
                 LayoutHelpers.AtLeftIn(TEST1factionPanel, GUI.factionPanel, 0)
-            TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico.dds"))
+            TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico.png"))
                 LayoutHelpers.AtLeftIn(TEST2factionPanel, GUI.factionPanel, 45)
-            TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico.dds"))
+            TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico.png"))
                 LayoutHelpers.AtRightIn(TEST4factionPanel, GUI.factionPanel, 45)
-            TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico.dds"))
+            TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico.png"))
                 LayoutHelpers.AtRightIn(TEST5factionPanel, GUI.factionPanel, 0)
         elseif faction == 2 then
             ChangeSkinByFaction(2)
             ChangeSkinButtonByFaction(2)
             ChangeBackgroundLobby(nil, 2)
-            TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico-large.dds"))
+            TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico-large.png"))
                 LayoutHelpers.AtLeftIn(TEST1factionPanel, GUI.factionPanel, -15)
-            TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico.dds"))
+            TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico.png"))
                 LayoutHelpers.AtLeftIn(TEST2factionPanel, GUI.factionPanel, 45)
-            TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico.dds"))
-            TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico.dds"))
+            TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico.png"))
+            TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico.png"))
                 LayoutHelpers.AtRightIn(TEST4factionPanel, GUI.factionPanel, 45)
-            TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico.dds"))
+            TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico.png"))
                 LayoutHelpers.AtRightIn(TEST5factionPanel, GUI.factionPanel, 0)
         elseif faction == 3 then
             ChangeSkinByFaction(3)
             ChangeSkinButtonByFaction(3)
             ChangeBackgroundLobby(nil, 3)
-            TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico-large.dds"))
+            TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico-large.png"))
                 LayoutHelpers.AtLeftIn(TEST2factionPanel, GUI.factionPanel, 45-15)
-            TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico.dds"))
+            TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico.png"))
                 LayoutHelpers.AtLeftIn(TEST1factionPanel, GUI.factionPanel, 0)
-            TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico.dds"))
-            TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico.dds"))
+            TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico.png"))
+            TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico.png"))
                 LayoutHelpers.AtRightIn(TEST4factionPanel, GUI.factionPanel, 45)
-            TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico.dds"))
+            TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico.png"))
                 LayoutHelpers.AtRightIn(TEST5factionPanel, GUI.factionPanel, 0)
         elseif faction == 4 then
             ChangeSkinByFaction(4)
             ChangeSkinButtonByFaction(4)
             ChangeBackgroundLobby(nil, 4)
-            TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico-large.dds"))
+            TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico-large.png"))
                 LayoutHelpers.AtRightIn(TEST4factionPanel, GUI.factionPanel, 45-15)
-            TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico.dds"))
+            TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico.png"))
                 LayoutHelpers.AtLeftIn(TEST1factionPanel, GUI.factionPanel, 0)
-            TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico.dds"))
+            TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico.png"))
                 LayoutHelpers.AtLeftIn(TEST2factionPanel, GUI.factionPanel, 45)
-            TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico.dds"))
-            TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico.dds"))
+            TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico.png"))
+            TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico.png"))
                 LayoutHelpers.AtRightIn(TEST5factionPanel, GUI.factionPanel, 0)
         elseif faction == 5 then
             ChangeSkinByFaction(5)
             ChangeSkinButtonByFaction(5)
             ChangeBackgroundLobby(nil, 5)
-            TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico-large.dds"))
+            TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico-large.png"))
                 LayoutHelpers.AtRightIn(TEST5factionPanel, GUI.factionPanel, -15)
-            TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico.dds"))
+            TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico.png"))
                 LayoutHelpers.AtLeftIn(TEST1factionPanel, GUI.factionPanel, 0)
-            TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico.dds"))
+            TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico.png"))
                 LayoutHelpers.AtLeftIn(TEST2factionPanel, GUI.factionPanel, 45)
-            TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico.dds"))
-            TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico.dds"))
+            TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico.png"))
+            TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico.png"))
                 LayoutHelpers.AtRightIn(TEST4factionPanel, GUI.factionPanel, 45)
         end
         end
@@ -5938,15 +5938,15 @@ function ChangeSkinByFaction(input_faction)
     local faction = input_faction or Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
     if GUI.panel then
     if faction == 1 then
-        GUI.panel:SetTexture(UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[uef]power_panel_bmp.dds"))
+        GUI.panel:SetTexture(UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[uef]lobby.png"))
     elseif faction == 2 then
-        GUI.panel:SetTexture(UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[aeo]power_panel_bmp.dds"))
+        GUI.panel:SetTexture(UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[aeo]lobby.png"))
     elseif faction == 3 then
-        GUI.panel:SetTexture(UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[cyb]power_panel_bmp.dds"))
+        GUI.panel:SetTexture(UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[cyb]lobby.png"))
     elseif faction == 4 then
-        GUI.panel:SetTexture(UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[ser]power_panel_bmp.dds"))
+        GUI.panel:SetTexture(UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[ser]lobby.png"))
     elseif faction == 5 then
-        GUI.panel:SetTexture(UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[ran]power_panel_bmp.dds"))
+        GUI.panel:SetTexture(UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[random]lobby.png"))
     --else
     end
     end
@@ -5959,49 +5959,49 @@ end
 
 function ForceApplyNewSkin()
     if not GUI.LobbyOptions:IsDisabled() then
-        GUI.LobbyOptions:SetTexture(UIUtil.UIFile('/BUTTON/small/_up.dds'))
+        GUI.LobbyOptions:SetTexture(UIUtil.UIFile('/BUTTON/small/_up.png'))
     else
-        GUI.LobbyOptions:SetTexture(UIUtil.UIFile('/BUTTON/small/_dis.dds'))
+        GUI.LobbyOptions:SetTexture(UIUtil.UIFile('/BUTTON/small/_dis.png'))
     end
     -- Exit button
     if GUI.exitButton:IsDisabled() then
-        GUI.exitButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_dis.dds'))
+        GUI.exitButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_dis.png'))
     else
-        GUI.exitButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_up.dds'))
+        GUI.exitButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_up.png'))
     end
     -- StartGame show only if you Host and Enable only if All Player is Ready.
     if lobbyComm:IsHost() then
         if not GUI.launchGameButton:IsDisabled() then--and GetPlayersNotReady() then
             if GetPlayersNotReady() then
-                GUI.launchGameButton:SetTexture(UIUtil.UIFile('/BUTTON/large/_dis.dds'))
+                GUI.launchGameButton:SetTexture(UIUtil.UIFile('/BUTTON/large/_dis.png'))
             else
-                GUI.launchGameButton:SetTexture(UIUtil.UIFile('/BUTTON/large/_up.dds'))
+                GUI.launchGameButton:SetTexture(UIUtil.UIFile('/BUTTON/large/_up.png'))
             end
-        elseif GUI.launchGameButton:IsDisabled() then--and not GetPlayersNotReady() then
-            GUI.launchGameButton:SetTexture(UIUtil.UIFile('/BUTTON/large/_dis.dds'))
+        else--if GUI.launchGameButton:IsDisabled() then--and not GetPlayersNotReady() then
+            GUI.launchGameButton:SetTexture(UIUtil.UIFile('/BUTTON/large/_dis.png'))
         end
     end
     -- GameOption show only if you Host, else ModManager is show.
     if lobbyComm:IsHost() then
         if not GUI.gameoptionsButton:IsDisabled() then
-            GUI.gameoptionsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_up.dds'))
+            GUI.gameoptionsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_up.png'))
         elseif GUI.gameoptionsButton:IsDisabled() then
-            GUI.gameoptionsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_dis.dds'))
+            GUI.gameoptionsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_dis.png'))
         end
     end
     if not lobbyComm:IsHost() then
         if not GUI.gameoptionsButton:IsDisabled() then
-            GUI.gameoptionsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_up.dds'))
+            GUI.gameoptionsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_up.png'))
         elseif GUI.gameoptionsButton:IsDisabled() then
-            GUI.gameoptionsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_dis.dds'))
+            GUI.gameoptionsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_dis.png'))
         end
     end
     -- Restricted Unit show only if not you Host, else Preset Lobby is show.
     --if not lobbyComm:IsHost() then
         if not GUI.restrictedUnitsButton:IsDisabled() then
-            GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_up.dds'))
+            GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_up.png'))
         elseif GUI.restrictedUnitsButton:IsDisabled() then
-            GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_dis.dds'))
+            GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_dis.png'))
         end
     --end
     -- Observer, AutoTeam, RankedOpts, CPUBench, RandomMap.
@@ -6079,17 +6079,17 @@ function ChangeBackgroundLobby(slot, faction)
             GUI.background2:Hide()
             faction = faction or Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
             if faction == 1 then
-                GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/faction-background-paint_uef_bmp.dds"))
+                GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/faction/faction-background-paint_uef_bmp.png"))
             elseif faction == 2 then
-                GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/faction-background-paint_aion_bmp.dds"))
+                GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/faction/faction-background-paint_aion_bmp.png"))
             elseif faction == 3 then
-                GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/faction-background-paint_cybran_bmp.dds"))
+                GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/faction/faction-background-paint_cybran_bmp.png"))
             elseif faction == 4 then
-                GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/faction-background-paint_seraphim_bmp.dds"))
+                GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/faction/faction-background-paint_seraphim_bmp.png"))
             elseif faction == 5 then
-                GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/faction-background-paint_random_bmp.dds"))
+                GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/faction/faction-background-paint_random_bmp.png"))
             else
-                GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/background-paint_black_bmp.dds"))
+                GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/background-paint_black_bmp.png"))
             end
             LASTXinnoBackground = 'Factions'
         
@@ -6097,14 +6097,14 @@ function ChangeBackgroundLobby(slot, faction)
             if XinnonyDebug == 4 then AddChatText(">> Background ART") end
             GUI.background:Show()
             GUI.background2:Hide()
-            GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/art-background-paint0"..math.random(1, 5).."_bmp.dds"))
+            GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/art/art-background-paint0"..math.random(1, 5).."_bmp.dds"))
             LASTXinnoBackground = 'ConceptArt'
             
         elseif XinnoBackground == 'Screenshoot' then--and LASTBackgroundSelected != BackgroundSelected then
             if XinnonyDebug == 4 then AddChatText(">> Background SCREENSHOOT") end
             GUI.background:Show()
             GUI.background2:Hide()
-            GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/scrn-background-paint"..math.random(1, 14).."_bmp.dds"))
+            GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/scrn/scrn-background-paint"..math.random(1, 14).."_bmp.dds"))
             LASTXinnoBackground = 'Screenshoot'
         
         elseif XinnoBackground == 'Map' then--and LASTBackgroundSelected != BackgroundSelected then -- LASTBac... is for avoided loop set texture, when you change faction
@@ -6130,7 +6130,7 @@ function ChangeBackgroundLobby(slot, faction)
             if XinnonyDebug == 4 then AddChatText(">> Background NOTHING") end
             GUI.background:Hide()
             GUI.background2:Hide()
-            GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/background-paint_black_bmp.dds"))
+            GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/background-paint_black_bmp.png"))
             LASTXinnoBackground = 'No'
         end
     end
@@ -6140,7 +6140,7 @@ function CreateOptionLobbyDialog()
     local dialog = Group(GUI)
         LayoutHelpers.AtCenterIn(dialog, GUI)
         dialog.Depth:Set(999) -- :GetTopmostDepth() + 1
-    local background = Bitmap(dialog, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby.dds'))
+    local background = Bitmap(dialog, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby.png'))
         dialog.Width:Set(background.Width)
         dialog.Height:Set(background.Height)
         LayoutHelpers.FillParent(background, dialog)
@@ -6351,7 +6351,7 @@ function CreateOptionLobbyDialog()
     end
     ------------------
     -- Quit button --
-    local QuitButton = UIUtil.CreateButtonStd2(dialog2, '/BUTTON/medium/', "Thank You !", 12, -1)
+    local QuitButton = UIUtil.CreateButtonStd2PNG(dialog2, '/BUTTON/medium/', "Thank You !", 12, -1)
         LayoutHelpers.AtHorizontalCenterIn(QuitButton, dialog2, 0)
         LayoutHelpers.AtBottomIn(QuitButton, dialog2, 10)
         QuitButton.OnClick = function(self)
@@ -6438,7 +6438,7 @@ function GUI_PRESET()
 	GUI_Preset = Group(GUI)
         LayoutHelpers.AtCenterIn(GUI_Preset, GUI)
         GUI_Preset.Depth:Set(998) -- :GetTopmostDepth() + 1
-    local background = Bitmap(GUI_Preset, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby.dds'))
+    local background = Bitmap(GUI_Preset, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby.png'))
         GUI_Preset.Width:Set(background.Width)
         GUI_Preset.Height:Set(background.Height)
         LayoutHelpers.FillParent(background, GUI_Preset)
@@ -6461,7 +6461,7 @@ function GUI_PRESET()
 		text1:Hide()
 	--------------------
     -- LOAD button --
-	local LoadButton = UIUtil.CreateButtonStd2(dialog2, '/BUTTON/medium/', "Load preset", 12, -1)
+	local LoadButton = UIUtil.CreateButtonStd2PNG(dialog2, '/BUTTON/medium/', "Load preset", 12, -1)
         LayoutHelpers.AtLeftIn(LoadButton, dialog2, 0)
         LayoutHelpers.AtBottomIn(LoadButton, dialog2, 10)
         LoadButton.OnClick = function(self)
@@ -6543,7 +6543,7 @@ function GUI_PRESET()
 		end
 	-------------------
     -- QUIT button --
-	local QuitButton = UIUtil.CreateButtonStd2(dialog2, '/BUTTON/medium/', "Exit", 12, -1)
+	local QuitButton = UIUtil.CreateButtonStd2PNG(dialog2, '/BUTTON/medium/', "Exit", 12, -1)
         LayoutHelpers.CenteredRightOf(QuitButton, LoadButton, -16)
         QuitButton.OnClick = function(self)
             GUI_Preset:Destroy()
@@ -6591,7 +6591,7 @@ function GUI_PRESET_INPUT(tyype)
 	local GUI_Preset_InputBox = Group(GUI)
         LayoutHelpers.AtCenterIn(GUI_Preset_InputBox, GUI)
         GUI_Preset_InputBox.Depth:Set(1999)
-    local background2 = Bitmap(GUI_Preset_InputBox, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby-small.dds'))
+    local background2 = Bitmap(GUI_Preset_InputBox, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby-small.png'))
         GUI_Preset_InputBox.Width:Set(background2.Width)
         GUI_Preset_InputBox.Height:Set(background2.Height)
         LayoutHelpers.FillParent(background2, GUI_Preset_InputBox)
@@ -6616,7 +6616,7 @@ function GUI_PRESET_INPUT(tyype)
         nameEdit:AcquireFocus()
 	-------------------
     -- Ok button --
-	local OKButton = UIUtil.CreateButtonStd2(GUI_Preset_InputBox2, '/BUTTON/medium/', "Ok", 12, -1)
+	local OKButton = UIUtil.CreateButtonStd2PNG(GUI_Preset_InputBox2, '/BUTTON/medium/', "Ok", 12, -1)
         LayoutHelpers.AtHorizontalCenterIn(OKButton, GUI_Preset_InputBox2)
 		LayoutHelpers.AtBottomIn(OKButton, GUI_Preset_InputBox2, 10)
         if tyype == -1 then
