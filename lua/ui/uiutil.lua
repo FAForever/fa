@@ -341,13 +341,13 @@ function UIFile(filespec)
     end
 
     if UIFileCache[currentPath..filespec] == true then
-		LOG('[[ UIFileCache['..currentPath..filespec..'] == true')
+		--LOG('[[ UIFileCache['..currentPath..filespec..'] == true')
 		return currentPath..filespec
 	else
 		if UIFileCache[currentPath..filespec] == false then
-			LOG('[[ UIFileCache['..currentPath..filespec..'] == false')
+			--LOG('[[ UIFileCache['..currentPath..filespec..'] == false')
 		else
-			LOG('[[ UIFileCache['..currentPath..filespec..'] == not exist')
+			--LOG('[[ UIFileCache['..currentPath..filespec..'] == not exist')
 		end
 	--if not UIFileCache[currentPath..filespec] or UIFileCache[currentPath..filespec] != curFile then
 		-- if current skin is default, then don't bother trying to look for it, just append the default dir
@@ -357,12 +357,12 @@ function UIFile(filespec)
 			while visitingSkin do
 				local curFile = currentPath .. filespec
 				if DiskGetFileInfo(curFile) then
-					LOG('[[ File finded ('..visitingSkin..') : '..curFile)
+					--LOG('[[ File finded ('..visitingSkin..') : '..curFile)
 					UIFileCache[curFile] = true
 					--break
 					return curFile
 				else
-					LOG('[[ File not finded ('..visitingSkin..') : '..curFile)
+					--LOG('[[ File not finded ('..visitingSkin..') : '..curFile)
 					UIFileCache[curFile] = false
 					visitingSkin = skins[visitingSkin].default
 					if visitingSkin then

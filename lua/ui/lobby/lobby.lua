@@ -773,12 +773,12 @@ function SetSlotInfo(slot, playerInfo)
     --ChangeBackgroundLobby(slot, Prefs.GetFromCurrentProfile('LastFaction'))
     --\\ Stop - Change the background according to the chosen Faction
     --// Show the Country Flag in slot - Xinnony
-	if PrefLanguage == nil or PrefLanguage == '' then
+	if playerInfo.Country == nil or playerInfo.Country == '' then
 		GUI.slots[slot].KinderCountry:Hide()
 	else
 		GUI.slots[slot].KinderCountry:Show()
-		GUI.slots[slot].KinderCountry:SetTexture(UIUtil.UIFile('/countries/'..PrefLanguage..'.dds'))
-		Country_GetTooltipValue(PrefLanguage, slot)
+		GUI.slots[slot].KinderCountry:SetTexture(UIUtil.UIFile('/countries/'..playerInfo.Country..'.dds'))
+		Country_GetTooltipValue(playerInfo.Country, slot)
 		Country_AddControlTooltip(GUI.slots[slot].KinderCountry, 0, slot)
 	end
     --\\ Stop - Show the Country Flag in slot
@@ -3362,7 +3362,7 @@ function CreateUI(maxPlayers)
                 UIUtil.SkinnableFile('/game/unit_bmp/bar-back_bmp.dds'),
                 UIUtil.SkinnableFile('/game/unit_bmp/bar-01_bmp.dds'),
                 true)
-                LayoutHelpers.AtTopIn(GUI.slots[i].pingStatus, GUI.slots[i].pingGroup, 4)
+                LayoutHelpers.AtTopIn(GUI.slots[i].pingStatus, GUI.slots[i].pingGroup, 5)
                 LayoutHelpers.AtLeftIn(GUI.slots[i].pingStatus, GUI.slots[i].pingGroup, 0)
                 LayoutHelpers.AtRightIn(GUI.slots[i].pingStatus, GUI.slots[i].pingGroup, 0)
             --GUI.slots[i].pingStatus.Bottom:Set(GUI.slots[curRow].pingText.Top)
@@ -5418,10 +5418,10 @@ function CreateCPUMetricUI()
     if not singlePlayer then
         for i= 1, LobbyComm.maxPlayerSlots do
                 GUI.slots[i].CPUSpeedBar = StatusBar(GUI.slots[i].pingGroup, barMin, barMax, false, false,
-                    UIUtil.SkinnableFile('/game/unit_bmp/bar-back_bmp.dds'),
-                    UIUtil.SkinnableFile('/game/unit_bmp/bar02_bmp.dds'),
+                    UIUtil.UIFile('/game/unit_bmp/bar-back_bmp.dds'),
+                    UIUtil.UIFile('/game/unit_bmp/bar_purple_bmp.png'),
                     true)
-                LayoutHelpers.AtBottomIn(GUI.slots[i].CPUSpeedBar, GUI.slots[i].pingGroup, 1)
+                LayoutHelpers.AtBottomIn(GUI.slots[i].CPUSpeedBar, GUI.slots[i].pingGroup, 2)
                 LayoutHelpers.AtLeftIn(GUI.slots[i].CPUSpeedBar, GUI.slots[i].pingGroup, 0)
                 LayoutHelpers.AtRightIn(GUI.slots[i].CPUSpeedBar, GUI.slots[i].pingGroup, 0)
                 CPU_AddControlTooltip(GUI.slots[i].CPUSpeedBar, 0, i)
@@ -5542,7 +5542,7 @@ function SetSlotCPUBar(slot, playerInfo)
                 GUI.slots[slot].CPUSpeedBar.CPUActualValue = b.Result
                 GUI.slots[slot].CPUSpeedBar:Show()
 
-                GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar02_bmp.dds'))
+                GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.UIFile('/game/unit_bmp/bar_purple_bmp.png'))
 
                 -- if clampedResult <= greenBarMax then
                     -- GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-02_bmp.dds'))
