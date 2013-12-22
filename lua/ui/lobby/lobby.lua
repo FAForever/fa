@@ -2682,7 +2682,7 @@ function CreateUI(maxPlayers)
         GUI.RankedLabel:SetDropShadow(true)
     
     -- Checkbox Show changed Options
-    cbox_ShowChangedOption = UIUtil.CreateCheckboxStd(GUI.optionsPanel, '/CHECKBOX/radio')
+    cbox_ShowChangedOption = UIUtil.CreateCheckboxStdPNG(GUI.optionsPanel, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel, 3, 0)
         Tooltip.AddCheckboxTooltip(cbox_ShowChangedOption, {text='Hide unchanged Options', body='Show only changed Options'})
 		cbox_ShowChangedOption_TEXT = UIUtil.CreateText(cbox_ShowChangedOption, 'Hide unchanged Options', 11, 'Arial')
@@ -3084,7 +3084,6 @@ function CreateUI(maxPlayers)
             end
             Tooltip.AddButtonTooltip(GUI.loadButton, 'Lobby_Load')
     elseif not lobbyComm:IsHost() then
-        --GUI.gameoptionsButton = UIUtil.CreateButtonStd2(GUI.optionsPanel, '/BUTTON/gameoptions/gameoptions', "", 8, 0)
         GUI.restrictedUnitsButton = UIUtil.CreateButtonStd2PNG(GUI.optionsPanel, '/BUTTON/medium/', "Unit Manager", 14, 0)--"<LOC lobui_0376>Unit Manager", 14, 2)
             GUI.restrictedUnitsButton.label:SetColor('B9BFB9')
             GUI.restrictedUnitsButton.label:SetDropShadow(true)
@@ -3377,7 +3376,7 @@ function CreateUI(maxPlayers)
         GUI.slots[i].multiSpace.Top:Set(GUI.slots[curRow].Top)
 
         if not singlePlayer then
-            GUI.slots[i].ready = UIUtil.CreateCheckboxStd(GUI.slots[i].multiSpace, '/CHECKBOX/radio')
+            GUI.slots[i].ready = UIUtil.CreateCheckboxStdPNG(GUI.slots[i].multiSpace, '/CHECKBOX/radio')
             GUI.slots[i].ready.row = i
             LayoutHelpers.AtVerticalCenterIn(GUI.slots[curRow].ready, GUI.slots[curRow].multiSpace, 8)
             LayoutHelpers.AtLeftIn(GUI.slots[curRow].ready, GUI.slots[curRow].multiSpace, 0)
@@ -3445,7 +3444,7 @@ function CreateUI(maxPlayers)
         cybran = true
         seraphim = true
 
-        GUI.allowObservers = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/radio')
+        GUI.allowObservers = UIUtil.CreateCheckboxStdPNG(GUI.buttonPanelTop, '/CHECKBOX/radio')
             LayoutHelpers.CenteredLeftOf(GUI.allowObservers, GUI.buttonPanelTop, -30)
             Tooltip.AddControlTooltip(GUI.allowObservers, 'lob_observers_allowed')
         GUI.observerLabel = UIUtil.CreateText(GUI.allowObservers, 'Observers in Game', 11, 'Arial')--14, UIUtil.bodyFont)--"<LOC lobui_0275>Observers", 14, UIUtil.bodyFont)
@@ -3734,7 +3733,7 @@ function CreateUI(maxPlayers)
 
         --start of auto kick code -- Modified by Xinnony
         if lobbyComm:IsHost() then
-            GUI.autoKick = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/radio')
+            GUI.autoKick = UIUtil.CreateCheckboxStdPNG(GUI.buttonPanelTop, '/CHECKBOX/radio')
                 LayoutHelpers.CenteredRightOf(GUI.autoKick, GUI.observerLabel, 10)
                 Tooltip.AddControlTooltip(GUI.autoKick, 'lob_auto_kick')
             GUI.autoKickLabel = UIUtil.CreateText(GUI.autoKick, "Auto kick", 11, 'Arial')--14, UIUtil.bodyFont)
@@ -6152,7 +6151,7 @@ function CreateOptionLobbyDialog()
         
     ---------------------------
     -- CheckBox Options --
-    cbox_BG_Factions = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
+    cbox_BG_Factions = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftIn(cbox_BG_Factions, dialog2, 20)
         LayoutHelpers.AtTopIn(cbox_BG_Factions, dialog2, 20)
         Tooltip.AddCheckboxTooltip(cbox_BG_Factions, {text='Factions Background', body='Show the Factions Backgrounds in the Lobby'})
@@ -6173,7 +6172,7 @@ function CreateOptionLobbyDialog()
                     cbox_BG_Factions:SetCheck(true, true)
                 end
             end
-    cbox_BG_ConceptArt = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
+    cbox_BG_ConceptArt = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftIn(cbox_BG_ConceptArt, dialog2, 20)
         LayoutHelpers.AtTopIn(cbox_BG_ConceptArt, dialog2, 40)
         Tooltip.AddCheckboxTooltip(cbox_BG_Factions, {text='Factions Background', body='Show the Factions Backgrounds in the Lobby'})
@@ -6194,7 +6193,7 @@ function CreateOptionLobbyDialog()
                     cbox_BG_ConceptArt:SetCheck(true, true)
                 end
             end
-    cbox_BG_Screenshoot = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
+    cbox_BG_Screenshoot = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftIn(cbox_BG_Screenshoot, dialog2, 20)
         LayoutHelpers.AtTopIn(cbox_BG_Screenshoot, dialog2, 60)
         Tooltip.AddCheckboxTooltip(cbox_BG_Screenshoot, {text='Screenshoot Background', body='Show some Screenshot Backgrounds in the Lobby'})
@@ -6215,7 +6214,7 @@ function CreateOptionLobbyDialog()
                     cbox_BG_Screenshoot:SetCheck(true, true)
                 end
             end
-    cbox_BG_Map = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
+    cbox_BG_Map = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftIn(cbox_BG_Map, dialog2, 20)
         LayoutHelpers.AtTopIn(cbox_BG_Map, dialog2, 80)
         Tooltip.AddCheckboxTooltip(cbox_BG_Map, {text='Map Background', body='Show the Map Preview in the Lobby'})
@@ -6236,7 +6235,7 @@ function CreateOptionLobbyDialog()
                     cbox_BG_Map:SetCheck(true, true)
                 end
             end
-    cbox_BG_No = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
+    cbox_BG_No = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftIn(cbox_BG_No, dialog2, 20)
         LayoutHelpers.AtTopIn(cbox_BG_No, dialog2, 100)
         Tooltip.AddCheckboxTooltip(cbox_BG_No, {text='No Background', body='No background in the Lobby'})
@@ -6258,7 +6257,7 @@ function CreateOptionLobbyDialog()
                 end
             end
     --
-    cbox_Skin_Dark = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
+    cbox_Skin_Dark = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtRightIn(cbox_Skin_Dark, dialog2, 20)
         LayoutHelpers.AtTopIn(cbox_Skin_Dark, dialog2, 20)
         Tooltip.AddCheckboxTooltip(cbox_Skin_Dark, {text='Dark Skin', body='Apply the Dark Skin in the Lobby'})
@@ -6273,7 +6272,7 @@ function CreateOptionLobbyDialog()
                     cbox_Skin_Dark:SetCheck(true, true)
                 end
             end
-    local cbox6_0 = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
+    local cbox6_0 = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtRightIn(cbox6_0, dialog2, 20)
         LayoutHelpers.AtTopIn(cbox6_0, dialog2, 40)
 		Tooltip.AddCheckboxTooltip(cbox6_0, {text='White Skin', body='White Skin is not available yet, Need a Graphic Artist !!!'})
@@ -6287,7 +6286,7 @@ function CreateOptionLobbyDialog()
                 cbox6_0:SetCheck(false, true)
             end
     --
-    local cbox_StretchBG = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
+    local cbox_StretchBG = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtRightIn(cbox_StretchBG, dialog2, 20)
         LayoutHelpers.AtTopIn(cbox_StretchBG, dialog2, 80)
         Tooltip.AddCheckboxTooltip(cbox_StretchBG, {text='Stretch Background', body='You can stretch the background over the entire surface of this game.'})
