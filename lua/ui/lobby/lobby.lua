@@ -6705,6 +6705,10 @@ function GetModNameWithUid(uid)
 	local allMods = Mods.AllMods()
 	return allMods[uid].name
 end
+function GetModUIorNotUIWithUid(uid)
+	local allMods = Mods.AllMods()
+	return allMods[uid].ui_only
+end
 
 
 -------------------
@@ -6741,7 +6745,11 @@ function LOAD_PresetSettings_For_InfoList(Selected_Preset)
 		InfoList:AddItem('Mod :')
 		for k, v in profiles[Selected_Preset].Mods do
 			--k = (uids), v = true
-			InfoList:AddItem('- '..GetModNameWithUid(k))
+			if GetModUIorNotUIWithUid(k) then
+				InfoList:AddItem('- '..GetModNameWithUid(k)..' [Mod UI]')
+			else
+				InfoList:AddItem('- '..GetModNameWithUid(k))
+			end
 		end
 	end
 	if profiles[Selected_Preset].UnitsRestricts then
@@ -6929,13 +6937,20 @@ function SAVE_PRESET_IN_PREF() -- GET OPTIONS ON LOBBY AND SAVE TO PRESET
 	end
 	
 	local mods = Mods.GetGameMods(gameInfo.GameMods)
+	local modsUI = Mods.GetUiMods()
 	local nummods = 0
 	local uids = ""
-	for k in gameInfo.GameMods do
+	for k, v in mods do
 		nummods = nummods + 1
-		--AddChatText('Mod : '..k)
+		--AddChatText('Mod : '..v.name)
 		--LOG('> k : '..k)
-		SetPreference('UserPresetLobby.'..Selected_Preset..'.Mods.'..k, true)
+		SetPreference('UserPresetLobby.'..Selected_Preset..'.Mods.'..v.uid, true)
+	end
+	for k, v in modsUI do
+		nummods = nummods + 1
+		--AddChatText('Mod UI : '..v.name)
+		--LOG('> k : '..k)
+		SetPreference('UserPresetLobby.'..Selected_Preset..'.Mods.'..v.uid, true)
 	end
 	--LOG('> Num mods : '..nummods)
 end
