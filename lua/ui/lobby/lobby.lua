@@ -2577,7 +2577,7 @@ function CreateUI(maxPlayers)
         ModFeaturedLabel:SetDropShadow(true)
 	--\\
     --// Lobby options panel -- Xinnony
-    GUI.LobbyOptions = UIUtil.CreateButtonStd2(GUI.panel, '/BUTTON/small/', "Lobby Options", 10, -1)
+    GUI.LobbyOptions = UIUtil.CreateButtonStd2PNG(GUI.panel, '/BUTTON/small/', "Lobby Options", 10, -1)
         LayoutHelpers.AtTopIn(GUI.LobbyOptions, GUI.panel, 10)
         LayoutHelpers.AtHorizontalCenterIn(GUI.LobbyOptions, GUI, 0)
 		GUI.LobbyOptions.OnClick = function()
@@ -2770,7 +2770,7 @@ function CreateUI(maxPlayers)
     -- set up launch panel
     ---------------------------------------------------------------------------
     -- LAUNCH THE GAME BUTTON --
-    GUI.launchGameButton = UIUtil.CreateButtonStd2(GUI.launchPanel, '/BUTTON/large/', "Launch the Game", 16, -1)
+    GUI.launchGameButton = UIUtil.CreateButtonStd2PNG(GUI.launchPanel, '/BUTTON/large/', "Launch the Game", 16, -1)
         LayoutHelpers.AtCenterIn(GUI.launchGameButton, GUI.launchPanel, 20, -345)
         Tooltip.AddButtonTooltip(GUI.launchGameButton, 'Lobby_Launch')
         GUI.launchGameButton:Hide() -- hide unless we're the game host
@@ -6550,7 +6550,7 @@ function GUI_PRESET()
         end
 	--------------------
     -- SAVE button --
-	local SaveButton = UIUtil.CreateButtonStd2(dialog2, '/BUTTON/small/', "Save preset", 12, -1)
+	local SaveButton = UIUtil.CreateButtonStd2PNG(dialog2, '/BUTTON/small/', "Save preset", 12, -1)
         LayoutHelpers.AtRightIn(SaveButton, dialog2, 0)
         LayoutHelpers.AtBottomIn(SaveButton, dialog2, 10)
 		LayoutHelpers.AtVerticalCenterIn(SaveButton, LoadButton)
@@ -6565,7 +6565,7 @@ function GUI_PRESET()
         end
 	-------------------
     -- Delete button --
-	local DeleteButton = UIUtil.CreateButtonStd2(dialog2, '/BUTTON/small/', "Delete preset", 12, -1)
+	local DeleteButton = UIUtil.CreateButtonStd2PNG(dialog2, '/BUTTON/small/', "Delete preset", 12, -1)
         LayoutHelpers.CenteredLeftOf(DeleteButton, SaveButton, -10)
 		LayoutHelpers.AtVerticalCenterIn(DeleteButton, LoadButton)
         DeleteButton.OnClick = function(self)
