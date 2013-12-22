@@ -660,6 +660,17 @@ function CreateCheckboxStd(parent, filename, clickCue, rollCue)
         clickCue, rollCue)
     return checkbox
 end
+function CreateCheckboxStdPNG(parent, filename, clickCue, rollCue)
+    local checkbox = CreateCheckbox( parent,
+        SkinnableFile(filename .. '-d_btn_up.png'),
+        SkinnableFile(filename .. '-s_btn_up.png'),
+        SkinnableFile(filename .. '-d_btn_over.png'),
+        SkinnableFile(filename .. '-s_btn_over.png'),
+        SkinnableFile(filename .. '-d_btn_dis.png'),
+        SkinnableFile(filename .. '-s_btn_dis.png'),
+        clickCue, rollCue)
+    return checkbox
+end
 
 function CreateDialogButtonStd(parent, filename, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue)
     local button = CreateButtonStd(parent,filename,label,pointSize,textOffsetVert,textOffsetHorz, clickCue, rolloverCue)

@@ -2656,7 +2656,7 @@ function CreateUI(maxPlayers)
         GUI.mapView.Height:Set(194)
 
     --start of close slots code by Moritz
-    GUI.LargeMapPreview = UIUtil.CreateButtonStd2(GUI.mapView, '/BUTTON/zoom/', "", 8, 0)
+    GUI.LargeMapPreview = UIUtil.CreateButtonStd2PNG(GUI.mapView, '/BUTTON/zoom/', "", 8, 0)
         LayoutHelpers.AtRightIn(GUI.LargeMapPreview, GUI.mapView, -3)
         LayoutHelpers.AtBottomIn(GUI.LargeMapPreview, GUI.mapView, -3)
         Tooltip.AddButtonTooltip(GUI.LargeMapPreview, 'lob_click_LargeMapPreview')
@@ -3465,7 +3465,7 @@ function CreateUI(maxPlayers)
         end
 
         -- GO OBSERVER BUTTON --
-        GUI.becomeObserver = UIUtil.CreateButtonStd2(GUI.buttonPanelRight, '/BUTTON/observer/', '', 11, 19)
+        GUI.becomeObserver = UIUtil.CreateButtonStd2PNG(GUI.buttonPanelRight, '/BUTTON/observer/', '', 11, 19)
             GUI.becomeObserver.label:SetFont('Arial', 11)
             LayoutHelpers.AtLeftTopIn(GUI.becomeObserver, GUI.buttonPanelRight, -40+4, 25)
             Tooltip.AddButtonTooltip(GUI.becomeObserver, 'lob_become_observer')
@@ -3505,7 +3505,7 @@ function CreateUI(maxPlayers)
             end
 
         -- AUTO TEAM BUTTON -- start of auto teams code by Moritz
-        GUI.randTeam = UIUtil.CreateButtonStd2(GUI.buttonPanelRight, '/BUTTON/autoteam/')
+        GUI.randTeam = UIUtil.CreateButtonStd2PNG(GUI.buttonPanelRight, '/BUTTON/autoteam/')
             LayoutHelpers.AtLeftTopIn(GUI.randTeam, GUI.buttonPanelRight, 40+8, 25)
             Tooltip.AddButtonTooltip(GUI.randTeam, 'lob_click_randteam')
             if not lobbyComm:IsHost() then
@@ -3538,7 +3538,7 @@ function CreateUI(maxPlayers)
         --end of auto teams code
 
         -- DEFAULT OPTION BUTTON -- start of ranked options code
-        GUI.rankedOptions = UIUtil.CreateButtonStd2(GUI.buttonPanelRight, '/BUTTON/defaultoption/')
+        GUI.rankedOptions = UIUtil.CreateButtonStd2PNG(GUI.buttonPanelRight, '/BUTTON/defaultoption/')
             LayoutHelpers.CenteredRightOf(GUI.rankedOptions, GUI.randTeam, 0)
             Tooltip.AddButtonTooltip(GUI.rankedOptions, 'lob_click_rankedoptions')
             if not lobbyComm:IsHost() then
@@ -3572,13 +3572,13 @@ function CreateUI(maxPlayers)
         --end of ranked options code
 
         -- CPU BENCH BUTTON --
-        GUI.rerunBenchmark = UIUtil.CreateButtonStd2(GUI.observerPanel, '/BUTTON/cputest/', '', 10, 0)
+        GUI.rerunBenchmark = UIUtil.CreateButtonStd2PNG(GUI.observerPanel, '/BUTTON/cputest/', '', 10, 0)
             GUI.rerunBenchmark:Disable()
             LayoutHelpers.CenteredRightOf(GUI.rerunBenchmark, GUI.rankedOptions, 0)
             Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text='Run CPU Benchmark Test', body='Recalculates your CPU rating.'})
 
         -- RANDOM MAP BUTTON -- start of random map code by Moritz
-        GUI.randMap = UIUtil.CreateButtonStd2(GUI.buttonPanelRight, '/BUTTON/randommap/', '', 10, 0)
+        GUI.randMap = UIUtil.CreateButtonStd2PNG(GUI.buttonPanelRight, '/BUTTON/randommap/', '', 10, 0)
             LayoutHelpers.CenteredRightOf(GUI.randMap, GUI.rerunBenchmark, 0)
             Tooltip.AddButtonTooltip(GUI.randMap, 'lob_click_randmap')
             if not lobbyComm:IsHost() then
@@ -6007,37 +6007,37 @@ function ForceApplyNewSkin()
     -- Observer, AutoTeam, RankedOpts, CPUBench, RandomMap.
     if GUI.becomeObserver then
         if not GUI.becomeObserver:IsDisabled() then
-            GUI.becomeObserver:SetTexture(UIUtil.UIFile('/BUTTON/observer/_up.dds'))
+            GUI.becomeObserver:SetTexture(UIUtil.UIFile('/BUTTON/observer/_up.png'))
         elseif GUI.becomeObserver:IsDisabled() then
-            GUI.becomeObserver:SetTexture(UIUtil.UIFile('/BUTTON/observer/_dis.dds'))
+            GUI.becomeObserver:SetTexture(UIUtil.UIFile('/BUTTON/observer/_dis.png'))
         end
     end
     if GUI.randTeam then
         if not GUI.randTeam:IsDisabled() then
-            GUI.randTeam:SetTexture(UIUtil.UIFile('/BUTTON/autoteam/_up.dds'))
+            GUI.randTeam:SetTexture(UIUtil.UIFile('/BUTTON/autoteam/_up.png'))
         elseif GUI.randTeam:IsDisabled() then
-            GUI.randTeam:SetTexture(UIUtil.UIFile('/BUTTON/autoteam/_dis.dds'))
+            GUI.randTeam:SetTexture(UIUtil.UIFile('/BUTTON/autoteam/_dis.png'))
         end
     end
     if GUI.rankedOptions then
         if not GUI.rankedOptions:IsDisabled() then
-            GUI.rankedOptions:SetTexture(UIUtil.UIFile('/BUTTON/defaultoption/_up.dds'))
+            GUI.rankedOptions:SetTexture(UIUtil.UIFile('/BUTTON/defaultoption/_up.png'))
         elseif GUI.rankedOptions:IsDisabled() then
-            GUI.rankedOptions:SetTexture(UIUtil.UIFile('/BUTTON/defaultoption/_dis.dds'))
+            GUI.rankedOptions:SetTexture(UIUtil.UIFile('/BUTTON/defaultoption/_dis.png'))
         end
     end
     if GUI.rerunBenchmark then
         if not GUI.rerunBenchmark:IsDisabled() then
-            GUI.rerunBenchmark:SetTexture(UIUtil.UIFile('/BUTTON/cputest/_up.dds'))
+            GUI.rerunBenchmark:SetTexture(UIUtil.UIFile('/BUTTON/cputest/_up.png'))
         elseif GUI.rerunBenchmark:IsDisabled() then
-            GUI.rerunBenchmark:SetTexture(UIUtil.UIFile('/BUTTON/cputest/_dis.dds'))
+            GUI.rerunBenchmark:SetTexture(UIUtil.UIFile('/BUTTON/cputest/_dis.png'))
         end
     end
     if GUI.randMap then
         if not GUI.randMap:IsDisabled() then
-            GUI.randMap:SetTexture(UIUtil.UIFile('/BUTTON/randommap/_up.dds'))
+            GUI.randMap:SetTexture(UIUtil.UIFile('/BUTTON/randommap/_up.png'))
         elseif GUI.randMap:IsDisabled() then
-            GUI.randMap:SetTexture(UIUtil.UIFile('/BUTTON/randommap/_dis.dds'))
+            GUI.randMap:SetTexture(UIUtil.UIFile('/BUTTON/randommap/_dis.png'))
         end
     end
 end
