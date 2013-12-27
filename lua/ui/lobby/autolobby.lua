@@ -86,10 +86,12 @@ end
 local function HostAddPlayer(senderId, playerInfo)
     playerInfo.OwnerID = senderId
 
-    local slot = 1
-    while gameInfo.PlayerOptions[slot] do
-        slot = slot + 1
-    end
+    #the slot is not random...
+    local slot = playerInfo.StartSpot
+
+    -- while gameInfo.PlayerOptions[slot] do
+    --     slot = slot + 1
+    -- end
 
     playerInfo.PlayerName = lobbyComm:MakeValidPlayerName(playerInfo.OwnerID,playerInfo.PlayerName)
 
