@@ -36,8 +36,8 @@ factions[1] = 1
 factions[2] = 1
 
 local teams = {}
-teams[1] = 1
-teams[2] = 1
+teams[1] = -1
+teams[2] = -1
 
 
 local beaconTime = {}
@@ -49,13 +49,13 @@ assignSupports = function()
     	if army.ArmyIndex == 1 then
     		factions[1] = army.Faction
 			teams[1] = army.Team
-			beaconTime[1] = 0
 
     	elseif army.ArmyIndex == 2 then
     		factions[2] = army.Faction
 			teams[2] = army.Team
-			beaconTime[2] = 0
     	end
+    	beaconTime[army.ArmyIndex] = 0
+
     end
 
     for name,army in ScenarioInfo.ArmySetup do
@@ -66,8 +66,8 @@ assignSupports = function()
     		army.PlayerColor= 1
     		army.Faction = factions[1]
     		army.PlayerName="gw_support_1"
-    		armySupport[1] = army.ArmyName
-    		armySupportIndex[1] = army.ArmyIndex
+    		armySupport[army.Team] = army.ArmyName
+    		armySupportIndex[army.Team] = army.ArmyIndex
     		army.Support = true
 		elseif army.ArmyName == "SUPPORT_2" then
 			army.Team = teams[2]
@@ -75,11 +75,10 @@ assignSupports = function()
 			army.PlayerColor=2
 			army.Civilian = false
 			army.Faction = factions[2]
-			army.PlayerName="gw_support_2"
+			army.PlayerName="gw_support_2"			
+			armySupport[army.Team] = army.ArmyName
+			armySupportIndex[army.Team] = army.ArmyIndex
 			army.Support = true
-			armySupport[2] = army.ArmyName
-			armySupportIndex[2] = army.ArmyIndex
-
 		end
     end
 
@@ -103,27 +102,27 @@ end
 gwReinforcementsMainThread = function()
 	local gwReinforcementList =  import('/lua/gwReinforcementList.lua').gwReinforcements
 
-	gwSetAiColor( armySupportIndex[1], factions[1] )
-	gwSetAiColor( armySupportIndex[2], factions[2] )
+	gwSetAiColor( armySupportIndex[teams[1]], factions[1] )
+	gwSetAiColor( armySupportIndex[teams[2]], factions[2] )
 
 	WaitTicks(10)
 	
 	local ArmiesList = ScenarioInfo.ArmySetup
-	#WARN('armieslist is ' .. repr (ArmiesList))
+	WARN('armieslist is ' .. repr (ArmiesList))
 
 	local HumanPlayerACUs = GetACUs(ScenarioInfo.ArmySetup)
 	for index, HumanACU in HumanPlayerACUs do
 		ModHumanACU(HumanACU)
 	end	
 	
-	GetArmyBrain(armySupportIndex[1]):GiveStorage('MASS', 2000)
-	GetArmyBrain(armySupportIndex[1]):GiveStorage('ENERGY', 10000)
+	GetArmyBrain(armySupportIndex[teams[1]]):GiveStorage('MASS', 2000)
+	GetArmyBrain(armySupportIndex[teams[1]]):GiveStorage('ENERGY', 10000)
 
-	GetArmyBrain(armySupportIndex[2]):GiveStorage('MASS', 2000)
-	GetArmyBrain(armySupportIndex[2]):GiveStorage('ENERGY', 10000)
+	GetArmyBrain(armySupportIndex[teams[2]]):GiveStorage('MASS', 2000)
+	GetArmyBrain(armySupportIndex[teams[2]]):GiveStorage('ENERGY', 10000)
 
-	GetArmyBrain(armySupportIndex[1]):SetResourceSharing(false)
-	GetArmyBrain(armySupportIndex[2]):SetResourceSharing(false)
+	GetArmyBrain(armySupportIndex[teams[1]]):SetResourceSharing(false)
+	GetArmyBrain(armySupportIndex[teams[2]]):SetResourceSharing(false)
 	
 	
 	ScenarioInfo.gwReinforcementSpawnThreads = {}
@@ -292,7 +291,7 @@ end
 ModBeacon = function(ACU, beacon)
 
 	beacon.ArmyIndex  = ACU:GetArmy()
-	
+
 	if EntityCategoryContains(categories.UEF, ACU) then beacon.Faction = 1
 	elseif EntityCategoryContains(categories.AEON, ACU) then beacon.Faction = 2
 	elseif EntityCategoryContains(categories.CYBRAN, ACU) then beacon.Faction = 3
@@ -438,6 +437,7 @@ CallReinforcementsToBeacon = function(beacon, List)
 	beacon.AiBrain = beacon:GetAIBrain()
 	beacon.Nickname = beacon.AiBrain.Nickname
 	beacon.ArmyName = beacon.AiBrain.Name
+	beacon.Team = ScenarioInfo.ArmySetup[beacon.ArmyName].Team
 	WARN('gwReinforcementList.TransportedUnits is ' .. repr(ScenarioInfo.gwReinforcementList.transportedUnits))
 	
 	beacon.UnitReinforcementsToCall = List.unitNames
@@ -502,17 +502,16 @@ SpawnTransportedReinforcements = function(beacon, unitsToSpawn)
 	UnitsToTransport[2] = {}
 	UnitsToTransport[3] = {}
 	local NumberOfTransportsNeeded = 0
-	
-	
+
 	
 	#this spawns our units
 	for index, unitBPid in unitsToSpawn do
 		#WARN('spawning reinforcement unit bpid is ' .. repr(unitBPid))
 		#WARN('spawning beacon.ArmyName unit bpid is ' .. repr(beacon.ArmyIndex))
 		
-		
+		--get the right support AI for this player
 
-		local newUnit = CreateUnitHPR(unitBPid, armySupport[beacon.ArmyIndex], NearestOffMapLocation[1], NearestOffMapLocation[2], NearestOffMapLocation[3],0,0,0)
+		local newUnit = CreateUnitHPR(unitBPid, armySupport[beacon.Team], NearestOffMapLocation[1], NearestOffMapLocation[2], NearestOffMapLocation[3],0,0,0)
 		local TransportClass = newUnit:GetBlueprint().Transport.TransportClass
 		table.insert(UnitsToTransport[TransportClass], newUnit)
 	end
@@ -549,7 +548,7 @@ end
 SpawnTransportAndIssueDrop = function(transportBPid, units, NearestOffMapLocation, beacon)
 
 	#WARN('spawning transport, bpid and army are ' .. repr(transportBPid) .. ' and ' .. repr(beacon.ArmyName))
-	local transport = CreateUnitHPR(transportBPid, armySupport[beacon.ArmyIndex], NearestOffMapLocation[1], NearestOffMapLocation[2], NearestOffMapLocation[3],0,0,0)
+	local transport = CreateUnitHPR(transportBPid, armySupport[beacon.Team], NearestOffMapLocation[1], NearestOffMapLocation[2], NearestOffMapLocation[3],0,0,0)
 
 	transport.OldOnTransportDetach = transport.OnTransportDetach
 
@@ -674,8 +673,8 @@ end
 
 SpawnEngineerAndTransportAndBuildTheStructure = function(EngineerBPid, StructureBPid, TransportBPid, BuildLocation, beacon)
 	local NearestOffMapLocation = CalculateNearestOffMapLocation(beacon)
-	local engineer = CreateUnitHPR(EngineerBPid, armySupport[beacon.ArmyIndex], NearestOffMapLocation[1], NearestOffMapLocation[2], NearestOffMapLocation[3],0,0,0)
-	engineer.ArmyName = armySupport[beacon.ArmyIndex]
+	local engineer = CreateUnitHPR(EngineerBPid, armySupport[beacon.Team], NearestOffMapLocation[1], NearestOffMapLocation[2], NearestOffMapLocation[3],0,0,0)
+	engineer.ArmyName = armySupport[beacon.Team]
 	engineer.PlayerArmyName = beacon.ArmyIndex
 	engineer:SetProductionActive(true)
 	WaitSeconds( 0.1 )
@@ -683,7 +682,7 @@ SpawnEngineerAndTransportAndBuildTheStructure = function(EngineerBPid, Structure
 	engineer:SetProductionPerSecondMass(500)
 	WaitSeconds( 0.1 )
 
-	local transport = CreateUnitHPR(TransportBPid, armySupport[beacon.ArmyIndex], NearestOffMapLocation[1], NearestOffMapLocation[2], NearestOffMapLocation[3],0,0,0)
+	local transport = CreateUnitHPR(TransportBPid, armySupport[beacon.Team], NearestOffMapLocation[1], NearestOffMapLocation[2], NearestOffMapLocation[3],0,0,0)
 	local aiBrain = engineer:GetAIBrain()
 	local Transports = aiBrain:MakePlatoon( '', '' )
 	aiBrain:AssignUnitsToPlatoon( Transports, {transport}, 'Support', 'None' )
