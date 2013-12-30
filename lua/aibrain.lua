@@ -496,19 +496,21 @@ AIBrain = Class(moho.aibrain_methods) {
 	SpecialAbilities = {},
     SpecialAbilityUnits = {},
 
+	AddReinforcements = function(self, list)
+		local army = self:GetArmyIndex()
+		LOG("send reinforcement to sim")
+		AddReinforcementList( army, list )
+	end,
+
     AddSpecialAbilityUnit = function(self, unit, type, autoEnable)
-		LOG("Doing this")
         local unitId = unit:GetEntityId()
         if AbilityDefinition[ type ] then
-			LOG("got a definition")
             if not self.SpecialAbilityUnits[type] then
                 self.SpecialAbilityUnits[type] = {}
             end
             table.insert( self.SpecialAbilityUnits[type], unitId )
             SetAbilityUnits( self:GetArmyIndex(), type, self:GetSpecialAbilityUnitIds(type) )
-            LOG(autoEnable)
 			if autoEnable and table.getn( self.SpecialAbilityUnits[type] ) == 1 then
-				LOG("autoEnable")
                 self:EnableSpecialAbility( type, true )
             end
         end

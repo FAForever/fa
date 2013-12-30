@@ -260,6 +260,8 @@ GetACUs = function(armies)
 					ACUs[unit:GetArmy()] = unit
 					brain:AddSpecialAbilityUnit( unit, 'Recall', true )
 					LOG('found an ACU near marker ' .. repr(ArmyName))
+		
+			
 
 				end
 			end
@@ -272,7 +274,6 @@ end
 
 
 ModHumanACU =  function(ACU)
-	LOG("mod human")
 	ACU.OldOnStartBuild = ACU.OnStartBuild 
 	ACU.OldOnStopBuild = ACU.OnStopBuild
 	ACU.DespawnBeacon = DespawnBeacon
@@ -289,7 +290,6 @@ ModHumanACU =  function(ACU)
 end
 
 ModBeacon = function(ACU, beacon)
-
 	beacon.ArmyIndex  = ACU:GetArmy()
 
 	if EntityCategoryContains(categories.UEF, ACU) then beacon.Faction = 1
@@ -301,6 +301,7 @@ ModBeacon = function(ACU, beacon)
 	beacon.OldOnKilled = beacon.OnKilled
 	beacon.OnKilled = function(self, instigator, type, overkillRatio)
 	###ADD HERE
+		
 		if self.RecallThread then
 			KillThread(self.timerThread)
 			self.timerThread = nil
@@ -309,13 +310,14 @@ ModBeacon = function(ACU, beacon)
 	end
 	beacon.OldOnStopBeingBuilt = beacon.OnStopBeingBuilt
 	beacon.OnStopBeingBuilt = function(self, builder, layer)
+		
+		
+
+
 		#beacon.ReinforcementsThread = CallReinforcementsToBeacon(beacon)
 		#beacon.EngineersThread = CallEngineersToBeacon(beacon)
 		CheckEngineersDelay(self)
 		CheckUnitsDelay(self)
-		local brain = self:GetAIBrain()
-		brain:AddSpecialAbilityUnit( self, 'CallReinforcement', true )
-
 		if table.getn( self.unitsDelays ) != 0 or table.getn( self.engineersDelays ) != 0 then
 			beacon.timerThread = self:ForkThread(timerBeacon)
 		end
@@ -338,11 +340,13 @@ end
 
 #this function check all the units delay to spawn them.
 CheckUnitsDelay = function(beacon)
-	LOG("doing this")
 	beacon.unitsDelays = {}
 	for index, List in ScenarioInfo.gwReinforcementList.transportedUnits do
 		LOG(repr(List))
 		if List.playerName == beacon:GetAIBrain().Nickname and List.delay >= beaconTime[beacon.ArmyIndex] then
+			local brain = beacon:GetAIBrain()
+			LOG("adding reinforcements")
+			brain:AddReinforcements( List)
 			table.insert(beacon.unitsDelays, List)
 			LOG(repr(List))
 		end 
