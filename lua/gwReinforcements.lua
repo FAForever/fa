@@ -416,6 +416,7 @@ CallEngineersToBeacon = function(beacon, List)
 	beacon.AiBrain = beacon:GetAIBrain()
 	beacon.Nickname = beacon.AiBrain.Nickname
 	beacon.ArmyName = beacon.AiBrain.Name
+	beacon.Team = ScenarioInfo.ArmySetup[beacon.ArmyName].Team
 
 
 	beacon.StructureReinforcementsToCall = List.unitNames
