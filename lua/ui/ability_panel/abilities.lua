@@ -155,15 +155,15 @@ function AddReinforcements(list)
 	local List = list.List
 	LOG(repr(List))
 	local delay = List.delay
-	LOG(delay)
 	AbilityName = "CallReinforcement"
 	table.insert(availableOrders, "CallReinforcement")
-	defaultOrdersTable[AbilityName] = {bitmapId="deploy", enabled=true, helpText="recall", preferredSlot=2, script="Recall"}
+	defaultOrdersTable[AbilityName] = {bitmapId="deploy", enabled=false, helpText="deploy", preferredSlot=2, script="Recall", ExtraInfo={CoolDownTime = delay}}
 	defaultOrdersTable[AbilityName].behavior = AbilityButtonBehavior
 	defaultOrdersTable[AbilityName].behaviordoubleclick = AbilityButtonBehaviorDoubleClick
-	ButtonParams[AbilityName] = { Enabled = false, CoolDownTime = true, CurrCoolDownTime = delay, CoolDownEnabled = false, CoolDownTimerValue = delay }
+	ButtonParams[AbilityName] = { CoolDownTime = true, CurrCoolDownTime = delay, CoolDownEnabled = false, CoolDownTimerValue = delay }
+    LOG(repr(ButtonParams[AbilityName]))
 	SetAvailableOrders()
-	StartCoolDownTimer(AbilityName)
+	DisableButtonStartCoolDown(AbilityName)
 	
 end
 
@@ -185,6 +185,8 @@ function AddSpecialAbility(data)
 		defaultOrdersTable[AbilityName] = ability
         defaultOrdersTable[AbilityName].behavior = AbilityButtonBehavior
         defaultOrdersTable[AbilityName].behaviordoubleclick = AbilityButtonBehaviorDoubleClick
+        LOG("adding ability")
+        LOG(AbilityName)
 		ButtonParams[AbilityName] = { Enabled = true, CoolDownTime = false, CurrCoolDownTime = false, CoolDownEnabled = false, CoolDownTimerValue = 0 }
 		SetAvailableOrders()
 	end	
@@ -217,6 +219,7 @@ function EnableSpecialAbility(data)
 	local AbilityName = data.AbilityName
 	if orderCheckboxMap[AbilityName] then 
 		orderCheckboxMap[AbilityName]:Enable()
+        LOG("enable")
 		ButtonParams[AbilityName].Enabled = true
 		ForkThread(newOrderGlow, orderCheckboxMap[AbilityName])
 	end
@@ -338,7 +341,6 @@ function CreateAltOrders()
 
 		local orderInfo = standardOrdersTable[availOrder] or AbilityInformation[availOrder]
 		local orderCheckbox = AddOrder(orderInfo, slotForOrder[availOrder], true)
-
 		orderCheckbox._order = availOrder
             
 		if standardOrdersTable[availOrder].script then
@@ -407,8 +409,11 @@ function AddOrder(orderInfo, slot, batchMode)
             Checkbox.OnDisable(self)
         end
     end
-	
+	LOG("this order ...")
+    LOG(repr(orderInfo))
+    LOG(repr(orderInfo.ExtraInfo))
 	if orderInfo.ExtraInfo.CoolDownTime then 
+        LOG("yeps")
 		checkbox.buttonText = UIUtil.CreateText(checkbox, '', 18, UIUtil.bodyFont)
 		checkbox.buttonText:SetColor('ffffffff')
         checkbox.buttonText:SetDropShadow(true)
@@ -423,7 +428,10 @@ function AddOrder(orderInfo, slot, batchMode)
 		StartCoolDownTimer(button)
 	end
 	
+    LOG("this button..")
+    LOG(repr(ButtonParams[button]))
 	if not ButtonParams[button].Enabled then 
+        LOG("this is not enabled")
 		checkbox:Disable()
 	end
     
