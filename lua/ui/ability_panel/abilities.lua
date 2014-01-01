@@ -50,9 +50,9 @@ Panel_State = 'closed'
 
 # these variables control the number of slots available for orders
 # though they are fixed, the code is written so they could easily be made soft
-local numSlots = 5
+local numSlots = 6
 local firstAltSlot = 1
-local vertRows = 5
+local vertRows = 6
 local horzRows = 1
 local vertCols = numSlots/vertRows
 local horzCols = numSlots/horzRows
@@ -151,27 +151,33 @@ end
 
 -- Add Reinforcement
 function AddReinforcements(list)
-	
-	local List = list.List
-	LOG(repr(List))
-	local delay = List.delay
-	AbilityName = "CallReinforcement"
-	table.insert(availableOrders, "CallReinforcement")
-	defaultOrdersTable[AbilityName] = {bitmapId="deploy", enabled=false, helpText="deploy", preferredSlot=2, script="Recall", ExtraInfo={CoolDownTime = delay}}
-	defaultOrdersTable[AbilityName].behavior = AbilityButtonBehavior
-	defaultOrdersTable[AbilityName].behaviordoubleclick = AbilityButtonBehaviorDoubleClick
-	ButtonParams[AbilityName] = { CoolDownTime = true, CurrCoolDownTime = delay, CoolDownEnabled = false, CoolDownTimerValue = delay }
-    LOG(repr(ButtonParams[AbilityName]))
-	SetAvailableOrders()
-	DisableButtonStartCoolDown(AbilityName)
-	
+
+    local List = list.List
+    local delay = List.delay
+    AbilityName = 'CallReinforcement_' .. List.Index
+
+    local AddAbility = true
+    for k,v in availableOrders do
+        if v == AbilityName then 
+            AddAbility = false
+        end
+    end
+
+    if AddAbility then
+    	table.insert(availableOrders, AbilityName)
+    	defaultOrdersTable[AbilityName] = {Name=AbilityName, bitmapId="deploy", enabled=true, helpText="deploy", preferredSlot=List.Index+1, callBack = "Deploy", index = List.Index,ExtraInfo={CoolDownTime = delay}}
+    	defaultOrdersTable[AbilityName].behavior = AbilityButtonBehavior
+    	defaultOrdersTable[AbilityName].behaviordoubleclick = AbilityButtonBehaviorDoubleClick
+    	ButtonParams[AbilityName] = { CoolDownTime = true, CurrCoolDownTime = delay, CoolDownEnabled = false, CoolDownTimerValue = delay }
+        LOG(repr(ButtonParams[AbilityName]))
+    	SetAvailableOrders()	
+    end
 end
 
 --add an ability
 function AddSpecialAbility(data)
 	local AbilityName = data.AbilityName
 	local ability = SpecialAbilities[AbilityName] or false
-	LOG(repr(ability))
 	local AddAbility = true
 	
 	for k,v in availableOrders do
@@ -181,12 +187,11 @@ function AddSpecialAbility(data)
 	end
 		
 	if AddAbility and ability then
+	    ability['Name'] = AbilityName
 		table.insert(availableOrders, AbilityName)
 		defaultOrdersTable[AbilityName] = ability
         defaultOrdersTable[AbilityName].behavior = AbilityButtonBehavior
         defaultOrdersTable[AbilityName].behaviordoubleclick = AbilityButtonBehaviorDoubleClick
-        LOG("adding ability")
-        LOG(AbilityName)
 		ButtonParams[AbilityName] = { Enabled = true, CoolDownTime = false, CurrCoolDownTime = false, CoolDownEnabled = false, CoolDownTimerValue = 0 }
 		SetAvailableOrders()
 	end	
@@ -219,7 +224,6 @@ function EnableSpecialAbility(data)
 	local AbilityName = data.AbilityName
 	if orderCheckboxMap[AbilityName] then 
 		orderCheckboxMap[AbilityName]:Enable()
-        LOG("enable")
 		ButtonParams[AbilityName].Enabled = true
 		ForkThread(newOrderGlow, orderCheckboxMap[AbilityName])
 	end
@@ -275,6 +279,13 @@ function SetAvailableOrders()
 		controls.orderButtonGrid:EndBatch()
 	end
 	
+	--if no buttons on the panel hide it.
+    if numValidOrders == 0 and controls.bg.Mini then
+	   HideAll()
+    elseif controls.bg.Mini then
+	   ShowAll()
+	   RestartTimers()
+    end
 end
 
 --creates the buttons for the alt orders, placing them as possible
@@ -334,11 +345,9 @@ function CreateAltOrders()
     for slot, order in orderInSlot do
         slotForOrder[order] = slot
     end
-    
     -- create the alt order buttons
     for index, availOrder in availableOrders do
         if not standardOrdersTable[availOrder] then continue end   # skip any orders we don't have in our table
-
 		local orderInfo = standardOrdersTable[availOrder] or AbilityInformation[availOrder]
 		local orderCheckbox = AddOrder(orderInfo, slotForOrder[availOrder], true)
 		orderCheckbox._order = availOrder
@@ -346,7 +355,6 @@ function CreateAltOrders()
 		if standardOrdersTable[availOrder].script then
 			orderCheckbox._script = standardOrdersTable[availOrder].script
 		end
- 
 		orderCheckboxMap[availOrder] = orderCheckbox
     end
 end
@@ -356,7 +364,8 @@ function AddOrder(orderInfo, slot, batchMode)
     batchMode = batchMode or false
     
     local checkbox = Checkbox(controls.orderButtonGrid, GetOrderBitmapNames(orderInfo.bitmapId))
-	local button = orderInfo.script
+#	local button = orderInfo.script
+	local button = orderInfo.Name
 	
     -- set the info in to the data member for retrieval
     checkbox._data = orderInfo
@@ -409,31 +418,24 @@ function AddOrder(orderInfo, slot, batchMode)
             Checkbox.OnDisable(self)
         end
     end
-	LOG("this order ...")
-    LOG(repr(orderInfo))
-    LOG(repr(orderInfo.ExtraInfo))
-	if orderInfo.ExtraInfo.CoolDownTime then 
-        LOG("yeps")
-		checkbox.buttonText = UIUtil.CreateText(checkbox, '', 18, UIUtil.bodyFont)
-		checkbox.buttonText:SetColor('ffffffff')
+	
+    if orderInfo.ExtraInfo.CoolDownTime and orderInfo.ExtraInfo.CoolDownTime > 0 then 
+        checkbox.buttonText = UIUtil.CreateText(checkbox, '', 18, UIUtil.bodyFont)
+        checkbox.buttonText:SetColor('ffffffff')
         checkbox.buttonText:SetDropShadow(true)
         LayoutHelpers.AtBottomIn(checkbox.buttonText, checkbox)
         LayoutHelpers.AtHorizontalCenterIn(checkbox.buttonText, checkbox)
         checkbox.buttonText:DisableHitTest()
-		ButtonParams[button].CoolDownTime = orderInfo.ExtraInfo.CoolDownTime
-		--checkbox.buttonText:SetHidden(true)
-	end
-	
-	if ButtonParams[button].CoolDownEnabled then 
-		StartCoolDownTimer(button)
-	end
-	
-    LOG("this button..")
-    LOG(repr(ButtonParams[button]))
-	if not ButtonParams[button].Enabled then 
-        LOG("this is not enabled")
-		checkbox:Disable()
-	end
+        ButtonParams[button].CoolDownTime = orderInfo.ExtraInfo.CoolDownTime
+    end
+
+    if ButtonParams[button].CoolDownEnabled then 
+        StartCoolDownTimer(button)
+    end
+
+    if not ButtonParams[button].Enabled then 
+        checkbox:Disable()
+    end
     
 	--ok if the button fires a counted projectile weapon (silo).. we can use this to update the number of projectiles
 	--you will have to add the function to the orderinfo.ButtonTextFunc in this file.
@@ -491,7 +493,8 @@ end
 --mouse over glow
 function CreateOrderGlow(parent)
 
-	local button = parent._data.script
+#	local button = parent._data.script
+	local button = parent._data.Name
 	if controls.NewButtonGlows[button] then 
 		controls.NewButtonGlows[button]:Destroy()
 		controls.NewButtonGlows[button] = false
@@ -526,8 +529,8 @@ end
 
 --when a new button is added OR enabled make it glow for a while..
 function CreateNewAbilityGlow(parent)
-	local button = parent._data.script
-	if button then
+#	local button = parent._data.script
+	local button = parent._data.Name
     controls.NewButtonGlows[button] = Bitmap(parent, UIUtil.UIFile('/game/orders/glow-02_bmp.dds'))
     LayoutHelpers.AtCenterIn(controls.NewButtonGlows[button], parent)
     controls.NewButtonGlows[button]:SetAlpha(0.0)
@@ -537,36 +540,32 @@ function CreateNewAbilityGlow(parent)
     local incriment = true
 	local StartTime = GetGameTimeSeconds()
     controls.NewButtonGlows[button].OnFrame = function(self, deltaTime)
-		if button and controls.orderGlow[button] then
-			if (GetGameTimeSeconds() - StartTime) > FlashTime then 
-				controls.NewButtonGlows[button]:SetNeedsFrameUpdate(false)
-			end
-			
-			if incriment then
-				alpha = alpha + (deltaTime * 1.2)
-			else
-				alpha = alpha - (deltaTime * 1.2)
-			end
-			if alpha < 0 then
-				alpha = 0.0
-				incriment = true
-			end
-			if alpha > .4 then
-				alpha = .4
-				incriment = false
-			end
-			
-			if controls.orderGlow[button].SetAlpha then
-				controls.NewButtonGlows[button]:SetAlpha(alpha)
-			end
+	
+		if (GetGameTimeSeconds() - StartTime) > FlashTime then 
+			controls.NewButtonGlows[button]:SetNeedsFrameUpdate(false)
 		end
+		
+        if incriment then
+            alpha = alpha + (deltaTime * 1.2)
+        else
+            alpha = alpha - (deltaTime * 1.2)
+        end
+        if alpha < 0 then
+            alpha = 0.0
+            incriment = true
+        end
+        if alpha > .4 then
+            alpha = .4
+            incriment = false
+        end
+        controls.NewButtonGlows[button]:SetAlpha(alpha)
     end   
-	end
 end
 
 --when a new button is added to our panel, make it flash for a few seconds.. 
 function newOrderGlow(parent)
-	local button = parent._data.script
+#	local button = parent._data.script
+	local button = parent._data.Name
 	NewGlowThread[button] = CreateNewAbilityGlow(parent)
 	WaitSeconds(FlashTime)
 	
@@ -653,6 +652,14 @@ function GetOrderBitmapNames(bitmapId)
         , "UI_Action_MouseDown", "UI_Action_Rollover"   # sets click and rollover cues
 end
 
+function GetSelectedUnitIds()
+    local units = GetSelectedUnits() or {}
+    local ids = {}
+    for k, unit in units do
+        table.insert( ids, unit:GetEntityId() )
+    end
+    return ids
+end
 
 # ability button behaviour
 function AbilityButtonBehavior(self, modifiers)
@@ -660,99 +667,107 @@ function AbilityButtonBehavior(self, modifiers)
         CM.EndCommandMode(true)
 
     else
-		if self._data.callBack then
-			SimCallback({Func = self._data.callBack, Args = { From=GetFocusArmy()}})
-		else
+       if self._data.callBack then
+            LOG(repr(self._data))
+            if self._data.index then
+                SimCallback({Func = self._data.callBack, Args = { Index=self._data.index, From=GetFocusArmy()}})
+            else
+                SimCallback({Func = self._data.callBack, Args = { From=GetFocusArmy()}})
+            end
+       else        
+        local modeData = {
+            name = 'RULEUCC_Script',
+            AbilityName = self._data.abilityname,
+            Behaviour = 1,
+            cursor = self._data.cursor,
+            OrderIcon = self._data.OrderIcon,
+            SelectedUnits = GetSelectedUnitIds(),
+            TaskName = self._script,
+            Usage = self._data.usage,
+        }
+
         # anything in the modeData is passed to userscriptcommand.lua from commandmode.lua
-			local modeData = {
-				name = 'RULEUCC_Script',
-				AbilityName = self._data.abilityname,
-				TaskName = self._script,
-				cursor = self._data.cursor,
-				OrderIcon = self._data.OrderIcon,
-				MouseDecal = self._data.MouseDecal,
-				Usage = self._data.usage,
-				SelectedUnits = GetSelectedUnits(),
-			}
-			CM.StartCommandMode("order", modeData)
-		end
+           local modeData = {
+               name = 'RULEUCC_Script',
+               AbilityName = self._data.abilityname,
+               TaskName = self._script,
+               cursor = self._data.cursor,
+               OrderIcon = self._data.OrderIcon,
+               MouseDecal = self._data.MouseDecal,
+               Usage = self._data.usage,
+               SelectedUnits = GetSelectedUnits(),
+           }
+           CM.StartCommandMode("order", modeData)
+       end
     end
 end
 
 function AbilityButtonBehaviorDoubleClick(self, modifiers)
-
     if self:IsChecked() then
         CM.EndCommandMode(true)
+
     else
-		if self._data.callBack then
-			SimCallback({Func = self._data.callBack, Args = { From=GetFocusArmy()}})
-		else
-        # anything in the modeData is passed to userscriptcommand.lua from commandmode.lua
         local modeData = {
             name = 'RULEUCC_Script',
             AbilityName = self._data.abilityname,
-            TaskName = self._script,
+            Behaviour = 2,
             cursor = self._data.cursor,
             OrderIcon = self._data.OrderIcon,
-            MouseDecal = self._data.MouseDecal,
+            SelectedUnits = GetSelectedUnitIds(),
+            TaskName = self._script,
             Usage = self._data.usage,
-            SelectedUnits = GetSelectedUnits(),
-			}
-			CM.StartCommandMode("order", modeData)
-		end
-	end
+        }
+
+        # anything in the modeData is passed to userscriptcommand.lua from commandmode.lua
+        CM.StartCommandMode("order", modeData)
+    end
 end
 
 
 --adds the timer text to the button.. 
 function StartCoolDownTimer(buttonName)
-	local button = false
     if orderCheckboxMap[buttonName] then 
-		button = orderCheckboxMap[buttonName]
+        local button = orderCheckboxMap[buttonName]
 	
-		ButtonParams[buttonName].CoolDownEnabled = true
-		local Timer = ButtonParams[buttonName].CoolDownTimerValue or 0
-		local CountDown = ButtonParams[buttonName].CoolDownTime or button._data.ExtraInfo.CoolDownTime
-		local curTime = ButtonParams[buttonName].CurrCoolDownTime or button._data.ExtraInfo.CoolDownTime
-		local startTime = GetGameTimeSeconds()
-	
-		button.buttonText:SetNeedsFrameUpdate(true)
-	
-		UpdateTime = function(self)
-			self:SetText(curTime)
-			ButtonParams[buttonName].CurrCoolDownTime = curTime
-		end
-	
-		button.buttonText.OnFrame = function(self, delta)
-			Timer = Timer + delta
-			ButtonParams[buttonName].CoolDownTimerValue = Timer
-			if curTime <= 0 then
-				EnableButtonStopCoolDown(buttonName)
-			end
-            
-			if GetGameTimeSeconds() - startTime > 1 then
-				curTime = curTime - 1
-				startTime = GetGameTimeSeconds()
-				UpdateTime(self)
-			end	
-		end
-	end
+        local Timer = ButtonParams[buttonName].CoolDownTimerValue or 0
+        local CountDown = ButtonParams[buttonName].CoolDownTime or button._data.ExtraInfo.CoolDownTime
+        local curTime = ButtonParams[buttonName].CurrCoolDownTime or button._data.ExtraInfo.CoolDownTime
+        local startTime = GetGameTimeSeconds()
+
+        ButtonParams[buttonName].CoolDownEnabled = true
+
+        button.buttonText:SetNeedsFrameUpdate(true)
+
+        UpdateTime = function(self, curTime)
+            self:SetText( math.ceil(curTime) )
+        end
+
+        button.buttonText.OnFrame = function(self, delta)
+            Timer = Timer + delta
+            ButtonParams[buttonName].CoolDownTimerValue = Timer
+
+            curTime = (startTime + CountDown) - GetGameTimeSeconds()
+            if curTime >= 0 then
+                ButtonParams[buttonName].CurrCoolDownTime = curTime
+                UpdateTime(self, curTime)
+            else
+                EnableButtonStopCoolDown(buttonName)
+            end	
+        end
+    end
 end
 
 --needs work.. the timer does not restart once its done.. 
 --stop and destroy the cooldown timer.
 function StopCoolDownTimer(buttonName)
-	local button = false
     if orderCheckboxMap[buttonName] then 
-		button = orderCheckboxMap[buttonName]
-		ButtonParams[buttonName].CoolDownEnabled = false
-		ButtonParams[buttonName].CurrCoolDownTime = button._data.ExtraInfo.CoolDownTime
-		ButtonParams[buttonName].CoolDownTimerValue = 0
-		
-		--stop the frame here and set the text to nil
-		button.buttonText:SetNeedsFrameUpdate(false)
-		button.buttonText:SetText('')
-	end
+        Button = orderCheckboxMap[buttonName]
+        ButtonParams[buttonName].CoolDownEnabled = false
+        ButtonParams[buttonName].CurrCoolDownTime = Button._data.ExtraInfo.CoolDownTime
+        ButtonParams[buttonName].CoolDownTimerValue = 0
+        Button.buttonText:SetNeedsFrameUpdate(false)
+        Button.buttonText:SetText('')
+    end
 end
 
 --enable the ability button and kill the cooldown timer

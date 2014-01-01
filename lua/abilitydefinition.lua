@@ -3,10 +3,6 @@
 #
 
 abilities = {
-    ['TargetLocation'] = {
-        preferredSlot = 7,
-        script = 'TargetLocation',
-    },
 	['Recall'] = {
         bitmapId = 'teleport',
         enabled = true,

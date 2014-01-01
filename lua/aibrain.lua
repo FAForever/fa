@@ -499,7 +499,9 @@ AIBrain = Class(moho.aibrain_methods) {
 	AddReinforcements = function(self, list)
 		local army = self:GetArmyIndex()
 		LOG("send reinforcement to sim")
-		AddReinforcementList( army, list )
+		AddReinforcementList(army, list)
+    StartAbilityCoolDown( self:GetArmyIndex(), 'CallReinforcement_' .. list.Index )
+
 	end,
 
     AddSpecialAbilityUnit = function(self, unit, type, autoEnable)

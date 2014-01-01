@@ -4,24 +4,51 @@ OnSync = function()
     baseOnSync()
     import('/lua/UserCamera.lua').ProcessCameraRequests(Sync.CameraRequests)
 
+    for k, v in Sync.AddReinforcementList do
+        local army = v.Army
+        if army == GetFocusArmy() then
+            import('/lua/ui/ability_panel/abilities.lua').AddReinforcements(v)
+        end
+    end
+
     if Sync.FocusArmyChanged then
         import('/lua/ui/game/avatars.lua').FocusArmyChanged()
         import('/lua/ui/game/multifunction.lua').FocusArmyChanged()
     end
 
-		for k, v in Sync.AddSpecialAbility do
+	for k, v in Sync.AddSpecialAbility do
         local army = v.Army
         if army == GetFocusArmy() then
             import('/lua/ui/ability_panel/abilities.lua').AddSpecialAbility(v)
         end
     end
 
-	for k, v in Sync.AddReinforcementList do
+    for k, v in Sync.EnableSpecialAbility do
         local army = v.Army
         if army == GetFocusArmy() then
-            import('/lua/ui/ability_panel/abilities.lua').AddReinforcements(v)
+            import('/lua/ui/ability_panel/abilities.lua').EnableSpecialAbility(v)
         end
     end
+    for k, v in Sync.DisableSpecialAbility do
+        local army = v.Army
+        if army == GetFocusArmy() then
+            import('/lua/ui/ability_panel/abilities.lua').DisableSpecialAbility(v)
+        end
+    end
+
+
+    for k, v in Sync.StartAbilityCoolDown do
+        local army = v.Army
+        if army == GetFocusArmy() then
+            import('/lua/ui/ability_panel/abilities.lua').DisableButtonStartCoolDown(v.AbilityName)
+        end
+    end
+    for k, v in Sync.StopAbilityCoolDown do
+        local army = v.Army
+        if army == GetFocusArmy() then
+            import('/lua/ui/ability_panel/abilities.lua').EnableButtonStopCoolDown(v.AbilityName)
+        end
+    end    
 	
     if Sync.CampaignMode then
         import('/lua/ui/campaign/campaignmanager.lua').campaignMode = Sync.CampaignMode

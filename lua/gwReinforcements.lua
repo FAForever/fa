@@ -40,8 +40,6 @@ teams[1] = -1
 teams[2] = -1
 
 
-local beaconTime = {}
-
 assignSupports = function()
 	local ArmiesList = ScenarioInfo.ArmySetup
 	
@@ -54,7 +52,6 @@ assignSupports = function()
     		factions[2] = army.Faction
 			teams[2] = army.Team
     	end
-    	beaconTime[army.ArmyIndex] = 0
 
     end
 
@@ -106,6 +103,9 @@ gwReinforcementsMainThread = function()
 	gwSetAiColor( armySupportIndex[teams[2]], factions[2] )
 
 	WaitTicks(10)
+
+	ScenarioInfo.gwReinforcementSpawnThreads = {}
+	ScenarioInfo.gwReinforcementList = gwReinforcementList
 	
 	local ArmiesList = ScenarioInfo.ArmySetup
 	WARN('armieslist is ' .. repr (ArmiesList))
@@ -124,10 +124,6 @@ gwReinforcementsMainThread = function()
 	GetArmyBrain(armySupportIndex[teams[1]]):SetResourceSharing(false)
 	GetArmyBrain(armySupportIndex[teams[2]]):SetResourceSharing(false)
 	
-	
-	ScenarioInfo.gwReinforcementSpawnThreads = {}
-	ScenarioInfo.gwReinforcementList = gwReinforcementList
-
 	LOG("ScenarioInfo.gwReinforcementList")
 	LOG(repr(ScenarioInfo.gwReinforcementList))
 
@@ -287,70 +283,84 @@ ModHumanACU =  function(ACU)
 		self.OldOnStartBuild(self, unitBeingBuilt, order)
 	end
 
+	CheckEngineersDelay(ACU)
+	CheckUnitsDelay(ACU)
+
+
 end
+
+Deploy = function(data)
+	if not OkayToMessWithArmy(data.From) then return end
+	local aiBrain = GetArmyBrain(data.From)
+	if aiBrain:IsDefeated() then return end
+
+	local units = aiBrain:GetListOfUnits( categories.REINFORCEMENTSBEACON, false )
+
+	if table.getn( units ) == 0 then
+		PrintText('No beacon found for deployment!', 20, nil, 15, 'center')
+	end
+
+    for _, unit in units do
+        unit:Deploy(data.Index)
+    end
+
+end
+
 
 ModBeacon = function(ACU, beacon)
 	beacon.ArmyIndex  = ACU:GetArmy()
-
+	beacon.ACU = ACU
 	if EntityCategoryContains(categories.UEF, ACU) then beacon.Faction = 1
 	elseif EntityCategoryContains(categories.AEON, ACU) then beacon.Faction = 2
 	elseif EntityCategoryContains(categories.CYBRAN, ACU) then beacon.Faction = 3
 	elseif EntityCategoryContains(categories.SERAPHIM, ACU) then beacon.Faction = 4
 	end
-	
-	beacon.OldOnKilled = beacon.OnKilled
-	beacon.OnKilled = function(self, instigator, type, overkillRatio)
-	###ADD HERE
-		
-		if self.RecallThread then
-			KillThread(self.timerThread)
-			self.timerThread = nil
+
+	beacon.Deploy = function(self, index)
+		LOG("deploying index " .. index)
+
+		local toRemove = {}
+		curTime = GetGameTimeSeconds()
+		for idx, List in self.ACU.unitsDelays do
+			LOG(List.Index)
+			LOG(index)
+			if List.Index == index and List.delay <= curTime then
+				CallReinforcementsToBeacon(self, List)
+				table.insert(toRemove, idx)
+			end
 		end
-		beacon.OldOnKilled(self, instigator, type, overkillRatio)
-	end
-	beacon.OldOnStopBeingBuilt = beacon.OnStopBeingBuilt
-	beacon.OnStopBeingBuilt = function(self, builder, layer)
-		
-		
 
-
-		#beacon.ReinforcementsThread = CallReinforcementsToBeacon(beacon)
-		#beacon.EngineersThread = CallEngineersToBeacon(beacon)
-		CheckEngineersDelay(self)
-		CheckUnitsDelay(self)
-		if table.getn( self.unitsDelays ) != 0 or table.getn( self.engineersDelays ) != 0 then
-			beacon.timerThread = self:ForkThread(timerBeacon)
+		for _, idx in toRemove do
+			table.remove(self.ACU.unitsDelays, idx)
 		end
-		beacon.OldOnStopBeingBuilt(self, builder, layer)
-		
+
 	end
-
-
 end
 
 #this function check all the engineers delay to spawn them.
-CheckEngineersDelay = function(beacon)
-	beacon.engineersDelays = {}
+CheckEngineersDelay = function(ACU)
+	ACU.engineersDelays = {}
 	for index, List in ScenarioInfo.gwReinforcementList.builtByEngineerStructure do
-		if List.playerName == beacon:GetAIBrain().Nickname and List.delay >= beaconTime[beacon.ArmyIndex] then
-			table.insert(beacon.engineersDelays, List)
+		if List.playerName == ACU:GetAIBrain().Nickname then
+			table.insert(ACU.engineersDelays, List)
 		end 
 	end
 end
 
 #this function check all the units delay to spawn them.
-CheckUnitsDelay = function(beacon)
-	beacon.unitsDelays = {}
+CheckUnitsDelay = function(ACU)
+	LOG("checking reinforcements")
+	ACU.unitsDelays = {}
+	local brain = ACU:GetAIBrain()
 	for index, List in ScenarioInfo.gwReinforcementList.transportedUnits do
-		LOG(repr(List))
-		if List.playerName == beacon:GetAIBrain().Nickname and List.delay >= beaconTime[beacon.ArmyIndex] then
-			local brain = beacon:GetAIBrain()
-			LOG("adding reinforcements")
-			brain:AddReinforcements( List)
-			table.insert(beacon.unitsDelays, List)
+		if List.playerName == brain.Nickname then
+			List.Index = index
+			brain:AddReinforcements(List)
+			table.insert(ACU.unitsDelays, List)
 			LOG(repr(List))
 		end 
 	end
+	LOG("done checking reinforcements")
 end
 
 DespawnBeacon = function(ACU)
@@ -369,7 +379,7 @@ DespawnBeacon = function(ACU)
 	return
 end
 
-timerBeacon = function(self)
+timerBeacon2 = function(self)
 	while true do
 		beaconTime[self.ArmyIndex] = beaconTime[self.ArmyIndex] + 1
 		local toRemove = {}
