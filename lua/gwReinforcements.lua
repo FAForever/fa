@@ -256,9 +256,6 @@ GetACUs = function(armies)
 					ACUs[unit:GetArmy()] = unit
 					brain:AddSpecialAbilityUnit( unit, 'Recall', true )
 					LOG('found an ACU near marker ' .. repr(ArmyName))
-		
-			
-
 				end
 			end
 		end
@@ -322,9 +319,7 @@ ModBeacon = function(ACU, beacon)
 		local toRemove = {}
 		curTime = GetGameTimeSeconds()
 		for idx, List in self.ACU.unitsDelays do
-			LOG(List.Index)
-			LOG(index)
-			if List.Index == index and List.delay <= curTime then
+			if List.group == index and List.delay <= curTime then
 				CallReinforcementsToBeacon(self, List)
 				table.insert(toRemove, idx)
 			end
@@ -354,7 +349,6 @@ CheckUnitsDelay = function(ACU)
 	local brain = ACU:GetAIBrain()
 	for index, List in ScenarioInfo.gwReinforcementList.transportedUnits do
 		if List.playerName == brain.Nickname then
-			List.Index = index
 			brain:AddReinforcements(List)
 			table.insert(ACU.unitsDelays, List)
 			LOG(repr(List))

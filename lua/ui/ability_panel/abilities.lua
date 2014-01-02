@@ -154,7 +154,7 @@ function AddReinforcements(list)
 
     local List = list.List
     local delay = List.delay
-    AbilityName = 'CallReinforcement_' .. List.Index
+    AbilityName = 'CallReinforcement_' .. List.group
 
     local AddAbility = true
     for k,v in availableOrders do
@@ -165,7 +165,7 @@ function AddReinforcements(list)
 
     if AddAbility then
     	table.insert(availableOrders, AbilityName)
-    	defaultOrdersTable[AbilityName] = {Name=AbilityName, bitmapId="deploy", enabled=true, helpText="deploy", preferredSlot=List.Index+1, callBack = "Deploy", index = List.Index,ExtraInfo={CoolDownTime = delay}}
+    	defaultOrdersTable[AbilityName] = {Name=AbilityName, bitmapId="deploy", enabled=true, helpText="deploy", preferredSlot=List.group+1, callBack = "Deploy", index = List.group, ExtraInfo={CoolDownTime = delay}}
     	defaultOrdersTable[AbilityName].behavior = AbilityButtonBehavior
     	defaultOrdersTable[AbilityName].behaviordoubleclick = AbilityButtonBehaviorDoubleClick
     	ButtonParams[AbilityName] = { CoolDownTime = true, CurrCoolDownTime = delay, CoolDownEnabled = false, CoolDownTimerValue = delay }
@@ -707,6 +707,14 @@ function AbilityButtonBehaviorDoubleClick(self, modifiers)
         CM.EndCommandMode(true)
 
     else
+       if self._data.callBack then
+            LOG(repr(self._data))
+            if self._data.index then
+                SimCallback({Func = self._data.callBack, Args = { Index=self._data.index, From=GetFocusArmy()}})
+            else
+                SimCallback({Func = self._data.callBack, Args = { From=GetFocusArmy()}})
+            end
+       else        
         local modeData = {
             name = 'RULEUCC_Script',
             AbilityName = self._data.abilityname,
@@ -719,7 +727,18 @@ function AbilityButtonBehaviorDoubleClick(self, modifiers)
         }
 
         # anything in the modeData is passed to userscriptcommand.lua from commandmode.lua
-        CM.StartCommandMode("order", modeData)
+           local modeData = {
+               name = 'RULEUCC_Script',
+               AbilityName = self._data.abilityname,
+               TaskName = self._script,
+               cursor = self._data.cursor,
+               OrderIcon = self._data.OrderIcon,
+               MouseDecal = self._data.MouseDecal,
+               Usage = self._data.usage,
+               SelectedUnits = GetSelectedUnits(),
+           }
+           CM.StartCommandMode("order", modeData)
+       end
     end
 end
 
