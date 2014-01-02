@@ -708,7 +708,6 @@ function AbilityButtonBehaviorDoubleClick(self, modifiers)
 
     else
        if self._data.callBack then
-            LOG(repr(self._data))
             if self._data.index then
                 SimCallback({Func = self._data.callBack, Args = { Index=self._data.index, From=GetFocusArmy()}})
             else
