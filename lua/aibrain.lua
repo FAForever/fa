@@ -504,8 +504,9 @@ AIBrain = Class(moho.aibrain_methods) {
 
 	end,
 
-  reinforcementsCalled = function(self, group)
+  ReinforcementsCalled = function(self, group)
     DisableSpecialAbility( self:GetArmyIndex(), 'CallReinforcement_' .. list.group )
+    table.insert( Sync.ReinforcementCalled, { self:GetArmyIndex(), list.group } )
   end,
 
     AddSpecialAbilityUnit = function(self, unit, type, autoEnable)

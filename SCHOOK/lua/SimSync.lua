@@ -11,6 +11,7 @@ ResetSyncTable = function()
     Sync.Voice = {}
 
 	Sync.AddReinforcementList = {}
+    Sync.ReinforcementCalled = {}
     Sync.AddSpecialAbility = {}
     Sync.RemoveSpecialAbility = {}
     Sync.EnableSpecialAbility = {}

@@ -455,7 +455,7 @@ CallReinforcementsToBeacon = function(beacon, List)
 	#WARN('beacon.UnitReinforcementsToCall is ' .. repr(beacon.UnitReinforcementsToCall))
 	if beacon.UnitReinforcementsToCall then
 		SpawnTransportedReinforcements(beacon, beacon.UnitReinforcementsToCall)
-		beacon.AiBrain:reinforcementsCalled(List.group)
+		beacon.AiBrain:ReinforcementsCalled(List.group)
 	end
 end
 

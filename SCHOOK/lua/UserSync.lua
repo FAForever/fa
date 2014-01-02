@@ -136,6 +136,13 @@ OnSync = function()
 		end
     end
 
+    if Sync.ReinforcementCalled then
+        for k, group in Sync.ReinforcementCalled do
+            local armyIndex, group = unpack(gameResult)
+            GpgNetSend('ArmyCalled', armyIndex, group)
+        end
+    end
+
     for k,gameResult in Sync.GameResult do
         local armyIndex, result = unpack(gameResult)
         GpgNetSend('GameResult', armyIndex, result)
