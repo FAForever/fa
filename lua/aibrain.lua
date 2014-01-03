@@ -1195,9 +1195,11 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     OnRecall = function(self)
-        local result = string.format("%s %i", "recall", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
-        table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
-        self:AddArmyStat("Recall", 1)
+      if self and not self:IsDefeated() then
+          local result = string.format("%s %i", "recall", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
+          table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
+          self:AddArmyStat("Recall", 1)
+      end
     end,
 
     OnDefeat = function(self)

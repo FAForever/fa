@@ -4439,11 +4439,13 @@ Unit = Class(moho.unit_methods) {
         self:CleanupTeleportChargeEffects()
         
         WaitSeconds( 0.1 )
-        self:SetWorkProgress(0.0)
-        self:StopUnitAmbientSound('TeleportLoop')
-        self:PlayUnitSound('TeleportEnd')
-        aiBrain:OnRecall()
-        self:Destroy()
+        if not self:IsDead() then
+            self:SetWorkProgress(0.0)
+            self:StopUnitAmbientSound('TeleportLoop')
+            self:PlayUnitSound('TeleportEnd')
+            aiBrain:OnRecall()
+            self:Destroy()
+        end
      
         
     end,
