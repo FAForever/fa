@@ -27,6 +27,7 @@ gwReinforcements = {
 			playerName = "Ze_PilOt",
 			called = false,
 			delay = 5,
+			group = 1,
 			unitNames = {
 				"UEL0202","UEL0202","UEL0202","UEL0202","UEL0202","UEL0202",  #six pillars
 			},
@@ -36,6 +37,7 @@ gwReinforcements = {
 			playerName = "Ze_PilOt",
 			called = false,
 			delay = 150,
+			group = 2,
 			unitNames = {
 				"UEL0202","UEL0202","UEL0202",  #six pillars
 				"URL0304","URL0304","URL0304",
@@ -45,6 +47,7 @@ gwReinforcements = {
 			playerName = "Ze_PilOt",
 			called = false,
 			delay = 200,
+			group = 3,
 			unitNames = {
 				"UEL0202","UEL0202","UEL0202",  #six pillars
 				"URL0304","URL0304","URL0304",
