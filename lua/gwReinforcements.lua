@@ -247,7 +247,7 @@ end
 GetACUs = function(armies)
 	local ACUs = {}
 	
-	for ArmyName,Army in armies do
+	for ArmyName, Army in armies do
 		if Army.Human then 
 			local brain = GetArmyBrain(Army.ArmyIndex)
 			local units = brain:GetListOfUnits(categories.COMMAND, false)
@@ -268,7 +268,6 @@ end
 
 ModHumanACU =  function(ACU)
 	ACU.OldOnStartBuild = ACU.OnStartBuild 
-	ACU.OldOnStopBuild = ACU.OnStopBuild
 	ACU.DespawnBeacon = DespawnBeacon
 	ACU.ModBeacon = ModBeacon
 	ACU.OnStartBuild = function(self, unitBeingBuilt, order)
@@ -279,6 +278,7 @@ ModHumanACU =  function(ACU)
 		end
 		self.OldOnStartBuild(self, unitBeingBuilt, order)
 	end
+
 
 	CheckEngineersDelay(ACU)
 	CheckUnitsDelay(ACU)
@@ -298,7 +298,11 @@ Deploy = function(data)
 	end
 
     for _, unit in units do
-        unit:Deploy(data.Index)
+    	if unit.UnitBeingBuilt or unit:GetFractionComplete() != 1 then
+    		PrintText('The beacon is not complete!', 20, nil, 15, 'center')
+    	else
+        	unit:Deploy(data.Index)
+    	end
     end
 
 end
