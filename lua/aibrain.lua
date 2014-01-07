@@ -490,15 +490,14 @@ AIBrain = Class(moho.aibrain_methods) {
         self:InitializeEconomyState()
         self:InitializeVO()
         self.BrainType = 'Human'
-
+        self.SpecialAbilities = {}
+        self.SpecialAbilityUnits = {}
     end,
 
-	SpecialAbilities = {},
-    SpecialAbilityUnits = {},
+
 
 	AddReinforcements = function(self, list)
 		local army = self:GetArmyIndex()
-		LOG("send reinforcement to sim")
 		AddReinforcementList(army, list)
     StartAbilityCoolDown( army, 'CallReinforcement_' .. list.group )
 
@@ -510,6 +509,7 @@ AIBrain = Class(moho.aibrain_methods) {
   end,
 
     AddSpecialAbilityUnit = function(self, unit, type, autoEnable)
+
         local unitId = unit:GetEntityId()
         if AbilityDefinition[ type ] then
             if not self.SpecialAbilityUnits[type] then
@@ -537,7 +537,7 @@ AIBrain = Class(moho.aibrain_methods) {
 	
     EnableSpecialAbility = function(self, type, enable)
         if AbilityDefinition[type].enabled == false then
-            #WARN('Ability "'..repr(type)..'" is disabled in abilitydefinition file')
+            WARN('Ability "'..repr(type)..'" is disabled in abilitydefinition file')
             return false
         else
             if not self.SpecialAbilities[ type ] then
@@ -549,6 +549,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
             end
             enable = enable and true
+
             if self:IsSpecialAbilityEnabled( type ) == nil or self:IsSpecialAbilityEnabled( type ) != enable then
                 local army = self:GetArmyIndex()
                 self.SpecialAbilities[ type ][ 'enabled' ] = enable
@@ -625,7 +626,8 @@ AIBrain = Class(moho.aibrain_methods) {
 	
     OnCreateAI = function(self, planName)
         self:CreateBrainShared(planName)
-
+        self.SpecialAbilities = {}
+        self.SpecialAbilityUnits = {}
         #LOG('*AI DEBUG: AI planName = ', repr(planName))
         #LOG('*AI DEBUG: SCENARIO AI PLAN LIST = ', repr(aiScenarioPlans))
         local civilian = false

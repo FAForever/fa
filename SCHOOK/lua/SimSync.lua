@@ -79,7 +79,6 @@ end
 
 function AddSpecialAbility (army, ability)
     if army != nil and ability then
-		LOG("adding ability")
         table.insert(Sync.AddSpecialAbility, { AbilityName = ability, Army = army })
     end
 end
