@@ -123,14 +123,17 @@ local function CheckForLaunch()
         if id != localPlayerID then
             local peer = lobbyComm:GetPeer(id)
             if peer.status != 'Established' then
+                LOG("No connection to a player")
                 return
             end
             if not table.find(peer.establishedPeers, localPlayerID) then
+                LOG("No establishedPeers to a player")
                 return
             end
             playercount = playercount + 1
             for k2,other in important do
                 if id != other and not table.find(peer.establishedPeers, other) then
+                    LOG("No establishedPeers between two players")
                     return
                 end
             end
@@ -138,6 +141,7 @@ local function CheckForLaunch()
     end
 
     if playercount < requiredPlayers then
+        LOG("No enough players in the game")
        return
     end
     
