@@ -1197,9 +1197,9 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     OnRecall = function(self)
-          local result = string.format("%s %i", "recall", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
-          table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
-          self:AddArmyStat("Recall", 1)
+        local result = string.format("%s %i", "recall", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
+        table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
+        self:AddArmyStat("Recall", 1)
     end,
 
     OnDefeat = function(self)
@@ -1216,13 +1216,6 @@ AIBrain = Class(moho.aibrain_methods) {
         SetArmyOutOfGame(self:GetArmyIndex())
         
         # seems that FA send the OnDeath twice : one when losing, the other when disconnecting. But we only want it one time !
-
-          for index, brain in ArmyBrains do
-              if brain and not brain:IsDefeated() then
-                  local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
-                  table.insert( Sync.GameResult, { index, result } )
-              end
-          end   
         
         if math.floor(self:GetArmyStat("Recall",0.0).Value) != 1 then
         
@@ -1235,7 +1228,12 @@ AIBrain = Class(moho.aibrain_methods) {
             table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
             
             # Score change, we send the score of all other players, yes mam !
-    
+            for index, brain in ArmyBrains do
+                if brain and not brain:IsDefeated() then
+                    local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
+                    table.insert( Sync.GameResult, { index, result } )
+                end
+            end       
         end
         
         import('/lua/SimUtils.lua').UpdateUnitCap(self:GetArmyIndex())
