@@ -4366,7 +4366,7 @@ Unit = Class(moho.unit_methods) {
         self:SetWorkProgress(0.0)
         self:SetImmobile(false)
         self:SetBusy(false)
-        self:SetReclaimable(true)
+        self:SetReclaimable(false)
         self:SetUnSelectable(false) 
         self:SetPaused(false) 
         self:SetProductionActive(true)

@@ -36,7 +36,7 @@ local announced = {}
 
 function DoGameResult(armyIndex, result)
 
-	LOG("GAMERESULT : ", result)
+	LOG("GAMERESULT for " .. armyIndex .. " : " .. result)
     local condPos = string.find(result, " ")
 	if condPos != 0 then
 		result = string.sub(result, 1, condPos - 1)

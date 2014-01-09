@@ -1,5 +1,6 @@
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
+local explosion = import('/lua/defaultexplosions.lua')
 local SimUtils = import('/lua/SimUtils.lua')
 
 local UEF = 1
@@ -191,6 +192,62 @@ InitialStructuresSpawnThread = function(List, Army)
 	for index, v in UnitsToSpawn do
 		#WARN('unit and pos is ' .. repr(v) .. ' and ' .. repr(posX) .. ' and ' .. repr(posY))
         local unit = aiBrain:CreateUnitNearSpot(v, posX, posY)
+        unit:SetReclaimable(false)
+
+    	unit.CreateWreckageProp = function( self, overkillRatio )
+			local bp = self:GetBlueprint()
+			local wreck = bp.Wreckage.Blueprint
+			if wreck then
+				local pos = self:GetPosition()
+				
+				local time = (bp.Wreckage.ReclaimTimeMultiplier or 1)
+				if self:GetCurrentLayer() == 'Seabed' or self:GetCurrentLayer() == 'Land' then
+				    pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
+				else
+				    pos[2] = GetSurfaceHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
+				end
+				
+				local prop = CreateProp( pos, wreck )
+
+				# We make sure keep only a bounded list of wreckages around so we don't get into perf issues when
+				# we accumulate too many wreckages
+				prop:AddBoundedProp(1)
+
+				prop:SetScale(bp.Display.UniformScale)
+				prop:SetOrientation(self:GetOrientation(), true)
+				prop:SetPropCollision('Box', bp.CollisionOffsetX, bp.CollisionOffsetY, bp.CollisionOffsetZ, bp.SizeX* 0.5, bp.SizeY* 0.5, bp.SizeZ * 0.5)
+				prop:SetMaxReclaimValues(time, time, 1, 1)
+				time = time - (time * (overkillRatio or 1))
+
+				prop:SetReclaimValues(time, time, 1, 1)
+				prop:SetMaxHealth(bp.Defense.Health)
+				prop:SetHealth(self, bp.Defense.Health * (bp.Wreckage.HealthMult or 1))
+
+				#FIXME: SetVizToNeurals('Intel') is correct here, so you can't see enemy wreckage appearing
+				# under the fog. However the engine has a bug with prop intel that makes the wreckage
+				# never appear at all, even when you drive up to it, so this is disabled for now.
+				#prop:SetVizToNeutrals('Intel')
+	            if not bp.Wreckage.UseCustomMesh then
+	    	        prop:SetMesh(bp.Display.MeshBlueprintWrecked)
+	            end
+
+	            # Attempt to copy our animation pose to the prop. Only works if
+	            # the mesh and skeletons are the same, but will not produce an error
+	            # if not.
+	            TryCopyPose(self,prop,false)
+
+	            prop.AssociatedBP = self:GetBlueprint().BlueprintId
+
+				# Create some ambient wreckage smoke
+				explosion.CreateWreckageEffects(self,prop)
+
+				return prop
+		    else
+		        return nil
+			end
+	    end
+
+
         if delay > 0 then
         	unit:InitiateActivation(delay)
     	end
@@ -292,14 +349,17 @@ Deploy = function(data)
 	if aiBrain:IsDefeated() then return end
 
 	local units = aiBrain:GetListOfUnits( categories.REINFORCEMENTSBEACON, false )
+ 	local focusArmy = GetFocusArmy()
 
-	if table.getn( units ) == 0 then
+	if table.getn( units ) == 0 and focusArmy == data.From then		
 		PrintText('No beacon found for deployment!', 20, nil, 15, 'center')
 	end
 
     for _, unit in units do
     	if unit.UnitBeingBuilt or unit:GetFractionComplete() != 1 then
-    		PrintText('The beacon is not complete!', 20, nil, 15, 'center')
+    		if focusArmy == data.From then
+    			PrintText('The beacon is not complete!', 20, nil, 15, 'center')
+    		end
     	else
         	unit:Deploy(data.Index)
     	end
