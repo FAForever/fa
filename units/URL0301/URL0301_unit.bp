@@ -466,8 +466,8 @@ UnitBlueprint {
         },
         Switchback = {
             BuildCostEnergy = 50000,
-            BuildCostMass = 1000,
-            BuildTime = 5040,
+            BuildCostMass = 800,
+            BuildTime = 4200,
             Icon = 'ses',
             Name = '<LOC enhancements_0109>Rapid Fabricator',
             NewBuildRate = 98,
@@ -579,11 +579,11 @@ UnitBlueprint {
         TransportClass = 3,
     },
     Veteran = {
-        Level1 = 20,
+        Level1 = 25,
         Level2 = 50,
-        Level3 = 90,
-        Level4 = 140,
-        Level5 = 200,
+        Level3 = 75,
+        Level4 = 100,
+        Level5 = 125,
     },
     Weapon = {
         {
@@ -607,7 +607,7 @@ UnitBlueprint {
                     Duration = 4,
                     Radius = 3,
                     TargetAllow = 'MOBILE',
-                    TargetDisallow = 'EXPERIMENTAL,COMMAND,SUBCOMMANDER',
+                    TargetDisallow = 'EXPERIMENTAL,SUBCOMMANDER,COMMAND,WALL',
                 },
             },
             ChargeDelay = 0.5,
@@ -684,6 +684,7 @@ UnitBlueprint {
             CannotAttackGround = true,
             CollideFriendly = false,
             Damage = 300,
+            DamageRadius = 1.5,
             DamageType = 'Normal',
             DisplayName = 'Nanite Missile System',
             EffectiveRadius = 0,
@@ -702,8 +703,8 @@ UnitBlueprint {
             MuzzleSalvoSize = 3,
             MuzzleVelocity = 30,
             ProjectileId = '/projectiles/CAAMissileNanite02/CAAMissileNanite02_proj.bp',
-            ProjectileLifetime = 3,
-            ProjectilesPerOnFire = 4,
+            ProjectileLifetime = 5,
+            ProjectilesPerOnFire = 3,
             RackBones = {
                 {
                     MuzzleBones = {
