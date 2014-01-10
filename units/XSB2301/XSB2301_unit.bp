@@ -214,11 +214,11 @@ UnitBlueprint {
                 },
             },
             BallisticArc = 'RULEUBA_None',
-            BeamCollisionDelay = 0.3,
-            BeamLifetime = 0.9,
+            BeamCollisionDelay = 0,				#0.3
+            BeamLifetime = 1,					#0.9
             CollideFriendly = false,
-            Damage = 220,
-            DamageRadius = 0,
+            Damage = 55,					#220
+            DamageRadius = 0,					
             DamageType = 'Normal',
             DisplayName = 'Ultrachromatic Beam Generator',
             FireTargetLayerCapsTable = {
@@ -244,7 +244,7 @@ UnitBlueprint {
             },
             RackFireTogether = false,
             RackRecoilDistance = -1,
-            RackReloadTimeout = 10,
+            RackReloadTimeout = 0,				#10
             RackSalvoChargeTime = 0,
             RackSalvoFiresAfterCharge = false,
             RackSalvoReloadTime = 0,
@@ -252,7 +252,7 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.25,
-            TargetCheckInterval = 1,
+            TargetCheckInterval = 0.1,				#1
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'MOBILE',
@@ -273,6 +273,7 @@ UnitBlueprint {
             TurretYawRange = 180,
             TurretYawSpeed = 60,
             Turreted = true,
+	    UseFiringSolutionInsteadOfAimBone = true,		#Added
             WeaponCategory = 'Direct Fire',
             WeaponUnpacks = false,
         },
