@@ -107,7 +107,7 @@ UnitBlueprint {
     CollisionOffsetY = 0,
     Defense = {
         AirThreatLevel = 9,
-        ArmorType = 'Light',
+        ArmorType = 'ASF', # Light
         EconomyThreatLevel = 0,
         Health = 1850,
         MaxHealth = 1850,
@@ -326,7 +326,7 @@ UnitBlueprint {
                 'SPECIALLOWPRI',
                 'ALLUNITS',
             },
-            TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
+            TargetRestrictDisallow = 'UNTARGETABLE,LAND,POD,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
             TrackingRadius = 0,
             TurretBoneMuzzle = 'Muzzle02',
@@ -400,7 +400,7 @@ UnitBlueprint {
                 'SPECIALLOWPRI',
                 'ALLUNITS',
             },
-            TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
+            TargetRestrictDisallow = 'UNTARGETABLE,LAND,POD,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
             TurretBoneMuzzle = 'Muzzle01',
             TurretBonePitch = 'Muzzle01',
