@@ -1,0 +1,56 @@
+ProjectileBlueprint {
+    Categories = {
+        'CYBRAN',
+        'PROJECTILE',
+        'INDIRECTFIRE',
+        'TACTICAL',
+        'MISSILE',
+        'NOSPLASHDAMAGE',
+    },
+    Defense = {
+        Health = 1,
+        MaxHealth = 1,
+    },
+    Display = {
+        CameraFollowTimeout = 2,
+        CameraFollowsProjectile = true,
+        ImpactEffects = {
+            Type = 'Medium02',
+        },
+        Mesh = {
+            LODs = {
+                {
+                    LODCutoff = 150,
+                    ShaderName = 'TMeshNoLighting',
+                },
+            },
+        },
+        StrategicIconSize = 2,
+        UniformScale = 0.1,
+    },
+    General = {
+        Category = 'Missile',
+        EntityCategory = {
+            'CYBRAN',
+            'PROJECTILE',
+            'INDIRECTFIRE',
+            'TACTICAL',
+            'MISSILE',
+            'NOSPLASHDAMAGE',
+        },
+        Faction = 'Cybran',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        Acceleration = 6,
+        DestroyOnWater = false,
+        InitialSpeed = 2,
+        MaxSpeed = 15,
+        RotationalVelocity = 0,
+        RotationalVelocityRange = 0,
+        UseGravity = false,
+        VelocityAlign = true,
+    },
+}
