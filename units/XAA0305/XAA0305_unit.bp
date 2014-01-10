@@ -105,8 +105,8 @@ UnitBlueprint {
         AirThreatLevel = 22,
         ArmorType = 'Light',
         EconomyThreatLevel = 0,
-        Health = 6500,
-        MaxHealth = 6500,
+        Health = 6000,
+        MaxHealth = 6000,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 12,
@@ -160,7 +160,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 64000,
         BuildCostMass = 1200,
-        BuildTime = 4800,
+        BuildTime = 6000,			#4800
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -233,11 +233,11 @@ UnitBlueprint {
         TransportClass = 3,
     },
     Veteran = {
-        Level1 = 18,
-        Level2 = 36,
-        Level3 = 54,
-        Level4 = 72,
-        Level5 = 90,
+        Level1 = 15,
+        Level2 = 30,
+        Level3 = 45,
+        Level4 = 60,
+        Level5 = 75,
     },
     Weapon = {
         {
