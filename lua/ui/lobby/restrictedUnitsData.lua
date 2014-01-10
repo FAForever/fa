@@ -9,7 +9,19 @@ type = {
 --]]
 
 restrictedUnits = {
-    T1 = {
+    TELE = {
+		enhancement = {"Teleporter", "TeleporterRemove"},
+		categories = {},
+        name = "No TELE",
+        tooltip = "No TELE by Xinnony",
+	},
+	BILLY = {
+		enhancement = {"TacticalNukeMissile", "TacticalNukeMissileRemove"},
+		categories = {},
+        name = "No BILLY",
+        tooltip = "No BILLY (Nuke Commander) by Xinnony",
+	},
+	T1 = {
         categories = {"TECH1"},
         name = "<LOC restricted_units_data_0000>No Tech 1",
         tooltip = "restricted_uints_T1",
@@ -138,4 +150,6 @@ sortOrder = {
     "SUPCOM",
     "FABS",
     "SUPPFAC",
+	"TELE",
+	"BILLY",
 }

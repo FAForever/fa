@@ -5508,8 +5508,8 @@ function StressCPU(waitTime)
     firstCPUTest = false
 
     --Reset Button UI
-    GUI.rerunBenchmark:Enable()
-    GUI.rerunBenchmark.label:SetText('')
+    if GUI.rerunBenchmark then GUI.rerunBenchmark:Enable() end
+    if GUI.rerunBenchmark.label then GUI.rerunBenchmark.label:SetText('') end
 end
 
 function UpdateCPUBar(playerName)
@@ -5996,6 +5996,7 @@ function ForceApplyNewSkin()
         end
     end
     -- Restricted Unit show only if not you Host, else Preset Lobby is show.
+	-- Now if is Host, is a Preset button.
     --if not lobbyComm:IsHost() then
         if not GUI.restrictedUnitsButton:IsDisabled() then
             GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_up.png'))

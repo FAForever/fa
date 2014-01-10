@@ -13,7 +13,7 @@ local animationLock = false
 local gameOver = false
 local activeTab = false
 local pauseBtn = false
-local infoBtn = false
+--local infoBtn = false
 
 timeoutsRemaining = false
 
@@ -779,7 +779,7 @@ function ToggleGameInfos()
         LayoutHelpers.AtBottomIn(OkButton, dialog2, 10)
         OkButton.OnClick = function(self)
 			dialog:Destroy()
-			infoBtn:Enable()
+			--infoBtn:Enable()
         end
 	------------------
     -- Preset List --
