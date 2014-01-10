@@ -13,7 +13,7 @@ UnitBlueprint {
         CanFly = true,
         CombatTurnSpeed = 1.5,
         EngageDistance = 50,
-        KLift = 3,
+        KLift = 2, # 3
         KLiftDamping = 2.5,
         KMove = 1,
         KMoveDamping = 1,
@@ -21,7 +21,7 @@ UnitBlueprint {
         KRollDamping = 1,
         KTurn = 1,
         KTurnDamping = 1.5,
-        LiftFactor = 7,
+        LiftFactor = 10, # 7
         MaxAirspeed = 15,
         MinAirspeed = 10,
         PredictAheadForBombDrop = 4,
@@ -465,9 +465,8 @@ UnitBlueprint {
             },
             FiringRandomness = 0.1,
             FiringTolerance = 6,
-			FixBombTrajectory = true, # [152]
             Label = 'Bomb',
-            MaxRadius = 45,
+            MaxRadius = 60, # 45
             MuzzleSalvoDelay = 0.25,
             MuzzleSalvoSize = 8,
             MuzzleVelocity = 0,
