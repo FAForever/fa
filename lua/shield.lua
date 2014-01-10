@@ -214,7 +214,7 @@ Shield = Class(moho.shield_methods,Entity) {
                                 if v.MyShield:IsOn() then
     								damage = 0.5
     								if EntityCategoryContains(categories.STRUCTURE, v) then
-    									damage = 0.15
+    									damage = 0.1
     								end
     								self.MakeOverlapDamageThread = ForkThread(self.MakeOverlapDamage, self, position, v.MyShield, amount * damage , "shieldOverlap")
                                 end
