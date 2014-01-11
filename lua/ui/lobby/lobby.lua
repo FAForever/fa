@@ -6505,6 +6505,11 @@ function GUI_PRESET()
 				LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, row)) -- Charge les infos sur la InfoList
 			end
 		end
+		PresetList.OnDoubleClick = function(self, row)
+			--if row == 0 then
+				LOAD_PRESET_IN_PREF()
+			--end
+		end
 	---------------
     -- Info List --
 	InfoList = ItemList(dialog2)
