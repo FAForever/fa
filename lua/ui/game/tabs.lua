@@ -767,7 +767,7 @@ function ToggleGameInfos()
         LayoutHelpers.AtCenterIn(dialog2, dialog)
 	-----------
     -- Title --
-    local text0 = UIUtil.CreateText(dialog2, 'Game Info :', 17, 'Arial')
+    local text0 = UIUtil.CreateText(dialog2, 'Game Infos :', 17, 'Arial')
         text0:SetColor('B9BFB9') -- 808080
         text0:SetDropShadow(true)
         LayoutHelpers.AtHorizontalCenterIn(text0, dialog2, 0)
@@ -787,7 +787,7 @@ function ToggleGameInfos()
 		PresetList:SetFont(UIUtil.bodyFont, 11)
 		PresetList:SetColors(UIUtil.fontColor, "00000000", "FF000000",  UIUtil.highlightColor, "ffbcfffe")
 		--PresetList:ShowMouseoverItem(true)
-		PresetList.Width:Set(232)--210)
+		PresetList.Width:Set(537-20-19)--232)--210)
 		PresetList.Height:Set(310)
 		--LayoutHelpers.DepthOverParent(PresetList, dialog2, 10)
 		LayoutHelpers.AtLeftIn(PresetList, dialog2, 10)
@@ -841,7 +841,7 @@ function ToggleGameInfos()
 	--
 	-- ... other options ...
 	---------------
-	PresetList:AddItem('Scenario info :')
+	PresetList:AddItem('Scenario Infos :')
 	if SessionGetScenarioInfo() then
 		for k, v in SessionGetScenarioInfo() do
 			if k == 'name' then
@@ -894,7 +894,7 @@ function ToggleGameInfos()
 		PresetList:AddItem('')
 	end
 	if SessionGetScenarioInfo().Options.RestrictedCategories then
-		PresetList:AddItem('Restricteds Units :')
+		PresetList:AddItem('Restricteds :')
 		for k, v in SessionGetScenarioInfo().Options.RestrictedCategories do
 			PresetList:AddItem('- '..tostring(v))
 		end
