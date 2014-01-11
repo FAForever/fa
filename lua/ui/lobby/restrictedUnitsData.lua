@@ -9,17 +9,37 @@ type = {
 --]]
 
 restrictedUnits = {
-    TELE = {
+    ENGISTATION = {
+		categories = {"xeb0104", "xrb0104"},
+        name = "No Kennel and Hive (Engineering Station)",
+        tooltip = "No Kennel and Hive (Engineering Station) by Xinnony",
+	},
+	SALVAMAVOSCATH = {
+		categories = {"xab2307", "ueb2401", "url0401"},
+        name = "No Salvation, Mavor and Scathis (Rapid-Fire Artillery)",
+        tooltip = "No Salvation, Mavor and Scathis (Rapid-Fire Artillery) by Xinnony",
+	},
+	PARAGON = {
+		categories = {"xab1401"},
+        name = "No Paragon (Infinite Resource Generator)",
+        tooltip = "No Paragon (Infinite Resource Generator) by Xinnony",
+	},
+	SATELLITE = {
+		categories = {"xeb2402"},
+        name = "No Satellite",
+        tooltip = "No Satellite by Xinnony",
+	},
+	TELE = {
 		enhancement = {"Teleporter", "TeleporterRemove"},
 		categories = {},
-        name = "No TELE",
-        tooltip = "No TELE by Xinnony",
+        name = "No Teleport (COM Upgrade)",
+        tooltip = "No Teleport (COM Upgrade) by Xinnony",
 	},
 	BILLY = {
 		enhancement = {"TacticalNukeMissile", "TacticalNukeMissileRemove"},
 		categories = {},
-        name = "No BILLY",
-        tooltip = "No BILLY (Nuke Commander) by Xinnony",
+        name = "No Billy (COM UEF Upgrade)",
+        tooltip = "No Billy (COM UEF Upgrade) by Xinnony",
 	},
 	T1 = {
         categories = {"TECH1"},
@@ -82,6 +102,7 @@ restrictedUnits = {
         tooltip = "restricted_uints_nukes",
     },
     GAMEENDERS = {
+								---ArtyAEO---ArtyUEF---ArtyCYB---ArtySER---Paragon---Salvation---Scathis---Satellite---Mavor---Yolona Oss
         categories = {"uab2302", "urb2302", "ueb2302", "xsb2302", "xab1401", "xab2307", "url0401", "xeb2402", "ueb2401", "xsb2401"},
         name = "<LOC restricted_units_data_0012>No Game Enders",
         tooltip = "restricted_uints_gameenders",
@@ -152,4 +173,8 @@ sortOrder = {
     "SUPPFAC",
 	"TELE",
 	"BILLY",
+	"ENGISTATION",
+	"SALVAMAVOSCATH",
+	"PARAGON",
+	"SATELLITE",
 }
