@@ -85,6 +85,7 @@ UnitBlueprint {
         'REPAIR',
         'RECLAIM',
         'ENGINEER',
+        'CAPTURE',
         'VISIBLETORECON',
         'RECLAIMABLE',
     },
@@ -99,7 +100,7 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC uea0003_desc>Engineering Drone',
+    Description = '<LOC uea0001_desc>Engineering Drone',
     Display = {
         Abilities = {
             '<LOC ability_engineeringsuite>Engineering Suite',
@@ -108,12 +109,8 @@ UnitBlueprint {
             IconFadeInZoom = 175,
             LODs = {
                 {
-                    AlbedoName = '/Units/UEA0001/UEA0001_Albedo.dds',
                     LODCutoff = 150,
-                    MeshName = '/Units/UEA0001/UEA0001_lod0.scm',
-                    NormalsName = '/Units/UEA0001/UEA0001_normalsTS.dds',
                     ShaderName = 'Unit',
-                    SpecularName = '/Units/UEA0001/UEA0001_SpecTeam.dds',
                 },
             },
         },
@@ -124,11 +121,11 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 1600,
         BuildCostMass = 160,
-        BuildRadius = 8, 				#added
-        BuildRate = 35,
+        BuildRadius = 8,				#added
+        BuildRate = 5,
         BuildTime = 400,
         BuildableCategory = {
-            'BUILTBYTIER3ENGINEER UEF',
+            'BUILTBYCOMMANDER UEF',
         },
         NaturalProducer = true,
     },
@@ -166,19 +163,19 @@ UnitBlueprint {
         OrderOverrides = {
             DroneL = {
                 bitmapId = 'drone',
-                helpText = 'drone_SACU',
+                helpText = 'drone_ACU',
             },
         },
         SelectionPriority = 6,
         TechLevel = 'RULEUTL_Basic',
-        UnitName = '<LOC uea0003_name>C-D2 "Rover"',
+        UnitName = '<LOC uea0001_name>C-D1 "Rover"',
         UnitWeight = 1,
     },
     Intel = {
         VisionRadius = 12,
     },
     Interface = {
-        HelpText = '<LOC uea0003_help>Engineering Drone',
+        HelpText = '<LOC uea0001_help>Engineering Drone',
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.25,
