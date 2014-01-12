@@ -1483,42 +1483,9 @@ local function AlertHostMapMissing()
 end
 
 local function UpdateGame()
-    -- if anything happens to switch a no SupCom player to a faction other than Seraphim, switch them back
+    --LOG('- UpdateGame')
+	-- if anything happens to switch a no SupCom player to a faction other than Seraphim, switch them back
     local playerSlot = FindSlotForID(localPlayerID)
-
-    if not gameInfo.PlayerOptions[playerSlot].MEAN then
-        SetPlayerOption(playerSlot, 'MEAN', playerMean)
-    end
-
-    if not gameInfo.PlayerOptions[playerSlot].DEV then
-        SetPlayerOption(playerSlot, 'DEV', playerDeviation)
-    end
-
-    if not gameInfo.PlayerOptions[playerSlot].COUNTRY then
-        SetPlayerOption(playerSlot, 'COUNTRY', PrefLanguage)
-    end
-
-    if not gameInfo.PlayerOptions[playerSlot].PL then
-        SetPlayerOption(playerSlot, 'PL', playerRating)
-    end
-
-    if not gameInfo.PlayerOptions[playerSlot].RC then
-        SetPlayerOption(playerSlot, 'RC', ratingColor)
-    end
-
-    if not gameInfo.PlayerOptions[playerSlot].NG then
-        SetPlayerOption(playerSlot, 'NG', numGames)
-    end
-
-    if not hasSupcom then
-        local playerSlot = FindSlotForID(localPlayerID)
-        if gameInfo.PlayerOptions[playerSlot] and gameInfo.PlayerOptions[playerSlot].Faction != 4 and not
-               IsObserver(localPlayerID) then
-            SetPlayerOption(playerSlot, 'Faction', 4)
-            return
-        end
-    end
-
     local scenarioInfo = nil
 
     if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") then
@@ -1638,6 +1605,36 @@ local function UpdateGame()
             end
         end
     end
+	
+	-- Set the info in a Slot
+	if IsPlayer(localPlayerID) then
+		if not gameInfo.PlayerOptions[playerSlot].MEAN then
+			SetPlayerOption(playerSlot, 'MEAN', playerMean, true)
+		end
+		if not gameInfo.PlayerOptions[playerSlot].DEV then
+			SetPlayerOption(playerSlot, 'DEV', playerDeviation, true)
+		end
+		if not gameInfo.PlayerOptions[playerSlot].COUNTRY then
+			SetPlayerOption(playerSlot, 'COUNTRY', PrefLanguage, true)
+		end
+		if not gameInfo.PlayerOptions[playerSlot].PL then
+			SetPlayerOption(playerSlot, 'PL', playerRating, true)
+		end
+		if not gameInfo.PlayerOptions[playerSlot].RC then
+			SetPlayerOption(playerSlot, 'RC', ratingColor, true)
+		end
+		if not gameInfo.PlayerOptions[playerSlot].NG then
+			SetPlayerOption(playerSlot, 'NG', numGames, true)
+		end
+		if not hasSupcom then
+			local playerSlot = FindSlotForID(localPlayerID)
+			if gameInfo.PlayerOptions[playerSlot] and gameInfo.PlayerOptions[playerSlot].Faction != 4 and not
+				   IsObserver(localPlayerID) then
+				SetPlayerOption(playerSlot, 'Faction', 4, true)
+				return
+			end
+		end
+	end
     
     -- Add tooltip (mean and dev rating) in player rating column -- Xinnony
     for i = 1, LobbyComm.maxPlayerSlots do
@@ -2172,7 +2169,6 @@ function HostConvertPlayerToObserver(senderID, name, playerSlot)
 
     if lobbyComm:IsHost() then
         GpgNetSend('PlayerOption', string.format("team %s %d %s", name, -1, 0))
-
     end
 
 
@@ -2189,44 +2185,33 @@ function HostConvertPlayerToObserver(senderID, name, playerSlot)
     )
 
     SendSystemMessage(LOCF("<LOC lobui_0226>%s has switched from a player to an observer.", name))
-
     UpdateGame()
 end
 
-function HostConvertObserverToPlayer(senderID, name, fromObserverSlot, toPlayerSlot, requestedFaction,
-                                     requestedPL, requestedRC, requestedNG)
-    if gameInfo.Observers[fromObserverSlot] == nil then
+function HostConvertObserverToPlayer(senderID, name, fromObserverSlot, toPlayerSlot, requestedFaction, requestedPL, requestedRC, requestedNG)
+    if gameInfo.Observers[fromObserverSlot] == nil then -- IF no Observer on the current slot : QUIT
         return
-    end
-
-    if gameInfo.PlayerOptions[toPlayerSlot] != nil then
+    elseif gameInfo.PlayerOptions[toPlayerSlot] != nil then -- IF Player is in the target slot : QUIT
         return
-    end
-
-    if gameInfo.ClosedSlots[toPlayerSlot] != nil then
+    elseif gameInfo.ClosedSlots[toPlayerSlot] != nil then -- IF target slot is Closed : QUIT
         return
     end
 
     gameInfo.PlayerOptions[toPlayerSlot] = LobbyComm.GetDefaultPlayerOptions(name)
     gameInfo.PlayerOptions[toPlayerSlot].OwnerID = senderID
 
-    if requestedFaction then
-        --gameInfo.PlayerOptions[toPlayerSlot].Faction = gameInfo.Observers[fromObserverSlot].oldFaction or requestedFaction
-        gameInfo.PlayerOptions[toPlayerSlot].Faction = requestedFaction
-    end
-
+	--if requestedFaction then
+		gameInfo.PlayerOptions[toPlayerSlot].Faction = gameInfo.Observers[fromObserverSlot].oldFaction or requestedFaction or 5
+    --end
     if requestedPL then
         gameInfo.PlayerOptions[toPlayerSlot].PL = requestedPL
     end
-
     if requestedRC then
         gameInfo.PlayerOptions[toPlayerSlot].RC = requestedRC
     end
-
     if requestedNG then
         gameInfo.PlayerOptions[toPlayerSlot].NG = requestedNG
     end
-
     for colorIndex,colorVal in gameColors.PlayerColors do
         if IsColorFree(colorIndex) then
             gameInfo.PlayerOptions[toPlayerSlot].PlayerColor = gameInfo.Observers[fromObserverSlot].oldColor or colorIndex
@@ -2272,59 +2257,7 @@ function HostConvertObserverToPlayerWithoutSlot(senderID, name, fromObserverSlot
 	end
 	local toPlayerSlot = newSlot
 	
-	
-	if gameInfo.Observers[fromObserverSlot] == nil then
-        return
-    end
-
-    if gameInfo.PlayerOptions[toPlayerSlot] != nil then
-        return
-    end
-
-    if gameInfo.ClosedSlots[toPlayerSlot] != nil then
-        return
-    end
-
-    gameInfo.PlayerOptions[toPlayerSlot] = LobbyComm.GetDefaultPlayerOptions(name)
-    gameInfo.PlayerOptions[toPlayerSlot].OwnerID = senderID
-
-    if requestedFaction then
-        --gameInfo.PlayerOptions[toPlayerSlot].Faction = gameInfo.Observers[fromObserverSlot].oldFaction or requestedFaction
-        gameInfo.PlayerOptions[toPlayerSlot].Faction = requestedFaction
-    end
-
-    if requestedPL then
-        gameInfo.PlayerOptions[toPlayerSlot].PL = requestedPL
-    end
-
-    if requestedRC then
-        gameInfo.PlayerOptions[toPlayerSlot].RC = requestedRC
-    end
-
-    if requestedNG then
-        gameInfo.PlayerOptions[toPlayerSlot].NG = requestedNG
-    end
-
-    for colorIndex,colorVal in gameColors.PlayerColors do
-        if IsColorFree(colorIndex) then
-            gameInfo.PlayerOptions[toPlayerSlot].PlayerColor = gameInfo.Observers[fromObserverSlot].oldColor or colorIndex
-            break
-        end
-    end
-
-    gameInfo.Observers[fromObserverSlot] = nil
-
-    lobbyComm:BroadcastData(
-        {
-            Type = 'ConvertObserverToPlayer',
-            OldSlot = fromObserverSlot,
-            NewSlot = toPlayerSlot,
-            Options =  gameInfo.PlayerOptions[toPlayerSlot],
-        }
-    )
-
-    SendSystemMessage(LOCF("<LOC lobui_0227>%s has switched from an observer to player.", name))
-    UpdateGame()
+	HostConvertObserverToPlayer(senderID, name, fromObserverSlot, toPlayerSlot, requestedFaction, requestedPL, requestedRC, requestedNG)
 end
 
 function HostClearPlayer(uid)
@@ -3434,8 +3367,8 @@ function CreateUI(maxPlayers)
 
     -- FIXME : this is not needed anymore.
     if lobbyComm:IsHost() then
-        SetGameOption('RandomMap', 'Off') --make sure always create lobby with Random Map off
-        SetGameOption('RankedGame', 'Off') --make sure always create lobby with Ranked Game off
+        SetGameOption('RandomMap', 'Off', false, true) --make sure always create lobby with Random Map off
+        SetGameOption('RankedGame', 'Off', false, true) --make sure always create lobby with Ranked Game off
     end
 
     if not singlePlayer then
@@ -3454,7 +3387,7 @@ function CreateUI(maxPlayers)
             Tooltip.AddControlTooltip(GUI.observerLabel, 'lob_describe_observers')
         GUI.allowObservers:SetCheck(false)
         if lobbyComm:IsHost() then
-            SetGameOption("AllowObservers", false)
+            SetGameOption("AllowObservers", false, false, true)
             GUI.allowObservers.OnCheck = function(self, checked)
                 SetGameOption("AllowObservers", checked)
             end
@@ -3462,6 +3395,8 @@ function CreateUI(maxPlayers)
             GUI.allowObservers:Disable()
             GUI.observerLabel:Disable()
         end
+		
+		UpdateGame()
 
         -- GO OBSERVER BUTTON --
         GUI.becomeObserver = UIUtil.CreateButtonStd2PNG(GUI.buttonPanelRight, '/BUTTON/observer/', '', 11, 19)
@@ -3471,16 +3406,20 @@ function CreateUI(maxPlayers)
             GUI.becomeObserver.OnClick = function()
                 if IsPlayer(localPlayerID) then
                     if lobbyComm:IsHost() then
-                        HostConvertPlayerToObserver(hostID, localPlayerName, FindSlotForID(localPlayerID))
+						--LOG('1 - GO Observer button : '..tostring(localPlayerName)..' / '..tostring(FindSlotForID(localPlayerID)))
+						HostConvertPlayerToObserver(hostID, localPlayerName, FindSlotForID(localPlayerID))
                     else
-                        lobbyComm:SendData(hostID, {Type = 'RequestConvertToObserver', RequestedName = localPlayerName, RequestedSlot = FindSlotForID(localPlayerID)})
+						--LOG('2 - GO Observer button : '..tostring(localPlayerName)..' / '..tostring(FindSlotForID(localPlayerID)))
+						lobbyComm:SendData(hostID, {Type = 'RequestConvertToObserver', RequestedName = localPlayerName, RequestedSlot = FindSlotForID(localPlayerID)})
                     end
 					GUI.becomeObserver.label:SetText('Go Player')
 				elseif IsObserver(localPlayerID) then
 					if lobbyComm:IsHost() then
-                        HostConvertObserverToPlayerWithoutSlot(hostID, localPlayerName, FindObserverSlotForID(localPlayerID))
+						--LOG('3 - GO Player button : '..tostring(localPlayerName)..' / '..tostring(FindSlotForID(localPlayerID)))
+						HostConvertObserverToPlayerWithoutSlot(hostID, localPlayerName, FindObserverSlotForID(localPlayerID))
                     else
-                        lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayerWithoutSlot', RequestedName = localPlayerName})
+						--LOG('4 - GO Player button : '..tostring(localPlayerName)..' / '..tostring(FindSlotForID(localPlayerID)))
+						lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayerWithoutSlot', RequestedName = localPlayerName, ObserverSlot = FindObserverSlotForID(localPlayerID)})
                     end
 					GUI.becomeObserver.label:SetText('Go Observer')
                 end
@@ -3553,15 +3492,15 @@ function CreateUI(maxPlayers)
                     Prefs.SetToCurrentProfile('Lobby_Gen_Cap', 8)
                     Prefs.SetToCurrentProfile('Lobby_Prebuilt_Units', 1)
                     Prefs.SetToCurrentProfile('Lobby_NoRushOption', 1)
-                    SetGameOption('Victory', 'demoralization')
-                    SetGameOption('Timeouts', '3')
-                    SetGameOption('CheatsEnabled', 'false')
-                    SetGameOption('CivilianAlliance', 'enemy')
-                    SetGameOption('GameSpeed', 'normal')
-                    SetGameOption('FogOfWar', 'explored')
-                    SetGameOption('UnitCap', '1000')
-                    SetGameOption('PrebuiltUnits', 'Off')
-                    SetGameOption('NoRushOption', 'Off')
+                    SetGameOption('Victory', 'demoralization', false, true)
+                    SetGameOption('Timeouts', '3', false, true)
+                    SetGameOption('CheatsEnabled', 'false', false, true)
+                    SetGameOption('CivilianAlliance', 'enemy', false, true)
+                    SetGameOption('GameSpeed', 'normal', false, true)
+                    SetGameOption('FogOfWar', 'explored', false, true)
+                    SetGameOption('UnitCap', '1000', false, true)
+                    SetGameOption('PrebuiltUnits', 'Off', false, true)
+                    SetGameOption('NoRushOption', 'Off', false, true)
                     --gameInfo.GameMods["656b7af6-9a56-47c5-8182-3a896dc6f4b7"] = true
                     --lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
 					lobbyComm:BroadcastData( { Type = "SetAllPlayerNotReady" } )
@@ -4864,28 +4803,30 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         -- set default lobby values
         for index, option in globalOpts do
             local defValue = Prefs.GetFromCurrentProfile(option.pref) or option.default
-            SetGameOption(option.key,option.values[defValue].key)
+            SetGameOption(option.key,option.values[defValue].key, false, true)
         end
 
         for index, option in teamOpts do
             local defValue = Prefs.GetFromCurrentProfile(option.pref) or option.default
-            SetGameOption(option.key,option.values[defValue].key)
+            SetGameOption(option.key,option.values[defValue].key, false, true)
         end
 
         for index, option in AIOpts do
             local defValue = Prefs.GetFromCurrentProfile(option.pref) or option.default
-            SetGameOption(option.key,option.values[defValue].key)
+            SetGameOption(option.key,option.values[defValue].key, false, true)
         end
 
 		if self.desiredScenario and self.desiredScenario != "" then
             Prefs.SetToCurrentProfile('LastScenario', self.desiredScenario)
-			SetGameOption('ScenarioFile',self.desiredScenario)
+			SetGameOption('ScenarioFile',self.desiredScenario, false, true)
         else
             local scen = Prefs.GetFromCurrentProfile('LastScenario')
             if scen and scen != "" then
-                SetGameOption('ScenarioFile',scen)
+                SetGameOption('ScenarioFile',scen, false, true)
             end
         end
+		
+		UpdateGame()
 
         GUI.keepAliveThread = ForkThread(
             -- Eject players who haven't sent a heartbeat in a while
@@ -4968,8 +4909,10 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     end
 end
 
-function SetPlayerOption(slot, key, val)
-    if not IsLocallyOwned(slot) then
+function SetPlayerOption(slot, key, val, ignoreRefresh)
+	ignoreRefresh = ignoreRefresh or false
+	
+	if not IsLocallyOwned(slot) then
         WARN("Hey you can't set a player option on a slot you don't own. (slot:"..tostring(slot).." / key:"..tostring(key).." / val:"..tostring(val)..")")
         return
     end
@@ -4990,7 +4933,9 @@ function SetPlayerOption(slot, key, val)
             Slot = slot,
         }
     )
-    UpdateGame()
+    if not ignoreRefresh then
+		UpdateGame()
+	end
 end
 
 function SetGameOption(key, val, ignoreNilValue, ignoreRefresh)
