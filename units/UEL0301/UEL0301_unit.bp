@@ -580,6 +580,14 @@ UnitBlueprint {
         },
     },
     EnhancementPresets = {
+        BubbleShield = {
+            BuildIconSortPriority = 30,
+            Enhancements = {
+                'Shield',
+                'ShieldGeneratorField',
+            },
+            SortCategory = 'SORTOTHER',
+        },
         Combat = {
             BuildIconSortPriority = 15,
             Enhancements = {
@@ -595,8 +603,8 @@ UnitBlueprint {
             },
             SortCategory = 'SORTOTHER',
         },
-        Jammer = {
-            BuildIconSortPriority = 30,
+        IntelJammer = {
+            BuildIconSortPriority = 35,
             Enhancements = {
                 'RadarJammer',
                 'SensorRangeEnhancer',
@@ -609,7 +617,6 @@ UnitBlueprint {
                 'AdvancedCoolingUpgrade',
                 'HighExplosiveOrdnance',
                 'Shield',
-                'ShieldGeneratorField',
             },
             SortCategory = 'SORTOTHER',
         },

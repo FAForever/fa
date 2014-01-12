@@ -541,11 +541,19 @@ UnitBlueprint {
         },
     },
     EnhancementPresets = {
+        AdvancedCombat = {
+            BuildIconSortPriority = 30,
+            Enhancements = {
+                'EnhancedSensors',
+                'DamageStabilization',
+                'Overcharge',
+            },
+            SortCategory = 'SORTOTHER',
+        },
         Combat = {
             BuildIconSortPriority = 15,
             Enhancements = {
                 'EnhancedSensors',
-                'DamageStabilization',
             },
             SortCategory = 'SORTOTHER',
         },
@@ -557,15 +565,22 @@ UnitBlueprint {
             SortCategory = 'SORTOTHER',
         },
         Missile = {
-            BuildIconSortPriority = 30,
+            BuildIconSortPriority = 40,
             Enhancements = {
                 'EngineeringThroughput',
                 'Missile',
             },
             SortCategory = 'SORTOTHER',
         },
-        Rambo = {
+        Nano = {
             BuildIconSortPriority = 25,
+            Enhancements = {
+                'DamageStabilization',
+            },
+            SortCategory = 'SORTOTHER',
+        },
+        Rambo = {
+            BuildIconSortPriority = 35,
             Enhancements = {
                 'Overcharge',
                 'Shield',
@@ -574,7 +589,7 @@ UnitBlueprint {
             SortCategory = 'SORTOTHER',
         },
         Teleporter = {
-            BuildIconSortPriority = 35,
+            BuildIconSortPriority = 45,
             Enhancements = {
                 'Teleporter',
             },

@@ -552,11 +552,10 @@ UnitBlueprint {
         },
     },
     EnhancementPresets = {
-        Combat = {
+        SimpleCombat = {
             BuildIconSortPriority = 15,
             Enhancements = {
                 'StabilitySuppressant',
-                'SystemIntegrityCompensator',
             },
             SortCategory = 'SORTOTHER',
         },
@@ -567,8 +566,16 @@ UnitBlueprint {
             },
             SortCategory = 'SORTOTHER',
         },
-        Rambo = {
+        NanoCombat = {
             BuildIconSortPriority = 25,
+            Enhancements = {
+                'StabilitySuppressant',
+                'SystemIntegrityCompensator',
+            },
+            SortCategory = 'SORTOTHER',
+        }, 
+        Rambo = {
+            BuildIconSortPriority = 35,
             Enhancements = {
                 'StabilitySuppressant',
                 'Shield',
@@ -576,12 +583,19 @@ UnitBlueprint {
             },
             SortCategory = 'SORTOTHER',
         },
-        Teleporter = {
+        ShieldCombat= {
             BuildIconSortPriority = 30,
             Enhancements = {
                 'StabilitySuppressant',
+                'Shield',
+            },
+            SortCategory = 'SORTOTHER',
+        },
+        Teleporter = {
+            BuildIconSortPriority = 40,
+            Enhancements = {
+                'StabilitySuppressant',
                 'Teleporter',
-                'EngineeringFocusingModule',
             },
             SortCategory = 'SORTOTHER',
         },
