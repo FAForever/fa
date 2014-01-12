@@ -129,6 +129,7 @@ UnitBlueprint {
         'SHOWQUEUE',
         'OVERLAYOMNI',
         'OVERLAYDIRECTFIRE',
+        'USEBUILDPRESETS',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -537,6 +538,47 @@ UnitBlueprint {
                 'TeleporterRemove',
             },
             Slot = 'RCH',
+        },
+    },
+    EnhancementPresets = {
+        Combat = {
+            BuildIconSortPriority = 15,
+            Enhancements = {
+                'EnhancedSensors',
+                'DamageStabilization',
+            },
+            SortCategory = 'SORTOTHER',
+        },
+        Engineer = {
+            BuildIconSortPriority = 20,
+            Enhancements = {
+                'EngineeringThroughput',
+            },
+            SortCategory = 'SORTOTHER',
+        },
+        Missile = {
+            BuildIconSortPriority = 30,
+            Enhancements = {
+                'EngineeringThroughput',
+                'Missile',
+            },
+            SortCategory = 'SORTOTHER',
+        },
+        Rambo = {
+            BuildIconSortPriority = 25,
+            Enhancements = {
+                'Overcharge',
+                'Shield',
+                'DamageStabilization',
+            },
+            SortCategory = 'SORTOTHER',
+        },
+        Teleporter = {
+            BuildIconSortPriority = 35,
+            Enhancements = {
+                'Teleporter',
+            },
+            SortCategory = 'SORTOTHER',
         },
     },
     General = {

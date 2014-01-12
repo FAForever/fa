@@ -127,6 +127,7 @@ UnitBlueprint {
         'SHOWQUEUE',
         'OVERLAYOMNI',
         'OVERLAYDIRECTFIRE',
+        'USEBUILDPRESETS',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -488,6 +489,55 @@ UnitBlueprint {
                 'SwitchbackRemove',
             },
             Slot = 'LCH',
+        },
+    },
+    EnhancementPresets = {
+        AntiAir = {
+            BuildIconSortPriority = 45,
+            Enhancements = {
+                'NaniteMissileSystem',
+            },
+            SortCategory = 'SORTOTHER',
+        },
+        Cloak = {
+            BuildIconSortPriority = 35,
+            Enhancements = {
+                'FocusConvertor',
+                'StealthGenerator',
+                'CloakingGenerator',
+            },
+            SortCategory = 'SORTOTHER',
+        },
+        Combat = {
+            BuildIconSortPriority = 15,
+            Enhancements = {
+                'EMPCharge',
+                'FocusConvertor',
+            },
+            SortCategory = 'SORTOTHER',
+        },
+        Engineer = {
+            BuildIconSortPriority = 20,
+            Enhancements = {
+                'Switchback',
+            },
+            SortCategory = 'SORTOTHER',
+        },
+        Rambo = {
+            BuildIconSortPriority = 25,
+            Enhancements = {
+                'EMPCharge',
+                'FocusConvertor',
+                'SelfRepairSystem',
+            },
+            SortCategory = 'SORTOTHER',
+        },
+        Stealth = {
+            BuildIconSortPriority = 30,
+            Enhancements = {
+                'StealthGenerator',
+            },
+            SortCategory = 'SORTOTHER',
         },
     },
     General = {

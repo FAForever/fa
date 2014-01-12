@@ -175,6 +175,8 @@ Unit = Class(moho.unit_methods) {
         # Set number of effects per damage depending on its volume
         local x, y, z = self:GetUnitSizes()
         local vol = x*y*z
+
+        self:ShowPresetEnhancementBones()  # Added by Brute51 for unit enhancement presets
 		
         local damageamounts = 1
         if vol >= 20 then
@@ -2273,6 +2275,11 @@ Unit = Class(moho.unit_methods) {
         else
             self.MovementEffectsExist = false
         end
+
+        # Added by Brute51 for unit enhancement presets
+        if bp.EnhancementPresetAssigned then
+            self:CreatePresetEnhancements()
+        end
     end,
 
     StartBeingBuiltEffects = function(self, builder, layer)
@@ -2316,6 +2323,59 @@ Unit = Class(moho.unit_methods) {
         self.SiloProjectile = nil
     end,
 
+
+    ##########################################################################################
+    ## UNIT ENHANCEMENT PRESETS
+    ##########################################################################################
+    # Added by Brute51, copied from Nomads code for SCU presets
+
+    ShowPresetEnhancementBones = function(self)
+        # hide bones not involved in the preset enhancements.
+        # Useful during the build process to show the contours of the unit being built. Only visual.
+
+        local bp = self:GetBlueprint()
+
+        if bp.Enhancements then
+
+            # create a blank slate: hide all enhancement bones as specified in the unit BP
+            for k, enh in bp.Enhancements do
+                if enh.HideBones then
+                    for _, bone in enh.HideBones do
+                        self:HideBone(bone, true)
+                    end
+                end
+            end
+
+            # For the barebone version we're done here. For the presets versions: show the bones of the enhancements we'll create later on
+            if bp.EnhancementPresetAssigned then
+                for k, v in bp.EnhancementPresetAssigned.Enhancements do
+
+                    # first show all relevant bones
+                    if bp.Enhancements[v] and bp.Enhancements[v].ShowBones then
+                        for _, bone in bp.Enhancements[v].ShowBones do
+                            self:ShowBone(bone, true)
+                        end
+                    end
+
+                    # now hide child bones of previously revealed bones, that should remain hidden
+                    if bp.Enhancements[v] and bp.Enhancements[v].HideBones then
+                        for _, bone in bp.Enhancements[v].HideBones do
+                            self:HideBone(bone, true)
+                        end
+                    end
+                end
+            end
+        end
+    end,
+
+    CreatePresetEnhancements = function(self)
+        local bp = self:GetBlueprint()
+        if bp.Enhancements and bp.EnhancementPresetAssigned and bp.EnhancementPresetAssigned.Enhancements then
+            for k, v in bp.EnhancementPresetAssigned.Enhancements do
+                self:CreateEnhancement(v)
+            end
+        end
+    end,
 
     #############################################################################################
     ## CONSTRUCTING - BUILDING - REPAIR

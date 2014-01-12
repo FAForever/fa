@@ -378,7 +378,7 @@ function HandleUnitWithBuildPresets(bps, allUnitBlueprints)
             tempBp.EnhancementPresets = nil
 
             table.insert( allUnitBlueprints.Unit, tempBp )
-            LOG('*DEBUG: created preset unit '..repr(tempBp.BlueprintId))
+            #LOG('*DEBUG: created preset unit '..repr(tempBp.BlueprintId))
 
             BlueprintLoaderUpdateProgress()
         end
