@@ -323,7 +323,7 @@ UnitBlueprint {
             Turreted = true,
 	    UseFiringSolutionInsteadOfAimBone = true,		#Added
             WeaponCategory = 'Direct Fire Naval',
-            WeaponRepackTimeout = 0,				#2 - And again.
+            WeaponRepackTimeout = 2,
             WeaponUnpacks = false,
         },
         {
@@ -400,7 +400,7 @@ UnitBlueprint {
             Turreted = true,
 	    UseFiringSolutionInsteadOfAimBone = true,		#Added
             WeaponCategory = 'Direct Fire Naval',
-            WeaponRepackTimeout = 0,				#2
+            WeaponRepackTimeout = 2,
             WeaponUnpacks = false,
         },
         {
