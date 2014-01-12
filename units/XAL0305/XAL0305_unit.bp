@@ -242,10 +242,10 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 2,
+            FiringTolerance = 0.5, # 2
             Label = 'MainGun',
             MaxRadius = 70,
-            FiringRandomnessWhileMoving = 0.8,
+            FiringRandomnessWhileMoving = 0.75,
             MuzzleChargeDelay = 1,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
@@ -292,7 +292,7 @@ UnitBlueprint {
             TurretPitchSpeed = 30,
             TurretYaw = 0,
             TurretYawRange = 180,
-            TurretYawSpeed = 75,
+            TurretYawSpeed = 90, # 75
             Turreted = true,
             WeaponCategory = 'Direct Fire',
             WeaponRepackTimeout = 0,

@@ -275,7 +275,7 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 2,
+            FiringTolerance = 0.5, # 2
             IgnoreIfDisabled = true,
             Label = 'MainGun',
             MaxRadius = 65,
@@ -348,7 +348,7 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 2,
+            FiringTolerance = 0.5, # 2
             IgnoreIfDisabled = true,
             Label = 'SniperGun',
             MaxRadius = 75,
