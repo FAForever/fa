@@ -12,6 +12,10 @@ gwReinforcements = {
 	},
 	periodicUnitWarp = {
 	},
+	passiveItems = {
+		playerName = "Ze_PilOt",
+		itemNames = {"autorecall"}
+	},
 	transportedUnits = {
 		{
 			playerName = "Ze_PilOt",

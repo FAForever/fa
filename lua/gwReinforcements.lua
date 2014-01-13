@@ -236,8 +236,6 @@ InitialStructuresSpawnThread = function(List, Army)
 	            # if not.
 	            TryCopyPose(self,prop,false)
 
-	            prop.AssociatedBP = self:GetBlueprint().BlueprintId
-
 				# Create some ambient wreckage smoke
 				explosion.CreateWreckageEffects(self,prop)
 
