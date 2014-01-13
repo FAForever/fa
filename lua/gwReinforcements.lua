@@ -408,7 +408,6 @@ end
 
 #this function check all the units delay to spawn them.
 CheckUnitsDelay = function(ACU)
-	LOG("checking reinforcements")
 	ACU.unitsDelays = {}
 	local brain = ACU:GetAIBrain()
 	for index, List in ScenarioInfo.gwReinforcementList.transportedUnits do
@@ -418,7 +417,6 @@ CheckUnitsDelay = function(ACU)
 			LOG(repr(List))
 		end 
 	end
-	LOG("done checking reinforcements")
 end
 
 DespawnBeacon = function(ACU)
@@ -435,40 +433,6 @@ DespawnBeacon = function(ACU)
 	end
 	ACU.ReinforcementsBeacon = nil
 	return
-end
-
-timerBeacon2 = function(self)
-	while true do
-		beaconTime[self.ArmyIndex] = beaconTime[self.ArmyIndex] + 1
-		local toRemove = {}
-		for index, List in self.engineersDelays do
-			if List.delay == beaconTime[self.ArmyIndex] then
-				CallEngineersToBeacon(self, List)
-				table.insert(toRemove, index)
-			end
-		end
-
-		for _, index in toRemove do
-			table.remove(self.engineersDelays, index)
-		end
-
-		local toRemove = {}
-		for index, List in self.unitsDelays do
-			if List.delay == beaconTime[self.ArmyIndex] then
-				CallReinforcementsToBeacon(self, List)
-				table.insert(toRemove, index)
-			end
-		end
-
-		for _, index in toRemove do
-			table.remove(self.unitsDelays, index)
-		end
-
-		if table.getn( self.unitsDelays ) == 0 and table.getn( self.engineersDelays ) == 0 then
-			break
-		end
-	 	WaitSeconds(1)
-	end
 end
 
 CallEngineersToBeacon = function(beacon, List)

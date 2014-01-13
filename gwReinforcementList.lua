@@ -8,16 +8,6 @@ gwReinforcements = {
 			},
 		},
 	},
-	builtByEngineerStructure = { 
-		{
-			playerName = "Ze_PilOt",
-			called = false,
-			delay = 150,
-			unitNames = {
-				"UEB4201",
-			},
-		},
-	},
 	initialUnitWarp = {
 	},
 	periodicUnitWarp = {
@@ -30,6 +20,7 @@ gwReinforcements = {
 			group = 1,
 			unitNames = {
 				"UEL0202","UEL0202","UEL0202","UEL0202","UEL0202","UEL0202",  #six pillars
+				"UEB4201", # one defense
 			},
 		},
 
@@ -53,6 +44,25 @@ gwReinforcements = {
 				"URL0304","URL0304","URL0304",
 			},
 		},
-
+		{
+			playerName = "Ze_PilOt",
+			called = false,
+			delay = 200,
+			group = 4,
+			unitNames = {
+				"UEL0202","UEL0202","UEL0202",  #six pillars
+				"URL0304","URL0304","URL0304",
+			},
+		},
+		{
+			playerName = "Ze_PilOt",
+			called = false,
+			delay = 200,
+			group = 5,
+			unitNames = {
+				"UEL0202","UEL0202","UEL0202",  #six pillars
+				"URL0304","URL0304","URL0304",
+			},
+		},		
 	},
 }
