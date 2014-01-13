@@ -334,6 +334,7 @@ ModHumanACU =  function(ACU)
 		self.OldOnStartBuild(self, unitBeingBuilt, order)
 	end
 	CheckUnitsDelay(ACU)
+	CheckPassiveItems(ACU)
 
 
 end
@@ -415,6 +416,19 @@ ModBeacon = function(ACU, beacon)
 	end
 end
 
+# this function check all passive items.
+CheckPassiveItems = function(ACU)
+	local brain = ACU:GetAIBrain()
+	for index, List in ScenarioInfo.gwReinforcementList.passiveItems do
+		if List.playerName == brain.Nickname then
+			for index, itemname in List.itemNames do
+				if itemname == "autorecall" then
+					ACU:AddAutoRecall()
+				end
+			end
+		end
+	end
+end
 
 #this function check all the units delay to spawn them.
 CheckUnitsDelay = function(ACU)
@@ -424,7 +438,6 @@ CheckUnitsDelay = function(ACU)
 		if List.playerName == brain.Nickname then
 			brain:AddReinforcements(List)
 			table.insert(ACU.unitsDelays, List)
-			LOG(repr(List))
 		end 
 	end
 end

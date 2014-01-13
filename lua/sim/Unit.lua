@@ -4397,6 +4397,18 @@ Unit = Class(moho.unit_methods) {
     ## RECALL (for Galactic War)
     ##########################################################################################
 
+    AddAutoRecall = function(self)
+        self.DoDeathWeapon = function(self)
+            local aiBrain = self:GetAIBrain()
+            aiBrain:OnRecall()
+            self:PlayTeleportOutEffects()
+            self:CleanupTeleportChargeEffects()
+            self:StopUnitAmbientSound('TeleportLoop')
+            self:PlayUnitSound('TeleportEnd')
+            self:Destroy()            
+        end
+    end,
+
     Recall  = function(self)
         self:CleanupTeleportChargeEffects()
         if self.RecallTime then
