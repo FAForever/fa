@@ -4356,6 +4356,11 @@ Unit = Class(moho.unit_methods) {
     UpdateTeleportProgress = function(self, progress)
         #LOG(' UpdatingTeleportProgress ')
         self:SetWorkProgress(progress)
+
+        local scale = math.max( progress, 0.01 )
+        for k, fx in self.TeleportDestChargeBag do
+            fx:ScaleEmitter(scale)
+        end
     end,
 
     InitiateTeleportThread = function(self, teleporter, location, orientation)
@@ -4378,7 +4383,7 @@ Unit = Class(moho.unit_methods) {
         self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
 
         # create teleport charge effect
-        self:PlayTeleportChargeEffects()
+        self:PlayTeleportChargeEffects( location, orientation )
 
         WaitFor( self.TeleportDrain  ) # Perform fancy Teleportation FX here
 
@@ -4406,16 +4411,31 @@ Unit = Class(moho.unit_methods) {
         self.TeleportThread = nil
     end,
 
-    PlayTeleportChargeEffects = function(self)
+    PlayTeleportChargeEffects = function(self, location, orientation)
         local army = self:GetArmy()
         local bp = self:GetBlueprint()
 
+        # Creating teleport fx at unit location
         self.TeleportChargeBag = {}
         for k, v in EffectTemplate.GenericTeleportCharge01 do
             local fx = CreateEmitterAtEntity(self,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
             self.Trash:Add(fx)
             table.insert( self.TeleportChargeBag, fx)
         end
+
+        # Creating teleport fx at target location
+        self.TeleportDestChargeBag = {}
+        local pos = table.copy( location )
+        pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
+        local TeleportDestFxEntity = Entity()
+        Warp( TeleportDestFxEntity, pos )
+        for k, v in EffectTemplate.GenericTeleportCharge02 do
+            local fx = CreateEmitterAtEntity( TeleportDestFxEntity, army, v )
+            fx:ScaleEmitter(0.01)
+            self.Trash:Add(fx)
+            table.insert( self.TeleportDestChargeBag, fx)
+        end
+        TeleportDestFxEntity:Destroy()
     end,
 
     CleanupTeleportChargeEffects = function( self )
@@ -4424,6 +4444,12 @@ Unit = Class(moho.unit_methods) {
                 values:Destroy()
             end
             self.TeleportChargeBag = {}
+        end
+        if self.TeleportDestChargeBag then
+            for keys,values in self.TeleportDestChargeBag do
+                values:Destroy()
+            end
+            self.TeleportDestChargeBag = {}
         end
     end,
 
@@ -4434,7 +4460,6 @@ Unit = Class(moho.unit_methods) {
             emit = CreateEmitterAtEntity(self,army,v)
         end
     end,
-
 
     PlayTeleportInEffects = function(self)
         local army = self:GetArmy()
