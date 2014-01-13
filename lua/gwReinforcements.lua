@@ -518,18 +518,18 @@ CalculateNearestOffMapLocation = function(beacon)
 	# Are we closer to top or bottom?
 	local vert = {}
 	local hori = {}
-	vert = {BeaconPosition[1], BeaconPosition[2], ScenarioInfo.PlayableArea[4]}
+	vert = {BeaconPosition[1] + Random(-20, 20), BeaconPosition[2], ScenarioInfo.PlayableArea[4]}
 	if VDist3(corner1,BeaconPosition) < VDist3(corner4,BeaconPosition) then
 		#we are closer to top
-		vert = {BeaconPosition[1], BeaconPosition[2], ScenarioInfo.PlayableArea[2]}
+		vert = {BeaconPosition[1] + Random(-20, 20), BeaconPosition[2], ScenarioInfo.PlayableArea[2]}
 		
 	end
 	
 	# Are we closer to left or right?
-	hori = {ScenarioInfo.PlayableArea[3], BeaconPosition[2], BeaconPosition[3]}
+	hori = {ScenarioInfo.PlayableArea[3], BeaconPosition[2], BeaconPosition[3] + Random(-20, 20)}
 	if VDist3(corner1,BeaconPosition) < VDist3(corner2,BeaconPosition) then
 		#we are closer to left
-		hori = {ScenarioInfo.PlayableArea[1], BeaconPosition[2], BeaconPosition[3]}
+		hori = {ScenarioInfo.PlayableArea[1], BeaconPosition[2], BeaconPosition[3] + Random(-20, 20)}
 	end	
 	
 	# what is the closer spawn location, horizontal or vertical?
@@ -608,6 +608,8 @@ SpawnTransportAndIssueDrop = function(transportBPid, units, NearestOffMapLocatio
 	end	
 
 	transport.OffMapExcempt = true
+	transport:SetUnSelectable(true)
+	transport:SetFireState(1)
 
 	local aiBrain = transport:GetAIBrain()
 	local Transports = aiBrain:MakePlatoon( '', '' )
@@ -615,10 +617,15 @@ SpawnTransportAndIssueDrop = function(transportBPid, units, NearestOffMapLocatio
 
 	ScenarioFramework.AttachUnitsToTransports(units, {transport})
 	local beaconPosition = beacon:GetPosition()
-	
-	
-	
+
+	beaconPosition.x = beaconPosition.x + Random(-10,10)
+	beaconPosition.z = beaconPosition.z + Random(-10,10)
+
+
 	cmd = Transports:MoveToLocation(beaconPosition, false)
+	
+
+	beacon.AiBrain:ReinforcementsCalled(group)
 	if cmd then
 		while Transports:IsCommandsActive(cmd) do
 			WaitSeconds(1)
@@ -627,13 +634,11 @@ SpawnTransportAndIssueDrop = function(transportBPid, units, NearestOffMapLocatio
 			end
 		end
 	end
-		
-	Transports:UnloadAllAtLocation(beaconPosition)
-	transport:SetUnSelectable(true)
 	
+	Transports:UnloadAllAtLocation(beaconPosition)
+
 	WaitSeconds(5)
 	if not transport:IsDead() then
-		beacon.AiBrain:ReinforcementsCalled(group)
 		Transports:MoveToLocation(NearestOffMapLocation, false)
 	end
 	while not transport:IsDead() and not IsUnitCloseToPoint(transport,NearestOffMapLocation) do
@@ -739,9 +744,13 @@ SpawnEngineerAndTransportAndBuildTheStructure = function(EngineerBPid, Structure
 	ScenarioFramework.AttachUnitsToTransports({engineer}, {transport})
 
 	local beaconPosition = beacon:GetPosition()
+	beaconPosition.x = beaconPosition.x + Random(-10,10)
+	beaconPosition.z = beaconPosition.z + Random(-10,10)
+
 
 	cmd = Transports:MoveToLocation(beaconPosition, false)
 	if cmd then
+		beacon.AiBrain:ReinforcementsCalled(group)
 		while Transports:IsCommandsActive(cmd) do
 			WaitSeconds(1)
 			if not aiBrain:PlatoonExists(Transports) then
@@ -763,7 +772,7 @@ SpawnEngineerAndTransportAndBuildTheStructure = function(EngineerBPid, Structure
 	end
 	if not engineer:IsDead() then
 		aiBrain:BuildStructure(engineer, StructureBPid, BuildLocation)
-		ModEngineer(engineer, TransportBPid, beacon, group)
+		ModEngineer(engineer, TransportBPid, beacon)
 		
 		
 		
@@ -782,7 +791,7 @@ SpawnEngineerAndTransportAndBuildTheStructure = function(EngineerBPid, Structure
 	
 end
 
-ModEngineer = function(engineer, transportBPid, beacon, group)
+ModEngineer = function(engineer, transportBPid, beacon)
 	engineer.CanIBuild = true
 	engineer.transportBPid = transportBPid
 	engineer.OldOnStopBuild = engineer.OnStopBuild
@@ -811,7 +820,6 @@ ModEngineer = function(engineer, transportBPid, beacon, group)
 		end
 		self.CanIBuild = false
 		#unitBeingBuilt:SetUnSelectable(true)
-		beacon.AiBrain:ReinforcementsCalled(group)
 		self.OldOnStartBuild(self, unitBeingBuilt, order)
 		#engineer:SetActiveConsumptionInactive()
 	end
