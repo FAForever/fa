@@ -335,9 +335,6 @@ ModHumanACU =  function(ACU)
 		end
 		self.OldOnStartBuild(self, unitBeingBuilt, order)
 	end
-
-
-	CheckEngineersDelay(ACU)
 	CheckUnitsDelay(ACU)
 
 
@@ -383,8 +380,32 @@ ModBeacon = function(ACU, beacon)
 		local toRemove = {}
 		curTime = GetGameTimeSeconds()
 		for idx, List in self.ACU.unitsDelays do
+
 			if List.group == index and List.delay <= curTime then
-				CallReinforcementsToBeacon(self, List)
+				Units = {}
+				Buildings = {}
+				# split between units & building
+				for index, unitBPid in List.unitNames do
+					bp = GetUnitBlueprintByName(unitBPid)
+					if bp.Categories then
+						local cats = {} 
+						for k,cat in pairs(bp.Categories) do
+							cats[cat] = true
+						end							
+						if cats.STRUCTURE then
+							table.insert(Buildings, unitBPid)
+						else
+							table.insert(Units, unitBPid)
+						end
+					end
+
+				end
+				if table.getn(Units) > 0 then
+					CallReinforcementsToBeacon(self, Units, List.group)
+				end
+				if table.getn(Buildings) > 0 then
+					CallEngineersToBeacon(self, Buildings, List.group)
+				end
 				table.insert(toRemove, idx)
 			end
 		end
@@ -396,15 +417,6 @@ ModBeacon = function(ACU, beacon)
 	end
 end
 
-#this function check all the engineers delay to spawn them.
-CheckEngineersDelay = function(ACU)
-	ACU.engineersDelays = {}
-	for index, List in ScenarioInfo.gwReinforcementList.builtByEngineerStructure do
-		if List.playerName == ACU:GetAIBrain().Nickname then
-			table.insert(ACU.engineersDelays, List)
-		end 
-	end
-end
 
 #this function check all the units delay to spawn them.
 CheckUnitsDelay = function(ACU)
@@ -435,7 +447,7 @@ DespawnBeacon = function(ACU)
 	return
 end
 
-CallEngineersToBeacon = function(beacon, List)
+CallEngineersToBeacon = function(beacon, List, group)
 	#bring in units + engineers + etc
 	#beacon.Army = nil
 	#for x, Army in ListArmies() do
@@ -451,17 +463,17 @@ CallEngineersToBeacon = function(beacon, List)
 	beacon.Team = ScenarioInfo.ArmySetup[beacon.ArmyName].Team
 
 
-	beacon.StructureReinforcementsToCall = List.unitNames
+	beacon.StructureReinforcementsToCall = List
 
 	beacon.NearestOffMapLocation = CalculateNearestOffMapLocation(beacon)
 
-	#WARN('beacon.StructureReinforcementsToCall is ' .. repr(beacon.StructureReinforcementsToCall))
+	WARN('beacon.StructureReinforcementsToCall is ' .. repr(beacon.StructureReinforcementsToCall))
 	if beacon.StructureReinforcementsToCall then
-		SpawnBuildByEngineerReinforcements(beacon, beacon.StructureReinforcementsToCall)
+		SpawnBuildByEngineerReinforcements(beacon, beacon.StructureReinforcementsToCall, group)
 	end
 end
 
-CallReinforcementsToBeacon = function(beacon, List)
+CallReinforcementsToBeacon = function(beacon, List, group)
 	#bring in units + engineers + etc
 	#beacon.Army = nil
 	#for x, Army in ListArmies() do
@@ -475,15 +487,14 @@ CallReinforcementsToBeacon = function(beacon, List)
 	beacon.Nickname = beacon.AiBrain.Nickname
 	beacon.ArmyName = beacon.AiBrain.Name
 	beacon.Team = ScenarioInfo.ArmySetup[beacon.ArmyName].Team
-	WARN('gwReinforcementList.TransportedUnits is ' .. repr(ScenarioInfo.gwReinforcementList.transportedUnits))
+	#WARN('gwReinforcementList.TransportedUnits is ' .. repr(ScenarioInfo.gwReinforcementList.transportedUnits))
 	
-	beacon.UnitReinforcementsToCall = List.unitNames
+	beacon.UnitReinforcementsToCall = List
 
 	beacon.NearestOffMapLocation = CalculateNearestOffMapLocation(beacon)
 	#WARN('beacon.UnitReinforcementsToCall is ' .. repr(beacon.UnitReinforcementsToCall))
 	if beacon.UnitReinforcementsToCall then
-		SpawnTransportedReinforcements(beacon, beacon.UnitReinforcementsToCall)
-		beacon.AiBrain:ReinforcementsCalled(List.group)
+		SpawnTransportedReinforcements(beacon, beacon.UnitReinforcementsToCall, group)
 	end
 end
 
@@ -532,7 +543,7 @@ CalculateNearestOffMapLocation = function(beacon)
 	return NearestOffMapLocation
 end
 
-SpawnTransportedReinforcements = function(beacon, unitsToSpawn)
+SpawnTransportedReinforcements = function(beacon, unitsToSpawn, group)
 	WARN('Spawningtransported Reinforcements')
 	local NearestOffMapLocation = beacon.NearestOffMapLocation 
 	local UnitsToTransport = {}
@@ -565,14 +576,14 @@ SpawnTransportedReinforcements = function(beacon, unitsToSpawn)
 			table.insert(LoadForThisTransport, unit)
 			#if we reached max load for one transport, spawn it, load unit, set orders, start counting again 
 			if counter == TransportCapacity then
-				ForkThread(SpawnTransportAndIssueDrop, TransportInfo[beacon.Faction].Name, LoadForThisTransport, NearestOffMapLocation, beacon)
+				ForkThread(SpawnTransportAndIssueDrop, TransportInfo[beacon.Faction].Name, LoadForThisTransport, NearestOffMapLocation, beacon, group)
 				counter = 0
 				LoadForThisTransport = {}
 			end	
 		end
 		#this is to make sure we spawn a transport even if we don't have enough units to completely fill one up'
 		if counter > 0 then
-			ForkThread(SpawnTransportAndIssueDrop, TransportInfo[beacon.Faction].Name, LoadForThisTransport, NearestOffMapLocation, beacon)
+			ForkThread(SpawnTransportAndIssueDrop, TransportInfo[beacon.Faction].Name, LoadForThisTransport, NearestOffMapLocation, beacon, group)
 		end
 	end
 	
@@ -583,7 +594,7 @@ SpawnTransportedReinforcements = function(beacon, unitsToSpawn)
 
 end
 
-SpawnTransportAndIssueDrop = function(transportBPid, units, NearestOffMapLocation, beacon)
+SpawnTransportAndIssueDrop = function(transportBPid, units, NearestOffMapLocation, beacon, group)
 
 	#WARN('spawning transport, bpid and army are ' .. repr(transportBPid) .. ' and ' .. repr(beacon.ArmyName))
 	local transport = CreateUnitHPR(transportBPid, armySupport[beacon.Team], NearestOffMapLocation[1], NearestOffMapLocation[2], NearestOffMapLocation[3],0,0,0)
@@ -622,6 +633,7 @@ SpawnTransportAndIssueDrop = function(transportBPid, units, NearestOffMapLocatio
 	
 	WaitSeconds(5)
 	if not transport:IsDead() then
+		beacon.AiBrain:ReinforcementsCalled(group)
 		Transports:MoveToLocation(NearestOffMapLocation, false)
 	end
 	while not transport:IsDead() and not IsUnitCloseToPoint(transport,NearestOffMapLocation) do
@@ -664,7 +676,7 @@ end
 
 
 
-SpawnBuildByEngineerReinforcements = function(beacon, StructuresToBuild)
+SpawnBuildByEngineerReinforcements = function(beacon, StructuresToBuild, group)
 	local EngineersToSpawnAndOrdersAndTransport = {}
 	local NearestOffMapLocation = beacon.NearestOffMapLocation 
 	local counter = 0
@@ -684,7 +696,7 @@ SpawnBuildByEngineerReinforcements = function(beacon, StructuresToBuild)
 	for index, EngineerStructureTransportSet in EngineersToSpawnAndOrdersAndTransport do
 		counter = counter + 1
 		local BuildLocation = CalculateBuildLocationByCounterAndPosition(counter, beacon:GetPosition())
-		ForkThread(SpawnEngineerAndTransportAndBuildTheStructure,EngineerStructureTransportSet[1], EngineerStructureTransportSet[2], EngineerStructureTransportSet[3], BuildLocation, beacon)	
+		ForkThread(SpawnEngineerAndTransportAndBuildTheStructure,EngineerStructureTransportSet[1], EngineerStructureTransportSet[2], EngineerStructureTransportSet[3], BuildLocation, beacon, group)	
 	end
 	
 end
@@ -709,7 +721,7 @@ CalculateBuildLocationByCounterAndPosition = function(counter, position)
 	return BuildLocation
 end
 
-SpawnEngineerAndTransportAndBuildTheStructure = function(EngineerBPid, StructureBPid, TransportBPid, BuildLocation, beacon)
+SpawnEngineerAndTransportAndBuildTheStructure = function(EngineerBPid, StructureBPid, TransportBPid, BuildLocation, beacon, group)
 	local NearestOffMapLocation = CalculateNearestOffMapLocation(beacon)
 	local engineer = CreateUnitHPR(EngineerBPid, armySupport[beacon.Team], NearestOffMapLocation[1], NearestOffMapLocation[2], NearestOffMapLocation[3],0,0,0)
 	engineer.ArmyName = armySupport[beacon.Team]
@@ -751,7 +763,7 @@ SpawnEngineerAndTransportAndBuildTheStructure = function(EngineerBPid, Structure
 	end
 	if not engineer:IsDead() then
 		aiBrain:BuildStructure(engineer, StructureBPid, BuildLocation)
-		ModEngineer(engineer, TransportBPid)
+		ModEngineer(engineer, TransportBPid, beacon, group)
 		
 		
 		
@@ -770,7 +782,7 @@ SpawnEngineerAndTransportAndBuildTheStructure = function(EngineerBPid, Structure
 	
 end
 
-ModEngineer = function(engineer, transportBPid)
+ModEngineer = function(engineer, transportBPid, beacon, group)
 	engineer.CanIBuild = true
 	engineer.transportBPid = transportBPid
 	engineer.OldOnStopBuild = engineer.OnStopBuild
@@ -799,6 +811,7 @@ ModEngineer = function(engineer, transportBPid)
 		end
 		self.CanIBuild = false
 		#unitBeingBuilt:SetUnSelectable(true)
+		beacon.AiBrain:ReinforcementsCalled(group)
 		self.OldOnStartBuild(self, unitBeingBuilt, order)
 		#engineer:SetActiveConsumptionInactive()
 	end
