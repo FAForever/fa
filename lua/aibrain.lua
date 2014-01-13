@@ -471,8 +471,6 @@ AIBrain = Class(moho.aibrain_methods) {
     OnCreateHuman = function(self, planName)
 		self.support  = false
         self:CreateBrainShared(planName)
-
-		
         ####For handicap mod compatibility
         if DiskGetFileInfo('/lua/HandicapUtilities.lua') then
             for name,data in ScenarioInfo.ArmySetup do
@@ -522,8 +520,7 @@ AIBrain = Class(moho.aibrain_methods) {
             end
         end
     end,
-	
-	
+
     RemoveSpecialAbilityUnit = function(self, unit, type, autoDisable)
         if self.SpecialAbilityUnits[type] then
             local unitId = unit:GetEntityId()
@@ -1198,6 +1195,12 @@ AIBrain = Class(moho.aibrain_methods) {
 
     OnRecall = function(self)
         local result = string.format("%s %i", "recall", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
+        table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
+        self:AddArmyStat("Recall", 1)
+    end,
+
+    OnAutoRecall = function(self)
+        local result = string.format("%s %i", "autorecall", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
         table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
         self:AddArmyStat("Recall", 1)
     end,

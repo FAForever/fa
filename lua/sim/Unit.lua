@@ -4400,7 +4400,7 @@ Unit = Class(moho.unit_methods) {
     AddAutoRecall = function(self)
         self.DoDeathWeapon = function(self)
             local aiBrain = self:GetAIBrain()
-            aiBrain:OnRecall()
+            aiBrain:OnAutoRecall()
             self:PlayTeleportOutEffects()
             self:CleanupTeleportChargeEffects()
             self:StopUnitAmbientSound('TeleportLoop')
