@@ -1220,12 +1220,11 @@ AIBrain = Class(moho.aibrain_methods) {
         
         # seems that FA send the OnDeath twice : one when losing, the other when disconnecting. But we only want it one time !
         
-        if math.floor(self:GetArmyStat("Recall",0.0).Value) != 1 then
+        if math.floor(self:GetArmyStat("Recall",0.0).Value) != 1 and math.floor(self:GetArmyStat("FAFWin",0.0).Value) == 0 then
         
             if math.floor(self:GetArmyStat("FAFLose",0.0).Value) != -1 then
                 self:AddArmyStat("FAFLose", -1)
             end
-            
             
             local result = string.format("%s %i", "defeat", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
             table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
@@ -1295,7 +1294,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
     
     OnVictory = function(self)
-        self:AddArmyStat("FAFWin", 5) 
+        self:AddArmyStat("FAFWin", 1) 
         local result = string.format("%s %i", "victory", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
         table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
         
