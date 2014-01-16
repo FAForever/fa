@@ -401,6 +401,11 @@ GenericTeleportIn01 = {
     EmtBpPath .. 'generic_teleportin_05_emit.bp',
 }
 
+SeraphimTeleportCharge01 = {
+    EmtBpPath .. 'seraphim_teleport_charge_01_emit.bp', 
+    EmtBpPath .. 'seraphim_teleport_charge_02_emit.bp', 
+}
+
 #---------------------------------------------------------------
 # ### UNIT CONSTRUCTION ###
 

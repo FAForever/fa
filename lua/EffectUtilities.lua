@@ -1409,3 +1409,176 @@ IsHumanUnit = function(self)
 
 
 end
+
+function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
+    # plays teleport effects for the given unit
+    if not unit then
+        return
+    end
+
+    local army = unit:GetArmy()
+    local bp = unit:GetBlueprint()
+    local faction = bp.General.FactionName
+
+    if faction == 'Aeon' then
+
+    elseif faction == 'Cybran' then
+
+    elseif faction == 'Seraphim' then
+
+        # Creating teleport fx at unit location
+        if bp.Display.TeleportEffects.PlayChargeFxAtUnit != false then
+            unit.TeleportChargeBag = {}
+            local templ = unit.TeleportChargeFxAtUnitOverride or EffectTemplate.SeraphimTeleportCharge01
+            for k, v in templ do
+                local fx = CreateEmitterAtEntity(unit,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
+                unit.Trash:Add(fx)
+                table.insert( unit.TeleportChargeBag, fx)
+                EffectsBag:Add(fx)
+            end
+        end
+
+    else  # UEF or other factions
+
+        # Creating teleport fx at unit location
+        if bp.Display.TeleportEffects.PlayChargeFxAtUnit != false then
+            unit.TeleportChargeBag = {}
+            local templ = unit.TeleportChargeFxAtUnitOverride or EffectTemplate.GenericTeleportCharge01
+            for k, v in templ do
+                local fx = CreateEmitterAtEntity(unit,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
+                unit.Trash:Add(fx)
+                table.insert( unit.TeleportChargeBag, fx)
+                EffectsBag:Add(fx)
+            end
+        end
+
+        # Creating teleport fx at target location
+        if bp.Display.TeleportEffects.PlayChargeFxAtDestination != false then
+            unit.TeleportDestChargeBag = {}
+            local pos = table.copy( TeleportDestination )
+            pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
+            local TeleportDestFxEntity = Entity()
+            Warp( TeleportDestFxEntity, pos )
+            local templ = unit.TeleportChargeFxAtDestOverride or EffectTemplate.GenericTeleportCharge02
+            for k, v in templ do
+                local fx = CreateEmitterAtEntity( TeleportDestFxEntity, army, v )
+                fx:ScaleEmitter(0.01)
+                unit.Trash:Add(fx)
+                table.insert( unit.TeleportDestChargeBag, fx)
+                EffectsBag:Add(fx)
+            end
+            TeleportDestFxEntity:Destroy()
+        end
+
+    end
+end
+
+function TeleportChargingProgress(unit, fraction)
+    if unit.TeleportDestChargeBag then
+        local scale = math.max( fraction, 0.01 )
+        for k, fx in unit.TeleportDestChargeBag do
+            fx:ScaleEmitter(scale)
+        end
+    end
+end
+
+function DestroyTeleportChargingEffects(unit, EffectsBag)
+    if unit.TeleportChargeBag then
+        for keys,values in unit.TeleportChargeBag do
+            values:Destroy()
+        end
+        unit.TeleportChargeBag = {}
+    end
+    if unit.TeleportDestChargeBag then
+        for keys,values in unit.TeleportDestChargeBag do
+            values:Destroy()
+        end
+        unit.TeleportDestChargeBag = {}
+    end
+    EffectsBag:Destroy()
+end
+
+function PlayTeleportOutEffects(unit, EffectsBag)
+    local bp = unit:GetBlueprint()
+    if bp.Display.TeleportEffects.PlayTeleportOutFx != false then
+        local army = unit:GetArmy()
+        local templ = unit.TeleportOutFxOverride or EffectTemplate.GenericTeleportOut01
+        local fx = nil
+        for k, v in templ do
+            fx = CreateEmitterAtEntity(unit,army,v)
+            EffectsBag:Add(fx)
+        end
+    end
+end
+
+function PlayTeleportInEffects(unit, EffectsBag)
+
+    local bp = unit:GetBlueprint()
+    local faction = bp.General.FactionName
+
+    if faction == 'Seraphim' then
+
+        # this is basically a copy of the stock SeraphimRiftIn effect used when finished construction of buildings. This copy respects
+        # unit enhancements
+        local fn = function(unit)
+            local army = unit:GetArmy()
+            unit:HideBone(0, true)
+            for k, v in EffectTemplate.SerRiftIn_LargeFlash do
+                CreateAttachedEmitter ( unit, -1, army, v )
+            end		
+            WaitSeconds (2.0)	
+            CreateLightParticle( unit, -1, army, 4, 15, 'glow_05', 'ramp_jammer_01' )
+            WaitSeconds (0.1)
+
+            unit:ShowBone(0, true)
+
+            if bp.Enhancements then
+
+                # show all relevant bones
+                for k, enh in bp.Enhancements do
+                    if unit:HasEnhancement(k) then
+                        if enh.ShowBones then
+                            for _, bone in enh.ShowBones do
+                                unit:ShowBone(bone, true)
+                            end
+                        end
+                    else
+                        if enh.ShowBones then
+                            for _, bone in enh.ShowBones do
+                                unit:HideBone(bone, true)
+                            end
+                        end
+                    end
+                    if enh.HideBones then
+                        for _, bone in enh.HideBones do
+                            unit:HideBone(bone, true)
+                        end
+                    end
+                end
+            end
+
+            WaitSeconds (0.25)
+            for k, v in EffectTemplate.SerRiftIn_SmallFlash do
+                CreateAttachedEmitter ( unit, -1, army, v )
+	    end
+        end
+
+        local thread = unit:ForkThread(fn)
+        EffectsBag:Add(thread)
+
+    else  # UEF or other factions
+
+        if bp.Display.TeleportEffects.PlayTeleportInFx != false then
+            local army = unit:GetArmy()
+            local MeshExtentsY = (bp.Physics.MeshExtentsY or 1)
+            local templ = unit.TeleportInFxOverride or EffectTemplate.GenericTeleportIn01
+            local fx = nil
+            for k, v in templ do
+                fx = CreateEmitterAtEntity(unit,army,v):OffsetEmitter(0, MeshExtentsY / 2, 0)
+                EffectsBag:Add(fx)
+            end
+
+        end
+    end
+end
+

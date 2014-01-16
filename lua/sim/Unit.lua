@@ -77,7 +77,6 @@ Unit = Class(moho.unit_methods) {
     DestructionPartsChassisToss = {},
     EconomyProductionInitiallyActive = true,
 
-
     GetSync = function(self)
         if not Sync.UnitData[self:GetEntityId()] then
             Sync.UnitData[self:GetEntityId()] = {}
@@ -207,6 +206,7 @@ Unit = Class(moho.unit_methods) {
         self.OnBeingBuiltEffectsBag = TrashBag()
         self.CaptureEffectsBag = TrashBag()
         self.UpgradeEffectsBag = TrashBag()
+        self.TeleportFxBag = TrashBag()
 
         self.HasFuel = true
 
@@ -1857,6 +1857,9 @@ Unit = Class(moho.unit_methods) {
         end
         if self.UpgradeEffectsBag then
             self.UpgradeEffectsBag:Destroy()
+        end
+        if self.TeleportFxBag then
+            self.TeleportFxBag:Destroy()
         end
 
         if self.TeleportDrain then
@@ -4353,16 +4356,6 @@ Unit = Class(moho.unit_methods) {
         self.UnitBeingTeleported = nil
     end,
 
-    UpdateTeleportProgress = function(self, progress)
-        #LOG(' UpdatingTeleportProgress ')
-        self:SetWorkProgress(progress)
-
-        local scale = math.max( progress, 0.01 )
-        for k, fx in self.TeleportDestChargeBag do
-            fx:ScaleEmitter(scale)
-        end
-    end,
-
     InitiateTeleportThread = function(self, teleporter, location, orientation)
         local tbp = teleporter:GetBlueprint()
         local ubp = self:GetBlueprint()
@@ -4411,62 +4404,26 @@ Unit = Class(moho.unit_methods) {
         self.TeleportThread = nil
     end,
 
+    UpdateTeleportProgress = function(self, progress)
+        #LOG(' UpdatingTeleportProgress ')
+        self:SetWorkProgress(progress)
+        EffectUtilities.TeleportChargingProgress(self, progress)
+    end,
+
     PlayTeleportChargeEffects = function(self, location, orientation)
-        local army = self:GetArmy()
-        local bp = self:GetBlueprint()
-
-        # Creating teleport fx at unit location
-        self.TeleportChargeBag = {}
-        for k, v in EffectTemplate.GenericTeleportCharge01 do
-            local fx = CreateEmitterAtEntity(self,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
-            self.Trash:Add(fx)
-            table.insert( self.TeleportChargeBag, fx)
-        end
-
-        # Creating teleport fx at target location
-        self.TeleportDestChargeBag = {}
-        local pos = table.copy( location )
-        pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
-        local TeleportDestFxEntity = Entity()
-        Warp( TeleportDestFxEntity, pos )
-        for k, v in EffectTemplate.GenericTeleportCharge02 do
-            local fx = CreateEmitterAtEntity( TeleportDestFxEntity, army, v )
-            fx:ScaleEmitter(0.01)
-            self.Trash:Add(fx)
-            table.insert( self.TeleportDestChargeBag, fx)
-        end
-        TeleportDestFxEntity:Destroy()
+        EffectUtilities.PlayTeleportChargingEffects(self, location, self.TeleportFxBag)
     end,
 
     CleanupTeleportChargeEffects = function( self )
-        if self.TeleportChargeBag then
-            for keys,values in self.TeleportChargeBag do
-                values:Destroy()
-            end
-            self.TeleportChargeBag = {}
-        end
-        if self.TeleportDestChargeBag then
-            for keys,values in self.TeleportDestChargeBag do
-                values:Destroy()
-            end
-            self.TeleportDestChargeBag = {}
-        end
+        EffectUtilities.DestroyTeleportChargingEffects(self, self.TeleportFxBag)
     end,
 
     PlayTeleportOutEffects = function(self)
-        local army = self:GetArmy()
-        local emit = nil
-        for k, v in EffectTemplate.GenericTeleportOut01 do
-            emit = CreateEmitterAtEntity(self,army,v)
-        end
+        EffectUtilities.PlayTeleportOutEffects(self, self.TeleportFxBag)
     end,
 
     PlayTeleportInEffects = function(self)
-        local army = self:GetArmy()
-        local bp = self:GetBlueprint()
-        for k, v in EffectTemplate.GenericTeleportIn01 do
-            emit = CreateEmitterAtEntity(self,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
-        end
+        EffectUtilities.PlayTeleportInEffects(self, self.TeleportFxBag)
     end,
 
     #########################################################################################
