@@ -105,14 +105,13 @@ function TransferUnitsOwnership(units, ToArmyIndex)
                 end
             end
         end
-	
+		
 		local oldOwner = nil
 		if unit.oldowner then
 			oldOwner = unit.oldowner
 		end
 
         # changing owner
-		unit:OnBeforeTransferingOwnership(ToArmyIndex)
         unit = ChangeUnitArmy(unit,ToArmyIndex)
         if not unit then
             continue
@@ -165,7 +164,6 @@ function TransferUnitsOwnership(units, ToArmyIndex)
                 unit:DisableShield()
             end
         end
-		unit:OnAfterTransferingOwnership(owner) # owner var contains the now ex-owner
     end
     return newUnits
 end
