@@ -384,13 +384,14 @@ GenericTeleportCharge01 = {
 }
 
 GenericTeleportCharge02 = {
-    EmtBpPath .. 'generic_teleport_charge_01_emit.bp',
-    EmtBpPath .. 'generic_teleport_charge_02_emit.bp',
-    EmtBpPath .. 'generic_teleport_charge_03_emit.bp',
+    EmtBpPath .. 'generic_teleport_charge_04_emit.bp',
+    EmtBpPath .. 'generic_teleport_charge_05_emit.bp',
+    EmtBpPath .. 'generic_teleport_charge_06_emit.bp',
 }
 
 GenericTeleportOut01 = {
     EmtBpPath .. 'generic_teleportout_01_emit.bp',
+    EmtBpPath .. 'generic_teleportin_05_emit.bp',
 }
 
 GenericTeleportIn01 = {
@@ -401,10 +402,42 @@ GenericTeleportIn01 = {
     EmtBpPath .. 'generic_teleportin_05_emit.bp',
 }
 
+GenericTeleportInWeapon01 = {
+#    EmtBpPath .. 'generic_teleportin_weapon_01_emit.bp',
+}
+
 SeraphimTeleportCharge01 = {
     EmtBpPath .. 'seraphim_teleport_charge_01_emit.bp', 
     EmtBpPath .. 'seraphim_teleport_charge_02_emit.bp', 
 }
+
+SeraphimTeleportCharge02 = {
+    EmtBpPath .. 'seraphim_teleport_charge_03_emit.bp', 
+    EmtBpPath .. 'seraphim_teleport_charge_04_emit.bp', 
+    EmtBpPath .. 'seraphim_teleport_charge_05_emit.bp', 
+    EmtBpPath .. 'seraphim_teleport_charge_06_emit.bp', 
+#    EmtBpPath .. 'seraphim_teleport_charge_07_emit.bp', 
+}
+
+SeraphimTeleportOut01 = {
+    EmtBpPath .. 'seraphim_rift_in_small_03_emit.bp', 
+    EmtBpPath .. 'seraphim_rift_in_small_04_emit.bp', 
+}
+
+SeraphimTeleportIn01 = {
+    EmtBpPath .. 'seraphim_rift_in_large_03_emit.bp', 
+    EmtBpPath .. 'seraphim_rift_in_large_04_emit.bp', 
+}
+
+SeraphimTeleportIn02 = {
+    EmtBpPath .. 'seraphim_rift_in_small_03_emit.bp', 
+    EmtBpPath .. 'seraphim_rift_in_small_04_emit.bp', 
+}
+
+SeraphimTeleportInWeapon01 = {
+    EmtBpPath .. 'seraphim_teleportin_weapon_01_emit.bp',
+}
+
 
 #---------------------------------------------------------------
 # ### UNIT CONSTRUCTION ###

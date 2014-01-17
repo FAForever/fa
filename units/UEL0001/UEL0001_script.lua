@@ -209,10 +209,10 @@ UEL0001 = Class(TWalkingLandUnit) {
             end
         end
 
+self:CreateEnhancement('Teleporter')
+
         WaitSeconds(6)
         self:SetMesh(self:GetBlueprint().Display.MeshBlueprint, true)
-
-self:CreateEnhancement('Teleporter')
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
