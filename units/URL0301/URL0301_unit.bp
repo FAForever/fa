@@ -494,50 +494,68 @@ UnitBlueprint {
     EnhancementPresets = {
         AntiAir = {
             BuildIconSortPriority = 45,
+            Description = '<LOC url0301_AntiAir_desc>Support Armored Command Unit (Anti-Air preset)',
             Enhancements = {
                 'NaniteMissileSystem',
             },
+            HelpText = '<LOC url0301_AntiAir_help>Support Armored Command Unit. Enhanced during construction with the nanite missile system enhancement.',
             SortCategory = 'SORTOTHER',
+            UnitName = '<LOC url0301_AntiAir_name>SACU (Anti-Air preset)',
         },
         Cloak = {
             BuildIconSortPriority = 35,
+            Description = '<LOC url0301_Cloak_desc>Support Armored Command Unit (Cloak preset)',
             Enhancements = {
                 'FocusConvertor',
                 'StealthGenerator',
                 'CloakingGenerator',
             },
+            HelpText = '<LOC url0301_Cloak_help>Support Armored Command Unit. Enhanced during construction with the personal cloaking generator and disintegrator amplifier enhancements.',
             SortCategory = 'SORTOTHER',
+            UnitName = '<LOC url0301_Cloak_name>SACU (Cloak preset)',
         },
         Combat = {
             BuildIconSortPriority = 15,
+            Description = '<LOC url0301_Combat_desc>Support Armored Command Unit (Combatant preset)',
             Enhancements = {
                 'EMPCharge',
                 'FocusConvertor',
             },
+            HelpText = '<LOC url0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the EMP burst and disintegrator amplifier enhancements.',
             SortCategory = 'SORTOTHER',
+            UnitName = '<LOC url0301_Combat_name>SACU (Combatant preset)',
         },
         Engineer = {
             BuildIconSortPriority = 20,
+            Description = '<LOC url0301_Engineer_desc>Support Armored Command Unit (Engineer preset)',
             Enhancements = {
                 'Switchback',
             },
+            HelpText = '<LOC url0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the rapid fabricator enhancement.',
             SortCategory = 'SORTOTHER',
+            UnitName = '<LOC url0301_Engineer_name>SACU (Engineer preset)',
         },
         Rambo = {
             BuildIconSortPriority = 25,
+            Description = '<LOC url0301_Rambo_desc>Support Armored Command Unit (Rambo preset)',
             Enhancements = {
                 'EMPCharge',
                 'FocusConvertor',
                 'SelfRepairSystem',
             },
+            HelpText = '<LOC url0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with the EMP burst, disintegrator amplifier and nano-repair system enhancements.',
             SortCategory = 'SORTOTHER',
+            UnitName = '<LOC url0301_Rambo_name>SACU (Rambo preset)',
         },
         Stealth = {
             BuildIconSortPriority = 30,
+            Description = 'url0301_Stealth_desc>Support Armored Command Unit (Stealth preset)',
             Enhancements = {
                 'StealthGenerator',
             },
+            HelpText = '<LOC url0301_Stealth_help>Support Armored Command Unit. Enhanced during construction with the personal stealth generator enhancement.',
             SortCategory = 'SORTOTHER',
+            UnitName = '<LOC url0301_Stealth_name>SACU (Stealth preset)',
         },
     },
     General = {

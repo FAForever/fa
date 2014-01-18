@@ -40,11 +40,11 @@ Description = {
    ['uel0301-heo'] = "<LOC Unit_Description_0024>Equips the standard SACU Heavy plasma cannon with area-of-effect damage.",
 
    ## Support ACU presets
-   ['uel0301_Combat'] = "<LOC uel0301_Combat_help>SACU upgraded with both weapon upgrades.",
-   ['uel0301_Engineer'] = "<LOC uel0301_Engineer_help>SACU upgraded with an engineering drone.",
-   ['uel0301_Rambo'] = "<LOC uel0301_Rambo_help>SACU upgraded with both weapon upgrades and a personal shield.",
-   ['uel0301_BubbleShield'] = "<LOC uel0301_BubbleShield_help>SACU upgraded with a high HP bubble shield.",
-   ['uel0301_IntelJammer'] = "<LOC uel0301_IntelJammer_help>SACU upgraded with both Omnisensor and Jammer upgrades.",
+   ['uel0301_BubbleShield'] = "<LOC uel0301_BubbleShield_help>Support Armored Command Unit. Enhanced during construction with the bubble shield generator enhancement.",
+   ['uel0301_Combat'] = "<LOC uel0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the energy accelerator and heavy plasma refractor enhancements.",
+   ['uel0301_Engineer'] = "<LOC uel0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the engineering drone enhancement.",
+   ['uel0301_IntelJammer'] = "<LOC uel0301_IntelJammer_help>Support Armored Command Unit. Enhanced during construction with the radar jammer and enhanced sensor system enhancements.",
+   ['uel0301_Rambo'] = "<LOC uel0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with a personal shield, energy accelerator and heavy plasma refractor enhancements.",
 
     
     ##Land
@@ -217,12 +217,12 @@ Description = {
    ['url0301-sfs'] = "<LOC Unit_Description_0123> Hides the SACU from radar. Requires Energy to run.",
   
    ## Support ACU presets
-   ['url0301_AntiAir'] = "<LOC url0301_AntiAir_help>SACU upgraded with a SAM launcher.",
-   ['url0301_Cloak'] = "<LOC url0301_Cloak_help>SACU upgraded with a personal Stealth/Cloaking generator and rate of fire upgrade.",
-   ['url0301_Combat'] = "<LOC url0301_Combat_help>SACU upgraded with EMP and weapon upgrade.",
-   ['url0301_Engineer'] = "<LOC url0301_Engineer_help>SACU upgraded with Rapid Fabricator.",
-   ['url0301_Rambo'] = "<LOC url0301_Rambo_help>SACU upgraded with Nano-repair and both weapon upgrades.",
-   ['url0301_Stealth'] = "<LOC url0301_Stealth_help>SACU upgraded with personal Stealth.",
+   ['url0301_AntiAir'] = "<LOC url0301_AntiAir_help>Support Armored Command Unit. Enhanced during construction with the nanite missile system enhancement.",
+   ['url0301_Cloak'] = "<LOC url0301_Cloak_help>Support Armored Command Unit. Enhanced during construction with the personal cloaking generator and disintegrator amplifier enhancements.",
+   ['url0301_Combat'] = "<LOC url0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the EMP burst and disintegrator amplifier enhancements.",
+   ['url0301_Engineer'] = "<LOC url0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the rapid fabricator enhancement.",
+   ['url0301_Rambo'] = "<LOC url0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with the EMP burst, disintegrator amplifier and nano-repair system enhancements.",
+   ['url0301_Stealth'] = "<LOC url0301_Stealth_help>Support Armored Command Unit. Enhanced during construction with the personal stealth generator enhancement.",
 
    ##Land units
    
@@ -382,10 +382,10 @@ Description = {
 
    ## Support ACU presets
    ['ual0301_Engineer'] = "<LOC ual0301_Engineer_help>SACU upgraded with Rapid Fabricator.",
-   ['ual0301_NanoCombat'] = "<LOC ual0301_NanoCombat_help>SACU upgraded with weapon upgrade and Nano regeneration.",
-   ['ual0301_Rambo'] = "<LOC ual0301_Rambo_help>SACU upgraded with both shield upgrades and weapon upgrade.",
-   ['ual0301_ShieldCombat'] = "<LOC ual0301_ShieldCombat_help>SACU upgraded with weapon upgrade and a personal shield.",
-   ['ual0301_SimpleCombat'] = "<LOC ual0301_SimpleCombat_help>SACU upgraded with an AOE weapon upgrade.",
+   ['ual0301_NanoCombat'] = "<LOC ual0301_NanoCombat_help>Support Armored Command Unit. Enhanced during construction with the reacton refractor and nano-repair system enhancements.",
+   ['ual0301_Rambo'] = "<LOC ual0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with a heavy personal shield and the reacton refractor enhancements.",
+   ['ual0301_ShieldCombat'] = "<LOC ual0301_ShieldCombat_help>Support Armored Command Unit. Enhanced during construction with a personal shield and the reacton refractor enhancements.",
+   ['ual0301_SimpleCombat'] = "<LOC ual0301_SimpleCombat_help>Support Armored Command Unit. Enhanced during construction with the reacton refractor enhancement.",
    
    ##Land
    ['ual0101'] = "<LOC Unit_Description_0223> Fast, lightly armored reconnaissance vehicle. Armed with a laser and a state-of-the-art sensor suite.",
@@ -521,12 +521,12 @@ Description = {
     ['xsl0301-oc'] = "<LOC Unit_Description_0440> Single shot destroys most units. Consumes large amount of Energy.",
 
     ## Support ACU presets
-    ['xsl0301_AdvancedCombat'] = "<LOC xsl0301_AdvancedCombat_help>SACU upgraded with Overcharge, Nano upgrade and range upgrade.",
-    ['xsl0301_Combat'] = "<LOC xsl0301_Combat_help>SACU upgraded with range/intel upgrade.",
-    ['xsl0301_Engineer'] = "<LOC xsl0301_Engineer_help>SACU upgraded with Rapid Fabricator.",
-    ['xsl0301_Missile'] = "<LOC xsl0301_Missile_help>SACU equipped with Tactical Missile and Rapid Fabricator.",
-    ['xsl0301_NanoCombat'] = "<LOC xsl0301_NanoCombat_help>SACU upgraded with Nano regeneration and range/intel upgrade.",
-    ['xsl0301_Rambo'] = "<LOC xsl0301_Rambo_help>SACU upgraded with Overcharge, Nano-repair and Shield upgrades.",
+    ['xsl0301_AdvancedCombat'] = "<LOC xsl0301_AdvancedCombat_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system, nano-repair system and overcharge enhancements.",
+    ['xsl0301_Combat'] = "<LOC xsl0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system enhancement.",
+    ['xsl0301_Engineer'] = "<LOC xsl0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the rapid fabricator enhancement.",
+    ['xsl0301_Missile'] = "<LOC xsl0301_Missile_help>Support Armored Command Unit. Enhanced during construction with the tactical missile launcher and rapid fabricator enhancements.",
+    ['xsl0301_NanoCombat'] = "<LOC xsl0301_NanoCombat_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system and nano-repair system enhancements.",
+    ['xsl0301_Rambo'] = "<LOC xsl0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with the personal shield generator, nano-repair system and overcharge enhancements.",
 
     ##Land Units
     ['xsl0101'] = "<LOC Unit_Description_0337> Light, fast mobile reconnaissance unit. When stationary, deploys cloaking and stealth fields.",

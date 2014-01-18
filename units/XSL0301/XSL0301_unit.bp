@@ -543,51 +543,69 @@ UnitBlueprint {
     EnhancementPresets = {
         AdvancedCombat = {
             BuildIconSortPriority = 30,
+            Description = '<LOC xsl0301_Combat_desc>Support Armored Command Unit (Combatant preset)',
             Enhancements = {
                 'EnhancedSensors',
                 'DamageStabilization',
                 'Overcharge',
             },
+            HelpText = '<LOC xsl0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system enhancement.',
             SortCategory = 'SORTOTHER',
+            UnitName = '<LOC xsl0301_Combat_name>SACU (Combatant preset)',
         },
         Combat = {
             BuildIconSortPriority = 15,
+            Description = '<LOC xsl0301_Combat_desc>Support Armored Command Unit (Combatant preset)',
             Enhancements = {
                 'EnhancedSensors',
             },
+            HelpText = '<LOC xsl0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system enhancement.',
             SortCategory = 'SORTOTHER',
+            UnitName = '<LOC xsl0301_Combat_name>SACU (Combatant preset)',
         },
         Engineer = {
             BuildIconSortPriority = 20,
+            Description = '<LOC xsl0301_Engineer_desc>Support Armored Command Unit (Engineer preset)',
             Enhancements = {
                 'EngineeringThroughput',
             },
+            HelpText = '<LOC xsl0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the rapid fabricator enhancement.',
             SortCategory = 'SORTOTHER',
+            UnitName = '<LOC xsl0301_Engineer_name>SACU (Engineer preset)',
         },
         Missile = {
             BuildIconSortPriority = 40,
+            Description = '<LOC xsl0301_Missile_desc>Support Armored Command Unit (Missile preset)',
             Enhancements = {
                 'EngineeringThroughput',
                 'Missile',
             },
+            HelpText = '<LOC xsl0301_Missile_help>Support Armored Command Unit. Enhanced during construction with the tactical missile launcher and rapid fabricator enhancements.',
             SortCategory = 'SORTOTHER',
+            UnitName = '<LOC xsl0301_Missile_name>SACU (Missile preset)',
         },
         NanoCombat = {
             BuildIconSortPriority = 25,
+            Description = '<LOC xsl0301_NanoCombat_desc>Support Armored Command Unit (Nano Combatant preset)',
             Enhancements = {
                 'EnhancedSensors',
                 'DamageStabilization',
             },
+            HelpText = '<LOC xsl0301_NanoCombat_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system and nano-repair system enhancements.',
             SortCategory = 'SORTOTHER',
+            UnitName = '<LOC xsl0301_NanoCombat_name>SACU (Nano Combatant preset)',
         },
         Rambo = {
             BuildIconSortPriority = 35,
+            Description = '<LOC xsl0301_Rambo_desc>Support Armored Command Unit (Rambo preset)',
             Enhancements = {
                 'Overcharge',
                 'Shield',
                 'DamageStabilization',
             },
+            HelpText = '<LOC xsl0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with the personal shield generator, nano-repair system and overcharge enhancements.',
             SortCategory = 'SORTOTHER',
+            UnitName = '<LOC xsl0301_Rambo_name>SACU (Rambo preset)',
         },
     },
     General = {
