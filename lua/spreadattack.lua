@@ -149,8 +149,7 @@ function SpreadAttack()
     -- Since giving orders is a Sim-side command, use a SimCallback function.
     SimCallback( { Func = "GiveOrders",
                    Args = { unit_orders = unitorders,
-                            unit_id     = unit:GetEntityId(),
-                            From = GetFocusArmy()}, 
+                            unit_id     = unit:GetEntityId() }, 
                  }, false )
 
     -- Handle the next unit.
@@ -167,33 +166,33 @@ end -- Function SpreadAttack()
 -- This function re-issues all shadow orders to the selected units.
 -- Since the orders herein are Sim-side commands, this function needs to be called through a SimCallback.
 function GiveOrders(Data)
-    if OkayToMessWithArmy(Data.From) then --Check for cheats/exploits
-        local unit = GetEntityById(Data.unit_id)
 
-        -- Skip units with no valid shadow orders.
-        if not( Data.unit_orders ) or not( Data.unit_orders[1] ) then
-            return
-        end
+  local unit = GetEntityById(Data.unit_id)
 
-        -- All orders will be re-issued, so all existing orders have to be cleared first.
-        IssueClearCommands( { unit } )
+  -- Skip units with no valid shadow orders.
+  if not( Data.unit_orders ) or not( Data.unit_orders[1] ) then
+    return
+  end
 
-        -- Re-issue all orders.
-        for _,order in ipairs(Data.unit_orders) do
+  -- All orders will be re-issued, so all existing orders have to be cleared first.
+  IssueClearCommands( { unit } )
 
-        -- Currently supported 3 orders are: Attack, Move and AggressiveMove
-        if order.CommandType == "Attack" then
-            local victim = GetEntityById(order.Target)
-            IssueAttack( { unit },victim)
-        end
+  -- Re-issue all orders.
+  for _,order in ipairs(Data.unit_orders) do
 
-        if order.CommandType == "Move" then
-            IssueMove( { unit },order.Position)
-        end
-
-        if order.CommandType == "AggressiveMove" then
-            IssueAggressiveMove( { unit },order.Position)
-        end
+    -- Currently supported 3 orders are: Attack, Move and AggressiveMove
+    if order.CommandType == "Attack" then
+      local victim = GetEntityById(order.Target)
+      IssueAttack( { unit },victim)
     end
+
+    if order.CommandType == "Move" then
+      IssueMove( { unit },order.Position)
+    end
+
+    if order.CommandType == "AggressiveMove" then
+      IssueAggressiveMove( { unit },order.Position)
+    end
+  end
 
 end -- function GiveOrders(Data,Units)
