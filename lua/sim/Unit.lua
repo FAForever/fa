@@ -176,8 +176,6 @@ Unit = Class(moho.unit_methods) {
         local x, y, z = self:GetUnitSizes()
         local vol = x*y*z
 
-        #print('Created ' .. self:GetBlueprint().Display.DisplayName .. ': Volume:' .. vol)
-
         self:ShowPresetEnhancementBones() # Added by Brute51 for unit enhancement presets
 		
         local damageamounts = 1

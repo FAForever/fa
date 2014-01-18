@@ -543,15 +543,15 @@ UnitBlueprint {
     EnhancementPresets = {
         AdvancedCombat = {
             BuildIconSortPriority = 30,
-            Description = '<LOC xsl0301_Combat_desc>Support Armored Command Unit (Combatant preset)',
+            Description = '<LOC xsl0301_AdvancedCombat_desc>Support Armored Command Unit (Advanced Combatant preset)',
             Enhancements = {
                 'EnhancedSensors',
                 'DamageStabilization',
                 'Overcharge',
             },
-            HelpText = '<LOC xsl0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system enhancement.',
+            HelpText = '<LOC xsl0301_AdvancedCombat_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system, nano-repair system and overcharge enhancements.',
             SortCategory = 'SORTOTHER',
-            UnitName = '<LOC xsl0301_Combat_name>SACU (Combatant preset)',
+            UnitName = '<LOC xsl0301_AdvancedCombat_name>SACU (Advanced Combatant preset)',
         },
         Combat = {
             BuildIconSortPriority = 15,
