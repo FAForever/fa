@@ -208,32 +208,32 @@ function ExtractWreckageBlueprint(bp)
 end
 
 function ExtractBuildMeshBlueprint(bp)
-	local FactionName = bp.General.FactionName
+    local FactionName = bp.General.FactionName
 
-	if FactionName == 'Aeon' or FactionName == 'UEF' or FactionName == 'Cybran' or FactionName == 'Seraphim' then 
-		local meshid = bp.Display.MeshBlueprint
-		if not meshid then return end
+    if FactionName == 'Aeon' or FactionName == 'UEF' or FactionName == 'Cybran' or FactionName == 'Seraphim' then 
+        local meshid = bp.Display.MeshBlueprint
+        if not meshid then return end
 
-		local meshbp = original_blueprints.Mesh[meshid]
-		if not meshbp then return end
+        local meshbp = original_blueprints.Mesh[meshid]
+        if not meshbp then return end
 
-		local shadername = FactionName .. 'Build'
-		local secondaryname = '/textures/effects/' .. FactionName .. 'BuildSpecular.dds'
+        local shadername = FactionName .. 'Build'
+        local secondaryname = '/textures/effects/' .. FactionName .. 'BuildSpecular.dds'
 
-		local buildmeshbp = table.deepcopy(meshbp)
-		if buildmeshbp.LODs then
-			for i,lod in buildmeshbp.LODs do
-				lod.ShaderName = shadername
-				lod.SecondaryName = secondaryname
-				if FactionName == 'Seraphim' then
-				    lod.LookupName = '/textures/environment/Falloff_seraphim_lookup.dds'
-				end
-			end
-		end
-		buildmeshbp.BlueprintId = meshid .. '_build'
-		bp.Display.BuildMeshBlueprint = buildmeshbp.BlueprintId
-		MeshBlueprint(buildmeshbp)
-	end
+        local buildmeshbp = table.deepcopy(meshbp)
+        if buildmeshbp.LODs then
+            for i,lod in buildmeshbp.LODs do
+                lod.ShaderName = shadername
+                lod.SecondaryName = secondaryname
+                if FactionName == 'Seraphim' then
+                    lod.LookupName = '/textures/environment/Falloff_seraphim_lookup.dds'
+                end
+            end
+        end
+        buildmeshbp.BlueprintId = meshid .. '_build'
+        bp.Display.BuildMeshBlueprint = buildmeshbp.BlueprintId
+        MeshBlueprint(buildmeshbp)
+    end
 end
 
 
@@ -317,36 +317,170 @@ function RegisterAllBlueprints(blueprints)
 end
 
 
+# Brute51 - Adding support for SCU presets: allows building units that get enhancements at the factory, so no need to enhance
+# after building SCU.
+function HandleUnitWithBuildPresets(bps, allUnitBlueprints)
+
+    local SortCats = { 'SORTOTHER', 'SORTINTEL', 'SORTSTRATEGIC', 'SORTDEFENSE', 'SORTECONOMY', 'SORTCONSTRUCTION', }
+    local tempBp = {}
+
+    for k, bp in bps do
+        for name, preset in bp.EnhancementPresets do
+            # start with clean copy of the original unit BP
+            tempBp = table.deepcopy(bp)
+
+            # create BP table for the assigned preset with required info
+            tempBp.EnhancementPresetAssigned = {
+                Enhancements = table.deepcopy( preset.Enhancements ),
+                Name = name,
+                BaseBlueprintId = bp.BlueprintId,
+            }
+
+            # change cost of the new unit to match unit base cost + preset enhancement costs. An override is provided for cases where this is not desired.
+            local e, m, t = 0, 0, 0
+            if not preset.BuildCostEnergyOverride or not preset.BuildCostMassOverride or not preset.BuildTimeOverride then
+                for k, enh in preset.Enhancements do
+                    if not tempBp.Enhancements[enh] then
+                        WARN('*DEBUG: Enhancement '..repr(enh)..' used in preset '..repr(name)..' for unit '..repr(tempBp.BlueprintId)..' does not exist')
+                        continue
+                    end
+                    e = e + (tempBp.Enhancements[enh].BuildCostEnergy or 0)
+                    m = m + (tempBp.Enhancements[enh].BuildCostMass or 0)
+                    t = t + (tempBp.Enhancements[enh].BuildTime or 0)
+                end
+            end
+            tempBp.Economy.BuildCostEnergy = preset.BuildCostEnergyOverride or (tempBp.Economy.BuildCostEnergy + e)
+            tempBp.Economy.BuildCostMass = preset.BuildCostMassOverride or (tempBp.Economy.BuildCostMass + m)
+            tempBp.Economy.BuildTime = preset.BuildTimeOverride or (tempBp.Economy.BuildTime + t)
+
+            # Add a sorting category so similar SCUs are grouped together in the build menu
+            if preset.SortCategory then
+                if table.find(SortCats, preset.SortCategory) or preset.SortCategory == 'None' then
+                    for _, v in SortCats do
+                        table.removeByValue(tempBp.Categories, v)
+                    end
+                    if preset.SortCategory != 'None' then
+                        table.insert(tempBp.Categories, preset.SortCategory)
+                    end
+                end
+            end
+
+            # change other things relevant things aswell
+            tempBp.BlueprintId = tempBp.BlueprintId .. '_' .. name
+            tempBp.BuildIconSortPriority = preset.BuildIconSortPriority or tempBp.BuildIconSortPriority or 0
+            tempBp.General.UnitName = preset.UnitName or tempBp.General.UnitName
+            tempBp.Interface.HelpText = preset.HelpText or tempBp.Interface.HelpText
+            tempBp.Description = preset.Description or tempBp.Description
+            table.insert(tempBp.Categories, 'ISPREENHANCEDUNIT')
+
+            # clean up some data that's not needed anymore
+            table.removeByValue(tempBp.Categories, 'USEBUILDPRESETS')
+            tempBp.EnhancementPresets = nil
+
+            table.insert( allUnitBlueprints.Unit, tempBp )
+            #LOG('*DEBUG: created preset unit '..repr(tempBp.BlueprintId))
+
+            BlueprintLoaderUpdateProgress()
+        end
+    end
+end
+
+# Mod unit blueprints before allowing mods to modify it aswell, to pass the most correct unit blueprint to mods
+function PreModBlueprints(all_bps)
+
+    # Brute51: Modified code for ship wrecks and added code for SCU presets.
+    # removed the pairs() function call in the for loops for better efficiency and because it is not necessary.
+
+    local cats = {}
+
+    for _, bp in all_bps.Unit do
+
+        # skip units without categories
+        if not bp.Categories then
+            continue
+        end
+
+        # adding or deleting categories on the fly
+        if bp.DelCategories then
+            for k, v in bp.DelCategories do
+                table.removeByValue( bp.Categories, v )
+            end
+            bp.DelCategories = nil
+        end
+        if bp.AddCategories then
+            for k, v in bp.AddCategories do
+                table.insert( bp.Categories, v )
+            end
+            bp.AddCategories = nil
+        end
+
+        # find out what categories the unit has and allow easy reference
+        cats = {}
+        for k, cat in bp.Categories do
+            cats[cat] = true
+        end
+
+        if cats.NAVAL and not bp.Wreckage then
+            # Add naval wreckage
+            --LOG("Adding wreckage information to ", bp.Description)
+            bp.Wreckage = {
+                Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+                EnergyMult = 0,
+                HealthMult = 0.9,
+                MassMult = 0.9,
+                ReclaimTimeMultiplier = 1,
+                WreckageLayers = {
+                    Air = false,
+                    Land = false,
+                    Seabed = true,
+                    Sub = true,
+                    Water = true,
+                },
+            }
+        end
+
+        BlueprintLoaderUpdateProgress()
+    end
+end
+
 # Hook for mods to manipulate the entire blueprint table
 function ModBlueprints(all_bps)
-	
-	##This whole bit added for shipwreck mod
-	for id,bp in pairs(all_bps.Unit) do	
-		if (bp.Categories) then	
-			local cats = {}
-			for k,cat in pairs(bp.Categories) do
-				cats[cat] = true
-			end
-			if cats.NAVAL and not bp.Wreckage then
-				--LOG("Adding wreckage information to ", bp.Description)
-				bp.Wreckage = {
-					Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
-					EnergyMult = 0,
-					HealthMult = 0.9,
-					MassMult = 0.9,
-					ReclaimTimeMultiplier = 1,
-					WreckageLayers = {
-						Air = false,
-						Land = false,
-						Seabed = true,
-						Sub = true,
-						Water = true,
-					};
-				}
-			end
-		end
-	end
-	##end shipwreck mod bit
+end
+
+function PostModBlueprints(all_bps)
+
+    # Brute51: Modified code for ship wrecks and added code for SCU presets.
+    # removed the pairs() function call in the for loops for better efficiency and because it is not necessary.
+
+    local PresetUnitBPs = {}
+    local cats = {}
+
+    for _, bp in all_bps.Unit do
+
+        # skip units without categories
+        if not bp.Categories then
+            continue
+        end
+
+        # find out what categories the unit has and allow easy reference
+        cats = {}
+        for k, cat in bp.Categories do
+            cats[cat] = true
+        end
+
+        if cats.USEBUILDPRESETS then
+            # check blueprint, if correct info for presets then put this unit on the list to handle later
+            if bp.Enhancements and type(bp.Enhancements) == 'table' and bp.EnhancementPresets and type(bp.EnhancementPresets) == 'table' then
+                table.insert(PresetUnitBPs, table.deepcopy(bp))
+            else
+                WARN('Unit BP '..repr(bp.BlueprintId)..' has a category USEBUILDPRESETS but no or invalid Enhancements or EnhancementPresets data')
+            end
+        end
+
+        BlueprintLoaderUpdateProgress()
+    end
+
+    HandleUnitWithBuildPresets(PresetUnitBPs, all_bps)
 end
 
 
@@ -376,7 +510,9 @@ function LoadBlueprints()
 
     BlueprintLoaderUpdateProgress()
     LOG('Modding blueprints.')
+    PreModBlueprints(original_blueprints)
     ModBlueprints(original_blueprints)
+    PostModBlueprints(original_blueprints)
 
     BlueprintLoaderUpdateProgress()
     LOG('Registering blueprints...')
@@ -399,8 +535,3 @@ function ReloadBlueprint(file)
     RegisterAllBlueprints(original_blueprints)
     original_blueprints = nil
 end
-
-
-
-
-
