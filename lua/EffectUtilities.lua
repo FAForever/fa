@@ -1533,7 +1533,9 @@ function PlayTeleportOutEffects(unit, EffectsBag)
             end
         end
 
-    else  # UEF or other factions
+    elseif faction == 'UEF' then
+
+    else  # Aeon or other factions
         if bp.Display.TeleportEffects.PlayTeleportOutFx != false then
             local templ = unit.TeleportOutFxOverride or EffectTemplate.GenericTeleportOut01
             local fx = nil
@@ -1554,10 +1556,7 @@ function DoTeleportInDamage(unit)
     local dmgType = 'Normal'
     local dmgFriendly = false
 
-    if not bp.Weapon then
-        return
-
-    else
+    if bp.Weapon then
         for k, wep in bp.Weapon do
             if wep.Label == 'TeleportWeapon' then
                 dmg = wep.Damage or dmg
@@ -1577,7 +1576,9 @@ function DoTeleportInDamage(unit)
 
             if faction == 'Seraphim' then
                 templ = EffectTemplate.SeraphimTeleportInWeapon01
-            else  # UEF or other factions
+            elseif faction == 'UEF' then
+                templ = EffectTemplate.GenericTeleportInWeapon01
+            else  # Aeon or other factions
                 templ = EffectTemplate.GenericTeleportInWeapon01
             end
 
@@ -1659,7 +1660,9 @@ function PlayTeleportInEffects(unit, EffectsBag)
             EffectsBag:Add(thread)
         end
 
-    else  # UEF or other factions
+    elseif faction == 'UEF' then
+
+    else  # Aeon or other factions
 
         if bp.Display.TeleportEffects.PlayTeleportInFx != false then
             local MeshExtentsY = (bp.Physics.MeshExtentsY or 1)
