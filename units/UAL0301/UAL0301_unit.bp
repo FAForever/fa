@@ -552,27 +552,26 @@ UnitBlueprint {
         },
     },
     EnhancementPresets = {
-        SimpleCombat = {
-            BuildIconSortPriority = 15,
-            Enhancements = {
-                'StabilitySuppressant',
-            },
-            SortCategory = 'SORTOTHER',
-        },
         Engineer = {
             BuildIconSortPriority = 20,
+            Description = '<LOC ual0301_Engineer_desc>Support Armored Command Unit (Pre-enhancements: Engineer)',
             Enhancements = {
                 'EngineeringFocusingModule',
             },
+            HelpText = '<LOC ual0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the rapid replicator enhancement.',
             SortCategory = 'SORTOTHER',
+            UnitName = '<LOC ual0301_Engineer_name>Support Armored Command Unit (Pre-enhancements: Engineer)',
         },
         NanoCombat = {
             BuildIconSortPriority = 25,
+            Description = '<LOC ual0301_NanoCombat_desc>Support Armored Command Unit (Pre-enhancements: Nano Combatant)',
             Enhancements = {
                 'StabilitySuppressant',
                 'SystemIntegrityCompensator',
             },
+            HelpText = '<LOC ual0301_NanoCombat_help>Support Armored Command Unit. Enhanced during construction with the reacton refractor and nano-repair system enhancements.',
             SortCategory = 'SORTOTHER',
+            UnitName = '<LOC ual0301_NanoCombat_name>Support Armored Command Unit (Pre-enhancements: Nano Combatant)',
         }, 
         Rambo = {
             BuildIconSortPriority = 35,
@@ -588,6 +587,13 @@ UnitBlueprint {
             Enhancements = {
                 'StabilitySuppressant',
                 'Shield',
+            },
+            SortCategory = 'SORTOTHER',
+        },
+        SimpleCombat = {
+            BuildIconSortPriority = 15,
+            Enhancements = {
+                'StabilitySuppressant',
             },
             SortCategory = 'SORTOTHER',
         },

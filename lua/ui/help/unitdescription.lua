@@ -39,6 +39,7 @@ Description = {
    ['uel0301-acu'] = "<LOC Unit_Description_0023>Rapidly cools any weapon mounted onto the SACU. Increases rate of fire.",
    ['uel0301-heo'] = "<LOC Unit_Description_0024>Equips the standard SACU Heavy plasma cannon with area-of-effect damage.",
 
+   ## Support ACU presets
    ['uel0301_Combat'] = "<LOC uel0301_Combat_help>SACU upgraded with both weapon upgrades.",
    ['uel0301_Engineer'] = "<LOC uel0301_Engineer_help>SACU upgraded with an engineering drone.",
    ['uel0301_Rambo'] = "<LOC uel0301_Rambo_help>SACU upgraded with both weapon upgrades and a personal shield.",
@@ -215,6 +216,7 @@ Description = {
    ['url0301-srs'] = "<LOC Unit_Description_0122> Greatly increases the speed at which the SACU repairs itself.",
    ['url0301-sfs'] = "<LOC Unit_Description_0123> Hides the SACU from radar. Requires Energy to run.",
   
+   ## Support ACU presets
    ['url0301_AntiAir'] = "<LOC url0301_AntiAir_help>SACU upgraded with a SAM launcher.",
    ['url0301_Cloak'] = "<LOC url0301_Cloak_help>SACU upgraded with a personal Stealth/Cloaking generator and rate of fire upgrade.",
    ['url0301_Combat'] = "<LOC url0301_Combat_help>SACU upgraded with EMP and weapon upgrade.",
@@ -377,13 +379,13 @@ Description = {
    ['ual0301-ss'] = "<LOC Unit_Description_0173> Equips the standard SACU's Reacton cannon with area-of-effect damage.",
    ['ual0301-sic'] = "<LOC Unit_Description_0174> Greatly increases the speed at which the SACU repairs itself.",
    ['ual0301-pqt'] = "<LOC Unit_Description_0175> Adds teleporter. Requires considerable Energy to activate.",
-   
+
+   ## Support ACU presets
    ['ual0301_Engineer'] = "<LOC ual0301_Engineer_help>SACU upgraded with Rapid Fabricator.",
    ['ual0301_NanoCombat'] = "<LOC ual0301_NanoCombat_help>SACU upgraded with weapon upgrade and Nano regeneration.",
    ['ual0301_Rambo'] = "<LOC ual0301_Rambo_help>SACU upgraded with both shield upgrades and weapon upgrade.",
    ['ual0301_ShieldCombat'] = "<LOC ual0301_ShieldCombat_help>SACU upgraded with weapon upgrade and a personal shield.",
    ['ual0301_SimpleCombat'] = "<LOC ual0301_SimpleCombat_help>SACU upgraded with an AOE weapon upgrade.",
-   ['ual0301_Teleporter'] = "<LOC ual0301_Teleporter_help>SACU upgraded with a personal Teleporter and a weapon upgrade.",
    
    ##Land
    ['ual0101'] = "<LOC Unit_Description_0223> Fast, lightly armored reconnaissance vehicle. Armed with a laser and a state-of-the-art sensor suite.",
@@ -492,45 +494,45 @@ Description = {
    ['xab1401'] = "<LOC Unit_Description_0336> Generates nearly limitless Energy and Mass. Toggles output to match production demands. If destroyed, resulting explosion is equivalent to the detonation of a strategic weapon.",
 
 
-##Seraphim Units
+    ##Seraphim Units
 
-	##Seraphim Commanders
-	['xsl0001'] = "<LOC Unit_Description_0420> Houses Commander. Combination barracks and command center. Contains all the blueprints necessary to build a basic army from scratch.",
-	['xsl0001-pqt'] = "<LOC Unit_Description_0421> Adds teleporter. Requires considerable Energy to activate.",
+    ##Seraphim Commanders
+    ['xsl0001'] = "<LOC Unit_Description_0420> Houses Commander. Combination barracks and command center. Contains all the blueprints necessary to build a basic army from scratch.",
+    ['xsl0001-pqt'] = "<LOC Unit_Description_0421> Adds teleporter. Requires considerable Energy to activate.",
     ['xsl0001-dss'] = "<LOC Unit_Description_0422> Increases the speed at which the ACU repairs itself. Also increases hit points.",
-  ['xsl0001-adss'] = "<LOC Unit_Description_0454> Further increases the speed at which the ACU repairs itself. Also increases hitpoints.",
-	['xsl0001-ras'] = "<LOC Unit_Description_0424> Increases ACU's resource generation.",
-	['xsl0001-eras'] = "<LOC Unit_Description_0425> Requires Resource Allocation System. Further increases ACU's resource generation.",
-	['xsl0001-aes'] = "<LOC Unit_Description_0426> Expands the number of available schematics and increases the ACU's build speed and maximum health.",
-	['xsl0001-ees'] = "<LOC Unit_Description_0427> Replaces the Tech 2 Engineering Suite. Expands the number of available schematics and further increases the ACU's build speed and maximum health.",
-	['xsl0001-cba'] = "<LOC Unit_Description_0428> Increases the damage inflicted by ACU's primary weapon. Adds area-of-effect damage.",
-	['xsl0001-nrf'] = "<LOC Unit_Description_0429> Automatically speeds up the repair speed of nearby units.",
+    ['xsl0001-adss'] = "<LOC Unit_Description_0454> Further increases the speed at which the ACU repairs itself. Also increases hitpoints.",
+    ['xsl0001-ras'] = "<LOC Unit_Description_0424> Increases ACU's resource generation.",
+    ['xsl0001-eras'] = "<LOC Unit_Description_0425> Requires Resource Allocation System. Further increases ACU's resource generation.",
+    ['xsl0001-aes'] = "<LOC Unit_Description_0426> Expands the number of available schematics and increases the ACU's build speed and maximum health.",
+    ['xsl0001-ees'] = "<LOC Unit_Description_0427> Replaces the Tech 2 Engineering Suite. Expands the number of available schematics and further increases the ACU's build speed and maximum health.",
+    ['xsl0001-cba'] = "<LOC Unit_Description_0428> Increases the damage inflicted by ACU's primary weapon. Adds area-of-effect damage.",
+    ['xsl0001-nrf'] = "<LOC Unit_Description_0429> Automatically speeds up the repair speed of nearby units.",
     ['xsl0001-anrf'] = "<LOC Unit_Description_0430> Further speeds up the repair speed of nearby units. Increases maximum health of nearby units.",
-	['xsl0001-hsa'] = "<LOC Unit_Description_0431> Increases main cannon's rate of fire and range. Also increases range of Overcharge.",
-	['xsl0001-tml'] = "<LOC Unit_Description_0432> Mounts a tactical cruise missile launcher onto the back of the ACU.",
+    ['xsl0001-hsa'] = "<LOC Unit_Description_0431> Increases main cannon's rate of fire and range. Also increases range of Overcharge.",
+    ['xsl0001-tml'] = "<LOC Unit_Description_0432> Mounts a tactical cruise missile launcher onto the back of the ACU.",
 	
-	['xsl0301'] = "<LOC Unit_Description_0433> A multi-purpose construction, repair, capture and reclamation unit. Equivalent to a Tech 3 Engineer.",
+    ['xsl0301'] = "<LOC Unit_Description_0433> A multi-purpose construction, repair, capture and reclamation unit. Equivalent to a Tech 3 Engineer.",
     ['xsl0301-tmu'] = "<LOC Unit_Description_0434> Mounts a tactical cruise missile launcher onto the back of the SACU.",
     ['xsl0301-dss'] = "<LOC Unit_Description_0435> Increases the speed at which the SACU repairs itself. Also increases hit points.",
-	['xsl0301-sre'] = "<LOC Unit_Description_0436> Greatly expands the range of the standard onboard SACU sensor systems, including Omni.",
-	['xsl0301-efm'] = "<LOC Unit_Description_0437> Speeds up all engineering-related functions.",
-	['xsl0301-sp'] = "<LOC Unit_Description_0438> Adds a personal shield generator to the SACU.",
+    ['xsl0301-sre'] = "<LOC Unit_Description_0436> Greatly expands the range of the standard onboard SACU sensor systems, including Omni.",
+    ['xsl0301-efm'] = "<LOC Unit_Description_0437> Speeds up all engineering-related functions.",
+    ['xsl0301-sp'] = "<LOC Unit_Description_0438> Adds a personal shield generator to the SACU.",
     ['xsl0301-pqt'] = "<LOC Unit_Description_0439> Adds teleporter. Requires considerable Energy to activate.",
-	['xsl0301-oc'] = "<LOC Unit_Description_0440> Single shot destroys most units. Consumes large amount of Energy.",
+    ['xsl0301-oc'] = "<LOC Unit_Description_0440> Single shot destroys most units. Consumes large amount of Energy.",
 
-   ['xsl0301_AdvancedCombat'] = "<LOC xsl0301_AdvancedCombat_help>SACU upgraded with Overcharge, Nano upgrade and range upgrade.",
-   ['xsl0301_Combat'] = "<LOC xsl0301_Combat_help>SACU upgraded with range/intel upgrade.",
-   ['xsl0301_Engineer'] = "<LOC xsl0301_Engineer_help>SACU upgraded with Rapid Fabricator.",
-   ['xsl0301_Missile'] = "<LOC xsl0301_Missile_help>SACU equipped with Tactical Missile and Rapid Fabricator.",
-   ['xsl0301_NanoCombat'] = "<LOC xsl0301_NanoCombat_help>SACU upgraded with Nano regeneration and range/intel upgrade.",
-   ['xsl0301_Rambo'] = "<LOC xsl0301_Rambo_help>SACU upgraded with Overcharge, Nano-repair and Shield upgrades.",
-   ['xsl0301_Teleporter'] = "<LOC xsl0301_Teleporter_help>SACU upgraded with a personal Teleporter.",
+    ## Support ACU presets
+    ['xsl0301_AdvancedCombat'] = "<LOC xsl0301_AdvancedCombat_help>SACU upgraded with Overcharge, Nano upgrade and range upgrade.",
+    ['xsl0301_Combat'] = "<LOC xsl0301_Combat_help>SACU upgraded with range/intel upgrade.",
+    ['xsl0301_Engineer'] = "<LOC xsl0301_Engineer_help>SACU upgraded with Rapid Fabricator.",
+    ['xsl0301_Missile'] = "<LOC xsl0301_Missile_help>SACU equipped with Tactical Missile and Rapid Fabricator.",
+    ['xsl0301_NanoCombat'] = "<LOC xsl0301_NanoCombat_help>SACU upgraded with Nano regeneration and range/intel upgrade.",
+    ['xsl0301_Rambo'] = "<LOC xsl0301_Rambo_help>SACU upgraded with Overcharge, Nano-repair and Shield upgrades.",
 
-	##Land Units
-	['xsl0101'] = "<LOC Unit_Description_0337> Light, fast mobile reconnaissance unit. When stationary, deploys cloaking and stealth fields.",
-	['xsl0201'] = "<LOC Unit_Description_0338> Lightly armored tank. Armed with a single cannon.",
-	['xsl0103'] = "<LOC Unit_Description_0339> Amphibious mobile light artillery. Provides indirect fire support.",
-	['xsl0104'] = "<LOC Unit_Description_0340> Mobile anti-air defense. Effective against low-end enemy air units.",
+    ##Land Units
+    ['xsl0101'] = "<LOC Unit_Description_0337> Light, fast mobile reconnaissance unit. When stationary, deploys cloaking and stealth fields.",
+    ['xsl0201'] = "<LOC Unit_Description_0338> Lightly armored tank. Armed with a single cannon.",
+    ['xsl0103'] = "<LOC Unit_Description_0339> Amphibious mobile light artillery. Provides indirect fire support.",
+    ['xsl0104'] = "<LOC Unit_Description_0340> Mobile anti-air defense. Effective against low-end enemy air units.",
 	['xsl0202'] = "<LOC Unit_Description_0341> Lightly armored assault bot. Effective against equivalent enemy units.",
 	['xsl0203'] = "<LOC Unit_Description_0342> Amphibious tank. Armed with a single cannon.",
 	['xsl0111'] = "<LOC Unit_Description_0343> Relatively fast-moving mobile tactical missile launcher.",

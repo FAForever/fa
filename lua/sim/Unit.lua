@@ -176,7 +176,7 @@ Unit = Class(moho.unit_methods) {
         local x, y, z = self:GetUnitSizes()
         local vol = x*y*z
 
-        self:ShowPresetEnhancementBones()  # Added by Brute51 for unit enhancement presets
+        self:ShowPresetEnhancementBones() # Added by Brute51 for unit enhancement presets
 		
         local damageamounts = 1
         if vol >= 20 then
