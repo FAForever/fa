@@ -421,9 +421,11 @@ CheckPassiveItems = function(ACU)
 	local brain = ACU:GetAIBrain()
 	for index, List in ScenarioInfo.gwReinforcementList.passiveItems do
 		if List.playerName == brain.Nickname then
-			for index, itemname in List.itemNames do
-				if itemname == "autorecall" then
-					ACU:AddAutoRecall()
+			if List.itemNames then
+				for index, itemname in List.itemNames do
+					if itemname == "autorecall" then
+						ACU:AddAutoRecall()
+					end
 				end
 			end
 		end

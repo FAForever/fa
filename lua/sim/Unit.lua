@@ -1398,7 +1398,7 @@ Unit = Class(moho.unit_methods) {
         else
             self:PlayUnitSound('Killed')
         end
-        
+
         #If factory, destory what I'm building if I die
         if EntityCategoryContains(categories.FACTORY, self) then
             if self.UnitBeingBuilt and not self.UnitBeingBuilt:IsDead() and self.UnitBeingBuilt:GetFractionComplete() != 1 then
@@ -4388,6 +4388,10 @@ Unit = Class(moho.unit_methods) {
     end,
 
     Recall  = function(self)
+        local aiBrain = self:GetAIBrain()
+        if ArmyIsOutOfGame(aiBrain:GetArmyIndex()) then
+            return
+        end
         self:CleanupTeleportChargeEffects()
         if self.RecallTime then
             RemoveEconomyEvent( self, self.RecallTime)
