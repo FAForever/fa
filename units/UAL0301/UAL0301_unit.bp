@@ -554,48 +554,57 @@ UnitBlueprint {
     EnhancementPresets = {
         Engineer = {
             BuildIconSortPriority = 20,
-            Description = '<LOC ual0301_Engineer_desc>Support Armored Command Unit (Pre-enhancements: Engineer)',
+            Description = '<LOC ual0301_Engineer_desc>Support Armored Command Unit (Engineer preset)',
             Enhancements = {
                 'EngineeringFocusingModule',
             },
             HelpText = '<LOC ual0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the rapid replicator enhancement.',
             SortCategory = 'SORTOTHER',
-            UnitName = '<LOC ual0301_Engineer_name>Support Armored Command Unit (Pre-enhancements: Engineer)',
+            UnitName = '<LOC ual0301_Engineer_name>SACU (Engineer preset)',
         },
         NanoCombat = {
             BuildIconSortPriority = 25,
-            Description = '<LOC ual0301_NanoCombat_desc>Support Armored Command Unit (Pre-enhancements: Nano Combatant)',
+            Description = '<LOC ual0301_NanoCombat_desc>Support Armored Command Unit (Nano Combatant preset)',
             Enhancements = {
                 'StabilitySuppressant',
                 'SystemIntegrityCompensator',
             },
             HelpText = '<LOC ual0301_NanoCombat_help>Support Armored Command Unit. Enhanced during construction with the reacton refractor and nano-repair system enhancements.',
             SortCategory = 'SORTOTHER',
-            UnitName = '<LOC ual0301_NanoCombat_name>Support Armored Command Unit (Pre-enhancements: Nano Combatant)',
+            UnitName = '<LOC ual0301_NanoCombat_name>SACU (Nano Combatant preset)',
         }, 
         Rambo = {
             BuildIconSortPriority = 35,
+            Description = '<LOC ual0301_Rambo_desc>Support Armored Command Unit (Rambo preset)',
             Enhancements = {
                 'StabilitySuppressant',
                 'Shield',
                 'ShieldHeavy',
             },
+            HelpText = '<LOC ual0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with a personal shield and the reacton refractor enhancements.',
             SortCategory = 'SORTOTHER',
+            UnitName = '<LOC ual0301_Rambo_name>SACU (Rambo preset)',
         },
-        ShieldCombat= {
+        ShieldCombat = {
             BuildIconSortPriority = 30,
+            Description = '<LOC ual0301_ShieldCombat_desc>Support Armored Command Unit (Shield Combatant preset)',
             Enhancements = {
                 'StabilitySuppressant',
                 'Shield',
             },
+            HelpText = '<LOC ual0301_ShieldCombat_help>Support Armored Command Unit. Enhanced during construction with a personal shield and the reacton refractor enhancements.',
             SortCategory = 'SORTOTHER',
+            UnitName = '<LOC ual0301_ShieldCombat_name>SACU (Shield Combatant preset)',
         },
         SimpleCombat = {
             BuildIconSortPriority = 15,
+            Description = '<LOC ual0301_SimpleCombat_desc>Support Armored Command Unit (Combatant preset)',
             Enhancements = {
                 'StabilitySuppressant',
             },
+            HelpText = '<LOC ual0301_SimpleCombat_help>Support Armored Command Unit. Enhanced during construction with the reacton refractor enhancement.',
             SortCategory = 'SORTOTHER',
+            UnitName = '<LOC ual0301_SimpleCombat_name>SACU (Combatant preset)',
         },
     },
     General = {
