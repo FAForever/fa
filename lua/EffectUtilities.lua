@@ -1424,29 +1424,95 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
     local faction = bp.General.FactionName
 
     if faction == 'UEF' then
-        local pos = unit:GetPosition()
-#        local cube1 = Entity()
-#        cube1:SetPosition( Vector(pos[1], pos[2], pos[3]), true )
-#        cube1:SetMesh( '/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp', false )
-#        cube1:SetDrawScale( 1 )
 
-        local cube1 = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
-        Warp(cube1, pos)
-        cube1:SetScale(5,5,5)
+        local scaleX = bp.Physics.MeshExtentsX or bp.SizeX or 3
+        local scaleY = bp.Physics.MeshExtentsY or bp.SizeY or 3
+        local scaleZ = bp.Physics.MeshExtentsZ or bp.SizeZ or 3
 
-        EffectsBag:Add(cube1)
+        if bp.Display.TeleportEffects.PlayChargeFxAtUnit != false then
+            local fn = function(unit, scaleX, scaleY, scaleZ, EffectsBag)
 
-        pos = table.copy( TeleportDestination )
-#        local cube2 = Entity()
-#        cube2:SetPosition( Vector(pos[1], pos[2], pos[3]), true )
-#        cube2:SetMesh( '/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp', false )
-#        cube2:SetDrawScale( 1 )
+                local templ = unit.TeleportChargeFxAtUnitOverride or EffectTemplate.UEFTeleportCharge01
+                for k, v in templ do
+                    local fx = CreateEmitterAtEntity(unit,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
+                    table.insert( unit.TeleportChargeBag, fx)
+                    EffectsBag:Add(fx)
+                end
 
-        local cube2 = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
-        Warp(cube2, pos)
-        cube2:SetScale(5,5,5)
+                local cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
+                cfx:SetScale(scaleX, scaleY, scaleZ)
+                EffectsBag:Add(cfx)
 
-        EffectsBag:Add(cube2)
+                WaitSeconds(0.1)
+
+                local cube1 = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect03_proj.bp',0,0,0, nil, nil, nil )
+                cube1:SetScale(scaleX, scaleY, scaleZ)
+                EffectsBag:Add(cube1)
+
+                WaitSeconds(1.1)
+
+                while unit and not unit:IsDead() and cube1 do
+                    cfx:Destroy()
+                    cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
+                    cfx:SetScale(scaleX, scaleY, scaleZ)
+                    EffectsBag:Add(cfx)
+
+                    WaitSeconds(1.2)
+                end
+            end
+
+            local thread1 = unit:ForkThread(fn, scaleX, scaleY, scaleZ, EffectsBag)
+            EffectsBag:Add(thread1)
+        end
+
+        if bp.Display.TeleportEffects.PlayChargeFxAtDestination != false then
+            local fn = function(unit, scaleX, scaleY, scaleZ, TeleportDestination, EffectsBag)
+
+                unit.TeleportChargeFxAtDest_Multi = 0.1
+
+                local pos = table.copy( TeleportDestination )
+                pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
+                local TeleportDestFxEntity = Entity()
+                Warp( TeleportDestFxEntity, pos )
+
+                local templ = unit.TeleportChargeFxAtDestOverride or EffectTemplate.UEFTeleportCharge02
+                for k, v in templ do
+                    local fx = CreateEmitterAtEntity(TeleportDestFxEntity,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
+                    table.insert( unit.TeleportChargeBag, fx)
+                    EffectsBag:Add(fx)
+                end
+                TeleportDestFxEntity:Destroy()
+
+                local cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
+                Warp(cfx, pos)
+                cfx:SetScale(scaleX, scaleY * unit.TeleportChargeFxAtDest_Multi, scaleZ)
+                EffectsBag:Add(cfx)
+
+                WaitSeconds(0.1)
+
+#                local cube2 = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect03_proj.bp',0,0,0, nil, nil, nil )
+#                Warp(cube2, pos)
+#                cube2:SetScale(scaleX, scaleY * unit.TeleportChargeFxAtDest_Multi, scaleZ)
+#                EffectsBag:Add(cube2)
+
+                WaitSeconds(1.1)
+
+                while unit and not unit:IsDead() do
+                    cfx:Destroy()
+                    cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
+                    Warp(cfx, pos)
+                    cfx:SetScale(scaleX, scaleY * unit.TeleportChargeFxAtDest_Multi, scaleZ)
+                    EffectsBag:Add(cfx)
+
+#                    cube2:SetScale(scaleX, scaleY * unit.TeleportChargeFxAtDest_Multi, scaleZ)
+
+                    WaitSeconds(1.2)
+                end
+            end
+
+            local thread2 = unit:ForkThread(fn, scaleX, scaleY, scaleZ, TeleportDestination, EffectsBag)
+            EffectsBag:Add(thread2)
+        end
 
     elseif faction == 'Cybran' then
 
@@ -1458,7 +1524,6 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
             local templ = unit.TeleportChargeFxAtUnitOverride or EffectTemplate.SeraphimTeleportCharge01
             for k, v in templ do
                 local fx = CreateEmitterAtEntity(unit,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
-                unit.Trash:Add(fx)
                 table.insert( unit.TeleportChargeBag, fx)
                 EffectsBag:Add(fx)
             end
@@ -1475,7 +1540,6 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
             for k, v in templ do
                 local fx = CreateEmitterAtEntity( TeleportDestFxEntity, army, v )
                 fx:ScaleEmitter(0.01)
-                unit.Trash:Add(fx)
                 table.insert( unit.TeleportDestChargeBag, fx)
                 EffectsBag:Add(fx)
             end
@@ -1507,7 +1571,6 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
             for k, v in templ do
                 local fx = CreateEmitterAtEntity( TeleportDestFxEntity, army, v )
                 fx:ScaleEmitter(0.01)
-                unit.Trash:Add(fx)
                 table.insert( unit.TeleportDestChargeBag, fx)
                 EffectsBag:Add(fx)
             end
@@ -1518,10 +1581,18 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
 end
 
 function TeleportChargingProgress(unit, fraction)
-    if unit.TeleportDestChargeBag then
+
+    local faction = unit:GetBlueprint().General.FactionName
+
+    if faction == 'UEF' then
+        if unit.TeleportChargeFxAtDest_Multi and fraction > unit.TeleportChargeFxAtDest_Multi then
+            unit.TeleportChargeFxAtDest_Multi = math.min(1, math.max( 0.1, unit.TeleportChargeFxAtDest_Multi + 0.1))
+        end
+
+    elseif unit.TeleportDestChargeBag then
         local scale = math.max( fraction, 0.01 )
         for k, fx in unit.TeleportDestChargeBag do
-            fx:ScaleEmitter(scale)
+           fx:ScaleEmitter(scale)
         end
     end
 end
@@ -1557,6 +1628,12 @@ function PlayTeleportOutEffects(unit, EffectsBag)
         end
 
     elseif faction == 'UEF' then
+        local scaleX = bp.Physics.MeshExtentsX or bp.SizeX or 3
+        local scaleY = bp.Physics.MeshExtentsY or bp.SizeY or 3
+        local scaleZ = bp.Physics.MeshExtentsZ or bp.SizeZ or 3
+        local cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
+        cfx:SetScale(scaleX, scaleY, scaleZ)
+        EffectsBag:Add(cfx)
 
     else  # Aeon or other factions
         if bp.Display.TeleportEffects.PlayTeleportOutFx != false then
@@ -1684,6 +1761,12 @@ function PlayTeleportInEffects(unit, EffectsBag)
         end
 
     elseif faction == 'UEF' then
+        local scaleX = bp.Physics.MeshExtentsX or bp.SizeX or 3
+        local scaleY = bp.Physics.MeshExtentsY or bp.SizeY or 3
+        local scaleZ = bp.Physics.MeshExtentsZ or bp.SizeZ or 3
+        local cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
+        cfx:SetScale(scaleX, scaleY, scaleZ)
+        EffectsBag:Add(cfx)
 
     else  # Aeon or other factions
 
