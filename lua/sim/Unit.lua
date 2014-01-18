@@ -4376,16 +4376,40 @@ Unit = Class(moho.unit_methods) {
     ##########################################################################################
 
     AddAutoRecall = function(self)
-        self.DoDeathWeapon = function(self)
+
+        # On killed: this function plays when the unit takes a mortal hit.  It plays all the default death effect
+        # it also spawns the wreckage based upon how much it was overkilled.
+        self.OnKilled = function(self, instigator, type, overkillRatio)
+            
+            self.Dead = true
+        
+            self:OnKilledVO()
+            self:DoUnitCallbacks( 'OnKilled' )
+            self:DestroyTopSpeedEffects()
+
+            if self.UnitBeingTeleported and not self.UnitBeingTeleported:IsDead() then
+                self.UnitBeingTeleported:Destroy()
+                self.UnitBeingTeleported = nil
+            end
+
+            #Notify instigator that you killed me.
+            if instigator and IsUnit(instigator) then
+                instigator:OnKilledUnit(self)
+            end
+
+
             local aiBrain = self:GetAIBrain()
             aiBrain:OnAutoRecall()
             self:PlayTeleportOutEffects()
             self:CleanupTeleportChargeEffects()
             self:StopUnitAmbientSound('TeleportLoop')
             self:PlayUnitSound('TeleportEnd')
-            self:Destroy()            
+            self:DisableShield()
+            self:DisableUnitIntel()
+            self:Destroy()  
         end
     end,
+
 
     Recall  = function(self)
         local aiBrain = self:GetAIBrain()
