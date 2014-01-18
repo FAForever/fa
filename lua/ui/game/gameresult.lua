@@ -17,7 +17,7 @@ local OtherArmyResultStrings = {
     draw = '<LOC usersync_0003>%s receives a draw.',
     gameOver = '<LOC usersync_0004>Game Over.',
     recall = '<LOC usersync_0005>%s has fled the battle.',
-    autorecall = '<LOC usersync_0005>%s was recalled by his HQ.',
+    autorecall = '<LOC usersync_0006>%s was recalled by his HQ.',
 }
 
 local MyArmyResultStrings = {
