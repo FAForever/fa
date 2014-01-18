@@ -1423,7 +1423,30 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
     local bp = unit:GetBlueprint()
     local faction = bp.General.FactionName
 
-    if faction == 'Aeon' then
+    if faction == 'UEF' then
+        local pos = unit:GetPosition()
+#        local cube1 = Entity()
+#        cube1:SetPosition( Vector(pos[1], pos[2], pos[3]), true )
+#        cube1:SetMesh( '/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp', false )
+#        cube1:SetDrawScale( 1 )
+
+        local cube1 = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
+        Warp(cube1, pos)
+        cube1:SetScale(5,5,5)
+
+        EffectsBag:Add(cube1)
+
+        pos = table.copy( TeleportDestination )
+#        local cube2 = Entity()
+#        cube2:SetPosition( Vector(pos[1], pos[2], pos[3]), true )
+#        cube2:SetMesh( '/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp', false )
+#        cube2:SetDrawScale( 1 )
+
+        local cube2 = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
+        Warp(cube2, pos)
+        cube2:SetScale(5,5,5)
+
+        EffectsBag:Add(cube2)
 
     elseif faction == 'Cybran' then
 
@@ -1459,7 +1482,7 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
             TeleportDestFxEntity:Destroy()
         end
 
-    else  # UEF or other factions
+    else  # Aeon or other factions
 
         # Creating teleport fx at unit location
         if bp.Display.TeleportEffects.PlayChargeFxAtUnit != false then
