@@ -246,7 +246,8 @@ URL0001 = Class(CWalkingLandUnit) {
                 CreateAttachedEmitter(self,bone,army, v)
             end
         end
-        
+
+self:CreateEnhancement('Teleporter')
         WaitSeconds(6)
         self:SetMesh(self:GetBlueprint().Display.MeshBlueprint, true)
     end,    

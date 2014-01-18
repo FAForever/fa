@@ -414,6 +414,34 @@ UEFTeleportCharge02 = {
 #    EmtBpPath .. 'uef_teleport_charge_01_emit.bp', 
 }
 
+UEFTeleportInWeapon01 = {
+}
+
+
+CybranTeleportCharge01 = {
+
+}
+
+CybranTeleportCharge02 = {
+    EmtBpPath .. 'cybran_teleport_charge_01_emit.bp',
+    EmtBpPath .. 'cybran_teleport_charge_02_emit.bp',
+    EmtBpPath .. 'cybran_teleport_charge_03_emit.bp',
+    EmtBpPath .. 'cybran_teleport_charge_04_emit.bp',
+    EmtBpPath .. 'cybran_teleport_charge_05_emit.bp',
+    EmtBpPath .. 'cybran_teleport_charge_06_emit.bp',
+}
+
+CybranTeleportIn01 = {
+    EmtBpPath .. 'cybran_teleportin_01_emit.bp',
+#    EmtBpPath .. 'cybran_teleportin_02_emit.bp',
+    EmtBpPath .. 'cybran_teleportin_04_emit.bp',
+    EmtBpPath .. 'cybran_teleportin_05_emit.bp',
+}
+
+CybranTeleportInWeapon01 = {
+    EmtBpPath .. 'cybran_teleportin_weapon_01_emit.bp',
+}
+
 SeraphimTeleportCharge01 = {
     EmtBpPath .. 'seraphim_teleport_charge_01_emit.bp', 
     EmtBpPath .. 'seraphim_teleport_charge_02_emit.bp', 

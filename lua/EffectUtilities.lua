@@ -1425,9 +1425,9 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
 
     if faction == 'UEF' then
 
-        local scaleX = bp.Physics.MeshExtentsX or bp.SizeX or 3
-        local scaleY = bp.Physics.MeshExtentsY or bp.SizeY or 3
-        local scaleZ = bp.Physics.MeshExtentsZ or bp.SizeZ or 3
+        local scaleX = 1.05 * (bp.Physics.MeshExtentsX or bp.SizeX or 3)
+        local scaleY = 1.05 * (bp.Physics.MeshExtentsY or bp.SizeY or 3)
+        local scaleZ = 1.05 * (bp.Physics.MeshExtentsZ or bp.SizeZ or 3)
 
         if bp.Display.TeleportEffects.PlayChargeFxAtUnit != false then
             local fn = function(unit, scaleX, scaleY, scaleZ, EffectsBag)
@@ -1440,24 +1440,27 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
                 end
 
                 local cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
+                Warp(cfx, pos, unit:GetOrientation())
                 cfx:SetScale(scaleX, scaleY, scaleZ)
                 EffectsBag:Add(cfx)
 
                 WaitSeconds(0.1)
 
                 local cube1 = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect03_proj.bp',0,0,0, nil, nil, nil )
+                Warp(cube1, pos, unit:GetOrientation())
                 cube1:SetScale(scaleX, scaleY, scaleZ)
                 EffectsBag:Add(cube1)
 
-                WaitSeconds(1.1)
+                WaitSeconds(0.5)
 
                 while unit and not unit:IsDead() and cube1 do
                     cfx:Destroy()
                     cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
+                    Warp(cfx, pos, unit:GetOrientation())
                     cfx:SetScale(scaleX, scaleY, scaleZ)
                     EffectsBag:Add(cfx)
 
-                    WaitSeconds(1.2)
+                    WaitSeconds(0.6)
                 end
             end
 
@@ -1483,30 +1486,13 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
                 end
                 TeleportDestFxEntity:Destroy()
 
-                local cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
-                Warp(cfx, pos)
-                cfx:SetScale(scaleX, scaleY * unit.TeleportChargeFxAtDest_Multi, scaleZ)
-                EffectsBag:Add(cfx)
-
-                WaitSeconds(0.1)
-
-#                local cube2 = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect03_proj.bp',0,0,0, nil, nil, nil )
-#                Warp(cube2, pos)
-#                cube2:SetScale(scaleX, scaleY * unit.TeleportChargeFxAtDest_Multi, scaleZ)
-#                EffectsBag:Add(cube2)
-
-                WaitSeconds(1.1)
-
                 while unit and not unit:IsDead() do
                     cfx:Destroy()
                     cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
-                    Warp(cfx, pos)
+                    Warp(cfx, pos, unit:GetOrientation())
                     cfx:SetScale(scaleX, scaleY * unit.TeleportChargeFxAtDest_Multi, scaleZ)
                     EffectsBag:Add(cfx)
-
-#                    cube2:SetScale(scaleX, scaleY * unit.TeleportChargeFxAtDest_Multi, scaleZ)
-
-                    WaitSeconds(1.2)
+                    WaitSeconds(0.6)
                 end
             end
 
@@ -1515,6 +1501,21 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
         end
 
     elseif faction == 'Cybran' then
+        if bp.Display.TeleportEffects.PlayChargeFxAtDestination != false then
+
+            local pos = table.copy( TeleportDestination )
+            pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3]) + ((bp.Physics.MeshExtentsY or 1) / 2)
+            local sphere = TeleportCreateCybranSphere(unit, pos, 0.01)
+
+            unit.TeleportDestChargeBag = {}
+            local templ = unit.TeleportChargeFxAtDestOverride or EffectTemplate.CybranTeleportCharge02
+            for k, v in templ do
+                local fx = CreateEmitterAtEntity( sphere, army, v )
+                fx:ScaleEmitter(0.01 * unit.TeleportCybranSphereScale)
+                table.insert( unit.TeleportDestChargeBag, fx)
+                EffectsBag:Add(fx)
+            end
+        end
 
     elseif faction == 'Seraphim' then
 
@@ -1580,20 +1581,54 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
     end
 end
 
+function TeleportCreateCybranSphere(unit, location, initialScale)
+    local bp = unit:GetBlueprint()
+    local scale = 1
+
+    if bp.Physics.MeshExtentsX or bp.Physics.MeshExtentsY or bp.Physics.MeshExtentsZ then
+        scale = 2 * math.max(bp.Physics.MeshExtentsX or 0, math.max(bp.Physics.MeshExtentsY or 0, bp.Physics.MeshExtentsZ or 0))
+    elseif bp.SizeX or bp.SizeY or bp.SizeZ then
+        scale = 2 * math.max(bp.SizeX or 0, math.max(bp.SizeY or 0, bp.SizeZ or 0))
+    end
+
+    unit.TeleportCybranSphereScale = scale
+    local sphere = Entity()
+    sphere:SetPosition(location, true)
+    sphere:SetMesh('/effects/Entities/CybranTeleport/CybranTeleport_mesh', false)
+    sphere:SetDrawScale(initialScale or scale)
+    unit.Trash:Add(sphere)
+    unit.TeleportCybranSphere = sphere
+    return sphere
+end
+
 function TeleportChargingProgress(unit, fraction)
 
-    local faction = unit:GetBlueprint().General.FactionName
+    local bp = unit:GetBlueprint()
+    if bp.Display.TeleportEffects.PlayChargeFxAtDestination != false then
 
-    if faction == 'UEF' then
-        if unit.TeleportChargeFxAtDest_Multi and fraction > unit.TeleportChargeFxAtDest_Multi then
-            unit.TeleportChargeFxAtDest_Multi = math.min(1, math.max( 0.1, unit.TeleportChargeFxAtDest_Multi + 0.1))
+        local faction = bp.General.FactionName
+
+        if faction == 'UEF' then
+            if unit.TeleportChargeFxAtDest_Multi and fraction > unit.TeleportChargeFxAtDest_Multi then
+                unit.TeleportChargeFxAtDest_Multi = math.min(1, math.max( 0.1, unit.TeleportChargeFxAtDest_Multi + 0.1))
+            end
+
+        elseif faction == 'Cybran' then
+            if unit.TeleportCybranSphere then
+                local scale = math.max( fraction, 0.01 ) * (unit.TeleportCybranSphereScale or 5)
+                unit.TeleportCybranSphere:SetDrawScale(scale)
+                for k, fx in unit.TeleportDestChargeBag do
+                   fx:ScaleEmitter(scale)
+                end
+            end
+
+        elseif unit.TeleportDestChargeBag then
+            local scale = math.max( fraction, 0.01 )
+            for k, fx in unit.TeleportDestChargeBag do
+               fx:ScaleEmitter(scale)
+            end
         end
 
-    elseif unit.TeleportDestChargeBag then
-        local scale = math.max( fraction, 0.01 )
-        for k, fx in unit.TeleportDestChargeBag do
-           fx:ScaleEmitter(scale)
-        end
     end
 end
 
@@ -1618,7 +1653,17 @@ function PlayTeleportOutEffects(unit, EffectsBag)
     local faction = bp.General.FactionName
     local army = unit:GetArmy()
 
-    if faction == 'Seraphim' then
+    if faction == 'UEF' then
+        if bp.Display.TeleportEffects.PlayTeleportOutFx != false then
+            local scaleX = bp.Physics.MeshExtentsX or bp.SizeX or 3
+            local scaleY = bp.Physics.MeshExtentsY or bp.SizeY or 3
+            local scaleZ = bp.Physics.MeshExtentsZ or bp.SizeZ or 3
+            local cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
+            cfx:SetScale(scaleX, scaleY, scaleZ)
+            EffectsBag:Add(cfx)
+        end
+
+    elseif faction == 'Seraphim' then
         if bp.Display.TeleportEffects.PlayTeleportOutFx != false then
             CreateLightParticle( unit, -1, army, 4, 15, 'glow_05', 'ramp_jammer_01' )
             local MeshExtentsY = (bp.Physics.MeshExtentsY or 1)
@@ -1627,13 +1672,9 @@ function PlayTeleportOutEffects(unit, EffectsBag)
             end
         end
 
-    elseif faction == 'UEF' then
-        local scaleX = bp.Physics.MeshExtentsX or bp.SizeX or 3
-        local scaleY = bp.Physics.MeshExtentsY or bp.SizeY or 3
-        local scaleZ = bp.Physics.MeshExtentsZ or bp.SizeZ or 3
-        local cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
-        cfx:SetScale(scaleX, scaleY, scaleZ)
-        EffectsBag:Add(cfx)
+    elseif faction == 'Cybran' then
+        if bp.Display.TeleportEffects.PlayTeleportOutFx != false then
+        end
 
     else  # Aeon or other factions
         if bp.Display.TeleportEffects.PlayTeleportOutFx != false then
@@ -1674,10 +1715,14 @@ function DoTeleportInDamage(unit)
             local army = unit:GetArmy()
             local templ
 
-            if faction == 'Seraphim' then
-                templ = EffectTemplate.SeraphimTeleportInWeapon01
+            if unit.TeleportInWeaponFxOverride then
+                templ = unit.TeleportInWeaponFxOverride
             elseif faction == 'UEF' then
-                templ = EffectTemplate.GenericTeleportInWeapon01
+                templ = EffectTemplate.UEFTeleportInWeapon01
+            elseif faction == 'Cybran' then
+                templ = EffectTemplate.CybranTeleportInWeapon01
+            elseif faction == 'Seraphim' then
+                templ = EffectTemplate.SeraphimTeleportInWeapon01
             else  # Aeon or other factions
                 templ = EffectTemplate.GenericTeleportInWeapon01
             end
@@ -1700,7 +1745,55 @@ function PlayTeleportInEffects(unit, EffectsBag)
 
     DoTeleportInDamage(unit)
 
-    if faction == 'Seraphim' then
+    if faction == 'UEF' then
+        if bp.Display.TeleportEffects.PlayTeleportInFx != false then
+            local scaleX = bp.Physics.MeshExtentsX or bp.SizeX or 3
+            local scaleY = bp.Physics.MeshExtentsY or bp.SizeY or 3
+            local scaleZ = bp.Physics.MeshExtentsZ or bp.SizeZ or 3
+            local cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
+            cfx:SetScale(scaleX, scaleY, scaleZ)
+            EffectsBag:Add(cfx)
+        end
+
+    elseif faction == 'Cybran' then
+        if bp.Display.TeleportEffects.PlayTeleportInFx != false then
+            if not unit.TeleportCybranSphere then
+                local pos = table.copy( unit:GetPosition() )
+                pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3]) + ((bp.Physics.MeshExtentsY or 1) / 2)
+                unit.TeleportCybranSphere = TeleportCreateCybranSphere(unit, unit:GetPosition())
+            end
+
+            unit:HideBone(0, true)
+
+            local MeshExtentsY = (bp.Physics.MeshExtentsY or 1)
+            local templ = unit.TeleportInFxOverride or EffectTemplate.CybranTeleportIn01
+            local scale = unit.TeleportCybranSphereScale or 5
+            local fx = nil
+            for k, v in templ do
+                fx = CreateEmitterAtEntity(unit.TeleportCybranSphere,army,v)
+                fx:ScaleEmitter(scale)
+            end
+
+            CreateLightParticle( unit.TeleportCybranSphere, -1, army, 4, 15, 'glow_02', 'ramp_white_01' )
+
+            local decalOrient = RandomFloat(0,2*math.pi)
+            CreateDecal(unit:GetPosition(), decalOrient, 'Scorch_generic_008_albedo', '', 'Albedo', 7, 7, 200, 300, army)
+
+            local fn = function(unit)
+                WaitSeconds(0.3)
+                unit:ShowBone(0, true)
+                unit:ShowPresetEnhancementBones()
+                WaitSeconds(0.8)
+                if unit.TeleportCybranSphere then
+                    unit.TeleportCybranSphere:Destroy()
+                end
+            end
+
+            local thread = unit:ForkThread(fn)
+            EffectsBag:Add(thread)
+        end
+
+    elseif faction == 'Seraphim' then
 
         # this is basically a copy of the stock SeraphimRiftIn effect used when finished construction of buildings. This copy respects
         # unit enhancements
@@ -1724,31 +1817,7 @@ function PlayTeleportInEffects(unit, EffectsBag)
                 WaitSeconds (0.3)
 
                 unit:ShowBone(0, true)
-
-                if bp.Enhancements then
-
-                    # show all relevant bones
-                    for k, enh in bp.Enhancements do
-                        if unit:HasEnhancement(k) then
-                            if enh.ShowBones then
-                                for _, bone in enh.ShowBones do
-                                    unit:ShowBone(bone, true)
-                                end
-                            end
-                        else
-                            if enh.ShowBones then
-                                for _, bone in enh.ShowBones do
-                                    unit:HideBone(bone, true)
-                                end
-                            end
-                        end
-                        if enh.HideBones then
-                            for _, bone in enh.HideBones do
-                                unit:HideBone(bone, true)
-                            end
-                        end
-                    end
-                end
+                unit:ShowPresetEnhancementBones()
 
                 WaitSeconds (0.25)
                 for k, v in EffectTemplate.SeraphimTeleportIn02 do
@@ -1759,14 +1828,6 @@ function PlayTeleportInEffects(unit, EffectsBag)
             local thread = unit:ForkThread(fn)
             EffectsBag:Add(thread)
         end
-
-    elseif faction == 'UEF' then
-        local scaleX = bp.Physics.MeshExtentsX or bp.SizeX or 3
-        local scaleY = bp.Physics.MeshExtentsY or bp.SizeY or 3
-        local scaleZ = bp.Physics.MeshExtentsZ or bp.SizeZ or 3
-        local cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
-        cfx:SetScale(scaleX, scaleY, scaleZ)
-        EffectsBag:Add(cfx)
 
     else  # Aeon or other factions
 

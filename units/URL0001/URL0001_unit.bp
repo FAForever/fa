@@ -281,9 +281,9 @@ UnitBlueprint {
         ProductionPerSecondMass = 1,
         StorageEnergy = 4000,
         StorageMass = 650,
-        TeleportEnergyMod = 0.03,
+        TeleportEnergyMod = 0.0001, #0.03,
         TeleportMassMod = 0,
-        TeleportTimeMod = 0.0001,
+        TeleportTimeMod = 0.01, #0.0001,
     },
     Enhancements = {
         AdvancedEngineering = {
@@ -1043,6 +1043,18 @@ UnitBlueprint {
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
             Turreted = false,
             WeaponCategory = 'Anti Navy',
+        },
+        {
+            Damage = 1000,
+            DamageFriendly = true,
+            DamageRadius = 4,
+            DamageType = 'Normal',
+            DisplayName = 'Teleport in',
+            DummyWeapon = true,
+            Label = 'TeleportWeapon',
+            MaxRadius = 1,
+            RateOfFire = 1,
+            WeaponCategory = 'Teleport',
         },
     },
 }

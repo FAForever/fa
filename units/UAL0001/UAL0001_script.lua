@@ -228,6 +228,7 @@ UAL0001 = Class(AWalkingLandUnit) {
             end
         end
 
+self:CreateEnhancement('Teleporter')
         WaitSeconds(6)
         self:SetMesh(self:GetBlueprint().Display.MeshBlueprint, true)
     end,
