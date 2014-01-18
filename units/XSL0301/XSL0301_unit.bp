@@ -572,9 +572,10 @@ UnitBlueprint {
             },
             SortCategory = 'SORTOTHER',
         },
-        Nano = {
+        NanoCombat = {
             BuildIconSortPriority = 25,
             Enhancements = {
+                'EnhancedSensors',
                 'DamageStabilization',
             },
             SortCategory = 'SORTOTHER',
@@ -585,13 +586,6 @@ UnitBlueprint {
                 'Overcharge',
                 'Shield',
                 'DamageStabilization',
-            },
-            SortCategory = 'SORTOTHER',
-        },
-        Teleporter = {
-            BuildIconSortPriority = 45,
-            Enhancements = {
-                'Teleporter',
             },
             SortCategory = 'SORTOTHER',
         },

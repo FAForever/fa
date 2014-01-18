@@ -216,7 +216,7 @@ Description = {
    ['url0301-sfs'] = "<LOC Unit_Description_0123> Hides the SACU from radar. Requires Energy to run.",
   
    ['url0301_AntiAir'] = "<LOC url0301_AntiAir_help>SACU upgraded with a SAM launcher.",
-   ['url0301_Cloack'] = "<LOC url0301_Cloack_help>SACU upgraded with a personal Cloacking generator and rate of fire upgrade.",
+   ['url0301_Cloak'] = "<LOC url0301_Cloak_help>SACU upgraded with a personal Stealth/Cloaking generator and rate of fire upgrade.",
    ['url0301_Combat'] = "<LOC url0301_Combat_help>SACU upgraded with EMP and weapon upgrade.",
    ['url0301_Engineer'] = "<LOC url0301_Engineer_help>SACU upgraded with Rapid Fabricator.",
    ['url0301_Rambo'] = "<LOC url0301_Rambo_help>SACU upgraded with Nano-repair and both weapon upgrades.",
@@ -522,7 +522,7 @@ Description = {
    ['xsl0301_Combat'] = "<LOC xsl0301_Combat_help>SACU upgraded with range/intel upgrade.",
    ['xsl0301_Engineer'] = "<LOC xsl0301_Engineer_help>SACU upgraded with Rapid Fabricator.",
    ['xsl0301_Missile'] = "<LOC xsl0301_Missile_help>SACU equipped with Tactical Missile and Rapid Fabricator.",
-   ['xsl0301_Nano'] = "<LOC xsl0301_Nano_help>SACU upgraded with Nano regeneration.",
+   ['xsl0301_NanoCombat'] = "<LOC xsl0301_NanoCombat_help>SACU upgraded with Nano regeneration and range/intel upgrade.",
    ['xsl0301_Rambo'] = "<LOC xsl0301_Rambo_help>SACU upgraded with Overcharge, Nano-repair and Shield upgrades.",
    ['xsl0301_Teleporter'] = "<LOC xsl0301_Teleporter_help>SACU upgraded with a personal Teleporter.",
 

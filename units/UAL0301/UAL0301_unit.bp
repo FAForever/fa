@@ -591,14 +591,6 @@ UnitBlueprint {
             },
             SortCategory = 'SORTOTHER',
         },
-        Teleporter = {
-            BuildIconSortPriority = 40,
-            Enhancements = {
-                'StabilitySuppressant',
-                'Teleporter',
-            },
-            SortCategory = 'SORTOTHER',
-        },
     },
     General = {
         BuildBones = {
