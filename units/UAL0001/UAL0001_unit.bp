@@ -244,6 +244,12 @@
         },
         PlaceholderMeshName = 'UXB0000',
         SpawnRandomRotation = true,
+        TeleportEffects = {
+            PlayChargeFxAtDestination = true,
+            PlayChargeFxAtUnit = true,
+            PlayTeleportOutFx = true,
+            PlayTeleportInFx = true,
+        },
         TransportAnimation = {
             {
                 Animation = '/units/UAL0001/UAL0001_afold.sca',
@@ -1068,6 +1074,18 @@
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
             WeaponCategory = 'Death',
+        },
+        {
+            Damage = 1000,
+            DamageFriendly = true,
+            DamageRadius = 4,
+            DamageType = 'Normal',
+            DisplayName = 'Teleport in',
+            DummyWeapon = true,
+            Label = 'TeleportWeapon',
+            MaxRadius = 1,
+            RateOfFire = 1,
+            WeaponCategory = 'Teleport',
         },
     },
 }

@@ -250,7 +250,7 @@ UnitBlueprint {
         PlaceholderMeshName = 'UXB0000',
         SpawnRandomRotation = true,
         TeleportEffects = {
-            PlayChargeFxAtDestination = false,
+            PlayChargeFxAtDestination = true,
             PlayChargeFxAtUnit = true,
             PlayTeleportOutFx = true,
             PlayTeleportInFx = true,

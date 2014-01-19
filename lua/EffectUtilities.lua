@@ -1553,7 +1553,7 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
             Warp( TeleportDestFxEntity, pos )
             local templ = unit.TeleportChargeFxAtDestOverride or EffectTemplate.SeraphimTeleportCharge02
             for k, v in templ do
-                local fx = CreateEmitterAtEntity( TeleportDestFxEntity, army, v )
+                local fx = CreateEmitterAtEntity( TeleportDestFxEntity, army, v ):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
                 fx:ScaleEmitter(0.01)
                 table.insert( unit.TeleportDestChargeBag, fx)
                 EffectsBag:Add(fx)
@@ -1584,7 +1584,7 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
             Warp( TeleportDestFxEntity, pos )
             local templ = unit.TeleportChargeFxAtDestOverride or EffectTemplate.GenericTeleportCharge02
             for k, v in templ do
-                local fx = CreateEmitterAtEntity( TeleportDestFxEntity, army, v )
+                local fx = CreateEmitterAtEntity( TeleportDestFxEntity, army, v ):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
                 fx:ScaleEmitter(0.01)
                 table.insert( unit.TeleportDestChargeBag, fx)
                 EffectsBag:Add(fx)

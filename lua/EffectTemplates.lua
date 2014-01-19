@@ -387,6 +387,7 @@ GenericTeleportCharge02 = {
     EmtBpPath .. 'generic_teleport_charge_04_emit.bp',
     EmtBpPath .. 'generic_teleport_charge_05_emit.bp',
     EmtBpPath .. 'generic_teleport_charge_06_emit.bp',
+    EmtBpPath .. 'generic_teleport_charge_07_emit.bp',
 }
 
 GenericTeleportOut01 = {
@@ -403,7 +404,7 @@ GenericTeleportIn01 = {
 }
 
 GenericTeleportInWeapon01 = {
-#    EmtBpPath .. 'generic_teleportin_weapon_01_emit.bp',
+    EmtBpPath .. 'generic_teleportin_weapon_01_emit.bp',
 }
 
 UEFTeleportCharge01 = {
