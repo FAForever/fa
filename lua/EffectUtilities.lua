@@ -1451,7 +1451,6 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
                 Warp(cube1, pos, unit:GetOrientation())
                 cube1:SetScale(scaleX, scaleY, scaleZ)
                 EffectsBag:Add(cube1)
-unit.cube1 = cube1
 
                 WaitSeconds(0.5)
 
@@ -1483,6 +1482,7 @@ unit.cube1 = cube1
             local templ = unit.TeleportChargeFxAtDestOverride or EffectTemplate.UEFTeleportCharge02
             for k, v in templ do
                 local fx = CreateEmitterAtEntity(mimic, army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
+                fx:SetEmitterCurveParam('Y_POSITION_CURVE', 0, (bp.Physics.MeshExtentsY or 1) )
                 table.insert( unit.TeleportChargeBag, fx)
                 EffectsBag:Add(fx)
             end
@@ -1694,6 +1694,21 @@ function PlayTeleportOutEffects(unit, EffectsBag)
             local cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
             cfx:SetScale(scaleX, scaleY, scaleZ)
             EffectsBag:Add(cfx)
+
+            CreateLightParticle( unit, -1, army, 3, 7, 'glow_03', 'ramp_blue_02' )
+            local MeshExtentsY = (bp.Physics.MeshExtentsY or 1)
+            for k, v in unit.TeleportOutFxOverride or EffectTemplate.UEFTeleportOut01 do
+                CreateEmitterAtEntity(unit, army, v):OffsetEmitter(0, MeshExtentsY / 2, 0)
+            end
+        end
+
+    elseif faction == 'Cybran' then
+        if bp.Display.TeleportEffects.PlayTeleportOutFx != false then
+            CreateLightParticle( unit, -1, army, 4, 10, 'glow_02', 'ramp_red_06' )
+            local MeshExtentsY = (bp.Physics.MeshExtentsY or 1)
+            for k, v in unit.TeleportOutFxOverride or EffectTemplate.CybranTeleportOut01 do
+                CreateEmitterAtEntity(unit, army, v):OffsetEmitter(0, MeshExtentsY / 2, 0)
+            end
         end
 
     elseif faction == 'Seraphim' then
@@ -1703,10 +1718,6 @@ function PlayTeleportOutEffects(unit, EffectsBag)
             for k, v in unit.TeleportOutFxOverride or EffectTemplate.SeraphimTeleportOut01 do
                 CreateEmitterAtEntity(unit, army, v):OffsetEmitter(0, MeshExtentsY / 2, 0)
             end
-        end
-
-    elseif faction == 'Cybran' then
-        if bp.Display.TeleportEffects.PlayTeleportOutFx != false then
         end
 
     else  # Aeon or other factions
@@ -1782,8 +1793,18 @@ function PlayTeleportInEffects(unit, EffectsBag)
         if bp.Display.TeleportEffects.PlayTeleportInFx != false then
 
             local fn = function(unit)
-                CreateLightParticle( unit, -1, army, 4, 12, 'glow_03', 'ramp_yellow_01' )
+                local bp = unit:GetBlueprint()
+                local MeshExtentsY = (bp.Physics.MeshExtentsY or 1)
+
+                CreateLightParticle( unit, -1, army, 4, 10, 'glow_03', 'ramp_yellow_01' )
                 unit:HideBone(0, true)
+
+                local templ = unit.TeleportInFxOverride or EffectTemplate.UEFTeleportIn01
+                local fx = nil
+                for k, v in templ do
+                    fx = CreateEmitterAtEntity(unit,army,v):OffsetEmitter(0, MeshExtentsY / 2, 0)
+                end
+
                 WaitSeconds(0.2)
                 if unit.TeleportMimic then
                     unit.TeleportMimic:Destroy()
