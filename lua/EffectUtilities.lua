@@ -1451,6 +1451,7 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
                 Warp(cube1, pos, unit:GetOrientation())
                 cube1:SetScale(scaleX, scaleY, scaleZ)
                 EffectsBag:Add(cube1)
+unit.cube1 = cube1
 
                 WaitSeconds(0.5)
 
@@ -1584,32 +1585,36 @@ end
 
 function CreateMimicEntityOfUnit(unit, location)
     local bp = unit:GetBlueprint()
+    local army = unit:GetArmy()
 
-    local mimic = Entity()
-    mimic:SetPosition(location, true)
-    mimic:SetOrientation( unit:GetOrientation(), true )
-    mimic:SetMesh('/units/UEL0001/UEL0001_TeleportMimic_mesh', false)
-    mimic:SetDrawScale( bp.Display.UniformScale or 1 )
+    local mimicBp = bp.Display.TeleportEffects.TeleportAvatarUnit
 
-# FIXME: showing and hiding bones on entities isn't possible...
-    if bp.Enhancements then
-        for k, enh in bp.Enhancements do
-            if enh.HideBones then
-                for _, bone in enh.HideBones do
-#                    mimic:HideBone(bone, true)
+    if mimicBp then
+        local mimic = CreateUnitHPR( mimicBp, army, location[1], location[2], location[3], 0, 0, 0)
+        mimic:SetOrientation( unit:GetOrientation(), true )
+
+        if bp.Enhancements then
+            for k, enh in bp.Enhancements do
+                if enh.HideBones then
+                    for _, bone in enh.HideBones do
+                        mimic:HideBone(bone, true)
+                    end
+                end
+            end
+            for k, enh in bp.Enhancements do
+                if unit:HasEnhancement(k) and enh.ShowBones then
+                    for _, bone in enh.ShowBones do
+                        mimic:ShowBone(bone, true)
+                    end
                 end
             end
         end
-        for k, enh in bp.Enhancements do
-            if unit:HasEnhancement(k) and enh.ShowBones then
-                for _, bone in enh.ShowBones do
-#                    mimic:ShowBone(bone, true)
-                end
-            end
-        end
+
+        return mimic
+    else
+        WARN('*DEBUG: no avatar unit specified for use during the UEF teleport effect')
     end
-
-    return mimic
+    return
 end
 
 function TeleportCreateCybranSphere(unit, location, initialScale)

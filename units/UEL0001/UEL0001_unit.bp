@@ -275,6 +275,7 @@ UnitBlueprint {
             PlayChargeFxAtUnit = true,
             PlayTeleportOutFx = true,
             PlayTeleportInFx = true,
+            TeleportAvatarUnit = 'AvatarUEL0001',
         },
         TransportAnimation = {
             {

@@ -1,0 +1,17 @@
+MeshBlueprint {
+    IconFadeInZoom = 130,
+    LODs = {
+        {
+            MeshName = '/units/UEL0001/uel0001_lod0.scm',
+            AlbedoName = '/units/UEL0001/uel0001_albedo.dds',
+            NormalsName = '/units/UEL0001/uel0001_normals.dds',
+            SpecularName = '/units/UEL0001/uel0001_specteam.dds',
+
+#                    ShaderName = 'AlphaFade',
+            ShaderName = 'ShieldAeon',
+#                    ShaderName = 'UEFBuildCube',
+#            ShaderName = 'UnitStunned',
+            LODCutoff = 195,
+        },
+    },
+}
