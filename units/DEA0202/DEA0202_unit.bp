@@ -451,7 +451,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             BombDropThreshold = 4,
             CollideFriendly = false,
-            Damage = 10,
+            Damage = 5, # 10
             DamageFriendly = true,
             DamageRadius = 3,
             DamageType = 'Normal',
@@ -465,6 +465,7 @@ UnitBlueprint {
             },
             FiringRandomness = 0.1,
             FiringTolerance = 6,
+            InitialDamage = 75, # added
             Label = 'Bomb',
             MaxRadius = 60, # 45
             MuzzleSalvoDelay = 0.25,
