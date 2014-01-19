@@ -1,0 +1,366 @@
+UnitBlueprint {
+    AI = {
+        GuardReturnRadius = 120,
+        GuardScanRadius = 60,
+    },
+    Air = {
+        AutoLandTime = 1,
+        BankFactor = 3,
+        BankForward = false,
+        BreakOffDistance = 25, # 30
+        BreakOffIfNearNewTarget = true,
+        BreakOffTrigger = 20,
+        CanFly = true,
+        CombatTurnSpeed = 1.4, # 0.7
+        EngageDistance = 50,
+        KLift = 3,
+        KLiftDamping = 2.5,
+        KMove = 1,
+        KMoveDamping = 2,
+        KRoll = 2,
+        KRollDamping = 2,
+        KTurn = 0.7,
+        KTurnDamping = 1,
+        LiftFactor = 10,
+        MaxAirspeed = 10, # 7
+        MinAirspeed = 10,
+        PredictAheadForBombDrop = 3,
+        StartTurnDistance = 5,
+        TightTurnMultiplier = 0,
+        TurnSpeed = 1.4, # 0.7
+        Winged = true,
+    },
+    Audio = {
+        AirUnitWaterImpact = Sound {
+            Bank = 'Explosions',
+            Cue = 'Expl_Water_Lrg_01',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        AmbientMove = Sound {
+            Bank = 'UAA',
+            Cue = 'UAA0103_Move_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        Destroyed = Sound {
+            Bank = 'UAADestroy',
+            Cue = 'UAA_Destroy_Air',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        Killed = Sound {
+            Bank = 'UAADestroy',
+            Cue = 'UAA_Destroy_Air_Killed',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        Landing = Sound {
+            Bank = 'UAA',
+            Cue = 'UAA0103_Move_Land',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        Refueling = Sound {
+            Bank = 'UEA',
+            Cue = 'UEA_Repair_Refuel',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        StartMove = Sound {
+            Bank = 'UAA',
+            Cue = 'UAA0103_Move_Start',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        StopMove = Sound {
+            Bank = 'UAA',
+            Cue = 'UAA0103_Move_Stop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        Thruster = Sound {
+            Bank = 'UAA',
+            Cue = 'UAA0103_Move_Thruster',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        UISelection = Sound {
+            Bank = 'Interface',
+            Cue = 'Aeon_Select_Air',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+    },
+    Buffs = {
+        Regen = {
+            Level1 = 1,
+            Level2 = 2,
+            Level3 = 3,
+            Level4 = 4,
+            Level5 = 5,
+        },
+    },
+    BuildIconSortPriority = 40,
+    Categories = {
+        'PRODUCTSC1',
+        'SELECTABLE',
+        'BUILTBYTIER1FACTORY',
+        'BUILTBYTIER2FACTORY',
+        'BUILTBYTIER3FACTORY',
+        'AEON',
+        'MOBILE',
+        'AIR',
+        'HIGHALTAIR',
+        'TECH1',
+        'BOMBER',
+        'VISIBLETORECON',
+        'RECLAIMABLE',
+        'SHOWATTACKRETICLE',
+        'OVERLAYRADAR',
+    },
+    Defense = {
+        AirThreatLevel = 0,
+        ArmorType = 'Light',
+        EconomyThreatLevel = 0,
+        Health = 205,
+        MaxHealth = 205,
+        RegenRate = 0,
+        SubThreatLevel = 0,
+        SurfaceThreatLevel = 2,
+    },
+    Description = '<LOC uaa0103_desc>Attack Bomber',
+    Display = {
+        Abilities = {
+            '<LOC ability_stun>EMP Weapon',
+            '<LOC ability_radar>Radar',
+        },
+        LayerChangeEffects = {
+            AirLand = {
+                Effects = {
+                    {
+                        Bones = {
+                            'UAA0103',
+                        },
+                        Type = 'Landing01',
+                    },
+                },
+            },
+            LandAir = {
+                Effects = {
+                    {
+                        Bones = {
+                            'UAA0103',
+                        },
+                        Type = 'TakeOff01',
+                    },
+                },
+            },
+        },
+        Mesh = {
+            IconFadeInZoom = 130,
+            LODs = {
+                {
+                    LODCutoff = 120,
+                    Scrolling = true,
+                    ShaderName = 'Aeon',
+                },
+                {
+                    AlbedoName = 'uaa0103_lod1_albedo.dds',
+                    LODCutoff = 215,
+                    ShaderName = 'Aeon',
+                    SpecularName = 'uaa0103_lod1_specteam.dds',
+                },
+            },
+        },
+        MovementEffects = {
+            Air = {
+                Effects = {
+                    {
+                        Bones = {
+                            'Exhaust',
+                        },
+                        Type = 'AirMoveExhaust01',
+                    },
+                },
+            },
+        },
+        PlaceholderMeshName = 'UXA0002',
+        SpawnRandomRotation = true,
+        UniformScale = 0.125,
+    },
+    Economy = {
+        BuildCostEnergy = 2250,
+        BuildCostMass = 80,
+        BuildTime = 500,
+    },
+    Footprint = {
+        MaxSlope = 0.25,
+        SizeX = 1,
+        SizeZ = 1,
+    },
+    General = {
+        Category = 'Bomber',
+        Classification = 'RULEUC_MilitaryAircraft',
+        CommandCaps = {
+            RULEUCC_Attack = true,
+            RULEUCC_CallTransport = true,
+            RULEUCC_Capture = false,
+            RULEUCC_Dock = true,
+            RULEUCC_Guard = true,
+            RULEUCC_Move = true,
+            RULEUCC_Nuke = false,
+            RULEUCC_Patrol = true,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
+            RULEUCC_RetaliateToggle = true,
+            RULEUCC_Stop = true,
+            RULEUCC_Transport = false,
+        },
+        FactionName = 'Aeon',
+        Icon = 'air',
+        TechLevel = 'RULEUTL_Basic',
+        UnitName = '<LOC uaa0103_name>Shimmer',
+        UnitWeight = 1,
+    },
+    Intel = {
+        RadarRadius = 65,
+        VisionRadius = 32,
+    },
+    Interface = {
+        HelpText = '<LOC uaa0103_help>Attack Bomber',
+    },
+    LifeBarHeight = 0.075,
+    LifeBarOffset = 0.2,
+    LifeBarSize = 1.25,
+    Physics = {
+        BuildOnLayerCaps = {
+            LAYER_Air = true,
+            LAYER_Land = false,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
+        Elevation = 18,
+        FuelRechargeRate = 5,
+        FuelUseTime = 400,
+        GroundCollisionOffset = 1.6,
+        MaxSpeed = 0.5,
+        MeshExtentsX = 0.7,
+        MeshExtentsY = 0.25,
+        MeshExtentsZ = 1.7,
+        MotionType = 'RULEUMT_Air',
+    },
+    SelectionSizeX = 1.55,
+    SelectionSizeZ = 0.45,
+    SelectionThickness = 0.24,
+    SizeSphere = 1.6,
+    SizeX = 2,
+    SizeY = 0.25,
+    SizeZ = 0.625,
+    StrategicIconName = 'icon_bomber1_directfire',
+    StrategicIconSortPriority = 75,
+    Transport = {
+        AirClass = true,
+        TransportClass = 2,
+    },
+    Veteran = {
+        Level1 = 3,
+        Level2 = 6,
+        Level3 = 9,
+        Level4 = 12,
+        Level5 = 15,
+    },
+    Weapon = {
+        {
+            Audio = {
+                Fire = Sound {
+                    Bank = 'UAAWeapon',
+                    Cue = 'UAA0103_Bomb_Graviton',
+                    LodCutoff = 'Weapon_LodCutoff',
+                },
+            },
+            AutoInitiateAttackCommand = true,
+            BallisticArc = 'RULEUBA_None',
+            BombDropThreshold = 3,
+            Buffs = {
+                {
+                    Add = {
+                        OnImpact = true,
+                    },
+                    AppliedToTarget = true,
+                    BuffType = 'STUN',
+                    Duration = 1.5,
+                    Radius = 4,
+                    TargetAllow = 'ALLUNITS',
+                    TargetDisallow = 'TECH3,EXPERIMENTAL,COMMAND,WALL',
+                },
+            },
+            CollideFriendly = false,
+            Damage = 200,
+            DamageFriendly = true,
+            DamageRadius = 4,
+            DamageType = 'Normal',
+            DisplayName = 'Graviton Bomb',
+            FireTargetLayerCapsTable = {
+                Air = 'Land|Water|Seabed',
+                Land = 'Land|Water|Seabed',
+            },
+            FiringRandomness = 0,
+            FiringTolerance = 6,
+			FixBombTrajectory = true, # [152]
+            Label = 'Bomb',
+            MaxRadius = 40,
+            MuzzleSalvoDelay = 0,
+            MuzzleSalvoSize = 1,
+            MuzzleVelocity = 0,
+            NeedToComputeBombDrop = true,
+            ProjectileId = '/projectiles/AIFBombGraviton01/AIFBombGraviton01_proj.bp',
+            ProjectilesPerOnFire = 1,
+            RackBones = {
+                {
+                    MuzzleBones = {
+                        'UAA0103',  # [102]
+                    },
+                    RackBone = 'UAA0103',  # [102]
+                },
+            },
+            RackFireTogether = false,
+            RackRecoilDistance = 0,
+            RackReloadTimeout = 10,
+            RackSalvoChargeTime = 0,
+            RackSalvoReloadTime = 0,
+            RackSalvoSize = 1,
+            RackSlavedToTurret = false,
+            RateOfFire = 0.2, #from 0.5
+            TargetCheckInterval = 1,
+            TargetPriorities = {
+                'SPECIALHIGHPRI',
+                'STRUCTURE',
+                'SPECIALLOWPRI',
+                'ALLUNITS',
+            },
+            TargetRestrictDisallow = 'UNTARGETABLE',
+            TrackingRadius = 1.25,
+            TurretDualManipulators = false,
+            Turreted = false,
+            WeaponCategory = 'Bomb',
+        },
+        {
+            Damage = 100,
+            DamageFriendly = true,
+            DamageRadius = 1,
+            DamageType = 'Normal',
+            DisplayName = 'Air Crash',
+            DummyWeapon = true,
+            FiringTolerance = 2,
+            Label = 'DeathImpact',
+            WeaponCategory = 'Death',
+        },
+    },
+    Wreckage = {
+        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+        EnergyMult = 0,
+        HealthMult = 0.9,
+        MassMult = 0.9,
+        ReclaimTimeMultiplier = 1,
+        WreckageLayers = {
+            Air = false,
+            Land = true,
+            Seabed = true,
+            Sub = true,
+            Water = true,
+        },
+    },
+}
