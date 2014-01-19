@@ -419,7 +419,8 @@ UEFTeleportInWeapon01 = {
 
 
 CybranTeleportCharge01 = {
-
+    EmtBpPath .. 'cybran_teleport_charge_07_emit.bp',
+    EmtBpPath .. 'cybran_teleport_charge_08_emit.bp',
 }
 
 CybranTeleportCharge02 = {

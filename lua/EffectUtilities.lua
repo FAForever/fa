@@ -1501,6 +1501,20 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
         end
 
     elseif faction == 'Cybran' then
+
+        # Creating teleport fx at unit location
+        if bp.Display.TeleportEffects.PlayChargeFxAtUnit != false then
+            unit.TeleportChargeBag = {}
+            local templ = unit.TeleportChargeFxAtUnitOverride or EffectTemplate.CybranTeleportCharge01
+            for k, v in templ do
+                local fx = CreateEmitterAtEntity(unit,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
+                unit.Trash:Add(fx)
+                table.insert( unit.TeleportChargeBag, fx)
+                EffectsBag:Add(fx)
+            end
+        end
+
+        # Creating teleport fx at target location
         if bp.Display.TeleportEffects.PlayChargeFxAtDestination != false then
 
             local pos = table.copy( TeleportDestination )
@@ -1774,7 +1788,7 @@ function PlayTeleportInEffects(unit, EffectsBag)
                 fx:ScaleEmitter(scale)
             end
 
-            CreateLightParticle( unit.TeleportCybranSphere, -1, army, 4, 15, 'glow_02', 'ramp_white_01' )
+            CreateLightParticle( unit.TeleportCybranSphere, -1, army, 4, 10, 'glow_02', 'ramp_white_01' )
 
             local decalOrient = RandomFloat(0,2*math.pi)
             CreateDecal(unit:GetPosition(), decalOrient, 'Scorch_generic_008_albedo', '', 'Albedo', 7, 7, 200, 300, army)
@@ -1786,6 +1800,7 @@ function PlayTeleportInEffects(unit, EffectsBag)
                 WaitSeconds(0.8)
                 if unit.TeleportCybranSphere then
                     unit.TeleportCybranSphere:Destroy()
+                    unit.TeleportCybranSphere = false
                 end
             end
 
