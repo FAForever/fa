@@ -1783,7 +1783,7 @@ Unit = Class(moho.unit_methods) {
         self:DestroyAllDamageEffects()
 
         if self.PlayDestructionEffects then
-            self:CreateDestructionEffects( self, overkillRatio )
+            self:CreateDestructionEffects( overkillRatio )
         end
 
         #MetaImpact( self, self:GetPosition(), 0.1, 0.5 )
