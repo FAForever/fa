@@ -112,7 +112,7 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
                 self.AttachmentSliderManip = CreateSlider(self, bp.Display.BuildAttachBone or 0)
             end
             self:CreateRollOffEffects()
-            self.AttachmentSliderManip:SetSpeed(90)  #was 30, increased to help engineers move faster off of it
+            self.AttachmentSliderManip:SetSpeed(50)  #was 30, increased to help engineers move faster off of it
             self.AttachmentSliderManip:SetGoal(0, 0, 60)
             WaitFor( self.AttachmentSliderManip )
             self.AttachmentSliderManip:SetGoal(0, -55, 60)

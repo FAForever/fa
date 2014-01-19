@@ -7,11 +7,11 @@ UnitBlueprint {
         AutoLandTime = 1,
         BankFactor = 3,
         BankForward = false,
-        BreakOffDistance = 30,
+        BreakOffDistance = 25, # 30
         BreakOffIfNearNewTarget = true,
         BreakOffTrigger = 20,
         CanFly = true,
-        CombatTurnSpeed = 0.7,
+        CombatTurnSpeed = 1.4, # 0.7
         EngageDistance = 50,
         KLift = 3,
         KLiftDamping = 2.5,
@@ -21,13 +21,13 @@ UnitBlueprint {
         KRollDamping = 2,
         KTurn = 0.7,
         KTurnDamping = 1,
-        LiftFactor = 7,
+        LiftFactor = 10, # 7
         MaxAirspeed = 10,
         MinAirspeed = 10,
-        PredictAheadForBombDrop = 3,        
+        PredictAheadForBombDrop = 3,     
         StartTurnDistance = 5,
         TightTurnMultiplier = 0,
-        TurnSpeed = 0.7,
+        TurnSpeed = 1.4, # 0.7
         Winged = true,
     },
     Audio = {
@@ -327,7 +327,7 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 0.25, #from 0.5
+            RateOfFire = 0.2, #from 0.5
             TargetCheckInterval = 1,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
