@@ -412,7 +412,11 @@ UEFTeleportCharge01 = {
 }
 
 UEFTeleportCharge02 = {
-#    EmtBpPath .. 'uef_teleport_charge_01_emit.bp', 
+    EmtBpPath .. 'uef_teleport_charge_01_emit.bp',
+#    EmtBpPath .. 'uef_teleport_charge_03_emit.bp',
+    EmtBpPath .. 'uef_teleport_charge_04_emit.bp',
+    EmtBpPath .. 'uef_teleport_charge_05_emit.bp',
+    EmtBpPath .. 'uef_teleport_charge_06_emit.bp',
 }
 
 UEFTeleportInWeapon01 = {

@@ -1425,9 +1425,9 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
 
     if faction == 'UEF' then
 
-        local scaleX = 1.05 * (bp.Physics.MeshExtentsX or bp.SizeX or 3)
-        local scaleY = 1.05 * (bp.Physics.MeshExtentsY or bp.SizeY or 3)
-        local scaleZ = 1.05 * (bp.Physics.MeshExtentsZ or bp.SizeZ or 3)
+        local scaleX = 1.15 * (bp.Physics.MeshExtentsX or bp.SizeX or 3)
+        local scaleY = 1.15 * (bp.Physics.MeshExtentsY or bp.SizeY or 3)
+        local scaleZ = 1.15 * (bp.Physics.MeshExtentsZ or bp.SizeZ or 3)
 
         if bp.Display.TeleportEffects.PlayChargeFxAtUnit != false then
             local fn = function(unit, scaleX, scaleY, scaleZ, EffectsBag)
@@ -1470,35 +1470,21 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
         end
 
         if bp.Display.TeleportEffects.PlayChargeFxAtDestination != false then
-            local fn = function(unit, scaleX, scaleY, scaleZ, TeleportDestination, EffectsBag)
 
-                unit.TeleportChargeFxAtDest_Multi = 0.1
+            local pos = table.copy( TeleportDestination )
+            pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
 
-                local pos = table.copy( TeleportDestination )
-                pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
-                local TeleportDestFxEntity = Entity()
-                Warp( TeleportDestFxEntity, pos )
+            local mimic = CreateMimicEntityOfUnit(unit, pos)
+            unit.Trash:Add(mimic)
+            unit.TeleportMimic = mimic
 
-                local templ = unit.TeleportChargeFxAtDestOverride or EffectTemplate.UEFTeleportCharge02
-                for k, v in templ do
-                    local fx = CreateEmitterAtEntity(TeleportDestFxEntity,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
-                    table.insert( unit.TeleportChargeBag, fx)
-                    EffectsBag:Add(fx)
-                end
-                TeleportDestFxEntity:Destroy()
-
-                while unit and not unit:IsDead() do
-                    cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
-                    Warp(cfx, pos, unit:GetOrientation())
-                    cfx:SetScale(scaleX, scaleY * unit.TeleportChargeFxAtDest_Multi, scaleZ)
-                    EffectsBag:Add(cfx)
-                    WaitSeconds(0.6)
-                    cfx:Destroy()
-                end
+            unit.TeleportChargeBag = {}
+            local templ = unit.TeleportChargeFxAtDestOverride or EffectTemplate.UEFTeleportCharge02
+            for k, v in templ do
+                local fx = CreateEmitterAtEntity(mimic, army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
+                table.insert( unit.TeleportChargeBag, fx)
+                EffectsBag:Add(fx)
             end
-
-            local thread2 = unit:ForkThread(fn, scaleX, scaleY, scaleZ, TeleportDestination, EffectsBag)
-            EffectsBag:Add(thread2)
         end
 
     elseif faction == 'Cybran' then
@@ -1596,6 +1582,36 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
     end
 end
 
+function CreateMimicEntityOfUnit(unit, location)
+    local bp = unit:GetBlueprint()
+
+    local mimic = Entity()
+    mimic:SetPosition(location, true)
+    mimic:SetOrientation( unit:GetOrientation(), true )
+    mimic:SetMesh('/units/UEL0001/UEL0001_TeleportMimic_mesh', false)
+    mimic:SetDrawScale( bp.Display.UniformScale or 1 )
+
+# FIXME: showing and hiding bones on entities isn't possible...
+    if bp.Enhancements then
+        for k, enh in bp.Enhancements do
+            if enh.HideBones then
+                for _, bone in enh.HideBones do
+#                    mimic:HideBone(bone, true)
+                end
+            end
+        end
+        for k, enh in bp.Enhancements do
+            if unit:HasEnhancement(k) and enh.ShowBones then
+                for _, bone in enh.ShowBones do
+#                    mimic:ShowBone(bone, true)
+                end
+            end
+        end
+    end
+
+    return mimic
+end
+
 function TeleportCreateCybranSphere(unit, location, initialScale)
     local bp = unit:GetBlueprint()
     local scale = 1
@@ -1624,9 +1640,6 @@ function TeleportChargingProgress(unit, fraction)
         local faction = bp.General.FactionName
 
         if faction == 'UEF' then
-            if unit.TeleportChargeFxAtDest_Multi and fraction > unit.TeleportChargeFxAtDest_Multi then
-                unit.TeleportChargeFxAtDest_Multi = math.min(1, math.max( 0.1, unit.TeleportChargeFxAtDest_Multi + 0.1))
-            end
 
         elseif faction == 'Cybran' then
             if unit.TeleportCybranSphere then
@@ -1762,12 +1775,21 @@ function PlayTeleportInEffects(unit, EffectsBag)
 
     if faction == 'UEF' then
         if bp.Display.TeleportEffects.PlayTeleportInFx != false then
-            local scaleX = bp.Physics.MeshExtentsX or bp.SizeX or 3
-            local scaleY = bp.Physics.MeshExtentsY or bp.SizeY or 3
-            local scaleZ = bp.Physics.MeshExtentsZ or bp.SizeZ or 3
-            local cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
-            cfx:SetScale(scaleX, scaleY, scaleZ)
-            EffectsBag:Add(cfx)
+
+            local fn = function(unit)
+                CreateLightParticle( unit, -1, army, 4, 12, 'glow_03', 'ramp_yellow_01' )
+                unit:HideBone(0, true)
+                WaitSeconds(0.2)
+                if unit.TeleportMimic then
+                    unit.TeleportMimic:Destroy()
+                end
+                WaitSeconds(0.1)
+                unit:ShowBone(0, true)
+                unit:ShowPresetEnhancementBones()
+            end
+
+            local thread = unit:ForkThread(fn)
+            EffectsBag:Add(thread)
         end
 
     elseif faction == 'Cybran' then
