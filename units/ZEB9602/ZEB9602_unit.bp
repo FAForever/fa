@@ -139,6 +139,7 @@ UnitBlueprint {
             'BUILTBYTIER3FACTORY UEF STRUCTURE AIR',
             'BUILTBYTIER3FACTORY UEF MOBILE AIR',
             'TRANSPORTBUILTBYTIER3FACTORY UEF MOBILE AIR',
+            'BUILTBYAIRTIER3FACTORY UEF MOBILE CONSTRUCTION',
         },
         StorageEnergy = 0,        StorageMass = 320,
     },

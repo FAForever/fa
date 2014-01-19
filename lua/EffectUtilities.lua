@@ -461,7 +461,7 @@ end
 
 function CreateCybranEngineerBuildEffects( builder, BuildBones, BuildBots, BuildEffectsBag )
     # Create build constant build effect for each build effect bone defined
-    if BuildBones then
+    if BuildBones and BuildBots then
         local army = builder:GetArmy()
         for kBone, vBone in BuildBones do
             for kEffect, vEffect in  EffectTemplate.CybranBuildUnitBlink01 do
