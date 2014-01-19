@@ -2378,6 +2378,27 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    ShowEnhancementBones = function(self)
+        # hide and show certain bones based on available enhancements
+        local bp = self:GetBlueprint()
+        if bp.Enhancements then
+            for k, enh in bp.Enhancements do
+                if enh.HideBones then
+                    for _, bone in enh.HideBones do
+                        self:HideBone(bone, true)
+                    end
+                end
+            end
+            for k, enh in bp.Enhancements do
+                if self:HasEnhancement(k) and enh.ShowBones then
+                    for _, bone in enh.ShowBones do
+                        self:ShowBone(bone, true)
+                    end
+                end
+            end
+        end
+    end,
+
     #############################################################################################
     ## CONSTRUCTING - BUILDING - REPAIR
     #############################################################################################
