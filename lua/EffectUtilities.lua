@@ -1439,6 +1439,7 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
                     EffectsBag:Add(fx)
                 end
 
+                local pos = unit:GetPosition()
                 local cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
                 Warp(cfx, pos, unit:GetOrientation())
                 cfx:SetScale(scaleX, scaleY, scaleZ)
@@ -1487,12 +1488,12 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
                 TeleportDestFxEntity:Destroy()
 
                 while unit and not unit:IsDead() do
-                    cfx:Destroy()
                     cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
                     Warp(cfx, pos, unit:GetOrientation())
                     cfx:SetScale(scaleX, scaleY * unit.TeleportChargeFxAtDest_Multi, scaleZ)
                     EffectsBag:Add(cfx)
                     WaitSeconds(0.6)
+                    cfx:Destroy()
                 end
             end
 
