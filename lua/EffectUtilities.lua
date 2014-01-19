@@ -1422,24 +1422,23 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
     local army = unit:GetArmy()
     local bp = unit:GetBlueprint()
     local faction = bp.General.FactionName
+    local Yoffset = TeleportGetUnitYOffset(unit)
 
-    if faction == 'UEF' then
+    TeleportDestination = TeleportLocationToSurface( TeleportDestination )
 
-        local scaleX = 1.15 * (bp.Physics.MeshExtentsX or bp.SizeX or 3)
-        local scaleY = 1.15 * (bp.Physics.MeshExtentsY or bp.SizeY or 3)
-        local scaleZ = 1.15 * (bp.Physics.MeshExtentsZ or bp.SizeZ or 3)
+    if faction == 'UEF' then                                                                  #### UEF ####
 
-        if bp.Display.TeleportEffects.PlayChargeFxAtUnit != false then
+        if bp.Display.TeleportEffects.PlayChargeFxAtUnit != false then                        # FX AT UNIT
+
             local fn = function(unit, scaleX, scaleY, scaleZ, EffectsBag)
 
-                local templ = unit.TeleportChargeFxAtUnitOverride or EffectTemplate.UEFTeleportCharge01
-                for k, v in templ do
-                    local fx = CreateEmitterAtEntity(unit,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
-                    table.insert( unit.TeleportChargeBag, fx)
-                    EffectsBag:Add(fx)
-                end
-
+                # get position of unit and adjust for centerpoint offset found in blueprint
                 local pos = unit:GetPosition()
+                pos[1] = pos[1] + (bp.CollisionOffsetX or 0)
+                pos[2] = pos[2] + (bp.CollisionOffsetY or 0)
+                pos[3] = pos[3] + (bp.CollisionOffsetZ or 0)
+
+                # creates a single flash of the cube
                 local cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
                 Warp(cfx, pos, unit:GetOrientation())
                 cfx:SetScale(scaleX, scaleY, scaleZ)
@@ -1447,6 +1446,7 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
 
                 WaitSeconds(0.1)
 
+                # creates a static cube, doesn't have effects of its own
                 local cube1 = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect03_proj.bp',0,0,0, nil, nil, nil )
                 Warp(cube1, pos, unit:GetOrientation())
                 cube1:SetScale(scaleX, scaleY, scaleZ)
@@ -1454,6 +1454,7 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
 
                 WaitSeconds(0.5)
 
+                # continuously create flashes of the cube
                 while unit and not unit:IsDead() and cube1 do
                     cfx:Destroy()
                     cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
@@ -1465,48 +1466,53 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
                 end
             end
 
-            local thread1 = unit:ForkThread(fn, scaleX, scaleY, scaleZ, EffectsBag)
+            local scaleMod = 1.15
+            local scaleX, scaleY, scaleZ = TeleportGetUnitSizes(unit)
+            local thread1 = unit:ForkThread(fn, scaleX * scaleMod, scaleY * scaleMod, scaleZ * scaleMod, EffectsBag)
             EffectsBag:Add(thread1)
+
+            local templ = unit.TeleportChargeFxAtUnitOverride or EffectTemplate.UEFTeleportCharge01
+            for k, v in templ do
+                local fx = CreateEmitterAtEntity(unit,army,v):OffsetEmitter(0, Yoffset, 0)
+                table.insert( unit.TeleportChargeBag, fx)
+                EffectsBag:Add(fx)
+            end
         end
 
-        if bp.Display.TeleportEffects.PlayChargeFxAtDestination != false then
+        if bp.Display.TeleportEffects.PlayChargeFxAtDestination != false then                # FX AT DESTINATION
 
-            local pos = table.copy( TeleportDestination )
-            pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
-
-            local mimic = CreateMimicEntityOfUnit(unit, pos)
+            local mimic = CreateMimicEntityOfUnit(unit, TeleportDestination)
             unit.Trash:Add(mimic)
             unit.TeleportMimic = mimic
 
-            unit.TeleportChargeBag = {}
             local templ = unit.TeleportChargeFxAtDestOverride or EffectTemplate.UEFTeleportCharge02
             for k, v in templ do
-                local fx = CreateEmitterAtEntity(mimic, army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
-                fx:SetEmitterCurveParam('Y_POSITION_CURVE', 0, (bp.Physics.MeshExtentsY or 1) )
-                table.insert( unit.TeleportChargeBag, fx)
+                local fx = CreateEmitterAtEntity(mimic, army,v):OffsetEmitter(0, Yoffset, 0)
+                fx:SetEmitterCurveParam('Y_POSITION_CURVE', 0, Yoffset * 2)  # to make effects cover entire height of unit
                 EffectsBag:Add(fx)
             end
         end
 
-    elseif faction == 'Cybran' then
+    elseif faction == 'Cybran' then                                                           #### CYBRAN ####
 
         # Creating teleport fx at unit location
-        if bp.Display.TeleportEffects.PlayChargeFxAtUnit != false then
+        if bp.Display.TeleportEffects.PlayChargeFxAtUnit != false then                        # FX AT UNIT
+
             unit.TeleportChargeBag = {}
             local templ = unit.TeleportChargeFxAtUnitOverride or EffectTemplate.CybranTeleportCharge01
             for k, v in templ do
-                local fx = CreateEmitterAtEntity(unit,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
-                unit.Trash:Add(fx)
+                local fx = CreateEmitterAtEntity(unit,army,v):OffsetEmitter(0, Yoffset, 0)
                 table.insert( unit.TeleportChargeBag, fx)
                 EffectsBag:Add(fx)
             end
+
         end
 
         # Creating teleport fx at target location
-        if bp.Display.TeleportEffects.PlayChargeFxAtDestination != false then
+        if bp.Display.TeleportEffects.PlayChargeFxAtDestination != false then                # FX AT DESTINATION
 
             local pos = table.copy( TeleportDestination )
-            pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3]) + ((bp.Physics.MeshExtentsY or 1) / 2)
+            pos[2] = pos[2] + Yoffset   # make sure sphere isn't half in the ground
             local sphere = TeleportCreateCybranSphere(unit, pos, 0.01)
 
             unit.TeleportDestChargeBag = {}
@@ -1519,81 +1525,110 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
             end
         end
 
-    elseif faction == 'Seraphim' then
+    elseif faction == 'Seraphim' then                                                         #### SERAPHIM ####
 
         # Creating teleport fx at unit location
-        if bp.Display.TeleportEffects.PlayChargeFxAtUnit != false then
+        if bp.Display.TeleportEffects.PlayChargeFxAtUnit != false then                        # FX AT UNIT
+
             unit.TeleportChargeBag = {}
             local templ = unit.TeleportChargeFxAtUnitOverride or EffectTemplate.SeraphimTeleportCharge01
             for k, v in templ do
-                local fx = CreateEmitterAtEntity(unit,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
+                local fx = CreateEmitterAtEntity(unit,army,v):OffsetEmitter(0, Yoffset, 0)
                 table.insert( unit.TeleportChargeBag, fx)
                 EffectsBag:Add(fx)
             end
+
         end
 
         # Creating teleport fx at target location
-        if bp.Display.TeleportEffects.PlayChargeFxAtDestination != false then
-            unit.TeleportDestChargeBag = {}
-            local pos = table.copy( TeleportDestination )
-            pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
+        if bp.Display.TeleportEffects.PlayChargeFxAtDestination != false then                # FX AT DESTINATION
+
+            # using a barebone entity to position effects, it is destroyed afterwards
             local TeleportDestFxEntity = Entity()
-            Warp( TeleportDestFxEntity, pos )
+            Warp( TeleportDestFxEntity, TeleportDestination )
+
+            unit.TeleportDestChargeBag = {}
             local templ = unit.TeleportChargeFxAtDestOverride or EffectTemplate.SeraphimTeleportCharge02
             for k, v in templ do
-                local fx = CreateEmitterAtEntity( TeleportDestFxEntity, army, v ):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
+                local fx = CreateEmitterAtEntity( TeleportDestFxEntity, army, v ):OffsetEmitter(0, Yoffset, 0)
                 fx:ScaleEmitter(0.01)
                 table.insert( unit.TeleportDestChargeBag, fx)
                 EffectsBag:Add(fx)
             end
+
             TeleportDestFxEntity:Destroy()
+
         end
 
-    else  # Aeon or other factions
+    else  # Aeon or other factions                                                            #### AEON ####
 
         # Creating teleport fx at unit location
-        if bp.Display.TeleportEffects.PlayChargeFxAtUnit != false then
+        if bp.Display.TeleportEffects.PlayChargeFxAtUnit != false then                        # FX AT UNIT
+
             unit.TeleportChargeBag = {}
             local templ = unit.TeleportChargeFxAtUnitOverride or EffectTemplate.GenericTeleportCharge01
             for k, v in templ do
-                local fx = CreateEmitterAtEntity(unit,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
-                unit.Trash:Add(fx)
+                local fx = CreateEmitterAtEntity(unit,army,v):OffsetEmitter(0, Yoffset, 0)
                 table.insert( unit.TeleportChargeBag, fx)
                 EffectsBag:Add(fx)
             end
+
         end
 
         # Creating teleport fx at target location
-        if bp.Display.TeleportEffects.PlayChargeFxAtDestination != false then
-            unit.TeleportDestChargeBag = {}
-            local pos = table.copy( TeleportDestination )
-            pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
+        if bp.Display.TeleportEffects.PlayChargeFxAtDestination != false then                # FX AT DESTINATION
+
+            # using a barebone entity to position effects, it is destroyed afterwards
             local TeleportDestFxEntity = Entity()
-            Warp( TeleportDestFxEntity, pos )
+            Warp( TeleportDestFxEntity, TeleportDestination )
+
+            unit.TeleportDestChargeBag = {}
             local templ = unit.TeleportChargeFxAtDestOverride or EffectTemplate.GenericTeleportCharge02
             for k, v in templ do
-                local fx = CreateEmitterAtEntity( TeleportDestFxEntity, army, v ):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
+                local fx = CreateEmitterAtEntity( TeleportDestFxEntity, army, v ):OffsetEmitter(0, Yoffset, 0)
                 fx:ScaleEmitter(0.01)
                 table.insert( unit.TeleportDestChargeBag, fx)
                 EffectsBag:Add(fx)
             end
+
             TeleportDestFxEntity:Destroy()
         end
 
     end
 end
 
+function TeleportGetUnitYOffset(unit)
+    # returns how high to create effects to make the effects appear in the center of the unit
+    local bp = unit:GetBlueprint()
+    return bp.Display.TeleportEffects.FxOffsetY or ((bp.Physics.MeshExtentsY or bp.SizeY or 2) / 2)
+end
+
+function TeleportGetUnitSizes(unit)
+    # returns the sizes of the unit, to be used for teleportation effects
+    local bp = unit:GetBlueprint()
+    return (bp.Display.TeleportEffects.FxSizeX or bp.Physics.MeshExtentsX or bp.SizeX or 1),
+           (bp.Display.TeleportEffects.FxSizeY or bp.Physics.MeshExtentsY or bp.SizeY or 1),
+           (bp.Display.TeleportEffects.FxSizeZ or bp.Physics.MeshExtentsZ or bp.SizeZ or 1)
+end
+
+function TeleportLocationToSurface(loc)
+    # takes the given location, adjust the Y value to the surface height on that location
+    local pos = table.copy( loc )
+    pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
+    return pos
+end
+
 function CreateMimicEntityOfUnit(unit, location)
+    # Creates a unit that looks like the given unit at the given location
     local bp = unit:GetBlueprint()
     local army = unit:GetArmy()
 
-    local mimicBp = bp.Display.TeleportEffects.TeleportAvatarUnit
+    if bp.Display.TeleportEffects.TeleportAvatarUnit then
 
-    if mimicBp then
-        local mimic = CreateUnitHPR( mimicBp, army, location[1], location[2], location[3], 0, 0, 0)
+        local mimic = CreateUnitHPR( bp.Display.TeleportEffects.TeleportAvatarUnit, army, location[1], location[2], location[3], 0, 0, 0)
         mimic:SetOrientation( unit:GetOrientation(), true )
 
-        if bp.Enhancements then
+        if bp.Enhancements then  # hide and show certain bones based on available enhancements
             for k, enh in bp.Enhancements do
                 if enh.HideBones then
                     for _, bone in enh.HideBones do
@@ -1612,28 +1647,27 @@ function CreateMimicEntityOfUnit(unit, location)
 
         return mimic
     else
-        WARN('*DEBUG: no avatar unit specified for use during the UEF teleport effect')
+        WARN('*DEBUG: CreateMimicEntityOfUnit(): no avatar unit specified for use during the UEF teleport effect')
     end
     return
 end
 
 function TeleportCreateCybranSphere(unit, location, initialScale)
+    # Creates the sphere used by Cybran teleportation effects
     local bp = unit:GetBlueprint()
     local scale = 1
 
-    if bp.Physics.MeshExtentsX or bp.Physics.MeshExtentsY or bp.Physics.MeshExtentsZ then
-        scale = 2 * math.max(bp.Physics.MeshExtentsX or 0, math.max(bp.Physics.MeshExtentsY or 0, bp.Physics.MeshExtentsZ or 0))
-    elseif bp.SizeX or bp.SizeY or bp.SizeZ then
-        scale = 2 * math.max(bp.SizeX or 0, math.max(bp.SizeY or 0, bp.SizeZ or 0))
-    end
-
+    local sx, sy, sz = TeleportGetUnitSizes(unit)
+    local scale = 1.25 * math.max( sx, math.max( sy, sz))
     unit.TeleportCybranSphereScale = scale
+
     local sphere = Entity()
     sphere:SetPosition(location, true)
     sphere:SetMesh('/effects/Entities/CybranTeleport/CybranTeleport_mesh', false)
     sphere:SetDrawScale(initialScale or scale)
-    unit.Trash:Add(sphere)
     unit.TeleportCybranSphere = sphere
+    unit.Trash:Add(sphere)
+
     return sphere
 end
 
