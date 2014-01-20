@@ -408,7 +408,7 @@ GenericTeleportInWeapon01 = {
 }
 
 UEFTeleportCharge01 = {
-#    EmtBpPath .. 'uef_teleport_charge_09_emit.bp', 
+#    EmtBpPath .. 'uef_teleport_charge_09_emit.bp',
 }
 
 UEFTeleportCharge02 = {

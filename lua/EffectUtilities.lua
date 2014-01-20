@@ -1430,18 +1430,19 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
 
         if bp.Display.TeleportEffects.PlayChargeFxAtUnit != false then                        # FX AT UNIT
 
-            local fn = function(unit, scaleX, scaleY, scaleZ, EffectsBag)
+            local fn = function(unit, sx, sy, sz, ox, oy, oz, EffectsBag)
 
                 # get position of unit and adjust for centerpoint offset found in blueprint
                 local pos = unit:GetPosition()
-                pos[1] = pos[1] + (bp.CollisionOffsetX or 0)
-                pos[2] = pos[2] + (bp.CollisionOffsetY or 0)
-                pos[3] = pos[3] + (bp.CollisionOffsetZ or 0)
+                local heading = unit:GetHeading()
+                pos[1] = pos[1] + ((math.cos(heading) * ox) - (math.sin(heading) * oz))
+                pos[2] = pos[2] + oy
+                pos[3] = pos[3] + ((math.sin(heading) * ox) - (math.cos(heading) * oz))
 
                 # creates a single flash of the cube
                 local cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
                 Warp(cfx, pos, unit:GetOrientation())
-                cfx:SetScale(scaleX, scaleY, scaleZ)
+                cfx:SetScale(sx, sy, sz)
                 EffectsBag:Add(cfx)
 
                 WaitSeconds(0.1)
@@ -1449,7 +1450,7 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
                 # creates a static cube, doesn't have effects of its own
                 local cube1 = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect03_proj.bp',0,0,0, nil, nil, nil )
                 Warp(cube1, pos, unit:GetOrientation())
-                cube1:SetScale(scaleX, scaleY, scaleZ)
+                cube1:SetScale(sx, sy, sz)
                 EffectsBag:Add(cube1)
 
                 WaitSeconds(0.5)
@@ -1459,24 +1460,18 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
                     cfx:Destroy()
                     cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
                     Warp(cfx, pos, unit:GetOrientation())
-                    cfx:SetScale(scaleX, scaleY, scaleZ)
+                    cfx:SetScale(sx, sy, sz)
                     EffectsBag:Add(cfx)
 
                     WaitSeconds(0.6)
                 end
             end
 
-            local scaleMod = 1.15
-            local scaleX, scaleY, scaleZ = TeleportGetUnitSizes(unit)
-            local thread1 = unit:ForkThread(fn, scaleX * scaleMod, scaleY * scaleMod, scaleZ * scaleMod, EffectsBag)
+            local sx, sy, sz, ox, oy, oz = TeleportGetUnitSizes(unit)
+            local thread1 = unit:ForkThread(fn, sx, sy, sz, ox, oy, oz, EffectsBag)
             EffectsBag:Add(thread1)
 
-            local templ = unit.TeleportChargeFxAtUnitOverride or EffectTemplate.UEFTeleportCharge01
-            for k, v in templ do
-                local fx = CreateEmitterAtEntity(unit,army,v):OffsetEmitter(0, Yoffset, 0)
-                table.insert( unit.TeleportChargeBag, fx)
-                EffectsBag:Add(fx)
-            end
+            unit.TeleportChargeBag = TeleportShowChargeUpFxAtUnit(unit, unit.TeleportChargeFxAtUnitOverride or EffectTemplate.UEFTeleportCharge01, EffectsBag)
         end
 
         if bp.Display.TeleportEffects.PlayChargeFxAtDestination != false then                # FX AT DESTINATION
@@ -1501,15 +1496,7 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
 
         # Creating teleport fx at unit location
         if bp.Display.TeleportEffects.PlayChargeFxAtUnit != false then                        # FX AT UNIT
-
-            unit.TeleportChargeBag = {}
-            local templ = unit.TeleportChargeFxAtUnitOverride or EffectTemplate.CybranTeleportCharge01
-            for k, v in templ do
-                local fx = CreateEmitterAtEntity(unit,army,v):OffsetEmitter(0, Yoffset, 0)
-                table.insert( unit.TeleportChargeBag, fx)
-                EffectsBag:Add(fx)
-            end
-
+            unit.TeleportChargeBag = TeleportShowChargeUpFxAtUnit(unit, unit.TeleportChargeFxAtUnitOverride or EffectTemplate.CybranTeleportCharge01, EffectsBag)
         end
 
         # Creating teleport fx at target location
@@ -1533,15 +1520,7 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
 
         # Creating teleport fx at unit location
         if bp.Display.TeleportEffects.PlayChargeFxAtUnit != false then                        # FX AT UNIT
-
-            unit.TeleportChargeBag = {}
-            local templ = unit.TeleportChargeFxAtUnitOverride or EffectTemplate.SeraphimTeleportCharge01
-            for k, v in templ do
-                local fx = CreateEmitterAtEntity(unit,army,v):OffsetEmitter(0, Yoffset, 0)
-                table.insert( unit.TeleportChargeBag, fx)
-                EffectsBag:Add(fx)
-            end
-
+            unit.TeleportChargeBag = TeleportShowChargeUpFxAtUnit(unit, unit.TeleportChargeFxAtUnitOverride or EffectTemplate.SeraphimTeleportCharge01, EffectsBag)
         end
 
         # Creating teleport fx at target location
@@ -1568,15 +1547,7 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
 
         # Creating teleport fx at unit location
         if bp.Display.TeleportEffects.PlayChargeFxAtUnit != false then                        # FX AT UNIT
-
-            unit.TeleportChargeBag = {}
-            local templ = unit.TeleportChargeFxAtUnitOverride or EffectTemplate.GenericTeleportCharge01
-            for k, v in templ do
-                local fx = CreateEmitterAtEntity(unit,army,v):OffsetEmitter(0, Yoffset, 0)
-                table.insert( unit.TeleportChargeBag, fx)
-                EffectsBag:Add(fx)
-            end
-
+            unit.TeleportChargeBag = TeleportShowChargeUpFxAtUnit(unit, unit.TeleportChargeFxAtUnitOverride or EffectTemplate.GenericTeleportCharge01, EffectsBag)
         end
 
         # Creating teleport fx at target location
@@ -1612,7 +1583,10 @@ function TeleportGetUnitSizes(unit)
     local bp = unit:GetBlueprint()
     return (bp.Display.TeleportEffects.FxSizeX or bp.Physics.MeshExtentsX or bp.SizeX or 1),
            (bp.Display.TeleportEffects.FxSizeY or bp.Physics.MeshExtentsY or bp.SizeY or 1),
-           (bp.Display.TeleportEffects.FxSizeZ or bp.Physics.MeshExtentsZ or bp.SizeZ or 1)
+           (bp.Display.TeleportEffects.FxSizeZ or bp.Physics.MeshExtentsZ or bp.SizeZ or 1),
+           (bp.Display.TeleportEffects.FxOffsetX or bp.CollisionOffsetX or 0),
+           (bp.Display.TeleportEffects.FxOffsetY or bp.CollisionOffsetY or 0),
+           (bp.Display.TeleportEffects.FxOffsetZ or bp.CollisionOffsetZ or 0)
 end
 
 function TeleportLocationToSurface(loc)
@@ -1620,6 +1594,27 @@ function TeleportLocationToSurface(loc)
     local pos = table.copy( loc )
     pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
     return pos
+end
+
+function TeleportShowChargeUpFxAtUnit(unit, effectTemplate, EffectsBag)
+    # creates charge up effects at the unit
+    local bp = unit:GetBlueprint()
+    local army = unit:GetArmy()
+    local bones = bp.Display.TeleportEffects.ChargeFxAtUnitBones or {}
+    local bone, ox, oy, oz
+    local emitters = {}
+    for _, value in bones do
+        bone = value.Bone or -1
+        ox = value.Offset[1]
+        oy = value.Offset[2]
+        oz = value.Offset[3]
+        for k, v in effectTemplate do
+            local fx = CreateEmitterAtBone(unit, bone, army, v):OffsetEmitter(ox, oy, oz)
+            table.insert( emitters, fx)
+            EffectsBag:Add(fx)
+        end
+    end
+    return emitters
 end
 
 function CreateMimicEntityOfUnit(unit, location)

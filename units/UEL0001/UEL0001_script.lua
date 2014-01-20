@@ -210,6 +210,7 @@ UEL0001 = Class(TWalkingLandUnit) {
         end
 
 self:CreateEnhancement('Teleporter')
+self:CreateEnhancement('HeavyAntiMatterCannon')
 
         WaitSeconds(6)
         self:SetMesh(self:GetBlueprint().Display.MeshBlueprint, true)

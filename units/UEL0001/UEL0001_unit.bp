@@ -271,6 +271,22 @@ UnitBlueprint {
         PlaceholderMeshName = 'UXB0000',
         SpawnRandomRotation = true,
         TeleportEffects = {
+            ChargeFxAtUnitBones = {
+                {
+                    Bone = 'Back_Upgrade_B01',
+                    Offset = {
+                        0,
+                        0,
+                        -0.1,
+                    },
+                },
+            },
+            FxOffsetX = 0,
+            FxOffsetY = 0,
+            FxOffsetZ = -0.45,
+            FxSizeX = 2.31,
+            FxSizeY = 2.31,
+            FxSizeZ = 2.42,
             PlayChargeFxAtDestination = true,
             PlayChargeFxAtUnit = true,
             PlayTeleportOutFx = true,
