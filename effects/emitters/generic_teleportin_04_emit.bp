@@ -20,7 +20,7 @@ EmitterBlueprint {
 	InterpolateEmission = true,
 	TextureStripcount = 1.00,
 	SortOrder = 0.00,
-	LowFidelity = false,
+	LowFidelity = true,
 	MedFidelity = true,
 	HighFidelity = true,
 	Texture = [[/textures/particles/glow_02.dds]],

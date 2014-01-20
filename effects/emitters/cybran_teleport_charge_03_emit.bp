@@ -21,7 +21,7 @@ EmitterBlueprint {
 	TextureStripcount = 1.00,
 	SortOrder = 0.00,
 	LowFidelity = false,
-	MedFidelity = true,
+	MedFidelity = false,
 	HighFidelity = true,
 	Texture = [[/textures/particles/_swirl01.dds]],
 	RampTexture = [[/textures/particles/ramp_red_06.dds]],

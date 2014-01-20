@@ -10,7 +10,7 @@ EmitterBlueprint {
 	AlignRotation = true,
 	AlignToBone = false,
 	Flat = false,
-	LODCutoff = 100.00,
+	LODCutoff = 400.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
@@ -24,7 +24,7 @@ EmitterBlueprint {
 	MedFidelity = true,
 	HighFidelity = true,
 	Texture = [[/textures/particles/_swirl05.dds]],
-	RampTexture = [[/textures/particles/ramp_blue_06.dds]],
+	RampTexture = [[/textures/particles/ramp_green_01.dds]],
 	XDirectionCurve = {
 		XRange = 50.00,
 		Keys = {

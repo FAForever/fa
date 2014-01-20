@@ -456,6 +456,10 @@ CybranTeleportIn01 = {
 #    EmtBpPath .. 'cybran_teleportin_02_emit.bp',
     EmtBpPath .. 'cybran_teleportin_04_emit.bp',
     EmtBpPath .. 'cybran_teleportin_05_emit.bp',
+    EmtBpPath .. 'cybran_teleportin_06_emit.bp',
+    EmtBpPath .. 'cybran_teleportin_07_emit.bp',
+    EmtBpPath .. 'cybran_teleportin_08_emit.bp',
+    EmtBpPath .. 'cybran_teleportin_09_emit.bp',
 }
 
 CybranTeleportInWeapon01 = {

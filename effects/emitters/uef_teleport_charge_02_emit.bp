@@ -10,7 +10,7 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = false,
 	Flat = true,
-	LODCutoff = 100.00,
+	LODCutoff = 800.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
@@ -20,8 +20,8 @@ EmitterBlueprint {
 	InterpolateEmission = true,
 	TextureStripcount = 1.00,
 	SortOrder = 0.00,
-	LowFidelity = true,
-	MedFidelity = true,
+	LowFidelity = false,
+	MedFidelity = false,
 	HighFidelity = true,
 	Texture = [[/textures/particles/_swirl02.dds]],
 	RampTexture = [[/textures/particles/ramp_purple_03.dds]],
@@ -101,7 +101,7 @@ EmitterBlueprint {
 	YPosCurve = {
 		XRange = 30.00,
 		Keys = {
-			{ x=15.198,y=-0.250,z=0.000 },
+			{ x=15.198,y=0.000,z=0.000 },
 		},
 	},
 	ZPosCurve = {
