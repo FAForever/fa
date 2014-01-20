@@ -3,7 +3,7 @@ EmitterBlueprint {
 	Lifetime = -1.00,
 	Repeattime = 50.00,
 	TextureFramecount = 1.00,
-	Blendmode = 3.00,
+	Blendmode = 4.00,
 	LocalVelocity = false,
 	LocalAcceleration = false,
 	Gravity = false,
@@ -24,7 +24,7 @@ EmitterBlueprint {
 	MedFidelity = false,
 	HighFidelity = true,
 	Texture = [[/textures/particles/ring_11.dds]],
-	RampTexture = [[/textures/particles/ramp_grey_03.dds]],
+	RampTexture = [[/textures/particles/ramp_proton_flash_02.dds]],
 	XDirectionCurve = {
 		XRange = 21.00,
 		Keys = {

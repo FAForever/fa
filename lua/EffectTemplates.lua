@@ -388,6 +388,7 @@ GenericTeleportCharge02 = {
     EmtBpPath .. 'generic_teleport_charge_05_emit.bp',
     EmtBpPath .. 'generic_teleport_charge_06_emit.bp',
     EmtBpPath .. 'generic_teleport_charge_07_emit.bp',
+    EmtBpPath .. 'generic_teleport_charge_08_emit.bp',
 }
 
 GenericTeleportOut01 = {

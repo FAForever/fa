@@ -1,16 +1,16 @@
 EmitterBlueprint {
-	BlueprintId = 'generic_teleport_charge_05',
+	BlueprintId = 'generic_teleport_charge_08',
 	Lifetime = -1.00,
 	Repeattime = 50.00,
 	TextureFramecount = 1.00,
-	Blendmode = 3.00,
+	Blendmode = 1.00,
 	LocalVelocity = false,
 	LocalAcceleration = false,
 	Gravity = false,
 	AlignRotation = true,
 	AlignToBone = false,
 	Flat = false,
-	LODCutoff = 400.00,
+	LODCutoff = 500.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
@@ -20,11 +20,11 @@ EmitterBlueprint {
 	InterpolateEmission = true,
 	TextureStripcount = 1.00,
 	SortOrder = 0.00,
-	LowFidelity = true,
+	LowFidelity = false,
 	MedFidelity = true,
 	HighFidelity = true,
-	Texture = [[/textures/particles/_swirl05.dds]],
-	RampTexture = [[/textures/particles/ramp_blue_06.dds]],
+	Texture = [[/textures/particles/sparkle_05.dds]],
+	RampTexture = [[/textures/particles/ramp_reacton_03.dds]],
 	XDirectionCurve = {
 		XRange = 50.00,
 		Keys = {
@@ -46,7 +46,7 @@ EmitterBlueprint {
 	EmitRateCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=25.000,y=0.500,z=0.000 },
+			{ x=25.000,y=1.000,z=0.000 },
 		},
 	},
 	LifetimeCurve = {
@@ -112,13 +112,13 @@ EmitterBlueprint {
 	StartSizeCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=16.029,y=0.400,z=0.000 },
+			{ x=16.029,y=2.000,z=3.000 },
 		},
 	},
 	EndSizeCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=25.000,y=1.000,z=1.000 },
+			{ x=25.000,y=2.000,z=0.000 },
 		},
 	},
 	InitialRotationCurve = {
