@@ -285,7 +285,7 @@ UnitBlueprint {
                 Air = 'Air|Land',
                 Land = 'Air|Land',
             },
-            FiringTolerance = 0,
+            FiringTolerance = 2, # 0
             Label = 'AutoCannon1',
             MaxRadius = 30,
             MuzzleSalvoDelay = 0, # 0.1
@@ -313,7 +313,7 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.7, # 0.3
+            TargetCheckInterval = 0.5, # 0.3
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'AIR MOBILE',
