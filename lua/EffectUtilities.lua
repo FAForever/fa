@@ -1484,9 +1484,9 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
             local templ = unit.TeleportChargeFxAtDestOverride or EffectTemplate.UEFTeleportCharge02
             for k, v in templ do
                 local fx = CreateEmitterAtEntity(mimic, army,v):OffsetEmitter(0, Yoffset, 0)
+                fx:ScaleEmitter(0.75)
                 fx:SetEmitterCurveParam('Y_POSITION_CURVE', 0, Yoffset * 2)  # to make effects cover entire height of unit
                 fx:SetEmitterCurveParam('ROTATION_RATE_CURVE', 1, 0)
-                fx:ScaleEmitter(0.75)
                 table.insert( unit.TeleportDestChargeBag, fx)
                 EffectsBag:Add(fx)
             end
@@ -1575,7 +1575,7 @@ end
 function TeleportGetUnitYOffset(unit)
     # returns how high to create effects to make the effects appear in the center of the unit
     local bp = unit:GetBlueprint()
-    return bp.Display.TeleportEffects.FxOffsetY or ((bp.Physics.MeshExtentsY or bp.SizeY or 2) / 2)
+    return bp.Display.TeleportEffects.FxChargeAtDestOffsetY or ((bp.Physics.MeshExtentsY or bp.SizeY or 2) / 2)
 end
 
 function TeleportGetUnitSizes(unit)
@@ -1666,6 +1666,11 @@ function TeleportCreateCybranSphere(unit, location, initialScale)
     sphere:SetDrawScale(initialScale or scale)
     unit.TeleportCybranSphere = sphere
     unit.Trash:Add(sphere)
+
+    sphere:SetVizToAllies('Intel')
+    sphere:SetVizToEnemies('Intel')
+    sphere:SetVizToFocusPlayer('Intel')
+    sphere:SetVizToNeutrals('Intel')
 
     return sphere
 end
@@ -1981,6 +1986,7 @@ function PlayTeleportInEffects(unit, EffectsBag)
 end
 
 function DestroyTeleportChargingEffects(unit, EffectsBag)
+    # called when charging up is done (because succesfull or cancelled)
     if unit.TeleportChargeBag then
         for keys,values in unit.TeleportChargeBag do
             values:Destroy()
@@ -1994,4 +2000,14 @@ function DestroyTeleportChargingEffects(unit, EffectsBag)
         unit.TeleportDestChargeBag = {}
     end
     EffectsBag:Destroy()
+end
+
+function DestroyRemainingTeleportChargingEffects(unit, EffectsBag)
+    # called when we're done teleporting (because succesfull or cancelled)
+    if unit.TeleportMimic then
+        unit.TeleportMimic:Destroy()
+    end
+    if unit.TeleportCybranSphere then
+        unit.TeleportCybranSphere:Destroy()
+    end
 end

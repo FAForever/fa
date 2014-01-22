@@ -4430,6 +4430,7 @@ Unit = Class(moho.unit_methods) {
         end
         self:StopUnitAmbientSound('TeleportLoop')
         self:CleanupTeleportChargeEffects()
+        self:CleanupRemainingTeleportChargeEffects()
         self:SetWorkProgress(0.0)
         self:SetImmobile(false)
         self.UnitBeingTeleported = nil
@@ -4472,6 +4473,7 @@ Unit = Class(moho.unit_methods) {
         self:SetWorkProgress(0.0)
         Warp(self, location, orientation)
         self:PlayTeleportInEffects()
+        self:CleanupRemainingTeleportChargeEffects()
 
         WaitSeconds( 0.1 ) # Perform cooldown Teleportation FX here
         #Landing Sound
@@ -4495,6 +4497,10 @@ Unit = Class(moho.unit_methods) {
 
     CleanupTeleportChargeEffects = function( self )
         EffectUtilities.DestroyTeleportChargingEffects(self, self.TeleportFxBag)
+    end,
+
+    CleanupRemainingTeleportChargeEffects = function( self )
+        EffectUtilities.DestroyRemainingTeleportChargingEffects(self, self.TeleportFxBag)
     end,
 
     PlayTeleportOutEffects = function(self)
