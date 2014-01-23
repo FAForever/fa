@@ -246,6 +246,22 @@ UnitBlueprint {
         },
         PlaceholderMeshName = 'UXB0000',
         SpawnRandomRotation = true,
+        TeleportEffects = {
+            ChargeFxAtUnitBones = {
+                {
+                    Bone = 'Turbine',
+                    Offset = {
+                        0,
+                        0.2,
+                        -0.1,
+                    },
+                },
+            },
+            PlayChargeFxAtDestination = true,
+            PlayChargeFxAtUnit = true,
+            PlayTeleportOutFx = true,
+            PlayTeleportInFx = true,
+        },
         TransportAnimation = {
             {
                 Animation = '/units/UAL0301/UAL0301_afold.sca',

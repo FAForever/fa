@@ -22,6 +22,7 @@ UnitBlueprint {
 #        },
     },
     General = {
+        CapCost = 0,
         Category = 'Experimental',
         Classification = 'RULEUC_Commander',
         FactionName = 'UEF',

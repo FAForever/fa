@@ -1859,6 +1859,7 @@ function PlayTeleportInEffects(unit, EffectsBag)
 
                 CreateLightParticle( unit, -1, army, 4, 10, 'glow_03', 'ramp_yellow_01' )
                 unit:HideBone(0, true)
+                DamageArea(unit, unit:GetPosition(), 9, 1, 'Force', true)
 
                 WaitSeconds(0.2)
 
@@ -1902,6 +1903,7 @@ function PlayTeleportInEffects(unit, EffectsBag)
             end
 
             CreateLightParticle( unit.TeleportCybranSphere, -1, army, 4, 10, 'glow_02', 'ramp_white_01' )
+            DamageArea(unit, unit:GetPosition(), 9, 1, 'Force', true)
 
             local decalOrient = RandomFloat(0,2*math.pi)
             CreateDecal(unit:GetPosition(), decalOrient, 'Scorch_generic_008_albedo', '', 'Albedo', 7, 7, 200, 300, army)
@@ -1948,6 +1950,7 @@ function PlayTeleportInEffects(unit, EffectsBag)
                 end
 
                 CreateLightParticle( unit, -1, army, 4, 15, 'glow_05', 'ramp_jammer_01' )
+                DamageArea(unit, unit:GetPosition(), 9, 1, 'Force', true)
 
                 local decalOrient = RandomFloat(0,2*math.pi)
                 CreateDecal(unit:GetPosition(), decalOrient, 'crater01_albedo', '', 'Albedo', 4, 4, 200, 300, army)
@@ -1977,6 +1980,8 @@ function PlayTeleportInEffects(unit, EffectsBag)
             for k, v in templ do
                 CreateEmitterAtEntity(unit,army,v):OffsetEmitter(0, Yoffset, 0)
             end
+
+            DamageArea(unit, unit:GetPosition(), 9, 1, 'Force', true)
 
             local decalOrient = RandomFloat(0,2*math.pi)
             CreateDecal(unit:GetPosition(), decalOrient, 'Scorch_generic_006_albedo', '', 'Albedo', 9, 9, 200, 300, army)

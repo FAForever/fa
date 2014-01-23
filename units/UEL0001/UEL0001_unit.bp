@@ -305,7 +305,7 @@ UnitBlueprint {
                 Weight = 100,
             },
         },
-        UniformScale = 0.105,
+        UniformScale = 0.105, # if changed dont forget to update AvatarUEL0001 at /effects/Entities/UEFTeleport/AvatarUEL0001
     },
     Economy = {
         BuildCostEnergy = 5000000,
