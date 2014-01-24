@@ -91,6 +91,11 @@ UnitBlueprint {
             Cue = 'UEL0001_Move_Stop',
             LodCutoff = 'UnitMove_LodCutoff',
         },
+        TeleportIn = Sound {
+            Bank = 'UEL',
+            Cue = 'UEL0001_Gate_In',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
         UISelection = Sound {
             Bank = 'Interface',
             Cue = 'UEF_Select_Commander',

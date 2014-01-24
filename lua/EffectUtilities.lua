@@ -1426,9 +1426,11 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
 
     TeleportDestination = TeleportLocationToSurface( TeleportDestination )
 
-    if faction == 'UEF' then                                                                  #### UEF ####
+    if bp.Display.TeleportEffects.PlayChargeFxAtUnit != false then                            # FX AT UNIT
 
-        if bp.Display.TeleportEffects.PlayChargeFxAtUnit != false then                        # FX AT UNIT
+        unit:PlayUnitAmbientSound('TeleportChargingAtUnit')
+
+        if faction == 'UEF' then                                                              #### UEF ####
 
             local fn = function(unit, sx, sy, sz, ox, oy, oz, EffectsBag)
 
@@ -1472,9 +1474,44 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
             EffectsBag:Add(thread1)
 
             unit.TeleportChargeBag = TeleportShowChargeUpFxAtUnit(unit, unit.TeleportChargeFxAtUnitOverride or EffectTemplate.UEFTeleportCharge01, EffectsBag)
+
+        elseif faction == 'Cybran' then                                                       #### CYBRAN ####
+
+            # Creating teleport fx at unit location
+            unit.TeleportChargeBag = TeleportShowChargeUpFxAtUnit(unit, unit.TeleportChargeFxAtUnitOverride or EffectTemplate.CybranTeleportCharge01, EffectsBag)
+
+        elseif faction == 'Seraphim' then                                                     #### SERAPHIM ####
+
+            # Creating teleport fx at unit location
+            unit.TeleportChargeBag = TeleportShowChargeUpFxAtUnit(unit, unit.TeleportChargeFxAtUnitOverride or EffectTemplate.SeraphimTeleportCharge01, EffectsBag)
+
+        else  # Aeon or other factions                                                        #### AEON ####
+
+            unit.TeleportChargeBag = TeleportShowChargeUpFxAtUnit(unit, unit.TeleportChargeFxAtUnitOverride or EffectTemplate.GenericTeleportCharge01, EffectsBag)
+
+        end
+    end
+
+    if bp.Display.TeleportEffects.PlayChargeFxAtDestination != false then                     # FX AT DESTINATION
+
+        # customized version of PlayUnitAmbientSound() from unit.lua to play sound at target destination
+        local sound = 'TeleportChargingAtDestination'
+        local sndEnt = false
+        if sound and bp.Audio[sound] then
+            if not unit.AmbientSounds then
+                unit.AmbientSounds = {}
+            end
+            if not unit.AmbientSounds[sound] then
+                sndEnt = Entity {}
+                unit.AmbientSounds[sound] = sndEnt
+                unit.Trash:Add(sndEnt)
+                Warp( sndEnt, TeleportDestination )  # warping sound entity to destination so ambient sound plays there (and not at unit)
+            end
+            unit.AmbientSounds[sound]:SetAmbientSound( bp.Audio[sound], nil )
         end
 
-        if bp.Display.TeleportEffects.PlayChargeFxAtDestination != false then                # FX AT DESTINATION
+
+        if faction == 'UEF' then                                                              #### UEF ####
 
             local mimic = CreateMimicEntityOfUnit(unit, TeleportDestination)
             unit.Trash:Add(mimic)
@@ -1486,21 +1523,12 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
                 local fx = CreateEmitterAtEntity(mimic, army,v):OffsetEmitter(0, Yoffset, 0)
                 fx:ScaleEmitter(0.75)
                 fx:SetEmitterCurveParam('Y_POSITION_CURVE', 0, Yoffset * 2)  # to make effects cover entire height of unit
-                fx:SetEmitterCurveParam('ROTATION_RATE_CURVE', 1, 0)
+                fx:SetEmitterCurveParam('ROTATION_RATE_CURVE', 1, 0)  # small initial rotation, will be faster as charging
                 table.insert( unit.TeleportDestChargeBag, fx)
                 EffectsBag:Add(fx)
             end
-        end
 
-    elseif faction == 'Cybran' then                                                           #### CYBRAN ####
-
-        # Creating teleport fx at unit location
-        if bp.Display.TeleportEffects.PlayChargeFxAtUnit != false then                        # FX AT UNIT
-            unit.TeleportChargeBag = TeleportShowChargeUpFxAtUnit(unit, unit.TeleportChargeFxAtUnitOverride or EffectTemplate.CybranTeleportCharge01, EffectsBag)
-        end
-
-        # Creating teleport fx at target location
-        if bp.Display.TeleportEffects.PlayChargeFxAtDestination != false then                # FX AT DESTINATION
+        elseif faction == 'Cybran' then                                                       #### CYBRAN ####
 
             local pos = table.copy( TeleportDestination )
             pos[2] = pos[2] + Yoffset   # make sure sphere isn't half in the ground
@@ -1514,17 +1542,8 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
                 table.insert( unit.TeleportDestChargeBag, fx)
                 EffectsBag:Add(fx)
             end
-        end
 
-    elseif faction == 'Seraphim' then                                                         #### SERAPHIM ####
-
-        # Creating teleport fx at unit location
-        if bp.Display.TeleportEffects.PlayChargeFxAtUnit != false then                        # FX AT UNIT
-            unit.TeleportChargeBag = TeleportShowChargeUpFxAtUnit(unit, unit.TeleportChargeFxAtUnitOverride or EffectTemplate.SeraphimTeleportCharge01, EffectsBag)
-        end
-
-        # Creating teleport fx at target location
-        if bp.Display.TeleportEffects.PlayChargeFxAtDestination != false then                # FX AT DESTINATION
+        elseif faction == 'Seraphim' then                                                     #### SERAPHIM ####
 
             # using a barebone entity to position effects, it is destroyed afterwards
             local TeleportDestFxEntity = Entity()
@@ -1541,17 +1560,7 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
 
             TeleportDestFxEntity:Destroy()
 
-        end
-
-    else  # Aeon or other factions                                                            #### AEON ####
-
-        # Creating teleport fx at unit location
-        if bp.Display.TeleportEffects.PlayChargeFxAtUnit != false then                        # FX AT UNIT
-            unit.TeleportChargeBag = TeleportShowChargeUpFxAtUnit(unit, unit.TeleportChargeFxAtUnitOverride or EffectTemplate.GenericTeleportCharge01, EffectsBag)
-        end
-
-        # Creating teleport fx at target location
-        if bp.Display.TeleportEffects.PlayChargeFxAtDestination != false then                # FX AT DESTINATION
+        else  # Aeon or other factions                                                        #### AEON ####
 
             # using a barebone entity to position effects, it is destroyed afterwards
             local TeleportDestFxEntity = Entity()
@@ -1567,8 +1576,8 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
             end
 
             TeleportDestFxEntity:Destroy()
-        end
 
+        end
     end
 end
 
@@ -1600,14 +1609,14 @@ function TeleportShowChargeUpFxAtUnit(unit, effectTemplate, EffectsBag)
     # creates charge up effects at the unit
     local bp = unit:GetBlueprint()
     local army = unit:GetArmy()
-    local bones = bp.Display.TeleportEffects.ChargeFxAtUnitBones or {}
+    local bones = bp.Display.TeleportEffects.ChargeFxAtUnitBones or { Bone = 0, Offset = {0,0.25,0}, }
     local bone, ox, oy, oz
     local emitters = {}
     for _, value in bones do
-        bone = value.Bone or -1
-        ox = value.Offset[1]
-        oy = value.Offset[2]
-        oz = value.Offset[3]
+        bone = value.Bone or 0
+        ox = value.Offset[1] or 0
+        oy = value.Offset[2] or 0
+        oz = value.Offset[3] or 0
         for k, v in effectTemplate do
             local fx = CreateEmitterAtBone(unit, bone, army, v):OffsetEmitter(ox, oy, oz)
             table.insert( emitters, fx)
@@ -1728,9 +1737,11 @@ function PlayTeleportOutEffects(unit, EffectsBag)
     local army = unit:GetArmy()
     local Yoffset = TeleportGetUnitYOffset(unit)
 
-    if faction == 'UEF' then
+    if bp.Display.TeleportEffects.PlayTeleportOutFx != false then
 
-        if bp.Display.TeleportEffects.PlayTeleportOutFx != false then
+        unit:PlayUnitSound('TeleportOut')
+
+        if faction == 'UEF' then
 
             local scaleX, scaleY, scaleZ = TeleportGetUnitSizes(unit)
             local cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
@@ -1742,40 +1753,31 @@ function PlayTeleportOutEffects(unit, EffectsBag)
             for k, v in templ do
                 CreateEmitterAtEntity(unit, army, v):OffsetEmitter(0, Yoffset, 0)
             end
-        end
 
-    elseif faction == 'Cybran' then
-
-        if bp.Display.TeleportEffects.PlayTeleportOutFx != false then
+        elseif faction == 'Cybran' then
 
             CreateLightParticle( unit, -1, army, 4, 10, 'glow_02', 'ramp_red_06' )
             local templ = unit.TeleportOutFxOverride or EffectTemplate.CybranTeleportOut01
             for k, v in templ do
                 CreateEmitterAtEntity(unit, army, v):OffsetEmitter(0, Yoffset, 0)
             end
-        end
 
-    elseif faction == 'Seraphim' then
-
-        if bp.Display.TeleportEffects.PlayTeleportOutFx != false then
+        elseif faction == 'Seraphim' then
 
             CreateLightParticle( unit, -1, army, 4, 15, 'glow_05', 'ramp_jammer_01' )
             local templ = unit.TeleportOutFxOverride or EffectTemplate.SeraphimTeleportOut01
             for k, v in templ do
                 CreateEmitterAtEntity(unit, army, v):OffsetEmitter(0, Yoffset, 0)
             end
-        end
 
-    else  # Aeon or other factions
-
-        if bp.Display.TeleportEffects.PlayTeleportOutFx != false then
+        else  # Aeon or other factions
 
             local templ = unit.TeleportOutFxOverride or EffectTemplate.GenericTeleportOut01
             for k, v in templ do
                 CreateEmitterAtEntity(unit,army,v)
             end
-        end
 
+        end
     end
 end
 
@@ -1841,9 +1843,11 @@ function PlayTeleportInEffects(unit, EffectsBag)
 
     DoTeleportInDamage(unit)  # fire teleport weapon
 
-    if faction == 'UEF' then
+    if bp.Display.TeleportEffects.PlayTeleportInFx != false then
 
-        if bp.Display.TeleportEffects.PlayTeleportInFx != false then
+        unit:PlayUnitSound('TeleportIn')
+
+        if faction == 'UEF' then
 
             local templ = unit.TeleportInFxOverride or EffectTemplate.UEFTeleportIn01
             for k, v in templ do
@@ -1882,11 +1886,8 @@ function PlayTeleportInEffects(unit, EffectsBag)
 
             local thread = unit:ForkThread(fn)
             EffectsBag:Add(thread)
-        end
 
-    elseif faction == 'Cybran' then
-
-        if bp.Display.TeleportEffects.PlayTeleportInFx != false then
+        elseif faction == 'Cybran' then
 
             if not unit.TeleportCybranSphere then
                 local pos = TeleportLocationToSurface( table.copy(unit:GetPosition()) )
@@ -1932,11 +1933,9 @@ function PlayTeleportInEffects(unit, EffectsBag)
 
             local thread = unit:ForkThread(fn)
             EffectsBag:Add(thread)
-        end
 
-    elseif faction == 'Seraphim' then
+        elseif faction == 'Seraphim' then
 
-        if bp.Display.TeleportEffects.PlayTeleportInFx != false then
             local fn = function(unit)
 
                 local bp = unit:GetBlueprint()
@@ -1970,11 +1969,8 @@ function PlayTeleportInEffects(unit, EffectsBag)
 
             local thread = unit:ForkThread(fn)
             EffectsBag:Add(thread)
-        end
 
-    else  # Aeon or other factions
-
-        if bp.Display.TeleportEffects.PlayTeleportInFx != false then
+        else  # Aeon or other factions
 
             local templ = unit.TeleportInFxOverride or EffectTemplate.GenericTeleportIn01
             for k, v in templ do
@@ -2005,6 +2001,9 @@ function DestroyTeleportChargingEffects(unit, EffectsBag)
         unit.TeleportDestChargeBag = {}
     end
     EffectsBag:Destroy()
+
+    unit:StopUnitAmbientSound('TeleportChargingAtUnit')
+    unit:StopUnitAmbientSound('TeleportChargingAtDestination')
 end
 
 function DestroyRemainingTeleportChargingEffects(unit, EffectsBag)
