@@ -27,12 +27,12 @@ Shield = Class(moho.shield_methods,Entity) {
         self.MeshZBp = spec.MeshZ
         self.ImpactMeshBp = spec.ImpactMesh
         if spec.ImpactEffects != '' then
-			self.ImpactEffects = EffectTemplate[spec.ImpactEffects]
-		else
-			self.ImpactEffects = {}
-		end
+            self.ImpactEffects = EffectTemplate[spec.ImpactEffects]
+        else
+            self.ImpactEffects = {}
+        end
 
-		self:SetSize(spec.Size)
+        self:SetSize(spec.Size)
         self:SetMaxHealth(spec.ShieldMaxHealth)
         self:SetHealth(self,spec.ShieldMaxHealth)
 
@@ -52,9 +52,9 @@ Shield = Class(moho.shield_methods,Entity) {
         self:SetShieldRegenRate(spec.ShieldRegenRate)
         self:SetShieldRegenStartTime(spec.ShieldRegenStartTime)
 
-		self.OffHealth = -1
-		
-		self.PassOverkillDamage = spec.PassOverkillDamage
+        self.OffHealth = -1
+        
+        self.PassOverkillDamage = spec.PassOverkillDamage
 
         ChangeState(self, self.OnState)
     end,
@@ -107,10 +107,8 @@ Shield = Class(moho.shield_methods,Entity) {
         return math.min( self:GetHealth(), amount )
     end,
 
-
-
     OnCollisionCheckWeapon = function(self, firingWeapon)
-		local weaponBP = firingWeapon:GetBlueprint()
+        local weaponBP = firingWeapon:GetBlueprint()
         local collide = weaponBP.CollideFriendly
         if collide == false then
             if not ( IsEnemy(self:GetArmy(),firingWeapon.unit:GetArmy()) ) then
@@ -119,12 +117,12 @@ Shield = Class(moho.shield_methods,Entity) {
         end
         #Check DNC list
         if weaponBP.DoNotCollideList then
-			for k, v in pairs(weaponBP.DoNotCollideList) do
-				if EntityCategoryContains(ParseEntityCategory(v), self) then
-					return false
-				end
-			end
-		end   
+            for k, v in pairs(weaponBP.DoNotCollideList) do
+                if EntityCategoryContains(ParseEntityCategory(v), self) then
+                    return false
+                end
+            end
+        end   
         
         return true
     end,
@@ -142,14 +140,9 @@ Shield = Class(moho.shield_methods,Entity) {
         end
         return finalVal
     end,    
-
-	
-	MakeOverlapDamage = function(self,  position, shield, amount)
-		WaitSeconds(0.25)
-		Damage(self.Owner, position, shield, amount * 0.5, "shieldOverlap")
-	end,
-	
-    OnDamage =  function(self,instigator,amount,vector,type)
+    
+    OnDamage = function(self, instigator, amount, vector ,type)
+        #LOG('*DEBUG: OnDamage amount = '..repr(amount)..' type = '..repr(type) )
 
         local absorbed = self:OnGetDamageAbsorption(instigator,amount,type) 
         
@@ -157,77 +150,45 @@ Shield = Class(moho.shield_methods,Entity) {
             local overkill = self:GetOverkill(instigator,amount,type)     
             if self.Owner and IsUnit(self.Owner) and overkill > 0 then
                 self.Owner:DoTakeDamage(instigator, overkill, vector, type)
-            end             
+            end
         end
 
-		if type != "shieldOverlap" then		
-			if self.MakeOverlapDamageThread then
-				KillThread(self.MakeOverlapDamageThread)
-				self.MakeOverlapDamageThread = nil
-			end
-			
-			###### This code is to pass damage over overlapping shields.
-			###### The biggest shield in the game is the UEF shield boat. This code must be adapted if there is a bigger one
-			local position 		= self.Owner:GetPosition()
-			local shieldbp 		= self.Owner:GetBlueprint().Defense.Shield
-			local shieldRadius 	= (shieldbp.ShieldSize) / 2.0
-			local offsetY 		= GetSurfaceHeight(position[1],position[3]) + GetTerrainTypeOffset(position[1], position[3])
-			local shieldOffset 	= shieldRadius
-			if (shieldRadius > offsetY) then
-				shieldOffset 	= shieldOffset + offsetY			
-				if shieldbp.ShieldVerticalOffset then
-					shieldOffset = shieldOffset + shieldbp.ShieldVerticalOffset
-				end
-			
-			end
-			local aiBrain 		= self.Owner:GetAIBrain()
-			local otherShields 	= aiBrain:GetUnitsAroundPoint(( categories.SHIELD * categories.DEFENSE), position, 120, 'Ally' )
-			
-			## the shield can have an offset, making it visually and effectively smaller than it really is.
-			local surfaceRadius = math.sqrt((shieldRadius*(2*shieldOffset)) - (shieldOffset * shieldOffset))
-		
-			
-			for k,v in otherShields do
-				if self.Owner != v and v != instigator then
-					local otherPosition 	= v:GetPosition()
-					local othershieldbp 	= v:GetBlueprint().Defense.Shield
+        ###### This code is to pass damage over overlapping shields.
+        if type != 'shieldOverlap' and self:IsOn() then
 
-					
-					local otherShieldRadius = (othershieldbp.ShieldSize) / 2.0
-					
-					local otherOffsetY 		= GetSurfaceHeight(otherPosition[1],otherPosition[3]) + GetTerrainTypeOffset(otherPosition[1], otherPosition[3])
-					local otherShieldOffset 	= otherShieldRadius
-					if (otherShieldRadius > otherOffsetY) then			
-						otherShieldOffset 	= otherShieldOffset + otherOffsetY					
-						if othershieldbp.ShieldVerticalOffset then
-							otherShieldOffset = otherShieldOffset + othershieldbp.ShieldVerticalOffset
-						end
-					end
+            local brain = self.Owner:GetAIBrain()
 
-					local otherSurfaceRadius 	= math.sqrt((otherShieldRadius*(2*otherShieldOffset)) - (otherShieldOffset * otherShieldOffset))
+            # The idea is to find all units within X units away from us. We can't use our shield radius for X because some units could have
+            # bigger shields than us and we would not find them. Instead, use the size of the biggest shield as value for X. The biggest
+            # shield in the game is the UEF shield boat. This value must be adapted if there is a bigger one
+            local FindUnitRadius = 120
+# + categories.INCLUDEBUBBLESHIELDOVERLAP
+            local units = brain:GetUnitsAroundPoint( (categories.SHIELD * categories.DEFENSE), self.Owner:GetPosition(), FindUnitRadius, 'Ally' )
 
-					### Checking if the other shield is overlapping us.
-					local overlapOffset =  (98*(surfaceRadius + otherSurfaceRadius)) / 100
-					if self.Owner != v and VDist3(position, otherPosition) < (overlapOffset) then
-						if v and v.MyShield  then
-							if not v:IsDead() then
-                                if v.MyShield:IsOn() then
-    								damage = 0.5
-    								if EntityCategoryContains(categories.STRUCTURE, v) then
-    									damage = 0.1
-    								end
-    								self.MakeOverlapDamageThread = ForkThread(self.MakeOverlapDamage, self, position, v.MyShield, amount * damage , "shieldOverlap")
-                                end
-							end
-						end
-						
-					end
-				end
+            local pos = self:GetCachePosition()
+            local bp = self.Owner:GetBlueprint().Defense.Shield
+            local OverlapRadius = 0.98 * (bp.ShieldSize / 2)
+            local obp, oOverlapRadius, vpos, OverlapDist
 
-			end
-		end
+            for k, v in units do
+                if v and IsUnit(v) and not v:IsDead() and v.MyShield and v.MyShield:IsOn() and self.Owner != v and v != instigator then
+                    vspos = v.MyShield:GetCachePosition()
+                    obp = v:GetBlueprint().Defense.Shield
+                    oOverlapRadius = 0.98 * (obp.ShieldSize / 2)
 
-		
+                    OverlapDist = OverlapRadius + oOverlapRadius # If "self" and "v" are more than this far apart then shields don't overlap, otherwise they do
+
+                    if VDist3(pos, vspos) <= OverlapDist then
+                        v:OnAdjacentBubbleShieldDamageSpillOver( self, amount )
+                    end
+                end
+
+#if v then
+#    CreateEmitterAtEntity(v, self.Owner:GetArmy(), '/effects/Emitters/generic_teleportin_04_emit.bp')
+#end
+            end
+        end
+        
         self:AdjustHealth(instigator, -absorbed) 
         self:UpdateShieldRatio(-1)
 
@@ -238,17 +199,31 @@ Shield = Class(moho.shield_methods,Entity) {
         end
         if self:GetHealth() <= 0 then
             ChangeState(self, self.DamageRechargeState)
-        else
-        
-            if self.OffHealth < 0 then
-                ForkThread(self.CreateImpactEffect, self, vector)
-                if self.RegenRate > 0 then
-                    self.RegenThread = ForkThread(self.RegenStartThread, self)
-                    self.Owner.Trash:Add(self.RegenThread)
-                end
-            else
-                self:UpdateShieldRatio(0)
+        elseif self.OffHealth < 0 then
+            ForkThread(self.CreateImpactEffect, self, vector)
+            if self.RegenRate > 0 then
+                self.RegenThread = ForkThread(self.RegenStartThread, self)
+                self.Owner.Trash:Add(self.RegenThread)
             end
+        else
+            self:UpdateShieldRatio(0)
+        end
+    end,
+
+    OnAdjacentBubbleShieldDamageSpillOver = function(self, instigator, dmg)
+        #LOG('*DEBUG: OnAdjacentBubbleShieldDamageSpillOver dmg = '..repr(dmg))
+        local thread = ForkThread( self.AdjacentBubbleShieldDamageSpillOverThread, self, instigator, dmg )
+        self.Owner.Trash:Add(thread)
+    end,
+
+    AdjacentBubbleShieldDamageSpillOverThread = function(self, instigator, dmg)
+        WaitSeconds(0.3)
+        if self and self.Owner and not self.Owner:IsDead() and self:IsOn() then
+            local bp = self.Owner:GetBlueprint().Defense.Shield or {}
+            local dmgMod = bp.SpillOverDamageMod or 0.1
+            local vect = Util.GetDirectionVector( instigator:GetPosition(), self:GetCachePosition() )
+            #LOG('*DEBUG:AdjacentBubbleShieldDamageSpillOverThread dealing damage: '..repr(dmg * dmgMod))
+            self:OnDamage(instigator, dmg * dmgMod, vect, 'shieldOverlap' )
         end
     end,
 
@@ -266,31 +241,31 @@ Shield = Class(moho.shield_methods,Entity) {
 
     CreateImpactEffect = function(self, vector)
         local army = self:GetArmy()
-		local OffsetLength = Util.GetVectorLength(vector)
-		local ImpactMesh = Entity { Owner = self.Owner }
-		Warp( ImpactMesh, self:GetPosition())		
-		
-		if self.ImpactMeshBp != '' then
-			ImpactMesh:SetMesh(self.ImpactMeshBp)
-			ImpactMesh:SetDrawScale(self.Size)
-			ImpactMesh:SetOrientation(OrientFromDir(Vector(-vector.x,-vector.y,-vector.z)),true)
-		end
+        local OffsetLength = Util.GetVectorLength(vector)
+        local ImpactMesh = Entity { Owner = self.Owner }
+        Warp( ImpactMesh, self:GetPosition())        
+        
+        if self.ImpactMeshBp != '' then
+            ImpactMesh:SetMesh(self.ImpactMeshBp)
+            ImpactMesh:SetDrawScale(self.Size)
+            ImpactMesh:SetOrientation(OrientFromDir(Vector(-vector.x,-vector.y,-vector.z)),true)
+        end
 
-		for k, v in self.ImpactEffects do
-			CreateEmitterAtBone( ImpactMesh, -1, army, v ):OffsetEmitter(0,0,OffsetLength)
-		end
+        for k, v in self.ImpactEffects do
+            CreateEmitterAtBone( ImpactMesh, -1, army, v ):OffsetEmitter(0,0,OffsetLength)
+        end
 
-		WaitSeconds(5)
-		ImpactMesh:Destroy()
+        WaitSeconds(5)
+        ImpactMesh:Destroy()
     end,
 
     OnDestroy = function(self)
-		self:SetMesh('')
-		if self.MeshZ != nil then
-			self.MeshZ:Destroy()
-			self.MeshZ = nil
-		end
-		self:UpdateShieldRatio(0)
+        self:SetMesh('')
+        if self.MeshZ != nil then
+            self.MeshZ:Destroy()
+            self.MeshZ = nil
+        end
+        self:UpdateShieldRatio(0)
         ChangeState(self, self.DeadState)
     end,
 
@@ -328,48 +303,48 @@ Shield = Class(moho.shield_methods,Entity) {
     RemoveShield = function(self)
         self:SetCollisionShape('None')
 
-		self:SetMesh('')
-		if self.MeshZ != nil then
-			self.MeshZ:Destroy()
-			self.MeshZ = nil
-		end
+        self:SetMesh('')
+        if self.MeshZ != nil then
+            self.MeshZ:Destroy()
+            self.MeshZ = nil
+        end
     end,
 
     CreateShieldMesh = function(self)
-		self:SetCollisionShape( 'Sphere', 0, 0, 0, self.Size/2)
+        self:SetCollisionShape( 'Sphere', 0, 0, 0, self.Size/2)
 
-		self:SetMesh(self.MeshBp)
-		self:SetParentOffset(Vector(0,self.ShieldVerticalOffset,0))
-		self:SetDrawScale(self.Size)
+        self:SetMesh(self.MeshBp)
+        self:SetParentOffset(Vector(0,self.ShieldVerticalOffset,0))
+        self:SetDrawScale(self.Size)
 
-		if self.MeshZ == nil then
-			self.MeshZ = Entity { Owner = self.Owner }
-			self.MeshZ:SetMesh(self.MeshZBp)
+        if self.MeshZ == nil then
+            self.MeshZ = Entity { Owner = self.Owner }
+            self.MeshZ:SetMesh(self.MeshZBp)
             Warp( self.MeshZ, self.Owner:GetPosition() )
-			self.MeshZ:SetDrawScale(self.Size)
-			self.MeshZ:AttachBoneTo(-1,self.Owner,-1)
-			self.MeshZ:SetParentOffset(Vector(0,self.ShieldVerticalOffset,0))
+            self.MeshZ:SetDrawScale(self.Size)
+            self.MeshZ:AttachBoneTo(-1,self.Owner,-1)
+            self.MeshZ:SetParentOffset(Vector(0,self.ShieldVerticalOffset,0))
 
-			self.MeshZ:SetVizToFocusPlayer('Always')
-			self.MeshZ:SetVizToEnemies('Intel')
-			self.MeshZ:SetVizToAllies('Always')
-			self.MeshZ:SetVizToNeutrals('Intel')
-		end
+            self.MeshZ:SetVizToFocusPlayer('Always')
+            self.MeshZ:SetVizToEnemies('Intel')
+            self.MeshZ:SetVizToAllies('Always')
+            self.MeshZ:SetVizToNeutrals('Intel')
+        end
     end,
 
     # Basically run a timer, but with visual bar movement
     ChargingUp = function(self, curProgress, time)
-		local owner = self.Owner 
-		local position = owner:GetPosition()
-		local shieldbp = self.Owner:GetBlueprint().Defense.Shield
-		local shieldRadius = shieldbp.ShieldSize
-		local aiBrain = owner:GetAIBrain()
-		local otherShields = aiBrain:GetUnitsAroundPoint(( categories.SHIELD * categories.DEFENSE), position, shieldRadius, 'Ally' )
-		local rechargeTime = time + ((table.getn(otherShields) - 1) * .2 * time) 
-		if rechargeTime > (time * 3) then
-			rechargeTime = time
-		else
-		end
+        local owner = self.Owner 
+        local position = owner:GetPosition()
+        local shieldbp = self.Owner:GetBlueprint().Defense.Shield
+        local shieldRadius = shieldbp.ShieldSize
+        local aiBrain = owner:GetAIBrain()
+        local otherShields = aiBrain:GetUnitsAroundPoint(( categories.SHIELD * categories.DEFENSE), position, shieldRadius, 'Ally' )
+        local rechargeTime = time + ((table.getn(otherShields) - 1) * .2 * time) 
+        if rechargeTime > (time * 3) then
+            rechargeTime = time
+        else
+        end
         while curProgress < rechargeTime do
             local fraction = self.Owner:GetResourceConsumed()
             curProgress = curProgress + ( fraction / 10 )
@@ -403,9 +378,9 @@ Shield = Class(moho.shield_methods,Entity) {
             self:UpdateShieldRatio(-1)
 
             self.Owner:OnShieldEnabled()
-			self:CreateShieldMesh()
-			
-			local aiBrain = self.Owner:GetAIBrain()
+            self:CreateShieldMesh()
+            
+            local aiBrain = self.Owner:GetAIBrain()
 
             WaitSeconds(1.0)
             local fraction = self.Owner:GetResourceConsumed()
@@ -453,13 +428,13 @@ Shield = Class(moho.shield_methods,Entity) {
             end
 
             # Set the offhealth - this is used basically to let the unit know the unit was manually turned off
-      		self.OffHealth = self:GetHealth()
+              self.OffHealth = self:GetHealth()
 
             # Get rid of teh shield bar
             self:UpdateShieldRatio(0)
 
             self:RemoveShield()
-    		self.Owner:OnShieldDisabled()
+            self.Owner:OnShieldDisabled()
 
             WaitSeconds(1)            
         end,
@@ -510,14 +485,14 @@ UnitShield = Class(Shield){
         self.Owner = spec.Owner
         self.ImpactEffects = EffectTemplate[spec.ImpactEffects]        
         self.CollisionSizeX = spec.CollisionSizeX or 1
-		self.CollisionSizeY = spec.CollisionSizeY or 1
-		self.CollisionSizeZ = spec.CollisionSizeZ or 1
-		self.CollisionCenterX = spec.CollisionCenterX or 0
-		self.CollisionCenterY = spec.CollisionCenterY or 0
-		self.CollisionCenterZ = spec.CollisionCenterZ or 0
-		self.OwnerShieldMesh = spec.OwnerShieldMesh or ''
+        self.CollisionSizeY = spec.CollisionSizeY or 1
+        self.CollisionSizeZ = spec.CollisionSizeZ or 1
+        self.CollisionCenterX = spec.CollisionCenterX or 0
+        self.CollisionCenterY = spec.CollisionCenterY or 0
+        self.CollisionCenterZ = spec.CollisionCenterZ or 0
+        self.OwnerShieldMesh = spec.OwnerShieldMesh or ''
 
-		self:SetSize(spec.Size)
+        self:SetSize(spec.Size)
 
         self:SetMaxHealth(spec.ShieldMaxHealth)
         self:SetHealth(self,spec.ShieldMaxHealth)
@@ -545,35 +520,35 @@ UnitShield = Class(Shield){
 
     CreateImpactEffect = function(self, vector)
         local army = self:GetArmy()
-		local OffsetLength = Util.GetVectorLength(vector)
-		local ImpactEnt = Entity { Owner = self.Owner }
+        local OffsetLength = Util.GetVectorLength(vector)
+        local ImpactEnt = Entity { Owner = self.Owner }
 
-		Warp( ImpactEnt, self:GetPosition())
-		ImpactEnt:SetOrientation(OrientFromDir(Vector(-vector.x,-vector.y,-vector.z)),true)
+        Warp( ImpactEnt, self:GetPosition())
+        ImpactEnt:SetOrientation(OrientFromDir(Vector(-vector.x,-vector.y,-vector.z)),true)
 
-		for k, v in self.ImpactEffects do
-			CreateEmitterAtBone( ImpactEnt, -1, army, v ):OffsetEmitter(0,0,OffsetLength)
-		end
-		WaitSeconds(1)
+        for k, v in self.ImpactEffects do
+            CreateEmitterAtBone( ImpactEnt, -1, army, v ):OffsetEmitter(0,0,OffsetLength)
+        end
+        WaitSeconds(1)
 
-		ImpactEnt:Destroy()
+        ImpactEnt:Destroy()
     end,
 
     CreateShieldMesh = function(self)
-		self:SetCollisionShape( 'Box', self.CollisionCenterX, self.CollisionCenterY, self.CollisionCenterZ, self.CollisionSizeX, self.CollisionSizeY, self.CollisionSizeZ)
-		self.Owner:SetMesh(self.OwnerShieldMesh,true)
+        self:SetCollisionShape( 'Box', self.CollisionCenterX, self.CollisionCenterY, self.CollisionCenterZ, self.CollisionSizeX, self.CollisionSizeY, self.CollisionSizeZ)
+        self.Owner:SetMesh(self.OwnerShieldMesh,true)
     end,
 
     RemoveShield = function(self)
         self:SetCollisionShape('None')
-		self.Owner:SetMesh(self.Owner:GetBlueprint().Display.MeshBlueprint, true)
+        self.Owner:SetMesh(self.Owner:GetBlueprint().Display.MeshBlueprint, true)
     end,
 
     OnDestroy = function(self)
         if not self.Owner.MyShield or self.Owner.MyShield:GetEntityId() == self:GetEntityId() then
-	        self.Owner:SetMesh(self.Owner:GetBlueprint().Display.MeshBlueprint, true)
-		end
-		self:UpdateShieldRatio(0)
+            self.Owner:SetMesh(self.Owner:GetBlueprint().Display.MeshBlueprint, true)
+        end
+        self:UpdateShieldRatio(0)
         ChangeState(self, self.DeadState)
     end,
         
@@ -588,13 +563,13 @@ AntiArtilleryShield = Class(Shield){
             end
         end
         # Check DNC list
-		if bp.DoNotCollideList then
-			for k, v in pairs(bp.DoNotCollideList) do
-				if EntityCategoryContains(ParseEntityCategory(v), self) then
-					return false
-				end
-			end
-		end           
+        if bp.DoNotCollideList then
+            for k, v in pairs(bp.DoNotCollideList) do
+                if EntityCategoryContains(ParseEntityCategory(v), self) then
+                    return false
+                end
+            end
+        end           
         if bp.ArtilleryShieldBlocks then
             return true
         end

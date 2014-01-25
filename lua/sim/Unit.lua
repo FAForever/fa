@@ -4213,6 +4213,12 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    OnAdjacentBubbleShieldDamageSpillOver = function(self, instigator, damage)
+        if self.MyShield then
+            self.MyShield:OnAdjacentBubbleShieldDamageSpillOver(instigator, damage)
+        end
+    end,
+
     ##########################################################################################
     ## TRANSPORTING
     ##########################################################################################
