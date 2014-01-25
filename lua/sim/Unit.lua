@@ -4446,8 +4446,8 @@ Unit = Class(moho.unit_methods) {
         local bp = self:GetBlueprint().Economy
         local energyCost, time
         if bp then
-            local mass = bp.BuildCostMass * (bp.TeleportMassMod or 0.01)
-            local energy = bp.BuildCostEnergy * (bp.TeleportEnergyMod or 0.01)
+            local mass = (bp.TeleportMassCost or bp.BuildCostMass or 1) * (bp.TeleportMassMod or 0.01)
+            local energy = (bp.TeleportEnergyCost or bp.BuildCostEnergy or 1) * (bp.TeleportEnergyMod or 0.01)
             energyCost = mass + energy
             time = energyCost * (bp.TeleportTimeMod or 0.01)
         end
