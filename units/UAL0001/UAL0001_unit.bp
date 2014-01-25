@@ -306,9 +306,9 @@
         ProductionPerSecondMass = 1,
         StorageEnergy = 4000,
         StorageMass = 650,
-        TeleportEnergyMod = 0.0001, #0.03,
+        TeleportEnergyMod = 0.03,
         TeleportMassMod = 0,
-        TeleportTimeMod = 0.01, #0.0001,
+        TeleportTimeMod = 0.0001,
     },
     Enhancements = {
         AdvancedEngineering = {

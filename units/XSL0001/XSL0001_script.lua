@@ -240,8 +240,6 @@ XSL0001 = Class( SWalkingLandUnit ) {
             end
         end
 
-self:CreateEnhancement('Teleporter')
-
         WaitSeconds(6)
     end,
 

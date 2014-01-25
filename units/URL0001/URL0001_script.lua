@@ -247,7 +247,6 @@ URL0001 = Class(CWalkingLandUnit) {
             end
         end
 
-self:CreateEnhancement('Teleporter')
         WaitSeconds(6)
         self:SetMesh(self:GetBlueprint().Display.MeshBlueprint, true)
     end,    
