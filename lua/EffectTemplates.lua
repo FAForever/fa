@@ -382,14 +382,123 @@ GenericTeleportCharge01 = {
     EmtBpPath .. 'generic_teleport_charge_02_emit.bp',
     EmtBpPath .. 'generic_teleport_charge_03_emit.bp',
 }
+
+GenericTeleportCharge02 = {
+    EmtBpPath .. 'generic_teleport_charge_04_emit.bp',
+    EmtBpPath .. 'generic_teleport_charge_05_emit.bp',
+    EmtBpPath .. 'generic_teleport_charge_06_emit.bp',
+    EmtBpPath .. 'generic_teleport_charge_07_emit.bp',
+    EmtBpPath .. 'generic_teleport_charge_08_emit.bp',
+}
+
 GenericTeleportOut01 = {
     EmtBpPath .. 'generic_teleportout_01_emit.bp',
+    EmtBpPath .. 'generic_teleportin_05_emit.bp',
 }
+
 GenericTeleportIn01 = {
     EmtBpPath .. 'generic_teleportin_01_emit.bp',
     EmtBpPath .. 'generic_teleportin_02_emit.bp',
     EmtBpPath .. 'generic_teleportin_03_emit.bp',
+    EmtBpPath .. 'generic_teleportin_04_emit.bp',
+    EmtBpPath .. 'generic_teleportin_05_emit.bp',
 }
+
+GenericTeleportInWeapon01 = {
+    EmtBpPath .. 'generic_teleportin_weapon_01_emit.bp',
+}
+
+UEFTeleportCharge01 = {
+#    EmtBpPath .. 'uef_teleport_charge_09_emit.bp',
+}
+
+UEFTeleportCharge02 = {
+    EmtBpPath .. 'uef_teleport_charge_01_emit.bp',
+#    EmtBpPath .. 'uef_teleport_charge_02_emit.bp',
+#    EmtBpPath .. 'uef_teleport_charge_03_emit.bp',
+#    EmtBpPath .. 'uef_teleport_charge_04_emit.bp',
+    EmtBpPath .. 'uef_teleport_charge_06_emit.bp',
+    EmtBpPath .. 'uef_teleport_charge_05_emit.bp',
+    EmtBpPath .. 'uef_teleport_charge_07_emit.bp',
+    EmtBpPath .. 'uef_teleport_charge_08_emit.bp',
+}
+
+UEFTeleportOut01 = {
+}
+
+UEFTeleportIn01 = {
+    EmtBpPath .. 'uef_teleportin_01_emit.bp',
+    EmtBpPath .. 'uef_teleportin_02_emit.bp',
+}
+
+UEFTeleportInWeapon01 = {
+    EmtBpPath .. 'uef_teleportin_weapon_01_emit.bp',
+}
+
+CybranTeleportCharge01 = {
+    EmtBpPath .. 'cybran_teleport_charge_07_emit.bp',
+    EmtBpPath .. 'cybran_teleport_charge_08_emit.bp',
+}
+
+CybranTeleportCharge02 = {
+    EmtBpPath .. 'cybran_teleport_charge_01_emit.bp',
+    EmtBpPath .. 'cybran_teleport_charge_02_emit.bp',
+    EmtBpPath .. 'cybran_teleport_charge_03_emit.bp',
+    EmtBpPath .. 'cybran_teleport_charge_04_emit.bp',
+    EmtBpPath .. 'cybran_teleport_charge_05_emit.bp',
+    EmtBpPath .. 'cybran_teleport_charge_06_emit.bp',
+}
+
+CybranTeleportOut01 = {
+}
+
+CybranTeleportIn01 = {
+    EmtBpPath .. 'cybran_teleportin_01_emit.bp',
+#    EmtBpPath .. 'cybran_teleportin_02_emit.bp',
+    EmtBpPath .. 'cybran_teleportin_04_emit.bp',
+    EmtBpPath .. 'cybran_teleportin_05_emit.bp',
+    EmtBpPath .. 'cybran_teleportin_06_emit.bp',
+    EmtBpPath .. 'cybran_teleportin_07_emit.bp',
+    EmtBpPath .. 'cybran_teleportin_08_emit.bp',
+    EmtBpPath .. 'cybran_teleportin_09_emit.bp',
+}
+
+CybranTeleportInWeapon01 = {
+    EmtBpPath .. 'cybran_teleportin_weapon_01_emit.bp',
+}
+
+SeraphimTeleportCharge01 = {
+    EmtBpPath .. 'seraphim_teleport_charge_01_emit.bp', 
+    EmtBpPath .. 'seraphim_teleport_charge_02_emit.bp', 
+}
+
+SeraphimTeleportCharge02 = {
+    EmtBpPath .. 'seraphim_teleport_charge_03_emit.bp', 
+    EmtBpPath .. 'seraphim_teleport_charge_04_emit.bp', 
+    EmtBpPath .. 'seraphim_teleport_charge_05_emit.bp', 
+    EmtBpPath .. 'seraphim_teleport_charge_06_emit.bp', 
+#    EmtBpPath .. 'seraphim_teleport_charge_07_emit.bp', 
+}
+
+SeraphimTeleportOut01 = {
+    EmtBpPath .. 'seraphim_rift_in_small_03_emit.bp', 
+    EmtBpPath .. 'seraphim_rift_in_small_04_emit.bp', 
+}
+
+SeraphimTeleportIn01 = {
+    EmtBpPath .. 'seraphim_rift_in_large_03_emit.bp', 
+    EmtBpPath .. 'seraphim_rift_in_large_04_emit.bp', 
+}
+
+SeraphimTeleportIn02 = {
+    EmtBpPath .. 'seraphim_rift_in_small_03_emit.bp', 
+    EmtBpPath .. 'seraphim_rift_in_small_04_emit.bp', 
+}
+
+SeraphimTeleportInWeapon01 = {
+    EmtBpPath .. 'seraphim_teleportin_weapon_01_emit.bp',
+}
+
 
 #---------------------------------------------------------------
 # ### UNIT CONSTRUCTION ###

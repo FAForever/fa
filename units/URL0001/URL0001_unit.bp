@@ -92,6 +92,21 @@ UnitBlueprint {
             Cue = 'URL0001_Move_Stop',
             LodCutoff = 'UnitMove_LodCutoff',
         },
+        TeleportChargingAtDestination = Sound {
+            Bank = 'URLWeapon',
+            Cue = 'URL0402_Beam_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TeleportChargingAtUnit = Sound {
+            Bank = 'URL',
+            Cue = 'URL0309_Capture_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TeleportIn = Sound {
+            Bank = 'Impacts',
+            Cue = 'XSA_Bomb_Explosion_01',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
         UISelection = Sound {
             Bank = 'Interface',
             Cue = 'Cybran_Select_Commander',
@@ -249,6 +264,22 @@ UnitBlueprint {
         },
         PlaceholderMeshName = 'UXB0000',
         SpawnRandomRotation = true,
+        TeleportEffects = {
+            ChargeFxAtUnitBones = {
+                {
+                    Bone = 'Back_Upgrade',
+                    Offset = {
+                        0,
+                        0.05,
+                        0.2,
+                    },
+                },
+            },
+            PlayChargeFxAtDestination = true,
+            PlayChargeFxAtUnit = true,
+            PlayTeleportOutFx = true,
+            PlayTeleportInFx = true,
+        },
         TransportAnimation = {
             {
                 Animation = '/units/URL0001/URL0001_afold.sca',
@@ -1043,6 +1074,18 @@ UnitBlueprint {
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
             Turreted = false,
             WeaponCategory = 'Anti Navy',
+        },
+        {
+            Damage = 1000,
+            DamageFriendly = true,
+            DamageRadius = 4,
+            DamageType = 'Normal',
+            DisplayName = 'Teleport in',
+            DummyWeapon = true,
+            Label = 'TeleportWeapon',
+            MaxRadius = 1,
+            RateOfFire = 1,
+            WeaponCategory = 'Teleport',
         },
     },
 }

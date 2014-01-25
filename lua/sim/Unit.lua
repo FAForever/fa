@@ -77,7 +77,6 @@ Unit = Class(moho.unit_methods) {
     DestructionPartsChassisToss = {},
     EconomyProductionInitiallyActive = true,
 
-
     GetSync = function(self)
         if not Sync.UnitData[self:GetEntityId()] then
             Sync.UnitData[self:GetEntityId()] = {}
@@ -207,6 +206,7 @@ Unit = Class(moho.unit_methods) {
         self.OnBeingBuiltEffectsBag = TrashBag()
         self.CaptureEffectsBag = TrashBag()
         self.UpgradeEffectsBag = TrashBag()
+        self.TeleportFxBag = TrashBag()
 
         self.HasFuel = true
 
@@ -1858,6 +1858,9 @@ Unit = Class(moho.unit_methods) {
         if self.UpgradeEffectsBag then
             self.UpgradeEffectsBag:Destroy()
         end
+        if self.TeleportFxBag then
+            self.TeleportFxBag:Destroy()
+        end
 
         if self.TeleportDrain then
             RemoveEconomyEvent( self, self.TeleportDrain)
@@ -2371,6 +2374,27 @@ Unit = Class(moho.unit_methods) {
         if bp.Enhancements and bp.EnhancementPresetAssigned and bp.EnhancementPresetAssigned.Enhancements then
             for k, v in bp.EnhancementPresetAssigned.Enhancements do
                 self:CreateEnhancement(v)
+            end
+        end
+    end,
+
+    ShowEnhancementBones = function(self)
+        # hide and show certain bones based on available enhancements
+        local bp = self:GetBlueprint()
+        if bp.Enhancements then
+            for k, enh in bp.Enhancements do
+                if enh.HideBones then
+                    for _, bone in enh.HideBones do
+                        self:HideBone(bone, true)
+                    end
+                end
+            end
+            for k, enh in bp.Enhancements do
+                if self:HasEnhancement(k) and enh.ShowBones then
+                    for _, bone in enh.ShowBones do
+                        self:ShowBone(bone, true)
+                    end
+                end
             end
         end
     end,
@@ -4406,14 +4430,10 @@ Unit = Class(moho.unit_methods) {
         end
         self:StopUnitAmbientSound('TeleportLoop')
         self:CleanupTeleportChargeEffects()
+        self:CleanupRemainingTeleportChargeEffects()
         self:SetWorkProgress(0.0)
         self:SetImmobile(false)
         self.UnitBeingTeleported = nil
-    end,
-
-    UpdateTeleportProgress = function(self, progress)
-        #LOG(' UpdatingTeleportProgress ')
-        self:SetWorkProgress(progress)
     end,
 
     InitiateTeleportThread = function(self, teleporter, location, orientation)
@@ -4436,7 +4456,7 @@ Unit = Class(moho.unit_methods) {
         self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
 
         # create teleport charge effect
-        self:PlayTeleportChargeEffects()
+        self:PlayTeleportChargeEffects( location, orientation )
 
         WaitFor( self.TeleportDrain  ) # Perform fancy Teleportation FX here
 
@@ -4453,6 +4473,7 @@ Unit = Class(moho.unit_methods) {
         self:SetWorkProgress(0.0)
         Warp(self, location, orientation)
         self:PlayTeleportInEffects()
+        self:CleanupRemainingTeleportChargeEffects()
 
         WaitSeconds( 0.1 ) # Perform cooldown Teleportation FX here
         #Landing Sound
@@ -4464,42 +4485,30 @@ Unit = Class(moho.unit_methods) {
         self.TeleportThread = nil
     end,
 
-    PlayTeleportChargeEffects = function(self)
-        local army = self:GetArmy()
-        local bp = self:GetBlueprint()
+    UpdateTeleportProgress = function(self, progress)
+        #LOG(' UpdatingTeleportProgress ')
+        self:SetWorkProgress(progress)
+        EffectUtilities.TeleportChargingProgress(self, progress)
+    end,
 
-        self.TeleportChargeBag = {}
-        for k, v in EffectTemplate.GenericTeleportCharge01 do
-            local fx = CreateEmitterAtEntity(self,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
-            self.Trash:Add(fx)
-            table.insert( self.TeleportChargeBag, fx)
-        end
+    PlayTeleportChargeEffects = function(self, location, orientation)
+        EffectUtilities.PlayTeleportChargingEffects(self, location, self.TeleportFxBag)
     end,
 
     CleanupTeleportChargeEffects = function( self )
-        if self.TeleportChargeBag then
-            for keys,values in self.TeleportChargeBag do
-                values:Destroy()
-            end
-            self.TeleportChargeBag = {}
-        end
+        EffectUtilities.DestroyTeleportChargingEffects(self, self.TeleportFxBag)
+    end,
+
+    CleanupRemainingTeleportChargeEffects = function( self )
+        EffectUtilities.DestroyRemainingTeleportChargingEffects(self, self.TeleportFxBag)
     end,
 
     PlayTeleportOutEffects = function(self)
-        local army = self:GetArmy()
-        local emit = nil
-        for k, v in EffectTemplate.GenericTeleportOut01 do
-            emit = CreateEmitterAtEntity(self,army,v)
-        end
+        EffectUtilities.PlayTeleportOutEffects(self, self.TeleportFxBag)
     end,
 
-
     PlayTeleportInEffects = function(self)
-        local army = self:GetArmy()
-        local bp = self:GetBlueprint()
-        for k, v in EffectTemplate.GenericTeleportIn01 do
-            emit = CreateEmitterAtEntity(self,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
-        end
+        EffectUtilities.PlayTeleportInEffects(self, self.TeleportFxBag)
     end,
 
     #########################################################################################
