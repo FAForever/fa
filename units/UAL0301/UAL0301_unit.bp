@@ -93,6 +93,21 @@ UnitBlueprint {
             Cue = 'UAL0301_Move_Stop',
             LodCutoff = 'UnitMove_LodCutoff',
         },
+        TeleportChargingAtDestination = Sound {
+            Bank = 'UAL',
+            Cue = 'UAL0001_Reclaim_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TeleportChargingAtUnit = Sound {
+            Bank = 'UAL',
+            Cue = 'UAL0201_Move_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TeleportIn = Sound {
+            Bank = 'Impacts',
+            Cue = 'AEON_Expl_Lrg_Naval',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
         UISelection = Sound {
             Bank = 'Interface',
             Cue = 'Aeon_Select_Commander',

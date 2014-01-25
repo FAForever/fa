@@ -92,6 +92,26 @@ UnitBlueprint {
             Cue = 'XSL0301_Move_Stop',
             LodCutoff = 'UnitMove_LodCutoff',
         },
+        TeleportChargingAtDestination = Sound {
+            Bank = 'XSA',
+            Cue = 'XSA0402_Move_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TeleportChargingAtUnit = Sound {
+            Bank = 'XSB',
+            Cue = 'XSB0101_Construct_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TeleportIn = Sound {
+            Bank = 'XSB',
+            Cue = 'XSB0101_Activate',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TeleportOut = Sound {
+            Bank = 'XSB',
+            Cue = 'XSB0101_Activate',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
         UISelection = Sound {
             Bank = 'SeraphimSelect',
             Cue = 'Seraphim_Select_Commander',

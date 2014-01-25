@@ -91,9 +91,19 @@ UnitBlueprint {
             Cue = 'UEL0001_Move_Stop',
             LodCutoff = 'UnitMove_LodCutoff',
         },
-        TeleportIn = Sound {
+        TeleportChargingAtDestination = Sound {
             Bank = 'UEL',
-            Cue = 'UEL0001_Gate_In',
+            Cue = 'UEL0001_Reclaim_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TeleportChargingAtUnit = Sound {
+            Bank = 'UEL',
+            Cue = 'UEL0001_Construct_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TeleportIn = Sound {
+            Bank = 'Impacts',
+            Cue = 'UEF_Expl_Lrg_Naval',
             LodCutoff = 'UnitMove_LodCutoff',
         },
         UISelection = Sound {
