@@ -275,7 +275,7 @@ UnitBlueprint {
                     },
                 },
             },
-            PlayChargeFxAtDestination = true,
+            PlayChargeFxAtDestination = false,
             PlayChargeFxAtUnit = true,
             PlayTeleportOutFx = true,
             PlayTeleportInFx = true,
@@ -1076,7 +1076,7 @@ UnitBlueprint {
             WeaponCategory = 'Anti Navy',
         },
         {
-            Damage = 1000,
+            Damage = 100,
             DamageFriendly = true,
             DamageRadius = 4,
             DamageType = 'Normal',

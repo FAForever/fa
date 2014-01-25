@@ -1120,7 +1120,7 @@ UnitBlueprint {
             WeaponUnpacks = true,
         },
         {
-            Damage = 1000,
+            Damage = 100,
             DamageFriendly = true,
             DamageRadius = 4,
             DamageType = 'Normal',

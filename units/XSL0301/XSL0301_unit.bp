@@ -984,5 +984,17 @@ UnitBlueprint {
             WeaponRepackTimeout = 5,
             WeaponUnpacks = true,
         },
+        {
+            Damage = 100,
+            DamageFriendly = true,
+            DamageRadius = 4,
+            DamageType = 'Normal',
+            DisplayName = 'Teleport in',
+            DummyWeapon = true,
+            Label = 'TeleportWeapon',
+            MaxRadius = 1,
+            RateOfFire = 1,
+            WeaponCategory = 'Teleport',
+        },
     },
 }
