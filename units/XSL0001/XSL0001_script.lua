@@ -328,7 +328,6 @@ XSL0001 = Class( SWalkingLandUnit ) {
                         },
                     },
                 }
-LOG('bp.ACUAddHealth = '..repr(bp.ACUAddHealth))
             end
 
             Buff.ApplyBuff(self, 'SeraphimACURegenAuraSelfBuff')
@@ -395,7 +394,6 @@ LOG('bp.ACUAddHealth = '..repr(bp.ACUAddHealth))
                     },
                 }
             end
-LOG('bp.ACUAddHealth = '..repr(bp.ACUAddHealth))
 
             table.insert( self.ShieldEffectsBag, CreateAttachedEmitter( self, 'XSL0001', self:GetArmy(), '/effects/emitters/seraphim_regenerative_aura_01_emit.bp' ) )
             self.AdvancedRegenThreadHandle = self:ForkThread(self.AdvancedRegenBuffThread)
