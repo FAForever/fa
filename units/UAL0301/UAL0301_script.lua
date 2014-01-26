@@ -19,8 +19,7 @@ local Buff = import('/lua/sim/Buff.lua')
 UAL0301 = Class(AWalkingLandUnit) {    
     Weapons = {
         RightReactonCannon = Class(ADFReactonCannon) {},
-        DeathWeapon = Class(AIFCommanderDeathWeapon) {
-        },
+        DeathWeapon = Class(AIFCommanderDeathWeapon) {},
     },
     
     OnPrepareArmToBuild = function(self)

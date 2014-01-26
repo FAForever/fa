@@ -213,4 +213,6 @@ keyDescriptions = {
     ['debug_toggle_pannels'] = '<LOC key_desc_0180>Toggle UI panels on/off',
     ['spreadattack'] = 'Spread attack',
     ['shift_spreadattack'] = 'Spread attack',
+    
+    ['show_objective_screen'] = 'Show Scenario Options/Objectives Window',
 }
