@@ -152,7 +152,7 @@ UnitBlueprint {
             ShieldRegenRate = 64,
             ShieldRegenStartTime = 1,
             ShieldSize = 25,
-            ShieldSpillOverDamageMod = 0.5,
+            ShieldSpillOverDamageMod = 0, # we keep it different from other mobile shields
             ShieldVerticalOffset = -7,
         },
         SubThreatLevel = 40,
