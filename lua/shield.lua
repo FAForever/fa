@@ -141,7 +141,7 @@ Shield = Class(moho.shield_methods,Entity) {
         return finalVal
     end,    
     
-    OnDamage = function(self, instigator, amount, vector ,type)
+    OnDamage = function(self, instigator, amount, vector, type)
         #LOG('*DEBUG: OnDamage amount = '..repr(amount)..' type = '..repr(type) )
 
         local absorbed = self:OnGetDamageAbsorption(instigator,amount,type) 
@@ -155,6 +155,8 @@ Shield = Class(moho.shield_methods,Entity) {
 
         ###### This code is to pass damage over overlapping shields.
         if type != 'shieldOverlap' and self:IsOn() then
+
+            self:SpillOverDmgDBRegister(instigator, amount, type) # remember this damage to prevent additional overspill damage
 
             local brain = self.Owner:GetAIBrain()
 
@@ -173,10 +175,10 @@ Shield = Class(moho.shield_methods,Entity) {
                     vspos = v.MyShield:GetCachePosition()
                     oOverlapRadius = 0.98 * v.MyShield.Size
 
-                    OverlapDist = OverlapRadius + oOverlapRadius # If "self" and "v" are more than this far apart then shields don't overlap, otherwise they do
+                    OverlapDist = OverlapRadius + oOverlapRadius # If "self" and "v" are more than this far apart then the shields don't overlap, otherwise they do
 
                     if VDist3(pos, vspos) <= OverlapDist then
-                        v:OnAdjacentBubbleShieldDamageSpillOver( self, amount )
+                        v:OnAdjacentBubbleShieldDamageSpillOver( instigator, self.Owner, amount, type )
                     end
                 end
                 # DEBUG only, to see a flash on all units we're checking
@@ -207,23 +209,84 @@ Shield = Class(moho.shield_methods,Entity) {
         end
     end,
 
-    OnAdjacentBubbleShieldDamageSpillOver = function(self, instigator, dmg)
-        #LOG('*DEBUG: OnAdjacentBubbleShieldDamageSpillOver dmg = '..repr(dmg))
-        local thread = ForkThread( self.AdjacentBubbleShieldDamageSpillOverThread, self, instigator, dmg )
-        self.Owner.Trash:Add(thread)
+    SpillOverDmgDBRegister = function(self, instigator, amount, type)
+        LOG('*DEBUG: SpillOverDmgDBRegister')
+        if not self.SpillOverDmgDB then
+            self.SpillOverDmgDB = {}
+        end
+        if instigator and IsUnit(instigator) then
+            local entry = { amount = amount, instigator = instigator:GetEntityId(), tick = GetGameTick(), type = type, }
+            table.insert( self.SpillOverDmgDB, entry )
+            LOG('*DEBUG: db = '..repr(self.SpillOverDmgDB))
+        end
     end,
 
-    AdjacentBubbleShieldDamageSpillOverThread = function(self, instigator, dmg)
-        WaitSeconds(0.3)
+    SpillOverDmgDBUnregister = function(self, key)
+        if not self.SpillOverDmgDB then return end
+        table.remove( self.SpillOverDmgDB, key )
+    end,
+
+    SpillOverDmgDBFind = function(self, instigator, amount, type)
+        local r = false
+
+        if self.SpillOverDmgDB and instigator and not instigator:BeenDestroyed() then
+            local remove = {}
+            local tick = GetGameTick()
+            local entId = instigator:GetEntityId()
+
+            # checking whether there's 
+            for k, v in self.SpillOverDmgDB do
+                if v.tick < (tick-5) then               #### max spill damage delay is 5 ticks (1/2)
+                    table.insert(remove, k)
+                elseif r == false and v.amount == amount and v.type == type and v.instigator == entId then
+                    r = k
+                end
+            end
+
+            LOG('*DEBUG: SpillOverDmgDBFind dmg = '..repr(amount)..' type = '..repr(type)..' instigator = '..repr(entId))
+            LOG('*DEBUG: SpillOverDmgDBFind db before clean up = '..repr(self.SpillOverDmgDB))
+
+            # cleaning up old entries in database
+            for k, v in remove do
+                self:SpillOverDmgDBUnregister(k)
+            end
+
+            LOG('*DEBUG: SpillOverDmgDBFind db after clean up = '..repr(self.SpillOverDmgDB))
+        end
+
+        LOG('*DEBUG: SpillOverDmgDBFind found key = '..repr(r))
+        return r
+    end,
+
+    AdjacentBubbleShieldDamageSpillOverThread = function(self, instigator, spillingUnit, dmg, type)
+        WaitTicks(3)                                #### max spill damage delay is 5 ticks (2/2)
         if self and self.Owner and not self.Owner:IsDead() and self:IsOn() then
-            local bp = self.Owner:GetBlueprint().Defense.Shield or {}
-            local dmgMod = bp.SpillOverDamageMod or 0.1
-            if dmgMod > 0 then
-                local vect = Util.GetDirectionVector( instigator:GetPosition(), self:GetCachePosition() )
-                #LOG('*DEBUG:AdjacentBubbleShieldDamageSpillOverThread dealing damage: '..repr(dmg * dmgMod))
-                self:OnDamage(instigator, dmg * dmgMod, vect, 'shieldOverlap' )
+
+            # find out whether we've been hit by the cause of the spill over damage aswell. If yes, ignore spill over damage (we already took damage)
+            local DBkey = self:SpillOverDmgDBFind(instigator, dmg, type)
+            if DBkey then
+                LOG('*DEBUG: AdjacentBubbleShieldDamageSpillOverThread no spill damage')
+                # disabled because there may be more shields spilling damage from the same origin, we have to check for that too otherwise
+                # only the first overspill is prevented, not the spill from a second or third shield.
+                #self:SpillOverDmgDBUnregister(DBkey)
+
+            # do overspill damage
+            else
+                local bp = self.Owner:GetBlueprint().Defense.Shield or {}
+                local dmgMod = bp.SpillOverDamageMod or 0.1
+                if dmgMod > 0 then
+                    local vect = Util.GetDirectionVector( instigator:GetPosition(), self:GetCachePosition() )
+                    LOG('*DEBUG: AdjacentBubbleShieldDamageSpillOverThread dealing damage: '..repr(dmg * dmgMod))
+                    self:OnDamage(instigator, dmg * dmgMod, vect, 'shieldOverlap' )
+                end
             end
         end
+    end,
+
+    OnAdjacentBubbleShieldDamageSpillOver = function(self, instigator, spillingUnit, dmg, type)
+        #LOG('*DEBUG: OnAdjacentBubbleShieldDamageSpillOver dmg = '..repr(dmg))
+        local thread = ForkThread( self.AdjacentBubbleShieldDamageSpillOverThread, self, instigator, spillingUnit, dmg, type )
+        self.Owner.Trash:Add(thread)
     end,
 
     RegenStartThread = function(self)

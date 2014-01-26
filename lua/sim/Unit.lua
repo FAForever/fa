@@ -4213,9 +4213,9 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    OnAdjacentBubbleShieldDamageSpillOver = function(self, instigator, damage)
+    OnAdjacentBubbleShieldDamageSpillOver = function(self, instigator, spillingUnit, damage, type)
         if self.MyShield then
-            self.MyShield:OnAdjacentBubbleShieldDamageSpillOver(instigator, damage)
+            self.MyShield:OnAdjacentBubbleShieldDamageSpillOver(instigator, spillingUnit, damage, type)
         end
     end,
 
