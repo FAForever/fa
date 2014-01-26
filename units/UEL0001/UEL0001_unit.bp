@@ -611,7 +611,7 @@ UnitBlueprint {
             ShieldRegenRate = 42,
             ShieldRegenStartTime = 1,
             ShieldSize = 16,
-            ShieldSpillOverDamageMod = 0.5,
+            ShieldSpillOverDamageMod = 0, # we will keep it at 0 to keep this upgrade efficient / special
             ShieldVerticalOffset = -3,
             Slot = 'Back',
             UpgradeEffectBones = {
