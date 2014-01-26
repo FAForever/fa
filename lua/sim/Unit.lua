@@ -1126,6 +1126,11 @@ Unit = Class(moho.unit_methods) {
         return self:GetBuildRate() 
     end,
 
+    GetBuildRate = function(self)
+        return math.max( moho.unit_methods.GetBuildRate(self), 0.00001) # make sure we're never returning 0, this value will be used to divide with
+    end,
+
+
     #
     # Called when we start building a unit, turn on/off, get/lose bonuses, or on
     # any other change that might affect our build rate or resource use.
@@ -3494,7 +3499,9 @@ Unit = Class(moho.unit_methods) {
             end
             
             time = time * (self.ReclaimTimeMultiplier or 1)
-            return (time/10), target_bp.Economy.BuildCostEnergy, target_bp.Economy.BuildCostMass
+            time = math.max( (time/10), 1)  # this should never be 0 or we'll divide by 0!
+            return time, target_bp.Economy.BuildCostEnergy, target_bp.Economy.BuildCostMass
+
         elseif IsProp(target_entity) then
             local time, energy, mass =  target_entity:GetReclaimCosts(self)
             #LOG('*DEBUG: Reclaiming a prop.  Time = ', repr(time), ' Mass = ', repr(mass), ' Energy = ', repr(energy))
