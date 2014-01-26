@@ -14,6 +14,7 @@ local Group = import('/lua/maui/group.lua').Group
 local LazyVar = import('/lua/lazyvar.lua').Create
 
 local parent = false
+local Your_index = ''
 
 function DestroyDialog()
     if parent then 
@@ -26,7 +27,8 @@ end
 local function CreateDialog(clients)
     import('/lua/ui/game/worldview.lua').UnlockInput()
     import('/lua/ui/game/gamemain.lua').KillWaitingDialog()
-    GetCursor():Show()
+	
+	GetCursor():Show()
     DestroyDialog()
     
     parent = Group(GetFrame(0), "diconnectDialogParentGroup")
@@ -52,7 +54,12 @@ local function CreateDialog(clients)
 
         slot.index = i
         
-        if previous then
+        if client['local'] then -- GET your index local
+			Your_index = i
+			--LOG('>>> Local index:'..Your_index)
+		end
+		
+		if previous then
             LayoutHelpers.Below(slot, previous)
         else
             LayoutHelpers.AtTopIn(slot, parent)
@@ -68,7 +75,13 @@ local function CreateDialog(clients)
         slot.name:SetColor('FFbadbdb')
         LayoutHelpers.AtLeftTopIn(slot.name, slot, 20, 4)
         
-        slot.ping = UIUtil.CreateText(slot, "", 14, UIUtil.fixedFont)
+        slot.state = Bitmap(slot) 																		-- Skull if the player is Dead
+		slot.state:SetTexture(UIUtil.UIFile('/game/unit-over/icon-skull_bmp.dds')) 	-- Skull bitmap
+        slot.state:DisableHitTest()
+		slot.state:Hide()
+        LayoutHelpers.AtRightTopIn(slot.state, slot, 2, 2)
+		
+		slot.ping = UIUtil.CreateText(slot, "", 14, UIUtil.fixedFont)
         LayoutHelpers.AtLeftTopIn(slot.ping, slot, 5, 32)
         
         slot.quiet = UIUtil.CreateText(slot, "", 14, UIUtil.fixedFont)
@@ -86,10 +99,13 @@ local function CreateDialog(clients)
     end
 	
 	local canEject = false
+	local ForceEject = false
 
     parent.OnFrame = function(self, delta)
         self.time = self.time + delta
-        if self.time > 45 then
+        if self.time > 180 then
+			ForceEject = true
+		elseif self.time > 45 then
 			canEject = true
         end
     end
@@ -100,11 +116,29 @@ local function CreateDialog(clients)
     LayoutHelpers.AtCenterIn(parent, GetFrame(0))
 
     function parent.Update(self, clients)
-        for index, client in clients do
+		--local all_connected = nil
+		--for index, client in clients do
+			--if client.quiet > 1 and all_connected != false then
+				--all_connected = true
+				--LOG('>>> Connected ('..index..' - '..client.name..')')
+			--else
+				--all_connected = false
+				--LOG('>>> Unconnected ('..index..' - '..client.name..')')
+				--break
+			--end
+		--end
+		--if all_connected then
+			--LOG('>>> All_Connected : YES')
+		--else
+			--LOG('>>> All_Connected : NO')
+		--end
+		
+		for index, client in clients do
             local slot = slots[index]
 			local armiesInfo = GetArmiesTable().armiesTable
+			
             if client.connected then
-                if client.quiet < 5000 and armiesInfo[index].outOfGame == false then
+                if client.quiet < 5000 then--and armiesInfo[index].outOfGame == false then	-- IF client no lag and playing ...
 					if canEject then
 						slot.eject:Disable()
 					end
@@ -112,8 +146,18 @@ local function CreateDialog(clients)
                     slot.quiet:SetText('')
                     slot.ping:SetColor('FFbadbdb')
                     slot.quiet:SetColor('FFbadbdb')					
-                else
-					if canEject or armiesInfo[index].outOfGame then
+                else																										-- IF client Lag --or Observer ...
+					if ForceEject then																				-- IF client lag timeout (+3 minute), kick !
+						EjectSessionClient(index)
+						slot.eject:Disable()
+						slot.eject:Hide()
+					elseif armiesInfo[Your_index].outOfGame and canEject then				-- IF ME is Observer
+						--LOG('>>> CanEject and outOfGame')
+						EjectSessionClient(index)																-- Autokick the player lag
+						slot.eject:Disable()																			-- and Hide + Disable the Eject button
+						slot.eject:Hide()
+					elseif canEject then--or armiesInfo[index].outOfGame then 				-- IF client Lag --or Observer ...
+						--LOG('>>> CanEject')
 						slot.eject:Enable()
 					end
                     slot.ping:SetText(LOCF("%s: ---", "<LOC UI_Disco0003>Ping (ms)"))
@@ -124,10 +168,20 @@ local function CreateDialog(clients)
                     slot.quiet:SetText(LOCF("%s: %d:%02d", "<LOC UI_Disco0004>Quiet (m:s)",min,sec))					
                 end
             else
-                slot.ping:SetText('')
-                slot.quiet:SetText('')				
+                slot.ping:SetText(LOC("<LOC connectivity_0003>Not Connected"))
+				slot.ping:SetColor('FFff0000')
+				--slot.ping:SetText('')
+                --slot.quiet:SetText('')
             end
-                
+			
+			if armiesInfo[index].outOfGame then -- Show the Skull if the player is Dead
+				slot.state:Show()
+				LayoutHelpers.AtRightTopIn(slot.ejectedBy, slot, 34, 4)
+			else
+				LayoutHelpers.AtRightTopIn(slot.ejectedBy, slot, 5, 4)
+				slot.state:Hide()
+			end
+			
             local ejectedBy = ''
             for k, v in client.ejectedBy do
                 if ejectedBy != '' then

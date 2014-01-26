@@ -246,7 +246,7 @@ URL0001 = Class(CWalkingLandUnit) {
                 CreateAttachedEmitter(self,bone,army, v)
             end
         end
-        
+
         WaitSeconds(6)
         self:SetMesh(self:GetBlueprint().Display.MeshBlueprint, true)
     end,    

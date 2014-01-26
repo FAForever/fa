@@ -77,7 +77,6 @@ Unit = Class(moho.unit_methods) {
     DestructionPartsChassisToss = {},
     EconomyProductionInitiallyActive = true,
 
-
     GetSync = function(self)
         if not Sync.UnitData[self:GetEntityId()] then
             Sync.UnitData[self:GetEntityId()] = {}
@@ -98,7 +97,6 @@ Unit = Class(moho.unit_methods) {
         # in the global sync table to copy to the user layer at sync time.
         self.Sync = {}
         self.Sync.id = self:GetEntityId()
-		
         self.Sync.army = self:GetArmy()
         setmetatable(self.Sync,SyncMeta)
 
@@ -168,13 +166,14 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnCreate = function(self)
-		
         Entity.OnCreate(self)
         # Turn off land bones if this unit has them.
         self:HideLandBones()
         # Set number of effects per damage depending on its volume
         local x, y, z = self:GetUnitSizes()
         local vol = x*y*z
+
+        self:ShowPresetEnhancementBones() # Added by Brute51 for unit enhancement presets
 		
         local damageamounts = 1
         if vol >= 20 then
@@ -207,6 +206,7 @@ Unit = Class(moho.unit_methods) {
         self.OnBeingBuiltEffectsBag = TrashBag()
         self.CaptureEffectsBag = TrashBag()
         self.UpgradeEffectsBag = TrashBag()
+        self.TeleportFxBag = TrashBag()
 
         self.HasFuel = true
 
@@ -1126,6 +1126,11 @@ Unit = Class(moho.unit_methods) {
         return self:GetBuildRate() 
     end,
 
+    GetBuildRate = function(self)
+        return math.max( moho.unit_methods.GetBuildRate(self), 0.00001) # make sure we're never returning 0, this value will be used to divide with
+    end,
+
+
     #
     # Called when we start building a unit, turn on/off, get/lose bonuses, or on
     # any other change that might affect our build rate or resource use.
@@ -1434,7 +1439,7 @@ Unit = Class(moho.unit_methods) {
 			for index, brain in ArmyBrains do
 				if brain and not brain:IsDefeated() then
 					local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
-					--table.insert( Sync.GameResult, { index, result } )
+					table.insert( Sync.GameResult, { index, result } )
 				end
 
 			end
@@ -1716,7 +1721,7 @@ Unit = Class(moho.unit_methods) {
 
 			# Create some ambient wreckage smoke
 			explosion.CreateWreckageEffects(self,prop)
-
+            prop.IsWreckage = true
 			return prop
 	    else
 	        return nil
@@ -1783,7 +1788,7 @@ Unit = Class(moho.unit_methods) {
         self:DestroyAllDamageEffects()
 
         if self.PlayDestructionEffects then
-            self:CreateDestructionEffects( self, overkillRatio )
+            self:CreateDestructionEffects( overkillRatio )
         end
 
         #MetaImpact( self, self:GetPosition(), 0.1, 0.5 )
@@ -1857,6 +1862,9 @@ Unit = Class(moho.unit_methods) {
         end
         if self.UpgradeEffectsBag then
             self.UpgradeEffectsBag:Destroy()
+        end
+        if self.TeleportFxBag then
+            self.TeleportFxBag:Destroy()
         end
 
         if self.TeleportDrain then
@@ -2099,44 +2107,25 @@ Unit = Class(moho.unit_methods) {
             if EntityCategoryContains( categories.STRUCTURE, self) then
                 builder:ForkThread( builder.CheckFractionComplete, self )  # [159]
             end
-
-			#This whole section just breaks the rebuild bonus entirely and is NOT necessary to fix the exploid -FunkOff
-			#I may be willing to mess with this if I can find out what the heck bpUnitID is supposed to be
+            
             # this section is rebuild bonus check 2, it also requires the above IF statement to work OK [159]
-            #if builder.VerifyRebuildBonus then
-            #    builder.VerifyRebuildBonus = nil
-            #    self:ForkThread( self.CheckRebuildBonus )  # [159]
-            #end
+            if builder.VerifyRebuildBonus then
+                builder.VerifyRebuildBonus = nil
+                self:ForkThread( self.CheckRebuildBonus )  # [159]
+            end
         end
     end,
 	
 	
     GetRebuildBonus = function(self, rebuildUnitBP)
-		#LOG('getrebuildbonus')
 		# here 'self' is the engineer building the structure
 		self.InitialFractionComplete = 0.5
 		self.VerifyRebuildBonus = true    # rebuild bonus check 2 [159]
-		--self.IAmBuildingSomethingWithReBuildBonus = true
-		--self:ForkThread(self.DefeatTheExploit)
 	return self.InitialFractionComplete
 
     end,
 
-	DefeatTheExploit = function(self)
-	
-		#LOG('start isUnitMoving is ' .. repr(self:IsMoving()))
-		#LOG('defeattheexploit')
-		#self:SetUnSelectable(true)
-		WaitTicks(5)
-		while self:IsMoving() do  #while is new
-			WaitTicks(5)
-		end
-		self.IAmBuildingSomethingWithReBuildBonus = false
-		#self:SetUnSelectable(false)
-		#LOG('end isUnitMoving is ' .. repr(self:IsMoving()))
-	
-	end,
-    
+   
     CheckFractionComplete = function(self, unitBeingBuilt, threadCount)
         # rebuild bonus check 1 [159]
         # This code checks if the unit is allowed to be accelerate-built. If not the unit is destroyed (for lack 
@@ -2273,6 +2262,11 @@ Unit = Class(moho.unit_methods) {
         else
             self.MovementEffectsExist = false
         end
+
+        # Added by Brute51 for unit enhancement presets
+        if bp.EnhancementPresetAssigned then
+            self:CreatePresetEnhancements()
+        end
     end,
 
     StartBeingBuiltEffects = function(self, builder, layer)
@@ -2316,6 +2310,80 @@ Unit = Class(moho.unit_methods) {
         self.SiloProjectile = nil
     end,
 
+
+    ##########################################################################################
+    ## UNIT ENHANCEMENT PRESETS
+    ##########################################################################################
+    # Added by Brute51, copied from Nomads code for SCU presets
+
+    ShowPresetEnhancementBones = function(self)
+        # hide bones not involved in the preset enhancements.
+        # Useful during the build process to show the contours of the unit being built. Only visual.
+
+        local bp = self:GetBlueprint()
+
+        if bp.Enhancements then
+
+            # create a blank slate: hide all enhancement bones as specified in the unit BP
+            for k, enh in bp.Enhancements do
+                if enh.HideBones then
+                    for _, bone in enh.HideBones do
+                        self:HideBone(bone, true)
+                    end
+                end
+            end
+
+            # For the barebone version we're done here. For the presets versions: show the bones of the enhancements we'll create later on
+            if bp.EnhancementPresetAssigned then
+                for k, v in bp.EnhancementPresetAssigned.Enhancements do
+
+                    # first show all relevant bones
+                    if bp.Enhancements[v] and bp.Enhancements[v].ShowBones then
+                        for _, bone in bp.Enhancements[v].ShowBones do
+                            self:ShowBone(bone, true)
+                        end
+                    end
+
+                    # now hide child bones of previously revealed bones, that should remain hidden
+                    if bp.Enhancements[v] and bp.Enhancements[v].HideBones then
+                        for _, bone in bp.Enhancements[v].HideBones do
+                            self:HideBone(bone, true)
+                        end
+                    end
+                end
+            end
+        end
+    end,
+
+    CreatePresetEnhancements = function(self)
+        local bp = self:GetBlueprint()
+        if bp.Enhancements and bp.EnhancementPresetAssigned and bp.EnhancementPresetAssigned.Enhancements then
+            for k, v in bp.EnhancementPresetAssigned.Enhancements do
+                self:CreateEnhancement(v)
+            end
+        end
+    end,
+
+    ShowEnhancementBones = function(self)
+        # hide and show certain bones based on available enhancements
+        local bp = self:GetBlueprint()
+        if bp.Enhancements then
+            for k, enh in bp.Enhancements do
+                if enh.HideBones then
+                    for _, bone in enh.HideBones do
+                        self:HideBone(bone, true)
+                    end
+                end
+            end
+            for k, enh in bp.Enhancements do
+                if self:HasEnhancement(k) and enh.ShowBones then
+                    for _, bone in enh.ShowBones do
+                        self:ShowBone(bone, true)
+                    end
+                end
+            end
+        end
+    end,
 
     #############################################################################################
     ## CONSTRUCTING - BUILDING - REPAIR
@@ -2699,7 +2767,34 @@ Unit = Class(moho.unit_methods) {
     OnWorkBegin = function(self, work)
         local unitEnhancements = import('/lua/enhancementcommon.lua').GetEnhancements(self:GetEntityId())
         local tempEnhanceBp = self:GetBlueprint().Enhancements[work]
-        if tempEnhanceBp.Prerequisite then
+        
+		-- Check if the Enhance is Restricted -- Xinnony
+		LOG('CreateEnhancement work:'..tostring(work)) --bp = {table}
+		if ScenarioInfo.Options.RestrictedCategories then
+			local restrictedUnits = import('/lua/ui/lobby/restrictedUnitsData.lua').restrictedUnits
+			for k, restriction in ScenarioInfo.Options.RestrictedCategories do 
+				--LOG('1 : '..restriction) -- = TELE
+				if restrictedUnits[restriction].enhancement then
+					for kk, cat in restrictedUnits[restriction].enhancement do
+						--LOG('2 : '..cat) -- Teleporter
+						if work == cat then -- if Teleporter == Teleporter
+							--LOG('Enhancement removed !')
+							self:OnWorkEnd(work)
+							self.WorkProgress = 1
+							--self:SetWorkProgress(1)
+							--self:SetActiveConsumptionInactive()
+							--#self:PlayUnitSound('EnhanceEnd')
+							--#self:ClearWork()
+							--ChangeState(self, self.IdleState)
+							--self:CleanupEnhancementEffects()
+							return false
+						end
+					end
+				end
+			end
+		end
+		
+		if tempEnhanceBp.Prerequisite then
             if unitEnhancements[tempEnhanceBp.Slot] != tempEnhanceBp.Prerequisite then
                 error('*ERROR: Ordered enhancement does not have the proper prereq!', 2)
                 return false
@@ -3431,7 +3526,9 @@ Unit = Class(moho.unit_methods) {
             end
             
             time = time * (self.ReclaimTimeMultiplier or 1)
-            return (time/10), target_bp.Economy.BuildCostEnergy, target_bp.Economy.BuildCostMass
+            time = math.max( (time/10), 1)  # this should never be 0 or we'll divide by 0!
+            return time, target_bp.Economy.BuildCostEnergy, target_bp.Economy.BuildCostMass
+
         elseif IsProp(target_entity) then
             local time, energy, mass =  target_entity:GetReclaimCosts(self)
             #LOG('*DEBUG: Reclaiming a prop.  Time = ', repr(time), ' Mass = ', repr(mass), ' Energy = ', repr(energy))
@@ -4016,6 +4113,9 @@ Unit = Class(moho.unit_methods) {
                 ShieldRegenRate = bpShield.ShieldRegenRate or 1,
                 ShieldRegenStartTime = bpShield.ShieldRegenStartTime or 5,
                 PassOverkillDamage = bpShield.PassOverkillDamage or false,
+
+                SpillOverDamageMod = bpShield.ShieldSpillOverDamageMod or 0.1,
+                DamageThresholdToSpillOver = bpShield.ShieldDamageThresholdToSpillOver or 0,
             }
             self:SetFocusEntity(self.MyShield)
             self:EnableShield()
@@ -4128,6 +4228,12 @@ Unit = Class(moho.unit_methods) {
             return self.MyShield:IsOn()
         else
             return false
+        end
+    end,
+
+    OnAdjacentBubbleShieldDamageSpillOver = function(self, instigator, spillingUnit, damage, type)
+        if self.MyShield then
+            self.MyShield:OnAdjacentBubbleShieldDamageSpillOver(instigator, spillingUnit, damage, type)
         end
     end,
 
@@ -4348,14 +4454,10 @@ Unit = Class(moho.unit_methods) {
         end
         self:StopUnitAmbientSound('TeleportLoop')
         self:CleanupTeleportChargeEffects()
+        self:CleanupRemainingTeleportChargeEffects()
         self:SetWorkProgress(0.0)
         self:SetImmobile(false)
         self.UnitBeingTeleported = nil
-    end,
-
-    UpdateTeleportProgress = function(self, progress)
-        #LOG(' UpdatingTeleportProgress ')
-        self:SetWorkProgress(progress)
     end,
 
     InitiateTeleportThread = function(self, teleporter, location, orientation)
@@ -4368,8 +4470,8 @@ Unit = Class(moho.unit_methods) {
         local bp = self:GetBlueprint().Economy
         local energyCost, time
         if bp then
-            local mass = bp.BuildCostMass * (bp.TeleportMassMod or 0.01)
-            local energy = bp.BuildCostEnergy * (bp.TeleportEnergyMod or 0.01)
+            local mass = (bp.TeleportMassCost or bp.BuildCostMass or 1) * (bp.TeleportMassMod or 0.01)
+            local energy = (bp.TeleportEnergyCost or bp.BuildCostEnergy or 1) * (bp.TeleportEnergyMod or 0.01)
             energyCost = mass + energy
             time = energyCost * (bp.TeleportTimeMod or 0.01)
         end
@@ -4378,7 +4480,7 @@ Unit = Class(moho.unit_methods) {
         self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
 
         # create teleport charge effect
-        self:PlayTeleportChargeEffects()
+        self:PlayTeleportChargeEffects( location, orientation )
 
         WaitFor( self.TeleportDrain  ) # Perform fancy Teleportation FX here
 
@@ -4395,6 +4497,7 @@ Unit = Class(moho.unit_methods) {
         self:SetWorkProgress(0.0)
         Warp(self, location, orientation)
         self:PlayTeleportInEffects()
+        self:CleanupRemainingTeleportChargeEffects()
 
         WaitSeconds( 0.1 ) # Perform cooldown Teleportation FX here
         #Landing Sound
@@ -4406,42 +4509,30 @@ Unit = Class(moho.unit_methods) {
         self.TeleportThread = nil
     end,
 
-    PlayTeleportChargeEffects = function(self)
-        local army = self:GetArmy()
-        local bp = self:GetBlueprint()
+    UpdateTeleportProgress = function(self, progress)
+        #LOG(' UpdatingTeleportProgress ')
+        self:SetWorkProgress(progress)
+        EffectUtilities.TeleportChargingProgress(self, progress)
+    end,
 
-        self.TeleportChargeBag = {}
-        for k, v in EffectTemplate.GenericTeleportCharge01 do
-            local fx = CreateEmitterAtEntity(self,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
-            self.Trash:Add(fx)
-            table.insert( self.TeleportChargeBag, fx)
-        end
+    PlayTeleportChargeEffects = function(self, location, orientation)
+        EffectUtilities.PlayTeleportChargingEffects(self, location, self.TeleportFxBag)
     end,
 
     CleanupTeleportChargeEffects = function( self )
-        if self.TeleportChargeBag then
-            for keys,values in self.TeleportChargeBag do
-                values:Destroy()
-            end
-            self.TeleportChargeBag = {}
-        end
+        EffectUtilities.DestroyTeleportChargingEffects(self, self.TeleportFxBag)
+    end,
+
+    CleanupRemainingTeleportChargeEffects = function( self )
+        EffectUtilities.DestroyRemainingTeleportChargingEffects(self, self.TeleportFxBag)
     end,
 
     PlayTeleportOutEffects = function(self)
-        local army = self:GetArmy()
-        local emit = nil
-        for k, v in EffectTemplate.GenericTeleportOut01 do
-            emit = CreateEmitterAtEntity(self,army,v)
-        end
+        EffectUtilities.PlayTeleportOutEffects(self, self.TeleportFxBag)
     end,
 
-
     PlayTeleportInEffects = function(self)
-        local army = self:GetArmy()
-        local bp = self:GetBlueprint()
-        for k, v in EffectTemplate.GenericTeleportIn01 do
-            emit = CreateEmitterAtEntity(self,army,v):OffsetEmitter(0, (bp.Physics.MeshExtentsY or 1) / 2, 0)
-        end
+        EffectUtilities.PlayTeleportInEffects(self, self.TeleportFxBag)
     end,
 
     #########################################################################################

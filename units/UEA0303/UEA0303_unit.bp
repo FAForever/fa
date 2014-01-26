@@ -109,8 +109,8 @@ UnitBlueprint {
         AirThreatLevel = 9,
         ArmorType = 'ASF', # Light
         EconomyThreatLevel = 0,
-        Health = 1850,
-        MaxHealth = 1850,
+        Health = 1800,
+        MaxHealth = 1800,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -318,7 +318,7 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.3,
+            TargetCheckInterval = 0.5, # 0.3
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'AIR MOBILE',
@@ -392,7 +392,7 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.3,
+            TargetCheckInterval = 0.5, # 0.3
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'AIR MOBILE',

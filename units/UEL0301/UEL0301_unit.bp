@@ -129,6 +129,8 @@ UnitBlueprint {
         'OVERLAYOMNI',
         'OVERLAYDIRECTFIRE',
         'OVERLAYCOUNTERINTEL',
+        'USEBUILDPRESETS',
+        'BUBBLESHIELDSPILLOVERCHECK',
     },
     CollisionOffsetZ = -0.25,
     Defense = {
@@ -521,6 +523,7 @@ UnitBlueprint {
             ShieldRegenRate = 150,
             ShieldRegenStartTime = 1,
             ShieldSize = 20,
+            ShieldSpillOverDamageMod = 0.5,
             ShieldVerticalOffset = -3,
             Slot = 'Back',
             UpgradeUnitAmbientBones = {
@@ -576,6 +579,63 @@ UnitBlueprint {
                 x = -16,
                 y = 50,
             },
+        },
+    },
+    EnhancementPresets = {
+        BubbleShield = {
+            BuildIconSortPriority = 30,
+            Description = '<LOC uel0301_BubbleShield_desc>Support Armored Command Unit (Shield preset)',
+            Enhancements = {
+                'Shield',
+                'ShieldGeneratorField',
+            },
+            HelpText = '<LOC uel0301_BubbleShield_help>Support Armored Command Unit. Enhanced during construction with the bubble shield generator enhancement.',
+            SortCategory = 'SORTOTHER',
+            UnitName = '<LOC uel0301_BubbleShield_name>SACU (Shield preset)',
+        },
+        Combat = {
+            BuildIconSortPriority = 15,
+            Description = '<LOC uel0301_Combat_desc>Support Armored Command Unit (Combatant preset)',
+            Enhancements = {
+                'AdvancedCoolingUpgrade',
+                'HighExplosiveOrdnance',
+            },
+            HelpText = '<LOC uel0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the energy accelerator and heavy plasma refractor enhancements.',
+            SortCategory = 'SORTOTHER',
+            UnitName = '<LOC uel0301_Combat_name>SACU (Combatant preset)',
+        },
+        Engineer = {
+            BuildIconSortPriority = 20,
+            Description = '<LOC uel0301_Engineer_desc>Support Armored Command Unit (Engineer preset)',
+            Enhancements = {
+                'Pod',
+            },
+            HelpText = '<LOC uel0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the engineering drone enhancement.',
+            SortCategory = 'SORTOTHER',
+            UnitName = '<LOC uel0301_Engineer_name>SACU (Engineer preset)',
+        },
+        IntelJammer = {
+            BuildIconSortPriority = 35,
+            Description = '<LOC uel0301_IntelJammer_desc>Support Armored Command Unit (Intel Jammer preset)',
+            Enhancements = {
+                'RadarJammer',
+                'SensorRangeEnhancer',
+            },
+            HelpText = '<LOC uel0301_IntelJammer_help>Support Armored Command Unit. Enhanced during construction with the radar jammer and enhanced sensor system enhancements.',
+            SortCategory = 'SORTOTHER',
+            UnitName = '<LOC uel0301_IntelJammer_name>SACU (Intel Jammer preset)',
+        },
+        Rambo = {
+            BuildIconSortPriority = 25,
+            Description = '<LOC uel0301_Rambo_desc>Support Armored Command Unit (Rambo preset)',
+            HelpText = '<LOC uel0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with a personal shield, energy accelerator and heavy plasma refractor enhancements.',
+            Enhancements = {
+                'AdvancedCoolingUpgrade',
+                'HighExplosiveOrdnance',
+                'Shield',
+            },
+            SortCategory = 'SORTOTHER',
+            UnitName = '<LOC uel0301_Rambo_name>SACU (Rambo preset)',
         },
     },
     General = {
