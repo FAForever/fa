@@ -307,7 +307,7 @@ UnitBlueprint {
         SacrificeMassMult = 0.9,
         StorageEnergy = 500,
         StorageMass = 275,
-        TeleportEnergyMod = 3,
+        TeleportEnergyMod = 5.16, # 3
         TeleportMassMod = 0,
         TeleportTimeMod = 0.0001,
     },
