@@ -271,12 +271,12 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             BombDropThreshold = 3,
             CollideFriendly = false,
-            Damage = 3.5, # 4
+            Damage = 4,
             DamageFriendly = true,
             DamageRadius = 3, # 2.5
             DamageType = 'Normal',
             DisplayName = 'Napalm Carpet Bomb',
-            DoTPulses = 15,
+            DoTPulses = 10, # 15
             DoTTime = 1.5,
             FireTargetLayerCapsTable = {
                 Air = 'Land|Water|Seabed',
@@ -284,7 +284,7 @@ UnitBlueprint {
             },
             FiringRandomness = 3,
             FiringTolerance = 6,
-            InitialDamage = 35, # added
+            InitialDamage = 47.5, # added
             Label = 'Bomb',
             MaxRadius = 40,
             MuzzleSalvoDelay = 0.3, # 0.2
