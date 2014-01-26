@@ -19,8 +19,7 @@ local Buff = import('/lua/sim/Buff.lua')
 UAL0301 = Class(AWalkingLandUnit) {    
     Weapons = {
         RightReactonCannon = Class(ADFReactonCannon) {},
-        DeathWeapon = Class(AIFCommanderDeathWeapon) {
-        },
+        DeathWeapon = Class(AIFCommanderDeathWeapon) {},
     },
     
     OnPrepareArmToBuild = function(self)
@@ -201,26 +200,6 @@ UAL0301 = Class(AWalkingLandUnit) {
         end
         AWalkingLandUnit.OnUnpaused(self)
     end,
-
-    #Teleport animation
-    PlayTeleportInEffects = function(self)
-        self:PlayUnitSound('CommanderArrival')
-        self:CreateProjectile( '/effects/entities/UnitTeleport01/UnitTeleport01_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
-        WaitSeconds(2.1)
-        self:SetUnSelectable(false)
-        self:SetBusy(false)
-        self:SetBlockCommandQueue(false)
-        
-        local totalBones = self:GetBoneCount() - 1
-        local army = self:GetArmy()
-        for k, v in EffectTemplate.UnitTeleportSteam01 do
-            for bone = 1, totalBones do
-                CreateAttachedEmitter(self,bone,army, v)
-            end
-        end
-
-        WaitSeconds(6)
-    end, 
 }
 
 TypeClass = UAL0301

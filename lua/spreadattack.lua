@@ -181,18 +181,19 @@ function GiveOrders(Data)
         -- Re-issue all orders.
         for _,order in ipairs(Data.unit_orders) do
 
-        -- Currently supported 3 orders are: Attack, Move and AggressiveMove
-        if order.CommandType == "Attack" then
-            local victim = GetEntityById(order.Target)
-            IssueAttack( { unit },victim)
-        end
+            -- Currently supported 3 orders are: Attack, Move and AggressiveMove
+            if order.CommandType == "Attack" then
+                local victim = GetEntityById(order.Target)
+                IssueAttack( { unit },victim)
+            end
 
-        if order.CommandType == "Move" then
-            IssueMove( { unit },order.Position)
-        end
+            if order.CommandType == "Move" then
+                IssueMove( { unit },order.Position)
+            end
 
-        if order.CommandType == "AggressiveMove" then
-            IssueAggressiveMove( { unit },order.Position)
+            if order.CommandType == "AggressiveMove" then
+                IssueAggressiveMove( { unit },order.Position)
+            end
         end
     end
 

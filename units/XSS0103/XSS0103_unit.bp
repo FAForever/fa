@@ -221,11 +221,11 @@ UnitBlueprint {
     StrategicIconName = 'icon_ship1_intel',
     StrategicIconSortPriority = 165,
     Veteran = {
-        Level1 = 8,
-        Level2 = 16,
-        Level3 = 24,
-        Level4 = 32,
-        Level5 = 40,
+        Level1 = 6,
+        Level2 = 12,
+        Level3 = 18,
+        Level4 = 24,
+        Level5 = 30,
     },
     Weapon = {
         {

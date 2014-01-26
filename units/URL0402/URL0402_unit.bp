@@ -350,11 +350,11 @@ UnitBlueprint {
             },
             AutoInitiateAttackCommand = false,
             BallisticArc = 'RULEUBA_None',
-            BeamCollisionDelay = 0.1,
+            BeamCollisionDelay = 0,		#0.1
             BeamLifetime = 0,
             CollideFriendly = false,
             ContinuousBeam = true,
-            Damage = 800,
+            Damage = 400,			#800
             DamageRadius = 0.5,
             DamageType = 'Normal',
             DisplayName = 'Heavy Microwave Laser',
@@ -363,7 +363,7 @@ UnitBlueprint {
                 Seabed = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 2,
+            FiringTolerance = 0,		#2
             Label = 'MainGun',
             LeadTarget = false,
             MaxRadius = 30,
@@ -387,8 +387,8 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
-            RateOfFire = 3,
-            TargetCheckInterval = 0.5,
+            RateOfFire = 10,		#3
+            TargetCheckInterval = 0.1,		#0.5
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'EXPERIMENTAL',

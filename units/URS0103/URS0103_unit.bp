@@ -226,11 +226,11 @@ UnitBlueprint {
     StrategicIconName = 'icon_ship1_intel',
     StrategicIconSortPriority = 165,
     Veteran = {
-        Level1 = 8,
-        Level2 = 16,
-        Level3 = 24,
-        Level4 = 32,
-        Level5 = 40,
+        Level1 = 6,
+        Level2 = 12,
+        Level3 = 18,
+        Level4 = 24,
+        Level5 = 30,
     },
     Weapon = {
         {
@@ -254,7 +254,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_LowArc',
             CollideFriendly = false,
-            Damage = 40,
+            Damage = 45, # 40
             DamageRadius = 1,
             DamageType = 'Normal',
             DisplayName = 'Proton Cannon',
@@ -286,7 +286,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
-            RateOfFire = 1.53,
+            RateOfFire = 1.36, # 1.53
             SlavedToBody = true,
             SlavedToBodyArcRange = 155,
             TargetCheckInterval = 0.3,

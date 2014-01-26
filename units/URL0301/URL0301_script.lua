@@ -294,10 +294,10 @@ URL0301 = Class(CWalkingLandUnit) {
             wep:ChangeMaxRadius(bp.NewMaxRadius or 25)
         elseif enh == 'EMPCharge' then
             local wep = self:GetWeaponByLabel('RightDisintegrator')
-            wep:ReEnableBuff('STUN')        
+            wep:ReEnableBuff('STUN')
         elseif enh == 'EMPChargeRemove' then
             local wep = self:GetWeaponByLabel('RightDisintegrator')
-            wep:DisableBuff('STUN')        
+            wep:DisableBuff('STUN')
         end             
     end,
 

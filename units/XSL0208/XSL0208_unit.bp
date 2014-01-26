@@ -214,10 +214,10 @@ UnitBlueprint {
         UniformScale = 0.069,
     },
     Economy = {
-        BuildCostEnergy = 840,
-        BuildCostMass = 160,
+        BuildCostEnergy = 700,
+        BuildCostMass = 140,
         BuildRate = 12.5,
-        BuildTime = 800,
+        BuildTime = 700,
         BuildableCategory = {
             'BUILTBYTIER2ENGINEER SERAPHIM',
         },

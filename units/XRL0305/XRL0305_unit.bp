@@ -102,7 +102,7 @@ UnitBlueprint {
             },
         },
         AnimationWalk = '/units/xrl0305/xrl0305_awalk.sca',
-        AnimationWalkRate = 8,
+        AnimationWalkRate = 2,     #8
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
