@@ -353,6 +353,14 @@ function HandleUnitWithBuildPresets(bps, allUnitBlueprints)
             tempBp.Economy.BuildCostMass = preset.BuildCostMassOverride or (tempBp.Economy.BuildCostMass + m)
             tempBp.Economy.BuildTime = preset.BuildTimeOverride or (tempBp.Economy.BuildTime + t)
 
+            # teleport cost adjustments. Teleporting a manually enhanced SCU is cheaper than a prebuild SCU because the latter has its cost
+            # adjusted (up). This code sets bp values used in the code to calculate with different base values than the unit cost.
+            if preset.TeleportNoCostAdjustment != false then
+                # set teleport cost overrides to cost of base unit
+                tempBp.Economy.TeleportEnergyCost = bp.Economy.BuildCostEnergy or 0
+                tempBp.Economy.TeleportMassCost = bp.Economy.BuildMassEnergy or 0
+            end
+
             # Add a sorting category so similar SCUs are grouped together in the build menu
             if preset.SortCategory then
                 if table.find(SortCats, preset.SortCategory) or preset.SortCategory == 'None' then
