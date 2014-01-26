@@ -170,7 +170,8 @@ Prop = Class(moho.prop_methods, Entity) {
         if mtime < etime then
             time = etime
         end
-        return (time/10), self.EnergyReclaim, self.MassReclaim
+        time = math.max( (time/10), 1)  # this should never be 0 or we'll divide by 0!
+        return time, self.EnergyReclaim, self.MassReclaim
     end,
 
 

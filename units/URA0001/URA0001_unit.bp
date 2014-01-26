@@ -28,7 +28,6 @@ UnitBlueprint {
         'CONSTRUCTION',
         'ENGINEER',
         'REPAIR',
-#        'RECLAIM', # this is to fix problem when a cybran unit repairs another cybran unit that is reclaiming
         'UNTARGETABLE',
         'NOFORMATION',
         'INSIGNIFICANTUNIT',
