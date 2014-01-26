@@ -1269,7 +1269,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
             end            
 
-            local killacu = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+            local killacu = self:GetListOfUnits(categories.COMMAND, false)
             if killacu and table.getn(killacu) > 0 then
                 for index,unit in killacu do
                     unit:Recall()
@@ -4486,7 +4486,12 @@ AIBrain = Class(moho.aibrain_methods) {
 
     AbandonedByPlayer = function(self)
         if not IsGameOver() then
-            self:OnDefeat()
+            local killacu = self:GetListOfUnits(categories.COMMAND, false)
+            if killacu and table.getn(killacu) > 0 then
+                for index,unit in killacu do
+                    unit:Recall()
+                end
+            end
         end
     end,
     
