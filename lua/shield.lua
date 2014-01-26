@@ -150,7 +150,7 @@ Shield = Class(moho.shield_methods,Entity) {
     OnDamage = function(self, instigator, amount, vector, type)
         #LOG('*DEBUG: OnDamage amount = '..repr(amount)..' type = '..repr(type) )
 
-        local absorbed = self:OnGetDamageAbsorption(instigator,amount,type) 
+        local absorbed = self:OnGetDamageAbsorption(instigator, amount, type) 
         
         if self.PassOverkillDamage then
             local overkill = self:GetOverkill(instigator,amount,type)     
@@ -239,7 +239,7 @@ Shield = Class(moho.shield_methods,Entity) {
         self:SpillOverDmgDBcleanUp()
 
         if self.SpillOverDmgDB and instigator and not instigator:BeenDestroyed() then
-            local tick = GetGameTick() - 1                                               #### max spill damage delay is 1 ticks (2/3)
+            local tick = GetGameTick() - 2                                               #### max spill damage delay is 1 ticks (1/3)
             local entId = instigator:GetEntityId()
 
             for k, v in self.SpillOverDmgDB do
@@ -260,9 +260,9 @@ Shield = Class(moho.shield_methods,Entity) {
         #LOG('*DEBUG: SpillOverDmgDBcleanUp')
         if self.SpillOverDmgDB then
             local delete = {}
-            local tick = GetGameTick() - 1
+            local tick = GetGameTick() - 2                                               #### max spill damage delay is 1 ticks (2/3)
             for k, v in self.SpillOverDmgDB do
-                if v.tick < tick then                                                    #### max spill damage delay is 1 ticks (2/3)
+                if v.tick < tick then
                     table.insert(delete, k)
                 end
             end
