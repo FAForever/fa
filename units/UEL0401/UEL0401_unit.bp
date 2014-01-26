@@ -130,6 +130,7 @@ UnitBlueprint {
         'OVERLAYANTINAVY',
         'OVERLAYDIRECTFIRE',
         'OVERLAYMISC',
+        'BUBBLESHIELDSPILLOVERCHECK',
     },
     CollisionOffsetZ = 0,
     Defense = {
@@ -151,6 +152,7 @@ UnitBlueprint {
             ShieldRegenRate = 64,
             ShieldRegenStartTime = 1,
             ShieldSize = 25,
+            ShieldSpillOverDamageMod = 0.5,
             ShieldVerticalOffset = -7,
         },
         SubThreatLevel = 40,

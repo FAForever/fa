@@ -148,6 +148,7 @@ UnitBlueprint {
         'OVERLAYINDIRECTFIRE',
         'OVERLAYOMNI',
         'OVERLAYDEFENSE',
+        'BUBBLESHIELDSPILLOVERCHECK',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -610,6 +611,7 @@ UnitBlueprint {
             ShieldRegenRate = 42,
             ShieldRegenStartTime = 1,
             ShieldSize = 16,
+            ShieldSpillOverDamageMod = 0.5,
             ShieldVerticalOffset = -3,
             Slot = 'Back',
             UpgradeEffectBones = {

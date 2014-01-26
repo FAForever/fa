@@ -35,6 +35,7 @@ Shield = Class(moho.shield_methods,Entity) {
         self:SetSize(spec.Size)
         self:SetMaxHealth(spec.ShieldMaxHealth)
         self:SetHealth(self,spec.ShieldMaxHealth)
+        self:SetSpillOverParams(spec.SpillOverDamageMod or 0.1, spec.DamageThresholdToSpillOver or 0)
 
         # Show our 'lifebar'
         self:UpdateShieldRatio(1.0)
@@ -78,6 +79,11 @@ Shield = Class(moho.shield_methods,Entity) {
 
     SetShieldRegenStartTime = function(self, time)
         self.RegenStartTime = time
+    end,
+
+    SetSpillOverParams = function(self, dmgMod, threshold)
+        self.SpillOverDmgMod = math.max(dmgMod, 0)
+        self.DmgThresholdToSpillOver = math.max(threshold, 0)
     end,
 
     UpdateShieldRatio = function(self, value)        
@@ -154,9 +160,9 @@ Shield = Class(moho.shield_methods,Entity) {
         end
 
         ###### This code is to pass damage over overlapping shields.
-        if type != 'shieldOverlap' and self:IsOn() then
+        if type != 'ShieldSpillOver' and self.Size and self.Size > 0 and self:IsOn() and absorbed >= self.DmgThresholdToSpillOver then
 
-            self:SpillOverDmgDBRegister(instigator, amount, type) # remember this damage to prevent additional overspill damage
+            self:SpillOverDmgDBRegister(instigator, absorbed, type) # remember this damage to prevent additional overspill damage
 
             local brain = self.Owner:GetAIBrain()
 
@@ -178,7 +184,7 @@ Shield = Class(moho.shield_methods,Entity) {
                     OverlapDist = OverlapRadius + oOverlapRadius # If "self" and "v" are more than this far apart then the shields don't overlap, otherwise they do
 
                     if VDist3(pos, vspos) <= OverlapDist then
-                        v:OnAdjacentBubbleShieldDamageSpillOver( instigator, self.Owner, amount, type )
+                        v:OnAdjacentBubbleShieldDamageSpillOver( instigator, self.Owner, absorbed, type )
                     end
                 end
                 # DEBUG only, to see a flash on all units we're checking
@@ -285,7 +291,7 @@ Shield = Class(moho.shield_methods,Entity) {
                 if dmgMod > 0 then
                     local vect = Util.GetDirectionVector( instigator:GetPosition(), self:GetCachePosition() )
                     #LOG('*DEBUG: AdjacentBubbleShieldDamageSpillOverThread dealing damage: '..repr(dmg * dmgMod))
-                    self:OnDamage(instigator, dmg * dmgMod, vect, 'shieldOverlap' )
+                    self:OnDamage(instigator, dmg * self.SpillOverDmgMod, vect, 'ShieldSpillOver' )
                 end
             end
         end
