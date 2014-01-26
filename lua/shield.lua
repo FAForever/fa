@@ -210,14 +210,15 @@ Shield = Class(moho.shield_methods,Entity) {
     end,
 
     SpillOverDmgDBRegister = function(self, instigator, amount, type)
-        LOG('*DEBUG: SpillOverDmgDBRegister')
+        #LOG('*DEBUG: SpillOverDmgDBRegister')
         if not self.SpillOverDmgDB then
             self.SpillOverDmgDB = {}
         end
         if instigator and IsUnit(instigator) then
+            self:SpillOverDmgDBcleanUp()
             local entry = { amount = amount, instigator = instigator:GetEntityId(), tick = GetGameTick(), type = type, }
             table.insert( self.SpillOverDmgDB, entry )
-            LOG('*DEBUG: db = '..repr(self.SpillOverDmgDB))
+            #LOG('*DEBUG: db = '..repr(self.SpillOverDmgDB))
         end
     end,
 
@@ -229,43 +230,50 @@ Shield = Class(moho.shield_methods,Entity) {
     SpillOverDmgDBFind = function(self, instigator, amount, type)
         local r = false
 
+        self:SpillOverDmgDBcleanUp()
+
         if self.SpillOverDmgDB and instigator and not instigator:BeenDestroyed() then
-            local remove = {}
-            local tick = GetGameTick()
+            local tick = GetGameTick() - 1                                               #### max spill damage delay is 1 ticks (2/3)
             local entId = instigator:GetEntityId()
 
-            # checking whether there's 
             for k, v in self.SpillOverDmgDB do
-                if v.tick < (tick-5) then               #### max spill damage delay is 5 ticks (1/2)
-                    table.insert(remove, k)
-                elseif r == false and v.amount == amount and v.type == type and v.instigator == entId then
+                if v.tick >= tick and r == false and v.amount == amount and v.type == type and v.instigator == entId then
                     r = k
                 end
             end
 
-            LOG('*DEBUG: SpillOverDmgDBFind dmg = '..repr(amount)..' type = '..repr(type)..' instigator = '..repr(entId))
-            LOG('*DEBUG: SpillOverDmgDBFind db before clean up = '..repr(self.SpillOverDmgDB))
-
-            # cleaning up old entries in database
-            for k, v in remove do
-                self:SpillOverDmgDBUnregister(k)
-            end
-
-            LOG('*DEBUG: SpillOverDmgDBFind db after clean up = '..repr(self.SpillOverDmgDB))
+            #LOG('*DEBUG: SpillOverDmgDBFind dmg = '..repr(amount)..' type = '..repr(type)..' instigator = '..repr(entId))
         end
 
-        LOG('*DEBUG: SpillOverDmgDBFind found key = '..repr(r))
+        #LOG('*DEBUG: SpillOverDmgDBFind found key = '..repr(r))
         return r
     end,
 
+    SpillOverDmgDBcleanUp = function(self)
+        # remove old entries in DB
+        #LOG('*DEBUG: SpillOverDmgDBcleanUp')
+        if self.SpillOverDmgDB then
+            local delete = {}
+            local tick = GetGameTick() - 1
+            for k, v in self.SpillOverDmgDB do
+                if v.tick < tick then                                                    #### max spill damage delay is 1 ticks (2/3)
+                    table.insert(delete, k)
+                end
+            end
+            for k, v in delete do
+                self:SpillOverDmgDBUnregister(v)
+            end
+        end
+    end,
+
     AdjacentBubbleShieldDamageSpillOverThread = function(self, instigator, spillingUnit, dmg, type)
-        WaitTicks(3)                                #### max spill damage delay is 5 ticks (2/2)
+        WaitTicks(1)                                                                     #### max spill damage delay is 1 ticks (3/3)
         if self and self.Owner and not self.Owner:IsDead() and self:IsOn() then
 
             # find out whether we've been hit by the cause of the spill over damage aswell. If yes, ignore spill over damage (we already took damage)
             local DBkey = self:SpillOverDmgDBFind(instigator, dmg, type)
             if DBkey then
-                LOG('*DEBUG: AdjacentBubbleShieldDamageSpillOverThread no spill damage')
+                #LOG('*DEBUG: AdjacentBubbleShieldDamageSpillOverThread no spill damage')
                 # disabled because there may be more shields spilling damage from the same origin, we have to check for that too otherwise
                 # only the first overspill is prevented, not the spill from a second or third shield.
                 #self:SpillOverDmgDBUnregister(DBkey)
@@ -276,7 +284,7 @@ Shield = Class(moho.shield_methods,Entity) {
                 local dmgMod = bp.SpillOverDamageMod or 0.1
                 if dmgMod > 0 then
                     local vect = Util.GetDirectionVector( instigator:GetPosition(), self:GetCachePosition() )
-                    LOG('*DEBUG: AdjacentBubbleShieldDamageSpillOverThread dealing damage: '..repr(dmg * dmgMod))
+                    #LOG('*DEBUG: AdjacentBubbleShieldDamageSpillOverThread dealing damage: '..repr(dmg * dmgMod))
                     self:OnDamage(instigator, dmg * dmgMod, vect, 'shieldOverlap' )
                 end
             end
