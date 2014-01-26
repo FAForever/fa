@@ -161,20 +161,17 @@ Shield = Class(moho.shield_methods,Entity) {
             # The idea is to find all units within X units away from us. We can't use our shield radius for X because some units could have
             # bigger shields than us and we would not find them. Instead, use the size of the biggest shield as value for X. The biggest
             # shield in the game is the UEF shield boat. This value must be adapted if there is a bigger one
-            local FindUnitRadius = 120
-# + categories.INCLUDEBUBBLESHIELDOVERLAP
-            local units = brain:GetUnitsAroundPoint( (categories.SHIELD * categories.DEFENSE), self.Owner:GetPosition(), FindUnitRadius, 'Ally' )
+            local BiggestShieldSize = 120
+            local units = brain:GetUnitsAroundPoint( (categories.SHIELD * categories.DEFENSE) + categories.BUBBLESHIELDSPILLOVERCHECK, self.Owner:GetPosition(), (BiggestShieldSize / 2), 'Ally' )
 
             local pos = self:GetCachePosition()
-            local bp = self.Owner:GetBlueprint().Defense.Shield
-            local OverlapRadius = 0.98 * (bp.ShieldSize / 2)
+            local OverlapRadius = 0.98 * self.Size
             local obp, oOverlapRadius, vpos, OverlapDist
 
             for k, v in units do
-                if v and IsUnit(v) and not v:IsDead() and v.MyShield and v.MyShield:IsOn() and self.Owner != v and v != instigator then
+                if v and IsUnit(v) and not v:IsDead() and v.MyShield and v.MyShield:IsOn() and v.MyShield.Size and v.MyShield.Size > 0 and self.Owner != v and v != instigator then
                     vspos = v.MyShield:GetCachePosition()
-                    obp = v:GetBlueprint().Defense.Shield
-                    oOverlapRadius = 0.98 * (obp.ShieldSize / 2)
+                    oOverlapRadius = 0.98 * v.MyShield.Size
 
                     OverlapDist = OverlapRadius + oOverlapRadius # If "self" and "v" are more than this far apart then shields don't overlap, otherwise they do
 
@@ -182,10 +179,10 @@ Shield = Class(moho.shield_methods,Entity) {
                         v:OnAdjacentBubbleShieldDamageSpillOver( self, amount )
                     end
                 end
-
-#if v then
-#    CreateEmitterAtEntity(v, self.Owner:GetArmy(), '/effects/Emitters/generic_teleportin_04_emit.bp')
-#end
+                # DEBUG only, to see a flash on all units we're checking
+                #if v then
+                #    CreateEmitterAtEntity(v, self.Owner:GetArmy(), '/effects/Emitters/generic_teleportin_04_emit.bp')
+                #end
             end
         end
         
@@ -221,9 +218,11 @@ Shield = Class(moho.shield_methods,Entity) {
         if self and self.Owner and not self.Owner:IsDead() and self:IsOn() then
             local bp = self.Owner:GetBlueprint().Defense.Shield or {}
             local dmgMod = bp.SpillOverDamageMod or 0.1
-            local vect = Util.GetDirectionVector( instigator:GetPosition(), self:GetCachePosition() )
-            #LOG('*DEBUG:AdjacentBubbleShieldDamageSpillOverThread dealing damage: '..repr(dmg * dmgMod))
-            self:OnDamage(instigator, dmg * dmgMod, vect, 'shieldOverlap' )
+            if dmgMod > 0 then
+                local vect = Util.GetDirectionVector( instigator:GetPosition(), self:GetCachePosition() )
+                #LOG('*DEBUG:AdjacentBubbleShieldDamageSpillOverThread dealing damage: '..repr(dmg * dmgMod))
+                self:OnDamage(instigator, dmg * dmgMod, vect, 'shieldOverlap' )
+            end
         end
     end,
 

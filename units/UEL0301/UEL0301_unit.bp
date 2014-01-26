@@ -130,6 +130,7 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
         'OVERLAYCOUNTERINTEL',
         'USEBUILDPRESETS',
+        'BUBBLESHIELDSPILLOVERCHECK',
     },
     CollisionOffsetZ = -0.25,
     Defense = {
