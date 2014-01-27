@@ -18,7 +18,6 @@ local Game = import('/lua/game.lua')
 local RebuildBonusCheckCallback = import('/lua/sim/RebuildBonusCallback.lua').RunRebuildBonusCallback
 
 
-
 Prop = Class(moho.prop_methods, Entity) {
 
     # Do not call the base class __init and __post_init, we already have a c++ object
