@@ -715,41 +715,34 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
                 local itemArray = {}
                 line.combo.keyMap = {}
                 local tooltipTable = {}
-                
-				--LOG("XINNONY //////////////////////////////////////////")
-				for index, val in data.data.values do
-					-- val.text = Teleport Disabled
-					-- val.key = 1
-					--LOG('< val.text:'..val.text..' (index:'..index..')')
-					--LOG('< val.key:'..val.key..' (index:'..index..')')
-					itemArray[index] = val.text
-                    line.combo.keyMap[tostring(val.key)] = index -- = 1 ou 2 ..
-                    tooltipTable[index]={text=data.data.label,body=val.help}--= 'lob_'..data.data.key..'_'..val.key
+                for index, val in data.data.values do
+                    itemArray[index] = val.text
+                    line.combo.keyMap[val.key] = index -- = 1 ou 2 ..
+                    tooltipTable[index]={text=val.text,body=val.help}--= 'lob_'..data.data.key..'_'..val.key
                 end
-				--// Set SelectedOption or Default Option or ... -- Fix AdvancedOption by Xinnony
-				--LOG("XINNONY number of SubOption Values : "..table.getsize(data.data.values))		-- 7 (de 0 a 6)
-				if data.default != nil and data.default <= table.getsize(data.data.values) then
-					--LOG("XINNONY IF name of Option : "..data.data.key)	-- opt_tents
-					--LOG("XINNONY IF default : "..data.default)					-- 0
-					if line.combo.keyMap[curOptions[data.data.key]] != nil then		-- nil (1 pour OmniCheat)
-						--LOG("XINNONY IF changedOptions : "..line.combo.keyMap[curOptions[data.data.key]])
-					else
-						--LOG("XINNONY ELSE changedOptions : RIEN")
-						--LOG("XINNONY ELSE changedOptions : "..tostring(line.combo.keyMap[curOptions[data.data.key]]))
-					end
+--// Set SelectedOption or Default Option or ... -- Fix AdvancedOption by Xinnony
+--				LOG("XINNONY //////////////////////////////////////////")
+--				LOG("XINNONY number of Values : "..table.getsize(data.data.values))
+				if data.default ~= nil and data.default <= table.getsize(data.data.values) then
+--					LOG("XINNONY IF name of Option : "..data.data.key)
+--					LOG("XINNONY IF default : "..data.default)
+--					if line.combo.keyMap[curOptions[data.data.key]] != nil then
+--						LOG("XINNONY IF changedOptions : "..line.combo.keyMap[curOptions[data.data.key]])
+--					else
+--						LOG("XINNONY IF changedOptions : RIEN")
+--					end
 					defValue = changedOptions[data.data.key].index or line.combo.keyMap[curOptions[data.data.key]] or data.default or 1
 					if data.default == 0 then
-						--LOG("XINNONY ELSE name of Option : .")--..data.data.key)
-						--LOG("XINNONY ELSE default : 0 to 1")--..data.default)
+--						LOG("XINNONY ELSE name of Option : .")--..data.data.key)
+--						LOG("XINNONY ELSE default : 0 to 1")--..data.default)
 						defValue = line.combo.keyMap[curOptions[data.data.key]] or 1
 					end
 				else
-					--LOG("XINNONY ELSE name of Option : .")--..data.data.key)
-					--LOG("XINNONY ELSE default : Not default")--..data.default)
+--					LOG("XINNONY ELSE name of Option : .")--..data.data.key)
+--					LOG("XINNONY ELSE default : Not default")--..data.default)
 					defValue = changedOptions[data.data.key].index or line.combo.keyMap[curOptions[data.data.key]] or 1
 				end
-                --LOG("XINNONY defValue : "..tostring(defValue))
-				line.combo:AddItems(itemArray, defValue)
+                line.combo:AddItems(itemArray, defValue)
                 line.combo.OnClick = function(self, index, text)
                     changedOptions[data.data.key] = {value = data.data.values[index].key, pref = data.data.pref, index = index}
                 end
