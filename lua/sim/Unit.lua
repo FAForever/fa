@@ -4101,8 +4101,8 @@ Unit = Class(moho.unit_methods) {
                 ShieldRegenStartTime = bpShield.ShieldRegenStartTime or 5,
                 PassOverkillDamage = bpShield.PassOverkillDamage or false,
 
-                SpillOverDamageMod = bpShield.ShieldSpillOverDamageMod or 0.1,
-                DamageThresholdToSpillOver = bpShield.ShieldDamageThresholdToSpillOver or 0,
+                SpillOverDamageMod = bpShield.ShieldSpillOverDamageMod,
+                DamageThresholdToSpillOver = bpShield.ShieldDamageThresholdToSpillOver,
             }
             self:SetFocusEntity(self.MyShield)
             self:EnableShield()
