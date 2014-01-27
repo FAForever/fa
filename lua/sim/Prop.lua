@@ -79,25 +79,14 @@ Prop = Class(moho.prop_methods, Entity) {
         if not self.CanBeKilled then return end
         self:Destroy()
     end,
-    
+
     OnReclaimed = function(self, entity)
         self.CreateReclaimEndEffects( entity, self )        
         self:Destroy()
     end,
-    
+
     CreateReclaimEndEffects = function( self, target )
         EffectUtil.PlayReclaimEndEffects( self, target )
-    end,    
-
-    Destroy = function(self)
-        self.DestroyCalled = true
-    end,
-		
-    OnDestroy = function(self)
-        if self.IsWreckage and not self.DestroyCalled then
-            RebuildBonusCheckCallback(self:GetPosition(), self.AssociatedBP)
-        end    
-        self.Trash:Destroy()
     end,
 
     OnDamage = function(self, instigator, amount, direction, damageType)
@@ -250,5 +239,29 @@ Prop = Class(moho.prop_methods, Entity) {
             end
             return false
         end
+    end,
+
+}
+
+###below added for CBFP
+# Brute51: This is part of the rebuild bonus callback script. If Destroy() isn't called here but OnDestroy() is that
+# means that the engine removed a prop, most likely a wreckage used for a rebuild bonus.
+
+local CBFP_oldProp = Prop
+local Game = import('/lua/game.lua')
+local RebuildBonusCheckCallback = import('/lua/sim/RebuildBonusCallback.lua').RunRebuildBonusCallback
+
+Prop = Class(CBFP_oldProp, Entity) {
+
+    Destroy = function(self)
+        self.DestroyCalled = true
+        CBFP_oldProp.Destroy(self)
+    end,
+
+    OnDestroy = function(self)
+        if self.IsWreckage and not self.DestroyCalled then
+            RebuildBonusCheckCallback(self:GetPosition(), self.AssociatedBP)
+        end
+        CBFP_oldProp.OnDestroy(self)
     end,
 }
