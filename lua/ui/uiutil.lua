@@ -86,8 +86,6 @@ local currentSkin = import('/lua/lazyvar.lua').Create()
 currentLayout = false
 changeLayoutFunction = false    -- set this function to get called with the new layout name when layout changes
 
-local UIFileCache = {}
-
 --* layout control, sets current layout preference
 function SetCurrentLayout(layout)
     if not layout then return end
@@ -340,43 +338,20 @@ function UIFile(filespec)
         return nil
     end
 
-    if UIFileCache[currentPath..filespec] == true then
-		--LOG('[[ UIFileCache['..currentPath..filespec..'] == true')
-		return currentPath..filespec
-	else
-		if UIFileCache[currentPath..filespec] == false then
-			--LOG('[[ UIFileCache['..currentPath..filespec..'] == false')
-		else
-			--LOG('[[ UIFileCache['..currentPath..filespec..'] == not exist')
-		end
-	--if not UIFileCache[currentPath..filespec] or UIFileCache[currentPath..filespec] != curFile then
-		-- if current skin is default, then don't bother trying to look for it, just append the default dir
-		if visitingSkin == 'default' then
-			return currentPath .. filespec
-		else
-			while visitingSkin do
-				local curFile = currentPath .. filespec
-				if DiskGetFileInfo(curFile) then
-					--LOG('[[ File finded ('..visitingSkin..') : '..curFile)
-					UIFileCache[curFile] = true
-					--break
-					return curFile
-				else
-					--LOG('[[ File not finded ('..visitingSkin..') : '..curFile)
-					UIFileCache[curFile] = false
-					visitingSkin = skins[visitingSkin].default
-					if visitingSkin then
-						currentPath = skins[visitingSkin].texturesPath
-					end
-				end
-				
-			end
-		end
-	--else
-		--if UIFileCache[visitingSkin][filespec] == curFile then
-			--return curFile	
-		--end
-	end
+    -- if current skin is default, then don't bother trying to look for it, just append the default dir
+    if visitingSkin == 'default' then
+        return currentPath .. filespec
+    else
+        while visitingSkin do
+            local curFile = currentPath .. filespec
+            if DiskGetFileInfo(curFile) then
+                return curFile
+            else
+                visitingSkin = skins[visitingSkin].default
+                if visitingSkin then currentPath = skins[visitingSkin].texturesPath end
+            end
+        end
+    end
 
     LOG("Warning: Unable to find file ", filespec)
     -- pass out the final string anyway so resource loader can gracefully fail
@@ -626,20 +601,6 @@ function CreateButtonStd2(parent, filename, label, pointSize, textOffsetVert, te
         , rolloverCue
         )
 end
-function CreateButtonStd2PNG(parent, filename, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue) -- XinnonyWork
-    return CreateButton2(parent
-        , filename .. "_up.png"
-        , filename .. "_down.png"
-        , filename .. "_over.png"
-        , filename .. "_dis.png"
-        , label
-        , pointSize
-        , textOffsetVert
-        , textOffsetHorz
-        , clickCue
-        , rolloverCue
-        )
-end
 
 function CreateCheckbox(parent, up, upsel, over, oversel, dis, dissel, clickCue, rollCue)
     local clickSound = clickCue or 'UI_Mini_MouseDown'
@@ -657,17 +618,6 @@ function CreateCheckboxStd(parent, filename, clickCue, rollCue)
         SkinnableFile(filename .. '-s_btn_over.dds'),
         SkinnableFile(filename .. '-d_btn_dis.dds'),
         SkinnableFile(filename .. '-s_btn_dis.dds'),
-        clickCue, rollCue)
-    return checkbox
-end
-function CreateCheckboxStdPNG(parent, filename, clickCue, rollCue)
-    local checkbox = CreateCheckbox( parent,
-        SkinnableFile(filename .. '-d_btn_up.png'),
-        SkinnableFile(filename .. '-s_btn_up.png'),
-        SkinnableFile(filename .. '-d_btn_over.png'),
-        SkinnableFile(filename .. '-s_btn_over.png'),
-        SkinnableFile(filename .. '-d_btn_dis.png'),
-        SkinnableFile(filename .. '-s_btn_dis.png'),
         clickCue, rollCue)
     return checkbox
 end

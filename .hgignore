@@ -3,6 +3,7 @@ syntax: glob
 *~
 *.pyc
 *.jpg
+*.png
 *.project
 *.settings*
 *.cproject
@@ -17,4 +18,3 @@ textures/ui/common/BUTTON/TEST/
 textures/ui/common/BACKGROUND/test/
 lua/ui/lobby/test/
 textures/ui/common/BUTTON/BACKUP/
-*/dds/*
