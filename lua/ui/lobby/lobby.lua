@@ -1,6 +1,3 @@
-finish = true
-GUI_Balance_OPEN = false
-local CalcBalance = import('/lua/ui/lobby/calc_balance.lua')
 --*****************************************************************************
 --* File: lua/modules/ui/lobby/lobby.lua
 --* Author: Chris Blackwell
@@ -9,7 +6,7 @@ local CalcBalance = import('/lua/ui/lobby/calc_balance.lua')
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
 
-LOBBYversion = 'v TESTING'
+LOBBYversion = 'v2.0'
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
@@ -1788,23 +1785,7 @@ local function UpdateGame()
             GameQualityLabel:SetText("")
         end
     end
-	--
-	
-	--// Check if best balance finded -- Xinnony
-	if GameQualityLabel then
-		LOG('### Check_If_Best_Balance_Finded')
-		Check_If_Best_Balance_Finded()
-	end
-	--\\ Stop -- Check if best balance finded
-	
-	--// Update the Balance UI for recalculate with new player or new team -- Xinnony
-	if GUI_Balance_OPEN then
-		LOG('### Balance UI is Open and go Updated label')
-		Update_GUI_BALANCE()
-	end
-	--\\ Stop -- Update the Balance UI for recalculate with new player or new team
-    
-	--// Add Tooltip info on Map Name Label -- Xinnony
+    --// Add Tooltip info on Map Name Label -- Xinnony
     if MapNameLabel and GameQualityLabel and scenarioInfo then
         if scenarioInfo.map_version then
             TTips_map_version = scenarioInfo.map_version
@@ -1852,8 +1833,7 @@ local function UpdateGame()
         end
     end
     --\\ Stop -- Add Tooltip info on Map Name Label
-    
-	--// For refresh menu in slot -- Xinnony
+    --// For refresh menu in slot -- Xinnony
     FuncSlotMenuData()
     --\\ Stop -- For refresh menu in slot
 end
@@ -2185,7 +2165,6 @@ function HostConvertPlayerToObserver(senderID, name, playerSlot)
         PL = gameInfo.PlayerOptions[playerSlot].PL,
         oldColor = gameInfo.PlayerOptions[playerSlot].PlayerColor, -- Vicarian
         oldFaction = gameInfo.PlayerOptions[playerSlot].Faction, -- Vicarian
-		oldCountry = gameInfo.PlayerOptions[playerSlot].Country, -- Xinnony
     }
 
     if lobbyComm:IsHost() then
@@ -2221,7 +2200,6 @@ function HostConvertObserverToPlayer(senderID, name, fromObserverSlot, toPlayerS
     gameInfo.PlayerOptions[toPlayerSlot] = LobbyComm.GetDefaultPlayerOptions(name)
     gameInfo.PlayerOptions[toPlayerSlot].OwnerID = senderID
 
-	gameInfo.PlayerOptions[toPlayerSlot].Country = gameInfo.Observers[fromObserverSlot].oldCountry or 'world' -- Xinnony
 	--if requestedFaction then
 		gameInfo.PlayerOptions[toPlayerSlot].Faction = gameInfo.Observers[fromObserverSlot].oldFaction or requestedFaction or 5
     --end
@@ -2496,17 +2474,9 @@ function CreateUI(maxPlayers)
         MapNameLabel:SetColor('B9BFB9')
         MapNameLabel:SetDropShadow(true)
     --\\
-	--// Balance Button
-	BalanceButton = UIUtil.CreateButtonStd2PNG(GUI.panel, '/BUTTON/small/', "Balance", 10, -1)
-        LayoutHelpers.AtRightTopIn(BalanceButton, GUI.panel, 50-14, 61)
-		BalanceButton.OnClick = function()
-			GUI_BALANCE()
-		end
-	--\\
 	--// Game Quality Label
-	GameQualityLabel = UIUtil.CreateText(GUI.panel, "Game quality N/A", 13, 'Arial Gras')
-		LayoutHelpers.LeftOf(GameQualityLabel, BalanceButton, -5)
-		LayoutHelpers.AtVerticalCenterIn(GameQualityLabel, BalanceButton, -1)
+	GameQualityLabel = UIUtil.CreateText(GUI.panel, "", 13, 'Arial Gras')
+        LayoutHelpers.AtRightTopIn(GameQualityLabel, GUI.panel, 50, 61)
         GameQualityLabel:SetColor('B9BFB9')
         GameQualityLabel:SetDropShadow(true)
     --Tooltip.AddButtonTooltip(MapNameLabel,{text='', body=''})
@@ -5621,34 +5591,10 @@ function RuleTitle_INPUT()
 			nameEdit.Width:Set(334)
 			nameEdit.Height:Set(24)
 			nameEdit:AcquireFocus()
-			nameEdit.OnEnterPressed = function(self, text)
-				if text == '' then
-					GUI_Preset_InputBox:Destroy()
-					RuleLabel:DeleteAllItems()
-					RuleLabel:AddItem('Rule : no rule.')
-					RuleLabel:AddItem('')
-					RuleTitle_SendMSG()
-				else
-					GUI_Preset_InputBox:Destroy()
-					wrapped = import('/lua/maui/text.lua').WrapText('Rule : '..text, 350, function(curText) return RuleLabel:GetStringAdvance(curText) end)
-					RuleLabel:DeleteAllItems()
-					RuleLabel:AddItem(wrapped[1] or '')
-					RuleLabel:AddItem(wrapped[2] or '')
-					RuleTitle_SendMSG()
-				end
-			end
-		-------------------
-		-- Exit button --
-		local ExitButton = UIUtil.CreateButtonStd2PNG(GUI_Preset_InputBox2, '/BUTTON/medium/', "Cancel", 12, -1)
-			LayoutHelpers.AtLeftIn(ExitButton, GUI_Preset_InputBox2, 70)
-			LayoutHelpers.AtBottomIn(ExitButton, GUI_Preset_InputBox2, 10)
-			ExitButton.OnClick = function(self)
-				GUI_Preset_InputBox:Destroy()
-			end
 		-------------------
 		-- Ok button --
 		local OKButton = UIUtil.CreateButtonStd2PNG(GUI_Preset_InputBox2, '/BUTTON/medium/', "Ok", 12, -1)
-			LayoutHelpers.AtRightIn(OKButton, GUI_Preset_InputBox2, 70)
+			LayoutHelpers.AtHorizontalCenterIn(OKButton, GUI_Preset_InputBox2)
 			LayoutHelpers.AtBottomIn(OKButton, GUI_Preset_InputBox2, 10)
 			text09:SetText('Edit the Rule :')
 			OKButton.OnClick = function(self)
@@ -5997,13 +5943,12 @@ function ForceApplyNewSkin()
     -- Restricted Unit show only if not you Host, else Preset Lobby is show.
 	-- Now if is Host, is a Preset button.
     --if not lobbyComm:IsHost() then
-	if GUI.restrictedUnitsButton then
-		if GUI.restrictedUnitsButton:IsDisabled() then -- SI PAS DISABLED ALORS
-            GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_dis.png'))
-        else
+        if not GUI.restrictedUnitsButton:IsDisabled() then
             GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_up.png'))
+        elseif GUI.restrictedUnitsButton:IsDisabled() then
+            GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_dis.png'))
         end
-    end
+    --end
     -- Observer, AutoTeam, RankedOpts, CPUBench, RandomMap.
     if GUI.becomeObserver then
         if not GUI.becomeObserver:IsDisabled() then
@@ -6485,7 +6430,7 @@ function GUI_PRESET()
 		PresetList.OnClick = function(self, row)
 			if PresetList:GetItemCount() == (row+1) then
 				PresetList:SetSelection(row)
-				LoadButton.label:SetText('Create new preset')
+				LoadButton.label:SetText('New preset')
 				LoadButton.OnClick = function(self)
 					CREATE_PRESET_IN_PREF()
 				end
@@ -6548,7 +6493,7 @@ function GUI_PRESET()
 		end
 	-------------------
     -- QUIT button --
-	local QuitButton = UIUtil.CreateButtonStd2PNG(dialog2, '/BUTTON/medium/', "Cancel", 12, -1)
+	local QuitButton = UIUtil.CreateButtonStd2PNG(dialog2, '/BUTTON/medium/', "Exit", 12, -1)
         LayoutHelpers.CenteredRightOf(QuitButton, LoadButton, -16)
         QuitButton.OnClick = function(self)
             GUI_Preset:Destroy()
@@ -6619,69 +6564,10 @@ function GUI_PRESET_INPUT(tyype)
         nameEdit.Width:Set(334)
         nameEdit.Height:Set(24)
         nameEdit:AcquireFocus()
-		nameEdit.OnEnterPressed = function(self, text)
-			if tyype == -1 then
-				if text == '' then
-					-- No word in nameEdit
-				else
-					applyCREATE_PRESET_IN_PREF(text)
-					GUI_Preset_InputBox:Destroy()
-				end
-			elseif tyype == 0 then
-				if text == '' then
-					-- No word in nameEdit
-				else
-					applyCREATE_PRESET_IN_PREF(text)
-					GUI_Preset_InputBox:Destroy()
-				end
-			elseif tyype == 1 then
-				if text == '' then
-					-- No word in nameEdit
-				else
-					local profiles = GetPreference("UserPresetLobby")
-					SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.PresetName', tostring(text))
-					local lastselect = PresetList:GetSelection()
-					LOAD_PresetProfils_For_PresetList()
-					PresetList:SetSelection(lastselect)
-					LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-					GUI_Preset_InputBox:Destroy()
-				end
-			elseif tyype == 2 then
-				if text == '' then
-					-- No word in nameEdit
-				else
-					local profiles = GetPreference("UserPresetLobby")
-					SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.FAF_Title', tostring(text))
-					LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-					GUI_Preset_InputBox:Destroy()
-				end
-			elseif tyype == 3 then
-				if text == '' then
-					local profiles = GetPreference("UserPresetLobby")
-					SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', 'no rule.')
-					LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-					GUI_Preset_InputBox:Destroy()
-				else
-					local profiles = GetPreference("UserPresetLobby")
-					--AddChatText('rename> Profil?:'..table.KeyByIndex(profiles, PresetList:GetSelection())..' // selection:'..PresetList:GetSelection())
-					SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', tostring(text))
-					LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-					GUI_Preset_InputBox:Destroy()
-				end
-			end
-		end
-	-------------------
-    -- Exit button --
-	local ExitButton = UIUtil.CreateButtonStd2PNG(GUI_Preset_InputBox2, '/BUTTON/medium/', "Cancel", 12, -1)
-		LayoutHelpers.AtLeftIn(ExitButton, GUI_Preset_InputBox2, 70)
-		LayoutHelpers.AtBottomIn(ExitButton, GUI_Preset_InputBox2, 10)
-		ExitButton.OnClick = function(self)
-			GUI_Preset_InputBox:Destroy()
-		end
 	-------------------
     -- Ok button --
 	local OKButton = UIUtil.CreateButtonStd2PNG(GUI_Preset_InputBox2, '/BUTTON/medium/', "Ok", 12, -1)
-		LayoutHelpers.AtRightIn(OKButton, GUI_Preset_InputBox2, 70)
+        LayoutHelpers.AtHorizontalCenterIn(OKButton, GUI_Preset_InputBox2)
 		LayoutHelpers.AtBottomIn(OKButton, GUI_Preset_InputBox2, 10)
         if tyype == -1 then
 			text09:SetText('No Preset exist, set your first Preset name :')
@@ -6739,10 +6625,7 @@ function GUI_PRESET_INPUT(tyype)
 			OKButton.OnClick = function(self)
 				local result = nameEdit:GetText()
 				if result == '' then
-					local profiles = GetPreference("UserPresetLobby")
-					SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', 'no rule.')
-					LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-					GUI_Preset_InputBox:Destroy()
+					-- No word in nameEdit
 				else
 					local profiles = GetPreference("UserPresetLobby")
 					--AddChatText('rename> Profil?:'..table.KeyByIndex(profiles, PresetList:GetSelection())..' // selection:'..PresetList:GetSelection())
@@ -6822,7 +6705,7 @@ function LOAD_PresetSettings_For_InfoList(Selected_Preset)
 	end
 	if profiles[Selected_Preset].UnitsRestricts then
 		InfoList:AddItem('')
-		InfoList:AddItem('Unit Restrictions :')
+		InfoList:AddItem('Units Restricts :')
 		for k, v in profiles[Selected_Preset].UnitsRestricts do
 			--k = (uids), v = true
 			InfoList:AddItem('- '..k)
@@ -6921,9 +6804,6 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
 				table.insert(urestrict, k)
 			end
 			SetGameOption('RestrictedCategories', urestrict, false, true)
-		else
-			-- Clear Restricted
-			SetGameOption('RestrictedCategories', {}, false, true)
 		end
 		
 		--
@@ -7027,553 +6907,34 @@ function SAVE_PRESET_IN_PREF() -- GET OPTIONS ON LOBBY AND SAVE TO PRESET
 end
 
 
-################################################################
-######################### TEST Balance Script ######################### -- Xinnony
-## TODO : Add Cache for the Best Balance Combination
-
-----------
--- GUI --
-function GUI_BALANCE()
-	--------
-	-- UI --
-	GUI_Balance = Group(GUI)
-        LayoutHelpers.AtCenterIn(GUI_Balance, GUI)
-        GUI_Balance.Depth:Set(998) -- :GetTopmostDepth() + 1
-	GUI_Balance.background = Bitmap(GUI_Balance, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby.png'))
-        GUI_Balance.Width:Set(GUI_Balance.background.Width)
-        GUI_Balance.Height:Set(GUI_Balance.background.Height)
-        LayoutHelpers.FillParent(GUI_Balance.background, GUI_Balance)
-    GUI_Balance.dialog = Group(GUI_Balance)
-        GUI_Balance.dialog.Width:Set(536)
-        GUI_Balance.dialog.Height:Set(400)
-        LayoutHelpers.AtCenterIn(GUI_Balance.dialog, GUI_Balance)
-	
-	-------------------
-    -- QUIT button --
-	local QuitButton = UIUtil.CreateButtonStd2PNG(GUI_Balance.dialog, '/BUTTON/medium/', "Cancel", 12, -1)
-        LayoutHelpers.AtLeftIn(QuitButton, GUI_Balance.dialog, 70)
-		LayoutHelpers.AtBottomIn(QuitButton, GUI_Balance.dialog, 20)
-        QuitButton.OnClick = function(self)
-            GUI_Balance_OPEN = false
-			GUI_Balance:Destroy()
-        end
-	
-	------------
-    -- LABEL --
-    UIB_text0 = UIUtil.CreateText(GUI_Balance.dialog, 'Balance :', 17, 'Arial Gras')
-        UIB_text0:SetColor('B9BFB9')
-        UIB_text0:SetDropShadow(true)
-        LayoutHelpers.AtHorizontalCenterIn(UIB_text0, GUI_Balance.dialog, 0)
-        LayoutHelpers.AtTopIn(UIB_text0, GUI_Balance.dialog, 10)
-	--
-	UIB_text1b = UIUtil.CreateText(GUI_Balance.dialog, 'Info ...', 9, 'Arial')
-		UIB_text1b:SetText("Info : Information: The GameQuality and Balance are calculated differently, preferred Balance")
-		UIB_text1b:SetColor('CC9966')
-        UIB_text1b:SetDropShadow(true)
-		--text1b:Hide()
-		--LayoutHelpers.AtLeftIn(text1b, GUI_Balance.dialog, 30)
-        --LayoutHelpers.AtTopIn(text1b, GUI_Balance.dialog, 40)
-		LayoutHelpers.AtLeftIn(UIB_text1b, GUI_Balance.dialog, 30)
-        LayoutHelpers.AtTopIn(UIB_text1b, GUI_Balance.dialog, 140)
-	--
-	UIB_text1 = UIUtil.CreateText(GUI_Balance.dialog, 'Current numbers of Players : xx (Team 1 : x, Team 2 : x, Other : x)', 11, 'Arial')
-		--text1:SetText('Numbers of Players : '..FIXNumber_Of_Players())
-		UIB_text1:SetColor('B9BFB9')
-        UIB_text1:SetDropShadow(true)
-		LayoutHelpers.AtLeftIn(UIB_text1, GUI_Balance.dialog, 30)
-        LayoutHelpers.AtTopIn(UIB_text1, GUI_Balance.dialog, 60)
-	--
-	UIB_text2 = UIUtil.CreateText(GUI_Balance.dialog, 'Current Game Quality : (disable for the moment)', 11, 'Arial')
-		UIB_text2:SetColor('B9BFB9')
-        UIB_text2:SetDropShadow(true)
-		LayoutHelpers.AtLeftIn(UIB_text2, GUI_Balance.dialog, 30)
-        LayoutHelpers.AtTopIn(UIB_text2, GUI_Balance.dialog, 80)
-	UIB_text2b = UIUtil.CreateText(GUI_Balance.dialog, 'Best Game Quality : (disable for the moment)', 11, 'Arial')
-		UIB_text2b:SetColor('B9BFB9')
-        UIB_text2b:SetDropShadow(true)
-		LayoutHelpers.AtRightIn(UIB_text2b, GUI_Balance.dialog, 30)
-        LayoutHelpers.AtTopIn(UIB_text2b, GUI_Balance.dialog, 80)
-	--
-	UIB_text3 = UIUtil.CreateText(GUI_Balance.dialog, 'Current Balance : xx%', 11, 'Arial')
-		UIB_text3:SetColor('B9BFB9')
-        UIB_text3:SetDropShadow(true)
-		LayoutHelpers.AtLeftIn(UIB_text3, GUI_Balance.dialog, 30)
-        LayoutHelpers.AtTopIn(UIB_text3, GUI_Balance.dialog, 100)
-	UIB_text3w = UIUtil.CreateText(GUI_Balance.dialog, '', 11, 'Arial') --9
-		UIB_text3w:SetColor('CC6666') -- CC9966 Yellow
-        UIB_text3w:SetDropShadow(true)
-		UIB_text3w:Hide()
-		LayoutHelpers.AtLeftIn(UIB_text3w, GUI_Balance.dialog, 30)
-        LayoutHelpers.AtTopIn(UIB_text3w, GUI_Balance.dialog, 120)
-		--LayoutHelpers.AtLeftIn(text3w, GUI_Balance.dialog, 40)
-        --LayoutHelpers.AtTopIn(text3w, GUI_Balance.dialog, 115)
-	UIB_text3b = UIUtil.CreateText(GUI_Balance.dialog, 'Best Balance : xx%', 11, 'Arial')
-		UIB_text3b:SetColor('B9BFB9')
-        UIB_text3b:SetDropShadow(true)
-		LayoutHelpers.AtRightIn(UIB_text3b, GUI_Balance.dialog, 30)
-        LayoutHelpers.AtTopIn(UIB_text3b, GUI_Balance.dialog, 100)
-	--
-	UIB_text4 = UIUtil.CreateText(GUI_Balance.dialog, 'Team 1 (xxxx) xx%', 11, 'Arial Gras')
-		UIB_text4:SetColor('B9BFB9')
-        UIB_text4:SetDropShadow(true)
-		LayoutHelpers.AtLeftIn(UIB_text4, GUI_Balance.dialog, 50)
-        LayoutHelpers.AtTopIn(UIB_text4, GUI_Balance.dialog, 160)
-	UIB_text5 = UIUtil.CreateText(GUI_Balance.dialog, 'Team 2 (xxxx) xx%', 11, 'Arial Gras')
-		UIB_text5:SetColor('B9BFB9')
-        UIB_text5:SetDropShadow(true)
-		LayoutHelpers.AtLeftIn(UIB_text5, GUI_Balance.dialog, 330)
-        LayoutHelpers.AtTopIn(UIB_text5, GUI_Balance.dialog, 160)
-	UIB_text5b = UIUtil.CreateText(GUI_Balance.dialog, 'vs', 11, 'Arial Gras')
-		UIB_text5b:SetColor('B9BFB9')
-        UIB_text5b:SetDropShadow(true)
-		LayoutHelpers.AtHorizontalCenterIn(UIB_text5b, GUI_Balance.dialog, -20)
-        LayoutHelpers.AtTopIn(UIB_text5b, GUI_Balance.dialog, 160)
-	--
-	
-	UIB_textslotA = {}
-	UIB_textslotB = {}
-	for i = 1, 6 do
-		UIB_textslotA[i] = UIUtil.CreateText(GUI_Balance.dialog, i..' - xxxxxxx (xxx)', 11, 'Arial')
-			UIB_textslotA[i]:SetColor('B9BFB9')
-			UIB_textslotA[i]:SetDropShadow(true)
-			LayoutHelpers.AtLeftIn(UIB_textslotA[i], GUI_Balance.dialog, 70)
-			LayoutHelpers.AtTopIn(UIB_textslotA[i], GUI_Balance.dialog, 180+(20*(i-1)))
-			UIB_textslotA[i]:Hide()
-	end
-	for i = 1, 6 do
-		UIB_textslotB[i] = UIUtil.CreateText(GUI_Balance.dialog, i..' - xxxxxxx (xxx)', 11, 'Arial')
-			UIB_textslotB[i]:SetColor('B9BFB9')
-			UIB_textslotB[i]:SetDropShadow(true)
-			LayoutHelpers.AtLeftIn(UIB_textslotB[i], GUI_Balance.dialog, 350)
-			LayoutHelpers.AtTopIn(UIB_textslotB[i], GUI_Balance.dialog, 180+(20*(i-1)))
-			UIB_textslotB[i]:Hide()
-	end
-	
-	------------------------
-    -- BALANCE button --
-	local BalanceButton = UIUtil.CreateButtonStd2PNG(GUI_Balance.dialog, '/BUTTON/medium/', "Moves Players", 12, -1)
-        LayoutHelpers.AtRightIn(BalanceButton, GUI_Balance.dialog, 70)
-        LayoutHelpers.AtBottomIn(BalanceButton, GUI_Balance.dialog, 20)
-        BalanceButton.OnClick = function(self)
-			Update_GUI_BALANCE()
-        end
-	
-	-------------
-    -- Credit --
-    local UIB_text99 = UIUtil.CreateText(GUI_Balance.dialog, 'Xinnony', 9, 'Arial')
-        UIB_text99:SetColor('808080')
-        UIB_text99:SetDropShadow(true)
-        LayoutHelpers.AtRightIn(UIB_text99, GUI_Balance.dialog, 0)
-        LayoutHelpers.AtBottomIn(UIB_text99, GUI_Balance.dialog, 2)
-	
-	Update_GUI_BALANCE()
-	GUI_Balance_OPEN = true
-end
-
---
-
-function Check_If_Best_Balance_Finded()
-	LOG('/// Check_If_Best_Balance_Finded')
-	--
-	local POURCENT_CURRENT = false
-	local POURCENT_BEST = false
-	--
-	local num = Number_Of_Players()
-	if num['numTotal'] == 4 or num['numTotal'] == 6 or num['numTotal'] == 8 or num['numTotal'] == 10 or num['numTotal'] == 12 then
-		POURCENT_CURRENT = Calc_Current_Balance()
-		RRating =  {}
-		PPlayer = {}
-		j = 1
-		for i = 1, LobbyComm.maxPlayerSlots do
-			if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] and gameInfo.PlayerOptions[i].Human and gameInfo.PlayerOptions[i].PL and gameInfo.PlayerOptions[i].PlayerName then
-				RRating[j] = gameInfo.PlayerOptions[i].PL
-				PPlayer[j] = gameInfo.PlayerOptions[i].PlayerName
-				j = j + 1
-			end
-		end
-		--
-		Final_Result = CalcBalance.Start(RRating, PPlayer)
-		POURCENT_BEST = Final_Result['PAB']
-	--elseif num['numTotal'] == 3 or num['numTotal'] == 5 or num['numTotal'] == 7 or num['numTotal'] == 9 or num['numTotal'] == 11 then
-		--POURCENT_CURRENT = Calc_Current_Balance()
-		--RRating =  {}
-		--PPlayer = {}
-		--j = 1
-		--for i = 1, LobbyComm.maxPlayerSlots do
-			--if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] and gameInfo.PlayerOptions[i].Human and gameInfo.PlayerOptions[i].PL and gameInfo.PlayerOptions[i].PlayerName then
-				--RRating[j] = gameInfo.PlayerOptions[i].PL
-				--PPlayer[j] = gameInfo.PlayerOptions[i].PlayerName
-				--j = j + 1
-			--end
-		--end
-		--RRating[j] = 0 -- Add ghost player for equilibrate the team
-		--PPlayer[j] = '' -- Add ghost player for equilibrate the team
-		--
-		--Final_Result = CalcBalance.Start(RRating, PPlayer)
-		--POURCENT_BEST = Final_Result['PAB']
-	else
-		GameQualityLabel:SetColor('B9BFB9')
-		LOG('\\\ Check_If_Best_Balance_Finded broken because the players is not pair')
-		return
-	end
-	--
-	LOG('-- POURCENT_CURRENT : '..tostring(POURCENT_CURRENT)..' / Nb of Player : '..num['numTotal'])
-	LOG('-- POURCENT_BEST : '..tostring(POURCENT_BEST)..' / Best Balance % : '..tostring(Final_Result['PAB']))
-	--
-	if POURCENT_BEST != false and POURCENT_CURRENT != false and POURCENT_CURRENT < POURCENT_BEST then
-		-- BEST BALANCE FINDED
-		GameQualityLabel:SetColor('CC9966')
-		GameQualityLabel:SetText('Best Balance found ('..round(POURCENT_CURRENT, 2)..'% to '..round(POURCENT_BEST, 2)..'%)')
-	else
-		-- NO BEST BALANCE FINDED
-		GameQualityLabel:SetColor('B9BFB9')
-		--GameQualityLabel:SetText('')
-		--GameQualityLabel:SetText('Game Quality xx%')
-	end
-end
-
-function Update_GUI_BALANCE()
-	LOG('/// Update_GUI_BALANCE')
-	local num = Number_Of_Players()
-	
-	UIB_text1:SetText('Numbers of Players : '..num['numTotal']..' (Team 1 : '..num['numTA']..', Team 2 : '..num['numTB']..', Other : '..num['numTOther']..')')
-	UIB_text3:SetText('Current Balance : '..round(Calc_Current_Balance(), 2)..'%')
-	
-	--
-	
-	RRating =  {}
-	PPlayer = {}
-	j = 1
-	for i = 1, LobbyComm.maxPlayerSlots do
-		if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] and gameInfo.PlayerOptions[i].Human and gameInfo.PlayerOptions[i].PL and gameInfo.PlayerOptions[i].PlayerName then
-			--LOG('Player & Rating finded ! ('..tostring(gameInfo.PlayerOptions[i].PlayerName)..' / '..tostring(gameInfo.PlayerOptions[i].PL)..')')
-			RRating[j] = gameInfo.PlayerOptions[i].PL
-			PPlayer[j] = gameInfo.PlayerOptions[i].PlayerName
-			j = j + 1
-		#--else
-			#--LOG('Player & Rating NOT finded !')
-		end
-	end
-	--LOG('---------------------------------')
-	--LOG('table size : '..table.getn(RRating)..' / '..table.getn(PPlayer)..' / '..LobbyComm.maxPlayerSlots)
-	--for k, v in RRating do
-		--LOG(tostring(k)..'] Rating : '..tostring(v))
-	--end
-	--for k, v in PPlayer do
-		--LOG(tostring(k)..'] Player : '..tostring(v))
-	--end
-	--LOG('---------------------------------')
-	
-	if num['numTotal'] == 4 or num['numTotal'] == 6 or num['numTotal'] == 8 or num['numTotal'] == 10 or num['numTotal'] == 12 then
-		Final_Result = CalcBalance.Start(RRating, PPlayer)
-		--Final_Result['TA'] = TeamA_Total -- Addition de tout les Rating de la Team A
-		--Final_Result['TB'] = TeamB_Total -- Addition de tout les Rating de la Team B
-		--Final_Result['TAB'] = AB_Total -- Addition de tout les Rating des deux Team
-		--Final_Result['PA'] = TeamA_Purcent -- Pourcentage de Balance comparer a la Team B
-		--Final_Result['PB'] = TeamB_Purcent -- Pourcentage de Balance comparer a la Team A
-		--Final_Result['PAB'] = AB_Purcent -- Pourcentage de Balance entre les deux Team
-		--Final_Result['BL'] = BEST_Lower -- Difference de Rating entre les deux Team
-		--Final_Result['BA'] = BEST_IndexA -- Index de Table du meilleur Balance de la Team A
-		--Final_Result['BB'] = BEST_IndexB -- Index de Table du meilleur Balance de la Team B
-		--Final_Result['NA'] = BEST_PlayerName_TeamA -- Table contenant les Pseudo Balancé de la Team A
-		--Final_Result['NB'] = BEST_PlayerName_TeamB -- Table contenant les Pseudo Balancé de la Team B
-		
-		--
-		
-		UIB_text4:SetText('Team 1 ('..Final_Result['TA']..') '..round(Final_Result['PA'], 2)..'%')
-		UIB_text5:SetText('Team 2 ('..Final_Result['TB']..') '..round(Final_Result['PB'], 2)..'%')
-		UIB_text3b:SetText('Best Balance : '..round(Final_Result['PAB'], 2)..'%')
-		
-		if num['numTotal'] == 0 or num['numTotal'] == 1 or num['numTotal'] == 3 or num['numTotal'] == 5 or num['numTotal'] == 7 or num['numTotal'] == 9 or num['numTotal'] == 11 then
-			UIB_text3w:SetText("Info : You can not balance the team if the number of players is not a pair")
-			UIB_text3w:Show()
-		else
-			UIB_text3w:Hide()
-		end
-		
-		--
-		
-		ib = 1
-		for i = 1, num['numTotal'] do
-			#--LOG('numTotal:'..num['numTotal']..' / nbA:'..Final_Result['nbA']..' / nbB:'..Final_Result['nbB']..' / i:'..i..' / ib:'..ib)
-			if i <= Final_Result['nbA'] then
-				#--LOG('nbA')
-				#--LOG('-- '..tostring(Final_Result['NA'][i]))
-				#--LOG('--- '..tostring(gameInfo.PlayerOptions[FindSlotForID(FindIDForName(Final_Result['NA'][i]))].PL))
-				UIB_textslotA[i]:SetText(i..' - '..Final_Result['NA'][i]..' ('..gameInfo.PlayerOptions[FindSlotForID(FindIDForName(Final_Result['NA'][i]))].PL..')')
-				--textslotA[i]:SetText(i..' - '..Final_Result['NA'][i]..' ('..Final_Result['A'][i]..')')
-				UIB_textslotA[i]:Show()
-			else
-				#--LOG('nbB')
-				#--LOG('-- '..tostring(Final_Result['NB'][ib]))
-				#--LOG('--- '..tostring(gameInfo.PlayerOptions[FindSlotForID(FindIDForName(Final_Result['NB'][ib]))].PL))
-				UIB_textslotB[ib]:SetText(i..' - '..Final_Result['NB'][ib]..' ('..gameInfo.PlayerOptions[FindSlotForID(FindIDForName(Final_Result['NB'][ib]))].PL..')')
-				--textslotB[ib]:SetText(i..' - '..Final_Result['NB'][i-Final_Result['nbA']]..' ('..Final_Result['B'][i-Final_Result['nbA']]..')')
-				UIB_textslotB[ib]:Show()
-				ib = ib + 1
-			end
-		end
-		
-		--
-	else
-		LOG('\\\ Update_GUI_BALANCE broken because the players is not pair')
-		UIB_text4:SetText('Team 1 (..) ..%')
-		UIB_text5:SetText('Team 2 (..) ..%')
-		UIB_text3b:SetText('Best Balance : ..%')
-		UIB_text3w:SetText("Info : You can not balance the team if the number of players is not a pair")
-		UIB_text3w:Show()
-		for i = 1, 6 do
-			UIB_textslotA[i]:Hide()
-			UIB_textslotB[i]:Hide()
-		end
-	end
-end
-
-function Calc_Current_Balance()
-	LOG('/// Calc_Current_Balance')
-	--
-	calcA = 0
-	calcB = 0
-	PurcentBalance = '..'
-	for i = 1, LobbyComm.maxPlayerSlots do
-		if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] and gameInfo.PlayerOptions[i].Human and gameInfo.PlayerOptions[i].PL and gameInfo.PlayerOptions[i].PlayerName then
-			team = gameInfo.PlayerOptions[i].Team
-			if team == 2 then -- 1
-				calcA = calcA + tonumber(gameInfo.PlayerOptions[i].PL)
-			elseif team == 3 then -- 2
-				calcB = calcB + tonumber(gameInfo.PlayerOptions[i].PL)
-			else
-				--
-			end
-		else
-			--
-		end
-	end
-	--
-	PurcentA = (calcA*100)/(calcA+calcB)
-	PurcentB = (calcB*100)/(calcA+calcB)
-	if PurcentA < PurcentB then
-		PurcentBalance = (PurcentA/PurcentB)*100
-	else
-		PurcentBalance = (PurcentB/PurcentA)*100
-	end
-	--
-	return PurcentBalance
-end
-
---
-
-function Number_Of_Players()
-	num = {}
-	numTA = 0
-	numTB = 0
-	numTOther = 0
-	for i = 1, LobbyComm.maxPlayerSlots do
-		if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] and gameInfo.PlayerOptions[i].Human and gameInfo.PlayerOptions[i].PL and gameInfo.PlayerOptions[i].PlayerName then
-			if gameInfo.PlayerOptions[i].Team == 2 then
-				numTA = numTA + 1
-			elseif gameInfo.PlayerOptions[i].Team == 3 then
-				numTB = numTB + 1
-			else
-				numTOther = numTOther + 1
-			end
-		end
-	end
-	num['numTA'] = numTA
-	num['numTB'] = numTB
-	num['numTotal'] = numTA+numTB--numTOther
-	num['numTOther'] = numTOther
-	return num
-end
-
---
-
-function Number_Of_Players_in_Team()
-	numA = 0
-	numB = 0
-	numX = 0
-	state = false
-	for i = 1, LobbyComm.maxPlayerSlots do
-		if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] and gameInfo.PlayerOptions[i].Human and gameInfo.PlayerOptions[i].MEAN and gameInfo.PlayerOptions[i].DEV then
-			team = gameInfo.PlayerOptions[i].Team
-			if team == 2 then -- 1
-				numA = numA + 1
-			elseif team == 3 then -- 2
-				numB = numB + 1
-			else
-				numX = numX + 1
-			end
-		end
-	end
-	if numA == numB then
-		--EQUIPE EQUILIBRER
-		state = true
-		--text3w:Hide()
-	else
-		if numX >= 1 then
-			--JOUEUR HORS TEAM1 OU TEAM2
-			state = false
-			--text3w:SetText('Warning : the "Current Balance" is miscalculated because the players are not all in the team 1 or 2.')
-			--text3w:Show()
-		else
-			--EQUIPE NON EQUILIBRER
-			state = false
-			--text3w:SetText('Warning : the "Current Balance" is miscalculated because the team 1 and 2 is not equal.')--is uneven.')
-			--text3w:Show()
-		end
-	end
-	return state
-end
-
-function Current_Balance()
-	local Team1Rating = 0
-	local Team2Rating = 0
-	local TotalRating = 0
-	local PurcentTeam1 = 0
-	local PurcentTeam2 = 0
-	local TotalPurcent = 0
-	for i = 1, LobbyComm.maxPlayerSlots do
-		if gameInfo.PlayerOptions[i] and gameInfo.PlayerOptions[i].Human and gameInfo.PlayerOptions[i].PL then
-			team = gameInfo.PlayerOptions[i].Team
-			if team == 2 then -- 2 = 1
-				Team2Rating = Team2Rating + gameInfo.PlayerOptions[i].PL
-			elseif team == 3 then -- 3 = 2
-				Team1Rating = Team1Rating + gameInfo.PlayerOptions[i].PL
-			else -- 1 = -; 3 = 2; ...
-				-- THE PLAYER IS NOT IN A TEAM OR NOT TEAM 1 OR 2
-				--Team1Rating = Team1Rating + gameInfo.PlayerOptions[i].PL
-				--LOG('>> Team0:'..team..' / Rating:'..gameInfo.PlayerOptions[i].PL)
-			end
-		end
-	end
-	TotalRating = Team1Rating + Team2Rating
-	PurcentTeam1 = ((Team1Rating)*100)/TotalRating
-	PurcentTeam2 = ((Team2Rating)*100)/TotalRating
-	if Team1Rating < PurcentTeam2 then
-		TotalPurcent = (PurcentTeam1/PurcentTeam2)*100
-	else
-		TotalPurcent = (PurcentTeam2/PurcentTeam1)*100
-	end
-	return TotalPurcent
-end
-
-function Best_Quality()
-	local teams = nil
-	local teamcreated = false
-	local multipl = 0
-	local reset_multipl = false
-	correct = true
-	--
-	for i = 1, FIXNumber_Of_Players() do
-		player = Player.create(CalcBalance.best_name_permutAB[i-1], Rating.create(gameInfo.PlayerOptions[FindSlotForID(FindIDForName(CalcBalance.best_name_permutAB[i-1]))].MEAN, gameInfo.PlayerOptions[FindSlotForID(FindIDForName(CalcBalance.best_name_permutAB[i-1]))].DEV))
-		if  gameInfo.PlayerOptions[i].Human then
-			if i > (FIXNumber_Of_Players()/2) then -- TEAM 2
-				if teamcreated then
-					teams:addPlayer(1, player)
-				else
-					teams = Teams.create(1, player)
-					teamcreated = true
-				end
-				if reset_multipl == false then
-					reset_multipl = true
-					multipl = 0
-				end
-			else -- TEAM 1
-				if teamcreated then
-					teams:addPlayer(2, player)
-				else
-					teams = Teams.create(2, player)
-					teamcreated = true
-				end
-			end
-		else
-			correct = false
-		end
-		multipl = multipl + 1
-	end
-	local quality = Trueskill.computeQuality(teams)
-	return quality
-end
-
-function Current_Quality()
-	local teams = nil
-	local teamcreated = false
-	correct = true
-	for i = 1, LobbyComm.maxPlayerSlots do
-		if gameInfo.PlayerOptions[i] then
-			if  gameInfo.PlayerOptions[i].Human then
-				if gameInfo.PlayerOptions[i].MEAN and gameInfo.PlayerOptions[i].DEV then
-					player = Player.create(gameInfo.PlayerOptions[i].PlayerName, Rating.create(gameInfo.PlayerOptions[i].MEAN, gameInfo.PlayerOptions[i].DEV))
-					team = gameInfo.PlayerOptions[i].Team
-					if team == 2 then
-						if teamcreated then
-							teams:addPlayer(1, player)
-						else
-							teams = Teams.create(1, player)
-							teamcreated = true
-						end
-					else
-						if teamcreated then
-							teams:addPlayer(2, player)
-						else
-							teams = Teams.create(2, player)
-							teamcreated = true
-						end
-					end
-				end
-			else
-				correct = false
-			end
-		end
-	end
-	local quality = Trueskill.computeQuality(teams)
-	return quality
-end
 
 ###############################################################
 ######################### Other Debug Funct ######################### -- Xinnony
 
-function joinMyTables(t1, t2)
-	t3 = {}
-	for k,v in ipairs(t1) do
-		table.insert(t3, v)
-		--print(v)
-	end
-	for k,v in ipairs(t2) do
-		table.insert(t3, v)
-		--print(v)
-	end
-	return t3
-end
-
-function round(num, idp)
-	local mult = 10^(idp or 0)
-	return math.floor(num * mult + 0.5) / mult
-end
-
 function table_print (tt, indent, done)
-	done = done or {}
-	indent = indent or 0
-	if type(tt) == "table" then
-		local sb = {}
-		for key, value in pairs (tt) do
-			table.insert(sb, string.rep (" ", indent)) -- indent it
-			if type (value) == "table" and not done [value] then
-				done [value] = true
-				table.insert(sb, "{\n");
-				table.insert(sb, table_print (value, indent + 2, done))
-				table.insert(sb, string.rep (" ", indent)) -- indent it
-				table.insert(sb, "}\n");
-			elseif "number" == type(key) then
-				table.insert(sb, string.format("\"%s\"\n", tostring(value)))
-			else
-				table.insert(sb, string.format("%s = \"%s\"\n", tostring (key), tostring(value)))
-			end
-		end
-		return table.concat(sb)
-	else
-		return tt .. "\n"
-	end
+  done = done or {}
+  indent = indent or 0
+  if type(tt) == "table" then
+    local sb = {}
+    for key, value in pairs (tt) do
+      table.insert(sb, string.rep (" ", indent)) -- indent it
+      if type (value) == "table" and not done [value] then
+        done [value] = true
+        table.insert(sb, "{\n");
+        table.insert(sb, table_print (value, indent + 2, done))
+        table.insert(sb, string.rep (" ", indent)) -- indent it
+        table.insert(sb, "}\n");
+      elseif "number" == type(key) then
+        table.insert(sb, string.format("\"%s\"\n", tostring(value)))
+      else
+        table.insert(sb, string.format(
+            "%s = \"%s\"\n", tostring (key), tostring(value)))
+       end
+    end
+    return table.concat(sb)
+  else
+    return tt .. "\n"
+  end
 end
 
 function to_string( tbl )

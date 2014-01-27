@@ -2767,7 +2767,6 @@ Unit = Class(moho.unit_methods) {
     OnWorkBegin = function(self, work)
         local unitEnhancements = import('/lua/enhancementcommon.lua').GetEnhancements(self:GetEntityId())
         local tempEnhanceBp = self:GetBlueprint().Enhancements[work]
-		local UpgradeRestricted = false
         
 		-- Check if the Enhance is Restricted -- Xinnony
 		LOG('CreateEnhancement work:'..tostring(work)) --bp = {table}
@@ -2779,19 +2778,14 @@ Unit = Class(moho.unit_methods) {
 					for kk, cat in restrictedUnits[restriction].enhancement do
 						--LOG('2 : '..cat) -- Teleporter
 						if work == cat then -- if Teleporter == Teleporter
-							UpgradeRestricted = true
 							--LOG('Enhancement removed !')
-							--self:OnWorkEnd(work)
-							self.WorkItemBuildCostEnergy = 0
-							self.WorkItemBuildCostMass = 0
-							self.WorkItemBuildTime = 0
-							self.WorkProgress = 0
+							self:OnWorkEnd(work)
+							self.WorkProgress = 1
 							--self:SetWorkProgress(1)
-							--
 							--self:SetActiveConsumptionInactive()
-							--self:PlayUnitSound('EnhanceFail')
-							--self:StopUnitAmbientSound('EnhanceLoop')
-							self:ClearWork()
+							--#self:PlayUnitSound('EnhanceEnd')
+							--#self:ClearWork()
+							--ChangeState(self, self.IdleState)
 							--self:CleanupEnhancementEffects()
 							return false
 						end
@@ -2800,7 +2794,7 @@ Unit = Class(moho.unit_methods) {
 			end
 		end
 		
-		if tempEnhanceBp.Prerequisite and UpgradeRestricted == false then
+		if tempEnhanceBp.Prerequisite then
             if unitEnhancements[tempEnhanceBp.Slot] != tempEnhanceBp.Prerequisite then
                 error('*ERROR: Ordered enhancement does not have the proper prereq!', 2)
                 return false
