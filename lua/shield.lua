@@ -285,7 +285,7 @@ Shield = Class(moho.shield_methods,Entity) {
                 #self:SpillOverDmgDBUnregister(DBkey)
 
             # do overspill damage
-            elseif self.SpillOverDmgMod > 0 then
+            elseif self.SpillOverDmgMod > 0 and instigator and instigator.GetPosition then
                 local vect = Util.GetDirectionVector( instigator:GetPosition(), self:GetCachePosition() )
                 #LOG('*DEBUG: AdjacentBubbleShieldDamageSpillOverThread dealing damage: '..repr(dmg * dmgMod))
                 self:OnDamage(instigator, dmg * self.SpillOverDmgMod, vect, 'ShieldSpillOver' )
