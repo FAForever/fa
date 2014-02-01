@@ -91,6 +91,7 @@ Prop = Class(moho.prop_methods, Entity) {
 
     Destroy = function(self)
         self.DestroyCalled = true
+        Entity.Destroy(self)
     end,
 		
     OnDestroy = function(self)
