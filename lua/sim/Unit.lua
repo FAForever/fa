@@ -2260,7 +2260,7 @@ Unit = Class(moho.unit_methods) {
 
         # Added by Brute51 for unit enhancement presets
         if bp.EnhancementPresetAssigned then
-            self:CreatePresetEnhancements()
+            self:ForkThread(self.CreatePresetEnhancementsThread)
         end
     end,
 
@@ -2351,20 +2351,21 @@ Unit = Class(moho.unit_methods) {
     end,
 
     CreatePresetEnhancements = function(self)
-        # Creating the preset enhancements on SCUs after they've been constructed. Delaying this by 1 tick to fix a problem where cloak and
-        # stealth enhancements work incorrectly.
-        local fn = function(self)
-            WaitTicks(1)
-            if self and not self:IsDead() then
-                local bp = self:GetBlueprint()
-                if bp.Enhancements and bp.EnhancementPresetAssigned and bp.EnhancementPresetAssigned.Enhancements then
-                    for k, v in bp.EnhancementPresetAssigned.Enhancements do
-                        self:CreateEnhancement(v)
-                    end
-                end
+        local bp = self:GetBlueprint()
+        if bp.Enhancements and bp.EnhancementPresetAssigned and bp.EnhancementPresetAssigned.Enhancements then
+            for k, v in bp.EnhancementPresetAssigned.Enhancements do
+                self:CreateEnhancement(v)
             end
         end
-        self:ForkThread(fn)
+    end,
+
+    CreatePresetEnhancementsThread = function(self)
+        # Creating the preset enhancements on SCUs after they've been constructed. Delaying this by 1 tick to fix a problem where cloak and
+        # stealth enhancements work incorrectly.
+        WaitTicks(1)
+        if self and not self:IsDead() then
+            self:CreatePresetEnhancements()
+        end
     end,
 
     ShowEnhancementBones = function(self)
