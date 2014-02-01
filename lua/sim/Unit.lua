@@ -1721,6 +1721,7 @@ Unit = Class(moho.unit_methods) {
 
 			# Create some ambient wreckage smoke
 			explosion.CreateWreckageEffects(self,prop)
+            prop.IsWreckage = true
 			return prop
 	    else
 	        return nil
@@ -2106,40 +2107,25 @@ Unit = Class(moho.unit_methods) {
             if EntityCategoryContains( categories.STRUCTURE, self) then
                 builder:ForkThread( builder.CheckFractionComplete, self )  # [159]
             end
-
-            #This whole section just breaks the rebuild bonus entirely and is NOT necessary to fix the exploid -FunkOff
-            #I may be willing to mess with this if I can find out what the heck bpUnitID is supposed to be
+            
             # this section is rebuild bonus check 2, it also requires the above IF statement to work OK [159]
-            #if builder.VerifyRebuildBonus then
-            #    builder.VerifyRebuildBonus = nil
-            #    self:ForkThread( self.CheckRebuildBonus )  # [159]
-            #end
+            if builder.VerifyRebuildBonus then
+                builder.VerifyRebuildBonus = nil
+                self:ForkThread( self.CheckRebuildBonus )  # [159]
+            end
         end
     end,
 	
+	
     GetRebuildBonus = function(self, rebuildUnitBP)
-        #LOG('getrebuildbonus')
-        # here 'self' is the engineer building the structure
-        self.InitialFractionComplete = 0.5
-        self.VerifyRebuildBonus = true    # rebuild bonus check 2 [159]
-        --self.IAmBuildingSomethingWithReBuildBonus = true
-        --self:ForkThread(self.DefeatTheExploit)
-        return self.InitialFractionComplete
+		# here 'self' is the engineer building the structure
+		self.InitialFractionComplete = 0.5
+		self.VerifyRebuildBonus = true    # rebuild bonus check 2 [159]
+	return self.InitialFractionComplete
+
     end,
 
-    DefeatTheExploit = function(self)
-        #LOG('start isUnitMoving is ' .. repr(self:IsMoving()))
-        #LOG('defeattheexploit')
-        #self:SetUnSelectable(true)
-        WaitTicks(5)
-        while self:IsMoving() do  #while is new
-            WaitTicks(5)
-        end
-        self.IAmBuildingSomethingWithReBuildBonus = false
-        #self:SetUnSelectable(false)
-        #LOG('end isUnitMoving is ' .. repr(self:IsMoving()))
-    end,
-
+   
     CheckFractionComplete = function(self, unitBeingBuilt, threadCount)
         # rebuild bonus check 1 [159]
         # This code checks if the unit is allowed to be accelerate-built. If not the unit is destroyed (for lack 
