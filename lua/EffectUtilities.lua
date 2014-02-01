@@ -1862,8 +1862,10 @@ function PlayTeleportInEffects(unit, EffectsBag)
                 local MeshExtentsY = (bp.Physics.MeshExtentsY or 1)
 
                 CreateLightParticle( unit, -1, army, 4, 10, 'glow_03', 'ramp_yellow_01' )
-                unit:HideBone(0, true)
                 DamageArea(unit, unit:GetPosition(), 9, 1, 'Force', true)
+
+                unit.TeleportFx_IsInvisible = true
+                unit:HideBone(0, true)
 
                 WaitSeconds(0.2)
 
@@ -1875,6 +1877,7 @@ function PlayTeleportInEffects(unit, EffectsBag)
 
                 unit:ShowBone(0, true)
                 unit:ShowEnhancementBones()
+                unit.TeleportFx_IsInvisible = false
 
                 local totalBones = unit:GetBoneCount() - 1
                 for k, v in EffectTemplate.UnitTeleportSteam01 do
@@ -1885,7 +1888,9 @@ function PlayTeleportInEffects(unit, EffectsBag)
             end
 
             local thread = unit:ForkThread(fn)
-            EffectsBag:Add(thread)
+            # Don't add this thread to the effects bag or the unit might be manipulated into becoming invisible: thread is deleted before it
+            # can make the unit visible again.
+            #EffectsBag:Add(thread)
 
         elseif faction == 'Cybran' then
 
@@ -1894,8 +1899,6 @@ function PlayTeleportInEffects(unit, EffectsBag)
                 pos[2] = pos[2] + Yoffset
                 unit.TeleportCybranSphere = TeleportCreateCybranSphere(unit, pos)
             end
-
-            unit:HideBone(0, true)
 
             local templ = unit.TeleportInFxOverride or EffectTemplate.CybranTeleportIn01
             local scale = unit.TeleportCybranSphereScale or 5
@@ -1911,10 +1914,14 @@ function PlayTeleportInEffects(unit, EffectsBag)
 
             local fn = function(unit)
 
+                unit.TeleportFx_IsInvisible = true
+                unit:HideBone(0, true)
+
                 WaitSeconds(0.3)
 
                 unit:ShowBone(0, true)
                 unit:ShowEnhancementBones()
+                unit.TeleportFx_IsInvisible = false
 
                 WaitSeconds(0.8)
 
@@ -1932,7 +1939,9 @@ function PlayTeleportInEffects(unit, EffectsBag)
             end
 
             local thread = unit:ForkThread(fn)
-            EffectsBag:Add(thread)
+            # Don't add this thread to the effects bag or the unit might be manipulated into becoming invisible: thread is deleted before it
+            # can make the unit visible again.
+            #EffectsBag:Add(thread)
 
         elseif faction == 'Seraphim' then
 
@@ -1941,6 +1950,7 @@ function PlayTeleportInEffects(unit, EffectsBag)
                 local bp = unit:GetBlueprint()
                 local Yoffset = TeleportGetUnitYOffset(unit)
 
+                unit.TeleportFx_IsInvisible = true
                 unit:HideBone(0, true)
 
                 local templ = unit.TeleportInFxOverride or EffectTemplate.SeraphimTeleportIn01
@@ -1959,6 +1969,7 @@ function PlayTeleportInEffects(unit, EffectsBag)
 
                 unit:ShowBone(0, true)
                 unit:ShowEnhancementBones()
+                unit.TeleportFx_IsInvisible = false
 
                 WaitSeconds (0.25)
 
@@ -1968,7 +1979,9 @@ function PlayTeleportInEffects(unit, EffectsBag)
             end
 
             local thread = unit:ForkThread(fn)
-            EffectsBag:Add(thread)
+            # Don't add this thread to the effects bag or the unit might be manipulated into becoming invisible: thread is deleted before it
+            # can make the unit visible again.
+            #EffectsBag:Add(thread)
 
         else  # Aeon or other factions
 
