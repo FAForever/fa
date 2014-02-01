@@ -967,13 +967,13 @@ Unit = Class(moho.unit_methods) {
 
     OnStopReclaim = function(self, target)
         self:DoUnitCallbacks('OnStopReclaim', target)
-		self:StopReclaimEffects(target)
-		self:StopUnitAmbientSound('ReclaimLoop')
-		self:PlayUnitSound('StopReclaim')
+        self:StopReclaimEffects(target)
+        self:StopUnitAmbientSound('ReclaimLoop')
+        self:PlayUnitSound('StopReclaim')
     end,
 
     StartReclaimEffects = function( self, target )
-		self.ReclaimEffectsBag:Add( self:ForkThread( self.CreateReclaimEffects, target ) )
+        self.ReclaimEffectsBag:Add( self:ForkThread( self.CreateReclaimEffects, target ) )
     end,
 
     CreateReclaimEffects = function( self, target )
@@ -983,7 +983,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     StopReclaimEffects = function( self, target )
-		self.ReclaimEffectsBag:Destroy()
+        self.ReclaimEffectsBag:Destroy()
     end,
 
     OnDecayed = function(self)
@@ -1681,10 +1681,6 @@ Unit = Class(moho.unit_methods) {
 			    pos[2] = GetSurfaceHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
 			end
 
-			
-			
-			
-			
 			local prop = CreateProp( pos, wreck )
 
 			# We make sure keep only a bounded list of wreckages around so we don't get into perf issues when
@@ -1852,10 +1848,10 @@ Unit = Class(moho.unit_methods) {
             self.BuildEffectsBag:Destroy()
         end
         if self.CaptureEffectsBag then
-			self.CaptureEffectsBag:Destroy()
-		end
+            self.CaptureEffectsBag:Destroy()
+        end
         if self.ReclaimEffectsBag then
-			self.ReclaimEffectsBag:Destroy()
+            self.ReclaimEffectsBag:Destroy()
         end
         if self.OnBeingBuiltEffectsBag then
             self.OnBeingBuiltEffectsBag:Destroy()
@@ -3453,20 +3449,20 @@ Unit = Class(moho.unit_methods) {
 
     OnStartRefueling = function(self)
         self:PlayUnitSound('Refueling')
-		        #added by brute51
+        #added by brute51
         self:DoUnitCallbacks('OnStartRefueling')
     end,
 
     OnRunOutOfFuel = function(self)
         self.HasFuel = false
         self:DestroyTopSpeedEffects()
-		        #added by brute51
+        #added by brute51
         self:DoUnitCallbacks('OnRunOutOfFuel')
     end,
 
     OnGotFuel = function(self)
         self.HasFuel = true
-		        #added by brute51
+        #added by brute51
         self:DoUnitCallbacks('OnGotFuel')
     end,
 
@@ -3499,7 +3495,7 @@ Unit = Class(moho.unit_methods) {
             end
             
             time = time * (self.ReclaimTimeMultiplier or 1)
-            time = math.max( (time/10), 1)  # this should never be 0 or we'll divide by 0!
+            time = math.max( (time/10), 0.0001)  # this should never be 0 or we'll divide by 0!
             return time, target_bp.Economy.BuildCostEnergy, target_bp.Economy.BuildCostMass
 
         elseif IsProp(target_entity) then
