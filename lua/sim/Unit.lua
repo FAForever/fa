@@ -287,21 +287,15 @@ Unit = Class(moho.unit_methods) {
 		
     end,
 
-	
-	getDeathVector = function(self)
-		return self.debris_Vector
-	end,
-	
-	##########################################################################################
+    getDeathVector = function(self)
+        return self.debris_Vector
+    end,
+
+    ##########################################################################################
     ## TARGET AND ATTACKERS FUNCTIONS
     ##########################################################################################
 	-- issue:#43 : better stealth
-	
-	
 
-	
-	
-	
 	-- when we fire on something, we tell that unit that we attack it.
 	OnGotTarget = function(self, Weapon)
 		local Target = Weapon:GetCurrentTarget()
@@ -311,7 +305,6 @@ Unit = Class(moho.unit_methods) {
 			--LOG("adding this unit in our list of attack")
 			self:addTargetWeapon(Target)
 		end
-	
 	end,
 	
 	-- we lost focus, so we remove this unit from the list of threat
@@ -454,8 +447,6 @@ Unit = Class(moho.unit_methods) {
 			table.insert(self.WeaponTargets, target)
 		end
 	end,
-	
-	
 	
 	-- Add a target to the list for this unit
 	addTarget = function(self, target)
@@ -2274,10 +2265,10 @@ Unit = Class(moho.unit_methods) {
     end,
 
     StartBeingBuiltEffects = function(self, builder, layer)
-		local BuildMeshBp = self:GetBlueprint().Display.BuildMeshBlueprint
-		if BuildMeshBp then
-			self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
-		end
+        local BuildMeshBp = self:GetBlueprint().Display.BuildMeshBlueprint
+        if BuildMeshBp then
+            self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
+        end
     end,
 
     StopBeingBuiltEffects = function(self, builder, layer)
@@ -2360,12 +2351,20 @@ Unit = Class(moho.unit_methods) {
     end,
 
     CreatePresetEnhancements = function(self)
-        local bp = self:GetBlueprint()
-        if bp.Enhancements and bp.EnhancementPresetAssigned and bp.EnhancementPresetAssigned.Enhancements then
-            for k, v in bp.EnhancementPresetAssigned.Enhancements do
-                self:CreateEnhancement(v)
+        # Creating the preset enhancements on SCUs after they've been constructed. Delaying this by 1 tick to fix a problem where cloak and
+        # stealth enhancements work incorrectly.
+        local fn = function(self)
+            WaitTicks(1)
+            if self and not self:IsDead() then
+                local bp = self:GetBlueprint()
+                if bp.Enhancements and bp.EnhancementPresetAssigned and bp.EnhancementPresetAssigned.Enhancements then
+                    for k, v in bp.EnhancementPresetAssigned.Enhancements do
+                        self:CreateEnhancement(v)
+                    end
+                end
             end
         end
+        self:ForkThread(fn)
     end,
 
     ShowEnhancementBones = function(self)
