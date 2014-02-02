@@ -97,7 +97,7 @@ UnitBlueprint {
             },
         },
         AnimationWalk = '/units/xel0305/xel0305_awalk.sca',
-        AnimationWalkRate = 2,
+        AnimationWalkRate = 3,
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {

@@ -1,0 +1,12 @@
+MeshBlueprint {
+    LODs = {
+        {
+            MeshName = '/effects/Entities/Sphere01/Sphere01_lod0.scm',
+            AlbedoName = '/effects/Entities/CybranPhalanxSphere01/CybranPhalanxSphere02_Albedo.dds',
+            NormalsName = '/effects/Entities/CybranPhalanxSphere01/CybranPhalanxSphere01_Normals.dds',
+            ShaderName = 'NukeEMP',
+            LODCutoff = 200,
+        },
+    },
+    SortOrder = 999,
+}

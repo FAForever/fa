@@ -190,10 +190,10 @@ UnitBlueprint {
         UniformScale = 0.07,
     },
     Economy = {
-        BuildCostEnergy = 3150,
-        BuildCostMass = 490,
+        BuildCostEnergy = 2200,
+        BuildCostMass = 440,
         BuildRate = 40,
-        BuildTime = 2100,
+        BuildTime = 2200,
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER AEON',
         },

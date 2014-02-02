@@ -274,9 +274,12 @@ XSL0001 = Class( SWalkingLandUnit ) {
     end,
 
     RegenBuffThread = function(self)
+        local bp = self:GetBlueprint().Enhancements.RegenAura
+        local unitCat = ParseEntityCategory( bp.UnitCategory or 'BUILTBYTIER3FACTORY + BUILTBYQUANTUMGATE + NEEDMOBILEBUILD')
+
         while not self:IsDead() do
             #Get friendly units in the area (including self)
-            local units = AIUtils.GetOwnUnitsAroundPoint(self:GetAIBrain(), categories.BUILTBYTIER3FACTORY + categories.BUILTBYQUANTUMGATE + categories.NEEDMOBILEBUILD, self:GetPosition(), self:GetBlueprint().Enhancements.RegenAura.Radius)
+            local units = AIUtils.GetOwnUnitsAroundPoint(self:GetAIBrain(), unitCat, self:GetPosition(), bp.Radius)
             
             #Give them a 5 second regen buff
             for _,unit in units do
@@ -289,9 +292,12 @@ XSL0001 = Class( SWalkingLandUnit ) {
     end,
        
     AdvancedRegenBuffThread = function(self)
+        local bp = self:GetBlueprint().Enhancements.AdvancedRegenAura
+        local unitCat = ParseEntityCategory( bp.UnitCategory or 'BUILTBYTIER3FACTORY + BUILTBYQUANTUMGATE + NEEDMOBILEBUILD')
+
         while not self:IsDead() do
             #Get friendly units in the area (including self)
-            local units = AIUtils.GetOwnUnitsAroundPoint(self:GetAIBrain(), categories.BUILTBYTIER3FACTORY + categories.BUILTBYQUANTUMGATE + categories.NEEDMOBILEBUILD, self:GetPosition(), self:GetBlueprint().Enhancements.AdvancedRegenAura.Radius)
+            local units = AIUtils.GetOwnUnitsAroundPoint(self:GetAIBrain(), unitCat, self:GetPosition(), bp.Radius)
             
             #Give them a 5 second regen buff
             for _,unit in units do
@@ -310,8 +316,8 @@ XSL0001 = Class( SWalkingLandUnit ) {
         
         # Regenerative Aura
         if enh == 'RegenAura' then
-            local bp = self:GetBlueprint().Enhancements[enh]
-            if not Buffs['SeraphimACURegenAura'] then
+
+            if not Buffs['SeraphimACURegenAura'] then   # AURA BUFF
                 BuffBlueprint {
                     Name = 'SeraphimACURegenAura',
                     DisplayName = 'SeraphimACURegenAura',
@@ -327,9 +333,24 @@ XSL0001 = Class( SWalkingLandUnit ) {
                         },
                     },
                 }
-                
             end
-                
+            if not Buffs['SeraphimACURegenAuraSelfBuff'] then   # AURA SELF BUFF
+                BuffBlueprint {
+                    Name = 'SeraphimACURegenAuraSelfBuff',
+                    DisplayName = 'SeraphimACURegenAuraSelfBuff',
+                    BuffType = 'COMMANDERAURAFORSELF',
+                    Stacks = 'REPLACE',
+                    Duration = -1,
+                    Affects = {
+                        MaxHealth = {
+                            Add = bp.ACUAddHealth or 0,
+                            Mult = 1,
+                        },
+                    },
+                }
+            end
+
+            Buff.ApplyBuff(self, 'SeraphimACURegenAuraSelfBuff')
             table.insert( self.ShieldEffectsBag, CreateAttachedEmitter( self, 'XSL0001', self:GetArmy(), '/effects/emitters/seraphim_regenerative_aura_01_emit.bp' ) )
             self.RegenThreadHandle = self:ForkThread(self.RegenBuffThread)
                         
@@ -341,6 +362,7 @@ XSL0001 = Class( SWalkingLandUnit ) {
 		        self.ShieldEffectsBag = {}
 		    end
             KillThread(self.RegenThreadHandle)
+            Buff.RemoveBuff(self, 'SeraphimACURegenAuraSelfBuff')
             
         elseif enh == 'AdvancedRegenAura' then
             if self.RegenThreadHandle then
@@ -353,9 +375,9 @@ XSL0001 = Class( SWalkingLandUnit ) {
                 KillThread(self.RegenThreadHandle)
                 
             end
-            
-            local bp = self:GetBlueprint().Enhancements[enh]
-            if not Buffs['SeraphimAdvancedACURegenAura'] then
+            Buff.RemoveBuff(self, 'SeraphimACURegenAuraSelfBuff')
+
+            if not Buffs['SeraphimAdvancedACURegenAura'] then   # AURA BUFF
                 BuffBlueprint {
                     Name = 'SeraphimAdvancedACURegenAura',
                     DisplayName = 'SeraphimAdvancedACURegenAura',
@@ -377,10 +399,26 @@ XSL0001 = Class( SWalkingLandUnit ) {
                     },
                 }
             end
-            
+            if not Buffs['SeraphimACUAdvancedRegenAuraSelfBuff'] then   # AURA SELF BUFF
+                BuffBlueprint {
+                    Name = 'SeraphimACUAdvancedRegenAuraSelfBuff',
+                    DisplayName = 'SeraphimACUAdvancedRegenAuraSelfBuff',
+                    BuffType = 'COMMANDERAURAFORSELF',
+                    Stacks = 'REPLACE',
+                    Duration = -1,
+                    Affects = {
+                        MaxHealth = {
+                            Add = bp.ACUAddHealth or 0,
+                            Mult = 1,
+                        },
+                    },
+                }
+            end
+
             table.insert( self.ShieldEffectsBag, CreateAttachedEmitter( self, 'XSL0001', self:GetArmy(), '/effects/emitters/seraphim_regenerative_aura_01_emit.bp' ) )
             self.AdvancedRegenThreadHandle = self:ForkThread(self.AdvancedRegenBuffThread)
-            
+            Buff.ApplyBuff(self, 'SeraphimACUAdvancedRegenAuraSelfBuff')
+
         elseif enh == 'AdvancedRegenAuraRemove' then
             if self.ShieldEffectsBag then
                 for k, v in self.ShieldEffectsBag do
@@ -389,7 +427,9 @@ XSL0001 = Class( SWalkingLandUnit ) {
 		        self.ShieldEffectsBag = {}
 		    end
             KillThread(self.AdvancedRegenThreadHandle)
-            
+            Buff.RemoveBuff(self, 'SeraphimACURegenAuraSelfBuff')
+            Buff.RemoveBuff(self, 'SeraphimACUAdvancedRegenAuraSelfBuff')
+
         #Resource Allocation
         elseif enh == 'ResourceAllocation' then
             local bp = self:GetBlueprint().Enhancements[enh]

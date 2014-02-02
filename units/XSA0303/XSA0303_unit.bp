@@ -108,10 +108,10 @@ UnitBlueprint {
     CollisionOffsetZ = -0.2,
     Defense = {
         AirThreatLevel = 9,
-        ArmorType = 'Light',
+        ArmorType = 'ASF', # Light
         EconomyThreatLevel = 0,
-        Health = 1800,
-        MaxHealth = 1800,
+        Health = 1775,
+        MaxHealth = 1775,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -279,7 +279,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 135,
+            Damage = 405, # 135
             DamageFriendly = false,
             DamageType = 'Normal',
             DisplayName = 'Losaare AA Autocannon',
@@ -287,15 +287,15 @@ UnitBlueprint {
                 Air = 'Air|Land',
                 Land = 'Air|Land',
             },
-            FiringTolerance = 0,
+            FiringTolerance = 2, # 0
             Label = 'AutoCannon1',
             MaxRadius = 30,
-            MuzzleSalvoDelay = 0.1,
-            MuzzleSalvoSize = 3,
+            MuzzleSalvoDelay = 0, # 0.1
+            MuzzleSalvoSize = 1, # 3
             MuzzleVelocity = 120,
             ProjectileId = '/projectiles/SAALosaareAutoCannon01/SAALosaareAutoCannon01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
-            ProjectilesPerOnFire = 3,
+            ProjectilesPerOnFire = 1, # 3
             RackBones = {
                 {
                     MuzzleBones = {
@@ -315,7 +315,7 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.3,
+            TargetCheckInterval = 0.5, # 0.3
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'AIR MOBILE HIGHPRIAIR',
@@ -327,7 +327,7 @@ UnitBlueprint {
                 'SPECIALLOWPRI',
                 'ALLUNITS',
             },
-            TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
+            TargetRestrictDisallow = 'UNTARGETABLE,LAND,POD,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
             TrackingRadius = 0,
             TurretBoneMuzzle = 'Muzzle',

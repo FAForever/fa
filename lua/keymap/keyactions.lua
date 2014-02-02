@@ -279,6 +279,8 @@ keyActions = {
         category = 'ui', order = 1,},
     ['create_build_template'] = {action = 'UI_Lua import("/lua/ui/game/build_templates.lua").CreateBuildTemplate()',
         category = 'selection', order = 100},
+    ['show_objective_screen'] = {action = 'UI_Lua import("/lua/ui/game/objectiveDetail.lua").ToggleDisplay()',
+        category = 'ui', order = 23},
 }
     
 debugKeyActions = {    

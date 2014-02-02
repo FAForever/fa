@@ -19,14 +19,12 @@ armordefinition = {
         # Armor Definition
         'Normal 1.0',
     },
-
     {   # Armor Type Name
         'Normal',
 
         # Armor Definition
         'Normal 1.0',
     },
-
     {   # Armor Type Name
         'Light',
 
@@ -62,6 +60,14 @@ armordefinition = {
         
         # Armor Definition
         'Normal 1.0',        
-		'FireBeetleExplosion 0.0',        
+        'FireBeetleExplosion 0.0',        
+    },
+    {
+        # Armor Type name
+        'ASF',
+        
+        # Armor Definition
+        'Normal 1.0',        
+        'CzarBeam 0.25',   
     },
 }

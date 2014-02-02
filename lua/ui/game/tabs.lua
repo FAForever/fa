@@ -168,13 +168,18 @@ local menus = {
         },
         gpgnet = {
             {
+                action = 'ShowGameInfos',
+                label = 'Show Game Infos',
+                tooltip = 'Show the settings of this game',
+            },
+			{
                 action = 'Options',
                 label = '<LOC _Options>',
                 tooltip = 'esc_options',
             },
             {
                 action = 'ExitMPGame',
-                label = '<LOC _Exit_to_GPGNet>Exit to GPGNet',
+                label = 'Exit to FAF',
                 tooltip = 'esc_exit',
             },
             {
@@ -257,6 +262,9 @@ local actions = {
             nil, nil,
             true,
             {escapeButton = 2, enterButton = 1, worldCover = true})
+    end,
+	ShowGameInfos = function()
+        ToggleGameInfos()
     end,
     Return = function()
         CollapseWindow()

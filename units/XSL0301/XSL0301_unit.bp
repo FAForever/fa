@@ -92,6 +92,26 @@ UnitBlueprint {
             Cue = 'XSL0301_Move_Stop',
             LodCutoff = 'UnitMove_LodCutoff',
         },
+        TeleportChargingAtDestination = Sound {
+            Bank = 'XSA',
+            Cue = 'XSA0402_Move_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TeleportChargingAtUnit = Sound {
+            Bank = 'XSB',
+            Cue = 'XSB0101_Construct_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TeleportIn = Sound {
+            Bank = 'XSB',
+            Cue = 'XSB0101_Activate',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TeleportOut = Sound {
+            Bank = 'XSB',
+            Cue = 'XSB0101_Activate',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
         UISelection = Sound {
             Bank = 'SeraphimSelect',
             Cue = 'Seraphim_Select_Commander',
@@ -129,6 +149,7 @@ UnitBlueprint {
         'SHOWQUEUE',
         'OVERLAYOMNI',
         'OVERLAYDIRECTFIRE',
+        'USEBUILDPRESETS',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -249,6 +270,22 @@ UnitBlueprint {
         },
         PlaceholderMeshName = 'UXB0000',
         SpawnRandomRotation = true,
+        TeleportEffects = {
+            ChargeFxAtUnitBones = {
+                {
+                    Bone = 'Back_Upgrade',
+                    Offset = {
+                        0,
+                        0,
+                        0.1,
+                    },
+                },
+            },
+            PlayChargeFxAtDestination = true,
+            PlayChargeFxAtUnit = true,
+            PlayTeleportOutFx = true,
+            PlayTeleportInFx = true,
+        },
         TransportAnimation = {
             {
                 Animation = '/units/XSL0301/XSL0301_afold.sca',
@@ -277,7 +314,7 @@ UnitBlueprint {
         ProductionPerSecondMass = 2,
         StorageEnergy = 500,
         StorageMass = 275,
-        TeleportEnergyMod = 2.5,
+        TeleportEnergyMod = 5.42, # 2.5
         TeleportMassMod = 0,
         TeleportTimeMod = 0.0001,
     },
@@ -320,8 +357,8 @@ UnitBlueprint {
         },
         EngineeringThroughput = {
             BuildCostEnergy = 50000,
-            BuildCostMass = 1000,
-            BuildTime = 5040,
+            BuildCostMass = 800,
+            BuildTime = 4200,
             Icon = 'efm',
             Name = '<LOC enhancements_0143>Rapid Fabricator',
             NewBuildRate = 98,
@@ -539,6 +576,74 @@ UnitBlueprint {
             Slot = 'RCH',
         },
     },
+    EnhancementPresets = {
+        AdvancedCombat = {
+            BuildIconSortPriority = 30,
+            Description = '<LOC xsl0301_AdvancedCombat_desc>Support Armored Command Unit (Advanced Combatant preset)',
+            Enhancements = {
+                'EnhancedSensors',
+                'DamageStabilization',
+                'Overcharge',
+            },
+            HelpText = '<LOC xsl0301_AdvancedCombat_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system, nano-repair system and overcharge enhancements.',
+            SortCategory = 'SORTOTHER',
+            UnitName = '<LOC xsl0301_AdvancedCombat_name>SACU (Advanced Combatant preset)',
+        },
+        Combat = {
+            BuildIconSortPriority = 15,
+            Description = '<LOC xsl0301_Combat_desc>Support Armored Command Unit (Combatant preset)',
+            Enhancements = {
+                'EnhancedSensors',
+            },
+            HelpText = '<LOC xsl0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system enhancement.',
+            SortCategory = 'SORTOTHER',
+            UnitName = '<LOC xsl0301_Combat_name>SACU (Combatant preset)',
+        },
+        Engineer = {
+            BuildIconSortPriority = 20,
+            Description = '<LOC xsl0301_Engineer_desc>Support Armored Command Unit (Engineer preset)',
+            Enhancements = {
+                'EngineeringThroughput',
+            },
+            HelpText = '<LOC xsl0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the rapid fabricator enhancement.',
+            SortCategory = 'SORTOTHER',
+            UnitName = '<LOC xsl0301_Engineer_name>SACU (Engineer preset)',
+        },
+        Missile = {
+            BuildIconSortPriority = 40,
+            Description = '<LOC xsl0301_Missile_desc>Support Armored Command Unit (Missile preset)',
+            Enhancements = {
+                'EngineeringThroughput',
+                'Missile',
+            },
+            HelpText = '<LOC xsl0301_Missile_help>Support Armored Command Unit. Enhanced during construction with the tactical missile launcher and rapid fabricator enhancements.',
+            SortCategory = 'SORTOTHER',
+            UnitName = '<LOC xsl0301_Missile_name>SACU (Missile preset)',
+        },
+        NanoCombat = {
+            BuildIconSortPriority = 25,
+            Description = '<LOC xsl0301_NanoCombat_desc>Support Armored Command Unit (Nano Combatant preset)',
+            Enhancements = {
+                'EnhancedSensors',
+                'DamageStabilization',
+            },
+            HelpText = '<LOC xsl0301_NanoCombat_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system and nano-repair system enhancements.',
+            SortCategory = 'SORTOTHER',
+            UnitName = '<LOC xsl0301_NanoCombat_name>SACU (Nano Combatant preset)',
+        },
+        Rambo = {
+            BuildIconSortPriority = 35,
+            Description = '<LOC xsl0301_Rambo_desc>Support Armored Command Unit (Rambo preset)',
+            Enhancements = {
+                'Overcharge',
+                'Shield',
+                'DamageStabilization',
+            },
+            HelpText = '<LOC xsl0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with the personal shield generator, nano-repair system and overcharge enhancements.',
+            SortCategory = 'SORTOTHER',
+            UnitName = '<LOC xsl0301_Rambo_name>SACU (Rambo preset)',
+        },
+    },
     General = {
         BuildBones = {
             AimBone = 'Left_Arm_Muzzle',
@@ -630,11 +735,11 @@ UnitBlueprint {
         TransportClass = 3,
     },
     Veteran = {
-        Level1 = 20,
+        Level1 = 25,
         Level2 = 50,
-        Level3 = 90,
-        Level4 = 140,
-        Level5 = 200,
+        Level3 = 75,
+        Level4 = 100,
+        Level5 = 125,
     },
     Weapon = {
         {
@@ -878,6 +983,18 @@ UnitBlueprint {
             WeaponCategory = 'Missile',
             WeaponRepackTimeout = 5,
             WeaponUnpacks = true,
+        },
+        {
+            Damage = 100,
+            DamageFriendly = true,
+            DamageRadius = 4,
+            DamageType = 'Normal',
+            DisplayName = 'Teleport in',
+            DummyWeapon = true,
+            Label = 'TeleportWeapon',
+            MaxRadius = 1,
+            RateOfFire = 1,
+            WeaponCategory = 'Teleport',
         },
     },
 }

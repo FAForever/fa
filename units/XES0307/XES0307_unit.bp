@@ -274,7 +274,7 @@ UnitBlueprint {
             FireTargetLayerCapsTable = {
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 2,
+            FiringTolerance = 0,				#2
             Label = 'HiroCannonFront',
             MaxRadius = 80,
             MuzzleChargeDelay = 0,
@@ -301,7 +301,7 @@ UnitBlueprint {
             RateOfFire = 0.15,
             SlavedToBody = true,
             SlavedToBodyArcRange = 135,
-            TargetCheckInterval = 1,
+            TargetCheckInterval = 0.8,				#1
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'NAVAL MOBILE',
@@ -321,6 +321,7 @@ UnitBlueprint {
             TurretYawRange = 140,
             TurretYawSpeed = 90,
             Turreted = true,
+	    UseFiringSolutionInsteadOfAimBone = true,		#Added
             WeaponCategory = 'Direct Fire Naval',
             WeaponRepackTimeout = 2,
             WeaponUnpacks = false,
@@ -350,7 +351,7 @@ UnitBlueprint {
             FireTargetLayerCapsTable = {
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 2,
+            FiringTolerance = 0,				#2
             Label = 'HiroCannonBack',
             MaxRadius = 80,
             MuzzleChargeDelay = 0,
@@ -377,7 +378,7 @@ UnitBlueprint {
             RateOfFire = 0.15,
             SlavedToBody = true,
             SlavedToBodyArcRange = 135,
-            TargetCheckInterval = 1,
+            TargetCheckInterval = 0.8,				#1
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'NAVAL MOBILE',
@@ -397,6 +398,7 @@ UnitBlueprint {
             TurretYawRange = 140,
             TurretYawSpeed = 90,
             Turreted = true,
+	    UseFiringSolutionInsteadOfAimBone = true,		#Added
             WeaponCategory = 'Direct Fire Naval',
             WeaponRepackTimeout = 2,
             WeaponUnpacks = false,

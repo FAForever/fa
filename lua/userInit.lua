@@ -86,3 +86,10 @@ IN_ClearKeyMap()
 
 -- Add back all mapped keys and user prefs (FA Version)
 IN_AddKeyMapTable(import('/lua/keymap/keymapper.lua').GetKeyMappings(true))
+
+--Key binding for objectives key (F12).
+--(only rebind if not in use)
+local keyMap_FAFCustom = import('/lua/keymap/keymapper.lua')
+if not keyMap_FAFCustom.IsKeyInMap('F12', keyMap_FAFCustom.GetCurrentKeyMap()) then
+    keyMap_FAFCustom.SetUserKeyMapping('F12', '', 'show_objective_screen')
+end

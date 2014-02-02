@@ -127,6 +127,7 @@ UnitBlueprint {
         'SHOWQUEUE',
         'OVERLAYOMNI',
         'OVERLAYDIRECTFIRE',
+        'USEBUILDPRESETS',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -466,8 +467,8 @@ UnitBlueprint {
         },
         Switchback = {
             BuildCostEnergy = 50000,
-            BuildCostMass = 1000,
-            BuildTime = 5040,
+            BuildCostMass = 800,
+            BuildTime = 4200,
             Icon = 'ses',
             Name = '<LOC enhancements_0109>Rapid Fabricator',
             NewBuildRate = 98,
@@ -488,6 +489,73 @@ UnitBlueprint {
                 'SwitchbackRemove',
             },
             Slot = 'LCH',
+        },
+    },
+    EnhancementPresets = {
+        AntiAir = {
+            BuildIconSortPriority = 45,
+            Description = '<LOC url0301_AntiAir_desc>Support Armored Command Unit (Anti-Air preset)',
+            Enhancements = {
+                'NaniteMissileSystem',
+            },
+            HelpText = '<LOC url0301_AntiAir_help>Support Armored Command Unit. Enhanced during construction with the nanite missile system enhancement.',
+            SortCategory = 'SORTOTHER',
+            UnitName = '<LOC url0301_AntiAir_name>SACU (Anti-Air preset)',
+        },
+        Cloak = {
+            BuildIconSortPriority = 35,
+            Description = '<LOC url0301_Cloak_desc>Support Armored Command Unit (Cloak preset)',
+            Enhancements = {
+                'FocusConvertor',
+                'StealthGenerator',
+                'CloakingGenerator',
+            },
+            HelpText = '<LOC url0301_Cloak_help>Support Armored Command Unit. Enhanced during construction with the personal cloaking generator and disintegrator amplifier enhancements.',
+            SortCategory = 'SORTOTHER',
+            UnitName = '<LOC url0301_Cloak_name>SACU (Cloak preset)',
+        },
+        Combat = {
+            BuildIconSortPriority = 15,
+            Description = '<LOC url0301_Combat_desc>Support Armored Command Unit (Combatant preset)',
+            Enhancements = {
+                'EMPCharge',
+                'FocusConvertor',
+            },
+            HelpText = '<LOC url0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the EMP burst and disintegrator amplifier enhancements.',
+            SortCategory = 'SORTOTHER',
+            UnitName = '<LOC url0301_Combat_name>SACU (Combatant preset)',
+        },
+        Engineer = {
+            BuildIconSortPriority = 20,
+            Description = '<LOC url0301_Engineer_desc>Support Armored Command Unit (Engineer preset)',
+            Enhancements = {
+                'Switchback',
+            },
+            HelpText = '<LOC url0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the rapid fabricator enhancement.',
+            SortCategory = 'SORTOTHER',
+            UnitName = '<LOC url0301_Engineer_name>SACU (Engineer preset)',
+        },
+        Rambo = {
+            BuildIconSortPriority = 25,
+            Description = '<LOC url0301_Rambo_desc>Support Armored Command Unit (Rambo preset)',
+            Enhancements = {
+                'EMPCharge',
+                'FocusConvertor',
+                'SelfRepairSystem',
+            },
+            HelpText = '<LOC url0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with the EMP burst, disintegrator amplifier and nano-repair system enhancements.',
+            SortCategory = 'SORTOTHER',
+            UnitName = '<LOC url0301_Rambo_name>SACU (Rambo preset)',
+        },
+        Stealth = {
+            BuildIconSortPriority = 30,
+            Description = 'url0301_Stealth_desc>Support Armored Command Unit (Stealth preset)',
+            Enhancements = {
+                'StealthGenerator',
+            },
+            HelpText = '<LOC url0301_Stealth_help>Support Armored Command Unit. Enhanced during construction with the personal stealth generator enhancement.',
+            SortCategory = 'SORTOTHER',
+            UnitName = '<LOC url0301_Stealth_name>SACU (Stealth preset)',
         },
     },
     General = {
@@ -579,11 +647,11 @@ UnitBlueprint {
         TransportClass = 3,
     },
     Veteran = {
-        Level1 = 20,
+        Level1 = 25,
         Level2 = 50,
-        Level3 = 90,
-        Level4 = 140,
-        Level5 = 200,
+        Level3 = 75,
+        Level4 = 100,
+        Level5 = 125,
     },
     Weapon = {
         {
@@ -607,7 +675,7 @@ UnitBlueprint {
                     Duration = 4,
                     Radius = 3,
                     TargetAllow = 'MOBILE',
-                    TargetDisallow = 'EXPERIMENTAL,COMMAND,SUBCOMMANDER',
+                    TargetDisallow = 'EXPERIMENTAL,SUBCOMMANDER,COMMAND,WALL',
                 },
             },
             ChargeDelay = 0.5,
@@ -684,6 +752,7 @@ UnitBlueprint {
             CannotAttackGround = true,
             CollideFriendly = false,
             Damage = 300,
+            DamageRadius = 1.5,
             DamageType = 'Normal',
             DisplayName = 'Nanite Missile System',
             EffectiveRadius = 0,
@@ -702,8 +771,8 @@ UnitBlueprint {
             MuzzleSalvoSize = 3,
             MuzzleVelocity = 30,
             ProjectileId = '/projectiles/CAAMissileNanite02/CAAMissileNanite02_proj.bp',
-            ProjectileLifetime = 3,
-            ProjectilesPerOnFire = 4,
+            ProjectileLifetime = 5,
+            ProjectilesPerOnFire = 3,
             RackBones = {
                 {
                     MuzzleBones = {
