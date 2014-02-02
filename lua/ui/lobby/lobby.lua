@@ -3009,7 +3009,7 @@ function CreateUI(maxPlayers)
     UIUtil.CreateVertScrollbarFor2(GUI.OptionContainer, 1, nil, -9, -24)
 
     if singlePlayer then
-        GUI.loadButton = UIUtil.CreateButtonStd(GUI.optionsPanel, '/scx_menu/small-btn/small',"<LOC lobui_0176>Load", 18, 2)
+        GUI.loadButton = UIUtil.CreateButtonStd2PNG(GUI.optionsPanel, '/BUTTON/small/',"<LOC lobui_0176>Load", 18, 2)
             LayoutHelpers.LeftOf(GUI.loadButton, GUI.launchGameButton, 10)
             LayoutHelpers.AtVerticalCenterIn(GUI.loadButton, GUI.launchGameButton)
             GUI.loadButton.OnClick = function(self, modifiers)
@@ -5943,12 +5943,13 @@ function ForceApplyNewSkin()
     -- Restricted Unit show only if not you Host, else Preset Lobby is show.
 	-- Now if is Host, is a Preset button.
     --if not lobbyComm:IsHost() then
+    if GUI.restrictedUnitsButton then
         if not GUI.restrictedUnitsButton:IsDisabled() then
             GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_up.png'))
         elseif GUI.restrictedUnitsButton:IsDisabled() then
             GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_dis.png'))
         end
-    --end
+    end
     -- Observer, AutoTeam, RankedOpts, CPUBench, RandomMap.
     if GUI.becomeObserver then
         if not GUI.becomeObserver:IsDisabled() then
