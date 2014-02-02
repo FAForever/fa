@@ -173,13 +173,13 @@ Shield = Class(moho.shield_methods,Entity) {
             local units = brain:GetUnitsAroundPoint( (categories.SHIELD * categories.DEFENSE) + categories.BUBBLESHIELDSPILLOVERCHECK, self.Owner:GetPosition(), (BiggestShieldSize / 2), 'Ally' )
 
             local pos = self:GetCachePosition()
-            local OverlapRadius = 0.98 * self.Size
+            local OverlapRadius = 0.98 * (self.Size / 2)  # size is diameter, dividing by 2 to get radius
             local obp, oOverlapRadius, vpos, OverlapDist
 
             for k, v in units do
                 if v and IsUnit(v) and not v:IsDead() and v.MyShield and v.MyShield:IsOn() and v.MyShield.Size and v.MyShield.Size > 0 and self.Owner != v and v != instigator then
                     vspos = v.MyShield:GetCachePosition()
-                    oOverlapRadius = 0.98 * v.MyShield.Size
+                    oOverlapRadius = 0.98 * (v.MyShield.Size / 2)  # size is diameter, dividing by 2 to get radius
 
                     OverlapDist = OverlapRadius + oOverlapRadius # If "self" and "v" are more than this far apart then the shields don't overlap, otherwise they do
 
