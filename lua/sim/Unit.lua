@@ -2313,7 +2313,7 @@ Unit = Class(moho.unit_methods) {
 
         local bp = self:GetBlueprint()
 
-        if bp.Enhancements then
+        if bp.Enhancements and ( table.find(bp.Categories, 'USEBUILDPRESETS') or table.find(bp.Categories, 'ISPREENHANCEDUNIT') ) then
 
             # create a blank slate: hide all enhancement bones as specified in the unit BP
             for k, enh in bp.Enhancements do
