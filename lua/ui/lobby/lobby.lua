@@ -1379,7 +1379,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
 			gameInfo.GameMods["e7846e9b-23a4-4b95-ae3a-fb69b289a585"] = true
 			lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
 		end
-		gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
+		
 		-- Set up options for campaign
 
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
@@ -1395,8 +1395,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
 				break
 			end
 		end
-		
-		--local maxDefaultArmies = table.getn(scenarioArmies)
+
 		local addedArmies = {}
 		for spot, army in gameInfo.PlayerOptions do
 			if spot != 1 then
@@ -1415,11 +1414,13 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
 					add = add + 1				
 			end
 		end
-		
-		LOG(repr(gameInfo))
+
+
+
 
         -- Tell everyone else to launch and then launch ourselves.
-        lobbyComm:BroadcastData( { Type = 'Launch', GameInfo = gameInfo } )		
+        lobbyComm:BroadcastData( { Type = 'Launch', GameInfo = gameInfo } )	
+        gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)	
         lobbyComm:LaunchGame(gameInfo)
 
     end
@@ -1814,12 +1815,9 @@ end
 -- notify other clients about the change.
 local function HostUpdateMods(newPlayerID, newPlayerName)
     if lobbyComm:IsHost() then
-        if gameInfo.GameOptions['RankedGame'] and gameInfo.GameOptions['RankedGame'] != 'Off' then
             gameInfo.GameMods = {}
             gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
             lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
-            return
-        end
         local newmods = {}
         local missingmods = {}
         for k,modId in selectedMods do
