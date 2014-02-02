@@ -1649,7 +1649,7 @@ AirUnit = Class(MobileUnit) {
     OnRunOutOfFuel = function(self)
         MobileUnit.OnRunOutOfFuel(self)
         # penalize movement for running out of fuel
-        self:SetSpeedMult(0.25)     # change the speed of the unit by this mult
+        self:SetSpeedMult(0.35)     # change the speed of the unit by this mult
         self:SetAccMult(0.25)       # change the acceleration of the unit by this mult
         self:SetTurnMult(0.25)      # change the turn ability of the unit by this mult
     end,

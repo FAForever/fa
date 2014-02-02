@@ -190,11 +190,11 @@ UnitBlueprint {
         },
         DragCoefficient = 0.2,
         Elevation = 0.25,
-        MaxAcceleration = 3.1,
+        MaxAcceleration = 2.9, # 3.1
         MaxBrake = 15,
-        MaxSpeed = 3.1,
-        MaxSpeedReverse = 3.1,
-        MaxSteerForce = 3.1,
+        MaxSpeed = 2.9, # 3.1
+        MaxSpeedReverse = 2.9, # 3.1
+        MaxSteerForce = 2.9, # 3.1
         MeshExtentsX = 0.75,
         MeshExtentsY = 0.5,
         MeshExtentsZ = 0.8,
@@ -239,6 +239,7 @@ UnitBlueprint {
             DamageRadius = 0,
             DamageType = 'Normal',
             DisplayName = 'Disruptor Cannon',
+            FiringRandomnessWhileMoving = 0.6,
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',

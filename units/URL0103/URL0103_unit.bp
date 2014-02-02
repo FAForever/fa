@@ -227,12 +227,23 @@ UnitBlueprint {
                     BuffType = 'STUN',
                     Duration = 3,
                     Radius = 2,
-                    TargetAllow = 'TECH1,TECH2',
-					TargetDisallow = 'WALL',  # added for bug fix [162]
+                    TargetAllow = 'TECH1',
+		    TargetDisallow = 'TECH2,WALL',  # added for bug fix [162]
+                },
+                {
+                    Add = {
+                        OnImpact = true,
+                    },
+                    AppliedToTarget = true,
+                    BuffType = 'STUN',
+                    Duration = 2,
+                    Radius = 2,
+                    TargetAllow = 'TECH2',
+                    TargetDisallow = 'WALL',  # added for bug fix [162]
                 },
             },
             CollideFriendly = false,
-            Damage = 195,
+            Damage = 230, # 195
             DamageFriendly = false,
             DamageRadius = 2,
             DamageType = 'Normal',
@@ -267,7 +278,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_IndirectFire',
-            RateOfFire = 0.2,
+            RateOfFire = 0.166, # 0.2
             TargetCheckInterval = 1,
             TargetPriorities = {
                 'SPECIALHIGHPRI',

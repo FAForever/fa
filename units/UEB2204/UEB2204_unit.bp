@@ -211,9 +211,9 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 102,
+            Damage = 125,			#102
             DamageFriendly = false,
-            DamageRadius = 4,
+            DamageRadius = 3.5,			#4
             DamageType = 'Normal',
             DetonatesAtTargetHeight = true,
             DisplayName = 'Fragmentation Flak',
@@ -222,13 +222,13 @@ UnitBlueprint {
                 Land = 'Air',
                 Water = 'Air',
             },
-            FiringRandomness = 2.5,
+            FiringRandomness = 2,
             FiringTolerance = 2,
             Label = 'AAGun',
-            MaxRadius = 44,
+            MaxRadius = 50,			#44
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 20,
+            MuzzleVelocity = 25,		#20
             ProjectileId = '/projectiles/TAALightFragmentationShell01/TAALightFragmentationShell01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
             ProjectilesPerOnFire = 1,
@@ -254,7 +254,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
-            RateOfFire = 1.5,
+            RateOfFire = 1.25,			#1.5
             SalvoShotDelay = 0.1,
             SalvoSize = 2,
             TargetCheckInterval = 0.3,

@@ -92,6 +92,21 @@ UnitBlueprint {
             Cue = 'URL0001_Move_Stop',
             LodCutoff = 'UnitMove_LodCutoff',
         },
+        TeleportChargingAtDestination = Sound {
+            Bank = 'URLWeapon',
+            Cue = 'URL0402_Beam_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TeleportChargingAtUnit = Sound {
+            Bank = 'URL',
+            Cue = 'URL0309_Capture_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TeleportIn = Sound {
+            Bank = 'Impacts',
+            Cue = 'XSA_Bomb_Explosion_01',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
         UISelection = Sound {
             Bank = 'Interface',
             Cue = 'Cybran_Select_Commander',
@@ -249,6 +264,22 @@ UnitBlueprint {
         },
         PlaceholderMeshName = 'UXB0000',
         SpawnRandomRotation = true,
+        TeleportEffects = {
+            ChargeFxAtUnitBones = {
+                {
+                    Bone = 'Back_Upgrade',
+                    Offset = {
+                        0,
+                        0.05,
+                        0.2,
+                    },
+                },
+            },
+            PlayChargeFxAtDestination = false,
+            PlayChargeFxAtUnit = true,
+            PlayTeleportOutFx = true,
+            PlayTeleportInFx = true,
+        },
         TransportAnimation = {
             {
                 Animation = '/units/URL0001/URL0001_afold.sca',
@@ -928,12 +959,12 @@ UnitBlueprint {
                 },
             },
             BallisticArc = 'RULEUBA_None',
-            BeamCollisionDelay = 0.1,
+            BeamCollisionDelay = 0,			#0.1
             BeamLifetime = 0,
             CanFireFromTransport = true,
             CollideFriendly = false,
 			ContinuousBeam = true,  #new
-            Damage = 800,
+            Damage = 400,				#800
             DamageRadius = 0.5,
             DamageType = 'Normal',
             DisplayName = 'Heavy Microwave Laser',
@@ -943,7 +974,7 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 2,
+            FiringTolerance = 0,			#2
             HeadingArcCenter = 0,
             HeadingArcRange = 180,
             Label = 'MLG',
@@ -968,8 +999,8 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
-            RateOfFire = 3,
-            TargetCheckInterval = 0.5,
+            RateOfFire = 10,				#3
+            TargetCheckInterval = 0.1,			#0.5
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'MOBILE',
@@ -1043,6 +1074,18 @@ UnitBlueprint {
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
             Turreted = false,
             WeaponCategory = 'Anti Navy',
+        },
+        {
+            Damage = 100,
+            DamageFriendly = true,
+            DamageRadius = 4,
+            DamageType = 'Normal',
+            DisplayName = 'Teleport in',
+            DummyWeapon = true,
+            Label = 'TeleportWeapon',
+            MaxRadius = 1,
+            RateOfFire = 1,
+            WeaponCategory = 'Teleport',
         },
     },
 }
