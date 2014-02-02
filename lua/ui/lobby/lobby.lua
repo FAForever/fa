@@ -3027,7 +3027,7 @@ function CreateUI(maxPlayers)
             end
             Tooltip.AddButtonTooltip(GUI.restrictedUnitsButton, 'lob_RestrictedUnitsClient')
 	elseif lobbyComm:IsHost() then
-		GUI.restrictedUnitsButton = UIUtil.CreateButtonStd2PNG(GUI.optionsPanel, '/BUTTON/medium/', "Preset Lobby", 14, 0)
+		GUI.restrictedUnitsButton = UIUtil.CreateButtonStd2PNG(GUI.optionsPanel, '/BUTTON/medium/', "Lobby Presets", 14, 0)
 		GUI.restrictedUnitsButton.label:SetColor('B9BFB9')
             GUI.restrictedUnitsButton.label:SetDropShadow(true)
             LayoutHelpers.AtHorizontalCenterIn(GUI.restrictedUnitsButton, GUI.gameoptionsButton)
@@ -3035,7 +3035,7 @@ function CreateUI(maxPlayers)
             GUI.restrictedUnitsButton.OnClick = function(self, modifiers)
                 GUI_PRESET()
             end
-            Tooltip.AddButtonTooltip(GUI.restrictedUnitsButton, 'Load and Save Preset Lobby')
+            Tooltip.AddButtonTooltip(GUI.restrictedUnitsButton, 'Load and Save Lobby Presets')
     end
     
     ---------------------------------------------------------------------------
@@ -6571,7 +6571,7 @@ function GUI_PRESET_INPUT(tyype)
         LayoutHelpers.AtHorizontalCenterIn(OKButton, GUI_Preset_InputBox2)
 		LayoutHelpers.AtBottomIn(OKButton, GUI_Preset_InputBox2, 10)
         if tyype == -1 then
-			text09:SetText('No Preset exist, set your first Preset name :')
+			text09:SetText('No Preset exists, please enter your first Preset name :')
 			OKButton.OnClick = function(self)
 				local result = nameEdit:GetText()
 				if result == '' then
@@ -6582,7 +6582,7 @@ function GUI_PRESET_INPUT(tyype)
 				end
 			end
 		elseif tyype == 0 then
-			text09:SetText('Set your Preset name :')
+			text09:SetText('Enter your Preset name :')
 			OKButton.OnClick = function(self)
 				local result = nameEdit:GetText()
 				if result == '' then
@@ -6622,7 +6622,7 @@ function GUI_PRESET_INPUT(tyype)
 				end
 			end
 		elseif tyype == 3 then
-			text09:SetText('Rename your Rule :')
+			text09:SetText('Rename your Rules :')
 			OKButton.OnClick = function(self)
 				local result = nameEdit:GetText()
 				if result == '' then
