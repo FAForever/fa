@@ -91,6 +91,7 @@ Prop = Class(moho.prop_methods, Entity) {
 
     Destroy = function(self)
         self.DestroyCalled = true
+        Entity.Destroy(self)
     end,
 		
     OnDestroy = function(self)
@@ -170,7 +171,7 @@ Prop = Class(moho.prop_methods, Entity) {
         if mtime < etime then
             time = etime
         end
-        time = math.max( (time/10), 1)  # this should never be 0 or we'll divide by 0!
+        time = math.max( (time/10), 0.0001)  # this should never be 0 or we'll divide by 0!
         return time, self.EnergyReclaim, self.MassReclaim
     end,
 

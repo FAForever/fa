@@ -35,7 +35,7 @@ Shield = Class(moho.shield_methods,Entity) {
         self:SetSize(spec.Size)
         self:SetMaxHealth(spec.ShieldMaxHealth)
         self:SetHealth(self,spec.ShieldMaxHealth)
-        self:SetSpillOverParams(spec.SpillOverDamageMod or 0.1, spec.DamageThresholdToSpillOver or 0)
+        self:SetSpillOverParams(spec.SpillOverDamageMod or 0.15, spec.DamageThresholdToSpillOver or 0)
 
         # Show our 'lifebar'
         self:UpdateShieldRatio(1.0)
@@ -285,14 +285,17 @@ Shield = Class(moho.shield_methods,Entity) {
                 #self:SpillOverDmgDBUnregister(DBkey)
 
             # do overspill damage
-            else
-                local bp = self.Owner:GetBlueprint().Defense.Shield or {}
-                local dmgMod = bp.SpillOverDamageMod or 0.1
-                if dmgMod > 0 then
-                    local vect = Util.GetDirectionVector( instigator:GetPosition(), self:GetCachePosition() )
-                    #LOG('*DEBUG: AdjacentBubbleShieldDamageSpillOverThread dealing damage: '..repr(dmg * dmgMod))
-                    self:OnDamage(instigator, dmg * self.SpillOverDmgMod, vect, 'ShieldSpillOver' )
+            elseif self.SpillOverDmgMod > 0 then
+                local vect = Vector(0,0,0)
+
+                if instigator and instigator.GetPosition then
+                    vect = Util.GetDirectionVector( instigator:GetPosition(), self:GetCachePosition() )
+                elseif spillingUnit and spillingUnit.GetPosition then
+                    vect = Util.GetDirectionVector( spillingUnit:GetPosition(), self:GetCachePosition() )
                 end
+
+                #LOG('*DEBUG: AdjacentBubbleShieldDamageSpillOverThread dealing damage: '..repr(dmg * dmgMod))
+                self:OnDamage(instigator, dmg * self.SpillOverDmgMod, vect, 'ShieldSpillOver' )
             end
         end
     end,
