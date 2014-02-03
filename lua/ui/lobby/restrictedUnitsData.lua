@@ -13,6 +13,7 @@ restrictedUnits = {
 		categories = {"xeb0104", "xrb0104"},
         name = "No Engineering Station",
         tooltip = {text='No Engineering Station', body='Remove Kennel and Hive (by Xinnony)'},
+		--"No Kennel and Hive (Engineering Station) by Xinnony",
 	},
 	SALVAMAVOSCATH = {
 		categories = {"xab2307", "ueb2401", "url0401"},
