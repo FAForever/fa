@@ -2165,6 +2165,7 @@ function HostConvertPlayerToObserver(senderID, name, playerSlot)
         PL = gameInfo.PlayerOptions[playerSlot].PL,
         oldColor = gameInfo.PlayerOptions[playerSlot].PlayerColor, -- Vicarian
         oldFaction = gameInfo.PlayerOptions[playerSlot].Faction, -- Vicarian
+		oldCountry = gameInfo.PlayerOptions[playerSlot].Country, -- Xinnony
     }
 
     if lobbyComm:IsHost() then
@@ -2200,6 +2201,7 @@ function HostConvertObserverToPlayer(senderID, name, fromObserverSlot, toPlayerS
     gameInfo.PlayerOptions[toPlayerSlot] = LobbyComm.GetDefaultPlayerOptions(name)
     gameInfo.PlayerOptions[toPlayerSlot].OwnerID = senderID
 
+	gameInfo.PlayerOptions[toPlayerSlot].Country = gameInfo.Observers[fromObserverSlot].oldCountry or 'world' -- Xinnony
 	--if requestedFaction then
 		gameInfo.PlayerOptions[toPlayerSlot].Faction = gameInfo.Observers[fromObserverSlot].oldFaction or requestedFaction or 5
     --end
@@ -5591,10 +5593,34 @@ function RuleTitle_INPUT()
 			nameEdit.Width:Set(334)
 			nameEdit.Height:Set(24)
 			nameEdit:AcquireFocus()
+			nameEdit.OnEnterPressed = function(self, text)
+				if text == '' then
+					GUI_Preset_InputBox:Destroy()
+					RuleLabel:DeleteAllItems()
+					RuleLabel:AddItem('Rule : no rule.')
+					RuleLabel:AddItem('')
+					RuleTitle_SendMSG()
+				else
+					GUI_Preset_InputBox:Destroy()
+					wrapped = import('/lua/maui/text.lua').WrapText('Rule : '..text, 350, function(curText) return RuleLabel:GetStringAdvance(curText) end)
+					RuleLabel:DeleteAllItems()
+					RuleLabel:AddItem(wrapped[1] or '')
+					RuleLabel:AddItem(wrapped[2] or '')
+					RuleTitle_SendMSG()
+				end
+			end
+		-------------------
+		-- Exit button --
+		local ExitButton = UIUtil.CreateButtonStd2PNG(GUI_Preset_InputBox2, '/BUTTON/medium/', "Cancel", 12, -1)
+			LayoutHelpers.AtLeftIn(ExitButton, GUI_Preset_InputBox2, 70)
+			LayoutHelpers.AtBottomIn(ExitButton, GUI_Preset_InputBox2, 10)
+			ExitButton.OnClick = function(self)
+				GUI_Preset_InputBox:Destroy()
+			end
 		-------------------
 		-- Ok button --
 		local OKButton = UIUtil.CreateButtonStd2PNG(GUI_Preset_InputBox2, '/BUTTON/medium/', "Ok", 12, -1)
-			LayoutHelpers.AtHorizontalCenterIn(OKButton, GUI_Preset_InputBox2)
+			LayoutHelpers.AtRightIn(OKButton, GUI_Preset_InputBox2, 70)
 			LayoutHelpers.AtBottomIn(OKButton, GUI_Preset_InputBox2, 10)
 			text09:SetText('Edit the Rule :')
 			OKButton.OnClick = function(self)
@@ -5943,11 +5969,11 @@ function ForceApplyNewSkin()
     -- Restricted Unit show only if not you Host, else Preset Lobby is show.
 	-- Now if is Host, is a Preset button.
     --if not lobbyComm:IsHost() then
-    if GUI.restrictedUnitsButton then
-        if not GUI.restrictedUnitsButton:IsDisabled() then
-            GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_up.png'))
-        elseif GUI.restrictedUnitsButton:IsDisabled() then
+	if GUI.restrictedUnitsButton then
+		if GUI.restrictedUnitsButton:IsDisabled() then -- SI PAS DISABLED ALORS
             GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_dis.png'))
+        else
+            GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_up.png'))
         end
     end
     -- Observer, AutoTeam, RankedOpts, CPUBench, RandomMap.
@@ -6431,7 +6457,7 @@ function GUI_PRESET()
 		PresetList.OnClick = function(self, row)
 			if PresetList:GetItemCount() == (row+1) then
 				PresetList:SetSelection(row)
-				LoadButton.label:SetText('New preset')
+				LoadButton.label:SetText('Create new preset')
 				LoadButton.OnClick = function(self)
 					CREATE_PRESET_IN_PREF()
 				end
@@ -6494,7 +6520,7 @@ function GUI_PRESET()
 		end
 	-------------------
     -- QUIT button --
-	local QuitButton = UIUtil.CreateButtonStd2PNG(dialog2, '/BUTTON/medium/', "Exit", 12, -1)
+	local QuitButton = UIUtil.CreateButtonStd2PNG(dialog2, '/BUTTON/medium/', "Cancel", 12, -1)
         LayoutHelpers.CenteredRightOf(QuitButton, LoadButton, -16)
         QuitButton.OnClick = function(self)
             GUI_Preset:Destroy()
@@ -6565,13 +6591,72 @@ function GUI_PRESET_INPUT(tyype)
         nameEdit.Width:Set(334)
         nameEdit.Height:Set(24)
         nameEdit:AcquireFocus()
+		nameEdit.OnEnterPressed = function(self, text)
+			if tyype == -1 then
+				if text == '' then
+					-- No word in nameEdit
+				else
+					applyCREATE_PRESET_IN_PREF(text)
+					GUI_Preset_InputBox:Destroy()
+				end
+			elseif tyype == 0 then
+				if text == '' then
+					-- No word in nameEdit
+				else
+					applyCREATE_PRESET_IN_PREF(text)
+					GUI_Preset_InputBox:Destroy()
+				end
+			elseif tyype == 1 then
+				if text == '' then
+					-- No word in nameEdit
+				else
+					local profiles = GetPreference("UserPresetLobby")
+					SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.PresetName', tostring(text))
+					local lastselect = PresetList:GetSelection()
+					LOAD_PresetProfils_For_PresetList()
+					PresetList:SetSelection(lastselect)
+					LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
+					GUI_Preset_InputBox:Destroy()
+				end
+			elseif tyype == 2 then
+				if text == '' then
+					-- No word in nameEdit
+				else
+					local profiles = GetPreference("UserPresetLobby")
+					SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.FAF_Title', tostring(text))
+					LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
+					GUI_Preset_InputBox:Destroy()
+				end
+			elseif tyype == 3 then
+				if text == '' then
+					local profiles = GetPreference("UserPresetLobby")
+					SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', 'no rule.')
+					LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
+					GUI_Preset_InputBox:Destroy()
+				else
+					local profiles = GetPreference("UserPresetLobby")
+					--AddChatText('rename> Profil?:'..table.KeyByIndex(profiles, PresetList:GetSelection())..' // selection:'..PresetList:GetSelection())
+					SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', tostring(text))
+					LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
+					GUI_Preset_InputBox:Destroy()
+				end
+			end
+		end
+	-------------------
+    -- Exit button --
+	local ExitButton = UIUtil.CreateButtonStd2PNG(GUI_Preset_InputBox2, '/BUTTON/medium/', "Cancel", 12, -1)
+		LayoutHelpers.AtLeftIn(ExitButton, GUI_Preset_InputBox2, 70)
+		LayoutHelpers.AtBottomIn(ExitButton, GUI_Preset_InputBox2, 10)
+		ExitButton.OnClick = function(self)
+			GUI_Preset_InputBox:Destroy()
+		end
 	-------------------
     -- Ok button --
 	local OKButton = UIUtil.CreateButtonStd2PNG(GUI_Preset_InputBox2, '/BUTTON/medium/', "Ok", 12, -1)
-        LayoutHelpers.AtHorizontalCenterIn(OKButton, GUI_Preset_InputBox2)
+		LayoutHelpers.AtRightIn(OKButton, GUI_Preset_InputBox2, 70)
 		LayoutHelpers.AtBottomIn(OKButton, GUI_Preset_InputBox2, 10)
         if tyype == -1 then
-			text09:SetText('No Preset exists, please enter your first Preset name :')
+			text09:SetText('No Preset exist, set your first Preset name :')
 			OKButton.OnClick = function(self)
 				local result = nameEdit:GetText()
 				if result == '' then
@@ -6582,7 +6667,7 @@ function GUI_PRESET_INPUT(tyype)
 				end
 			end
 		elseif tyype == 0 then
-			text09:SetText('Enter your Preset name :')
+			text09:SetText('Set your Preset name :')
 			OKButton.OnClick = function(self)
 				local result = nameEdit:GetText()
 				if result == '' then
@@ -6622,11 +6707,14 @@ function GUI_PRESET_INPUT(tyype)
 				end
 			end
 		elseif tyype == 3 then
-			text09:SetText('Rename your Rules :')
+			text09:SetText('Rename your Rule :')
 			OKButton.OnClick = function(self)
 				local result = nameEdit:GetText()
 				if result == '' then
-					-- No word in nameEdit
+					local profiles = GetPreference("UserPresetLobby")
+					SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', 'no rule.')
+					LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
+					GUI_Preset_InputBox:Destroy()
 				else
 					local profiles = GetPreference("UserPresetLobby")
 					--AddChatText('rename> Profil?:'..table.KeyByIndex(profiles, PresetList:GetSelection())..' // selection:'..PresetList:GetSelection())
@@ -6706,7 +6794,7 @@ function LOAD_PresetSettings_For_InfoList(Selected_Preset)
 	end
 	if profiles[Selected_Preset].UnitsRestricts then
 		InfoList:AddItem('')
-		InfoList:AddItem('Units Restricts :')
+		InfoList:AddItem('Unit Restrictions :')
 		for k, v in profiles[Selected_Preset].UnitsRestricts do
 			--k = (uids), v = true
 			InfoList:AddItem('- '..k)
@@ -6805,6 +6893,9 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
 				table.insert(urestrict, k)
 			end
 			SetGameOption('RestrictedCategories', urestrict, false, true)
+		else
+			-- Clear Restricted
+			SetGameOption('RestrictedCategories', {}, false, true)
 		end
 		
 		--
@@ -6912,30 +7003,47 @@ end
 ###############################################################
 ######################### Other Debug Funct ######################### -- Xinnony
 
+function joinMyTables(t1, t2)
+	t3 = {}
+	for k,v in ipairs(t1) do
+		table.insert(t3, v)
+		--print(v)
+	end
+	for k,v in ipairs(t2) do
+		table.insert(t3, v)
+		--print(v)
+	end
+	return t3
+end
+
+function round(num, idp)
+	local mult = 10^(idp or 0)
+	return math.floor(num * mult + 0.5) / mult
+end
+
 function table_print (tt, indent, done)
-  done = done or {}
-  indent = indent or 0
-  if type(tt) == "table" then
-    local sb = {}
-    for key, value in pairs (tt) do
-      table.insert(sb, string.rep (" ", indent)) -- indent it
-      if type (value) == "table" and not done [value] then
-        done [value] = true
-        table.insert(sb, "{\n");
-        table.insert(sb, table_print (value, indent + 2, done))
-        table.insert(sb, string.rep (" ", indent)) -- indent it
-        table.insert(sb, "}\n");
-      elseif "number" == type(key) then
-        table.insert(sb, string.format("\"%s\"\n", tostring(value)))
-      else
-        table.insert(sb, string.format(
-            "%s = \"%s\"\n", tostring (key), tostring(value)))
-       end
-    end
-    return table.concat(sb)
-  else
-    return tt .. "\n"
-  end
+	done = done or {}
+	indent = indent or 0
+	if type(tt) == "table" then
+		local sb = {}
+		for key, value in pairs (tt) do
+			table.insert(sb, string.rep (" ", indent)) -- indent it
+			if type (value) == "table" and not done [value] then
+				done [value] = true
+				table.insert(sb, "{\n");
+				table.insert(sb, table_print (value, indent + 2, done))
+				table.insert(sb, string.rep (" ", indent)) -- indent it
+				table.insert(sb, "}\n");
+			elseif "number" == type(key) then
+				table.insert(sb, string.format("\"%s\"\n", tostring(value)))
+			else
+				table.insert(sb, string.format("%s = \"%s\"\n", tostring (key), tostring(value)))
+			end
+		end
+		return table.concat(sb)
+	else
+		return tt .. "\n"
+	end
 end
 
 function to_string( tbl )
