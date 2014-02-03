@@ -6773,6 +6773,14 @@ function GetModNameWithUid(uid)
 	local allMods = Mods.AllMods()
 	return allMods[uid].name
 end
+function GetModUidExist(uid)
+	local allMods = Mods.AllMods()
+	if allMods[uid].name == true then
+		return true
+	else
+		return false
+	end
+end
 function GetModUIorNotUIWithUid(uid)
 	local allMods = Mods.AllMods()
 	return allMods[uid].ui_only
@@ -6813,10 +6821,14 @@ function LOAD_PresetSettings_For_InfoList(Selected_Preset)
 		InfoList:AddItem('Mod :')
 		for k, v in profiles[Selected_Preset].Mods do
 			--k = (uids), v = true
-			if GetModUIorNotUIWithUid(k) then
-				InfoList:AddItem('- '..GetModNameWithUid(k)..' [Mod UI]')
+			if GetModUidExist(uid) == false then
+				InfoList:AddItem('- '..GetModNameWithUid(k)..' [NOT EXIST]')
 			else
-				InfoList:AddItem('- '..GetModNameWithUid(k))
+				if GetModUIorNotUIWithUid(k) then
+					InfoList:AddItem('- '..GetModNameWithUid(k)..' [Mod UI]')
+				else
+					InfoList:AddItem('- '..GetModNameWithUid(k))
+				end
 			end
 		end
 	end
