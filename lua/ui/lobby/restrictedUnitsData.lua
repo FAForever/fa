@@ -108,7 +108,7 @@ restrictedUnits = {
         tooltip = "restricted_uints_gameenders",
     },
     BUBBLES = {
-        categories = {"uel0307", "ual0307", "xsl0307", "deb4303", "xes0205", "ueb4202", "urb4202", "uab4202", "xsb4202", "ueb4301", "uab4301", "xsb4301", },
+        categories = {"uel0307", "ual0307", "xsl0307", "xes0205", "ueb4202", "urb4202", "uab4202", "xsb4202", "ueb4301", "uab4301", "xsb4301", },
         name = "<LOC restricted_units_data_0013>No Bubbles",
         tooltip = "restricted_uints_bubbles",
     },
