@@ -1,4 +1,4 @@
-# Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+# Copyright Å  2005 Gas Powered Games, Inc.  All rights reserved.
 #
 # This is the sim-specific top-level lua initialization file. It is run at initialization time
 # to set up all lua state for the sim.
@@ -179,10 +179,12 @@ function BeginSession()
 					end
 				end
 			end
-            if buildRestrictions == nil then
-                buildRestrictions = restrictedCategories
-            else
-                buildRestrictions = buildRestrictions + restrictedCategories
+            if restrictedCategories then   # some restrictions dont have unit categories set like enhancement restrictions, skip them
+                if buildRestrictions == nil then
+                    buildRestrictions = restrictedCategories
+                else
+                    buildRestrictions = buildRestrictions + restrictedCategories
+                end
             end
         end
     end
