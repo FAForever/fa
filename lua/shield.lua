@@ -35,6 +35,7 @@ Shield = Class(moho.shield_methods,Entity) {
         self:SetSize(spec.Size)
         self:SetMaxHealth(spec.ShieldMaxHealth)
         self:SetHealth(self,spec.ShieldMaxHealth)
+        self:SetType('Bubble')
         self:SetSpillOverParams(spec.SpillOverDamageMod or 0.15, spec.DamageThresholdToSpillOver or 0)
 
         # Show our 'lifebar'
@@ -79,6 +80,10 @@ Shield = Class(moho.shield_methods,Entity) {
 
     SetShieldRegenStartTime = function(self, time)
         self.RegenStartTime = time
+    end,
+
+    SetType = function(self, type)
+        self.ShieldType = type
     end,
 
     SetSpillOverParams = function(self, dmgMod, threshold)
@@ -517,6 +522,10 @@ Shield = Class(moho.shield_methods,Entity) {
 
             WaitSeconds(1)            
         end,
+
+        IsOn = function(self)
+            return false
+        end,
     },
 
     # This state happens when the shield has been depleted due to damage
@@ -531,7 +540,11 @@ Shield = Class(moho.shield_methods,Entity) {
             self:SetHealth(self, self:GetMaxHealth())
             
             ChangeState(self, self.OnState)
-        end
+        end,
+
+        IsOn = function(self)
+            return false
+        end,
     },
 
     # This state happens only when the army has run out of power
@@ -548,11 +561,19 @@ Shield = Class(moho.shield_methods,Entity) {
             else
                 ChangeState(self, self.OffState)
             end
-        end
+        end,
+
+        IsOn = function(self)
+            return false
+        end,
     },
 
     DeadState = State {
         Main = function(self)
+        end,
+
+        IsOn = function(self)
+            return false
         end,
     },
 }
@@ -572,6 +593,7 @@ UnitShield = Class(Shield){
         self.OwnerShieldMesh = spec.OwnerShieldMesh or ''
 
         self:SetSize(spec.Size)
+        self:SetType('Personal')
 
         self:SetMaxHealth(spec.ShieldMaxHealth)
         self:SetHealth(self,spec.ShieldMaxHealth)
@@ -630,10 +652,16 @@ UnitShield = Class(Shield){
         self:UpdateShieldRatio(0)
         ChangeState(self, self.DeadState)
     end,
-        
+       
 }
 
-AntiArtilleryShield = Class(Shield){
+AntiArtilleryShield = Class(Shield) {
+
+    OnCreate = function(self, spec)
+        Shield.OnCreate(self, spec)
+        self:SetType('AntiArtillery')
+    end,
+
     OnCollisionCheckWeapon = function(self, firingWeapon)
         local bp = firingWeapon:GetBlueprint()
         if bp.CollideFriendly == false then

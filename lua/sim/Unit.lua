@@ -1282,7 +1282,10 @@ Unit = Class(moho.unit_methods) {
     OnDamage = function(self, instigator, amount, vector, damageType)
         if self.CanTakeDamage then
             self:DoOnDamagedCallbacks(instigator)
-            self:DoTakeDamage(instigator, amount, vector, damageType)
+
+            if self:GetShieldType() != 'Personal' or not self:ShieldIsOn() then    # let personal shields handle the damage
+                self:DoTakeDamage(instigator, amount, vector, damageType)
+            end
         end
     end,
 
@@ -4229,6 +4232,13 @@ Unit = Class(moho.unit_methods) {
         else
             return false
         end
+    end,
+
+    GetShieldType = function(self)
+        if self.MyShield then
+            return self.MyShield.ShieldType or 'Unknown'
+        end
+        return 'None'
     end,
 
     OnAdjacentBubbleShieldDamageSpillOver = function(self, instigator, spillingUnit, damage, type)
