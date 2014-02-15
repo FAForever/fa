@@ -1832,7 +1832,7 @@ Platoon = Class(moho.platoon_methods) {
             
             local category = ParseEntityCategory( catString )
         
-            local assistList = AIUtilsAlt.FindUnfinishedUnits( aiBrain, assistData.AssistLocation, category )
+            local assistList = AIUtils.FindUnfinishedUnits( aiBrain, assistData.AssistLocation, category )
 
 			if assistList then
 				assistee = assistList
@@ -2160,7 +2160,7 @@ Platoon = Class(moho.platoon_methods) {
             buildFunction = AIBuildStructures.AIBuildBaseTemplateOrdered
         elseif cons.FireBase and cons.FireBaseRange then
 			#DUNCAN - pulled out and uses alt finder
-			reference, refName = AIUtilsAlt.AIFindFirebaseLocation(aiBrain, cons.LocationType, cons.FireBaseRange, cons.NearMarkerType,
+			reference, refName = AIUtils.AIFindFirebaseLocation(aiBrain, cons.LocationType, cons.FireBaseRange, cons.NearMarkerType,
 												cons.ThreatMin, cons.ThreatMax, cons.ThreatRings, cons.ThreatType, 
 												cons.MarkerUnitCount, cons.MarkerUnitCategory, cons.MarkerRadius)
 			if not reference or not refName then
@@ -2189,7 +2189,7 @@ Platoon = Class(moho.platoon_methods) {
 				#DUNCAN - use my alternative expansion finder on large maps below a certain time
 				local mapSizeX, mapSizeZ = GetMapSize()
 				if GetGameTimeSeconds() <= 780 and mapSizeX > 512 and mapSizeZ > 512 then
-					reference, refName = AIUtilsAlt.AIFindFurthestStartLocationNeedsEngineer( aiBrain, cons.LocationType, 
+					reference, refName = AIUtils.AIFindFurthestStartLocationNeedsEngineer( aiBrain, cons.LocationType, 
                         (cons.LocationRadius or 100), cons.ThreatMin, cons.ThreatMax, cons.ThreatRings, cons.ThreatType )
 					if not reference or not refName then
 						reference, refName = AIUtils.AIFindStartLocationNeedsEngineer( aiBrain, cons.LocationType, 
@@ -2303,7 +2303,7 @@ Platoon = Class(moho.platoon_methods) {
                 self:PlatoonDisband()
                 return
             end
-            reference  = AIUtilsAlt.FindUnclutteredArea( aiBrain, cat, pos, radius, cons.maxUnits, cons.maxRadius, avoidCat)
+            reference  = AIUtils.FindUnclutteredArea( aiBrain, cat, pos, radius, cons.maxUnits, cons.maxRadius, avoidCat)
             buildFunction = AIBuildStructures.AIBuildAdjacency
             table.insert( baseTmplList, baseTmpl )
 		elseif cons.AdjacencyCategory then
@@ -2349,9 +2349,9 @@ Platoon = Class(moho.platoon_methods) {
             for k, v in cons.BuildStructures do
                 if aiBrain:PlatoonExists(self) then
                     if not eng:IsDead() then
-                  local faction = AIUtilsAlt.GetEngineerFaction(eng)
+                  local faction = AIUtils.GetEngineerFaction(eng)
                   if aiBrain.CustomUnits[v] and aiBrain.CustomUnits[v][faction] then
-                     local replacement = AIUtilsAlt.GetTemplateReplacement(aiBrain, v, faction)
+                     local replacement = AIUtils.GetTemplateReplacement(aiBrain, v, faction)
                      if replacement then
                         buildFunction(aiBrain, eng, v, closeToBuilder, relative, replacement, baseListData, reference, cons.NearMarkerType)
                      else
@@ -3603,7 +3603,7 @@ Platoon = Class(moho.platoon_methods) {
             local buildLocation = BuildToNormalLocation(eng.EngineerBuildQueue[1][2])
             local buildRelative = eng.EngineerBuildQueue[1][3]
             # see if we can move there first  
-            if AIUtilsAlt.EngineerMoveWithSafePath(aiBrain, eng, buildLocation) then
+            if AIUtils.EngineerMoveWithSafePath(aiBrain, eng, buildLocation) then
                 if not eng or eng:IsDead() or not eng.PlatoonHandle or not aiBrain:PlatoonExists(eng.PlatoonHandle) then
                     if eng then eng.ProcessBuild = nil end
                     return
@@ -3619,7 +3619,7 @@ Platoon = Class(moho.platoon_methods) {
 				end
 				
                 # check to see if we need to reclaim or capture...
-                if not AIUtilsAlt.EngineerTryReclaimCaptureArea(aiBrain, eng, buildLocation) then
+                if not AIUtils.EngineerTryReclaimCaptureArea(aiBrain, eng, buildLocation) then
                     # check to see if we can repair
                     if not AIUtils.EngineerTryRepair(aiBrain, eng, whatToBuild, buildLocation) then
                         # otherwise, go ahead and build the next structure there
@@ -3671,7 +3671,7 @@ Platoon = Class(moho.platoon_methods) {
                while AIUtils.GetTransports(self) < 1 do
                        WaitSeconds(3)
                end
-               cmd = AIUtilsAlt.UseTransports(self:GetPlatoonUnits() , self:GetSquadUnits( 'Scout' ), targetLocation, nil )
+               cmd = AIUtils.UseTransports(self:GetPlatoonUnits() , self:GetSquadUnits( 'Scout' ), targetLocation, nil )
 
                self:SetAIPlan('EngineerBuildAI')
                landed = true
@@ -3697,7 +3697,7 @@ Platoon = Class(moho.platoon_methods) {
                end
            end
            #LOG('*AI DEBUG:  Ghetto transport load')
-           cmd = AIUtilsAlt.UseTransports(self:GetPlatoonUnits() , self:GetSquadUnits( 'Scout' ), nil, nil )
+           cmd = AIUtils.UseTransports(self:GetPlatoonUnits() , self:GetSquadUnits( 'Scout' ), nil, nil )
        until cmd
 
        local target = false
