@@ -476,7 +476,9 @@ FactoryBuilderManager = Class(BuilderManager) {
 
         # Use factory location if no other rally or if rally point is far away
         if not rally or VDist2( rally[1], rally[3], position[1], position[3] ) > 75 then
-            rally = position
+            #DUNCAN - added to try and vary the rally points.
+			position = AIUtils.RandomLocation(position[1],position[3])
+			rally = position
         end
         
         IssueClearFactoryCommands( {factory} )
