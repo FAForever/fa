@@ -994,9 +994,16 @@ Platoon = Class(moho.platoon_methods) {
         if self.PlatoonData.LocationType and self.PlatoonData.LocationType != 'NOTMAIN' then
             basePosition = aiBrain.BuilderManagers[self.PlatoonData.LocationType].Position
         else
-            basePosition = aiBrain:FindClosestBuilderManagerPosition(self:GetPlatoonPosition())
+            local platoonPosition = self:GetPlatoonPosition()
+            if platoonPosition then
+                basePosition = aiBrain:FindClosestBuilderManagerPosition(self:GetPlatoonPosition())
+            end
         end
         
+        if not basePosition then
+            return
+        end
+
 		#DUNCAN - changed from 75, added home radius
         local guardRadius = self.PlatoonData.GuardRadius or 200
 		local homeRadius = self.PlatoonData.HomeRadius or 200
@@ -2495,12 +2502,19 @@ Platoon = Class(moho.platoon_methods) {
         local target
         local blip
 		local hadtarget = false
-		
 		local basePosition = false
+
         if self.PlatoonData.LocationType and self.PlatoonData.LocationType != 'NOTMAIN' then
             basePosition = aiBrain.BuilderManagers[self.PlatoonData.LocationType].Position
         else
-            basePosition = aiBrain:FindClosestBuilderManagerPosition(self:GetPlatoonPosition())
+            local platoonPosition = self:GetPlatoonPosition()
+            if platoonPosition then
+                basePosition = aiBrain:FindClosestBuilderManagerPosition(self:GetPlatoonPosition())
+            end
+        end
+
+        if not basePosition then
+            return
         end
 
         while aiBrain:PlatoonExists(self) do
@@ -4781,7 +4795,13 @@ Platoon = Class(sorianoldPlatoon) {
         if self.PlatoonData.LocationType and self.PlatoonData.LocationType != 'NOTMAIN' then
             basePosition = aiBrain.BuilderManagers[self.PlatoonData.LocationType].Position
         else
-            basePosition = aiBrain:FindClosestBuilderManagerPosition(self:GetPlatoonPosition())
+            local platoonPosition = self:GetPlatoonPosition()
+            if platoonPosition then            
+                basePosition = aiBrain:FindClosestBuilderManagerPosition(self:GetPlatoonPosition())
+        end
+        
+        if not basePosition then
+            return
         end
         
         local guardRadius = self.PlatoonData.GuardRadius or 200

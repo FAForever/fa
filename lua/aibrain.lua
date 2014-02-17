@@ -1589,18 +1589,19 @@ AIBrain = Class(moho.aibrain_methods) {
             local changed = false
             for k,v in self.BuilderManagers do
                 if k != 'MAIN' and v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) <= 0 and v.FactoryManager:GetNumCategoryFactories(categories.ALLUNITS) <= 0 then
-			if v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) <= 0 then
-	                    v.EngineerManager:SetEnabled(false)
-	                    v.FactoryManager:SetEnabled(false)
-	                    v.PlatoonFormManager:SetEnabled(false)
-	                    v.StrategyManager:SetEnabled(false)
-	                    v.FactoryManager:Destroy()
-	                    v.PlatoonFormManager:Destroy()
-	                    v.EngineerManager:Destroy()
-	                    v.StrategyManager:Destroy()
-	                    self.BuilderManagers[k] = nil
-	                    self.NumBases = self.NumBases - 1
-	                    changed = true
+            			if v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) <= 0 then
+            	                    v.EngineerManager:SetEnabled(false)
+            	                    v.FactoryManager:SetEnabled(false)
+            	                    v.PlatoonFormManager:SetEnabled(false)
+            	                    v.StrategyManager:SetEnabled(false)
+            	                    v.FactoryManager:Destroy()
+            	                    v.PlatoonFormManager:Destroy()
+            	                    v.EngineerManager:Destroy()
+            	                    v.StrategyManager:Destroy()
+            	                    self.BuilderManagers[k] = nil
+            	                    self.NumBases = self.NumBases - 1
+            	                    changed = true
+                  end
                 end
             end
             if changed then
@@ -1638,16 +1639,17 @@ AIBrain = Class(moho.aibrain_methods) {
             if v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) <= 0 and v.FactoryManager:GetNumCategoryFactories(categories.ALLUNITS) <= 0 then
                 continue
             end
-            
-            if not closest then
-                distance = VDist3( position, v.Position )
-                closest = v.Position
-            else
-                local tempDist = VDist3( position, v.Position )
-                if tempDist < distance then
-                    distance = tempDist
-                    closest = v.Position
-                end
+            if position and v.Position then
+              if not closest then 
+                  distance = VDist3( position, v.Position )
+                  closest = v.Position
+              else
+                  local tempDist = VDist3( position, v.Position )
+                  if tempDist < distance then
+                      distance = tempDist
+                      closest = v.Position
+                  end
+              end
             end
         end
         return closest

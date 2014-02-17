@@ -558,7 +558,7 @@ function AIFindFirebaseLocation( aiBrain, locationType, radius, markerType, tMin
     local estartX, estartZ = aiBrain:GetCurrentEnemy():GetArmyStartPos()
     local threatPos = {estartX, 0, estartZ}
     #Get markers
-    local markerList = AIUtils.AIGetMarkerLocations(aiBrain, markerType)
+    local markerList = AIGetMarkerLocations(aiBrain, markerType)
     
     #For each marker, check against threatpos. Save markers that are within the FireBaseRange
     local inRangeList = {}
@@ -585,7 +585,7 @@ function AIFindFirebaseLocation( aiBrain, locationType, radius, markerType, tMin
     for _,marker in inRangeList do
         local threat = aiBrain:GetThreatAtPosition(marker.Position, 1, true, 'AntiSurface')
         if threat < maxThreat then
-            local numUnits = table.getn( AIUtils.GetOwnUnitsAroundPoint( aiBrain, catCheck, marker.Position, markerRadius or 20) )
+            local numUnits = table.getn( GetOwnUnitsAroundPoint( aiBrain, catCheck, marker.Position, markerRadius or 20) )
             if numUnits < maxUnits then
                 if threat < bestThreat and threat < maxThreat then
                     bestDistSq = VDist2Sq(threatPos[1], threatPos[3], marker.Position[1], marker.Position[3])
@@ -2885,7 +2885,7 @@ function AIFindFurthestExpansionAreaNeedsEngineer( aiBrain, locationType, radius
     if not pos then
         return false
     end
-    local positions = AIUtils.AIGetMarkersAroundLocation( aiBrain, 'Expansion Area', pos, radius, tMin, tMax, tRings, tType)
+    local positions = AIGetMarkersAroundLocation( aiBrain, 'Expansion Area', pos, radius, tMin, tMax, tRings, tType)
     
     #DUNCAN - change to look for furtherest away!
     local retPos, retName
