@@ -1832,7 +1832,7 @@ Platoon = Class(moho.platoon_methods) {
             
             local category = ParseEntityCategory( catString )
         
-            local assistList = AIUtils.FindUnfinishedUnits( aiBrain, assistData.AssistLocation, category )
+            local assistList = SUtils.FindUnfinishedUnits( aiBrain, assistData.AssistLocation, category )
 
 			if assistList then
 				assistee = assistList
@@ -2349,9 +2349,9 @@ Platoon = Class(moho.platoon_methods) {
             for k, v in cons.BuildStructures do
                 if aiBrain:PlatoonExists(self) then
                     if not eng:IsDead() then
-                  local faction = AIUtils.GetEngineerFaction(eng)
+                  local faction = SUtils.GetEngineerFaction(eng)
                   if aiBrain.CustomUnits[v] and aiBrain.CustomUnits[v][faction] then
-                     local replacement = AIUtils.GetTemplateReplacement(aiBrain, v, faction)
+                     local replacement = SUtils.GetTemplateReplacement(aiBrain, v, faction)
                      if replacement then
                         buildFunction(aiBrain, eng, v, closeToBuilder, relative, replacement, baseListData, reference, cons.NearMarkerType)
                      else
