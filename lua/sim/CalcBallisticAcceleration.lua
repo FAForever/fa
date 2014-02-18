@@ -60,7 +60,7 @@ CalculateBallisticAcceleration = function (weapon, proj, ProjectilesPerOnFire)
       # Get the target (if it's a entity)
       local target = launcher:GetTargetEntity()
 
-      if target then
+      if target and IsUnit(target) then
          # Target is a unit (or at least an entity)
       
          # Get target position
