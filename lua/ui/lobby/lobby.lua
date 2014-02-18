@@ -25,6 +25,7 @@ local ModManager = import('/lua/ui/dialogs/modmanager.lua')
 local FactionData = import('/lua/factions.lua')
 local Text = import('/lua/maui/text.lua').Text
 local Trueskill = import('/lua/ui/lobby/trueskill.lua')
+local round = import('/lua/ui/lobby/trueskill.lua').round
 local Player = import('/lua/ui/lobby/trueskill.lua').Player
 local Rating = import('/lua/ui/lobby/trueskill.lua').Rating
 local Teams = import('/lua/ui/lobby/trueskill.lua').Teams
@@ -118,7 +119,9 @@ else
     playerDeviation = 500
 end
 
-local playerRating = math.floor(playerMean - 3 * playerDeviation)
+
+
+local playerRating = math.floor( Trueskill.round2((playerMean - 3 * playerDeviation) / 100.0) * 100 )
 
 -- builds the faction tables, and then adds random faction icon to the end
 local factionBmps = {}
@@ -1641,17 +1644,7 @@ local function UpdateGame()
         --if not GUI.slots[i].tooltiprating then
         if not GUI.slots[i].closed and gameInfo.PlayerOptions[i].Human then
             if gameInfo.PlayerOptions[i].Human then
-                if gameInfo.PlayerOptions[i].MEAN and gameInfo.PlayerOptions[i].DEV then
-                    local mean = math.floor(gameInfo.PlayerOptions[i].MEAN) or 'N/A'
-                    local dev = math.floor(gameInfo.PlayerOptions[i].DEV) or 'N/A'
-                    Tooltip.AddControlTooltip(GUI.slots[i].ratingText, {text='Rating', body='- Mean : '..mean..'\n - Dev : '..dev})
-                else
-                    local mean =  'N/A'
-                    local dev = 'N/A'
-                    Tooltip.AddControlTooltip(GUI.slots[i].ratingText, {text='Rating', body='- Mean : N/A'..'\n - Dev : N/A'})
-                end
-            else
-                Tooltip.AddControlTooltip(GUI.slots[i].ratingText, '')
+                Tooltip.AddControlTooltip(GUI.slots[i].ratingText, {text='Rating', body='This is the player rating.'})
             end
         end
     end
@@ -1660,7 +1653,6 @@ local function UpdateGame()
         if not GUI.mapView:SetTexture(scenarioInfo.preview) then
             GUI.mapView:SetTextureFromMap(scenarioInfo.map)
         end
-        --GUI.RankedLabel:SetText(LOC(scenarioInfo.name)) -- Add RankedLabel above option lobby (replace with Ranked Label)
         ShowMapPositions(GUI.mapView,scenarioInfo,numPlayers)
     else
         GUI.mapView:ClearTexture()
@@ -2596,26 +2588,11 @@ function CreateUI(maxPlayers)
         LayoutHelpers.AtBottomIn(GUI.LargeMapPreview, GUI.mapView, -3)
         Tooltip.AddButtonTooltip(GUI.LargeMapPreview, 'lob_click_LargeMapPreview')
         GUI.LargeMapPreview.OnClick = function()
-            --for i = 1, LobbyComm.maxPlayerSlots do
-                --if not gameInfo.ClosedSlots[i] and not gameInfo.PlayerOptions[i] then
-                    --HostCloseSlot(localPlayerID, i)
-                --end
-            --end
             CreateBigPreview(501, GUI.mapPanel)
         end
     --end of close slots code
 
-    -- Ranked label --
-    GUI.RankedLabel = UIUtil.CreateText(GUI.mapPanel, "", 16, UIUtil.titleFont)
-        GUI.RankedLabel:SetColor(UIUtil.bodyColor)
-        LayoutHelpers.AtTopIn(GUI.RankedLabel, GUI.optionsPanel, 5)
-        LayoutHelpers.AtHorizontalCenterIn(GUI.RankedLabel, GUI.optionsPanel, -8)
-        GUI.RankedLabel:SetFont('Arial Gras', 13)
-        LayoutHelpers.AtRightTopIn(GUI.RankedLabel, ModFeaturedLabel, 0, 0)--GUI.panel, 50, 61+14)
-        LayoutHelpers.RightOf(GUI.RankedLabel, ModFeaturedLabel, 0)
-        --GUI.RankedLabel:SetColor('ff7777') -- 77ff77
-        GUI.RankedLabel:SetDropShadow(true)
-    
+   
     -- Checkbox Show changed Options
     cbox_ShowChangedOption = UIUtil.CreateCheckboxStdPNG(GUI.optionsPanel, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel, 3, 0)
@@ -3812,77 +3789,6 @@ function RefreshOptionDisplayData(scenarioInfo)
     formattedOptions = {}
 	FormOpt2 = {}
 
---// Check Ranked active -- Xinnony & Vicarian
-    local getInit = GetCommandLineArg("/init", 1)
-    getInit = tostring(getInit[1])
-    if getInit == "init_faf.lua" then
-        SetText2(ModFeaturedLabel, 'FA Forever - ', 10)
-        --AddChatText('Welcome to Forged Alliance Forever MOD'..getInit)
-        local getVictory = gameInfo.GameOptions['Victory'] -- 'demoralization'
-        local getCheat = gameInfo.GameOptions['CheatsEnabled'] -- 'false'
-        local getSpeed = gameInfo.GameOptions['GameSpeed'] -- 'normal'
-        local getFog = gameInfo.GameOptions['FogOfWar'] -- 'explored'
-        local getPrebui = gameInfo.GameOptions['PrebuiltUnits'] -- 'Off'
-        local getNorush = gameInfo.GameOptions['NoRushOption'] -- 'Off'
-        local getNumbMod = table.getn(Mods.GetGameMods(gameInfo.GameMods)) -- 0 for the purposes of this function
-        local getRstric = gameInfo.GameOptions.RestrictedCategories --can be nil or a table, even if no restrictions are present
-		local getMapIsBlacklist = false
-		if gameInfo.GameOptions.ScenarioFile == '/maps/battle of thermopylae official/battle of thermopylae official_scenario.lua' then -- Check if the current map is Battle of Thermo OFFICIAL, this map is blacklisted to ranked
-			LOG('Map blacklisted to ranked : /maps/battle of thermopylae official/battle of thermopylae official_scenario.lua')
-			getMapIsBlacklist = true
-		end
---~             AddChatText(tostring(cRstr))
-        if getVictory == 'demoralization' and getCheat == 'false' and getSpeed == 'normal' and getFog == 'explored' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and (getRstric == nil or table.getn(getRstric) == 0) and getMapIsBlacklist == false then
-            --table.insert(formattedOptions, {text = 'Ranking',
-                --value = 'Ranked',
-                --green = true,
-                --tooltip = {text='Ranked',body='This game is Ranked !'}})
-            SetText2(GUI.RankedLabel, "game is Ranked", 10)
-            GUI.RankedLabel:SetColor("77ff77")
-            --Tooltip.AddControlTooltip(GUI.RankedLabel, '')
-        else
-            --table.insert(formattedOptions, {text = 'Ranking',
-                --value = 'Unranked',
-                --red = true,
-                --tooltip = {text='Unranked',body='This game is NOT Ranked !'}})
-            SetText2(GUI.RankedLabel, "not Ranked", 10)
-            GUI.RankedLabel:SetColor("ff7777")
-            --Tooltip.AddControlTooltip(GUI.RankedLabel, '')
-        end
-    else
-        if getInit == "init_blackops.lua" then
-            SetText2(ModFeaturedLabel, 'BlackOps MOD - ', 10)
-		elseif getInit == "init_coop.lua" then
-            SetText2(ModFeaturedLabel, 'COOP - ', 10)
-        elseif getInit == "init_balancetesting.lua" then
-            SetText2(ModFeaturedLabel, 'Balance Testing - ', 10)
-        elseif getInit == "init_gw.lua" then
-            SetText2(ModFeaturedLabel, 'Galactic War - ', 10)
-        elseif getInit == "init_labwars.lua" then
-            SetText2(ModFeaturedLabel, 'Labwars MOD - ', 10)
-        elseif getInit == "init_ladder1v1.lua" then
-            SetText2(ModFeaturedLabel, 'Ladder 1v1 - ', 10)
-        elseif getInit == "init_nomads.lua" then
-            SetText2(ModFeaturedLabel, 'Nomads MOD - ', 10)
-        elseif getInit == "init_phantomx.lua" then
-            SetText2(ModFeaturedLabel, 'PhantomX MOD - ', 10)
-        elseif getInit == "init_supremedestruction.lua" then
-            SetText2(ModFeaturedLabel, 'SupremeDestruction MOD - ', 10)
-        elseif getInit == "init_xtremewars.lua" then
-            SetText2(ModFeaturedLabel, 'XtremeWars MOD - ', 10)
-        --else
-            --ModFeaturedLabel:SetText('')
-        end
-        --table.insert(formattedOptions, {text = 'Ranking',
-            --value = 'Unranked',
-            --red = true,
-            --tooltip = {text='Unranked',body='This game is NOT Ranked !'}})
-        SetText2(GUI.RankedLabel, "not Ranked", 10)
-    
-        GUI.RankedLabel:SetColor("ff7777")
-        --Tooltip.AddControlTooltip(GUI.RankedLabel, '')
-    end
---\\ Stop Check Ranked active
 --// Check Mod active
     local modStr = false
 	local modNum = table.getn(Mods.GetGameMods(gameInfo.GameMods)) or 0
@@ -7014,11 +6920,6 @@ function joinMyTables(t1, t2)
 		--print(v)
 	end
 	return t3
-end
-
-function round(num, idp)
-	local mult = 10^(idp or 0)
-	return math.floor(num * mult + 0.5) / mult
 end
 
 function table_print (tt, indent, done)
