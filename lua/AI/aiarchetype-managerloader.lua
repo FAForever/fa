@@ -106,23 +106,36 @@ end
 #Runs the whole game and kills off units when the AI hits unit cap.
 
 function UnitCapWatchThread(aiBrain)
-    KillPD = false
+    #DUNCAN - Added T1 kill and check every 30 seconds and within 10 of the unit cap
+	KillPD = false
+	KillT1 = false
     while true do
-        WaitSeconds(60)
+        WaitSeconds(30)
         if GetArmyUnitCostTotal(aiBrain:GetArmyIndex()) > (GetArmyUnitCap(aiBrain:GetArmyIndex()) - 10) then
-            if not KillPD then
-                local units = aiBrain:GetListOfUnits(categories.TECH1 * categories.ENERGYPRODUCTION * categories.STRUCTURE, true)
+            if not KillT1 then
+				local units = aiBrain:GetListOfUnits(categories.TECH1 * categories.MOBILE * categories.LAND, true)
+				local count = 0
+				for k, v in units do
+					v:Kill()
+					count = count + 1
+					if count >= 20 then break end
+				end				
+				KillT1 = true
+			elseif not KillPD then
+                local units = aiBrain:GetListOfUnits(categories.TECH1 * categories.DEFENSE * categories.DIRECTFIRE * categories.STRUCTURE, true)
+				
                 for k, v in units do
                     v:Kill()
                 end
                 KillPD = true
             else
-
-                local units = aiBrain:GetListOfUnits(categories.TECH1 * categories.DEFENSE * categories.DIRECTFIRE * categories.STRUCTURE, true)
-                for k, v in units do
-                    v:Kill()
-                end
+				#DUNCAN - dont kill power, it kills the econ, will now be reclaimed
+                #local units = aiBrain:GetListOfUnits(categories.TECH1 * categories.ENERGYPRODUCTION * categories.STRUCTURE, true)
+                #for k, v in units do
+                #    v:Kill()
+                #end
                 KillPD = false
+				KillT1 = false
             end
         end
     end
