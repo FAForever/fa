@@ -3717,7 +3717,11 @@ function CreateUI(maxPlayers)
                         --GUI.slots[slot].pingText:SetColor(pingcolor)
                         if ping and GUI.slots[slot].pingStatus then
                             GUI.slots[slot].pingStatus:SetValue(ping)
-                            GUI.slots[slot].pingStatus:Show()
+                            if ping >= 500 or pingcolor != "green" then
+                                GUI.slots[slot].pingStatus:Show()
+                            else
+                                GUI.slots[slot].pingStatus:Hide()
+                            end
                             if pingcolor == 'red' then
                                 GUI.slots[slot].pingStatus._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-03_bmp.dds'))
                             elseif pingcolor == 'green' then
