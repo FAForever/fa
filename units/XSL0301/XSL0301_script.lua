@@ -308,11 +308,15 @@ XSL0301 = Class(SWalkingLandUnit) {
             self:SetIntelRadius('Omni', bp.NewOmniRadius or 104)
             local wep = self:GetWeaponByLabel('LightChronatronCannon')
             wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
+            local wep = self:GetWeaponByLabel('OverCharge')
+            wep:ChangeMaxRadius(30)
         elseif enh == 'EnhancedSensorsRemove' then
             local bpIntel = self:GetBlueprint().Intel
             self:SetIntelRadius('Vision', bpIntel.VisionRadius or 26)
             self:SetIntelRadius('Omni', bpIntel.OmniRadius or 16)
             local wep = self:GetWeaponByLabel('LightChronatronCannon')
+            wep:ChangeMaxRadius(bp.NewMaxRadius or 25)
+            local wep = self:GetWeaponByLabel('OverCharge')
             wep:ChangeMaxRadius(bp.NewMaxRadius or 25)
         end
     end,
@@ -330,25 +334,6 @@ XSL0301 = Class(SWalkingLandUnit) {
         end
         SWalkingLandUnit.OnUnpaused(self)
     end,    
-#Teleport animation
-    PlayTeleportInEffects = function(self)
-        self:PlayUnitSound('CommanderArrival')
-        self:CreateProjectile( '/effects/entities/UnitTeleport01/UnitTeleport01_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
-        WaitSeconds(2.1)
-        self:SetUnSelectable(false)
-        self:SetBusy(false)
-        self:SetBlockCommandQueue(false)
-        
-        local totalBones = self:GetBoneCount() - 1
-        local army = self:GetArmy()
-        for k, v in EffectTemplate.UnitTeleportSteam01 do
-            for bone = 1, totalBones do
-                CreateAttachedEmitter(self,bone,army, v)
-            end
-        end
-
-        WaitSeconds(6)
-    end, 
 }
 
 TypeClass = XSL0301

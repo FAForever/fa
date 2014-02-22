@@ -366,7 +366,7 @@ UnitBlueprint {
             FiringTolerance = 6,
             Label = 'GroundMissile',
             LeadTarget = true,
-            MaxRadius = 45,
+            MaxRadius = 40, # 45
             MuzzleSalvoDelay = 0.05,
             MuzzleSalvoSize = 4,
             MuzzleVelocity = 35,

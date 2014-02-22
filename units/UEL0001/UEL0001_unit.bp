@@ -91,6 +91,21 @@ UnitBlueprint {
             Cue = 'UEL0001_Move_Stop',
             LodCutoff = 'UnitMove_LodCutoff',
         },
+        TeleportChargingAtDestination = Sound {
+            Bank = 'UEL',
+            Cue = 'UEL0001_Reclaim_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TeleportChargingAtUnit = Sound {
+            Bank = 'UEL',
+            Cue = 'UEL0001_Construct_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TeleportIn = Sound {
+            Bank = 'Impacts',
+            Cue = 'UEF_Expl_Lrg_Naval',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
         UISelection = Sound {
             Bank = 'Interface',
             Cue = 'UEF_Select_Commander',
@@ -133,6 +148,7 @@ UnitBlueprint {
         'OVERLAYINDIRECTFIRE',
         'OVERLAYOMNI',
         'OVERLAYDEFENSE',
+        'BUBBLESHIELDSPILLOVERCHECK',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -270,6 +286,29 @@ UnitBlueprint {
         },
         PlaceholderMeshName = 'UXB0000',
         SpawnRandomRotation = true,
+        TeleportEffects = {
+            ChargeFxAtUnitBones = {
+                {
+                    Bone = 'Back_Upgrade_B01',
+                    Offset = {
+                        0,
+                        0,
+                        -0.1,
+                    },
+                },
+            },
+            FxOffsetX = 0,
+            FxOffsetY = 0,
+            FxOffsetZ = -0.45,
+            FxSizeX = 2.31,
+            FxSizeY = 2.31,
+            FxSizeZ = 2.42,
+            PlayChargeFxAtDestination = true,
+            PlayChargeFxAtUnit = true,
+            PlayTeleportOutFx = true,
+            PlayTeleportInFx = true,
+            TeleportAvatarUnit = 'AvatarUEL0001',
+        },
         TransportAnimation = {
             {
                 Animation = '/units/UEL0001/UEL0001_afold.sca',
@@ -282,7 +321,7 @@ UnitBlueprint {
                 Weight = 100,
             },
         },
-        UniformScale = 0.105,
+        UniformScale = 0.105, # if changed dont forget to update AvatarUEL0001 at /effects/Entities/UEFTeleport/AvatarUEL0001
     },
     Economy = {
         BuildCostEnergy = 5000000,
@@ -303,7 +342,7 @@ UnitBlueprint {
         StorageMass = 650,
         TeleportEnergyMod = 0.03,
         TeleportMassMod = 0,
-        TeleportTimeMod = 0.0001,
+        TeleportTimeMod = 0.0001
     },
     Enhancements = {
         AdvancedEngineering = {
@@ -572,6 +611,7 @@ UnitBlueprint {
             ShieldRegenRate = 42,
             ShieldRegenStartTime = 1,
             ShieldSize = 16,
+            ShieldSpillOverDamageMod = 0, # we will keep it at 0 to keep this upgrade efficient / special
             ShieldVerticalOffset = -3,
             Slot = 'Back',
             UpgradeEffectBones = {
@@ -1200,6 +1240,18 @@ UnitBlueprint {
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
             WeaponCategory = 'Death',
+        },
+        {
+            Damage = 100,
+            DamageFriendly = true,
+            DamageRadius = 4,
+            DamageType = 'Normal',
+            DisplayName = 'Teleport in',
+            DummyWeapon = true,
+            Label = 'TeleportWeapon',
+            MaxRadius = 1,
+            RateOfFire = 1,
+            WeaponCategory = 'Teleport',
         },
     },
 }

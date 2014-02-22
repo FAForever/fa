@@ -98,6 +98,26 @@ UnitBlueprint {
             Cue = 'XSL0001_Move_Stop',
             LodCutoff = 'UnitMove_LodCutoff',
         },
+        TeleportChargingAtDestination = Sound {
+            Bank = 'XSA',
+            Cue = 'XSA0402_Move_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TeleportChargingAtUnit = Sound {
+            Bank = 'XSB',
+            Cue = 'XSB0101_Construct_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TeleportIn = Sound {
+            Bank = 'XSB',
+            Cue = 'XSB0101_Activate',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        TeleportOut = Sound {
+            Bank = 'XSB',
+            Cue = 'XSB0101_Activate',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
         UISelection = Sound {
             Bank = 'SeraphimSelect',
             Cue = 'Seraphim_Select_Commander',
@@ -113,7 +133,7 @@ UnitBlueprint {
             Level5 = 15,
         },
     },
-	BuffFields = {
+    BuffFields = {
         RegenField = 'SeraphimACURegenBuffField',
         AdvancedRegenField = 'SeraphimAdvancedACURegenBuffField',
     },
@@ -260,6 +280,22 @@ UnitBlueprint {
         },
         PlaceholderMeshName = 'UXB0000',
         SpawnRandomRotation = true,
+        TeleportEffects = {
+            ChargeFxAtUnitBones = {
+                {
+                    Bone = 'Back_Upgrade',
+                    Offset = {
+                        0,
+                        0,
+                        -0.1,
+                    },
+                },
+            },
+            PlayChargeFxAtDestination = true,
+            PlayChargeFxAtUnit = true,
+            PlayTeleportOutFx = true,
+            PlayTeleportInFx = true,
+        },
         TransportAnimation = {
             {
                 Animation = '/units/XSL0001/XSL0001_afold.sca',
@@ -336,18 +372,20 @@ UnitBlueprint {
             Slot = 'LCH',
         },
         AdvancedRegenAura = {
+            ACUAddHealth = 2500, #added
             BuildCostEnergy = 31250,
             BuildCostMass = 1500,
-            BuildTime = 1750,
+            BuildTime = 1250,
             Icon = 'anrf',
             Name = '<LOC enhancements_0127>Rapid Restoration Field',
             Prerequisite = 'RegenAura',
-            Radius = 30,
+            Radius = 30, # 25
             RegenCeiling = 200,
             RegenFloor = 0,
-            MaxHealthFactor = 1,
-            RegenPerSecond = 0.01111111111,
+            MaxHealthFactor = 1.1, # 1
+            RegenPerSecond = 0.01111111111, 
             Slot = 'RCH',
+            UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD',		#	added
             UpgradeEffectBones = {
                 'Right_Upgrade',
                 'Right_Turret_Muzzle',
@@ -547,19 +585,21 @@ UnitBlueprint {
             Slot = 'RCH',
         },
         RegenAura = {
+            ACUAddHealth = 1000,			#added
             BuildCostEnergy = 4500,
             BuildCostMass = 600,
             BuildTime = 600,
             Icon = 'nrf',
             Name = '<LOC enhancements_0125>Restoration Field',
-            Radius = 22,
-            RegenCeiling = 75,
+            Radius = 22, # 15
+            RegenCeiling = 15, # 75
             RegenFloor = 0,
-            RegenPerSecond = 0.0055555555,
+            RegenPerSecond = 0.02, # 0.0055555555
             ShowBones = {
                 'Right_Upgrade',
             },
             Slot = 'RCH',
+            UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD',		#added
             UpgradeEffectBones = {
                 'Right_Upgrade',
                 'Right_Turret_Muzzle',
@@ -1078,6 +1118,18 @@ UnitBlueprint {
             WeaponCategory = 'Missile',
             WeaponRepackTimeout = 5,
             WeaponUnpacks = true,
+        },
+        {
+            Damage = 100,
+            DamageFriendly = true,
+            DamageRadius = 4,
+            DamageType = 'Normal',
+            DisplayName = 'Teleport in',
+            DummyWeapon = true,
+            Label = 'TeleportWeapon',
+            MaxRadius = 1,
+            RateOfFire = 1,
+            WeaponCategory = 'Teleport',
         },
     },
 }

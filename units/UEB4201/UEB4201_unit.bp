@@ -191,7 +191,7 @@ UnitBlueprint {
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 100,
             ProjectileId = '/projectiles/TDPhalanx01/TDPhalanx01_proj.bp',
-            ProjectileLifetimeUsesMultiplier = 1.1,
+            ProjectileLifetimeUsesMultiplier = 2,#1.1
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
@@ -226,8 +226,8 @@ UnitBlueprint {
             TurretYawSpeed = 720,
             Turreted = true,
             WeaponCategory = 'Defense',
-            WeaponRepackTimeout = 1,
-            WeaponUnpacks = true,
+#            WeaponRepackTimeout = 1,
+            WeaponUnpacks = false,
         },
     },
     Wreckage = {

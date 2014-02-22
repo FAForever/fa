@@ -90,7 +90,7 @@ end
 
 function AIGetStartLocations(aiBrain)
     local markerList = {}
-    for i = 1,8 do
+    for i = 1,12 do
         if Scenario.MasterChain._MASTERCHAIN_.Markers['ARMY_'..i] then
             table.insert( markerList, Scenario.MasterChain._MASTERCHAIN_.Markers['ARMY_'..i].position )
         end

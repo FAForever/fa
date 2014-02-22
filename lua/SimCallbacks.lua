@@ -121,7 +121,7 @@ Callbacks.AddTarget = function(data, units)
 	
 	if type(data.target) == 'string' then
 		local entity = GetEntityById(data.target)
-		if entity then
+		if entity and IsBlip(entity) and entity.GetSource then
 			local blipentity = entity:GetSource()
 			if blipentity then
 				if IsUnit(blipentity) then

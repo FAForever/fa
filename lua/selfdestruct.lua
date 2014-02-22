@@ -7,10 +7,8 @@ function ToggleSelfDestruct(data)
         local unitEntities = {}
         for _, unitId in data.units do
             local unit = GetEntityById(unitId)
-	    if unit then
-                if OkayToMessWithArmy(unit:GetArmy()) then
-		    table.insert(unitEntities, unit)
-		end
+            if OkayToMessWithArmy(unit:GetArmy()) then
+                table.insert(unitEntities, unit)
             end
         end
         if table.getsize(unitEntities) > 0 then

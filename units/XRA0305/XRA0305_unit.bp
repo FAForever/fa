@@ -16,7 +16,7 @@ UnitBlueprint {
         KTurn = 1,
         KTurnDamping = 2.3,
         LiftFactor = 7,
-        MaxAirspeed = 8,
+        MaxAirspeed = 10,
         MinAirspeed = 3,
         StartTurnDistance = 5,
     },
@@ -191,9 +191,9 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 52500,
-        BuildCostMass = 1680,
-        BuildTime = 8400,
+        BuildCostEnergy = 42000,		#52500
+        BuildCostMass = 1260,			#1680
+        BuildTime = 6300,			#8400
         MaintenanceConsumptionPerSecondEnergy = 25,
     },
     Footprint = {
@@ -301,7 +301,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_LowArc',
             ChargeDelay = 0.5,
             CollideFriendly = false,
-            Damage = 150,
+            Damage = 140,					#150
             DamageType = 'Normal',
             DisplayName = 'Disintegrator Pulse Laser',
             FireTargetLayerCapsTable = {
@@ -340,7 +340,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
-            RateOfFire = 2,
+            RateOfFire = 1.6,					#2
             TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'SPECIALHIGHPRI',

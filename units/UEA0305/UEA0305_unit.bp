@@ -16,7 +16,7 @@ UnitBlueprint {
         KTurn = 1,
         KTurnDamping = 1.5,
         LiftFactor = 7,
-        MaxAirspeed = 8,
+        MaxAirspeed = 10,
         MinAirspeed = 3,
         StartTurnDistance = 5,
     },
@@ -214,9 +214,9 @@ UnitBlueprint {
         UniformScale = 0.1,
     },
     Economy = {
-        BuildCostEnergy = 52500,
-        BuildCostMass = 1680,
-        BuildTime = 8400,
+        BuildCostEnergy = 42000,		#52500
+        BuildCostMass = 1260,			#1680
+        BuildTime = 6300,			#8400
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -314,7 +314,7 @@ UnitBlueprint {
             AutoInitiateAttackCommand = true,
             BallisticArc = 'RULEUBA_LowArc',
             CollideFriendly = false,
-            Damage = 100,
+            Damage = 90,				#100
             DamageType = 'Normal',
             DisplayName = 'Heavy Plasma Cannon',
             FireTargetLayerCapsTable = {
@@ -352,7 +352,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
-            RateOfFire = 3,
+            RateOfFire = 2.5,				#3
             TargetCheckInterval = 0.27,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
@@ -388,7 +388,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 2,
+            Damage = 8,
             DamageType = 'Normal',
             DisplayName = 'Linked Railgun',
             EffectiveRadius = 0,

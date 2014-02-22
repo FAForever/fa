@@ -259,11 +259,11 @@ UnitBlueprint {
         TransportClass = 1,
     },
     Veteran = {
-        Level1 = 3,
-        Level2 = 6,
-        Level3 = 9,
-        Level4 = 12,
-        Level5 = 15,
+        Level1 = 5,
+        Level2 = 10,
+        Level3 = 15,
+        Level4 = 20,
+        Level5 = 25,
     },
     Weapon = {
         {
@@ -287,7 +287,7 @@ UnitBlueprint {
             },
             FiringTolerance = 2,
             Label = 'MainGun',
-            MaxRadius = 16,
+            MaxRadius = 20, # 16 = to make it better in patrol / ground attack mode
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 40,
