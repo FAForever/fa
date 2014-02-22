@@ -6775,7 +6775,7 @@ function GetModNameWithUid(uid)
 end
 function GetModUidExist(uid)
 	local allMods = Mods.AllMods()
-	if allMods[uid].name == true then
+	if allMods[uid].name != nil then
 		return true
 	else
 		return false
@@ -6821,8 +6821,8 @@ function LOAD_PresetSettings_For_InfoList(Selected_Preset)
 		InfoList:AddItem('Mod :')
 		for k, v in profiles[Selected_Preset].Mods do
 			--k = (uids), v = true
-			if GetModUidExist(uid) == false then
-				InfoList:AddItem('- '..GetModNameWithUid(k)..' [NOT EXIST]')
+			if GetModUidExist(k) == false then
+				InfoList:AddItem('- '..k..' [NOT EXIST]')
 			else
 				if GetModUIorNotUIWithUid(k) then
 					InfoList:AddItem('- '..GetModNameWithUid(k)..' [Mod UI]')
