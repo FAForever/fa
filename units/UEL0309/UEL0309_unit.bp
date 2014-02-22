@@ -195,10 +195,10 @@ UnitBlueprint {
         UniformScale = 0.1,
     },
     Economy = {
-        BuildCostEnergy = 3150,
-        BuildCostMass = 490,
+        BuildCostEnergy = 2200,
+        BuildCostMass = 440,
         BuildRate = 30,
-        BuildTime = 2100,
+        BuildTime = 2200,
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER UEF',
         },

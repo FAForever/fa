@@ -130,6 +130,7 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
         'OVERLAYDEFENSE',
         'CANNOTUSEAIRSTAGING',
+        'BUBBLESHIELDSPILLOVERCHECK',
     },
     CollisionOffsetY = -1,
     Defense = {
@@ -151,6 +152,7 @@ UnitBlueprint {
             ShieldRegenRate = 30,
             ShieldRegenStartTime = 1,
             ShieldSize = 8.5,
+            ShieldSpillOverDamageMod = 0.5,
             ShieldVerticalOffset = -1,
         },
         SubThreatLevel = 0,

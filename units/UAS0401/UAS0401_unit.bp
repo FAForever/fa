@@ -341,11 +341,11 @@ UnitBlueprint {
     StrategicIconName = 'icon_experimental_generic',
     StrategicIconSortPriority = 45,
     Veteran = {
-        Level1 = 30,
-        Level2 = 60,
-        Level3 = 90,
-        Level4 = 120,
-        Level5 = 150,
+        Level1 = 32,
+        Level2 = 64,
+        Level3 = 96,
+        Level4 = 128,
+        Level5 = 160,
     },
     Weapon = {
         {
@@ -389,7 +389,7 @@ UnitBlueprint {
             MuzzleChargeDelay = 1.5,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 35,
+            MuzzleVelocity = 28,
             MuzzleVelocityReduceDistance = 130,
             NotExclusive = true,
             ProjectileId = '/projectiles/ADFOblivionCannon04/ADFOblivionCannon04_proj.bp',
@@ -441,15 +441,17 @@ UnitBlueprint {
             Audio = {
                 Fire = Sound {
                     Bank = 'UALWeapon',
-                    Cue = 'UAB2205_Torpedo',
+                    Cue = 'UAS0201_Depth_Charge',
                     LodCutoff = 'Weapon_LodCutoff',
                 },
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 235,
+            Damage = 350,
+            DamageRadius = 1.5,
             DamageType = 'Normal',
-            DisplayName = 'Heavy Chrono Torpedo',
+            DisplayName = 'Harmonic Depth Charge',
+            EffectiveRadius = 80,
             FireTargetLayerCapsTable = {
                 Sub = 'Seabed|Sub|Water',
                 Water = 'Seabed|Sub|Water',
@@ -457,11 +459,11 @@ UnitBlueprint {
             FiringTolerance = 2,
             Label = 'Torpedo01',
             MaxRadius = 80,
-            MuzzleSalvoDelay = 0.5,
+            MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 6,
-            MuzzleVelocity = 5,
-            ProjectileId = '/projectiles/AANTorpedo01/AANTorpedo01_proj.bp',
-            ProjectileLifetime = 7,
+            MuzzleVelocity = 20,
+            ProjectileId = '/projectiles/AANDepthCharge02/AANDepthCharge02_proj.bp',
+            ProjectileLifetime = 10,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -483,7 +485,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiNavy',
-            RateOfFire = 0.25,
+            RateOfFire = 0.2,
             TargetCheckInterval = 1.25,
             TargetPriorities = {
                 'SPECIALHIGHPRI',

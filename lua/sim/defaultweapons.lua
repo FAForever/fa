@@ -21,6 +21,16 @@ local CalculateBallisticAcceleration = import('/lua/sim/CalcBallisticAcceleratio
 
 DefaultProjectileWeapon = Class(Weapon) {		
 
+
+    # Brute51 - added support for initialdamage in unit BP (copy/paste from Nomads code)
+    GetDamageTable = function(self)
+        local table = Weapon.GetDamageTable(self)
+        table.InitialDamageAmount = self:GetBlueprint().InitialDamage or 0
+        return table
+    end,
+
+
+
     FxRackChargeMuzzleFlash = {},
     FxRackChargeMuzzleFlashScale = 1,
     FxChargeMuzzleFlash = {},

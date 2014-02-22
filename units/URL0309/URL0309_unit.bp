@@ -85,7 +85,7 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 1425,
+        Health = 540,
         MaxHealth = 540,
         RegenRate = 0,
         SubThreatLevel = 0,
@@ -182,10 +182,10 @@ UnitBlueprint {
         UniformScale = 0.12,
     },
     Economy = {
-        BuildCostEnergy = 3150,
-        BuildCostMass = 490,
+        BuildCostEnergy = 2200,
+        BuildCostMass = 440,
         BuildRate = 30,
-        BuildTime = 2100,
+        BuildTime = 2200,
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER CYBRAN',
         },

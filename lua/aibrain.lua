@@ -1067,12 +1067,17 @@ AIBrain = Class(moho.aibrain_methods) {
             SUtils.GiveAwayMyCrap(self)
         end
         ###end sorian AI bit
+
+        # seems that FA send the OnDeath twice : one when losing, the other when disconnecting (function AbandonedByPlayer). 
+        # But we only want it one time !
         
+        if ArmyIsOutOfGame(self:GetArmyIndex()) then
+            return
+        end
+
         SetArmyOutOfGame(self:GetArmyIndex())
-		LOG("Army " .. self:GetArmyIndex() .. " is out of game")
         
-        # seems that FA send the OnDeath twice : one when losing, the other when disconnecting. But we only want it one time !
-    
+   
         if math.floor(self:GetArmyStat("FAFLose",0.0).Value) != -1 then
             self:AddArmyStat("FAFLose", -1)
         end
@@ -1094,7 +1099,7 @@ AIBrain = Class(moho.aibrain_methods) {
         local function KillArmy()
             local allies = {}
             local selfIndex = self:GetArmyIndex()
-            WaitSeconds(10)
+            WaitSeconds(20)
             
             #this part determiens the share condition            
             local shareOption = ScenarioInfo.Options.Share or "no"
@@ -1131,7 +1136,6 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
             end
 
-	    WaitSeconds(1)
             local killacu = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
             if killacu and table.getn(killacu) > 0 then
                 for index,unit in killacu do
@@ -1556,14 +1560,16 @@ AIBrain = Class(moho.aibrain_methods) {
         if ScenarioInfo.Options.TeamSpawn == 'fixed' then
             #Spawn locations were fixed. We know exactly where our opponents are. 
             
-            for i=1,8 do
+            for i=1,12 do
                 local token = 'ARMY_' .. i
                 local army = ScenarioInfo.ArmySetup[token]
                 
                 if army then
                     if army.ArmyIndex ~= myArmy.ArmyIndex and (army.Team ~= myArmy.Team or army.Team == 1) then
                         local startPos = ScenarioUtils.GetMarker('ARMY_' .. i).position
-                        self:AssignThreatAtPosition(startPos, amount, decay, threatType or 'Overall')
+                        if startPos then
+                          self:AssignThreatAtPosition(startPos, amount, decay, threatType or 'Overall')
+                        end
                     end
                 end
             end
@@ -4372,14 +4378,16 @@ AIBrain = Class(moho.aibrain_methods) {
         if ScenarioInfo.Options.TeamSpawn == 'fixed' then
             #Spawn locations were fixed. We know exactly where our opponents are. 
             
-            for i=1,8 do
+            for i=1,12 do
                 local token = 'ARMY_' .. i
                 local army = ScenarioInfo.ArmySetup[token]
                 
                 if army then
                     if army.ArmyIndex ~= myArmy.ArmyIndex and (army.Team ~= myArmy.Team or army.Team == 1) then
                         local startPos = ScenarioUtils.GetMarker('ARMY_' .. i).position
-                        self:AssignThreatAtPosition(startPos, amount, decay)
+                        if startPos then
+                          self:AssignThreatAtPosition(startPos, amount, decay)
+                        end
                     end
                 end
             end
@@ -4387,7 +4395,7 @@ AIBrain = Class(moho.aibrain_methods) {
         #Breaks test maps
         --else #Spawn locations were random. We don't know where our opponents are. 
             --
-            --for i=1,8 do
+            --for i=1,12 do
                 --local token = 'ARMY_' .. i
                 --
                 --local army = ScenarioInfo.ArmySetup[token]
@@ -4557,11 +4565,11 @@ AIBrain = Class(moho.aibrain_methods) {
                 #Don't scout areas owned by us or our allies.  
                 local numOpponents = 0
                 
-                for i=1,8 do
+                for i=1,12 do
                     local army = ScenarioInfo.ArmySetup['ARMY_' .. i]
                     local startPos = ScenarioUtils.GetMarker('ARMY_' .. i).position
                     
-                    if army then
+                    if army and startPos then
                         if army.ArmyIndex ~= myArmy.ArmyIndex and (army.Team ~= myArmy.Team or army.Team == 1) then
                         #Add the army start location to the list of interesting spots.
                         opponentStarts['ARMY_' .. i] = startPos
@@ -4621,11 +4629,11 @@ AIBrain = Class(moho.aibrain_methods) {
             else #Spawn locations were random. We don't know where our opponents are. Add all non-ally start locations to the scout list              
                 local numOpponents = 0
                 
-                for i=1,8 do
+                for i=1,12 do
                     local army = ScenarioInfo.ArmySetup['ARMY_' .. i]
                     local startPos = ScenarioUtils.GetMarker('ARMY_' .. i).position
                     
-                    if army then
+                    if army and startPos then
                         if army.ArmyIndex == myArmy.ArmyIndex or (army.Team == myArmy.Team and army.Team ~= 1) then
                             allyStarts['ARMY_' .. i] = startPos
                         else
@@ -4713,11 +4721,11 @@ AIBrain = Class(moho.aibrain_methods) {
                 #Don't scout areas owned by us or our allies.  
                 local numOpponents = 0
                 
-                for i=1,8 do
+                for i=1,12 do
                     local army = ScenarioInfo.ArmySetup['ARMY_' .. i]
                     local startPos = ScenarioUtils.GetMarker('ARMY_' .. i).position
                     
-                    if army then
+                    if army and startPos then
                         if army.ArmyIndex ~= myArmy.ArmyIndex and (army.Team ~= myArmy.Team or army.Team == 1) then
                         #Add the army start location to the list of interesting spots.
                         opponentStarts['ARMY_' .. i] = startPos
@@ -4785,11 +4793,11 @@ AIBrain = Class(moho.aibrain_methods) {
             else #Spawn locations were random. We don't know where our opponents are. Add all non-ally start locations to the scout list              
                 local numOpponents = 0
                 
-                for i=1,8 do
+                for i=1,12 do
                     local army = ScenarioInfo.ArmySetup['ARMY_' .. i]
                     local startPos = ScenarioUtils.GetMarker('ARMY_' .. i).position
                     
-                    if army then
+                    if army and startPos then
                         if army.ArmyIndex == myArmy.ArmyIndex or (army.Team == myArmy.Team and army.Team ~= 1) then
                             allyStarts['ARMY_' .. i] = startPos
                         else

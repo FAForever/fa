@@ -151,7 +151,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        VisionRadius = 18,
+        VisionRadius = 20, # 18
     },
     Interface = {
         HelpText = '<LOC ual0104_help>Mobile Anti-Air Gun',
