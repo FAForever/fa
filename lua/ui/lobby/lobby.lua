@@ -6,7 +6,7 @@
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
 
-LOBBYversion = 'v2.1'
+LOBBYversion = 'v2.2'
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
