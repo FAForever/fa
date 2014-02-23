@@ -122,7 +122,7 @@ end
 
 function CreateUI(isReplay)
     ConExecute("Cam_Free off")
-    
+    import('/modules/hotbuild.lua').init()
     local prefetchTable = { models = {}, anims = {}, d3d_textures = {}, batch_textures = {} }
     
     -- set up our layout change function
