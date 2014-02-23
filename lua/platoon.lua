@@ -4798,6 +4798,7 @@ Platoon = Class(sorianoldPlatoon) {
             local platoonPosition = self:GetPlatoonPosition()
             if platoonPosition then            
                 basePosition = aiBrain:FindClosestBuilderManagerPosition(self:GetPlatoonPosition())
+	    end
         end
         
         if not basePosition then
