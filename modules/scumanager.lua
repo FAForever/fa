@@ -88,12 +88,12 @@ function Init()
 	buttonGroup.Depth:Set(500)
 	buttonGroup:DisableHitTest()
 	--create the button for combat upgrades
-	local combatButton = Button(buttonGroup, UIUtil.GUITexture('/scumanager/combat_up.dds'), UIUtil.GUITexture('/scumanager/combat_down.dds'), UIUtil.GUITexture('/scumanager/combat_over.dds'), UIUtil.GUITexture('/scumanager/combat_up.dds'), "UI_Menu_MouseDown_Sml", "UI_Menu_MouseDown_Sml")
+	local combatButton = Button(buttonGroup, UIUtil.UIFile('/SCUManager/combat_up.dds'), UIUtil.UIFile('/SCUManager/combat_down.dds'), UIUtil.UIFile('/SCUManager/combat_over.dds'), UIUtil.UIFile('/SCUManager/combat_up.dds'), "UI_Menu_MouseDown_Sml", "UI_Menu_MouseDown_Sml")
 	LayoutHelpers.AtRightTopIn(combatButton, buttonGroup)
 	combatButton.Type = 'Combat'
 	combatButton.HandleEvent = UpgradeClickFunc
 	--create the button for engineer upgrades
-	local EngineerButton = Button(buttonGroup, UIUtil.GUITexture('/scumanager/engineer_up.dds'), UIUtil.GUITexture('/scumanager/engineer_down.dds'), UIUtil.GUITexture('/scumanager/engineer_over.dds'), UIUtil.GUITexture('/scumanager/engineer_up.dds'), "UI_Menu_MouseDown_Sml", "UI_Menu_MouseDown_Sml")
+	local EngineerButton = Button(buttonGroup, UIUtil.UIFile('/SCUManager/engineer_up.dds'), UIUtil.UIFile('/SCUManager/engineer_down.dds'), UIUtil.UIFile('/SCUManager/engineer_over.dds'), UIUtil.UIFile('/SCUManager/engineer_up.dds'), "UI_Menu_MouseDown_Sml", "UI_Menu_MouseDown_Sml")
 	LayoutHelpers.Below(EngineerButton, combatButton)
 	EngineerButton.Type = 'Engineer'
 	EngineerButton.HandleEvent = UpgradeClickFunc
@@ -131,7 +131,7 @@ end
 --configuration window
 function ConfigureUpgrades()
 	local window = Bitmap(GetFrame(0))
-	window:SetTexture('/mods/GAZ_UI/textures/scumanager/configwindow.dds')
+	window:SetTexture('/textures/ui/common/SCUManager/configwindow.dds')
 	LayoutHelpers.AtRightTopIn(window, GetFrame(0), 100, 100)
 	window.Depth:Set(1000)
 	local buttonGrid = Grid(window, 48, 48)
@@ -142,8 +142,8 @@ function ConfigureUpgrades()
 
 	local factionChooser = Combo(window, 14, 4, nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
 	--create the buttons for choosing acu type
-	local combatButton = Checkbox(window, '/mods/GAZ_UI/textures/scumanager/combat_up.dds', '/mods/GAZ_UI/textures/scumanager/combat_sel.dds', '/mods/GAZ_UI/textures/scumanager/combat_over.dds', '/mods/GAZ_UI/textures/scumanager/combat_over.dds', '/mods/GAZ_UI/textures/scumanager/combat_up.dds', '/mods/GAZ_UI/textures/scumanager/combat_up.dds', "UI_Menu_MouseDown_Sml", "UI_Menu_MouseDown_Sml")
-	local EngineerButton = Checkbox(window, '/mods/GAZ_UI/textures/scumanager/engineer_up.dds', '/mods/GAZ_UI/textures/scumanager/engineer_sel.dds', '/mods/GAZ_UI/textures/scumanager/engineer_over.dds', '/mods/GAZ_UI/textures/scumanager/engineer_over.dds', '/mods/GAZ_UI/textures/scumanager/engineer_up.dds', '/mods/GAZ_UI/textures/scumanager/engineer_up.dds', "UI_Menu_MouseDown_Sml", "UI_Menu_MouseDown_Sml")
+	local combatButton = Checkbox(window, '/textures/ui/common/SCUManager/combat_up.dds', '/textures/ui/common/SCUManager/combat_sel.dds', '/textures/ui/common/SCUManager/combat_over.dds', '/textures/ui/common/SCUManager/combat_over.dds', '/textures/ui/common/SCUManager/combat_up.dds', '/textures/ui/common/SCUManager/combat_up.dds', "UI_Menu_MouseDown_Sml", "UI_Menu_MouseDown_Sml")
+	local EngineerButton = Checkbox(window, '/textures/ui/common/SCUManager/engineer_up.dds', '/textures/ui/common/SCUManager/engineer_sel.dds', '/textures/ui/common/SCUManager/engineer_over.dds', '/textures/ui/common/SCUManager/engineer_over.dds', '/textures/ui/common/SCUManager/engineer_up.dds', '/textures/ui/common/SCUManager/engineer_up.dds', "UI_Menu_MouseDown_Sml", "UI_Menu_MouseDown_Sml")
 	combatButton:SetCheck(true)
 	
 	LayoutHelpers.AtLeftTopIn(factionChooser, window, 6, 6)
@@ -179,7 +179,7 @@ function ConfigureUpgrades()
 	for i = 1, 6 do
 		local index = i
 		buttonGrid.QueuedUpgrades[index] = Bitmap(buttonGrid)
-		buttonGrid.QueuedUpgrades[index]:SetTexture('/mods/GAZ_UI/textures/scumanager/queueborder.dds')
+		buttonGrid.QueuedUpgrades[index]:SetTexture('/textures/ui/common/SCUManager/queueborder.dds')
 		if index == 1 then
 			LayoutHelpers.AtLeftTopIn(buttonGrid.QueuedUpgrades[index], window, 150, 4)
 		else
@@ -219,11 +219,11 @@ end
 function LayoutGrid(buttonGrid, faction, scuType)
 	--get the enhancements available to whichever scu is being edited
 	local bpid = 'ual0301'
-	if faction == 'Cybran' then
+	if faction == 'cybran' then
 		bpid = 'url0301'
-	elseif faction == 'UEF' then
+	elseif faction == 'uef' then
 		bpid = 'uel0301'
-	elseif faction == 'Seraphim' then
+	elseif faction == 'seraphim' then
 		bpid = 'xsl0301'
 	end
 	local bp = __blueprints[bpid]
@@ -508,7 +508,7 @@ local index = 1
 function PlaceMarker(upgradeType, position)
 	local worldview = import('/lua/ui/game/worldview.lua').viewLeft
 	markerTable[index] = Bitmap(GetFrame(0))
-	markerTable[index]:SetTexture('/mods/GAZ_UI/textures/scumanager/'..upgradeType..'_up.dds')
+	markerTable[index]:SetTexture('/textures/ui/common/SCUManager/'..upgradeType..'_up.dds')
 	markerTable[index].Depth:Set(100)
 	markerTable[index].Left:Set(100)
 	markerTable[index].Top:Set(100)

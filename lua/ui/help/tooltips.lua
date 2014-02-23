@@ -2253,83 +2253,79 @@ Tooltips = {
     #**********************
 
     options_gui_bigger_strat_build_icons = {
-        title = 'GUI Mod',
+        title = 'Bigger Strategic Build Icons',
         description = 'Replaces the default strategic build icons with something more visible.',
     },
     options_gui_template_rotator = {
-        title = 'GUI Mod',
+        title = 'Template Rotation',
         description = 'Allows build templates to be rotated with the middle mouse button.',
     },
     options_gui_scu_manager = {
-        title = 'GUI Mod',
+        title = 'SCU Manager',
         description = 'Allows SCUs to be upgraded automatically or in a single click.',
     },
     options_gui_draggable_queue = {
-        title = 'GUI Mod',
+        title = 'Draggable Build Queue',
         description = 'Allows factory build queues to be reordered with drag and drop.',
     },
     options_gui_idle_engineer_avatars = {
-        title = 'GUI Mod',
+        title = 'Middle Click Avatars',
         description = 'Allows middle clicking idle engineer avatars to select all idle engineers on screen.',
     },
     options_gui_all_race_templates = {
-        title = 'GUI Mod',
+        title = 'All Race Templates',
         description = 'Allows build templates to be used across all 4 factions.',
     },
     options_gui_enhanced_unitview = {
-        title = 'GUI Mod',
+        title = 'Single Unit Selected Info',
         description = 'Replaces fuel bar with progress bar, and causes the unitview to always be shown for a 1 unit selection.',
     },
     options_gui_enhanced_unitrings = {
-        title = 'GUI Mod',
+        title = 'Single Unit Selected Rings',
         description = 'When a single unit is selected, show that units range rings.',
     },
     options_gui_templates_factory = {
-        title = 'GUI Mod',
+        title = 'Factory Build Queue Templates',
         description = 'Allows creation of factory build queue templates.',
     },
     options_gui_seperate_idle_builders = {
-        title = 'GUI Mod',
+        title = 'Seperate Idle Builders',
         description = 'Use a seperate icon for idle Engineers and other builders.',
     },
     options_gui_visible_template_names = {
-        title = 'GUI Mod',
+        title = 'Visible Template Names',
         description = 'Displays template name below template icon.',
     },
     options_gui_template_name_cutoff = {
-        title = 'GUI Mod',
+        title = 'Template Name Cutoff',
         description = 'The first 7 characters are displayed (default). Number of characters omitted can be customized. (Needs restart for effects to be visible.)',
     },
     options_gui_detailed_unitview = {
-        title = 'GUI Mod',
+        title = 'Display more Unit Stats',
         description = 'Displays Shield Hp, Regen rate, Hp Regen rate and Build rate. Adapted from Total Veterancy by Eni.',
     },
     options_gui_display_reclaim_totals = {
-        title = 'GUI Mod',
+        title = 'Display Reclaim Window',
         description = 'Displays resources reclaimed.',
     },
     options_gui_render_custom_names = {
-        title = 'GUI Mod',
+        title = 'Always Render Custom Names',
         description = 'Toggle display of custom names. Enabled by default.',
     },
     options_gui_render_enemy_lifebars = {
-        title = 'GUI Mod',
+        title = 'Force Render Enemy Lifebars',
         description = 'Force rendering enemy lifebars. Disabled by default',
     },
-    options_gui_auto_rename_replays = {
-        title = 'GUI Mod',
-        description = 'Auto renames the current Replay once you exit to the Score screen. Enabled by default',
-    },
     options_gui_improved_unit_deselection = {
-        title = 'GUI Mod',
+        title = 'Improved Unit deselection',
         description = 'Reduce the number of selected units by shift(-1) or ctrl(-5) or ctrl+shift(-10) right-click in group selection. Enabled by default',
     },
     options_gui_zoom_pop_distance = {
-        title = 'GUI Mod',
+        title = 'Zoom Pop Distance',
         description = 'Adjusts distance to which Zoom Pop zooms to.',
     },
     options_gui_smart_economy_indicators = {
-        title = 'GUI Mod',
+        title = 'Smart Economy Indicators',
         description = 'Smart Economy indicators. Rate display works differently now. Efficiency is "infinite" when consumption is zero. Values greater than 100% are possible again. Mass rate begins to flash bright white if stored mass is > 80% and rate is climbing. Energy rate begins to flash bright white if stored energy is < 20% and rate is sinking. Mass and energy bars are vertically exchanged (mass is heavier, thus it is below energy - TA style). Mass bar, as well as income and store numbers, are gray - TA style.',
     },
 

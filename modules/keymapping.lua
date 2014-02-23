@@ -1,4 +1,3 @@
-local KeyMapper = import('/lua/keymap/keymapper.lua')
 local Prefs = import('/lua/user/prefs.lua')
 
 local lockZoomEnable = false
