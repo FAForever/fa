@@ -495,9 +495,13 @@ function assignToTeam(num)
 
 end
 
-local function round(num, idp)
+function round(num, idp)
   local mult = 10^(idp or 0)
   return math.floor(num * mult + 0.5) / mult
+end
+
+function round2(num)
+  return math.floor(num + 0.5)
 end
 
 function computeQuality(team)
