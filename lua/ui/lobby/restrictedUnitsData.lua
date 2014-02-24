@@ -172,8 +172,8 @@ sortOrder = {
     "SUPCOM",
     "FABS",
     "SUPPFAC",
-	"TELE",
-	"BILLY",
+	--"TELE", -- DISABLE FOR PREVENT A BUG, Need a fix
+	--"BILLY", -- DISABLE FOR PREVENT A BUG, Need a fix
 	"ENGISTATION",
 	"SALVAMAVOSCATH",
 	"PARAGON",
