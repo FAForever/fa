@@ -6,7 +6,7 @@
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
 
-LOBBYversion = 'v2.2b'
+LOBBYversion = 'v2.2'
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
@@ -3793,35 +3793,6 @@ function RefreshOptionDisplayData(scenarioInfo)
     formattedOptions = {}
 	FormOpt2 = {}
 
---// Check Ranked active -- Xinnony & Vicarian
-    local getInit = GetCommandLineArg("/init", 1)
-    getInit = tostring(getInit[1])
-    if getInit == "init_faf.lua" then
-        SetText2(ModFeaturedLabel, 'FA Forever', 10)
-    elseif getInit == "init_blackops.lua" then
-        SetText2(ModFeaturedLabel, 'BlackOps MOD', 10)
-	elseif getInit == "init_coop.lua" then
-        SetText2(ModFeaturedLabel, 'COOP', 10)
-    elseif getInit == "init_balancetesting.lua" then
-        SetText2(ModFeaturedLabel, 'Balance Testing', 10)
-    elseif getInit == "init_gw.lua" then
-        SetText2(ModFeaturedLabel, 'Galactic War', 10)
-    elseif getInit == "init_labwars.lua" then
-        SetText2(ModFeaturedLabel, 'Labwars MOD', 10)
-    elseif getInit == "init_ladder1v1.lua" then
-        SetText2(ModFeaturedLabel, 'Ladder 1v1', 10)
-    elseif getInit == "init_nomads.lua" then
-        SetText2(ModFeaturedLabel, 'Nomads MOD', 10)
-    elseif getInit == "init_phantomx.lua" then
-        SetText2(ModFeaturedLabel, 'PhantomX MOD', 10)
-    elseif getInit == "init_supremedestruction.lua" then
-        SetText2(ModFeaturedLabel, 'SupremeDestruction MOD', 10)
-    elseif getInit == "init_xtremewars.lua" then
-        SetText2(ModFeaturedLabel, 'XtremeWars MOD', 10)
-    --else
-        --ModFeaturedLabel:SetText('')
-    end
---\\ Stop Check Ranked active
 --// Check Mod active
     local modStr = false
 	local modNum = table.getn(Mods.GetGameMods(gameInfo.GameMods)) or 0
