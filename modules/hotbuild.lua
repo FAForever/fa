@@ -163,8 +163,17 @@ function addModifiers()
     for key, action in currentKeyMap do
       if action["category"] == "hotbuild" then
         if key != nil then
-            modifiersKeys["Shift-" .. key] = action
-            LOG("binding modifiers")
+            if not import('/lua/keymap/keymapper.lua').IsKeyInMap("Shift-" .. key, currentKeyMap) then
+                modifiersKeys["Shift-" .. key] = action
+            else
+                WARN("Shift-" .. key .. " is already bind")
+            end
+            
+            if not import('/lua/keymap/keymapper.lua').IsKeyInMap("Alt-" .. key, currentKeyMap) then
+                modifiersKeys["Alt-" .. key] = action
+            else
+                WARN("Alt-" .. key .. " is already bind")
+            end    
         end
       end
     end  
@@ -174,8 +183,7 @@ end
 function init()
   buildingTab = getBuildingTab()
   initCycleMap()
-  CommandMode.AddEndBehavior(resetCycle)
-  addModifiers()
+  CommandMode.AddEndBehavior(resetCycle)  
 end
 
 ---- The actual key action callback
@@ -187,7 +195,7 @@ function buildAction(name)
     modifier = "Alt"
   end
 
-  LOG("---> buildAction " .. name .. " modifier: " .. modifier)
+  --LOG("---> buildAction " .. name .. " modifier: " .. modifier)
   local selection = GetSelectedUnits()
   if selection then
     --if current selection is engineer (includes commander)
@@ -201,10 +209,10 @@ end
 
 -- Some of the work here is redundant when cycle_preview is disabled
 function buildActionBuilding(name, modifier)
-  LOG("BAB " .. name)
+  --LOG("BAB " .. name)
   local options = Prefs.GetFromCurrentProfile('options')
   local allValues = buildingTab[name]
-  LOG(repr(allValues))
+  --LOG(repr(allValues))
   local effectiveValues = {}
   
  if (table.find(allValues, "_templates")) then
@@ -437,7 +445,7 @@ function buildActionUnit(name, modifier)
   local values = buildingTab[name]
   
   -- Try to delete old units except for the one currently in construction
-  if (modifier == 'ALT') then
+  if (modifier == 'Alt') then
     local currentCommandQueue = Construction.getCurrentCommandQueue()
     if (currentCommandQueue) then
       for index = table.getn(currentCommandQueue), 1, -1  do
@@ -456,7 +464,7 @@ function buildActionUnit(name, modifier)
     end
   end
   local count = 1
-  if (modifier == 'SHIFT') then
+  if (modifier == 'Shift') then
     count = 5
   end
   

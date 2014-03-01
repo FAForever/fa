@@ -37,6 +37,30 @@ local oldData = {}
 local lastObserving
 ##end faf variables
 
+-- Hotbuild stuff
+modifiersKeys = {}
+-- Adding modifiers shorcuts on the fly.
+local currentKeyMap = import('/lua/keymap/keymapper.lua').GetKeyMappings()
+for key, action in currentKeyMap do
+  if action["category"] == "hotbuild" then
+    if key != nil then
+        if not import('/lua/keymap/keymapper.lua').IsKeyInMap("Shift-" .. key, currentKeyMap) then
+            modifiersKeys["Shift-" .. key] = action
+        else
+            WARN("Shift-" .. key .. " is already bind")
+        end
+        
+        if not import('/lua/keymap/keymapper.lua').IsKeyInMap("Alt-" .. key, currentKeyMap) then
+            modifiersKeys["Alt-" .. key] = action
+        else
+            WARN("Alt-" .. key .. " is already bind")
+        end        
+    end
+  end
+end  
+IN_AddKeyMapTable(modifiersKeys)
+
+
 -- check this flag to see if it's valid to show the exit dialog
 supressExitDialog = false
 
@@ -83,6 +107,7 @@ function SetLayout(layout)
 end
 
 function OnFirstUpdate()
+    import('/modules/hotbuild.lua').init()
     EnableWorldSounds()
     local avatars = GetArmyAvatars()
     if avatars and avatars[1]:IsInCategory("COMMAND") then
@@ -123,7 +148,6 @@ end
 
 function CreateUI(isReplay)
     ConExecute("Cam_Free off")
-    import('/modules/hotbuild.lua').init()
     local prefetchTable = { models = {}, anims = {}, d3d_textures = {}, batch_textures = {} }
     
     -- set up our layout change function
