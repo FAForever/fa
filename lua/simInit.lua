@@ -1,4 +1,4 @@
-# Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+# Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #
 # This is the sim-specific top-level lua initialization file. It is run at initialization time
 # to set up all lua state for the sim.
@@ -169,23 +169,26 @@ function BeginSession()
     if ScenarioInfo.Options.RestrictedCategories then
         local restrictedUnits = import('/lua/ui/lobby/restrictedUnitsData.lua').restrictedUnits
         for index, restriction in ScenarioInfo.Options.RestrictedCategories do
+		LOG('1 - '..restriction..' ['..index..']')
             local restrictedCategories = nil
-            if restrictedUnits[restriction].categories then -- Fix the Restricted crash
+            if restrictedUnits[restriction].categories then
 				for index, cat in restrictedUnits[restriction].categories do
+					LOG('2 - '..cat..' ['..index..']')
 					if restrictedCategories == nil then
 						restrictedCategories = categories[cat]
 					else
 						restrictedCategories = restrictedCategories + categories[cat]
 					end
+					LOG('2 - <<<')
 				end
+				LOG('1 - <<<')
+				if buildRestrictions == nil then
+					buildRestrictions = restrictedCategories
+				else
+					buildRestrictions = buildRestrictions + restrictedCategories
+				end
+				LOG('0 - <<<')
 			end
-            if restrictedCategories then   # some restrictions dont have unit categories set like enhancement restrictions, skip them
-                if buildRestrictions == nil then
-                    buildRestrictions = restrictedCategories
-                else
-                    buildRestrictions = buildRestrictions + restrictedCategories
-                end
-            end
         end
     end
 

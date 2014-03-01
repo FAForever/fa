@@ -2781,10 +2781,9 @@ Unit = Class(moho.unit_methods) {
     OnWorkBegin = function(self, work)
         local unitEnhancements = import('/lua/enhancementcommon.lua').GetEnhancements(self:GetEntityId())
         local tempEnhanceBp = self:GetBlueprint().Enhancements[work]
-		local UpgradeRestricted = false
         
 		-- Check if the Enhance is Restricted -- Xinnony
-		LOG('CreateEnhancement work:'..tostring(work)) --bp = {table}
+		--LOG('CreateEnhancement workBEGIN:'..tostring(work)) --bp = {table}
 		if ScenarioInfo.Options.RestrictedCategories then
 			local restrictedUnits = import('/lua/ui/lobby/restrictedUnitsData.lua').restrictedUnits
 			for k, restriction in ScenarioInfo.Options.RestrictedCategories do 
@@ -2793,19 +2792,14 @@ Unit = Class(moho.unit_methods) {
 					for kk, cat in restrictedUnits[restriction].enhancement do
 						--LOG('2 : '..cat) -- Teleporter
 						if work == cat then -- if Teleporter == Teleporter
-							UpgradeRestricted = true
 							--LOG('Enhancement removed !')
-							--self:OnWorkEnd(work)
-							self.WorkItemBuildCostEnergy = 0
-							self.WorkItemBuildCostMass = 0
-							self.WorkItemBuildTime = 0
-							self.WorkProgress = 0
+							self:OnWorkFail(work)
+							--self.WorkProgress = 0
 							--self:SetWorkProgress(1)
-							--
 							--self:SetActiveConsumptionInactive()
-							--self:PlayUnitSound('EnhanceFail')
-							--self:StopUnitAmbientSound('EnhanceLoop')
-							self:ClearWork()
+							--#self:PlayUnitSound('EnhanceEnd')
+							--#self:ClearWork()
+							--ChangeState(self, self.IdleState)
 							--self:CleanupEnhancementEffects()
 							return false
 						end
@@ -2837,6 +2831,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnWorkEnd = function(self, work)
+        --LOG('CreateEnhancement workEND:'..tostring(work))
         self:SetActiveConsumptionInactive()
         self:PlayUnitSound('EnhanceEnd')
         self:StopUnitAmbientSound('EnhanceLoop')
@@ -2844,7 +2839,8 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnWorkFail = function(self, work)
-        self:SetActiveConsumptionInactive()
+        --LOG('CreateEnhancement workFAIL:'..tostring(work))
+		self:SetActiveConsumptionInactive()
         self:PlayUnitSound('EnhanceFail')
         self:StopUnitAmbientSound('EnhanceLoop')
         self:ClearWork()
@@ -2857,6 +2853,7 @@ Unit = Class(moho.unit_methods) {
             error('*ERROR: Got CreateEnhancement call with an enhancement that doesnt exist in the blueprint.', 2)
             return false
         end
+        --LOG('CreateEnhancement :'..tostring(enh)..' and BP : '..tostring(bp))
         if bp.ShowBones then
             for k, v in bp.ShowBones do
                 if self:IsValidBone(v) then

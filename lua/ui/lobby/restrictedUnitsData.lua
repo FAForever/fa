@@ -32,14 +32,12 @@ restrictedUnits = {
 	},
 	TELE = {
 		enhancement = {"Teleporter", "TeleporterRemove"},
-		categories = {},
-        name = "No Teleport",
+        name = "No Teleport (FIXED)",
 		tooltip = {text='No Teleport', body='Remove Teleport Upgrade on the UEF Commander (by Xinnony)'},
 	},
 	BILLY = {
 		enhancement = {"TacticalNukeMissile", "TacticalNukeMissileRemove"},
-		categories = {},
-        name = "No Billy",
+        name = "No Billy (FIXED)",
 		tooltip = {text='No Billy', body='Remove Billy (Nuke) Upgrade on the UEF Commander (by Xinnony)'},
 	},
 	T1 = {
@@ -172,8 +170,8 @@ sortOrder = {
     "SUPCOM",
     "FABS",
     "SUPPFAC",
-	--"TELE", -- DISABLE FOR PREVENT A BUG, Need a fix
-	--"BILLY", -- DISABLE FOR PREVENT A BUG, Need a fix
+	"TELE",
+	"BILLY",
 	"ENGISTATION",
 	"SALVAMAVOSCATH",
 	"PARAGON",
