@@ -61,7 +61,6 @@ UnitBlueprint {
         'ANTIMISSILE',
         'ANTIAIR',
         'FACTORY',
-        'REPAIR',
         'CARRIER',
         'VISIBLETORECON',
         'RECLAIMABLE',

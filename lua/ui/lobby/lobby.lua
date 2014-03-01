@@ -3717,7 +3717,11 @@ function CreateUI(maxPlayers)
                         --GUI.slots[slot].pingText:SetColor(pingcolor)
                         if ping and GUI.slots[slot].pingStatus then
                             GUI.slots[slot].pingStatus:SetValue(ping)
-                            GUI.slots[slot].pingStatus:Show()
+                            if ping >= 500 or pingcolor != "green" then
+                                GUI.slots[slot].pingStatus:Show()
+                            else
+                                GUI.slots[slot].pingStatus:Hide()
+                            end
                             if pingcolor == 'red' then
                                 GUI.slots[slot].pingStatus._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-03_bmp.dds'))
                             elseif pingcolor == 'green' then
@@ -5172,7 +5176,7 @@ end -- NewShowMapPositions(...)
 
 --CPU Status Bar Configuration
 local barMax = 450
-local barMin = 150
+local barMin = 0
 local greenBarMax = 300
 local yellowBarMax = 375
 local scoreSkew1 = 0 --Skews all CPU scores up or down by the amount specified (0 = no skew)
@@ -5387,11 +5391,14 @@ function SetSlotCPUBar(slot, playerInfo)
             if b then
                 -- For display purposes, the bar has a higher minimum that the actual barMin value.
                 -- This is to ensure that the bar is visible for very small values
-                local clampedResult =  math.max(math.min(b.Result, barMax), barMin + math.floor(.04 * (barMax - barMin)))
+
+                local clampedResult =  math.max(math.min((b.Result * GetPlayerCount())/12, barMax), barMin + math.floor(.04 * (barMax - barMin)))
                 GUI.slots[slot].CPUSpeedBar:SetValue(clampedResult)
                 
                 --For the tooltip, we use the actual clamped value
                 GUI.slots[slot].CPUSpeedBar.CPUActualValue = b.Result
+
+
                 GUI.slots[slot].CPUSpeedBar:Show()
 
                 GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.UIFile('/game/unit_bmp/bar_purple_bmp.png'))

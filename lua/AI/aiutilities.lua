@@ -551,11 +551,12 @@ end
 
 function AIFindFirebaseLocation( aiBrain, locationType, radius, markerType, tMin, tMax, tRings, tType, maxUnits, unitCat, markerRadius)
     #Get location of commander
-    local threatPos, threatVal = aiBrain:GetHighestThreatPosition(1, true, 'Commander')--, aiBrain:GetCurrentEnemy())
-    if threatVal == 0 then
-        local threatPos, threatVal = aiBrain:GetHighestThreatPosition(1, true, 'Structures')--, aiBrain:GetCurrentEnemy())
-    end
-    
+    #local threatPos, threatVal = aiBrain:GetHighestThreatPosition(0, true, 'Commander', aiBrain:GetCurrentEnemy():GetArmyIndex())
+    #if threatVal == 0 then
+    #    local threatPos, threatVal = aiBrain:GetHighestThreatPosition(1, true, tType or 'Structures', aiBrain:GetCurrentEnemy():GetArmyIndex())
+    #end
+    local estartX, estartZ = aiBrain:GetCurrentEnemy():GetArmyStartPos()
+    local threatPos = {estartX, 0, estartZ}
     #Get markers
     local markerList = AIGetMarkerLocations(aiBrain, markerType)
     
@@ -607,6 +608,7 @@ function AIFindFirebaseLocation( aiBrain, locationType, radius, markerType, tMin
     end
     return reference, refName
 end
+
 
 function AIGetMarkerMostUnits( aiBrain, markerType, markerRadius, pos, posRad, unitCount, unitCat, tMin, tMax, tRings, tType)
     local markers = AIGetMarkersAroundLocation( aiBrain, markerType, pos, posRad, tMin, tMax, tRings, tType )
@@ -1503,30 +1505,40 @@ function UseTransports(units, transports, location, transportPlatoon)
 			table.remove(transports, k)
         end
     end
-    # Return empty transports to base
-	for k,v in transports do
-        if not v:IsDead() and EntityCategoryContains( categories.TRANSPORTATION, v ) and table.getn(v:GetCargo()) < 1 then
-            ReturnTransportsToPool({v}, true)
-			table.remove(transports, k)
+    #DUNCAN - if some transports have no units return to pool
+    for k,t in transports do
+        if not t:IsDead() and table.getn(t:GetCargo()) < 1 then
+            aiBrain:AssignUnitsToPlatoon( 'ArmyPool', {t}, 'Scout', 'None' )
+            table.remove( transports, k )
         end
     end
     #LOG('*AI DEBUG: Transport loaded')
 
     
     if table.getn(transports) != 0 then
-        local safePath = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Air', transports[1]:GetPosition(), location, 200)
-        if safePath then 
-            for _,p in safePath do
-                IssueMove(transports, p)
+        #DUNCAN - if no location then we have loaded transports then return true
+        if location then
+            local safePath = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Air', transports[1]:GetPosition(), location, 200)
+            if safePath then 
+                for _,p in safePath do
+                    IssueMove(transports, p)
+                end
+                #LOG('*AI DEBUG: Transport using safe path')
             end
-            #LOG('*AI DEBUG: Transport using safe path')
+        else
+            #LOG('No transport location supplied, units not unloaded.')
+            return true
         end
+    else
+        #DUNCAN - if no transports return false
+        return false
     end
+
 
     IssueTransportUnload( transports, location )
     local attached = true
     while attached do
-        WaitSeconds(3)
+        WaitSeconds(2)
         local allDead = true
         for k,v in transports do
             if not v:IsDead() then
@@ -1695,17 +1707,22 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
     local result, bestPos = unit:CanPathTo( destination )
 
     local bUsedTransports = false
-    if not result or VDist2(pos[1], pos[3], destination[1], destination[3]) > 200 and unit.PlatoonHandle then
-        # if we can\'t path to our destination, we need, rather than want, transports
+    #DUNCAN - increase check to 300 for transports
+    if not result or VDist2Sq(pos[1], pos[3], destination[1], destination[3]) > 300*300 
+    and unit.PlatoonHandle and not EntityCategoryContains(categories.COMMAND, unit) then
+        # if we can't path to our destination, we need, rather than want, transports
         local needTransports = not result
-        if VDist2( pos[1], pos[3], destination[1], destination[3] ) > 512 then
+        if VDist2Sq( pos[1], pos[3], destination[1], destination[3] ) > 512*512 then #and unit.PlatoonHandle.PlatoonData.RequireTransport then
             needTransports = true
         end
         # skip the last move... we want to return and do a build
-        bUsedTransports = AIAttackUtils.SendPlatoonWithTransports(aiBrain, unit.PlatoonHandle, destination, needTransports, true)
+        bUsedTransports = AIAttackUtils.SendPlatoonWithTransportsNoCheck(aiBrain, unit.PlatoonHandle, destination, needTransports, true, false)
         
         if bUsedTransports then
             return true
+        elseif VDist2Sq( pos[1], pos[3], destination[1], destination[3] ) > 512*512 then
+            #DUNCAN - if over 512 and no transports dont try and walk!
+            return false
         end
     end
     
@@ -1720,14 +1737,17 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
                     IssueMove({unit},waypointPath)
                 end
             end  
+        #else
+            #IssueMove({unit},destination)
         end
-        # if there wasn\'t a *safe* path (but dest was pathable), then the last move would have been to go there directly
-        # so don\'t bother... the build/capture/reclaim command will take care of that after we return
+        # if there wasn't a *safe* path (but dest was pathable), then the last move would have been to go there directly
+        # so don't bother... the build/capture/reclaim command will take care of that after we return
         return true
     end
     
     return false
-end    
+end   
+
 
 function EngineerTryReclaimCaptureArea(aiBrain, eng, pos)
     if not pos then
@@ -2803,3 +2823,77 @@ function UseTransportsGhetto(units, transports)
     end
     return true
 end
+
+#DUNCAN - added
+function AIFindFurthestMarkerNeedsEngineer( aiBrain, pos, radius, tMin, tMax, tRings, tType, positions )
+   local closest = false
+   local retPos, retName
+   local positions = AIFilterAlliedBases( aiBrain, positions )
+   for k,v in positions do
+       if not aiBrain.BuilderManagers[v.Name] then
+           if not closest or VDist3(pos, v.Position) > closest then
+               closest = VDist3(pos, v.Position)
+               retPos = v.Position
+               retName = v.Name
+           end
+       else
+           local managers = aiBrain.BuilderManagers[v.Name]
+           if managers.EngineerManager:GetNumUnits('Engineers') == 0 and managers.FactoryManager:GetNumFactories() == 0 then
+               if not closest or VDist3(pos, v.Position) > closest then
+                   closest = VDist3(pos, v.Position)
+                   retPos = v.Position
+                   retName = v.Name
+               end
+           end
+       end
+   end
+   return retPos, retName
+end
+
+# We use both Blank Marker that are army names as well as the new Large Expansion Area to determine big expansion bases
+function AIFindFurthestStartLocationNeedsEngineer( aiBrain, locationType, radius, tMin, tMax, tRings, tType, eng)
+    local pos = aiBrain:PBMGetLocationCoords( locationType )
+    if not pos then
+        return false
+    end
+
+    local validPos = AIGetMarkersAroundLocation( aiBrain, 'Large Expansion Area', pos, radius, tMin, tMax, tRings, tType)
+
+    local positions = AIGetMarkersAroundLocation( aiBrain, 'Blank Marker', pos, radius, tMin, tMax, tRings, tType)
+    local startX, startZ = aiBrain:GetArmyStartPos()
+    for k,v in positions do
+        if string.sub(v.Name,1,5) == 'ARMY_' then
+            if startX != v.Position[1] and startZ != v.Position[3] then
+                table.insert( validPos, v )
+            end
+        end
+    end
+    
+    #DUNCAN - change to look for furtherest away!
+    local retPos, retName
+    if eng then
+        retPos, retName = AIFindFurthestMarkerNeedsEngineer( aiBrain, eng:GetPosition(), radius, tMin, tMax, tRings, tType, validPos )
+    else
+        retPos, retName = AIFindFurthestMarkerNeedsEngineer( aiBrain, pos, radius, tMin, tMax, tRings, tType, validPos )
+    end
+    return retPos, retName
+end
+
+
+function AIFindFurthestExpansionAreaNeedsEngineer( aiBrain, locationType, radius, tMin, tMax, tRings, tType, eng)
+    local pos = aiBrain:PBMGetLocationCoords( locationType )
+    if not pos then
+        return false
+    end
+    local positions = AIGetMarkersAroundLocation( aiBrain, 'Expansion Area', pos, radius, tMin, tMax, tRings, tType)
+    
+    #DUNCAN - change to look for furtherest away!
+    local retPos, retName
+    if eng then
+        retPos, retName = AIFindFurthestMarkerNeedsEngineer( aiBrain, eng:GetPosition(), radius, tMin, tMax, tRings, tType, positions )
+    else
+        retPos, retName = AIFindFurthestMarkerNeedsEngineer( aiBrain, pos, radius, tMin, tMax, tRings, tType, positions )
+    end
+    return retPos, retName
+end
+

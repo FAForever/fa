@@ -14,6 +14,7 @@ local GameCommon = import('/lua/ui/game/gamecommon.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Movie = import('/lua/maui/movie.lua').Movie
 local Prefs = import('/lua/user/prefs.lua')
+local options = Prefs.GetFromCurrentProfile('options')
 
 local gameParent = false
 local controlClusterGroup = false
@@ -122,7 +123,7 @@ end
 
 function CreateUI(isReplay)
     ConExecute("Cam_Free off")
-    
+    import('/modules/hotbuild.lua').init()
     local prefetchTable = { models = {}, anims = {}, d3d_textures = {}, batch_textures = {} }
     
     -- set up our layout change function
@@ -208,6 +209,15 @@ function CreateUI(isReplay)
 		import('/lua/ui/game/avatars.lua').ToggleAvatars(false)
 		AddBeatFunction(UiBeat)
 	end
+
+    if options.gui_scu_manager != 0 then
+        import('/modules/scumanager.lua').Init()
+    end
+
+    if options.gui_render_enemy_lifebars == 1 or options.gui_render_custom_names == 0 then
+        import('/modules/console_commands.lua').Init()
+    end
+
 end
 
 local provider = false
@@ -391,6 +401,15 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         import('/lua/ui/game/selection.lua').PlaySelectionSound(added)
         import('/lua/ui/game/rallypoint.lua').OnSelectionChanged(newSelection)
     end
+
+    local selUnits = newSelection
+
+    if selUnits and table.getn(selUnits) == 1 and import('/modules/selectedinfo.lua').SelectedOverlayOn then
+        import('/modules/selectedinfo.lua').ActivateSingleRangeOverlay()
+    else
+        import('/modules/selectedinfo.lua').DeactivateSingleRangeOverlay()
+    end   
+
 end
 
 function OnQueueChanged(newQueue)
