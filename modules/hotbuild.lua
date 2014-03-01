@@ -11,6 +11,7 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Effect = import('/lua/maui/effecthelpers.lua')
 
+local upgradeTab = import('/modules/upgradeTab.lua').upgradeTab
 
 local buildingTab
 local cyclePos
