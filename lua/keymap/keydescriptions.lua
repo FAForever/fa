@@ -296,7 +296,7 @@ keyDescriptions = {
     # hotbuild
     ['builders'] = 'build builders (factories, Quantum Gate & T1 engineers)',
     ['sensors'] = 'build sensors + T1 sub marines',
-    ['shields'] = 'build shields/steath fields + LAB + Interceptors + Fregates',
+    ['shields'] = 'build shields/steath fields + LAB + Interceptors + Frigates',
     ['tmd'] = 'build Tactical Missiles Defense + T1 Tanks + T1 Bombers + Attack boat',
     ['xp'] = 'build experimentals + mobile T1 AA + T1 light Transports',
     ['mobilearty'] = 'build T1 artilleries + T1 light gunship',

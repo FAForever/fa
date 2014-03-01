@@ -424,7 +424,7 @@ options = {
                 title = "Bigger Strategic Build Icons",
                 key = 'gui_bigger_strat_build_icons',
                 type = 'toggle',
-                default = 1,
+                default = 0,
                 custom = {
                     states = {
                         {text = "<LOC _Off>", key = 0 },
@@ -438,7 +438,7 @@ options = {
                 title = "Template Rotation",
                 key = 'gui_template_rotator',
                 type = 'toggle',
-                default = 1,
+                default = 0,
                 custom = {
                     states = {
                         {text = "<LOC _Off>", key = 0 },
@@ -451,7 +451,7 @@ options = {
                 title = "SCU Manager",
                 key = 'gui_scu_manager',
                 type = 'toggle',
-                default = 1,
+                default = 0,
                 custom = {
                     states = {
                         {text = "<LOC _Off>", key = 0 },
@@ -464,7 +464,7 @@ options = {
                 title = "Draggable Build Queue",
                 key = 'gui_draggable_queue',
                 type = 'toggle',
-                default = 1,
+                default = 0,
                 custom = {
                     states = {
                         {text = "<LOC _Off>", key = 0 },
@@ -477,7 +477,7 @@ options = {
                 title = "Middle Click Avatars",
                 key = 'gui_idle_engineer_avatars',
                 type = 'toggle',
-                default = 1,
+                default = 0,
                 custom = {
                     states = {
                         {text = "<LOC _Off>", key = 0 },
@@ -490,7 +490,7 @@ options = {
                 title = "All Race Templates",
                 key = 'gui_all_race_templates',
                 type = 'toggle',
-                default = 1,
+                default = 0,
                 custom = {
                     states = {
                         {text = "<LOC _Off>", key = 0 },
@@ -503,7 +503,7 @@ options = {
                 title = "Single Unit Selected Info",
                 key = 'gui_enhanced_unitview',
                 type = 'toggle',
-                default = 1,
+                default = 0,
                 custom = {
                     states = {
                         {text = "<LOC _Off>", key = 0 },
@@ -516,7 +516,7 @@ options = {
                 title = "Single Unit Selected Rings",
                 key = 'gui_enhanced_unitrings',
                 type = 'toggle',
-                default = 1,
+                default = 0,
                 custom = {
                     states = {
                         {text = "<LOC _Off>", key = 0 },
@@ -541,7 +541,7 @@ options = {
                 title = "Factory Build Queue Templates",
                 key = 'gui_templates_factory',
                 type = 'toggle',
-                default = 1,
+                default = 0,
                 custom = {
                     states = {
                         {text = "<LOC _Off>", key = 0 },
@@ -554,7 +554,7 @@ options = {
                 title = "Seperate Idle Builders",
                 key = 'gui_seperate_idle_builders',
                 type = 'toggle',
-                default = 1,
+                default = 0,
                 custom = {
                     states = {
                         {text = "<LOC _Off>", key = 0 },
@@ -566,7 +566,7 @@ options = {
                 title = "Visible Template Names",
                 key = 'gui_visible_template_names',
                 type = 'toggle',
-                default = 1,
+                default = 0,
                 custom = {
                     states = {
                         {text = "<LOC _Off>", key = 0 },
@@ -591,7 +591,7 @@ options = {
                 title = "Display more Unit Stats",
                 key = 'gui_detailed_unitview',
                 type = 'toggle',
-                default = 1,
+                default = 0,
                 custom = {
                     states = {
                         {text = "<LOC _Off>", key = 0 },
@@ -617,7 +617,7 @@ options = {
                 title = "Always Render Custom Names",
                 key = 'gui_render_custom_names',
                 type = 'toggle',
-                default = 1,
+                default = 0,
                 set = function(key,value,startup)
                     ConExecute("ui_RenderCustomNames " .. tostring(value))
                 end,
@@ -649,7 +649,7 @@ options = {
                 title = "Improved Unit deselection",
                 key = 'gui_improved_unit_deselection',
                 type = 'toggle',
-                default = 1,
+                default = 0,
                 custom = {
                     states = {
                         {text = "<LOC _Off>", key = 0 },
