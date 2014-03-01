@@ -9,7 +9,8 @@ keyCategories = {
     ['chat'] = "<LOC keymap_category_0087>Chat",
     ['debug'] = "<LOC keymap_category_0088>Debug",
     ['user'] = "<LOC keymap_category_0090>User",
-    ['hotbuild'] = "<LOC keymap_category_091>Hotbuilding",
+    ['hotbuilding'] = "<LOC keymap_category_091>Hotbuilding",
+    ['hotbuildingExtra'] = "<LOC keymap_category_092>Hotbuilding - Extra keys",
     ['none'] = "<LOC keymap_category_0089>Unassigned Actions",
 }
 
@@ -20,7 +21,8 @@ keyCategoryOrder = {
     'selection',
     'orders',
     'chat',
-    'hotbuild',
+    'hotbuilding',
+    'hotbuildingExtra',
     'user',
     'debug',
     'none'

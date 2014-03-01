@@ -387,7 +387,7 @@ function CreateUI()
                 line.key:SetText(LOC(data.keyDisp))
                 line.key:SetColor('ffffffff')
                 line.key:SetFont('Arial', 16)
-                line.description:SetText(LOC(data.text or "<LOC key_binding_0001>No action text"))
+                line.description:SetText(LOC(data.text or data.action or "<LOC key_binding_0001>No action text"))
                 line.bg.dataKey = data.key
                 line.bg.dataAction = data.action
                 line.bg.dataIndex = lineID
@@ -426,10 +426,13 @@ function FormatData()
     for k, v in keyactions do
         if v.category then
             local keyForAction = keyLookup[k]
-                if not retkeys[v.category] then
-                    retkeys[v.category] = {}
-                end
-                table.insert(retkeys[v.category], {id = v.order, desckey = k, key = keyForAction})
+            if not keyCategories[v.category] then
+                keyCategories[v.category] = v.category
+            end
+            if not retkeys[v.category] then
+                retkeys[v.category] = {}
+            end
+            table.insert(retkeys[v.category], {id = v.order, desckey = k, key = keyForAction})
 
         end
     end
@@ -437,10 +440,15 @@ function FormatData()
     for i, v in retkeys do
         table.sort(v, function(val1, val2)
             if val1.id == val2.id then
-                if keydesc[val1.desckey] >= keydesc[val2.desckey] then
-                    return false
+                
+                if keydesc[val1.desckey] and keydesc[val2.desckey] then
+                    if keydesc[val1.desckey] >= keydesc[val2.desckey] then
+                        return false
+                    else
+                        return true
+                    end
                 else
-                    return true
+                    return false
                 end
             else
                 if val1.id >= val2.id then
