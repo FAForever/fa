@@ -757,9 +757,6 @@ EngineerManager = Class(BuilderManager) {
     end,
     
     ReassignUnit = function(self, unit)
-        if not unit then
-            return
-        end
         local managers = self.Brain.BuilderManagers
         local bestManager = false
         local distance = false
@@ -774,7 +771,7 @@ EngineerManager = Class(BuilderManager) {
 			end
         end
         self:RemoveUnit(unit)
-        if bestManager and not unit:Dead() then
+        if bestManager and not unit:IsDead() then
             bestManager:AddUnit(unit)
         end
     end,

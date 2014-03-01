@@ -3738,18 +3738,19 @@ Platoon = Class(moho.platoon_methods) {
                     return
                 end
             end
-
-           local antiAirThreat = aiBrain:GetThreatAtPosition(table.copy(target:GetPosition()), 1, true, 'AntiAir') 
-           #LOG("AntiAir threat: " .. antiAirThreat)
-           if target and antiAirThreat < 6 then
-               while not target:IsDead() do
-                   local targetLocation =target:GetPosition()
-                   local closeLocation = {targetLocation[1] + 4, targetLocation[2] + 0.2, targetLocation[3] + 2 }
-                   IssueMove( self:GetSquadUnits('Scout' ), closeLocation)
-                   WaitSeconds(2)
+           if target then
+               local antiAirThreat = aiBrain:GetThreatAtPosition(table.copy(target:GetPosition()), 1, true, 'AntiAir') 
+               #LOG("AntiAir threat: " .. antiAirThreat)
+               if antiAirThreat < 6 then
+                   while not target:IsDead() do
+                       local targetLocation =target:GetPosition()
+                       local closeLocation = {targetLocation[1] + 4, targetLocation[2] + 0.2, targetLocation[3] + 2 }
+                       IssueMove( self:GetSquadUnits('Scout' ), closeLocation)
+                       WaitSeconds(2)
+                   end
+               else 
+                    #LOG('No Ghetto target!')
                end
-           else 
-                #LOG('No Ghetto target!')
            end
            WaitSeconds(2)
        end
