@@ -219,11 +219,11 @@ end
 function LayoutGrid(buttonGrid, faction, scuType)
 	--get the enhancements available to whichever scu is being edited
 	local bpid = 'ual0301'
-	if faction == 'cybran' then
+	if faction == 'Cybran' then
 		bpid = 'url0301'
-	elseif faction == 'uef' then
+	elseif faction == 'UEF' then
 		bpid = 'uel0301'
-	elseif faction == 'seraphim' then
+	elseif faction == 'Seraphim' then
 		bpid = 'xsl0301'
 	end
 	local bp = __blueprints[bpid]
