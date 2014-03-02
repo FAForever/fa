@@ -346,7 +346,7 @@ function buildActionTemplate(modifier)
         end
         template.templateID = templateIndex
         table.insert(effectiveTemplates, template)
-		table.insert(effectiveIcons, template.icon)
+		  table.insert(effectiveIcons, template.icon)
       end
     end
   else
@@ -363,7 +363,7 @@ function buildActionTemplate(modifier)
       if valid then
         template.templateID = templateIndex
         table.insert(effectiveTemplates, template)
-		table.insert(effectiveIcons, template.icon)
+		    table.insert(effectiveIcons, template.icon)
       end
     end
   end
@@ -425,6 +425,29 @@ function buildActionTemplate(modifier)
   ClearBuildTemplates()
   CommandMode.StartCommandMode("build", {name = cmd})
   SetActiveBuildTemplate(template.templateData)
+
+  if options.gui_template_rotator != 0 then
+    -- rotating templates
+    local worldview = import('/lua/ui/game/worldview.lua').viewLeft
+    local oldHandleEvent = worldview.HandleEvent
+    worldview.HandleEvent = function(self, event)
+        if event.Type == 'ButtonPress' then
+            if event.Modifiers.Middle then
+                ClearBuildTemplates()
+                local tempTemplate = table.deepcopy(template.templateData)
+                for i = 3, table.getn(template.templateData) do
+                    local index = i
+                    template.templateData[index][3] = 0 - tempTemplate[index][4]
+                    template.templateData[index][4] = tempTemplate[index][3]
+                end
+                SetActiveBuildTemplate(template.templateData)
+            elseif event.Modifiers.Shift then
+            else
+                worldview.HandleEvent = oldHandleEvent
+            end
+        end
+    end
+  end
 
 end
 
