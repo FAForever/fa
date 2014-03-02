@@ -771,7 +771,9 @@ EngineerManager = Class(BuilderManager) {
 			end
         end
         self:RemoveUnit(unit)
-        bestManager:AddUnit(unit)
+        if bestManager and not unit:IsDead() then
+            bestManager:AddUnit(unit)
+        end
     end,
     
     TaskFinished = function(self, unit)
@@ -862,7 +864,21 @@ EngineerManager = Class(BuilderManager) {
         }
         return template
     end,
+
+    DelayAssign = function(self, unit)
+        if not unit.DelayThread then
+            unit.DelayThread = unit:ForkThread( self.DelayAssignBody, self )
+        end
+    end,
     
+    DelayAssignBody = function( unit, manager )
+        WaitSeconds(1)
+        if not unit:IsDead() then
+            manager:AssignEngineerTask(unit)
+        end
+        unit.DelayThread = nil
+    end,    
+
     AssignEngineerTask = function(self, unit)
         unit.DesiresAssist = false
         unit.NumAssistees = nil
@@ -947,19 +963,6 @@ EngineerManager = Class(BuilderManager) {
         self:ForkThread( self.EngineerWaiting, unit )
     end,
     
-    DelayAssign = function(self, unit)
-        if not unit.DelayThread then
-            unit.DelayThread = unit:ForkThread( self.DelayAssignBody, self )
-        end
-    end,
-    
-    DelayAssignBody = function( unit, manager )
-        WaitSeconds(1)
-        if not unit:IsDead() then
-            manager:AssignEngineerTask(unit)
-        end
-        unit.DelayThread = nil
-    end,
     
     ManagerLoopBody = function(self,builder,bType)
         if builder.OldPriority and not builder.SetByStrat then

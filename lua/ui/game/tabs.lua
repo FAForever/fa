@@ -158,8 +158,8 @@ local menus = {
         },
         gpgnet = {
             {
-                action = 'ShowGameInfos',
-                label = 'Show Game Infos',
+                action = 'ShowGameInfo',
+                label = 'Show Game Info',
                 tooltip = 'Show the settings of this game',
             },
 			{
@@ -253,8 +253,8 @@ local actions = {
             true,
             {escapeButton = 2, enterButton = 1, worldCover = true})
     end,
-	ShowGameInfos = function()
-        ToggleGameInfos()
+	ShowGameInfo = function()
+        ToggleGameInfo()
     end,
     Return = function()
         CollapseWindow()
@@ -750,7 +750,7 @@ function TogglePause()
     end
 end
 
-function ToggleGameInfos()
+function ToggleGameInfo()
     --LOG("XINNOinfo")
 	local ItemList = import('/lua/maui/itemlist.lua').ItemList
 	--
@@ -767,7 +767,7 @@ function ToggleGameInfos()
         LayoutHelpers.AtCenterIn(dialog2, dialog)
 	-----------
     -- Title --
-    local text0 = UIUtil.CreateText(dialog2, 'Game Infos :', 17, 'Arial')
+    local text0 = UIUtil.CreateText(dialog2, 'Game Info :', 17, 'Arial')
         text0:SetColor('B9BFB9') -- 808080
         text0:SetDropShadow(true)
         LayoutHelpers.AtHorizontalCenterIn(text0, dialog2, 0)
@@ -841,7 +841,7 @@ function ToggleGameInfos()
 	--
 	-- ... other options ...
 	---------------
-	PresetList:AddItem('Scenario Infos :')
+	PresetList:AddItem('Scenario Info :')
 	if SessionGetScenarioInfo() then
 		for k, v in SessionGetScenarioInfo() do
 			if k == 'name' then
@@ -894,7 +894,7 @@ function ToggleGameInfos()
 		PresetList:AddItem('')
 	end
 	if SessionGetScenarioInfo().Options.RestrictedCategories then
-		PresetList:AddItem('Restricteds :')
+		PresetList:AddItem('Unit Restrictions :')
 		for k, v in SessionGetScenarioInfo().Options.RestrictedCategories do
 			PresetList:AddItem('- '..tostring(v))
 		end

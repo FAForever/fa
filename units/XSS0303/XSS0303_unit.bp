@@ -52,7 +52,6 @@ UnitBlueprint {
         'NAVAL',
         'TECH3',
         'AIRSTAGINGPLATFORM',
-        'REPAIR',
         'CARRIER',
         'ANTIAIR',
         'VISIBLETORECON',

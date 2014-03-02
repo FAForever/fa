@@ -14,6 +14,7 @@ local GameCommon = import('/lua/ui/game/gamecommon.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Movie = import('/lua/maui/movie.lua').Movie
 local Prefs = import('/lua/user/prefs.lua')
+local options = Prefs.GetFromCurrentProfile('options')
 
 local gameParent = false
 local controlClusterGroup = false
@@ -35,6 +36,30 @@ local sendChat = import('/lua/ui/game/chat.lua').ReceiveChatFromSim
 local oldData = {}
 local lastObserving
 ##end faf variables
+
+-- Hotbuild stuff
+modifiersKeys = {}
+-- Adding modifiers shorcuts on the fly.
+local currentKeyMap = import('/lua/keymap/keymapper.lua').GetKeyMappings()
+for key, action in currentKeyMap do
+  if action["category"] == "hotbuilding" then
+    if key != nil then
+        if not import('/lua/keymap/keymapper.lua').IsKeyInMap("Shift-" .. key, currentKeyMap) then
+            modifiersKeys["Shift-" .. key] = action
+        else
+            WARN("Shift-" .. key .. " is already bind")
+        end
+        
+        if not import('/lua/keymap/keymapper.lua').IsKeyInMap("Alt-" .. key, currentKeyMap) then
+            modifiersKeys["Alt-" .. key] = action
+        else
+            WARN("Alt-" .. key .. " is already bind")
+        end        
+    end
+  end
+end  
+IN_AddKeyMapTable(modifiersKeys)
+
 
 -- check this flag to see if it's valid to show the exit dialog
 supressExitDialog = false
@@ -82,6 +107,7 @@ function SetLayout(layout)
 end
 
 function OnFirstUpdate()
+    import('/modules/hotbuild.lua').init()
     EnableWorldSounds()
     local avatars = GetArmyAvatars()
     if avatars and avatars[1]:IsInCategory("COMMAND") then
@@ -122,7 +148,6 @@ end
 
 function CreateUI(isReplay)
     ConExecute("Cam_Free off")
-    
     local prefetchTable = { models = {}, anims = {}, d3d_textures = {}, batch_textures = {} }
     
     -- set up our layout change function
@@ -208,6 +233,15 @@ function CreateUI(isReplay)
 		import('/lua/ui/game/avatars.lua').ToggleAvatars(false)
 		AddBeatFunction(UiBeat)
 	end
+
+    if options.gui_scu_manager != 0 then
+        import('/modules/scumanager.lua').Init()
+    end
+
+    if options.gui_render_enemy_lifebars == 1 or options.gui_render_custom_names == 0 then
+        import('/modules/console_commands.lua').Init()
+    end
+
 end
 
 local provider = false
@@ -391,6 +425,15 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         import('/lua/ui/game/selection.lua').PlaySelectionSound(added)
         import('/lua/ui/game/rallypoint.lua').OnSelectionChanged(newSelection)
     end
+
+    local selUnits = newSelection
+
+    if selUnits and table.getn(selUnits) == 1 and import('/modules/selectedinfo.lua').SelectedOverlayOn then
+        import('/modules/selectedinfo.lua').ActivateSingleRangeOverlay()
+    else
+        import('/modules/selectedinfo.lua').DeactivateSingleRangeOverlay()
+    end   
+
 end
 
 function OnQueueChanged(newQueue)

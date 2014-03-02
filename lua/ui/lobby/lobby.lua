@@ -6,7 +6,7 @@
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
 
-LOBBYversion = 'v2.0'
+LOBBYversion = 'v2.2b'
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
@@ -25,6 +25,7 @@ local ModManager = import('/lua/ui/dialogs/modmanager.lua')
 local FactionData = import('/lua/factions.lua')
 local Text = import('/lua/maui/text.lua').Text
 local Trueskill = import('/lua/ui/lobby/trueskill.lua')
+local round = import('/lua/ui/lobby/trueskill.lua').round
 local Player = import('/lua/ui/lobby/trueskill.lua').Player
 local Rating = import('/lua/ui/lobby/trueskill.lua').Rating
 local Teams = import('/lua/ui/lobby/trueskill.lua').Teams
@@ -118,7 +119,9 @@ else
     playerDeviation = 500
 end
 
-local playerRating = math.floor(playerMean - 3 * playerDeviation)
+
+
+local playerRating = math.floor( Trueskill.round2((playerMean - 3 * playerDeviation) / 100.0) * 100 )
 
 -- builds the faction tables, and then adds random faction icon to the end
 local factionBmps = {}
@@ -1618,17 +1621,7 @@ local function UpdateGame()
         --if not GUI.slots[i].tooltiprating then
         if not GUI.slots[i].closed and gameInfo.PlayerOptions[i].Human then
             if gameInfo.PlayerOptions[i].Human then
-                if gameInfo.PlayerOptions[i].MEAN and gameInfo.PlayerOptions[i].DEV then
-                    local mean = math.floor(gameInfo.PlayerOptions[i].MEAN) or 'N/A'
-                    local dev = math.floor(gameInfo.PlayerOptions[i].DEV) or 'N/A'
-                    Tooltip.AddControlTooltip(GUI.slots[i].ratingText, {text='Rating', body='- Mean : '..mean..'\n - Dev : '..dev})
-                else
-                    local mean =  'N/A'
-                    local dev = 'N/A'
-                    Tooltip.AddControlTooltip(GUI.slots[i].ratingText, {text='Rating', body='- Mean : N/A'..'\n - Dev : N/A'})
-                end
-            else
-                Tooltip.AddControlTooltip(GUI.slots[i].ratingText, '')
+                Tooltip.AddControlTooltip(GUI.slots[i].ratingText, {text='Rating', body='This is the player rating.'})
             end
         end
     end
@@ -1637,7 +1630,6 @@ local function UpdateGame()
         if not GUI.mapView:SetTexture(scenarioInfo.preview) then
             GUI.mapView:SetTextureFromMap(scenarioInfo.map)
         end
-        --GUI.RankedLabel:SetText(LOC(scenarioInfo.name)) -- Add RankedLabel above option lobby (replace with Ranked Label)
         ShowMapPositions(GUI.mapView,scenarioInfo,numPlayers)
     else
         GUI.mapView:ClearTexture()
@@ -2136,6 +2128,7 @@ function HostConvertPlayerToObserver(senderID, name, playerSlot)
         PL = gameInfo.PlayerOptions[playerSlot].PL,
         oldColor = gameInfo.PlayerOptions[playerSlot].PlayerColor, -- Vicarian
         oldFaction = gameInfo.PlayerOptions[playerSlot].Faction, -- Vicarian
+		oldCountry = gameInfo.PlayerOptions[playerSlot].Country, -- Xinnony
     }
 
     if lobbyComm:IsHost() then
@@ -2171,6 +2164,7 @@ function HostConvertObserverToPlayer(senderID, name, fromObserverSlot, toPlayerS
     gameInfo.PlayerOptions[toPlayerSlot] = LobbyComm.GetDefaultPlayerOptions(name)
     gameInfo.PlayerOptions[toPlayerSlot].OwnerID = senderID
 
+	gameInfo.PlayerOptions[toPlayerSlot].Country = gameInfo.Observers[fromObserverSlot].oldCountry or 'world' -- Xinnony
 	--if requestedFaction then
 		gameInfo.PlayerOptions[toPlayerSlot].Faction = gameInfo.Observers[fromObserverSlot].oldFaction or requestedFaction or 5
     --end
@@ -2565,26 +2559,11 @@ function CreateUI(maxPlayers)
         LayoutHelpers.AtBottomIn(GUI.LargeMapPreview, GUI.mapView, -3)
         Tooltip.AddButtonTooltip(GUI.LargeMapPreview, 'lob_click_LargeMapPreview')
         GUI.LargeMapPreview.OnClick = function()
-            --for i = 1, LobbyComm.maxPlayerSlots do
-                --if not gameInfo.ClosedSlots[i] and not gameInfo.PlayerOptions[i] then
-                    --HostCloseSlot(localPlayerID, i)
-                --end
-            --end
             CreateBigPreview(501, GUI.mapPanel)
         end
     --end of close slots code
 
-    -- Ranked label --
-    GUI.RankedLabel = UIUtil.CreateText(GUI.mapPanel, "", 16, UIUtil.titleFont)
-        GUI.RankedLabel:SetColor(UIUtil.bodyColor)
-        LayoutHelpers.AtTopIn(GUI.RankedLabel, GUI.optionsPanel, 5)
-        LayoutHelpers.AtHorizontalCenterIn(GUI.RankedLabel, GUI.optionsPanel, -8)
-        GUI.RankedLabel:SetFont('Arial Gras', 13)
-        LayoutHelpers.AtRightTopIn(GUI.RankedLabel, ModFeaturedLabel, 0, 0)--GUI.panel, 50, 61+14)
-        LayoutHelpers.RightOf(GUI.RankedLabel, ModFeaturedLabel, 0)
-        --GUI.RankedLabel:SetColor('ff7777') -- 77ff77
-        GUI.RankedLabel:SetDropShadow(true)
-    
+   
     -- Checkbox Show changed Options
     cbox_ShowChangedOption = UIUtil.CreateCheckboxStdPNG(GUI.optionsPanel, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel, 3, 0)
@@ -2998,7 +2977,7 @@ function CreateUI(maxPlayers)
             end
             Tooltip.AddButtonTooltip(GUI.restrictedUnitsButton, 'lob_RestrictedUnitsClient')
 	elseif lobbyComm:IsHost() then
-		GUI.restrictedUnitsButton = UIUtil.CreateButtonStd2PNG(GUI.optionsPanel, '/BUTTON/medium/', "Preset Lobby", 14, 0)
+		GUI.restrictedUnitsButton = UIUtil.CreateButtonStd2PNG(GUI.optionsPanel, '/BUTTON/medium/', "Lobby Presets", 14, 0)
 		GUI.restrictedUnitsButton.label:SetColor('B9BFB9')
             GUI.restrictedUnitsButton.label:SetDropShadow(true)
             LayoutHelpers.AtHorizontalCenterIn(GUI.restrictedUnitsButton, GUI.gameoptionsButton)
@@ -3006,7 +2985,7 @@ function CreateUI(maxPlayers)
             GUI.restrictedUnitsButton.OnClick = function(self, modifiers)
                 GUI_PRESET()
             end
-            Tooltip.AddButtonTooltip(GUI.restrictedUnitsButton, 'Load and Save Preset Lobby')
+            Tooltip.AddButtonTooltip(GUI.restrictedUnitsButton, 'Load and Save Lobby Presets')
     end
     
     ---------------------------------------------------------------------------
@@ -3709,7 +3688,11 @@ function CreateUI(maxPlayers)
                         --GUI.slots[slot].pingText:SetColor(pingcolor)
                         if ping and GUI.slots[slot].pingStatus then
                             GUI.slots[slot].pingStatus:SetValue(ping)
-                            GUI.slots[slot].pingStatus:Show()
+                            if ping >= 500 or pingcolor != "green" then
+                                GUI.slots[slot].pingStatus:Show()
+                            else
+                                GUI.slots[slot].pingStatus:Hide()
+                            end
                             if pingcolor == 'red' then
                                 GUI.slots[slot].pingStatus._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-03_bmp.dds'))
                             elseif pingcolor == 'green' then
@@ -3785,71 +3768,29 @@ function RefreshOptionDisplayData(scenarioInfo)
     local getInit = GetCommandLineArg("/init", 1)
     getInit = tostring(getInit[1])
     if getInit == "init_faf.lua" then
-        SetText2(ModFeaturedLabel, 'FA Forever - ', 10)
-        --AddChatText('Welcome to Forged Alliance Forever MOD'..getInit)
-        local getVictory = gameInfo.GameOptions['Victory'] -- 'demoralization'
-        local getCheat = gameInfo.GameOptions['CheatsEnabled'] -- 'false'
-        local getSpeed = gameInfo.GameOptions['GameSpeed'] -- 'normal'
-        local getFog = gameInfo.GameOptions['FogOfWar'] -- 'explored'
-        local getPrebui = gameInfo.GameOptions['PrebuiltUnits'] -- 'Off'
-        local getNorush = gameInfo.GameOptions['NoRushOption'] -- 'Off'
-        local getNumbMod = table.getn(Mods.GetGameMods(gameInfo.GameMods)) -- 0 for the purposes of this function
-        local getRstric = gameInfo.GameOptions.RestrictedCategories --can be nil or a table, even if no restrictions are present
-		local getMapIsBlacklist = false
-		if gameInfo.GameOptions.ScenarioFile == '/maps/battle of thermopylae official/battle of thermopylae official_scenario.lua' then -- Check if the current map is Battle of Thermo OFFICIAL, this map is blacklisted to ranked
-			LOG('Map blacklisted to ranked : /maps/battle of thermopylae official/battle of thermopylae official_scenario.lua')
-			getMapIsBlacklist = true
-		end
---~             AddChatText(tostring(cRstr))
-        if getVictory == 'demoralization' and getCheat == 'false' and getSpeed == 'normal' and getFog == 'explored' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and (getRstric == nil or table.getn(getRstric) == 0) and getMapIsBlacklist == false then
-            --table.insert(formattedOptions, {text = 'Ranking',
-                --value = 'Ranked',
-                --green = true,
-                --tooltip = {text='Ranked',body='This game is Ranked !'}})
-            SetText2(GUI.RankedLabel, "game is Ranked", 10)
-            GUI.RankedLabel:SetColor("77ff77")
-            --Tooltip.AddControlTooltip(GUI.RankedLabel, '')
-        else
-            --table.insert(formattedOptions, {text = 'Ranking',
-                --value = 'Unranked',
-                --red = true,
-                --tooltip = {text='Unranked',body='This game is NOT Ranked !'}})
-            SetText2(GUI.RankedLabel, "not Ranked", 10)
-            GUI.RankedLabel:SetColor("ff7777")
-            --Tooltip.AddControlTooltip(GUI.RankedLabel, '')
-        end
-    else
-        if getInit == "init_blackops.lua" then
-            SetText2(ModFeaturedLabel, 'BlackOps MOD - ', 10)
-		elseif getInit == "init_coop.lua" then
-            SetText2(ModFeaturedLabel, 'COOP - ', 10)
-        elseif getInit == "init_balancetesting.lua" then
-            SetText2(ModFeaturedLabel, 'Balance Testing - ', 10)
-        elseif getInit == "init_gw.lua" then
-            SetText2(ModFeaturedLabel, 'Galactic War - ', 10)
-        elseif getInit == "init_labwars.lua" then
-            SetText2(ModFeaturedLabel, 'Labwars MOD - ', 10)
-        elseif getInit == "init_ladder1v1.lua" then
-            SetText2(ModFeaturedLabel, 'Ladder 1v1 - ', 10)
-        elseif getInit == "init_nomads.lua" then
-            SetText2(ModFeaturedLabel, 'Nomads MOD - ', 10)
-        elseif getInit == "init_phantomx.lua" then
-            SetText2(ModFeaturedLabel, 'PhantomX MOD - ', 10)
-        elseif getInit == "init_supremedestruction.lua" then
-            SetText2(ModFeaturedLabel, 'SupremeDestruction MOD - ', 10)
-        elseif getInit == "init_xtremewars.lua" then
-            SetText2(ModFeaturedLabel, 'XtremeWars MOD - ', 10)
-        --else
-            --ModFeaturedLabel:SetText('')
-        end
-        --table.insert(formattedOptions, {text = 'Ranking',
-            --value = 'Unranked',
-            --red = true,
-            --tooltip = {text='Unranked',body='This game is NOT Ranked !'}})
-        SetText2(GUI.RankedLabel, "not Ranked", 10)
-    
-        GUI.RankedLabel:SetColor("ff7777")
-        --Tooltip.AddControlTooltip(GUI.RankedLabel, '')
+        SetText2(ModFeaturedLabel, 'FA Forever', 10)
+    elseif getInit == "init_blackops.lua" then
+        SetText2(ModFeaturedLabel, 'BlackOps MOD', 10)
+	elseif getInit == "init_coop.lua" then
+        SetText2(ModFeaturedLabel, 'COOP', 10)
+    elseif getInit == "init_balancetesting.lua" then
+        SetText2(ModFeaturedLabel, 'Balance Testing', 10)
+    elseif getInit == "init_gw.lua" then
+        SetText2(ModFeaturedLabel, 'Galactic War', 10)
+    elseif getInit == "init_labwars.lua" then
+        SetText2(ModFeaturedLabel, 'Labwars MOD', 10)
+    elseif getInit == "init_ladder1v1.lua" then
+        SetText2(ModFeaturedLabel, 'Ladder 1v1', 10)
+    elseif getInit == "init_nomads.lua" then
+        SetText2(ModFeaturedLabel, 'Nomads MOD', 10)
+    elseif getInit == "init_phantomx.lua" then
+        SetText2(ModFeaturedLabel, 'PhantomX MOD', 10)
+    elseif getInit == "init_supremedestruction.lua" then
+        SetText2(ModFeaturedLabel, 'SupremeDestruction MOD', 10)
+    elseif getInit == "init_xtremewars.lua" then
+        SetText2(ModFeaturedLabel, 'XtremeWars MOD', 10)
+    --else
+        --ModFeaturedLabel:SetText('')
     end
 --\\ Stop Check Ranked active
 --// Check Mod active
@@ -5235,7 +5176,7 @@ end -- NewShowMapPositions(...)
 
 --CPU Status Bar Configuration
 local barMax = 450
-local barMin = 150
+local barMin = 0
 local greenBarMax = 300
 local yellowBarMax = 375
 local scoreSkew1 = 0 --Skews all CPU scores up or down by the amount specified (0 = no skew)
@@ -5450,11 +5391,14 @@ function SetSlotCPUBar(slot, playerInfo)
             if b then
                 -- For display purposes, the bar has a higher minimum that the actual barMin value.
                 -- This is to ensure that the bar is visible for very small values
-                local clampedResult =  math.max(math.min(b.Result, barMax), barMin + math.floor(.04 * (barMax - barMin)))
+
+                local clampedResult =  math.max(math.min((b.Result * GetPlayerCount())/12, barMax), barMin + math.floor(.04 * (barMax - barMin)))
                 GUI.slots[slot].CPUSpeedBar:SetValue(clampedResult)
                 
                 --For the tooltip, we use the actual clamped value
                 GUI.slots[slot].CPUSpeedBar.CPUActualValue = b.Result
+
+
                 GUI.slots[slot].CPUSpeedBar:Show()
 
                 GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.UIFile('/game/unit_bmp/bar_purple_bmp.png'))
@@ -5562,10 +5506,34 @@ function RuleTitle_INPUT()
 			nameEdit.Width:Set(334)
 			nameEdit.Height:Set(24)
 			nameEdit:AcquireFocus()
+			nameEdit.OnEnterPressed = function(self, text)
+				if text == '' then
+					GUI_Preset_InputBox:Destroy()
+					RuleLabel:DeleteAllItems()
+					RuleLabel:AddItem('Rule : no rule.')
+					RuleLabel:AddItem('')
+					RuleTitle_SendMSG()
+				else
+					GUI_Preset_InputBox:Destroy()
+					wrapped = import('/lua/maui/text.lua').WrapText('Rule : '..text, 350, function(curText) return RuleLabel:GetStringAdvance(curText) end)
+					RuleLabel:DeleteAllItems()
+					RuleLabel:AddItem(wrapped[1] or '')
+					RuleLabel:AddItem(wrapped[2] or '')
+					RuleTitle_SendMSG()
+				end
+			end
+		-------------------
+		-- Exit button --
+		local ExitButton = UIUtil.CreateButtonStd2PNG(GUI_Preset_InputBox2, '/BUTTON/medium/', "Cancel", 12, -1)
+			LayoutHelpers.AtLeftIn(ExitButton, GUI_Preset_InputBox2, 70)
+			LayoutHelpers.AtBottomIn(ExitButton, GUI_Preset_InputBox2, 10)
+			ExitButton.OnClick = function(self)
+				GUI_Preset_InputBox:Destroy()
+			end
 		-------------------
 		-- Ok button --
 		local OKButton = UIUtil.CreateButtonStd2PNG(GUI_Preset_InputBox2, '/BUTTON/medium/', "Ok", 12, -1)
-			LayoutHelpers.AtHorizontalCenterIn(OKButton, GUI_Preset_InputBox2)
+			LayoutHelpers.AtRightIn(OKButton, GUI_Preset_InputBox2, 70)
 			LayoutHelpers.AtBottomIn(OKButton, GUI_Preset_InputBox2, 10)
 			text09:SetText('Edit the Rule :')
 			OKButton.OnClick = function(self)
@@ -5914,11 +5882,11 @@ function ForceApplyNewSkin()
     -- Restricted Unit show only if not you Host, else Preset Lobby is show.
 	-- Now if is Host, is a Preset button.
     --if not lobbyComm:IsHost() then
-    if GUI.restrictedUnitsButton then
-        if not GUI.restrictedUnitsButton:IsDisabled() then
-            GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_up.png'))
-        elseif GUI.restrictedUnitsButton:IsDisabled() then
+	if GUI.restrictedUnitsButton then
+		if GUI.restrictedUnitsButton:IsDisabled() then -- SI PAS DISABLED ALORS
             GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_dis.png'))
+        else
+            GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_up.png'))
         end
     end
     -- Observer, AutoTeam, RankedOpts, CPUBench, RandomMap.
@@ -6402,7 +6370,7 @@ function GUI_PRESET()
 		PresetList.OnClick = function(self, row)
 			if PresetList:GetItemCount() == (row+1) then
 				PresetList:SetSelection(row)
-				LoadButton.label:SetText('New preset')
+				LoadButton.label:SetText('Create new preset')
 				LoadButton.OnClick = function(self)
 					CREATE_PRESET_IN_PREF()
 				end
@@ -6465,7 +6433,7 @@ function GUI_PRESET()
 		end
 	-------------------
     -- QUIT button --
-	local QuitButton = UIUtil.CreateButtonStd2PNG(dialog2, '/BUTTON/medium/', "Exit", 12, -1)
+	local QuitButton = UIUtil.CreateButtonStd2PNG(dialog2, '/BUTTON/medium/', "Cancel", 12, -1)
         LayoutHelpers.CenteredRightOf(QuitButton, LoadButton, -16)
         QuitButton.OnClick = function(self)
             GUI_Preset:Destroy()
@@ -6536,10 +6504,69 @@ function GUI_PRESET_INPUT(tyype)
         nameEdit.Width:Set(334)
         nameEdit.Height:Set(24)
         nameEdit:AcquireFocus()
+		nameEdit.OnEnterPressed = function(self, text)
+			if tyype == -1 then
+				if text == '' then
+					-- No word in nameEdit
+				else
+					applyCREATE_PRESET_IN_PREF(text)
+					GUI_Preset_InputBox:Destroy()
+				end
+			elseif tyype == 0 then
+				if text == '' then
+					-- No word in nameEdit
+				else
+					applyCREATE_PRESET_IN_PREF(text)
+					GUI_Preset_InputBox:Destroy()
+				end
+			elseif tyype == 1 then
+				if text == '' then
+					-- No word in nameEdit
+				else
+					local profiles = GetPreference("UserPresetLobby")
+					SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.PresetName', tostring(text))
+					local lastselect = PresetList:GetSelection()
+					LOAD_PresetProfils_For_PresetList()
+					PresetList:SetSelection(lastselect)
+					LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
+					GUI_Preset_InputBox:Destroy()
+				end
+			elseif tyype == 2 then
+				if text == '' then
+					-- No word in nameEdit
+				else
+					local profiles = GetPreference("UserPresetLobby")
+					SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.FAF_Title', tostring(text))
+					LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
+					GUI_Preset_InputBox:Destroy()
+				end
+			elseif tyype == 3 then
+				if text == '' then
+					local profiles = GetPreference("UserPresetLobby")
+					SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', 'no rule.')
+					LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
+					GUI_Preset_InputBox:Destroy()
+				else
+					local profiles = GetPreference("UserPresetLobby")
+					--AddChatText('rename> Profil?:'..table.KeyByIndex(profiles, PresetList:GetSelection())..' // selection:'..PresetList:GetSelection())
+					SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', tostring(text))
+					LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
+					GUI_Preset_InputBox:Destroy()
+				end
+			end
+		end
+	-------------------
+    -- Exit button --
+	local ExitButton = UIUtil.CreateButtonStd2PNG(GUI_Preset_InputBox2, '/BUTTON/medium/', "Cancel", 12, -1)
+		LayoutHelpers.AtLeftIn(ExitButton, GUI_Preset_InputBox2, 70)
+		LayoutHelpers.AtBottomIn(ExitButton, GUI_Preset_InputBox2, 10)
+		ExitButton.OnClick = function(self)
+			GUI_Preset_InputBox:Destroy()
+		end
 	-------------------
     -- Ok button --
 	local OKButton = UIUtil.CreateButtonStd2PNG(GUI_Preset_InputBox2, '/BUTTON/medium/', "Ok", 12, -1)
-        LayoutHelpers.AtHorizontalCenterIn(OKButton, GUI_Preset_InputBox2)
+		LayoutHelpers.AtRightIn(OKButton, GUI_Preset_InputBox2, 70)
 		LayoutHelpers.AtBottomIn(OKButton, GUI_Preset_InputBox2, 10)
         if tyype == -1 then
 			text09:SetText('No Preset exist, set your first Preset name :')
@@ -6597,7 +6624,10 @@ function GUI_PRESET_INPUT(tyype)
 			OKButton.OnClick = function(self)
 				local result = nameEdit:GetText()
 				if result == '' then
-					-- No word in nameEdit
+					local profiles = GetPreference("UserPresetLobby")
+					SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', 'no rule.')
+					LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
+					GUI_Preset_InputBox:Destroy()
 				else
 					local profiles = GetPreference("UserPresetLobby")
 					--AddChatText('rename> Profil?:'..table.KeyByIndex(profiles, PresetList:GetSelection())..' // selection:'..PresetList:GetSelection())
@@ -6627,6 +6657,14 @@ end
 function GetModNameWithUid(uid)
 	local allMods = Mods.AllMods()
 	return allMods[uid].name
+end
+function GetModUidExist(uid)
+	local allMods = Mods.AllMods()
+	if allMods[uid].name != nil then
+		return true
+	else
+		return false
+	end
 end
 function GetModUIorNotUIWithUid(uid)
 	local allMods = Mods.AllMods()
@@ -6668,16 +6706,20 @@ function LOAD_PresetSettings_For_InfoList(Selected_Preset)
 		InfoList:AddItem('Mod :')
 		for k, v in profiles[Selected_Preset].Mods do
 			--k = (uids), v = true
-			if GetModUIorNotUIWithUid(k) then
-				InfoList:AddItem('- '..GetModNameWithUid(k)..' [Mod UI]')
+			if GetModUidExist(k) == false then
+				InfoList:AddItem('- '..k..' [NOT EXIST]')
 			else
-				InfoList:AddItem('- '..GetModNameWithUid(k))
+				if GetModUIorNotUIWithUid(k) then
+					InfoList:AddItem('- '..GetModNameWithUid(k)..' [Mod UI]')
+				else
+					InfoList:AddItem('- '..GetModNameWithUid(k))
+				end
 			end
 		end
 	end
 	if profiles[Selected_Preset].UnitsRestricts then
 		InfoList:AddItem('')
-		InfoList:AddItem('Units Restricts :')
+		InfoList:AddItem('Unit Restrictions :')
 		for k, v in profiles[Selected_Preset].UnitsRestricts do
 			--k = (uids), v = true
 			InfoList:AddItem('- '..k)
@@ -6776,6 +6818,9 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
 				table.insert(urestrict, k)
 			end
 			SetGameOption('RestrictedCategories', urestrict, false, true)
+		else
+			-- Clear Restricted
+			SetGameOption('RestrictedCategories', {}, false, true)
 		end
 		
 		--
@@ -6883,30 +6928,42 @@ end
 ###############################################################
 ######################### Other Debug Funct ######################### -- Xinnony
 
+function joinMyTables(t1, t2)
+	t3 = {}
+	for k,v in ipairs(t1) do
+		table.insert(t3, v)
+		--print(v)
+	end
+	for k,v in ipairs(t2) do
+		table.insert(t3, v)
+		--print(v)
+	end
+	return t3
+end
+
 function table_print (tt, indent, done)
-  done = done or {}
-  indent = indent or 0
-  if type(tt) == "table" then
-    local sb = {}
-    for key, value in pairs (tt) do
-      table.insert(sb, string.rep (" ", indent)) -- indent it
-      if type (value) == "table" and not done [value] then
-        done [value] = true
-        table.insert(sb, "{\n");
-        table.insert(sb, table_print (value, indent + 2, done))
-        table.insert(sb, string.rep (" ", indent)) -- indent it
-        table.insert(sb, "}\n");
-      elseif "number" == type(key) then
-        table.insert(sb, string.format("\"%s\"\n", tostring(value)))
-      else
-        table.insert(sb, string.format(
-            "%s = \"%s\"\n", tostring (key), tostring(value)))
-       end
-    end
-    return table.concat(sb)
-  else
-    return tt .. "\n"
-  end
+	done = done or {}
+	indent = indent or 0
+	if type(tt) == "table" then
+		local sb = {}
+		for key, value in pairs (tt) do
+			table.insert(sb, string.rep (" ", indent)) -- indent it
+			if type (value) == "table" and not done [value] then
+				done [value] = true
+				table.insert(sb, "{\n");
+				table.insert(sb, table_print (value, indent + 2, done))
+				table.insert(sb, string.rep (" ", indent)) -- indent it
+				table.insert(sb, "}\n");
+			elseif "number" == type(key) then
+				table.insert(sb, string.format("\"%s\"\n", tostring(value)))
+			else
+				table.insert(sb, string.format("%s = \"%s\"\n", tostring (key), tostring(value)))
+			end
+		end
+		return table.concat(sb)
+	else
+		return tt .. "\n"
+	end
 end
 
 function to_string( tbl )

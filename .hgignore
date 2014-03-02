@@ -10,6 +10,7 @@ syntax: glob
 *.pydev*
 *.vcproj
 *.jpeg
+*.orig
 textures/ui/common/BUTTON/backgroundselect/original/
 textures/ui/common/BUTTON/backgroundselect/test/
 textures/ui/common/countries/original/

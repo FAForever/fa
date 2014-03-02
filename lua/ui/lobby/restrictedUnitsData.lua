@@ -13,6 +13,7 @@ restrictedUnits = {
 		categories = {"xeb0104", "xrb0104"},
         name = "No Engineering Station",
         tooltip = {text='No Engineering Station', body='Remove Kennel and Hive (by Xinnony)'},
+		--"No Kennel and Hive (Engineering Station) by Xinnony",
 	},
 	SALVAMAVOSCATH = {
 		categories = {"xab2307", "ueb2401", "url0401"},
@@ -31,14 +32,12 @@ restrictedUnits = {
 	},
 	TELE = {
 		enhancement = {"Teleporter", "TeleporterRemove"},
-		categories = {},
-        name = "No Teleport",
+        name = "No Teleport (FIXED)",
 		tooltip = {text='No Teleport', body='Remove Teleport Upgrade on the UEF Commander (by Xinnony)'},
 	},
 	BILLY = {
 		enhancement = {"TacticalNukeMissile", "TacticalNukeMissileRemove"},
-		categories = {},
-        name = "No Billy",
+        name = "No Billy (FIXED)",
 		tooltip = {text='No Billy', body='Remove Billy (Nuke) Upgrade on the UEF Commander (by Xinnony)'},
 	},
 	T1 = {
@@ -108,7 +107,7 @@ restrictedUnits = {
         tooltip = "restricted_uints_gameenders",
     },
     BUBBLES = {
-        categories = {"uel0307", "ual0307", "xsl0307", "deb4303", "xes0205", "ueb4202", "urb4202", "uab4202", "xsb4202", "ueb4301", "uab4301", "xsb4301", },
+        categories = {"uel0307", "ual0307", "xsl0307", "xes0205", "ueb4202", "urb4202", "uab4202", "xsb4202", "ueb4301", "uab4301", "xsb4301", },
         name = "<LOC restricted_units_data_0013>No Bubbles",
         tooltip = "restricted_uints_bubbles",
     },

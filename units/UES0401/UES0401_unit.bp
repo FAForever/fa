@@ -91,7 +91,6 @@ UnitBlueprint {
         'AIRSTAGINGPLATFORM',
         'INTELLIGENCE',
         'RADAR',
-        'REPAIR',
         'CARRIER',
         'NEEDMOBILEBUILD',
         'VISIBLETORECON',
