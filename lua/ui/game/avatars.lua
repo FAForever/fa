@@ -360,7 +360,7 @@ function ClickFunc(self, event)
         end
         self.curIndex = 1
     elseif event.Type == 'ButtonPress' then
-        if event.Type == event.Modifiers.Middle and options.gui_idle_engineer_avatars != 0 then
+        if event.Modifiers.Middle and options.gui_idle_engineer_avatars != 0 then
             if self.id then --it's a primary idle unit button, deal with all units
                 if event.Modifiers.Shift then
                     local curUnits = {}
@@ -571,6 +571,8 @@ function CreateIdleEngineerList(parent, units)
         engineers[2] = EntityCategoryFilterDown(categories.TECH2 - categories.FIELDENGINEER, unitData)
         engineers[1] = EntityCategoryFilterDown(categories.TECH1, unitData)   
 
+        local indexToIcon = {'1', '2', '2', '3', '3'}
+        local keyToIcon = {'T1','T2','T2F','T3','SCU'}
         if options.gui_scu_manager != 0 then
             local tempSCUs = EntityCategoryFilterDown(categories.SUBCOMMANDER, unitData)
             
@@ -587,11 +589,8 @@ function CreateIdleEngineerList(parent, units)
                     end
                 end
             end
-            local indexToIcon = {'1', '2', '2', '3', '3', 'E', 'C'}
-            local keyToIcon = {'T1','T2','T2F','T3','SCU', 'SCU', 'SCU'}
-        else
-            local indexToIcon = {'1', '2', '2', '3', '3'}
-            local keyToIcon = {'T1','T2','T2F','T3','SCU'}
+            indexToIcon = {'1', '2', '2', '3', '3', 'E', 'C'}
+            keyToIcon = {'T1','T2','T2F','T3','SCU', 'SCU', 'SCU'}
         end
 
         for index, units in engineers do

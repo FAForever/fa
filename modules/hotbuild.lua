@@ -161,7 +161,7 @@ function addModifiers()
   -- Adding modifiers shorcuts on the fly.
   local currentKeyMap = import('/lua/keymap/keymapper.lua').GetKeyMappings()
     for key, action in currentKeyMap do
-      if action["category"] == "hotbuild" then
+      if action["category"] == "hotbuilding" then
         if key != nil then
             if not import('/lua/keymap/keymapper.lua').IsKeyInMap("Shift-" .. key, currentKeyMap) then
                 modifiersKeys["Shift-" .. key] = action
