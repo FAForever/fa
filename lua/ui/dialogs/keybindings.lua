@@ -143,12 +143,43 @@ local function EditActionKey(parent, action, currentKey)
     local function AssignKey()
         -- check if key is already assigned to something else
         local Keymapper = import('/lua/keymap/keymapper.lua')
+        
+        local function ClearShiftKey()
+            Keymapper.ClearUserKeyMapping("Shift-" .. currentKeyPattern)
+            LOG("clearing Shift-"..currentKeyPattern)
+        end
+
+        local function ClearAltKey()
+            Keymapper.ClearUserKeyMapping("Alt-" .. currentKeyPattern)
+            LOG("clearing Alt-"..currentKeyPattern)
+        end
+
         local function MapKey()
             Keymapper.SetUserKeyMapping(currentKeyPattern, currentKey, action)
+            local cat = Keymapper.KeyCategory(currentKeyPattern, Keymapper.GetCurrentKeyMap(true), Keymapper.GetKeyActions())
+            if cat and cat == "hotbuilding" then
+                if Keymapper.IsKeyInMap("Shift-" .. currentKeyPattern, Keymapper.GetCurrentKeyMap(true)) then
+                    UIUtil.QuickDialog(panel, "Shift-"..currentKeyPattern.. " is already mapped to another action, do you want to clear it for hotbuild?",
+                        "<LOC _Yes>", ClearShiftKey,
+                        "<LOC _No>", nil,
+                        nil, nil,
+                        true, 
+                        {escapeButton = 2, enterButton = 1, worldCover = false})
+                end
+
+                if Keymapper.IsKeyInMap("Alt-" .. currentKeyPattern, Keymapper.GetCurrentKeyMap(true)) then
+                    UIUtil.QuickDialog(panel, "Alt-"..currentKeyPattern.. " is already mapped to another action, do you want to clear it for hotbuild?",
+                        "<LOC _Yes>", ClearAltKey,
+                        "<LOC _No>", nil,
+                        nil, nil,
+                        true, 
+                        {escapeButton = 2, enterButton = 1, worldCover = false})
+                end
+            end
             keyTable = FormatData()
             keyContainer:CalcVisible()
         end
-        if Keymapper.IsKeyInMap(currentKeyPattern, Keymapper.GetCurrentKeyMap()) then
+        if Keymapper.IsKeyInMap(currentKeyPattern, Keymapper.GetCurrentKeyMap(true)) then
             UIUtil.QuickDialog(panel, "<LOC key_binding_0006>This key is already mapped to another action, are you sure you want to change it?",
                 "<LOC _Yes>", MapKey,
                 "<LOC _No>", nil,
@@ -216,8 +247,6 @@ function CreateUI()
         panel:Destroy()
         panel = false
     end
-
--- removed keybinding work
 
     local assignKeyButton = UIUtil.CreateButtonStd(panel, "/widgets/small02", LOC("<LOC key_binding_0003>Assign Key"), 12)
     LayoutHelpers.LeftOf(assignKeyButton, closeButton, 10)
