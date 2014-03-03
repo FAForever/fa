@@ -6,7 +6,7 @@
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
 
-LOBBYversion = 'v2.2b'
+LOBBYversion = 'v2.2c'
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
@@ -6852,8 +6852,12 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
 			for k, v in profiles[Selected_Preset].Mods do
 				--k = (uids), v = true
 				--AddChatText('> PRESET > Mods : '..k..' // v : '..tostring(v)) -->>> PRESET Mods : ['d5c7af75-6944-490b-b647-47dc1efffdc7'] = true
-				SetPreference('active_mods.'..k, true)
-				selectedMods[k] = true
+				if GetModUidExist(k) == true then
+					SetPreference('active_mods.'..k, true)
+					selectedMods[k] = true
+				else
+					--LOG('>> LOAD_PRESET_IN_PREF > Missing Mod : '..tostring(k))
+				end
 			end
 			OnModsChanged(selectedMods, true)
 			--UpdateGame() -- Rafraichie les mods (utile)
