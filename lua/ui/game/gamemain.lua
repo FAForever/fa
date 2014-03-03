@@ -40,7 +40,7 @@ local lastObserving
 -- Hotbuild stuff
 modifiersKeys = {}
 -- Adding modifiers shorcuts on the fly.
-local currentKeyMap = import('/lua/keymap/keymapper.lua').GetKeyMappings()
+local currentKeyMap = import('/lua/keymap/keymapper.lua').GetKeyMappings(true)
 for key, action in currentKeyMap do
   if action["category"] == "hotbuilding" then
     if key != nil then

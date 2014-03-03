@@ -24,12 +24,12 @@ local keyTable
 local function ResetKeyMap()
     IN_ClearKeyMap()
     import('/lua/keymap/keymapper.lua').ClearUserKeyMap()
-    IN_AddKeyMapTable(import('/lua/keymap/keymapper.lua').GetKeyActions())
+    IN_AddKeyMapTable(import('/lua/keymap/keymapper.lua').GetKeyActions(true))
 end
 
 local function ConfirmNewKeyMap()
 	--add option to accept the changes to the key map?
-    IN_AddKeyMapTable(import('/lua/keymap/keymapper.lua').GetKeyMappings())
+    IN_AddKeyMapTable(import('/lua/keymap/keymapper.lua').GetKeyMappings(true))
     -- Update hotbuild modifiers
     if SessionIsActive() then
         import('/modules/hotbuild.lua').addModifiers()
@@ -446,7 +446,7 @@ end
 
 --TODO clean up the table names a bit to be more consistent?
 function FormatData()
-    local keyactions = import('/lua/keymap/keymapper.lua').GetKeyActions()
+    local keyactions = import('/lua/keymap/keymapper.lua').GetKeyActions(true)
 
     local retkeys = {}
     local KeyData = {}

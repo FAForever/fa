@@ -402,7 +402,7 @@ function UpdateWindow(info)
             end
         end
     end
-    if options.gui_detailed_unitview != 0 then
+    if options.gui_detailed_unitview != 0 and controls.Buildrate and controls.shieldText then
         local TV = import('/modules/tvcheck.lua').Init()
         if TV == false then
             if info.blueprintId != 'unknown' then
