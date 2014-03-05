@@ -6,7 +6,7 @@
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
 
-LOBBYversion = 'v2.2c'
+LOBBYversion = 'v2.3'
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
@@ -710,8 +710,6 @@ function SetSlotInfo(slot, playerInfo)
     GUI.slots[slot].numGamesText:SetText(playerInfo.NG or "")
 
     GUI.slots[slot].name:Show()
-    GUI.slots[slot].name:SetTitleText(LOC(playerInfo.PlayerName))
-    
     --// Color the Name in Slot by State - Xinnony & Vicarian
     if slotState == 'ai' then
         GUI.slots[slot].name:SetTitleTextColor("dbdbb9") -- Beige Color for AI
@@ -734,6 +732,13 @@ function SetSlotInfo(slot, playerInfo)
         GUI.slots[FindSlotForID(hostID)].name._text:SetFont('Arial Gras', 15)
     end
     --\\ Stop - Color the Name in Slot by State
+	if wasConnected(playerInfo.OwnerID) or IsLocallyOwned(slot) then
+		GUI.slots[slot].name:SetTitleText(playerInfo.PlayerName)
+		GUI.slots[slot].name._text:SetFont('Arial Gras', 15)
+	else
+		GUI.slots[slot].name:SetTitleText('Connecting to ... ' .. playerInfo.PlayerName)
+		GUI.slots[slot].name._text:SetFont('Arial Gras', 11)
+	end
 
     GUI.slots[slot].faction:Show()
     GUI.slots[slot].faction:SetItem(playerInfo.Faction)
@@ -1550,6 +1555,10 @@ local function UpdateGame()
             TEST3factionPanel:Disable()
             TEST4factionPanel:Disable()
             TEST5factionPanel:Disable()
+			Disable_Faction_Selector(true, gameInfo.PlayerOptions[playerSlot].Faction)
+			if lobbyComm:IsHost() then
+				GUI.restrictedUnitsButton:Disable()
+			end
         else
             if GUI.becomeObserver then
 				GUI.becomeObserver:Enable()
@@ -1560,6 +1569,10 @@ local function UpdateGame()
             TEST3factionPanel:Enable()
             TEST4factionPanel:Enable()
             TEST5factionPanel:Enable()
+			Disable_Faction_Selector(false, gameInfo.PlayerOptions[playerSlot].Faction)
+			if lobbyComm:IsHost() then
+				GUI.restrictedUnitsButton:Enable()
+			end
         end
     end
 
@@ -2446,13 +2459,14 @@ function CreateUI(maxPlayers)
     ---------------------------------------------------------------------------
     -- Set up main control panels
     ---------------------------------------------------------------------------
-    --if singlePlayer then
-        --GUI.panel = Bitmap(GUI, UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/power_panel-skirmish_bmp.dds"))
-    --else
-        GUI.panel = Bitmap(GUI, UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[random]lobby.png"))
-    --end
-    LayoutHelpers.AtCenterIn(GUI.panel, GUI)
-    --GUI.panel.brackets = UIUtil.CreateDialogBrackets(GUI.panel, 18, 17, 18, 15)
+	GUI.panel = Bitmap(GUI, UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[random]lobby.png"))
+		LayoutHelpers.AtCenterIn(GUI.panel, GUI)
+	GUI.panelWideLeft = Bitmap(GUI, '/textures/ui/common/scx_menu/lan-game-lobby/wide/[uef]wide.png')
+		GUI.panelWideLeft.Width:Set((GUI.Width()-1000)/2)
+		LayoutHelpers.CenteredLeftOf(GUI.panelWideLeft, GUI.panel, -11)
+	GUI.panelWideRight = Bitmap(GUI, '/textures/ui/common/scx_menu/lan-game-lobby/wide/[uef]wide.png')
+		GUI.panelWideRight.Width:Set((GUI.Width()-1000)/2)
+		LayoutHelpers.CenteredRightOf(GUI.panelWideRight, GUI.panel, -11)
     
     --// Title Label
 	titleText = UIUtil.CreateText(GUI.panel, "", 17, 'Arial Gras')--UIUtil.titleFont)
@@ -3178,11 +3192,8 @@ function CreateUI(maxPlayers)
             GUI.slots[i].name.Width:Set(slotColumnSizes.player.width)
             GUI.slots[i].name.row = i
         -- left deal with name clicks
-        GUI.slots[i].name.OnClick = function(self, index, text)
-            DoSlotBehavior(self.row, self.slotKeys[index], text)
-        end
         GUI.slots[i].name.OnEvent = function(self, event)
-            if event.Type == 'MouseEnter' then
+			if event.Type == 'MouseEnter' then
                 if gameInfo.GameOptions['TeamSpawn'] != 'random' and GUI.markers[curRow].Indicator then
                     GUI.markers[curRow].Indicator:Play()
                 end
@@ -3190,7 +3201,12 @@ function CreateUI(maxPlayers)
                 if GUI.markers[curRow].Indicator then
                     GUI.markers[curRow].Indicator:Stop()
                 end
+			elseif event.Type == 'ButtonDClick' then
+				DoSlotBehavior(curRow, 'occupy', '')
             end
+        end
+		GUI.slots[i].name.OnClick = function(self, index, text)
+            DoSlotBehavior(self.row, self.slotKeys[index], text)
         end
 
         --// Color
@@ -4021,10 +4037,12 @@ end
 
 function CalcConnectionStatus(peer)
     if peer.status != 'Established' then
-        return 'red'
+		return 'red'
     else
-        if not wasConnected(peer.id) then
-            table.insert(connectedTo, peer.id)
+		if not wasConnected(peer.id) then
+            GUI.slots[FindSlotForID(peer.id)].name:SetTitleText(peer.name)
+			GUI.slots[FindSlotForID(peer.id)].name._text:SetFont('Arial Gras', 15)
+			table.insert(connectedTo, peer.id)
             GpgNetSend('Connected', string.format("%d", peer.id))
         end
 
@@ -5585,27 +5603,65 @@ function RuleTitle_INPUT()
 -- Author : Xinnony                                --
 --------------------------------------------------
 function CreateUI_Faction_Selector()
-        TEST1factionPanel = Bitmap(GUI.factionPanel, UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico.png"))
+        TEST1factionPanel = Bitmap(GUI.factionPanel, "/textures/ui/common/FACTIONSELECTOR/aeon_ico.png")
             --LayoutHelpers.AtTopIn(TEST1factionPanel, GUI.factionPanel, 0)
             LayoutHelpers.AtLeftIn(TEST1factionPanel, GUI.factionPanel)
             LayoutHelpers.AtVerticalCenterIn(TEST1factionPanel, GUI.factionPanel)
-        TEST2factionPanel = Bitmap(GUI.factionPanel, UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico.png"))
+        TEST2factionPanel = Bitmap(GUI.factionPanel, "/textures/ui/common/FACTIONSELECTOR/cybran_ico.png")
             --LayoutHelpers.AtTopIn(TEST2factionPanel, GUI.factionPanel, 10)
             LayoutHelpers.AtLeftIn(TEST2factionPanel, GUI.factionPanel, 45)
             LayoutHelpers.AtVerticalCenterIn(TEST2factionPanel, GUI.factionPanel, 0)
-        TEST3factionPanel = Bitmap(GUI.factionPanel, UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico.png"))
+        TEST3factionPanel = Bitmap(GUI.factionPanel, "/textures/ui/common/FACTIONSELECTOR/uef_ico.png")
             --LayoutHelpers.AtTopIn(TEST3factionPanel, GUI.factionPanel, 0)
             LayoutHelpers.AtHorizontalCenterIn(TEST3factionPanel, GUI.factionPanel, 0)
             LayoutHelpers.AtVerticalCenterIn(TEST3factionPanel, GUI.factionPanel, 0)
-        TEST4factionPanel = Bitmap(GUI.factionPanel, UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico.png"))
+        TEST4factionPanel = Bitmap(GUI.factionPanel, "/textures/ui/common/FACTIONSELECTOR/seraphim_ico.png")
             --LayoutHelpers.AtTopIn(TEST4factionPanel, GUI.factionPanel, 10)
             LayoutHelpers.AtRightIn(TEST4factionPanel, GUI.factionPanel, 45)
             LayoutHelpers.AtVerticalCenterIn(TEST4factionPanel, GUI.factionPanel, 0)
-        TEST5factionPanel = Bitmap(GUI.factionPanel, UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico.png"))
+        TEST5factionPanel = Bitmap(GUI.factionPanel, "/textures/ui/common/FACTIONSELECTOR/random_ico.png")
             --LayoutHelpers.AtTopIn(TEST5factionPanel, GUI.factionPanel, 0)
             LayoutHelpers.AtRightIn(TEST5factionPanel, GUI.factionPanel, 0)
             LayoutHelpers.AtVerticalCenterIn(TEST5factionPanel, GUI.factionPanel, 0)
     end
+
+function Disable_Faction_Selector(disable, faction)
+	if disable == true then
+        TEST1factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/aeon_ico-dis.png")
+        TEST2factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/cybran_ico-dis.png")
+        TEST3factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/uef_ico-dis.png")
+        TEST4factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/seraphim_ico-dis.png")
+        TEST5factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/random_ico-dis.png")
+		if faction == 1 then
+			TEST3factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/uef_ico-large-dis.png")
+		elseif faction == 2 then
+			TEST1factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/aeon_ico-large-dis.png")
+		elseif faction == 3 then
+			TEST2factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/cybran_ico-large-dis.png")
+		elseif faction == 4 then
+			TEST4factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/seraphim_ico-large-dis.png")
+		elseif faction == 5 then
+			TEST5factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/random_ico-large-dis.png")
+		end
+	else
+		TEST1factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/aeon_ico.png")
+        TEST2factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/cybran_ico.png")
+        TEST3factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/uef_ico.png")
+        TEST4factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/seraphim_ico.png")
+        TEST5factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/random_ico.png")
+		if faction == 1 then
+			TEST3factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/uef_ico-large.png")
+		elseif faction == 2 then
+			TEST1factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/aeon_ico-large.png")
+		elseif faction == 3 then
+			TEST2factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/cybran_ico-large.png")
+		elseif faction == 4 then
+			TEST4factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/seraphim_ico-large.png")
+		elseif faction == 5 then
+			TEST5factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/random_ico-large.png")
+		end
+	end
+end
 
 function SetEvent_Faction_Selector()
     -- set up control logic
@@ -5615,15 +5671,15 @@ function SetEvent_Faction_Selector()
         local faction = Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
             local eventHandled = false
             if faction == 2 then
-                TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico-large.png"))
-                LayoutHelpers.AtLeftIn(TEST1factionPanel, GUI.factionPanel, -15)
+				TEST1factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/aeon_ico-large.png")
+				LayoutHelpers.AtLeftIn(TEST1factionPanel, GUI.factionPanel, -15)
             elseif IsPlayer(localPlayerID) then
                 if event.Type == 'MouseEnter' then
-                        TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico-hover.png"))
+                        TEST1factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/aeon_ico-hover.png")
                         LayoutHelpers.AtLeftIn(TEST1factionPanel, GUI.factionPanel, 0)
                     eventHandled = true
                 elseif event.Type == 'MouseExit' then
-                        TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico.png"))
+                        TEST1factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/aeon_ico.png")
                         LayoutHelpers.AtLeftIn(TEST1factionPanel, GUI.factionPanel, 0)
                     eventHandled = true
                 elseif event.Type == 'ButtonPress' then
@@ -5647,15 +5703,15 @@ function SetEvent_Faction_Selector()
         local faction = Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
             local eventHandled = false
             if faction == 3 then
-                TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico-large.png"))
+				TEST2factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/cybran_ico-large.png")
                 LayoutHelpers.AtLeftIn(TEST2factionPanel, GUI.factionPanel, 45-15)
             elseif IsPlayer(localPlayerID) then
                 if event.Type == 'MouseEnter' then
-                        TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico-hover.png"))
+                        TEST2factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/cybran_ico-hover.png")
                         LayoutHelpers.AtLeftIn(TEST2factionPanel, GUI.factionPanel, 45)
                     eventHandled = true
                 elseif event.Type == 'MouseExit' then
-                        TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico.png"))
+                        TEST2factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/cybran_ico.png")
                         LayoutHelpers.AtLeftIn(TEST2factionPanel, GUI.factionPanel, 45)
                     eventHandled = true
                 elseif event.Type == 'ButtonPress' then
@@ -5679,13 +5735,13 @@ function SetEvent_Faction_Selector()
         local faction = Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
             local eventHandled = false
             if faction == 1 then
-                TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico-large.png"))
+				TEST3factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/uef_ico-large.png")
             elseif IsPlayer(localPlayerID) then
                 if event.Type == 'MouseEnter' then
-                        TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico-hover.png"))
+                        TEST3factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/uef_ico-hover.png")
                     eventHandled = true
                 elseif event.Type == 'MouseExit' then
-                        TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico.png"))
+                        TEST3factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/uef_ico.png")
                     eventHandled = true
                 elseif event.Type == 'ButtonPress' then
                     eventHandled = true
@@ -5708,15 +5764,15 @@ function SetEvent_Faction_Selector()
         local faction = Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
             local eventHandled = false
             if faction == 4 then
-                TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico-large.png"))
+				TEST4factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/seraphim_ico-large.png")
                 LayoutHelpers.AtRightIn(TEST4factionPanel, GUI.factionPanel, 45-15)
             elseif IsPlayer(localPlayerID) then
                 if event.Type == 'MouseEnter' then
-                        TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico-hover.png"))
+                        TEST4factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/seraphim_ico-hover.png")
                         LayoutHelpers.AtRightIn(TEST4factionPanel, GUI.factionPanel, 45)
                     eventHandled = true
                 elseif event.Type == 'MouseExit' then
-                        TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico.png"))
+                        TEST4factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/seraphim_ico.png")
                         LayoutHelpers.AtRightIn(TEST4factionPanel, GUI.factionPanel, 45)
                     eventHandled = true
                 elseif event.Type == 'ButtonPress' then
@@ -5740,15 +5796,15 @@ function SetEvent_Faction_Selector()
         local faction = Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
             local eventHandled = false
             if faction == 5 then
-                TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico-large.png"))
+				TEST5factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/random_ico-large.png")
                 LayoutHelpers.AtRightIn(TEST5factionPanel, GUI.factionPanel, -15)
             elseif IsPlayer(localPlayerID) then
                 if event.Type == 'MouseEnter' then
-                        TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico-hover.png"))
+                        TEST5factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/random_ico-hover.png")
                         LayoutHelpers.AtRightIn(TEST5factionPanel, GUI.factionPanel, 0)
                     eventHandled = true
                 elseif event.Type == 'MouseExit' then
-                        TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico.png"))
+                        TEST5factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/random_ico.png")
                         LayoutHelpers.AtRightIn(TEST5factionPanel, GUI.factionPanel, 0)
                     eventHandled = true
                 elseif event.Type == 'ButtonPress' then
@@ -5774,66 +5830,66 @@ function SetCurrentFactionTo_Faction_Selector(input_faction)
             ChangeSkinByFaction(1)
             ChangeSkinButtonByFaction(1)
             ChangeBackgroundLobby(nil, 1)
-            TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico-large.png"))
-            TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico.png"))
+            TEST3factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/uef_ico-large.png")
+            TEST1factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/aeon_ico.png")
                 LayoutHelpers.AtLeftIn(TEST1factionPanel, GUI.factionPanel, 0)
-            TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico.png"))
+            TEST2factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/cybran_ico.png")
                 LayoutHelpers.AtLeftIn(TEST2factionPanel, GUI.factionPanel, 45)
-            TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico.png"))
+            TEST4factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/seraphim_ico.png")
                 LayoutHelpers.AtRightIn(TEST4factionPanel, GUI.factionPanel, 45)
-            TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico.png"))
+            TEST5factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/random_ico.png")
                 LayoutHelpers.AtRightIn(TEST5factionPanel, GUI.factionPanel, 0)
         elseif faction == 2 then
             ChangeSkinByFaction(2)
             ChangeSkinButtonByFaction(2)
             ChangeBackgroundLobby(nil, 2)
-            TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico-large.png"))
+            TEST1factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/aeon_ico-large.png")
                 LayoutHelpers.AtLeftIn(TEST1factionPanel, GUI.factionPanel, -15)
-            TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico.png"))
+            TEST2factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/cybran_ico.png")
                 LayoutHelpers.AtLeftIn(TEST2factionPanel, GUI.factionPanel, 45)
-            TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico.png"))
-            TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico.png"))
+            TEST3factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/uef_ico.png")
+            TEST4factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/seraphim_ico.png")
                 LayoutHelpers.AtRightIn(TEST4factionPanel, GUI.factionPanel, 45)
-            TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico.png"))
+            TEST5factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/random_ico.png")
                 LayoutHelpers.AtRightIn(TEST5factionPanel, GUI.factionPanel, 0)
         elseif faction == 3 then
             ChangeSkinByFaction(3)
             ChangeSkinButtonByFaction(3)
             ChangeBackgroundLobby(nil, 3)
-            TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico-large.png"))
+            TEST2factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/cybran_ico-large.png")
                 LayoutHelpers.AtLeftIn(TEST2factionPanel, GUI.factionPanel, 45-15)
-            TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico.png"))
+            TEST1factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/aeon_ico.png")
                 LayoutHelpers.AtLeftIn(TEST1factionPanel, GUI.factionPanel, 0)
-            TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico.png"))
-            TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico.png"))
+            TEST3factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/uef_ico.png")
+            TEST4factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/seraphim_ico.png")
                 LayoutHelpers.AtRightIn(TEST4factionPanel, GUI.factionPanel, 45)
-            TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico.png"))
+            TEST5factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/random_ico.png")
                 LayoutHelpers.AtRightIn(TEST5factionPanel, GUI.factionPanel, 0)
         elseif faction == 4 then
             ChangeSkinByFaction(4)
             ChangeSkinButtonByFaction(4)
             ChangeBackgroundLobby(nil, 4)
-            TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico-large.png"))
+            TEST4factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/seraphim_ico-large.png")
                 LayoutHelpers.AtRightIn(TEST4factionPanel, GUI.factionPanel, 45-15)
-            TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico.png"))
+            TEST1factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/aeon_ico.png")
                 LayoutHelpers.AtLeftIn(TEST1factionPanel, GUI.factionPanel, 0)
-            TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico.png"))
+            TEST2factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/cybran_ico.png")
                 LayoutHelpers.AtLeftIn(TEST2factionPanel, GUI.factionPanel, 45)
-            TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico.png"))
-            TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico.png"))
+            TEST3factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/uef_ico.png")
+            TEST5factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/random_ico.png")
                 LayoutHelpers.AtRightIn(TEST5factionPanel, GUI.factionPanel, 0)
         elseif faction == 5 then
             ChangeSkinByFaction(5)
             ChangeSkinButtonByFaction(5)
             ChangeBackgroundLobby(nil, 5)
-            TEST5factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/random_ico-large.png"))
+            TEST5factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/random_ico-large.png")
                 LayoutHelpers.AtRightIn(TEST5factionPanel, GUI.factionPanel, -15)
-            TEST1factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/aeon_ico.png"))
+            TEST1factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/aeon_ico.png")
                 LayoutHelpers.AtLeftIn(TEST1factionPanel, GUI.factionPanel, 0)
-            TEST2factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/cybran_ico.png"))
+            TEST2factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/cybran_ico.png")
                 LayoutHelpers.AtLeftIn(TEST2factionPanel, GUI.factionPanel, 45)
-            TEST3factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/uef_ico.png"))
-            TEST4factionPanel:SetTexture(UIUtil.SkinnableFile("/FACTIONSELECTOR/seraphim_ico.png"))
+            TEST3factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/uef_ico.png")
+            TEST4factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/seraphim_ico.png")
                 LayoutHelpers.AtRightIn(TEST4factionPanel, GUI.factionPanel, 45)
         end
         end
@@ -5843,15 +5899,25 @@ function ChangeSkinByFaction(input_faction)
     local faction = input_faction or Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
     if GUI.panel then
     if faction == 1 then
-        GUI.panel:SetTexture(UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[uef]lobby.png"))
+        GUI.panel:SetTexture("/textures/ui/common/scx_menu/lan-game-lobby/[uef]lobby.png")
+		GUI.panelWideLeft:SetTexture('/textures/ui/common/scx_menu/lan-game-lobby/wide/[uef]wide.png')
+		GUI.panelWideRight:SetTexture('/textures/ui/common/scx_menu/lan-game-lobby/wide/[uef]wide.png')
     elseif faction == 2 then
-        GUI.panel:SetTexture(UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[aeo]lobby.png"))
+        GUI.panel:SetTexture("/textures/ui/common/scx_menu/lan-game-lobby/[aeo]lobby.png")
+		GUI.panelWideLeft:SetTexture('/textures/ui/common/scx_menu/lan-game-lobby/wide/[aeo]wide.png')
+		GUI.panelWideRight:SetTexture('/textures/ui/common/scx_menu/lan-game-lobby/wide/[aeo]wide.png')
     elseif faction == 3 then
-        GUI.panel:SetTexture(UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[cyb]lobby.png"))
+        GUI.panel:SetTexture("/textures/ui/common/scx_menu/lan-game-lobby/[cyb]lobby.png")
+		GUI.panelWideLeft:SetTexture('/textures/ui/common/scx_menu/lan-game-lobby/wide/[cyb]wide.png')
+		GUI.panelWideRight:SetTexture('/textures/ui/common/scx_menu/lan-game-lobby/wide/[cyb]wide.png')
     elseif faction == 4 then
-        GUI.panel:SetTexture(UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[ser]lobby.png"))
+        GUI.panel:SetTexture("/textures/ui/common/scx_menu/lan-game-lobby/[ser]lobby.png")
+		GUI.panelWideLeft:SetTexture('/textures/ui/common/scx_menu/lan-game-lobby/wide/[ser]wide.png')
+		GUI.panelWideRight:SetTexture('/textures/ui/common/scx_menu/lan-game-lobby/wide/[ser]wide.png')
     elseif faction == 5 then
-        GUI.panel:SetTexture(UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[random]lobby.png"))
+        GUI.panel:SetTexture("/textures/ui/common/scx_menu/lan-game-lobby/[random]lobby.png")
+		GUI.panelWideLeft:SetTexture('/textures/ui/common/scx_menu/lan-game-lobby/wide/[random]wide.png')
+		GUI.panelWideRight:SetTexture('/textures/ui/common/scx_menu/lan-game-lobby/wide/[random]wide.png')
     --else
     end
     end
@@ -5986,17 +6052,17 @@ function ChangeBackgroundLobby(slot, faction)
             GUI.background2:Hide()
             faction = faction or Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
             if faction == 1 then
-                GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/faction/faction-background-paint_uef_bmp.png"))
+                GUI.background:SetTexture("/textures/ui/common/BACKGROUND/faction/faction-background-paint_uef_bmp.png")
             elseif faction == 2 then
-                GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/faction/faction-background-paint_aion_bmp.png"))
+                GUI.background:SetTexture("/textures/ui/common/BACKGROUND/faction/faction-background-paint_aion_bmp.png")
             elseif faction == 3 then
-                GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/faction/faction-background-paint_cybran_bmp.png"))
+                GUI.background:SetTexture("/textures/ui/common/BACKGROUND/faction/faction-background-paint_cybran_bmp.png")
             elseif faction == 4 then
-                GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/faction/faction-background-paint_seraphim_bmp.png"))
+                GUI.background:SetTexture("/textures/ui/common/BACKGROUND/faction/faction-background-paint_seraphim_bmp.png")
             elseif faction == 5 then
-                GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/faction/faction-background-paint_random_bmp.png"))
+                GUI.background:SetTexture("/textures/ui/common/BACKGROUND/faction/faction-background-paint_random_bmp.png")
             else
-                GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/background-paint_black_bmp.png"))
+                GUI.background:SetTexture("/textures/ui/common/BACKGROUND/background-paint_black_bmp.png")
             end
             LASTXinnoBackground = 'Factions'
         
@@ -6004,14 +6070,14 @@ function ChangeBackgroundLobby(slot, faction)
             if XinnonyDebug == 4 then AddChatText(">> Background ART") end
             GUI.background:Show()
             GUI.background2:Hide()
-            GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/art/art-background-paint0"..math.random(1, 5).."_bmp.dds"))
+            GUI.background:SetTexture("/textures/ui/common/BACKGROUND/art/art-background-paint0"..math.random(1, 5).."_bmp.dds")
             LASTXinnoBackground = 'ConceptArt'
             
         elseif XinnoBackground == 'Screenshoot' then--and LASTBackgroundSelected != BackgroundSelected then
             if XinnonyDebug == 4 then AddChatText(">> Background SCREENSHOOT") end
             GUI.background:Show()
             GUI.background2:Hide()
-            GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/scrn/scrn-background-paint"..math.random(1, 14).."_bmp.dds"))
+            GUI.background:SetTexture("/textures/ui/common/BACKGROUND/scrn/scrn-background-paint"..math.random(1, 14).."_bmp.dds")
             LASTXinnoBackground = 'Screenshoot'
         
         elseif XinnoBackground == 'Map' then--and LASTBackgroundSelected != BackgroundSelected then -- LASTBac... is for avoided loop set texture, when you change faction
@@ -6047,7 +6113,7 @@ function CreateOptionLobbyDialog()
     local dialog = Group(GUI)
         LayoutHelpers.AtCenterIn(dialog, GUI)
         dialog.Depth:Set(999) -- :GetTopmostDepth() + 1
-    local background = Bitmap(dialog, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby.png'))
+    local background = Bitmap(dialog, '/textures/ui/common/scx_menu/lan-game-lobby/optionlobby.png')
         dialog.Width:Set(background.Width)
         dialog.Height:Set(background.Height)
         LayoutHelpers.FillParent(background, dialog)

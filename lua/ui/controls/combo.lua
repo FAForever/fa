@@ -17,22 +17,22 @@ local activeCombo = nil
 local defaultBitmaps = {
     button = {
         left = {
-            up = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_up_l.dds'),
-            down = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_up_l.dds'),
-            over = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_over_l.dds'),
-            dis = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_dis_l.dds'),
+            up = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_up_l.png'),
+            down = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_down_l.png'),
+            over = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_over_l.png'),
+            dis = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_dis_l.png'),
         },
         mid = {
-            up = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_up_m.dds'),
-            down = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_up_m.dds'),
-            over = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_over_m.dds'),
-            dis = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_dis_m.dds'),
+            up = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_up_m.png'),
+            down = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_down_m.png'),
+            over = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_over_m.png'),
+            dis = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_dis_m.png'),
         },
         right = {
-            up = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_up_r.dds'),
-            down = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_up_r.dds'),
-            over = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_over_r.dds'),
-            dis = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_dis_r.dds'),
+            up = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_up_r.png'),
+            down = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_down_r.png'),
+            over = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_over_r.png'),
+            dis = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_dis_r.png'),
         }
     },
     list = {
@@ -447,7 +447,7 @@ Combo2 = Class(Group) { --Xinnony
 
         self._list = ItemList(ddm)   -- make list depth over text so if you have them stacked, you see list
         self._list:SetFont(UIUtil.bodyFont, pointSize)
-        self._list:SetColors(UIUtil.fontColor, "Black", "Black", "Gainsboro")
+        self._list:SetColors(UIUtil.fontColor, "Black", "Black", "Gainsboro") -- Items Colors
         if staticTitle then
             self._list:ShowSelection(false)
         end
@@ -503,7 +503,7 @@ Combo2 = Class(Group) { --Xinnony
                 self._btnLeft:SetTexture(bitmaps.button.left.down)
                 self._btnRight:SetTexture(bitmaps.button.right.down)
                 self._btnMid:SetTexture(bitmaps.button.mid.down)
-                self._text:SetColor("Black")
+                self._text:SetColor("FFF6F6F6") -- Color of Combo Text if Clicked
                 self:OnMouseExit()
                 if activeCombo and activeCombo != self then
                     activeCombo._listhidden = true
