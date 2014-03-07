@@ -71,7 +71,7 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC xsb0301_desc>Land Factory',
+    Description = '<LOC xsb0301_desc>Land Factory HQ',
     Display = {
         AnimationDeath = {
             {
@@ -212,7 +212,7 @@ UnitBlueprint {
         VisionRadius = 20,
     },
     Interface = {
-        HelpText = '<LOC xsb0301_help>Land Factory',
+        HelpText = '<LOC xsb0301_help>Land Factory HQ',
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 2,
