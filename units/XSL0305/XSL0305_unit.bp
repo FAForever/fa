@@ -43,7 +43,6 @@ UnitBlueprint {
         'SERAPHIM',
         'MOBILE',
         'LAND',
-		#'HOVER', #added to reflect hover
         'TECH3',
         'DIRECTFIRE',
         'INDIRECTFIRE', #New, for range ring
@@ -65,10 +64,6 @@ UnitBlueprint {
     },
     Description = '<LOC xsl0305_desc>Sniper Bot',
     Display = {
-        #Abilities = {
-        #    '<LOC ability_deploys>Deploys',
-			#'<LOC ability_hover>Hover', #added to reflect hover
-        #},
         AnimationDeath = {
             {
                 Animation = '/units/xsl0305/xsl0305_ADeath.sca',
