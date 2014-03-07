@@ -64,7 +64,7 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC uab0303_desc>Naval Factory',
+    Description = '<LOC uab0303_desc>Naval Factory HQ',
     Display = {
         BlinkingLights = {
             {
@@ -185,7 +185,7 @@ UnitBlueprint {
         VisionRadius = 20,
     },
     Interface = {
-        HelpText = '<LOC uab0303_help>Naval Factory',
+        HelpText = '<LOC uab0303_help>Naval Factory HQ',
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 6.7,

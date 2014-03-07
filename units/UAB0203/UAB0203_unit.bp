@@ -64,7 +64,7 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC uab0203_desc>Naval Factory',
+    Description = '<LOC uab0203_desc>Naval Factory HQ',
     Display = {
         Abilities = {
             '<LOC ability_upgradable>Upgradeable',
@@ -184,7 +184,7 @@ UnitBlueprint {
         VisionRadius = 20,
     },
     Interface = {
-        HelpText = '<LOC uab0203_help>Naval Factory',
+        HelpText = '<LOC uab0203_help>Naval Factory HQ',
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 6.5,

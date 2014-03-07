@@ -70,7 +70,7 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC uab0201_desc>Land Factory',
+    Description = '<LOC uab0201_desc>Land Factory HQ',
     Display = {
         Abilities = {
             '<LOC ability_upgradable>Upgradeable',
