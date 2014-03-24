@@ -166,7 +166,7 @@ Shield = Class(moho.shield_methods,Entity) {
         end
 
         ###### This code is to pass damage over overlapping shields.
-        if type != 'ShieldSpillOver' and self.Size and self.Size > 0 and self:IsOn() and absorbed >= self.DmgThresholdToSpillOver then
+        if type != 'ShieldSpillOver' and self.Size and self.Size > 0 and self:IsUp() and absorbed >= self.DmgThresholdToSpillOver then
 
             self:SpillOverDmgDBRegister(instigator, absorbed, type) # remember this damage to prevent additional overspill damage
 
@@ -183,7 +183,7 @@ Shield = Class(moho.shield_methods,Entity) {
             local obp, oOverlapRadius, vpos, OverlapDist
 
             for k, v in units do
-                if v and IsUnit(v) and not v:IsDead() and v.MyShield and v.MyShield:IsOn() and v.MyShield.Size and v.MyShield.Size > 0 and self.Owner != v and v != instigator then
+                if v and IsUnit(v) and not v:IsDead() and v.MyShield and v.MyShield:IsUp() and v.MyShield.Size and v.MyShield.Size > 0 and self.Owner != v and v != instigator then
                     vspos = v.MyShield:GetCachePosition()
                     oOverlapRadius = 0.98 * (v.MyShield.Size / 2)  # size is diameter, dividing by 2 to get radius
 
@@ -280,7 +280,7 @@ Shield = Class(moho.shield_methods,Entity) {
 
     AdjacentBubbleShieldDamageSpillOverThread = function(self, instigator, spillingUnit, dmg, type)
         WaitTicks(1)                                                                     #### max spill damage delay is 1 ticks (3/3)
-        if self and self.Owner and not self.Owner:IsDead() and self:IsOn() then
+        if self and self.Owner and not self.Owner:IsDead() and self:IsUp() then
 
             # find out whether we've been hit by the cause of the spill over damage aswell. If yes, ignore spill over damage (we already took damage)
             local DBkey = self:SpillOverDmgDBFind(instigator, dmg, type)
@@ -386,7 +386,7 @@ Shield = Class(moho.shield_methods,Entity) {
     end,
 
     IsUp = function(self)
-        return self._IsUp or false
+        return (self:IsOn() and self._IsUp)
     end,
 
     RemoveShield = function(self)
