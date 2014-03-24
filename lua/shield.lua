@@ -26,6 +26,7 @@ Shield = Class(moho.shield_methods,Entity) {
         self.MeshBp = spec.Mesh
         self.MeshZBp = spec.MeshZ
         self.ImpactMeshBp = spec.ImpactMesh
+        self._IsUp = false
         if spec.ImpactEffects != '' then
             self.ImpactEffects = EffectTemplate[spec.ImpactEffects]
         else
@@ -384,7 +385,13 @@ Shield = Class(moho.shield_methods,Entity) {
         return false
     end,
 
+    IsUp = function(self)
+        return self._IsUp or false
+    end,
+
     RemoveShield = function(self)
+        self._IsUp = false
+
         self:SetCollisionShape('None')
 
         self:SetMesh('')
@@ -414,6 +421,8 @@ Shield = Class(moho.shield_methods,Entity) {
             self.MeshZ:SetVizToAllies('Always')
             self.MeshZ:SetVizToNeutrals('Intel')
         end
+
+        self._IsUp = true
     end,
 
     # Basically run a timer, but with visual bar movement
