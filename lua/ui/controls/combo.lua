@@ -305,7 +305,7 @@ Combo = Class(Group) {
 
     -- remove old items and replace with a table of strings, also set the visible size
     -- defaultItemIndex is 1 based
-    AddItems = function(self, textArray, defaultItemIndex)
+    AddItems = function(self, textArray, defaultItemIndex, realDefValue)
         defaultItemIndex = defaultItemIndex or 1
         local numItems = table.getn(textArray)
         self._visibleItems:Set(math.min(numItems, self._maxVisibleItems))
@@ -318,7 +318,11 @@ Combo = Class(Group) {
         end
 
         for i, text in ipairs(textArray) do
-            self._list:AddItem(LOC(text))
+            if realDefValue and i == realDefValue then
+				self._list:AddItem(LOC(text)..' (default)')
+			else
+				self._list:AddItem(LOC(text))
+			end
         end
 
         self:SetItem(defaultItemIndex)

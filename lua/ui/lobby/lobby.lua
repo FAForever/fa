@@ -6,7 +6,7 @@
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
 
-LOBBYversion = 'v2.3'
+LOBBYversion = 'v2.4'
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
@@ -21,7 +21,7 @@ local Edit = import('/lua/maui/edit.lua').Edit
 local LobbyComm = import('/lua/ui/lobby/lobbyComm.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local Mods = import('/lua/mods.lua')
-local ModManager = import('/lua/ui/dialogs/modmanager.lua')
+--local ModManager = import('/lua/ui/dialogs/modmanager.lua')
 local FactionData = import('/lua/factions.lua')
 local Text = import('/lua/maui/text.lua').Text
 local Trueskill = import('/lua/ui/lobby/trueskill.lua')
@@ -35,8 +35,11 @@ local teamOpts = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
 local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
 local gameColors = import('/lua/gameColors.lua').GameColors
 local numOpenSlots = LobbyComm.maxPlayerSlots
+
 formattedOptions = {''}
 FormOpt2 = {''}
+local Warning_MAP = false
+
 local teamIcons = {
     '/lobby/team_icons/team_no_icon.dds',
     '/lobby/team_icons/team_1_icon.dds',
@@ -62,12 +65,14 @@ local PrefLanguageTooltipTitle={}
 local PrefLanguageTooltipText={}
 --\\ Stop - Table of Tooltip Country
 --// Get a value on /Country CommandLine in FA.exe - Xinnony
-local PrefLanguage = GetCommandLineArg("/country", 1)
-if PrefLanguage[1] == '' or PrefLanguage[1] == nil then
-    LOG('COUNTRY - Country has not been found')
-    PrefLanguage = "world"
-else
-    PrefLanguage = tostring(string.lower(PrefLanguage[1]))
+local PrefLanguage = "world"
+if GetCommandLineArg("/country", 1) then
+	local PrefLanguage = GetCommandLineArg("/country", 1)
+	PrefLanguage = tostring(string.lower(PrefLanguage[1]))
+	if PrefLanguage == '' or PrefLanguage == nil or PrefLanguage == '/init' then
+		LOG('COUNTRY - Country has not been found')
+		PrefLanguage = "world"
+	end
 end
 --\\ Stop - Get a value on /Country CommandLine in FA.exe
 
@@ -1524,10 +1529,8 @@ local function UpdateGame()
             end
         end
     else
-        --GUI.gameoptionsButton.label:SetText(LOC('<LOC tooltipui0145>'))
         GUI.gameoptionsButton.OnClick = function(self, modifiers)
-            modstatus = ModManager.ClientModStatus(gameInfo.GameMods)
-            ModManager.CreateDialog(GUI, true, OnModsChanged, true, modstatus)
+			import('/lua/ui/lobby/ModsManager.lua').NEW_MODS_GUI(GUI, lobbyComm:IsHost(), gameInfo.GameMods)
         end
         Tooltip.AddButtonTooltip(GUI.gameoptionsButton, 'Lobby_Mods')
         GUI.launchGameButton:Hide()
@@ -2461,12 +2464,12 @@ function CreateUI(maxPlayers)
     ---------------------------------------------------------------------------
 	GUI.panel = Bitmap(GUI, UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[random]lobby.png"))
 		LayoutHelpers.AtCenterIn(GUI.panel, GUI)
-	GUI.panelWideLeft = Bitmap(GUI, '/textures/ui/common/scx_menu/lan-game-lobby/wide/[uef]wide.png')
-		GUI.panelWideLeft.Width:Set((GUI.Width()-1000)/2)
+	GUI.panelWideLeft = Bitmap(GUI, '/textures/ui/common/scx_menu/lan-game-lobby/wide/[random]wide.png')
 		LayoutHelpers.CenteredLeftOf(GUI.panelWideLeft, GUI.panel, -11)
-	GUI.panelWideRight = Bitmap(GUI, '/textures/ui/common/scx_menu/lan-game-lobby/wide/[uef]wide.png')
-		GUI.panelWideRight.Width:Set((GUI.Width()-1000)/2)
+		GUI.panelWideLeft.Left:Set(function() return GUI.Left() end)
+	GUI.panelWideRight = Bitmap(GUI, '/textures/ui/common/scx_menu/lan-game-lobby/wide/[random]wide.png')
 		LayoutHelpers.CenteredRightOf(GUI.panelWideRight, GUI.panel, -11)
+		GUI.panelWideRight.Right:Set(function() return GUI.Right() end)
     
     --// Title Label
 	titleText = UIUtil.CreateText(GUI.panel, "", 17, 'Arial Gras')--UIUtil.titleFont)
@@ -2496,15 +2499,15 @@ function CreateUI(maxPlayers)
         LayoutHelpers.AtLeftTopIn(RuleLabel, GUI.panel, 50, 81) --Right, Top
 		RuleLabel.Height:Set(34)
 		RuleLabel.Width:Set(350)
-		--if lobbyComm:IsHost() then
-			--tmptext = 'Rule : no rule (click for edit).'
-		--else
-			tmptext = 'Rule : no rule.'
-		--end
-		wrapped = import('/lua/maui/text.lua').WrapText(tmptext, 350, function(curText) return RuleLabel:GetStringAdvance(curText) end)
 		RuleLabel:DeleteAllItems()
-		RuleLabel:AddItem(wrapped[1] or '')
-		RuleLabel:AddItem(wrapped[2] or '')
+		if lobbyComm:IsHost() then
+			tmptext = 'Rule : no rule (click for edit)'
+			RuleLabel:SetColors("FFCC00")
+		else
+			tmptext = 'Rule : no rule.'
+		end
+		RuleLabel:AddItem(tmptext or '')
+		RuleLabel:AddItem('')
 		if lobbyComm:IsHost() then
 			RuleLabel.OnClick = function(self)
 				RuleTitle_INPUT()
@@ -2516,6 +2519,33 @@ function CreateUI(maxPlayers)
         LayoutHelpers.AtLeftTopIn(ModFeaturedLabel, GUI.panel, 50, 61)
         ModFeaturedLabel:SetColor('B9BFB9')
         ModFeaturedLabel:SetDropShadow(true)
+		local getInit = GetCommandLineArg("/init", 1)
+		getInit = tostring(getInit[1])
+		if getInit == "init_faf.lua" then
+			SetText2(ModFeaturedLabel, 'FA Forever', 10)
+		elseif getInit == "init_blackops.lua" then
+			SetText2(ModFeaturedLabel, 'BlackOps MOD', 10)
+		elseif getInit == "init_coop.lua" then
+			SetText2(ModFeaturedLabel, 'COOP', 10)
+		elseif getInit == "init_balancetesting.lua" then
+			SetText2(ModFeaturedLabel, 'Balance Testing', 10)
+		elseif getInit == "init_gw.lua" then
+			SetText2(ModFeaturedLabel, 'Galactic War', 10)
+		elseif getInit == "init_labwars.lua" then
+			SetText2(ModFeaturedLabel, 'Labwars MOD', 10)
+		elseif getInit == "init_ladder1v1.lua" then
+			SetText2(ModFeaturedLabel, 'Ladder 1v1', 10)
+		elseif getInit == "init_nomads.lua" then
+			SetText2(ModFeaturedLabel, 'Nomads MOD', 10)
+		elseif getInit == "init_phantomx.lua" then
+			SetText2(ModFeaturedLabel, 'PhantomX MOD', 10)
+		elseif getInit == "init_supremedestruction.lua" then
+			SetText2(ModFeaturedLabel, 'SupremeDestruction MOD', 10)
+		elseif getInit == "init_xtremewars.lua" then
+			SetText2(ModFeaturedLabel, 'XtremeWars MOD', 10)
+		--else
+			--ModFeaturedLabel:SetText('')
+		end
 	--\\
     --// Lobby options panel -- Xinnony
     GUI.LobbyOptions = UIUtil.CreateButtonStd2PNG(GUI.panel, '/BUTTON/small/', "Lobby Options", 10, -1)
@@ -2526,7 +2556,7 @@ function CreateUI(maxPlayers)
 		end
 	--\\
 	--// Credits footer -- Xinnony
-    local Credits = 'New Skin by Xinnony and Barlots ('..LOBBYversion..')'
+    local Credits = 'New Skin by Xinnony and Barlots (Lobby version : '..LOBBYversion..')'
     local Credits_Text_X = 11
     Credits_Text = UIUtil.CreateText(GUI.panel, '', 17, UIUtil.titleFont)
     SetText2(Credits_Text, Credits, 10)
@@ -2610,14 +2640,14 @@ function CreateUI(maxPlayers)
     -- Checkbox Show changed Options
     cbox_ShowChangedOption = UIUtil.CreateCheckboxStdPNG(GUI.optionsPanel, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel, 3, 0)
-        Tooltip.AddCheckboxTooltip(cbox_ShowChangedOption, {text='Hide unchanged Options', body='Show only changed Options'})
-		cbox_ShowChangedOption_TEXT = UIUtil.CreateText(cbox_ShowChangedOption, 'Hide unchanged Options', 11, 'Arial')
+        Tooltip.AddCheckboxTooltip(cbox_ShowChangedOption, {text='Hide default Options', body='Show only changed Options and Advanced Map Options'})
+		cbox_ShowChangedOption_TEXT = UIUtil.CreateText(cbox_ShowChangedOption, 'Hide default Options', 11, 'Arial')
             cbox_ShowChangedOption_TEXT:SetColor('B9BFB9')
             cbox_ShowChangedOption_TEXT:SetDropShadow(true)
             LayoutHelpers.AtLeftIn(cbox_ShowChangedOption_TEXT, cbox_ShowChangedOption, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox_ShowChangedOption_TEXT, cbox_ShowChangedOption)
             cbox_ShowChangedOption.OnCheck = function(self, checked)
-                if checked then
+				if checked then
                     XinnonyOption = 1
 					RefreshOptionDisplayData()
 					if GUI.OptionContainer.CalcVisible then
@@ -3375,21 +3405,22 @@ function CreateUI(maxPlayers)
         GUI.allowObservers = UIUtil.CreateCheckboxStdPNG(GUI.buttonPanelTop, '/CHECKBOX/radio')
             LayoutHelpers.CenteredLeftOf(GUI.allowObservers, GUI.buttonPanelTop, -30)
             Tooltip.AddControlTooltip(GUI.allowObservers, 'lob_observers_allowed')
-        GUI.observerLabel = UIUtil.CreateText(GUI.allowObservers, 'Observers in Game', 11, 'Arial')--14, UIUtil.bodyFont)--"<LOC lobui_0275>Observers", 14, UIUtil.bodyFont)
-            GUI.observerLabel:SetColor('B9BFB9')
-            GUI.observerLabel:SetDropShadow(true)
-            LayoutHelpers.CenteredRightOf(GUI.observerLabel, GUI.allowObservers, 0)
-            Tooltip.AddControlTooltip(GUI.observerLabel, 'lob_describe_observers')
-        GUI.allowObservers:SetCheck(false)
-        if lobbyComm:IsHost() then
-            SetGameOption("AllowObservers", false, false, true)
-            GUI.allowObservers.OnCheck = function(self, checked)
-                SetGameOption("AllowObservers", checked)
-            end
-        else
-            GUI.allowObservers:Disable()
-            GUI.observerLabel:Disable()
-        end
+			GUI.observerLabel = UIUtil.CreateText(GUI.allowObservers, 'Observers in Game', 11, 'Arial')--14, UIUtil.bodyFont)--"<LOC lobui_0275>Observers", 14, UIUtil.bodyFont)
+				GUI.observerLabel:SetColor('B9BFB9')
+				GUI.observerLabel:SetDropShadow(true)
+				LayoutHelpers.CenteredRightOf(GUI.observerLabel, GUI.allowObservers, 0)
+				Tooltip.AddControlTooltip(GUI.observerLabel, 'lob_describe_observers')
+			GUI.allowObservers:SetCheck(false)
+			if lobbyComm:IsHost() then
+				SetGameOption("AllowObservers", false, false, true)
+				GUI.allowObservers.OnCheck = function(self, checked)
+					SetGameOption("AllowObservers", checked)
+				end
+			else
+				GUI.allowObservers:Disable()
+				GUI.observerLabel:Disable()
+				GUI.observerLabel:SetColor('5C5F5C')
+			end
 		
 		UpdateGame()
 
@@ -3802,38 +3833,12 @@ function RefreshOptionDisplayData(scenarioInfo)
     local globalOpts = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
     local teamOptions = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
     local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
+	if not scenarioInfo and gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") then
+		scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+	end
     formattedOptions = {}
 	FormOpt2 = {}
 
---// Check Ranked active -- Xinnony & Vicarian
-    local getInit = GetCommandLineArg("/init", 1)
-    getInit = tostring(getInit[1])
-    if getInit == "init_faf.lua" then
-        SetText2(ModFeaturedLabel, 'FA Forever', 10)
-    elseif getInit == "init_blackops.lua" then
-        SetText2(ModFeaturedLabel, 'BlackOps MOD', 10)
-	elseif getInit == "init_coop.lua" then
-        SetText2(ModFeaturedLabel, 'COOP', 10)
-    elseif getInit == "init_balancetesting.lua" then
-        SetText2(ModFeaturedLabel, 'Balance Testing', 10)
-    elseif getInit == "init_gw.lua" then
-        SetText2(ModFeaturedLabel, 'Galactic War', 10)
-    elseif getInit == "init_labwars.lua" then
-        SetText2(ModFeaturedLabel, 'Labwars MOD', 10)
-    elseif getInit == "init_ladder1v1.lua" then
-        SetText2(ModFeaturedLabel, 'Ladder 1v1', 10)
-    elseif getInit == "init_nomads.lua" then
-        SetText2(ModFeaturedLabel, 'Nomads MOD', 10)
-    elseif getInit == "init_phantomx.lua" then
-        SetText2(ModFeaturedLabel, 'PhantomX MOD', 10)
-    elseif getInit == "init_supremedestruction.lua" then
-        SetText2(ModFeaturedLabel, 'SupremeDestruction MOD', 10)
-    elseif getInit == "init_xtremewars.lua" then
-        SetText2(ModFeaturedLabel, 'XtremeWars MOD', 10)
-    --else
-        --ModFeaturedLabel:SetText('')
-    end
---\\ Stop Check Ranked active
 --// Check Mod active
     local modStr = false
 	local modNum = table.getn(Mods.GetGameMods(gameInfo.GameMods)) or 0
@@ -3875,6 +3880,7 @@ function RefreshOptionDisplayData(scenarioInfo)
             valueTooltip = 'Lobby_Mod_Option'})
 	end
 --\\ Stop Check Mod active
+
 --// Check RestrictedUnit active
     if gameInfo.GameOptions.RestrictedCategories != nil then
         if table.getn(gameInfo.GameOptions.RestrictedCategories) != 0 then
@@ -3891,6 +3897,7 @@ function RefreshOptionDisplayData(scenarioInfo)
         end
     end
 --\\ Stop Check RestrictedUnit active
+
 --// Check MapSize & MaxPlayer active -- Disable because is Added in Tooltip on RankedLabel Label (MapNameLabel)
     --if scenarioInfo then
         --table.insert(formattedOptions, {text = '<LOC MAPSEL_0024>',
@@ -3903,114 +3910,93 @@ function RefreshOptionDisplayData(scenarioInfo)
             --valueTooltip = 'map_select_maxplayers'})
     --end
 --\\ Stop Check MapSize & MaxPlayer active
+
 --// Check other options active
-    for i, v in gameInfo.GameOptions do
-        local option = false
-        local mpOnly = false
-        --RankedOptions
-        --Mod Options
-        --Unit Manager
-        --globalOpts
-        --teamOptions
-        --AIOpts
-        --AdvancedOptions
-        for index, optData in globalOpts do
-            if i == optData.key then
-                mpOnly = optData.mponly or false
-                option = {text = optData.label, tooltip = optData.pref}
-                for _, val in optData.values do
-					if val.key == v then
-						if optData.default and _ != optData.default then -- If the option is not default value, insert. - Xinnony
-							table.insert(FormOpt2, {
-								text = optData.label,
-								value = val.text,
-								tooltip = {text = optData.label, body = optData.help},
-								valueTooltip = {text = optData.label, body = val.help}})
-						end
-						option.value = val.text
-						option.tooltip = {text = optData.label, body = optData.help}
-						option.valueTooltip = {text = optData.label, body = val.help}
-                        break
-                    end
-                end
-                break
-            end
-        end
-        if not option then
-            for index, optData in teamOptions do
-                if i == optData.key then
-                    option = {text = optData.label, tooltip = optData.pref}
-                    for _, val in optData.values do
-                        if val.key == v then
-							if optData.default and _ != optData.default then -- If the option is not default value, insert. - Xinnony
-								table.insert(FormOpt2, {
-									text = optData.label,
-									value = val.text,
-									tooltip = {text = optData.label, body = optData.help},
-									valueTooltip = {text = optData.label, body = val.help}})
-							end
-							option.value = val.text
-							option.tooltip = {text = optData.label, body = optData.help}
-                            option.valueTooltip = {text = optData.label, body = val.help}
-                            break
-                        end
-                    end
-                    break
-                end
-            end
-        end
-        if not option then
-            for index, optData in AIOpts do
-                if i == optData.key then
-                    option = {text = optData.label, tooltip = optData.pref}
-                    for _, val in optData.values do
-                        if val.key == v then
-							if optData.default and _ != optData.default then -- If the option is not default value, insert. - Xinnony
-								table.insert(FormOpt2, {
-									text = optData.label,
-									value = val.text,
-									tooltip = {text = optData.label, body = optData.help},
-									valueTooltip = {text = optData.label, body = val.help}})
-							end
-							option.value = val.text
-							option.tooltip = {text = optData.label, body = optData.help}
-                            option.valueTooltip = {text = optData.label, body = val.help}
-                            break
-                        end
-                    end
-                    break
-                end
-            end
-        end
-        if not option and scenarioInfo.options then
-            for index, optData in scenarioInfo.options do
-                if i == optData.key then
-                    option = {text = optData.label, tooltip = optData.pref}
-                    for _, val in optData.values do
-						if tostring(val.key) == tostring(v) then
-							if optData.default and _ != optData.default then -- If the option is not default value, insert. - Xinnony
-								table.insert(FormOpt2, {
-									text = optData.label,
-									value = val.text,
-									tooltip = {text = optData.label, body = optData.help},
-									valueTooltip = {text = optData.label, body = val.help}})
-							end
-							option.value = val.text
-							option.tooltip = {text = optData.label, body = optData.help}
-                            option.valueTooltip = {text = optData.label, body = val.help}
-                            break
-                        end
-                    end
-                    break
-                end
-            end
-        end
-        if option then
-            if not mpOnly or not singlePlayer then
-				table.insert(formattedOptions, option)
-            end
-        end
-    end
+	for index, optData in globalOpts do -- Force add Option, if exist in gameInfo.GameOptions, else if a default
+		--LOG('>> '..index..' > '..tostring(optData.label))
+		--LOG('>> gameInfo.GameOptions = '..tostring(gameInfo.GameOptions[optData.key]))
+		local FIND = false
+		if gameInfo.GameOptions[optData.key] then
+			FIND = true
+		end
+		option = {}
+		mpOnly = optData.mponly or false
+		option.text = optData.label
+		option.tooltip = {text = optData.label, body = optData.help}
+		for _, val in optData.values do
+			--LOG('>> SubOption "'..tostring(val.text)..'",   val.key='..tostring(val.key)..',   default='..tostring(optData.default)..',   _='..tostring(_))
+			if FIND and tostring(val.key) == tostring(gameInfo.GameOptions[optData.key]) then
+				--LOG('<< FINDED in gameInfo.GameOptions = '..tostring(val.text))
+				option.value = val.text
+				option.valueTooltip = {text = optData.label, body = val.help}
+				if optData.default and tostring(_) != tostring(optData.default) then
+					table.insert(FormOpt2, option)
+				end
+				if not mpOnly then--or not singlePlayer then
+					table.insert(formattedOptions, option)
+				end
+				break -- Need exit loop for prevent duplicate table.insert if scenario.option have two subOption with equal Key
+			elseif not FIND and tostring(_) == tostring(optData.default) then
+				--LOG('<< FINDED in optData.default = '..tostring(val.text))
+				option.value = val.text
+				option.valueTooltip = {text = optData.label, body = val.help}
+				if optData.default and tostring(_) != tostring(optData.default) then
+					table.insert(FormOpt2, option)
+				end
+				if not mpOnly or not singlePlayer then
+					table.insert(formattedOptions, option)
+				end
+				break -- Need exit loop for prevent duplicate table.insert if scenario.option have two subOption with equal Key
+			end
+		end
+	end
+-----------------------------------------------------------------
+	if scenarioInfo.options then -- Force add Option
+	for index, optData in scenarioInfo.options do -- Force add Option, if exist in gameInfo.GameOptions, else if a default
+		--LOG('>> '..index..' > '..tostring(optData.label))
+		--LOG('>> gameInfo.GameOptions = '..tostring(gameInfo.GameOptions[optData.key]))
+		local FIND = false
+		if gameInfo.GameOptions[optData.key] then
+			FIND = true
+		end
+		option = {}
+		mpOnly = optData.mponly or false
+		option.text = optData.label
+		option.tooltip = {text = optData.label, body = optData.help}
+		if not Warning_MAP and (optData.default == 0 or optData.default > table.getsize(optData.values)) then -- THE MAP OPTIONS IS NOT RESPECTED
+			Warning_MAP = true
+			AddChatText('The options included in this map are not compliant.')
+			AddChatText('Please contact the author of the map or Xinnony.')
+		end
+		for _, val in optData.values do
+			--LOG('>> SubOption "'..tostring(val.text)..'",   val.key='..tostring(val.key)..',   default='..tostring(optData.default)..',   _='..tostring(_))
+			if FIND and tostring(val.key) == tostring(gameInfo.GameOptions[optData.key]) then
+				--LOG('<< FINDED in gameInfo.GameOptions = '..tostring(val.text))
+				option.value = val.text
+				option.valueTooltip = {text = optData.label, body = val.help}
+				if optData.default and tostring(_) != tostring(optData.default) then
+					table.insert(FormOpt2, option)
+				end
+				if not mpOnly then--or not singlePlayer then
+					table.insert(formattedOptions, option)
+				end
+				break -- Need exit loop for prevent duplicate table.insert if scenario.option have two subOption with equal Key
+			elseif not FIND and tostring(_) == tostring(optData.default) then
+				--LOG('<< FINDED in optData.default = '..tostring(val.text))
+				option.value = val.text
+				option.valueTooltip = {text = optData.label, body = val.help}
+				if optData.default and tostring(_) != tostring(optData.default) then
+					table.insert(FormOpt2, option)
+				end
+				if not mpOnly or not singlePlayer then
+					table.insert(formattedOptions, option)
+				end
+				break -- Need exit loop for prevent duplicate table.insert if scenario.option have two subOption with equal Key
+			end
+		end
+	end
+	end
+-----------------------------------------------------------------
 
 -- Disable before separate AI option on GlobalOption, but the order can set on lobbyOptions.lua - Xinnony
 --    table.sort(formattedOptions,
@@ -4680,7 +4666,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             elseif data.Type == 'ModsChanged' then
                 gameInfo.GameMods = data.GameMods
                 UpdateGame()
-                ModManager.UpdateClientModStatus(gameInfo.GameMods)
+                import('/lua/ui/lobby/ModsManager.lua').UpdateClientModStatus(gameInfo.GameMods)
 
             elseif data.Type == 'SlotClose' then
                 gameInfo.ClosedSlots[data.Slot] = true
@@ -4774,6 +4760,9 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 		if self.desiredScenario and self.desiredScenario != "" then
             Prefs.SetToCurrentProfile('LastScenario', self.desiredScenario)
 			SetGameOption('ScenarioFile',self.desiredScenario, false, true)
+			--for index, option in scenarioInfo.options do
+				--SetGameOption(option.key,option.values[defValue].key, false, true)
+			--end
         else
             local scen = Prefs.GetFromCurrentProfile('LastScenario')
             if scen and scen != "" then
@@ -5505,9 +5494,15 @@ end--]]
 --------------------------------------------------
 function RuleTitle_SendMSG()
     if RuleLabel and lobbyComm:IsHost() then
-        if XinnonyDebug == 2 then AddChatText(">> SENDING MSG Rule_Title_MSG : "..RuleLabel:GetItem(0)) end
-		if XinnonyDebug == 2 then AddChatText(">> SENDING MSG Rule_Title_MSG : "..RuleLabel:GetItem(1)) end
-		lobbyComm:BroadcastData( { Type = 'Rule_Title_MSG', Result1 = RuleLabel:GetItem(0), Result2 = RuleLabel:GetItem(1) } )
+		local getRule = {RuleLabel:GetItem(0), RuleLabel:GetItem(1)}
+		if getRule[1]..getRule[2] == 'Rule : no rule (click for edit)' or getRule[1]..getRule[2] == 'Rule : no rule (click for edit) ' then
+			getRule[1] = 'Rule : no rule.'
+			getRule[2] = ''
+		else
+			getRule[1] = RuleLabel:GetItem(0)
+			getRule[2] = RuleLabel:GetItem(1)
+		end
+		lobbyComm:BroadcastData( { Type = 'Rule_Title_MSG', Result1 = getRule[1], Result2 = getRule[2] } )
     end
 end
 
@@ -5550,7 +5545,8 @@ function RuleTitle_INPUT()
 				if text == '' then
 					GUI_Preset_InputBox:Destroy()
 					RuleLabel:DeleteAllItems()
-					RuleLabel:AddItem('Rule : no rule.')
+					RuleLabel:AddItem('Rule : no rule (click for edit)')
+					RuleLabel:SetColors("FFCC00")
 					RuleLabel:AddItem('')
 					RuleTitle_SendMSG()
 				else
@@ -5558,6 +5554,7 @@ function RuleTitle_INPUT()
 					wrapped = import('/lua/maui/text.lua').WrapText('Rule : '..text, 350, function(curText) return RuleLabel:GetStringAdvance(curText) end)
 					RuleLabel:DeleteAllItems()
 					RuleLabel:AddItem(wrapped[1] or '')
+					RuleLabel:SetColors("B9BFB9")
 					RuleLabel:AddItem(wrapped[2] or '')
 					RuleTitle_SendMSG()
 				end
@@ -5581,7 +5578,8 @@ function RuleTitle_INPUT()
 				if result == '' then
 					GUI_Preset_InputBox:Destroy()
 					RuleLabel:DeleteAllItems()
-					RuleLabel:AddItem('Rule : no rule.')
+					RuleLabel:AddItem('Rule : no rule (click for edit)')
+					RuleLabel:SetColors("FFCC00")
 					RuleLabel:AddItem('')
 					RuleTitle_SendMSG()
 					--return 'Rule : no rule.'
@@ -5591,6 +5589,7 @@ function RuleTitle_INPUT()
 					wrapped = import('/lua/maui/text.lua').WrapText('Rule : '..result, 350, function(curText) return RuleLabel:GetStringAdvance(curText) end)
 					RuleLabel:DeleteAllItems()
 					RuleLabel:AddItem(wrapped[1] or '')
+					RuleLabel:SetColors("B9BFB9")
 					RuleLabel:AddItem(wrapped[2] or '')
 					RuleTitle_SendMSG()
 					--return 'Rule : '..result
@@ -5633,15 +5632,15 @@ function Disable_Faction_Selector(disable, faction)
         TEST4factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/seraphim_ico-dis.png")
         TEST5factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/random_ico-dis.png")
 		if faction == 1 then
-			TEST3factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/uef_ico-large-dis.png")
+			TEST3factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/uef_ico-large.png")
 		elseif faction == 2 then
-			TEST1factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/aeon_ico-large-dis.png")
+			TEST1factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/aeon_ico-large.png")
 		elseif faction == 3 then
-			TEST2factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/cybran_ico-large-dis.png")
+			TEST2factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/cybran_ico-large.png")
 		elseif faction == 4 then
-			TEST4factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/seraphim_ico-large-dis.png")
+			TEST4factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/seraphim_ico-large.png")
 		elseif faction == 5 then
-			TEST5factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/random_ico-large-dis.png")
+			TEST5factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/random_ico-large.png")
 		end
 	else
 		TEST1factionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/aeon_ico.png")
@@ -6105,6 +6104,34 @@ function ChangeBackgroundLobby(slot, faction)
             GUI.background2:Hide()
             GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/background-paint_black_bmp.png"))
             LASTXinnoBackground = 'No'
+			
+		elseif XinnoBackground == 'Extra' then
+            GUI.background:Show()
+            GUI.background2:Hide()
+            faction = faction or Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
+			if DiskGetFileInfo("/Mods/Lobby Background/mod_info.lua") then
+				settings = import("/Mods/Lobby Background/mod_info.lua")
+				if settings.BackgroundType == 1 then
+					if faction == 1 and settings.uef > 0 then
+						GUI.background:SetTexture("/Mods/Lobby Background/BACKGROUND/uef"..math.random(1, settings.uef)..".png")
+					elseif faction == 2 and settings.aeon > 0 then
+						GUI.background:SetTexture("/Mods/Lobby Background/BACKGROUND/aeo"..math.random(1, settings.aeon)..".png")
+					elseif faction == 3 and settings.cybran > 0 then
+						GUI.background:SetTexture("/Mods/Lobby Background/BACKGROUND/cyb"..math.random(1, settings.cybran)..".png")
+					elseif faction == 4 and settings.seraphim > 0 then
+						GUI.background:SetTexture("/Mods/Lobby Background/BACKGROUND/ser"..math.random(1, settings.seraphim)..".png")
+					elseif faction == 5 and settings.random > 0 then
+						GUI.background:SetTexture("/Mods/Lobby Background/BACKGROUND/ran"..math.random(1, settings.random)..".png")
+					else
+						GUI.background:SetTexture("/textures/ui/common/BACKGROUND/background-paint_black_bmp.png")
+					end
+				elseif settings.BackgroundType == 2 then
+					GUI.background:SetTexture("/Mods/Lobby Background/BACKGROUND/"..math.random(1, settings.random)..".png")
+				end
+			else
+				GUI.background:SetTexture("/textures/ui/common/BACKGROUND/background-paint_black_bmp.png")
+			end
+            LASTXinnoBackground = 'Extra'
         end
     end
 end
@@ -6121,7 +6148,6 @@ function CreateOptionLobbyDialog()
         dialog2.Width:Set(536)
         dialog2.Height:Set(400)
         LayoutHelpers.AtCenterIn(dialog2, dialog)
-        
         
     ---------------------------
     -- CheckBox Options --
@@ -6141,6 +6167,7 @@ function CreateOptionLobbyDialog()
                     cbox_BG_Screenshoot:SetCheck(false, true)
                     cbox_BG_Map:SetCheck(false, true)
                     cbox_BG_No:SetCheck(false, true)
+					cbox_BG_Extra:SetCheck(false, true)
                     ChangeBackgroundLobby(nil, nil)
                 else
                     cbox_BG_Factions:SetCheck(true, true)
@@ -6162,6 +6189,7 @@ function CreateOptionLobbyDialog()
                     cbox_BG_Screenshoot:SetCheck(false, true)
                     cbox_BG_Map:SetCheck(false, true)
                     cbox_BG_No:SetCheck(false, true)
+					cbox_BG_Extra:SetCheck(false, true)
                     ChangeBackgroundLobby(nil, nil)
                 else
                     cbox_BG_ConceptArt:SetCheck(true, true)
@@ -6183,6 +6211,7 @@ function CreateOptionLobbyDialog()
                     cbox_BG_ConceptArt:SetCheck(false, true)
                     cbox_BG_Map:SetCheck(false, true)
                     cbox_BG_No:SetCheck(false, true)
+					cbox_BG_Extra:SetCheck(false, true)
                     ChangeBackgroundLobby(nil, nil)
                 else
                     cbox_BG_Screenshoot:SetCheck(true, true)
@@ -6204,6 +6233,7 @@ function CreateOptionLobbyDialog()
                     cbox_BG_ConceptArt:SetCheck(false, true)
                     cbox_BG_Screenshoot:SetCheck(false, true)
                     cbox_BG_No:SetCheck(false, true)
+					cbox_BG_Extra:SetCheck(false, true)
                     ChangeBackgroundLobby(nil, nil)
                 else
                     cbox_BG_Map:SetCheck(true, true)
@@ -6225,9 +6255,33 @@ function CreateOptionLobbyDialog()
                     cbox_BG_ConceptArt:SetCheck(false, true)
                     cbox_BG_Screenshoot:SetCheck(false, true)
                     cbox_BG_Map:SetCheck(false, true)
+					cbox_BG_Extra:SetCheck(false, true)
                     ChangeBackgroundLobby(nil, nil)
                 else
                     cbox_BG_No:SetCheck(true, true)
+                end
+            end
+    --
+	cbox_BG_Extra = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
+        LayoutHelpers.AtLeftIn(cbox_BG_Extra, dialog2, 20)
+        LayoutHelpers.AtTopIn(cbox_BG_Extra, dialog2, 120)
+        Tooltip.AddCheckboxTooltip(cbox_BG_Extra, {text='Extra Background', body='Extra background (stored in a "Lobby Background" mod) in the Lobby'})
+		cbox_BG_Extra_TEXT = UIUtil.CreateText(cbox_BG_Extra, 'Extra Background', 14, 'Arial')
+            cbox_BG_Extra_TEXT:SetColor('B9BFB9')
+            cbox_BG_Extra_TEXT:SetDropShadow(true)
+            LayoutHelpers.AtLeftIn(cbox_BG_Extra_TEXT, cbox_BG_Extra, 25)
+            LayoutHelpers.AtVerticalCenterIn(cbox_BG_Extra_TEXT, cbox_BG_Extra)
+            cbox_BG_Extra.OnCheck = function(self, checked)
+                if checked then
+                    Prefs.SetToCurrentProfile('XinnoBackground', 'Extra')
+                    cbox_BG_Factions:SetCheck(false, true)
+                    cbox_BG_ConceptArt:SetCheck(false, true)
+                    cbox_BG_Screenshoot:SetCheck(false, true)
+                    cbox_BG_Map:SetCheck(false, true)
+					cbox_BG_No:SetCheck(false, true)
+                    ChangeBackgroundLobby(nil, nil)
+                else
+                    cbox_BG_Extra:SetCheck(true, true)
                 end
             end
     --
@@ -6328,7 +6382,7 @@ function CreateOptionLobbyDialog()
         LayoutHelpers.AtHorizontalCenterIn(QuitButton, dialog2, 0)
         LayoutHelpers.AtBottomIn(QuitButton, dialog2, 10)
         QuitButton.OnClick = function(self)
-            dialog:Destroy()
+			dialog:Destroy()
             dialog2:Destroy()
         end
     --------------------------------------
@@ -6340,30 +6394,42 @@ function CreateOptionLobbyDialog()
         cbox_BG_Screenshoot:SetCheck(false, true)
         cbox_BG_Map:SetCheck(false, true)
         cbox_BG_No:SetCheck(false, true)
+		cbox_BG_Extra:SetCheck(false, true)
     elseif XinnoBackground == 'ConceptArt' then
         cbox_BG_Factions:SetCheck(false, true)
         cbox_BG_ConceptArt:SetCheck(true, true)
         cbox_BG_Screenshoot:SetCheck(false, true)
         cbox_BG_Map:SetCheck(false, true)
         cbox_BG_No:SetCheck(false, true)
+		cbox_BG_Extra:SetCheck(false, true)
     elseif XinnoBackground == 'Screenshoot' then
         cbox_BG_Factions:SetCheck(false, true)
         cbox_BG_ConceptArt:SetCheck(false, true)
         cbox_BG_Screenshoot:SetCheck(true, true)
         cbox_BG_Map:SetCheck(false, true)
         cbox_BG_No:SetCheck(false, true)
+		cbox_BG_Extra:SetCheck(false, true)
     elseif XinnoBackground == 'Map' then
         cbox_BG_Factions:SetCheck(false, true)
         cbox_BG_ConceptArt:SetCheck(false, true)
         cbox_BG_Screenshoot:SetCheck(false, true)
         cbox_BG_Map:SetCheck(true, true)
         cbox_BG_No:SetCheck(false, true)
+		cbox_BG_Extra:SetCheck(false, true)
     elseif XinnoBackground == 'No' then
         cbox_BG_Factions:SetCheck(false, true)
         cbox_BG_ConceptArt:SetCheck(false, true)
         cbox_BG_Screenshoot:SetCheck(false, true)
         cbox_BG_Map:SetCheck(false, true)
         cbox_BG_No:SetCheck(true, true)
+		cbox_BG_Extra:SetCheck(false, true)
+	elseif XinnoBackground == 'Extra' then
+		cbox_BG_Factions:SetCheck(false, true)
+        cbox_BG_ConceptArt:SetCheck(false, true)
+        cbox_BG_Screenshoot:SetCheck(false, true)
+        cbox_BG_Map:SetCheck(false, true)
+        cbox_BG_No:SetCheck(false, true)
+        cbox_BG_Extra:SetCheck(true, true)
     end
     --
     local XinnoSkin = Prefs.GetFromCurrentProfile('XinnoSkin') or 'Dark'
@@ -6879,14 +6945,16 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
 			-- Set Title on FAF Client
 		--AddChatText('> PRESET > Rule : '..profiles[Selected_Preset].Rule)
 			-- Set Rule Title in TextBox
-			if profiles[Selected_Preset].Rule == '' then
+			if profiles[Selected_Preset].Rule == '' or profiles[Selected_Preset].Rule == 'no rule.' then
 				RuleLabel:DeleteAllItems()
-				RuleLabel:AddItem('Rule : no rule.')
+				RuleLabel:AddItem('Rule : no rule (click for edit)')
+				RuleLabel:SetColors("FFCC00")
 				RuleLabel:AddItem('')
 			else
 				wrapped = import('/lua/maui/text.lua').WrapText('Rule : '..profiles[Selected_Preset].Rule, RuleLabel.Width(), function(curText) return RuleLabel:GetStringAdvance(curText) end)
 				RuleLabel:DeleteAllItems()
 				RuleLabel:AddItem(wrapped[1] or '')
+				RuleLabel:SetColors("B9BFB9")
 				RuleLabel:AddItem(wrapped[2] or '')
 			end
 			RuleTitle_SendMSG()
@@ -6959,7 +7027,11 @@ function SAVE_PRESET_IN_PREF() -- GET OPTIONS ON LOBBY AND SAVE TO PRESET
 	
 	local Preset_Name = profiles[Selected_Preset].PresetName or 'ERROR, Set preset name here' -- Nom du PresetLobby
 	local Title_FAF = profiles[Selected_Preset].Title_FAF or '' -- Title is for FAF Client title in "Find Games" tabs
-	local Rule_Text = string.gsub(RuleLabel:GetItem(0)..RuleLabel:GetItem(1), 'Rule : ', '') or profiles[Selected_Preset].Rule_Text or '' -- Rule text showing in top of Lobby
+	local Rule_Text = RuleLabel:GetItem(0)..RuleLabel:GetItem(1)
+	if Rule_Text == 'Rule : no rule (click for edit)' then
+		Rule_Text = 'no rule.'
+	end
+	Rule_Text = string.gsub(Rule_Text, 'Rule : ', '') or profiles[Selected_Preset].Rule_Text or '' -- Rule text showing in top of Lobby
 	
 	SetPreference('UserPresetLobby.'..Selected_Preset, {}) -- Delete all value
 	
@@ -7069,3 +7141,8 @@ function to_string( tbl )
         return tostring(tbl)
     end
 end
+
+
+
+#############################################################
+######################### DEV TEST AREA ######################### -- Xinnony
