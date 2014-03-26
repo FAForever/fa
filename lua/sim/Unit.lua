@@ -1283,7 +1283,7 @@ Unit = Class(moho.unit_methods) {
         if self.CanTakeDamage then
             self:DoOnDamagedCallbacks(instigator)
 
-            if self:GetShieldType() != 'Personal' or not self:ShieldIsOn() then    -- let personal shields handle the damage
+            if self:GetShieldType() != 'Personal' or not self:ShieldIsUp() then    -- let personal shields handle the damage
                 self:DoTakeDamage(instigator, amount, vector, damageType)
             end
         end
@@ -4243,6 +4243,14 @@ Unit = Class(moho.unit_methods) {
     ShieldIsOn = function(self)
         if self.MyShield then
             return self.MyShield:IsOn()
+        else
+            return false
+        end
+    end,
+
+    ShieldIsUp = function(self)
+        if self.MyShield then
+            return (self.MyShield:IsOn() and self.MyShield:IsUp())
         else
             return false
         end
