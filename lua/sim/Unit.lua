@@ -1146,68 +1146,57 @@ Unit = Class(moho.unit_methods) {
             local time = 1
             local mass = 0
             local energy = 0
-            
-	    if self.WorkItem then
-	       time, energy, mass = Game.GetConstructEconomyModel(self, self.WorkItem)
-	       
-	       if self:IsUnitState('Enhancing') or self:IsUnitState('Upgrading') then
-		  local guards = self:GetGuards()
-		  #-- We need to check all the unit assisting.
-		  for k,v in guards do
-		     if not v:IsDead() then
-			v:UpdateConsumptionValues()
-		     end
-		  end
-		  
-		  #-- and if there is any unit repairing ...
-		  local workers = self:GetAIBrain():GetUnitsAroundPoint(( categories.REPAIR), self:GetPosition(), 50, 'Ally' )
-		  for k,v in workers do
-		     if not v:IsDead() and v:IsUnitState('Repairing')  then
-			v:UpdateConsumptionValues()
-		     end
-		  end				
-	       end
-	       
+
+            if self.WorkItem then
+                time, energy, mass = Game.GetConstructEconomyModel(self, self.WorkItem)
+
+                if self:IsUnitState('Enhancing') or self:IsUnitState('Upgrading') then
+                    local guards = self:GetGuards()
+                    #-- We need to check all the unit assisting.
+                    for k,v in guards do
+                        if not v:IsDead() then
+                            v:UpdateConsumptionValues()
+                        end
+                    end
+
+                    #-- and if there is any unit repairing ...
+                    local workers = self:GetAIBrain():GetUnitsAroundPoint(( categories.REPAIR), self:GetPosition(), 50, 'Ally' )
+                    for k,v in workers do
+                        if not v:IsDead() and v:IsUnitState('Repairing')  then
+                            v:UpdateConsumptionValues()
+                        end
+                    end				
+                end
             elseif focus and focus:IsUnitState('SiloBuildingAmmo') then
-	       -- If building silo ammo; create the energy and mass costs based on build rate of the silo
-	       --     against the build rate of the assisting unit
-	       time, energy, mass = focus:GetBuildCosts(focus.SiloProjectile)
-	       
-	       local siloBuildRate = focus:GetBuildRate() or 1
-	       energy = (energy / siloBuildRate) * (self:GetBuildRate() or 1)
-	       mass = (mass / siloBuildRate) * (self:GetBuildRate() or 1)
-	       
+                -- If building silo ammo; create the energy and mass costs based on build rate of the silo
+                --     against the build rate of the assisting unit
+                time, energy, mass = focus:GetBuildCosts(focus.SiloProjectile)
+
+                local siloBuildRate = focus:GetBuildRate() or 1
+                energy = (energy / siloBuildRate) * (self:GetBuildRate() or 1)
+                mass = (mass / siloBuildRate) * (self:GetBuildRate() or 1)
+
             elseif focus then
-
-	       #
-	       -- Modified to allow for differential upgrade cost calculation (Added by Rienzilla)
-	       #
-	       if focus:IsUnitState('Enhancing') or focus:IsUnitState('Upgrading') then
-		  -- If the unit is assisting an enhancement, we must know how much it costs.
-		  --LOG("Focusunit is upgrading")
-		  time, energy, mass = Game.GetConstructEconomyModel(self, focus.WorkItem)
-
-	       else
-		  --LOG("Focus Unit is not upgrading")
-		  
-		  if self:IsUnitState('Upgrading') then
-		     --LOG("Self is upgrading")
-		     -- If we are upgrading ourselves, add our own economy blueprint to the upgrade cost calculation 
-		     -- GetConstructEconomyModel can use this to substract the cost of the unit that is upgrading from the cost of the unit that it is upgrading to
-		     time, energy, mass = Game.GetConstructEconomyModel(self, focus:GetBlueprint().Economy, self:GetBlueprint().Economy)
-
-		  else
-		     -- Check if the builder of our focusUnit is upgrading. If it is, we are assisting an upgrade.
-		     if focus.originalBuilder and not focus.originalBuilder:IsDead() and focus.originalBuilder:IsUnitState('Upgrading') then
-			--LOG("Focusunit is an upgrade")
-			time, energy, mass = Game.GetConstructEconomyModel(self, focus:GetBlueprint().Economy, focus.originalBuilder:GetBlueprint().Economy)
-		     else
-			--LOG("Focusunit is not an upgrade")
-			time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
-		     end
-		  end
-	       end
+                #
+                # Modified to allow for differential upgrade cost calculation (Added by Rienzilla)
+                #
+                if(self:IsUnitState('Repairing')) then --
+                    time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
+                elseif self:IsUnitState('Upgrading') then
+                    # If we are upgrading ourselves, add our own economy blueprint to the upgrade cost calculation 
+                    # GetConstructEconomyModel can use this to substract the cost of the unit that is upgrading from the cost of the unit that it is upgrading to
+                    time, energy, mass = Game.GetConstructEconomyModel(self, focus:GetBlueprint().Economy, self:GetBlueprint().Economy)
+                elseif focus:IsUnitState('Enhancing') or focus:IsUnitState('Upgrading') then
+                    # If the unit is assisting an enhancement, we must know how much it costs.
+                    time, energy, mass = Game.GetConstructEconomyModel(self, focus.WorkItem)
+                elseif focus.originalBuilder and not focus.originalBuilder:IsDead() and focus.originalBuilder:IsUnitState('Upgrading') then
+                    # Check if the builder of our focusUnit is upgrading. If it is, we are assisting an upgrade.
+                    time, energy, mass = Game.GetConstructEconomyModel(self, focus:GetBlueprint().Economy, focus.originalBuilder:GetBlueprint().Economy)
+                else
+                    time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
+                end
             end
+
             energy = energy * (self.EnergyBuildAdjMod or 1)
             if energy < 1 then
                 energy = 1
@@ -2220,10 +2209,12 @@ Unit = Class(moho.unit_methods) {
         self:PlayUnitAmbientSound( 'ActiveLoop' )
 
         if self.DisallowCollisions and builder then
+            -- set correct hitpoints after upgrade
+            local hpDamage = builder:GetMaxHealth() - builder:GetHealth() -- current damage
+            local damagePercent = hpDamage / self:GetMaxHealth() -- resulting % with upgraded building
+            local newHealthAmount = builder:GetMaxHealth() * (1-damagePercent) -- HP for upgraded building
+            builder:SetHealth(builder, newHealthAmount) -- seems like the engine uses builder to determine new HP
             self.DisallowCollisions = false
-            local healthPercentage = builder:GetHealthPercent()
-            local newHealthAmount = healthPercentage * self:GetBlueprint().Defense.MaxHealth
-            self:SetHealth(self, newHealthAmount)
         end
 
         -- Turn off land bones if this unit has them.
@@ -2433,9 +2424,12 @@ Unit = Class(moho.unit_methods) {
 
     OnStartBuild = function(self, unitBeingBuilt, order)
 	#LOG('onstartbuild and order is ' .. repr(order))
-		if order == 'Repair' and unitBeingBuilt.WorkItem != self.WorkItem then
-			self:InheritWork(unitBeingBuilt)
-		end	
+        if order == 'Repair' then
+            if unitBeingBuilt.WorkItem != self.WorkItem then
+                self:InheritWork(unitBeingBuilt)
+            end
+            self:SetUnitState('Repairing', true)
+        end	
 	        
         local bp = self:GetBlueprint()
         if order != 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
