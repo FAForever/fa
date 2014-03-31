@@ -871,9 +871,7 @@ MassCollectionUnit = Class(StructureUnit) {
     OnStartBuild = function(self, unitbuilding, order)
         StructureUnit.OnStartBuild(self, unitbuilding, order)
         self:AddCommandCap('RULEUCC_Stop')
-        local massConsumption = self:GetConsumptionPerSecondMass()
-        local massProduction = self:GetProductionPerSecondMass()
-        self.UpgradeWatcher = self:ForkThread(self.WatchUpgradeConsumption, massConsumption, massProduction)
+        self.UpgradeWatcher = self:ForkThread(self.WatchUpgradeConsumption)
     end,
 
     OnStopBuild = function(self, unitbuilding, order)
@@ -882,14 +880,16 @@ MassCollectionUnit = Class(StructureUnit) {
         if self.UpgradeWatcher then
             KillThread(self.UpgradeWatcher)
             self:SetConsumptionPerSecondMass(0)
-            self:SetProductionPerSecondMass(self:GetBlueprint().Economy.ProductionPerSecondMass or 0)                  
+	    self:SetProductionPerSecondMass((self:GetBlueprint().Economy.ProductionPerSecondMass or 0) * (self.MassProdAdjMod or 1))  
         end  
     end,
     # band-aid on lack of multiple separate resource requests per unit...  
     # if mass econ is depleted, take all the mass generated and use it for the upgrade
 
 	###Old WatchUpgradeConsumption replaced with this on, enabling mex to not use resources when paused
-    WatchUpgradeConsumption = function(self, massConsumption, massProduction)
+    WatchUpgradeConsumption = function(self)
+        local bp = self:GetBlueprint()
+        local massConsumption = self:GetConsumptionPerSecondMass()
 
         # Fix for weird mex behaviour when upgrading with depleted resource stock or while paused [100]
         # Replaced Gowerly's fix with this which is very much inspired by his code. My code looks much better and 
@@ -914,7 +914,7 @@ MassCollectionUnit = Class(StructureUnit) {
         end
 
         while not self:IsDead() do
-
+            local massProduction = bp.Economy.ProductionPerSecondMass * (self.MassProdAdjMod or 1)
             if self:IsPaused() then
                 # paused mex upgrade (another bug here that caused paused upgrades to continue use resources)
                 self:SetConsumptionPerSecondMass( 0 )
