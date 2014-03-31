@@ -402,7 +402,7 @@ function UpdateWindow(info)
             end
         end
     end
-    if options.gui_detailed_unitview != 0 and controls.Buildrate and controls.shieldText then
+    if options.gui_detailed_unitview != 0 then
         local TV = import('/modules/tvcheck.lua').Init()
         if TV == false then
             if info.blueprintId != 'unknown' then
@@ -539,6 +539,15 @@ function CreateUI()
     controls.bg:DisableHitTest(true)
     
     controls.bg:SetNeedsFrameUpdate(true)
+
+    if options.gui_detailed_unitview != 0 then
+        local TV = import('/modules/tvcheck.lua').Init()
+        if TV == false then    
+            controls.shieldText = UIUtil.CreateText(controls.bg, '', 13, UIUtil.bodyFont)
+            controls.Buildrate = UIUtil.CreateText(controls.bg, '', 12, UIUtil.bodyFont)
+        end
+    end
+
     controls.bg.OnFrame = function(self, delta)
     local info = GetRolloverInfo()
         if options.gui_enhanced_unitview != 0 then
@@ -569,11 +578,5 @@ function CreateUI()
         LayoutHelpers.AtRightIn(controls.SCUType, controls.icon)
         LayoutHelpers.AtBottomIn(controls.SCUType, controls.icon)
     end
-    if options.gui_detailed_unitview != 0 then
-        local TV = import('/modules/tvcheck.lua').Init()
-        if TV == false then    
-            controls.shieldText = UIUtil.CreateText(controls.bg, '', 13, UIUtil.bodyFont)
-            controls.Buildrate = UIUtil.CreateText(controls.bg, '', 12, UIUtil.bodyFont)
-        end
-    end
+
 end
