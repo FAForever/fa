@@ -33,7 +33,7 @@ UnitBlueprint {
         },
         Destroyed = Sound {
             Bank = 'URADestroy',
-            Cue = 'URA_Destroy_Med',
+            Cue = 'URA_Destroy_Air',
             LodCutoff = 'UnitMove_LodCutoff',
         },
         Killed = Sound {

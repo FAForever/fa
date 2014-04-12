@@ -74,7 +74,7 @@ function CDRRunAway( aiBrain, cdr )
                     nmeLand = aiBrain:GetUnitsAroundPoint( categories.LAND, cdrPos, 25, 'Enemy' )
                     nmeHardcore = aiBrain:GetUnitsAroundPoint( categories.EXPERIMENTAL, cdrPos, 25, 'Enemy' )
                 end
-            until cdr:IsDead() or ( nmeAir < 2 and nmeLand < 2 and nmeHardcore == 0 ) or cdr:GetHealthPercent() > .4
+            until cdr:IsDead() or ( nmeAir < 2 and nmeLand < 2 and nmeHardcore == 0 ) or cdr:GetHealthPercent() > .7
             IssueClearCommands( {cdr} )
         end
     end 
@@ -91,21 +91,52 @@ function CDROverCharge( aiBrain, cdr )
             break
         end
     end
-    local distressRange = 30
+
     local beingBuilt = false
     cdr.UnitBeingBuiltBehavior = false
     local cdrPos = cdr.CDRHome
-    local numUnits = aiBrain:GetNumUnitsAroundPoint( categories.LAND - categories.SCOUT, cdrPos, ( weapon.MaxRadius ), 'Enemy' )
-    local distressLoc = aiBrain:BaseMonitorDistressLocation(cdrPos)
+	
+	local distressRange = 60 #DUNCAN - Was 30
+	local maxRadius = weapon.MaxRadius + 10 
+    local mapSizeX, mapSizeZ = GetMapSize()
+	
+	#DUNCAN - added for ACUs starting near each other.
+	if GetGameTimeSeconds() < 60 then 
+		return
+	end
+	
+	#DUNCAN - increase distress on non-water maps
+	if (cdr:GetHealthPercent() > .80) and aiBrain:GetMapWaterRatio() < .4 then
+		distressRange = 100
+	end
+	
+	#DUNCAN - increase attack range for a few mins on small maps
+	if (cdr:GetHealthPercent() > .80) and GetGameTimeSeconds() < 660 and GetGameTimeSeconds() > 243 
+		and mapSizeX <= 512 and mapSizeZ <= 512 #and aiBrain:GetMapWaterRatio() < .4
+		and ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality != 'turtle' 
+		and ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality != 'defense'
+	    and ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality != 'rushnaval' 
+		then
+		maxRadius = 256
+		
+	end
+
+	#DUNCAN - took away engineers too
+	local numUnits = aiBrain:GetNumUnitsAroundPoint( categories.LAND - categories.SCOUT, cdrPos, ( maxRadius ), 'Enemy' ) 
+	local distressLoc = aiBrain:BaseMonitorDistressLocation(cdrPos)
     local overCharging = false
-    local maxRadius = weapon.MaxRadius + 10
+	
+	#DUNCAN - dont move if upgrading
+	if cdr:IsUnitState("Upgrading") or cdr:IsUnitState("Enhancing") then
+		return
+	end
     
     if Utilities.XZDistanceTwoVectors(cdrPos, cdr:GetPosition()) > maxRadius then
         return
     end
     
     if numUnits > 0 or ( not cdr.DistressCall and distressLoc and Utilities.XZDistanceTwoVectors( distressLoc, cdrPos ) < distressRange ) then
-        CDRRevertPriorityChange( aiBrain, cdr )
+        #CDRRevertPriorityChange( aiBrain, cdr )
         if cdr:GetUnitBeingBuilt() then
             #LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': CDR was building something')
             cdr.UnitBeingBuiltBehavior = cdr:GetUnitBeingBuilt()
@@ -128,34 +159,56 @@ function CDROverCharge( aiBrain, cdr )
             overCharging = false
             if counter >= 5 or not target or target:IsDead() or Utilities.XZDistanceTwoVectors(cdrPos, target:GetPosition()) > maxRadius then
                 counter = 0
-                for k,v in priList do
-                    target = plat:FindClosestUnit( 'Support', 'Enemy', true, v )
-                    if target and Utilities.XZDistanceTwoVectors(cdrPos, target:GetPosition()) < maxRadius then
-                        local cdrLayer = cdr:GetCurrentLayer()
-                        local targetLayer = target:GetCurrentLayer()
-                        if not (cdrLayer == 'Land' and (targetLayer == 'Air' or targetLayer == 'Sub' or targetLayer == 'Seabed')) and
-                           not (cdrLayer == 'Seabed' and (targetLayer == 'Air' or targetLayer == 'Water')) then
-                            break
-                        end
-                    end
-                    target = false
-                end
+				searchRadius = 30
+                repeat
+					searchRadius = searchRadius + 30
+					for k,v in priList do
+	                    target = plat:FindClosestUnit( 'Support', 'Enemy', true, v )
+	                    if target and Utilities.XZDistanceTwoVectors(cdrPos, target:GetPosition()) <= searchRadius then
+	                        local cdrLayer = cdr:GetCurrentLayer()
+	                        local targetLayer = target:GetCurrentLayer()
+	                        if not (cdrLayer == 'Land' and (targetLayer == 'Air' or targetLayer == 'Sub' or targetLayer == 'Seabed')) and
+	                           not (cdrLayer == 'Seabed' and (targetLayer == 'Air' or targetLayer == 'Water')) then
+	                            break
+	                        end
+	                    end
+	                    target = false
+	                end
+				until target or searchRadius >= maxRadius
                 if target then
                     local targetPos = target:GetPosition()
-                    enemyThreat = aiBrain:GetThreatAtPosition( targetPos, 1, true, 'AntiSurface')
-                    if enemyThreat >= cdrThreat / 2 then
-                        return
-                    end
+					
+					#if inside base dont check threat, just shoot!
+					if Utilities.XZDistanceTwoVectors(cdr.CDRHome, cdr:GetPosition()) > 45 then 
+						enemyThreat = aiBrain:GetThreatAtPosition( targetPos, 1, true, 'AntiSurface')
+						enemyCdrThreat = aiBrain:GetThreatAtPosition( targetPos, 1, true, 'Commander')
+						friendlyThreat = aiBrain:GetThreatAtPosition( targetPos, 1, true, 'AntiSurface', aiBrain:GetArmyIndex() )
+						if enemyThreat - enemyCdrThreat >= friendlyThreat + (cdrThreat / 1.5) then #DUNCAN - was 2
+						    #LOG("AI DEBUG: " .. aiBrain.Nickname .. " target threat too big.")
+							break #DUNCAN - try a break rather than return.
+							#return
+						end
+					end
+
                     if aiBrain:GetEconomyStored('ENERGY') >= weapon.EnergyRequired and target and not target:IsDead() then
                         overCharging = true
                         IssueClearCommands({cdr})
                         IssueOverCharge( {cdr}, target )
+					elseif target and not target:IsDead() then #DUNCAN - added so Commander attacks even if not enough energy for overcharge
+						IssueClearCommands( {cdr} )
+                        IssueMove( {cdr}, targetPos )
+                        IssueMove( {cdr}, cdr.CDRHome )
                     end
                 elseif distressLoc then
+					#LOG("AI DEBUG: " .. aiBrain.Nickname .. " distress location found.")
                     enemyThreat = aiBrain:GetThreatAtPosition( distressLoc, 1, true, 'AntiSurface')
-                    if enemyThreat >= cdrThreat / 2 then
-                        return
-                    end                
+					enemyCdrThreat = aiBrain:GetThreatAtPosition( distressLoc, 1, true, 'Commander')
+					friendlyThreat = aiBrain:GetThreatAtPosition( distressLoc, 1, true, 'AntiSurface', aiBrain:GetArmyIndex() )
+                    if enemyThreat - enemyCdrThreat >= friendlyThreat + (cdrThreat / 3) then  #DUNCAN - was 2
+                        #LOG("AI DEBUG: " .. aiBrain.Nickname .. " distress threat too big.")
+						break #DUNCAN - try a break rather than return.
+						#return
+                    end            
                     if distressLoc and ( Utilities.XZDistanceTwoVectors( distressLoc, cdrPos ) < distressRange ) then
                         IssueClearCommands( {cdr} )
                         IssueMove( {cdr}, distressLoc )
@@ -176,14 +229,22 @@ function CDROverCharge( aiBrain, cdr )
             if cdr:IsDead() then
                 return
             end
-            if ( aiBrain:GetNumUnitsAroundPoint( categories.LAND - categories.SCOUT, cdrPos, maxRadius, 'Enemy' ) <= 3 )
-                and ( not distressLoc or ( Utilities.XZDistanceTwoVectors( distressLoc, cdrPos ) < distressRange )
-                and ( Utilities.XZDistanceTwoVectors(cdrPos, cdr:GetPosition()) < maxRadius ) ) then
+            if (aiBrain:GetNumUnitsAroundPoint( categories.LAND - categories.SCOUT, cdrPos, maxRadius, 'Enemy' ) <= 0 ) #DUNCAN - was 3
+				and (not distressLoc or ( Utilities.XZDistanceTwoVectors( distressLoc, cdrPos ) > distressRange ) )then
                 continueFighting = false
-            end           
+            end   
+			#DUNCAN - if com is down to yellow then dont keep fighting
+			if (cdr:GetHealthPercent() < .75) and Utilities.XZDistanceTwoVectors(cdr.CDRHome, cdr:GetPosition()) > 30 then
+				continueFighting = false
+			end
         until not continueFighting or not aiBrain:PlatoonExists(plat)
         #LOG("AI DEBUG: " .. aiBrain.Nickname .. " done overcharging")
         IssueClearCommands( {cdr} )
+		#DUNCAN - finish the unit
+		if cdr.UnitBeingBuiltBehavior and not cdr.UnitBeingBuiltBehavior:BeenDestroyed() and cdr.UnitBeingBuiltBehavior:GetFractionComplete() < 1 then
+			IssueRepair( {cdr}, cdr.UnitBeingBuiltBehavior )
+		end
+		cdr.UnitBeingBuiltBehavior = false
     end
 end
 
@@ -233,7 +294,7 @@ end
 function CommanderBehavior(platoon)
     for k,v in platoon:GetPlatoonUnits() do
         if not v:IsDead() and not v.CommanderThread then
-            v.CommanderThread = v:ForkThread( CommanderThread, platoon )
+            v.CommanderThread = v:ForkThread( CommanderThreadImproved, platoon )
         end
     end
 end
@@ -260,7 +321,9 @@ function CommanderThread(cdr, platoon)
         WaitTicks(1)
         
         #call platoon resume building deal...
-        if not cdr:IsDead() and cdr:IsIdleState() then
+		#DUNCAN - added some extra checks
+        if not cdr:IsDead() and cdr:IsIdleState() and not cdr.GoingHome and not cdr:IsUnitState("Building")
+		and not cdr:IsUnitState("Attacking") and not cdr:IsUnitState("Repairing") and not cdr:IsUnitState("Upgrading") then
             if not cdr.EngineerBuildQueue or table.getn(cdr.EngineerBuildQueue) == 0 then
                 local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
                 aiBrain:AssignUnitsToPlatoon( pool, {cdr}, 'Unassigned', 'None' )
@@ -272,6 +335,55 @@ function CommanderThread(cdr, platoon)
         end        
     end
 end
+
+function CommanderThreadImproved(cdr, platoon)
+    local aiBrain = cdr:GetAIBrain()
+    
+    SetCDRHome(cdr, platoon)
+	
+	#DUNCAN - added to ensure we know the start locations (thanks to Sorian).
+	aiBrain:BuildScoutLocations()
+        
+    while not cdr:IsDead() do
+		
+		#DUNCAN - for debuging
+		#cdr:PrintCommandQueue() 
+
+        WaitTicks(2)
+        # Overcharge
+        if not cdr:IsDead() then CDROverCharge( aiBrain, cdr ) end
+        WaitTicks(1)
+        # Run away (not really useful right now, without teleport ability kicking in... might as well just go home)
+        #if not cdr:IsDead() then CDRRunAway( aiBrain, cdr ) end
+        #WaitTicks(1)
+        # Go back to base
+        if not cdr:IsDead() then CDRReturnHome( aiBrain, cdr ) end
+        WaitTicks(1)
+        
+        #call platoon resume building deal...
+		#DUNCAN - added some extra checks
+        if not cdr:IsDead() and cdr:IsIdleState() and not cdr.GoingHome and not cdr:IsUnitState("Moving") 
+		and not cdr:IsUnitState("Building") and not cdr:IsUnitState("Guarding")
+		and not cdr:IsUnitState("Attacking") and not cdr:IsUnitState("Repairing") 
+		and not cdr:IsUnitState("Upgrading") and not cdr:IsUnitState("Enhancing") then
+            if not cdr.EngineerBuildQueue or table.getn(cdr.EngineerBuildQueue) == 0 then
+                #LOG("AI DEBUG: " .. aiBrain.Nickname .. " reassigning commander")
+				local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
+				aiBrain:AssignUnitsToPlatoon( pool, {cdr}, 'Unassigned', 'None' )
+				if cdr.PlatoonHandle then
+					cdr.PlatoonHandle:PlatoonDisband()
+				end
+				WaitSeconds(5)
+            elseif cdr.EngineerBuildQueue and table.getn(cdr.EngineerBuildQueue) != 0 then
+                if not cdr.NotBuildingThread then
+                    cdr.NotBuildingThread = cdr:ForkThread(platoon.WatchForNotBuilding)
+                end             
+            end
+        end
+		WaitSeconds(3)
+    end
+end
+
 
 # ==== Generic Unit Behaviors === #
 function BuildOnceAI(platoon)
@@ -492,7 +604,7 @@ CommanderOverrideCheck = function(self)
     local experimental = self:GetPlatoonUnits()[1]
     
     local mainWeapon = experimental:GetWeapon(1)
-    local weaponRange = mainWeapon:GetBlueprint().MaxRadius
+    local weaponRange = mainWeapon:GetBlueprint().MaxRadius + 50 #DUNCAN - look outside range.
    
     local commanders = aiBrain:GetUnitsAroundPoint(categories.COMMAND, self:GetPlatoonPosition(), weaponRange, 'Enemy')
     
@@ -638,6 +750,7 @@ FindExperimentalTarget = function(self)
             return bestUnit, bestBase
         end
     end
+	return false, false
 end
 
 # ==== Indivitual Unit Behaviors ==== #
@@ -683,6 +796,9 @@ function BehemothBehavior(self)
                 IssueAttack({experimental}, nearCommander)
                 targetUnit = nearCommander
             end
+			
+			#DUNCAN - if no target jump out
+			if not targetUnit then break end
             
             #Check if we or the target are under a shield
             local closestBlockingShield = false
@@ -792,6 +908,14 @@ end
 #   Returns:  
 #       nil (function loops until experimental dies)
 #-----------------------------------------------------
+
+#DUNCAN - added water check to fatboy. 
+function InWaterCheck(platoon)
+	local t4Pos = platoon:GetPlatoonPosition()
+	local inWater = GetTerrainHeight(t4Pos[1], t4Pos[3]) < GetSurfaceHeight(t4Pos[1], t4Pos[3])
+	return inWater
+end
+
 function FatBoyBehavior(self)   
     local aiBrain = self:GetBrain()
     AssignExperimentalPriorities(self)
@@ -812,12 +936,18 @@ function FatBoyBehavior(self)
         
         if targetUnit then
             IssueClearCommands({experimental})
-            IssueAttack({experimental}, targetUnit)       
-        
+            
+			local useMove = InWaterCheck(self)
+			if useMove then
+				IssueMove({experimental}, targetUnit:GetPosition())
+			else
+				IssueAttack({experimental}, targetUnit)       
+			end
+			
             local pos = experimental:GetPosition()
             
             #Wait to get in range
-            while VDist2(pos[1], pos[3], lastBase.Position[1], lastBase.Position[3]) > weaponRange + 50
+            while VDist2(pos[1], pos[3], lastBase.Position[1], lastBase.Position[3]) > weaponRange + 10 #DUNCAN - was 50
             and not experimental:IsDead() and not experimental:IsIdleState() do
                 WaitSeconds(5)
             end
@@ -1097,9 +1227,15 @@ CzarBehavior = function(self)
         if targetUnit and targetUnit != oldTargetUnit then
             IssueClearCommands({experimental})
             WaitTicks(5)
-            IssueAttack({experimental}, experimental:GetPosition())
-            WaitTicks(5)
-            IssueMove({experimental}, targetUnit:GetPosition())
+			
+			#DUNCAN - move to the target without attacking. This will get it out of your base without the beam on.
+			if targetUnit and VDist3( targetUnit:GetPosition(), experimental:GetPosition() ) > 50 then
+				IssueMove({experimental}, targetUnit:GetPosition())
+			else 
+				IssueAttack({experimental}, experimental:GetPosition())
+				WaitTicks(5)
+				IssueMove({experimental}, targetUnit:GetPosition())
+			end
         end
         
         

@@ -23,6 +23,7 @@ local ModManager = import('/lua/ui/dialogs/modmanager.lua')
 local FactionData = import('/lua/factions.lua')
 local Text = import('/lua/maui/text.lua').Text
 local Trueskill = import('/lua/ui/lobby/trueskill.lua')
+local round = import('/lua/ui/lobby/trueskill.lua').round
 local Player = import('/lua/ui/lobby/trueskill.lua').Player
 local Rating = import('/lua/ui/lobby/trueskill.lua').Rating
 local Teams = import('/lua/ui/lobby/trueskill.lua').Teams
@@ -114,7 +115,9 @@ else
     playerDeviation = 500
 end
 
-local playerRating = math.floor(playerMean - 3 * playerDeviation)
+
+
+local playerRating = math.floor( Trueskill.round2((playerMean - 3 * playerDeviation) / 100.0) * 100 )
 
 -- builds the faction tables, and then adds random faction icon to the end
 local factionBmps = {}
@@ -2467,11 +2470,6 @@ function CreateUI(maxPlayers)
         Tooltip.AddButtonTooltip(GUI.LargeMapPreview, 'lob_click_LargeMapPreview')
 
         GUI.LargeMapPreview.OnClick = function()
-            --for i = 1, LobbyComm.maxPlayerSlots do
-                --if not gameInfo.ClosedSlots[i] and not gameInfo.PlayerOptions[i] then
-                    --HostCloseSlot(localPlayerID, i)
-                --end
-            --end
             CreateBigPreview(501, GUI.mapPanel)
         end
         --end of close slots code
@@ -4843,7 +4841,7 @@ local benchmarkLength = 5 --5.0 Seconds
 
 --CPU Status Bar Configuration
 local barMax = 450
-local barMin = 150
+local barMin = 0
 local greenBarMax = 300
 local yellowBarMax = 375
 local scoreSkew1 = -25 --Skews all CPU scores up or down by the amount specified (0 = no skew)
@@ -5058,11 +5056,14 @@ function SetSlotCPUBar(slot, playerInfo)
             if b then
 				-- For display purposes, the bar has a higher minimum that the actual barMin value.
 				-- This is to ensure that the bar is visible for very small values
-		    	local clampedResult =  math.max(math.min(b.Result, barMax), barMin + math.floor(.04 * (barMax - barMin)))
+
+                local clampedResult =  math.max(math.min((b.Result * GetPlayerCount())/12, barMax), barMin + math.floor(.04 * (barMax - barMin)))
                 GUI.slots[slot].CPUSpeedBar:SetValue(clampedResult)
 				
 				--For the tooltip, we use the actual clamped value
 				GUI.slots[slot].CPUSpeedBar.CPUActualValue = b.Result
+
+
                 GUI.slots[slot].CPUSpeedBar:Show()
 
                 GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-02_bmp.dds'))

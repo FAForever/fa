@@ -26,6 +26,7 @@ Shield = Class(moho.shield_methods,Entity) {
         self.MeshBp = spec.Mesh
         self.MeshZBp = spec.MeshZ
         self.ImpactMeshBp = spec.ImpactMesh
+        self._IsUp = false
         if spec.ImpactEffects != '' then
             self.ImpactEffects = EffectTemplate[spec.ImpactEffects]
         else
@@ -35,6 +36,7 @@ Shield = Class(moho.shield_methods,Entity) {
         self:SetSize(spec.Size)
         self:SetMaxHealth(spec.ShieldMaxHealth)
         self:SetHealth(self,spec.ShieldMaxHealth)
+        self:SetType('Bubble')
         self:SetSpillOverParams(spec.SpillOverDamageMod or 0.15, spec.DamageThresholdToSpillOver or 0)
 
         # Show our 'lifebar'
@@ -79,6 +81,10 @@ Shield = Class(moho.shield_methods,Entity) {
 
     SetShieldRegenStartTime = function(self, time)
         self.RegenStartTime = time
+    end,
+
+    SetType = function(self, type)
+        self.ShieldType = type
     end,
 
     SetSpillOverParams = function(self, dmgMod, threshold)
@@ -160,7 +166,7 @@ Shield = Class(moho.shield_methods,Entity) {
         end
 
         ###### This code is to pass damage over overlapping shields.
-        if type != 'ShieldSpillOver' and self.Size and self.Size > 0 and self:IsOn() and absorbed >= self.DmgThresholdToSpillOver then
+        if type != 'ShieldSpillOver' and self.Size and self.Size > 0 and self:IsUp() and absorbed >= self.DmgThresholdToSpillOver then
 
             self:SpillOverDmgDBRegister(instigator, absorbed, type) # remember this damage to prevent additional overspill damage
 
@@ -173,13 +179,13 @@ Shield = Class(moho.shield_methods,Entity) {
             local units = brain:GetUnitsAroundPoint( (categories.SHIELD * categories.DEFENSE) + categories.BUBBLESHIELDSPILLOVERCHECK, self.Owner:GetPosition(), (BiggestShieldSize / 2), 'Ally' )
 
             local pos = self:GetCachePosition()
-            local OverlapRadius = 0.98 * self.Size
+            local OverlapRadius = 0.98 * (self.Size / 2)  # size is diameter, dividing by 2 to get radius
             local obp, oOverlapRadius, vpos, OverlapDist
 
             for k, v in units do
-                if v and IsUnit(v) and not v:IsDead() and v.MyShield and v.MyShield:IsOn() and v.MyShield.Size and v.MyShield.Size > 0 and self.Owner != v and v != instigator then
+                if v and IsUnit(v) and not v:IsDead() and v.MyShield and v.MyShield:IsUp() and v.MyShield.Size and v.MyShield.Size > 0 and self.Owner != v and v != instigator then
                     vspos = v.MyShield:GetCachePosition()
-                    oOverlapRadius = 0.98 * v.MyShield.Size
+                    oOverlapRadius = 0.98 * (v.MyShield.Size / 2)  # size is diameter, dividing by 2 to get radius
 
                     OverlapDist = OverlapRadius + oOverlapRadius # If "self" and "v" are more than this far apart then the shields don't overlap, otherwise they do
 
@@ -274,7 +280,7 @@ Shield = Class(moho.shield_methods,Entity) {
 
     AdjacentBubbleShieldDamageSpillOverThread = function(self, instigator, spillingUnit, dmg, type)
         WaitTicks(1)                                                                     #### max spill damage delay is 1 ticks (3/3)
-        if self and self.Owner and not self.Owner:IsDead() and self:IsOn() then
+        if self and self.Owner and not self.Owner:IsDead() and self:IsUp() then
 
             # find out whether we've been hit by the cause of the spill over damage aswell. If yes, ignore spill over damage (we already took damage)
             local DBkey = self:SpillOverDmgDBFind(instigator, dmg, type)
@@ -379,7 +385,13 @@ Shield = Class(moho.shield_methods,Entity) {
         return false
     end,
 
+    IsUp = function(self)
+        return (self:IsOn() and self._IsUp)
+    end,
+
     RemoveShield = function(self)
+        self._IsUp = false
+
         self:SetCollisionShape('None')
 
         self:SetMesh('')
@@ -409,6 +421,8 @@ Shield = Class(moho.shield_methods,Entity) {
             self.MeshZ:SetVizToAllies('Always')
             self.MeshZ:SetVizToNeutrals('Intel')
         end
+
+        self._IsUp = true
     end,
 
     # Basically run a timer, but with visual bar movement
@@ -517,6 +531,10 @@ Shield = Class(moho.shield_methods,Entity) {
 
             WaitSeconds(1)            
         end,
+
+        IsOn = function(self)
+            return false
+        end,
     },
 
     # This state happens when the shield has been depleted due to damage
@@ -531,7 +549,11 @@ Shield = Class(moho.shield_methods,Entity) {
             self:SetHealth(self, self:GetMaxHealth())
             
             ChangeState(self, self.OnState)
-        end
+        end,
+
+        IsOn = function(self)
+            return false
+        end,
     },
 
     # This state happens only when the army has run out of power
@@ -548,11 +570,19 @@ Shield = Class(moho.shield_methods,Entity) {
             else
                 ChangeState(self, self.OffState)
             end
-        end
+        end,
+
+        IsOn = function(self)
+            return false
+        end,
     },
 
     DeadState = State {
         Main = function(self)
+        end,
+
+        IsOn = function(self)
+            return false
         end,
     },
 }
@@ -572,6 +602,7 @@ UnitShield = Class(Shield){
         self.OwnerShieldMesh = spec.OwnerShieldMesh or ''
 
         self:SetSize(spec.Size)
+        self:SetType('Personal')
 
         self:SetMaxHealth(spec.ShieldMaxHealth)
         self:SetHealth(self,spec.ShieldMaxHealth)
@@ -630,10 +661,16 @@ UnitShield = Class(Shield){
         self:UpdateShieldRatio(0)
         ChangeState(self, self.DeadState)
     end,
-        
+       
 }
 
-AntiArtilleryShield = Class(Shield){
+AntiArtilleryShield = Class(Shield) {
+
+    OnCreate = function(self, spec)
+        Shield.OnCreate(self, spec)
+        self:SetType('AntiArtillery')
+    end,
+
     OnCollisionCheckWeapon = function(self, firingWeapon)
         local bp = firingWeapon:GetBlueprint()
         if bp.CollideFriendly == false then

@@ -13,6 +13,7 @@
 
 local AIDefaultPlansList = import('/lua/aibrainplans.lua').AIPlansList
 local AIUtils = import('/lua/ai/aiutilities.lua')
+
 local PCBC = import('/lua/editor/platooncountbuildconditions.lua')
 local Utilities = import('/lua/utilities.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
@@ -1181,6 +1182,10 @@ AIBrain = Class(moho.aibrain_methods) {
         if self.BuilderManagers then
             self.ConditionsMonitor:Destroy()
             for k,v in self.BuilderManagers do
+		#DUNCAN - added setenabled's to false
+		v.EngineerManager:SetEnabled(false)
+		v.FactoryManager:SetEnabled(false)
+		v.PlatoonFormManager:SetEnabled(false)
                 v.FactoryManager:Destroy()
                 v.PlatoonFormManager:Destroy()
                 v.EngineerManager:Destroy()
@@ -1720,17 +1725,19 @@ AIBrain = Class(moho.aibrain_methods) {
             local changed = false
             for k,v in self.BuilderManagers do
                 if k != 'MAIN' and v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) <= 0 and v.FactoryManager:GetNumCategoryFactories(categories.ALLUNITS) <= 0 then
-                    v.EngineerManager:SetEnabled(false)
-                    v.FactoryManager:SetEnabled(false)
-                    v.PlatoonFormManager:SetEnabled(false)
-                    v.StrategyManager:SetEnabled(false)
-                    v.FactoryManager:Destroy()
-                    v.PlatoonFormManager:Destroy()
-                    v.EngineerManager:Destroy()
-                    v.StrategyManager:Destroy()
-                    self.BuilderManagers[k] = nil
-                    self.NumBases = self.NumBases - 1
-                    changed = true
+            			if v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) <= 0 then
+            	                    v.EngineerManager:SetEnabled(false)
+            	                    v.FactoryManager:SetEnabled(false)
+            	                    v.PlatoonFormManager:SetEnabled(false)
+            	                    v.StrategyManager:SetEnabled(false)
+            	                    v.FactoryManager:Destroy()
+            	                    v.PlatoonFormManager:Destroy()
+            	                    v.EngineerManager:Destroy()
+            	                    v.StrategyManager:Destroy()
+            	                    self.BuilderManagers[k] = nil
+            	                    self.NumBases = self.NumBases - 1
+            	                    changed = true
+                  end
                 end
             end
             if changed then
@@ -1768,16 +1775,17 @@ AIBrain = Class(moho.aibrain_methods) {
             if v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) <= 0 and v.FactoryManager:GetNumCategoryFactories(categories.ALLUNITS) <= 0 then
                 continue
             end
-            
-            if not closest then
-                distance = VDist3( position, v.Position )
-                closest = v.Position
-            else
-                local tempDist = VDist3( position, v.Position )
-                if tempDist < distance then
-                    distance = tempDist
-                    closest = v.Position
-                end
+            if position and v.Position then
+              if not closest then 
+                  distance = VDist3( position, v.Position )
+                  closest = v.Position
+              else
+                  local tempDist = VDist3( position, v.Position )
+                  if tempDist < distance then
+                      distance = tempDist
+                      closest = v.Position
+                  end
+              end
             end
         end
         return closest
@@ -1801,7 +1809,7 @@ AIBrain = Class(moho.aibrain_methods) {
                     continue
                 elseif type == 'Naval Area' and not ( string.find(k, 'Naval Area') ) then
                     continue
-                elseif type == 'Expansion Area' and ( not string.find(k, 'Expansion Area') or string.find(k, 'Large Expansion') ) then
+                elseif type == 'Expansion Area' and ( not (string.find(k, 'Expansion Area') or string.find(k, 'EXPANSION_AREA')) or string.find(k, 'Large Expansion') ) then
                     continue
                 end
             end
@@ -4074,7 +4082,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 table.insert( self.BaseMonitor.BaseMonitorPoints,
                              {
                                 Position = v,
-                                Threat = self:GetThreatAtPosition( v, 0, true, 'AntiSurface' ),
+                                Threat = self:GetThreatAtPosition( v, 0, true, 'Overall' ),
                                 Alert = false
                              }
                          )
@@ -4097,15 +4105,8 @@ AIBrain = Class(moho.aibrain_methods) {
             local alertThreat = self.BaseMonitor.AlertLevel
             for k,v in self.BaseMonitor.BaseMonitorPoints do
                 if not v.Alert then
-                    v.Threat = self:GetThreatAtPosition( v.Position, 0, true, 'AntiSurface' )
-                    local myThreat = self:GetThreatAtPosition( v.Position, 0, true, 'AntiSurface', self:GetArmyIndex())
-                    if v.Threat - myThreat < 1 then
-                        local eEngies = self:GetNumUnitsAroundPoint( categories.ENGINEER, v.Position, 10, 'Enemy' )
-                        if eEngies > 0 then
-                            v.Threat = v.Threat + (eEngies * 10)
-                        end
-                    end                        
-                    if v.Threat - myThreat > alertThreat then
+                    v.Threat = self:GetThreatAtPosition( v.Position, 0, true, 'Overall' )
+                    if v.Threat > alertThreat then
                         v.Alert = true
                         table.insert( self.BaseMonitor.AlertsTable,
                             {

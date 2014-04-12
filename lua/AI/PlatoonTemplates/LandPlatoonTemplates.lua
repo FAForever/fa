@@ -47,8 +47,24 @@ PlatoonTemplate {
     },
 }
 PlatoonTemplate {
+    Name = 'LABAttack',
+    Plan = 'HuntAI', 
+    GlobalSquads = {
+        { categories.MOBILE * categories.LAND * categories.TECH1 * categories.BOT - categories.REPAIR + (categories.SERAPHIM * categories.SCOUT), 5, 50, 'Attack', 'none' }
+    },
+}
+#DUNCAN - Added
+PlatoonTemplate {
+    Name = 'GhettoMarines',
+    Plan = 'GhettoAI', 
+    GlobalSquads = {
+		#DUNCAN - the REPAIR is to remove the mantis. Added in Selen too.
+        { categories.MOBILE * categories.LAND * categories.TECH1 * categories.BOT - categories.REPAIR + (categories.SERAPHIM * categories.SCOUT), 6, 6, 'Attack', 'none' }
+    },
+}
+PlatoonTemplate {
     Name = 'HuntAttackSmall',
-    Plan = 'HuntAI',
+    Plan = 'HuntAI', 
     GlobalSquads = {
         { categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.ENGINEER, 5, 25, 'Attack', 'none' }
     },
@@ -56,7 +72,7 @@ PlatoonTemplate {
 
 PlatoonTemplate {
     Name = 'HuntAttackMedium',
-    Plan = 'HUntAI',
+    Plan = 'HuntAI', 
     GlobalSquads = {
         { categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.ENGINEER, 25, 50, 'Attack', 'none' }
     },
@@ -65,7 +81,8 @@ PlatoonTemplate {
     Name = 'StartLocationAttack',
     Plan = 'GuardMarker',
     GlobalSquads = {
-        { categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.ENGINEER, 15, 25, 'Attack', 'none' },
+		#DUNCAN - was 15 to 25
+        { categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.ENGINEER, 5, 25, 'Attack', 'none' },
         { categories.ENGINEER, 1, 1, 'Attack', 'none' },
     },
 }
@@ -80,7 +97,7 @@ PlatoonTemplate {
     Name = 'LandAttackHunt',
     Plan = 'HuntAI',
     GlobalSquads = {
-        { categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.ENGINEER, 1, 100, 'Attack', 'none' }
+        { categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.ENGINEER, 10, 100, 'Attack', 'none' } #DUNCAN - was 1 to 100
     }
 }
 
@@ -97,7 +114,8 @@ PlatoonTemplate {
     #Plan = 'AttackForceAI',    
     Plan = 'GuardMarker',    
     GlobalSquads = {
-        { categories.TECH1 * categories.LAND * categories.MOBILE * categories.DIRECTFIRE * categories.BOT - categories.SCOUT - categories.ENGINEER - categories.EXPERIMENTAL, 3, 15, 'attack', 'none' },
+		#DUNCAN - removed bot as mantis is a bot?
+        { categories.TECH1 * categories.LAND * categories.MOBILE * categories.DIRECTFIRE - categories.SCOUT - categories.ENGINEER - categories.EXPERIMENTAL, 3, 15, 'attack', 'none' },
         { categories.LAND * categories.SCOUT, 0, 1, 'attack', 'none' },
     }
 }
@@ -107,16 +125,8 @@ PlatoonTemplate {
     #Plan = 'AttackForceAI',    
     Plan = 'GuardMarker',    
     GlobalSquads = {
-        { categories.TECH1 * categories.LAND * categories.MOBILE * categories.DIRECTFIRE * categories.BOT - categories.SCOUT - categories.ENGINEER - categories.EXPERIMENTAL, 10, 25, 'attack', 'none' },
-        { categories.LAND * categories.SCOUT, 0, 1, 'attack', 'none' },
-    }
-}
-PlatoonTemplate {
-    Name = 'T2MassHuntersCategory',
-    #Plan = 'AttackForceAI',    
-    Plan = 'GuardMarker',    
-    GlobalSquads = {
-        { categories.TECH1 * categories.LAND * categories.MOBILE * categories.DIRECTFIRE * categories.BOT - categories.SCOUT - categories.ENGINEER - categories.EXPERIMENTAL, 3, 15, 'attack', 'none' },
+		#DUNCAN - removed bot as mantis is a bot?
+        { categories.TECH1 * categories.LAND * categories.MOBILE * categories.DIRECTFIRE - categories.SCOUT - categories.ENGINEER - categories.EXPERIMENTAL, 10, 25, 'attack', 'none' },
         { categories.LAND * categories.SCOUT, 0, 1, 'attack', 'none' },
     }
 }
@@ -132,8 +142,8 @@ PlatoonTemplate {
 
 PlatoonTemplate {
     Name = 'T2HuntersCategory',
-    Plan = 'AttackForceAI',
-    #Plan = 'HuntAI',
+    #Plan = 'AttackForceAI',
+    Plan = 'HuntAI',
     GlobalSquads = {
         { categories.LAND * categories.MOBILE * categories.DIRECTFIRE - categories.SCOUT - categories.ENGINEER - categories.EXPERIMENTAL, 10, 15, 'attack', 'none' },
         { categories.LAND * categories.SCOUT, 0, 1, 'attack', 'none' },
@@ -144,7 +154,16 @@ PlatoonTemplate {
     Name = 'T4ExperimentalLand',
     Plan = 'ExperimentalAIHub',   
     GlobalSquads = {
-        { categories.EXPERIMENTAL * categories.LAND * categories.MOBILE, 1, 1, 'attack', 'none' }
+		#DUNCAN - removed the sera lightning unit
+        { categories.EXPERIMENTAL * categories.LAND * categories.MOBILE - categories.INSIGNIFICANTUNIT, 1, 1, 'attack', 'none' }
+    },
+}
+PlatoonTemplate {
+    Name = 'T4ExperimentalLandGroup',
+    Plan = 'ExperimentalAIHub',   
+    GlobalSquads = {
+		#DUNCAN - removed the sera lightning unit
+        { categories.EXPERIMENTAL * categories.LAND * categories.MOBILE - categories.INSIGNIFICANTUNIT, 2, 3, 'attack', 'none' }
     },
 }
 
@@ -152,7 +171,16 @@ PlatoonTemplate {
     Name = 'T1EngineerGuard',
     Plan = 'None',
     GlobalSquads = {
-        { categories.DIRECTFIRE * categories.TECH1 * categories.LAND * categories.MOBILE - categories.SCOUT - categories.ENGINEER, 1, 3, 'guard', 'None' }
+		#DUNCAN - was 1 to 3
+        { categories.DIRECTFIRE * categories.TECH1 * categories.LAND * categories.MOBILE - categories.SCOUT - categories.ENGINEER, 3, 5, 'guard', 'None' } 
+    },
+}
+
+PlatoonTemplate {
+    Name = 'T3ExperimentalGuard',
+    Plan = 'GuardUnit',
+    GlobalSquads = {
+        { categories.DIRECTFIRE * (categories.TECH3 + categories.TECH2) * categories.LAND * categories.MOBILE - categories.SCOUT - categories.ENGINEER, 1, 20, 'guard', 'None' }
     },
 }
 
@@ -332,7 +360,7 @@ PlatoonTemplate {
         Aeon = {
             { 'xal0203', 1, 1, 'attack', 'None' },
         },
-        Cybran = {
+        Cybran = { #DUNCAN - Was UEF in orig
             { 'drl0204', 1, 1, 'attack', 'None' },
         },
     },
@@ -433,7 +461,7 @@ PlatoonTemplate {
     Name = 'T3ArmoredAssault',
     FactionSquads = {
         UEF = {
-            { 'xel0305', 1, 1, 'attack', 'none' },
+            { 'xel0305', 1, 1, 'attack', 'none' }, #DUNCAN - fixed typo
         },
         Cybran = {
             { 'xrl0305', 1, 1, 'attack', 'none' },

@@ -188,7 +188,7 @@ UnitBlueprint {
         VisionRadius = 20,
     },
     Interface = {
-        HelpText = '<LOC uab0302_help>Air Factory',
+        HelpText = '<LOC uab0302_help>Air Factory HQ',
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 2.1,

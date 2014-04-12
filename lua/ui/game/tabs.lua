@@ -168,8 +168,8 @@ local menus = {
         },
         gpgnet = {
             {
-                action = 'ShowGameInfos',
-                label = 'Show Game Infos',
+                action = 'ShowGameInfo',
+                label = 'Show Game Info',
                 tooltip = 'Show the settings of this game',
             },
 			{
@@ -263,8 +263,8 @@ local actions = {
             true,
             {escapeButton = 2, enterButton = 1, worldCover = true})
     end,
-	ShowGameInfos = function()
-        ToggleGameInfos()
+	ShowGameInfo = function()
+        ToggleGameInfo()
     end,
     Return = function()
         CollapseWindow()

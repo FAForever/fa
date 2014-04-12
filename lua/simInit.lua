@@ -184,19 +184,26 @@ function BeginSession()
     if ScenarioInfo.Options.RestrictedCategories then
         local restrictedUnits = import('/lua/ui/lobby/restrictedUnitsData.lua').restrictedUnits
         for index, restriction in ScenarioInfo.Options.RestrictedCategories do
+		LOG('1 - '..restriction..' ['..index..']')
             local restrictedCategories = nil
-            for index, cat in restrictedUnits[restriction].categories do
-                if restrictedCategories == nil then
-                    restrictedCategories = categories[cat]
-                else
-                    restrictedCategories = restrictedCategories + categories[cat]
-                end
-            end
-            if buildRestrictions == nil then
-                buildRestrictions = restrictedCategories
-            else
-                buildRestrictions = buildRestrictions + restrictedCategories
-            end
+            if restrictedUnits[restriction].categories then
+				for index, cat in restrictedUnits[restriction].categories do
+					LOG('2 - '..cat..' ['..index..']')
+					if restrictedCategories == nil then
+						restrictedCategories = categories[cat]
+					else
+						restrictedCategories = restrictedCategories + categories[cat]
+					end
+					LOG('2 - <<<')
+				end
+				LOG('1 - <<<')
+				if buildRestrictions == nil then
+					buildRestrictions = restrictedCategories
+				else
+					buildRestrictions = buildRestrictions + restrictedCategories
+				end
+				LOG('0 - <<<')
+			end
         end
     end
 
