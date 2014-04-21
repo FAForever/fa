@@ -111,6 +111,7 @@ local function CheckForLaunch()
 
     local important = {}
     for slot,player in gameInfo.PlayerOptions do
+        GpgNetSend('PlayerOption', string.format("startspot %s %d %s", player.PlayerName, slot, slot))
         if not table.find(important, player.OwnerID) then
             table.insert(important, player.OwnerID)
         end
@@ -234,6 +235,8 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         localPlayerName = newLocalName
         localPlayerID = myID
 
+        GpgNetSend('connectedToHost', string.format("%d", hostID))
+
         # Ok, I'm connected to the host. Now request to become a player
         lobbyComm:SendData( hostID, { Type = 'AddPlayer', PlayerInfo = MakeLocalPlayerInfo(newLocalName), } )
     end
@@ -281,6 +284,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
     end
 
     lobbyComm.EstablishedPeers = function(self, uid, peers)
+        GpgNetSend('Connected', string.format("%d", uid))
         if self:IsHost() then
             CheckForLaunch()
         end
@@ -339,6 +343,7 @@ function ConnectToPeer(addressAndPort,name,uid)
 end
 
 function DisconnectFromPeer(uid)
+    GpgNetSend('Disconnected', string.format("%d", uid))
     lobbyComm:DisconnectFromPeer(uid)
 end
 

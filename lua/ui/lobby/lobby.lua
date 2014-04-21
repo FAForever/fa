@@ -4802,6 +4802,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         LOG('>DEBUG> PeerDisconnected : peerName='..peerName..' peerID='..peerID)
         --AddChatText('>debug> PeerDisconnected : peerName='..peerName..' peerID='..peerID) -- XINNONY -- Here this message always show the player quit !!!
         if XinnonyDebug == 3 then AddChatText('>> PeerDisconnected : peerName='..peerName..' peerID='..peerID) end -- XINNONY -- Here this message always show the player quit !!!
+        GpgNetSend('Disonnected', string.format("%d", peerID))
         if XinnonyDebug == 3 then LOG('GameInfo = ', repr(gameInfo)) end
         if IsPlayer(peerID) then
             local slot = FindSlotForID(peerID)
