@@ -553,13 +553,21 @@ function JoinGame(address, asObserver, playerName, uid)
 end
 
 function ConnectToPeer(addressAndPort,name,uid)
-	LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..")")
+    if not string.find(addressAndPort, '127.0.0.1') then
+        LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..")")
+    else
+        if wasConnected(uid) then DisconnectFromPeer(uid) end
+        LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..", USE PROXY)")
+    end
     lobbyComm:ConnectToPeer(addressAndPort,name,uid)
 end
 
 function DisconnectFromPeer(uid)
-	LOG("DisconnectFromPeer (uid=" .. uid ..")")
-    if wasConnected(uid) then table.remove(connectedTo, uid) end
+    LOG("DisconnectFromPeer (uid=" .. uid ..")")
+    if wasConnected(uid) then 
+        table.remove(connectedTo, uid) 
+        GpgNetSend('Disonnected', string.format("%d", peerID))
+    end
     lobbyComm:DisconnectFromPeer(uid)
 end
 
