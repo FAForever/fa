@@ -85,6 +85,15 @@ local function IsColorFree(colorIndex)
     return true
 end
 
+function wasConnected(peer)
+    for _,v in pairs(connectedTo) do
+        if v == peer then
+            return true
+        end
+    end
+    return false
+end
+
 local function HostAddPlayer(senderId, playerInfo)
     playerInfo.OwnerID = senderId
 
@@ -284,7 +293,10 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
     end
 
     lobbyComm.EstablishedPeers = function(self, uid, peers)
-        GpgNetSend('Connected', string.format("%d", uid))
+        if not wasConnected(uid) then
+            table.insert(connectedTo, uid)
+            GpgNetSend('Connected', string.format("%d", uid))
+        end
         if self:IsHost() then
             CheckForLaunch()
         end
@@ -339,11 +351,21 @@ function JoinGame(address, asObserver, playerName, uid)
 end
 
 function ConnectToPeer(addressAndPort,name,uid)
+    if not string.find(addressAndPort, '127.0.0.1') then
+        LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..")")
+    else
+        if wasConnected(uid) then DisconnectFromPeer(uid) end
+        LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..", USE PROXY)")
+    end
     lobbyComm:ConnectToPeer(addressAndPort,name,uid)
 end
 
 function DisconnectFromPeer(uid)
-    GpgNetSend('Disconnected', string.format("%d", uid))
+    if wasConnected(uid) then 
+        table.remove(connectedTo, uid) 
+        GpgNetSend('Disconnected', string.format("%d", uid))
+    end
+    
     lobbyComm:DisconnectFromPeer(uid)
 end
 
