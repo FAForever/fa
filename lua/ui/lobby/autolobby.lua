@@ -51,6 +51,7 @@ local Strings = LobbyComm.Strings
 
 local lobbyComm = false
 
+local connectedTo = {}
 
 local function MakeLocalPlayerInfo(name)
     local result = LobbyComm.GetDefaultPlayerOptions(name)
