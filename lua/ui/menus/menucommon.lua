@@ -18,13 +18,11 @@ local background = false
 local bgFilespec = false
 
 local backgroundFiles = {
-	--"/menus02/background-paint_uef_bmp.dds",
-	--"/menus02/background-paint_cybran_bmp.dds",
-    --"/menus02/background-paint_aion_bmp.dds",
-    --"/menus02/background-paint_seraphim_bmp.dds",
-    --"/menus02/background-paint_random_bmp.dds",
-	"/menus02/background-paint_black_bmp.dds",
-	--"/menus02/background-paint_nomads_bmp.dds",
+    "/menus02/background-paint01_bmp.dds",
+    "/menus02/background-paint02_bmp.dds",
+    "/menus02/background-paint03_bmp.dds",
+    "/menus02/background-paint04_bmp.dds",
+    "/menus02/background-paint05_bmp.dds",
 }
 
 -- pick one background per import
