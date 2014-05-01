@@ -4357,14 +4357,10 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     lobbyComm = LobbyComm.CreateLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
     if not lobbyComm then
         error('Failed to create lobby using port ' .. tostring(localPort))
-    --else
-        --if GUI.chatDisplay then
-            --AddChatText(">> InitLobbyComm : OK !")
-        --end
     end
     
     lobbyComm.ConnectionFailed = function(self, reason)
-        LOG("CONNECTION FAILED ",reason)
+        LOG("CONNECTION FAILED " .. reason)
 
         GUI.connectionFailedDialog = UIUtil.ShowInfoDialog(GUI.panel, LOCF(Strings.ConnectionFailed, Strings[reason] or reason),
                                                            "<LOC _OK>", ReturnToMenu)
@@ -4378,7 +4374,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     end
 
     lobbyComm.Ejected = function(self,reason)
-        LOG("EJECTED ",reason)
+        LOG("EJECTED " .. reason)
 
         GUI.connectionFailedDialog = UIUtil.ShowInfoDialog(GUI, LOCF(Strings.Ejected, Strings[reason] or reason),
                                                            "<LOC _OK>", ReturnToMenu)

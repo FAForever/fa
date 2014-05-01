@@ -95,6 +95,19 @@ function wasConnected(peer)
     return false
 end
 
+function FindSlotForID(id)
+    for k,player in gameInfo.PlayerOptions do
+        if player.OwnerID == id and player.Human then
+            return k
+        end
+    end
+    return nil
+end
+
+function IsPlayer(id)
+    return FindSlotForID(id) != nil
+end
+
 local function HostAddPlayer(senderId, playerInfo)
     playerInfo.OwnerID = senderId
 
@@ -213,6 +226,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
     end
 
     lobbyComm.ConnectionFailed = function(self, reason)
+        LOG("CONNECTION FAILED " .. reason)
         if connectingDialog then
             connectingDialog:Destroy()
         end
@@ -221,6 +235,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
     end
 
     lobbyComm.LaunchFailed = function(self,reasonKey)
+        LOG("LAUNCH FAILED")
         if connectingDialog then
             connectingDialog:Destroy()
         end
@@ -228,7 +243,8 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         local failedDlg = UIUtil.ShowInfoDialog(controlGroup, LOCF(Strings.LaunchFailed,LOC(reasonKey)), "<LOC _OK>", CleanupAndExit)
     end
 
-    lobbyComm.Ejected = function(self)
+    lobbyComm.Ejected = function(self, reason)
+        LOG("EJECTED " .. reason)
         if connectingDialog then
             connectingDialog:Destroy()
         end
@@ -237,7 +253,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
     end
 
     lobbyComm.ConnectionToHostEstablished = function(self,myID,newLocalName,theHostID)
-        LOG('********** ConnectionToHostEstablished() called')
+        LOG("CONNECTED TO HOST")
         if connectingDialog then
             connectingDialog:Destroy()
         end
@@ -247,7 +263,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
 
         GpgNetSend('connectedToHost', string.format("%d", hostID))
 
-        # Ok, I'm connected to the host. Now request to become a player
+        -- Ok, I'm connected to the host. Now request to become a player
         lobbyComm:SendData( hostID, { Type = 'AddPlayer', PlayerInfo = MakeLocalPlayerInfo(newLocalName), } )
     end
 
@@ -302,6 +318,17 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
             CheckForLaunch()
         end
     end
+
+    lobbyComm.PeerDisconnected = function(self,peerName,peerID)
+        LOG('>DEBUG> PeerDisconnected : peerName='..peerName..' peerID='..peerID)
+        if IsPlayer(peerID) then
+            local slot = FindSlotForID(peerID)
+            if slot and lobbyComm:IsHost() then
+                gameInfo.PlayerOptions[slot] = nil        
+            end
+        end
+    end
+
 end
 
 
@@ -333,7 +360,7 @@ function HostGame(gameName, scenarioFileName, singlePlayer)
     local args = GetCommandLineArg("/players", 1)
     if args then
         requiredPlayers = tonumber(args[1])
-        #LOG("requiredPlayers was set to: "..requiredPlayers)
+        LOG("requiredPlayers was set to: "..requiredPlayers)
     end
 
 	
@@ -346,9 +373,10 @@ end
 
 -- join an already existing lobby
 function JoinGame(address, asObserver, playerName, uid)
+    LOG("Joingame (name=" .. playerName .. ", uid=" .. uid .. ", address=" .. address ..")")
     CreateUI()
 
-    lobbyComm:JoinGame(address, playerName, uid);
+    lobbyComm:JoinGame(address, playerName, uid)
 end
 
 function ConnectToPeer(addressAndPort,name,uid)
@@ -362,6 +390,7 @@ function ConnectToPeer(addressAndPort,name,uid)
 end
 
 function DisconnectFromPeer(uid)
+    LOG("DisconnectFromPeer (uid=" .. uid ..")")
     if wasConnected(uid) then 
         table.remove(connectedTo, uid)         
     end
