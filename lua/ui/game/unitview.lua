@@ -403,80 +403,76 @@ function UpdateWindow(info)
         end
     end
     if options.gui_detailed_unitview != 0 then
-        local TV = import('/modules/tvcheck.lua').Init()
-        if TV == false then
-            if info.blueprintId != 'unknown' then
-                controls.Buildrate:Hide()
-                controls.shieldText:Hide()
+        if info.blueprintId != 'unknown' then
+            controls.Buildrate:Hide()
+            controls.shieldText:Hide()
 
-                local getEnh = import('/lua/enhancementcommon.lua')
-                if info.userUnit != nil then
-                    local enhRegen , regenBase = 0 , 0
-                    if getEnh.GetEnhancements(info.entityId) != nil then
-                        for k,v in getEnh.GetEnhancements(info.entityId) do
-                            if info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId)[k]].NewRegenRate != nil then
-                                enhRegen = info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId)[k]].NewRegenRate
-                            end
-                        end
-                    end
-                    local veterancyLevels = info.userUnit:GetBlueprint().Veteran or veterancyDefaults
-                    if info.kills >= veterancyLevels[string.format('Level%d', 1)] then
-                        local lvl = 1
-                        for i = 2,5 do
-                            if info.kills >= veterancyLevels[string.format('Level%d', i)] then
-                                lvl = i
-                            end
-                        end
-                        local addRegen = info.userUnit:GetBlueprint().Buffs.Regen[string.format('Level%d', lvl)]
-                        local regenTotal
-                        if info.userUnit != nil and info.health then
-                            if math.floor(info.userUnit:GetBlueprint().Defense.RegenRate) > 0 then
-                                regenTotal = math.floor(  (info.userUnit:GetBlueprint().Defense.RegenRate) + addRegen   )
-                                regenBase = math.floor(info.userUnit:GetBlueprint().Defense.RegenRate + enhRegen)
-                            else
-                                regenTotal = math.floor(addRegen)
-                            end
-                            if regenTotal > 0 and regenBase > 0 then
-                                controls.health:SetText(string.format("%d / %d +%d(%d)/s", info.health, info.maxHealth, regenBase ,regenTotal ))
-                            else
-                                controls.health:SetText(string.format("%d / %d +%d/s", info.health, info.maxHealth ,regenTotal ))
-                            end
-                        end
-                    else
-                        if info.userUnit != nil and info.health and info.userUnit:GetBlueprint().Defense.RegenRate > 0 then
-                            controls.health:SetText(string.format("%d / %d +%d/s", info.health, info.maxHealth,math.floor(info.userUnit:GetBlueprint().Defense.RegenRate + enhRegen)))
+            local getEnh = import('/lua/enhancementcommon.lua')
+            if info.userUnit != nil then
+                local enhRegen , regenBase = 0 , 0
+                if getEnh.GetEnhancements(info.entityId) != nil then
+                    for k,v in getEnh.GetEnhancements(info.entityId) do
+                        if info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId)[k]].NewRegenRate != nil then
+                            enhRegen = info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId)[k]].NewRegenRate
                         end
                     end
                 end
-
-                if info.shieldRatio > 0 and info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth then
-                    local ShieldMaxHealth = info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth
-                    controls.shieldText:Show()
-                    if info.userUnit:GetBlueprint().Defense.Shield.ShieldRegenRate then
-                        controls.shieldText:SetText(string.format("%d / %d +%d/s", math.floor(ShieldMaxHealth*info.shieldRatio), info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth , info.userUnit:GetBlueprint().Defense.Shield.ShieldRegenRate))
-                    else
-                        controls.shieldText:SetText(string.format("%d / %d", math.floor(ShieldMaxHealth*info.shieldRatio), info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth ))
+                local veterancyLevels = info.userUnit:GetBlueprint().Veteran or veterancyDefaults
+                if info.kills >= veterancyLevels[string.format('Level%d', 1)] then
+                    local lvl = 1
+                    for i = 2,5 do
+                        if info.kills >= veterancyLevels[string.format('Level%d', i)] then
+                            lvl = i
+                        end
                     end
-                end
-
-                if info.shieldRatio > 0 and info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth == nil then
-                    local ShieldMaxHealth = info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId).Back].ShieldMaxHealth
-                    controls.shieldText:Show()
-                    if info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId).Back].ShieldRegenRate then
-                        controls.shieldText:SetText(string.format("%d / %d +%d/s", math.floor(ShieldMaxHealth*info.shieldRatio), ShieldMaxHealth , info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId).Back].ShieldRegenRate))
-                    else
-                        controls.shieldText:SetText(string.format("%d / %d", math.floor(ShieldMaxHealth*info.shieldRatio), ShieldMaxHealth ))
+                    local addRegen = info.userUnit:GetBlueprint().Buffs.Regen[string.format('Level%d', lvl)]
+                    local regenTotal
+                    if info.userUnit != nil and info.health then
+                        if math.floor(info.userUnit:GetBlueprint().Defense.RegenRate) > 0 then
+                            regenTotal = math.floor(  (info.userUnit:GetBlueprint().Defense.RegenRate) + addRegen   )
+                            regenBase = math.floor(info.userUnit:GetBlueprint().Defense.RegenRate + enhRegen)
+                        else
+                            regenTotal = math.floor(addRegen)
+                        end
+                        if regenTotal > 0 and regenBase > 0 then
+                            controls.health:SetText(string.format("%d / %d +%d(%d)/s", info.health, info.maxHealth, regenBase ,regenTotal ))
+                        else
+                            controls.health:SetText(string.format("%d / %d +%d/s", info.health, info.maxHealth ,regenTotal ))
+                        end
                     end
-                end
-
-                if info.userUnit != nil and info.userUnit:GetBuildRate() >= 2 then
-                    controls.Buildrate:SetText(string.format("%d",math.floor(info.userUnit:GetBuildRate())))
-                    controls.Buildrate:Show()
                 else
-                    controls.Buildrate:Hide()
+                    if info.userUnit != nil and info.health and info.userUnit:GetBlueprint().Defense.RegenRate > 0 then
+                        controls.health:SetText(string.format("%d / %d +%d/s", info.health, info.maxHealth,math.floor(info.userUnit:GetBlueprint().Defense.RegenRate + enhRegen)))
+                    end
                 end
             end
 
+            if info.shieldRatio > 0 and info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth then
+                local ShieldMaxHealth = info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth
+                controls.shieldText:Show()
+                if info.userUnit:GetBlueprint().Defense.Shield.ShieldRegenRate then
+                    controls.shieldText:SetText(string.format("%d / %d +%d/s", math.floor(ShieldMaxHealth*info.shieldRatio), info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth , info.userUnit:GetBlueprint().Defense.Shield.ShieldRegenRate))
+                else
+                    controls.shieldText:SetText(string.format("%d / %d", math.floor(ShieldMaxHealth*info.shieldRatio), info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth ))
+                end
+            end
+
+            if info.shieldRatio > 0 and info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth == nil then
+                local ShieldMaxHealth = info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId).Back].ShieldMaxHealth
+                controls.shieldText:Show()
+                if info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId).Back].ShieldRegenRate then
+                    controls.shieldText:SetText(string.format("%d / %d +%d/s", math.floor(ShieldMaxHealth*info.shieldRatio), ShieldMaxHealth , info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId).Back].ShieldRegenRate))
+                else
+                    controls.shieldText:SetText(string.format("%d / %d", math.floor(ShieldMaxHealth*info.shieldRatio), ShieldMaxHealth ))
+                end
+            end
+
+            if info.userUnit != nil and info.userUnit:GetBuildRate() >= 2 then
+                controls.Buildrate:SetText(string.format("%d",math.floor(info.userUnit:GetBuildRate())))
+                controls.Buildrate:Show()
+            else
+                controls.Buildrate:Hide()
+            end
         end
     end
 end
@@ -541,11 +537,8 @@ function CreateUI()
     controls.bg:SetNeedsFrameUpdate(true)
 
     if options.gui_detailed_unitview != 0 then
-        local TV = import('/modules/tvcheck.lua').Init()
-        if TV == false then    
-            controls.shieldText = UIUtil.CreateText(controls.bg, '', 13, UIUtil.bodyFont)
-            controls.Buildrate = UIUtil.CreateText(controls.bg, '', 12, UIUtil.bodyFont)
-        end
+        controls.shieldText = UIUtil.CreateText(controls.bg, '', 13, UIUtil.bodyFont)
+        controls.Buildrate = UIUtil.CreateText(controls.bg, '', 12, UIUtil.bodyFont)
     end
 
     controls.bg.OnFrame = function(self, delta)

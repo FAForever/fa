@@ -1,12 +1,12 @@
 #
 # Lobby communications and common services
 #
-quietTimeout = 10000.0 # milliseconds to wait before booting people
+quietTimeout = 30000.0 -- milliseconds to wait before booting people
 maxPlayerSlots = 12
-maxConnections = 16 # count doesn't include ourself.
+maxConnections = 16 -- count doesn't include ourself.
 
 Strings = {
-    # General info strings
+     General info strings
     ['Connecting'] = "<LOC lobui_0083>Connecting to Game",
     ['AbortConnect'] = "<LOC lobui_0204>Abort Connect",
     ['TryingToConnect'] = "<LOC lobui_0331>Connecting...",

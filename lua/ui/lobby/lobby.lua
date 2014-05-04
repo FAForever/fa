@@ -568,6 +568,7 @@ function ConnectToPeer(addressAndPort,name,uid)
     if not string.find(addressAndPort, '127.0.0.1') then
         LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..")")
     else
+        DisconnectFromPeer(uid) 
         LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..", USE PROXY)")
     end
     lobbyComm:ConnectToPeer(addressAndPort,name,uid)
@@ -575,7 +576,10 @@ end
 
 function DisconnectFromPeer(uid)
     LOG("DisconnectFromPeer (uid=" .. uid ..")")
-    if wasConnected(uid) then table.remove(connectedTo, uid) end
+    if wasConnected(uid) then 
+        table.remove(connectedTo, uid)         
+    end
+    GpgNetSend('Disonnected', string.format("%d", uid))
     lobbyComm:DisconnectFromPeer(uid)
 end
 
@@ -4353,14 +4357,10 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     lobbyComm = LobbyComm.CreateLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
     if not lobbyComm then
         error('Failed to create lobby using port ' .. tostring(localPort))
-    --else
-        --if GUI.chatDisplay then
-            --AddChatText(">> InitLobbyComm : OK !")
-        --end
     end
     
     lobbyComm.ConnectionFailed = function(self, reason)
-        LOG("CONNECTION FAILED ",reason)
+        LOG("CONNECTION FAILED " .. reason)
 
         GUI.connectionFailedDialog = UIUtil.ShowInfoDialog(GUI.panel, LOCF(Strings.ConnectionFailed, Strings[reason] or reason),
                                                            "<LOC _OK>", ReturnToMenu)
@@ -4374,7 +4374,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     end
 
     lobbyComm.Ejected = function(self,reason)
-        LOG("EJECTED ",reason)
+        LOG("EJECTED " .. reason)
 
         GUI.connectionFailedDialog = UIUtil.ShowInfoDialog(GUI, LOCF(Strings.Ejected, Strings[reason] or reason),
                                                            "<LOC _OK>", ReturnToMenu)
