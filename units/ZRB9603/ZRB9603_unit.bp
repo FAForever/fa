@@ -139,7 +139,7 @@ UnitBlueprint {
         BuildCostEnergy = 7429,
         BuildCostMass = 1600,
         BuildRate = 120,
-        BuildTime = 5600,
+        BuildTime = 4000,
 	DifferentialUpgradeCostCalculation = true, 
         RebuildBonusIds = {
             'zrb9603',
