@@ -5,7 +5,7 @@
 #**
 #**  Summary  : Shield lua module
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Å  2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local Entity = import('/lua/sim/Entity.lua').Entity
@@ -199,9 +199,12 @@ Shield = Class(moho.shield_methods,Entity) {
                 #end
             end
         end
-        
-        self:AdjustHealth(instigator, -absorbed) 
-        self:UpdateShieldRatio(-1)
+    
+--Apply damage, but only if the one inflicting that damage is not also the owner of the shield (IceDreamer)
+        if self.Owner != instigator then        
+            self:AdjustHealth(instigator, -absorbed) 
+            self:UpdateShieldRatio(-1)
+        end
 
         #LOG('Shield Health: ' .. self:GetHealth())
         if self.RegenThread then
