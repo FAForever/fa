@@ -759,8 +759,7 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Light Chronotron Cannon',
             FireTargetLayerCapsTable = {
-                Land = 'Land|Water|Seabed',
-                Seabed = 'Land|Water|Seabed',
+                Land = 'Land|Water|Seabed',                        --Removed Seabed fire caps (IceDreamer)
                 Water = 'Land|Water|Seabed',
             },
             FiringTolerance = 2,
