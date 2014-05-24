@@ -205,6 +205,7 @@ UnitBlueprint {
             CannotAttackGround = true,
             CollideFriendly = false,
             Damage = 600,
+            DamageFriendly = false,                    --IceDreamer
             DamageRadius = 1.5,
             DamageType = 'Normal',
             DisplayName = 'Zealot AA Missile',
