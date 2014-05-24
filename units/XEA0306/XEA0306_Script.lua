@@ -78,6 +78,7 @@ XEA0306 = Class(TAirUnit) {
 		for _, U in Units do
 			U:SetCanTakeDamage(false)	
 		end	
+		self:SetCanTakeDamage(false)        
 	end,	
 	
 	OnShieldDisabled = function(self)
@@ -85,6 +86,7 @@ XEA0306 = Class(TAirUnit) {
 		for _, U in Units do
 			U:SetCanTakeDamage(true)	
 		end	
+		self:SetCanTakeDamage(true)        
 	end,
 	
 	OnShieldHpDepleted = function(self)
@@ -92,6 +94,7 @@ XEA0306 = Class(TAirUnit) {
 		for _, U in Units do
 			U:SetCanTakeDamage(true)	
 		end	
+		self:SetCanTakeDamage(true)        
 	end,
 	
 	OnShieldEnergyDepleted = function(self)
@@ -99,6 +102,7 @@ XEA0306 = Class(TAirUnit) {
 		for _, U in Units do
 			U:SetCanTakeDamage(true)	
 		end	
+		self:SetCanTakeDamage(true)        
 	end,	
 	
 	OnTransportAttach = function(self, attachBone, unit)
