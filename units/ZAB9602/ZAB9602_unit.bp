@@ -132,8 +132,8 @@ UnitBlueprint {
         UniformScale = 0.35,
     },
     Economy = {
-        BuildCostEnergy = 26182,
-        BuildCostMass = 1000,
+        BuildCostEnergy = 34153,
+        BuildCostMass = 1510,
         BuildRate = 120,
         BuildTime = 4000,
 	DifferentialUpgradeCostCalculation = true, 
@@ -143,7 +143,7 @@ UnitBlueprint {
             'BUILTBYTIER3FACTORY AEON MOBILE AIR',
             'TRANSPORTBUILTBYTIER3FACTORY AEON MOBILE AIR',
         },
-        StorageEnergy = 1600,
+        StorageEnergy = 0,
         StorageMass = 320,
     },
     Footprint = {
