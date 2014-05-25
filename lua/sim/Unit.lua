@@ -5,7 +5,7 @@
 #**
 #**  Summary  : The Unit lua module
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Å  2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local Entity = import('/lua/sim/Entity.lua').Entity
@@ -4212,6 +4212,16 @@ Unit = Class(moho.unit_methods) {
         self:SetMaintenanceConsumptionInactive()
     end,
 
+--Added these two functions to fix Continental (IceDreamer)
+	OnShieldHpDepleted = function(self)
+        self:PlayUnitSound('ShieldOff')		
+	end,
+	
+	OnShieldEnergyDepleted = function(self)
+        self:PlayUnitSound('ShieldOff')	
+	end,
+--Fix ends
+
     EnableShield = function(self)
         self:SetScriptBit('RULEUTC_ShieldToggle', true)
         if self.MyShield then
@@ -4894,4 +4904,3 @@ Unit = Class(moho.unit_methods) {
 	
 
 }
-
