@@ -756,8 +756,7 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Reacton Cannon',
             FireTargetLayerCapsTable = {
-                Land = 'Land|Water|Seabed',
-                Seabed = 'Land|Water|Seabed',
+                Land = 'Land|Water|Seabed',                --Removed Seabed layer caps (IceDreamer)
                 Water = 'Land|Water|Seabed',
             },
             FiringTolerance = 2,

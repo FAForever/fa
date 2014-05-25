@@ -755,8 +755,7 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Heavy Plasma Cannon',
             FireTargetLayerCapsTable = {
-                Land = 'Land|Water|Seabed',
-                Seabed = 'Land|Water|Seabed',
+                Land = 'Land|Water|Seabed',                    --Seabed fire caps removed (IceDreamer)
                 Water = 'Land|Water|Seabed',
             },
             FiringTolerance = 2,

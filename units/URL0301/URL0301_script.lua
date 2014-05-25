@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Cybran Sub Commander Script
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Å  2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
 local CWeapons = import('/lua/cybranweapons.lua')
@@ -284,14 +284,16 @@ URL0301 = Class(CWalkingLandUnit) {
             if Buff.HasBuff( self, 'CybranSCUBuildRate' ) then
                 Buff.RemoveBuff( self, 'CybranSCUBuildRate' )
             end
+            
+--Fixed damage stacking infinitely and range not being reduced on removal (IceDreamer)
         elseif enh == 'FocusConvertor' then
             local wep = self:GetWeaponByLabel('RightDisintegrator')
-            wep:AddDamageMod(self:GetBlueprint().Enhancements.FocusConvertor.NewDamageMod or 0)
+            wep:AddDamageMod(bp.NewDamageMod or 0)   
             wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
         elseif enh == 'FocusConvertorRemove' then
             local wep = self:GetWeaponByLabel('RightDisintegrator')
-            wep:AddDamageMod(0)
-            wep:ChangeMaxRadius(bp.NewMaxRadius or 25)
+            wep:AddDamageMod(-self:GetBlueprint().Enhancements['FocusConvertor'].NewDamageMod)
+            wep:ChangeMaxRadius(self:GetBlueprint().Weapon[1].MaxRadius or 25)
         elseif enh == 'EMPCharge' then
             local wep = self:GetWeaponByLabel('RightDisintegrator')
             wep:ReEnableBuff('STUN')
