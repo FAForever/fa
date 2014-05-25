@@ -5,7 +5,7 @@
 #**
 #**  Summary  : Shield lua module
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Å  2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local Entity = import('/lua/sim/Entity.lua').Entity
@@ -199,9 +199,12 @@ Shield = Class(moho.shield_methods,Entity) {
                 #end
             end
         end
-        
-        self:AdjustHealth(instigator, -absorbed) 
-        self:UpdateShieldRatio(-1)
+    
+--Apply damage, but only if the one inflicting that damage is not also the owner of the shield (IceDreamer)
+        if self.Owner != instigator then        
+            self:AdjustHealth(instigator, -absorbed) 
+            self:UpdateShieldRatio(-1)
+        end
 
         #LOG('Shield Health: ' .. self:GetHealth())
         if self.RegenThread then
@@ -541,7 +544,7 @@ Shield = Class(moho.shield_methods,Entity) {
     DamageRechargeState = State {
         Main = function(self)
             self:RemoveShield()
-            
+            self.Owner:OnShieldHpDepleted(self)                                    --Continental Fix            
             # We must make the unit charge up before gettings its shield back
             self:ChargingUp(0, self.ShieldRechargeTime)
             
@@ -560,7 +563,7 @@ Shield = Class(moho.shield_methods,Entity) {
     EnergyDrainRechargeState = State {
         Main = function(self)
             self:RemoveShield()
-            
+            self.Owner:OnShieldEnergyDepleted(self)                                --Continental Fix            
             self:ChargingUp(0, self.ShieldEnergyDrainRechargeTime)
             
             # If the unit is attached to a transport, make sure the shield goes to the off state
