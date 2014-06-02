@@ -1426,7 +1426,7 @@ Unit_Description_0314="Orbital Laser Bombardment Satellite. The Satellite is unt
 Unit_Description_0060="Restricts the movement of enemy units and offers substantial protection from low direct fire attacks."
 Unit_Description_0063="Tactical Missile Defence turret."
 Unit_Description_0065="Generates a protective shield around units and structures within its radius. Can be upgraded to Tech 3. Shields transfer residual damage to intersecting bubbles."
-Unit_Description_0067="Strategic Missile Defence Silo."
+Unit_Description_0067="Strategic Missile Defence Silo. Fires at passing Strategic Missiles even if their target is not inside the circle."
 Unit_Description_0068="Generates a heavy shield around units and structures within its radius. Shields transfer residual damage to intersecting bubbles."
 Unit_Description_0071="Refuels and repairs aircraft. Air patrols will automatically use this facility."
 	
@@ -1568,7 +1568,7 @@ Unit_Description_0325="Submerged heavy torpedo turret."
 Unit_Description_0179="Restricts the movement of enemy units and offers substantial protection from low direct fire attacks."
 Unit_Description_0182="Tactical Missile Defence turret."
 Unit_Description_0184="Generates a protective Shield around units and structures within its radius. Can be upgraded four times. Shields transfer residual damage to intersecting bubbles."
-Unit_Description_0186="Strategic Missile Defence Silo."
+Unit_Description_0186="Strategic Missile Defence Silo. Fires at passing Strategic Missiles even if their target is not inside the circle."
 Unit_Description_0189="Refuels and repairs aircraft. Air patrols will automatically use this facility."
 Unit_Description_0306="Upgrade increases shield's size, strength and operating costs."
 
@@ -1707,7 +1707,7 @@ Unit_Description_0334="Rapid-Fire Obliteration Artillery. Fires a splitting clus
 Unit_Description_0258="Restricts the movement of enemy units and offers substantial protection from low direct fire attacks."
 Unit_Description_0261="Tactical Missile Defence turret. Fires flares which confuse any nearby tactical missiles, but suffers poor Rate-Of-Fire."
 Unit_Description_0263="Generates a protective shield around units and structures within its radius. Shields transfer residual damage to intersecting bubbles."
-Unit_Description_0265="Strategic Missile Defence Silo."
+Unit_Description_0265="Strategic Missile Defence Silo. Fires at passing Strategic Missiles even if their target is not inside the circle."
 Unit_Description_0266="Generates a heavy protective shield around units and structures within its radius. Shields transfer residual damage to intersecting bubbles."
 Unit_Description_0269="Refuels and repairs aircraft. Air patrols will automatically use this facility."
 
@@ -1835,7 +1835,7 @@ Unit_Description_0386="Experimental Strategic Missile Launcher. Must be ordered 
 Unit_Description_0372="Restricts the movement of enemy units and offers substantial protection from low direct fire attacks."
 Unit_Description_0375="Tactical Missile Defence turret."
 Unit_Description_0376="Generates a protective shield around units and structures within its radius. Can be upgraded to Tech 3. Shields transfer residual damage to intersecting bubbles."
-Unit_Description_0379="Strategic Missile Defence Silo."
+Unit_Description_0379="Strategic Missile Defence Silo. Fires at passing Strategic Missiles even if their target is not inside the circle."
 Unit_Description_0380="Generates a heavy shield around units and structures within its radius. Shields transfer residual damage to intersecting bubbles."
 Unit_Description_0383="Refuels and repairs aircraft. Air patrols will automatically use this facility."
 	
