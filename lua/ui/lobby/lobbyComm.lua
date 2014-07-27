@@ -6,7 +6,7 @@ maxPlayerSlots = 12
 maxConnections = 16 -- count doesn't include ourself.
 
 Strings = {
-     General info strings
+    # General info strings
     ['Connecting'] = "<LOC lobui_0083>Connecting to Game",
     ['AbortConnect'] = "<LOC lobui_0204>Abort Connect",
     ['TryingToConnect'] = "<LOC lobui_0331>Connecting...",
