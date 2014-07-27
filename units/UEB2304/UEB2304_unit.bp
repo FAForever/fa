@@ -193,6 +193,7 @@ UnitBlueprint {
             CannotAttackGround = true,
             CollideFriendly = false,
             Damage = 200,
+            DamageFriendly = false,                    --IceDreamer
             DamageRadius = 1.5,
             DamageType = 'Normal',
             DisplayName = 'Flayer SAM Launcher',
