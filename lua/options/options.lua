@@ -1039,16 +1039,16 @@ options = {
                 
                 cancel = function()
                     if savedMusicVol then
-                        SetMusicVolume(savedMusicVol)
+                        SetVolume("Music", savedMusicVol)
                     end
                 end,
 
                 set = function(key,value,startup)
-                    SetMusicVolume(value / 100) 
+                    SetVolume("Music", value / 100)
                     savedMusicVol = value/100
                 end,
                 update = function(key,value)
-                    SetMusicVolume(value / 100) 
+                    SetVolume("Music", value / 100)
                 end,
                 custom = {
                     min = 0,
