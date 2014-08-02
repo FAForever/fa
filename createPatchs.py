@@ -18,12 +18,14 @@ def zipdir(path):
         path = path[:-1]
     short = os.path.split(path)[0]
     for root, dirs, files in os.walk(path):
-        for f in files:
+        dirs.sort()
+        for f in sorted(files):
             name = os.path.join(os.path.normcase(root), f)
+            print name
             n = name[len(os.path.commonprefix([name,path])):]
-            paths.append(n)
-            
-             
+            paths.append((n.lower(),name))
+
+
             # zipf.write(name, os.path.join(fname,n))
     return paths
 
@@ -31,24 +33,21 @@ def zipdir(path):
 
 
 for folder in folders:
-	archive_num = 0
-	zsize = 0
+        archive_num = 0
+        zsize = 0
 
-	filename = os.path.join(dest, "%s_%i.%i.nxt" % (folder.lower(), archive_num, patch))
-	
-	zipped = zipfile.ZipFile(filename, "w", zipfile.ZIP_DEFLATED)
-	filelist = zipdir(folder)
-	for n in filelist:
-		if n[0] == "\\": n = n[1:]
-		full_name_path =  os.path.join(folder,n)
-		if zsize > 10485760 : # 10mb
-			zipped.close()
-			archive_num += 1
-			filename = os.path.join(dest, "%s_%i.%i.nxt" % (folder.lower(), archive_num, patch))
-			zipped = zipfile.ZipFile(filename, "w", zipfile.ZIP_DEFLATED)
-			zsize= 0
+        filename = os.path.join(dest, "%s_%i.%i.nxt" % (folder.lower(), archive_num, patch))
 
-		zipped.write(full_name_path, full_name_path.lower())
+        zipped = zipfile.ZipFile(filename, "w", zipfile.ZIP_DEFLATED)
+        filelist = zipdir(folder)
+        for n, path in filelist:
+                print n, path
+#               if zsize > 10485760 : # 10mb
+#                       zipped.close()
+#                       archive_num += 1
+#                       filename = os.path.join(dest, "%s_%i.%i.nxt" % (folder.lower(), archive_num, patch))
+#                       zipped = zipfile.ZipFile(filename, "w", zipfile.ZIP_DEFLATED)
+#                       zsize= 0
+                zipped.write(path, path)
 
-		zsize += zipped.getinfo(full_name_path.lower().replace(os.path.sep, "/")).compress_size #  get compressed size of file
-
+#               zsize += zipped.getinfo(path).compress_size #  get compressed size of file
