@@ -68,7 +68,7 @@ UnitBlueprint {
         },
 		AnimationDeath = {
             {
-                Animation = '/mods/T3MAA/units/DSLK004/DSLK004_death.sca',
+                Animation = '/units/DSLK004/DSLK004_death.sca',
                 AnimationRateMax = 8,
                 AnimationRateMin = 8,
                 Weight = 1,
@@ -311,7 +311,7 @@ UnitBlueprint {
             Turreted = true,
             WeaponCategory = 'Anti Air',
 			WeaponRepackTimeout = 4,
-			WeaponUnpackAnimation = '/mods/T3MAA/units/DSLK004/DSLK004_updummy.sca',
+			WeaponUnpackAnimation = '/units/DSLK004/DSLK004_updummy.sca',
             WeaponUnpackAnimationRate = 3.8,
             WeaponUnpackLocksMotion = false,
             WeaponUnpacks = true,
@@ -391,7 +391,7 @@ UnitBlueprint {
             Turreted = true,
             WeaponCategory = 'Direct Fire',
             WeaponRepackTimeout = 4,
-			WeaponUnpackAnimation = '/mods/T3MAA/units/DSLK004/DSLK004_unpack.sca',
+			WeaponUnpackAnimation = '/units/DSLK004/DSLK004_unpack.sca',
             WeaponUnpackAnimationRate = 3.8,
             WeaponUnpackLocksMotion = false,
             WeaponUnpacks = true,

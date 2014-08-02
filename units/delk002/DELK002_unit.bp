@@ -115,13 +115,13 @@ UnitBlueprint {
         SpawnRandomRotation = false,
 		TransportAnimation = {
             {
-                Animation = '/mods/T3MAA/units/DELK002/DELK002_fold.sca',
+                Animation = '/units/DELK002/DELK002_fold.sca',
                 Weight = 100,
             },
         },
 		TransportDropAnimation = {
             {
-                Animation = '/mods/T3MAA/units/DELK002/DELK002_unfold.sca',
+                Animation = '/units/DELK002/DELK002_unfold.sca',
                 Weight = 100,
             },
         },

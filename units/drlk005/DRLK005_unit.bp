@@ -69,7 +69,7 @@ UnitBlueprint {
     },
     Description = '<LOC drlk005_desc>Crab Egg (Bouncer)',
     Display = {
-        AnimationOpen = '/mods/T3MAA/units/drlk005/drlk005_aopen.sca',
+        AnimationOpen = '/units/drlk005/drlk005_aopen.sca',
         BuildAttachBone = 'AttachPoint',
         Mesh = {
             IconFadeInZoom = 130,

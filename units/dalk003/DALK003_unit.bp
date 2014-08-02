@@ -77,19 +77,19 @@ UnitBlueprint {
         },
         AnimationDeath = {
             {
-                Animation = '/mods/T3MAA/units/DALK003/DALK003_death01.sca',
+                Animation = '/units/DALK003/DALK003_death01.sca',
                 AnimationRateMax = 6,
                 AnimationRateMin = 5,
                 Weight = 1,
             },
 			{
-                Animation = '/mods/T3MAA/units/DALK003/DALK003_death02.sca',
+                Animation = '/units/DALK003/DALK003_death02.sca',
                 AnimationRateMax = 2.5,
                 AnimationRateMin = 1.5,
                 Weight = 1,
             },
         },		
-        AnimationWalk = '/mods/T3MAA/units/DALK003/DALK003_walk.sca',
+        AnimationWalk = '/units/DALK003/DALK003_walk.sca',
         AnimationWalkRate = 6,
         Mesh = {
             IconFadeInZoom = 130,
@@ -122,13 +122,13 @@ UnitBlueprint {
         SpawnRandomRotation = true,
         TransportAnimation = {
             {
-                Animation = '/mods/T3MAA/units/DALK003/DALK003_fold.sca',
+                Animation = '/units/DALK003/DALK003_fold.sca',
                 Weight = 100,
             },
         },
 		TransportDropAnimation = {
             {
-                Animation = '/mods/T3MAA/units/DALK003/DALK003_unfold.sca',
+                Animation = '/units/DALK003/DALK003_unfold.sca',
                 Weight = 100,
             },
         },
@@ -297,7 +297,7 @@ UnitBlueprint {
             Turreted = false,
             WeaponCategory = 'Anti Air',
 			WeaponRepackTimeout = 5,
-            WeaponUnpackAnimation = '/mods/T3MAA/units/DALK003/DALK003_unpack.sca',
+            WeaponUnpackAnimation = '/units/DALK003/DALK003_unpack.sca',
             WeaponUnpackAnimationRate = 4,
             WeaponUnpackLocksMotion = false,
             WeaponUnpacks = true,

@@ -83,13 +83,13 @@ UnitBlueprint {
         },
         AnimationDeath = {
             {
-                Animation = '/mods/T3MAA/units/DRLK001/DRLK001_death01.sca',
+                Animation = '/units/DRLK001/DRLK001_death01.sca',
                 AnimationRateMax = 4,
                 AnimationRateMin = 2.5,
                 Weight = 100,
             },
         },
-        AnimationWalk = '/mods/T3MAA/units/DRLK001/DRLK001_walk.sca',
+        AnimationWalk = '/units/DRLK001/DRLK001_walk.sca',
         AnimationWalkRate = 7,
         AttackReticuleSize = 3,
         Mesh = {
@@ -119,13 +119,13 @@ UnitBlueprint {
         SpawnRandomRotation = true,
         TransportAnimation = {
             {
-                Animation = '/mods/T3MAA/units/DRLK001/DRLK001_fold.sca',
+                Animation = '/units/DRLK001/DRLK001_fold.sca',
                 Weight = 100,
             },
         },
 		TransportDropAnimation = {
             {
-                Animation = '/mods/T3MAA/units/DRLK001/DRLK001_unfold.sca',
+                Animation = '/units/DRLK001/DRLK001_unfold.sca',
                 Weight = 100,
             },
         },
