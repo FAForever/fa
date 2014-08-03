@@ -276,17 +276,8 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     selectButton.Depth:Set(function() return panel.Depth() + 10 end)
     Tooltip.AddButtonTooltip(modButton, "Lobby_Mods")
     modButton.OnClick = function(self, modifiers)
-        modstatus = ModManager.HostModStatus(availableMods)
-        mapList:AbandonKeyboardFocus()
-        ModManager.CreateDialog(
-            panel,
-            true,
-            function(modsSelected)
-                mapList:AcquireKeyboardFocus(true)
-                OnModsChanged(modsSelected)
-            end,
-            true,
-            modstatus)
+        TheAvailableMods = import('/lua/ui/lobby/ModsManager.lua').HostModStatus(availableMods)
+		import('/lua/ui/lobby/ModsManager.lua').NEW_MODS_GUI(panel, true, nil, TheAvailableMods)
     end
 
     local restrictedUnitsButton = UIUtil.CreateButtonStd(modButton, '/scx_menu/small-btn/small', "<LOC sel_map_0006>Unit Manager", 16, 2)
@@ -578,8 +569,8 @@ function RefreshOptions(skipRefresh, singlePlayer)
         if table.getsize(OptionTable.options) > 0 then
             table.insert(Options, {type = 'title', text = OptionTable.title})
             for optionIndex, optionData in OptionTable.options do
-                if not(singlePlayer and optionData.mponly == true) then
-                    table.insert(Options, {type = 'option', text = optionData.label, data = optionData, default = optionData.default})
+				if not(singlePlayer and optionData.mponly == true) then
+					table.insert(Options, {type = 'option', text = optionData.label, data = optionData, default = optionData.default}) -- option1 for teamOptions for exemple
                 end
             end
         end
@@ -614,7 +605,7 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
         local tooltipTable = {}
         Tooltip.AddComboTooltip(combo, tooltipTable, combo._list)
         combo.UpdateValue = function(key)
-            combo:SetItem(combo.keyMap[key])
+			combo:SetItem(combo.keyMap[key])
         end
 
         return combo
@@ -715,49 +706,75 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
                 local itemArray = {}
                 line.combo.keyMap = {}
                 local tooltipTable = {}
+				
+				local defValue = false
+				local realDefValue = false
                 
 				--LOG("XINNONY //////////////////////////////////////////")
 				for index, val in data.data.values do
-					-- val.text = Teleport Disabled
-					-- val.key = 1
-					--LOG('< val.text:'..val.text..' (index:'..index..')')
-					--LOG('< val.key:'..val.key..' (index:'..index..')')
+					--LOG(data.text..' << val.text:'..val.text..' << val.key:'..val.key..' (index:'..index..')')
+					--
 					itemArray[index] = val.text
                     line.combo.keyMap[tostring(val.key)] = index -- = 1 ou 2 ..
                     tooltipTable[index]={text=data.data.label,body=val.help}--= 'lob_'..data.data.key..'_'..val.key
+					--
+					if curOptions[data.data.key] and val.key == curOptions[data.data.key] then -- curOptions = gameInfo.GameOptions
+						--LOG('FIND on curOptions : key='..val.key..', index='..index)
+						defValue = index
+					end
                 end
 				--// Set SelectedOption or Default Option or ... -- Fix AdvancedOption by Xinnony
-				--LOG("XINNONY number of SubOption Values : "..table.getsize(data.data.values))		-- 7 (de 0 a 6)
-				if data.default != nil and data.default <= table.getsize(data.data.values) then
-					--LOG("XINNONY IF name of Option : "..data.data.key)	-- opt_tents
-					--LOG("XINNONY IF default : "..data.default)					-- 0
-					if line.combo.keyMap[curOptions[data.data.key]] != nil then		-- nil (1 pour OmniCheat)
-						--LOG("XINNONY IF changedOptions : "..line.combo.keyMap[curOptions[data.data.key]])
-					else
-						--LOG("XINNONY ELSE changedOptions : RIEN")
-						--LOG("XINNONY ELSE changedOptions : "..tostring(line.combo.keyMap[curOptions[data.data.key]]))
-					end
-					defValue = changedOptions[data.data.key].index or line.combo.keyMap[curOptions[data.data.key]] or data.default or 1
-					if data.default == 0 then
-						--LOG("XINNONY ELSE name of Option : .")--..data.data.key)
-						--LOG("XINNONY ELSE default : 0 to 1")--..data.default)
-						defValue = line.combo.keyMap[curOptions[data.data.key]] or 1
-					end
-				else
-					--LOG("XINNONY ELSE name of Option : .")--..data.data.key)
-					--LOG("XINNONY ELSE default : Not default")--..data.default)
-					defValue = changedOptions[data.data.key].index or line.combo.keyMap[curOptions[data.data.key]] or 1
+				--LOG('Option name : '..data.text)
+				--LOG('Number of SubOption Values : '..table.getsize(data.data.values))
+				--LOG('Default : '..tostring(data.default)..' ('..tostring(data.data.default)..')')
+				--LOG('changedOptions.index : '..tostring(changedOptions[data.data.key].index))
+				--LOG('curOptions : '..tostring(curOptions[data.data.key])) -- = gameInfo.GameOptions
+--------------------------------------------------------------------------------------------------------------------------------
+				if data.default == 0 or data.default > table.getsize(data.data.values) then -- THE MAP OPTIONS IS NOT RESPECTED
+					LOG('THE MAP OPTIONS IS NOT RESPECTED, NEED FIX BY THE AUTHOR OF THIS MAP (default value is Index !)')
 				end
-                --LOG("XINNONY defValue : "..tostring(defValue))
-				line.combo:AddItems(itemArray, defValue)
+				if defValue then -- IF already set and saved (curOptions exist)
+					--LOG('> 1')
+					defValue = defValue
+				elseif changedOptions[data.data.key].index then -- IF already set&clicked in Combo
+					--LOG('> 2')
+					defValue = changedOptions[data.data.key].index
+				else
+					--LOG('> 3')
+					if data.default != nil and data.default <= table.getsize(data.data.values) then
+						--LOG('> 3 > 1')
+						if line.combo.keyMap[curOptions[data.data.key]] != nil then
+							--LOG('> 3 > 1 > 1')
+						else
+							--LOG('> 3 > 1 > 2')
+						end
+						defValue = changedOptions[data.data.key].index or line.combo.keyMap[curOptions[data.data.key]] or data.default or 1
+						if data.default == 0 then -- THE MAP OPTIONS IS NOT RESPECTED
+							--LOG('> 3 > 1 > 3')
+							--LOG("default : 0 (set to 1 because is index)")
+							defValue = line.combo.keyMap[curOptions[data.data.key]] or 1
+						end
+					else
+						--LOG('> 4 > Not have a default value (set to the first Item)')
+						defValue = changedOptions[data.data.key].index or line.combo.keyMap[curOptions[data.data.key]] or 1
+					end
+					--LOG("FINALY, defValue = "..tostring(defValue))
+					--LOG("XINNONY \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\")
+				end
+				--
+				--if data.type == 'option1' or data.type == 'option2' or data.type == 'option3' then -- For enable label (default) just or global/team/ai options
+				if data.data.default then realDefValue = data.data.default end
+				line.combo:AddItems(itemArray, defValue, realDefValue) -- For all (true for enable (default) label)
                 line.combo.OnClick = function(self, index, text)
+					--LOG('>> OnClick > '..index..' > '..text)
                     changedOptions[data.data.key] = {value = data.data.values[index].key, pref = data.data.pref, index = index}
+					--LOG('>> changedOptions > '..changedOptions[data.data.key].value..' > '..changedOptions[data.data.key].pref..' > '..changedOptions[data.data.key].index)
                 end
                 line.HandleEvent = Group.HandleEvent
                 Tooltip.AddControlTooltip(line, {text=data.data.label,body=data.data.help})--(line, data.data.pref)
                 Tooltip.AddComboTooltip(line.combo, tooltipTable, line.combo._list)
                 line.combo.UpdateValue = function(key)
-                    line.combo:SetItem(line.combo.keyMap[key])
+					line.combo:SetItem(line.combo.keyMap[key])
                 end
             end
         end
