@@ -10,37 +10,37 @@ type = {
 
 restrictedUnits = {
     ENGISTATION = {
-		categories = {"xeb0104", "xrb0104"},
+        categories = {"xeb0104", "xrb0104"},
         name = "No Engineering Station",
         tooltip = {text='No Engineering Station', body='Remove Kennel and Hive (by Xinnony)'},
-		--"No Kennel and Hive (Engineering Station) by Xinnony",
-	},
-	SALVAMAVOSCATH = {
-		categories = {"xab2307", "ueb2401", "url0401"},
+        --"No Kennel and Hive (Engineering Station) by Xinnony",
+    },
+    SALVAMAVOSCATH = {
+        categories = {"xab2307", "ueb2401", "url0401"},
         name = "No Rapid-Fire and T4 Artillery",
         tooltip = {text='No Rapid-Fire and T4 Artillery', body='Remove Salvation, Mavor and Scathis (by Xinnony)'},
-	},
-	PARAGON = {
-		categories = {"xab1401"},
+    },
+    PARAGON = {
+        categories = {"xab1401"},
         name = "No Infinite Resource Generator",
         tooltip = {text='No Infinite Resource Generator', body='Remove Paragon (by Xinnony)'},
-	},
-	SATELLITE = {
-		categories = {"xeb2402"},
+    },
+    SATELLITE = {
+        categories = {"xeb2402"},
         name = "No Satellite",
         tooltip = {text='No Satellite', body='Remove Satellite UEF (by Xinnony)'},
-	},
-	TELE = {
-		enhancement = {"Teleporter", "TeleporterRemove"},
+    },
+    TELE = {
+        enhancement = {"Teleporter", "TeleporterRemove"},
         name = "No Teleport (FIXED)",
-		tooltip = {text='No Teleport', body='Remove Teleport Upgrade on the UEF Commander (by Xinnony)'},
-	},
-	BILLY = {
-		enhancement = {"TacticalNukeMissile", "TacticalNukeMissileRemove"},
+        tooltip = {text='No Teleport', body='Remove Teleport Upgrade on the UEF Commander (by Xinnony)'},
+    },
+    BILLY = {
+        enhancement = {"TacticalNukeMissile", "TacticalNukeMissileRemove"},
         name = "No Billy (FIXED)",
-		tooltip = {text='No Billy', body='Remove Billy (Nuke) Upgrade on the UEF Commander (by Xinnony)'},
-	},
-	T1 = {
+        tooltip = {text='No Billy', body='Remove Billy (Nuke) Upgrade on the UEF Commander (by Xinnony)'},
+    },
+    T1 = {
         categories = {"TECH1"},
         name = "<LOC restricted_units_data_0000>No Tech 1",
         tooltip = "restricted_uints_T1",
@@ -101,7 +101,7 @@ restrictedUnits = {
         tooltip = "restricted_uints_nukes",
     },
     GAMEENDERS = {
-								---ArtyAEO---ArtyUEF---ArtyCYB---ArtySER---Paragon---Salvation---Scathis---Satellite---Mavor---Yolona Oss
+                                ---ArtyAEO---ArtyUEF---ArtyCYB---ArtySER---Paragon---Salvation---Scathis---Satellite---Mavor---Yolona Oss
         categories = {"uab2302", "urb2302", "ueb2302", "xsb2302", "xab1401", "xab2307", "url0401", "xeb2402", "ueb2401", "xsb2401"},
         name = "<LOC restricted_units_data_0012>No Game Enders",
         tooltip = "restricted_uints_gameenders",
@@ -146,11 +146,17 @@ restrictedUnits = {
         name = "<LOC restricted_units_data_0020>No Support Factories",
         tooltip = "restricted_units_supportfactory",
     },
+    T3MOBILEAA = {
+        categories = {"dalk003","delk002", "drlk001", "drlk005", "dslk004",},
+        name = "<LOC restricted_units_data_0021>No T3 Mobile Anti-Air",
+        tooltip = "restricted_units_t3mobileaa",
+    },    
 }
 
 sortOrder = {
     "GAMEENDERS",
     "NUKE",
+    "T3MOBILEAA",
     "PRODSC1",
     "PRODFA",
     "PRODDL",
@@ -170,10 +176,10 @@ sortOrder = {
     "SUPCOM",
     "FABS",
     "SUPPFAC",
-	"TELE",
-	"BILLY",
-	"ENGISTATION",
-	"SALVAMAVOSCATH",
-	"PARAGON",
-	"SATELLITE",
+    "TELE",
+    "BILLY",
+    "ENGISTATION",
+    "SALVAMAVOSCATH",
+    "PARAGON",
+    "SATELLITE",
 }
