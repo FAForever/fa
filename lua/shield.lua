@@ -256,7 +256,7 @@ Shield = Class(moho.shield_methods,Entity) {
         if not self.SpillOverDmgDB then
             self.SpillOverDmgDB = {}
         end
-        if instigator and IsUnit(instigator) then
+        if instigator and not instigator:BeenDestroyed() and IsUnit(instigator) then
             self:SpillOverDmgDBcleanUp()
             local entry = { amount = amount, instigator = instigator:GetEntityId(), tick = GetGameTick() }
             table.insert( self.SpillOverDmgDB, entry )
