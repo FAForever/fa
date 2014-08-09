@@ -585,7 +585,7 @@ function DisconnectFromPeer(uid)
     if wasConnected(uid) then 
         table.remove(connectedTo, uid)         
     end
-    GpgNetSend('Disonnected', string.format("%d", uid))
+    GpgNetSend('Disconnected', string.format("%d", uid))
     lobbyComm:DisconnectFromPeer(uid)
 end
 
@@ -1578,7 +1578,7 @@ local function UpdateGame()
             TEST4factionPanel:Enable()
             TEST5factionPanel:Enable()
 			Disable_Faction_Selector(false, gameInfo.PlayerOptions[playerSlot].Faction)
-			if lobbyComm:IsHost() then
+			if lobbyComm:IsHost() and GUI.restrictedUnitsButton then
 				GUI.restrictedUnitsButton:Enable()
 			end
         end
