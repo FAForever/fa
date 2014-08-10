@@ -111,7 +111,7 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
         'CANNOTUSEAIRSTAGING',
     },
-    CollisionOffsetY = 1.75,
+    CollisionOffsetY = 0.9, #1.75 -- temporary fix so that the Sera T3 mobile AA can hit the Soul Ripper
     Defense = {
         AirThreatLevel = 50,
         ArmorType = 'Light',
