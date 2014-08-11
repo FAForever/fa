@@ -85,7 +85,6 @@ function DoOverspill(source, instigator, amount, dmgType, dmgMod)
                     local direction = Util.GetDirectionVector(source.Owner:GetCachePosition(), v.Owner:GetCachePosition())
                     v:ApplyDamage(source, (amount * dmgMod), direction, dmgType, false)
                     RegisterDamage(targetId, instigatorId, amount)
-                    CreateEmitterAtEntity(v.Owner, source.Owner:GetArmy(), '/effects/Emitters/generic_teleportin_04_emit.bp')
                 end
             end
             CleanupDamageTable()
