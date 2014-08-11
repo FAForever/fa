@@ -10,16 +10,18 @@
 
 local ASeaUnit = import('/lua/aeonunits.lua').ASeaUnit
 local AeonWeapons = import('/lua/aeonweapons.lua')
-local ADFCannonOblivionWeapon = AeonWeapons.ADFCannonOblivionWeapon
 local AANDepthChargeBombWeapon = AeonWeapons.AANDepthChargeBombWeapon
 local AANChronoTorpedoWeapon = AeonWeapons.AANChronoTorpedoWeapon
 local AIFQuasarAntiTorpedoWeapon = AeonWeapons.AIFQuasarAntiTorpedoWeapon
+
+--Custom files
+local NavalCannonOblivionWeapon = import('/lua/aeon_naval_weapons.lua').ADFCannonOblivionNaval
 
 
 UAS0201 = Class(ASeaUnit) {
     BackWakeEffect = {},
     Weapons = {
-        FrontTurret = Class(ADFCannonOblivionWeapon) {},
+        FrontTurret = Class(NavalCannonOblivionWeapon) {},
         DepthCharge = Class(AANDepthChargeBombWeapon) {},
         Torpedo1 = Class(AANChronoTorpedoWeapon) {},
         Torpedo2 = Class(AANChronoTorpedoWeapon) {},

@@ -209,7 +209,7 @@ function SetSelectedMods(s)
     if s then
         LOG("MOD LIST SET TO:")
         for uid,v in s do
-            LOG("\t" .. _mod_cache[uid].name .. "\t(" .. uid .. ")")
+            LOG("\t" .. tostring(_mod_cache[uid].name) .. "\t(" .. uid .. ")")
         end
 
         SetPreference('active_mods', s)
@@ -219,6 +219,20 @@ end
 
 function GetSelectedMods()
     return GetPreference('active_mods') or {}
+end
+
+function GetUnSelectedMods()
+    local selectMod = GetSelectedMods()
+	local allMod = AllMods()
+	local tableUnselectMod = {}
+	for k, v in allMod do
+		if not selectMod[v.uid] then
+			--LOG('>>> '..v.name..' - '..v.uid)
+			tableUnselectMod[v.uid] = true
+			--table.insert(tableUnselectMod, v.uid)
+		end
+	end
+	return tableUnselectMod, true
 end
 
 
@@ -322,8 +336,8 @@ local function GetActiveModsFiltered(filter, selected)
     return r
 end
 
-function GetUiMods()
-    return GetActiveModsFiltered(function(m) return m.ui_only end)
+function GetUiMods(selected)
+    return GetActiveModsFiltered(function(m) return m.ui_only end, selected)
 end
 
 function GetGameMods(selected)
