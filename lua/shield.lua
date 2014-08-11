@@ -5,10 +5,11 @@
 --**
 --**  Summary  : Shield lua module
 --**
---**  Copyright Ã…  2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local Entity = import('/lua/sim/Entity.lua').Entity
+local Overspill = import('/lua/overspill.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local Util = import('utilities.lua')
 
@@ -37,7 +38,7 @@ Shield = Class(moho.shield_methods,Entity) {
         self:SetMaxHealth(spec.ShieldMaxHealth)
         self:SetHealth(self,spec.ShieldMaxHealth)
         self:SetType('Bubble')
-        self:SetSpillOverParams(spec.SpillOverDamageMod or 0.15, spec.DamageThresholdToSpillOver or 0)
+        self:SetSpillOverDmgMod(spec.SpillOverDamageMod or 0.15)
 
         -- Show our 'lifebar'
         self:UpdateShieldRatio(1.0)
@@ -87,9 +88,8 @@ Shield = Class(moho.shield_methods,Entity) {
         self.ShieldType = type
     end,
 
-    SetSpillOverParams = function(self, dmgMod, threshold)
+    SetSpillOverDmgMod = function(self, dmgMod)
         self.SpillOverDmgMod = math.max(dmgMod, 0)
-        self.DmgThresholdToSpillOver = math.max(threshold, 0)
     end,
 
     UpdateShieldRatio = function(self, value)        
@@ -153,60 +153,25 @@ Shield = Class(moho.shield_methods,Entity) {
         return finalVal
     end,    
 
-    GetAdjacentShields = function(self)
-        local adjacentShields = {}
-        -- The idea is to find all units within X units away from us. We can't use our shield radius for X because some units could have
-        -- bigger shields than us and we would not find them. Instead, use the size of the biggest shield as value for X. The biggest
-        -- shield in the game is the UEF shield boat. This value must be adapted if there is a bigger one
-        local brain = self.Owner:GetAIBrain()
-        local BiggestShieldSize = 120
-        local units = brain:GetUnitsAroundPoint( (categories.SHIELD * categories.DEFENSE) + categories.BUBBLESHIELDSPILLOVERCHECK, self.Owner:GetPosition(), BiggestShieldSize, 'Ally' )
-        local pos = self:GetCachePosition()
-        local OverlapRadius = 0.98 * (self.Size / 2)  -- size is diameter, dividing by 2 to get radius
-        local obp, oOverlapRadius, vpos, OverlapDist
-
-        for k, v in units do
-            if v and IsUnit(v) and not v:IsDead() and v.MyShield and v.MyShield:IsUp() and v.MyShield.Size and v.MyShield.Size > 0 and self.Owner != v then
-                vspos = v.MyShield:GetCachePosition()
-                oOverlapRadius = 0.98 * (v.MyShield.Size / 2)  -- size is diameter, dividing by 2 to get radius
-                -- If "self" and "v" are more than this far apart then the shields don't overlap, otherwise they do
-                OverlapDist = OverlapRadius + oOverlapRadius
-                if VDist3(pos, vspos) <= OverlapDist then
-                    table.insert(adjacentShields, v.MyShield)
-                end
-            end
-        end
-        return adjacentShields
-    end,
-
     OnDamage = function(self, instigator, amount, vector, dmgType)
-        local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
-
-        if self.PassOverkillDamage then
-            local overkill = self:GetOverkill(instigator,amount,dmgType)    
-            if self.Owner and IsUnit(self.Owner) and overkill > 0 then
-                self.Owner:DoTakeDamage(instigator, overkill, vector, dmgType)
-            end
-        end
-
-        --Determine whether or not to do spillover damage methods
-        if dmgType != 'ShieldSpillOver' and self.Size and self.Size > 0 and self:IsUp() and absorbed >= self.DmgThresholdToSpillOver then
-            local adjacentShields = self:GetAdjacentShields()
-            --Register the original hit
-            self:SpillOverDmgDBRegister(instigator, amount)
-            for k, v in adjacentShields do
-                if v:IsUp() then
-                    v:OnAdjacentBubbleShieldDamageSpillOver(instigator, self.Owner, amount, absorbed)
-                end
-            end
-        end
-        self:ApplyDamage(instigator, absorbed, vector)
+        self:ApplyDamage(instigator, amount, vector, dmgType, true)
     end,
 
-    ApplyDamage = function(self, instigator, amount, vector)
+    ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
         if self.Owner != instigator then
-            self:AdjustHealth(instigator, -amount)
+
+            local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
+
+            if self.PassOverkillDamage then
+                local overkill = self:GetOverkill(instigator,amount,dmgType)    
+                if self.Owner and IsUnit(self.Owner) and overkill > 0 then
+                    self.Owner:DoTakeDamage(instigator, overkill, vector, dmgType)
+                end
+            end
+
+            self:AdjustHealth(instigator, -absorbed)
             self:UpdateShieldRatio(-1)
+            ForkThread(self.CreateImpactEffect, self, vector)
             if self.RegenThread then
                 KillThread(self.RegenThread)
                 self.RegenThread = nil
@@ -214,7 +179,6 @@ Shield = Class(moho.shield_methods,Entity) {
             if self:GetHealth() <= 0 then
                 ChangeState(self, self.DamageRechargeState)
             elseif self.OffHealth < 0 then
-                ForkThread(self.CreateImpactEffect, self, vector)
                 if self.RegenRate > 0 then
                     self.RegenThread = ForkThread(self.RegenStartThread, self)
                     self.Owner.Trash:Add(self.RegenThread)
@@ -223,82 +187,10 @@ Shield = Class(moho.shield_methods,Entity) {
                 self:UpdateShieldRatio(0)
             end		
         end	
-    end,
-
-    --Start shield spillover methods
-
-    --Create a new thread for each intersecting shield
-    OnAdjacentBubbleShieldDamageSpillOver = function(self, instigator, spillingUnit, dmg, absorbed)
-        --Check that this shield has not already registered this damage, and is set to have damage spilled over
-        if self:SpillOverDmgDBFind(instigator, dmg) == false and self.SpillOverDmgMod > 0 then
-            local thread = ForkThread(self.AdjacentBubbleShieldDamageSpillOverThread, self, instigator, spillingUnit, dmg, absorbed)
-            self.Owner.Trash:Add(thread)
+        if doOverspill then
+            Overspill.DoOverspill(self, instigator, amount, dmgType, self.SpillOverDmgMod)
         end
     end,
-
-    --Search for previous damage by the same event
-    SpillOverDmgDBFind = function(self, instigator, amount)
-        if self.SpillOverDmgDB and instigator and not instigator:BeenDestroyed() then
-            local tick = GetGameTick() - 2                                               
-            local entId = instigator:GetEntityId()
-            for k, v in self.SpillOverDmgDB do
-                local absAmount = math.abs(v.amount - amount)
-                if v.tick >= tick and absAmount < 0.1 and v.instigator == entId then
-                    return k
-                end
-            end
-        end
-        return false
-    end,	
-
-    --Register damage instances in a private table
-    SpillOverDmgDBRegister = function(self, instigator, amount)
-        if not self.SpillOverDmgDB then
-            self.SpillOverDmgDB = {}
-        end
-        if instigator and not instigator:BeenDestroyed() and IsUnit(instigator) then
-            self:SpillOverDmgDBcleanUp()
-            local entry = { amount = amount, instigator = instigator:GetEntityId(), tick = GetGameTick() }
-            table.insert( self.SpillOverDmgDB, entry )
-        end
-    end, 
-
-    AdjacentBubbleShieldDamageSpillOverThread = function(self, instigator, spillingUnit, dmg, absorbed)
-        WaitTicks(1)                                                                     
-        if self and self.Owner and not self.Owner:IsDead() and self:IsUp() and self:SpillOverDmgDBFind(instigator, dmg) == false then
-            --Create appropriate vectors needed by the code
-            local vect = Vector(0,0,0)
-            if instigator and instigator.GetPosition then
-                vect = Util.GetDirectionVector( instigator:GetPosition(), self:GetCachePosition() )
-            elseif spillingUnit and spillingUnit.GetPosition then
-                vect = Util.GetDirectionVector( spillingUnit:GetPosition(), self:GetCachePosition() )
-            end
-            self:ApplyDamage(instigator, (absorbed * self.SpillOverDmgMod), vect)
-            self:SpillOverDmgDBRegister(instigator, absorbed)
-        end
-    end,
-
-    --Damage registration table cleanups
-    SpillOverDmgDBcleanUp = function(self)
-        if self.SpillOverDmgDB then
-            local delete = {}
-            local tick = GetGameTick() - 2                                               
-            for k, v in self.SpillOverDmgDB do
-                if v.tick < tick then
-                    table.insert(delete, k)
-                end
-            end
-            for k, v in delete do
-                self:SpillOverDmgDBUnregister(v)
-            end
-        end
-    end,
-
-    SpillOverDmgDBUnregister = function(self, key)
-        if not self.SpillOverDmgDB then return end
-        table.remove( self.SpillOverDmgDB, key )
-    end,
-    --End shield spillover methods
 
     RegenStartThread = function(self)
         WaitSeconds(self.RegenStartTime)
