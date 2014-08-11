@@ -974,7 +974,7 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 0,			#2
+            FiringTolerance = 0.25,
             HeadingArcCenter = 0,
             HeadingArcRange = 180,
             Label = 'MLG',
@@ -982,6 +982,7 @@ UnitBlueprint {
             MuzzleChargeDelay = 0,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
+            PrefersPrimaryWeaponTarget = true,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
@@ -1016,10 +1017,10 @@ UnitBlueprint {
             TurretDualManipulators = false,
             TurretPitch = 0,
             TurretPitchRange = 80,
-            TurretPitchSpeed = 20,
+            TurretPitchSpeed = 90,
             TurretYaw = 0,
-            TurretYawRange = 360,
-            TurretYawSpeed = 30,
+            TurretYawRange = 5,
+            TurretYawSpeed = 90,
             Turreted = true,
             UseFiringSolutionInsteadOfAimBone = true,
             WeaponCategory = 'Direct Fire Experimental',

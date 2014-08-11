@@ -65,12 +65,15 @@ local PrefLanguageTooltipTitle={}
 local PrefLanguageTooltipText={}
 --\\ Stop - Table of Tooltip Country
 --// Get a value on /Country CommandLine in FA.exe - Xinnony
-local PrefLanguage = GetCommandLineArg("/country", 1) or "world"
-PrefLanguage = tostring(string.lower(PrefLanguage[1]))
-if PrefLanguage == '' or PrefLanguage == '/init' or PrefLanguage == nil then
+local PrefLanguage = GetCommandLineArg("/country", 1)
+if PrefLanguage == '' or PrefLanguage == '/init' or PrefLanguage == nil or PrefLanguage == false then
 	LOG('COUNTRY - Country has not been found')
 	PrefLanguage = "world"
+else
+    PrefLanguage = tostring(string.lower(PrefLanguage[1]))
 end
+
+
 --\\ Stop - Get a value on /Country CommandLine in FA.exe
 
 local LASTXinnoBackground = '' -- For prevent the infinite loop to Background
@@ -581,7 +584,7 @@ function DisconnectFromPeer(uid)
     if wasConnected(uid) then 
         table.remove(connectedTo, uid)         
     end
-    GpgNetSend('Disonnected', string.format("%d", uid))
+    GpgNetSend('Disconnected', string.format("%d", uid))
     lobbyComm:DisconnectFromPeer(uid)
 end
 
@@ -1574,7 +1577,7 @@ local function UpdateGame()
             TEST4factionPanel:Enable()
             TEST5factionPanel:Enable()
 			Disable_Faction_Selector(false, gameInfo.PlayerOptions[playerSlot].Faction)
-			if lobbyComm:IsHost() then
+			if lobbyComm:IsHost() and GUI.restrictedUnitsButton then
 				GUI.restrictedUnitsButton:Enable()
 			end
         end

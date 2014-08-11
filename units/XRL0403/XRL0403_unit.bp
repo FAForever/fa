@@ -510,7 +510,7 @@ UnitBlueprint {
             },
             FiringTolerance = 2,
             Label = 'Torpedo01',
-            MaxRadius = 45,
+            MaxRadius = 64,# 45 -- Fix for Megalith not attacking a naval target because it stays in range of primary weapon
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 5,
