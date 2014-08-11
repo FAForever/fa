@@ -74,6 +74,8 @@ XEA0306 = Class(TAirUnit) {
 	
 --Begin Shielding fix
 	OnShieldEnabled = function(self)
+		self:PlayUnitSound('ShieldOn')	
+        self:SetMaintenanceConsumptionActive()		
 		local Units = self:GetCargo()						
 		for _, U in Units do
 			U:SetCanTakeDamage(false)	
@@ -82,6 +84,8 @@ XEA0306 = Class(TAirUnit) {
 	end,	
 	
 	OnShieldDisabled = function(self)
+        self:PlayUnitSound('ShieldOff')	
+        self:SetMaintenanceConsumptionInactive()		
 		local Units = self:GetCargo()						
 		for _, U in Units do
 			U:SetCanTakeDamage(true)	
@@ -90,6 +94,7 @@ XEA0306 = Class(TAirUnit) {
 	end,
 	
 	OnShieldHpDepleted = function(self)
+        self:PlayUnitSound('ShieldOff')	
 		local Units = self:GetCargo()						
 		for _, U in Units do
 			U:SetCanTakeDamage(true)	
@@ -98,6 +103,7 @@ XEA0306 = Class(TAirUnit) {
 	end,
 	
 	OnShieldEnergyDepleted = function(self)
+        self:PlayUnitSound('ShieldOff')	
 		local Units = self:GetCargo()						
 		for _, U in Units do
 			U:SetCanTakeDamage(true)	
