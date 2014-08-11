@@ -226,6 +226,7 @@ UnitBlueprint {
             'xrl0003',
             'xrl0004',
             'xrl0005',
+            'drlk005',
         },
         MaxBuildDistance = 1,
     },
