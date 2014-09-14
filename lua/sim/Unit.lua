@@ -1270,7 +1270,10 @@ Unit = Class(moho.unit_methods) {
         if self.CanTakeDamage then
             self:DoOnDamagedCallbacks(instigator)
 
-            if self:GetShieldType() != 'Personal' or not self:ShieldIsUp() then    -- let personal shields handle the damage
+			--Pass damage to an active personal shield, as personal shields no longer have collisions
+            if self:GetShieldType() == 'Personal' and self:ShieldIsOn() then
+                self.MyShield:ApplyDamage(instigator, amount, vector, damageType)
+            else
                 self:DoTakeDamage(instigator, amount, vector, damageType)
             end
         end
@@ -4142,13 +4145,7 @@ Unit = Class(moho.unit_methods) {
             if bpShield.OwnerShieldMesh then
                 self.MyShield = UnitShield {
                     Owner = self,
-					ImpactEffects = bpShield.ImpactEffects or '',                     
-                    CollisionSizeX = bp.SizeX * 0.75 or 1,
-                    CollisionSizeY = bp.SizeY * 0.75 or 1,
-                    CollisionSizeZ = bp.SizeZ * 0.75 or 1,
-                    CollisionCenterX = bp.CollisionOffsetX or 0,
-                    CollisionCenterY = bp.CollisionOffsetY or 0,
-                    CollisionCenterZ = bp.CollisionOffsetZ or 0,
+                    ImpactEffects = bpShield.ImpactEffects or '',
                     OwnerShieldMesh = bpShield.OwnerShieldMesh,
                     ShieldMaxHealth = bpShield.ShieldMaxHealth or 250,
                     ShieldRechargeTime = bpShield.ShieldRechargeTime or 10,
@@ -4244,14 +4241,6 @@ Unit = Class(moho.unit_methods) {
     ShieldIsOn = function(self)
         if self.MyShield then
             return self.MyShield:IsOn()
-        else
-            return false
-        end
-    end,
-
-    ShieldIsUp = function(self)
-        if self.MyShield then
-            return (self.MyShield:IsOn() and self.MyShield:IsUp())
         else
             return false
         end
@@ -4819,7 +4808,7 @@ Unit = Class(moho.unit_methods) {
 	
 	
 	
-	    ##########################################################################################
+	##########################################################################################
     #-- SHIELDS
     ##########################################################################################
 
