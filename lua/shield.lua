@@ -350,8 +350,17 @@ Shield = Class(moho.shield_methods,Entity) {
 
             self:UpdateShieldRatio(-1)
 
-            self.Owner:OnShieldEnabled()
-            self:CreateShieldMesh()
+			--Switch the order of these around to make many things possible
+            self:CreateShieldMesh()			
+			self.Owner:OnShieldEnabled() --Now an empty function needed only for Harbinger
+			--OnShieldEnabled() is part of several functions which play a sound and manipulate the energy drain.
+			--They are only called from shield.lua, so I can replace them here.
+			self.Owner:PlayUnitSound('ShieldOn')
+			self.Owner:SetMaintenanceConsumptionActive()
+			
+			--Then we can make any units inside a transport with a Shield invulnerable here
+			self:ProtectTransportedUnits()
+			self.Owner:IsTransportProtected(true)			
 
             local aiBrain = self.Owner:GetAIBrain()
 
@@ -403,11 +412,17 @@ Shield = Class(moho.shield_methods,Entity) {
             -- Set the offhealth - this is used basically to let the unit know the unit was manually turned off
             self.OffHealth = self:GetHealth()
 
-            -- Get rid of teh shield bar
+            -- Get rid of the shield bar
             self:UpdateShieldRatio(0)
 
             self:RemoveShield()
-            self.Owner:OnShieldDisabled()
+            self.Owner:OnShieldDisabled() --Now an empty function needed only for Harbinger
+			self.Owner:PlayUnitSound('ShieldOff')
+			self.Owner:SetMaintenanceConsumptionInactive()
+			
+			--Apply vulnerabilities
+			self:RevokeTransportProtection()
+			self.Owner:IsTransportProtected(false)			
 
             WaitSeconds(1)            
         end,
@@ -421,7 +436,13 @@ Shield = Class(moho.shield_methods,Entity) {
     DamageRechargeState = State {
         Main = function(self)
             self:RemoveShield()
-            self.Owner:OnShieldHpDepleted(self)                                    --Continental Fix            
+            self.Owner:OnShieldHpDepleted(self) --Now an empty function needed only for Harbinger  
+			self.Owner:PlayUnitSound('ShieldOff')
+			
+			--Apply vulnerabilities
+			self:RevokeTransportProtection()
+			self.Owner:IsTransportProtected(false)
+			
             # We must make the unit charge up before gettings its shield back
             self:ChargingUp(0, self.ShieldRechargeTime)
 
@@ -440,7 +461,12 @@ Shield = Class(moho.shield_methods,Entity) {
     EnergyDrainRechargeState = State {
         Main = function(self)
             self:RemoveShield()
-            self.Owner:OnShieldEnergyDepleted(self)                                --Continental Fix            
+            self.Owner:OnShieldEnergyDepleted(self) --Now an empty function needed only for Harbinger 
+			self.Owner:PlayUnitSound('ShieldOff')
+			--Apply vulnerabilities
+			self:RevokeTransportProtection()
+			self.Owner:IsTransportProtected(false)
+			
             self:ChargingUp(0, self.ShieldEnergyDrainRechargeTime)
 
             -- If the unit is attached to a transport, make sure the shield goes to the off state
@@ -457,6 +483,27 @@ Shield = Class(moho.shield_methods,Entity) {
         end,
     },
 
+	--These two functions cause transports with shields to properly protect their cargo
+	ProtectTransportedUnits = function(self)
+		if EntityCategoryContains(categories.TRANSPORTATION, self.Owner) then
+			self.Owner:SetCanTakeDamage(false)		
+			local Cargo = self.Owner:GetCargo()
+			for _, v in Cargo do
+				v:SetCanTakeDamage(false)
+			end	
+		end
+	end,
+	
+	RevokeTransportProtection = function(self)
+		if EntityCategoryContains(categories.TRANSPORTATION, self.Owner) then	
+			self.Owner:SetCanTakeDamage(true)		
+			local Cargo = self.Owner:GetCargo()
+			for _, v in Cargo do
+				v:SetCanTakeDamage(true)
+			end
+		end
+	end,	
+	
     DeadState = State {
         Main = function(self)
         end,
@@ -525,7 +572,8 @@ UnitShield = Class(Shield){
     end,
 
     CreateShieldMesh = function(self)
-        self:SetCollisionShape( 'Box', self.CollisionCenterX, self.CollisionCenterY, self.CollisionCenterZ, self.CollisionSizeX, self.CollisionSizeY, self.CollisionSizeZ)
+		--Remove the shield collision entirely to allow everything to go through unit.lua
+		self:SetCollisionShape('None')	
         self.Owner:SetMesh(self.OwnerShieldMesh,true)
     end,
 
