@@ -76,6 +76,7 @@ Unit = Class(moho.unit_methods) {
     DestructionPartsLowToss = {},
     DestructionPartsChassisToss = {},
     EconomyProductionInitiallyActive = true,
+	damageProtected = false,	--For protecting Shielded Transports
 
     GetSync = function(self)
         if not Sync.UnitData[self:GetEntityId()] then
@@ -1272,10 +1273,15 @@ Unit = Class(moho.unit_methods) {
         if self.CanTakeDamage then
             self:DoOnDamagedCallbacks(instigator)
 
-            if self:GetShieldType() != 'Personal' or not self:ShieldIsUp() then    -- let personal shields handle the damage
-                self:DoTakeDamage(instigator, amount, vector, damageType)
+			--Pass damage to an active personal shield, as personal shields no longer have collisions
+            if self:GetShieldType() == 'Personal' and self:ShieldIsOn() then
+                self.MyShield:ApplyDamage(instigator, amount, vector, damageType)
+            elseif EntityCategoryContains(categories.NUKE, instigator) and transportProtected == true then
+				self.MyShield:RevokeTransportProtection()
+				self:DoTakeDamage(instigator, amount, vector, damageType)			
+			else
+				self:DoTakeDamage(instigator, amount, vector, damageType)
             end
-        end
     end,
 
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
@@ -2182,11 +2188,8 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
-
         local bp = self:GetBlueprint()
-
         self:SetupIntel()
-
         self:ForkThread( self.StopBeingBuiltEffects, builder, layer )
 
         if ( self:GetCurrentLayer() == 'Water' ) then
@@ -2203,9 +2206,7 @@ Unit = Class(moho.unit_methods) {
         if bp.Defense.LifeTime then
             self:ForkThread(self.LifeTimeThread)
         end
-
         self:PlayUnitSound('DoneBeingBuilt')
-
         self:PlayUnitAmbientSound( 'ActiveLoop' )
 
         if self.DisallowCollisions and builder then
@@ -2263,6 +2264,12 @@ Unit = Class(moho.unit_methods) {
         if bp.EnhancementPresetAssigned then
             self:ForkThread(self.CreatePresetEnhancementsThread)
         end
+		
+		--Certain units must be raised on completion for their target bones to work
+		if bp.RaiseDistance then
+			local Position = self:GetPosition()
+			self:SetPosition({Position[1], Position[2] + bp.RaiseDistance, Position[3]}, true)		
+		end			
     end,
 
     StartBeingBuiltEffects = function(self, builder, layer)
@@ -4198,29 +4205,19 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+	--The following four functions are being emptied. They have been replaced by code in Shield.lua
+	--They remain here to enable the Harbinger's unique shield to work properly
     OnShieldEnabled = function(self)
-        #self:PlayUnitSound('Activate')
-        self:PlayUnitSound('ShieldOn')
-        -- Make the shield drain energy
-        self:SetMaintenanceConsumptionActive()
     end,
 
     OnShieldDisabled = function(self)
-        #self:PlayUnitSound('Deactivate')
-        self:PlayUnitSound('ShieldOff')
-        -- Turn off the energy drain
-        self:SetMaintenanceConsumptionInactive()
     end,
 
---Added these two functions to fix Continental (IceDreamer)
 	OnShieldHpDepleted = function(self)
-        self:PlayUnitSound('ShieldOff')		
 	end,
 	
 	OnShieldEnergyDepleted = function(self)
-        self:PlayUnitSound('ShieldOff')	
 	end,
---Fix ends
 
     EnableShield = function(self)
         self:SetScriptBit('RULEUTC_ShieldToggle', true)
@@ -4244,11 +4241,10 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+	--Get rid of broken check mechanism
     ShieldIsOn = function(self)
         if self.MyShield then
             return self.MyShield:IsOn()
-        else
-            return false
         end
     end,
 
@@ -4337,7 +4333,12 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnTransportAttach = function(self, attachBone, unit)
-
+	
+		--Apply protection to transported units if appropriate
+		if self:ShieldIsOn() then
+			unit:SetCanTakeDamage(false)
+		end
+		
 		self:PlayUnitSound('Load')
 		self:MarkWeaponsOnTransport(unit, true)
 		if unit:ShieldIsOn() then
@@ -4347,21 +4348,15 @@ Unit = Class(moho.unit_methods) {
 		if not EntityCategoryContains(categories.PODSTAGINGPLATFORM, self) then
 			self:RequestRefreshUI()
 		end
-				-- added by brute51
+		-- added by brute51
 		unit:OnAttachedToTransport(self, attachBone)
 		self:DoUnitCallbacks( 'OnTransportAttach', unit )
-		
     end,
-	
-
-
-
-
-
 	
     OnTransportDetach = function(self, attachBone, unit)
         self:PlayUnitSound('Unload')
         self:MarkWeaponsOnTransport(unit, false)
+		unit:SetCanTakeDamage(true) --Ensure units dropped off can take damage
         unit:EnableShield()
         unit:EnableDefaultToggleCaps()
         if not EntityCategoryContains(categories.PODSTAGINGPLATFORM, self) then
@@ -4371,6 +4366,11 @@ Unit = Class(moho.unit_methods) {
 		 unit:OnDetachedToTransport(self)
         self:DoUnitCallbacks( 'OnTransportDetach', unit )
     end,
+	
+	--This function is toggled alongside the Shield states to tell OnDamage if protection is active
+	IsTransportProtected = function(self, value)
+		transportProtected = value
+	end,		
 
     OnStartTransportLoading = function(self)
 		#WARN('OnStartTransportLoading with args ' .. repr(self))
@@ -4445,7 +4445,7 @@ Unit = Class(moho.unit_methods) {
             rate = -rate
         end
 
-        WaitSeconds(.5)
+        WaitSeconds(1)		--From 0.5 to make greater drop height look more natural
         if bp then
             local animBlock = self:ChooseAnimBlock( bp )
             if animBlock.Animation then
