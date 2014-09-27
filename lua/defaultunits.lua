@@ -766,6 +766,43 @@ FactoryUnit = Class(StructureUnit) {
 #  AIR FACTORY UNITS
 #-------------------------------------------------------------
 AirFactoryUnit = Class(FactoryUnit) {
+
+    OnStartBuild = function(self, unitBeingBuilt, order )
+        self:ChangeBlinkingLights('Yellow')
+		
+		--Force T3 Air Factories To have equal Engineer BuildRate to Land
+		if EntityCategoryContains(categories.ENGINEER, unitBeingBuilt) and EntityCategoryContains(categories.TECH3, self) then		
+			self:SetBuildRate(90)					
+			self.BuildRateChanged = true
+		end
+		
+        StructureUnit.OnStartBuild(self, unitBeingBuilt, order )
+        self.BuildingUnit = true
+        if order != 'Upgrade' then
+            ChangeState(self, self.BuildingState)
+            self.BuildingUnit = false
+        end
+        self.FactoryBuildFailed = false
+    end,
+
+    OnStopBuild = function(self, unitBeingBuilt, order )
+        StructureUnit.OnStopBuild(self, unitBeingBuilt, order )
+        
+		--Reset BuildRate
+		if self.BuildRateChanged == true then
+			self:SetBuildRate(self:GetBlueprint().Economy.BuildRate)
+			self.BuildRateChanged = false
+		end
+		
+        if not self.FactoryBuildFailed then
+            if not EntityCategoryContains(categories.AIR, unitBeingBuilt) then
+                self:RollOffUnit()
+            end
+            self:StopBuildFx()
+            self:ForkThread(self.FinishBuildThread, unitBeingBuilt, order )
+        end
+        self.BuildingUnit = false
+    end,	
 }
 
 #-------------------------------------------------------------
@@ -1221,6 +1258,61 @@ SeaFactoryUnit = Class(FactoryUnit) {
 
     StopRocking = function(self)
     end,
+	
+    OnStartBuild = function(self, unitBeingBuilt, order )
+        self:ChangeBlinkingLights('Yellow')
+		
+		--Force T2 and T3 Naval Factories To have equal Engineer BuildRates to Land		
+		if EntityCategoryContains(categories.ENGINEER, unitBeingBuilt) and EntityCategoryContains(categories.TECH2, self) then		
+			self:SetBuildRate(40)					
+			self.BuildRateChanged = true
+		elseif EntityCategoryContains(categories.ENGINEER, unitBeingBuilt) and EntityCategoryContains(categories.TECH3, self) then	
+			self:SetBuildRate(90)
+			self.BuildRateChanged = true
+		end		
+		
+        StructureUnit.OnStartBuild(self, unitBeingBuilt, order )
+        self.BuildingUnit = true
+        if order != 'Upgrade' then
+            ChangeState(self, self.BuildingState)
+            self.BuildingUnit = false
+        end
+        self.FactoryBuildFailed = false
+    end,
+	
+    OnStopBuild = function(self, unitBeingBuilt, order )
+        StructureUnit.OnStopBuild(self, unitBeingBuilt, order )
+        
+		--Reset BuildRate
+		if self.BuildRateChanged == true then
+			self:SetBuildRate(self:GetBlueprint().Economy.BuildRate)
+			self.BuildRateChanged = false
+		end		
+		
+        if not self.FactoryBuildFailed then
+            if not EntityCategoryContains(categories.AIR, unitBeingBuilt) then
+                self:RollOffUnit()
+            end
+            self:StopBuildFx()
+            self:ForkThread(self.FinishBuildThread, unitBeingBuilt, order )
+        end
+        self.BuildingUnit = false
+    end,	
+	
+    RolloffBody = function(self)
+        self:SetBusy(true)
+        self:SetBlockCommandQueue(true)
+        self:PlayFxRollOff()
+		
+        --Force the Factory to not wait until unit has left
+		WaitSeconds(2.5)
+		
+        self.MoveCommand = nil
+        self:PlayFxRollOffEnd()
+        self:SetBusy(false)
+        self:SetBlockCommandQueue(false)
+        ChangeState(self, self.IdleState)
+    end,	
 }
 
 

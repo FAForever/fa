@@ -2,12 +2,9 @@
     AI = {
         GuardRadius = 10,
         TargetBones = {
+            'Torso',		
             'Head',
-            'Right_Arm_B01',
-            'Left_Arm_B01',
-            'Torso',
-            'Left_Leg_B01',
-            'Right_Leg_B01',
+			'AttachPoint',
         },
     },
     Audio = {
@@ -144,6 +141,7 @@
         'OVERLAYDIRECTFIRE',
         'OVERLAYOMNI',
     },
+	CollisionOffsetZ = 0.1,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Commander',
@@ -831,8 +829,8 @@
     SelectionThickness = 0.9,
     SelectionYOffset = 0,
     SizeX = 1.2, #from 1
-    SizeY = 2.2, #from 2
-    SizeZ = 1.2, # 0.7
+    SizeY = 2.0, #from 2
+    SizeZ = 0.8, # 0.7
     StrategicIconName = 'icon_commander_generic',
     StrategicIconSortPriority = 0,
     Transport = {

@@ -8,11 +8,10 @@
 #**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
---Shield fixed to protect carried units by IceDreamer
-
 local explosion = import('/lua/defaultexplosions.lua')
 local util = import('/lua/utilities.lua')
 local WeaponsFile = import('/lua/terranweapons.lua')
+
 local TAirUnit = import('/lua/terranunits.lua').TAirUnit
 local TSAMLauncher = import('/lua/terranweapons.lua').TSAMLauncher
 local TWeapons = import('/lua/terranweapons.lua')
@@ -71,57 +70,7 @@ XEA0306 = Class(TAirUnit) {
         self.Trash:Add(self.LandingAnimManip)
         self.LandingAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationLand):SetRate(1)
     end,
-	
---Begin Shielding fix
-	OnShieldEnabled = function(self)
-		self:PlayUnitSound('ShieldOn')	
-        self:SetMaintenanceConsumptionActive()		
-		local Units = self:GetCargo()						
-		for _, U in Units do
-			U:SetCanTakeDamage(false)	
-		end	
-		self:SetCanTakeDamage(false)        
-	end,	
-	
-	OnShieldDisabled = function(self)
-        self:PlayUnitSound('ShieldOff')	
-        self:SetMaintenanceConsumptionInactive()		
-		local Units = self:GetCargo()						
-		for _, U in Units do
-			U:SetCanTakeDamage(true)	
-		end	
-		self:SetCanTakeDamage(true)        
-	end,
-	
-	OnShieldHpDepleted = function(self)
-        self:PlayUnitSound('ShieldOff')	
-		local Units = self:GetCargo()						
-		for _, U in Units do
-			U:SetCanTakeDamage(true)	
-		end	
-		self:SetCanTakeDamage(true)        
-	end,
-	
-	OnShieldEnergyDepleted = function(self)
-        self:PlayUnitSound('ShieldOff')	
-		local Units = self:GetCargo()						
-		for _, U in Units do
-			U:SetCanTakeDamage(true)	
-		end	
-		self:SetCanTakeDamage(true)        
-	end,	
-	
-	OnTransportAttach = function(self, attachBone, unit)
-		if self:ShieldIsOn() then					
-			unit:SetCanTakeDamage(false)
-		end	
-	end,
-	
-	OnTransportDetach = function(self, attachBone, unit)
-		unit:SetCanTakeDamage(true)
-	end,
---End fix
-	
+
     # When one of our attached units gets killed, detach it
     OnAttachedKilled = function(self, attached)
         attached:DetachFrom()
@@ -164,6 +113,7 @@ XEA0306 = Class(TAirUnit) {
             return bp.SizeX, bp.SizeY, bp.SizeZ
         end
     end,    
+
 }
 
 TypeClass = XEA0306

@@ -2,12 +2,9 @@ UnitBlueprint {
     AI = {
         GuardRadius = 10,
         TargetBones = {
+            'Torso',		
             'Head',
-            'Right_Arm_B01',
-            'Left_Arm_B01',
-            'Torso',
-            'Left_Leg_B01',
-            'Right_Leg_B01',
+			'AttachPoint'
         },
     },
     Abilities = {
@@ -163,7 +160,7 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
         'OVERLAYINDIRECTFIRE',
     },
-    CollisionOffsetZ = 0.2, # added
+    CollisionOffsetZ = 0.1, # added
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Commander',
@@ -853,8 +850,8 @@ UnitBlueprint {
     SelectionSizeZ = 0.6,
     SelectionThickness = 0.9,
     SelectionYOffset = 0,
-    SizeX = 1,
-    SizeY = 2.2,
+    SizeX = 1.4,
+    SizeY = 2.7,
     SizeZ = 1.2, # from 0.7
     StrategicIconName = 'icon_commander_generic',
     StrategicIconSortPriority = 0,
@@ -1066,7 +1063,7 @@ UnitBlueprint {
             CountedProjectile = true,
             Damage = 6000,
             DamageFriendly = true,
-            DamageRadius = 3,
+            DamageRadius = 2,
             DamageType = 'Normal',
             DisplayName = 'Laanse Tactical Missile Launcher',
             EffectiveRadius = 0,
@@ -1085,7 +1082,7 @@ UnitBlueprint {
             MuzzleChargeDelay = 0.2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 5,
+            MuzzleVelocity = 10,
             ProjectileId = '/projectiles/SIFLaanseTacticalMissileCDR/SIFLaanseTacticalMissileCDR_proj.bp',
             ProjectileLifetime = 80,
             ProjectilesPerOnFire = 1,

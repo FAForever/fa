@@ -241,7 +241,7 @@ UnitBlueprint {
             NukeInnerRingRadius = 30,
             NukeInnerRingTicks = 24,
             NukeInnerRingTotalTime = 0,
-            NukeOuterRingDamage = 500,
+            NukeOuterRingDamage = 5000,
             NukeOuterRingRadius = 40,
             NukeOuterRingTicks = 20,
             NukeOuterRingTotalTime = 0,
