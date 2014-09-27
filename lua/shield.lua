@@ -5,7 +5,7 @@
 --**
 --**  Summary  : Shield lua module
 --**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local Entity = import('/lua/sim/Entity.lua').Entity
@@ -372,7 +372,6 @@ Shield = Class(moho.shield_methods,Entity) {
             -- Test in here if we have run out of power; if the fraction is ever not 1 we don't have full power
             while on do
                 WaitTicks(1)
-
                 self:UpdateShieldRatio(-1)
 
                 fraction = self.Owner:GetResourceConsumed()
