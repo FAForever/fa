@@ -822,10 +822,7 @@ Unit = Class(moho.unit_methods) {
     OnPaused = function(self)
         self:SetActiveConsumptionInactive()
         self:StopUnitAmbientSound( 'ConstructLoop' )
-		        -- added by brute51
         self:DoUnitCallbacks('OnPaused')
-		        -- added by brute51
-        self:DoUnitCallbacks('OnUnpaused')
     end,
 
     OnUnpaused = function(self)
@@ -833,6 +830,7 @@ Unit = Class(moho.unit_methods) {
             self:SetActiveConsumptionActive()
             self:PlayUnitAmbientSound( 'ConstructLoop' )
         end
+        self:DoUnitCallbacks('OnUnpaused')
     end,
 
     EnableSpecialToggle = function(self)
