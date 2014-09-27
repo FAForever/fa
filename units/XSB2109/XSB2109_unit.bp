@@ -1,9 +1,11 @@
 UnitBlueprint {
-    AI = {
-        TargetBones = {
-            'XSB2109',
-        },
-    },
+	AI = {
+		TargetBones = {
+			'XSB2109',
+			'Muzzle01',
+			'Muzzle02',
+		},
+	},
     Audio = {
         Destroyed = Sound {
             Bank = 'XSL_Destroy',
@@ -56,8 +58,8 @@ UnitBlueprint {
         'OVERLAYSONAR',
         'SORTDEFENSE',
     },
-    CollisionOffsetY = -1,
-    CollisionOffsetZ = 0.05,
+    CollisionOffsetY = -1.2,
+    CollisionOffsetZ = 0.1,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
@@ -187,9 +189,9 @@ UnitBlueprint {
     SelectionSizeX = 0.5,
     SelectionSizeZ = 0.8,
     SelectionThickness = 0.47,
-    SizeX = 0.9,
-    SizeY = 2,
-    SizeZ = 0.9,
+	SizeX = 1.3,
+	SizeY = 2.4,
+	SizeZ = 1.3,
     StrategicIconName = 'icon_structure1_antinavy',
     StrategicIconSortPriority = 205,
     Veteran = {

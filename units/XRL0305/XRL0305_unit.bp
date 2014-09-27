@@ -1,12 +1,13 @@
 UnitBlueprint {
     AI = {
         TargetBones = {          
+			'Turret',
             'Right_Leg01_B01',
             'Right_Leg02_B01',
             'Left_Leg01_B01',
-            'Left_Leg02_B01',
-            'Turret',
-            'Projectile03',            
+            'Left_Leg02_B01',		
+			'Projectile03',
+			'AttachPoint',         
         },
     },
     Audio = {
@@ -206,9 +207,9 @@ UnitBlueprint {
     SelectionSizeX = 0.9,
     SelectionSizeZ = 0.9,
     SelectionThickness = 0.47,
-    SizeX = 0.9,
-    SizeY = 1.6,
-    SizeZ = 0.9,
+	SizeX = 1.4,
+	SizeY = 1.9,
+	SizeZ = 1.4,
     StrategicIconName = 'icon_bot3_armored',
     StrategicIconSortPriority = 115,
     Transport = {

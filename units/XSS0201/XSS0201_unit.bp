@@ -335,7 +335,7 @@ UnitBlueprint {
             TurretBoneYaw = 'Front_Turret',
             TurretDualManipulators = false,
             TurretPitch = 10,
-            TurretPitchRange = 20,
+            TurretPitchRange = 40,
             TurretPitchSpeed = 30,
             TurretYaw = 0,
             TurretYawRange = 120,				#140
@@ -422,7 +422,7 @@ UnitBlueprint {
             TurretBoneYaw = 'Back_Turret',
             TurretDualManipulators = false,
             TurretPitch = 10,
-            TurretPitchRange = 20,
+            TurretPitchRange = 40,
             TurretPitchSpeed = 30,
             TurretYaw = 0,
             TurretYawRange = 140,				

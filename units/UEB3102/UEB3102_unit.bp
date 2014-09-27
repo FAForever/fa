@@ -1,4 +1,9 @@
 UnitBlueprint {
+	AI = {
+		TargetBones = {
+			'UEB3102',
+		},
+	},
     Audio = {
         Destroyed = Sound {
             Bank = 'UELDestroy',
@@ -38,7 +43,7 @@ UnitBlueprint {
         'OVERLAYSONAR',
         'SORTINTEL',
     },
-    CollisionOffsetY = -0.25,
+    CollisionOffsetY = -0.5,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
@@ -174,12 +179,13 @@ UnitBlueprint {
         SkirtSizeZ = 1,
         TurnRate = 0,
     },
+	RaiseDistance = 0.2,
     SelectionSizeX = 0.4,
     SelectionSizeZ = 0.4,
     SelectionThickness = 1,
-    SizeX = 0.6,
-    SizeY = 0.5,
-    SizeZ = 0.6,
+	SizeX = 0.7,
+	SizeY = 1,
+	SizeZ = 0.7,
     StrategicIconName = 'icon_structure1_intel',
     StrategicIconSortPriority = 235,
     Wreckage = {
