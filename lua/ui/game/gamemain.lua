@@ -783,6 +783,9 @@ function UiBeat()
         lastObserving = observing
         import('/lua/ui/game/economy.lua').ToggleEconPanel(not observing)
     end
+    if HasCommandLineArg("/syncreplay") and HasCommandLineArg("/gpgnet") then	
+        GpgNetSend("BEAT",GameTick(),GetGameSpeed()) 
+    end
 end
 
 SendChat = function()
