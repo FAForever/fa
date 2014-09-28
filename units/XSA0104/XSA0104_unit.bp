@@ -27,7 +27,7 @@ UnitBlueprint {
         LiftFactor = 8,
         MaxAirspeed = 15,
         StartTurnDistance = 10,
-        TransportHoverHeight = 3,
+        TransportHoverHeight = 7,
     },
     Audio = {
         AirUnitWaterImpact = Sound {

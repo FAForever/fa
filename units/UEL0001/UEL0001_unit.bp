@@ -2,12 +2,8 @@ UnitBlueprint {
     AI = {
         GuardRadius = 10,
         TargetBones = {
+            'Torso',		
             'Head',
-            'Right_Arm_B01',
-            'Left_Arm_B01',
-            'Torso',
-            'Left_Leg_B01',
-            'Right_Leg_B01',
         },
     },
     Audio = {
@@ -150,6 +146,7 @@ UnitBlueprint {
         'OVERLAYDEFENSE',
         'BUBBLESHIELDSPILLOVERCHECK',
     },
+	CollisionOffsetZ = 0.2,	
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Commander',
@@ -899,9 +896,9 @@ UnitBlueprint {
     SelectionSizeZ = 0.6,
     SelectionThickness = 0.9,
     SelectionYOffset = 0,
-    SizeX = 1.2, #from 1
-    SizeY = 2.2, #from 2
-    SizeZ = 1.2, #from 0.7
+    SizeX = 1.7, #from 1
+    SizeY = 2.1, #from 2
+    SizeZ = 1, 	 #from 0.7
     StrategicIconName = 'icon_commander_generic',
     StrategicIconSortPriority = 0,
     Transport = {
@@ -1167,11 +1164,11 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 10,
-            NukeInnerRingDamage = 12000,
+            NukeInnerRingDamage = 10000,
             NukeInnerRingRadius = 15,
             NukeInnerRingTicks = 24,
             NukeInnerRingTotalTime = 0,
-            NukeOuterRingDamage = 250,
+            NukeOuterRingDamage = 1000,
             NukeOuterRingRadius = 25,
             NukeOuterRingTicks = 20,
             NukeOuterRingTotalTime = 0,
@@ -1190,7 +1187,7 @@ UnitBlueprint {
             RackRecoilDistance = 0,
             RackReloadTimeout = 10,
             RackSalvoChargeTime = 0,
-            RackSalvoReloadTime = 30,
+            RackSalvoReloadTime = 10,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_IndirectFire',
