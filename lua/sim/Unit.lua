@@ -2477,7 +2477,6 @@ Unit = Class(moho.unit_methods) {
 
     OnFailedToBuild = function(self)
         self:DoOnFailedToBuildCallbacks()
-        self:SetActiveConsumptionInactive()
         self:StopUnitAmbientSound('ConstructLoop')
     end,
 
