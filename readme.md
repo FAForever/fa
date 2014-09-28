@@ -7,6 +7,10 @@ Current patch is: 3634
 Changelog for next patch (3636)
 -------------------------------
 
+This is the changelog posted on the forums for patch 3635.
+
+Subject to change and investigation of correctness.
+
 - Mongoose Buff (Slight increase in Gatling gun MuzzleVelocity to take it closer to Ravager's)
 - Fixed UEF T3 Mobile AA being able to fire from Continental, and reduced projectile number
 - Continental Fixes:
@@ -37,6 +41,13 @@ Changelog for next patch (3636)
     - LABs, Mantis, Aurora, Striker, Pillar, Hoplite, Mongoose, Firebeetle, Seraphim T3 Mobile Artillery, Cybran T2 Mobile Flack, HARMS, Zthuee all fixed
 - New icon name for Mass Storage
 - Tempest can now build hovering Aeon Land units
+
+Contributors:
+ - Sheeo
+ - a_vehicle
+ - Crotalus
+ - Pip
+ - IceDreamer
 
 
 Contributing
