@@ -2,9 +2,13 @@ UnitBlueprint {
     AI = {
         GuardRadius = 10,
         TargetBones = {
-            'Torso',		
             'Head',
+            'Torso',
+            'Right_Arm_B01',
+            'Left_Arm_B01',
             'Back_Upgrade',
+            'Left_Leg_B01',
+            'Right_Leg_B01',
         },
     },
     Audio = {
@@ -728,9 +732,9 @@ UnitBlueprint {
     SelectionSizeZ = 0.6,
     SelectionThickness = 0.9,
     SelectionYOffset = 0,
-    SizeX = 1.4,
-    SizeY = 2.4,
-    SizeZ = 1.0, # 0.7
+    SizeX = 1.2,
+    SizeY = 2.2,
+    SizeZ = 1.2, # 0.7
     StrategicIconName = 'icon_commander_generic',
     StrategicIconSortPriority = 0,
     Transport = {

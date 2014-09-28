@@ -1,12 +1,16 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
-            'URL0402',		
             'Left_Turret',
             'Right_Turret',
-            'Center_Turret',       
-			'Center_Turret_Barrel',
-            'Center_Turret_Muzzle',	         
+            'Center_Turret',
+            'Right_Projectile01',
+            'Left_Projectile01',
+            'Right_Projectile02',
+            'Left_Projectile02',
+            'URL0402',
+            'Center_Turret_Muzzle',
+            'Center_Turret',            
         },
     },
     Audio = {
@@ -81,7 +85,7 @@ UnitBlueprint {
         'OVERLAYANTINAVY',
 		'OVERLAYINDIRECTFIRE',   # Added for range ring issue [155]
     },
-    CollisionOffsetZ = 0.2,
+    CollisionOffsetY = 0,
     Defense = {
         AirThreatLevel = 16,
         ArmorType = 'Experimental',
@@ -302,9 +306,9 @@ UnitBlueprint {
     SelectionSizeX = 3.75,
     SelectionSizeZ = 3.75,
     SelectionThickness = 0.28,
-    SizeX = 5.6,
-    SizeY = 4.2,
-    SizeZ = 5.6,
+    SizeX = 2,
+    SizeY = 4,
+    SizeZ = 3,
     StrategicIconName = 'icon_experimental_generic',
     StrategicIconSortPriority = 45,
     Transport = {

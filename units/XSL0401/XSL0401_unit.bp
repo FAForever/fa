@@ -3,6 +3,9 @@ UnitBlueprint {
         TargetBones = {
             'Torso',
             'Head',
+            'Projectile01',
+            'Left_Leg_B03',
+            'Right_Leg_B15',
         },
     },
     Audio = {
@@ -65,7 +68,7 @@ UnitBlueprint {
         'DRAGBUILD',
         'SHOWATTACKRETICLE',
     },
-    CollisionOffsetZ = 0.7,
+    CollisionOffsetY = 0.3,
     Defense = {
         AirThreatLevel = 16,
         ArmorType = 'Experimental',
@@ -259,9 +262,9 @@ UnitBlueprint {
     SelectionSizeX = 2.2,
     SelectionSizeZ = 1.6,
     SelectionThickness = 0.32,
-    SizeX = 4.4,
-    SizeY = 9.2,
-    SizeZ = 4.2,
+    SizeX = 2.5,
+    SizeY = 8.5,
+    SizeZ = 1.5,
     StrategicIconName = 'icon_experimental_generic',
     StrategicIconSortPriority = 115,
     Transport = {

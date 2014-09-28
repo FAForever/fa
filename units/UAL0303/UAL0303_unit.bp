@@ -1,9 +1,4 @@
 UnitBlueprint { 
-	AI = {
-		TargetBones = {
-			'Turret',
-		},
-	},
     Audio = {
         AmbientMove = Sound {
             Bank = 'UAL',
@@ -68,6 +63,7 @@ UnitBlueprint {
         'BOT',
         'OVERLAYDIRECTFIRE',
     },
+    CollisionOffsetY = 0,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
@@ -237,8 +233,8 @@ UnitBlueprint {
     SelectionSizeX = 0.85,
     SelectionSizeZ = 0.85,
     SelectionThickness = 0.5,
-    SizeX = 1.2,
-    SizeY = 1.6,
+    SizeX = 1,
+    SizeY = 1.5,
     SizeZ = 1.2,
     StrategicIconName = 'icon_bot3_directfire',
     StrategicIconSortPriority = 115,
