@@ -30,6 +30,12 @@ local Player = import('/lua/ui/lobby/trueskill.lua').Player
 local Rating = import('/lua/ui/lobby/trueskill.lua').Rating
 local Teams = import('/lua/ui/lobby/trueskill.lua').Teams
 
+local IsSyncReplayServer = false
+
+if HasCommandLineArg("/syncreplay") and HasCommandLineArg("/gpgnet") then
+    IsSyncReplayServer = true
+end
+
 local globalOpts = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
 local teamOpts = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
 local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
@@ -522,36 +528,44 @@ end
 -- Create a new unconnected lobby.
 function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider, over, exitBehavior,
                      playerHasSupcom)
-
-    -- default to true, if the param is nil, then not playing through GPGnet
-    if playerHasSupcom == nil or playerHasSupcom == true then
-        hasSupcom = true
+    if IsSyncReplayServer then
+        LOG('Heyhey!')
+		SetFrontEndData('syncreplayid',localPlayerUID)
+        dl = UIUtil.QuickDialog(GetFrame(0), "Downloading the replay file...")
+        LaunchReplaySession('gpgnet:\/\/' .. GetCommandLineArg('/gpgnet',1)[1] .. '\/' .. import('/lua/user/prefs.lua').GetFromCurrentProfile('Name'))
+		dl:Destroy()
+		UIUtil.QuickDialog(GetFrame(0), "You dont have this map.", "Exit", function() ExitApplication() end)
     else
-        hasSupcom = true
-    end
+		-- default to true, if the param is nil, then not playing through GPGnet
+		if playerHasSupcom == nil or playerHasSupcom == true then
+			hasSupcom = true
+		else
+			hasSupcom = true
+		end
 
-    Reset()
+		Reset()
 
-    if GUI then
-        WARN('CreateLobby called but I already have one setup...?')
-        GUI:Destroy()
-    end
+		if GUI then
+			WARN('CreateLobby called but I already have one setup...?')
+			GUI:Destroy()
+		end
 
-    GUI = UIUtil.CreateScreenGroup(over, "CreateLobby ScreenGroup")
-
-
-    GUI.exitBehavior = exitBehavior
+		GUI = UIUtil.CreateScreenGroup(over, "CreateLobby ScreenGroup")
 
 
-    GUI.optionControls = {}
-    GUI.slots = {}
+		GUI.exitBehavior = exitBehavior
 
-    GUI.connectdialog = UIUtil.ShowInfoDialog(GUI, Strings.TryingToConnect, Strings.AbortConnect, ReturnToMenu)
 
-    InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
+		GUI.optionControls = {}
+		GUI.slots = {}
 
-    -- Store off the validated playername
-    localPlayerName = lobbyComm:GetLocalPlayerName()
+		GUI.connectdialog = UIUtil.ShowInfoDialog(GUI, Strings.TryingToConnect, Strings.AbortConnect, ReturnToMenu)
+
+		InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
+
+		-- Store off the validated playername
+		localPlayerName = lobbyComm:GetLocalPlayerName()
+	end
 end
 
 
@@ -589,11 +603,25 @@ function DisconnectFromPeer(uid)
 end
 
 function SetHasSupcom(supcomInstalled)
-    hasSupcom = supcomInstalled
+    if IsSyncReplayServer then
+        if cmd == 0 then
+           SessionResume()
+        elseif cmd == 1 then
+           SessionRequestPause()
+        end
+    else
+        hasSupcom = cmd -- was: supcomInstalled
+    end
 end
 
 function SetHasForgedAlliance(faInstalled)
-    hadFA = faInstalled
+    if IsSyncReplayServer then
+        if GetGameSpeed() != speed then
+            SetGameSpeed(speed)
+        end
+    else
+        hadFA = speed -- was: faInstalled
+    end
 end
 
 function FindSlotForID(id)
