@@ -162,7 +162,6 @@ Unit = Class(moho.unit_methods) {
                 OnBeforeTransferingOwnership = {},
                 OnAfterTransferingOwnership = {},
                 
-                
         }
     end,
 
@@ -561,173 +560,150 @@ Unit = Class(moho.unit_methods) {
     -- Engymod helper function: updates build restrictions of the passed unit.
     -- Added by Rien
     updateBuildRestrictions = function(self)
-    --LOG("updateBuildRestrictions called")
+        local faction = nil
+        local type = nil
+        local techlevel = nil
 
-    local faction = nil
-    local type = nil
-    local techlevel = nil
+        if EntityCategoryContains(categories.AEON, self) then
+            faction = categories.AEON
+        elseif EntityCategoryContains(categories.UEF, self) then
+            faction = categories.UEF
+        elseif EntityCategoryContains(categories.CYBRAN, self) then
+            faction = categories.CYBRAN
+        elseif EntityCategoryContains(categories.SERAPHIM, self) then
+            faction = categories.SERAPHIM
+        end
 
-    if EntityCategoryContains(categories.AEON, self) then
-       faction = categories.AEON
-    elseif EntityCategoryContains(categories.UEF, self) then
-       faction = categories.UEF
-    elseif EntityCategoryContains(categories.CYBRAN, self) then
-       faction = categories.CYBRAN
-    elseif EntityCategoryContains(categories.SERAPHIM, self) then
-       faction = categories.SERAPHIM
-    end
+        if EntityCategoryContains(categories.LAND, self) then
+            type = categories.LAND
+        elseif EntityCategoryContains(categories.AIR, self) then
+            type = categories.AIR
+        elseif EntityCategoryContains(categories.NAVAL, self) then
+            type = categories.NAVAL
+        end
 
-    if EntityCategoryContains(categories.LAND, self) then
-       type = categories.LAND
-    elseif EntityCategoryContains(categories.AIR, self) then
-       type = categories.AIR
-    elseif EntityCategoryContains(categories.NAVAL, self) then
-       type = categories.NAVAL
-    end
+        if EntityCategoryContains(categories.TECH1, self) then
+            techlevel = categories.TECH1
+        elseif EntityCategoryContains(categories.TECH2, self) then
+            techlevel = categories.TECH2
+        elseif EntityCategoryContains(categories.TECH3, self) then
+            techlevel = categories.TECH3
+        end
 
-    if EntityCategoryContains(categories.TECH1, self) then
-       techlevel = categories.TECH1
-    elseif EntityCategoryContains(categories.TECH2, self) then
-       techlevel = categories.TECH2
-    elseif EntityCategoryContains(categories.TECH3, self) then
-       techlevel = categories.TECH3
-    end
+        local aiBrain = self:GetAIBrain()
+        local supportfactory = false
 
-    local aiBrain = self:GetAIBrain()
-    local supportfactory = false
+        --Sanity check.
+        if not faction then
+            return
+        end
 
-    -- Sanity check. 
-    if not faction then 
-       --LOG("updateBuildRestrictions: Faction unset")
-       return 
-    end
-
-    -- Phase one: add build restrictions
-    if EntityCategoryContains(categories.FACTORY, self) then
-       if EntityCategoryContains(categories.SUPPORTFACTORY, self) then
-          -- Add support factory cannot build higher tech units at all, until there is a HQ factory
-          --LOG("Adding build restrictions for tech2mobile tech3mobile tech3factory")
-          self:AddBuildRestriction(categories.TECH2 * categories.MOBILE)
-          self:AddBuildRestriction(categories.TECH3 * categories.MOBILE)
-          self:AddBuildRestriction(categories.TECH3 * categories.FACTORY)
-          supportfactory = true
-       else
-          -- A normal factory cannot build a support factory until there is a HQ factory
-          --LOG("Adding build restrictions for supportfactory for factory")
-          self:AddBuildRestriction(categories.SUPPORTFACTORY)
-          supportfactory = false
-       end
-    elseif EntityCategoryContains(categories.ENGINEER, self) then
-       -- Engineers also cannot build a support factory until there is a HQ factory
-       --LOG("Adding build restrictions for supportfactory for engineer")
-       self:AddBuildRestriction(categories.SUPPORTFACTORY)
-    else
-       --LOG("Cowardly doing nothing")
-    end
-    
-    if supportfactory then 
-       if not type then 
-          --LOG("updateBuildRestrictions: Type unset")
-          return 
-       end
-       
-       -- Gather statistics about the amount of research stations we have 
-       for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH2 * faction, false, true) do
-          if not unit:IsDead() and not unit:IsBeingBuilt() then
-         --LOG("Removing restriction tech2construction")
-         self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE * categories.CONSTRUCTION)
-          end
-       end
-       
-       for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH3 * faction, false, true) do
-          if not unit:IsDead() and not unit:IsBeingBuilt() then
-         --LOG("Removing restriction tech2construction and tech3construction")
-         self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE * categories.CONSTRUCTION)
-         self:RemoveBuildRestriction(categories.TECH3 * categories.MOBILE * categories.CONSTRUCTION)
-         break
-          end
-       end
-       
-       for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH2 * faction * type, false, true) do
-          if not unit:IsDead() and not unit:IsBeingBuilt() then
-         --LOG("Removing restriction tech2mobile")
-         self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE)
-         break
-          end
-       end
-       
-       for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH3 * faction * type, false, true) do
-          if not unit:IsDead() and not unit:IsBeingBuilt() then
-         --LOG("Removing restriction tech2 and tech 3 mobile tech 3 support factory")
-         self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE)
-         self:RemoveBuildRestriction(categories.TECH3 * categories.MOBILE)
-         self:RemoveBuildRestriction(categories.TECH3 * categories.FACTORY * categories.SUPPORTFACTORY)
-         break
-          end
-       end
-
-    else
-       for i,researchType in ipairs({categories.LAND, categories.AIR, categories.NAVAL}) do
-
-          -- If there is a (tech 2 of tech 3) research station of this faction and type, enable building of tech 2 supportfactories
-          for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH2 * faction * researchType, false, true) do
-         if not unit:IsDead() and not unit:IsBeingBuilt() then
-
-            -- Special case for the commander, since its engineering upgrades are implemented using build restrictions
-            -- My preferred implementation would be: Check if the unit currently can build any t2 units, and if so, also unlock the t2 support factory, like this:
-            --
-            -- buildableCategories = /get the units current buildablecats. .... With GetUnitCommandData??/
-            -- local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
-            -- if table.getn(EntityCategoryFilterDown(categories.TECH2, buildableUnits)) > 0 then
-            --     LOG("Removing restriction tech2 support factory for commander")
-            --     self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
-            --  end
-            --
-            -- This would be a generic solution that works for all units, but since I don't know where I can get the list of 
-            -- currently buildablecategories (the blueprint listing is incorrect) I have to make special case for the commander 
-            -- and rely on the enhancement names :(
-            -- Rien
-
-            if EntityCategoryContains(categories.COMMAND, self) then
-               if self:HasEnhancement('AdvancedEngineering') or self:HasEnhancement('T3Engineering') then
-              --LOG("Removing restriction tech2 support factory for commander")
-              self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
-               end
+        -- Phase one: add build restrictions
+        if EntityCategoryContains(categories.FACTORY, self) then
+            if EntityCategoryContains(categories.SUPPORTFACTORY, self) then
+                -- Add support factory cannot build higher tech units at all, until there is a HQ factory
+                self:AddBuildRestriction(categories.TECH2 * categories.MOBILE)
+                self:AddBuildRestriction(categories.TECH3 * categories.MOBILE)
+                self:AddBuildRestriction(categories.TECH3 * categories.FACTORY)
+                supportfactory = true
             else
-               --LOG("Removing restriction tech2 support factory for non-supfacs")
-               self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
+                -- A normal factory cannot build a support factory until there is a HQ factory
+                self:AddBuildRestriction(categories.SUPPORTFACTORY)
+                supportfactory = false
+            end
+        elseif EntityCategoryContains(categories.ENGINEER, self) then
+            -- Engineers also cannot build a support factory until there is a HQ factory
+            self:AddBuildRestriction(categories.SUPPORTFACTORY)
+        end
+
+        if supportfactory then
+            if not type then
+                return
             end
 
-            break
-         end
-          end
-          
-          for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH3 * faction * researchType, false, true) do
-         if not unit:IsDead() and not unit:IsBeingBuilt() then
-
-            -- Special case for the commander, since its engineering upgrades are implemented using build restrictions
-            if EntityCategoryContains(categories.COMMAND, self) then
-               if self:HasEnhancement('AdvancedEngineering') then
-              --LOG("Removing restriction tech2 support factory for commander")
-              self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
-
-               elseif self:HasEnhancement('T3Engineering') then
-              --LOG("Removing restriction tech2 and tech3 support factory for commander")
-              self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
-              self:RemoveBuildRestriction(categories.TECH3 * categories.SUPPORTFACTORY * faction * researchType)
-               end
-            else
-               --LOG("Removing restriction tech2 and t3 support factory for non-supfacs")
-               self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
-               self:RemoveBuildRestriction(categories.TECH3 * categories.SUPPORTFACTORY * faction * researchType)
+            -- Gather statistics about the amount of research stations we have
+            for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH2 * faction, false, true) do
+                if not unit:IsDead() and not unit:IsBeingBuilt() then
+                    self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE * categories.CONSTRUCTION)
+                end
             end
 
-            break
-         end
-          end
-       end
-    end
-     end,
+            for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH3 * faction, false, true) do
+                if not unit:IsDead() and not unit:IsBeingBuilt() then
+                    self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE * categories.CONSTRUCTION)
+                    self:RemoveBuildRestriction(categories.TECH3 * categories.MOBILE * categories.CONSTRUCTION)
+                    break
+                end
+            end
+
+            for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH2 * faction * type, false, true) do
+                if not unit:IsDead() and not unit:IsBeingBuilt() then
+                    self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE)
+                    break
+                end
+            end
+
+            for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH3 * faction * type, false, true) do
+                if not unit:IsDead() and not unit:IsBeingBuilt() then
+                    self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE)
+                    self:RemoveBuildRestriction(categories.TECH3 * categories.MOBILE)
+                    self:RemoveBuildRestriction(categories.TECH3 * categories.FACTORY * categories.SUPPORTFACTORY)
+                    break
+                end
+            end
+        else
+            for i,researchType in ipairs({categories.LAND, categories.AIR, categories.NAVAL}) do
+                -- If there is a (tech 2 of tech 3) research station of this faction and type, enable building of tech 2 supportfactories
+                for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH2 * faction * researchType, false, true) do
+                    if not unit:IsDead() and not unit:IsBeingBuilt() then
+                        -- Special case for the commander, since its engineering upgrades are implemented using build restrictions
+                        -- My preferred implementation would be: Check if the unit currently can build any t2 units, and if so, also unlock the t2 support factory, like this:
+                        --
+                        -- buildableCategories = /get the units current buildablecats. .... With GetUnitCommandData??/
+                        -- local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
+                        -- if table.getn(EntityCategoryFilterDown(categories.TECH2, buildableUnits)) > 0 then
+                        --     LOG("Removing restriction tech2 support factory for commander")
+                        --     self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
+                        --  end
+                        --
+                        -- This would be a generic solution that works for all units, but since I don't know where I can get the list of
+                        -- currently buildablecategories (the blueprint listing is incorrect) I have to make special case for the commander
+                        -- and rely on the enhancement names :(
+                        -- Rien
+
+                        if EntityCategoryContains(categories.COMMAND, self) then
+                            if self:HasEnhancement('AdvancedEngineering') or self:HasEnhancement('T3Engineering') then
+                                self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
+                            end
+                        else
+                            self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
+                        end
+                        break
+                    end
+                end
+
+                for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH3 * faction * researchType, false, true) do
+                    if not unit:IsDead() and not unit:IsBeingBuilt() then
+
+                        -- Special case for the commander, since its engineering upgrades are implemented using build restrictions
+                        if EntityCategoryContains(categories.COMMAND, self) then
+                            if self:HasEnhancement('AdvancedEngineering') then
+                                self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
+                            elseif self:HasEnhancement('T3Engineering') then
+                                self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
+                                self:RemoveBuildRestriction(categories.TECH3 * categories.SUPPORTFACTORY * faction * researchType)
+                            end
+                        else
+                            self:RemoveBuildRestriction(categories.TECH2 * categories.SUPPORTFACTORY * faction * researchType)
+                            self:RemoveBuildRestriction(categories.TECH3 * categories.SUPPORTFACTORY * faction * researchType)
+                        end
+
+                        break
+                    end
+                end
+            end
+        end
+    end,
 
     ##########################################################################################
     #-- TOGGLES
@@ -982,7 +958,6 @@ Unit = Class(moho.unit_methods) {
 
     OnCaptured = function(self, captor)
         if self and not self:IsDead() and captor and not captor:IsDead() and self:GetAIBrain() ~= captor:GetAIBrain() then
-
             if not self:IsCapturable() then
                 self:Kill()
                 return
@@ -1131,9 +1106,9 @@ Unit = Class(moho.unit_methods) {
         local energy_rate = 0
         local mass_rate = 0
         local build_rate = 0
-        
-                -- added by brute51 - to make sure we use the proper consumption values. [132]
-        if self.ActiveConsumption then        
+
+        -- added by brute51 - to make sure we use the proper consumption values. [132]
+        if self.ActiveConsumption then
             local focus = self:GetFocusUnit()
             if focus and self.WorkItem and self.WorkProgress < 1 and (focus:IsUnitState('Enhancing') or focus:IsUnitState('Building')) then
                 self.WorkItem = focus.WorkItem    -- set our workitem to the focus unit work item, is specific for enhancing
@@ -1480,22 +1455,20 @@ Unit = Class(moho.unit_methods) {
 
     OnKilledUnit = function(self, unitKilled)
         -- new vet system
-        
         if not IsAlly(self:GetArmy(), unitKilled:GetArmy()) then
             if unitKilled:GetFractionComplete() == 1 then
-                
                 if EntityCategoryContains( categories.STRUCTURE, unitKilled ) then
                     self:AddXP(1)
-                elseif EntityCategoryContains( categories.TECH1, unitKilled )  then 
-                    self:AddXP(1)    
+                elseif EntityCategoryContains( categories.TECH1, unitKilled )  then
+                    self:AddXP(1)
                 elseif EntityCategoryContains( categories.TECH2, unitKilled ) then
-                    self:AddXP(3)    
+                    self:AddXP(3)
                 elseif EntityCategoryContains( categories.TECH3, unitKilled ) then
-                    self:AddXP(6)    
-                elseif EntityCategoryContains( categories.COMMAND, unitKilled ) then    
-                    self:AddXP(6)    
-                elseif EntityCategoryContains( categories.EXPERIMENTAL, unitKilled ) then    
-                    self:AddXP(50)    
+                    self:AddXP(6)
+                elseif EntityCategoryContains( categories.COMMAND, unitKilled ) then
+                    self:AddXP(6)
+                elseif EntityCategoryContains( categories.EXPERIMENTAL, unitKilled ) then
+                    self:AddXP(50)
                 else
                     self:AddXP(1)
                 end
@@ -2131,24 +2104,25 @@ Unit = Class(moho.unit_methods) {
         -- this section is rebuild bonus check 2 [159]
         -- This code checks if the unit is allowed to be accelerate-built. If not the unit is destroyed (for lack 
         -- of a SetFractionComplete() function). Added by brute51
+
         if self:GetFractionComplete() > 0 then
             local cb = function(bpUnitId)
-                            local ourUnit = self:GetUnitId()
-                            if ourUnit == bpUnitId then 
-                                self:OnRebuildBonusIsLegal()
-                            else
-                                while true do
-                                    bpUnitId = GetUnitBlueprintByName(bpUnitId).General.UpgradesFrom 
-                                    if bpUnitId == ourUnit then
-                                        self:OnRebuildBonusIsLegal()
-                                        break
-                                    elseif bpUnitId == nil then
-                                        break
-                                    end  
-                                end
-                            end
+            local ourUnit = self:GetUnitId()
+            if ourUnit == bpUnitId then
+                self:OnRebuildBonusIsLegal()
+            else
+                while true do
+                    bpUnitId = GetUnitBlueprintByName(bpUnitId).General.UpgradesFrom
+                    if bpUnitId == ourUnit then
+                        self:OnRebuildBonusIsLegal()
+                        break
+                    elseif bpUnitId == nil then
+                        break
+                    end
+                end
             end
-            RRBC( self:GetPosition(), cb)
+        end
+        RRBC( self:GetPosition(), cb)
             self.RebuildBonusIllegalThread = self:ForkThread(
                 function(self) 
                     WaitTicks(1)
@@ -2171,9 +2145,8 @@ Unit = Class(moho.unit_methods) {
         -- rebuild bonus check 1 and 2 [159]
         -- this doesn't always run. In fact, in most of the time it doesn't.
         self:Destroy()
-    LOG ('unit killed due to illegal copy')
+        LOG ('unit killed due to illegal copy')
     end,
-
 
     UnitBuiltPercentageCallbackThread = function(self, percent, callback)
         while not self:IsDead() and self:GetHealthPercent() < percent do
@@ -4414,7 +4387,6 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-
     GetTransportClass = function(self)
         local bp = self:GetBlueprint().Transport
         return bp.TransportClass
@@ -4447,8 +4419,6 @@ Unit = Class(moho.unit_methods) {
             end
         end
     end,
-
-
 
     ##########################################################################################
     #-- TELEPORTING
@@ -4806,9 +4776,6 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    
-    
-    
     ##########################################################################################
     #-- SHIELDS
     ##########################################################################################
@@ -4828,12 +4795,7 @@ Unit = Class(moho.unit_methods) {
         self:DoUnitCallbacks('OnShieldIsCharging')
     end,
 
-    
-    
-    
-    
     OnAttachedToTransport = function(self, transport, bone)
-
         self:DoUnitCallbacks( 'OnAttachedToTransport', transport )
         for i=1,transport:GetBoneCount() do
             if transport:GetBoneName(i) == bone then
@@ -4865,7 +4827,7 @@ Unit = Class(moho.unit_methods) {
         self:DoUnitCallbacks('OnTeleported', self, location)
     end,
     
-        #########################################################################################
+    ##########################################################################################
     #-- COMMANDER ENHANCING
     ##########################################################################################
 
@@ -4878,16 +4840,4 @@ Unit = Class(moho.unit_methods) {
     OnCmdrUpgradeStart = function(self)
         self:DoUnitCallbacks('OnCmdrUpgradeStart')
     end,
-    
-    
-    
-     
-    
-    
-    
-    
-    
-    
-    
-
 }
