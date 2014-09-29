@@ -31,7 +31,7 @@ Subject to change and investigation of correctness.
     - Bubble Shields now correctly ricochet damage among themselves
     - Bubble Shields now interact with splash weaponry properly
 - Fixed infinite economy exploit
-- Hitbox Fixes: Adjusted collision boxes and target bones on dozens of units to allow weapons to target and impact them properly. 
+- Hitbox Fixes: Adjusted collision boxes and target bones on dozens of units to allow weapons to target and impact them properly.
     - Dynamically changing hitbox for Salem
     - ACUs and sACUs now hit properly by Lasers
     - Hovertanks now hit properly by Lasers
@@ -55,3 +55,12 @@ Contributing
 
 To contribute, please fork this repository and make pull requests to the
 develop branch.
+
+Code convention
+---------------
+
+Please follow the [Lua Style Guide](http://lua-users.org/wiki/LuaStyleGuide) as
+much as possible.
+
+For file encoding, use UTF-8 and unix-style file endings in the repo (Set
+core.autocrlf).
