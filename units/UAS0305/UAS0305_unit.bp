@@ -1,4 +1,10 @@
 UnitBlueprint {
+	AI = {
+		TargetBones = {
+			'Tower_01',
+			'UAS0305',
+		},
+	},
     Audio = {
         Killed = Sound {
             Bank = 'UASDestroy',
@@ -186,9 +192,9 @@ UnitBlueprint {
     SelectionSizeX = 0.65,
     SelectionSizeZ = 0.65,
     SelectionThickness = 0.6,
-    SizeX = 1,
-    SizeY = 1.1,
-    SizeZ = 1,
+	SizeX = 1.2,
+	SizeY = 1.1,
+	SizeZ = 1.2,
     StrategicIconName = 'icon_structure3_intel',
     StrategicIconSortPriority = 235,
     Weapon = {

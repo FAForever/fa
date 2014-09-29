@@ -6,9 +6,7 @@ UnitBlueprint {
             'Projectile01',
             'Left_Leg_B01',
             'Right_Leg_B01',
-        },
-		AddTargetBones = {
-            'AttachSpecial01',  # added to make unit targetable even when almost submerged [141]
+            'AttachSpecial01',
             'AttachSpecial02',
         },
     },
@@ -71,7 +69,7 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
         'OVERLAYOMNI',
     },
-    CollisionOffsetY = 0.3,
+    CollisionOffsetZ = 0.1,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Experimental',
@@ -252,9 +250,9 @@ UnitBlueprint {
     SelectionSizeX = 2.2,
     SelectionSizeZ = 1.6,
     SelectionThickness = 0.32,
-    SizeX = 2.5,
-    SizeY = 6.5,
-    SizeZ = 1.5,
+	SizeX = 3.2,
+	SizeY = 7.0,
+	SizeZ = 2.2,
     StrategicIconName = 'icon_experimental_generic',
     StrategicIconSortPriority = 115,
     Transport = {

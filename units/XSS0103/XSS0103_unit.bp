@@ -264,6 +264,7 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0.25,
             MuzzleSalvoSize = 3,
             MuzzleVelocity = 30,
+			MuzzleVelocityReduceDistance = 20,			
             ProjectileId = '/projectiles/SDFShieeihAutoCannon01/SDFShieeihAutoCannon01_proj.bp',
             RackBones = {
                 {

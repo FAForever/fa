@@ -1,4 +1,11 @@
 UnitBlueprint {
+	AI = {
+		TargetBones = {
+			'UEL0203',
+			'Turret_Muzzle_01',
+			'Turret_Muzzle_02',
+		},
+	},
     Audio = {
         AmbientMoveLand = Sound {
             Bank = 'UEL',
@@ -72,6 +79,7 @@ UnitBlueprint {
         'TANK',
         'OVERLAYDIRECTFIRE',
     },
+	CollisionOffsetY = -0.1,	
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
@@ -283,7 +291,7 @@ UnitBlueprint {
     SelectionSizeZ = 0.7,
     SelectionThickness = 0.6,
     SizeX = 0.9,
-    SizeY = 0.45,
+    SizeY = 0.65,
     SizeZ = 1.2,
     StrategicIconName = 'icon_land2_directfire',
     StrategicIconSortPriority = 125,

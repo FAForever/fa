@@ -1,4 +1,9 @@
 UnitBlueprint {
+	AI = {
+		TargetBones = {
+			'Torso',
+		},
+	},
 	ResolvePath = true,
     Audio = {
         AmbientMove = Sound {
@@ -215,9 +220,9 @@ UnitBlueprint {
     SelectionSizeX = 0.3,
     SelectionSizeZ = 0.3,
     SelectionThickness = 1.2,
-    SizeX = 0.6,
+    SizeX = 0.7,
     SizeY = 0.7,
-    SizeZ = 0.6,
+    SizeZ = 0.7,
     StrategicIconName = 'icon_bot1_intel',
     StrategicIconSortPriority = 135,
     Transport = {
