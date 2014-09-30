@@ -22,10 +22,14 @@ function GetOverlappingShields(source)
 
     local obp, oOverlapRadius, vpos, OverlapDist
     for k, v in units do
-        if v and IsUnit(v) and not v:IsDead() and v.MyShield and v.MyShield:IsUp() and v.MyShield.Size and v.MyShield.Size > 0 and source.Owner != v then
+        if v and IsUnit(v) and not v:IsDead()
+             and v.MyShield and v.MyShield:IsUp()
+             and v.MyShield.Size and v.MyShield.Size > 0
+             and source.Owner != v then
             vspos = v.MyShield:GetCachePosition()
-            oOverlapRadius = 0.98 * (v.MyShield.Size / 2)  -- size is diameter, dividing by 2 to get radius
-            -- If "source" and "v" are more than this far apart then the shields don't overlap, otherwise they do
+            oOverlapRadius = 0.98 * (v.MyShield.Size / 2)
+            -- If "source" and "v" are more than this far apart then the shields don't overlap,
+            -- otherwise they do
             OverlapDist = OverlapRadius + oOverlapRadius
             if VDist3(pos, vspos) <= OverlapDist then
                 table.insert(adjacentShields, v.MyShield)
@@ -72,7 +76,12 @@ function CleanupDamageTable()
     end
 end
 
+-- Set up overspilling from the given source with the
+-- given dmgType and dmgMod
 function DoOverspill(source, instigator, amount, dmgType, dmgMod)
+    if not instigator then
+        return
+    end
     if source:IsUp() then
         local instigatorId = instigator:GetEntityId()
         RegisterDamage(source:GetEntityId(), instigatorId, amount)
