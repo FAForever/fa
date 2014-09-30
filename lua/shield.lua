@@ -187,7 +187,10 @@ Shield = Class(moho.shield_methods,Entity) {
                 self:UpdateShieldRatio(0)
             end		
         end	
-        if doOverspill then
+        -- Only do overspill on events where we have an instigator. 
+        -- "Force" damage events from stratbombs are one example
+        -- where we don't.
+        if doOverspill and IsEntity(instigator) then
             Overspill.DoOverspill(self, instigator, amount, dmgType, self.SpillOverDmgMod)
         end
     end,
