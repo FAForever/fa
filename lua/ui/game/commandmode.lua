@@ -150,8 +150,6 @@ function OnCommandIssued(command)
 		EndCommandMode(true)
 	end
 	
-	-- issue:#43
-	
 	if command.CommandType == 'Attack' then
 		if command.Clear then
 			local cb = { Func = 'ClearTargets', Args = { } }
