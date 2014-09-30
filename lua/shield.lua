@@ -353,8 +353,11 @@ Shield = Class(moho.shield_methods,Entity) {
 
             self:UpdateShieldRatio(-1)
 
-            self.Owner:OnShieldEnabled()
+            -- The order of these calls have been reversed
+            -- Enabling the unit to act on the shield after it
+            -- has been created
             self:CreateShieldMesh()
+            self.Owner:OnShieldEnabled()
 
             local aiBrain = self.Owner:GetAIBrain()
 
@@ -412,7 +415,7 @@ Shield = Class(moho.shield_methods,Entity) {
             self:RemoveShield()
             self.Owner:OnShieldDisabled()
 
-            WaitSeconds(1)            
+            WaitSeconds(1)
         end,
 
         IsOn = function(self)
@@ -424,8 +427,12 @@ Shield = Class(moho.shield_methods,Entity) {
     DamageRechargeState = State {
         Main = function(self)
             self:RemoveShield()
-            self.Owner:OnShieldHpDepleted(self)                                    --Continental Fix            
-            # We must make the unit charge up before gettings its shield back
+
+            if self.Owner.OnShieldHpDepleted then -- This check is made so we don't crash if unit was shadowed
+                self.Owner:OnShieldHpDepleted(self)
+            end
+
+            -- We must make the unit charge up before gettings its shield back
             self:ChargingUp(0, self.ShieldRechargeTime)
 
             -- Fully charged, get full health
@@ -443,7 +450,9 @@ Shield = Class(moho.shield_methods,Entity) {
     EnergyDrainRechargeState = State {
         Main = function(self)
             self:RemoveShield()
-            self.Owner:OnShieldEnergyDepleted(self)                                --Continental Fix            
+            if self.Owner.OnShieldEnergyDepleted then -- This check is made so we don't crash if unit was shadowed
+                self.Owner:OnShieldEnergyDepleted(self)
+            end
             self:ChargingUp(0, self.ShieldEnergyDrainRechargeTime)
 
             -- If the unit is attached to a transport, make sure the shield goes to the off state
@@ -528,7 +537,9 @@ UnitShield = Class(Shield){
     end,
 
     CreateShieldMesh = function(self)
-        self:SetCollisionShape( 'Box', self.CollisionCenterX, self.CollisionCenterY, self.CollisionCenterZ, self.CollisionSizeX, self.CollisionSizeY, self.CollisionSizeZ)
+        -- Personal shields (unit shields) don't handle collisions anymore.
+        -- This is done in the Unit's OnDamage function instead.
+        self:SetCollisionShape('None')
         self.Owner:SetMesh(self.OwnerShieldMesh,true)
     end,
 
