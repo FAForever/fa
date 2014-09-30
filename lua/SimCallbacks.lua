@@ -145,4 +145,45 @@ Callbacks.ClearTargets = function(data, units)
 	
 end
 
+function GetEntityIds(t)
+    local ids = {}
+    for k,v in t do
+        table.insert(ids, v:GetEntityId())
+    end
+    return ids
+end
+
+function IsBeingGuardedBy(units, target)
+    if not units then
+        return false
+    end
+
+    local guards = {}
+    for n, unit in units or {} do
+        guards = table.cat(guards, unit:GetGuards())
+    end
+    -- First loop over all guards
+    for k,v in guards do
+        if v:GetEntityId() == target then
+            return true
+        end
+    end
+    -- Then check them recursively
+    for k,v in guards do
+        if IsBeingGuardedBy({v}, target) then
+            return true
+        end
+    end
+    return false
+end
+
+Callbacks.ValidateAssist = function(data, units)
+    local target = data.target
+    if IsBeingGuardedBy(units, target) then
+        for k,u in units do
+            IssueClearCommands({u})
+        end
+    end
+end
+
 Callbacks.GiveOrders = import('/lua/spreadattack.lua').GiveOrders
