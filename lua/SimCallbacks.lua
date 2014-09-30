@@ -1,12 +1,12 @@
-# 
-# 
-# This module contains the Sim-side lua functions that can be invoked
-# from the user side.  These need to validate all arguments against
-# cheats and exploits.
-#
-
-# We store the callbacks in a sub-table (instead of directly in the
-# module) so that we don't include any
+---- 
+---- 
+---- This module contains the Sim-side lua functions that can be invoked
+---- from the user side.  These need to validate all arguments against
+---- cheats and exploits.
+----
+--
+---- We store the callbacks in a sub-table (instead of directly in the
+---- module) so that we don't include any
 
 local Callbacks = {}
 
@@ -80,17 +80,17 @@ Callbacks.OnControlGroupAssign = function(units)
             ScenarioInfo.ControlGroupUnits = {}
         end
         
-        # add units to list
+        -- add units to list
         local entities = {}
         for k,v in units do
             table.insert(entities, GetEntityById(v))
         end
         ScenarioInfo.ControlGroupUnits = table.merged(ScenarioInfo.ControlGroupUnits, entities)
 
-        # remove units on death
+        -- remove units on death
         for k,v in entities do
             SimTriggers.CreateUnitDeathTrigger(OnUnitKilled, v)
-            SimTriggers.CreateUnitReclaimedTrigger(OnUnitKilled, v) #same as killing for our purposes   
+            SimTriggers.CreateUnitReclaimedTrigger(OnUnitKilled, v) --same as killing for our purposes   
         end
     end
 end
@@ -115,7 +115,6 @@ Callbacks.OnPlayerQueryResult = SimPlayerQuery.OnPlayerQueryResult
 Callbacks.PingGroupClick = import('/lua/SimPingGroup.lua').OnClickCallback
 
 
--- issue:#43
 
 Callbacks.AddTarget = function(data, units)
 	
@@ -144,6 +143,47 @@ Callbacks.ClearTargets = function(data, units)
 		end
 	end
 	
+end
+
+function GetEntityIds(t)
+    local ids = {}
+    for k,v in t do
+        table.insert(ids, v:GetEntityId())
+    end
+    return ids
+end
+
+function IsBeingGuardedBy(units, target)
+    if not units then
+        return false
+    end
+
+    local guards = {}
+    for n, unit in units or {} do
+        guards = table.cat(guards, unit:GetGuards())
+    end
+    -- First loop over all guards
+    for k,v in guards do
+        if v:GetEntityId() == target then
+            return true
+        end
+    end
+    -- Then check them recursively
+    for k,v in guards do
+        if IsBeingGuardedBy({v}, target) then
+            return true
+        end
+    end
+    return false
+end
+
+Callbacks.ValidateAssist = function(data, units)
+    local target = data.target
+    if IsBeingGuardedBy(units, target) then
+        for k,u in units do
+            IssueClearCommands({u})
+        end
+    end
 end
 
 Callbacks.GiveOrders = import('/lua/spreadattack.lua').GiveOrders
