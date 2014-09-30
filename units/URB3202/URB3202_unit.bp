@@ -37,7 +37,7 @@ UnitBlueprint {
         'OVERLAYSONAR',
         'SORTINTEL',
     },
-    CollisionOffsetY = -0.25,
+    CollisionOffsetY = -0.4,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
@@ -173,9 +173,9 @@ UnitBlueprint {
     SelectionSizeX = 0.45,
     SelectionSizeZ = 0.45,
     SelectionThickness = 0.88,
-    SizeX = 0.5,
-    SizeY = 0.5,
-    SizeZ = 0.5,
+    SizeX = 0.7,
+    SizeY = 1.1,
+    SizeZ = 0.7,
     StrategicIconName = 'icon_structure2_intel',
     StrategicIconSortPriority = 230,
     Wreckage = {

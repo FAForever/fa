@@ -150,6 +150,7 @@ UnitBlueprint {
         'OVERLAYDEFENSE',
         'BUBBLESHIELDSPILLOVERCHECK',
     },
+    CollisionOffsetZ = 0.2,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Commander',
@@ -899,9 +900,9 @@ UnitBlueprint {
     SelectionSizeZ = 0.6,
     SelectionThickness = 0.9,
     SelectionYOffset = 0,
-    SizeX = 1.2, #from 1
-    SizeY = 2.2, #from 2
-    SizeZ = 1.2, #from 0.7
+    SizeX = 1.7,
+    SizeY = 2.1,
+    SizeZ = 1,
     StrategicIconName = 'icon_commander_generic',
     StrategicIconSortPriority = 0,
     Transport = {
