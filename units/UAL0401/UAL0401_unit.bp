@@ -6,9 +6,7 @@ UnitBlueprint {
             'Projectile01',
             'Left_Leg_B01',
             'Right_Leg_B01',
-        },
-		AddTargetBones = {
-            'AttachSpecial01',  # added to make unit targetable even when almost submerged [141]
+            'AttachSpecial01',
             'AttachSpecial02',
         },
     },

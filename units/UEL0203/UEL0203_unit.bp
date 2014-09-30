@@ -1,4 +1,11 @@
 UnitBlueprint {
+	AI = {
+		TargetBones = {
+			'UEL0203',
+			'Turret_Muzzle_01',
+			'Turret_Muzzle_02',
+		},
+	},
     Audio = {
         AmbientMoveLand = Sound {
             Bank = 'UEL',

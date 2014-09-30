@@ -1,4 +1,9 @@
 UnitBlueprint {
+	AI = {
+		TargetBones = {
+			'Torso',
+		},
+	},
 	ResolvePath = true,
     Audio = {
         AmbientMove = Sound {

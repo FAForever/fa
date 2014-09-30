@@ -1,4 +1,10 @@
 UnitBlueprint {
+	AI = {
+		TargetBones = {
+			'Torso',		
+			'XSL0304',
+		},
+	},
     ResolvePath = true,
     AI = {
         GuardScanRadius = 30,
