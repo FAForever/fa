@@ -53,6 +53,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'OVERLAYINDIRECTFIRE',
     },
+    CollisionOffsetY = -0.05,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
@@ -259,9 +260,9 @@ UnitBlueprint {
     SelectionSizeX = 0.35,
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.75,
-    SizeX = 0.55,
-    SizeY = 0.35,
-    SizeZ = 0.6,
+    SizeX = 0.6,
+    SizeY = 0.45,
+    SizeZ = 1.0,
     StrategicIconName = 'icon_land1_artillery',
     StrategicIconSortPriority = 135,
     Veteran = {

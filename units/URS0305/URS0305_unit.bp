@@ -52,7 +52,7 @@ UnitBlueprint {
         'SORTINTEL',
 		'NAVAL', #for shipwreck mod
     },
-    CollisionOffsetY = -0.25,
+    CollisionOffsetZ = -0.05,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
@@ -206,9 +206,9 @@ UnitBlueprint {
     SelectionSizeX = 0.5,
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.78,
-    SizeX = 0.8,
-    SizeY = 1.2,
-    SizeZ = 0.8,
+    SizeX = 1.1,
+    SizeY = 1.4,
+    SizeZ = 1.1,
     StrategicIconName = 'icon_structure3_intel',
     StrategicIconSortPriority = 230,
     Wreckage = {

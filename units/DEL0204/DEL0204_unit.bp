@@ -52,6 +52,7 @@ UnitBlueprint {
         'SHOWATTACKRETICLE',
         'OVERLAYDIRECTFIRE',
     },
+	CollisionOffsetX = -0.03,	
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
@@ -192,9 +193,9 @@ UnitBlueprint {
     SelectionSizeX = 0.6,
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.62,
-    SizeX = 0.7,
+    SizeX = 0.9,
     SizeY = 1,
-    SizeZ = 0.4,
+    SizeZ = 0.6,
     StrategicIconName = 'icon_bot2_directfire',
     StrategicIconSortPriority = 115,
     Transport = {
