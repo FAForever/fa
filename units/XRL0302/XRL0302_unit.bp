@@ -1,10 +1,10 @@
 UnitBlueprint {
-	AI = {
-		TargetBones = {
-			'XRL0302',		
-			'Torso',
-		},
-	},
+    AI = {
+        TargetBones = {
+            'XRL0302',        
+            'Torso',
+        },
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'XRL',
@@ -47,7 +47,7 @@ UnitBlueprint {
         'MOBILE',
         'LAND',
         'TECH2',
-	'COUNTERINTELLIGENCE',
+    'COUNTERINTELLIGENCE',
         'DIRECTFIRE',
         'VISIBLETORECON',
         'RECLAIMABLE',
@@ -62,7 +62,7 @@ UnitBlueprint {
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 4,
-		InstantDeath = true,
+        InstantDeath = true,
     },
     Description = '<LOC xrl0302_desc>Mobile Bomb',
     Display = {
@@ -179,8 +179,8 @@ UnitBlueprint {
         MeshExtentsZ = 0.65,
         MinSpeedPercent = 0,
         MotionType = 'RULEUMT_Land',
-        TurnRadius = 4,			#3
-        TurnRate = 160,			#120
+        TurnRadius = 4,            #3
+        TurnRate = 160,            #120
     },
     SelectionSizeX = 0.35,
     SelectionSizeZ = 0.45,

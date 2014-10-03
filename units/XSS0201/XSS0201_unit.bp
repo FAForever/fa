@@ -283,9 +283,9 @@ UnitBlueprint {
             AutoInitiateAttackCommand = false,
             BallisticArc = 'RULEUBA_None',
             BeamCollisionDelay = 0,
-            BeamLifetime = 1,					
+            BeamLifetime = 1,                    
             CollideFriendly = false,
-            Damage = 50,					#47
+            Damage = 50,                    #47
             DamageRadius = 1,
             DamageType = 'Normal',
             DisplayName = 'Ultrachromatic Beam Generator',
@@ -295,7 +295,7 @@ UnitBlueprint {
             FireTargetLayerCapsTable = {
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 0,				#2
+            FiringTolerance = 0,                #2
             Label = 'FrontTurret',
             MaxRadius = 60,
             MuzzleChargeDelay = 0,
@@ -321,7 +321,7 @@ UnitBlueprint {
             RateOfFire = 0.25,
             SlavedToBody = true,
             SlavedToBodyArcRange = 135,
-            TargetCheckInterval = 0.8,				#4			
+            TargetCheckInterval = 0.8,                #4            
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'NAVAL MOBILE',
@@ -338,10 +338,10 @@ UnitBlueprint {
             TurretPitchRange = 20,
             TurretPitchSpeed = 30,
             TurretYaw = 0,
-            TurretYawRange = 120,				#140
-            TurretYawSpeed = 60,				#90
+            TurretYawRange = 120,                #140
+            TurretYawSpeed = 60,                #90
             Turreted = true,
-	    UseFiringSolutionInsteadOfAimBone = true,		#Added
+        UseFiringSolutionInsteadOfAimBone = true,        #Added
             WeaponCategory = 'Direct Fire Naval',
             WeaponRepackTimeout = 2,
             WeaponUnpacks = false,
@@ -371,8 +371,8 @@ UnitBlueprint {
             BeamCollisionDelay = 0,
             BeamLifetime = 1,
             CollideFriendly = false,
-            Damage = 26,					#42
-            DamageRadius = 1,					
+            Damage = 26,                    #42
+            DamageRadius = 1,                    
             DamageType = 'Normal',
             DisplayName = 'Ultrachromatic Beam Generator',
             DoNotCollideList = {
@@ -381,7 +381,7 @@ UnitBlueprint {
             FireTargetLayerCapsTable = {
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 0,				#2
+            FiringTolerance = 0,                #2
             Label = 'BackTurret',
             MaxRadius = 60,
             MuzzleChargeDelay = 0,
@@ -408,7 +408,7 @@ UnitBlueprint {
             RateOfFire = 0.25,
             SlavedToBody = true,
             SlavedToBodyArcRange = 135,
-            TargetCheckInterval = 0.8,				#2							
+            TargetCheckInterval = 0.8,                #2                            
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'NAVAL MOBILE',
@@ -425,10 +425,10 @@ UnitBlueprint {
             TurretPitchRange = 20,
             TurretPitchSpeed = 30,
             TurretYaw = 0,
-            TurretYawRange = 140,				
-            TurretYawSpeed = 60,				#90
+            TurretYawRange = 140,                
+            TurretYawSpeed = 60,                #90
             Turreted = true,
-	    UseFiringSolutionInsteadOfAimBone = true,		#Added
+        UseFiringSolutionInsteadOfAimBone = true,        #Added
             WeaponCategory = 'Direct Fire Naval',
             WeaponRepackTimeout = 2,
             WeaponUnpacks = false,

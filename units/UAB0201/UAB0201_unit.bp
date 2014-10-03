@@ -58,7 +58,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
-	'RESEARCH',
+    'RESEARCH',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -154,7 +154,7 @@ UnitBlueprint {
         BuildCostMass = 1040,
         BuildRate = 40,
         BuildTime = 1600,
-	DifferentialUpgradeCostCalculation = true,
+    DifferentialUpgradeCostCalculation = true,
         BuildableCategory = {
             'BUILTBYTIER2FACTORY AEON MOBILE CONSTRUCTION',
             'BUILTBYTIER2FACTORY AEON STRUCTURE LAND',
