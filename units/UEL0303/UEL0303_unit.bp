@@ -67,6 +67,7 @@ UnitBlueprint {
         'BOT',
         'OVERLAYDIRECTFIRE',
     },
+    CollisionOffsetZ = 0.15,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
@@ -231,7 +232,7 @@ UnitBlueprint {
     SelectionSizeX = 0.55,
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.7,
-    SizeX = 0.9,
+    SizeX = 1.1,
     SizeY = 1.2,
     SizeZ = 0.9,
     StrategicIconName = 'icon_bot3_directfire',

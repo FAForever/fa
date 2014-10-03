@@ -81,7 +81,7 @@ UnitBlueprint {
         'OVERLAYANTINAVY',
         'OVERLAYINDIRECTFIRE',   # Added for range ring issue [155]
     },
-    CollisionOffsetY = 0,
+    CollisionOffsetZ = 0.2,
     Defense = {
         AirThreatLevel = 16,
         ArmorType = 'Experimental',
@@ -302,9 +302,9 @@ UnitBlueprint {
     SelectionSizeX = 3.75,
     SelectionSizeZ = 3.75,
     SelectionThickness = 0.28,
-    SizeX = 2,
-    SizeY = 4,
-    SizeZ = 3,
+    SizeX = 5.6,
+    SizeY = 4.2,
+    SizeZ = 5.6,
     StrategicIconName = 'icon_experimental_generic',
     StrategicIconSortPriority = 45,
     Transport = {
