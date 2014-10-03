@@ -42,21 +42,21 @@ modifiersKeys = {}
 -- Adding modifiers shorcuts on the fly.
 local currentKeyMap = import('/lua/keymap/keymapper.lua').GetKeyMappings(true)
 for key, action in currentKeyMap do
-  if action["category"] == "hotbuilding" then
-    if key != nil then
-        if not import('/lua/keymap/keymapper.lua').IsKeyInMap("Shift-" .. key, currentKeyMap) then
-            modifiersKeys["Shift-" .. key] = action
-        else
-            WARN("Shift-" .. key .. " is already bind")
+    if action["category"] == "hotbuilding" then
+        if key != nil then
+            if not import('/lua/keymap/keymapper.lua').IsKeyInMap("Shift-" .. key, currentKeyMap) then
+                modifiersKeys["Shift-" .. key] = action
+            else
+                WARN("Shift-" .. key .. " is already bind")
+            end
+
+            if not import('/lua/keymap/keymapper.lua').IsKeyInMap("Alt-" .. key, currentKeyMap) then
+                modifiersKeys["Alt-" .. key] = action
+            else
+                WARN("Alt-" .. key .. " is already bind")
+            end        
         end
-        
-        if not import('/lua/keymap/keymapper.lua').IsKeyInMap("Alt-" .. key, currentKeyMap) then
-            modifiersKeys["Alt-" .. key] = action
-        else
-            WARN("Alt-" .. key .. " is already bind")
-        end        
     end
-  end
 end  
 IN_AddKeyMapTable(modifiersKeys)
 
@@ -88,9 +88,9 @@ function SetLayout(layout)
     import('/lua/ui/game/multifunction.lua').SetLayout(layout)
     if not isReplay then
         import('/lua/ui/game/orders.lua').SetLayout(layout)
-		
+
     end
-	import('/lua/ui/game/avatars.lua').SetLayout()
+    import('/lua/ui/game/avatars.lua').SetLayout()
     import('/lua/ui/game/unitview.lua').SetLayout(layout)
     import('/lua/ui/game/objectives2.lua').SetLayout(layout)
     import('/lua/ui/game/unitviewDetail.lua').SetLayout(layout, mapGroup)
@@ -122,18 +122,18 @@ function OnFirstUpdate()
     end
     PlaySound( Sound { Bank='AmbientTest', Cue='AMB_Planet_Rumble_zoom'} )
     ForkThread( 
-        function()
-            WaitSeconds(1.5)
-            UIZoomTo(avatars, 1)
-            WaitSeconds(1.5)
-            SelectUnits(avatars)
-            FlushEvents()
-            if not IsNISMode() then
-                import('/lua/ui/game/worldview.lua').UnlockInput()
-            end
-        end
-    )
-    
+               function()
+                   WaitSeconds(1.5)
+                   UIZoomTo(avatars, 1)
+                   WaitSeconds(1.5)
+                   SelectUnits(avatars)
+                   FlushEvents()
+                   if not IsNISMode() then
+                       import('/lua/ui/game/worldview.lua').UnlockInput()
+                   end
+               end
+               )
+
     if Prefs.GetOption('skin_change_on_start') != 'no' then
         local focusarmy = GetFocusArmy()
         local armyInfo = GetArmiesTable()
@@ -149,7 +149,7 @@ end
 function CreateUI(isReplay)
     ConExecute("Cam_Free off")
     local prefetchTable = { models = {}, anims = {}, d3d_textures = {}, batch_textures = {} }
-    
+
     -- set up our layout change function
     UIUtil.changeLayoutFunction = SetLayout
 
@@ -180,9 +180,9 @@ function CreateUI(isReplay)
     mfdControl = import('/lua/ui/game/multifunction.lua').Create(controlClusterGroup)
     if not isReplay then
         ordersControl = import('/lua/ui/game/orders.lua').SetupOrdersControl(controlClusterGroup, mfdControl)
-        
+
     end
-	import('/lua/ui/game/avatars.lua').CreateAvatarUI(mapGroup)
+    import('/lua/ui/game/avatars.lua').CreateAvatarUI(mapGroup)
     import('/lua/ui/game/construction.lua').SetupConstructionControl(controlClusterGroup, mfdControl, ordersControl)
     import('/lua/ui/game/unitview.lua').SetupUnitViewLayout(mapGroup, ordersControl)
     import('/lua/ui/game/unitviewDetail.lua').SetupUnitViewLayout(mapGroup, mapGroup)
@@ -193,10 +193,10 @@ function CreateUI(isReplay)
     import('/lua/ui/game/consoleecho.lua').CreateConsoleEcho(mapGroup)
     import('/lua/ui/game/build_templates.lua').Init()
     import('/lua/ui/game/taunt.lua').Init()
-    
+
     import('/lua/ui/game/chat.lua').SetupChatLayout(windowGroup)
     import('/lua/ui/game/minimap.lua').CreateMinimap(windowGroup)
-    
+
     if import('/lua/ui/campaign/campaignmanager.lua').campaignMode then
         import('/lua/ui/game/objectives2.lua').CreateUI(mapGroup)
     end
@@ -220,19 +220,19 @@ function CreateUI(isReplay)
         end
         return false
     end
-    
+
     Prefetcher:Update(prefetchTable)
-	
-	
-	##below added for FAF
-	import("/modules/displayrings.lua").Init()	##added for acu and engineer build radius ui mod
-	if SessionIsReplay() then
-		ForkThread(SendChat)
-		lastObserving = true
+
+
+    ##below added for FAF
+    import("/modules/displayrings.lua").Init()	##added for acu and engineer build radius ui mod
+    if SessionIsReplay() then
+        ForkThread(SendChat)
+        lastObserving = true
         import('/lua/ui/game/economy.lua').ToggleEconPanel(false)
-		import('/lua/ui/game/avatars.lua').ToggleAvatars(false)
-		AddBeatFunction(UiBeat)
-	end
+        import('/lua/ui/game/avatars.lua').ToggleAvatars(false)
+        AddBeatFunction(UiBeat)
+    end
 
     if options.gui_scu_manager != 0 then
         import('/modules/scumanager.lua').Init()
@@ -255,7 +255,7 @@ local function LoadDialog(parent)
         movieFile = factions[loadingPref].loadingMovie
         color = factions[loadingPref].loadingColor
     end
-    
+
     local movie = Movie(parent, movieFile)
     LayoutHelpers.FillParent(movie, parent)
     movie:Loop(true)
@@ -285,8 +285,8 @@ function CreateWldUIProvider()
     local lastTime = 0
 
     provider.StartLoadingDialog = function(self)
-		GetCursor():Hide()
-		supressExitDialog = true
+        GetCursor():Hide()
+        supressExitDialog = true
         if not loadingDialog then
             self.loadingDialog = LoadDialog(GetFrame(0))
             if GetNumRootFrames() > 1 then
@@ -306,15 +306,15 @@ function CreateWldUIProvider()
         local function InitialAnimations()
             import('/lua/ui/game/tabs.lua').InitialAnimation()
             WaitSeconds(.15)
-			if not SessionIsReplay() then
-				import('/lua/ui/game/economy.lua').InitialAnimation()
-			end
+            if not SessionIsReplay() then
+                import('/lua/ui/game/economy.lua').InitialAnimation()
+            end
             import('/lua/ui/game/score.lua').InitialAnimation()
             WaitSeconds(.15)
             import('/lua/ui/game/multifunction.lua').InitialAnimation()
             if not SessionIsReplay() then
-				import('/lua/ui/game/avatars.lua').InitialAnimation()
-			end
+                import('/lua/ui/game/avatars.lua').InitialAnimation()
+            end
             import('/lua/ui/game/controlgroups.lua').InitialAnimation()
             WaitSeconds(.15)
             HideGameUI('off')
@@ -327,7 +327,7 @@ function CreateWldUIProvider()
             texture = factions[loadingPref].loadingTexture
             color = factions[loadingPref].loadingColor
         end
-		GetCursor():Show()
+        GetCursor():Show()
         local background = Bitmap(GetFrame(0), UIUtil.UIFile(texture))
         LayoutHelpers.FillParent(background, GetFrame(0))
         background.Depth:Set(200)
@@ -380,7 +380,7 @@ function CreateWldUIProvider()
         if not import('/lua/ui/campaign/campaignmanager.lua').campaignMode then
             HideGameUI('on')
         end
-		supressExitDialog = false
+        supressExitDialog = false
         FlushEvents()
     end
 
@@ -420,7 +420,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         -- todo change the current command mode if no longer available? or set to nil?
         import('/lua/ui/game/construction.lua').OnSelection(buildableCategories,newSelection,isOldSelection)
     end
-        
+
     if not isOldSelection then
         import('/lua/ui/game/selection.lua').PlaySelectionSound(added)
         import('/lua/ui/game/rallypoint.lua').OnSelectionChanged(newSelection)
@@ -467,7 +467,7 @@ end
 
 # Called immediately when the user hits the pause button. This only ever gets
 # called on the machine that initiated the pause (i.e. other network players
-# won't call this)
+                                                  # won't call this)
 function OnUserPause(pause)
     local Tabs = import('/lua/ui/game/tabs.lua')
     local focus = GetArmiesTable().focusArmy
@@ -559,8 +559,8 @@ function HideGameUI(state)
             import('/lua/ui/game/minimap.lua').Contract()
             import('/lua/ui/game/construction.lua').Contract()
             if not SessionIsReplay() then
-               import('/lua/ui/game/avatars.lua').Contract()
-               import('/lua/ui/game/orders.lua').Contract()
+                import('/lua/ui/game/avatars.lua').Contract()
+                import('/lua/ui/game/orders.lua').Contract()
             end
         end
     end
@@ -665,7 +665,7 @@ function ShowNISBars()
     NISControls.barTop.Right:Set(function() return GetFrame(0).Right() end)
     NISControls.barTop.Top:Set(function() return GetFrame(0).Top() end)
     NISControls.barTop.Height:Set(1)
-    
+
     if not NISControls.barBot then
         NISControls.barBot = Bitmap(GetFrame(0))
     end
@@ -675,7 +675,7 @@ function ShowNISBars()
     NISControls.barBot.Right:Set(function() return GetFrame(0).Right() end)
     NISControls.barBot.Bottom:Set(function() return GetFrame(0).Bottom() end)
     NISControls.barBot.Height:Set(NISControls.barTop.Height)
-    
+
     NISControls.barTop:SetNeedsFrameUpdate(true)
     NISControls.barTop.OnFrame = function(self, delta)
         if delta then
@@ -731,12 +731,12 @@ end
 
 function QuickSave(filename)
     if SessionIsActive() and 
-       WorldIsPlaying() and 
-       not SessionIsGameOver() and 
-       not SessionIsMultiplayer() and 
-       not SessionIsReplay() and
-       not IsNISMode() then
-       
+        WorldIsPlaying() and 
+        not SessionIsGameOver() and 
+        not SessionIsMultiplayer() and 
+        not SessionIsReplay() and
+        not IsNISMode() then
+
         local saveType
         if import('/lua/ui/campaign/campaignmanager.lua').campaignMode then
             saveType = "CampaignSave"
@@ -747,12 +747,12 @@ function QuickSave(filename)
         local statusStr = "<LOC saveload_0002>Quick Save in progress..."
         local status = UIUtil.ShowInfoDialog(GetFrame(0), statusStr)
         InternalSaveGame(path, filename, function(worked, errmsg)
-            status:Destroy()
-            if not worked then
-                infoStr = LOC("<LOC uisaveload_0008>Save failed! ") .. errmsg
-                UIUtil.ShowInfoDialog(GetFrame(0), infoStr, "<LOC _Ok>")
-            end
-        end)
+                         status:Destroy()
+                         if not worked then
+                             infoStr = LOC("<LOC uisaveload_0008>Save failed! ") .. errmsg
+                             UIUtil.ShowInfoDialog(GetFrame(0), infoStr, "<LOC _Ok>")
+                         end
+                     end)
     end
 end
 
@@ -764,7 +764,7 @@ function SimChangeCameraZoom(newMult)
         not SessionIsMultiplayer() and 
         not SessionIsReplay() and
         not IsNISMode() then
-       
+
         defaultZoom = newMult
         local views = import('/lua/ui/game/worldview.lua').GetWorldViews()
         for _, viewControl in views do
@@ -789,31 +789,31 @@ function UiBeat()
 end
 
 SendChat = function()
-	while true do
-		if UnitData.Chat then
-			if table.getn(UnitData.Chat) > 0 then
-				for index, chat in UnitData.Chat do
-					local newChat = true
-					if table.getn(oldData) > 0 then
-						for index, old in oldData do
-							if (old.oldTime + 3) < GetGameTimeSeconds() then
-								oldData[index] = nil
-							elseif old.msg.text == chat.msg.text and old.sender == chat.sender and chat.msg.to == old.msg.to then
-								newChat = false
-							elseif type(chat.msg.to) == 'number' and chat.msg.to == old.msg.to and old.msg.text == chat.msg.text then
-								newChat = false
-							end
-						end
-					end						
-					if newChat then							
-						chat.oldTime = GetGameTimeSeconds()
-						table.insert(oldData, chat)
-						sendChat(chat.sender, chat.msg)
-					end
-				end
-				UnitData.Chat = {}
-			end
-		end
-		WaitSeconds(0.1)
-	end
+    while true do
+        if UnitData.Chat then
+            if table.getn(UnitData.Chat) > 0 then
+                for index, chat in UnitData.Chat do
+                    local newChat = true
+                    if table.getn(oldData) > 0 then
+                        for index, old in oldData do
+                            if (old.oldTime + 3) < GetGameTimeSeconds() then
+                                oldData[index] = nil
+                            elseif old.msg.text == chat.msg.text and old.sender == chat.sender and chat.msg.to == old.msg.to then
+                                newChat = false
+                            elseif type(chat.msg.to) == 'number' and chat.msg.to == old.msg.to and old.msg.text == chat.msg.text then
+                                newChat = false
+                            end
+                        end
+                    end						
+                    if newChat then							
+                        chat.oldTime = GetGameTimeSeconds()
+                        table.insert(oldData, chat)
+                        sendChat(chat.sender, chat.msg)
+                    end
+                end
+                UnitData.Chat = {}
+            end
+        end
+        WaitSeconds(0.1)
+    end
 end
