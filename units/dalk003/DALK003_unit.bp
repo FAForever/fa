@@ -47,14 +47,14 @@ UnitBlueprint {
     },
     BuildIconSortPriority = 25,
     Categories = {
-		'PRODUCTDL',
+        'PRODUCTDL',
         'SELECTABLE',
         'BUILTBYTIER3FACTORY',
         'AEON',
         'MOBILE',
         'LAND',
         'TECH3',
-		'ANTIAIR',
+        'ANTIAIR',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYANTIAIR',
@@ -82,7 +82,7 @@ UnitBlueprint {
                 AnimationRateMin = 5,
                 Weight = 1,
             },
-			{
+            {
                 Animation = '/units/DALK003/DALK003_death02.sca',
                 AnimationRateMax = 2.5,
                 AnimationRateMin = 1.5,
@@ -126,7 +126,7 @@ UnitBlueprint {
                 Weight = 100,
             },
         },
-		TransportDropAnimation = {
+        TransportDropAnimation = {
             {
                 Animation = '/units/DALK003/DALK003_unfold.sca',
                 Weight = 100,
@@ -219,7 +219,7 @@ UnitBlueprint {
         Level5 = 75,
     },
     Weapon = {
-		{
+        {
             AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
@@ -227,7 +227,7 @@ UnitBlueprint {
                     Cue = 'UAL0111_Missile_Serpent',
                     LodCutoff = 'Weapon_LodCutoff',
                 },
-				Open = Sound {
+                Open = Sound {
                     Bank = 'UAB',
                     Cue = 'UAB2304_Activate',
                     LodCutoff = 'Weapon_LodCutoff',
@@ -249,7 +249,7 @@ UnitBlueprint {
             Label = 'Missile',
             MaxRadius = 54,
             MuzzleChargeDelay = 0.1,
-			MuzzleSalvoDelay = 0,
+            MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 30,
             ProjectileId = '/projectiles/AASerpentine/AASerpentine_proj.bp',
@@ -296,7 +296,7 @@ UnitBlueprint {
             TurretYawSpeed = 0,
             Turreted = false,
             WeaponCategory = 'Anti Air',
-			WeaponRepackTimeout = 5,
+            WeaponRepackTimeout = 5,
             WeaponUnpackAnimation = '/units/DALK003/DALK003_unpack.sca',
             WeaponUnpackAnimationRate = 4,
             WeaponUnpackLocksMotion = false,
