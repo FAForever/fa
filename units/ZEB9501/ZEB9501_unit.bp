@@ -144,13 +144,13 @@ UnitBlueprint {
         BuildCostMass = 540,
         BuildRate = 40,
         BuildTime = 1300,
-	DifferentialUpgradeCostCalculation = true, 
+    DifferentialUpgradeCostCalculation = true, 
         RebuildBonusIds = {
             'zeb9501',
         },
         BuildableCategory = {
             'BUILTBYTIER2FACTORY UEF MOBILE CONSTRUCTION',
-	    'BUILTBYTIER2SUPPORTFACTORY UEF STRUCTURE LAND',
+        'BUILTBYTIER2SUPPORTFACTORY UEF STRUCTURE LAND',
             'BUILTBYTIER2FACTORY UEF MOBILE LAND',
             'BUILTBYLANDTIER2FACTORY UEF MOBILE CONSTRUCTION',
         },

@@ -58,7 +58,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
-	'RESEARCH',
+    'RESEARCH',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -139,7 +139,7 @@ UnitBlueprint {
         BuildCostMass = 4440,
         BuildRate = 90,
         BuildTime = 9400,
-	DifferentialUpgradeCostCalculation = true, 
+    DifferentialUpgradeCostCalculation = true, 
         RebuildBonusIds = {
             'ueb0301',
         },
@@ -187,7 +187,7 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Secret',
         UnitWeight = 1,
         UpgradesFrom = 'ueb0201',
-	UpgradesFromBase = 'ueb0101',
+    UpgradesFromBase = 'ueb0101',
     },
     Intel = {
         VisionRadius = 20,

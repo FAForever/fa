@@ -7,7 +7,7 @@ UnitBlueprint {
         RepairConsumeEnergy = 5,
         RepairConsumeMass = 0.5,
         TargetBones = {
-#            'UAA0310',
+            #            'UAA0310',
             'Attachpoint01',
             'Attachpoint02',
             'Attachpoint03',
@@ -287,17 +287,17 @@ UnitBlueprint {
             },
             AutoInitiateAttackCommand = true,
             BallisticArc = 'RULEUBA_None',
-            BeamCollisionDelay = 0,	#0.2				
+            BeamCollisionDelay = 0,    #0.2                
             BeamLifetime = 0,
             CollideFriendly = false,
-            Damage = 333,			#1000						
+            Damage = 333,            #1000                        
             DamageRadius = 4,
             DamageType = 'CzarBeam',  # Normal
             DisplayName = 'Quantum Beam Generator',
             FireTargetLayerCapsTable = {
                 Air = 'Land|Water|Seabed',
             },
-            FiringTolerance = 30,					#0
+            FiringTolerance = 30,                    #0
             Label = 'QuantumBeamGeneratorWeapon',
             MaxRadius = 30,
             MaximumBeamLength = 50,
@@ -319,8 +319,8 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 10,						#0.2
-            TargetCheckInterval = 0.1,					#2.5
+            RateOfFire = 10,                        #0.2
+            TargetCheckInterval = 0.1,                    #2.5
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'STRUCTURE',
@@ -333,7 +333,7 @@ UnitBlueprint {
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
             WeaponCategory = 'Direct Fire Experimental',
-            WeaponRepackTimeout = 0,					#10
+            WeaponRepackTimeout = 0,                    #10
             WeaponUnpacks = false,
         },
         {

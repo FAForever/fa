@@ -1,10 +1,10 @@
 UnitBlueprint {
-	AI = {
-		TargetBones = {
-			'XSL0203',
-			'Turret',
-		},
-	},
+    AI = {
+        TargetBones = {
+            'XSL0203',
+            'Turret',
+        },
+    },
     Audio = {
         AmbientMoveLand = Sound {
             Bank = 'XSL',
