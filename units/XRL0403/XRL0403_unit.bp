@@ -3,12 +3,11 @@ UnitBlueprint {
         TargetBones = {
             'Left_Turret',
             'Right_Turret',
-            'AA_Turret',
             'Left_Leg02_B01',
             'Left_Leg01_B01',
             'Right_Leg02_B01',
             'Right_Leg01_B01',
-            'URL0403',
+            'AA_Turret',
             'Right_Turret_Barrel',
             'Left_Turret_Barrel',            
         },
@@ -353,7 +352,7 @@ UnitBlueprint {
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 65,
             ProjectileId = '/projectiles/CDFProtonCannon05/CDFProtonCannon05_proj.bp',
-			ProjectileLifetime = 0.9, # fix for Megalith huge range bug [126]
+            ProjectileLifetime = 0.9, # fix for Megalith huge range bug [126]
             RackBones = {
                 {
                     MuzzleBones = {
@@ -443,7 +442,7 @@ UnitBlueprint {
             MuzzleVelocity = 65,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/CDFProtonCannon05/CDFProtonCannon05_proj.bp',
-			ProjectileLifetime = 0.9, # fix for Megalith huge range bug [126]
+            ProjectileLifetime = 0.9, # fix for Megalith huge range bug [126]
             RackBones = {
                 {
                     MuzzleBones = {

@@ -1,6 +1,7 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
+            'UAB2109',
             'Turret',
         },
     },

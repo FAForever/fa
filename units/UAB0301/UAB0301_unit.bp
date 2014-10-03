@@ -58,7 +58,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
-	'RESEARCH',
+    'RESEARCH',
     },
     CollisionOffsetY = 0,
     Defense = {
@@ -148,8 +148,8 @@ UnitBlueprint {
         BuildCostMass = 4440,
         BuildRate = 90,
         BuildTime = 9400,
-	DifferentialUpgradeCostCalculation = true,
-	RebuildBonusIds = {
+    DifferentialUpgradeCostCalculation = true,
+    RebuildBonusIds = {
             'uab0301',
         },
         BuildableCategory = {

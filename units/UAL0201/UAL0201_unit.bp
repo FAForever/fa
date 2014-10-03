@@ -1,4 +1,10 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'Turret',
+            'Exhaust_Left',
+        },
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'UAL',

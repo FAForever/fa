@@ -3,7 +3,7 @@ UnitBlueprint {
         TargetBones = {
             'Turret',
             'Torso',
-			'Turret_Barrel',  # added to make unit targetable even when almost submerged [141]
+            'Turret_Barrel',  # added to make unit targetable even when almost submerged [141]
         },
     },
     Audio = {

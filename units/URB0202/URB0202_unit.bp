@@ -58,7 +58,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
-	'RESEARCH',
+    'RESEARCH',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -141,7 +141,7 @@ UnitBlueprint {
         BuildCostMass = 840,
         BuildRate = 40,
         BuildTime = 1800,
-	DifferentialUpgradeCostCalculation = true, 
+    DifferentialUpgradeCostCalculation = true, 
         RebuildBonusIds = {
             'urb0202',
         },

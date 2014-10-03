@@ -136,7 +136,7 @@ UnitBlueprint {
             '<LOC ability_torpedo>Torpedoes',
         },
         AnimationDeath = {
-	    {
+        {
                 Animation = '/units/ues0401/ues0401_ADeath01.sca',
                 AnimationRateMax = 0.2,
                 AnimationRateMin = 0.1,

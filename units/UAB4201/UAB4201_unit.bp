@@ -46,7 +46,7 @@ UnitBlueprint {
         'OVERLAYDEFENSE',
         'SORTDEFENSE',
     },
-	CollisionOffsetY = -0.25, # fix for TMD cannot be hit by torpedoes [145]
+    CollisionOffsetY = -0.25, # fix for TMD cannot be hit by torpedoes [145]
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
@@ -238,7 +238,7 @@ UnitBlueprint {
             WeaponUnpackAnimationRate = 10,
             WeaponUnpacks = true,
         },
-		{ # dummy weapon used manipulate the game to show correct range circle [129]
+        { # dummy weapon used manipulate the game to show correct range circle [129]
             EffectiveRadius = 10,             
             MaxRadius = 10,
             RangeCategory = 'UWRC_Countermeasure',

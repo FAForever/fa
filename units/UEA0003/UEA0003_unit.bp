@@ -124,7 +124,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 1600,
         BuildCostMass = 160,
-        BuildRadius = 8, 				#added
+        BuildRadius = 8,                 #added
         BuildRate = 35,
         BuildTime = 400,
         BuildableCategory = {
