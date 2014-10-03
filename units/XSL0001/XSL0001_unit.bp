@@ -2,12 +2,9 @@ UnitBlueprint {
     AI = {
         GuardRadius = 10,
         TargetBones = {
+            'Torso',        
             'Head',
-            'Right_Arm_B01',
-            'Left_Arm_B01',
-            'Torso',
-            'Left_Leg_B01',
-            'Right_Leg_B01',
+            'AttachPoint'
         },
     },
     Abilities = {
@@ -385,7 +382,7 @@ UnitBlueprint {
             MaxHealthFactor = 1.1, # 1
             RegenPerSecond = 0.01111111111, 
             Slot = 'RCH',
-            UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD',		#	added
+            UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD',        #    added
             UpgradeEffectBones = {
                 'Right_Upgrade',
                 'Right_Turret_Muzzle',
@@ -585,7 +582,7 @@ UnitBlueprint {
             Slot = 'RCH',
         },
         RegenAura = {
-            ACUAddHealth = 1000,			#added
+            ACUAddHealth = 1000,            #added
             BuildCostEnergy = 4500,
             BuildCostMass = 600,
             BuildTime = 600,
@@ -599,7 +596,7 @@ UnitBlueprint {
                 'Right_Upgrade',
             },
             Slot = 'RCH',
-            UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD',		#added
+            UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD',        #added
             UpgradeEffectBones = {
                 'Right_Upgrade',
                 'Right_Turret_Muzzle',

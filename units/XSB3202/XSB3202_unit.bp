@@ -1,4 +1,10 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'B05',
+            'XSB3102',                    #Bone number is wrong ingame
+        },
+    },
     Audio = {
         Destroyed = Sound {
             Bank = 'XSL_Destroy',

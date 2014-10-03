@@ -59,7 +59,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
-	'SUPPORTFACTORY',
+    'SUPPORTFACTORY',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -96,7 +96,7 @@ UnitBlueprint {
             Yellow = '/effects/emitters/light_yellow_02_emit.bp',
         },
         BuildAttachBone = 'Attachpoint',
-	Mesh = {
+    Mesh = {
             IconFadeInZoom = 130,
             LODs = {
                 {
@@ -134,7 +134,7 @@ UnitBlueprint {
         BuildCostMass = 1290,
         BuildRate = 90,
         BuildTime = 3000,
-	DifferentialUpgradeCostCalculation = true, 
+    DifferentialUpgradeCostCalculation = true, 
         RebuildBonusIds = {
             'zrb9601',
         },
@@ -184,7 +184,7 @@ UnitBlueprint {
         SelectionPriority = 5,
         TechLevel = 'RULEUTL_Secret',
         UnitWeight = 1,
-	UpgradesFromBase = 'urb0101',
+    UpgradesFromBase = 'urb0101',
         UpgradesFrom = 'zrb9501',
     },
     Intel = {

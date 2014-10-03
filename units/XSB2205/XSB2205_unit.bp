@@ -1,7 +1,8 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
-            'UAB2205',
+            'XSB2205',        
+            'Turret',
         },
     },
     Audio = {

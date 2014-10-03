@@ -1,13 +1,10 @@
-	UnitBlueprint {
+    UnitBlueprint {
     AI = {
         GuardRadius = 10,
         TargetBones = {
+            'Torso',        
             'Head',
-            'Right_Arm_B01',
-            'Left_Arm_B01',
-            'Torso',
-            'Left_Leg_B01',
-            'Right_Leg_B01',
+            'AttachPoint',
         },
     },
     Audio = {

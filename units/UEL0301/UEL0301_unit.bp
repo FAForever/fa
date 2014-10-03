@@ -1,10 +1,10 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
-            'Head',
             'UEL0301',
-            'Left_Left_B02',
-            'Left_Right_B02',
+            'Leg_Right_B01',
+            'Leg_Left_B01',
+            'Head',
         },
     },
     Audio = {
@@ -264,7 +264,7 @@ UnitBlueprint {
             'BUILTBYTIER3ENGINEER UEF',
         },
         MaintenanceConsumptionPerSecondEnergy = 0,
-	MaxBuildDistance = 10,
+    MaxBuildDistance = 10,
         NaturalProducer = true,
         ProductionPerSecondEnergy = 20,
         ProductionPerSecondMass = 1,

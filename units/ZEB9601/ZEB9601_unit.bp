@@ -47,7 +47,7 @@ UnitBlueprint {
         'STRUCTURE',
         'LAND',
         'TECH3',
-	'BUILTBYTIER2SUPPORTFACTORY',
+    'BUILTBYTIER2SUPPORTFACTORY',
         'BUILTBYTIER3ENGINEER',
         'BUILTBYTIER3COMMANDER',
         'CONSTRUCTION',
@@ -60,7 +60,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
-	'SUPPORTFACTORY',
+    'SUPPORTFACTORY',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -140,7 +140,7 @@ UnitBlueprint {
         BuildCostMass = 1290,
         BuildRate = 90,
         BuildTime = 3000,
-	DifferentialUpgradeCostCalculation = true, 
+    DifferentialUpgradeCostCalculation = true, 
         RebuildBonusIds = {
             'zeb9601',
         },
@@ -188,7 +188,7 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Secret',
         UnitWeight = 1,
         UpgradesFrom = 'zeb9501',
-	UpgradesFromBase = 'ueb0101',
+    UpgradesFromBase = 'ueb0101',
     },
     Intel = {
         VisionRadius = 20,

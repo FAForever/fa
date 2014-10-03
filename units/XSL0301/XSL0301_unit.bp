@@ -1,9 +1,8 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
-            'Back_Upgrade',
-            'Left_Leg_B02',
-            'Right_Leg_B02',
+            'Torso',
+            'AttachPoint',
         },
     },
     Audio = {
@@ -310,7 +309,7 @@ UnitBlueprint {
             'BUILTBYTIER3ENGINEER SERAPHIM',
         },
         MaxBuildDistance = 10,
-	NaturalProducer = true,
+    NaturalProducer = true,
         ProductionPerSecondEnergy = 200,
         ProductionPerSecondMass = 2,
         StorageEnergy = 500,

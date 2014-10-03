@@ -6,9 +6,7 @@ UnitBlueprint {
             'Projectile01',
             'Left_Leg_B01',
             'Right_Leg_B01',
-        },
-		AddTargetBones = {
-            'AttachSpecial01',  # added to make unit targetable even when almost submerged [141]
+            'AttachSpecial01',
             'AttachSpecial02',
         },
     },
@@ -245,7 +243,7 @@ UnitBlueprint {
         SkirtSizeZ = 6,
         StandUpright = true,
         TurnRadius = 3,
-        TurnRate = 40,					
+        TurnRate = 40,                    
     },
     SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = -0.25,
@@ -296,11 +294,11 @@ UnitBlueprint {
             },
             AutoInitiateAttackCommand = false,
             BallisticArc = 'RULEUBA_None',
-            BeamCollisionDelay = 0,		#0.1
+            BeamCollisionDelay = 0,        #0.1
             BeamLifetime = 0,
             CollideFriendly = false,
             ContinuousBeam = true,
-            Damage = 250,		#500
+            Damage = 250,        #500
             DamageRadius = 0.5,
             DamageType = 'Normal',
             DisplayName = 'Phason Laser',
@@ -312,7 +310,7 @@ UnitBlueprint {
                 Seabed = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 0,	#2
+            FiringTolerance = 0,    #2
             Label = 'EyeWeapon',
             MaxRadius = 40,
             MinRadius = 2,
@@ -335,7 +333,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
-            RateOfFire = 10,	#3				
+            RateOfFire = 10,    #3                
             SlavedToBody = true,
             SlavedToBodyArcRange = 65,
             TargetCheckInterval = 0.25,
@@ -345,7 +343,7 @@ UnitBlueprint {
                 'SUBCOMMANDER',
                 'TECH3 MOBILE',
                 'STRUCTURE DEFENSE',#
-		'TECH3 STRUCTURE',#
+        'TECH3 STRUCTURE',#
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
                 'SPECIALLOWPRI',

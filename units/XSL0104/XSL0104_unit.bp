@@ -247,7 +247,7 @@ UnitBlueprint {
             MuzzleSalvoSize = 2,
             MuzzleVelocity = 45,
             ProjectileId = '/projectiles/SAAShleoAAGatlingGun01/SAAShleoAAGatlingGun01_proj.bp',
-			ProjectileLifetime = 10, # fix for having huge range [126]. 10 is just an arbitrary value that should not interfere with this weapons
+            ProjectileLifetime = 10, # fix for having huge range [126]. 10 is just an arbitrary value that should not interfere with this weapons
             ProjectileLifetimeUsesMultiplier = 1.25,
             ProjectilesPerOnFire = 2,
             RackBones = {

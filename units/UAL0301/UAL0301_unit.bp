@@ -1,10 +1,8 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
+            'Torso',        
             'AttachPoint',
-            'Leg_Left_B02',
-            'Leg_Right_B02',
-            'Torso',
         },
     },
     Audio = {
@@ -300,7 +298,7 @@ UnitBlueprint {
             'BUILTBYTIER3ENGINEER AEON',
         },
         MaxBuildDistance = 10,
-	NaturalProducer = true,
+    NaturalProducer = true,
         ProductionPerSecondEnergy = 20,
         ProductionPerSecondMass = 1,
         SacrificeEnergyMult = 0.9,
