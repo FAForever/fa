@@ -830,7 +830,7 @@
     SelectionYOffset = 0,
     SizeX = 1.2, #from 1
     SizeY = 2.0,
-    SizeZ = 0.8
+    SizeZ = 0.8,
     StrategicIconName = 'icon_commander_generic',
     StrategicIconSortPriority = 0,
     Transport = {
