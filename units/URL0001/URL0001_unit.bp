@@ -294,7 +294,7 @@ UnitBlueprint {
         BuildCostEnergy = 5000000,
         BuildCostMass = 18000,
         BuildRate = 10,
-        BuildTime = 6000000,  #was 60000
+        BuildTime = 6000000,
         BuildableCategory = {
             'BUILTBYCOMMANDER CYBRAN',
             'BUILTBYTIER2COMMANDER CYBRAN',
@@ -588,7 +588,7 @@ UnitBlueprint {
             Name = '<LOC enhancements_0103>Tech 3 Engineering Suite',
             NewBuildRate = 126,
             NewHealth = 7000,
-            NewRegenRate = 35, # fixes lower regen rate with t3 suite. this is t2 regen + t3 regen [130]
+            NewRegenRate = 35,         --Fixes lower regeneration rate with T3 suite. This is T2 + t3 regeneration [130]
             Prerequisite = 'AdvancedEngineering',
             Slot = 'LCH',
             UpgradeEffectBones = {
@@ -955,12 +955,12 @@ UnitBlueprint {
                 },
             },
             BallisticArc = 'RULEUBA_None',
-            BeamCollisionDelay = 0,            #0.1
+            BeamCollisionDelay = 0,
             BeamLifetime = 0,
             CanFireFromTransport = true,
             CollideFriendly = false,
-            ContinuousBeam = true,  #new
-            Damage = 400,                #800
+            ContinuousBeam = true,     --New line
+            Damage = 400,
             DamageRadius = 0.5,
             DamageType = 'Normal',
             DisplayName = 'Heavy Microwave Laser',
@@ -983,9 +983,9 @@ UnitBlueprint {
             RackBones = {
                 {
                     MuzzleBones = {
-                        'Turret_Muzzle_03',
+                        'Center_Turret',
                     },
-                    RackBone = 'Turret_Muzzle_03',
+                    RackBone = 'Center_Turret',
                 },
             },
             RackFireTogether = false,
@@ -996,8 +996,8 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
-            RateOfFire = 10,                #3
-            TargetCheckInterval = 0.1,            #0.5
+            RateOfFire = 10,
+            TargetCheckInterval = 0.1, --Changed to 0.1 for smooth beam transitions
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'MOBILE',
@@ -1007,16 +1007,16 @@ UnitBlueprint {
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,
-            TurretBoneMuzzle = 'Turret_Muzzle_03',
-            TurretBonePitch = 'Turret_Muzzle_03',
-            TurretBoneYaw = 'Turret_Muzzle_03',
+            TurretBoneMuzzle = 'Center_Turret',
+            TurretBonePitch = 'Center_Turret',
+            TurretBoneYaw = 'Center_Turret',
             TurretDualManipulators = false,
             TurretPitch = 0,
             TurretPitchRange = 80,
             TurretPitchSpeed = 90,
             TurretYaw = 0,
-            TurretYawRange = 5,
-            TurretYawSpeed = 90,
+            TurretYawRange = 10,
+            TurretYawSpeed = 110,
             Turreted = true,
             UseFiringSolutionInsteadOfAimBone = true,
             WeaponCategory = 'Direct Fire Experimental',
