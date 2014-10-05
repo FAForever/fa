@@ -1415,10 +1415,8 @@ Unit = Class(moho.unit_methods) {
             self:ForkThread(self.PlayAnimationThread, 'AnimationDeath')
         end
 
-        self:OnKilledVO()
         self:DoUnitCallbacks( 'OnKilled' )
-        self:DestroyTopSpeedEffects()
-        self:DestroyIdleEffects()
+        self:OnKilledVO()
 
         if self.UnitBeingTeleported and not self.UnitBeingTeleported:IsDead() then
             self.UnitBeingTeleported:Destroy()
@@ -1666,45 +1664,7 @@ Unit = Class(moho.unit_methods) {
         return prop
     end,
 
-    CreateUnitDestructionDebris = function(self, overkillRatio)
-    --[[
-        for i=1,self:GetBoneCount() do
-            LOG(self:GetBoneName(i))
-        end
-        ]]
-
-        local all_parts = {
-            low=self.DestructionPartsLowToss or {},
-            high=self.DestructionPartsHighToss or {},
-            chassis=self.DestructionPartsChassisToss or {},
-        }
-
-        all_parts.chassis ={}
-
-        for type, parts in all_parts do
-            local n = table.getsize(parts)
-            if(n > 0) then
-                local limit = Random(1, n)
-                local i = 1
-                for _, bone in parts do
-                    local pos = self:GetPosition(bone)
-                    LOG("BONE: " .. bone)
-                    self:ShowBone(bone, false)
-                    self.NumDebrisProjectiles = self.NumDebrisProjectiles + 1
-                    proj = self:CreateProjectileAtBone('/mods/ReclaimGround/projectiles/DebrisBoneProjectile/DebrisBoneProjectile_proj.bp', bone)
-                    --proj = self:CreateProjectile('/mods/ReclaimGround/projectiles/DebrisBoneProjectile/DebrisBoneProjectile_proj.bp')
-                    --proj = self:CreateProjectileAtBone('/effects/entities/DebrisBoneAttachLow01/DebrisBoneAttachLow01_proj.bp', bone)
-                    --self:AttachBoneToEntityBone(bone, proj,-1, false)
-                    proj:AttachToBone(self, bone)
-                    pos[2] = pos[2] + 20
-                    proj:SetPosition(pos, true)
-                    self.Trash:Add(proj)
-                end
-            end
-        end
-    end,
-
-    CreateUnitDestructionDebris2 = function( self, high, low, chassis )
+    CreateUnitDestructionDebris = function( self, high, low, chassis )
         local HighDestructionParts = table.getn(self.DestructionPartsHighToss)
         local LowDestructionParts = table.getn(self.DestructionPartsLowToss)
         local ChassisDestructionParts = table.getn(self.DestructionPartsChassisToss)
@@ -1733,7 +1693,7 @@ Unit = Class(moho.unit_methods) {
                 self:ShowBone( self.DestructionPartsLowToss[i], false )
                 boneProj = self:CreateProjectileAtBone('/effects/entities/DebrisBoneAttachLow01/DebrisBoneAttachLow01_proj.bp',self.DestructionPartsLowToss[i])
                 self:AttachBoneToEntityBone(self.DestructionPartsLowToss[i],boneProj,-1,false)
-                #explosion.CreateUnitDebrisEffects( self, self.DestructionPartsLowToss[i] )
+                --explosion.CreateUnitDebrisEffects( self, self.DestructionPartsLowToss[i] )
             end
         end
         if chassis and (ChassisDestructionParts > 0) then
@@ -1785,13 +1745,13 @@ Unit = Class(moho.unit_methods) {
             local randBone = Util.GetRandomInt( 0, numBones)
             local boneHeight = self:GetPosition(randBone)[2]
             local toSurface = surfaceHeight - boneHeight
+            local y = toSurface
             local rx, ry, rz = self:GetRandomOffset(0.3)
             local rs = math.max(math.min(2.5, vol / 20), 0.5)
             local scale = Util.GetRandomFloat(rs/2, rs)
 
             self:DestroyAllDamageEffects()
             if(toSurface < 1) then
-                local y = toSurface
                 CreateAttachedEmitter(self, randBone, army,'/effects/emitters/destruction_water_sinking_ripples_01_emit.bp'):OffsetEmitter(rx, y, rz):ScaleEmitter(scale)
                 CreateAttachedEmitter(self, randBone, army, '/effects/emitters/destruction_water_sinking_wash_01_emit.bp'):OffsetEmitter(rx, y, rz):ScaleEmitter(scale)
             end
@@ -1802,12 +1762,12 @@ Unit = Class(moho.unit_methods) {
             else
                 local lifetime = Util.GetRandomInt(50, 200)
 
-                if(toSurface > 2) then
+                if(toSurface > 1) then
                     CreateEmitterAtBone( self, randBone, army, '/effects/emitters/underwater_bubbles_01_emit.bp'):OffsetEmitter(rx, ry, rz)
                         :ScaleEmitter(scale)
                         :SetEmitterParam('LIFETIME', lifetime)
 
-                    CreateAttachedEmitter(self, -1, army, '/effects/emitters/destruction_underwater_sinking_wash_01_emit.bp'):OffsetEmitter(rx, y, rz):ScaleEmitter(scale)
+                    CreateAttachedEmitter(self, -1, army, '/effects/emitters/destruction_underwater_sinking_wash_01_emit.bp'):OffsetEmitter(rx, ry, rz):ScaleEmitter(scale)
 
                         --[[
                     CreateEmitterAtBone( self, randBone, army, '/effects/emitters/underwater_vent_bubbles_01_emit.bp'):OffsetEmitter(rx, ry, rz)
@@ -1833,30 +1793,17 @@ Unit = Class(moho.unit_methods) {
         local bp = self:GetBlueprint()
         local scale = ((bp.SizeX or 0 + bp.SizeZ or 0) * 0.5)
         local bone = 0
-        local sink_data = {
+        local data = {
             TargetBone = bone,
             TargetEntity = self,
-            --Angle = angle,
         }
 
         -- create projectile
-        local proj = self:CreateProjectileAtBone('/mods/ReclaimGround/projectiles/Sink_helper/Sink_helper_proj.bp', bone)
-        proj:PassData( sink_data )
+        local proj = self:CreateProjectileAtBone('/projectiles/Sinker/Sinker_proj.bp', bone)
+        proj:PassData( data )
         proj:Start(10 * math.max(2, math.min(7, scale)))
 
         self.Trash:Add(proj)
-        --[[
-        if(self.LastVelocity) then
-            proj:SetVelocity(self.LastVelocity[1]*10, self.LastVelocity[2]*10, self.LastVelocity[3]*10)
-        end
-        ]]
-
-        --[[
-        local R = utilities.GetRandomFloat
-        self.Trash:Add(CreateRotator( self, 0, 'x', nil, 0, R(1,3), R(40,60)))
-        self.Trash:Add(CreateRotator( self, 0, 'y', nil, 0, R(1,3), R(10,30)))
-        self.Trash:Add(CreateRotator( self, 0, 'z', nil, 0, R(1,6, R(40,60))))
-        ]]
     end,
 
     DeathThread = function( self, overkillRatio, instigator)
@@ -1865,6 +1812,9 @@ Unit = Class(moho.unit_methods) {
         local isSinking = layer == 'Water' or layer == 'Sub'
         WaitSeconds( utilities.GetRandomFloat( self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax) )
         self:DestroyAllDamageEffects()
+        self:DestroyTopSpeedEffects()
+        self:DestroyIdleEffects()
+        self:DestroyBeamExhaust()
 
         if self.PlayDestructionEffects then
             self:CreateDestructionEffects(overkillRatio)
@@ -1874,8 +1824,7 @@ Unit = Class(moho.unit_methods) {
             self:ForkThread(self.SinkThread)
         end
 
---[[
-        if((self.ShowUnitDestructionDebris and overkillRatio) or true) then
+        if((self.ShowUnitDestructionDebris and overkillRatio)) then
             if overkillRatio <= 1 then
                 self.CreateUnitDestructionDebris( self, true, true, false )
             elseif overkillRatio <= 2 then
@@ -1886,7 +1835,6 @@ Unit = Class(moho.unit_methods) {
                 self.CreateUnitDestructionDebris( self, true, true, true )
             end
         end
-        ]]
 
         if self.DeathAnimManip and not isNaval then -- wait for non naval-units death animations
             if(not isSinking) then
@@ -1900,42 +1848,16 @@ Unit = Class(moho.unit_methods) {
 
         if isSinking then
             self:ForkThread(self.SinkDestructionEffects)
-
-            --MetaImpact( self, self:GetPosition(), 0.1, 0.5 )
             self:SeabedWatcher() -- finishes when unit reached seabed
-            --CreateScaledBoom(self, overkillRatio)
         end
-
-        --self:DebrisWatcher()
 
         self:CreateWreckage( overkillRatio )
-
-        if self.testProj then
-            self.testProj:Destroy()
-        end
 
         -- Create destruction debris out of the mesh, currently these projectiles look like crap,
         -- since projectile rotation and terrain collision doesn't work that great. These are left in
         -- hopes that this will look better in the future.. =)
 
---[[
-        if((self.ShowUnitDestructionDebris and overkillRatio) or true) then
-            if overkillRatio <= 1 then
-                self.CreateUnitDestructionDebris( self, true, true, false )
-            elseif overkillRatio <= 2 then
-                self.CreateUnitDestructionDebris( self, true, true, false )
-            elseif overkillRatio <= 3 then
-                self.CreateUnitDestructionDebris( self, true, true, true )
-            else --VAPORIZED
-                self.CreateUnitDestructionDebris( self, true, true, true )
-            end
-        end
-        ]]
-
-        --LOG('*DEBUG: DeathThread Destroying in ',  self.DeathThreadDestructionWaitTime )
-        --WaitSeconds(self.DeathThreadDestructionWaitTime)
-
-
+        WaitSeconds(self.DeathThreadDestructionWaitTime)
 
         if not isSinking then
             self:PlayUnitSound('Destroyed')
