@@ -1,4 +1,9 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'muzzle01',
+        },
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'XSL',
@@ -50,7 +55,7 @@ UnitBlueprint {
         'OVERLAYANTIAIR',
         'OVERLAYDIRECTFIRE',
     },
-    CollisionOffsetZ = 0,
+    CollisionOffsetZ = 0.05,
     Defense = {
         AirThreatLevel = 27,
         ArmorType = 'Normal',
@@ -214,9 +219,9 @@ UnitBlueprint {
     SelectionSizeX = 0.8,
     SelectionSizeZ = 0.8,
     SelectionThickness = 0.3,
-    SizeX = 0.8,
-    SizeY = 0.3,
-    SizeZ = 1.0,
+    SizeX = 1.3,
+    SizeY = 0.5,
+    SizeZ = 1.5,
     StrategicIconName = 'icon_land3_antiair',
     StrategicIconSortPriority = 115,
     Transport = {
