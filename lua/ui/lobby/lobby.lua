@@ -211,6 +211,27 @@ local pmDialog = false
 local hasSupcom = true
 local hasFA = true
 
+local windowedMode = false
+
+function SetWindowedLobby(windowed)
+    local Prefs = import('/lua/user/prefs.lua')
+    local options = Prefs.GetFromCurrentProfile('options')
+    local primary = options.primary_adapter or "windowed"
+
+    -- Dont change resolution if user already using windowed mode
+    if(primary == 'windowed' or windowed == windowedMode) then
+        return
+    end
+
+    if windowed then
+        ConExecute('SC_PrimaryAdapter windowed')
+    else
+        ConExecute('SC_PrimaryAdapter ' .. tostring(primary))
+    end
+
+    windowedMode = windowed
+end
+
 --// Menu in Slot select -- Add new function by Xinnony
 function FuncSlotMenuData()
     slotMenuStrings = {
@@ -565,6 +586,7 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
 
         -- Store off the validated playername
         localPlayerName = lobbyComm:GetLocalPlayerName()
+        SetWindowedLobby(true)
     end
 end
 
@@ -1453,6 +1475,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
 
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+        SetWindowedLobby(false)
         lobbyComm:LaunchGame(gameInfo)
     end
 
@@ -4519,6 +4542,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             elseif data.Type == 'Launch' then
                 local info = data.GameInfo
                 info.GameMods = Mods.GetGameMods(info.GameMods)
+                SetWindowedLobby(false)
                 lobbyComm:LaunchGame(info)
             elseif data.Type == 'ClearSlot' then
                 ClearSlotInfo(data.Slot)
