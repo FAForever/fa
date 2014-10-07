@@ -976,6 +976,171 @@ local function shuffle( a )
     return a
 end
 
+---------------------------
+-- autobalance functions --
+---------------------------
+local function team_sort_by_sum(t1, t2)
+    return t1['sum'] < t2['sum']
+end
+
+local function autobalance_bestworst(players, teams_arg)
+    local players = table.deepcopy(players)
+    local result = {}
+    local best = true
+    local teams = {}
+
+    for t, slots in teams_arg do
+        table.insert(teams, {team=t, slots=table.deepcopy(slots), sum=0})
+    end
+
+    -- teams first picks best player and then worst player, repeat
+    while table.getn(players) > 0 do
+        for i, t in teams do
+            local team = t['team']
+            local slots = t['slots']
+            local slot = table.remove(slots, 1)
+            local player
+
+            if(best) then
+                player = table.remove(players, 1)
+            else
+                player = table.remove(players)
+            end
+
+            if(not player) then break end
+
+            teams[i]['sum'] = teams[i]['sum'] + player['rating']
+            table.insert(result, {player=player['pos'], rating=player['rating'], team=team, slot=slot})
+        end
+
+        best = not best
+        if(best) then
+            table.sort(teams, team_sort_by_sum)
+        end
+    end
+
+    return result
+end
+
+local function autobalance_avg(players, teams_arg)
+    local players = table.deepcopy(players)
+    local result = {}
+    local teams = {}
+    local max_sum = 0
+
+    for t, slots in teams_arg do
+        table.insert(teams, {team=t, slots=table.deepcopy(slots), sum=0})
+    end
+
+    while table.getn(players) > 0 do
+        local first_team = true
+        for i, t in teams do
+            local team = t['team']
+            local slots = t['slots']
+            local slot = table.remove(slots, 1)
+            local player
+            local player_key
+
+            for j, p in players do
+                player_key = j
+                if(first_team or t['sum'] + p['rating'] <= max_sum) then
+                    break
+                end
+            end
+
+            player = table.remove(players, player_key)
+            if(not player) then break end
+
+            teams[i]['sum'] = teams[i]['sum'] + player['rating']
+            max_sum = math.max(max_sum, teams[i]['sum'])
+            table.insert(result, {player=player['pos'], rating=player['rating'], team=team, slot=slot})
+            first_team = false
+        end
+
+        table.sort(teams, team_sort_by_sum)
+    end
+
+    return result
+end
+
+local function autobalance_rr(players, teams)
+    local players = table.deepcopy(players)
+    local teams = table.deepcopy(teams)
+    local result = {}
+
+    local team_picks = {
+        {},
+        {1,2,  2,1,  2,1,  1,2,  1,2,  2,1},
+        {1,2,3,  3,2,1,  2,1,3,  2,3,1},
+        {1,2,3,4,  4,3,2,1,  3,1,4,2},
+    }
+
+    local picks = team_picks[table.getn(teams)]
+
+    i = 1
+    while (table.getn(players) > 0) do
+        local player = table.remove(players, 1)
+        local team = table.remove(picks, 1)
+        local slot = table.remove(teams[team], 1)
+        if(not player) then break end
+
+        table.insert(result, {player=player['pos'], rating=player['rating'], team=team, slot=slot})
+    end
+
+    return result
+end
+
+local function autobalance_random(players, teams_arg)
+    local players = table.deepcopy(players)
+    local result = {}
+    local teams = {}
+
+    shuffle(players)
+
+    for t, slots in teams_arg do
+        table.insert(teams, {team=t, slots=table.deepcopy(slots)})
+    end
+
+    while(table.getn(players) > 0) do
+
+        for _, t in teams do
+            local team = t['team']
+            local slot = table.remove(t['slots'], 1)
+            local player = table.remove(players, 1)
+
+            if(not player) then break end
+
+            table.insert(result, {player=player['pos'], rating=player['rating'], team=team, slot=slot})
+        end
+    end
+
+    return result
+end
+
+function autobalance_quality(players)
+    local teams = nil
+    local quality = nil
+
+    for _, p in players do
+        local i = p['player']
+        local team = p['team']
+        local player = Player.create(gameInfo.PlayerOptions[i].PlayerName,
+                                     Rating.create(gameInfo.PlayerOptions[i].MEAN or 1500, gameInfo.PlayerOptions[i].DEV or 500))
+
+        if(not teams) then
+            teams = Teams.create(team, player)
+        else
+            teams:addPlayer(team, player)
+        end
+    end
+
+    if(teams) then
+        quality = Trueskill.computeQuality(teams)
+    end
+
+    return quality
+end
+
 local function AssignRandomStartSpots(gameInfo)
     if gameInfo.GameOptions['TeamSpawn'] == 'random' then
         local numAvailStartSpots = nil
@@ -997,120 +1162,123 @@ local function AssignRandomStartSpots(gameInfo)
             return
         end
 
-        local norating = false
-        local ratingTable = {}
+        teams = {}
+        teams[1] = {}
+        teams[2] = {}
 
-        for i = 1, numAvailStartSpots do
-            if gameInfo.PlayerOptions[i] then
-                if gameInfo.PlayerOptions[i].PL then
-                    rating = gameInfo.PlayerOptions[i].PL
-                    ratingTable[rating] = i
-                else
-                    norating = true
-                end
-            end
-        end
-
-        a = {}
-        for n in pairs(ratingTable) do table.insert(a, n) end
-        table.sort(a)
-
-        team1 = {}
-        team2 = {}
         for i = 1, numAvailStartSpots do
             if gameInfo.ClosedSlots[i] == nil then
                 if gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
-
                     local midLine = GUI.mapView.Left() + (GUI.mapView.Width() / 2)
+                    if(not GUI.markers[i].marker) then return end
                     local markerPos = GUI.markers[i].marker.Left()
 
                     if markerPos < midLine then
-                        table.insert(team1, i)
+                        table.insert(teams[1], i)
                     else
-                        table.insert(team2, i)
+                        table.insert(teams[2], i)
                     end
-
                 elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
                     local midLine = GUI.mapView.Top() + (GUI.mapView.Height() / 2)
                     local markerPos = GUI.markers[i].marker.Top()
 
                     if markerPos < midLine then
-                        table.insert(team1, i)
+                        table.insert(teams[1], i)
                     else
-                        table.insert(team2, i)
+                        table.insert(teams[2], i)
                     end
-
                 elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' then
                     if i == 1 or i == 3 or i == 5 or i == 7 or i == 9 or i == 11 then
-                        table.insert(team1, i)
+                        table.insert(teams[1], i)
                     else
-                        table.insert(team2, i)
+                        table.insert(teams[2], i)
                     end
                 end
             end
         end
-
         -- shuffle the array for randomness.
-        team1 = shuffle(team1)
-        team2 = shuffle(team2)
+        teams[1] = shuffle(teams[1])
+        teams[2] = shuffle(teams[2])
+        shuffle(teams)
 
-        local team1Increment = 1
-        local team2Increment = 1
-
+        local ratingTable = {}
         for i = 1, numAvailStartSpots do
             if gameInfo.PlayerOptions[i] then
-                -- don't select closed slots for random pick
-                local randSlot
-                local goodteam = nil
-                for k,n in ipairs(a) do
-                    if a[n] == i then
-                        goodteam = Trueskill.assignToTeam(k-1)
-
-                    end
+                if(not gameInfo.PlayerOptions[i].MEAN) then
+                    gameInfo.PlayerOptions[i].MEAN = 1500
                 end
 
-                repeat
-
-                    if gameInfo.GameOptions['AutoTeams'] == 'manual' or gameInfo.GameOptions['AutoTeams'] == 'none' then
-                        randSlot = math.random(1,numAvailStartSpots)
-                    else
-                        if goodteam and norating == false then
-                            if goodteam == 1 then
-                                randSlot = team1[team1Increment]
-                                team1Increment = team1Increment + 1
-                            else
-                                randSlot = team2[team2Increment]
-                                team2Increment = team2Increment + 1
-                            end
-                        else
-                            randSlot = math.random(1,numAvailStartSpots)
-                        end
-                    end
-
-
-                until gameInfo.ClosedSlots[randSlot] == nil
-
-
-                local temp = nil
-                if gameInfo.PlayerOptions[randSlot] then
-                    temp = table.deepcopy(gameInfo.PlayerOptions[randSlot])
+                if(not gameInfo.PlayerOptions[i].DEV) then
+                    gameInfo.PlayerOptions[i].DEV = 500
                 end
 
-                gameInfo.PlayerOptions[randSlot] = table.deepcopy(gameInfo.PlayerOptions[i])
-                gameInfo.PlayerOptions[i] = temp
+                --table.insert(ratingTable, {pos=i, rating=gameInfo.PlayerOptions[i].PL or 0})
+                table.insert(ratingTable, {pos=i, rating=gameInfo.PlayerOptions[i].MEAN-gameInfo.PlayerOptions[i].DEV*3})
             end
         end
-    end
 
+        shuffle(ratingTable) -- random order for people with same rating
+        table.sort(ratingTable, function(a, b) return a['rating'] > b['rating'] end)
+
+        local functions = {
+            rr=autobalance_rr,
+            bestworst=autobalance_bestworst,
+            avg=autobalance_avg,
+        }
+
+        local best = {quality=0, result=nil}
+        local r, q
+        for fname, f in functions do
+            r = f(ratingTable, teams)
+            q = autobalance_quality(r)
+
+            -- when all functions fail, use one as default
+            if q > best.quality or q.players == nil then
+                best.result = r
+                best.quality = q
+            end
+        end
+
+        local results = {}
+        table.insert(results, best)
+
+        -- add 100 random compositions and keep 3 with at least 90% of best quality
+        for i=1, 100 do
+            r = autobalance_random(ratingTable, teams)
+            q = autobalance_quality(r)
+
+            if(q > best.quality*0.9) then
+                table.insert(results, {quality=q, result=r})
+
+                if(table.getsize(results) > 4) then break end
+            end
+        end
+
+        shuffle(results)
+        best = table.remove(results, 1)
+        gameInfo.GameOptions['Quality'] = best.quality
+
+        local orgPlayerOptions = table.deepcopy(gameInfo.PlayerOptions)
+        for k, p in gameInfo.PlayerOptions do
+            orgPlayerOptions[k] = table.deepcopy(p)
+        end
+
+        gameInfo.PlayerOptions = {}
+        for _, r in best.result do
+            local slot = r['slot']
+            local player = r['player']
+            local team = r['team']
+            gameInfo.PlayerOptions[slot] = table.deepcopy(orgPlayerOptions[player])
+            gameInfo.PlayerOptions[slot].StartSpot = slot
+            gameInfo.PlayerOptions[slot].Team = team
+        end
+    end
 end
 
--- This fonction is used to double check the observers.
+-- This function is used to double check the observers.
 local function sendObserversList(gameInfo)
     for k,observer in gameInfo.Observers do
-
         GpgNetSend('PlayerOption', string.format("team %s %d %s", observer.PlayerName, -1, 0))
-
-
     end
 end
 
