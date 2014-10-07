@@ -1233,7 +1233,7 @@ local function AssignRandomStartSpots(gameInfo)
             q = autobalance_quality(r)
 
             -- when all functions fail, use one as default
-            if q > best.quality or q.players == nil then
+            if q > best.quality or best.result == nil then
                 best.result = r
                 best.quality = q
             end
