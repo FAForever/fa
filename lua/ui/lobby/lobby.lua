@@ -86,7 +86,7 @@ local LASTXinnoBackground = '' -- For prevent the infinite loop to Background
 
 local connectedTo = {}
 
-local availableMods = {} # map from peer ID to set of available mods; each set is a map from "mod id"->true
+local availableMods = {} -- map from peer ID to set of available mods; each set is a map from "mod id"->true
 local selectedMods = nil
 
 local commandQueueIndex = 0
@@ -281,11 +281,11 @@ FuncSlotMenuData()
 local function GetAITooltipList()
     local aitypes = import('/lua/ui/lobby/aitypes.lua').aitypes
     local retTable = {}
-    #this is to fix tooltip problem
+    --this is to fix tooltip problem
     for i = 1, 2 do
         table.insert(retTable, nil)
     end
-    #end new faf part
+    --end new faf part
     for i, v in aitypes do
         table.insert(retTable, 'aitype_'..v.key)
     end
@@ -346,7 +346,7 @@ local function HandleSlotSwitches(moveFrom, moveTo) -- Xinnony (Factored by Vica
     local fromFaction = pOpts[moveFrom].Faction
     local fromNumGame = pOpts[moveFrom].NG
 
-    if pOpts[moveFrom].Human and moveFrom != moveTo then -- IF Player moveFrom is Human and Player moveFrom NOT in moveTo
+    if pOpts[moveFrom].Human and moveFrom ~= moveTo then -- IF Player moveFrom is Human and Player moveFrom NOT in moveTo
         -- IF Slot moveToSlot is Human and NOT Ready, AND IF Player moveFromSlot is NOT Ready
         if pOpts[moveTo].Human then
             if pOpts[moveTo].Ready then
@@ -616,7 +616,7 @@ end
 
 function SetHasForgedAlliance(faInstalled)
     if IsSyncReplayServer then
-        if GetGameSpeed() != speed then
+        if GetGameSpeed() ~= speed then
             SetGameSpeed(speed)
         end
     else
@@ -665,11 +665,11 @@ function IsLocallyOwned(slot)
 end
 
 function IsPlayer(id)
-    return FindSlotForID(id) != nil
+    return FindSlotForID(id) ~= nil
 end
 
 function IsObserver(id)
-    return FindObserverSlotForID(id) != nil
+    return FindObserverSlotForID(id) ~= nil
 end
 
 
@@ -737,7 +737,7 @@ function SetSlotInfo(slot, playerInfo)
     GUI.slots[slot].ratingGroup:Show()
     --if playerInfo.MEAN == '-9999' then -- The player is a Smurf (Banned)
     --GUI.slots[slot].ratingText:SetText('Banned')
-    --GUI.slots[slot].ratingText:SetColor('Crimson') --= #dc143c
+    --GUI.slots[slot].ratingText:SetColor('Crimson') --= --dc143c
     --else
     GUI.slots[slot].ratingText:SetText(playerInfo.PL or '')
     --end
@@ -958,7 +958,7 @@ local function AssignRandomStartSpots(gameInfo)
     if gameInfo.GameOptions['TeamSpawn'] == 'random' then
         local numAvailStartSpots = nil
         local scenarioInfo = nil
-        if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") then
+        if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
             scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
         end
         if scenarioInfo then
@@ -1131,7 +1131,7 @@ local function AssignRandomTeams(gameInfo)
             end
         end
     end
-    if gameInfo.GameOptions['AutoTeams'] == 'pvsi' or gameInfo.GameOptions['RandomMap'] != 'Off' then
+    if gameInfo.GameOptions['AutoTeams'] == 'pvsi' or gameInfo.GameOptions['RandomMap'] ~= 'Off' then
         for i = 1, LobbyComm.maxPlayerSlots do
             if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
                 if i == 1 or i == 3 or i == 5 or i == 7 or i == 9 or i == 11 then
@@ -1215,7 +1215,7 @@ function PublicChat(text)
 end
 
 function PrivateChat(targetID,text)
-    if targetID != localPlayerID then
+    if targetID ~= localPlayerID then
         lobbyComm:SendData(
             targetID,
             {
@@ -1233,7 +1233,7 @@ function UpdateAvailableSlots( numAvailStartSpots )
     end
 
     -- if number of available slots has changed, update it
-    if numOpenSlots != numAvailStartSpots then
+    if numOpenSlots ~= numAvailStartSpots then
         numOpenSlots = numAvailStartSpots
         for i = 1, LobbyComm.maxPlayerSlots do
             if i <= numAvailStartSpots then
@@ -1290,17 +1290,17 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
             if player.Human then
                 totalHumanPlayers = totalHumanPlayers + 1
             end
-            if not moreThanOneTeam and lastTeam and lastTeam != player.Team then
+            if not moreThanOneTeam and lastTeam and lastTeam ~= player.Team then
                 moreThanOneTeam = true
             end
-            if player.Team != 1 then
+            if player.Team ~= 1 then
                 allFFA = false
             end
             lastTeam = player.Team
         end
     end
 
-    if gameInfo.GameOptions['Victory'] != 'sandbox' then
+    if gameInfo.GameOptions['Victory'] ~= 'sandbox' then
         local valid = true
         if totalPlayers == 1 then
             valid = false
@@ -1353,12 +1353,12 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
             local i = 1
             local n = 0
             repeat
-                if gameInfo.PlayerOptions[i].Team != 1 and gameInfo.PlayerOptions[i].Team != nil then
+                if gameInfo.PlayerOptions[i].Team ~= 1 and gameInfo.PlayerOptions[i].Team ~= nil then
                     n = n + 1
                 end
                 i = i + 1
             until i == 9
-            if totalPlayers > 3 and not stillAllowLockedTeams and totalPlayers != n and gameInfo.GameOptions['AutoTeams']
+            if totalPlayers > 3 and not stillAllowLockedTeams and totalPlayers ~= n and gameInfo.GameOptions['AutoTeams']
                 == 'none' then
                 UIUtil.QuickDialog(GUI, "<LOC lobui_0526>There are players for a team game and teams are locked.  Do you " ..
                                    "still wish to launch?",
@@ -1423,7 +1423,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         -- Send observer list again, just by precaution.
         sendObserversList(gameInfo)
 
-        if gameInfo.GameOptions['RandomMap'] != 'Off' then
+        if gameInfo.GameOptions['RandomMap'] ~= 'Off' then
             autoRandMap = true
             autoMap()
         end
@@ -1467,7 +1467,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
     --self.OnClick = function(self) TryLaunch(false) end
     --GUI.launchGameButton.label:SetText(LOC("<LOC lobui_0212>Launch"))
     --end
-    --if gameInfo.GameOptions['RandomMap'] != 'Off' then
+    --if gameInfo.GameOptions['RandomMap'] ~= 'Off' then
     --local rMapSizeFil = import('/lua/ui/dialogs/mapselect.lua').rMapSizeFil
     --local rMapSizeFilLim = import('/lua/ui/dialogs/mapselect.lua').rMapSizeFilLim
     --local rMapPlayersFil = import('/lua/ui/dialogs/mapselect.lua').rMapPlayersFil
@@ -1491,13 +1491,13 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
     --if rMapPlayersFilLim == 'greater' then
     --rMapPlayersFilLim = '>='
     --end
-    --if rMapSizeFil != 0 and rMapPlayersFil != 0 then
+    --if rMapSizeFil ~= 0 and rMapPlayersFil ~= 0 then
     --SendSystemMessage(LOCF("<LOC lobui_0558>Random Map enabled: Map Size is %s %dkm and Number of Players" ..
     --                       " are %s %d", rMapSizeFilLim, rMapSizeFil, rMapPlayersFilLim, rMapPlayersFil))
-    --elseif rMapSizeFil != 0 then
+    --elseif rMapSizeFil ~= 0 then
     --SendSystemMessage(LOCF("<LOC lobui_0559>Random Map enabled: Map Size is %s %dkm and Number of Players" ..
     --                       " are ALL", rMapSizeFilLim, rMapSizeFil))
-    --elseif rMapPlayersFil != 0 then
+    --elseif rMapPlayersFil ~= 0 then
     --SendSystemMessage(LOCF("<LOC lobui_0560>Random Map enabled: Map Size is ALL and Number of Players " ..
     --                       "are %s %d", rMapPlayersFilLim, rMapPlayersFil))
     --else
@@ -1533,10 +1533,10 @@ local function UpdateGame()
     local playerSlot = FindSlotForID(localPlayerID)
     local scenarioInfo = nil
 
-    if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") then
+    if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
 
-        if scenarioInfo and scenarioInfo.map and scenarioInfo.map != '' then
+        if scenarioInfo and scenarioInfo.map and scenarioInfo.map ~= '' then
             local mods = Mods.GetGameMods(gameInfo.GameMods)
             PrefetchSession(scenarioInfo.map, mods, true)
         else
@@ -1616,7 +1616,7 @@ local function UpdateGame()
         GUI.observerList:DeleteAllItems()
 
         for index, observer in gameInfo.Observers do
-            observer.ObserverListIndex = GUI.observerList:GetItemCount() # Pin-head William made this zero-based
+            observer.ObserverListIndex = GUI.observerList:GetItemCount() -- Pin-head William made this zero-based
             GUI.observerList:AddItem(observer.PlayerName)
         end
     end
@@ -1679,7 +1679,7 @@ local function UpdateGame()
         end
         if not hasSupcom then
             local playerSlot = FindSlotForID(localPlayerID)
-            if gameInfo.PlayerOptions[playerSlot] and gameInfo.PlayerOptions[playerSlot].Faction != 4 and not
+            if gameInfo.PlayerOptions[playerSlot] and gameInfo.PlayerOptions[playerSlot].Faction ~= 4 and not
                 IsObserver(localPlayerID) then
                 SetPlayerOption(playerSlot, 'Faction', 4, true)
                 return
@@ -1697,7 +1697,7 @@ local function UpdateGame()
         end
     end
 
-    if scenarioInfo and scenarioInfo.map and (scenarioInfo.map != "") then
+    if scenarioInfo and scenarioInfo.map and (scenarioInfo.map ~= "") then
         if not GUI.mapView:SetTexture(scenarioInfo.preview) then
             GUI.mapView:SetTextureFromMap(scenarioInfo.map)
         end
@@ -1713,7 +1713,7 @@ local function UpdateGame()
         -- disable options when all players are marked ready
         if not singlePlayer then
             local allPlayersReady = true
-            if GetPlayersNotReady() != false then
+            if GetPlayersNotReady() ~= false then
                 allPlayersReady = false
             end
 
@@ -1748,8 +1748,8 @@ local function UpdateGame()
 
     if LASTXinnoBackground == 'Map' then ChangeBackgroundLobby(nil, nil) end-- For update map background
 
-    if gameInfo.GameOptions['TeamSpawn'] != 'random' and math.mod(numPlayers,2) == 0 and gameInfo.GameOptions['AutoTeams'] !=
-        'manual' and gameInfo.GameOptions['AutoTeams'] != 'none' then
+    if gameInfo.GameOptions['TeamSpawn'] ~= 'random' and math.mod(numPlayers,2) == 0 and gameInfo.GameOptions['AutoTeams'] ~=
+        'manual' and gameInfo.GameOptions['AutoTeams'] ~= 'none' then
 
         local teams = nil
         local teamcreated = false
@@ -1785,12 +1785,12 @@ local function UpdateGame()
                 end
             end
         end
-        if correct and teams != nil then
+        if correct and teams ~= nil then
             local quality = Trueskill.computeQuality(teams)
             if quality and quality > 0 then
                 gameInfo.GameOptions['Quality'] = quality
-                --#local MapNameLabel = UIUtil.CreateText(GUI.panel, "current game quality : " .. quality .. " %", 17, UIUtil.titleFont)
-                --#LayoutHelpers.AtRightTopIn(MapNameLabel, GUI.panel, 50, 41)
+                --local MapNameLabel = UIUtil.CreateText(GUI.panel, "current game quality : " .. quality .. " %", 17, UIUtil.titleFont)
+                --LayoutHelpers.AtRightTopIn(MapNameLabel, GUI.panel, 50, 41)
                 if MapNameLabel and scenarioInfo.name then
                     -- Set the map name and quality at the top right corner in lobby -- Xinnony
                     SetText2(MapNameLabel, scenarioInfo.name, 10)
@@ -1882,7 +1882,7 @@ end
 -- notify other clients about the change.
 local function HostUpdateMods(newPlayerID, newPlayerName)
     if lobbyComm:IsHost() then
-        if gameInfo.GameOptions['RankedGame'] and gameInfo.GameOptions['RankedGame'] != 'Off' then
+        if gameInfo.GameOptions['RankedGame'] and gameInfo.GameOptions['RankedGame'] ~= 'Off' then
             gameInfo.GameMods = {}
             gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
             lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
@@ -1981,7 +1981,7 @@ end
 -- host makes a specific slot closed to players
 function HostCloseSlot(senderID, slot)
     -- don't close an already closed slot or an occupied slot
-    if gameInfo.ClosedSlots[slot] != nil or gameInfo.PlayerOptions[slot] != nil then
+    if gameInfo.ClosedSlots[slot] ~= nil or gameInfo.PlayerOptions[slot] ~= nil then
         return
     end
 
@@ -2138,7 +2138,7 @@ function HostTryMovePlayer(senderID, currentSlot, requestedSlot)
         return
     end
 
-    if gameInfo.ClosedSlots[requestedSlot] != nil then
+    if gameInfo.ClosedSlots[requestedSlot] ~= nil then
         LOG("HostTryMovePlayer: requested slot " .. requestedSlot .. " is closed")
         return
     end
@@ -2232,9 +2232,9 @@ end
 function HostConvertObserverToPlayer(senderID, name, fromObserverSlot, toPlayerSlot, requestedFaction, requestedPL, requestedRC, requestedNG)
     if gameInfo.Observers[fromObserverSlot] == nil then -- IF no Observer on the current slot : QUIT
         return
-    elseif gameInfo.PlayerOptions[toPlayerSlot] != nil then -- IF Player is in the target slot : QUIT
+    elseif gameInfo.PlayerOptions[toPlayerSlot] ~= nil then -- IF Player is in the target slot : QUIT
         return
-    elseif gameInfo.ClosedSlots[toPlayerSlot] != nil then -- IF target slot is Closed : QUIT
+    elseif gameInfo.ClosedSlots[toPlayerSlot] ~= nil then -- IF target slot is Closed : QUIT
         return
     end
 
@@ -2458,7 +2458,7 @@ function CreateUI(maxPlayers)
 
     UIUtil.SetCurrentSkin('uef')
 
-    if (GUI.connectdialog != false) then
+    if (GUI.connectdialog ~= false) then
         MenuCommon.MenuCleanup()
         GUI.connectdialog:Destroy()
         GUI.connectdialog = false
@@ -2816,7 +2816,7 @@ function CreateUI(maxPlayers)
 
         GUI.chatDisplayScroll = UIUtil.CreateVertScrollbarFor2(GUI.chatDisplay, -21, nil, 30)
 
-        # OnlineProvider.RegisterChatDisplay(GUI.chatDisplay)
+        -- OnlineProvider.RegisterChatDisplay(GUI.chatDisplay)
 
         GUI.chatEdit:SetMaxChars(200)
         GUI.chatEdit.OnCharPressed = function(self, charcode)
@@ -2835,7 +2835,7 @@ function CreateUI(maxPlayers)
         end
 
         GUI.chatEdit.OnEnterPressed = function(self, text)
-            if text != "" then
+            if text ~= "" then
                 GpgNetSend('Chat', text)
                 table.insert(commandQueue, 1, text)
                 commandQueueIndex = 0
@@ -2872,7 +2872,7 @@ function CreateUI(maxPlayers)
                     end
                 end
                 if keyCode == 40 then
-                    if commandQueueIndex != 1 then
+                    if commandQueueIndex ~= 1 then
                         if commandQueue[commandQueueIndex - 1] then
                             commandQueueIndex = commandQueueIndex - 1
                             self:SetText(commandQueue[commandQueueIndex])
@@ -2937,7 +2937,7 @@ function CreateUI(maxPlayers)
             LayoutHelpers.AtLeftTopIn(GUI.OptionDisplay[1], GUI.OptionContainer)
 
             local index = 2
-            while index != 8 do
+            while index ~= 8 do
                 --while GUI.OptionDisplay[table.getsize(GUI.OptionDisplay)].Bottom() + GUI.OptionDisplay[1].Height() < GUI.OptionContainer.Bottom() do
                 CreateElement(index)
                 LayoutHelpers.Below(GUI.OptionDisplay[index], GUI.OptionDisplay[index-1])
@@ -3193,7 +3193,7 @@ function CreateUI(maxPlayers)
             GUI.slots[i]._slot = i
             GUI.slots[i].HandleEvent = function(self, event)
                 if event.Type == 'MouseEnter' then
-                    if gameInfo.GameOptions['TeamSpawn'] != 'random' and GUI.markers[curRow].Indicator then
+                    if gameInfo.GameOptions['TeamSpawn'] ~= 'random' and GUI.markers[curRow].Indicator then
                         GUI.markers[curRow].Indicator:Play()
                     end
                 elseif event.Type == 'MouseExit' then
@@ -3256,7 +3256,7 @@ function CreateUI(maxPlayers)
             -- left deal with name clicks
             GUI.slots[i].name.OnEvent = function(self, event)
                 if event.Type == 'MouseEnter' then
-                    if gameInfo.GameOptions['TeamSpawn'] != 'random' and GUI.markers[curRow].Indicator then
+                    if gameInfo.GameOptions['TeamSpawn'] ~= 'random' and GUI.markers[curRow].Indicator then
                         GUI.markers[curRow].Indicator:Play()
                     end
                 elseif event.Type == 'MouseExit' then
@@ -3666,17 +3666,17 @@ function CreateUI(maxPlayers)
                         elseif rMapTypeFil == 2 then
                             rMapTypeFil = "<LOC lobui_0577>Custom"
                         end
-                        if rMapSizeFil != 0 and rMapPlayersFil != 0 then
+                        if rMapSizeFil ~= 0 and rMapPlayersFil ~= 0 then
                             SendSystemMessage(LOCF("<LOC lobui_0516>Filters: Map Size is %s %dkm and Number of Players are %s %d",
                                                    rMapSizeFilLim, rMapSizeFil, rMapPlayersFilLim, rMapPlayersFil))
-                        elseif rMapSizeFil != 0 then
+                        elseif rMapSizeFil ~= 0 then
                             SendSystemMessage(LOCF("<LOC lobui_0517>Filters: Map Size is %s %dkm and Number of Players are ALL",
                                                    rMapSizeFilLim, rMapSizeFil))
-                        elseif rMapPlayersFil != 0 then
+                        elseif rMapPlayersFil ~= 0 then
                             SendSystemMessage(LOCF("<LOC lobui_0518>Filters: Map Size is ALL and Number of Players are %s %d",
                                                    rMapPlayersFilLim, rMapPlayersFil))
                         end
-                        if rMapTypeFil != 0 then
+                        if rMapTypeFil ~= 0 then
                             SendSystemMessage(LOCF("<LOC lobui_0578>Map Type: %s", rMapTypeFil))
                         end
                         SendSystemMessage("---------------------------------------------------------------------------------------"..
@@ -3788,7 +3788,7 @@ function CreateUI(maxPlayers)
                     function()
                         while true and lobbyComm do
                             for slot, player in gameInfo.PlayerOptions do
-                                if player.Human and player.OwnerID != localPlayerID then
+                                if player.Human and player.OwnerID ~= localPlayerID then
                                     local peer = lobbyComm:GetPeer(player.OwnerID)
                                     local ping = peer.ping and math.floor(peer.ping)
                                     local pingcolor = CalcConnectionStatus(peer)
@@ -3796,7 +3796,7 @@ function CreateUI(maxPlayers)
                                     --GUI.slots[slot].pingText:SetColor(pingcolor)
                                     if ping and GUI.slots[slot].pingStatus then
                                         GUI.slots[slot].pingStatus:SetValue(ping)
-                                        if ping >= 500 or pingcolor != "green" then
+                                        if ping >= 500 or pingcolor ~= "green" then
                                             GUI.slots[slot].pingStatus:Show()
                                         else
                                             GUI.slots[slot].pingStatus:Hide()
@@ -3814,13 +3814,13 @@ function CreateUI(maxPlayers)
                                 end
                             end
                             for slot, observer in gameInfo.Observers do
-                                if observer and (observer.OwnerID != localPlayerID) and observer.ObserverListIndex then
+                                if observer and (observer.OwnerID ~= localPlayerID) and observer.ObserverListIndex then
                                     local peer = lobbyComm:GetPeer(observer.OwnerID)
 
                                     --Lobby "bug" fix.  This should fix the problem where the lobby pings get bugged.
                                     -- -Duck42
                                     local ping = 0
-                                    if peer.ping != nil then
+                                    if peer.ping ~= nil then
                                         ping = math.floor(peer.ping)
                                     end
 
@@ -3869,7 +3869,7 @@ function CreateUI(maxPlayers)
                                                    local globalOpts = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
                                                    local teamOptions = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
                                                    local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
-                                                   if not scenarioInfo and gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != "") then
+                                                   if not scenarioInfo and gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
                                                        scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
                                                    end
                                                    formattedOptions = {}
@@ -3918,8 +3918,8 @@ function CreateUI(maxPlayers)
                                                    --\\ Stop Check Mod active
 
                                                    --// Check RestrictedUnit active
-                                                   if gameInfo.GameOptions.RestrictedCategories != nil then
-                                                       if table.getn(gameInfo.GameOptions.RestrictedCategories) != 0 then
+                                                   if gameInfo.GameOptions.RestrictedCategories ~= nil then
+                                                       if table.getn(gameInfo.GameOptions.RestrictedCategories) ~= 0 then
                                                            table.insert(formattedOptions, {text = LOC("<LOC lobby_0005>Build Restrictions Enabled"),
                                                                         value = LOC("<LOC lobby_0006>Check Unit Manager"),
                                                                         mod = true,
@@ -3965,7 +3965,7 @@ function CreateUI(maxPlayers)
                                                            --LOG('<< FINDED in gameInfo.GameOptions = '..tostring(val.text))
                                                            option.value = val.text
                                                            option.valueTooltip = {text = optData.label, body = val.help}
-                                                           if optData.default and tostring(_) != tostring(optData.default) then
+                                                           if optData.default and tostring(_) ~= tostring(optData.default) then
                                                                table.insert(FormOpt2, option)
                                                            end
                                                            if not mpOnly then--or not singlePlayer then
@@ -3976,7 +3976,7 @@ function CreateUI(maxPlayers)
                                                            --LOG('<< FINDED in optData.default = '..tostring(val.text))
                                                            option.value = val.text
                                                            option.valueTooltip = {text = optData.label, body = val.help}
-                                                           if optData.default and tostring(_) != tostring(optData.default) then
+                                                           if optData.default and tostring(_) ~= tostring(optData.default) then
                                                                table.insert(FormOpt2, option)
                                                            end
                                                            if not mpOnly or not singlePlayer then
@@ -4010,7 +4010,7 @@ function CreateUI(maxPlayers)
                                                                --LOG('<< FINDED in gameInfo.GameOptions = '..tostring(val.text))
                                                                option.value = val.text
                                                                option.valueTooltip = {text = optData.label, body = val.help}
-                                                               if optData.default and tostring(_) != tostring(optData.default) then
+                                                               if optData.default and tostring(_) ~= tostring(optData.default) then
                                                                    table.insert(FormOpt2, option)
                                                                end
                                                                if not mpOnly then--or not singlePlayer then
@@ -4021,7 +4021,7 @@ function CreateUI(maxPlayers)
                                                                --LOG('<< FINDED in optData.default = '..tostring(val.text))
                                                                option.value = val.text
                                                                option.valueTooltip = {text = optData.label, body = val.help}
-                                                               if optData.default and tostring(_) != tostring(optData.default) then
+                                                               if optData.default and tostring(_) ~= tostring(optData.default) then
                                                                    table.insert(FormOpt2, option)
                                                                end
                                                                if not mpOnly or not singlePlayer then
@@ -4058,7 +4058,7 @@ function CreateUI(maxPlayers)
                                            end
 
                                            function CalcConnectionStatus(peer)
-                                               if peer.status != 'Established' then
+                                               if peer.status ~= 'Established' then
                                                    return 'red'
                                                else
                                                    if not wasConnected(peer.id) then
@@ -4075,7 +4075,7 @@ function CreateUI(maxPlayers)
 
                                                    local peers = lobbyComm:GetPeers()
                                                    for k,v in peers do
-                                                       if v.id != peer.id and v.status == 'Established' then
+                                                       if v.id ~= peer.id and v.status == 'Established' then
                                                            if not table.find(peer.establishedPeers, v.id) then
                                                                -- they can't talk to someone we can talk to.
                                                                return 'yellow'
@@ -4100,10 +4100,10 @@ function CreateUI(maxPlayers)
                                                end
                                                local result = true
                                                for k,id in important do
-                                                   if id != localPlayerID then
+                                                   if id ~= localPlayerID then
                                                        local peer = lobbyComm:GetPeer(id)
                                                        for k2,other in important do
-                                                           if id != other and not table.find(peer.establishedPeers, other) then
+                                                           if id ~= other and not table.find(peer.establishedPeers, other) then
                                                                result = false
                                                                AddChatText(LOCF("<LOC lobui_0299>%s doesn't have an established connection to %s",
                                                                                 peer.name,
@@ -4198,8 +4198,8 @@ function CreateUI(maxPlayers)
                                                    GUI.markers[slot].markerOverlay.Slot = slot
                                                    GUI.markers[slot].markerOverlay.OnClick = function(self, modifiers)
                                                        if modifiers.Left then
-                                                           if gameInfo.GameOptions['TeamSpawn'] != 'random' then
-                                                               if FindSlotForID(localPlayerID) != self.Slot and gameInfo.PlayerOptions[self.Slot] == nil then
+                                                           if gameInfo.GameOptions['TeamSpawn'] ~= 'random' then
+                                                               if FindSlotForID(localPlayerID) ~= self.Slot and gameInfo.PlayerOptions[self.Slot] == nil then
                                                                    if IsPlayer(localPlayerID) then
                                                                        if lobbyComm:IsHost() then
                                                                            HostTryMovePlayer(hostID, FindSlotForID(localPlayerID), self.Slot)
@@ -4273,7 +4273,7 @@ function CreateUI(maxPlayers)
                            end
                            GUI.markers[slot].markerOverlay.HandleEvent = function(self, event)
                                if event.Type == 'MouseEnter' then
-                                   if gameInfo.GameOptions['TeamSpawn'] != 'random' then
+                                   if gameInfo.GameOptions['TeamSpawn'] ~= 'random' then
                                        GUI.slots[self.Slot].name.HandleEvent(self, event)
                                    elseif gameInfo.GameOptions['AutoTeams'] == 'manual' and lobbyComm:IsHost() then
                                        GUI.markers[slot].Indicator:Play()
@@ -4374,7 +4374,7 @@ function CreateUI(maxPlayers)
                                end
                            end
 
-                           if gameInfo.ClosedSlots[slot] != nil then
+                           if gameInfo.ClosedSlots[slot] ~= nil then
                                local textOverlay = Text(GUI.markers[slot].markerOverlay)
                                textOverlay:SetFont(UIUtil.bodyFont, 14)
                                textOverlay:SetColor("Crimson")
@@ -4490,7 +4490,7 @@ function CreateUI(maxPlayers)
 
                                        -- Messages anyone can receive
                                        if data.Type == 'PlayerOption' then
-                                           if gameInfo.PlayerOptions[data.Slot].OwnerID != data.SenderID then
+                                           if gameInfo.PlayerOptions[data.Slot].OwnerID ~= data.SenderID then
                                                WARN("Attempt to set option on unowned slot.")
                                                return
                                            end
@@ -4512,7 +4512,7 @@ function CreateUI(maxPlayers)
                                            AddPlayerBenchmark(data)
                                            local playerId = FindIDForName(data.PlayerName)
                                            local playerSlot = FindSlotForID(playerId)
-                                           if playerSlot != nil then
+                                           if playerSlot ~= nil then
                                                SetSlotCPUBar(playerSlot, gameInfo.PlayerOptions[playerSlot])
                                            end
                                            -- End CPU benchmark code
@@ -4789,7 +4789,7 @@ function CreateUI(maxPlayers)
                                            SetGameOption(option.key,option.values[defValue].key, false, true)
                                        end
 
-                                       if self.desiredScenario and self.desiredScenario != "" then
+                                       if self.desiredScenario and self.desiredScenario ~= "" then
                                            Prefs.SetToCurrentProfile('LastScenario', self.desiredScenario)
                                            SetGameOption('ScenarioFile',self.desiredScenario, false, true)
                                            --for index, option in scenarioInfo.options do
@@ -4797,7 +4797,7 @@ function CreateUI(maxPlayers)
                                            --end
                                        else
                                            local scen = Prefs.GetFromCurrentProfile('LastScenario')
-                                           if scen and scen != "" then
+                                           if scen and scen ~= "" then
                                                SetGameOption('ScenarioFile',scen, false, true)
                                            end
                                        end
@@ -4940,17 +4940,17 @@ function CreateUI(maxPlayers)
                                        -- but since there's only one, we'll call it out here
                                        if key == 'RestrictedCategories' then
                                            local restrictionsEnabled = false
-                                           if val != nil then
-                                               if table.getn(val) != 0 then
+                                           if val ~= nil then
+                                               if table.getn(val) ~= 0 then
                                                    restrictionsEnabled = true
                                                end
                                            end
                                            GpgNetSend('GameOption', key, restrictionsEnabled)
                                        elseif key == 'ScenarioFile' then
                                            GpgNetSend('GameOption', key, val)
-                                           if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != '') then
+                                           if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= '') then
                                                scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-                                               if scenarioInfo and scenarioInfo.map and (scenarioInfo.map != '') then
+                                               if scenarioInfo and scenarioInfo.map and (scenarioInfo.map ~= '') then
                                                    GpgNetSend('GameOption', 'Slots', table.getsize(scenarioInfo.Configurations.standard.teams[1].armies))
                                                end
                                            end
@@ -5009,7 +5009,7 @@ function CreateUI(maxPlayers)
                                    end
 
                                    scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-                                   if scenarioInfo and scenarioInfo.map and (scenarioInfo.map != '') then
+                                   if scenarioInfo and scenarioInfo.map and (scenarioInfo.map ~= '') then
                                        if not LrgMap:SetTexture(scenarioInfo.preview) then
                                            LrgMap:SetTextureFromMap(scenarioInfo.map)
                                        end
@@ -5127,7 +5127,7 @@ function CreateUI(maxPlayers)
                                    LrgMap.markers[slot].markerOverlay.Slot = slot
                                    LrgMap.markers[slot].markerOverlay.OnClick = function(self, modifiers)
                                        if modifiers.Left then
-                                           if FindSlotForID(localPlayerID) != self.Slot and gameInfo.PlayerOptions[self.Slot] == nil then
+                                           if FindSlotForID(localPlayerID) ~= self.Slot and gameInfo.PlayerOptions[self.Slot] == nil then
                                                if IsPlayer(localPlayerID) then
                                                    if lobbyComm:IsHost() then
                                                        HostTryMovePlayer(hostID, FindSlotForID(localPlayerID), self.Slot)
@@ -5158,7 +5158,7 @@ function CreateUI(maxPlayers)
                end
                LrgMap.markers[slot].markerOverlay.HandleEvent = function(self, event)
                    if event.Type == 'MouseEnter' then
-                       if gameInfo.GameOptions['TeamSpawn'] != 'random' then
+                       if gameInfo.GameOptions['TeamSpawn'] ~= 'random' then
                            GUI.slots[self.Slot].name.HandleEvent(self, event)
                            LrgMap.markers[self.Slot].Indicator:Play()
                        end
@@ -5213,7 +5213,7 @@ function CreateUI(maxPlayers)
                    end
                end
 
-               if gameInfo.ClosedSlots[slot] != nil then
+               if gameInfo.ClosedSlots[slot] ~= nil then
                    local textOverlay = Text(LrgMap.markers[slot].markerOverlay)
                    textOverlay:SetFont(UIUtil.bodyFont, 14)
                    textOverlay:SetColor("Crimson")
@@ -5438,7 +5438,7 @@ function CreateUI(maxPlayers)
            --    playerName: The name of the player whose benchmark should be updated.
            local playerId = FindIDForName(playerName)
            local playerSlot = FindSlotForID(playerId)
-           if playerSlot != nil then
+           if playerSlot ~= nil then
                SetSlotCPUBar(playerSlot, gameInfo.PlayerOptions[playerSlot])
            end
        end
@@ -5481,11 +5481,11 @@ function CreateUI(maxPlayers)
 
 
 
-       ##########################################################################
-       ################################  Xinnony Wall  ################################
+       ---------------------------------------------------------------------------------
+       ---------------------------------  Xinnony Wall  --------------------------------
        --------------------------------------------------
-       -- CountryFlag Functions                         --
-       -- Author : Xinnony                                --
+       -- CountryFlag Functions                        --
+       -- Author : Xinnony                             --
        --------------------------------------------------
        function Country_AddControlTooltip(control, waitDelay, slotNumber)
            local self = control
@@ -6080,7 +6080,7 @@ function CreateUI(maxPlayers)
        function ChangeBackgroundLobby(slot, faction)
            XinnoBackground = Prefs.GetFromCurrentProfile('XinnoBackground') or 'Factions'
            if GUI.background and GUI.background2 then--and FindSlotForID(localPlayerID) == slot then
-               if XinnoBackground == 'Factions' then--and LASTBackgroundSelected != BackgroundSelected then
+               if XinnoBackground == 'Factions' then--and LASTBackgroundSelected ~= BackgroundSelected then
                    if XinnonyDebug == 4 then AddChatText(">> Background FACTION") end
                    GUI.background:Show()
                    GUI.background2:Hide()
@@ -6100,28 +6100,28 @@ function CreateUI(maxPlayers)
                    end
                    LASTXinnoBackground = 'Factions'
 
-               elseif XinnoBackground == 'ConceptArt' then--and LASTBackgroundSelected != BackgroundSelected then
+               elseif XinnoBackground == 'ConceptArt' then--and LASTBackgroundSelected ~= BackgroundSelected then
                    if XinnonyDebug == 4 then AddChatText(">> Background ART") end
                    GUI.background:Show()
                    GUI.background2:Hide()
                    GUI.background:SetTexture("/textures/ui/common/BACKGROUND/art/art-background-paint0"..math.random(1, 5).."_bmp.dds")
                    LASTXinnoBackground = 'ConceptArt'
 
-               elseif XinnoBackground == 'Screenshoot' then--and LASTBackgroundSelected != BackgroundSelected then
+               elseif XinnoBackground == 'Screenshoot' then--and LASTBackgroundSelected ~= BackgroundSelected then
                    if XinnonyDebug == 4 then AddChatText(">> Background SCREENSHOOT") end
                    GUI.background:Show()
                    GUI.background2:Hide()
                    GUI.background:SetTexture("/textures/ui/common/BACKGROUND/scrn/scrn-background-paint"..math.random(1, 14).."_bmp.dds")
                    LASTXinnoBackground = 'Screenshoot'
 
-               elseif XinnoBackground == 'Map' then--and LASTBackgroundSelected != BackgroundSelected then -- LASTBac... is for avoided loop set texture, when you change faction
+               elseif XinnoBackground == 'Map' then--and LASTBackgroundSelected ~= BackgroundSelected then -- LASTBac... is for avoided loop set texture, when you change faction
                    if XinnonyDebug == 4 then AddChatText(">> Background MAP") end
                    GUI.background:Hide()
                    GUI.background2:Show()
                    local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
-                   if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile != '') then
+                   if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= '') then
                        scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-                       if scenarioInfo and scenarioInfo.map and (scenarioInfo.map != '') and scenarioInfo.preview then
+                       if scenarioInfo and scenarioInfo.map and (scenarioInfo.map ~= '') and scenarioInfo.preview then
                            if not GUI.background2:SetTexture(scenarioInfo.preview) then
                                GUI.background2:SetTextureFromMap(scenarioInfo.map)
                            end
@@ -6133,7 +6133,7 @@ function CreateUI(maxPlayers)
                    end
                    LASTXinnoBackground = 'Map'
 
-               elseif XinnoBackground == 'No' and LASTXinnoBackground != XinnoBackground then -- LASTBac... is for avoided loop set texture, when you change faction
+               elseif XinnoBackground == 'No' and LASTXinnoBackground ~= XinnoBackground then -- LASTBac... is for avoided loop set texture, when you change faction
                    if XinnonyDebug == 4 then AddChatText(">> Background NOTHING") end
                    GUI.background:Hide()
                    GUI.background2:Hide()
@@ -6482,8 +6482,9 @@ function CreateUI(maxPlayers)
                    end
                end
 
-               ##########################################################################
-               ######################### TEST Text Animation (Experimental) ######################### -- Xinnony
+               --------------------------------------------------------------------------------------
+               -------------------------- TEST Text Animation (Experimental) ------------------------ -- Xinnony
+               
 
                SetText2 = function(self, text, delay) -- Set Text with Animation
                    --// Faire une variable qui evite deux droit SetText2 sur le même control de text en même temps.
@@ -6498,9 +6499,9 @@ function CreateUI(maxPlayers)
                    end
                end
 
-               ##########################################################################
-               ######################### TEST Save/Load Preset Game Lobby ######################### -- Xinnony
-               ----------
+               --------------------------------------------------------------------------------------
+               -------------------------- TEST Save/Load Preset Game Lobby -------------------------- -- Xinnony
+               
                -- GUI --
                function GUI_PRESET()
 
@@ -6849,7 +6850,7 @@ function CreateUI(maxPlayers)
                end
                function GetModUidExist(uid)
                    local allMods = Mods.AllMods()
-                   if allMods[uid].name != nil then
+                   if allMods[uid].name ~= nil then
                        return true
                    else
                        return false
@@ -7124,8 +7125,8 @@ function CreateUI(maxPlayers)
 
 
 
-               ###############################################################
-               ######################### Other Debug Funct ######################### -- Xinnony
+               ---------------------------------------------------------------------
+               -------------------------- Other Debug Funct ------------------------ -- Xinnony
 
                function joinMyTables(t1, t2)
                    t3 = {}
@@ -7179,5 +7180,5 @@ function CreateUI(maxPlayers)
 
 
 
-               #############################################################
-               ######################### DEV TEST AREA ######################### -- Xinnony
+               -------------------------------------------------------------------
+               -------------------------- DEV TEST AREA -------------------------- -- Xinnony
