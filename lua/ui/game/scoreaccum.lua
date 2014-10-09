@@ -61,7 +61,7 @@ scoreData {
                     kills,
                     built,
                     lost,
-                }, 
+                },
                 experimental {
                     kills,
                     built,
@@ -116,41 +116,16 @@ scoreData.historical = {}
 
 fullSyncOccured = false
 
---[[
-scoreData.historical = {}
---]]
-
 -- score interval determines how often the historical data gets updated, this is in seconds
-scoreInterval = 10
+scoreInterval = 10 -- FIXME: this should be synced from sim side
 
 function UpdateScoreData(newData)
 	if fullSyncOccured == false then
 		scoreData.current = table.deepcopy(newData)
 	end
-
 end
 
 function OnFullSync(accumData)
-		scoreData = accumData
-		fullSyncOccured = true
+    scoreData = accumData
+    fullSyncOccured = true
 end
-
---[[
-
--- copy data over to historical
-local curInterval = 1
-local historicalUpdateThread = ForkThread(function()
-    while true do
-        WaitSeconds(scoreInterval)
-        scoreData.historical[curInterval] = table.deepcopy(scoreData.current)
-        curInterval = curInterval + 1
-    end        
-end)
-
-function StopScoreUpdate()
-    if historicalUpdateThread then
-        KillThread(historicalUpdateThread)
-    end
-end
-
---]]
