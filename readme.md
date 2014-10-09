@@ -28,15 +28,15 @@ This is the changelog posted on the forums for patch 3635.
 - [X] Replay sync support
 - [X] Tempest can now build hovering Aeon Land units
 - [X] Fixed free ACU upgrade exploit
+- [X] Fixed UEF T3 Mobile AA being able to fire from Continental, and reduced projectile number
+- [X] Continental Fixes:
+    - [X] Fixed units firing from transport
+    - [X] Fixed Continental not dying to Nukes with the shield up
+    - [X] Improved fix for units being transported taking no damage while the shield is up
 
 *Changes to be verified*
 
 - [ ] Mongoose Buff (Slight increase in Gatling gun MuzzleVelocity to take it closer to Ravager's)
-- [ ] Fixed UEF T3 Mobile AA being able to fire from Continental, and reduced projectile number
-- [ ] Continental Fixes:
-    - [ ] Fixed units firing from transport
-    - [ ] Fixed Continental not dying to Nukes with the shield up
-    - [ ] Improved fix for units being transported taking no damage while the shield is up
 - [ ] T3 Seraphim Mobile Artillery given proper 'ARTILLERY' designation
 - [ ] Attempt to fix bomblet spread on bombers such as UEF and Cybran T1 Bombers
 - [ ] Attempt to fix Seraphim T1 Mobile AA's aim
