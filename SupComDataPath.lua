@@ -1,0 +1,11 @@
+-- This is assuming the following structure:
+--
+-- bin/
+-- repo/
+--     /faf
+--     /gw
+--     /coop
+--     etc...
+--
+-- And that SupComDataPath gets copied from here to bin/
+dofile(InitFileDir .. '..\\repo\\faf\\init.lua')

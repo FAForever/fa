@@ -1,5 +1,5 @@
 -- this imports a path file that is written by Forged Alliance Forever right before it starts the game.
-dofile(InitFileDir .. '\\..\\fa_path.lua')
+dofile(InitFileDir .. '\\..\\..\\fa_path.lua')
  
 path = {}
 
@@ -137,8 +137,8 @@ mount_contents(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supr
 mount_contents(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods', '/mods')
 mount_contents(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\maps', '/maps')
 
-mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nxt', '/')
-mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nx2', '/')
+-- InitFileDir = /repo/faf/
+mount_dir(InitFileDir, '/')
  
 -- these are using the newly generated path from the dofile() statement at the beginning of this script
 mount_dir_with_whitelist(fa_path .. '\\gamedata\\', '*.scd', '/')
