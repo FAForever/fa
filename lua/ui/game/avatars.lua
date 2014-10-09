@@ -47,10 +47,10 @@ end
 
 function CreateAvatarUI(parent)
     controls.parent = parent
-    
+
     controls.avatarGroup = Group(controls.parent)
     controls.avatarGroup.Depth:Set(100)
-    
+
     controls.bgTop = Bitmap(controls.avatarGroup)
     controls.bgBottom = Bitmap(controls.avatarGroup)
     controls.bgStretch = Bitmap(controls.avatarGroup)
@@ -59,26 +59,26 @@ function CreateAvatarUI(parent)
         ToggleAvatars(checked)
     end
     ToolTip.AddCheckboxTooltip(controls.collapseArrow, 'avatars_collapse')
-    
+
     controls.avatarGroup:DisableHitTest()
     controls.bgTop:DisableHitTest()
     controls.bgBottom:DisableHitTest()
     controls.bgStretch:DisableHitTest()
-    
+
     SetLayout()
-    
-    if GetFocusArmy() != -1 then
+
+    if GetFocusArmy() ~= -1 then
         recievingBeatUpdate = true
         GameMain.AddBeatFunction(AvatarUpdate)
     end
 end
 
 function ToggleAvatars(checked)
-    # disable when in Screen Capture mode
+    -- disable when in Screen Capture mode
     if import('/lua/ui/game/gamemain.lua').gameUIHidden then
         return
     end
-    
+
     if UIUtil.GetAnimationPrefs() then
         if controls.avatarGroup:IsHidden() then
             PlaySound(Sound({Cue = "UI_Score_Window_Open", Bank = "Interface"}))
@@ -127,9 +127,9 @@ function CreateAvatar(unit)
     bg.ID = unit:GetEntityId()
     bg.Blueprint = unit:GetBlueprint()
     bg.tooltipKey = 'avatar_Avatar_ACU'
-    
+
     bg.units = {unit}
-    
+
     bg.icon = Bitmap(bg)
     LayoutHelpers.AtLeftTopIn(bg.icon, bg, 5, 5)
     if DiskGetFileInfo('/textures/ui/common/icons/units/'..bg.Blueprint.BlueprintId..'_icon.dds') then
@@ -140,7 +140,7 @@ function CreateAvatar(unit)
     bg.icon.Height:Set(44)
     bg.icon.Width:Set(44)
     bg.icon:DisableHitTest()
-    
+
     bg.healthbar = StatusBar(bg, 0, 1, false, false,
         UIUtil.SkinnableFile('/game/avatar/health-bar-back_bmp.dds'),
         UIUtil.SkinnableFile('/game/avatar/health-bar-green.dds'),
@@ -152,13 +152,13 @@ function CreateAvatar(unit)
     bg.healthbar.Height:Set(function() return bg.healthbar.Bottom() - bg.healthbar.Top() end)
     bg.healthbar.Width:Set(function() return bg.healthbar.Right() - bg.healthbar.Left() end)
     bg.healthbar:DisableHitTest(true)
-    
-    
+
+
     bg.curIndex = 1
     bg.HandleEvent = ClickFunc
     bg.idleAnnounced = true
     bg.lastAlert = 0
-    
+
     bg.Update = function(self)
         if bg.units[1]:IsIdle() and not bg.idle then
             if not bg.idle then
@@ -195,11 +195,11 @@ function CreateAvatar(unit)
         local tempHealth = self.units[1]:GetHealth()
         bg.healthbar:SetRange(0, self.units[1]:GetMaxHealth())
         bg.healthbar:SetValue(tempHealth)
-        if tempPrevHealth != tempHealth then
+        if tempPrevHealth ~= tempHealth then
             SetHealthbarColor(bg.healthbar, self.units[1]:GetHealth() / self.units[1]:GetMaxHealth())
         end
     end
-    
+
     return bg
 end
 
@@ -217,23 +217,23 @@ function CreateIdleTab(unitData, id, expandFunc)
     local bg = Bitmap(controls.avatarGroup, UIUtil.SkinnableFile('/game/avatar/avatar-s-e-f_bmp.dds'))
     bg.id = id
     bg.tooltipKey = 'mfd_idle_'..id
-    
+
     bg.allunits = unitData
     bg.units = unitData
-    
+
     bg.icon = Bitmap(bg)
     LayoutHelpers.AtLeftTopIn(bg.icon, bg, 7, 8)
     bg.icon:SetSolidColor('00000000')
     bg.icon.Height:Set(34)
     bg.icon.Width:Set(34)
     bg.icon:DisableHitTest()
-    
+
     bg.count = UIUtil.CreateText(bg.icon, '', 18, UIUtil.bodyFont)
     bg.count:DisableHitTest()
     bg.count:SetDropShadow(true)
     LayoutHelpers.AtBottomIn(bg.count, bg.icon)
     LayoutHelpers.AtRightIn(bg.count, bg.icon)
-    
+
     bg.expandCheck = Checkbox(bg,
         UIUtil.SkinnableFile('/game/avatar-arrow_btn/tab-open_btn_up.dds'),
         UIUtil.SkinnableFile('/game/avatar-arrow_btn/tab-close_btn_up.dds'),
@@ -245,7 +245,7 @@ function CreateIdleTab(unitData, id, expandFunc)
     LayoutHelpers.AtVerticalCenterIn(bg.expandCheck, bg)
     bg.expandCheck.OnCheck = function(self, checked)
         if checked then
-            if expandedCheck and expandedCheck != bg.id and GetCheck(expandedCheck) then
+            if expandedCheck and expandedCheck ~= bg.id and GetCheck(expandedCheck) then
                 GetCheck(expandedCheck):SetCheck(false)
             end
             expandedCheck = bg.id
@@ -270,9 +270,9 @@ function CreateIdleTab(unitData, id, expandFunc)
             sortedUnits[3] = EntityCategoryFilterDown(categories.FIELDENGINEER, self.allunits)
             sortedUnits[2] = EntityCategoryFilterDown(categories.TECH2 - categories.FIELDENGINEER, self.allunits)
             sortedUnits[1] = EntityCategoryFilterDown(categories.TECH1, self.allunits)
-            
+
             local keyToIcon = {'T1','T2','T2F','T3','SCU'}
-            
+
             local i = table.getn(sortedUnits)
             local needIcon = true
             while i > 0 do
@@ -300,7 +300,7 @@ function CreateIdleTab(unitData, id, expandFunc)
                 sortedFactories[i][2] = EntityCategoryFilterDown(categories.TECH2 * categories[cat], self.allunits)
                 sortedFactories[i][3] = EntityCategoryFilterDown(categories.TECH3 * categories[cat], self.allunits)
             end
-            
+
             local i = 3
             local needIcon = true
             while i > 0 do
@@ -323,12 +323,12 @@ function CreateIdleTab(unitData, id, expandFunc)
             end
         end
         self.count:SetText(table.getsize(self.allunits))
-        
+
         if self.expandCheck.expandList then
             self.expandCheck.expandList:Update(self.allunits)
         end
     end
-    
+
     return bg
 end
 
@@ -361,7 +361,7 @@ function ClickFunc(self, event)
         end
         self.curIndex = 1
     elseif event.Type == 'ButtonPress' then
-        if event.Modifiers.Middle and options.gui_idle_engineer_avatars != 0 then
+        if event.Modifiers.Middle and options.gui_idle_engineer_avatars ~= 0 then
             if self.id then --it's a primary idle unit button, deal with all units
                 if event.Modifiers.Shift then
                     local curUnits = {}
@@ -386,7 +386,7 @@ function ClickFunc(self, event)
                         end
                         return false
                     end
-                    
+
                     local curUnits = {}
                     if event.Modifiers.Shift then
                         curUnits = GetSelectedUnits() or {}
@@ -403,7 +403,7 @@ function ClickFunc(self, event)
                             table.insert(curUnits, unit)
                         end
                     end
-                    
+
                     SelectUnits(curUnits)
                 end
             end
@@ -468,38 +468,38 @@ end
 
 function CreateIdleEngineerList(parent, units)
     local group = Group(parent)
-    
+
     local bgTop = Bitmap(group, UIUtil.SkinnableFile('/game/avatar-engineers-panel/panel-eng_bmp_t.dds'))
     local bgBottom = Bitmap(group, UIUtil.SkinnableFile('/game/avatar-engineers-panel/panel-eng_bmp_b.dds'))
     local bgStretch = Bitmap(group, UIUtil.SkinnableFile('/game/avatar-engineers-panel/panel-eng_bmp_m.dds'))
-    
+
     group.Width:Set(bgTop.Width)
     group.Height:Set(1)
-    
+
     bgTop.Bottom:Set(group.Top)
     bgBottom.Top:Set(group.Bottom)
     bgStretch.Top:Set(group.Top)
     bgStretch.Bottom:Set(group.Bottom)
-    
+
     LayoutHelpers.AtHorizontalCenterIn(bgTop, group)
     LayoutHelpers.AtHorizontalCenterIn(bgBottom, group)
     LayoutHelpers.AtHorizontalCenterIn(bgStretch, group)
-    
+
     group.connector = Bitmap(group, UIUtil.SkinnableFile('/game/avatar-engineers-panel/bracket_bmp.dds'))
     group.connector.Right:Set(function() return parent.Left() + 8 end)
     LayoutHelpers.AtVerticalCenterIn(group.connector, parent)
-    
+
     LayoutHelpers.LeftOf(group, parent, 10)
     group.Top:Set(function() return math.max(controls.avatarGroup.Top()+10, (parent.Top() + (parent.Height() / 2)) - (group.Height() / 2)) end)
-    
+
     group:DisableHitTest(true)
-    
+
     group.icons = {}
-    
+
     group.Update = function(self, unitData)
         local function CreateUnitEntry(techLevel, userUnits, icontexture)
             local entry = Group(self)
-            
+
             entry.icon = Bitmap(entry)
             if DiskGetFileInfo('/textures/ui/common'..icontexture) then
                 entry.icon:SetTexture('/textures/ui/common'..icontexture)
@@ -510,12 +510,12 @@ function CreateIdleEngineerList(parent, units)
             entry.icon.Width:Set(34)
             LayoutHelpers.AtRightIn(entry.icon, entry, 22)
             LayoutHelpers.AtVerticalCenterIn(entry.icon, entry)
-            
+
             entry.iconBG = Bitmap(entry, UIUtil.SkinnableFile('/game/avatar-factory-panel/avatar-s-e-f_bmp.dds'))
             LayoutHelpers.AtCenterIn(entry.iconBG, entry.icon)
             entry.iconBG.Depth:Set(function() return entry.icon.Depth() - 1 end)
 
-            if options.gui_scu_manager != 0 then
+            if options.gui_scu_manager ~= 0 then
                 --SCU MANAGER SHOW CORRECT ICON
                 if techLevel == 'C' or techLevel == 'E' then
                     entry.techIcon = Bitmap(entry, UIUtil.UIFile('/SCUManager/tech-'..techLevel..'_bmp.dds'))
@@ -527,40 +527,40 @@ function CreateIdleEngineerList(parent, units)
             end
             LayoutHelpers.AtLeftIn(entry.techIcon, entry)
             LayoutHelpers.AtVerticalCenterIn(entry.techIcon, entry.icon)
-            
+
             entry.count = UIUtil.CreateText(entry, '', 20, UIUtil.bodyFont)
             entry.count:SetColor('ffffffff')
             entry.count:SetDropShadow(true)
             LayoutHelpers.AtRightIn(entry.count, entry.icon)
             LayoutHelpers.AtBottomIn(entry.count, entry.icon)
-            
+
             entry.countBG = Bitmap(entry)
             entry.countBG:SetSolidColor('77000000')
             entry.countBG.Top:Set(function() return entry.count.Top() - 1 end)
             entry.countBG.Left:Set(function() return entry.count.Left() - 1 end)
             entry.countBG.Right:Set(function() return entry.count.Right() + 1 end)
             entry.countBG.Bottom:Set(function() return entry.count.Bottom() + 1 end)
-            
+
             entry.countBG.Depth:Set(function() return entry.Depth() + 1 end)
             entry.count.Depth:Set(function() return entry.countBG.Depth() + 1 end)
-            
+
             entry.Height:Set(function() return entry.iconBG.Height() end)
             entry.Width:Set(self.Width)
-            
+
             entry.icon:DisableHitTest()
             entry.iconBG:DisableHitTest()
             entry.techIcon:DisableHitTest()
             entry.count:DisableHitTest()
             entry.countBG:DisableHitTest()
-            
+
             entry.curIndex = 1
             entry.units = userUnits
             entry.HandleEvent = ClickFunc
-            
+
             return entry
         end
         local engineers = {}
-        if options.gui_scu_manager != 0 then
+        if options.gui_scu_manager ~= 0 then
             engineers[7] = {}
             engineers[6] = {}
             engineers[5] = {}
@@ -570,13 +570,13 @@ function CreateIdleEngineerList(parent, units)
         engineers[4] = EntityCategoryFilterDown(categories.TECH3 - categories.SUBCOMMANDER, unitData)
         engineers[3] = EntityCategoryFilterDown(categories.FIELDENGINEER, unitData)
         engineers[2] = EntityCategoryFilterDown(categories.TECH2 - categories.FIELDENGINEER, unitData)
-        engineers[1] = EntityCategoryFilterDown(categories.TECH1, unitData)   
+        engineers[1] = EntityCategoryFilterDown(categories.TECH1, unitData)
 
         local indexToIcon = {'1', '2', '2', '3', '3'}
         local keyToIcon = {'T1','T2','T2F','T3','SCU'}
-        if options.gui_scu_manager != 0 then
+        if options.gui_scu_manager ~= 0 then
             local tempSCUs = EntityCategoryFilterDown(categories.SUBCOMMANDER, unitData)
-            
+
             if table.getsize(tempSCUs) > 0 then
                 for i, unit in tempSCUs do
                     if unit.SCUType then
@@ -596,7 +596,7 @@ function CreateIdleEngineerList(parent, units)
 
         for index, units in engineers do
             local i = index
-            if i == 3 and currentFaction != 1 then
+            if i == 3 and currentFaction ~= 1 then
                 continue
             end
             if not self.icons[i] then
@@ -632,30 +632,30 @@ function CreateIdleEngineerList(parent, units)
         end
         group.Height:Set(groupHeight)
     end
-    
+
     group:Update(units)
-    
+
     return group
 end
 
 function CreateIdleFactoryList(parent, units)
     local bg = Bitmap(parent, UIUtil.SkinnableFile('/game/avatar-factory-panel/factory-panel_bmp.dds'))
-    
+
     bg.Right:Set(function() return parent.Left() - 9 end)
     bg.Top:Set(function() return math.max(controls.avatarGroup.Top()+10, (parent.Top() + (parent.Height() / 2)) - (bg.Height() / 2)) end)
-    
+
     local connector = Bitmap(bg, UIUtil.SkinnableFile('/game/avatar-factory-panel/bracket_bmp.dds'))
     LayoutHelpers.AtVerticalCenterIn(connector, parent)
     connector.Right:Set(function() return parent.Left() + 7 end)
-    
+
     bg:DisableHitTest(true)
-    
+
     bg.icons = {}
-    
+
     local iconData = {'LAND','AIR','NAVAL'}
-    
+
     local idleTextures = Factions[currentFaction].IdleFactoryTextures
-    
+
     local prevIcon = false
     for type, category in iconData do
         local function CreateIcon(texture)
@@ -667,25 +667,25 @@ function CreateIdleFactoryList(parent, units)
             end
             icon.Height:Set(40)
             icon.Width:Set(40)
-            
+
             icon.count = UIUtil.CreateText(icon, '', 20, UIUtil.bodyFont)
             icon.count:SetColor('ffffffff')
             LayoutHelpers.AtRightIn(icon.count, icon)
             LayoutHelpers.AtBottomIn(icon.count, icon)
-            
+
             icon.countBG = Bitmap(icon)
             icon.countBG:SetSolidColor('77000000')
             icon.countBG.Top:Set(function() return icon.count.Top() - 1 end)
             icon.countBG.Left:Set(function() return icon.count.Left() - 1 end)
             icon.countBG.Right:Set(function() return icon.count.Right() + 1 end)
             icon.countBG.Bottom:Set(function() return icon.count.Bottom() + 1 end)
-            
+
             icon.countBG.Depth:Set(function() return icon.Depth() + 1 end)
             icon.count.Depth:Set(function() return icon.countBG.Depth() + 1 end)
-            
+
             icon.curIndex = 1
             icon.HandleEvent = ClickFunc
-            
+
             return icon
         end
         bg.icons[category] = {}
@@ -706,7 +706,7 @@ function CreateIdleFactoryList(parent, units)
             end
         end
     end
-    
+
     bg.Update = function(self, unitData)
         local factories = {LAND = {}, AIR = {}, NAVAL = {}}
         for type, table in factories do
@@ -730,9 +730,9 @@ function CreateIdleFactoryList(parent, units)
             end
         end
     end
-    
+
     bg:Update(units)
-    
+
     return bg
 end
 
@@ -745,9 +745,9 @@ function AvatarUpdate()
     local factories = GetIdleFactories()
     local needsAvatarLayout = false
     local validAvatars = {}
-    
+
     currentFaction = GetArmiesTable().armiesTable[GetFocusArmy()].faction + 1
-    
+
     if avatars then
         for _, unit in avatars do
             if controls.avatars[unit:GetEntityId()] then
@@ -774,7 +774,7 @@ function AvatarUpdate()
             needsAvatarLayout = true
         end
     end
-    
+
     if engineers then
         if controls.idleEngineers then
             controls.idleEngineers:Update(engineers)
@@ -792,7 +792,7 @@ function AvatarUpdate()
             needsAvatarLayout = true
         end
     end
-    
+
     if factories and table.getn(EntityCategoryFilterDown(categories.ALLUNITS - categories.GATE, factories)) > 0 then
         if controls.idleFactories then
             controls.idleFactories:Update(EntityCategoryFilterDown(categories.ALLUNITS - categories.GATE, factories))
@@ -810,12 +810,12 @@ function AvatarUpdate()
             needsAvatarLayout = true
         end
     end
-    
+
     if needsAvatarLayout then
         import(UIUtil.GetLayoutFilename('avatars')).LayoutAvatars()
     end
 
-    if options.gui_scu_manager != 0 then
+    if options.gui_scu_manager ~= 0 then
         local buttons = import('/modules/scumanager.lua').buttonGroup
         local showing = false
         if controls.idleEngineers then

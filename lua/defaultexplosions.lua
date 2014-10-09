@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/defaultexplosions.lua
-#**  Author(s):  Gordon Duclos
-#**
-#**  Summary  :
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/defaultexplosions.lua
+--**  Author(s):  Gordon Duclos
+--**
+--**  Summary  :
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local Entity = import('/lua/sim/entity.lua').Entity
 local EffectTemplate = import('/lua/EffectTemplates.lua')
@@ -25,9 +25,9 @@ local CreateRandomEffects = EfctUtil.CreateRandomEffects
 local ScaleEmittersParam = EfctUtil.ScaleEmittersParam
 
 
-#---------------------------------------------------------------
-# UTILITY FUNCTIONS
-#---------------------------------------------------------------
+----------------------
+-- UTILITY FUNCTION --
+----------------------
 function GetUnitSizes( unit )
     local bp = unit:GetBlueprint()
     return bp.SizeX or 0, bp.SizeY or 0, bp.SizeZ or 0
@@ -59,9 +59,9 @@ function QuatFromRotation( rotation, x, y, z )
     return qx, qy, qz, qw
 end
 
-#---------------------------------------------------------------
-# DEFAULT EXPLOSION BASE FUNCTIONS
-#---------------------------------------------------------------
+--------------------------------------
+-- DEFAULT EXPLOSION BASE FUNCTIONS --
+--------------------------------------
 function CreateScalableUnitExplosion( unit, overKillRatio )
 	if unit then
 		if IsUnit(unit) then 
@@ -80,13 +80,12 @@ function CreateDefaultHitExplosion( obj, scale )
 end
 
 function CreateDefaultHitExplosionOffset( obj, scale, xOffset, yOffset, zOffset )
-    #LOG( xOffset, ' ', yOffset, ' ', zOffset )
-    if obj:BeenDestroyed() then 
+    if obj:BeenDestroyed() then
         return
     end
     
     local army = obj:GetArmy()
-    #CreateFlash( obj, -1, scale * 0.5, army )
+    --CreateFlash( obj, -1, scale * 0.5, army )
     CreateBoneEffectsOffset( obj, -1, army, EffectTemplate.DefaultHitExplosion01, xOffset, yOffset, zOffset )
 end
 
@@ -135,64 +134,60 @@ function _CreateScalableUnitExplosion( obj )
     local ShakeTimeModifier = 0
     local ShakeMaxMul = 1 
 
-    # Determine effect table to use, based on unit bounding box scale
-    #LOG(scale)
-    if layer == 'Land' then 
-        if scale < 1.1 then   ## Small units
-             BaseEffectTable = EffectTemplate.ExplosionSmall   
-        elseif scale > 3.75 then ## Large units
+    -- Determine effect table to use, based on unit bounding box scale
+    if layer == 'Land' then
+        if scale < 1.1 then   ---- Small units
+             BaseEffectTable = EffectTemplate.ExplosionSmall
+        elseif scale > 3.75 then ---- Large units
             BaseEffectTable = EffectTemplate.ExplosionLarge
             ShakeTimeModifier = 1.0
             ShakeMaxMul = 0.25
-        else                  ## Medium units
+        else                  ---- Medium units
             BaseEffectTable = EffectTemplate.ExplosionMedium
         end
     end
-    
-    if layer == 'Air' then 
-        if scale < 1.1 then   ## Small units
-             BaseEffectTable = EffectTemplate.ExplosionSmallAir  
-        elseif scale > 3 then ## Large units
+
+    if layer == 'Air' then
+        if scale < 1.1 then   ---- Small units
+             BaseEffectTable = EffectTemplate.ExplosionSmallAir
+        elseif scale > 3 then ---- Large units
             BaseEffectTable = EffectTemplate.ExplosionLarge
             ShakeTimeModifier = 1.0
             ShakeMaxMul = 0.25
-        else                  ## Medium units
+        else                  ---- Medium units
             BaseEffectTable = EffectTemplate.ExplosionMedium
         end
     end
-    
-    if layer == 'Water' then 
-        if scale < 1 then   ## Small units
-             BaseEffectTable = EffectTemplate.ExplosionSmallWater 
-        elseif scale > 3 then ## Large units
+
+    if layer == 'Water' then
+        if scale < 1 then   ---- Small units
+             BaseEffectTable = EffectTemplate.ExplosionSmallWater
+        elseif scale > 3 then ---- Large units
             BaseEffectTable = EffectTemplate.ExplosionMediumWater
             ShakeTimeModifier = 1.0
             ShakeMaxMul = 0.25
-        else                  ## Medium units
+        else                  ---- Medium units
             BaseEffectTable = EffectTemplate.ExplosionMediumWater
         end
     end
 
-    # Get Environmental effects for current layer
+    -- Get Environmental effects for current layer
     EnvironmentalEffectTable = GetUnitEnvironmentalExplosionEffects( layer, scale )
 
-    # Merge resulting tables to final explosion emitter list
-    if table.getn( EnvironmentalEffectTable ) != 0 then
+    -- Merge resulting tables to final explosion emitter list
+    if table.getn( EnvironmentalEffectTable ) ~= 0 then
         EffectTable = EffectTemplate.TableCat( BaseEffectTable, EnvironmentalEffectTable )
     else
         EffectTable = BaseEffectTable
     end
-    
-    #LOG( 'ExplosionEntity ', repr(obj), '\nEffect Table ', repr(EffectTable), '\nPosition ', repr(obj:GetPosition()) )
 
-    #---------------------------------------------------------------
-    # Create Generic emitter effects
+    -- Create Generic emitter effects
     CreateEffects( obj, army, EffectTable )
 
-    # Create Light particle flash
+    -- Create Light particle flash
     CreateFlash( obj, -1, scale, army )
 
-    # Create scorch mark
+    -- Create scorch mark
     if layer == 'Land' then
         if scale > 1.2 then
             CreateScorchMarkDecal( obj, scale, army )
@@ -201,14 +196,14 @@ function _CreateScalableUnitExplosion( obj )
         end
     end
 
-    # Create GenericDebris chunks
+    -- Create GenericDebris chunks
     CreateDebrisProjectiles( obj, obj.Spec.BoundingXYZRadius, obj.Spec.Dimensions )
 
-    # Camera Shake  (.radius .maxshake .minshake .lifetime)
+    -- Camera Shake  (.radius .maxshake .minshake .lifetime)
     obj:ShakeCamera( 30 * scale, scale * ShakeMaxMul, 0, 0.5 + ShakeTimeModifier )
-    #---------------------------------------------------------------
-    #WaitSeconds( 5 )
-    #_CreateScalableUnitExplosion( obj )
+
+    --WaitSeconds( 5 )
+    --_CreateScalableUnitExplosion( obj )
     obj:Destroy()
 end
 
@@ -226,16 +221,16 @@ function GetUnitEnvironmentalExplosionEffects( layer, scale )
     return EffectTable
 end
 
-#---------------------------------------------------------------
-# CREATELIGHTPARTICLE FLASH
-#---------------------------------------------------------------
+-------------------------------
+-- CREATELIGHTPARTICLE FLASH --
+-------------------------------
 function CreateFlash( obj, bone, scale, army )
     CreateLightParticle( obj, bone, army, GetRandomFloat(6,10) * scale, GetRandomFloat(10.5, 14.5), 'glow_03', 'ramp_flare_02' )
 end
 
-#---------------------------------------------------------------
-# SCORCH MARK SPLATS
-#---------------------------------------------------------------
+------------------------
+-- SCORCH MARK SPLATS --
+------------------------
 function CreateScorchMarkSplat( obj, scale, army )
     CreateSplat(obj:GetPosition(),GetRandomFloat(0,2*math.pi),ScorchSplatTextures[GetRandomInt(1,table.getn(ScorchSplatTextures))], scale * 4, scale * 4, GetRandomFloat(200,350), GetRandomFloat(300,600), army )
 end
@@ -272,9 +267,9 @@ ScorchDecalTextures = {
     'scorch_009_albedo',
     'scorch_010_albedo',}
 
-#---------------------------------------------------------------
-# WRECKAGE EFFECTS
-#---------------------------------------------------------------
+----------------------
+-- WRECKAGE EFFECTS --
+----------------------
 function CreateWreckageEffects( obj, prop )
     if IsUnit(obj) then
         local army = obj:GetArmy()
@@ -282,16 +277,16 @@ function CreateWreckageEffects( obj, prop )
         local emitters = {}
         local layer = obj:GetCurrentLayer()
 
-        if scale < 0.5 then # SMALL UNITS
+        if scale < 0.5 then -- SMALL UNITS
             emitters = CreateRandomEffects( prop, army, EffectTemplate.DefaultWreckageEffectsSml01, 1 )
-        elseif scale > 1.5 then # LARGE UNITS 
+        elseif scale > 1.5 then -- LARGE UNITS
             local x,y,z = GetUnitSizes(obj)
             emitters = CreateEffectsWithRandomOffset( prop, army, EffectTemplate.DefaultWreckageEffectsLrg01, x, 0, z )
-        else # MEDIUM UNITS
+        else -- MEDIUM UNITS
             emitters = CreateRandomEffects( prop, army, EffectTemplate.DefaultWreckageEffectsMed01, 2 )
         end
 
-        # Give the emitters created some random lifetimes
+        -- Give the emitters created some random lifetimes
         ScaleEmittersParam( emitters, 'LIFETIME', 100, 1000 )
 
         for k, v in emitters do
@@ -300,9 +295,9 @@ function CreateWreckageEffects( obj, prop )
     end
 end
 
-#---------------------------------------------------------------
-# DEBRIS PROJECTILES EFFECTS
-#---------------------------------------------------------------
+--------------------------------
+-- DEBRIS PROJECTILES EFFECTS --
+--------------------------------
 function CreateDebrisProjectiles( obj, volume, dimensions )
     local partamounts = math.min(GetRandomInt( 1 + (volume * 50), (volume * 100) ) , 250)
     local sx, sy, sz = unpack(dimensions)
@@ -326,9 +321,9 @@ function CreateDebrisProjectiles( obj, volume, dimensions )
     end
 end
 
-#---------------------------------------------------------------
-# OLD EXPLOSION TECH
-#---------------------------------------------------------------
+------------------------
+-- OLD EXPLOSION TECH --
+------------------------
 function CreateDefaultExplosion( unit, scale, overKillRatio )
 
     local spec = {
@@ -336,21 +331,21 @@ function CreateDefaultExplosion( unit, scale, overKillRatio )
         Dimensions = GetUnitSizes( unit ),
         Volume = GetUnitVolume( unit ),
     }
-    local Explosion = unit #Entity(spec)
+    local Explosion = unit --Entity(spec)
     local army = unit:GetArmy()
 
     CreateConcussionRing( Explosion, scale )
-    #CreateDestructionFire( Explosion, scale )
-    #CreateFlash( Explosion, scale, army )
-    #CreateFirePlume( Explosion, scale )
-    #CreateGenericDebris( Explosion )
-    #CreateScorchMark( Explosion, GetRandomFloat( scale * 0.9, scale * 1.2), army )
-    #CreateFireShadow( Explosion, scale )
-    #unit:ShakeCamera(50, 2, 0, 0.5)
-    #CreateSmoke( Explosion, scale )
-    #CreateDestructionSparks( Explosion, scale )
+    --CreateDestructionFire( Explosion, scale )
+    --CreateFlash( Explosion, scale, army )
+    --CreateFirePlume( Explosion, scale )
+    --CreateGenericDebris( Explosion )
+    --CreateScorchMark( Explosion, GetRandomFloat( scale * 0.9, scale * 1.2), army )
+    --CreateFireShadow( Explosion, scale )
+    --unit:ShakeCamera(50, 2, 0, 0.5)
+    --CreateSmoke( Explosion, scale )
+    --CreateDestructionSparks( Explosion, scale )
 
-    #ForkThread( CreateCompositeExplosionMeshes, Explosion )
+    --ForkThread( CreateCompositeExplosionMeshes, Explosion )
 
 end
 
@@ -375,7 +370,7 @@ function CreateFirePlume( object, scale )
         proj = object:CreateProjectile('/effects/entities/DestructionFirePlume01/DestructionFirePlume01_proj.bp', 0, 0, 0, nil, nil, nil)
         proj:SetBallisticAcceleration(GetRandomFloat(-2, -3)):SetCollision(false)
         local emitter = CreateEmitterOnEntity(proj,proj:GetArmy(),'/effects/emitters/destruction_explosion_fire_plume_02_emit.bp')
-        #emitter:ScaleEmitter(scale)
+        --emitter:ScaleEmitter(scale)
 
         local lifetime = GetRandomFloat( 12, 22 )
         emitter:SetEmitterParam('REPEATTIME',lifetime)
@@ -410,8 +405,8 @@ end
 
 
 
-# Composite effects
-# *********************
+-- Composite effects
+-- *****************
 function CreateExplosionMesh( object, projBP, posX, posY, posZ, scale, scaleVelocity, Lifetime, velX, velY, VelZ, orientRot, orientX, orientY, orientZ  )
 
     proj = object:CreateProjectile(projBP, posX, posY, posZ, nil, nil, nil)
@@ -419,7 +414,6 @@ function CreateExplosionMesh( object, projBP, posX, posY, posZ, scale, scaleVelo
 
     local orient = {0,0,0,0}
     orient[1], orient[2], orient[3], orient[4] = QuatFromRotation( orientRot, orientX, orientY, orientZ )
-    #LOG('Quat(xyzw)', repr(orient))
     proj:SetOrientation( orient, true)
 
     CreateEmitterAtEntity(proj,proj:GetArmy(),'/effects/emitters/destruction_explosion_smoke_10_emit.bp')
@@ -437,18 +431,18 @@ function CreateCompositeExplosionMeshes( object )
     table.insert( explosionMeshProjectiles, CreateExplosionMesh( object, '/effects/Explosion/Explosion01_c_proj.bp', -0.2, 0.4, -0.4, GetRandomFloat( 0.1, 0.2 ), GetRandomFloat( scalingmin, scalingmax ), lifetime, -0.04, 0.1, -0.1, -90, -1,0,0 ))
     table.insert( explosionMeshProjectiles, CreateExplosionMesh( object, '/effects/Explosion/Explosion01_d_proj.bp', 0.0, 0.7, 0.4, GetRandomFloat( 0.1, 0.14 ), GetRandomFloat( scalingmin, scalingmax ), lifetime, 0, 0.1, 0, 90, 1,0,0 ))
 
-    # Slow down scaling of secondary meshes
+    -- Slow down scaling of secondary meshes
     WaitSeconds( 0.3 )
 
     for k, v in explosionMeshProjectiles do
-        #v:SetScaleVelocity( GetRandomFloat( 0.03, 0.06 ) )
+        --v:SetScaleVelocity( GetRandomFloat( 0.03, 0.06 ) )
     end
 end
 
 
-#---------------------------------------------------------------
-#  Replaced by new effect structure (see EffectTemplates.lua)
-#---------------------------------------------------------------
+-----------------------------------------------------------------
+--  Replaced by new effect structure (see EffectTemplates.lua) --
+-----------------------------------------------------------------
 function CreateSmoke( object, scale )
     local SmokeEffects = {'/effects/emitters/destruction_explosion_smoke_03_emit.bp',
                           '/effects/emitters/destruction_explosion_smoke_07_emit.bp'}
