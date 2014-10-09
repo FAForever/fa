@@ -33,11 +33,11 @@ This is the changelog posted on the forums for patch 3635.
     - [X] Fixed units firing from transport
     - [X] Fixed Continental not dying to Nukes with the shield up
     - [X] Improved fix for units being transported taking no damage while the shield is up
+- [X] T3 Seraphim Mobile Artillery given proper 'ARTILLERY' designation
 
 *Changes to be verified*
 
 - [ ] Mongoose Buff (Slight increase in Gatling gun MuzzleVelocity to take it closer to Ravager's)
-- [ ] T3 Seraphim Mobile Artillery given proper 'ARTILLERY' designation
 - [ ] Attempt to fix bomblet spread on bombers such as UEF and Cybran T1 Bombers
 - [ ] Attempt to fix Seraphim T1 Mobile AA's aim
 - [ ] Attempt to fix Aeon T1 Frigate, T2 Destroyer, and Seraphim T3 Subhunter weapon bones to improve fire reliability
