@@ -586,7 +586,9 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
 
         -- Store off the validated playername
         localPlayerName = lobbyComm:GetLocalPlayerName()
-        SetWindowedLobby(true)
+        local Prefs = import('/lua/user/prefs.lua')
+        local windowed = Prefs.GetFromCurrentProfile('WindowedLobby') or 'true'
+        SetWindowedLobby(windowed == 'true')
     end
 end
 
@@ -6335,10 +6337,31 @@ function CreateOptionLobbyDialog()
             cbox_BG_Extra:SetCheck(true, true)
         end
     end
+
+    cbox_WindowedLobby = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
+    LayoutHelpers.AtRightIn(cbox_WindowedLobby, dialog2, 20)
+    LayoutHelpers.AtTopIn(cbox_WindowedLobby, dialog2, 20)
+    Tooltip.AddCheckboxTooltip(cbox_WindowedLobby, {text='Windowed mode', body='Lobby is windowed until launch'})
+    cbox_WindowedLobby_TEXT = UIUtil.CreateText(cbox_WindowedLobby, 'Windowed mode', 14, 'Arial')
+    cbox_WindowedLobby_TEXT:SetColor('B9BFB9')
+    cbox_WindowedLobby_TEXT:SetDropShadow(true)
+    LayoutHelpers.AtRightIn(cbox_WindowedLobby_TEXT, cbox_WindowedLobby, 25)
+    LayoutHelpers.AtVerticalCenterIn(cbox_WindowedLobby_TEXT, cbox_WindowedLobby)
+    cbox_WindowedLobby.OnCheck = function(self, checked)
+        local option
+        if(checked) then
+            option = 'true'
+        else
+            option = 'false'
+        end
+        Prefs.SetToCurrentProfile('WindowedLobby', option)
+        SetWindowedLobby(checked)
+    end
+
     --
     cbox_Skin_Dark = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
     LayoutHelpers.AtRightIn(cbox_Skin_Dark, dialog2, 20)
-    LayoutHelpers.AtTopIn(cbox_Skin_Dark, dialog2, 20)
+    LayoutHelpers.AtTopIn(cbox_Skin_Dark, dialog2, 60)
     Tooltip.AddCheckboxTooltip(cbox_Skin_Dark, {text='Dark Skin', body='Apply the Dark Skin in the Lobby'})
     cbox_Skin_Dark_TEXT = UIUtil.CreateText(cbox_Skin_Dark, 'Dark Skin', 14, 'Arial')
     cbox_Skin_Dark_TEXT:SetColor('B9BFB9')
@@ -6353,7 +6376,7 @@ function CreateOptionLobbyDialog()
     end
     local cbox6_0 = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
     LayoutHelpers.AtRightIn(cbox6_0, dialog2, 20)
-    LayoutHelpers.AtTopIn(cbox6_0, dialog2, 40)
+    LayoutHelpers.AtTopIn(cbox6_0, dialog2, 80)
     Tooltip.AddCheckboxTooltip(cbox6_0, {text='White Skin', body='White Skin is not available yet, Need a Graphic Artist !!!'})
     local cbox6_1 = UIUtil.CreateText(cbox6_0, 'White Skin', 14, 'Arial')
     cbox6_1:SetColor('B9BFB9')
@@ -6367,7 +6390,7 @@ function CreateOptionLobbyDialog()
     --
     local cbox_StretchBG = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
     LayoutHelpers.AtRightIn(cbox_StretchBG, dialog2, 20)
-    LayoutHelpers.AtTopIn(cbox_StretchBG, dialog2, 80)
+    LayoutHelpers.AtTopIn(cbox_StretchBG, dialog2, 120)
     Tooltip.AddCheckboxTooltip(cbox_StretchBG, {text='Stretch Background', body='You can stretch the background over the entire surface of this game.'})
     local cbox_StretchBG_TEXT = UIUtil.CreateText(cbox_StretchBG, 'Stretch Background', 14, 'Arial')
     cbox_StretchBG_TEXT:SetColor('B9BFB9')
@@ -6482,7 +6505,11 @@ function CreateOptionLobbyDialog()
         cbox_BG_No:SetCheck(false, true)
         cbox_BG_Extra:SetCheck(true, true)
     end
-    --
+
+    local WindowedLobby = Prefs.GetFromCurrentProfile('WindowedLobby') or 'true'
+
+    cbox_WindowedLobby:SetCheck(WindowedLobby == 'true', true)
+        --
     local XinnoSkin = Prefs.GetFromCurrentProfile('XinnoSkin') or 'Dark'
     if XinnoSkin == 'Dark' then
         cbox_Skin_Dark:SetCheck(true, true)
