@@ -11,7 +11,6 @@ local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
 local CybranWeaponsFile = import('/lua/cybranweapons.lua')
 local CAANanoDartWeapon = CybranWeaponsFile.CAANanoDartWeapon
 local TargetingLaser = import('/lua/kirvesweapons.lua').TargetingLaser
-
 local EffectUtils = import('/lua/effectutilities.lua')
 local Effects = import('/lua/effecttemplates.lua')
 
@@ -35,9 +34,9 @@ DRLK001 = Class(CWalkingLandUnit)
         self:SetWeaponEnabledByLabel('GroundGun', false)
     end,
 	
-	OnKilled = function(self)
+	OnKilled = function(self, instigator, type, overkillRatio)
         self:SetWeaponEnabledByLabel('Lazor', false)
-        CWalkingLandUnit.OnKilled(self)
+        CWalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
     
     OnScriptBitSet = function(self, bit)
