@@ -969,15 +969,6 @@ local function AssignRandomFactions(gameInfo)
     end
 end
 
-local function shuffle( a )
-    local c = table.getn(a)
-    for i = 1, c do
-        local ndx0 = math.random( 1, c )
-        a[ ndx0 ], a[ i ] = a[ i ], a[ ndx0 ]
-    end
-    return a
-end
-
 ---------------------------
 -- autobalance functions --
 ---------------------------
@@ -1097,7 +1088,7 @@ local function autobalance_random(players, teams_arg)
     local result = {}
     local teams = {}
 
-    shuffle(players)
+    players = table.shuffle(players)
 
     for t, slots in teams_arg do
         table.insert(teams, {team=t, slots=table.deepcopy(slots)})
@@ -1199,9 +1190,9 @@ local function AssignRandomStartSpots(gameInfo)
             end
         end
         -- shuffle the array for randomness.
-        teams[1] = shuffle(teams[1])
-        teams[2] = shuffle(teams[2])
-        shuffle(teams)
+        teams[1] = table.shuffle(teams[1])
+        teams[2] = table.shuffle(teams[2])
+        teams = table.shuffle(teams)
 
         local ratingTable = {}
         for i = 1, numAvailStartSpots do
@@ -1219,7 +1210,7 @@ local function AssignRandomStartSpots(gameInfo)
             end
         end
 
-        shuffle(ratingTable) -- random order for people with same rating
+        ratingTable = table.shuffle(ratingTable) -- random order for people with same rating
         table.sort(ratingTable, function(a, b) return a['rating'] > b['rating'] end)
 
         local functions = {
@@ -1256,7 +1247,7 @@ local function AssignRandomStartSpots(gameInfo)
             end
         end
 
-        shuffle(results)
+        results = table.shuffle(results)
         best = table.remove(results, 1)
         gameInfo.GameOptions['Quality'] = best.quality
 
