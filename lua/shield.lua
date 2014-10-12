@@ -353,11 +353,17 @@ Shield = Class(moho.shield_methods,Entity) {
 
             self:UpdateShieldRatio(-1)
 
-            -- The order of these calls have been reversed
-            -- Enabling the unit to act on the shield after it
-            -- has been created
-            self:CreateShieldMesh()
-            self.Owner:OnShieldEnabled()
+            --Switch the order of these around to make many things possible
+            self:CreateShieldMesh()            
+            self.Owner:OnShieldEnabled() --Now an empty function needed only for Harbinger
+            --OnShieldEnabled() is part of several functions which play a sound and manipulate the energy drain.
+            --They are only called from shield.lua, so I can replace them here.
+            self.Owner:PlayUnitSound('ShieldOn')
+            self.Owner:SetMaintenanceConsumptionActive()
+            
+            --Then we can make any units inside a transport with a Shield invulnerable here
+            self:ProtectTransportedUnits()
+            self.Owner:IsTransportProtected(true)
 
             local aiBrain = self.Owner:GetAIBrain()
 
@@ -409,11 +415,17 @@ Shield = Class(moho.shield_methods,Entity) {
             -- Set the offhealth - this is used basically to let the unit know the unit was manually turned off
             self.OffHealth = self:GetHealth()
 
-            -- Get rid of teh shield bar
+            -- Get rid of the shield bar
             self:UpdateShieldRatio(0)
 
             self:RemoveShield()
-            self.Owner:OnShieldDisabled()
+            self.Owner:OnShieldDisabled() --Now an empty function needed only for Harbinger
+            self.Owner:PlayUnitSound('ShieldOff')
+            self.Owner:SetMaintenanceConsumptionInactive()
+
+            --Apply vulnerabilities
+            self:RevokeTransportProtection()
+            self.Owner:IsTransportProtected(false)
 
             WaitSeconds(1)
         end,
@@ -429,9 +441,14 @@ Shield = Class(moho.shield_methods,Entity) {
             self:RemoveShield()
 
             if self.Owner.OnShieldHpDepleted then -- This check is made so we don't crash if unit was shadowed
-                self.Owner:OnShieldHpDepleted(self)
+                self.Owner:OnShieldHpDepleted(self) --Now an empty function needed only for Harbinger
             end
+            self.Owner:PlayUnitSound('ShieldOff')            
 
+            --Apply vulnerabilities
+            self:RevokeTransportProtection()
+            self.Owner:IsTransportProtected(false)
+            
             -- We must make the unit charge up before gettings its shield back
             self:ChargingUp(0, self.ShieldRechargeTime)
 
@@ -451,8 +468,13 @@ Shield = Class(moho.shield_methods,Entity) {
         Main = function(self)
             self:RemoveShield()
             if self.Owner.OnShieldEnergyDepleted then -- This check is made so we don't crash if unit was shadowed
-                self.Owner:OnShieldEnergyDepleted(self)
+                self.Owner:OnShieldEnergyDepleted(self) --Now an empty function needed only for Harbinger
             end
+            self.Owner:PlayUnitSound('ShieldOff')
+            --Apply vulnerabilities
+            self:RevokeTransportProtection()
+            self.Owner:IsTransportProtected(false)
+            
             self:ChargingUp(0, self.ShieldEnergyDrainRechargeTime)
 
             -- If the unit is attached to a transport, make sure the shield goes to the off state
@@ -469,6 +491,26 @@ Shield = Class(moho.shield_methods,Entity) {
         end,
     },
 
+    ProtectTransportedUnits = function(self)
+        if EntityCategoryContains(categories.TRANSPORTATION, self.Owner) then
+            self.Owner:SetCanTakeDamage(false)        
+            local Cargo = self.Owner:GetCargo()
+            for _, v in Cargo do
+                v:SetCanTakeDamage(false)
+            end    
+        end
+    end,
+    
+    RevokeTransportProtection = function(self)
+        if EntityCategoryContains(categories.TRANSPORTATION, self.Owner) then    
+            self.Owner:SetCanTakeDamage(true)        
+            local Cargo = self.Owner:GetCargo()
+            for _, v in Cargo do
+                v:SetCanTakeDamage(true)
+            end
+        end
+    end,    
+    
     DeadState = State {
         Main = function(self)
         end,
