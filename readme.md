@@ -36,10 +36,11 @@ This is the changelog posted on the forums for patch 3635.
 - [X] T3 Seraphim Mobile Artillery given proper 'ARTILLERY' designation
 - [X] Fix adjacency buffs working when unit is turned off
 - [X] Fixed Cybran ACU with Laser upgrade being unable to ever fire the weapon after being transported, and improve targeting further
+- [X] Mongoose Buff (Slight increase in Gatling gun MuzzleVelocity to equal Ravager's)
+- [X] All Factories of a given tech level now roll out Engineers at an even pace with each other 
 
 *Changes to be verified*
 
-- [ ] Mongoose Buff (Slight increase in Gatling gun MuzzleVelocity to take it closer to Ravager's)
 - [ ] Attempt to fix bomblet spread on bombers such as UEF and Cybran T1 Bombers
 - [ ] Attempt to fix Seraphim T1 Mobile AA's aim
 - [ ] Attempt to fix Aeon T1 Frigate, T2 Destroyer, and Seraphim T3 Subhunter weapon bones to improve fire reliability
