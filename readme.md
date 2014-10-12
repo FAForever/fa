@@ -35,6 +35,7 @@ This is the changelog posted on the forums for patch 3635.
     - [X] Improved fix for units being transported taking no damage while the shield is up
 - [X] T3 Seraphim Mobile Artillery given proper 'ARTILLERY' designation
 - [X] Fix adjacency buffs working when unit is turned off
+- [X] Fixed Cybran ACU with Laser upgrade being unable to ever fire the weapon after being transported, and improve targeting further
 
 *Changes to be verified*
 
@@ -42,7 +43,6 @@ This is the changelog posted on the forums for patch 3635.
 - [ ] Attempt to fix bomblet spread on bombers such as UEF and Cybran T1 Bombers
 - [ ] Attempt to fix Seraphim T1 Mobile AA's aim
 - [ ] Attempt to fix Aeon T1 Frigate, T2 Destroyer, and Seraphim T3 Subhunter weapon bones to improve fire reliability
-- [ ] Fixed Cybran ACU with Laser upgrade being unable to ever fire the weapon after being transported, and improve targeting further
 - [ ] New icon name for Mass Storage
 
 *Changes to be made*
