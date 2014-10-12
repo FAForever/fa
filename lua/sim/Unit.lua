@@ -4389,21 +4389,6 @@ Unit = Class(moho.unit_methods) {
         self:DoUnitCallbacks( 'OnTransportAttach', unit )
     end,
 
-        self:PlayUnitSound('Load')
-        self:MarkWeaponsOnTransport(unit, true)
-        if unit:ShieldIsOn() then
-            unit:DisableShield()
-            unit:DisableDefaultToggleCaps()
-        end
-        if not EntityCategoryContains(categories.PODSTAGINGPLATFORM, self) then
-            self:RequestRefreshUI()
-        end
-        -- added by brute51
-        unit:OnAttachedToTransport(self, attachBone)
-        self:DoUnitCallbacks( 'OnTransportAttach', unit )
-
-    end,
-
     OnTransportDetach = function(self, attachBone, unit)
         self:PlayUnitSound('Unload')
         self:MarkWeaponsOnTransport(unit, false)
