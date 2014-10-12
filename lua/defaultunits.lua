@@ -459,7 +459,7 @@ StructureUnit = Class(Unit) {
                 end
             end
         end
-    end    
+    end,
 
     -------------------------------
     -- Add/Remove Adjacency Effects
@@ -881,7 +881,7 @@ MassCollectionUnit = Class(StructureUnit) {
     OnConsumptionInActive = function(self)
         self:RemoveAdjacencyBuffs()
         self._productionActive = false
-    end
+    end,
     
     OnCreate = function(self)
         StructureUnit.OnCreate(self)
