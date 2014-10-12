@@ -34,6 +34,7 @@ This is the changelog posted on the forums for patch 3635.
     - [X] Fixed Continental not dying to Nukes with the shield up
     - [X] Improved fix for units being transported taking no damage while the shield is up
 - [X] T3 Seraphim Mobile Artillery given proper 'ARTILLERY' designation
+- [X] Fix adjacency buffs working when unit is turned off
 
 *Changes to be verified*
 
