@@ -12,6 +12,7 @@ This is the changelog posted on the forums for patch 3635.
 
 *Merged changes*
 - [X] Fixed infinite economy exploit
+- [X] Fixed free ACU upgrade exploit
 - [X] Shield Fixes:
     - [X] Personal Shields now protect units also under bubble shields
     - [X] Personal Shields now protect units properly from splash weaponry
@@ -27,7 +28,6 @@ This is the changelog posted on the forums for patch 3635.
     - [X] LABs, Mantis, Aurora, Striker, Pillar, Hoplite, Mongoose, Firebeetle, Seraphim T3 Mobile Artillery, Cybran T2 Mobile Flack, HARMS, Zthuee all fixed
 - [X] Replay sync support
 - [X] Tempest can now build hovering Aeon Land units
-- [X] Fixed free ACU upgrade exploit
 - [X] Fixed UEF T3 Mobile AA being able to fire from Continental, and reduced projectile number
 - [X] Continental Fixes:
     - [X] Fixed units firing from transport
@@ -55,6 +55,8 @@ Contributors:
  - Crotalus
  - Pip
  - IceDreamer
+ - thygrrr
+ - PattogoTehen
 
 
 Contributing
