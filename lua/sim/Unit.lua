@@ -4249,24 +4249,6 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    --The following four functions are emptied as their purpose has moved to Shield.lua. They remain
-    --so that Harbinger's unique script can use them
-    OnShieldEnabled = function(self)
-    end,
-
-    OnShieldDisabled = function(self)
-    end,
-
---Added these two functions to fix Continental (IceDreamer)
-    OnShieldHpDepleted = function(self)
-        self:PlayUnitSound('ShieldOff')
-    end,
-
-    OnShieldEnergyDepleted = function(self)
-        self:PlayUnitSound('ShieldOff')
-    end,
---Fix ends
-
     EnableShield = function(self)
         self:SetScriptBit('RULEUTC_ShieldToggle', true)
         if self.MyShield then
