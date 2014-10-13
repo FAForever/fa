@@ -789,33 +789,16 @@ AirFactoryUnit = Class(FactoryUnit) {
             self.BuildRateChanged = true
         end
         
-        StructureUnit.OnStartBuild(self, unitBeingBuilt, order )
-        self.BuildingUnit = true
-        if order != 'Upgrade' then
-            ChangeState(self, self.BuildingState)
-            self.BuildingUnit = false
-        end
-        self.FactoryBuildFailed = false
+        FactoryUnit.OnStartBuild(self, unitBeingBuilt, order )
     end,
     
     OnStopBuild = function(self, unitBeingBuilt, order )
-        StructureUnit.OnStopBuild(self, unitBeingBuilt, order )
-        
         --Reset BuildRate
         if self.BuildRateChanged == true then
             self:SetBuildRate(self:GetBlueprint().Economy.BuildRate)
             self.BuildRateChanged = false
         end
-        
-        if not self.FactoryBuildFailed then
-            if not EntityCategoryContains(categories.AIR, unitBeingBuilt) then
-            if not EntityCategoryContains(categories.AIR, unitBeingBuilt) then
-                self:RollOffUnit()
-            end
-            self:StopBuildFx()
-            self:ForkThread(self.FinishBuildThread, unitBeingBuilt, order )
-        end
-        self.BuildingUnit = false
+        FactoryUnit.OnStopBuild(self, unitBeingBuilt, order )        
     end,    
 }
 
@@ -1241,34 +1224,17 @@ SeaFactoryUnit = Class(FactoryUnit) {
         elseif EntityCategoryContains(categories.ENGINEER, unitBeingBuilt) and EntityCategoryContains(categories.TECH3, self) then    
             self:SetBuildRate(90)
             self.BuildRateChanged = true
-        end        
-        
-        StructureUnit.OnStartBuild(self, unitBeingBuilt, order )
-        self.BuildingUnit = true
-        if order != 'Upgrade' then
-            ChangeState(self, self.BuildingState)
-            self.BuildingUnit = false
-        end
-        self.FactoryBuildFailed = false
+        end               
+        FactoryUnit.OnStartBuild(self, unitBeingBuilt, order )
     end,
     
     OnStopBuild = function(self, unitBeingBuilt, order )
-        StructureUnit.OnStopBuild(self, unitBeingBuilt, order )
-        
         --Reset BuildRate
         if self.BuildRateChanged == true then
             self:SetBuildRate(self:GetBlueprint().Economy.BuildRate)
             self.BuildRateChanged = false
         end        
-        
-        if not self.FactoryBuildFailed then
-            if not EntityCategoryContains(categories.AIR, unitBeingBuilt) then
-                self:RollOffUnit()
-            end
-            self:StopBuildFx()
-            self:ForkThread(self.FinishBuildThread, unitBeingBuilt, order )
-        end
-        self.BuildingUnit = false
+        FactoryUnit.OnStopBuild(self, unitBeingBuilt, order )
     end,    
     
     RolloffBody = function(self)
@@ -1286,7 +1252,7 @@ SeaFactoryUnit = Class(FactoryUnit) {
         ChangeState(self, self.IdleState)
     end,
     
-    -- Disable the default rocking behavior
+    -- Disable the default rocking behaviour
     StartRocking = function(self)
     end,
 
