@@ -350,14 +350,19 @@ Shield = Class(moho.shield_methods,Entity) {
 
             -- We are no longer turned off
             self.OffHealth = -1
-
+            
             self:UpdateShieldRatio(-1)
-
-            --Switch the order of these around to make many things possible
-            self:CreateShieldMesh()            
-            self.Owner:OnShieldEnabled() --Now an empty function needed only for Harbinger
-            --OnShieldEnabled() is part of several functions which play a sound and manipulate the energy drain.
-            --They are only called from shield.lua, so I can replace them here.
+            self:CreateShieldMesh()
+            
+            --Code for Personal Bubbles, currently only the Harbinger
+            local OwnerBp = self.Owner:GetBlueprint()
+            local OwnerShield = OwnerBp.Defense.Shield
+            if OwnerShield.PersonalBubble and OwnerShield.PersonalBubble == true then
+                self.Owner:SetCollisionShape('Sphere', 0, OwnerBp.SizeY * 0.5, 0, OwnerShield.ShieldSize * 0.5)
+                --Manually disable the bubble shield's collision sphere after its creation so it acts like the new personal shields
+                self:SetCollisionShape('None')
+            end
+            
             self.Owner:PlayUnitSound('ShieldOn')
             self.Owner:SetMaintenanceConsumptionActive()
             
@@ -417,9 +422,15 @@ Shield = Class(moho.shield_methods,Entity) {
 
             -- Get rid of the shield bar
             self:UpdateShieldRatio(0)
-
             self:RemoveShield()
-            self.Owner:OnShieldDisabled() --Now an empty function needed only for Harbinger
+            
+            --Code for Personal Bubbles, currently only the Harbinger
+            local OwnerBp = self.Owner:GetBlueprint()
+            local OwnerShield = OwnerBp.Defense.Shield
+            if OwnerShield.PersonalBubble and OwnerShield.PersonalBubble == true then
+                self.Owner:SetCollisionShape('Box', 0, OwnerBp.SizeY * 0.5, 0, OwnerBp.SizeX * 0.5, OwnerBp.SizeY * 0.5, OwnerBp.SizeZ * 0.5)
+            end
+            
             self.Owner:PlayUnitSound('ShieldOff')
             self.Owner:SetMaintenanceConsumptionInactive()
 
@@ -440,8 +451,11 @@ Shield = Class(moho.shield_methods,Entity) {
         Main = function(self)
             self:RemoveShield()
 
-            if self.Owner.OnShieldHpDepleted then -- This check is made so we don't crash if unit was shadowed
-                self.Owner:OnShieldHpDepleted(self) --Now an empty function needed only for Harbinger
+            --Code for Personal Bubbles, currently only the Harbinger
+            local OwnerBp = self.Owner:GetBlueprint()
+            local OwnerShield = OwnerBp.Defense.Shield
+            if OwnerShield.PersonalBubble and OwnerShield.PersonalBubble == true then
+                self.Owner:SetCollisionShape('Box', 0, OwnerBp.SizeY * 0.5, 0, OwnerBp.SizeX * 0.5, OwnerBp.SizeY * 0.5, OwnerBp.SizeZ * 0.5)
             end
             self.Owner:PlayUnitSound('ShieldOff')            
 
@@ -449,7 +463,7 @@ Shield = Class(moho.shield_methods,Entity) {
             self:RevokeTransportProtection()
             self.Owner:IsTransportProtected(false)
             
-            -- We must make the unit charge up before gettings its shield back
+            -- We must make the unit charge up before getting its shield back
             self:ChargingUp(0, self.ShieldRechargeTime)
 
             -- Fully charged, get full health
@@ -467,10 +481,14 @@ Shield = Class(moho.shield_methods,Entity) {
     EnergyDrainRechargeState = State {
         Main = function(self)
             self:RemoveShield()
-            if self.Owner.OnShieldEnergyDepleted then -- This check is made so we don't crash if unit was shadowed
-                self.Owner:OnShieldEnergyDepleted(self) --Now an empty function needed only for Harbinger
+            --Code for Personal Bubbles, currently only the Harbinger
+            local OwnerBp = self.Owner:GetBlueprint()
+            local OwnerShield = OwnerBp.Defense.Shield
+            if OwnerShield.PersonalBubble and OwnerShield.PersonalBubble == true then
+                self.Owner:SetCollisionShape('Box', 0, OwnerBp.SizeY * 0.5, 0, OwnerBp.SizeX * 0.5, OwnerBp.SizeY * 0.5, OwnerBp.SizeZ * 0.5)
             end
             self.Owner:PlayUnitSound('ShieldOff')
+            
             --Apply vulnerabilities
             self:RevokeTransportProtection()
             self.Owner:IsTransportProtected(false)
