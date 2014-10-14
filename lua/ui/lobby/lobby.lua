@@ -211,15 +211,11 @@ local pmDialog = false
 local hasSupcom = true
 local hasFA = true
 
-local windowedMode = false
+local windowedMode = (Prefs.GetFromCurrentProfile('options').primary_adapter == "windowed" or HasCommandLineArg("/windowed"))
 
 function SetWindowedLobby(windowed)
-    local Prefs = import('/lua/user/prefs.lua')
-    local options = Prefs.GetFromCurrentProfile('options')
-    local primary = options.primary_adapter or "windowed"
-
     -- Dont change resolution if user already using windowed mode
-    if(primary == 'windowed' or windowed == windowedMode) then
+    if windowed == windowedMode then
         return
     end
 
