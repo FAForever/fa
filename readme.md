@@ -38,6 +38,7 @@ This is the changelog posted on the forums for patch 3635.
 - [X] Fixed Cybran ACU with Laser upgrade being unable to ever fire the weapon after being transported, and improve targeting further
 - [X] Mongoose Buff (Slight increase in Gatling gun MuzzleVelocity to equal Ravager's)
 - [X] All Factories of a given tech level now roll out Engineers at an even pace with each other 
+- [X] Hotbuild 'upgrade' key now takes engy-mod into account
 
 *Changes to be verified*
 
