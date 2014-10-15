@@ -509,17 +509,26 @@ end
 function buildActionUpgrade()
   local selectedUnits = GetSelectedUnits()
   local availableOrders,  availableToggles, buildableCategories = GetUnitCommandData(selectedUnits)
---  local buildable = EntityCategoryGetUnitList(buildableCategories)
+  --local buildable = EntityCategoryGetUnitList(buildableCategories)
   local bpTypes = {}
 
   for index, unit in selectedUnits do
     local bpId = unit:GetBlueprint().BlueprintId
     -- LOG("bpid: " .. bpId)
     local cmd = upgradeTab[bpId]
-    if (cmd) then
-      SelectUnits({unit})
+    SelectUnits({unit})
+    if(type(cmd) == "table") then -- Issue the first upgrade command that we may build
+        for k,v in cmd do
+            if EntityCategoryContains(buildableCategories, v) then
+                IssueBlueprintCommand("UNITCOMMAND_Upgrade", v, 1, false)
+                break
+            end
+        end
+    elseif (type(cmd) == "string") then -- Direct upgrade path
       -- LOG("upgrading: " .. repr(unit) .. " with cmd: " .. cmd)
-      IssueBlueprintCommand("UNITCOMMAND_Upgrade", cmd, 1, false)
+      if EntityCategoryContains(buildableCategories, cmd) then
+          IssueBlueprintCommand("UNITCOMMAND_Upgrade", cmd, 1, false)
+      end
     end
   end
   SelectUnits(selectedUnits)
