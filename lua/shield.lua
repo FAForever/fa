@@ -368,7 +368,6 @@ Shield = Class(moho.shield_methods,Entity) {
             
             --Then we can make any units inside a transport with a Shield invulnerable here
             self:ProtectTransportedUnits()
-            self.Owner:IsTransportProtected(true)
 
             local aiBrain = self.Owner:GetAIBrain()
 
@@ -436,7 +435,6 @@ Shield = Class(moho.shield_methods,Entity) {
 
             --Apply vulnerabilities
             self:RevokeTransportProtection()
-            self.Owner:IsTransportProtected(false)
 
             WaitSeconds(1)
         end,
@@ -461,7 +459,6 @@ Shield = Class(moho.shield_methods,Entity) {
 
             --Apply vulnerabilities
             self:RevokeTransportProtection()
-            self.Owner:IsTransportProtected(false)
             
             -- We must make the unit charge up before getting its shield back
             self:ChargingUp(0, self.ShieldRechargeTime)
@@ -491,7 +488,6 @@ Shield = Class(moho.shield_methods,Entity) {
             
             --Apply vulnerabilities
             self:RevokeTransportProtection()
-            self.Owner:IsTransportProtected(false)
             
             self:ChargingUp(0, self.ShieldEnergyDrainRechargeTime)
 
@@ -515,7 +511,8 @@ Shield = Class(moho.shield_methods,Entity) {
             local Cargo = self.Owner:GetCargo()
             for _, v in Cargo do
                 v:SetCanTakeDamage(false)
-            end    
+            end
+            self.Owner:IsTransportProtected(true)            
         end
     end,
     
@@ -526,6 +523,7 @@ Shield = Class(moho.shield_methods,Entity) {
             for _, v in Cargo do
                 v:SetCanTakeDamage(true)
             end
+            self.Owner:IsTransportProtected(false)            
         end
     end,    
     
