@@ -4,15 +4,27 @@ FAF LUA Code
 Current patch is: 3634
 
 
-Changelog for next patch (3636)
+Changelog for patch (3636)
 -------------------------------
 
-This is the changelog posted on the forums for patch 3635.
+This is the changelog to be posted on the forums for patch 3635.
 
-
-*Merged changes*
+*Exploit Fixes*
 - [X] Fixed infinite economy exploit
 - [X] Fixed free ACU upgrade exploit
+
+*Bug Fixes*
+- [X] Continental Fixes:
+    - [X] Fixed units firing from transport
+    - [X] Fixed Continental not dying to Nukes with the shield up
+    - [X] Improved fix for units being transported taking no damage while the shield is up
+- [X] Fixed UEF T3 Mobile AA being able to fire from Continental, and reduced projectile number
+- [X] T3 Seraphim Mobile Artillery given proper 'ARTILLERY' designation
+- [X] Fix adjacency buffs working when unit is turned off
+- [X] Fixed Cybran ACU with Laser upgrade being unable to ever fire the weapon after being transported, and improve targeting further
+- [X] Fixed Seraphim ACU dying when dropped from Transport after being picked up while firing
+
+*Game Improvements*
 - [X] Shield Fixes:
     - [X] Personal Shields now protect units also under bubble shields
     - [X] Personal Shields now protect units properly from splash weaponry
@@ -27,28 +39,30 @@ This is the changelog posted on the forums for patch 3635.
     - [X] Brick, Percival, Harbinger, Titan, Loyalist and Othuum fixed
     - [X] LABs, Mantis, Aurora, Striker, Pillar, Hoplite, Mongoose, Firebeetle, Seraphim T3 Mobile Artillery, Cybran T2 Mobile Flack, HARMS, Zthuee all fixed
 - [X] Replay sync support
+- [X] Hotbuild 'upgrade' key now takes engy-mod into account       
+    
+*Balance Changes*
+- [X] Shield and Hitbox fixes above will have balance implications of varying size
 - [X] Tempest can now build hovering Aeon Land units
-- [X] Fixed UEF T3 Mobile AA being able to fire from Continental, and reduced projectile number
-- [X] Continental Fixes:
-    - [X] Fixed units firing from transport
-    - [X] Fixed Continental not dying to Nukes with the shield up
-    - [X] Improved fix for units being transported taking no damage while the shield is up
-- [X] T3 Seraphim Mobile Artillery given proper 'ARTILLERY' designation
-- [X] Fix adjacency buffs working when unit is turned off
-- [X] Fixed Cybran ACU with Laser upgrade being unable to ever fire the weapon after being transported, and improve targeting further
 - [X] Mongoose Buff (Slight increase in Gatling gun MuzzleVelocity to equal Ravager's)
-- [X] All Factories of a given tech level now roll out Engineers at an even pace with each other 
-- [X] Hotbuild 'upgrade' key now takes engy-mod into account
+- [X] All Factories of a given tech level now roll out Engineers at an even pace with each other
 
+----------------------------------
 *Changes to be verified*
-
 - [ ] Attempt to fix bomblet spread on bombers such as UEF and Cybran T1 Bombers
 - [ ] Attempt to fix Seraphim T1 Mobile AA's aim
 - [ ] Attempt to fix Aeon T1 Frigate, T2 Destroyer, and Seraphim T3 Subhunter weapon bones to improve fire reliability
 - [ ] New icon name for Mass Storage
 
+----------------------------------
 *Changes to be made*
-- Satellite base now builds the satelite, when satelite dies, base can rebuild
+- Satellite base now builds the satellite, when satellite dies, base can rebuild
+- Fix cyclic factory assist crash exploit
+- Fix engineer repair on upgrade exploit
+- Fix HQ Factory visual bug
+- Implement proper Stealth
+- Fix replays desyncing
+- Fix Support factories being built prior to HQ with UI exploit
 
 Contributors:
  - Sheeo
