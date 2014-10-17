@@ -4295,27 +4295,21 @@ Unit = Class(moho.unit_methods) {
     #-- TRANSPORTING
     ##########################################################################################
     OnStartTransportBeamUp = function(self, transport, bone)
-        #added for transport bug fix
+    
+        --Ensures bone availability
         if transport.slotsFree[bone] == false then
-            #WARN('Stop issued due to attachment bone already in use, bone ' .. repr(bone))
             IssueClearCommands({self})
             IssueClearCommands({transport})
-            #self:Kill()
-            LOG('Unit load order stopped to attachment bone already in use.')
             return
         else
-            #WARN('Unit is okay to attach on bone ' .. repr(bone))
-            #WARN('slotsFree is ' .. repr(transport.slotsFree[bone]))
             self:DestroyIdleEffects()
             self:DestroyMovementEffects()
             local army =  self:GetArmy()
             table.insert( self.TransportBeamEffectsBag, AttachBeamEntityToEntity(self, -1, transport, bone, army, EffectTemplate.TTransportBeam01))
             table.insert( self.TransportBeamEffectsBag, AttachBeamEntityToEntity( transport, bone, self, -1, army, EffectTemplate.TTransportBeam02))
             table.insert( self.TransportBeamEffectsBag, CreateEmitterAtBone( transport, bone, army, EffectTemplate.TTransportGlow01) )
-            self:TransportAnimation()
-
+            self:TransportAnimation()        
         end
-        ##end transport bug fix
     end,
 
     OnStopTransportBeamUp = function(self)
@@ -4324,6 +4318,12 @@ Unit = Class(moho.unit_methods) {
         for k, v in self.TransportBeamEffectsBag do
             v:Destroy()
         end
+
+        --Reset weapons to ensure torso centres and unit survives drop
+        for i = 1, self:GetWeaponCount() do
+            local wep = self:GetWeapon(i)
+            wep:ResetTarget()
+        end     
     end,
 
     OnTransportAborted = function(self)
@@ -4337,7 +4337,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     MarkWeaponsOnTransport = function(self, unit, transport)
-        #Mark the weapons on a transport
+        --Mark the weapons on a transport
         if unit then
             for i = 1, unit:GetWeaponCount() do
                 local wep = unit:GetWeapon(i)
@@ -4366,7 +4366,7 @@ Unit = Class(moho.unit_methods) {
         if not EntityCategoryContains(categories.PODSTAGINGPLATFORM, self) then
             self:RequestRefreshUI()
         end
-                -- added by brute51
+        --Added by brute51
         unit:OnAttachedToTransport(self, attachBone)
         self:DoUnitCallbacks( 'OnTransportAttach', unit )
     end,
@@ -4381,7 +4381,7 @@ Unit = Class(moho.unit_methods) {
             self:RequestRefreshUI()
         end
         unit:TransportAnimation(-1)
-         unit:OnDetachedToTransport(self)
+        unit:OnDetachedToTransport(self)
         self:DoUnitCallbacks( 'OnTransportDetach', unit )
     end,
     
@@ -4456,13 +4456,12 @@ Unit = Class(moho.unit_methods) {
 
     TransportAnimationThread = function(self,rate)
         local bp = self:GetBlueprint().Display.TransportAnimation
-
         if rate and rate < 0 and self:GetBlueprint().Display.TransportDropAnimation then
             bp = self:GetBlueprint().Display.TransportDropAnimation
             rate = -rate
         end
-
         WaitSeconds(.5)
+        
         if bp then
             local animBlock = self:ChooseAnimBlock( bp )
             if animBlock.Animation then
