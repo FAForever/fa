@@ -4,10 +4,10 @@ FAF LUA Code
 Current patch is: 3634
 
 
-Changelog for patch (3636)
--------------------------------
+Changelog for patch 3636
+------------------------
 
-This is the changelog to be posted on the forums for patch 3635.
+This is the changelog to be posted on the forums for patch 3636.
 
 *Exploit Fixes*
 - [X] Fixed infinite economy exploit
