@@ -10,7 +10,8 @@ function ReclaimGround(command)
                         Func = 'ReclaimGround',
                         Args = {
                             Units = {command.Units[1]:GetEntityId()}, Location = command.Target.Position,
-                            Move = command.Target.Type == 'Position'
+                            Move = command.Target.Type == 'Position',
+                            From = GetFocusArmy()
                         }
                     }
         SimCallback(cb, true)

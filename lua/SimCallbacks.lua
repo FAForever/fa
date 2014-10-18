@@ -151,7 +151,9 @@ Callbacks.ReclaimGround = function(data)
 
     for _,id in ids do
         local unit = GetEntityById(id)
-        table.insert(units, unit)
+        if(OkayToMessWithArmy(unit:GetArmy())) then
+            table.insert(units, unit)
+        end
     end
 
     local location = Vector(data.Location[1], data.Location[2], data.Location[3])
