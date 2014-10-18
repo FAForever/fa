@@ -1136,7 +1136,6 @@ Unit = Class(moho.unit_methods) {
                 elseif focus.originalBuilder and not focus.originalBuilder:IsDead() and focus.originalBuilder:IsUnitState('Upgrading') then
                     baseData = focus.originalBuilder:GetBlueprint().Economy
                 end
-
                 if baseData then
                     targetData = focus:GetBlueprint().Economy
                 end
@@ -1144,19 +1143,14 @@ Unit = Class(moho.unit_methods) {
 
             if targetData then -- upgrade / enhancement
                 time, energy, mass = Game.GetConstructEconomyModel(self, targetData, baseData)
-            else -- building/repairing something
-                local buildCost
-                if(focus_state == 'SiloBuildingAmmo') then
-                    buildCost = focus.SiloProjectile
-                else
-                    buildCost = focus:GetBlueprint()
-                end
-
-                time, energy, mass = focus:GetBuildCosts(buildCost)
+            elseif focus then -- building/repairing something
                 if(focus_state == 'SiloBuildingAmmo') then
                     local siloBuildRate = focus:GetBuildRate() or 1
+                    time, energy, mass = focus:GetBuildCosts(focus.SiloProjectile)
                     energy = (energy / siloBuildRate) * (self:GetBuildRate() or 1)
                     mass = (mass / siloBuildRate) * (self:GetBuildRate() or 1)
+                else
+                    time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
                 end
             end
 
