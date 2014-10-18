@@ -12,6 +12,7 @@ This is the changelog to be posted on the forums for patch 3636.
 *Exploit Fixes*
 - [X] Fixed infinite economy exploit
 - [X] Fixed free ACU upgrade exploit
+- [ ] Security exploits with simcallbacks
 
 *Bug Fixes*
 - [X] Continental Fixes:
@@ -39,7 +40,8 @@ This is the changelog to be posted on the forums for patch 3636.
     - [X] Brick, Percival, Harbinger, Titan, Loyalist and Othuum fixed
     - [X] LABs, Mantis, Aurora, Striker, Pillar, Hoplite, Mongoose, Firebeetle, Seraphim T3 Mobile Artillery, Cybran T2 Mobile Flack, HARMS, Zthuee all fixed
 - [X] Replay sync support
-- [X] Hotbuild 'upgrade' key now takes engy-mod into account       
+- [X] Hotbuild 'upgrade' key now takes engy-mod into account
+- [X] Spread attack now works for move, build and overcharge
     
 *Balance Changes*
 - [X] Shield and Hitbox fixes above will have balance implications of varying size
