@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/unit.lua
-#**  Author(s):  John Comes, David Tomandl, Gordon Duclos
-#**
-#**  Summary  : The Unit lua module
-#**
-#**  Copyright Š 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/unit.lua
+--**  Author(s):  John Comes, David Tomandl, Gordon Duclos
+--**
+--**  Summary  : The Unit lua module
+--**
+--**  Copyright Š 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local Entity = import('/lua/sim/Entity.lua').Entity
 local explosion = import('/lua/defaultexplosions.lua')
@@ -32,7 +32,6 @@ SyncMeta = {
     end,
 
     __newindex = function(t,key,val)
-        #LOG( "SYNC: " .. key .. ' = ' .. repr(val))
         local id = rawget(t,'id')
         local army = rawget(t,'army')
         if not UnitData[id] then
@@ -89,9 +88,9 @@ Unit = Class(moho.unit_methods) {
     -- Used for calculating differential upgrade costs (Added by Rienzilla)
     originalBuilder = nil,
 
-    ##########################################################################################
-    #-- INITIALIZATION
-    ##########################################################################################
+    -------------------------------------------------------------------------------------------
+    ---- INITIALIZATION
+    -------------------------------------------------------------------------------------------
 
     OnPreCreate = function(self)
         -- Each unit has a sync table that magically knows when values change and stuffs it
@@ -101,7 +100,7 @@ Unit = Class(moho.unit_methods) {
         self.Sync.army = self:GetArmy()
         setmetatable(self.Sync,SyncMeta)
 
-        #Entity.OnPreCreate(self)
+        --Entity.OnPreCreate(self)
         if not self.Trash then
             self.Trash = TrashBag()
         end
@@ -183,7 +182,7 @@ Unit = Class(moho.unit_methods) {
         elseif vol >= 0.5 then
             damageamounts = 2
         end
-        #print('Damage Amounts: ' .. damageamounts)
+        --print('Damage Amounts: ' .. damageamounts)
         self.FxDamage1Amount = self.FxDamage1Amount or damageamounts
         self.FxDamage2Amount = self.FxDamage2Amount or damageamounts
         self.FxDamage3Amount = self.FxDamage3Amount or damageamounts
@@ -229,7 +228,6 @@ Unit = Class(moho.unit_methods) {
         self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
 
         if self.EconomyProductionInitiallyActive then
-            #LOG('*DEBUG: SETTING PRODUCTION ACTIVE')
             self:SetProductionActive(true)
         end
 
@@ -270,7 +268,7 @@ Unit = Class(moho.unit_methods) {
 
         self.Dead = false
 
-        ###below here added for CBFP
+        --below here added for CBFP
         local bp = self:GetBlueprint()
         if bp.Transport and bp.Transport.DontUseForcedAttachPoints then
             self:RemoveTransportForcedAttachPoints()
@@ -279,7 +277,7 @@ Unit = Class(moho.unit_methods) {
         self:DisableRestrictedWeapons()    -- added by brute51 [119]
         self:OnCreated()
 
-        ###below here added for FAF by FunkOff
+        --below here added for FAF by FunkOff
         self.attachmentBone = nil
         self.slotsFree = {}
 
@@ -289,18 +287,16 @@ Unit = Class(moho.unit_methods) {
         return self.debris_Vector
     end,
 
-    ##########################################################################################
-    #-- TARGET AND ATTACKERS FUNCTIONS
-    ##########################################################################################
+    -------------------------------------------------------------------------------------------
+    -- TARGET AND ATTACKERS FUNCTIONS
+    ------------------------------------------------------------------------------------------
     -- issue:#43 : better stealth
 
     -- when we fire on something, we tell that unit that we attack it.
     OnGotTarget = function(self, Weapon)
         local Target = Weapon:GetCurrentTarget()
         if Target and IsUnit(Target) then
-            --LOG("adding weapon attackers")
             Target:addAttackerWeapon(self)
-            --LOG("adding this unit in our list of attack")
             self:addTargetWeapon(Target)
         end
     end,
@@ -317,7 +313,6 @@ Unit = Class(moho.unit_methods) {
     addAttackerWeapon = function(self, attacker)
         if not attacker:IsDead() then
             if not table.find(self.WeaponAttackers, attacker) then
-                --LOG("weapon attacker added")
                 table.insert(self.WeaponAttackers, attacker)
             end
         end
@@ -327,7 +322,6 @@ Unit = Class(moho.unit_methods) {
     addAttacker = function(self, attacker)
         if not attacker:IsDead() then
             if not table.find(self.Attackers, attacker) then
-                --LOG("attacker added")
                 table.insert(self.Attackers, attacker)
             end
         end
@@ -337,7 +331,6 @@ Unit = Class(moho.unit_methods) {
     removeWeaponAttacker = function(self, attacker)
         for k, ent in self.Attackers do
             if ent == attacker then
-                --LOG("removing this weapon attacker")
                 table.remove(self.WeaponAttackers, k)
             end
         end
@@ -347,7 +340,6 @@ Unit = Class(moho.unit_methods) {
     removeAttacker = function(self, attacker)
         for k, ent in self.Attackers do
             if ent == attacker then
-                --LOG("removing this attacker")
                 table.remove(self.Attackers, k)
             end
         end
@@ -402,7 +394,6 @@ Unit = Class(moho.unit_methods) {
 
         for k, ent in self.WeaponAttackers do
             if ent and not ent:IsDead() then
-                --LOG("must stop attacking current WEAPON unit !")
                 local numWep = self:GetWeaponCount()
                 if numWep > 0 then
                      for w = 1, numWep do
@@ -459,9 +450,9 @@ Unit = Class(moho.unit_methods) {
 
     end,
 
-    ##########################################################################################
-    #-- MISC FUNCTIONS
-    ##########################################################################################
+    -------------------------------------------------------------------------------------------
+    ---- MISC FUNCTIONS
+    -------------------------------------------------------------------------------------------
 
     SetDead = function(self)
         self.Dead = true
@@ -696,9 +687,9 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    ##########################################################################################
-    #-- TOGGLES
-    ##########################################################################################
+    -------------------------------------------------------------------------------------------
+    ---- TOGGLES
+    -------------------------------------------------------------------------------------------
      OnScriptBitSet = function(self, bit)
         if bit == 0 then -- shield toggle
             self:PlayUnitAmbientSound( 'ActiveLoop' )
@@ -845,15 +836,14 @@ Unit = Class(moho.unit_methods) {
     end,
 
 
-    ##########################################################################################
-    #-- MISC EVENTS
-    ##########################################################################################
+    -------------------------------------------------------------------------------------------
+    ---- MISC EVENTS
+    -------------------------------------------------------------------------------------------
 
     OnSpecialAction = function(self, location)
     end,
 
     OnProductionActive = function(self)
-         #LOG('*DEBUG: PRODUCTION IS NOW ACTIVE')
     end,
 
     OnActive = function(self)
@@ -1000,11 +990,11 @@ Unit = Class(moho.unit_methods) {
             end
 
             -- no need for this anymore
-            #if unitEnh then
+            --if unitEnh then
             --    for k,v in unitEnh do
             --        newUnit:CreateEnhancement(v)
             --    end
-            #end
+            --end
             -- Because the old unit is lost we cannot call a member function for newUnit callbacks
             for k,cb in newUnitCallbacks do
                 if cb then
@@ -1016,9 +1006,9 @@ Unit = Class(moho.unit_methods) {
 
 
 
-    ##########################################################################################
-    #-- ECONOMY
-    ##########################################################################################
+    -------------------------------------------------------------------------------------------
+    -- ECONOMY
+    -------------------------------------------------------------------------------------------
 
     OnConsumptionActive = function(self)
     end,
@@ -1029,7 +1019,7 @@ Unit = Class(moho.unit_methods) {
     -- We are splitting Consumption into two catagories:
     --   Maintenance -- for units that are usually "on": radar, mass extractors, etc.
     --   Active -- when upgrading, constructing, or something similar.
-    #
+    --
     -- It will be possible for both or neither of these consumption methods to be
     -- in operation at the same time.  Here are the functions to turn them off and on.
     SetMaintenanceConsumptionActive = function(self)
@@ -1086,11 +1076,6 @@ Unit = Class(moho.unit_methods) {
         return math.max( moho.unit_methods.GetBuildRate(self), 0.00001) -- make sure we're never returning 0, this value will be used to divide with
     end,
 
-
-    #
-    -- Called when we start building a unit, turn on/off, get/lose bonuses, or on
-    -- any other change that might affect our build rate or resource use.
-    #
     UpdateConsumptionValues = function(self)
         local myBlueprint = self:GetBlueprint()
 
@@ -1220,9 +1205,9 @@ Unit = Class(moho.unit_methods) {
         return self.BuildRateOverride
     end,
 
-    ##########################################################################################
-    #-- DAMAGE
-    ##########################################################################################
+    -------------------------------------------------------------------------------------------
+    -- DAMAGE
+    -------------------------------------------------------------------------------------------
     --Sets if the unit can take damage.  val = true means it can take damage.
     --val = false means it can't take damage
     SetCanTakeDamage = function(self, val)
@@ -1240,7 +1225,7 @@ Unit = Class(moho.unit_methods) {
             --Pass damage to an active personal shield, as personal shields no longer have collisions
             if self:GetShieldType() == 'Personal' and self:ShieldIsOn() then
                 self.MyShield:ApplyDamage(instigator, amount, vector, damageType)
-                
+
             --This makes sure Nukes will still kill shielded Transports and their units
             elseif EntityCategoryContains(categories.NUKE, instigator) and transportProtected == true then
                 self.MyShield:RevokeTransportProtection()
@@ -1285,8 +1270,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     ManageDamageEffects = function(self, newHealth, oldHealth)
-        #LOG('*DEBUG: ManageDamageEffects, New: ', repr(newHealth), ' Old: ', repr(oldHealth))
-
         -- Health values come in at fixed 25% intervals
         if newHealth < oldHealth then
             if oldHealth == 0.75 then
@@ -1594,7 +1577,7 @@ Unit = Class(moho.unit_methods) {
         --this checks if wreck are allowed...
         if self:GetBlueprint().Wreckage.WreckageLayers[self:GetCurrentLayer()] then
             local wreckage = self:CreateWreckageProp(overkillRatio)
-            #this is for stopping an exploit
+            --this is for stopping an exploit
             if wreckage then
                 wreckage.bpid = self:GetBlueprint().BlueprintId
             end
@@ -1610,7 +1593,6 @@ Unit = Class(moho.unit_methods) {
             return nil
         end
 
-        --LOG('*DEBUG: Spawning Wreckage = ', repr(wreck), 'overkill = ',repr(overkillRatio))
         local mass = bp.Economy.BuildCostMass * (bp.Wreckage.MassMult or 0)
         local energy = bp.Economy.BuildCostEnergy * (bp.Wreckage.EnergyMult or 0)
         local time = (bp.Wreckage.ReclaimTimeMultiplier or 1)
@@ -1681,14 +1663,11 @@ Unit = Class(moho.unit_methods) {
                 self:ShowBone( self.DestructionPartsHighToss[i], false )
                 boneProj = self:CreateProjectileAtBone('/effects/entities/DebrisBoneAttachHigh01/DebrisBoneAttachHigh01_proj.bp',self.DestructionPartsHighToss[i])
                 self:AttachBoneToEntityBone(self.DestructionPartsHighToss[i],boneProj,-1,false)
-
                 --explosion.CreateUnitDebrisEffects( self, self.DestructionPartsHighToss[i] )
             end
         end
         if low and (LowDestructionParts > 0) then
             LowPartLimit = Random( 1, LowDestructionParts)
-            #LOG('*DEBUG: CreateUnitDestructionDebris Parts', repr(self.DestructionPartsLowToss))
-            #LOG('*DEBUG: CreateUnitDestructionDebris LowPartLimit ', repr(LowPartLimit))
             for i = 1, LowPartLimit do
                 self:ShowBone( self.DestructionPartsLowToss[i], false )
                 boneProj = self:CreateProjectileAtBone('/effects/entities/DebrisBoneAttachLow01/DebrisBoneAttachLow01_proj.bp',self.DestructionPartsLowToss[i])
@@ -1702,7 +1681,6 @@ Unit = Class(moho.unit_methods) {
                 self:ShowBone( self.DestructionPartsChassisToss[i], false )
                 boneProj = self:CreateProjectileAtBone('/effects/entities/DebrisBoneAttachChassis01/DebrisBoneAttachChassis01_proj.bp',self.DestructionPartsChassisToss[i])
                 self:AttachBoneToEntityBone(self.DestructionPartsChassisToss[i],boneProj,-1,false)
-
                 --explosion.CreateUnitDebrisEffects( self, self.DestructionPartsChassisToss[i] )
             end
         end
@@ -1882,13 +1860,12 @@ Unit = Class(moho.unit_methods) {
 
         --If factory, destory what I'm building if I die
         if EntityCategoryContains(categories.FACTORY, self) then
-            if self.UnitBeingBuilt and not self.UnitBeingBuilt:IsDead() and self.UnitBeingBuilt:GetFractionComplete() != 1 then
+            if self.UnitBeingBuilt and not self.UnitBeingBuilt:IsDead() and self.UnitBeingBuilt:GetFractionComplete() ~= 1 then
                 self.UnitBeingBuilt:Destroy()
             end
         end
 
         -- destroy everything added to the trash
-        #LOG('*DEBUG: Unit:OnDestroy')
         self.Trash:Destroy()
         if self.BuildEffectsBag then
             self.BuildEffectsBag:Destroy()
@@ -1917,27 +1894,20 @@ Unit = Class(moho.unit_methods) {
     end,
 
     HideLandBones = function(self)
-        #LOG( self:GetUnitId() .. " being built on layer '" .. self:GetCurrentLayer() .. "'" )
-        #HIDE THE BONES FOR BUILDINGS BUILT ON LAND.
+        --HIDE THE BONES FOR BUILDINGS BUILT ON LAND.
         if self.LandBuiltHiddenBones and self:GetCurrentLayer() == 'Land' then
             for k, v in self.LandBuiltHiddenBones do
-                #LOG('*DEBUG: HIDING BONE = ', repr(v), ' BECAUSE IT IS BUILT ON LAND')
                 if self:IsValidBone(v) then
                     self:HideBone(v, true)
-                #else
-                    #LOG('*WARNING: NOT HIDING BONE ', repr(v), ' BECAUSE IT IS INVALID ON UNIT ', repr(self:GetUnitId()))
                 end
             end
-        #else
-            #LOG('*DEBUG: _NOT_ HIDING BONE = ', repr(v), ' BECAUSE IT IS BUILT ON ', self:GetCurrentLayer())
         end
     end,
 
-    #GENERIC FUNCTION FOR SHOWING A TABLE OF BONES
-    #TABLE = LIST OF BONES
-    #CHILDREND = TRUE/FALSE TO SHOW CHILD BONES
+    --GENERIC FUNCTION FOR SHOWING A TABLE OF BONES
+    --TABLE = LIST OF BONES
+    --CHILDREND = TRUE/FALSE TO SHOW CHILD BONES
     ShowBones = function(self, table, children)
-        #LOG('*DEBUG: IN SHOWBONES TABLE = ', repr(table))
         for k, v in table do
             if self:IsValidBone(v) then
                 self:ShowBone(v, children)
@@ -2122,9 +2092,9 @@ Unit = Class(moho.unit_methods) {
         self.DeathWeaponEnabled = enable
     end,
 
-    #############################################################################################
-    #-- CONSTRUCTING - BEING BUILT
-    #############################################################################################
+    ----------------------------------------------------------------------------------------------
+    -- CONSTRUCTING - BEING BUILT
+    ----------------------------------------------------------------------------------------------
     OnBeingBuiltProgress = function(self, unit, oldProg, newProg)
     end,
 
@@ -2145,7 +2115,7 @@ Unit = Class(moho.unit_methods) {
         -- this section is rebuild bonus check 1 [159]
         -- GPG if you read this I can explain what this does. So if you need me to, contact me (Brute51).
         local builderUpgradesTo = builder:GetBlueprint().General.UpgradesTo or false
-        if not builderUpgradesTo or self:GetUnitId() != builderUpgradesTo then    -- avoid upgrades
+        if not builderUpgradesTo or self:GetUnitId() ~= builderUpgradesTo then    -- avoid upgrades
             if EntityCategoryContains( categories.STRUCTURE, self) then
                 builder:ForkThread( builder.CheckFractionComplete, self )  -- [159]
             end
@@ -2205,7 +2175,6 @@ Unit = Class(moho.unit_methods) {
                 function(self)
                     WaitTicks(1)
                     self:OnRebuildBonusIsIllegal()
-                    #WARN ('checkrebuildbonus if')
                 end
             )
         end
@@ -2283,7 +2252,7 @@ Unit = Class(moho.unit_methods) {
 
         -- If we have a shield spec'd create it.
         if bp.Defense.Shield.ShieldSize > 0 then
-            if bp.Defense.Shield.StartOn != false then
+            if bp.Defense.Shield.StartOn ~= false then
                 if bp.Defense.Shield.PersonalShield == true then
                     self:CreatePersonalShield()
                 elseif bp.Defense.Shield.AntiArtilleryShield then
@@ -2303,11 +2272,10 @@ Unit = Class(moho.unit_methods) {
         local bpTable = bp.Display.MovementEffects
         if bpTable.Land or bpTable.Air or bpTable.Water or bpTable.Sub or bpTable.BeamExhaust then
             self.MovementEffectsExist = true
-            if bpTable.BeamExhaust and (bpTable.BeamExhaust.Idle != false) then
+            if bpTable.BeamExhaust and (bpTable.BeamExhaust.Idle ~= false) then
                 self:UpdateBeamExhaust( 'Idle' )
             end
             if not self.Footfalls and bpTable[layer].Footfall then
-                #LOG('Creating Footfall Manips')
                 self.Footfalls = self:CreateFootFallManipulators( bpTable[layer].Footfall )
             end
         else
@@ -2320,7 +2288,7 @@ Unit = Class(moho.unit_methods) {
             local Position = self:GetPosition()
             self:SetPosition({Position[1], Position[2] + bp.RaiseDistance, Position[3]}, true)
         end
-        
+
         -- Added by Brute51 for unit enhancement presets
         if bp.EnhancementPresetAssigned then
             self:ForkThread(self.CreatePresetEnhancementsThread)
@@ -2369,9 +2337,9 @@ Unit = Class(moho.unit_methods) {
     end,
 
 
-    ##########################################################################################
-    #-- UNIT ENHANCEMENT PRESETS
-    ##########################################################################################
+    -------------------------------------------------------------------------------------------
+    -- UNIT ENHANCEMENT PRESETS
+    -------------------------------------------------------------------------------------------
     -- Added by Brute51, copied from Nomads code for SCU presets
 
     ShowPresetEnhancementBones = function(self)
@@ -2452,9 +2420,9 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    #############################################################################################
-    #-- CONSTRUCTING - BUILDING - REPAIR
-    #############################################################################################
+    ----------------------------------------------------------------------------------------------
+    -- CONSTRUCTING - BUILDING - REPAIR
+    ----------------------------------------------------------------------------------------------
     SetupBuildBones = function(self)
         local bp = self:GetBlueprint()
         if not bp.General.BuildBones or
@@ -2464,8 +2432,8 @@ Unit = Class(moho.unit_methods) {
            return
         end
         -- Syntactical reference:
-        #CreateBuilderArmController(unit,turretBone, [barrelBone], [aimBone])
-        #BuilderArmManipulator:SetAimingArc(minHeading, maxHeading, headingMaxSlew, minPitch, maxPitch, pitchMaxSlew)
+        --CreateBuilderArmController(unit,turretBone, [barrelBone], [aimBone])
+        --BuilderArmManipulator:SetAimingArc(minHeading, maxHeading, headingMaxSlew, minPitch, maxPitch, pitchMaxSlew)
         self.BuildArmManipulator = CreateBuilderArmController(self, bp.General.BuildBones.YawBone or 0 , bp.General.BuildBones.PitchBone or 0, bp.General.BuildBones.AimBone or 0)
         self.BuildArmManipulator:SetAimingArc(-180, 180, 360, -90, 90, 360)
         self.BuildArmManipulator:SetPrecedence(5)
@@ -2485,16 +2453,15 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
-    #LOG('onstartbuild and order is ' .. repr(order))
         if order == 'Repair' then
-            if unitBeingBuilt.WorkItem != self.WorkItem then
+            if unitBeingBuilt.WorkItem ~= self.WorkItem then
                 self:InheritWork(unitBeingBuilt)
             end
             self:SetUnitState('Repairing', true)
         end
 
         local bp = self:GetBlueprint()
-        if order != 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
+        if order ~= 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
             self:StartBuildingEffects(unitBeingBuilt, order)
         end
         self:SetActiveConsumptionActive()
@@ -2512,7 +2479,7 @@ Unit = Class(moho.unit_methods) {
                 unitBeingBuilt:CreateTarmac(true, true, true, false, false)
             end
         end
-        #self.CurrentBuildOrder = order
+        --self.CurrentBuildOrder = order
     end,
 
     OnStopBuild = function(self, unitBeingBuilt)
@@ -2521,9 +2488,9 @@ Unit = Class(moho.unit_methods) {
         self:DoOnUnitBuiltCallbacks(unitBeingBuilt)
         self:StopUnitAmbientSound('ConstructLoop')
         self:PlayUnitSound('ConstructStop')
-        ###This part of the CBFP is REMOVED due to incompatibility with NOMADS
-        ###This may be re-added at a future point if it can be done while not totally breaking the entire game --FunkOff
-        #if self.CurrentBuildOrder == 'MobileBuild' then  -- prevents false positives by assisted enhancing
+        --This part of the CBFP is REMOVED due to incompatibility with NOMADS
+        --This may be re-added at a future point if it can be done while not totally breaking the entire game --FunkOff
+        --if self.CurrentBuildOrder == 'MobileBuild' then  -- prevents false positives by assisted enhancing
         --    if self.OnStopBuildWasRun then
         --        if unitBeingBuilt and not unitBeingBuilt:BeenDestroyed() then
         --            unitBeingBuilt:Destroy()  -- [164]
@@ -2532,7 +2499,7 @@ Unit = Class(moho.unit_methods) {
         --        self.OnStopBuildWasRun = true
         --        self:ForkThread( function(self) WaitTicks(2) self.OnStopBuildWasRun = nil end )
         --    end
-        #end
+        --end
     end,
 
     GetUnitBeingBuilt = function(self)
@@ -2577,10 +2544,10 @@ Unit = Class(moho.unit_methods) {
         self:Destroy()
     end,
 
-    ##########################################################################################
-    #-- INTEL
-    ##########################################################################################
-    #Setup the initial intelligence of the unit.  Return true if it can, false if it can't.
+    -------------------------------------------------------------------------------------------
+    -- INTEL
+    -------------------------------------------------------------------------------------------
+    --Setup the initial intelligence of the unit.  Return true if it can, false if it can't.
     SetupIntel = function(self)
         local bp = self:GetBlueprint().Intel
         self:EnableIntel('Vision')
@@ -2610,7 +2577,6 @@ Unit = Class(moho.unit_methods) {
         if intel then
             self.IntelDisables[intel] = self.IntelDisables[intel] + 1
             if self.IntelDisables[intel] == 1 then
-                #LOG('*DEBUG: Disabling Intel: ', repr(intel))
                 self:DisableIntel(intel)
                 intDisabled = true
             end
@@ -2618,7 +2584,6 @@ Unit = Class(moho.unit_methods) {
             for k, v in self.IntelDisables do
                 self.IntelDisables[k] = v + 1
                 if self.IntelDisables[k] == 1 then
-                    #LOG('*DEBUG: Disabling Intel: ', repr(k))
                     self:DisableIntel(k)
                     intDisabled = true
                 end
@@ -2639,7 +2604,6 @@ Unit = Class(moho.unit_methods) {
         if intel then
             if self.IntelDisables[intel] == 1 then
                 self:EnableIntel(intel)
-                #LOG('*DEBUG: Enabling Intel: ', repr(intel))
                 intEnabled = true
             end
             self.IntelDisables[intel] = self.IntelDisables[intel] - 1
@@ -2647,7 +2611,6 @@ Unit = Class(moho.unit_methods) {
             for k, v in self.IntelDisables do
                 if v == 1 then
                     self:EnableIntel(k)
-                    #LOG('*DEBUG: Enabling Intel: ', repr(k))
                     if self:IsIntelEnabled(k) then
                         intEnabled = true
                     end
@@ -2723,9 +2686,9 @@ Unit = Class(moho.unit_methods) {
         return watchPower
     end,
 
-    #Old and removed, see below
-    #Watch the economy.  If this unit doesn't get all it needs, shut off the intel.
-    #IntelWatchThread = function(self)
+    --Old and removed, see below
+    --Watch the economy.  If this unit doesn't get all it needs, shut off the intel.
+    --IntelWatchThread = function(self)
     --    local bp = self:GetBlueprint()
     --    while self:ShouldWatchIntel() do
     --        WaitSeconds(0.5)
@@ -2742,9 +2705,9 @@ Unit = Class(moho.unit_methods) {
     --    if self.IntelThread then
     --        self.IntelThread = nil
     --    end
-    #end,
+    --end,
 
-    #FIX BY GOWERLY - Intel should only care about energy, let's not die if we run out of mass while upgrading, ok?
+    --FIX BY GOWERLY - Intel should only care about energy, let's not die if we run out of mass while upgrading, ok?
     -- Brute51: This is bug fix [158] and was present since v1. I've enhanced the Gowerlys code for v4
     IntelWatchThread = function(self)
         local aiBrain = self:GetAIBrain()
@@ -2815,9 +2778,9 @@ Unit = Class(moho.unit_methods) {
     end,
 
 
-    ##########################################################################################
-    #-- GENERIC WORK
-    ##########################################################################################
+    -------------------------------------------------------------------------------------------
+    -- GENERIC WORK
+    -------------------------------------------------------------------------------------------
 
     InheritWork = function(self, target)
         self.WorkItem = target.WorkItem
@@ -2837,24 +2800,13 @@ Unit = Class(moho.unit_methods) {
         local unitEnhancements = import('/lua/enhancementcommon.lua').GetEnhancements(self:GetEntityId())
         local tempEnhanceBp = self:GetBlueprint().Enhancements[work]
         -- Check if the Enhance is Restricted -- Xinnony
-        --LOG('CreateEnhancement workBEGIN:'..tostring(work)) --bp = {table}
         if ScenarioInfo.Options.RestrictedCategories then
             local restrictedUnits = import('/lua/ui/lobby/restrictedUnitsData.lua').restrictedUnits
             for k, restriction in ScenarioInfo.Options.RestrictedCategories do
-                --LOG('1 : '..restriction) -- = TELE
                 if restrictedUnits[restriction].enhancement then
                     for kk, cat in restrictedUnits[restriction].enhancement do
-                        --LOG('2 : '..cat) -- Teleporter
                         if work == cat then -- if Teleporter == Teleporter
-                            --LOG('Enhancement removed !')
                             self:OnWorkFail(work)
-                            --self.WorkProgress = 0
-                            --self:SetWorkProgress(1)
-                            --self:SetActiveConsumptionInactive()
-                            --#self:PlayUnitSound('EnhanceEnd')
-                            --#self:ClearWork()
-                            --ChangeState(self, self.IdleState)
-                            --self:CleanupEnhancementEffects()
                             return false
                         end
                     end
@@ -2862,7 +2814,7 @@ Unit = Class(moho.unit_methods) {
             end
         end
         if tempEnhanceBp.Prerequisite then
-            if unitEnhancements[tempEnhanceBp.Slot] != tempEnhanceBp.Prerequisite then
+            if unitEnhancements[tempEnhanceBp.Slot] ~= tempEnhanceBp.Prerequisite then
                 error('*ERROR: Ordered enhancement does not have the proper prereq!', 2)
                 return false
             end
@@ -2884,7 +2836,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnWorkEnd = function(self, work)
-        --LOG('CreateEnhancement workEND:'..tostring(work))
         self:SetActiveConsumptionInactive()
         self:PlayUnitSound('EnhanceEnd')
         self:StopUnitAmbientSound('EnhanceLoop')
@@ -2892,7 +2843,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnWorkFail = function(self, work)
-        --LOG('CreateEnhancement workFAIL:'..tostring(work))
         self:SetActiveConsumptionInactive()
         self:PlayUnitSound('EnhanceFail')
         self:StopUnitAmbientSound('EnhanceLoop')
@@ -2906,7 +2856,6 @@ Unit = Class(moho.unit_methods) {
             error('*ERROR: Got CreateEnhancement call with an enhancement that doesnt exist in the blueprint.', 2)
             return false
         end
-        --LOG('CreateEnhancement :'..tostring(enh)..' and BP : '..tostring(bp))
         if bp.ShowBones then
             for k, v in bp.ShowBones do
                 if self:IsValidBone(v) then
@@ -2974,12 +2923,11 @@ Unit = Class(moho.unit_methods) {
     end,
 
 
-    ##########################################################################################
-    ##
-    ##########################################################################################
+    -------------------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------------------
 
     OnLayerChange = function(self, new, old)
-        #LOG('LayerChange old=',old,' new=',new,' for ',self:GetBlueprint().BlueprintId )
         for i = 1, self:GetWeaponCount() do
             self:GetWeapon(i):SetValidTargetsForCurrentLayer(new)
         end
@@ -3015,7 +2963,6 @@ Unit = Class(moho.unit_methods) {
             return
         end
         local layer = self:GetCurrentLayer()
-        #LOG( 'OnMotionHorzEventChange, unit=', repr(self:GetBlueprint().BlueprintId), ' old = ', old, ', new = ', new, ', layer = ', self:GetCurrentLayer() )
 
         if ( old == 'Stopped' or (old == 'Stopping' and (new == 'Cruise' or new == 'TopSpeed'))) then
             -- This will play the first appropriate StartMove sound that it finds
@@ -3089,7 +3036,6 @@ Unit = Class(moho.unit_methods) {
         end
         local layer = self:GetCurrentLayer()
 
-        #LOG( 'OnMotionVertEventChange, unit=', repr(self:GetBlueprint().BlueprintId), ' old = ', old, ', new = ', new, ', layer = ', self:GetCurrentLayer() )
         if (new == 'Down') then
             -- Play the "landing" sound
             self:PlayUnitSound('Landing')
@@ -3159,7 +3105,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnTerrainTypeChange = function(self, new, old)
-        #LOG('TerrainChange old=',repr(old.Description),' new=',repr(new.Description),' for ',self:GetBlueprint().BlueprintId)
         if self.MovementEffectsExist then
             self:DestroyMovementEffects()
             self:CreateMovementEffects( self.MovementEffectsBag, nil, new )
@@ -3201,17 +3146,17 @@ Unit = Class(moho.unit_methods) {
                 end
             end
 
-            if boneTable.Tread and self:GetTTTreadType(self:GetPosition(bone)) != 'None' then
+            if boneTable.Tread and self:GetTTTreadType(self:GetPosition(bone)) ~= 'None' then
                 CreateSplatOnBone(self, boneTable.Tread.TreadOffset, 0, boneTable.Tread.TreadMarks, boneTable.Tread.TreadMarksSizeX, boneTable.Tread.TreadMarksSizeZ, 100, boneTable.Tread.TreadLifeTime or 15, army )
                 local treadOffsetX = boneTable.Tread.TreadOffset[1]
                 if x and x > 0 then
-                    if layer != 'Seabed' then
+                    if layer ~= 'Seabed' then
                     self:PlayUnitSound('FootFallLeft')
                     else
                         self:PlayUnitSound('FootFallLeftSeabed')
                     end
                 elseif x and x < 0 then
-                    if layer != 'Seabed' then
+                    if layer ~= 'Seabed' then
                     self:PlayUnitSound('FootFallRight')
                     else
                         self:PlayUnitSound('FootFallRightSeabed')
@@ -3223,7 +3168,7 @@ Unit = Class(moho.unit_methods) {
                 CreateEmitterAtBone(self, bone, army, v):ScaleEmitter(scale):OffsetEmitter(offset.x or 0,offset.y or 0,offset.z or 0)
             end
         end
-        if layer != 'Seabed' then
+        if layer ~= 'Seabed' then
             self:PlayUnitSound('FootFallGeneric')
         else
             self:PlayUnitSound('FootFallGenericSeabed')
@@ -3231,7 +3176,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     UpdateMovementEffectsOnMotionEventChange = function( self, new, old )
-        #LOG('UpdateMovementEffectsOnMotionEventChange ', new, ' ', old )
         local layer = self:GetCurrentLayer()
         local bpMTable = self:GetBlueprint().Display.MovementEffects
 
@@ -3249,8 +3193,8 @@ Unit = Class(moho.unit_methods) {
             end
         end
 
-        if (old == 'Stopped' and new != 'Stopping') or
-           (old == 'Stopping' and new != 'Stopped') then
+        if (old == 'Stopped' and new ~= 'Stopping') or
+           (old == 'Stopping' and new ~= 'Stopped') then
             self:DestroyIdleEffects()
             self:DestroyMovementEffects()
             self:CreateMovementEffects( self.MovementEffectsBag, nil )
@@ -3301,7 +3245,6 @@ Unit = Class(moho.unit_methods) {
             TerrainType = GetTerrainType( -1, -1 )
         end
 
-        #LOG( 'GetTerrainTypeEffects ', TerrainType.Name .. ' ' .. TerrainType.Description, ' ', layer, ' ', type )
         return TerrainType[FxType][layer][type] or {}
     end,
 
@@ -3437,14 +3380,14 @@ Unit = Class(moho.unit_methods) {
             if self.BeamExhaustCruise  then
                 self:DestroyBeamExhaust()
             end
-            if self.BeamExhaustIdle and (table.getn(self.BeamExhaustEffectsBag) == 0) and (bpTable.Idle != false) then
+            if self.BeamExhaustIdle and (table.getn(self.BeamExhaustEffectsBag) == 0) and (bpTable.Idle ~= false) then
                 self:CreateBeamExhaust( bpTable, self.BeamExhaustIdle )
             end
         elseif motionState == 'Cruise' then
             if self.BeamExhaustIdle and self.BeamExhaustCruise then
                 self:DestroyBeamExhaust()
             end
-            if self.BeamExhaustCruise and (bpTable.Cruise != false) then
+            if self.BeamExhaustCruise and (bpTable.Cruise ~= false) then
                 self:CreateBeamExhaust( bpTable, self.BeamExhaustCruise )
             end
         elseif motionState == 'Landed' then
@@ -3490,7 +3433,7 @@ Unit = Class(moho.unit_methods) {
         local maxShakeEpicenter = camShake.MaxShakeEpicenter or 1.0
         local minShakeAtRadius = camShake.MinShakeAtRadius or 0.0
         local interval = camShake.Interval or 10.0
-        if interval != 0.0 then
+        if interval ~= 0.0 then
             while true do
                 self:ShakeCamera( radius, maxShakeEpicenter, minShakeAtRadius, interval )
                 WaitSeconds(interval)
@@ -3505,7 +3448,7 @@ Unit = Class(moho.unit_methods) {
         self.TreadThreads = {}
         if treads.TreadMarks then
             local type = self:GetTTTreadType(self:GetPosition())
-            if type != 'None' then
+            if type ~= 'None' then
                 for k, v in treads.TreadMarks do
                     table.insert( self.TreadThreads, self:ForkThread(self.CreateTreadsThread, v, type ))
                 end
@@ -3550,20 +3493,20 @@ Unit = Class(moho.unit_methods) {
 
     OnStartRefueling = function(self)
         self:PlayUnitSound('Refueling')
-        #added by brute51
+        --added by brute51
         self:DoUnitCallbacks('OnStartRefueling')
     end,
 
     OnRunOutOfFuel = function(self)
         self.HasFuel = false
         self:DestroyTopSpeedEffects()
-        #added by brute51
+        --added by brute51
         self:DoUnitCallbacks('OnRunOutOfFuel')
     end,
 
     OnGotFuel = function(self)
         self.HasFuel = true
-        #added by brute51
+        --added by brute51
         self:DoUnitCallbacks('OnGotFuel')
     end,
 
@@ -3586,8 +3529,6 @@ Unit = Class(moho.unit_methods) {
         local bp = self:GetBlueprint()
         local target_bp = target_entity:GetBlueprint()
         if IsUnit(target_entity) then
-            #LOG('Reclaim Target Is Unit')
-
             local mtime = target_bp.Economy.BuildCostEnergy / self:GetBuildRate()
             local etime = target_bp.Economy.BuildCostMass / self:GetBuildRate()
             local time = mtime
@@ -3601,17 +3542,9 @@ Unit = Class(moho.unit_methods) {
 
         elseif IsProp(target_entity) then
             local time, energy, mass =  target_entity:GetReclaimCosts(self)
-            #LOG('*DEBUG: Reclaiming a prop.  Time = ', repr(time), ' Mass = ', repr(mass), ' Energy = ', repr(energy))
             return time, energy, mass
         end
     end,
-
-    -- Return the Bonus Build Multiplier for the target we are re-building if we are trying to rebuild the same
-    -- structure that was destroyed earlier.
-    #GetRebuildBonus = function(self, rebuildUnitBP)
-    --    -- for now everything is re-built is 50% complete to begin with
-    --    return 0.5
-    #end,
 
     SetCaptureTimeMultiplier = function(self, time_mult)
         self.CaptureTimeMultiplier = time_mult
@@ -3655,11 +3588,9 @@ Unit = Class(moho.unit_methods) {
     PlayUnitSound = function(self, sound)
         local bp = self:GetBlueprint().Audio
         if bp and bp[sound] then
-            #LOG( 'Playing ', sound )
             self:PlaySound(bp[sound])
             return true
         end
-        #LOG( 'Could not play ', sound )
         return false
     end,
 
@@ -3688,9 +3619,9 @@ Unit = Class(moho.unit_methods) {
         self.AmbientSounds[sound] = nil
     end,
 
-    ##########################################################################################
-    #-- UNIT CALLBACKS
-    ##########################################################################################
+    -------------------------------------------------------------------------------------------
+    -- UNIT CALLBACKS
+    -------------------------------------------------------------------------------------------
     AddUnitCallback = function(self, fn, type)
         if not fn then
             error('*ERROR: Tried to add a callback type - ' .. type .. ' with a nil function')
@@ -3771,16 +3702,13 @@ Unit = Class(moho.unit_methods) {
                 Category = category
             }
         table.insert(self.EventCallbacks.OnUnitBuilt, insertedTable)
-        #LOG('*DEBUG: CALLBACK ADDED')
     end,
 
     DoOnUnitBuiltCallbacks = function(self, unit)
-        #LOG('*DEBUG: CALLBACK FIRED')
         if self.EventCallbacks.OnUnitBuilt then
             for k, v in self.EventCallbacks.OnUnitBuilt do
                 if v and unit and not unit:IsDead() and EntityCategoryContains(v.Category, unit) then
-                    #LOG('*DEBUG: CALLBACK FIRED, RUNNING FUNCTION')
-                    #Function will call back with both the unit's and the unit being built's handle
+                    --Function will call back with both the unit's and the unit being built's handle
                     v.CallBackFunction(self, unit)
                 end
             end
@@ -3812,7 +3740,6 @@ Unit = Class(moho.unit_methods) {
             if type(v) == "table" then
                 for kcb, vcb in v do
                     if vcb == fn then
-                        #LOG('*DEBUG: REMOVED TRIGGER ', repr(kcb))
                         v[kcb] = nil
                     end
                 end
@@ -3842,9 +3769,9 @@ Unit = Class(moho.unit_methods) {
     end,
 
 
-    ##########################################################################################
-    #-- STATES
-    ##########################################################################################
+    -------------------------------------------------------------------------------------------
+    -- STATES
+    -------------------------------------------------------------------------------------------
 
     IdleState = State {
         Main = function(self)
@@ -3858,7 +3785,7 @@ Unit = Class(moho.unit_methods) {
 
     WorkingState = State {
         Main = function(self)
-                    #added by brute51
+                    --added by brute51
             self:OnCmdrUpgradeStart()
             while self.WorkProgress < 1 and not self:IsDead() do
                 WaitSeconds(0.1)
@@ -3878,15 +3805,15 @@ Unit = Class(moho.unit_methods) {
             self:StopUnitAmbientSound('EnhanceLoop')
             self:EnableDefaultToggleCaps()
             ChangeState(self, self.IdleState)
-                        #added by brute51
+                        --added by brute51
             self:OnCmdrUpgradeFinished()
         end,
     },
 
 
-    ##########################################################################################
-    #-- BUFFS
-    ##########################################################################################
+    -------------------------------------------------------------------------------------------
+    -- BUFFS
+    -------------------------------------------------------------------------------------------
 
     AddBuff = function(self, buffTable, PosEntity)
         local bt = buffTable.BuffType
@@ -3895,7 +3822,7 @@ Unit = Class(moho.unit_methods) {
             error('*ERROR: Tried to add a unit buff in unit.lua but got no buff table.  Wierd.', 1)
             return
         end
-        #When adding debuffs we have to make sure that we check for permissions
+        --When adding debuffs we have to make sure that we check for permissions
         local allow = categories.ALLUNITS
         if buffTable.TargetAllow then
             allow = ParseEntityCategory(buffTable.TargetAllow)
@@ -3907,8 +3834,8 @@ Unit = Class(moho.unit_methods) {
 
         if bt == 'STUN' then
            if buffTable.Radius and buffTable.Radius > 0 then
-                #if the radius is bigger than 0 then we will use the unit as the center of the stun blast
-                #and collect all targets from that point
+                --if the radius is bigger than 0 then we will use the unit as the center of the stun blast
+                --and collect all targets from that point
                 local targets = {}
                 if PosEntity then
                     targets = utilities.GetEnemyUnitsInSphere(self, PosEntity, buffTable.Radius)
@@ -3916,7 +3843,6 @@ Unit = Class(moho.unit_methods) {
                     targets = utilities.GetEnemyUnitsInSphere(self, self:GetPosition(), buffTable.Radius)
                 end
                 if not targets then
-                    #LOG('*DEBUG: No targets in radius to buff')
                     return
                 end
                 for k, v in targets do
@@ -3925,7 +3851,7 @@ Unit = Class(moho.unit_methods) {
                     end
                 end
             else
-                #The buff will be applied to the unit only
+                --The buff will be applied to the unit only
                 if EntityCategoryContains(allow, self) and (not disallow or not EntityCategoryContains(disallow, self)) then
                     self:SetStunned(buffTable.Duration or 1)
                 end
@@ -3968,18 +3894,18 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    ##########################################################################################
-    #-- VETERANCY
-    ##########################################################################################
+    -------------------------------------------------------------------------------------------
+    -- VETERANCY
+    -------------------------------------------------------------------------------------------
     AddXP = function(self,amount)
         self.xp = self.xp + (amount)
         self.Sync.xp = self.xp
         self:CheckVeteranLevel()
     end,
 
-    #This function should be used for kills made through the script, since kills through the engine (projectiles etc...) are already counted.
+    --This function should be used for kills made through the script, since kills through the engine (projectiles etc...) are already counted.
     AddKills = function(self, numKills)
-        #Add the kills, then check veterancy junk.
+        --Add the kills, then check veterancy junk.
         local unitKills = self:GetStat('KILLS', 0).Value + numKills
         self:SetStat('KILLS', unitKills)
 
@@ -3993,7 +3919,7 @@ Unit = Class(moho.unit_methods) {
         local nextLvl = self.VeteranLevel + 1
         local nextKills = vet[('Level' .. nextLvl)]
 
-        #Since we could potentially be gaining a lot of kills here, check if we gained more than one level
+        --Since we could potentially be gaining a lot of kills here, check if we gained more than one level
         while unitKills >= nextKills and self.VeteranLevel ~= vetLevels do
             self:SetVeteranLevel(nextLvl)
 
@@ -4027,15 +3953,13 @@ Unit = Class(moho.unit_methods) {
     --Check to see if we should veteran up.
     CheckVeteranLevel = function(self)
         local bp = self:GetBlueprint().Veteran
-        #There is no veteran block in the bp, return
+        --There is no veteran block in the bp, return
         if not bp then
             bp = Game.VeteranDefault
         end
-        #LOG('*DEBUG: Vet Table = ', repr(bp))
-        #We add 1 because we get this before the stat gets updated
+        --We add 1 because we get this before the stat gets updated
         local unitKills = self.xp
-        #LOG('*DEBUG: Veteran Kills = ', repr(unitKills))
-        #We are already at the highest veteran level, return
+        --We are already at the highest veteran level, return
         if self.VeteranLevel == table.getsize(bp) then
             return
         end
@@ -4049,9 +3973,8 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    #Set the veteran level to the level specified
+    --Set the veteran level to the level specified
     SetVeteranLevel = function(self, level)
-        #LOG('*DEBUG: VETERAN UP! LEVEL ', repr(level))
         local old = self.VeteranLevel
         self.VeteranLevel = level
 
@@ -4072,14 +3995,14 @@ Unit = Class(moho.unit_methods) {
         -- Each weapon can override the buff if desired
 
         -- TODO: Enable per weapon buffs again
-        #for i = 1, self:GetWeaponCount() do
-            #local wep = self:GetWeapon(i)
-            #wep:OnVeteranLevel(old, level)
-        #end
+        --for i = 1, self:GetWeaponCount() do
+            --local wep = self:GetWeapon(i)
+            --wep:OnVeteranLevel(old, level)
+        --end
 
         -- Get any overriding buffs if they exist
         local bp = self:GetBlueprint().Buffs
-        #Check for unit buffs
+        --Check for unit buffs
         if bp then
             for bType,bData in bp do
                 for lName,lValue in bData do
@@ -4152,13 +4075,13 @@ Unit = Class(moho.unit_methods) {
     end,
 
     PlayVeteranFx = function(self, newLvl)
-        #NOTE: Place vet FX here
+        --NOTE: Place vet FX here
         CreateAttachedEmitter(self, 0, self:GetArmy(), 'destruction_explosion_concussion_ring_03_emit.bp'):ScaleEmitter(1)
     end,
 
-    ##########################################################################################
-    #-- SHIELDS
-    ##########################################################################################
+    -------------------------------------------------------------------------------------------
+    -- SHIELDS
+    -------------------------------------------------------------------------------------------
     CreateShield = function(self, shieldSpec)
         local bp = self:GetBlueprint()
         local bpShield = shieldSpec
@@ -4209,7 +4132,7 @@ Unit = Class(moho.unit_methods) {
                     ShieldEnergyDrainRechargeTime = bpShield.ShieldEnergyDrainRechargeTime or 10,
                     ShieldRegenRate = bpShield.ShieldRegenRate or 1,
                     ShieldRegenStartTime = bpShield.ShieldRegenStartTime or 5,
-                    PassOverkillDamage = bpShield.PassOverkillDamage != false, --Default to true
+                    PassOverkillDamage = bpShield.PassOverkillDamage ~= false, --Default to true
                 }
                 self:SetFocusEntity(self.MyShield)
                 self:EnableShield()
@@ -4291,11 +4214,11 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    ##########################################################################################
-    #-- TRANSPORTING
-    ##########################################################################################
+    -------------------------------------------------------------------------------------------
+    -- TRANSPORTING
+    -------------------------------------------------------------------------------------------
     OnStartTransportBeamUp = function(self, transport, bone)
-    
+
         --Ensures bone availability
         if transport.slotsFree[bone] == false then
             IssueClearCommands({self})
@@ -4308,7 +4231,7 @@ Unit = Class(moho.unit_methods) {
             table.insert( self.TransportBeamEffectsBag, AttachBeamEntityToEntity(self, -1, transport, bone, army, EffectTemplate.TTransportBeam01))
             table.insert( self.TransportBeamEffectsBag, AttachBeamEntityToEntity( transport, bone, self, -1, army, EffectTemplate.TTransportBeam02))
             table.insert( self.TransportBeamEffectsBag, CreateEmitterAtBone( transport, bone, army, EffectTemplate.TTransportGlow01) )
-            self:TransportAnimation()        
+            self:TransportAnimation()
         end
     end,
 
@@ -4323,17 +4246,13 @@ Unit = Class(moho.unit_methods) {
         for i = 1, self:GetWeaponCount() do
             local wep = self:GetWeapon(i)
             wep:ResetTarget()
-        end     
+        end
     end,
 
     OnTransportAborted = function(self)
-        #LOG('TransportAborted')
-        #WARN('TransportAborted')
     end,
 
     OnTransportOrdered = function(self)
-        #LOG('TransportOrdered')
-        #WARN('TransportOrdered')
     end,
 
     MarkWeaponsOnTransport = function(self, unit, transport)
@@ -4356,7 +4275,7 @@ Unit = Class(moho.unit_methods) {
         --Protect units boarding a shielded Transport if the shield is up
         if self:ShieldIsOn() then
             unit:SetCanTakeDamage(false)
-        end        
+        end
         self:PlayUnitSound('Load')
         self:MarkWeaponsOnTransport(unit, true)
         if unit:ShieldIsOn() then
@@ -4366,7 +4285,7 @@ Unit = Class(moho.unit_methods) {
         if not EntityCategoryContains(categories.PODSTAGINGPLATFORM, self) then
             self:RequestRefreshUI()
         end
-        --Added by brute51
+        -- added by brute51
         unit:OnAttachedToTransport(self, attachBone)
         self:DoUnitCallbacks( 'OnTransportAttach', unit )
     end,
@@ -4384,19 +4303,16 @@ Unit = Class(moho.unit_methods) {
         unit:OnDetachedToTransport(self)
         self:DoUnitCallbacks( 'OnTransportDetach', unit )
     end,
-    
+
     --This function is called from Shield.lua to tell the unit when the protection status changes
     IsTransportProtected = function(self, value)
         transportProtected = value
     end,
 
     OnStartTransportLoading = function(self)
-        #WARN('OnStartTransportLoading with args ' .. repr(self))
-        #WARN('OnStartTransportLoading')
     end,
 
     OnStopTransportLoading = function(self)
-        #WARN('OnStopTransportLoading')
     end,
 
     OnAddToStorage = function(self, unit)
@@ -4415,7 +4331,7 @@ Unit = Class(moho.unit_methods) {
                         v:SetCanTakeDamage(false)
                         v:SetReclaimable(false)
                         v:SetCapturable(false)
-                        #v:DisableShield()
+                        --v:DisableShield()
                     end
                 end
             end
@@ -4438,7 +4354,7 @@ Unit = Class(moho.unit_methods) {
                         v:SetCanTakeDamage(true)
                         v:SetReclaimable(true)
                         v:SetCapturable(true)
-                        #v:EnableShield()
+                        --v:EnableShield()
                     end
                 end
             end
@@ -4456,12 +4372,13 @@ Unit = Class(moho.unit_methods) {
 
     TransportAnimationThread = function(self,rate)
         local bp = self:GetBlueprint().Display.TransportAnimation
+
         if rate and rate < 0 and self:GetBlueprint().Display.TransportDropAnimation then
             bp = self:GetBlueprint().Display.TransportDropAnimation
             rate = -rate
         end
+
         WaitSeconds(.5)
-        
         if bp then
             local animBlock = self:ChooseAnimBlock( bp )
             if animBlock.Animation then
@@ -4477,9 +4394,9 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    ##########################################################################################
-    #-- TELEPORTING
-    ##########################################################################################
+    -------------------------------------------------------------------------------------------
+    -- TELEPORTING
+    -------------------------------------------------------------------------------------------
     OnTeleportUnit = function(self, teleporter, location, orientation)
         if self.TeleportDrain then
             RemoveEconomyEvent( self, self.TeleportDrain)
@@ -4526,7 +4443,6 @@ Unit = Class(moho.unit_methods) {
             time = energyCost * (bp.TeleportTimeMod or 0.01)
         end
 
-        #LOG('*UNIT DEBUG: TELEPORTING, energyCost = ', repr(energyCost), ' time = ', repr(time))
         self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
 
         -- create teleport charge effect
@@ -4550,8 +4466,7 @@ Unit = Class(moho.unit_methods) {
         self:CleanupRemainingTeleportChargeEffects()
 
         WaitSeconds( 0.1 ) -- Perform cooldown Teleportation FX here
-        #Landing Sound
-        #LOG('DROP')
+        --Landing Sound
         self:StopUnitAmbientSound('TeleportLoop')
         self:PlayUnitSound('TeleportEnd')
         self:SetImmobile(false)
@@ -4560,7 +4475,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     UpdateTeleportProgress = function(self, progress)
-        #LOG(' UpdatingTeleportProgress ')
         self:SetWorkProgress(progress)
         EffectUtilities.TeleportChargingProgress(self, progress)
     end,
@@ -4585,9 +4499,9 @@ Unit = Class(moho.unit_methods) {
         EffectUtilities.PlayTeleportInEffects(self, self.TeleportFxBag)
     end,
 
-    #########################################################################################
-    #-- ROCKING
-    ##########################################################################################
+    ------------------------------------------------------------------------------------------
+    -- ROCKING
+    -------------------------------------------------------------------------------------------
     -- While not as exciting as Rock 'n Roll, this will make the unit rock from side to side slowly
     -- in the water
     StartRocking = function(self)
@@ -4632,7 +4546,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
 
-    ##Below this line is more stuff for CBFP
+    --Below this line is more stuff for CBFP
 
     OnCreated = function(self)   -- new in v3
         self:DoUnitCallbacks('OnCreated')
@@ -4647,7 +4561,7 @@ Unit = Class(moho.unit_methods) {
                 -- getting buff field blueprint
                 local BuffFieldBp = BuffFieldBlueprints[bp.BuffFields[scriptName]]
 
-                if not BuffFieldBp or type(BuffFieldBp) != 'table' then
+                if not BuffFieldBp or type(BuffFieldBp) ~= 'table' then
                     WARN('BuffField: no blueprint data for buff field '..repr(scriptName))
                     continue
                 end
@@ -4718,7 +4632,7 @@ Unit = Class(moho.unit_methods) {
         end
 
     end,
-    
+
 
     OnTimedEvent = function(self, interval, passData)
         self:DoOnTimedEventCallbacks(interval, passData)
@@ -4833,9 +4747,9 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    ##########################################################################################
-    #-- SHIELDS
-    ##########################################################################################
+    -------------------------------------------------------------------------------------------
+    -- SHIELDS
+    -------------------------------------------------------------------------------------------
 
     -- Added by brute51, fires shield events for units. The other shield events dont run at the correct times
     -- (to early)
@@ -4858,7 +4772,6 @@ Unit = Class(moho.unit_methods) {
         for i=1,transport:GetBoneCount() do
             if transport:GetBoneName(i) == bone then
                 self.attachmentBone = i
-                #WARN('OnAttach bone is ' .. repr(bone))
                 transport.slotsFree[i] = false
             end
         end
@@ -4885,9 +4798,9 @@ Unit = Class(moho.unit_methods) {
         self:DoUnitCallbacks('OnTeleported', self, location)
     end,
 
-    ##########################################################################################
-    #-- COMMANDER ENHANCING
-    ##########################################################################################
+    -------------------------------------------------------------------------------------------
+    -- COMMANDER ENHANCING
+    -------------------------------------------------------------------------------------------
 
     -- Events that happen when a commander unit (ACU or SCU) is enhanced with a new toy
 
