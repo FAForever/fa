@@ -42,6 +42,7 @@ This is the changelog to be posted on the forums for patch 3636.
 - [X] Replay sync support
 - [X] Hotbuild 'upgrade' key now takes engy-mod into account
 - [X] Spread attack now works for move, build and overcharge
+- [X] Ability to reclaim ground
     
 *Balance Changes*
 - [X] Shield and Hitbox fixes above will have balance implications of varying size
