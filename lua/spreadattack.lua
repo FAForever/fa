@@ -181,8 +181,10 @@ function GiveOrders(Data)
 
     for id, orders in final do
         local unit = GetEntityById(id)
-        table.insert(all_units, unit)
-        IssueClearCommands({unit})
+        if(OkayToMessWithArmy(unit:GetArmy())) then
+          table.insert(all_units, unit)
+          IssueClearCommands({unit})
+        end
     end
 
     for id, orders in final do
