@@ -31,7 +31,7 @@ local commandMeshResources = import('/lua/ui/game/commandmeshes.lua').commandMes
     RULEUCC_Guard               = (1 << 3),
     RULEUCC_Patrol              = (1 << 4),
     RULEUCC_RetaliateToggle     = (1 << 5),
-    
+
     // Unit specific rules
     RULEUCC_Repair              = (1 << 6),
     RULEUCC_Capture             = (1 << 7),
@@ -50,13 +50,13 @@ local commandMeshResources = import('/lua/ui/game/commandmeshes.lua').commandMes
     RULEUCC_Reclaim             = (1 << 20),
     RULEUCC_SpecialAction       = (1 << 21),
     RULEUCC_Dock                = (1 << 22),
-   
+
     // Unit general
     RULEUCC_Script              = (1 << 23),
  }
- 
+
  toggleModes = {
-    
+
     // Unit toggle rules
     RULEUTC_ShieldToggle        = (1 << 0),
     RULEUTC_WeaponToggle        = (1 << 1),
@@ -68,7 +68,7 @@ local commandMeshResources = import('/lua/ui/game/commandmeshes.lua').commandMes
     RULEUTC_SpecialToggle       = (1 << 7),
     RULEUTC_CloakToggle         = (1 << 8),
 }
- 
+
 --]]
 
 local commandMode = false
@@ -79,9 +79,9 @@ local startBehaviors = {}
 local endBehaviors = {}
 
 function OnCommandModeBeat()
-	if issuedOneCommand and not IsKeyDown('Shift') then
-		EndCommandMode(true)
-	end
+    if issuedOneCommand and not IsKeyDown('Shift') then
+        EndCommandMode(true)
+    end
 end
 
 import('/lua/ui/game/gamemain.lua').AddBeatFunction(OnCommandModeBeat)
@@ -119,80 +119,83 @@ function EndCommandMode(isCancel)
     if modeData.isCancel then
         ClearBuildTemplates()
     end
-    
+
     commandMode = false
     modeData = false
-	issuedOneCommand = false
+    issuedOneCommand = false
 end
 
 function AddCommandFeedbackByType(pos, type)
 
-	if commandMeshResources[type] == nil then
-		return false;
-	else
-		AddCommandFeedbackBlip({
-					Position = pos, 
-					MeshName = commandMeshResources[type][1],
-					TextureName = commandMeshResources[type][2],
-					ShaderName = 'CommandFeedback',
-					UniformScale = 0.125,
-				}, 0.7)
-	end
-		
-	return true;
+    if commandMeshResources[type] == nil then
+        return false;
+    else
+        AddCommandFeedbackBlip({
+                    Position = pos,
+                    MeshName = commandMeshResources[type][1],
+                    TextureName = commandMeshResources[type][2],
+                    ShaderName = 'CommandFeedback',
+                    UniformScale = 0.125,
+                }, 0.7)
+    end
+
+    return true;
 end
-	
+
 
 function OnCommandIssued(command)
     if not command.Clear then
-		issuedOneCommand = true
-	else
-		EndCommandMode(true)
-	end
-	
-	if command.CommandType == 'Attack' then
-		if command.Clear then
-			local cb = { Func = 'ClearTargets', Args = { } }
-			SimCallback(cb, true)
-		end
+        issuedOneCommand = true
+    else
+        EndCommandMode(true)
+    end
 
-		local cb = { Func = 'AddTarget', Args = { target = command.Target.EntityId, position = command.Target.Position } } 
-		SimCallback(cb, true)
+    if command.CommandType == 'Attack' then
+        if command.Clear then
+            local cb = { Func = 'ClearTargets', Args = { } }
+            SimCallback(cb, true)
+        end
 
-	--else
-	--	local cc = { Func = 'ClearTargets', Args = { } }
-	--	SimCallback(cc, true)
-	end
-	
-	-- end of issue:#43
-	
-	if command.CommandType == 'BuildMobile' then				
-		AddCommandFeedbackBlip({
-			Position = command.Target.Position, 
-			BlueprintID = command.Blueprint,			
-			TextureName = '/meshes/game/flag02d_albedo.dds',
-			ShaderName = 'CommandFeedback',
-			UniformScale = 1,
-		}, 0.7)	
-	else	
-	
-		if AddCommandFeedbackByType(command.Target.Position, command.CommandType) == false then	
-			AddCommandFeedbackBlip({
-				Position = command.Target.Position, 
-				MeshName = '/meshes/game/flag02d_lod0.scm',
-				TextureName = '/meshes/game/flag02d_albedo.dds',
-				ShaderName = 'CommandFeedback',
-				UniformScale = 0.5,
-			}, 0.7)		
-			
-			AddCommandFeedbackBlip({
-				Position = command.Target.Position, 
-				MeshName = '/meshes/game/crosshair02d_lod0.scm',
-				TextureName = '/meshes/game/crosshair02d_albedo.dds',
-				ShaderName = 'CommandFeedback2',
-				UniformScale = 0.5,
-			}, 0.75)		
-		end		
-	end
-	import('/lua/spreadattack.lua').MakeShadowCopyOrders(command)
+        local cb = { Func = 'AddTarget', Args = { target = command.Target.EntityId, position = command.Target.Position } }
+        SimCallback(cb, true)
+
+    --else
+    --  local cc = { Func = 'ClearTargets', Args = { } }
+    --  SimCallback(cc, true)
+    end
+    -- end of issue:#43
+
+    if command.CommandType == 'Reclaim' and (command.Target.Type == 'Position' or IsKeyDown('Menu')) then
+        import('/modules/reclaimground.lua').ReclaimGround(command)
+    end
+
+    if command.CommandType == 'BuildMobile' then
+        AddCommandFeedbackBlip({
+            Position = command.Target.Position,
+            BlueprintID = command.Blueprint,
+            TextureName = '/meshes/game/flag02d_albedo.dds',
+            ShaderName = 'CommandFeedback',
+            UniformScale = 1,
+        }, 0.7)
+    else
+
+        if AddCommandFeedbackByType(command.Target.Position, command.CommandType) == false then
+            AddCommandFeedbackBlip({
+                Position = command.Target.Position,
+                MeshName = '/meshes/game/flag02d_lod0.scm',
+                TextureName = '/meshes/game/flag02d_albedo.dds',
+                ShaderName = 'CommandFeedback',
+                UniformScale = 0.5,
+            }, 0.7)
+
+            AddCommandFeedbackBlip({
+                Position = command.Target.Position,
+                MeshName = '/meshes/game/crosshair02d_lod0.scm',
+                TextureName = '/meshes/game/crosshair02d_albedo.dds',
+                ShaderName = 'CommandFeedback2',
+                UniformScale = 0.5,
+            }, 0.75)
+        end
+    end
+    import('/lua/spreadattack.lua').MakeShadowCopyOrders(command)
 end
