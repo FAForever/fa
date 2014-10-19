@@ -52,7 +52,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'OVERLAYANTIAIR',
     },
-     CollisionOffsetZ = 0.2, # added for beam bug fix
+    CollisionOffsetZ = 0.2,
     Defense = {
         AirThreatLevel = 0.33,
         ArmorType = 'Normal',
@@ -88,7 +88,7 @@ UnitBlueprint {
                 Weight = 100,
             },
         },
-        AnimationWalk = '/units/XSL0104/XSL0104_Awalk01.sca', # /units/XSL0104/XSL0104_Awalk01.sca   [116]
+        AnimationWalk = '/units/XSL0104/XSL0104_Awalk01.sca',
         AnimationWalkRate = 5,
         Mesh = {
             IconFadeInZoom = 130,
@@ -165,7 +165,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        VisionRadius = 20, # 18
+        VisionRadius = 20,
     },
     Interface = {
         HelpText = '<LOC xsl0104_help>Mobile Anti-Air Gun',
@@ -204,7 +204,7 @@ UnitBlueprint {
     SelectionThickness = 0.83,
     SizeX = 0.6,
     SizeY = 0.4,
-    SizeZ = 1, # #from 0.6, for beam bug fix
+    SizeZ = 1,
     StrategicIconName = 'icon_land1_antiair',
     StrategicIconSortPriority = 135,
     Transport = {
@@ -243,11 +243,11 @@ UnitBlueprint {
             FiringTolerance = 0.5,
             Label = 'AAGun',
             MaxRadius = 32,
-            MuzzleSalvoDelay = 0.1,
+            MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 2,
             MuzzleVelocity = 45,
             ProjectileId = '/projectiles/SAAShleoAAGatlingGun01/SAAShleoAAGatlingGun01_proj.bp',
-            ProjectileLifetime = 10, # fix for having huge range [126]. 10 is just an arbitrary value that should not interfere with this weapons
+            ProjectileLifetime = 10,
             ProjectileLifetimeUsesMultiplier = 1.25,
             ProjectilesPerOnFire = 2,
             RackBones = {
@@ -259,7 +259,7 @@ UnitBlueprint {
                 },
                 {
                     MuzzleBones = {
-                        'Turret_Muzzle01', # Turret_Muzzle02 this fixes the shoot to ground bug when moving.... HALF FIX at best
+                        'Turret_Muzzle02',
                     },
                     RackBone = 'Turret_Barrel',
                 },
@@ -287,7 +287,7 @@ UnitBlueprint {
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.4,
-            TurretBoneDualMuzzle = 'Turret_Muzzle01', # Turret_Muzzle02
+            TurretBoneDualMuzzle = 'Turret_Muzzle01',
             TurretBoneDualPitch = 'Turret_Barrel',
             TurretBoneMuzzle = 'Turret_Muzzle01',
             TurretBonePitch = 'Turret_Barrel',
@@ -300,6 +300,7 @@ UnitBlueprint {
             TurretYawRange = 180,
             TurretYawSpeed = 240,
             Turreted = true,
+            UseFiringSolutionInsteadOfAimBone = true,   --Added to solve the unit firing at the ground
             WeaponCategory = 'Anti Air',
         },
     },
