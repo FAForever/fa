@@ -44,7 +44,9 @@ This is the changelog to be posted on the forums for patch 3636.
 - [X] Hotbuild 'upgrade' key now takes engy-mod into account
 - [X] Spread attack now works for move, build and overcharge
 - [X] Ability to reclaim ground
-    
+- [X] Attempt to fix bomblet spread on bombers such as UEF and Cybran T1 Bombers
+- [X] Attempt to fix Seraphim T1 Mobile AA's aim
+
 *Balance Changes*
 - [X] Shield and Hitbox fixes above will have balance implications of varying size
 - [X] Tempest can now build hovering Aeon Land units
@@ -53,8 +55,6 @@ This is the changelog to be posted on the forums for patch 3636.
 
 ----------------------------------
 *Changes to be verified*
-- [ ] Attempt to fix bomblet spread on bombers such as UEF and Cybran T1 Bombers
-- [ ] Attempt to fix Seraphim T1 Mobile AA's aim
 - [ ] Attempt to fix Aeon T1 Frigate, T2 Destroyer, and Seraphim T3 Subhunter weapon bones to improve fire reliability
 - [ ] New icon name for Mass Storage
 
