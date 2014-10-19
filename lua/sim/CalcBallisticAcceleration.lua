@@ -33,7 +33,7 @@ local bomber_table = {}
 # But normally that may never happen
 local default_value = 4.75
 
-CalculateBallisticAcceleration = function (weapon, proj, ProjectilesPerOnFire)
+CalculateBallisticAcceleration = function (weapon, proj, ProjectilesPerOnFire, MuzzleSalvoDelay)
    
    local launcher = proj:GetLauncher()
    if not launcher then return default_value end
@@ -115,7 +115,7 @@ CalculateBallisticAcceleration = function (weapon, proj, ProjectilesPerOnFire)
       # the trajectory of first bomb, but as the result will be a carpet bomb, we try to have
       # the target in the center of the flames, so the first bomb must fall before the target
       # (0.1 is the delay between 2 drops)
-      local offset = (ProjectilesPerOnFire - 1) * 0.1 * vhorz_launcher / 2
+      local offset = (ProjectilesPerOnFire - 1) * MuzzleSalvoDelay * vhorz_launcher / 2
       
       dist = dist - offset  # this is not exact in some cases, but that should be good enough
       
