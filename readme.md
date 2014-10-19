@@ -12,7 +12,7 @@ This is the changelog to be posted on the forums for patch 3636.
 *Exploit Fixes*
 - [X] Fixed infinite economy exploit
 - [X] Fixed free ACU upgrade exploit
-- [ ] Security exploits with simcallbacks
+- [X] Security exploits with simcallbacks
 
 *Bug Fixes*
 - [X] Continental Fixes:
