@@ -24,6 +24,7 @@ This is the changelog to be posted on the forums for patch 3636.
 - [X] Fix adjacency buffs working when unit is turned off
 - [X] Fixed Cybran ACU with Laser upgrade being unable to ever fire the weapon after being transported, and improve targeting further
 - [X] Fixed Seraphim ACU dying when dropped from Transport after being picked up while firing
+- [X] Fixed Seraphim ACU shot being visible through FoW
 
 *Game Improvements*
 - [X] Shield Fixes:
