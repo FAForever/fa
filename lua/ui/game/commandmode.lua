@@ -150,21 +150,6 @@ function OnCommandIssued(command)
         EndCommandMode(true)
     end
 
-    if command.CommandType == 'Attack' then
-        if command.Clear then
-            local cb = { Func = 'ClearTargets', Args = { } }
-            SimCallback(cb, true)
-        end
-
-        local cb = { Func = 'AddTarget', Args = { target = command.Target.EntityId, position = command.Target.Position } }
-        SimCallback(cb, true)
-
-    --else
-    --  local cc = { Func = 'ClearTargets', Args = { } }
-    --  SimCallback(cc, true)
-    end
-    -- end of issue:#43
-
     if command.CommandType == 'Reclaim' and (command.Target.Type == 'Position' or IsKeyDown('Menu')) then
         import('/modules/reclaimground.lua').ReclaimGround(command)
     end

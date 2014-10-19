@@ -905,68 +905,6 @@ AIBrain = Class(moho.aibrain_methods) {
 
     
     OnIntelChange = function(self, blip, reconType, val)
-    
-        -- Count how many seconds this unit is not seen..-- Count how many seconds this unit is not seen..
-        local function IAmNotSeen(self)
-            self.TimeIHaveBeenNotSeen = 0
-            
-            while not self:IsDead() and self.TimeIHaveBeenNotSeen < 3 do
-                --LOG(self.TimeIHaveBeenNotSeen)
-                self.TimeIHaveBeenNotSeen = (self.TimeIHaveBeenNotSeen + 1)
-                WaitSeconds(1)
-            end        
-            
-            if not self:IsDead() then
-                self:stopAttackers()
-            end
-            
-            self.IAmNotSeenThread = nil
-        end
-    
-        -- If we are seen, we kill the "I not seen" counter.
-        local function  KillNotSeenThread(self)
-            --LOG("killthread.")
-            KillThread(self.IAmNotSeenThread)
-            self.IAmNotSeenThread = nil
-            self.TimeIHaveBeenNotSeen = 0
-
-        end
-    
-    
-        #LOG('*AI DEBUG: ONINTELCHANGED: Blip = ', repr(blip), ' ReconType = ', repr(reconType), ' Value = ', repr(val))
-        #LOG('*AI DEBUG: IntelTriggerList = ', repr(self.IntelTriggerList))
-        #LOG('*AI DEBUG: BlipID = ', repr(blip:GetBlueprint().BlueprintId))    
-        if blip and reconType and val != nil then 
-            local BlipSource = blip:GetSource()
-            if BlipSource then
-                if reconType == 'Radar' then
-                    if IsUnit(BlipSource) and EntityCategoryContains( categories.MOBILE, BlipSource ) then 
-                        if val then
-                            self:SetUnitIntelTable(BlipSource, reconType, true)
-                        else
-                            self:SetUnitIntelTable(BlipSource, reconType, false)
-                        end
-                    end
-            
-            
-                if not self:IsUnitTargeatable(blip, BlipSource) then
-                    --LOG("Unit going out of radar - Clearing attackers")
-                    if not BlipSource.IAmNotSeenThread then
-                        BlipSource.IAmNotSeenThread = BlipSource:ForkThread(IAmNotSeen)
-                    end
-                    --BlipSource:stopAttackers()
-                else
-                    if BlipSource.IAmNotSeenThread then
-                        BlipSource:ForkThread(KillNotSeenThread)
-                    end
-                
-                end
-                    
-            end
-        end
-            
-    end
-        
         if self.IntelTriggerList then
             for k, v in self.IntelTriggerList do
                 if EntityCategoryContains(v.Category, blip:GetBlueprint().BlueprintId)

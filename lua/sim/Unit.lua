@@ -209,7 +209,6 @@ Unit = Class(moho.unit_methods) {
 
         -- issue#43 for better stealth
         self.Targets = {}
-        self.Attackers = {}
         self.WeaponTargets = {}
         self.WeaponAttackers = {}
 
@@ -290,139 +289,10 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
     -- TARGET AND ATTACKERS FUNCTIONS
     ------------------------------------------------------------------------------------------
-    -- issue:#43 : better stealth
 
-    -- when we fire on something, we tell that unit that we attack it.
     OnGotTarget = function(self, Weapon)
-        local Target = Weapon:GetCurrentTarget()
-        if Target and IsUnit(Target) then
-            Target:addAttackerWeapon(self)
-            self:addTargetWeapon(Target)
-        end
     end,
-    -- we lost focus, so we remove this unit from the list of threat
     OnLostTarget = function(self, Weapon)
-        for k, ent in self.WeaponTargets do
-            if not ent:IsDead() then
-                ent:removeWeaponAttacker(self)
-            end
-        end
-    end,
-
-    -- add a list of units attacking this unit with a weapon
-    addAttackerWeapon = function(self, attacker)
-        if not attacker:IsDead() then
-            if not table.find(self.WeaponAttackers, attacker) then
-                table.insert(self.WeaponAttackers, attacker)
-            end
-        end
-    end,
-
-    -- add a list of units attacking this unit with an order
-    addAttacker = function(self, attacker)
-        if not attacker:IsDead() then
-            if not table.find(self.Attackers, attacker) then
-                table.insert(self.Attackers, attacker)
-            end
-        end
-    end,
-
-    -- that weapon is not longer attacking us.
-    removeWeaponAttacker = function(self, attacker)
-        for k, ent in self.Attackers do
-            if ent == attacker then
-                table.remove(self.WeaponAttackers, k)
-            end
-        end
-    end,
-
-    -- that unit is not longer attacking us.
-    removeAttacker = function(self, attacker)
-        for k, ent in self.Attackers do
-            if ent == attacker then
-                table.remove(self.Attackers, k)
-            end
-        end
-    end,
-
-    -- clear the attack orders if the units got out of sight.
-    stopAttackers = function(self)
-
-        for k, ent in self.Attackers do
-
-            if ent and not ent:IsDead() then
-
-                if self:IsIntelEnabled("Cloak") or self:IsIntelEnabled("CloakField") then
-                    IssueClearCommands({ent})
-                elseif self:GetCurrentLayer() == "Seabed" and  self:IsIntelEnabled("SonarStealth") or self:IsIntelEnabled("SonarStealthField") then
-
-                    IssueClearCommands({ent})
-                elseif self:GetCurrentLayer() == "Land" and  self:IsIntelEnabled("RadarStealth") or self:IsIntelEnabled("RadarStealthField") then
-                    IssueClearCommands({ent})
-                else
-                    local aiBrain = self:GetAIBrain()
-                    if self:GetCurrentLayer() == "Land" then
-                        local units = aiBrain:GetUnitsAroundPoint( categories.OVERLAYCOUNTERINTEL, self:GetPosition(),  50)
-                        local stop = false
-                        for k,v in units do
-                            if v:IsIntelEnabled("RadarStealthField") and  VDist3(self:GetPosition(), v:GetPosition()) < v:GetBlueprint().Intel.SonarStealthFieldRadius then
-                                stop = true
-                            end
-                        end
-                        if stop == true then
-                            IssueClearCommands({ent})
-                        end
-
-                    elseif self:GetCurrentLayer() == "Seabed" then
-                        local units = aiBrain:GetUnitsAroundPoint( categories.OVERLAYCOUNTERINTEL, self:GetPosition(),  100)
-                        local stop = false
-                        for k,v in units do
-                            if v:IsIntelEnabled("SonarStealthField") and  VDist3(self:GetPosition(), v:GetPosition()) < v:GetBlueprint().Intel.RadarStealthFieldRadius then
-                                stop = true
-                            end
-                        end
-                        if stop == true then
-                            IssueClearCommands({ent})
-                        end
-                    end
-                end
-            end
-
-        end
-        -- and we remove them from the list of attackers
-        self.Attackers = {}
-
-        for k, ent in self.WeaponAttackers do
-            if ent and not ent:IsDead() then
-                local numWep = self:GetWeaponCount()
-                if numWep > 0 then
-                     for w = 1, numWep do
-                        local wep = self:GetWeapon(w)
-                        if wep:GetCurrentTarget() == self then
-                            wep:ResetTarget()
-                        end
-                     end
-                end
-
-            end
-        end
-
-    end,
-
-    -- This function make units target again if the unit got an attacker.
-    resumeAttackers = function(self)
-        for k, attacker in self.Attackers do
-            if attacker and not attacker:IsDead() then
-                for j, target in attacker.Targets do
-                    if target == self then
-                        IssueAttack({attacker}, self)
-                    end
-
-                end
-
-            end
-        end
-
     end,
 
     -- Add a target to the weapon list for this unit
@@ -447,7 +317,6 @@ Unit = Class(moho.unit_methods) {
         end
         -- now we clear the list
         self.Targets = {}
-
     end,
 
     -------------------------------------------------------------------------------------------
