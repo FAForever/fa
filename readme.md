@@ -30,7 +30,6 @@ This is the changelog to be posted on the forums for patch 3636.
 - [X] Shield Fixes:
     - [X] Personal Shields now protect units also under bubble shields
     - [X] Personal Shields now protect units properly from splash weaponry
-    - [X] Bubble Shields now correctly ricochet damage among themselves
     - [X] Bubble Shields now interact with splash weaponry properly
 - [X] Hitbox Fixes: Adjusted collision boxes and target bones on dozens of units to allow weapons to target and impact them properly.
     - [X] Dynamically changing hitbox for Salem
