@@ -22,9 +22,9 @@ local DEBUG = true
 
 --Configuration Values
 local POLL_FREQUENCY = 30   -- Seconds (recommended that this not be less than 10 seconds)
-local HEADROOM       = 2.5  -- buffer value (avg + dev*<headroom>).  dev is std-deviation
-local MAX_NETLAG     = 500  -- maximum net_lag value (milliseconds)
+local HEADROOM       = 2.5  -- buffer value (avg + 25 + dev*<headroom>).  dev is std-deviation
 local MIN_NETLAG     = 25   -- minimum net_lag value (milliseconds)
+local MAX_NETLAG     = 500  -- maximum net_lag value (milliseconds)
 local HISTORY_SIZE   = 10   -- size of ping history, used for avg / dev
 
 function Init()
@@ -84,7 +84,7 @@ function updateClientData()
         end
     end
     isMasterClient = minUid == myUid -- client with lowest uid is master
-    optimalValue = math.floor(math.min(math.max(worstPing, MIN_NETLAG), MAX_NETLAG))
+    optimalValue = math.floor(math.min(math.max(worstPing + 25, MIN_NETLAG), MAX_NETLAG))
 end
 
 function NetLagThread()
