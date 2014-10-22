@@ -25,6 +25,7 @@ This is the changelog to be posted on the forums for patch 3636.
 - [X] Fixed Cybran ACU with Laser upgrade being unable to ever fire the weapon after being transported, and improve targeting further
 - [X] Fixed Seraphim ACU dying when dropped from Transport after being picked up while firing
 - [X] Fixed Seraphim ACU shot being visible through FoW
+- [X] Fixed invalid preview range of SMDs
 
 *Game Improvements*
 - [X] Shield Fixes:
@@ -46,6 +47,7 @@ This is the changelog to be posted on the forums for patch 3636.
 - [X] Attempt to fix bomblet spread on bombers such as UEF and Cybran T1 Bombers
 - [X] Attempt to fix Seraphim T1 Mobile AA's aim
 - [X] Improved autobalance with random spawns in lobby
+- [X] SMD can be paused
 
 
 *Balance Changes*

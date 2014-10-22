@@ -154,6 +154,7 @@ UnitBlueprint {
             RULEUCC_Move = false,
             RULEUCC_Nuke = false,
             RULEUCC_Patrol = false,
+            RULEUCC_Pause = true,
             RULEUCC_Reclaim = false,
             RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
@@ -225,7 +226,7 @@ UnitBlueprint {
             Damage = 30,
             DamageType = 'Normal',
             DisplayName = 'Saint Anti Nuke',
-            EffectiveRadius = 75,
+            EffectiveRadius = 90,
             FireTargetLayerCapsTable = {
                 Land = 'Air',
                 Seabed = 'Air',
