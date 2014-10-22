@@ -45,6 +45,8 @@ This is the changelog to be posted on the forums for patch 3636.
 - [X] Ability to reclaim ground
 - [X] Attempt to fix bomblet spread on bombers such as UEF and Cybran T1 Bombers
 - [X] Attempt to fix Seraphim T1 Mobile AA's aim
+- [X] Improved autobalance with random spawns in lobby
+
 
 *Balance Changes*
 - [X] Shield and Hitbox fixes above will have balance implications of varying size
@@ -60,8 +62,7 @@ This is the changelog to be posted on the forums for patch 3636.
 ----------------------------------
 *Changes to be made*
 - Satellite base now builds the satellite, when satellite dies, base can rebuild
-- Fix cyclic factory assist crash exploit
-- Fix engineer repair on upgrade exploit
+- Fix cyclic factory assist crash
 - Fix HQ Factory visual bug
 - Implement proper Stealth
 - Fix replays desyncing
@@ -76,6 +77,7 @@ Contributors:
  - thygrrr
  - PattogoTehen
  - RK4000
+ - Eximius
 
 
 Contributing
