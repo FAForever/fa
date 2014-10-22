@@ -1067,6 +1067,10 @@ local function autobalance_rr(players, teams)
 
     local picks = team_picks[table.getn(teams)]
 
+    if(not picks or table.getsize(picks) == 0) then
+        return
+    end
+
     i = 1
     while (table.getn(players) > 0) do
         local player = table.remove(players, 1)
@@ -1132,6 +1136,13 @@ function autobalance_quality(players)
 end
 
 local function AssignRandomStartSpots(gameInfo)
+    function teamsAddSpot(teams, team, spot)
+        if(not teams[team]) then
+            teams[team] = {}
+        end
+        table.insert(teams[team], spot)
+    end
+
     if gameInfo.GameOptions['TeamSpawn'] == 'random' then
         local numAvailStartSpots = nil
         local scenarioInfo = nil
@@ -1152,43 +1163,52 @@ local function AssignRandomStartSpots(gameInfo)
             return
         end
 
-        teams = {}
-        teams[1] = {}
-        teams[2] = {}
-
+        local autoTeams = gameInfo.GameOptions['AutoTeams']
+        local teams = {}
         for i = 1, numAvailStartSpots do
             if gameInfo.ClosedSlots[i] == nil then
-                if gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
+                local team = nil
+
+                if autoTeams == 'lvsr' then
                     local midLine = GUI.mapView.Left() + (GUI.mapView.Width() / 2)
                     if(not GUI.markers[i].marker) then return end
                     local markerPos = GUI.markers[i].marker.Left()
 
                     if markerPos < midLine then
-                        table.insert(teams[1], i)
+                        team = 2
                     else
-                        table.insert(teams[2], i)
+                        team = 3
                     end
-                elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
+                elseif autoTeams == 'tvsb' then
                     local midLine = GUI.mapView.Top() + (GUI.mapView.Height() / 2)
                     local markerPos = GUI.markers[i].marker.Top()
 
                     if markerPos < midLine then
-                        table.insert(teams[1], i)
+                        team = 2
                     else
-                        table.insert(teams[2], i)
+                        team = 3
                     end
-                elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' then
+                elseif autoTeams == 'pvsi' then
                     if i == 1 or i == 3 or i == 5 or i == 7 or i == 9 or i == 11 then
-                        table.insert(teams[1], i)
+                        team = 2
                     else
-                        table.insert(teams[2], i)
+                        team = 3
                     end
+                elseif autoTeams == 'manual' then
+                    team = gameInfo.AutoTeams[i]
+                else -- none
+                    team = gameInfo.PlayerOptions[i].Team
+                end
+
+                if team ~= nil then
+                    teamsAddSpot(teams, team, i)
                 end
             end
         end
         -- shuffle the array for randomness.
-        teams[1] = table.shuffle(teams[1])
-        teams[2] = table.shuffle(teams[2])
+        for i, team in teams do
+            teams[i] = table.shuffle(team)
+        end
         teams = table.shuffle(teams)
 
         local ratingTable = {}
@@ -1202,7 +1222,6 @@ local function AssignRandomStartSpots(gameInfo)
                     gameInfo.PlayerOptions[i].DEV = 500
                 end
 
-                --table.insert(ratingTable, {pos=i, rating=gameInfo.PlayerOptions[i].PL or 0})
                 table.insert(ratingTable, {pos=i, rating=gameInfo.PlayerOptions[i].MEAN-gameInfo.PlayerOptions[i].DEV*3})
             end
         end
@@ -1220,12 +1239,14 @@ local function AssignRandomStartSpots(gameInfo)
         local r, q
         for fname, f in functions do
             r = f(ratingTable, teams)
-            q = autobalance_quality(r)
+            if r then
+                q = autobalance_quality(r)
 
-            -- when all functions fail, use one as default
-            if q > best.quality or best.result == nil then
-                best.result = r
-                best.quality = q
+                -- when all functions fail, use one as default
+                if q > best.quality or best.result == nil then
+                    best.result = r
+                    best.quality = q
+                end
             end
         end
 
