@@ -1662,7 +1662,7 @@ Unit_Description_0442="Extremely Long range support tank armed with weaponry whi
 ##Air
 Unit_Description_0235="Fast aerial reconnaissance vehicle."
 Unit_Description_0236="Quick, manoeuvrable Anti-Air Fighter."
-Unit_Description_0237="Lightly armoured Bomber armed with EMP Bomb which stuns enemy units. This bomber can target submerged units, but only damage them in shallow water."
+Unit_Description_0237="Lightly armoured Bomber armed with EMP Bomb which stuns enemy units."
 Unit_Description_0238="Air Transport which can carry 6 T1 units, 3 T2 units, or a single T3 unit (Plus 2 T1). Cannot transport the ACU."
 Unit_Description_0239="Gunship armed with direct fire cannon."
 Unit_Description_0240="Torpedo Bomber capable of attacking ships and submarines. Armed with Depth Charges which ignore enemy Torpedo Defence."

@@ -26,6 +26,7 @@ This is the changelog to be posted on the forums for patch 3636.
 - [X] Fixed Seraphim ACU dying when dropped from Transport after being picked up while firing
 - [X] Fixed Seraphim ACU shot being visible through FoW
 - [X] Fixed invalid preview range of SMDs
+- [X] Fixed Aeon T1 Bomber targeting subsurface units
 
 *Game Improvements*
 - [X] Shield Fixes:
