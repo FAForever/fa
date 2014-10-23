@@ -1,51 +1,51 @@
-#
-# Blueprint loading
-#
-#   During preloading of the map, we run loadBlueprints() from this file. It scans
-#   the game directories and runs all .bp files it finds.
-#
-#   The .bp files call UnitBlueprint(), PropBlueprint(), etc. to define a blueprint.
-#   All those functions do is fill in a couple of default fields and store off the
-#   table in 'original_blueprints'.
-#
-#   Once that scan is complete, ModBlueprints() is called. It can arbitrarily mess
-#   with the data in original_blueprints.
-#
-#   Finally, the engine registers all blueprints in original_blueprints to define the
-#   "real" blueprints used by the game. A separate copy of these blueprints is made
-#   available to the sim-side and user-side scripts.
-#
-# How mods can affect blueprints
-#
-#   First, a mod can simply add a new blueprint file that defines a new blueprint.
-#
-#   Second, a mod can contain a blueprint with the same ID as an existing blueprint.
-#   In this case it will completely override the original blueprint. Note that in
-#   order to replace an original non-unit blueprint, the mod must set the "BlueprintId"
-#   field to name the blueprint to be replaced. Otherwise the BlueprintId is defaulted
-#   off the source file name. (Units don't have this problem because the BlueprintId is
-#   shortened and doesn't include the original path).
-#
-#   Third, a mod can can contain a blueprint with the same ID as an existing blueprint,
-#   and with the special field "Merge = true". This causes the mod to be merged with,
-#   rather than replace, the original blueprint.
-#
-#   Finally, a mod can hook the ModBlueprints() function which manipulates the
-#   blueprints table in arbitrary ways.
-#      1. create a file /mod/s.../hook/system/Blueprints.lua
-#      2. override ModBlueprints(all_bps) in that file to manipulate the blueprints
-#
-# Reloading of changed blueprints
-#
-#   When the disk watcher notices that a .bp file has changed, it calls
-#   ReloadBlueprint() on it. ReloadBlueprint() repeats the above steps, but with
-#   original_blueprints containing just the one blueprint.
-#
-#   Changing an existing blueprint is not 100% reliable; some changes will be picked
-#   up by existing units, some not until a new unit of that type is created, and some
-#   not at all. Also, if you remove a field from a blueprint and then reload, it will
-#   default to its old value, not to 0 or its normal default.
-#
+--
+-- Blueprint loading
+--
+--   During preloading of the map, we run loadBlueprints() from this file. It scans
+--   the game directories and runs all .bp files it finds.
+--
+--   The .bp files call UnitBlueprint(), PropBlueprint(), etc. to define a blueprint.
+--   All those functions do is fill in a couple of default fields and store off the
+--   table in 'original_blueprints'.
+--
+--   Once that scan is complete, ModBlueprints() is called. It can arbitrarily mess
+--   with the data in original_blueprints.
+--
+--   Finally, the engine registers all blueprints in original_blueprints to define the
+--   "real" blueprints used by the game. A separate copy of these blueprints is made
+--   available to the sim-side and user-side scripts.
+--
+-- How mods can affect blueprints
+--
+--   First, a mod can simply add a new blueprint file that defines a new blueprint.
+--
+--   Second, a mod can contain a blueprint with the same ID as an existing blueprint.
+--   In this case it will completely override the original blueprint. Note that in
+--   order to replace an original non-unit blueprint, the mod must set the "BlueprintId"
+--   field to name the blueprint to be replaced. Otherwise the BlueprintId is defaulted
+--   off the source file name. (Units don't have this problem because the BlueprintId is
+--   shortened and doesn't include the original path).
+--
+--   Third, a mod can can contain a blueprint with the same ID as an existing blueprint,
+--   and with the special field "Merge = true". This causes the mod to be merged with,
+--   rather than replace, the original blueprint.
+--
+--   Finally, a mod can hook the ModBlueprints() function which manipulates the
+--   blueprints table in arbitrary ways.
+--      1. create a file /mod/s.../hook/system/Blueprints.lua
+--      2. override ModBlueprints(all_bps) in that file to manipulate the blueprints
+--
+-- Reloading of changed blueprints
+--
+--   When the disk watcher notices that a .bp file has changed, it calls
+--   ReloadBlueprint() on it. ReloadBlueprint() repeats the above steps, but with
+--   original_blueprints containing just the one blueprint.
+--
+--   Changing an existing blueprint is not 100% reliable; some changes will be picked
+--   up by existing units, some not until a new unit of that type is created, and some
+--   not at all. Also, if you remove a field from a blueprint and then reload, it will
+--   default to its old value, not to 0 or its normal default.
+--
 
 local sub = string.sub
 local gsub = string.gsub
@@ -68,12 +68,12 @@ local function InitOriginalBlueprints()
 end
 
 local function GetSource()
-    # Find the first calling function not in this source file
+    -- Find the first calling function not in this source file
     local n = 2
     local there
     while true do
         there = getinfo(n).source
-        if there!=here then break end
+        if there ~= here then break end
         n = n+1
     end
     if sub(there,1,1)=="@" then
@@ -97,36 +97,36 @@ local function StoreBlueprint(group, bp)
 end
 
 
-#
-# Figure out what to name this blueprint based on the name of the file it came from.
-# Returns the entire filename. Either this or SetLongId() should really be got rid of.
-#
+--
+-- Figure out what to name this blueprint based on the name of the file it came from.
+-- Returns the entire filename. Either this or SetLongId() should really be got rid of.
+--
 local function SetBackwardsCompatId(bp)
     bp.Source = bp.Source or GetSource()
     bp.BlueprintId = lower(bp.Source)
 end
 
 
-#
-# Figure out what to name this blueprint based on the name of the file it came from.
-# Returns the full resource name except with ".bp" stripped off
-#
+--
+-- Figure out what to name this blueprint based on the name of the file it came from.
+-- Returns the full resource name except with ".bp" stripped off
+--
 local function SetLongId(bp)
     bp.Source = bp.Source or GetSource()
     if not bp.BlueprintId then
         local id = lower(bp.Source)
-        id = gsub(id, "%.bp$", "")                          # strip trailing .bp
-        #id = gsub(id, "/([^/]+)/%1_([a-z]+)$", "/%1_%2")    # strip redundant directory name
+        id = gsub(id, "%.bp$", "")                          -- strip trailing .bp
+        --id = gsub(id, "/([^/]+)/%1_([a-z]+)$", "/%1_%2")    -- strip redundant directory name
         bp.BlueprintId = id
     end
 end
 
 
-#
-# Figure out what to name this blueprint based on the name of the file it came from.
-# Returns just the base filename, without any blueprint type info or extension. Used
-# for units only.
-#
+--
+-- Figure out what to name this blueprint based on the name of the file it came from.
+-- Returns just the base filename, without any blueprint type info or extension. Used
+-- for units only.
+--
 local function SetShortId(bp)
     bp.Source = bp.Source or GetSource()
     bp.BlueprintId = bp.BlueprintId or
@@ -134,12 +134,12 @@ local function SetShortId(bp)
 end
 
 
-#
-# If the bp contains a 'Mesh' section, move that over to a separate Mesh blueprint, and
-# point bp.MeshBlueprint at it.
-#
-# Also fill in a default value for bp.MeshBlueprint if one was not given at all.
-#
+--
+-- If the bp contains a 'Mesh' section, move that over to a separate Mesh blueprint, and
+-- point bp.MeshBlueprint at it.
+--
+-- Also fill in a default value for bp.MeshBlueprint if one was not given at all.
+--
 function ExtractMeshBlueprint(bp)
     local disp = bp.Display or {}
     bp.Display = disp
@@ -150,13 +150,13 @@ function ExtractMeshBlueprint(bp)
     end
 
     if type(disp.MeshBlueprint)=='string' then
-        if disp.MeshBlueprint!=lower(disp.MeshBlueprint) then
-            #Should we allow mixed-case blueprint names?
-            #LOG('Warning: ',bp.Source,' (MeshBlueprint): ','Blueprint IDs must be all lowercase')
+        if disp.MeshBlueprint~=lower(disp.MeshBlueprint) then
+            --Should we allow mixed-case blueprint names?
+            --LOG('Warning: ',bp.Source,' (MeshBlueprint): ','Blueprint IDs must be all lowercase')
             disp.MeshBlueprint = lower(disp.MeshBlueprint)
         end
 
-        # strip trailing .bp
+        -- strip trailing .bp
         disp.MeshBlueprint = gsub(disp.MeshBlueprint, "%.bp$", "")
 
         if disp.Mesh then
@@ -165,8 +165,8 @@ function ExtractMeshBlueprint(bp)
     end
 
     if disp.MeshBlueprint==nil then
-        # For a blueprint file "/units/uel0001/uel0001_unit.bp", the default
-        # mesh blueprint is "/units/uel0001/uel0001_mesh"
+        -- For a blueprint file "/units/uel0001/uel0001_unit.bp", the default
+        -- mesh blueprint is "/units/uel0001/uel0001_mesh"
         local meshname,subcount = gsub(bp.Source, "_[a-z]+%.bp$", "_mesh")
         if subcount==1 then
             disp.MeshBlueprint = meshname
@@ -176,8 +176,8 @@ function ExtractMeshBlueprint(bp)
             local meshbp = disp.Mesh
             meshbp.Source = meshbp.Source or bp.Source
             meshbp.BlueprintId = disp.MeshBlueprint
-            # roates:  Commented out so the info would stay in the unit BP and I could use it to precache by unit.
-            # disp.Mesh = nil
+            -- roates:  Commented out so the info would stay in the unit BP and I could use it to precache by unit.
+            -- disp.Mesh = nil
             MeshBlueprint(meshbp)
         end
     end
@@ -210,7 +210,7 @@ end
 function ExtractBuildMeshBlueprint(bp)
     local FactionName = bp.General.FactionName
 
-    if FactionName == 'Aeon' or FactionName == 'UEF' or FactionName == 'Cybran' or FactionName == 'Seraphim' then 
+    if FactionName == 'Aeon' or FactionName == 'UEF' or FactionName == 'Cybran' or FactionName == 'Seraphim' then
         local meshid = bp.Display.MeshBlueprint
         if not meshid then return end
 
@@ -238,7 +238,7 @@ end
 
 
 function MeshBlueprint(bp)
-    # fill in default values
+    -- fill in default values
     SetLongId(bp)
     StoreBlueprint('Mesh', bp)
 end
@@ -317,8 +317,8 @@ function RegisterAllBlueprints(blueprints)
 end
 
 
-# Brute51 - Adding support for SCU presets: allows building units that get enhancements at the factory, so no need to enhance
-# after building SCU.
+-- Brute51 - Adding support for SCU presets: allows building units that get enhancements at the factory, so no need to enhance
+-- after building SCU.
 function HandleUnitWithBuildPresets(bps, allUnitBlueprints)
 
     local SortCats = { 'SORTOTHER', 'SORTINTEL', 'SORTSTRATEGIC', 'SORTDEFENSE', 'SORTECONOMY', 'SORTCONSTRUCTION', }
@@ -326,17 +326,17 @@ function HandleUnitWithBuildPresets(bps, allUnitBlueprints)
 
     for k, bp in bps do
         for name, preset in bp.EnhancementPresets do
-            # start with clean copy of the original unit BP
+            -- start with clean copy of the original unit BP
             tempBp = table.deepcopy(bp)
 
-            # create BP table for the assigned preset with required info
+            -- create BP table for the assigned preset with required info
             tempBp.EnhancementPresetAssigned = {
                 Enhancements = table.deepcopy( preset.Enhancements ),
                 Name = name,
                 BaseBlueprintId = bp.BlueprintId,
             }
 
-            # change cost of the new unit to match unit base cost + preset enhancement costs. An override is provided for cases where this is not desired.
+            -- change cost of the new unit to match unit base cost + preset enhancement costs. An override is provided for cases where this is not desired.
             local e, m, t = 0, 0, 0
             if not preset.BuildCostEnergyOverride or not preset.BuildCostMassOverride or not preset.BuildTimeOverride then
                 for k, enh in preset.Enhancements do
@@ -353,27 +353,27 @@ function HandleUnitWithBuildPresets(bps, allUnitBlueprints)
             tempBp.Economy.BuildCostMass = preset.BuildCostMassOverride or (tempBp.Economy.BuildCostMass + m)
             tempBp.Economy.BuildTime = preset.BuildTimeOverride or (tempBp.Economy.BuildTime + t)
 
-            # teleport cost adjustments. Teleporting a manually enhanced SCU is cheaper than a prebuild SCU because the latter has its cost
-            # adjusted (up). This code sets bp values used in the code to calculate with different base values than the unit cost.
-            if preset.TeleportNoCostAdjustment != false then
-                # set teleport cost overrides to cost of base unit
+            -- teleport cost adjustments. Teleporting a manually enhanced SCU is cheaper than a prebuild SCU because the latter has its cost
+            -- adjusted (up). This code sets bp values used in the code to calculate with different base values than the unit cost.
+            if preset.TeleportNoCostAdjustment ~= false then
+                -- set teleport cost overrides to cost of base unit
                 tempBp.Economy.TeleportEnergyCost = bp.Economy.BuildCostEnergy or 0
                 tempBp.Economy.TeleportMassCost = bp.Economy.BuildMassEnergy or 0
             end
 
-            # Add a sorting category so similar SCUs are grouped together in the build menu
+            -- Add a sorting category so similar SCUs are grouped together in the build menu
             if preset.SortCategory then
                 if table.find(SortCats, preset.SortCategory) or preset.SortCategory == 'None' then
                     for _, v in SortCats do
                         table.removeByValue(tempBp.Categories, v)
                     end
-                    if preset.SortCategory != 'None' then
+                    if preset.SortCategory ~= 'None' then
                         table.insert(tempBp.Categories, preset.SortCategory)
                     end
                 end
             end
 
-            # change other things relevant things aswell
+            -- change other things relevant things aswell
             tempBp.BlueprintId = tempBp.BlueprintId .. '_' .. name
             tempBp.BuildIconSortPriority = preset.BuildIconSortPriority or tempBp.BuildIconSortPriority or 0
             tempBp.General.UnitName = preset.UnitName or tempBp.General.UnitName
@@ -381,34 +381,34 @@ function HandleUnitWithBuildPresets(bps, allUnitBlueprints)
             tempBp.Description = preset.Description or tempBp.Description
             table.insert(tempBp.Categories, 'ISPREENHANCEDUNIT')
 
-            # clean up some data that's not needed anymore
+            -- clean up some data that's not needed anymore
             table.removeByValue(tempBp.Categories, 'USEBUILDPRESETS')
             tempBp.EnhancementPresets = nil
 
             table.insert( allUnitBlueprints.Unit, tempBp )
-            #LOG('*DEBUG: created preset unit '..repr(tempBp.BlueprintId))
+            --LOG('*DEBUG: created preset unit '..repr(tempBp.BlueprintId))
 
             BlueprintLoaderUpdateProgress()
         end
     end
 end
 
-# Mod unit blueprints before allowing mods to modify it aswell, to pass the most correct unit blueprint to mods
+-- Mod unit blueprints before allowing mods to modify it aswell, to pass the most correct unit blueprint to mods
 function PreModBlueprints(all_bps)
 
-    # Brute51: Modified code for ship wrecks and added code for SCU presets.
-    # removed the pairs() function call in the for loops for better efficiency and because it is not necessary.
+    -- Brute51: Modified code for ship wrecks and added code for SCU presets.
+    -- removed the pairs() function call in the for loops for better efficiency and because it is not necessary.
 
     local cats = {}
 
     for _, bp in all_bps.Unit do
 
-        # skip units without categories
+        -- skip units without categories
         if not bp.Categories then
             continue
         end
 
-        # adding or deleting categories on the fly
+        -- adding or deleting categories on the fly
         if bp.DelCategories then
             for k, v in bp.DelCategories do
                 table.removeByValue( bp.Categories, v )
@@ -422,14 +422,14 @@ function PreModBlueprints(all_bps)
             bp.AddCategories = nil
         end
 
-        # find out what categories the unit has and allow easy reference
+        -- find out what categories the unit has and allow easy reference
         cats = {}
         for k, cat in bp.Categories do
             cats[cat] = true
         end
 
         if cats.NAVAL and not bp.Wreckage then
-            # Add naval wreckage
+            -- Add naval wreckage
             --LOG("Adding wreckage information to ", bp.Description)
             bp.Wreckage = {
                 Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
@@ -451,33 +451,33 @@ function PreModBlueprints(all_bps)
     end
 end
 
-# Hook for mods to manipulate the entire blueprint table
+-- Hook for mods to manipulate the entire blueprint table
 function ModBlueprints(all_bps)
 end
 
 function PostModBlueprints(all_bps)
 
-    # Brute51: Modified code for ship wrecks and added code for SCU presets.
-    # removed the pairs() function call in the for loops for better efficiency and because it is not necessary.
+    -- Brute51: Modified code for ship wrecks and added code for SCU presets.
+    -- removed the pairs() function call in the for loops for better efficiency and because it is not necessary.
 
     local PresetUnitBPs = {}
     local cats = {}
 
     for _, bp in all_bps.Unit do
 
-        # skip units without categories
+        -- skip units without categories
         if not bp.Categories then
             continue
         end
 
-        # find out what categories the unit has and allow easy reference
+        -- find out what categories the unit has and allow easy reference
         cats = {}
         for k, cat in bp.Categories do
             cats[cat] = true
         end
 
         if cats.USEBUILDPRESETS then
-            # check blueprint, if correct info for presets then put this unit on the list to handle later
+            -- check blueprint, if correct info for presets then put this unit on the list to handle later
             if bp.Enhancements and type(bp.Enhancements) == 'table' and bp.EnhancementPresets and type(bp.EnhancementPresets) == 'table' then
                 table.insert(PresetUnitBPs, table.deepcopy(bp))
             else
@@ -492,7 +492,7 @@ function PostModBlueprints(all_bps)
 end
 
 
-# Load all blueprints
+-- Load all blueprints
 function LoadBlueprints()
     LOG('Loading blueprints...')
     InitOriginalBlueprints()
@@ -532,7 +532,7 @@ function LoadBlueprints()
 end
 
 
-# Reload a single blueprint
+-- Reload a single blueprint
 function ReloadBlueprint(file)
     InitOriginalBlueprints()
 
