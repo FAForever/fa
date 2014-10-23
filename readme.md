@@ -14,6 +14,8 @@ It is temporary and subject to change. Anything on this list is fully open for
 debate.  Please search the forum for a discussion about the relevant change, or
 make a thread if it isn't there already.
 
+To help the community with this, those changes most likely to cause concern or debate are highlighted in **bold**
+
 
 *Exploit Fixes*
 - [X] Fixed infinite economy exploit
@@ -32,7 +34,7 @@ make a thread if it isn't there already.
 - [X] Fixed Seraphim ACU dying when dropped from Transport after being picked up while firing
 - [X] Fixed Seraphim ACU shot being visible through FoW
 - [X] Fixed invalid preview range of SMDs
-- [X] Fixed Aeon T1 Bomber targeting subsurface units
+- [X] **Fixed Aeon T1 Bomber targeting subsurface units**
 
 *Game Improvements*
 - [X] Shield Fixes:
@@ -49,8 +51,8 @@ make a thread if it isn't there already.
     - [X] LABs, Mantis, Aurora, Striker, Pillar, Hoplite, Mongoose, Firebeetle, Seraphim T3 Mobile Artillery, Cybran T2 Mobile Flack, HARMS, Zthuee all fixed
 - [X] Replay sync support
 - [X] Hotbuild 'upgrade' key now takes engy-mod into account
-- [X] Spread attack now works for move, build and overcharge
-- [X] Ability to reclaim ground
+- [X] **Spread attack now works for move, build and overcharge**
+- [X] **Ability to reclaim ground**
 - [X] Attempt to fix bomblet spread on bombers such as UEF and Cybran T1 Bombers
 - [X] Attempt to fix Seraphim T1 Mobile AA's aim
 - [X] Improved autobalance with random spawns in lobby
@@ -59,9 +61,9 @@ make a thread if it isn't there already.
 
 *Balance Changes*
 - [X] Shield and Hitbox fixes above will have balance implications of varying size
-- [X] Tempest can now build hovering Aeon Land units
+- [X] **Tempest can now build hovering Aeon Land units**
 - [X] Mongoose Buff (Slight increase in Gatling gun MuzzleVelocity to equal Ravager's)
-- [X] All Factories of a given tech level now roll out Engineers at an even pace with each other
+- [X] **All Factories of a given tech level now roll out Engineers at an even pace with each other**
 
 ----------------------------------
 *Changes to be verified*
