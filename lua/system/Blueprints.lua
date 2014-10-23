@@ -447,6 +447,33 @@ function PreModBlueprints(all_bps)
             }
         end
 
+        -- mod in AI.GuardScanRadius = Weapon.MaxRadius + Intel.VisionRadius
+        -- fixes move-attack range issues
+        if cats.MOBILE and (cats.DIRECTFIRE or cats.INDIRECTFIRE or cats.ENGINEER) and not (bp.AI and bp.AI.GuardScanRadius) then
+            local br = nil
+
+            if(cats.ENGINEER) then
+                br = bp.Economy.MaxBuildDistance or 10
+            elseif bp.Weapon then
+                local vision = bp.Intel.VisionRadius or 10
+                local max = 0
+
+                for _, w in bp.Weapon do
+                    local ignore = w.CountedProjectile or w.RangeCategory == 'UWRC_AntiAir' or w.WeaponCategory == 'Defense'
+                    if w.MaxRadius and not ignore then
+                        max = math.max(w.MaxRadius, max)
+                    end
+                end
+
+                br = vision + max
+            end
+
+            if(br) then
+                if not bp.AI then bp.AI = {} end
+                bp.AI.GuardScanRadius = br
+            end
+        end
+
         BlueprintLoaderUpdateProgress()
     end
 end
