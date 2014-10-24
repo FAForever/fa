@@ -59,8 +59,6 @@ make a thread if it isn't there already.
 
 *Balance Changes*
 - [X] Shield and Hitbox fixes above will have balance implications of varying size
-- [X] Tempest can now build hovering Aeon Land units
-- [X] Mongoose Buff (Slight increase in Gatling gun MuzzleVelocity to equal Ravager's)
 - [X] All Factories of a given tech level now roll out Engineers at an even pace with each other
 
 ----------------------------------
@@ -87,6 +85,13 @@ Contributors:
  - PattogoTehen
  - RK4000
  - Eximius
+
+
+Changes under consideration for future patches
+----------------------------------------------
+
+- Tempest being able to build hovering land units
+- Mongoose muzzle velocity buff 
 
 
 Contributing
