@@ -33,6 +33,7 @@ make a thread if it isn't there already.
 - [X] Fixed Seraphim ACU shot being visible through FoW
 - [X] Fixed invalid preview range of SMDs
 - [X] Fixed Aeon T1 Bomber targeting subsurface units
+- [X] All Factories of a given tech level now roll out Engineers at an even pace with each other
 
 *Game Improvements*
 - [X] Shield Fixes:
@@ -55,11 +56,6 @@ make a thread if it isn't there already.
 - [X] Attempt to fix Seraphim T1 Mobile AA's aim
 - [X] Improved autobalance with random spawns in lobby
 - [X] SMD can be paused
-
-
-*Balance Changes*
-- [X] Shield and Hitbox fixes above will have balance implications of varying size
-- [X] All Factories of a given tech level now roll out Engineers at an even pace with each other
 
 ----------------------------------
 *Changes to be verified*
