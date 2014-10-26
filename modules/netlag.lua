@@ -23,7 +23,7 @@ local DEBUG = true
 --Configuration Values
 local POLL_FREQUENCY = 30   -- Seconds (recommended that this not be less than 10 seconds)
 local HEADROOM       = 2.5  -- buffer value (avg + 25 + dev*<headroom>).  dev is std-deviation
-local MIN_NETLAG     = 25   -- minimum net_lag value (milliseconds)
+local MIN_NETLAG     = 0   -- minimum net_lag value (milliseconds)
 local MAX_NETLAG     = 500  -- maximum net_lag value (milliseconds)
 local HISTORY_SIZE   = 10   -- size of ping history, used for avg / dev
 
@@ -33,11 +33,14 @@ function Init()
     ForkThread(NetLagThread)
 end
 
+netLag = MAX_NETLAG
+worstPings = {}
 ----------------------------------- Common Functions-----------------------------------
 
 local myUid = -1
 local isMasterClient = false
 local clientData = {}
+
 local optimalValue = MAX_NETLAG
 
 function DLOG(log)
@@ -45,7 +48,7 @@ function DLOG(log)
 end
 
 -- decides who's master, gathers ping data from the clients
-function updateClientData()
+function UpdateClientData()
     local clients = GetSessionClients()
     local minUid = nil
     local worstPing = MIN_NETLAG
@@ -61,6 +64,7 @@ function updateClientData()
             if(not minUid or client.uid < minId) then minUid = client.uid end
             data.ping = client.ping
             table.insert(data.history, 1, data.ping)
+            data.history[HISTORY_SIZE+1] = nil -- truncate
 
             -- calculate average ping
             local i, n = 0, math.min(HISTORY_SIZE, table.getsize(data.history))
@@ -72,19 +76,15 @@ function updateClientData()
 
             -- calculate standard deviation
             for i=1, n do
-                dev = dev + (avg - data.history[i])^2
+                dev = dev + math.pow(data.avg - data.history[i], 2)
             end
             data.dev = math.sqrt(dev/n)
             if(data.avg > 0) then data.reldev = data.dev / data.avg end
-
-            data.history[HISTORY_SIZE+1] = nil -- truncate
             clientData[index] = data
-
-            worstPing = math.max(worstPing, data.avg + data.dev*HEADROOM)
         end
     end
+
     isMasterClient = minUid == myUid -- client with lowest uid is master
-    optimalValue = math.floor(math.min(math.max(worstPing + 25, MIN_NETLAG), MAX_NETLAG))
 end
 
 function NetLagThread()
@@ -92,7 +92,7 @@ function NetLagThread()
     --If we are the master, send a request for max ping values
 
     while(true) do
-        updateClientData()
+        UpdateClientData()
         if isMasterClient then ForkThread(SendNetLagRequest) end
 
         WaitSeconds(POLL_FREQUENCY)
@@ -103,7 +103,7 @@ end
 
 
 -----------------------------------Master Client Control Functions-----------------------------------
-local netLag = MAX_NETLAG
+
 local requestNumber = 0
 local ResponseTable = {}
 local updatedThisCycle = false
@@ -118,7 +118,7 @@ function SendNetLagRequest()
 
     local armiesInfo = GetArmiesTable()
     local f = armiesInfo.focusArmy
-    DLOG('AUTO NETLAG: Master sending net_lag request #' .. requestNumber)
+    DLOG('AUTO NETLAG: Master sending net_lag request nr ' .. requestNumber)
     for armyIndex, armyData in armiesInfo.armiesTable do
         qd = { From = f, To = armyIndex, Name='NetLagUpdateRequest', RNumber=requestNumber}
         QuerySystem.Query(qd, ReceiveNetLagAnswer)
@@ -129,19 +129,29 @@ function SendNetLagChange()
     local armiesInfo = GetArmiesTable()
     local f = armiesInfo.focusArmy
     DLOG('AUTO NETLAG: Master:NetLegUpdateCommand '.. netLag .. 'ms')
-    qd = { From = f, To = f, Name='NetLagUpdateCommand', RNumber=requestNumber, UValue=netLag}
+    qd = { From = f, To = f, Name='NetLagUpdateCommand', RNumber=requestNumber, worstPings=worstPings, UValue=netLag}
     QuerySystem.Query(qd, ReceiveNetLagCommandAnswer)
 end
 
 function ReceiveNetLagAnswer(resultData)
     if resultData.RNumber == requestNumber and not HasClientResponded(resultData.From) then
-        DLOG('AUTO NETLAG: ReceiveNetLagAnswer, client='.. resultData.From .. ', netLag= '.. resultData.SValue .. 'ms')
-        ResponseTable[resultData.From] = true
-        netLag = math.max(netLag, resultData.SValue)
+        DLOG('AUTO NETLAG: ReceiveNetLagAnswer, client='.. resultData.From .. ', Pings= ' .. repr(resultData.Pings))
+        ResponseTable[resultData.From] = resultData.Pings
     end
 
     if AllClientsResponded() and updatedThisCycle == false then
+        local worstPing = 0
         updatedThisCycle = true
+        for from, pings in ResponseTable do
+            worstPings[from] = 0
+            for to, data in pings do
+                worstPings[from] = math.max(worstPings[from], data.avg + data.dev*HEADROOM)
+            end
+
+            worstPing = math.max(worstPing, worstPings[from])
+        end
+        netLag = math.floor(math.min(math.max(worstPing + 25, MIN_NETLAG), MAX_NETLAG))
+
         ForkThread(SendNetLagChange)
     end
 end
@@ -162,13 +172,18 @@ function ReceiveNetLagRequest(qd)
     local armiesInfo = GetArmiesTable()
     local f = armiesInfo.focusArmy
     if qd.To == f then
-        ad = { From = f, To = qd.From, Name='NetLagUpdateRequest', SValue=optimalValue,  RNumber=qd.RNumber}
-        DLOG('AUTO NETLAG: NetLagUpdateRequest, netLag='.. optimalValue .. ' ms')
+        local clientPings = {}
+        for i, data in clientData do
+            clientPings[i] = {avg=data.avg, dev=data.dev}
+        end
+        ad = { From = f, To = qd.From, Name='NetLagUpdateRequest', Pings = clientPings, RNumber=qd.RNumber}
+        DLOG('AUTO NETLAG: NetLagUpdateRequest, Pings='.. repr(clientPings))
         QuerySystem.SendResult(qd, ad)
     end
 end
 
 function ReceiveNetLagCommand(qd)
+    worstPings = qd.worstPings
     ForkThread(DoNetLagChange, qd.UValue)
 end
 -----------------------------------------------------------------------------------------------------
