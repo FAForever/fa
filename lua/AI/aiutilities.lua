@@ -1757,7 +1757,7 @@ function EngineerTryReclaimCaptureArea(aiBrain, eng, pos)
     # Check if enemy units are at location
     local checkUnits = aiBrain:GetUnitsAroundPoint( categories.STRUCTURE + ( categories.MOBILE * categories.LAND), pos, 10, 'Enemy' )
     #( Rect( pos[1] - 7, pos[3] - 7, pos[1] + 7, pos[3] + 7 ) )
-    if checkUnits and table.getn(checkUnits) > 0then
+    if checkUnits and table.getn(checkUnits) > 0 then
         for num,unit in checkUnits do
             if not unit:IsDead() and EntityCategoryContains( categories.ENGINEER, unit ) and ( unit:GetAIBrain():GetFactionIndex() ~= aiBrain:GetFactionIndex() ) then
                 IssueReclaim( {eng}, unit )
