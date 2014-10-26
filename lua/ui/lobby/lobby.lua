@@ -217,8 +217,10 @@ local pmDialog = false
 local hasSupcom = true
 local hasFA = true
 
-local defaultMode = Prefs.GetFromCurrentProfile('options').primary_adapter or "windowed"
-local windowedMode = (defaultMode == "windowed" or HasCommandLineArg("/windowed"))
+local defaultMode =(HasCommandLineArg("/windowed") and "windowed") or Prefs.GetFromCurrentProfile('options').primary_adapter
+local windowedMode = defaultMode == "windowed" or (HasCommandLineArg("/windowed"))
+
+LOG("defaultMode " .. defaultMode)
 
 function SetWindowedLobby(windowed)
     -- Dont change resolution if user already using windowed mode
