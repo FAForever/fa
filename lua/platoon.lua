@@ -6255,10 +6255,10 @@ Platoon = Class(sorianoldPlatoon) {
                 WaitSeconds(5)
             else
                 # wait a little longer if we're stuck so that we have a better chance to move
-#				if quickReset then
-#					quickReset = false
-#					WaitSeconds(6)
-#				else ]]--
+				if quickReset then
+					quickReset = false
+					WaitSeconds(6)
+				else ]]--
 				WaitSeconds(Random(5,11) + 2 * stuckCount)
 #				end
 #            end
