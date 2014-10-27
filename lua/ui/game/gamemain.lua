@@ -51,10 +51,10 @@ for key, action in currentKeyMap do
                 modifiersKeys["Alt-" .. key] = action
             else
                 WARN("Alt-" .. key .. " is already bind")
-            end        
+            end
         end
     end
-end  
+end
 IN_AddKeyMapTable(modifiersKeys)
 
 
@@ -118,7 +118,7 @@ function OnFirstUpdate()
         import('/lua/ui/game/score.lua').CreateScoreUI()
     end
     PlaySound( Sound { Bank='AmbientTest', Cue='AMB_Planet_Rumble_zoom'} )
-    ForkThread( 
+    ForkThread(
                function()
                    WaitSeconds(1.5)
                    UIZoomTo(avatars, 1)
@@ -388,7 +388,7 @@ function CreateWldUIProvider()
     end
 
     provider.GetPrefetchTextures = function(self)
-        return import('/lua/ui/game/prefetchtextures.lua').prefetchTextures        
+        return import('/lua/ui/game/prefetchtextures.lua').prefetchTextures
     end
 
 end
@@ -421,14 +421,10 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         import('/lua/ui/game/rallypoint.lua').OnSelectionChanged(newSelection)
     end
 
-    local selUnits = newSelection
 
-    if selUnits and table.getn(selUnits) == 1 and import('/modules/selectedinfo.lua').SelectedOverlayOn then
-        import('/modules/selectedinfo.lua').ActivateSingleRangeOverlay()
-    else
-        import('/modules/selectedinfo.lua').DeactivateSingleRangeOverlay()
-    end   
-
+    if import('/modules/selectedinfo.lua').SelectedOverlayOn then
+        import('/modules/selectedinfo.lua').EnableSingleRangeOverlay(newSelection and table.getsize(newSelection) == 1)
+    end
 end
 
 function OnQueueChanged(newQueue)
@@ -725,10 +721,10 @@ function ReceiveChat(sender, data)
 end
 
 function QuickSave(filename)
-    if SessionIsActive() and 
-        WorldIsPlaying() and 
-        not SessionIsGameOver() and 
-        not SessionIsMultiplayer() and 
+    if SessionIsActive() and
+        WorldIsPlaying() and
+        not SessionIsGameOver() and
+        not SessionIsMultiplayer() and
         not SessionIsReplay() and
         not IsNISMode() then
 
@@ -753,10 +749,10 @@ end
 
 defaultZoom = 1.4
 function SimChangeCameraZoom(newMult)
-    if SessionIsActive() and 
-        WorldIsPlaying() and 
-        not SessionIsGameOver() and 
-        not SessionIsMultiplayer() and 
+    if SessionIsActive() and
+        WorldIsPlaying() and
+        not SessionIsGameOver() and
+        not SessionIsMultiplayer() and
         not SessionIsReplay() and
         not IsNISMode() then
 
@@ -776,7 +772,7 @@ function UiBeat()
         lastObserving = observing
         import('/lua/ui/game/economy.lua').ToggleEconPanel(not observing)
     end
-    if HasCommandLineArg("/syncreplay") and HasCommandLineArg("/gpgnet") then	
-        GpgNetSend("BEAT",GameTick(),GetGameSpeed()) 
+    if HasCommandLineArg("/syncreplay") and HasCommandLineArg("/gpgnet") then
+        GpgNetSend("BEAT",GameTick(),GetGameSpeed())
     end
 end

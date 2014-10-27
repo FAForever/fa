@@ -1,23 +1,16 @@
 local Prefs = import('/lua/user/prefs.lua')
 local options = Prefs.GetFromCurrentProfile('options')
+local activeFilters = Prefs.GetFromCurrentProfile('activeFilters') or {}
 
-local selectionOverlay = {
-        key = 'selection',
-        Label = "<LOC map_options_0006>Selection",
-        Pref = 'range_RenderSelected',
-        Type = 3,
-        Tooltip = "overlay_selection",
-}
+SelectedOverlayOn = activeFilters['selection'] == true
+OverlayActive = false
 
 SelectedInfoOn = true
-SelectedOverlayOn = true
 
-if options.gui_enhanced_unitview == 0 then 
-   SelectedInfoOn = false
+if options.gui_enhanced_unitview == 0 then
+	SelectedInfoOn = false
 end
-if options.gui_enhanced_unitrings == 0 then 
-   SelectedOverlayOn = false
-end
+
 
 function GetUnitRolloverInfo(unit)
 	local info = {}
@@ -44,12 +37,12 @@ function GetUnitRolloverInfo(unit)
 	if unit:GetFocus() then
 		info.focus = GetUnitRolloverInfo(unit:GetFocus())
 	end
-   
+
 	local killStat = unit:GetStat('KILLS')
 	info.kills = killStat.Value
 
 	local missileInfo = unit:GetMissileInfo()
-	info.nukeSiloBuildCount = missileInfo.nukeSiloBuildCount 
+	info.nukeSiloBuildCount = missileInfo.nukeSiloBuildCount
 	info.nukeSiloMaxStorageCount = missileInfo.nukeSiloMaxStorageCount
 	info.nukeSiloStorageCount = missileInfo.nukeSiloStorageCount
 	info.tacticalSiloBuildCount = missileInfo.tacticalSiloBuildCount
@@ -59,41 +52,33 @@ function GetUnitRolloverInfo(unit)
 	info.customName = unit:GetCustomName(unit)
 	info.userUnit = unit
 	info.armyIndex = unit:GetArmy() - 1
---   info.teamColor="ffe80a0a"
-
 	return info
 end
 
 function ToggleOn()
-   if SelectedInfoOn then
-      SelectedInfoOn = false
-   else
-      SelectedInfoOn = true
-   end
+	if SelectedInfoOn then
+		SelectedInfoOn = false
+	else
+		SelectedInfoOn = true
+	end
 end
 
-function ToggleOverlayOn()
-   if SelectedOverlayOn then
-      SelectedOverlayOn = false
-      DeactivateSingleRangeOverlay()
-   else
-      SelectedOverlayOn = true
-      local selUnits = GetSelectedUnits()
-      if selUnits and table.getn(selUnits) == 1 then
-         ActivateSingleRangeOverlay()
-      end         
-   end
+function EnableSelectedOverlay(bool)
+	local enable = false
+	SelectedOverlayOn = bool
+
+	if SelectedOverlayOn then
+		local selUnits = GetSelectedUnits()
+		if selUnits and table.getn(selUnits) == 1 then
+			enable = true
+		end
+	end
+
+	EnableSingleRangeOverlay(enable)
 end
 
-function ActivateSingleRangeOverlay()
-   ConExecute('range_RenderSelected true')
+function EnableSingleRangeOverlay(bool)
+	ConExecute('range_RenderSelected ' .. tostring(bool))
+	OverlayActive = bool
 end
 
-function DeactivateSingleRangeOverlay()
-   local info = selectionOverlay
-   local pref = Prefs.GetFromCurrentProfile(info.Pref)
-   if pref == nil then
-      pref = true
-   end
-   ConExecute(info.Pref..' '..tostring(pref))
-end
