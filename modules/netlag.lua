@@ -61,7 +61,7 @@ function UpdateClientData()
 
         if client.connected then
             if(client['local']) then myUid = client.uid end -- find out local players uid
-            if(not minUid or client.uid < minId) then minUid = client.uid end
+            if(not minUid or client.uid < minUid) then minUid = client.uid end
             data.ping = client.ping
             table.insert(data.history, 1, data.ping)
             data.history[HISTORY_SIZE+1] = nil -- truncate
