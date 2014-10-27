@@ -64,7 +64,7 @@ end
 --------------------------------------
 function CreateScalableUnitExplosion( unit, overKillRatio )
 	if unit then
-		if IsUnit(unit) then 
+		if IsUnit(unit) then
 			local explosionEntity = CreateUnitExplosionEntity( unit, overKillRatio )
 			ForkThread( _CreateScalableUnitExplosion, explosionEntity )
 		end
@@ -83,7 +83,7 @@ function CreateDefaultHitExplosionOffset( obj, scale, xOffset, yOffset, zOffset 
     if obj:BeenDestroyed() then
         return
     end
-    
+
     local army = obj:GetArmy()
     --CreateFlash( obj, -1, scale * 0.5, army )
     CreateBoneEffectsOffset( obj, -1, army, EffectTemplate.DefaultHitExplosion01, xOffset, yOffset, zOffset )
@@ -113,9 +113,9 @@ function MakeExplosionEntitySpec(unit, overKillRatio)
         BoundingXZRadius = GetAverageBoundingXZRadius(unit),
         BoundingXYZRadius = GetAverageBoundingXYZRadius(unit),
         OverKillRatio = overKillRatio,
-        Volume = GetUnitVolume( unit ), 
+        Volume = GetUnitVolume( unit ),
         Layer = unit:GetCurrentLayer(),
-    }    
+    }
 end
 
 function CreateUnitExplosionEntity( unit, overKillRatio )
@@ -132,7 +132,7 @@ function _CreateScalableUnitExplosion( obj )
     local EnvironmentalEffectTable = {}
     local EffectTable = {}
     local ShakeTimeModifier = 0
-    local ShakeMaxMul = 1 
+    local ShakeMaxMul = 1
 
     -- Determine effect table to use, based on unit bounding box scale
     if layer == 'Land' then
@@ -211,13 +211,13 @@ function GetUnitEnvironmentalExplosionEffects( layer, scale )
     local EffectTable = {}
     if layer == 'Water' then
         if scale < 0.5 then
-            EffectTable = EffectTemplate.Splashy      
+            EffectTable = EffectTemplate.Splashy
         elseif scale > 1.5 then
-            EffectTable = EffectTemplate.ExplosionMediumWater      
+            EffectTable = EffectTemplate.ExplosionMediumWater
         else
-            EffectTable = EffectTemplate.ExplosionSmallWater      
+            EffectTable = EffectTemplate.ExplosionSmallWater
         end
-    end 
+    end
     return EffectTable
 end
 
@@ -299,7 +299,7 @@ end
 -- DEBRIS PROJECTILES EFFECTS --
 --------------------------------
 function CreateDebrisProjectiles( obj, volume, dimensions )
-    local partamounts = math.min(GetRandomInt( 1 + (volume * 50), (volume * 100) ) , 250)
+    local partamounts = math.min(GetRandomInt( 1 + (volume * 25), (volume * 50) ) , 100)
     local sx, sy, sz = unpack(dimensions)
 	local vector = obj.Spec.OverKillRatio.debris_Vector
     for i = 1, partamounts do
