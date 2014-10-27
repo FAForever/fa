@@ -12,10 +12,10 @@ preprocess_gpg_lua() {
   # 2. C-style equality
   # 3. C-style continue 
 
-  sed -e 's:^\(\([^"#]\|"[^"#]*"\)*\)#\(.\|\xa9\)*$:\1:g' \
+  sed -e "s:^\(\([^\"'#]\|\(\"\|'\)[^\"'#]*\3\)*\)#\(.\|\xa9\)*$:\1:g" \
       -e 's:\!\=:\~\=:g' \
       -e 's:\(\scontinue\)\(\s\):\1\(\)\2:g' \
-      "$file" 
+      "$file"
 }
 
 had_error=0
