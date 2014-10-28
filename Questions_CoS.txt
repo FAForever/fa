@@ -1,0 +1,13 @@
+This document outlines some questions which the Council of Setons should debate and come to a consensus on.
+It is not an exclusive list, but decisions here can give direction to contributors.
+
+Should Shielding affect a nuclear blast wave, and/or be able to protect units from nuclear damage?
+How should Torpedo Bombers behave?
+What intel should be given to players regarding the upgrading of a unit which has been scouted?
+Should Nuke Launchers and Defences stall completely when your economy is stalled?
+Should units with toggleable weapons automatically toggle when manually told to attack a target, then toggle back on kill?
+How should the Stealth system work?
+Should dead planes grant intel until they hit the ground? Should they grant full intel, or just LOS?
+Should the distribution of the outer ring damage of the game's Nukes be made more streamlined?
+Should the Attack-Move Factory bug be fixed? Should a fix be followed by more efficient reclaim tools?
+Should SCU-Presets have Adjacency bonuses applied to the cost of the enhancements?
