@@ -50,7 +50,7 @@ SyncMeta = {
 
 Unit = Class(moho.unit_methods) {
     Weapons = {},
-    
+
     FxScale = 1,
     FxDamageScale = 1,
     --FX Damage tables. A random damage effect table of emitters is chosen out of this table
@@ -72,7 +72,7 @@ Unit = Class(moho.unit_methods) {
     DestructionPartsLowToss = {},
     DestructionPartsChassisToss = {},
     EconomyProductionInitiallyActive = true,
-    
+
     --Used to toggle damage protection on shielded transports
     transportProtected = false,
 
@@ -99,7 +99,7 @@ Unit = Class(moho.unit_methods) {
         if not self.Trash then
             self.Trash = TrashBag()
         end
-        
+
         self.EventCallbacks = {
             OnKilled = {},
             OnUnitBuilt = {},
@@ -203,10 +203,10 @@ Unit = Class(moho.unit_methods) {
         --Set up veterancy
         self.xp = 0
         self.Sync.xp = self.xp
-        self.VeteranLevel = 0        
+        self.VeteranLevel = 0
 
         self.debris_Vector = Vector( 0, 0, 0 )
-        
+
         --Define Economic modifications
         local bpEcon = self:GetBlueprint().Economy
         self:SetConsumptionPerSecondEnergy(bpEcon.MaintenanceConsumptionPerSecondEnergy or 0)
@@ -217,12 +217,12 @@ Unit = Class(moho.unit_methods) {
         if self.EconomyProductionInitiallyActive then
             self:SetProductionActive(true)
         end
-        
+
         self.Buffs = {
             BuffTable = {},
             Affects = {},
         }
-        
+
         local bpVision = self:GetBlueprint().Intel.VisionRadius
         if bpVision then
             self:SetIntelRadius('Vision', bpVision)
@@ -232,7 +232,7 @@ Unit = Class(moho.unit_methods) {
 
         self:SetCanTakeDamage(true)
         self:SetCanBeKilled(true)
-        
+
         local bpDeathAnim = self:GetBlueprint().Display.AnimationDeath
         if bpDeathAnim and table.getn(bpDeathAnim) > 0 then
             self.PlayDeathAnimation = true
@@ -249,7 +249,7 @@ Unit = Class(moho.unit_methods) {
         if self:GetAIBrain().CheatEnabled then
             AIUtils.ApplyCheatBuffs(self)
         end
-        
+
         self.Dead = false
 
         local bp = self:GetBlueprint()
@@ -274,7 +274,7 @@ Unit = Class(moho.unit_methods) {
     ------------------------------------------------------------------------------------------
     OnGotTarget = function(self, Weapon)
     end,
-    
+
     OnLostTarget = function(self, Weapon)
     end,
 
@@ -284,14 +284,14 @@ Unit = Class(moho.unit_methods) {
             table.insert(self.WeaponTargets, target)
         end
     end,
-    
+
     --Add a target to the list for this unit
     addTarget = function(self, target)
         if not target:IsDead() then
             table.insert(self.Targets, target)
         end
     end,
-    
+
     --Remove all the targets for this unit
     clearTarget = function(self)
         --Tell our target we are no longer a threat
@@ -505,7 +505,7 @@ Unit = Class(moho.unit_methods) {
                         break
                     end
                 end
-                
+
                 for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH3 * faction * researchType, false, true) do
                     if not unit:IsDead() and not unit:IsBeingBuilt() then
 
@@ -812,7 +812,7 @@ Unit = Class(moho.unit_methods) {
 
             --Fix captured units not retaining their data
             local newUnits = import('/lua/SimUtils.lua').TransferUnitsOwnership( {self}, captorArmyIndex)
-            
+
             --The unit transfer function returns a table of units. Since we transferred 1 unit, the table contains 1 unit (The new unit).
             if table.getn(newUnits) ~= 1 then
                 return
@@ -1051,7 +1051,7 @@ Unit = Class(moho.unit_methods) {
                 self.MyShield:ApplyDamage(instigator, amount, vector, damageType)
 
             --This makes sure Nukes will still kill shielded Transports and their units
-            elseif EntityCategoryContains(categories.NUKE, instigator) and transportProtected == true then
+            elseif EntityCategoryContains(categories.NUKE, instigator) and self.transportProtected == true then
                 self.MyShield:RevokeTransportProtection()
                 self:DoTakeDamage(instigator, amount, vector, damageType)
             else
@@ -1428,7 +1428,7 @@ Unit = Class(moho.unit_methods) {
 
         --Keep track of the global wreckage count to avoid performance issues
         prop:AddBoundedProp(mass)
-        
+
         prop:SetScale(bp.Display.UniformScale)
         prop:SetOrientation(self:GetOrientation(), true)
         prop:SetPropCollision('Box', bp.CollisionOffsetX, bp.CollisionOffsetY, bp.CollisionOffsetZ, bp.SizeX* 0.5, bp.SizeY* 0.5, bp.SizeZ * 0.5)
@@ -1899,7 +1899,7 @@ Unit = Class(moho.unit_methods) {
                 end
             end
         end
-        
+
         self.originalBuilder = builder
 
         --Rebuild bonus check 1. Added by Brute51
@@ -2016,7 +2016,7 @@ Unit = Class(moho.unit_methods) {
         end
         self:PlayUnitSound('DoneBeingBuilt')
         self:PlayUnitAmbientSound( 'ActiveLoop' )
-        
+
         if self.DisallowCollisions and builder then
             --Set correct hitpoints after upgrade
             local hpDamage = builder:GetMaxHealth() - builder:GetHealth() --Current damage
@@ -2635,7 +2635,7 @@ Unit = Class(moho.unit_methods) {
                 end
             end
         end
-        
+
         if bp.UpgradeUnitAmbientBones then
             for k, v in bp.UpgradeUnitAmbientBones do
                 if self:IsValidBone(v) then
@@ -3552,7 +3552,7 @@ Unit = Class(moho.unit_methods) {
             error('*ERROR: Tried to add a unit buff in unit.lua but got no buff table.  Wierd.', 1)
             return
         end
-        
+
         --When adding debuffs we have to make sure that we check for permissions
         local allow = categories.ALLUNITS
         if buffTable.TargetAllow then
@@ -3708,7 +3708,7 @@ Unit = Class(moho.unit_methods) {
     SetVeteranLevel = function(self, level)
         local old = self.VeteranLevel
         self.VeteranLevel = level
-        
+
         --Apply default veterancy buffs
         local buffTypes = { 'Regen', 'Health', }
         local notUsingMaxHealth = self:GetBlueprint().MaxHealthNotAffectHealth
@@ -4289,7 +4289,7 @@ Unit = Class(moho.unit_methods) {
         }
         return ( self.BuffFields[name](spec) )
     end,
-    
+
     --Removes engine forced attachment bones for transports
     RemoveTransportForcedAttachPoints = function(self)
         --This cancels the weird attachment bone manipulations, so transported units attach to the correct positions
@@ -4381,7 +4381,7 @@ Unit = Class(moho.unit_methods) {
             if nukeCount > lastTimeNukeCount then
                 self:OnSMLAmmoIncrease()
             end
-            
+
             if tacticalCount > lastTimeTacticalCount then
                 self:OnTMLAmmoIncrease()
             end
