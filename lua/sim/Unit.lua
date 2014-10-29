@@ -2211,6 +2211,7 @@ Unit = Class(moho.unit_methods) {
             local newHealthAmount = builder:GetMaxHealth() * (1-damagePercent) -- HP for upgraded building
             builder:SetHealth(builder, newHealthAmount) -- seems like the engine uses builder to determine new HP
             self.DisallowCollisions = false
+            self:SetCanTakeDamage(true)
         end
 
         -- Turn off land bones if this unit has them.
@@ -2437,6 +2438,7 @@ Unit = Class(moho.unit_methods) {
         self:PlayUnitAmbientSound('ConstructLoop')
         if bp.General.UpgradesTo and unitBeingBuilt:GetUnitId() == bp.General.UpgradesTo and order == 'Upgrade' then
             unitBeingBuilt.DisallowCollisions = true
+            unitBeingBuilt:SetCanTakeDamage(false)
         end
         
         if unitBeingBuilt:GetBlueprint().Physics.FlattenSkirt and not unitBeingBuilt:HasTarmac() then
