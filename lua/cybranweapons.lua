@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/cybranweapons.lua
-#**  Author(s):  David Tomandl, John Comes, Gordon Duclos
-#**
-#**  Summary  :  Cybran weapon definitions
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/cybranweapons.lua
+--**  Author(s):  David Tomandl, John Comes, Gordon Duclos
+--**
+--**  Summary  :  Cybran weapon definitions
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
 local KamikazeWeapon = WeaponFile.KamikazeWeapon
@@ -42,7 +42,7 @@ CDFOverchargeWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.CMolecularRipperOverChargeFlash01,
 }
 
-# COMMANDER ENHANCEMENT WEAPON!
+-- COMMANDER ENHANCEMENT WEAPON!
 CDFHeavyMicrowaveLaserGeneratorCom = Class(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.MicrowaveLaserCollisionBeam02,
     FxMuzzleFlash = {},
@@ -55,15 +55,15 @@ CDFHeavyMicrowaveLaserGeneratorCom = Class(DefaultBeamWeapon) {
         local army = self.unit:GetArmy()
         local bp = self:GetBlueprint()
         for k, v in self.FxUpackingChargeEffects do
-            for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do 
-                CreateAttachedEmitter(self.unit, ev, army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)  
+            for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
+                CreateAttachedEmitter(self.unit, ev, army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
             end
         end
         DefaultBeamWeapon.PlayFxWeaponUnpackSequence(self)
     end,
 }
 
-# SPIDER BOT WEAPON!
+-- SPIDER BOT WEAPON!
 CDFHeavyMicrowaveLaserGenerator = Class(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.MicrowaveLaserCollisionBeam01,
     FxMuzzleFlash = {},
@@ -105,8 +105,8 @@ CDFHeavyMicrowaveLaserGenerator = Class(DefaultBeamWeapon) {
             local army = self.unit:GetArmy()
             local bp = self:GetBlueprint()
             for k, v in self.FxUpackingChargeEffects do
-                for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do 
-                    CreateAttachedEmitter(self.unit, ev, army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)  
+                for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
+                    CreateAttachedEmitter(self.unit, ev, army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
                 end
             end
             DefaultBeamWeapon.PlayFxWeaponUnpackSequence(self)
@@ -175,12 +175,12 @@ CDFMissileMesonWeapon = Class(DefaultProjectileWeapon) {
 }
 
 CIFCommanderDeathWeapon = Class(BareBonesWeapon) {
-    FiringMuzzleBones = {0}, # just fire from the base bone of the unit
+    FiringMuzzleBones = {0}, -- just fire from the base bone of the unit
 
     OnCreate = function(self)
         BareBonesWeapon.OnCreate(self)
         local myBlueprint = self:GetBlueprint()
-        # The "or x" is supplying default values in case the blueprint doesn't have an overriding value
+        -- The "or x" is supplying default values in case the blueprint doesn't have an overriding value
         self.Data = {
             NukeOuterRingDamage = myBlueprint.NukeOuterRingDamage or 10,
             NukeOuterRingRadius = myBlueprint.NukeOuterRingRadius or 40,
@@ -194,11 +194,11 @@ CIFCommanderDeathWeapon = Class(BareBonesWeapon) {
         }
         self:SetWeaponEnabled(false)
     end,
-        
+
     OnFire = function(self)
 
     end,
-    
+
     Fire = function(self)
         local myBlueprint = self:GetBlueprint()
         local myProjectile = self.unit:CreateProjectile( myBlueprint.ProjectileId, 0, 0, 0, nil, nil, nil):SetCollision(false)
@@ -284,7 +284,7 @@ CAANanoDartWeapon = Class(DefaultProjectileWeapon) {
 CAABurstCloudFlakArtilleryWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {
 		'/effects/emitters/default_muzzle_flash_01_emit.bp',
-        '/effects/emitters/default_muzzle_flash_02_emit.bp' 
+        '/effects/emitters/default_muzzle_flash_02_emit.bp'
     },
     FxMuzzleFlashScale = 1.5,
 
@@ -310,11 +310,11 @@ CAABurstCloudFlakArtilleryWeapon = Class(DefaultProjectileWeapon) {
 }
 
 CAAMissileNaniteWeapon = Class(DefaultProjectileWeapon) {
-	# Uses default muzzle flash
+	-- Uses default muzzle flash
 }
 
 CIFGrenadeWeapon = Class(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_02_emit.bp',}, 
+    FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_02_emit.bp',},
 }
 
 CIFArtilleryWeapon = Class(DefaultProjectileWeapon) {
@@ -333,12 +333,12 @@ CIFMissileLoaTacticalWeapon = Class(DefaultProjectileWeapon) {
 }
 
 CIFBombNeutronWeapon = Class(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_02_emit.bp',}, 
+    FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_02_emit.bp',},
 }
 
 CIFNaniteTorpedoWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_02_emit.bp',},
-    
+
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
@@ -380,7 +380,7 @@ CAMZapperWeapon = Class(DefaultBeamWeapon) {
     SphereEffectActiveMesh = '/effects/entities/cybranphalanxsphere01/cybranphalanxsphere02_mesh',
     SphereEffectBp = '/effects/emitters/zapper_electricity_01_emit.bp',
     SphereEffectBone = 'Turret_Muzzle',
-    
+
     OnCreate = function(self)
         DefaultBeamWeapon.OnCreate(self)
 
@@ -391,7 +391,7 @@ CAMZapperWeapon = Class(DefaultBeamWeapon) {
         self.SphereEffectEntity:SetVizToAllies('Intel')
         self.SphereEffectEntity:SetVizToNeutrals('Intel')
         self.SphereEffectEntity:SetVizToEnemies('Intel')
-        
+
         local emit = CreateAttachedEmitter( self.unit, self:GetBlueprint().RackBones[1].MuzzleBones[1], self.unit:GetArmy(), self.SphereEffectBp )
 
         self.unit.Trash:Add(self.SphereEffectEntity)
@@ -412,7 +412,7 @@ CAMZapperWeapon = Class(DefaultBeamWeapon) {
     OnLostTarget = function(self)
         DefaultBeamWeapon.OnLostTarget(self)
         self.SphereEffectEntity:SetMesh(self.SphereEffectIdleMesh)
-    end,    
+    end,
 }
 
 CAMZapperWeapon02 = Class(DefaultBeamWeapon) {
@@ -438,32 +438,32 @@ CMobileKamikazeBombWeapon = Class(KamikazeWeapon){
 		local army = self.unit:GetArmy()
         for k, v in self.FxDeath do
             CreateEmitterAtBone(self.unit,-2,army,v)
-        end   
-        ####CreateLightParticle( self.unit, -1, -1, 15, 10, 'flare_lens_add_02', 'ramp_red_10' ) 
+        end
+        --CreateLightParticle( self.unit, -1, -1, 15, 10, 'flare_lens_add_02', 'ramp_red_10' )
 		KamikazeWeapon.OnFire(self)
     end,
 }
 
 CMobileKamikazeBombDeathWeapon = Class(BareBonesWeapon) {
 	FxDeath = EffectTemplate.CMobileKamikazeBombDeathExplosion,
-    
+
     OnCreate = function(self)
         BareBonesWeapon.OnCreate(self)
-        self:SetWeaponEnabled(false)   
+        self:SetWeaponEnabled(false)
     end,
-    
+
 
     OnFire = function(self)
     end,
-    
+
     Fire = function(self)
 		local army = self.unit:GetArmy()
         for k, v in self.FxDeath do
             CreateEmitterAtBone(self.unit,-2,army,v)
-        end 
-        ###CreateLightParticle( self.unit, -1, -1, 15, 10, 'flare_lens_add_02', 'ramp_red_10' )  
+        end
+        --CreateLightParticle( self.unit, -1, -1, 15, 10, 'flare_lens_add_02', 'ramp_red_10' )
 		local myBlueprint = self:GetBlueprint()
         DamageArea(self.unit, self.unit:GetPosition(), myBlueprint.DamageRadius, myBlueprint.Damage, myBlueprint.DamageType or 'Normal', myBlueprint.DamageFriendly or false)
-    end,    
+    end,
 }
 
