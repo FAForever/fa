@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Cybran weapon definitions
 --**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
@@ -74,7 +74,8 @@ CDFHeavyMicrowaveLaserGenerator = Class(DefaultBeamWeapon) {
     IdleState = State(DefaultBeamWeapon.IdleState) {
         Main = function(self)
             if self.RotatorManip then
-                self.RotatorManip:SetSpeed(0)
+                self.RotatorManip:SetTargetSpeed(0)
+                self.RotatorManip:SetAccel(90)
             end
             if self.SliderManip then
                 self.SliderManip:SetGoal(0,0,0)
@@ -93,7 +94,8 @@ CDFHeavyMicrowaveLaserGenerator = Class(DefaultBeamWeapon) {
             self.RotatorManip = CreateRotator(self.unit, 'Center_Turret_Barrel', 'z')
             self.unit.Trash:Add(self.RotatorManip)
         end
-        self.RotatorManip:SetSpeed(180)
+        self.RotatorManip:SetTargetSpeed(500)
+        self.RotatorManip:SetAccel(200)
         self.SliderManip:SetPrecedence(11)
         self.SliderManip:SetGoal(0, 0, -1)
         self.SliderManip:SetSpeed(-1)
@@ -108,6 +110,9 @@ CDFHeavyMicrowaveLaserGenerator = Class(DefaultBeamWeapon) {
                 for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
                     CreateAttachedEmitter(self.unit, ev, army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
                 end
+            end
+            if self.RotatorManip then
+                self.RotatorManip:SetTargetSpeed(179)
             end
             DefaultBeamWeapon.PlayFxWeaponUnpackSequence(self)
         end
