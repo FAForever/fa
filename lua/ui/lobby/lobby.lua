@@ -1269,7 +1269,7 @@ local function AssignRandomStartSpots(gameInfo)
     end
 end
 
-local function AssignRandomTeams(gameInfo)
+local function AssignAutoTeams(gameInfo)
     -- first, send all observers
 
     if gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
@@ -1278,11 +1278,10 @@ local function AssignRandomTeams(gameInfo)
             if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
                 local markerPos = GUI.mapView.startPositions[i].Left()
                 if markerPos < midLine then
-                    gameInfo.PlayerOptions[i].Team = 2
+                    SetPlayerOption(i, "Team", 2, true)
                 else
-                    gameInfo.PlayerOptions[i].Team = 3
+                    SetPlayerOption(i, "Team", 3, true)
                 end
-                SetSlotInfo(i, gameInfo.PlayerOptions[i])
             end
         end
     elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
@@ -1291,38 +1290,21 @@ local function AssignRandomTeams(gameInfo)
             if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
                 local markerPos = GUI.mapView.startPositions[i].Top()
                 if markerPos < midLine then
-                    gameInfo.PlayerOptions[i].Team = 2
+                    SetPlayerOption(i, "Team", 2, true)
                 else
-                    gameInfo.PlayerOptions[i].Team = 3
+                    SetPlayerOption(i, "Team", 3, true)
                 end
-                SetSlotInfo(i, gameInfo.PlayerOptions[i])
             end
         end
-    elseif gameInfo.GameOptions['AutoTeams'] == 'manual' and gameInfo.GameOptions['TeamSpawn'] == 'random' then
+    elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' or gameInfo.GameOptions['RandomMap'] ~= 'Off' then
         for i = 1, LobbyComm.maxPlayerSlots do
             if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
-                gameInfo.PlayerOptions[i].Team = gameInfo.AutoTeams[i]
-                SetSlotInfo(i, gameInfo.PlayerOptions[i])
-            end
-        end
-    end
-    if gameInfo.GameOptions['AutoTeams'] == 'pvsi' or gameInfo.GameOptions['RandomMap'] ~= 'Off' then
-        for i = 1, LobbyComm.maxPlayerSlots do
-            if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
-                if math.mod(i, 2) ~= 0 then
-                    gameInfo.PlayerOptions[i].Team = 2
-                else
-                    gameInfo.PlayerOptions[i].Team = 3
-                end
-                SetSlotInfo(i, gameInfo.PlayerOptions[i])
-            end
-        end
-    end
 
-    if gameInfo.GameOptions['AutoTeams'] == 'none' then
-        for i = 1, LobbyComm.maxPlayerSlots do
-            if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
-                SetSlotInfo(i, gameInfo.PlayerOptions[i])
+                if math.mod(i, 2) ~= 0 then
+                    SetPlayerOption(i, "Team", 2, true)
+                else
+                    SetPlayerOption(i, "Team", 3, true)
+                end
             end
         end
     end
@@ -1594,10 +1576,6 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
     numberOfPlayers = totalPlayers
 
     local function LaunchGame()
-
-        -- Send observer list again, just by precaution.
-        sendObserversList(gameInfo)
-
         if gameInfo.GameOptions['RandomMap'] ~= 'Off' then
             autoRandMap = true
             autoMap()
@@ -1608,7 +1586,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         AssignRandomFactions(gameInfo)
         AssignRandomStartSpots(gameInfo)
         --assign the teams just before launch
-        AssignRandomTeams(gameInfo)
+        AssignAutoTeams(gameInfo)
         randstring = randomString(16, "%l%d")
         gameInfo.GameOptions['ReplayID'] = randstring
         AssignAINames(gameInfo)
@@ -1786,8 +1764,22 @@ local function UpdateGame()
     GUI.allowObservers:SetCheck(gameInfo.GameOptions.AllowObservers, true)
 
     RefreshOptionDisplayData(scenarioInfo)
-    -- Send autoteams infos to server.
-    AssignRandomTeams(gameInfo)
+
+    -- Disable team selection for Auto Teams
+    do
+        local autoTeams = gameInfo.GameOption['AuoTeams']
+        if autoTeams == 'none' or
+           (autoTeams == 'manual' and lobbyComm:IsHost())
+          then
+            for i= 1, LobbyComm.maxPlayerSlots do
+                GUI.slots[i].team:Enable()
+            end
+        else
+            for i= 1, LobbyComm.maxPlayerSlots do
+                GUI.slots[i].team:Disable()
+            end
+        end
+    end
 
     -- Update the map background to reflect the possibly-changed map.
     if Prefs.GetFromCurrentProfile('LobbyBackground') == 4 then
@@ -2140,6 +2132,8 @@ function HostTryAddPlayer(senderID, slot, requestedPlayerName, human, aiPersonal
         gameInfo.PlayerOptions[newSlot].Country = requestedCOUNTRY
     end
 
+    AssignAutoTeams(gameInfo)
+
     if lobbyComm:IsHost() then
         for k,v in gameInfo.PlayerOptions[newSlot] do
             GpgNetSend('PlayerOption', newSlot, k, v)
@@ -2196,6 +2190,7 @@ function HostTryMovePlayer(senderID, currentSlot, requestedSlot)
         }
     )
 
+    AssignAutoTeams(gameInfo)
     UpdateGame()
 end
 
@@ -3549,29 +3544,29 @@ function CreateUI(maxPlayers)
     end
     
     -- AUTO TEAM BUTTON -- start of auto teams code.
-    GUI.randTeam = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/autoteam/')
-    LayoutHelpers.RightOf(GUI.randTeam, GUI.randMap, -19)
-    Tooltip.AddButtonTooltip(GUI.randTeam, 'lob_click_randteam')
+    GUI.autoTeams = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/autoteam/')
+    LayoutHelpers.RightOf(GUI.autoTeams, GUI.randMap, -19)
+    Tooltip.AddButtonTooltip(GUI.autoTeams, 'lob_click_randteam')
     if not isHost then
-        GUI.randTeam:Hide()
+        GUI.autoTeams:Hide()
     else
-        GUI.randTeam.OnClick = function(self, modifiers)
-            if gameInfo.GameOptions['AutoTeams'] == 'none' then
-                SetGameOption('AutoTeams', 'tvsb')
-                SendSystemMessage("Auto Teams option set: Top vs Bottom")
-            elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
-                SetGameOption('AutoTeams', 'lvsr')
-                SendSystemMessage("Auto Teams option set: Left vs Right")
-            elseif gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
-                SetGameOption('AutoTeams', 'pvsi')
-                SendSystemMessage("Auto Teams option set: Even Slots vs Odd Slots")
-            elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' then
-                SetGameOption('AutoTeams', 'manual')
-                SendSystemMessage("Auto Teams option set: Manual Select")
-            else
-                SetGameOption('AutoTeams', 'none')
-                SendSystemMessage("Auto Teams option set: None")
-            end
+        GUI.autoTeams.OnClick = function(self, modifiers)
+            local next_states =
+            {
+                none = {'tvsb', 'Top vs Bottom', 2},
+                tvsb = {'lvsr', 'Left vs Right', 3},
+                lvsr = {'pvsi', 'Even Slots vs Odd Slots', 4},
+                pvsi = {'manual', 'Manual Select', 5},
+                manual = {'none', 'None', 1},
+            }
+            local next_state = next_states[gameInfo.GameOptions['AutoTeams']]
+
+            Prefs.SetToCurrentProfile('Lobby_Auto_Teams', next_state[3])
+            SetGameOption('AutoTeams', next_state[1])
+            SendSystemMessage("Auto Teams option set: "..next_state[2])
+
+            AssignAutoTeams(gameInfo)
+            UpdateGame()
         end
     end
     
@@ -3634,7 +3629,7 @@ function CreateUI(maxPlayers)
 
         GUI.allowObservers:Hide()
         GUI.becomeObserver:Hide()
-        GUI.randTeam:Hide()
+        GUI.autoTeams:Hide()
         GUI.defaultOptions:Hide()
         GUI.rerunBenchmark:Hide()
         GUI.randMap:Hide()
@@ -3677,12 +3672,10 @@ function CreateUI(maxPlayers)
         end
     end)
 
-    -- CPU Benchmark code
     if not singlePlayer then
         CreateCPUMetricUI()
         ForkThread(function() StressCPU(10) end)
     end
-    -- End CPU Benchmark code
 
     GUI.uiCreated = true
 end
@@ -4160,10 +4153,18 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     lobbyComm.DataReceived = function(self,data)
         -- Messages anyone can receive
         if data.Type == 'PlayerOption' then
-            if gameInfo.PlayerOptions[data.Slot].OwnerID ~= data.SenderID then
-                WARN("Attempt to set option on unowned slot.")
-                return
+            if data.SenderID ~= hostID then
+                if gameInfo.PlayerOptions[data.Slot].OwnerID ~= data.SenderID then
+                    WARN("Attempt to set option on unowned slot.")
+                    return
+                end
+
+                if data.Key == "Team" and gameInfo.GameOption["AutoTeams"] ~= 'none' then
+                    WARN("Attempt to set Team while Auto Teams are on.")
+                    return
+                end
             end
+
             if lobbyComm:IsHost() then
                 GpgNetSend('PlayerOption', data.Slot, data.Key, data.Value)
             end
@@ -4212,9 +4213,13 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             elseif data.Type == 'RequestConvertToPlayer' then
                 HostConvertObserverToPlayer(data.SenderID, data.RequestedName, data.ObserverSlot, data.PlayerSlot,
                                             data.requestedFaction, data.requestedPL, data.requestedRC, data.requestedNG)
+                AssignAutoTeams(gameInfo)
+                UpdateGame()
             elseif data.Type == 'RequestConvertToPlayerWithoutSlot' then
                 HostConvertObserverToPlayerWithoutSlot(data.SenderID, data.RequestedName, data.ObserverSlot,
                                                     data.requestedFaction, data.requestedPL, data.requestedRC, data.requestedNG)
+                AssignAutoTeams(gameInfo)
+                UpdateGame()
             elseif data.Type == 'RequestColor' then
                 if IsColorFree(data.Color) then
                     -- Color is available, let everyone else know
@@ -4339,9 +4344,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 UpdateGame()
             elseif data.Type == 'SlotOpen' then
                 gameInfo.ClosedSlots[data.Slot] = nil
-                UpdateGame()
-            elseif data.Type == 'AutoTeams' then
-                gameInfo.AutoTeams[data.Slot] = data.Team
                 UpdateGame()
             end
         end
@@ -4546,7 +4548,7 @@ end
 function SetPlayerOption(slot, key, val, ignoreRefresh)
     ignoreRefresh = ignoreRefresh or false
 
-    if not IsLocallyOwned(slot) then
+    if not IsLocallyOwned(slot) and not lobbyComm:IsHost() then
         WARN("Hey you can't set a player option on a slot you don't own. (slot:"..tostring(slot).." / key:"..tostring(key).." / val:"..tostring(val)..")")
         return
     end
