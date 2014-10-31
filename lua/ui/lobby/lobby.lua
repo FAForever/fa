@@ -4753,9 +4753,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 				--lobui_0226 = Move Player to Observer
 				--lobui_0227 = Move Observer to Player
 				--lobui_0205 = Timed Out
-				if data.Id == "Engine0004" or data.Id == "Engine0005" then
-					AddChatText('<<<ENGINE000X !!!>>>')
-				end
 				if data.Id == 'lobui_0202' or data.Id == 'lobui_0226' or data.Id == 'lobui_0227' or data.Id == 'lobui_0205' or data.Id == 'switch' then
 					local XinnoSystemMessage = Prefs.GetFromCurrentProfile('XinnoSystemMessage') or 'false'
 					if XinnoSystemMessage == 'true' then
