@@ -4226,7 +4226,7 @@ function CreateUI(maxPlayers)
 				if XinnoSystemMessage == 'true' then
 					if not table.find(ConnexionEtablished, peer.name) then
 						AddChatText('<< '..peer.name..' >> '..FindSlotForID(peer.id))
-						if playerInfo.Human and IsLocallyOwned(FindSlotForID(peer.id)) then
+						if gameInfo.PlayerOptions[FindSlotForID(peer.id)].Human and IsLocallyOwned(FindSlotForID(peer.id)) then
 							if table.find(ConnectedWithProxy, peer.id) then
 								AddChatText(LOCF("<LOC Xngine0004>Connection to %s established.", peer.name)..' (FAF Proxy)', "Xngine0004")
 							else
