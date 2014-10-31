@@ -1455,14 +1455,13 @@ function SendSystemMessage(text, id)
 		Id = id or '',
     }
     lobbyComm:BroadcastData(data)
-	if data.Id == "Engine0004" or data.Id == "Engine0005" then
-		AddChatText('<<<ENGINE000X !!!>>>')
-	end
 	if data.Id == 'lobui_0202' or data.Id == 'lobui_0226' or data.Id == 'lobui_0227' or data.Id == 'lobui_0205' or data.Id == 'switch' then
 		local XinnoSystemMessage = Prefs.GetFromCurrentProfile('XinnoSystemMessage') or 'false'
 		if XinnoSystemMessage == 'true' then
 			AddChatText(text)
 		end
+	else
+		AddChatText(text)
 	end
 end
 
@@ -3448,111 +3447,9 @@ function CreateUI(maxPlayers)
             LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].color, GUI.slots[i], 9)
             GUI.slots[i].color.Width:Set(slotColumnSizes.color.width)
             GUI.slots[i].color.row = i
-            
-			--
-			
---			GUI.slots[i].color.OnEvent = function(self, event)
---                if event.Type == 'ButtonPress' then
---					AddChatText('> Clik')
---					ALL_Color[slot] = gameColors.PlayerColors
---					AddChatText('> Table.getn : '..table.getn(ALL_Color[slot]))
---					for k, v in gameColors.PlayerColors do
---						for ii= 1, LobbyComm.maxPlayerSlots do
---							if gameInfo.PlayerOptions[ii].PlayerColor then
---								if FindSlotForID(FindIDForName(localPlayerName)) != ii then
-									--AddChatText('> color : '..gameInfo.PlayerOptions[ii].PlayerColor..' == '..k)
---									if gameInfo.PlayerOptions[ii].PlayerColor == k then -- SI UN PLAYER A LA COULEUR
---										AddChatText('> MATCH and REMOVE the Color')
---										AddChatText('> color : '..gameInfo.PlayerOptions[ii].PlayerColor..' == '..k)
---										table.remove(ALL_Color[slot], k)
-										--self._list[k]:Destroy()
-										--self._listbmp[k]:Destroy()
-										--self._listhilight[k]:Destroy()
---										self:ChangeBitmapArray(ALL_Color[slot], true)
-										--self._listbmp[k] = nil
-										--self._listhilight[k] = nil
-										--ALL_Color[slot][v] = nil
---										AddChatText('> Table.getn : '..table.getn(ALL_Color[slot]))
---									end
---								end
---							end
---						end
-					
-						--if GUI.slots[i].color._list then
-							--for k,v in GUI.slots[i].color._list do
-								--v:Destroy()
-							--end
-						--end
-						
-						--GUI.slots[i].color._list[index]._index = ctrl
-						--GUI.slots[i].color:SetItem(ctrl._index)
-						--GUI.slots[i].color:OnClick(ctrl._index, self._array[ctrl._index])
-						
-						--GUI.slots[i].color._array = ALL_Color[slot]
-						--self._bitmap:SetSolidColor(self._array[index])
-						--BitmapCombo.__init.ChangeBitmapArray = function( GUI.slots[i].color, ALL_Color[slot], true )
-						--test = import('/lua/ui/controls/combo.lua').BitmapCombo2.ChangeBitmapArray
-						--test(GUI.slots[i].color, ALL_Color[slot], true)
-						--GUI.slots[i].color:ClearItems()
-							--self._visibleItems:Set(0)
-							--GUI.slots[i].color._list:DeleteAllItems()
-							--self._text:SetText("")
-							--if self._scrollbar then
-								--self._scrollbar:Destroy()
-								--self._scrollbar = nil
-							--end
-						--end,
-						
-						--local CELF = GUI.slots[i].color
-						--CELF._array = ALL_Color[slot]
-						--if CELF._list then
-							--for k,v in CELF._list do
-								--v:Destroy()
-							--end
-						--end
-						--CELF._list = {}
-						--CELF._listbmp = {}
-						--CELF._listhilight = {}
-						
---					end
-					--self:Destroy()
-					--GUI.slots[i].color = BitmapCombo(bg, ALL_Color[slot], 1, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
-					--LayoutHelpers.AtLeftIn(GUI.slots[i].color, GUI.panel, slotColumnSizes.color.x)
-					--LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].color, GUI.slots[i], 9)
-					--GUI.slots[i].color.Width:Set(slotColumnSizes.color.width)
-					--GUI.slots[i].color.row = i
-					
-					--GUI.slots[i].color.__init:ChangeBitmapArray(ALL_Color[slot],true)
-					------------self:ChangeBitmapArray(ALL_Color[slot], true)
---				end
---			end
-			GUI.slots[i].color.OnClick = function(self, index, text)
-                AddChatText('> Clic')
-            end
-			GUI.slots[i].color.GetItem = function(self)
-				AddChatText('> GetItem')
-            end
-			GUI.slots[i].color.OnEvent = function(self, event)
-                if event.Type == 'ButtonPress' then
-					AddChatText('> Clik')
-				end
-			end
-			
-			
-			
-			--> Apres avoir l'index du ALLcolor = 3 (exemple)
-			--> Prendre la couleur ALLcolor[3] = #C (exemple)
-			--> Chercher la couleur avec TABLE et recupérée l'index
-			
-			
-			
 			GUI.slots[i].color.OnClick = function(self, index)
                 AddChatText('> OnClick (i:'..index..')')
-				--Check_Availaible_Color(GUI.slots[i].color, i)
 				Get_IndexColor_by_CompleteTable(index, i)
-				--AddChatText('> OnClick (i:'..self._color:Get()..')')
-				--AddChatText('> '..self.GetItem(GUI.slots[i].color))
-				--
 				Tooltip.DestroyMouseoverDisplay()
                 if not lobbyComm:IsHost() then
                     lobbyComm:SendData(hostID, { Type = 'RequestColor', Color = index, Slot = self.row } )
@@ -3574,28 +3471,6 @@ function CreateUI(maxPlayers)
             Tooltip.AddControlTooltip(GUI.slots[i].color, 'lob_color')
             GUI.slots[i].color.row = i
 			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-
             --// Faction
             GUI.slots[i].faction = BitmapCombo(bg, factionBmps, table.getn(factionBmps), nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
             LayoutHelpers.AtLeftIn(GUI.slots[i].faction, GUI.panel, slotColumnSizes.faction.x)
