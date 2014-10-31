@@ -9,7 +9,14 @@ type = {
 --]]
 
 restrictedUnits = {
-    ENGISTATION = {
+    TRYENGISTATION = {
+        categories = {"xeb0104", "xrb0104"},
+		enhancement = {"LeftPod", "RightPod", "LeftPodRemove", "RightPodRemove", "Pod", "PodRemove"},
+        name = "TRY No Engineering Station + Enhancement Drone (SACU NOT WORK)",
+        tooltip = {text='TRY No Engineering Station + Enhancement Drone (SACU NOT WORK)', body='Remove Kennel, Hive and Drone S/ACU [SACU NOT WORK] (by Xinnony)'},
+        --"No Kennel and Hive (Engineering Station) by Xinnony",
+    },
+	ENGISTATION = {
         categories = {"xeb0104", "xrb0104"},
         name = "No Engineering Station",
         tooltip = {text='No Engineering Station', body='Remove Kennel and Hive (by Xinnony)'},
@@ -32,12 +39,12 @@ restrictedUnits = {
     },
     TELE = {
         enhancement = {"Teleporter", "TeleporterRemove"},
-        name = "No Teleport (FIXED)",
+        name = "No Teleport",
         tooltip = {text='No Teleport', body='Remove Teleport Upgrade on the UEF Commander (by Xinnony)'},
     },
     BILLY = {
         enhancement = {"TacticalNukeMissile", "TacticalNukeMissileRemove"},
-        name = "No Billy (FIXED)",
+        name = "No Billy",
         tooltip = {text='No Billy', body='Remove Billy (Nuke) Upgrade on the UEF Commander (by Xinnony)'},
     },
     T1 = {
@@ -101,7 +108,7 @@ restrictedUnits = {
         tooltip = "restricted_uints_nukes",
     },
     GAMEENDERS = {
-                                ---ArtyAEO---ArtyUEF---ArtyCYB---ArtySER---Paragon---Salvation---Scathis---Satellite---Mavor---Yolona Oss
+                                ---ArtyAEO---ArtyUEF---ArtyCYB-------ArtySER-----Paragon----Salvation---Scathis------Satellite------Mavor---Yolona Oss
         categories = {"uab2302", "urb2302", "ueb2302", "xsb2302", "xab1401", "xab2307", "url0401", "xeb2402", "ueb2401", "xsb2401"},
         name = "<LOC restricted_units_data_0012>No Game Enders",
         tooltip = "restricted_uints_gameenders",
@@ -182,4 +189,5 @@ sortOrder = {
     "SALVAMAVOSCATH",
     "PARAGON",
     "SATELLITE",
+	"TRYENGISTATION",
 }

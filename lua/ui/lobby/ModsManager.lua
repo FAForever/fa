@@ -340,6 +340,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 		end
 		
 		-- TRIE LES MOD ACTIFS EN HAUT ET LE RESTE ALPHABETIQUEMENT
+		LOG('<<<<<'..table.getn(current_list)..'>>>>>')
 		table.sort(current_list, function(a,b) 
 			if selmods[a.uid] and selmods[b.uid] then
 				return a.name < b.name
