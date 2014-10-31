@@ -6,7 +6,7 @@
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
 
-LOBBYversion = 'v2.5 - TEST'
+LOBBYversion = 'v2.5'
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
@@ -89,10 +89,8 @@ CurrentConnexion = {} -- by Name
 ConnexionEtablished = {} -- by Name
 ConnectedWithProxy = {} -- by UID
 
-ALL_Color = {} -- Color Availaible
---Avail_Color = {} -- Color Only Availaible
-Avail_Color = {}
-BASE_ALL_Color = gameColors.PlayerColors -- Copie la table de couleur
+Avail_Color = {} -- Color Only Availaible
+BASE_ALL_Color = gameColors.PlayerColors -- Copy color table
 
 local availableMods = {} -- map from peer ID to set of available mods; each set is a map from "mod id"->true
 local selectedMods = nil
@@ -7416,7 +7414,7 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
         if check_Map_Exist(profiles[Selected_Preset].MapPath) == true then
 			SetGameOption('ScenarioFile', profiles[Selected_Preset].MapPath, false, true)
 		else
-			AddChatText('MAP INEXISTANTE !')
+			AddChatText('MAP NOT EXIST !')
 		end
         --gameInfo.GameOptions['ScenarioFile'] = profiles[Selected_Preset].MapPath
         --Prefs.SetToCurrentProfile('LastScenario', profiles[Selected_Preset].MapPath)
@@ -7556,11 +7554,8 @@ end
 -- Get the true Index Color --
 function Get_IndexColor_by_AvailableTable(index_limit, slot)
 	-- Retourne l'index couleur de la table imcomplete grace a l'index de la table complete
-	##--AddChatText('>> Get_IndexColor_by_CompleteTable(index: '..index_limit..' | slot: '..slot..') <<')
 	for k, v in BASE_ALL_Color do
-		##--AddChatText('--> Color:'..v..' | Search:'..Avail_Color[slot][index_limit]..' <<')
 		if v == Avail_Color[slot][index_limit] then
-			##--AddChatText('--> Result : Real Index Color = '..k..' (before:'..index_limit..')')
 			return k
 		end
 	end
@@ -7569,13 +7564,8 @@ end
 
 function Get_IndexColor_by_CompleteTable(index_limit, slot)
 	-- Retourne l'index couleur de la table complete grace a l'index de la table imcomplete
-	##--AddChatText('>> Get_IndexColor_by_CompleteTable(index: '..index_limit..' | slot: '..slot..') <<')
 	for k, v in Avail_Color[slot] do
-		--AddChatText('--> Color:'..v..' | Search:'..Avail_Color[slot][index_limit]..' <<')
-		##--AddChatText('--> Color:'..v..' | Search:'..BASE_ALL_Color[index_limit]..' <<')
-		--if v == Avail_Color[slot][index_limit] then
 		if v == BASE_ALL_Color[index_limit] then
-			##--AddChatText('--> Result : Real Index Color = '..k..' (before:'..index_limit..')')
 			return k
 		end
 	end
@@ -7594,57 +7584,24 @@ function Check_Availaible_Color(self, slot)
     local EffectHelpers = import('/lua/maui/effecthelpers.lua')
     local ItemList = import('/lua/maui/itemlist.lua').ItemList
     local Prefs = import('/lua/user/prefs.lua')
-	--local gameColors = import('/lua/gameColors.lua').GameColors
-	##--AddChatText('>> Check_Available_Color (slot : '..slot..') <<')
-	--
-	--for k, v in gameColors.PlayerColors do
-		--colorIndex = k
-		--for id,player in gameInfo.PlayerOptions do
-			--if player.PlayerColor == colorIndex then
-				--return false
-			--end
-		--end
-		--return true
-	--end
 	--
 	Avail_Color[slot] = {}
 	num = 0
-	--Avail_Color[slot] = BASE_ALL_Color
 	--// CHECK COLOR ALREADY USED AND RECREATE TABLE WITH COLOR AVAILAIBLE ONLY \\
 	for k, v in BASE_ALL_Color do
 		finded = false
-			
 			for ii = 1, LobbyComm.maxPlayerSlots do
 				if gameInfo.PlayerOptions[ii].PlayerColor then
-					--AddChatText('-- IF PlayerColor : '..gameInfo.PlayerOptions[ii].PlayerColor..'('..ii..')')
-					--AddChatText('--> Player:'..ii..' | Name:'..gameInfo.PlayerOptions[ii].PlayerName..' | Slot:'..slot)
 					if slot != ii then
-						--AddChatText('-- IF slot:'..slot..' != ii:'..ii)
-					--if FindSlotForID(FindIDForName(localPlayerName)) != ii then
-						--AddChatText('> color : '..gameInfo.PlayerOptions[ii].PlayerColor..' == '..k)
 						if gameInfo.PlayerOptions[ii].PlayerColor == k then -- SI UN PLAYER A LA COULEUR
-							##--AddChatText('--> Color '..k..' > '..BASE_ALL_Color[k]..' > NOT AVAILABLE with player: '..gameInfo.PlayerOptions[ii].PlayerName..' | slot: '..ii)
 							finded = true
 							break
-							--Avail_Color[slot][k] = '20'..string.sub(Avail_Color[slot][k], 3, -1)
-							--table.remove(Avail_Color[slot], k)
-							--AddChatText('> Color not availaible : '..gameInfo.PlayerOptions[ii].PlayerColor..' = '..k..' ('..table.getn(ALL_Color[slot])..')')
-						else
-							--AddChatText('> ADD : '..BASE_ALL_Color[k]..' ('..ii..'|'..k..'|'..gameInfo.PlayerOptions[ii].PlayerName..')')
-							--table.insert(Avail_Color[slot], BASE_ALL_Color[k])
-							--num = num + 1
-							--Avail_Color[slot][num] = BASE_ALL_Color[k]
 						end
-					else
-						--AddChatText('-- ELSE slot:'..slot..' != ii:'..ii)
 					end
-				else
-					--AddChatText('-- ELSE PlayerColor : '..'('..ii..')')
 				end
 			end
 		
 		if finded != true then
-			--AddChatText('> ADD : '..BASE_ALL_Color[k]..' ('..k..')')
 			num = num + 1
 			Avail_Color[slot][num] = BASE_ALL_Color[k]
 		end
@@ -7655,41 +7612,16 @@ function Check_Availaible_Color(self, slot)
 		return
 	end
 	--
-	##--AddChatText('>> Limited-Table SIZE : '..table.getn(Avail_Color[slot])..' <<')
-	--for k, v in Avail_Color[slot] do
-		--AddChatText('>> Limited-Table : '..k..' : '..v..' <<')
-	--end
-	--
-	--AddChatText('>> get : '..tostring(self:GetItem2())..' <<')
-	--for k, v in self._listbmp[1] do
-		--AddChatText('>> get : '..tostring(v)..' <<')
-	--end
-	--
-	--GUI.slots[slot].color = self
-	--return ALL_Color[slot]
-	--
 	yy = Get_IndexColor_by_CompleteTable(gameInfo.PlayerOptions[slot].PlayerColor, slot)
-	--yy = Get_IndexColor_by_CompleteTable(GUI.slots[slot].color:GetItem(), slot)
-	--for k, v in Avail_Color[slot] do
-		--AddChatText('>> color '..k..' : '..v..' = '..gameColors.PlayerColors[k]..' <<')
-	--end
-	--AddChatText('RESULT = '..yy)
 	--
-	--GUI.slots[slot].color:ChangeBitmapArray(Avail_Color[slot], true)
-	--AddChatText('Finish')
---end
---function hh()
 	GUI.slots[slot].color:Destroy()
-	##--AddChatText('>> Destroy and recreate BitmapCombo <<')
 	GUI.slots[slot].color = BitmapCombo(GUI.slots[slot], Avail_Color[slot], yy, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
-	##--AddChatText('--> Cur_Index : '..GUI.slots[slot].color:GetItem())
 	LayoutHelpers.AtLeftIn(GUI.slots[slot].color, GUI.panel, (161+264)+11)
 	LayoutHelpers.AtVerticalCenterIn(GUI.slots[slot].color, GUI.slots[slot], 9)
 	GUI.slots[slot].color.Width:Set(59)
 	GUI.slots[slot].color.row = slot
 	--
 	GUI.slots[slot].color.OnClick = function(self, index)
-		##--AddChatText('> OnClick (i:'..index..')')
 		indexx = Get_IndexColor_by_AvailableTable(index, slot)
 		--
 		Tooltip.DestroyMouseoverDisplay()
@@ -7712,7 +7644,6 @@ function Check_Availaible_Color(self, slot)
 	GUI.slots[slot].color.OnEvent = GUI.slots[slot].name.OnEvent
 	Tooltip.AddControlTooltip(GUI.slots[slot].color, 'lob_color')
 	GUI.slots[slot].color.row = slot
-	##--AddChatText('Finish')
 end
 
 #
