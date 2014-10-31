@@ -5,10 +5,24 @@
 --      name = "name to display in list",
 --      tooltip = tooltipID,
 --  }
+-- 
+-- You can get the UnitID here : http://content.faforever.com/faf/unitsDB/
 -----------------------------------------------------------------------------------------
 
 restrictedUnits = {
-    ENGISTATION = {
+    EYED = {
+	    categories = {"xab3301", "xrb3301"},
+        name = "No Eye of Rhianne and Soothsayer",
+        tooltip = {text='No Eye of Rhianne and Soothsayer', body='Remove the T3 Optics Aeon and T3 Perimeter Cybran (by Xinnony)'},
+    },
+	TRYENGISTATION = {
+        categories = {"xeb0104", "xrb0104"},
+		enhancement = {"LeftPod", "RightPod", "LeftPodRemove", "RightPodRemove", "Pod", "PodRemove"},
+        name = "TRY No Engineering Station + Enhancement Drone (SACU NOT WORK)",
+        tooltip = {text='TRY No Engineering Station + Enhancement Drone (SACU NOT WORK)', body='Remove Kennel, Hive and Drone S/ACU [SACU NOT WORK] (by Xinnony)'},
+        --"No Kennel and Hive (Engineering Station) by Xinnony",
+    },
+	ENGISTATION = {
         categories = {"xeb0104", "xrb0104"},
         name = "<LOC restricted_units_data_023>No Engineering Stations",
         tooltip = {text = 'No Engineering Stations', body = 'Removes the Kennel and Hive'},
@@ -99,6 +113,7 @@ restrictedUnits = {
         tooltip = {text = 'No Nukes', body = 'Prevents all Nukes being built, apart from the UEF "Billy" nuke'},
     },
     GAMEENDERS = {
+                                ---ArtyAEO---ArtyUEF---ArtyCYB-------ArtySER-----Paragon----Salvation---Scathis------Satellite------Mavor---Yolona Oss
         categories = {"uab2302", "urb2302", "ueb2302", "xsb2302", "xab1401", "xab2307", "url0401", "xeb2402", "ueb2401", "xsb2401"},
         name = "<LOC restricted_units_data_0012>No Game Enders",
         tooltip = {text = 'No Game Enders', body = 'Restricts access to Heavy Artilley, Paragon, Novax Satellite and Yolona Oss'},
@@ -185,4 +200,6 @@ sortOrder = {
     "PARAGON",
     "SATELLITE",
     "WALL",
+	"TRYENGISTATION",
+	"EYED",
 }
