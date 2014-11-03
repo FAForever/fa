@@ -5,6 +5,8 @@ UnitBlueprint {
             'Torso',        
             'Head',
             'Back_Upgrade',
+            'Left_Foot_B01',
+            'Right_Foot_B01',
         },
     },
     Audio = {
