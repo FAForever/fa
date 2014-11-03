@@ -1046,9 +1046,9 @@ UnitBlueprint {
             RackBones = {
                 {
                     MuzzleBones = {
-                        'Turret_Muzzle_03',
+                        'Center_Turret',
                     },
-                    RackBone = 'Turret_Muzzle_03',
+                    RackBone = 'Center_Turret',
                 },
             },
             RackFireTogether = false,
