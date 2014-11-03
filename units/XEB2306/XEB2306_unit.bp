@@ -45,7 +45,7 @@ UnitBlueprint {
     },
     CollisionOffsetY = 0,
     Defense = {
-        AirThreatLevel = 0, # Ravager threat level fix (by Legion Darrath) [108]
+        AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 46,
         Health = 7500,

@@ -58,7 +58,7 @@ UnitBlueprint {
         'SHOWATTACKRETICLE',
         'OVERLAYDIRECTFIRE',
     },
-	CollisionOffsetX = -0.03,	
+    CollisionOffsetX = -0.03,    
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
@@ -92,7 +92,7 @@ UnitBlueprint {
             },
         },
         AnimationWalk = '/units/del0204/del0204_awalk.sca',
-        AnimationWalkRate = 3.2,  #4.5
+        AnimationWalkRate = 3.2,
         AttackReticuleSize = 3,
         Mesh = {
             IconFadeInZoom = 130,
@@ -192,7 +192,7 @@ UnitBlueprint {
         MotionType = 'RULEUMT_Land',
         StandUpright = true,
         TurnRadius = 0,
-        TurnRate = 90, # 150
+        TurnRate = 90,
     },
     SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = -0.15,
@@ -238,7 +238,7 @@ UnitBlueprint {
                 Water = 'Land|Water|Seabed',
             },
             FiringRandomness = 0.4,
-            FiringTolerance = 1, # 0.1
+            FiringTolerance = 1,
             Label = 'GatlingCannon',
             MaxRadius = 34,
             MuzzleSalvoDelay = 0.3,
@@ -287,7 +287,7 @@ UnitBlueprint {
             TurretPitchSpeed = 50,
             TurretYaw = 0,
             TurretYawRange = 180,
-            TurretYawSpeed = 80,   #50
+            TurretYawSpeed = 80,
             Turreted = true,
             UseFiringSolutionInsteadOfAimBone = true,
             WeaponCategory = 'Direct Fire',
@@ -314,8 +314,8 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringRandomness = 2.5, # 2
-            FiringTolerance = 1, # 0.1
+            FiringRandomness = 2.5,
+            FiringTolerance = 1,
             Label = 'Grenade',
             MaxRadius = 34,
             MuzzleSalvoDelay = 0.3,
@@ -358,11 +358,11 @@ UnitBlueprint {
             TurretBoneYaw = 'Right_Arm_B01',
             TurretDualManipulators = false,
             TurretPitch = 0,
-            TurretPitchRange = 55, # 45
+            TurretPitchRange = 55,
             TurretPitchSpeed = 45,
             TurretYaw = 0,
             TurretYawRange = 20,
-            TurretYawSpeed = 80, # 50
+            TurretYawSpeed = 80,
             Turreted = true,
             UseFiringSolutionInsteadOfAimBone = true,
             WeaponCategory = 'Direct Fire',
