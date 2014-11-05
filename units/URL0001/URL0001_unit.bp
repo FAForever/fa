@@ -5,6 +5,8 @@ UnitBlueprint {
             'Torso',        
             'Head',
             'Back_Upgrade',
+            'Left_Foot_B01',
+            'Right_Foot_B01',
         },
     },
     Audio = {
@@ -1025,6 +1027,7 @@ UnitBlueprint {
         },
         {
             BallisticArc = 'RULEUBA_None',
+            BelowWaterFireOnly = true,  -- Added this value to prevent shore-lining
             CollideFriendly = false,
             Damage = 250,
             DamageType = 'Normal',
@@ -1046,9 +1049,9 @@ UnitBlueprint {
             RackBones = {
                 {
                     MuzzleBones = {
-                        'Turret_Muzzle_03',
+                        'Center_Turret',
                     },
-                    RackBone = 'Turret_Muzzle_03',
+                    RackBone = 'Center_Turret',
                 },
             },
             RackFireTogether = false,
