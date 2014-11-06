@@ -150,20 +150,27 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
             LayoutHelpers.AtLeftIn(cbox_Act_TEXT, cbox_Act, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox_Act_TEXT, cbox_Act)
 			cbox_Act:SetCheck(true, true)--isChecked, skipEvent)
+	-- Disabled because bug
+	cbox_Act_TEXT:SetColor('5C5F5C')
+	cbox_Act:SetCheck(false, true)
+	cbox_Act:Disable()
+	cbox_Act_TEXT:Disable()
+	Tooltip.AddCheckboxTooltip(cbox_Act, {text='Hide Unselectable', body='Disabled for prevent a bug'})
+	Tooltip.AddCheckboxTooltip(cbox_Act_TEXT, {text='Hide Unselectable', body='Disabled for prevent a bug'})
 	--
 	--
 	if IsHost then
 		cbox_GAME:Enable()
-		cbox_Act:Enable()
+		--cbox_Act:Enable()
 	else
 		cbox_GAME:Disable()
-		cbox_Act:Disable()
+		--cbox_Act:Disable()
 		cbox_GAME_TEXT:Disable()
-		cbox_Act_TEXT:Disable()
+		--cbox_Act_TEXT:Disable()
 		cbox_GAME:SetCheck(false, true)
-		cbox_Act:SetCheck(false, true)
+		--cbox_Act:SetCheck(false, true)
 		cbox_GAME_TEXT:SetColor('5C5F5C')
-		cbox_Act_TEXT:SetColor('5C5F5C')
+		--cbox_Act_TEXT:SetColor('5C5F5C')
 	end
 	cbox_GAME.OnCheck = function(self, checked)
 		if IsHost then
@@ -290,6 +297,19 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 		local GetSIM_Activedmods = Mods.GetGameMods() -- Active SIM
 		local GetSIM_Unactivedmods = Mods.GetGameMods(unselmods) -- Active + Unactive SIM
 		
+		--local function tablelength(T)
+			--local count = 0
+			--for _ in pairs(T) do count = count + 1 end
+			--return count
+		--end
+		--LOG('MOD1> '..tablelength(allmods)..' < All Mods')
+		--LOG('MOD2> '..tablelength(selmods)..' < Selected Mod')
+		--LOG('MOD3> '..tablelength(unselmods)..' < UnSelected Mod')
+		--LOG('MOD4> '..table.getn(GetSIM_Activedmods)..' < Sim ActiveMod')
+		--LOG('MOD5> '..table.getn(GetSIM_Unactivedmods)..' < Sim UnActiveMod')
+		--LOG('MOD6> '..table.getn(GetUI_Activedmods)..' < Ui ActiveMod')
+		--LOG('MOD7> '..table.getn(GetUI_Unactivedmods)..' < Ui UnActiveMod')
+		
 		-- CREE UNE LIST TEMPORAIRE
 		if not IsHost then
 			for k, v in allmods do
@@ -331,15 +351,17 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 		end
 		
 		-- Remove Unselectable and mod not available with all players
-		for i, v in current_list do
-			if cbox_Act then
-				if not v.selectable or availableMods[v.uid] == v.uid then
-					current_list[i] = nil
-				end
-			end
-		end
+		-- BUG ? (cause an error line 364 "return a.name < b.name")
+		--if cbox_Act then
+			--for i, v in current_list do
+				--if not v.selectable or availableMods[v.uid] == v.uid then
+					--current_list[i] = nil
+				--end
+			--end
+		--end
 		
 		-- TRIE LES MOD ACTIFS EN HAUT ET LE RESTE ALPHABETIQUEMENT
+		--LOG('<<<<<'..table.getn(current_list)..'>>>>>')
 		table.sort(current_list, function(a,b) 
 			if selmods[a.uid] and selmods[b.uid] then
 				return a.name < b.name
