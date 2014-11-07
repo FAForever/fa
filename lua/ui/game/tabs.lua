@@ -17,7 +17,7 @@ local pauseBtn = false
 
 -- Allow a coop toggle - IceDreamer
 -- Possible results are 'skirmish', 'campaign', and 'campaign_coop'
-local MapScenarioType = import('/lua/ui/lobby/lobby.lua').MapScenarioType
+local MapScenarioType = import('/lua/ui/maputil.lua').MapScenarioType
 
 function CampaignToggle()
     if MapScenarioType == 'campaign_coop' then

@@ -56,10 +56,6 @@ local teamIcons = {
     '/lobby/team_icons/team_6_icon.dds',
 }
 
--- Add a global coop toggle - IceDreamer
--- This is changed the first time scenarioInfo is defined below
-MapScenarioType = nil
-
 --// Xinnony DEBUG
 XinnonyDebug = 0
 XinnonyOption = 0
@@ -1152,7 +1148,6 @@ local function AssignRandomStartSpots(gameInfo)
         local scenarioInfo = nil
         if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
             scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-            ScenarioType = scenarioInfo.type
         end
         if scenarioInfo then
             local armyTable = MapUtil.GetArmies(scenarioInfo)
@@ -1506,20 +1501,13 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         end
     end
     
-    -- Added by IceDreamer  
-    scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-    ScenarioType = scenarioInfo.type
-    
-    local IsMapCampaign = false
-    if scenarioInfo.type == 'campaign_coop' then
-        IsMapCampaign = true
-    else
-        LOG('Not a campaign map')
-    end
-    
+    local MapScenarioType = MapUtil.MapScenarioType -- IceDreamer
+    local MapScenarioType = MapUtil:ToggleCoop()
+    LOG('lobby.lua returns MapScenarioType as...')
+    LOG(MapScenarioType)
     if gameInfo.GameOptions['Victory'] ~= 'sandbox' then
         local valid = true
-        if totalPlayers == 1 and IsMapCampaign != true then
+        if totalPlayers == 1 and not MapScenarioType == "campaign_coop" then
             valid = false
         end
         if not allFFA and not moreThanOneTeam then
@@ -1634,7 +1622,8 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
     end
 
     numberOfPlayers = totalPlayers
-
+    
+    scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
     local function LaunchGame()
 
         -- Send observer list again, just by precaution.
@@ -1663,7 +1652,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         end
         gameInfo.GameOptions['Ratings'] = allRatings
 
-        if IsMapCampaign == true then
+        if MapScenarioType == "campaign_coop" then
             gameInfo.GameOptions['Difficulty'] = 3
 
             LOG(repr(gameInfo))
@@ -1695,12 +1684,13 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
                 end
             end
         end
+
         -- Tell everyone else to launch and then launch ourselves.
         lobbyComm:BroadcastData( { Type = 'Launch', GameInfo = gameInfo } )
 
         -- set the mods
         gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
-
+        
         SetWindowedLobby(false)
         lobbyComm:LaunchGame(gameInfo)
     end

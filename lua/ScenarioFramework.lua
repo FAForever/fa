@@ -22,7 +22,7 @@ Objectives = import('/lua/SimObjectives.lua')
 
 -- Allow a coop toggle - IceDreamer
 -- Possible results are 'skirmish', 'campaign', and 'campaign_coop'
-local MapScenarioType = import('/lua/ui/lobby/lobby.lua').MapScenarioType
+local MapUtil = import('/lua/ui/maputil.lua')
     
 # Cause the game to exit immediately
 function ExitGame()
@@ -1122,8 +1122,16 @@ function SetPlayableArea( rect, voFlag )
     end
 
     import('/lua/SimSync.lua').SyncPlayableRect(rect)
-    if MapScenarioType != 'campaign_coop' or nil then
+    
+    -- Update toggle value
+    local MapScenarioType = MapUtil.ToggleCoop()
+    LOG('ScenarioFramework.lua reports the toggle as...')
+    LOG(MapScenarioType)
+    if MapScenarioType == "campaign_coop" then
+        LOG('ScenarioFramework.lua reports coop at 1')
+    else
         ForkThread(GenerateOffMapAreas)
+        LOG('ScenarioFramework.lua forking to non-coop offmap')
     end
 end
 
@@ -1632,10 +1640,14 @@ function OperationCameraThread(location, heading, faction, track, unit, unlock, 
     local cam = import('/lua/simcamera.lua').SimCamera('WorldCamera')
     LockInput()
     
-    if MapScenarioType == 'campaign_coop' then
+    -- IceDreamer
+    local MapScenarioType = MapUtil.ToggleCoop()
+    if MapScenarioType == "campaign_coop" then
         cam:UseGameClock()
+        LOG('ScenarioFramework.lua UseGameClock 1 coop')
     else
         cam:UseSystemClock()
+        LOG('ScenarioFramework.lua UseSystemClock 1 non-coop')
     end
     
     WaitTicks(1)
@@ -1721,10 +1733,14 @@ function MissionNISCameraThread( unit, blendtime, holdtime, orientationoffset, p
         local cam = import('/lua/simcamera.lua').SimCamera('WorldCamera')
         LockInput()
         
-        if MapScenarioType == 'campaign_coop' then
+        -- IceDreamer
+        local MapScenarioType = MapUtil.ToggleCoop()
+        if MapScenarioType == "campaign_coop" then
             cam:UseGameClock()
+            LOG('ScenarioFramework.lua UseGameClock 2 coop')
         else
             cam:UseSystemClock()
+            LOG('ScenarioFramework.lua UseSystemClock 2 non-coop')
         end
         
         WaitTicks(1)
@@ -1820,32 +1836,42 @@ function OperationNISCameraThread( unitInfo, camInfo )
 
         LockInput()
         
-        if MapScenarioType == 'campaign_coop' then
+        -- IceDreamer
+        local MapScenarioType = MapUtil.ToggleCoop()
+        if MapScenarioType == "campaign_coop" then
             cam:UseGameClock()
+            LOG('ScenarioFramework.lua UseGameClock 3 coop')
         else
             cam:UseSystemClock()
+            LOG('ScenarioFramework.lua UseSystemClock 3 non-coop')
         end
         
         Sync.NISMode = 'on'
 
-        if (camInfo.vizRadius) then
-            local ArmyDesignation = nil
-            
-            if MapScenarioType == 'campaign_coop' then
-                ArmyDesignation = 1
+        if (camInfo.vizRadius) then            
+            if MapScenarioType == "campaign_coop" then
+                local spec = {
+                    X = position[1],
+                    Z = position[3],
+                    Radius = camInfo.vizRadius,
+                    LifeTime = -1,
+                    Omni = false,
+                    Vision = true,
+                    Army = 1,
+                }
+                LOG('Set ArmyDesignation in ScenarioFramework.lua coop')
             else
-                ArmyDesignation = GetFocusArmy()
+                local spec = {
+                    X = position[1],
+                    Z = position[3],
+                    Radius = camInfo.vizRadius,
+                    LifeTime = -1,
+                    Omni = false,
+                    Vision = true,
+                    Army = GetFocusArmy(),
+                }
+                LOG('ScenarioFramework.lua using GetFocusArmy() non-coop')
             end
-            
-            local spec = {
-                X = position[1],
-                Z = position[3],
-                Radius = camInfo.vizRadius,
-                LifeTime = -1,
-                Omni = false,
-                Vision = true,
-                Army = ArmyDesignation,
-            }
             vizmarker = VizMarker(spec)
             WaitTicks(3) # this seems to be needed to prevent them from popping in
         end

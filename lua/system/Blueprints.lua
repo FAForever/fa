@@ -47,10 +47,6 @@
 --   default to its old value, not to 0 or its normal default.
 --
 
--- Allow a coop toggle - IceDreamer
--- Possible results are 'skirmish', 'campaign', and 'campaign_coop'
-local MapScenarioType = import('/lua/ui/lobby/lobby.lua').MapScenarioType
-
 local sub = string.sub
 local gsub = string.gsub
 local lower = string.lower
@@ -58,6 +54,8 @@ local getinfo = debug.getinfo
 local here = getinfo(1).source
 
 local original_blueprints
+
+local MapUtil = import('/lua/ui/maputil.lua')
 
 local function InitOriginalBlueprints()
     original_blueprints = {
@@ -528,7 +526,12 @@ function LoadBlueprints()
     LOG('Loading blueprints...')
     InitOriginalBlueprints()
 
-    if MapScenarioType == 'campaign_coop' then
+    -- Create toggle value - IceDreamer
+    local MapScenarioType = MapUtil.ToggleCoop()
+    LOG('Blueprints.lua has just loaded...')
+    LOG(MapScenarioType)
+    if MapScenarioType == "campaign_coop" then
+        LOG('Blueprints.lua is using the active toggle')
         for i,dir in {'/effects', '/env', '/meshes', '/projectiles', '/props', '/units', '/maps'} do
             for k,file in DiskFindFiles(dir, '*.bp') do
                 BlueprintLoaderUpdateProgress()
@@ -536,6 +539,7 @@ function LoadBlueprints()
             end
         end    
     else
+        LOG('Blueprints.lua is NOT using the active toggle')
         for i,dir in {'/effects', '/env', '/meshes', '/projectiles', '/props', '/units'} do
             for k,file in DiskFindFiles(dir, '*.bp') do
                 BlueprintLoaderUpdateProgress()
