@@ -20,10 +20,6 @@ local Utilities = import('/lua/Utilities.lua') # enabled so we can hide strat ic
 PingGroups = import('/lua/SimPingGroup.lua')
 Objectives = import('/lua/SimObjectives.lua')
 
--- Allow a coop toggle - IceDreamer
--- Possible results are 'skirmish', 'campaign', and 'campaign_coop'
-local MapUtil = import('/lua/ui/maputil.lua')
-    
 # Cause the game to exit immediately
 function ExitGame()
     Sync.RequestingExit = true
@@ -1124,11 +1120,11 @@ function SetPlayableArea( rect, voFlag )
     import('/lua/SimSync.lua').SyncPlayableRect(rect)
     
     -- Update toggle value
-    local MapScenarioType = MapUtil.ToggleCoop()
+    local MapScenarioType = ScenarioInfo.type
     LOG('ScenarioFramework.lua reports the toggle as...')
     LOG(MapScenarioType)
     if MapScenarioType == "campaign_coop" then
-        LOG('ScenarioFramework.lua reports coop at 1')
+        LOG('ScenarioFramework.lua reports coop at 1, no not forking to GenerateOffMapAreas')
     else
         ForkThread(GenerateOffMapAreas)
         LOG('ScenarioFramework.lua forking to non-coop offmap')
@@ -1641,7 +1637,9 @@ function OperationCameraThread(location, heading, faction, track, unit, unlock, 
     LockInput()
     
     -- IceDreamer
-    local MapScenarioType = MapUtil.ToggleCoop()
+    local MapScenarioType = ScenarioInfo.type
+    LOG('ScenarioFramework.lua reports type...')
+    LOG(MapScenarioType)
     if MapScenarioType == "campaign_coop" then
         cam:UseGameClock()
         LOG('ScenarioFramework.lua UseGameClock 1 coop')
@@ -1734,7 +1732,9 @@ function MissionNISCameraThread( unit, blendtime, holdtime, orientationoffset, p
         LockInput()
         
         -- IceDreamer
-        local MapScenarioType = MapUtil.ToggleCoop()
+        local MapScenarioType = ScenarioInfo.type
+        LOG('ScenarioFramework.lua reports at 2 type...')
+        LOG(MapScenarioType)        
         if MapScenarioType == "campaign_coop" then
             cam:UseGameClock()
             LOG('ScenarioFramework.lua UseGameClock 2 coop')
@@ -1837,7 +1837,9 @@ function OperationNISCameraThread( unitInfo, camInfo )
         LockInput()
         
         -- IceDreamer
-        local MapScenarioType = MapUtil.ToggleCoop()
+        local MapScenarioType = ScenarioInfo.type
+        LOG('ScenarioFramework.lua reports at 3 type...')
+        LOG(MapScenarioType)
         if MapScenarioType == "campaign_coop" then
             cam:UseGameClock()
             LOG('ScenarioFramework.lua UseGameClock 3 coop')

@@ -1500,9 +1500,10 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
             lastTeam = player.Team
         end
     end
-    
-    local MapScenarioType = MapUtil.MapScenarioType -- IceDreamer
-    local MapScenarioType = MapUtil:ToggleCoop()
+
+    -- Set up the toggle initially - IceDreamer
+    scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)    
+    local MapScenarioType = scenarioInfo.type
     LOG('lobby.lua returns MapScenarioType as...')
     LOG(MapScenarioType)
     if gameInfo.GameOptions['Victory'] ~= 'sandbox' then
@@ -1623,7 +1624,6 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
 
     numberOfPlayers = totalPlayers
     
-    scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
     local function LaunchGame()
 
         -- Send observer list again, just by precaution.
@@ -1652,7 +1652,12 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         end
         gameInfo.GameOptions['Ratings'] = allRatings
 
+        -- Toggle stuff - IceDreamer
+        LOG('lobby.lua has reached the second toggle dependant part')
+        LOG('logging MapScenarioType value')
+        LOG(MapScenarioType)
         if MapScenarioType == "campaign_coop" then
+            LOG('And has gone inside it')
             gameInfo.GameOptions['Difficulty'] = 3
 
             LOG(repr(gameInfo))

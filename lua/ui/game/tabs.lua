@@ -16,14 +16,14 @@ local pauseBtn = false
 --local infoBtn = false
 
 -- Allow a coop toggle - IceDreamer
--- Possible results are 'skirmish', 'campaign', and 'campaign_coop'
-local MapScenarioType = import('/lua/ui/maputil.lua').MapScenarioType
-
 function CampaignToggle()
-    if MapScenarioType == 'campaign_coop' then
-        LOG('tabs.lua thinks campaign_coop is true')
+    local MapScenarioType = SessionGetScenarioInfo().type
+    LOG(MapScenarioType)
+    if MapScenarioType == "campaign_coop" then
+        LOG('tabs.lua thinks campaign_coop is true, returning false')
         return false
     else
+        LOG('tabs.lua thinks campaign_coop is false, returning true')
         return true
     end
 end
@@ -58,7 +58,7 @@ local tabs = {
     {
         bitmap = 'diplomacy',
         content = 'diplomacy',
-        disableInCampaign = CampaignToggle(),
+        disableInCampaign = CampaignToggle(), -- IceDreamer
         disableInReplay = true,
         disableForObserver = true,
         closeSound = 'UI_Diplomacy_Close',

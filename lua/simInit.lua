@@ -55,7 +55,7 @@ doscript '/lua/SimSync.lua'
 function SetupSession()
 
 
-    # LOG('SetupSession: ', repr(ScenarioInfo))
+    -- LOG('SetupSession: ', repr(ScenarioInfo))
 
     ArmyBrains = {}
 
@@ -139,24 +139,15 @@ end
 #===================================================================================
 function BeginSession()
 
-    -- Allow a coop toggle - IceDreamer
-    -- Possible results are 'skirmish', 'campaign', and 'campaign_coop'
-    local MapScenarioType = MapUtil.ToggleCoop()
-    LOG('simInit.lua reports MapScenarioType as...')
-    LOG(MapScenarioType)
-
     local focusarmy = GetFocusArmy()
     if focusarmy>=0 and ArmyBrains[focusarmy] then
         LocGlobals.PlayerName = ArmyBrains[focusarmy].Nickname
-        LOG('1')
     end
 
     # Pass ScenarioInfo into OnPopulate() and OnStart() for backwards compatibility
     ScenarioInfo.Env.OnPopulate(ScenarioInfo)
-    LOG('2')
     ScenarioInfo.Env.OnStart(ScenarioInfo)
 
-    LOG('3')
     # Look for teams
     local teams = {}
     for name,army in ScenarioInfo.ArmySetup do
@@ -166,7 +157,6 @@ function BeginSession()
             end
             table.insert(teams[army.Team],army.ArmyIndex)
         end
-        LOG('4')
     end
 
     if ScenarioInfo.Options.TeamLock == 'locked' then
@@ -238,12 +228,10 @@ function BeginSession()
         end
     end
 
-#for off-map prevention
-    if MapScenarioType == "campaign_coop" then
-        LOG('simInit.lua reports coop is up!')
-    else
+    -- for off-map prevention
+    -- Create toggle - IceDreamer
+    if not ScenarioInfo.type == "campaign_coop" then
         OnStartOffMapPreventionThread()
-        LOG('Map is not coop, so prevent offmaps')
     end
 end
 

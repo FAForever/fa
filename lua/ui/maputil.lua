@@ -8,15 +8,6 @@
 
 -- this table indicates the order prefixes will be sorted in the map select window
 
--- Declare the global coop toggle - IceDreamer
-MapScenarioType = "undefined"
-
-function ToggleCoop()
-    LOG('Returning this value...')
-    LOG(MapScenarioType)
-    return MapScenarioType
-end
-
 local defaultPrefixOrder = {
     scmp = 1,
     scca = 2,
@@ -157,11 +148,6 @@ function GetStartPositions(scenario)
     doscript(scenario.save, saveData)
 
     local armyPositions = {}
-
-    -- Set up the global coop toggle - IceDreamer
-    MapScenarioType = repr(scenario.type)
-    LOG('maputil.lua has just set the toggle to the correct value')
-    LOG(MapScenarioType)
     
     -- try new data first
     if scenario.Configurations.standard and scenario.Configurations.standard.teams then

@@ -55,8 +55,6 @@ local here = getinfo(1).source
 
 local original_blueprints
 
-local MapUtil = import('/lua/ui/maputil.lua')
-
 local function InitOriginalBlueprints()
     original_blueprints = {
         Mesh = {},
@@ -526,25 +524,11 @@ function LoadBlueprints()
     LOG('Loading blueprints...')
     InitOriginalBlueprints()
 
-    -- Create toggle value - IceDreamer
-    local MapScenarioType = MapUtil.ToggleCoop()
-    LOG('Blueprints.lua has just loaded...')
-    LOG(MapScenarioType)
-    if MapScenarioType == "campaign_coop" then
-        LOG('Blueprints.lua is using the active toggle')
-        for i,dir in {'/effects', '/env', '/meshes', '/projectiles', '/props', '/units', '/maps'} do
-            for k,file in DiskFindFiles(dir, '*.bp') do
-                BlueprintLoaderUpdateProgress()
-                safecall("loading blueprint "..file, doscript, file)
-            end
-        end    
-    else
-        LOG('Blueprints.lua is NOT using the active toggle')
-        for i,dir in {'/effects', '/env', '/meshes', '/projectiles', '/props', '/units'} do
-            for k,file in DiskFindFiles(dir, '*.bp') do
-                BlueprintLoaderUpdateProgress()
-                safecall("loading blueprint "..file, doscript, file)
-            end
+    -- Add /maps to the following - IceDreamer
+    for i,dir in {'/effects', '/env', '/meshes', '/projectiles', '/props', '/units', '/maps'} do
+        for k,file in DiskFindFiles(dir, '*.bp') do
+            BlueprintLoaderUpdateProgress()
+            safecall("loading blueprint "..file, doscript, file)
         end
     end
 
