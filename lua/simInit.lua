@@ -227,7 +227,7 @@ function BeginSession()
     end
 
     -- Check scenario type before preventing offmapping
-    if not ScenarioInfo.type == "campaign_coop" then
+    if ScenarioInfo.type != "campaign_coop" then
         OnStartOffMapPreventionThread()
     end
 end

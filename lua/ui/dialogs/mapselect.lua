@@ -276,7 +276,6 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     selectButton.Depth:Set(function() return panel.Depth() + 10 end)
     Tooltip.AddButtonTooltip(modButton, "Lobby_Mods")
     modButton.OnClick = function(self, modifiers)
-        LOG('mapselect.lua reports coop')
         modstatus = ModManager.HostModStatus(availableMods)
         mapList:AbandonKeyboardFocus()
         ModManager.CreateDialog(

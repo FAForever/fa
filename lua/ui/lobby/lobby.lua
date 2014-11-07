@@ -1542,9 +1542,9 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
     
     if gameInfo.GameOptions['Victory'] ~= 'sandbox' then
         local valid = true
-        
         -- Allow Coop mode to be launched single player
-        if totalPlayers == 1 and not MapScenarioType == "campaign_coop" then
+        if totalPlayers == 1 and MapScenarioType != "campaign_coop" then
+            LOG('Setting valid as false')
             valid = false
         end
         if not allFFA and not moreThanOneTeam then
@@ -1675,7 +1675,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         AssignRandomFactions(gameInfo)
         
         -- Don't assign random starts in Coop
-        if not MapScenarioType == "campaign_coop" then
+        if MapScenarioType != "campaign_coop" then
             AssignRandomStartSpots(gameInfo)
         end
         --assign the teams just before launch
