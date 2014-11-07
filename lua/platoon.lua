@@ -1271,6 +1271,32 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    PatrolLocationFactoriesAI = function(self)
+        local aiBrain = self:GetBrain()
+        local location = self.PlatoonData.LocationType or 'MAIN'
+        local position = aiBrain:PBMGetLocationCoords(location)
+        local radius = aiBrain:PBMGetLocationRadius(location)
+        while aiBrain:PlatoonExists(self) do
+            self:Stop()
+            local factories = aiBrain:PBMGetLocationFactories(location)
+            if factories then
+                for fType,fac in factories do
+                    if not fac:IsDead() then
+                        self:Patrol(fac:GetPosition())
+                        local guards = fac:GetGuards()
+                        if guards then
+                            for num,guard in guards do
+                                self:Patrol(guard:GetPosition())
+                            end
+                        end
+                    end
+                end
+            else
+                aiBrain:DisbandPlatoon(self)
+            end
+            WaitSeconds(71)
+        end
+    end,
     PatrolBaseVectorsAI = function(self)
         self:Stop()
         self:SetPartOfAttackForce()
