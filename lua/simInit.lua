@@ -137,6 +137,10 @@ end
 #===================================================================================
 function BeginSession()
 
+    -- Allow a coop toggle - IceDreamer
+    -- Possible results are 'skirmish', 'campaign', and 'campaign_coop'
+    local MapScenarioType = import('/lua/ui/lobby/lobby.lua').MapScenarioType
+
     local focusarmy = GetFocusArmy()
     if focusarmy>=0 and ArmyBrains[focusarmy] then
         LocGlobals.PlayerName = ArmyBrains[focusarmy].Nickname
@@ -227,8 +231,9 @@ function BeginSession()
     end
 
 #for off-map prevention
-    OnStartOffMapPreventionThread()
-    
+    if MapScenarioType != 'campaign_coop' or nil then
+        OnStartOffMapPreventionThread()
+    end
 end
 
 ###for off-map prevention
