@@ -22,7 +22,8 @@ Objectives = import('/lua/SimObjectives.lua')
 
 -- Allow a coop toggle - IceDreamer
 -- Possible results are 'skirmish', 'campaign', and 'campaign_coop'
-local MapScenarioType = import('/lua/ui/lobby/lobby.lua').MapScenarioType
+local MapUtil = import('/lua/ui/maputil.lua')
+local MapScenarioType = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).type
     
 # Cause the game to exit immediately
 function ExitGame()
@@ -1122,7 +1123,7 @@ function SetPlayableArea( rect, voFlag )
     end
 
     import('/lua/SimSync.lua').SyncPlayableRect(rect)
-    if MapScenarioType != 'campaign_coop' or nil then
+    if MapScenarioType != 'campaign_coop' then
         ForkThread(GenerateOffMapAreas)
     end
 end

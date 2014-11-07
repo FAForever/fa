@@ -56,10 +56,6 @@ local teamIcons = {
     '/lobby/team_icons/team_6_icon.dds',
 }
 
--- Add a global coop toggle - IceDreamer
--- This is changed the first time scenarioInfo is defined below
-MapScenarioType = nil
-
 --// Xinnony DEBUG
 XinnonyDebug = 0
 XinnonyOption = 0
@@ -1152,7 +1148,6 @@ local function AssignRandomStartSpots(gameInfo)
         local scenarioInfo = nil
         if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
             scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-            ScenarioType = scenarioInfo.type
         end
         if scenarioInfo then
             local armyTable = MapUtil.GetArmies(scenarioInfo)
@@ -1507,8 +1502,8 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
     end
     
     -- Added by IceDreamer  
-    scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-    ScenarioType = scenarioInfo.type
+    local ScenarioFileMapPath = gameInfo.GameOptions.ScenarioFile
+    scenarioInfo = MapUtil.LoadScenario(ScenarioFileMapPath)
     
     local IsMapCampaign = false
     if scenarioInfo.type == 'campaign_coop' then
