@@ -20,11 +20,25 @@ local Utilities = import('/lua/Utilities.lua') # enabled so we can hide strat ic
 PingGroups = import('/lua/SimPingGroup.lua')
 Objectives = import('/lua/SimObjectives.lua')
 
+-- Allow a coop toggle - IceDreamer
+-- Possible results are 'skirmish', 'campaign', and 'campaign_coop'
+local MapUtil = import('/lua/ui/maputil.lua')
+local MapScenarioType = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).type
+    
 # Cause the game to exit immediately
 function ExitGame()
     Sync.RequestingExit = true
 end
 
+#fill the human table
+function fillCoop()    
+    local tblArmy = ListArmies()
+    for iArmy, strArmy in pairs(tblArmy) do
+        if iArmy >= ScenarioInfo.Coop1 then
+            table.insert(ScenarioInfo.HumanPlayers, iArmy)
+        end
+    end
+end
 # Call to end an operation
 #   bool _success - instructs UI which dialog to show
 #   bool _allPrimary - true if all primary objectives completed, otherwise, false
@@ -97,6 +111,17 @@ function CreateTimerTrigger( cb, seconds, displayBool)
     return timerThread
 end
 
+function CreateTimerTriggerUnlockCoop(cb, faction, seconds, displayBool)
+    local tblArmy = ListArmies()
+    for iArmy, strArmy in pairs(tblArmy) do
+        if iArmy >= ScenarioInfo.Coop1 then
+            factionIdx = GetArmyBrain(strArmy):GetFactionIndex()
+            if(factionIdx == faction) then
+                CreateTimerTrigger(cb, seconds, displayBool)
+            end
+        end
+    end
+end
 function ResetUITimer()
     if timerThread then
         Sync.ObjectiveTimer = 0
@@ -959,7 +984,23 @@ function RemoveRestriction(army, categories, isSilent)
     RemoveBuildRestriction(army, categories)
 end
 
-
+function RemoveRestrictionCoop(faction, categories, isSilent)
+    --for coop players
+    local tblArmy = ListArmies()
+    for iArmy, strArmy in pairs(tblArmy) do
+        if iArmy >= ScenarioInfo.Coop1 then     
+            factionIdx = GetArmyBrain(strArmy):GetFactionIndex()
+            if(factionIdx == faction) then
+                SimUIVars.SaveTechAllowance(categories)
+                if not isSilent then
+                    if not Sync.NewTech then Sync.NewTech = {} end
+                    table.insert(Sync.NewTech, EntityCategoryGetUnitList(categories))
+                end
+                RemoveBuildRestriction(iArmy, categories)
+            end
+        end
+    end
+end
 #### returns lists of factories by category
 #### <point> and <radius> are optional
 #### this allows you to know which factories can build and which can't
@@ -1082,7 +1123,9 @@ function SetPlayableArea( rect, voFlag )
     end
 
     import('/lua/SimSync.lua').SyncPlayableRect(rect)
-    ForkThread(GenerateOffMapAreas)
+    if MapScenarioType != 'campaign_coop' then
+        ForkThread(GenerateOffMapAreas)
+    end
 end
 
 function PlayableRectCameraThread( rect )
@@ -1589,7 +1632,13 @@ end
 function OperationCameraThread(location, heading, faction, track, unit, unlock, time)
     local cam = import('/lua/simcamera.lua').SimCamera('WorldCamera')
     LockInput()
-    cam:UseSystemClock()
+    
+    if MapScenarioType == 'campaign_coop' then
+        cam:UseGameClock()
+    else
+        cam:UseSystemClock()
+    end
+    
     WaitTicks(1)
     # Track the unit; not totally working properly yet
     if track and unit then
@@ -1672,7 +1721,13 @@ function MissionNISCameraThread( unit, blendtime, holdtime, orientationoffset, p
         ScenarioInfo.NIS = true
         local cam = import('/lua/simcamera.lua').SimCamera('WorldCamera')
         LockInput()
-        cam:UseSystemClock()
+        
+        if MapScenarioType == 'campaign_coop' then
+            cam:UseGameClock()
+        else
+            cam:UseSystemClock()
+        end
+        
         WaitTicks(1)
 
         local position = unit:GetPosition()
@@ -1765,10 +1820,24 @@ function OperationNISCameraThread( unitInfo, camInfo )
         ScenarioInfo.NIS = true
 
         LockInput()
-        cam:UseSystemClock()
+        
+        if MapScenarioType == 'campaign_coop' then
+            cam:UseGameClock()
+        else
+            cam:UseSystemClock()
+        end
+        
         Sync.NISMode = 'on'
 
         if (camInfo.vizRadius) then
+            local ArmyDesignation = nil
+            
+            if MapScenarioType == 'campaign_coop' then
+                ArmyDesignation = 1
+            else
+                ArmyDesignation = GetFocusArmy()
+            end
+            
             local spec = {
                 X = position[1],
                 Z = position[3],
@@ -1776,7 +1845,7 @@ function OperationNISCameraThread( unitInfo, camInfo )
                 LifeTime = -1,
                 Omni = false,
                 Vision = true,
-                Army = GetFocusArmy(),
+                Army = ArmyDesignation,
             }
             vizmarker = VizMarker(spec)
             WaitTicks(3) # this seems to be needed to prevent them from popping in
