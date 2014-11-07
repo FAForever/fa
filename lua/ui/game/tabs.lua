@@ -15,6 +15,19 @@ local activeTab = false
 local pauseBtn = false
 --local infoBtn = false
 
+-- Allow a coop toggle - IceDreamer
+-- Possible results are 'skirmish', 'campaign', and 'campaign_coop'
+local MapScenarioType = import('/lua/ui/lobby/lobby.lua').MapScenarioType
+
+function CampaignToggle()
+    if MapScenarioType == 'campaign_coop' then
+        LOG('tabs.lua thinks campaign_coop is true')
+        return false
+    else
+        return true
+    end
+end
+
 timeoutsRemaining = false
 
 if SessionIsMultiplayer() then
@@ -45,7 +58,7 @@ local tabs = {
     {
         bitmap = 'diplomacy',
         content = 'diplomacy',
-        disableInCampaign = true,
+        disableInCampaign = CampaignToggle(),
         disableInReplay = true,
         disableForObserver = true,
         closeSound = 'UI_Diplomacy_Close',
