@@ -768,6 +768,7 @@ function SetSlotInfo(slot, playerInfo)
     GUI.slots[slot].numGamesText:SetText(playerInfo.NG or "")
 
     GUI.slots[slot].name:Show()
+    GUI.slots[slot].name:SetTitleText(LOC(playerInfo.PlayerName))
     --// Color the Name in Slot by State - Xinnony & Vicarian
     if slotState == 'ai' then
         GUI.slots[slot].name:SetTitleTextColor("dbdbb9") -- Beige Color for AI
@@ -973,6 +974,15 @@ local function team_sort_by_sum(t1, t2)
     return t1['sum'] < t2['sum']
 end
 
+local function shuffle( a )
+    local c = table.getn(a)
+    for i = 1, c do
+        local ndx0 = math.random( 1, c )
+        a[ ndx0 ], a[ i ] = a[ i ], a[ ndx0 ]
+    end
+    return a
+end
+
 local function autobalance_bestworst(players, teams_arg)
     local players = table.deepcopy(players)
     local result = {}
@@ -1150,7 +1160,14 @@ local function AssignRandomStartSpots(gameInfo)
             scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
         end
         if scenarioInfo then
-            local armyTable = MapUtil.GetArmies(scenarioInfo)
+
+            -- Take account of Coop mode
+            if scenarioInfo.type == "campaign_coop" then
+                local armyTable = {"Player", "Coop1", "Coop2", "Coop3"}
+            else
+                local armyTable = MapUtil.GetArmies(scenarioInfo)
+            end
+
             if armyTable then
                 if gameInfo.GameOptions['RandomMap'] == 'Off' then
                     numAvailStartSpots = table.getn(armyTable)
@@ -1162,6 +1179,24 @@ local function AssignRandomStartSpots(gameInfo)
             WARN("Can't assign random start spots, no scenario selected.")
             return
         end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         local autoTeams = gameInfo.GameOptions['AutoTeams']
         local teams = {}
@@ -1638,7 +1673,11 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         SetFrontEndData('NextOpBriefing', nil)
         -- assign random factions just as game is launched
         AssignRandomFactions(gameInfo)
-        AssignRandomStartSpots(gameInfo)
+        
+        -- Don't assign random starts in Coop
+        if not MapScenarioType == "campaign_coop" then
+            AssignRandomStartSpots(gameInfo)
+        end
         --assign the teams just before launch
         AssignRandomTeams(gameInfo)
         randstring = randomString(16, "%l%d")
@@ -1801,7 +1840,12 @@ local function UpdateGame()
 
     local numAvailStartSpots = LobbyComm.maxPlayerSlots
     if scenarioInfo then
-        local armyTable = MapUtil.GetArmies(scenarioInfo)
+        local armyTable = {}
+        if scenarioInfo.type == "campaign_coop" then
+            armyTable = {"Player", "Coop1", "Coop2", "Coop3"}
+        else
+            armyTable = MapUtil.GetArmies(scenarioInfo)
+        end
         if armyTable then
             numAvailStartSpots = table.getn(armyTable)
         end
@@ -4278,7 +4322,13 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
     local mWidth = scenario.size[1]
     local mHeight = scenario.size[2]
 
-    local playerArmyArray = MapUtil.GetArmies(scenario)
+    -- Take Coop into account
+    local playerArmyArray = {}
+    if scenario.type == "campaign_coop" then 
+        playerArmyArray = {"Player", "Coop1", "Coop2", "Coop3"}
+    else
+        playerArmyArray = MapUtil.GetArmies(scenario)
+    end
 
     for inSlot, army in playerArmyArray do
         local pos = startPos[army]
