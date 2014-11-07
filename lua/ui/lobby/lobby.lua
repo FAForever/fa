@@ -1500,10 +1500,21 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
             lastTeam = player.Team
         end
     end
-
+    
+    -- Added by IceDreamer  
+    local ScenarioFileMapPath = gameInfo.GameOptions.ScenarioFile
+    scenarioInfo = MapUtil.LoadScenario(ScenarioFileMapPath)
+    
+    local IsMapCampaign = false
+    if scenarioInfo.type == 'campaign_coop' then
+        IsMapCampaign = true
+    else
+        LOG('Not a campaign map')
+    end
+    
     if gameInfo.GameOptions['Victory'] ~= 'sandbox' then
         local valid = true
-        if totalPlayers == 1 then
+        if totalPlayers == 1 and IsMapCampaign != true then
             valid = false
         end
         if not allFFA and not moreThanOneTeam then
@@ -1647,18 +1658,53 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         end
         gameInfo.GameOptions['Ratings'] = allRatings
 
+        if IsMapCampaign == true then
+            gameInfo.GameOptions['Difficulty'] = 3
+
+            LOG(repr(gameInfo))
+            
+            scenarioArmies = {}
+            for index, teamConfig in scenarioInfo.Configurations.standard.teams do
+                if teamConfig.name and (teamConfig.name == 'FFA') then
+                    scenarioArmies =teamConfig.armies
+                    break
+                end
+            end
+
+            local addedArmies = {}
+            for spot, army in gameInfo.PlayerOptions do
+                if spot != 1 then
+                    table.insert(addedArmies, army)
+                end			
+            end
+            SetGameOption('Victory', 'sandbox')
+            add = 1
+            for armyIndex, armyName in scenarioArmies do
+                if armyName != "Player" and stringstarts(armyName, "Coop") == false then
+                    gameInfo.PlayerOptions[armyIndex] = LobbyComm.GetDefaultPlayerOptions(armyName)
+                    gameInfo.PlayerOptions[armyIndex].Human = false
+                    gameInfo.PlayerOptions[armyIndex].Faction = 1
+                elseif stringstarts(armyName, "Coop") == true and table.getn(addedArmies) >= add then
+                        gameInfo.PlayerOptions[armyIndex] = addedArmies[add]
+                        add = add + 1				
+                end
+            end
+        end
         -- Tell everyone else to launch and then launch ourselves.
         lobbyComm:BroadcastData( { Type = 'Launch', GameInfo = gameInfo } )
 
         -- set the mods
         gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
 
-        scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
         SetWindowedLobby(false)
         lobbyComm:LaunchGame(gameInfo)
     end
 
     LaunchGame()
+end
+
+function stringstarts(String,Start)
+   return string.sub(String,1,string.len(Start))==Start
 end
 
 local function AlertHostMapMissing()
