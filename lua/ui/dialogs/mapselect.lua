@@ -27,6 +27,10 @@ local ModManager = import('/lua/ui/dialogs/modmanager.lua')
 local EnhancedLobby = import('/lua/EnhancedLobby.lua')
 ###New local - End
 
+-- Allow a coop toggle - IceDreamer
+-- Possible results are 'skirmish', 'campaign', and 'campaign_coop'
+local MapScenarioType = import('/lua/ui/lobby/lobby.lua').MapScenarioType
+
 local scenarios = MapUtil.EnumerateSkirmishScenarios()
 local selectedScenario = false
 local description = false
@@ -276,8 +280,23 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     selectButton.Depth:Set(function() return panel.Depth() + 10 end)
     Tooltip.AddButtonTooltip(modButton, "Lobby_Mods")
     modButton.OnClick = function(self, modifiers)
-        TheAvailableMods = import('/lua/ui/lobby/ModsManager.lua').HostModStatus(availableMods)
-		import('/lua/ui/lobby/ModsManager.lua').NEW_MODS_GUI(panel, true, nil, TheAvailableMods)
+        if MapScenarioType != 'campaign_coop' then
+            TheAvailableMods = import('/lua/ui/lobby/ModsManager.lua').HostModStatus(availableMods)
+            import('/lua/ui/lobby/ModsManager.lua').NEW_MODS_GUI(panel, true, nil, TheAvailableMods)
+        else
+            modstatus = ModManager.HostModStatus(availableMods)
+            mapList:AbandonKeyboardFocus()
+            ModManager.CreateDialog(
+                panel,
+                true,
+                function(modsSelected)
+                    mapList:AcquireKeyboardFocus(true)
+                    OnModsChanged(modsSelected)
+                end,
+                true,
+                modstatus
+            )
+        end
     end
 
     local restrictedUnitsButton = UIUtil.CreateButtonStd(modButton, '/scx_menu/small-btn/small', "<LOC sel_map_0006>Unit Manager", 16, 2)
@@ -710,65 +729,36 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
 				local defValue = false
 				local realDefValue = false
                 
-				--LOG("XINNONY //////////////////////////////////////////")
 				for index, val in data.data.values do
-					--LOG(data.text..' << val.text:'..val.text..' << val.key:'..val.key..' (index:'..index..')')
-					--
 					itemArray[index] = val.text
                     line.combo.keyMap[tostring(val.key)] = index -- = 1 ou 2 ..
                     tooltipTable[index]={text=data.data.label,body=val.help}--= 'lob_'..data.data.key..'_'..val.key
-					--
+
 					if curOptions[data.data.key] and val.key == curOptions[data.data.key] then -- curOptions = gameInfo.GameOptions
-						--LOG('FIND on curOptions : key='..val.key..', index='..index)
 						defValue = index
 					end
                 end
-				--// Set SelectedOption or Default Option or ... -- Fix AdvancedOption by Xinnony
-				--LOG('Option name : '..data.text)
-				--LOG('Number of SubOption Values : '..table.getsize(data.data.values))
-				--LOG('Default : '..tostring(data.default)..' ('..tostring(data.data.default)..')')
-				--LOG('changedOptions.index : '..tostring(changedOptions[data.data.key].index))
-				--LOG('curOptions : '..tostring(curOptions[data.data.key])) -- = gameInfo.GameOptions
---------------------------------------------------------------------------------------------------------------------------------
 				if data.default == 0 or data.default > table.getsize(data.data.values) then -- THE MAP OPTIONS IS NOT RESPECTED
 					LOG('THE MAP OPTIONS IS NOT RESPECTED, NEED FIX BY THE AUTHOR OF THIS MAP (default value is Index !)')
 				end
 				if defValue then -- IF already set and saved (curOptions exist)
-					--LOG('> 1')
 					defValue = defValue
 				elseif changedOptions[data.data.key].index then -- IF already set&clicked in Combo
-					--LOG('> 2')
 					defValue = changedOptions[data.data.key].index
 				else
-					--LOG('> 3')
 					if data.default != nil and data.default <= table.getsize(data.data.values) then
-						--LOG('> 3 > 1')
-						if line.combo.keyMap[curOptions[data.data.key]] != nil then
-							--LOG('> 3 > 1 > 1')
-						else
-							--LOG('> 3 > 1 > 2')
-						end
 						defValue = changedOptions[data.data.key].index or line.combo.keyMap[curOptions[data.data.key]] or data.default or 1
 						if data.default == 0 then -- THE MAP OPTIONS IS NOT RESPECTED
-							--LOG('> 3 > 1 > 3')
-							--LOG("default : 0 (set to 1 because is index)")
 							defValue = line.combo.keyMap[curOptions[data.data.key]] or 1
 						end
 					else
-						--LOG('> 4 > Not have a default value (set to the first Item)')
 						defValue = changedOptions[data.data.key].index or line.combo.keyMap[curOptions[data.data.key]] or 1
 					end
-					--LOG("FINALY, defValue = "..tostring(defValue))
-					--LOG("XINNONY \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\")
 				end
-				--
-				--if data.type == 'option1' or data.type == 'option2' or data.type == 'option3' then -- For enable label (default) just or global/team/ai options
 				if data.data.default then realDefValue = data.data.default end
 				line.combo:AddItems(itemArray, defValue, realDefValue) -- For all (true for enable (default) label)
                 line.combo.OnClick = function(self, index, text)
-					--LOG('>> OnClick > '..index..' > '..text)
                     changedOptions[data.data.key] = {value = data.data.values[index].key, pref = data.data.pref, index = index}
-					--LOG('>> changedOptions > '..changedOptions[data.data.key].value..' > '..changedOptions[data.data.key].pref..' > '..changedOptions[data.data.key].index)
                 end
                 line.HandleEvent = Group.HandleEvent
                 Tooltip.AddControlTooltip(line, {text=data.data.label,body=data.data.help})--(line, data.data.pref)
