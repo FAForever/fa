@@ -34,6 +34,7 @@ function fillCoop()
         end
     end
 end
+
 # Call to end an operation
 #   bool _success - instructs UI which dialog to show
 #   bool _allPrimary - true if all primary objectives completed, otherwise, false
@@ -1119,15 +1120,11 @@ function SetPlayableArea( rect, voFlag )
 
     import('/lua/SimSync.lua').SyncPlayableRect(rect)
     
-    -- Update toggle value
+    -- Check for Coop map before Offmap generation
     local MapScenarioType = ScenarioInfo.type
-    LOG('ScenarioFramework.lua reports the toggle as...')
-    LOG(MapScenarioType)
     if MapScenarioType == "campaign_coop" then
-        LOG('ScenarioFramework.lua reports coop at 1, no not forking to GenerateOffMapAreas')
     else
         ForkThread(GenerateOffMapAreas)
-        LOG('ScenarioFramework.lua forking to non-coop offmap')
     end
 end
 
@@ -1636,16 +1633,12 @@ function OperationCameraThread(location, heading, faction, track, unit, unlock, 
     local cam = import('/lua/simcamera.lua').SimCamera('WorldCamera')
     LockInput()
     
-    -- IceDreamer
+    -- Decide clock based on scenario type
     local MapScenarioType = ScenarioInfo.type
-    LOG('ScenarioFramework.lua reports type...')
-    LOG(MapScenarioType)
     if MapScenarioType == "campaign_coop" then
         cam:UseGameClock()
-        LOG('ScenarioFramework.lua UseGameClock 1 coop')
     else
         cam:UseSystemClock()
-        LOG('ScenarioFramework.lua UseSystemClock 1 non-coop')
     end
     
     WaitTicks(1)
@@ -1731,16 +1724,12 @@ function MissionNISCameraThread( unit, blendtime, holdtime, orientationoffset, p
         local cam = import('/lua/simcamera.lua').SimCamera('WorldCamera')
         LockInput()
         
-        -- IceDreamer
-        local MapScenarioType = ScenarioInfo.type
-        LOG('ScenarioFramework.lua reports at 2 type...')
-        LOG(MapScenarioType)        
+        -- Decide clock based on scenario type
+        local MapScenarioType = ScenarioInfo.type      
         if MapScenarioType == "campaign_coop" then
             cam:UseGameClock()
-            LOG('ScenarioFramework.lua UseGameClock 2 coop')
         else
             cam:UseSystemClock()
-            LOG('ScenarioFramework.lua UseSystemClock 2 non-coop')
         end
         
         WaitTicks(1)
@@ -1836,21 +1825,18 @@ function OperationNISCameraThread( unitInfo, camInfo )
 
         LockInput()
         
-        -- IceDreamer
+        -- Decide clock based on scenario type
         local MapScenarioType = ScenarioInfo.type
-        LOG('ScenarioFramework.lua reports at 3 type...')
-        LOG(MapScenarioType)
         if MapScenarioType == "campaign_coop" then
             cam:UseGameClock()
-            LOG('ScenarioFramework.lua UseGameClock 3 coop')
         else
             cam:UseSystemClock()
-            LOG('ScenarioFramework.lua UseSystemClock 3 non-coop')
         end
         
         Sync.NISMode = 'on'
 
-        if (camInfo.vizRadius) then            
+        if (camInfo.vizRadius) then
+            -- Ensure Coop maps have Army = 1
             if MapScenarioType == "campaign_coop" then
                 local spec = {
                     X = position[1],
@@ -1861,7 +1847,6 @@ function OperationNISCameraThread( unitInfo, camInfo )
                     Vision = true,
                     Army = 1,
                 }
-                LOG('Set ArmyDesignation in ScenarioFramework.lua coop')
             else
                 local spec = {
                     X = position[1],
@@ -1872,7 +1857,6 @@ function OperationNISCameraThread( unitInfo, camInfo )
                     Vision = true,
                     Army = GetFocusArmy(),
                 }
-                LOG('ScenarioFramework.lua using GetFocusArmy() non-coop')
             end
             vizmarker = VizMarker(spec)
             WaitTicks(3) # this seems to be needed to prevent them from popping in

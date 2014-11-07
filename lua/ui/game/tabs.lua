@@ -15,19 +15,6 @@ local activeTab = false
 local pauseBtn = false
 --local infoBtn = false
 
--- Allow a coop toggle - IceDreamer
-function CampaignToggle()
-    local MapScenarioType = SessionGetScenarioInfo().type
-    LOG(MapScenarioType)
-    if MapScenarioType == "campaign_coop" then
-        LOG('tabs.lua thinks campaign_coop is true, returning false')
-        return false
-    else
-        LOG('tabs.lua thinks campaign_coop is false, returning true')
-        return true
-    end
-end
-
 timeoutsRemaining = false
 
 if SessionIsMultiplayer() then
@@ -58,7 +45,9 @@ local tabs = {
     {
         bitmap = 'diplomacy',
         content = 'diplomacy',
-        disableInCampaign = CampaignToggle(), -- IceDreamer
+        
+        -- I made a toggle, but is there a reason not to just set this false?
+        disableInCampaign = false,
         disableInReplay = true,
         disableForObserver = true,
         closeSound = 'UI_Diplomacy_Close',

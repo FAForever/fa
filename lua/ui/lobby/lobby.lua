@@ -1501,13 +1501,14 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         end
     end
 
-    -- Set up the toggle initially - IceDreamer
+    -- Allow this function to know what the scenario type is
     scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)    
     local MapScenarioType = scenarioInfo.type
-    LOG('lobby.lua returns MapScenarioType as...')
-    LOG(MapScenarioType)
+    
     if gameInfo.GameOptions['Victory'] ~= 'sandbox' then
         local valid = true
+        
+        -- Allow Coop mode to be launched single player
         if totalPlayers == 1 and not MapScenarioType == "campaign_coop" then
             valid = false
         end
@@ -1652,15 +1653,9 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         end
         gameInfo.GameOptions['Ratings'] = allRatings
 
-        -- Toggle stuff - IceDreamer
-        LOG('lobby.lua has reached the second toggle dependant part')
-        LOG('logging MapScenarioType value')
-        LOG(MapScenarioType)
+        -- Allow Coop mode to set up difficulty and armies properly
         if MapScenarioType == "campaign_coop" then
-            LOG('And has gone inside it')
             gameInfo.GameOptions['Difficulty'] = 3
-
-            LOG(repr(gameInfo))
             
             scenarioArmies = {}
             for index, teamConfig in scenarioInfo.Configurations.standard.teams do

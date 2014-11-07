@@ -27,10 +27,6 @@ local ModManager = import('/lua/ui/dialogs/modmanager.lua')
 local EnhancedLobby = import('/lua/EnhancedLobby.lua')
 ###New local - End
 
--- Allow a coop toggle - IceDreamer
--- Possible results are 'skirmish', 'campaign', and 'campaign_coop'
-local MapScenarioType = MapUtil:ToggleCoop()
-
 local scenarios = MapUtil.EnumerateSkirmishScenarios()
 local selectedScenario = false
 local description = false
@@ -280,25 +276,19 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     selectButton.Depth:Set(function() return panel.Depth() + 10 end)
     Tooltip.AddButtonTooltip(modButton, "Lobby_Mods")
     modButton.OnClick = function(self, modifiers)
-        if not MapScenarioType == "campaign_coop" then
-            LOG('mapselect.lua reports this is not coop')
-            TheAvailableMods = import('/lua/ui/lobby/ModsManager.lua').HostModStatus(availableMods)
-            import('/lua/ui/lobby/ModsManager.lua').NEW_MODS_GUI(panel, true, nil, TheAvailableMods)
-        else
-            LOG('mapselect.lua reports coop')
-            modstatus = ModManager.HostModStatus(availableMods)
-            mapList:AbandonKeyboardFocus()
-            ModManager.CreateDialog(
-                panel,
-                true,
-                function(modsSelected)
-                    mapList:AcquireKeyboardFocus(true)
-                    OnModsChanged(modsSelected)
-                end,
-                true,
-                modstatus
-            )
-        end
+        LOG('mapselect.lua reports coop')
+        modstatus = ModManager.HostModStatus(availableMods)
+        mapList:AbandonKeyboardFocus()
+        ModManager.CreateDialog(
+            panel,
+            true,
+            function(modsSelected)
+                mapList:AcquireKeyboardFocus(true)
+                OnModsChanged(modsSelected)
+            end,
+            true,
+            modstatus
+        )
     end
 
     local restrictedUnitsButton = UIUtil.CreateButtonStd(modButton, '/scx_menu/small-btn/small', "<LOC sel_map_0006>Unit Manager", 16, 2)

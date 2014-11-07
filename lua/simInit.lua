@@ -30,8 +30,6 @@
 #===================================================================================
 doscript '/lua/globalInit.lua'
 
-local MapUtil = import('/lua/ui/maputil.lua')
-
 LOG('Active mods in sim: ', repr(__active_mods))
 
 WaitTicks = coroutine.yield
@@ -228,8 +226,7 @@ function BeginSession()
         end
     end
 
-    -- for off-map prevention
-    -- Create toggle - IceDreamer
+    -- Check scenario type before preventing offmapping
     if not ScenarioInfo.type == "campaign_coop" then
         OnStartOffMapPreventionThread()
     end
