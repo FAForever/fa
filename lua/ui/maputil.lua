@@ -1,6 +1,8 @@
 --*****************************************************************************
 --* File: lua/modules/ui/maputil.lua
 --* Author: Chris Blackwell
+--* Author: Chris Blackwell
+--* Author: Chris Blackwell
 --* Summary: Functions for loading maps and map info
 --*
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
@@ -106,7 +108,7 @@ function EnumerateSkirmishScenarios(nameFilter, sortFunc)
     local scenarios = {}
     for index, fileName in scenFiles do
         local scen = LoadScenario(fileName)
-        if IsScenarioPlayable(scen) and scen.type == "skirmish" then
+        if IsScenarioPlayable(scen) and scen.type == "skirmish" or scen.type == "campaign_coop" then
             table.insert(scenarios, scen)
         end
     end
