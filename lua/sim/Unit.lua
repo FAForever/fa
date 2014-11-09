@@ -1422,8 +1422,11 @@ Unit = Class(moho.unit_methods) {
             energy = energy * 0.5
         end
 
-        pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
-
+        -- Stop the Y position of the wreck being on the seabed for Naval Factories
+        if not (EntityCategoryContains(categories.FACTORY, self) and EntityCategoryContains(categories.STRUCTURE, self) and EntityCategoryContains(categories.NAVAL, self)) then
+            pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
+        end
+        
         local prop = CreateProp( pos, wreck )
 
         --Keep track of the global wreckage count to avoid performance issues
@@ -1588,6 +1591,7 @@ Unit = Class(moho.unit_methods) {
         local layer = self:GetCurrentLayer()
         local isNaval = EntityCategoryContains(categories.NAVAL, self)
         local isSinking = layer == 'Water' or layer == 'Sub'
+        local isNavalFactory = (EntityCategoryContains(categories.FACTORY, self) and EntityCategoryContains(categories.STRUCTURE, self))
         WaitSeconds( utilities.GetRandomFloat( self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax) )
         self:DestroyAllDamageEffects()
         self:DestroyTopSpeedEffects()
@@ -1598,7 +1602,8 @@ Unit = Class(moho.unit_methods) {
             self:CreateDestructionEffects(overkillRatio)
         end
 
-        if isSinking and not (isNaval and self.DeathAnimManip) then -- naval units sink by their animation
+        -- Make sure Naval units use their animation to sink
+        if isSinking and not (isNaval and self.DeathAnimManip) then
             self:ForkThread(self.SinkThread)
         end
 
@@ -1624,9 +1629,9 @@ Unit = Class(moho.unit_methods) {
             end
         end
 
-        if isSinking then
+        if isSinking and not isNavalFactory then
             self:ForkThread(self.SinkDestructionEffects)
-            self:SeabedWatcher() --Finishes when unit reached seabed
+            self:SeabedWatcher() -- Finishes when unit reached seabed
         end
         self:CreateWreckage( overkillRatio )
         WaitSeconds(self.DeathThreadDestructionWaitTime)
