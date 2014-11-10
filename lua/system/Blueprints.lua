@@ -458,11 +458,17 @@ function PreModBlueprints(all_bps)
                 local vision = bp.Intel.VisionRadius or 10
                 local max = 0
 
-                for _, w in bp.Weapon do
+                for i, w in bp.Weapon do
                     local ignore = w.CountedProjectile or w.RangeCategory == 'UWRC_AntiAir' or w.WeaponCategory == 'Defense'
                     if w.MaxRadius and not ignore then
                         max = math.max(w.MaxRadius, max)
                     end
+
+                    -- Test to reduce load on game, especially ASF
+                    if w.TargetCheckInterval < 0.3 then
+                        bp.Weapon[i].TargetCheckInterval = 0.3
+                    end
+
                 end
 
                 br = vision + max
