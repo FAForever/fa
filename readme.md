@@ -60,6 +60,8 @@ make a thread if it isn't there already.
 - [X] Attempt to fix Seraphim T1 Mobile AA's aim
 - [X] Improved autobalance with random spawns in lobby
 - [X] SMD can be paused
+- [X] New "No Walls" Unit Restriction
+- [X] Improved the Unit Restrictions menu descriptions
 
 ----------------------------------
 *Changes to be verified*
