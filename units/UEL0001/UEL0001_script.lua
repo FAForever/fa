@@ -256,7 +256,8 @@ UEL0001 = Class(TWalkingLandUnit) {
 
     RebuildPod = function(self, PodNumber)
         if PodNumber == 1 then
-            if self.RebuildingPod2 then
+            -- Force pod rebuilds to queue up
+            if self.RebuildingPod2 != nil then
                 WaitFor(self.RebuildingPod2)
             end
             if self.HasLeftPod == true then
@@ -264,6 +265,7 @@ UEL0001 = Class(TWalkingLandUnit) {
                 self:RequestRefreshUI()
                 WaitFor(self.RebuildingPod)
                 self:SetWorkProgress(0.0)
+                self.RebuildingPod = nil
                 local location = self:GetPosition('AttachSpecial02')
                 local pod = CreateUnitHPR('UEA0001', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
                 pod:SetParent(self, 'LeftPod')
@@ -271,15 +273,17 @@ UEL0001 = Class(TWalkingLandUnit) {
                 self.Trash:Add(pod)
                 self.LeftPod = pod
             end
-        else
-            if self.RebuildingPod then
+        elseif PodNumber == 2 then
+            -- Force pod rebuilds to queue up
+            if self.RebuildingPod != nil then
                 WaitFor(self.RebuildingPod)
             end
             if self.HasRightPod == true then
                 self.RebuildingPod2 = CreateEconomyEvent(self, 1600, 160, 10, self.SetWorkProgress)
                 self:RequestRefreshUI()
-                WaitFor(self.RebuildingPod)
+                WaitFor(self.RebuildingPod2)
                 self:SetWorkProgress(0.0)
+                self.RebuildingPod2 = nil
                 local location = self:GetPosition('AttachSpecial01')
                 local pod = CreateUnitHPR('UEA0001', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
                 pod:SetParent(self, 'RightPod')
@@ -294,11 +298,11 @@ UEL0001 = Class(TWalkingLandUnit) {
     NotifyOfPodDeath = function(self, pod)
         if pod == 'LeftPod' then
             if self.HasLeftPod == true then
-                self:ForkThread(self.RebuildPod, 1)
+                self.RebuildThread = self:ForkThread(self.RebuildPod, 1)
             end
         elseif pod == 'RightPod' then
             if self.HasRightPod == true then
-                self:ForkThread(self.RebuildPod, 2)
+                self.RebuildThread2 = self:ForkThread(self.RebuildPod, 2)
             end
         end
     end,
@@ -326,24 +330,27 @@ UEL0001 = Class(TWalkingLandUnit) {
             self.RightPod = pod
         elseif enh == 'LeftPodRemove' or enh == 'RightPodRemove' then
             if self.HasLeftPod == true then
+                self.HasLeftPod = false
                 if self.LeftPod and not self.LeftPod:IsDead() then
                     self.LeftPod:Kill()
                 end
-                self.HasLeftPod = false
-                if self.RebuildingPod then
-                    self:RemoveEconomyEvent(self.RebuildingPod)
+                if self.RebuildingPod != nil then
+                    RemoveEconomyEvent(self, self.RebuildingPod)
+                    self.RebuildingPod = nil
                 end
             end
-            if self.RightPod and not self.RightPod:IsDead() then
+            if self.HasRightPod == true then
+                self.HasRightPod = false
                 if self.RightPod and not self.RightPod:IsDead() then
                     self.RightPod:Kill()
                 end
-                self.HasRightPod = false
-                if self.RebuildingPod2 then
-                    self:RemoveEconomyEvent(self.RebuildingPod2)
+                if self.RebuildingPod2 != nil then
+                    RemoveEconomyEvent(self, self.RebuildingPod2)
+                    self.RebuildingPod2 = nil
                 end
             end
-            KillThread(RebuildPod)
+            KillThread(self.RebuildThread)
+            KillThread(self.RebuildThread2)
         elseif enh == 'Teleporter' then
             self:AddCommandCap('RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
