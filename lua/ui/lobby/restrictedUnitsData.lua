@@ -10,32 +10,32 @@
 restrictedUnits = {
     ENGISTATION = {
         categories = {"xeb0104", "xrb0104"},
-        name = "No Engineering Stations",
+        name = "<LOC restricted_units_data_023>No Engineering Stations",
         tooltip = {text = 'No Engineering Stations', body = 'Removes the Kennel and Hive'},
     },
     SALVAMAVOSCATH = {
         categories = {"xab2307", "ueb2401", "url0401"},
-        name = "No Super-Artillery",
+        name = "<LOC restricted_units_data_024>No Super-Artillery",
         tooltip = {text = 'No Super-Artillery', body = 'Removes Salvation, Mavor and Scathis'},
     },
     PARAGON = {
         categories = {"xab1401"},
-        name = "No Paragon",
+        name = "<LOC restricted_units_data_025>No Paragon",
         tooltip = {text = 'No Paragon', body = 'Removes the Paragon, the Aeon Experimental Infinite Resource Generator'},
     },
     SATELLITE = {
         categories = {"xeb2402"},
-        name = "No Satellite",
+        name = "<LOC restricted_units_data_026>No Satellite",
         tooltip = {text = 'No Satellite', body = 'Removes the UEF Novax Satellite'},
     },
     TELE = {
         enhancement = {"Teleporter", "TeleporterRemove"},
-        name = "No Teleporting",
+        name = "<LOC restricted_units_data_027>No Teleporting",
         tooltip = {text = 'No Teleporting', body = 'Removes the ability to upgrade ACUs and sACUs with Teleporters'},
     },
     BILLY = {
         enhancement = {"TacticalNukeMissile", "TacticalNukeMissileRemove"},
-        name = "No Billy",
+        name = "<LOC restricted_units_data_028>No Billy",
         tooltip = {text = 'No Billy', body = 'Prevents UEF commanders from upgrading their ACU to have the "billy" tactical nuke upgrade'},
     },
     T1 = {
@@ -98,61 +98,60 @@ restrictedUnits = {
         name = "<LOC restricted_units_data_0011>No Nukes",
         tooltip = {text = 'No Nukes', body = 'Prevents all Nukes being built, apart from the UEF "Billy" nuke'},
     },
-    GAMEENDERS = {--IceDreamer
-                                ---ArtyAEO---ArtyUEF---ArtyCYB---ArtySER---Paragon---Salvation---Scathis---Satellite---Mavor---Yolona Oss
+    GAMEENDERS = {
         categories = {"uab2302", "urb2302", "ueb2302", "xsb2302", "xab1401", "xab2307", "url0401", "xeb2402", "ueb2401", "xsb2401"},
         name = "<LOC restricted_units_data_0012>No Game Enders",
-        tooltip = "restricted_units_gameenders",
+        tooltip = {text = 'No Game Enders', body = 'Restricts access to Heavy Artilley, Paragon, Novax Satellite and Yolona Oss'},
     },
     BUBBLES = {
         categories = {"uel0307", "ual0307", "xsl0307", "xes0205", "ueb4202", "urb4202", "uab4202", "xsb4202", "ueb4301", "uab4301", "xsb4301"},
-        name = "<LOC restricted_units_data_0013>No Bubbles",
-        tooltip = "restricted_units_bubbles",
+        name = "<LOC restricted_units_data_0013>No Bubble Shields",
+        tooltip = {text = 'No Bubble Shields', body = 'Removes all non-upgrade Bubble Shields'},
     },
     INTEL = {
         categories = {"OMNI", "uab3101", "uab3201", "ueb3101", "ueb3201", "urb3101", "urb3201", "xsb3101", "xsb3201", "uab3102", "uab3202", "ueb3102", "ueb3202", "urb3102", "urb3202", "xsb3102", "xsb3202", "xab3301", "xrb3301", "ues0305", "uas0305", "urs0305"},
         name = "<LOC restricted_units_data_0014>No Intel Structures",
-        tooltip = "restricted_units_intel",
+        tooltip = {text = 'No Intel Structures', body = 'Prevents players from constructing Sonar, Radar, or Stealth structures'},
     },
     SUPCOM = {
         categories = {"SUBCOMMANDER"},
         name = "<LOC restricted_units_data_0015>No Support Commanders",
-        tooltip = "restricted_units_supcom",
+        tooltip = {text = 'No Support Commanders', body = 'Prevents players from summoning Support Armored Command Units'},
     },
     PRODSC1 = {
         categories = {"PRODUCTSC1"},
-        name = "<LOC restricted_units_data_0016>No Supreme Commander",
-        tooltip = "restricted_units_supremecommander",
+        name = "<LOC restricted_units_data_0016>No Vanilla",
+        tooltip = {text = 'No Vanilla', body = 'Removes all units which were found in the original Supreme Commander'},
     },
     PRODFA = {
         categories = {"PRODUCTFA"},
         name = "<LOC restricted_units_data_0017>No Forged Alliance",
-        tooltip = "restricted_units_forgedalliance",
+        tooltip = {text = 'No Forged Alliance', body = 'Removes all units which were introduced in the Forged Alliance expansion'},
     },
     PRODDL = {
         categories = {"PRODUCTDL"},
         name = "<LOC restricted_units_data_0018>No Downloaded",
-        tooltip = "restricted_units_downloaded",
+        tooltip = {text = 'No Downloaded', body = 'Prevents players building units introduced as DLC'},
     },
     FABS = {
         categories = {"ueb1104", "ueb1303", "urb1104", "urb1303", "uab1104", "uab1303", "xsb1104", "xsb1303"},
         name = "<LOC restricted_units_data_0019>No Mass Fabrication",
-        tooltip = "restricted_units_massfab",
+        tooltip = {text = 'No Mass Fabrication', body = 'Prevents players building Mass Fabricators'},
     },
     SUPPFAC = {
         categories = {"SUPPORTFACTORY"},
         name = "<LOC restricted_units_data_0020>No Support Factories",
-        tooltip = "restricted_units_supportfactory",
+        tooltip = {text = 'No Support Factories', body = 'Prevents players from building fresh Support Factories, effectively disabling the "Engiemod" changes'},
     },
     T3MOBILEAA = {
         categories = {"dalk003","delk002", "drlk001", "drlk005", "dslk004"},
         name = "<LOC restricted_units_data_0021>No T3 Mobile Anti-Air",
-        tooltip = "restricted_units_t3mobileaa",
+        tooltip = {text = 'No T3 Mobile Anti-Air', body = 'Prevents players being able to build the new T3 MAA units'},
     },
     WALL = {
         categories = {"WALL"},
         name = "<LOC restricted_units_data_022>No Walls",
-        tooltip = "Prevents players being able to build Walls",
+        tooltip = {text = 'No Walls', body = 'Prevents players being able to build Walls'},
     },
 }
 
