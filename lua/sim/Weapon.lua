@@ -475,6 +475,7 @@ Weapon = Class(moho.weapon_methods) {
             --send a message to tell the weapon that the unit just got dropped and needs to restart aim
             self:OnLostTarget()
         end
+
         --Disable weapon if on transport and not allowed to fire from it
         if not self.unit:GetBlueprint().Transport.CanFireFromTransport then
             if transportstate then
@@ -484,7 +485,12 @@ Weapon = Class(moho.weapon_methods) {
                 self:SetWeaponEnabled(true)
                 self.WeaponDisabledOnTransport = false
             end
-        end        
+        end
+
+        if transportstate then
+            --Reset weapon to ensure torso centres and unit survives drop
+            self:ResetTarget()
+        end
     end,
 
     --Method to retreive onTransport information. True if the parent unit has been loaded on to a transport unit
