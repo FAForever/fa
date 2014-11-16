@@ -187,7 +187,10 @@ Shield = Class(moho.shield_methods,Entity) {
                 self:UpdateShieldRatio(0)
             end		
         end	
-        if doOverspill then
+        -- Only do overspill on events where we have an instigator. 
+        -- "Force" damage events from stratbombs are one example
+        -- where we don't.
+        if doOverspill and IsEntity(instigator) then
             Overspill.DoOverspill(self, instigator, amount, dmgType, self.SpillOverDmgMod)
         end
     end,
@@ -347,11 +350,24 @@ Shield = Class(moho.shield_methods,Entity) {
 
             -- We are no longer turned off
             self.OffHealth = -1
-
+            
             self:UpdateShieldRatio(-1)
-
-            self.Owner:OnShieldEnabled()
             self:CreateShieldMesh()
+            
+            --Code for Personal Bubbles, currently only the Harbinger
+            local OwnerBp = self.Owner:GetBlueprint()
+            local OwnerShield = OwnerBp.Defense.Shield
+            if OwnerShield.PersonalBubble and OwnerShield.PersonalBubble == true then
+                self.Owner:SetCollisionShape('Sphere', 0, OwnerBp.SizeY * 0.5, 0, OwnerShield.ShieldSize * 0.5)
+                --Manually disable the bubble shield's collision sphere after its creation so it acts like the new personal shields
+                self:SetCollisionShape('None')
+            end
+            
+            self.Owner:PlayUnitSound('ShieldOn')
+            self.Owner:SetMaintenanceConsumptionActive()
+            
+            --Then we can make any units inside a transport with a Shield invulnerable here
+            self:ProtectTransportedUnits()
 
             local aiBrain = self.Owner:GetAIBrain()
 
@@ -403,13 +419,24 @@ Shield = Class(moho.shield_methods,Entity) {
             -- Set the offhealth - this is used basically to let the unit know the unit was manually turned off
             self.OffHealth = self:GetHealth()
 
-            -- Get rid of teh shield bar
+            -- Get rid of the shield bar
             self:UpdateShieldRatio(0)
-
             self:RemoveShield()
-            self.Owner:OnShieldDisabled()
+            
+            --Code for Personal Bubbles, currently only the Harbinger
+            local OwnerBp = self.Owner:GetBlueprint()
+            local OwnerShield = OwnerBp.Defense.Shield
+            if OwnerShield.PersonalBubble and OwnerShield.PersonalBubble == true then
+                self.Owner:SetCollisionShape('Box', 0, OwnerBp.SizeY * 0.5, 0, OwnerBp.SizeX * 0.5, OwnerBp.SizeY * 0.5, OwnerBp.SizeZ * 0.5)
+            end
+            
+            self.Owner:PlayUnitSound('ShieldOff')
+            self.Owner:SetMaintenanceConsumptionInactive()
 
-            WaitSeconds(1)            
+            --Apply vulnerabilities
+            self:RevokeTransportProtection()
+
+            WaitSeconds(1)
         end,
 
         IsOn = function(self)
@@ -421,8 +448,19 @@ Shield = Class(moho.shield_methods,Entity) {
     DamageRechargeState = State {
         Main = function(self)
             self:RemoveShield()
-            self.Owner:OnShieldHpDepleted(self)                                    --Continental Fix            
-            # We must make the unit charge up before gettings its shield back
+
+            --Code for Personal Bubbles, currently only the Harbinger
+            local OwnerBp = self.Owner:GetBlueprint()
+            local OwnerShield = OwnerBp.Defense.Shield
+            if OwnerShield.PersonalBubble and OwnerShield.PersonalBubble == true then
+                self.Owner:SetCollisionShape('Box', 0, OwnerBp.SizeY * 0.5, 0, OwnerBp.SizeX * 0.5, OwnerBp.SizeY * 0.5, OwnerBp.SizeZ * 0.5)
+            end
+            self.Owner:PlayUnitSound('ShieldOff')            
+
+            --Apply vulnerabilities
+            self:RevokeTransportProtection()
+            
+            -- We must make the unit charge up before getting its shield back
             self:ChargingUp(0, self.ShieldRechargeTime)
 
             -- Fully charged, get full health
@@ -440,7 +478,17 @@ Shield = Class(moho.shield_methods,Entity) {
     EnergyDrainRechargeState = State {
         Main = function(self)
             self:RemoveShield()
-            self.Owner:OnShieldEnergyDepleted(self)                                --Continental Fix            
+            --Code for Personal Bubbles, currently only the Harbinger
+            local OwnerBp = self.Owner:GetBlueprint()
+            local OwnerShield = OwnerBp.Defense.Shield
+            if OwnerShield.PersonalBubble and OwnerShield.PersonalBubble == true then
+                self.Owner:SetCollisionShape('Box', 0, OwnerBp.SizeY * 0.5, 0, OwnerBp.SizeX * 0.5, OwnerBp.SizeY * 0.5, OwnerBp.SizeZ * 0.5)
+            end
+            self.Owner:PlayUnitSound('ShieldOff')
+            
+            --Apply vulnerabilities
+            self:RevokeTransportProtection()
+            
             self:ChargingUp(0, self.ShieldEnergyDrainRechargeTime)
 
             -- If the unit is attached to a transport, make sure the shield goes to the off state
@@ -457,6 +505,28 @@ Shield = Class(moho.shield_methods,Entity) {
         end,
     },
 
+    ProtectTransportedUnits = function(self)
+        if EntityCategoryContains(categories.TRANSPORTATION, self.Owner) then
+            self.Owner:SetCanTakeDamage(false)        
+            local Cargo = self.Owner:GetCargo()
+            for _, v in Cargo do
+                v:SetCanTakeDamage(false)
+            end
+            self.Owner:IsTransportProtected(true)            
+        end
+    end,
+    
+    RevokeTransportProtection = function(self)
+        if EntityCategoryContains(categories.TRANSPORTATION, self.Owner) then    
+            self.Owner:SetCanTakeDamage(true)        
+            local Cargo = self.Owner:GetCargo()
+            for _, v in Cargo do
+                v:SetCanTakeDamage(true)
+            end
+            self.Owner:IsTransportProtected(false)            
+        end
+    end,    
+    
     DeadState = State {
         Main = function(self)
         end,
@@ -525,7 +595,9 @@ UnitShield = Class(Shield){
     end,
 
     CreateShieldMesh = function(self)
-        self:SetCollisionShape( 'Box', self.CollisionCenterX, self.CollisionCenterY, self.CollisionCenterZ, self.CollisionSizeX, self.CollisionSizeY, self.CollisionSizeZ)
+        -- Personal shields (unit shields) don't handle collisions anymore.
+        -- This is done in the Unit's OnDamage function instead.
+        self:SetCollisionShape('None')
         self.Owner:SetMesh(self.OwnerShieldMesh,true)
     end,
 

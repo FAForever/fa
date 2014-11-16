@@ -77,6 +77,7 @@ UnitBlueprint {
             Mesh = '/effects/entities/AeonShield01/AeonShield01_mesh',
             MeshZ = '/effects/entities/Shield01/Shield01z_mesh',
             PassOverkillDamage = true,
+            PersonalBubble = true,
             RegenAssistMult = 60,
             ShieldEnergyDrainRechargeTime = 5,
             ShieldMaxHealth = 1300,
