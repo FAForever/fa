@@ -161,12 +161,12 @@ function OnCommandIssued(command)
 		local cb = { Func = 'AddTarget', Args = { target = command.Target.EntityId, position = command.Target.Position } } 
 		SimCallback(cb, true)
 
-	--else
-	--	local cc = { Func = 'ClearTargets', Args = { } }
-	--	SimCallback(cc, true)
 	end
-	
-	-- end of issue:#43
+    
+    if command.CommandType == 'Guard' and command.Target.Type == 'Entity' then
+        local cb = { Func = 'ValidateAssist', Args = { target = command.Target.EntityId }}
+        SimCallback(cb, true)
+    end
 	
 	if command.CommandType == 'BuildMobile' then				
 		AddCommandFeedbackBlip({
