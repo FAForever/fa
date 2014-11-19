@@ -21,193 +21,179 @@ ShadowOrders = {}
 -- Some orders need to be changed for them to work when garbling orders.
 -- Note that the Stop command is handled implicitly by the clear bit being set.
 TranslatedOrder = {
-    ["Move"]                    = "Move",
-    ["Attack"]                  = "Attack",
-    ["AggressiveMove"]          = "AggressiveMove",
-    ["FormMove"]                = "Move",                -- Form actions currently not supported
-    ["FormAttack"]              = "Attack",              -- Form actions currently not supported
-    ["FormAggressiveMove"]      = "AggressiveMove",      -- Form actions currently not supported
-    ['OverCharge']              = 'OverCharge',
-    ["BuildMobile"]             = "BuildMobile",
-    ["TransportUnloadUnits"]    = "TransportUnloadUnits",
-    ["Reclaim"]                 = "Reclaim",
+ ["Move"]               = "Move",
+ ["Attack"]             = "Attack",
+ ["AggressiveMove"]     = "AggressiveMove",
+ ["FormMove"]           = "Move",                -- Form actions currently not supported
+ ["FormAttack"]         = "Attack",              -- Form actions currently not supported
+ ["FormAggressiveMove"] = "AggressiveMove",      -- Form actions currently not supported
 }
-
-function orderHash(order)
-    return order.CommandType .. order.Blueprint .. "x" .. order.Target.Position[1] .. "z" .. order.Target.Position[2] .. "y" .. order.Target.Position[3]
-end
 
 -- This function makes a shadow copy of the orders given to the units.
 -- Due to it's use, only a subset of the orders will be kept.
 function MakeShadowCopyOrders(command)
-    -- The following subset of order is kept:
-    -- - Move
-    -- - Stop               : Special, it will not be shadow copied, but it's clear orders command will be executed
-    -- - Attack
-    -- - AggressiveMove
-    -- - FormMove           : These orders are copied, but will be renamed to normal Move orders
-    -- - FormAttack         : These orders are copied, but will be renamed to normal Attack orders
-    -- - FormAggressiveMove : These orders are copied, but will be renamed to normal AggressiveMove orders
 
-    -- If the order has the Clear bit set, then all previously issued orders will be removed first,
-    -- even if the specific order will not be handled below.
-    -- This conveniently also handles the Stop order (= clear all orders).
-    if command.Clear == true then
-        for _,unit in ipairs(command.Units) do
-            ShadowOrders[unit:GetEntityId()] = {}
-        end
-    end
-
-    -- Skip handling the order if it does not belong to the given subset.
-    if not TranslatedOrder[command.CommandType] then
-        return
-    end
-
-    local Order = {
-        CommandType = "",
-        Target      = nil,
-    }
-
-
-    -- Fill in the Order table for the current order given
-    Order.CommandType = TranslatedOrder[command.CommandType]
-    Order.Blueprint   = command.Blueprint
-    Order.Target      = command.Target
-    Order.Hash      = orderHash(Order)
-
-    -- Add this order to each individual unit.
+  -- The following subset of order is kept:
+  -- - Move
+  -- - Stop               : Special, it will not be shadow copied, but it's clear orders command will be executed
+  -- - Attack
+  -- - AggressiveMove
+  -- - FormMove           : These orders are copied, but will be renamed to normal Move orders
+  -- - FormAttack         : These orders are copied, but will be renamed to normal Attack orders
+  -- - FormAggressiveMove : These orders are copied, but will be renamed to normal AggressiveMove orders
+  
+  -- If the order has the Clear bit set, then all previously issued orders will be removed first,
+  -- even if the specific order will not be handled below.
+  -- This conveniently also handles the Stop order (= clear all orders).
+  if command.Clear == true then
     for _,unit in ipairs(command.Units) do
-        -- Initialise the orders table, if needed.
-        if not ShadowOrders[unit:GetEntityId()] then
-            ShadowOrders[unit:GetEntityId()] = {}
-        end
-        table.insert(ShadowOrders[unit:GetEntityId()],Order)
+      ShadowOrders[unit:GetEntityId()] = {}
     end
+  end
+
+  -- Skip handling the order if it does not belong to the given subset.
+  if not( TranslatedOrder[command.CommandType] ) then
+    return
+  end
+  
+  local Order = {
+    CommandType = "",
+    Position    = {},
+    Target      = nil,
+  }
+
+  -- Fill in the Order table for the current order given
+  Order.CommandType = TranslatedOrder[command.CommandType]
+  Order.Position    = command.Target.Position
+  Order.Target      = command.Target.EntityId
+  
+  -- Add this order to each individual unit.
+  for _,unit in ipairs(command.Units) do
+
+    -- Initialise the orders table, if needed.
+    if not( ShadowOrders[unit:GetEntityId()] ) then
+      ShadowOrders[unit:GetEntityId()] = {}
+    end
+    table.insert(ShadowOrders[unit:GetEntityId()],Order)
+  end
+
 end -- function MakeShadowCopyorders(command)
 
-function getNearestOrder(position, orders)
-    local best = nil
 
-    for id, o in orders do
-        if(best == nil or VDist3(position, o.Target.Position) < VDist3(position, orders[best].Target.Position)) then
-            best = id
-        end
-    end
+--------------------------
+-- Function SpreadAttack()
+--------------------------
 
-    return best
-end
-
-function distributeOrders(all_orders, units)
-    local final = {}
-    local orders = {}
-    local positions = {}
-    local done = {}
-    local n_orders = table.getsize(all_orders)
-    local n_units = table.getsize(units)
-
-    if n_orders == 0 then
-        return {}
-    end
-
-    orders = table.copy(all_orders)
-
-    while table.getsize(done) < 2 do
-        for _, b in units do
-            local id = b:GetEntityId()
-            local best = nil
-            local best_id = nil
-
-            if table.getsize(orders) == 0 then
-                orders = table.copy(all_orders)
-                done[1] = true
-            end
-
-            if not final[id] then
-                final[id] = {}
-            end
-
-            if not positions[id] then
-                positions[id] = b:GetPosition()
-            end
-
-            best_id = getNearestOrder(positions[id], orders)
-            if best_id then
-                table.insert(final[id], orders[best_id])
-                positions[id] = orders[best_id].Position
-                orders[best_id] = nil
-            end
-        end
-
-        done[2] = true
-    end
-
-    return final
-end
-
+-- This function rearranges all attack orders randomly for every unit.
 function SpreadAttack()
-    local selected = GetSelectedUnits() or {}
-    local builders = {}
-    local orders = {}
-    local queue = {}
 
-    for _, u in selected do
-        local unit_orders = ShadowOrders[u:GetEntityId()]
+  -- Get the currently selected units.
+  local curSelection = GetSelectedUnits()
 
-        if unit_orders then
-            for _, o in unit_orders do
-                local hash = o.Hash
+  if not ( curSelection ) then
+    return
+  end
 
-                if not orders[hash] then
-                    orders[hash] = o
-                end
-            end
-        end
+  -- Switch the orders for each unit.
+  for _,unit in ipairs(curSelection) do
+    local unitorders = ShadowOrders[unit:GetEntityId()]
 
-        builders[u:GetEntityId()] = u
+    -- Only mix orders if this unit has any orders to mix.
+    if not( unitorders ) and not( unitorders[1] ) then 
+      continue
     end
+  
+    -- Find all consecutive Attack orders, and only mix those.
+    local beginAttack,endAttack,counter = nil,nil,1
 
-    local final = distributeOrders(orders, builders)
+    while unitorders[counter] ~= nil  do
 
-    SimCallback({   Func = "GiveOrders",
-                    Args = {final=final},
-                }, false)
+      beginAttack = nil
+      -- Search for the first entry of an Attack order.
+      while beginAttack == nil and unitorders[counter] ~= nil do
+        if unitorders[counter].CommandType == "Attack" then
+          beginAttack = counter
+        end
+        counter = counter + 1
+      end
 
-    UnitOrders = {}
-end
+      endAttack = beginAttack
+      -- Search for the last entry of an Attack order in this series.
+      while unitorders[counter] ~= nil do
+        if unitorders[counter].CommandType == "Attack" then
+          endAttack = counter
+          counter = counter + 1
+        else
+          break
+        end
+      end
+      
+      -- Skip if there was no Attack found, or only one attack (can't swap one command).
+      if beginAttack == nil or endAttack == beginAttack then
+        break
+      end
 
+      -- Swap each order with a random other order.
+      for i = beginAttack,endAttack do
+        local randomorder = math.random(beginAttack,endAttack)
+        if randomorder ~= i then
+          unitorders[i],unitorders[randomorder] = unitorders[randomorder],unitorders[i]
+        end
+      end
+
+
+      -- Repeat this loop and search for more Attack series.
+    end
+  
+    -- All Attack orders have been mixed, now it's time to reassign those orders.
+    -- Since giving orders is a Sim-side command, use a SimCallback function.
+    SimCallback( { Func = "GiveOrders",
+                   Args = { unit_orders = unitorders,
+                            unit_id     = unit:GetEntityId(),
+                            From = GetFocusArmy()}, 
+                 }, false )
+
+    -- Handle the next unit.
+  end
+
+
+end -- Function SpreadAttack()
+
+
+----------------------------
+-- Function GiveOrders(Data)
+----------------------------
+
+-- This function re-issues all shadow orders to the selected units.
+-- Since the orders herein are Sim-side commands, this function needs to be called through a SimCallback.
 function GiveOrders(Data)
-    local final = Data.final
-    local all_units = {}
+    if OkayToMessWithArmy(Data.From) then --Check for cheats/exploits
+        local unit = GetEntityById(Data.unit_id)
+        -- Skip units with no valid shadow orders.
+        if not( Data.unit_orders ) or not( Data.unit_orders[1] ) then
+            return
+        end
 
-    for id, orders in final do
-        local unit = GetEntityById(id)
-        if(OkayToMessWithArmy(unit:GetArmy())) then
-          table.insert(all_units, unit)
-          IssueClearCommands({unit})
+        -- All orders will be re-issued, so all existing orders have to be cleared first.
+        IssueClearCommands( { unit } )
+
+        -- Re-issue all orders.
+        for _,order in ipairs(Data.unit_orders) do
+
+            -- Currently supported 3 orders are: Attack, Move and AggressiveMove
+            if order.CommandType == "Attack" then
+                local victim = GetEntityById(order.Target)
+                IssueAttack( { unit },victim)
+            end
+
+            if order.CommandType == "Move" then
+                IssueMove( { unit },order.Position)
+            end
+
+            if order.CommandType == "AggressiveMove" then
+                IssueAggressiveMove( { unit },order.Position)
+            end
         end
     end
 
-    for id, orders in final do
-        local unit = GetEntityById(id)
-
-        for _, o in orders do
-            local target
-
-            if o.Target.Type == "Position" then
-                target = o.Target.Position
-            elseif o.Target.Type == "Entity" then
-                target = GetEntityById(o.Target.EntityId)
-            end
-
-            if(not target) then
-                return
-            end
-
-            if o.CommandType == "BuildMobile" then
-                IssueBuildMobile({unit}, o.Target.Position, o.Blueprint, {})
-            else
-                _G['Issue'.. o.CommandType]({unit}, target)
-            end
-        end
-    end
-end
+end -- function GiveOrders(Data,Units)
