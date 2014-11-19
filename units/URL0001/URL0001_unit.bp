@@ -1027,6 +1027,7 @@ UnitBlueprint {
         },
         {
             BallisticArc = 'RULEUBA_None',
+            BelowWaterFireOnly = true,  -- Added this value to prevent shore-lining
             CollideFriendly = false,
             Damage = 250,
             DamageType = 'Normal',
