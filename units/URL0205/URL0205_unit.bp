@@ -1,10 +1,4 @@
 UnitBlueprint {
-    AI = {
-        TargetBones = {
-            'URL0205',
-            'Turret',
-        },
-    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'URL',
@@ -183,9 +177,9 @@ UnitBlueprint {
     SelectionSizeX = 0.5,
     SelectionSizeZ = 0.65,
     SelectionThickness = 0.6,
-    SizeX = 0.8,
-    SizeY = 0.7,
-    SizeZ = 1,
+    SizeX = 0.65,
+    SizeY = 0.6,
+    SizeZ = 0.9,
     StrategicIconName = 'icon_land2_antiair',
     StrategicIconSortPriority = 125,
     Transport = {
