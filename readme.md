@@ -22,6 +22,7 @@ make a thread if it isn't there already.
 - [X] Fixed infinite economy exploit
 - [X] Fixed free ACU upgrade exploit
 - [X] Security exploits with simcallbacks
+- [X] Fixed UEF Drone upgrade exploits
 
 *Bug Fixes*
 - [X] Continental Fixes:
@@ -33,6 +34,8 @@ make a thread if it isn't there already.
 - [X] Fix adjacency buffs working when unit is turned off
 - [X] Fixed Cybran ACU with Laser upgrade being unable to ever fire the weapon after being transported, and improve targeting further
 - [X] Fixed Cybran ACU with Torpedo upgrade firing at the floor after being transported
+- [X] Fixed Cybran ACU Torpedo upgrade firing while the ACU's feet are only just underwater
+- [X] Fixed Cybran ACU being unable to be shot by Torpedoes with only its feet in the water
 - [X] Fixed Seraphim ACU dying when dropped from Transport after being picked up while firing
 - [X] Fixed Seraphim ACU shot being visible through FoW
 - [X] Fixed invalid preview range of SMDs
@@ -60,6 +63,8 @@ make a thread if it isn't there already.
 - [X] Attempt to fix Seraphim T1 Mobile AA's aim
 - [X] Improved autobalance with random spawns in lobby
 - [X] SMD can be paused
+- [X] New "No Walls" Unit Restriction
+- [X] Improved the Unit Restrictions menu descriptions
 
 ----------------------------------
 *Changes to be verified*
