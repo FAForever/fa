@@ -1,14 +1,10 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UEL0001/UEL0001_script.lua
-#**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
-#**
-#**  Summary  :  UEF Commander Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+-----------------------------------------------------------------
+-- File     :  /cdimage/units/UEL0001/UEL0001_script.lua
+-- Author(s):  John Comes, David Tomandl, Jessica St. Croix
+-- Summary  :  UEF Commander Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
 local Shield = import('/lua/shield.lua').Shield
-
 local TWalkingLandUnit = import('/lua/terranunits.lua').TWalkingLandUnit
 local TerranWeaponFile = import('/lua/terranweapons.lua')
 local TDFZephyrCannonWeapon = TerranWeaponFile.TDFZephyrCannonWeapon
@@ -95,8 +91,7 @@ UEL0001 = Class(TWalkingLandUnit) {
                         TDFOverchargeWeapon.RackSalvoFireReadyState.OnFire(self)
                     end
                 end,
-            },            
-            
+            },
         },
         TacMissile = Class(TIFCruiseMissileLauncher) {
         },
@@ -113,7 +108,7 @@ UEL0001 = Class(TWalkingLandUnit) {
         self:SetupBuildBones()
         self.HasLeftPod = false
         self.HasRightPod = false
-        # Restrict what enhancements will enable later
+        -- Restrict what enhancements will enable later
         self:AddBuildRestriction( categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
     end,
 
@@ -235,7 +230,7 @@ UEL0001 = Class(TWalkingLandUnit) {
 
     CreateBuildEffects = function( self, unitBeingBuilt, order )
         local UpgradesFrom = unitBeingBuilt:GetBlueprint().General.UpgradesFrom
-        # If we are assisting an upgrading unit, or repairing a unit, play seperate effects
+        -- If we are assisting an upgrading unit, or repairing a unit, play separate effects
         if (order == 'Repair' and not unitBeingBuilt:IsBeingBuilt()) or (UpgradesFrom and UpgradesFrom != 'none' and self:IsUnitState('Guarding'))then
             EffectUtil.CreateDefaultBuildBeams( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )
         else
@@ -259,70 +254,57 @@ UEL0001 = Class(TWalkingLandUnit) {
         self.BuildingUnit = false          
     end,
 
-	RebuildPod = function(self, PodNumber)
-		if PodNumber == 1 then
-			local ecobp = self:GetBlueprint().Pod
-			self.RebuildingPod = CreateEconomyEvent(self, 1600, 160, 10, self.SetWorkProgress)
-			self:RequestRefreshUI()
-			WaitFor(self.RebuildingPod)
-			self:SetWorkProgress(0.0)
-            local location = self:GetPosition('AttachSpecial02')
-            local pod = CreateUnitHPR('UEA0001', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
-            pod:SetParent(self, 'LeftPod')
-            pod:SetCreator(self)
-            self.Trash:Add(pod)
-            self.HasLeftPod = true
-            self.LeftPod = pod
-		else
-			local ecobp = self:GetBlueprint().Pod
-			self.RebuildingPod = CreateEconomyEvent(self, 1600, 160, 10, self.SetWorkProgress)
-			self:RequestRefreshUI()
-			WaitFor(self.RebuildingPod)
-			self:SetWorkProgress(0.0)
-			
-            local location = self:GetPosition('AttachSpecial01')
-            local pod = CreateUnitHPR('UEA0001', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
-            pod:SetParent(self, 'RightPod')
-            pod:SetCreator(self)
-            self.Trash:Add(pod)
-            self.HasRightPod = true
-            self.RightPod = pod		
-		end
-		self:RequestRefreshUI()
-	end,	
-	
+    RebuildPod = function(self, PodNumber)
+        if PodNumber == 1 then
+            -- Force pod rebuilds to queue up
+            if self.RebuildingPod2 != nil then
+                WaitFor(self.RebuildingPod2)
+            end
+            if self.HasLeftPod == true then
+                self.RebuildingPod = CreateEconomyEvent(self, 1600, 160, 10, self.SetWorkProgress)
+                self:RequestRefreshUI()
+                WaitFor(self.RebuildingPod)
+                self:SetWorkProgress(0.0)
+                self.RebuildingPod = nil
+                local location = self:GetPosition('AttachSpecial02')
+                local pod = CreateUnitHPR('UEA0001', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+                pod:SetParent(self, 'LeftPod')
+                pod:SetCreator(self)
+                self.Trash:Add(pod)
+                self.LeftPod = pod
+            end
+        elseif PodNumber == 2 then
+            -- Force pod rebuilds to queue up
+            if self.RebuildingPod != nil then
+                WaitFor(self.RebuildingPod)
+            end
+            if self.HasRightPod == true then
+                self.RebuildingPod2 = CreateEconomyEvent(self, 1600, 160, 10, self.SetWorkProgress)
+                self:RequestRefreshUI()
+                WaitFor(self.RebuildingPod2)
+                self:SetWorkProgress(0.0)
+                self.RebuildingPod2 = nil
+                local location = self:GetPosition('AttachSpecial01')
+                local pod = CreateUnitHPR('UEA0001', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+                pod:SetParent(self, 'RightPod')
+                pod:SetCreator(self)
+                self.Trash:Add(pod)
+                self.RightPod = pod
+            end
+        end
+        self:RequestRefreshUI()
+    end,
+
     NotifyOfPodDeath = function(self, pod)
-	
-	if pod == 'LeftPod' then
-	    	if self.HasLeftPod == true then #for fixing bug!
-			self:ForkThread(self.RebuildPod,1)
-		else
-			return
-		end
-
+        if pod == 'LeftPod' then
+            if self.HasLeftPod == true then
+                self.RebuildThread = self:ForkThread(self.RebuildPod, 1)
+            end
         elseif pod == 'RightPod' then
-		if self.HasRightPod == true then #for fixing bug!
-			self:ForkThread(self.RebuildPod,2)
-		else
-			return
-		end
-
-	end
-        #if pod == 'RightPod' and self.HasLeftPod then
-        #    self:CreateEnhancement('RightPodRemove')
-        #    self:CreateEnhancement('LeftPod')
-        #    self.HasRightPod = false
-        #    self:RequestRefreshUI()
-        #elseif pod == 'RightPod' and not self.HasLeftPod then
-        #    self:CreateEnhancement('RightPodRemove')
-        #    self:CreateEnhancement('LeftPodRemove')
-        #    self.HasRightPod = false
-        #    self:RequestRefreshUI()
-        #elseif pod == 'LeftPod' then
-        #    self.HasLeftPod = false
-        #    self:CreateEnhancement('LeftPodRemove')
-        #    self:RequestRefreshUI()
-        #end
+            if self.HasRightPod == true then
+                self.RebuildThread2 = self:ForkThread(self.RebuildPod, 2)
+            end
+        end
     end,
 
     CreateEnhancement = function(self, enh)
@@ -347,14 +329,28 @@ UEL0001 = Class(TWalkingLandUnit) {
             self.HasRightPod = true
             self.RightPod = pod
         elseif enh == 'LeftPodRemove' or enh == 'RightPodRemove' then
-            if self.LeftPod and not self.LeftPod:IsDead() then
-		self.HasLeftPod = false #new, for bug fix!
-                self.LeftPod:Kill()
+            if self.HasLeftPod == true then
+                self.HasLeftPod = false
+                if self.LeftPod and not self.LeftPod:IsDead() then
+                    self.LeftPod:Kill()
+                end
+                if self.RebuildingPod != nil then
+                    RemoveEconomyEvent(self, self.RebuildingPod)
+                    self.RebuildingPod = nil
+                end
             end
-            if self.RightPod and not self.RightPod:IsDead() then
-		self.HasRightPod = false  #new, for bug fix!
-                self.RightPod:Kill()
+            if self.HasRightPod == true then
+                self.HasRightPod = false
+                if self.RightPod and not self.RightPod:IsDead() then
+                    self.RightPod:Kill()
+                end
+                if self.RebuildingPod2 != nil then
+                    RemoveEconomyEvent(self, self.RebuildingPod2)
+                    self.RebuildingPod2 = nil
+                end
             end
+            KillThread(self.RebuildThread)
+            KillThread(self.RebuildThread2)
         elseif enh == 'Teleporter' then
             self:AddCommandCap('RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
@@ -408,8 +404,8 @@ UEL0001 = Class(TWalkingLandUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'UEFACUT2BuildRate')
-	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-	    self:updateBuildRestrictions()
+            -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+            self:updateBuildRestrictions()
         elseif enh =='AdvancedEngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -418,10 +414,9 @@ UEL0001 = Class(TWalkingLandUnit) {
             self:AddBuildRestriction( categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
             if Buff.HasBuff( self, 'UEFACUT2BuildRate' ) then
                 Buff.RemoveBuff( self, 'UEFACUT2BuildRate' )
-	     end
-	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-	    self:updateBuildRestrictions()
-
+            end
+            -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+            self:updateBuildRestrictions()
         elseif enh =='T3Engineering' then
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
             self:RemoveBuildRestriction(cat)
@@ -449,8 +444,8 @@ UEL0001 = Class(TWalkingLandUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'UEFACUT3BuildRate')
-	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-	    self:updateBuildRestrictions()
+            -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+            self:updateBuildRestrictions()
         elseif enh =='T3EngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -459,8 +454,8 @@ UEL0001 = Class(TWalkingLandUnit) {
                 Buff.RemoveBuff( self, 'UEFACUT3BuildRate' )
             end
             self:AddBuildRestriction( categories.UEF * ( categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
-	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-	    self:updateBuildRestrictions()
+            -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
+            self:updateBuildRestrictions()
         elseif enh =='DamageStablization' then
             if not Buffs['UEFACUDamageStablization'] then
                 BuffBlueprint {
@@ -496,8 +491,7 @@ UEL0001 = Class(TWalkingLandUnit) {
             local bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius
             wep:ChangeMaxRadius(bpDisrupt or 22)
             local oc = self:GetWeaponByLabel('OverCharge')
-            oc:ChangeMaxRadius(bpDisrupt or 22)            
-        #ResourceAllocation              
+            oc:ChangeMaxRadius(bpDisrupt or 22)
         elseif enh == 'ResourceAllocation' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
@@ -550,7 +544,6 @@ UEL0001 = Class(TWalkingLandUnit) {
         end
         TWalkingLandUnit.OnUnpaused(self)
     end,      
-
 }
 
 TypeClass = UEL0001
