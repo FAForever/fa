@@ -141,7 +141,6 @@
         'OVERLAYDIRECTFIRE',
         'OVERLAYOMNI',
     },
-    CollisionOffsetZ = 0.1,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Commander',
@@ -829,8 +828,8 @@
     SelectionThickness = 0.9,
     SelectionYOffset = 0,
     SizeX = 1.2, #from 1
-    SizeY = 2.0,
-    SizeZ = 0.8,
+    SizeY = 2.2,
+    SizeZ = 1.2,
     StrategicIconName = 'icon_commander_generic',
     StrategicIconSortPriority = 0,
     Transport = {

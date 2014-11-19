@@ -55,7 +55,7 @@ UnitBlueprint {
         'OVERLAYANTINAVY',
         'SORTDEFENSE',
     },
-    CollisionOffsetY = -3.5,
+    CollisionOffsetY = -2.7,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
@@ -187,9 +187,9 @@ UnitBlueprint {
     SelectionSizeX = 1.8,
     SelectionSizeZ = 1.6,
     SelectionThickness = 0.39,
-    SizeX = 3,
-    SizeY = 2.9,
-    SizeZ = 3,
+    SizeX = 2,
+    SizeY = 2.7,
+    SizeZ = 2,
     StrategicIconName = 'icon_structure3_antinavy',
     StrategicIconSortPriority = 200,
     Veteran = {

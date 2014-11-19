@@ -69,7 +69,7 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
         'OVERLAYOMNI',
     },
-    CollisionOffsetZ = 0.1,
+    CollisionOffsetY = 0.3,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Experimental',
@@ -250,9 +250,9 @@ UnitBlueprint {
     SelectionSizeX = 2.2,
     SelectionSizeZ = 1.6,
     SelectionThickness = 0.32,
-    SizeX = 3.2,
-    SizeY = 7.0,
-    SizeZ = 2.2,
+    SizeX = 2.5,
+    SizeY = 6.5,
+    SizeZ = 1.5,
     StrategicIconName = 'icon_experimental_generic',
     StrategicIconSortPriority = 115,
     Transport = {

@@ -53,6 +53,8 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWATTACKRETICLE',
     },
+    CollisionOffsetY = -0.025,
+    CollisionOffsetZ = 0.05,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'FireBeetle',
@@ -185,9 +187,9 @@ UnitBlueprint {
     SelectionSizeX = 0.35,
     SelectionSizeZ = 0.45,
     SelectionThickness = 0.83,
-    SizeX = 0.75,
-    SizeY = 0.4,
-    SizeZ = 0.65,
+    SizeX = 0.4,
+    SizeY = 0.35,
+    SizeZ = 0.55,
     StrategicIconName = 'icon_land2_bomb',
     StrategicIconSortPriority = 135,
     Transport = {
