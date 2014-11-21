@@ -6,10 +6,17 @@ type = {
     name = "name to display in list",
     tooltip = tooltipID,
 }
+
+You can get the UnitID here : http://content.faforever.com/faf/unitsDB/
 --]]
 
 restrictedUnits = {
-    TRYENGISTATION = {
+    EYED = {
+	    categories = {"xab3301", "xrb3301"},
+        name = "No Eye of Rhianne and Soothsayer",
+        tooltip = {text='No Eye of Rhianne and Soothsayer', body='Remove the T3 Optics Aeon and T3 Perimeter Cybran (by Xinnony)'},
+    },
+	TRYENGISTATION = {
         categories = {"xeb0104", "xrb0104"},
 		enhancement = {"LeftPod", "RightPod", "LeftPodRemove", "RightPodRemove", "Pod", "PodRemove"},
         name = "TRY No Engineering Station + Enhancement Drone (SACU NOT WORK)",
@@ -190,4 +197,5 @@ sortOrder = {
     "PARAGON",
     "SATELLITE",
 	"TRYENGISTATION",
+	"EYED",
 }
