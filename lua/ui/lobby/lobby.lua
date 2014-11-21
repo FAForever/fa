@@ -4355,7 +4355,7 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
         GUI.markers[slot].marker.Height:Set(10)
         GUI.markers[slot].marker.Width:Set(8)
         GUI.markers[slot].marker.Depth:Set(function() return GUI.posGroup.Depth() + 10 end)
-        GUI.markers[slot].marker:SetSolidColor('ff777777')
+        GUI.markers[slot].marker:SetSolidColor('00777777')
 
         GUI.markers[slot].teamIndicator = Bitmap(GUI.markers[slot].marker)
         LayoutHelpers.AnchorToRight(GUI.markers[slot].teamIndicator, GUI.markers[slot].marker, 1)
@@ -4490,7 +4490,7 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
         end
 
         if gameInfo.GameOptions['TeamSpawn'] == 'random' then
-            GUI.markers[slot].marker:SetSolidColor("ff777777")
+            GUI.markers[slot].marker:SetSolidColor("00777777")
         else
             if gameInfo.PlayerOptions[slot] then
                 GUI.markers[slot].marker:SetSolidColor(gameColors.PlayerColors[gameInfo.PlayerOptions[slot].PlayerColor])
@@ -4500,7 +4500,7 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
                     GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[gameInfo.PlayerOptions[slot].Team]))
                 end
             else
-                GUI.markers[slot].marker:SetSolidColor("ff777777")
+                GUI.markers[slot].marker:SetSolidColor("00777777")
                 GUI.markers[slot].teamIndicator:SetSolidColor('00000000')
             end
         end
@@ -5308,7 +5308,7 @@ function NewShowMapPositions(mapCtrl, scenario, numPlayers)
         LrgMap.markers[slot].marker.Height:Set(10)
         LrgMap.markers[slot].marker.Width:Set(8)
         LrgMap.markers[slot].marker.Depth:Set(function() return posGroup.Depth() + 10 end)
-        LrgMap.markers[slot].marker:SetSolidColor('ff777777')
+        LrgMap.markers[slot].marker:SetSolidColor('00777777')
 
         LrgMap.markers[slot].teamIndicator = Bitmap(LrgMap.markers[slot].marker)
         LayoutHelpers.AnchorToRight(LrgMap.markers[slot].teamIndicator, LrgMap.markers[slot].marker, 1)
@@ -5395,7 +5395,7 @@ function NewShowMapPositions(mapCtrl, scenario, numPlayers)
         end
 
         if gameInfo.GameOptions['TeamSpawn'] == 'random' then
-            LrgMap.markers[slot].marker:SetSolidColor("ff777777")
+            LrgMap.markers[slot].marker:SetSolidColor("00777777")
         else
             if gameInfo.PlayerOptions[slot] then
                 LrgMap.markers[slot].marker:SetSolidColor(gameColors.PlayerColors[gameInfo.PlayerOptions[slot].PlayerColor])
@@ -5405,7 +5405,7 @@ function NewShowMapPositions(mapCtrl, scenario, numPlayers)
                     LrgMap.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[gameInfo.PlayerOptions[slot].Team]))
                 end
             else
-                LrgMap.markers[slot].marker:SetSolidColor("ff777777")
+                LrgMap.markers[slot].marker:SetSolidColor("00777777")
                 LrgMap.markers[slot].teamIndicator:SetSolidColor('00000000')
             end
         end
