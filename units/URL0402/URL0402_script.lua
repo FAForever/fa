@@ -1,12 +1,12 @@
--- ****************************************************************************
--- **
--- **  File     :  /cdimage/units/URL0402/URL0402_script.lua
--- **  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Gordon Duclos
--- **
--- **  Summary  :  Cybran Spider Bot Script
--- **
--- **  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
--- ****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/URL0402/URL0402_script.lua
+--**  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Gordon Duclos
+--**
+--**  Summary  :  Cybran Spider Bot Script
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
@@ -60,71 +60,71 @@ URL0402 = Class(CWalkingLandUnit) {
         self:SetMaintenanceConsumptionActive()
     end,
 
-	OnLayerChange = function(self, new, old)
-		CWalkingLandUnit.OnLayerChange(self, new, old)
+    OnLayerChange = function(self, new, old)
+        CWalkingLandUnit.OnLayerChange(self, new, old)
         self:CreateUnitAmbientEffect(new)
         if new == 'Seabed' then
             self:EnableUnitIntel('Layer', 'Sonar')
         else
             self:DisableUnitIntel('Layer', 'Sonar')
         end
-	end,
-	
+    end,
+    
     AmbientExhaustBones = {
-		'Exhaust01',
-		'Exhaust02',
-		'Exhaust03',
-		'Exhaust06',
-		'Exhaust05',
-    },	
+        'Exhaust01',
+        'Exhaust02',
+        'Exhaust03',
+        'Exhaust06',
+        'Exhaust05',
+    },  
     
     AmbientLandExhaustEffects = {
-		'/effects/emitters/dirty_exhaust_smoke_02_emit.bp',
-		'/effects/emitters/dirty_exhaust_sparks_02_emit.bp',			
-	},
-	
+        '/effects/emitters/dirty_exhaust_smoke_02_emit.bp',
+        '/effects/emitters/dirty_exhaust_sparks_02_emit.bp',            
+    },
+    
     AmbientSeabedExhaustEffects = {
-		'/effects/emitters/underwater_vent_bubbles_02_emit.bp',			
-	},	
-	
-	CreateUnitAmbientEffect = function(self, layer)
-	    if( self.AmbientEffectThread ~= nil ) then
-	       self.AmbientEffectThread:Destroy()
-        end	 
+        '/effects/emitters/underwater_vent_bubbles_02_emit.bp',         
+    },  
+    
+    CreateUnitAmbientEffect = function(self, layer)
+        if( self.AmbientEffectThread ~= nil ) then
+           self.AmbientEffectThread:Destroy()
+        end  
         if self.AmbientExhaustEffectsBag then
             EffectUtil.CleanupEffectBag(self,'AmbientExhaustEffectsBag')
         end        
         
         self.AmbientEffectThread = nil
         self.AmbientExhaustEffectsBag = {} 
-	    if layer == 'Land' then
-	        self.AmbientEffectThread = self:ForkThread(self.UnitLandAmbientEffectThread)
-	    elseif layer == 'Seabed' then
-	        local army = self:GetArmy()
-			for kE, vE in self.AmbientSeabedExhaustEffects do
-				for kB, vB in self.AmbientExhaustBones do
-					table.insert( self.AmbientExhaustEffectsBag, CreateAttachedEmitter(self, vB, army, vE ))
-				end
-			end	        
-	    end          
-	end, 
-	
-	UnitLandAmbientEffectThread = function(self)
-		while not self:IsDead() do
-            local army = self:GetArmy()			
-			
-			for kE, vE in self.AmbientLandExhaustEffects do
-				for kB, vB in self.AmbientExhaustBones do
-					table.insert( self.AmbientExhaustEffectsBag, CreateAttachedEmitter(self, vB, army, vE ))
-				end
-			end
-			
-			WaitSeconds(2)
-			EffectUtil.CleanupEffectBag(self,'AmbientExhaustEffectsBag')
-							
-			WaitSeconds(utilities.GetRandomFloat(1,7))
-		end		
-	end,
+        if layer == 'Land' then
+            self.AmbientEffectThread = self:ForkThread(self.UnitLandAmbientEffectThread)
+        elseif layer == 'Seabed' then
+            local army = self:GetArmy()
+            for kE, vE in self.AmbientSeabedExhaustEffects do
+                for kB, vB in self.AmbientExhaustBones do
+                    table.insert( self.AmbientExhaustEffectsBag, CreateAttachedEmitter(self, vB, army, vE ))
+                end
+            end         
+        end          
+    end, 
+    
+    UnitLandAmbientEffectThread = function(self)
+        while not self:IsDead() do
+            local army = self:GetArmy()         
+            
+            for kE, vE in self.AmbientLandExhaustEffects do
+                for kB, vB in self.AmbientExhaustBones do
+                    table.insert( self.AmbientExhaustEffectsBag, CreateAttachedEmitter(self, vB, army, vE ))
+                end
+            end
+            
+            WaitSeconds(2)
+            EffectUtil.CleanupEffectBag(self,'AmbientExhaustEffectsBag')
+                            
+            WaitSeconds(utilities.GetRandomFloat(1,7))
+        end     
+    end,
 
     OnKilled = function(self, inst, type, okr)
         if self.AmbientExhaustEffectsBag then

@@ -1,11 +1,11 @@
--- ****************************************************************************
--- **
--- **  File     :  /units/XRL0403/XRL0403_script.lua
--- **
--- **  Summary  :  Megalith script
--- **
--- **  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
--- ****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /units/XRL0403/XRL0403_script.lua
+--**
+--**  Summary  :  Megalith script
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
@@ -39,28 +39,28 @@ XRL0403 = Class(CWalkingLandUnit) {
         AAGun = Class(CAABurstCloudFlakArtilleryWeapon) {},
         HackPegLauncher= Class(CDFBrackmanCrabHackPegLauncherWeapon){},
     },
-    
+
     DisableAllButHackPegLauncher= function(self)
         self:SetWeaponEnabledByLabel('ParticleGunRight', false) -- -- -- Disable all other weapons.
         self:SetWeaponEnabledByLabel('ParticleGunLeft', false)
         self:SetWeaponEnabledByLabel('AAGun', false)
         self:SetWeaponEnabledByLabel('Torpedo01', false)
-        
+
         self:ShowBone('Missile_Turret', true)
     end,
-    
+
     EnableHackPegLauncher= function(self)
         self:SetWeaponEnabledByLabel('HackPegLauncher', true)   -- -- -- Enable and show hack-peg launcher.
     end,
-    
+
     OnCreate= function(self)
         CWalkingLandUnit.OnCreate(self)
         self:SetWeaponEnabledByLabel('HackPegLauncher', false)
         if self:IsValidBone('Missile_Turret') then
             self:HideBone('Missile_Turret', true)
         end
-    end, 
-    
+    end,
+
     OnStartBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStartBeingBuilt(self, builder, layer)
         if not self.AnimationManipulator then
@@ -69,18 +69,18 @@ XRL0403 = Class(CWalkingLandUnit) {
         end
         self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationActivate, false):SetRate(0)
     end,
-    
+
     OnStopBeingBuilt = function(self,builder,layer)
         CWalkingLandUnit.OnStopBeingBuilt(self,builder,layer)
         
         if self:IsValidBone('Missile_Turret') then
             self:HideBone('Missile_Turret', true)
         end
-        
+
         if self.AnimationManipulator then
             self:SetUnSelectable(true)
             self.AnimationManipulator:SetRate(1)
-            
+
             self:ForkThread(function()
                 WaitSeconds(self.AnimationManipulator:GetAnimationDuration()*self.AnimationManipulator:GetRate())
                 self:SetUnSelectable(false)
@@ -109,7 +109,7 @@ XRL0403 = Class(CWalkingLandUnit) {
         for k, v in EffectTemplate.DamageFireSmoke01 do
             CreateAttachedEmitter( self, bone, army, v ):ScaleEmitter(1.5)
         end
-    end,	
+    end,
 
     CreateDeathExplosionDustRing = function( self )
         local blanketSides = 18
@@ -123,7 +123,7 @@ XRL0403 = Class(CWalkingLandUnit) {
 
             local Blanketparts = self:CreateProjectile('/effects/entities/DestructionDust01/DestructionDust01_proj.bp', blanketX, 1.5, blanketZ + 4, blanketX, 0, blanketZ)
                 :SetVelocity(blanketVelocity):SetAcceleration(-0.3)
-        end        
+        end
     end,
 
     CreateFirePlumes = function( self, army, bones, yBoneOffset )
@@ -138,7 +138,7 @@ XRL0403 = Class(CWalkingLandUnit) {
             velocity.y = velocity.y + utilities.GetRandomFloat( 0.0, 0.3)
             proj = self:CreateProjectile('/effects/entities/DestructionFirePlume01/DestructionFirePlume01_proj.bp', offset.x, offset.y + yBoneOffset, offset.z, velocity.x, velocity.y, velocity.z)
             proj:SetBallisticAcceleration(utilities.GetRandomFloat(-1, -2)):SetVelocity(utilities.GetRandomFloat(3, 4)):SetCollision(false)
-            
+
             local emitter = CreateEmitterOnEntity(proj, army, '/effects/emitters/destruction_explosion_fire_plume_02_emit.bp')
 
             local lifetime = utilities.GetRandomFloat( 12, 22 )
@@ -169,7 +169,6 @@ XRL0403 = Class(CWalkingLandUnit) {
         self:CreateExplosionDebris( army )
 
         WaitSeconds(1)
-        
         -- Create damage effects on turret bone
         CreateDeathExplosion( self, 'Right_Turret_Barrel', 1.5)
         self:CreateDamageEffects( 'Right_Turret_Barrel', army )
@@ -214,31 +213,31 @@ XRL0403 = Class(CWalkingLandUnit) {
         self:CreateFirePlumes( army, {'Torpedo_Muzzle11'}, -1 )
         self:CreateDamageEffects( 'Right_Turret', army )
         WaitSeconds(0.5)
-        
+
         CreateDeathExplosion( self, 'Left_Leg0' .. Random(1,2) .. '_B0' .. Random(1,2), 0.25)
         self:CreateDamageEffects( 'Right_Footfall_02', army )
         WaitSeconds(0.5)
         CreateDeathExplosion( self, 'Left_Turret_Muzzle01', 1)
         self:CreateExplosionDebris( army )
-        
+
         CreateDeathExplosion( self, 'Right_Leg0' .. Random(1,2) .. '_B0' .. Random(1,2), 0.25)
         self:CreateDamageEffects( 'Torpedo_Muzzle01', army )
         WaitSeconds(0.5)
-        
+
         CreateDeathExplosion( self, 'Left_Leg0' .. Random(1,2) .. '_B0' .. Random(1,2), 0.25)
         CreateDeathExplosion( self, 'Flare_Muzzle06', 2 )
         self:CreateDamageEffects( 'Left_Leg02_B02', army )
-        explosion.CreateFlash( self, 'Right_Leg01_B01', 3.2, army )        
+        explosion.CreateFlash( self, 'Right_Leg01_B01', 3.2, army )
 
         self:CreateWreckage(0.1)
         self:ShakeCamera(3, 2, 0, 0.15)
         self:Destroy()
     end,
-    
-    
+
+
     OnMotionHorzEventChange = function( self, new, old )
         CWalkingLandUnit.OnMotionHorzEventChange(self, new, old)
-        
+
         if ( old == 'Stopped' ) then
             local bpDisplay = self:GetBlueprint().Display
             if bpDisplay.AnimationWalk and self.Animator then

@@ -789,7 +789,7 @@ Unit = Class(moho.unit_methods) {
         self:StartReclaimEffects(target)
         self:PlayUnitSound('StartReclaim')
         self:PlayUnitAmbientSound('ReclaimLoop')
-        
+
         -- Force me to move on to the guard properly when done
         local guard = self:GetGuardedUnit()
         if guard then
@@ -1226,9 +1226,11 @@ Unit = Class(moho.unit_methods) {
         if instigator and IsUnit(instigator) then
             instigator:OnKilledUnit(self)
         end
+
         if self.DeathWeaponEnabled ~= false then
             self:DoDeathWeapon()
         end
+
         self:DisableShield()
         self:DisableUnitIntel('Killed')
         self:ForkThread(self.DeathThread, overkillRatio , instigator)
@@ -1294,6 +1296,7 @@ Unit = Class(moho.unit_methods) {
         if self.DisallowCollisions then
             return false
         end
+
         if EntityCategoryContains(categories.PROJECTILE, other) then
             if self:GetArmy() == other:GetArmy() then
                 return other:GetCollideFriendly()
@@ -1343,6 +1346,7 @@ Unit = Class(moho.unit_methods) {
                 end
             end
         end
+
         return true
     end,
 
@@ -1512,7 +1516,7 @@ Unit = Class(moho.unit_methods) {
             local scale = Util.GetRandomFloat(rs/2, rs)
 
             self:DestroyAllDamageEffects()
-            if(toSurface < 1) then
+            if toSurface < 1 then
                 CreateAttachedEmitter(self, randBone, army,'/effects/emitters/destruction_water_sinking_ripples_01_emit.bp'):OffsetEmitter(rx, y, rz):ScaleEmitter(scale)
                 CreateAttachedEmitter(self, randBone, army, '/effects/emitters/destruction_water_sinking_wash_01_emit.bp'):OffsetEmitter(rx, y, rz):ScaleEmitter(scale)
             end
@@ -1522,7 +1526,7 @@ Unit = Class(moho.unit_methods) {
             else
                 local lifetime = Util.GetRandomInt(50, 200)
 
-                if(toSurface > 1) then
+                if toSurface > 1 then
                     CreateEmitterAtBone( self, randBone, army, '/effects/emitters/underwater_bubbles_01_emit.bp'):OffsetEmitter(rx, ry, rz)
                         :ScaleEmitter(scale)
                         :SetEmitterParam('LIFETIME', lifetime)
@@ -1901,7 +1905,7 @@ Unit = Class(moho.unit_methods) {
                 bp.SizeSphere
             )
         end
-        
+
         if bp.Display.AnimationPermOpen then
             self.PermOpenAnimManipulator = CreateAnimator(self):PlayAnim(bp.Display.AnimationPermOpen)
             self.Trash:Add(self.PermOpenAnimManipulator)
@@ -2282,10 +2286,10 @@ Unit = Class(moho.unit_methods) {
             self.IntelDisables[intel][disabler] = true
             return intDisabled
         end
-    
+
         local intDisabled = false
-        
-        -- We need this guard because the engine emits an early OnLayerChange event that would screw us up here with certain units that have Intel changes on layer change 
+
+        -- We need this guard because the engine emits an early OnLayerChange event that would screw us up here with certain units that have Intel changes on layer change
         -- The NotInitialized disabler is removed in OnStopBeingBuilt, when the Unit's intel engine state is properly initialized.
         if self.IntelDisables['Radar']['NotInitialized'] then
             return
@@ -2316,9 +2320,9 @@ Unit = Class(moho.unit_methods) {
             end
             return intEnabled
         end
-    
+
         local intEnabled = false
-        
+
         -- We need this guard because the engine emits an early OnLayerChange event that would screw us up here.
         -- The NotInitialized disabler is removed in OnStopBeingBuilt, when the Unit's intel engine state is properly initialized.
         if self.IntelDisables['Radar']['NotInitialized'] == true and disabler ~= 'NotInitialized' then
@@ -2494,8 +2498,8 @@ Unit = Class(moho.unit_methods) {
         end
 
         ChangeState(self, self.WorkingState)
-        -- inform EnhanceTask that enhancement is not restricted 
-		return true 
+        -- inform EnhanceTask that enhancement is not restricted
+		return true
     end,
 
     OnWorkEnd = function(self, work)
@@ -2600,19 +2604,19 @@ Unit = Class(moho.unit_methods) {
         elseif (old == 'Land' or old == 'None') and (new == 'Seabed' or new == 'Water' or new == 'Sub') then
             self:EnableIntel('WaterVision')
         end
-        
+
         -- All units want normal vision!
         if (old == 'None') then
             self:EnableIntel('Vision')
         end
 
-        if( new == 'Land' ) then
+        if new == 'Land' then
             self:PlayUnitSound('TransitionLand')
             self:PlayUnitAmbientSound('AmbientMoveLand')
-        elseif(( new == 'Water' ) or ( new == 'Seabed' )) then
+        elseif new == 'Water'  or new == 'Seabed' then
             self:PlayUnitSound('TransitionWater')
             self:PlayUnitAmbientSound('AmbientMoveWater')
-        elseif ( new == 'Sub' ) then
+        elseif new == 'Sub' then
             self:PlayUnitAmbientSound('AmbientMoveSub')
         end
 
@@ -2662,7 +2666,7 @@ Unit = Class(moho.unit_methods) {
             end
         end
 
-        if( new == 'Stopped' or new == 'Stopping' ) then
+        if new == 'Stopped' or new == 'Stopping' then
             --Stop ambient sounds
             self:StopUnitAmbientSound( 'AmbientMove' )
             self:StopUnitAmbientSound( 'AmbientMoveWater' )
@@ -2821,7 +2825,7 @@ Unit = Class(moho.unit_methods) {
         local layer = self:GetCurrentLayer()
         local bpMTable = self:GetBlueprint().Display.MovementEffects
 
-        if( old == 'TopSpeed' ) then
+        if old == 'TopSpeed' then
             --Destroy top speed contrails and exhaust effects
             self:DestroyTopSpeedEffects()
         end
