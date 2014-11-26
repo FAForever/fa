@@ -20,6 +20,7 @@ local TooltipInfo = import('/lua/ui/help/tooltips.lua').Tooltips
 local Prefs = import('/lua/user/prefs.lua')
 local Factions = import('/lua/factions.lua').Factions
 local options = Prefs.GetFromCurrentProfile('options')
+local DiskGetFileInfo = UIUtil.DiskGetFileInfo
 
 controls = {
     avatars = {},

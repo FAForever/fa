@@ -7,6 +7,7 @@
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
+local DiskGetFileInfo = UIUtil.DiskGetFileInfo
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local GameCommon = import('/lua/ui/game/gamecommon.lua')
 local Group = import('/lua/maui/group.lua').Group
@@ -34,27 +35,27 @@ function Expand()
     controls.bg:Show()
 end
 
-#INFO:   blueprintId="uel0001",
-#INFO:   energyConsumed=0,
-#INFO:   energyProduced=10,
-#INFO:   energyRequested=0,
-#INFO:   entityId="0",
-#INFO:   fuelRatio=-1,
-#INFO:   health=12000,
-#INFO:   kills=0,
-#INFO:   massConsumed=0,
-#INFO:   massProduced=1,
-#INFO:   massRequested=0,
-#INFO:   maxHealth=12000,
-#INFO:   nukeSiloBuildCount=0,
-#INFO:   nukeSiloMaxStorageCount=1,
-#INFO:   nukeSiloStorageCount=0,
-#INFO:   shieldRatio=0,
-#INFO:   tacticalSiloBuildCount=0,
-#INFO:   tacticalSiloMaxStorageCount=1,
-#INFO:   tacticalSiloStorageCount=0,
-#INFO:   teamColor="ffe80a0a",
-#INFO:   workProgress=0
+--INFO:   blueprintId="uel0001",
+--INFO:   energyConsumed=0,
+--INFO:   energyProduced=10,
+--INFO:   energyRequested=0,
+--INFO:   entityId="0",
+--INFO:   fuelRatio=-1,
+--INFO:   health=12000,
+--INFO:   kills=0,
+--INFO:   massConsumed=0,
+--INFO:   massProduced=1,
+--INFO:   massRequested=0,
+--INFO:   maxHealth=12000,
+--INFO:   nukeSiloBuildCount=0,
+--INFO:   nukeSiloMaxStorageCount=1,
+--INFO:   nukeSiloStorageCount=0,
+--INFO:   shieldRatio=0,
+--INFO:   tacticalSiloBuildCount=0,
+--INFO:   tacticalSiloMaxStorageCount=1,
+--INFO:   tacticalSiloStorageCount=0,
+--INFO:   teamColor="ffe80a0a",
+--INFO:   workProgress=0
 
 local queueTextures = {
     Move = {texture = UIUtil.UIFile('/game/orders/move_btn_up.dds'), text = '<LOC order_0000>Moving'},
@@ -87,7 +88,7 @@ local statFuncs = {
     function(info)
         if info.massProduced > 0 or info.massRequested > 0 then
             return string.format('%+d', math.ceil(info.massProduced - info.massRequested)), UIUtil.UIFile('/game/unit_view_icons/mass.dds'), '00000000'
-        elseif info.armyIndex + 1 != GetFocusArmy() and info.kills == 0 and info.shieldRatio <= 0 then
+        elseif info.armyIndex + 1 ~= GetFocusArmy() and info.kills == 0 and info.shieldRatio <= 0 then
             local armyData = GetArmiesTable().armiesTable[info.armyIndex+1]
             local icon = Factions.Factions[armyData.faction+1].Icon
             if armyData.showScore and icon then
@@ -107,18 +108,18 @@ local statFuncs = {
         end
     end,
     function(info)
-		if UnitData[info.entityId].xp != nil then
+		if UnitData[info.entityId].xp ~= nil then
 			local nextLevel = 0
 			local veterancyLevels = __blueprints[info.blueprintId].Veteran or veterancyDefaults
 			for index = 1, 5 do
 				local i = index
 				local vet = veterancyLevels[string.format('Level%d', i)]
-				
+
 				if UnitData[info.entityId].xp < vet then
 					return string.format('%d / %d', UnitData[info.entityId].xp, vet)
 				end
 			end
-			
+
 			return false
 		else
 			return false
@@ -133,7 +134,7 @@ local statFuncs = {
             return false
         end
     end,
-	
+
     function(info)
         if info.tacticalSiloMaxStorageCount > 0 or info.nukeSiloMaxStorageCount > 0 then
             if info.userUnit:IsInCategory('VERIFYMISSILEUI') then
@@ -268,7 +269,7 @@ function UpdateWindow(info)
                 end
             end
         end
-        
+
         controls.shieldBar:Hide()
         controls.fuelBar:Hide()
 
@@ -276,7 +277,7 @@ function UpdateWindow(info)
             controls.shieldBar:Show()
             controls.shieldBar:SetValue(info.shieldRatio)
         end
-        
+
         if info.fuelRatio > 0 then
             controls.fuelBar:Show()
             controls.fuelBar:SetValue(info.fuelRatio)
@@ -345,11 +346,11 @@ function UpdateWindow(info)
             controls.actionText:SetText(LOC('<LOC _Idle>'))
             controls.actionIcon:Show()
             controls.actionText:Show()
-        else    
+        else
             controls.actionIcon:Hide()
             controls.actionText:Hide()
         end
-        
+
         if Prefs.GetOption('uvd_format') == 'full' and bp.Display.Abilities then
             local i = 1
             local maxWidth = 0
@@ -385,14 +386,14 @@ function UpdateWindow(info)
             controls.abilities:Hide()
         end
     end
-    if options.gui_scu_manager != 0 then
+    if options.gui_scu_manager ~= 0 then
         controls.SCUType:Hide()
         if info.userUnit.SCUType then
             controls.SCUType:SetTexture('/textures/ui/common/SCUManager/'..info.userUnit.SCUType..'_icon.dds')
             controls.SCUType:Show()
         end
-    end    
-    if options.gui_enhanced_unitview != 0 then
+    end
+    if options.gui_enhanced_unitview ~= 0 then
         -- Replace fuel bar with progress bar
         if info.blueprintId ~= 'unknown' then
             controls.fuelBar:Hide()
@@ -402,17 +403,17 @@ function UpdateWindow(info)
             end
         end
     end
-    if options.gui_detailed_unitview != 0 then
-        if info.blueprintId != 'unknown' then
+    if options.gui_detailed_unitview ~= 0 then
+        if info.blueprintId ~= 'unknown' then
             controls.Buildrate:Hide()
             controls.shieldText:Hide()
 
             local getEnh = import('/lua/enhancementcommon.lua')
-            if info.userUnit != nil then
+            if info.userUnit ~= nil then
                 local enhRegen , regenBase = 0 , 0
-                if getEnh.GetEnhancements(info.entityId) != nil then
+                if getEnh.GetEnhancements(info.entityId) ~= nil then
                     for k,v in getEnh.GetEnhancements(info.entityId) do
-                        if info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId)[k]].NewRegenRate != nil then
+                        if info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId)[k]].NewRegenRate ~= nil then
                             enhRegen = info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId)[k]].NewRegenRate
                         end
                     end
@@ -427,7 +428,7 @@ function UpdateWindow(info)
                     end
                     local addRegen = info.userUnit:GetBlueprint().Buffs.Regen[string.format('Level%d', lvl)]
                     local regenTotal
-                    if info.userUnit != nil and info.health then
+                    if info.userUnit ~= nil and info.health then
                         if math.floor(info.userUnit:GetBlueprint().Defense.RegenRate) > 0 then
                             regenTotal = math.floor(  (info.userUnit:GetBlueprint().Defense.RegenRate) + addRegen   )
                             regenBase = math.floor(info.userUnit:GetBlueprint().Defense.RegenRate + enhRegen)
@@ -441,7 +442,7 @@ function UpdateWindow(info)
                         end
                     end
                 else
-                    if info.userUnit != nil and info.health and info.userUnit:GetBlueprint().Defense.RegenRate > 0 then
+                    if info.userUnit ~= nil and info.health and info.userUnit:GetBlueprint().Defense.RegenRate > 0 then
                         controls.health:SetText(string.format("%d / %d +%d/s", info.health, info.maxHealth,math.floor(info.userUnit:GetBlueprint().Defense.RegenRate + enhRegen)))
                     end
                 end
@@ -467,7 +468,7 @@ function UpdateWindow(info)
                 end
             end
 
-            if info.userUnit != nil and info.userUnit:GetBuildRate() >= 2 then
+            if info.userUnit ~= nil and info.userUnit:GetBuildRate() >= 2 then
                 controls.Buildrate:SetText(string.format("%d",math.floor(info.userUnit:GetBuildRate())))
                 controls.Buildrate:Show()
             else
@@ -518,7 +519,7 @@ function CreateUI()
     end
     controls.actionIcon = Bitmap(controls.bg)
     controls.actionText = UIUtil.CreateText(controls.bg, '', 14, UIUtil.bodyFont)
-    
+
     controls.abilities = Group(controls.bg)
     controls.abilityText = {}
     controls.abilityBG = {}
@@ -531,19 +532,19 @@ function CreateUI()
     controls.abilityBG.BL = Bitmap(controls.abilities)
     controls.abilityBG.BR = Bitmap(controls.abilities)
     controls.abilityBG.BM = Bitmap(controls.abilities)
-    
+
     controls.bg:DisableHitTest(true)
-    
+
     controls.bg:SetNeedsFrameUpdate(true)
 
-    if options.gui_detailed_unitview != 0 then
+    if options.gui_detailed_unitview ~= 0 then
         controls.shieldText = UIUtil.CreateText(controls.bg, '', 13, UIUtil.bodyFont)
         controls.Buildrate = UIUtil.CreateText(controls.bg, '', 12, UIUtil.bodyFont)
     end
 
     controls.bg.OnFrame = function(self, delta)
     local info = GetRolloverInfo()
-        if options.gui_enhanced_unitview != 0 then
+        if options.gui_enhanced_unitview ~= 0 then
             -- If no rollover, then see if we have a single unit selected
             if not info and import("/modules/selectedinfo.lua").SelectedInfoOn then
                 local selUnits = GetSelectedUnits()
@@ -553,7 +554,7 @@ function CreateUI()
                 end
             end
         end
-              
+
         if info then
             UpdateWindow(info)
             if self:GetAlpha() < 1 then
@@ -566,7 +567,7 @@ function CreateUI()
         end
     end
 
-    if options.gui_scu_manager != 0 then
+    if options.gui_scu_manager ~= 0 then
         controls.SCUType = Bitmap(controls.bg)
         LayoutHelpers.AtRightIn(controls.SCUType, controls.icon)
         LayoutHelpers.AtBottomIn(controls.SCUType, controls.icon)
