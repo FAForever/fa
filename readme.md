@@ -55,6 +55,23 @@ make a thread if it isn't there already.
 - [X] New "No Walls" Unit Restriction
 - [X] Improved the Unit Restrictions menu descriptions
 - [X] Improved the Attack-Move feature (Factory Attack-Move Engineer behaviour left alone)
+- [X] Made factory queue templates more accessible, the save button was hidden when the factory wasn't paused
+- [X] Less UI-lag
+
+----------------------------------
+*Changes to be verified*
+- [ ] Attempt to fix Aeon T1 Frigate, T2 Destroyer, and Seraphim T3 Subhunter weapon bones to improve fire reliability
+- [ ] New icon name for Mass Storage
+
+----------------------------------
+*Changes to be made*
+- Satellite base now builds the satellite, when satellite dies, base can rebuild
+- Fix cyclic factory assist crash
+- Fix HQ Factory visual bug
+- Implement proper Stealth
+- Fix replays desyncing
+- Fix Support factories being built prior to HQ with UI exploit
+>>>>>>> b91645e... Update readme for #140
 
 Contributors:
  - Sheeo
