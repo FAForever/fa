@@ -2055,7 +2055,7 @@ function FormatData(unitData, type)
     import(UIUtil.GetLayoutFilename('construction')).OnTabChangeLayout(type)
 
 
-    if type == 'templates' and allFactories and controls.extraBtn2:IsChecked() then
+    if type == 'templates' and allFactories then
         -- replace Infinite queue by Create template
         Tooltip.AddCheckboxTooltip(controls.extraBtn1, 'save_template')
         if table.getsize(currentCommandQueue) > 0 then
