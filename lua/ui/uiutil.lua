@@ -55,7 +55,7 @@ consoleDepth = false  -- in order to get the console to always be on top, assign
 
 networkBool = import('/lua/lazyvar.lua').Create()    -- boolean whether the game is local or networked
 
-# Default scenario for skirmishes / MP Lobby
+-- Default scenario for skirmishes / MP Lobby
 defaultScenario = '/maps/scmp_039/scmp_039_scenario.lua'      
 
 --* These values MUST NOT CHANGE! They syncronize with values in UIManager.h and are used to
@@ -111,7 +111,7 @@ function GetNetworkBool()
     local sessionClientsTable = GetSessionClients()
     local networkBool = false
     local sessionBool = true
-    if sessionClientsTable != nil then
+    if sessionClientsTable ~= nil then
         networkBool = SessionIsMultiplayer()
     else
         sessionBool = false
@@ -306,7 +306,7 @@ end
 --* cycle through all available layouts
 function RotateLayout(direction)
 
-    # disable when in Screen Capture mode
+    -- disable when in Screen Capture mode
     if import('/lua/ui/game/gamemain.lua').gameUIHidden then
         return
     end
@@ -333,54 +333,41 @@ end
 --* given a path and name relative to the skin path, returns the full path based on the current skin
 function UIFile(filespec)
     local skins = import('/lua/skins/skins.lua').skins
-    local visitingSkin = currentSkin()
-    local currentPath = skins[visitingSkin].texturesPath
+    local useSkin = currentSkin()
+    local currentPath = skins[useSkin].texturesPath
 
-    if visitingSkin == nil or currentPath == nil then
+    if useSkin == nil or currentPath == nil then
         return nil
     end
 
-    if UIFileCache[currentPath..filespec] == true then
-		--LOG('[[ UIFileCache['..currentPath..filespec..'] == true')
-		return currentPath..filespec
-	else
-		if UIFileCache[currentPath..filespec] == false then
-			--LOG('[[ UIFileCache['..currentPath..filespec..'] == false')
-		else
-			--LOG('[[ UIFileCache['..currentPath..filespec..'] == not exist')
-		end
-	--if not UIFileCache[currentPath..filespec] or UIFileCache[currentPath..filespec] != curFile then
-		-- if current skin is default, then don't bother trying to look for it, just append the default dir
-		if visitingSkin == 'default' then
-			return currentPath .. filespec
-		else
-			while visitingSkin do
-				local curFile = currentPath .. filespec
-				if DiskGetFileInfo(curFile) then
-					--LOG('[[ File finded ('..visitingSkin..') : '..curFile)
-					UIFileCache[curFile] = true
-					--break
-					return curFile
-				else
-					--LOG('[[ File not finded ('..visitingSkin..') : '..curFile)
-					UIFileCache[curFile] = false
-					visitingSkin = skins[visitingSkin].default
-					if visitingSkin then
-						currentPath = skins[visitingSkin].texturesPath
-					end
-				end
-				
-			end
-		end
-	--else
-		--if UIFileCache[visitingSkin][filespec] == curFile then
-			--return curFile	
-		--end
-	end
+    if not UIFileCache[currentPath .. filespec] then
+        local found = false
 
-    LOG("Warning: Unable to find file ", filespec)
-    -- pass out the final string anyway so resource loader can gracefully fail
-    return filespec
+        if useSkin == 'default' then
+            found = currentPath .. filespec
+        else
+            while not found and useSkin do
+                found = currentPath .. filespec
+                if not DiskGetFileInfo(found) then
+                    found = false
+                    useSkin = skins[useSkin].default
+                    if useSkin then
+                        currentPath = skins[useSkin].texturesPath
+                    end
+                end
+            end
+        end
+
+        if found then
+            if not UIFileCache[useSkin] then UIFileCache[useSkin] = {} end
+            UIFileCache[useSkin][filespec] = found
+        else
+            LOG("Warning: Unable to find file ", filespec)
+            return filespec
+        end
+    end
+
+    return UIFileCache[useSkin][filespec]
 end
 
 --* return the filename as a lazy var function to allow triggering of OnDirty
@@ -1212,14 +1199,14 @@ function CreateWorldCover(parent, colorOverride)
             worldCovers[index].ID = index
             worldCovers[index].OnDestroy = function(self)
                 for h, x in worldCovers do
-                    if x and h != self.ID then 
+                    if x and h ~= self.ID then 
                         x:Destroy()
                     end
                 end
             end
             worldCovers[index].OnHide = function(self, hidden)
                 for h, x in worldCovers do
-                    if x and h != self.ID then 
+                    if x and h ~= self.ID then 
                         x:SetHidden(hidden)
                     end
                 end
