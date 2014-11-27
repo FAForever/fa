@@ -1121,19 +1121,19 @@ Tooltips = {
 
     #**********************
     #** Power lobby Strings
-    #**********************	
-	lob_click_randmap = {
-		title = "<LOC lobui_0501>Random Map",
-		description = "<LOC lobui_0502>When clicked, a random map will be selected",
-	},
-	lob_click_randteam = {
-		title = "<LOC lobui_0507>Auto Teams",
-		description = "<LOC lobui_0508>Click to change the auto teams settings",
-	},
-	lob_click_rankedoptions = {
-		title = "<LOC lobui_0523>Ranked Settings",
-		description = "<LOC lobui_0524>When clicked, all the main game options will be reset to ranked settings",
-	},
+    #**********************    
+    lob_click_randmap = {
+        title = "<LOC lobui_0501>Random Map",
+        description = "<LOC lobui_0502>When clicked, a random map will be selected",
+    },
+    lob_click_randteam = {
+        title = "<LOC lobui_0507>Auto Teams",
+        description = "<LOC lobui_0508>Click to change the auto teams settings",
+    },
+    lob_click_rankedoptions = {
+        title = "<LOC lobui_0523>Ranked Settings",
+        description = "<LOC lobui_0524>When clicked, all the main game options will be reset to ranked settings",
+    },
     Lobby_Auto_Teams = {
         title = "<LOC lobui_0537>Automatic Teams",
         description = "<LOC lobui_0538>Determine if the game will form the teams automaticly",
@@ -1170,31 +1170,31 @@ Tooltips = {
         title = "<LOC lobui_0551>Official Maps Only",
         description = "<LOC lobui_0552>The game will choose a random map just before the game launch",
     },
-	lob_RandomMap_All = {
+    lob_RandomMap_All = {
         title = "<LOC lobui_0557>All Maps",
         description = "<LOC lobui_0552>The game will choose a random map just before the game launch",
     },
-	map_type = {
+    map_type = {
         title = "<LOC lobui_0583>Map Type",
         description = "<LOC lobui_0584>Sort by official or custom maps",
     },
-	lob_auto_kick = {
+    lob_auto_kick = {
         title = "<LOC lobui_0590>Automaticly Remove",
         description = "<LOC lobui_0591>Check if you want to automaticly remove the players who don't have the enabled mods",
     },
-	lob_reconnect = {
+    lob_reconnect = {
         title = "<LOC lobui_0736>Reconnect to Lobby",
         description = "<LOC lobui_0737>Click to leave and reconnect to the lobby",
     },
-	lob_upload_map = {
+    lob_upload_map = {
         title = "<LOC lobui_0738>Upload Current Map",
         description = "<LOC lobui_0739>Upload the current map to server",
     },
-	lob_disable_allmods = {
+    lob_disable_allmods = {
         title = "<LOC lobui_0600>Disable All Mods",
         description = "<LOC lobui_0601>Click to disable all the mods at once",
     },
-	Lobby_Ranked_Game = {
+    Lobby_Ranked_Game = {
         title = "<LOC lobui_0606>Play in Ranked Mode",
         description = "<LOC lobui_0607>When enabled, the game will count as Ranked Mode",
     },
@@ -1206,7 +1206,7 @@ Tooltips = {
         title = "<LOC lobui_0610>Enabled",
         description = "<LOC lobui_0611>Ranked Mode enabled",
     },
-	Lobby_Score = {
+    Lobby_Score = {
         title = "<LOC lobui_0731>Game Score",
         description = "<LOC lobui_0728>Set score on or off during the game",
     },
@@ -1218,7 +1218,7 @@ Tooltips = {
         title = "<LOC lobui_0610>Enabled",
         description = "<LOC lobui_0733>With Score",
     },
-	Lobby_Share = {
+    Lobby_Share = {
         title = "<LOC lobui_0740>Share Conditions",
         description = "<LOC lobui_0741>Choose between destroying or not the units you shared to your allies when you die",
     },
@@ -1237,7 +1237,7 @@ Tooltips = {
     lob_UnitCap_375 = {
         title = "<LOC lobui_0721>375",
         description = "<LOC lobui_0722>375 units per player may be in play",
-    },	
+    },    
     lob_UnitCap_625 = {
         title = "<LOC lobui_0723>625",
         description = "<LOC lobui_0724>625 units per player may be in play",
@@ -1245,82 +1245,82 @@ Tooltips = {
     lob_UnitCap_875 = {
         title = "<LOC lobui_0725>875",
         description = "<LOC lobui_0726>875 units per player may be in play",
-    },	
-	lob_click_LargeMapPreview = {
+    },    
+    lob_click_LargeMapPreview = {
         title = "<LOC lobui_0618>Large Preview",
         description = "<LOC lobui_0619>Click to show a large map preview showing all the mass and hydrocarbon spots",
     },
-	aitype_sorian = {
+    aitype_sorian = {
         title = "<LOC sorian_0001>AI: Sorian",
         description = "<LOC sorian_0002>A balanced AI. Good for 20x20+ maps.",
     },
-	aitype_sorianrush = {
+    aitype_sorianrush = {
         title = "<LOC sorian_0003>AI: Sorian Rush",
         description = "<LOC sorian_0004>A rush AI. Good for 10x10 or smaller maps.",
     },
-	aitype_sorianair = {
+    aitype_sorianair = {
         title = "<LOC sorian_0005>AI: Sorian Air",
         description = "<LOC sorian_0006>An AI that focuses on air. Good for 20x20+ maps.",
     },
-	aitype_sorianwater = {
+    aitype_sorianwater = {
         title = "<LOC sorian_0007>AI: Sorian Water",
         description = "<LOC sorian_0008>An AI that focuses on water. Good for 20x20+ water maps.",
     },
-	aitype_sorianturtle = {
+    aitype_sorianturtle = {
         title = "<LOC sorian_0009>AI: Sorian Turtle",
         description = "<LOC sorian_0010>A turtle AI. Good for 20x20+ maps.",
     },
-	aitype_sorianadaptive = {
+    aitype_sorianadaptive = {
         title = "<LOC sorian_0011>AI: Sorian Adaptive",
         description = "<LOC sorian_0012>Chooses a Sorian AI based on the map. Use this if you can\'t decide on an AI.",
     },
-	aitype_soriancheat = {
+    aitype_soriancheat = {
         title = "<LOC sorian_0013>AIx: Sorian Cheat",
         description = "<LOC sorian_0014>A cheating balanced AI. Good for 20x20+ maps.",
     },
-	aitype_sorianrushcheat = {
+    aitype_sorianrushcheat = {
         title = "<LOC sorian_0015>AIx: Sorian Rush Cheat",
         description = "<LOC sorian_0016>A cheating rush AI. Good for 10x10 or smaller maps.",
     },
-	aitype_sorianaircheat = {
+    aitype_sorianaircheat = {
         title = "<LOC sorian_0017>AIx: Sorian Air Cheat",
         description = "<LOC sorian_0018>A cheating AI that focuses on air. Good for 20x20+ maps.",
     },
-	aitype_sorianwatercheat = {
+    aitype_sorianwatercheat = {
         title = "<LOC sorian_0019>AIx: Sorian Water Cheat",
         description = "<LOC sorian_0020>A cheating AI that focuses on water. Good for 20x20+ water maps.",
     },
-	aitype_sorianturtlecheat = {
+    aitype_sorianturtlecheat = {
         title = "<LOC sorian_0021>AIx: Sorian Turtle Cheat",
         description = "<LOC sorian_0022>A cheating turtle AI. Good for 20x20+ maps.",
     },
-	aitype_sorianadaptivecheat = {
+    aitype_sorianadaptivecheat = {
         title = "<LOC sorian_0023>AIx: Sorian Adaptive Cheat",
         description = "<LOC sorian_0024>Chooses a Sorian cheating AI based on the map. Use this if you can\'t decide on an AI.",
     },
-	lob_team_five = {
+    lob_team_five = {
         title = '<LOC lobui_0746>Team 5',
         description = '',
     },
-	lob_team_six = {
+    lob_team_six = {
         title = '<LOC lobui_0747>Team 6',
         description = '',
     },
-	num_games = {
+    num_games = {
         title = '<LOC lobui_0748>Number of Games',
         description = '<LOC lobui_0749>Number of games played in global ladder.',
     },
-	rating = {
+    rating = {
         title = '<LOC lobui_0750>Rating',
         description = '<LOC lobui_0751>Global ladder rating.',
     },
-	###New - Start
-	map_ai_markers = {
+    ###New - Start
+    map_ai_markers = {
         title = '<LOC lobui_0585>AI Markers',
         description = '<LOC lobui_0586>Select maps with AI Markers.',
     },
-	###New - End
-	
+    ###New - End
+    
     #**********************
     #** Profile Strings
     #**********************
@@ -1910,8 +1910,8 @@ Tooltips = {
         description = "<LOC tooltipui0319>Learn to play Supreme Commander: Forged Alliance",
     },
     mainmenu_extras = {
-    	title = "<LOC tooltipui0355>Extras",
-    	description = "<LOC tooltipui0356>Access additional SupCom content and functionality",
+        title = "<LOC tooltipui0355>Extras",
+        description = "<LOC tooltipui0356>Access additional SupCom content and functionality",
     },
     profile = {
         title = "<LOC tooltipui0147>Profile",
@@ -2059,87 +2059,128 @@ Tooltips = {
     #**********************
     #** Restricted Units
     #**********************
-    restricted_uints_T1 = {
+    restricted_units_T1 = {
         title = "<LOC tooltipui0508>No Tech 1",
-        description = "<LOC tooltipui0509>Players will not be able to build tech 1 units",
+        description = "<LOC tooltipui0509>Prevents all T1 units being built",
     },
-    restricted_uints_T2 = {
+    restricted_units_T2 = {
         title = "<LOC tooltipui0510>No Tech 2",
-        description = "<LOC tooltipui0511>Players will not be able to build tech 2 units",
+        description = "<LOC tooltipui0511>Prevents all T2 units being built",
     },
-    restricted_uints_T3 = {
+    restricted_units_T3 = {
         title = "<LOC tooltipui0512>No Tech 3",
-        description = "<LOC tooltipui0513>Players will not be able to build tech 3 units",
+        description = "<LOC tooltipui0513>Prevents all T3 units being built",
     },
-    restricted_uints_experimental = {
+    restricted_units_experimental = {
         title = "<LOC tooltipui0514>No Experimental",
-        description = "<LOC tooltipui0515>Players will not be able to build experimental units",
+        description = "<LOC tooltipui0515>Prevents all Experimentals being built",
     },
-    restricted_uints_naval = {
-        title = "<LOC tooltipui0516>No Naval",
-        description = "<LOC tooltipui0517>Players will not be able to build mobile naval units",
+    restricted_units_land = {
+        title = "<LOC tooltipui0516>No Land",
+        description = "<LOC tooltipui0517>Prevents all Land units being built",
     },
-    restricted_uints_air = {
+    restricted_units_air = {
         title = "<LOC tooltipui0518>No Air",
-        description = "<LOC tooltipui0519>Players will not be able to build mobile air units",
+        description = "<LOC tooltipui0519>Prevents all Air units being built. Does not count UEF Novax Satellite",
     },
-    restricted_uints_land = {
-        title = "<LOC tooltipui0520>No Land",
-        description = "<LOC tooltipui0521>Players will not be able to build mobile land units",
+    restricted_units_naval = {
+        title = "<LOC tooltipui0520>No Naval",
+        description = "<LOC tooltipui0521>Prevents all Naval units being built",
     },
-    restricted_uints_uef = {
+    restricted_units_uef = {
         title = "<LOC tooltipui0522>No UEF",
-        description = "<LOC tooltipui0523>Players will not be able to build UEF units",
+        description = "<LOC tooltipui0523>Prevents all UEF units being built",
     },
-    restricted_uints_cybran = {
+    restricted_units_cybran = {
         title = "<LOC tooltipui0524>No Cybran",
-        description = "<LOC tooltipui0525>Players will not be able to build Cybran units",
+        description = "<LOC tooltipui0525>Prevents all Cybran units being built",
     },
-    restricted_uints_aeon = {
+    restricted_units_aeon = {
         title = "<LOC tooltipui0526>No Aeon",
-        description = "<LOC tooltipui0527>Players will not be able to build Aeon units",
+        description = "<LOC tooltipui0527>Prevents all Aeon units being built",
     },
-    restricted_uints_seraphim = {
+    restricted_units_seraphim = {
         title = "<LOC tooltipui0528>No Seraphim",
-        description = "<LOC tooltipui0529>Players will not be able to build Seraphim units",
+        description = "<LOC tooltipui0529>Prevents all Seraphim units being built",
     },
-    restricted_uints_nukes = {
+    restricted_units_nukes = {
         title = "<LOC tooltipui0530>No Nukes",
-        description = "<LOC tooltipui0531>Players will not be able to build Tech 3 strategic missile launchers ",
+        description = "<LOC tooltipui0531>Prevents all Nukes being built, apart from the UEF 'Billy' nuke",
     },
-    restricted_uints_gameenders = {
+    restricted_units_gameenders = {
         title = "<LOC tooltipui0532>No Game Enders",
-        description = "<LOC tooltipui0533>Players will not be able to build Tech 3 strategic missile launchers and artillery",
+        description = "<LOC tooltipui0533>Restricts access to Heavy Artilley, Paragon, Novax Satellite and Yolona Oss",
     },
-    restricted_uints_bubbles = {
+    restricted_units_bubbles = {
         title = "<LOC tooltipui0534>No Bubbles",
-        description = "<LOC tooltipui0535>Players will not be able to build mobile shield generators and shield defenses",
+        description = "<LOC tooltipui0535>Removes all non-upgrade Bubble Shields",
     },
-    restricted_uints_intel = {
+    restricted_units_intel = {
         title = "<LOC tooltipui0536>No Intel Structures",
-        description = "<LOC tooltipui0537>Players will not be able to build radar, sonar and omni installations",
+        description = "<LOC tooltipui0537>Prevents players from constructing Sonar, Radar, or Optical Sensor structures",
     },
-    restricted_uints_supcom = {
+    restricted_units_supcom = {
         title = "<LOC tooltipui0538>No Support Commanders",
-        description = "<LOC tooltipui0539>Players will not be able to build support commanders",
+        description = "<LOC tooltipui0539>Prevents players from summoning Support Armored Command Units",
     },
     restricted_units_supremecommander = {
-        title = "<LOC tooltipui0639>No Supreme Commander",
-        description = "<LOC tooltipui0640>Players will not be able to build Supreme Commander units"
+        title = "<LOC tooltipui0639>No Vanilla",
+        description = "<LOC tooltipui0640>Removes all units which were found in the original Supreme Commander"
     },
     restricted_units_forgedalliance = {
         title = "<LOC tooltipui0641>No Forged Alliance",
-        description = "<LOC tooltipui0642>Players will not be able to build Forged Alliance units"
+        description = "<LOC tooltipui0642>Removes all units which were introduced in the Forged Alliance expansion"
     },
     restricted_units_downloaded = {
         title = "<LOC tooltipui0643>No Downloaded",
-        description = "<LOC tooltipui0644>Players will not be able to build downloaded GPG units"
+        description = "<LOC tooltipui0644>Prevents players building units introduced as DLC"
     },
     restricted_units_massfab = {
-        title = "<LOC tooltipui0645>No Fabrication",
-        description = "<LOC tooltipui0646>Players will not be able to build mass fabricators"
+        title = "<LOC tooltipui0645>No Mass Fabrication",
+        description = "<LOC tooltipui0646>Prevents players building Mass Fabricators"
     },
-
+    -- Added for FAF
+    restricted_units_supportfactory = {
+        title = "<LOC tooltipui0670>No Support Factories",
+        description = "<LOC tooltipui0671>Prevents players from building fresh Support Factories, effectively disabling the 'Engiemod' changes"
+    },    
+    restricted_units_t3mobileaa = {
+        title = "<LOC tooltipui0672>No T3 Mobile Anti-Air",
+        description = "<LOC tooltipui0673>Prevents players being able to build the new T3 MAA units"
+    },  
+    restricted_units_wall = {
+        title = "<LOC tooltipui0674>No Walls",
+        description = "<LOC tooltipui0675>Prevents players being able to build Walls"
+    },      
+    restricted_units_engineeringstation = {
+        title = "<LOC tooltipui0676>No Engineering Stations",
+        description = "<LOC tooltipui0677>Removes the Kennel and Hive"
+    },
+    restricted_units_superarty = {
+        title = "<LOC tooltipui0678>No Super-Artillery",
+        description = "<LOC tooltipui0679>Removes Salvation, Mavor and Scathis"
+    }, 
+    restricted_units_paragon = {
+        title = "<LOC tooltipui0680>No Paragon",
+        description = "<LOC tooltipui0681>Removes the Paragon, the Aeon Experimental Infinite Resource Generator"
+    }, 
+    restricted_units_satellite = {
+        title = "<LOC tooltipui0682>No Satellite",
+        description = "<LOC tooltipui0683>Removes the UEF Novax Satellite"
+    }, 
+    restricted_units_teleport = {
+        title = "<LOC tooltipui0684>No Teleporting",
+        description = "<LOC tooltipui0685>Removes the ability to upgrade ACUs and sACUs with Teleporters"
+    }, 
+    restricted_units_billy = {
+        title = "<LOC tooltipui0686>No Billy",
+        description = "<LOC tooltipui0687>Prevents UEF commanders from upgrading their ACU to have the 'Billy' tactical nuke upgrade"
+    },
+    restricted_units_eye = {
+        title = "<LOC tooltipui0686>No Eye of Rhianne and Soothsayer",
+        description = "<LOC tooltipui0687>Remove the Aeon T3 Optics and CybranT3 Perimeter"
+    },
+    
     #**********************
     #** Strategic overlay
     #**********************
