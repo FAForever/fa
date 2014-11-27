@@ -34,6 +34,8 @@ local StratManager = import('/lua/sim/StrategyManager.lua')
 
 local scoreOption = ScenarioInfo.Options.Score or "no"
 
+local TransferUnitsOwnership = import('/lua/SimUtils.lua').TransferUnitsOwnership
+
 
 local observer = false
 scoreData = {}
@@ -304,100 +306,6 @@ function CollectCurrentScores()
     end
 
 end
-
-
-function TransferUnitsOwnership(units, ToArmyIndex)
-    local toBrain = GetArmyBrain(ToArmyIndex)
-    if not toBrain or toBrain:IsDefeated() or not units or table.getn(units) < 1 then
-        return
-    end
-    local newUnits = {}
-    table.sort(units, function (a, b) return a:GetBlueprint().Economy.BuildCostMass > b:GetBlueprint().Economy.BuildCostMass end)
-    for k,v in units do
-        local owner = v:GetArmy()
-        if owner == ToArmyIndex then
-            continue
-            # removed " not IsAlly(owner,ToArmyIndex) or " because else it doesnt work when unit captured
-        end
-        # Only allow units not attached to be given. This is because units will give all of it's children over
-        # aswell, so we only want the top level units to be given. Also, don't allow commanders to be given.
-        if v:GetParent() != v or (v.Parent and v.Parent != v) then
-            continue
-        end
-
-        local unit = v
-        local bp = unit:GetBlueprint()
-        local unitId = unit:GetUnitId()
-
-        # B E F O R E
-        local numNukes = unit:GetNukeSiloAmmoCount()  #looks like one of these 2 works for SMDs also
-        local numTacMsl = unit:GetTacticalSiloAmmoCount()
-        local unitKills = unit:GetStat('KILLS', 0).Value   #also takes care of the veteran level
-        local unitHealth = unit:GetHealth()
-        local shieldIsOn = false
-        local ShieldHealth = 0
-        local hasFuel = false
-        local fuelRatio = 0
-        local enh = {} # enhancements
-
-        if unit.MyShield then
-            shieldIsOn = unit:ShieldIsOn()
-            ShieldHealth = unit.MyShield:GetHealth()
-        end
-        if bp.Physics.FuelUseTime and bp.Physics.FuelUseTime > 0 then   # going through the BP to check for fuel
-            fuelRatio = unit:GetFuelRatio()                             # usage is more reliable then unit.HasFuel
-            hasFuel = true                                              # cause some buildings say they use fuel
-        end
-        local posblEnh = bp.Enhancements
-        if posblEnh then
-            for k,v in posblEnh do
-                if unit:HasEnhancement( k ) then
-                   table.insert( enh, k )
-                end
-            end
-        end
-
-        # changing owner
-        unit = ChangeUnitArmy(unit,ToArmyIndex)        
-        if not unit then
-            continue
-        end
-        table.insert(newUnits, unit)
-
-        # A F T E R
-        if unitKills and unitKills > 0 then # set veterancy first
-            unit:AddKills( unitKills )
-        end
-        if enh and table.getn(enh) > 0 then
-            for k, v in enh do
-                unit:CreateEnhancement( v )
-            end
-        end
-        if unitHealth > unit:GetMaxHealth() then
-            unitHealth = unit:GetMaxHealth()
-        end
-        unit:SetHealth(unit,unitHealth)
-        if hasFuel then
-            unit:SetFuelRatio(fuelRatio)
-        end
-        if numNukes and numNukes > 0 then
-            unit:GiveNukeSiloAmmo( (numNukes - unit:GetNukeSiloAmmoCount()) )
-        end
-        if numTacMsl and numTacMsl > 0 then
-            unit:GiveTacticalSiloAmmo( (numTacMsl - unit:GetTacticalSiloAmmoCount()) )
-        end
-        if unit.MyShield then
-            unit.MyShield:SetHealth( unit, ShieldHealth )
-            if shieldIsOn then
-                unit:EnableShield()
-            else
-                unit:DisableShield()
-            end
-        end
-    end
-    return newUnits
-end
-
 
 function SyncScores()
     if GetFocusArmy() == -1 or import('/lua/victory.lua').gameOver == true or observer == true then
@@ -982,7 +890,7 @@ AIBrain = Class(moho.aibrain_methods) {
         if self.BuilderManagers then
             self.ConditionsMonitor:Destroy()
             for k,v in self.BuilderManagers do
-		#DUNCAN - added setenabled's to false
+		--DUNCAN - added setenabled's to false
 		v.EngineerManager:SetEnabled(false)
 		v.FactoryManager:SetEnabled(false)
 		v.PlatoonFormManager:SetEnabled(false)
@@ -1040,23 +948,23 @@ AIBrain = Class(moho.aibrain_methods) {
         import('/lua/SimPing.lua').OnArmyDefeat(self:GetArmyIndex())
         
         local function KillArmy()
+            
             local allies = {}
             local selfIndex = self:GetArmyIndex()
             WaitSeconds(10)
-            
-            #this part determiens the share condition            
+            -- this part determiens the share condition            
             local shareOption = ScenarioInfo.Options.Share or "no"
-            ##"no" means full share
+            -- "no" means full share
             if shareOption == "no" then            
-                ##this part determines who the allies are 
+                -- this part determines who the allies are 
                 for index, brain in ArmyBrains do
                     brain.index = index
                     brain.score = brain:CalculateScore()
-                    if IsAlly(selfIndex, brain:GetArmyIndex()) and selfIndex != brain:GetArmyIndex() and not brain:IsDefeated() then
+                    if IsAlly(selfIndex, brain:GetArmyIndex()) and selfIndex ~= brain:GetArmyIndex() and not brain:IsDefeated() then
                         table.insert(allies, brain)
                     end
                 end
-                ##This part determines which ally has the highest score and transfers ownership of all units to him
+                -- This part determines which ally has the highest score and transfers ownership of all units to him
                 if table.getn(allies) > 0 then
                     table.sort(allies, function(a,b) return a.score > b.score end)
                     for k,v in allies do                
@@ -1066,27 +974,40 @@ AIBrain = Class(moho.aibrain_methods) {
                         end
                     end
                 end            
-            ##"yes" means share until death
+            -- "yes" means share until death
             elseif shareOption == "yes" then
                 import('/lua/SimUtils.lua').KillSharedUnits(self:GetArmyIndex())
                 local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+                -- return borrowed units to their real owners
+                local borrowed = {}
                 for index,unit in units do
-                    if unit.oldowner and unit.oldowner != self:GetArmyIndex() then
-                        TransferUnitsOwnership(unit, unit.oldowner)
-                    else
-                        unit:Kill()
+                    local oldowner = unit.oldowner
+                    if oldowner and owner ~= self:GetArmyIndex() then
+                        if not borrowed[oldowner] and not GetArmyBrain(owner):IsDefeated() then
+                            borrowed[oldowner] = {}
+                        end
+
+                        if borrowed[oldowner] then
+                            table.insert(borrowed[unit.oldowner], unit)
+                        end
                     end
                 end
+
+                for owner, units in borrowed do
+                    TransferUnitsOwnership(units, owner)
+                end
             end
+
             WaitSeconds(0.1)
 
-            local killacu = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-            if killacu and table.getn(killacu) > 0 then
-                for index,unit in killacu do
+            local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+            if tokill and table.getn(tokill) > 0 then
+                for index, unit in tokill do
                     unit:Kill()
                 end
             end
         end
+
         ForkThread(KillArmy)
         ##For Sorian AI bit 2
         if self.BuilderManagers then
