@@ -30,17 +30,17 @@ restrictedUnits = {
     },
     LAND = {
         categories = {"LAND"},
-        name = "<LOC restricted_units_data_0004>No Land",
+        name = "<LOC restricted_units_data_0005>No Land",
         tooltip = "restricted_units_land",
     },
     AIR = {
         categories = {"AIR"},
-        name = "<LOC restricted_units_data_0005>No Air",
+        name = "<LOC restricted_units_data_0006>No Air",
         tooltip = "restricted_units_air",
     },
     NAVAL = {
         categories = {"NAVAL"},
-        name = "<LOC restricted_units_data_0006>No Naval",
+        name = "<LOC restricted_units_data_0004>No Naval",
         tooltip = "restricted_units_naval",
     },
     UEF = {
