@@ -53,7 +53,8 @@ make a thread if it isn't there already.
 - [X] Improved autobalance with random spawns in lobby
 - [X] SMD can be paused
 - [X] New "No Walls" Unit Restriction
-- [X] Improved the Unit Restrictions menu descriptions
+
+- [X] Improved the Unit Restrictions menu descriptions, including localisation
 - [X] Improved the Attack-Move feature (Factory Attack-Move Engineer behaviour left alone)
 - [X] Made factory queue templates more accessible, the save button was hidden when the factory wasn't paused
 - [X] Less UI-lag
@@ -72,7 +73,6 @@ make a thread if it isn't there already.
 - Implement proper Stealth
 - Fix replays desyncing
 - Fix Support factories being built prior to HQ with UI exploit
->>>>>>> b91645e... Update readme for #140
 
 Contributors:
  - Sheeo
@@ -84,6 +84,7 @@ Contributors:
  - PattogoTehen
  - RK4000
  - Eximius
+ - Xinonny
 
 Contributing
 ------------
