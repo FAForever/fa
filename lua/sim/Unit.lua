@@ -202,7 +202,7 @@ Unit = Class(moho.unit_methods) {
 
         --Set up veterancy
         self.xp = 0
-        self.Sync.xp = self.xp
+        --self.Sync.xp = self.xp
         self.VeteranLevel = 0
 
         self.debris_Vector = Vector( 0, 0, 0 )
@@ -3635,7 +3635,7 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
     -- VETERANCY
     -------------------------------------------------------------------------------------------
-    AddXP = function(self,amount)
+    AddXP = function(self, amount)
         self.xp = self.xp + (amount)
         self.Sync.xp = self.xp
         self:CheckVeteranLevel()
@@ -3643,42 +3643,21 @@ Unit = Class(moho.unit_methods) {
 
     --This function should be used for kills made through the script, since kills through the engine (projectiles etc...) are already counted.
     AddKills = function(self, numKills)
-        --Add the kills, then check Veterancy
         local unitKills = self:GetStat('KILLS', 0).Value + numKills
         self:SetStat('KILLS', unitKills)
-
-        local vet = self:GetBlueprint().Veteran or Game.VeteranDefault
-
-        local vetLevels = table.getsize(vet)
-        if self.VeteranLevel == vetLevels then
-            return
-        end
-
-        local nextLvl = self.VeteranLevel + 1
-        local nextKills = vet[('Level' .. nextLvl)]
-
-        --Since we could potentially be gaining a lot of kills here, check if we gained more than one level
-        while unitKills >= nextKills and self.VeteranLevel ~= vetLevels do
-            self:SetVeteranLevel(nextLvl)
-
-            nextLvl = self.VeteranLevel + 1
-            nextKills = vet[('Level' .. nextLvl)]
-        end
     end,
 
-    --Use this to go through the AddKills function rather than directly setting Veterancy
+    --Use this to go through the AddXP function rather than directly setting Veterancy
     SetVeterancy = function(self, veteranLevel)
         veteranLevel = veteranLevel or 5
-        if veteranLevel == 0 or veteranLevel > 5 then
-            return
-        end
+        if veteranLevel == 0 or veteranLevel > 5 then return end
         local bp = self:GetBlueprint()
-        if bp.Veteran['Level'..veteranLevel] then
-            self:AddXP(bp.Veteran['Level'..veteranLevel])
-        elseif import('/lua/game.lua').VeteranDefault['Level'..veteranLevel] then
-            self:AddXP(import('/lua/game.lua').VeteranDefault['Level'..veteranLevel])
+        local lvl = 'Level' .. veteranLevel
+        local xp = bp.Veteran[lvl] or import('/lua/game.lua').VeteranDefault[lvl]
+        if xp then
+            self:AddXP(xp)
         else
-            error('Invalid veteran level - ' .. veteranLevel)
+             error('Invalid veteran level - ' .. veteranLevel)
         end
     end,
 
@@ -3687,27 +3666,20 @@ Unit = Class(moho.unit_methods) {
         return self.VeteranLevel
     end,
 
-
     --Check to see if we should veteran up.
     CheckVeteranLevel = function(self)
-        local bp = self:GetBlueprint().Veteran
-        --There is no veteran block in the bp, return
-        if not bp then
-            bp = Game.VeteranDefault
-        end
-        --We add 1 because we get this before the stat gets updated
-        local unitKills = self.xp
+        local levels = self:GetBlueprint().Veteran or Game.VeteranDefault
+        local maxLevel = table.getsize(levels)
+
         --We are already at the highest veteran level, return
-        if self.VeteranLevel == table.getsize(bp) then
+        if self.VeteranLevel >= maxLevel then
             return
         end
-
-        local nextLvl = self.VeteranLevel + 1
-        local nextKills = bp[('Level' .. nextLvl)]
-        if unitKills >= nextKills then
-            self:SetVeteranLevel(nextLvl)
-            self.xp = nextKills
-            self.Sync.xp = nextKills
+        
+        local next = self.VeteranLevel + 1
+        while self.xp >= levels[('Level' .. next)] and self.VeteranLevel < maxLevel do
+             self:SetVeteranLevel(next)
+             next = self.VeteranLevel + 1
         end
     end,
 
