@@ -57,6 +57,7 @@ make a thread if it isn't there already.
 - [X] Improved the Attack-Move feature (Factory Attack-Move Engineer behaviour left alone)
 - [X] Made factory queue templates more accessible, the save button was hidden when the factory wasn't paused
 - [X] Less UI-lag
+- [X] Show replay-ID in score 
 
 ----------------------------------
 *Changes to be verified*

@@ -27,6 +27,7 @@ local observerLine = false
 
 ##  I switched the order of these because it was causing error, originally, the scoreoption line was first
 local sessionInfo = SessionGetScenarioInfo()   
+local replayID = nil
 
 
 local lastUnitWarning = false
@@ -360,6 +361,8 @@ function SetupPlayerLines()
 	
 	mapData = {}	
 	mapData.mapname = LOCF("<LOC gamesel_0002>Map: %s", sessionInfo.name)
+    if not replayID then replayID = GetCommandLineArg("/replayid", 1)[1] or -1 end
+    if replayID > 0 then mapData.mapname = mapData.mapname .. ', ID: ' .. replayID end
 	controls.armyLines[index] = CreateMapNameLine(mapData, 0)
 end
 	function _OnBeat()
