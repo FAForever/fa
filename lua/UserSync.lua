@@ -12,7 +12,6 @@ UnitData = {}
 
 -- Here's an opportunity for user side script to examine the Sync table for the new tick
 function OnSync()
-	
     if Sync.RequestingExit then
         --LOG("Got it")
         ExitGame()

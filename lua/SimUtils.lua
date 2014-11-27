@@ -1,4 +1,4 @@
--- Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --
 -- General Sim scripts
 
@@ -49,7 +49,7 @@ import('/lua/SimPlayerQuery.lua').AddResultListener( "OfferAlliance", OnAlliance
 function KillSharedUnits(owner)
     if sharedUnits[owner] and table.getn(sharedUnits[owner]) > 0 then
         for index,unit in sharedUnits[owner] do
-            if not unit:IsDead() and unit.oldowner then
+            if not unit:IsDead() and unit.oldowner == owner then
                 unit:Kill()
             end
         end
@@ -62,13 +62,15 @@ function TransferUnitsOwnership(units, ToArmyIndex)
     if not toBrain or toBrain:IsDefeated() or not units or table.getn(units) < 1 then
         return
     end
-    local newUnits = {} 
+
+    local newUnits = {}
     for k,v in units do
-        local owner = v:GetArmy()       
-        if owner == ToArmyIndex or GetArmyBrain(owner):IsDefeated() then
+        local owner = v:GetArmy()
+        --if owner == ToArmyIndex or GetArmyBrain(owner):IsDefeated() then
+        if owner == ToArmyIndex then
             continue
-            -- removed " not IsAlly(owner,ToArmyIndex) or " because else it doesnt work when unit captured
         end
+
         -- Only allow units not attached to be given. This is because units will give all of it's children over
         -- aswell, so we only want the top level units to be given. Also, don't allow commanders to be given.
         if v:GetParent() ~= v or (v.Parent and v.Parent ~= v) then
@@ -82,7 +84,8 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         -- B E F O R E
         local numNukes = unit:GetNukeSiloAmmoCount()  --looks like one of these 2 works for SMDs also
         local numTacMsl = unit:GetTacticalSiloAmmoCount()
-        local unitKills = unit:GetStat('KILLS', 0).Value   --also takes care of the veteran level
+        local unitKills = unit:GetStat('KILLS', 0).Value
+        local xp = unit.xp
         local unitHealth = unit:GetHealth()
         local shieldIsOn = false
         local ShieldHealth = 0
@@ -106,11 +109,6 @@ function TransferUnitsOwnership(units, ToArmyIndex)
                 end
             end
         end
-    
-        local oldOwner = nil
-        if unit.oldowner then
-            oldOwner = unit.oldowner
-        end
 
         -- changing owner
         unit:OnBeforeTransferingOwnership(ToArmyIndex)
@@ -119,27 +117,24 @@ function TransferUnitsOwnership(units, ToArmyIndex)
             continue
         end
 
-        table.insert(newUnits, unit)	
-		
-		if IsAlly(owner,ToArmyIndex) then
-			if oldOwner == nil or oldOwner == owner then
-				unit.oldowner = owner
-				if not sharedUnits[owner] then
-					sharedUnits[owner] = {}
-				end
-				table.insert(sharedUnits[owner], unit)
-			else
-				unit.oldowner = oldOwner
-				if not sharedUnits[oldOwner] then
-					sharedUnits[oldOwner] = {}
-				end
-				table.insert(sharedUnits[oldOwner], unit)
-			end
-		end
-		
+        table.insert(newUnits, unit)    
+        
+        if IsAlly(owner, ToArmyIndex) then
+            if unit.oldowner == nil then
+                unit.oldowner = owner
+                if not sharedUnits[owner] then
+                    sharedUnits[owner] = {}
+                end
+                table.insert(sharedUnits[owner], unit)
+            end
+        end
+        
         -- A F T E R
-        if unitKills and unitKills > 0 then -- set veterancy first
+        if unitKills and unitKills > 0 then
             unit:AddKills( unitKills )
+        end
+        if xp and xp > 0 then
+            unit:AddXP(xp)
         end
         if enh and table.getn(enh) > 0 then
             for k, v in enh do
@@ -167,7 +162,7 @@ function TransferUnitsOwnership(units, ToArmyIndex)
                 unit:DisableShield()
             end
         end
-        unit:OnAfterTransferingOwnership(owner) -- owner var contains the now ex-owner
+        unit:OnAfterTransferingOwnership(owner)
     end
     return newUnits
 end
