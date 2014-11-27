@@ -64,7 +64,7 @@ make a thread if it isn't there already.
 - [X] Improved autobalance with random spawns in lobby
 - [X] SMD can be paused
 - [X] New "No Walls" Unit Restriction
-- [X] Improved the Unit Restrictions menu descriptions
+- [X] Improved the Unit Restrictions menu descriptions, including localisation
 - [X] Made factory queue templates more accessible, the save button was hidden when the factory wasn't paused
 - [X] Less UI-lag
 
@@ -92,7 +92,10 @@ Contributors:
  - PattogoTehen
  - RK4000
  - Eximius
-
+ - Xinonny
+ 
+Special Thanks:
+ - Navax
 
 Changes under consideration for future patches
 ----------------------------------------------
