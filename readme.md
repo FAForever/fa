@@ -67,6 +67,7 @@ make a thread if it isn't there already.
 - [X] Improved the Unit Restrictions menu descriptions
 - [X] Made factory queue templates more accessible, the save button was hidden when the factory wasn't paused
 - [X] Less UI-lag
+- [X] Show replay-ID in score 
 
 ----------------------------------
 *Changes to be verified*
