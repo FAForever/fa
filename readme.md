@@ -96,7 +96,9 @@ Contributors:
  
 Special Thanks:
  - Navax
-
+ - Alex1911
+ - Preytor
+ 
 Changes under consideration for future patches
 ----------------------------------------------
 
