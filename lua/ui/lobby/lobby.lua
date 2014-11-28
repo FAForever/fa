@@ -1838,12 +1838,12 @@ local function UpdateGame()
                 ClearSlotInfo(i)
 				GUI.slots[i].SlotBackground:SetTexture(UIUtil.UIFile('/SLOT/slot-player_other.png'))
             end
-			if gameInfo.PlayerOptions[i].Human then
+            if gameInfo.PlayerOptions[i].Human then
                 --if gameInfo.PlayerOptions[i].DEV and gameInfo.PlayerOptions[i].MEAN then
-					--Tooltip.AddControlTooltip(GUI.slots[i].ratingText, {text='Rating', body='DEV : '..round(gameInfo.PlayerOptions[i].DEV)..', MEAN : '..round(gameInfo.PlayerOptions[i].MEAN)}) -- Add tooltip (mean and dev rating) in player rating column -- Xinnony
-				--else
-					Tooltip.AddControlTooltip(GUI.slots[i].ratingText, {text='Rating', body='This is the player rating.'})
-				--end
+                    --Tooltip.AddControlTooltip(GUI.slots[i].ratingText, {text='Rating', body='DEV : '..round(gameInfo.PlayerOptions[i].DEV)..', MEAN : '..round(gameInfo.PlayerOptions[i].MEAN)}) -- Add tooltip (mean and dev rating) in player rating column -- Xinnony
+                --else
+                    Tooltip.AddControlTooltip(GUI.slots[i].ratingText, {text='Rating', body='This is the player rating.'})
+                --end
             end
         end
     end
