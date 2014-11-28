@@ -150,27 +150,20 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
             LayoutHelpers.AtLeftIn(cbox_Act_TEXT, cbox_Act, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox_Act_TEXT, cbox_Act)
 			cbox_Act:SetCheck(true, true)--isChecked, skipEvent)
-	-- Disabled because bug
-	cbox_Act_TEXT:SetColor('5C5F5C')
-	cbox_Act:SetCheck(false, true)
-	cbox_Act:Disable()
-	cbox_Act_TEXT:Disable()
-	Tooltip.AddCheckboxTooltip(cbox_Act, {text='Hide Unselectable', body='Disabled for prevent a bug'})
-	Tooltip.AddCheckboxTooltip(cbox_Act_TEXT, {text='Hide Unselectable', body='Disabled for prevent a bug'})
 	--
 	--
 	if IsHost then
 		cbox_GAME:Enable()
-		--cbox_Act:Enable()
+		cbox_Act:Enable()
 	else
 		cbox_GAME:Disable()
-		--cbox_Act:Disable()
+		cbox_Act:Disable()
 		cbox_GAME_TEXT:Disable()
-		--cbox_Act_TEXT:Disable()
+		cbox_Act_TEXT:Disable()
 		cbox_GAME:SetCheck(false, true)
-		--cbox_Act:SetCheck(false, true)
+		cbox_Act:SetCheck(false, true)
 		cbox_GAME_TEXT:SetColor('5C5F5C')
-		--cbox_Act_TEXT:SetColor('5C5F5C')
+		cbox_Act_TEXT:SetColor('5C5F5C')
 	end
 	cbox_GAME.OnCheck = function(self, checked)
 		if IsHost then
@@ -352,16 +345,16 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 		
 		-- Remove Unselectable and mod not available with all players
 		-- BUG ? (cause an error line 364 "return a.name < b.name")
-		--if cbox_Act then
-			--for i, v in current_list do
-				--if not v.selectable or availableMods[v.uid] == v.uid then
-					--current_list[i] = nil
-				--end
-			--end
-		--end
+		if cbox_Act then
+			for i, v in current_list do
+				if not v.selectable or availableMods[v.uid] == v.uid then
+					table.remove(current_list, i)
+					i = i - 1 -- For sure check the next mod
+				end
+			end
+		end
 		
 		-- TRIE LES MOD ACTIFS EN HAUT ET LE RESTE ALPHABETIQUEMENT
-		--LOG('<<<<<'..table.getn(current_list)..'>>>>>')
 		table.sort(current_list, function(a,b) 
 			if selmods[a.uid] and selmods[b.uid] then
 				return a.name < b.name
