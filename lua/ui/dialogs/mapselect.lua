@@ -780,7 +780,7 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
             end
         end
         for i, v in OptionDisplay do
-			if Options[i + self.top] then
+            if Options[i + self.top] then
                 SetTextLine(v, Options[i + self.top], i + self.top)
             else
                 v.text:SetText('')
