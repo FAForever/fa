@@ -7374,7 +7374,7 @@ function SAVE_PRESET_IN_PREF() -- GET OPTIONS ON LOBBY AND SAVE TO PRESET
     for k, v in gameInfo.GameOptions do
         if k == 'ScenarioFile' then -- MAP
             --AddChatText('<<< gameInfo.GameOptions : '..k..' = '..tostring(gameInfo.GameOptions[k])) --EX: gameInfo.GameOptions : UnitCap = 500
-            SetPreference('UserPresetLobby.'..Selected_Preset..'.MapPath', tostring(gameInfo.GameOptions[k]))
+            SetPreference('UserPresetLobby.'..Selected_Preset..'.MapPath', gameInfo.GameOptions[k])
 
         elseif k == 'AllowObservers' then
             SetPreference('UserPresetLobby.'..Selected_Preset..'.Settings.AllowObservers', gameInfo.GameOptions[k])
@@ -7395,7 +7395,7 @@ function SAVE_PRESET_IN_PREF() -- GET OPTIONS ON LOBBY AND SAVE TO PRESET
 
         else -- SETTINGS
             --AddChatText('<<< gameInfo.GameOptions : '..k..' = '..tostring(gameInfo.GameOptions[k])) --EX: gameInfo.GameOptions : UnitCap = 500
-            SetPreference('UserPresetLobby.'..Selected_Preset..'.Settings.'..k, tostring(gameInfo.GameOptions[k])) -- Enregistre les Options dans le Game.prefs
+            SetPreference('UserPresetLobby.'..Selected_Preset..'.Settings.'..k, gameInfo.GameOptions[k]) -- Enregistre les Options dans le Game.prefs
         end
     end
 
