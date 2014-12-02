@@ -60,8 +60,9 @@ make a thread if it isn't there already.
 - [X] Improved the Unit Restrictions menu descriptions, including localisation
 - [X] Improved the Attack-Move feature (Factory Attack-Move Engineer behaviour left alone)
 - [X] Made factory queue templates more accessible, the save button was hidden when the factory wasn't paused
-- [X] Less UI-lag
 - [X] Show replay-ID in score 
+- [X] Less UI-lag
+- [X] Some sim-speed improvements 
 
 ----------------------------------
 *Changes to be verified*
