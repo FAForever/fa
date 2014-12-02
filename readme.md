@@ -43,6 +43,7 @@ make a thread if it isn't there already.
 - [X] All Factories of a given tech level now roll out Engineers at an even pace with each other
 - [X] Given units now get correct experience points 
 - [X] Given units are returned to their original owner in share until death 
+- [X] UI-mods are now refreshed before launch
 
 
 *Game Improvements*
