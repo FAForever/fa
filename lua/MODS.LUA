@@ -213,6 +213,7 @@ function SetSelectedMods(s)
         end
 
         SetPreference('active_mods', s)
+        UpdateUIMods()
     end
 end
 
@@ -413,4 +414,10 @@ function GetDependencies(uid)
     if table.empty(ret.conflicts) then ret.conflicts = nil end
     return ret
 end
-    
+
+function UpdateUIMods()
+    __active_mods = {}
+    for i,m in ipairs(GetUiMods()) do
+        table.insert(__active_mods, m)
+    end
+end
