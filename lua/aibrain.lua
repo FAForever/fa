@@ -159,7 +159,7 @@ function GetArmyScore()
         ArmyScore[index].units.naval.built = brain:GetBlueprintStat("Units_History", categories.NAVAL)
         ArmyScore[index].units.naval.lost = brain:GetBlueprintStat("Units_Killed", categories.NAVAL)
 
-        --ArmyScore[index].units.cdr.kills = brain:GetBlueprintStat("Enemies_Killed", categories.COMMAND)
+        ArmyScore[index].units.cdr.kills = brain:GetBlueprintStat("Enemies_Killed", categories.COMMAND)
         ArmyScore[index].units.cdr.built = brain:GetBlueprintStat("Units_History", categories.COMMAND)
         ArmyScore[index].units.cdr.lost = brain:GetBlueprintStat("Units_Killed", categories.COMMAND)
         ArmyScore[index].units.experimental.kills = brain:GetBlueprintStat("Enemies_Killed", categories.EXPERIMENTAL)
