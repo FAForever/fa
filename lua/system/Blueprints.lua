@@ -453,7 +453,7 @@ function PreModBlueprints(all_bps)
             local br = nil
 
             if(cats.ENGINEER) then
-                br = bp.Economy.MaxBuildDistance or 26
+                br = 26 -- bp.Economy.MaxBuildDistance or
             elseif bp.Weapon then
                 local vision = bp.Intel.VisionRadius or 10
                 local max = 0
