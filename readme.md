@@ -6,16 +6,11 @@ master|develop
 
 Current patch is: 3634
 
-
-**Tentative** changelog for patch 3636
---------------------------------------
-
-This is the **tentative** changelog to be posted on the forums for patch
-3636.
-
-It is temporary and subject to change. Anything on this list is fully open for
-debate.  Please search the forum for a discussion about the relevant change, or
-make a thread if it isn't there already.
+Changelog for patch 3636
+------------------------
+This is the changelog to be posted on the forums for patch 3636. It is subject 
+to change, but nearing release status. Please search the forum for a discussion
+about the relevant change, or make a thread if it isn't there already.
 
 
 *Exploit Fixes*
@@ -74,20 +69,6 @@ make a thread if it isn't there already.
 - [X] Less UI-lag
 - [X] Some sim-speed improvements 
 
-----------------------------------
-*Changes to be verified*
-- [ ] Attempt to fix Aeon T1 Frigate, T2 Destroyer, and Seraphim T3 Subhunter weapon bones to improve fire reliability
-- [ ] New icon name for Mass Storage
-
-----------------------------------
-*Changes to be made*
-- Satellite base now builds the satellite, when satellite dies, base can rebuild
-- Fix cyclic factory assist crash
-- Fix HQ Factory visual bug
-- Implement proper Stealth
-- Fix replays desyncing
-- Fix Support factories being built prior to HQ with UI exploit
-
 Contributors:
  - Sheeo
  - a_vehicle
@@ -112,6 +93,11 @@ Changes under consideration for future patches
 - Mongoose muzzle velocity buff 
 
 
+Special Thanks:
+ - Navax
+ - Alex1911
+ - Preytor
+ 
 Contributing
 ------------
 
