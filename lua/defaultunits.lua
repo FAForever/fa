@@ -381,65 +381,61 @@ StructureUnit = Class(Unit) {
     --  Adjacency
     ----------------------------------------------------------------------------------------------
 
-    -- When we're adjacent, try to all all the possible bonuses.
-     -- When we're adjacent, try to all all the possible bonuses.
-     OnAdjacentTo = function(self, adjacentUnit, triggerUnit)
-         if self:IsBeingBuilt() then return end
-         if adjacentUnit:IsBeingBuilt() then return end
+    -- When we're adjacent, try to apply all the possible bonuses
+    OnAdjacentTo = function(self, adjacentUnit, triggerUnit)    -- What is triggerUnit?
+        if self:IsBeingBuilt() then return end
+        if adjacentUnit:IsBeingBuilt() then return end
+
+        -- Does the unit have any adjacency buffs to use?
+        local adjBuffs = self:GetBlueprint().Adjacency
+        if not adjBuffs then return end
  
-         local adjBuffs = self:GetBlueprint().Adjacency
-         if not adjBuffs then return end
- 
-         for k,v in AdjacencyBuffs[adjBuffs] do
-             Buff.ApplyBuff(adjacentUnit, v, self)
-         end
+        -- Apply each buff needed to you and/or adjacent unit
+        for k,v in AdjacencyBuffs[adjBuffs] do
+            Buff.ApplyBuff(adjacentUnit, v, self)
+        end
         
-        -- Keep track of adjacent units
-        if not self.AdjacentUnits then self.AdjacentUnits = {} end       
-        -- Clear all adjacency buffs from surrounding structures
-        self:RemoveAdjacencyBuffs()
-        
-        -- Add the new adjacent building and read the buffs if we're producing mass
-        table.insert(self.AdjacentUnits, adjacentUnit)                
-        -- Only read adjacencies if consumption is active
-        if self._productionActive then
-            self:ApplyAdjacencyBuffs()
-        end      
+        -- Keep track of which units you are adjacent to
+        table.insert(self.AdjacentUnits, adjacentUnit)
         
         self:RequestRefreshUI()
-        adjacentUnit:RequestRefreshUI()        
+        adjacentUnit:RequestRefreshUI()
      end,
 
-    --When we're not adjacent, try to remove all the possible bonuses.
-     OnNotAdjacentTo = function(self, adjacentUnit)
-         local adjBuffs = self:GetBlueprint().Adjacency
-         if adjBuffs and AdjacencyBuffs[adjBuffs] then
-             for k,v in AdjacencyBuffs[adjBuffs] do
-                 if Buff.HasBuff(adjacentUnit, v) then
-                     Buff.RemoveBuff(adjacentUnit, v)
-                 end
-             end
-         end
-         self:DestroyAdjacentEffects()
+    --When we're not adjacent, try to remove all the possible bonuses
+    OnNotAdjacentTo = function(self, adjacentUnit)
+        local adjBuffs = self:GetBlueprint().Adjacency
         
-        --Keep track of adjacent units
+        if adjBuffs and AdjacencyBuffs[adjBuffs] then
+            for k,v in AdjacencyBuffs[adjBuffs] do
+                if Buff.HasBuff(adjacentUnit, v) then
+                    Buff.RemoveBuff(adjacentUnit, v)
+                end
+            end
+        end
+        self:DestroyAdjacentEffects()
+        
+        -- Keep track of units losing adjacent structures
         for k,u in self.AdjacentUnits do
             if u == adjacentUnit then
                 table.remove(self.AdjacentUnits, k)
                 adjacentUnit:RequestRefreshUI()
             end
-       end        
-        self:RequestRefreshUI()        
+        end
+        self:RequestRefreshUI()
     end,
     
     ------------------------------------
     --Add/Remove Adjacency Functionality
     ------------------------------------
     
+    -- Applies all appropriate buffs to all adjacent units
     ApplyAdjacencyBuffs = function(self)
         local adjBuffs = self:GetBlueprint().Adjacency
-        if not adjBuffs or not self.AdjacentUnits then return end
-        for key, adjacentUnit in self.AdjacentUnits do
+        if not adjBuffs then return end
+        
+        -- There won't be any adjacentUnit if this is a producer just built...
+        for k, adjacentUnit in self.AdjacentUnits do
             for k,v in AdjacencyBuffs[adjBuffs] do
                 Buff.ApplyBuff(adjacentUnit, v, self)
                 adjacentUnit:RequestRefreshUI()
@@ -448,9 +444,10 @@ StructureUnit = Class(Unit) {
         self:RequestRefreshUI()
     end,
     
+    -- Removes all appropriate buffs from all adjacent units
     RemoveAdjacencyBuffs = function(self)
         local adjBuffs = self:GetBlueprint().Adjacency
-        if not adjBuffs or not self.AdjacentUnits then return end
+        if not adjBuffs then return end
 		
         for k, adjacentUnit in self.AdjacentUnits do
             for key, v in AdjacencyBuffs[adjBuffs] do
@@ -460,6 +457,7 @@ StructureUnit = Class(Unit) {
                 end
             end
         end
+        self:RequestRefreshUI()
     end,
 
     -------------------------------
@@ -477,21 +475,19 @@ StructureUnit = Class(Unit) {
                 return
             end
         end
-
         self:ForkThread( EffectUtil.CreateAdjacencyBeams, adjacentUnit, self.AdjacencyBeamsBag )
     end,
 
     DestroyAdjacentEffects = function(self, adjacentUnit)
         if not self.AdjacencyBeamsBag then return end
+        
         for k, v in self.AdjacencyBeamsBag do
-            -- if any of the adjacent units are destroyed or the passed in unit is found: Kill the effect
-            if v.Unit:BeenDestroyed() or v.Unit:IsDead() then --or v.Unit:GetEntityId() == adjacentUnit:GetEntityId() then
+            if v.Unit:BeenDestroyed() or v.Unit:IsDead() then
                 v.Trash:Destroy()
                 self.AdjacencyBeamsBag[k] = nil
             end
         end
     end,
-
 }
 
 ---------------------------------------------------------------

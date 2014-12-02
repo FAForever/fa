@@ -263,6 +263,9 @@ Unit = Class(moho.unit_methods) {
         --Ensure transport slots are available
         self.attachmentBone = nil
         self.slotsFree = {}
+        
+        -- Set up Adjacency container
+        self.AdjacentUnits = {}
     end,
 
     getDeathVector = function(self)
