@@ -159,7 +159,7 @@ function GetArmyScore()
         ArmyScore[index].units.naval.built = brain:GetBlueprintStat("Units_History", categories.NAVAL)
         ArmyScore[index].units.naval.lost = brain:GetBlueprintStat("Units_Killed", categories.NAVAL)
 
-        ArmyScore[index].units.cdr.kills = brain:GetBlueprintStat("Enemies_Killed", categories.COMMAND)
+        --ArmyScore[index].units.cdr.kills = brain:GetBlueprintStat("Enemies_Killed", categories.COMMAND)
         ArmyScore[index].units.cdr.built = brain:GetBlueprintStat("Units_History", categories.COMMAND)
         ArmyScore[index].units.cdr.lost = brain:GetBlueprintStat("Units_Killed", categories.COMMAND)
         ArmyScore[index].units.experimental.kills = brain:GetBlueprintStat("Enemies_Killed", categories.EXPERIMENTAL)
@@ -558,13 +558,13 @@ AIBrain = Class(moho.aibrain_methods) {
 
         -- score components calculated
         local resourceProduction = ((massSpent) + (energySpent / energyValueCoefficient)) / 2
-        local battleResults = (((massValueDestroyed - massValueLost) + ((energyValueDestroyed - energyValueLost) / energyValueCoefficient)) / 2)
+        local battleResults = (((massValueDestroyed - massValueLost- (commanderKills * 18000)) + ((energyValueDestroyed - energyValueLost - (commanderKills * 5000000)) / energyValueCoefficient)) / 2)
         if battleResults < 0 then
             battleResults = 0
         end
 
         -- score calculated
-        local score = math.floor(resourceProduction + battleResults)
+        local score = math.floor(resourceProduction + battleResults + (commanderKills * 5000))
 
         return score
     end,
