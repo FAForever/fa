@@ -11,15 +11,6 @@ UnitBlueprint {
         MaxHealth = 10,
     },
     Display = {
-#        Mesh = {
-#            IconFadeInZoom = 130,
-#            LODs = {
-#                {
-#                    LODCutoff = 175,
-#                    ShaderName = 'Unit',
-#                },
-#            },
-#        },
     },
     General = {
         CapCost = 0,
