@@ -288,6 +288,7 @@
         UniformScale = 0.018,
     },
     Economy = {
+        -- If modifying Energy or Mass costs, modify Score component in aibrain.lua search battleResults
         BuildCostEnergy = 5000000,
         BuildCostMass = 18000,
         BuildRate = 10,
