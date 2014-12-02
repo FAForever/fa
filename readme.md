@@ -6,16 +6,11 @@ master|develop
 
 Current patch is: 3634
 
-
-**Tentative** changelog for patch 3636
---------------------------------------
-
-This is the **tentative** changelog to be posted on the forums for patch
-3636.
-
-It is temporary and subject to change. Anything on this list is fully open for
-debate.  Please search the forum for a discussion about the relevant change, or
-make a thread if it isn't there already.
+Changelog for patch 3636
+------------------------
+This is the changelog to be posted on the forums for patch 3636. It is subject 
+to change, but nearing release status. Please search the forum for a discussion
+about the relevant change, or make a thread if it isn't there already.
 
 
 *Exploit Fixes*
@@ -56,27 +51,12 @@ make a thread if it isn't there already.
 - [X] Improved autobalance with random spawns in lobby
 - [X] SMD can be paused
 - [X] New "No Walls" Unit Restriction
-
 - [X] Improved the Unit Restrictions menu descriptions, including localisation
 - [X] Improved the Attack-Move feature (Factory Attack-Move Engineer behaviour left alone)
 - [X] Made factory queue templates more accessible, the save button was hidden when the factory wasn't paused
 - [X] Show replay-ID in score 
 - [X] Less UI-lag
 - [X] Some sim-speed improvements 
-
-----------------------------------
-*Changes to be verified*
-- [ ] Attempt to fix Aeon T1 Frigate, T2 Destroyer, and Seraphim T3 Subhunter weapon bones to improve fire reliability
-- [ ] New icon name for Mass Storage
-
-----------------------------------
-*Changes to be made*
-- Satellite base now builds the satellite, when satellite dies, base can rebuild
-- Fix cyclic factory assist crash
-- Fix HQ Factory visual bug
-- Implement proper Stealth
-- Fix replays desyncing
-- Fix Support factories being built prior to HQ with UI exploit
 
 Contributors:
  - Sheeo
@@ -90,6 +70,11 @@ Contributors:
  - Eximius
  - Xinonny
 
+Special Thanks:
+ - Navax
+ - Alex1911
+ - Preytor
+ 
 Contributing
 ------------
 

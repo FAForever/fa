@@ -463,12 +463,6 @@ function PreModBlueprints(all_bps)
                     if w.MaxRadius and not ignore then
                         max = math.max(w.MaxRadius, max)
                     end
-
-                    -- Test to reduce load on game, especially ASF
-                    if w.TargetCheckInterval < 0.3 then
-                        bp.Weapon[i].TargetCheckInterval = 0.3
-                    end
-
                 end
 
                 br = vision + max
