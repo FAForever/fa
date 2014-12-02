@@ -18,7 +18,7 @@ function UpdateClientModStatus(mod_selec)
 	if GUI_OPEN then
 		IsHost = false
 		modstatus = mod_selec
-		Refresh_Mod_List(false, true, true, IsHost, modstatus)
+		Refresh_Mod_List(false, true, true, IsHost, modstatus, false)
 	end
 end
 
@@ -116,7 +116,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 		LoadListButton:Disable()
 	-------------------------------------
 	-- CHECKBOX UI MOD FILTER --
-	local cbox_UI = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
+	local cbox_UI = UIUtil.CreateCheckboxStdPNG(dialog2, '/RADIOBOX/radio')
         LayoutHelpers.AtLeftIn(cbox_UI, dialog2, 20+130+10)
 		LayoutHelpers.AtBottomIn(cbox_UI, dialog2, 16)
         Tooltip.AddCheckboxTooltip(cbox_UI, {text='UI Mods', body='Hide or Show the UI Mods (actived UI Mods is always showed)'})
@@ -128,7 +128,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 			cbox_UI:SetCheck(true, true)--isChecked, skipEvent)
 	-----------------------------------------
 	-- CHECKBOX GAME MOD FILTER --
-	local cbox_GAME = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
+	local cbox_GAME = UIUtil.CreateCheckboxStdPNG(dialog2, '/RADIOBOX/radio')
         LayoutHelpers.AtLeftIn(cbox_GAME, dialog2, 20+130+100)
 		LayoutHelpers.AtBottomIn(cbox_GAME, dialog2, 16)
         Tooltip.AddCheckboxTooltip(cbox_GAME, {text='GAME Mods', body='Hide or Show the GAME Mods (actived GAME Mods is always showed)'})
@@ -137,12 +137,12 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
             cbox_GAME_TEXT:SetDropShadow(true)
             LayoutHelpers.AtLeftIn(cbox_GAME_TEXT, cbox_GAME, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox_GAME_TEXT, cbox_GAME)
-			cbox_GAME:SetCheck(true, true)--isChecked, skipEvent)
+			cbox_GAME:SetCheck(false, true)--isChecked, skipEvent)
 	----------------------------------------------
-	-- CHECKBOX FAVORITE MOD FILTER --
+	-- CHECKBOX HIDE UNSELECTABLE MOD --
 	local cbox_Act = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftIn(cbox_Act, dialog2, 20+130+120+100)
-		LayoutHelpers.AtBottomIn(cbox_Act, dialog2, 16)
+		LayoutHelpers.AtBottomIn(cbox_Act, dialog2, 23)
         Tooltip.AddCheckboxTooltip(cbox_Act, {text='Hide Unselectable', body='Hide all mods cannot be enabled because is unselectable or other player(s) not have the mod'})
 		cbox_Act_TEXT = UIUtil.CreateText(cbox_Act, 'Hide Unselectable', 14, 'Arial')
             cbox_Act_TEXT:SetColor('B9BFB9')
@@ -150,6 +150,18 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
             LayoutHelpers.AtLeftIn(cbox_Act_TEXT, cbox_Act, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox_Act_TEXT, cbox_Act)
 			cbox_Act:SetCheck(true, true)--isChecked, skipEvent)
+	----------------------------------------------
+	-- CHECKBOX LITTLE VIEW MOD LIST --
+	local cbox_Act2 = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
+        LayoutHelpers.AtLeftIn(cbox_Act2, dialog2, 20+130+120+100)
+		LayoutHelpers.AtBottomIn(cbox_Act2, dialog2, 6)
+        Tooltip.AddCheckboxTooltip(cbox_Act2, {text='Little View', body='See another mod list display'})
+		cbox_Act_TEXT2 = UIUtil.CreateText(cbox_Act2, 'Little View', 14, 'Arial')
+            cbox_Act_TEXT2:SetColor('B9BFB9')
+            cbox_Act_TEXT2:SetDropShadow(true)
+            LayoutHelpers.AtLeftIn(cbox_Act_TEXT2, cbox_Act2, 25)
+            LayoutHelpers.AtVerticalCenterIn(cbox_Act_TEXT2, cbox_Act2)
+			cbox_Act2:SetCheck(false, true)--isChecked, skipEvent)
 	--
 	--
 	if IsHost then
@@ -166,23 +178,38 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 		cbox_Act_TEXT:SetColor('5C5F5C')
 	end
 	cbox_GAME.OnCheck = function(self, checked)
-		if IsHost then
-			save_mod()
-			swiffer()
-			Refresh_Mod_List(checked, cbox_UI:IsChecked(), cbox_Act:IsChecked(), IsHost, modstatus)
+		if checked then
+			cbox_UI:SetCheck(false, true)
+			if IsHost then
+				save_mod()
+				swiffer()
+				Refresh_Mod_List(checked, cbox_UI:IsChecked(), cbox_Act:IsChecked(), IsHost, modstatus, cbox_Act2:IsChecked())
+			end
+		else
+			cbox_GAME:SetCheck(true, true)
 		end
 	end
 	cbox_UI.OnCheck = function(self, checked)
-		save_mod()
-		swiffer()
-		Refresh_Mod_List(cbox_GAME:IsChecked(), checked, cbox_Act:IsChecked(), IsHost, modstatus)
+		if checked then
+			cbox_GAME:SetCheck(false, true)
+			save_mod()
+			swiffer()
+			Refresh_Mod_List(cbox_GAME:IsChecked(), checked, cbox_Act:IsChecked(), IsHost, modstatus, cbox_Act2:IsChecked())
+		else
+			cbox_UI:SetCheck(true, true)
+		end
 	end
 	cbox_Act.OnCheck = function(self, checked)
 		if IsHost then
 			save_mod()
 			swiffer()
-			Refresh_Mod_List(cbox_GAME:IsChecked(), cbox_UI:IsChecked(), checked, IsHost, modstatus)
+			Refresh_Mod_List(cbox_GAME:IsChecked(), cbox_UI:IsChecked(), checked, IsHost, modstatus, cbox_Act2:IsChecked())
 		end
+	end
+	cbox_Act2.OnCheck = function(self, checked)
+		save_mod()
+		swiffer()
+		Refresh_Mod_List(cbox_GAME:IsChecked(), cbox_UI:IsChecked(), cbox_Act:IsChecked(), IsHost, modstatus, checked)
 	end
 	-------------
     -- Credit --
@@ -277,7 +304,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 		import('/lua/mods.lua').SetSelectedMods(selectedMods)
 	end
 	--
-	function Refresh_Mod_List(cbox_GAME, cbox_UI, cbox_Act, IsHost, modstatus)
+	function Refresh_Mod_List(cbox_GAME, cbox_UI, cbox_Act, IsHost, modstatus, cbox_Act2)
 		index = 0
 		exclusiveMod = false
 		current_list = {}
@@ -354,6 +381,21 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 			end
 		end
 		
+		-- Remove Selected Mods
+		--if cbox_Act2 then
+			--table.insert(current_list, 1)
+			--for i, v in current_list do
+				--LOG('>> '..i..' > '..tostring(v.uid)..' == '..tostring(selmods[v.uid])..' ('..v.name..')')
+				--if selmods[v.uid] then
+					--LOG('>> Finded '..i..' ('..v.name..')')
+					--table.remove(current_list, i)
+					--i = i - 1 -- For sure check the next mod
+				--end
+				--LOG('>> End '..i..' ('..v.name..')')
+			--end
+			--table.remove(current_list, 1)
+		--end
+		
 		-- TRIE LES MOD ACTIFS EN HAUT ET LE RESTE ALPHABETIQUEMENT
 		table.sort(current_list, function(a,b) 
 			if selmods[a.uid] and selmods[b.uid] then
@@ -367,7 +409,11 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 		
 		-- CREE LES MOD DANS LA GUI ET SELEC LES ACTIFS
 		for k, v in current_list do
-			table.insert(scrollGroup.controlList, CreateListElementtt(scrollGroup, v, k))
+			if not cbox_Act2 then
+				table.insert(scrollGroup.controlList, CreateListElementtt(scrollGroup, v, k, false))
+			else
+				table.insert(scrollGroup.controlList, CreateListElementtt(scrollGroup, v, k, true))
+			end
 			if IsHost and selmods[v.uid] then
 				scrollGroup.controlList[k].actived = true
 				scrollGroup.controlList[k].type:SetColor('101010') -- Noir
@@ -500,7 +546,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 					if not exist then -- IF The mod is not listed in the GUI, Create the mod in the list
 						--LOG('Try add hidden mod : '..allMods[c].name)
 						--table.insert(scrollGroup.controlList, CreateListElementtt(scrollGroup, allMods[c], table.getn(scrollGroup.controlList)+1))
-						table.insert(scrollGroup.controlList, the_mod.pos+1, CreateListElementtt(scrollGroup, allMods[c], the_mod.pos))
+						table.insert(scrollGroup.controlList, the_mod.pos+1, CreateListElementtt(scrollGroup, allMods[c], the_mod.pos, false))
 						control = scrollGroup.controlList[the_mod.pos+1]
 						--LOG('Try enable hidden mod : '..control.modInfo.name)
 						--control.modInfo.hidden = false
@@ -652,7 +698,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 		scrollGroup.top = 1
 		scrollGroup:CalcVisible()
 	end
-	Refresh_Mod_List(true, true, true, IsHost, modstatus)
+	Refresh_Mod_List(false, true, true, IsHost, modstatus)
 	--
 	scrollGroup.HandleEvent = function(self, event)
         if event.Type == 'WheelRotation' then
@@ -677,10 +723,17 @@ end
 
 
 
-function CreateListElementtt(parent, modInfo, Pos)
-	numElementsPerPage = 6
+function CreateListElementtt(parent, modInfo, Pos, little)
 	local group = Group(parent)
-		group.Height:Set(function() return parent.Height() / numElementsPerPage  end)
+		if little then
+			numElementsPerPage = 22
+			--group.Height:Set(20)
+			--group.Height:Set(function() return parent.Height() / numElementsPerPage  end)
+			group.Height:Set(20)
+		else
+			numElementsPerPage = 6
+			group.Height:Set(function() return parent.Height() / numElementsPerPage  end)
+		end
 		group.Width:Set(parent.Width)
 		LayoutHelpers.AtLeftTopIn(group, parent, 0, group.Height()*(Pos-1))
 	--
@@ -699,20 +752,32 @@ function CreateListElementtt(parent, modInfo, Pos)
 		LayoutHelpers.AtLeftTopIn(group.bg0, group, 0, 0)--group.bg.Height()*(Pos-1))
 	--
 	group.icon = Bitmap(group, modInfo.icon)
-		group.icon.Height:Set(56)
-		group.icon.Width:Set(56)
-		LayoutHelpers.AtLeftTopIn(group.icon, group, 10, 10)
+		if little then
+			group.icon.Height:Set(20)
+			group.icon.Width:Set(20)
+			LayoutHelpers.AtLeftTopIn(group.icon, group, 0, 0)
+		else
+			group.icon.Height:Set(56)
+			group.icon.Width:Set(56)
+			LayoutHelpers.AtLeftTopIn(group.icon, group, 10, 10)
+		end
 	--
 	group.name = UIUtil.CreateText(group, modInfo.name, 14, UIUtil.bodyFont)
 		group.name:SetColor('B9BFB9') -- Gris
-		LayoutHelpers.AtLeftTopIn(group.name, group, 80, 10)
+		if little then
+			LayoutHelpers.AtLeftTopIn(group.name, group, 30, 1)
+		else
+			LayoutHelpers.AtLeftTopIn(group.name, group, 80, 10)
+		end
 		group.name:SetDropShadow(true)
 	--
-	group.desc = MultiLineText(group, UIUtil.bodyFont, 12, 'B9BFB9')--UIUtil.fontColor)
-        LayoutHelpers.AtLeftTopIn(group.desc, group, 80, 30)
-        group.desc.Height:Set(40) -- 40
-        group.desc.Width:Set(group.Width()-86)
-        group.desc:SetText(modInfo.description)
+	if not little then
+		group.desc = MultiLineText(group, UIUtil.bodyFont, 12, 'B9BFB9')--UIUtil.fontColor)
+			LayoutHelpers.AtLeftTopIn(group.desc, group, 80, 30)
+			group.desc.Height:Set(40) -- 40
+			group.desc.Width:Set(group.Width()-86)
+			group.desc:SetText(modInfo.description)
+	end
 	--
 	group.type = UIUtil.CreateText(group, '', 10, 'Arial Narrow Bold')--'Arial Black')--UIUtil.fontColor)
 		group.type:SetColor('B9BFB9') -- Gris
@@ -727,7 +792,11 @@ function CreateListElementtt(parent, modInfo, Pos)
 			group.type:SetFont('Arial Black', 11)
 			group.ui = false
 		end
-		LayoutHelpers.AtRightTopIn(group.type, group, 12, 4)
+		if little then
+			LayoutHelpers.AtRightTopIn(group.type, group, 12, 2)
+		else
+			LayoutHelpers.AtRightTopIn(group.type, group, 12, 4)
+		end
 		--group.type:SetDropShadow(true)
 	--
 	return group
