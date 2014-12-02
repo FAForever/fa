@@ -40,6 +40,8 @@ make a thread if it isn't there already.
 - [X] Fixed Seraphim ACU shot being visible through FoW
 - [X] Fixed invalid preview range of SMDs
 - [X] Fixed Aeon T1 Bomber targeting subsurface units
+- [X] Given units now get correct experience points 
+- [X] Given units are returned to their original owner in share until death 
 
 *Game Improvements*
 - [X] Shield Fixes:
