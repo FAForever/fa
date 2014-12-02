@@ -11,6 +11,7 @@ local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
+local Prefs = import('/lua/user/prefs.lua')
 
 local GUI_OPEN = false
 
@@ -161,7 +162,12 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
             cbox_Act_TEXT2:SetDropShadow(true)
             LayoutHelpers.AtLeftIn(cbox_Act_TEXT2, cbox_Act2, 25)
             LayoutHelpers.AtVerticalCenterIn(cbox_Act_TEXT2, cbox_Act2)
-			cbox_Act2:SetCheck(false, true)--isChecked, skipEvent)
+			local XinnoModsManagerLittleView = Prefs.GetFromCurrentProfile('XinnoModsManagerLittleView') or false
+			if XinnoModsManagerLittleView then
+				cbox_Act2:SetCheck(true, true)--isChecked, skipEvent)
+			else
+				cbox_Act2:SetCheck(false, true)--isChecked, skipEvent)
+			end
 	--
 	--
 	if IsHost then
@@ -210,6 +216,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 		save_mod()
 		swiffer()
 		Refresh_Mod_List(cbox_GAME:IsChecked(), cbox_UI:IsChecked(), cbox_Act:IsChecked(), IsHost, modstatus, checked)
+		Prefs.SetToCurrentProfile('XinnoModsManagerLittleView', checked)
 	end
 	-------------
     -- Credit --
@@ -698,7 +705,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 		scrollGroup.top = 1
 		scrollGroup:CalcVisible()
 	end
-	Refresh_Mod_List(false, true, true, IsHost, modstatus)
+	Refresh_Mod_List(false, true, true, IsHost, modstatus, cbox_Act2:IsChecked())
 	--
 	scrollGroup.HandleEvent = function(self, event)
         if event.Type == 'WheelRotation' then
