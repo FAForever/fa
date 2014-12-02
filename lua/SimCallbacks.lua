@@ -28,6 +28,8 @@ local SUtils = import('/lua/ai/sorianutilities.lua')
 
 Callbacks.BreakAlliance = SimUtils.BreakAlliance
 
+Callbacks.SaveChatToReplay = SimUtils.SaveChatToReplay
+
 Callbacks.GiveUnitsToPlayer = SimUtils.GiveUnitsToPlayer
 
 Callbacks.GiveResourcesToPlayer = SimUtils.GiveResourcesToPlayer

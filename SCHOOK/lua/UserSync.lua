@@ -1,6 +1,19 @@
 # Here's an opportunity for user side script to examine the Sync table for the new tick
 local baseOnSync = OnSync
 OnSync = function()
+
+
+    if not table.empty(Sync.Chat) then
+        if SessionIsReplay() then
+            for id, data in Sync.Chat do
+                data.Msg.Chat = true
+                import('/lua/ui/game/chat.lua').ReceiveChatFromSim(data.Sender, data.Msg)
+            end
+        else
+            Sync.Chat = {}
+        end
+    end
+
     baseOnSync()
     import('/lua/UserCamera.lua').ProcessCameraRequests(Sync.CameraRequests)
 
