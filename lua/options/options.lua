@@ -49,6 +49,7 @@ optionsOrder = {
     "sound",
 }
 
+local SetMusicVolume = import('/lua/UserMusic.lua').SetMusicVolume
 local savedMasterVol = false
 local savedFXVol = false
 local savedMusicVol = false
@@ -63,7 +64,7 @@ local voiceHandle = false
 function PlayTestVoice()
     if not voiceHandle then
         local sound = Sound{ Bank = 'XGG', Cue = 'Computer_Computer_MissileLaunch_01351' }
-        ForkThread( 
+        ForkThread(
             function()
                 WaitSeconds(0.5)
                 voiceHandle = false
@@ -291,7 +292,7 @@ options = {
                 type = 'toggle',
                 default = true,
                 set = function(key, value, startup)
-                    import('/lua/ui/uiutil.lua').UpdateWorldBorderState(nil, value)                        
+                    import('/lua/ui/uiutil.lua').UpdateWorldBorderState(nil, value)
                 end,
                 custom = {
                     states = {
@@ -433,7 +434,7 @@ options = {
                     },
                 },
             },
-            
+
             {
                 title = "Template Rotation",
                 key = 'gui_template_rotator',
@@ -446,7 +447,7 @@ options = {
                     },
                 },
             },
-            
+
             {
                 title = "SCU Manager",
                 key = 'gui_scu_manager',
@@ -459,7 +460,7 @@ options = {
                     },
                 },
             },
-            
+
             {
                 title = "Draggable Build Queue",
                 key = 'gui_draggable_queue',
@@ -472,7 +473,7 @@ options = {
                     },
                 },
             },
-            
+
             {
                 title = "Middle Click Avatars",
                 key = 'gui_idle_engineer_avatars',
@@ -485,7 +486,7 @@ options = {
                     },
                 },
             },
-            
+
             {
                 title = "All Race Templates",
                 key = 'gui_all_race_templates',
@@ -498,7 +499,7 @@ options = {
                     },
                 },
             },
-            
+
             {
                 title = "Single Unit Selected Info",
                 key = 'gui_enhanced_unitview',
@@ -511,7 +512,7 @@ options = {
                     },
                 },
             },
-            
+
             {
                 title = "Single Unit Selected Rings",
                 key = 'gui_enhanced_unitrings',
@@ -524,7 +525,7 @@ options = {
                     },
                 },
             },
-            
+
             {
                 title = "Zoom Pop Distance",
                 key = 'gui_zoom_pop_distance',
@@ -536,7 +537,7 @@ options = {
                     inc = 1,
                 },
             },
-            
+
             {
                 title = "Factory Build Queue Templates",
                 key = 'gui_templates_factory',
@@ -549,7 +550,7 @@ options = {
                     },
                 },
             },
-            
+
             {
                 title = "Seperate Idle Builders",
                 key = 'gui_seperate_idle_builders',
@@ -574,7 +575,7 @@ options = {
                     },
                 },
             },
-            
+
             {
                 title = "Template Name Cutoff",
                 key = 'gui_template_name_cutoff',
@@ -586,7 +587,7 @@ options = {
                     inc = 1,
                 },
             },
-            
+
             {
                 title = "Display more Unit Stats",
                 key = 'gui_detailed_unitview',
@@ -599,7 +600,7 @@ options = {
                     },
                 },
             },
-            
+
             {
                 title = "Display Reclaim Window",
                 key = 'gui_display_reclaim_totals',
@@ -612,7 +613,7 @@ options = {
                     },
                 },
             },
-            
+
             {
                 title = "Always Render Custom Names",
                 key = 'gui_render_custom_names',
@@ -628,7 +629,7 @@ options = {
                     },
                 },
             },
-            
+
             {
                 title = "Force Render Enemy Lifebars",
                 key = 'gui_render_enemy_lifebars',
@@ -644,7 +645,7 @@ options = {
                     },
                 },
             },
-               
+
             {
                 title = "Improved Unit deselection",
                 key = 'gui_improved_unit_deselection',
@@ -657,7 +658,7 @@ options = {
                     },
                 },
             },
-            
+
             {
                 title = "Smart Economy Indicators",
                 key = 'gui_smart_economy_indicators',
@@ -670,7 +671,7 @@ options = {
                     },
                 },
             },
-        },            
+        },
     },
     video = {
         title = "<LOC _Video>",
@@ -746,7 +747,7 @@ options = {
                 default = 4,
                 update = function(control,value)
                     logic = import('/lua/options/optionsLogic.lua')
-                    
+
                     aaoptions = GetAntiAliasingOptions()
 
                     aamax = 0
@@ -755,7 +756,7 @@ options = {
 						aahigh = aaoptions[table.getn(aaoptions)]
 						aamed = aaoptions[math.ceil(table.getn(aaoptions)/2)]
 					end
-					
+
                     if 0 == value then
                         logic.SetValue('fidelity',0,true)
                         logic.SetValue('shadow_quality',0,true)
@@ -968,20 +969,20 @@ options = {
                 key = 'master_volume',
                 type = 'slider',
                 default = 100,
-                
+
                 init = function()
                     savedMasterVol = GetVolume("Global")
                 end,
-                
+
                 cancel = function()
                     if savedMasterVol then
                         SetVolume("Global", savedMasterVol)
                     end
                 end,
-                
+
                 set = function(key,value,startup)
                     SetVolume("Global", value / 100)
-                    savedMasterVol = value/100                
+                    savedMasterVol = value/100
                 end,
                 update = function(control,value)
                     SetVolume("Global", value / 100)
@@ -1001,7 +1002,7 @@ options = {
                 init = function()
                     savedFXVol = GetVolume("World")
                 end,
-                
+
                 cancel = function()
                     if savedFXVol then
                         SetVolume("World", savedFXVol)
@@ -1014,13 +1015,13 @@ options = {
                     SetVolume("Interface", value / 100)
                     savedFXVol = value/100
                 end,
-               
+
                 update = function(control,value)
                     SetVolume("World", value / 100)
                     SetVolume("Interface", value / 100)
                     PlayTestSound()
                 end,
-                
+
                 custom = {
                     min = 0,
                     max = 100,
@@ -1035,20 +1036,21 @@ options = {
 
                 init = function()
                     savedMusicVol = GetVolume("Music")
+                    SetMusicVolume(savedMusicVol)
                 end,
-                
+
                 cancel = function()
                     if savedMusicVol then
-                        SetVolume("Music", savedMusicVol)
+                        SetMusicVolume(savedMusicVol)
                     end
                 end,
 
                 set = function(key,value,startup)
-                    SetVolume("Music", value / 100)
+                    SetMusicVolume(value / 100)
                     savedMusicVol = value/100
                 end,
                 update = function(key,value)
-                    SetVolume("Music", value / 100)
+                    SetMusicVolume(value / 100)
                 end,
                 custom = {
                     min = 0,
@@ -1065,7 +1067,7 @@ options = {
                 init = function()
                     savedVOVol = GetVolume("VO")
                 end,
-                
+
                 cancel = function()
                     if savedVOVol then
                         SetVolume("VO", savedVOVol)
@@ -1107,7 +1109,7 @@ extraOpts = {
                 text = "<LOC _Yes>Yes",
                 help = "<LOC lobui_0605>Ranked Mode set",
                 key = 'On',
-            },            
+            },
         },
     },
     {
@@ -1145,7 +1147,7 @@ extraOpts = {
                 text = "<LOC _Off>Off",
                 help = "<LOC lobui_0723>Score is disabled",
                 key = 'no',
-            },			
+            },
         },
     },
 }

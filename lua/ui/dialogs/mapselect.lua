@@ -693,7 +693,8 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
     end
     -- determines what controls should be visible or not
     OptionContainer.CalcVisible = function(self)
-        local function SetTextLine(line, data, lineID)
+        --LOG("### CalcVisible !")
+		local function SetTextLine(line, data, lineID)
             if data.type == 'title' then
                 line.text:SetText(LOC(data.text))
                 line.text:SetFont(UIUtil.titleFont, 14, 3)
@@ -732,10 +733,17 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
 				if data.default == 0 or data.default > table.getsize(data.data.values) then -- THE MAP OPTIONS IS NOT RESPECTED
 					LOG('THE MAP OPTIONS IS NOT RESPECTED, NEED FIX BY THE AUTHOR OF THIS MAP (default value is Index !)')
 				end
-				if defValue then -- IF already set and saved (curOptions exist)
+
+				--if defValue then -- IF already set and saved (curOptions exist)
+					--defValue = defValue
+				--elseif changedOptions[data.data.key].index then -- IF already set&clicked in Combo
+
+                if changedOptions[data.data.key].index then -- IF already set&clicked in Combo
+					--LOG('> 2')
+                    defValue = changedOptions[data.data.key].index
+                elseif defValue then -- IF already set and saved (curOptions exist)
+					--LOG('> 1')
 					defValue = defValue
-				elseif changedOptions[data.data.key].index then -- IF already set&clicked in Combo
-					defValue = changedOptions[data.data.key].index
 				else
 					if data.default != nil and data.default <= table.getsize(data.data.values) then
 						defValue = changedOptions[data.data.key].index or line.combo.keyMap[curOptions[data.data.key]] or data.default or 1

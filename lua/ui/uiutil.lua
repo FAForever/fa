@@ -46,17 +46,17 @@ transparentPanelColor = import('/lua/lazyvar.lua').Create() -- default color whe
 consoleBGColor = import('/lua/lazyvar.lua').Create()        -- console background color
 consoleFGColor = import('/lua/lazyvar.lua').Create()        -- console foreground color (text)
 consoleTextBGColor = import('/lua/lazyvar.lua').Create()    -- console text background color
-menuFontSize = import('/lua/lazyvar.lua').Create()          -- font size used on main in game escape menu  
+menuFontSize = import('/lua/lazyvar.lua').Create()          -- font size used on main in game escape menu
 -- table of layouts supported by this skin, not a lazy var as we don't need updates
-layouts = nil     
-           
+layouts = nil
+
 --* other handy variables!
 consoleDepth = false  -- in order to get the console to always be on top, assign this number and never go over
 
 networkBool = import('/lua/lazyvar.lua').Create()    -- boolean whether the game is local or networked
 
-# Default scenario for skirmishes / MP Lobby
-defaultScenario = '/maps/scmp_039/scmp_039_scenario.lua'      
+-- Default scenario for skirmishes / MP Lobby
+defaultScenario = '/maps/scmp_039/scmp_039_scenario.lua'
 
 --* These values MUST NOT CHANGE! They syncronize with values in UIManager.h and are used to
 --* specify a render pass
@@ -87,6 +87,21 @@ currentLayout = false
 changeLayoutFunction = false    -- set this function to get called with the new layout name when layout changes
 
 local UIFileCache = {}
+local FileCache =  {}
+
+local oldDiskGetFileInfo = DiskGetFileInfo
+function DiskGetFileInfo(file)
+    if FileCache[file] == nil then
+        local info = oldDiskGetFileInfo(file)
+        if(info) then
+            FileCache[file] = info
+        else
+            FileCache[file] = false
+        end
+    end
+
+    return FileCache[file]
+end
 
 --* layout control, sets current layout preference
 function SetCurrentLayout(layout)
@@ -111,7 +126,7 @@ function GetNetworkBool()
     local sessionClientsTable = GetSessionClients()
     local networkBool = false
     local sessionBool = true
-    if sessionClientsTable != nil then
+    if sessionClientsTable ~= nil then
         networkBool = SessionIsMultiplayer()
     else
         sessionBool = false
@@ -136,7 +151,7 @@ function UpdateWorldBorderState(skin, isOn)
     if skin == nil then
         skin = currentSkin()
     end
-    
+
     if SessionIsActive() then
         if isOn == nil then
             isOn = Prefs.GetOption('world_border')
@@ -169,11 +184,11 @@ end
 --* skin control, sets the current skin table
 function SetCurrentSkin(skin)
     local skins = import('/lua/skins/skins.lua').skins
-    
+
     if skins[skin] == nil then
         skin = 'uef'
     end
-    
+
     currentSkin:Set(skin)
 
     tooltipTitleColor:Set(skins[skin].tooltipTitleColor or skins['default'].tooltipTitleColor)
@@ -202,7 +217,7 @@ function SetCurrentSkin(skin)
     layouts = skins[skin].layouts or skins['default'].layouts
 
     UpdateWorldBorderState(skin)
-    
+
     local curLayout = Prefs.GetFromCurrentProfile("layout")
 
     if not curLayout then
@@ -227,18 +242,18 @@ end
 
 function SetCurrentSkin2(skin)
     local skins = import('/lua/skins/skins.lua').skins
-    
+
     if skins[skin] == nil then
         skin = 'uef'
     end
-    
+
     currentSkin:Set(skin)
 
     menuFontSize:Set(skins[skin].menuFontSize or skins['default'].menuFontSize)
     layouts = skins[skin].layouts or skins['default'].layouts
 
     --UpdateWorldBorderState(skin)
-    
+
     --local curLayout = Prefs.GetFromCurrentProfile("layout")
 
     --if not curLayout then
@@ -306,7 +321,7 @@ end
 --* cycle through all available layouts
 function RotateLayout(direction)
 
-    # disable when in Screen Capture mode
+    -- disable when in Screen Capture mode
     if import('/lua/ui/game/gamemain.lua').gameUIHidden then
         return
     end
@@ -333,54 +348,41 @@ end
 --* given a path and name relative to the skin path, returns the full path based on the current skin
 function UIFile(filespec)
     local skins = import('/lua/skins/skins.lua').skins
-    local visitingSkin = currentSkin()
-    local currentPath = skins[visitingSkin].texturesPath
+    local useSkin = currentSkin()
+    local currentPath = skins[useSkin].texturesPath
 
-    if visitingSkin == nil or currentPath == nil then
+    if useSkin == nil or currentPath == nil then
         return nil
     end
 
-    if UIFileCache[currentPath..filespec] == true then
-		--LOG('[[ UIFileCache['..currentPath..filespec..'] == true')
-		return currentPath..filespec
-	else
-		if UIFileCache[currentPath..filespec] == false then
-			--LOG('[[ UIFileCache['..currentPath..filespec..'] == false')
-		else
-			--LOG('[[ UIFileCache['..currentPath..filespec..'] == not exist')
-		end
-	--if not UIFileCache[currentPath..filespec] or UIFileCache[currentPath..filespec] != curFile then
-		-- if current skin is default, then don't bother trying to look for it, just append the default dir
-		if visitingSkin == 'default' then
-			return currentPath .. filespec
-		else
-			while visitingSkin do
-				local curFile = currentPath .. filespec
-				if DiskGetFileInfo(curFile) then
-					--LOG('[[ File finded ('..visitingSkin..') : '..curFile)
-					UIFileCache[curFile] = true
-					--break
-					return curFile
-				else
-					--LOG('[[ File not finded ('..visitingSkin..') : '..curFile)
-					UIFileCache[curFile] = false
-					visitingSkin = skins[visitingSkin].default
-					if visitingSkin then
-						currentPath = skins[visitingSkin].texturesPath
-					end
-				end
-				
-			end
-		end
-	--else
-		--if UIFileCache[visitingSkin][filespec] == curFile then
-			--return curFile	
-		--end
-	end
+    if not UIFileCache[currentPath .. filespec] then
+        local found = false
 
-    LOG("Warning: Unable to find file ", filespec)
-    -- pass out the final string anyway so resource loader can gracefully fail
-    return filespec
+        if useSkin == 'default' then
+            found = currentPath .. filespec
+        else
+            while not found and useSkin do
+                found = currentPath .. filespec
+                if not DiskGetFileInfo(found) then
+                    found = false
+                    useSkin = skins[useSkin].default
+                    if useSkin then
+                        currentPath = skins[useSkin].texturesPath
+                    end
+                end
+            end
+        end
+
+        if found then
+            if not UIFileCache[useSkin] then UIFileCache[useSkin] = {} end
+            UIFileCache[useSkin][filespec] = found
+        else
+            LOG("Warning: Unable to find file ", filespec)
+            return filespec
+        end
+    end
+
+    return UIFileCache[useSkin][filespec]
 end
 
 --* return the filename as a lazy var function to allow triggering of OnDirty
@@ -445,7 +447,7 @@ function SetupEditStd(control, foreColor, backColor, highlightFore, highlightBac
     if fontFace and fontSize then
         control:SetFont(fontFace, fontSize)
     end
-    
+
     control.OnCharPressed = function(self, charcode)
         if charcode == VK_TAB then
             return true
@@ -708,7 +710,7 @@ function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom,
                             ,SkinnableFile(scrollbarmid)
                             ,SkinnableFile(scrollbartop)
                             ,SkinnableFile(scrollbarbot))
-                            
+
     local scrollUpButton = Button(  scrollbar
                                     , SkinnableFile(textureName..'arrow-up_scr_up.dds')
                                     , SkinnableFile(textureName..'arrow-up_scr_over.dds')
@@ -729,12 +731,12 @@ function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom,
 
     scrollUpButton.Left:Set(scrollbar.Left)
     scrollUpButton.Top:Set(function() return attachto.Top() + offset_top end)
-    
+
 	scrollDownButton.Left:Set(scrollbar.Left)
     scrollDownButton.Bottom:Set(function() return attachto.Bottom() + offset_bottom end)
-    
+
     scrollbar.Right:Set(scrollUpButton.Right)
-    
+
     scrollbar:AddButtons(scrollUpButton, scrollDownButton)
     scrollbar:SetScrollable(attachto)
 
@@ -761,7 +763,7 @@ function CreateVertScrollbarFor2(attachto, offset_right, filename, offset_bottom
                             ,SkinnableFile(scrollbarmid)
                             ,SkinnableFile(scrollbartop)
                             ,SkinnableFile(scrollbarbot))
-                            
+
     local scrollUpButton = Button(  scrollbar
                                     , SkinnableFile(textureName..'arrow-up_scr_up.dds')
                                     , SkinnableFile(textureName..'arrow-up_scr_over.dds')
@@ -782,12 +784,12 @@ function CreateVertScrollbarFor2(attachto, offset_right, filename, offset_bottom
 
     scrollUpButton.Left:Set(scrollbar.Left)
     scrollUpButton.Top:Set(function() return attachto.Top() + offset_top end)
-    
+
 	scrollDownButton.Left:Set(scrollbar.Left)
     scrollDownButton.Bottom:Set(function() return attachto.Bottom() + offset_bottom end)
-    
+
     scrollbar.Right:Set(scrollUpButton.Right)
-    
+
     scrollbar:AddButtons(scrollUpButton, scrollDownButton)
     scrollbar:SetScrollable(attachto)
 
@@ -832,13 +834,13 @@ end
 -- functions signature is: function()
 function MakeInputModal(control, onEnterFunc, onEscFunc)
     AddInputCapture(control)
-    
+
     local oldOnDestroy = control.OnDestroy
     control.OnDestroy = function(self)
         RemoveInputCapture(control)
         oldOnDestroy(self)
-    end    
-    
+    end
+
     if onEnterFunc or onEscFunc then
         control.oldHandleEvent = control.HandleEvent
         control.HandleEvent = function(self, event)
@@ -847,7 +849,7 @@ function MakeInputModal(control, onEnterFunc, onEscFunc)
                     if onEscFunc then
                         onEscFunc()
                         return true
-                    end                
+                    end
                 elseif event.KeyCode == VK_ENTER then
                     if onEnterFunc then
                         onEnterFunc()
@@ -857,7 +859,7 @@ function MakeInputModal(control, onEnterFunc, onEscFunc)
             end
             if control.oldHandleEvent then
                 return control.oldHandleEvent(self, event)
-			end               
+			end
 			return true
         end
     end
@@ -892,20 +894,20 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
     dialog.Width:Set(background.Width)
     dialog.Height:Set(background.Height)
     LayoutHelpers.FillParent(background, dialog)
-    
+
     local textLine = {}
     textLine[1] = CreateText(dialog, "", 18, titleFont)
     textLine[1].Top:Set(background.Top)
     LayoutHelpers.AtHorizontalCenterIn(textLine[1], dialog)
-    
-    local textBoxWidth = (dialog.Width() - 80) 
+
+    local textBoxWidth = (dialog.Width() - 80)
     local tempTable = import('/lua/maui/text.lua').WrapText(LOC(dialogText), textBoxWidth,
     function(text)
         return textLine[1]:GetStringAdvance(text)
     end)
 
     local tempLines = table.getn(tempTable)
-    
+
     local prevControl = false
     for i, v in tempTable do
         if i == 1 then
@@ -918,23 +920,23 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
             prevControl = textLine[i]
         end
     end
-    
+
     background:SetTiled(true)
     background.Bottom:Set(textLine[tempLines].Bottom)
-    
+
     local backgroundTop = Bitmap(dialog, SkinnableFile('/dialogs/dialog/panel_bmp_T.dds'))
     backgroundTop.Bottom:Set(background.Top)
     backgroundTop.Left:Set(background.Left)
     local backgroundBottom = Bitmap(dialog, SkinnableFile('/dialogs/dialog/panel_bmp_b.dds'))
     backgroundBottom.Top:Set(background.Bottom)
     backgroundBottom.Left:Set(background.Left)
-    
+
     background.brackets = CreateDialogBrackets(background, 35, 65, 35, 115, true)
-    
+
     if not modalInfo or modalInfo.worldCover then
         CreateWorldCover(dialog)
     end
-    
+
     local function MakeButton(text, callback)
         local button = CreateButtonStd( background
                                         , '/scx_menu/small-btn/small'
@@ -1016,7 +1018,7 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
                 end
             end
         end
-        
+
         local function OnEscFunc()
             if modalInfo.escapeButton then
                 if modalInfo.escapeButton == 1 then
@@ -1034,7 +1036,7 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
                 end
             end
         end
-        
+
         MakeInputModal(dialog, OnEnterFunc, OnEscFunc)
     end
 
@@ -1056,16 +1058,16 @@ function QuickDialog2(parent, dialogText, button1Text, button1Callback, button2T
     dialog.Width:Set(654)--background.Width())
     dialog.Height:Set(background.Height)
     LayoutHelpers.FillParent(background, dialog)
-    
+
     local textLine = {}
     textLine[1] = CreateText(dialog, "", 18, 'Arial')
     textLine[1].Top:Set(background.Top)
     LayoutHelpers.AtHorizontalCenterIn(textLine[1], dialog)
-    
+
     local tempTable = import('/lua/maui/text.lua').WrapText(LOC(dialogText), 1000, function(text) return textLine[1]:GetStringAdvance(text) end)
 
     local tempLines = table.getn(tempTable)
-    
+
     local prevControl = false
     for i, v in tempTable do
         if i == 1 then
@@ -1079,23 +1081,23 @@ function QuickDialog2(parent, dialogText, button1Text, button1Callback, button2T
             prevControl = textLine[i]
         end
     end
-    
+
     background:SetTiled(true)
     background.Bottom:Set(textLine[tempLines].Bottom)
-    
+
     local backgroundTop = Bitmap(dialog, SkinnableFile('/dialogs/dialog_02/panel_bmp_T.dds'))
     backgroundTop.Bottom:Set(background.Top)
     backgroundTop.Left:Set(background.Left)
     local backgroundBottom = Bitmap(dialog, SkinnableFile('/dialogs/dialog_02/panel_bmp_b.dds'))
     backgroundBottom.Top:Set(background.Bottom)
     backgroundBottom.Left:Set(background.Left)
-    
+
     --background.brackets = CreateDialogBrackets(background, 35, 65, 35, 115, true)
-    
+
     if not modalInfo or modalInfo.worldCover then
         CreateWorldCover(dialog)
     end
-    
+
     local function MakeButton(text, callback)
         local button = CreateButtonStd( background
                                         , '/scx_menu/small-btn/small'
@@ -1177,7 +1179,7 @@ function QuickDialog2(parent, dialogText, button1Text, button1Callback, button2T
                 end
             end
         end
-        
+
         local function OnEscFunc()
             if modalInfo.escapeButton then
                 if modalInfo.escapeButton == 1 then
@@ -1195,7 +1197,7 @@ function QuickDialog2(parent, dialogText, button1Text, button1Callback, button2T
                 end
             end
         end
-        
+
         MakeInputModal(dialog, OnEnterFunc, OnEscFunc)
     end
 
@@ -1212,14 +1214,14 @@ function CreateWorldCover(parent, colorOverride)
             worldCovers[index].ID = index
             worldCovers[index].OnDestroy = function(self)
                 for h, x in worldCovers do
-                    if x and h != self.ID then 
+                    if x and h ~= self.ID then 
                         x:Destroy()
                     end
                 end
             end
             worldCovers[index].OnHide = function(self, hidden)
                 for h, x in worldCovers do
-                    if x and h != self.ID then 
+                    if x and h ~= self.ID then 
                         x:SetHidden(hidden)
                     end
                 end
@@ -1242,7 +1244,7 @@ function CreateWorldCover(parent, colorOverride)
             end
         end
     end
-    
+
     return worldCovers
 end
 
@@ -1319,18 +1321,18 @@ function SetTextBoxText(textBox, text)
     local wrapped = import('/lua/maui/text.lua').WrapText(LOC(text), textBox.Width(), function(curText) return textBox:GetStringAdvance(curText) end)
     for i, line in wrapped do
         textBox:AddItem(line)
-    end 
+    end
 end
 
 function CreateDialogBrackets(parent, leftOffset, topOffset, rightOffset, bottomOffset, altTextures)
     local ret = Group(parent)
-    
+
     if altTextures then
         ret.topleft = Bitmap(ret, UIFile('/scx_menu/panel-brackets-small/bracket-ul_bmp.dds'))
         ret.topright = Bitmap(ret, UIFile('/scx_menu/panel-brackets-small/bracket-ur_bmp.dds'))
         ret.bottomleft = Bitmap(ret, UIFile('/scx_menu/panel-brackets-small/bracket-ll_bmp.dds'))
         ret.bottomright = Bitmap(ret, UIFile('/scx_menu/panel-brackets-small/bracket-lr_bmp.dds'))
-        
+
         ret.topleftglow = Bitmap(ret, UIFile('/scx_menu/panel-brackets-small/bracket-glow-ul_bmp.dds'))
         ret.toprightglow = Bitmap(ret, UIFile('/scx_menu/panel-brackets-small/bracket-glow-ur_bmp.dds'))
         ret.bottomleftglow = Bitmap(ret, UIFile('/scx_menu/panel-brackets-small/bracket-glow-ll_bmp.dds'))
@@ -1340,37 +1342,37 @@ function CreateDialogBrackets(parent, leftOffset, topOffset, rightOffset, bottom
         ret.topright = Bitmap(ret, UIFile('/scx_menu/panel-brackets/bracket-ur_bmp.dds'))
         ret.bottomleft = Bitmap(ret, UIFile('/scx_menu/panel-brackets/bracket-ll_bmp.dds'))
         ret.bottomright = Bitmap(ret, UIFile('/scx_menu/panel-brackets/bracket-lr_bmp.dds'))
-        
+
         ret.topleftglow = Bitmap(ret, UIFile('/scx_menu/panel-brackets/bracket-glow-ul_bmp.dds'))
         ret.toprightglow = Bitmap(ret, UIFile('/scx_menu/panel-brackets/bracket-glow-ur_bmp.dds'))
         ret.bottomleftglow = Bitmap(ret, UIFile('/scx_menu/panel-brackets/bracket-glow-ll_bmp.dds'))
         ret.bottomrightglow = Bitmap(ret, UIFile('/scx_menu/panel-brackets/bracket-glow-lr_bmp.dds'))
     end
-    
+
     ret.topleftglow.Depth:Set(function() return ret.topleft.Depth() - 1 end)
     ret.toprightglow.Depth:Set(function() return ret.topright.Depth() - 1 end)
     ret.bottomleftglow.Depth:Set(function() return ret.bottomleft.Depth() - 1 end)
     ret.bottomrightglow.Depth:Set(function() return ret.bottomright.Depth() - 1 end)
-    
+
     LayoutHelpers.AtCenterIn(ret.topleftglow, ret.topleft)
     LayoutHelpers.AtCenterIn(ret.toprightglow, ret.topright)
     LayoutHelpers.AtCenterIn(ret.bottomleftglow, ret.bottomleft)
     LayoutHelpers.AtCenterIn(ret.bottomrightglow, ret.bottomright)
-    
+
     ret.topleft.Left:Set(function() return parent.Left() - leftOffset end)
     ret.topleft.Top:Set(function() return parent.Top() - topOffset end)
-    
+
     ret.topright.Right:Set(function() return parent.Right() + rightOffset end)
     ret.topright.Top:Set(function() return parent.Top() - topOffset end)
-    
+
     ret.bottomleft.Left:Set(function() return parent.Left() - leftOffset end)
     ret.bottomleft.Bottom:Set(function() return parent.Bottom() + bottomOffset end)
-    
+
     ret.bottomright.Right:Set(function() return parent.Right() + rightOffset end)
     ret.bottomright.Bottom:Set(function() return parent.Bottom() + bottomOffset end)
-    
+
     ret:DisableHitTest(true)
     LayoutHelpers.FillParent(ret, parent)
-    
+
     return ret
 end

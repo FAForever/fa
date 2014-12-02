@@ -31,11 +31,8 @@ local isReplay = false
 
 local waitingDialog = false
 
-###variables for FAF
-local sendChat = import('/lua/ui/game/chat.lua').ReceiveChatFromSim
 local oldData = {}
 local lastObserving
-##end faf variables
 
 -- Hotbuild stuff
 modifiersKeys = {}
@@ -43,7 +40,7 @@ modifiersKeys = {}
 local currentKeyMap = import('/lua/keymap/keymapper.lua').GetKeyMappings(true)
 for key, action in currentKeyMap do
     if action["category"] == "hotbuilding" then
-        if key != nil then
+        if key ~= nil then
             if not import('/lua/keymap/keymapper.lua').IsKeyInMap("Shift-" .. key, currentKeyMap) then
                 modifiersKeys["Shift-" .. key] = action
             else
@@ -54,10 +51,10 @@ for key, action in currentKeyMap do
                 modifiersKeys["Alt-" .. key] = action
             else
                 WARN("Alt-" .. key .. " is already bind")
-            end        
+            end
         end
     end
-end  
+end
 IN_AddKeyMapTable(modifiersKeys)
 
 
@@ -121,7 +118,7 @@ function OnFirstUpdate()
         import('/lua/ui/game/score.lua').CreateScoreUI()
     end
     PlaySound( Sound { Bank='AmbientTest', Cue='AMB_Planet_Rumble_zoom'} )
-    ForkThread( 
+    ForkThread(
                function()
                    WaitSeconds(1.5)
                    UIZoomTo(avatars, 1)
@@ -134,7 +131,7 @@ function OnFirstUpdate()
                end
                )
 
-    if Prefs.GetOption('skin_change_on_start') != 'no' then
+    if Prefs.GetOption('skin_change_on_start') ~= 'no' then
         local focusarmy = GetFocusArmy()
         local armyInfo = GetArmiesTable()
         if focusarmy >= 1 then
@@ -224,17 +221,15 @@ function CreateUI(isReplay)
     Prefetcher:Update(prefetchTable)
 
 
-    ##below added for FAF
-    import("/modules/displayrings.lua").Init()	##added for acu and engineer build radius ui mod
+    import("/modules/displayrings.lua").Init()	--#added for acu and engineer build radius ui mod
     if SessionIsReplay() then
-        ForkThread(SendChat)
         lastObserving = true
         import('/lua/ui/game/economy.lua').ToggleEconPanel(false)
         import('/lua/ui/game/avatars.lua').ToggleAvatars(false)
         AddBeatFunction(UiBeat)
     end
 
-    if options.gui_scu_manager != 0 then
+    if options.gui_scu_manager ~= 0 then
         import('/modules/scumanager.lua').Init()
     end
 
@@ -393,7 +388,7 @@ function CreateWldUIProvider()
     end
 
     provider.GetPrefetchTextures = function(self)
-        return import('/lua/ui/game/prefetchtextures.lua').prefetchTextures        
+        return import('/lua/ui/game/prefetchtextures.lua').prefetchTextures
     end
 
 end
@@ -426,14 +421,10 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         import('/lua/ui/game/rallypoint.lua').OnSelectionChanged(newSelection)
     end
 
-    local selUnits = newSelection
 
-    if selUnits and table.getn(selUnits) == 1 and import('/modules/selectedinfo.lua').SelectedOverlayOn then
-        import('/modules/selectedinfo.lua').ActivateSingleRangeOverlay()
-    else
-        import('/modules/selectedinfo.lua').DeactivateSingleRangeOverlay()
-    end   
-
+    if import('/modules/selectedinfo.lua').SelectedOverlayOn then
+        import('/modules/selectedinfo.lua').EnableSingleRangeOverlay(newSelection and table.getsize(newSelection) == 1)
+    end
 end
 
 function OnQueueChanged(newQueue)
@@ -442,8 +433,8 @@ function OnQueueChanged(newQueue)
     end
 end
 
-# Called after the Sim has confirmed the game is indeed paused. This will happen
-# on everyone's machine in a network game.
+-- Called after the Sim has confirmed the game is indeed paused. This will happen
+-- on everyone's machine in a network game.
 function OnPause(pausedBy, timeoutsRemaining)
     local isOwner = false
     if pausedBy == SessionGetLocalCommandSource() then
@@ -456,7 +447,7 @@ function OnPause(pausedBy, timeoutsRemaining)
     import('/lua/ui/game/missiontext.lua').OnGamePause(true)
 end
 
-# Called after the Sim has confirmed that the game has resumed.
+-- Called after the Sim has confirmed that the game has resumed.
 function OnResume()
     PauseSound("World",false)
     PauseSound("Music",false)
@@ -465,9 +456,9 @@ function OnResume()
     import('/lua/ui/game/missiontext.lua').OnGamePause(false)
 end
 
-# Called immediately when the user hits the pause button. This only ever gets
-# called on the machine that initiated the pause (i.e. other network players
-                                                  # won't call this)
+-- Called immediately when the user hits the pause button. This only ever gets
+-- called on the machine that initiated the pause (i.e. other network players
+                                                  -- won't call this)
 function OnUserPause(pause)
     local Tabs = import('/lua/ui/game/tabs.lua')
     local focus = GetArmiesTable().focusArmy
@@ -566,10 +557,10 @@ function HideGameUI(state)
     end
 end
 
-# Given a userunit that is adjacent to a given blueprint, does it yield a
-# bonus? Used by the UI to draw extra info
+-- Given a userunit that is adjacent to a given blueprint, does it yield a
+-- bonus? Used by the UI to draw extra info
 function OnDetectAdjacencyBonus(userUnit, otherBp)
-    # fixme: todo
+    -- fixme: todo
     return true
 end
 
@@ -619,7 +610,7 @@ function NISMode(state)
             ConExecute(i..' false')
         end
         preNISSettings.gameSpeed = GetGameSpeed()
-        if preNISSettings.gameSpeed != 0 then
+        if preNISSettings.gameSpeed ~= 0 then
             SetGameSpeed(0)
         end
         preNISSettings.Units = GetSelectedUnits()
@@ -635,7 +626,7 @@ function NISMode(state)
         end
         worldView.viewLeft:EnableResourceRendering(preNISSettings.Resources)
         worldView.viewLeft:SetCartographic(preNISSettings.Cartographic)
-        # Todo: Restore settings of overlays, lifebars properly
+        -- Todo: Restore settings of overlays, lifebars properly
         ConExecute('UI_RenderUnitBars true')
         ConExecute('UI_NisRenderIcons true')
         ConExecute('ren_SelectBoxes true')
@@ -646,7 +637,7 @@ function NISMode(state)
                 ConExecute(i..' '..tostring(Prefs.GetFromCurrentProfile(i)))
             end
         end
-        if GetGameSpeed() != preNISSettings.gameSpeed then
+        if GetGameSpeed() ~= preNISSettings.gameSpeed then
             SetGameSpeed(preNISSettings.gameSpeed)
         end
         SelectUnits(preNISSettings.Units)
@@ -730,10 +721,10 @@ function ReceiveChat(sender, data)
 end
 
 function QuickSave(filename)
-    if SessionIsActive() and 
-        WorldIsPlaying() and 
-        not SessionIsGameOver() and 
-        not SessionIsMultiplayer() and 
+    if SessionIsActive() and
+        WorldIsPlaying() and
+        not SessionIsGameOver() and
+        not SessionIsMultiplayer() and
         not SessionIsReplay() and
         not IsNISMode() then
 
@@ -758,24 +749,22 @@ end
 
 defaultZoom = 1.4
 function SimChangeCameraZoom(newMult)
-    if SessionIsActive() and 
-        WorldIsPlaying() and 
-        not SessionIsGameOver() and 
-        not SessionIsMultiplayer() and 
+    if SessionIsActive() and
+        WorldIsPlaying() and
+        not SessionIsGameOver() and
+        not SessionIsMultiplayer() and
         not SessionIsReplay() and
         not IsNISMode() then
 
         defaultZoom = newMult
         local views = import('/lua/ui/game/worldview.lua').GetWorldViews()
         for _, viewControl in views do
-            if viewControl._cameraName != 'MiniMap' then
+            if viewControl._cameraName ~= 'MiniMap' then
                 GetCamera(viewControl._cameraName):SetMaxZoomMult(newMult)
             end
         end
     end
 end
-
-####below is FAF function
 
 function UiBeat()
     local observing = (GetFocusArmy() == -1)
@@ -783,37 +772,7 @@ function UiBeat()
         lastObserving = observing
         import('/lua/ui/game/economy.lua').ToggleEconPanel(not observing)
     end
-    if HasCommandLineArg("/syncreplay") and HasCommandLineArg("/gpgnet") then	
-        GpgNetSend("BEAT",GameTick(),GetGameSpeed()) 
-    end
-end
-
-SendChat = function()
-    while true do
-        if UnitData.Chat then
-            if table.getn(UnitData.Chat) > 0 then
-                for index, chat in UnitData.Chat do
-                    local newChat = true
-                    if table.getn(oldData) > 0 then
-                        for index, old in oldData do
-                            if (old.oldTime + 3) < GetGameTimeSeconds() then
-                                oldData[index] = nil
-                            elseif old.msg.text == chat.msg.text and old.sender == chat.sender and chat.msg.to == old.msg.to then
-                                newChat = false
-                            elseif type(chat.msg.to) == 'number' and chat.msg.to == old.msg.to and old.msg.text == chat.msg.text then
-                                newChat = false
-                            end
-                        end
-                    end						
-                    if newChat then							
-                        chat.oldTime = GetGameTimeSeconds()
-                        table.insert(oldData, chat)
-                        sendChat(chat.sender, chat.msg)
-                    end
-                end
-                UnitData.Chat = {}
-            end
-        end
-        WaitSeconds(0.1)
+    if HasCommandLineArg("/syncreplay") and HasCommandLineArg("/gpgnet") then
+        GpgNetSend("BEAT",GameTick(),GetGameSpeed())
     end
 end

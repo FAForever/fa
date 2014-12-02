@@ -130,6 +130,16 @@ globalOpts = {
                 help = "<LOC lobui_0236>1000 units per player may be in play",
                 key = '1000',
             },
+			{
+                text = "1250",
+                help = "1250 units per player may be in play",
+                key = '1250',
+            },
+			{
+                text = "1500",
+                help = "1500 units per player may be in play",
+                key = '1500',
+            },
         },
     },
     {

@@ -1,16 +1,17 @@
-# Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#
-# General Sim scripts
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--
+-- General Sim scripts
 
-#==============================================================================
-# Diplomacy
-#==============================================================================
+--==============================================================================
+-- Diplomacy
+--==============================================================================
 
 local sharedUnits = {}
+local chatID = 1
 
 function BreakAlliance( data )
 
-    # You cannot change alliances in a team game
+    -- You cannot change alliances in a team game
     if ScenarioInfo.TeamGame then
         return
     end
@@ -27,7 +28,7 @@ function BreakAlliance( data )
 end
 
 function OnAllianceResult( resultData )
-    # You cannot change alliances in a team game
+    -- You cannot change alliances in a team game
     if ScenarioInfo.TeamGame then
         return
     end
@@ -46,14 +47,14 @@ end
 import('/lua/SimPlayerQuery.lua').AddResultListener( "OfferAlliance", OnAllianceResult )
 
 function KillSharedUnits(owner)
-	if sharedUnits[owner] and table.getn(sharedUnits[owner]) > 0 then
-		for index,unit in sharedUnits[owner] do
-			if not unit:IsDead() and unit.oldowner then
-				unit:Kill()
-			end
-		end
-		sharedUnits[owner] = {}
-	end
+    if sharedUnits[owner] and table.getn(sharedUnits[owner]) > 0 then
+        for index,unit in sharedUnits[owner] do
+            if not unit:IsDead() and unit.oldowner == owner then
+                unit:Kill()
+            end
+        end
+        sharedUnits[owner] = {}
+    end
 end
 
 function TransferUnitsOwnership(units, ToArmyIndex)
@@ -61,16 +62,18 @@ function TransferUnitsOwnership(units, ToArmyIndex)
     if not toBrain or toBrain:IsDefeated() or not units or table.getn(units) < 1 then
         return
     end
-    local newUnits = {}	
+
+    local newUnits = {}
     for k,v in units do
-        local owner = v:GetArmy()		
-        if owner == ToArmyIndex or GetArmyBrain(owner):IsDefeated() then
+        local owner = v:GetArmy()
+        --if owner == ToArmyIndex or GetArmyBrain(owner):IsDefeated() then
+        if owner == ToArmyIndex then
             continue
-            # removed " not IsAlly(owner,ToArmyIndex) or " because else it doesnt work when unit captured
         end
-        # Only allow units not attached to be given. This is because units will give all of it's children over
-        # aswell, so we only want the top level units to be given. Also, don't allow commanders to be given.
-        if v:GetParent() != v or (v.Parent and v.Parent != v) then
+
+        -- Only allow units not attached to be given. This is because units will give all of it's children over
+        -- aswell, so we only want the top level units to be given. Also, don't allow commanders to be given.
+        if v:GetParent() ~= v or (v.Parent and v.Parent ~= v) then
             continue
         end
 
@@ -78,24 +81,25 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         local bp = unit:GetBlueprint()
         local unitId = unit:GetUnitId()
 
-        # B E F O R E
-        local numNukes = unit:GetNukeSiloAmmoCount()  #looks like one of these 2 works for SMDs also
+        -- B E F O R E
+        local numNukes = unit:GetNukeSiloAmmoCount()  --looks like one of these 2 works for SMDs also
         local numTacMsl = unit:GetTacticalSiloAmmoCount()
-        local unitKills = unit:GetStat('KILLS', 0).Value   #also takes care of the veteran level
+        local unitKills = unit:GetStat('KILLS', 0).Value
+        local xp = unit.xp
         local unitHealth = unit:GetHealth()
         local shieldIsOn = false
         local ShieldHealth = 0
         local hasFuel = false
         local fuelRatio = 0
-        local enh = {} # enhancements
+        local enh = {} -- enhancements
 
         if unit.MyShield then
             shieldIsOn = unit:ShieldIsOn()
             ShieldHealth = unit.MyShield:GetHealth()
         end
-        if bp.Physics.FuelUseTime and bp.Physics.FuelUseTime > 0 then   # going through the BP to check for fuel
-            fuelRatio = unit:GetFuelRatio()                             # usage is more reliable then unit.HasFuel
-            hasFuel = true                                              # cause some buildings say they use fuel
+        if bp.Physics.FuelUseTime and bp.Physics.FuelUseTime > 0 then   -- going through the BP to check for fuel
+            fuelRatio = unit:GetFuelRatio()                             -- usage is more reliable then unit.HasFuel
+            hasFuel = true                                              -- cause some buildings say they use fuel
         end
         local posblEnh = bp.Enhancements
         if posblEnh then
@@ -105,39 +109,32 @@ function TransferUnitsOwnership(units, ToArmyIndex)
                 end
             end
         end
-	
-		local oldOwner = nil
-		if unit.oldowner then
-			oldOwner = unit.oldowner
-		end
 
-        # changing owner
+        -- changing owner
         unit:OnBeforeTransferingOwnership(ToArmyIndex)
         unit = ChangeUnitArmy(unit,ToArmyIndex)
         if not unit then
             continue
         end
-        table.insert(newUnits, unit)	
-		
-		if IsAlly(owner,ToArmyIndex) then
-			if oldOwner == nil or oldOwner == owner then
-				unit.oldowner = owner
-				if not sharedUnits[owner] then
-					sharedUnits[owner] = {}
-				end
-				table.insert(sharedUnits[owner], unit)
-			else
-				unit.oldowner = oldOwner
-				if not sharedUnits[oldOwner] then
-					sharedUnits[oldOwner] = {}
-				end
-				table.insert(sharedUnits[oldOwner], unit)
-			end
-		end
-		
-        # A F T E R
-        if unitKills and unitKills > 0 then # set veterancy first
+
+        table.insert(newUnits, unit)    
+        
+        if IsAlly(owner, ToArmyIndex) then
+            if unit.oldowner == nil then
+                unit.oldowner = owner
+                if not sharedUnits[owner] then
+                    sharedUnits[owner] = {}
+                end
+                table.insert(sharedUnits[owner], unit)
+            end
+        end
+        
+        -- A F T E R
+        if unitKills and unitKills > 0 then
             unit:AddKills( unitKills )
+        end
+        if xp and xp > 0 then
+            unit:AddXP(xp)
         end
         if enh and table.getn(enh) > 0 then
             for k, v in enh do
@@ -165,7 +162,7 @@ function TransferUnitsOwnership(units, ToArmyIndex)
                 unit:DisableShield()
             end
         end
-        unit:OnAfterTransferingOwnership(owner) # owner var contains the now ex-owner
+        unit:OnAfterTransferingOwnership(owner)
     end
     return newUnits
 end
@@ -173,7 +170,7 @@ end
 function GiveUnitsToPlayer( data, units )
     if units then
         local owner = units[1]:GetArmy()
-        if OkayToMessWithArmy(owner) and IsAlly(owner,data.To) then			
+        if OkayToMessWithArmy(owner) and IsAlly(owner,data.To) then         
             TransferUnitsOwnership( units, data.To )
         end
     end
@@ -186,7 +183,7 @@ function SetResourceSharing( data )
 end
 
 function RequestAlliedVictory( data )
-    # You cannot change this in a team game
+    -- You cannot change this in a team game
 
     if ScenarioInfo.TeamGame then
         return
@@ -206,11 +203,11 @@ function SetOfferDraw(data)
 end
 
 
-#==============================================================================
-# UNIT CAP
-#==============================================================================
+--==============================================================================
+-- UNIT CAP
+--==============================================================================
 function UpdateUnitCap(deadArmy)
-    # If we are asked to share out unit cap for the defeated army, do the following...
+    -- If we are asked to share out unit cap for the defeated army, do the following...
     local mode = ScenarioInfo.Options.ShareUnitCap
     
     if(not mode or mode == 'none') then
@@ -252,29 +249,31 @@ function UpdateUnitCap(deadArmy)
     end
 end
 
-function SendChatToReplay(data)
-	if data.Sender and data.Msg then
-		if not Sync.UnitData.Chat then
-			Sync.UnitData.Chat = {}
-		end
-		table.insert(Sync.UnitData.Chat, {sender=data.Sender, msg=data.Msg})
-	end
+function SaveChatToReplay(data)
+    if data.Sender and data.Msg then
+        if not Sync.Chat then
+            chatID = 1
+            Sync.Chat = {}
+        end
+        chatID = chatID + 1
+        Sync.Chat[chatID] = {Sender=data.Sender, Msg=data.Msg}
+        --table.insert(Sync.Chat, {Sender=data.Sender, Msg=data.Msg})
+    end
 end
 
 function GiveResourcesToPlayer(data)
-	SendChatToReplay(data)
-	if data.From != -1 then
-		if not OkayToMessWithArmy(data.From) then
-			return
-		end
-		local fromBrain = GetArmyBrain(data.From)
-		local toBrain = GetArmyBrain(data.To)
-		if fromBrain:IsDefeated() or toBrain:IsDefeated() then
-			return
-		end
-		local massTaken = fromBrain:TakeResource('Mass',data.Mass * fromBrain:GetEconomyStored('Mass'))
-		local energyTaken = fromBrain:TakeResource('Energy',data.Energy * fromBrain:GetEconomyStored('Energy'))
-		toBrain:GiveResource('Mass',massTaken)
-		toBrain:GiveResource('Energy',energyTaken)
-	end
+    if data.From ~= -1 then
+        if not OkayToMessWithArmy(data.From) then
+            return
+        end
+        local fromBrain = GetArmyBrain(data.From)
+        local toBrain = GetArmyBrain(data.To)
+        if fromBrain:IsDefeated() or toBrain:IsDefeated() then
+            return
+        end
+        local massTaken = fromBrain:TakeResource('Mass',data.Mass * fromBrain:GetEconomyStored('Mass'))
+        local energyTaken = fromBrain:TakeResource('Energy',data.Energy * fromBrain:GetEconomyStored('Energy'))
+        toBrain:GiveResource('Mass',massTaken)
+        toBrain:GiveResource('Energy',energyTaken)
+    end
 end

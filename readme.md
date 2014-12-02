@@ -41,6 +41,10 @@ make a thread if it isn't there already.
 - [X] Fixed invalid preview range of SMDs
 - [X] Fixed Aeon T1 Bomber targeting subsurface units
 - [X] All Factories of a given tech level now roll out Engineers at an even pace with each other
+- [X] Given units now get correct experience points 
+- [X] Given units are returned to their original owner in share until death 
+- [X] UI-mods are now refreshed before launch
+
 
 *Game Improvements*
 - [X] Shield Fixes:
@@ -64,7 +68,11 @@ make a thread if it isn't there already.
 - [X] Improved autobalance with random spawns in lobby
 - [X] SMD can be paused
 - [X] New "No Walls" Unit Restriction
-- [X] Improved the Unit Restrictions menu descriptions
+- [X] Improved the Unit Restrictions menu descriptions, including localisation
+- [X] Made factory queue templates more accessible, the save button was hidden when the factory wasn't paused
+- [X] Show replay-ID in score 
+- [X] Less UI-lag
+- [X] Some sim-speed improvements 
 
 ----------------------------------
 *Changes to be verified*
@@ -90,8 +98,13 @@ Contributors:
  - PattogoTehen
  - RK4000
  - Eximius
-
-
+ - Xinonny
+ 
+Special Thanks:
+ - Navax
+ - Alex1911
+ - Preytor
+ 
 Changes under consideration for future patches
 ----------------------------------------------
 
