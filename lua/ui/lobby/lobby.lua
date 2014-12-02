@@ -224,7 +224,7 @@ LOG("defaultMode " .. defaultMode)
 
 function SetWindowedLobby(windowed)
     -- Dont change resolution if user already using windowed mode
-    if windowed == windowedMode then
+    if windowed == windowedMode or defaultMode == 'windowed' then
         return
     end
 
@@ -606,7 +606,7 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
         -- Store off the validated playername
         localPlayerName = lobbyComm:GetLocalPlayerName()
         local Prefs = import('/lua/user/prefs.lua')
-        local windowed = Prefs.GetFromCurrentProfile('WindowedLobby') or 'true'
+        local windowed = Prefs.GetFromCurrentProfile('WindowedLobby') or 'false'
         SetWindowedLobby(windowed == 'true')
     end
 end
@@ -615,7 +615,6 @@ end
 -- create the lobby as a host
 function HostGame(desiredGameName, scenarioFileName, inSinglePlayer)
     singlePlayer = inSinglePlayer
-    singlePlayer = false
     gameName = lobbyComm:MakeValidGameName(desiredGameName)
     lobbyComm.desiredScenario = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
     lobbyComm:HostGame()
