@@ -41,6 +41,9 @@ make a thread if it isn't there already.
 - [X] Fixed invalid preview range of SMDs
 - [X] Fixed Aeon T1 Bomber targeting subsurface units
 - [X] All Factories of a given tech level now roll out Engineers at an even pace with each other
+- [X] Given units now get correct experience points 
+- [X] Given units are returned to their original owner in share until death 
+
 
 *Game Improvements*
 - [X] Shield Fixes:
