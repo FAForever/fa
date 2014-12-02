@@ -57,6 +57,7 @@ about the relevant change, or make a thread if it isn't there already.
 - [X] Show replay-ID in score 
 - [X] Less UI-lag
 - [X] Some sim-speed improvements 
+- [X] Remove ACU score bump, ACU kills now score 5000
 
 Contributors:
  - Sheeo
