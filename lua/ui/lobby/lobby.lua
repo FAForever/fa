@@ -2966,7 +2966,7 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtLeftTopIn(GUI.chatEdit, GUI.chatPanel, 0+13, 184+7)
     GUI.chatEdit.Width:Set(334)
     GUI.chatEdit.Height:Set(24)
-    GUI.chatEdit:SetFont(UIUtil.bodyFont, 12) -- 16
+    GUI.chatEdit:SetFont(UIUtil.bodyFont, 16) -- 16|12
     GUI.chatEdit:SetForegroundColor(UIUtil.fontColor)
     GUI.chatEdit:SetHighlightBackgroundColor('00000000')
     GUI.chatEdit:SetHighlightForegroundColor(UIUtil.fontColor)
@@ -2974,7 +2974,7 @@ function CreateUI(maxPlayers)
     GUI.chatEdit:AcquireFocus()
 
     GUI.chatDisplay = ItemList(GUI.chatPanel)
-    GUI.chatDisplay:SetFont(UIUtil.bodyFont, 12)
+    GUI.chatDisplay:SetFont(UIUtil.bodyFont, 14) -- 14|12
     GUI.chatDisplay:SetColors(UIUtil.fontColor(), "00000000", UIUtil.fontColor(), "00000000")
     LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.chatPanel, 8, 4) --Right, Top
     GUI.chatDisplay.Bottom:Set(function() return GUI.chatEdit.Top() -6 end)
@@ -4227,9 +4227,8 @@ function CreateUI(maxPlayers)
                 local XinnoSystemMessage = Prefs.GetFromCurrentProfile('XinnoSystemMessage') or 'false'
                 if XinnoSystemMessage == 'true' then
                     if not table.find(ConnexionEtablished, peer.name) then
-                        AddChatText('<< '..peer.name..' >> '..FindSlotForID(peer.id))
-                        if gameInfo.PlayerOptions[FindSlotForID(peer.id)].Human and IsLocallyOwned(FindSlotForID(peer.id)) then
-                            if table.find(ConnectedWithProxy, peer.id) then
+                        --AddChatText('<< '..peer.name..' >> '..FindSlotForID(peer.id)..' || '..tostring(gameInfo.PlayerOptions[FindSlotForID(peer.id)].Human)..' || '..tostring(IsLocallyOwned(FindSlotForID(peer.id))))
+                        if gameInfo.PlayerOptions[FindSlotForID(peer.id)].Human and not IsLocallyOwned(FindSlotForID(peer.id)) then                            if table.find(ConnectedWithProxy, peer.id) then
                                 AddChatText(LOCF("<LOC Xngine0004>Connection to %s established.", peer.name)..' (FAF Proxy)', "Xngine0004")
                             else
                                 AddChatText(LOCF("<LOC Xngine0004>Connection to %s established.", peer.name), "Xngine0004")
@@ -4782,6 +4781,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                         gameInfo.Observers[data.Slot] = nil
                     end
                 end
+                AddChatText(LOCF("<LOC Xngine0003>Lost connection to %s.", peerName), "Xngine0003")
                 ClearSlotInfo(data.Slot)
                 UpdateGame()
             elseif data.Type == 'SlotAssigned' then
@@ -4833,7 +4833,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 ClearSlotInfo(data.OldSlot)
                 UpdateGame()
             elseif data.Type == 'SetColor' then
-                AddChatText('<>')
                 data.Color = Get_IndexColor_by_CompleteTable(data.Color)
                 gameInfo.PlayerOptions[data.Slot].PlayerColor = data.Color
                 gameInfo.PlayerOptions[data.Slot].ArmyColor = data.Color
@@ -5035,7 +5034,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             end
         end
         
-        AddChatText(LOCF("<LOC Xngine0003>Lost connection to %s.", peerName), "Xngine0003")
+        --AddChatText("Lost connection or try connect with proxy")
         
         if IsPlayer(peerID) then
             local slot = FindSlotForID(peerID)
