@@ -2,7 +2,7 @@
 local Prefs = import('/lua/user/prefs.lua')
 local templates = Prefs.GetFromCurrentProfile('build_templates_factory') or {}
 
---# utils
+-- Utilities
 function GetInitialName()
     local nextNum = 0
     for _, template in templates do
@@ -15,7 +15,6 @@ function GetInitialName()
         end
     end
     local name = '(' .. nextNum + 1 .. ')'
-    
     return name
 end
 
@@ -30,7 +29,7 @@ function GetInitialIcon(buildQueue)
     end
 end
 
---# main functions
+-- Main functions
 function CreateBuildTemplate(buildQueue)
     if buildQueue and not table.empty(buildQueue) then
         PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Tab_Click_02'}))
@@ -46,7 +45,7 @@ function GetTemplates()
     return Prefs.GetFromCurrentProfile('build_templates_factory')
 end
 
---# options menu
+-- Options menu
 function RemoveTemplate(templateID)
     table.remove(templates, templateID)
     Prefs.SetToCurrentProfile('build_templates_factory', templates)

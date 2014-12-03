@@ -1,4 +1,4 @@
---list of blueprint id's used for each category
+-- List of blueprint id's used for each category
 buildingTab = {
 
 ["Builders"] = {
@@ -7,7 +7,6 @@ buildingTab = {
   "Naval_Factory",
   "Quantum_Gateway",
   "T1_Engineer",
-  "url0301", -- SuppComs
   "ual0301",
   "uel0301",
   "xsl0301",
@@ -39,9 +38,9 @@ buildingTab = {
   "Tactical_Missile_Defense",
   "Strategic_Missile_Defense",
   "T1_Tank",
-  "T1_Assault_Bot", -- stupid Mantis
+  "T1_Assault_Bot", -- Mantis
   "T1_Attack_Bomber",
-  "T1_Attack_Boat", -- Aeon extra
+  "T1_Attack_Boat",
 },
 
 ["XP"] = {
@@ -56,7 +55,6 @@ buildingTab = {
 },
 
 -- Second Row
-
 ["Mass"] = {
   "Mass_Extractor",
   "T2_Engineer",
@@ -64,14 +62,11 @@ buildingTab = {
 
 ["MassFab"] = {
   "Mass_Fabricator",
-  
   "T2_Gatling_Bot",
   "T2_Rocket_Bot",
   "T2_Assault_Bot",
-  
   "T2_Fighter/Bomber",
   "T2_Combat_Fighter",
-  
   "T2_Submarine_Hunter",
   "T2_Torpedo_Boat",
   "T2_Submarine_Killer",
@@ -80,36 +75,25 @@ buildingTab = {
 ["Pgen"] = {
   "Power_Generator",
   "Hydrocarbon_Power_Plant",
-
   "T2_Heavy_Tank",
-  
   "T2_Torpedo_Bomber",
-  
   "T2_Destroyer",
 },
 
 ["Templates"] = {
---  "Mass_Storage",
---  "Energy_Storage",
-  "_templates", -- Special :)
-
+  "_templates",
   "T2_Hover_Tank",
   "T2_Assault_Tank",
   "T2_Amphibious_Tank",
-  
   "T2_Gunship",
-  
   "T2_Cruiser",
 },
 
 ["EngyStations"] = {
   "Engineering_Station",
-  
   "T2_Mobile_Anti_Air_Cannon",
   "T2_Mobile_AA_Flak_Artillery",
-  
   "T2_Air_Transport",
-  
   "T2_Counter_Intelligence_Boat",
   "T2_Shield_Boat",
 },
@@ -129,25 +113,20 @@ buildingTab = {
 },
 
 -- Row 3 XCVBNM
-
 ["Defenses"] = {
   "Heavy_Point_Defense",
   "Point_Defense",
   "Wall_Section",
-  
   "T3_Engineer",
 },
 
 ["AA"] = {
   "Anti_Air",
   "Air_Staging",
-
   "T3_Sniper_Bot",
   "url0303", -- Loyalist
   "uel0303", -- Titan
-
   "T3_Spy_Plane",
-  
   "T3_Strategic_Missile_Submarine",
   "T3_Submarine_Hunter",
 },
@@ -156,25 +135,19 @@ buildingTab = {
 ["Torpedo"] = {
   "Torpedo_Ambushing_System",
   "Torpedo_Launcher",
-
   "ual0303", -- Harbinger
   "xrl0305", -- Brick
   "xel0305", -- Percival
   "xsl0303", -- Seraphim Tank
-  
   "T3_Air_Superiority_Fighter",
-  
   "T3_Battleship",
 },
 
 ["Arties"] = {
   "Artillery_Installation",
   "Heavy_Artillery_Installation",
-  
   "T3_Strategic_Bomber",
-
   "T3_Mobile_Heavy_Artillery",
-
   "T3_Aircraft_Carrier",
   "T3_Battlecruiser",
 },
@@ -182,14 +155,11 @@ buildingTab = {
 ["TML"] = {
   "Tactical_Missile_Launcher",
   "Strategic_Missile_Launcher",
-
   "T3_Mobile_Missile_Platform",
   "T3_Shield_Disruptor",
   "T3_Mobile_Shield_Generator",
-  
   "T3_Heavy_Gunship",
   "T3_AA_Gunship",
-  
   "T3_Missile_Ship",
 },
 
@@ -199,14 +169,12 @@ buildingTab = {
   "T3_Torpedo_Bomber",
 },
 
-
-
 ["Experimental"] = {
 -- Aeon
-"ual0401",
-"uaa0310",
-"uas0401",
-"xab1401",
+"ual0401", -- Colossus
+"uaa0310", -- Czar
+"uas0401", -- Tempest
+"xab1401", -- Paragon
 -- Cyb
 "url0402", -- Monkeylord
 "xrl0403", -- Megalith
@@ -217,7 +185,7 @@ buildingTab = {
 "ues0401", -- Atlantis
 "xeb2402", -- Novax
 "ueb2401", -- Mavor
--- Sera
+-- Seraphim
 "xsl0401", -- Ythotha
 "xsa0402", -- Bomber
 "xsb2401", -- SML
@@ -646,5 +614,4 @@ buildingTab = {
 "xsl0307",},
 ["T3_Submarine_Hunter"] = {
 "xss0304",},
--- end of script generated data
 }

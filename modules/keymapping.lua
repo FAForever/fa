@@ -2,20 +2,17 @@ local Prefs = import('/lua/user/prefs.lua')
 
 local lockZoomEnable = false
 function lockZoom()
-	if lockZoomEnable then
-			local options = Prefs.GetFromCurrentProfile('options')
-			value = options.wheel_sensitivity
-			ConExecute("cam_ZoomAmount " .. tostring(value / 100))
-			
-			lockZoomEnable = false
-	else
-			ConExecute("cam_ZoomAmount 0")
-			lockZoomEnable = true
-	end
-
-
+    if lockZoomEnable then
+        local options = Prefs.GetFromCurrentProfile('options')
+        
+        value = options.wheel_sensitivity
+        ConExecute("cam_ZoomAmount " .. tostring(value / 100))
+        lockZoomEnable = false
+    else
+        ConExecute("cam_ZoomAmount 0")
+        lockZoomEnable = true
+    end
 end
-
 
 function airNoTransports()
 UISelectionByCategory("AIR + MOBILE", false,false,false,false) SelectUnits(EntityCategoryFilterDown(categories.ALLUNITS - categories.TRANSPORTATION, GetSelectedUnits()))
@@ -50,7 +47,7 @@ function ToggleRepeatBuild()
     end
 end
 
---function to toggle things like shields etc
+-- Function to toggle things like shields etc
 -- Unit toggle rules copied from orders.lua, used for converting to the numbers needed for the togglescriptbit function
 unitToggleRules = {
     Shield =  0,
@@ -125,7 +122,6 @@ function toggleOverlay(type)
             end
         end
     end
-
     Prefs.SetToCurrentProfile('activeFilters', currentFilters)
     import('/lua/ui/game/multifunction.lua').UpdateActiveFilters()
 end
@@ -133,7 +129,6 @@ end
 local currentLandFactoryIndex = 1
 local currentAirFactoryIndex = 1
 local currentNavalFactoryIndex = 1
-
 
 function GetNextLandFactory()
     UISelectionByCategory("FACTORY * LAND", false, false, false, false)
@@ -197,16 +192,16 @@ function toggleIntelShieldScript()
     toggleScript("Shield")
 end
 
---this function might be too slow in larger games, needs testing
+-- This function might be too slow in larger games, needs testing
 function GetSimilarUnits()
     local enhance = import('/lua/enhancementcommon.lua')
     local curSelection = GetSelectedUnits()
     if curSelection then
-        --find out what enhancements the current unit has
+        -- Find out what enhancements the current unit has
         local curUnitId = curSelection[1]:GetEntityId()
         local curUnitEnhancements = enhance.GetEnhancements(curUnitId)
 
-        --select all similar units by category
+        -- Select all similar units by category
         local bp = curSelection[1]:GetBlueprint()
         local bpCats = bp.Categories
         local catString = ""
@@ -219,7 +214,7 @@ function GetSimilarUnits()
         end
         UISelectionByCategory(catString, false, false, false, false)
 
-        --get enhancements on each unit and filter down to only those with the same as the first unit
+        -- Get enhancements on each unit and filter down to only those with the same as the first unit
         local newSelection = GetSelectedUnits()
         local tempSelectionTable = {}
         for i, unit in newSelection do
@@ -238,7 +233,6 @@ function GetSimilarUnits()
     end
 end
 
--- by norem
 local lastACUSelectionTime = 0
 
 function ACUSelectCG()
@@ -249,7 +243,6 @@ function ACUSelectCG()
     else
         ConExecute('UI_SelectByCategory +nearest +goto COMMAND')
     end
-
     lastACUSelectionTime = curTime
 end
 
@@ -277,7 +270,6 @@ function GetNearestIdleEngineerNotACU()
             nearestDist = dist
         end
     end
-
     SelectUnits({idleEngineers[nearestIndex]})
 end
 
@@ -285,14 +277,14 @@ function AddNearestIdleEngineersSeq()
     local allIdleEngineers = GetIdleEngineers() or {}
     local currentSelection = GetSelectedUnits() or {}
 
-    -- check if current selection contains only idle engineers
+    -- Check if current selection contains only idle engineers
     local idleEngineers = allIdleEngineers
     for i, unit in currentSelection do
         local key = table.find(idleEngineers, unit)
         if key then
             table.remove(idleEngineers, key)
         else
-            -- not an idle engineer, clear selection
+            -- Not an idle engineer, clear selection
             SelectUnits(nil)
             currentSelection = {}
             idleEngineers = allIdleEngineers
@@ -303,7 +295,7 @@ function AddNearestIdleEngineersSeq()
         return
     end
 
-    -- get nearest in list of unselected, idle
+    -- Get nearest in list of unselected, idle
     local mousePos = GetMouseWorldPos()
     local nearestIndex = 1
     local nearestDist = GetDistanceBetweenTwoVectors(mousePos, idleEngineers[nearestIndex]:GetPosition())
@@ -315,17 +307,10 @@ function AddNearestIdleEngineersSeq()
         end
     end
 
-    -- compare nearest with already selected
-    -- if it is closer than any of them, select it and deselect the others
-    -- can be confusing in some situations
-    --[[for i, unit in currentSelection do
-    if GetDistanceBetweenTwoVectors(mousePos, unit:GetPosition()) > nearestDist then
-        SelectUnits({idleEngineers[nearestIndex]})
-        return
-    end
-end]]
-
-AddSelectUnits({idleEngineers[nearestIndex]})
+    -- Compare nearest with already selected
+    -- If it is closer than any of them, select it and deselect the others
+    -- Can be confusing in some situations
+    AddSelectUnits({idleEngineers[nearestIndex]})
 end
 
 local categoryTable = {'LAND','AIR','NAVAL'}
@@ -367,7 +352,6 @@ function CycleIdleFactories()
     else
         curFacIndex = 1
     end
-
     SelectUnits({factoriesList[curFacIndex]})
 end
 
@@ -398,7 +382,7 @@ function CycleUnitTypesInSel()
     end
 
     if isNewSel then
-        -- sort units
+        -- Sort units
         sortedUnits = {}
         for i, cat in ipairs(unitTypes) do
             local units = EntityCategoryFilterDown(cat, selection)
@@ -407,7 +391,7 @@ function CycleUnitTypesInSel()
             end
         end
 
-        -- first type should be selected
+        -- First type should be selected
         if not table.empty(sortedUnits) then
             unitCurType = 1
         else
@@ -415,13 +399,12 @@ function CycleUnitTypesInSel()
             return
         end
     else
-        -- next type should be selected
+        -- Next type should be selected
         unitCurType = unitCurType + 1
         if not sortedUnits[unitCurType] then
             unitCurType = 1
         end
     end
-
     SelectUnits(sortedUnits[unitCurType])
 end
 
@@ -433,5 +416,3 @@ function CreateTemplateFactory()
     end
     import('/modules/templates_factory.lua').CreateBuildTemplate(currentCommandQueue)
 end
-
--- end by norem
