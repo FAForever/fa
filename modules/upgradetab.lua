@@ -63,7 +63,7 @@ upgradeTab =
     ['urb4205']  = 'urb4206',
     ['urb4206']  = 'urb4207',
 
-    --- Phim
+    --- Seraphim
     ['xsb0101']  = {'zsb9501', 'xsb0201'},
     ['xsb0102']  = {'zsb9502', 'xsb0202'},
     ['xsb0103']  = {'zsb9503', 'xsb0203'},
