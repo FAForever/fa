@@ -25,6 +25,15 @@ function ExitGame()
     Sync.RequestingExit = true
 end
 
+#fill the human table
+function fillCoop()    
+    local tblArmy = ListArmies()
+    for iArmy, strArmy in pairs(tblArmy) do
+        if iArmy >= ScenarioInfo.Coop1 then
+            table.insert(ScenarioInfo.HumanPlayers, iArmy)
+        end
+    end
+end
 # Call to end an operation
 #   bool _success - instructs UI which dialog to show
 #   bool _allPrimary - true if all primary objectives completed, otherwise, false
@@ -97,6 +106,17 @@ function CreateTimerTrigger( cb, seconds, displayBool)
     return timerThread
 end
 
+function CreateTimerTriggerUnlockCoop(cb, faction, seconds, displayBool)
+    local tblArmy = ListArmies()
+    for iArmy, strArmy in pairs(tblArmy) do
+        if iArmy >= ScenarioInfo.Coop1 then
+            factionIdx = GetArmyBrain(strArmy):GetFactionIndex()
+            if(factionIdx == faction) then
+                CreateTimerTrigger(cb, seconds, displayBool)
+            end
+        end
+    end
+end
 function ResetUITimer()
     if timerThread then
         Sync.ObjectiveTimer = 0
@@ -959,6 +979,23 @@ function RemoveRestriction(army, categories, isSilent)
     RemoveBuildRestriction(army, categories)
 end
 
+function RemoveRestrictionCoop(faction, categories, isSilent)
+    --for coop players
+    local tblArmy = ListArmies()
+    for iArmy, strArmy in pairs(tblArmy) do
+        if iArmy >= ScenarioInfo.Coop1 then     
+            factionIdx = GetArmyBrain(strArmy):GetFactionIndex()
+            if(factionIdx == faction) then
+                SimUIVars.SaveTechAllowance(categories)
+                if not isSilent then
+                    if not Sync.NewTech then Sync.NewTech = {} end
+                    table.insert(Sync.NewTech, EntityCategoryGetUnitList(categories))
+                end
+                RemoveBuildRestriction(iArmy, categories)
+            end
+        end
+    end
+end
 
 #### returns lists of factories by category
 #### <point> and <radius> are optional
