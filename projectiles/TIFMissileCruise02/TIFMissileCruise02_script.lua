@@ -1,11 +1,10 @@
-#
-# Terran Sub-Launched Cruise Missile
-#
+-- UEF Sub-Launched Cruise Missile
+
 local TMissileCruiseSubProjectile = import('/lua/terranprojectiles.lua').TMissileCruiseSubProjectile
 
 TIFMissileCruise02 = Class(TMissileCruiseSubProjectile) {
 
-	FxAirUnitHitScale = 1.65,
+    FxAirUnitHitScale = 1.65,
     FxLandHitScale = 1.65,
     FxNoneHitScale = 1.65,
     FxPropHitScale = 1.65,
@@ -36,22 +35,22 @@ TIFMissileCruise02 = Class(TMissileCruiseSubProjectile) {
 
     SetTurnRateByDist = function(self)
         local dist = self:GetDistanceToTarget()
-        #Get the nuke as close to 90 deg as possible
+        -- Get the nuke as close to 90 deg as possible
         if dist > 50 then        
-            #Freeze the turn rate as to prevent steep angles at long distance targets
+            -- Freeze the turn rate as to prevent steep angles at long distance targets
             WaitSeconds(2)
             self:SetTurnRate(20)
         elseif dist > 64 and dist <= 107 then
-						# Increase check intervals
-						self:SetTurnRate(30)
-						WaitSeconds(1.5)
+                        -- Increase check intervals
+                        self:SetTurnRate(30)
+                        WaitSeconds(1.5)
             self:SetTurnRate(30)
         elseif dist > 21 and dist <= 53 then
-						# Further increase check intervals
+                        -- Further increase check intervals
             WaitSeconds(0.3)
             self:SetTurnRate(50)
-				elseif dist > 0 and dist <= 21 then
-						# Further increase check intervals            
+                elseif dist > 0 and dist <= 21 then
+                        -- Further increase check intervals            
             self:SetTurnRate(100)   
             KillThread(self.MoveThread)         
         end
@@ -71,4 +70,3 @@ TIFMissileCruise02 = Class(TMissileCruiseSubProjectile) {
 }
 
 TypeClass = TIFMissileCruise02
-

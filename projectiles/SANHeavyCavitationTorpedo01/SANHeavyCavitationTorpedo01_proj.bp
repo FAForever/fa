@@ -21,7 +21,7 @@ ProjectileBlueprint {
         'PROJECTILE',
         'ANTINAVY',
         'TORPEDO',
-		'NOSPLASHDAMAGE',
+        'NOSPLASHDAMAGE',
     },
     Display = {
         ImpactEffects = {
@@ -41,7 +41,7 @@ ProjectileBlueprint {
     Physics = {
         Acceleration = 0,
         DestroyOnWater = false,
-        InitialSpeed = 10, #from 5
+        InitialSpeed = 10,
         Lifetime = 20,
         MaxSpeed = 14,
         StayUnderwater = true,
