@@ -1204,7 +1204,14 @@ local function AssignRandomStartSpots(gameInfo)
             scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
         end
         if scenarioInfo then
-            local armyTable = MapUtil.GetArmies(scenarioInfo)
+            LOG('Scenario Type Is...')
+            LOG(repr(scenarioInfo.type))
+            local armyTable = {}
+            if scenarioInfo.type == "campaign_coop" then
+                armyTable = {"Player", "Coop1", "Coop2", "Coop3"}
+            else
+                armyTable = MapUtil.GetArmies(scenarioInfo)
+            end
             if armyTable then
                 if gameInfo.GameOptions['RandomMap'] == 'Off' then
                     numAvailStartSpots = table.getn(armyTable)
@@ -1563,9 +1570,11 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         end
     end
 
-    if gameInfo.GameOptions['Victory'] ~= 'sandbox' then
+    local scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)    
+    
+    if gameInfo.GameOptions['Victory'] != 'sandbox' then
         local valid = true
-        if totalPlayers == 1 then
+        if totalPlayers == 1 and scenarioInfo.type != "campaign_coop" then
             valid = false
         end
         if not allFFA and not moreThanOneTeam then
@@ -1713,14 +1722,53 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         lobbyComm:BroadcastData( { Type = 'Launch', GameInfo = gameInfo } )
 
         -- set the mods
-        gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
+        
 
-        scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+        local scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+
+        if scenarioInfo.type == "campaign_coop" then
+            gameInfo.GameOptions['Difficulty'] = 3
+        
+            LOG(repr(gameInfo))
+            
+            scenarioArmies = {}
+            for index, teamConfig in scenarioInfo.Configurations.standard.teams do
+                if teamConfig.name and (teamConfig.name == 'FFA') then
+                    scenarioArmies =teamConfig.armies
+                    break
+                end
+            end
+
+            local addedArmies = {}
+            for spot, army in gameInfo.PlayerOptions do
+                if spot != 1 then
+                    table.insert(addedArmies, army)
+                end			
+            end
+            SetGameOption('Victory', 'sandbox')
+            add = 1
+            for armyIndex, armyName in scenarioArmies do
+                if armyName != "Player" and stringstarts(armyName, "Coop") == false then
+                    gameInfo.PlayerOptions[armyIndex] = LobbyComm.GetDefaultPlayerOptions(armyName)
+                    gameInfo.PlayerOptions[armyIndex].Human = false
+                    gameInfo.PlayerOptions[armyIndex].Faction = 1
+                elseif stringstarts(armyName, "Coop") == true and table.getn(addedArmies) >= add then
+                        gameInfo.PlayerOptions[armyIndex] = addedArmies[add]
+                        add = add + 1				
+                end
+            end
+        end
+        
+        gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
         SetWindowedLobby(false)
         lobbyComm:LaunchGame(gameInfo)
     end
 
     LaunchGame()
+end
+
+function stringstarts(String,Start)
+   return string.sub(String,1,string.len(Start))==Start
 end
 
 local function AlertHostMapMissing()
@@ -4346,9 +4394,16 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
 
     local mWidth = scenario.size[1]
     local mHeight = scenario.size[2]
-
-    local playerArmyArray = MapUtil.GetArmies(scenario)
-
+    
+    local playerArmyArray = {}
+    if scenario.type == "campaign_coop" then
+        playerArmyArray = {"Player", "Coop1", "Coop2", "Coop3"}
+        LOG('Coop')
+    else
+        playerArmyArray = MapUtil.GetArmies(scenario)
+        LOG('Not Coop')
+    end
+        
     for inSlot, army in playerArmyArray do
         local pos = startPos[army]
         local slot = inSlot

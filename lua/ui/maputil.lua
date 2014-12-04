@@ -105,7 +105,7 @@ function EnumerateSkirmishScenarios(nameFilter, sortFunc)
     local scenarios = {}
     for index, fileName in scenFiles do
         local scen = LoadScenario(fileName)
-        if IsScenarioPlayable(scen) and scen.type == "skirmish" then
+        if IsScenarioPlayable(scen) and (scen.type == "skirmish" or scen.type == "campaign_coop") then
             table.insert(scenarios, scen)
         end
     end
