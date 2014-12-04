@@ -264,12 +264,12 @@ function buildActionBuilding(name, modifier)
             end
             WaitSeconds(fadeTime)
             cyclePos = 0
-            end
+        end)
     else
-            cycleThread = ForkThread(function()
-                WaitSeconds(options.hotbuild_cycle_reset_time / 1000.0);
-                cyclePos = 0
-            end)
+        cycleThread = ForkThread(function()
+            WaitSeconds(options.hotbuild_cycle_reset_time / 1000.0);
+            cyclePos = 0
+        end)
     end
         
     local cmd = effectiveValues[cyclePos]
