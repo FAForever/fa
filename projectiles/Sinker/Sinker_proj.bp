@@ -31,8 +31,8 @@ ProjectileBlueprint {
         DestroyOnWater = false,
         InitialSpeed = 0,
         LeadTarget = false,
-        Lifetime = 100,     -- projectile should be alive long enough to hit seabed
-        UseGravity = false, -- not using gravity, units sink way to fast
+        Lifetime = 100,     -- Projectile should be alive long enough to hit seabed
+        UseGravity = false, -- Not using gravity, units sink way to fast
         SinkSpeed = 0.05,
         VelocityAlign = false,
 

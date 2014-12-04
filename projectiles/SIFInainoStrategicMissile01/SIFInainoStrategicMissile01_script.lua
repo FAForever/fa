@@ -1,12 +1,10 @@
-#****************************************************************************
-#**
-#**  File     :  /data/projectiles/SIFInainoStrategicMissile01/SIFInainoStrategicMissile01_script.lua
-#**  Author(s):  Gordon Duclos, Matt Vainio
-#**
-#**  Summary  :  Inaino Strategic Missile Projectile script, XSB2305
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+----------------------------------------------------------------------------------------------------
+--  File     :  /data/projectiles/SIFInainoStrategicMissile01/SIFInainoStrategicMissile01_script.lua
+--  Author(s):  Gordon Duclos, Matt Vainio
+--  Summary  :  Inaino Strategic Missile Projectile script, XSB2305
+--  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+----------------------------------------------------------------------------------------------------
+
 local SIFInainoStrategicMissile = import('/lua/seraphimprojectiles.lua').SIFInainoStrategicMissile
 
 SIFInainoStrategicMissile01 = Class(SIFInainoStrategicMissile) {
@@ -17,21 +15,21 @@ SIFInainoStrategicMissile01 = Class(SIFInainoStrategicMissile) {
     ExplodeSound = 'Nuke_Impact',
     AmbientSound = 'Nuke_Flight',
 
-	InitialEffects = {
-		'/effects/emitters/seraphim_inaino_fxtrails_01_emit.bp',
-		'/effects/emitters/seraphim_inaino_fxtrails_02_emit.bp',
-	},    
+    InitialEffects = {
+        '/effects/emitters/seraphim_inaino_fxtrails_01_emit.bp',
+        '/effects/emitters/seraphim_inaino_fxtrails_02_emit.bp',
+    },    
     ThrustEffects = {
-		'/effects/emitters/seraphim_inaino_fxtrails_01_emit.bp',
-		'/effects/emitters/seraphim_inaino_fxtrails_02_emit.bp',
-	},
+        '/effects/emitters/seraphim_inaino_fxtrails_01_emit.bp',
+        '/effects/emitters/seraphim_inaino_fxtrails_02_emit.bp',
+    },
     LaunchEffects = {
-		'/effects/emitters/seraphim_inaino_fxtrails_01_emit.bp',
-		'/effects/emitters/seraphim_inaino_fxtrails_02_emit.bp',
-	},
+        '/effects/emitters/seraphim_inaino_fxtrails_01_emit.bp',
+        '/effects/emitters/seraphim_inaino_fxtrails_02_emit.bp',
+    },
     
     OnCreate = function(self)
-		SIFInainoStrategicMissile.OnCreate(self)
+        SIFInainoStrategicMissile.OnCreate(self)
         local launcher = self:GetLauncher()
         if launcher and not launcher:IsDead() and launcher.EventCallbacks.ProjectileDamaged then
             self.ProjectileDamaged = {}
@@ -46,7 +44,7 @@ SIFInainoStrategicMissile01 = Class(SIFInainoStrategicMissile) {
 
     OnImpact = function(self, TargetType, TargetEntity)
         if not TargetEntity or not EntityCategoryContains(categories.PROJECTILE, TargetEntity) then
-            # Play the explosion sound
+            -- Play the explosion sound
             local myBlueprint = self:GetBlueprint()
             if myBlueprint.Audio.Explosion then
                 self:PlaySound(myBlueprint.Audio.Explosion)
@@ -79,16 +77,16 @@ SIFInainoStrategicMissile01 = Class(SIFInainoStrategicMissile) {
         local launcher = self:GetLauncher()
         self.CreateEffects( self, self.InitialEffects, army, 1 )
         self:TrackTarget(false)
-        WaitSeconds(2.5)		# Height
+        WaitSeconds(2.5)        -- Height
         self:SetCollision(true)
         self.CreateEffects( self, self.LaunchEffects, army, 1 )
         WaitSeconds(2.5)
         self.CreateEffects( self, self.ThrustEffects, army, 3 )
         WaitSeconds(2.5)
-        self:TrackTarget(true) # Turn ~90 degrees towards target
+        self:TrackTarget(true) -- Turn ~90 degrees towards target
         self:SetDestroyOnWater(true)
         self:SetTurnRate(47.36)
-        WaitSeconds(2) 					# Now set turn rate to zero so nuke flies straight
+        WaitSeconds(2)                     -- Now set turn rate to zero so nuke flies straight
         self:SetTurnRate(0)
         self:SetAcceleration(0.001)
         self.WaitTime = 0.5
@@ -100,18 +98,18 @@ SIFInainoStrategicMissile01 = Class(SIFInainoStrategicMissile) {
 
     SetTurnRateByDist = function(self)
         local dist = self:GetDistanceToTarget()
-        #Get the nuke as close to 90 deg as possible
+        -- Get the nuke as close to 90 deg as possible
         if dist > 150 then        
-            #Freeze the turn rate as to prevent steep angles at long distance targets
+            -- Freeze the turn rate as to prevent steep angles at long distance targets
             self:SetTurnRate(0)
         elseif dist > 75 and dist <= 150 then
-						# Increase check intervals
+                        -- Increase check intervals
             self.WaitTime = 0.3
         elseif dist > 32 and dist <= 75 then
-						# Further increase check intervals
+                        -- Further increase check intervals
             self.WaitTime = 0.1
         elseif dist < 32 then
-						# Turn the missile down
+                        -- Turn the missile down
             self:SetTurnRate(50)
         end
     end,
@@ -122,7 +120,6 @@ SIFInainoStrategicMissile01 = Class(SIFInainoStrategicMissile) {
         local dist = VDist2(mpos[1], mpos[3], tpos[1], tpos[3])
         return dist
     end,
-
 }
 
 TypeClass = SIFInainoStrategicMissile01

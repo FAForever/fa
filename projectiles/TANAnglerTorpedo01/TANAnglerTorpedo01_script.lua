@@ -1,17 +1,15 @@
-#
-# Terran Torpedo Bomb
-#
+-- UEF Torpedo Bomb
+
 local TTorpedoShipProjectile = import('/lua/terranprojectiles.lua').TTorpedoShipProjectile
 
 TANAnglerTorpedo01 = Class(TTorpedoShipProjectile) 
 {
-
     OnEnterWater = function(self)
         TTorpedoShipProjectile.OnEnterWater(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         local army = self:GetArmy()
 
-        for k, v in self.FxEnterWater do #splash
+        for k, v in self.FxEnterWater do
             CreateEmitterAtEntity(self,army,v)
         end
         self:TrackTarget(true)
@@ -21,7 +19,6 @@ TANAnglerTorpedo01 = Class(TTorpedoShipProjectile)
         --self:SetVelocity(0)
         self:ForkThread(self.MovementThread)
     end,
-
 }
 
 TypeClass = TANAnglerTorpedo01

@@ -1,7 +1,8 @@
 ProjectileBlueprint {
    Merge = true,
    Source = '/projectiles/LaserBotTerran01/LaserBotTerran01_proj.bp',
---[BF4] All of the following code was completely missing from the original.
+   
+-- All of the following code was completely missing from the original.
    Categories = {
       'UEF',
       'PROJECTILE',

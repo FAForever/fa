@@ -7,20 +7,20 @@ end
 function ReclaimGround(command)
     if command.CommandType == 'Reclaim' and (command.Target.Type == 'Position' or IsKeyDown('Menu')) then
         local cb = {
-                        Func = 'ReclaimGround',
-                        Args = {
-                            Units = {command.Units[1]:GetEntityId()}, Location = command.Target.Position,
-                            Move = command.Target.Type == 'Position',
-                            From = GetFocusArmy()
-                        }
-                    }
+            Func = 'ReclaimGround',
+            Args = {
+                Units = {command.Units[1]:GetEntityId()}, Location = command.Target.Position,
+                Move = command.Target.Type == 'Position',
+                From = GetFocusArmy()
+            }
+        }
         SimCallback(cb, true)
     end
 end
 
 function ReclaimGroundSim(units, location, doMove)
     local MAX_SIZE = 5
-    local range = 99 -- choose minimum distance below
+    local range = 99 -- Choose minimum distance below
 
     for _, u in units do
         local bp = u:GetBlueprint()
@@ -32,8 +32,7 @@ function ReclaimGroundSim(units, location, doMove)
     for _, r in reclaimTargets do
         if(not IsUnit(r)) then
             local bp = r:GetBlueprint()
-            local type = bp.ScriptClass -- tree, wreckage etc
-
+            local type = bp.ScriptClass -- Tree, wreckage etc
             local sizeX = bp.Footprint.SizeX
             local sizeZ = bp.Footprint.SizeZ
             local pos = location

@@ -6,4 +6,3 @@ do
         ConExecute("UI_ForceLifbarsOnEnemy " .. tostring(options.gui_render_enemy_lifebars))
     end
 end
-
