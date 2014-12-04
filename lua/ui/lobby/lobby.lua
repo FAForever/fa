@@ -1205,8 +1205,6 @@ local function AssignRandomStartSpots(gameInfo)
             scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
         end
         if scenarioInfo then
-            LOG('Scenario Type Is...')
-            LOG(repr(scenarioInfo.type))
             local armyTable = {}
             if scenarioInfo.type == "campaign_coop" then
                 armyTable = {"Player", "Coop1", "Coop2", "Coop3"}
@@ -4399,10 +4397,8 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
     local playerArmyArray = {}
     if scenario.type == "campaign_coop" then
         playerArmyArray = {"Player", "Coop1", "Coop2", "Coop3"}
-        LOG('Coop')
     else
         playerArmyArray = MapUtil.GetArmies(scenario)
-        LOG('Not Coop')
     end
         
     for inSlot, army in playerArmyArray do
