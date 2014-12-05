@@ -1,4 +1,4 @@
-UnitBlueprint { 
+UnitBlueprint {
     AI = {
         TargetBones = {
             'Torso',
@@ -177,7 +177,7 @@ UnitBlueprint {
         UniformScale = 0.1,
     },
     Economy = {
-        BuildCostEnergy = 343750, 
+        BuildCostEnergy = 343750,
         BuildCostMass = 27500,
         BuildTime = 20625,
     },
@@ -243,7 +243,7 @@ UnitBlueprint {
         SkirtSizeZ = 6,
         StandUpright = true,
         TurnRadius = 3,
-        TurnRate = 40,                    
+        TurnRate = 40,
     },
     SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = -0.25,
@@ -333,7 +333,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
-            RateOfFire = 10,    #3                
+            RateOfFire = 10,    #3
             SlavedToBody = true,
             SlavedToBodyArcRange = 65,
             TargetCheckInterval = 0.25,

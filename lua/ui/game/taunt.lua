@@ -1,11 +1,11 @@
-﻿#****************************************************************************
-#**  File     :  lua/modules/ui/game/taunt.lua
-#**  Author(s):  Chris blackwell
-#**
-#**  Summary  :  Taunt system
-#**
-#**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+﻿--****************************************************************************
+--**  File     :  lua/modules/ui/game/taunt.lua
+--**  Author(s):  Chris blackwell
+--**
+--**  Summary  :  Taunt system
+--**
+--**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local Prefs = import('/lua/user/prefs.lua')
 local AIChatS = import('/lua/AIChatSorian.lua')
 
@@ -74,7 +74,7 @@ local taunts = {
     {text = '<LOC XGG_MP1_620_010>[{i Hex5}]: Man, I\'m good at this!', bank = 'XGG', cue = 'XGG_Hex5_MP1_04627'},
     {text = '<LOC XGG_MP1_630_010>[{i Hex5}]: Goodbye!', bank = 'XGG', cue = 'XGG_Hex5_MP1_04628'},
     {text = '<LOC XGG_MP1_640_010>[{i Hex5}]: Don\'t worry, it\'ll be over soon.', bank = 'XGG', cue = 'XGG_Hex5_MP1_04629'},
-    
+
 --    {text = '<LOC MP_Taunt_0033>', bank = '', cue = ''},
 }
 
@@ -98,7 +98,7 @@ function RecieveAITaunt(sender, msg)
             StopSound(prevHandle)
             prevHandle = PlayVoice(Sound({Cue = taunt.cue, Bank = taunt.bank}))
             import('/lua/ui/game/chat.lua').ReceiveChat(sender, {Chat = true, text = LOC(taunt.text), to = "all", aisender = msg.aisender})
-		elseif taunt then
+        elseif taunt then
             StopSound(prevHandle)
             prevHandle = PlayVoice(Sound({Cue = taunt.cue, Bank = taunt.bank}))
             import('/lua/ui/game/chat.lua').ReceiveChat(sender, {Chat = true, text = LOC(taunt.text), to = "all"})
@@ -111,10 +111,10 @@ function Init()
 end
 function SendTaunt(tauntIndex, sender)
     if sender then
-		AIChatS.AISendChatMessage(nil, {Taunt = true, data = tauntIndex, aisender = sender})
-	else
-		SessionSendChatMessage({Taunt = true, data = tauntIndex})
-	end
+        AIChatS.AISendChatMessage(nil, {Taunt = true, data = tauntIndex, aisender = sender})
+    else
+        SessionSendChatMessage({Taunt = true, data = tauntIndex})
+    end
 end
 
 -- if this returns true, taunt found and handled, else return false so chat handling can continue
@@ -123,11 +123,11 @@ function CheckForAndHandleTaunt(text, sender)
     if (string.len(text) > 1) and (string.sub(text, 1, 1) == "/") then
         local tauntIndex = tonumber(string.sub(text, 2))
         if tauntIndex and taunts[tauntIndex] then
-			if sender then
-				SendTaunt(tauntIndex, sender)
-			else
-				SendTaunt(tauntIndex)
-			end
+            if sender then
+                SendTaunt(tauntIndex, sender)
+            else
+                SendTaunt(tauntIndex)
+            end
             return true
         end
     end

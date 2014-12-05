@@ -1,11 +1,11 @@
-#*****************************************************************************
-#* File: lua/modules/ui/game/commandmode.lua
-#* Author: Chris Blackwell
-#* Summary: Manages the current command mode, which determines what action
-#* the mouse will take when next clicked in the world
-#*
-#* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#*****************************************************************************
+--*****************************************************************************
+--* File: lua/modules/ui/game/commandmode.lua
+--* Author: Chris Blackwell
+--* Summary: Manages the current command mode, which determines what action
+--* the mouse will take when next clicked in the world
+--*
+--* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--*****************************************************************************
 local Dragger = import('/lua/maui/dragger.lua').Dragger
 local Construction = import('/lua/ui/game/construction.lua')
 local UIMain = import('/lua/ui/uimain.lua')
@@ -15,7 +15,7 @@ local commandMeshResources = import('/lua/ui/game/commandmeshes.lua').commandMes
 --[[
  THESE TABLES ARE NOT ACTUALLY USED IN SCRIPT. Just here for reference
 
- # these are the strings which represent a command mode
+ -- these are the strings which represent a command mode
  commandModes = {
      "order",
      "build",

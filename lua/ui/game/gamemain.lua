@@ -221,7 +221,7 @@ function CreateUI(isReplay)
     Prefetcher:Update(prefetchTable)
 
 
-    import("/modules/displayrings.lua").Init()	--#added for acu and engineer build radius ui mod
+    import("/modules/displayrings.lua").Init()    ----added for acu and engineer build radius ui mod
     if SessionIsReplay() then
         lastObserving = true
         import('/lua/ui/game/economy.lua').ToggleEconPanel(false)

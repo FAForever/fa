@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
-            'Torso',        
+            'Torso',
             'AttachPoint',
         },
     },
@@ -601,7 +601,7 @@ UnitBlueprint {
             HelpText = '<LOC ual0301_NanoCombat_help>Support Armored Command Unit. Enhanced during construction with the reacton refractor and nano-repair system enhancements.',
             SortCategory = 'SORTOTHER',
             UnitName = '<LOC ual0301_NanoCombat_name>SACU (Nano Combatant preset)',
-        }, 
+        },
         Rambo = {
             BuildIconSortPriority = 35,
             Description = '<LOC ual0301_Rambo_desc>Support Armored Command Unit (Rambo preset)',

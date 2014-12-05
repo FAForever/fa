@@ -148,7 +148,7 @@ CANTorpedoLauncherWeapon = Class(DefaultProjectileWeapon) {
 
 CANNaniteTorpedoWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {
-		'/effects/emitters/default_muzzle_flash_01_emit.bp',
+        '/effects/emitters/default_muzzle_flash_01_emit.bp',
         '/effects/emitters/default_muzzle_flash_02_emit.bp',
         '/effects/emitters/torpedo_underwater_launch_01_emit.bp',
     },
@@ -215,18 +215,18 @@ CIFCommanderDeathWeapon = Class(BareBonesWeapon) {
 }
 
 CDFRocketIridiumWeapon = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = {'/effects/emitters/muzzle_flash_01_emit.bp',},
+    FxMuzzleFlash = {'/effects/emitters/muzzle_flash_01_emit.bp',},
 }
 
 CDFRocketIridiumWeapon02 = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = {
-	    '/effects/emitters/cybran_hoplight_muzzle_smoke_01_emit.bp',
-	    '/effects/emitters/muzzle_flash_01_emit.bp',
-	},
+    FxMuzzleFlash = {
+        '/effects/emitters/cybran_hoplight_muzzle_smoke_01_emit.bp',
+        '/effects/emitters/muzzle_flash_01_emit.bp',
+    },
 }
 
 CIFMissileCorsairWeapon = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = {'/effects/emitters/muzzle_flash_01_emit.bp',},
+    FxMuzzleFlash = {'/effects/emitters/muzzle_flash_01_emit.bp',},
 }
 
 CDFLaserPulseLightWeapon = Class(DefaultProjectileWeapon) {
@@ -243,24 +243,24 @@ CDFLaserHeavyWeapon02 = Class(DefaultProjectileWeapon) {
 
 CDFLaserDisintegratorWeapon01 = Class(DefaultProjectileWeapon) {
     FxChargeMuzzleFlash = {
-		'/effects/emitters/disintegrator_muzzle_charge_01_emit.bp',
-		'/effects/emitters/disintegrator_muzzle_charge_02_emit.bp',
+        '/effects/emitters/disintegrator_muzzle_charge_01_emit.bp',
+        '/effects/emitters/disintegrator_muzzle_charge_02_emit.bp',
         '/effects/emitters/disintegrator_muzzle_charge_05_emit.bp',
     },
     FxMuzzleFlash = {
-		'/effects/emitters/disintegrator_muzzle_flash_01_emit.bp',
-		'/effects/emitters/disintegrator_muzzle_flash_02_emit.bp',
-		'/effects/emitters/disintegrator_muzzle_flash_03_emit.bp',
-	},
+        '/effects/emitters/disintegrator_muzzle_flash_01_emit.bp',
+        '/effects/emitters/disintegrator_muzzle_flash_02_emit.bp',
+        '/effects/emitters/disintegrator_muzzle_flash_03_emit.bp',
+    },
 }
 
 CDFLaserDisintegratorWeapon02 = Class(DefaultProjectileWeapon) {
     FxChargeMuzzleFlash = {
-		'/effects/emitters/disintegrator_muzzle_charge_03_emit.bp',
+        '/effects/emitters/disintegrator_muzzle_charge_03_emit.bp',
         '/effects/emitters/disintegrator_muzzle_charge_04_emit.bp',
     },
     FxMuzzleFlash = {
-		'/effects/emitters/disintegrator_muzzle_flash_04_emit.bp',
+        '/effects/emitters/disintegrator_muzzle_flash_04_emit.bp',
         '/effects/emitters/disintegrator_muzzle_flash_05_emit.bp',
     },
 }
@@ -268,12 +268,12 @@ CDFLaserDisintegratorWeapon02 = Class(DefaultProjectileWeapon) {
 CDFHeavyDisintegratorWeapon = Class(DefaultProjectileWeapon) {
     FxChargeMuzzleFlash = {},
     FxMuzzleFlash = {
-		'/effects/emitters/disintegratorhvy_muzzle_flash_01_emit.bp',
-		'/effects/emitters/disintegratorhvy_muzzle_flash_02_emit.bp',
-		'/effects/emitters/disintegratorhvy_muzzle_flash_03_emit.bp',
-		'/effects/emitters/disintegratorhvy_muzzle_flash_04_emit.bp',
-		'/effects/emitters/disintegratorhvy_muzzle_flash_05_emit.bp',
-	},
+        '/effects/emitters/disintegratorhvy_muzzle_flash_01_emit.bp',
+        '/effects/emitters/disintegratorhvy_muzzle_flash_02_emit.bp',
+        '/effects/emitters/disintegratorhvy_muzzle_flash_03_emit.bp',
+        '/effects/emitters/disintegratorhvy_muzzle_flash_04_emit.bp',
+        '/effects/emitters/disintegratorhvy_muzzle_flash_05_emit.bp',
+    },
 }
 
 CAAAutocannon = Class(DefaultProjectileWeapon) {
@@ -288,7 +288,7 @@ CAANanoDartWeapon = Class(DefaultProjectileWeapon) {
 
 CAABurstCloudFlakArtilleryWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {
-		'/effects/emitters/default_muzzle_flash_01_emit.bp',
+        '/effects/emitters/default_muzzle_flash_01_emit.bp',
         '/effects/emitters/default_muzzle_flash_02_emit.bp'
     },
     FxMuzzleFlashScale = 1.5,
@@ -315,7 +315,7 @@ CAABurstCloudFlakArtilleryWeapon = Class(DefaultProjectileWeapon) {
 }
 
 CAAMissileNaniteWeapon = Class(DefaultProjectileWeapon) {
-	-- Uses default muzzle flash
+    -- Uses default muzzle flash
 }
 
 CIFGrenadeWeapon = Class(DefaultProjectileWeapon) {
@@ -323,7 +323,7 @@ CIFGrenadeWeapon = Class(DefaultProjectileWeapon) {
 }
 
 CIFArtilleryWeapon = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = EffectTemplate.CArtilleryFlash01
+    FxMuzzleFlash = EffectTemplate.CArtilleryFlash01
 }
 
 CIFMissileStrategicWeapon = Class(DefaultProjectileWeapon) {
@@ -437,20 +437,20 @@ CKrilTorpedoLauncherWeapon = Class(DefaultProjectileWeapon) {
 }
 
 CMobileKamikazeBombWeapon = Class(KamikazeWeapon){
-	FxDeath = EffectTemplate.CMobileKamikazeBombExplosion,
+    FxDeath = EffectTemplate.CMobileKamikazeBombExplosion,
 
     OnFire = function(self)
-		local army = self.unit:GetArmy()
+        local army = self.unit:GetArmy()
         for k, v in self.FxDeath do
             CreateEmitterAtBone(self.unit,-2,army,v)
         end
         --CreateLightParticle( self.unit, -1, -1, 15, 10, 'flare_lens_add_02', 'ramp_red_10' )
-		KamikazeWeapon.OnFire(self)
+        KamikazeWeapon.OnFire(self)
     end,
 }
 
 CMobileKamikazeBombDeathWeapon = Class(BareBonesWeapon) {
-	FxDeath = EffectTemplate.CMobileKamikazeBombDeathExplosion,
+    FxDeath = EffectTemplate.CMobileKamikazeBombDeathExplosion,
 
     OnCreate = function(self)
         BareBonesWeapon.OnCreate(self)
@@ -462,12 +462,12 @@ CMobileKamikazeBombDeathWeapon = Class(BareBonesWeapon) {
     end,
 
     Fire = function(self)
-		local army = self.unit:GetArmy()
+        local army = self.unit:GetArmy()
         for k, v in self.FxDeath do
             CreateEmitterAtBone(self.unit,-2,army,v)
         end
         --CreateLightParticle( self.unit, -1, -1, 15, 10, 'flare_lens_add_02', 'ramp_red_10' )
-		local myBlueprint = self:GetBlueprint()
+        local myBlueprint = self:GetBlueprint()
         DamageArea(self.unit, self.unit:GetPosition(), myBlueprint.DamageRadius, myBlueprint.Damage, myBlueprint.DamageType or 'Normal', myBlueprint.DamageFriendly or false)
     end,
 }

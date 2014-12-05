@@ -27,7 +27,7 @@ UnitBlueprint {
             Bank = 'XSB',
             Cue = 'XSB2305_Nuke_Charge',
             LodCutoff = 'UnitMove_LodCutoff'
-        },                
+        },
         StartMove = Sound {
             Bank = 'XSS',
             Cue = 'XSS0302_Move_Start',

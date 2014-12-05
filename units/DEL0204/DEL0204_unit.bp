@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
-            'Body',        
+            'Body',
             'DEL0204',
         },
     },
@@ -58,7 +58,7 @@ UnitBlueprint {
         'SHOWATTACKRETICLE',
         'OVERLAYDIRECTFIRE',
     },
-    CollisionOffsetX = -0.03,    
+    CollisionOffsetX = -0.03,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',

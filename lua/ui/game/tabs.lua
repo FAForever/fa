@@ -162,7 +162,7 @@ local menus = {
                 label = 'Show Game Info',
                 tooltip = 'Show the settings of this game',
             },
-			{
+            {
                 action = 'Options',
                 label = '<LOC _Options>',
                 tooltip = 'esc_options',
@@ -204,7 +204,7 @@ local actions = {
         import('/lua/ui/dialogs/replay.lua').CreateDialog(GetFrame(0), true)
     end,
     EndSPGame = function()
-        UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0001>Are you sure you'd like to quit?", 
+        UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0001>Are you sure you'd like to quit?",
             "<LOC _Yes>", EndGame,
             "<LOC _Save>", EndGameSaveWindow,
             "<LOC _No>", nil,
@@ -213,15 +213,15 @@ local actions = {
     end,
     EndMPGame = function()
         UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0001>Are you sure you'd like to quit?",
-        "<LOC _Yes>", EndGame, 
+        "<LOC _Yes>", EndGame,
         "<LOC _No>", nil,
             nil, nil,
             true,
             {escapeButton = 3, enterButton = 1, worldCover = true})
     end,
     RestartGame = function()
-        UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0002>Are you sure you'd like to restart?", 
-            "<LOC _Yes>", function() RestartSession() end, 
+        UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0002>Are you sure you'd like to restart?",
+            "<LOC _Yes>", function() RestartSession() end,
             "<LOC _No>", nil,
             nil, nil,
             true,
@@ -229,31 +229,31 @@ local actions = {
     end,
     RestartReplay = function()
         local replayFilename = GetFrontEndData('replay_filename')
-        UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0002>Are you sure you'd like to restart?", 
-            "<LOC _Yes>", function() LaunchReplaySession(replayFilename) end, 
+        UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0002>Are you sure you'd like to restart?",
+            "<LOC _Yes>", function() LaunchReplaySession(replayFilename) end,
             "<LOC _No>", nil)
     end,
     ExitSPGame = function()
-        UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0003>Are you sure you'd like to exit?", 
+        UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0003>Are you sure you'd like to exit?",
             "<LOC _Yes>", function()
                 ExitApplication()
-            end, 
+            end,
             "<LOC _Save>", ExitGameSaveWindow,
             "<LOC _No>", nil,
             true,
             {escapeButton = 3, enterButton = 1, worldCover = true})
     end,
     ExitMPGame = function()
-        UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0003>Are you sure you'd like to exit?", 
+        UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0003>Are you sure you'd like to exit?",
             "<LOC _Yes>", function()
                 ExitApplication()
-            end, 
+            end,
             "<LOC _No>", nil,
             nil, nil,
             true,
             {escapeButton = 2, enterButton = 1, worldCover = true})
     end,
-	ShowGameInfo = function()
+    ShowGameInfo = function()
         ToggleGameInfo()
     end,
     Return = function()
@@ -285,7 +285,7 @@ function EndGameSaveWindow()
             EndGame()
         end
     end
-    import('/lua/ui/dialogs/saveload.lua').CreateSaveDialog(GetFrame(0), 
+    import('/lua/ui/dialogs/saveload.lua').CreateSaveDialog(GetFrame(0),
         SaveKillBehavior, saveType)
 end
 
@@ -301,7 +301,7 @@ function ExitGameSaveWindow()
             ExitApplication()
         end
     end
-    import('/lua/ui/dialogs/saveload.lua').CreateSaveDialog(GetFrame(0), 
+    import('/lua/ui/dialogs/saveload.lua').CreateSaveDialog(GetFrame(0),
         SaveKillBehavior, saveType)
 end
 
@@ -317,70 +317,70 @@ function CreateStretchBar(parent, topPiece)
     group.center = Bitmap(group)
     group.left = Bitmap(group)
     group.right = Bitmap(group)
-    
+
     LayoutHelpers.AtHorizontalCenterIn(group.center, group)
     LayoutHelpers.AtTopIn(group.center, group)
     LayoutHelpers.AtLeftIn(group.left, group)
     LayoutHelpers.AtTopIn(group.left, group)
     LayoutHelpers.AtRightIn(group.right, group)
     LayoutHelpers.AtTopIn(group.right, group)
-    
+
     if topPiece then
         group.centerLeft = Bitmap(group)
         group.centerLeft.Top:Set(function() return group.center.Top() + 8 end)
         group.centerLeft.Left:Set(group.left.Right)
         group.centerLeft.Right:Set(group.center.Left)
-        
+
         group.centerRight = Bitmap(group)
         group.centerRight.Top:Set(group.centerLeft.Top)
         group.centerRight.Left:Set(group.center.Right)
         group.centerRight.Right:Set(group.right.Left)
-        
+
         group.Width:Set(function() return group.right.Width() + group.left.Width() + group.center.Width() end)
     else
         group.center.Left:Set(group.left.Right)
         group.center.Right:Set(group.right.Left)
     end
-    
+
     group.Height:Set(function() return math.max(group.center.Height(), group.left.Height()) end)
-    
+
     group:DisableHitTest(true)
-    
+
     return group
 end
 
 function Create(parent)
     savedParent = parent
-    
+
     controls.parent = Group(savedParent)
     controls.parent.Depth:Set(100)
-    
+
     controls.bgTop = CreateStretchBar(controls.parent, true)
     controls.bgBottom = CreateStretchBar(controls.parent)
     controls.bgBottom.Width:Set(controls.bgTop.Width)
-    
+
     controls.collapseArrow = Checkbox(savedParent)
     Tooltip.AddCheckboxTooltip(controls.collapseArrow, 'menu_collapse')
-    
+
     controls.tabContainer = Group(controls.bgTop)
     controls.tabContainer:DisableHitTest()
-    
+
     local function CreateTab(data)
         local tab = Checkbox(controls.tabContainer)
         tab.Depth:Set(function() return controls.bgTop.Depth() + 10 end)
         tab.Data = data
         Tooltip.AddCheckboxTooltip(tab, data.tooltip)
-        
+
         if data.pause then
             tab.Glow = Bitmap(tab)
             LayoutHelpers.AtCenterIn(tab.Glow, tab)
             tab.Glow:DisableHitTest()
             tab.Glow:SetAlpha(0)
         end
-        
+
         return tab
     end
-    
+
     controls.tabs = {}
     for i, data in tabs do
         local index = i
@@ -389,7 +389,7 @@ function Create(parent)
             pauseBtn = controls.tabs[index]
         end
     end
-    
+
     SetLayout()
     CommonLogic()
 end
@@ -462,7 +462,7 @@ function CommonLogic()
         else
             tab.OnCheck = function(self, checked)
                 for _, altTab in controls.tabs do
-                    if altTab != self and not altTab.Data.pause then
+                    if altTab ~= self and not altTab.Data.pause then
                         altTab:SetCheck(false, true)
                     end
                 end
@@ -506,7 +506,7 @@ function BuildContent(contentID)
     local contentGroup = false
     if menus[contentID] then
         contentGroup = Group(controls.parent)
-        
+
         local function BuildButton(button)
             local btn = UIUtil.CreateButtonStd(contentGroup, '/game/medium-btn/medium', button.label, UIUtil.menuFontSize)
             btn.label:SetFont(UIUtil.factionFont, UIUtil.menuFontSize)
@@ -516,7 +516,7 @@ function BuildContent(contentID)
             LayoutHelpers.AtVerticalCenterIn(btn.label, btn, 4)
             return btn
         end
-        
+
         local tableID = 'singlePlayer'
         if HasCommandLineArg('/gpgnet') then
             tableID = 'gpgnet'
@@ -525,9 +525,9 @@ function BuildContent(contentID)
         elseif GameMain.GetReplayState() then
             tableID = 'replay'
         end
-        
+
         contentGroup.Buttons = {}
-        
+
         for index, buttonData in menus[contentID][tableID] do
             local i = index
             contentGroup.Buttons[i] = BuildButton(buttonData)
@@ -541,7 +541,7 @@ function BuildContent(contentID)
                 LayoutHelpers.Below(contentGroup.Buttons[i], contentGroup.Buttons[i-1])
             end
         end
-        
+
         controls.bgTop.widthOffset = 4
         contentGroup.Width:Set(contentGroup.Buttons[1].Width)
         contentGroup.Height:Set(function() return contentGroup.Buttons[1].Height() * table.getsize(contentGroup.Buttons) end)
@@ -549,9 +549,9 @@ function BuildContent(contentID)
         controls.bgTop.widthOffset = 30
         contentGroup = import('/lua/ui/game/'..contentID..'.lua').CreateContent(controls.parent)
     end
-    
+
     animationLock = true
-    
+
     contentGroup.Top:Set(function() return controls.bgTop.Bottom() + 20 end)
     LayoutHelpers.AtHorizontalCenterIn(contentGroup, controls.bgTop)
     contentGroup:SetAlpha(0, true)
@@ -563,9 +563,9 @@ function BuildContent(contentID)
         end
         self:SetAlpha(newAlpha, true)
     end
-    
+
     controls.contentGroup = contentGroup
-    
+
     CreateStretchBG()
     controls.bgTop:SetNeedsFrameUpdate(true)
     controls.bgTop.Time = 0
@@ -668,25 +668,25 @@ function CreateStretchBG()
     import(UIUtil.GetLayoutFilename('tabs')).LayoutStretchBG()
 end
 
-function DestroyStretchBG() 
+function DestroyStretchBG()
     controls.bgBottomLeftGlow:Destroy()
     controls.bgBottomLeftGlow = false
-    
+
     controls.bgTopLeftGlow:Destroy()
     controls.bgTopLeftGlow = false
-    
+
     controls.bgLeftStretch:Destroy()
     controls.bgLeftStretch = false
-    
+
     controls.bgBottomRightGlow:Destroy()
     controls.bgBottomRightGlow = false
-    
+
     controls.bgTopRightGlow:Destroy()
     controls.bgTopRightGlow = false
-    
+
     controls.bgRightStretch:Destroy()
     controls.bgRightStretch = false
-    
+
     controls.bgMidStretch:Destroy()
     controls.bgMidStretch = false
 end
@@ -701,7 +701,7 @@ function ToggleTab(tabID)
             break
         end
     end
-    if tabControl and not tabControl:IsDisabled() then  
+    if tabControl and not tabControl:IsDisabled() then
         tabControl:OnClick()
     end
 end
@@ -752,9 +752,9 @@ end
 
 function ToggleGameInfo()
     --LOG("XINNOinfo")
-	local ItemList = import('/lua/maui/itemlist.lua').ItemList
-	--
-	local dialog = Group(GetFrame(0))
+    local ItemList = import('/lua/maui/itemlist.lua').ItemList
+    --
+    local dialog = Group(GetFrame(0))
         LayoutHelpers.AtCenterIn(dialog, GetFrame(0))
         dialog.Depth:Set(999) -- :GetTopmostDepth() + 1
     local background = Bitmap(dialog, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby-withoutBG.dds'))
@@ -765,154 +765,154 @@ function ToggleGameInfo()
         dialog2.Width:Set(background.Width)--536)537--268
         dialog2.Height:Set(background.Height)--400)401
         LayoutHelpers.AtCenterIn(dialog2, dialog)
-	-----------
+    -----------
     -- Title --
     local text0 = UIUtil.CreateText(dialog2, 'Game Info :', 17, 'Arial')
         text0:SetColor('B9BFB9') -- 808080
         text0:SetDropShadow(true)
         LayoutHelpers.AtHorizontalCenterIn(text0, dialog2, 0)
         LayoutHelpers.AtTopIn(text0, dialog2, 10)
-	--------------------
+    --------------------
     -- OK button --
-	local OkButton = UIUtil.CreateButtonStd2PNG(dialog2, '/BUTTON/medium/', "Ok", 12, -1)
+    local OkButton = UIUtil.CreateButtonStd2PNG(dialog2, '/BUTTON/medium/', "Ok", 12, -1)
         LayoutHelpers.AtHorizontalCenterIn(OkButton, dialog2, 0)
         LayoutHelpers.AtBottomIn(OkButton, dialog2, 10)
         OkButton.OnClick = function(self)
-			dialog:Destroy()
-			--infoBtn:Enable()
+            dialog:Destroy()
+            --infoBtn:Enable()
         end
-	------------------
+    ------------------
     -- Preset List --
-	PresetList = ItemList(dialog2)
-		PresetList:SetFont(UIUtil.bodyFont, 11)
-		PresetList:SetColors(UIUtil.fontColor, "00000000", "FF000000",  UIUtil.highlightColor, "ffbcfffe")
-		--PresetList:ShowMouseoverItem(true)
-		PresetList.Width:Set(537-20-19)--232)--210)
-		PresetList.Height:Set(310)
-		--LayoutHelpers.DepthOverParent(PresetList, dialog2, 10)
-		LayoutHelpers.AtLeftIn(PresetList, dialog2, 10)
+    PresetList = ItemList(dialog2)
+        PresetList:SetFont(UIUtil.bodyFont, 11)
+        PresetList:SetColors(UIUtil.fontColor, "00000000", "FF000000",  UIUtil.highlightColor, "ffbcfffe")
+        --PresetList:ShowMouseoverItem(true)
+        PresetList.Width:Set(537-20-19)--232)--210)
+        PresetList.Height:Set(310)
+        --LayoutHelpers.DepthOverParent(PresetList, dialog2, 10)
+        LayoutHelpers.AtLeftIn(PresetList, dialog2, 10)
         LayoutHelpers.AtTopIn(PresetList, dialog2, 38)
-		UIUtil.CreateVertScrollbarFor2(PresetList)
-	------------
+        UIUtil.CreateVertScrollbarFor2(PresetList)
+    ------------
     -- Script --
-	
-	-- Configurations = { #Thermo 2vs2
-		-- standard = {
-			-- customprops = {pas regarder}
-			-- teams = {
-				-- [1] = {
-					-- name : FFA
-					-- armies = {
-						-- 1 : ARMY_1
-						-- 2 : ARMY_2
-						-- 3 : ARMY_3
-						-- 4 : ARMY_4
-						-- 5 : ARMY_5
-						-- 6 : ARMY_6
-						-- 7 : ARMY_7
-						-- 8 : ARMY_8
-					-- }
-				-- }
-			-- }
-		-- }
-	-- }
-	
-	-- Options = {
-		-- RestrictedCategories = {}
-		-- Ratings = {
-			-- Xinnony : 299
-		-- }
-		-- ... tout les réglage d'option de scenario
-	-- }
-	
-	--  size = { #Thermo, taille de la carte
-		-- 1 : 512
-		-- 2 : 512
-	-- }
-	---------------
-	-- name : Battle of Thermopylae OFFICIAL
-	-- Options.ScenarioFile : /maps/Battle of Thermopulae OFFICIAL/Battle fo Thermopylae OFFICIAL_scenario.lua
-	-- map_version : 3
-	-- type : skirmish
-	--
-	-- Mods : {pas ici, dans une autres commande TABLE}
-	--
-	-- RestrictedCategories : {}
-	--
-	-- ... other options ...
-	---------------
-	PresetList:AddItem('Scenario Info :')
-	if SessionGetScenarioInfo() then
-		for k, v in SessionGetScenarioInfo() do
-			if k == 'name' then
-				PresetList:AddItem('- Name : '..tostring(v))
-			--elseif k == 'Options.ScenarioFile' then
-				--PresetList:AddItem('- Scenario : '..'(not implement)')
-			elseif k == 'map_version' then
-				PresetList:AddItem('- Map version : '..tostring(v))
-			elseif k == 'type' then
-				PresetList:AddItem('- Type : '..tostring(v))
-			end
-		end
-		if SessionGetScenarioInfo().Options['Rule'] then
-			local tmptext = SessionGetScenarioInfo().Options['Rule']
-			wrapped = import('/lua/maui/text.lua').WrapText(tmptext, 232, function(curText) return PresetList:GetStringAdvance(curText) end)
-			for i, line in wrapped do
-				if i == 1 then
-					PresetList:AddItem('- '..line)
-				else
-					PresetList:AddItem(line)
-				end
-			end
-		end
-		PresetList:AddItem('')
-	end
-	if __active_mods then
-		PresetList:AddItem('Mods :')
-		for i, m in __active_mods do
-			--PresetList:AddItem('- MODi : '..tostring(i)) -- Nombre de MODs
-			--PresetList:AddItem('- MODm : '..tostring(m)) -- Table
-			local tmp = ''
-			for v, r in m do
-				if v == 'name' then
-					tmp = tostring(r)
-				elseif v == 'ui_only' then
-					if r == true then
-						tmp = tmp..' [Mod UI]'
-						--if v == 'description' then PresetList:AddItem('- '..tostring(v)..' : '..tostring(r)) end
-						--if v == 'uid' then PresetList:AddItem('- '..tostring(v)..' : '..tostring(r)) end
-						--if v == 'version' then PresetList:AddItem('- '..tostring(v)..' : '..tostring(r)) end
-					else
-						--if v == 'description' then PresetList:AddItem('- '..tostring(v)..' : '..tostring(r)) end
-						--if v == 'uid' then PresetList:AddItem('- '..tostring(v)..' : '..tostring(r)) end
-						--if v == 'version' then PresetList:AddItem('- '..tostring(v)..' : '..tostring(r)) end
-					end
-				end
-			end
-			PresetList:AddItem('- '..tmp)
-		end
-		PresetList:AddItem('')
-	end
-	if SessionGetScenarioInfo().Options.RestrictedCategories then
-		PresetList:AddItem('Unit Restrictions :')
-		for k, v in SessionGetScenarioInfo().Options.RestrictedCategories do
-			PresetList:AddItem('- '..tostring(v))
-		end
-		PresetList:AddItem('')
-	end
-	if SessionGetScenarioInfo().Options then
-		PresetList:AddItem('Scenario Options :')
-		for k, v in SessionGetScenarioInfo().Options do
-			if k == 'ScenarioFile' then
-			elseif k == 'ReplayID' then
-			elseif k == 'Rule' then
-			elseif k == 'Ratings' then
-			elseif k == 'RestrictedCategories' then
-			else
-				PresetList:AddItem('- '..tostring(k)..' : '..tostring(v))
-			end
-		end
-	end
+
+    -- Configurations = { --Thermo 2vs2
+        -- standard = {
+            -- customprops = {pas regarder}
+            -- teams = {
+                -- [1] = {
+                    -- name : FFA
+                    -- armies = {
+                        -- 1 : ARMY_1
+                        -- 2 : ARMY_2
+                        -- 3 : ARMY_3
+                        -- 4 : ARMY_4
+                        -- 5 : ARMY_5
+                        -- 6 : ARMY_6
+                        -- 7 : ARMY_7
+                        -- 8 : ARMY_8
+                    -- }
+                -- }
+            -- }
+        -- }
+    -- }
+
+    -- Options = {
+        -- RestrictedCategories = {}
+        -- Ratings = {
+            -- Xinnony : 299
+        -- }
+        -- ... tout les réglage d'option de scenario
+    -- }
+
+    --  size = { --Thermo, taille de la carte
+        -- 1 : 512
+        -- 2 : 512
+    -- }
+    ---------------
+    -- name : Battle of Thermopylae OFFICIAL
+    -- Options.ScenarioFile : /maps/Battle of Thermopulae OFFICIAL/Battle fo Thermopylae OFFICIAL_scenario.lua
+    -- map_version : 3
+    -- type : skirmish
+    --
+    -- Mods : {pas ici, dans une autres commande TABLE}
+    --
+    -- RestrictedCategories : {}
+    --
+    -- ... other options ...
+    ---------------
+    PresetList:AddItem('Scenario Info :')
+    if SessionGetScenarioInfo() then
+        for k, v in SessionGetScenarioInfo() do
+            if k == 'name' then
+                PresetList:AddItem('- Name : '..tostring(v))
+            --elseif k == 'Options.ScenarioFile' then
+                --PresetList:AddItem('- Scenario : '..'(not implement)')
+            elseif k == 'map_version' then
+                PresetList:AddItem('- Map version : '..tostring(v))
+            elseif k == 'type' then
+                PresetList:AddItem('- Type : '..tostring(v))
+            end
+        end
+        if SessionGetScenarioInfo().Options['Rule'] then
+            local tmptext = SessionGetScenarioInfo().Options['Rule']
+            wrapped = import('/lua/maui/text.lua').WrapText(tmptext, 232, function(curText) return PresetList:GetStringAdvance(curText) end)
+            for i, line in wrapped do
+                if i == 1 then
+                    PresetList:AddItem('- '..line)
+                else
+                    PresetList:AddItem(line)
+                end
+            end
+        end
+        PresetList:AddItem('')
+    end
+    if __active_mods then
+        PresetList:AddItem('Mods :')
+        for i, m in __active_mods do
+            --PresetList:AddItem('- MODi : '..tostring(i)) -- Nombre de MODs
+            --PresetList:AddItem('- MODm : '..tostring(m)) -- Table
+            local tmp = ''
+            for v, r in m do
+                if v == 'name' then
+                    tmp = tostring(r)
+                elseif v == 'ui_only' then
+                    if r == true then
+                        tmp = tmp..' [Mod UI]'
+                        --if v == 'description' then PresetList:AddItem('- '..tostring(v)..' : '..tostring(r)) end
+                        --if v == 'uid' then PresetList:AddItem('- '..tostring(v)..' : '..tostring(r)) end
+                        --if v == 'version' then PresetList:AddItem('- '..tostring(v)..' : '..tostring(r)) end
+                    else
+                        --if v == 'description' then PresetList:AddItem('- '..tostring(v)..' : '..tostring(r)) end
+                        --if v == 'uid' then PresetList:AddItem('- '..tostring(v)..' : '..tostring(r)) end
+                        --if v == 'version' then PresetList:AddItem('- '..tostring(v)..' : '..tostring(r)) end
+                    end
+                end
+            end
+            PresetList:AddItem('- '..tmp)
+        end
+        PresetList:AddItem('')
+    end
+    if SessionGetScenarioInfo().Options.RestrictedCategories then
+        PresetList:AddItem('Unit Restrictions :')
+        for k, v in SessionGetScenarioInfo().Options.RestrictedCategories do
+            PresetList:AddItem('- '..tostring(v))
+        end
+        PresetList:AddItem('')
+    end
+    if SessionGetScenarioInfo().Options then
+        PresetList:AddItem('Scenario Options :')
+        for k, v in SessionGetScenarioInfo().Options do
+            if k == 'ScenarioFile' then
+            elseif k == 'ReplayID' then
+            elseif k == 'Rule' then
+            elseif k == 'Ratings' then
+            elseif k == 'RestrictedCategories' then
+            else
+                PresetList:AddItem('- '..tostring(k)..' : '..tostring(v))
+            end
+        end
+    end
 end
 
 function CreateScreenGlow()
@@ -923,26 +923,26 @@ function CreateScreenGlow()
         pauseGlow.Bottom = Bitmap(pauseGlow.Top, UIUtil.SkinnableFile('/game/pause-indicator/bottom.dds'))
         pauseGlow.Center = Bitmap(pauseGlow.Top)
         pauseGlow.Center:SetSolidColor('55000000')
-        
+
         pauseGlow.Top.Top:Set(GetFrame(0).Top)
         pauseGlow.Top.Left:Set(GetFrame(0).Left)
         pauseGlow.Top.Right:Set(GetFrame(0).Right)
-        
+
         pauseGlow.Left.Top:Set(GetFrame(0).Top)
         pauseGlow.Left.Left:Set(GetFrame(0).Left)
         pauseGlow.Left.Bottom:Set(GetFrame(0).Bottom)
-        
+
         pauseGlow.Right.Top:Set(GetFrame(0).Top)
         pauseGlow.Right.Right:Set(GetFrame(0).Right)
         pauseGlow.Right.Bottom:Set(GetFrame(0).Bottom)
-        
+
         pauseGlow.Bottom.Left:Set(GetFrame(0).Left)
         pauseGlow.Bottom.Right:Set(GetFrame(0).Right)
         pauseGlow.Bottom.Bottom:Set(GetFrame(0).Bottom)
-        
+
         LayoutHelpers.FillParent(pauseGlow.Center, GetFrame(0))
         pauseGlow.Center.Depth:Set(function() return pauseGlow.Top.Depth() - 1 end)
-        
+
         pauseGlow.Top:DisableHitTest(true)
     end
     pauseGlow.Top:SetNeedsFrameUpdate(true)
@@ -978,7 +978,7 @@ function ToggleScore()
 end
 
 function ToggleTabDisplay(state)
-    if import('/lua/ui/game/gamemain.lua').gameUIHidden and state != nil then
+    if import('/lua/ui/game/gamemain.lua').gameUIHidden and state ~= nil then
         return
     end
     if UIUtil.GetAnimationPrefs() then
@@ -1099,14 +1099,14 @@ function UpdateModeDisplay()
         controls.modeDisplay = Bitmap(controls.parent, UIUtil.SkinnableFile('/dialogs/time-units-tabs/energy_bmp.dds'))
         LayoutHelpers.Below(controls.modeDisplay, controls.bgBottom, -12)
         LayoutHelpers.AtHorizontalCenterIn(controls.modeDisplay, controls.bgBottom)
-        
+
         controls.modeDisplay.modes = Group(controls.modeDisplay)
         controls.modeDisplay.modes.Height:Set(1)
         local prevControl = false
         local width = 0
         for i, v in modes do
             local bg = Bitmap(controls.modeDisplay, UIUtil.SkinnableFile('/dialogs/time-units-tabs/panel-tracking_bmp_m.dds'))
-            
+
             if not v.callback then
                 bg.text = UIUtil.CreateText(bg, LOC(v.label), 18, UIUtil.bodyFont)
                 LayoutHelpers.AtLeftIn(bg.text, bg)
@@ -1118,10 +1118,10 @@ function UpdateModeDisplay()
                 LayoutHelpers.AtLeftIn(bg.btn, bg)
                 LayoutHelpers.AtVerticalCenterIn(bg.btn, bg, -3)
                 bg.btn.OnClick = v.callback
-                
+
                 bg.Width:Set(bg.btn.Width)
             end
-            
+
             if prevControl then
                 bg.seperator = Bitmap(bg, UIUtil.SkinnableFile('/dialogs/time-units-tabs/panel-tracking_bmp_d.dds'))
                 LayoutHelpers.LeftOf(bg.seperator, bg)
@@ -1143,7 +1143,7 @@ function UpdateModeDisplay()
         controls.modeDisplay.minCap.Top:Set(function() return controls.modeDisplay.modes.Top() - 3 end)
         controls.modeDisplay.maxCap.Left:Set(controls.modeDisplay.modes.Right)
         controls.modeDisplay.maxCap.Top:Set(controls.modeDisplay.minCap.Top)
-        
+
         controls.modeDisplay:DisableHitTest()
         controls.modeDisplay.minCap:DisableHitTest()
         controls.modeDisplay.maxCap:DisableHitTest()

@@ -1,12 +1,12 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
-            'URL0402',        
+            'URL0402',
             'Left_Turret',
             'Right_Turret',
-            'Center_Turret',       
+            'Center_Turret',
             'Center_Turret_Barrel',
-            'Center_Turret_Muzzle',             
+            'Center_Turret_Muzzle',
         },
     },
     Audio = {
@@ -220,7 +220,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 260000,
         BuildCostMass = 19000,
-        BuildTime = 15750, 
+        BuildTime = 15750,
         MaintenanceConsumptionPerSecondEnergy = 400,
     },
     General = {

@@ -19,7 +19,7 @@ defaultKeyMap = {
     ['Alt-DownArrow']       = 'switch_layout_down',
     ['Alt-LeftArrow']       = 'switch_skin_down',
     ['Alt-RightArrow']      = 'switch_skin_up',
- 
+
     ['F1']                  = 'toggle_key_bindings',
     ['F2']                  = 'toggle_score_screen',
     ['F3']                  = 'quick_save',
@@ -31,7 +31,7 @@ defaultKeyMap = {
     ['F10']                 = 'toggle_main_menu',
     ['F11']                 = 'toggle_disconnect_screen',
     ['F12']                 = 'show_objective_screen',
-    
+
     ['1']                   = 'group1',
     ['2']                   = 'group2',
     ['3']                   = 'group3',
@@ -45,7 +45,7 @@ defaultKeyMap = {
     ['Ctrl-1']              = 'set_group1',
     ['Ctrl-2']              = 'set_group2',
     ['Ctrl-3']              = 'set_group3',
-    ['Ctrl-4']              = 'set_group4', 
+    ['Ctrl-4']              = 'set_group4',
     ['Ctrl-5']              = 'set_group5',
     ['Ctrl-6']              = 'set_group6',
     ['Ctrl-7']              = 'set_group7',

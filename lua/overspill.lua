@@ -25,7 +25,7 @@ function GetOverlappingShields(source)
         if v and IsUnit(v) and not v:IsDead()
              and v.MyShield and v.MyShield:IsUp()
              and v.MyShield.Size and v.MyShield.Size > 0
-             and source.Owner != v then
+             and source.Owner ~= v then
             vspos = v.MyShield:GetCachePosition()
             oOverlapRadius = 0.98 * (v.MyShield.Size / 2)
             -- If "source" and "v" are more than this far apart then the shields don't overlap,

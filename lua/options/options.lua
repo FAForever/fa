@@ -753,9 +753,9 @@ options = {
                     aamax = 0
                     aamed = 0
                     if 0 < table.getn(aaoptions) then
-						aahigh = aaoptions[table.getn(aaoptions)]
-						aamed = aaoptions[math.ceil(table.getn(aaoptions)/2)]
-					end
+                        aahigh = aaoptions[table.getn(aaoptions)]
+                        aamed = aaoptions[math.ceil(table.getn(aaoptions)/2)]
+                    end
 
                     if 0 == value then
                         logic.SetValue('fidelity',0,true)
@@ -877,8 +877,8 @@ options = {
                 custom = {
                     states = {
                         {text = "<LOC OPTIONS_0029>Off", key = 0},
-                        ## the remaining values are populated at runtime from device caps
-                        ## what follows is just an example of the data which will be encountered
+                        ---- the remaining values are populated at runtime from device caps
+                        ---- what follows is just an example of the data which will be encountered
                         {text =  "2", key =  2},
                         {text =  "4", key =  4},
                         {text =  "8", key =  8},
@@ -1093,7 +1093,7 @@ options = {
 }
 
 extraOpts = {
-	{
+    {
         default = 1,
         label = "<LOC lobui_0708>- Ladder Game -",
         help = "<LOC lobui_0706>If enabled, the game will count as Ranked Game for www.fa-ladder.com website",
@@ -1105,7 +1105,7 @@ extraOpts = {
                 help = "<LOC lobui_0604>No Ranked Mode",
                 key = 'Off',
             },
-			{
+            {
                 text = "<LOC _Yes>Yes",
                 help = "<LOC lobui_0605>Ranked Mode set",
                 key = 'On',
@@ -1131,7 +1131,7 @@ extraOpts = {
             },
         },
     },
-	{
+    {
         default = 1,
         label = "<LOC lobui_0720>Score",
         help = "<LOC lobui_0721>Set score on or off during the game",

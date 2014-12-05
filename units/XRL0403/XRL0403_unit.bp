@@ -9,7 +9,7 @@ UnitBlueprint {
             'Right_Leg01_B01',
             'AA_Turret',
             'Right_Turret_Barrel',
-            'Left_Turret_Barrel',            
+            'Left_Turret_Barrel',
         },
     },
     Audio = {

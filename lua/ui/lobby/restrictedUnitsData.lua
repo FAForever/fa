@@ -5,11 +5,11 @@
 --      name = "name to display in list",
 --      tooltip = tooltipID,
 --  }
--- 
+--
 -- You can get the UnitID here : http://content.faforever.com/faf/unitsDB/
 -----------------------------------------------------------------------------------------
 
-restrictedUnits = {    
+restrictedUnits = {
     T1 = {
         categories = {"TECH1"},
         name = "<LOC restricted_units_data_0000>No Tech 1",
@@ -177,7 +177,7 @@ sortOrder = {
     "AEON",
     "SERAPHIM",
     "NUKE",
-    "GAMEENDERS",    
+    "GAMEENDERS",
     "BUBBLES",
     "INTEL",
     "SUPCOM",
@@ -191,7 +191,7 @@ sortOrder = {
     "ENGISTATION",
     "SALVAMAVOSCATH",
     "PARAGON",
-    "SATELLITE",    
+    "SATELLITE",
     "TELE",
     "BILLY",
     "EYE",

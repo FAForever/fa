@@ -389,15 +389,15 @@ StructureUnit = Class(Unit) {
         -- Does the unit have any adjacency buffs to use?
         local adjBuffs = self:GetBlueprint().Adjacency
         if not adjBuffs then return end
- 
+
         -- Apply each buff needed to you and/or adjacent unit
         for k,v in AdjacencyBuffs[adjBuffs] do
             Buff.ApplyBuff(adjacentUnit, v, self)
         end
-        
+
         -- Keep track of which units you are adjacent to
         table.insert(self.AdjacentUnits, adjacentUnit)
-        
+
         self:RequestRefreshUI()
         adjacentUnit:RequestRefreshUI()
      end,
@@ -405,7 +405,7 @@ StructureUnit = Class(Unit) {
     --When we're not adjacent, try to remove all the possible bonuses
     OnNotAdjacentTo = function(self, adjacentUnit)
         local adjBuffs = self:GetBlueprint().Adjacency
-        
+
         if adjBuffs and AdjacencyBuffs[adjBuffs] then
             for k,v in AdjacencyBuffs[adjBuffs] do
                 if Buff.HasBuff(adjacentUnit, v) then
@@ -414,7 +414,7 @@ StructureUnit = Class(Unit) {
             end
         end
         self:DestroyAdjacentEffects()
-        
+
         -- Keep track of units losing adjacent structures
         for k,u in self.AdjacentUnits do
             if u == adjacentUnit then
@@ -424,16 +424,16 @@ StructureUnit = Class(Unit) {
         end
         self:RequestRefreshUI()
     end,
-    
+
     ------------------------------------
     --Add/Remove Adjacency Functionality
     ------------------------------------
-    
+
     -- Applies all appropriate buffs to all adjacent units
     ApplyAdjacencyBuffs = function(self)
         local adjBuffs = self:GetBlueprint().Adjacency
         if not adjBuffs then return end
-        
+
         -- There won't be any adjacentUnit if this is a producer just built...
         for k, adjacentUnit in self.AdjacentUnits do
             for k,v in AdjacencyBuffs[adjBuffs] do
@@ -443,12 +443,12 @@ StructureUnit = Class(Unit) {
         end
         self:RequestRefreshUI()
     end,
-    
+
     -- Removes all appropriate buffs from all adjacent units
     RemoveAdjacencyBuffs = function(self)
         local adjBuffs = self:GetBlueprint().Adjacency
         if not adjBuffs then return end
-		
+
         for k, adjacentUnit in self.AdjacentUnits do
             for key, v in AdjacencyBuffs[adjBuffs] do
                 if Buff.HasBuff(adjacentUnit, v) then
@@ -480,7 +480,7 @@ StructureUnit = Class(Unit) {
 
     DestroyAdjacentEffects = function(self, adjacentUnit)
         if not self.AdjacencyBeamsBag then return end
-        
+
         for k, v in self.AdjacencyBeamsBag do
             if v.Unit:BeenDestroyed() or v.Unit:IsDead() then
                 v.Trash:Destroy()
@@ -800,24 +800,24 @@ AirFactoryUnit = Class(FactoryUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order )
         self:ChangeBlinkingLights('Yellow')
-        
+
         --Force T3 Air Factories To have equal Engineer BuildRate to Land
-        if EntityCategoryContains(categories.ENGINEER, unitBeingBuilt) and EntityCategoryContains(categories.TECH3, self) then        
-            self:SetBuildRate(90)                    
+        if EntityCategoryContains(categories.ENGINEER, unitBeingBuilt) and EntityCategoryContains(categories.TECH3, self) then
+            self:SetBuildRate(90)
             self.BuildRateChanged = true
         end
-        
+
         FactoryUnit.OnStartBuild(self, unitBeingBuilt, order )
     end,
-    
+
     OnStopBuild = function(self, unitBeingBuilt, order )
         --Reset BuildRate
         if self.BuildRateChanged == true then
             self:SetBuildRate(self:GetBlueprint().Economy.BuildRate)
             self.BuildRateChanged = false
         end
-        FactoryUnit.OnStopBuild(self, unitBeingBuilt, order )        
-    end,    
+        FactoryUnit.OnStopBuild(self, unitBeingBuilt, order )
+    end,
 }
 
 -------------------------------------------------------------
@@ -902,7 +902,7 @@ MassCollectionUnit = Class(StructureUnit) {
         self:RemoveAdjacencyBuffs()
         self._productionActive = false
     end,
-    
+
     OnCreate = function(self)
         StructureUnit.OnCreate(self)
         local markers = ScenarioUtils.GetMarkers()
@@ -1029,7 +1029,7 @@ MassFabricationUnit = Class(StructureUnit) {
         self:SetMaintenanceConsumptionActive()
         self:SetProductionActive(true)
         self:ApplyAdjacencyBuffs()
-        self._productionActive = true        
+        self._productionActive = true
     end,
 
     OnConsumptionInActive = function(self)
@@ -1037,7 +1037,7 @@ MassFabricationUnit = Class(StructureUnit) {
         self:SetMaintenanceConsumptionInactive()
         self:SetProductionActive(false)
         self:RemoveAdjacencyBuffs()
-        self._productionActive = false        
+        self._productionActive = false
     end,
 
     OnPaused = function(self)
@@ -1234,42 +1234,42 @@ SeaFactoryUnit = Class(FactoryUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order )
         self:ChangeBlinkingLights('Yellow')
-        
-        --Force T2 and T3 Naval Factories To have equal Engineer BuildRates to Land        
-        if EntityCategoryContains(categories.ENGINEER, unitBeingBuilt) and EntityCategoryContains(categories.TECH2, self) then        
-            self:SetBuildRate(40)                    
+
+        --Force T2 and T3 Naval Factories To have equal Engineer BuildRates to Land
+        if EntityCategoryContains(categories.ENGINEER, unitBeingBuilt) and EntityCategoryContains(categories.TECH2, self) then
+            self:SetBuildRate(40)
             self.BuildRateChanged = true
-        elseif EntityCategoryContains(categories.ENGINEER, unitBeingBuilt) and EntityCategoryContains(categories.TECH3, self) then    
+        elseif EntityCategoryContains(categories.ENGINEER, unitBeingBuilt) and EntityCategoryContains(categories.TECH3, self) then
             self:SetBuildRate(90)
             self.BuildRateChanged = true
-        end               
+        end
         FactoryUnit.OnStartBuild(self, unitBeingBuilt, order )
     end,
-    
+
     OnStopBuild = function(self, unitBeingBuilt, order )
         --Reset BuildRate
         if self.BuildRateChanged == true then
             self:SetBuildRate(self:GetBlueprint().Economy.BuildRate)
             self.BuildRateChanged = false
-        end        
+        end
         FactoryUnit.OnStopBuild(self, unitBeingBuilt, order )
-    end,    
-    
+    end,
+
     RolloffBody = function(self)
         self:SetBusy(true)
         self:SetBlockCommandQueue(true)
         self:PlayFxRollOff()
-        
+
         --Force the Factory to not wait until unit has left
         WaitSeconds(2.5)
-        
+
         self.MoveCommand = nil
         self:PlayFxRollOffEnd()
         self:SetBusy(false)
         self:SetBlockCommandQueue(false)
         ChangeState(self, self.IdleState)
     end,
-    
+
     -- Disable the default rocking behaviour
     StartRocking = function(self)
     end,

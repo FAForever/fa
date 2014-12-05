@@ -9,7 +9,7 @@ keyDescriptions = {
     ['pause'] = '<LOC key_desc_0002>Toggles Game Pause',
     ['cap_frame'] = '<LOC key_desc_0003>Take a screen shot',
     ['show_fps'] = "<LOC key_desc_0131>Toggle the display of frames rendered per second",
-    
+
     ['group1'] = '<LOC key_desc_0004>Recall Group 1',
     ['group2'] = '<LOC key_desc_0005>Recall Group 2',
     ['group3'] = '<LOC key_desc_0006>Recall Group 3',
@@ -32,7 +32,7 @@ keyDescriptions = {
     ['set_group8'] = '<LOC key_desc_0022>Set Group 8',
     ['set_group9'] = '<LOC key_desc_0023>Set Group 9',
     ['set_group0'] = '<LOC key_desc_0024>Set Group 10',
-    
+
     ['append_group1'] = '<LOC key_desc_0110>Append Group 1 to current selection',
     ['append_group2'] = '<LOC key_desc_0111>Append Group 2 to current selection',
     ['append_group3'] = '<LOC key_desc_0112>Append Group 3 to current selection',
@@ -43,7 +43,7 @@ keyDescriptions = {
     ['append_group8'] = '<LOC key_desc_0117>Append Group 8 to current selection',
     ['append_group9'] = '<LOC key_desc_0118>Append Group 9 to current selection',
     ['append_group0'] = '<LOC key_desc_0119>Append Group 10 to current selection',
-    
+
     ['fac_group1'] = '<LOC key_desc_0120>Select only factories from Group 1',
     ['fac_group2'] = '<LOC key_desc_0121>Select only factories from Group 2',
     ['fac_group3'] = '<LOC key_desc_0122>Select only factories from Group 3',
@@ -58,7 +58,7 @@ keyDescriptions = {
     ['next_cam_position'] = '<LOC key_desc_0025>Go to the next saved Camera Position',
     ['add_cam_position'] = '<LOC key_desc_0026>Save a Camera Position',
     ['rem_cam_position'] = '<LOC key_desc_0027>Delete current Camera Position',
-    
+
     ['zoom_in'] = '<LOC key_desc_0028>Zoom your View in',
     ['zoom_out'] = '<LOC key_desc_0029>Zoom your View out',
     ['zoom_in_fast'] = '<LOC key_desc_0030>Zoom your View in fast',
@@ -78,7 +78,7 @@ keyDescriptions = {
     ['select_land'] = '<LOC key_desc_0058>Select all Land units',
     ['select_all_units_of_same_type'] = '<LOC key_desc_0059>Select all units similar to those selected',
     ['reset_camera'] = '<LOC key_desc_0060>Reset the Camera',
-    # ['build'] = '<LOC key_desc_0061>Silo Build mode',
+    -- ['build'] = '<LOC key_desc_0061>Silo Build mode',
     ['select_engineers'] = '<LOC key_desc_0062>Select all Engineers',
     ['repair'] = '<LOC key_desc_0036>Repair',
     ['reclaim'] = '<LOC key_desc_0037>Reclaim',
@@ -143,7 +143,7 @@ keyDescriptions = {
     ['switch_skin_down'] = '<LOC key_desc_0092>Rotate skins down',
     ['switch_layout_up'] = '<LOC key_desc_0093>Rotate layouts up',
     ['switch_layout_down'] = '<LOC key_desc_0094>Rotate layouts down',
-    
+
     ['toggle_main_menu'] = '<LOC key_desc_0179>Toggles the main menu',
     ['toggle_score_screen'] = '<LOC key_desc_0095>Toggles the Score Overlay',
     ['toggle_objective_screen'] = '<LOC key_desc_0096>Toggles the Objective Window',
@@ -157,11 +157,11 @@ keyDescriptions = {
     ['ping_marker'] = '<LOC key_desc_0108>Create a marker at the mouse location',
     ['toggle_map_control'] = "<LOC key_desc_0109>Toggles the map control window",
     ['cam_free'] = "<LOC key_desc_0104>Toggles camera free mode",
-    
+
     ['quick_save'] = "<LOC key_desc_0130>Save the game to a special quick save file",
     ['mouse_help'] = "<LOC key_desc_0132>Turn the mouse button help icon on/off",
 
-    ['create_build_template'] = "<LOC key_desc_0181>Create a build template based on the current selection", 
+    ['create_build_template'] = "<LOC key_desc_0181>Create a build template based on the current selection",
 
     ['debug_navpath'] = "<LOC key_desc_0133>Toggles pathfinding debugger",
     ['debug_create_unit'] = "<LOC key_desc_0134>Shows a dialog that allows you to create units",
@@ -213,10 +213,10 @@ keyDescriptions = {
     ['debug_toggle_pannels'] = '<LOC key_desc_0180>Toggle UI panels on/off',
     ['spreadattack'] = 'Spread attack',
     ['shift_spreadattack'] = 'Spread attack',
-    
+
     ['show_objective_screen'] = 'Show Scenario Options/Objectives Window',
 
-    #GAZUI
+    --GAZUI
     ['toggle_repeat_build'] = 'Toggle factory repeat build',
     ['show_enemy_life'] = 'Show enemy life bars',
     ['show_network_stats'] = 'Show network stats window',
@@ -293,7 +293,7 @@ keyDescriptions = {
     ['select_air_transport'] = 'Select only transports',
     ['lock_zoom'] = 'lock the zoom to current level',
 
-    # hotbuild
+    -- hotbuild
     ['builders'] = 'build builders (factories, Quantum Gate & T1 engineers)',
     ['sensors'] = 'build sensors + T1 sub marines',
     ['shields'] = 'build shields/steath fields + LAB + Interceptors + Frigates',
@@ -315,7 +315,7 @@ keyDescriptions = {
     ['tml'] = 'build Tactical Missile Launchers + Shield disruptors + T3 mobile shields + T3 gunships + Missile Ship',
     ['upgrades'] = 'build upgrades + T3 Air Transport + T3 torpedo bomber',
 
-    # extra
+    -- extra
     ['land_factory'] = 'build Land Factory',
     ['air_factory'] = 'build Air Factory',
     ['naval_factory'] = 'build Naval Factory',
@@ -418,6 +418,6 @@ keyDescriptions = {
     ['t3_siege_tank'] = 'build T3 Siege Tank',
     ['t3_mobile_shield_generator'] = 'build T3 Mobile Shield Generator',
     ['t3_submarine_hunter'] = 'build T3 Submarine Hunter',
-    
+
 
 }

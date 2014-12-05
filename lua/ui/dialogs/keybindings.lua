@@ -28,7 +28,7 @@ local function ResetKeyMap()
 end
 
 local function ConfirmNewKeyMap()
-	--add option to accept the changes to the key map?
+    --add option to accept the changes to the key map?
     IN_AddKeyMapTable(import('/lua/keymap/keymapper.lua').GetKeyMappings(true))
     -- Update hotbuild modifiers
     if SessionIsActive() then
@@ -41,7 +41,7 @@ local function EditActionKey(parent, action, currentKey)
     LayoutHelpers.AtCenterIn(dialog, parent)
     LayoutHelpers.DepthOverParent(dialog, parent, 100)
     dialog.Height:Set(100)
-    
+
     local background = Bitmap(dialog, UIUtil.SkinnableFile('/dialogs/dialog_02/panel_bmp_m.dds'))
     background:SetTiled(true)
     dialog.Width:Set(background.Width)
@@ -51,22 +51,22 @@ local function EditActionKey(parent, action, currentKey)
     LayoutHelpers.Above(backgroundTop, background)
     local backgroundBottom = Bitmap(dialog, UIUtil.SkinnableFile('/dialogs/dialog_02/panel_bmp_b.dds'))
     LayoutHelpers.Below(backgroundBottom, background)
-    
+
     local okButton = UIUtil.CreateButtonStd( background, '/widgets/small', "<LOC _Ok>", 12, 0)
     LayoutHelpers.AtBottomIn(okButton, backgroundBottom, 25)
-    LayoutHelpers.AtLeftIn(okButton, backgroundBottom, 30)           
+    LayoutHelpers.AtLeftIn(okButton, backgroundBottom, 30)
 
     local cancelButton = UIUtil.CreateButtonStd( background, '/widgets/small', "<LOC _Cancel>", 12, 0)
     LayoutHelpers.AtBottomIn(cancelButton, backgroundBottom, 25)
     LayoutHelpers.AtRightIn(cancelButton, backgroundBottom, 30)
     cancelButton.OnClick = function(self, modifiers)
         dialog:Destroy()
-    end          
-    
+    end
+
     local helpText = UIUtil.CreateText(background, "<LOC key_binding_0002>Hit the key combination you'd like to assign", 16)
     LayoutHelpers.AtTopIn(helpText, background)
     LayoutHelpers.AtHorizontalCenterIn(helpText, background)
-    
+
     local keyText = UIUtil.CreateText(background, formatkeyname(currentKey), 24)
     LayoutHelpers.AtTopIn(keyText, background, 40)
     LayoutHelpers.AtHorizontalCenterIn(keyText, background)
@@ -79,27 +79,27 @@ local function EditActionKey(parent, action, currentKey)
     local keyCodeLookup = import('/lua/keymap/keymapper.lua').GetKeyCodeLookup()
     local keyAdder = {}
     local currentKeyPattern
-    
+
     local function AddKey(keyCode, modifiers)
-       
-        if keyCodeLookup[keyCode] != nil then
+
+        if keyCodeLookup[keyCode] ~= nil then
             local ctrl = false
             local alt = false
             local shift = false
 
             local key = keyCodeLookup[keyCode]
-            
-            if key != 'Ctrl' then
+
+            if key ~= 'Ctrl' then
                 if modifiers.Ctrl == true then
                     ctrl = true
                 end
-                
-                if key != 'Shift' then
+
+                if key ~= 'Shift' then
                     if modifiers.Shift == true then
                         shift = true
                     end
-                
-                    if key != 'Alt' then
+
+                    if key ~= 'Alt' then
                         if modifiers.Alt == true then
                             alt = true
                         end
@@ -107,43 +107,43 @@ local function EditActionKey(parent, action, currentKey)
                 end
 
             end
-            
+
             local keyComboName = ""
             currentKeyPattern = ""
-            
+
             if ctrl == true then
                 currentKeyPattern = currentKeyPattern .. keyNames['11'] .. "-"
                 keyComboName = keyComboName .. LOC(properKeyNames[keyNames['11']]) .. "-"
             end
-            
+
             if shift == true  then
                 currentKeyPattern = currentKeyPattern .. keyNames['10'] .. "-"
                 keyComboName = keyComboName .. LOC(properKeyNames[keyNames['10']]) .. "-"
             end
-            
+
             if alt == true  then
                 currentKeyPattern = currentKeyPattern .. keyNames['12'] .. "-"
                 keyComboName = keyComboName .. LOC(properKeyNames[keyNames['12']]) .. "-"
             end
-    
+
             currentKeyPattern = currentKeyPattern .. key
             keyComboName = keyComboName .. LOC(properKeyNames[key])
-            
-            keyText:SetText(keyComboName)        
-            
+
+            keyText:SetText(keyComboName)
+
         end
     end
-    
+
     dialog.HandleEvent = function(self, event)
         if event.Type == 'KeyDown' then
             AddKey(event.RawKeyCode, event.Modifiers)
         end
-    end    
+    end
 
     local function AssignKey()
         -- check if key is already assigned to something else
         local Keymapper = import('/lua/keymap/keymapper.lua')
-        
+
         local function ClearShiftKey()
             Keymapper.ClearUserKeyMapping("Shift-" .. currentKeyPattern)
             LOG("clearing Shift-"..currentKeyPattern)
@@ -163,7 +163,7 @@ local function EditActionKey(parent, action, currentKey)
                         "<LOC _Yes>", ClearShiftKey,
                         "<LOC _No>", nil,
                         nil, nil,
-                        true, 
+                        true,
                         {escapeButton = 2, enterButton = 1, worldCover = false})
                 end
 
@@ -172,7 +172,7 @@ local function EditActionKey(parent, action, currentKey)
                         "<LOC _Yes>", ClearAltKey,
                         "<LOC _No>", nil,
                         nil, nil,
-                        true, 
+                        true,
                         {escapeButton = 2, enterButton = 1, worldCover = false})
                 end
             end
@@ -184,18 +184,18 @@ local function EditActionKey(parent, action, currentKey)
                 "<LOC _Yes>", MapKey,
                 "<LOC _No>", nil,
                 nil, nil,
-                true, 
+                true,
                 {escapeButton = 2, enterButton = 1, worldCover = false})
-            
+
         else
             MapKey()
         end
     end
-    
+
     okButton.OnClick = function(self, modifiers)
         AssignKey()
         dialog:Destroy()
-    end          
+    end
 
 end
 
@@ -204,7 +204,7 @@ function CreateUI()
         return
     end
 
-    if panel then 
+    if panel then
         panel:Destroy()
         panel = false
         return
@@ -220,7 +220,7 @@ function CreateUI()
             end
         end
     end
-    
+
     panel = Bitmap(GetFrame(0), UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_m.dds'))
     panel.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
     panel.Height:Set(390)
@@ -229,21 +229,21 @@ function CreateUI()
     panel.OnDestroy = function(self)
         RemoveInputCapture(panel)
     end
-    
+
     panel.border = CreateBorder(panel)
     panel.brackets = UIUtil.CreateDialogBrackets(panel, 106, 110, 110, 108, true)
-    
+
     local worldCover = UIUtil.CreateWorldCover(panel)
-    
+
     local title = UIUtil.CreateText(panel, LOC("<LOC key_binding_0000>Key Bindings"), 22)
     LayoutHelpers.AtTopIn(title, panel.border.tm, 12)
     LayoutHelpers.AtHorizontalCenterIn(title, panel)
-    
+
     local closeButton = UIUtil.CreateButtonStd(panel, "/scx_menu/small-btn/small", LOC("<LOC _Close>"), 14, 2)
     LayoutHelpers.AtTopIn(closeButton, panel.border.bm, -20)
     LayoutHelpers.AtHorizontalCenterIn(closeButton, panel)
     closeButton.OnClick = function(self, modifiers)
-		ConfirmNewKeyMap()
+        ConfirmNewKeyMap()
         panel:Destroy()
         panel = false
     end
@@ -253,7 +253,7 @@ function CreateUI()
     assignKeyButton.OnClick = function(self, modifiers)
         AssignCurrentSelection()
     end
-    
+
     local resetButton = UIUtil.CreateButtonStd(panel, "/widgets/small02", LOC("<LOC key_binding_0004>Reset"), 12)
     LayoutHelpers.RightOf(resetButton, closeButton, 10)
     resetButton.OnClick = function(self, modifiers)
@@ -261,7 +261,7 @@ function CreateUI()
             "<LOC _Yes>", ResetKeyMap,
             "<LOC _No>", nil,
             nil, nil,
-            true, 
+            true,
             {escapeButton = 2, enterButton = 1, worldCover = false})
     end
 
@@ -273,35 +273,35 @@ function CreateUI()
             end
         end
     end
-    
+
     AddInputCapture(panel)
 
     keyContainer = Group(panel)
     keyContainer.Height:Set(385)
     keyContainer.Width:Set(593)
     keyContainer.top = 0
-    
+
     LayoutHelpers.AtLeftTopIn(keyContainer, panel, -46)
     UIUtil.CreateVertScrollbarFor(keyContainer)
-    
+
     local keyEntries = {}
-    
+
     local function CreateElement(index)
         keyEntries[index] = {}
         keyEntries[index].bg = Bitmap(keyContainer)
         keyEntries[index].bg.Left:Set(keyContainer.Left)
         keyEntries[index].bg.Right:Set(keyContainer.Right)
-        
+
         keyEntries[index].key = UIUtil.CreateText(keyEntries[1].bg, '', 16, "Arial")
         keyEntries[index].key:DisableHitTest()
-        
+
         keyEntries[index].description = UIUtil.CreateText(keyEntries[1].bg, '', 16, "Arial")
         keyEntries[index].description:DisableHitTest()
         keyEntries[index].description:SetClipToWidth(true)
         keyEntries[index].description.Width:Set(keyEntries[index].bg.Right() - keyEntries[index].bg.Left() - 150) -- this is not meant to be a lazy var function since the layout is static
-        
+
         keyEntries[index].bg.Height:Set(function() return keyEntries[index].key.Height() + 4 end)
-        
+
         LayoutHelpers.AtVerticalCenterIn(keyEntries[index].key, keyEntries[index].bg)
         LayoutHelpers.AtLeftIn(keyEntries[index].description, keyEntries[index].bg, 150)
         LayoutHelpers.AtVerticalCenterIn(keyEntries[index].description, keyEntries[index].bg)
@@ -319,10 +319,10 @@ function CreateUI()
                 end
                 if keyTable[self.dataIndex].type == 'entry' then
                     keyTable[self.dataIndex]._selected = true
-                end               
+                end
                 keyContainer:CalcVisible()
             end
-            
+
             if event.Type == 'ButtonPress' then
                 SelectLine()
                 eventHandled = true
@@ -330,28 +330,28 @@ function CreateUI()
                 SelectLine()
                 eventHandled = true
             end
-       
-            
+
+
             return eventHandled
         end
     end
-    
+
     CreateElement(1)
     LayoutHelpers.AtTopIn(keyEntries[1].bg, keyContainer)
-        
+
     local index = 2
     while keyEntries[table.getsize(keyEntries)].bg.Top() + (2 * keyEntries[1].bg.Height()) < keyContainer.Bottom() do
         CreateElement(index)
         LayoutHelpers.Below(keyEntries[index].bg, keyEntries[index-1].bg)
         index = index + 1
     end
-    
+
     local numLines = function() return table.getsize(keyEntries) end
-    
+
     local function DataSize()
         return table.getn(keyTable)
     end
-    
+
     -- called when the scrollbar for the control requires data to size itself
     -- GetScrollValues must return 4 values in this order:
     -- rangeMin, rangeMax, visibleMin, visibleMax
@@ -465,11 +465,11 @@ function FormatData()
 
         end
     end
-    
+
     for i, v in retkeys do
         table.sort(v, function(val1, val2)
             if val1.id == val2.id then
-                
+
                 if keydesc[val1.desckey] and keydesc[val2.desckey] then
                     if keydesc[val1.desckey] >= keydesc[val2.desckey] then
                         return false
@@ -488,10 +488,10 @@ function FormatData()
             end
         end)
     end
-    
+
     local index = 1
     for i, v in retkeys do
-        if index != 1 then
+        if index ~= 1 then
             KeyData[index] = {type = 'spacer'}
             index = index + 1
         end
@@ -511,7 +511,7 @@ function formatkeyname(key)
     if not key then
         return ""
     end
-    
+
     local function LookupToken(token)
         if properKeyNames[token] then
             return LOC(properKeyNames[token])
@@ -542,35 +542,35 @@ function CreateBorder(parent)
     tbl.bl = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_ll.dds'))
     tbl.bm = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_lm.dds'))
     tbl.br = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_lr.dds'))
-    
+
     tbl.tl.Bottom:Set(parent.Top)
     tbl.tl.Right:Set(parent.Left)
-    
+
     tbl.tr.Bottom:Set(parent.Top)
     tbl.tr.Left:Set(parent.Right)
-    
+
     tbl.tm.Bottom:Set(parent.Top)
     tbl.tm.Right:Set(parent.Right)
     tbl.tm.Left:Set(parent.Left)
-    
+
     tbl.l.Bottom:Set(parent.Bottom)
     tbl.l.Top:Set(parent.Top)
     tbl.l.Right:Set(parent.Left)
-    
+
     tbl.r.Bottom:Set(parent.Bottom)
     tbl.r.Top:Set(parent.Top)
     tbl.r.Left:Set(parent.Right)
-    
+
     tbl.bl.Top:Set(parent.Bottom)
     tbl.bl.Right:Set(parent.Left)
-    
+
     tbl.br.Top:Set(parent.Bottom)
     tbl.br.Left:Set(parent.Right)
-    
+
     tbl.bm.Top:Set(parent.Bottom)
     tbl.bm.Right:Set(parent.Right)
     tbl.bm.Left:Set(parent.Left)
-    
+
     tbl.tl.Depth:Set(function() return parent.Depth() - 1 end)
     tbl.tm.Depth:Set(function() return parent.Depth() - 1 end)
     tbl.tr.Depth:Set(function() return parent.Depth() - 1 end)
@@ -579,6 +579,6 @@ function CreateBorder(parent)
     tbl.bl.Depth:Set(function() return parent.Depth() - 1 end)
     tbl.bm.Depth:Set(function() return parent.Depth() - 1 end)
     tbl.br.Depth:Set(function() return parent.Depth() - 1 end)
-    
+
     return tbl
 end

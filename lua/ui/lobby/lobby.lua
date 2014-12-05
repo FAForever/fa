@@ -373,12 +373,12 @@ local function HandleSlotSwitches(moveFrom, moveTo) -- Xinnony (Factored by Vica
     local fromNumGame = pOpts[moveFrom].NG
 
     if pOpts[moveFrom].Human and moveFrom ~= moveTo then -- IF Player moveFrom is Human and Player moveFrom NOT in moveTo
-        
-        
-        
+
+
+
         -- IF Slot moveToSlot is Human and NOT Ready, AND IF Player moveFromSlot is NOT Ready
         if pOpts[moveTo].Human then
-            
+
             if pOpts[moveTo].Ready then
                 --SetPlayerOption(moveTo, 'Ready', false)
                 if not IsLocallyOwned(moveTo) then
@@ -386,7 +386,7 @@ local function HandleSlotSwitches(moveFrom, moveTo) -- Xinnony (Factored by Vica
                 end
                 gameInfo.PlayerOptions[moveTo]['Ready'] = false
             end
-            
+
             if pOpts[moveFrom].Ready then
                 --SetPlayerOption(moveFrom, 'Ready', false)
                 if not IsLocallyOwned(moveTo) then
@@ -394,26 +394,26 @@ local function HandleSlotSwitches(moveFrom, moveTo) -- Xinnony (Factored by Vica
                 end
                 gameInfo.PlayerOptions[moveFrom]['Ready'] = false
             end
-            
+
             HostConvertPlayerToObserver(toID, toName, moveTo, false) -- Move Slot moveTo to Observer
             --ClearSlotInfo(moveTo)
             HostTryMovePlayer(fromID, moveFrom, moveTo) -- Move Player moveFrom to Slot moveTo
             --ClearSlotInfo(moveFrom)
             HostConvertObserverToPlayer(toID, toName, FindObserverSlotForID(toID), moveFrom, toFaction, toRating, toRatingColor, toNumGame, false)
             SendSystemMessage(fromName..' has switched with '..toName, 'switch')
-        
-        
-        
+
+
+
         elseif not pOpts[moveTo].Human then -- IF moveTo is AI
             HostRemoveAI(moveTo)
             HostTryMovePlayer(pOpts[moveFrom].OwnerID, moveFrom, moveTo)
-        
-        
-        
+
+
+
         else
             AddChatText('You cannot move the player in slot '..moveFrom..'.')
         end
-    
+
     else
         if not pOpts[moveFrom].Human then
             AddChatText('You cannot move the Player in slot '..moveFrom..' to slot '..moveTo..' because '..pOpts[moveFrom].PlayerName..' is not human.')
@@ -2187,7 +2187,7 @@ end
 
 -- slot less than 1 means try to find a slot
 function HostTryAddPlayer(senderID, slot, requestedPlayerName, human, aiPersonality, requestedColor, requestedFaction, requestedTeam, requestedPL, requestedRC, requestedNG, requestedMEAN, requestedDEV, requestedCOUNTRY)
-    
+
     --// RULE TITLE - Xinnony
     if not singlePlayer then
         RuleTitle_SendMSG()
@@ -2283,7 +2283,7 @@ function HostTryAddPlayer(senderID, slot, requestedPlayerName, human, aiPersonal
     if requestedCOUNTRY then
         gameInfo.PlayerOptions[newSlot].Country = requestedCOUNTRY
     end
-    
+
     lobbyComm:BroadcastData(
         {
             Type = 'SlotAssigned',
@@ -3267,7 +3267,7 @@ function CreateUI(maxPlayers)
         if XinnoHideDefault == 'true' then
             cbox_ShowChangedOption:SetCheck(true, false) -- BUG FIXED !, OptionContainer NOT CREATED BEFORE -- isChecked, skipEvent
         end
-        
+
         ---------------------------------------------------------------------------
         -- Faction Selector -- Xinnony
         ---------------------------------------------------------------------------
@@ -3472,7 +3472,7 @@ function CreateUI(maxPlayers)
             GUI.slots[i].color.OnEvent = GUI.slots[curRow].name.OnEvent
             Tooltip.AddControlTooltip(GUI.slots[i].color, 'lob_color')
             GUI.slots[i].color.row = i
-            
+
             --// Faction
             GUI.slots[i].faction = BitmapCombo(bg, factionBmps, table.getn(factionBmps), nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
             LayoutHelpers.AtLeftIn(GUI.slots[i].faction, GUI.panel, slotColumnSizes.faction.x)
@@ -4969,7 +4969,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                         SendSystemMessage(LOCF("<LOC lobui_0226>%s timed out.", peer.name), "lobui_0205")
                         --SendSystemMessage(LOCF(Strings.TimedOut,peer.name), "lobui_0205")
                         --AddChatText('TIMEOUT !')
-                        
+
                         -- Search and Remove the peer disconnected
                         for k, v in CurrentConnexion do
                             if v == peer.name then
@@ -5014,7 +5014,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         --AddChatText('>debug> PeerDisconnected : peerName='..peerName..' peerID='..peerID) -- XINNONY -- Here this message always show the player quit !!!
         if XinnonyDebug == 3 then AddChatText('>> PeerDisconnected : peerName='..peerName..' peerID='..peerID) end -- XINNONY -- Here this message always show the player quit !!!
         if XinnonyDebug == 3 then LOG('GameInfo = ', repr(gameInfo)) end
-        
+
          -- Search and Remove the peer disconnected
         for k, v in CurrentConnexion do
             if v == peerName then
@@ -5034,9 +5034,9 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 break
             end
         end
-        
+
         AddChatText(LOCF("<LOC Xngine0003>Lost connection to %s.", peerName), "Xngine0003")
-        
+
         if IsPlayer(peerID) then
             local slot = FindSlotForID(peerID)
             if slot and lobbyComm:IsHost() then
@@ -5422,7 +5422,7 @@ function NewShowMapPositions(mapCtrl, scenario, numPlayers)
     end
 end -- NewShowMapPositions(...)
 
---------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------
 --------------------------------------------------------  Duck_42 Wall  --------------------------------------------------------
 --******************************************************************************************************
 -- CPU Benchmark Code
@@ -5682,10 +5682,10 @@ function SetSlotCPUBar(slot, playerInfo)
     end
 end
 
-#
-##
-##########################################
-################  Flag Country  ################
+--
+----
+------------------------------------------------------------------------------------
+--------------------------------  Flag Country  --------------------------------
 --------------------------------------------------
 -- CountryFlag Functions                        --
 -- Author : Xinnony                             --
@@ -5726,10 +5726,10 @@ function Country_GetTooltipValue(CountryResult, slot)
     end
 end--]]
 
-#
-##
-########################################
-################  Rule Title  ################
+--
+----
+--------------------------------------------------------------------------------
+--------------------------------  Rule Title  --------------------------------
 --------------------------------------------------
 -- Change the title for to say the rule --
 -- Author : Xinnony                             --
@@ -5839,10 +5839,10 @@ function RuleTitle_INPUT()
     end
 end
 
-#
-##
-############################################
-################  Faction Selector  ################
+--
+----
+----------------------------------------------------------------------------------------
+--------------------------------  Faction Selector  --------------------------------
 --------------------------------------------------
 -- Create a Faction easy selector       --
 -- Author : Xinnony                             --
@@ -6168,10 +6168,10 @@ function ChangeSkinByFaction(input_faction)
     end
 end
 
-#
-##
-#########################################
-################  Skin_2013  ################
+--
+----
+----------------------------------------------------------------------------------
+--------------------------------  Skin_2013  --------------------------------
 --------------------------------------------------
 -- New skin 2013                                    --
 -- Author : Xinnony                             --
@@ -6766,10 +6766,10 @@ end
 
 -- GUI --
 
-#
-##
-##########################################
-################  Preset Lobby  ################
+--
+----
+------------------------------------------------------------------------------------
+--------------------------------  Preset Lobby  --------------------------------
 --------------------------------------------------
 -- Load and Create Preset Lobby     --
 -- Author : Xinnony                             --
@@ -7162,7 +7162,7 @@ function LOAD_PresetSettings_For_InfoList(Selected_Preset)
     InfoList:AddItem('Preset Name : '..profiles[Selected_Preset].PresetName)
     InfoList:AddItem('FAF Title : '..'(not working for the moment)')--profiles[Selected_Preset].FAF_Title)
     InfoList:AddItem('Rule : '..profiles[Selected_Preset].Rule)
-    
+
     if check_Map_Exist(profiles[Selected_Preset].MapPath) == true then
         InfoList:AddItem('Map : '..profiles[Selected_Preset].MapName)
     else
@@ -7174,9 +7174,9 @@ function LOAD_PresetSettings_For_InfoList(Selected_Preset)
         --Tooltip.AddControlTooltip(InfoList.test, {text='Map : '..profiles[Selected_Preset].MapName, body='MAP NOT AVAILABLE !'})
         --InfoList:ModifyItem(3, ' Map : '..profiles[Selected_Preset].MapName)
     end
-    
-    
-    
+
+
+
     if profiles[Selected_Preset].Mods then
         InfoList:AddItem('')
         InfoList:AddItem('Mod :')
@@ -7417,10 +7417,10 @@ function SAVE_PRESET_IN_PREF() -- GET OPTIONS ON LOBBY AND SAVE TO PRESET
     --LOG('> Num mods : '..nummods)
 end
 
-#
-##
-###############################################
-################  Only Available Color  ################
+--
+----
+----------------------------------------------------------------------------------------------
+--------------------------------  Only Available Color  --------------------------------
 --------------------------------------------------------
 -- Show Only the Available Color in Combo   --
 -- Author : Xinnony                                     --
@@ -7466,7 +7466,7 @@ function Check_Availaible_Color(self, slot)
         finded = false
             for ii = 1, LobbyComm.maxPlayerSlots do
                 if gameInfo.PlayerOptions[ii].PlayerColor then
-                    if slot != ii then
+                    if slot ~= ii then
                         if gameInfo.PlayerOptions[ii].PlayerColor == k then -- SI UN PLAYER A LA COULEUR
                             finded = true
                             break
@@ -7474,12 +7474,12 @@ function Check_Availaible_Color(self, slot)
                     end
                 end
             end
-        
-        if finded != true then
+
+        if finded ~= true then
             num = num + 1
             Avail_Color[slot][num] = BASE_ALL_Color[k]
         end
-        
+
     end
     --
     if num == 0 then
@@ -7520,10 +7520,10 @@ function Check_Availaible_Color(self, slot)
     GUI.slots[slot].color.row = slot
 end
 
-#
-##
-##############################################
-################  Other Debug Func  ################
+--
+----
+--------------------------------------------------------------------------------------------
+--------------------------------  Other Debug Func  --------------------------------
 --------------------------------------------------
 -- Author : Xinnony                             --
 --------------------------------------------------
@@ -7577,10 +7577,10 @@ function to_string( tbl )
     end
 end
 
-#
-##
-############################################
-################  DEV TEST AREA  ################
+--
+----
+----------------------------------------------------------------------------------------
+--------------------------------  DEV TEST AREA  --------------------------------
 
 --function round(n)
     --return n % 1 >= 0.5 and math.ceil(n) or math.floor(n)

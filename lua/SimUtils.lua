@@ -117,8 +117,8 @@ function TransferUnitsOwnership(units, ToArmyIndex)
             continue
         end
 
-        table.insert(newUnits, unit)    
-        
+        table.insert(newUnits, unit)
+
         if IsAlly(owner, ToArmyIndex) then
             if unit.oldowner == nil then
                 unit.oldowner = owner
@@ -128,7 +128,7 @@ function TransferUnitsOwnership(units, ToArmyIndex)
                 table.insert(sharedUnits[owner], unit)
             end
         end
-        
+
         -- A F T E R
         if unitKills and unitKills > 0 then
             unit:AddKills( unitKills )
@@ -170,7 +170,7 @@ end
 function GiveUnitsToPlayer( data, units )
     if units then
         local owner = units[1]:GetArmy()
-        if OkayToMessWithArmy(owner) and IsAlly(owner,data.To) then         
+        if OkayToMessWithArmy(owner) and IsAlly(owner,data.To) then
             TransferUnitsOwnership( units, data.To )
         end
     end
@@ -209,7 +209,7 @@ end
 function UpdateUnitCap(deadArmy)
     -- If we are asked to share out unit cap for the defeated army, do the following...
     local mode = ScenarioInfo.Options.ShareUnitCap
-    
+
     if(not mode or mode == 'none') then
         return
     end
@@ -228,7 +228,7 @@ function UpdateUnitCap(deadArmy)
             eligible = false
         end
 
-        if eligible then 
+        if eligible then
             if not brain:IsDefeated() then
                 table.insert(alive, brain)
             end

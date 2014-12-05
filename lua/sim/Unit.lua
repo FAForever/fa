@@ -263,7 +263,7 @@ Unit = Class(moho.unit_methods) {
         --Ensure transport slots are available
         self.attachmentBone = nil
         self.slotsFree = {}
-        
+
         -- Set up Adjacency container
         self.AdjacentUnits = {}
     end,
@@ -1429,7 +1429,7 @@ Unit = Class(moho.unit_methods) {
         if not (EntityCategoryContains(categories.FACTORY, self) and EntityCategoryContains(categories.STRUCTURE, self) and EntityCategoryContains(categories.NAVAL, self)) then
             pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
         end
-        
+
         local prop = CreateProp( pos, wreck )
 
         --Keep track of the global wreckage count to avoid performance issues
@@ -3678,7 +3678,7 @@ Unit = Class(moho.unit_methods) {
         if self.VeteranLevel >= maxLevel then
             return
         end
-        
+
         local next = self.VeteranLevel + 1
         while self.xp >= levels[('Level' .. next)] and self.VeteranLevel < maxLevel do
              self:SetVeteranLevel(next)

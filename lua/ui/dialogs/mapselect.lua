@@ -23,9 +23,9 @@ local Mods = import('/lua/mods.lua')
 local Combo = import('/lua/ui/controls/combo.lua').Combo
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local ModManager = import('/lua/ui/dialogs/modmanager.lua')
-###New local - Start
+------New local - Start
 local EnhancedLobby = import('/lua/EnhancedLobby.lua')
-###New local - End
+------New local - End
 
 local scenarios = MapUtil.EnumerateSkirmishScenarios()
 local selectedScenario = false
@@ -45,10 +45,10 @@ local currentFilters = {
     ['map_select_size'] = 0,
     ['map_select_supportedplayers_limiter'] = "equal",
     ['map_select_size_limiter'] = "equal",
-	['map_type'] = 0,
-	###New - Start
-	['map_ai_markers'] = 0,
-	###New - End
+    ['map_type'] = 0,
+    ------New - Start
+    ['map_ai_markers'] = 0,
+    ------New - End
 }
 
 local scenarioKeymap = {}
@@ -72,10 +72,10 @@ mapFilters = {
             {text = "<LOC MAPSEL_0015>6", key = 6},
             {text = "<LOC MAPSEL_0016>7", key = 7},
             {text = "<LOC MAPSEL_0017>8", key = 8},
-			{text = "<LOC lobui_0714>9", key = 9},
-			{text = "<LOC lobui_0715>10", key = 10},
-			{text = "<LOC lobui_0716>11", key = 11},
-			{text = "<LOC lobui_0717>12", key = 12},
+            {text = "<LOC lobui_0714>9", key = 9},
+            {text = "<LOC lobui_0715>10", key = 10},
+            {text = "<LOC lobui_0716>11", key = 11},
+            {text = "<LOC lobui_0717>12", key = 12},
         }
     },
     {
@@ -93,25 +93,25 @@ mapFilters = {
     {
         FilterName = "<LOC lobui_0575>Map Type",
         FilterKey = 'map_type',
-		NoDelimiter = true,
+        NoDelimiter = true,
         Options = {
-			{text = "<LOC MAPSEL_0025>All", key = 0},
+            {text = "<LOC MAPSEL_0025>All", key = 0},
             {text = "<LOC lobui_0576>Official", key = 1},
             {text = "<LOC lobui_0577>Custom", key = 2},
         }
     },
-	###New mapFilters - Start
-	{
+    ------New mapFilters - Start
+    {
         FilterName = "<LOC lobui_0585>AI Markers",
         FilterKey = 'map_ai_markers',
-		NoDelimiter = true,
+        NoDelimiter = true,
         Options = {
-			{text = "<LOC MAPSEL_0025>All", key = 0},
+            {text = "<LOC MAPSEL_0025>All", key = 0},
             {text = "<LOC lobui_0587>Yes", key = 1},
             {text = "<LOC lobui_0588>No", key = 2},
         }
     },
-	###New mapFilters - End
+    ------New mapFilters - End
 }
 
 -- Create a filter dropdown and title from the table above
@@ -145,28 +145,28 @@ function CreateFilter(parent, filterData)
     end
 
     if not filterData.NoDelimiter then
-		group.comboFilter = Combo(group, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
-		LayoutHelpers.AtVerticalCenterIn(group.comboFilter, group.title)
-		group.comboFilter.Right:Set(function() return group.combo.Left() - 5 end)
-		group.comboFilter.Width:Set(60)
+        group.comboFilter = Combo(group, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
+        LayoutHelpers.AtVerticalCenterIn(group.comboFilter, group.title)
+        group.comboFilter.Right:Set(function() return group.combo.Left() - 5 end)
+        group.comboFilter.Width:Set(60)
 
-		local filterArray = {
-			{text = "=", key = "equal"},
-			{text = ">=", key = "greater"},
-			{text = "<=", key = "less"}}
-		local tempText = {}
-		group.comboFilter.keyMap = {}
-		for index, val in filterArray do
-			tempText[index] = val.text
-			group.comboFilter.keyMap[index] = val.key
-		end
-		group.comboFilter.Key = filterData.FilterKey.."_limiter"
-		group.comboFilter:AddItems(tempText, 1)
+        local filterArray = {
+            {text = "=", key = "equal"},
+            {text = ">=", key = "greater"},
+            {text = "<=", key = "less"}}
+        local tempText = {}
+        group.comboFilter.keyMap = {}
+        for index, val in filterArray do
+            tempText[index] = val.text
+            group.comboFilter.keyMap[index] = val.key
+        end
+        group.comboFilter.Key = filterData.FilterKey.."_limiter"
+        group.comboFilter:AddItems(tempText, 1)
 
-		group.comboFilter.OnClick = function(self, index, text)
-			currentFilters[self.Key] = self.keyMap[index]
-			PopulateMapList()
-		end
+        group.comboFilter.OnClick = function(self, index, text)
+            currentFilters[self.Key] = self.keyMap[index]
+            PopulateMapList()
+        end
     end
 
     group.Height:Set(group.title.Height())
@@ -180,8 +180,8 @@ local function ResetFilters()
         ['map_select_size'] = 0,
         ['map_select_supportedplayers_limiter'] = "equal",
         ['map_select_size_limiter'] = "equal",
-		['map_type'] = 0,
-		['map_ai_markers'] = 0,
+        ['map_type'] = 0,
+        ['map_ai_markers'] = 0,
     }
     changedOptions = {}
     selectedScenario = nil
@@ -220,18 +220,18 @@ end
 
 --function to check if the map is a official map
 function CheckMapIsOfficial(scenario)
-	local mapsList = {'Burial Mounds', 'Concord Lake', "Drake's Ravine", 'Emerald Crater', "Gentleman's Reef", "Ian's Cross", 'Open Palms', 'Seraphim Glaciers',
-		"Seton's Clutch", 'Sung Island', 'The Great Void', 'Theta Passage', 'Winter Duel', 'The Bermuda Locket', 'Fields of Isis', 'Canis River', 'Syrtis Major',
-		'Sentry Point', "Finn's Revenge", 'Roanoke Abyss', 'Alpha 7 Quarantine', 'Arctic Refuge', 'Varga Pass', 'Crossfire Canal', 'Saltrock Colony',
-		'Vya-3 Protectorate', 'The Scar', 'Hanna Oasis', 'Betrayal Ocean', 'Frostmill Ruins', 'Four-Leaf Clover', 'The Wilderness', 'White Fire', 'High Noon',
-		'Paradise', 'Blasted Rock', 'Sludge', 'Ambush Pass', 'Four-Corners', 'The Ditch', 'Crag Dunes', "Williamson's Bridge", 'Snoey Triangle', 'Haven Reef',
-		'The Dark Heart', "Daroza's Sanctuary", 'Strip Mine', 'Thawing Glacier', 'Liberiam Battles', 'Shards', 'Shuriken Island', 'Debris', 'Flooded Strip Mine', 'Eye of the Storm'}
-	for i, map in mapsList do
-		if scenario.name == map then
-			return true
-		end
-	end
-	return false
+    local mapsList = {'Burial Mounds', 'Concord Lake', "Drake's Ravine", 'Emerald Crater', "Gentleman's Reef", "Ian's Cross", 'Open Palms', 'Seraphim Glaciers',
+        "Seton's Clutch", 'Sung Island', 'The Great Void', 'Theta Passage', 'Winter Duel', 'The Bermuda Locket', 'Fields of Isis', 'Canis River', 'Syrtis Major',
+        'Sentry Point', "Finn's Revenge", 'Roanoke Abyss', 'Alpha 7 Quarantine', 'Arctic Refuge', 'Varga Pass', 'Crossfire Canal', 'Saltrock Colony',
+        'Vya-3 Protectorate', 'The Scar', 'Hanna Oasis', 'Betrayal Ocean', 'Frostmill Ruins', 'Four-Leaf Clover', 'The Wilderness', 'White Fire', 'High Noon',
+        'Paradise', 'Blasted Rock', 'Sludge', 'Ambush Pass', 'Four-Corners', 'The Ditch', 'Crag Dunes', "Williamson's Bridge", 'Snoey Triangle', 'Haven Reef',
+        'The Dark Heart', "Daroza's Sanctuary", 'Strip Mine', 'Thawing Glacier', 'Liberiam Battles', 'Shards', 'Shuriken Island', 'Debris', 'Flooded Strip Mine', 'Eye of the Storm'}
+    for i, map in mapsList do
+        if scenario.name == map then
+            return true
+        end
+    end
+    return false
 end
 --end
 
@@ -277,7 +277,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     Tooltip.AddButtonTooltip(modButton, "Lobby_Mods")
     modButton.OnClick = function(self, modifiers)
         TheAvailableMods = import('/lua/ui/lobby/ModsManager.lua').HostModStatus(availableMods)
-		import('/lua/ui/lobby/ModsManager.lua').NEW_MODS_GUI(panel, true, nil, TheAvailableMods)
+        import('/lua/ui/lobby/ModsManager.lua').NEW_MODS_GUI(panel, true, nil, TheAvailableMods)
     end
 
     local restrictedUnitsButton = UIUtil.CreateButtonStd(modButton, '/scx_menu/small-btn/small', "<LOC sel_map_0006>Unit Manager", 16, 2)
@@ -299,97 +299,97 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
             true)
     end
 
-	--start of random map code by Moritz
-	local doNotRepeatMap
-	local randomMapButton = UIUtil.CreateButtonStd(modButton, '/scx_menu/small-btn/small', "<LOC lobui_0503>Random Map", 16, 2)
-	LayoutHelpers.AtLeftTopIn(randomMapButton, panel, 385, 645)
-	Tooltip.AddButtonTooltip(randomMapButton, 'lob_click_randmap')
+    --start of random map code by Moritz
+    local doNotRepeatMap
+    local randomMapButton = UIUtil.CreateButtonStd(modButton, '/scx_menu/small-btn/small', "<LOC lobui_0503>Random Map", 16, 2)
+    LayoutHelpers.AtLeftTopIn(randomMapButton, panel, 385, 645)
+    Tooltip.AddButtonTooltip(randomMapButton, 'lob_click_randmap')
 
-	randomMapButton.OnClick = function(self, modifiers)
-		if randMapList != 0 then
-			local randomMapMessage
-			local nummapa
-			nummapa = math.random(1, randMapList)
-			if randMapList >= 2 and nummapa == doNotRepeatMap then
-				repeat
-					nummapa = math.random(1, randMapList)
-				until nummapa != doNotRepeatMap
-			end
-			doNotRepeatMap = nummapa
-			local scen = scenarios[scenarioKeymap[nummapa]]
-			selectedScenario = scen
-			if not singlePlayer then
-				rMapName = scenarios[scenarioKeymap[nummapa]].name
-				rMapSize1 = scenarios[scenarioKeymap[nummapa]].size[1]/50
-				rMapSize2 = scenarios[scenarioKeymap[nummapa]].size[2]/50
-				rMapSizeFilLim = currentFilters.map_select_size_limiter
-				rMapSizeFil = currentFilters.map_select_size/50
-				rMapPlayersFilLim = currentFilters.map_select_supportedplayers_limiter
-				rMapPlayersFil = currentFilters.map_select_supportedplayers
-				rMapTypeFil = currentFilters.map_type
-			end
-			selectBehavior(selectedScenario, changedOptions, restrictedCategories)
-			ResetFilters()
-			if not singlePlayer then
-				randomMapMessage = import('/lua/ui/lobby/lobby.lua').sendRandMapMessage()
-			end
-		end
-	end
-	if not singlePlayer then
-		function randomLobbyMap()
-			local randomMapMessage
-			local nummapa
-			nummapa = math.random(1, randMapList)
-			if randMapList >= 2 and nummapa == doNotRepeatMap then
-				repeat
-					nummapa = math.random(1, randMapList)
-				until nummapa != doNotRepeatMap
-			end
-			doNotRepeatMap = nummapa
-			local scen = scenarios[scenarioKeymap[nummapa]]
-			selectedScenario = scen
-			rMapName = scenarios[scenarioKeymap[nummapa]].name
-			rMapSize1 = scenarios[scenarioKeymap[nummapa]].size[1]/50
-			rMapSize2 = scenarios[scenarioKeymap[nummapa]].size[2]/50
-			selectBehavior(selectedScenario, changedOptions, restrictedCategories)
-			ResetFilters()
-			randomMapMessage = import('/lua/ui/lobby/lobby.lua').sendRandMapMessage()
-		end
-	end
-	function randomAutoMap(official)
-		local nummapa
-		nummapa = math.random(1, randMapList)
-		if randMapList >= 2 and nummapa == doNotRepeatMap then
-			repeat
-				nummapa = math.random(1, randMapList)
-			until nummapa != doNotRepeatMap
-		end
-		doNotRepeatMap = nummapa
-		local scen = scenarios[scenarioKeymap[nummapa]]
-		if official then
-			local officialMap = CheckMapIsOfficial(scen)
-			if not officialMap then
-				return randomAutoMap(true)
-			end
-		end
-		selectedScenario = scen
-		selectBehavior(selectedScenario, changedOptions, restrictedCategories)
-		ResetFilters()
-	end
-	--end of random map code
+    randomMapButton.OnClick = function(self, modifiers)
+        if randMapList ~= 0 then
+            local randomMapMessage
+            local nummapa
+            nummapa = math.random(1, randMapList)
+            if randMapList >= 2 and nummapa == doNotRepeatMap then
+                repeat
+                    nummapa = math.random(1, randMapList)
+                until nummapa ~= doNotRepeatMap
+            end
+            doNotRepeatMap = nummapa
+            local scen = scenarios[scenarioKeymap[nummapa]]
+            selectedScenario = scen
+            if not singlePlayer then
+                rMapName = scenarios[scenarioKeymap[nummapa]].name
+                rMapSize1 = scenarios[scenarioKeymap[nummapa]].size[1]/50
+                rMapSize2 = scenarios[scenarioKeymap[nummapa]].size[2]/50
+                rMapSizeFilLim = currentFilters.map_select_size_limiter
+                rMapSizeFil = currentFilters.map_select_size/50
+                rMapPlayersFilLim = currentFilters.map_select_supportedplayers_limiter
+                rMapPlayersFil = currentFilters.map_select_supportedplayers
+                rMapTypeFil = currentFilters.map_type
+            end
+            selectBehavior(selectedScenario, changedOptions, restrictedCategories)
+            ResetFilters()
+            if not singlePlayer then
+                randomMapMessage = import('/lua/ui/lobby/lobby.lua').sendRandMapMessage()
+            end
+        end
+    end
+    if not singlePlayer then
+        function randomLobbyMap()
+            local randomMapMessage
+            local nummapa
+            nummapa = math.random(1, randMapList)
+            if randMapList >= 2 and nummapa == doNotRepeatMap then
+                repeat
+                    nummapa = math.random(1, randMapList)
+                until nummapa ~= doNotRepeatMap
+            end
+            doNotRepeatMap = nummapa
+            local scen = scenarios[scenarioKeymap[nummapa]]
+            selectedScenario = scen
+            rMapName = scenarios[scenarioKeymap[nummapa]].name
+            rMapSize1 = scenarios[scenarioKeymap[nummapa]].size[1]/50
+            rMapSize2 = scenarios[scenarioKeymap[nummapa]].size[2]/50
+            selectBehavior(selectedScenario, changedOptions, restrictedCategories)
+            ResetFilters()
+            randomMapMessage = import('/lua/ui/lobby/lobby.lua').sendRandMapMessage()
+        end
+    end
+    function randomAutoMap(official)
+        local nummapa
+        nummapa = math.random(1, randMapList)
+        if randMapList >= 2 and nummapa == doNotRepeatMap then
+            repeat
+                nummapa = math.random(1, randMapList)
+            until nummapa ~= doNotRepeatMap
+        end
+        doNotRepeatMap = nummapa
+        local scen = scenarios[scenarioKeymap[nummapa]]
+        if official then
+            local officialMap = CheckMapIsOfficial(scen)
+            if not officialMap then
+                return randomAutoMap(true)
+            end
+        end
+        selectedScenario = scen
+        selectBehavior(selectedScenario, changedOptions, restrictedCategories)
+        ResetFilters()
+    end
+    --end of random map code
 
     UIUtil.MakeInputModal(panel)
 
     mapListTitle = UIUtil.CreateText(panel, "<LOC sel_map_0005>Maps", 18)
-    LayoutHelpers.AtLeftTopIn(mapListTitle, panel, 360, 207)###New - Change value, originals: 360, 177--Notes: Title movement down
+    LayoutHelpers.AtLeftTopIn(mapListTitle, panel, 360, 207)------New - Change value, originals: 360, 177--Notes: Title movement down
 
     mapList = ItemList(panel, "mapselect:mapList")
     mapList:SetFont(UIUtil.bodyFont, 14)
     mapList:SetColors(UIUtil.fontColor, "00000000", "FF000000",  UIUtil.highlightColor, "ffbcfffe")
     mapList:ShowMouseoverItem(true)
     mapList.Width:Set(258)
-    mapList.Height:Set(409)###New - Change value, original: 438--Notes: Height of map selection scroll
-    LayoutHelpers.AtLeftTopIn(mapList, panel, 360, 232)###New - Change value, originals: 360, 202--Notes: Masp selection scroll move down
+    mapList.Height:Set(409)------New - Change value, original: 438--Notes: Height of map selection scroll
+    LayoutHelpers.AtLeftTopIn(mapList, panel, 360, 232)------New - Change value, originals: 360, 202--Notes: Masp selection scroll move down
     mapList.Depth:Set(function() return panel.Depth() + 10 end) --TODO what is this getting under when it's in over state?
     mapList:AcquireKeyboardFocus(true)
     mapList.OnDestroy = function(control)
@@ -462,10 +462,10 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     end
 
     selectButton.OnClick = function(self, modifiers)
-		rMapSizeFilLim = currentFilters.map_select_size_limiter
-		rMapSizeFil = currentFilters.map_select_size/50
-		rMapPlayersFilLim = currentFilters.map_select_supportedplayers_limiter
-		rMapPlayersFil = currentFilters.map_select_supportedplayers
+        rMapSizeFilLim = currentFilters.map_select_size_limiter
+        rMapSizeFil = currentFilters.map_select_size/50
+        rMapPlayersFilLim = currentFilters.map_select_supportedplayers_limiter
+        rMapPlayersFil = currentFilters.map_select_supportedplayers
         selectBehavior(selectedScenario, changedOptions, restrictedCategories)
         ResetFilters()
     end
@@ -554,14 +554,14 @@ function RefreshOptions(skipRefresh, singlePlayer)
     -- so we'll used this flag to reset the options sources so they can set up for multiplayer
     if skipRefresh then
         OptionSource[1] = {title = "<LOC uilobby_0001>Team Options", options = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions}
-		OptionSource[2] = {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts}
-		OptionSource[3] = {title = "AI Options", options = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts}
+        OptionSource[2] = {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts}
+        OptionSource[3] = {title = "AI Options", options = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts}
 --~         table.sort(OptionSource[1].options, function(a, b) return LOC(a.label) < LOC(b.label) end)
 --~         table.sort(OptionSource[2].options, function(a, b) return LOC(a.label) < LOC(b.label) end)
 --~         table.sort(OptionSource[3].options, function(a, b) return LOC(a.label) < LOC(b.label) end)
     end
-	OptionSource[4] = {}
-	OptionSource[4] = {title = "<LOC lobui_0164>Advanced", options = advOptions or {}}
+    OptionSource[4] = {}
+    OptionSource[4] = {title = "<LOC lobui_0164>Advanced", options = advOptions or {}}
 
     Options = {}
 
@@ -569,8 +569,8 @@ function RefreshOptions(skipRefresh, singlePlayer)
         if table.getsize(OptionTable.options) > 0 then
             table.insert(Options, {type = 'title', text = OptionTable.title})
             for optionIndex, optionData in OptionTable.options do
-				if not(singlePlayer and optionData.mponly == true) then
-					table.insert(Options, {type = 'option', text = optionData.label, data = optionData, default = optionData.default}) -- option1 for teamOptions for exemple
+                if not(singlePlayer and optionData.mponly == true) then
+                    table.insert(Options, {type = 'option', text = optionData.label, data = optionData, default = optionData.default}) -- option1 for teamOptions for exemple
                 end
             end
         end
@@ -605,7 +605,7 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
         local tooltipTable = {}
         Tooltip.AddComboTooltip(combo, tooltipTable, combo._list)
         combo.UpdateValue = function(key)
-			combo:SetItem(combo.keyMap[key])
+            combo:SetItem(combo.keyMap[key])
         end
 
         return combo
@@ -683,8 +683,8 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
     end
     -- determines what controls should be visible or not
     OptionContainer.CalcVisible = function(self)
-        --LOG("### CalcVisible !")
-		local function SetTextLine(line, data, lineID)
+        --LOG("------ CalcVisible !")
+        local function SetTextLine(line, data, lineID)
             if data.type == 'title' then
                 line.text:SetText(LOC(data.text))
                 line.text:SetFont(UIUtil.titleFont, 14, 3)
@@ -707,75 +707,75 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
                 local itemArray = {}
                 line.combo.keyMap = {}
                 local tooltipTable = {}
-				
-				local defValue = false
-				local realDefValue = false
-                
-				--LOG("XINNONY //////////////////////////////////////////")
-				for index, val in data.data.values do
-					--LOG(data.text..' << val.text:'..val.text..' << val.key:'..val.key..' (index:'..index..')')
-					--
-					itemArray[index] = val.text
+
+                local defValue = false
+                local realDefValue = false
+
+                --LOG("XINNONY //////////////////////////////////////////")
+                for index, val in data.data.values do
+                    --LOG(data.text..' << val.text:'..val.text..' << val.key:'..val.key..' (index:'..index..')')
+                    --
+                    itemArray[index] = val.text
                     line.combo.keyMap[tostring(val.key)] = index -- = 1 ou 2 ..
                     tooltipTable[index]={text=data.data.label,body=val.help}--= 'lob_'..data.data.key..'_'..val.key
-					--
-					if curOptions[data.data.key] and val.key == curOptions[data.data.key] then -- curOptions = gameInfo.GameOptions
-						--LOG('FIND on curOptions : key='..val.key..', index='..index)
-						defValue = index
-					end
+                    --
+                    if curOptions[data.data.key] and val.key == curOptions[data.data.key] then -- curOptions = gameInfo.GameOptions
+                        --LOG('FIND on curOptions : key='..val.key..', index='..index)
+                        defValue = index
+                    end
                 end
-				--// Set SelectedOption or Default Option or ... -- Fix AdvancedOption by Xinnony
-				--LOG('Option name : '..data.text)
-				--LOG('Number of SubOption Values : '..table.getsize(data.data.values))
-				--LOG('Default : '..tostring(data.default)..' ('..tostring(data.data.default)..')')
-				--LOG('changedOptions.index : '..tostring(changedOptions[data.data.key].index))
-				--LOG('curOptions : '..tostring(curOptions[data.data.key])) -- = gameInfo.GameOptions
---------------------------------------------------------------------------------------------------------------------------------
-				if data.default == 0 or data.default > table.getsize(data.data.values) then -- THE MAP OPTIONS IS NOT RESPECTED
-					LOG('THE MAP OPTIONS IS NOT RESPECTED, NEED FIX BY THE AUTHOR OF THIS MAP (default value is Index !)')
-				end
-				if changedOptions[data.data.key].index then -- IF already set&clicked in Combo
-					--LOG('> 2')
-					defValue = changedOptions[data.data.key].index
-				elseif defValue then -- IF already set and saved (curOptions exist)
-					--LOG('> 1')
-					defValue = defValue
-				else
-					--LOG('> 3')
-					if data.default != nil and data.default <= table.getsize(data.data.values) then
-						--LOG('> 3 > 1')
-						if line.combo.keyMap[curOptions[data.data.key]] != nil then
-							--LOG('> 3 > 1 > 1')
-						else
-							--LOG('> 3 > 1 > 2')
-						end
-						defValue = changedOptions[data.data.key].index or line.combo.keyMap[curOptions[data.data.key]] or data.default or 1
-						if data.default == 0 then -- THE MAP OPTIONS IS NOT RESPECTED
-							--LOG('> 3 > 1 > 3')
-							--LOG("default : 0 (set to 1 because is index)")
-							defValue = line.combo.keyMap[curOptions[data.data.key]] or 1
-						end
-					else
-						--LOG('> 4 > Not have a default value (set to the first Item)')
-						defValue = changedOptions[data.data.key].index or line.combo.keyMap[curOptions[data.data.key]] or 1
-					end
-					--LOG("FINALY, defValue = "..tostring(defValue))
-					--LOG("XINNONY \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\")
-				end
-				--
-				--if data.type == 'option1' or data.type == 'option2' or data.type == 'option3' then -- For enable label (default) just or global/team/ai options
-				if data.data.default then realDefValue = data.data.default end
-				line.combo:AddItems(itemArray, defValue, realDefValue) -- For all (true for enable (default) label)
+                --// Set SelectedOption or Default Option or ... -- Fix AdvancedOption by Xinnony
+                --LOG('Option name : '..data.text)
+                --LOG('Number of SubOption Values : '..table.getsize(data.data.values))
+                --LOG('Default : '..tostring(data.default)..' ('..tostring(data.data.default)..')')
+                --LOG('changedOptions.index : '..tostring(changedOptions[data.data.key].index))
+                --LOG('curOptions : '..tostring(curOptions[data.data.key])) -- = gameInfo.GameOptions
+-----------------------------------------------------------------------------------------------------
+                if data.default == 0 or data.default > table.getsize(data.data.values) then -- THE MAP OPTIONS IS NOT RESPECTED
+                    LOG('THE MAP OPTIONS IS NOT RESPECTED, NEED FIX BY THE AUTHOR OF THIS MAP (default value is Index !)')
+                end
+                if changedOptions[data.data.key].index then -- IF already set&clicked in Combo
+                    --LOG('> 2')
+                    defValue = changedOptions[data.data.key].index
+                elseif defValue then -- IF already set and saved (curOptions exist)
+                    --LOG('> 1')
+                    defValue = defValue
+                else
+                    --LOG('> 3')
+                    if data.default ~= nil and data.default <= table.getsize(data.data.values) then
+                        --LOG('> 3 > 1')
+                        if line.combo.keyMap[curOptions[data.data.key]] ~= nil then
+                            --LOG('> 3 > 1 > 1')
+                        else
+                            --LOG('> 3 > 1 > 2')
+                        end
+                        defValue = changedOptions[data.data.key].index or line.combo.keyMap[curOptions[data.data.key]] or data.default or 1
+                        if data.default == 0 then -- THE MAP OPTIONS IS NOT RESPECTED
+                            --LOG('> 3 > 1 > 3')
+                            --LOG("default : 0 (set to 1 because is index)")
+                            defValue = line.combo.keyMap[curOptions[data.data.key]] or 1
+                        end
+                    else
+                        --LOG('> 4 > Not have a default value (set to the first Item)')
+                        defValue = changedOptions[data.data.key].index or line.combo.keyMap[curOptions[data.data.key]] or 1
+                    end
+                    --LOG("FINALY, defValue = "..tostring(defValue))
+                    --LOG("XINNONY \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\")
+                end
+                --
+                --if data.type == 'option1' or data.type == 'option2' or data.type == 'option3' then -- For enable label (default) just or global/team/ai options
+                if data.data.default then realDefValue = data.data.default end
+                line.combo:AddItems(itemArray, defValue, realDefValue) -- For all (true for enable (default) label)
                 line.combo.OnClick = function(self, index, text)
-					--LOG('>> OnClick > '..index..' > '..text)
+                    --LOG('>> OnClick > '..index..' > '..text)
                     changedOptions[data.data.key] = {value = data.data.values[index].key, pref = data.data.pref, index = index}
-					--LOG('>> changedOptions > '..changedOptions[data.data.key].value..' > '..changedOptions[data.data.key].pref..' > '..changedOptions[data.data.key].index)
+                    --LOG('>> changedOptions > '..changedOptions[data.data.key].value..' > '..changedOptions[data.data.key].pref..' > '..changedOptions[data.data.key].index)
                 end
                 line.HandleEvent = Group.HandleEvent
                 Tooltip.AddControlTooltip(line, {text=data.data.label,body=data.data.help})--(line, data.data.pref)
                 Tooltip.AddComboTooltip(line.combo, tooltipTable, line.combo._list)
                 line.combo.UpdateValue = function(key)
-					line.combo:SetItem(line.combo.keyMap[key])
+                    line.combo:SetItem(line.combo.keyMap[key])
                 end
             end
         end
@@ -832,13 +832,13 @@ function SetDescription(scen)
         description:AddItem(LOCF("<LOC map_select_0005>NO START SPOTS DEFINED"))
         errors = true
     end
-	###New SetDescription - Start
-	if EnhancedLobby.CheckMapHasMarkers(scen) then
-		description:AddItem("AI Markers: Yes")
-	else
-		description:AddItem("AI Markers: No")
-	end
-	###New SetDescription - End
+    ------New SetDescription - Start
+    if EnhancedLobby.CheckMapHasMarkers(scen) then
+        description:AddItem("AI Markers: Yes")
+    else
+        description:AddItem("AI Markers: No")
+    end
+    ------New SetDescription - End
     description:AddItem("")
     if scen.description then
         local textBoxWidth = description.Width()
@@ -866,7 +866,7 @@ function PopulateMapList()
         local validMapSize = false
         local validMapPlayers = false
         local index = i
-        if currentFilters.map_select_supportedplayers != 0 then
+        if currentFilters.map_select_supportedplayers ~= 0 then
             if CompareFunc(table.getsize(sceninfo.Configurations.standard.teams[1].armies),
                 currentFilters.map_select_supportedplayers,
                 currentFilters.map_select_supportedplayers_limiter) then
@@ -875,32 +875,32 @@ function PopulateMapList()
         else
             validMapSize = true
         end
-        if currentFilters.map_select_size != 0 then
+        if currentFilters.map_select_size ~= 0 then
             if CompareFunc(sceninfo.size[1], currentFilters.map_select_size, currentFilters.map_select_size_limiter) then
                 validMapPlayers = true
             end
         else
             validMapPlayers = true
         end
-		if currentFilters.map_type != 0 then
-			local officialMap = CheckMapIsOfficial(sceninfo)
-			if not officialMap and currentFilters.map_type == 1 then
-				continue
-			end
-			if officialMap and currentFilters.map_type == 2 then
-				continue
-			end
-		end
-		###New scenario - Start
-		if currentFilters.map_ai_markers != 0 then
-			if not EnhancedLobby.CheckMapHasMarkers(sceninfo) and currentFilters.map_ai_markers == 1 then
-				continue
-			end
-			if EnhancedLobby.CheckMapHasMarkers(sceninfo) and currentFilters.map_ai_markers == 2 then
-				continue
-			end
-		end
-		###New scenario - End
+        if currentFilters.map_type ~= 0 then
+            local officialMap = CheckMapIsOfficial(sceninfo)
+            if not officialMap and currentFilters.map_type == 1 then
+                continue
+            end
+            if officialMap and currentFilters.map_type == 2 then
+                continue
+            end
+        end
+        ------New scenario - Start
+        if currentFilters.map_ai_markers ~= 0 then
+            if not EnhancedLobby.CheckMapHasMarkers(sceninfo) and currentFilters.map_ai_markers == 1 then
+                continue
+            end
+            if EnhancedLobby.CheckMapHasMarkers(sceninfo) and currentFilters.map_ai_markers == 2 then
+                continue
+            end
+        end
+        ------New scenario - End
         if validMapSize and validMapPlayers then
             table.insert(tempMaps, sceninfo)
             scenarioKeymap[count] = index
@@ -910,22 +910,22 @@ function PopulateMapList()
 
     for i,sceninfo in tempMaps do
         local name = sceninfo.name
-		local officialMap = CheckMapIsOfficial(sceninfo)
-		if not officialMap then
-			name = name .. " (" .. LOC("<LOC MAINMENU_0011>Custom") .. ")"
-		end
+        local officialMap = CheckMapIsOfficial(sceninfo)
+        if not officialMap then
+            name = name .. " (" .. LOC("<LOC MAINMENU_0011>Custom") .. ")"
+        end
         mapList:AddItem(LOC(name))
     end
 
-	randMapList = count - 1
+    randMapList = count - 1
 
-	if randMapList == 0 then
-		mapListTitle:SetText(LOCF("<LOC lobui_0579>No Map Available", randMapList))
-	elseif randMapList == 1 then
-		mapListTitle:SetText(LOCF("<LOC lobui_0580>%d Map Available", randMapList))
-	else
-		mapListTitle:SetText(LOCF("<LOC lobui_0581>%d Maps Available", randMapList))
-	end
+    if randMapList == 0 then
+        mapListTitle:SetText(LOCF("<LOC lobui_0579>No Map Available", randMapList))
+    elseif randMapList == 1 then
+        mapListTitle:SetText(LOCF("<LOC lobui_0580>%d Map Available", randMapList))
+    else
+        mapListTitle:SetText(LOCF("<LOC lobui_0581>%d Maps Available", randMapList))
+    end
 end
 
 function CompareFunc(valA, valB, operatorVar)

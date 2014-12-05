@@ -551,9 +551,9 @@ function CreateButton2(parent, up, down, over, disabled, label, pointSize, textO
         button.label = CreateText(button, label, pointSize)
         LayoutHelpers.AtCenterIn(button.label, button, textOffsetVert, textOffsetHorz)
         button.label:DisableHitTest()
-		button.label:SetFont('Arial', 11)
-		button.label:SetColor('B9BFB9')
-		button.label:SetDropShadow(true)
+        button.label:SetFont('Arial', 11)
+        button.label:SetColor('B9BFB9')
+        button.label:SetDropShadow(true)
 
         -- if text exists, set up to grey it out
         button.OnDisable = function(self)
@@ -692,8 +692,8 @@ end
 --* return the standard scrollbar
 function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom, offset_top)
     offset_right = offset_right or 0
-	offset_bottom = offset_bottom or 0
-	offset_top = offset_top or 0
+    offset_bottom = offset_bottom or 0
+    offset_top = offset_top or 0
     local textureName = filename or '/small-vert_scroll/'
     local scrollbg = textureName..'back_scr_mid.dds'
     local scrollbarmid = textureName..'bar-mid_scr_over.dds'
@@ -732,7 +732,7 @@ function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom,
     scrollUpButton.Left:Set(scrollbar.Left)
     scrollUpButton.Top:Set(function() return attachto.Top() + offset_top end)
 
-	scrollDownButton.Left:Set(scrollbar.Left)
+    scrollDownButton.Left:Set(scrollbar.Left)
     scrollDownButton.Bottom:Set(function() return attachto.Bottom() + offset_bottom end)
 
     scrollbar.Right:Set(scrollUpButton.Right)
@@ -745,8 +745,8 @@ end
 
 function CreateVertScrollbarFor2(attachto, offset_right, filename, offset_bottom, offset_top) -- for New Skin Lobby -- Xinnony
     offset_right = offset_right or 0
-	offset_bottom = offset_bottom or 0
-	offset_top = offset_top or 0
+    offset_bottom = offset_bottom or 0
+    offset_top = offset_top or 0
     local textureName = filename or '/SCROLLBAR_VERT/'
     local scrollbg = textureName..'back_scr_mid.dds'
     local scrollbarmid = textureName..'bar-mid_scr_over.dds'
@@ -785,7 +785,7 @@ function CreateVertScrollbarFor2(attachto, offset_right, filename, offset_bottom
     scrollUpButton.Left:Set(scrollbar.Left)
     scrollUpButton.Top:Set(function() return attachto.Top() + offset_top end)
 
-	scrollDownButton.Left:Set(scrollbar.Left)
+    scrollDownButton.Left:Set(scrollbar.Left)
     scrollDownButton.Bottom:Set(function() return attachto.Bottom() + offset_bottom end)
 
     scrollbar.Right:Set(scrollUpButton.Right)
@@ -859,8 +859,8 @@ function MakeInputModal(control, onEnterFunc, onEscFunc)
             end
             if control.oldHandleEvent then
                 return control.oldHandleEvent(self, event)
-			end
-			return true
+            end
+            return true
         end
     end
 end
@@ -946,9 +946,9 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
         if callback then
             button.OnClick = function(self)
                 callback()
-				if destroyOnCallback then
-					dialog:Destroy()
-				end
+                if destroyOnCallback then
+                    dialog:Destroy()
+                end
             end
         else
             button.OnClick = function(self)
@@ -1076,7 +1076,7 @@ function QuickDialog2(parent, dialogText, button1Text, button1Callback, button2T
         else
             textLine[i] = CreateText(dialog, v, 10, 'Arial')
             LayoutHelpers.Below(textLine[i], prevControl)
-			LayoutHelpers.AtLeftIn(textLine[i], dialog, 30)
+            LayoutHelpers.AtLeftIn(textLine[i], dialog, 30)
             --LayoutHelpers.AtHorizontalCenterIn(textLine[i], dialog)
             prevControl = textLine[i]
         end
@@ -1107,9 +1107,9 @@ function QuickDialog2(parent, dialogText, button1Text, button1Callback, button2T
         if callback then
             button.OnClick = function(self)
                 callback()
-				if destroyOnCallback then
-					dialog:Destroy()
-				end
+                if destroyOnCallback then
+                    dialog:Destroy()
+                end
             end
         else
             button.OnClick = function(self)
@@ -1214,14 +1214,14 @@ function CreateWorldCover(parent, colorOverride)
             worldCovers[index].ID = index
             worldCovers[index].OnDestroy = function(self)
                 for h, x in worldCovers do
-                    if x and h ~= self.ID then 
+                    if x and h ~= self.ID then
                         x:Destroy()
                     end
                 end
             end
             worldCovers[index].OnHide = function(self, hidden)
                 for h, x in worldCovers do
-                    if x and h ~= self.ID then 
+                    if x and h ~= self.ID then
                         x:SetHidden(hidden)
                     end
                 end

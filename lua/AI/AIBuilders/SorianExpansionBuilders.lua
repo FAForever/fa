@@ -1,11 +1,11 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/AI/AIBuilders/SorianExpansionBuilders.lua
-#**
-#**  Summary  : Builder definitions for expansion bases
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/AI/AIBuilders/SorianExpansionBuilders.lua
+--**
+--**  Summary  : Builder definitions for expansion bases
+--**
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local BBTmplFile = '/lua/basetemplates.lua'
 local BuildingTmpl = 'BuildingTemplates'
@@ -29,11 +29,11 @@ local ExtractorToFactoryRatio = 3
 BuilderGroup {
     BuilderGroupName = 'SorianEngineerExpansionBuildersFull',
     BuildersType = 'EngineerBuilder',
-    
-    ########################################
-    ## Builds expansion bases
-    ########################################
-    ### Start the Factories in the expansion
+
+    --------------------------------------------------------------------------------
+    ---- Builds expansion bases
+    --------------------------------------------------------------------------------
+    ------ Start the Factories in the expansion
     Builder {
         BuilderName = 'Sorian T1VacantStartingAreaEngineer - Rush',
         PlatoonTemplate = 'EngineerBuilderSorian',
@@ -43,17 +43,17 @@ BuilderGroup {
             { UCBC, 'StartLocationNeedsEngineer', { 'LocationType', 1000, -1000, 5, 0, 'StructuresNotMex' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { SBC, 'LessThanGameTime', { 600 } },
-			{ SIBC, 'LessThanExpansionBases', { } },
-			{ SBC, 'NoRushTimeCheck', { 0 }},
-            #{ UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
-            #{ EBC, 'MassIncomeToUnitRatio', { 6.5, '>=', 'FACTORY TECH1 STRUCTURE' } },
-            #{ EBC, 'MassIncomeToUnitRatio', { 14, '>=', 'FACTORY TECH2 STRUCTURE' } },
-            #{ EBC, 'MassIncomeToUnitRatio', { 19, '>=', 'FACTORY TECH3 STRUCTURE' } },
-            #{ EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
+            { SIBC, 'LessThanExpansionBases', { } },
+            { SBC, 'NoRushTimeCheck', { 0 }},
+            --{ UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
+            --{ EBC, 'MassIncomeToUnitRatio', { 6.5, '>=', 'FACTORY TECH1 STRUCTURE' } },
+            --{ EBC, 'MassIncomeToUnitRatio', { 14, '>=', 'FACTORY TECH2 STRUCTURE' } },
+            --{ EBC, 'MassIncomeToUnitRatio', { 19, '>=', 'FACTORY TECH3 STRUCTURE' } },
+            --{ EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
         },
         BuilderType = 'Any',
         BuilderData = {
-			RequireTransport = true,
+            RequireTransport = true,
             Construction = {
                 BuildClose = false,
                 BaseTemplate = ExBaseTmpl,
@@ -65,18 +65,18 @@ BuilderGroup {
                 ThreatMax = 5,
                 ThreatRings = 0,
                 ThreatType = 'StructuresNotMex',
-                BuildStructures = {                    
-					'T1GroundDefense',
-					'T1LandFactory',
-					'T1LandFactory',
-					'T1AADefense',
-					'T1Radar',
-                }               
+                BuildStructures = {
+                    'T1GroundDefense',
+                    'T1LandFactory',
+                    'T1LandFactory',
+                    'T1AADefense',
+                    'T1Radar',
+                }
             },
             NeedGuard = true,
         }
-    }, 
-    
+    },
+
     Builder {
         BuilderName = 'Sorian T1VacantStartingAreaEngineer',
         PlatoonTemplate = 'EngineerBuilderSorian',
@@ -85,17 +85,17 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'StartLocationNeedsEngineer', { 'LocationType', 1000, -1000, 100, 0, 'StructuresNotMex' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
-			{ SIBC, 'LessThanExpansionBases', { } },
-			{ SBC, 'NoRushTimeCheck', { 0 }},
-            #{ UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
-            #{ EBC, 'MassIncomeToUnitRatio', { 6.5, '>=', 'FACTORY TECH1 STRUCTURE' } },
-            #{ EBC, 'MassIncomeToUnitRatio', { 14, '>=', 'FACTORY TECH2 STRUCTURE' } },
-            #{ EBC, 'MassIncomeToUnitRatio', { 19, '>=', 'FACTORY TECH3 STRUCTURE' } },
+            { SIBC, 'LessThanExpansionBases', { } },
+            { SBC, 'NoRushTimeCheck', { 0 }},
+            --{ UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
+            --{ EBC, 'MassIncomeToUnitRatio', { 6.5, '>=', 'FACTORY TECH1 STRUCTURE' } },
+            --{ EBC, 'MassIncomeToUnitRatio', { 14, '>=', 'FACTORY TECH2 STRUCTURE' } },
+            --{ EBC, 'MassIncomeToUnitRatio', { 19, '>=', 'FACTORY TECH3 STRUCTURE' } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
         },
         BuilderType = 'Any',
         BuilderData = {
-			RequireTransport = true,
+            RequireTransport = true,
             Construction = {
                 BuildClose = false,
                 BaseTemplate = ExBaseTmpl,
@@ -107,16 +107,16 @@ BuilderGroup {
                 ThreatMax = 100,
                 ThreatRings = 0,
                 ThreatType = 'StructuresNotMex',
-                BuildStructures = {                    
-					'T1GroundDefense',
-					'T1LandFactory',
-					'T1AADefense',
-					'T1Radar',
+                BuildStructures = {
+                    'T1GroundDefense',
+                    'T1LandFactory',
+                    'T1AADefense',
+                    'T1Radar',
                 }
             },
             NeedGuard = true,
         }
-    },       
+    },
     Builder {
         BuilderName = 'Sorian T2VacantStartingAreaEngineer',
         PlatoonTemplate = 'T2EngineerBuilderSorian',
@@ -125,18 +125,18 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'StartLocationNeedsEngineer', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
-			{ SIBC, 'LessThanExpansionBases', { } },
-			{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH2 } },
-			{ SBC, 'NoRushTimeCheck', { 0 }},
-            #{ UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
-            #{ EBC, 'MassIncomeToUnitRatio', { 6.5, '>=', 'FACTORY TECH1 STRUCTURE' } },
-            #{ EBC, 'MassIncomeToUnitRatio', { 14, '>=', 'FACTORY TECH2 STRUCTURE' } },
-            #{ EBC, 'MassIncomeToUnitRatio', { 19, '>=', 'FACTORY TECH3 STRUCTURE' } },
+            { SIBC, 'LessThanExpansionBases', { } },
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH2 } },
+            { SBC, 'NoRushTimeCheck', { 0 }},
+            --{ UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
+            --{ EBC, 'MassIncomeToUnitRatio', { 6.5, '>=', 'FACTORY TECH1 STRUCTURE' } },
+            --{ EBC, 'MassIncomeToUnitRatio', { 14, '>=', 'FACTORY TECH2 STRUCTURE' } },
+            --{ EBC, 'MassIncomeToUnitRatio', { 19, '>=', 'FACTORY TECH3 STRUCTURE' } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
         },
         BuilderType = 'Any',
         BuilderData = {
-			RequireTransport = true,
+            RequireTransport = true,
             Construction = {
                 BuildClose = false,
                 BaseTemplate = ExBaseTmpl,
@@ -148,11 +148,11 @@ BuilderGroup {
                 ThreatMax = 0,
                 ThreatRings = 2,
                 ThreatType = 'StructuresNotMex',
-                BuildStructures = {                    
-					'T2GroundDefense',
-					'T1LandFactory',
-					'T2AADefense',
-					'T2Radar',
+                BuildStructures = {
+                    'T2GroundDefense',
+                    'T1LandFactory',
+                    'T2AADefense',
+                    'T2Radar',
                 }
             },
             NeedGuard = true,
@@ -166,15 +166,15 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'StartLocationNeedsEngineer', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
-			{ SIBC, 'LessThanExpansionBases', { } },
-			{ SBC, 'NoRushTimeCheck', { 0 }},
-			{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
+            { SIBC, 'LessThanExpansionBases', { } },
+            { SBC, 'NoRushTimeCheck', { 0 }},
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
             { UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
         },
         BuilderType = 'Any',
         BuilderData = {
-			RequireTransport = true,
+            RequireTransport = true,
             Construction = {
                 BuildClose = false,
                 BaseTemplate = ExBaseTmpl,
@@ -187,10 +187,10 @@ BuilderGroup {
                 ThreatRings = 2,
                 ThreatType = 'StructuresNotMex',
                 BuildStructures = {
-                    'T2GroundDefense',                    
+                    'T2GroundDefense',
                     'T1LandFactory',
-					'T3AADefense',
-					'T2Radar',				
+                    'T3AADefense',
+                    'T2Radar',
                 }
             },
             NeedGuard = true,
@@ -201,11 +201,11 @@ BuilderGroup {
 BuilderGroup {
     BuilderGroupName = 'SorianEngineerExpansionBuildersFull - Naval',
     BuildersType = 'EngineerBuilder',
-    
-    ########################################
-    ## Builds expansion bases
-    ########################################
-    ### Start the Factories in the expansion
+
+    --------------------------------------------------------------------------------
+    ---- Builds expansion bases
+    --------------------------------------------------------------------------------
+    ------ Start the Factories in the expansion
     Builder {
         BuilderName = 'Sorian T1VacantStartingAreaEngineer - Naval',
         PlatoonTemplate = 'EngineerBuilderSorian',
@@ -214,17 +214,17 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'StartLocationNeedsEngineer', { 'LocationType', 1000, -1000, 100, 0, 'StructuresNotMex' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
-			{ SIBC, 'LessThanExpansionBases', { } },
-			{ SBC, 'NoRushTimeCheck', { 0 }},
-            #{ UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
-            #{ EBC, 'MassIncomeToUnitRatio', { 6.5, '>=', 'FACTORY TECH1 STRUCTURE' } },
-            #{ EBC, 'MassIncomeToUnitRatio', { 14, '>=', 'FACTORY TECH2 STRUCTURE' } },
-            #{ EBC, 'MassIncomeToUnitRatio', { 19, '>=', 'FACTORY TECH3 STRUCTURE' } },
+            { SIBC, 'LessThanExpansionBases', { } },
+            { SBC, 'NoRushTimeCheck', { 0 }},
+            --{ UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
+            --{ EBC, 'MassIncomeToUnitRatio', { 6.5, '>=', 'FACTORY TECH1 STRUCTURE' } },
+            --{ EBC, 'MassIncomeToUnitRatio', { 14, '>=', 'FACTORY TECH2 STRUCTURE' } },
+            --{ EBC, 'MassIncomeToUnitRatio', { 19, '>=', 'FACTORY TECH3 STRUCTURE' } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
         },
         BuilderType = 'Any',
         BuilderData = {
-			RequireTransport = true,
+            RequireTransport = true,
             Construction = {
                 BuildClose = false,
                 BaseTemplate = ExBaseTmpl,
@@ -236,16 +236,16 @@ BuilderGroup {
                 ThreatMax = 100,
                 ThreatRings = 0,
                 ThreatType = 'StructuresNotMex',
-                BuildStructures = {                    
-					'T1GroundDefense',
-					'T1LandFactory',
-					'T1AADefense',
-					'T1Radar',
+                BuildStructures = {
+                    'T1GroundDefense',
+                    'T1LandFactory',
+                    'T1AADefense',
+                    'T1Radar',
                 }
             },
             NeedGuard = true,
         }
-    },       
+    },
     Builder {
         BuilderName = 'Sorian T2VacantStartingAreaEngineer - Naval',
         PlatoonTemplate = 'T2EngineerBuilderSorian',
@@ -254,18 +254,18 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'StartLocationNeedsEngineer', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
-			{ SIBC, 'LessThanExpansionBases', { } },
-			{ SBC, 'NoRushTimeCheck', { 0 }},
-			{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH2 } },
-            #{ UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
-            #{ EBC, 'MassIncomeToUnitRatio', { 6.5, '>=', 'FACTORY TECH1 STRUCTURE' } },
-            #{ EBC, 'MassIncomeToUnitRatio', { 14, '>=', 'FACTORY TECH2 STRUCTURE' } },
-            #{ EBC, 'MassIncomeToUnitRatio', { 19, '>=', 'FACTORY TECH3 STRUCTURE' } },
+            { SIBC, 'LessThanExpansionBases', { } },
+            { SBC, 'NoRushTimeCheck', { 0 }},
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH2 } },
+            --{ UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
+            --{ EBC, 'MassIncomeToUnitRatio', { 6.5, '>=', 'FACTORY TECH1 STRUCTURE' } },
+            --{ EBC, 'MassIncomeToUnitRatio', { 14, '>=', 'FACTORY TECH2 STRUCTURE' } },
+            --{ EBC, 'MassIncomeToUnitRatio', { 19, '>=', 'FACTORY TECH3 STRUCTURE' } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
         },
         BuilderType = 'Any',
         BuilderData = {
-			RequireTransport = true,
+            RequireTransport = true,
             Construction = {
                 BuildClose = false,
                 BaseTemplate = ExBaseTmpl,
@@ -277,11 +277,11 @@ BuilderGroup {
                 ThreatMax = 0,
                 ThreatRings = 2,
                 ThreatType = 'StructuresNotMex',
-                BuildStructures = {                    
-					'T2GroundDefense',
-					'T1LandFactory',
-					'T2AADefense',
-					'T2Radar',
+                BuildStructures = {
+                    'T2GroundDefense',
+                    'T1LandFactory',
+                    'T2AADefense',
+                    'T2Radar',
                 }
             },
             NeedGuard = true,
@@ -295,15 +295,15 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'StartLocationNeedsEngineer', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
-			{ SIBC, 'LessThanExpansionBases', { } },
-			{ SBC, 'NoRushTimeCheck', { 0 }},
-			{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
+            { SIBC, 'LessThanExpansionBases', { } },
+            { SBC, 'NoRushTimeCheck', { 0 }},
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
             { UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
         },
         BuilderType = 'Any',
         BuilderData = {
-			RequireTransport = true,
+            RequireTransport = true,
             Construction = {
                 BuildClose = false,
                 BaseTemplate = ExBaseTmpl,
@@ -316,10 +316,10 @@ BuilderGroup {
                 ThreatRings = 2,
                 ThreatType = 'StructuresNotMex',
                 BuildStructures = {
-                    'T2GroundDefense',                    
+                    'T2GroundDefense',
                     'T1LandFactory',
-					'T3AADefense',
-					'T2Radar',				
+                    'T3AADefense',
+                    'T2Radar',
                 }
             },
             NeedGuard = true,
@@ -330,10 +330,10 @@ BuilderGroup {
 BuilderGroup {
     BuilderGroupName = 'SorianEngineerExpansionBuildersSmall',
     BuildersType = 'EngineerBuilder',
-    
-    ########################################
-    ## Builds expansion bases
-    ########################################
+
+    --------------------------------------------------------------------------------
+    ---- Builds expansion bases
+    --------------------------------------------------------------------------------
     Builder {
         BuilderName = 'Sorian T1 Vacant Expansion Area Engineer(Full Base)',
         PlatoonTemplate = 'EngineerBuilderSorian',
@@ -342,18 +342,18 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'ExpansionAreaNeedsEngineer', { 'LocationType', 1000, -1000, 100, 2, 'StructuresNotMex' } },
             { UCBC, 'StartLocationsFull', { 'LocationType', 1000, -1000, 100, 2, 'StructuresNotMex' } },
-            { UCBC, 'UnitCapCheckLess', { .8 } },   
-			{ SIBC, 'LessThanExpansionBases', { } },
-			{ SBC, 'NoRushTimeCheck', { 0 }},
-            #{ EBC, 'MassIncomeToUnitRatio', { 10, '>=', 'FACTORY TECH1 STRUCTURE' } },
-            #{ EBC, 'MassIncomeToUnitRatio', { 20, '>=', 'FACTORY TECH2 STRUCTURE' } },
-            #{ EBC, 'MassIncomeToUnitRatio', { 30, '>=', 'FACTORY TECH3 STRUCTURE' } },
-            #{ UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
+            { UCBC, 'UnitCapCheckLess', { .8 } },
+            { SIBC, 'LessThanExpansionBases', { } },
+            { SBC, 'NoRushTimeCheck', { 0 }},
+            --{ EBC, 'MassIncomeToUnitRatio', { 10, '>=', 'FACTORY TECH1 STRUCTURE' } },
+            --{ EBC, 'MassIncomeToUnitRatio', { 20, '>=', 'FACTORY TECH2 STRUCTURE' } },
+            --{ EBC, 'MassIncomeToUnitRatio', { 30, '>=', 'FACTORY TECH3 STRUCTURE' } },
+            --{ UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
         },
         BuilderType = 'Any',
         BuilderData = {
-			RequireTransport = true,
+            RequireTransport = true,
             Construction = {
                 BuildClose = false,
                 BaseTemplate = ExBaseTmpl,
@@ -365,11 +365,11 @@ BuilderGroup {
                 ThreatMax = 100,
                 ThreatRings = 2,
                 ThreatType = 'StructuresNotMex',
-                BuildStructures = {                    
-					'T1GroundDefense',
-					'T1LandFactory',
-					'T1AADefense',
-					'T1Radar',
+                BuildStructures = {
+                    'T1GroundDefense',
+                    'T1LandFactory',
+                    'T1AADefense',
+                    'T1Radar',
                 }
             },
             NeedGuard = true,
@@ -378,39 +378,39 @@ BuilderGroup {
     Builder {
         BuilderName = 'Sorian T1 Vacant Expansion Area Engineer(Fire base)',
         PlatoonTemplate = 'EngineerBuilderSorian',
-        Priority = 0, #850,
+        Priority = 0, --850,
         InstanceCount = 2,
         BuilderConditions = {
             { SIBC, 'ExpansionPointNeedsStructure', { 'LocationType', 1000, 'DEFENSE TECH1 STRUCTURE', 20, 3, 0, 1, 2, 'StructuresNotMex' } },
-            #{ UCBC, 'StartLocationsFull', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
+            --{ UCBC, 'StartLocationsFull', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             { UCBC, 'UnitCapCheckLess', { .7 } },
-            #{ UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
+            --{ UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
         },
         BuilderType = 'Any',
         BuilderData = {
-			RequireTransport = true,
+            RequireTransport = true,
             Construction = {
                 BuildClose = false,
-				MarkerRadius = 20,
+                MarkerRadius = 20,
                 NearMarkerType = 'Expansion Area',
                 LocationRadius = 1000,
                 LocationType = 'LocationType',
                 ThreatMin = 0,
                 ThreatMax = 1,
                 ThreatRings = 2,
-				MarkerUnitCount = 3,
+                MarkerUnitCount = 3,
                 ThreatType = 'StructuresNotMex',
-				MarkerUnitCategory = 'DEFENSE TECH1 STRUCTURE',
+                MarkerUnitCategory = 'DEFENSE TECH1 STRUCTURE',
                 BuildStructures = {
-                    'T1GroundDefense',                    
                     'T1GroundDefense',
-					'T1AADefense',
-					'T1AADefense',
+                    'T1GroundDefense',
+                    'T1AADefense',
+                    'T1AADefense',
                 }
             },
             NeedGuard = true,
         }
-    },    
+    },
     Builder {
         BuilderName = 'Sorian T2VacantExpansiongAreaEngineer',
         PlatoonTemplate = 'T2EngineerBuilderSorian',
@@ -420,15 +420,15 @@ BuilderGroup {
             { UCBC, 'ExpansionAreaNeedsEngineer', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             { UCBC, 'StartLocationsFull', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             { UCBC, 'UnitCapCheckLess', { .7 } },
-			{ SIBC, 'LessThanExpansionBases', { } },
-			{ SBC, 'NoRushTimeCheck', { 0 }},
-			{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH2 } },
+            { SIBC, 'LessThanExpansionBases', { } },
+            { SBC, 'NoRushTimeCheck', { 0 }},
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH2 } },
             { UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
         },
         BuilderType = 'Any',
         BuilderData = {
-			RequireTransport = true,
+            RequireTransport = true,
             Construction = {
                 BuildClose = false,
                 BaseTemplate = ExBaseTmpl,
@@ -441,10 +441,10 @@ BuilderGroup {
                 ThreatRings = 2,
                 ThreatType = 'StructuresNotMex',
                 BuildStructures = {
-					'T2GroundDefense',
-					'T1LandFactory',
+                    'T2GroundDefense',
+                    'T1LandFactory',
                     'T2AADefense',
-					'T2Radar',				
+                    'T2Radar',
                 }
             },
             NeedGuard = true,
@@ -459,15 +459,15 @@ BuilderGroup {
             { UCBC, 'ExpansionAreaNeedsEngineer', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             { UCBC, 'StartLocationsFull', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             { UCBC, 'UnitCapCheckLess', { .7 } },
-			{ SIBC, 'LessThanExpansionBases', { } },
-			{ SBC, 'NoRushTimeCheck', { 0 }},
-			{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
+            { SIBC, 'LessThanExpansionBases', { } },
+            { SBC, 'NoRushTimeCheck', { 0 }},
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
             { UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
         },
         BuilderType = 'Any',
         BuilderData = {
-			RequireTransport = true,
+            RequireTransport = true,
             Construction = {
                 BuildClose = false,
                 BaseTemplate = ExBaseTmpl,
@@ -480,10 +480,10 @@ BuilderGroup {
                 ThreatRings = 2,
                 ThreatType = 'StructuresNotMex',
                 BuildStructures = {
-					'T2GroundDefense',
-					'T1LandFactory',
-					'T3AADefense',
-					'T2Radar',				
+                    'T2GroundDefense',
+                    'T1LandFactory',
+                    'T3AADefense',
+                    'T2Radar',
                 }
             },
             NeedGuard = true,
@@ -495,10 +495,10 @@ BuilderGroup {
 BuilderGroup {
     BuilderGroupName = 'SorianEngineerFirebaseBuilders',
     BuildersType = 'EngineerBuilder',
-    
-    ########################################
-    ## Builds fire bases
-    ########################################
+
+    --------------------------------------------------------------------------------
+    ---- Builds fire bases
+    --------------------------------------------------------------------------------
     Builder {
         BuilderName = 'Sorian T2 Expansion Area Firebase Engineer',
         PlatoonTemplate = 'T2EngineerBuilderSorian',
@@ -507,13 +507,13 @@ BuilderGroup {
         BuilderConditions = {
             { MABC, 'CanBuildFirebase', { 'LocationType', 256, 'Expansion Area', -1000, 5, 1, 'AntiSurface', 1, 'STRATEGIC', 20} },
             { UCBC, 'UnitCapCheckLess', { .85 } },
-			{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH2 } },
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH2 } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
-			{ SBC, 'NoRushTimeCheck', { 0 }},
+            { SBC, 'NoRushTimeCheck', { 0 }},
         },
         BuilderType = 'Any',
         BuilderData = {
-			RequireTransport = true,
+            RequireTransport = true,
             Construction = {
                 BuildClose = false,
                 BaseTemplate = ExBaseTmpl,
@@ -532,14 +532,14 @@ BuilderGroup {
                     'T2StrategicMissile',
                     'T2AADefense',
                     'T2GroundDefense',
-					'T2Radar',
+                    'T2Radar',
                     'T2Artillery',
                     'T2StrategicMissileDefense',
                     'T2AADefense',
                     'T2GroundDefense',
                     'T2StrategicMissile',
-                    'T2Artillery',       
-					'T2ShieldDefense',
+                    'T2Artillery',
+                    'T2ShieldDefense',
                 }
             }
         }
@@ -551,18 +551,18 @@ BuilderGroup {
         InstanceCount = 1,
         BuilderConditions = {
             { SBC, 'CanBuildFirebase', { 'LocationType', 700, 'Expansion Area', -10000, 5, 1, 'AntiSurface', 1, 'STRUCTURE ARTILLERY TECH3', 20} },
-            #{ UCBC, 'UnitCapCheckLess', { .85 } },
-			{ SBC, 'EnemyInT3ArtilleryRange', { 'LocationType', false } },
-			#{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.STRUCTURE * categories.TECH3 * categories.ANTIMISSILE}},
-			{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL}},
+            --{ UCBC, 'UnitCapCheckLess', { .85 } },
+            { SBC, 'EnemyInT3ArtilleryRange', { 'LocationType', false } },
+            --{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.STRUCTURE * categories.TECH3 * categories.ANTIMISSILE}},
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL}},
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
-			{ SBC, 'MapGreaterThan', { 500, 500 }},
-			{ SBC, 'NoRushTimeCheck', { 0 }},
+            { SBC, 'MapGreaterThan', { 500, 500 }},
+            { SBC, 'NoRushTimeCheck', { 0 }},
         },
         BuilderType = 'Any',
         BuilderData = {
-			RequireTransport = true,
+            RequireTransport = true,
             Construction = {
                 BuildClose = false,
                 BaseTemplate = ExBaseTmpl,
@@ -577,17 +577,17 @@ BuilderGroup {
                 MarkerUnitCategory = 'STRUCTURE ARTILLERY TECH3',
                 MarkerRadius = 20,
                 BuildStructures = {
-					'T2RadarJammer',
+                    'T2RadarJammer',
                     'T3AADefense',
                     'T2GroundDefense',
-					'T2Radar',
+                    'T2Radar',
                     'T3AADefense',
                     'T2GroundDefense',
-					'T2StrategicMissileDefense',
-					'T2ShieldDefense',
-					'T2EngineerSupport',
-					'T2ShieldDefense',
-					'T3Artillery',
+                    'T2StrategicMissileDefense',
+                    'T2ShieldDefense',
+                    'T2EngineerSupport',
+                    'T2ShieldDefense',
+                    'T3Artillery',
                     'T2Artillery',
                     'T2StrategicMissile',
                 }
@@ -601,18 +601,18 @@ BuilderGroup {
         InstanceCount = 1,
         BuilderConditions = {
             { SBC, 'CanBuildFirebase', { 'LocationType', 900, 'Expansion Area', -10000, 5, 1, 'AntiSurface', 1, 'STRUCTURE ARTILLERY TECH3', 20} },
-            #{ UCBC, 'UnitCapCheckLess', { .85 } },
-			{ SBC, 'EnemyInT3ArtilleryRange', { 'LocationType', false } },
-			#{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.STRUCTURE * categories.TECH3 * categories.ANTIMISSILE}},
-			{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL}},
+            --{ UCBC, 'UnitCapCheckLess', { .85 } },
+            { SBC, 'EnemyInT3ArtilleryRange', { 'LocationType', false } },
+            --{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.STRUCTURE * categories.TECH3 * categories.ANTIMISSILE}},
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL}},
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
-			{ SBC, 'MapGreaterThan', { 500, 500 }},
-			{ SBC, 'NoRushTimeCheck', { 0 }},
+            { SBC, 'MapGreaterThan', { 500, 500 }},
+            { SBC, 'NoRushTimeCheck', { 0 }},
         },
         BuilderType = 'Any',
         BuilderData = {
-			RequireTransport = true,
+            RequireTransport = true,
             Construction = {
                 BuildClose = false,
                 BaseTemplate = ExBaseTmpl,
@@ -627,16 +627,16 @@ BuilderGroup {
                 MarkerUnitCategory = 'STRUCTURE ARTILLERY TECH3',
                 MarkerRadius = 20,
                 BuildStructures = {
-					'T2RadarJammer',
+                    'T2RadarJammer',
                     'T3AADefense',
                     'T2GroundDefense',
-					'T2Radar',
+                    'T2Radar',
                     'T3AADefense',
                     'T2GroundDefense',
-					'T2StrategicMissileDefense',
-					'T3ShieldDefense',
-					'T3ShieldDefense',
-					'T3Artillery',
+                    'T2StrategicMissileDefense',
+                    'T3ShieldDefense',
+                    'T3ShieldDefense',
+                    'T3Artillery',
                     'T2Artillery',
                     'T2StrategicMissile',
                 }
@@ -650,18 +650,18 @@ BuilderGroup {
         InstanceCount = 1,
         BuilderConditions = {
             { SBC, 'CanBuildFirebase', { 'LocationType', 750, 'Expansion Area', -10000, 5, 1, 'AntiSurface', 1, 'STRUCTURE ARTILLERY TECH3', 20} },
-            #{ UCBC, 'UnitCapCheckLess', { .85 } },
-			{ SBC, 'EnemyInT3ArtilleryRange', { 'LocationType', false } },
-			#{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.STRUCTURE * categories.TECH3 * categories.ANTIMISSILE}},
-			{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL}},
+            --{ UCBC, 'UnitCapCheckLess', { .85 } },
+            { SBC, 'EnemyInT3ArtilleryRange', { 'LocationType', false } },
+            --{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.STRUCTURE * categories.TECH3 * categories.ANTIMISSILE}},
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL}},
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
-			{ SBC, 'MapGreaterThan', { 500, 500 }},
-			{ SBC, 'NoRushTimeCheck', { 0 }},
+            { SBC, 'MapGreaterThan', { 500, 500 }},
+            { SBC, 'NoRushTimeCheck', { 0 }},
         },
         BuilderType = 'Any',
         BuilderData = {
-			RequireTransport = true,
+            RequireTransport = true,
             Construction = {
                 BuildClose = false,
                 BaseTemplate = ExBaseTmpl,
@@ -676,20 +676,20 @@ BuilderGroup {
                 MarkerUnitCategory = 'STRUCTURE ARTILLERY TECH3',
                 MarkerRadius = 20,
                 BuildStructures = {
-					'T2RadarJammer',
+                    'T2RadarJammer',
                     'T3AADefense',
                     'T2GroundDefense',
-					'T2Radar',
+                    'T2Radar',
                     'T3AADefense',
                     'T2GroundDefense',
-					'T2StrategicMissileDefense',
-					'T3ShieldDefense',
-					'T2EngineerSupport',
-					'T3ShieldDefense',
-					'T3Artillery',
+                    'T2StrategicMissileDefense',
+                    'T3ShieldDefense',
+                    'T2EngineerSupport',
+                    'T3ShieldDefense',
+                    'T3Artillery',
                     'T2Artillery',
                     'T2StrategicMissile',
-				}
+                }
             }
         }
     },
@@ -700,18 +700,18 @@ BuilderGroup {
         InstanceCount = 1,
         BuilderConditions = {
             { SBC, 'CanBuildFirebase', { 'LocationType', 825, 'Expansion Area', -10000, 5, 1, 'AntiSurface', 1, 'STRUCTURE ARTILLERY TECH3', 20} },
-            #{ UCBC, 'UnitCapCheckLess', { .85 } },
-			{ SBC, 'EnemyInT3ArtilleryRange', { 'LocationType', false } },
-			#{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.STRUCTURE * categories.TECH3 * categories.ANTIMISSILE}},
-			{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL}},
+            --{ UCBC, 'UnitCapCheckLess', { .85 } },
+            { SBC, 'EnemyInT3ArtilleryRange', { 'LocationType', false } },
+            --{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.STRUCTURE * categories.TECH3 * categories.ANTIMISSILE}},
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL}},
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
-			{ SBC, 'MapGreaterThan', { 500, 500 }},
-			{ SBC, 'NoRushTimeCheck', { 0 }},
+            { SBC, 'MapGreaterThan', { 500, 500 }},
+            { SBC, 'NoRushTimeCheck', { 0 }},
         },
         BuilderType = 'Any',
         BuilderData = {
-			RequireTransport = true,
+            RequireTransport = true,
             Construction = {
                 BuildClose = false,
                 BaseTemplate = ExBaseTmpl,
@@ -726,16 +726,16 @@ BuilderGroup {
                 MarkerUnitCategory = 'STRUCTURE ARTILLERY TECH3',
                 MarkerRadius = 20,
                 BuildStructures = {
-					'T2RadarJammer',
+                    'T2RadarJammer',
                     'T3AADefense',
                     'T2GroundDefense',
-					'T2Radar',
+                    'T2Radar',
                     'T3AADefense',
                     'T2GroundDefense',
-					'T2StrategicMissileDefense',
-					'T3ShieldDefense',
-					'T3ShieldDefense',
-					'T3Artillery',
+                    'T2StrategicMissileDefense',
+                    'T3ShieldDefense',
+                    'T3ShieldDefense',
+                    'T3Artillery',
                     'T2Artillery',
                     'T2StrategicMissile',
                 }
@@ -749,18 +749,18 @@ BuilderGroup {
         InstanceCount = 1,
         BuilderConditions = {
             { SBC, 'CanBuildFirebase', { 'LocationType', 700, 'Defensive Point', -10000, 5, 1, 'AntiSurface', 1, 'STRUCTURE ARTILLERY TECH3', 20} },
-            #{ UCBC, 'UnitCapCheckLess', { .85 } },
-			{ SBC, 'EnemyInT3ArtilleryRange', { 'LocationType', false } },
-			#{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.STRUCTURE * categories.TECH3 * categories.ANTIMISSILE}},
-			{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL}},
+            --{ UCBC, 'UnitCapCheckLess', { .85 } },
+            { SBC, 'EnemyInT3ArtilleryRange', { 'LocationType', false } },
+            --{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.STRUCTURE * categories.TECH3 * categories.ANTIMISSILE}},
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL}},
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
-			{ SBC, 'MapGreaterThan', { 500, 500 }},
-			{ SBC, 'NoRushTimeCheck', { 0 }},
+            { SBC, 'MapGreaterThan', { 500, 500 }},
+            { SBC, 'NoRushTimeCheck', { 0 }},
         },
         BuilderType = 'Any',
         BuilderData = {
-			RequireTransport = true,
+            RequireTransport = true,
             Construction = {
                 BuildClose = false,
                 BaseTemplate = ExBaseTmpl,
@@ -775,16 +775,16 @@ BuilderGroup {
                 MarkerUnitCategory = 'STRUCTURE ARTILLERY TECH3',
                 MarkerRadius = 20,
                 BuildStructures = {
-					'T2RadarJammer',
+                    'T2RadarJammer',
                     'T3AADefense',
                     'T2GroundDefense',
-					'T2Radar',
+                    'T2Radar',
                     'T3AADefense',
                     'T2GroundDefense',
-					'T2StrategicMissileDefense',
-					'T3ShieldDefense',
-					'T3ShieldDefense',
-					'T3Artillery',
+                    'T2StrategicMissileDefense',
+                    'T3ShieldDefense',
+                    'T3ShieldDefense',
+                    'T3Artillery',
                     'T2Artillery',
                     'T2StrategicMissile',
                 }
@@ -798,18 +798,18 @@ BuilderGroup {
         InstanceCount = 1,
         BuilderConditions = {
             { SBC, 'CanBuildFirebase', { 'LocationType', 900, 'Defensive Point', -10000, 5, 1, 'AntiSurface', 1, 'STRUCTURE ARTILLERY TECH3', 20} },
-            #{ UCBC, 'UnitCapCheckLess', { .85 } },
-			{ SBC, 'EnemyInT3ArtilleryRange', { 'LocationType', false } },
-			#{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.STRUCTURE * categories.TECH3 * categories.ANTIMISSILE}},
-			{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL}},
+            --{ UCBC, 'UnitCapCheckLess', { .85 } },
+            { SBC, 'EnemyInT3ArtilleryRange', { 'LocationType', false } },
+            --{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.STRUCTURE * categories.TECH3 * categories.ANTIMISSILE}},
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL}},
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
-			{ SBC, 'MapGreaterThan', { 500, 500 }},
-			{ SBC, 'NoRushTimeCheck', { 0 }},
+            { SBC, 'MapGreaterThan', { 500, 500 }},
+            { SBC, 'NoRushTimeCheck', { 0 }},
         },
         BuilderType = 'Any',
         BuilderData = {
-			RequireTransport = true,
+            RequireTransport = true,
             Construction = {
                 BuildClose = false,
                 BaseTemplate = ExBaseTmpl,
@@ -824,16 +824,16 @@ BuilderGroup {
                 MarkerUnitCategory = 'STRUCTURE ARTILLERY TECH3',
                 MarkerRadius = 20,
                 BuildStructures = {
-					'T2RadarJammer',
+                    'T2RadarJammer',
                     'T3AADefense',
                     'T2GroundDefense',
-					'T2Radar',
+                    'T2Radar',
                     'T3AADefense',
                     'T2GroundDefense',
-					'T2StrategicMissileDefense',
-					'T3ShieldDefense',
-					'T3ShieldDefense',
-					'T3Artillery',
+                    'T2StrategicMissileDefense',
+                    'T3ShieldDefense',
+                    'T3ShieldDefense',
+                    'T3Artillery',
                     'T2Artillery',
                     'T2StrategicMissile',
                 }
@@ -847,18 +847,18 @@ BuilderGroup {
         InstanceCount = 1,
         BuilderConditions = {
             { SBC, 'CanBuildFirebase', { 'LocationType', 750, 'Defensive Point', -10000, 5, 1, 'AntiSurface', 1, 'STRUCTURE ARTILLERY TECH3', 20} },
-            #{ UCBC, 'UnitCapCheckLess', { .85 } },
-			{ SBC, 'EnemyInT3ArtilleryRange', { 'LocationType', false } },
-			#{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.STRUCTURE * categories.TECH3 * categories.ANTIMISSILE}},
-			{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL}},
+            --{ UCBC, 'UnitCapCheckLess', { .85 } },
+            { SBC, 'EnemyInT3ArtilleryRange', { 'LocationType', false } },
+            --{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.STRUCTURE * categories.TECH3 * categories.ANTIMISSILE}},
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL}},
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
-			{ SBC, 'MapGreaterThan', { 500, 500 }},
-			{ SBC, 'NoRushTimeCheck', { 0 }},
+            { SBC, 'MapGreaterThan', { 500, 500 }},
+            { SBC, 'NoRushTimeCheck', { 0 }},
         },
         BuilderType = 'Any',
         BuilderData = {
-			RequireTransport = true,
+            RequireTransport = true,
             Construction = {
                 BuildClose = false,
                 BaseTemplate = ExBaseTmpl,
@@ -873,19 +873,19 @@ BuilderGroup {
                 MarkerUnitCategory = 'STRUCTURE ARTILLERY TECH3',
                 MarkerRadius = 20,
                 BuildStructures = {
-					'T2RadarJammer',
+                    'T2RadarJammer',
                     'T3AADefense',
                     'T2GroundDefense',
-					'T2Radar',
+                    'T2Radar',
                     'T3AADefense',
                     'T2GroundDefense',
-					'T2StrategicMissileDefense',
-					'T3ShieldDefense',
-					'T3ShieldDefense',
-					'T3Artillery',
+                    'T2StrategicMissileDefense',
+                    'T3ShieldDefense',
+                    'T3ShieldDefense',
+                    'T3Artillery',
                     'T2Artillery',
                     'T2StrategicMissile',
-				}
+                }
             }
         }
     },
@@ -896,18 +896,18 @@ BuilderGroup {
         InstanceCount = 1,
         BuilderConditions = {
             { SBC, 'CanBuildFirebase', { 'LocationType', 825, 'Defensive Point', -10000, 5, 1, 'AntiSurface', 1, 'STRUCTURE ARTILLERY TECH3', 20} },
-            #{ UCBC, 'UnitCapCheckLess', { .85 } },
-			{ SBC, 'EnemyInT3ArtilleryRange', { 'LocationType', false } },
-			#{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.STRUCTURE * categories.TECH3 * categories.ANTIMISSILE}},
-			{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL}},
+            --{ UCBC, 'UnitCapCheckLess', { .85 } },
+            { SBC, 'EnemyInT3ArtilleryRange', { 'LocationType', false } },
+            --{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.STRUCTURE * categories.TECH3 * categories.ANTIMISSILE}},
+            { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL}},
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
-			{ SBC, 'MapGreaterThan', { 500, 500 }},
-			{ SBC, 'NoRushTimeCheck', { 0 }},
+            { SBC, 'MapGreaterThan', { 500, 500 }},
+            { SBC, 'NoRushTimeCheck', { 0 }},
         },
         BuilderType = 'Any',
         BuilderData = {
-			RequireTransport = true,
+            RequireTransport = true,
             Construction = {
                 BuildClose = false,
                 BaseTemplate = ExBaseTmpl,
@@ -922,16 +922,16 @@ BuilderGroup {
                 MarkerUnitCategory = 'STRUCTURE ARTILLERY TECH3',
                 MarkerRadius = 20,
                 BuildStructures = {
-					'T2RadarJammer',
+                    'T2RadarJammer',
                     'T3AADefense',
                     'T2GroundDefense',
-					'T2Radar',
+                    'T2Radar',
                     'T3AADefense',
                     'T2GroundDefense',
-					'T2StrategicMissileDefense',
-					'T3ShieldDefense',
-					'T3ShieldDefense',
-					'T3Artillery',
+                    'T2StrategicMissileDefense',
+                    'T3ShieldDefense',
+                    'T3ShieldDefense',
+                    'T3Artillery',
                     'T2Artillery',
                     'T2StrategicMissile',
                 }

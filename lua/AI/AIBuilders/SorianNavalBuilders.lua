@@ -1,11 +1,11 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/SorianNavalBuilders.lua
-#**
-#**  Summary  : Default Naval structure builders for skirmish
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/SorianNavalBuilders.lua
+--**
+--**  Summary  : Default Naval structure builders for skirmish
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local BBTmplFile = '/lua/basetemplates.lua'
 local BuildingTmpl = 'BuildingTemplates'
@@ -37,7 +37,7 @@ BuilderGroup {
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 600, -1000, 10, 1, 'AntiSurface' } },
             { UCBC, 'HaveLessThanUnitsWithCategory', { 1, 'FACTORY NAVAL TECH2, FACTORY NAVAL TECH3'}},
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'FACTORY NAVAL TECH2, FACTORY NAVAL TECH3' } },
-			{ SIBC, 'LessThanNavalBases', { } },
+            { SIBC, 'LessThanNavalBases', { } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
         },
         BuilderType = 'Any',
@@ -56,11 +56,11 @@ BuilderGroup {
                 ExpansionRadius = 50,
                 BuildStructures = {
                 'T1SeaFactory',
-				'T1NavalDefense',
-				'T1AADefense',
-				'T1Sonar',
-				'T1SeaFactory',
-				'T1SeaFactory',
+                'T1NavalDefense',
+                'T1AADefense',
+                'T1Sonar',
+                'T1SeaFactory',
+                'T1SeaFactory',
                 }
             }
         }
@@ -72,11 +72,11 @@ BuilderGroup {
         InstanceCount = 1,
         BuilderConditions = {
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 600, -1000, 10, 1, 'AntiSurface' } },
-			{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'FACTORY NAVAL'}},
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'FACTORY NAVAL TECH2, FACTORY NAVAL TECH3' } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'FACTORY NAVAL'}},
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'FACTORY NAVAL TECH2, FACTORY NAVAL TECH3' } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.1 }},
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			{ SIBC, 'LessThanNavalBases', { } },
+            { SIBC, 'LessThanNavalBases', { } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
         },
         BuilderType = 'Any',
@@ -95,9 +95,9 @@ BuilderGroup {
                 ExpansionRadius = 50,
                 BuildStructures = {
                     'T1SeaFactory',
-				'T1NavalDefense',
-				'T1AADefense',
-				'T1Sonar',
+                'T1NavalDefense',
+                'T1AADefense',
+                'T1Sonar',
                 }
             }
         }
@@ -109,10 +109,10 @@ BuilderGroup {
         InstanceCount = 1,
         BuilderConditions = {
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 600, -1000, 10, 1, 'AntiSurface' } },
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'FACTORY NAVAL TECH2, FACTORY NAVAL TECH3' } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'FACTORY NAVAL TECH2, FACTORY NAVAL TECH3' } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.1 }},
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			{ SIBC, 'LessThanNavalBases', { } },
+            { SIBC, 'LessThanNavalBases', { } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
         },
         BuilderType = 'Any',
@@ -131,9 +131,9 @@ BuilderGroup {
                 ExpansionRadius = 50,
                 BuildStructures = {
                     'T1SeaFactory',
-				'T2NavalDefense',
-				'T2AADefense',
-				'T2Sonar',
+                'T2NavalDefense',
+                'T2AADefense',
+                'T2Sonar',
                 }
             }
         }
@@ -145,10 +145,10 @@ BuilderGroup {
         InstanceCount = 1,
         BuilderConditions = {
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 600, -1000, 10, 1, 'AntiSurface' } },
-			{ UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'FACTORY NAVAL TECH2, FACTORY NAVAL TECH3' } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'FACTORY NAVAL TECH2, FACTORY NAVAL TECH3' } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.1 }},
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			{ SIBC, 'LessThanNavalBases', { } },
+            { SIBC, 'LessThanNavalBases', { } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
         },
         BuilderType = 'Any',
@@ -167,16 +167,16 @@ BuilderGroup {
                 ExpansionRadius = 50,
                 BuildStructures = {
                     'T1SeaFactory',
-				'T2NavalDefense',
-				'T3AADefense',
-				'T2Sonar',
+                'T2NavalDefense',
+                'T3AADefense',
+                'T2Sonar',
                 }
             }
         }
     },
 }
 
-# For everything but Naval Rush
+-- For everything but Naval Rush
 BuilderGroup {
     BuilderGroupName = 'SorianNavalExpansionBuilders',
     BuildersType = 'EngineerBuilder',
@@ -189,7 +189,7 @@ BuilderGroup {
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 600, -1000, 10, 1, 'AntiSurface' } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.1 }},
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			{ SIBC, 'LessThanNavalBases', { } },
+            { SIBC, 'LessThanNavalBases', { } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
         },
         BuilderType = 'Any',
@@ -208,9 +208,9 @@ BuilderGroup {
                 ExpansionRadius = 50,
                 BuildStructures = {
                     'T1SeaFactory',
-				'T1NavalDefense',
-				'T1AADefense',
-				'T1Sonar',
+                'T1NavalDefense',
+                'T1AADefense',
+                'T1Sonar',
                 }
             }
         }
@@ -224,7 +224,7 @@ BuilderGroup {
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 600, -1000, 10, 1, 'AntiSurface' } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.1 }},
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			{ SIBC, 'LessThanNavalBases', { } },
+            { SIBC, 'LessThanNavalBases', { } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
         },
         BuilderType = 'Any',
@@ -243,9 +243,9 @@ BuilderGroup {
                 ExpansionRadius = 50,
                 BuildStructures = {
                     'T1SeaFactory',
-				'T2NavalDefense',
-				'T2AADefense',
-				'T2Sonar',
+                'T2NavalDefense',
+                'T2AADefense',
+                'T2Sonar',
                 }
             }
         }
@@ -259,7 +259,7 @@ BuilderGroup {
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 600, -1000, 10, 1, 'AntiSurface' } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.1 }},
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
-			{ SIBC, 'LessThanNavalBases', { } },
+            { SIBC, 'LessThanNavalBases', { } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
         },
         BuilderType = 'Any',
@@ -278,9 +278,9 @@ BuilderGroup {
                 ExpansionRadius = 50,
                 BuildStructures = {
                     'T1SeaFactory',
-				'T2NavalDefense',
-				'T3AADefense',
-				'T2Sonar',
+                'T2NavalDefense',
+                'T3AADefense',
+                'T2Sonar',
                 }
             }
         }

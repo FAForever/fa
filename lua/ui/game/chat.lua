@@ -159,7 +159,7 @@ function CreateChatBackground()
     UIUtil.SkinnableFile('/game/menu-btns/default_btn_dis.dds'))
     LayoutHelpers.LeftOf(bg.ResetPositionBtn, bg._configBtn)
     bg.ResetPositionBtn.Depth:Set(function() return bg.Depth() + 10 end)
-    bg.ResetPositionBtn.OnClick = function(self, modifiers) 
+    bg.ResetPositionBtn.OnClick = function(self, modifiers)
         for index, position in location do
             local i = index
             local pos = position
@@ -169,7 +169,7 @@ function CreateChatBackground()
         bg:SaveWindowLocation()
     end
 
-    Tooltip.AddButtonTooltip(bg.ResetPositionBtn, 'chat_reset')    
+    Tooltip.AddButtonTooltip(bg.ResetPositionBtn, 'chat_reset')
 
     bg:SetMinimumResize(400, 160)
     return bg
@@ -505,7 +505,7 @@ function SetupChatScroll()
                 GUI.chatLines[index].textBG:SetSolidColor('00000000')
                 GUI.chatLines[index].nameBG:SetSolidColor('00000000')
                 GUI.chatLines[index].EntryID = curEntry
-                if chatHistory[curEntry].new and GUI.bg:IsHidden() then 
+                if chatHistory[curEntry].new and GUI.bg:IsHidden() then
                     GUI.chatLines[index]:Show()
                     GUI.chatLines[index].topBG:Hide()
                     GUI.chatLines[index].rightBG:Hide()
@@ -554,7 +554,7 @@ function FindClients(id)
             end
             local playerIsObserver = true
             for id, player in GetArmiesTable().armiesTable do
-                if player.outOfGame and player.human and player.nickname == client.name then                        
+                if player.outOfGame and player.human and player.nickname == client.name then
                     table.insert(result, index)
                     playerIsObserver = false
                     break
@@ -815,13 +815,13 @@ function ReceiveChat(sender, msg)
     end
 end
 
-function ReceiveChatFromSim(sender, msg)        
+function ReceiveChatFromSim(sender, msg)
     sender = sender or "nil sender"
     if msg.ConsoleOutput then
         print(LOCF("%s %s", sender, msg.ConsoleOutput))
         return
     end
-    if not msg.Chat then            
+    if not msg.Chat then
         return
     end
     if type(msg) == 'string' then
@@ -833,11 +833,11 @@ function ReceiveChatFromSim(sender, msg)
     if not armyData and GetFocusArmy() ~= -1 and not SessionIsReplay() then
         return
     end
-    local towho = LOC(ToStrings[msg.to].text) or LOC(ToStrings['private'].text)     
+    local towho = LOC(ToStrings[msg.to].text) or LOC(ToStrings['private'].text)
     local tokey = ToStrings[msg.to].colorkey or ToStrings['private'].colorkey
     if msg.Observer then
         towho = LOC("<LOC lobui_0592>to observes:")
-        tokey = "link_color"            
+        tokey = "link_color"
     end
     if msg.Observer and armyData.faction then
         armyData.faction = table.getn(FactionsIcon) - 1
@@ -847,18 +847,18 @@ function ReceiveChatFromSim(sender, msg)
     end
     local name = sender .. ' ' .. towho
 
-    if msg.echo then            
+    if msg.echo then
         if msg.from and SessionIsReplay() then
             armyData = GetArmyData(msg.from)
             name = string.format("%s %s %s:", msg.from, LOC(ToStrings.to.text), GetArmyData(msg.to).nickname)
         else
             name = string.format("%s %s:", LOC(ToStrings.to.caps), sender)
         end
-    end     
+    end
     local tempText = WrapText({text = msg.text, name = name})
     -- if text wrap produces no lines (ie text is all white space) then add a blank line
     if table.getn(tempText) == 0 then
-        tempText = {""} 
+        tempText = {""}
     end
     local entry = {
         name = name,
@@ -887,7 +887,7 @@ function ReceiveChatFromSim(sender, msg)
     end
 end
 function ToggleChat()
-    if GUI.bg:IsHidden() then           
+    if GUI.bg:IsHidden() then
         GUI.bg:Show()
         GUI.chatEdit.edit:AcquireFocus()
         if not GUI.bg.pinned then
@@ -898,7 +898,7 @@ function ToggleChat()
             v:SetNeedsFrameUpdate(false)
             v:Show()
             v.OnFrame = nil
-        end         
+        end
     else
         GUI.bg:Hide()
         GUI.chatEdit.edit:AbandonFocus()
@@ -906,7 +906,7 @@ function ToggleChat()
     end
 end
 
-function ActivateChat(modifiers)        
+function ActivateChat(modifiers)
     if type(ChatTo()) ~= 'number' then
         if modifiers.Shift then
             ChatTo:Set('allies')
@@ -914,7 +914,7 @@ function ActivateChat(modifiers)
             ChatTo:Set('all')
         end
     end
-    ToggleChat()        
+    ToggleChat()
 end
 
 -------------------------
@@ -1183,16 +1183,16 @@ function RewrapLog()
 end
 
 function WrapText(data)
-    return import('/lua/maui/text.lua').WrapText(data.text, 
+    return import('/lua/maui/text.lua').WrapText(data.text,
     function(line)
         if line == 1 then
             return GUI.chatLines[1].Right() - (GUI.chatLines[1].teamColor.Right() + GUI.chatLines[1].name:GetStringAdvance(data.name) + 4)
         else
             return GUI.chatLines[1].Right() - GUI.chatLines[1].nameBG.Right()
         end
-    end, 
-    function(text) 
-        return GUI.chatLines[1].text:GetStringAdvance(text) 
+    end,
+    function(text)
+        return GUI.chatLines[1].text:GetStringAdvance(text)
     end)
 end
 
@@ -1381,10 +1381,10 @@ function CreateConfigWindow()
         elseif data.type == 'slider' then
             group.name = UIUtil.CreateText(group, data.name, 14, "Arial")
             LayoutHelpers.AtLeftTopIn(group.name, group)
-            group.slider = IntegerSlider(group, false, 
-            data.min, data.max, 
-            data.inc, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), 
-            UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), 
+            group.slider = IntegerSlider(group, false,
+            data.min, data.max,
+            data.inc, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
+            UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
             UIUtil.SkinnableFile('/dialogs/options-02/slider-back_bmp.dds'))
             LayoutHelpers.Below(group.slider, group.name)
             group.slider.key = data.key

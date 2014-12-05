@@ -4,11 +4,11 @@ UnitBlueprint {
             'Turret_AA',
             'Turret_Cannon',
             'Stern',
-            'URS0201',            
+            'URS0201',
             'WakeFront_L',
             'WakeFront_R',
         },
-    },    
+    },
     Audio = {
         AmbientMoveLand = Sound {
             Bank = 'URS',

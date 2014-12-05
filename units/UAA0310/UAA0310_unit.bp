@@ -287,10 +287,10 @@ UnitBlueprint {
             },
             AutoInitiateAttackCommand = true,
             BallisticArc = 'RULEUBA_None',
-            BeamCollisionDelay = 0,    #0.2                
+            BeamCollisionDelay = 0,    #0.2
             BeamLifetime = 0,
             CollideFriendly = false,
-            Damage = 333,            #1000                        
+            Damage = 333,            #1000
             DamageRadius = 4,
             DamageType = 'CzarBeam',  # Normal
             DisplayName = 'Quantum Beam Generator',

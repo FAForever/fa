@@ -202,7 +202,7 @@ UnitBlueprint {
                 Category = 'MISSILE',
                 Radius = 15,
             },
-            Label = 'AntiMissile',            
+            Label = 'AntiMissile',
             MaxRadius = 30,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
@@ -239,10 +239,10 @@ UnitBlueprint {
             WeaponUnpacks = true,
         },
         { # dummy weapon used manipulate the game to show correct range circle [129]
-            EffectiveRadius = 10,             
+            EffectiveRadius = 10,
             MaxRadius = 10,
             RangeCategory = 'UWRC_Countermeasure',
-        }, 
+        },
     },
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',

@@ -12,30 +12,30 @@ function GetDefaultKeyMap(includeDebugKeys)
     local ret = {}
     local defaultKeyMap = import('defaultKeyMap.lua').defaultKeyMap
     local debugKeyMap = import('defaultKeyMap.lua').debugKeyMap
-    
+
     for k,v in defaultKeyMap do
         ret[k] = v
     end
-    
+
 
     for k,v in debugKeyMap do
         ret[k] = v
     end
 
-    
+
     return ret
 end
 
 function GetUserKeyMap(includeDebugKeys)
     local ret = {}
     local userKeyMap = Prefs.GetFromCurrentProfile("UserKeyMap")
-    
+
     if not userKeyMap then return nil end
-    
+
     for k,v in userKeyMap do
         ret[k] = v
     end
-    
+
 
     local userDebugKeyMap = Prefs.GetFromCurrentProfile("UserDebugKeyMap")
     if not userDebugKeyMap then
@@ -44,7 +44,7 @@ function GetUserKeyMap(includeDebugKeys)
 
     if userDebugKeyMap then
         for k,v in userDebugKeyMap do
-            ret[k] = v 
+            ret[k] = v
         end
     end
 
@@ -54,9 +54,9 @@ end
 function GetUserDebugKeyMap()
     local ret = {}
     local UserDebugKeyMap = Prefs.GetFromCurrentProfile("UserDebugKeyMap")
-    
+
     if not UserDebugKeyMap then return nil end
-    
+
     for k,v in UserDebugKeyMap do
         ret[k] = v
     end
@@ -68,7 +68,7 @@ function GetCurrentKeyMap(includeDebugKeys)
 end
 
 function ClearUserKeyMapping(key)
-    
+
     local newUserMap = GetCurrentKeyMap(false)
     local newDebugMap = GetUserDebugKeyMap()
     if not newDebugMap then
@@ -95,7 +95,7 @@ function SetUserKeyMapping(key, oldKey, action)
         newDebugMap = import('defaultKeyMap.lua').debugKeyMap
     end
 
-    if oldKey != nil then
+    if oldKey ~= nil then
         if IsKeyInMap(oldKey, newDebugMap) then
             newDebugMap[oldKey] = nil
         elseif IsKeyInMap(oldKey, newUserMap) then
@@ -129,11 +129,11 @@ function GetKeyActions(includeDebugKeys)
 
     local keyActions = import('keyactions.lua').keyActions
     local debugKeyActions = import('keyactions.lua').debugKeyActions
-    
+
     for k,v in keyActions do
         ret[k] = v
     end
-    
+
 
     for k,v in debugKeyActions do
         ret[k] = v
@@ -141,12 +141,12 @@ function GetKeyActions(includeDebugKeys)
 
 
     local userActions = Prefs.GetFromCurrentProfile("UserKeyActions")
-    if userActions != nil then
+    if userActions ~= nil then
         for k,v in userActions do
             ret[k] = v
         end
     end
-    
+
     return ret
 end
 
@@ -163,7 +163,7 @@ end
 -- returns keys mapped to actions
 function GetKeyMappings(includeDebugKeys)
     local currentKeyMap = GetCurrentKeyMap(true)
-    local keyActions = GetKeyActions(true)    
+    local keyActions = GetKeyActions(true)
     local keyMap = {}
 
     -- set up default mapping
@@ -173,18 +173,18 @@ function GetKeyMappings(includeDebugKeys)
             WARN("Key action not found " .. action .. " for key " .. key)
         end
     end
-    
+
     return keyMap
 end
 
 -- returns action names mapped to keys
 function GetKeyLookup()
     local currentKeyMap = GetCurrentKeyMap(true)
-    
+
     -- get default keys
     local ret = {}
     for k,v in currentKeyMap do
-        ret[v] = k    
+        ret[v] = k
     end
 
     return ret
@@ -210,7 +210,7 @@ function NormalizeKey(inKey)
                      [keyNames['10']] = true, -- shift
                      [keyNames['12']] = true, -- alt
                     }
-                    
+
     local startpos = 1
     while startpos do
         local fst, lst = string.find(inKey, "-", startpos)
@@ -238,9 +238,9 @@ function IsKeyInMap(key, map)
         local curKeyCombo = NormalizeKey(keyCombo)
         if table.equal(curKeyCombo, compKeyCombo) then
             return true
-        end    
+        end
     end
-    
+
     return false
 end
 
@@ -250,9 +250,9 @@ function IsActionInMap(action, map)
     for keyCombo, curaction in map do
         if action == curaction then
             return true
-        end    
+        end
     end
-    
+
     return false
 end
 
@@ -262,10 +262,10 @@ function KeyCategory(key, map, actions)
     for keyCombo, action in map do
         local curKeyCombo = NormalizeKey(keyCombo)
         if table.equal(curKeyCombo, compKeyCombo) then
-            if actions[action] != nil then
+            if actions[action] ~= nil then
                 if actions[action].category then
                     return actions[action].category
-                else 
+                else
                     return false
                 end
             end

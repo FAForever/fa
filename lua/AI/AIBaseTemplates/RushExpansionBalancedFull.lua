@@ -1,40 +1,40 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AIBaseTemplates/RushExpansionBalancedFull.lua
-#**
-#**  Summary  : Manage engineers for a location
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AIBaseTemplates/RushExpansionBalancedFull.lua
+--**
+--**  Summary  : Manage engineers for a location
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 BaseBuilderTemplate {
     BaseTemplateName = 'RushExpansionBalancedFull',
     Builders = {
-        # ==== ECONOMY ==== #
-        # Factory upgrades
+        -- ==== ECONOMY ==== --
+        -- Factory upgrades
         'T1BalancedUpgradeBuildersExpansion',
         'T2BalancedUpgradeBuildersExpansion',
-        
-        # Engineer Builders
+
+        -- Engineer Builders
         'EngineerFactoryBuilders',
         'T1EngineerBuilders',
         'T2EngineerBuilders',
         'T3EngineerBuilders',
         'EngineerFactoryConstruction',
         'LandInitialFactoryConstruction',
-        
-        # Build Mass low pri at this base
+
+        -- Build Mass low pri at this base
         'EngineerMassBuildersLowerPri',
-        
-        # Build some power, but not much
+
+        -- Build some power, but not much
         'EngineerEnergyBuildersExpansions',
-        
-        # ==== EXPANSION ==== #
-		#DUNCAN - expansions dont build more expansions!
-        #'EngineerExpansionBuildersFull',
-        #'EngineerExpansionBuildersSmall',
-        
-        # ==== DEFENSES ==== #
+
+        -- ==== EXPANSION ==== --
+        --DUNCAN - expansions dont build more expansions!
+        --'EngineerExpansionBuildersFull',
+        --'EngineerExpansionBuildersSmall',
+
+        -- ==== DEFENSES ==== --
         'T1LightDefenses',
         'T2LightDefenses',
         'T3LightDefenses',
@@ -43,24 +43,24 @@ BaseBuilderTemplate {
         'T3NukeDefenses',
         'T3NukeDefenseBehaviors',
 
-        # Extractors        
+        -- Extractors
         'Time Exempt Extractor Upgrades Expansion',
-                
-        # ==== NAVAL EXPANSION ==== #
+
+        -- ==== NAVAL EXPANSION ==== --
         'NavalExpansionBuilders',
-		
-		# ==== UNIT CAP BUILDERS ==== #
+
+        -- ==== UNIT CAP BUILDERS ==== --
         'UnitCapAirAttackFormBuilders',
         'UnitCapLandAttackFormBuilders',
-        
-        # ==== LAND UNIT BUILDERS ==== #
+
+        -- ==== LAND UNIT BUILDERS ==== --
         'T1LandFactoryBuilders',
         'T2LandFactoryBuilders',
         'T3LandFactoryBuilders',
         'FrequentLandAttackFormBuilders',
         'MassHunterLandFormBuilders',
         'MiscLandFormBuilders',
-        
+
         'T1LandAA',
         'T2LandAA',
 
@@ -68,39 +68,39 @@ BaseBuilderTemplate {
         'T2ReactionDF',
         'T3ReactionDF',
 
-        # ==== AIR UNIT BUILDERS ==== #
+        -- ==== AIR UNIT BUILDERS ==== --
         'T1AirFactoryBuilders',
         'T2AirFactoryBuilders',
         'T3AirFactoryBuilders',
         'FrequentAirAttackFormBuilders',
         'MassHunterAirFormBuilders',
-        
+
         'ACUHunterAirFormBuilders',
-        
+
         'TransportFactoryBuilders',
-        
+
         'T1AntiAirBuilders',
         'T2AntiAirBuilders',
         'T3AntiAirBuilders',
         'BaseGuardAirFormBuilders',
 
-        # ==== EXPERIMENTALS ==== #
+        -- ==== EXPERIMENTALS ==== --
         'MobileLandExperimentalEngineers',
         'MobileLandExperimentalForm',
-        
+
         'MobileAirExperimentalEngineers',
         'MobileAirExperimentalForm',
     },
     NonCheatBuilders = {
         'AirScoutFactoryBuilders',
         'AirScoutFormBuilders',
-        
+
         'LandScoutFactoryBuilders',
         'LandScoutFormBuilders',
-        
+
         'RadarEngineerBuilders',
         'RadarUpgradeBuildersExpansion',
-        
+
         'CounterIntelBuilders',
     },
     BaseSettings = {
@@ -111,8 +111,8 @@ BaseBuilderTemplate {
             SCU = 1,
         },
         FactoryCount = {
-            Land = 4, 
-            Air = 2, 
+            Land = 4,
+            Air = 2,
             Sea = 0,
             Gate = 1,
         },
@@ -123,16 +123,16 @@ BaseBuilderTemplate {
         },
     },
     ExpansionFunction = function(aiBrain, location, markerType)
-        if markerType != 'Start Location' then
+        if markerType ~= 'Start Location' then
             return 0
         end
-        
+
         local personality = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
         if not( personality == 'adaptive' or personality == 'rushbalanced' ) then
             return 0
         end
 
-        local threatCutoff = 10 # value of overall threat that determines where enemy bases are
+        local threatCutoff = 10 -- value of overall threat that determines where enemy bases are
         local distance = import('/lua/ai/AIUtilities.lua').GetThreatDistance( aiBrain, location, threatCutoff )
         if not distance or distance > 1000 then
             return 50
@@ -140,10 +140,10 @@ BaseBuilderTemplate {
             return 75
         elseif distance > 250 then
             return 100
-        else # within 250
+        else -- within 250
             return 25
         end
-        
+
         return 0
     end,
 }

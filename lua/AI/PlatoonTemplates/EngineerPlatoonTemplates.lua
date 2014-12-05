@@ -1,20 +1,20 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/EngineerPlatoonTemplates.lua
-#**
-#**  Summary  : Global platoon templates
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/EngineerPlatoonTemplates.lua
+--**
+--**  Summary  : Global platoon templates
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
-### Engineer platoons to be formed
+------ Engineer platoons to be formed
 
 PlatoonTemplate {
     Name = 'CommanderAssist',
     Plan = 'ManagerEngineerAssistAI',
     GlobalSquads = {
         { categories.COMMAND, 1, 1, 'support', 'None' },
-    },        
+    },
 }
 
 PlatoonTemplate {
@@ -22,7 +22,7 @@ PlatoonTemplate {
     Plan = 'EngineerBuildAI',
     GlobalSquads = {
         { categories.COMMAND, 1, 1, 'support', 'None' }
-    },        
+    },
 }
 
 PlatoonTemplate {
@@ -30,7 +30,7 @@ PlatoonTemplate {
     Plan = 'EnhanceAI',
     GlobalSquads = {
         { categories.COMMAND, 1, 1, 'support', 'None' }
-    },        
+    },
 }
 
 PlatoonTemplate {
@@ -38,7 +38,7 @@ PlatoonTemplate {
     Plan = 'ManagerEngineerAssistAI',
     GlobalSquads = {
         { categories.ENGINEER * categories.TECH1, 1, 1, 'support', 'None' }
-    },        
+    },
 }
 
 PlatoonTemplate {
@@ -46,7 +46,7 @@ PlatoonTemplate {
     Plan = 'EngineerBuildAI',
     GlobalSquads = {
         { categories.ENGINEER * categories.TECH1, 1, 1, 'support', 'None' }
-    },        
+    },
 }
 
 PlatoonTemplate {
@@ -54,7 +54,7 @@ PlatoonTemplate {
     Plan = 'EngineerDropAI',
     GlobalSquads = {
         { categories.ENGINEER * categories.TECH1, 6, 6, 'support', 'None' }
-    },        
+    },
 }
 
 PlatoonTemplate {
@@ -70,7 +70,7 @@ PlatoonTemplate {
     Plan = 'ManagerEngineerAssistAI',
     GlobalSquads = {
         { categories.ENGINEER * categories.TECH2, 1, 1, 'support', 'None' }
-    },        
+    },
 }
 
 PlatoonTemplate {
@@ -78,7 +78,7 @@ PlatoonTemplate {
     Plan = 'EngineerBuildAI',
     GlobalSquads = {
         { categories.ENGINEER * categories.TECH2, 1, 1, 'support', 'None' }
-    },        
+    },
 }
 
 PlatoonTemplate {
@@ -94,7 +94,7 @@ PlatoonTemplate {
     Plan = 'EngineerBuildAI',
     GlobalSquads = {
         { categories.UEF * categories.ENGINEER * categories.TECH2, 1, 1, 'support', 'None' }
-    },        
+    },
 }
 
 PlatoonTemplate {
@@ -102,7 +102,7 @@ PlatoonTemplate {
     Plan = 'EngineerBuildAI',
     GlobalSquads = {
         { categories.CYBRAN * categories.ENGINEER * categories.TECH2, 1, 1, 'support', 'None' }
-    },        
+    },
 }
 
 PlatoonTemplate {
@@ -110,7 +110,7 @@ PlatoonTemplate {
     Plan = 'ManagerEngineerAssistAI',
     GlobalSquads = {
         { categories.ENGINEER * categories.TECH3 + categories.SUBCOMMANDER, 1, 1, 'support', 'None' }
-    },        
+    },
 }
 
 PlatoonTemplate {
@@ -118,7 +118,7 @@ PlatoonTemplate {
     Plan = 'EngineerBuildAI',
     GlobalSquads = {
         { categories.ENGINEER * categories.TECH3 + categories.SUBCOMMANDER, 1, 1, 'support', 'None' }
-    },        
+    },
 }
 
 PlatoonTemplate {
@@ -134,7 +134,7 @@ PlatoonTemplate {
     Plan = 'EngineerBuildAI',
     GlobalSquads = {
         { categories.AEON * categories.ENGINEER * ( categories.TECH3 + categories.SUBCOMMANDER ), 1, 1, 'support', 'None' }
-    },        
+    },
 }
 
 PlatoonTemplate {
@@ -142,7 +142,7 @@ PlatoonTemplate {
     Plan = 'EngineerBuildAI',
     GlobalSquads = {
         { categories.UEF * categories.ENGINEER * ( categories.TECH3 + categories.SUBCOMMANDER ), 1, 1, 'support', 'None' }
-    },        
+    },
 }
 
 PlatoonTemplate {
@@ -150,7 +150,7 @@ PlatoonTemplate {
     Plan = 'EngineerBuildAI',
     GlobalSquads = {
         { categories.CYBRAN * categories.ENGINEER * ( categories.TECH3 + categories.SUBCOMMANDER ), 1, 1, 'support', 'None' }
-    },        
+    },
 }
 
 PlatoonTemplate {
@@ -158,10 +158,10 @@ PlatoonTemplate {
     Plan = 'EngineerBuildAI',
     GlobalSquads = {
         { categories.SERAPHIM * categories.ENGINEER * ( categories.TECH3 + categories.SUBCOMMANDER ), 1, 1, 'support', 'None' }
-    },        
+    },
 }
 
-### Factory built Engineers below
+------ Factory built Engineers below
 
 PlatoonTemplate {
     Name = 'T1BuildEngineer',

@@ -2,7 +2,7 @@ UnitBlueprint {
     AI = {
         GuardRadius = 10,
         TargetBones = {
-            'Torso',        
+            'Torso',
             'Head',
             'AttachPoint'
         },
@@ -381,7 +381,7 @@ UnitBlueprint {
             RegenCeiling = 200,
             RegenFloor = 0,
             MaxHealthFactor = 1.1, # 1
-            RegenPerSecond = 0.01111111111, 
+            RegenPerSecond = 0.01111111111,
             Slot = 'RCH',
             UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD',        #    added
             UpgradeEffectBones = {

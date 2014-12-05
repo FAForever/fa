@@ -1,4 +1,4 @@
-UnitBlueprint { 
+UnitBlueprint {
     AI = {
         TargetBones = {
             'Turret',

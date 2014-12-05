@@ -166,7 +166,7 @@ UnitBlueprint {
         SkirtSizeZ = 1,
         TurnRate = 0,
     },
-	RaiseDistance = 0.1,
+    RaiseDistance = 0.1,
     SelectionSizeX = 0.75,
     SelectionSizeZ = 0.75,
     SelectionThickness = 0.5,

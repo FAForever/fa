@@ -275,7 +275,7 @@ UnitBlueprint {
         Level5 = 350,
     },
     Weapon = {
-        {   
+        {
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
             AimsStraightOnDisable = true,
@@ -714,7 +714,7 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, 
+            Seabed = true,
             Sub = true, #from false
             Water = true, #from false
         },

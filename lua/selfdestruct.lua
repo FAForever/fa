@@ -3,7 +3,7 @@ function ToggleSelfDestruct(data)
     if ScenarioInfo.tutorial and ScenarioInfo.tutorial == true then
         return
     end
-    if data.owner != -1 then
+    if data.owner ~= -1 then
         local unitEntities = {}
         for _, unitId in data.units do
             local unit = GetEntityById(unitId)
@@ -26,9 +26,9 @@ function ToggleSelfDestruct(data)
                 for _, unitEnt in unitEntities do
                     local unit = unitEnt
 
-                    # added by brute51 - makes selfdestruct alterable through BP files
-                    # instant kill if InstantDeathOnSelfDestruct = true variable set in units general table
-                    # fires weapons with FireOnSelfDestruct = true in units weapon table
+                    -- added by brute51 - makes selfdestruct alterable through BP files
+                    -- instant kill if InstantDeathOnSelfDestruct = true variable set in units general table
+                    -- fires weapons with FireOnSelfDestruct = true in units weapon table
 
                     local bp = unit:GetBlueprint()
                     if bp.General.InstantDeathOnSelfDestruct then
@@ -47,7 +47,7 @@ function ToggleSelfDestruct(data)
                         unit:Kill()
                     else
 
-                    # regular self destruct cycle
+                    -- regular self destruct cycle
                         local entityId = unit:GetEntityId()
                         StartCountdown(entityId)
                         unit.SelfDestructThread = ForkThread(function()
@@ -67,8 +67,6 @@ function ToggleSelfDestruct(data)
                             unit:Kill()
                         end)
                     end
-
-
                 end
             end
         end

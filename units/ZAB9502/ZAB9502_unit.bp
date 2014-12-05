@@ -135,7 +135,7 @@ UnitBlueprint {
         BuildCostMass = 510,
         BuildRate = 40,
         BuildTime = 1300,
-    DifferentialUpgradeCostCalculation = true, 
+    DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = {
             'zab9502',
         },
@@ -357,7 +357,7 @@ UnitBlueprint {
         TurnRate = 0,
     },
     SelectionCenterOffsetX = 0.22,
-    SelectionCenterOffsetZ = -0.25,    
+    SelectionCenterOffsetZ = -0.25,
     SelectionSizeX = 2.85,
     SelectionSizeZ = 2.75,
     SelectionThickness = 0.35,

@@ -24,7 +24,7 @@ UnitBlueprint {
         LiftFactor = 15, # 7
         MaxAirspeed = 15,
         MinAirspeed = 10,
-        PredictAheadForBombDrop = 3,  
+        PredictAheadForBombDrop = 3,
         StartTurnDistance = 5,
         TightTurnMultiplier = 1.02,
         TurnSpeed = 1.5,

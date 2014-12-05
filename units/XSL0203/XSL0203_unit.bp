@@ -79,7 +79,7 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
     },
     CollisionOffsetX = 0.14,
-    CollisionOffsetY = -0.1,	
+    CollisionOffsetY = -0.1,    
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',

@@ -218,7 +218,7 @@ UnitBlueprint {
             BeamLifetime = 1,                    #0.9
             CollideFriendly = false,
             Damage = 55,                    #220
-            DamageRadius = 0,                    
+            DamageRadius = 0,
             DamageType = 'Normal',
             DisplayName = 'Ultrachromatic Beam Generator',
             FireTargetLayerCapsTable = {

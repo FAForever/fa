@@ -155,7 +155,7 @@ UnitBlueprint {
                 Weight = 100,
             },
         },
-        
+
         IdleEffects = {
             Sub = {
                 Effects = {

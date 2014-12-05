@@ -2,7 +2,7 @@
     AI = {
         GuardRadius = 10,
         TargetBones = {
-            'Torso',        
+            'Torso',
             'Head',
             'AttachPoint',
         },

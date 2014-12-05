@@ -23,7 +23,7 @@ UnitBlueprint {
             'Turret_Right01_Barrel02', #from Turret_Right01_Barrel02
             'Turret_Right02_Barrel02',
             'Attachpoint3',             #this is new, it's the rear-most air staging facility
-            'Turret_Left_AA',        #new    
+            'Turret_Left_AA',        #new
             'Turret_Right_AA',        #new
         },
     },
