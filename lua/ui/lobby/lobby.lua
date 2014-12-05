@@ -72,8 +72,8 @@ local PrefLanguageTooltipText={}
 --\\ Stop - Table of Tooltip Country
 --// Get a value on /Country CommandLine in FA.exe - Xinnony
 local PrefLanguage = GetCommandLineArg("/country", 1)
-if PrefLanguage == '' or PrefLanguage == '/init' or PrefLanguage == nil or PrefLanguage == false then
-    LOG('COUNTRY - Country has not been found')
+if PrefLanguage[1] == '' or PrefLanguage[1] == '/init' or PrefLanguage == nil or PrefLanguage == false then
+    LOG('COUNTRY - Country has not been found "'..tostring(PrefLanguage[1])..'"')
     PrefLanguage = "world"
 else
     PrefLanguage = tostring(string.lower(PrefLanguage[1]))
@@ -719,7 +719,11 @@ end
 
 -- update the data in a player slot
 function SetSlotInfo(slot, playerInfo)
-    local isLocallyOwned
+	if (GUI.connectdialog ~= false) then -- Remove the ConnectDialog
+		GUI.connectdialog:Destroy()
+		GUI.connectdialog = false
+	end
+	local isLocallyOwned
     if IsLocallyOwned(slot) then
         if gameInfo.PlayerOptions[slot]['Ready'] then
             DisableSlot(slot, true)
@@ -2624,8 +2628,8 @@ function CreateUI(maxPlayers)
 
     if (GUI.connectdialog ~= false) then
         MenuCommon.MenuCleanup()
-        GUI.connectdialog:Destroy()
-        GUI.connectdialog = false
+        --GUI.connectdialog:Destroy()
+        --GUI.connectdialog = false
     end
 
     local title
