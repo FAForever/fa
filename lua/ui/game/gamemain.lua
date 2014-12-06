@@ -229,9 +229,7 @@ function CreateUI(isReplay)
         AddBeatFunction(UiBeat)
     end
 
-    if options.gui_scu_manager ~= 0 then
-        import('/modules/scumanager.lua').Init()
-    end
+    import('/modules/scumanager.lua').Init()
 
     if options.gui_render_enemy_lifebars == 1 or options.gui_render_custom_names == 0 then
         import('/modules/console_commands.lua').Init()
