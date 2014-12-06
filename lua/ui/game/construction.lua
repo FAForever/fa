@@ -1763,15 +1763,18 @@ function CreateExtraControls(controlType)
             end
         end
         local allFactories = true
-        local currentInfiniteQueueCheckStatus = false
+        local currentInfiniteQueueCheckStatus = true
+
         for i,v in sortedOptions.selection do
-            if v:IsRepeatQueue() then
-                currentInfiniteQueueCheckStatus = true
+            if not v:IsRepeatQueue() then
+                currentInfiniteQueueCheckStatus = false
             end
+
             if not v:IsInCategory('FACTORY') then
                 allFactories = false
             end
         end
+
         if allFactories then
             controls.extraBtn1:SetCheck(currentInfiniteQueueCheckStatus, true)
             controls.extraBtn1:Enable()
