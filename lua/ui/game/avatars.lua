@@ -815,30 +815,13 @@ function AvatarUpdate()
         import(UIUtil.GetLayoutFilename('avatars')).LayoutAvatars()
     end
 
-    if options.gui_scu_manager ~= 0 then
-        local buttons = import('/modules/scumanager.lua').buttonGroup
-        local showing = false
-        if controls.idleEngineers then
-            local subCommanders = EntityCategoryFilterDown(categories.SUBCOMMANDER, GetIdleEngineers())
-            if table.getsize(subCommanders) > 0 then
-                local show = false
-                for i, unit in subCommanders do
-                    if not unit.SCUType then
-                        show = true
-                        break
-                    end
-                end
-                if show then
-                    buttons:Show()
-                    buttons.Right:Set(function() return controls.collapseArrow.Right() - 2 end)
-                    buttons.Top:Set(function() return controls.collapseArrow.Bottom() end)
-                    showing = true
-                end
-            end
-        end
-        if not showing then
-            buttons:Hide()
-        end
+    local buttons = import('/modules/scumanager.lua').buttonGroup
+    if options.gui_scu_manager == 0 then
+        buttons:Hide()
+    else 
+        buttons:Show()
+        buttons.Right:Set(function() return controls.collapseArrow.Right() - 2 end)
+        buttons.Top:Set(function() return controls.collapseArrow.Bottom() end)
     end
 end
 
