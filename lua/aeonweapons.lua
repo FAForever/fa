@@ -188,64 +188,39 @@ ADFTractorClawStructure = Class(DefaultBeamWeapon) {
     FxMuzzleFlash = {},
 }
 
-
 ADFChronoDampener = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.AChronoDampener,
     FxMuzzleFlashScale = 0.5,
 
-    CreateProjectileAtMuzzle = function(self, muzzle)
+    OnCreate = function(self)
+        DefaultProjectileWeapon.OnCreate(self)
     end,
-    
-    OnGotTarget = function(self)
-        LOG('Inside my OnGotTarget')
-        DefaultProjectileWeapon.OnGotTarget(self)
-        if self.FiringTimerThread == nil then
-            LOG('About to fork FiringTimer')
-            self.FiringTimerThread = ForkThread(self.FiringTimer)
-        end
-    end,
-    
-    -- Disable the normal weapon firing sequence
-    OnFire = function(self)
-        LOG('OnFire has been called')
-    end,
-    
-    -- This function cycles through and fires the weapon's stun buff every 5 seconds
-    FiringTimer = function(self)
-        LOG('Inside FiringTimer function')
-        while true do
+    RackSalvoFiringState = State(DefaultProjectileWeapon.RackSalvoFiringState) {
+        Main = function(self)
             local bp = self:GetBlueprint()
-            local CurrentGameTick = GetGameTick()
-            WaitTicks(50 - (CurrentGameTick - (math.floor(CurrentGameTick/50)*50)))
-            
-            LOG('Current game tick is...')
-            LOG(CurrentGameTick)
-            
-            if bp.Audio.Fire then
-                self:PlaySound(bp.Audio.Fire)
-            end
-            
-            if bp.WeaponUnpacks == true then
-                ChangeState(self, self.WeaponUnpackingState)
-            else
-                if bp.RackSalvoChargeTime and bp.RackSalvoChargeTime > 0 then
-                    ChangeState(self, self.RackSalvoChargeState)
-                elseif bp.SkipReadyState and bp.SkipReadyState == true then
-                    ChangeState(self, self.RackSalvoFiringState)
-                else
-                    ChangeState(self, self.RackSalvoFireReadyState)
+            while true do
+                local CurrentGameTick = GetGameTick()
+                local wait = (50 - (CurrentGameTick - (math.floor(CurrentGameTick/50)*50)))
+                if wait == 50 then
+                    if bp.Audio.Fire then
+                        self:PlaySound(bp.Audio.Fire)
+                    end
+                    self:DoOnFireBuffs()
+                    self:PlayFxMuzzleSequence(1)
+                    self:StartEconomyDrain()
+                    self:OnWeaponFired()
                 end
+                WaitTicks(wait)
             end
-            self:DoOnFireBuffs()
-        end
-    end,
-    
-    OnLostTarget = function(self)
-        DefaultProjectileWeapon.OnLostTarget(self)
-        if self.FiringTimerThread != nil then
-            KillThread(self.FiringTimerThread)
-        end
-    end,
+        end,
+        OnFire = function(self)
+        end,
+        OnLostTarget = function(self)
+            ChangeState(self, self.IdleState)
+            DefaultProjectileWeapon.OnLostTarget(self)
+        end,
+    },
+
 }
 
 ADFQuadLaserLightWeapon = Class(DefaultProjectileWeapon) {
