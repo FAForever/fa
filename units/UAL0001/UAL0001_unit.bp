@@ -997,7 +997,7 @@
                     Add = {
                         OnFire = true,
                     },
-                    BuffType = 'STUN',
+                    BuffType = 'CHRONOSTUN',
                     Duration = 3.5,
                     Radius = 35,
                     TargetAllow = 'MOBILE',
