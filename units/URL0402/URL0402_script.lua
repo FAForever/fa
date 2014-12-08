@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/URL0402/URL0402_script.lua
-#**  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Gordon Duclos
-#**
-#**  Summary  :  Cybran Spider Bot Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/URL0402/URL0402_script.lua
+--**  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Gordon Duclos
+--**
+--**  Summary  :  Cybran Spider Bot Script
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
@@ -29,8 +29,7 @@ URL0402 = Class(CWalkingLandUnit) {
 
     Weapons = {
         MainGun = Class(CDFHeavyMicrowaveLaserGenerator) {
-                #DisabledFiringBones = {'Center_Turret_Muzzle', 'Center_Turret', 'Center_Turret_B01', 'Center_Turret_Barrel'},
-            },
+        },
         RightLaserTurret = Class(CDFElectronBolterWeapon) {},
         LeftLaserTurret = Class(CDFElectronBolterWeapon) {},
         RightAntiAirMissile = Class(CAAMissileNaniteWeapon) {},
@@ -61,25 +60,15 @@ URL0402 = Class(CWalkingLandUnit) {
         end        
         self:SetMaintenanceConsumptionActive()
         local layer = self:GetCurrentLayer()
-        # If created with F2 on land, then play the transform anim.
         if(layer == 'Land') then
             self:CreateUnitAmbientEffect(layer)
-			# Enable Land weapons
-	        # self:SetWeaponEnabledByLabel('RightAntiAirMissile', true)
-	        # self:SetWeaponEnabledByLabel('LeftAntiAirMissile', true)
-			# Disable Torpedo
 			if self.SonarEnt then
                 self.SonarEnt:Destroy()
             end
-            #self:DisableUnitIntel('Sonar')
 	        self:SetWeaponEnabledByLabel('Torpedo', false)
         elseif (layer == 'Seabed') then
             self:CreateUnitAmbientEffect(layer)
-			# Disable Land Weapons
-	        # self:SetWeaponEnabledByLabel('RightAntiAirMissile', false)
-	        # self:SetWeaponEnabledByLabel('LeftAntiAirMissile', false)
             self:EnableUnitIntel('SonarStealth')
-			# Enable Torpedo and Sonar
             self.SonarEnt = Entity {}
             self.Trash:Add(self.SonarEnt)
             self.SonarEnt:InitIntel(self:GetArmy(), 'Sonar', 76)
@@ -95,18 +84,12 @@ URL0402 = Class(CWalkingLandUnit) {
 		if self.WeaponsEnabled then
 			if( new == 'Land' ) then
 			    self:CreateUnitAmbientEffect(new)
-				# Enable Land weapons
 			    if self.SonarEnt then
                     self.SonarEnt:Destroy()
                 end
-                #self:DisableUnitIntel('Sonar')
-			    # Disable Torpedo
 	            self:SetWeaponEnabledByLabel('Torpedo', false)
 			elseif ( new == 'Seabed' ) then
 			    self:CreateUnitAmbientEffect(new)
-				# Disable Land Weapons     
-                #self:EnableUnitIntel('Sonar')
-				# Enable Torpedo and Sonar
 			    if self.SonarEnt then
                     self.SonarEnt:Destroy()
                 end
@@ -138,7 +121,7 @@ URL0402 = Class(CWalkingLandUnit) {
 	},	
 	
 	CreateUnitAmbientEffect = function(self, layer)
-	    if( self.AmbientEffectThread != nil ) then
+	    if( self.AmbientEffectThread ~= nil ) then
 	       self.AmbientEffectThread:Destroy()
         end	 
         if self.AmbientExhaustEffectsBag then
@@ -212,7 +195,7 @@ URL0402 = Class(CWalkingLandUnit) {
         for k, vBone in bones do
             position = self:GetPosition(vBone)
             offset = utilities.GetDifferenceVector( position, basePosition )
-            velocity = utilities.GetDirectionVector( position, basePosition ) # 
+            velocity = utilities.GetDirectionVector( position, basePosition ) -- 
             velocity.x = velocity.x + utilities.GetRandomFloat(-0.3, 0.3)
             velocity.z = velocity.z + utilities.GetRandomFloat(-0.3, 0.3)
             velocity.y = velocity.y + utilities.GetRandomFloat( 0.0, 0.3)
@@ -235,7 +218,7 @@ URL0402 = Class(CWalkingLandUnit) {
         self:PlayUnitSound('Destroyed')
         local army = self:GetArmy()
 
-        # Create Initial explosion effects
+        -- Create Initial explosion effects
         explosion.CreateFlash( self, 'Center_Turret', 4.5, army )
         CreateAttachedEmitter(self, 'URL0402', army, '/effects/emitters/destruction_explosion_concussion_ring_03_emit.bp')
         CreateAttachedEmitter(self,'URL0402', army, '/effects/emitters/explosion_fire_sparks_02_emit.bp')
@@ -249,7 +232,7 @@ URL0402 = Class(CWalkingLandUnit) {
 
         WaitSeconds(1)
         
-        # Create damage effects on turret bone
+        -- Create damage effects on turret bone
         CreateDeathExplosion( self, 'Center_Turret', 1.5)
         self:CreateDamageEffects( 'Center_Turret_B01', army )
         self:CreateDamageEffects( 'Center_Turret_Barrel', army )
@@ -261,9 +244,9 @@ URL0402 = Class(CWalkingLandUnit) {
         WaitSeconds(0.4)
 
 
-        # When the spider bot impacts with the ground
-        # Effects: Explosion on turret, dust effects on the muzzle tip, large dust ring around unit
-        # Other: Damage force ring to force trees over and camera shake
+        -- When the spider bot impacts with the ground
+        -- Effects: Explosion on turret, dust effects on the muzzle tip, large dust ring around unit
+        -- Other: Damage force ring to force trees over and camera shake
         self:ShakeCamera(50, 5, 0, 1)
         CreateDeathExplosion( self, 'Left_Turret_Muzzle', 1)
         for k, v in EffectTemplate.FootFall01 do
@@ -281,10 +264,10 @@ URL0402 = Class(CWalkingLandUnit) {
         WaitSeconds(0.5)
         CreateDeathExplosion( self, 'Center_Turret', 2)
 
-        # Finish up force ring to push trees
+        -- Finish up force ring to push trees
         DamageRing(self, {x,y,z}, 0.1, 3, 1, 'Force', true)
 
-        # Explosion on and damage fire on various bones
+        -- Explosion on and damage fire on various bones
         CreateDeathExplosion( self, 'Right_Leg0' .. Random(1,3) .. '_B0' .. Random(1,3), 0.25)
         CreateDeathExplosion( self, 'Left_Projectile01', 2)
         self:CreateFirePlumes( army, {'Left_Projectile01'}, -1 )

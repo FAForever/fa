@@ -83,7 +83,7 @@ UnitBlueprint {
         'OVERLAYCOUNTERINTEL',
         'OVERLAYANTIAIR',
         'OVERLAYANTINAVY',
-		'OVERLAYINDIRECTFIRE',   # Added for range ring issue [155]
+        'OVERLAYINDIRECTFIRE',   -- Added for range ring issue [155]
     },
     CollisionOffsetY = 0,
     Defense = {
@@ -111,7 +111,7 @@ UnitBlueprint {
         AnimationDeath = {
             {
                 Animation = '/units/url0402/url0402_A005.sca',
-                Weight = 100,
+                Weight = 1,
             },
         },
         AnimationWalk = '/units/url0402/url0402_a001.sca',
@@ -772,8 +772,10 @@ UnitBlueprint {
             WeaponCategory = 'Anti Navy',
         },
         {
+            BoneImpact = {'Left_Leg01_B01', 'Right_Leg01_B01'},
             Damage = 4000,
             DamageFriendly = true,
+            DamageRadiusMax = 3,
             DamageRadius = 7,
             DamageType = 'Normal',
             DisplayName = 'Death Weapon',
