@@ -195,6 +195,52 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
 
     CreateProjectileAtMuzzle = function(self, muzzle)
     end,
+    
+    OnGotTarget = function(self)
+        DefaultProjectileWeapon.OnGotTarget(self)
+        if self.FiringTimerThread == nil then
+            self.FiringTimerThread = ForkThread(self.FiringTimer)
+        end
+    end,
+    
+    OnFire = function(self)
+    end,
+    
+    FiringTimer = function(self)
+        while true do
+            local CurrentGameTick = GetGameTick()
+            local FireTick = CurrentGameTick - math.floor((CurrentGameTick / 50) * 50)
+            
+            if FireTick == 0 then
+                local bp = self:GetBlueprint()
+                
+                if bp.Audio.Fire then
+                    self:PlaySound(bp.Audio.Fire)
+                end
+                
+                if bp.WeaponUnpacks == true then
+                    ChangeState(self, self.WeaponUnpackingState)
+                else
+                    if bp.RackSalvoChargeTime and bp.RackSalvoChargeTime > 0 then
+                        ChangeState(self, self.RackSalvoChargeState)
+                    elseif bp.SkipReadyState and bp.SkipReadyState == true then
+                        ChangeState(self, self.RackSalvoFiringState)
+                    else
+                        ChangeState(self, self.RackSalvoFireReadyState)
+                    end
+                end
+                self:DoOnFireBuffs()
+                WaitTicks(50)
+            end
+        end
+    end,
+    
+    OnLostTarget = function(self)
+        DefaultProjectileWeapon.OnLostTarget(self)
+        if self.FiringTimerThread != nil then
+            KillThread(self.FiringTimerThread)
+        end
+    end,
 }
 
 ADFQuadLaserLightWeapon = Class(DefaultProjectileWeapon) {
