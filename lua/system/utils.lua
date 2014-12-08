@@ -426,3 +426,25 @@ function table.filter(t, filterFunc)
 
     return newTable
 end
+
+-- Binary insert value into table
+--
+-- @param t Table to insert to
+-- @param value Value to insert
+-- @param cmp Sort function to compare by, default is a < b
+-- @return The key at which the value was inserted
+function table.binsert(t, value, cmp)
+    local cmp = cmp or (function(a, b) return a < b end)
+    local iStart, iEnd, iMid, iState = 1, table.getsize(t), 1, 0
+    while iStart <= iEnd do
+        iMid = math.floor((iStart + iEnd) / 2)
+        if cmp(value, t[iMid]) then
+            iEnd, iState = iMid - 1, 0
+        else
+            iStart, iState = iMid + 1, 1
+        end
+    end
+    
+    table.insert(t, iMid + iState, value)
+    return iMid + iState
+end
