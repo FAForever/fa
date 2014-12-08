@@ -1042,6 +1042,9 @@
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_IndirectFire',
+            
+            -- If changing firing interval from 5 seconds, be aware that the timing loop in 
+            -- ADFChronoDampener in aeonweapons.lua must be adjusted accordingly
             RateOfFire = 0.2,
             TargetCheckInterval = 5,
             TargetPriorities = {
