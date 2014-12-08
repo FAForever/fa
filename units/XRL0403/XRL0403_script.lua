@@ -170,8 +170,7 @@ XRL0403 = Class(CWalkingLandUnit) {
         end
     end,
 
-    DeathThread = function(self)
-        self:PlayUnitSound('Destroyed')
+    DeathThread = function(self, overkillRatio, instigator)
         local army = self:GetArmy()
 
         -- Create Initial explosion effects
@@ -219,14 +218,6 @@ XRL0403 = Class(CWalkingLandUnit) {
         -- Finish up force ring to push trees
         DamageRing(self, {x,y,z}, 0.1, 3, 1, 'Force', true)
 
-        local bp = self:GetBlueprint()
-        for i, numWeapons in bp.Weapon do
-            if(bp.Weapon[i].Label == 'MegalithDeath') then
-                DamageArea(self, self:GetPosition(), bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
-                break
-            end
-        end
-
         -- Explosion on and damage fire on various bones
         CreateDeathExplosion( self, 'Right_Leg0' .. Random(1,2) .. '_B0' .. Random(1,2), 0.25)
         CreateDeathExplosion( self, 'Flare_Muzzle03', 2)
@@ -249,11 +240,10 @@ XRL0403 = Class(CWalkingLandUnit) {
         self:CreateDamageEffects( 'Left_Leg02_B02', army )
         explosion.CreateFlash( self, 'Right_Leg01_B01', 3.2, army )
 
-        self:CreateWreckage(0.1)
         self:ShakeCamera(3, 2, 0, 0.15)
-        self:Destroy()
-    end,
 
+        CWalkingLandUnit.DeathThread(self, overkillRatio, instigator)
+    end,
 
     OnMotionHorzEventChange = function( self, new, old )
         CWalkingLandUnit.OnMotionHorzEventChange(self, new, old)
