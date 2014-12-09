@@ -3574,7 +3574,7 @@ Unit = Class(moho.unit_methods) {
         end
 
         if bt == 'STUN' then
-           if buffTable.Radius and buffTable.Radius > 0 then
+            if buffTable.Radius and buffTable.Radius > 0 then
                 --If the radius is bigger than 0 then we will use the unit as the center of the stun blast
                 --and collect all targets from that point
                 local targets = {}
@@ -3595,6 +3595,25 @@ Unit = Class(moho.unit_methods) {
                 --The buff will be applied to the unit only
                 if EntityCategoryContains(allow, self) and (not disallow or not EntityCategoryContains(disallow, self)) then
                     self:SetStunned(buffTable.Duration or 1)
+                end
+            end
+            
+        -- This buff allows Aeon's Chrono ACU upgrade to not stun allied units
+        elseif bt == 'CHRONOSTUN' then
+            if not buffTable.Radius and not buffTable.Radius > 0 then
+                return
+            end
+            
+            -- GetTrueEnemiesInSphere is a new utility which excludes allied units
+            local targets = utilities.GetTrueEnemiesInSphere(self, self:GetPosition(), buffTable.Radius)
+            
+            if not targets then
+                return
+            end
+
+            for k, v in targets do
+                if EntityCategoryContains(allow, v) and (not disallow or not EntityCategoryContains(disallow, v)) then
+                    v:SetStunned(buffTable.Duration or 1)
                 end
             end
         elseif bt == 'MAXHEALTH' then
