@@ -69,6 +69,7 @@ about the relevant change, or make a thread if it isn't there already.
 - [X] Less UI-lag
 - [X] Some sim-speed improvements 
 - [X] Remove ACU score bump, ACU kills now score 5000
+- [X] Chrono now syncs with allies, and no longer stuns allied units
 
 Contributors:
  - Sheeo
