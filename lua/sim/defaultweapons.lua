@@ -1,54 +1,45 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/sim/DefaultWeapons.lua
-#**  Author(s):  John Comes
-#**
-#**  Summary  :  Default definitions of weapons
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
-
+-----------------------------------------------------------------
+-- File     :  /lua/sim/DefaultWeapons.lua
+-- Author(s):  John Comes
+-- Summary  :  Default definitions of weapons
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
 local Weapon = import('/lua/sim/Weapon.lua').Weapon
-
 local CollisionBeam = import('/lua/sim/CollisionBeam.lua').CollisionBeam
-
-#new for CBFP
 local Game = import('/lua/game.lua')
-local CalculateBallisticAcceleration = import('/lua/sim/CalcBallisticAcceleration.lua').CalculateBallisticAcceleration 
+local CalculateBallisticAcceleration = import('/lua/sim/CalcBallisticAcceleration.lua').CalculateBallisticAcceleration
 
-#The big weapon change, most things are derived from this DefaultProjectileWeapon
-#See the Solutions Library on how to use it.
+-- Most weapons derive from this class, including beam weapons later in this file
+DefaultProjectileWeapon = Class(Weapon) {
 
-DefaultProjectileWeapon = Class(Weapon) {		
-
-
-    # Brute51 - added support for initialdamage in unit BP (copy/paste from Nomads code)
+    -- Record the initial damage of the weapon for future use
     GetDamageTable = function(self)
         local table = Weapon.GetDamageTable(self)
         table.InitialDamageAmount = self:GetBlueprint().InitialDamage or 0
         return table
     end,
 
-
-
     FxRackChargeMuzzleFlash = {},
     FxRackChargeMuzzleFlashScale = 1,
     FxChargeMuzzleFlash = {},
     FxChargeMuzzleFlashScale = 1,
     FxMuzzleFlash = {
-		'/effects/emitters/default_muzzle_flash_01_emit.bp',
+        '/effects/emitters/default_muzzle_flash_01_emit.bp',
         '/effects/emitters/default_muzzle_flash_02_emit.bp',
     },
-    FxMuzzleFlashScale = 1,    
+    FxMuzzleFlashScale = 1,
 
+    -- Called when the weapon is created, almost always when the owning unit is created
     OnCreate = function(self)
-    
         Weapon.OnCreate(self)
+        
         local bp = self:GetBlueprint()
         self.WeaponCanFire = true
         if bp.RackRecoilDistance != 0 then
             self.RecoilManipulators = {}
         end
+        
+        -- Make certain the weapon has essential aspects defined
         if not bp.RackBones then
            local strg = '*ERROR: No RackBones table specified, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
            error(strg, 2)
@@ -64,8 +55,10 @@ DefaultProjectileWeapon = Class(Weapon) {
            error(strg, 2)
            return
         end
+        
         self.CurrentRackSalvoNumber = 1
-        #Calculate recoil speed so that it finishes returning just as the next shot is ready.
+        
+        -- Calculate recoil speed so that it finishes returning just as the next shot is ready
         if bp.RackRecoilDistance != 0 then
             local dist = bp.RackRecoilDistance
             if bp.RackBones[1].TelescopeRecoilDistance then
@@ -76,7 +69,8 @@ DefaultProjectileWeapon = Class(Weapon) {
             end
             self.RackRecoilReturnSpeed = bp.RackRecoilReturnSpeed or math.abs( dist / (( 1 / bp.RateOfFire ) - (bp.MuzzleChargeDelay or 0))) * 1.25
         end
-        #Error Checking
+        
+        -- Ensure firing cycle is compatible internally
         self.NumMuzzles = 0
         for rk, rv in bp.RackBones do
             self.NumMuzzles = self.NumMuzzles + table.getn(rv.MuzzleBones or 0)
@@ -93,30 +87,34 @@ DefaultProjectileWeapon = Class(Weapon) {
             error(strg, 2)
             return false
         end
+        
         if bp.EnergyChargeForFirstShot == false then
             self.FirstShot = true
         end
+        
+        -- Set the firing cycle progress bar to full if required
         if bp.RenderFireClock then
             self.unit:SetWorkProgress(1)
         end
-        ChangeState(self, self.IdleState)
-	
-	###new for CBFP
-        local bp = self:GetBlueprint()
+        
         if bp.FixBombTrajectory then
             self.CBFP_CalcBallAcc = { Do = true, ProjectilesPerOnFire = (bp.ProjectilesPerOnFire or 1), MuzzleSalvoDelay = (bp.MuzzleSalvoDelay or 0.1), }
         end
-
+        
+        ChangeState(self, self.IdleState)
     end,
 
+    -- Triggers when the weapon is moved horizontally, usually by owner's motion
     OnMotionHorzEventChange = function(self, new, old)
         Weapon.OnMotionHorzEventChange(self, new, old)
+        
+        -- Handle weapons which must pack before moving
         local bp = self:GetBlueprint()
         if bp.WeaponUnpackLocksMotion == true and old == 'Stopped' then
             self:PackAndMove()
         end
-        #Changing firing randomness while moving, NOTE: This is hard set.  If it's changed somewhere else this will override
-        #I'd do it the proper way but we're at the end of the project and thusly stuck.
+        
+        -- Handle motion-triggered FiringRandomness changes
         if old == 'Stopped' then
             if bp.FiringRandomnessWhileMoving then
                 self:SetFiringRandomness(bp.FiringRandomnessWhileMoving)
@@ -126,11 +124,14 @@ DefaultProjectileWeapon = Class(Weapon) {
         end
     end,
 
+    -- This function creates the projectile, and happens when the unit is trying to fire
+    -- Called from inside RackSalvoFiringState
     CreateProjectileAtMuzzle = function(self, muzzle)
         local proj = self:CreateProjectileForWeapon(muzzle)
         if not proj or proj:BeenDestroyed()then
             return proj
         end
+        
         local bp = self:GetBlueprint()
         if bp.DetonatesAtTargetHeight == true then
             local pos = self:GetCurrentTargetPos()
@@ -148,16 +149,37 @@ DefaultProjectileWeapon = Class(Weapon) {
         elseif bp.Audio.Fire then
             self:PlaySound(bp.Audio.Fire)
         end
-	
-	#new for CBFP
-	self:CheckBallisticAcceleration( proj)  # if weapon BP specifies fix bomb trajectory then that's what happens
-        self:CheckCountedMissileLaunch()  # added by brute51 - provides a unit event function
+
+        self:CheckBallisticAcceleration(proj)  -- Check weapon blueprint for trajectory fix request
+        self:CheckCountedMissileLaunch()
 
         return proj
     end,
 
+    -- Used mainly for Bomb drop physics calculations
+    CheckBallisticAcceleration = function(self, proj)
+        if self.CBFP_CalcBallAcc and self.CBFP_CalcBallAcc.Do then
+            local acc = CalculateBallisticAcceleration(self, proj, self.CBFP_CalcBallAcc.ProjectilesPerOnFire, self.CBFP_CalcBallAcc.MuzzleSalvoDelay)
+            proj:SetBallisticAcceleration(-acc) -- Change projectile trajectory so it hits the target
+        end
+    end,
+    
+    -- Differentiates between Tactical and Nuclear missiles
+    CheckCountedMissileLaunch = function(self)
+        local bp = self:GetBlueprint()
+        if bp.CountedProjectile then
+            if bp.NukeWeapon then
+                self.unit:OnCountedMissileLaunch('nuke')
+            else
+                self.unit:OnCountedMissileLaunch('tactical')
+            end
+        end
+    end,
+
+    -- Create an economy event for those weapons which require Energy to fire
     StartEconomyDrain = function(self)
         if self.FirstShot then return end
+        
         local bp = self:GetBlueprint()
         if not self.EconDrain and bp.EnergyRequired and bp.EnergyDrainPerSecond then
             local nrgReq = self:GetWeaponEnergyRequired()
@@ -173,8 +195,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         end
     end,
 
-    #The adjacency mod only effects the over all cost, not the drain per second. So, the drain will be about the same
-    #but the time it takes to drain will not be.
+    -- Determine how much Energy is required to fire
     GetWeaponEnergyRequired = function(self)
         local bp = self:GetBlueprint()
         local weapNRG = (bp.EnergyRequired or 0) * (self.AdjEnergyMod or 1)
@@ -184,15 +205,17 @@ DefaultProjectileWeapon = Class(Weapon) {
         return weapNRG
     end,
 
+    -- Determine how much Energy should be drained per second
     GetWeaponEnergyDrain = function(self)
         local bp = self:GetBlueprint()
         local weapNRG = (bp.EnergyDrainPerSecond or 0)
         return weapNRG
     end,
 
-    #Effect functions: Not only visual effects but also plays animations, recoil, etc.
+    -- Effect Functions Section
+    -- Play visual effects, animations, recoil etc
 
-    #PlayFxMuzzleSequence: Played when a muzzle is fired.  Mostly used for muzzle flashes
+    -- Played when a muzzle is fired. Mostly used for muzzle flashes
     PlayFxMuzzleSequence = function(self, muzzle)
         local bp = self:GetBlueprint()
         for k, v in self.FxMuzzleFlash do
@@ -200,16 +223,16 @@ DefaultProjectileWeapon = Class(Weapon) {
         end
     end,
 
-    #PlayFxMuzzleSequence: Played during the beginning of the MuzzleChargeDelay time when a muzzle in a rack is fired.
+    -- Played during the beginning of the MuzzleChargeDelay time when a muzzle in a rack is fired.
     PlayFxMuzzleChargeSequence = function(self, muzzle)
         local bp = self:GetBlueprint()
         for k, v in self.FxChargeMuzzleFlash do
             CreateAttachedEmitter(self.unit, muzzle, self.unit:GetArmy(), v):ScaleEmitter(self.FxChargeMuzzleFlashScale)
         end
-    end,    
+    end,
 
-    #PlayFxRackSalvoChargeSequence: Played when a rack salvo charges.  Do not put a wait in here or you'll
-    #make the time value in the bp off.  Spawn another thread to do waits.
+    -- Played when a rack salvo charges
+    -- Do not wait in here or the sequence in the blueprint will be messed up. Fork a thread instead
     PlayFxRackSalvoChargeSequence = function(self)
         local bp = self:GetBlueprint()
         for k, v in self.FxRackChargeMuzzleFlash do
@@ -226,8 +249,8 @@ DefaultProjectileWeapon = Class(Weapon) {
         end
     end,
 
-    #PlayFxRackSalvoReloadSequence: Played when a rack salvo reloads.  Do not put a wait in here or you'll
-    #make the time value in the bp off.  Spawn another thread to do waits.
+    -- Played when a rack salvo reloads
+    -- Do not wait in here or the sequence in the blueprint will be messed up. Fork a thread instead
     PlayFxRackSalvoReloadSequence = function(self)
         local bp = self:GetBlueprint()
         if bp.AnimationReload and not self.Animator then
@@ -236,7 +259,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         end
     end,
 
-    #PlayFxRackSalvoReloadSequence: Played when a rack reloads. Mostly used for Recoil.
+    -- Played when a rack reloads. Mostly used for Recoil
     PlayFxRackReloadSequence = function(self)
         local bp = self:GetBlueprint()
         if bp.CameraShakeRadius and bp.CameraShakeMax and bp.CameraShakeMin and bp.CameraShakeDuration and
@@ -252,10 +275,10 @@ DefaultProjectileWeapon = Class(Weapon) {
         end
     end,
 
-    #PlayFxWeaponUnpackSequence: Played when a weapon unpacks.  Here a wait is used because by definition a weapon
-    #can not fire while packed up.
+    -- Played when a weapon unpacks
     PlayFxWeaponUnpackSequence = function(self)
-        local bp = self:GetBlueprint()
+
+        -- Deal with owner's audio cues
         local unitBP = self.unit:GetBlueprint()
         if unitBP.Audio.Activate then
             self:PlaySound(unitBP.Audio.Activate)
@@ -263,6 +286,9 @@ DefaultProjectileWeapon = Class(Weapon) {
         if unitBP.Audio.Open then
             self:PlaySound(unitBP.Audio.Open)
         end
+        
+        -- Deal with the Weapon's audio and animations
+        local bp = self:GetBlueprint()        
         if bp.Audio.Unpack then
             self:PlaySound(bp.Audio.Unpack)
         end
@@ -278,7 +304,8 @@ DefaultProjectileWeapon = Class(Weapon) {
         end
     end,
 
-    #PlayFxWeaponUnpackSequence: Played when a weapon packs up.  It has no target and is done with all of its rack salvos
+    -- Played when a weapon packs up
+    -- There is no target, and all rack salvos are complete
     PlayFxWeaponPackSequence = function(self)
         local bp = self:GetBlueprint()
         local unitBP = self.unit:GetBlueprint()
@@ -293,7 +320,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         end
     end,
 
-
+    -- Create the visual side of rack recoil
     PlayRackRecoil = function(self, rackList)
         local bp = self:GetBlueprint()
         for k, v in rackList do
@@ -315,6 +342,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         self:ForkThread(self.PlayRackRecoilReturn, rackList)
     end,
 
+    -- The opposite function to PlayRackRecoil, returns the rack to default position
     PlayRackRecoilReturn = function(self, rackList)
         WaitTicks(1)
         for k, v in rackList do
@@ -325,6 +353,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         end
     end,
 
+    -- Wait for all recoil and animations
     WaitForAndDestroyManips = function(self)
         local manips = self.RecoilManipulators
         if manips then
@@ -340,6 +369,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         end
     end,
 
+    -- Destroy the sliders which cause weapon visual recoil
     DestroyRecoilManips = function(self)
         local manips = self.RecoilManipulators
         if manips then
@@ -350,14 +380,15 @@ DefaultProjectileWeapon = Class(Weapon) {
         end
     end,
 
-    #General State-less event handling
+    -- Should be called whenever a target is lost
+    -- Includes the manual selection of a new target, and the issuing of a move order
     OnLostTarget = function(self)
-	
-		-- issue#43 for better stealth
-		if self.unit then 
-			self.unit:OnLostTarget(self)
-		end
-	
+        -- Issue 43
+        -- Tell the owner this weapon has lost the target
+        if self.unit then
+            self.unit:OnLostTarget(self)
+        end
+
         Weapon.OnLostTarget(self)
         local bp = self:GetBlueprint()
         if bp.WeaponUnpacks == true then
@@ -367,10 +398,12 @@ DefaultProjectileWeapon = Class(Weapon) {
         end
     end,
 
+    -- Sends the weapon to DeadState, probably called by the Owner
     OnDestroy = function(self)
         ChangeState(self, self.DeadState)
     end,
 
+    -- I think this is triggered whenever the state changes to anything but DeadState
     OnEnterState = function(self)
         if self.WeaponWantEnabled and not self.WeaponIsEnabled then
             self.WeaponIsEnabled = true
@@ -389,49 +422,50 @@ DefaultProjectileWeapon = Class(Weapon) {
             self.WeaponAimIsEnabled = false
             self:AimManipulatorSetEnabled(false)
         end
-
     end,
 
+    -- Called on horizontal motion event
     PackAndMove = function(self)
         ChangeState(self, self.WeaponPackingState)
     end,
 
+    -- Checks to see if the weapon is allowed to fire
+    -- What is the point in art 2? Oncreate declares the variable, it will always return part 1 -- IceDreamer
     CanWeaponFire = function(self)
         if self.WeaponCanFire then
             return self.WeaponCanFire
         else
+            WARN('This weapon for some reason does not have self.WeaponCanFire declared...') -- I'll keep an eye out for this (IceDreamer)
             return true
         end
     end,
 
+    -- Present mainly for Overcharge to hook into
     OnWeaponFired = function(self)
     end,
 
-    OnEnableWeapon = function(self)
-    end,
+    -- Weapon States
 
-    # WEAPON STATES:
-
-    #Weapon is in idle state when it does not have a target and is done with any animations or unpacking.
+    -- Idle state is when the weapon has no target and is done with any animations or unpacking
     IdleState = State {
-	
-		-- issue#43 for better stealth
-		OnGotTarget = function(self)
-			if self.unit then 
-				self.unit:OnGotTarget(self)
-			end
-		end,
-	
+
+        -- issue--43 for better stealth
+        OnGotTarget = function(self)
+            if self.unit then
+                self.unit:OnGotTarget(self)
+            end
+        end,
+
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
         Main = function(self)
             if self.unit:IsDead() then return end
-            
+
             self.unit:SetBusy(false)
             self:WaitForAndDestroyManips()
             local bp = self:GetBlueprint()
-            #LOG("Weapon " .. bp.DisplayName .. " entered IdleState.")
+            --LOG("Weapon " .. bp.DisplayName .. " entered IdleState.")
             if not bp.RackBones then
                 error('Error on rackbones ' .. self.unit:GetUnitId() )
             end
@@ -453,12 +487,12 @@ DefaultProjectileWeapon = Class(Weapon) {
 
         OnGotTarget = function(self)
             local bp = self:GetBlueprint()
-			
-			-- issue#43 for better stealth
-			if self.unit then
-				self.unit:OnGotTarget(self)
-			end
-			
+
+            -- issue--43 for better stealth
+            if self.unit then
+                self.unit:OnGotTarget(self)
+            end
+
             if (bp.WeaponUnpackLockMotion != true or (bp.WeaponUnpackLocksMotion == true and not self.unit:IsUnitState('Moving'))) then
                 if bp.CountedProjectile == true and not self:CanFire() then
                     return
@@ -491,6 +525,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         end,
     },
 
+    -- This state is for when the weapon is charging before firing
     RackSalvoChargeState = State {
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
@@ -499,7 +534,7 @@ DefaultProjectileWeapon = Class(Weapon) {
             self.unit:SetBusy(true)
             local bp = self:GetBlueprint()
             self:PlayFxRackSalvoChargeSequence()
-            #LOG("Weapon " .. bp.DisplayName .. " entered RackSalvoChargeState.")
+            --LOG("Weapon " .. bp.DisplayName .. " entered RackSalvoChargeState.")
             if bp.NotExclusive then
                 self.unit:SetBusy(false)
             end
@@ -507,7 +542,7 @@ DefaultProjectileWeapon = Class(Weapon) {
             if bp.NotExclusive then
                 self.unit:SetBusy(true)
             end
-            
+
             if bp.RackSalvoFiresAfterCharge == true then
                 ChangeState(self, self.RackSalvoFiringState)
             else
@@ -519,13 +554,14 @@ DefaultProjectileWeapon = Class(Weapon) {
         end,
     },
 
+    -- This state is for when the weapon is ready to fire
     RackSalvoFireReadyState = State {
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
         Main = function(self)
             local bp = self:GetBlueprint()
-            #LOG("Weapon " .. bp.DisplayName .. " entered RackSalvoFireReadyState.")
+            --LOG("Weapon " .. bp.DisplayName .. " entered RackSalvoFireReadyState.")
             if (bp.CountedProjectile == true and bp.WeaponUnpacks == true) then
                 self.unit:SetBusy(true)
             else
@@ -539,9 +575,9 @@ DefaultProjectileWeapon = Class(Weapon) {
                 self.EconDrain = nil
                 self.WeaponCanFire = true
             end
-            #We change the state on counted projectiles because we won't get another OnFire call.
-            #The second part is a hack for units with reload animations.  They have the same problem
-            #they need a RackSalvoReloadTime that's 1/RateOfFire set to avoid firing twice on the first shot
+            --We change the state on counted projectiles because we won't get another OnFire call.
+            --The second part is a hack for units with reload animations.  They have the same problem
+            --they need a RackSalvoReloadTime that's 1/RateOfFire set to avoid firing twice on the first shot
             if bp.CountedProjectile == true  or bp.AnimationReload then
                 ChangeState(self, self.RackSalvoFiringState)
             end
@@ -554,6 +590,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         end,
     },
 
+    -- This state is for when the weapon is actually in the process of firing
     RackSalvoFiringState = State {
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
@@ -561,36 +598,36 @@ DefaultProjectileWeapon = Class(Weapon) {
         RenderClockThread = function(self, rof)
             local clockTime = rof
             local totalTime = clockTime
-            while clockTime > 0.0 and 
-                  not self:BeenDestroyed() and 
+            while clockTime > 0.0 and
+                  not self:BeenDestroyed() and
                   not self.unit:IsDead() do
                 self.unit:SetWorkProgress( 1 - clockTime / totalTime )
                 clockTime = clockTime - 0.1
-                WaitSeconds(0.1)                            
+                WaitSeconds(0.1)
             end
         end,
-    
+
         Main = function(self)
             self.unit:SetBusy(true)
             local bp = self:GetBlueprint()
-            #LOG("Weapon " .. bp.DisplayName .. " entered RackSalvoFiringState.")
+            --LOG("Weapon " .. bp.DisplayName .. " entered RackSalvoFiringState.")
             self:DestroyRecoilManips()
             local numRackFiring = self.CurrentRackSalvoNumber
-            #This is done to make sure that when racks fire together, they fire together.
+            --This is done to make sure that when racks fire together, they fire together.
             if bp.RackFireTogether == true then
                 numRackFiring = table.getsize(bp.RackBones)
             end
 
-            # Fork timer counter thread carefully....
-            if not self:BeenDestroyed() and 
+            -- Fork timer counter thread carefully....
+            if not self:BeenDestroyed() and
                not self.unit:IsDead() then
                 if bp.RenderFireClock and bp.RateOfFire > 0 then
-                    local rof = 1 / bp.RateOfFire                
-                    self:ForkThread(self.RenderClockThread, rof)                
+                    local rof = 1 / bp.RateOfFire
+                    self:ForkThread(self.RenderClockThread, rof)
                 end
             end
 
-            #Most of the time this will only run once, the only time it doesn't is when racks fire together.
+            --Most of the time this will only run once, the only time it doesn't is when racks fire together.
             while self.CurrentRackSalvoNumber <= numRackFiring and not self.HaltFireOrdered do
                 local rackInfo = bp.RackBones[self.CurrentRackSalvoNumber]
                 local numMuzzlesFiring = bp.MuzzleSalvoSize
@@ -619,7 +656,7 @@ DefaultProjectileWeapon = Class(Weapon) {
                             self.unit:SetBusy(true)
                         end
                     end
-                    self:PlayFxMuzzleSequence(muzzle)                    
+                    self:PlayFxMuzzleSequence(muzzle)
                     if rackInfo.HideMuzzle == true then
                         self.unit:HideBone(muzzle, true)
                     end
@@ -627,15 +664,15 @@ DefaultProjectileWeapon = Class(Weapon) {
                         continue
                     end
                     self:CreateProjectileAtMuzzle(muzzle)
-                    #Decrement the ammo if they are a counted projectile
+                    --Decrement the ammo if they are a counted projectile
                     if bp.CountedProjectile == true then
                         if bp.NukeWeapon == true then
                             self.unit:NukeCreatedAtUnit()
-                            
-                            #Generate ui notification for automatic nuke ping
-        					local launchData = { army = self.unit:GetArmy()-1, location = self:GetCurrentTargetPos()}
-							Sync.NukeLaunchData = launchData    
-							    
+
+                            --Generate ui notification for automatic nuke ping
+                            local launchData = { army = self.unit:GetArmy()-1, location = self:GetCurrentTargetPos()}
+                            Sync.NukeLaunchData = launchData
+
                             self.unit:RemoveNukeSiloAmmo(1)
                         else
                             self.unit:RemoveTacticalSiloAmmo(1)
@@ -652,7 +689,7 @@ DefaultProjectileWeapon = Class(Weapon) {
                         WaitSeconds(bp.MuzzleSalvoDelay)
                         if bp.NotExclusive then
                             self.unit:SetBusy(true)
-                        end         
+                        end
                     end
                 end
 
@@ -670,7 +707,7 @@ DefaultProjectileWeapon = Class(Weapon) {
 
             self:OnWeaponFired()
 
-            # We can fire again after reaching here
+            -- We can fire again after reaching here
             self.HaltFireOrdered = false
 
             if self.CurrentRackSalvoNumber > table.getn(bp.RackBones) then
@@ -703,12 +740,13 @@ DefaultProjectileWeapon = Class(Weapon) {
             end
         end,
 
-        # Set a bool so we won't fire if the target reticle is moved
+        -- Set a bool so we won't fire if the target reticle is moved
         OnHaltFire = function(self)
             self.HaltFireOrdered = true
         end,
     },
 
+    -- This state is for when the weapon is reloading
     RackSalvoReloadState = State {
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
@@ -716,7 +754,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         Main = function(self)
             self.unit:SetBusy(true)
             local bp = self:GetBlueprint()
-            #LOG("Weapon " .. bp.DisplayName .. " entered RackSalvoReloadState.")
+            --LOG("Weapon " .. bp.DisplayName .. " entered RackSalvoReloadState.")
             self:PlayFxRackSalvoReloadSequence()
             if bp.NotExclusive then
                 self.unit:SetBusy(false)
@@ -741,6 +779,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         end,
     },
 
+    -- This state is for weapons which have to unpack before firing
     WeaponUnpackingState = State {
         WeaponWantEnabled = false,
         WeaponAimWantEnabled = false,
@@ -749,7 +788,7 @@ DefaultProjectileWeapon = Class(Weapon) {
             self.unit:SetBusy(true)
 
             local bp = self:GetBlueprint()
-            #LOG("Weapon " .. bp.DisplayName .. " entered WeaponUnpackingState.")
+            --LOG("Weapon " .. bp.DisplayName .. " entered WeaponUnpackingState.")
             if bp.WeaponUnpackLocksMotion then
                 self.unit:SetImmobile(true)
             end
@@ -762,12 +801,13 @@ DefaultProjectileWeapon = Class(Weapon) {
             end
         end,
 
-        # Override so that it doesn't play the firing sound when
-        # we're not actually creating the projectile yet
+        -- Override so that it doesn't play the firing sound when
+        -- we're not actually creating the projectile yet
         OnFire = function(self)
         end,
     },
 
+    -- This state is for weapons which have to pack up before moving or whatever
     WeaponPackingState = State {
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
@@ -775,7 +815,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         Main = function(self)
             self.unit:SetBusy(true)
             local bp = self:GetBlueprint()
-            #LOG("Weapon " .. bp.DisplayName .. " entered WeaponPackingState.")
+            --LOG("Weapon " .. bp.DisplayName .. " entered WeaponPackingState.")
             WaitSeconds(self:GetBlueprint().WeaponRepackTimeout)
             self:AimManipulatorSetEnabled(false)
             self:PlayFxWeaponPackSequence()
@@ -786,19 +826,19 @@ DefaultProjectileWeapon = Class(Weapon) {
         end,
 
         OnGotTarget = function(self)
-			
-			-- issue#43 for better stealth
-			if self.unit then 
-				self.unit:OnGotTarget(self)
-			end
-		
+
+            -- issue--43 for better stealth
+            if self.unit then
+                self.unit:OnGotTarget(self)
+            end
+
             if not self:GetBlueprint().ForceSingleFire then
                 ChangeState(self, self.WeaponUnpackingState)
             end
         end,
 
-        # Override so that it doesn't play the firing sound when
-        # we're not actually creating the projectile yet
+        -- Override so that it doesn't play the firing sound when
+        -- we're not actually creating the projectile yet
         OnFire = function(self)
             local bp = self:GetBlueprint()
             if bp.CountedProjectile == true and not self:GetBlueprint().ForceSingleFire then
@@ -808,6 +848,7 @@ DefaultProjectileWeapon = Class(Weapon) {
 
     },
 
+    -- This state is entered only when the owner of the weapon is dead
     DeadState = State {
 
         OnEnterState = function(self)
@@ -816,28 +857,6 @@ DefaultProjectileWeapon = Class(Weapon) {
         Main = function(self)
         end,
     },
-    
-    ##3 new functions for CBFP
-    CheckBallisticAcceleration = function(self, proj)                          # [152]
-        if self.CBFP_CalcBallAcc and self.CBFP_CalcBallAcc.Do then
-            local acc = CalculateBallisticAcceleration( self, proj, self.CBFP_CalcBallAcc.ProjectilesPerOnFire, self.CBFP_CalcBallAcc.MuzzleSalvoDelay )
-            proj:SetBallisticAcceleration( -acc) # change projectile trajectory so it hits the target, cure for engine bug
-        end
-    end,
-
-    CheckCountedMissileLaunch = function(self)
-        # takes care of a unit event function added in CBFP v2. MOved it to here in v4, that way I can get rid of
-        # a whole lot of other-mod-incompatible code
-        local bp = self:GetBlueprint()
-        if bp.CountedProjectile then
-            if bp.NukeWeapon then
-                self.unit:OnCountedMissileLaunch('nuke')
-            else
-                self.unit:OnCountedMissileLaunch('tactical')
-            end
-        end
-    end,
-    ##end 3 new functions for CBFP
 }
 
 KamikazeWeapon = Class(Weapon) {
@@ -914,7 +933,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
         elseif bp.Audio.Fire then
             self:PlaySound(bp.Audio.Fire)
         end
-	
+
 
 
     end,
@@ -955,7 +974,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
 
     PlayFxWeaponUnpackSequence = function(self)
         local bp = self:GetBlueprint()
-        # if it's not a continuous beam, or  if it's a continuous beam that's off...
+        -- if it's not a continuous beam, or  if it's a continuous beam that's off...
         if (bp.BeamLifetime > 0) or ((bp.BeamLifetime <= 0) and not self.ContBeamOn) then
             DefaultProjectileWeapon.PlayFxWeaponUnpackSequence(self)
         end
@@ -972,7 +991,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
     WeaponPackingState = State (DefaultProjectileWeapon.WeaponPackingState) {
         Main = function(self)
             local bp = self:GetBlueprint()
-            # if not a continuous beam...
+            -- if not a continuous beam...
             if (bp.BeamLifetime > 0) then
                 self:PlayFxBeamEnd()
             else
@@ -1010,23 +1029,23 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
         self.ContBeamOn = false
     end,
 
-    BeamLifetimeThread = function(self, beam, lifeTime) 
+    BeamLifetimeThread = function(self, beam, lifeTime)
         WaitSeconds(lifeTime)
-        WaitTicks(1) # added by brute51 fix for beam weapon DPS bug [101]
-        self:PlayFxBeamEnd(beam) 
-    end, 
-    
+        WaitTicks(1) -- added by brute51 fix for beam weapon DPS bug [101]
+        self:PlayFxBeamEnd(beam)
+    end,
+
     WatchForHoldFire = function(self, beam)
         while true do
             WaitSeconds(1)
-            #if we're at hold fire, stop beam
+            --if we're at hold fire, stop beam
             if self.unit and self.unit:GetFireState() == 1 then
                 self.BeamStarted = false
                 self:PlayFxBeamEnd(beam)
             end
         end
     end,
-    
+
     StartEconomyDrain = function(self)
         local bp = self:GetBlueprint()
         if not self.EconDrain and bp.EnergyRequired and bp.EnergyDrainPerSecond then
@@ -1036,21 +1055,21 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
         end
         DefaultProjectileWeapon.StartEconomyDrain(self)
     end,
-    
+
     OnHaltFire = function(self)
         for k,v in self.Beams do
-            # Only halt fire on the beams that are currently enabled
+            -- Only halt fire on the beams that are currently enabled
             if not v.Beam:IsEnabled() then
                 continue
             end
-            
+
             self:PlayFxBeamEnd( v.Beam )
         end
     end,
-    
+
     EconomySupportsBeam = function(self)
         local aiBrain = self.unit:GetAIBrain()
-        local energyIncome = aiBrain:GetEconomyIncome( 'ENERGY' ) * 10 # per tick to per seconds
+        local energyIncome = aiBrain:GetEconomyIncome( 'ENERGY' ) * 10 -- per tick to per seconds
         local energyStored = aiBrain:GetEconomyStored( 'ENERGY' )
         local nrgReq = self:GetWeaponEnergyRequired()
         local nrgDrain = self:GetWeaponEnergyDrain()
@@ -1058,10 +1077,10 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
         if energyStored < nrgReq and energyIncome < nrgDrain then
             return false
         end
-        return true    
+        return true
     end,
-    
-    
+
+
     RackSalvoFireReadyState = State (DefaultProjectileWeapon.RackSalvoFireReadyState) {
 
         Main = function(self)
@@ -1074,10 +1093,5 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
         end,
     },
 
-    
+
 }
-
-
-
-
-
