@@ -4021,6 +4021,8 @@ function CreateUI(maxPlayers)
         -- End CPU Benchmark code
 
         GUI.uiCreated = true
+		
+		if Need_Changelog() then GUI_Changelog() end
     end
 
     function RefreshOptionDisplayData(scenarioInfo)
@@ -4775,7 +4777,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             elseif data.Type == 'Peer_Really_Disconnected' then
                 if XinnonyDebug == 3 then AddChatText('>> DATA RECEIVE : Peer_Really_Disconnected (slot:'..data.Slot..')') end
                 if XinnonyDebug == 3 then LOG('>> DATA RECEIVE : Peer_Really_Disconnected (slot:'..data.Slot..')') end
-                AddChatText('>> DATA RECEIVE : Peer_Really_Disconnected (slot:'..data.Slot..')')
                 if data.Options.OwnerID == localPlayerID then
                     lobbyComm:SendData( hostID, {Type = "GetGameInfo"} )
                 else
@@ -7582,11 +7583,83 @@ end
 
 #
 ##
+##############################################
+################  Changelog Dialog  #################
+-- Author : Xinnony --
+function Need_Changelog()
+	local Changelog = import('/lua/ui/lobby/changelog.lua').changelog
+	local Last_Changelog_Version = Prefs.GetFromCurrentProfile('XinnoChangelog') or 0
+	local result = false
+	for i, d in Changelog do
+		if Last_Changelog_Version < d.version then
+			result = true
+			break
+		end
+	end
+	return result
+end
+
+function GUI_Changelog()
+    GROUP_Changelog = Group(GUI)
+    LayoutHelpers.AtCenterIn(GROUP_Changelog, GUI)
+    GROUP_Changelog.Depth:Set(999) -- :GetTopmostDepth() + 1
+    local background = Bitmap(GROUP_Changelog, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby.png'))
+    GROUP_Changelog.Width:Set(background.Width)
+    GROUP_Changelog.Height:Set(background.Height)
+    LayoutHelpers.FillParent(background, GROUP_Changelog)
+    local dialog2 = Group(GROUP_Changelog)
+    dialog2.Width:Set(536)
+    dialog2.Height:Set(400)
+    LayoutHelpers.AtCenterIn(dialog2, GROUP_Changelog)
+    -- Title --
+    local text0 = UIUtil.CreateText(dialog2, "What's new in Lobby ?", 17, 'Arial Gras')
+    text0:SetColor('B9BFB9')
+    text0:SetDropShadow(true)
+    LayoutHelpers.AtHorizontalCenterIn(text0, dialog2, 0)
+    LayoutHelpers.AtTopIn(text0, dialog2, 10)
+    -- Info List --
+    InfoList = ItemList(dialog2)
+    InfoList:SetFont(UIUtil.bodyFont, 11)
+    InfoList:SetColors(nil, "00000000")
+    InfoList.Width:Set(498)
+    InfoList.Height:Set(300)
+    LayoutHelpers.AtLeftIn(InfoList, dialog2, 10)
+	LayoutHelpers.AtRightIn(InfoList, dialog2, 26)
+    LayoutHelpers.AtTopIn(InfoList, dialog2, 38)
+    UIUtil.CreateVertScrollbarFor2(InfoList)
+	InfoList.OnClick = function(self)
+	end
+	-- See only new Changelog by version
+	local Changelog = import('/lua/ui/lobby/changelog.lua')
+	local Last_Changelog_Version = Prefs.GetFromCurrentProfile('XinnoChangelog') or 0
+	for i, d in Changelog.changelog do
+		if Last_Changelog_Version < d.version then
+			InfoList:AddItem(d.name)
+			for k, v in d.description do
+				InfoList:AddItem(v)
+			end
+			InfoList:AddItem('')
+		end
+	end
+    -- OK button --
+    local OkButton = UIUtil.CreateButtonStd2PNG(dialog2, '/BUTTON/medium/', "Ok", 12, -1)
+	LayoutHelpers.AtLeftIn(OkButton, dialog2, 0)
+    LayoutHelpers.AtBottomIn(OkButton, dialog2, 10)
+    OkButton.OnClick = function(self)
+        Prefs.SetToCurrentProfile('XinnoChangelog', Changelog.last_version)
+		GROUP_Changelog:Destroy()
+    end
+    -- Credit --
+    local text99 = UIUtil.CreateText(dialog2, 'Xinnony', 9, 'Arial')
+    text99:SetColor('808080')
+    text99:SetDropShadow(true)
+    LayoutHelpers.AtRightIn(text99, dialog2, 0)
+    LayoutHelpers.AtBottomIn(text99, dialog2, 2)
+end
+
+#
+##
 ############################################
 ################  DEV TEST AREA  ################
-
---function round(n)
-    --return n % 1 >= 0.5 and math.ceil(n) or math.floor(n)
---end
 
 --
