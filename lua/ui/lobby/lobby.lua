@@ -2970,7 +2970,7 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtLeftTopIn(GUI.chatEdit, GUI.chatPanel, 0+13, 184+7)
     GUI.chatEdit.Width:Set(334)
     GUI.chatEdit.Height:Set(24)
-    GUI.chatEdit:SetFont(UIUtil.bodyFont, 16) -- 16|12
+    GUI.chatEdit:SetFont(UIUtil.bodyFont, 16)
     GUI.chatEdit:SetForegroundColor(UIUtil.fontColor)
     GUI.chatEdit:SetHighlightBackgroundColor('00000000')
     GUI.chatEdit:SetHighlightForegroundColor(UIUtil.fontColor)
@@ -2978,7 +2978,7 @@ function CreateUI(maxPlayers)
     GUI.chatEdit:AcquireFocus()
 
     GUI.chatDisplay = ItemList(GUI.chatPanel)
-    GUI.chatDisplay:SetFont(UIUtil.bodyFont, 14) -- 14|12
+    GUI.chatDisplay:SetFont(UIUtil.bodyFont, 14)
     GUI.chatDisplay:SetColors(UIUtil.fontColor(), "00000000", UIUtil.fontColor(), "00000000")
     LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.chatPanel, 8, 4) --Right, Top
     GUI.chatDisplay.Bottom:Set(function() return GUI.chatEdit.Top() -6 end)
@@ -5013,9 +5013,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         --end
     end
 
-    lobbyComm.PeerDisconnected = function(self,peerName,peerID)
-        LOG('>DEBUG> PeerDisconnected : peerName='..peerName..' peerID='..peerID)
-        --AddChatText('>debug> PeerDisconnected : peerName='..peerName..' peerID='..peerID) -- XINNONY -- Here this message always show the player quit !!!
+    lobbyComm.PeerDisconnected = function(self,peerName,peerID) -- Lost connection or try connect with proxy
         if XinnonyDebug == 3 then AddChatText('>> PeerDisconnected : peerName='..peerName..' peerID='..peerID) end -- XINNONY -- Here this message always show the player quit !!!
         if XinnonyDebug == 3 then LOG('GameInfo = ', repr(gameInfo)) end
         
@@ -5038,8 +5036,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 break
             end
         end
-        
-        --AddChatText("Lost connection or try connect with proxy")
         
         if IsPlayer(peerID) then
             local slot = FindSlotForID(peerID)
