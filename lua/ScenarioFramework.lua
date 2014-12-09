@@ -29,6 +29,17 @@ end
 --   bool _success - instructs UI which dialog to show
 --   bool _allPrimary - true if all primary objectives completed, otherwise, false
 --   bool _allSecondary - true if all secondary objectives completed, otherwise, false
+
+-- Fill the human table
+function fillCoop()    
+    local tblArmy = ListArmies()
+    for iArmy, strArmy in pairs(tblArmy) do
+        if iArmy >= ScenarioInfo.Coop1 then
+            table.insert(ScenarioInfo.HumanPlayers, iArmy)
+        end
+    end
+end
+
 function EndOperation(_success, _allPrimary, _allSecondary)
     Sync.OperationComplete = {
         opKey = ScenarioInfo.campaignInfo.opKey or '',
@@ -38,7 +49,6 @@ function EndOperation(_success, _allPrimary, _allSecondary)
         allSecondary = _allSecondary,
         campaignID = ScenarioInfo.campaignInfo.campaignID or ScenarioInfo.Options.FACampaignFaction or '',
     }
-    --EndGame()
 end
 
 -- Pop up a dialog to ask the user what faction they want to play
@@ -52,7 +62,6 @@ end
 
 -- Hook for player requested faction
 -- "data" is a table containing field "Faction" which can be "cybran", "uef", or "aeon"
-
 function OnFactionSelect(data)
     if ScenarioInfo.campaignInfo then
         ScenarioInfo.campaignInfo.campaignID = data.Faction
@@ -71,7 +80,7 @@ function EndOperationT(opData)
     Sync.OperationComplete = opData
 end
 
------- Single Area Trigger Creation
+-- Single Area Trigger Creation
 -- This will create an area trigger around <rectangle>.  It will fire when <categoy> is met of <aiBrain>.
 -- onceOnly means it will not continue to run after the first time it fires.
 -- invert meants it will fire when units are NOT in the area.  Useful for testing if someone has defeated a base.
@@ -80,14 +89,14 @@ function CreateAreaTrigger( callbackFunction, rectangle, category, onceOnly, inv
     return TriggerFile.CreateAreaTrigger(callbackFunction, rectangle, category, onceOnly, invert, aiBrain, number, requireBuilt)
 end
 
------- Table of Areas Trigger Creations
+-- Table of Areas Trigger Creations
 -- same as above except you can supply the function with a table of Rects.
 -- If you have an odd shaped area for an area trigger
 function CreateMultipleAreaTrigger(callbackFunction, rectangleTable, category, onceOnly, invert, aiBrain, number, requireBuilt)
     return TriggerFile.CreateMultipleAreaTrigger(callbackFunction, rectangleTable, category, onceOnly, invert, aiBrain, number, requireBuilt)
 end
 
------- Single Line timer Trigger creation
+-- Single Line timer Trigger creation
 -- Fire the <cb> function after <seconds> number of seconds.
 -- you can have the function repeant <repeatNum> times which will fire every <seconds>
 -- until <repeatNum> is met
@@ -97,6 +106,18 @@ function CreateTimerTrigger( cb, seconds, displayBool)
     return timerThread
 end
 
+function CreateTimerTriggerUnlockCoop(cb, faction, seconds, displayBool)
+    local tblArmy = ListArmies()
+    for iArmy, strArmy in pairs(tblArmy) do
+        if iArmy >= ScenarioInfo.Coop1 then
+            factionIdx = GetArmyBrain(strArmy):GetFactionIndex()
+            if(factionIdx == faction) then
+                CreateTimerTrigger(cb, seconds, displayBool)
+            end
+        end
+    end
+end
+
 function ResetUITimer()
     if timerThread then
         Sync.ObjectiveTimer = 0
@@ -104,7 +125,7 @@ function ResetUITimer()
     end
 end
 
------- Single Line unit damaged trigger creation
+-- Single Line unit damaged trigger creation
 -- When <unit> is damaged it will call the <callbackFunction> provided
 -- If <percent> provided, will check if damaged percent EXCEEDS number provided before callback
 -- function repeats up to repeatNum ... or once if not declared
@@ -116,7 +137,7 @@ function CreateUnitPercentageBuiltTrigger(callbackFunction, aiBrain, category, p
     aiBrain:AddUnitBuiltPercentageCallback(callbackFunction, category, percent)
 end
 
------- Single Line unit death trigger creation
+-- Single Line unit death trigger creation
 -- When <unit> dies it will call the <cb> function provided
 function CreateUnitDeathTrigger( cb, unit, camera )
     TriggerFile.CreateUnitDeathTrigger(cb, unit)
@@ -959,6 +980,23 @@ function RemoveRestriction(army, categories, isSilent)
     RemoveBuildRestriction(army, categories)
 end
 
+function RemoveRestrictionCoop(faction, categories, isSilent)
+    --for coop players
+    local tblArmy = ListArmies()
+    for iArmy, strArmy in pairs(tblArmy) do
+        if iArmy >= ScenarioInfo.Coop1 then     
+            factionIdx = GetArmyBrain(strArmy):GetFactionIndex()
+            if(factionIdx == faction) then
+                SimUIVars.SaveTechAllowance(categories)
+                if not isSilent then
+                    if not Sync.NewTech then Sync.NewTech = {} end
+                    table.insert(Sync.NewTech, EntityCategoryGetUnitList(categories))
+                end
+                RemoveBuildRestriction(iArmy, categories)
+            end
+        end
+    end
+end
 
 -------- returns lists of factories by category
 -------- <point> and <radius> are optional
