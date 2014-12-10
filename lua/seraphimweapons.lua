@@ -15,6 +15,8 @@ local KamikazeWeapon = WeaponFile.KamikazeWeapon
 local BareBonesWeapon = WeaponFile.BareBonesWeapon
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
+local OverchargeWeapon = WeaponFile.OverchargeWeapon
+
 local Explosion = import('defaultexplosions.lua')
 local DisruptorBeamCollisionBeam = CollisionBeamFile.DisruptorBeamCollisionBeam
 local QuantumBeamGeneratorCollisionBeam = CollisionBeamFile.QuantumBeamGeneratorCollisionBeam
@@ -148,7 +150,7 @@ SDFChronotronCannonWeapon = Class(DefaultProjectileWeapon) {
     FxChargeMuzzleFlash = EffectTemplate.SChronotronCannonMuzzleCharge,
 }
 
-SDFChronotronCannonOverChargeWeapon = Class(DefaultProjectileWeapon) {
+SDFChronotronCannonOverChargeWeapon = Class(OverchargeWeapon) {
     FxMuzzleFlash = EffectTemplate.SChronotronCannonOverChargeMuzzle,
 }
 
@@ -157,7 +159,7 @@ SDFLightChronotronCannonWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.SLightChronotronCannonMuzzleFlash,
 }
 
-SDFLightChronotronCannonOverchargeWeapon = Class(DefaultProjectileWeapon) {
+SDFLightChronotronCannonOverchargeWeapon = Class(OverchargeWeapon) {
     FxMuzzleFlash = EffectTemplate.SLightChronotronCannonOverChargeMuzzleFlash,
 }
 
