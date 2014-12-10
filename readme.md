@@ -13,7 +13,6 @@ This is the changelog patch 3636. It is subject to change, but nearing release
 status. Please search the forum for a discussion about the relevant change, or
 make a thread if it isn't there already.
 
-
 *Exploit Fixes*
 - [X] Fixed infinite economy exploit
 - [X] Fixed free ACU upgrade exploit

@@ -1,4 +1,4 @@
-last_version = 2
+last_version = 1
 changelog = {
 	{
 		version = 1,
@@ -32,12 +32,5 @@ changelog = {
 			"- Add new restrictions (NoEngineeringStation+EnhancementDrone), (NoEyeofRhianneandSoothsayer)",
 			"- Typos in PresetLobby",
 		}
-	},
-	{
-		version = 2,
-		name = "3636",
-		description = {
-			"test",
-		}
-	},
+	}
 }
