@@ -43,7 +43,6 @@ URL0001 = Class(CWalkingLandUnit) {
                 end
             end,          
         },
-
         OverCharge = Class(CDFOverchargeWeapon) {},
     },
 

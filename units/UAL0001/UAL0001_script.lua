@@ -27,10 +27,8 @@ UAL0001 = Class(AWalkingLandUnit) {
         DeathWeapon = Class(AIFCommanderDeathWeapon) {},
         RightDisruptor = Class(ADFDisruptorCannonWeapon) {},
         ChronoDampener = Class(ADFChronoDampener) {},
-        OverCharge = Class(ADFOverchargeWeapon) {},              
-        },
+        OverCharge = Class(ADFOverchargeWeapon) {},
     },
-
 
     OnCreate = function(self)
         AWalkingLandUnit.OnCreate(self)
