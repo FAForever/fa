@@ -72,8 +72,8 @@ local PrefLanguageTooltipText={}
 --\\ Stop - Table of Tooltip Country
 --// Get a value on /Country CommandLine in FA.exe - Xinnony
 local PrefLanguage = GetCommandLineArg("/country", 1)
-if PrefLanguage == '' or PrefLanguage == '/init' or PrefLanguage == nil or PrefLanguage == false then
-    LOG('COUNTRY - Country has not been found')
+if PrefLanguage[1] == '' or PrefLanguage[1] == '/init' or PrefLanguage == nil or PrefLanguage == false then
+    LOG('COUNTRY - Country has not been found "'..tostring(PrefLanguage[1])..'"')
     PrefLanguage = "world"
 else
     PrefLanguage = tostring(string.lower(PrefLanguage[1]))
@@ -719,7 +719,11 @@ end
 
 -- update the data in a player slot
 function SetSlotInfo(slot, playerInfo)
-    local isLocallyOwned
+	if (GUI.connectdialog ~= false) then -- Remove the ConnectDialog
+		GUI.connectdialog:Destroy()
+		GUI.connectdialog = false
+	end
+	local isLocallyOwned
     if IsLocallyOwned(slot) then
         if gameInfo.PlayerOptions[slot]['Ready'] then
             DisableSlot(slot, true)
@@ -2624,8 +2628,8 @@ function CreateUI(maxPlayers)
 
     if (GUI.connectdialog ~= false) then
         MenuCommon.MenuCleanup()
-        GUI.connectdialog:Destroy()
-        GUI.connectdialog = false
+        --GUI.connectdialog:Destroy()
+        --GUI.connectdialog = false
     end
 
     local title
@@ -4017,6 +4021,8 @@ function CreateUI(maxPlayers)
         -- End CPU Benchmark code
 
         GUI.uiCreated = true
+		
+		if Need_Changelog() then GUI_Changelog() end
     end
 
     function RefreshOptionDisplayData(scenarioInfo)
@@ -4227,8 +4233,8 @@ function CreateUI(maxPlayers)
                 local XinnoSystemMessage = Prefs.GetFromCurrentProfile('XinnoSystemMessage') or 'false'
                 if XinnoSystemMessage == 'true' then
                     if not table.find(ConnexionEtablished, peer.name) then
-                        AddChatText('<< '..peer.name..' >> '..FindSlotForID(peer.id))
-                        if gameInfo.PlayerOptions[FindSlotForID(peer.id)].Human and IsLocallyOwned(FindSlotForID(peer.id)) then
+                        if gameInfo.PlayerOptions[FindSlotForID(peer.id)].Human
+                                and not IsLocallyOwned(FindSlotForID(peer.id)) then
                             if table.find(ConnectedWithProxy, peer.id) then
                                 AddChatText(LOCF("<LOC Xngine0004>Connection to %s established.", peer.name)..' (FAF Proxy)', "Xngine0004")
                             else
@@ -4782,6 +4788,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                         gameInfo.Observers[data.Slot] = nil
                     end
                 end
+                AddChatText(LOCF("<LOC Xngine0003>Lost connection to %s.", peerName), "Xngine0003")
                 ClearSlotInfo(data.Slot)
                 UpdateGame()
             elseif data.Type == 'SlotAssigned' then
@@ -4833,7 +4840,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 ClearSlotInfo(data.OldSlot)
                 UpdateGame()
             elseif data.Type == 'SetColor' then
-                AddChatText('<>')
                 data.Color = Get_IndexColor_by_CompleteTable(data.Color)
                 gameInfo.PlayerOptions[data.Slot].PlayerColor = data.Color
                 gameInfo.PlayerOptions[data.Slot].ArmyColor = data.Color
@@ -5009,9 +5015,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         --end
     end
 
-    lobbyComm.PeerDisconnected = function(self,peerName,peerID)
-        LOG('>DEBUG> PeerDisconnected : peerName='..peerName..' peerID='..peerID)
-        --AddChatText('>debug> PeerDisconnected : peerName='..peerName..' peerID='..peerID) -- XINNONY -- Here this message always show the player quit !!!
+    lobbyComm.PeerDisconnected = function(self,peerName,peerID) -- Lost connection or try connect with proxy
         if XinnonyDebug == 3 then AddChatText('>> PeerDisconnected : peerName='..peerName..' peerID='..peerID) end -- XINNONY -- Here this message always show the player quit !!!
         if XinnonyDebug == 3 then LOG('GameInfo = ', repr(gameInfo)) end
         
@@ -5034,8 +5038,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 break
             end
         end
-        
-        AddChatText(LOCF("<LOC Xngine0003>Lost connection to %s.", peerName), "Xngine0003")
         
         if IsPlayer(peerID) then
             local slot = FindSlotForID(peerID)
@@ -7577,13 +7579,76 @@ function to_string( tbl )
     end
 end
 
-#
-##
-############################################
-################  DEV TEST AREA  ################
+#####################################################
+################  Changelog Dialog  #################
 
---function round(n)
-    --return n % 1 >= 0.5 and math.ceil(n) or math.floor(n)
---end
+function Need_Changelog()
+	local Changelog = import('/lua/ui/lobby/changelog.lua').changelog
+	local Last_Changelog_Version = Prefs.GetFromCurrentProfile('XinnoChangelog') or 0
+	local result = false
+	for i, d in Changelog do
+		if Last_Changelog_Version < d.version then
+			result = true
+			break
+		end
+	end
+	return result
+end
 
---
+function GUI_Changelog()
+    GROUP_Changelog = Group(GUI)
+    LayoutHelpers.AtCenterIn(GROUP_Changelog, GUI)
+    GROUP_Changelog.Depth:Set(999) -- :GetTopmostDepth() + 1
+    local background = Bitmap(GROUP_Changelog, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby.png'))
+    GROUP_Changelog.Width:Set(background.Width)
+    GROUP_Changelog.Height:Set(background.Height)
+    LayoutHelpers.FillParent(background, GROUP_Changelog)
+    local dialog2 = Group(GROUP_Changelog)
+    dialog2.Width:Set(536)
+    dialog2.Height:Set(400)
+    LayoutHelpers.AtCenterIn(dialog2, GROUP_Changelog)
+    -- Title --
+    local text0 = UIUtil.CreateText(dialog2, "What's new in Lobby ?", 17, 'Arial Gras')
+    text0:SetColor('B9BFB9')
+    text0:SetDropShadow(true)
+    LayoutHelpers.AtHorizontalCenterIn(text0, dialog2, 0)
+    LayoutHelpers.AtTopIn(text0, dialog2, 10)
+    -- Info List --
+    InfoList = ItemList(dialog2)
+    InfoList:SetFont(UIUtil.bodyFont, 11)
+    InfoList:SetColors(nil, "00000000")
+    InfoList.Width:Set(498)
+    InfoList.Height:Set(300)
+    LayoutHelpers.AtLeftIn(InfoList, dialog2, 10)
+	LayoutHelpers.AtRightIn(InfoList, dialog2, 26)
+    LayoutHelpers.AtTopIn(InfoList, dialog2, 38)
+    UIUtil.CreateVertScrollbarFor2(InfoList)
+	InfoList.OnClick = function(self)
+	end
+	-- See only new Changelog by version
+	local Changelog = import('/lua/ui/lobby/changelog.lua')
+	local Last_Changelog_Version = Prefs.GetFromCurrentProfile('XinnoChangelog') or 0
+	for i, d in Changelog.changelog do
+		if Last_Changelog_Version < d.version then
+			InfoList:AddItem(d.name)
+			for k, v in d.description do
+				InfoList:AddItem(v)
+			end
+			InfoList:AddItem('')
+		end
+	end
+    -- OK button --
+    local OkButton = UIUtil.CreateButtonStd2PNG(dialog2, '/BUTTON/medium/', "Ok", 12, -1)
+	LayoutHelpers.AtLeftIn(OkButton, dialog2, 0)
+    LayoutHelpers.AtBottomIn(OkButton, dialog2, 10)
+    OkButton.OnClick = function(self)
+        Prefs.SetToCurrentProfile('XinnoChangelog', Changelog.last_version)
+		GROUP_Changelog:Destroy()
+    end
+    -- Credit --
+    local text99 = UIUtil.CreateText(dialog2, 'Xinnony', 9, 'Arial')
+    text99:SetColor('808080')
+    text99:SetDropShadow(true)
+    LayoutHelpers.AtRightIn(text99, dialog2, 0)
+    LayoutHelpers.AtBottomIn(text99, dialog2, 2)
+end

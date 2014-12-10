@@ -8,9 +8,10 @@ Current patch is: 3634
 
 Changelog for patch 3636
 ------------------------
-This is the changelog to be posted on the forums for patch 3636. It is subject 
-to change, but nearing release status. Please search the forum for a discussion
-about the relevant change, or make a thread if it isn't there already.
+
+This is the changelog patch 3636. It is subject to change, but nearing release
+status. Please search the forum for a discussion about the relevant change, or
+make a thread if it isn't there already.
 
 
 *Exploit Fixes*
@@ -35,8 +36,8 @@ about the relevant change, or make a thread if it isn't there already.
 - [X] Fixed Seraphim ACU shot being visible through FoW
 - [X] Fixed invalid preview range of SMDs
 - [X] Fixed Aeon T1 Bomber targeting subsurface units
-- [X] Given units now get correct experience points 
-- [X] Given units are returned to their original owner in share until death 
+- [X] Given units now get correct experience points
+- [X] Given units are returned to their original owner in share until death
 - [X] UI-mods are now refreshed before launch
 
 *Game Improvements*
@@ -54,9 +55,9 @@ about the relevant change, or make a thread if it isn't there already.
 - [X] Improved the Unit Restrictions menu descriptions, including localisation
 - [X] Improved the Attack-Move feature (Factory Attack-Move Engineer behaviour left alone)
 - [X] Made factory queue templates more accessible, the save button was hidden when the factory wasn't paused
-- [X] Show replay-ID in score 
+- [X] Show replay-ID in score
 - [X] Less UI-lag
-- [X] Some sim-speed improvements 
+- [X] Some sim-speed improvements
 - [X] Remove ACU score bump, ACU kills now score 5000
 
 Contributors:
@@ -75,7 +76,7 @@ Special Thanks:
  - Navax
  - Alex1911
  - Preytor
- 
+
 Contributing
 ------------
 

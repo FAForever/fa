@@ -7,6 +7,7 @@
 --==============================================================================
 
 local sharedUnits = {}
+local chatID = 1
 
 function BreakAlliance( data )
 
