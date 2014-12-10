@@ -52,6 +52,9 @@ function MakeShadowCopyOrders(command)
     -- If the order has the Clear bit set, then all previously issued orders will be removed first,
     -- even if the specific order will not be handled below.
     -- This conveniently also handles the Stop order (= clear all orders).
+
+    if command.CommandType == 'None' then return end
+
     if command.Clear == true then
         for _,unit in ipairs(command.Units) do
             ShadowOrders[unit:GetEntityId()] = {}
@@ -75,13 +78,15 @@ function MakeShadowCopyOrders(command)
     Order.Target      = command.Target
     Order.Hash      = orderHash(Order)
 
+
+
     -- Add this order to each individual unit.
     for _,unit in ipairs(command.Units) do
         -- Initialise the orders table, if needed.
         if not ShadowOrders[unit:GetEntityId()] then
             ShadowOrders[unit:GetEntityId()] = {}
         end
-        table.insert(ShadowOrders[unit:GetEntityId()],Order)
+        table.insert(ShadowOrders[unit:GetEntityId()], Order)
     end
 end -- function MakeShadowCopyorders(command)
 
