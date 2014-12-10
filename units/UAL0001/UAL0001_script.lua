@@ -27,77 +27,7 @@ UAL0001 = Class(AWalkingLandUnit) {
         DeathWeapon = Class(AIFCommanderDeathWeapon) {},
         RightDisruptor = Class(ADFDisruptorCannonWeapon) {},
         ChronoDampener = Class(ADFChronoDampener) {},
-        OverCharge = Class(ADFOverchargeWeapon) {
-
-            OnCreate = function(self)
-                ADFOverchargeWeapon.OnCreate(self)
-                self:SetWeaponEnabled(false)
-                self.AimControl:SetEnabled(false)
-                self.AimControl:SetPrecedence(0)
-				self.unit:SetOverchargePaused(false)
-            end,
-
-            OnEnableWeapon = function(self)
-                if self:BeenDestroyed() then return end
-                ADFOverchargeWeapon.OnEnableWeapon(self)
-                self:SetWeaponEnabled(true)
-                self.unit:SetWeaponEnabledByLabel('RightDisruptor', false)
-                self.unit:BuildManipulatorSetEnabled(false)
-                self.AimControl:SetEnabled(true)
-                self.AimControl:SetPrecedence(20)
-                self.unit.BuildArmManipulator:SetPrecedence(0)
-                self.AimControl:SetHeadingPitch( self.unit:GetWeaponManipulatorByLabel('RightDisruptor'):GetHeadingPitch() )
-            end,
-
-            OnWeaponFired = function(self)
-                ADFOverchargeWeapon.OnWeaponFired(self)
-                self:OnDisableWeapon()
-                self:ForkThread(self.PauseOvercharge)
-            end,
-            
-            OnDisableWeapon = function(self)
-                if self.unit:BeenDestroyed() then return end
-                self:SetWeaponEnabled(false)
-                self.unit:SetWeaponEnabledByLabel('RightDisruptor', true)
-                self.unit:BuildManipulatorSetEnabled(false)
-                self.AimControl:SetEnabled(false)
-                self.AimControl:SetPrecedence(0)
-                self.unit.BuildArmManipulator:SetPrecedence(0)
-                self.unit:GetWeaponManipulatorByLabel('RightDisruptor'):SetHeadingPitch( self.AimControl:GetHeadingPitch() )
-            end,
-            
-            PauseOvercharge = function(self)
-                if not self.unit:IsOverchargePaused() then
-                    self.unit:SetOverchargePaused(true)
-                    WaitSeconds(1/self:GetBlueprint().RateOfFire)
-                    self.unit:SetOverchargePaused(false)
-                end
-            end,
-            
-            OnFire = function(self)
-                if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
-                    ADFOverchargeWeapon.OnFire(self)
-                end
-            end,
-            IdleState = State(ADFOverchargeWeapon.IdleState) {
-                OnGotTarget = function(self)
-                    if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
-                        ADFOverchargeWeapon.IdleState.OnGotTarget(self)
-                    end
-                end,            
-                OnFire = function(self)
-                    if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
-                        ChangeState(self, self.RackSalvoFiringState)
-                    end
-                end,
-            },
-            RackSalvoFireReadyState = State(ADFOverchargeWeapon.RackSalvoFireReadyState) {
-                OnFire = function(self)
-                    if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
-                        ADFOverchargeWeapon.RackSalvoFireReadyState.OnFire(self)
-                    end
-                end,
-            },              
+        OverCharge = Class(ADFOverchargeWeapon) {},              
         },
     },
 

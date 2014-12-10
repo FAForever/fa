@@ -21,78 +21,7 @@ UEL0001 = Class(TWalkingLandUnit) {
     Weapons = {
         DeathWeapon = Class(TIFCommanderDeathWeapon) {},
         RightZephyr = Class(TDFZephyrCannonWeapon) {},
-        OverCharge = Class(TDFOverchargeWeapon) {
-
-            OnCreate = function(self)
-                TDFOverchargeWeapon.OnCreate(self)
-                self:SetWeaponEnabled(false)
-                self.AimControl:SetEnabled(false)
-                self.AimControl:SetPrecedence(0)
-                self.unit:SetOverchargePaused(false)
-            end,
-
-            OnEnableWeapon = function(self)
-                if self:BeenDestroyed() then return end
-                self:SetWeaponEnabled(true)
-                self.unit:SetWeaponEnabledByLabel('RightZephyr', false)
-                self.unit:ResetWeaponByLabel('RightZephyr')
-                self.unit:BuildManipulatorSetEnabled(false)
-                self.AimControl:SetEnabled(true)
-                self.AimControl:SetPrecedence(20)
-                self.unit.BuildArmManipulator:SetPrecedence(0)
-                self.AimControl:SetHeadingPitch( self.unit:GetWeaponManipulatorByLabel('RightZephyr'):GetHeadingPitch() )
-            end,
-
-            OnWeaponFired = function(self)
-                TDFOverchargeWeapon.OnWeaponFired(self)
-                self:OnDisableWeapon()
-                self:ForkThread(self.PauseOvercharge)
-            end,
-            
-            OnDisableWeapon = function(self)
-                if self.unit:BeenDestroyed() then return end
-                self:SetWeaponEnabled(false)
-                self.unit:SetWeaponEnabledByLabel('RightZephyr', true)
-                self.unit:BuildManipulatorSetEnabled(false)
-                self.AimControl:SetEnabled(false)
-                self.AimControl:SetPrecedence(0)
-                self.unit.BuildArmManipulator:SetPrecedence(0)
-                self.unit:GetWeaponManipulatorByLabel('RightZephyr'):SetHeadingPitch( self.AimControl:GetHeadingPitch() )
-            end,
-            
-            PauseOvercharge = function(self)
-                if not self.unit:IsOverchargePaused() then
-                    self.unit:SetOverchargePaused(true)
-                    WaitSeconds(1/self:GetBlueprint().RateOfFire)
-                    self.unit:SetOverchargePaused(false)
-                end
-            end,
-            
-            OnFire = function(self)
-                if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
-                    TDFOverchargeWeapon.OnFire(self)
-                end
-            end,
-            IdleState = State(TDFOverchargeWeapon.IdleState) {
-                OnGotTarget = function(self)
-                    if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
-                        TDFOverchargeWeapon.IdleState.OnGotTarget(self)
-                    end
-                end,            
-                OnFire = function(self)
-                    if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
-                        ChangeState(self, self.RackSalvoFiringState)
-                    end
-                end,
-            },
-            RackSalvoFireReadyState = State(TDFOverchargeWeapon.RackSalvoFireReadyState) {
-                OnFire = function(self)
-                    if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
-                        TDFOverchargeWeapon.RackSalvoFireReadyState.OnFire(self)
-                    end
-                end,
-            },
-        },
+        OverCharge = Class(TDFOverchargeWeapon) {},
         TacMissile = Class(TIFCruiseMissileLauncher) {
         },
         TacNukeMissile = Class(TIFCruiseMissileLauncher) {

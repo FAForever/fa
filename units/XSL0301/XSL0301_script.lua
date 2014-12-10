@@ -24,77 +24,7 @@ XSL0301 = Class(SWalkingLandUnit) {
     Weapons = {
         LightChronatronCannon = Class(SDFLightChronotronCannonWeapon) {},
         DeathWeapon = Class(AIFCommanderDeathWeapon) {},
-        OverCharge = Class(SDFOverChargeWeapon) {
-
-            OnCreate = function(self)
-                SDFOverChargeWeapon.OnCreate(self)
-                self:SetWeaponEnabled(false)
-                self.AimControl:SetEnabled(false)
-                self.AimControl:SetPrecedence(0)
-				self.unit:SetOverchargePaused(false)
-            end,
-
-            OnEnableWeapon = function(self)
-                SDFOverChargeWeapon.OnEnableWeapon(self)
-                self:SetWeaponEnabled(true)
-                self.unit:SetWeaponEnabledByLabel('LightChronatronCannon', false)
-                self.unit:BuildManipulatorSetEnabled(false)
-                self.AimControl:SetEnabled(true)
-                self.AimControl:SetPrecedence(20)
-                self.unit.BuildArmManipulator:SetPrecedence(0)
-                self.AimControl:SetHeadingPitch( self.unit:GetWeaponManipulatorByLabel('LightChronatronCannon'):GetHeadingPitch() )
-            end,
-
-            OnWeaponFired = function(self)
-                SDFOverChargeWeapon.OnWeaponFired(self)
-                self:OnDisableWeapon()
-                self:ForkThread(self.PauseOvercharge)
-            end,
-            
-            OnDisableWeapon = function(self)    
-                self:SetWeaponEnabled(false)
-                self.unit:SetWeaponEnabledByLabel('LightChronatronCannon', true)
-                self.unit:BuildManipulatorSetEnabled(false)
-                self.AimControl:SetEnabled(false)
-                self.AimControl:SetPrecedence(0)
-                self.unit.BuildArmManipulator:SetPrecedence(0)
-                self.unit:GetWeaponManipulatorByLabel('LightChronatronCannon'):SetHeadingPitch( self.AimControl:GetHeadingPitch() )
-            end,
-
-            PauseOvercharge = function(self)
-                if not self.unit:IsOverchargePaused() then
-                    self.unit:SetOverchargePaused(true)
-                    WaitSeconds(1/self:GetBlueprint().RateOfFire)
-                    self.unit:SetOverchargePaused(false)
-                end
-            end,
-            
-            OnFire = function(self)
-                if not self.unit:IsOverchargePaused() then
-                    SDFOverChargeWeapon.OnFire(self)
-                end
-            end,
-            IdleState = State(SDFOverChargeWeapon.IdleState) {
-                OnGotTarget = function(self)
-                    if not self.unit:IsOverchargePaused() then
-                        SDFOverChargeWeapon.IdleState.OnGotTarget(self)
-                    end
-                end,            
-                OnFire = function(self)
-                    if not self.unit:IsOverchargePaused() then
-                        ChangeState(self, self.RackSalvoFiringState)
-                    end
-                end,
-            },
-            RackSalvoFireReadyState = State(SDFOverChargeWeapon.RackSalvoFireReadyState) {
-                OnFire = function(self)
-                    if not self.unit:IsOverchargePaused() then
-                        SDFOverChargeWeapon.RackSalvoFireReadyState.OnFire(self)
-                    end
-                end,
-            },  
-
-        },
+        OverCharge = Class(SDFOverChargeWeapon) {},
         Missile = Class(SIFLaanseTacticalMissileLauncher) {
             OnCreate = function(self)
                 SIFLaanseTacticalMissileLauncher.OnCreate(self)
