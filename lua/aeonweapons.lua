@@ -21,6 +21,7 @@ local BareBonesWeapon = WeaponFile.BareBonesWeapon
 
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
+local OverchargeWeapon = WeaponFile.OverchargeWeapon
 
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
@@ -41,7 +42,7 @@ ADFReactonCannon = Class(DefaultProjectileWeapon) {
                            '/effects/emitters/reacton_cannon_muzzle_flash_03_emit.bp',},
 }
 
-ADFOverchargeWeapon = Class(DefaultProjectileWeapon) {
+ADFOverchargeWeapon = Class(OverchargeWeapon) {
     FxMuzzleFlash = EffectTemplate.ACommanderOverchargeFlash01,
 }
 
@@ -188,7 +189,6 @@ ADFTractorClawStructure = Class(DefaultBeamWeapon) {
     FxMuzzleFlash = {},
 }
 
-
 ADFChronoDampener = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.AChronoDampener,
     FxMuzzleFlashScale = 0.5,
@@ -260,16 +260,13 @@ ADFLaserHeavyWeapon = Class(DefaultProjectileWeapon) {
     FxChargeMuzzleFlash = {},
 }
 
-
 ADFGravitonProjectorWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.AGravitonBolterMuzzleFlash01,
 }
 
-
 ADFDisruptorCannonWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.ADisruptorCannonMuzzle01,
 }
-
 
 ADFDisruptorWeapon = Class(DefaultProjectileWeapon) {
 	FxMuzzleFlash = EffectTemplate.ASDisruptorCannonMuzzle01,
@@ -325,7 +322,6 @@ AIFArtilleryMiasmaShellWeapon = Class(DefaultProjectileWeapon) {
     end,
 
 }
-
 
 AIFArtillerySonanceShellWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {
@@ -409,7 +405,6 @@ AANChronoTorpedoWeapon = Class(DefaultProjectileWeapon) {
     },
 }
 
-
 AIFQuasarAntiTorpedoWeapon = Class(DefaultProjectileWeapon) {
 	FxMuzzleFlash = EffectTemplate.AQuasarAntiTorpedoFlash,
 }
@@ -418,7 +413,6 @@ AIFQuasarAntiTorpedoWeapon = Class(DefaultProjectileWeapon) {
 AKamikazeWeapon = Class(KamikazeWeapon) {
     FxMuzzleFlash = {},
 }
-
 
 AIFQuantumWarhead = Class(DefaultProjectileWeapon) {
 }
@@ -488,7 +482,6 @@ AIFParagonDeathWeapon = Class(BareBonesWeapon) {
     end,
 }
 
-
 ACruiseMissileWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = { '/effects/emitters/aeon_missile_launch_01_emit.bp', },
 }
@@ -496,7 +489,6 @@ ACruiseMissileWeapon = Class(DefaultProjectileWeapon) {
 ADFLaserHighIntensityWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.AHighIntensityLaserFlash01,
 }
-
 
 AAATemporalFizzWeapon = Class(DefaultProjectileWeapon) {
     FxChargeEffects = { '/effects/emitters/temporal_fizz_muzzle_charge_01_emit.bp', },
@@ -513,7 +505,6 @@ AAATemporalFizzWeapon = Class(DefaultProjectileWeapon) {
         end
     end,
 }
-
 
 AAASonicPulseBatteryWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/sonic_pulse_muzzle_flash_01_emit.bp',},
@@ -561,7 +552,6 @@ AQuantumBeamGenerator = Class(DefaultBeamWeapon) {
         DefaultBeamWeapon.PlayFxWeaponUnpackSequence(self)
     end,
 }
-
 
 AAMSaintWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.ASaintLaunch01,
