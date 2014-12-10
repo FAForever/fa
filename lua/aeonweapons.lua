@@ -21,6 +21,7 @@ local BareBonesWeapon = WeaponFile.BareBonesWeapon
 
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
+local OverchargeWeapon = WeaponFile.OverchargeWeapon
 
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
@@ -41,7 +42,7 @@ ADFReactonCannon = Class(DefaultProjectileWeapon) {
                            '/effects/emitters/reacton_cannon_muzzle_flash_03_emit.bp',},
 }
 
-ADFOverchargeWeapon = Class(DefaultProjectileWeapon) {
+ADFOverchargeWeapon = Class(OverchargeWeapon) {
     FxMuzzleFlash = EffectTemplate.ACommanderOverchargeFlash01,
 }
 
