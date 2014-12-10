@@ -440,7 +440,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         end
     end,
 
-    -- Present mainly for Overcharge to hook into
+    -- Present for Overcharge to hook into
     OnWeaponFired = function(self)
     end,
 
@@ -880,6 +880,107 @@ BareBonesWeapon = Class(Weapon) {
     end,
 }
 
+-- IceDreamer
+OverchargeWeapon = Class(DefaultProjectileWeapon) {
+
+    -- Called in OnCreate
+    GetWeaponLabelByFaction = function(self)
+        local Faction = self.unit:GetBlueprint().General.FactionName
+        local Label = nil
+        if Faction == 'Aeon' then
+            Label = 'RightDisruptor'
+        elseif Faction == 'UEF' then
+            Label = 'RightZephyr'
+        elseif Faction == 'Cybran' then
+            Label = 'RightRipper'
+        elseif Faction == 'Seraphim' then
+            if EntityCategoryContains(categories.REBUILDER, self) then -- Rebuilder is an sACU only Category at present
+                Label = 'LightChronatronCannon'
+            else
+                Label = 'ChronotronCannon'
+            end
+        end
+        
+        return Label
+    end,
+    
+    -- The Overcharge cool-down function
+    PauseOvercharge = function(self)
+        if not self.unit:IsOverchargePaused() then
+            self.unit:SetOverchargePaused(true)
+            WaitSeconds(1/self:GetBlueprint().RateOfFire)
+            self.unit:SetOverchargePaused(false)
+        end
+    end,
+    
+    OnCreate = function(self)
+        DefaultProjectileWeapon.OnCreate(self)
+        self:SetWeaponEnabled(false)
+        self.AimControl:SetEnabled(false)
+        self.AimControl:SetPrecedence(0)
+        self.unit:SetOverchargePaused(false)
+        
+        -- Differentiate weapon label by faction
+        self.DesiredWeaponLabel = self:GetWeaponLabelByFaction()
+    end,
+    
+    OnFire = function(self)
+        if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
+            DefaultProjectileWeapon.OnFire(self)
+        end
+    end,
+
+    OnEnableWeapon = function(self)
+        if self:BeenDestroyed() then return end
+        DefaultProjectileWeapon.OnEnableWeapon(self)
+        self:SetWeaponEnabled(true)
+        self.unit:SetWeaponEnabledByLabel(self.DesiredWeaponLabel, false)
+        self.unit:BuildManipulatorSetEnabled(false)
+        self.AimControl:SetEnabled(true)
+        self.AimControl:SetPrecedence(20)
+        self.unit.BuildArmManipulator:SetPrecedence(0)
+        self.AimControl:SetHeadingPitch(self.unit:GetWeaponManipulatorByLabel(self.DesiredWeaponLabel):GetHeadingPitch())
+    end,
+    
+    OnDisableWeapon = function(self)
+        if self.unit:BeenDestroyed() then return end
+        self:SetWeaponEnabled(false)
+        self.unit:SetWeaponEnabledByLabel(self.DesiredWeaponLabel, true)
+        self.unit:BuildManipulatorSetEnabled(false)
+        self.AimControl:SetEnabled(false)
+        self.AimControl:SetPrecedence(0)
+        self.unit.BuildArmManipulator:SetPrecedence(0)
+        self.unit:GetWeaponManipulatorByLabel(self.DesiredWeaponLabel):SetHeadingPitch(self.AimControl:GetHeadingPitch())
+    end,
+
+    OnWeaponFired = function(self)
+        DefaultProjectileWeapon.OnWeaponFired(self)
+        self:OnDisableWeapon()
+        self:ForkThread(self.PauseOvercharge)
+    end,
+    
+    -- Weapon State Modifications
+    IdleState = State(DefaultProjectileWeapon.IdleState) {
+        OnGotTarget = function(self)
+        if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
+                DefaultProjectileWeapon.IdleState.OnGotTarget(self)
+            end
+        end,            
+        OnFire = function(self)
+            if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
+                ChangeState(self, self.RackSalvoFiringState)
+            end
+        end,
+    },
+    
+    RackSalvoFireReadyState = State(DefaultProjectileWeapon.RackSalvoFireReadyState) {
+        OnFire = function(self)
+            if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
+                DefaultProjectileWeapon.RackSalvoFireReadyState.OnFire(self)
+            end
+        end,
+    },  
+}
 
 DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
 
