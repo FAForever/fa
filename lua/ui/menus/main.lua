@@ -20,6 +20,7 @@ local MapUtil = import('/lua/ui/maputil.lua')
 local TooltipInfo = import('/lua/ui/help/tooltips.lua')
 local Movie = import('/lua/maui/movie.lua').Movie
 local Mods = import('/lua/mods.lua')
+local GetVersion = import('/version.lua').GetVersion
 
 local mapErrorDialog = false
 
