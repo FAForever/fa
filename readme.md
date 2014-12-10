@@ -70,6 +70,7 @@ about the relevant change, or make a thread if it isn't there already.
 - [X] Some sim-speed improvements 
 - [X] Remove ACU score bump, ACU kills now score 5000
 - [X] Chrono now syncs with allies, and no longer stuns allied units
+- [X] Hover / air units now sink with physics instead of slider
 
 Contributors:
  - Sheeo
