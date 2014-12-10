@@ -87,6 +87,7 @@ Special Thanks:
  - Navax
  - Alex1911
  - Preytor
+ - Sir-Prize
  
 Changes under consideration for future patches
 ----------------------------------------------
@@ -94,12 +95,6 @@ Changes under consideration for future patches
 - Tempest being able to build hovering land units
 - Mongoose muzzle velocity buff 
 
-
-Special Thanks:
- - Navax
- - Alex1911
- - Preytor
- 
 Contributing
 ------------
 
