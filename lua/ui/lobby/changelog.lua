@@ -46,6 +46,7 @@ changelog = {
 			"- Fix people can change color of other people",
 			"- Fix wrong description for Eye and Soothsayer Unit Restrictions",
 			"- Fix people can't join/host (black screen lobby)",
+			"- Fix problem with Preset Lobby",
 			"- Remove debug message",
 		}
 	}
