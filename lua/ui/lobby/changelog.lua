@@ -34,4 +34,16 @@ changelog = {
 			"- Autobalance the teams when spawn is random [by Crotalus]",
 		}
 	},
+	{
+		version = 4,
+		name = "Lobby 2.5b",
+		description = {
+			"- Disable Windowed options if the game is already set windowed",
+			"- Add color for the default options in Game Options window",
+			"- Add Tooltip for the Mod in Mod Manager with Little View",
+			"- Fix people can change color of other people",
+			"- Fix wrong description for Eye and Soothsayer Unit Restrictions",
+			"- Remove debug message",
+		}
+	}
 }
