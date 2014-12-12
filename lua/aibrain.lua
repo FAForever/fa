@@ -826,11 +826,11 @@ AIBrain = Class(moho.aibrain_methods) {
             local allies = {}
             local selfIndex = self:GetArmyIndex()
             WaitSeconds(10)
-            -- this part determiens the share condition            
+            -- this part determiens the share condition
             local shareOption = ScenarioInfo.Options.Share or "no"
             -- "no" means full share
-            if shareOption == "no" then            
-                -- this part determines who the allies are 
+            if shareOption == "no" then
+                -- this part determines who the allies are
                 for index, brain in ArmyBrains do
                     brain.index = index
                     brain.score = brain:CalculateScore()
@@ -847,7 +847,7 @@ AIBrain = Class(moho.aibrain_methods) {
                             TransferUnitsOwnership(units, v.index)
                         end
                     end
-                end            
+                end
             -- "yes" means share until death
             elseif shareOption == "yes" then
                 import('/lua/SimUtils.lua').KillSharedUnits(self:GetArmyIndex())
@@ -856,8 +856,8 @@ AIBrain = Class(moho.aibrain_methods) {
                 local borrowed = {}
                 for index,unit in units do
                     local oldowner = unit.oldowner
-                    if oldowner and owner ~= self:GetArmyIndex() then
-                        if not borrowed[oldowner] and not GetArmyBrain(owner):IsDefeated() then
+                    if oldowner and oldowner ~= self:GetArmyIndex() then
+                        if not borrowed[oldowner] and not GetArmyBrain(oldowner):IsDefeated() then
                             borrowed[oldowner] = {}
                         end
 
