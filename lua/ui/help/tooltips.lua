@@ -2177,8 +2177,8 @@ Tooltips = {
         description = "<LOC tooltipui0687>Prevents UEF commanders from upgrading their ACU to have the 'Billy' tactical nuke upgrade"
     },
     restricted_units_eye = {
-        title = "<LOC tooltipui0686>No Eye of Rhianne and Soothsayer",
-        description = "<LOC tooltipui0687>Remove the Aeon T3 Optics and CybranT3 Perimeter"
+        title = "No Eye of Rhianne and Soothsayer",
+        description = "Remove the Aeon T3 Optics and CybranT3 Perimeter"
     },
     
     #**********************
