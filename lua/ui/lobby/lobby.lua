@@ -5485,10 +5485,6 @@ end
 --  CPU Benchmarking Functions
 --------------------------------------------------
 function CPUBenchmark()
-    BenchTime = 0
-end
-
-function DISABLECPUBenchmark()
     --This function gives the CPU some busy work to do.
     --CPU score is determined by how quickly the work is completed.
     local totalTime = 0
