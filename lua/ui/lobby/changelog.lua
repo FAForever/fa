@@ -1,8 +1,8 @@
-last_version = 2
+last_version = 1
 changelog = {
 	{
 		version = 1,
-		name = "Lobby 2.5",
+		name = "Lobby 2.5 (3636 patch)",
 		description = {
 			"- Add Changelog dialog",
 			"- Add numbers of Restriction in OptionContainer",
@@ -15,8 +15,7 @@ changelog = {
 			"- Fix ModManager crash sometime",
 			"- Fix a bug in Game Options, the new value is reset if you scroll the list",
 			"- Fix sometime a PresetLobby not loaded (caused by map not available)",
-			"- Fix 'CH' and 'VA' flag country",
-			"- Fix yellow country",
+			"- Fix 'CH' and 'VA' and yellow Flag Country",
 			"- Replace Checkbox to Radiobox in ModManager",
 			"- Replace the 'world' flag country",
 			"- Delete 'Player go to Slot' message",
@@ -31,13 +30,8 @@ changelog = {
 			"- Transparent color the ACU in Minimap (just the grey color, not the black border)",
 			"- Add new restrictions (NoEngineeringStation+EnhancementDrone), (NoEyeofRhianneandSoothsayer)",
 			"- Typos in PresetLobby",
-		}
-	},
-	{
-		version = 2,
-		name = "3636",
-		description = {
-			"test",
+			"- Add Windowed options for launch Lobby windowed until launch [by Crotalus]",
+			"- Autobalance the teams when spawn is random [by Crotalus]",
 		}
 	},
 }
