@@ -65,8 +65,6 @@ local ToStrings = {
     private = {text = '<LOC chat_0006>to you:', caps = '<LOC chat_0007>To You:', colorkey = 'priv_color'},
 }
 
-local chatID = 1
-
 function SetLayout()
     import(UIUtil.GetLayoutFilename('chat')).SetLayout()
 end
@@ -768,9 +766,6 @@ function CreateChatEdit()
             end
 
             msg = { to = ChatTo(), Chat = true }
-            msg.id = chatID
-            chatID = chatID + 1
-
             if self.tempCam then
                 msg.camera = self.tempCam
             elseif group.camData:IsChecked() then

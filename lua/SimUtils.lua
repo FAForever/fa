@@ -251,11 +251,13 @@ end
 
 function SaveChatToReplay(data)
     if data.Sender and data.Msg then
-        local id = tonumber(data.Msg.id)
         if not Sync.Chat then
+            chatID = 1
             Sync.Chat = {}
         end
-        Sync.Chat[data.Sender .. '-' .. id] = {Sender=data.Sender, Msg=data.Msg}
+        chatID = chatID + 1
+        Sync.Chat[chatID] = {Sender=data.Sender, Msg=data.Msg}
+        --table.insert(Sync.Chat, {Sender=data.Sender, Msg=data.Msg})
     end
 end
 
