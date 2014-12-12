@@ -45,6 +45,7 @@ changelog = {
 			"- Add Tooltip for the Mod in Mod Manager with Little View",
 			"- Fix people can change color of other people",
 			"- Fix wrong description for Eye and Soothsayer Unit Restrictions",
+			"- Fix people can't join/host (black screen lobby)",
 			"- Remove debug message",
 		}
 	}
