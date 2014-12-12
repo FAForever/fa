@@ -806,5 +806,9 @@ function CreateListElementtt(parent, modInfo, Pos, little)
 		end
 		--group.type:SetDropShadow(true)
 	--
+	if little then
+		Tooltip.AddControlTooltip(group.bg, {text=modInfo.name, body=modInfo.description})
+	end
+	--
 	return group
 end

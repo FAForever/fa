@@ -765,10 +765,11 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
 				--
 				--if data.type == 'option1' or data.type == 'option2' or data.type == 'option3' then -- For enable label (default) just or global/team/ai options
 				if data.data.default then realDefValue = data.data.default end
-				line.combo:AddItems(itemArray, defValue, realDefValue) -- For all (true for enable (default) label)
+				line.combo:AddItems(itemArray, defValue, realDefValue, true) -- For all (true for enable (default) label)
                 line.combo.OnClick = function(self, index, text)
 					--LOG('>> OnClick > '..index..' > '..text)
                     changedOptions[data.data.key] = {value = data.data.values[index].key, pref = data.data.pref, index = index}
+					if line.combo.EnableColor then line.combo._text:SetColor('DBBADB') end
 					--LOG('>> changedOptions > '..changedOptions[data.data.key].value..' > '..changedOptions[data.data.key].pref..' > '..changedOptions[data.data.key].index)
                 end
                 line.HandleEvent = Group.HandleEvent
