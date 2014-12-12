@@ -26,7 +26,7 @@ savedParent = false
 local observerLine = false
 
 ##  I switched the order of these because it was causing error, originally, the scoreoption line was first
-local sessionInfo = SessionGetScenarioInfo()   
+local sessionInfo = SessionGetScenarioInfo()
 local replayID = -1
 
 
@@ -38,40 +38,40 @@ local needExpand = false
 local contractOnCreate = false
 function CreateScoreUI(parent)
     savedParent = GetFrame(0)
-    
+
     controls.bg = Group(savedParent)
     controls.bg.Depth:Set(10)
-    
+
     controls.collapseArrow = Checkbox(savedParent)
     controls.collapseArrow.OnCheck = function(self, checked)
         ToggleScoreControl(not checked)
     end
     Tooltip.AddCheckboxTooltip(controls.collapseArrow, 'score_collapse')
-    
+
     controls.bgTop = Bitmap(controls.bg)
     controls.bgBottom = Bitmap(controls.bg)
     controls.bgStretch = Bitmap(controls.bg)
     controls.armyGroup = Group(controls.bg)
-    
+
     controls.leftBracketMin = Bitmap(controls.bg)
     controls.leftBracketMax = Bitmap(controls.bg)
     controls.leftBracketMid = Bitmap(controls.bg)
-    
+
     controls.rightBracketMin = Bitmap(controls.bg)
     controls.rightBracketMax = Bitmap(controls.bg)
     controls.rightBracketMid = Bitmap(controls.bg)
-    
+
     controls.leftBracketMin:DisableHitTest()
     controls.leftBracketMax:DisableHitTest()
     controls.leftBracketMid:DisableHitTest()
     controls.rightBracketMin:DisableHitTest()
     controls.rightBracketMax:DisableHitTest()
     controls.rightBracketMid:DisableHitTest()
-    
+
     controls.bg:DisableHitTest(true)
-    
+
     SetupPlayerLines()
-    
+
     controls.time = UIUtil.CreateText(controls.bgTop, '0', 12, UIUtil.bodyFont)
     controls.time:SetColor('ff00dbff')
     controls.timeIcon = Bitmap(controls.bgTop)
@@ -82,18 +82,18 @@ function CreateScoreUI(parent)
     controls.units = UIUtil.CreateText(controls.bgTop, '0', 12, UIUtil.bodyFont)
     controls.units:SetColor('ffff9900')
     Tooltip.AddControlTooltip(controls.units, 'score_units')
-    
+
     SetLayout()
-    
+
     GameMain.AddBeatFunction(_OnBeat)
     controls.bg.OnDestroy = function(self)
         GameMain.RemoveBeatFunction(_OnBeat)
     end
-    
+
     if contractOnCreate then
         Contract()
     end
-    
+
     controls.bg:SetNeedsFrameUpdate(true)
     controls.bg.OnFrame = function(self, delta)
         local newRight = self.Right() + (1000*delta)
@@ -105,7 +105,7 @@ function CreateScoreUI(parent)
         self.Right:Set(newRight)
     end
     controls.collapseArrow:SetCheck(true, true)
-    
+
 
 end
 
@@ -132,7 +132,7 @@ function SetupPlayerLines()
     local function CreateArmyLine(data, armyIndex)
         local group = Group(controls.bgStretch)
         local sw = 42
-        
+
         if (armyIndex != 0 and SessionIsReplay()) then
              group.faction = Bitmap(group)
             if armyIndex != 0 then
@@ -144,29 +144,29 @@ function SetupPlayerLines()
             group.faction.Width:Set(14)
             group.faction:DisableHitTest()
             LayoutHelpers.AtLeftTopIn(group.faction, group, -4)
-            
+
             group.color = Bitmap(group.faction)
             group.color:SetSolidColor(data.color)
             group.color.Depth:Set(function() return group.faction.Depth() - 1 end)
             group.color:DisableHitTest()
             LayoutHelpers.FillParent(group.color, group.faction)
-    
+
             group.name = UIUtil.CreateText(group, data.nickname, 12, UIUtil.bodyFont)
             group.name:DisableHitTest()
     --        LayoutHelpers.AtLeftIn(group.name, group, 16)
             LayoutHelpers.AtLeftIn(group.name, group, 12)
             LayoutHelpers.AtVerticalCenterIn(group.name, group)
             group.name:SetColor('ffffffff')
-            
+
             group.score = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
             group.score:DisableHitTest()
             LayoutHelpers.AtRightIn(group.score, group, sw * 2)
             LayoutHelpers.AtVerticalCenterIn(group.score, group)
             group.score:SetColor('ffffffff')
-            
+
             group.name.Right:Set(group.score.Left)
             group.name:SetClipToWidth(true)
-            
+
             group.mass = Bitmap(group)
             group.mass:SetTexture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
             LayoutHelpers.AtRightIn(group.mass, group, sw * 1)
@@ -179,20 +179,20 @@ function SetupPlayerLines()
             LayoutHelpers.AtRightIn(group.mass_in, group, sw * 1+14)
             LayoutHelpers.AtVerticalCenterIn(group.mass_in, group)
             group.mass_in:SetColor('ffb7e75f')
-    
+
             group.energy = Bitmap(group)
             group.energy:SetTexture(UIUtil.UIFile('/game/build-ui/icon-energy_bmp.dds'))
             LayoutHelpers.AtRightIn(group.energy, group, sw * 0)
             LayoutHelpers.AtVerticalCenterIn(group.energy, group)
             group.energy.Height:Set(14)
             group.energy.Width:Set(14)
-                    
+
             group.energy_in = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
             group.energy_in:DisableHitTest()
             LayoutHelpers.AtRightIn(group.energy_in, group, sw * 0+14)
             LayoutHelpers.AtVerticalCenterIn(group.energy_in, group)
             group.energy_in:SetColor('fff7c70f')
-    
+
        else
             group.faction = Bitmap(group)
             if armyIndex != 0 then
@@ -204,25 +204,25 @@ function SetupPlayerLines()
             group.faction.Width:Set(14)
             group.faction:DisableHitTest()
             LayoutHelpers.AtLeftTopIn(group.faction, group)
-            
+
             group.color = Bitmap(group.faction)
             group.color:SetSolidColor(data.color)
             group.color.Depth:Set(function() return group.faction.Depth() - 1 end)
             group.color:DisableHitTest()
             LayoutHelpers.FillParent(group.color, group.faction)
-    
+
             group.name = UIUtil.CreateText(group, data.nickname, 12, UIUtil.bodyFont)
             group.name:DisableHitTest()
              LayoutHelpers.AtLeftIn(group.name, group, 16)
             LayoutHelpers.AtVerticalCenterIn(group.name, group)
             group.name:SetColor('ffffffff')
-            
+
             group.score = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
             group.score:DisableHitTest()
             LayoutHelpers.AtRightIn(group.score, group)
             LayoutHelpers.AtVerticalCenterIn(group.score, group)
             group.score:SetColor('ffffffff')
-            
+
             group.name.Right:Set(group.score.Left)
             group.name:SetClipToWidth(true)
        end
@@ -232,10 +232,10 @@ function SetupPlayerLines()
         LayoutHelpers.AtRightIn(group.score, group)
         LayoutHelpers.AtVerticalCenterIn(group.score, group)
         group.score:SetColor('ffffffff')
-        
+
         group.name.Right:Set(group.score.Left)
         group.name:SetClipToWidth(true)
-]]--        
+]]--
         group.Height:Set(group.faction.Height)
         group.Width:Set(262)
         group.armyID = armyIndex
@@ -262,13 +262,13 @@ function SetupPlayerLines()
         else
             group:DisableHitTest()
         end
-        
+
         return group
     end
     local index = 1
     for armyIndex, armyData in GetArmiesTable().armiesTable do
         if armyData.civilian or not armyData.showScore then continue end
-        if not controls.armyLines then 
+        if not controls.armyLines then
             controls.armyLines = {}
         end
         controls.armyLines[index] = CreateArmyLine(armyData, armyIndex)
@@ -281,38 +281,38 @@ function SetupPlayerLines()
         observerLine.speedText = UIUtil.CreateText(controls.bgStretch, '', 14, UIUtil.bodyFont)
         observerLine.speedText:SetColor('ff00dbff')
         LayoutHelpers.AtRightIn(observerLine.speedText, observerLine)
-        observerLine.speedSlider = IntegerSlider(controls.bgStretch, false, -10, 10, 1, 
-            UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), 
-            UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), 
-            UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), 
+        observerLine.speedSlider = IntegerSlider(controls.bgStretch, false, -10, 10, 1,
+            UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
+            UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
+            UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
             UIUtil.SkinnableFile('/dialogs/options/slider-back_bmp.dds'))
-            
+
         observerLine.speedSlider.Left:Set(function() return observerLine.Left() + 5 end)
         observerLine.speedSlider.Right:Set(function() return observerLine.Right() - 20 end)
         observerLine.speedSlider.Bottom:Set(function() return observerLine.Bottom() - 5 end)
         observerLine.speedSlider._background.Left:Set(observerLine.speedSlider.Left)
         observerLine.speedSlider._background.Right:Set(observerLine.speedSlider.Right)
         observerLine.speedSlider._background.Top:Set(observerLine.speedSlider.Top)
-        observerLine.speedSlider._background.Bottom:Set(observerLine.speedSlider.Bottom) 
+        observerLine.speedSlider._background.Bottom:Set(observerLine.speedSlider.Bottom)
         observerLine.speedSlider._thumb.Depth:Set(function() return observerLine.Depth() + 5 end)
         Tooltip.AddControlTooltip(observerLine.speedSlider._thumb, 'Lobby_Gen_GameSpeed')
         observerLine.speedSlider._background.Depth:Set(function() return observerLine.speedSlider._thumb.Depth() - 1 end)
         LayoutHelpers.AtVerticalCenterIn(observerLine.speedText, observerLine.speedSlider)
-        
+
         observerLine.speedSlider.OnValueChanged = function(self, newValue)
             observerLine.speedText:SetText(string.format("%+d", math.floor(tostring(newValue))))
         end
-        
+
         observerLine.speedSlider.OnValueSet = function(self, newValue)
             ConExecute("WLD_GameSpeed " .. newValue)
         end
         observerLine.speedSlider:SetValue(gameSpeed)
         controls.armyLines[index] = observerLine
         index = index + 1
-    end 
+    end
     local function CreateMapNameLine(data, armyIndex)
-        local group = Group(controls.bgStretch) 
-                
+        local group = Group(controls.bgStretch)
+
         local mapnamesize = string.len(data.mapname)
         local mapoffset = 131 - (mapnamesize * 2.7)
         if (sessionInfo.Options.Ranked) then
@@ -323,30 +323,30 @@ function SetupPlayerLines()
         LayoutHelpers.AtLeftIn(group.name, group, mapoffset)
         LayoutHelpers.AtVerticalCenterIn(group.name, group, 1)
         group.name:SetColor('ffffffff')
-        
+
         if (sessionInfo.Options.Ranked) then
             group.faction = Bitmap(group)
-            group.faction:SetTexture("/textures/ui/powerlobby/rankedscore.dds")        
+            group.faction:SetTexture("/textures/ui/powerlobby/rankedscore.dds")
             group.faction.Height:Set(14)
             group.faction.Width:Set(14)
             group.faction:DisableHitTest()
             LayoutHelpers.AtLeftTopIn(group.faction, group.name, -15)
         end
-        
+
         group.score = UIUtil.CreateText(group, '', 10, UIUtil.bodyFont)
         group.score:DisableHitTest()
         LayoutHelpers.AtRightIn(group.score, group)
         LayoutHelpers.AtVerticalCenterIn(group.score, group)
         group.score:SetColor('ffffffff')
-        
+
         group.name.Right:Set(group.score.Left)
         group.name:SetClipToWidth(true)
-        
+
         group.Height:Set(18)
-        group.Width:Set(262)        
-        
+        group.Width:Set(262)
+
         group:DisableHitTest()
-        
+
         return group
     end
 
@@ -358,8 +358,8 @@ function SetupPlayerLines()
             line.name:SetText(playerNameLine)
         end
     end
-    
-    mapData = {}    
+
+    mapData = {}
     mapData.mapname = LOCF("<LOC gamesel_0002>Map: %s", sessionInfo.name)
     if replayID == -1 then -- only do this once
         if HasCommandLineArg("/syncreplay") and HasCommandLineArg("/gpgnet") and GetFrontEndData('syncreplayid') ~= nil and GetFrontEndData('syncreplayid') ~= 0 then
@@ -372,13 +372,14 @@ function SetupPlayerLines()
             replayID =  GetCommandLineArg("/replayid", 1)[1]
         end
     end
-    
-    if tonumber(replayID) > 0 then mapData.mapname = mapData.mapname .. ', ID: ' .. replayID end
+
+    -- Temporarily disabled due to formatting error
+    --if tonumber(replayID) > 0 then mapData.mapname = mapData.mapname .. ', ID: ' .. replayID end
     controls.armyLines[index] = CreateMapNameLine(mapData, 0)
 end
     function _OnBeat()
 
-        controls.time:SetText(string.format("%s (%+d / %+d)", GetGameTime(), gameSpeed, GetSimRate() ))        
+        controls.time:SetText(string.format("%s (%+d / %+d)", GetGameTime(), gameSpeed, GetSimRate() ))
 
         if sessionInfo.Options.NoRushOption and sessionInfo.Options.NoRushOption != 'Off' then
             if tonumber(sessionInfo.Options.NoRushOption) * 60 > GetGameTimeSeconds() then
@@ -408,7 +409,7 @@ end
                         else
                             line.score:SetText(fmtnum(scoreData.general.score))
                             line.scoreNumber = scoreData.general.score
-                            
+
                         end
                         if GetFocusArmy() == index then
                             line.name:SetColor('ffff7f00')
@@ -436,9 +437,9 @@ end
                             line.score:SetColor('ffa0a0a0')
                             if SessionIsReplay() then
                                 line.mass_in:SetColor('ffa0a0a0')
-                                line.energy_in:SetColor('ffa0a0a0') 
+                                line.energy_in:SetColor('ffa0a0a0')
                             end
-                            
+
                         end
                         break
                     end
@@ -492,7 +493,7 @@ function ToggleScoreControl(state)
         import('/lua/ui/game/objectives2.lua').ToggleObjectives()
         return
     end
-    
+
     if UIUtil.GetAnimationPrefs() then
         if state or controls.bg:IsHidden() then
             Prefs.SetToCurrentProfile("scoreoverlay", true)
