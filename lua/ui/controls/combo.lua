@@ -52,12 +52,13 @@ local defaultBitmaps = {
 
 ---------------------------------------------------------------------------------------------------------------------------------------- COMBO
 Combo = Class(Group) {
-    __init = function(self, parent, pointSize, maxVisibleItems, staticTitle, bitmaps, rolloverCue, clickCue, itemCue, debugName)
+    __init = function(self, parent, pointSize, maxVisibleItems, staticTitle, bitmaps, rolloverCue, clickCue, itemCue, debugName, EnableColor)
         Group.__init(self, parent)
         self:SetName(debugName or "Combo")
         self.mRolloverCue = rolloverCue
         self.mClickCue = clickCue
         self.mItemCue = itemCue or "UI_Tab_Click_01"
+		self.EnableColor = EnableColor or true
 
         bitmaps = bitmaps or defaultBitmaps
 
@@ -211,7 +212,7 @@ Combo = Class(Group) {
                     self._btnLeft:SetTexture(bitmaps.button.left.over)
                     self._btnRight:SetTexture(bitmaps.button.right.over)
                     self._btnMid:SetTexture(bitmaps.button.mid.over)
-                    self._text:SetColor(self._titleColor or UIUtil.fontColor)
+                    if not self.EnableColor then self._text:SetColor(self._titleColor or UIUtil.fontColor) end
                     if self.mRolloverCue then
                         local sound = Sound({Cue = self.mRolloverCue, Bank = "Interface",})
                         PlaySound(sound)
@@ -223,7 +224,7 @@ Combo = Class(Group) {
                     self._btnLeft:SetTexture(bitmaps.button.left.up)
                     self._btnRight:SetTexture(bitmaps.button.right.up)
                     self._btnMid:SetTexture(bitmaps.button.mid.up)
-                    self._text:SetColor(self._titleColor or UIUtil.fontColor)
+                    if not self.EnableColor then self._text:SetColor(self._titleColor or UIUtil.fontColor) end
                 end
                 self:OnMouseExit()
                 eventHandled = true
@@ -245,7 +246,7 @@ Combo = Class(Group) {
             self._btnLeft:SetTexture(bitmaps.button.left.dis)
             self._btnRight:SetTexture(bitmaps.button.right.dis)
             self._btnMid:SetTexture(bitmaps.button.mid.dis)
-            self._text:SetColor(self._titleColor or UIUtil.fontColor)
+            if not self.EnableColor then self._text:SetColor(self._titleColor or UIUtil.fontColor) end
             self._dropdown:Hide()
         end
         
@@ -253,7 +254,7 @@ Combo = Class(Group) {
             self._btnLeft:SetTexture(bitmaps.button.left.up)
             self._btnRight:SetTexture(bitmaps.button.right.up)
             self._btnMid:SetTexture(bitmaps.button.mid.up)
-            self._text:SetColor(self._titleColor or UIUtil.fontColor)
+            if not self.EnableColor then self._text:SetColor(self._titleColor or UIUtil.fontColor) end
         end
 
         -- set up selection logic
@@ -306,9 +307,10 @@ Combo = Class(Group) {
     -- remove old items and replace with a table of strings, also set the visible size
     -- defaultItemIndex is 1 based
     AddItems = function(self, textArray, defaultItemIndex, realDefValue)
-        defaultItemIndex = defaultItemIndex or 1
         local numItems = table.getn(textArray)
-        self._visibleItems:Set(math.min(numItems, self._maxVisibleItems))
+        local defaultItemIndex = defaultItemIndex or 1
+        
+		self._visibleItems:Set(math.min(numItems, self._maxVisibleItems))
 
         if self._scrollbar then
             self._scrollbar:Destroy()
@@ -317,13 +319,19 @@ Combo = Class(Group) {
             self._scrollbar = UIUtil.CreateVertScrollbarFor(self._list)
         end
 
-        for i, text in ipairs(textArray) do
+        local realDefFinded = false
+		for i, text in ipairs(textArray) do
             if realDefValue and i == realDefValue then
+				if i == defaultItemIndex then realDefFinded = true end
 				self._list:AddItem(LOC(text)..' (default)')
-			else
+			elseif i != realDefValue then
 				self._list:AddItem(LOC(text))
 			end
         end
+		
+		if self.EnableColor and realDefFinded then
+			self._text:SetColor('DBDBBA') -- Yellow
+		end
 
         self:SetItem(defaultItemIndex)
     end,
@@ -332,6 +340,7 @@ Combo = Class(Group) {
         self._visibleItems:Set(0)
         self._list:DeleteAllItems()
         self._text:SetText("")
+		self._text:SetColor(UIUtil.fontColor) -- Gris
         if self._scrollbar then
             self._scrollbar:Destroy()
             self._scrollbar = nil
@@ -365,6 +374,7 @@ Combo = Class(Group) {
 
     -- overload to get clicks
     OnClick = function(self, index, text)
+		--if line.combo.EnableColor then line.combo:SetTitleTextColor('BADBBA') end -- Green
     end,
     
     OnEvent = function(self)

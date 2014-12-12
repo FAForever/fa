@@ -6,7 +6,7 @@
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
 
-LOBBYversion = 'v2.5'
+LOBBYversion = 'v2.5b'
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
@@ -855,11 +855,7 @@ function SetSlotInfo(slot, playerInfo)
     GUI.slots[slot].faction:SetItem(playerInfo.Faction)
 
     GUI.slots[slot].color:Show()
-    --AddChatText('------------------------')
-    --AddChatText('=> SetSlotInfo START, index: '..playerInfo.PlayerColor..' = '..BASE_ALL_Color[playerInfo.PlayerColor]..' (slot:'..slot..'|'..gameInfo.PlayerOptions[slot].PlayerName..')')
     Check_Availaible_Color(GUI.slots[slot].color, slot)
-    --AddChatText('=> SetSlotInfo FINISH, index: '..playerInfo.PlayerColor..' = '..BASE_ALL_Color[playerInfo.PlayerColor]..' (slot:'..slot..'|'..gameInfo.PlayerOptions[slot].PlayerName..')')
-    --AddChatText('------------------------')
     --GUI.slots[slot].color:SetItem(playerInfo.PlayerColor)
 
     GUI.slots[slot].team:Show()
@@ -3454,7 +3450,6 @@ function CreateUI(maxPlayers)
             GUI.slots[i].color.Width:Set(slotColumnSizes.color.width)
             GUI.slots[i].color.row = i
             GUI.slots[i].color.OnClick = function(self, index)
-                AddChatText('> OnClick (i:'..index..')')
                 Get_IndexColor_by_CompleteTable(index, i)
                 Tooltip.DestroyMouseoverDisplay()
                 if not lobbyComm:IsHost() then
@@ -4730,7 +4725,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 HostConvertObserverToPlayerWithoutSlot(data.SenderID, data.RequestedName, data.ObserverSlot,
                                                     data.requestedFaction, data.requestedPL, data.requestedRC, data.requestedNG)
             elseif data.Type == 'RequestColor' then
-                AddChatText('<>')
                 data.Color = Get_IndexColor_by_CompleteTable(data.Color)
                 if IsColorFree(data.Color) then
                     -- Color is available, let everyone else know
@@ -6719,6 +6713,12 @@ function CreateOptionLobbyDialog()
     --
     local WindowedLobby = Prefs.GetFromCurrentProfile('WindowedLobby') or 'true'
     cbox_WindowedLobby:SetCheck(WindowedLobby == 'true', true)
+	if defaultMode == 'windowed' then
+		-- Already set Windowed in Game
+		cbox_WindowedLobby:Disable()
+		cbox_WindowedLobby_TEXT:Disable()
+		cbox_WindowedLobby_TEXT:SetColor('5C5F5C')
+	end
     --
     local XinnoSkin = Prefs.GetFromCurrentProfile('XinnoSkin') or 'Dark'
     if XinnoSkin == 'Dark' then
@@ -7446,16 +7446,7 @@ end
 
 -- Create the Available Color Table and Recreate the ComboBox --
 function Check_Availaible_Color(self, slot)
-    local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-    local Text = import('/lua/maui/text.lua').Text
-    local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
-    local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
-    local Combo = import('/lua/ui/controls/combo.lua').Combo2
-    local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
     local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo2
-    local EffectHelpers = import('/lua/maui/effecthelpers.lua')
-    local ItemList = import('/lua/maui/itemlist.lua').ItemList
-    local Prefs = import('/lua/user/prefs.lua')
     --
     Avail_Color[slot] = {}
     num = 0
@@ -7516,6 +7507,16 @@ function Check_Availaible_Color(self, slot)
     GUI.slots[slot].color.OnEvent = GUI.slots[slot].name.OnEvent
     Tooltip.AddControlTooltip(GUI.slots[slot].color, 'lob_color')
     GUI.slots[slot].color.row = slot
+	--
+	if IsLocallyOwned(slot) then
+		if gameInfo.PlayerOptions[slot]['Ready'] then
+			GUI.slots[slot].color:Disable()
+		else
+			GUI.slots[slot].color:Enable()
+		end
+	else
+		GUI.slots[slot].color:Disable()
+	end
 end
 
 #
