@@ -6772,9 +6772,8 @@ end
 --------------------------------------------------
 -- GUI --
 function GUI_PRESET()
-
     local profiles = GetPreference("UserPresetLobby")
-    if not profiles then
+    if not profiles or profiles[0] == nil then
         GUI_PRESET_INPUT(-1)
     end
 
@@ -7021,6 +7020,9 @@ function GUI_PRESET_INPUT(tyype)
     LayoutHelpers.AtBottomIn(ExitButton, GUI_Preset_InputBox2, 10)
     ExitButton.OnClick = function(self)
         GUI_Preset_InputBox:Destroy()
+		if tyype == -1 then
+			GUI_Preset:Destroy()
+		end
     end
     -------------------
     -- Ok button --
