@@ -1,10 +1,4 @@
 UnitBlueprint {
-	AI = {
-		TargetBones = {
-			'XRL0302',		
-			'Torso',
-		},
-	},
     Audio = {
         AmbientMove = Sound {
             Bank = 'XRL',

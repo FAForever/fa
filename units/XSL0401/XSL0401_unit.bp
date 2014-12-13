@@ -3,6 +3,9 @@ UnitBlueprint {
         TargetBones = {
             'Torso',
             'Head',
+            'Projectile01',
+            'Left_Leg_B03',
+            'Right_Leg_B15',
         },
     },
     Audio = {

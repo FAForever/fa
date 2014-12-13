@@ -2,9 +2,12 @@
     AI = {
         GuardRadius = 10,
         TargetBones = {
-            'Torso',		
             'Head',
-			'AttachPoint',
+            'Right_Arm_B01',
+            'Left_Arm_B01',
+            'Torso',
+            'Left_Leg_B01',
+            'Right_Leg_B01',
         },
     },
     Audio = {

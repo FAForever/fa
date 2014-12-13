@@ -1,10 +1,4 @@
 UnitBlueprint {
-	AI = {
-		TargetBones = {
-			'UAB3102',
-			'Tower_02',
-		},
-	},
     Audio = {
         Destroyed = Sound {
             Bank = 'UALDestroy',

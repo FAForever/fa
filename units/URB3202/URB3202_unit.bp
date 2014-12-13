@@ -1,11 +1,4 @@
 UnitBlueprint {
-	AI = {
-		TargetBones = {
-			'Deck04',
-			'Deck03',
-			'URB3202',
-		},
-	},
     Audio = {
         Destroyed = Sound {
             Bank = 'URLDestroy',

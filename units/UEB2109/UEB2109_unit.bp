@@ -1,10 +1,9 @@
 UnitBlueprint {
-	AI = {
-		TargetBones = {
-			'UEB2109',
-			'Turret',
-		},
-	},
+    AI = {
+        TargetBones = {
+            'Turret',
+        },
+    },
     Audio = {
         Destroyed = Sound {
             Bank = 'UELDestroy',

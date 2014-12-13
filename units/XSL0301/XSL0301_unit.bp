@@ -1,8 +1,9 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
-			'Torso',
-			'AttachPoint',
+            'Back_Upgrade',
+            'Left_Leg_B02',
+            'Right_Leg_B02',
         },
     },
     Audio = {

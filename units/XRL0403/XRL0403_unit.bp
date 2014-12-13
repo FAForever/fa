@@ -3,11 +3,12 @@ UnitBlueprint {
         TargetBones = {
             'Left_Turret',
             'Right_Turret',
+            'AA_Turret',
             'Left_Leg02_B01',
             'Left_Leg01_B01',
             'Right_Leg02_B01',
             'Right_Leg01_B01',
-            'AA_Turret',
+            'URL0403',
             'Right_Turret_Barrel',
             'Left_Turret_Barrel',            
         },
