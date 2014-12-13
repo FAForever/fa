@@ -6,7 +6,7 @@
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
 
-LOBBYversion = 'v2.5b'
+LOBBYversion = 'v2.5c'
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
@@ -57,14 +57,30 @@ local teamIcons = {
 }
 
 --// Xinnony DEBUG
-XinnonyDebug = 0
+XinnonyDebug = ''
 XinnonyOption = 0
--- 0 = NO DEBUG (Default)
--- -1 = DEBUG OTHER
--- 1 = DEBUG Country
--- 2 = DEBUG RuleTitle
--- 3 = DEBUG PeerDisconnected
--- 4 = DEBUG Background
+function LOGX(text, ttype, AlwaysWriteInLog)
+	-- useChat = for debug in the Chat
+	-- useBoth = for debug in the Chat and Log
+	-- CLEAR = for disable the debug
+	-- Country
+	-- RuleTitle
+	-- PeerDisconnected
+	-- Background
+	useBoth = string.find(XinnonyDebug, 'useBoth') or nil
+	useChat = string.find(XinnonyDebug, 'useChat') or nil
+	if AlwaysWriteInLog then LOG(text) end
+	if string.find(XinnonyDebug, ttype) and ttype != nil then
+		if useBoth then
+			AddChatText(text)
+			LOG(text)
+		elseif useChat != nil then
+			AddChatText(text)
+		elseif GUI.chatDisplay then
+			LOG(text)
+		end
+	end
+end
 --\\ Xinnony DEBUG
 --// Table of Tooltip Country - Xinnony
 local PrefLanguageTooltipTitle={}
@@ -78,8 +94,6 @@ if PrefLanguage[1] == '' or PrefLanguage[1] == '/init' or PrefLanguage == nil or
 else
     PrefLanguage = tostring(string.lower(PrefLanguage[1]))
 end
-
-
 --\\ Stop - Get a value on /Country CommandLine in FA.exe
 
 local LASTXinnoBackground = '' -- For prevent the infinite loop to Background
@@ -182,6 +196,17 @@ local function ParseWhisper(params)
     end
 end
 
+local function LOGXWhisper(params)
+	-- Exemple : Country Background useChat'
+	if string.find(params, 'CLEAR') then
+		XinnonyDebug = ''
+		AddChatText('Debug disabled')
+	else
+		XinnonyDebug = params
+		AddChatText('Debug actived : '..params)
+	end
+end
+
 local commands = {
     {
         key = 'pm',
@@ -198,6 +223,10 @@ local commands = {
     {
         key = 'whisper',
         action = ParseWhisper,
+    },
+	{
+        key = 'debug',
+        action = LOGXWhisper,
     },
 }
 
@@ -567,7 +596,6 @@ end
 function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider, over, exitBehavior,
                      playerHasSupcom)
     if IsSyncReplayServer then
-        LOG('Heyhey!')
         SetFrontEndData('syncreplayid',localPlayerUID)
         dl = UIUtil.QuickDialog(GetFrame(0), "Downloading the replay file...")
         LaunchReplaySession('gpgnet://' .. GetCommandLineArg('/gpgnet',1)[1] .. '/' .. import('/lua/user/prefs.lua').GetFromCurrentProfile('Name'))
@@ -2220,7 +2248,7 @@ function HostTryAddPlayer(senderID, slot, requestedPlayerName, human, aiPersonal
     if newSlot == -1 then
         PrivateChat( senderID, LOC("<LOC lobui_0237>No slots available, attempting to make you an observer"))
         if human then
-            HostTryAddObserver(senderID, requestedPlayerName)
+			HostTryAddObserver( senderID, requestedPlayerName, requestedPL, requestedColor, requestedFaction, requestedCOUNTRY )
         end
         return
     end
@@ -2331,16 +2359,21 @@ function HostTryMovePlayer(senderID, currentSlot, requestedSlot)
     UpdateGame()
 end
 
-function HostTryAddObserver( senderID, requestedObserverName )
+function HostTryAddObserver( senderID, requestedObserverName, RequestedPL, RequestedColor, RequestedFaction, RequestedCOUNTRY )
     local index = 1
     while gameInfo.Observers[index] do
         index = index + 1
     end
 
-    local observerName = lobbyComm:MakeValidPlayerName(senderID,requestedObserverName)
+    AddChatText('//HostTryAddObserver//RequestedPL='..tostring(RequestedPL))
+	local observerName = lobbyComm:MakeValidPlayerName(senderID,requestedObserverName)
     gameInfo.Observers[index] = {
         PlayerName = observerName,
         OwnerID = senderID,
+		PL = RequestedPL,
+		oldColor = RequestedColor,
+        oldFaction = RequestedFaction,
+		oldCountry= RequestedCOUNTRY,
     }
 
     lobbyComm:BroadcastData(
@@ -2972,7 +3005,7 @@ function CreateUI(maxPlayers)
     GUI.chatEdit:AcquireFocus()
 
     GUI.chatDisplay = ItemList(GUI.chatPanel)
-    GUI.chatDisplay:SetFont(UIUtil.bodyFont, 12)
+    GUI.chatDisplay:SetFont(UIUtil.bodyFont, tonumber(Prefs.GetFromCurrentProfile('XinnoChatSizeFont')) or 14)
     GUI.chatDisplay:SetColors(UIUtil.fontColor(), "00000000", UIUtil.fontColor(), "00000000")
     LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.chatPanel, 8, 4) --Right, Top
     GUI.chatDisplay.Bottom:Set(function() return GUI.chatEdit.Top() -6 end)
@@ -3477,7 +3510,6 @@ function CreateUI(maxPlayers)
             GUI.slots[i].faction.Width:Set(slotColumnSizes.faction.width)
             GUI.slots[i].faction.OnClick = function(self, index)
                 SetPlayerOption(self.row,'Faction',index)
-                if XinnonyDebug == -1 then SendSystemMessage(curRow..' and '..FindSlotForID(FindIDForName(localPlayerName))) end
                 if curRow == FindSlotForID(FindIDForName(localPlayerName)) then
                     SetCurrentFactionTo_Faction_Selector()
                 end
@@ -3912,7 +3944,7 @@ function CreateUI(maxPlayers)
             --end of auto kick code
 
             GUI.observerList = ItemList(GUI.observerPanel, "observer list")
-            GUI.observerList:SetFont(UIUtil.bodyFont, 14)
+            GUI.observerList:SetFont(UIUtil.bodyFont, 12)
             GUI.observerList:SetColors(UIUtil.fontColor, "00000000", UIUtil.fontOverColor, UIUtil.highlightColor, "ffbcfffe")
             GUI.observerList.Left:Set(function() return GUI.observerPanel.Left() + 6 end)
             GUI.observerList.Bottom:Set(function() return GUI.observerPanel.Bottom() - 4 end)
@@ -4596,7 +4628,8 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
         if wantToBeObserver then
             -- Ok, I'm connected to the host. Now request to become an observer
-            lobbyComm:SendData( hostID, { Type = 'AddObserver', RequestedObserverName = localPlayerName, } )
+            lobbyComm:SendData( hostID, { Type = 'AddObserver', RequestedObserverName = localPlayerName, RequestedPL = playerRating, RequestedColor = Prefs.GetFromCurrentProfile('LastColor'), RequestedFaction = requestedFaction, RequestedCOUNTRY = PrefLanguage, } )
+			AddChatText('//ConnectionToHostEstablished//SendData//playerRating='..tostring(playerRating))
         else
             -- Ok, I'm connected to the host. Now request to become a player
             local requestedFaction = Prefs.GetFromCurrentProfile('LastFaction')
@@ -4672,8 +4705,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             AddChatText("<<"..data.SenderName..">> "..data.Text)
             --// RULE TITLE - Xinnony
         elseif data.Type == 'Rule_Title_MSG' then
-            if XinnonyDebug == 2 then LOG(">> RECEIVE MSG Rule_Title_MSG : result="..(data.Result or "?")) end
-            if XinnonyDebug == 2 then AddChatText(">> RECEIVE MSG Rule_Title_MSG : result="..data.Result1..' result2='..data.Result2) end
+			LOGX('>> RECEIVE MSG Rule_Title_MSG : result='..data.Result1..' result2='..data.Result2, 'RuleTitle')
             RuleTitle_SetText(data.Result1 or "", data.Result2 or "")
             --\\ Stop RULE TITLE
             -- CPU benchmark code
@@ -4710,7 +4742,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             elseif data.Type == 'AddObserver' then
                 -- create empty slot if possible and give it to the observer
                 if gameInfo.GameOptions.AllowObservers then
-                    HostTryAddObserver( data.SenderID, data.RequestedObserverName )
+                    HostTryAddObserver( data.SenderID, data.RequestedObserverName, data.RequestedPL, data.RequestedColor, data.RequestedFaction, data.RequestedCOUNTRY )
                 else
                     lobbyComm:EjectPeer(data.SenderID, 'NoObservers');
                 end
@@ -4768,9 +4800,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 end
                 SetPlayerOption(FindSlotForID(FindIDForName(localPlayerName)), 'Ready', false)
             elseif data.Type == 'Peer_Really_Disconnected' then
-                if XinnonyDebug == 3 then AddChatText('>> DATA RECEIVE : Peer_Really_Disconnected (slot:'..data.Slot..')') end
-                if XinnonyDebug == 3 then LOG('>> DATA RECEIVE : Peer_Really_Disconnected (slot:'..data.Slot..')') end
-                AddChatText('>> DATA RECEIVE : Peer_Really_Disconnected (slot:'..data.Slot..')')
+				LOGX('>> DATA RECEIVE : Peer_Really_Disconnected (slot:'..data.Slot..')', 'PeerDisconnected')
                 if data.Options.OwnerID == localPlayerID then
                     lobbyComm:SendData( hostID, {Type = "GetGameInfo"} )
                 else
@@ -5008,8 +5038,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     end
 
     lobbyComm.PeerDisconnected = function(self,peerName,peerID) -- Lost connection or try connect with proxy
-        if XinnonyDebug == 3 then AddChatText('>> PeerDisconnected : peerName='..peerName..' peerID='..peerID) end -- XINNONY -- Here this message always show the player quit !!!
-        if XinnonyDebug == 3 then LOG('GameInfo = ', repr(gameInfo)) end
+		LOGX('>> PeerDisconnected : peerName='..peerName..' peerID='..peerID, 'PeerDisconnected')
         
          -- Search and Remove the peer disconnected
         for k, v in CurrentConnexion do
@@ -6285,7 +6314,7 @@ function ChangeBackgroundLobby(slot, faction)
     XinnoBackground = Prefs.GetFromCurrentProfile('XinnoBackground') or 'Factions'
     if GUI.background and GUI.background2 then--and FindSlotForID(localPlayerID) == slot then
         if XinnoBackground == 'Factions' then--and LASTBackgroundSelected ~= BackgroundSelected then
-            if XinnonyDebug == 4 then AddChatText(">> Background FACTION") end
+			LOGX('>> Background FACTION', 'Background')
             GUI.background:Show()
             GUI.background2:Hide()
             faction = faction or Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
@@ -6305,21 +6334,21 @@ function ChangeBackgroundLobby(slot, faction)
             LASTXinnoBackground = 'Factions'
 
         elseif XinnoBackground == 'ConceptArt' then--and LASTBackgroundSelected ~= BackgroundSelected then
-            if XinnonyDebug == 4 then AddChatText(">> Background ART") end
+			LOGX('>> Background ART', 'Background')
             GUI.background:Show()
             GUI.background2:Hide()
             GUI.background:SetTexture("/textures/ui/common/BACKGROUND/art/art-background-paint0"..math.random(1, 5).."_bmp.dds")
             LASTXinnoBackground = 'ConceptArt'
 
         elseif XinnoBackground == 'Screenshoot' then--and LASTBackgroundSelected ~= BackgroundSelected then
-            if XinnonyDebug == 4 then AddChatText(">> Background SCREENSHOOT") end
+			LOGX('>> Background SCREENSHOOT', 'Background')
             GUI.background:Show()
             GUI.background2:Hide()
             GUI.background:SetTexture("/textures/ui/common/BACKGROUND/scrn/scrn-background-paint"..math.random(1, 14).."_bmp.dds")
             LASTXinnoBackground = 'Screenshoot'
 
         elseif XinnoBackground == 'Map' then--and LASTBackgroundSelected ~= BackgroundSelected then -- LASTBac... is for avoided loop set texture, when you change faction
-            if XinnonyDebug == 4 then AddChatText(">> Background MAP") end
+            LOGX('>> Background MAP', 'Background')
             GUI.background:Hide()
             GUI.background2:Show()
             local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
@@ -6338,13 +6367,14 @@ function ChangeBackgroundLobby(slot, faction)
             LASTXinnoBackground = 'Map'
 
         elseif XinnoBackground == 'No' and LASTXinnoBackground ~= XinnoBackground then -- LASTBac... is for avoided loop set texture, when you change faction
-            if XinnonyDebug == 4 then AddChatText(">> Background NOTHING") end
+            LOGX('>> Background NOTHING', 'Background')
             GUI.background:Hide()
             GUI.background2:Hide()
             GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/background-paint_black_bmp.png"))
             LASTXinnoBackground = 'No'
 
         elseif XinnoBackground == 'Extra' then
+			LOGX('>> Background EXTRA', 'Background')
             GUI.background:Show()
             GUI.background2:Hide()
             faction = faction or Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
@@ -6378,7 +6408,7 @@ end
 function CreateOptionLobbyDialog()
     local dialog = Group(GUI)
     LayoutHelpers.AtCenterIn(dialog, GUI)
-    dialog.Depth:Set(999) -- :GetTopmostDepth() + 1
+    dialog.Depth:Set(999) -- GetTopmostDepth()
     local background = Bitmap(dialog, '/textures/ui/common/scx_menu/lan-game-lobby/optionlobby.png')
     dialog.Width:Set(background.Width)
     dialog.Height:Set(background.Height)
@@ -6500,7 +6530,6 @@ function CreateOptionLobbyDialog()
             cbox_BG_No:SetCheck(true, true)
         end
     end
-    --
     cbox_BG_Extra = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
     LayoutHelpers.AtLeftIn(cbox_BG_Extra, dialog2, 20)
     LayoutHelpers.AtTopIn(cbox_BG_Extra, dialog2, 120)
@@ -6523,7 +6552,24 @@ function CreateOptionLobbyDialog()
             cbox_BG_Extra:SetCheck(true, true)
         end
     end
-
+	--
+	local Slider = import('/lua/maui/slider.lua').Slider
+	local getFontSize = Prefs.GetFromCurrentProfile('XinnoChatSizeFont') or 14
+	slider_Chat_SizeFont_TEXT = UIUtil.CreateText(cbox_BG_Extra, 'Chat Size Font : '..getFontSize, 14, 'Arial')
+		slider_Chat_SizeFont_TEXT:SetColor('B9BFB9')
+		slider_Chat_SizeFont_TEXT:SetDropShadow(true)
+		LayoutHelpers.AtLeftIn(slider_Chat_SizeFont_TEXT, dialog2, 28)
+		LayoutHelpers.AtTopIn(slider_Chat_SizeFont_TEXT, dialog2, 155)
+	slider_Chat_SizeFont = Slider(dialog2, false, 9, 18, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))    
+		LayoutHelpers.AtLeftIn(slider_Chat_SizeFont, dialog2, 26)
+		LayoutHelpers.AtTopIn(slider_Chat_SizeFont, dialog2, 170)
+		slider_Chat_SizeFont:SetValue(getFontSize)
+	slider_Chat_SizeFont.OnValueChanged = function(self, newValue)
+		slider_Chat_SizeFont_TEXT:SetText('Chat Size Font : '..string.format('%3d', slider_Chat_SizeFont._currentValue()))
+		GUI.chatDisplay:SetFont(UIUtil.bodyFont, tonumber(string.format('%3d', slider_Chat_SizeFont._currentValue())))
+		Prefs.SetToCurrentProfile('XinnoChatSizeFont', tonumber(string.format('%3d', slider_Chat_SizeFont._currentValue())))
+	end
+	--
     cbox_WindowedLobby = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
     LayoutHelpers.AtRightIn(cbox_WindowedLobby, dialog2, 20)
     LayoutHelpers.AtTopIn(cbox_WindowedLobby, dialog2, 20)
@@ -6543,7 +6589,6 @@ function CreateOptionLobbyDialog()
         Prefs.SetToCurrentProfile('WindowedLobby', option)
         SetWindowedLobby(checked)
     end
-
     --
     cbox_Skin_Dark = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
     LayoutHelpers.AtRightIn(cbox_Skin_Dark, dialog2, 20)
@@ -6570,6 +6615,8 @@ function CreateOptionLobbyDialog()
     LayoutHelpers.AtRightIn(cbox6_1, cbox6_0, 25)
     LayoutHelpers.AtVerticalCenterIn(cbox6_1, cbox6_0)
     cbox6_0:Disable()
+	cbox6_1:Disable()
+	cbox6_1:SetColor('5C5F5C')
     cbox6_0.OnClick = function(self, checked)
         cbox6_0:SetCheck(false, true)
     end
@@ -7503,7 +7550,7 @@ function Check_Availaible_Color(self, slot)
                 self:SetItem( gameInfo.PlayerOptions[self.row].PlayerColor )
             end
         end
-    end
+    end 
     GUI.slots[slot].color.OnEvent = GUI.slots[slot].name.OnEvent
     Tooltip.AddControlTooltip(GUI.slots[slot].color, 'lob_color')
     GUI.slots[slot].color.row = slot
