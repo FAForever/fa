@@ -1425,10 +1425,14 @@ Unit = Class(moho.unit_methods) {
             energy = energy * 0.5
         end
 
-        -- Stop the Y position of the wreck being on the seabed for Naval Factories
-        if not (EntityCategoryContains(categories.FACTORY, self) and EntityCategoryContains(categories.STRUCTURE, self) and EntityCategoryContains(categories.NAVAL, self)) then
+        if self:GetCurrentLayer() == 'Air' then
+            pos[2] = GetSurfaceHeight(pos[1], pos[3])
+        elseif self:GetCurrentLayer() == 'Seabed' or self:GetCurrentLayer() == 'Land' then
             pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
+        else
+            pos[2] = GetSurfaceHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
         end
+
         
         local prop = CreateProp( pos, wreck )
 
