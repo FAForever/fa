@@ -1,5 +1,5 @@
 function GetVersion()
-    return "3636"
+    return "3637"
 end
 function GetLobbyVersion()
     return "2.5"
