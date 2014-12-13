@@ -42,7 +42,7 @@ UnitBlueprint {
     },
     BuildIconSortPriority = 35,
     Categories = {
-        'PRODUCTDL',
+		'PRODUCTDL',
         'SELECTABLE',
         'BUILTBYTIER3FACTORY',
         'SERAPHIM',
@@ -53,7 +53,7 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYANTIAIR',
-        'OVERLAYDIRECTFIRE',
+		'OVERLAYDIRECTFIRE',
     },
     CollisionOffsetZ = 0.05,
     Defense = {
@@ -71,14 +71,14 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_aa>Anti-Air',
         },
-        AnimationDeath = {
+		AnimationDeath = {
             {
                 Animation = '/units/DSLK004/DSLK004_death.sca',
                 AnimationRateMax = 8,
                 AnimationRateMin = 8,
                 Weight = 1,
             },
-        },
+		},
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
@@ -211,8 +211,8 @@ UnitBlueprint {
         MeshExtentsZ = 1.15,
         MinSpeedPercent = 0,
         MotionType = 'RULEUMT_Land',
-        RotateOnSpot = false,
-        StandUpright = true,
+		RotateOnSpot = false,
+		StandUpright = true,
         TurnRadius = 2,
         TurnRate = 75,
     },
@@ -237,7 +237,7 @@ UnitBlueprint {
     },
     Weapon = {
         {
-            AlwaysRecheckTarget = true,
+			AlwaysRecheckTarget = true,
             AboveWaterTargetsOnly = true,
             Audio = {
                 Fire = Sound {
@@ -250,7 +250,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             BeamCollisionDelay = 0.01,
             BeamLifetime = 0.6,
-            CannotAttackGround = true,
+			CannotAttackGround = true,
             CollideFriendly = false,
             ContinuousBeam = false,
             Damage = 200,
@@ -261,7 +261,7 @@ UnitBlueprint {
             FireTargetLayerCapsTable = {
                 Land = 'Air',
             },
-            FiringRandomness = 0,
+			FiringRandomness = 0,
             FiringTolerance = 2,
             Label = 'PhasonBeamAir',
             LeadTarget = false,
@@ -287,7 +287,7 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 1,
-            ReTargetOnMiss = true,
+			ReTargetOnMiss = true,
             RequireTime = 0,
             TargetCheckInterval = 0.7,
             TargetPriorities = {
@@ -315,13 +315,13 @@ UnitBlueprint {
             TurretYawSpeed = 1000,
             Turreted = true,
             WeaponCategory = 'Anti Air',
-            WeaponRepackTimeout = 4,
-            WeaponUnpackAnimation = '/units/DSLK004/DSLK004_updummy.sca',
+			WeaponRepackTimeout = 4,
+			WeaponUnpackAnimation = '/units/DSLK004/DSLK004_updummy.sca',
             WeaponUnpackAnimationRate = 3.8,
             WeaponUnpackLocksMotion = false,
             WeaponUnpacks = true,
         },
-        {
+		{
             AboveWaterTargetsOnly = true,
             Audio = {
                 Fire = Sound {
@@ -396,7 +396,7 @@ UnitBlueprint {
             Turreted = true,
             WeaponCategory = 'Direct Fire',
             WeaponRepackTimeout = 4,
-            WeaponUnpackAnimation = '/units/DSLK004/DSLK004_unpack.sca',
+			WeaponUnpackAnimation = '/units/DSLK004/DSLK004_unpack.sca',
             WeaponUnpackAnimationRate = 3.8,
             WeaponUnpackLocksMotion = false,
             WeaponUnpacks = true,

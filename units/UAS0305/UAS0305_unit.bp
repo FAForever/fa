@@ -1,10 +1,10 @@
 UnitBlueprint {
-    AI = {
-        TargetBones = {
-            'Tower_01',
-            'UAS0305',
-        },
-    },
+	AI = {
+		TargetBones = {
+			'Tower_01',
+			'UAS0305',
+		},
+	},
     Audio = {
         Killed = Sound {
             Bank = 'UASDestroy',
@@ -36,7 +36,7 @@ UnitBlueprint {
         'OVERLAYSONAR',
         'OVERLAYDEFENSE',
         'SORTINTEL',
-        'NAVAL', #added for shipwreck mod
+		'NAVAL', #added for shipwreck mod
     },
     CollisionOffsetY = -0.25,
     Defense = {

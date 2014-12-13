@@ -1,9 +1,9 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
-            'UEL0301',
-            'Leg_Right_B01',
-            'Leg_Left_B01',
+			'UEL0301',
+			'Leg_Right_B01',
+			'Leg_Left_B01',
             'Head',
         },
     },
@@ -263,7 +263,7 @@ UnitBlueprint {
             'BUILTBYTIER3ENGINEER UEF',
         },
         MaintenanceConsumptionPerSecondEnergy = 0,
-    MaxBuildDistance = 10,
+	MaxBuildDistance = 10,
         NaturalProducer = true,
         ProductionPerSecondEnergy = 20,
         ProductionPerSecondMass = 1,

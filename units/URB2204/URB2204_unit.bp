@@ -212,7 +212,7 @@ UnitBlueprint {
             CollideFriendly = false,
             Damage = 38,
             DamageFriendly = false,
-            DamageRadius = 5,                #4
+            DamageRadius = 5,				#4
             DamageType = 'Normal',
             DetonatesAtTargetHeight = true,
             DisplayName = 'Electron Flak',
@@ -221,7 +221,7 @@ UnitBlueprint {
                 Land = 'Air',
                 Water = 'Air',
             },
-            FiringRandomness = 4,            #2.5
+            FiringRandomness = 4,			#2.5
             FiringTolerance = 2,
             Label = 'AAGun',
             MaxRadius = 44,

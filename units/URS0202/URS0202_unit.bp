@@ -312,7 +312,7 @@ UnitBlueprint {
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 30,
             ProjectileId = '/projectiles/CDFProtonCannon02/CDFProtonCannon02_proj.bp',
-            ProjectileLifetime = 2.6, # needs a projectile lifetime for same reason Megalith needs one [126]
+			ProjectileLifetime = 2.6, # needs a projectile lifetime for same reason Megalith needs one [126]
             RackBones = {
                 {
                     MuzzleBones = {

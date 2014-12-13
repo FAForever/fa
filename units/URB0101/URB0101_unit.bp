@@ -140,7 +140,7 @@ UnitBlueprint {
         BuildCostMass = 240,
         BuildRate = 20,
         BuildTime = 300,
-    DifferentialUpgradeCostCalculation = true,
+	DifferentialUpgradeCostCalculation = true,
         BuildableCategory = {
             'BUILTBYTIER1FACTORY CYBRAN MOBILE CONSTRUCTION',
             'BUILTBYTIER1FACTORY CYBRAN STRUCTURE LAND',

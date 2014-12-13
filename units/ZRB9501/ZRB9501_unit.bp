@@ -61,7 +61,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
-    'SUPPORTFACTORY',
+	'SUPPORTFACTORY',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -102,7 +102,7 @@ UnitBlueprint {
             Yellow = '/effects/emitters/light_yellow_02_emit.bp',
         },
         BuildAttachBone = 'Attachpoint',
-    Mesh = {
+	Mesh = {
             IconFadeInZoom = 130,
             LODs = {
                 {
@@ -143,7 +143,7 @@ UnitBlueprint {
         BuildCostMass = 540,
         BuildRate = 40,
         BuildTime = 1300,
-    DifferentialUpgradeCostCalculation = true, 
+	DifferentialUpgradeCostCalculation = true, 
         RebuildBonusIds = {
             'zrb9501',
         },

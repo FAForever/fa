@@ -52,7 +52,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
-    'SUPPORTFACTORY',
+	'SUPPORTFACTORY',
     },
     CollisionOffsetY = -1,
     CollisionOffsetZ = 0,
@@ -133,7 +133,7 @@ UnitBlueprint {
         BuildCostMass = 1600,
         BuildRate = 120,
         BuildTime = 4000,
-    DifferentialUpgradeCostCalculation = true, 
+	DifferentialUpgradeCostCalculation = true, 
         RebuildBonusIds = {
             'zab9603',
         },
