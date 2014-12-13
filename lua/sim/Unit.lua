@@ -4487,4 +4487,13 @@ Unit = Class(moho.unit_methods) {
     OnCmdrUpgradeStart = function(self)
         self:DoUnitCallbacks('OnCmdrUpgradeStart')
     end,
+
+    
+    OnShieldEnabled = function(self)		
+        WARN("Deprecated function unit:OnShieldEnabled() called")
+    end,		
+		
+    OnShieldDisabled = function(self)		
+        WARN("Deprecated function unit:OnShieldDisabled() called")
+    end,
 }
