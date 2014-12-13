@@ -1433,7 +1433,6 @@ Unit = Class(moho.unit_methods) {
             pos[2] = GetSurfaceHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
         end
 
-        
         local prop = CreateProp( pos, wreck )
 
         --Keep track of the global wreckage count to avoid performance issues
@@ -1598,7 +1597,7 @@ Unit = Class(moho.unit_methods) {
         local layer = self:GetCurrentLayer()
         local isNaval = EntityCategoryContains(categories.NAVAL, self)
         local isSinking = layer == 'Water' or layer == 'Sub'
-        local isNavalFactory = (EntityCategoryContains(categories.FACTORY, self) and EntityCategoryContains(categories.STRUCTURE, self))
+        local isNavalFactory = (EntityCategoryContains(categories.FACTORY, self) and EntityCategoryContains(categories.STRUCTURE, self) and EntityCategoryContains(categories.NAVAL, self))
         WaitSeconds( utilities.GetRandomFloat( self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax) )
         self:DestroyAllDamageEffects()
         self:DestroyTopSpeedEffects()
