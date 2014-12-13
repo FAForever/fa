@@ -1,4 +1,4 @@
-last_version = 4
+last_version = 5
 changelog = {
 	{
 		version = 3,
@@ -48,6 +48,17 @@ changelog = {
 			"- Fix people can't join/host (black screen lobby)",
 			"- Fix problem with Preset Lobby",
 			"- Remove debug message",
+		}
+	},
+	{
+		version = 5,
+		name = "Lobby 2.5c",
+		description = {
+			"- Fix le Rating pas afficher dans les observers",
+			"- Observers font-size is reduced",
+			"- Fix the Country not show sometime",
+			"- Add debugger system",
+			"- Add slider for change the chat font-size",
 		}
 	}
 }
