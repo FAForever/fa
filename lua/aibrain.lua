@@ -1,15 +1,15 @@
---****************************************************************************
---**
---**  File     :  /lua/aibrain.lua
---**  Author(s):
---**
---**  Summary  :
---**
---**  Copyright Š 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
---########################################
--- AIBrain Lua Module                    #
---########################################
+#****************************************************************************
+#**
+#**  File     :  /lua/aibrain.lua
+#**  Author(s):
+#**
+#**  Summary  :
+#**
+#**  Copyright Š 2005 Gas Powered Games, Inc.  All rights reserved.
+#****************************************************************************
+#########################################
+# AIBrain Lua Module                    #
+#########################################
 
 local AIDefaultPlansList = import('/lua/aibrainplans.lua').AIPlansList
 local AIUtils = import('/lua/ai/aiutilities.lua')
@@ -19,15 +19,15 @@ local Utilities = import('/lua/utilities.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local Behaviors = import('/lua/ai/aibehaviors.lua')
 local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
---LOG('aibrain_methods.__index = ',moho.aibrain_methods.__index,' ',moho.aibrain_methods)
+#LOG('aibrain_methods.__index = ',moho.aibrain_methods.__index,' ',moho.aibrain_methods)
 
 local FactoryManager = import('/lua/sim/FactoryBuilderManager.lua')
 local PlatoonFormManager = import('/lua/sim/PlatoonFormManager.lua')
 local BrainConditionsMonitor = import('/lua/sim/BrainConditionsMonitor.lua')
 local EngineerManager = import('/lua/sim/EngineerManager.lua')
-local StratManager = import('/lua/sim/StrategyManager.lua')
+#local StratManager = import('/lua/sim/StrategyManager.lua')
 
---Sorian AI stuff
+###Sorian AI stuff
 local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
 local SUtils = import('/lua/AI/sorianutilities.lua')
 local StratManager = import('/lua/sim/StrategyManager.lua')
@@ -38,8 +38,26 @@ local TransferUnitsOwnership = import('/lua/SimUtils.lua').TransferUnitsOwnershi
 
 
 local observer = false
+scoreData = {}
+scoreData.current = {}
 
---Support for Handicap mod
+scoreInterval = 10
+scoreData.historical = {}
+-- copy data over to historical
+local curInterval = 1
+
+local historicalUpdateThread = ForkThread(function()
+    while true do
+        WaitSeconds(scoreInterval)
+        scoreData.historical[curInterval] = table.deepcopy(scoreData.current)
+        curInterval = curInterval + 1
+    end
+end)
+
+
+
+
+#Support for Handicap mod
 local Handicaps = {-5,-4,-3,-2,-1,0,1,2,3,4,5}
 local HCapUtils
 local Handicaps = {-5,-4,-3,-2,-1,0,1,2,3,4,5}
@@ -47,11 +65,11 @@ local HCapUtils
 if DiskGetFileInfo('/lua/HandicapUtilities.lua') then
     HCapUtils = import('/lua/HandicapUtilities.lua')
 end
---##end sorian ai imports
+##end sorian ai imports
 
---#############################################
---###### VO Timeout and Replay Durations ######
---#############################################
+#############################################
+###### VO Timeout and Replay Durations ######
+#############################################
 local VOReplayTime = {
     OnTransportFull = 1,
     OnUnitCapLimitReached = 60,
@@ -73,176 +91,283 @@ local VOReplayTime = {
     EnemyNavalForcesDetected = 60,
 }
 
+#############################################
+###### Runtime score update sync loop  ######
+#############################################
+local ArmyScore = {}
+
+function UpdateScoreData(newData)
+    scoreData.current = table.deepcopy(newData)
+    fullSyncOccured = false
+end
+
 
 function StopScoreUpdate()
+    if historicalUpdateThread then
+        KillThread(historicalUpdateThread)
+    end
 end
+
 
 function CollectCurrentScores()
-    local scoreData = {current={}, historical={}}
-    local historyInterval = 10
-    local scoreUpdateInterval = 5
-    local syncInterval = 1
-
-    local second = 0
-    while(true) do
-        if math.mod(second, scoreUpdateInterval) == 0 then
-            scoreData.current = GetArmyScore()
-            UpdateReclaimStat()
-        end
-
-        if math.mod(second, historyInterval) == 0 then
-            scoreData.historical[1 + second / historyInterval] = table.deepcopy(scoreData.current)
-        end
-
-        if(math.mod(second, syncInterval) == 0) then
-            SyncScores(scoreData)
-        end
-
-        second = second + 1
-        WaitSeconds(1)
-    end
-end
-
-function GetArmyScore()
-    local ArmyScore = {}
-
-    -- Initialize the score data stucture
+    # Initialize the score data stucture
     for index, brain in ArmyBrains do
-        ArmyScore[index] = {}
+       ArmyScore[index] = {}
 
-        ArmyScore[index].general = {}
-        ArmyScore[index].general.kills = {}
-        ArmyScore[index].general.built = {}
-        ArmyScore[index].general.lost = {}
-        ArmyScore[index].general.currentunits = {}
-        ArmyScore[index].general.currentcap = {}
-        ArmyScore[index].general.score = brain:CalculateScore()
+       ####################
+       ## General scores ##
+       ####################
+       ArmyScore[index].general = {}
+       ArmyScore[index].general.score = 0
+       ArmyScore[index].general.mass = 0
+       ArmyScore[index].general.energy = 0
+       ArmyScore[index].general.kills = {}
+       ArmyScore[index].general.kills.count = 0
+       ArmyScore[index].general.kills.mass = 0
+       ArmyScore[index].general.kills.energy = 0
+       ArmyScore[index].general.built = {}
+       ArmyScore[index].general.built.count = 0
+       ArmyScore[index].general.built.mass = 0
+       ArmyScore[index].general.built.energy = 0
+       ArmyScore[index].general.lost = {}
+       ArmyScore[index].general.lost.count = 0
+       ArmyScore[index].general.lost.mass = 0
+       ArmyScore[index].general.lost.energy = 0
+       ArmyScore[index].general.currentunits = {}
+       ArmyScore[index].general.currentunits.count = 0
+       ArmyScore[index].general.currentcap = {}
+       ArmyScore[index].general.currentcap.count = 0
 
-        ArmyScore[index].units = {}
-        ArmyScore[index].units.cdr = {}
-        ArmyScore[index].units.land = {}
-        ArmyScore[index].units.air = {}
-        ArmyScore[index].units.naval = {}
-        ArmyScore[index].units.structures = {}
-        ArmyScore[index].units.experimental = {}
+       #################
+       ## unit scores ##
+       #################
+       ArmyScore[index].units = {}
+       ArmyScore[index].units.cdr = {}
+       ArmyScore[index].units.cdr.kills = 0
+       ArmyScore[index].units.cdr.built = 0
+       ArmyScore[index].units.cdr.lost = 0
+       ArmyScore[index].units.land = {}
+       ArmyScore[index].units.land.kills = 0
+       ArmyScore[index].units.land.built = 0
+       ArmyScore[index].units.land.lost = 0
+       ArmyScore[index].units.air = {}
+       ArmyScore[index].units.air.kills = 0
+       ArmyScore[index].units.air.built = 0
+       ArmyScore[index].units.air.lost = 0
+       ArmyScore[index].units.naval = {}
+       ArmyScore[index].units.naval.kills = 0
+       ArmyScore[index].units.naval.built = 0
+       ArmyScore[index].units.naval.lost = 0
+       ArmyScore[index].units.structures = {}
+       ArmyScore[index].units.structures.kills = 0
+       ArmyScore[index].units.structures.built = 0
+       ArmyScore[index].units.structures.lost = 0
+       ArmyScore[index].units.experimental = {}
+       ArmyScore[index].units.experimental.kills = 0
+       ArmyScore[index].units.experimental.built = 0
+       ArmyScore[index].units.experimental.lost = 0
 
-        ArmyScore[index].resources = {}
-        ArmyScore[index].resources.massin = {}
-        ArmyScore[index].resources.massout = {}
-        ArmyScore[index].resources.energyin = {}
-        ArmyScore[index].resources.energyout = {}
-
-        ArmyScore[index].general.mass = brain:GetArmyStat("Economy_TotalProduced_Mass", 0.0).Value
-        ArmyScore[index].general.energy = brain:GetArmyStat("Economy_TotalProduced_Energy", 0.0).Value
-        ArmyScore[index].general.currentunits.count = brain:GetArmyStat("UnitCap_Current", 0.0).Value
-        ArmyScore[index].general.currentcap.count = brain:GetArmyStat("UnitCap_MaxCap", 0.0).Value
-
-        ArmyScore[index].general.kills.count = brain:GetArmyStat("Enemies_Killed", 0.0).Value
-        ArmyScore[index].general.kills.mass = brain:GetArmyStat("Enemies_MassValue_Destroyed", 0.0).Value
-        ArmyScore[index].general.kills.energy = brain:GetArmyStat("Enemies_EnergyValue_Destroyed", 0.0).Value
-
-        ArmyScore[index].general.built.count = brain:GetArmyStat("Units_History", 0.0).Value
-        ArmyScore[index].general.built.mass = brain:GetArmyStat("Units_MassValue_Built", 0.0).Value
-        ArmyScore[index].general.built.energy = brain:GetArmyStat("Units_EnergyValue_Built", 0.0).Value
-        ArmyScore[index].general.lost.count = brain:GetArmyStat("Units_Killed", 0.0).Value
-        ArmyScore[index].general.lost.mass = brain:GetArmyStat("Units_MassValue_Lost", 0.0).Value
-        ArmyScore[index].general.lost.energy = brain:GetArmyStat("Units_EnergyValue_Lost", 0.0).Value
-
-        ArmyScore[index].units.land.kills = brain:GetBlueprintStat("Enemies_Killed", categories.LAND)
-        ArmyScore[index].units.land.built = brain:GetBlueprintStat("Units_History", categories.LAND)
-        ArmyScore[index].units.land.lost = brain:GetBlueprintStat("Units_Killed", categories.LAND)
-
-        ArmyScore[index].units.air.kills = brain:GetBlueprintStat("Enemies_Killed", categories.AIR)
-        ArmyScore[index].units.air.built = brain:GetBlueprintStat("Units_History", categories.AIR)
-        ArmyScore[index].units.air.lost = brain:GetBlueprintStat("Units_Killed", categories.AIR)
-        ArmyScore[index].units.naval.kills = brain:GetBlueprintStat("Enemies_Killed", categories.NAVAL)
-        ArmyScore[index].units.naval.built = brain:GetBlueprintStat("Units_History", categories.NAVAL)
-        ArmyScore[index].units.naval.lost = brain:GetBlueprintStat("Units_Killed", categories.NAVAL)
-
-        ArmyScore[index].units.cdr.kills = brain:GetBlueprintStat("Enemies_Killed", categories.COMMAND)
-        ArmyScore[index].units.cdr.built = brain:GetBlueprintStat("Units_History", categories.COMMAND)
-        ArmyScore[index].units.cdr.lost = brain:GetBlueprintStat("Units_Killed", categories.COMMAND)
-        ArmyScore[index].units.experimental.kills = brain:GetBlueprintStat("Enemies_Killed", categories.EXPERIMENTAL)
-        ArmyScore[index].units.experimental.built = brain:GetBlueprintStat("Units_History", categories.EXPERIMENTAL)
-        ArmyScore[index].units.experimental.lost = brain:GetBlueprintStat("Units_Killed", categories.EXPERIMENTAL)
-
-        ArmyScore[index].units.structures.kills = brain:GetBlueprintStat("Enemies_Killed", categories.STRUCTURE)
-        ArmyScore[index].units.structures.built = brain:GetBlueprintStat("Units_History", categories.STRUCTURE)
-        ArmyScore[index].units.structures.lost = brain:GetBlueprintStat("Units_Killed", categories.STRUCTURE)
-
-        ArmyScore[index].resources.massin.total = brain:GetArmyStat("Economy_TotalProduced_Mass", 0.0).Value
-        ArmyScore[index].resources.massin.rate = brain:GetArmyStat("Economy_Income_Mass", 0.0).Value - brain:GetArmyStat("Economy_income_reclaimed_Mass", 0.0).Value
-        ArmyScore[index].resources.massout.total = brain:GetArmyStat("Economy_TotalConsumed_Mass", 0.0).Value
-        ArmyScore[index].resources.massout.rate = brain:GetArmyStat("Economy_Output_Mass", 0.0).Value
-        ArmyScore[index].resources.massover = brain:GetArmyStat("Economy_AccumExcess_Mass", 0.0).Value
-
-        ArmyScore[index].resources.energyin.total = brain:GetArmyStat("Economy_TotalProduced_Energy", 0.0).Value
-        ArmyScore[index].resources.energyin.rate = brain:GetArmyStat("Economy_Income_Energy", 0.0).Value - brain:GetArmyStat("Economy_income_reclaimed_Energy", 0.0).Value
-        ArmyScore[index].resources.energyout.total = brain:GetArmyStat("Economy_TotalConsumed_Energy", 0.0).Value
-        ArmyScore[index].resources.energyout.rate = brain:GetArmyStat("Economy_Output_Energy", 0.0).Value
-        ArmyScore[index].resources.energyover = brain:GetArmyStat("Economy_AccumExcess_Energy", 0.0).Value
+       #####################
+       ## resource scores ##
+       #####################
+       ArmyScore[index].resources = {}
+       ArmyScore[index].resources.massin = {}
+       ArmyScore[index].resources.massin.total = 0
+       ArmyScore[index].resources.massin.rate = 0
+       ArmyScore[index].resources.massout = {}
+       ArmyScore[index].resources.massout.total = 0
+       ArmyScore[index].resources.massout.rate = 0
+       ArmyScore[index].resources.massover = 0
+       ArmyScore[index].resources.energyin = {}
+       ArmyScore[index].resources.energyin.total = 0
+       ArmyScore[index].resources.energyin.rate = 0
+       ArmyScore[index].resources.energyout = {}
+       ArmyScore[index].resources.energyout.total = 0
+       ArmyScore[index].resources.energyout.rate = 0
+       ArmyScore[index].resources.energyover = 0
+       UpdateScoreData(ArmyScore)
     end
 
-    return ArmyScore
-end
+    # Collect the various scores at regular intervals
+    while true do
 
-function UpdateReclaimStat()
-    -- this function update the reclaim income stat.
-    for index, brain in ArmyBrains do
-        local reclaimedMass     = brain:GetArmyStat("Economy_Reclaimed_Mass", 0.0).Value
-        local oldReclaimedMass  = brain:GetArmyStat("Economy_old_Reclaimed_Mass", 0.0).Value
-        brain:SetArmyStat("Economy_income_reclaimed_Mass", reclaimedMass - oldReclaimedMass)
-        brain:SetArmyStat("Economy_old_Reclaimed_Mass", reclaimedMass)
+        for index, brain in ArmyBrains do
+           ##############################
+           ## General economy scores 1 ##
+           ##############################
+           ArmyScore[index].general.score = brain:CalculateScore()
+        end
+        WaitSeconds(0.5)  -- update scores every second
 
-        local reclaimedEnergy     = brain:GetArmyStat("Economy_Reclaimed_Energy", 0.0).Value
-        local oldReclaimedEnergy  = brain:GetArmyStat("Economy_old_Reclaimed_Energy", 0.0).Value
-        brain:SetArmyStat("Economy_income_reclaimed_Energy", reclaimedEnergy - oldReclaimedEnergy)
-        brain:SetArmyStat("Economy_old_Reclaimed_Energy", reclaimedEnergy)
+        for index, brain in ArmyBrains do
+           ##############################
+           ## General economy scores 2 ##
+           ##############################
+           ArmyScore[index].general.mass = brain:GetArmyStat("Economy_TotalProduced_Mass", 0.0).Value
+           ArmyScore[index].general.energy = brain:GetArmyStat("Economy_TotalProduced_Energy", 0.0).Value
+           ArmyScore[index].general.currentunits.count = brain:GetArmyStat("UnitCap_Current", 0.0).Value
+           ArmyScore[index].general.currentcap.count = brain:GetArmyStat("UnitCap_MaxCap", 0.0).Value
+        end
+        WaitSeconds(0.5)  -- update scores every second
+
+        for index, brain in ArmyBrains do
+           #################################
+           ## General unit stats scores 1 ##
+           #################################
+           ArmyScore[index].general.kills.count = brain:GetArmyStat("Enemies_Killed", 0.0).Value
+           ArmyScore[index].general.kills.mass = brain:GetArmyStat("Enemies_MassValue_Destroyed", 0.0).Value
+           ArmyScore[index].general.kills.energy = brain:GetArmyStat("Enemies_EnergyValue_Destroyed", 0.0).Value
+        end
+        WaitSeconds(0.5)  -- update scores every second
+
+        for index, brain in ArmyBrains do
+           #################################
+           ## General unit stats scores 2 ##
+           #################################
+           ArmyScore[index].general.built.count = brain:GetArmyStat("Units_History", 0.0).Value
+           ArmyScore[index].general.built.mass = brain:GetArmyStat("Units_MassValue_Built", 0.0).Value
+           ArmyScore[index].general.built.energy = brain:GetArmyStat("Units_EnergyValue_Built", 0.0).Value
+           ArmyScore[index].general.lost.count = brain:GetArmyStat("Units_Killed", 0.0).Value
+           ArmyScore[index].general.lost.mass = brain:GetArmyStat("Units_MassValue_Lost", 0.0).Value
+           ArmyScore[index].general.lost.energy = brain:GetArmyStat("Units_EnergyValue_Lost", 0.0).Value
+        end
+        WaitSeconds(0.5)  -- update scores every second
+
+        for index, brain in ArmyBrains do
+           ###########################
+           ## Regular unit scores 1 ##
+           ###########################
+           ArmyScore[index].units.land.kills = brain:GetBlueprintStat("Enemies_Killed", categories.LAND)
+           ArmyScore[index].units.land.built = brain:GetBlueprintStat("Units_History", categories.LAND)
+           ArmyScore[index].units.land.lost = brain:GetBlueprintStat("Units_Killed", categories.LAND)
+        end
+        WaitSeconds(0.5)  -- update scores every second
+
+        for index, brain in ArmyBrains do
+           ###########################
+           ## Regular unit scores 2 ##
+           ###########################
+           ArmyScore[index].units.air.kills = brain:GetBlueprintStat("Enemies_Killed", categories.AIR)
+           ArmyScore[index].units.air.built = brain:GetBlueprintStat("Units_History", categories.AIR)
+           ArmyScore[index].units.air.lost = brain:GetBlueprintStat("Units_Killed", categories.AIR)
+           ArmyScore[index].units.naval.kills = brain:GetBlueprintStat("Enemies_Killed", categories.NAVAL)
+           ArmyScore[index].units.naval.built = brain:GetBlueprintStat("Units_History", categories.NAVAL)
+           ArmyScore[index].units.naval.lost = brain:GetBlueprintStat("Units_Killed", categories.NAVAL)
+        end
+        WaitSeconds(0.5)  -- update scores every second
+
+        for index, brain in ArmyBrains do
+           #########################################
+           ## Structures and Special units scores ##
+           #########################################
+           ArmyScore[index].units.cdr.kills = brain:GetBlueprintStat("Enemies_Killed", categories.COMMAND)
+           ArmyScore[index].units.cdr.built = brain:GetBlueprintStat("Units_History", categories.COMMAND)
+           ArmyScore[index].units.cdr.lost = brain:GetBlueprintStat("Units_Killed", categories.COMMAND)
+           ArmyScore[index].units.experimental.kills = brain:GetBlueprintStat("Enemies_Killed", categories.EXPERIMENTAL)
+           ArmyScore[index].units.experimental.built = brain:GetBlueprintStat("Units_History", categories.EXPERIMENTAL)
+           ArmyScore[index].units.experimental.lost = brain:GetBlueprintStat("Units_Killed", categories.EXPERIMENTAL)
+        end
+        WaitSeconds(0.5)  -- update scores every second
+
+        for index, brain in ArmyBrains do
+           #######################
+           ## Structures scores ##
+           #######################
+           ArmyScore[index].units.structures.kills = brain:GetBlueprintStat("Enemies_Killed", categories.STRUCTURE)
+           ArmyScore[index].units.structures.built = brain:GetBlueprintStat("Units_History", categories.STRUCTURE)
+           ArmyScore[index].units.structures.lost = brain:GetBlueprintStat("Units_Killed", categories.STRUCTURE)
+        end
+        WaitSeconds(0.5)  -- update scores every second
+
+        for index, brain in ArmyBrains do
+           #######################
+           ## Resource scores 1 ##
+           #######################
+           ArmyScore[index].resources.massin.total = brain:GetArmyStat("Economy_TotalProduced_Mass", 0.0).Value
+           ArmyScore[index].resources.massin.rate = brain:GetArmyStat("Economy_Income_Mass", 0.0).Value - brain:GetArmyStat("Economy_income_reclaimed_Mass", 0.0).Value
+           ArmyScore[index].resources.massout.total = brain:GetArmyStat("Economy_TotalConsumed_Mass", 0.0).Value
+           ArmyScore[index].resources.massout.rate = brain:GetArmyStat("Economy_Output_Mass", 0.0).Value
+           ArmyScore[index].resources.massover = brain:GetArmyStat("Economy_AccumExcess_Mass", 0.0).Value
+        end
+        WaitSeconds(0.5)  -- update scores every second
+
+        for index, brain in ArmyBrains do
+           #######################
+           ## Resource scores 2 ##
+           #######################
+           ArmyScore[index].resources.energyin.total = brain:GetArmyStat("Economy_TotalProduced_Energy", 0.0).Value
+           ArmyScore[index].resources.energyin.rate = brain:GetArmyStat("Economy_Income_Energy", 0.0).Value - brain:GetArmyStat("Economy_income_reclaimed_Energy", 0.0).Value
+           ArmyScore[index].resources.energyout.total = brain:GetArmyStat("Economy_TotalConsumed_Energy", 0.0).Value
+           ArmyScore[index].resources.energyout.rate = brain:GetArmyStat("Economy_Output_Energy", 0.0).Value
+           ArmyScore[index].resources.energyover = brain:GetArmyStat("Economy_AccumExcess_Energy", 0.0).Value
+        end
+        WaitSeconds(0.5)  -- update scores every second
+        UpdateScoreData(ArmyScore)
     end
+
 end
 
-function SyncScores(scoreData)
+function SyncScores()
     if GetFocusArmy() == -1 or import('/lua/victory.lua').gameOver == true or observer == true then
         observer = true
         Sync.FullScoreSync = true
         Sync.ScoreAccum = scoreData
         Sync.Score = scoreData.current
+
     elseif observer == false then
         for index, brain in ArmyBrains do
             Sync.Score[index] = {}
             Sync.Score[index].general = {}
             if GetFocusArmy() == index or GetFocusArmy() == -1 then
                 Sync.Score[index].general.currentunits = {}
-                Sync.Score[index].general.currentunits.count = brain:GetArmyStat("UnitCap_Current", 0.0).Value
+                Sync.Score[index].general.currentunits.count = ArmyScore[index].general.currentunits.count
                 Sync.Score[index].general.currentcap = {}
-                Sync.Score[index].general.currentcap.count = brain:GetArmyStat("UnitCap_MaxCap", 0.0).Value
+                Sync.Score[index].general.currentcap.count = ArmyScore[index].general.currentcap.count
             end
 
-            local scoreOption = ScenarioInfo.Options.Score or "no"
-            if scoreOption ~= 'no' then
-                Sync.Score[index].general.score = brain:CalculateScore()
+            ####################
+            ## General scores ##
+            ####################
+            if scoreOption != 'no' then
+                Sync.Score[index].general.score = ArmyScore[index].general.score
             else
                 Sync.Score[index].general.score = -1
             end
         end
 
     end
+
+
 end
 
+function UpdateReclaimStat()
+    # this function update the reclaim income stat.
+    while true do
+        for index, brain in ArmyBrains do
 
+            local reclaimedMass     = brain:GetArmyStat("Economy_Reclaimed_Mass", 0.0).Value
+            local oldReclaimedMass  = brain:GetArmyStat("Economy_old_Reclaimed_Mass", 0.0).Value
+            brain:SetArmyStat("Economy_income_reclaimed_Mass", reclaimedMass - oldReclaimedMass)
+            brain:SetArmyStat("Economy_old_Reclaimed_Mass", reclaimedMass)
+
+            local reclaimedEnergy     = brain:GetArmyStat("Economy_Reclaimed_Energy", 0.0).Value
+            local oldReclaimedEnergy  = brain:GetArmyStat("Economy_old_Reclaimed_Energy", 0.0).Value
+            brain:SetArmyStat("Economy_income_reclaimed_Energy", reclaimedEnergy - oldReclaimedEnergy)
+            brain:SetArmyStat("Economy_old_Reclaimed_Energy", reclaimedEnergy)
+
+        end
+       WaitSeconds(.1)  -- update the stat every tick
+    end
+end
 
 function SyncCurrentScores()
-    --[[
     Sync.FullScoreSync = false
     # Sync the score at 1 sec intervals
     while true do
         SyncScores()
         WaitSeconds(1)  -- update scores every second
     end
-    ]]
 end
-
-
 
 AIBrain = Class(moho.aibrain_methods) {
 
