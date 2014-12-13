@@ -1,4 +1,7 @@
 UnitBlueprint { 
+    AI = {
+        GuardScanRadius = 50,
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'UAL',
