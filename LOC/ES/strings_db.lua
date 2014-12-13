@@ -7131,6 +7131,8 @@ tooltipui0684="Sin Teletransporte"
 tooltipui0685="Remueve la habilidad de mejorar a los ACUs y sACUs con teletransporte"
 tooltipui0686="Sin Billy"
 tooltipui0687="Previene a los comandantes de la UEF mejorar su ACU con el arma nuclear táctica 'Billy'"
+tooltipui0688="No Super-Intel"
+tooltipui0689="Removes the Aeon Eye of Rhianne and the Cybran Soothsayer"
 
 tooltipui0540="Restablecer ventana de chat"
 tooltipui0541="Restablece la posición y apariencia de la ventana de chat."
