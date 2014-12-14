@@ -449,11 +449,14 @@ function PreModBlueprints(all_bps)
 
         -- mod in AI.GuardScanRadius = Weapon.MaxRadius + Intel.VisionRadius
         -- fixes move-attack range issues
-        if cats.MOBILE and (cats.DIRECTFIRE or cats.INDIRECTFIRE or cats.ENGINEER) and not (bp.AI and bp.AI.GuardScanRadius) then
+        -- Most Air units have the GSR defined already, this is just making certain they don't get included
+        if cats.MOBILE and (cats.LAND or cats.NAVAL) and (cats.DIRECTFIRE or cats.INDIRECTFIRE or cats.ENGINEER) and not (bp.AI and bp.AI.GuardScanRadius) then
             local br = nil
 
             if(cats.ENGINEER) then
-                br = 26 -- bp.Economy.MaxBuildDistance or
+                br = 26
+            elseif(cats.SCOUT) then
+                br = 10
             elseif bp.Weapon then
                 local vision = bp.Intel.VisionRadius or 10
                 local max = 0
