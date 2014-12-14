@@ -395,7 +395,10 @@ StructureUnit = Class(Unit) {
             Buff.ApplyBuff(adjacentUnit, v, self)
         end
         
-        -- Keep track of which units you are adjacent to
+        -- Keep track of adjacent units
+        if not self.AdjacentUnits then
+            self.AdjacentUnits = {}
+        end
         table.insert(self.AdjacentUnits, adjacentUnit)
         
         self:RequestRefreshUI()
@@ -404,6 +407,11 @@ StructureUnit = Class(Unit) {
 
     --When we're not adjacent, try to remove all the possible bonuses
     OnNotAdjacentTo = function(self, adjacentUnit)
+        if not self.AdjacentUnits then
+            WARN("Precondition Failed: No AdjacentUnits registered for entity: " .. repr(self.GetEntityId))
+            return
+        end
+
         local adjBuffs = self:GetBlueprint().Adjacency
         
         if adjBuffs and AdjacencyBuffs[adjBuffs] then
@@ -435,13 +443,15 @@ StructureUnit = Class(Unit) {
         if not adjBuffs then return end
         
         -- There won't be any adjacentUnit if this is a producer just built...
-        for k, adjacentUnit in self.AdjacentUnits do
-            for k,v in AdjacencyBuffs[adjBuffs] do
-                Buff.ApplyBuff(adjacentUnit, v, self)
-                adjacentUnit:RequestRefreshUI()
+        if self.AdjacentUnits then
+            for k, adjacentUnit in self.AdjacentUnits do
+                for k,v in AdjacencyBuffs[adjBuffs] do
+                    Buff.ApplyBuff(adjacentUnit, v, self)
+                    adjacentUnit:RequestRefreshUI()
+                end
             end
+            self:RequestRefreshUI()
         end
-        self:RequestRefreshUI()
     end,
     
     -- Removes all appropriate buffs from all adjacent units
@@ -449,15 +459,17 @@ StructureUnit = Class(Unit) {
         local adjBuffs = self:GetBlueprint().Adjacency
         if not adjBuffs then return end
 		
-        for k, adjacentUnit in self.AdjacentUnits do
-            for key, v in AdjacencyBuffs[adjBuffs] do
-                if Buff.HasBuff(adjacentUnit, v) then
-                    Buff.RemoveBuff(adjacentUnit, v, false, self)
-                    adjacentUnit:RequestRefreshUI()
+        if self.AdjacentUnits then
+            for k, adjacentUnit in self.AdjacentUnits do
+                for key, v in AdjacencyBuffs[adjBuffs] do
+                    if Buff.HasBuff(adjacentUnit, v) then
+                        Buff.RemoveBuff(adjacentUnit, v, false, self)
+                        adjacentUnit:RequestRefreshUI()
+                    end
                 end
             end
+            self:RequestRefreshUI()
         end
-        self:RequestRefreshUI()
     end,
 
     -------------------------------
