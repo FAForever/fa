@@ -1,4 +1,4 @@
-last_version = 5
+last_version = 7
 changelog = {
 	{
 		version = 3,
@@ -54,11 +54,30 @@ changelog = {
 		version = 5,
 		name = "Lobby 2.5c",
 		description = {
-			"- Fix le Rating pas afficher dans les observers",
+			"- Fix the Rating not show in observers list",
 			"- Observers font-size is reduced",
 			"- Fix the Country not show sometime",
 			"- Add debugger system",
 			"- Add slider for change the chat font-size",
+		}
+	},
+	{
+		version = 6,
+		name = "Lobby 2.5d",
+		description = {
+			"- Lobby 2.5c not pushed correctly",
+			"- Remove debug message",
+			"- Enhancement Debug System",
+			"- Fix UI bug with ConnectDialog",
+			"- Fix the player not removed in the slot when is leave the lobby",
+		}
+	},
+	{
+		version = 7,
+		name = "Your attention,",
+		description = {
+			"I remind you that in case of bugs, we cannot help you without your game.log file",
+			"and a message on the forum !!!",
 		}
 	}
 }

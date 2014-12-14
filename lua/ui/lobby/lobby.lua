@@ -6,7 +6,8 @@
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
 
-LOBBYversion = 'v2.5c'
+LOBBYversion = 'v2.5d'
+LOG('Lobby version : '..LOBBYversion)
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
@@ -57,27 +58,29 @@ local teamIcons = {
 }
 
 --// Xinnony DEBUG
-XinnonyDebug = ''
+XinnonyDebug = Prefs.GetFromCurrentProfile('XinnoDEBUG') or ''
 XinnonyOption = 0
-function LOGX(text, ttype, AlwaysWriteInLog)
-	-- useChat = for debug in the Chat
-	-- useBoth = for debug in the Chat and Log
+function LOGX(text, ttype)
+	-- onlyChat = for debug only in the Chat
+	-- onlyLOG = for debug only in the LOG
 	-- CLEAR = for disable the debug
-	-- Country
-	-- RuleTitle
-	-- PeerDisconnected
-	-- Background
-	useBoth = string.find(XinnonyDebug, 'useBoth') or nil
-	useChat = string.find(XinnonyDebug, 'useChat') or nil
-	if AlwaysWriteInLog then LOG(text) end
-	if string.find(XinnonyDebug, ttype) and ttype != nil then
-		if useBoth then
-			AddChatText(text)
-			LOG(text)
-		elseif useChat != nil then
-			AddChatText(text)
-		elseif GUI.chatDisplay then
-			LOG(text)
+	-- Country, RuleTitle, Background
+	-- Disconnected, Connecting, UpdateGame
+	local text = tostring(text)
+	local onlyLOG = string.find(XinnonyDebug, 'onlyLOG') or nil
+	local onlyChat = string.find(XinnonyDebug, 'onlyChat') or nil
+	if ttype == nil then
+		LOG(text)
+	else
+		if string.find(XinnonyDebug, ttype) and ttype != nil then
+			if onlyLOG != nil then
+				LOG(text)
+			elseif onlyChat != nil then
+				AddChatText(text)
+			else
+				LOG(text)
+				AddChatText(text)
+			end
 		end
 	end
 end
@@ -200,9 +203,11 @@ local function LOGXWhisper(params)
 	-- Exemple : Country Background useChat'
 	if string.find(params, 'CLEAR') then
 		XinnonyDebug = ''
+		Prefs.SetToCurrentProfile('XinnoDEBUG', '')
 		AddChatText('Debug disabled')
 	else
 		XinnonyDebug = params
+		Prefs.SetToCurrentProfile('XinnoDEBUG', params)
 		AddChatText('Debug actived : '..params)
 	end
 end
@@ -626,6 +631,7 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
         GUI.slots = {}
 
         GUI.connectdialog = UIUtil.ShowInfoDialog(GUI, Strings.TryingToConnect, Strings.AbortConnect, ReturnToMenu)
+		GUI.connectdialog.Depth:Set(GetFrame(GUI:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 999)
 
         InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
 
@@ -655,9 +661,11 @@ end
 function ConnectToPeer(addressAndPort,name,uid)
     if not string.find(addressAndPort, '127.0.0.1') then
         LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..")")
+		LOGX('>> ConnectToPeer > name='..tostring(name), 'Connecting')
     else
         DisconnectFromPeer(uid)
         LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..", USE PROXY)")
+		LOGX('>> ConnectToPeer > name='..tostring(name)..' (with PROXY)', 'Connecting')
         table.insert(ConnectedWithProxy, uid)
     end
     lobbyComm:ConnectToPeer(addressAndPort,name,uid)
@@ -668,11 +676,12 @@ function DisconnectFromPeer(uid)
     if wasConnected(uid) then
         table.remove(connectedTo, uid)
     end
+	LOGX('>> DisconnectFromPeer > name='..tostring(FindNameForID(uid)), 'Disconnected')
     GpgNetSend('Disconnected', string.format("%d", uid))
     lobbyComm:DisconnectFromPeer(uid)
 end
 
-function SetHasSupcom(cmd)
+function SetHasSupcom(supcomInstalled)
     if IsSyncReplayServer then
         if cmd == 0 then
             SessionResume()
@@ -684,7 +693,7 @@ function SetHasSupcom(cmd)
     end
 end
 
-function SetHasForgedAlliance(speed)
+function SetHasForgedAlliance(faInstalled)
     if IsSyncReplayServer then
         if GetGameSpeed() ~= speed then
             SetGameSpeed(speed)
@@ -1758,7 +1767,7 @@ local function AlertHostMapMissing()
 end
 
 local function UpdateGame()
-    --LOG('- UpdateGame')
+    LOGX('>> UpdateGame', 'UpdateGame')
     -- if anything happens to switch a no SupCom player to a faction other than Seraphim, switch them back
     local playerSlot = FindSlotForID(localPlayerID)
     local scenarioInfo = nil
@@ -2213,7 +2222,7 @@ end
 
 -- slot less than 1 means try to find a slot
 function HostTryAddPlayer(senderID, slot, requestedPlayerName, human, aiPersonality, requestedColor, requestedFaction, requestedTeam, requestedPL, requestedRC, requestedNG, requestedMEAN, requestedDEV, requestedCOUNTRY)
-    
+    LOGX('>> HostTryAddPlayer > requestedPlayerName='..tostring(requestedPlayerName), 'Connecting')
     --// RULE TITLE - Xinnony
     if not singlePlayer then
         RuleTitle_SendMSG()
@@ -2365,7 +2374,7 @@ function HostTryAddObserver( senderID, requestedObserverName, RequestedPL, Reque
         index = index + 1
     end
 
-    AddChatText('//HostTryAddObserver//RequestedPL='..tostring(RequestedPL))
+    LOGX('>> HostTryAddObserver > requestedObserverName='..tostring(requestedObserverName), 'Connecting')
 	local observerName = lobbyComm:MakeValidPlayerName(senderID,requestedObserverName)
     gameInfo.Observers[index] = {
         PlayerName = observerName,
@@ -2655,8 +2664,6 @@ function CreateUI(maxPlayers)
 
     if (GUI.connectdialog ~= false) then
         MenuCommon.MenuCleanup()
-        --GUI.connectdialog:Destroy()
-        --GUI.connectdialog = false
     end
 
     local title
@@ -2997,7 +3004,7 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtLeftTopIn(GUI.chatEdit, GUI.chatPanel, 0+13, 184+7)
     GUI.chatEdit.Width:Set(334)
     GUI.chatEdit.Height:Set(24)
-    GUI.chatEdit:SetFont(UIUtil.bodyFont, 12) -- 16
+    GUI.chatEdit:SetFont(UIUtil.bodyFont, 16)
     GUI.chatEdit:SetForegroundColor(UIUtil.fontColor)
     GUI.chatEdit:SetHighlightBackgroundColor('00000000')
     GUI.chatEdit:SetHighlightForegroundColor(UIUtil.fontColor)
@@ -4258,9 +4265,8 @@ function CreateUI(maxPlayers)
                 local XinnoSystemMessage = Prefs.GetFromCurrentProfile('XinnoSystemMessage') or 'false'
                 if XinnoSystemMessage == 'true' then
                     if not table.find(ConnexionEtablished, peer.name) then
-                        if gameInfo.PlayerOptions[FindSlotForID(peer.id)].Human
-                                and not IsLocallyOwned(FindSlotForID(peer.id)) then
-                            if table.find(ConnectedWithProxy, peer.id) then
+                        --AddChatText('<< '..peer.name..' >> '..FindSlotForID(peer.id)..' || '..tostring(gameInfo.PlayerOptions[FindSlotForID(peer.id)].Human)..' || '..tostring(IsLocallyOwned(FindSlotForID(peer.id))))
+                        if gameInfo.PlayerOptions[FindSlotForID(peer.id)].Human and not IsLocallyOwned(FindSlotForID(peer.id)) then                            if table.find(ConnectedWithProxy, peer.id) then
                                 AddChatText(LOCF("<LOC Xngine0004>Connection to %s established.", peer.name)..' (FAF Proxy)', "Xngine0004")
                             else
                                 AddChatText(LOCF("<LOC Xngine0004>Connection to %s established.", peer.name), "Xngine0004")
@@ -4629,7 +4635,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         if wantToBeObserver then
             -- Ok, I'm connected to the host. Now request to become an observer
             lobbyComm:SendData( hostID, { Type = 'AddObserver', RequestedObserverName = localPlayerName, RequestedPL = playerRating, RequestedColor = Prefs.GetFromCurrentProfile('LastColor'), RequestedFaction = requestedFaction, RequestedCOUNTRY = PrefLanguage, } )
-			AddChatText('//ConnectionToHostEstablished//SendData//playerRating='..tostring(playerRating))
+			LOGX('>> ConnectionToHostEstablished//SendData//playerRating='..tostring(playerRating), 'Connecting')
         else
             -- Ok, I'm connected to the host. Now request to become a player
             local requestedFaction = Prefs.GetFromCurrentProfile('LastFaction')
@@ -4800,7 +4806,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 end
                 SetPlayerOption(FindSlotForID(FindIDForName(localPlayerName)), 'Ready', false)
             elseif data.Type == 'Peer_Really_Disconnected' then
-				LOGX('>> DATA RECEIVE : Peer_Really_Disconnected (slot:'..data.Slot..')', 'PeerDisconnected')
+				LOGX('>> DATA RECEIVE : Peer_Really_Disconnected (slot:'..data.Slot..')', 'Disconnected')
                 if data.Options.OwnerID == localPlayerID then
                     lobbyComm:SendData( hostID, {Type = "GetGameInfo"} )
                 else
@@ -4810,7 +4816,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                         gameInfo.Observers[data.Slot] = nil
                     end
                 end
-                AddChatText(LOCF("<LOC Xngine0003>Lost connection to %s.", peerName), "Xngine0003")
+                AddChatText(LOCF("<LOC Xngine0003>Lost connection to %s.", data.Options.PlayerName), "Xngine0003")
                 ClearSlotInfo(data.Slot)
                 UpdateGame()
             elseif data.Type == 'SlotAssigned' then
@@ -5038,7 +5044,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     end
 
     lobbyComm.PeerDisconnected = function(self,peerName,peerID) -- Lost connection or try connect with proxy
-		LOGX('>> PeerDisconnected : peerName='..peerName..' peerID='..peerID, 'PeerDisconnected')
+		LOGX('>> PeerDisconnected : peerName='..peerName..' peerID='..peerID, 'Disconnected')
         
          -- Search and Remove the peer disconnected
         for k, v in CurrentConnexion do
@@ -7623,9 +7629,11 @@ function to_string( tbl )
     end
 end
 
-#####################################################
+#
+##
+##############################################
 ################  Changelog Dialog  #################
-
+-- Author : Xinnony --
 function Need_Changelog()
 	local Changelog = import('/lua/ui/lobby/changelog.lua').changelog
 	local Last_Changelog_Version = Prefs.GetFromCurrentProfile('XinnoChangelog') or 0
@@ -7696,3 +7704,10 @@ function GUI_Changelog()
     LayoutHelpers.AtRightIn(text99, dialog2, 0)
     LayoutHelpers.AtBottomIn(text99, dialog2, 2)
 end
+
+#
+##
+############################################
+################  DEV TEST AREA  ################
+
+--
