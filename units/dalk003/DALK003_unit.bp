@@ -1,9 +1,4 @@
 UnitBlueprint {
-    AI = {
-        TargetBones = {
-            'Turret',
-        },
-    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'UAL',
@@ -208,7 +203,7 @@ UnitBlueprint {
     SelectionSizeZ = 0.85,
     SelectionThickness = 0.5,
     SizeX = 1,
-    SizeY = 1,
+    SizeY = 1.5,
     SizeZ = 1.2,
     StrategicIconName = 'icon_bot3_antiair',
     StrategicIconSortPriority = 115,

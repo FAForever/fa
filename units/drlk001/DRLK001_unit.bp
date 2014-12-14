@@ -1,7 +1,6 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
-            'Turret01',
             'DRLK001',
         },
     },
@@ -206,9 +205,9 @@ UnitBlueprint {
     SelectionSizeX = 0.79,
     SelectionSizeZ = 0.9,
     SelectionThickness = 0.62,
-    SizeX = 1.5,
-    SizeY = 0.9,
-    SizeZ = 1.2,
+    SizeX = 1.2,
+    SizeY = 0.4,
+    SizeZ = 0.8,
     StrategicIconName = 'icon_bot3_antiair',
     StrategicIconSortPriority = 155,
     Transport = {
