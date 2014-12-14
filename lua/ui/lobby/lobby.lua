@@ -7631,8 +7631,8 @@ end
 
 #
 ##
-##############################################
-################  Changelog Dialog  #################
+#####################################################
+################ Changelog Dialog #################
 -- Author : Xinnony --
 function Need_Changelog()
 	local Changelog = import('/lua/ui/lobby/changelog.lua').changelog
