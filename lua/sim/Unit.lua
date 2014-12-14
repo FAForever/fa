@@ -1425,9 +1425,7 @@ Unit = Class(moho.unit_methods) {
             energy = energy * 0.5
         end
 
-        if self:GetCurrentLayer() == 'Air' then
-            pos[2] = GetSurfaceHeight(pos[1], pos[3])
-        elseif self:GetCurrentLayer() == 'Seabed' or self:GetCurrentLayer() == 'Land' then
+        if self:GetCurrentLayer() == 'Seabed' or self:GetCurrentLayer() == 'Land' then
             pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
         else
             pos[2] = GetSurfaceHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
@@ -1461,7 +1459,11 @@ Unit = Class(moho.unit_methods) {
 
         -- Attempt to copy our animation pose to the prop. Only works if
         -- the mesh and skeletons are the same, but will not produce an error if not.
-        TryCopyPose(self,prop, true)
+        -- Air results in floating wrecks
+        if not EntityCategoryContains(categories.AIR, self) then
+            TryCopyPose(self,prop,true)
+        end
+        
         --Prevent rebuild exploit
         prop.AssociatedBP = self:GetBlueprint().BlueprintId
 
