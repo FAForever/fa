@@ -69,6 +69,7 @@ changelog = {
 			"- Enhancement Debug System",
 			"- Fix UI bug with ConnectDialog",
 			"- Fix the player not removed in the slot when is leave the lobby",
+			"- Fix replaysync [by fafafaf]",
 		}
 	},
 	{

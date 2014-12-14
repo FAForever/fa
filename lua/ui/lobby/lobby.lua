@@ -681,7 +681,7 @@ function DisconnectFromPeer(uid)
     lobbyComm:DisconnectFromPeer(uid)
 end
 
-function SetHasSupcom(supcomInstalled)
+function SetHasSupcom(cmd)
     if IsSyncReplayServer then
         if cmd == 0 then
             SessionResume()
@@ -693,7 +693,7 @@ function SetHasSupcom(supcomInstalled)
     end
 end
 
-function SetHasForgedAlliance(faInstalled)
+function SetHasForgedAlliance(speed)
     if IsSyncReplayServer then
         if GetGameSpeed() ~= speed then
             SetGameSpeed(speed)
