@@ -1046,17 +1046,18 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
+        
+        -- Revoke transport protection for shielded transports when impacted by nuclear weaponry
+        if EntityCategoryContains(categories.NUKE, instigator) and self.transportProtected == true then
+            self.MyShield:RevokeTransportProtection()
+        end
+    
         if self.CanTakeDamage then
             self:DoOnDamagedCallbacks(instigator)
-
+            
             --Pass damage to an active personal shield, as personal shields no longer have collisions
             if self:GetShieldType() == 'Personal' and self:ShieldIsOn() then
                 self.MyShield:ApplyDamage(instigator, amount, vector, damageType)
-
-            --This makes sure Nukes will still kill shielded Transports and their units
-            elseif EntityCategoryContains(categories.NUKE, instigator) and self.transportProtected == true then
-                self.MyShield:RevokeTransportProtection()
-                self:DoTakeDamage(instigator, amount, vector, damageType)
             else
                 self:DoTakeDamage(instigator, amount, vector, damageType)
             end
@@ -4007,7 +4008,7 @@ Unit = Class(moho.unit_methods) {
 
     --This function is called from Shield.lua to tell the unit when the protection status changes
     IsTransportProtected = function(self, value)
-        transportProtected = value
+        self.transportProtected = value
     end,
 
     OnStartTransportLoading = function(self)
