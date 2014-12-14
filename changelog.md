@@ -1,3 +1,18 @@
+Changelog for hotfix-patch 3638
+-------------------------------
+
+*Bug fixes*
+- Fixed air wrecks floating mid air on certain maps
+- Fixed continental not dying to nukes
+- Improved GuardScanRadius:
+  - Scouts no longer engage at long range, value was set to 10
+  - Harbinger will automatically engage at range again
+- Fixed seraphim T3MAA targetbones (Units will no longer aim above it)
+- Fixed integrated replaysync
+- More mod compatibility
+- Lobby 2.5c included, changelog shown in game
+
+
 Changelog for hotfix-patch 3637
 -------------------------------
 
