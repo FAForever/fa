@@ -65,7 +65,6 @@ changelog = {
 		version = 6,
 		name = "Lobby 2.5d",
 		description = {
-			"- Lobby 2.5c not pushed correctly",
 			"- Remove debug message",
 			"- Enhancement Debug System",
 			"- Fix UI bug with ConnectDialog",
