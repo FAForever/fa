@@ -1381,7 +1381,7 @@ Unit = Class(moho.unit_methods) {
                 self.Trash:Add(sinkAnim)
                 WaitFor(sinkAnim)
 
-                if(EntityCategoryContains(categories.NAVAL, self)) then
+                if EntityCategoryContains(categories.NAVAL, self) then
                     self.StopSink = true --Stop sinking when animation is complete
                 end
             end
@@ -1417,17 +1417,16 @@ Unit = Class(moho.unit_methods) {
         local energy = bp.Economy.BuildCostEnergy * (bp.Wreckage.EnergyMult or 0)
         local time = (bp.Wreckage.ReclaimTimeMultiplier or 1)
         local pos = self:GetPosition()
+        local layer = self:GetCurrentLayer()
 
-        if self:GetCurrentLayer() == 'Water' then
+        if layer == 'Water' then
             --Reduce the mass value of submerged wrecks
             mass = mass * 0.5
             energy = energy * 0.5
         end
 
-        if self:GetCurrentLayer() == 'Seabed' or self:GetCurrentLayer() == 'Land' then
+        if layer == 'Air' or EntityCategoryContains(categories.NAVAL - categories.STRUCTURE, self) then -- make sure air / naval wrecks stick to ground / seabottom
             pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
-        else
-            pos[2] = GetSurfaceHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
         end
 
         local prop = CreateProp( pos, wreck )
@@ -1458,11 +1457,11 @@ Unit = Class(moho.unit_methods) {
 
         -- Attempt to copy our animation pose to the prop. Only works if
         -- the mesh and skeletons are the same, but will not produce an error if not.
-        -- Air results in floating wrecks
-        if not EntityCategoryContains(categories.AIR, self) then
-            TryCopyPose(self,prop,true)
-        end
         
+        if layer ~= 'Air' then
+            TryCopyPose(self, prop, true)
+        end
+
         --Prevent rebuild exploit
         prop.AssociatedBP = self:GetBlueprint().BlueprintId
 
@@ -1627,7 +1626,7 @@ Unit = Class(moho.unit_methods) {
         end
 
         if self.DeathAnimManip and not isNaval then --Wait for non naval-units death animations
-            if(not isSinking) then
+            if not isSinking then
                 WaitFor(self.DeathAnimManip)
             end
 
@@ -1640,6 +1639,7 @@ Unit = Class(moho.unit_methods) {
             self:ForkThread(self.SinkDestructionEffects)
             self:SeabedWatcher() -- Finishes when unit reached seabed
         end
+
         self:CreateWreckage( overkillRatio )
         WaitSeconds(self.DeathThreadDestructionWaitTime)
 

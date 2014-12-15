@@ -1431,7 +1431,7 @@ SubUnit = Class(MobileUnit) {
 
    -- DESTRUCTION PARAMS
     ShowUnitDestructionDebris = false,
-    DeathThreadDestructionWaitTime = 10,
+    DeathThreadDestructionWaitTime = 0,
 }
 
 --------------------------------------------------------------
@@ -1712,7 +1712,7 @@ ConstructionUnit = Class(MobileUnit) {
 ---------------------------------------------------------------
 
 SeaUnit = Class(MobileUnit){
-    DeathThreadDestructionWaitTime = 5,
+    DeathThreadDestructionWaitTime = 0,
     ShowUnitDestructionDebris = false,
     PlayEndestructionEffects = false,
     CollidedBones = 0,
