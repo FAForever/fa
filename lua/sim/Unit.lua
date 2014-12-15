@@ -928,33 +928,30 @@ Unit = Class(moho.unit_methods) {
         local focus = self:GetFocusUnit()
         local energy_rate = 0
         local mass_rate = 0
-        local states = {'Building', 'Enhancing', 'Repairing', 'Upgrading', 'SiloBuildingAmmo'}
+        local states = {'Enhancing',  'Upgrading', 'SiloBuildingAmmo', 'Building', 'Repairing'}
         local self_state
         local focus_state
 
         for _, state in states do
-            if self:IsUnitState(state) then self_state = state end
-            if focus and focus:IsUnitState(state) then focus_state = state end
+            if not self_state and self:IsUnitState(state) then self_state = state end
+            if focus and not focus_state and focus:IsUnitState(state) then focus_state = state end
         end
 
         if self.ActiveConsumption then
             local focus = self:GetFocusUnit()
-            if focus and self.WorkItem and self.WorkProgress < 1 and (focus_state == 'Enhancing' or focus_state == 'Building') then
-                self.WorkItem = focus.WorkItem    --Set our workitem to the focus unit work item, is specific for enhancing
-            end
-        end
-
-        if self.ActiveConsumption then
             local time = 1
             local mass = 0
             local energy = 0
             local targetData
             local baseData
-            local workItem = self.WorkItem
 
-            if workItem then --Enhancement
-                targetData = workItem
-                if self.WorkItem and self_state == 'Enhancing' or self_state == 'Upgrading' then
+            if focus and focus.WorkItem and focus.WorkProgress < 1 then
+                self:InheritWork(focus)
+            end
+
+            if self.WorkItem then --Enhancement
+                targetData = self.WorkItem
+                if self.WorkItem and (self_state == 'Enhancing' or self_state == 'Upgrading') then
                     self:UpdateAssistersConsumption()
                 end
             elseif focus then --Handling upgrades
@@ -963,6 +960,7 @@ Unit = Class(moho.unit_methods) {
                 elseif focus.originalBuilder and not focus.originalBuilder:IsDead() and focus.originalBuilder:IsUnitState('Upgrading') then
                     baseData = focus.originalBuilder:GetBlueprint().Economy
                 end
+
                 if baseData then
                     targetData = focus:GetBlueprint().Economy
                 end
@@ -971,7 +969,7 @@ Unit = Class(moho.unit_methods) {
             if targetData then --Upgrade/enhancement
                 time, energy, mass = Game.GetConstructEconomyModel(self, targetData, baseData)
             elseif focus then --Building/repairing something
-                if(focus_state == 'SiloBuildingAmmo') then
+                if focus_state == 'SiloBuildingAmmo' then
                     local siloBuildRate = focus:GetBuildRate() or 1
                     time, energy, mass = focus:GetBuildCosts(focus.SiloProjectile)
                     energy = (energy / siloBuildRate) * (self:GetBuildRate() or 1)
