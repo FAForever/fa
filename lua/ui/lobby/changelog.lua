@@ -1,4 +1,4 @@
-last_version = 7
+last_version = 6
 changelog = {
 	{
 		version = 3,
@@ -70,14 +70,6 @@ changelog = {
 			"- Fix UI bug with ConnectDialog",
 			"- Fix the player not removed in the slot when is leave the lobby",
 			"- Fix replaysync [by fafafaf]",
-		}
-	},
-	{
-		version = 7,
-		name = "Your attention,",
-		description = {
-			"I remind you that in case of bugs, we cannot help you without your game.log file",
-			"and a message on the forum !!!",
 		}
 	}
 }
