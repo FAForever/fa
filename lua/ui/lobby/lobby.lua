@@ -7418,16 +7418,16 @@ function Check_Availaible_Color(self, slot)
     --// CHECK COLOR ALREADY USED AND RECREATE TABLE WITH COLOR AVAILAIBLE ONLY \\
     for k, v in BASE_ALL_Color do
         finded = false
-            for ii = 1, LobbyComm.maxPlayerSlots do
-                if gameInfo.PlayerOptions[ii].PlayerColor then
-                    if slot ~= ii then
-                        if gameInfo.PlayerOptions[ii].PlayerColor == k then
-                            finded = true
-                            break
-                        end
+        for ii = 1, LobbyComm.maxPlayerSlots do
+            if gameInfo.PlayerOptions[ii].PlayerColor then
+                if slot ~= ii then
+                    if gameInfo.PlayerOptions[ii].PlayerColor == k then
+                        finded = true
+                        break
                     end
                 end
             end
+        end
         
         if finded ~= true then
             num = num + 1
