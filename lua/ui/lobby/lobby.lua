@@ -966,12 +966,12 @@ function ClearSlotInfo(slot)
         GUI.slots[slot].name.slotKeys = nil
         GUI.slots[slot].name:Disable()
     end
+
+    GUI.slots[slot].name._text:SetFont('Arial Gras', 12)
     if stateKey == 'closed' then
         GUI.slots[slot].name:SetTitleTextColor("Crimson")
-        GUI.slots[slot].name._text:SetFont('Arial Gras', 12)
     else
         GUI.slots[slot].name:SetTitleTextColor('B9BFB9')--UIUtil.fontColor)
-        GUI.slots[slot].name._text:SetFont('Arial Gras', 12)
     end
 
     if lobbyComm:IsHost() and stateKey == 'open' then
