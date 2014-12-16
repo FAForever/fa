@@ -72,10 +72,10 @@ function LOGX(text, ttype)
 	if ttype == nil then
 		LOG(text)
 	else
-		if string.find(XinnonyDebug, ttype) and ttype != nil then
-			if onlyLOG != nil then
+		if string.find(XinnonyDebug, ttype) and ttype ~= nil then
+			if onlyLOG ~= nil then
 				LOG(text)
-			elseif onlyChat != nil then
+			elseif onlyChat ~= nil then
 				AddChatText(text)
 			else
 				LOG(text)
@@ -7464,7 +7464,7 @@ function Check_Availaible_Color(self, slot)
         finded = false
             for ii = 1, LobbyComm.maxPlayerSlots do
                 if gameInfo.PlayerOptions[ii].PlayerColor then
-                    if slot != ii then
+                    if slot ~= ii then
                         if gameInfo.PlayerOptions[ii].PlayerColor == k then -- SI UN PLAYER A LA COULEUR
                             finded = true
                             break
@@ -7473,7 +7473,7 @@ function Check_Availaible_Color(self, slot)
                 end
             end
         
-        if finded != true then
+        if finded ~= true then
             num = num + 1
             Avail_Color[slot][num] = BASE_ALL_Color[k]
         end
