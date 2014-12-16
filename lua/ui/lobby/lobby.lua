@@ -7414,22 +7414,22 @@ function Check_Availaible_Color(self, slot)
     local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo2
     --
     Avail_Color[slot] = {}
-    num = 0
+    local num = 0
     --// CHECK COLOR ALREADY USED AND RECREATE TABLE WITH COLOR AVAILAIBLE ONLY \\
     for k, v in BASE_ALL_Color do
-        finded = false
+        local found = false
         for ii = 1, LobbyComm.maxPlayerSlots do
             if gameInfo.PlayerOptions[ii].PlayerColor then
                 if slot ~= ii then
                     if gameInfo.PlayerOptions[ii].PlayerColor == k then
-                        finded = true
+                        found = true
                         break
                     end
                 end
             end
         end
         
-        if finded ~= true then
+        if found ~= true then
             num = num + 1
             Avail_Color[slot][num] = BASE_ALL_Color[k]
         end
@@ -7440,7 +7440,7 @@ function Check_Availaible_Color(self, slot)
         return
     end
     --
-    yy = Get_IndexColor_by_CompleteTable(gameInfo.PlayerOptions[slot].PlayerColor, slot)
+    local yy = Get_IndexColor_by_CompleteTable(gameInfo.PlayerOptions[slot].PlayerColor, slot)
     --
     GUI.slots[slot].color:Destroy()
     GUI.slots[slot].color = BitmapCombo(GUI.slots[slot], Avail_Color[slot], yy, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
@@ -7450,7 +7450,7 @@ function Check_Availaible_Color(self, slot)
     GUI.slots[slot].color.row = slot
     --
     GUI.slots[slot].color.OnClick = function(self, index)
-        indexx = Get_IndexColor_by_AvailableTable(index, slot)
+        local indexx = Get_IndexColor_by_AvailableTable(index, slot)
         --
         Tooltip.DestroyMouseoverDisplay()
         if not lobbyComm:IsHost() then
