@@ -779,6 +779,8 @@ function SetSlotInfo(slot, playerInfo)
     local slotState
     if not playerInfo.Human then
         slotState = 'ai'
+    elseif FindSlotForID(hostID) == slot then
+        slotState = 'host'
     elseif not isLocallyOwned then
         slotState = 'player'
     else
@@ -829,6 +831,9 @@ function SetSlotInfo(slot, playerInfo)
     elseif slotState == 'player' then
         GUI.slots[slot].name:SetTitleTextColor("64d264") -- Green Color for Players
         GUI.slots[slot].name._text:SetFont('Arial Gras', 15)
+    elseif slotState == 'host' then
+        GUI.slots[slot].name:SetTitleTextColor("ffc726") -- Orange Color for Host
+        GUI.slots[slot].name._text:SetFont('Arial Gras', 15)
     elseif isLocallyOwned then
         GUI.slots[slot].name:SetTitleTextColor("6363d2") -- Blue Color for You
         GUI.slots[slot].name._text:SetFont('Arial Gras', 15)
@@ -836,10 +841,7 @@ function SetSlotInfo(slot, playerInfo)
         GUI.slots[slot].name:SetTitleTextColor(UIUtil.fontColor) -- Normal Color for Other
         GUI.slots[slot].name._text:SetFont('Arial Gras', 12)
     end
-    if FindSlotForID(hostID) then -- Orange Color for Host
-        GUI.slots[FindSlotForID(hostID)].name:SetTitleTextColor("ffc726")
-        GUI.slots[FindSlotForID(hostID)].name._text:SetFont('Arial Gras', 15)
-    end
+
     --\\ Stop - Color the Name in Slot by State
     if wasConnected(playerInfo.OwnerID) or IsLocallyOwned(slot) then
         GUI.slots[slot].name:SetTitleText(playerInfo.PlayerName)
