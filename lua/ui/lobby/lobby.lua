@@ -755,20 +755,18 @@ function SetSlotInfo(slot, playerInfo)
 		GUI.connectdialog:Destroy()
 		GUI.connectdialog = false
 	end
-	local isLocallyOwned
-    if IsLocallyOwned(slot) then
+	local isLocallyOwned = IsLocallyOwned(slot)
+    if isLocallyOwned then
         if gameInfo.PlayerOptions[slot]['Ready'] then
             DisableSlot(slot, true)
         else
             EnableSlot(slot)
         end
-        isLocallyOwned = true
         if not hasSupcom then
             GUI.slots[slot].faction:Disable()
         end
     else
         DisableSlot(slot)
-        isLocallyOwned = false
     end
 
     local hostKey
@@ -776,9 +774,6 @@ function SetSlotInfo(slot, playerInfo)
         hostKey = 'host'
     else
         hostKey = 'client'
-    end
-
-    if not playerInfo.Human and lobbyComm:IsHost() then
     end
 
     local slotState
