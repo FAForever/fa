@@ -791,7 +791,7 @@ function SetSlotInfo(slot, playerInfo)
         GUI.slots[slot].name:Enable()
         local slotKeys, slotStrings = GetSlotMenuTables(slotState, hostKey)
         GUI.slots[slot].name.slotKeys = slotKeys
-        if lobbyComm:IsHost() and (slotState == 'open' or slotState == 'ai') then
+        if lobbyComm:IsHost() and slotState == 'ai' then
             Tooltip.AddComboTooltip(GUI.slots[slot].name, GetAITooltipList())
         else
             Tooltip.RemoveComboTooltip(GUI.slots[slot].name)
@@ -829,9 +829,6 @@ function SetSlotInfo(slot, playerInfo)
     elseif slotState == 'player' then
         GUI.slots[slot].name:SetTitleTextColor("64d264") -- Green Color for Players
         GUI.slots[slot].name._text:SetFont('Arial Gras', 15)
-    elseif slotState == 'open' then
-        GUI.slots[slot].name:SetTitleTextColor('B9BFB9')--UIUtil.fontColor) -- Normal Color for Open Slot
-        GUI.slots[slot].name._text:SetFont('Arial Gras', 12)
     elseif isLocallyOwned then
         GUI.slots[slot].name:SetTitleTextColor("6363d2") -- Blue Color for You
         GUI.slots[slot].name._text:SetFont('Arial Gras', 15)
