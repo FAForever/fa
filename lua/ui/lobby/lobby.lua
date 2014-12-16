@@ -271,6 +271,9 @@ end
 
 --// Menu in Slot select -- Add new function by Xinnony
 function FuncSlotMenuData()
+    -- String from which to build the various "Move player to slot" labels.
+    -- TODO: This probably needs localising.
+    local move_player_to_slot = "Move Player to slot "
     slotMenuStrings = {
         open = "<LOC lobui_0219>Open",
         close = "<LOC lobui_0220>Close",
@@ -279,18 +282,6 @@ function FuncSlotMenuData()
         pm = "<LOC lobui_0223>Private Message",
         remove_to_kik = "Remove Player",
         remove_to_observer = "Move Player to Observer",
-        move_player_to_slot1 = "Move Player to slot 1",
-        move_player_to_slot2 = "Move Player to slot 2",
-        move_player_to_slot3 = "Move Player to slot 3",
-        move_player_to_slot4 = "Move Player to slot 4",
-        move_player_to_slot5 = "Move Player to slot 5",
-        move_player_to_slot6 = "Move Player to slot 6",
-        move_player_to_slot7 = "Move Player to slot 7",
-        move_player_to_slot8 = "Move Player to slot 8",
-        move_player_to_slot9 = "Move Player to slot 9",
-        move_player_to_slot10 = "Move Player to slot 10",
-        move_player_to_slot11 = "Move Player to slot 11",
-        move_player_to_slot12 = "Move Player to slot 12",
     }
     slotMenuData = {
         open = {
@@ -329,8 +320,10 @@ function FuncSlotMenuData()
             },
         },
     }
+    -- Populate the tables with the "move player to slot X" entries.
     for i = 1, numOpenSlots, 1 do
         table.insert(slotMenuData.player.host, 'move_player_to_slot'..i)
+        slotMenuStrings['move_player_to_slot' .. i] = move_player_to_slot .. i
     end
 end
 FuncSlotMenuData()
@@ -466,34 +459,9 @@ local function DoSlotBehavior(slot, key, name)
         if gameInfo.PlayerOptions[slot].Human then
             GUI.chatEdit:SetText(string.format("/whisper %s ", gameInfo.PlayerOptions[slot].PlayerName))
         end
-
-        --// Move player slot to slot -- Xinnony (Factored by Vicarian)
-    elseif key == 'move_player_to_slot1' then
-        HandleSlotSwitches(slot, 1)
-    elseif key == 'move_player_to_slot2' then
-        HandleSlotSwitches(slot, 2)
-    elseif key == 'move_player_to_slot3' then
-        HandleSlotSwitches(slot,3)
-    elseif key == 'move_player_to_slot4' then
-        HandleSlotSwitches(slot,4)
-    elseif key == 'move_player_to_slot5' then
-        HandleSlotSwitches(slot,5)
-    elseif key == 'move_player_to_slot6' then
-        HandleSlotSwitches(slot,6)
-    elseif key == 'move_player_to_slot7' then
-        HandleSlotSwitches(slot,7)
-    elseif key == 'move_player_to_slot8' then
-        HandleSlotSwitches(slot,8)
-    elseif key == 'move_player_to_slot9' then
-        HandleSlotSwitches(slot,9)
-    elseif key == 'move_player_to_slot10' then
-        HandleSlotSwitches(slot,10)
-    elseif key == 'move_player_to_slot11' then
-        HandleSlotSwitches(slot,11)
-    elseif key == 'move_player_to_slot12' then
-        HandleSlotSwitches(slot,12)
-        --\\ Stop Move player slot to slot
-        --// Move Player slot to Observer -- Xinnony
+    -- Handle the various "Move to slot X" options.
+    elseif string.sub(key, 1, 19) == 'move_player_to_slot' then
+        HandleSlotSwitches(slot, tonumber(string.sub(key, 20)))
     elseif key == 'remove_to_observer' then
         if gameInfo.PlayerOptions[slot].Human then
             HostConvertPlayerToObserver(gameInfo.PlayerOptions[slot].OwnerID, gameInfo.PlayerOptions[slot].PlayerName, slot)
