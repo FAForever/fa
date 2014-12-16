@@ -6765,7 +6765,7 @@ end
 -- GUI --
 function GUI_PRESET()
     local profiles = GetPreference("UserPresetLobby")
-    if not profiles or profiles[0] == nil then
+    if not profiles or profiles[1] == nil then
         GUI_PRESET_INPUT(-1)
     end
 
