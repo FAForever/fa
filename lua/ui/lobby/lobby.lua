@@ -972,24 +972,24 @@ function ClearSlotInfo(slot)
     else
         GUI.slots[slot].name:SetTitleTextColor('B9BFB9')--UIUtil.fontColor)
     GUI.slots[slot].name._text:SetFont('Arial Gras', 12)
-end
-if lobbyComm:IsHost() and (stateKey == 'open' or stateKey == 'ai') then
-    Tooltip.AddComboTooltip(GUI.slots[slot].name, GetAITooltipList())
-else
-    Tooltip.RemoveComboTooltip(GUI.slots[slot].name)
-end
+    end
+    if lobbyComm:IsHost() and (stateKey == 'open' or stateKey == 'ai') then
+        Tooltip.AddComboTooltip(GUI.slots[slot].name, GetAITooltipList())
+    else
+        Tooltip.RemoveComboTooltip(GUI.slots[slot].name)
+    end
 
--- hide these to clear slot of visible data
-GUI.slots[slot].KinderCountry:Hide() -- Hide the Country Flag
-GUI.slots[slot].ratingGroup:Hide()
-GUI.slots[slot].numGamesGroup:Hide()
-GUI.slots[slot].faction:Hide()
-GUI.slots[slot].color:Hide()
-GUI.slots[slot].team:Hide()
-GUI.slots[slot].multiSpace:Hide()
-if GUI.slots[slot].pingGroup then
-    GUI.slots[slot].pingGroup:Hide()
-end
+    -- hide these to clear slot of visible data
+    GUI.slots[slot].KinderCountry:Hide()
+    GUI.slots[slot].ratingGroup:Hide()
+    GUI.slots[slot].numGamesGroup:Hide()
+    GUI.slots[slot].faction:Hide()
+    GUI.slots[slot].color:Hide()
+    GUI.slots[slot].team:Hide()
+    GUI.slots[slot].multiSpace:Hide()
+    if GUI.slots[slot].pingGroup then
+        GUI.slots[slot].pingGroup:Hide()
+    end
 end
 
 function IsColorFree(colorIndex)
