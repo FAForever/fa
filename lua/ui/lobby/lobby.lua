@@ -843,13 +843,13 @@ function SetSlotInfo(slot, playerInfo)
     end
 
     --\\ Stop - Color the Name in Slot by State
-    if wasConnected(playerInfo.OwnerID) or IsLocallyOwned(slot) then
+    if wasConnected(playerInfo.OwnerID) or isLocallyOwned then
         GUI.slots[slot].name:SetTitleText(playerInfo.PlayerName)
         GUI.slots[slot].name._text:SetFont('Arial Gras', 15)
         local XinnoSystemMessage = Prefs.GetFromCurrentProfile('XinnoSystemMessage') or 'false'
         if XinnoSystemMessage == 'true' then
             if not table.find(ConnexionEtablished, playerInfo.PlayerName) then
-                if playerInfo.Human and not IsLocallyOwned(slot) then
+                if playerInfo.Human and not isLocallyOwned then
                     if table.find(ConnectedWithProxy, playerInfo.OwnerID) then
                         AddChatText(LOCF("<LOC Xngine0004>Connection to %s established.", playerInfo.PlayerName)..' (FAF Proxy)', "Xngine0004")
                     else
