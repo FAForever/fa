@@ -971,9 +971,10 @@ function ClearSlotInfo(slot)
         GUI.slots[slot].name._text:SetFont('Arial Gras', 12)
     else
         GUI.slots[slot].name:SetTitleTextColor('B9BFB9')--UIUtil.fontColor)
-    GUI.slots[slot].name._text:SetFont('Arial Gras', 12)
+        GUI.slots[slot].name._text:SetFont('Arial Gras', 12)
     end
-    if lobbyComm:IsHost() and (stateKey == 'open' or stateKey == 'ai') then
+
+    if lobbyComm:IsHost() and stateKey == 'open' then
         Tooltip.AddComboTooltip(GUI.slots[slot].name, GetAITooltipList())
     else
         Tooltip.RemoveComboTooltip(GUI.slots[slot].name)
