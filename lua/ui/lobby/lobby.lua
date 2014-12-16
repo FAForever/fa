@@ -7392,7 +7392,6 @@ end
 
 -- Get the true Index Color --
 function Get_IndexColor_by_AvailableTable(index_limit, slot)
-    -- Retourne l'index couleur de la table imcomplete grace a l'index de la table complete
     for k, v in BASE_ALL_Color do
         if v == Avail_Color[slot][index_limit] then
             return k
@@ -7402,7 +7401,6 @@ function Get_IndexColor_by_AvailableTable(index_limit, slot)
 end
 
 function Get_IndexColor_by_CompleteTable(index_limit, slot)
-    -- Retourne l'index couleur de la table complete grace a l'index de la table imcomplete
     for k, v in Avail_Color[slot] do
         if v == BASE_ALL_Color[index_limit] then
             return k
@@ -7423,7 +7421,7 @@ function Check_Availaible_Color(self, slot)
             for ii = 1, LobbyComm.maxPlayerSlots do
                 if gameInfo.PlayerOptions[ii].PlayerColor then
                     if slot ~= ii then
-                        if gameInfo.PlayerOptions[ii].PlayerColor == k then -- SI UN PLAYER A LA COULEUR
+                        if gameInfo.PlayerOptions[ii].PlayerColor == k then
                             finded = true
                             break
                         end
