@@ -474,12 +474,9 @@ local function DoSlotBehavior(slot, key, name)
             end
         elseif IsObserver(localPlayerID) then
             if lobbyComm:IsHost() then
-                requestedFaction = Prefs.GetFromCurrentProfile('LastFaction')
-                requestedPL = playerRating
-                requestedRC = ratingColor
-                requestedNG = numGames
+                local requestedFaction = Prefs.GetFromCurrentProfile('LastFaction')
                 HostConvertObserverToPlayer(hostID, localPlayerName, FindObserverSlotForID(localPlayerID), slot,
-                                            requestedFaction, requestedPL, requestedRC, requestedNG)
+                                            requestedFaction, playerRating, ratingColor, numGames)
             else
                 lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer', RequestedName = localPlayerName, ObserverSlot =
                                    FindObserverSlotForID(localPlayerID), PlayerSlot = slot, requestedFaction =
