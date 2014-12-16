@@ -102,8 +102,8 @@ end
 local LASTXinnoBackground = '' -- For prevent the infinite loop to Background
 
 local connectedTo = {} -- by UID
-CurrentConnexion = {} -- by Name
-ConnexionEtablished = {} -- by Name
+CurrentConnection = {} -- by Name
+ConnectionEstablished = {} -- by Name
 ConnectedWithProxy = {} -- by UID
 
 Avail_Color = {} -- Color Only Availaible
@@ -848,17 +848,17 @@ function SetSlotInfo(slot, playerInfo)
         GUI.slots[slot].name._text:SetFont('Arial Gras', 15)
         local XinnoSystemMessage = Prefs.GetFromCurrentProfile('XinnoSystemMessage') or 'false'
         if XinnoSystemMessage == 'true' then
-            if not table.find(ConnexionEtablished, playerInfo.PlayerName) then
+            if not table.find(ConnectionEstablished, playerInfo.PlayerName) then
                 if playerInfo.Human and not isLocallyOwned then
                     if table.find(ConnectedWithProxy, playerInfo.OwnerID) then
                         AddChatText(LOCF("<LOC Xngine0004>Connection to %s established.", playerInfo.PlayerName)..' (FAF Proxy)', "Xngine0004")
                     else
                         AddChatText(LOCF("<LOC Xngine0004>Connection to %s established.", playerInfo.PlayerName), "Xngine0004")
                     end
-                    table.insert(ConnexionEtablished, playerInfo.PlayerName)
-                    for k, v in CurrentConnexion do -- Remove PlayerName in this Table
+                    table.insert(ConnectionEstablished, playerInfo.PlayerName)
+                    for k, v in CurrentConnection do -- Remove PlayerName in this Table
                         if v == playerInfo.PlayerName then
-                            CurrentConnexion[k] = nil
+                            CurrentConnection[k] = nil
                             break
                         end
                     end
@@ -870,9 +870,9 @@ function SetSlotInfo(slot, playerInfo)
         GUI.slots[slot].name._text:SetFont('Arial Gras', 11)
         local XinnoSystemMessage = Prefs.GetFromCurrentProfile('XinnoSystemMessage') or 'false'
         if XinnoSystemMessage == 'true' then
-            if not table.find(CurrentConnexion, playerInfo.PlayerName) then
+            if not table.find(CurrentConnection, playerInfo.PlayerName) then
                 AddChatText('Connecting to '..playerInfo.PlayerName..' ...')
-                table.insert(CurrentConnexion, playerInfo.PlayerName)
+                table.insert(CurrentConnection, playerInfo.PlayerName)
             end
         end
     end
@@ -4250,17 +4250,17 @@ function CreateUI(maxPlayers)
                 GUI.slots[FindSlotForID(peer.id)].name._text:SetFont('Arial Gras', 15)
                 local XinnoSystemMessage = Prefs.GetFromCurrentProfile('XinnoSystemMessage') or 'false'
                 if XinnoSystemMessage == 'true' then
-                    if not table.find(ConnexionEtablished, peer.name) then
+                    if not table.find(ConnectionEstablished, peer.name) then
                         --AddChatText('<< '..peer.name..' >> '..FindSlotForID(peer.id)..' || '..tostring(gameInfo.PlayerOptions[FindSlotForID(peer.id)].Human)..' || '..tostring(IsLocallyOwned(FindSlotForID(peer.id))))
                         if gameInfo.PlayerOptions[FindSlotForID(peer.id)].Human and not IsLocallyOwned(FindSlotForID(peer.id)) then                            if table.find(ConnectedWithProxy, peer.id) then
                                 AddChatText(LOCF("<LOC Xngine0004>Connection to %s established.", peer.name)..' (FAF Proxy)', "Xngine0004")
                             else
                                 AddChatText(LOCF("<LOC Xngine0004>Connection to %s established.", peer.name), "Xngine0004")
                             end
-                            table.insert(ConnexionEtablished, peer.name)
-                            for k, v in CurrentConnexion do -- Remove PlayerName in this Table
+                            table.insert(ConnectionEstablished, peer.name)
+                            for k, v in CurrentConnection do -- Remove PlayerName in this Table
                                 if v == peer.name then
-                                    CurrentConnexion[k] = nil
+                                    CurrentConnection[k] = nil
                                     break
                                 end
                             end
@@ -4991,15 +4991,15 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                         --AddChatText('TIMEOUT !')
                         
                         -- Search and Remove the peer disconnected
-                        for k, v in CurrentConnexion do
+                        for k, v in CurrentConnection do
                             if v == peer.name then
-                                CurrentConnexion[k] = nil
+                                CurrentConnection[k] = nil
                                 break
                             end
                         end
-                        for k, v in ConnexionEtablished do
+                        for k, v in ConnectionEstablished do
                             if v == peer.name then
-                                ConnexionEtablished[k] = nil
+                                ConnectionEstablished[k] = nil
                                 break
                             end
                         end
@@ -5033,15 +5033,15 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 		LOGX('>> PeerDisconnected : peerName='..peerName..' peerID='..peerID, 'Disconnected')
         
          -- Search and Remove the peer disconnected
-        for k, v in CurrentConnexion do
+        for k, v in CurrentConnection do
             if v == peerName then
-                CurrentConnexion[k] = nil
+                CurrentConnection[k] = nil
                 break
             end
         end
-        for k, v in ConnexionEtablished do
+        for k, v in ConnectionEstablished do
             if v == peerName then
-                ConnexionEtablished[k] = nil
+                ConnectionEstablished[k] = nil
                 break
             end
         end
