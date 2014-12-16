@@ -388,70 +388,48 @@ local function GetSlotMenuTables(stateKey, hostKey)
     return keys, strings
 end
 
-local function HandleSlotSwitches(moveFrom, moveTo) -- Xinnony (Factored by Vicarian)
-    local pOpts = gameInfo.PlayerOptions -- rename for readability
-    local toName = pOpts[moveTo].PlayerName
-    local toID = pOpts[moveTo].OwnerID
-    local toRatingColor = pOpts[moveTo].RC
-    local toRating = pOpts[moveTo].PL
-    local toFaction = pOpts[moveTo].Faction
-    local toNumGame = pOpts[moveTo].NG
+-- Called by the host when a "move player to slot X" option is clicked.
+local function HandleSlotSwitches(moveFrom, moveTo)
+    -- Bail out early for the stupid cases.
+    if moveFrom == moveTo then
+        AddChatText('You cannot move the Player in slot '..moveFrom..' to the same slot!')
+        return
+    end
 
-    local fromName = pOpts[moveFrom].PlayerName
-    local fromID = pOpts[moveFrom].OwnerID
-    local fromRatingColor = pOpts[moveFrom].RC
-    local fromRating = pOpts[moveFrom].PL
-    local fromFaction = pOpts[moveFrom].Faction
-    local fromNumGame = pOpts[moveFrom].NG
+    local fromOpts = gameInfo.PlayerOptions[moveFrom]
+    local toOpts = gameInfo.PlayerOptions[moveTo]
 
-    if pOpts[moveFrom].Human and moveFrom ~= moveTo then -- IF Player moveFrom is Human and Player moveFrom NOT in moveTo
-        
-        
-        
-        -- IF Slot moveToSlot is Human and NOT Ready, AND IF Player moveFromSlot is NOT Ready
-        if pOpts[moveTo].Human then
-            
-            if pOpts[moveTo].Ready then
-                --SetPlayerOption(moveTo, 'Ready', false)
-                if not IsLocallyOwned(moveTo) then
-                    lobbyComm:SendData(toID, {Type = 'SetPlayerNotReady', Slot = moveTo})
-                end
-                gameInfo.PlayerOptions[moveTo]['Ready'] = false
-            end
-            
-            if pOpts[moveFrom].Ready then
-                --SetPlayerOption(moveFrom, 'Ready', false)
-                if not IsLocallyOwned(moveTo) then
-                    lobbyComm:SendData(fromID, {Type = 'SetPlayerNotReady', Slot = moveFrom})
-                end
-                gameInfo.PlayerOptions[moveFrom]['Ready'] = false
-            end
-            
-            HostConvertPlayerToObserver(toID, toName, moveTo, false) -- Move Slot moveTo to Observer
-            --ClearSlotInfo(moveTo)
-            HostTryMovePlayer(fromID, moveFrom, moveTo) -- Move Player moveFrom to Slot moveTo
-            --ClearSlotInfo(moveFrom)
-            HostConvertObserverToPlayer(toID, toName, FindObserverSlotForID(toID), moveFrom, toFaction, toRating, toRatingColor, toNumGame, false)
-            SendSystemMessage(fromName..' has switched with '..toName, 'switch')
-        
-        
-        
-        elseif not pOpts[moveTo].Human then -- IF moveTo is AI
-            HostRemoveAI(moveTo)
-            HostTryMovePlayer(pOpts[moveFrom].OwnerID, moveFrom, moveTo)
-        
-        
-        
-        else
-            AddChatText('You cannot move the player in slot '..moveFrom..'.')
+    if not fromOpts.Human then
+        AddChatText('You cannot move the Player in slot '..moveFrom..' because they are not human.')
+        return
+    end
+
+    -- If we're moving a human onto an AI, evict the AI and move the player into the space.
+    if not toOpts.Human then
+        HostRemoveAI(moveTo)
+        HostTryMovePlayer(fromOpts.OwnerID, moveFrom, moveTo)
+        return
+    end
+
+    -- So we're switching two humans. (or moving a human to a blank).
+    -- Clear the ready flag for both targets.
+    setPlayerNotReady(moveTo)
+    setPlayerNotReady(moveFrom)
+
+    HostConvertPlayerToObserver(toOpts.OwnerID, toOpts.PlayerName, moveTo, false) -- Move Slot moveTo to Observer
+    HostTryMovePlayer(fromOpts.OwnerID, moveFrom, moveTo) -- Move Player moveFrom to Slot moveTo
+    HostConvertObserverToPlayer(toOpts.OwnerID, toOpts.PlayerName, FindObserverSlotForID(toOpts.OwnerID), moveFrom, toOpts.Faction, toOpts.PL, toOpts.RC, toOpts.NG, false)
+    SendSystemMessage(fromOpts.PlayerName..' has switched with '..toOpts.PlayerName, 'switch')
+end
+
+-- Instruct a player to unset their "ready" status. Should be called only by the host.
+local function setPlayerNotReady(slot)
+    local slotOptions = gameInfo.PlayerOptions[slot]
+    if slotOptions.Ready then
+        if not IsLocallyOwned(slot) then
+            lobbyComm:SendData(slotOptions.OwnerID, {Type = 'SetPlayerNotReady', Slot = slot})
         end
-    
-    else
-        if not pOpts[moveFrom].Human then
-            AddChatText('You cannot move the Player in slot '..moveFrom..' to slot '..moveTo..' because '..pOpts[moveFrom].PlayerName..' is not human.')
-        elseif moveFrom == moveTo then
-            AddChatText('You cannot move the Player in slot '..moveFrom..' to slot '..moveTo..' is equal.')
-        end
+        gameInfo.PlayerOptions[slot]['Ready'] = false
     end
 end
 
