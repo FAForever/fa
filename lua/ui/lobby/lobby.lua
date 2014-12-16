@@ -120,7 +120,7 @@ local quickRandMap = true
 
 local lastUploadedMap = nil
 
-local CPU_BenchmarkList = {} -- Stores CPU benchmark data
+local CPU_Benchmarks = {} -- Stores CPU benchmark data
 
 local playerMean = GetCommandLineArg("/mean", 1)
 local playerDeviation = GetCommandLineArg("/deviation", 1)
@@ -2230,9 +2230,9 @@ function HostTryAddPlayer(senderID, slot, requestedPlayerName, human, aiPersonal
     --\\ Stop RULE TITLE
     -- CPU benchmark code
     if human and not singlePlayer then
-        for i,benchmark in CPU_BenchmarkList do
+        for name, benchmark in pairs(CPU_Benchmarks) do
             -- If we're getting a new player, send them all our benchmark data for players who have joined already
-            lobbyComm:SendData(senderID, { Type = 'CPUBenchmark', PlayerName=benchmark.PlayerName, Result = benchmark.Result} )
+            lobbyComm:SendData(senderID, { Type = 'CPUBenchmark', PlayerName = name, Result = benchmark })
         end
     end
     -- End CPU benchmark code
@@ -4018,10 +4018,10 @@ function CreateUI(maxPlayers)
                             ping = math.floor(peer.ping)
                         end
                         -- CPU benchmark modified code
-                        local score_CPU =  FindBenchmarkForName(observer.PlayerName)
+                        local score_CPU = CPU_Benchmarks[observer.PlayerName]
                         local cputext = ""
                         if score_CPU then
-                            cputext = ", CPU = "..tostring(score_CPU.Result)
+                            cputext = ", CPU = "..tostring(score_CPU)
                         end
                         pingtext = LOC("<LOC lobui_0240> (Ping = ")..tostring(ping)
                         ratingtext = ", Rating = " .. tostring(observer.PL)
@@ -4029,10 +4029,10 @@ function CreateUI(maxPlayers)
                         GUI.observerList:ModifyItem(observer.ObserverListIndex, observer.PlayerName .. pingtext ..
                         ratingtext .. cputext .. ")")
                     elseif observer.OwnerID == localPlayerID then
-                        local score_CPU =  FindBenchmarkForName(observer.PlayerName)
+                        local score_CPU = CPU_Benchmarks[observer.PlayerName]
                         local cputext = ""
                         if score_CPU then
-                            cputext = ", CPU = "..tostring(score_CPU.Result)
+                            cputext = ", CPU = "..tostring(score_CPU)
                         end
                         pingtext = ""
                         ratingtext = " (Rating = "..tostring(observer.PL)
@@ -4717,7 +4717,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             -- CPU benchmark code
         elseif data.Type == 'CPUBenchmark' then
             --LOG("CPU Data: "..(data.PlayerName or "?")..", ".. (data.Result or "?"))
-            AddPlayerBenchmark(data)
+            CPU_Benchmarks[data.PlayerName] = data.Result
             local playerId = FindIDForName(data.PlayerName)
             local playerSlot = FindSlotForID(playerId)
             if playerSlot ~= nil then
@@ -5479,36 +5479,6 @@ local firstCPUTest = true
 local BenchTime
 
 --------------------------------------------------
---  CPU Benchmark Storage and Retrieval Functions
---------------------------------------------------
-function AddPlayerBenchmark(data)
-    --This function stores CPU benchmark results from the host
-    --and/or other players in the appropriate table.
-    --    data: The benchamark data to store {PlayerName, Result}
-    local alreadyExists = false
-    for i,benchmark in CPU_BenchmarkList do
-        if data.PlayerName == benchmark.PlayerName then
-            alreadyExists = true
-            CPU_BenchmarkList[i].Result = data.Result
-        end
-    end
-    if not alreadyExists then
-        table.insert(CPU_BenchmarkList, {PlayerName = data.PlayerName, Result = data.Result})
-    end
-end
-
-function FindBenchmarkForName(name)
-    --Given a playername, this function looks up the corresponding benchmark in the table and returns it
-    --A value of false is returned if the name is not in the benchmark table
-    for i,benchmark in CPU_BenchmarkList do
-        if name == benchmark.PlayerName then
-            return benchmark
-        end
-    end
-    return false
-end
-
---------------------------------------------------
 --  CPU Benchmarking Functions
 --------------------------------------------------
 function CPUBenchmark()
@@ -5620,8 +5590,8 @@ function StressCPU(waitTime)
     end
 
     --Get our last benchmark (if there was one)
-    local currentBestBenchmark = FindBenchmarkForName(localPlayerName)
-    if currentBestBenchmark == false then
+    local currentBestBenchmark = CPU_Benchmarks[localPlayerName]
+    if currentBestBenchmark == nil then
         currentBestBenchmark = 10000
     end
 
@@ -5646,7 +5616,7 @@ function StressCPU(waitTime)
             end
 
             --Add the benchmark to the local benchmark table
-            AddPlayerBenchmark({PlayerName = localPlayerName, Result = currentBestBenchmark})
+            CPU_Benchmarks[localPlayerName] = currentBestBenchmark
 
             --Update the UI bar
             UpdateCPUBar(localPlayerName)
@@ -5679,16 +5649,16 @@ function SetSlotCPUBar(slot, playerInfo)
     if GUI.slots[slot].CPUSpeedBar then
         GUI.slots[slot].CPUSpeedBar:Hide()
         if playerInfo.Human then
-            local b = FindBenchmarkForName(playerInfo.PlayerName)
+            local b = CPU_Benchmarks[playerInfo.PlayerName]
             if b then
                 -- For display purposes, the bar has a higher minimum that the actual barMin value.
                 -- This is to ensure that the bar is visible for very small values
 
-                local clampedResult =  math.max(math.min((b.Result * GetPlayerCount())/12, barMax), barMin + math.floor(.04 * (barMax - barMin)))
+                local clampedResult =  math.max(math.min((b * GetPlayerCount())/12, barMax), barMin + math.floor(.04 * (barMax - barMin)))
                 GUI.slots[slot].CPUSpeedBar:SetValue(clampedResult)
 
                 --For the tooltip, we use the actual clamped value
-                GUI.slots[slot].CPUSpeedBar.CPUActualValue = b.Result
+                GUI.slots[slot].CPUSpeedBar.CPUActualValue = b
 
 
                 GUI.slots[slot].CPUSpeedBar:Show()
