@@ -474,12 +474,9 @@ local function DoSlotBehavior(slot, key, name)
             end
         elseif IsObserver(localPlayerID) then
             if lobbyComm:IsHost() then
-                requestedFaction = Prefs.GetFromCurrentProfile('LastFaction')
-                requestedPL = playerRating
-                requestedRC = ratingColor
-                requestedNG = numGames
+                local requestedFaction = Prefs.GetFromCurrentProfile('LastFaction')
                 HostConvertObserverToPlayer(hostID, localPlayerName, FindObserverSlotForID(localPlayerID), slot,
-                                            requestedFaction, requestedPL, requestedRC, requestedNG)
+                                            requestedFaction, playerRating, ratingColor, numGames)
             else
                 lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer', RequestedName = localPlayerName, ObserverSlot =
                                    FindObserverSlotForID(localPlayerID), PlayerSlot = slot, requestedFaction =
@@ -4009,37 +4006,31 @@ function CreateUI(maxPlayers)
                     end
                 end
                 for slot, observer in gameInfo.Observers do
+                    -- Create a label for this observer of the form:
+                    -- PlayerName (R:xxx, P:xxx, C:xxx)
+                    -- Such conciseness is necessary as the field in the UI is rather narrow...
+                    local observer_label = observer.PlayerName .. " (R:" .. observer.PL
+
+                    -- Add the ping only if this entry refers to a different client.
                     if observer and (observer.OwnerID ~= localPlayerID) and observer.ObserverListIndex then
                         local peer = lobbyComm:GetPeer(observer.OwnerID)
-                        --Lobby "bug" fix.  This should fix the problem where the lobby pings get bugged.
-                        -- -Duck42
+
                         local ping = 0
                         if peer.ping ~= nil then
                             ping = math.floor(peer.ping)
                         end
-                        -- CPU benchmark modified code
-                        local score_CPU = CPU_Benchmarks[observer.PlayerName]
-                        local cputext = ""
-                        if score_CPU then
-                            cputext = ", CPU = "..tostring(score_CPU)
-                        end
-                        pingtext = LOC("<LOC lobui_0240> (Ping = ")..tostring(ping)
-                        ratingtext = ", Rating = " .. tostring(observer.PL)
-                        --PlayerName (Ping = xxx, Rating = xxx, CPU = xxx)
-                        GUI.observerList:ModifyItem(observer.ObserverListIndex, observer.PlayerName .. pingtext ..
-                        ratingtext .. cputext .. ")")
-                    elseif observer.OwnerID == localPlayerID then
-                        local score_CPU = CPU_Benchmarks[observer.PlayerName]
-                        local cputext = ""
-                        if score_CPU then
-                            cputext = ", CPU = "..tostring(score_CPU)
-                        end
-                        pingtext = ""
-                        ratingtext = " (Rating = "..tostring(observer.PL)
-                        --PlayerName (Rating = xxx, CPU = xxx)
-                        GUI.observerList:ModifyItem(observer.ObserverListIndex, observer.PlayerName..ratingtext .. cputext..")")
-                        -- End CPU benchmark modified code
+
+                        observer_label = observer_label .. ", P:" .. ping
                     end
+
+                    -- Add the CPU score if one is available.
+                    local score_CPU = FindBenchmarkForName(observer.PlayerName)
+                    if score_CPU then
+                        observer_label = observer_label .. ", C:" .. score_CPU.Result
+                    end
+                    observer_label = observer_label .. ")"
+
+                    GUI.observerList:ModifyItem(observer.ObserverListIndex, observer_label)
                 end
                 WaitSeconds(1)
             end
