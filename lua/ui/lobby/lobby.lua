@@ -124,6 +124,7 @@ local CPU_Benchmarks = {} -- Stores CPU benchmark data
 
 local playerMean = GetCommandLineArg("/mean", 1)
 local playerDeviation = GetCommandLineArg("/deviation", 1)
+local playerClan = GetCommandLineArg("/clan", 1)
 
 local ratingColor = GetCommandLineArg("/ratingcolor", 1)
 local numGames = GetCommandLineArg("/numgames", 1)
@@ -151,6 +152,10 @@ if playerDeviation then
     playerDeviation = tonumber(playerDeviation[1])
 else
     playerDeviation = 500
+end
+
+if playerClan then
+    playerClan = tostring(playerClan[1])
 end
 
 
@@ -578,6 +583,9 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
         GUI.connectdialog = UIUtil.ShowInfoDialog(GUI, Strings.TryingToConnect, Strings.AbortConnect, ReturnToMenu)
 		GUI.connectdialog.Depth:Set(GetFrame(GUI:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 999)
 
+        if playerClan then
+            desiredPlayerName = string.format('[%s] %s', playerClan, desiredPlayerName)
+        end
         InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
 
         -- Store off the validated playername
