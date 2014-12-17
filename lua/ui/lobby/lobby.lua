@@ -724,6 +724,7 @@ function SetSlotInfo(slot, playerInfo)
         hostKey = 'client'
     end
 
+    -- These states are used to select the appropriate strings with GetSlotMenuTables.
     local slotState
     if not playerInfo.Human then
         slotState = 'ai'
@@ -774,11 +775,11 @@ function SetSlotInfo(slot, playerInfo)
     if slotState == 'ai' then
         GUI.slots[slot].name:SetTitleTextColor("dbdbb9") -- Beige Color for AI
         GUI.slots[slot].name._text:SetFont('Arial Gras', 12)
+    elseif FindSlotForID(hostID) == slot then
+        GUI.slots[slot].name:SetTitleTextColor("ffc726") -- Orange Color for Host
+        GUI.slots[slot].name._text:SetFont('Arial Gras', 15)
     elseif slotState == 'player' then
         GUI.slots[slot].name:SetTitleTextColor("64d264") -- Green Color for Players
-        GUI.slots[slot].name._text:SetFont('Arial Gras', 15)
-    elseif slotState == 'host' then
-        GUI.slots[slot].name:SetTitleTextColor("ffc726") -- Orange Color for Host
         GUI.slots[slot].name._text:SetFont('Arial Gras', 15)
     elseif isLocallyOwned then
         GUI.slots[slot].name:SetTitleTextColor("6363d2") -- Blue Color for You
