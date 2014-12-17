@@ -727,8 +727,6 @@ function SetSlotInfo(slot, playerInfo)
     local slotState
     if not playerInfo.Human then
         slotState = 'ai'
-    elseif FindSlotForID(hostID) == slot then
-        slotState = 'host'
     elseif not isLocallyOwned then
         slotState = 'player'
     else
