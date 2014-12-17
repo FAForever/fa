@@ -348,11 +348,13 @@ local function GetSlotMenuTables(stateKey, hostKey)
     local strings = {}
 
     if not slotMenuData[stateKey] then
-        ERROR("Invalid slot menu state selected: " .. stateKey)
+        WARN("Invalid slot menu state selected: " .. stateKey)
+        return nil
     end
 
     if not slotMenuData[stateKey][hostKey] then
-        ERROR("Invalid slot menu host key selected: " .. hostKey)
+        WARN("Invalid slot menu host key selected: " .. hostKey)
+        return nil
     end
 
     local isPlayerReady = false
