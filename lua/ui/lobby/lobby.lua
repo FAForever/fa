@@ -2627,9 +2627,9 @@ function CreateUI(maxPlayers)
             LayoutHelpers.FillParentPreserveAspectRatio(GUI.background2, GUI)
         end
     elseif singlePlayer then
-        title = "<LOC _Skirmish_Setup>"
+        title = LOC("<LOC _Skirmish_Setup>")
     else
-        title = "<LOC _LAN_Game_Lobby>"
+        title = LOC("<LOC _LAN_Game_Lobby>")
     end
 
     ---------------------------------------------------------------------------
