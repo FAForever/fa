@@ -74,26 +74,32 @@ end
 
 DecalFunctions = {
     RULEUCC_Nuke = function()
-        local reticleSize = 0
-        local invalidCursor = false
-        local validAttackersSelection = GetValidAttackingUnits()
-        if validAttackersSelection and table.getn(validAttackersSelection) > 0 then
-            for index, unit in validAttackersSelection do
-                if unit:GetBlueprint().Display.AttackReticleSize then
-                    reticleSize = math.max(unit:GetBlueprint().Display.AttackReticleSize, reticleSize)
+        local InnerSize = 0
+        local OuterSize = 0
+        local Invalid = false
+        local ValidAttackers = GetValidAttackingUnits()
+        
+        if ValidAttackers and table.getn(ValidAttackers) > 0 then
+            for index, unit in ValidAttackers do
+                local bp = unit:GetBlueprint()
+                for i, w in bp.Weapon do
+                    if w.CountedProjectile == true and w.NukeWeapon == true then
+                        -- Needs to be re-scaled to correspond to ingame radius values
+                        InnerSize = w.NukeInnerRingRadius * 2
+                        OuterSize = w.NukeOuterRingRadius * 2
+                    end
                 end
             end
         else
-            invalidCursor = true      
+            Invalid = true
         end
-        -- if no size specd, use default of 60
-        if reticleSize == 0 then 
-            reticleSize = 60 
+        
+        if InnerSize == 0 or OuterSize == 0 then
+            WARN('Nuke decal called for non-nuclear weapon')
         end
-        return invalidCursor, "/textures/ui/common/game/AreaTargetDecal/nuke_icon_small.dds", Vector(reticleSize, 1, reticleSize)
+        return Invalid, "/textures/ui/common/game/AreaTargetDecal/nuke_icon_outer.dds", Vector(OuterSize, 1, OuterSize), "/textures/ui/common/game/AreaTargetDecal/nuke_icon_inner.dds", Vector(InnerSize, 1, InnerSize)
     end,
     RULEUCC_Attack = AttackDecalFunc,
-    #RULEUCC_Tactical = AttackDecalFunc,
 }
 
 WorldView = Class(moho.UIWorldView, Control) {
@@ -123,6 +129,8 @@ WorldView = Class(moho.UIWorldView, Control) {
             self.LastCursor = nil
             if self.TargetDecal then
                 self.TargetDecal:Destroy()
+                self.TargetDecal2:Destroy()
+                self.TargetDecal2 = false
                 self.TargetDecal = false
                 self.DecalTexture = false
                 self.DecalScale = false
@@ -136,6 +144,9 @@ WorldView = Class(moho.UIWorldView, Control) {
         local newDecalTexture = false
         local newScale = Vector(0,0,0)
         local mode = import('/lua/ui/game/commandmode.lua').GetCommandMode()
+        local outer = false
+        local outerScale = Vector(0,0,0)
+        
         self.NeedTargetDecal = false
         if mode[1] == "order" then
             local showInvalidTargetCursor = false
@@ -143,7 +154,7 @@ WorldView = Class(moho.UIWorldView, Control) {
                 self.Cursor = {UIUtil.GetCursor("MOVE2PATROLCOMMAND")}
             else
                 if DecalFunctions[mode[2].name] then
-                    showInvalidTargetCursor, newDecalTexture, newScale = DecalFunctions[mode[2].name]()
+                    showInvalidTargetCursor, newDecalTexture, newScale, outer, outerScale = DecalFunctions[mode[2].name]()
                     self.NeedTargetDecal = not showInvalidTargetCursor
                 end
                 if showInvalidTargetCursor then
@@ -185,19 +196,25 @@ WorldView = Class(moho.UIWorldView, Control) {
         if self.NeedTargetDecal then
             if not self.TargetDecal then
                 self.TargetDecal = UserDecal {}
+                self.TargetDecal2 = UserDecal {}
             end
             if newDecalTexture and self.DecalTexture != newDecalTexture then
                 self.TargetDecal:SetTexture(newDecalTexture)
                 self.DecalTexture = newDecalTexture
+                self.TargetDecal2:SetTexture(outer)--
             end
             if newScale and self.DecalScale != newScale then
                 self.TargetDecal:SetScale(newScale)
                 self.DecalScale = newScale
+                self.TargetDecal2:SetScale(outerScale)
             end
             self.TargetDecal:SetPosition(GetMouseWorldPos())
+            self.TargetDecal2:SetPosition(GetMouseWorldPos())
         elseif self.TargetDecal then
             self.TargetDecal:Destroy()
             self.TargetDecal = false
+            self.TargetDecal2:Destroy()
+            self.TargetDecal2 = false
             self.DecalTexture = false
             self.DecalScale = false
         end
