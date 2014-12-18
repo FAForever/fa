@@ -5855,7 +5855,7 @@ function SetEvent_Faction_Selector()
 end
 
 function SetCurrentFactionTo_Faction_Selector(input_faction)
-    local faction = input_faction or Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
+    local faction = input_faction or Prefs.GetFromCurrentProfile('LastFaction') or 1
     if AeonFactionPanel and CybranFactionPanel and UEFFactionPanel and SeraphimFactionPanel and RandomFactionPanel then
         ChangeSkinByFaction(faction)
         ChangeSkinButtonByFaction(faction)
@@ -6055,7 +6055,7 @@ function ChangeBackgroundLobby(slot, faction)
 			LOGX('>> Background EXTRA', 'Background')
             GUI.background:Show()
             GUI.background2:Hide()
-            faction = faction or Prefs.GetFromCurrentProfile('LastFaction') or 'uef'
+            faction = faction or Prefs.GetFromCurrentProfile('LastFaction') or 1
             if DiskGetFileInfo("/Mods/Lobby Background/mod_info.lua") then
                 settings = import("/Mods/Lobby Background/mod_info.lua")
                 if settings.BackgroundType == 1 then
