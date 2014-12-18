@@ -6149,9 +6149,10 @@ function CreateOptionLobbyDialog()
     slider_Chat_SizeFont:SetValue(currentFontSize)
 
 	slider_Chat_SizeFont.OnValueChanged = function(self, newValue)
-        slider_Chat_SizeFont_TEXT:SetText('Chat Size Font : '..string.format('%3d', slider_Chat_SizeFont._currentValue()))
-        GUI.chatDisplay:SetFont(UIUtil.bodyFont, tonumber(string.format('%3d', slider_Chat_SizeFont._currentValue())))
-        Prefs.SetToCurrentProfile('LobbyChatFontSize', tonumber(string.format('%3d', slider_Chat_SizeFont._currentValue())))
+        local sliderValue = math.floor(slider_Chat_SizeFont._currentValue())
+        slider_Chat_SizeFont_TEXT:SetText('Chat Size Font : '..sliderValue)
+        GUI.chatDisplay:SetFont(UIUtil.bodyFont, sliderValue)
+        Prefs.SetToCurrentProfile('LobbyChatFontSize', sliderValue)
 	end
 	--
     local cbox_WindowedLobby = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
