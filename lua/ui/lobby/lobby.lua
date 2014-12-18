@@ -4047,8 +4047,8 @@ function CreateUI(maxPlayers)
             local getNorush = gameInfo.GameOptions['NoRushOption'] -- 'Off'
             local getNumbMod = table.getn(Mods.GetGameMods(gameInfo.GameMods)) -- 0 for the purposes of this function
             local getRstric = gameInfo.GameOptions.RestrictedCategories --can be nil or a table, even if no restrictions are present
-            if (getVictory == 'demoralization' and getCheat == 'false' and getSpeed == 'normal' and getFog == 'explored' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and getRstric == nil) or
-			(getVictory == 'demoralization' and getCheat == 'false' and getSpeed == 'normal' and getFog == 'explored' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and table.getn(getRstric) == 0) then
+            if getRstric == nil or table.getn(getRstric) == 0 then getRstric = true else getRstric = false end
+            if (getVictory == 'demoralization' and getCheat == 'false' and getSpeed == 'normal' and getFog == 'explored' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and getRstric) then
                 GUI.RankedLabel:SetText("Game is Ranked")
                 GUI.RankedLabel:SetColor("77ff77")
             else
