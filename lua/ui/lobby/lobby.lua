@@ -1435,6 +1435,25 @@ function ReturnToMenu(reconnect)
     end
 end
 
+-- Display, if appropriate, a system message.
+function DisplaySystemMessage(data)
+    -- If the message is related to use connectivity and the user has turned off system messages,
+    -- don't display the message.'
+
+    --switch = Player switched with other Player
+    --lobui_0202 = Joined as a Observer
+    --lobui_0226 = Move Player to Observer
+    --lobui_0227 = Move Observer to Player
+    --lobui_0205 = Timed Out
+    if data.Id == 'lobui_0202' or data.Id == 'lobui_0226' or data.Id == 'lobui_0227' or data.Id == 'lobui_0205' or data.Id == 'switch' then
+        if not SystemMessagesEnabled() then
+            return
+        end
+    end
+
+    AddChatText(data.Text)
+end
+
 function SendSystemMessage(text, id)
     local data = {
         Type = "SystemMessage",
@@ -1442,13 +1461,7 @@ function SendSystemMessage(text, id)
         Id = id or '',
     }
     lobbyComm:BroadcastData(data)
-    if data.Id == 'lobui_0202' or data.Id == 'lobui_0226' or data.Id == 'lobui_0227' or data.Id == 'lobui_0205' or data.Id == 'switch' then
-        if SystemMessagesEnabled() then
-            AddChatText(text)
-        end
-    else
-        AddChatText(text)
-    end
+    DisplaySystemMessage(data)
 end
 
 function PublicChat(text)
@@ -4768,18 +4781,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             end
         else -- Non-host only messages
             if data.Type == 'SystemMessage' then
-                --switch = Player switched with other Player
-                --lobui_0202 = Joinned as a Observer
-                --lobui_0226 = Move Player to Observer
-                --lobui_0227 = Move Observer to Player
-                --lobui_0205 = Timed Out
-                if data.Id == 'lobui_0202' or data.Id == 'lobui_0226' or data.Id == 'lobui_0227' or data.Id == 'lobui_0205' or data.Id == 'switch' then
-                    if SystemMessagesEnabled() then
-                        AddChatText(data.Text)
-                    end
-                else
-                    AddChatText(data.Text)
-                end
+                DisplaySystemMessage(data)
             elseif data.Type == 'SetAllPlayerNotReady' then
                 EnableSlot(FindSlotForID(FindIDForName(localPlayerName)))
                 if GUI.becomeObserver then
