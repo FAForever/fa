@@ -5907,92 +5907,51 @@ function ChangeSkinByFaction(input_faction)
     end
 end
 
+-- If a control has two textures, _up.png and _dis.png, to be used based on its enabledness, set
+-- the appropriate one based on its current state.
+function setEnablednessTexture(control, path)
+    -- TODO: Really, we should just make sure we don't do ForceApplyNewSkin() before the UI exists...
+    if not control then
+        return
+    end
+
+    if control:IsDisabled() then
+        control:SetTexture(UIUtil.UIFile(path .. '/_dis.png'))
+    else
+        control:SetTexture(UIUtil.UIFile(path .. '/_up.png'))
+    end
+end
+
 -- New skin (2013)
 function ForceApplyNewSkin()
-    if not GUI.LobbyOptions:IsDisabled() then
-        GUI.LobbyOptions:SetTexture(UIUtil.UIFile('/BUTTON/small/_up.png'))
-    else
-        GUI.LobbyOptions:SetTexture(UIUtil.UIFile('/BUTTON/small/_dis.png'))
-    end
+    setEnablednessTexture(GUI.LobbyOptions, '/BUTTON/small')
     -- Exit button
-    if GUI.exitButton:IsDisabled() then
-        GUI.exitButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_dis.png'))
-    else
-        GUI.exitButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_up.png'))
-    end
+    setEnablednessTexture(GUI.exitButton, '/BUTTON/medium')
     -- StartGame show only if you Host and Enable only if All Player is Ready.
     if lobbyComm:IsHost() then
-        if not GUI.launchGameButton:IsDisabled() then--and GetPlayersNotReady() then
+        if not GUI.launchGameButton:IsDisabled() then
             if GetPlayersNotReady() then
-                GUI.launchGameButton:SetTexture(UIUtil.UIFile('/BUTTON/large/_dis.png'))
+                GUI.launchGameButton:Disable()
             else
-                GUI.launchGameButton:SetTexture(UIUtil.UIFile('/BUTTON/large/_up.png'))
+                GUI.launchGameButton:Enable()
             end
-        else--if GUI.launchGameButton:IsDisabled() then--and not GetPlayersNotReady() then
-            GUI.launchGameButton:SetTexture(UIUtil.UIFile('/BUTTON/large/_dis.png'))
         end
-    end
-    -- GameOption show only if you Host, else ModManager is show.
-    if lobbyComm:IsHost() then
-        if not GUI.gameoptionsButton:IsDisabled() then
-            GUI.gameoptionsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_up.png'))
-        elseif GUI.gameoptionsButton:IsDisabled() then
-            GUI.gameoptionsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_dis.png'))
-        end
-    end
-    if not lobbyComm:IsHost() then
-        if not GUI.gameoptionsButton:IsDisabled() then
-            GUI.gameoptionsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_up.png'))
-        elseif GUI.gameoptionsButton:IsDisabled() then
-            GUI.gameoptionsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_dis.png'))
-        end
+
+        setEnablednessTexture(GUI.launchGameButton, '/BUTTON/large')
+
+        -- GameOption show only if you Host, else ModManager is show.
+        setEnablednessTexture(GUI.gameoptionsButton, '/BUTTON/medium')
     end
     -- Restricted Unit show only if not you Host, else Preset Lobby is show.
     -- Now if is Host, is a Preset button.
-    --if not lobbyComm:IsHost() then
-    if GUI.restrictedUnitsButton then
-        if GUI.restrictedUnitsButton:IsDisabled() then -- SI PAS DISABLED ALORS
-            GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_dis.png'))
-        else
-            GUI.restrictedUnitsButton:SetTexture(UIUtil.UIFile('/BUTTON/medium/_up.png'))
-        end
-    end
+    setEnablednessTexture(GUI.restrictedUnitsButton, '/BUTTON/medium')
+
     -- Observer, AutoTeam, RankedOpts, CPUBench, RandomMap.
-    if GUI.becomeObserver then
-        if not GUI.becomeObserver:IsDisabled() then
-            GUI.becomeObserver:SetTexture(UIUtil.UIFile('/BUTTON/observer/_up.png'))
-        elseif GUI.becomeObserver:IsDisabled() then
-            GUI.becomeObserver:SetTexture(UIUtil.UIFile('/BUTTON/observer/_dis.png'))
-        end
-    end
-    if GUI.randTeam then
-        if not GUI.randTeam:IsDisabled() then
-            GUI.randTeam:SetTexture(UIUtil.UIFile('/BUTTON/autoteam/_up.png'))
-        elseif GUI.randTeam:IsDisabled() then
-            GUI.randTeam:SetTexture(UIUtil.UIFile('/BUTTON/autoteam/_dis.png'))
-        end
-    end
-    if GUI.rankedOptions then
-        if not GUI.rankedOptions:IsDisabled() then
-            GUI.rankedOptions:SetTexture(UIUtil.UIFile('/BUTTON/defaultoption/_up.png'))
-        elseif GUI.rankedOptions:IsDisabled() then
-            GUI.rankedOptions:SetTexture(UIUtil.UIFile('/BUTTON/defaultoption/_dis.png'))
-        end
-    end
-    if GUI.rerunBenchmark then
-        if not GUI.rerunBenchmark:IsDisabled() then
-            GUI.rerunBenchmark:SetTexture(UIUtil.UIFile('/BUTTON/cputest/_up.png'))
-        elseif GUI.rerunBenchmark:IsDisabled() then
-            GUI.rerunBenchmark:SetTexture(UIUtil.UIFile('/BUTTON/cputest/_dis.png'))
-        end
-    end
-    if GUI.randMap then
-        if not GUI.randMap:IsDisabled() then
-            GUI.randMap:SetTexture(UIUtil.UIFile('/BUTTON/randommap/_up.png'))
-        elseif GUI.randMap:IsDisabled() then
-            GUI.randMap:SetTexture(UIUtil.UIFile('/BUTTON/randommap/_dis.png'))
-        end
-    end
+    setEnablednessTexture(GUI.becomeObserver, '/BUTTON/observer')
+    setEnablednessTexture(GUI.randTeam, '/BUTTON/autoteam')
+    setEnablednessTexture(GUI.rankedOptions, '/BUTTON/defaultoption')
+    setEnablednessTexture(GUI.rerunBenchmark, '/BUTTON/cputest')
+    setEnablednessTexture(GUI.randMap, '/BUTTON/randommap')
 end
 
 function ChangeSkinButtonByFaction(input_faction)
