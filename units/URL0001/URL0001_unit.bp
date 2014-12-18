@@ -974,6 +974,7 @@ UnitBlueprint {
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
+                Seabed = 'Land|Water|Seabed',
             },
             FiringTolerance = 0.25,
             HeadingArcCenter = 0,
@@ -1092,3 +1093,4 @@ UnitBlueprint {
         },
     },
 }
+>>>>>>> Allow ACU Laser to fire when standing in water
