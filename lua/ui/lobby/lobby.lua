@@ -703,6 +703,12 @@ function IsObserver(id)
     return FindObserverSlotForID(id) ~= nil
 end
 
+-- Returns true if system messages are enabled.
+function SystemMessagesEnabled()
+    local LobbySystemMessagesEnabled = Prefs.GetFromCurrentProfile('LobbySystemMessagesEnabled') or 'true'
+    return LobbySystemMessagesEnabled == 'true'
+end
+
 
 -- update the data in a player slot
 function SetSlotInfo(slot, playerInfo)
@@ -800,8 +806,7 @@ function SetSlotInfo(slot, playerInfo)
     if wasConnected(playerInfo.OwnerID) or isLocallyOwned then
         GUI.slots[slot].name:SetTitleText(playerInfo.PlayerName)
         GUI.slots[slot].name._text:SetFont('Arial Gras', 15)
-        local LobbySystemMessagesEnabled = Prefs.GetFromCurrentProfile('LobbySystemMessagesEnabled') or 'false'
-        if LobbySystemMessagesEnabled == 'true' then
+        if SystemMessagesEnabled() then
             if not table.find(ConnectionEstablished, playerInfo.PlayerName) then
                 if playerInfo.Human and not isLocallyOwned then
                     if table.find(ConnectedWithProxy, playerInfo.OwnerID) then
@@ -822,8 +827,7 @@ function SetSlotInfo(slot, playerInfo)
     else
         GUI.slots[slot].name:SetTitleText('Connecting to ... ' .. playerInfo.PlayerName)
         GUI.slots[slot].name._text:SetFont('Arial Gras', 11)
-        local LobbySystemMessagesEnabled = Prefs.GetFromCurrentProfile('LobbySystemMessagesEnabled') or 'false'
-        if LobbySystemMessagesEnabled == 'true' then
+        if SystemMessagesEnabled() then
             if not table.find(CurrentConnection, playerInfo.PlayerName) then
                 AddChatText('Connecting to '..playerInfo.PlayerName..' ...')
                 table.insert(CurrentConnection, playerInfo.PlayerName)
@@ -1439,8 +1443,7 @@ function SendSystemMessage(text, id)
     }
     lobbyComm:BroadcastData(data)
     if data.Id == 'lobui_0202' or data.Id == 'lobui_0226' or data.Id == 'lobui_0227' or data.Id == 'lobui_0205' or data.Id == 'switch' then
-        local LobbySystemMessagesEnabled = Prefs.GetFromCurrentProfile('LobbySystemMessagesEnabled') or 'false'
-        if LobbySystemMessagesEnabled == 'true' then
+        if SystemMessagesEnabled() then
             AddChatText(text)
         end
     else
@@ -4242,8 +4245,7 @@ function CreateUI(maxPlayers)
             if not wasConnected(peer.id) then
                 GUI.slots[FindSlotForID(peer.id)].name:SetTitleText(peer.name)
                 GUI.slots[FindSlotForID(peer.id)].name._text:SetFont('Arial Gras', 15)
-                local LobbySystemMessagesEnabled = Prefs.GetFromCurrentProfile('LobbySystemMessagesEnabled') or 'false'
-                if LobbySystemMessagesEnabled == 'true' then
+                if SystemMessagesEnabled() then
                     if not table.find(ConnectionEstablished, peer.name) then
                         --AddChatText('<< '..peer.name..' >> '..FindSlotForID(peer.id)..' || '..tostring(gameInfo.PlayerOptions[FindSlotForID(peer.id)].Human)..' || '..tostring(IsLocallyOwned(FindSlotForID(peer.id))))
                         if gameInfo.PlayerOptions[FindSlotForID(peer.id)].Human and not IsLocallyOwned(FindSlotForID(peer.id)) then                            if table.find(ConnectedWithProxy, peer.id) then
@@ -4772,8 +4774,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 --lobui_0227 = Move Observer to Player
                 --lobui_0205 = Timed Out
                 if data.Id == 'lobui_0202' or data.Id == 'lobui_0226' or data.Id == 'lobui_0227' or data.Id == 'lobui_0205' or data.Id == 'switch' then
-                    local LobbySystemMessagesEnabled = Prefs.GetFromCurrentProfile('LobbySystemMessagesEnabled') or 'false'
-                    if LobbySystemMessagesEnabled == 'true' then
+                    if SystemMessagesEnabled() then
                         AddChatText(data.Text)
                     end
                 else
@@ -6260,8 +6261,7 @@ function CreateOptionLobbyDialog()
     local LobbyBackgroundStretch = Prefs.GetFromCurrentProfile('LobbyBackgroundStretch') or 'true'
     cbox_StretchBG:SetCheck(LobbyBackgroundStretch == 'true', true)
     --
-    local LobbySystemMessagesEnabled = Prefs.GetFromCurrentProfile('LobbySystemMessagesEnabled') or 'false'
-    cbox_SMsg:SetCheck(LobbySystemMessagesEnabled == 'true', true)
+    cbox_SMsg:SetCheck(SystemMessagesEnabled(), true)
 end
 
 --------------------------------------------------------------------------------------
