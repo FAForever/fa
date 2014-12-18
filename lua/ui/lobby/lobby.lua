@@ -102,7 +102,7 @@ else
 end
 --\\ Stop - Get a value on /Country CommandLine in FA.exe
 
-local LASTLobbyBackground = '' -- For prevent the infinite loop to Background
+local LASTLobbyBackground = 0 -- For prevent the infinite loop to Background
 
 local connectedTo = {} -- by UID
 CurrentConnection = {} -- by Name
@@ -1934,7 +1934,10 @@ local function UpdateGame()
     -- Send autoteams infos to server.
     AssignRandomTeams(gameInfo)
 
-    if LASTLobbyBackground == 'Map' then ChangeBackgroundLobby(nil, nil) end-- For update map background
+    -- Update the map background to reflect the possibly-changed map.
+    if LASTLobbyBackground == 4 then
+        ChangeBackgroundLobby(nil, nil)
+    end
 
     if gameInfo.GameOptions['TeamSpawn'] ~= 'random' and math.mod(numPlayers,2) == 0 and gameInfo.GameOptions['AutoTeams'] ~=
         'manual' and gameInfo.GameOptions['AutoTeams'] ~= 'none' then
@@ -6014,9 +6017,9 @@ function ChangeSkinButtonByFaction(input_faction)
 end
 
 function ChangeBackgroundLobby(slot, faction)
-    local LobbyBackground = Prefs.GetFromCurrentProfile('LobbyBackground') or 'Factions'
+    local LobbyBackground = Prefs.GetFromCurrentProfile('LobbyBackground') or 1
     if GUI.background and GUI.background2 then
-        if LobbyBackground == 'Factions' then
+        if LobbyBackground == 1 then -- Factions
 			LOGX('>> Background FACTION', 'Background')
             GUI.background:Show()
             GUI.background2:Hide()
@@ -6027,23 +6030,23 @@ function ChangeBackgroundLobby(slot, faction)
             else
                 GUI.background:SetTexture("/textures/ui/common/BACKGROUND/faction/faction-background-paint_" .. FACTION_NAMES[faction] .. "_bmp.png")
             end
-            LASTLobbyBackground = 'Factions'
+            LASTLobbyBackground = 1
 
-        elseif LobbyBackground == 'Concept Art' then--and LASTBackgroundSelected ~= BackgroundSelected then
+        elseif LobbyBackground == 2 then -- Concept art
 			LOGX('>> Background ART', 'Background')
             GUI.background:Show()
             GUI.background2:Hide()
             GUI.background:SetTexture("/textures/ui/common/BACKGROUND/art/art-background-paint0"..math.random(1, 5).."_bmp.dds")
-            LASTLobbyBackground = 'Concept Art'
+            LASTLobbyBackground = 2
 
-        elseif LobbyBackground == 'Screenshot' then--and LASTBackgroundSelected ~= BackgroundSelected then
+        elseif LobbyBackground == 3 then -- Screenshot
 			LOGX('>> Background SCREENSHOT', 'Background')
             GUI.background:Show()
             GUI.background2:Hide()
             GUI.background:SetTexture("/textures/ui/common/BACKGROUND/scrn/scrn-background-paint"..math.random(1, 14).."_bmp.dds")
-            LASTLobbyBackground = 'Screenshot'
+            LASTLobbyBackground = 3
 
-        elseif LobbyBackground == 'Map' then--and LASTBackgroundSelected ~= BackgroundSelected then -- LASTBac... is for avoided loop set texture, when you change faction
+        elseif LobbyBackground == 4 then -- Map
             LOGX('>> Background MAP', 'Background')
             GUI.background:Hide()
             GUI.background2:Show()
@@ -6060,16 +6063,16 @@ function ChangeBackgroundLobby(slot, faction)
             else
                 GUI.background2:ClearTexture()
             end
-            LASTLobbyBackground = 'Map'
+            LASTLobbyBackground = 4
 
-        elseif LobbyBackground == 'None' and LASTLobbyBackground ~= LobbyBackground then -- LASTBac... is for avoided loop set texture, when you change faction
+        elseif LobbyBackground == 5 and LASTLobbyBackground ~= LobbyBackground then -- None
             LOGX('>> Background NOTHING', 'Background')
             GUI.background:Hide()
             GUI.background2:Hide()
             GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/background-paint_black_bmp.png"))
-            LASTLobbyBackground = 'None'
+            LASTLobbyBackground = 5
 
-        elseif LobbyBackground == 'Extra' then
+        elseif LobbyBackground == 6 then -- Extra
 			LOGX('>> Background EXTRA', 'Background')
             GUI.background:Show()
             GUI.background2:Hide()
@@ -6096,48 +6099,51 @@ function ChangeBackgroundLobby(slot, faction)
             else
                 GUI.background:SetTexture("/textures/ui/common/BACKGROUND/background-paint_black_bmp.png")
             end
-            LASTLobbyBackground = 'Extra'
+            LASTLobbyBackground = 6
         end
     end
 end
-
 
 
 function CreateOptionLobbyDialog()
     local dialog = Group(GUI)
     LayoutHelpers.AtCenterIn(dialog, GUI)
     dialog.Depth:Set(GetFrame(dialog:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 1)
+
     local background = Bitmap(dialog, '/textures/ui/common/scx_menu/lan-game-lobby/optionlobby.png')
     dialog.Width:Set(background.Width)
     dialog.Height:Set(background.Height)
     LayoutHelpers.FillParent(background, dialog)
+
     local dialog2 = Group(dialog)
     dialog2.Width:Set(526)
     dialog2.Height:Set(350)
     LayoutHelpers.AtCenterIn(dialog2, dialog)
 
-    -- Background switching radiobutton.
+    -- The provided radiobutton control doesn't allow satellite data, so we use the index in this
+    -- list as our stored background mode value.
     local backgroundStates = {
-        "Factions",
-        "Concept Art",
-        "Screenshot",
-        "Map",
-        "None",
-        "Extra"
+        LOC("<LOC lobui_0406>"), -- Factions
+        LOC("<LOC lobui_0407>"), -- Concept art
+        LOC("<LOC lobui_0408>"), -- Screenshot
+        LOC("<LOC lobui_0409>"), -- Map
+        LOC("<LOC lobui_0410>"), -- None
+        LOC("<LOC lobui_0411>")  -- Extra
     }
-    local selectedBackgroundState = Prefs.GetFromCurrentProfile("LobbyBackground") or "Factions"
-    local backgroundRadiobutton = UIUtil.CreateRadioButtonsStdPNG(dialog2, '/CHECKBOX/radio', "Lobby background", backgroundStates, selectedBackgroundState)
+    local selectedBackgroundState = backgroundStates[Prefs.GetFromCurrentProfile("LobbyBackground") or 1]
+    local backgroundRadiobutton = UIUtil.CreateRadioButtonsStdPNG(dialog2, '/CHECKBOX/radio', LOC("<LOC lobui_0405>"), backgroundStates, selectedBackgroundState)
 
     LayoutHelpers.AtLeftTopIn(backgroundRadiobutton, dialog2, 20, 20)
 
     backgroundRadiobutton.OnChoose = function(self, button)
-        Prefs.SetToCurrentProfile("LobbyBackground", button)
+        local backgroundMode = indexOf(backgroundStates, button)
+        Prefs.SetToCurrentProfile("LobbyBackground", backgroundMode)
         ChangeBackgroundLobby(nil, nil)
     end
 	--
 	local Slider = import('/lua/maui/slider.lua').Slider
 	local currentFontSize = Prefs.GetFromCurrentProfile('XinnoChatSizeFont') or 14
-	local slider_Chat_SizeFont_TEXT = UIUtil.CreateText(dialog2, 'Chat Font Size: '.. currentFontSize, 14, 'Arial')
+	local slider_Chat_SizeFont_TEXT = UIUtil.CreateText(dialog2, LOC("<LOC lobui_0404>").. currentFontSize, 14, 'Arial')
     slider_Chat_SizeFont_TEXT:SetColor('B9BFB9')
     slider_Chat_SizeFont_TEXT:SetDropShadow(true)
     LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont_TEXT, dialog2, 20, 155)
@@ -6155,8 +6161,8 @@ function CreateOptionLobbyDialog()
     local cbox_WindowedLobby = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
     LayoutHelpers.AtRightIn(cbox_WindowedLobby, dialog2, 20)
     LayoutHelpers.AtTopIn(cbox_WindowedLobby, dialog2, 20)
-    Tooltip.AddCheckboxTooltip(cbox_WindowedLobby, {text='Windowed mode', body='Lobby is windowed until launch'})
-    local cbox_WindowedLobby_TEXT = UIUtil.CreateText(cbox_WindowedLobby, 'Windowed mode', 14, 'Arial')
+    Tooltip.AddCheckboxTooltip(cbox_WindowedLobby, {text='Windowed mode', body=LOC("<LOC lobui_0403>")})
+    local cbox_WindowedLobby_TEXT = UIUtil.CreateText(cbox_WindowedLobby, LOC("<LOC lobui_0402>"), 14, 'Arial')
     cbox_WindowedLobby_TEXT:SetColor('B9BFB9')
     cbox_WindowedLobby_TEXT:SetDropShadow(true)
     LayoutHelpers.AtRightIn(cbox_WindowedLobby_TEXT, cbox_WindowedLobby, 25)
@@ -6174,8 +6180,8 @@ function CreateOptionLobbyDialog()
     --
     local cbox_StretchBG = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
     LayoutHelpers.AtRightTopIn(cbox_StretchBG, dialog2, 20, 60)
-    Tooltip.AddCheckboxTooltip(cbox_StretchBG, {text='Stretch Background', body='Stretch background to fill screen.'})
-    local cbox_StretchBG_TEXT = UIUtil.CreateText(cbox_StretchBG, 'Stretch Background', 14, 'Arial')
+    Tooltip.AddCheckboxTooltip(cbox_StretchBG, {text='Stretch Background', body=LOC("<LOC lobui_0401>")})
+    local cbox_StretchBG_TEXT = UIUtil.CreateText(cbox_StretchBG, LOC("<LOC lobui_0400>"), 14, 'Arial')
     cbox_StretchBG_TEXT:SetColor('B9BFB9')
     cbox_StretchBG_TEXT:SetDropShadow(true)
     LayoutHelpers.AtRightIn(cbox_StretchBG_TEXT, cbox_StretchBG, 25)
@@ -6194,8 +6200,8 @@ function CreateOptionLobbyDialog()
     --
     local cbox_SMsg = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
     LayoutHelpers.AtRightTopIn(cbox_SMsg, dialog2, 20, 100)
-    Tooltip.AddCheckboxTooltip(cbox_SMsg, {text='Log to chat', body='Display system messages in chat window (connection status etc.)'})
-    local cbox_SMsg_TEXT = UIUtil.CreateText(cbox_SMsg, 'Show system message', 14, 'Arial')
+    Tooltip.AddCheckboxTooltip(cbox_SMsg, {text='Log to chat', body=LOC("<LOC lobui_0398>")})
+    local cbox_SMsg_TEXT = UIUtil.CreateText(cbox_SMsg, LOC("<LOC lobui_0397>"), 14, 'Arial')
     cbox_SMsg_TEXT:SetColor('B9BFB9')
     cbox_SMsg_TEXT:SetDropShadow(true)
     LayoutHelpers.AtRightIn(cbox_SMsg_TEXT, cbox_SMsg, 25)
@@ -6208,9 +6214,8 @@ function CreateOptionLobbyDialog()
         end
     end
     ----------------------
-
     -- Developer box --
-    local devsHeader = UIUtil.CreateText(dialog2, 'Lobby Developers :', 17, 'Arial Gras')
+    local devsHeader = UIUtil.CreateText(dialog2, LOC("<LOC lobui_0399>"), 17, 'Arial Gras')
     devsHeader:SetColor('B9BFB9')
     devsHeader:SetDropShadow(true)
     LayoutHelpers.AtLeftTopIn(devsHeader, dialog2, 20, 220)
@@ -6930,6 +6935,18 @@ end
 -- Show only available colours.
 
 -- Get the true Index Color --
+
+-- Find the key for the given value in a table.
+-- Nil keys are not supported.
+function indexOf(table, needle)
+    for k, v in table do
+        if v == needle then
+            return k
+        end
+    end
+    return nil
+end
+
 function Get_IndexColor_by_AvailableTable(index_limit, slot)
     for k, v in BASE_ALL_Color do
         if v == Avail_Color[slot][index_limit] then
@@ -7091,17 +7108,17 @@ end
 function GUI_Changelog()
     GROUP_Changelog = Group(GUI)
     LayoutHelpers.AtCenterIn(GROUP_Changelog, GUI)
-    GROUP_Changelog.Depth:Set(999) -- :GetTopmostDepth() + 1
+    GROUP_Changelog.Depth:Set(GetFrame(GROUP_Changelog:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 1)
     local background = Bitmap(GROUP_Changelog, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby.png'))
     GROUP_Changelog.Width:Set(background.Width)
     GROUP_Changelog.Height:Set(background.Height)
     LayoutHelpers.FillParent(background, GROUP_Changelog)
     local dialog2 = Group(GROUP_Changelog)
-    dialog2.Width:Set(536)
-    dialog2.Height:Set(400)
+    dialog2.Width:Set(526)
+    dialog2.Height:Set(350)
     LayoutHelpers.AtCenterIn(dialog2, GROUP_Changelog)
     -- Title --
-    local text0 = UIUtil.CreateText(dialog2, "What's new in Lobby ?", 17, 'Arial Gras')
+    local text0 = UIUtil.CreateText(dialog2, LOC("<LOC lobui_0412>"), 17, 'Arial Gras')
     text0:SetColor('B9BFB9')
     text0:SetDropShadow(true)
     LayoutHelpers.AtHorizontalCenterIn(text0, dialog2, 0)

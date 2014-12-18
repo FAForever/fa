@@ -5103,6 +5103,29 @@ lobby_0003="Vérifiez la gestion de mods"
 lobby_0004="%d mod actif"
 lobui_0329="Les joueurs suivants ne possèdent pas la carte actuellement sélectionnée, impossible de lancer : %s"
 lobui_0330="%s n'a pas la carte %s."
+
+# Lobby options panel
+lobui_0397="Show system message"
+lobui_0398="Display system messages in chat window (connection status etc.)"
+lobui_0399="Lobby Developers"
+lobui_0400="Stretch Background"
+lobui_0401="Stretch background to fill screen."
+lobui_0402="Windowed Mode"
+lobui_0403="Lobby is windowed until launch"
+lobui_0404="Chat Font Size:"
+lobui_0405="Lobby Background"
+
+# Lobby background options
+lobui_0406="Factions"
+lobui_0407="Concept Art"
+lobui_0408="Screenshot"
+lobui_0409="Map"
+lobui_0410="None"
+lobui_0411="Extra"
+
+# Lobby changelog panel
+lobui_0412="What's new in Lobby?"
+
 main_menu_0000="Forged Alliance"
 main_menu_0001="Multijoueur local"
 pause_0000="Par %s"
