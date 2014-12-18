@@ -4439,25 +4439,16 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
                     if gameInfo.GameOptions['AutoTeams'] and lobbyComm:IsHost() then
                         if gameInfo.GameOptions['AutoTeams'] == 'manual' then
                             if not gameInfo.ClosedSlots[slot] and (gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] == 'random') then
+                                local targetTeam
                                 if gameInfo.AutoTeams[slot] == 7 then
-                                    GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[2]))
-                                    gameInfo.AutoTeams[slot] = 2
-                                elseif gameInfo.AutoTeams[slot] == 2 then
-                                    GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[3]))
-                                    gameInfo.AutoTeams[slot] = 3
-                                elseif gameInfo.AutoTeams[slot] == 3 then
-                                    GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[4]))
-                                    gameInfo.AutoTeams[slot] = 4
-                                elseif gameInfo.AutoTeams[slot] == 4 then
-                                    GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[5]))
-                                    gameInfo.AutoTeams[slot] = 5
-                                elseif gameInfo.AutoTeams[slot] == 5 then
-                                    GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[6]))
-                                    gameInfo.AutoTeams[slot] = 6
-                                elseif gameInfo.AutoTeams[slot] == 6 then
-                                    GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[7]))
-                                    gameInfo.AutoTeams[slot] = 7
+                                    targetTeam = 2
+                                else
+                                    targetTeam = gameInfo.AutoTeams[slot] + 1
                                 end
+
+                                GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[targetTeam]))
+                                gameInfo.AutoTeams[slot] = targetTeam
+
                                 lobbyComm:BroadcastData(
                                     {
                                         Type = 'AutoTeams',
