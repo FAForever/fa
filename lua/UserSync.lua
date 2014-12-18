@@ -53,6 +53,10 @@ function OnSync()
     for id,v in Sync.ReleaseIds do
         UnitData[id] = nil
     end
+
+    if Sync.Overflow then
+        import('/lua/ui/game/economy.lua').allyOverflow = Sync.Overflow
+    end
     
     if Sync.NukeLaunchData then
 		import('/modules/nukelaunchping.lua').DoNukePing(Sync.NukeLaunchData)

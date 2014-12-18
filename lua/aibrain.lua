@@ -54,9 +54,6 @@ local historicalUpdateThread = ForkThread(function()
     end
 end)
 
-
-
-
 #Support for Handicap mod
 local Handicaps = {-5,-4,-3,-2,-1,0,1,2,3,4,5}
 local HCapUtils
@@ -343,8 +340,14 @@ end
 function UpdateReclaimStat()
     # this function update the reclaim income stat.
     while true do
-        for index, brain in ArmyBrains do
+        local calcOverflow = math.mod(GetGameTick(), 5) == 0
+        local me = GetFocusArmy()
+        local my_brain = ArmyBrains[me]
+        local defeated = my_brain and my_brain:IsDefeated()
+        local overflow = {MASS=0, ENERGY=0}
+        local n_allies = 0
 
+        for index, brain in ArmyBrains do
             local reclaimedMass     = brain:GetArmyStat("Economy_Reclaimed_Mass", 0.0).Value
             local oldReclaimedMass  = brain:GetArmyStat("Economy_old_Reclaimed_Mass", 0.0).Value
             brain:SetArmyStat("Economy_income_reclaimed_Mass", reclaimedMass - oldReclaimedMass)
@@ -355,8 +358,33 @@ function UpdateReclaimStat()
             brain:SetArmyStat("Economy_income_reclaimed_Energy", reclaimedEnergy - oldReclaimedEnergy)
             brain:SetArmyStat("Economy_old_Reclaimed_Energy", reclaimedEnergy)
 
+            if calcOverflow and not defeated then
+                if me ~= index and IsAlly(me, index) then
+                    for _, t in {'ENERGY', 'MASS'} do 
+                        local stored = brain:GetEconomyStored(t)
+                        local ratio = brain:GetEconomyStoredRatio(t)
+                        local max = stored / ratio
+                        local net = brain:GetEconomyIncome(t) - brain:GetEconomyRequested(t)
+
+                        if stored + net > max then
+                            overflow[t] = net - (max - stored)
+                        end
+                    end
+
+                    n_allies = n_allies + 1
+                end
+            end
         end
-       WaitSeconds(.1)  -- update the stat every tick
+
+        if calcOverflow then
+            if not n_allies then n_allies = 1 end -- just to prevent / 0
+            for _, t in {'ENERGY', 'MASS'} do
+                overflow[t] = overflow[t] / n_allies
+            end
+            Sync.Overflow = overflow
+        end
+        
+        WaitSeconds(.1)  -- update the stat every tick
     end
 end
 
