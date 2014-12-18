@@ -6349,8 +6349,8 @@ function CreateOptionLobbyDialog()
     LayoutHelpers.AtLeftIn(text10, dialog2, 20)
     LayoutHelpers.AtBottomIn(text10, dialog2, 165)
     ----------------------
-    -- Devlopper box --
-    local text0 = UIUtil.CreateText(dialog2, 'Lobby Developpers :', 17, 'Arial Gras')
+    -- Developer box --
+    local text0 = UIUtil.CreateText(dialog2, 'Lobby Developers :', 17, 'Arial Gras')
     text0:SetColor('B9BFB9')
     text0:SetDropShadow(true)
     LayoutHelpers.AtLeftIn(text0, dialog2, 20)
