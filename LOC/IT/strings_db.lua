@@ -7131,6 +7131,8 @@ tooltipui0684="Niente Teletrasporti"
 tooltipui0685="Rimuove il teletrasporto, l' abilita di Comandanti e comandanti in seconda"
 tooltipui0686="No Billy"
 tooltipui0687="Rimuove la possibilita per i comandanti UEF di aggiungere al commander 'Billy' missile tattico nucleare"
+tooltipui0688="No Super-Intel"
+tooltipui0689="Rimuove l' Occhio di Arianna (Aeon) e il Controllo Perimetrale (Cibrano)"
 
 
 tooltipui0540="Ripristina finestra chat"

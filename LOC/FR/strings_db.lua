@@ -7130,6 +7130,8 @@ tooltipui0684="Pas de Téléportation"
 tooltipui0685="Supprime la capacité d'améliorer l'ACU et les SACU avec un téléporteur"
 tooltipui0686="Pas de Billy"
 tooltipui0687="Empêche les commandants UEF d'améliorer leur ACU avec un missile nucléaire tactique 'Billy'"
+tooltipui0688="Pas de super structures d'espionage"
+tooltipui0689="Pas d'Oeil de Rihanne (Aeon) ni de Devin (Cybran)"
 
 tooltipui0540="Réinitialiser la fenêtre de discussion"
 tooltipui0541="Réinitialise la position et la disposition de la fenêtre de discussion."

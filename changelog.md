@@ -1,16 +1,38 @@
 Changelog for hotfix-patch 3638
 -------------------------------
 
+*Exploit fixes*
+- Fixed a regression of the free ACU upgrade exploit
+
 *Bug fixes*
 - Fixed air wrecks floating mid air on certain maps
+- Fixed air wrecks sinking to bottom of water, then jumping back up to surface
 - Fixed continental not dying to nukes
 - Improved GuardScanRadius:
   - Scouts no longer engage at long range, value was set to 10
   - Harbinger will automatically engage at range again
-- Fixed seraphim T3MAA targetbones (Units will no longer aim above it)
+  - Range tuned down a bit so units will not run off too much
+- Fixed Seraphim T3MAA targetbones (Units will no longer aim above it)
 - Fixed integrated replaysync
 - More mod compatibility
-- Lobby 2.5c included, changelog shown in game
+- Lobby 2.5d included, changelog shown in game
+- Give Eye of Rihanne restriction a new description
+- Fixed hoplite not firing at landed air units
+- Added BOMBER category to Ahwassa
+- Added FACTORY category to Megalith, allows queuing of units while being built
+- Improve new unit share code (Units dying after being transferred multiple times)
+- Fixed sinking wrecks blocking projectiles where the unit used to be
+
+
+Thanks to pip, briang and Alex1911 for translations
+
+Contributors:
+
+ - ChrisKitching
+ - Crotalus
+ - IceDreamer
+ - Sheeo
+ - Xinnony
 
 
 Changelog for hotfix-patch 3637

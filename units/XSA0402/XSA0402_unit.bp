@@ -108,6 +108,7 @@ UnitBlueprint {
         'SERAPHIM',
         'MOBILE',
         'AIR',
+	'BOMBER',
         'HIGHALTAIR',
         'EXPERIMENTAL',
         'NEEDMOBILEBUILD',
