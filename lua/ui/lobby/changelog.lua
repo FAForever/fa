@@ -72,6 +72,7 @@ changelog = {
             "- Fix replaysync",
             "- Clan tags are shown in game",
             "- Set ranked options works again"
+            "- Display the Ranked Label",
         }
     }
 }
