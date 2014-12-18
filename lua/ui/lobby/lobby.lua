@@ -114,7 +114,6 @@ local selectedMods = nil
 local commandQueueIndex = 0
 local commandQueue = {}
 
-local launchThread = false
 local quickRandMap = true
 
 local lastUploadedMap = nil
@@ -273,65 +272,61 @@ function SetWindowedLobby(windowed)
     windowedMode = windowed
 end
 
--- Menu in Slot select
-function FuncSlotMenuData()
-    -- String from which to build the various "Move player to slot" labels.
-    -- TODO: This probably needs localising.
-    local move_player_to_slot = "Move Player to slot "
-    slotMenuStrings = {
-        open = "<LOC lobui_0219>Open",
-        close = "<LOC lobui_0220>Close",
-        closed = "<LOC lobui_0221>Closed",
-        occupy = "<LOC lobui_0222>Occupy",
-        pm = "<LOC lobui_0223>Private Message",
-        remove_to_kik = "Remove Player",
-        remove_to_observer = "Move Player to Observer",
-    }
-    slotMenuData = {
-        open = {
-            host = {
-                'close',
-                'occupy',
-                'ailist',
-            },
-            client = {
-                'occupy',
-            },
+-- String from which to build the various "Move player to slot" labels.
+-- TODO: This probably needs localising.
+local move_player_to_slot = "Move Player to slot "
+local slotMenuStrings = {
+    open = "<LOC lobui_0219>Open",
+    close = "<LOC lobui_0220>Close",
+    closed = "<LOC lobui_0221>Closed",
+    occupy = "<LOC lobui_0222>Occupy",
+    pm = "<LOC lobui_0223>Private Message",
+    remove_to_kik = "Remove Player",
+    remove_to_observer = "Move Player to Observer",
+}
+local slotMenuData = {
+    open = {
+        host = {
+            'close',
+            'occupy',
+            'ailist',
         },
-        closed = {
-            host = {
-                'open',
-            },
-            client = {
-            },
+        client = {
+            'occupy',
         },
-        player = {
-            host = {
-                'pm',
-                'remove_to_observer',
-                'remove_to_kik',
-            },
-            client = {
-                'pm',
-            },
+    },
+    closed = {
+        host = {
+            'open',
         },
-        ai = {
-            host = {
-                'remove_to_kik',
-                'ailist',
-            },
-            client = {
-            },
+        client = {
         },
-    }
-    -- Populate the tables with the "move player to slot X" entries.
-    for i = 1, numOpenSlots, 1 do
-        table.insert(slotMenuData.player.host, 'move_player_to_slot'..i)
-        slotMenuStrings['move_player_to_slot' .. i] = move_player_to_slot .. i
-    end
+    },
+    player = {
+        host = {
+            'pm',
+            'remove_to_observer',
+            'remove_to_kik',
+        },
+        client = {
+            'pm',
+        },
+    },
+    ai = {
+        host = {
+            'remove_to_kik',
+            'ailist',
+        },
+        client = {
+        },
+    },
+}
+
+-- Populate the tables with the "move player to slot X" entries.
+for i = 1, numOpenSlots, 1 do
+    table.insert(slotMenuData.player.host, 'move_player_to_slot'..i)
+    slotMenuStrings['move_player_to_slot' .. i] = move_player_to_slot .. i
 end
-FuncSlotMenuData()
---\\ Stop Menu in Slot select
 
 local function GetAITooltipList()
     local aitypes = import('/lua/ui/lobby/aitypes.lua').aitypes
@@ -1766,8 +1761,6 @@ end
 
 local function UpdateGame()
     LOGX('>> UpdateGame', 'UpdateGame')
-    -- if anything happens to switch a no SupCom player to a faction other than Seraphim, switch them back
-    local playerSlot = FindSlotForID(localPlayerID)
     local scenarioInfo = nil
 
     if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
@@ -1781,66 +1774,74 @@ local function UpdateGame()
         end
     end
 
-    if not GUI.uiCreated then return end
+    -- This allows us to assume the existence of UI elements throughout.
+    if not GUI.uiCreated then
+        return
+    end
 
-    if lobbyComm:IsHost() then
-        GUI.gameoptionsButton:Show()
-        GUI.launchGameButton:Show()
+    local isHost = lobbyComm:IsHost()
 
+    UIUtil.setVisible(GUI.launchGameButton, isHost)
+    if isHost then
         if not singlePlayer then
-            if quickRandMap then
-                GUI.randMap:Enable()
-            else
-                GUI.randMap:Disable()
-            end
+            UIUtil.setEnabled(GUI.randMap, quickRandMap)
         end
     else
         GUI.gameoptionsButton.OnClick = function(self, modifiers)
-            import('/lua/ui/lobby/ModsManager.lua').NEW_MODS_GUI(GUI, lobbyComm:IsHost(), gameInfo.GameMods)
+            import('/lua/ui/lobby/ModsManager.lua').NEW_MODS_GUI(GUI, isHost, gameInfo.GameMods)
         end
         Tooltip.AddButtonTooltip(GUI.gameoptionsButton, 'Lobby_Mods')
-        GUI.launchGameButton:Hide()
-        if gameInfo.GameOptions.AllowObservers then
-            GUI.allowObservers:SetCheck(true, true)
-        else
-            GUI.allowObservers:SetCheck(false, true)
-        end
+        GUI.allowObservers:SetCheck(gameInfo.GameOptions.AllowObservers, true)
     end
 
     local localPlayerSlot = FindSlotForID(localPlayerID)
     if localPlayerSlot then
-        if gameInfo.PlayerOptions[localPlayerSlot].Ready then
-            if GUI.becomeObserver then
-                GUI.becomeObserver:Disable()
-            end
-            GUI.LargeMapPreview:Disable()
-            Faction_Selector_Set_Enabled(false, gameInfo.PlayerOptions[playerSlot].Faction)
-            if lobbyComm:IsHost() then
-                GUI.restrictedUnitsButton:Disable()
-            end
-        else
-            if GUI.becomeObserver then
-                GUI.becomeObserver:Enable()
-            end
-            GUI.LargeMapPreview:Enable()
-            Faction_Selector_Set_Enabled(true, gameInfo.PlayerOptions[playerSlot].Faction)
-            if lobbyComm:IsHost() and GUI.restrictedUnitsButton then
-                GUI.restrictedUnitsButton:Enable()
+        local playerOptions = gameInfo.PlayerOptions[localPlayerSlot]
+
+        -- if anything happens to switch a no SupCom player to a faction other than Seraphim, switch them back
+        if not hasSupcom then
+            if playerOptions.Faction ~= 4 and not
+            IsObserver(localPlayerID) then
+                SetPlayerOption(localPlayerSlot, 'Faction', 4, true)
+                return
             end
         end
-    end
 
-    if GUI.observerList then
-        -- clear every update and repopulate
-        GUI.observerList:DeleteAllItems()
-        for index, observer in gameInfo.Observers do
-            observer.ObserverListIndex = GUI.observerList:GetItemCount() -- Pin-head William made this zero-based
-            GUI.observerList:AddItem(observer.PlayerName)
+        -- Disable some controls if the user is ready.
+        local notReady = not playerOptions.Ready
+
+        if not singlePlayer then
+            UIUtil.setEnabled(GUI.becomeObserver, notReady)
+            UIUtil.setEnabled(GUI.restrictedUnitsButton, isHost and notReady)
+        end
+
+        UIUtil.setEnabled(GUI.LargeMapPreview, notReady)
+        Faction_Selector_Set_Enabled(notReady, playerOptions.Faction)
+
+        -- Set the info in a Slot
+        -- TODO: Since these stats are all constants, we should figure out the right place to do this
+        -- job once.
+        if not playerOptions.MEAN then
+            SetPlayerOption(localPlayerSlot, 'MEAN', playerMean, true)
+        end
+        if not playerOptions.DEV then
+            SetPlayerOption(localPlayerSlot, 'DEV', playerDeviation, true)
+        end
+        if not playerOptions.COUNTRY then
+            SetPlayerOption(localPlayerSlot, 'COUNTRY', PrefLanguage, true)
+        end
+        if not playerOptions.PL then
+            SetPlayerOption(localPlayerSlot, 'PL', playerRating, true)
+        end
+        if not playerOptions.RC then
+            SetPlayerOption(localPlayerSlot, 'RC', ratingColor, true)
+        end
+        if not playerOptions.NG then
+            SetPlayerOption(localPlayerSlot, 'NG', numGames, true)
         end
     end
 
     local numPlayers = GetPlayerCount()
-
 
     local numAvailStartSpots = LobbyComm.maxPlayerSlots
     if scenarioInfo then
@@ -1863,43 +1864,6 @@ local function UpdateGame()
                 ClearSlotInfo(i)
                 GUI.slots[i].SlotBackground:SetTexture(UIUtil.UIFile('/SLOT/slot-player_other.png'))
             end
-            if gameInfo.PlayerOptions[i].Human then
-                --if gameInfo.PlayerOptions[i].DEV and gameInfo.PlayerOptions[i].MEAN then
-                    --Tooltip.AddControlTooltip(GUI.slots[i].ratingText, {text='Rating', body='DEV : '..round(gameInfo.PlayerOptions[i].DEV)..', MEAN : '..round(gameInfo.PlayerOptions[i].MEAN)}) -- Add tooltip (mean and dev rating) in player rating column
-                --else
-                    Tooltip.AddControlTooltip(GUI.slots[i].ratingText, {text='Rating', body='This is the player rating.'})
-                --end
-            end
-        end
-    end
-
-    -- Set the info in a Slot
-    if IsPlayer(localPlayerID) then
-        if not gameInfo.PlayerOptions[playerSlot].MEAN then
-            SetPlayerOption(playerSlot, 'MEAN', playerMean, true)
-        end
-        if not gameInfo.PlayerOptions[playerSlot].DEV then
-            SetPlayerOption(playerSlot, 'DEV', playerDeviation, true)
-        end
-        if not gameInfo.PlayerOptions[playerSlot].COUNTRY then
-            SetPlayerOption(playerSlot, 'COUNTRY', PrefLanguage, true)
-        end
-        if not gameInfo.PlayerOptions[playerSlot].PL then
-            SetPlayerOption(playerSlot, 'PL', playerRating, true)
-        end
-        if not gameInfo.PlayerOptions[playerSlot].RC then
-            SetPlayerOption(playerSlot, 'RC', ratingColor, true)
-        end
-        if not gameInfo.PlayerOptions[playerSlot].NG then
-            SetPlayerOption(playerSlot, 'NG', numGames, true)
-        end
-        if not hasSupcom then
-            local playerSlot = FindSlotForID(localPlayerID)
-            if gameInfo.PlayerOptions[playerSlot] and gameInfo.PlayerOptions[playerSlot].Faction ~= 4 and not
-                IsObserver(localPlayerID) then
-                SetPlayerOption(playerSlot, 'Faction', 4, true)
-                return
-            end
         end
     end
 
@@ -1913,29 +1877,26 @@ local function UpdateGame()
         ShowMapPositions(nil, false)
     end
 
+    if not singlePlayer then
+        -- Rebuild the observer list.
+        GUI.observerList:DeleteAllItems()
+        for index, observer in gameInfo.Observers do
+            observer.ObserverListIndex = GUI.observerList:GetItemCount() -- Pin-head William made this zero-based
+            GUI.observerList:AddItem(observer.PlayerName)
+        end
 
-    -- deal with options display
-    if lobbyComm:IsHost() then
+        -- deal with options display
+        if isHost then
         -- disable options when all players are marked ready
-        if not singlePlayer then
-            local allPlayersReady = true
-            if GetPlayersNotReady() ~= false then
-                allPlayersReady = false
-            end
+            -- Is at least one person not ready?
+            local playerNotReady = GetPlayersNotReady() ~= false
 
-            if allPlayersReady then
-                GUI.gameoptionsButton:Disable()
-                GUI.rankedOptions:Disable()
-                GUI.randMap:Disable()
-                GUI.launchGameButton:Enable()
-            else
-                GUI.gameoptionsButton:Enable()
-                GUI.rankedOptions:Enable()
-                GUI.randMap:Enable()
-                if launchThread then CancelLaunch() end
+            UIUtil.setEnabled(GUI.gameoptionsButton, playerNotReady)
+            UIUtil.setEnabled(GUI.rankedOptions, playerNotReady)
+            UIUtil.setEnabled(GUI.randMap, playerNotReady)
 
-                GUI.launchGameButton:Disable()
-            end
+            -- Launch button enabled if everyone is ready.
+            UIUtil.setEnabled(GUI.launchGameButton, not playerNotReady)
         end
     end
     if LrgMap then
@@ -1951,22 +1912,31 @@ local function UpdateGame()
         ChangeBackgroundLobby(nil, nil)
     end
 
-    if gameInfo.GameOptions['TeamSpawn'] ~= 'random' and math.mod(numPlayers,2) == 0 and gameInfo.GameOptions['AutoTeams'] ~=
-        'manual' and gameInfo.GameOptions['AutoTeams'] ~= 'none' then
+    -- Set the map name at the top right corner in lobby
+    if scenarioInfo.name then
+        SetText2(MapNameLabel, scenarioInfo.name, 10)
+    end
+
+    -- Auto-team logic.
+    if gameInfo.GameOptions['TeamSpawn'] ~= 'random' and
+       math.mod(numPlayers,2) == 0 and
+       gameInfo.GameOptions['AutoTeams'] ~= 'manual' and
+       gameInfo.GameOptions['AutoTeams'] ~= 'none' then
 
         local teams = nil
         local teamcreated = false
-        correct = true
+        local correct = true
 
         for i = 1, LobbyComm.maxPlayerSlots do
-            if gameInfo.PlayerOptions[i] then
+            local playerOptions = gameInfo.PlayerOptions[i]
+            if playerOptions then
 
-                if  gameInfo.PlayerOptions[i].Human then
-                    if gameInfo.PlayerOptions[i].MEAN and gameInfo.PlayerOptions[i].DEV then
-                        player = Player.create(gameInfo.PlayerOptions[i].PlayerName,
-                                               Rating.create(gameInfo.PlayerOptions[i].MEAN, gameInfo.PlayerOptions[i].DEV))
-                        team = gameInfo.PlayerOptions[i].Team
-                        if team == 2 then
+                if playerOptions.Human then
+                    if playerOptions.MEAN and playerOptions.DEV then
+                        local player = Player.create(playerOptions.PlayerName,
+                                               Rating.create(playerOptions.MEAN, playerOptions.DEV))
+
+                        if playerOptions.Team == 2 then
                             if teamcreated then
                                 teams:addPlayer(1, player)
                             else
@@ -1984,92 +1954,52 @@ local function UpdateGame()
                     end
                 else
                     correct = false
-
                 end
             end
         end
+
         if correct and teams ~= nil then
             local quality = Trueskill.computeQuality(teams)
-            if quality and quality > 0 then
+
+            if quality > 0 then
                 gameInfo.GameOptions['Quality'] = quality
-                if MapNameLabel and scenarioInfo.name then
-                    -- Set the map name and quality at the top right corner in lobby
-                    SetText2(MapNameLabel, scenarioInfo.name, 10)
-                end
-                if GameQualityLabel then
-                    SetText2(GameQualityLabel, "Game quality : "..quality.."%", 10)
-                end
+                SetText2(GameQualityLabel, "Game quality : "..quality.."%", 10)
             else
-                if MapNameLabel and scenarioInfo.name then
-                    -- Set the map name and quality at the top right corner in lobby
-                    SetText2(MapNameLabel, scenarioInfo.name, 10)
-                end
-                if GameQualityLabel then
-                    SetText2(GameQualityLabel, "Game quality N/A", 10)
-                end
+                SetText2(GameQualityLabel, "Game quality N/A", 10)
             end
         else
-            if MapNameLabel and scenarioInfo.name then
-                -- Set the map name and quality at the top right corner in lobby
-                SetText2(MapNameLabel, scenarioInfo.name, 10)
-            end
-            if GameQualityLabel then
-                GameQualityLabel:SetText("")
-            end
-        end
-    else
-        if MapNameLabel and scenarioInfo.name then
-            -- Set the map name and quality at the top right corner in lobby
-            SetText2(MapNameLabel, scenarioInfo.name, 10)
-        end
-        if GameQualityLabel then
             GameQualityLabel:SetText("")
         end
-    end
-    --// Add Tooltip info on Map Name Label
-    if MapNameLabel and GameQualityLabel and scenarioInfo then
-        if scenarioInfo.map_version then
-            TTips_map_version = scenarioInfo.map_version
-        else
-            TTips_map_version = "N/A"
-        end
-        --
-        local ArmySize = table.getsize(scenarioInfo.Configurations.standard.teams[1].armies)
-        if ArmySize then
-            TTips_army = ArmySize
-        else
-            TTips_army = "N/A"
-        end
-        --
-        if scenarioInfo.size then
-            TTips_sizeX = scenarioInfo.size[1]/51.2
-            TTips_sizeY = scenarioInfo.size[2]/51.2
-        else
-            TTips_sizeX = "N/A"
-            TTips_sizeY = "N/A"
-        end
-        Tooltip.AddControlTooltip(MapNameLabel,{text=scenarioInfo.name, body='- Map version : '..TTips_map_version..'\n '..
-                                  '- Max Players : '..TTips_army..' max'..'\n '..
-                                  '- Map Size : '..TTips_sizeX..'km x '..TTips_sizeY..'km'})
-        --'- Map Description :\n'..TTips_description})
-        Tooltip.AddControlTooltip(GameQualityLabel,{text=scenarioInfo.name, body='- Map version : '..TTips_map_version..'\n '..
-                                  '- Max Players : '..TTips_army..' max'..'\n '..
-                                  '- Map Size : '..TTips_sizeX..'km x '..TTips_sizeY..'km'})
-        --'- Map Description :\n'..TTips_description})
     else
-        if MapNameLabel then
-            Tooltip.AddControlTooltip(MapNameLabel,{text="N/A", body='- Map version : N/A'..'\n '..
-                                      '- Max Players : N/A max'..'\n '..
-                                      '- Map Size : N/Akm x N/Akm'})
-            Tooltip.AddControlTooltip(GameQualityLabel,{text="N/A", body='- Map version : N/A'..'\n '..
-                                      '- Max Players : N/A max'..'\n '..
-                                      '- Map Size : N/Akm x N/Akm'})
-        end
+        GameQualityLabel:SetText("")
     end
-    --\\ Stop -- Add Tooltip info on Map Name Label
-    --// For refresh menu in slot
-    FuncSlotMenuData()
-    --\\ Stop -- For refresh menu in slot
+
+    -- Add Tooltip info on Map Name Label
+    if GameQualityLabel and scenarioInfo then
+        local TTips_map_version = scenarioInfo.map_version or "N/A"
+        local TTips_army = table.getsize(scenarioInfo.Configurations.standard.teams[1].armies) or "N/A"
+        local TTips_sizeX = scenarioInfo.size[1] / 51.2 or "N/A"
+        local TTips_sizeY = scenarioInfo.size[2] / 51.2 or "N/A"
+
+        local mapTooltip = {
+            text = scenarioInfo.name,
+            body = '- Map version : '..TTips_map_version..'\n '..
+                   '- Max Players : '..TTips_army..' max'..'\n '..
+                   '- Map Size : '..TTips_sizeX..'km x '..TTips_sizeY..'km'
+        }
+
+        Tooltip.AddControlTooltip(MapNameLabel, mapTooltip)
+        Tooltip.AddControlTooltip(GameQualityLabel, mapTooltip)
+    else
+        local mapTooltip = {
+            text="N/A",
+            body='- Map version : N/A\n '..
+                 '- Max Players : N/A max\n '..
+                 '- Map Size : N/Akm x N/Akm'
+        }
+        Tooltip.AddControlTooltip(MapNameLabel, mapTooltip)
+        Tooltip.AddControlTooltip(GameQualityLabel, mapTooltip)
+    end
 end
 
 -- Update our local gameInfo.GameMods from selected map name and selected mods, then

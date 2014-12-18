@@ -1390,3 +1390,21 @@ function CreateDialogBrackets(parent, leftOffset, topOffset, rightOffset, bottom
 
     return ret
 end
+
+-- Enable or disable a control based on a boolean.
+function setEnabled(control, enabled)
+    if (enabled) then
+        control:Enable()
+    else
+        control:Disable()
+    end
+end
+
+-- Show or hide a control based on a boolean.
+function setVisible(control, visible)
+    if (visible) then
+        control:Show()
+    else
+        control:Hide()
+    end
+end
