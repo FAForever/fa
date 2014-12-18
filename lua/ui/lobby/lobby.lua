@@ -102,7 +102,7 @@ else
 end
 --\\ Stop - Get a value on /Country CommandLine in FA.exe
 
-local LASTXinnoBackground = '' -- For prevent the infinite loop to Background
+local LASTLobbyBackground = '' -- For prevent the infinite loop to Background
 
 local connectedTo = {} -- by UID
 CurrentConnection = {} -- by Name
@@ -1934,7 +1934,7 @@ local function UpdateGame()
     -- Send autoteams infos to server.
     AssignRandomTeams(gameInfo)
 
-    if LASTXinnoBackground == 'Map' then ChangeBackgroundLobby(nil, nil) end-- For update map background
+    if LASTLobbyBackground == 'Map' then ChangeBackgroundLobby(nil, nil) end-- For update map background
 
     if gameInfo.GameOptions['TeamSpawn'] ~= 'random' and math.mod(numPlayers,2) == 0 and gameInfo.GameOptions['AutoTeams'] ~=
         'manual' and gameInfo.GameOptions['AutoTeams'] ~= 'none' then
@@ -2638,6 +2638,24 @@ function CreateUI(maxPlayers)
     local title
     if GpgNetActive() then
         title = "FA FOREVER GAME LOBBY"
+        --
+        LobbyBackgroundStretch = Prefs.GetFromCurrentProfile('LobbyBackgroundStretch') or 'true'
+        GUI.background = Bitmap(GUI, UIUtil.SkinnableFile('/BACKGROUND/background-paint_black_bmp.png')) -- Background faction or art
+        LayoutHelpers.AtCenterIn(GUI.background, GUI)
+        if LobbyBackgroundStretch == 'true' then
+            LayoutHelpers.FillParent(GUI.background, GUI)
+        else
+            LayoutHelpers.FillParentPreserveAspectRatio(GUI.background, GUI)
+        end
+        GUI.background2 = MapPreview(GUI) -- Background map
+        LayoutHelpers.AtCenterIn(GUI.background2, GUI)
+        GUI.background2.Width:Set(400)
+        GUI.background2.Height:Set(400)
+        if LobbyBackgroundStretch == 'true' then
+            LayoutHelpers.FillParent(GUI.background2, GUI)
+        else
+            LayoutHelpers.FillParentPreserveAspectRatio(GUI.background2, GUI)
+        end
     elseif singlePlayer then
         title = LOC("<LOC _Skirmish_Setup>")
     else
@@ -5996,9 +6014,9 @@ function ChangeSkinButtonByFaction(input_faction)
 end
 
 function ChangeBackgroundLobby(slot, faction)
-    local XinnoBackground = Prefs.GetFromCurrentProfile('XinnoBackground') or 'Factions'
+    local LobbyBackground = Prefs.GetFromCurrentProfile('LobbyBackground') or 'Factions'
     if GUI.background and GUI.background2 then
-        if XinnoBackground == 'Factions' then
+        if LobbyBackground == 'Factions' then
 			LOGX('>> Background FACTION', 'Background')
             GUI.background:Show()
             GUI.background2:Hide()
@@ -6009,23 +6027,23 @@ function ChangeBackgroundLobby(slot, faction)
             else
                 GUI.background:SetTexture("/textures/ui/common/BACKGROUND/faction/faction-background-paint_" .. FACTION_NAMES[faction] .. "_bmp.png")
             end
-            LASTXinnoBackground = 'Factions'
+            LASTLobbyBackground = 'Factions'
 
-        elseif XinnoBackground == 'ConceptArt' then--and LASTBackgroundSelected ~= BackgroundSelected then
+        elseif LobbyBackground == 'Concept Art' then--and LASTBackgroundSelected ~= BackgroundSelected then
 			LOGX('>> Background ART', 'Background')
             GUI.background:Show()
             GUI.background2:Hide()
             GUI.background:SetTexture("/textures/ui/common/BACKGROUND/art/art-background-paint0"..math.random(1, 5).."_bmp.dds")
-            LASTXinnoBackground = 'ConceptArt'
+            LASTLobbyBackground = 'Concept Art'
 
-        elseif XinnoBackground == 'Screenshoot' then--and LASTBackgroundSelected ~= BackgroundSelected then
-			LOGX('>> Background SCREENSHOOT', 'Background')
+        elseif LobbyBackground == 'Screenshot' then--and LASTBackgroundSelected ~= BackgroundSelected then
+			LOGX('>> Background SCREENSHOT', 'Background')
             GUI.background:Show()
             GUI.background2:Hide()
             GUI.background:SetTexture("/textures/ui/common/BACKGROUND/scrn/scrn-background-paint"..math.random(1, 14).."_bmp.dds")
-            LASTXinnoBackground = 'Screenshoot'
+            LASTLobbyBackground = 'Screenshot'
 
-        elseif XinnoBackground == 'Map' then--and LASTBackgroundSelected ~= BackgroundSelected then -- LASTBac... is for avoided loop set texture, when you change faction
+        elseif LobbyBackground == 'Map' then--and LASTBackgroundSelected ~= BackgroundSelected then -- LASTBac... is for avoided loop set texture, when you change faction
             LOGX('>> Background MAP', 'Background')
             GUI.background:Hide()
             GUI.background2:Show()
@@ -6042,16 +6060,16 @@ function ChangeBackgroundLobby(slot, faction)
             else
                 GUI.background2:ClearTexture()
             end
-            LASTXinnoBackground = 'Map'
+            LASTLobbyBackground = 'Map'
 
-        elseif XinnoBackground == 'No' and LASTXinnoBackground ~= XinnoBackground then -- LASTBac... is for avoided loop set texture, when you change faction
+        elseif LobbyBackground == 'None' and LASTLobbyBackground ~= LobbyBackground then -- LASTBac... is for avoided loop set texture, when you change faction
             LOGX('>> Background NOTHING', 'Background')
             GUI.background:Hide()
             GUI.background2:Hide()
             GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/background-paint_black_bmp.png"))
-            LASTXinnoBackground = 'No'
+            LASTLobbyBackground = 'None'
 
-        elseif XinnoBackground == 'Extra' then
+        elseif LobbyBackground == 'Extra' then
 			LOGX('>> Background EXTRA', 'Background')
             GUI.background:Show()
             GUI.background2:Hide()
@@ -6078,10 +6096,12 @@ function ChangeBackgroundLobby(slot, faction)
             else
                 GUI.background:SetTexture("/textures/ui/common/BACKGROUND/background-paint_black_bmp.png")
             end
-            LASTXinnoBackground = 'Extra'
+            LASTLobbyBackground = 'Extra'
         end
     end
 end
+
+
 
 function CreateOptionLobbyDialog()
     local dialog = Group(GUI)
@@ -6096,163 +6116,48 @@ function CreateOptionLobbyDialog()
     dialog2.Height:Set(400)
     LayoutHelpers.AtCenterIn(dialog2, dialog)
 
-    ---------------------------
-    -- CheckBox Options --
-    cbox_BG_Factions = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
-    LayoutHelpers.AtLeftIn(cbox_BG_Factions, dialog2, 20)
-    LayoutHelpers.AtTopIn(cbox_BG_Factions, dialog2, 20)
-    Tooltip.AddCheckboxTooltip(cbox_BG_Factions, {text='Factions Background', body='Show the Factions Backgrounds in the Lobby'})
-    cbox_BG_Factions_TEXT = UIUtil.CreateText(cbox_BG_Factions, 'Factions Backgrounds', 14, 'Arial')
-    cbox_BG_Factions_TEXT:SetColor('B9BFB9')
-    cbox_BG_Factions_TEXT:SetDropShadow(true)
-    LayoutHelpers.AtLeftIn(cbox_BG_Factions_TEXT, cbox_BG_Factions, 25)
-    LayoutHelpers.AtVerticalCenterIn(cbox_BG_Factions_TEXT, cbox_BG_Factions)
-    cbox_BG_Factions.OnCheck = function(self, checked)
-        if checked then
-            Prefs.SetToCurrentProfile('XinnoBackground', 'Factions')
-            cbox_BG_ConceptArt:SetCheck(false, true)
-            cbox_BG_Screenshoot:SetCheck(false, true)
-            cbox_BG_Map:SetCheck(false, true)
-            cbox_BG_No:SetCheck(false, true)
-            cbox_BG_Extra:SetCheck(false, true)
-            ChangeBackgroundLobby(nil, nil)
-        else
-            cbox_BG_Factions:SetCheck(true, true)
-        end
-    end
-    cbox_BG_ConceptArt = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
-    LayoutHelpers.AtLeftIn(cbox_BG_ConceptArt, dialog2, 20)
-    LayoutHelpers.AtTopIn(cbox_BG_ConceptArt, dialog2, 40)
-    Tooltip.AddCheckboxTooltip(cbox_BG_Factions, {text='Concept Art Background', body='Show the Original Concept Art Backgrounds in the Lobby'})
-    cbox_BG_ConceptArt_TEXT = UIUtil.CreateText(cbox_BG_ConceptArt, 'Concept Art Backgrounds', 14, 'Arial')
-    cbox_BG_ConceptArt_TEXT:SetColor('B9BFB9')
-    cbox_BG_ConceptArt_TEXT:SetDropShadow(true)
-    LayoutHelpers.AtLeftIn(cbox_BG_ConceptArt_TEXT, cbox_BG_ConceptArt, 25)
-    LayoutHelpers.AtVerticalCenterIn(cbox_BG_ConceptArt_TEXT, cbox_BG_ConceptArt)
-    cbox_BG_ConceptArt.OnCheck = function(self, checked)
-        if checked then
-            Prefs.SetToCurrentProfile('XinnoBackground', 'ConceptArt')
-            cbox_BG_Factions:SetCheck(false, true)
-            cbox_BG_Screenshoot:SetCheck(false, true)
-            cbox_BG_Map:SetCheck(false, true)
-            cbox_BG_No:SetCheck(false, true)
-            cbox_BG_Extra:SetCheck(false, true)
-            ChangeBackgroundLobby(nil, nil)
-        else
-            cbox_BG_ConceptArt:SetCheck(true, true)
-        end
-    end
-    cbox_BG_Screenshoot = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
-    LayoutHelpers.AtLeftIn(cbox_BG_Screenshoot, dialog2, 20)
-    LayoutHelpers.AtTopIn(cbox_BG_Screenshoot, dialog2, 60)
-    Tooltip.AddCheckboxTooltip(cbox_BG_Screenshoot, {text='Screenshoot Background', body='Show some Screenshot Backgrounds in the Lobby'})
-    cbox_BG_Screenshoot_TEXT = UIUtil.CreateText(cbox_BG_Screenshoot, 'Screenshot Backgrounds', 14, 'Arial')
-    cbox_BG_Screenshoot_TEXT:SetColor('B9BFB9')
-    cbox_BG_Screenshoot_TEXT:SetDropShadow(true)
-    LayoutHelpers.AtLeftIn(cbox_BG_Screenshoot_TEXT, cbox_BG_Screenshoot, 25)
-    LayoutHelpers.AtVerticalCenterIn(cbox_BG_Screenshoot_TEXT, cbox_BG_Screenshoot)
-    cbox_BG_Screenshoot.OnCheck = function(self, checked)
-        if checked then
-            Prefs.SetToCurrentProfile('XinnoBackground', 'Screenshoot')
-            cbox_BG_Factions:SetCheck(false, true)
-            cbox_BG_ConceptArt:SetCheck(false, true)
-            cbox_BG_Map:SetCheck(false, true)
-            cbox_BG_No:SetCheck(false, true)
-            cbox_BG_Extra:SetCheck(false, true)
-            ChangeBackgroundLobby(nil, nil)
-        else
-            cbox_BG_Screenshoot:SetCheck(true, true)
-        end
-    end
-    cbox_BG_Map = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
-    LayoutHelpers.AtLeftIn(cbox_BG_Map, dialog2, 20)
-    LayoutHelpers.AtTopIn(cbox_BG_Map, dialog2, 80)
-    Tooltip.AddCheckboxTooltip(cbox_BG_Map, {text='Map Background', body='Show the Map Preview in the Lobby'})
-    cbox_BG_Map_TEXT = UIUtil.CreateText(cbox_BG_Map, 'Map Preview', 14, 'Arial')
-    cbox_BG_Map_TEXT:SetColor('B9BFB9')
-    cbox_BG_Map_TEXT:SetDropShadow(true)
-    LayoutHelpers.AtLeftIn(cbox_BG_Map_TEXT, cbox_BG_Map, 25)
-    LayoutHelpers.AtVerticalCenterIn(cbox_BG_Map_TEXT, cbox_BG_Map)
-    cbox_BG_Map.OnCheck = function(self, checked)
-        if checked then
-            Prefs.SetToCurrentProfile('XinnoBackground', 'Map')
-            cbox_BG_Factions:SetCheck(false, true)
-            cbox_BG_ConceptArt:SetCheck(false, true)
-            cbox_BG_Screenshoot:SetCheck(false, true)
-            cbox_BG_No:SetCheck(false, true)
-            cbox_BG_Extra:SetCheck(false, true)
-            ChangeBackgroundLobby(nil, nil)
-        else
-            cbox_BG_Map:SetCheck(true, true)
-        end
-    end
-    cbox_BG_No = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
-    LayoutHelpers.AtLeftIn(cbox_BG_No, dialog2, 20)
-    LayoutHelpers.AtTopIn(cbox_BG_No, dialog2, 100)
-    Tooltip.AddCheckboxTooltip(cbox_BG_No, {text='No Background', body='No background in the Lobby'})
-    cbox_BG_No_TEXT = UIUtil.CreateText(cbox_BG_No, 'No Background', 14, 'Arial')
-    cbox_BG_No_TEXT:SetColor('B9BFB9')
-    cbox_BG_No_TEXT:SetDropShadow(true)
-    LayoutHelpers.AtLeftIn(cbox_BG_No_TEXT, cbox_BG_No, 25)
-    LayoutHelpers.AtVerticalCenterIn(cbox_BG_No_TEXT, cbox_BG_No)
-    cbox_BG_No.OnCheck = function(self, checked)
-        if checked then
-            Prefs.SetToCurrentProfile('XinnoBackground', 'No')
-            cbox_BG_Factions:SetCheck(false, true)
-            cbox_BG_ConceptArt:SetCheck(false, true)
-            cbox_BG_Screenshoot:SetCheck(false, true)
-            cbox_BG_Map:SetCheck(false, true)
-            cbox_BG_Extra:SetCheck(false, true)
-            ChangeBackgroundLobby(nil, nil)
-        else
-            cbox_BG_No:SetCheck(true, true)
-        end
-    end
-    cbox_BG_Extra = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
-    LayoutHelpers.AtLeftIn(cbox_BG_Extra, dialog2, 20)
-    LayoutHelpers.AtTopIn(cbox_BG_Extra, dialog2, 120)
-    Tooltip.AddCheckboxTooltip(cbox_BG_Extra, {text='Extra Background', body='Extra background (stored in a "Lobby Background" mod) in the Lobby'})
-    cbox_BG_Extra_TEXT = UIUtil.CreateText(cbox_BG_Extra, 'Extra Background', 14, 'Arial')
-    cbox_BG_Extra_TEXT:SetColor('B9BFB9')
-    cbox_BG_Extra_TEXT:SetDropShadow(true)
-    LayoutHelpers.AtLeftIn(cbox_BG_Extra_TEXT, cbox_BG_Extra, 25)
-    LayoutHelpers.AtVerticalCenterIn(cbox_BG_Extra_TEXT, cbox_BG_Extra)
-    cbox_BG_Extra.OnCheck = function(self, checked)
-        if checked then
-            Prefs.SetToCurrentProfile('XinnoBackground', 'Extra')
-            cbox_BG_Factions:SetCheck(false, true)
-            cbox_BG_ConceptArt:SetCheck(false, true)
-            cbox_BG_Screenshoot:SetCheck(false, true)
-            cbox_BG_Map:SetCheck(false, true)
-            cbox_BG_No:SetCheck(false, true)
-            ChangeBackgroundLobby(nil, nil)
-        else
-            cbox_BG_Extra:SetCheck(true, true)
-        end
+    -- Background switching radiobutton.
+    local backgroundStates = {
+        "Factions",
+        "Concept Art",
+        "Screenshot",
+        "Map",
+        "None",
+        "Extra"
+    }
+    local selectedBackgroundState = Prefs.GetFromCurrentProfile("LobbyBackground") or "Factions"
+    local backgroundRadiobutton = UIUtil.CreateRadioButtonsStdPNG(dialog2, '/CHECKBOX/radio', "Lobby background", backgroundStates, selectedBackgroundState)
+
+    LayoutHelpers.AtLeftTopIn(backgroundRadiobutton, dialog2, 20, 20)
+
+    backgroundRadiobutton.OnChoose = function(self, button)
+        LOG("Radioclick: " .. button)
+        Prefs.SetToCurrentProfile("LobbyBackground", button)
+        ChangeBackgroundLobby(nil, nil)
     end
 	--
 	local Slider = import('/lua/maui/slider.lua').Slider
-	local getFontSize = Prefs.GetFromCurrentProfile('XinnoChatSizeFont') or 14
-	slider_Chat_SizeFont_TEXT = UIUtil.CreateText(cbox_BG_Extra, 'Chat Size Font : '..getFontSize, 14, 'Arial')
-		slider_Chat_SizeFont_TEXT:SetColor('B9BFB9')
-		slider_Chat_SizeFont_TEXT:SetDropShadow(true)
-		LayoutHelpers.AtLeftIn(slider_Chat_SizeFont_TEXT, dialog2, 28)
-		LayoutHelpers.AtTopIn(slider_Chat_SizeFont_TEXT, dialog2, 155)
-	slider_Chat_SizeFont = Slider(dialog2, false, 9, 18, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))    
-		LayoutHelpers.AtLeftIn(slider_Chat_SizeFont, dialog2, 26)
-		LayoutHelpers.AtTopIn(slider_Chat_SizeFont, dialog2, 170)
-		slider_Chat_SizeFont:SetValue(getFontSize)
+	local currentFontSize = Prefs.GetFromCurrentProfile('XinnoChatSizeFont') or 14
+	local slider_Chat_SizeFont_TEXT = UIUtil.CreateText(dialog2, 'Chat Font Size: '.. currentFontSize, 14, 'Arial')
+    slider_Chat_SizeFont_TEXT:SetColor('B9BFB9')
+    slider_Chat_SizeFont_TEXT:SetDropShadow(true)
+    LayoutHelpers.AtLeftTopIn(slider_Chat_SizeFont_TEXT, dialog2, 28, 205)
+
+	local slider_Chat_SizeFont = Slider(dialog2, false, 9, 18, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
+    LayoutHelpers.AtLeftTopIn(slider_Chat_SizeFont, dialog2, 26, 220)
+    slider_Chat_SizeFont:SetValue(currentFontSize)
+
 	slider_Chat_SizeFont.OnValueChanged = function(self, newValue)
-		slider_Chat_SizeFont_TEXT:SetText('Chat Size Font : '..string.format('%3d', slider_Chat_SizeFont._currentValue()))
-		GUI.chatDisplay:SetFont(UIUtil.bodyFont, tonumber(string.format('%3d', slider_Chat_SizeFont._currentValue())))
-		Prefs.SetToCurrentProfile('XinnoChatSizeFont', tonumber(string.format('%3d', slider_Chat_SizeFont._currentValue())))
+        slider_Chat_SizeFont_TEXT:SetText('Chat Size Font : '..string.format('%3d', slider_Chat_SizeFont._currentValue()))
+        GUI.chatDisplay:SetFont(UIUtil.bodyFont, tonumber(string.format('%3d', slider_Chat_SizeFont._currentValue())))
+        Prefs.SetToCurrentProfile('XinnoChatSizeFont', tonumber(string.format('%3d', slider_Chat_SizeFont._currentValue())))
 	end
 	--
-    cbox_WindowedLobby = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
+    local cbox_WindowedLobby = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
     LayoutHelpers.AtRightIn(cbox_WindowedLobby, dialog2, 20)
     LayoutHelpers.AtTopIn(cbox_WindowedLobby, dialog2, 20)
     Tooltip.AddCheckboxTooltip(cbox_WindowedLobby, {text='Windowed mode', body='Lobby is windowed until launch'})
-    cbox_WindowedLobby_TEXT = UIUtil.CreateText(cbox_WindowedLobby, 'Windowed mode', 14, 'Arial')
+    local cbox_WindowedLobby_TEXT = UIUtil.CreateText(cbox_WindowedLobby, 'Windowed mode', 14, 'Arial')
     cbox_WindowedLobby_TEXT:SetColor('B9BFB9')
     cbox_WindowedLobby_TEXT:SetDropShadow(true)
     LayoutHelpers.AtRightIn(cbox_WindowedLobby_TEXT, cbox_WindowedLobby, 25)
@@ -6310,11 +6215,11 @@ function CreateOptionLobbyDialog()
     LayoutHelpers.AtVerticalCenterIn(cbox_StretchBG_TEXT, cbox_StretchBG)
     cbox_StretchBG.OnCheck = function(self, checked)
         if checked then
-            Prefs.SetToCurrentProfile('XinnoBackgroundStretch', 'true')
+            Prefs.SetToCurrentProfile('LobbyBackgroundStretch', 'true')
             LayoutHelpers.FillParent(GUI.background, GUI)
             LayoutHelpers.FillParent(GUI.background2, GUI)
         else
-            Prefs.SetToCurrentProfile('XinnoBackgroundStretch', 'false')
+            Prefs.SetToCurrentProfile('LobbyBackgroundStretch', 'false')
             LayoutHelpers.FillParentPreserveAspectRatio(GUI.background, GUI)
             LayoutHelpers.FillParentPreserveAspectRatio(GUI.background2, GUI)
         end
@@ -6336,18 +6241,6 @@ function CreateOptionLobbyDialog()
             Prefs.SetToCurrentProfile('XinnoSystemMessage', 'false')
         end
     end
-    --------------------
-    -- Warning text --
-    local text9 = UIUtil.CreateText(dialog2, "If you have a problem with the new Lobby Skin, I can't help you without Screen and Log !", 10, 'Arial')
-    text9:SetColor('B9BFB9')
-    text9:SetDropShadow(true)
-    LayoutHelpers.AtLeftIn(text9, dialog2, 20)
-    LayoutHelpers.AtBottomIn(text9, dialog2, 180)
-    local text10 = UIUtil.CreateText(dialog2, "And your silence will not solve anything :)", 10, 'Arial')
-    text10:SetColor('B9BFB9')
-    text10:SetDropShadow(true)
-    LayoutHelpers.AtLeftIn(text10, dialog2, 20)
-    LayoutHelpers.AtBottomIn(text10, dialog2, 165)
     ----------------------
     -- Developer box --
     local text0 = UIUtil.CreateText(dialog2, 'Lobby Developers :', 17, 'Arial Gras')
@@ -6388,28 +6281,6 @@ function CreateOptionLobbyDialog()
         dialog2:Destroy()
     end
 
-    -- Apply the State in Checkbox
-    local XinnoBackground = Prefs.GetFromCurrentProfile('XinnoBackground') or 'Factions'
-    cbox_BG_Factions:SetCheck(false, true)
-    cbox_BG_ConceptArt:SetCheck(false, true)
-    cbox_BG_Screenshoot:SetCheck(false, true)
-    cbox_BG_Map:SetCheck(false, true)
-    cbox_BG_No:SetCheck(false, true)
-    cbox_BG_Extra:SetCheck(false, true)
-
-    if XinnoBackground == 'Factions' then
-        cbox_BG_Factions:SetCheck(true, true)
-    elseif XinnoBackground == 'ConceptArt' then
-        cbox_BG_ConceptArt:SetCheck(true, true)
-    elseif XinnoBackground == 'Screenshoot' then
-        cbox_BG_Screenshoot:SetCheck(true, true)
-    elseif XinnoBackground == 'Map' then
-        cbox_BG_Map:SetCheck(true, true)
-    elseif XinnoBackground == 'No' then
-        cbox_BG_No:SetCheck(true, true)
-    elseif XinnoBackground == 'Extra' then
-        cbox_BG_Extra:SetCheck(true, true)
-    end
     --
     local WindowedLobby = Prefs.GetFromCurrentProfile('WindowedLobby') or 'true'
     cbox_WindowedLobby:SetCheck(WindowedLobby == 'true', true)
@@ -6423,8 +6294,8 @@ function CreateOptionLobbyDialog()
     local XinnoSkin = Prefs.GetFromCurrentProfile('XinnoSkin') or 'Dark'
     cbox_Skin_Dark:SetCheck(XinnoSkin == 'Dark', true)
     --
-    local XinnoBackgroundStretch = Prefs.GetFromCurrentProfile('XinnoBackgroundStretch') or 'true'
-    cbox_StretchBG:SetCheck(XinnoBackgroundStretch == 'true', true)
+    local LobbyBackgroundStretch = Prefs.GetFromCurrentProfile('LobbyBackgroundStretch') or 'true'
+    cbox_StretchBG:SetCheck(LobbyBackgroundStretch == 'true', true)
     --
     local XinnoSystemMessage = Prefs.GetFromCurrentProfile('XinnoSystemMessage') or 'false'
     cbox_SMsg:SetCheck(XinnoSystemMessage == 'true', true)

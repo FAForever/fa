@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Various utility functions to make UI scripts easier and more consistent
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local LazyVar = import('/lua/lazyvar.lua')
@@ -14,6 +14,7 @@ local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
 local Button = import('/lua/maui/button.lua').Button
 local Edit = import('/lua/maui/edit.lua').Edit
 local Checkbox = import('/lua/maui/Checkbox.lua').Checkbox
+local RadioButtons = import('/lua/maui/radiobuttons.lua').RadioButtons
 local Scrollbar = import('/lua/maui/scrollbar.lua').Scrollbar
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Cursor = import('/lua/maui/cursor.lua').Cursor
@@ -662,6 +663,7 @@ function CreateCheckboxStd(parent, filename, clickCue, rollCue)
         clickCue, rollCue)
     return checkbox
 end
+
 function CreateCheckboxStdPNG(parent, filename, clickCue, rollCue)
     local checkbox = CreateCheckbox( parent,
         SkinnableFile(filename .. '-d_btn_up.png'),
@@ -672,6 +674,18 @@ function CreateCheckboxStdPNG(parent, filename, clickCue, rollCue)
         SkinnableFile(filename .. '-s_btn_dis.png'),
         clickCue, rollCue)
     return checkbox
+end
+
+function CreateRadioButtonsStdPNG(parent, filename, title, buttons, default)
+    local radioButton = RadioButtons(parent, title, buttons, default, "Arial", 14, fontColor,
+        SkinnableFile(filename .. '-d_btn_up.png'),
+        SkinnableFile(filename .. '-s_btn_up.png'),
+        SkinnableFile(filename .. '-d_btn_over.png'),
+        SkinnableFile(filename .. '-s_btn_over.png'),
+        SkinnableFile(filename .. '-d_btn_dis.png'),
+        SkinnableFile(filename .. '-s_btn_dis.png'),
+        "")
+    return radioButton
 end
 
 function CreateDialogButtonStd(parent, filename, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue)
