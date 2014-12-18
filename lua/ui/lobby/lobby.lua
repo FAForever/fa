@@ -128,10 +128,14 @@ local CPU_Benchmarks = {} -- Stores CPU benchmark data
 local playerMean = GetCommandLineArg("/mean", 1)
 local playerDeviation = GetCommandLineArg("/deviation", 1)
 local playerClan = GetCommandLineArg("/clan", 1)
-
+local getInit = GetCommandLineArg("/init", 1)
 local ratingColor = GetCommandLineArg("/ratingcolor", 1)
 local numGames = GetCommandLineArg("/numgames", 1)
 
+
+if getInit then
+    getInit = tostring(getInit[1])
+end
 
 if ratingColor then
     ratingColor = tostring(ratingColor[1])
@@ -2721,31 +2725,34 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtLeftTopIn(ModFeaturedLabel, GUI.panel, 50, 61)
     ModFeaturedLabel:SetColor('B9BFB9')
     ModFeaturedLabel:SetDropShadow(true)
-    local getInit = GetCommandLineArg("/init", 1)
-    getInit = tostring(getInit[1])
     if getInit == "init_faf.lua" then
-        SetText2(ModFeaturedLabel, 'FA Forever', 10)
+        SetText2(ModFeaturedLabel, 'FA Forever - ', 10)
     elseif getInit == "init_blackops.lua" then
-        SetText2(ModFeaturedLabel, 'BlackOps MOD', 10)
+        SetText2(ModFeaturedLabel, 'BlackOps MOD - ', 10)
     elseif getInit == "init_coop.lua" then
-        SetText2(ModFeaturedLabel, 'COOP', 10)
+        SetText2(ModFeaturedLabel, 'COOP - ', 10)
     elseif getInit == "init_balancetesting.lua" then
-        SetText2(ModFeaturedLabel, 'Balance Testing', 10)
+        SetText2(ModFeaturedLabel, 'Balance Testing - ', 10)
     elseif getInit == "init_gw.lua" then
-        SetText2(ModFeaturedLabel, 'Galactic War', 10)
+        SetText2(ModFeaturedLabel, 'Galactic War - ', 10)
     elseif getInit == "init_labwars.lua" then
-        SetText2(ModFeaturedLabel, 'Labwars MOD', 10)
+        SetText2(ModFeaturedLabel, 'Labwars MOD - ', 10)
     elseif getInit == "init_ladder1v1.lua" then
-        SetText2(ModFeaturedLabel, 'Ladder 1v1', 10)
+        SetText2(ModFeaturedLabel, 'Ladder 1v1 - ', 10)
     elseif getInit == "init_nomads.lua" then
-        SetText2(ModFeaturedLabel, 'Nomads MOD', 10)
+        SetText2(ModFeaturedLabel, 'Nomads MOD - ', 10)
     elseif getInit == "init_phantomx.lua" then
-        SetText2(ModFeaturedLabel, 'PhantomX MOD', 10)
+        SetText2(ModFeaturedLabel, 'PhantomX MOD - ', 10)
     elseif getInit == "init_supremedestruction.lua" then
-        SetText2(ModFeaturedLabel, 'SupremeDestruction MOD', 10)
+        SetText2(ModFeaturedLabel, 'SupremeDestruction MOD - ', 10)
     elseif getInit == "init_xtremewars.lua" then
-        SetText2(ModFeaturedLabel, 'XtremeWars MOD', 10)
+        SetText2(ModFeaturedLabel, 'XtremeWars MOD - ', 10)
     end
+    --\\
+    --// Ranked Label
+    GUI.RankedLabel = UIUtil.CreateText(GUI.panel, "", 13, 'Arial Gras')
+    GUI.RankedLabel:SetColor(UIUtil.bodyColor)
+    LayoutHelpers.RightOf(GUI.RankedLabel, ModFeaturedLabel, 0)
     --\\
     --// Lobby options panel
     GUI.LobbyOptions = UIUtil.CreateButtonStd2PNG(GUI.panel, '/BUTTON/small/', "Lobby Options", 10, -1)
@@ -2837,7 +2844,7 @@ function CreateUI(maxPlayers)
     --end of close slots code
 
 
-    -- Checkbox Show changed Options
+	-- Checkbox Hide default Options
     cbox_ShowChangedOption = UIUtil.CreateCheckboxStdPNG(GUI.optionsPanel, '/CHECKBOX/radio')
     LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel, 3, 0)
     Tooltip.AddCheckboxTooltip(cbox_ShowChangedOption, {text='Hide default Options', body='Show only changed Options and Advanced Map Options'})
@@ -2869,7 +2876,7 @@ function CreateUI(maxPlayers)
     --if XinnoHideDefault == 'true' then
         --cbox_ShowChangedOption:SetCheck(true, false) -- BUG, OptionContainer NOT CREATED BEFORE -- isChecked, skipEvent
     --end
-    -- Checkbox Show changed Options
+    -- Checkbox Hide default Options
 
     -- GAME OPTIONS // MODS MANAGER BUTTON --
     if lobbyComm:IsHost() then     -- GAME OPTION
@@ -4030,7 +4037,30 @@ function CreateUI(maxPlayers)
         formattedOptions = {}
         FormOpt2 = {}
 
-        --// Check Mod active
+        --// Check Game is Ranked
+        if getInit == "init_faf.lua" then
+            local getVictory = gameInfo.GameOptions['Victory'] -- 'demoralization'
+            local getCheat = gameInfo.GameOptions['CheatsEnabled'] -- 'false'
+            local getSpeed = gameInfo.GameOptions['GameSpeed'] -- 'normal'
+            local getFog = gameInfo.GameOptions['FogOfWar'] -- 'explored'
+            local getPrebui = gameInfo.GameOptions['PrebuiltUnits'] -- 'Off'
+            local getNorush = gameInfo.GameOptions['NoRushOption'] -- 'Off'
+            local getNumbMod = table.getn(Mods.GetGameMods(gameInfo.GameMods)) -- 0 for the purposes of this function
+            local getRstric = gameInfo.GameOptions.RestrictedCategories --can be nil or a table, even if no restrictions are present
+            if getRstric == nil or table.getn(getRstric) == 0 then getRstric = true else getRstric = false end
+            if (getVictory == 'demoralization' and getCheat == 'false' and getSpeed == 'normal' and getFog == 'explored' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and getRstric) then
+                GUI.RankedLabel:SetText("Game is Ranked")
+                GUI.RankedLabel:SetColor("77ff77")
+            else
+                GUI.RankedLabel:SetText("Game is not Ranked")
+                GUI.RankedLabel:SetColor("ff7777")
+            end
+        else
+            GUI.RankedLabel:SetText("Game is not Ranked")
+            GUI.RankedLabel:SetColor("ff7777")
+        end
+        --\\ Stop Check Ranked active
+		--// Check Mod active
         local modStr = false
         local modNum = table.getn(Mods.GetGameMods(gameInfo.GameMods)) or 0
         local modNumUI = table.getn(Mods.GetUiMods()) or 0

@@ -71,7 +71,8 @@ changelog = {
             "- Fix the player not removed in the slot when is leave the lobby",
             "- Fix replaysync",
             "- Clan tags are shown in game",
-            "- Set ranked options works again"
+            "- Set ranked options works again",
+            "- Display the Ranked Label"
         }
     }
 }
