@@ -593,7 +593,7 @@ UnitBlueprint {
             Name = '<LOC enhancements_0103>Tech 3 Engineering Suite',
             NewBuildRate = 126,
             NewHealth = 7000,
-            NewRegenRate = 35,         --Fixes lower regeneration rate with T3 suite. This is T2 + t3 regeneration [130]
+            NewRegenRate = 35,
             Prerequisite = 'AdvancedEngineering',
             Slot = 'LCH',
             UpgradeEffectBones = {
@@ -735,7 +735,7 @@ UnitBlueprint {
     SelectionYOffset = 0,
     SizeX = 1.2,
     SizeY = 2.2,
-    SizeZ = 1.2, # 0.7
+    SizeZ = 1.2,
     StrategicIconName = 'icon_commander_generic',
     StrategicIconSortPriority = 0,
     Transport = {
@@ -964,7 +964,7 @@ UnitBlueprint {
             BeamLifetime = 0,
             CanFireFromTransport = true,
             CollideFriendly = false,
-            ContinuousBeam = true,     --New line
+            ContinuousBeam = true,
             Damage = 400,
             DamageRadius = 0.5,
             DamageType = 'Normal',
@@ -1002,8 +1002,8 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
-            RateOfFire = 10,				#3
-            TargetCheckInterval = 0.1,			#0.5
+            RateOfFire = 10,
+            TargetCheckInterval = 0.1,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'MOBILE',
@@ -1093,4 +1093,3 @@ UnitBlueprint {
         },
     },
 }
->>>>>>> Allow ACU Laser to fire when standing in water
