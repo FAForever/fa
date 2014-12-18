@@ -16,6 +16,7 @@ Changelog for patch 3641
 - Projectiles no longer collide with sinking units
 - Fixed share until death bug with dual-given units
 - Fixed bug with insta-disappearing wrecks due to garbage collect 
+- Cybran ACU can now fire the laser when standing in water
 
 *Enhancements*
 - Scathis now has Amphibious build icon
