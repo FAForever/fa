@@ -6112,8 +6112,8 @@ function CreateOptionLobbyDialog()
     dialog.Height:Set(background.Height)
     LayoutHelpers.FillParent(background, dialog)
     local dialog2 = Group(dialog)
-    dialog2.Width:Set(536)
-    dialog2.Height:Set(400)
+    dialog2.Width:Set(526)
+    dialog2.Height:Set(350)
     LayoutHelpers.AtCenterIn(dialog2, dialog)
 
     -- Background switching radiobutton.
@@ -6131,7 +6131,6 @@ function CreateOptionLobbyDialog()
     LayoutHelpers.AtLeftTopIn(backgroundRadiobutton, dialog2, 20, 20)
 
     backgroundRadiobutton.OnChoose = function(self, button)
-        LOG("Radioclick: " .. button)
         Prefs.SetToCurrentProfile("LobbyBackground", button)
         ChangeBackgroundLobby(nil, nil)
     end
@@ -6141,10 +6140,10 @@ function CreateOptionLobbyDialog()
 	local slider_Chat_SizeFont_TEXT = UIUtil.CreateText(dialog2, 'Chat Font Size: '.. currentFontSize, 14, 'Arial')
     slider_Chat_SizeFont_TEXT:SetColor('B9BFB9')
     slider_Chat_SizeFont_TEXT:SetDropShadow(true)
-    LayoutHelpers.AtLeftTopIn(slider_Chat_SizeFont_TEXT, dialog2, 28, 205)
+    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont_TEXT, dialog2, 20, 155)
 
 	local slider_Chat_SizeFont = Slider(dialog2, false, 9, 18, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
-    LayoutHelpers.AtLeftTopIn(slider_Chat_SizeFont, dialog2, 26, 220)
+    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont, dialog2, 20, 170)
     slider_Chat_SizeFont:SetValue(currentFontSize)
 
 	slider_Chat_SizeFont.OnValueChanged = function(self, newValue)
@@ -6173,40 +6172,8 @@ function CreateOptionLobbyDialog()
         SetWindowedLobby(checked)
     end
     --
-    cbox_Skin_Dark = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
-    LayoutHelpers.AtRightIn(cbox_Skin_Dark, dialog2, 20)
-    LayoutHelpers.AtTopIn(cbox_Skin_Dark, dialog2, 60)
-    Tooltip.AddCheckboxTooltip(cbox_Skin_Dark, {text='Dark Skin', body='Apply the Dark Skin in the Lobby'})
-    cbox_Skin_Dark_TEXT = UIUtil.CreateText(cbox_Skin_Dark, 'Dark Skin', 14, 'Arial')
-    cbox_Skin_Dark_TEXT:SetColor('B9BFB9')
-    cbox_Skin_Dark_TEXT:SetDropShadow(true)
-    LayoutHelpers.AtRightIn(cbox_Skin_Dark_TEXT, cbox_Skin_Dark, 25)
-    LayoutHelpers.AtVerticalCenterIn(cbox_Skin_Dark_TEXT, cbox_Skin_Dark)
-    cbox_Skin_Dark.OnCheck = function(self, checked)
-        if checked then
-        else
-            cbox_Skin_Dark:SetCheck(true, true)
-        end
-    end
-    local cbox6_0 = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
-    LayoutHelpers.AtRightIn(cbox6_0, dialog2, 20)
-    LayoutHelpers.AtTopIn(cbox6_0, dialog2, 80)
-    Tooltip.AddCheckboxTooltip(cbox6_0, {text='White Skin', body='White Skin is not available yet, Need a Graphic Artist !!!'})
-    local cbox6_1 = UIUtil.CreateText(cbox6_0, 'White Skin', 14, 'Arial')
-    cbox6_1:SetColor('B9BFB9')
-    cbox6_1:SetDropShadow(true)
-    LayoutHelpers.AtRightIn(cbox6_1, cbox6_0, 25)
-    LayoutHelpers.AtVerticalCenterIn(cbox6_1, cbox6_0)
-    cbox6_0:Disable()
-	cbox6_1:Disable()
-	cbox6_1:SetColor('5C5F5C')
-    cbox6_0.OnClick = function(self, checked)
-        cbox6_0:SetCheck(false, true)
-    end
-    --
     local cbox_StretchBG = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
-    LayoutHelpers.AtRightIn(cbox_StretchBG, dialog2, 20)
-    LayoutHelpers.AtTopIn(cbox_StretchBG, dialog2, 120)
+    LayoutHelpers.AtRightTopIn(cbox_StretchBG, dialog2, 20, 60)
     Tooltip.AddCheckboxTooltip(cbox_StretchBG, {text='Stretch Background', body='Stretch background to fill screen.'})
     local cbox_StretchBG_TEXT = UIUtil.CreateText(cbox_StretchBG, 'Stretch Background', 14, 'Arial')
     cbox_StretchBG_TEXT:SetColor('B9BFB9')
@@ -6226,8 +6193,7 @@ function CreateOptionLobbyDialog()
     end
     --
     local cbox_SMsg = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
-    LayoutHelpers.AtRightIn(cbox_SMsg, dialog2, 20)
-    LayoutHelpers.AtTopIn(cbox_SMsg, dialog2, 160)
+    LayoutHelpers.AtRightTopIn(cbox_SMsg, dialog2, 20, 100)
     Tooltip.AddCheckboxTooltip(cbox_SMsg, {text='Log to chat', body='Display system messages in chat window (connection status etc.)'})
     local cbox_SMsg_TEXT = UIUtil.CreateText(cbox_SMsg, 'Show system message', 14, 'Arial')
     cbox_SMsg_TEXT:SetColor('B9BFB9')
@@ -6242,12 +6208,12 @@ function CreateOptionLobbyDialog()
         end
     end
     ----------------------
+
     -- Developer box --
-    local text0 = UIUtil.CreateText(dialog2, 'Lobby Developers :', 17, 'Arial Gras')
-    text0:SetColor('B9BFB9')
-    text0:SetDropShadow(true)
-    LayoutHelpers.AtLeftIn(text0, dialog2, 20)
-    LayoutHelpers.AtBottomIn(text0, dialog2, 125)
+    local devsHeader = UIUtil.CreateText(dialog2, 'Lobby Developers :', 17, 'Arial Gras')
+    devsHeader:SetColor('B9BFB9')
+    devsHeader:SetDropShadow(true)
+    LayoutHelpers.AtLeftTopIn(devsHeader, dialog2, 20, 220)
     -- Ask to Xinnony for add your name and work correctly
     local text = {}
     local ttext = {'- Xinnony : New Skin (with Barlots), Preset Lobby, Faction Selector, Country Flag, Move Player to,',
@@ -6255,20 +6221,18 @@ function CreateOptionLobbyDialog()
     'Bugs Fixing and lots of mores.',
     '- Vicarian : Contribute with Xinnony, Rating Observer, bugs fixing.',
     '- Duck_42 : CPU Bench, Ping Nuke.',
-    '- Moritz : Power Lobby 2.0.',}
+    '- Moritz : Power Lobby 2.0.', }
+
     for i, v in ttext do
         text[i] = UIUtil.CreateText(dialog2, v, 10, 'Arial')
         text[i]:SetColor('B9BFB9')
         text[i]:SetDropShadow(true)
         if i == 2 then
-            LayoutHelpers.AtLeftIn(text[2], dialog2, 40) -- Manual set the SubLine position
-            LayoutHelpers.AtBottomIn(text[2], dialog2, 95)
+            LayoutHelpers.AtLeftTopIn(text[2], dialog2, 40, 255)
         elseif i == 3 then
-            LayoutHelpers.AtLeftIn(text[3], dialog2, 40) -- Manual set the SubLine position
-            LayoutHelpers.AtBottomIn(text[3], dialog2, 85)
+            LayoutHelpers.AtLeftTopIn(text[3], dialog2, 40, 265)
         else
-            LayoutHelpers.AtLeftIn(text[i], dialog2, 20)
-            LayoutHelpers.AtBottomIn(text[i], dialog2, 120-(15*i))
+            LayoutHelpers.AtLeftTopIn(text[i], dialog2, 20, 225+(15*i))
         end
     end
     ------------------
@@ -6290,9 +6254,6 @@ function CreateOptionLobbyDialog()
 		cbox_WindowedLobby_TEXT:Disable()
 		cbox_WindowedLobby_TEXT:SetColor('5C5F5C')
 	end
-    --
-    local XinnoSkin = Prefs.GetFromCurrentProfile('XinnoSkin') or 'Dark'
-    cbox_Skin_Dark:SetCheck(XinnoSkin == 'Dark', true)
     --
     local LobbyBackgroundStretch = Prefs.GetFromCurrentProfile('LobbyBackgroundStretch') or 'true'
     cbox_StretchBG:SetCheck(LobbyBackgroundStretch == 'true', true)
@@ -7150,7 +7111,7 @@ function GUI_Changelog()
     InfoList:SetFont(UIUtil.bodyFont, 11)
     InfoList:SetColors(nil, "00000000")
     InfoList.Width:Set(498)
-    InfoList.Height:Set(300)
+    InfoList.Height:Set(260)
     LayoutHelpers.AtLeftIn(InfoList, dialog2, 10)
 	LayoutHelpers.AtRightIn(InfoList, dialog2, 26)
     LayoutHelpers.AtTopIn(InfoList, dialog2, 38)
