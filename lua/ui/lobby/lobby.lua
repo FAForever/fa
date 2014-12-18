@@ -4400,11 +4400,9 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
             gameInfo.AutoTeams[slot] = 2
         end
 
+        local buttonImage = UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds')
         GUI.markers[slot].markerOverlay = Button(GUI.markers[slot].marker,
-        UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds'),
-        UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds'),
-        UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds'),
-        UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds'))
+                                                 buttonImage, buttonImage, buttonImage, buttonImage)
         LayoutHelpers.AtCenterIn(GUI.markers[slot].markerOverlay, GUI.markers[slot].marker)
         GUI.markers[slot].markerOverlay.Slot = slot
         GUI.markers[slot].markerOverlay.OnClick = function(self, modifiers)
