@@ -6106,7 +6106,7 @@ end
 function CreateOptionLobbyDialog()
     local dialog = Group(GUI)
     LayoutHelpers.AtCenterIn(dialog, GUI)
-    dialog.Depth:Set(999) -- GetTopmostDepth()
+    dialog.Depth:Set(GetFrame(dialog:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 1)
     local background = Bitmap(dialog, '/textures/ui/common/scx_menu/lan-game-lobby/optionlobby.png')
     dialog.Width:Set(background.Width)
     dialog.Height:Set(background.Height)
