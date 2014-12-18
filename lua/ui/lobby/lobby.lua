@@ -60,9 +60,8 @@ local teamIcons = {
     '/lobby/team_icons/team_6_icon.dds',
 }
 
---// Xinnony DEBUG
-XinnonyDebug = Prefs.GetFromCurrentProfile('XinnoDEBUG') or ''
-XinnonyOption = 0
+DebugEnabled = Prefs.GetFromCurrentProfile('LobbyDebug') or ''
+HideDefaultOptions = 0
 function LOGX(text, ttype)
 	-- onlyChat = for debug only in the Chat
 	-- onlyLOG = for debug only in the LOG
@@ -70,12 +69,12 @@ function LOGX(text, ttype)
 	-- Country, RuleTitle, Background
 	-- Disconnected, Connecting, UpdateGame
 	local text = tostring(text)
-	local onlyLOG = string.find(XinnonyDebug, 'onlyLOG') or nil
-	local onlyChat = string.find(XinnonyDebug, 'onlyChat') or nil
+	local onlyLOG = string.find(DebugEnabled, 'onlyLOG') or nil
+	local onlyChat = string.find(DebugEnabled, 'onlyChat') or nil
 	if ttype == nil then
 		LOG(text)
 	else
-		if string.find(XinnonyDebug, ttype) and ttype ~= nil then
+		if string.find(DebugEnabled, ttype) and ttype ~= nil then
 			if onlyLOG ~= nil then
 				LOG(text)
 			elseif onlyChat ~= nil then
@@ -87,12 +86,10 @@ function LOGX(text, ttype)
 		end
 	end
 end
---\\ Xinnony DEBUG
---// Table of Tooltip Country
+-- Table of Tooltip Country
 local PrefLanguageTooltipTitle={}
 local PrefLanguageTooltipText={}
---\\ Stop - Table of Tooltip Country
---// Get a value on /Country CommandLine in FA.exe
+
 local PrefLanguage = GetCommandLineArg("/country", 1)
 if PrefLanguage[1] == '' or PrefLanguage[1] == '/init' or PrefLanguage == nil or PrefLanguage == false then
     LOG('COUNTRY - Country has not been found "'..tostring(PrefLanguage[1])..'"')
@@ -100,7 +97,6 @@ if PrefLanguage[1] == '' or PrefLanguage[1] == '/init' or PrefLanguage == nil or
 else
     PrefLanguage = tostring(string.lower(PrefLanguage[1]))
 end
---\\ Stop - Get a value on /Country CommandLine in FA.exe
 
 local LASTLobbyBackground = 0 -- For prevent the infinite loop to Background
 
@@ -210,12 +206,12 @@ end
 local function LOGXWhisper(params)
 	-- Exemple : Country Background useChat'
 	if string.find(params, 'CLEAR') then
-		XinnonyDebug = ''
-		Prefs.SetToCurrentProfile('XinnoDEBUG', '')
+		DebugEnabled = ''
+		Prefs.SetToCurrentProfile('LobbyDebug', '')
 		AddChatText('Debug disabled')
 	else
-		XinnonyDebug = params
-		Prefs.SetToCurrentProfile('XinnoDEBUG', params)
+        DebugEnabled = params
+		Prefs.SetToCurrentProfile('LobbyDebug', params)
 		AddChatText('Debug actived : '..params)
 	end
 end
@@ -804,8 +800,8 @@ function SetSlotInfo(slot, playerInfo)
     if wasConnected(playerInfo.OwnerID) or isLocallyOwned then
         GUI.slots[slot].name:SetTitleText(playerInfo.PlayerName)
         GUI.slots[slot].name._text:SetFont('Arial Gras', 15)
-        local XinnoSystemMessage = Prefs.GetFromCurrentProfile('XinnoSystemMessage') or 'false'
-        if XinnoSystemMessage == 'true' then
+        local LobbySystemMessagesEnabled = Prefs.GetFromCurrentProfile('LobbySystemMessagesEnabled') or 'false'
+        if LobbySystemMessagesEnabled == 'true' then
             if not table.find(ConnectionEstablished, playerInfo.PlayerName) then
                 if playerInfo.Human and not isLocallyOwned then
                     if table.find(ConnectedWithProxy, playerInfo.OwnerID) then
@@ -826,8 +822,8 @@ function SetSlotInfo(slot, playerInfo)
     else
         GUI.slots[slot].name:SetTitleText('Connecting to ... ' .. playerInfo.PlayerName)
         GUI.slots[slot].name._text:SetFont('Arial Gras', 11)
-        local XinnoSystemMessage = Prefs.GetFromCurrentProfile('XinnoSystemMessage') or 'false'
-        if XinnoSystemMessage == 'true' then
+        local LobbySystemMessagesEnabled = Prefs.GetFromCurrentProfile('LobbySystemMessagesEnabled') or 'false'
+        if LobbySystemMessagesEnabled == 'true' then
             if not table.find(CurrentConnection, playerInfo.PlayerName) then
                 AddChatText('Connecting to '..playerInfo.PlayerName..' ...')
                 table.insert(CurrentConnection, playerInfo.PlayerName)
@@ -1443,8 +1439,8 @@ function SendSystemMessage(text, id)
     }
     lobbyComm:BroadcastData(data)
     if data.Id == 'lobui_0202' or data.Id == 'lobui_0226' or data.Id == 'lobui_0227' or data.Id == 'lobui_0205' or data.Id == 'switch' then
-        local XinnoSystemMessage = Prefs.GetFromCurrentProfile('XinnoSystemMessage') or 'false'
-        if XinnoSystemMessage == 'true' then
+        local LobbySystemMessagesEnabled = Prefs.GetFromCurrentProfile('LobbySystemMessagesEnabled') or 'false'
+        if LobbySystemMessagesEnabled == 'true' then
             AddChatText(text)
         end
     else
@@ -1789,9 +1785,9 @@ local function UpdateGame()
         Tooltip.AddButtonTooltip(GUI.gameoptionsButton, 'Lobby_Mods')
         GUI.launchGameButton:Hide()
         if gameInfo.GameOptions.AllowObservers then
-            GUI.allowObservers:SetCheck(true, true) -- XinnoTest
+            GUI.allowObservers:SetCheck(true, true)
         else
-            GUI.allowObservers:SetCheck(false, true) -- XinnoTest
+            GUI.allowObservers:SetCheck(false, true)
         end
     end
 
@@ -2869,25 +2865,25 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtVerticalCenterIn(cbox_ShowChangedOption_TEXT, cbox_ShowChangedOption)
     cbox_ShowChangedOption.OnCheck = function(self, checked)
         if checked then
-            XinnonyOption = 1
+            HideDefaultOptions = 1
             RefreshOptionDisplayData()
             if GUI.OptionContainer.CalcVisible then
                 GUI.OptionContainer:CalcVisible()
             end
             GUI.OptionContainer.ScrollSetTop(GUI.OptionContainer, 'Vert', 0)
-            Prefs.SetToCurrentProfile('XinnoHideDefaultOptions', 'true')
+            Prefs.SetToCurrentProfile('LobbyHideDefaultOptions', 'true')
         else
-            XinnonyOption = 0
+            HideDefaultOptions = 0
             RefreshOptionDisplayData()
             if GUI.OptionContainer.CalcVisible then
                 GUI.OptionContainer:CalcVisible()
             end
             GUI.OptionContainer.ScrollSetTop(GUI.OptionContainer, 'Vert', 0)
-            Prefs.SetToCurrentProfile('XinnoHideDefaultOptions', 'false')
+            Prefs.SetToCurrentProfile('LobbyHideDefaultOptions', 'false')
         end
     end
-    local XinnoHideDefault = Prefs.GetFromCurrentProfile('XinnoHideDefaultOptions') or 'false'
-    --if XinnoHideDefault == 'true' then
+    local hideDefaultOptions = Prefs.GetFromCurrentProfile('LobbyHideDefaultOptions') or 'false'
+    --if hideDefaultOptions == 'true' then
         --cbox_ShowChangedOption:SetCheck(true, false) -- BUG, OptionContainer NOT CREATED BEFORE -- isChecked, skipEvent
     --end
     -- Checkbox Show changed Options
@@ -3002,7 +2998,7 @@ function CreateUI(maxPlayers)
     GUI.chatEdit:AcquireFocus()
 
     GUI.chatDisplay = ItemList(GUI.chatPanel)
-    GUI.chatDisplay:SetFont(UIUtil.bodyFont, tonumber(Prefs.GetFromCurrentProfile('XinnoChatSizeFont')) or 14)
+    GUI.chatDisplay:SetFont(UIUtil.bodyFont, tonumber(Prefs.GetFromCurrentProfile('LobbyChatFontSize')) or 14)
     GUI.chatDisplay:SetColors(UIUtil.fontColor(), "00000000", UIUtil.fontColor(), "00000000")
     LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.chatPanel, 8, 4) --Right, Top
     GUI.chatDisplay.Bottom:Set(function() return GUI.chatEdit.Top() -6 end)
@@ -3145,9 +3141,9 @@ function CreateUI(maxPlayers)
         local numLines = function() return table.getsize(GUI.OptionDisplay) end
 
         local function DataSize()
-            if XinnonyOption == 0 then
+            if HideDefaultOptions == 0 then
                 return table.getn(formattedOptions)
-            elseif XinnonyOption == 1 then
+            elseif HideDefaultOptions == 1 then
                 return table.getn(FormOpt2)
             end
         end
@@ -3222,7 +3218,7 @@ function CreateUI(maxPlayers)
             end
 
             for i, v in GUI.OptionDisplay do
-                if XinnonyOption == 0 then
+                if HideDefaultOptions == 0 then
                     if formattedOptions[i + self.top] then
                         SetTextLine(v, formattedOptions[i + self.top], i + self.top)
                     else
@@ -3231,7 +3227,7 @@ function CreateUI(maxPlayers)
                         v.value.bg:Hide()
                         v.value.bg2:Hide()
                     end
-                elseif XinnonyOption == 1 then
+                elseif HideDefaultOptions == 1 then
                     if FormOpt2[i + self.top] then
                         SetTextLine(v, FormOpt2[i + self.top], i + self.top)
                     else
@@ -3292,7 +3288,7 @@ function CreateUI(maxPlayers)
         ---------------------------------------------------------------------------
         -- Checkbox Show changed Options
         ---------------------------------------------------------------------------
-        if XinnoHideDefault == 'true' then
+        if hideDefaultOptions == 'true' then
             cbox_ShowChangedOption:SetCheck(true, false) -- BUG FIXED !, OptionContainer NOT CREATED BEFORE -- isChecked, skipEvent
         end
         
@@ -4246,8 +4242,8 @@ function CreateUI(maxPlayers)
             if not wasConnected(peer.id) then
                 GUI.slots[FindSlotForID(peer.id)].name:SetTitleText(peer.name)
                 GUI.slots[FindSlotForID(peer.id)].name._text:SetFont('Arial Gras', 15)
-                local XinnoSystemMessage = Prefs.GetFromCurrentProfile('XinnoSystemMessage') or 'false'
-                if XinnoSystemMessage == 'true' then
+                local LobbySystemMessagesEnabled = Prefs.GetFromCurrentProfile('LobbySystemMessagesEnabled') or 'false'
+                if LobbySystemMessagesEnabled == 'true' then
                     if not table.find(ConnectionEstablished, peer.name) then
                         --AddChatText('<< '..peer.name..' >> '..FindSlotForID(peer.id)..' || '..tostring(gameInfo.PlayerOptions[FindSlotForID(peer.id)].Human)..' || '..tostring(IsLocallyOwned(FindSlotForID(peer.id))))
                         if gameInfo.PlayerOptions[FindSlotForID(peer.id)].Human and not IsLocallyOwned(FindSlotForID(peer.id)) then                            if table.find(ConnectedWithProxy, peer.id) then
@@ -4776,8 +4772,8 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 --lobui_0227 = Move Observer to Player
                 --lobui_0205 = Timed Out
                 if data.Id == 'lobui_0202' or data.Id == 'lobui_0226' or data.Id == 'lobui_0227' or data.Id == 'lobui_0205' or data.Id == 'switch' then
-                    local XinnoSystemMessage = Prefs.GetFromCurrentProfile('XinnoSystemMessage') or 'false'
-                    if XinnoSystemMessage == 'true' then
+                    local LobbySystemMessagesEnabled = Prefs.GetFromCurrentProfile('LobbySystemMessagesEnabled') or 'false'
+                    if LobbySystemMessagesEnabled == 'true' then
                         AddChatText(data.Text)
                     end
                 else
@@ -6142,7 +6138,7 @@ function CreateOptionLobbyDialog()
     end
 	--
 	local Slider = import('/lua/maui/slider.lua').Slider
-	local currentFontSize = Prefs.GetFromCurrentProfile('XinnoChatSizeFont') or 14
+	local currentFontSize = Prefs.GetFromCurrentProfile('LobbyChatFontSize') or 14
 	local slider_Chat_SizeFont_TEXT = UIUtil.CreateText(dialog2, LOC("<LOC lobui_0404>").. currentFontSize, 14, 'Arial')
     slider_Chat_SizeFont_TEXT:SetColor('B9BFB9')
     slider_Chat_SizeFont_TEXT:SetDropShadow(true)
@@ -6155,7 +6151,7 @@ function CreateOptionLobbyDialog()
 	slider_Chat_SizeFont.OnValueChanged = function(self, newValue)
         slider_Chat_SizeFont_TEXT:SetText('Chat Size Font : '..string.format('%3d', slider_Chat_SizeFont._currentValue()))
         GUI.chatDisplay:SetFont(UIUtil.bodyFont, tonumber(string.format('%3d', slider_Chat_SizeFont._currentValue())))
-        Prefs.SetToCurrentProfile('XinnoChatSizeFont', tonumber(string.format('%3d', slider_Chat_SizeFont._currentValue())))
+        Prefs.SetToCurrentProfile('LobbyChatFontSize', tonumber(string.format('%3d', slider_Chat_SizeFont._currentValue())))
 	end
 	--
     local cbox_WindowedLobby = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
@@ -6208,9 +6204,9 @@ function CreateOptionLobbyDialog()
     LayoutHelpers.AtVerticalCenterIn(cbox_SMsg_TEXT, cbox_SMsg)
     cbox_SMsg.OnCheck = function(self, checked)
         if checked then
-            Prefs.SetToCurrentProfile('XinnoSystemMessage', 'true')
+            Prefs.SetToCurrentProfile('LobbySystemMessagesEnabled', 'true')
         else
-            Prefs.SetToCurrentProfile('XinnoSystemMessage', 'false')
+            Prefs.SetToCurrentProfile('LobbySystemMessagesEnabled', 'false')
         end
     end
     ----------------------
@@ -6263,8 +6259,8 @@ function CreateOptionLobbyDialog()
     local LobbyBackgroundStretch = Prefs.GetFromCurrentProfile('LobbyBackgroundStretch') or 'true'
     cbox_StretchBG:SetCheck(LobbyBackgroundStretch == 'true', true)
     --
-    local XinnoSystemMessage = Prefs.GetFromCurrentProfile('XinnoSystemMessage') or 'false'
-    cbox_SMsg:SetCheck(XinnoSystemMessage == 'true', true)
+    local LobbySystemMessagesEnabled = Prefs.GetFromCurrentProfile('LobbySystemMessagesEnabled') or 'false'
+    cbox_SMsg:SetCheck(LobbySystemMessagesEnabled == 'true', true)
 end
 
 --------------------------------------------------------------------------------------
@@ -7094,7 +7090,7 @@ end
 -- Changelog dialog
 function Need_Changelog()
 	local Changelog = import('/lua/ui/lobby/changelog.lua').changelog
-	local Last_Changelog_Version = Prefs.GetFromCurrentProfile('XinnoChangelog') or 0
+	local Last_Changelog_Version = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
 	local result = false
 	for i, d in Changelog do
 		if Last_Changelog_Version < d.version then
@@ -7137,7 +7133,7 @@ function GUI_Changelog()
 	end
 	-- See only new Changelog by version
 	local Changelog = import('/lua/ui/lobby/changelog.lua')
-	local Last_Changelog_Version = Prefs.GetFromCurrentProfile('XinnoChangelog') or 0
+	local Last_Changelog_Version = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
 	for i, d in Changelog.changelog do
 		if Last_Changelog_Version < d.version then
 			InfoList:AddItem(d.name)
@@ -7152,7 +7148,7 @@ function GUI_Changelog()
 	LayoutHelpers.AtLeftIn(OkButton, dialog2, 0)
     LayoutHelpers.AtBottomIn(OkButton, dialog2, 10)
     OkButton.OnClick = function(self)
-        Prefs.SetToCurrentProfile('XinnoChangelog', Changelog.last_version)
+        Prefs.SetToCurrentProfile('LobbyChangelog', Changelog.last_version)
 		GROUP_Changelog:Destroy()
     end
     -- Credit --
