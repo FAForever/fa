@@ -1228,7 +1228,7 @@ local function AssignRandomStartSpots(gameInfo)
                         team = 3
                     end
                 elseif autoTeams == 'pvsi' then
-                    if i == 1 or i == 3 or i == 5 or i == 7 or i == 9 or i == 11 then
+                    if math.mod(i, 2) ~= 0 then
                         team = 2
                     else
                         team = 3
@@ -4563,7 +4563,7 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
                 end
             elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' then
                 if not gameInfo.ClosedSlots[slot] and (gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] == 'random') then
-                    if slot == 1 or slot == 3 or slot == 5 or slot == 7 or slot == 9 or slot == 11 then
+                    if math.floor(slot, 2) ~= 0 then
                         GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[2]))
                     else
                         GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[3]))
