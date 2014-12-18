@@ -6421,25 +6421,13 @@ function CreateOptionLobbyDialog()
 	end
     --
     local XinnoSkin = Prefs.GetFromCurrentProfile('XinnoSkin') or 'Dark'
-    if XinnoSkin == 'Dark' then
-        cbox_Skin_Dark:SetCheck(true, true)
-    else
-        cbox_Skin_Dark:SetCheck(false, true)
-    end
+    cbox_Skin_Dark:SetCheck(XinnoSkin == 'Dark', true)
     --
     local XinnoBackgroundStretch = Prefs.GetFromCurrentProfile('XinnoBackgroundStretch') or 'true'
-    if XinnoBackgroundStretch == 'true' then
-        cbox_StretchBG:SetCheck(true, true)
-    else
-        cbox_StretchBG:SetCheck(false, true)
-    end
+    cbox_StretchBG:SetCheck(XinnoBackgroundStretch == 'true', true)
     --
     local XinnoSystemMessage = Prefs.GetFromCurrentProfile('XinnoSystemMessage') or 'false'
-    if XinnoSystemMessage == 'true' then
-        cbox_SMsg:SetCheck(true, true)
-    else
-        cbox_SMsg:SetCheck(false, true)
-    end
+    cbox_SMsg:SetCheck(XinnoSystemMessage == 'true', true)
 end
 
 --------------------------------------------------------------------------------------
