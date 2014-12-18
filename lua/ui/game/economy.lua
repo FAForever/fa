@@ -23,6 +23,8 @@ local UIState = true
 
 local lastEfficiency = {MASS=1, ENERGY=1}
 local Reclaim = {focus=-1, MASS={rate=0, history={}}, ENERGY={rate=0, history={}}}
+-- updated in UserSync.lua
+TeamEco = {allies={}, overflow={MASS=0, ENERGY=0}}
 
 group = false
 savedParent = false
@@ -322,12 +324,24 @@ function UpdateEconData(eco, type)
     end
     local expense = eco[key][type] * tps
     local rate = round(income - expense)
+    local overflow
+
+    if options.gui_team_economy == 1 and TeamEco and TeamEco.overflow then
+        overflow = TeamEco.overflow[type]
+    else
+        overflow = 0
+    end
 
     controls.storageBar:SetRange(0, maxStorage)
     controls.storageBar:SetValue(stored)
     controls.curStorage:SetText(round(stored))
     controls.maxStorage:SetText(round(maxStorage))
-    controls.income:SetText(string.format("+%d", round(income)))
+
+    if overflow > 0 then
+        controls.income:SetText(string.format("+%d (+%d)", round(income), round(overflow)))
+    else
+        controls.income:SetText(string.format("+%d", round(income)))
+    end
     controls.expense:SetText(string.format("-%d", round(expense)))
 
     if expense == 0 then

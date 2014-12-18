@@ -671,6 +671,19 @@ options = {
                     },
                 },
             },
+
+            {
+                title = "Show team overflow and storage",
+                key = 'gui_team_economy',
+                type = 'toggle',
+                default = 0,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 0 },
+                        {text = "<LOC _On>", key = 1 },
+                    },
+                },
+            },
         },
     },
     video = {
