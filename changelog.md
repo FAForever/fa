@@ -4,6 +4,9 @@ Changelog for hotfix-patch 3638
 *Exploit fixes*
 - Fixed a regression of the free ACU upgrade exploit
 
+*Game improvements*
+- Game quality is now visible in score overlay
+
 *Bug fixes*
 - Fixed air wrecks floating mid air on certain maps
 - Fixed air wrecks sinking to bottom of water, then jumping back up to surface
