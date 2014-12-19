@@ -74,30 +74,30 @@ end
 
 DecalFunctions = {
     RULEUCC_Nuke = function()
-        local InnerSize = 0
-        local OuterSize = 0
-        local Invalid = false
-        local ValidAttackers = GetValidAttackingUnits()
+        local innerSize = nil
+        local outerSize = nil
+        local invalid = false
+        local validAttackers = GetValidAttackingUnits()
         
-        if ValidAttackers and table.getn(ValidAttackers) > 0 then
-            for index, unit in ValidAttackers do
+        if validAttackers and table.getn(validAttackers) > 0 then
+            for index, unit in validAttackers do
                 local bp = unit:GetBlueprint()
                 for i, w in bp.Weapon do
                     if w.CountedProjectile == true and w.NukeWeapon == true then
                         -- Needs to be re-scaled to correspond to ingame radius values
-                        InnerSize = w.NukeInnerRingRadius * 2
-                        OuterSize = w.NukeOuterRingRadius * 2
+                        innerSize = w.NukeInnerRingRadius * 2
+                        outerSize = w.NukeOuterRingRadius * 2
                     end
                 end
             end
         else
-            Invalid = true
+            invalid = true
         end
         
-        if InnerSize == 0 or OuterSize == 0 then
+        if not innerSize or not outerSize then
             WARN('Nuke decal called for non-nuclear weapon')
         end
-        return Invalid, "/textures/ui/common/game/AreaTargetDecal/nuke_icon_outer.dds", Vector(OuterSize, 1, OuterSize), "/textures/ui/common/game/AreaTargetDecal/nuke_icon_inner.dds", Vector(InnerSize, 1, InnerSize)
+        return invalid, "/textures/ui/common/game/AreaTargetDecal/nuke_icon_outer.dds", Vector(outerSize, 1, outerSize), "/textures/ui/common/game/AreaTargetDecal/nuke_icon_inner.dds", Vector(innerSize, 1, innerSize)
     end,
     RULEUCC_Attack = AttackDecalFunc,
 }
@@ -196,7 +196,7 @@ WorldView = Class(moho.UIWorldView, Control) {
         if self.NeedTargetDecal then
             if not self.TargetDecal then
                 self.TargetDecal = UserDecal {}
-                self.TargetDecal2 = UserDecal {}
+                self.TargetDecal2 = UserDecal {} -- Forces two textures to render for Nukes
             end
             if newDecalTexture and self.DecalTexture != newDecalTexture then
                 self.TargetDecal:SetTexture(newDecalTexture)
