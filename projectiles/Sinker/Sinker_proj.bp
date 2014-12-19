@@ -28,6 +28,7 @@ ProjectileBlueprint {
         HelpText = 0,
     },
     Physics = {
+        CollideEntity = false,
         DestroyOnWater = false,
         InitialSpeed = 0,
         LeadTarget = false,
@@ -35,7 +36,6 @@ ProjectileBlueprint {
         UseGravity = false, -- not using gravity, units sink way to fast
         SinkSpeed = 0.05,
         VelocityAlign = false,
-
         RotationalVelocity = 1,
         RotationalVelocityRange = 6,
         DirectionX = 0,
