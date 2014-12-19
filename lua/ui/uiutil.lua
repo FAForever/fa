@@ -524,24 +524,6 @@ function CreateButton(parent, up, down, over, disabled, label, pointSize, textOf
     return button
 end
 
-function SetNewButtonTextures(button, up, down, over, disabled)
-    -- if strings passed in, make them skinnables, otherwise assume they are already skinnables
-    if type(up) == 'string' then
-        up = SkinnableFile(up)
-    end
-    if type(down) == 'string' then
-        down = SkinnableFile(down)
-    end
-    if type(over) == 'string' then
-        over = SkinnableFile(over)
-    end
-    if type(disabled) == 'string' then
-        disabled = SkinnableFile(disabled)
-    end
-
-    button:SetNewTextures(up, down, over, disabled)
-end
-
 --* create a button with standardized texture names
 --* given a path and button name prefix, generates the four button asset file names according to the naming convention
 function CreateButtonStd(parent, filename, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue)
@@ -624,14 +606,6 @@ function CreateDialogButtonStd(parent, filename, label, pointSize, textOffsetVer
     button.label:SetFont( dialogButtonFont, pointSize )
     button.label:SetColor( dialogButtonColor )
     return button
-end
-
-function SetNewButtonStdTextures(button, filename)
-    SetNewButtonTextures(button
-        , filename .. "_btn_up.dds"
-        , filename .. "_btn_down.dds"
-        , filename .. "_btn_over.dds"
-        , filename .. "_btn_dis.dds")
 end
 
 --* return the standard scrollbar
