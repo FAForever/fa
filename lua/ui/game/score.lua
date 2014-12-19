@@ -391,9 +391,11 @@ function UpdateScoreThread()
     end
 end
 
+local refreshTicks = 0
 function RefreshScore()
     local quality = '?%'
     local team_eco = import('/lua/ui/game/economy.lua').TeamEco
+    local tps = GetSimTicksPerSecond()
 
     if(sessionInfo.Options.Quality) then
         quality = string.format("%.2f%%", sessionInfo.Options.Quality)
@@ -426,8 +428,23 @@ function RefreshScore()
                         local keys = {'mass', 'mass_in', 'energy', 'energy_in'}
 
                         if eco then
-                            line.mass_in:SetText(fmtnum(eco['MASS'].stored))
-                            line.energy_in:SetText(fmtnum(eco['ENERGY'].stored))
+                            if eco['MASS'].overflow > 0 and refreshTicks < 10 then
+                                line.mass_in:SetText(fmtnum(eco['MASS'].overflow*tps))
+                                line.mass_in:SetColor('ff00ff00')
+                            else
+                                line.mass_in:SetText(fmtnum(eco['MASS'].stored))
+                                line.mass_in:SetColor('ffb7e75f')
+                            end
+
+                            if eco['ENERGY'].overflow > 0 and refreshTicks < 10 then
+                                line.energy_in:SetText(fmtnum(eco['ENERGY'].overflow*tps))
+                                line.energy_in:SetColor('ff00ff00')
+                            else
+                                line.energy_in:SetText(fmtnum(eco['ENERGY'].stored))
+                                line.energy_in:SetColor('fff7c70f')
+                            end
+
+                            
                             line.isAlly = true
                         else
                             line.isAlly = false
@@ -483,7 +500,6 @@ function RefreshScore()
                             line.mass_in:SetColor('ffa0a0a0')
                             line.energy_in:SetColor('ffa0a0a0')
                         end
-
                     end
 
                     break
@@ -519,6 +535,8 @@ function RefreshScore()
         end)
 
     import(UIUtil.GetLayoutFilename('score')).LayoutArmyLines()
+
+    refreshTicks = math.mod(refreshTicks + 1, 20)
 end
 
 function SetUnitText(current, cap)
