@@ -90,29 +90,19 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
         LayoutHelpers.AtTopIn(text1, dialog2, 26)
 	--------------------
     -- SAVE button --
-	local SaveButton = UIUtil.CreateButtonStd2PNG(dialog2, '/BUTTON/medium/', "Ok", 12, -1)
+	local SaveButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Ok", -1)
         LayoutHelpers.AtLeftIn(SaveButton, dialog2, 0)
         LayoutHelpers.AtBottomIn(SaveButton, dialog2, 10)
-	-------------------
-    -- QUIT button --
-	--local QuitButton = UIUtil.CreateButtonStd2PNG(dialog2, '/BUTTON/medium/', "Cancel", 12, -1)
-        --LayoutHelpers.AtRightIn(QuitButton, dialog2, 0)
-        --LayoutHelpers.AtBottomIn(QuitButton, dialog2, 10)
-        --QuitButton.OnClick = function(self)
-            --GUI_ModsManager:Destroy()
-        --end
-	--------------------------
     -- SAVE LIST button --
-	local SaveListButton = UIUtil.CreateButtonStd2PNG(dialog2, '/BUTTON/small/', "Save List", 12, -1)
+	local SaveListButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/small/', "Save List", -1)
         LayoutHelpers.AtRightIn(SaveListButton, dialog2, 0)
         LayoutHelpers.AtTopIn(SaveListButton, dialog2, 10)
 		Tooltip.AddCheckboxTooltip(SaveListButton, {text='Save List', body='Save the currents selecteds Mods in a List'})
 		SaveListButton:Disable()
 	--------------------------
     -- LOAD LIST button --
-	local LoadListButton = UIUtil.CreateButtonStd2PNG(dialog2, '/BUTTON/small/', "Load List", 12, -1)
-        LayoutHelpers.AtLeftIn(LoadListButton, dialog2, 0)
-        LayoutHelpers.AtTopIn(LoadListButton, dialog2, 10)
+	local LoadListButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/small/', "Load List", -1)
+        LayoutHelpers.AtLeftTopIn(LoadListButton, dialog2, 0, 10)
 		Tooltip.AddCheckboxTooltip(LoadListButton, {text='Load List', body='Load a List of Mods'})
 		LoadListButton:Disable()
 	-------------------------------------

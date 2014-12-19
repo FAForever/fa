@@ -48,6 +48,7 @@ consoleBGColor = import('/lua/lazyvar.lua').Create()        -- console backgroun
 consoleFGColor = import('/lua/lazyvar.lua').Create()        -- console foreground color (text)
 consoleTextBGColor = import('/lua/lazyvar.lua').Create()    -- console text background color
 menuFontSize = import('/lua/lazyvar.lua').Create()          -- font size used on main in game escape menu
+
 -- table of layouts supported by this skin, not a lazy var as we don't need updates
 layouts = nil
 
@@ -200,8 +201,8 @@ function SetCurrentSkin(skin)
     bodyFont:Set(skins[skin].bodyFont or skins['default'].bodyFont)
     fixedFont:Set(skins[skin].fixedFont or skins['default'].fixedFont)
     titleFont:Set(skins[skin].titleFont or skins['default'].titleFont)
-    fontColor:Set(skins[skin].fontColor or skins['default'].fontColor)
     bodyColor:Set(skins[skin].bodyColor or skins['default'].bodyColor)
+    fontColor:Set(skins[skin].fontColor or skins['default'].fontColor)
     fontOverColor:Set(skins[skin].fontOverColor or skins['default'].fontOverColor)
     fontDownColor:Set(skins[skin].fontDownColor or skins['default'].fontDownColor)
     dialogCaptionColor:Set(skins[skin].dialogCaptionColor or skins['default'].dialogCaptionColor)
@@ -462,7 +463,7 @@ function SetupEditStd(control, foreColor, backColor, highlightFore, highlightBac
 end
 
 --* return a button set up with a text overlay and a click sound
-function CreateButton(parent, up, down, over, disabled, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue)
+function CreateButton(parent, up, down, over, disabled, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue, dropshadow)
     textOffsetVert = textOffsetVert or 0
     textOffsetHorz = textOffsetHorz or 0
     if clickCue == "NO_SOUND" then
@@ -495,6 +496,9 @@ function CreateButton(parent, up, down, over, disabled, label, pointSize, textOf
         button.label = CreateText(button, label, pointSize)
         LayoutHelpers.AtCenterIn(button.label, button, textOffsetVert, textOffsetHorz)
         button.label:DisableHitTest()
+        if dropshadow then
+            button.label:SetDropShadow(true)
+        end
 
         -- if text exists, set up to grey it out
         button.OnDisable = function(self)
@@ -513,66 +517,6 @@ function CreateButton(parent, up, down, over, disabled, label, pointSize, textOf
                 button.label:SetColor(fontColor)
             elseif event == 'down' then
                 button.label:SetColor(fontDownColor)
-            end
-        end
-    end
-
-    return button
-end
-function CreateButton2(parent, up, down, over, disabled, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue)
-    textOffsetVert = textOffsetVert or 0
-    textOffsetHorz = textOffsetHorz or 0
-    if clickCue == "NO_SOUND" then
-        clickCue = nil
-    else
-        clickCue = clickCue or "UI_Menu_MouseDown_Sml"
-    end
-    if rolloverCue == "NO_SOUND" then
-        rolloverCue = nil
-    else
-        rolloverCue = rolloverCue or "UI_Menu_Rollover_Sml"
-    end
-    if type(up) == 'string' then
-        up = SkinnableFile(up)
-    end
-    if type(down) == 'string' then
-        down = SkinnableFile(down)
-    end
-    if type(over) == 'string' then
-        over = SkinnableFile(over)
-    end
-    if type(disabled) == 'string' then
-        disabled = SkinnableFile(disabled)
-    end
-
-    local button = Button(parent, up, down, over, disabled, clickCue, rolloverCue)
-    button:UseAlphaHitTest(true)
-
-    if label and pointSize then
-        button.label = CreateText(button, label, pointSize)
-        LayoutHelpers.AtCenterIn(button.label, button, textOffsetVert, textOffsetHorz)
-        button.label:DisableHitTest()
-		button.label:SetFont('Arial', 11)
-		button.label:SetColor('B9BFB9')
-		button.label:SetDropShadow(true)
-
-        -- if text exists, set up to grey it out
-        button.OnDisable = function(self)
-            Button.OnDisable(self)
-            button.label:SetColor('7B7F7B')
-        end
-
-        button.OnEnable = function(self)
-            Button.OnEnable(self)
-            button.label:SetColor('B9BFB9')
-        end
-        button.OnRolloverEvent = function(self, event)
-            if event == 'enter' then
-                button.label:SetColor('DEE5DE')
-            elseif event == 'exit' then
-                button.label:SetColor('B9BFB9')
-            elseif event == 'down' then
-                button.label:SetColor('FFFFFF')
             end
         end
     end
@@ -615,32 +559,19 @@ function CreateButtonStd(parent, filename, label, pointSize, textOffsetVert, tex
         )
 end
 
-function CreateButtonStd2(parent, filename, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue) -- XinnonyWork
-    return CreateButton2(parent
-        , filename .. "_up.dds"
-        , filename .. "_down.dds"
-        , filename .. "_over.dds"
-        , filename .. "_dis.dds"
+function CreateButtonWithDropshadow(parent, filename, label, textOffsetVert, textOffsetHorz, clickCue, rolloverCue)
+    return CreateButton(parent
+        , filename .. "_btn_up.png"
+        , filename .. "_btn_up.png"
+        , filename .. "_btn_up.png"
+        , filename .. "_btn_up.png"
         , label
-        , pointSize
+        , 11
         , textOffsetVert
         , textOffsetHorz
         , clickCue
         , rolloverCue
-        )
-end
-function CreateButtonStd2PNG(parent, filename, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue) -- XinnonyWork
-    return CreateButton2(parent
-        , filename .. "_up.png"
-        , filename .. "_down.png"
-        , filename .. "_over.png"
-        , filename .. "_dis.png"
-        , label
-        , pointSize
-        , textOffsetVert
-        , textOffsetHorz
-        , clickCue
-        , rolloverCue
+        , true
         )
 end
 

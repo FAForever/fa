@@ -774,7 +774,7 @@ function ToggleGameInfo()
         LayoutHelpers.AtTopIn(text0, dialog2, 10)
 	--------------------
     -- OK button --
-	local OkButton = UIUtil.CreateButtonStd2PNG(dialog2, '/BUTTON/medium/', "Ok", 12, -1)
+	local OkButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Ok", -1)
         LayoutHelpers.AtHorizontalCenterIn(OkButton, dialog2, 0)
         LayoutHelpers.AtBottomIn(OkButton, dialog2, 10)
         OkButton.OnClick = function(self)
