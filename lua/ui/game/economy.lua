@@ -26,7 +26,8 @@ local filteredMass = 1
 local fullFlag = false
 local emptyFlag = false
 
-allyOverflow = {MASS=0, ENERGY=0}
+-- updated in UserSync.lua
+TeamEco = {allies={}, overflow={MASS=0, ENERGY=0}}
 
 group = false
 savedParent = false
@@ -280,6 +281,7 @@ end
 function _BeatFunction()
     local econData = GetEconomyTotals()
     local simFrequency = GetSimTicksPerSecond()
+    local allyOverflow = TeamEco['overflow']
     if options.gui_display_reclaim_totals == 1 then
     -- fetch & format reclaim values
         reclaimedTotalsMass = math.ceil(econData.reclaimed.MASS)

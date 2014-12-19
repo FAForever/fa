@@ -25,7 +25,7 @@ controls = {}
 savedParent = false
 local observerLine = false
 
-##  I switched the order of these because it was causing error, originally, the scoreoption line was first
+--  I switched the order of these because it was causing error, originally, the scoreoption line was first
 local sessionInfo = SessionGetScenarioInfo()
 local replayID = -1
 
@@ -36,6 +36,9 @@ local issuedNoRushWarning = false
 local gameSpeed = 0
 local needExpand = false
 local contractOnCreate = false
+
+local UpdateThread = nil
+
 function CreateScoreUI(parent)
     savedParent = GetFrame(0)
 
@@ -85,9 +88,12 @@ function CreateScoreUI(parent)
 
     SetLayout()
 
-    GameMain.AddBeatFunction(_OnBeat)
+    --GameMain.AddBeatFunction(_OnBeat)
+    UpdateThread = ForkThread(UpdateScoreThread)
     controls.bg.OnDestroy = function(self)
-        GameMain.RemoveBeatFunction(_OnBeat)
+        --GameMain.RemoveBeatFunction(_OnBeat)
+        KillThread(UpdateThread)
+        UpdateThread = nil
     end
 
     if contractOnCreate then
@@ -133,9 +139,9 @@ function SetupPlayerLines()
         local group = Group(controls.bgStretch)
         local sw = 42
 
-        if (armyIndex != 0 and SessionIsReplay()) then
+        if armyIndex ~= 0 then
              group.faction = Bitmap(group)
-            if armyIndex != 0 then
+            if armyIndex ~= 0 then
                 group.faction:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(data.faction)))
             else
                 group.faction:SetTexture(UIUtil.UIFile('/widgets/faction-icons-alpha_bmp/observer_ico.dds'))
@@ -195,7 +201,7 @@ function SetupPlayerLines()
 
        else
             group.faction = Bitmap(group)
-            if armyIndex != 0 then
+            if armyIndex ~= 0 then
                 group.faction:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(data.faction)))
             else
                 group.faction:SetTexture(UIUtil.UIFile('/widgets/faction-icons-alpha_bmp/observer_ico.dds'))
@@ -377,99 +383,142 @@ function SetupPlayerLines()
     --if tonumber(replayID) > 0 then mapData.mapname = mapData.mapname .. ', ID: ' .. replayID end
     controls.armyLines[index] = CreateMapNameLine(mapData, 0)
 end
-    function _OnBeat()
-        local quality = '?%'
-        if(sessionInfo.Options.Quality) then
-            quality = string.format("%.2f%%", sessionInfo.Options.Quality)
-        end
-        controls.time:SetText(string.format("%s (%+d / %+d) Q: %s", GetGameTime(), gameSpeed, GetSimRate(), quality))
 
-        if sessionInfo.Options.NoRushOption and sessionInfo.Options.NoRushOption != 'Off' then
-            if tonumber(sessionInfo.Options.NoRushOption) * 60 > GetGameTimeSeconds() then
-                local time = (tonumber(sessionInfo.Options.NoRushOption) * 60) - GetGameTimeSeconds()
-                controls.time:SetText(LOCF('%02d:%02d:%02d', math.floor(time / 3600), math.floor(time/60), math.mod(time, 60)))
-            end
-            if not issuedNoRushWarning and tonumber(sessionInfo.Options.NoRushOption) * 60 == math.floor(GetGameTimeSeconds()) then
-                import('/lua/ui/game/announcement.lua').CreateAnnouncement('<LOC score_0001>No Rush Time Elapsed', controls.time)
-                issuedNoRushWarning = true
-            end
-        end
-        local armiesInfo = GetArmiesTable().armiesTable
-        if currentScores then
-            for index, scoreData in currentScores do
-                for _, line in controls.armyLines do
-                    if line.armyID == index then
-                        if line.OOG then break end
-                        if SessionIsReplay() then
-                            if (scoreData.resources.massin.rate) then
-                                line.mass_in:SetText(fmtnum(scoreData.resources.massin.rate * 10))
-                                line.energy_in:SetText(fmtnum(scoreData.resources.energyin.rate * 10))
-                            end
+function UpdateScoreThread()
+    while true do
+        RefreshScore()
+        WaitSeconds(.2)
+    end
+end
+
+function RefreshScore()
+    local quality = '?%'
+    local team_eco = import('/lua/ui/game/economy.lua').TeamEco
+
+    if(sessionInfo.Options.Quality) then
+        quality = string.format("%.2f%%", sessionInfo.Options.Quality)
+    end
+    
+    controls.time:SetText(string.format("%s (%+d / %+d) Q: %s", GetGameTime(), gameSpeed, GetSimRate(), quality))
+
+    if sessionInfo.Options.NoRushOption and sessionInfo.Options.NoRushOption ~= 'Off' then
+        if tonumber(sessionInfo.Options.NoRushOption) * 60 > GetGameTimeSeconds() then
+            local time = (tonumber(sessionInfo.Options.NoRushOption) * 60) - GetGameTimeSeconds()
+            controls.time:SetText(LOCF('%02d:%02d:%02d', math.floor(time / 3600), math.floor(time/60), math.mod(time, 60)))            end
+        if not issuedNoRushWarning and tonumber(sessionInfo.Options.NoRushOption) * 60 == math.floor(GetGameTimeSeconds()) then
+            import('/lua/ui/game/announcement.lua').CreateAnnouncement('<LOC score_0001>No Rush Time Elapsed', controls.time)
+            issuedNoRushWarning = true            end
+    end
+
+    local armiesInfo = GetArmiesTable().armiesTable
+    if currentScores then
+        for index, scoreData in currentScores do
+            for _, line in controls.armyLines do
+                if line.armyID == index then
+                    if line.OOG then break end
+                    if SessionIsReplay() then
+                        if (scoreData.resources.massin.rate) then
+                            line.mass_in:SetText(fmtnum(scoreData.resources.massin.rate * 10))
+                            line.energy_in:SetText(fmtnum(scoreData.resources.energyin.rate * 10))
                         end
-                        if scoreData.general.score == -1 then
-                            line.score:SetText(LOC("<LOC _Playing>Playing"))
-                            line.scoreNumber = -1
+                    else
+                        local eco = team_eco['allies'][line.armyID]
+                        local keys = {'mass', 'mass_in', 'energy', 'energy_in'}
+
+                        if eco then
+                            line.mass_in:SetText(fmtnum(eco['MASS'].stored))
+                            line.energy_in:SetText(fmtnum(eco['ENERGY'].stored))
+                            line.isAlly = true
                         else
-                            line.score:SetText(fmtnum(scoreData.general.score))
-                            line.scoreNumber = scoreData.general.score
+                            line.isAlly = false
+                        end
 
-                        end
-                        if GetFocusArmy() == index then
-                            line.name:SetColor('ffff7f00')
-                            line.score:SetColor('ffff7f00')
-                            line.name:SetFont('Arial Bold', 12)
-                            line.score:SetFont('Arial Bold', 12)
-                            if scoreData.general.currentcap.count > 0 then
-                                SetUnitText(scoreData.general.currentunits.count, scoreData.general.currentcap.count)
+                        for _, k in keys do
+                            if eco then
+                                line[k]:Show()
+                            else
+                                line[k]:Hide()
                             end
-                        else
-                            line.name:SetColor('ffffffff')
-                            line.score:SetColor('ffffffff')
-                            line.name:SetFont(UIUtil.bodyFont, 12)
-                            line.score:SetFont(UIUtil.bodyFont, 12)
                         end
-                        if armiesInfo[index].outOfGame then
-                            if scoreData.general.score == -1 then
-                                line.score:SetText(LOC("<LOC _Defeated>Defeated"))
-                                line.scoreNumber = -1
-                            end
-                            line.OOG = true
-                            line.faction:SetTexture(UIUtil.UIFile('/game/unit-over/icon-skull_bmp.dds'))
-                            line.color:SetSolidColor('ff000000')
-                            line.name:SetColor('ffa0a0a0')
-                            line.score:SetColor('ffa0a0a0')
-                            if SessionIsReplay() then
-                                line.mass_in:SetColor('ffa0a0a0')
-                                line.energy_in:SetColor('ffa0a0a0')
-                            end
-
-                        end
-                        break
                     end
+
+                    if scoreData.general.score == -1 then
+                        line.score:SetText(LOC("<LOC _Playing>Playing"))
+                        line.scoreNumber = -1
+                    else
+                        line.score:SetText(fmtnum(scoreData.general.score))
+                        line.scoreNumber = scoreData.general.score
+
+                    end
+                    if GetFocusArmy() == index then
+                        line.name:SetColor('ffff7f00')
+                        line.score:SetColor('ffff7f00')
+                        line.name:SetFont('Arial Bold', 12)
+                        line.score:SetFont('Arial Bold', 12)
+                        if scoreData.general.currentcap.count > 0 then
+                            SetUnitText(scoreData.general.currentunits.count, scoreData.general.currentcap.count)
+                        end
+                    else
+                        if line.isAlly then
+                            line.name:SetColor('ff40e040')
+                        else
+                            line.name:SetColor('ffe04040')
+                        end
+                        line.score:SetColor('ffffffff')
+                        line.name:SetFont(UIUtil.bodyFont, 12)
+                        line.score:SetFont(UIUtil.bodyFont, 12)
+                    end
+
+                    if armiesInfo[index].outOfGame then
+                        if scoreData.general.score == -1 then
+                            line.score:SetText(LOC("<LOC _Defeated>Defeated"))
+                            line.scoreNumber = -1
+                        end
+                        line.OOG = true
+                        line.faction:SetTexture(UIUtil.UIFile('/game/unit-over/icon-skull_bmp.dds'))
+                        line.color:SetSolidColor('ff000000')
+                        line.name:SetColor('ffa0a0a0')
+                        line.score:SetColor('ffa0a0a0')
+                        if SessionIsReplay() then
+                            line.mass_in:SetColor('ffa0a0a0')
+                            line.energy_in:SetColor('ffa0a0a0')
+                        end
+
+                    end
+
+                    break
                 end
             end
         end
-        if observerLine then
-            if GetFocusArmy() == -1 then
-                observerLine.name:SetColor('ffff7f00')
-                observerLine.name:SetFont('Arial Bold', 14)
-            else
-                observerLine.name:SetColor('ffffffff')
-                observerLine.name:SetFont(UIUtil.bodyFont, 14)
-            end
+    end
+
+    if observerLine then
+        if GetFocusArmy() == -1 then
+            observerLine.name:SetColor('ffff7f00')
+            observerLine.name:SetFont('Arial Bold', 14)
+        else
+            observerLine.name:SetColor('ffffffff')
+            observerLine.name:SetFont(UIUtil.bodyFont, 14)
         end
-        table.sort(controls.armyLines, function(a,b)
-            if a.armyID == 0 or b.armyID == 0 then
-                return a.armyID >= b.armyID
-            else
-                if tonumber(a.scoreNumber) == tonumber(b.scoreNumber) then
+    end
+
+    table.sort(controls.armyLines, function(a,b)
+        if a.armyID == 0 or b.armyID == 0 then
+            return a.armyID >= b.armyID
+        else
+            if tonumber(a.scoreNumber) == tonumber(b.scoreNumber) then
+                if a.isAlly == b.isAlly then
                     return a.name:GetText() < b.name:GetText()
                 else
-                    return tonumber(a.scoreNumber) > tonumber(b.scoreNumber)
+                    return a.isAlly
                 end
+            else
+                return tonumber(a.scoreNumber) > tonumber(b.scoreNumber)
             end
+        end
         end)
-        import(UIUtil.GetLayoutFilename('score')).LayoutArmyLines()
+
+    import(UIUtil.GetLayoutFilename('score')).LayoutArmyLines()
 end
 
 function SetUnitText(current, cap)
@@ -487,7 +536,7 @@ function SetUnitText(current, cap)
 end
 
 function ToggleScoreControl(state)
-    # disable when in Screen Capture mode
+    -- disable when in Screen Capture mode
     if import('/lua/ui/game/gamemain.lua').gameUIHidden then
         return
     end
@@ -578,7 +627,7 @@ end
 function InitialAnimation(state)
     controls.bg.Right:Set(savedParent.Right() + controls.bg.Width())
     controls.bg:Hide()
-    if Prefs.GetFromCurrentProfile("scoreoverlay") != false then
+    if Prefs.GetFromCurrentProfile("scoreoverlay") ~= false then
         controls.collapseArrow:SetCheck(false, true)
         controls.bg:Show()
         controls.bg:SetNeedsFrameUpdate(true)

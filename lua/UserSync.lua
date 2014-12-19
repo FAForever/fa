@@ -54,8 +54,8 @@ function OnSync()
         UnitData[id] = nil
     end
 
-    if Sync.Overflow then
-        import('/lua/ui/game/economy.lua').allyOverflow = Sync.Overflow
+    if Sync.TeamEco then
+        import('/lua/ui/game/economy.lua').TeamEco = Sync.TeamEco
     end
     
     if Sync.NukeLaunchData then

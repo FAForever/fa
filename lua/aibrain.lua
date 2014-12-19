@@ -337,16 +337,56 @@ function SyncScores()
 
 end
 
-function UpdateReclaimStat()
-    # this function update the reclaim income stat.
+function SyncTeamEconomy()
     while true do
-        local calcOverflow = math.mod(GetGameTick(), 5) == 0
         local me = GetFocusArmy()
         local my_brain = ArmyBrains[me]
         local defeated = my_brain and my_brain:IsDefeated()
-        local overflow = {MASS=0, ENERGY=0}
-        local n_allies = 0
+        local team_eco = {allies={}, overflow={MASS=0, ENERGY=0}}
+        local n_allies = 0 
 
+        for index, brain in ArmyBrains do
+            if IsAlly(me, index) then
+                for _, t in {'ENERGY', 'MASS'} do 
+                    local eco = {}
+                    eco.stored = brain:GetEconomyStored(t)
+                    eco.ratio = brain:GetEconomyStoredRatio(t)
+                    eco.max = eco.stored / math.max(eco.ratio, 0.001)
+                    eco.net = brain:GetEconomyIncome(t) - brain:GetEconomyRequested(t)
+                    if eco.stored + eco.net > eco.max then
+                        eco.overflow = eco.net - (eco.max - eco.stored)
+                    else
+                        eco.overflow = 0
+                    end
+
+                    if not team_eco['allies'][index] then
+                        team_eco['allies'][index] = {}
+                    end
+                
+                    team_eco['allies'][index][t] = eco
+                    if me ~= index then
+                      team_eco['overflow'][t] = (team_eco['overflow'][t] or 0) + eco.overflow
+                    end
+                end
+            end
+        end
+
+        local n_allies = table.getsize(team_eco['allies']) - 1 -- not yourself
+        if n_allies > 0 then
+            team_eco['overflow']['MASS'] = team_eco['overflow']['MASS'] / n_allies
+            team_eco['overflow']['ENERGY'] = team_eco['overflow']['ENERGY'] / n_allies
+        end
+        
+        Sync.TeamEco = team_eco
+        
+        WaitTicks(5)    
+    end
+end
+
+function UpdateReclaimStat()
+    ForkThread(SyncTeamEconomy)
+    # this function update the reclaim income stat.
+    while true do
         for index, brain in ArmyBrains do
             local reclaimedMass     = brain:GetArmyStat("Economy_Reclaimed_Mass", 0.0).Value
             local oldReclaimedMass  = brain:GetArmyStat("Economy_old_Reclaimed_Mass", 0.0).Value
@@ -357,31 +397,6 @@ function UpdateReclaimStat()
             local oldReclaimedEnergy  = brain:GetArmyStat("Economy_old_Reclaimed_Energy", 0.0).Value
             brain:SetArmyStat("Economy_income_reclaimed_Energy", reclaimedEnergy - oldReclaimedEnergy)
             brain:SetArmyStat("Economy_old_Reclaimed_Energy", reclaimedEnergy)
-
-            if calcOverflow and not defeated then
-                if me ~= index and IsAlly(me, index) then
-                    for _, t in {'ENERGY', 'MASS'} do 
-                        local stored = brain:GetEconomyStored(t)
-                        local ratio = brain:GetEconomyStoredRatio(t)
-                        local max = stored / ratio
-                        local net = brain:GetEconomyIncome(t) - brain:GetEconomyRequested(t)
-
-                        if stored + net > max then
-                            overflow[t] = net - (max - stored)
-                        end
-                    end
-
-                    n_allies = n_allies + 1
-                end
-            end
-        end
-
-        if calcOverflow then
-            if not n_allies then n_allies = 1 end -- just to prevent / 0
-            for _, t in {'ENERGY', 'MASS'} do
-                overflow[t] = overflow[t] / n_allies
-            end
-            Sync.Overflow = overflow
         end
         
         WaitSeconds(.1)  -- update the stat every tick
