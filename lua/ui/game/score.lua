@@ -418,13 +418,14 @@ function RefreshScore()
             for _, line in controls.armyLines do
                 if line.armyID == index then
                     if line.OOG then break end
+
+                    local eco = team_eco['allies'][line.armyID]
                     if SessionIsReplay() then
                         if (scoreData.resources.massin.rate) then
                             line.mass_in:SetText(fmtnum(scoreData.resources.massin.rate * 10))
                             line.energy_in:SetText(fmtnum(scoreData.resources.energyin.rate * 10))
                         end
                     else
-                        local eco = team_eco['allies'][line.armyID]
                         local keys = {'mass', 'mass_in', 'energy', 'energy_in'}
 
                         if eco then
@@ -443,11 +444,6 @@ function RefreshScore()
                                 line.energy_in:SetText(fmtnum(eco['ENERGY'].stored))
                                 line.energy_in:SetColor('fff7c70f')
                             end
-
-                            
-                            line.isAlly = true
-                        else
-                            line.isAlly = false
                         end
 
                         for _, k in keys do
@@ -459,6 +455,12 @@ function RefreshScore()
                         end
                     end
 
+                    if eco then
+                        line.isAlly = true
+                    else
+                        line.isAlly = false
+                    end
+
                     if scoreData.general.score == -1 then
                         line.score:SetText(LOC("<LOC _Playing>Playing"))
                         line.scoreNumber = -1
@@ -467,7 +469,9 @@ function RefreshScore()
                         line.scoreNumber = scoreData.general.score
 
                     end
-                    if GetFocusArmy() == index then
+
+                    local focus = GetFocusArmy()
+                    if focus == index then
                         line.name:SetColor('ffff7f00')
                         line.score:SetColor('ffff7f00')
                         line.name:SetFont('Arial Bold', 12)
@@ -476,7 +480,9 @@ function RefreshScore()
                             SetUnitText(scoreData.general.currentunits.count, scoreData.general.currentcap.count)
                         end
                     else
-                        if line.isAlly then
+                        if focus == -1 then
+                            line.name:SetColor('ffffffff')
+                        elseif line.isAlly then
                             line.name:SetColor('ff40e040')
                         else
                             line.name:SetColor('ffe04040')

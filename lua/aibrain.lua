@@ -340,13 +340,13 @@ end
 function SyncTeamEconomy()
     while true do
         local me = GetFocusArmy()
-        local my_brain = ArmyBrains[me]
+        local my_brain = me ~= -1 and ArmyBrains[me]
         local defeated = my_brain and my_brain:IsDefeated()
         local team_eco = {allies={}, overflow={MASS=0, ENERGY=0}}
         local n_allies = 0 
 
         for index, brain in ArmyBrains do
-            if IsAlly(me, index) then
+            if me ~= -1 and IsAlly(me, index) then
                 for _, t in {'ENERGY', 'MASS'} do 
                     local eco = {}
                     eco.stored = brain:GetEconomyStored(t)
