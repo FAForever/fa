@@ -107,7 +107,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 		LoadListButton:Disable()
 	-------------------------------------
 	-- CHECKBOX UI MOD FILTER --
-	local cbox_UI = UIUtil.CreateCheckboxStdPNG(dialog2, '/RADIOBOX/radio')
+	local cbox_UI = UIUtil.CreateCheckboxStd(dialog2, '/RADIOBOX/radio')
         LayoutHelpers.AtLeftIn(cbox_UI, dialog2, 20+130+10)
 		LayoutHelpers.AtBottomIn(cbox_UI, dialog2, 16)
         Tooltip.AddCheckboxTooltip(cbox_UI, {text='UI Mods', body='Hide or Show the UI Mods (actived UI Mods is always showed)'})
@@ -119,7 +119,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 			cbox_UI:SetCheck(true, true)--isChecked, skipEvent)
 	-----------------------------------------
 	-- CHECKBOX GAME MOD FILTER --
-	local cbox_GAME = UIUtil.CreateCheckboxStdPNG(dialog2, '/RADIOBOX/radio')
+	local cbox_GAME = UIUtil.CreateCheckboxStd(dialog2, '/RADIOBOX/radio')
         LayoutHelpers.AtLeftIn(cbox_GAME, dialog2, 20+130+100)
 		LayoutHelpers.AtBottomIn(cbox_GAME, dialog2, 16)
         Tooltip.AddCheckboxTooltip(cbox_GAME, {text='GAME Mods', body='Hide or Show the GAME Mods (actived GAME Mods is always showed)'})
@@ -131,7 +131,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 			cbox_GAME:SetCheck(false, true)--isChecked, skipEvent)
 	----------------------------------------------
 	-- CHECKBOX HIDE UNSELECTABLE MOD --
-	local cbox_Act = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
+	local cbox_Act = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftIn(cbox_Act, dialog2, 20+130+120+100)
 		LayoutHelpers.AtBottomIn(cbox_Act, dialog2, 23)
         Tooltip.AddCheckboxTooltip(cbox_Act, {text='Hide Unselectable', body='Hide all mods cannot be enabled because is unselectable or other player(s) not have the mod'})
@@ -143,7 +143,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 			cbox_Act:SetCheck(true, true)--isChecked, skipEvent)
 	----------------------------------------------
 	-- CHECKBOX LITTLE VIEW MOD LIST --
-	local cbox_Act2 = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
+	local cbox_Act2 = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
         LayoutHelpers.AtLeftIn(cbox_Act2, dialog2, 20+130+120+100)
 		LayoutHelpers.AtBottomIn(cbox_Act2, dialog2, 6)
         Tooltip.AddCheckboxTooltip(cbox_Act2, {text='Little View', body='See another mod list display'})
@@ -378,23 +378,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 			end
 		end
 		
-		-- Remove Selected Mods
-		--if cbox_Act2 then
-			--table.insert(current_list, 1)
-			--for i, v in current_list do
-				--LOG('>> '..i..' > '..tostring(v.uid)..' == '..tostring(selmods[v.uid])..' ('..v.name..')')
-				--if selmods[v.uid] then
-					--LOG('>> Finded '..i..' ('..v.name..')')
-					--table.remove(current_list, i)
-					--i = i - 1 -- For sure check the next mod
-				--end
-				--LOG('>> End '..i..' ('..v.name..')')
-			--end
-			--table.remove(current_list, 1)
-		--end
-		
-		-- TRIE LES MOD ACTIFS EN HAUT ET LE RESTE ALPHABETIQUEMENT
-		table.sort(current_list, function(a,b) 
+		table.sort(current_list, function(a,b)
 			if selmods[a.uid] and selmods[b.uid] then
 				return a.name < b.name
 			elseif selmods[a.uid] or selmods[b.uid] then
@@ -403,8 +387,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 				return a.name < b.name
 			end
 		end)
-		
-		-- CREE LES MOD DANS LA GUI ET SELEC LES ACTIFS
+
 		for k, v in current_list do
 			if not cbox_Act2 then
 				table.insert(scrollGroup.controlList, CreateListElementtt(scrollGroup, v, k, false))
@@ -416,28 +399,28 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 				scrollGroup.controlList[k].type:SetColor('101010') -- Noir
 				if v.ui_only then
 					scrollGroup.controlList[k].type:SetText('UI MOD ACTIVED')
-					scrollGroup.controlList[k].bg:SetTexture('/textures/ui/common/MODS/enable_ui.png')
+					scrollGroup.controlList[k].bg:SetTexture('/textures/ui/common/MODS/enable_ui.dds')
 				else
 					scrollGroup.controlList[k].type:SetText('GAME MOD ACTIVED')
-					scrollGroup.controlList[k].bg:SetTexture('/textures/ui/common/MODS/enable_game.png')
+					scrollGroup.controlList[k].bg:SetTexture('/textures/ui/common/MODS/enable_game.dds')
 				end
 			elseif not IsHost and modstatus[v.uid] and not v.ui_only then
 				scrollGroup.controlList[k].actived = true
 				scrollGroup.controlList[k].type:SetColor('101010') -- Noir
 				scrollGroup.controlList[k].type:SetText('GAME MOD ACTIVED')
-				scrollGroup.controlList[k].bg:SetTexture('/textures/ui/common/MODS/enable_game.png')
+				scrollGroup.controlList[k].bg:SetTexture('/textures/ui/common/MODS/enable_game.dds')
 			elseif not IsHost and selmods[v.uid] and v.ui_only then
 				scrollGroup.controlList[k].actived = true
 				scrollGroup.controlList[k].type:SetColor('101010') -- Noir
 				scrollGroup.controlList[k].type:SetText('UI MOD ACTIVED')
-				scrollGroup.controlList[k].bg:SetTexture('/textures/ui/common/MODS/enable_ui.png')
+				scrollGroup.controlList[k].bg:SetTexture('/textures/ui/common/MODS/enable_ui.dds')
 			end
 			if scrollGroup.controlList[k].modInfo.exclusive and selmods[v.uid] then
 				exclusiveMod = true
 				scrollGroup.controlList[k].actived = true
 				scrollGroup.controlList[k].type:SetColor('101010') -- Noir
 				scrollGroup.controlList[k].type:SetText('EXCLUSIF MOD ACTIVED')
-				scrollGroup.controlList[k].bg:SetTexture('/textures/ui/common/MODS/enable_excusif.png')
+				scrollGroup.controlList[k].bg:SetTexture('/textures/ui/common/MODS/enable_excusif.dds')
 			end
 		end
 		
@@ -456,8 +439,8 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 		local function UNActiveMod(the_mod)
 			the_mod.actived = false
 			the_mod.type:SetColor('B9BFB9') -- Gris
-			the_mod.bg:SetTexture('/textures/none.png')
-			the_mod.bg0:SetTexture('/textures/none.png')
+			the_mod.bg:SetTexture('/textures/none.dds')
+			the_mod.bg0:SetTexture('/textures/none.dds')
 			if the_mod.ui then -- IF UI MOD
 				the_mod.type:SetText('UI MOD')
 			else
@@ -679,12 +662,12 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 						end
 					elseif event.Type == 'MouseEnter' then
 						if self.actived then
-							self.bg0:SetTexture('/textures/ui/common/MODS/line_black.png')
+							self.bg0:SetTexture('/textures/ui/common/MODS/line_black.dds')
 						else
-							self.bg0:SetTexture('/textures/ui/common/MODS/line_blank.png')
+							self.bg0:SetTexture('/textures/ui/common/MODS/line_blank.dds')
 						end
 					elseif event.Type == 'MouseExit' then
-						self.bg0:SetTexture('/textures/none.png')
+						self.bg0:SetTexture('/textures/none.dds')
 					end
 				end
 			end
@@ -738,12 +721,12 @@ function CreateListElementtt(parent, modInfo, Pos, little)
 	group.modInfo = modInfo
 	group.actived = false
 	--
-	group.bg = Bitmap(group, '/textures/none.png')
+	group.bg = Bitmap(group, '/textures/none.dds')
 		group.bg.Height:Set(group.Height())
 		group.bg.Width:Set(group.Width())
 		LayoutHelpers.AtLeftTopIn(group.bg, group, 0, 0)--group.bg.Height()*(Pos-1))
 	--
-	group.bg0 = Bitmap(group, '/textures/none.png')
+	group.bg0 = Bitmap(group, '/textures/none.dds')
 		group.bg0.Height:Set(group.Height())
 		group.bg0.Width:Set(group.Width())
 		LayoutHelpers.AtLeftTopIn(group.bg0, group, 0, 0)--group.bg.Height()*(Pos-1))

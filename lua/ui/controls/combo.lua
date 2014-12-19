@@ -17,22 +17,22 @@ local activeCombo = nil
 local defaultBitmaps = {
     button = {
         left = {
-            up = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_up_l.png'),
-            down = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_down_l.png'),
-            over = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_over_l.png'),
-            dis = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_dis_l.png'),
+            up = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_up_l.dds'),
+            down = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_down_l.dds'),
+            over = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_over_l.dds'),
+            dis = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_dis_l.dds'),
         },
         mid = {
-            up = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_up_m.png'),
-            down = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_down_m.png'),
-            over = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_over_m.png'),
-            dis = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_dis_m.png'),
+            up = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_up_m.dds'),
+            down = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_down_m.dds'),
+            over = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_over_m.dds'),
+            dis = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_dis_m.dds'),
         },
         right = {
-            up = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_up_r.png'),
-            down = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_down_r.png'),
-            over = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_over_r.png'),
-            dis = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_dis_r.png'),
+            up = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_up_r.dds'),
+            down = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_down_r.dds'),
+            over = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_over_r.dds'),
+            dis = UIUtil.SkinnableFile('/widgets/drop-down/drop_btn_dis_r.dds'),
         }
     },
     list = {

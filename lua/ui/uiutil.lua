@@ -543,10 +543,10 @@ end
 
 function CreateButtonWithDropshadow(parent, filename, label, textOffsetVert, textOffsetHorz, clickCue, rolloverCue)
     return CreateButton(parent
-        , filename .. "_btn_up.png"
-        , filename .. "_btn_up.png"
-        , filename .. "_btn_up.png"
-        , filename .. "_btn_up.png"
+        , filename .. "_btn_up.dds"
+        , filename .. "_btn_down.dds"
+        , filename .. "_btn_over.dds"
+        , filename .. "_btn_dis.dds"
         , label
         , 11
         , textOffsetVert
@@ -577,31 +577,19 @@ function CreateCheckboxStd(parent, filename, clickCue, rollCue)
     return checkbox
 end
 
-function CreateCheckboxStdPNG(parent, filename, clickCue, rollCue)
-    local checkbox = CreateCheckbox( parent,
-        SkinnableFile(filename .. '-d_btn_up.png'),
-        SkinnableFile(filename .. '-s_btn_up.png'),
-        SkinnableFile(filename .. '-d_btn_over.png'),
-        SkinnableFile(filename .. '-s_btn_over.png'),
-        SkinnableFile(filename .. '-d_btn_dis.png'),
-        SkinnableFile(filename .. '-s_btn_dis.png'),
-        clickCue, rollCue)
-    return checkbox
-end
-
-function CreateRadioButtonsStdPNG(parent, filename, title, buttons, default)
+function CreateRadioButtonsStd(parent, filename, title, buttons, default)
     local radioButton = RadioButtons(parent, title, buttons, default, "Arial", 14, fontColor,
-        SkinnableFile(filename .. '-d_btn_up.png'),
-        SkinnableFile(filename .. '-s_btn_up.png'),
-        SkinnableFile(filename .. '-d_btn_over.png'),
-        SkinnableFile(filename .. '-s_btn_over.png'),
-        SkinnableFile(filename .. '-d_btn_dis.png'),
-        SkinnableFile(filename .. '-s_btn_dis.png'),
+        SkinnableFile(filename .. '-d_btn_up.dds'),
+        SkinnableFile(filename .. '-s_btn_up.dds'),
+        SkinnableFile(filename .. '-d_btn_over.dds'),
+        SkinnableFile(filename .. '-s_btn_over.dds'),
+        SkinnableFile(filename .. '-d_btn_dis.dds'),
+        SkinnableFile(filename .. '-s_btn_dis.dds'),
         "")
     return radioButton
 end
 
-function CreateDialogButtonStd(parent, filename, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue)
+ function CreateDialogButtonStd(parent, filename, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue)
     local button = CreateButtonStd(parent,filename,label,pointSize,textOffsetVert,textOffsetHorz, clickCue, rolloverCue)
     button.label:SetFont( dialogButtonFont, pointSize )
     button.label:SetColor( dialogButtonColor )

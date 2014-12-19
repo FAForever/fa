@@ -1855,14 +1855,14 @@ local function UpdateGame()
 
     for i = 1, LobbyComm.maxPlayerSlots do
         if GUI.slots[i].closed then
-            GUI.slots[i].SlotBackground:SetTexture(UIUtil.UIFile('/SLOT/slot-dis.png')) -- Change the Slot Background by Slot State
+            GUI.slots[i].SlotBackground:SetTexture(UIUtil.UIFile('/SLOT/slot-dis.dds')) -- Change the Slot Background by Slot State
         else
             if gameInfo.PlayerOptions[i] then
                 SetSlotInfo(i, gameInfo.PlayerOptions[i])
-                GUI.slots[i].SlotBackground:SetTexture(UIUtil.UIFile('/SLOT/slot-player.png'))
+                GUI.slots[i].SlotBackground:SetTexture(UIUtil.UIFile('/SLOT/slot-player.dds'))
             else
                 ClearSlotInfo(i)
-                GUI.slots[i].SlotBackground:SetTexture(UIUtil.UIFile('/SLOT/slot-player_other.png'))
+                GUI.slots[i].SlotBackground:SetTexture(UIUtil.UIFile('/SLOT/slot-player_other.dds'))
             end
         end
     end
@@ -2585,7 +2585,7 @@ function CreateUI(maxPlayers)
         title = "FA FOREVER GAME LOBBY"
         --
         LobbyBackgroundStretch = Prefs.GetFromCurrentProfile('LobbyBackgroundStretch') or 'true'
-        GUI.background = Bitmap(GUI, UIUtil.SkinnableFile('/BACKGROUND/background-paint_black_bmp.png')) -- Background faction or art
+        GUI.background = Bitmap(GUI, UIUtil.SkinnableFile('/BACKGROUND/background-paint_black_bmp.dds')) -- Background faction or art
         LayoutHelpers.AtCenterIn(GUI.background, GUI)
         if LobbyBackgroundStretch == 'true' then
             LayoutHelpers.FillParent(GUI.background, GUI)
@@ -2628,12 +2628,12 @@ function CreateUI(maxPlayers)
     ---------------------------------------------------------------------------
     -- Set up main control panels
     ---------------------------------------------------------------------------
-    GUI.panel = Bitmap(GUI, UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[random]lobby.png"))
+    GUI.panel = Bitmap(GUI, UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[random]lobby.dds"))
     LayoutHelpers.AtCenterIn(GUI.panel, GUI)
-    GUI.panelWideLeft = Bitmap(GUI, '/textures/ui/common/scx_menu/lan-game-lobby/wide/[random]wide.png')
+    GUI.panelWideLeft = Bitmap(GUI, '/textures/ui/common/scx_menu/lan-game-lobby/wide/[random]wide.dds')
     LayoutHelpers.CenteredLeftOf(GUI.panelWideLeft, GUI.panel, -11)
     GUI.panelWideLeft.Left:Set(function() return GUI.Left() end)
-    GUI.panelWideRight = Bitmap(GUI, '/textures/ui/common/scx_menu/lan-game-lobby/wide/[random]wide.png')
+    GUI.panelWideRight = Bitmap(GUI, '/textures/ui/common/scx_menu/lan-game-lobby/wide/[random]wide.dds')
     LayoutHelpers.CenteredRightOf(GUI.panelWideRight, GUI.panel, -11)
     GUI.panelWideRight.Right:Set(function() return GUI.Right() end)
 
@@ -2798,7 +2798,7 @@ function CreateUI(maxPlayers)
     end
 
     -- Checkbox Show changed Options
-    cbox_ShowChangedOption = UIUtil.CreateCheckboxStdPNG(GUI.optionsPanel, '/CHECKBOX/radio')
+    cbox_ShowChangedOption = UIUtil.CreateCheckboxStd(GUI.optionsPanel, '/CHECKBOX/radio')
     LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel, 3, 0)
     Tooltip.AddCheckboxTooltip(cbox_ShowChangedOption, {text='Hide default Options', body='Show only changed Options and Advanced Map Options'})
     cbox_ShowChangedOption_TEXT = UIUtil.CreateText(cbox_ShowChangedOption, 'Hide default Options', 11, 'Arial')
@@ -3346,7 +3346,7 @@ function CreateUI(maxPlayers)
         local bg = GUI.slots[i]
 
         --// Slot Background
-        GUI.slots[i].SlotBackground = Bitmap(GUI, UIUtil.SkinnableFile("/SLOT/slot-dis.png"))
+        GUI.slots[i].SlotBackground = Bitmap(GUI, UIUtil.SkinnableFile("/SLOT/slot-dis.dds"))
         LayoutHelpers.AtBottomIn(GUI.slots[i].SlotBackground, GUI.slots[i], -6)
         LayoutHelpers.AtLeftIn(GUI.slots[i].SlotBackground, GUI.slots[i], 0)
         --\\ Stop Slot Background
@@ -3501,7 +3501,7 @@ function CreateUI(maxPlayers)
         GUI.slots[i].multiSpace.Top:Set(GUI.slots[curRow].Top)
 
         if not singlePlayer then
-            GUI.slots[i].ready = UIUtil.CreateCheckboxStdPNG(GUI.slots[i].multiSpace, '/CHECKBOX/radio')
+            GUI.slots[i].ready = UIUtil.CreateCheckboxStd(GUI.slots[i].multiSpace, '/CHECKBOX/radio')
             GUI.slots[i].ready.row = i
             LayoutHelpers.AtVerticalCenterIn(GUI.slots[curRow].ready, GUI.slots[curRow].multiSpace, 8)
             LayoutHelpers.AtLeftIn(GUI.slots[curRow].ready, GUI.slots[curRow].multiSpace, 0)
@@ -3569,7 +3569,7 @@ function CreateUI(maxPlayers)
         cybran = true
         seraphim = true
 
-        GUI.allowObservers = UIUtil.CreateCheckboxStdPNG(GUI.buttonPanelTop, '/CHECKBOX/radio')
+        GUI.allowObservers = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/radio')
         LayoutHelpers.CenteredLeftOf(GUI.allowObservers, GUI.buttonPanelTop, -30)
         Tooltip.AddControlTooltip(GUI.allowObservers, 'lob_observers_allowed')
         GUI.observerLabel = UIUtil.CreateText(GUI.allowObservers, 'Observers in Game', 11, 'Arial') --14, UIUtil.bodyFont)--"<LOC lobui_0275>Observers", 14, UIUtil.bodyFont)
@@ -3632,7 +3632,7 @@ function CreateUI(maxPlayers)
             end
         end
 
-        -- AUTO TEAM BUTTON -- start of auto teams code by Moritz
+        -- AUTO TEAM BUTTON -- start of auto teams code.
         GUI.randTeam = UIUtil.CreateButtonWithDropshadow(GUI.buttonPanelRight, '/BUTTON/autoteam/')
         LayoutHelpers.AtLeftTopIn(GUI.randTeam, GUI.buttonPanelRight, 40+8, 25)
         Tooltip.AddButtonTooltip(GUI.randTeam, 'lob_click_randteam')
@@ -3860,7 +3860,7 @@ function CreateUI(maxPlayers)
 
         --start of auto kick code
         if lobbyComm:IsHost() then
-            GUI.autoKick = UIUtil.CreateCheckboxStdPNG(GUI.buttonPanelTop, '/CHECKBOX/radio')
+            GUI.autoKick = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/radio')
             LayoutHelpers.CenteredRightOf(GUI.autoKick, GUI.observerLabel, 10)
             Tooltip.AddControlTooltip(GUI.autoKick, 'lob_auto_kick')
             GUI.autoKickLabel = UIUtil.CreateText(GUI.autoKick, "Auto kick", 11, 'Arial')--14, UIUtil.bodyFont)
@@ -5438,8 +5438,8 @@ function CreateCPUMetricUI()
     if not singlePlayer then
         for i= 1, LobbyComm.maxPlayerSlots do
             GUI.slots[i].CPUSpeedBar = StatusBar(GUI.slots[i].pingGroup, barMin, barMax, false, false,
-            UIUtil.UIFile('/game/unit_bmp/bar-back_bmp.dds'),
-            UIUtil.UIFile('/game/unit_bmp/bar_purple_bmp.png'),
+            UIUtil.UIFile('/game/unit_bmp/bar_black_bmp.dds'),
+            UIUtil.UIFile('/game/unit_bmp/bar_purple_bmp.dds'),
             true)
             LayoutHelpers.AtBottomIn(GUI.slots[i].CPUSpeedBar, GUI.slots[i].pingGroup, 2)
             LayoutHelpers.AtLeftIn(GUI.slots[i].CPUSpeedBar, GUI.slots[i].pingGroup, 0)
@@ -5565,7 +5565,7 @@ function SetSlotCPUBar(slot, playerInfo)
 
                 GUI.slots[slot].CPUSpeedBar:Show()
 
-                GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.UIFile('/game/unit_bmp/bar_purple_bmp.png'))
+                GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.UIFile('/game/unit_bmp/bar_purple_bmp.dds'))
 
                 -- if clampedResult <= greenBarMax then
                 -- GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-02_bmp.dds'))
@@ -5645,7 +5645,7 @@ function RuleTitle_INPUT()
     local GUI_Preset_InputBox = Group(GUI)
     LayoutHelpers.AtCenterIn(GUI_Preset_InputBox, GUI)
     GUI_Preset_InputBox.Depth:Set(1999)
-    local background2 = Bitmap(GUI_Preset_InputBox, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby-small.png'))
+    local background2 = Bitmap(GUI_Preset_InputBox, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby-small.dds'))
     GUI_Preset_InputBox.Width:Set(background2.Width)
     GUI_Preset_InputBox.Height:Set(background2.Height)
     LayoutHelpers.FillParent(background2, GUI_Preset_InputBox)
@@ -5831,13 +5831,13 @@ end
 function ChangeSkinByFaction(input_faction)
     local faction = input_faction or Prefs.GetFromCurrentProfile('LastFaction') or 1
     if GUI.panel then
-        GUI.panel:SetTexture("/textures/ui/common/scx_menu/lan-game-lobby/" .. FACTION_NAMES[faction] .. "_lobby.png")
-        GUI.panelWideLeft:SetTexture("/textures/ui/common/scx_menu/lan-game-lobby/wide/" .. FACTION_NAMES[faction] .. "_wide.png")
-        GUI.panelWideRight:SetTexture("/textures/ui/common/scx_menu/lan-game-lobby/wide/" .. FACTION_NAMES[faction] .. "_wide.png")
+        GUI.panel:SetTexture("/textures/ui/common/scx_menu/lan-game-lobby/" .. FACTION_NAMES[faction] .. "_lobby.dds")
+        GUI.panelWideLeft:SetTexture("/textures/ui/common/scx_menu/lan-game-lobby/wide/" .. FACTION_NAMES[faction] .. "_wide.dds")
+        GUI.panelWideRight:SetTexture("/textures/ui/common/scx_menu/lan-game-lobby/wide/" .. FACTION_NAMES[faction] .. "_wide.dds")
     end
 end
 
--- If a control has two textures, _up.png and _dis.png, to be used based on its enabledness, set
+-- If a control has two textures, _up.dds and _dis.dds, to be used based on its enabledness, set
 -- the appropriate one based on its current state.
 function setEnablednessTexture(control, path)
     -- TODO: Really, we should just make sure we don't do ForceApplyNewSkin() before the UI exists...
@@ -5846,9 +5846,9 @@ function setEnablednessTexture(control, path)
     end
 
     if control:IsDisabled() then
-        control:SetTexture(UIUtil.UIFile(path .. '/_dis.png'))
+        control:SetTexture(UIUtil.UIFile(path .. '/_btn_dis.dds'))
     else
-        control:SetTexture(UIUtil.UIFile(path .. '/_up.png'))
+        control:SetTexture(UIUtil.UIFile(path .. '/_btn_up.dds'))
     end
 end
 
@@ -5903,9 +5903,9 @@ function ChangeBackgroundLobby(slot, faction)
             faction = faction or Prefs.GetFromCurrentProfile('LastFaction') or 0
             -- Unknown faction
             if faction < 1 then
-                GUI.background:SetTexture("/textures/ui/common/BACKGROUND/background-paint_black_bmp.png")
+                GUI.background:SetTexture("/textures/ui/common/BACKGROUND/background-paint_black_bmp.dds")
             else
-                GUI.background:SetTexture("/textures/ui/common/BACKGROUND/faction/faction-background-paint_" .. FACTION_NAMES[faction] .. "_bmp.png")
+                GUI.background:SetTexture("/textures/ui/common/BACKGROUND/faction/faction-background-paint_" .. FACTION_NAMES[faction] .. "_bmp.dds")
             end
             LASTLobbyBackground = 1
 
@@ -5946,7 +5946,7 @@ function ChangeBackgroundLobby(slot, faction)
             LOGX('>> Background NOTHING', 'Background')
             GUI.background:Hide()
             GUI.background2:Hide()
-            GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/background-paint_black_bmp.png"))
+            GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/background-paint_black_bmp.dds"))
             LASTLobbyBackground = 5
 
         elseif LobbyBackground == 6 then -- Extra
@@ -5968,13 +5968,13 @@ function ChangeBackgroundLobby(slot, faction)
                     elseif faction == 5 and settings.random > 0 then
                         GUI.background:SetTexture("/Mods/Lobby Background/BACKGROUND/ran"..math.random(1, settings.random)..".png")
                     else
-                        GUI.background:SetTexture("/textures/ui/common/BACKGROUND/background-paint_black_bmp.png")
+                        GUI.background:SetTexture("/textures/ui/common/BACKGROUND/background-paint_black_bmp.dds")
                     end
                 elseif settings.BackgroundType == 2 then
                     GUI.background:SetTexture("/Mods/Lobby Background/BACKGROUND/"..math.random(1, settings.random)..".png")
                 end
             else
-                GUI.background:SetTexture("/textures/ui/common/BACKGROUND/background-paint_black_bmp.png")
+                GUI.background:SetTexture("/textures/ui/common/BACKGROUND/background-paint_black_bmp.dds")
             end
             LASTLobbyBackground = 6
         end
@@ -5987,7 +5987,7 @@ function CreateOptionLobbyDialog()
     LayoutHelpers.AtCenterIn(dialog, GUI)
     dialog.Depth:Set(GetFrame(dialog:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 1)
 
-    local background = Bitmap(dialog, '/textures/ui/common/scx_menu/lan-game-lobby/optionlobby.png')
+    local background = Bitmap(dialog, '/textures/ui/common/scx_menu/lan-game-lobby/optionlobby.dds')
     dialog.Width:Set(background.Width)
     dialog.Height:Set(background.Height)
     LayoutHelpers.FillParent(background, dialog)
@@ -6008,7 +6008,7 @@ function CreateOptionLobbyDialog()
         LOC("<LOC lobui_0411>")  -- Extra
     }
     local selectedBackgroundState = backgroundStates[Prefs.GetFromCurrentProfile("LobbyBackground") or 1]
-    local backgroundRadiobutton = UIUtil.CreateRadioButtonsStdPNG(dialog2, '/CHECKBOX/radio', LOC("<LOC lobui_0405>"), backgroundStates, selectedBackgroundState)
+    local backgroundRadiobutton = UIUtil.CreateRadioButtonsStd(dialog2, '/CHECKBOX/radio', LOC("<LOC lobui_0405>"), backgroundStates, selectedBackgroundState)
 
     LayoutHelpers.AtLeftTopIn(backgroundRadiobutton, dialog2, 20, 20)
 
@@ -6036,7 +6036,7 @@ function CreateOptionLobbyDialog()
         Prefs.SetToCurrentProfile('LobbyChatFontSize', sliderValue)
 	end
 	--
-    local cbox_WindowedLobby = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
+    local cbox_WindowedLobby = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
     LayoutHelpers.AtRightIn(cbox_WindowedLobby, dialog2, 20)
     LayoutHelpers.AtTopIn(cbox_WindowedLobby, dialog2, 20)
     Tooltip.AddCheckboxTooltip(cbox_WindowedLobby, {text='Windowed mode', body=LOC("<LOC lobui_0403>")})
@@ -6056,7 +6056,7 @@ function CreateOptionLobbyDialog()
         SetWindowedLobby(checked)
     end
     --
-    local cbox_StretchBG = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
+    local cbox_StretchBG = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
     LayoutHelpers.AtRightTopIn(cbox_StretchBG, dialog2, 20, 60)
     Tooltip.AddCheckboxTooltip(cbox_StretchBG, {text='Stretch Background', body=LOC("<LOC lobui_0401>")})
     local cbox_StretchBG_TEXT = UIUtil.CreateText(cbox_StretchBG, LOC("<LOC lobui_0400>"), 14, 'Arial')
@@ -6076,7 +6076,7 @@ function CreateOptionLobbyDialog()
         end
     end
     --
-    local cbox_SMsg = UIUtil.CreateCheckboxStdPNG(dialog2, '/CHECKBOX/radio')
+    local cbox_SMsg = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
     LayoutHelpers.AtRightTopIn(cbox_SMsg, dialog2, 20, 100)
     Tooltip.AddCheckboxTooltip(cbox_SMsg, {text='Log to chat', body=LOC("<LOC lobui_0398>")})
     local cbox_SMsg_TEXT = UIUtil.CreateText(cbox_SMsg, LOC("<LOC lobui_0397>"), 14, 'Arial')
@@ -6174,7 +6174,7 @@ function GUI_PRESET()
     GUI_Preset = Group(GUI)
     LayoutHelpers.AtCenterIn(GUI_Preset, GUI)
     GUI_Preset.Depth:Set(998) -- :GetTopmostDepth() + 1
-    local background = Bitmap(GUI_Preset, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby.png'))
+    local background = Bitmap(GUI_Preset, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby.dds'))
     GUI_Preset.Width:Set(background.Width)
     GUI_Preset.Height:Set(background.Height)
     LayoutHelpers.FillParent(background, GUI_Preset)
@@ -6333,7 +6333,7 @@ function GUI_PRESET_INPUT(tyype)
     local GUI_Preset_InputBox = Group(GUI)
     LayoutHelpers.AtCenterIn(GUI_Preset_InputBox, GUI)
     GUI_Preset_InputBox.Depth:Set(1999)
-    local background2 = Bitmap(GUI_Preset_InputBox, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby-small.png'))
+    local background2 = Bitmap(GUI_Preset_InputBox, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby-small.dds'))
     GUI_Preset_InputBox.Width:Set(background2.Width)
     GUI_Preset_InputBox.Height:Set(background2.Height)
     LayoutHelpers.FillParent(background2, GUI_Preset_InputBox)
@@ -6986,7 +6986,7 @@ function GUI_Changelog()
     GROUP_Changelog = Group(GUI)
     LayoutHelpers.AtCenterIn(GROUP_Changelog, GUI)
     GROUP_Changelog.Depth:Set(GetFrame(GROUP_Changelog:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 1)
-    local background = Bitmap(GROUP_Changelog, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby.png'))
+    local background = Bitmap(GROUP_Changelog, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby.dds'))
     GROUP_Changelog.Width:Set(background.Width)
     GROUP_Changelog.Height:Set(background.Height)
     LayoutHelpers.FillParent(background, GROUP_Changelog)
