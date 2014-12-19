@@ -308,12 +308,6 @@ function _BeatFunction()
             local incomeAvg = math.min(incomeVal * simFrequency, 99999999)
             local overflow = math.ceil(math.min(allyOverflow[tableID] * simFrequency, 99999999))
             
-            --[[
-            if options.gui_team_economy == 0 then
-                overflow = 0
-            end
-            ]]
-
             controls.storageBar:SetRange(0, maxStorageVal)
             controls.storageBar:SetValue(storedVal)
             controls.curStorage:SetText(math.ceil(storedVal))
@@ -504,11 +498,6 @@ function _BeatFunction()
             local actualAvg = math.min(lastActualVal * simFrequency, 9999999)
             local incomeAvg = math.min(incomeVal * simFrequency, 99999999)
             local overflow = math.ceil(math.min(allyOverflow[tableID] * simFrequency, 99999999))
-            --[[
-            if options.gui_team_economy == 0 and false then
-                overflow = 0
-            end
-            ]]
             
             controls.storageBar:SetRange(0, maxStorageVal)
             controls.storageBar:SetValue(storedVal)
