@@ -281,7 +281,14 @@ end
 function _BeatFunction()
     local econData = GetEconomyTotals()
     local simFrequency = GetSimTicksPerSecond()
-    local allyOverflow = TeamEco['overflow']
+    local allyOverflow
+
+    if options.gui_team_economy == 1 and TeamEco and TeamEco.overflow then
+        allyOverflow = TeamEco.overflow
+    else
+        allyOverflow = {MASS=0, ENERGY=0}
+    end
+
     if options.gui_display_reclaim_totals == 1 then
     -- fetch & format reclaim values
         reclaimedTotalsMass = math.ceil(econData.reclaimed.MASS)
@@ -300,6 +307,12 @@ function _BeatFunction()
             local actualAvg = math.min(lastActualVal * simFrequency, 99999999)
             local incomeAvg = math.min(incomeVal * simFrequency, 99999999)
             local overflow = math.ceil(math.min(allyOverflow[tableID] * simFrequency, 99999999))
+            
+            --[[
+            if options.gui_team_economy == 0 then
+                overflow = 0
+            end
+            ]]
 
             controls.storageBar:SetRange(0, maxStorageVal)
             controls.storageBar:SetValue(storedVal)
@@ -491,6 +504,11 @@ function _BeatFunction()
             local actualAvg = math.min(lastActualVal * simFrequency, 9999999)
             local incomeAvg = math.min(incomeVal * simFrequency, 99999999)
             local overflow = math.ceil(math.min(allyOverflow[tableID] * simFrequency, 99999999))
+            --[[
+            if options.gui_team_economy == 0 and false then
+                overflow = 0
+            end
+            ]]
             
             controls.storageBar:SetRange(0, maxStorageVal)
             controls.storageBar:SetValue(storedVal)

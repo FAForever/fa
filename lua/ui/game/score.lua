@@ -20,6 +20,7 @@ local Grid = import('/lua/maui/Grid.lua').Grid
 local Prefs = import('/lua/user/prefs.lua')
 local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
 local Tooltip = import('/lua/ui/game/tooltip.lua')
+local options = Prefs.GetFromCurrentProfile('options')
 
 controls = {}
 savedParent = false
@@ -413,6 +414,7 @@ function RefreshScore()
     end
 
     local armiesInfo = GetArmiesTable().armiesTable
+    local show_team = options.gui_team_economy == 1
     if currentScores then
         for index, scoreData in currentScores do
             for _, line in controls.armyLines do
@@ -426,9 +428,7 @@ function RefreshScore()
                             line.energy_in:SetText(fmtnum(scoreData.resources.energyin.rate * 10))
                         end
                     else
-                        local keys = {'mass', 'mass_in', 'energy', 'energy_in'}
-
-                        if eco then
+                        if eco and show_team then
                             if eco['MASS'].overflow > 0 and refreshTicks < 10 then
                                 line.mass_in:SetText(fmtnum(eco['MASS'].overflow*tps))
                                 line.mass_in:SetColor('ff00ff00')
@@ -446,8 +446,9 @@ function RefreshScore()
                             end
                         end
 
+                        local keys = {'mass', 'mass_in', 'energy', 'energy_in'}
                         for _, k in keys do
-                            if eco then
+                            if eco and show_team then
                                 line[k]:Show()
                             else
                                 line[k]:Hide()
