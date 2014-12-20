@@ -1691,7 +1691,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         AssignRandomTeams(gameInfo)
         randstring = randomString(16, "%l%d")
         gameInfo.GameOptions['ReplayID'] = randstring
-        gameInfo.GameOptions['Rule'] = RuleLabel:GetItem(0)..RuleLabel:GetItem(1)
+        gameInfo.GameOptions['Rule'] = GUI.RuleLabel:GetItem(0)..GUI.RuleLabel:GetItem(1)
         AssignAINames(gameInfo)
         local allRatings = {}
         for k,v in gameInfo.PlayerOptions do
@@ -1914,7 +1914,7 @@ local function UpdateGame()
 
     -- Set the map name at the top right corner in lobby
     if scenarioInfo.name then
-        SetText2(MapNameLabel, scenarioInfo.name, 10)
+        SetText2(GUI.MapNameLabel, scenarioInfo.name, 10)
     end
 
     -- Auto-team logic.
@@ -1963,19 +1963,19 @@ local function UpdateGame()
 
             if quality > 0 then
                 gameInfo.GameOptions['Quality'] = quality
-                SetText2(GameQualityLabel, "Game quality : "..quality.."%", 10)
+                SetText2(GUI.GameQualityLabel, "Game quality : "..quality.."%", 10)
             else
-                SetText2(GameQualityLabel, "Game quality N/A", 10)
+                SetText2(GUI.GameQualityLabel, "Game quality N/A", 10)
             end
         else
-            GameQualityLabel:SetText("")
+            GUI.GameQualityLabel:SetText("")
         end
     else
-        GameQualityLabel:SetText("")
+        GUI.GameQualityLabel:SetText("")
     end
 
     -- Add Tooltip info on Map Name Label
-    if GameQualityLabel and scenarioInfo then
+    if GUI.GameQualityLabel and scenarioInfo then
         local TTips_map_version = scenarioInfo.map_version or "N/A"
         local TTips_army = table.getsize(scenarioInfo.Configurations.standard.teams[1].armies) or "N/A"
         local TTips_sizeX = scenarioInfo.size[1] / 51.2 or "N/A"
@@ -1988,8 +1988,8 @@ local function UpdateGame()
                    '- Map Size : '..TTips_sizeX..'km x '..TTips_sizeY..'km'
         }
 
-        Tooltip.AddControlTooltip(MapNameLabel, mapTooltip)
-        Tooltip.AddControlTooltip(GameQualityLabel, mapTooltip)
+        Tooltip.AddControlTooltip(GUI.MapNameLabel, mapTooltip)
+        Tooltip.AddControlTooltip(GUI.GameQualityLabel, mapTooltip)
     else
         local mapTooltip = {
             text="N/A",
@@ -1997,8 +1997,8 @@ local function UpdateGame()
                  '- Max Players : N/A max\n '..
                  '- Map Size : N/Akm x N/Akm'
         }
-        Tooltip.AddControlTooltip(MapNameLabel, mapTooltip)
-        Tooltip.AddControlTooltip(GameQualityLabel, mapTooltip)
+        Tooltip.AddControlTooltip(GUI.MapNameLabel, mapTooltip)
+        Tooltip.AddControlTooltip(GUI.GameQualityLabel, mapTooltip)
     end
 end
 
@@ -2584,7 +2584,7 @@ function CreateUI(maxPlayers)
     if GpgNetActive() then
         title = "FA FOREVER GAME LOBBY"
         --
-        LobbyBackgroundStretch = Prefs.GetFromCurrentProfile('LobbyBackgroundStretch') or 'true'
+        local LobbyBackgroundStretch = Prefs.GetFromCurrentProfile('LobbyBackgroundStretch') or 'true'
         GUI.background = Bitmap(GUI, UIUtil.SkinnableFile('/BACKGROUND/background-paint_black_bmp.dds')) -- Background faction or art
         LayoutHelpers.AtCenterIn(GUI.background, GUI)
         if LobbyBackgroundStretch == 'true' then
@@ -2638,76 +2638,77 @@ function CreateUI(maxPlayers)
     GUI.panelWideRight.Right:Set(function() return GUI.Right() end)
 
     --// Title Label
-    titleText = UIUtil.CreateText(GUI.panel, "", 17, 'Arial Gras')--UIUtil.titleFont)
+    local titleText = UIUtil.CreateText(GUI.panel, "", 17, 'Arial Gras')--UIUtil.titleFont)
     SetText2(titleText, title, 10)
     LayoutHelpers.AtLeftTopIn(titleText, GUI.panel, 50, 41)
     titleText:SetColor('B9BFB9')
     titleText:SetDropShadow(true)
     --\\
     --// Map Name Label
-    MapNameLabel = UIUtil.CreateText(GUI.panel, "", 17, 'Arial Gras')
-    SetText2(MapNameLabel, "Loading ...", 10)
-    LayoutHelpers.AtRightTopIn(MapNameLabel, GUI.panel, 50, 41)
-    MapNameLabel:SetColor('B9BFB9')
-    MapNameLabel:SetDropShadow(true)
+    GUI.MapNameLabel = UIUtil.CreateText(GUI.panel, "", 17, 'Arial Gras')
+    SetText2(GUI.MapNameLabel, "Loading ...", 10)
+    LayoutHelpers.AtRightTopIn(GUI.MapNameLabel, GUI.panel, 50, 41)
+    GUI.MapNameLabel:SetColor('B9BFB9')
+    GUI.MapNameLabel:SetDropShadow(true)
     --\\
     --// Game Quality Label
-    GameQualityLabel = UIUtil.CreateText(GUI.panel, "", 13, 'Arial Gras')
-    LayoutHelpers.AtRightTopIn(GameQualityLabel, GUI.panel, 50, 61)
-    GameQualityLabel:SetColor('B9BFB9')
-    GameQualityLabel:SetDropShadow(true)
+    GUI.GameQualityLabel = UIUtil.CreateText(GUI.panel, "", 13, 'Arial Gras')
+    LayoutHelpers.AtRightTopIn(GUI.GameQualityLabel, GUI.panel, 50, 61)
+    GUI.GameQualityLabel:SetColor('B9BFB9')
+    GUI.GameQualityLabel:SetDropShadow(true)
     --\\
     --// Rule Label
-    RuleLabel = ItemList(GUI.panel)
-    RuleLabel:SetFont('Arial Gras', 11)
-    RuleLabel:SetColors("B9BFB9", "00000000", "B9BFB9", "00000000") -- colortxt, bg, colortxt selec, bg selec?
-    LayoutHelpers.AtLeftTopIn(RuleLabel, GUI.panel, 50, 81) --Right, Top
-    RuleLabel.Height:Set(34)
-    RuleLabel.Width:Set(350)
-    RuleLabel:DeleteAllItems()
+    GUI.RuleLabel = ItemList(GUI.panel)
+    GUI.RuleLabel:SetFont('Arial Gras', 11)
+    GUI.RuleLabel:SetColors("B9BFB9", "00000000", "B9BFB9", "00000000") -- colortxt, bg, colortxt selec, bg selec?
+    LayoutHelpers.AtLeftTopIn(GUI.RuleLabel, GUI.panel, 50, 81) --Right, Top
+    GUI.RuleLabel.Height:Set(34)
+    GUI.RuleLabel.Width:Set(350)
+    GUI.RuleLabel:DeleteAllItems()
+    local tmptext
     if lobbyComm:IsHost() then
         tmptext = 'Rule : no rule (click for edit)'
-        RuleLabel:SetColors("FFCC00")
+        GUI.RuleLabel:SetColors("FFCC00")
     else
         tmptext = 'Rule : no rule.'
     end
-    RuleLabel:AddItem(tmptext or '')
-    RuleLabel:AddItem('')
+    GUI.RuleLabel:AddItem(tmptext or '')
+    GUI.RuleLabel:AddItem('')
     if lobbyComm:IsHost() then
-        RuleLabel.OnClick = function(self)
+        GUI.RuleLabel.OnClick = function(self)
             RuleTitle_INPUT()
         end
     end
     --\\
     --// MOD Label
-    ModFeaturedLabel = UIUtil.CreateText(GUI.panel, "", 13, 'Arial Gras')
-    LayoutHelpers.AtLeftTopIn(ModFeaturedLabel, GUI.panel, 50, 61)
-    ModFeaturedLabel:SetColor('B9BFB9')
-    ModFeaturedLabel:SetDropShadow(true)
+    GUI.ModFeaturedLabel = UIUtil.CreateText(GUI.panel, "", 13, 'Arial Gras')
+    LayoutHelpers.AtLeftTopIn(GUI.ModFeaturedLabel, GUI.panel, 50, 61)
+    GUI.ModFeaturedLabel:SetColor('B9BFB9')
+    GUI.ModFeaturedLabel:SetDropShadow(true)
     local getInit = GetCommandLineArg("/init", 1)
     getInit = tostring(getInit[1])
     if getInit == "init_faf.lua" then
-        SetText2(ModFeaturedLabel, 'FA Forever', 10)
+        SetText2(GUI.ModFeaturedLabel, 'FA Forever', 10)
     elseif getInit == "init_blackops.lua" then
-        SetText2(ModFeaturedLabel, 'BlackOps MOD', 10)
+        SetText2(GUI.ModFeaturedLabel, 'BlackOps MOD', 10)
     elseif getInit == "init_coop.lua" then
-        SetText2(ModFeaturedLabel, 'COOP', 10)
+        SetText2(GUI.ModFeaturedLabel, 'COOP', 10)
     elseif getInit == "init_balancetesting.lua" then
-        SetText2(ModFeaturedLabel, 'Balance Testing', 10)
+        SetText2(GUI.ModFeaturedLabel, 'Balance Testing', 10)
     elseif getInit == "init_gw.lua" then
-        SetText2(ModFeaturedLabel, 'Galactic War', 10)
+        SetText2(GUI.ModFeaturedLabel, 'Galactic War', 10)
     elseif getInit == "init_labwars.lua" then
-        SetText2(ModFeaturedLabel, 'Labwars MOD', 10)
+        SetText2(GUI.ModFeaturedLabel, 'Labwars MOD', 10)
     elseif getInit == "init_ladder1v1.lua" then
-        SetText2(ModFeaturedLabel, 'Ladder 1v1', 10)
+        SetText2(GUI.ModFeaturedLabel, 'Ladder 1v1', 10)
     elseif getInit == "init_nomads.lua" then
-        SetText2(ModFeaturedLabel, 'Nomads MOD', 10)
+        SetText2(GUI.ModFeaturedLabel, 'Nomads MOD', 10)
     elseif getInit == "init_phantomx.lua" then
-        SetText2(ModFeaturedLabel, 'PhantomX MOD', 10)
+        SetText2(GUI.ModFeaturedLabel, 'PhantomX MOD', 10)
     elseif getInit == "init_supremedestruction.lua" then
-        SetText2(ModFeaturedLabel, 'SupremeDestruction MOD', 10)
+        SetText2(GUI.ModFeaturedLabel, 'SupremeDestruction MOD', 10)
     elseif getInit == "init_xtremewars.lua" then
-        SetText2(ModFeaturedLabel, 'XtremeWars MOD', 10)
+        SetText2(GUI.ModFeaturedLabel, 'XtremeWars MOD', 10)
     end
     --\\
     --// Lobby options panel
@@ -2720,14 +2721,13 @@ function CreateUI(maxPlayers)
     --\\
     --// Credits footer
     local Credits = 'New Skin by Xinnony and Barlots (Lobby version : '..LOBBYversion..')'
-    local Credits_Text_X = 11 -- Offset Right
-    Credits_Text = UIUtil.CreateText(GUI.panel, '', 17, UIUtil.titleFont)
-    SetText2(Credits_Text, Credits, 10)
-    Credits_Text:SetFont(UIUtil.titleFont, 12)
-    Credits_Text:SetColor("FFFFFF")
-    LayoutHelpers.AtBottomIn(Credits_Text, GUI, 0)
-    LayoutHelpers.AtRightIn(Credits_Text, GUI, Credits_Text_X)
-    Credits_Text:SetDropShadow(true)
+    GUI.Credits_Text = UIUtil.CreateText(GUI.panel, '', 17, UIUtil.titleFont)
+    SetText2(GUI.Credits_Text, Credits, 10)
+    GUI.Credits_Text:SetFont(UIUtil.titleFont, 12)
+    GUI.Credits_Text:SetColor("FFFFFF")
+    LayoutHelpers.AtBottomIn(GUI.Credits_Text, GUI, 0)
+    LayoutHelpers.AtRightIn(GUI.Credits_Text, GUI, 11)
+    GUI.Credits_Text:SetDropShadow(true)
     --\\
 
     -- FOR SEE THE GROUP POSITION, LOOK THIS SCREENSHOOT : http://img402.imageshack.us/img402/8826/falobbygroup.png
@@ -2798,10 +2798,10 @@ function CreateUI(maxPlayers)
     end
 
     -- Checkbox Show changed Options
-    cbox_ShowChangedOption = UIUtil.CreateCheckboxStd(GUI.optionsPanel, '/CHECKBOX/radio')
+    local cbox_ShowChangedOption = UIUtil.CreateCheckboxStd(GUI.optionsPanel, '/CHECKBOX/radio')
     LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel, 3, 0)
     Tooltip.AddCheckboxTooltip(cbox_ShowChangedOption, {text='Hide default Options', body='Show only changed Options and Advanced Map Options'})
-    cbox_ShowChangedOption_TEXT = UIUtil.CreateText(cbox_ShowChangedOption, 'Hide default Options', 11, 'Arial')
+    local cbox_ShowChangedOption_TEXT = UIUtil.CreateText(cbox_ShowChangedOption, 'Hide default Options', 11, 'Arial')
     cbox_ShowChangedOption_TEXT:SetColor('B9BFB9')
     cbox_ShowChangedOption_TEXT:SetDropShadow(true)
     LayoutHelpers.AtLeftIn(cbox_ShowChangedOption_TEXT, cbox_ShowChangedOption, 25)
@@ -3231,7 +3231,7 @@ function CreateUI(maxPlayers)
     -- Checkbox Show changed Options
     ---------------------------------------------------------------------------
     if hideDefaultOptions == 'true' then
-        cbox_ShowChangedOption:SetCheck(true, false) -- BUG FIXED !, OptionContainer NOT CREATED BEFORE -- isChecked, skipEvent
+        cbox_ShowChangedOption:SetCheck(true, false)
     end
 
     ---------------------------------------------------------------------------
@@ -5620,24 +5620,24 @@ end
 
 -- Update the title to display the rule.
 function RuleTitle_SendMSG()
-    if RuleLabel and lobbyComm:IsHost() then
-        local getRule = {RuleLabel:GetItem(0), RuleLabel:GetItem(1)}
+    if GUI.RuleLabel and lobbyComm:IsHost() then
+        local getRule = {GUI.RuleLabel:GetItem(0), GUI.RuleLabel:GetItem(1)}
         if getRule[1]..getRule[2] == 'Rule : no rule (click for edit)' or getRule[1]..getRule[2] == 'Rule : no rule (click for edit) ' then
             getRule[1] = 'Rule : no rule.'
             getRule[2] = ''
         else
-            getRule[1] = RuleLabel:GetItem(0)
-            getRule[2] = RuleLabel:GetItem(1)
+            getRule[1] = GUI.RuleLabel:GetItem(0)
+            getRule[2] = GUI.RuleLabel:GetItem(1)
         end
         lobbyComm:BroadcastData( { Type = 'Rule_Title_MSG', Result1 = getRule[1], Result2 = getRule[2] } )
     end
 end
 
 function RuleTitle_SetText(Result1, Result2)
-    if RuleLabel and not lobbyComm:IsHost() then
-        RuleLabel:DeleteAllItems()
-        RuleLabel:AddItem(Result1)
-        RuleLabel:AddItem(Result2)
+    if GUI.RuleLabel and not lobbyComm:IsHost() then
+        GUI.RuleLabel:DeleteAllItems()
+        GUI.RuleLabel:AddItem(Result1)
+        GUI.RuleLabel:AddItem(Result2)
     end
 end
 
@@ -5671,18 +5671,18 @@ function RuleTitle_INPUT()
     nameEdit.OnEnterPressed = function(self, text)
         if text == '' then
             GUI_Preset_InputBox:Destroy()
-            RuleLabel:DeleteAllItems()
-            RuleLabel:AddItem('Rule : no rule (click for edit)')
-            RuleLabel:SetColors("FFCC00")
-            RuleLabel:AddItem('')
+            GUI.RuleLabel:DeleteAllItems()
+            GUI.RuleLabel:AddItem('Rule : no rule (click for edit)')
+            GUI.RuleLabel:SetColors("FFCC00")
+            GUI.RuleLabel:AddItem('')
             RuleTitle_SendMSG()
         else
             GUI_Preset_InputBox:Destroy()
-            wrapped = import('/lua/maui/text.lua').WrapText('Rule : '..text, 350, function(curText) return RuleLabel:GetStringAdvance(curText) end)
-            RuleLabel:DeleteAllItems()
-            RuleLabel:AddItem(wrapped[1] or '')
-            RuleLabel:SetColors("B9BFB9")
-            RuleLabel:AddItem(wrapped[2] or '')
+            wrapped = import('/lua/maui/text.lua').WrapText('Rule : '..text, 350, function(curText) return GUI.RuleLabel:GetStringAdvance(curText) end)
+            GUI.RuleLabel:DeleteAllItems()
+            GUI.RuleLabel:AddItem(wrapped[1] or '')
+            GUI.RuleLabel:SetColors("B9BFB9")
+            GUI.RuleLabel:AddItem(wrapped[2] or '')
             RuleTitle_SendMSG()
         end
     end
@@ -5704,20 +5704,20 @@ function RuleTitle_INPUT()
         local result = nameEdit:GetText()
         if result == '' then
             GUI_Preset_InputBox:Destroy()
-            RuleLabel:DeleteAllItems()
-            RuleLabel:AddItem('Rule : no rule (click for edit)')
-            RuleLabel:SetColors("FFCC00")
-            RuleLabel:AddItem('')
+            GUI.RuleLabel:DeleteAllItems()
+            GUI.RuleLabel:AddItem('Rule : no rule (click for edit)')
+            GUI.RuleLabel:SetColors("FFCC00")
+            GUI.RuleLabel:AddItem('')
             RuleTitle_SendMSG()
             --return 'Rule : no rule.'
         else
             GUI_Preset_InputBox:Destroy()
             --AddChatText('> '..result)
-            wrapped = import('/lua/maui/text.lua').WrapText('Rule : '..result, 350, function(curText) return RuleLabel:GetStringAdvance(curText) end)
-            RuleLabel:DeleteAllItems()
-            RuleLabel:AddItem(wrapped[1] or '')
-            RuleLabel:SetColors("B9BFB9")
-            RuleLabel:AddItem(wrapped[2] or '')
+            wrapped = import('/lua/maui/text.lua').WrapText('Rule : '..result, 350, function(curText) return GUI.RuleLabel:GetStringAdvance(curText) end)
+            GUI.RuleLabel:DeleteAllItems()
+            GUI.RuleLabel:AddItem(wrapped[1] or '')
+            GUI.RuleLabel:SetColors("B9BFB9")
+            GUI.RuleLabel:AddItem(wrapped[2] or '')
             RuleTitle_SendMSG()
             --return 'Rule : '..result
         end
@@ -6664,16 +6664,16 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
         --AddChatText('> PRESET > Rule : '..profiles[Selected_Preset].Rule)
         -- Set Rule Title in TextBox
         if profiles[Selected_Preset].Rule == '' or profiles[Selected_Preset].Rule == 'no rule.' then
-            RuleLabel:DeleteAllItems()
-            RuleLabel:AddItem('Rule : no rule (click for edit)')
-            RuleLabel:SetColors("FFCC00")
-            RuleLabel:AddItem('')
+            GUI.RuleLabel:DeleteAllItems()
+            GUI.RuleLabel:AddItem('Rule : no rule (click for edit)')
+            GUI.RuleLabel:SetColors("FFCC00")
+            GUI.RuleLabel:AddItem('')
         else
-            wrapped = import('/lua/maui/text.lua').WrapText('Rule : '..profiles[Selected_Preset].Rule, RuleLabel.Width(), function(curText) return RuleLabel:GetStringAdvance(curText) end)
-            RuleLabel:DeleteAllItems()
-            RuleLabel:AddItem(wrapped[1] or '')
-            RuleLabel:SetColors("B9BFB9")
-            RuleLabel:AddItem(wrapped[2] or '')
+            wrapped = import('/lua/maui/text.lua').WrapText('Rule : '..profiles[Selected_Preset].Rule, GUI.RuleLabel.Width(), function(curText) return GUI.RuleLabel:GetStringAdvance(curText) end)
+            GUI.RuleLabel:DeleteAllItems()
+            GUI.RuleLabel:AddItem(wrapped[1] or '')
+            GUI.RuleLabel:SetColors("B9BFB9")
+            GUI.RuleLabel:AddItem(wrapped[2] or '')
         end
         RuleTitle_SendMSG()
         --AddChatText('> PRESET > MapPath : '..profiles[Selected_Preset].MapPath)
@@ -6749,7 +6749,7 @@ function SAVE_PRESET_IN_PREF() -- GET OPTIONS ON LOBBY AND SAVE TO PRESET
 
     local Preset_Name = profiles[Selected_Preset].PresetName or 'ERROR, Set preset name here' -- Nom du PresetLobby
     local Title_FAF = profiles[Selected_Preset].Title_FAF or '' -- Title is for FAF Client title in "Find Games" tabs
-    local Rule_Text = RuleLabel:GetItem(0)..RuleLabel:GetItem(1)
+    local Rule_Text = GUI.RuleLabel:GetItem(0)..GUI.RuleLabel:GetItem(1)
     if Rule_Text == 'Rule : no rule (click for edit)' then
         Rule_Text = 'no rule.'
     end
