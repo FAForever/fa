@@ -242,42 +242,6 @@ function SetCurrentSkin(skin)
     Prefs.SetToCurrentProfile("skin", skin)
 end
 
-function SetCurrentSkin2(skin)
-    local skins = import('/lua/skins/skins.lua').skins
-
-    if skins[skin] == nil then
-        skin = 'uef'
-    end
-
-    currentSkin:Set(skin)
-
-    menuFontSize:Set(skins[skin].menuFontSize or skins['default'].menuFontSize)
-    layouts = skins[skin].layouts or skins['default'].layouts
-
-    --UpdateWorldBorderState(skin)
-
-    --local curLayout = Prefs.GetFromCurrentProfile("layout")
-
-    --if not curLayout then
-        --SetCurrentLayout(layouts[1])
-    --else
-        --local validLayout = false
-        --for i, layoutName in layouts do
-            --if layoutName == curLayout then
-                --validLayout = true
-                --break
-            --end
-        --end
-        --if validLayout then
-            --SetCurrentLayout(curLayout)
-        --else
-            --SetCurrentLayout(layouts[1])
-        --end
-    --end
-
-    Prefs.SetToCurrentProfile("skin", skin)
-end
-
 --* cycle through all available skins
 function RotateSkin(direction)
     if not SessionIsActive() or import('/lua/ui/game/gamemain.lua').IsNISMode() then
