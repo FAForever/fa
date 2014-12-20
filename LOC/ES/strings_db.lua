@@ -5122,7 +5122,6 @@ lobui_0407="Concept Art"
 lobui_0408="Screenshot"
 lobui_0409="Map"
 lobui_0410="None"
-lobui_0411="Extra"
 
 # Lobby changelog panel
 lobui_0412="What's new in Lobby?"
