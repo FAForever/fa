@@ -3823,40 +3823,23 @@ function CreateUI(maxPlayers)
         ButtonsPanelText:SetDropShadow(true)
         ButtonsPanelText.Left:Set(math.floor(GUI.rerunBenchmark.Left() - (ButtonsPanelText.Width() / 2)))
         LayoutHelpers.AtVerticalCenterIn(ButtonsPanelText, GUI.randTeam, 25)
-        GUI.randTeam.OnRolloverEvent = function(self, state)
-            if state == 'enter' then
-                ButtonsPanelText:SetText('Random Team')
-                ButtonsPanelText.Left:Set(math.floor(GUI.rerunBenchmark.Left() - (ButtonsPanelText.Width() / 2)))
-            elseif state == 'exit' then
-                ButtonsPanelText:SetText('')
-            end
-        end
-        GUI.rankedOptions.OnRolloverEvent = function(self, state)
-            if state == 'enter' then
-                ButtonsPanelText:SetText('Set Ranked Options')
-                ButtonsPanelText.Left:Set(math.floor(GUI.rerunBenchmark.Left() - (ButtonsPanelText.Width() / 2)))
-            elseif state == 'exit' then
-                ButtonsPanelText:SetText('')
-            end
-        end
 
-        GUI.rerunBenchmark.OnRolloverEvent = function(self, state)
-            if state == 'enter' then
-                ButtonsPanelText:SetText('Re-run CPU Benchmark')
-                ButtonsPanelText.Left:Set(math.floor(GUI.rerunBenchmark.Left() - (ButtonsPanelText.Width() / 2)))
-            elseif state == 'exit' then
-                ButtonsPanelText:SetText('')
+        -- Manufacture a rollover event that sets the ButtonsPanelText's text to label and clears
+        -- it on rollout.
+        local function getButtonPanelRollover(label)
+            return function(self, state)
+                if state == 'enter' then
+                    ButtonsPanelText:SetText(label)
+                    ButtonsPanelText.Left:Set(math.floor(GUI.rerunBenchmark.Left() - (ButtonsPanelText.Width() / 2)))
+                elseif state == 'exit' then
+                    ButtonsPanelText:SetText('')
+                end
             end
         end
-
-        GUI.randMap.OnRolloverEvent = function(self, state)
-            if state == 'enter' then
-                ButtonsPanelText:SetText('Random Map')
-                ButtonsPanelText.Left:Set(math.floor(GUI.rerunBenchmark.Left() - (ButtonsPanelText.Width() / 2)))
-            elseif state == 'exit' then
-                ButtonsPanelText:SetText('')
-            end
-        end
+        GUI.randTeam.OnRolloverEvent = getButtonPanelRollover("Random Team")
+        GUI.rankedOptions.OnRolloverEvent = getButtonPanelRollover("Set Ranked Options")
+        GUI.rerunBenchmark.OnRolloverEvent = getButtonPanelRollover("Re-run CPU Benchmark")
+        GUI.randMap.OnRolloverEvent = getButtonPanelRollover("Random Map")
 
         --start of auto kick code
         if lobbyComm:IsHost() then
