@@ -1751,11 +1751,7 @@ local function Faction_Selector_Set_Enabled(enabled, faction)
 
     -- Set the enabled state of the panel.
     for k , v in pairs(FACTION_PANELS) do
-        if enabled then
-            v:Enable()
-        else
-            v:Disable()
-        end
+        UIUtil.setEnabled(v, enabled)
     end
 end
 
