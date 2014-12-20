@@ -2567,7 +2567,7 @@ function CreateUI(maxPlayers)
     local Text = import('/lua/maui/text.lua').Text
     local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
     local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
-    local Combo = import('/lua/ui/controls/combo.lua').Combo2
+    local Combo = import('/lua/ui/controls/combo.lua').Combo
     local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
     local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo2
     local EffectHelpers = import('/lua/maui/effecthelpers.lua')
@@ -3372,7 +3372,7 @@ function CreateUI(maxPlayers)
         LayoutHelpers.AtRightIn(GUI.slots[i].numGamesText, GUI.slots[i].numGamesGroup, 9)
 
         --// Name
-        GUI.slots[i].name = Combo(bg, 15, 10, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+        GUI.slots[i].name = Combo(bg, 14, 12, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         GUI.slots[i].name._text:SetFont('Arial Gras', 15)
         GUI.slots[i].name._text:SetDropShadow(true)
         LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].name, GUI.slots[i], 8)
