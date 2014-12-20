@@ -2569,7 +2569,7 @@ function CreateUI(maxPlayers)
     local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
     local Combo = import('/lua/ui/controls/combo.lua').Combo
     local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
-    local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo2
+    local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo
     local EffectHelpers = import('/lua/maui/effecthelpers.lua')
     local ItemList = import('/lua/maui/itemlist.lua').ItemList
     local Prefs = import('/lua/user/prefs.lua')
@@ -6815,7 +6815,7 @@ end
 
 -- Create the Available Color Table and Recreate the ComboBox --
 function Check_Availaible_Color(self, slot)
-    local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo2
+    local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo
     --
     Avail_Color[slot] = {}
     local num = 0
@@ -6847,6 +6847,7 @@ function Check_Availaible_Color(self, slot)
     local yy = Get_IndexColor_by_CompleteTable(gameInfo.PlayerOptions[slot].PlayerColor, slot)
     --
     GUI.slots[slot].color:Destroy()
+    -- TODO: There should be no need to rebuild the whole UI control here.
     GUI.slots[slot].color = BitmapCombo(GUI.slots[slot], Avail_Color[slot], yy, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
     LayoutHelpers.AtLeftIn(GUI.slots[slot].color, GUI.panel, (161+264)+11)
     LayoutHelpers.AtVerticalCenterIn(GUI.slots[slot].color, GUI.slots[slot], 9)
