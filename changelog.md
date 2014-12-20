@@ -1,5 +1,5 @@
-Changelog for hotfix-patch 3638
--------------------------------
+Changelog for patch 3638
+------------------------
 
 *Exploit fixes*
 - Fixed a regression of the free ACU upgrade exploit
@@ -20,13 +20,13 @@ Changelog for hotfix-patch 3638
 - Fixed Seraphim T3MAA targetbones (Units will no longer aim above it)
 - Fixed integrated replaysync
 - More mod compatibility
-- Lobby 2.5d included, changelog shown in game
 - Give Eye of Rihanne restriction a new description
 - Fixed hoplite not firing at landed air units
 - Added BOMBER category to Ahwassa
 - Added FACTORY category to Megalith, allows queuing of units while being built
 - Improve new unit share code (Units dying after being transferred multiple times)
 - Fixed sinking wrecks blocking projectiles where the unit used to be
+- Lobby 2.6.0 included, changelog shown in game
 
 
 Thanks to pip, briang and Alex1911 for translations

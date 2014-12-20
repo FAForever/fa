@@ -6,7 +6,7 @@
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
 
-LOBBYversion = 'v2.5d'
+LOBBYversion = import('/lua/version.lua').GetLobbyVersion()
 LOG('Lobby version : '..LOBBYversion)
 
 local UIUtil = import('/lua/ui/uiutil.lua')
