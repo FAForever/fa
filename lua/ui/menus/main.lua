@@ -424,16 +424,8 @@ function CreateUI()
             control:SetNeedsFrameUpdate(true)
             control:SetTexture(UIUtil.UIFile('/menus/main02/profile-edit_btn_up.dds'))
             control.label:SetColor(UIUtil.fontColor)
-            control.time = 0
-            control.wait = 0
             control.first = true
             control.OnFrame = function(self, delta)
-                self.time = self.time + delta
-                if self.first then
-                    self.leftBracket:SetAlpha(1)
-                    self.rightBracket:SetAlpha(1)
-                    self.first = false
-                end
                 local change = (delta * 200)
                 local rightGoal = function() return self.Left() + 10 end
                 local leftGoal = function() return self.Right() - 10 end
@@ -443,21 +435,13 @@ function CreateUI()
                         newRight = rightGoal
                     end
                     self.leftBracket.Right:Set(newRight)
-                end
-                if self.rightBracket.Left() > leftGoal() then
+
                     local newLeft = self.rightBracket.Left() - change
                     if newLeft < leftGoal() then
                         newLeft = leftGoal
                     end
                     self.rightBracket.Left:Set(newLeft)
-                end
-                if self.time > .5 and self.time > self.wait then
-                    local num = math.random(20, 70)/100
-                    local waitRand = math.random(0, 3)/10
-                    self.wait = self.time + waitRand
-                    self:SetItemAlpha(num)
-                end
-                if self.time > 1.5 then
+                else
                     self.leftBracket.Right:Set(rightGoal)
                     self.rightBracket.Left:Set(leftGoal)
                     self:SetItemAlpha(1)
@@ -472,41 +456,24 @@ function CreateUI()
             Tooltip.DestroyMouseoverDisplay()
             control:SetTexture(UIUtil.UIFile('/menus/main02/profile-edit_btn_up.dds'))
             control.label:SetColor(UIUtil.fontColor)
-            control.time = 0
-            control.wait = 0
             control.OnFrame = function(self, delta)
-                self.time = self.time + delta
-                if self.time < 1 and self.time > self.wait then
-                    local num = math.random(20, 80)/100
-                    local waitRand = math.random(0, 3)/10
-                    self.wait = self.time + waitRand
-                    self:SetItemAlpha(num)
-                end
                 local rightGoal = function() return menuBracketLeft.Right() - 15 end
                 local leftGoal = function() return menuBracketRight.Left() + 15 end
-                if self.time >= 1 then
-                    if self:GetAlpha() > 0 then
-                        self:SetItemAlpha(0)
+                local change = (delta * 200)
+                if self.leftBracket.Right() > rightGoal() then
+                    local newRight = self.leftBracket.Right() - change
+                    if newRight < rightGoal() then
+                        newRight = rightGoal
+                        self.leftBracket:SetAlpha(0)
                     end
-                    local change = (delta * 200)
-                    if self.leftBracket.Right() > rightGoal() then
-                        local newRight = self.leftBracket.Right() - change
-                        if newRight < rightGoal() then
-                            newRight = rightGoal
-                            self.leftBracket:SetAlpha(0)
-                        end
-                        self.leftBracket.Right:Set(newRight)
+                    self.leftBracket.Right:Set(newRight)
+                    local newLeft = self.rightBracket.Left() + change
+                    if newLeft > leftGoal() then
+                        newLeft = leftGoal
+                        self.rightBracket:SetAlpha(0)
                     end
-                    if self.rightBracket.Left() < leftGoal() then
-                        local newLeft = self.rightBracket.Left() + change
-                        if newLeft > leftGoal() then
-                            newLeft = leftGoal
-                            self.rightBracket:SetAlpha(0)
-                        end
-                        self.rightBracket.Left:Set(newLeft)
-                    end
-                end
-                if self.time > 1.5 then
+                    self.rightBracket.Left:Set(newLeft)
+                else
                     self.leftBracket.Right:Set(rightGoal)
                     self.rightBracket.Left:Set(leftGoal)
                     self:SetNeedsFrameUpdate(false)
@@ -624,22 +591,12 @@ function CreateUI()
                     if control:IsDisabled() then
                         control:SetTexture(UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_dis.dds'))
                     end
-                    control.time = 0
-                    control.wait = 0
                     control.first = true
                     control.OnFrame = function(self, delta)
-                        self.time = self.time + delta
                         if self.first then
                             self.leftBracket:SetAlpha(1)
                             self.rightBracket:SetAlpha(1)
                             self.first = false
-                        end
-                        if self.time > .5 and self.time > self.wait then
-                            self.OnClick = self.clickfunc
-                            local num = math.random(20, 70)/100
-                            local waitRand = math.random(0, 3)/10
-                            self.wait = self.time + waitRand
-                            self:SetItemAlpha(num)
                         end
                         local change = (delta * 200)
                         local rightGoal = function() return self.Left() + 40 end
@@ -650,15 +607,15 @@ function CreateUI()
                                 newRight = rightGoal
                             end
                             self.leftBracket.Right:Set(newRight)
-                        end
-                        if self.rightBracket.Left() > leftGoal() then
+
                             local newLeft = self.rightBracket.Left() - change
                             if newLeft < leftGoal() then
                                 newLeft = leftGoal
                             end
                             self.rightBracket.Left:Set(newLeft)
-                        end
-                        if self.time > 1.5 then
+                        else
+                            -- If we're done sliding the brackets in, show the button.
+                            self.OnClick = self.clickfunc
                             self.leftBracket.Right:Set(rightGoal)
                             self.rightBracket.Left:Set(leftGoal)
                             self:SetItemAlpha(1)
@@ -677,41 +634,26 @@ function CreateUI()
                     control:SetNeedsFrameUpdate(true)
                     control.OnRolloverEvent = function() end
                     control.OnClick = function() end
-                    control.time = 0
-                    control.wait = 0
                     control.OnFrame = function(self, delta)
-                        self.time = self.time + delta
-                        if self.time < 1 and self.time > self.wait then
-                            local num = math.random(20, 80)/100
-                            local waitRand = math.random(0, 3)/10
-                            self.wait = self.time + waitRand
-                            self:SetItemAlpha(num)
-                        end
                         local rightGoal = function() return menuBracketLeft.Right() - 15 end
                         local leftGoal = function() return menuBracketRight.Left() + 15 end
-                        if self.time >= 1 then
-                            if self:GetAlpha() > 0 then
-                                self:SetItemAlpha(0)
+
+                        local change = (delta * 200)
+                        if self.leftBracket.Right() > rightGoal() then
+                            local newRight = self.leftBracket.Right() - change
+                            if newRight < rightGoal() then
+                                newRight = rightGoal
+                                self.leftBracket:SetAlpha(0)
                             end
-                            local change = (delta * 200)
-                            if self.leftBracket.Right() > rightGoal() then
-                                local newRight = self.leftBracket.Right() - change
-                                if newRight < rightGoal() then
-                                    newRight = rightGoal
-                                    self.leftBracket:SetAlpha(0)
-                                end
-                                self.leftBracket.Right:Set(newRight)
+                            self.leftBracket.Right:Set(newRight)
+
+                            local newLeft = self.rightBracket.Left() + change
+                            if newLeft > leftGoal() then
+                                newLeft = leftGoal
+                                self.rightBracket:SetAlpha(0)
                             end
-                            if self.rightBracket.Left() < leftGoal() then
-                                local newLeft = self.rightBracket.Left() + change
-                                if newLeft > leftGoal() then
-                                    newLeft = leftGoal
-                                    self.rightBracket:SetAlpha(0)
-                                end
-                                self.rightBracket.Left:Set(newLeft)
-                            end
-                        end
-                        if self.time > 1.5 then
+                            self.rightBracket.Left:Set(newLeft)
+                        else
                             self.leftBracket.Right:Set(rightGoal)
                             self.rightBracket.Left:Set(leftGoal)
                             self:SetItemAlpha(0)
@@ -758,7 +700,7 @@ function CreateUI()
     -- Animate the menu
     
     function MenuAnimation(fadeIn, callback, skipSlide)
-        animation_active = true
+        animation_active = false
         local function ButtonFade(menuSlide)
             ForkThread(function()
                 for i, v in mainMenu do
@@ -778,7 +720,6 @@ function CreateUI()
                     PlaySound(Sound({Bank = 'Interface', Cue = 'X_Main_Menu_Off'}))
                     mainMenu.profile:FadeOut()
                 end
-                WaitSeconds(1.5)
                 if menuSlide then
                     menuBracketMiddle:Animate(fadeIn, callback)
                 elseif callback then
