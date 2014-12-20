@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell, Evan Pongress
 --* Summary: create main menu screen
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -25,9 +25,9 @@ local GetVersion = import('/lua/version.lua').GetVersion
 local mapErrorDialog = false
 
 local TOOLTIP_DELAY = 1
-local menuFontColor = 'feff77' #'FFbadbdb' (default grey-blue) #feff77 (light yellow) #edd570 (gold)
+local menuFontColor = 'feff77' --'FFbadbdb' (default grey-blue) #feff77 (light yellow) #edd570 (gold)
 local menuFontColorTitle = 'EEEEEE'
-local menuFontColorAlt = 'feff77' #currently the same as menuFontColor
+local menuFontColorAlt = 'feff77' --currently the same as menuFontColor
 
 local initial = true
 local animation_active = false
@@ -62,7 +62,7 @@ function CreateUI()
         return
     end
     
-    # to disable any button on the menu, just comment/delete the "action" key/value pair or set to nil
+    -- to disable any button on the menu, just comment/delete the "action" key/value pair or set to nil
     local menuExtras = {
         title = '<LOC tooltipui0355>Extras',
         {
@@ -120,10 +120,8 @@ function CreateUI()
             action = function() ButtonLAN() end, 
         },
         {
-            --name = '<LOC MAINMENU_0003>GPGNet',
-            image = '/menus/gpgnet-logo/gpgnet-logo_bmp.dds',
-            tooltip = 'mpselect_gpgnet', 
-            action = function() ButtonGPGNet() end,
+            name = '',
+            color = menuFontColorAlt,
         },
         {
             name = '<LOC tooltipui0355>Extras',
@@ -146,7 +144,7 @@ function CreateUI()
     local largestMenu = menuTop
     local mainMenuSize = table.getn(largestMenu)
 
-    # BACKGROUND
+    -- BACKGROUND
     local parent = UIUtil.CreateScreenGroup(GetFrame(0), "Main Menu ScreenGroup")
     
     local backMovie = false
@@ -160,17 +158,17 @@ function CreateUI()
     darker:SetAlpha(.5)
     darker:Hide()
     
-    # BORDER, LOGO and TEXT
+    -- BORDER, LOGO and TEXT
     local border = Group(parent, "border")
     LayoutHelpers.FillParent(border, parent)
     
-    # SupCom logo resizes to current resolution
+    -- SupCom logo resizes to current resolution
     local logo = Bitmap(border, UIUtil.UIFile('/scx_menu/logo/logo.dds'))
     LayoutHelpers.AtHorizontalCenterIn(logo, border)
     LayoutHelpers.AtTopIn(logo, border)
     logo.Depth:Set(60)
 
-    # version text
+    -- version text
     local versionText = UIUtil.CreateText(border, GetVersion(), 14, UIUtil.bodyFont)
     versionText:SetColor('677983')
     LayoutHelpers.AtRightTopIn(versionText, border, 0, 0)
@@ -180,7 +178,7 @@ function CreateUI()
     LayoutHelpers.FillParent(versionTextBG, versionText)
     versionTextBG.Depth:Set(function() return versionText.Depth() - 1 end)
     
-    # Borders
+    -- Borders
     local topBorder = Bitmap(logo, UIUtil.UIFile('/scx_menu/main-menu/border-console-top_bmp.dds'))
     LayoutHelpers.AtHorizontalCenterIn(topBorder, border)
     LayoutHelpers.AtTopIn(topBorder, border)
@@ -206,7 +204,7 @@ function CreateUI()
     scrollingBG.Height:Set(20)
     LayoutHelpers.AtBottomIn(scrollingBG, border)
     
-    # legal text
+    -- legal text
     local legalText = UIUtil.CreateText(botBorderLeft, LOC(import('/lua/ui/help/eula.lua').LEGAL_TEXT), 9, UIUtil.bodyFont)
     legalText:SetColor('ffa5a5a5')
     legalText.Depth:Set(function() return botBorderLeft.Depth() - 1 end)
@@ -222,14 +220,8 @@ function CreateUI()
         end
         self.Left:Set(newLeft)
     end
-    
-    # PRESS BUILD GRAPHIC
-#    local pressBuild = Bitmap(border, UIUtil.UIFile('/menus/main03/press_build.dds'))
-#    LayoutHelpers.AtLeftTopIn(pressBuild, border, 0, -10)
-#    pressBuild:DisableHitTest()
-#    EffectHelpers.ScaleTo(pressBuild, .5, 0)
-        
-    # music
+
+    -- music
     local ambientSoundHandle = PlaySound(Sound({Cue = "AMB_Menu_Loop", Bank = "AmbientTest",}))
 
     local musicHandle = false
@@ -256,12 +248,12 @@ function CreateUI()
     
     StartMusic()
     
-    # TOP-LEVEL GROUP TO PARENT ALL DYNAMIC CONTENT
+    -- TOP-LEVEL GROUP TO PARENT ALL DYNAMIC CONTENT
     local topLevelGroup = Group(border, "topLevelGroup")
     LayoutHelpers.FillParent(topLevelGroup, border)
     topLevelGroup.Depth:Set(100)
 
-    # MAIN MENU  
+    -- MAIN MENU
     local mainMenuGroup = Group(topLevelGroup, "mainMenuGroup")
     mainMenuGroup.Width:Set(0)
     mainMenuGroup.Height:Set(0)
@@ -328,7 +320,7 @@ function CreateUI()
         end
     end
     
-    # debug FMV head button
+    -- debug FMV head button
     if HasCommandLineArg("/headtest") then
         local headTestBtn = UIUtil.CreateButtonStd(mainMenuGroup, '/scx_menu/small-btn/small', "Head Test", 12)
         LayoutHelpers.AtRightIn(headTestBtn, border)
@@ -339,13 +331,13 @@ function CreateUI()
         end
     end
     
-    # TODO: don't destroy the whole menu. just destroy the buttons, then you only have to set the top once.
+    -- TODO: don't destroy the whole menu. just destroy the buttons, then you only have to set the top once.
     function MenuBuild(menuTable, center)
         if menuTable == 'home' then
             menuTable = menuTop
         end
     
-        # title
+        -- title
         mainMenu.titleBack = Bitmap(mainMenuGroup, UIUtil.UIFile('/menus/main03/panel-top_bmp.dds'))
         LayoutHelpers.AtHorizontalCenterIn(mainMenu.titleBack, mainMenuGroup)
         LayoutHelpers.AtTopIn(mainMenu.titleBack, mainMenuGroup, 10)
@@ -356,7 +348,7 @@ function CreateUI()
         mainMenu.titleTxt:SetNewColor(menuFontColorTitle)
         mainMenu.titleTxt:Hide()
                 
-        # profile button
+        -- profile button
         
         local profileDlg = nil
         
@@ -374,7 +366,7 @@ function CreateUI()
             local currentProfile = GetPreference("profile.current")
             if currentProfile then
                 local profiles = GetPreference("profile.profiles")
-                if profiles[currentProfile] != nil then
+                if profiles[currentProfile] ~= nil then
                     mainMenu.titleTxt:SetFont(UIUtil.titleFont, 26)
                     mainMenu.titleTxt:SetText(profiles[currentProfile].Name)
                     ForkThread(function()
@@ -536,10 +528,10 @@ function CreateUI()
             end)
         end
         
-        # menu buttons
+        -- menu buttons
         local buttonHeight = nil
         for k, v in menuTable do
-            if k != 'title' then
+            if k ~= 'title' then
                 mainMenu[k] = {}
                 if v.name then
                     mainMenu[k].btn = UIUtil.CreateButtonStd(mainMenuGroup, '/scx_menu/large-no-bracket-btn/large', v.name, 22, 2, 0, "UI_Menu_MouseDown", "UI_Menu_Rollover")
@@ -744,26 +736,26 @@ function CreateUI()
             MenuAnimation(true)
         end
         
-        # set ESC key functionality depending on menu layer        
+        -- set ESC key functionality depending on menu layer
         if menuTable == 'home' or menuTable == menuTop then
             SetEscapeHandle(ButtonExit)
         else
             SetEscapeHandle(ButtonBack)
         end
 
-        # set final dimensions/placement of mainMenuGroup
+        -- set final dimensions/placement of mainMenuGroup
         mainMenuGroup.Height:Set(function() return (mainMenuSize * buttonHeight) + mainMenu.titleBack.Height() end)
         mainMenuGroup.Width:Set(mainMenu.titleBack.Width)
         LayoutHelpers.AtHorizontalCenterIn(mainMenuGroup, border)
         
         mainMenuGroup.Top:Set(function()
-            --return math.floor(logo.Bottom() + (border_lm.Top() + 14 - logo.Bottom() - mainMenuGroup.Height() ) / 2 ) # includes offset for alpha on border_lm
+            --return math.floor(logo.Bottom() + (border_lm.Top() + 14 - logo.Bottom() - mainMenuGroup.Height() ) / 2 ) -- includes offset for alpha on border_lm
             return math.floor(logo.Bottom() - 18)
         end)
     end
 
 
-    # Animate the menu
+    -- Animate the menu
     
     function MenuAnimation(fadeIn, callback, skipSlide)
         animation_active = true
@@ -816,13 +808,13 @@ function CreateUI()
             end
             mainMenuGroup:Hide()
             logo:Hide()
-            mainMenuGroup.Depth:Set(50)        # setting depth below topLayerGroup (100) to avoid the button glow persisting when overlays are up
+            mainMenuGroup.Depth:Set(50)        -- setting depth below topLayerGroup (100) to avoid the button glow persisting when overlays are up
             if callback then callback() end
         end)
     end
     
     function MenuShow()
-        mainMenuGroup.Depth:Set(101)    # and setting it back again
+        mainMenuGroup.Depth:Set(101)    -- and setting it back again
         mainMenuGroup:Show()
         logo:Show()
         legalText:Show()
@@ -853,7 +845,7 @@ function CreateUI()
         end, skipSlide)
     end
 
-    # BUTTON FUNCTIONS
+    -- BUTTON FUNCTIONS
     function TutorialPrompt(callback)
         if Prefs.GetFromCurrentProfile('MenuTutorialPrompt') then
             callback()
@@ -896,22 +888,6 @@ function CreateUI()
         MenuHide(function()
             import('/lua/ui/lobby/gameselect.lua').CreateUI(topLevelGroup, function() MenuShow() SetEscapeHandle(ButtonExit) end)
         end)
-    end
-
-    function ButtonGPGNet()
-        UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0004>Launching GPGNet will close Forged Alliance.", 
-            "<LOC EXITDLG_0005>Launch GPGNet", function()
-                    if LaunchGPGNet() then
-                        StopMusic()
-                        parent:Destroy()
-                        ExitApplication()
-                    else
-                        UIUtil.ShowInfoDialog(topLevelGroup, "<LOC mainmenu_0000>Launching GPGNet failed.", "<LOC _Ok>")
-                    end
-                end,
-            "<LOC _Cancel>", nil,
-            nil, nil,
-            true,  {worldCover = true, enterButton = 1, escapeButton = 2})
     end
 
     function ButtonSkirmish()
@@ -993,7 +969,7 @@ function CreateUI()
         end                        
     end
 
-    # START
+    -- START
 
     MenuBuild('home', true)
 
