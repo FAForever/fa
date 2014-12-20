@@ -30,7 +30,6 @@ dialogButtonFont = import('/lua/lazyvar.lua').Create()      -- default font used
 bodyFont = import('/lua/lazyvar.lua').Create()              -- font used for all other text
 fixedFont = import('/lua/lazyvar.lua').Create()             -- font used for fixed width characters
 titleFont = import('/lua/lazyvar.lua').Create()             -- font used for titles and labels
-newFont = import('/lua/lazyvar.lua').Create()             -- XinnonyWork NEW FONT 2013
 fontColor = import('/lua/lazyvar.lua').Create()             -- common font color
 fontOverColor = import('/lua/lazyvar.lua').Create()             -- common font color
 fontDownColor = import('/lua/lazyvar.lua').Create()             -- common font color
