@@ -66,12 +66,6 @@ function CreateUI()
     local menuExtras = {
         title = '<LOC tooltipui0355>Extras',
         {
-            name = '<LOC _Replay>',
-            tooltip = 'mainmenu_replay',    
-            action = function() ButtonReplay() end,
-            color = menuFontColorAlt,
-        },
-        {
             name = '<LOC _Mod_Manager>',
             tooltip = 'mainmenu_mod',    
             action = function() ButtonMod() end,
@@ -92,11 +86,15 @@ function CreateUI()
             name = '<LOC _Back>',
             action = function() ButtonBack() end,
             color = menuFontColorAlt,
-        },  
+        },
         {
             name = '',
             color = menuFontColorAlt,
-        }, 
+        },
+        {
+            name = '',
+            color = menuFontColorAlt,
+        },
         {
             name = '',
             color = menuFontColorAlt,
@@ -120,7 +118,9 @@ function CreateUI()
             action = function() ButtonLAN() end, 
         },
         {
-            name = '',
+            name = '<LOC _Replay>',
+            tooltip = 'mainmenu_replay',
+            action = function() ButtonReplay() end,
             color = menuFontColorAlt,
         },
         {
