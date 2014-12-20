@@ -988,27 +988,22 @@ end
 function CreateDialogBrackets(parent, leftOffset, topOffset, rightOffset, bottomOffset, altTextures)
     local ret = Group(parent)
 
+    local texturePath
     if altTextures then
-        ret.topleft = Bitmap(ret, UIFile('/scx_menu/panel-brackets-small/bracket-ul_bmp.dds'))
-        ret.topright = Bitmap(ret, UIFile('/scx_menu/panel-brackets-small/bracket-ur_bmp.dds'))
-        ret.bottomleft = Bitmap(ret, UIFile('/scx_menu/panel-brackets-small/bracket-ll_bmp.dds'))
-        ret.bottomright = Bitmap(ret, UIFile('/scx_menu/panel-brackets-small/bracket-lr_bmp.dds'))
-
-        ret.topleftglow = Bitmap(ret, UIFile('/scx_menu/panel-brackets-small/bracket-glow-ul_bmp.dds'))
-        ret.toprightglow = Bitmap(ret, UIFile('/scx_menu/panel-brackets-small/bracket-glow-ur_bmp.dds'))
-        ret.bottomleftglow = Bitmap(ret, UIFile('/scx_menu/panel-brackets-small/bracket-glow-ll_bmp.dds'))
-        ret.bottomrightglow = Bitmap(ret, UIFile('/scx_menu/panel-brackets-small/bracket-glow-lr_bmp.dds'))
+        texturePath = "/scx_menu/panel-brackets-small"
     else
-        ret.topleft = Bitmap(ret, UIFile('/scx_menu/panel-brackets/bracket-ul_bmp.dds'))
-        ret.topright = Bitmap(ret, UIFile('/scx_menu/panel-brackets/bracket-ur_bmp.dds'))
-        ret.bottomleft = Bitmap(ret, UIFile('/scx_menu/panel-brackets/bracket-ll_bmp.dds'))
-        ret.bottomright = Bitmap(ret, UIFile('/scx_menu/panel-brackets/bracket-lr_bmp.dds'))
-
-        ret.topleftglow = Bitmap(ret, UIFile('/scx_menu/panel-brackets/bracket-glow-ul_bmp.dds'))
-        ret.toprightglow = Bitmap(ret, UIFile('/scx_menu/panel-brackets/bracket-glow-ur_bmp.dds'))
-        ret.bottomleftglow = Bitmap(ret, UIFile('/scx_menu/panel-brackets/bracket-glow-ll_bmp.dds'))
-        ret.bottomrightglow = Bitmap(ret, UIFile('/scx_menu/panel-brackets/bracket-glow-lr_bmp.dds'))
+        texturePath = "/scx_menu/panel-brackets"
     end
+
+    ret.topleft = Bitmap(ret, UIFile(texturePath .. '/bracket-ul_bmp.dds'))
+    ret.topright = Bitmap(ret, UIFile(texturePath .. '/bracket-ur_bmp.dds'))
+    ret.bottomleft = Bitmap(ret, UIFile(texturePath .. '/bracket-ll_bmp.dds'))
+    ret.bottomright = Bitmap(ret, UIFile(texturePath .. '/bracket-lr_bmp.dds'))
+
+    ret.topleftglow = Bitmap(ret, UIFile(texturePath .. '/bracket-glow-ul_bmp.dds'))
+    ret.toprightglow = Bitmap(ret, UIFile(texturePath .. '/bracket-glow-ur_bmp.dds'))
+    ret.bottomleftglow = Bitmap(ret, UIFile(texturePath .. '/bracket-glow-ll_bmp.dds'))
+    ret.bottomrightglow = Bitmap(ret, UIFile(texturePath .. '/bracket-glow-lr_bmp.dds'))
 
     ret.topleftglow.Depth:Set(function() return ret.topleft.Depth() - 1 end)
     ret.toprightglow.Depth:Set(function() return ret.topright.Depth() - 1 end)
