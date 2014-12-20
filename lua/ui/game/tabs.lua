@@ -792,7 +792,7 @@ function ToggleGameInfo()
 		--LayoutHelpers.DepthOverParent(PresetList, dialog2, 10)
 		LayoutHelpers.AtLeftIn(PresetList, dialog2, 10)
         LayoutHelpers.AtTopIn(PresetList, dialog2, 38)
-		UIUtil.CreateVertScrollbarFor2(PresetList)
+		UIUtil.CreateLobbyVertScrollbar(PresetList)
 	------------
     -- Script --
 	

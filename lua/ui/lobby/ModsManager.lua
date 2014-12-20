@@ -221,7 +221,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
     scrollGroup.Width:Set(519)
     scrollGroup.Height:Set(450)
     LayoutHelpers.AtLeftTopIn(scrollGroup, dialog2, 0, 47)
-    UIUtil.CreateVertScrollbarFor2(scrollGroup)
+    UIUtil.CreateLobbyVertScrollbar(scrollGroup)
 	---
 	---
 	scrollGroup.controlList = {}

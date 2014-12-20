@@ -2949,7 +2949,7 @@ function CreateUI(maxPlayers)
     GUI.chatDisplay.Height:Set(function() return GUI.chatDisplay.Bottom() - GUI.chatDisplay.Top() end)
     GUI.chatDisplay.Width:Set(function() return GUI.chatDisplay.Right() - GUI.chatDisplay.Left() -20 end)
 
-    GUI.chatDisplayScroll = UIUtil.CreateVertScrollbarFor2(GUI.chatDisplay, -21, nil, 30)
+    GUI.chatDisplayScroll = UIUtil.CreateLobbyVertScrollbar(GUI.chatDisplay, -21, nil, 30)
 
     -- OnlineProvider.RegisterChatDisplay(GUI.chatDisplay)
 
@@ -3195,7 +3195,7 @@ function CreateUI(maxPlayers)
         end
     end
 
-    UIUtil.CreateVertScrollbarFor2(GUI.OptionContainer, 1, nil, -9, -24)
+    UIUtil.CreateLobbyVertScrollbar(GUI.OptionContainer, 1, nil, -9, -24)
 
     if singlePlayer then
         GUI.loadButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/small/',"<LOC lobui_0176>Load", 2)
@@ -3898,7 +3898,7 @@ function CreateUI(maxPlayers)
                 )
             end
         end
-        UIUtil.CreateVertScrollbarFor2(GUI.observerList, -15, nil, -1)
+        UIUtil.CreateLobbyVertScrollbar(GUI.observerList, -15, nil, -1)
     else -- singleplayer
         -- observers are always allowed in skirmish games.
         SetGameOption("AllowObservers",true)
@@ -6214,7 +6214,7 @@ function GUI_PRESET()
     LayoutHelpers.DepthOverParent(PresetList, dialog2, 10)
     LayoutHelpers.AtLeftIn(PresetList, dialog2, 10)
     LayoutHelpers.AtTopIn(PresetList, dialog2, 38)
-    UIUtil.CreateVertScrollbarFor2(PresetList)
+    UIUtil.CreateLobbyVertScrollbar(PresetList)
     --
     LOAD_PresetProfils_For_PresetList()
     PresetList:SetSelection(0)
@@ -6260,7 +6260,7 @@ function GUI_PRESET()
     LayoutHelpers.Below(text1, InfoList, 0)
     LayoutHelpers.AtHorizontalCenterIn(text1, InfoList, 0)
     --SetColors = function(self, foreground, background, selected_foreground, selected_background, mouseover_foreground, mouseover_background)
-    UIUtil.CreateVertScrollbarFor2(InfoList)
+    UIUtil.CreateLobbyVertScrollbar(InfoList)
     --
     local profiles = GetPreference("UserPresetLobby")
     if profiles then
@@ -7009,7 +7009,7 @@ function GUI_Changelog()
     LayoutHelpers.AtLeftIn(InfoList, dialog2, 10)
 	LayoutHelpers.AtRightIn(InfoList, dialog2, 26)
     LayoutHelpers.AtTopIn(InfoList, dialog2, 38)
-    UIUtil.CreateVertScrollbarFor2(InfoList)
+    UIUtil.CreateLobbyVertScrollbar(InfoList)
 	InfoList.OnClick = function(self)
 	end
 	-- See only new Changelog by version

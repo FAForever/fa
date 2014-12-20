@@ -650,57 +650,8 @@ function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom,
     return scrollbar
 end
 
-function CreateVertScrollbarFor2(attachto, offset_right, filename, offset_bottom, offset_top) -- for New Skin Lobby -- Xinnony
-    offset_right = offset_right or 0
-	offset_bottom = offset_bottom or 0
-	offset_top = offset_top or 0
-    local textureName = filename or '/SCROLLBAR_VERT/'
-    local scrollbg = textureName..'back_scr_mid.dds'
-    local scrollbarmid = textureName..'bar-mid_scr_over.dds'
-    local scrollbartop = textureName..'bar-top_scr_up.dds'
-    local scrollbarbot = textureName..'bar-bot_scr_up.dds'
-    if filename then
-        scrollbg = textureName..'back_scr_mid.dds'
-        scrollbarmid = textureName..'bar-mid_scr_up.dds'
-        scrollbartop = textureName..'bar-top_scr_up.dds'
-        scrollbarbot = textureName..'bar-bot_scr_up.dds'
-    end
-    local scrollbar = Scrollbar(attachto, import('/lua/maui/scrollbar.lua').ScrollAxis.Vert)
-    scrollbar:SetTextures(  SkinnableFile(scrollbg)
-                            ,SkinnableFile(scrollbarmid)
-                            ,SkinnableFile(scrollbartop)
-                            ,SkinnableFile(scrollbarbot))
-
-    local scrollUpButton = Button(  scrollbar
-                                    , SkinnableFile(textureName..'arrow-up_scr_up.dds')
-                                    , SkinnableFile(textureName..'arrow-up_scr_over.dds')
-                                    , SkinnableFile(textureName..'arrow-up_scr_down.dds')
-                                    , SkinnableFile(textureName..'arrow-up_scr_dis.dds')
-                                    , "UI_Arrow_Click")
-
-    local scrollDownButton = Button(  scrollbar
-                                    , SkinnableFile(textureName..'arrow-down_scr_up.dds')
-                                    , SkinnableFile(textureName..'arrow-down_scr_over.dds')
-                                    , SkinnableFile(textureName..'arrow-down_scr_down.dds')
-                                    , SkinnableFile(textureName..'arrow-down_scr_dis.dds')
-                                    , "UI_Arrow_Click")
-
-    scrollbar.Left:Set(function() return attachto.Right() + offset_right end)
-    scrollbar.Top:Set(scrollUpButton.Bottom)
-    scrollbar.Bottom:Set(scrollDownButton.Top)
-
-    scrollUpButton.Left:Set(scrollbar.Left)
-    scrollUpButton.Top:Set(function() return attachto.Top() + offset_top end)
-
-	scrollDownButton.Left:Set(scrollbar.Left)
-    scrollDownButton.Bottom:Set(function() return attachto.Bottom() + offset_bottom end)
-
-    scrollbar.Right:Set(scrollUpButton.Right)
-
-    scrollbar:AddButtons(scrollUpButton, scrollDownButton)
-    scrollbar:SetScrollable(attachto)
-
-    return scrollbar
+function CreateLobbyVertScrollbar(attachto, offset_right, filename, offset_bottom, offset_top)
+    return CreateVertScrollbarFor(attachto, offset_right, "/SCROLLBAR_VERT/", offset_bottom, offset_top)
 end
 
 function CreateHorzScrollbarFor(attachto, offset)
