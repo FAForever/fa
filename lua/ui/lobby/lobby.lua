@@ -5915,35 +5915,6 @@ function ChangeBackgroundLobby(slot, faction)
             GUI.background2:Hide()
             GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/background-paint_black_bmp.dds"))
             LASTLobbyBackground = 5
-
-        elseif LobbyBackground == 6 then -- Extra
-			LOGX('>> Background EXTRA', 'Background')
-            GUI.background:Show()
-            GUI.background2:Hide()
-            faction = faction or Prefs.GetFromCurrentProfile('LastFaction') or 1
-            if DiskGetFileInfo("/Mods/Lobby Background/mod_info.lua") then
-                settings = import("/Mods/Lobby Background/mod_info.lua")
-                if settings.BackgroundType == 1 then
-                    if faction == 1 and settings.uef > 0 then
-                        GUI.background:SetTexture("/Mods/Lobby Background/BACKGROUND/uef"..math.random(1, settings.uef)..".png")
-                    elseif faction == 2 and settings.aeon > 0 then
-                        GUI.background:SetTexture("/Mods/Lobby Background/BACKGROUND/aeo"..math.random(1, settings.aeon)..".png")
-                    elseif faction == 3 and settings.cybran > 0 then
-                        GUI.background:SetTexture("/Mods/Lobby Background/BACKGROUND/cyb"..math.random(1, settings.cybran)..".png")
-                    elseif faction == 4 and settings.seraphim > 0 then
-                        GUI.background:SetTexture("/Mods/Lobby Background/BACKGROUND/ser"..math.random(1, settings.seraphim)..".png")
-                    elseif faction == 5 and settings.random > 0 then
-                        GUI.background:SetTexture("/Mods/Lobby Background/BACKGROUND/ran"..math.random(1, settings.random)..".png")
-                    else
-                        GUI.background:SetTexture("/textures/ui/common/BACKGROUND/background-paint_black_bmp.dds")
-                    end
-                elseif settings.BackgroundType == 2 then
-                    GUI.background:SetTexture("/Mods/Lobby Background/BACKGROUND/"..math.random(1, settings.random)..".png")
-                end
-            else
-                GUI.background:SetTexture("/textures/ui/common/BACKGROUND/background-paint_black_bmp.dds")
-            end
-            LASTLobbyBackground = 6
         end
     end
 end
@@ -5972,7 +5943,6 @@ function CreateOptionLobbyDialog()
         LOC("<LOC lobui_0408>"), -- Screenshot
         LOC("<LOC lobui_0409>"), -- Map
         LOC("<LOC lobui_0410>"), -- None
-        LOC("<LOC lobui_0411>")  -- Extra
     }
     local selectedBackgroundState = backgroundStates[Prefs.GetFromCurrentProfile("LobbyBackground") or 1]
     local backgroundRadiobutton = UIUtil.CreateRadioButtonsStd(dialog2, '/CHECKBOX/radio', LOC("<LOC lobui_0405>"), backgroundStates, selectedBackgroundState)
