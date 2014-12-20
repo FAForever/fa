@@ -108,7 +108,7 @@ UnitBlueprint {
         'SERAPHIM',
         'MOBILE',
         'AIR',
-	'BOMBER',
+    'BOMBER',
         'HIGHALTAIR',
         'EXPERIMENTAL',
         'NEEDMOBILEBUILD',
@@ -311,7 +311,7 @@ UnitBlueprint {
             },
             FiringRandomness = 3,
             FiringTolerance = 6,
-			FixBombTrajectory = true, # [152]
+            FixBombTrajectory = true,
             Label = 'Bomb',
             MaxRadius = 90,
             MuzzleSalvoDelay = 0,
@@ -337,7 +337,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RateOfFire = 0.1,
-	    RenderFireClock = true, # added
+            RenderFireClock = true, # added
             TargetCheckInterval = 3,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
@@ -651,9 +651,13 @@ UnitBlueprint {
         },
         {
             AboveWaterTargetsOnly = true,
+            BoneImpact = {'Nose_Extent', 'Left_Wing_Extent', 'Right_Wing_Extent', 'Tail_Extent'},
+            BoneDamage = 1000,
+            BoneRadius = 5,
             Damage = 10000,
             DamageFriendly = true,
-            DamageRadius = 8,
+            DamageRadius = 10,
+            DamageRadiusMax = 5,
             DamageType = 'Normal',
             DisplayName = 'Air Crash',
             DummyWeapon = true,
