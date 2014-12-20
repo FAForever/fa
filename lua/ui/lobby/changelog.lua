@@ -54,7 +54,7 @@ changelog = {
         version = 6,
         name = "Lobby 2.6.0",
         description = {
-            "- Fix the tating not showing up for observers",
+            "- Fix the rating not showing up for observers",
             "- Font-size for observers reduced",
             "- Chat font-size adjustable from options",
             "- Remove debug messages",
