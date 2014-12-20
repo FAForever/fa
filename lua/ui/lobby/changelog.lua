@@ -51,27 +51,18 @@ changelog = {
         }
     },
     {
-        version = 5,
-        name = "Lobby 2.5c",
-        description = {
-            "- Fix the Rating not show in observers list",
-            "- Observers font-size is reduced",
-            "- Fix the Country not show sometime",
-            "- Add debugger system",
-            "- Add slider for change the chat font-size",
-        }
-    },
-    {
         version = 6,
-        name = "Lobby 2.5d",
+        name = "Lobby 2.6.0",
         description = {
-            "- Remove debug message",
-            "- Enhancement Debug System",
-            "- Fix UI bug with ConnectDialog",
-            "- Fix the player not removed in the slot when is leave the lobby",
-            "- Fix replaysync",
+            "- Fix the tating not showing up for observers",
+            "- Font-size for observers reduced",
+            "- Chat font-size adjustable from options",
+            "- Remove debug messages",
+            "- Connection dialog no longer appears below lobby slots",
+            "- Fixed issue with players not being removed from slots on disconnect",
+            "- Fix integrated replaysync",
             "- Clan tags are shown in game",
-            "- Set ranked options works again"
+            "- 'Set ranked options' button works again"
         }
     }
 }
