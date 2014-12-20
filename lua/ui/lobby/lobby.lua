@@ -2637,27 +2637,29 @@ function CreateUI(maxPlayers)
     LayoutHelpers.CenteredRightOf(GUI.panelWideRight, GUI.panel, -11)
     GUI.panelWideRight.Right:Set(function() return GUI.Right() end)
 
-    --// Title Label
-    local titleText = UIUtil.CreateText(GUI.panel, "", 17, 'Arial Gras')--UIUtil.titleFont)
-    SetText2(titleText, title, 10)
-    LayoutHelpers.AtLeftTopIn(titleText, GUI.panel, 50, 41)
-    titleText:SetColor('B9BFB9')
-    titleText:SetDropShadow(true)
-    --\\
-    --// Map Name Label
-    GUI.MapNameLabel = UIUtil.CreateText(GUI.panel, "", 17, 'Arial Gras')
-    SetText2(GUI.MapNameLabel, "Loading ...", 10)
+    -- Create a label with a given size and initial text
+    local function makeLabel(text, size)
+        local label = UIUtil.CreateText(GUI.panel, text, size, 'Arial Gras')
+        -- TODO: Move colour to skin.
+        label:SetColor("B9BFB9")
+        label:SetDropShadow(true)
+
+        return label
+    end
+
+    -- Title Label
+    GUI.titleText = makeLabel(title, 17)
+    LayoutHelpers.AtLeftTopIn(GUI.titleText, GUI.panel, 50, 41)
+
+    -- Map Name Label TODO: Localise!
+    GUI.MapNameLabel = makeLabel("Loading...", 17)
     LayoutHelpers.AtRightTopIn(GUI.MapNameLabel, GUI.panel, 50, 41)
-    GUI.MapNameLabel:SetColor('B9BFB9')
-    GUI.MapNameLabel:SetDropShadow(true)
-    --\\
-    --// Game Quality Label
-    GUI.GameQualityLabel = UIUtil.CreateText(GUI.panel, "", 13, 'Arial Gras')
+
+    -- Game Quality Label
+    GUI.GameQualityLabel = makeLabel("", 13)
     LayoutHelpers.AtRightTopIn(GUI.GameQualityLabel, GUI.panel, 50, 61)
-    GUI.GameQualityLabel:SetColor('B9BFB9')
-    GUI.GameQualityLabel:SetDropShadow(true)
-    --\\
-    --// Rule Label
+
+    -- Rule Label
     GUI.RuleLabel = ItemList(GUI.panel)
     GUI.RuleLabel:SetFont('Arial Gras', 11)
     GUI.RuleLabel:SetColors("B9BFB9", "00000000", "B9BFB9", "00000000") -- colortxt, bg, colortxt selec, bg selec?
@@ -2679,12 +2681,11 @@ function CreateUI(maxPlayers)
             RuleTitle_INPUT()
         end
     end
-    --\\
-    --// MOD Label
-    GUI.ModFeaturedLabel = UIUtil.CreateText(GUI.panel, "", 13, 'Arial Gras')
+
+    -- Mod Label
+    GUI.ModFeaturedLabel = makeLabel("", 13)
     LayoutHelpers.AtLeftTopIn(GUI.ModFeaturedLabel, GUI.panel, 50, 61)
-    GUI.ModFeaturedLabel:SetColor('B9BFB9')
-    GUI.ModFeaturedLabel:SetDropShadow(true)
+
     local getInit = GetCommandLineArg("/init", 1)
     getInit = tostring(getInit[1])
     if getInit == "init_faf.lua" then
@@ -3264,58 +3265,42 @@ function CreateUI(maxPlayers)
     GUI.labelGroup.Height:Set(21)
     LayoutHelpers.AtLeftTopIn(GUI.labelGroup, GUI.playerPanel, 5, 5)
 
-    GUI.ratingLabel = UIUtil.CreateText(GUI.labelGroup, "R", 14, 'Arial Gras')--UIUtil.titleFont) 14 SIZE
-    GUI.ratingLabel:SetColor('B9BFB9')
-    GUI.ratingLabel:SetDropShadow(true)
+    GUI.ratingLabel = makeLabel("R", 14)
     LayoutHelpers.AtLeftIn(GUI.ratingLabel, GUI.panel, slotColumnSizes.rating.x+20) -- Offset Right
     LayoutHelpers.AtVerticalCenterIn(GUI.ratingLabel, GUI.labelGroup, 5) -- Offset Down
     Tooltip.AddControlTooltip(GUI.ratingLabel, 'rating')
 
-    GUI.numGamesLabel = UIUtil.CreateText(GUI.labelGroup, "G", 14, 'Arial Gras')--UIUtil.titleFont)
-    GUI.numGamesLabel:SetColor('B9BFB9')
-    GUI.numGamesLabel:SetDropShadow(true)
+    GUI.numGamesLabel = makeLabel("G", 14)
     LayoutHelpers.AtLeftIn(GUI.numGamesLabel, GUI.panel, slotColumnSizes.games.x - 4 + 24)
     LayoutHelpers.AtVerticalCenterIn(GUI.numGamesLabel, GUI.labelGroup, 5)
     Tooltip.AddControlTooltip(GUI.numGamesLabel, 'num_games')
 
-    GUI.nameLabel = UIUtil.CreateText(GUI.labelGroup, "Nickname", 14, 'Arial Gras')--UIUtil.titleFont)
-    GUI.nameLabel:SetColor('B9BFB9')
-    GUI.nameLabel:SetDropShadow(true)
+    GUI.nameLabel = makeLabel("Nickname", 14)
     LayoutHelpers.AtLeftIn(GUI.nameLabel, GUI.panel, slotColumnSizes.player.x)
     LayoutHelpers.AtVerticalCenterIn(GUI.nameLabel, GUI.labelGroup, 5)
     Tooltip.AddControlTooltip(GUI.nameLabel, 'lob_slot')
 
-    GUI.colorLabel = UIUtil.CreateText(GUI.labelGroup, "Color", 14, 'Arial Gras')--UIUtil.titleFont)
-    GUI.colorLabel:SetColor('B9BFB9')
-    GUI.colorLabel:SetDropShadow(true)
+    GUI.colorLabel = makeLabel("Color", 14)
     LayoutHelpers.AtLeftIn(GUI.colorLabel, GUI.panel, slotColumnSizes.color.x)
     LayoutHelpers.AtVerticalCenterIn(GUI.colorLabel, GUI.labelGroup, 5)
     Tooltip.AddControlTooltip(GUI.colorLabel, 'lob_color')
 
-    GUI.factionLabel = UIUtil.CreateText(GUI.labelGroup, "Faction", 14, 'Arial Gras')--UIUtil.titleFont)
-    GUI.factionLabel:SetColor('B9BFB9')
-    GUI.factionLabel:SetDropShadow(true)
+    GUI.factionLabel = makeLabel("Faction", 14)
     LayoutHelpers.AtLeftIn(GUI.factionLabel, GUI.panel, slotColumnSizes.faction.x)
     LayoutHelpers.AtVerticalCenterIn(GUI.factionLabel, GUI.labelGroup, 5)
     Tooltip.AddControlTooltip(GUI.factionLabel, 'lob_faction')
 
-    GUI.teamLabel = UIUtil.CreateText(GUI.labelGroup, "Team", 14, 'Arial Gras')--UIUtil.titleFont)
-    GUI.teamLabel:SetColor('B9BFB9')
-    GUI.teamLabel:SetDropShadow(true)
+    GUI.teamLabel = makeLabel("Team", 14)
     LayoutHelpers.AtLeftIn(GUI.teamLabel, GUI.panel, slotColumnSizes.team.x)
     LayoutHelpers.AtVerticalCenterIn(GUI.teamLabel, GUI.labelGroup, 5)
     Tooltip.AddControlTooltip(GUI.teamLabel, 'lob_team')
 
     if not singlePlayer then
-        GUI.pingLabel = UIUtil.CreateText(GUI.labelGroup, "Ping/CPU", 14, 'Arial Gras')--UIUtil.titleFont)
-        GUI.pingLabel:SetColor('B9BFB9')
-        GUI.pingLabel:SetDropShadow(true)
+        GUI.pingLabel = makeLabel("Ping/CPU", 14)
         LayoutHelpers.AtLeftIn(GUI.pingLabel, GUI.panel, slotColumnSizes.ping.x-18+3)
         LayoutHelpers.AtVerticalCenterIn(GUI.pingLabel, GUI.labelGroup, 5)
 
-        GUI.readyLabel = UIUtil.CreateText(GUI.labelGroup, "Ready", 14, 'Arial Gras')--UIUtil.titleFont)
-        GUI.readyLabel:SetColor('B9BFB9')
-        GUI.readyLabel:SetDropShadow(true)
+        GUI.readyLabel = makeLabel("Ready", 14)
         LayoutHelpers.AtLeftIn(GUI.readyLabel, GUI.panel, slotColumnSizes.ready.x-3+3)
         LayoutHelpers.AtVerticalCenterIn(GUI.readyLabel, GUI.labelGroup, 5)
     end
