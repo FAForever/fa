@@ -1729,11 +1729,9 @@ local function updateFactionSelectorIcons(enabled, faction)
     end
 
     -- Set everything to the small version.
-    GUI.AeonFactionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/aeon_ico" .. dis .. ".png")
-    GUI.CybranFactionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/cybran_ico" .. dis .. ".png")
-    GUI.UEFFactionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/uef_ico" .. dis .. ".png")
-    GUI.SeraphimFactionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/seraphim_ico" .. dis .. ".png")
-    GUI.RandomFactionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/random_ico" .. dis .. ".png")
+    for k, v in pairs(FACTION_PANELS) do
+        v:SetTexture("/textures/ui/common/FACTIONSELECTOR/" .. FACTION_NAMES[k] .. "_ico" .. dis .. ".png")
+    end
 
     -- Set the selection faction icon to the large version.
     FACTION_PANELS[faction]:SetTexture("/textures/ui/common/FACTIONSELECTOR/" .. FACTION_NAMES[faction] .. "_ico-large.png")
