@@ -120,43 +120,24 @@ local lastUploadedMap = nil
 
 local CPU_Benchmarks = {} -- Stores CPU benchmark data
 
-local playerMean = GetCommandLineArg("/mean", 1)
-local playerDeviation = GetCommandLineArg("/deviation", 1)
-local playerClan = GetCommandLineArg("/clan", 1)
+local function GetCommandLineArgOrDefault(argname, default)
+    local arg = GetCommandLineArg(argname, 1)
+    if arg then
+        return arg[1]
+    end
 
-local ratingColor = GetCommandLineArg("/ratingcolor", 1)
-local numGames = GetCommandLineArg("/numgames", 1)
-
-
-if ratingColor then
-    ratingColor = tostring(ratingColor[1])
-else
-    ratingColor = "ffffffff"
+    return default
 end
 
-if numGames then
-    numGames = tonumber(numGames[1])
-else
-    numGames = 0
-end
+local playerMean = tonumber(GetCommandLineArgOrDefault("/mean", 1500))
+local playerDeviation = tonumber(GetCommandLineArgOrDefault("/deviation", 500))
+local playerClan = GetCommandLineArgOrDefault("/clan", nil)
 
-if playerMean then
-    playerMean = tonumber(playerMean[1])
-else
-    playerMean = 1500
-end
+local ratingColor = GetCommandLineArgOrDefault("/ratingcolor", "ffffffff")
+local numGames = tonumber(GetCommandLineArgOrDefault("/numgames", 0))
 
-if playerDeviation then
-    playerDeviation = tonumber(playerDeviation[1])
-else
-    playerDeviation = 500
-end
-
-if playerClan then
-    playerClan = tostring(playerClan[1])
-end
-
-
+-- Is this client the host?
+local isHost = false
 
 local playerRating = math.floor( Trueskill.round2((playerMean - 3 * playerDeviation) / 100.0) * 100 )
 
