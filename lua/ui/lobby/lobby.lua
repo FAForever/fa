@@ -90,6 +90,8 @@ end
 local PrefLanguageTooltipTitle={}
 local PrefLanguageTooltipText={}
 
+local FACTION_PANELS = {}
+
 local PrefLanguage = GetCommandLineArg("/country", 1)
 if PrefLanguage[1] == '' or PrefLanguage[1] == '/init' or PrefLanguage == nil or PrefLanguage == false then
     LOG('COUNTRY - Country has not been found "'..tostring(PrefLanguage[1])..'"')
@@ -97,8 +99,6 @@ if PrefLanguage[1] == '' or PrefLanguage[1] == '/init' or PrefLanguage == nil or
 else
     PrefLanguage = tostring(string.lower(PrefLanguage[1]))
 end
-
-local LASTLobbyBackground = 0 -- For prevent the infinite loop to Background
 
 local connectedTo = {} -- by UID
 CurrentConnection = {} -- by Name
@@ -868,9 +868,6 @@ function SetSlotInfo(slot, playerInfo)
         Prefs.SetToCurrentProfile('LastFaction', playerInfo.Faction)
     end
 
-    --// Change the background according to the chosen Faction
-    --ChangeBackgroundLobby(slot, Prefs.GetFromCurrentProfile('LastFaction'))
-    --\\ Stop - Change the background according to the chosen Faction
     --// Show the Country Flag in slot
     if playerInfo.Country == nil or playerInfo.Country == '' then
         GUI.slots[slot].KinderCountry:Hide()
@@ -1732,11 +1729,9 @@ local function updateFactionSelectorIcons(enabled, faction)
     end
 
     -- Set everything to the small version.
-    AeonFactionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/aeon_ico" .. dis .. ".png")
-    CybranFactionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/cybran_ico" .. dis .. ".png")
-    UEFFactionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/uef_ico" .. dis .. ".png")
-    SeraphimFactionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/seraphim_ico" .. dis .. ".png")
-    RandomFactionPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/random_ico" .. dis .. ".png")
+    for k, v in pairs(FACTION_PANELS) do
+        v:SetTexture("/textures/ui/common/FACTIONSELECTOR/" .. FACTION_NAMES[k] .. "_ico" .. dis .. ".png")
+    end
 
     -- Set the selection faction icon to the large version.
     FACTION_PANELS[faction]:SetTexture("/textures/ui/common/FACTIONSELECTOR/" .. FACTION_NAMES[faction] .. "_ico-large.png")
@@ -1904,8 +1899,8 @@ local function UpdateGame()
     AssignRandomTeams(gameInfo)
 
     -- Update the map background to reflect the possibly-changed map.
-    if LASTLobbyBackground == 4 then
-        ChangeBackgroundLobby(nil, nil)
+    if Prefs.GetFromCurrentProfile('LobbyBackground') == 4 then
+        ChangeBackgroundLobby()
     end
 
     -- Set the map name at the top right corner in lobby
@@ -2743,11 +2738,6 @@ function CreateUI(maxPlayers)
     GUI.buttonPanelRight.Width:Set(265)
     GUI.buttonPanelRight.Height:Set(89)
 
-    GUI.factionPanel = Group(GUI.panel, "factionPanel") -- Faction Selector
-    LayoutHelpers.AtLeftTopIn(GUI.factionPanel, GUI.panel, 410, 36) --Right:615
-    GUI.factionPanel.Width:Set(205)
-    GUI.factionPanel.Height:Set(60)
-
     GUI.observerPanel = Group(GUI.panel, "observerPanel") -- PINK Square in Screenshoot
     LayoutHelpers.AtLeftTopIn(GUI.observerPanel, GUI.panel, 458, 519)
     GUI.observerPanel.Width:Set(280)
@@ -3238,7 +3228,6 @@ function CreateUI(maxPlayers)
     -- Faction Selector
     ---------------------------------------------------------------------------
     CreateUI_Faction_Selector()
-    SetEvent_Faction_Selector()
     SetCurrentFactionTo_Faction_Selector()
 
     ---------------------------------------------------------------------------
@@ -5693,115 +5682,117 @@ end
 
 -- Faction selector
 function CreateUI_Faction_Selector()
-    AeonFactionPanel = Bitmap(GUI.factionPanel, "/textures/ui/common/FACTIONSELECTOR/aeon_ico.png")
-    --LayoutHelpers.AtTopIn(TEST1factionPanel, GUI.factionPanel, 0)
-    LayoutHelpers.AtLeftTopIn(AeonFactionPanel, GUI.factionPanel, 0, 0)
-    LayoutHelpers.AtVerticalCenterIn(AeonFactionPanel, GUI.factionPanel, 0)
-    CybranFactionPanel = Bitmap(GUI.factionPanel, "/textures/ui/common/FACTIONSELECTOR/cybran_ico.png")
-    --LayoutHelpers.AtTopIn(TEST2factionPanel, GUI.factionPanel, 10)
-    LayoutHelpers.AtLeftTopIn(CybranFactionPanel, GUI.factionPanel, 45, 0)
-    LayoutHelpers.AtVerticalCenterIn(CybranFactionPanel, GUI.factionPanel, 0)
-    UEFFactionPanel = Bitmap(GUI.factionPanel, "/textures/ui/common/FACTIONSELECTOR/uef_ico.png")
-    --LayoutHelpers.AtTopIn(TEST3factionPanel, GUI.factionPanel, 0)
-    LayoutHelpers.AtHorizontalCenterIn(UEFFactionPanel, GUI.factionPanel, 0)
-    LayoutHelpers.AtVerticalCenterIn(UEFFactionPanel, GUI.factionPanel, 0)
-    SeraphimFactionPanel = Bitmap(GUI.factionPanel, "/textures/ui/common/FACTIONSELECTOR/seraphim_ico.png")
-    --LayoutHelpers.AtTopIn(TEST4factionPanel, GUI.factionPanel, 10)
-    LayoutHelpers.AtRightTopIn(SeraphimFactionPanel, GUI.factionPanel, 45, 0)
-    LayoutHelpers.AtVerticalCenterIn(SeraphimFactionPanel, GUI.factionPanel, 0)
-    RandomFactionPanel = Bitmap(GUI.factionPanel, "/textures/ui/common/FACTIONSELECTOR/random_ico.png")
-    --LayoutHelpers.AtTopIn(TEST5factionPanel, GUI.factionPanel, 0)
-    LayoutHelpers.AtRightTopIn(RandomFactionPanel, GUI.factionPanel, 0, 0)
-    LayoutHelpers.AtVerticalCenterIn(RandomFactionPanel, GUI.factionPanel, 0)
+    local factionPanel = Group(GUI.panel, "factionPanel")
+    LayoutHelpers.AtLeftTopIn(factionPanel, GUI.panel, 410, 36) --Right:615
+    factionPanel.Width:Set(205)
+    factionPanel.Height:Set(60)
+
+    GUI.AeonFactionPanel = Bitmap(factionPanel, "/textures/ui/common/FACTIONSELECTOR/aeon_ico.png")
+    LayoutHelpers.AtLeftTopIn(GUI.AeonFactionPanel, factionPanel, 0, 0)
+    LayoutHelpers.AtVerticalCenterIn(GUI.AeonFactionPanel, factionPanel, 0)
+
+    GUI.CybranFactionPanel = Bitmap(factionPanel, "/textures/ui/common/FACTIONSELECTOR/cybran_ico.png")
+    LayoutHelpers.AtLeftTopIn(GUI.CybranFactionPanel, factionPanel, 45, 0)
+    LayoutHelpers.AtVerticalCenterIn(GUI.CybranFactionPanel, factionPanel, 0)
+
+    GUI.UEFFactionPanel = Bitmap(factionPanel, "/textures/ui/common/FACTIONSELECTOR/uef_ico.png")
+    LayoutHelpers.AtHorizontalCenterIn(GUI.UEFFactionPanel, factionPanel, 0)
+    LayoutHelpers.AtVerticalCenterIn(GUI.UEFFactionPanel, factionPanel, 0)
+
+    GUI.SeraphimFactionPanel = Bitmap(factionPanel, "/textures/ui/common/FACTIONSELECTOR/seraphim_ico.png")
+    LayoutHelpers.AtRightTopIn(GUI.SeraphimFactionPanel, factionPanel, 45, 0)
+    LayoutHelpers.AtVerticalCenterIn(GUI.SeraphimFactionPanel, factionPanel, 0)
+
+    GUI.RandomFactionPanel = Bitmap(factionPanel, "/textures/ui/common/FACTIONSELECTOR/random_ico.png")
+    LayoutHelpers.AtRightTopIn(GUI.RandomFactionPanel, factionPanel, 0, 0)
+    LayoutHelpers.AtVerticalCenterIn(GUI.RandomFactionPanel, factionPanel, 0)
+
+    GUI.factionPanel = factionPanel
 
     -- Relate faction numbers to faction panels to simplify update.
-    FACTION_PANELS = {[1] = UEFFactionPanel, [2] = AeonFactionPanel,
-                      [3] = CybranFactionPanel, [4] = SeraphimFactionPanel, [5] = RandomFactionPanel}
-end
+    FACTION_PANELS = {[1] = GUI.UEFFactionPanel, [2] = GUI.AeonFactionPanel,
+                      [3] = GUI.CybranFactionPanel, [4] = GUI.SeraphimFactionPanel, [5] = GUI.RandomFactionPanel }
 
--- Get a closure suitable for use as the event listener on a faction selection button.
--- targetFaction is the faction represented by the faction selection panel using this listener.
--- targetPanel is that faction selection panel.
--- layoutSlot is the slot, from the left, in the containing group the panel shall occupy.
-local function getFactionEventListener(targetPanel, targetFaction, layoutSlot)
-    return function(ctrl, event)
-        local faction = Prefs.GetFromCurrentProfile('LastFaction') or 1
-        local eventHandled = false
-        if faction == targetFaction then
-            targetPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/" .. FACTION_NAMES[targetFaction] .. "_ico-large.png")
-        elseif IsPlayer(localPlayerID) then
-            if event.Type == 'MouseEnter' then
-                targetPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/" .. FACTION_NAMES[targetFaction] .. "_ico-hover.png")
-                eventHandled = true
-            elseif event.Type == 'MouseExit' then
-                targetPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/" .. FACTION_NAMES[targetFaction] .. "_ico.png")
-                eventHandled = true
-            elseif event.Type == 'ButtonPress' then
-                eventHandled = true
+    -- Get a closure suitable for use as the event listener on a faction selection button.
+    -- targetFaction is the faction represented by the faction selection panel using this listener.
+    -- targetPanel is that faction selection panel.
+    local function getFactionEventListener(targetPanel, targetFaction)
+        return function(ctrl, event)
+            local faction = Prefs.GetFromCurrentProfile('LastFaction') or 1
+            local eventHandled = false
+            if faction == targetFaction then
+                targetPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/" .. FACTION_NAMES[targetFaction] .. "_ico-large.png")
+            elseif IsPlayer(localPlayerID) then
+                if event.Type == 'MouseEnter' then
+                    targetPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/" .. FACTION_NAMES[targetFaction] .. "_ico-hover.png")
+                    eventHandled = true
+                elseif event.Type == 'MouseExit' then
+                    targetPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/" .. FACTION_NAMES[targetFaction] .. "_ico.png")
+                    eventHandled = true
+                elseif event.Type == 'ButtonPress' then
+                    eventHandled = true
 
-                local localSlot = FindSlotForID(localPlayerID)
-                Prefs.SetToCurrentProfile('LastFaction', targetFaction)
-                GUI.slots[localSlot].faction:SetItem(targetFaction)
-                SetPlayerOption(localSlot, 'Faction', targetFaction)
-                gameInfo.PlayerOptions[localSlot].Faction = targetFaction
+                    local localSlot = FindSlotForID(localPlayerID)
+                    Prefs.SetToCurrentProfile('LastFaction', targetFaction)
+                    GUI.slots[localSlot].faction:SetItem(targetFaction)
+                    SetPlayerOption(localSlot, 'Faction', targetFaction)
+                    gameInfo.PlayerOptions[localSlot].Faction = targetFaction
 
-                SetCurrentFactionTo_Faction_Selector(targetFaction)
+                    SetCurrentFactionTo_Faction_Selector(targetFaction)
+                end
             end
-        end
-        return eventHandled
-    end
-end
 
-function SetEvent_Faction_Selector()
-    AeonFactionPanel.HandleEvent = getFactionEventListener(AeonFactionPanel, 2, 0)
-    CybranFactionPanel.HandleEvent = getFactionEventListener(CybranFactionPanel, 3, 1)
-    UEFFactionPanel.HandleEvent = getFactionEventListener(UEFFactionPanel, 1, 2)
-    SeraphimFactionPanel.HandleEvent = getFactionEventListener(SeraphimFactionPanel, 4, 3)
-    RandomFactionPanel.HandleEvent = getFactionEventListener(RandomFactionPanel, 5, 4)
+            return eventHandled
+        end
+    end
+
+    GUI.AeonFactionPanel.HandleEvent = getFactionEventListener(GUI.AeonFactionPanel, 2)
+    GUI.CybranFactionPanel.HandleEvent = getFactionEventListener(GUI.CybranFactionPanel, 3)
+    GUI.UEFFactionPanel.HandleEvent = getFactionEventListener(GUI.UEFFactionPanel, 1)
+    GUI.SeraphimFactionPanel.HandleEvent = getFactionEventListener(GUI.SeraphimFactionPanel, 4)
+    GUI.RandomFactionPanel.HandleEvent = getFactionEventListener(GUI.RandomFactionPanel, 5)
 end
 
 function SetCurrentFactionTo_Faction_Selector(input_faction)
     local faction = input_faction or Prefs.GetFromCurrentProfile('LastFaction') or 1
-    if AeonFactionPanel and CybranFactionPanel and UEFFactionPanel and SeraphimFactionPanel and RandomFactionPanel then
-        ChangeSkinByFaction(faction)
-        ChangeSkinButtonByFaction(faction)
-        ChangeBackgroundLobby(nil, faction)
-        if faction == 1 then
-            LayoutHelpers.AtLeftIn(AeonFactionPanel, GUI.factionPanel, 0)
-            LayoutHelpers.AtLeftIn(CybranFactionPanel, GUI.factionPanel, 45)
-            LayoutHelpers.AtRightIn(SeraphimFactionPanel, GUI.factionPanel, 45)
-            LayoutHelpers.AtRightIn(RandomFactionPanel, GUI.factionPanel, 0)
-        elseif faction == 2 then
-            LayoutHelpers.AtLeftIn(AeonFactionPanel, GUI.factionPanel, -15)
-            LayoutHelpers.AtLeftIn(CybranFactionPanel, GUI.factionPanel, 45)
-            LayoutHelpers.AtRightIn(SeraphimFactionPanel, GUI.factionPanel, 45)
-            LayoutHelpers.AtRightIn(RandomFactionPanel, GUI.factionPanel, 0)
-        elseif faction == 3 then
-            LayoutHelpers.AtLeftIn(AeonFactionPanel, GUI.factionPanel, 0)
-            LayoutHelpers.AtLeftIn(CybranFactionPanel, GUI.factionPanel, 45-15)
-            LayoutHelpers.AtRightIn(SeraphimFactionPanel, GUI.factionPanel, 45)
-            LayoutHelpers.AtRightIn(RandomFactionPanel, GUI.factionPanel, 0)
-        elseif faction == 4 then
-            LayoutHelpers.AtLeftIn(AeonFactionPanel, GUI.factionPanel, 0)
-            LayoutHelpers.AtLeftIn(CybranFactionPanel, GUI.factionPanel, 45)
-            LayoutHelpers.AtRightIn(SeraphimFactionPanel, GUI.factionPanel, 45-15)
-            LayoutHelpers.AtRightIn(RandomFactionPanel, GUI.factionPanel, 0)
-        elseif faction == 5 then
-            LayoutHelpers.AtLeftIn(AeonFactionPanel, GUI.factionPanel, 0)
-            LayoutHelpers.AtLeftIn(CybranFactionPanel, GUI.factionPanel, 45)
-            LayoutHelpers.AtRightIn(SeraphimFactionPanel, GUI.factionPanel, 45)
-            LayoutHelpers.AtRightIn(RandomFactionPanel, GUI.factionPanel, -15)
-        end
+
+    ChangeSkinByFaction(faction)
+    ChangeSkinButtonByFaction(faction)
+    ChangeBackgroundLobby(faction)
+    if faction == 1 then
+        LayoutHelpers.AtLeftIn(GUI.AeonFactionPanel, GUI.factionPanel, 0)
+        LayoutHelpers.AtLeftIn(GUI.CybranFactionPanel, GUI.factionPanel, 45)
+        LayoutHelpers.AtRightIn(GUI.SeraphimFactionPanel, GUI.factionPanel, 45)
+        LayoutHelpers.AtRightIn(GUI.RandomFactionPanel, GUI.factionPanel, 0)
+    elseif faction == 2 then
+        LayoutHelpers.AtLeftIn(GUI.AeonFactionPanel, GUI.factionPanel, -15)
+        LayoutHelpers.AtLeftIn(GUI.CybranFactionPanel, GUI.factionPanel, 45)
+        LayoutHelpers.AtRightIn(GUI.SeraphimFactionPanel, GUI.factionPanel, 45)
+        LayoutHelpers.AtRightIn(GUI.RandomFactionPanel, GUI.factionPanel, 0)
+    elseif faction == 3 then
+        LayoutHelpers.AtLeftIn(GUI.AeonFactionPanel, GUI.factionPanel, 0)
+        LayoutHelpers.AtLeftIn(GUI.CybranFactionPanel, GUI.factionPanel, 45-15)
+        LayoutHelpers.AtRightIn(GUI.SeraphimFactionPanel, GUI.factionPanel, 45)
+        LayoutHelpers.AtRightIn(GUI.RandomFactionPanel, GUI.factionPanel, 0)
+    elseif faction == 4 then
+        LayoutHelpers.AtLeftIn(GUI.AeonFactionPanel, GUI.factionPanel, 0)
+        LayoutHelpers.AtLeftIn(GUI.CybranFactionPanel, GUI.factionPanel, 45)
+        LayoutHelpers.AtRightIn(GUI.SeraphimFactionPanel, GUI.factionPanel, 45-15)
+        LayoutHelpers.AtRightIn(GUI.RandomFactionPanel, GUI.factionPanel, 0)
+    elseif faction == 5 then
+        LayoutHelpers.AtLeftIn(GUI.AeonFactionPanel, GUI.factionPanel, 0)
+        LayoutHelpers.AtLeftIn(GUI.CybranFactionPanel, GUI.factionPanel, 45)
+        LayoutHelpers.AtRightIn(GUI.SeraphimFactionPanel, GUI.factionPanel, 45)
+        LayoutHelpers.AtRightIn(GUI.RandomFactionPanel, GUI.factionPanel, -15)
     end
 end
 
 function ChangeSkinByFaction(input_faction)
     local faction = input_faction or Prefs.GetFromCurrentProfile('LastFaction') or 1
-    if GUI.panel then
-        GUI.panel:SetTexture("/textures/ui/common/scx_menu/lan-game-lobby/" .. FACTION_NAMES[faction] .. "_lobby.dds")
-        GUI.panelWideLeft:SetTexture("/textures/ui/common/scx_menu/lan-game-lobby/wide/" .. FACTION_NAMES[faction] .. "_wide.dds")
-        GUI.panelWideRight:SetTexture("/textures/ui/common/scx_menu/lan-game-lobby/wide/" .. FACTION_NAMES[faction] .. "_wide.dds")
-    end
+
+    GUI.panel:SetTexture("/textures/ui/common/scx_menu/lan-game-lobby/" .. FACTION_NAMES[faction] .. "_lobby.dds")
+    GUI.panelWideLeft:SetTexture("/textures/ui/common/scx_menu/lan-game-lobby/wide/" .. FACTION_NAMES[faction] .. "_wide.dds")
+    GUI.panelWideRight:SetTexture("/textures/ui/common/scx_menu/lan-game-lobby/wide/" .. FACTION_NAMES[faction] .. "_wide.dds")
 end
 
 -- If a control has two textures, _up.dds and _dis.dds, to be used based on its enabledness, set
@@ -5860,7 +5851,7 @@ function ChangeSkinButtonByFaction(input_faction)
     end
 end
 
-function ChangeBackgroundLobby(slot, faction)
+function ChangeBackgroundLobby(faction)
     local LobbyBackground = Prefs.GetFromCurrentProfile('LobbyBackground') or 1
     if GUI.background and GUI.background2 then
         if LobbyBackground == 1 then -- Factions
@@ -5874,21 +5865,18 @@ function ChangeBackgroundLobby(slot, faction)
             else
                 GUI.background:SetTexture("/textures/ui/common/BACKGROUND/faction/faction-background-paint_" .. FACTION_NAMES[faction] .. "_bmp.dds")
             end
-            LASTLobbyBackground = 1
 
         elseif LobbyBackground == 2 then -- Concept art
 			LOGX('>> Background ART', 'Background')
             GUI.background:Show()
             GUI.background2:Hide()
             GUI.background:SetTexture("/textures/ui/common/BACKGROUND/art/art-background-paint0"..math.random(1, 5).."_bmp.dds")
-            LASTLobbyBackground = 2
 
         elseif LobbyBackground == 3 then -- Screenshot
 			LOGX('>> Background SCREENSHOT', 'Background')
             GUI.background:Show()
             GUI.background2:Hide()
             GUI.background:SetTexture("/textures/ui/common/BACKGROUND/scrn/scrn-background-paint"..math.random(1, 14).."_bmp.dds")
-            LASTLobbyBackground = 3
 
         elseif LobbyBackground == 4 then -- Map
             LOGX('>> Background MAP', 'Background')
@@ -5907,14 +5895,12 @@ function ChangeBackgroundLobby(slot, faction)
             else
                 GUI.background2:ClearTexture()
             end
-            LASTLobbyBackground = 4
 
-        elseif LobbyBackground == 5 and LASTLobbyBackground ~= LobbyBackground then -- None
+        elseif LobbyBackground == 5 then -- None
             LOGX('>> Background NOTHING', 'Background')
             GUI.background:Hide()
             GUI.background2:Hide()
             GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/background-paint_black_bmp.dds"))
-            LASTLobbyBackground = 5
 
         elseif LobbyBackground == 6 then -- Extra
 			LOGX('>> Background EXTRA', 'Background')
@@ -5943,7 +5929,6 @@ function ChangeBackgroundLobby(slot, faction)
             else
                 GUI.background:SetTexture("/textures/ui/common/BACKGROUND/background-paint_black_bmp.dds")
             end
-            LASTLobbyBackground = 6
         end
     end
 end
@@ -5982,7 +5967,7 @@ function CreateOptionLobbyDialog()
     backgroundRadiobutton.OnChoose = function(self, button)
         local backgroundMode = indexOf(backgroundStates, button)
         Prefs.SetToCurrentProfile("LobbyBackground", backgroundMode)
-        ChangeBackgroundLobby(nil, nil)
+        ChangeBackgroundLobby()
     end
 	--
 	local Slider = import('/lua/maui/slider.lua').Slider
