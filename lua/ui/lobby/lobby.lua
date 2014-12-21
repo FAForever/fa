@@ -866,9 +866,6 @@ function SetSlotInfo(slot, playerInfo)
         Prefs.SetToCurrentProfile('LastFaction', playerInfo.Faction)
     end
 
-    --// Change the background according to the chosen Faction
-    --ChangeBackgroundLobby(slot, Prefs.GetFromCurrentProfile('LastFaction'))
-    --\\ Stop - Change the background according to the chosen Faction
     --// Show the Country Flag in slot
     if playerInfo.Country == nil or playerInfo.Country == '' then
         GUI.slots[slot].KinderCountry:Hide()
@@ -1903,7 +1900,7 @@ local function UpdateGame()
 
     -- Update the map background to reflect the possibly-changed map.
     if Prefs.GetFromCurrentProfile('LobbyBackground') == 4 then
-        ChangeBackgroundLobby(nil, nil)
+        ChangeBackgroundLobby()
     end
 
     -- Set the map name at the top right corner in lobby
@@ -5763,7 +5760,7 @@ function SetCurrentFactionTo_Faction_Selector(input_faction)
     if AeonFactionPanel and CybranFactionPanel and UEFFactionPanel and SeraphimFactionPanel and RandomFactionPanel then
         ChangeSkinByFaction(faction)
         ChangeSkinButtonByFaction(faction)
-        ChangeBackgroundLobby(nil, faction)
+        ChangeBackgroundLobby(faction)
         if faction == 1 then
             LayoutHelpers.AtLeftIn(AeonFactionPanel, GUI.factionPanel, 0)
             LayoutHelpers.AtLeftIn(CybranFactionPanel, GUI.factionPanel, 45)
@@ -5858,7 +5855,7 @@ function ChangeSkinButtonByFaction(input_faction)
     end
 end
 
-function ChangeBackgroundLobby(slot, faction)
+function ChangeBackgroundLobby(faction)
     local LobbyBackground = Prefs.GetFromCurrentProfile('LobbyBackground') or 1
     if GUI.background and GUI.background2 then
         if LobbyBackground == 1 then -- Factions
@@ -5973,7 +5970,7 @@ function CreateOptionLobbyDialog()
     backgroundRadiobutton.OnChoose = function(self, button)
         local backgroundMode = indexOf(backgroundStates, button)
         Prefs.SetToCurrentProfile("LobbyBackground", backgroundMode)
-        ChangeBackgroundLobby(nil, nil)
+        ChangeBackgroundLobby()
     end
 	--
 	local Slider = import('/lua/maui/slider.lua').Slider
