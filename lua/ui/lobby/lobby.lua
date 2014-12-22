@@ -2573,12 +2573,12 @@ function CreateUI(maxPlayers)
     ---------------------------------------------------------------------------
     -- Set up main control panels
     ---------------------------------------------------------------------------
-    GUI.panel = Bitmap(GUI, UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/[random]lobby.dds"))
+    GUI.panel = Bitmap(GUI, UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/lobby.dds"))
     LayoutHelpers.AtCenterIn(GUI.panel, GUI)
-    GUI.panelWideLeft = Bitmap(GUI, '/textures/ui/common/scx_menu/lan-game-lobby/wide/[random]wide.dds')
+    GUI.panelWideLeft = Bitmap(GUI, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/wide.dds'))
     LayoutHelpers.CenteredLeftOf(GUI.panelWideLeft, GUI.panel, -11)
     GUI.panelWideLeft.Left:Set(function() return GUI.Left() end)
-    GUI.panelWideRight = Bitmap(GUI, '/textures/ui/common/scx_menu/lan-game-lobby/wide/[random]wide.dds')
+    GUI.panelWideRight = Bitmap(GUI, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/wide.dds'))
     LayoutHelpers.CenteredRightOf(GUI.panelWideRight, GUI.panel, -11)
     GUI.panelWideRight.Right:Set(function() return GUI.Right() end)
 
@@ -3762,9 +3762,8 @@ function CreateUI(maxPlayers)
         GUI.readyLabel:Hide()
     end
 
-    -- Setup large pretty faction selector. Needs initialiation late as it calls ForceApplyNewSkin.
+    -- Setup large pretty faction selector.
     CreateUI_Faction_Selector()
-    SetEvent_Faction_Selector()
     SetCurrentFactionTo_Faction_Selector()
 
     ---------------------------------------------------------------------------
@@ -5616,8 +5615,7 @@ end
 function SetCurrentFactionTo_Faction_Selector(input_faction)
     local faction = input_faction or Prefs.GetFromCurrentProfile('LastFaction') or 1
 
-    ChangeSkinByFaction(faction)
-    ChangeSkinButtonByFaction(faction)
+    UIUtil.SetCurrentSkin(FACTION_NAMES[faction])
     ChangeBackgroundLobby(faction)
     if faction == 1 then
         LayoutHelpers.AtLeftIn(GUI.AeonFactionPanel, GUI.factionPanel, 0)
@@ -5644,61 +5642,6 @@ function SetCurrentFactionTo_Faction_Selector(input_faction)
         LayoutHelpers.AtLeftIn(GUI.CybranFactionPanel, GUI.factionPanel, 45)
         LayoutHelpers.AtRightIn(GUI.SeraphimFactionPanel, GUI.factionPanel, 45)
         LayoutHelpers.AtRightIn(GUI.RandomFactionPanel, GUI.factionPanel, -15)
-    end
-end
-
-function ChangeSkinByFaction(input_faction)
-    local faction = input_faction or Prefs.GetFromCurrentProfile('LastFaction') or 1
-
-    GUI.panel:SetTexture("/textures/ui/common/scx_menu/lan-game-lobby/" .. FACTION_NAMES[faction] .. "_lobby.dds")
-    GUI.panelWideLeft:SetTexture("/textures/ui/common/scx_menu/lan-game-lobby/wide/" .. FACTION_NAMES[faction] .. "_wide.dds")
-    GUI.panelWideRight:SetTexture("/textures/ui/common/scx_menu/lan-game-lobby/wide/" .. FACTION_NAMES[faction] .. "_wide.dds")
-end
-
--- If a control has two textures, _up.dds and _dis.dds, to be used based on its enabledness, set
--- the appropriate one based on its current state.
-function setEnablednessTexture(control, path)
-    if control:IsDisabled() then
-        control:SetTexture(UIUtil.UIFile(path .. '/_btn_dis.dds'))
-    else
-        control:SetTexture(UIUtil.UIFile(path .. '/_btn_up.dds'))
-    end
-end
-
--- Set the textures for all UI buttons to reflect their enabled state.
--- TODO: This ought to happen incrementally, instead of with a sledgehammer.
-function ForceApplyNewSkin()
-    setEnablednessTexture(GUI.LobbyOptions, '/BUTTON/small')
-    -- Exit button
-    setEnablednessTexture(GUI.exitButton, '/BUTTON/medium')
-    -- StartGame show only if you Host and Enable only if All Player is Ready.
-    if lobbyComm:IsHost() then
-        UIUtil.setEnabled(GUI.launchGameButton, GetPlayersNotReady())
-
-        setEnablednessTexture(GUI.launchGameButton, '/BUTTON/large')
-
-        -- GameOption show only if you Host, else ModManager is show.
-        setEnablednessTexture(GUI.gameoptionsButton, '/BUTTON/medium')
-    end
-
-    -- This button is either non-host's "view unit restrictions" button or the host's "lobby presets"
-    -- button. As they occupy the same position they've been slightly confusingly merged.
-    setEnablednessTexture(GUI.restrictedUnitsOrPresetsBtn, '/BUTTON/medium')
-
-    -- Observer, AutoTeam, RankedOpts, CPUBench, RandomMap.
-    setEnablednessTexture(GUI.becomeObserver, '/BUTTON/observer')
-    setEnablednessTexture(GUI.randTeam, '/BUTTON/autoteam')
-    setEnablednessTexture(GUI.rankedOptions, '/BUTTON/defaultoption')
-    setEnablednessTexture(GUI.rerunBenchmark, '/BUTTON/cputest')
-    setEnablednessTexture(GUI.randMap, '/BUTTON/randommap')
-end
-
-function ChangeSkinButtonByFaction(input_faction)
-    local faction = input_faction or Prefs.GetFromCurrentProfile('LastFaction') or 1
-    if GUI.panel then
-        local skins = import('/lua/skins/skins.lua').skins
-        skins.uef.texturesPath = "/textures/ui/" .. FACTION_NAMES[faction]
-        ForceApplyNewSkin()
     end
 end
 
