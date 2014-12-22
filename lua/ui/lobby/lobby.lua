@@ -3797,18 +3797,13 @@ function CreateUI(maxPlayers)
                 if player.Human and player.OwnerID ~= localPlayerID then
                     local peer = lobbyComm:GetPeer(player.OwnerID)
                     local ping = peer.ping and math.floor(peer.ping)
-                    local pingcolor = CalcConnectionStatus(peer)
+                    local connectionStatus = CalcConnectionStatus(peer)
                     if ping then
                         GUI.slots[slot].pingStatus:SetValue(ping)
-                        UIUtil.setEnabled(GUI.slots[slot].pingStatus, ping >= 500 or pingcolor ~= "green")
+                        UIUtil.setEnabled(GUI.slots[slot].pingStatus, ping >= 500 or connectionStatus ~= 3)
 
-                        if pingcolor == 'red' then
-                            GUI.slots[slot].pingStatus._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-03_bmp.dds'))
-                        elseif pingcolor == 'green' then
-                            GUI.slots[slot].pingStatus._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-02_bmp.dds'))
-                        elseif pingcolor == 'yellow' then
-                            GUI.slots[slot].pingStatus._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-01_bmp.dds'))
-                        end
+                        -- Set the ping bar to a colour representing the status of our connection.
+                        GUI.slots[slot].pingStatus._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-0' .. connectionStatus .. '_bmp.dds'))
                     else
                         GUI.slots[slot].pingStatus:Hide()
                     end
@@ -4009,16 +4004,19 @@ function wasConnected(peer)
     return false
 end
 
+-- Return a status code representing the status of our connection to a peer.
+-- 1: no connection
+-- 2: half-duplex established or peer reports no connection to a peer we are connected to.
+-- 3: full-duplex connection established
 function CalcConnectionStatus(peer)
     if peer.status ~= 'Established' then
-        return 'red'
+        return 1
     else
         if not wasConnected(peer.id) then
             GUI.slots[FindSlotForID(peer.id)].name:SetTitleText(peer.name)
             GUI.slots[FindSlotForID(peer.id)].name._text:SetFont('Arial Gras', 15)
             if SystemMessagesEnabled() then
                 if not table.find(ConnectionEstablished, peer.name) then
-                    --AddChatText('<< '..peer.name..' >> '..FindSlotForID(peer.id)..' || '..tostring(gameInfo.PlayerOptions[FindSlotForID(peer.id)].Human)..' || '..tostring(IsLocallyOwned(FindSlotForID(peer.id))))
                     if gameInfo.PlayerOptions[FindSlotForID(peer.id)].Human and not IsLocallyOwned(FindSlotForID(peer.id)) then
                         if table.find(ConnectedWithProxy, peer.id) then
                             AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", peer.name)..' (FAF Proxy)', "Engine0004")
@@ -4041,7 +4039,7 @@ function CalcConnectionStatus(peer)
         end
         if not table.find(peer.establishedPeers, lobbyComm:GetLocalPlayerID()) then
             -- they haven't reported that they can talk to us?
-            return 'yellow'
+            return 2
         end
 
         local peers = lobbyComm:GetPeers()
@@ -4049,11 +4047,11 @@ function CalcConnectionStatus(peer)
             if v.id ~= peer.id and v.status == 'Established' then
                 if not table.find(peer.establishedPeers, v.id) then
                     -- they can't talk to someone we can talk to.
-                    return 'yellow'
+                    return 2
                 end
             end
         end
-        return 'green'
+        return 3
     end
 end
 
