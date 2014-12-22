@@ -2546,24 +2546,6 @@ function CreateUI(maxPlayers)
     local title
     if GpgNetActive() then
         title = "FA FOREVER GAME LOBBY"
-        --
-        local LobbyBackgroundStretch = Prefs.GetFromCurrentProfile('LobbyBackgroundStretch') or 'true'
-        GUI.background = Bitmap(GUI, UIUtil.SkinnableFile('/BACKGROUND/background-paint_black_bmp.dds')) -- Background faction or art
-        LayoutHelpers.AtCenterIn(GUI.background, GUI)
-        if LobbyBackgroundStretch == 'true' then
-            LayoutHelpers.FillParent(GUI.background, GUI)
-        else
-            LayoutHelpers.FillParentPreserveAspectRatio(GUI.background, GUI)
-        end
-        GUI.background2 = MapPreview(GUI) -- Background map
-        LayoutHelpers.AtCenterIn(GUI.background2, GUI)
-        GUI.background2.Width:Set(400)
-        GUI.background2.Height:Set(400)
-        if LobbyBackgroundStretch == 'true' then
-            LayoutHelpers.FillParent(GUI.background2, GUI)
-        else
-            LayoutHelpers.FillParentPreserveAspectRatio(GUI.background2, GUI)
-        end
     elseif singlePlayer then
         title = LOC("<LOC _Skirmish_Setup>")
     else
