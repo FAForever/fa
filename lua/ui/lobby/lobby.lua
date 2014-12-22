@@ -5817,13 +5817,7 @@ function ForceApplyNewSkin()
     setEnablednessTexture(GUI.exitButton, '/BUTTON/medium')
     -- StartGame show only if you Host and Enable only if All Player is Ready.
     if lobbyComm:IsHost() then
-        if not GUI.launchGameButton:IsDisabled() then
-            if GetPlayersNotReady() then
-                GUI.launchGameButton:Disable()
-            else
-                GUI.launchGameButton:Enable()
-            end
-        end
+        UIUtil.setEnabled(GUI.launchGameButton, GetPlayersNotReady())
 
         setEnablednessTexture(GUI.launchGameButton, '/BUTTON/large')
 
