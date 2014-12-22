@@ -5355,6 +5355,11 @@ function CPUBenchmark()
     local l
     local m
     for h = 1, 48, 1 do
+        -- If the need for the benchmark no longer exists, abort it now.
+        if not lobbyComm then
+            return
+        end
+
         lastTime = GetSystemTimeSeconds()
         for i = 1.0, 25.0, 0.0008 do
             --This instruction set should cover most LUA operators
@@ -5433,18 +5438,24 @@ function CPU_AddControlTooltip(control, delay, slotNumber)
     end
 end
 
-function StressCPU(waitTime)
-    --This function instructs the PC to do a CPU score benchmark.
-    --It handles the necessary UI updates during the benchmark, sends
-    --the benchmark result to other players when finished, and it updates the local
-    --user's UI with their new result.
-    --    waitTime: The delay in seconds that this function should wait before starting the benchmark.
 
-    if waitTime == nil then waitTime = 10 end
+-- This function instructs the PC to do a CPU score benchmark.
+-- It handles the necessary UI updates during the benchmark, sends
+-- the benchmark result to other players when finished, and it updates the local
+-- user's UI with their new result.
+--    waitTime: The delay in seconds that this function should wait before starting the benchmark.
+function StressCPU(waitTime)
 
     for i = waitTime, 1, -1 do
-        if GUI.rerunBenchmark.label then GUI.rerunBenchmark.label:SetText(i..'s') end
+        GUI.rerunBenchmark.label:SetText(i..'s')
         WaitSeconds(1)
+
+        -- lobbyComm is destroyed when the lobby is exited. If the user left the lobby, we no longer
+        -- want to run the benchmark (it just introduces lag as the user is trying to do something
+        -- else.
+        if not lobbyComm then
+            return
+        end
     end
 
     --Get our last benchmark (if there was one)
