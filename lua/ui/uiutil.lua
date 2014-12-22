@@ -383,13 +383,17 @@ function CreateCursor()
 end
 
 --* return a text object with the appropriate font set
-function CreateText(parent, label, pointSize, font)
+function CreateText(parent, label, pointSize, font, dropshadow)
     label = LOC(label) or LOC("<LOC uiutil_0000>[no text]")
     font = font or buttonFont
     local text = Text(parent, "Text: " .. label)
     text:SetFont(font, pointSize)
     text:SetColor(fontColor)
     text:SetText(label)
+
+    if dropshadow then
+        text:SetDropShadow(true)
+    end
     return text
 end
 
@@ -456,12 +460,9 @@ function CreateButton(parent, up, down, over, disabled, label, pointSize, textOf
     button:UseAlphaHitTest(true)
 
     if label and pointSize then
-        button.label = CreateText(button, label, pointSize)
+        button.label = CreateText(button, label, pointSize, buttonFont, dropshadow)
         LayoutHelpers.AtCenterIn(button.label, button, textOffsetVert, textOffsetHorz)
         button.label:DisableHitTest()
-        if dropshadow then
-            button.label:SetDropShadow(true)
-        end
 
         -- if text exists, set up to grey it out
         button.OnDisable = function(self)
