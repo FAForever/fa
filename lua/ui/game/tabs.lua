@@ -7,6 +7,7 @@ local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
 local Button = import('/lua/maui/button.lua').Button
 local GameMain = import('/lua/ui/game/gamemain.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
+local EscapeHandler = import('/lua/ui/dialogs/eschandler.lua')
 
 local savedParent = false
 local animationLock = false
@@ -246,7 +247,7 @@ local actions = {
     ExitMPGame = function()
         UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0003>Are you sure you'd like to exit?", 
             "<LOC _Yes>", function()
-                ExitApplication()
+                EscapeHandler.SafeQuit()
             end, 
             "<LOC _No>", nil,
             nil, nil,
