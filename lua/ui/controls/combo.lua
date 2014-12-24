@@ -541,16 +541,8 @@ BitmapCombo = Class(Group) {
 
     -- Nuke the old bitmap array and replace it
     ChangeBitmapArray = function( self, bitmapArray, isColor )
-
         self._array = bitmapArray
         self._isColor = isColor
-
-        if self._list then
-            for k,v in self._list do
-                v:Destroy()
-            end
-        end
-
         self._list = {}
         self._listbmp = {}
         self._listhilight = {}
@@ -575,29 +567,28 @@ BitmapCombo = Class(Group) {
             
             self._list[index]._index = index
             self._list[index].HandleEvent = function(ctrl, event)
-                local eventHandled = false
                 if event.Type == 'MouseEnter' then
                     if not ctrl.highlight then
                         ctrl.highlight = Bitmap(ctrl, UIUtil.SkinnableFile('/widgets/drop-down/player-text-highlight_bmp.dds'))
                         LayoutHelpers.FillParent(ctrl.highlight, ctrl)
                         ctrl.highlight:DisableHitTest()
                         self:OnOverItem(ctrl._index, self._array[ctrl._index])
-                        eventHandled = true
+                        return true
                     end
                 elseif event.Type == 'MouseExit' then
                     if ctrl.highlight then 
                         ctrl.highlight:Destroy()
                         ctrl.highlight = nil
-                        eventHandled = true
+                        return true
                     end
                 elseif event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
                     self:SetItem(ctrl._index)
                     self._ddhidden = true
                     self._dropdown:SetHidden(true)
                     self:OnClick(ctrl._index, self._array[ctrl._index])
-                    eventHandled = true
+                    return true
                 end
-                return eventHandled
+                return false
             end
             prev = self._list[index]
         end
