@@ -1733,6 +1733,41 @@ local function Faction_Selector_Set_Enabled(enabled, faction)
     end
 end
 
+-- Refresh (with a sledgehammer) all the items in the observer list.
+local function refreshObserverList()
+    GUI.observerList:DeleteAllItems()
+
+    for slot, observer in gameInfo.Observers do
+        observer.ObserverListIndex = GUI.observerList:GetItemCount() -- Pin-head William made this zero-based
+
+        -- Create a label for this observer of the form:
+        -- PlayerName (R:xxx, P:xxx, C:xxx)
+        -- Such conciseness is necessary as the field in the UI is rather narrow...
+        local observer_label = observer.PlayerName .. " (R:" .. observer.PL
+
+        -- Add the ping only if this entry refers to a different client.
+        if observer and (observer.OwnerID ~= localPlayerID) and observer.ObserverListIndex then
+            local peer = lobbyComm:GetPeer(observer.OwnerID)
+
+            local ping = 0
+            if peer.ping ~= nil then
+                ping = math.floor(peer.ping)
+            end
+
+            observer_label = observer_label .. ", P:" .. ping
+        end
+
+        -- Add the CPU score if one is available.
+        local score_CPU = CPU_Benchmarks[observer.PlayerName]
+        if score_CPU then
+            observer_label = observer_label .. ", C:" .. score_CPU
+        end
+        observer_label = observer_label .. ")"
+
+        GUI.observerList:AddItem(observer_label)
+    end
+end
+
 local function UpdateGame()
     LOGX('>> UpdateGame', 'UpdateGame')
     local scenarioInfo = nil
@@ -1836,12 +1871,8 @@ local function UpdateGame()
         ShowMapPositions(nil, false)
     end
 
-
-    -- Rebuild the observer list.
-    GUI.observerList:DeleteAllItems()
-    for index, observer in gameInfo.Observers do
-        observer.ObserverListIndex = GUI.observerList:GetItemCount() -- Pin-head William made this zero-based
-        GUI.observerList:AddItem(observer.PlayerName)
+    if not singlePlayer then
+        refreshObserverList()
     end
 
     -- deal with options display
@@ -2268,7 +2299,7 @@ function HostTryAddObserver( senderID, requestedObserverName, RequestedPL, Reque
         }
     )
     SendSystemMessage(LOCF("<LOC lobui_0202>%s has joined as an observer.",observerName), "lobui_0202")
-    UpdateGame()
+    refreshObserverList()
 end
 
 function HostConvertPlayerToObserver(senderID, name, playerSlot, ignoreMsg)
@@ -3779,7 +3810,7 @@ function CreateUI(maxPlayers)
     -- get ping times
     GUI.pingThread = ForkThread(
     function()
-        while true and lobbyComm do
+        while lobbyComm do
             for slot, player in gameInfo.PlayerOptions do
                 if player.Human and player.OwnerID ~= localPlayerID then
                     local peer = lobbyComm:GetPeer(player.OwnerID)
@@ -3795,33 +3826,6 @@ function CreateUI(maxPlayers)
                         GUI.slots[slot].pingStatus:Hide()
                     end
                 end
-            end
-            for slot, observer in gameInfo.Observers do
-                -- Create a label for this observer of the form:
-                -- PlayerName (R:xxx, P:xxx, C:xxx)
-                -- Such conciseness is necessary as the field in the UI is rather narrow...
-                local observer_label = observer.PlayerName .. " (R:" .. observer.PL
-
-                -- Add the ping only if this entry refers to a different client.
-                if observer and (observer.OwnerID ~= localPlayerID) and observer.ObserverListIndex then
-                    local peer = lobbyComm:GetPeer(observer.OwnerID)
-
-                    local ping = 0
-                    if peer.ping ~= nil then
-                        ping = math.floor(peer.ping)
-                    end
-
-                    observer_label = observer_label .. ", P:" .. ping
-                end
-
-                -- Add the CPU score if one is available.
-                local score_CPU = FindBenchmarkForName(observer.PlayerName)
-                if score_CPU then
-                    observer_label = observer_label .. ", C:" .. score_CPU.Result
-                end
-                observer_label = observer_label .. ")"
-
-                GUI.observerList:ModifyItem(observer.ObserverListIndex, observer_label)
             end
             WaitSeconds(1)
         end
@@ -4563,7 +4567,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                     -- The new slot was someone else, just add that info.
                     gameInfo.Observers[data.Slot] = data.Options
                 end
-                UpdateGame()
+                refreshObserverList()
             elseif data.Type == 'ConvertObserverToPlayer' then
                 if data.Options.OwnerID == localPlayerID then
                     lobbyComm:SendData( hostID, {Type = "GetGameInfo"} )
