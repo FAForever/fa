@@ -3327,18 +3327,16 @@ function CreateUI(maxPlayers)
         GUI.slots[i].color.Width:Set(slotColumnSizes.color.width)
         GUI.slots[i].color.row = i
         GUI.slots[i].color.OnClick = function(self, index)
-            local indexx = Get_IndexColor_by_AvailableTable(index, self.row)
-            --
             if not lobbyComm:IsHost() then
-                lobbyComm:SendData(hostID, { Type = 'RequestColor', Color = indexx, Slot = self.row } )
-                gameInfo.PlayerOptions[self.row].PlayerColor = indexx
-                gameInfo.PlayerOptions[self.row].ArmyColor = indexx
+                lobbyComm:SendData(hostID, { Type = 'RequestColor', Color = index, Slot = self.row } )
+                gameInfo.PlayerOptions[self.row].PlayerColor = index
+                gameInfo.PlayerOptions[self.row].ArmyColor = index
                 UpdateGame()
             else
-                if IsColorFree(indexx) then
-                    lobbyComm:BroadcastData( { Type = 'SetColor', Color = indexx, Slot = self.row } )
-                    gameInfo.PlayerOptions[self.row].PlayerColor = indexx
-                    gameInfo.PlayerOptions[self.row].ArmyColor = indexx
+                if IsColorFree(index) then
+                    lobbyComm:BroadcastData( { Type = 'SetColor', Color = index, Slot = self.row } )
+                    gameInfo.PlayerOptions[self.row].PlayerColor = index
+                    gameInfo.PlayerOptions[self.row].ArmyColor = index
                     UpdateGame()
                 else
                     self:SetItem( gameInfo.PlayerOptions[self.row].PlayerColor )
@@ -4439,7 +4437,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 HostConvertObserverToPlayerWithoutSlot(data.SenderID, data.RequestedName, data.ObserverSlot,
                                                     data.requestedFaction, data.requestedPL, data.requestedRC, data.requestedNG)
             elseif data.Type == 'RequestColor' then
-                data.Color = Get_IndexColor_by_CompleteTable(data.Color)
                 if IsColorFree(data.Color) then
                     -- Color is available, let everyone else know
                     gameInfo.PlayerOptions[data.Slot].PlayerColor = data.Color
@@ -4532,7 +4529,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 ClearSlotInfo(data.OldSlot)
                 UpdateGame()
             elseif data.Type == 'SetColor' then
-                data.Color = Get_IndexColor_by_CompleteTable(data.Color)
                 gameInfo.PlayerOptions[data.Slot].PlayerColor = data.Color
                 gameInfo.PlayerOptions[data.Slot].ArmyColor = data.Color
                 UpdateGame()
@@ -6457,59 +6453,31 @@ function indexOf(table, needle)
     return nil
 end
 
-function Get_IndexColor_by_AvailableTable(index_limit, slot)
-    for k, v in BASE_ALL_Color do
-        if v == Avail_Color[slot][index_limit] then
-            return k
-        end
-    end
-    return index_limit
-end
-
-function Get_IndexColor_by_CompleteTable(index_limit, slot)
-    for k, v in Avail_Color[slot] do
-        if v == BASE_ALL_Color[index_limit] then
-            return k
-        end
-    end
-    return index_limit
-end
-
 -- Create the Available Color Table and Recreate the ComboBox --
 function Check_Availaible_Color(slot)
     local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo
     --
     Avail_Color[slot] = {}
-    local num = 0
     --// CHECK COLOR ALREADY USED AND RECREATE TABLE WITH COLOR AVAILAIBLE ONLY \\
     for k, v in BASE_ALL_Color do
         local found = false
         for ii = 1, LobbyComm.maxPlayerSlots do
-            if gameInfo.PlayerOptions[ii].PlayerColor then
-                if slot ~= ii then
-                    if gameInfo.PlayerOptions[ii].PlayerColor == k then
-                        found = true
-                        break
-                    end
+            if slot ~= ii then
+                if gameInfo.PlayerOptions[ii].PlayerColor == k then
+                    found = true
+                    break
                 end
             end
         end
         
         if found ~= true then
-            num = num + 1
-            Avail_Color[slot][num] = BASE_ALL_Color[k]
+            Avail_Color[slot][k] = BASE_ALL_Color[k]
         end
         
     end
     --
-    if num == 0 then
-        return
-    end
-    --
-    local yy = Get_IndexColor_by_CompleteTable(gameInfo.PlayerOptions[slot].PlayerColor, slot)
-    --
     GUI.slots[slot].color:ChangeBitmapArray(Avail_Color[slot], true)
-    GUI.slots[slot].color:SetItem(yy)
+    GUI.slots[slot].color:SetItem(gameInfo.PlayerOptions[slot].PlayerColor)
 end
 
 -- Changelog dialog
