@@ -838,7 +838,14 @@ function SetSlotInfo(slot, playerInfo)
     GUI.slots[slot].faction:SetItem(playerInfo.Faction)
 
     GUI.slots[slot].color:Show()
-    Check_Availaible_Color(slot)
+
+    -- TODO: Finer incremental slot information updates!
+    for i = 1, LobbyComm.maxPlayerSlots do
+        -- Update the available colour set for every occupied slot.
+        if gameInfo.PlayerOptions[i] then
+            Check_Availaible_Color(i)
+        end
+    end
 
     GUI.slots[slot].team:Show()
     GUI.slots[slot].team:SetItem(playerInfo.Team)
@@ -3401,21 +3408,26 @@ function CreateUI(maxPlayers)
         GUI.slots[i].color.Width:Set(slotColumnSizes.color.width)
         GUI.slots[i].color.row = i
         GUI.slots[i].color.OnClick = function(self, index)
-            if not lobbyComm:IsHost() then
-                lobbyComm:SendData(hostID, { Type = 'RequestColor', Color = index, Slot = self.row } )
-                gameInfo.PlayerOptions[self.row].PlayerColor = index
-                gameInfo.PlayerOptions[self.row].ArmyColor = index
-                UpdateGame()
-            else
-                if IsColorFree(index) then
-                    lobbyComm:BroadcastData( { Type = 'SetColor', Color = index, Slot = self.row } )
-                    gameInfo.PlayerOptions[self.row].PlayerColor = index
-                    gameInfo.PlayerOptions[self.row].ArmyColor = index
-                    UpdateGame()
-                else
-                    self:SetItem( gameInfo.PlayerOptions[self.row].PlayerColor )
-                end
+            -- If we know the colour isn't free, bail.
+            if not IsColorFree(index) then
+                self:SetItem( gameInfo.PlayerOptions[self.row].PlayerColor )
+                return
             end
+
+            -- Either request the colour from the host, or claim it (if we are the host)
+            if lobbyComm:IsHost() then
+                lobbyComm:BroadcastData({ Type = 'SetColor', Color = index, Slot = self.row })
+            else
+                lobbyComm:SendData(hostID, { Type = 'RequestColor', Color = index, Slot = self.row })
+            end
+
+            -- Update our local state to reflect the new colour anyway. The host will tell us to
+            -- switch back if the colour turns out not to be available (which is an unlikely race
+            -- condition anyway), and switching here makes the UI seem smoother.
+            gameInfo.PlayerOptions[self.row].PlayerColor = index
+            gameInfo.PlayerOptions[self.row].ArmyColor = index
+
+            SetSlotInfo(self.row, gameInfo.PlayerOptions[self.row])
         end
         GUI.slots[i].color.OnEvent = GUI.slots[i].name.OnEvent
         Tooltip.AddControlTooltip(GUI.slots[i].color, 'lob_color')
@@ -4645,9 +4657,9 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                     -- Color is available, let everyone else know
                     gameInfo.PlayerOptions[data.Slot].PlayerColor = data.Color
                     lobbyComm:BroadcastData( { Type = 'SetColor', Color = data.Color, Slot = data.Slot } )
-                    UpdateGame()
+                    SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
                 else
-                -- Sorry, it's not free. Force the player back to the color we have for him.
+                    -- Sorry, it's not free. Force the player back to the color we have for him.
                     lobbyComm:SendData( data.SenderID, { Type = 'SetColor', Color =
                     gameInfo.PlayerOptions[data.Slot].PlayerColor, Slot = data.Slot } )
                 end
@@ -4737,7 +4749,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             elseif data.Type == 'SetColor' then
                 gameInfo.PlayerOptions[data.Slot].PlayerColor = data.Color
                 gameInfo.PlayerOptions[data.Slot].ArmyColor = data.Color
-                UpdateGame()
+                SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
             elseif data.Type == 'GameInfo' then
                 -- Note: this nukes whatever options I may have set locally
                 gameInfo = data.GameInfo
