@@ -15,6 +15,7 @@ local Prefs = import('/lua/user/prefs.lua')
 local MapUtil = import('/lua/ui/maputil.lua')
 local Group = import('/lua/maui/group.lua').Group
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
+local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Button = import('/lua/maui/button.lua').Button
@@ -6756,8 +6757,6 @@ end
 
 -- Create the Available Color Table and Recreate the ComboBox --
 function Check_Availaible_Color(slot)
-    local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo
-    --
     Avail_Color[slot] = {}
     --// CHECK COLOR ALREADY USED AND RECREATE TABLE WITH COLOR AVAILAIBLE ONLY \\
     for k, v in BASE_ALL_Color do
