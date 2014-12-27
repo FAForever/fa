@@ -266,8 +266,6 @@ Combo = Class(Group) {
             self._dropdown:SetHidden(true)
         end
 
-        
-
         self._list.OnMouseoverItem = function(list, row)
             if self.mItemCue then
                 local sound = Sound({Cue = self.mItemCue, Bank = "Interface",})
@@ -411,11 +409,10 @@ BitmapCombo = Class(Group) {
         
         self.Height:Set(self._btnMid.Height)
 
-        LayoutHelpers.AtLeftIn(self._btnLeft, self)
-        LayoutHelpers.AtTopIn(self._btnLeft, self)
-        LayoutHelpers.AtRightIn(self._btnRight, self)
-        LayoutHelpers.AtTopIn(self._btnRight, self)
+        LayoutHelpers.AtLeftTopIn(self._btnLeft, self)
+        LayoutHelpers.AtRightTopIn(self._btnRight, self)
         LayoutHelpers.AtTopIn(self._btnMid, self)
+
         self._btnMid.Left:Set(function() return self._btnLeft.Right() - 1 end)
         self._btnMid.Right:Set(self._btnRight.Left)
 
@@ -433,8 +430,54 @@ BitmapCombo = Class(Group) {
                 self:OnMouseExit()
             end
         end
-        
-        self:ChangeBitmapArray(bitmapArray,isColor)
+
+        -- Create the dropdown background. It's a crude approximation to a nine-patch.
+        local ddul = Bitmap(self._dropdown, self._bitmaps.list.ul)
+        local ddum = Bitmap(self._dropdown, self._bitmaps.list.um)
+        local ddur = Bitmap(self._dropdown, self._bitmaps.list.ur)
+        local ddl = Bitmap(self._dropdown, self._bitmaps.list.l)
+        self.ddm = Bitmap(self._dropdown)
+        self.ddm:SetSolidColor("black")
+        local ddr = Bitmap(self._dropdown, self._bitmaps.list.r)
+        local ddll = Bitmap(self._dropdown, self._bitmaps.list.ll)
+        local ddlm = Bitmap(self._dropdown, self._bitmaps.list.lm)
+        local ddlr = Bitmap(self._dropdown, self._bitmaps.list.lr)
+
+        -- top part is fixed under self
+        LayoutHelpers.AnchorToBottom(ddul, self._btnMid)
+        LayoutHelpers.AtLeftIn(ddul, self._btnLeft, 5)
+        LayoutHelpers.AnchorToBottom(ddur, self._btnMid)
+        LayoutHelpers.AtRightIn(ddur, self._btnRight)
+        LayoutHelpers.AnchorToBottom(ddum, self._btnMid)
+        LayoutHelpers.AnchorToRight(ddum, ddul)
+        LayoutHelpers.AnchorToLeft(ddum, ddur)
+
+        -- middle part is fixed to width, set to height of item list
+        ddl.Top:Set(ddul.Bottom)
+        ddl.Left:Set(ddul.Left)
+        ddr.Top:Set(ddur.Bottom)
+        ddr.Right:Set(ddur.Right)
+        self.ddm.Top:Set(ddum.Bottom)
+        self.ddm.Left:Set(ddl.Right)
+        self.ddm.Right:Set(ddr.Left)
+        LayoutHelpers.ResetHeight(self.ddm)
+        ddl.Height:Set(self.ddm.Height)
+        ddr.Height:Set(self.ddm.Height)
+
+        LayoutHelpers.AnchorToBottom(ddll, ddl)
+        LayoutHelpers.AtLeftIn(ddll, ddl)
+
+        LayoutHelpers.AnchorToBottom(ddlr, ddr)
+        LayoutHelpers.AtRightIn(ddlr, ddr)
+
+        LayoutHelpers.AnchorToBottom(ddlm, self.ddm)
+        LayoutHelpers.AnchorToRight(ddlm, ddl)
+        LayoutHelpers.AnchorToLeft(ddlm, ddr)
+
+        LayoutHelpers.FillParent(self._dropdown, self.ddm)
+
+        -- Populate the dropdown with bitmaps.
+        self:ChangeBitmapArray(bitmapArray, isColor)
 
         self:SetItem(defaultIndex)
         self._curIndex = defaultIndex
@@ -541,32 +584,38 @@ BitmapCombo = Class(Group) {
 
     -- Nuke the old bitmap array and replace it
     ChangeBitmapArray = function( self, bitmapArray, isColor )
+        if self._list then
+            for k,v in self._list do
+                v:Destroy()
+            end
+        end
+
         self._array = bitmapArray
         self._isColor = isColor
         self._list = {}
-        self._listbmp = {}
-        self._listhilight = {}
-        
+
         local prev = nil
+        local elementNum = 1
         for index, bmp in bitmapArray do
-            self._list[index] = Group(self._dropdown)
-            self._listbmp[index] = Bitmap(self._list[index])
-            self._listbmp[index]:DisableHitTest()
-            LayoutHelpers.DepthOverParent(self._listbmp[index], self._list[index], 2)   -- make room for highlight underneath
-            self._list[index].Width:Set(self._dropdown.Width)
-            local listIndex = index
-            self._list[index].Height:Set(function() return self._listbmp[listIndex].Height() + 4 end)
-            self:SetBitmap(self._listbmp[index], bmp)
-            LayoutHelpers.AtLeftTopIn(self._listbmp[index], self._list[index], 2, 2)
+            local listUIElement = Group(self._dropdown)
+            local newBitmap = Bitmap(listUIElement)
+            LayoutHelpers.DepthOverParent(newBitmap, listUIElement, 2)   -- make room for highlight underneath
+            listUIElement.Width:Set(self._dropdown.Width)
+            listUIElement.Height:Set(function() return newBitmap.Height() + 4 end)
+            self:SetBitmap(newBitmap, bmp)
+            LayoutHelpers.AtLeftTopIn(newBitmap, listUIElement, 2, 2)
+
             local prevCtrl = prev   -- this gets the prev control into the closure of this iteration
-            if index == 1 then
-                LayoutHelpers.AtLeftTopIn(self._list[index], self._dropdown)
+            if elementNum == 1 then
+                LayoutHelpers.AtLeftTopIn(listUIElement, self._dropdown)
             else
-                LayoutHelpers.Below(self._list[index], prevCtrl, 1)
+                LayoutHelpers.Below(listUIElement, prevCtrl, 1)
             end
-            
-            self._list[index]._index = index
-            self._list[index].HandleEvent = function(ctrl, event)
+            elementNum = elementNum + 1
+
+            -- The key in the input array with which the corresponding bitmap was associated.
+            listUIElement._index = index
+            listUIElement.HandleEvent = function(ctrl, event)
                 if event.Type == 'MouseEnter' then
                     if not ctrl.highlight then
                         ctrl.highlight = Bitmap(ctrl, UIUtil.SkinnableFile('/widgets/drop-down/player-text-highlight_bmp.dds'))
@@ -590,57 +639,15 @@ BitmapCombo = Class(Group) {
                 end
                 return false
             end
-            prev = self._list[index]
+            prev = listUIElement
+            self._list[elementNum] = listUIElement
         end
 
         -- prev will be last control here
-        local ddul = Bitmap(self._dropdown, self._bitmaps.list.ul)
-        local ddum = Bitmap(self._dropdown, self._bitmaps.list.um)
-        local ddur = Bitmap(self._dropdown, self._bitmaps.list.ur)
-        local ddl = Bitmap(self._dropdown, self._bitmaps.list.l)
-        local ddm = Bitmap(self._dropdown)
-        ddm:SetSolidColor("black")
-        local ddr = Bitmap(self._dropdown, self._bitmaps.list.r)
-        local ddll = Bitmap(self._dropdown, self._bitmaps.list.ll)
-        local ddlm = Bitmap(self._dropdown, self._bitmaps.list.lm)
-        local ddlr = Bitmap(self._dropdown, self._bitmaps.list.lr)
+        self.ddm.Bottom:Set(prev.Bottom)
 
-        -- top part is fixed under self        
-        LayoutHelpers.AnchorToBottom(ddul, self._btnMid)
-        LayoutHelpers.AtLeftIn(ddul, self._btnLeft, 5)
-        LayoutHelpers.AnchorToBottom(ddur, self._btnMid)
-        LayoutHelpers.AtRightIn(ddur, self._btnRight)
-        LayoutHelpers.AnchorToBottom(ddum, self._btnMid)
-        LayoutHelpers.AnchorToRight(ddum, ddul)
-        LayoutHelpers.AnchorToLeft(ddum, ddur)
-
-        -- middle part is fixed to width, set to height of item list
-        ddl.Top:Set(ddul.Bottom)
-        ddl.Left:Set(ddul.Left)
-        ddr.Top:Set(ddur.Bottom)
-        ddr.Right:Set(ddur.Right)
-        ddm.Top:Set(ddum.Bottom)
-        ddm.Left:Set(ddl.Right)
-        ddm.Right:Set(ddr.Left)
-        ddm.Bottom:Set(prev.Bottom)
-        LayoutHelpers.ResetHeight(ddm)
-        ddl.Height:Set(ddm.Height)
-        ddr.Height:Set(ddm.Height)
-
-        LayoutHelpers.AnchorToBottom(ddll, ddl)
-        LayoutHelpers.AtLeftIn(ddll, ddl)
-        
-        LayoutHelpers.AnchorToBottom(ddlr, ddr)
-        LayoutHelpers.AtRightIn(ddlr, ddr)
-        
-        LayoutHelpers.AnchorToBottom(ddlm, ddm)
-        LayoutHelpers.AnchorToRight(ddlm, ddl)
-        LayoutHelpers.AnchorToLeft(ddlm, ddr)
-
-        LayoutHelpers.FillParent(self._dropdown, ddm)
         self._dropdown:Hide()
         self._ddhidden = true
-
     end,
 
     SetBitmap = function(self, bmp, name)
