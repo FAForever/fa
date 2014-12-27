@@ -106,8 +106,10 @@ CurrentConnection = {} -- by Name
 ConnectionEstablished = {} -- by Name
 ConnectedWithProxy = {} -- by UID
 
-Avail_Color = {} -- Color Only Availaible
-BASE_ALL_Color = gameColors.PlayerColors -- Copy color table
+-- The set of available colours for each slot. Each index in this table contains the set of colour
+-- values that may appear in its combobox. Keys in the sub-tables are indexes into allColours,
+-- values are the colour values.
+availableColours = {}
 
 local availableMods = {} -- map from peer ID to set of available mods; each set is a map from "mod id"->true
 local selectedMods = nil
@@ -2549,11 +2551,12 @@ function CreateUI(maxPlayers)
     local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
     local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
     local Combo = import('/lua/ui/controls/combo.lua').Combo
-    local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
     local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo
+    local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
     local EffectHelpers = import('/lua/maui/effecthelpers.lua')
     local ItemList = import('/lua/maui/itemlist.lua').ItemList
     local Prefs = import('/lua/user/prefs.lua')
+    local Tooltip = import('/lua/ui/game/tooltip.lua')
 
     UIUtil.SetCurrentSkin('uef')
 
@@ -3321,7 +3324,8 @@ function CreateUI(maxPlayers)
         end
 
         -- Color
-        GUI.slots[i].color = BitmapCombo(bg, BASE_ALL_Color, 1, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+        GUI.slots[i].color = BitmapCombo(bg, gameColors.PlayerColors, 1, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+
         LayoutHelpers.AtLeftIn(GUI.slots[i].color, GUI.panel, slotColumnSizes.color.x)
         LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].color, GUI.slots[i], 8)
         GUI.slots[i].color.Width:Set(slotColumnSizes.color.width)
@@ -6438,10 +6442,6 @@ function SAVE_PRESET_IN_PREF() -- GET OPTIONS ON LOBBY AND SAVE TO PRESET
     --LOG('> Num mods : '..nummods)
 end
 
--- Show only available colours.
-
--- Get the true Index Color --
-
 -- Find the key for the given value in a table.
 -- Nil keys are not supported.
 function indexOf(table, needle)
@@ -6453,13 +6453,15 @@ function indexOf(table, needle)
     return nil
 end
 
--- Create the Available Color Table and Recreate the ComboBox --
+-- Update the combobox for the given slot so it correctly shows the set of available colours.
+-- causes availableColours[slot] to be repopulated.
 function Check_Availaible_Color(slot)
-    local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo
-    --
-    Avail_Color[slot] = {}
-    --// CHECK COLOR ALREADY USED AND RECREATE TABLE WITH COLOR AVAILAIBLE ONLY \\
-    for k, v in BASE_ALL_Color do
+    availableColours[slot] = {}
+
+    -- For each possible colour, scan the slots to try and find it and, if unsuccessful, add it to
+    -- the available colour set.
+    local allColours = gameColors.PlayerColors
+    for k, v in allColours do
         local found = false
         for ii = 1, LobbyComm.maxPlayerSlots do
             if slot ~= ii then
@@ -6469,14 +6471,13 @@ function Check_Availaible_Color(slot)
                 end
             end
         end
-        
-        if found ~= true then
-            Avail_Color[slot][k] = BASE_ALL_Color[k]
+
+        if not found then
+            availableColours[slot][k] = allColours[k]
         end
-        
     end
     --
-    GUI.slots[slot].color:ChangeBitmapArray(Avail_Color[slot], true)
+    GUI.slots[slot].color:ChangeBitmapArray(availableColours[slot], true)
     GUI.slots[slot].color:SetItem(gameInfo.PlayerOptions[slot].PlayerColor)
 end
 
