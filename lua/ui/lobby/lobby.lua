@@ -1772,19 +1772,6 @@ local function UpdateGame()
 
     local isHost = lobbyComm:IsHost()
 
-    UIUtil.setVisible(GUI.launchGameButton, isHost)
-    if isHost then
-        if not singlePlayer then
-            UIUtil.setEnabled(GUI.randMap, quickRandMap)
-        end
-    else
-        GUI.gameoptionsButton.OnClick = function(self, modifiers)
-            import('/lua/ui/lobby/ModsManager.lua').NEW_MODS_GUI(GUI, isHost, gameInfo.GameMods)
-        end
-        Tooltip.AddButtonTooltip(GUI.gameoptionsButton, 'Lobby_Mods')
-        GUI.allowObservers:SetCheck(gameInfo.GameOptions.AllowObservers, true)
-    end
-
     local localPlayerSlot = FindSlotForID(localPlayerID)
     if localPlayerSlot then
         local playerOptions = gameInfo.PlayerOptions[localPlayerSlot]
@@ -1869,6 +1856,8 @@ local function UpdateGame()
     end
 
     if not singlePlayer then
+        UIUtil.setEnabled(GUI.randMap, quickRandMap)
+
         -- Rebuild the observer list.
         GUI.observerList:DeleteAllItems()
         for index, observer in gameInfo.Observers do
@@ -1888,6 +1877,8 @@ local function UpdateGame()
 
             -- Launch button enabled if everyone is ready.
             UIUtil.setEnabled(GUI.launchGameButton, not playerNotReady)
+        else
+            GUI.allowObservers:SetCheck(gameInfo.GameOptions.AllowObservers, true)
         end
     end
     if LrgMap then
@@ -2803,59 +2794,64 @@ function CreateUI(maxPlayers)
     -- GAME OPTIONS // MODS MANAGER BUTTON --
     if lobbyComm:IsHost() then     -- GAME OPTION
         GUI.gameoptionsButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Game Options", -1)
-    else                                        -- MODS MANAGER
-        GUI.gameoptionsButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Mods Manager", -1)
-    end
-    LayoutHelpers.AtBottomIn(GUI.gameoptionsButton, GUI.optionsPanel, -55)
-    LayoutHelpers.AtHorizontalCenterIn(GUI.gameoptionsButton, GUI.optionsPanel)
-    Tooltip.AddButtonTooltip(GUI.gameoptionsButton, 'lob_select_map')
-    GUI.gameoptionsButton.OnClick = function(self)
-        local mapSelectDialog
+        Tooltip.AddButtonTooltip(GUI.gameoptionsButton, 'lob_select_map')
+        GUI.gameoptionsButton.OnClick = function(self)
+            local mapSelectDialog
 
-        autoRandMap = false
-        quickRandMap = false
-        local function selectBehavior(selectedScenario, changedOptions, restrictedCategories)
-            if autoRandMap then
-                Prefs.SetToCurrentProfile('LastScenario', selectedScenario.file)
-                gameInfo.GameOptions['ScenarioFile'] = selectedScenario.file
-            else
-                Prefs.SetToCurrentProfile('LastScenario', selectedScenario.file)
+            autoRandMap = false
+            quickRandMap = false
+            local function selectBehavior(selectedScenario, changedOptions, restrictedCategories)
+                if autoRandMap then
+                    Prefs.SetToCurrentProfile('LastScenario', selectedScenario.file)
+                    gameInfo.GameOptions['ScenarioFile'] = selectedScenario.file
+                else
+                    Prefs.SetToCurrentProfile('LastScenario', selectedScenario.file)
+                    mapSelectDialog:Destroy()
+                    GUI.chatEdit:AcquireFocus()
+                    for optionKey, data in changedOptions do
+                        Prefs.SetToCurrentProfile(data.pref, data.index)
+                        SetGameOption(optionKey, data.value)
+                    end
+                    --SendSystemMessage(selectedScenario.file)
+
+                    SetGameOption('ScenarioFile',selectedScenario.file)
+
+                    SetGameOption('RestrictedCategories', restrictedCategories, true)
+                    ClearBadMapFlags()  -- every new map, clear the flags, and clients will report if a new map is bad
+                    HostUpdateMods()
+                    UpdateGame()
+                end
+            end
+
+            local function exitBehavior()
                 mapSelectDialog:Destroy()
                 GUI.chatEdit:AcquireFocus()
-                for optionKey, data in changedOptions do
-                    Prefs.SetToCurrentProfile(data.pref, data.index)
-                    SetGameOption(optionKey, data.value)
-                end
-                --SendSystemMessage(selectedScenario.file)
-
-                SetGameOption('ScenarioFile',selectedScenario.file)
-
-                SetGameOption('RestrictedCategories', restrictedCategories, true)
-                ClearBadMapFlags()  -- every new map, clear the flags, and clients will report if a new map is bad
-                HostUpdateMods()
                 UpdateGame()
             end
+
+            GUI.chatEdit:AbandonFocus()
+
+            mapSelectDialog = import('/lua/ui/dialogs/mapselect.lua').CreateDialog(
+                selectBehavior,
+                exitBehavior,
+                GUI,
+                singlePlayer,
+                gameInfo.GameOptions.ScenarioFile,
+                gameInfo.GameOptions,
+                availableMods,
+                OnModsChanged
+            )
         end
-
-        local function exitBehavior()
-            mapSelectDialog:Destroy()
-            GUI.chatEdit:AcquireFocus()
-            UpdateGame()
+    else
+        GUI.gameoptionsButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Mods Manager", -1)
+        GUI.gameoptionsButton.OnClick = function(self, modifiers)
+            import('/lua/ui/lobby/ModsManager.lua').NEW_MODS_GUI(GUI, false, gameInfo.GameMods)
         end
-
-        GUI.chatEdit:AbandonFocus()
-
-        mapSelectDialog = import('/lua/ui/dialogs/mapselect.lua').CreateDialog(
-                                 selectBehavior,
-                                 exitBehavior,
-                                 GUI,
-                                 singlePlayer,
-                                 gameInfo.GameOptions.ScenarioFile,
-                                 gameInfo.GameOptions,
-                                 availableMods,
-                                 OnModsChanged
-                                 )
+        Tooltip.AddButtonTooltip(GUI.gameoptionsButton, 'Lobby_Mods')
     end
+
+    LayoutHelpers.AtBottomIn(GUI.gameoptionsButton, GUI.optionsPanel, -55)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.gameoptionsButton, GUI.optionsPanel)
 
     ---------------------------------------------------------------------------
     -- set up launch panel
@@ -2864,6 +2860,7 @@ function CreateUI(maxPlayers)
     GUI.launchGameButton = UIUtil.CreateButtonWithDropshadow(GUI.launchPanel, '/BUTTON/large/', "Launch the Game", -1)
     LayoutHelpers.AtCenterIn(GUI.launchGameButton, GUI.launchPanel, 20, -345)
     Tooltip.AddButtonTooltip(GUI.launchGameButton, 'Lobby_Launch')
+    UIUtil.setVisible(GUI.launchGameButton, lobbyComm:IsHost())
     GUI.launchGameButton:Hide() -- hide unless we're the game host
     GUI.launchGameButton.OnClick = function(self)
         TryLaunch(false)
