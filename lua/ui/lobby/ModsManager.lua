@@ -61,7 +61,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 		GUI_ModsManager.Depth:Set(GetFrame(parent:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 1)
 		--LayoutHelpers.DepthOverParent(GUI_ModsManager, GUI, 10)
         --GUI_ModsManager.Depth:Set(998) -- :GetTopmostDepth() + 1
-    local background = Bitmap(GUI_ModsManager, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/Mod_Lobby.png'))
+    local background = Bitmap(GUI_ModsManager, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/Mod_Lobby.dds'))
         GUI_ModsManager.Width:Set(background.Width)
         GUI_ModsManager.Height:Set(background.Height)
         LayoutHelpers.FillParent(background, GUI_ModsManager)
@@ -460,7 +460,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 				the_exclusif_mod.actived = true
 				the_exclusif_mod.type:SetColor('101010') -- Noir
 				the_exclusif_mod.type:SetText('EXCLUSIF MOD ACTIVED')
-				the_exclusif_mod.bg:SetTexture('/textures/ui/common/MODS/enable_excusif.png')
+				the_exclusif_mod.bg:SetTexture('/textures/ui/common/MODS/enable_excusif.dds')
 				PlaySound(Sound({Cue = "UI_Mod_Select", Bank = "Interface",}))
 				text1:SetText(count_mod_SIM_actived()..' GAME Mods and '..count_mod_UI_actived()..' UI Mods actived')
 			end
@@ -515,11 +515,11 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 							if control.ui then -- IF UI MOD
 								control.type:SetColor('101010') -- Noir
 								control.type:SetText('UI MOD ACTIVED')
-								control.bg:SetTexture('/textures/ui/common/MODS/enable_ui.png')
+								control.bg:SetTexture('/textures/ui/common/MODS/enable_ui.dds')
 							else -- IF SIM MOD
 								control.type:SetColor('101010') -- Noir
 								control.type:SetText('GAME MOD ACTIVED')
-								control.bg:SetTexture('/textures/ui/common/MODS/enable_game.png')
+								control.bg:SetTexture('/textures/ui/common/MODS/enable_game.dds')
 							end
 						end
 					end
@@ -534,11 +534,11 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 						if control.ui then -- IF UI MOD
 							control.type:SetColor('101010') -- Noir
 							control.type:SetText('UI MOD ACTIVED')
-							control.bg:SetTexture('/textures/ui/common/MODS/enable_ui.png')
+							control.bg:SetTexture('/textures/ui/common/MODS/enable_ui.dds')
 						else -- IF SIM MOD
 							control.type:SetColor('101010') -- Noir
 							control.type:SetText('GAME MOD ACTIVED')
-							control.bg:SetTexture('/textures/ui/common/MODS/enable_game.png')
+							control.bg:SetTexture('/textures/ui/common/MODS/enable_game.dds')
 						end
 						EVENT_Click()
 						scrollGroup:CalcVisible()
@@ -589,11 +589,11 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 				if the_mod.ui then -- IF UI MOD
 					the_mod.type:SetColor('101010') -- Noir
 					the_mod.type:SetText('UI MOD ACTIVED')
-					the_mod.bg:SetTexture('/textures/ui/common/MODS/enable_ui.png')
+					the_mod.bg:SetTexture('/textures/ui/common/MODS/enable_ui.dds')
 				else -- IF SIM MOD
 					the_mod.type:SetColor('101010') -- Noir
 					the_mod.type:SetText('GAME MOD ACTIVED')
-					the_mod.bg:SetTexture('/textures/ui/common/MODS/enable_game.png')
+					the_mod.bg:SetTexture('/textures/ui/common/MODS/enable_game.dds')
 				end
 			end
 		end
@@ -629,12 +629,12 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 							if not self.modInfo.selectable then
 								self.type:SetColor('B9BFB9') -- Gris
 								self.type:SetText('The MOD is not Selectable')
-								self.bg:SetTexture('/textures/ui/common/MODS/enable_not.png')
+								self.bg:SetTexture('/textures/ui/common/MODS/enable_not.dds')
 							elseif not availableMods[self.modInfo.uid] and not self.ui then
 								-- If other player not have the mod
 								self.type:SetColor('B9BFB9') -- Gris
 								self.type:SetText('Player(s) not have this MOD')
-								self.bg:SetTexture('/textures/ui/common/MODS/enable_not.png')
+								self.bg:SetTexture('/textures/ui/common/MODS/enable_not.dds')
 							else
 								-- If all player have the mod
 								if self.actived then
