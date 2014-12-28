@@ -868,7 +868,7 @@ function SetSlotInfo(slot, playerInfo)
         Prefs.SetToCurrentProfile('LastFaction', playerInfo.Faction)
     end
 
-    --// Show the Country Flag in slot
+    -- Show the player's nationality
     if playerInfo.Country == nil or playerInfo.Country == '' then
         GUI.slots[slot].KinderCountry:Hide()
     else
@@ -877,11 +877,9 @@ function SetSlotInfo(slot, playerInfo)
         Country_GetTooltipValue(playerInfo.Country, slot)
         Country_AddControlTooltip(GUI.slots[slot].KinderCountry, 0, slot)
     end
-    --\\ Stop - Show the Country Flag in slot
-
-    --CPU Benchmark code
-    SetSlotCPUBar(slot, playerInfo) --Update the slot CPU bar
-    --End CPU Benchmark code
+    
+    -- Set the CPU bar
+    SetSlotCPUBar(slot, playerInfo)
 end
 
 function ClearSlotInfo(slot)
@@ -1958,7 +1956,7 @@ local function UpdateGame()
 
     -- Add Tooltip info on Map Name Label
     if GUI.GameQualityLabel and scenarioInfo then
-        local TTips_map_version = scenarioInfo.map_version or "N/A"
+        local TTips_map_version = scenarioInfo.map_version or "1"
         local TTips_army = table.getsize(scenarioInfo.Configurations.standard.teams[1].armies) or "N/A"
         local TTips_sizeX = scenarioInfo.size[1] / 51.2 or "N/A"
         local TTips_sizeY = scenarioInfo.size[2] / 51.2 or "N/A"
@@ -2651,7 +2649,7 @@ function CreateUI(maxPlayers)
     GUI.RuleLabel:DeleteAllItems()
     local tmptext
     if lobbyComm:IsHost() then
-        tmptext = 'Rule : no rule (click for edit)'
+        tmptext = 'No Rules: Click to add rules'
         GUI.RuleLabel:SetColors("FFCC00")
     else
         tmptext = 'Rule : no rule.'
@@ -3179,7 +3177,7 @@ function CreateUI(maxPlayers)
         GUI.restrictedUnitsButton.OnClick = function(self, modifiers)
             GUI_PRESET()
         end
-        Tooltip.AddButtonTooltip(GUI.restrictedUnitsButton, 'Load and Save Lobby Presets')
+        Tooltip.AddButtonTooltip(GUI.restrictedUnitsButton, 'Lobby_presetDescription')
     end
 
     ---------------------------------------------------------------------------
@@ -5480,18 +5478,10 @@ end
 
 function Country_GetTooltipValue(CountryResult, slot)
     local CountryOverrideTooltip = import('/lua/ui/help/tooltips-country.lua').tooltip
-    local CountryOverrideTooltipSpecial = import('/lua/ui/help/tooltips-country.lua').tooltipSpecial
     local find = 0
     for index, option in CountryOverrideTooltip do
         if option.value == CountryResult and find == 0 then
-            PrefLanguageTooltipTitle[slot] = option.title
-            PrefLanguageTooltipText[slot] = option.text
-            find = 1
-        end
-    end
-    for index, option in CountryOverrideTooltipSpecial do
-        if option.value == CountryResult and find == 0 then
-            PrefLanguageTooltipTitle[slot] = option.title
+            PrefLanguageTooltipTitle[slot] = option.title or "Country"
             PrefLanguageTooltipText[slot] = option.text
             find = 1
         end
@@ -5504,7 +5494,7 @@ end
 function RuleTitle_SendMSG()
     if GUI.RuleLabel and lobbyComm:IsHost() then
         local getRule = {GUI.RuleLabel:GetItem(0), GUI.RuleLabel:GetItem(1)}
-        if getRule[1]..getRule[2] == 'Rule : no rule (click for edit)' or getRule[1]..getRule[2] == 'Rule : no rule (click for edit) ' then
+        if getRule[1]..getRule[2] == 'No Rules: Click to add rules' or getRule[1]..getRule[2] == 'No Rules: Click to add rules ' then
             getRule[1] = 'Rule : no rule.'
             getRule[2] = ''
         else
@@ -5554,7 +5544,7 @@ function RuleTitle_INPUT()
         if text == '' then
             GUI_Preset_InputBox:Destroy()
             GUI.RuleLabel:DeleteAllItems()
-            GUI.RuleLabel:AddItem('Rule : no rule (click for edit)')
+            GUI.RuleLabel:AddItem('No Rules: Click to add rules')
             GUI.RuleLabel:SetColors("FFCC00")
             GUI.RuleLabel:AddItem('')
             RuleTitle_SendMSG()
@@ -5581,27 +5571,24 @@ function RuleTitle_INPUT()
     local OKButton = UIUtil.CreateButtonWithDropshadow(GUI_Preset_InputBox2, '/BUTTON/medium/', "Ok", -1)
     LayoutHelpers.AtRightIn(OKButton, GUI_Preset_InputBox2, 70)
     LayoutHelpers.AtBottomIn(OKButton, GUI_Preset_InputBox2, 10)
-    text09:SetText('Edit the Rule :')
+    text09:SetText('Game Rules')
     OKButton.OnClick = function(self)
         local result = nameEdit:GetText()
         if result == '' then
             GUI_Preset_InputBox:Destroy()
             GUI.RuleLabel:DeleteAllItems()
-            GUI.RuleLabel:AddItem('Rule : no rule (click for edit)')
+            GUI.RuleLabel:AddItem('No Rules: Click to add rules')
             GUI.RuleLabel:SetColors("FFCC00")
             GUI.RuleLabel:AddItem('')
             RuleTitle_SendMSG()
-            --return 'Rule : no rule.'
         else
             GUI_Preset_InputBox:Destroy()
-            --AddChatText('> '..result)
             wrapped = import('/lua/maui/text.lua').WrapText('Rule : '..result, 350, function(curText) return GUI.RuleLabel:GetStringAdvance(curText) end)
             GUI.RuleLabel:DeleteAllItems()
             GUI.RuleLabel:AddItem(wrapped[1] or '')
             GUI.RuleLabel:SetColors("B9BFB9")
             GUI.RuleLabel:AddItem(wrapped[2] or '')
             RuleTitle_SendMSG()
-            --return 'Rule : '..result
         end
     end
 end
@@ -6536,7 +6523,7 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
         -- Set Rule Title in TextBox
         if profiles[Selected_Preset].Rule == '' or profiles[Selected_Preset].Rule == 'no rule.' then
             GUI.RuleLabel:DeleteAllItems()
-            GUI.RuleLabel:AddItem('Rule : no rule (click for edit)')
+            GUI.RuleLabel:AddItem('No Rules: Click to add rules')
             GUI.RuleLabel:SetColors("FFCC00")
             GUI.RuleLabel:AddItem('')
         else
@@ -6621,7 +6608,7 @@ function SAVE_PRESET_IN_PREF() -- GET OPTIONS ON LOBBY AND SAVE TO PRESET
     local Preset_Name = profiles[Selected_Preset].PresetName or 'ERROR, Set preset name here' -- Nom du PresetLobby
     local Title_FAF = profiles[Selected_Preset].Title_FAF or '' -- Title is for FAF Client title in "Find Games" tabs
     local Rule_Text = GUI.RuleLabel:GetItem(0)..GUI.RuleLabel:GetItem(1)
-    if Rule_Text == 'Rule : no rule (click for edit)' then
+    if Rule_Text == 'No Rules: Click to add rules' then
         Rule_Text = 'no rule.'
     end
     Rule_Text = string.gsub(Rule_Text, 'Rule : ', '') or profiles[Selected_Preset].Rule_Text or '' -- Rule text showing in top of Lobby
