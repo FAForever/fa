@@ -15,6 +15,7 @@ local Prefs = import('/lua/user/prefs.lua')
 local MapUtil = import('/lua/ui/maputil.lua')
 local Group = import('/lua/maui/group.lua').Group
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
+local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Button = import('/lua/maui/button.lua').Button
@@ -105,8 +106,11 @@ CurrentConnection = {} -- by Name
 ConnectionEstablished = {} -- by Name
 ConnectedWithProxy = {} -- by UID
 
-Avail_Color = {} -- Color Only Availaible
-BASE_ALL_Color = gameColors.PlayerColors -- Copy color table
+-- The set of available colours for each slot. Each index in this table contains the set of colour
+-- values that may appear in its combobox. Keys in the sub-tables are indexes into allColours,
+-- values are the colour values.
+availableColours = {}
+allColours = gameColors.PlayerColors
 
 local availableMods = {} -- map from peer ID to set of available mods; each set is a map from "mod id"->true
 local selectedMods = nil
@@ -834,8 +838,14 @@ function SetSlotInfo(slot, playerInfo)
     GUI.slots[slot].faction:SetItem(playerInfo.Faction)
 
     GUI.slots[slot].color:Show()
-    Check_Availaible_Color(GUI.slots[slot].color, slot)
-    --GUI.slots[slot].color:SetItem(playerInfo.PlayerColor)
+
+    -- TODO: Finer incremental slot information updates!
+    for i = 1, LobbyComm.maxPlayerSlots do
+        -- Update the available colour set for every occupied slot.
+        if gameInfo.PlayerOptions[i] then
+            Check_Availaible_Color(i)
+        end
+    end
 
     GUI.slots[slot].team:Show()
     GUI.slots[slot].team:SetItem(playerInfo.Team)
@@ -3258,8 +3268,6 @@ function CreateUI(maxPlayers)
 
     for i= 1, LobbyComm.maxPlayerSlots do
         -- capture the index in the current closure so it's accessible on callbacks
-        local curRow = i
-
         GUI.slots[i] = Group(GUI.playerPanel, "playerSlot " .. tostring(i))
         GUI.slots[i].closed = false
         --TODO these need layout from art when available
@@ -3268,12 +3276,12 @@ function CreateUI(maxPlayers)
         GUI.slots[i]._slot = i
         GUI.slots[i].HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then
-                if gameInfo.GameOptions['TeamSpawn'] ~= 'random' and GUI.markers[curRow].Indicator then
-                    GUI.markers[curRow].Indicator:Play()
+                if gameInfo.GameOptions['TeamSpawn'] ~= 'random' and GUI.markers[i].Indicator then
+                    GUI.markers[i].Indicator:Play()
                 end
             elseif event.Type == 'MouseExit' then
-                if GUI.markers[curRow].Indicator then
-                    GUI.markers[curRow].Indicator:Stop()
+                if GUI.markers[i].Indicator then
+                    GUI.markers[i].Indicator:Stop()
                 end
             end
             return Group.HandleEvent(self, event)
@@ -3299,7 +3307,7 @@ function CreateUI(maxPlayers)
         --// Rating
         GUI.slots[i].ratingGroup = Group(bg)
         GUI.slots[i].ratingGroup.Width:Set(slotColumnSizes.rating.width)
-        GUI.slots[i].ratingGroup.Height:Set(GUI.slots[curRow].Height)
+        GUI.slots[i].ratingGroup.Height:Set(GUI.slots[i].Height)
         LayoutHelpers.AtLeftIn(GUI.slots[i].ratingGroup, GUI.panel, slotColumnSizes.rating.x)
         LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].ratingGroup, GUI.slots[i], 6)
         GUI.slots[i].ratingText = UIUtil.CreateText(GUI.slots[i].ratingGroup, "", 14, 'Arial')--14, UIUtil.bodyFont)
@@ -3310,7 +3318,7 @@ function CreateUI(maxPlayers)
         --// NumGame
         GUI.slots[i].numGamesGroup = Group(bg)
         GUI.slots[i].numGamesGroup.Width:Set(slotColumnSizes.games.width)
-        GUI.slots[i].numGamesGroup.Height:Set(GUI.slots[curRow].Height)
+        GUI.slots[i].numGamesGroup.Height:Set(GUI.slots[i].Height)
         LayoutHelpers.AtLeftIn(GUI.slots[i].numGamesGroup, GUI.panel, slotColumnSizes.games.x)
         LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].numGamesGroup, GUI.slots[i], 6)
         GUI.slots[i].numGamesText = UIUtil.CreateText(GUI.slots[i].numGamesGroup, "", 14, 'Arial')--14, UIUtil.bodyFont)
@@ -3330,15 +3338,15 @@ function CreateUI(maxPlayers)
         -- left deal with name clicks
         GUI.slots[i].name.OnEvent = function(self, event)
             if event.Type == 'MouseEnter' then
-                if gameInfo.GameOptions['TeamSpawn'] ~= 'random' and GUI.markers[curRow].Indicator then
-                    GUI.markers[curRow].Indicator:Play()
+                if gameInfo.GameOptions['TeamSpawn'] ~= 'random' and GUI.markers[i].Indicator then
+                    GUI.markers[i].Indicator:Play()
                 end
             elseif event.Type == 'MouseExit' then
-                if GUI.markers[curRow].Indicator then
-                    GUI.markers[curRow].Indicator:Stop()
+                if GUI.markers[i].Indicator then
+                    GUI.markers[i].Indicator:Stop()
                 end
             elseif event.Type == 'ButtonDClick' then
-                DoSlotBehavior(curRow, 'occupy', '')
+                DoSlotBehavior(i, 'occupy', '')
             end
         end
         GUI.slots[i].name.OnClick = function(self, index, text)
@@ -3346,31 +3354,34 @@ function CreateUI(maxPlayers)
         end
 
         --// Color
-        GUI.slots[i].color = BitmapCombo(bg, BASE_ALL_Color, 1, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+        GUI.slots[i].color = BitmapCombo(bg, allColours, 1, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         LayoutHelpers.AtLeftIn(GUI.slots[i].color, GUI.panel, slotColumnSizes.color.x)
         LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].color, GUI.slots[i], 9)
         GUI.slots[i].color.Width:Set(slotColumnSizes.color.width)
         GUI.slots[i].color.row = i
         GUI.slots[i].color.OnClick = function(self, index)
-            Get_IndexColor_by_CompleteTable(index, i)
-            Tooltip.DestroyMouseoverDisplay()
-            if not lobbyComm:IsHost() then
-                lobbyComm:SendData(hostID, { Type = 'RequestColor', Color = index, Slot = self.row } )
-                gameInfo.PlayerOptions[self.row].PlayerColor = index
-                gameInfo.PlayerOptions[self.row].ArmyColor = index
-                UpdateGame()
-            else
-                if IsColorFree(index) then
-                    lobbyComm:BroadcastData( { Type = 'SetColor', Color = index, Slot = self.row } )
-                    gameInfo.PlayerOptions[self.row].PlayerColor = index
-                    gameInfo.PlayerOptions[self.row].ArmyColor = index
-                    UpdateGame()
-                else
-                    self:SetItem( gameInfo.PlayerOptions[self.row].PlayerColor )
-                end
+            -- If we know the colour isn't free, bail.
+            if not IsColorFree(index) then
+                self:SetItem( gameInfo.PlayerOptions[self.row].PlayerColor )
+                return
             end
+
+            -- Either request the colour from the host, or claim it (if we are the host)
+            if lobbyComm:IsHost() then
+                lobbyComm:BroadcastData({ Type = 'SetColor', Color = index, Slot = self.row })
+            else
+                lobbyComm:SendData(hostID, { Type = 'RequestColor', Color = index, Slot = self.row })
+            end
+
+            -- Update our local state to reflect the new colour anyway. The host will tell us to
+            -- switch back if the colour turns out not to be available (which is an unlikely race
+            -- condition anyway), and switching here makes the UI seem smoother.
+            gameInfo.PlayerOptions[self.row].PlayerColor = index
+            gameInfo.PlayerOptions[self.row].ArmyColor = index
+
+            SetSlotInfo(self.row, gameInfo.PlayerOptions[self.row])
         end
-        GUI.slots[i].color.OnEvent = GUI.slots[curRow].name.OnEvent
+        GUI.slots[i].color.OnEvent = GUI.slots[i].name.OnEvent
         Tooltip.AddControlTooltip(GUI.slots[i].color, 'lob_color')
         GUI.slots[i].color.row = i
 
@@ -3381,7 +3392,7 @@ function CreateUI(maxPlayers)
         GUI.slots[i].faction.Width:Set(slotColumnSizes.faction.width)
         GUI.slots[i].faction.OnClick = function(self, index)
             SetPlayerOption(self.row,'Faction',index)
-            if curRow == FindSlotForID(FindIDForName(localPlayerName)) then
+            if i == FindSlotForID(FindIDForName(localPlayerName)) then
                 SetCurrentFactionTo_Faction_Selector()
             end
             Tooltip.DestroyMouseoverDisplay()
@@ -3389,7 +3400,7 @@ function CreateUI(maxPlayers)
         Tooltip.AddControlTooltip(GUI.slots[i].faction, 'lob_faction')
         Tooltip.AddComboTooltip(GUI.slots[i].faction, factionTooltips)
         GUI.slots[i].faction.row = i
-        GUI.slots[i].faction.OnEvent = GUI.slots[curRow].name.OnEvent
+        GUI.slots[i].faction.OnEvent = GUI.slots[i].name.OnEvent
         if not hasSupcom then
             GUI.slots[i].faction:SetItem(4)
         end
@@ -3406,13 +3417,13 @@ function CreateUI(maxPlayers)
         end
         Tooltip.AddControlTooltip(GUI.slots[i].team, 'lob_team')
         Tooltip.AddComboTooltip(GUI.slots[i].team, teamTooltips)
-        GUI.slots[i].team.OnEvent = GUI.slots[curRow].name.OnEvent
+        GUI.slots[i].team.OnEvent = GUI.slots[i].name.OnEvent
 
         --// Ping
         if not singlePlayer then
             GUI.slots[i].pingGroup = Group(bg)
             GUI.slots[i].pingGroup.Width:Set(slotColumnSizes.ping.width)
-            GUI.slots[i].pingGroup.Height:Set(GUI.slots[curRow].Height)
+            GUI.slots[i].pingGroup.Height:Set(GUI.slots[i].Height)
             LayoutHelpers.AtLeftIn(GUI.slots[i].pingGroup, GUI.panel, slotColumnSizes.ping.x)
             LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].pingGroup, GUI.slots[i], 6)
 
@@ -3432,15 +3443,15 @@ function CreateUI(maxPlayers)
         -- depending on if this is single player or multiplayer this displays different info
         GUI.slots[i].multiSpace = Group(bg, "multiSpace " .. tonumber(i))
         GUI.slots[i].multiSpace.Width:Set(slotColumnSizes.ready.width)
-        GUI.slots[i].multiSpace.Height:Set(GUI.slots[curRow].Height)
+        GUI.slots[i].multiSpace.Height:Set(GUI.slots[i].Height)
         LayoutHelpers.AtLeftIn(GUI.slots[i].multiSpace, GUI.panel, slotColumnSizes.ready.x)
-        GUI.slots[i].multiSpace.Top:Set(GUI.slots[curRow].Top)
+        GUI.slots[i].multiSpace.Top:Set(GUI.slots[i].Top)
 
         if not singlePlayer then
             GUI.slots[i].ready = UIUtil.CreateCheckboxStd(GUI.slots[i].multiSpace, '/CHECKBOX/radio')
             GUI.slots[i].ready.row = i
-            LayoutHelpers.AtVerticalCenterIn(GUI.slots[curRow].ready, GUI.slots[curRow].multiSpace, 8)
-            LayoutHelpers.AtLeftIn(GUI.slots[curRow].ready, GUI.slots[curRow].multiSpace, 0)
+            LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].ready, GUI.slots[i].multiSpace, 8)
+            LayoutHelpers.AtLeftIn(GUI.slots[i].ready, GUI.slots[i].multiSpace, 0)
             GUI.slots[i].ready.OnCheck = function(self, checked)
                 if checked then
                     DisableSlot(self.row, true)
@@ -4546,14 +4557,13 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 HostConvertObserverToPlayerWithoutSlot(data.SenderID, data.RequestedName, data.ObserverSlot,
                                                     data.requestedFaction, data.requestedPL, data.requestedRC, data.requestedNG)
             elseif data.Type == 'RequestColor' then
-                data.Color = Get_IndexColor_by_CompleteTable(data.Color)
                 if IsColorFree(data.Color) then
                     -- Color is available, let everyone else know
                     gameInfo.PlayerOptions[data.Slot].PlayerColor = data.Color
                     lobbyComm:BroadcastData( { Type = 'SetColor', Color = data.Color, Slot = data.Slot } )
-                    UpdateGame()
+                    SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
                 else
-                -- Sorry, it's not free. Force the player back to the color we have for him.
+                    -- Sorry, it's not free. Force the player back to the color we have for him.
                     lobbyComm:SendData( data.SenderID, { Type = 'SetColor', Color =
                     gameInfo.PlayerOptions[data.Slot].PlayerColor, Slot = data.Slot } )
                 end
@@ -4641,10 +4651,9 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 ClearSlotInfo(data.OldSlot)
                 UpdateGame()
             elseif data.Type == 'SetColor' then
-                data.Color = Get_IndexColor_by_CompleteTable(data.Color)
                 gameInfo.PlayerOptions[data.Slot].PlayerColor = data.Color
                 gameInfo.PlayerOptions[data.Slot].ArmyColor = data.Color
-                UpdateGame()
+                SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
             elseif data.Type == 'GameInfo' then
                 -- Note: this nukes whatever options I may have set locally
                 gameInfo = data.GameInfo
@@ -6680,10 +6689,6 @@ function SAVE_PRESET_IN_PREF() -- GET OPTIONS ON LOBBY AND SAVE TO PRESET
     --LOG('> Num mods : '..nummods)
 end
 
--- Show only available colours.
-
--- Get the true Index Color --
-
 -- Find the key for the given value in a table.
 -- Nil keys are not supported.
 function indexOf(table, needle)
@@ -6695,98 +6700,31 @@ function indexOf(table, needle)
     return nil
 end
 
-function Get_IndexColor_by_AvailableTable(index_limit, slot)
-    for k, v in BASE_ALL_Color do
-        if v == Avail_Color[slot][index_limit] then
-            return k
-        end
-    end
-    return index_limit
-end
+-- Update the combobox for the given slot so it correctly shows the set of available colours.
+-- causes availableColours[slot] to be repopulated.
+function Check_Availaible_Color(slot)
+    availableColours[slot] = {}
 
-function Get_IndexColor_by_CompleteTable(index_limit, slot)
-    for k, v in Avail_Color[slot] do
-        if v == BASE_ALL_Color[index_limit] then
-            return k
-        end
-    end
-    return index_limit
-end
-
--- Create the Available Color Table and Recreate the ComboBox --
-function Check_Availaible_Color(self, slot)
-    local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo
-    --
-    Avail_Color[slot] = {}
-    local num = 0
-    --// CHECK COLOR ALREADY USED AND RECREATE TABLE WITH COLOR AVAILAIBLE ONLY \\
-    for k, v in BASE_ALL_Color do
+    -- For each possible colour, scan the slots to try and find it and, if unsuccessful, add it to
+    -- the available coloiur set.
+    for k, v in allColours do
         local found = false
         for ii = 1, LobbyComm.maxPlayerSlots do
-            if gameInfo.PlayerOptions[ii].PlayerColor then
-                if slot ~= ii then
-                    if gameInfo.PlayerOptions[ii].PlayerColor == k then
-                        found = true
-                        break
-                    end
+            if slot ~= ii then
+                if gameInfo.PlayerOptions[ii].PlayerColor == k then
+                    found = true
+                    break
                 end
             end
         end
         
-        if found ~= true then
-            num = num + 1
-            Avail_Color[slot][num] = BASE_ALL_Color[k]
+        if not found then
+            availableColours[slot][k] = allColours[k]
         end
-        
     end
     --
-    if num == 0 then
-        return
-    end
-    --
-    local yy = Get_IndexColor_by_CompleteTable(gameInfo.PlayerOptions[slot].PlayerColor, slot)
-    --
-    GUI.slots[slot].color:Destroy()
-    -- TODO: There should be no need to rebuild the whole UI control here.
-    GUI.slots[slot].color = BitmapCombo(GUI.slots[slot], Avail_Color[slot], yy, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
-    LayoutHelpers.AtLeftIn(GUI.slots[slot].color, GUI.panel, (161+264)+11)
-    LayoutHelpers.AtVerticalCenterIn(GUI.slots[slot].color, GUI.slots[slot], 9)
-    GUI.slots[slot].color.Width:Set(59)
-    GUI.slots[slot].color.row = slot
-    --
-    GUI.slots[slot].color.OnClick = function(self, index)
-        local indexx = Get_IndexColor_by_AvailableTable(index, slot)
-        --
-        Tooltip.DestroyMouseoverDisplay()
-        if not lobbyComm:IsHost() then
-            lobbyComm:SendData(hostID, { Type = 'RequestColor', Color = indexx, Slot = self.row } )
-            gameInfo.PlayerOptions[self.row].PlayerColor = indexx
-            gameInfo.PlayerOptions[self.row].ArmyColor = indexx
-            UpdateGame()
-        else
-            if IsColorFree(indexx) then
-                lobbyComm:BroadcastData( { Type = 'SetColor', Color = indexx, Slot = self.row } )
-                gameInfo.PlayerOptions[self.row].PlayerColor = indexx
-                gameInfo.PlayerOptions[self.row].ArmyColor = indexx
-                UpdateGame()
-            else
-                self:SetItem( gameInfo.PlayerOptions[self.row].PlayerColor )
-            end
-        end
-    end 
-    GUI.slots[slot].color.OnEvent = GUI.slots[slot].name.OnEvent
-    Tooltip.AddControlTooltip(GUI.slots[slot].color, 'lob_color')
-    GUI.slots[slot].color.row = slot
-	--
-	if IsLocallyOwned(slot) then
-		if gameInfo.PlayerOptions[slot]['Ready'] then
-			GUI.slots[slot].color:Disable()
-		else
-			GUI.slots[slot].color:Enable()
-		end
-	else
-		GUI.slots[slot].color:Disable()
-	end
+    GUI.slots[slot].color:ChangeBitmapArray(availableColours[slot], true)
+    GUI.slots[slot].color:SetItem(gameInfo.PlayerOptions[slot].PlayerColor)
 end
 
 -- Changelog dialog
