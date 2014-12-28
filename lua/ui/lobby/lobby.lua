@@ -46,8 +46,8 @@ local numOpenSlots = LobbyComm.maxPlayerSlots
 -- Maps faction identifiers to their names.
 local FACTION_NAMES = {[1] = "uef", [2] = "aeon", [3] = "cybran", [4] = "seraphim", [5] = "random"}
 
-formattedOptions = {''}
-FormOpt2 = {''}
+local formattedOptions = {}
+local nonDefaultFormattedOptions = {}
 local Warning_MAP = false
 
 local teamIcons = {
@@ -61,7 +61,7 @@ local teamIcons = {
 }
 
 DebugEnabled = Prefs.GetFromCurrentProfile('LobbyDebug') or ''
-HideDefaultOptions = 0
+local HideDefaultOptions = Prefs.GetFromCurrentProfile('LobbyHideDefaultOptions') == 'true'
 function LOGX(text, ttype)
 	-- onlyChat = for debug only in the Chat
 	-- onlyLOG = for debug only in the LOG
@@ -2794,29 +2794,11 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtLeftIn(cbox_ShowChangedOption_TEXT, cbox_ShowChangedOption, 25)
     LayoutHelpers.AtVerticalCenterIn(cbox_ShowChangedOption_TEXT, cbox_ShowChangedOption)
     cbox_ShowChangedOption.OnCheck = function(self, checked)
-        if checked then
-            HideDefaultOptions = 1
-            RefreshOptionDisplayData()
-            if GUI.OptionContainer.CalcVisible then
-                GUI.OptionContainer:CalcVisible()
-            end
-            GUI.OptionContainer.ScrollSetTop(GUI.OptionContainer, 'Vert', 0)
-            Prefs.SetToCurrentProfile('LobbyHideDefaultOptions', 'true')
-        else
-            HideDefaultOptions = 0
-            RefreshOptionDisplayData()
-            if GUI.OptionContainer.CalcVisible then
-                GUI.OptionContainer:CalcVisible()
-            end
-            GUI.OptionContainer.ScrollSetTop(GUI.OptionContainer, 'Vert', 0)
-            Prefs.SetToCurrentProfile('LobbyHideDefaultOptions', 'false')
-        end
+        HideDefaultOptions = checked
+        RefreshOptionDisplayData()
+        GUI.OptionContainer.ScrollSetTop(GUI.OptionContainer, 'Vert', 0)
+        Prefs.SetToCurrentProfile('LobbyHideDefaultOptions', tostring(checked))
     end
-    local hideDefaultOptions = Prefs.GetFromCurrentProfile('LobbyHideDefaultOptions') or 'false'
-    --if hideDefaultOptions == 'true' then
-        --cbox_ShowChangedOption:SetCheck(true, false) -- BUG, OptionContainer NOT CREATED BEFORE -- isChecked, skipEvent
-    --end
-    -- Checkbox Show changed Options
 
     -- GAME OPTIONS // MODS MANAGER BUTTON --
     if lobbyComm:IsHost() then     -- GAME OPTION
@@ -3019,7 +3001,6 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtLeftTopIn(GUI.OptionContainer, GUI.optionsPanel, 0+4+1, 30-2) -- -24
 
     GUI.OptionDisplay = {}
-    RefreshOptionDisplayData()
 
     function CreateOptionElements()
         local function CreateElement(index)
@@ -3074,10 +3055,10 @@ function CreateUI(maxPlayers)
     local numLines = function() return table.getsize(GUI.OptionDisplay) end
 
     local function DataSize()
-        if HideDefaultOptions == 0 then
+        if HideDefaultOptions then
+            return table.getn(nonDefaultFormattedOptions)
+        else
             return table.getn(formattedOptions)
-        elseif HideDefaultOptions == 1 then
-            return table.getn(FormOpt2)
         end
     end
 
@@ -3118,21 +3099,13 @@ function CreateUI(maxPlayers)
     GUI.OptionContainer.CalcVisible = function(self)
         local function SetTextLine(line, data, lineID)
             if data.mod then
+                -- The special label at the top stating the number of mods.
                 line.text:SetColor('ffff7777')
                 LayoutHelpers.AtHorizontalCenterIn(line.text, line, 5)
                 LayoutHelpers.AtHorizontalCenterIn(line.value, line, 5, 16)
                 LayoutHelpers.ResetRight(line.value)
-            elseif data.red then
-                line.text:SetColor('ff7777')
-                LayoutHelpers.AtHorizontalCenterIn(line.text, line, 5)
-                LayoutHelpers.AtHorizontalCenterIn(line.value, line, 5, 16)
-                LayoutHelpers.ResetRight(line.value)
-            elseif data.green then
-                line.text:SetColor('77ff77')
-                LayoutHelpers.AtHorizontalCenterIn(line.text, line, 5)
-                LayoutHelpers.AtHorizontalCenterIn(line.value, line, 5, 16)
-                LayoutHelpers.ResetRight(line.value)
             else
+                -- Game options.
                 line.text:SetColor(UIUtil.fontColor)
                 LayoutHelpers.AtLeftTopIn(line.text, line, 5)
                 LayoutHelpers.AtRightTopIn(line.value, line, 5, 16)
@@ -3150,30 +3123,24 @@ function CreateUI(maxPlayers)
             end
         end
 
+        local optionsToUse
+        if HideDefaultOptions then
+            optionsToUse = nonDefaultFormattedOptions
+        else
+            optionsToUse = formattedOptions
+        end
+
         for i, v in GUI.OptionDisplay do
-            if HideDefaultOptions == 0 then
-                if formattedOptions[i + self.top] then
-                    SetTextLine(v, formattedOptions[i + self.top], i + self.top)
-                else
-                    v.text:SetText('')
-                    v.value:SetText('')
-                    v.value.bg:Hide()
-                    v.value.bg2:Hide()
-                end
-            elseif HideDefaultOptions == 1 then
-                if FormOpt2[i + self.top] then
-                    SetTextLine(v, FormOpt2[i + self.top], i + self.top)
-                else
-                    v.text:SetText('')
-                    v.value:SetText('')
-                    v.value.bg:Hide()
-                    v.value.bg2:Hide()
-                end
+            if optionsToUse[i + self.top] then
+                SetTextLine(v, optionsToUse[i + self.top], i + self.top)
+            else
+                v.text:SetText('')
+                v.value:SetText('')
+                v.value.bg:Hide()
+                v.value.bg2:Hide()
             end
         end
     end
-
-    GUI.OptionContainer:CalcVisible()
 
     GUI.OptionContainer.HandleEvent = function(self, event)
         if event.Type == 'WheelRotation' then
@@ -3184,6 +3151,8 @@ function CreateUI(maxPlayers)
             self:ScrollLines(nil, lines)
         end
     end
+
+    RefreshOptionDisplayData()
 
     UIUtil.CreateLobbyVertScrollbar(GUI.OptionContainer, 1, nil, -9, -24)
 
@@ -3220,9 +3189,7 @@ function CreateUI(maxPlayers)
     ---------------------------------------------------------------------------
     -- Checkbox Show changed Options
     ---------------------------------------------------------------------------
-    if hideDefaultOptions == 'true' then
-        cbox_ShowChangedOption:SetCheck(true, false)
-    end
+    cbox_ShowChangedOption:SetCheck(HideDefaultOptions, false)
 
     ---------------------------------------------------------------------------
     -- Faction Selector
@@ -3945,7 +3912,7 @@ function RefreshOptionDisplayData(scenarioInfo)
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
     end
     formattedOptions = {}
-    FormOpt2 = {}
+    nonDefaultFormattedOptions = {}
 
     --// Check Mod active
     local modStr = false
@@ -3974,156 +3941,108 @@ function RefreshOptionDisplayData(scenarioInfo)
         end
     end
     if modStr then
-        table.insert(formattedOptions,
-            {
-                text = modStr,
-                value = LOC('<LOC lobby_0003>Check Mod Manager'),
-                mod = true,
-                tooltip = 'Lobby_Mod_Option',
-                valueTooltip = 'Lobby_Mod_Option'
-            })
-        table.insert(FormOpt2,
-            {
-                text = modStr,
-                value = LOC('<LOC lobby_0003>Check Mod Manager'),
-                mod = true,
-                tooltip = 'Lobby_Mod_Option',
-                valueTooltip = 'Lobby_Mod_Option'
-            })
+        local option = {
+            text = modStr,
+            value = LOC('<LOC lobby_0003>Check Mod Manager'),
+            mod = true,
+            tooltip = 'Lobby_Mod_Option',
+            valueTooltip = 'Lobby_Mod_Option'
+        }
+
+        table.insert(formattedOptions, option)
+        table.insert(nonDefaultFormattedOptions, option)
     end
     --\\ Stop Check Mod active
 
-    --// Check RestrictedUnit active
+    -- Update the unit restrictions display.
     if gameInfo.GameOptions.RestrictedCategories ~= nil then
         local restrNum = table.getn(gameInfo.GameOptions.RestrictedCategories)
         if restrNum ~= 0 then
+            -- TODO: Localise label.
+            local restrictLabel
             if restrNum == 1 then -- just 1
-                table.insert(formattedOptions,
-                    {
-                        text = restrNum.." Build Restriction",
-                        value = "Check Unit Manager",
-                        mod = true,
-                        tooltip = 'Lobby_BuildRestrict_Option',
-                        valueTooltip = 'Lobby_BuildRestrict_Option'
-                    })
-                table.insert(FormOpt2,
-                    {
-                        text = restrNum.." Build Restriction",
-                        value = "Check Unit Manager",
-                        mod = true,
-                        tooltip = 'Lobby_BuildRestrict_Option',
-                        valueTooltip = 'Lobby_BuildRestrict_Option'
-                    })
-            else -- 2 or more
-                table.insert(formattedOptions,
-                    {
-                        text = restrNum.." Builds Restrictions",
-                        value = "Check Unit Manager",
-                        mod = true,
-                        tooltip = 'Lobby_BuildRestrict_Option',
-                        valueTooltip = 'Lobby_BuildRestrict_Option'
-                    })
-                table.insert(FormOpt2,
-                    {
-                        text = restrNum.." Builds Restrictions",
-                        value = "Check Unit Manager",
-                        mod = true,
-                        tooltip = 'Lobby_BuildRestrict_Option',
-                        valueTooltip = 'Lobby_BuildRestrict_Option'
-                    })
+                restrictLabel = "1 Build Restriction"
+            else
+                restrictLabel = restrNum.." Build Restrictions"
             end
-        end
-    end
-    --\\ Stop Check RestrictedUnit active
 
-    --// Check other options active
-    for index, optData in globalOpts do -- Force add Option, if exist in gameInfo.GameOptions, else if a default
-        local FIND = false
-        if gameInfo.GameOptions[optData.key] then
-            FIND = true
-        end
-        option = {}
-        mpOnly = optData.mponly or false
-        option.text = optData.label
-        option.tooltip = {text = optData.label, body = optData.help}
-        for _, val in optData.values do
-            if FIND and tostring(val.key) == tostring(gameInfo.GameOptions[optData.key]) then
-                option.value = val.text
-                option.valueTooltip = {text = optData.label, body = val.help}
-                if optData.default and tostring(_) ~= tostring(optData.default) then
-                    table.insert(FormOpt2, option)
-                end
-                if not mpOnly then--or not singlePlayer then
-                    table.insert(formattedOptions, option)
-                end
-                break -- Need exit loop for prevent duplicate table.insert if scenario.option have two subOption with equal Key
-            elseif not FIND and tostring(_) == tostring(optData.default) then
-                option.value = val.text
-                option.valueTooltip = {text = optData.label, body = val.help}
-                if optData.default and tostring(_) ~= tostring(optData.default) then
-                    table.insert(FormOpt2, option)
-                end
-                if not mpOnly or not singlePlayer then
-                    table.insert(formattedOptions, option)
-                end
-                break -- Need exit loop for prevent duplicate table.insert if scenario.option have two subOption with equal Key
-            end
+            local option = {
+                text = restrictLabel,
+                value = "Check Unit Manager",
+                mod = true,
+                tooltip = 'Lobby_BuildRestrict_Option',
+                valueTooltip = 'Lobby_BuildRestrict_Option'
+            }
+
+            table.insert(formattedOptions, option)
+            table.insert(nonDefaultFormattedOptions, option)
         end
     end
-    -----------------------------------------------------------------
-    if scenarioInfo.options then -- Force add Option
-        for index, optData in scenarioInfo.options do -- Force add Option, if exist in gameInfo.GameOptions, else if a default
-            local FIND = false
-            if gameInfo.GameOptions[optData.key] then
-                FIND = true
-            end
-            option = {}
-            mpOnly = optData.mponly or false
-            option.text = optData.label
-            option.tooltip = {text = optData.label, body = optData.help}
-            if not Warning_MAP and (optData.default == 0 or optData.default > table.getsize(optData.values)) then -- THE MAP OPTIONS IS NOT RESPECTED
-                Warning_MAP = true
-                AddChatText('The options included in this map are not compliant.')
-                AddChatText('Please contact the author of the map or Xinnony.')
-            end
-            for _, val in optData.values do
-                if FIND and tostring(val.key) == tostring(gameInfo.GameOptions[optData.key]) then
+
+    -- Add an option to the formattedOption lists
+    local function addFormattedOption(optData, gameOption)
+        -- Don't show multiplayer-only options in single-player
+        if optData.mponly and singlePlayer then
+            return
+        end
+
+        -- Verify that the map contains sane defaults.
+        if not Warning_MAP and (optData.default == 0 or optData.default > table.getsize(optData.values)) then
+            Warning_MAP = true
+            AddChatText('The options included in this map are not compliant.')
+            AddChatText('Please contact the author of the map.')
+        end
+
+        local option = {
+            text = optData.label,
+            tooltip = { text = optData.label, body = optData.help }
+        }
+
+        -- Options are stored as keys from values array in optData. We want to display the
+        -- descriptive string in the UI, so let's go dig it out.
+
+        -- If the is value is unset, it is definitely its default so we directly lookup what we want.
+        if not gameOption then
+            local val = optData.values[optData.default]
+
+            option.value = val.text
+            option.valueTooltip = {text = optData.label, body = val.help }
+
+            table.insert(formattedOptions, option)
+        else
+            -- Scan the values array to find the one with the key matching our value for that option.
+            for k, val in optData.values do
+                if val.key == gameOption then
                     option.value = val.text
-                    option.valueTooltip = {text = optData.label, body = val.help}
-                    if optData.default and tostring(_) ~= tostring(optData.default) then
-                        table.insert(FormOpt2, option)
+                    option.valueTooltip = {text = optData.label, body = val.help }
+
+                    table.insert(formattedOptions, option)
+
+                    -- Add this option to the non-default set for the UI.
+                    if k ~= optData.default then
+                        table.insert(nonDefaultFormattedOptions, option)
                     end
-                    if not mpOnly then--or not singlePlayer then
-                        table.insert(formattedOptions, option)
-                    end
-                    break -- Need exit loop for prevent duplicate table.insert if scenario.option have two subOption with equal Key
-                elseif not FIND and tostring(_) == tostring(optData.default) then
-                    option.value = val.text
-                    option.valueTooltip = {text = optData.label, body = val.help}
-                    if optData.default and tostring(_) ~= tostring(optData.default) then
-                        table.insert(FormOpt2, option)
-                    end
-                    if not mpOnly or not singlePlayer then
-                        table.insert(formattedOptions, option)
-                    end
-                    break -- Need exit loop for prevent duplicate table.insert if scenario.option have two subOption with equal Key
+
+                    break
                 end
             end
         end
     end
-    -----------------------------------------------------------------
-    -- Disable before separate AI option on GlobalOption, but the order can set on lobbyOptions.lua
-    --    table.sort(formattedOptions,
-    --        function(a, b)
-    --            if a.mod or b.mod then
-    --                return a.mod or false
-    --            else
-    --                return LOC(a.text) < LOC(b.text)
-    --            end
-    --        end)
-    if GUI.OptionContainer.CalcVisible then
-        GUI.OptionContainer:CalcVisible()
+
+    -- Add options from globalOpts to the formattedOption lists.
+    for index, optData in globalOpts do
+        local gameOption = gameInfo.GameOptions[optData.key]
+        addFormattedOption(optData, gameOption)
     end
+
+    -- Add options from the scenario object, if any are provided.
+    if scenarioInfo.options then
+        for index, optData in scenarioInfo.options do
+            addFormattedOption(optData, gameInfo.GameOptions[optData.key])
+        end
+    end
+
+    GUI.OptionContainer:CalcVisible()
 end
 
 function wasConnected(peer)
