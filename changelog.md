@@ -44,6 +44,8 @@ Changelog for patch 3638
 
 - Added christmas presents for reclaim
 
+Big thanks to ozonex for this contribution!
+
 Changelog for hotfix-patch 3637
 -------------------------------
 
