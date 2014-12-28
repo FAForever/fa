@@ -14,6 +14,7 @@ local MenuCommon = import('/lua/ui/menus/menucommon.lua')
 local Prefs = import('/lua/user/prefs.lua')
 local MapUtil = import('/lua/ui/maputil.lua')
 local Group = import('/lua/maui/group.lua').Group
+local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
@@ -1889,12 +1890,9 @@ local function UpdateGame()
         UIUtil.setEnabled(GUI.launchGameButton, not playerNotReady)
         UIUtil.setEnabled(GUI.randMap, quickRandMap)
     end
+
     GUI.allowObservers:SetCheck(gameInfo.GameOptions.AllowObservers, true)
 
-    if LrgMap then
-        scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-        CreateBigPreview(501, GUI.mapPanel)
-    end
     RefreshOptionDisplayData(scenarioInfo)
     -- Send autoteams infos to server.
     AssignRandomTeams(gameInfo)
@@ -2758,7 +2756,7 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtBottomIn(GUI.LargeMapPreview, GUI.mapView, -3)
     Tooltip.AddButtonTooltip(GUI.LargeMapPreview, 'lob_click_LargeMapPreview')
     GUI.LargeMapPreview.OnClick = function()
-        CreateBigPreview(501, GUI.mapPanel)
+        CreateBigPreview(501, GUI)
     end
 
     -- Checkbox Show changed Options
@@ -4919,52 +4917,60 @@ function DebugDump()
     end
 end
 
-
--------------------------------------------------------  Big Map Preview  ------------------------------------------------------
-------------------------------------------------------- (Code by ThaPear) ------------------------------------------------------
-
-LrgMap = false
+local LrgMap = false
 function CreateBigPreview(depth, parent)
-    local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
+    -- Size of the border image around the large map.
+    local MAP_PREVIEW_BORDER_SIZE = 754
 
-    if LrgMap then
-        CloseBigPreview()
-    end
-    LrgMap = MapPreview(parent)
-    LrgMap.OnDestroy = function(self) LrgMap = false end
-    LrgMap.Width:Set(710)
-    LrgMap.Height:Set(710)
+    -- Size of the actual map preview to generate.
+    local MAP_PREVIEW_SIZE = 713
+
+    -- The size of the mass/hydrocarbon icons
+    local HYDROCARBON_ICON_SIZE = 14
+    local MASS_ICON_SIZE = 10
+
+    LrgMap = Group(parent)
+    LrgMap.Width:Set(MAP_PREVIEW_BORDER_SIZE)
+    LrgMap.Height:Set(MAP_PREVIEW_BORDER_SIZE)
+
+    -- Center the map group on the screen
+    LayoutHelpers.AtHorizontalCenterIn(LrgMap, parent)
+    LayoutHelpers.AtVerticalCenterIn(LrgMap, parent)
+
     LrgMap.Depth:Set(depth)
-    LrgMap:Show() -- for accessibility from mapselect.lua
-    LrgMap.Overlay = Bitmap(LrgMap, UIUtil.SkinnableFile("/lobby/lan-game-lobby/map-pane-border_bmp.dds"))
-    LrgMap.Overlay.Height:Set(830)
-    LrgMap.Overlay.Width:Set(830)
 
-    LrgMap.Top:Set(function() return GetFrame(0).Height()/2-LrgMap.Overlay.Height()/2 + 60 end)
-    LrgMap.Left:Set(function() return GetFrame(0).Width()/2-LrgMap.Overlay.Width()/2 + 60 end)
-    LrgMap.Overlay.Top:Set(function() return LrgMap.Top() - 60 end)
-    LrgMap.Overlay.Left:Set(function() return LrgMap.Left() - 60 end)
+    -- Create the map preview
+    local mapPreview = MapPreview(LrgMap)
+    mapPreview.Width:Set(MAP_PREVIEW_SIZE)
+    mapPreview.Height:Set(MAP_PREVIEW_SIZE)
+    LayoutHelpers.AtLeftTopIn(mapPreview, LrgMap, 19, 20)
 
-    LrgMap.Overlay.Depth:Set(function() return LrgMap.Depth()+1 end)
+    -- Place the border inside the group at the origin.
+    local border = Bitmap(LrgMap, UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/map-pane-border-large.png"))
+    LayoutHelpers.AtLeftTopIn(border, LrgMap)
+    LayoutHelpers.DepthOverParent(border, mapPreview, 1)
 
-    LrgMap.CloseBtn = UIUtil.CreateButtonStd(LrgMap, '/dialogs/close_btn/close', "", 12, 2, 0, "UI_Tab_Click_01",
+    local closeBtn = UIUtil.CreateButtonStd(LrgMap, '/dialogs/close_btn/close', "", 12, 2, 0, "UI_Tab_Click_01",
     "UI_Tab_Rollover_01")
-    LayoutHelpers.AtRightTopIn(LrgMap.CloseBtn, LrgMap, -15, -10)
-    LrgMap.CloseBtn.Depth:Set(function() return LrgMap.Overlay.Depth()+1 end)
-    LrgMap.CloseBtn.OnClick = function()
+    LayoutHelpers.AtRightTopIn(closeBtn, LrgMap, 20, 17)
+    closeBtn.OnClick = function()
         CloseBigPreview()
     end
 
-    scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+    -- Keep the close button on top of the border (which is itself on top of the map preview)
+    LayoutHelpers.DepthOverParent(closeBtn, border, 1)
+
+    -- Load the mass/hydrocarbon points and put them on the map.
+    local scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
     if scenarioInfo and scenarioInfo.map and (scenarioInfo.map ~= '') then
-        if not LrgMap:SetTexture(scenarioInfo.preview) then
-            LrgMap:SetTextureFromMap(scenarioInfo.map)
+        if not mapPreview:SetTexture(scenarioInfo.preview) then
+            mapPreview:SetTextureFromMap(scenarioInfo.map)
         end
     end
 
     local mapdata = {}
     doscript('/lua/dataInit.lua', mapdata) -- needed for the format of _save files
-    doscript(scenarioInfo.save, mapdata) -- ...
+    doscript(scenarioInfo.save, mapdata)
 
     local allmarkers = mapdata.Scenario.MasterChain['_MASTERCHAIN_'].Markers -- get the markers from the save file
     local massmarkers = {}
@@ -4978,49 +4984,45 @@ function CreateBigPreview(depth, parent)
         end
     end
 
-    LrgMap.massmarkers = {}
+    -- Add the mass points.
+    local masses = {}
     for i = 1, table.getn(massmarkers) do
-        LrgMap.massmarkers[i] = Bitmap(LrgMap, UIUtil.SkinnableFile("/game/build-ui/icon-mass_bmp.dds"))
-        LrgMap.massmarkers[i].Width:Set(10)
-        LrgMap.massmarkers[i].Height:Set(10)
-        LrgMap.massmarkers[i].Left:Set(LrgMap.Left() + massmarkers[i].position[1]/scenarioInfo.size[1]*LrgMap.Width() -
-        LrgMap.massmarkers[i].Width()/2)
-        LrgMap.massmarkers[i].Top:Set(LrgMap.Top() + massmarkers[i].position[3]/scenarioInfo.size[2]*LrgMap.Height() -
-        LrgMap.massmarkers[i].Height()/2)
+        masses[i] = Bitmap(mapPreview, UIUtil.SkinnableFile("/game/build-ui/icon-mass_bmp.dds"))
+        masses[i].Width:Set(MASS_ICON_SIZE)
+        masses[i].Height:Set(MASS_ICON_SIZE)
+
+        LayoutHelpers.AtLeftTopIn(masses[i], mapPreview,
+            massmarkers[i].position[1] / scenarioInfo.size[1] * MAP_PREVIEW_SIZE - MASS_ICON_SIZE / 2,
+            massmarkers[i].position[3] / scenarioInfo.size[2] * MAP_PREVIEW_SIZE - MASS_ICON_SIZE / 2)
     end
-    LrgMap.hydros = {}
+    mapPreview.massmarkers = masses
+
+    -- Add the hydrocarbon points.
+    local hydros = {}
     for i = 1, table.getn(hydromarkers) do
-        LrgMap.hydros[i] = Bitmap(LrgMap, UIUtil.SkinnableFile("/game/build-ui/icon-energy_bmp.dds"))
-        LrgMap.hydros[i].Width:Set(14)
-        LrgMap.hydros[i].Height:Set(14)
-        LrgMap.hydros[i].Left:Set(LrgMap.Left() + hydromarkers[i].position[1]/scenarioInfo.size[1]*LrgMap.Width() -
-        LrgMap.hydros[i].Width()/2)
-        LrgMap.hydros[i].Top:Set(LrgMap.Top() + hydromarkers[i].position[3]/scenarioInfo.size[2]*LrgMap.Height() -
-        LrgMap.hydros[i].Height()/2)
+        hydros[i] = Bitmap(mapPreview, UIUtil.SkinnableFile("/game/build-ui/icon-energy_bmp.dds"))
+        hydros[i].Width:Set(HYDROCARBON_ICON_SIZE)
+        hydros[i].Height:Set(HYDROCARBON_ICON_SIZE)
+
+        LayoutHelpers.AtLeftTopIn(hydros[i], mapPreview,
+            hydromarkers[i].position[1] / scenarioInfo.size[1] * MAP_PREVIEW_SIZE - HYDROCARBON_ICON_SIZE / 2,
+            hydromarkers[i].position[3] / scenarioInfo.size[2]*  MAP_PREVIEW_SIZE - HYDROCARBON_ICON_SIZE / 2)
     end
+    mapPreview.hydros = hydros
 
     -- start positions
-    LrgMap.markers = {}
-    NewShowMapPositions(LrgMap,scenarioInfo,GetPlayerCount())
-end -- CreateBigPreview(...)
+    mapPreview.markers = {}
+    -- TODO: DIE DIE DIE.
+    NewShowMapPositions(mapPreview, scenarioInfo, GetPlayerCount())
+end
 
 function CloseBigPreview()
-    if LrgMap then
-        LrgMap.CloseBtn:Destroy()
-        LrgMap.Overlay:Destroy()
-        for i = 1, table.getn(LrgMap.massmarkers) do
-            LrgMap.massmarkers[i]:Destroy()
-        end
-        for i = 1, table.getn(LrgMap.hydros) do
-            LrgMap.hydros[i]:Destroy()
-        end
-        LrgMap:Destroy()
-        LrgMap = false
-    end
-end -- CloseBigPreview()
+    LrgMap:Hide()
+end
 
 local posGroup = false
 -- copied from the old lobby.lua, needed to change GUI. into LrgMap. for a separately handled set of markers
+-- TODO: We have these things called "function parameters".
 function NewShowMapPositions(mapCtrl, scenario, numPlayers)
     if scenario.starts == nil then scenario.starts = true end
 
@@ -5029,8 +5031,8 @@ function NewShowMapPositions(mapCtrl, scenario, numPlayers)
         posGroup = false
     end
 
-    if LrgMap.markers and table.getn(LrgMap.markers) > 0 then
-        for i, v in LrgMap.markers do
+    if mapCtrl.markers and table.getn(mapCtrl.markers) > 0 then
+        for i, v in mapCtrl.markers do
             v.marker:Destroy()
         end
     end
@@ -5053,26 +5055,24 @@ function NewShowMapPositions(mapCtrl, scenario, numPlayers)
     for inSlot, army in playerArmyArray do
         local pos = startPos[army]
         local slot = inSlot
-        LrgMap.markers[slot] = {}
-        LrgMap.markers[slot].marker = Bitmap(posGroup)
-        LrgMap.markers[slot].marker.Height:Set(10)
-        LrgMap.markers[slot].marker.Width:Set(8)
-        LrgMap.markers[slot].marker.Depth:Set(function() return posGroup.Depth() + 10 end)
-        LrgMap.markers[slot].marker:SetSolidColor('00777777')
+        mapCtrl.markers[slot] = {}
+        mapCtrl.markers[slot].marker = Bitmap(posGroup)
+        mapCtrl.markers[slot].marker.Height:Set(10)
+        mapCtrl.markers[slot].marker.Width:Set(8)
+        mapCtrl.markers[slot].marker.Depth:Set(function() return posGroup.Depth() + 10 end)
+        mapCtrl.markers[slot].marker:SetSolidColor('00777777')
 
-        LrgMap.markers[slot].teamIndicator = Bitmap(LrgMap.markers[slot].marker)
-        LayoutHelpers.AnchorToRight(LrgMap.markers[slot].teamIndicator, LrgMap.markers[slot].marker, 1)
-        LayoutHelpers.AtTopIn(LrgMap.markers[slot].teamIndicator, LrgMap.markers[slot].marker, 5)
-        LrgMap.markers[slot].teamIndicator:DisableHitTest()
+        mapCtrl.markers[slot].teamIndicator = Bitmap(mapCtrl.markers[slot].marker)
+        LayoutHelpers.AnchorToRight(mapCtrl.markers[slot].teamIndicator, mapCtrl.markers[slot].marker, 1)
+        LayoutHelpers.AtTopIn(mapCtrl.markers[slot].teamIndicator, mapCtrl.markers[slot].marker, 5)
+        mapCtrl.markers[slot].teamIndicator:DisableHitTest()
 
-        LrgMap.markers[slot].markerOverlay = Button(LrgMap.markers[slot].marker,
-        UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds'),
-        UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds'),
-        UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds'),
-        UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds'))
-        LayoutHelpers.AtCenterIn(LrgMap.markers[slot].markerOverlay, LrgMap.markers[slot].marker)
-        LrgMap.markers[slot].markerOverlay.Slot = slot
-        LrgMap.markers[slot].markerOverlay.OnClick = function(self, modifiers)
+        local buttonImage = UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds')
+        mapCtrl.markers[slot].markerOverlay = Button(mapCtrl.markers[slot].marker, buttonImage, buttonImage, buttonImage, buttonImage)
+
+        LayoutHelpers.AtCenterIn(mapCtrl.markers[slot].markerOverlay, mapCtrl.markers[slot].marker)
+        mapCtrl.markers[slot].markerOverlay.Slot = slot
+        mapCtrl.markers[slot].markerOverlay.OnClick = function(self, modifiers)
             if modifiers.Left then
                 if FindSlotForID(localPlayerID) ~= self.Slot and gameInfo.PlayerOptions[self.Slot] == nil then
                     if IsPlayer(localPlayerID) then
@@ -5103,32 +5103,32 @@ function NewShowMapPositions(mapCtrl, scenario, numPlayers)
                 end
             end
         end
-        LrgMap.markers[slot].markerOverlay.HandleEvent = function(self, event)
+        mapCtrl.markers[slot].markerOverlay.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then
                 if gameInfo.GameOptions['TeamSpawn'] ~= 'random' then
                     GUI.slots[self.Slot].name.HandleEvent(self, event)
-                    LrgMap.markers[self.Slot].Indicator:Play()
+                    mapCtrl.markers[self.Slot].Indicator:Play()
                 end
             elseif event.Type == 'MouseExit' then
                 GUI.slots[self.Slot].name.HandleEvent(self, event)
-                LrgMap.markers[self.Slot].Indicator:Stop()
+                mapCtrl.markers[self.Slot].Indicator:Stop()
             end
             Button.HandleEvent(self, event)
         end
-        LayoutHelpers.AtLeftTopIn(LrgMap.markers[slot].marker, posGroup,
-        ((pos[1] / mWidth) * cWidth) - (LrgMap.markers[slot].marker.Width() / 2),
-        ((pos[2] / mHeight) * cHeight) - (LrgMap.markers[slot].marker.Height() / 2))
+        LayoutHelpers.AtLeftTopIn(mapCtrl.markers[slot].marker, posGroup,
+        ((pos[1] / mWidth) * cWidth) - (mapCtrl.markers[slot].marker.Width() / 2),
+        ((pos[2] / mHeight) * cHeight) - (mapCtrl.markers[slot].marker.Height() / 2))
 
         local index = slot
-        LrgMap.markers[slot].Indicator = Bitmap(LrgMap.markers[slot].marker,
+        mapCtrl.markers[slot].Indicator = Bitmap(mapCtrl.markers[slot].marker,
         UIUtil.UIFile('/game/beacons/beacon-quantum-gate_btn_up.dds'))
-        LayoutHelpers.AtCenterIn(LrgMap.markers[slot].Indicator, LrgMap.markers[slot].marker)
-        LrgMap.markers[slot].Indicator.Height:Set(function() return LrgMap.markers[index].Indicator.BitmapHeight() * .3 end)
-        LrgMap.markers[slot].Indicator.Width:Set(function() return LrgMap.markers[index].Indicator.BitmapWidth() * .3 end)
-        LrgMap.markers[slot].Indicator.Depth:Set(function() return LrgMap.markers[index].marker.Depth() - 1 end)
-        LrgMap.markers[slot].Indicator:Hide()
-        LrgMap.markers[slot].Indicator:DisableHitTest()
-        LrgMap.markers[slot].Indicator.Play = function(self)
+        LayoutHelpers.AtCenterIn(mapCtrl.markers[slot].Indicator, mapCtrl.markers[slot].marker)
+        mapCtrl.markers[slot].Indicator.Height:Set(function() return mapCtrl.markers[index].Indicator.BitmapHeight() * .3 end)
+        mapCtrl.markers[slot].Indicator.Width:Set(function() return mapCtrl.markers[index].Indicator.BitmapWidth() * .3 end)
+        mapCtrl.markers[slot].Indicator.Depth:Set(function() return mapCtrl.markers[index].marker.Depth() - 1 end)
+        mapCtrl.markers[slot].Indicator:Hide()
+        mapCtrl.markers[slot].Indicator:DisableHitTest()
+        mapCtrl.markers[slot].Indicator.Play = function(self)
             self:SetAlpha(1)
             self:Show()
             self:SetNeedsFrameUpdate(true)
@@ -5138,34 +5138,34 @@ function NewShowMapPositions(mapCtrl, scenario, numPlayers)
                 control:SetAlpha(MATH_Lerp(math.sin(control.time), -.5, .5, 0.3, 0.5))
             end
         end
-        LrgMap.markers[slot].Indicator.Stop = function(self)
+        mapCtrl.markers[slot].Indicator.Stop = function(self)
             self:SetAlpha(0)
             self:Hide()
             self:SetNeedsFrameUpdate(false)
         end
 
         if gameInfo.GameOptions['TeamSpawn'] == 'random' then
-            LrgMap.markers[slot].marker:SetSolidColor("00777777")
+            mapCtrl.markers[slot].marker:SetSolidColor("00777777")
         else
             if gameInfo.PlayerOptions[slot] then
-                LrgMap.markers[slot].marker:SetSolidColor(gameColors.PlayerColors[gameInfo.PlayerOptions[slot].PlayerColor])
+                mapCtrl.markers[slot].marker:SetSolidColor(gameColors.PlayerColors[gameInfo.PlayerOptions[slot].PlayerColor])
                 if gameInfo.PlayerOptions[slot].Team == 1 then
-                    LrgMap.markers[slot].teamIndicator:SetSolidColor('00000000')
+                    mapCtrl.markers[slot].teamIndicator:SetSolidColor('00000000')
                 else
-                    LrgMap.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[gameInfo.PlayerOptions[slot].Team]))
+                    mapCtrl.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[gameInfo.PlayerOptions[slot].Team]))
                 end
             else
-                LrgMap.markers[slot].marker:SetSolidColor("00777777")
-                LrgMap.markers[slot].teamIndicator:SetSolidColor('00000000')
+                mapCtrl.markers[slot].marker:SetSolidColor("00777777")
+                mapCtrl.markers[slot].teamIndicator:SetSolidColor('00000000')
             end
         end
 
         if gameInfo.ClosedSlots[slot] ~= nil then
-            local textOverlay = Text(LrgMap.markers[slot].markerOverlay)
+            local textOverlay = Text(mapCtrl.markers[slot].markerOverlay)
             textOverlay:SetFont(UIUtil.bodyFont, 14)
             textOverlay:SetColor("Crimson")
             textOverlay:SetText("X")
-            LayoutHelpers.AtCenterIn(textOverlay, LrgMap.markers[slot].markerOverlay)
+            LayoutHelpers.AtCenterIn(textOverlay, mapCtrl.markers[slot].markerOverlay)
         end
     end
 end -- NewShowMapPositions(...)
