@@ -2861,7 +2861,6 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtCenterIn(GUI.launchGameButton, GUI.launchPanel, 20, -345)
     Tooltip.AddButtonTooltip(GUI.launchGameButton, 'Lobby_Launch')
     UIUtil.setVisible(GUI.launchGameButton, lobbyComm:IsHost())
-    GUI.launchGameButton:Hide() -- hide unless we're the game host
     GUI.launchGameButton.OnClick = function(self)
         TryLaunch(false)
     end
