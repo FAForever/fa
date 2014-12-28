@@ -2182,6 +2182,10 @@ Tooltips = {
         title = "<LOC tooltipui0688>No Super-Intel",
         description = "<LOC tooltipui0689>Removes the Aeon Eye of Rhianne and the Cybran Soothsayer"
     },
+    Lobby_presetDescription = {
+        title = "<LOC tooltipui0690>Lobby Presets",
+        description = "<LOC tooltipui0691>Save and load presets for game settings and maps"
+    },
     
     #**********************
     #** Strategic overlay
