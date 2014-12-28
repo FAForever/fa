@@ -2735,6 +2735,8 @@ function CreateUI(maxPlayers)
     -- Checkbox Show changed Options
     local cbox_ShowChangedOption = UIUtil.CreateCheckboxStd(GUI.optionsPanel, '/CHECKBOX/radio')
     LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel, 3, 0)
+    -- TODO: Localise!
+
     Tooltip.AddCheckboxTooltip(cbox_ShowChangedOption, {text='Hide default Options', body='Show only changed Options and Advanced Map Options'})
     local cbox_ShowChangedOption_TEXT = UIUtil.CreateText(cbox_ShowChangedOption, 'Hide default Options', 11, 'Arial', true)
     cbox_ShowChangedOption_TEXT:SetColor('B9BFB9')
