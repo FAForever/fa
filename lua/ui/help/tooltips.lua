@@ -4,7 +4,7 @@
 #**
 #**  Summary  :  Strings and images for the tooltips System
 #**
-#**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 Tooltips = {
@@ -1134,6 +1134,10 @@ Tooltips = {
         title = "<LOC lobui_0523>Ranked Settings",
         description = "<LOC lobui_0524>When clicked, all the main game options will be reset to ranked settings",
     },
+    lob_rerun_benchmark = {
+        title='<LOC lobui_0752>Rerun CPU Benchmark',
+        description='<LOC lobui_0753>Recalculates your CPU rating.'
+    },
     Lobby_Auto_Teams = {
         title = "<LOC lobui_0537>Automatic Teams",
         description = "<LOC lobui_0538>Determine if the game will form the teams automaticly",
@@ -1314,12 +1318,10 @@ Tooltips = {
         title = '<LOC lobui_0750>Rating',
         description = '<LOC lobui_0751>Global ladder rating.',
     },
-    ###New - Start
     map_ai_markers = {
         title = '<LOC lobui_0585>AI Markers',
         description = '<LOC lobui_0586>Select maps with AI Markers.',
     },
-    ###New - End
     
     #**********************
     #** Profile Strings

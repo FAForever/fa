@@ -3250,6 +3250,7 @@ function CreateUI(maxPlayers)
         LayoutHelpers.AtLeftIn(GUI.slots[i].KinderCountry, GUI.slots[i], 2) -- 1
         --\\ Stop COUNTRY
 
+        -- TODO: Factorise this boilerplate.
         --// Rating
         GUI.slots[i].ratingGroup = Group(bg)
         GUI.slots[i].ratingGroup.Width:Set(slotColumnSizes.rating.width)
@@ -3257,9 +3258,11 @@ function CreateUI(maxPlayers)
         LayoutHelpers.AtLeftIn(GUI.slots[i].ratingGroup, GUI.panel, slotColumnSizes.rating.x)
         LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].ratingGroup, GUI.slots[i], 6)
         GUI.slots[i].ratingText = UIUtil.CreateText(GUI.slots[i].ratingGroup, "", 14, 'Arial')--14, UIUtil.bodyFont)
+        GUI.slots[i].ratingText:SetColor('B9BFB9')
+        GUI.slots[i].ratingText:SetDropShadow(true)
         LayoutHelpers.AtBottomIn(GUI.slots[i].ratingText, GUI.slots[i].ratingGroup, 2)
         LayoutHelpers.AtRightIn(GUI.slots[i].ratingText, GUI.slots[i].ratingGroup, 9)
-        GUI.slots[i].tooltiprating = Tooltip.AddControlTooltip(GUI.slots[i].ratingText, '')
+        GUI.slots[i].tooltiprating = Tooltip.AddControlTooltip(GUI.slots[i].ratingText, 'rating')
 
         --// NumGame
         GUI.slots[i].numGamesGroup = Group(bg)
@@ -3267,7 +3270,10 @@ function CreateUI(maxPlayers)
         GUI.slots[i].numGamesGroup.Height:Set(GUI.slots[curRow].Height)
         LayoutHelpers.AtLeftIn(GUI.slots[i].numGamesGroup, GUI.panel, slotColumnSizes.games.x)
         LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].numGamesGroup, GUI.slots[i], 6)
-        GUI.slots[i].numGamesText = UIUtil.CreateText(GUI.slots[i].numGamesGroup, "", 14, 'Arial', true)
+        GUI.slots[i].numGamesText = UIUtil.CreateText(GUI.slots[i].numGamesGroup, "", 14, 'Arial')--14, UIUtil.bodyFont)
+        GUI.slots[i].numGamesText:SetColor('B9BFB9')
+        GUI.slots[i].numGamesText:SetDropShadow(true)
+        Tooltip.AddControlTooltip(GUI.slots[i].numGamesText, 'num_games')
         LayoutHelpers.AtBottomIn(GUI.slots[i].numGamesText, GUI.slots[i].numGamesGroup, 2)
         LayoutHelpers.AtRightIn(GUI.slots[i].numGamesText, GUI.slots[i].numGamesGroup, 9)
 
