@@ -1937,7 +1937,7 @@ local function UpdateGame()
 
     -- Add Tooltip info on Map Name Label
     if GUI.GameQualityLabel and scenarioInfo then
-        local TTips_map_version = scenarioInfo.map_version or "N/A"
+        local TTips_map_version = scenarioInfo.map_version or "1"
         local TTips_army = table.getsize(scenarioInfo.Configurations.standard.teams[1].armies) or "N/A"
         local TTips_sizeX = scenarioInfo.size[1] / 51.2 or "N/A"
         local TTips_sizeY = scenarioInfo.size[2] / 51.2 or "N/A"
