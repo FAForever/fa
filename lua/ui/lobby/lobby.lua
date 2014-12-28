@@ -3172,15 +3172,15 @@ function CreateUI(maxPlayers)
         end
         Tooltip.AddButtonTooltip(GUI.restrictedUnitsButton, 'lob_RestrictedUnitsClient')
     elseif lobbyComm:IsHost() then
-        GUI.restrictedUnitsButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Lobby Presets", 0)
-        GUI.restrictedUnitsButton.label:SetColor('B9BFB9')
-        GUI.restrictedUnitsButton.label:SetDropShadow(true)
-        LayoutHelpers.AtHorizontalCenterIn(GUI.restrictedUnitsButton, GUI.gameoptionsButton)
-        LayoutHelpers.AtVerticalCenterIn(GUI.restrictedUnitsButton, GUI.exitButton)
-        GUI.restrictedUnitsButton.OnClick = function(self, modifiers)
+        GUI.lobbyPresets = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Lobby Presets", 0)
+        GUI.lobbyPresets.label:SetColor('B9BFB9')
+        GUI.lobbyPresets.label:SetDropShadow(true)
+        LayoutHelpers.AtHorizontalCenterIn(GUI.lobbyPresets, GUI.gameoptionsButton)
+        LayoutHelpers.AtVerticalCenterIn(GUI.lobbyPresets, GUI.exitButton)
+        GUI.lobbyPresets.OnClick = function(self, modifiers)
             GUI_PRESET()
         end
-        Tooltip.AddButtonTooltip(GUI.restrictedUnitsButton, 'Load and Save Lobby Presets')
+        Tooltip.AddButtonTooltip(GUI.lobbyPresets, 'Lobby_presetDescription')
     end
 
     ---------------------------------------------------------------------------
