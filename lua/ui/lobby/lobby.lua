@@ -855,7 +855,7 @@ function SetSlotInfo(slot, playerInfo)
         Prefs.SetToCurrentProfile('LastFaction', playerInfo.Faction)
     end
 
-    --// Show the Country Flag in slot
+    -- Show the player's nationality
     if playerInfo.Country == nil or playerInfo.Country == '' then
         GUI.slots[slot].KinderCountry:Hide()
     else
@@ -864,11 +864,9 @@ function SetSlotInfo(slot, playerInfo)
         Country_GetTooltipValue(playerInfo.Country, slot)
         Country_AddControlTooltip(GUI.slots[slot].KinderCountry, 0, slot)
     end
-    --\\ Stop - Show the Country Flag in slot
-
-    --CPU Benchmark code
-    SetSlotCPUBar(slot, playerInfo) --Update the slot CPU bar
-    --End CPU Benchmark code
+    
+    -- Set the CPU bar
+    SetSlotCPUBar(slot, playerInfo)
 end
 
 function ClearSlotInfo(slot)
@@ -5423,18 +5421,10 @@ end
 
 function Country_GetTooltipValue(CountryResult, slot)
     local CountryOverrideTooltip = import('/lua/ui/help/tooltips-country.lua').tooltip
-    local CountryOverrideTooltipSpecial = import('/lua/ui/help/tooltips-country.lua').tooltipSpecial
     local find = 0
     for index, option in CountryOverrideTooltip do
         if option.value == CountryResult and find == 0 then
-            PrefLanguageTooltipTitle[slot] = option.title
-            PrefLanguageTooltipText[slot] = option.text
-            find = 1
-        end
-    end
-    for index, option in CountryOverrideTooltipSpecial do
-        if option.value == CountryResult and find == 0 then
-            PrefLanguageTooltipTitle[slot] = option.title
+            PrefLanguageTooltipTitle[slot] = option.title or "Country"
             PrefLanguageTooltipText[slot] = option.text
             find = 1
         end
