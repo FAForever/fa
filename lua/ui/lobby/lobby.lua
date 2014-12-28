@@ -1958,7 +1958,7 @@ local function UpdateGame()
 
     -- Add Tooltip info on Map Name Label
     if GUI.GameQualityLabel and scenarioInfo then
-        local TTips_map_version = scenarioInfo.map_version or "N/A"
+        local TTips_map_version = scenarioInfo.map_version or "1"
         local TTips_army = table.getsize(scenarioInfo.Configurations.standard.teams[1].armies) or "N/A"
         local TTips_sizeX = scenarioInfo.size[1] / 51.2 or "N/A"
         local TTips_sizeY = scenarioInfo.size[2] / 51.2 or "N/A"
@@ -3172,15 +3172,15 @@ function CreateUI(maxPlayers)
         end
         Tooltip.AddButtonTooltip(GUI.restrictedUnitsButton, 'lob_RestrictedUnitsClient')
     elseif lobbyComm:IsHost() then
-        GUI.lobbyPresets = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Lobby Presets", 0)
-        GUI.lobbyPresets.label:SetColor('B9BFB9')
-        GUI.lobbyPresets.label:SetDropShadow(true)
-        LayoutHelpers.AtHorizontalCenterIn(GUI.lobbyPresets, GUI.gameoptionsButton)
-        LayoutHelpers.AtVerticalCenterIn(GUI.lobbyPresets, GUI.exitButton)
-        GUI.lobbyPresets.OnClick = function(self, modifiers)
+        GUI.restrictedUnitsButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Lobby Presets", 0)
+        GUI.restrictedUnitsButton.label:SetColor('B9BFB9')
+        GUI.restrictedUnitsButton.label:SetDropShadow(true)
+        LayoutHelpers.AtHorizontalCenterIn(GUI.restrictedUnitsButton, GUI.gameoptionsButton)
+        LayoutHelpers.AtVerticalCenterIn(GUI.restrictedUnitsButton, GUI.exitButton)
+        GUI.restrictedUnitsButton.OnClick = function(self, modifiers)
             GUI_PRESET()
         end
-        Tooltip.AddButtonTooltip(GUI.lobbyPresets, 'Lobby_presetDescription')
+        Tooltip.AddButtonTooltip(GUI.restrictedUnitsButton, 'Lobby_presetDescription')
     end
 
     ---------------------------------------------------------------------------
