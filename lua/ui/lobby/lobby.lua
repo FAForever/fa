@@ -2607,7 +2607,7 @@ function CreateUI(maxPlayers)
     GUI.RuleLabel:DeleteAllItems()
     local tmptext
     if lobbyComm:IsHost() then
-        tmptext = 'Rule : no rule (click for edit)'
+        tmptext = 'No Rules: Click to add rules'
         GUI.RuleLabel:SetColors("FFCC00")
     else
         tmptext = 'Rule : no rule.'
@@ -5437,7 +5437,7 @@ end
 function RuleTitle_SendMSG()
     if GUI.RuleLabel and lobbyComm:IsHost() then
         local getRule = {GUI.RuleLabel:GetItem(0), GUI.RuleLabel:GetItem(1)}
-        if getRule[1]..getRule[2] == 'Rule : no rule (click for edit)' or getRule[1]..getRule[2] == 'Rule : no rule (click for edit) ' then
+        if getRule[1]..getRule[2] == 'No Rules: Click to add rules' or getRule[1]..getRule[2] == 'No Rules: Click to add rules ' then
             getRule[1] = 'Rule : no rule.'
             getRule[2] = ''
         else
@@ -5485,7 +5485,7 @@ function RuleTitle_INPUT()
         if text == '' then
             GUI_Preset_InputBox:Destroy()
             GUI.RuleLabel:DeleteAllItems()
-            GUI.RuleLabel:AddItem('Rule : no rule (click for edit)')
+            GUI.RuleLabel:AddItem('No Rules: Click to add rules')
             GUI.RuleLabel:SetColors("FFCC00")
             GUI.RuleLabel:AddItem('')
             RuleTitle_SendMSG()
@@ -5512,27 +5512,24 @@ function RuleTitle_INPUT()
     local OKButton = UIUtil.CreateButtonWithDropshadow(GUI_Preset_InputBox2, '/BUTTON/medium/', "Ok", -1)
     LayoutHelpers.AtRightIn(OKButton, GUI_Preset_InputBox2, 70)
     LayoutHelpers.AtBottomIn(OKButton, GUI_Preset_InputBox2, 10)
-    text09:SetText('Edit the Rule :')
+    text09:SetText('Game Rules')
     OKButton.OnClick = function(self)
         local result = nameEdit:GetText()
         if result == '' then
             GUI_Preset_InputBox:Destroy()
             GUI.RuleLabel:DeleteAllItems()
-            GUI.RuleLabel:AddItem('Rule : no rule (click for edit)')
+            GUI.RuleLabel:AddItem('No Rules: Click to add rules')
             GUI.RuleLabel:SetColors("FFCC00")
             GUI.RuleLabel:AddItem('')
             RuleTitle_SendMSG()
-            --return 'Rule : no rule.'
         else
             GUI_Preset_InputBox:Destroy()
-            --AddChatText('> '..result)
             wrapped = import('/lua/maui/text.lua').WrapText('Rule : '..result, 350, function(curText) return GUI.RuleLabel:GetStringAdvance(curText) end)
             GUI.RuleLabel:DeleteAllItems()
             GUI.RuleLabel:AddItem(wrapped[1] or '')
             GUI.RuleLabel:SetColors("B9BFB9")
             GUI.RuleLabel:AddItem(wrapped[2] or '')
             RuleTitle_SendMSG()
-            --return 'Rule : '..result
         end
     end
 end
@@ -6390,7 +6387,7 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
         -- Set Rule Title in TextBox
         if profiles[Selected_Preset].Rule == '' or profiles[Selected_Preset].Rule == 'no rule.' then
             GUI.RuleLabel:DeleteAllItems()
-            GUI.RuleLabel:AddItem('Rule : no rule (click for edit)')
+            GUI.RuleLabel:AddItem('No Rules: Click to add rules')
             GUI.RuleLabel:SetColors("FFCC00")
             GUI.RuleLabel:AddItem('')
         else
@@ -6475,7 +6472,7 @@ function SAVE_PRESET_IN_PREF() -- GET OPTIONS ON LOBBY AND SAVE TO PRESET
     local Preset_Name = profiles[Selected_Preset].PresetName or 'ERROR, Set preset name here' -- Nom du PresetLobby
     local Title_FAF = profiles[Selected_Preset].Title_FAF or '' -- Title is for FAF Client title in "Find Games" tabs
     local Rule_Text = GUI.RuleLabel:GetItem(0)..GUI.RuleLabel:GetItem(1)
-    if Rule_Text == 'Rule : no rule (click for edit)' then
+    if Rule_Text == 'No Rules: Click to add rules' then
         Rule_Text = 'no rule.'
     end
     Rule_Text = string.gsub(Rule_Text, 'Rule : ', '') or profiles[Selected_Preset].Rule_Text or '' -- Rule text showing in top of Lobby
