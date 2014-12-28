@@ -1,4 +1,4 @@
-Changelog for patch 3638
+Changelog for patch 3639
 ------------------------
 
 *Exploit fixes*
@@ -39,6 +39,10 @@ Contributors:
  - Sheeo
  - Xinnony
 
+Changelog for patch 3638
+------------------------
+
+- Added christmas presents for reclaim
 
 Changelog for hotfix-patch 3637
 -------------------------------

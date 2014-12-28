@@ -1,0 +1,36 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                     AlbedoName = [[/ENV/gift_yellow.dds]],
+                    LODCutoff = 250,
+                    ShaderName = 'NormalMappedTerrain',
+                },
+            },
+        },
+        UniformScale = 0.04,
+    },
+    Economy = {
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 5,
+        ReclaimTime = 5,
+    },
+    Interface = {
+        HelpText = 'Small Rock',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    SizeX = 0.5,
+    SizeY = 0.25,
+    SizeZ = 0.5,
+}
