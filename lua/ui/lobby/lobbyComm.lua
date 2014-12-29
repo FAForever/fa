@@ -26,6 +26,8 @@ Strings = {
     ['HostLeft'] = "<LOC lob_0007>Host abandoned lobby",
 }
 
+--- @Deprecated
+-- Used only by autolobby. Use PlayerData class instead.
 function GetDefaultPlayerOptions(playerName)
     return {
         Team = 1,
