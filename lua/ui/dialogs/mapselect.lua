@@ -16,7 +16,7 @@ local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
 local Button = import('/lua/maui/button.lua').Button
 local Group = import('/lua/maui/group.lua').Group
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
-local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
+local ResourceMapPreview = import('/lua/ui/controls/resmappreview.lua').ResourceMapPreview
 local MainMenu = import('/lua/ui/menus/main.lua')
 local MapUtil = import('/lua/ui/maputil.lua')
 local Mods = import('/lua/mods.lua')
@@ -404,9 +404,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
 
     UIUtil.CreateVertScrollbarFor(mapList)
 
-    local preview = MapPreview(panel)
-    preview.Width:Set(290)
-    preview.Height:Set(288)
+    local preview = ResourceMapPreview(panel, 290, 5, 8, true)
     LayoutHelpers.AtLeftTopIn(preview, panel, 37, 102)
 
     local previewOverlay = Bitmap(preview, UIUtil.UIFile('/dialogs/mapselect03/map-panel-glow_bmp.dds'))
@@ -477,17 +475,11 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
             advOptions = scen.options
             RefreshOptions(false, singlePlayer)
             PrefetchSession(mapfile, Mods.GetGameMods(), false)
-            preview:Show()
-            if not preview:SetTexture(scen.preview) then
-                preview:SetTextureFromMap(mapfile)
-            end
+            preview:SetScenario(scen)
             nopreviewtext:Hide()
-
-            ShowMapPositions(preview,scen)
             SetDescription(scen)
         else
             WARN("No scenario map file defined")
-            preview:Hide()
             nopreviewtext:Show()
             description:DeleteAllItems()
             description:AddItem(LOC("<LOC MAPSEL_0000>No description available."))
@@ -795,11 +787,13 @@ function SetDescription(scen)
         description:AddItem(LOCF("<LOC map_select_0005>NO START SPOTS DEFINED"))
         errors = true
     end
+
     if EnhancedLobby.CheckMapHasMarkers(scen) then
         description:AddItem("AI Markers: Yes")
     else
         description:AddItem("AI Markers: No")
     end
+
     description:AddItem("")
     if scen.description then
         local textBoxWidth = description.Width()
