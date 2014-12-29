@@ -154,6 +154,17 @@ function table.merged(t1, t2)
     return t1
 end
 
+--- Write all undefined keys from t2 into t1.
+function table.assimilate(t1, t2)
+    for k, v in t2 do
+        if t1[k] == nil then
+            t1[k] = v
+        end
+    end
+
+    return t1
+end
+
 --==============================================================================
 -- table.cat(t1, t2) performs a shallow "merge" of t1 and t2, where t1 and t2
 -- are expected to be numerically keyed (existing keys are discarded).
