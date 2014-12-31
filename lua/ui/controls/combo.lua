@@ -119,7 +119,7 @@ Combo = Class(Group) {
 
         self._list = ItemList(ddm)   -- make list depth over text so if you have them stacked, you see list
         self._list:SetFont(UIUtil.bodyFont, pointSize)
-        self._list:SetColors(UIUtil.fontColor, "Black", "Black", "Gainsboro")
+        self._list:SetColors(UIUtil.fontColor, "Black", UIUtil.fontColor, "Black")
         if staticTitle then
             self._list:ShowSelection(false)
         end
@@ -195,7 +195,7 @@ Combo = Class(Group) {
         -- set the height of the list based on the number of items visible and the font metrics
         self._maxVisibleItems = maxVisibleItems
         self._visibleItems = LazyVar.Create()
-        self._list.Height:Set(function() return self._visibleItems() * (self._text.FontAscent() + self._text.FontDescent() + self._text.FontExternalLeading()) end)
+        self._list.Height:Set(function() return self._visibleItems() * (self._text.FontAscent() + self._text.FontDescent() + self._text.FontExternalLeading() + 1) end)
         self._dropdown.Height:Set(function() return self._list.Height() + ddum.Height() + ddlm.Height() end)
         self._visibleItems:Set(1)
 
