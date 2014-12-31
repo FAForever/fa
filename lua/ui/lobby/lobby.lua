@@ -5376,24 +5376,15 @@ function SetSlotCPUBar(slot, playerInfo)
                 -- For display purposes, the bar has a higher minimum that the actual barMin value.
                 -- This is to ensure that the bar is visible for very small values
 
-                local clampedResult =  math.max(math.min((b * GetPlayerCount())/12, barMax), barMin + math.floor(.04 * (barMax - barMin)))
-                GUI.slots[slot].CPUSpeedBar:SetValue(clampedResult)
+                -- Lock values to the largest possible result.
+                if b > barMax then
+                    b = barMax
+                end
 
-                --For the tooltip, we use the actual clamped value
+                GUI.slots[slot].CPUSpeedBar:SetValue(b)
                 GUI.slots[slot].CPUSpeedBar.CPUActualValue = b
 
-
                 GUI.slots[slot].CPUSpeedBar:Show()
-
-                GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.UIFile('/game/unit_bmp/bar_purple_bmp.dds'))
-
-                -- if clampedResult <= greenBarMax then
-                -- GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-02_bmp.dds'))
-                -- elseif clampedResult <= yellowBarMax then
-                -- GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-01_bmp.dds'))
-                -- else
-                -- GUI.slots[slot].CPUSpeedBar._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-03_bmp.dds'))
-                -- end
             end
         end
     end
