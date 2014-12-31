@@ -3152,7 +3152,7 @@ function CreateUI(maxPlayers)
             GUI_PRESET()
         end
         -- TODO: Localise!
-        Tooltip.AddButtonTooltip(GUI.restrictedUnitsOrPresetsBtn, 'Load and Save Lobby Presets')
+        Tooltip.AddButtonTooltip(GUI.restrictedUnitsOrPresetsBtn, 'Lobby_presetDescription')
     else
         -- TODO: Localise!
         GUI.restrictedUnitsOrPresetsBtn.label:SetText("Unit Manager")
