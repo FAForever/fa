@@ -2650,7 +2650,7 @@ function CreateUI(maxPlayers)
     if getInit == "init_faf.lua" then
         SetText2(GUI.ModFeaturedLabel, 'FA Forever', 10)
     elseif getInit == "init_blackops.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'BlackOps MOD', 10)
+        SetText2(GUI.ModFeaturedLabel, 'BlackOps', 10)
     elseif getInit == "init_coop.lua" then
         SetText2(GUI.ModFeaturedLabel, 'COOP', 10)
     elseif getInit == "init_balancetesting.lua" then
@@ -2658,17 +2658,17 @@ function CreateUI(maxPlayers)
     elseif getInit == "init_gw.lua" then
         SetText2(GUI.ModFeaturedLabel, 'Galactic War', 10)
     elseif getInit == "init_labwars.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'Labwars MOD', 10)
+        SetText2(GUI.ModFeaturedLabel, 'Labwars', 10)
     elseif getInit == "init_ladder1v1.lua" then
         SetText2(GUI.ModFeaturedLabel, 'Ladder 1v1', 10)
     elseif getInit == "init_nomads.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'Nomads MOD', 10)
+        SetText2(GUI.ModFeaturedLabel, 'Nomads Mod', 10)
     elseif getInit == "init_phantomx.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'PhantomX MOD', 10)
+        SetText2(GUI.ModFeaturedLabel, 'PhantomX', 10)
     elseif getInit == "init_supremedestruction.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'SupremeDestruction MOD', 10)
+        SetText2(GUI.ModFeaturedLabel, 'SupremeDestruction', 10)
     elseif getInit == "init_xtremewars.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'XtremeWars MOD', 10)
+        SetText2(GUI.ModFeaturedLabel, 'XtremeWars', 10)
     end
     --\\
     --// Lobby options panel
@@ -2679,14 +2679,15 @@ function CreateUI(maxPlayers)
         CreateOptionLobbyDialog()
     end
     --\\
-    --// Credits footer
-    -- TODO: Localise or exterminate.
-    local Credits = 'New Skin by Xinnony and Barlots (Lobby version : '..LOBBYversion..')'
-    GUI.Credits_Text = UIUtil.CreateText(GUI.panel, Credits, 12, UIUtil.titleFont, true)
+
+    -- Credits for the FAF lobby
+    -- TODO: Localise
+    local Credits = 'Lobby by Xinnony and Barlots: V'..LOBBYversion..')'
+    GUI.Credits_Text = UIUtil.CreateText(GUI.panel, Credits, 11, UIUtil.titleFont, true)
     SetText2(GUI.Credits_Text, Credits, 10)
     GUI.Credits_Text:SetColor("FFFFFF")
-    LayoutHelpers.AtBottomIn(GUI.Credits_Text, GUI, 0)
-    LayoutHelpers.AtRightIn(GUI.Credits_Text, GUI, 11)
+    LayoutHelpers.AtBottomIn(GUI.Credits_Text, GUI, 2)
+    LayoutHelpers.AtRightIn(GUI.Credits_Text, GUI, 5)
     --\\
 
     -- FOR SEE THE GROUP POSITION, LOOK THIS SCREENSHOOT : http://img402.imageshack.us/img402/8826/falobbygroup.png
@@ -5734,23 +5735,22 @@ function CreateOptionLobbyDialog()
 	--
 	local Slider = import('/lua/maui/slider.lua').Slider
 	local currentFontSize = Prefs.GetFromCurrentProfile('LobbyChatFontSize') or 14
-	local slider_Chat_SizeFont_TEXT = UIUtil.CreateText(dialog2, LOC("<LOC lobui_0404>").. currentFontSize, 14, 'Arial', true)
-    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont_TEXT, dialog2, 20, 155)
+	local slider_Chat_SizeFont_TEXT = UIUtil.CreateText(dialog2, LOC("<LOC lobui_0404> ").. currentFontSize, 14, 'Arial', true)
+    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont_TEXT, dialog2, 45, 126)
 
 	local slider_Chat_SizeFont = Slider(dialog2, false, 9, 18, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
-    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont, dialog2, 20, 170)
+    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont, dialog2, 20, 146)
     slider_Chat_SizeFont:SetValue(currentFontSize)
 
 	slider_Chat_SizeFont.OnValueChanged = function(self, newValue)
         local sliderValue = math.floor(slider_Chat_SizeFont._currentValue())
-        slider_Chat_SizeFont_TEXT:SetText('Chat Size Font : '..sliderValue)
+        slider_Chat_SizeFont_TEXT:SetText(LOC("<LOC lobui_0404> ").. sliderValue)
         GUI.chatDisplay:SetFont(UIUtil.bodyFont, sliderValue)
         Prefs.SetToCurrentProfile('LobbyChatFontSize', sliderValue)
 	end
 	--
     local cbox_WindowedLobby = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
-    LayoutHelpers.AtRightIn(cbox_WindowedLobby, dialog2, 20)
-    LayoutHelpers.AtTopIn(cbox_WindowedLobby, dialog2, 20)
+    LayoutHelpers.AtRightTopIn(cbox_WindowedLobby, dialog2, 20, 42)
     Tooltip.AddCheckboxTooltip(cbox_WindowedLobby, {text='Windowed mode', body=LOC("<LOC lobui_0403>")})
     local cbox_WindowedLobby_TEXT = UIUtil.CreateText(cbox_WindowedLobby, LOC("<LOC lobui_0402>"), 14, 'Arial', true)
     LayoutHelpers.AtRightIn(cbox_WindowedLobby_TEXT, cbox_WindowedLobby, 25)
@@ -5767,7 +5767,7 @@ function CreateOptionLobbyDialog()
     end
     --
     local cbox_StretchBG = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
-    LayoutHelpers.AtRightTopIn(cbox_StretchBG, dialog2, 20, 60)
+    LayoutHelpers.AtRightTopIn(cbox_StretchBG, dialog2, 20, 68)
     Tooltip.AddCheckboxTooltip(cbox_StretchBG, {text='Stretch Background', body=LOC("<LOC lobui_0401>")})
     local cbox_StretchBG_TEXT = UIUtil.CreateText(cbox_StretchBG, LOC("<LOC lobui_0400>"), 14, 'Arial', true)
     LayoutHelpers.AtRightIn(cbox_StretchBG_TEXT, cbox_StretchBG, 25)
@@ -5785,7 +5785,7 @@ function CreateOptionLobbyDialog()
     end
     --
     local cbox_SMsg = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
-    LayoutHelpers.AtRightTopIn(cbox_SMsg, dialog2, 20, 100)
+    LayoutHelpers.AtRightTopIn(cbox_SMsg, dialog2, 20, 94)
     Tooltip.AddCheckboxTooltip(cbox_SMsg, {text='Log to chat', body=LOC("<LOC lobui_0398>")})
     local cbox_SMsg_TEXT = UIUtil.CreateText(cbox_SMsg, LOC("<LOC lobui_0397>"), 14, 'Arial', true)
     LayoutHelpers.AtRightIn(cbox_SMsg_TEXT, cbox_SMsg, 25)
@@ -5799,6 +5799,7 @@ function CreateOptionLobbyDialog()
     end
     ----------------------
     -- Developer box --
+    --[[
     local devsHeader = UIUtil.CreateText(dialog2, LOC("<LOC lobui_0399>"), 17, 'Arial Gras', true)
     LayoutHelpers.AtLeftTopIn(devsHeader, dialog2, 20, 220)
     -- Ask to Xinnony for add your name and work correctly
@@ -5819,10 +5820,10 @@ function CreateOptionLobbyDialog()
         else
             LayoutHelpers.AtLeftTopIn(text[i], dialog2, 20, 225+(15*i))
         end
-    end
+    end --]]
     ------------------
     -- Quit button --
-    local QuitButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Thank You !", -1)
+    local QuitButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Close", -1)
     LayoutHelpers.AtHorizontalCenterIn(QuitButton, dialog2, 0)
     LayoutHelpers.AtBottomIn(QuitButton, dialog2, 10)
     QuitButton.OnClick = function(self)
@@ -6621,9 +6622,4 @@ function GUI_Changelog()
         Prefs.SetToCurrentProfile('LobbyChangelog', Changelog.last_version)
 		GROUP_Changelog:Destroy()
     end
-    -- Credit --
-    local text99 = UIUtil.CreateText(dialog2, 'Xinnony', 9, 'Arial', true)
-    text99:SetColor('808080')
-    LayoutHelpers.AtRightIn(text99, dialog2, 0)
-    LayoutHelpers.AtBottomIn(text99, dialog2, 2)
 end

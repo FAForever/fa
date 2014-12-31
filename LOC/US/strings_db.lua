@@ -4227,8 +4227,8 @@ lobui_0395="AIx: Random"
 lobui_0396="Command Not Known: %s"
 
 # Lobby options panel
-lobui_0397="Show system message"
-lobui_0398="Display system messages in chat window (connection status etc.)"
+lobui_0397="Show System Message"
+lobui_0398="Display error logging in the chat window"
 lobui_0399="Lobby Developers"
 lobui_0400="Stretch Background"
 lobui_0401="Stretch background to fill screen."
