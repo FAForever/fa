@@ -1,11 +1,10 @@
 Changelog for patch 3639
 ------------------------
 
+- Christmas presents for reclaim have been removed
+
 *Exploit fixes*
 - Fixed a regression of the free ACU upgrade exploit
-
-*Game improvements*
-- Game quality is now visible in score overlay
 
 *Bug fixes*
 - Fixed air wrecks floating mid air on certain maps
@@ -24,7 +23,17 @@ Changelog for patch 3639
 - Added FACTORY category to Megalith, allows queuing of units while being built
 - Improve new unit share code (Units dying after being transferred multiple times)
 - Fixed sinking wrecks blocking projectiles where the unit used to be
-- Lobby 2.6.0 included, changelog shown in game
+
+*Lobby changes (Version 2.6.0)*
+- Fix the rating not showing up for observers
+- Font-size for observers reduced
+- Chat font-size adjustable from options
+- Remove debug messages
+- Connection dialog no longer appears below lobby slots
+- Fixed issue with players not being removed from slots on disconnect
+- Fixed integrated replaysync
+- Clan tags are shown in game
+- "Set ranked options" button works again
 
 
 Thanks to pip, briang and Alex1911 for translations
