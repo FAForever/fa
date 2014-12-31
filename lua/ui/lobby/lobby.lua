@@ -2631,7 +2631,7 @@ function CreateUI(maxPlayers)
         tmptext = 'No Rules: Click to add rules'
         GUI.RuleLabel:SetColors("FFCC00")
     else
-        tmptext = 'Rule : no rule.'
+        tmptext = 'Rule: No Rule'
     end
     GUI.RuleLabel:AddItem(tmptext or '')
     GUI.RuleLabel:AddItem('')
@@ -5412,7 +5412,7 @@ function RuleTitle_SendMSG()
     if GUI.RuleLabel and lobbyComm:IsHost() then
         local getRule = {GUI.RuleLabel:GetItem(0), GUI.RuleLabel:GetItem(1)}
         if getRule[1]..getRule[2] == 'No Rules: Click to add rules' or getRule[1]..getRule[2] == 'No Rules: Click to add rules ' then
-            getRule[1] = 'Rule : no rule.'
+            getRule[1] = 'Rule: No Rule'
             getRule[2] = ''
         else
             getRule[1] = GUI.RuleLabel:GetItem(0)
@@ -5846,33 +5846,20 @@ function CreateOptionLobbyDialog()
     cbox_SMsg:SetCheck(SystemMessagesEnabled(), true)
 end
 
---------------------------------------------------------------------------------------
--------------------------- TEST Text Animation (Experimental) ------------------------
-
-
-SetText2 = function(self, text, delay) -- Set Text with Animation
-    --// Faire une variable qui evite deux droit SetText2 sur le même control de text en même temps.
-    if self:GetText() == text then
-        --self:SetText(text)
-    else
-        --if ANIM_TEXT_ALLOWED then
+-- Experimental Animated Text Function
+SetText2 = function(self, text, delay)
+    if not self:GetText() == text then
         self:StreamText(text, delay)
-        --else
-        --self:SetText(text)
-        --end
     end
 end 
 
---------------------------------------------------------------------------------------
--------------------------- TEST Save/Load Preset Game Lobby --------------------------
--- GUI
--- Load and Create Preset Lobby
+-- Lobby Presets
 function GUI_PRESET()
     local profiles = GetPreference("UserPresetLobby")
 
     GUI_Preset = Group(GUI)
     LayoutHelpers.AtCenterIn(GUI_Preset, GUI)
-    GUI_Preset.Depth:Set(998) -- :GetTopmostDepth() + 1
+    GUI_Preset.Depth:Set(998)
     local background = Bitmap(GUI_Preset, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby.dds'))
     GUI_Preset.Width:Set(background.Width)
     GUI_Preset.Height:Set(background.Height)
@@ -5881,115 +5868,35 @@ function GUI_PRESET()
     dialog2.Width:Set(536)
     dialog2.Height:Set(400)
     LayoutHelpers.AtCenterIn(dialog2, GUI_Preset)
-    -----------
-    -- Title --
-    local text0 = UIUtil.CreateText(dialog2, 'Preset Lobby :', 17, 'Arial Gras', true)
+
+    -- Title
+    local text0 = UIUtil.CreateText(dialog2, 'Lobby Presets', 17, 'Arial Gras', true)
     LayoutHelpers.AtHorizontalCenterIn(text0, dialog2, 0)
-    LayoutHelpers.AtTopIn(text0, dialog2, 10)
-    ---------------
-    -- Info text --
-    local text1 = UIUtil.CreateText(dialog2, 'Note : Double click in the list for Edit', 9, 'Arial', true)
+    LayoutHelpers.AtTopIn(text0, dialog2, 30)
+
+    -- Info text
+    local text1 = UIUtil.CreateText(dialog2, 'Double-click to edit', 9, 'Arial', true)
     text1:SetColor('FFCC00')
     text1:Hide()
-    --------------------
-    -- LOAD button --
-    local LoadButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Load preset", -1)
-    LayoutHelpers.AtLeftIn(LoadButton, dialog2, 0)
-    LayoutHelpers.AtBottomIn(LoadButton, dialog2, 10)
+
+    -- Load button
+    local LoadButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Load Preset", -1)
+    LayoutHelpers.AtLeftIn(LoadButton, dialog2, -10)
+    LayoutHelpers.AtBottomIn(LoadButton, dialog2, 30)
     LoadButton.OnClick = function(self)
         LOAD_PRESET_IN_PREF()
     end
-    ------------------
-    -- Preset List --
-    PresetList = ItemList(dialog2)
-    PresetList:SetFont(UIUtil.bodyFont, 14)
-    --InfoList:SetColors(UIUtil.fontColor, "00000000", "FF000000",  UIUtil.highlightColor, "ffbcfffe")
-    PresetList:ShowMouseoverItem(true)
-    PresetList.Width:Set(210)
-    PresetList.Height:Set(310)
-    LayoutHelpers.DepthOverParent(PresetList, dialog2, 10)
-    LayoutHelpers.AtLeftIn(PresetList, dialog2, 10)
-    LayoutHelpers.AtTopIn(PresetList, dialog2, 38)
-    UIUtil.CreateLobbyVertScrollbar(PresetList)
-    --
-    LOAD_PresetProfils_For_PresetList()
-    PresetList:SetSelection(0)
-    PresetList.OnClick = function(self, row)
-        if PresetList:GetItemCount() == (row+1) then
-            PresetList:SetSelection(row)
-            LoadButton.label:SetText('Create new preset')
-            LoadButton.OnClick = function(self)
-                CREATE_PRESET_IN_PREF()
-            end
-            --
-            InfoList:DeleteAllItems()
-        else
-            LoadButton.label:SetText('Load preset')
-            LoadButton.OnClick = function(self)
-                LOAD_PRESET_IN_PREF()
-            end
-            --
-            PresetList:SetSelection(row)
-            local profiles = GetPreference("UserPresetLobby")
-            --AddChatText('> '..table.KeyByIndex(profiles, row)) -- Selected Profils : Preset1
-            --AddChatText('> '..PresetList:GetItem(row)..' , '..(PresetList:GetSelection()+1)..' / '..PresetList:GetItemCount()) -- (itemname) , (currentitem) / (maxitem)
-            --LOG('> '..(PresetList:GetSelection()+1)..' / '..PresetList:GetItemCount())
-            LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, row)) -- Charge les infos sur la InfoList
-        end
-    end
-    PresetList.OnDoubleClick = function(self, row)
-        --if row == 0 then
-        LOAD_PRESET_IN_PREF()
-        --end
-    end
-    ---------------
-    -- Info List --
-    InfoList = ItemList(dialog2)
-    InfoList:SetFont(UIUtil.bodyFont, 11)
-    --                                  foreground, background, selected_foreground, selected_background, mouseover_foreground, mouseover_background)
-    InfoList:SetColors(nil, "00000000")--, "FF000000",  UIUtil.highlightColor, "ffbcfffe")
-    InfoList:ShowMouseoverItem(true)
-    InfoList.Width:Set(262)-- -16
-    InfoList.Height:Set(300)
-    LayoutHelpers.AtRightIn(InfoList, dialog2, 10+16)
-    LayoutHelpers.AtTopIn(InfoList, dialog2, 38)
-    LayoutHelpers.Below(text1, InfoList, 0)
-    LayoutHelpers.AtHorizontalCenterIn(text1, InfoList, 0)
-    --SetColors = function(self, foreground, background, selected_foreground, selected_background, mouseover_foreground, mouseover_background)
-    UIUtil.CreateLobbyVertScrollbar(InfoList)
-    --
-    local profiles = GetPreference("UserPresetLobby")
-    if profiles then
-        LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, 0))
-    end
-    InfoList.OnDoubleClick = function(self, row)
-        if row == 0 then
-            GUI_PRESET_INPUT(1)
-        elseif row == 1 then
-            GUI_PRESET_INPUT(2)
-        elseif row == 2 then
-            GUI_PRESET_INPUT(3)
-        end
-    end
-    InfoList.OnMouseoverItem = function(self, row) -- Show notice or Hide
-        if row == 0 or row == 1 or row == 2 then
-            text1:Show()
-        else
-            text1:Hide()
-        end
-    end
-    -------------------
-    -- QUIT button --
+    
+    -- Quit button
     local QuitButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Cancel", -1)
-    LayoutHelpers.CenteredRightOf(QuitButton, LoadButton, -16)
+    LayoutHelpers.CenteredRightOf(QuitButton, LoadButton, -28)
     QuitButton.OnClick = function(self)
         GUI_Preset:Destroy()
     end
-    --------------------
-    -- SAVE button --
-    local SaveButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/small/', "Save preset", -1)
-    LayoutHelpers.AtRightIn(SaveButton, dialog2, 0)
-    --LayoutHelpers.AtBottomIn(SaveButton, dialog2, 10)
+
+    -- Save button
+    local SaveButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Save Preset", -1)
+    LayoutHelpers.AtRightIn(SaveButton, dialog2, -10)
     LayoutHelpers.AtVerticalCenterIn(SaveButton, LoadButton)
     SaveButton.OnClick = function(self)
         SAVE_PRESET_IN_PREF()
@@ -6000,28 +5907,94 @@ function GUI_PRESET()
         LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, last_selected))
         SavePreferences()
     end
-    -------------------
-    -- Delete button --
-    local DeleteButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/small/', "Delete preset", -1)
-    LayoutHelpers.CenteredLeftOf(DeleteButton, SaveButton, -10)
-    --LayoutHelpers.AtBottomIn(DeleteButton, dialog2, 10)
+
+    -- Delete button
+    local DeleteButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Delete Preset", -1)
+    LayoutHelpers.CenteredLeftOf(DeleteButton, SaveButton, -28)
     LayoutHelpers.AtVerticalCenterIn(DeleteButton, LoadButton)
     DeleteButton.OnClick = function(self)
         local profiles = GetPreference("UserPresetLobby")
-        local last_selected = table.KeyByIndex(profiles, PresetList:GetSelection()) -- Preset4
-        profiles[last_selected] = nil -- Efface le Preset selectioner
-        SetPreference('UserPresetLobby', profiles) -- ReInsert all preset without last deleted
+        local last_selected = table.KeyByIndex(profiles, PresetList:GetSelection())
+        profiles[last_selected] = nil
+        SetPreference('UserPresetLobby', profiles)
         LOAD_PresetProfils_For_PresetList()
         PresetList:SetSelection(0)
         LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
         SavePreferences()
     end
-    -------------
-    -- Credit --
-    local text99 = UIUtil.CreateText(dialog2, 'Xinnony', 9, 'Arial', true)
-    text99:SetColor('808080')
-    LayoutHelpers.AtRightIn(text99, dialog2, 0)
-    LayoutHelpers.AtBottomIn(text99, dialog2, 2)
+    
+    -- Preset List
+    PresetList = ItemList(dialog2)
+    PresetList:SetFont(UIUtil.bodyFont, 14)
+    PresetList:ShowMouseoverItem(true)
+    PresetList.Width:Set(210)
+    PresetList.Height:Set(280)
+    LayoutHelpers.DepthOverParent(PresetList, dialog2, 10)
+    LayoutHelpers.AtLeftIn(PresetList, dialog2, 10)
+    LayoutHelpers.AtTopIn(PresetList, dialog2, 52)
+    UIUtil.CreateLobbyVertScrollbar(PresetList)
+    
+    LOAD_PresetProfils_For_PresetList()
+    PresetList:SetSelection(0)
+    PresetList.OnClick = function(self, row)
+        if PresetList:GetItemCount() == (row+1) then
+            PresetList:SetSelection(row)
+            LoadButton.label:SetText('Create Preset')
+            LoadButton.OnClick = function(self)
+                CREATE_PRESET_IN_PREF()
+            end
+            InfoList:DeleteAllItems()
+        else
+            LoadButton.label:SetText('Load Preset')
+            LoadButton.OnClick = function(self)
+                LOAD_PRESET_IN_PREF()
+            end
+            --
+            PresetList:SetSelection(row)
+            local profiles = GetPreference("UserPresetLobby")
+            LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, row))
+        end
+    end
+    
+    PresetList.OnDoubleClick = function(self, row)
+        LOAD_PRESET_IN_PREF()
+    end
+
+    -- Info List
+    InfoList = ItemList(dialog2)
+    InfoList:SetFont(UIUtil.bodyFont, 11)
+    InfoList:SetColors(nil, "00000000")
+    InfoList:ShowMouseoverItem(true)
+    InfoList.Width:Set(262)
+    InfoList.Height:Set(280)
+    LayoutHelpers.AtRightIn(InfoList, dialog2, 26)
+    LayoutHelpers.AtTopIn(InfoList, dialog2, 52)
+    LayoutHelpers.Below(text1, InfoList, 0)
+    LayoutHelpers.AtHorizontalCenterIn(text1, InfoList, 0)
+    UIUtil.CreateLobbyVertScrollbar(InfoList)
+    
+    local profiles = GetPreference("UserPresetLobby")
+    if profiles then
+        LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, 0))
+    end
+    
+    InfoList.OnDoubleClick = function(self, row)
+        if row == 0 then
+            GUI_PRESET_INPUT(1)
+        elseif row == 1 then
+            GUI_PRESET_INPUT(2)
+        elseif row == 2 then
+            GUI_PRESET_INPUT(3)
+        end
+    end
+    
+    InfoList.OnMouseoverItem = function(self, row)
+        if row == 0 or row == 1 or row == 2 then
+            text1:Show()
+        else
+            text1:Hide()
+        end
+    end
 end
 
 function GUI_PRESET_INPUT(tyype)
@@ -6036,13 +6009,13 @@ function GUI_PRESET_INPUT(tyype)
     GUI_Preset_InputBox2.Width:Set(536)
     GUI_Preset_InputBox2.Height:Set(400-240)
     LayoutHelpers.AtCenterIn(GUI_Preset_InputBox2, GUI_Preset_InputBox)
-    -----------
-    -- Title --
+
+    -- Title
     local text09 = UIUtil.CreateText(GUI_Preset_InputBox2, '', 17, 'Arial', true)
     LayoutHelpers.AtHorizontalCenterIn(text09, GUI_Preset_InputBox2)
     LayoutHelpers.AtTopIn(text09, GUI_Preset_InputBox2, 10)
-    ----------
-    -- Edit --
+
+    -- Edit
     local nameEdit = Edit(GUI_Preset_InputBox2)
     LayoutHelpers.AtHorizontalCenterIn(nameEdit, GUI_Preset_InputBox2)
     LayoutHelpers.AtVerticalCenterIn(nameEdit, GUI_Preset_InputBox2)
@@ -6088,20 +6061,19 @@ function GUI_PRESET_INPUT(tyype)
         elseif tyype == 3 then
             if text == '' then
                 local profiles = GetPreference("UserPresetLobby")
-                SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', 'no rule.')
+                SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', 'No Rule')
                 LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
                 GUI_Preset_InputBox:Destroy()
             else
                 local profiles = GetPreference("UserPresetLobby")
-                --AddChatText('rename> Profil?:'..table.KeyByIndex(profiles, PresetList:GetSelection())..' // selection:'..PresetList:GetSelection())
                 SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', tostring(text))
                 LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
                 GUI_Preset_InputBox:Destroy()
             end
         end
     end
-    -------------------
-    -- Exit button --
+
+    -- Exit button
     local ExitButton = UIUtil.CreateButtonWithDropshadow(GUI_Preset_InputBox2, '/BUTTON/medium/', "Cancel", -1)
     LayoutHelpers.AtLeftIn(ExitButton, GUI_Preset_InputBox2, 70)
     LayoutHelpers.AtBottomIn(ExitButton, GUI_Preset_InputBox2, 10)
@@ -6111,8 +6083,8 @@ function GUI_PRESET_INPUT(tyype)
 			GUI_Preset:Destroy()
 		end
     end
-    -------------------
-    -- Ok button --
+
+    -- Ok button
     local OKButton = UIUtil.CreateButtonWithDropshadow(GUI_Preset_InputBox2, '/BUTTON/medium/', "Ok", -1)
     LayoutHelpers.AtRightIn(OKButton, GUI_Preset_InputBox2, 70)
     LayoutHelpers.AtBottomIn(OKButton, GUI_Preset_InputBox2, 10)
@@ -6160,7 +6132,7 @@ function GUI_PRESET_INPUT(tyype)
         OKButton.OnClick = function(self)
             local result = nameEdit:GetText()
             if result == '' then
-                -- No word in nameEdit
+                WARN('No new Title defined')
             else
                 local profiles = GetPreference("UserPresetLobby")
                 SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.FAF_Title', tostring(result))
@@ -6174,12 +6146,11 @@ function GUI_PRESET_INPUT(tyype)
             local result = nameEdit:GetText()
             if result == '' then
                 local profiles = GetPreference("UserPresetLobby")
-                SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', 'no rule.')
+                SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', 'No Rule')
                 LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
                 GUI_Preset_InputBox:Destroy()
             else
                 local profiles = GetPreference("UserPresetLobby")
-                --AddChatText('rename> Profil?:'..table.KeyByIndex(profiles, PresetList:GetSelection())..' // selection:'..PresetList:GetSelection())
                 SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', tostring(result))
                 LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
                 GUI_Preset_InputBox:Destroy()
@@ -6188,19 +6159,16 @@ function GUI_PRESET_INPUT(tyype)
     end
 end
 
-----------------------
--- Other function --
+-- Other function
 function table.KeyByIndex(tablle, index)
     local num = -1
     for k, v in tablle do
         num = num + 1
-        --LOG('k : '..k) -- Preset1 / Preset2
-        --LOG('v : '..v) -- Error : Table value
         if num == index then
             return k
         end
     end
-    return false -- or maybe call error() here
+    return false
 end
 
 function GetModNameWithUid(uid)
@@ -6220,9 +6188,7 @@ function GetModUIorNotUIWithUid(uid)
     return allMods[uid].ui_only
 end
 
-
--------------------
--- Refresh List --
+-- Refresh List
 function LOAD_PresetProfils_For_PresetList()
     local profiles = GetPreference("UserPresetLobby")
     PresetList:DeleteAllItems()
@@ -6234,40 +6200,23 @@ function LOAD_PresetProfils_For_PresetList()
     end
     PresetList:AddItem('> New Preset')
 end
+
 function LOAD_PresetSettings_For_InfoList(Selected_Preset)
     local profiles = GetPreference("UserPresetLobby")
     InfoList:DeleteAllItems()
-    --
-    --if Selected_Preset == '' then
-    --AddChatText('ERROR !, Selected_Preset is nul')
-    --elseif Selected_Preset == nil then
-    --AddChatText('ERROR !, Selected_Preset is nul')
-    --else
-    --AddChatText('ERROR !, Selected_Preset is :'..Selected_Preset)
-    --end
-    InfoList:AddItem('Preset Name : '..profiles[Selected_Preset].PresetName)
-    InfoList:AddItem('FAF Title : '..'(not working for the moment)')--profiles[Selected_Preset].FAF_Title)
-    InfoList:AddItem('Rule : '..profiles[Selected_Preset].Rule)
+    InfoList:AddItem('Preset Name: '..profiles[Selected_Preset].PresetName)
+    InfoList:AddItem('Rule: '..profiles[Selected_Preset].Rule)
     
     if check_Map_Exist(profiles[Selected_Preset].MapPath) == true then
-        InfoList:AddItem('Map : '..profiles[Selected_Preset].MapName)
+        InfoList:AddItem('Map: '..profiles[Selected_Preset].MapName)
     else
-        InfoList:AddItem('Map : NOT AVAILABLE ('..profiles[Selected_Preset].MapName..')')
-        --InfoList.test = Bitmap(InfoList, UIUtil.SkinnableFile('/game/idle_mini_icon/idle_icon.dds'))
-        --LayoutHelpers.AtLeftTopIn(InfoList.test, InfoList, -12, 3*InfoList:GetRowHeight()) -- left, top
-        --InfoList.test.Width:Set(InfoList:GetRowHeight())
-        --InfoList.test.Height:Set(InfoList:GetRowHeight())
-        --Tooltip.AddControlTooltip(InfoList.test, {text='Map : '..profiles[Selected_Preset].MapName, body='MAP NOT AVAILABLE !'})
-        --InfoList:ModifyItem(3, ' Map : '..profiles[Selected_Preset].MapName)
+        InfoList:AddItem('Map: Unavailable ('..profiles[Selected_Preset].MapName..')')
     end
-    
-    
     
     if profiles[Selected_Preset].Mods then
         InfoList:AddItem('')
         InfoList:AddItem('Mod :')
         for k, v in profiles[Selected_Preset].Mods do
-            --k = (uids), v = true
             if GetModUidExist(k) == false then
                 InfoList:AddItem('- NOT AVAILABLE ('..k..')')
             else
@@ -6283,7 +6232,6 @@ function LOAD_PresetSettings_For_InfoList(Selected_Preset)
         InfoList:AddItem('')
         InfoList:AddItem('Unit Restrictions :')
         for k, v in profiles[Selected_Preset].UnitsRestricts do
-            --k = (uids), v = true
             InfoList:AddItem('- '..k)
         end
     end
@@ -6291,13 +6239,12 @@ function LOAD_PresetSettings_For_InfoList(Selected_Preset)
         InfoList:AddItem('')
         InfoList:AddItem('Settings :')
         for k, v in profiles[Selected_Preset].Settings do
-            --k = (uids), v = true
             InfoList:AddItem('- '..k..' : '..tostring(v))
         end
     end
 end
 
--- Create Preset in Pref --
+-- Create Preset in Pref
 function CREATE_PRESET_IN_PREF()
     GUI_PRESET_INPUT(0)
 end
@@ -6357,13 +6304,13 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
         -- Set Title on FAF Client
         --AddChatText('> PRESET > Rule : '..profiles[Selected_Preset].Rule)
         -- Set Rule Title in TextBox
-        if profiles[Selected_Preset].Rule == '' or profiles[Selected_Preset].Rule == 'no rule.' then
+        if profiles[Selected_Preset].Rule == '' or profiles[Selected_Preset].Rule == 'No Rule' then
             GUI.RuleLabel:DeleteAllItems()
             GUI.RuleLabel:AddItem('No Rules: Click to add rules')
             GUI.RuleLabel:SetColors("FFCC00")
             GUI.RuleLabel:AddItem('')
         else
-            wrapped = import('/lua/maui/text.lua').WrapText('Rule : '..profiles[Selected_Preset].Rule, GUI.RuleLabel.Width(), function(curText) return GUI.RuleLabel:GetStringAdvance(curText) end)
+            wrapped = import('/lua/maui/text.lua').WrapText('Rule: '..profiles[Selected_Preset].Rule, GUI.RuleLabel.Width(), function(curText) return GUI.RuleLabel:GetStringAdvance(curText) end)
             GUI.RuleLabel:DeleteAllItems()
             GUI.RuleLabel:AddItem(wrapped[1] or '')
             GUI.RuleLabel:SetColors("B9BFB9")
@@ -6445,7 +6392,7 @@ function SAVE_PRESET_IN_PREF() -- GET OPTIONS ON LOBBY AND SAVE TO PRESET
     local Title_FAF = profiles[Selected_Preset].Title_FAF or '' -- Title is for FAF Client title in "Find Games" tabs
     local Rule_Text = GUI.RuleLabel:GetItem(0)..GUI.RuleLabel:GetItem(1)
     if Rule_Text == 'No Rules: Click to add rules' then
-        Rule_Text = 'no rule.'
+        Rule_Text = 'No Rule'
     end
     Rule_Text = string.gsub(Rule_Text, 'Rule : ', '') or profiles[Selected_Preset].Rule_Text or '' -- Rule text showing in top of Lobby
 
