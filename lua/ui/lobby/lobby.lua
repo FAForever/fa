@@ -5883,9 +5883,6 @@ end
 -- Load and Create Preset Lobby
 function GUI_PRESET()
     local profiles = GetPreference("UserPresetLobby")
-    if not profiles or profiles[1] == nil then
-        GUI_PRESET_INPUT(-1)
-    end
 
     GUI_Preset = Group(GUI)
     LayoutHelpers.AtCenterIn(GUI_Preset, GUI)
@@ -6134,7 +6131,8 @@ function GUI_PRESET_INPUT(tyype)
     LayoutHelpers.AtRightIn(OKButton, GUI_Preset_InputBox2, 70)
     LayoutHelpers.AtBottomIn(OKButton, GUI_Preset_InputBox2, 10)
     if tyype == -1 then
-        text09:SetText('No Preset exist, set your first Preset name :')
+        -- TODO: Localize this
+        text09:SetText('No presets found, choose a name for a new preset:')
         OKButton.OnClick = function(self)
             local result = nameEdit:GetText()
             if result == '' then
@@ -6145,7 +6143,7 @@ function GUI_PRESET_INPUT(tyype)
             end
         end
     elseif tyype == 0 then
-        text09:SetText('Set your Preset name :')
+        text09:SetText('Set your preset name:')
         OKButton.OnClick = function(self)
             local result = nameEdit:GetText()
             if result == '' then
@@ -6156,7 +6154,7 @@ function GUI_PRESET_INPUT(tyype)
             end
         end
     elseif tyype == 1 then
-        text09:SetText('Rename your Preset :')
+        text09:SetText('Rename your preset:')
         OKButton.OnClick = function(self)
             local result = nameEdit:GetText()
             if result == '' then
@@ -6172,7 +6170,7 @@ function GUI_PRESET_INPUT(tyype)
             end
         end
     elseif tyype == 2 then
-        text09:SetText('Rename your FAF Title :')
+        text09:SetText('Rename your FAF Title:')
         OKButton.OnClick = function(self)
             local result = nameEdit:GetText()
             if result == '' then
@@ -6185,7 +6183,7 @@ function GUI_PRESET_INPUT(tyype)
             end
         end
     elseif tyype == 3 then
-        text09:SetText('Rename your Rule :')
+        text09:SetText('Rename your rule:')
         OKButton.OnClick = function(self)
             local result = nameEdit:GetText()
             if result == '' then
