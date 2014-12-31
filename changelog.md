@@ -15,7 +15,6 @@ Changelog for patch 3639
   - Harbinger will automatically engage at range again
   - Range tuned down a bit so units will not run off too much
 - Fixed Seraphim T3MAA targetbones (Units will no longer aim above it)
-- Fixed integrated replaysync
 - More mod compatibility
 - Give Eye of Rihanne restriction a new description
 - Fixed hoplite not firing at landed air units
@@ -24,7 +23,7 @@ Changelog for patch 3639
 - Improve new unit share code (Units dying after being transferred multiple times)
 - Fixed sinking wrecks blocking projectiles where the unit used to be
 
-*Lobby changes (Version 2.6.0)*
+*Lobby changes (Version 2.6.0, also shown in game)*
 - Fix the rating not showing up for observers
 - Font-size for observers reduced
 - Chat font-size adjustable from options
@@ -32,8 +31,9 @@ Changelog for patch 3639
 - Connection dialog no longer appears below lobby slots
 - Fixed issue with players not being removed from slots on disconnect
 - Fixed integrated replaysync
-- Clan tags are shown in game
 - "Set ranked options" button works again
+- Tooltips for various buttons fixed and text revised
+- More detailed large map preview
 
 
 Thanks to pip, briang and Alex1911 for translations
@@ -44,6 +44,7 @@ Contributors:
  - Crotalus
  - IceDreamer
  - Sheeo
+ - Santa Claus
  - Xinnony
 
 Changelog for patch 3638

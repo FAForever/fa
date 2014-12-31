@@ -62,7 +62,9 @@ changelog = {
             "- Fixed issue with players not being removed from slots on disconnect",
             "- Fix integrated replaysync",
             "- Clan tags are shown in game",
-            "- 'Set ranked options' button works again"
+            "- 'Set ranked options' button works again",
+            "- Tooltips for various buttons fixed and text revised",
+            "- More detailed large map preview"
         }
     }
 }
