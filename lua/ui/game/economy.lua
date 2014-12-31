@@ -26,8 +26,6 @@ local filteredMass = 1
 local fullFlag = false
 local emptyFlag = false
 
--- updated in UserSync.lua
-TeamEco = {allies={}, overflow={MASS=0, ENERGY=0}}
 
 group = false
 savedParent = false
@@ -281,19 +279,12 @@ end
 function _BeatFunction()
     local econData = GetEconomyTotals()
     local simFrequency = GetSimTicksPerSecond()
-    local allyOverflow
-
-    if options.gui_team_economy == 1 and TeamEco and TeamEco.overflow then
-        allyOverflow = TeamEco.overflow
-    else
-        allyOverflow = {MASS=0, ENERGY=0}
-    end
-
     if options.gui_display_reclaim_totals == 1 then
     -- fetch & format reclaim values
         reclaimedTotalsMass = math.ceil(econData.reclaimed.MASS)
         reclaimedTotalsEnergy = math.ceil(econData.reclaimed.ENERGY)
     end
+    
 
     if options.gui_smart_economy_indicators == 1 then
         local function DisplayEconData(controls, tableID, viewPref, filtered, warnfull)
@@ -306,19 +297,13 @@ function _BeatFunction()
             local requestedAvg = math.min(lastRequestedVal * simFrequency, 99999999)
             local actualAvg = math.min(lastActualVal * simFrequency, 99999999)
             local incomeAvg = math.min(incomeVal * simFrequency, 99999999)
-            local overflow = math.ceil(math.min(allyOverflow[tableID] * simFrequency, 99999999))
-            
+
             controls.storageBar:SetRange(0, maxStorageVal)
             controls.storageBar:SetValue(storedVal)
             controls.curStorage:SetText(math.ceil(storedVal))
             controls.maxStorage:SetText(math.ceil(maxStorageVal))
 
-            if overflow > 0 then
-                controls.income:SetText(string.format("+%d (+%d)", math.ceil(incomeAvg), overflow))
-            else
-                controls.income:SetText(string.format("+%d", math.ceil(incomeAvg)))
-            end
-
+            controls.income:SetText(string.format("+%d", math.ceil(incomeAvg)))
             if (storedVal > 0.5) then
                 controls.expense:SetText(string.format("-%d", math.ceil(actualAvg)))
             else
@@ -331,7 +316,6 @@ function _BeatFunction()
             else
                 rateVal = math.ceil(incomeAvg - requestedAvg)
             end
-            rateVal = rateVal + overflow 
 
 
             -- CHANGED by THYGRRR: Effective value calculation and rate calculation separated.
@@ -497,24 +481,17 @@ function _BeatFunction()
             local requestedAvg = math.min(lastRequestedVal * simFrequency, 99999999)
             local actualAvg = math.min(lastActualVal * simFrequency, 9999999)
             local incomeAvg = math.min(incomeVal * simFrequency, 99999999)
-            local overflow = math.ceil(math.min(allyOverflow[tableID] * simFrequency, 99999999))
             
             controls.storageBar:SetRange(0, maxStorageVal)
             controls.storageBar:SetValue(storedVal)
             controls.curStorage:SetText(math.ceil(storedVal))
             controls.maxStorage:SetText(math.ceil(maxStorageVal))
             
-            if overflow > 0 then
-                controls.income:SetText(string.format("+%d (+%d)", math.ceil(incomeAvg), overflow))
-            else
-                controls.income:SetText(string.format("+%d", math.ceil(incomeAvg)))
-            end
-            
-
+            controls.income:SetText(string.format("+%d", math.ceil(incomeAvg)))
             if storedVal > 0.5 then
-                controls.expense:SetText(string.format("+%d", math.ceil(actualAvg)))
+                controls.expense:SetText(string.format("-%d", math.ceil(actualAvg)))
             else
-                controls.expense:SetText(string.format("+%d", math.ceil(requestedAvg)))
+                controls.expense:SetText(string.format("-%d", math.ceil(requestedAvg)))
             end
         
             local rateVal = 0
@@ -523,8 +500,6 @@ function _BeatFunction()
             else
                 rateVal = math.ceil(incomeAvg - requestedAvg)
             end
-
-            rateVal = rateVal + overflow 
             local rateStr = string.format('%+d', math.min(math.max(rateVal, -99999999), 99999999))
             local rateStr, effVal = FormatRateString(rateVal, storedVal, incomeAvg, actualAvg, requestedAvg)
         -- CHOOSE RATE or EFFICIENCY STRING

@@ -6,8 +6,6 @@ Changelog for patch 3639
 
 *Game improvements*
 - Game quality is now visible in score overlay
-- Ally overflow is now visible in economy overlay
-- Ally storage is now visible in score overlay
 
 *Bug fixes*
 - Fixed air wrecks floating mid air on certain maps
