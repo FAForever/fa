@@ -80,6 +80,7 @@ UnitBlueprint {
         'LAND',
         'EXPERIMENTAL',
         'CONSTRUCTION',
+	'FACTORY',
         'DIRECTFIRE',
         'ANTIAIR',
         'NEEDMOBILEBUILD',

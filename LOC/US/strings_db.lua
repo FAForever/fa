@@ -768,12 +768,9 @@ EarthCom="EarthCom"
 Elliott="Elliott"
 Engine0001="Connecting to game host..."
 Engine0002="%s disconnected."
-Engine0003="" -- Lost connection to %s." -- Modified by Xinnony
-Xngine0003="Lost connection to %s." -- Modified by Xinnony
-Engine0004="" -- Connection to %s established." -- Modified by Xinnony
-Xngine0004="Connection to %s established." -- Modified by Xinnony
-Engine0005="" -- Connecting to %s..." -- Modified by Xinnony
-Xngine0005="Connecting to %s..." -- Modified by Xinnony
+Engine0003="Lost connection to %s."
+Engine0004="Connection to %s established."
+Engine0005="Connecting to %s..."
 Engine0006="%s: adjusting game speed to %+d"
 Engine0007="Double left-click for coordinated attack"
 Engine0008="Double right-click for coordinated attack"
@@ -4228,6 +4225,28 @@ lobui_0393="AIx: Random"
 lobui_0394="Randomly chooses one of the cheating AI types"
 lobui_0395="AIx: Random"
 lobui_0396="Command Not Known: %s"
+
+# Lobby options panel
+lobui_0397="Show system message"
+lobui_0398="Display system messages in chat window (connection status etc.)"
+lobui_0399="Lobby Developers"
+lobui_0400="Stretch Background"
+lobui_0401="Stretch background to fill screen."
+lobui_0402="Windowed Mode"
+lobui_0403="Lobby is windowed until launch"
+lobui_0404="Chat Font Size:"
+lobui_0405="Lobby Background"
+
+# Lobby background options
+lobui_0406="Factions"
+lobui_0407="Concept Art"
+lobui_0408="Screenshot"
+lobui_0409="Map"
+lobui_0410="None"
+
+# Lobby changelog panel
+lobui_0412="What's new in Lobby?"
+
 main_menu_0000="Forged Alliance"
 main_menu_0001="Multiplayer LAN"
 main_menu_9586="Close Menu"
@@ -5091,8 +5110,8 @@ tooltipui0684="No Teleporting"
 tooltipui0685="Removes the ability to upgrade ACUs and sACUs with Teleporters"
 tooltipui0686="No Billy"
 tooltipui0687="Prevents UEF commanders from upgrading their ACU to have the 'Billy' tactical nuke upgrade"
-tooltipui0688="No Eye of Rhianne and Soothsayer"
-tooltipui0689="Remove the Aeon T3 Optics and Cybran T3 Perimeter"
+tooltipui0688="No Super-Intel"
+tooltipui0689="Removes the Aeon Eye of Rhianne and the Cybran Soothsayer"
 
 tooltipui0540="Reset Chat Window"
 tooltipui0541="Resets the position and layout of the chat window"
@@ -6638,3 +6657,20 @@ xss0303_name="Iavish"
 xss0304_desc="Submarine Hunter"
 xss0304_help="Submarine Hunter"
 xss0304_name="Yathsou"
+lobui_0750="Rating"
+lobui_0751="Global ladder rating"
+lobui_0752="Rerun CPU Benchmark"
+lobui_0753="Recalculates your CPU rating"
+lobui_0585="AI Markers"
+lobui_0586="Select maps with AI Markers"
+lobui_0748="Number of Games"
+lobui_0749="Number of games played in global ladder"
+lobui_0507="Auto Teams"
+lobui_0508="Click to change the auto teams settings"
+lobui_0523="Ranked Settings"
+lobui_0524="When clicked, all the main game options will be reset to ranked settings"
+lobui_0501="Random Map"
+lobui_0502="When clicked, a random map will be selected"
+lobui_0590="Automatically Remove"
+lobui_0591="Check if you want to automatically remove players who don't have selected mods"
+

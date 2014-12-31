@@ -277,7 +277,7 @@ UnitBlueprint {
                 'SPECIALLOWPRI',
                 'ALLUNITS',
             },
-            TargetRestrictDisallow = 'HIGHALTAIR, UNTARGETABLE',
+            TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Turret_Muzzle_01',
             TurretBonePitch = 'Turret_Barrel',
@@ -288,7 +288,7 @@ UnitBlueprint {
             TurretPitchSpeed = 100,
             TurretYaw = 0,
             TurretYawRange = 180,
-            TurretYawSpeed = 60, # 50
+            TurretYawSpeed = 60,
             Turreted = true,
             WeaponCategory = 'Direct Fire',
         },

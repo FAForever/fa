@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Various utility functions to make UI scripts easier and more consistent
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local LazyVar = import('/lua/lazyvar.lua')
@@ -14,6 +14,7 @@ local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
 local Button = import('/lua/maui/button.lua').Button
 local Edit = import('/lua/maui/edit.lua').Edit
 local Checkbox = import('/lua/maui/Checkbox.lua').Checkbox
+local RadioButtons = import('/lua/maui/radiobuttons.lua').RadioButtons
 local Scrollbar = import('/lua/maui/scrollbar.lua').Scrollbar
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Cursor = import('/lua/maui/cursor.lua').Cursor
@@ -29,7 +30,6 @@ dialogButtonFont = import('/lua/lazyvar.lua').Create()      -- default font used
 bodyFont = import('/lua/lazyvar.lua').Create()              -- font used for all other text
 fixedFont = import('/lua/lazyvar.lua').Create()             -- font used for fixed width characters
 titleFont = import('/lua/lazyvar.lua').Create()             -- font used for titles and labels
-newFont = import('/lua/lazyvar.lua').Create()             -- XinnonyWork NEW FONT 2013
 fontColor = import('/lua/lazyvar.lua').Create()             -- common font color
 fontOverColor = import('/lua/lazyvar.lua').Create()             -- common font color
 fontDownColor = import('/lua/lazyvar.lua').Create()             -- common font color
@@ -47,6 +47,7 @@ consoleBGColor = import('/lua/lazyvar.lua').Create()        -- console backgroun
 consoleFGColor = import('/lua/lazyvar.lua').Create()        -- console foreground color (text)
 consoleTextBGColor = import('/lua/lazyvar.lua').Create()    -- console text background color
 menuFontSize = import('/lua/lazyvar.lua').Create()          -- font size used on main in game escape menu
+
 -- table of layouts supported by this skin, not a lazy var as we don't need updates
 layouts = nil
 
@@ -199,8 +200,8 @@ function SetCurrentSkin(skin)
     bodyFont:Set(skins[skin].bodyFont or skins['default'].bodyFont)
     fixedFont:Set(skins[skin].fixedFont or skins['default'].fixedFont)
     titleFont:Set(skins[skin].titleFont or skins['default'].titleFont)
-    fontColor:Set(skins[skin].fontColor or skins['default'].fontColor)
     bodyColor:Set(skins[skin].bodyColor or skins['default'].bodyColor)
+    fontColor:Set(skins[skin].fontColor or skins['default'].fontColor)
     fontOverColor:Set(skins[skin].fontOverColor or skins['default'].fontOverColor)
     fontDownColor:Set(skins[skin].fontDownColor or skins['default'].fontDownColor)
     dialogCaptionColor:Set(skins[skin].dialogCaptionColor or skins['default'].dialogCaptionColor)
@@ -236,42 +237,6 @@ function SetCurrentSkin(skin)
             SetCurrentLayout(layouts[1])
         end
     end
-
-    Prefs.SetToCurrentProfile("skin", skin)
-end
-
-function SetCurrentSkin2(skin)
-    local skins = import('/lua/skins/skins.lua').skins
-
-    if skins[skin] == nil then
-        skin = 'uef'
-    end
-
-    currentSkin:Set(skin)
-
-    menuFontSize:Set(skins[skin].menuFontSize or skins['default'].menuFontSize)
-    layouts = skins[skin].layouts or skins['default'].layouts
-
-    --UpdateWorldBorderState(skin)
-
-    --local curLayout = Prefs.GetFromCurrentProfile("layout")
-
-    --if not curLayout then
-        --SetCurrentLayout(layouts[1])
-    --else
-        --local validLayout = false
-        --for i, layoutName in layouts do
-            --if layoutName == curLayout then
-                --validLayout = true
-                --break
-            --end
-        --end
-        --if validLayout then
-            --SetCurrentLayout(curLayout)
-        --else
-            --SetCurrentLayout(layouts[1])
-        --end
-    --end
 
     Prefs.SetToCurrentProfile("skin", skin)
 end
@@ -418,13 +383,17 @@ function CreateCursor()
 end
 
 --* return a text object with the appropriate font set
-function CreateText(parent, label, pointSize, font)
+function CreateText(parent, label, pointSize, font, dropshadow)
     label = LOC(label) or LOC("<LOC uiutil_0000>[no text]")
     font = font or buttonFont
     local text = Text(parent, "Text: " .. label)
     text:SetFont(font, pointSize)
     text:SetColor(fontColor)
     text:SetText(label)
+
+    if dropshadow then
+        text:SetDropShadow(true)
+    end
     return text
 end
 
@@ -461,7 +430,7 @@ function SetupEditStd(control, foreColor, backColor, highlightFore, highlightBac
 end
 
 --* return a button set up with a text overlay and a click sound
-function CreateButton(parent, up, down, over, disabled, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue)
+function CreateButton(parent, up, down, over, disabled, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue, dropshadow)
     textOffsetVert = textOffsetVert or 0
     textOffsetHorz = textOffsetHorz or 0
     if clickCue == "NO_SOUND" then
@@ -491,7 +460,7 @@ function CreateButton(parent, up, down, over, disabled, label, pointSize, textOf
     button:UseAlphaHitTest(true)
 
     if label and pointSize then
-        button.label = CreateText(button, label, pointSize)
+        button.label = CreateText(button, label, pointSize, buttonFont, dropshadow)
         LayoutHelpers.AtCenterIn(button.label, button, textOffsetVert, textOffsetHorz)
         button.label:DisableHitTest()
 
@@ -518,84 +487,6 @@ function CreateButton(parent, up, down, over, disabled, label, pointSize, textOf
 
     return button
 end
-function CreateButton2(parent, up, down, over, disabled, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue)
-    textOffsetVert = textOffsetVert or 0
-    textOffsetHorz = textOffsetHorz or 0
-    if clickCue == "NO_SOUND" then
-        clickCue = nil
-    else
-        clickCue = clickCue or "UI_Menu_MouseDown_Sml"
-    end
-    if rolloverCue == "NO_SOUND" then
-        rolloverCue = nil
-    else
-        rolloverCue = rolloverCue or "UI_Menu_Rollover_Sml"
-    end
-    if type(up) == 'string' then
-        up = SkinnableFile(up)
-    end
-    if type(down) == 'string' then
-        down = SkinnableFile(down)
-    end
-    if type(over) == 'string' then
-        over = SkinnableFile(over)
-    end
-    if type(disabled) == 'string' then
-        disabled = SkinnableFile(disabled)
-    end
-
-    local button = Button(parent, up, down, over, disabled, clickCue, rolloverCue)
-    button:UseAlphaHitTest(true)
-
-    if label and pointSize then
-        button.label = CreateText(button, label, pointSize)
-        LayoutHelpers.AtCenterIn(button.label, button, textOffsetVert, textOffsetHorz)
-        button.label:DisableHitTest()
-		button.label:SetFont('Arial', 11)
-		button.label:SetColor('B9BFB9')
-		button.label:SetDropShadow(true)
-
-        -- if text exists, set up to grey it out
-        button.OnDisable = function(self)
-            Button.OnDisable(self)
-            button.label:SetColor('7B7F7B')
-        end
-
-        button.OnEnable = function(self)
-            Button.OnEnable(self)
-            button.label:SetColor('B9BFB9')
-        end
-        button.OnRolloverEvent = function(self, event)
-            if event == 'enter' then
-                button.label:SetColor('DEE5DE')
-            elseif event == 'exit' then
-                button.label:SetColor('B9BFB9')
-            elseif event == 'down' then
-                button.label:SetColor('FFFFFF')
-            end
-        end
-    end
-
-    return button
-end
-
-function SetNewButtonTextures(button, up, down, over, disabled)
-    -- if strings passed in, make them skinnables, otherwise assume they are already skinnables
-    if type(up) == 'string' then
-        up = SkinnableFile(up)
-    end
-    if type(down) == 'string' then
-        down = SkinnableFile(down)
-    end
-    if type(over) == 'string' then
-        over = SkinnableFile(over)
-    end
-    if type(disabled) == 'string' then
-        disabled = SkinnableFile(disabled)
-    end
-
-    button:SetNewTextures(up, down, over, disabled)
-end
 
 --* create a button with standardized texture names
 --* given a path and button name prefix, generates the four button asset file names according to the naming convention
@@ -614,32 +505,19 @@ function CreateButtonStd(parent, filename, label, pointSize, textOffsetVert, tex
         )
 end
 
-function CreateButtonStd2(parent, filename, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue) -- XinnonyWork
-    return CreateButton2(parent
-        , filename .. "_up.dds"
-        , filename .. "_down.dds"
-        , filename .. "_over.dds"
-        , filename .. "_dis.dds"
+function CreateButtonWithDropshadow(parent, filename, label, textOffsetVert, textOffsetHorz, clickCue, rolloverCue)
+    return CreateButton(parent
+        , filename .. "_btn_up.dds"
+        , filename .. "_btn_down.dds"
+        , filename .. "_btn_over.dds"
+        , filename .. "_btn_dis.dds"
         , label
-        , pointSize
+        , 11
         , textOffsetVert
         , textOffsetHorz
         , clickCue
         , rolloverCue
-        )
-end
-function CreateButtonStd2PNG(parent, filename, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue) -- XinnonyWork
-    return CreateButton2(parent
-        , filename .. "_up.png"
-        , filename .. "_down.png"
-        , filename .. "_over.png"
-        , filename .. "_dis.png"
-        , label
-        , pointSize
-        , textOffsetVert
-        , textOffsetHorz
-        , clickCue
-        , rolloverCue
+        , true
         )
 end
 
@@ -662,31 +540,24 @@ function CreateCheckboxStd(parent, filename, clickCue, rollCue)
         clickCue, rollCue)
     return checkbox
 end
-function CreateCheckboxStdPNG(parent, filename, clickCue, rollCue)
-    local checkbox = CreateCheckbox( parent,
-        SkinnableFile(filename .. '-d_btn_up.png'),
-        SkinnableFile(filename .. '-s_btn_up.png'),
-        SkinnableFile(filename .. '-d_btn_over.png'),
-        SkinnableFile(filename .. '-s_btn_over.png'),
-        SkinnableFile(filename .. '-d_btn_dis.png'),
-        SkinnableFile(filename .. '-s_btn_dis.png'),
-        clickCue, rollCue)
-    return checkbox
+
+function CreateRadioButtonsStd(parent, filename, title, buttons, default)
+    local radioButton = RadioButtons(parent, title, buttons, default, "Arial", 14, fontColor,
+        SkinnableFile(filename .. '-d_btn_up.dds'),
+        SkinnableFile(filename .. '-s_btn_up.dds'),
+        SkinnableFile(filename .. '-d_btn_over.dds'),
+        SkinnableFile(filename .. '-s_btn_over.dds'),
+        SkinnableFile(filename .. '-d_btn_dis.dds'),
+        SkinnableFile(filename .. '-s_btn_dis.dds'),
+        "")
+    return radioButton
 end
 
-function CreateDialogButtonStd(parent, filename, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue)
+ function CreateDialogButtonStd(parent, filename, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue)
     local button = CreateButtonStd(parent,filename,label,pointSize,textOffsetVert,textOffsetHorz, clickCue, rolloverCue)
     button.label:SetFont( dialogButtonFont, pointSize )
     button.label:SetColor( dialogButtonColor )
     return button
-end
-
-function SetNewButtonStdTextures(button, filename)
-    SetNewButtonTextures(button
-        , filename .. "_btn_up.dds"
-        , filename .. "_btn_down.dds"
-        , filename .. "_btn_over.dds"
-        , filename .. "_btn_dis.dds")
 end
 
 --* return the standard scrollbar
@@ -743,57 +614,8 @@ function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom,
     return scrollbar
 end
 
-function CreateVertScrollbarFor2(attachto, offset_right, filename, offset_bottom, offset_top) -- for New Skin Lobby -- Xinnony
-    offset_right = offset_right or 0
-	offset_bottom = offset_bottom or 0
-	offset_top = offset_top or 0
-    local textureName = filename or '/SCROLLBAR_VERT/'
-    local scrollbg = textureName..'back_scr_mid.dds'
-    local scrollbarmid = textureName..'bar-mid_scr_over.dds'
-    local scrollbartop = textureName..'bar-top_scr_up.dds'
-    local scrollbarbot = textureName..'bar-bot_scr_up.dds'
-    if filename then
-        scrollbg = textureName..'back_scr_mid.dds'
-        scrollbarmid = textureName..'bar-mid_scr_up.dds'
-        scrollbartop = textureName..'bar-top_scr_up.dds'
-        scrollbarbot = textureName..'bar-bot_scr_up.dds'
-    end
-    local scrollbar = Scrollbar(attachto, import('/lua/maui/scrollbar.lua').ScrollAxis.Vert)
-    scrollbar:SetTextures(  SkinnableFile(scrollbg)
-                            ,SkinnableFile(scrollbarmid)
-                            ,SkinnableFile(scrollbartop)
-                            ,SkinnableFile(scrollbarbot))
-
-    local scrollUpButton = Button(  scrollbar
-                                    , SkinnableFile(textureName..'arrow-up_scr_up.dds')
-                                    , SkinnableFile(textureName..'arrow-up_scr_over.dds')
-                                    , SkinnableFile(textureName..'arrow-up_scr_down.dds')
-                                    , SkinnableFile(textureName..'arrow-up_scr_dis.dds')
-                                    , "UI_Arrow_Click")
-
-    local scrollDownButton = Button(  scrollbar
-                                    , SkinnableFile(textureName..'arrow-down_scr_up.dds')
-                                    , SkinnableFile(textureName..'arrow-down_scr_over.dds')
-                                    , SkinnableFile(textureName..'arrow-down_scr_down.dds')
-                                    , SkinnableFile(textureName..'arrow-down_scr_dis.dds')
-                                    , "UI_Arrow_Click")
-
-    scrollbar.Left:Set(function() return attachto.Right() + offset_right end)
-    scrollbar.Top:Set(scrollUpButton.Bottom)
-    scrollbar.Bottom:Set(scrollDownButton.Top)
-
-    scrollUpButton.Left:Set(scrollbar.Left)
-    scrollUpButton.Top:Set(function() return attachto.Top() + offset_top end)
-
-	scrollDownButton.Left:Set(scrollbar.Left)
-    scrollDownButton.Bottom:Set(function() return attachto.Bottom() + offset_bottom end)
-
-    scrollbar.Right:Set(scrollUpButton.Right)
-
-    scrollbar:AddButtons(scrollUpButton, scrollDownButton)
-    scrollbar:SetScrollable(attachto)
-
-    return scrollbar
+function CreateLobbyVertScrollbar(attachto, offset_right, filename, offset_bottom, offset_top)
+    return CreateVertScrollbarFor(attachto, offset_right, "/SCROLLBAR_VERT/", offset_bottom, offset_top)
 end
 
 function CreateHorzScrollbarFor(attachto, offset)
@@ -1043,167 +865,6 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
     return dialog
 end
 
-function QuickDialog2(parent, dialogText, button1Text, button1Callback, button2Text, button2Callback, button3Text, button3Callback, destroyOnCallback, modalInfo, Offset_Width)
-    -- if there is a callback and destroy not specified, assume destroy
-    if (destroyOnCallback == nil) and (button1Callback or button2Callback or button3Callback) then
-        destroyOnCallback = true
-    end
-
-    local dialog = Group(parent, "quickDialogGroup")
-
-    LayoutHelpers.AtCenterIn(dialog, parent)
-    dialog.Depth:Set(GetFrame(parent:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 1)
-    local background = Bitmap(dialog, SkinnableFile('/dialogs/dialog_02/panel_bmp_m.dds'))
-    dialog._background = background
-    dialog.Width:Set(654)--background.Width())
-    dialog.Height:Set(background.Height)
-    LayoutHelpers.FillParent(background, dialog)
-
-    local textLine = {}
-    textLine[1] = CreateText(dialog, "", 18, 'Arial')
-    textLine[1].Top:Set(background.Top)
-    LayoutHelpers.AtHorizontalCenterIn(textLine[1], dialog)
-
-    local tempTable = import('/lua/maui/text.lua').WrapText(LOC(dialogText), 1000, function(text) return textLine[1]:GetStringAdvance(text) end)
-
-    local tempLines = table.getn(tempTable)
-
-    local prevControl = false
-    for i, v in tempTable do
-        if i == 1 then
-            textLine[1]:SetText(v)
-            prevControl = textLine[1]
-        else
-            textLine[i] = CreateText(dialog, v, 10, 'Arial')
-            LayoutHelpers.Below(textLine[i], prevControl)
-			LayoutHelpers.AtLeftIn(textLine[i], dialog, 30)
-            --LayoutHelpers.AtHorizontalCenterIn(textLine[i], dialog)
-            prevControl = textLine[i]
-        end
-    end
-
-    background:SetTiled(true)
-    background.Bottom:Set(textLine[tempLines].Bottom)
-
-    local backgroundTop = Bitmap(dialog, SkinnableFile('/dialogs/dialog_02/panel_bmp_T.dds'))
-    backgroundTop.Bottom:Set(background.Top)
-    backgroundTop.Left:Set(background.Left)
-    local backgroundBottom = Bitmap(dialog, SkinnableFile('/dialogs/dialog_02/panel_bmp_b.dds'))
-    backgroundBottom.Top:Set(background.Bottom)
-    backgroundBottom.Left:Set(background.Left)
-
-    --background.brackets = CreateDialogBrackets(background, 35, 65, 35, 115, true)
-
-    if not modalInfo or modalInfo.worldCover then
-        CreateWorldCover(dialog)
-    end
-
-    local function MakeButton(text, callback)
-        local button = CreateButtonStd( background
-                                        , '/scx_menu/small-btn/small'
-                                        , text
-                                        , 14
-                                        , 2)
-        if callback then
-            button.OnClick = function(self)
-                callback()
-				if destroyOnCallback then
-					dialog:Destroy()
-				end
-            end
-        else
-            button.OnClick = function(self)
-                dialog:Destroy()
-            end
-        end
-        return button
-    end
-
-    dialog._button1 = false
-    dialog._button2 = false
-    dialog._button3 = false
-
-    if button1Text then
-        dialog._button1 = MakeButton(button1Text, button1Callback)
-        LayoutHelpers.Below(dialog._button1, background, 0)
-    end
-    if button2Text then
-        dialog._button2 = MakeButton(button2Text, button2Callback)
-        LayoutHelpers.Below(dialog._button2, background, 0)
-    end
-    if button3Text then
-        dialog._button3 = MakeButton(button3Text, button3Callback)
-        LayoutHelpers.Below(dialog._button3, background, 0)
-    end
-
-    if dialog._button3 then
-        -- center each button to one third of the dialog
-        LayoutHelpers.AtHorizontalCenterIn(dialog._button2, dialog)
-        LayoutHelpers.LeftOf(dialog._button1, dialog._button2, -8)
-        LayoutHelpers.ResetLeft(dialog._button1)
-        LayoutHelpers.RightOf(dialog._button3, dialog._button2, -8)
-        backgroundTop:SetTexture(SkinnableFile('/dialogs/dialog_02/panel_bmp_T.dds'))
-        backgroundBottom:SetTexture(SkinnableFile('/dialogs/dialog_02/panel_bmp_b.dds'))
-        background:SetTexture(SkinnableFile('/dialogs/dialog_02/panel_bmp_m.dds'))
-    elseif dialog._button2 then
-        -- center each button to half the dialog
-        dialog._button1.Left:Set(function()
-            return dialog.Left() + (((dialog.Width() / 2) - dialog._button1.Width()) / 2) + 8
-        end)
-        dialog._button2.Left:Set(function()
-            local halfWidth = dialog.Width() / 2
-            return dialog.Left() + halfWidth + ((halfWidth - dialog._button2.Width()) / 2) - 8
-        end)
-    elseif dialog._button1 then
-        LayoutHelpers.AtHorizontalCenterIn(dialog._button1, dialog)
-    else
-        backgroundBottom:SetTexture(UIFile('/dialogs/dialog/panel_bmp_alt_b.dds'))
-        background.brackets:Hide()
-    end
-
-    if modalInfo and not modalInfo.OnlyWorldCover then
-        local function OnEnterFunc()
-            if modalInfo.enterButton then
-                if modalInfo.enterButton == 1 then
-                    if dialog._button1 then
-                        dialog._button1.OnClick(dialog._button1)
-                    end
-                elseif modalInfo.enterButton == 2 then
-                    if dialog._button2 then
-                        dialog._button2.OnClick(dialog._button2)
-                    end
-                elseif modalInfo.enterButton == 3 then
-                    if dialog._button3 then
-                        dialog._button3.OnClick(dialog._button3)
-                    end
-                end
-            end
-        end
-
-        local function OnEscFunc()
-            if modalInfo.escapeButton then
-                if modalInfo.escapeButton == 1 then
-                    if dialog._button1 then
-                        dialog._button1.OnClick(dialog._button1)
-                    end
-                elseif modalInfo.escapeButton == 2 then
-                    if dialog._button2 then
-                        dialog._button2.OnClick(dialog._button2)
-                    end
-                elseif modalInfo.escapeButton == 3 then
-                    if dialog._button3 then
-                        dialog._button3.OnClick(dialog._button3)
-                    end
-                end
-            end
-        end
-
-        MakeInputModal(dialog, OnEnterFunc, OnEscFunc)
-    end
-
-    return dialog
-end
-
 function CreateWorldCover(parent, colorOverride)
     local NumFrame = GetNumRootFrames() - 1
     local worldCovers = {}
@@ -1327,27 +988,22 @@ end
 function CreateDialogBrackets(parent, leftOffset, topOffset, rightOffset, bottomOffset, altTextures)
     local ret = Group(parent)
 
+    local texturePath
     if altTextures then
-        ret.topleft = Bitmap(ret, UIFile('/scx_menu/panel-brackets-small/bracket-ul_bmp.dds'))
-        ret.topright = Bitmap(ret, UIFile('/scx_menu/panel-brackets-small/bracket-ur_bmp.dds'))
-        ret.bottomleft = Bitmap(ret, UIFile('/scx_menu/panel-brackets-small/bracket-ll_bmp.dds'))
-        ret.bottomright = Bitmap(ret, UIFile('/scx_menu/panel-brackets-small/bracket-lr_bmp.dds'))
-
-        ret.topleftglow = Bitmap(ret, UIFile('/scx_menu/panel-brackets-small/bracket-glow-ul_bmp.dds'))
-        ret.toprightglow = Bitmap(ret, UIFile('/scx_menu/panel-brackets-small/bracket-glow-ur_bmp.dds'))
-        ret.bottomleftglow = Bitmap(ret, UIFile('/scx_menu/panel-brackets-small/bracket-glow-ll_bmp.dds'))
-        ret.bottomrightglow = Bitmap(ret, UIFile('/scx_menu/panel-brackets-small/bracket-glow-lr_bmp.dds'))
+        texturePath = "/scx_menu/panel-brackets-small"
     else
-        ret.topleft = Bitmap(ret, UIFile('/scx_menu/panel-brackets/bracket-ul_bmp.dds'))
-        ret.topright = Bitmap(ret, UIFile('/scx_menu/panel-brackets/bracket-ur_bmp.dds'))
-        ret.bottomleft = Bitmap(ret, UIFile('/scx_menu/panel-brackets/bracket-ll_bmp.dds'))
-        ret.bottomright = Bitmap(ret, UIFile('/scx_menu/panel-brackets/bracket-lr_bmp.dds'))
-
-        ret.topleftglow = Bitmap(ret, UIFile('/scx_menu/panel-brackets/bracket-glow-ul_bmp.dds'))
-        ret.toprightglow = Bitmap(ret, UIFile('/scx_menu/panel-brackets/bracket-glow-ur_bmp.dds'))
-        ret.bottomleftglow = Bitmap(ret, UIFile('/scx_menu/panel-brackets/bracket-glow-ll_bmp.dds'))
-        ret.bottomrightglow = Bitmap(ret, UIFile('/scx_menu/panel-brackets/bracket-glow-lr_bmp.dds'))
+        texturePath = "/scx_menu/panel-brackets"
     end
+
+    ret.topleft = Bitmap(ret, UIFile(texturePath .. '/bracket-ul_bmp.dds'))
+    ret.topright = Bitmap(ret, UIFile(texturePath .. '/bracket-ur_bmp.dds'))
+    ret.bottomleft = Bitmap(ret, UIFile(texturePath .. '/bracket-ll_bmp.dds'))
+    ret.bottomright = Bitmap(ret, UIFile(texturePath .. '/bracket-lr_bmp.dds'))
+
+    ret.topleftglow = Bitmap(ret, UIFile(texturePath .. '/bracket-glow-ul_bmp.dds'))
+    ret.toprightglow = Bitmap(ret, UIFile(texturePath .. '/bracket-glow-ur_bmp.dds'))
+    ret.bottomleftglow = Bitmap(ret, UIFile(texturePath .. '/bracket-glow-ll_bmp.dds'))
+    ret.bottomrightglow = Bitmap(ret, UIFile(texturePath .. '/bracket-glow-lr_bmp.dds'))
 
     ret.topleftglow.Depth:Set(function() return ret.topleft.Depth() - 1 end)
     ret.toprightglow.Depth:Set(function() return ret.topright.Depth() - 1 end)
@@ -1375,4 +1031,22 @@ function CreateDialogBrackets(parent, leftOffset, topOffset, rightOffset, bottom
     LayoutHelpers.FillParent(ret, parent)
 
     return ret
+end
+
+-- Enable or disable a control based on a boolean.
+function setEnabled(control, enabled)
+    if (enabled) then
+        control:Enable()
+    else
+        control:Disable()
+    end
+end
+
+-- Show or hide a control based on a boolean.
+function setVisible(control, visible)
+    if (visible) then
+        control:Show()
+    else
+        control:Hide()
+    end
 end

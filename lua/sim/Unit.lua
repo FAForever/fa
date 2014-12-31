@@ -928,33 +928,30 @@ Unit = Class(moho.unit_methods) {
         local focus = self:GetFocusUnit()
         local energy_rate = 0
         local mass_rate = 0
-        local states = {'Building', 'Enhancing', 'Repairing', 'Upgrading', 'SiloBuildingAmmo'}
+        local states = {'Enhancing',  'Upgrading', 'SiloBuildingAmmo', 'Building', 'Repairing'}
         local self_state
         local focus_state
 
         for _, state in states do
-            if self:IsUnitState(state) then self_state = state end
-            if focus and focus:IsUnitState(state) then focus_state = state end
+            if not self_state and self:IsUnitState(state) then self_state = state end
+            if focus and not focus_state and focus:IsUnitState(state) then focus_state = state end
         end
 
         if self.ActiveConsumption then
             local focus = self:GetFocusUnit()
-            if focus and self.WorkItem and self.WorkProgress < 1 and (focus_state == 'Enhancing' or focus_state == 'Building') then
-                self.WorkItem = focus.WorkItem    --Set our workitem to the focus unit work item, is specific for enhancing
-            end
-        end
-
-        if self.ActiveConsumption then
             local time = 1
             local mass = 0
             local energy = 0
             local targetData
             local baseData
-            local workItem = self.WorkItem
 
-            if workItem then --Enhancement
-                targetData = workItem
-                if self.WorkItem and self_state == 'Enhancing' or self_state == 'Upgrading' then
+            if focus and focus.WorkItem and focus.WorkProgress < 1 then
+                self:InheritWork(focus)
+            end
+
+            if self.WorkItem then --Enhancement
+                targetData = self.WorkItem
+                if self.WorkItem and (self_state == 'Enhancing' or self_state == 'Upgrading') then
                     self:UpdateAssistersConsumption()
                 end
             elseif focus then --Handling upgrades
@@ -963,6 +960,7 @@ Unit = Class(moho.unit_methods) {
                 elseif focus.originalBuilder and not focus.originalBuilder:IsDead() and focus.originalBuilder:IsUnitState('Upgrading') then
                     baseData = focus.originalBuilder:GetBlueprint().Economy
                 end
+
                 if baseData then
                     targetData = focus:GetBlueprint().Economy
                 end
@@ -971,7 +969,7 @@ Unit = Class(moho.unit_methods) {
             if targetData then --Upgrade/enhancement
                 time, energy, mass = Game.GetConstructEconomyModel(self, targetData, baseData)
             elseif focus then --Building/repairing something
-                if(focus_state == 'SiloBuildingAmmo') then
+                if focus_state == 'SiloBuildingAmmo' then
                     local siloBuildRate = focus:GetBuildRate() or 1
                     time, energy, mass = focus:GetBuildCosts(focus.SiloProjectile)
                     energy = (energy / siloBuildRate) * (self:GetBuildRate() or 1)
@@ -1224,6 +1222,8 @@ Unit = Class(moho.unit_methods) {
             self:ForkThread(self.PlayAnimationThread, 'AnimationDeath')
         end
 
+        self:SetCollisionShape('None')
+
         self:DoUnitCallbacks( 'OnKilled' )
         self:OnKilledVO()
 
@@ -1383,7 +1383,7 @@ Unit = Class(moho.unit_methods) {
                 self.Trash:Add(sinkAnim)
                 WaitFor(sinkAnim)
 
-                if(EntityCategoryContains(categories.NAVAL, self)) then
+                if EntityCategoryContains(categories.NAVAL, self) then
                     self.StopSink = true --Stop sinking when animation is complete
                 end
             end
@@ -1419,17 +1419,16 @@ Unit = Class(moho.unit_methods) {
         local energy = bp.Economy.BuildCostEnergy * (bp.Wreckage.EnergyMult or 0)
         local time = (bp.Wreckage.ReclaimTimeMultiplier or 1)
         local pos = self:GetPosition()
+        local layer = self:GetCurrentLayer()
 
-        if self:GetCurrentLayer() == 'Water' then
+        if layer == 'Water' then
             --Reduce the mass value of submerged wrecks
             mass = mass * 0.5
             energy = energy * 0.5
         end
 
-        if self:GetCurrentLayer() == 'Seabed' or self:GetCurrentLayer() == 'Land' then
+        if layer == 'Air' or EntityCategoryContains(categories.NAVAL - categories.STRUCTURE, self) then -- make sure air / naval wrecks stick to ground / seabottom
             pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
-        else
-            pos[2] = GetSurfaceHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
         end
 
         local prop = CreateProp( pos, wreck )
@@ -1460,11 +1459,11 @@ Unit = Class(moho.unit_methods) {
 
         -- Attempt to copy our animation pose to the prop. Only works if
         -- the mesh and skeletons are the same, but will not produce an error if not.
-        -- Air results in floating wrecks
-        if not EntityCategoryContains(categories.AIR, self) then
-            TryCopyPose(self,prop,true)
-        end
         
+        if layer ~= 'Air' then
+            TryCopyPose(self, prop, true)
+        end
+
         --Prevent rebuild exploit
         prop.AssociatedBP = self:GetBlueprint().BlueprintId
 
@@ -1629,7 +1628,7 @@ Unit = Class(moho.unit_methods) {
         end
 
         if self.DeathAnimManip and not isNaval then --Wait for non naval-units death animations
-            if(not isSinking) then
+            if not isSinking then
                 WaitFor(self.DeathAnimManip)
             end
 
@@ -1642,6 +1641,7 @@ Unit = Class(moho.unit_methods) {
             self:ForkThread(self.SinkDestructionEffects)
             self:SeabedWatcher() -- Finishes when unit reached seabed
         end
+
         self:CreateWreckage( overkillRatio )
         WaitSeconds(self.DeathThreadDestructionWaitTime)
 

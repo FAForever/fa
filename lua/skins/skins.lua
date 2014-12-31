@@ -19,43 +19,18 @@ skins = {
         texturesPath = "/textures/ui/uef",
         imagerMesh = "/meshes/game/map-border_squ_uef_mesh",
         imagerMeshHorz = "/meshes/game/map-border_hor_uef_mesh",
-        buttonFont = "Zeroes Three",
-	    factionFont = "Zeroes Three",
-        bodyFont = "Arial",
-        fixedFont = "Arial",
-        titleFont = "Zeroes Three",
-        fontColor = "FFbadbdb",
-        bodyColor = "FF6FAFAF",
-        dialogCaptionColor = "FFbadbdb",
-        dialogColumnColor = "FF6FAFAF",
-        dialogButtonColor = "FF69AB4D",
-        dialogButtonFont = "Zeroes Three",
-        highlightColor = "FF7FA8A4",
-        disabledColor = "FF47555a",
         tooltipBorderColor = "FF7392a5",
         tooltipTitleColor = "FF004142",
-        tooltipBackgroundColor = "FF000000",
-        menuFontSize = 18,
-        layouts = {
-            "bottom",
-            "left",
-            "right"
-        },
     },
     aeon = {
-        default = "uef",
+        default = "default",
         texturesPath = "/textures/ui/aeon",
         imagerMesh = "/meshes/game/map-border_squ_aeon_mesh",
         imagerMeshDetails = "/meshes/game/map-border_squ_aeon_a_mesh",
         imagerMeshHorz = "/meshes/game/map-border_hor_aeon_mesh",
         imagerMeshDetailsHorz = "/meshes/game/map-border_hor_aeon_a_mesh",
-        buttonFont = "Zeroes Three",
-	    factionFont = "Zeroes Three",
-        fixedFont = "Arial",
-        titleFont = "Zeroes Three",
-        fontColor = "FFc7e98a",
         bodyColor = "FFc7e98a",
-	    factionFontOverColor = "FFa4ff00",
+        factionFontOverColor = "FFa4ff00",
         factionFontDownColor = "FFFFFFFF",
         dialogCaptionColor = "FFbadbdb",
         dialogColumnColor = "FF6FAFAF",
@@ -65,29 +40,16 @@ skins = {
         disabledColor = "FF3b5511",
         tooltipBorderColor = "FF609541",
         tooltipTitleColor = "FF283d10",
-        tooltipBackgroundColor = "FF000000",
-        menuFontSize = 18,
-        layouts = {
-            "bottom",
-            "left",
-            "right"
-        },
     },
     cybran = {
-        default = "uef",
+        default = "default",
         texturesPath = "/textures/ui/cybran",
         imagerMesh = "/meshes/game/map-border_squ_cybran_mesh",
         imagerMeshHorz = "/meshes/game/map-border_hor_cybran_mesh",
-        buttonFont = "Zeroes Three",
-	    factionFont = "Zeroes Three",
-        bodyFont = "Arial",
-        fixedFont = "Arial",
-        titleFont = "Zeroes Three",
-        fontColor = "FFe24f2d",
         bodyColor = "FFe24f2d",
         factionFontOverColor = "FFff0000",
         factionFontDownColor = "FFFFFFFF",
-	    dialogCaptionColor = "FFbadbdb",
+        dialogCaptionColor = "FFbadbdb",
         dialogColumnColor = "FF6FAFAF",
         dialogButtonColor = "FF69AB4D",
         dialogButtonFont = "Zeroes Three",
@@ -95,31 +57,18 @@ skins = {
         disabledColor = "FF640505",
         tooltipBorderColor = "FFb62929",
         tooltipTitleColor = "FF621917",
-        tooltipBackgroundColor = "FF000000",
-        menuFontSize = 18,
-        layouts = {
-            "bottom",
-            "left",
-            "right"
-        },
     },
     seraphim = {
-        default = "uef",
+        default = "default",
         texturesPath = "/textures/ui/seraphim",
         imagerMesh = "/meshes/game/map-border_squ_sera_mesh",
         imagerMeshDetails = "/meshes/game/map-border_squ_sera_a_mesh",
         imagerMeshHorz = "/meshes/game/map-border_hor_sera_mesh",
         imagerMeshDetailsHorz = "/meshes/game/map-border_hor_sera_a_mesh",
-        buttonFont = "Zeroes Three",
-	    factionFont = "Zeroes Three",
-        bodyFont = "Arial",
-        fixedFont = "Arial",
-        titleFont = "Zeroes Three",
-        fontColor = "FFffd700",
         bodyColor = "FFffd700",
         factionFontOverColor = "FFfffe84",
         factionFontDownColor = "FFFFFFFF",
-	    dialogCaptionColor = "FFbadbdb",
+        dialogCaptionColor = "FFbadbdb",
         dialogColumnColor = "FF6FAFAF",
         dialogButtonColor = "FF69AB4D",
         dialogButtonFont = "Zeroes Three",
@@ -127,46 +76,27 @@ skins = {
         disabledColor = "FF685f16",
         tooltipBorderColor = "FFeee274",
         tooltipTitleColor = "FF725b1a",
-        tooltipBackgroundColor = "FF000000",
-        menuFontSize = 18,
-        layouts = {
-            "bottom",
-            "left",
-            "right"
-        },
     },
-	randomfaction = {
+    randomfaction = {
         default = "default",
         texturesPath = "/textures/ui/random",
         imagerMesh = "/meshes/game/map-border_squ_uef_mesh",
         imagerMeshHorz = "/meshes/game/map-border_hor_uef_mesh",
-        buttonFont = "Zeroes Three",
-	    factionFont = "Zeroes Three",
-        bodyFont = "Arial",
-        fixedFont = "Arial",
-        titleFont = "Zeroes Three",
-		fontColor = "FFffffff", -- Couleur de texte
-        bodyColor = "FFff0000", -- ??
-		dialogCaptionColor = "FFffffff", -- Couleur de texte d'une boite de dialogue
-        dialogColumnColor = "FFff0000", -- ??
-        dialogButtonColor = "FFff0000", -- ??
-        dialogButtonFont = "Zeroes Three", -- ??
-		highlightColor = "FF767676", -- Cadre de selection
-        disabledColor = "FF767676", -- Couleur de texte dont sa été désactivée
-		tooltipBorderColor = "FF3b3b3b", -- Bordure du Tooltip
-        tooltipTitleColor = "FF767676", -- Haut du Tooltip
-        tooltipBackgroundColor = "FF000000", -- Bas du Tooltip
-		menuFontSize = 18,
-        layouts = {
-            "bottom",
-            "left",
-            "right"
-        },
+        bodyColor = "FFff0000",
+        dialogCaptionColor = "FFffffff",
+        dialogColumnColor = "FFff0000",
+        dialogButtonColor = "FFff0000",
+        dialogButtonFont = "Zeroes Three",
+        highlightColor = "FF767676",
+        disabledColor = "FF767676",
+        tooltipBorderColor = "FF3b3b3b",
+        tooltipTitleColor = "FF767676",
     },
 
     -- warning, do not change the name of this skin descriptor or things will break!
     default = {
         -- note, no default value here, so the "default chain" will get broken at this point, and you'll get file not found
+        factionFont = "Zeroes Three",
         texturesPath = "/textures/ui/common",
         imagerMesh = "/meshes/game/map-border_mesh",
         buttonFont = "Zeroes Three",
@@ -189,6 +119,7 @@ skins = {
         consoleFGColor = "white",
         consoleTextBGColor = "80000000",
         menuFontSize = 18,
+        tooltipBackgroundColor = "FF000000",
         layouts = {
             "bottom",
             "left",

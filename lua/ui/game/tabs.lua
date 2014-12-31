@@ -7,6 +7,7 @@ local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
 local Button = import('/lua/maui/button.lua').Button
 local GameMain = import('/lua/ui/game/gamemain.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
+local EscapeHandler = import('/lua/ui/dialogs/eschandler.lua')
 
 local savedParent = false
 local animationLock = false
@@ -246,7 +247,7 @@ local actions = {
     ExitMPGame = function()
         UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0003>Are you sure you'd like to exit?", 
             "<LOC _Yes>", function()
-                ExitApplication()
+                EscapeHandler.SafeQuit()
             end, 
             "<LOC _No>", nil,
             nil, nil,
@@ -774,7 +775,7 @@ function ToggleGameInfo()
         LayoutHelpers.AtTopIn(text0, dialog2, 10)
 	--------------------
     -- OK button --
-	local OkButton = UIUtil.CreateButtonStd2PNG(dialog2, '/BUTTON/medium/', "Ok", 12, -1)
+	local OkButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Ok", -1)
         LayoutHelpers.AtHorizontalCenterIn(OkButton, dialog2, 0)
         LayoutHelpers.AtBottomIn(OkButton, dialog2, 10)
         OkButton.OnClick = function(self)
@@ -792,7 +793,7 @@ function ToggleGameInfo()
 		--LayoutHelpers.DepthOverParent(PresetList, dialog2, 10)
 		LayoutHelpers.AtLeftIn(PresetList, dialog2, 10)
         LayoutHelpers.AtTopIn(PresetList, dialog2, 38)
-		UIUtil.CreateVertScrollbarFor2(PresetList)
+		UIUtil.CreateLobbyVertScrollbar(PresetList)
 	------------
     -- Script --
 	

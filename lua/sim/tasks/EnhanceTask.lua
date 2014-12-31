@@ -32,13 +32,16 @@ EnhanceTask = Class(ScriptTask) {
     Stopping = State {
         TaskTick = function(self)
             local unit = self:GetUnit()
-
+            
             if unit:IsMobile() and unit:IsMoving() then
                 unit:GetNavigator():AbortMove()
                 return TASKSTATUS.Wait
             else
                 unit:OnWorkBegin(self.CommandData.Enhancement)
                 ChangeState(self, self.Enhancing)
+                if unit.UpdateAssistersConsumption then
+                    unit:UpdateAssistersConsumption()
+                end
                 return TASKSTATUS.Repeat
             end
         end,

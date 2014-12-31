@@ -159,7 +159,7 @@ restrictedUnits = {
     },
     EYE = {
         categories = {"xab3301", "xrb3301"},
-        name = "<LOC restricted_units_data_029>No Eye of Rhianne and Soothsayer",
+        name = "<LOC restricted_units_data_029>No Super-Intel",
         tooltip = "restricted_units_eye"
     },
 }

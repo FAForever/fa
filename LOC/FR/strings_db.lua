@@ -3234,12 +3234,9 @@ DIRCON_0002="L'adresse IP choisie n'est pas valide ou inconnue."
 DIRCON_0003="Le numéro de port choisi n'est pas valide. Ce doit être un chiffre compris entre 1 et 65535."
 Engine0001="Connexion à l'hôte de la partie..."
 Engine0002="%s s'est déconnecté."
-Engine0003="" -- Connexion avec %s perdue." -- Modified by Xinnony
-Xngine0003="Connexion avec %s perdue." -- Modified by Xinnony
-Engine0004="" -- Connexion avec %s établie." -- Modified by Xinnony
-Xngine0004="Connexion avec %s établie." -- Modified by Xinnony
-Engine0005="" -- Connexion avec %s..." -- Modified by Xinnony
-Xngine0005="Connexion avec %s..." -- Modified by Xinnony
+Engine0003="Connexion avec %s perdue."
+Engine0004="Connexion avec %s établie."
+Engine0005="Connexion avec %s..."
 GAMESEL_0012="Tentative d'accès"
 GAMSEL_0001="joueurs"
 OPTIONS_001="Niveau de qualité graphique"
@@ -5106,6 +5103,28 @@ lobby_0003="Vérifiez la gestion de mods"
 lobby_0004="%d mod actif"
 lobui_0329="Les joueurs suivants ne possèdent pas la carte actuellement sélectionnée, impossible de lancer : %s"
 lobui_0330="%s n'a pas la carte %s."
+
+# Lobby options panel
+lobui_0397="Show system message"
+lobui_0398="Display system messages in chat window (connection status etc.)"
+lobui_0399="Lobby Developers"
+lobui_0400="Stretch Background"
+lobui_0401="Stretch background to fill screen."
+lobui_0402="Windowed Mode"
+lobui_0403="Lobby is windowed until launch"
+lobui_0404="Chat Font Size:"
+lobui_0405="Lobby Background"
+
+# Lobby background options
+lobui_0406="Factions"
+lobui_0407="Concept Art"
+lobui_0408="Screenshot"
+lobui_0409="Map"
+lobui_0410="None"
+
+# Lobby changelog panel
+lobui_0412="What's new in Lobby?"
+
 main_menu_0000="Forged Alliance"
 main_menu_0001="Multijoueur local"
 pause_0000="Par %s"
@@ -7130,6 +7149,8 @@ tooltipui0684="Pas de Téléportation"
 tooltipui0685="Supprime la capacité d'améliorer l'ACU et les SACU avec un téléporteur"
 tooltipui0686="Pas de Billy"
 tooltipui0687="Empêche les commandants UEF d'améliorer leur ACU avec un missile nucléaire tactique 'Billy'"
+tooltipui0688="Pas de super structures d'espionage"
+tooltipui0689="Pas d'Oeil de Rihanne (Aeon) ni de Devin (Cybran)"
 
 tooltipui0540="Réinitialiser la fenêtre de discussion"
 tooltipui0541="Réinitialise la position et la disposition de la fenêtre de discussion."
@@ -7490,3 +7511,20 @@ score_0003="Observateur"
 uvd_0007="Arrière"
 uvd_0008="CCG"
 uvd_0009="CCD"
+lobui_0750="Rating"
+lobui_0751="Global ladder rating"
+lobui_0752="Rerun CPU Benchmark"
+lobui_0753="Recalculates your CPU rating"
+lobui_0585="AI Markers"
+lobui_0586="Select maps with AI Markers"
+lobui_0748="Number of Games"
+lobui_0749="Number of games played in global ladder"
+lobui_0507="Auto Teams"
+lobui_0508="Click to change the auto teams settings"
+lobui_0523="Ranked Settings"
+lobui_0524="When clicked, all the main game options will be reset to ranked settings"
+lobui_0501="Random Map"
+lobui_0502="When clicked, a random map will be selected"
+lobui_0590="Automatically Remove"
+lobui_0591="Check if you want to automatically remove players who don't have selected mods"
+

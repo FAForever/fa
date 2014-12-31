@@ -91,6 +91,7 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         local hasFuel = false
         local fuelRatio = 0
         local enh = {} # enhancements
+        local oldowner = unit.oldowner
 
         if unit.MyShield then
             shieldIsOn = unit:ShieldIsOn()
@@ -117,6 +118,8 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         end
 
         table.insert(newUnits, unit)
+
+        unit.oldowner = oldowner
 
         if IsAlly(owner, ToArmyIndex) then
             if unit.oldowner == nil then

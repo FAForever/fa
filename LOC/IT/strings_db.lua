@@ -3234,12 +3234,9 @@ DIRCON_0002="Indirizzo IP non valido/sconosciuto: %s"
 DIRCON_0003="Numero porta non valido: %s. Deve essere un numero intero compreso tra 1 e 65535."
 Engine0001="Connessione all'host..."
 Engine0002="%s disconnesso."
-Engine0003="" -- "Connessione a %s interrotta." -- Modified by Xinnony
-Xngine0003="Connessione a %s interrotta." -- Modified by Xinnony
-Engine0004="" -- "Connessione a %s stabilita." -- Modified by Xinnony
-Xngine0004="Connessione a %s stabilita." -- Modified by Xinnony
-Engine0005="" -- "Connessione a %s..." -- Modified by Xinnony
-Xngine0005="Connessione a %s..." -- Modified by Xinnony
+Engine0003="Connessione a %s interrotta."
+Engine0004="Connessione a %s stabilita."
+Engine0005="Connessione a %s..."
 Engine0006="%s: regolazione velocità di gioco %+d"
 GAMESEL_0012="Tentativo di partecipazione..."
 GAMSEL_0001="giocatori"
@@ -5107,6 +5104,28 @@ lobby_0003="Spunta gestione mods"
 lobby_0004="%d mods attivati"
 lobui_0329="Impossibile avviare, i seguenti giocatori non dispongono della mappa attualmente selezionata:%s."
 lobui_0330="%s non possiede la mappa %s."
+
+# Lobby options panel
+lobui_0397="Show system message"
+lobui_0398="Display system messages in chat window (connection status etc.)"
+lobui_0399="Lobby Developers"
+lobui_0400="Stretch Background"
+lobui_0401="Stretch background to fill screen."
+lobui_0402="Windowed Mode"
+lobui_0403="Lobby is windowed until launch"
+lobui_0404="Chat Font Size:"
+lobui_0405="Lobby Background"
+
+# Lobby background options
+lobui_0406="Factions"
+lobui_0407="Concept Art"
+lobui_0408="Screenshot"
+lobui_0409="Map"
+lobui_0410="None"
+
+# Lobby changelog panel
+lobui_0412="What's new in Lobby?"
+
 main_menu_0000="Forged Alliance"
 main_menu_0001="LAN multigiocatore"
 pause_0000="Per %s"
@@ -7131,6 +7150,8 @@ tooltipui0684="Niente Teletrasporti"
 tooltipui0685="Rimuove il teletrasporto, l' abilita di Comandanti e comandanti in seconda"
 tooltipui0686="No Billy"
 tooltipui0687="Rimuove la possibilita per i comandanti UEF di aggiungere al commander 'Billy' missile tattico nucleare"
+tooltipui0688="No Super-Intel"
+tooltipui0689="Rimuove l' Occhio di Arianna (Aeon) e il Controllo Perimetrale (Cibrano)"
 
 
 tooltipui0540="Ripristina finestra chat"
@@ -7492,3 +7513,20 @@ score_0003="Osservatore"
 uvd_0007="Retro"
 uvd_0008="ACS"
 uvd_0009="ACD"
+lobui_0750="Rating"
+lobui_0751="Global ladder rating"
+lobui_0752="Rerun CPU Benchmark"
+lobui_0753="Recalculates your CPU rating"
+lobui_0585="AI Markers"
+lobui_0586="Select maps with AI Markers"
+lobui_0748="Number of Games"
+lobui_0749="Number of games played in global ladder"
+lobui_0507="Auto Teams"
+lobui_0508="Click to change the auto teams settings"
+lobui_0523="Ranked Settings"
+lobui_0524="When clicked, all the main game options will be reset to ranked settings"
+lobui_0501="Random Map"
+lobui_0502="When clicked, a random map will be selected"
+lobui_0590="Automatically Remove"
+lobui_0591="Check if you want to automatically remove players who don't have selected mods"
+

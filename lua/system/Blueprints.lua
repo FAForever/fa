@@ -458,17 +458,22 @@ function PreModBlueprints(all_bps)
             elseif(cats.SCOUT) then
                 br = 10
             elseif bp.Weapon then
-                local vision = bp.Intel.VisionRadius or 10
-                local max = 0
+                local range = 0
+                local tracking = 1.05
 
                 for i, w in bp.Weapon do
                     local ignore = w.CountedProjectile or w.RangeCategory == 'UWRC_AntiAir' or w.WeaponCategory == 'Defense'
-                    if w.MaxRadius and not ignore then
-                        max = math.max(w.MaxRadius, max)
+                    if not ignore then
+                        if w.MaxRadius then
+                            range = math.max(w.MaxRadius, range)
+                        end
+                        if w.TrackingRadius then
+                            tracking = math.max(w.TrackingRadius, tracking)
+                        end
                     end
                 end
 
-                br = vision + max
+                br = (range * tracking)
             end
 
             if(br) then
