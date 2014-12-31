@@ -53,10 +53,6 @@ function OnSync()
     for id,v in Sync.ReleaseIds do
         UnitData[id] = nil
     end
-
-    if Sync.TeamEco then
-        import('/lua/ui/game/economy.lua').TeamEco = Sync.TeamEco
-    end
     
     if Sync.NukeLaunchData then
 		import('/modules/nukelaunchping.lua').DoNukePing(Sync.NukeLaunchData)
