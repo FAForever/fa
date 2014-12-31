@@ -3489,7 +3489,6 @@ function CreateUI(maxPlayers)
 
     -- GO OBSERVER BUTTON --
     GUI.becomeObserver = UIUtil.CreateButtonWithDropshadow(GUI.buttonPanelRight, '/BUTTON/observer/', '', 19)
-    GUI.becomeObserver.label:SetFont('Arial', 11)
     LayoutHelpers.AtLeftTopIn(GUI.becomeObserver, GUI.buttonPanelRight, -40+4, 25)
     Tooltip.AddButtonTooltip(GUI.becomeObserver, 'lob_become_observer')
     GUI.becomeObserver.OnClick = function()
@@ -3499,28 +3498,11 @@ function CreateUI(maxPlayers)
             else
                 lobbyComm:SendData(hostID, {Type = 'RequestConvertToObserver', RequestedName = localPlayerName, RequestedSlot = FindSlotForID(localPlayerID)})
             end
-            GUI.becomeObserver.label:SetText('Go Player')
         elseif IsObserver(localPlayerID) then
             if lobbyComm:IsHost() then
                 HostConvertObserverToPlayerWithoutSlot(hostID, localPlayerName, FindObserverSlotForID(localPlayerID))
             else
                 lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayerWithoutSlot', RequestedName = localPlayerName, ObserverSlot = FindObserverSlotForID(localPlayerID)})
-            end
-            GUI.becomeObserver.label:SetText('Go Observer')
-        end
-    end
-
-    GUI.becomeObserver.OnRolloverEvent = function(self, state)
-        if state == 'enter' then
-            if IsPlayer(localPlayerID) then
-                GUI.becomeObserver.label:SetText('Go Observer')
-            else
-                GUI.becomeObserver.label:SetText('Go Player')
-            end
-        elseif state == 'exit' then
-            GUI.becomeObserver.label:SetText('')
-            if GUI.becomeObserver:IsDisabled() then
-                GUI.becomeObserver:Disable()
             end
         end
     end
@@ -3728,10 +3710,14 @@ function CreateUI(maxPlayers)
     end
 
     -- TODO: Localise!
+    -- Disabling for now, they weren't positioning properly - IceDreamer
+    
+    --[[
     GUI.randTeam.OnRolloverEvent = getButtonPanelRollover("Random Team")
     GUI.rankedOptions.OnRolloverEvent = getButtonPanelRollover("Set Ranked Options")
     GUI.rerunBenchmark.OnRolloverEvent = getButtonPanelRollover("Re-run CPU Benchmark")
     GUI.randMap.OnRolloverEvent = getButtonPanelRollover("Random Map")
+    --]]
 
     --start of auto kick code
     if lobbyComm:IsHost() and not singlePlayer then
