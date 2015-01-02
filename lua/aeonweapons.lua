@@ -82,6 +82,8 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
         if not self.TT1 then
             self.TT1 = self:ForkThread(self.TractorThread, target)
             self:ForkThread(self.TractorWatchThread, target)
+        else
+            WARN('TT1 already exists')
         end
     end,
     
@@ -161,7 +163,7 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
                 CreateEmitterAtBone(self.unit, muzzle , self.unit:GetArmy(), vEffect)
             end
             
-            target:Destroy(self.unit, 'Damage', 1)
+            target:Destroy()
         end
         
         self.AimControl:SetResetPoseTime(2)
@@ -178,6 +180,7 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
             self.Slider = nil
         end
         self.unit:DetachAll(self:GetBlueprint().MuzzleSpecial or 0)
+        DefaultBeamWeapon.PlayFxBeamEnd(self,self.Beams[1].Beam)
         self:ResetTarget()
         self.AimControl:SetResetPoseTime(2)
     end,
