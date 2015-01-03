@@ -107,6 +107,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'OVERLAYANTIAIR',
         'OVERLAYRADAR',
+        'BOMBER',
     },
     Defense = {
         AirThreatLevel = 6,

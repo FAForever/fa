@@ -18,7 +18,7 @@ Changelog for patch 3639
 - More mod compatibility
 - Give Eye of Rihanne restriction a new description
 - Fixed hoplite not firing at landed air units
-- Added BOMBER category to Ahwassa
+- Added BOMBER category to Ahwassa, Notha
 - Added FACTORY category to Megalith, allows queuing of units while being built
 - Improve new unit share code (Units dying after being transferred multiple times)
 - Fixed sinking wrecks blocking projectiles where the unit used to be
