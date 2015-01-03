@@ -2561,7 +2561,7 @@ function CreateUI(maxPlayers)
 
     -- Setup custom backgrounds.
     local LobbyBackgroundStretch = Prefs.GetFromCurrentProfile('LobbyBackgroundStretch') or 'true'
-    GUI.background = Bitmap(GUI, UIUtil.SkinnableFile('/BACKGROUND/background-paint_black_bmp.png')) -- Background faction or art
+    GUI.background = Bitmap(GUI, UIUtil.SkinnableFile('/BACKGROUND/background-paint_black_bmp.dds')) -- Background faction or art
     LayoutHelpers.AtCenterIn(GUI.background, GUI)
     if LobbyBackgroundStretch == 'true' then
         LayoutHelpers.FillParent(GUI.background, GUI)
