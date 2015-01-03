@@ -6,6 +6,9 @@ Changelog for patch 3639
 *Exploit fixes*
 - Fixed a regression of the free ACU upgrade exploit
 
+*Game improvements*
+- Cartographic map previews are now being generated even for maps that do not contain colour information for them.
+
 *Bug fixes*
 - Fixed air wrecks floating mid air on certain maps
 - Fixed air wrecks sinking to bottom of water, then jumping back up to surface
@@ -43,8 +46,9 @@ Contributors:
  - ChrisKitching
  - Crotalus
  - IceDreamer
- - Sheeo
+ - Partytime
  - Santa Claus
+ - Sheeo
  - Xinnony
 
 Changelog for patch 3638
