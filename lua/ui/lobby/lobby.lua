@@ -5827,10 +5827,10 @@ end
 
 -- Experimental Animated Text Function
 SetText2 = function(self, text, delay)
-    if not self:GetText() == text then
+    if self:GetText() ~= text then
         self:StreamText(text, delay)
     end
-end 
+end
 
 -- Lobby Presets
 function GUI_PRESET()
