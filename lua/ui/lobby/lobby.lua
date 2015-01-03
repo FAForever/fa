@@ -3692,34 +3692,6 @@ function CreateUI(maxPlayers)
         end
     end --end of random map code
 
-    -- TEXT for DefaultOpt, CPUBench, RandomMap, AutoTeam --
-    GUI.ButtonsPanelText = UIUtil.CreateText(GUI.buttonPanelTop, '', 11, 'Arial', true)
-    GUI.ButtonsPanelText.Left:Set(math.floor(GUI.rerunBenchmark.Left() - (GUI.ButtonsPanelText.Width() / 2)))
-    LayoutHelpers.AtVerticalCenterIn(GUI.ButtonsPanelText, GUI.randTeam, 25)
-
-    -- Manufacture a rollover event that sets the ButtonsPanelText's text to label and clears
-    -- it on rollout.
-    local function getButtonPanelRollover(label)
-        return function(self, state)
-            if state == 'enter' then
-                GUI.ButtonsPanelText:SetText(label)
-                GUI.ButtonsPanelText.Left:Set(math.floor(GUI.rerunBenchmark.Left() - (GUI.ButtonsPanelText.Width() / 2)))
-            elseif state == 'exit' then
-                GUI.ButtonsPanelText:SetText('')
-            end
-        end
-    end
-
-    -- TODO: Localise!
-    -- Disabling for now, they weren't positioning properly - IceDreamer
-    
-    --[[
-    GUI.randTeam.OnRolloverEvent = getButtonPanelRollover("Random Team")
-    GUI.rankedOptions.OnRolloverEvent = getButtonPanelRollover("Set Ranked Options")
-    GUI.rerunBenchmark.OnRolloverEvent = getButtonPanelRollover("Re-run CPU Benchmark")
-    GUI.randMap.OnRolloverEvent = getButtonPanelRollover("Random Map")
-    --]]
-
     --start of auto kick code
     if lobbyComm:IsHost() and not singlePlayer then
         GUI.autoKick = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/radio')
