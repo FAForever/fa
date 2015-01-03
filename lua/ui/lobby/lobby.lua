@@ -2850,24 +2850,29 @@ function CreateUI(maxPlayers)
     else
         GUI.exitButton.label:SetText(LOC("<LOC _Back>"))
     end
-    import('/lua/ui/uimain.lua').SetEscapeHandler(function() GUI.exitButton.OnClick(GUI.exitButton) end)
-    LayoutHelpers.AtLeftIn(GUI.exitButton, GUI.chatPanel, 22)
-    LayoutHelpers.AtVerticalCenterIn(GUI.exitButton, GUI.launchGameButton)
-    GUI.exitButton.OnClick = function(self)
+
+    -- A function to show the "Exit game lobby?" dialog.
+    GUI.exitLobbyEscapeHandler = function()
         GUI.chatEdit:AbandonFocus()
         UIUtil.QuickDialog(GUI,
-                            "<LOC lobby_0000>Exit game lobby?",
-                            "<LOC _Yes>", function()
-                                ReturnToMenu(false)
-                            end,
-                            "<LOC _Cancel>", function()
-                                GUI.chatEdit:AcquireFocus()
-                            end,
-                            nil, nil,
-                            true,
-                            {worldCover = true, enterButton = 1, escapeButton = 2}
+            "<LOC lobby_0000>Exit game lobby?",
+            "<LOC _Yes>", function()
+                ReturnToMenu(false)
+            end,
+            "<LOC _Cancel>", function()
+                GUI.chatEdit:AcquireFocus()
+            end,
+            nil, nil,
+            true,
+            {worldCover = true, enterButton = 1, escapeButton = 2}
         )
     end
+    LayoutHelpers.AtLeftIn(GUI.exitButton, GUI.chatPanel, 22)
+    LayoutHelpers.AtVerticalCenterIn(GUI.exitButton, GUI.launchGameButton)
+    GUI.exitButton.OnClick = GUI.exitLobbyEscapeHandler
+    -- Behave as if the exit button was clicked when escape is pressed.
+    import('/lua/ui/uimain.lua').SetEscapeHandler(GUI.exitLobbyEscapeHandler)
+
 
     ---------------------------------------------------------------------------
     -- set up chat display
@@ -4915,6 +4920,11 @@ function CreateBigPreview(depth, parent)
         CloseBigPreview()
     end
 
+    -- Close the large map when the escape key is pressed.
+    import('/lua/ui/uimain.lua').SetEscapeHandler(function()
+        CloseBigPreview()
+    end)
+
     -- Keep the close button on top of the border (which is itself on top of the map preview)
     LayoutHelpers.DepthOverParent(closeBtn, border, 1)
 
@@ -4976,6 +4986,9 @@ end
 
 function CloseBigPreview()
     LrgMap:Hide()
+
+    -- Restore the default escape handler.
+    import('/lua/ui/uimain.lua').SetEscapeHandler(GUI.exitLobbyEscapeHandler)
 end
 
 local posGroup = false
