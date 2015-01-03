@@ -798,9 +798,9 @@ function SetSlotInfo(slot, playerInfo)
             if not table.find(ConnectionEstablished, playerInfo.PlayerName) then
                 if playerInfo.Human and not isLocallyOwned then
                     if table.find(ConnectedWithProxy, playerInfo.OwnerID) then
-                        AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", playerInfo.PlayerName)..' (FAF Proxy)', "Engine0004")
+                        DisplaySystemMessage(LOCF("<LOC Engine0004>Connection to %s established.", playerInfo.PlayerName)..' (FAF Proxy)', "Engine0004")
                     else
-                        AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", playerInfo.PlayerName), "Engine0004")
+                        DisplaySystemMessage(LOCF("<LOC Engine0004>Connection to %s established.", playerInfo.PlayerName), "Engine0004")
                     end
                     table.insert(ConnectionEstablished, playerInfo.PlayerName)
                     for k, v in CurrentConnection do -- Remove PlayerName in this Table
@@ -1405,18 +1405,8 @@ end
 
 -- Display, if appropriate, a system message.
 function DisplaySystemMessage(data)
-    -- If the message is related to use connectivity and the user has turned off system messages,
-    -- don't display the message.'
-
-    --switch = Player switched with other Player
-    --lobui_0202 = Joined as a Observer
-    --lobui_0226 = Move Player to Observer
-    --lobui_0227 = Move Observer to Player
-    --lobui_0205 = Timed Out
-    if data.Id == 'lobui_0202' or data.Id == 'lobui_0226' or data.Id == 'lobui_0227' or data.Id == 'lobui_0205' or data.Id == 'switch' then
-        if not SystemMessagesEnabled() then
-            return
-        end
+    if not SystemMessagesEnabled() then
+        return
     end
 
     AddChatText(data.Text)
@@ -3987,9 +3977,9 @@ function CalcConnectionStatus(peer)
                 if not table.find(ConnectionEstablished, peer.name) then
                     if gameInfo.PlayerOptions[FindSlotForID(peer.id)].Human and not IsLocallyOwned(FindSlotForID(peer.id)) then
                         if table.find(ConnectedWithProxy, peer.id) then
-                            AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", peer.name)..' (FAF Proxy)', "Engine0004")
+                            DisplaySystemMessage(LOCF("<LOC Engine0004>Connection to %s established.", peer.name)..' (FAF Proxy)', "Engine0004")
                         else
-                            AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", peer.name), "Engine0004")
+                            DisplaySystemMessage(LOCF("<LOC Engine0004>Connection to %s established.", peer.name), "Engine0004")
                         end
                         table.insert(ConnectionEstablished, peer.name)
                         for k, v in CurrentConnection do -- Remove PlayerName in this Table
@@ -4511,7 +4501,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                         gameInfo.Observers[data.Slot] = nil
                     end
                 end
-                AddChatText(LOCF("<LOC Engine0003>Lost connection to %s.", data.Options.PlayerName), "Engine0003")
+                DisplaySystemMessage(LOCF("<LOC Engine0003>Lost connection to %s.", data.Options.PlayerName), "Engine0003")
                 ClearSlotInfo(data.Slot)
                 UpdateGame()
             elseif data.Type == 'SlotAssigned' then
