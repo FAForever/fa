@@ -2633,31 +2633,25 @@ function CreateUI(maxPlayers)
     GUI.ModFeaturedLabel = makeLabel("", 13)
     LayoutHelpers.AtLeftTopIn(GUI.ModFeaturedLabel, GUI.panel, 50, 61)
 
-    local getInit = GetCommandLineArg("/init", 1)
-    getInit = tostring(getInit[1])
-    if getInit == "init_faf.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'FA Forever', 20)
-    elseif getInit == "init_blackops.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'BlackOps', 20)
-    elseif getInit == "init_coop.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'COOP', 20)
-    elseif getInit == "init_balancetesting.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'Balance Testing', 20)
-    elseif getInit == "init_gw.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'Galactic War', 20)
-    elseif getInit == "init_labwars.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'Labwars', 20)
-    elseif getInit == "init_ladder1v1.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'Ladder 1v1', 20)
-    elseif getInit == "init_nomads.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'Nomads Mod', 20)
-    elseif getInit == "init_phantomx.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'PhantomX', 20)
-    elseif getInit == "init_supremedestruction.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'SupremeDestruction', 20)
-    elseif getInit == "init_xtremewars.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'XtremeWars', 20)
-    end
+    -- Set the mod name to a value appropriate for the mod in use.
+    local initName = GetCommandLineArg("/init", 1)
+    initName = tostring(initName[1])
+    local modLabels = {
+        ["init_faf.lua"] = "FA Forever",
+        ["init_blackops.lua"] = "BlackOps",
+        ["init_coop.lua"] = "COOP",
+        ["init_balancetesting.lua"] = "Balance Testing",
+        ["init_gw.lua"] = "Galactic War",
+        ["init_labwars.lua"] = "Labwars",
+        ["init_ladder1v1.lua"] = "Ladder 1v1",
+        ["init_nomads.lua"] = "Nomads Mod",
+        ["init_phantomx.lua"] = "PhantomX",
+        ["init_supremedestruction.lua"] = "SupremeDestruction",
+        ["init_xtremewars.lua"] = "XtremeWars",
+
+    }
+    SetText2(GUI.ModFeaturedLabel, modLabels[initName] or "", 20)
+
     --\\
     --// Lobby options panel
     GUI.LobbyOptions = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/BUTTON/small/', "Lobby Options")
