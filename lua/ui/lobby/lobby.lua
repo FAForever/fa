@@ -1867,7 +1867,7 @@ local function UpdateGame()
         UIUtil.setEnabled(GUI.randMap, playerNotReady)
 
         -- Launch button enabled if everyone is ready.
-        UIUtil.setEnabled(GUI.launchGameButton, not playerNotReady)
+        UIUtil.setEnabled(GUI.launchGameButton, singlePlayer or not playerNotReady)
         UIUtil.setEnabled(GUI.randMap, quickRandMap)
     end
 
