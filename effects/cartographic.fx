@@ -151,6 +151,21 @@ float4 TerrainPS0( TerrainPixel pixel) : COLOR0
 	float3 hypsometric = tex1D(hypsometricSampler,h.x).rgb;
 	float1 topographic = tex1D(topographicSampler,h.x).a;
 	
+	// if the map doesnt contain color info for contour map already, lets magic some info up
+	if (hypsometric[0] == 0 && hypsometric[1] == 0 && hypsometric[2] == 0)
+	{
+		float chunkiness = 10;
+		float3 dark = float3(0.45, 0.38, 0.41);
+		float3 light = float3(0.80, 0.80, 0.68);
+
+		// background color is halfway between dark and light
+		hypsometric = lerp(dark, light, h.x);
+
+		// the "alpha" we return will be between 0 and 1, and used to determine if we should draw a contour line or not
+		// we could just return hyposometric but its too detailed. this logic chunks it up, which ends up drawing nicer lines
+		topographic = int((h.x * 100) / chunkiness) * chunkiness / 100;
+	}
+
 	return float4(hypsometric,topographic);
 }
 
