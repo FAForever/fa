@@ -1884,7 +1884,7 @@ local function UpdateGame()
 
     -- Set the map name at the top right corner in lobby
     if scenarioInfo.name then
-        SetText2(GUI.MapNameLabel, scenarioInfo.name, 10)
+        SetText2(GUI.MapNameLabel, scenarioInfo.name, 20)
     end
 
     -- Auto-team logic.
@@ -1933,9 +1933,9 @@ local function UpdateGame()
 
             if quality > 0 then
                 gameInfo.GameOptions['Quality'] = quality
-                SetText2(GUI.GameQualityLabel, "Game quality : "..quality.."%", 10)
+                SetText2(GUI.GameQualityLabel, "Game quality : "..quality.."%", 20)
             else
-                SetText2(GUI.GameQualityLabel, "Game quality N/A", 10)
+                SetText2(GUI.GameQualityLabel, "Game quality N/A", 20)
             end
         else
             GUI.GameQualityLabel:SetText("")
@@ -2636,27 +2636,27 @@ function CreateUI(maxPlayers)
     local getInit = GetCommandLineArg("/init", 1)
     getInit = tostring(getInit[1])
     if getInit == "init_faf.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'FA Forever', 10)
+        SetText2(GUI.ModFeaturedLabel, 'FA Forever', 20)
     elseif getInit == "init_blackops.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'BlackOps', 10)
+        SetText2(GUI.ModFeaturedLabel, 'BlackOps', 20)
     elseif getInit == "init_coop.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'COOP', 10)
+        SetText2(GUI.ModFeaturedLabel, 'COOP', 20)
     elseif getInit == "init_balancetesting.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'Balance Testing', 10)
+        SetText2(GUI.ModFeaturedLabel, 'Balance Testing', 20)
     elseif getInit == "init_gw.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'Galactic War', 10)
+        SetText2(GUI.ModFeaturedLabel, 'Galactic War', 20)
     elseif getInit == "init_labwars.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'Labwars', 10)
+        SetText2(GUI.ModFeaturedLabel, 'Labwars', 20)
     elseif getInit == "init_ladder1v1.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'Ladder 1v1', 10)
+        SetText2(GUI.ModFeaturedLabel, 'Ladder 1v1', 20)
     elseif getInit == "init_nomads.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'Nomads Mod', 10)
+        SetText2(GUI.ModFeaturedLabel, 'Nomads Mod', 20)
     elseif getInit == "init_phantomx.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'PhantomX', 10)
+        SetText2(GUI.ModFeaturedLabel, 'PhantomX', 20)
     elseif getInit == "init_supremedestruction.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'SupremeDestruction', 10)
+        SetText2(GUI.ModFeaturedLabel, 'SupremeDestruction', 20)
     elseif getInit == "init_xtremewars.lua" then
-        SetText2(GUI.ModFeaturedLabel, 'XtremeWars', 10)
+        SetText2(GUI.ModFeaturedLabel, 'XtremeWars', 20)
     end
     --\\
     --// Lobby options panel
@@ -2672,7 +2672,7 @@ function CreateUI(maxPlayers)
     -- TODO: Localise
     local Credits = 'Lobby by Xinnony and Barlots: V'..LOBBYversion..')'
     GUI.Credits_Text = UIUtil.CreateText(GUI.panel, Credits, 11, UIUtil.titleFont, true)
-    SetText2(GUI.Credits_Text, Credits, 10)
+    SetText2(GUI.Credits_Text, Credits, 20)
     GUI.Credits_Text:SetColor("FFFFFF")
     LayoutHelpers.AtBottomIn(GUI.Credits_Text, GUI, 2)
     LayoutHelpers.AtRightIn(GUI.Credits_Text, GUI, 5)
