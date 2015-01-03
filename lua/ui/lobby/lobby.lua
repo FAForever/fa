@@ -4870,6 +4870,13 @@ end
 
 local LrgMap = false
 function CreateBigPreview(depth, parent)
+    -- We don't want to create more than one!
+    -- TODO: It might be nice to make clicking outside of the preview close it (or do nothing).
+    -- That might obviate this slight ugliness (recreating the control all the time)
+    if LrgMap then
+        LrgMap:Destroy()
+    end
+
     -- Size of the border image around the large map.
     local MAP_PREVIEW_BORDER_SIZE = 754
 
