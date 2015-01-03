@@ -2672,7 +2672,7 @@ function CreateUI(maxPlayers)
     end
     --\\
     --// Lobby options panel
-    GUI.LobbyOptions = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/BUTTON/small/', "Lobby Options", -1)
+    GUI.LobbyOptions = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/BUTTON/small/', "Lobby Options")
     LayoutHelpers.AtTopIn(GUI.LobbyOptions, GUI.panel, 10)
     LayoutHelpers.AtHorizontalCenterIn(GUI.LobbyOptions, GUI, 0)
     GUI.LobbyOptions.OnClick = function()
@@ -2744,7 +2744,7 @@ function CreateUI(maxPlayers)
     GUI.mapView.Width:Set(196+2)
     GUI.mapView.Height:Set(194)
 
-    GUI.LargeMapPreview = UIUtil.CreateButtonWithDropshadow(GUI.mapView, '/BUTTON/zoom/', "", 0)
+    GUI.LargeMapPreview = UIUtil.CreateButtonWithDropshadow(GUI.mapView, '/BUTTON/zoom/', "")
     LayoutHelpers.AtRightIn(GUI.LargeMapPreview, GUI.mapView, -3)
     LayoutHelpers.AtBottomIn(GUI.LargeMapPreview, GUI.mapView, -3)
     Tooltip.AddButtonTooltip(GUI.LargeMapPreview, 'lob_click_LargeMapPreview')
@@ -2771,7 +2771,7 @@ function CreateUI(maxPlayers)
 
     -- GAME OPTIONS // MODS MANAGER BUTTON --
     if lobbyComm:IsHost() then     -- GAME OPTION
-        GUI.gameoptionsButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Game Options", -1)
+        GUI.gameoptionsButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Game Options")
         Tooltip.AddButtonTooltip(GUI.gameoptionsButton, 'lob_select_map')
         GUI.gameoptionsButton.OnClick = function(self)
             local mapSelectDialog
@@ -2821,7 +2821,7 @@ function CreateUI(maxPlayers)
             )
         end
     else
-        GUI.gameoptionsButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Mods Manager", -1)
+        GUI.gameoptionsButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Mods Manager")
         GUI.gameoptionsButton.OnClick = function(self, modifiers)
             import('/lua/ui/lobby/ModsManager.lua').NEW_MODS_GUI(GUI, false, gameInfo.GameMods)
         end
@@ -2835,7 +2835,7 @@ function CreateUI(maxPlayers)
     -- set up launch panel
     ---------------------------------------------------------------------------
     -- LAUNCH THE GAME BUTTON --
-    GUI.launchGameButton = UIUtil.CreateButtonWithDropshadow(GUI.launchPanel, '/BUTTON/large/', "Launch the Game", -1)
+    GUI.launchGameButton = UIUtil.CreateButtonWithDropshadow(GUI.launchPanel, '/BUTTON/large/', "Launch the Game")
     LayoutHelpers.AtCenterIn(GUI.launchGameButton, GUI.launchPanel, 20, -345)
     Tooltip.AddButtonTooltip(GUI.launchGameButton, 'Lobby_Launch')
     UIUtil.setVisible(GUI.launchGameButton, lobbyComm:IsHost())
@@ -2844,7 +2844,7 @@ function CreateUI(maxPlayers)
     end
 
     -- EXIT BUTTON --
-    GUI.exitButton = UIUtil.CreateButtonWithDropshadow(GUI.launchPanel, '/BUTTON/medium/','Exit', -1)
+    GUI.exitButton = UIUtil.CreateButtonWithDropshadow(GUI.launchPanel, '/BUTTON/medium/','Exit')
     if GpgNetActive() then
         GUI.exitButton.label:SetText(LOC("<LOC _Exit>"))
     else
@@ -3142,7 +3142,7 @@ function CreateUI(maxPlayers)
 
     -- Create the "Lobby presets" button for the host. If not the host, the same field is occupied
     -- instead by the read-only "Unit Manager" button.
-    GUI.restrictedUnitsOrPresetsBtn = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "", 0)
+    GUI.restrictedUnitsOrPresetsBtn = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "")
 
     if singlePlayer then
         GUI.restrictedUnitsOrPresetsBtn:Hide()
@@ -3573,13 +3573,13 @@ function CreateUI(maxPlayers)
     end
 
     -- CPU BENCH BUTTON --
-    GUI.rerunBenchmark = UIUtil.CreateButtonWithDropshadow(GUI.observerPanel, '/BUTTON/cputest/', '', 0)
+    GUI.rerunBenchmark = UIUtil.CreateButtonWithDropshadow(GUI.observerPanel, '/BUTTON/cputest/', '')
     GUI.rerunBenchmark:Disable()
     LayoutHelpers.CenteredRightOf(GUI.rerunBenchmark, GUI.rankedOptions, 0)
     Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text='Run CPU Benchmark Test', body='Recalculates your CPU rating.'})
 
     -- RANDOM MAP BUTTON -- start of random map code by Moritz
-    GUI.randMap = UIUtil.CreateButtonWithDropshadow(GUI.buttonPanelRight, '/BUTTON/randommap/', '', 0)
+    GUI.randMap = UIUtil.CreateButtonWithDropshadow(GUI.buttonPanelRight, '/BUTTON/randommap/', '')
     LayoutHelpers.CenteredRightOf(GUI.randMap, GUI.rerunBenchmark, 0)
     Tooltip.AddButtonTooltip(GUI.randMap, 'lob_click_randmap')
     if not lobbyComm:IsHost() then
@@ -5476,7 +5476,7 @@ function RuleTitle_INPUT()
     end
     -------------------
     -- Exit button --
-    local ExitButton = UIUtil.CreateButtonWithDropshadow(GUI_Preset_InputBox2, '/BUTTON/medium/', "Cancel", -1)
+    local ExitButton = UIUtil.CreateButtonWithDropshadow(GUI_Preset_InputBox2, '/BUTTON/medium/', "Cancel")
     LayoutHelpers.AtLeftIn(ExitButton, GUI_Preset_InputBox2, 70)
     LayoutHelpers.AtBottomIn(ExitButton, GUI_Preset_InputBox2, 10)
     ExitButton.OnClick = function(self)
@@ -5484,7 +5484,7 @@ function RuleTitle_INPUT()
     end
     -------------------
     -- Ok button --
-    local OKButton = UIUtil.CreateButtonWithDropshadow(GUI_Preset_InputBox2, '/BUTTON/medium/', "Ok", -1)
+    local OKButton = UIUtil.CreateButtonWithDropshadow(GUI_Preset_InputBox2, '/BUTTON/medium/', "Ok")
     LayoutHelpers.AtRightIn(OKButton, GUI_Preset_InputBox2, 70)
     LayoutHelpers.AtBottomIn(OKButton, GUI_Preset_InputBox2, 10)
     text09:SetText('Game Rules')
@@ -5823,7 +5823,7 @@ function CreateOptionLobbyDialog()
     end --]]
     ------------------
     -- Quit button --
-    local QuitButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Close", -1)
+    local QuitButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Close")
     LayoutHelpers.AtHorizontalCenterIn(QuitButton, dialog2, 0)
     LayoutHelpers.AtBottomIn(QuitButton, dialog2, 10)
     QuitButton.OnClick = function(self)
@@ -5881,7 +5881,7 @@ function GUI_PRESET()
     text1:Hide()
 
     -- Load button
-    local LoadButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Load Preset", -1)
+    local LoadButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Load Preset")
     LayoutHelpers.AtLeftIn(LoadButton, dialog2, -10)
     LayoutHelpers.AtBottomIn(LoadButton, dialog2, 30)
     LoadButton.OnClick = function(self)
@@ -5889,14 +5889,14 @@ function GUI_PRESET()
     end
     
     -- Quit button
-    local QuitButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Cancel", -1)
+    local QuitButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Cancel")
     LayoutHelpers.CenteredRightOf(QuitButton, LoadButton, -28)
     QuitButton.OnClick = function(self)
         GUI_Preset:Destroy()
     end
 
     -- Save button
-    local SaveButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Save Preset", -1)
+    local SaveButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Save Preset")
     LayoutHelpers.AtRightIn(SaveButton, dialog2, -10)
     LayoutHelpers.AtVerticalCenterIn(SaveButton, LoadButton)
     SaveButton.OnClick = function(self)
@@ -5910,7 +5910,7 @@ function GUI_PRESET()
     end
 
     -- Delete button
-    local DeleteButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Delete Preset", -1)
+    local DeleteButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Delete Preset")
     LayoutHelpers.CenteredLeftOf(DeleteButton, SaveButton, -28)
     LayoutHelpers.AtVerticalCenterIn(DeleteButton, LoadButton)
     DeleteButton.OnClick = function(self)
@@ -6075,7 +6075,7 @@ function GUI_PRESET_INPUT(tyype)
     end
 
     -- Exit button
-    local ExitButton = UIUtil.CreateButtonWithDropshadow(GUI_Preset_InputBox2, '/BUTTON/medium/', "Cancel", -1)
+    local ExitButton = UIUtil.CreateButtonWithDropshadow(GUI_Preset_InputBox2, '/BUTTON/medium/', "Cancel")
     LayoutHelpers.AtLeftIn(ExitButton, GUI_Preset_InputBox2, 70)
     LayoutHelpers.AtBottomIn(ExitButton, GUI_Preset_InputBox2, 10)
     ExitButton.OnClick = function(self)
@@ -6086,7 +6086,7 @@ function GUI_PRESET_INPUT(tyype)
     end
 
     -- Ok button
-    local OKButton = UIUtil.CreateButtonWithDropshadow(GUI_Preset_InputBox2, '/BUTTON/medium/', "Ok", -1)
+    local OKButton = UIUtil.CreateButtonWithDropshadow(GUI_Preset_InputBox2, '/BUTTON/medium/', "Ok")
     LayoutHelpers.AtRightIn(OKButton, GUI_Preset_InputBox2, 70)
     LayoutHelpers.AtBottomIn(OKButton, GUI_Preset_InputBox2, 10)
     if tyype == -1 then
@@ -6615,7 +6615,7 @@ function GUI_Changelog()
 		end
 	end
     -- OK button --
-    local OkButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Ok", -1)
+    local OkButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Ok")
 	LayoutHelpers.AtLeftIn(OkButton, dialog2, 0)
     LayoutHelpers.AtBottomIn(OkButton, dialog2, 10)
     OkButton.OnClick = function(self)
