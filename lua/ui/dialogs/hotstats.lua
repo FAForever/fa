@@ -194,10 +194,9 @@ function FillParentPreserveAspectRatioNoExpand(control, parent,offsetx,offsety)
     end)     
 end
 
--- what to do/display if no data ??
 function nodata()
 	local nodata=UIUtil.CreateText(GetFrame(0),modcontrols_trad("noData"), 22, UIUtil.titleFont)
-	nodata:SetColor("black")
+	nodata:SetColor("white")
 	Title_score:Hide()
 	LayoutHelpers.AtCenterIn(nodata, GetFrame(0))
 	nodata.Depth:Set(GetFrame(0):GetTopmostDepth())

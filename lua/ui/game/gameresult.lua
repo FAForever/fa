@@ -79,10 +79,26 @@ function DoGameResult(armyIndex, result)
 				if result == 'defeat' then
 					victory = false
 				end
-				
-				import('/lua/ui/game/tabs.lua').OnGameOver()
-				import('/lua/ui/game/tabs.lua').TabAnnouncement('main', LOC(MyArmyResultStrings[result]))
-				import('/lua/ui/game/tabs.lua').AddModeText("<LOC _Score>", function() import('/lua/ui/dialogs/score.lua').CreateDialog(victory) end)
+
+                local tabs = import('/lua/ui/game/tabs.lua')
+				tabs.OnGameOver()
+				tabs.TabAnnouncement('main', LOC(MyArmyResultStrings[result]))
+
+
+                local score = import('/lua/ui/dialogs/score.lua')
+                tabs.AddModeText("<LOC _Score>", function()
+                        UIUtil.QuickDialog(GetFrame(0),
+                            "<LOC EXITDLG_0003>Are you sure you'd like to exit?",
+                            "<LOC _Yes>", function()
+                                score.CreateDialog(victory)
+                            end,
+                            "<LOC _No>", nil,
+                            nil, nil,
+                            true,
+                            {escapeButton = 2, enterButton = 1, worldCover = true})
+                end)
+
+
 			else
 				local armies = GetArmiesTable().armiesTable
 				import('/lua/ui/game/score.lua').ArmyAnnounce(armyIndex, LOCF(OtherArmyResultStrings[result], armies[armyIndex].nickname))
