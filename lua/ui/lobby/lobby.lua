@@ -4586,6 +4586,10 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         for i, v in gameInfo.PlayerOptions do
             if v.Human and v.OwnerID == player then
                 Prefs.SetToCurrentProfile('LoadingFaction', v.Faction)
+
+                -- Set current skin to the actual faction you'll be playing as (the skin may not be
+                -- correct if the player chose "random").
+                UIUtil.SetCurrentSkin(FACTION_NAMES[v.faction])
                 break
             end
         end
