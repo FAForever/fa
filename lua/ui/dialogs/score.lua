@@ -227,28 +227,7 @@ function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
     DisableWorldSounds()
     StopAllSounds()
     UpdateData()
-	
-	if table.empty(curInfo.scoreData.historical) then
-		LOG("warning")
-		if HasCommandLineArg("/online") or HasCommandLineArg("/gpgnet") then
-			UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0007>The game is not finished !\nYou can't have access to scores now.\nYou will be able to see them from the replay.",
-				"<LOC _OK>", ExitApplication,
-				nil,  nil, 
-				nil, nil,
-				true,
-				{escapeButton = 1, enterButton = 1, worldCover = true})
-        else
-			UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0007>The game is not finished !\nYou can't have access to scores now.\nYou will be able to see them from the replay.",
-				"<LOC _OK>", ExitGame,
-				nil,  nil, 
-				nil, nil,
-				true,
-				{escapeButton = 1, enterButton = 1, worldCover = true})
-		
-        end
-		return 
-	end
-	
+
     campaignScore = tostring(curInfo.scoreData.current[1].general.score)
 
     if showCampaign then

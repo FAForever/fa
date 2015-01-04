@@ -1,7 +1,12 @@
 Changelog for patch 3639
 ------------------------
 
+*General changes*
 - Christmas presents for reclaim have been removed
+- Score viewing:
+    - Score button no longer exits the game forcefully
+    - Viewing of score screen when scores were set to off is re-enabled, but the
+      statistics are not particularly useful
 
 *Exploit fixes*
 - Fixed a regression of the free ACU upgrade exploit
