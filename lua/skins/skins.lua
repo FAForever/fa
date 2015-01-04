@@ -77,7 +77,7 @@ skins = {
         tooltipBorderColor = "FFeee274",
         tooltipTitleColor = "FF725b1a",
     },
-    randomfaction = {
+    random = {
         default = "default",
         texturesPath = "/textures/ui/random",
         imagerMesh = "/meshes/game/map-border_squ_uef_mesh",
