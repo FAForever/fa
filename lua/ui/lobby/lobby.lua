@@ -806,12 +806,9 @@ function SetSlotInfo(slot, playerInfo)
             end
         end
     else
+        -- TODO: Localise!
         GUI.slots[slot].name:SetTitleText('Connecting to ... ' .. playerInfo.PlayerName)
         GUI.slots[slot].name._text:SetFont('Arial Gras', 11)
-        if not table.find(CurrentConnection, playerInfo.PlayerName) then
-            AddChatText('Connecting to '..playerInfo.PlayerName..' ...')
-            table.insert(CurrentConnection, playerInfo.PlayerName)
-        end
     end
 
     GUI.slots[slot].faction:Show()
@@ -3928,9 +3925,7 @@ function CalcConnectionStatus(peer)
             if not table.find(ConnectionEstablished, peer.name) then
                 if gameInfo.PlayerOptions[peerSlot].Human and not IsLocallyOwned(peerSlot) then
                     if table.find(ConnectedWithProxy, peer.id) then
-                        AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", peer.name)..' (FAF Proxy)', "Engine0004")
-                    else
-                        AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", peer.name), "Engine0004")
+                        AddChatText(LOCF("<LOC Engine0032>Connected to %s via the FAF proxy.", peer.name), "Engine0032")
                     end
                     table.insert(ConnectionEstablished, peer.name)
                     for k, v in CurrentConnection do -- Remove PlayerName in this Table
@@ -4638,8 +4633,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                     if peer.quiet > LobbyComm.quietTimeout then
                         lobbyComm:EjectPeer(peer.id,'TimedOutToHost')
                         SendSystemMessage(LOCF("<LOC lobui_0226>%s timed out.", peer.name), "lobui_0205")
-                        --SendSystemMessage(LOCF(lobbyComm.Strings.TimedOut,peer.name), "lobui_0205")
-                        --AddChatText('TIMEOUT !')
                         
                         -- Search and Remove the peer disconnected
                         for k, v in CurrentConnection do
@@ -4669,15 +4662,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
         CreateUI(LobbyComm.maxPlayerSlots)
         UpdateGame()
-
-        --if not singlePlayer and not GpgNetActive() then
-        --AddChatText('Hosting on port :'..lobbyComm:GetLocalPort())
-        --AddChatText('protocol : '..protocol)
-        --AddChatText('localPort : '..localPort)
-        --AddChatText('desiredPlayerName : '..desiredPlayerName)
-        --AddChatText('localPlayerUID : '..localPlayerUID)
-        --AddChatText('NatTraversalProvider : '..natTraversalProvider) -- Bug here
-        --end
     end
 
     lobbyComm.PeerDisconnected = function(self,peerName,peerID) -- Lost connection or try connect with proxy
