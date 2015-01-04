@@ -3314,7 +3314,7 @@ function CreateUI(maxPlayers)
         -- Color
         GUI.slots[i].color = BitmapCombo(bg, BASE_ALL_Color, 1, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         LayoutHelpers.AtLeftIn(GUI.slots[i].color, GUI.panel, slotColumnSizes.color.x)
-        LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].color, GUI.slots[i], 9)
+        LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].color, GUI.slots[i], 8)
         GUI.slots[i].color.Width:Set(slotColumnSizes.color.width)
         GUI.slots[i].color.row = i
         GUI.slots[i].color.OnClick = function(self, index)
@@ -3345,7 +3345,7 @@ function CreateUI(maxPlayers)
         --// Faction
         GUI.slots[i].faction = BitmapCombo(bg, factionBmps, table.getn(factionBmps), nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         LayoutHelpers.AtLeftIn(GUI.slots[i].faction, GUI.panel, slotColumnSizes.faction.x)
-        LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].faction, GUI.slots[i], 9)
+        LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].faction, GUI.slots[i], 8)
         GUI.slots[i].faction.Width:Set(slotColumnSizes.faction.width)
         GUI.slots[i].faction.OnClick = function(self, index)
             SetPlayerOption(self.row,'Faction',index)
@@ -3365,7 +3365,7 @@ function CreateUI(maxPlayers)
         --// Team
         GUI.slots[i].team = BitmapCombo(bg, teamIcons, 1, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         LayoutHelpers.AtLeftIn(GUI.slots[i].team, GUI.panel, slotColumnSizes.team.x)
-        LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].team, GUI.slots[i], 9)
+        LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].team, GUI.slots[i], 8)
         GUI.slots[i].team.Width:Set(slotColumnSizes.team.width)
         GUI.slots[i].team.row = i
         GUI.slots[i].team.OnClick = function(self, index, text)
@@ -6499,7 +6499,7 @@ function Check_Availaible_Color(self, slot)
     -- TODO: There should be no need to rebuild the whole UI control here.
     GUI.slots[slot].color = BitmapCombo(GUI.slots[slot], Avail_Color[slot], yy, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
     LayoutHelpers.AtLeftIn(GUI.slots[slot].color, GUI.panel, (161+264)+11)
-    LayoutHelpers.AtVerticalCenterIn(GUI.slots[slot].color, GUI.slots[slot], 9)
+    LayoutHelpers.AtVerticalCenterIn(GUI.slots[slot].color, GUI.slots[slot], 8)
     GUI.slots[slot].color.Width:Set(59)
     GUI.slots[slot].color.row = slot
     --
