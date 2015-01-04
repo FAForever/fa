@@ -3922,10 +3922,11 @@ function CalcConnectionStatus(peer)
         return 1
     else
         if not wasConnected(peer.id) then
-            GUI.slots[FindSlotForID(peer.id)].name:SetTitleText(peer.name)
-            GUI.slots[FindSlotForID(peer.id)].name._text:SetFont('Arial Gras', 15)
+            local peerSlot = FindSlotForID(peer.id)
+            GUI.slots[peerSlot].name:SetTitleText(peer.name)
+            GUI.slots[peerSlot].name._text:SetFont('Arial Gras', 15)
             if not table.find(ConnectionEstablished, peer.name) then
-                if gameInfo.PlayerOptions[FindSlotForID(peer.id)].Human and not IsLocallyOwned(FindSlotForID(peer.id)) then
+                if gameInfo.PlayerOptions[peerSlot].Human and not IsLocallyOwned(peerSlot) then
                     if table.find(ConnectedWithProxy, peer.id) then
                         AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", peer.name)..' (FAF Proxy)', "Engine0004")
                     else
