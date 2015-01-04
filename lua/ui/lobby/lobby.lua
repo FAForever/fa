@@ -693,13 +693,6 @@ function IsObserver(id)
     return FindObserverSlotForID(id) ~= nil
 end
 
--- Returns true if system messages are enabled.
-function SystemMessagesEnabled()
-    local LobbySystemMessagesEnabled = Prefs.GetFromCurrentProfile('LobbySystemMessagesEnabled') or 'true'
-    return LobbySystemMessagesEnabled == 'true'
-end
-
-
 -- update the data in a player slot
 function SetSlotInfo(slot, playerInfo)
 	if (GUI.connectdialog ~= false) then -- Remove the ConnectDialog
@@ -796,20 +789,18 @@ function SetSlotInfo(slot, playerInfo)
     if wasConnected(playerInfo.OwnerID) or isLocallyOwned then
         GUI.slots[slot].name:SetTitleText(playerInfo.PlayerName)
         GUI.slots[slot].name._text:SetFont('Arial Gras', 15)
-        if SystemMessagesEnabled() then
-            if not table.find(ConnectionEstablished, playerInfo.PlayerName) then
-                if playerInfo.Human and not isLocallyOwned then
-                    if table.find(ConnectedWithProxy, playerInfo.OwnerID) then
-                        AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", playerInfo.PlayerName)..' (FAF Proxy)', "Engine0004")
-                    else
-                        AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", playerInfo.PlayerName), "Engine0004")
-                    end
-                    table.insert(ConnectionEstablished, playerInfo.PlayerName)
-                    for k, v in CurrentConnection do -- Remove PlayerName in this Table
-                        if v == playerInfo.PlayerName then
-                            CurrentConnection[k] = nil
-                            break
-                        end
+        if not table.find(ConnectionEstablished, playerInfo.PlayerName) then
+            if playerInfo.Human and not isLocallyOwned then
+                if table.find(ConnectedWithProxy, playerInfo.OwnerID) then
+                    AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", playerInfo.PlayerName)..' (FAF Proxy)', "Engine0004")
+                else
+                    AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", playerInfo.PlayerName), "Engine0004")
+                end
+                table.insert(ConnectionEstablished, playerInfo.PlayerName)
+                for k, v in CurrentConnection do -- Remove PlayerName in this Table
+                    if v == playerInfo.PlayerName then
+                        CurrentConnection[k] = nil
+                        break
                     end
                 end
             end
@@ -817,11 +808,9 @@ function SetSlotInfo(slot, playerInfo)
     else
         GUI.slots[slot].name:SetTitleText('Connecting to ... ' .. playerInfo.PlayerName)
         GUI.slots[slot].name._text:SetFont('Arial Gras', 11)
-        if SystemMessagesEnabled() then
-            if not table.find(CurrentConnection, playerInfo.PlayerName) then
-                AddChatText('Connecting to '..playerInfo.PlayerName..' ...')
-                table.insert(CurrentConnection, playerInfo.PlayerName)
-            end
+        if not table.find(CurrentConnection, playerInfo.PlayerName) then
+            AddChatText('Connecting to '..playerInfo.PlayerName..' ...')
+            table.insert(CurrentConnection, playerInfo.PlayerName)
         end
     end
 
@@ -1404,25 +1393,6 @@ function ReturnToMenu(reconnect)
     end
 end
 
--- Display, if appropriate, a system message.
-function DisplaySystemMessage(data)
-    -- If the message is related to use connectivity and the user has turned off system messages,
-    -- don't display the message.'
-
-    --switch = Player switched with other Player
-    --lobui_0202 = Joined as a Observer
-    --lobui_0226 = Move Player to Observer
-    --lobui_0227 = Move Observer to Player
-    --lobui_0205 = Timed Out
-    if data.Id == 'lobui_0202' or data.Id == 'lobui_0226' or data.Id == 'lobui_0227' or data.Id == 'lobui_0205' or data.Id == 'switch' then
-        if not SystemMessagesEnabled() then
-            return
-        end
-    end
-
-    AddChatText(data.Text)
-end
-
 function SendSystemMessage(text, id)
     local data = {
         Type = "SystemMessage",
@@ -1430,7 +1400,7 @@ function SendSystemMessage(text, id)
         Id = id or '',
     }
     lobbyComm:BroadcastData(data)
-    DisplaySystemMessage(data)
+    AddChatText(data)
 end
 
 function PublicChat(text)
@@ -3954,20 +3924,18 @@ function CalcConnectionStatus(peer)
         if not wasConnected(peer.id) then
             GUI.slots[FindSlotForID(peer.id)].name:SetTitleText(peer.name)
             GUI.slots[FindSlotForID(peer.id)].name._text:SetFont('Arial Gras', 15)
-            if SystemMessagesEnabled() then
                 if not table.find(ConnectionEstablished, peer.name) then
-                    if gameInfo.PlayerOptions[FindSlotForID(peer.id)].Human and not IsLocallyOwned(FindSlotForID(peer.id)) then
-                        if table.find(ConnectedWithProxy, peer.id) then
-                            AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", peer.name)..' (FAF Proxy)', "Engine0004")
-                        else
-                            AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", peer.name), "Engine0004")
-                        end
-                        table.insert(ConnectionEstablished, peer.name)
-                        for k, v in CurrentConnection do -- Remove PlayerName in this Table
-                            if v == peer.name then
-                                CurrentConnection[k] = nil
-                                break
-                            end
+                if gameInfo.PlayerOptions[FindSlotForID(peer.id)].Human and not IsLocallyOwned(FindSlotForID(peer.id)) then
+                    if table.find(ConnectedWithProxy, peer.id) then
+                        AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", peer.name)..' (FAF Proxy)', "Engine0004")
+                    else
+                        AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", peer.name), "Engine0004")
+                    end
+                    table.insert(ConnectionEstablished, peer.name)
+                    for k, v in CurrentConnection do -- Remove PlayerName in this Table
+                        if v == peer.name then
+                            CurrentConnection[k] = nil
+                            break
                         end
                     end
                 end
@@ -4465,7 +4433,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             end
         else -- Non-host only messages
             if data.Type == 'SystemMessage' then
-                DisplaySystemMessage(data)
+                AddChatText(data)
             elseif data.Type == 'SetAllPlayerNotReady' then
                 EnableSlot(FindSlotForID(FindIDForName(localPlayerName)))
                 GUI.becomeObserver:Enable()
@@ -5774,20 +5742,6 @@ function CreateOptionLobbyDialog()
             LayoutHelpers.FillParentPreserveAspectRatio(GUI.background2, GUI)
         end
     end
-    --
-    local cbox_SMsg = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
-    LayoutHelpers.AtRightTopIn(cbox_SMsg, dialog2, 20, 94)
-    Tooltip.AddCheckboxTooltip(cbox_SMsg, {text='Log to chat', body=LOC("<LOC lobui_0398>")})
-    local cbox_SMsg_TEXT = UIUtil.CreateText(cbox_SMsg, LOC("<LOC lobui_0397>"), 14, 'Arial', true)
-    LayoutHelpers.AtRightIn(cbox_SMsg_TEXT, cbox_SMsg, 25)
-    LayoutHelpers.AtVerticalCenterIn(cbox_SMsg_TEXT, cbox_SMsg)
-    cbox_SMsg.OnCheck = function(self, checked)
-        if checked then
-            Prefs.SetToCurrentProfile('LobbySystemMessagesEnabled', 'true')
-        else
-            Prefs.SetToCurrentProfile('LobbySystemMessagesEnabled', 'false')
-        end
-    end
     ------------------
     -- Quit button --
     local QuitButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Close")
@@ -5810,8 +5764,6 @@ function CreateOptionLobbyDialog()
     --
     local LobbyBackgroundStretch = Prefs.GetFromCurrentProfile('LobbyBackgroundStretch') or 'true'
     cbox_StretchBG:SetCheck(LobbyBackgroundStretch == 'true', true)
-    --
-    cbox_SMsg:SetCheck(SystemMessagesEnabled(), true)
 end
 
 -- Experimental Animated Text Function
