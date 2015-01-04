@@ -5700,8 +5700,8 @@ function CreateOptionLobbyDialog()
     LayoutHelpers.FillParent(background, dialog)
 
     local dialog2 = Group(dialog)
-    dialog2.Width:Set(526)
-    dialog2.Height:Set(350)
+    dialog2.Width:Set(420)
+    dialog2.Height:Set(240)
     LayoutHelpers.AtCenterIn(dialog2, dialog)
 
     -- The provided radiobutton control doesn't allow satellite data, so we use the index in this
@@ -5727,10 +5727,10 @@ function CreateOptionLobbyDialog()
 	local Slider = import('/lua/maui/slider.lua').Slider
 	local currentFontSize = Prefs.GetFromCurrentProfile('LobbyChatFontSize') or 14
 	local slider_Chat_SizeFont_TEXT = UIUtil.CreateText(dialog2, LOC("<LOC lobui_0404> ").. currentFontSize, 14, 'Arial', true)
-    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont_TEXT, dialog2, 45, 126)
+    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont_TEXT, dialog2, 27, 136)
 
 	local slider_Chat_SizeFont = Slider(dialog2, false, 9, 18, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
-    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont, dialog2, 20, 146)
+    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont, dialog2, 20, 156)
     slider_Chat_SizeFont:SetValue(currentFontSize)
 
 	slider_Chat_SizeFont.OnValueChanged = function(self, newValue)
@@ -5788,30 +5788,6 @@ function CreateOptionLobbyDialog()
             Prefs.SetToCurrentProfile('LobbySystemMessagesEnabled', 'false')
         end
     end
-    ----------------------
-    -- Developer box --
-    --[[
-    local devsHeader = UIUtil.CreateText(dialog2, LOC("<LOC lobui_0399>"), 17, 'Arial Gras', true)
-    LayoutHelpers.AtLeftTopIn(devsHeader, dialog2, 20, 220)
-    -- Ask to Xinnony for add your name and work correctly
-    local text = {}
-    local ttext = {'- Xinnony : New Skin (with Barlots), Preset Lobby, Faction Selector, Country Flag, Move Player to,',
-    'Hide Unchanged option, Color State in Nickname, Custom Title, Sort option, Game Ranked label,',
-    'Bugs Fixing and lots of mores.',
-    '- Vicarian : Contribute with Xinnony, Rating Observer, bugs fixing.',
-    '- Duck_42 : CPU Bench, Ping Nuke.',
-    '- Moritz : Power Lobby 2.0.', }
-
-    for i, v in ttext do
-        text[i] = UIUtil.CreateText(dialog2, v, 10, 'Arial', true)
-        if i == 2 then
-            LayoutHelpers.AtLeftTopIn(text[2], dialog2, 40, 255)
-        elseif i == 3 then
-            LayoutHelpers.AtLeftTopIn(text[3], dialog2, 40, 265)
-        else
-            LayoutHelpers.AtLeftTopIn(text[i], dialog2, 20, 225+(15*i))
-        end
-    end --]]
     ------------------
     -- Quit button --
     local QuitButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Close")
