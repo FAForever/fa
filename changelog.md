@@ -38,11 +38,18 @@ Changelog for patch 3639
 - Remove debug messages
 - Connection dialog no longer appears below lobby slots
 - Fixed issue with players not being removed from slots on disconnect
-- Fixed integrated replaysync
-- "Set ranked options" button works again
+- Fix integrated replaysync
+- Clan tags are shown in game
+- 'Set ranked options' button works again
 - Tooltips for various buttons fixed and text revised
 - More detailed large map preview
 - Seraphim icons normalized
+- Both players get ready flag cleared on swap
+- Removed extra space around Rerun CPU benchmark button
+- Made 'Random faction' skin load the chosen faction skin (Before it would always be UEF)
+- Fixed a problem preventing player colours from being updated correctly
+- Prevented CPU benchmark from running once the game starts
+- General performance improvements
 
 
 Thanks to pip, briang and Alex1911 for translations
