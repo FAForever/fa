@@ -37,6 +37,7 @@ Changelog for patch 3639
 - "Set ranked options" button works again
 - Tooltips for various buttons fixed and text revised
 - More detailed large map preview
+- Seraphim icons normalized
 
 
 Thanks to pip, briang and Alex1911 for translations

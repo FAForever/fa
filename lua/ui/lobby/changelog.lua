@@ -64,7 +64,8 @@ changelog = {
             "- Clan tags are shown in game",
             "- 'Set ranked options' button works again",
             "- Tooltips for various buttons fixed and text revised",
-            "- More detailed large map preview"
+            "- More detailed large map preview",
+            "- Seraphim icons normalized"
         }
     }
 }
