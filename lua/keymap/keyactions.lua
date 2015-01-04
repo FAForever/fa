@@ -330,7 +330,7 @@ keyActions = {
 -- start Ghaleon
     ['select_gunships'] = {action = 'UI_SelectByCategory AIR GROUNDATTACK', category = 'selection', order = 40,},
     ['select_bombers'] = {action = 'UI_SelectByCategory AIR BOMBER', category = 'selection', order = 41,},
-    ['select_anti_air_fighters'] = {action = 'UI_SelectByCategory AIR HIGHALTAIR ANTIAIR', category = 'selection', order = 42,},
+    ['select_anti_air_fighters'] = {action = 'UI_Lua import("/lua/keymap/smartSelection.lua").smartSelect("AIR HIGHALTAIR ANTIAIR -BOMBER")', category = 'selection', order = 42,},
     ['select_nearest_idle_airscout'] = {action = 'UI_SelectByCategory AIR SCOUT +idle', category = 'selection', order = 42,},
     ['select_all_tml'] = {action = 'UI_SelectByCategory STRUCTURE TACTICALMISSILEPLATFORM', category = 'selection', order = 43,},
     ['select_all_stationdrones'] = {action = 'UI_SelectByCategory AIR STATIONASSISTPOD', category = 'selection', order = 44,},
