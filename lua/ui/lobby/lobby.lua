@@ -3201,24 +3201,32 @@ function CreateUI(maxPlayers)
 
     for i= 1, LobbyComm.maxPlayerSlots do
         -- capture the index in the current closure so it's accessible on callbacks
+        local curRow = i
+
         GUI.slots[i] = Group(GUI.playerPanel, "playerSlot " .. tostring(i))
         GUI.slots[i].closed = false
         --TODO these need layout from art when available
         GUI.slots[i].Width:Set(GUI.labelGroup.Width)
         GUI.slots[i].Height:Set(GUI.labelGroup.Height)
         GUI.slots[i]._slot = i
-        GUI.slots[i].HandleEvent = function(self, event)
+
+        -- Default mouse behaviours for the slot.
+        local defaultHandler = function(self, event)
             if event.Type == 'MouseEnter' then
-                if gameInfo.GameOptions['TeamSpawn'] ~= 'random' and GUI.markers[i].Indicator then
-                    GUI.markers[i].Indicator:Play()
+                if gameInfo.GameOptions['TeamSpawn'] ~= 'random' and GUI.markers[curRow].Indicator then
+                    GUI.markers[curRow].Indicator:Play()
                 end
             elseif event.Type == 'MouseExit' then
-                if GUI.markers[i].Indicator then
-                    GUI.markers[i].Indicator:Stop()
+                if GUI.markers[curRow].Indicator then
+                    GUI.markers[curRow].Indicator:Stop()
                 end
+            elseif event.Type == 'ButtonDClick' then
+                DoSlotBehavior(curRow, 'occupy', '')
             end
+
             return Group.HandleEvent(self, event)
         end
+        GUI.slots[i].HandleEvent = defaultHandler
 
         local bg = GUI.slots[i]
 
@@ -3273,19 +3281,7 @@ function CreateUI(maxPlayers)
         GUI.slots[i].name.Width:Set(slotColumnSizes.player.width)
         GUI.slots[i].name.row = i
         -- left deal with name clicks
-        GUI.slots[i].name.OnEvent = function(self, event)
-            if event.Type == 'MouseEnter' then
-                if gameInfo.GameOptions['TeamSpawn'] ~= 'random' and GUI.markers[i].Indicator then
-                    GUI.markers[i].Indicator:Play()
-                end
-            elseif event.Type == 'MouseExit' then
-                if GUI.markers[i].Indicator then
-                    GUI.markers[i].Indicator:Stop()
-                end
-            elseif event.Type == 'ButtonDClick' then
-                DoSlotBehavior(i, 'occupy', '')
-            end
-        end
+        GUI.slots[i].name.OnEvent = defaultHandler
         GUI.slots[i].name.OnClick = function(self, index, text)
             DoSlotBehavior(self.row, self.slotKeys[index], text)
         end
@@ -3314,7 +3310,7 @@ function CreateUI(maxPlayers)
                 end
             end
         end
-        GUI.slots[i].color.OnEvent = GUI.slots[i].name.OnEvent
+        GUI.slots[i].color.OnEvent = defaultHandler
         Tooltip.AddControlTooltip(GUI.slots[i].color, 'lob_color')
         GUI.slots[i].color.row = i
 
@@ -3325,7 +3321,7 @@ function CreateUI(maxPlayers)
         GUI.slots[i].faction.Width:Set(slotColumnSizes.faction.width)
         GUI.slots[i].faction.OnClick = function(self, index)
             SetPlayerOption(self.row,'Faction',index)
-            if i == FindSlotForID(FindIDForName(localPlayerName)) then
+            if curRow == FindSlotForID(FindIDForName(localPlayerName)) then
                 SetCurrentFactionTo_Faction_Selector()
             end
             Tooltip.DestroyMouseoverDisplay()
@@ -3333,7 +3329,7 @@ function CreateUI(maxPlayers)
         Tooltip.AddControlTooltip(GUI.slots[i].faction, 'lob_faction')
         Tooltip.AddComboTooltip(GUI.slots[i].faction, factionTooltips)
         GUI.slots[i].faction.row = i
-        GUI.slots[i].faction.OnEvent = GUI.slots[i].name.OnEvent
+        GUI.slots[i].faction.OnEvent = defaultHandler
         if not hasSupcom then
             GUI.slots[i].faction:SetItem(4)
         end
@@ -3350,7 +3346,7 @@ function CreateUI(maxPlayers)
         end
         Tooltip.AddControlTooltip(GUI.slots[i].team, 'lob_team')
         Tooltip.AddComboTooltip(GUI.slots[i].team, teamTooltips)
-        GUI.slots[i].team.OnEvent = GUI.slots[i].name.OnEvent
+        GUI.slots[i].team.OnEvent = defaultHandler
 
         -- Ping
         GUI.slots[i].pingGroup = Group(bg)
