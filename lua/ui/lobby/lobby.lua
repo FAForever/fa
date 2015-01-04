@@ -3476,7 +3476,7 @@ function CreateUI(maxPlayers)
     end
 
     -- GO OBSERVER BUTTON --
-    GUI.becomeObserver = UIUtil.CreateButtonWithDropshadow(GUI.buttonPanelRight, '/BUTTON/observer/', '', 19)
+    GUI.becomeObserver = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/observer/')
     LayoutHelpers.AtLeftTopIn(GUI.becomeObserver, GUI.buttonPanelRight, -40+4, 25)
     Tooltip.AddButtonTooltip(GUI.becomeObserver, 'lob_become_observer')
     GUI.becomeObserver.OnClick = function()
@@ -3496,7 +3496,7 @@ function CreateUI(maxPlayers)
     end
 
     -- AUTO TEAM BUTTON -- start of auto teams code.
-    GUI.randTeam = UIUtil.CreateButtonWithDropshadow(GUI.buttonPanelRight, '/BUTTON/autoteam/')
+    GUI.randTeam = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/autoteam/')
     LayoutHelpers.AtLeftTopIn(GUI.randTeam, GUI.buttonPanelRight, 40+8, 25)
     Tooltip.AddButtonTooltip(GUI.randTeam, 'lob_click_randteam')
     if not lobbyComm:IsHost() then
@@ -3529,8 +3529,8 @@ function CreateUI(maxPlayers)
     --end of auto teams code
 
     -- DEFAULT OPTION BUTTON -- start of ranked options code
-    GUI.rankedOptions = UIUtil.CreateButtonWithDropshadow(GUI.buttonPanelRight, '/BUTTON/defaultoption/')
-    LayoutHelpers.CenteredRightOf(GUI.rankedOptions, GUI.randTeam, 0)
+    GUI.rankedOptions = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/defaultoption/')
+    LayoutHelpers.RightOf(GUI.rankedOptions, GUI.randTeam)
     Tooltip.AddButtonTooltip(GUI.rankedOptions, 'lob_click_rankedoptions')
     if not lobbyComm:IsHost() then
         GUI.rankedOptions:Disable()
@@ -3560,14 +3560,16 @@ function CreateUI(maxPlayers)
     end
 
     -- CPU BENCH BUTTON --
-    GUI.rerunBenchmark = UIUtil.CreateButtonWithDropshadow(GUI.observerPanel, '/BUTTON/cputest/', '')
+    GUI.rerunBenchmark = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/cputest/', '', 11)
     GUI.rerunBenchmark:Disable()
-    LayoutHelpers.CenteredRightOf(GUI.rerunBenchmark, GUI.rankedOptions, 0)
+    -- Evil hack to eliminate the gap between the buttons. These negative offsets shouldn't be
+    -- needed, but I just can't figure out why it's doing it :/
+    LayoutHelpers.RightOf(GUI.rerunBenchmark, GUI.rankedOptions, -3)
     Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text='Run CPU Benchmark Test', body='Recalculates your CPU rating.'})
 
-    -- RANDOM MAP BUTTON -- start of random map code by Moritz
-    GUI.randMap = UIUtil.CreateButtonWithDropshadow(GUI.buttonPanelRight, '/BUTTON/randommap/', '')
-    LayoutHelpers.CenteredRightOf(GUI.randMap, GUI.rerunBenchmark, 0)
+    -- RANDOM MAP BUTTON --
+    GUI.randMap = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/randommap/')
+    LayoutHelpers.RightOf(GUI.randMap, GUI.rerunBenchmark, -3)
     Tooltip.AddButtonTooltip(GUI.randMap, 'lob_click_randmap')
     if not lobbyComm:IsHost() then
         GUI.randMap:Disable()
