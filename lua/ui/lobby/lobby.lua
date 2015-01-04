@@ -5286,15 +5286,19 @@ function StressCPU(waitTime)
 
         BenchTime = scoreSkew2 * BenchTime + scoreSkew1
 
+        -- The bench might have yeilded to a launcher, so we verify the lobbyComm is available when
+        -- we need it in a moment here (as well as aborting if we're wasting our time more than usual)
+        if not lobbyComm then
+            return
+        end
+
         --If this benchmark was better than our best so far...
         if BenchTime < currentBestBenchmark then
             --Make this our best benchmark
             currentBestBenchmark = BenchTime
 
             --Send it to the other players
-            if lobbyComm then
-                lobbyComm:BroadcastData( { Type = 'CPUBenchmark', PlayerName = localPlayerName, Result = currentBestBenchmark} )
-            end
+            lobbyComm:BroadcastData( { Type = 'CPUBenchmark', PlayerName = localPlayerName, Result = currentBestBenchmark} )
 
             --Add the benchmark to the local benchmark table
             CPU_Benchmarks[localPlayerName] = currentBestBenchmark
