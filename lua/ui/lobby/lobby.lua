@@ -1397,7 +1397,7 @@ function SendSystemMessage(text, id)
         Id = id or '',
     }
     lobbyComm:BroadcastData(data)
-    AddChatText(data)
+    AddChatText(data.Text)
 end
 
 function PublicChat(text)
