@@ -1467,10 +1467,10 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
             lastTeam = player.Team
         end
     end
-
+    
     if gameInfo.GameOptions['Victory'] ~= 'sandbox' then
         local valid = true
-        if totalPlayers == 1 then
+        if totalPlayers == 1 and MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).type != "campaign_coop" then
             valid = false
         end
         if not allFFA and not moreThanOneTeam then
