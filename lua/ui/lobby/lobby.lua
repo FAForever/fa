@@ -53,6 +53,8 @@ local formattedOptions = {}
 local nonDefaultFormattedOptions = {}
 local Warning_MAP = false
 
+local coopGame = nil
+
 local teamIcons = {
     '/lobby/team_icons/team_no_icon.dds',
     '/lobby/team_icons/team_1_icon.dds',
@@ -1118,7 +1120,13 @@ local function AssignRandomStartSpots(gameInfo)
             scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
         end
         if scenarioInfo then
-            local armyTable = MapUtil.GetArmies(scenarioInfo)
+            local armyTable = nil
+            if coopGame == true then
+                armyTable = {"Player", "Coop1", "Coop2", "Coop3"}
+            else
+                armyTable = MapUtil.GetArmies(scenarioInfo)
+            end
+            
             if armyTable then
                 if gameInfo.GameOptions['RandomMap'] == 'Off' then
                     numAvailStartSpots = table.getn(armyTable)
@@ -1434,6 +1442,14 @@ function UpdateAvailableSlots( numAvailStartSpots )
     end
 end
 
+function IsCoopGame(type)
+    if type == "campaign_coop" then
+        return true
+    else
+        return false
+    end
+end
+
 local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObserversCheck)
     if not singlePlayer then
         local notReady = GetPlayersNotReady()
@@ -1445,6 +1461,11 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         end
     end
 
+    scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile) 
+    
+    -- Check if this is to be a Coop game
+    coopGame = IsCoopGame(scenarioInfo.type)
+    
     -- make sure there are some players (could all be observers?)
     -- Also count teams. There needs to be at least 2 teams (or all FFA) represented
     local totalPlayers = 0
@@ -1470,7 +1491,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
     
     if gameInfo.GameOptions['Victory'] ~= 'sandbox' then
         local valid = true
-        if totalPlayers == 1 and MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).type != "campaign_coop" then
+        if totalPlayers == 1 and coopGame == false then
             valid = false
         end
         if not allFFA and not moreThanOneTeam then
@@ -1617,15 +1638,51 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         -- Tell everyone else to launch and then launch ourselves.
         lobbyComm:BroadcastData( { Type = 'Launch', GameInfo = gameInfo } )
 
+        -- Set up campaign
+        if coopGame == true then
+            gameInfo.GameOptions['Difficulty'] = 3
+            
+    		scenarioArmies = {}
+            for index, teamConfig in scenarioInfo.Configurations.standard.teams do
+                if teamConfig.name and (teamConfig.name == 'FFA') then
+                    scenarioArmies =teamConfig.armies
+                    break
+                end
+            end
+            
+            local addedArmies = {}
+            for spot, army in gameInfo.PlayerOptions do
+                if spot != 1 then
+                    table.insert(addedArmies, army)
+                end
+            end
+            
+            SetGameOption('Victory', 'sandbox')
+            
+            add = 1
+            for armyIndex, armyName in scenarioArmies do
+                if armyName != "Player" and stringstarts(armyName, "Coop") == false then
+                    gameInfo.PlayerOptions[armyIndex] = LobbyComm.GetDefaultPlayerOptions(armyName)
+                    gameInfo.PlayerOptions[armyIndex].Human = false
+                    gameInfo.PlayerOptions[armyIndex].Faction = 1
+                elseif stringstarts(armyName, "Coop") == true and table.getn(addedArmies) >= add then
+                    gameInfo.PlayerOptions[armyIndex] = addedArmies[add]
+                    add = add + 1
+                end
+            end
+        end
+        
         -- set the mods
         gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
-
-        scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
         SetWindowedLobby(false)
         lobbyComm:LaunchGame(gameInfo)
     end
 
     LaunchGame()
+end
+
+function stringstarts(String,Start)
+   return string.sub(String,1,string.len(Start))==Start
 end
 
 local function AlertHostMapMissing()
@@ -1738,7 +1795,12 @@ local function UpdateGame()
 
     local numAvailStartSpots = LobbyComm.maxPlayerSlots
     if scenarioInfo then
-        local armyTable = MapUtil.GetArmies(scenarioInfo)
+        local armyTable = nil
+        if coopGame == true then
+            armyTable = {"Player", "Coop1", "Coop2", "Coop3"}
+        else    
+            armyTable = MapUtil.GetArmies(scenarioInfo)
+        end
         if armyTable then
             numAvailStartSpots = table.getn(armyTable)
         end
@@ -3968,7 +4030,19 @@ end
 
 function ShowMapPositions(mapCtrl, scenario, numPlayers)
     local startPos = MapUtil.GetStartPositions(scenario)
-    local playerArmyArray = MapUtil.GetArmies(scenario)
+
+    local cHeight = GUI.posGroup:Height()
+    local cWidth = GUI.posGroup:Width()
+
+    local mWidth = scenario.size[1]
+    local mHeight = scenario.size[2]
+
+    local playerArmyArray = nil
+    if coopGame == true then
+        playerArmyArray = {"Player", "Coop1", "Coop2", "Coop3"}
+    else
+        playerArmyArray = MapUtil.GetArmies(scenario)
+    end
 
     for inSlot, army in playerArmyArray do
         local pos = startPos[army]
