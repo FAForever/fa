@@ -380,6 +380,17 @@ local function GetSlotMenuTables(stateKey, hostKey)
     return keys, strings
 end
 
+-- Instruct a player to unset their "ready" status. Should be called only by the host.
+local function setPlayerNotReady(slot)
+    local slotOptions = gameInfo.PlayerOptions[slot]
+    if slotOptions.Ready then
+        if not IsLocallyOwned(slot) then
+            lobbyComm:SendData(slotOptions.OwnerID, {Type = 'SetPlayerNotReady', Slot = slot})
+        end
+        gameInfo.PlayerOptions[slot]['Ready'] = false
+    end
+end
+
 -- Called by the host when a "move player to slot X" option is clicked.
 local function HandleSlotSwitches(moveFrom, moveTo)
     -- Bail out early for the stupid cases.
@@ -412,17 +423,6 @@ local function HandleSlotSwitches(moveFrom, moveTo)
     HostTryMovePlayer(fromOpts.OwnerID, moveFrom, moveTo) -- Move Player moveFrom to Slot moveTo
     HostConvertObserverToPlayer(toOpts.OwnerID, toOpts.PlayerName, FindObserverSlotForID(toOpts.OwnerID), moveFrom, toOpts.Faction, toOpts.PL, toOpts.RC, toOpts.NG, false)
     SendSystemMessage(fromOpts.PlayerName..' has switched with '..toOpts.PlayerName, 'switch')
-end
-
--- Instruct a player to unset their "ready" status. Should be called only by the host.
-local function setPlayerNotReady(slot)
-    local slotOptions = gameInfo.PlayerOptions[slot]
-    if slotOptions.Ready then
-        if not IsLocallyOwned(slot) then
-            lobbyComm:SendData(slotOptions.OwnerID, {Type = 'SetPlayerNotReady', Slot = slot})
-        end
-        gameInfo.PlayerOptions[slot]['Ready'] = false
-    end
 end
 
 local function DoSlotBehavior(slot, key, name)
