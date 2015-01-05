@@ -5639,7 +5639,9 @@ end
 
 
 function CreateOptionLobbyDialog()
-    local dialog = Group(GUI)
+    -- TODO: Include the uiutils.popup
+    -- TODO: Add "Show only players messages" option
+	local dialog = Group(GUI)
     LayoutHelpers.AtCenterIn(dialog, GUI)
     dialog.Depth:Set(GetFrame(dialog:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 1)
 
@@ -5758,17 +5760,7 @@ end
 function GUI_PRESET()
     local profiles = GetPreference("UserPresetLobby")
 
-    GUI_Preset = Group(GUI)
-    LayoutHelpers.AtCenterIn(GUI_Preset, GUI)
-    GUI_Preset.Depth:Set(998)
-    local background = Bitmap(GUI_Preset, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby.dds'))
-    GUI_Preset.Width:Set(background.Width)
-    GUI_Preset.Height:Set(background.Height)
-    LayoutHelpers.FillParent(background, GUI_Preset)
-    local dialog2 = Group(GUI_Preset)
-    dialog2.Width:Set(536)
-    dialog2.Height:Set(400)
-    LayoutHelpers.AtCenterIn(dialog2, GUI_Preset)
+    local dialog2 = UIUtil.CreatePopup(GUI, 'Preset Lobby:', 536, 400, true, 'Xinnony', 'test', nil, 't2', nil)
 
     -- Title
     local text0 = UIUtil.CreateText(dialog2, 'Lobby Presets', 17, 'Arial Gras', true)
@@ -5792,7 +5784,7 @@ function GUI_PRESET()
     local QuitButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Cancel")
     LayoutHelpers.CenteredRightOf(QuitButton, LoadButton, -28)
     QuitButton.OnClick = function(self)
-        GUI_Preset:Destroy()
+        dialog2.UI:Destroy()
     end
 
     -- Save button
@@ -5899,7 +5891,8 @@ function GUI_PRESET()
 end
 
 function GUI_PRESET_INPUT(tyype)
-    local GUI_Preset_InputBox = Group(GUI)
+    -- TODO: Include the uiutils.popup
+	local GUI_Preset_InputBox = Group(GUI)
     LayoutHelpers.AtCenterIn(GUI_Preset_InputBox, GUI)
     GUI_Preset_InputBox.Depth:Set(1999)
     local background2 = Bitmap(GUI_Preset_InputBox, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby-small.dds'))
@@ -6183,7 +6176,7 @@ function applyCREATE_PRESET_IN_PREF(presetname)
     LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, 0))
 end
 
--- Load or Save Preset and Set or Get to Lobby --
+-- Load or Save Preset and Set or Get to Lobby
 function check_Map_Exist(map_path)
     if DiskGetFileInfo(map_path) then
         return true
@@ -6405,6 +6398,7 @@ function Need_Changelog()
 end
 
 function GUI_Changelog()
+    -- TODO: Include the uiutils.popup
     GROUP_Changelog = Group(GUI)
     LayoutHelpers.AtCenterIn(GROUP_Changelog, GUI)
     GROUP_Changelog.Depth:Set(GetFrame(GROUP_Changelog:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 1)
