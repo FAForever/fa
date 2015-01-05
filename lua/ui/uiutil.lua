@@ -1055,7 +1055,8 @@ end
 function CreatePopup(parent, popup_Title, popup_width, popup_height, activeFog, popup_Credit, button1Text, button1Callback, button2Text, button2Callback)
     -- TODO: Can choixe purcent opacity for the fog
     -- TODO: No need popup.Ui:Destroy() for close the popup
-	-- TODO: Top and Bottom textures are equal for the moment (merge?)
+    -- TODO: Top and Bottom textures are equal for the moment (merge?)
+    local popup_Title = popup_Title or false
     local popup_width = popup_width or 537
     local popup_height = popup_height or 400
     local activeFog = activeFog or true
@@ -1099,9 +1100,11 @@ function CreatePopup(parent, popup_Title, popup_width, popup_height, activeFog, 
     popup.bottom.Height:Set(4)
     LayoutHelpers.AtLeftBottomIn(popup.bottom, popup)
 
-    popup.title = CreateText(popup_UI, popup_Title, 17, 'Arial Gras', true)
-    LayoutHelpers.AtHorizontalCenterIn(popup.title, popup, 0)
-    LayoutHelpers.AtTopIn(popup.title, popup, 10)
+    if popup_Title then
+        popup.title = CreateText(popup_UI, popup_Title, 17, 'Arial Gras', true)
+        LayoutHelpers.AtHorizontalCenterIn(popup.title, popup, 0)
+        LayoutHelpers.AtTopIn(popup.title, popup, 10)
+    end
 
     if popup_Credit then
         popup.credit = CreateText(popup_UI, popup_Credit, 9, 'Arial', true)
