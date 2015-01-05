@@ -1055,60 +1055,61 @@ end
 function CreatePopup(parent, popup_Title, popup_width, popup_height, activeFog, popup_Credit, button1Text, button1Callback, button2Text, button2Callback)
     -- TODO: Can choixe purcent opacity for the fog
     -- TODO: No need popup.Ui:Destroy() for close the popup
+	-- TODO: Top and Bottom textures are equal for the moment (merge?)
     local popup_width = popup_width or 537
     local popup_height = popup_height or 400
     local activeFog = activeFog or true
     local popup_Credit = popup_Credit or false
-    local button1Text = button1Text or 'Cancel'
+    local button1Text = button1Text or false
     local button1Callback = button1Callback or nil
-    local button2Text = button2Text or '{Button 2}'
+    local button2Text = button2Text or false
     local button2Callback = button2Callback or nil
-    
+
     local popup_UI = Group(parent)
     LayoutHelpers.FillParent(popup_UI, parent)
     LayoutHelpers.DepthSetTopOverParent(popup_UI, parent)
-    
+
     if activeFog then
         popup_UI.fog = Bitmap(popup_UI)
         popup_UI.fog:SetSolidColor('780D0E0D')
         LayoutHelpers.FillParent(popup_UI.fog, parent)
     end
-    
+
     local popup = Group(popup_UI)
     popup.Width:Set(popup_width)
     popup.Height:Set(popup_height)
     LayoutHelpers.AtCenterIn(popup, parent)
     LayoutHelpers.DepthSetTopOverParent(popup, popup_UI)
-    
+
     popup.UI = popup_UI
-    
+
     popup.middle = Bitmap(popup_UI)
     popup.middle:SetSolidColor('ff101010')
     popup.middle.Width:Set(popup_width)
     popup.middle.Height:Set(popup_height-8)
     LayoutHelpers.AtLeftTopIn(popup.middle, popup, 0, 4)
-    
+
     popup.top = Bitmap(popup_UI, SkinnableFile('/scx_menu/lan-game-lobby/popup-t.png'))
     popup.top.Width:Set(popup_width)
     popup.top.Height:Set(4)
     LayoutHelpers.AtLeftTopIn(popup.top, popup)
-    
+
     popup.bottom = Bitmap(popup_UI, SkinnableFile('/scx_menu/lan-game-lobby/popup-b.png'))
     popup.bottom.Width:Set(popup_width)
     popup.bottom.Height:Set(4)
     LayoutHelpers.AtLeftBottomIn(popup.bottom, popup)
-    
+
     popup.title = CreateText(popup_UI, popup_Title, 17, 'Arial Gras', true)
     LayoutHelpers.AtHorizontalCenterIn(popup.title, popup, 0)
     LayoutHelpers.AtTopIn(popup.title, popup, 10)
-    
+
     if popup_Credit then
         popup.credit = CreateText(popup_UI, popup_Credit, 9, 'Arial', true)
         popup.credit:SetColor('808080')
         LayoutHelpers.AtRightIn(popup.credit, popup, 0)
         LayoutHelpers.AtBottomIn(popup.credit, popup, 2)
     end
-    
+
     if button1Text then
         popup.button1 = CreateButtonWithDropshadow(popup, '/BUTTON/medium/', button1Text, -1)
         if button1Callback then
@@ -1116,20 +1117,20 @@ function CreatePopup(parent, popup_Title, popup_width, popup_height, activeFog, 
         else
             popup.button1.OnClick = function(self) popup_UI:Destroy() end
         end
-    end
-    if button2Text then
-        LayoutHelpers.AtLeftBottomIn(popup.button1, popup, 0, 10)
-        popup.button2 = CreateButtonWithDropshadow(popup, '/BUTTON/medium/', button2Text, -1)
-        LayoutHelpers.AtRightBottomIn(popup.button2, popup, 0, 10)
-        if button2Callback then
-            popup.button2.OnClick = function(self) button2Callback() end
+        if button2Text then
+            LayoutHelpers.AtLeftBottomIn(popup.button1, popup, 0, 10)
+            popup.button2 = CreateButtonWithDropshadow(popup, '/BUTTON/medium/', button2Text, -1)
+            LayoutHelpers.AtRightBottomIn(popup.button2, popup, 0, 10)
+            if button2Callback then
+                popup.button2.OnClick = function(self) button2Callback() end
+            else
+                popup.button2.OnClick = function(self) popup_UI:Destroy() end
+            end
         else
-            popup.button2.OnClick = function(self) popup_UI:Destroy() end
+            LayoutHelpers.AtHorizontalCenterIn(popup.button1, popup)
+            LayoutHelpers.AtBottomIn(popup.button1, popup, 10)
         end
-    else
-        LayoutHelpers.AtHorizontalCenterIn(popup.button1, popup)
-        LayoutHelpers.AtBottomIn(popup.button1, popup, 10)
     end
-    
+
     return popup
 end
