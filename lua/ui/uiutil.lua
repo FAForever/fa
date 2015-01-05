@@ -262,8 +262,8 @@ function RotateSkin(direction)
         dir = -1
     end
 
-    -- Find the next skin from our current skin, skipping default, as it's not really a skin!
-    -- note that if the skin table is updated while running, the order of the table might change
+    -- Find the next skin from our current skin, skipping default/randomfaction: they're not really
+    -- skins note that if the skin table is updated while running, the order of the table might change
     -- so your cycle may be different. No big deal, just be aware it's a side effect.
     local numSkins = table.getn(skinNames)
     for index, skinName in skinNames do
@@ -271,7 +271,7 @@ function RotateSkin(direction)
             local nextSkinIndex = index + dir
             if nextSkinIndex > numSkins then nextSkinIndex = 1 end
             if nextSkinIndex < 1 then nextSkinIndex = numSkins end
-            if skinNames[nextSkinIndex] == 'default' then   -- skip default entry as it's not really a skin
+            if skinNames[nextSkinIndex] == 'default' or skinNames[nextSkinIndex] == 'random'  then   -- skip default entry as it's not really a skin
                 nextSkinIndex = nextSkinIndex + dir
                 if nextSkinIndex > numSkins then nextSkinIndex = 1 end
                 if nextSkinIndex < 1 then nextSkinIndex = numSkins end

@@ -125,7 +125,7 @@ local function UpdateDisplay()
         return    
     end
 
-    if not curInfo or not curInfo.scoreData or not curInfo.scoreData.historical then
+    if not curInfo or not curInfo.scoreData then
         return
     end
 
@@ -137,10 +137,16 @@ local function UpdateDisplay()
     for index, info in ipairs(curInfo) do
         sortOrder[index] = {}
         sortOrder[index].infoIndex = index
-        sortOrder[index].sortKey = curInfo.scoreData.current[index][curScoreKey][curSortCol][curType] or curInfo.scoreData.current[index][curScoreKey][curSortCol]
+        sortOrder[index].sortKey = curInfo.scoreData.current[index][curScoreKey][curSortCol][curType]
+                                   or curInfo.scoreData.current[index][curScoreKey][curSortCol]
     end
 
     table.sort(sortOrder, function(first, second)
+        if not first.sortKey or not second.sortKey then
+            return false
+        elseif type(first.sortKey) ~= "number" or type(second.sortKey) ~= "number" then
+            return false
+        end
         if curSortDescending then
             return (first.sortKey > second.sortKey)
         else
@@ -161,7 +167,7 @@ local function UpdateDisplay()
                 -- check if data sub-type otherwise use parent value
                 curGrid[index].cols[curCol]:SetText(tostring(math.floor(
                     curInfo.scoreData.current[curPlayerIndex][curScoreKey][colData.scoreKey][curType] or 
-                    curInfo.scoreData.current[curPlayerIndex][curScoreKey][colData.scoreKey])))
+                    curInfo.scoreData.current[curPlayerIndex][curScoreKey][colData.scoreKey] or 0)))
             end
         end
     end
@@ -221,28 +227,7 @@ function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
     DisableWorldSounds()
     StopAllSounds()
     UpdateData()
-	
-	if table.empty(curInfo.scoreData.historical) then
-		LOG("warning")
-		if HasCommandLineArg("/online") or HasCommandLineArg("/gpgnet") then
-			UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0007>The game is not finished !\nYou can't have access to scores now.\nYou will be able to see them from the replay.",
-				"<LOC _OK>", ExitApplication,
-				nil,  nil, 
-				nil, nil,
-				true,
-				{escapeButton = 1, enterButton = 1, worldCover = true})
-        else
-			UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0007>The game is not finished !\nYou can't have access to scores now.\nYou will be able to see them from the replay.",
-				"<LOC _OK>", ExitGame,
-				nil,  nil, 
-				nil, nil,
-				true,
-				{escapeButton = 1, enterButton = 1, worldCover = true})
-		
-        end
-		return 
-	end
-	
+
     campaignScore = tostring(curInfo.scoreData.current[1].general.score)
 
     if showCampaign then

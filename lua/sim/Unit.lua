@@ -1220,9 +1220,8 @@ Unit = Class(moho.unit_methods) {
 
         if self.PlayDeathAnimation and not self:IsBeingBuilt() then
             self:ForkThread(self.PlayAnimationThread, 'AnimationDeath')
+	    self:SetCollisionShape('None')
         end
-
-        self:SetCollisionShape('None')
 
         self:DoUnitCallbacks( 'OnKilled' )
         self:OnKilledVO()
