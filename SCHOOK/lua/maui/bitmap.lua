@@ -44,7 +44,9 @@ Bitmap = Class(moho.bitmap_methods, Control) {
             self:InternalSetSolidColor(self._color())
         end
         self._filename._texture.OnDirty = function(var)
-            self:SetNewTexture(self._filename._texture(), self._filename._border)
+            if self then
+                self:SetNewTexture(self._filename._texture(), self._filename._border)
+            end
         end
 
         if filename then
