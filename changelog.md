@@ -1,3 +1,8 @@
+Changelog for patch 3640
+------------------------
+
+- Adress an issue that causes the game to crash with core dumps in long games
+
 Changelog for patch 3639
 ------------------------
 
