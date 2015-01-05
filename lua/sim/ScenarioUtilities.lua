@@ -62,7 +62,7 @@ end
 function ChainToPositions(chainName)
     local chain = Scenario.Chains[chainName]
     if not chain then
-        error('ERROR: Invalid Chain Named- ' .. chainName, 2)
+        error('ERROR: Invalid Chain Named- ' .. repr(chainName), 2)
     end
     local positionTable = {}
     for num, marker in chain.Markers do

@@ -841,7 +841,7 @@ function FakeTeleportUnit(unit,killUnit)
     IssueClearCommands({unit})
     unit:SetCanBeKilled( false )
 
-    unit:PlayTeleportChargeEffects()
+    unit:PlayTeleportChargeEffects(unit:GetPosition())
     unit:PlayUnitSound('GateCharge')
     WaitSeconds(2)
 
