@@ -98,6 +98,12 @@ UnitBlueprint {
                 AnimationRateMin = 1,
                 Weight = 1,
             },
+            {
+                Animation = '/units/UAL0401/UAL0401_Adeath02.sca',
+                AnimationRateMax = 1,
+                AnimationRateMin = 1,
+                Weight = 1,
+            },
         },
         AnimationWalk = '/units/ual0401/ual0401_awalk.sca',
         AnimationWalkRate = 2,
@@ -534,15 +540,17 @@ UnitBlueprint {
             WeaponRepackTimeout = 0,
             WeaponUnpacks = false,
         },
-        {
+          {
             AboveWaterTargetsOnly = true,
-            Damage = 7500,
+            BoneImpact = {'Right_Foot', 'Left_Leg_B02', 'Right_Leg_B02', 'Torso'}, -- triggers for each bone impact
+            Damage = 8000, -- damage spread across bones (2000 on each in this case)
             DamageFriendly = true,
+            DamageRadiusMax = 2, -- core radius gives full damage
             DamageRadius = 4,
             DamageType = 'Normal',
-            DisplayName = 'Collossus Death',
+            DisplayName = 'Colossus Death',
             DummyWeapon = true,
-            Label = 'CollossusDeath',
+            Label = 'DeathWeapon',
             WeaponCategory = 'Death',
         },
     },
