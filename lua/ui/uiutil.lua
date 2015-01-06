@@ -563,8 +563,8 @@ end
 --* return the standard scrollbar
 function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom, offset_top)
     offset_right = offset_right or 0
-	offset_bottom = offset_bottom or 0
-	offset_top = offset_top or 0
+    offset_bottom = offset_bottom or 0
+    offset_top = offset_top or 0
     local textureName = filename or '/small-vert_scroll/'
     local scrollbg = textureName..'back_scr_mid.dds'
     local scrollbarmid = textureName..'bar-mid_scr_over.dds'
@@ -603,7 +603,7 @@ function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom,
     scrollUpButton.Left:Set(scrollbar.Left)
     scrollUpButton.Top:Set(function() return attachto.Top() + offset_top end)
 
-	scrollDownButton.Left:Set(scrollbar.Left)
+    scrollDownButton.Left:Set(scrollbar.Left)
     scrollDownButton.Bottom:Set(function() return attachto.Bottom() + offset_bottom end)
 
     scrollbar.Right:Set(scrollUpButton.Right)
@@ -681,8 +681,8 @@ function MakeInputModal(control, onEnterFunc, onEscFunc)
             end
             if control.oldHandleEvent then
                 return control.oldHandleEvent(self, event)
-			end
-			return true
+            end
+            return true
         end
     end
 end
@@ -768,9 +768,9 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
         if callback then
             button.OnClick = function(self)
                 callback()
-				if destroyOnCallback then
-					dialog:Destroy()
-				end
+                if destroyOnCallback then
+                    dialog:Destroy()
+                end
             end
         else
             button.OnClick = function(self)
@@ -1052,19 +1052,20 @@ function setVisible(control, visible)
 end
 
 -- Create a popup
-function CreatePopup(parent, popup_Title, popup_width, popup_height, activeFog, popup_Credit, button1Text, button1Callback, button2Text, button2Callback)
+function CreatePopup(parent, title, layout, options, buttons)
     -- TODO: Can choice purcent opacity for the fog
     -- TODO: No need popup.Ui:Destroy() for close the popup
-    -- TODO: Top and Bottom textures are equal for the moment (merge?)
-    local popup_Title = popup_Title or false
-    local popup_width = popup_width or 537
-    local popup_height = popup_height or 400
-    local activeFog = activeFog or true
-    local popup_Credit = popup_Credit or false
-    local button1Text = button1Text or false
-    local button1Callback = button1Callback or nil
-    local button2Text = button2Text or false
-    local button2Callback = button2Callback or nil
+    -- TODO: Top and Bottom textures are equal for the moment (merge to one file ?) (not use texture ?, only 3 colors)
+    -- TODO: Animate the popup appear ?
+    local popup_Title = title or false -- Popup Title [string] (optional)
+    local popup_width = layout[1] or 537 -- Popup width size [number]
+    local popup_height = layout[2] or 400 -- Popup height size [number]
+    local activeFog = options[1] or true -- Popup fog in background [true or false]
+    local popup_Credit = options[2] or false -- Popup credit [string]
+    local button1Text = buttons[1] or false -- Popup button name [string]
+    local button1Callback = buttons[2] or nil -- Popup button function [function]
+    local button2Text = buttons[3] or false -- Popup button name [string]
+    local button2Callback = buttons[4] or nil -- Popup button function [function]
 
     local popup_UI = Group(parent)
     LayoutHelpers.FillParent(popup_UI, parent)

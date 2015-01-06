@@ -5680,10 +5680,9 @@ end
 
 
 function CreateOptionLobbyDialog()
-    -- TODO: Include the uiutils.popup
     -- TODO: Add "Show only players messages" option
 
-    local dialog2 = UIUtil.CreatePopup(GUI, 'Lobby Options', 436, 240, true, 'Xinnony', 'Close')
+    local popup = UIUtil.CreatePopup(GUI, 'Lobby Options', {436, 240}, {true, 'Xinnony'}, {'Close'})
 
     -- The provided radiobutton control doesn't allow satellite data, so we use the index in this
     -- list as our stored background mode value.
@@ -5695,9 +5694,9 @@ function CreateOptionLobbyDialog()
         LOC("<LOC lobui_0410>"), -- None
     }
     local selectedBackgroundState = backgroundStates[Prefs.GetFromCurrentProfile("LobbyBackground") or 1]
-    local backgroundRadiobutton = UIUtil.CreateRadioButtonsStd(dialog2, '/CHECKBOX/radio', LOC("<LOC lobui_0405>"), backgroundStates, selectedBackgroundState)
+    local backgroundRadiobutton = UIUtil.CreateRadioButtonsStd(popup, '/CHECKBOX/radio', LOC("<LOC lobui_0405>"), backgroundStates, selectedBackgroundState)
 
-    LayoutHelpers.AtLeftTopIn(backgroundRadiobutton, dialog2, 20, 40)
+    LayoutHelpers.AtLeftTopIn(backgroundRadiobutton, popup, 20, 40)
 
     backgroundRadiobutton.OnChoose = function(self, button)
         local backgroundMode = indexOf(backgroundStates, button)
@@ -5707,11 +5706,11 @@ function CreateOptionLobbyDialog()
     --
     local Slider = import('/lua/maui/slider.lua').Slider
     local currentFontSize = Prefs.GetFromCurrentProfile('LobbyChatFontSize') or 14
-    local slider_Chat_SizeFont_TEXT = UIUtil.CreateText(dialog2, LOC("<LOC lobui_0404> ").. currentFontSize, 14, 'Arial', true)
-    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont_TEXT, dialog2, 27, 136)
+    local slider_Chat_SizeFont_TEXT = UIUtil.CreateText(popup, LOC("<LOC lobui_0404> ").. currentFontSize, 14, 'Arial', true)
+    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont_TEXT, popup, 27, 136)
 
-    local slider_Chat_SizeFont = Slider(dialog2, false, 9, 18, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
-    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont, dialog2, 20, 156)
+    local slider_Chat_SizeFont = Slider(popup, false, 9, 18, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
+    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont, popup, 20, 156)
     slider_Chat_SizeFont:SetValue(currentFontSize)
 
     slider_Chat_SizeFont.OnValueChanged = function(self, newValue)
@@ -5721,8 +5720,8 @@ function CreateOptionLobbyDialog()
         Prefs.SetToCurrentProfile('LobbyChatFontSize', sliderValue)
     end
     --
-    local cbox_WindowedLobby = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
-    LayoutHelpers.AtRightTopIn(cbox_WindowedLobby, dialog2, 20, 42)
+    local cbox_WindowedLobby = UIUtil.CreateCheckboxStd(popup, '/CHECKBOX/radio')
+    LayoutHelpers.AtRightTopIn(cbox_WindowedLobby, popup, 20, 42)
     Tooltip.AddCheckboxTooltip(cbox_WindowedLobby, {text='Windowed mode', body=LOC("<LOC lobui_0403>")})
     local cbox_WindowedLobby_TEXT = UIUtil.CreateText(cbox_WindowedLobby, LOC("<LOC lobui_0402>"), 14, 'Arial', true)
     LayoutHelpers.AtRightIn(cbox_WindowedLobby_TEXT, cbox_WindowedLobby, 25)
@@ -5738,8 +5737,8 @@ function CreateOptionLobbyDialog()
         SetWindowedLobby(checked)
     end
     --
-    local cbox_StretchBG = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
-    LayoutHelpers.AtRightTopIn(cbox_StretchBG, dialog2, 20, 68)
+    local cbox_StretchBG = UIUtil.CreateCheckboxStd(popup, '/CHECKBOX/radio')
+    LayoutHelpers.AtRightTopIn(cbox_StretchBG, popup, 20, 68)
     Tooltip.AddCheckboxTooltip(cbox_StretchBG, {text='Stretch Background', body=LOC("<LOC lobui_0401>")})
     local cbox_StretchBG_TEXT = UIUtil.CreateText(cbox_StretchBG, LOC("<LOC lobui_0400>"), 14, 'Arial', true)
     LayoutHelpers.AtRightIn(cbox_StretchBG_TEXT, cbox_StretchBG, 25)
@@ -5778,33 +5777,37 @@ end
 
 -- Lobby Presets
 function GUI_PRESET()
+    -- TODO: All variable to local and send variable to other function if neeeded
+    -- TODO: Include the other function here
+    -- TODO: Optimize the script
     local profiles = GetPreference("UserPresetLobby")
 
-    local dialog2 = UIUtil.CreatePopup(GUI, 'Lobby Presets', 536, 400, true, 'Xinnony')
+    local popup = UIUtil.CreatePopup(GUI, 'Lobby Presets', {536, 400}, {true, 'Xinnony'})
 
     -- Info text
-    local text1 = UIUtil.CreateText(dialog2, 'Double-click to edit', 9, 'Arial', true)
+    local text1 = UIUtil.CreateText(popup, 'Double-click to edit', 9, 'Arial', true)
     text1:SetColor('FFCC00')
     text1:Hide()
 
     -- Load button
-    local LoadButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Load Preset")
-    LayoutHelpers.AtLeftIn(LoadButton, dialog2, -10)
-    LayoutHelpers.AtBottomIn(LoadButton, dialog2, 10)
+    local LoadButton = UIUtil.CreateButtonWithDropshadow(popup, '/BUTTON/medium/', "Load Preset")
+    LayoutHelpers.AtLeftIn(LoadButton, popup, -10)
+    LayoutHelpers.AtBottomIn(LoadButton, popup, 10)
     LoadButton.OnClick = function(self)
         LOAD_PRESET_IN_PREF()
+        popup.UI:Destroy()
     end
     
     -- Quit button
-    local QuitButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Cancel")
+    local QuitButton = UIUtil.CreateButtonWithDropshadow(popup, '/BUTTON/medium/', "Cancel")
     LayoutHelpers.CenteredRightOf(QuitButton, LoadButton, -28)
     QuitButton.OnClick = function(self)
-        dialog2.UI:Destroy()
+        popup.UI:Destroy()
     end
 
     -- Save button
-    local SaveButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Save Preset")
-    LayoutHelpers.AtRightIn(SaveButton, dialog2, -10)
+    local SaveButton = UIUtil.CreateButtonWithDropshadow(popup, '/BUTTON/medium/', "Save Preset")
+    LayoutHelpers.AtRightIn(SaveButton, popup, -10)
     LayoutHelpers.AtVerticalCenterIn(SaveButton, LoadButton)
     SaveButton.OnClick = function(self)
         SAVE_PRESET_IN_PREF()
@@ -5817,7 +5820,7 @@ function GUI_PRESET()
     end
 
     -- Delete button
-    local DeleteButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Delete Preset")
+    local DeleteButton = UIUtil.CreateButtonWithDropshadow(popup, '/BUTTON/medium/', "Delete Preset")
     LayoutHelpers.CenteredLeftOf(DeleteButton, SaveButton, -28)
     LayoutHelpers.AtVerticalCenterIn(DeleteButton, LoadButton)
     DeleteButton.OnClick = function(self)
@@ -5832,14 +5835,14 @@ function GUI_PRESET()
     end
     
     -- Preset List
-    PresetList = ItemList(dialog2)
+    PresetList = ItemList(popup)
     PresetList:SetFont(UIUtil.bodyFont, 14)
     PresetList:ShowMouseoverItem(true)
     PresetList.Width:Set(210)
     PresetList.Height:Set(310)
-    LayoutHelpers.DepthOverParent(PresetList, dialog2, 10)
-    LayoutHelpers.AtLeftIn(PresetList, dialog2, 10)
-    LayoutHelpers.AtTopIn(PresetList, dialog2, 38)
+    LayoutHelpers.DepthOverParent(PresetList, popup, 10)
+    LayoutHelpers.AtLeftIn(PresetList, popup, 10)
+    LayoutHelpers.AtTopIn(PresetList, popup, 38)
     UIUtil.CreateLobbyVertScrollbar(PresetList)
     
     LOAD_PresetProfils_For_PresetList()
@@ -5856,6 +5859,7 @@ function GUI_PRESET()
             LoadButton.label:SetText('Load Preset')
             LoadButton.OnClick = function(self)
                 LOAD_PRESET_IN_PREF()
+                popup.UI:Destroy()
             end
             --
             PresetList:SetSelection(row)
@@ -5866,17 +5870,18 @@ function GUI_PRESET()
     
     PresetList.OnDoubleClick = function(self, row)
         LOAD_PRESET_IN_PREF()
+        popup.UI:Destroy()
     end
 
     -- Info List
-    InfoList = ItemList(dialog2)
+    InfoList = ItemList(popup)
     InfoList:SetFont(UIUtil.bodyFont, 11)
     InfoList:SetColors(nil, "00000000")
     InfoList:ShowMouseoverItem(true)
     InfoList.Width:Set(262)
     InfoList.Height:Set(300)
-    LayoutHelpers.AtRightIn(InfoList, dialog2, 26)
-    LayoutHelpers.AtTopIn(InfoList, dialog2, 38)
+    LayoutHelpers.AtRightIn(InfoList, popup, 26)
+    LayoutHelpers.AtTopIn(InfoList, popup, 38)
     LayoutHelpers.Below(text1, InfoList, 0)
     LayoutHelpers.AtHorizontalCenterIn(text1, InfoList, 0)
     UIUtil.CreateLobbyVertScrollbar(InfoList)
@@ -6287,7 +6292,6 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
         --
 
         UpdateGame()
-        GUI_Preset:Destroy()
     end
 end
 
@@ -6413,36 +6417,24 @@ function Need_Changelog()
 end
 
 function GUI_Changelog()
-    -- TODO: Include the uiutils.popup
-    GROUP_Changelog = Group(GUI)
-    LayoutHelpers.AtCenterIn(GROUP_Changelog, GUI)
-    GROUP_Changelog.Depth:Set(GetFrame(GROUP_Changelog:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 1)
-    local background = Bitmap(GROUP_Changelog, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby.dds'))
-    GROUP_Changelog.Width:Set(background.Width)
-    GROUP_Changelog.Height:Set(background.Height)
-    LayoutHelpers.FillParent(background, GROUP_Changelog)
-    local dialog2 = Group(GROUP_Changelog)
-    dialog2.Width:Set(526)
-    dialog2.Height:Set(350)
-    LayoutHelpers.AtCenterIn(dialog2, GROUP_Changelog)
-    -- Title --
-    local text0 = UIUtil.CreateText(dialog2, LOC("<LOC lobui_0412>"), 17, 'Arial Gras', true)
-    LayoutHelpers.AtHorizontalCenterIn(text0, dialog2, 0)
-    LayoutHelpers.AtTopIn(text0, dialog2, 10)
-    -- Info List --
-    InfoList = ItemList(dialog2)
+    local Changelog = import('/lua/ui/lobby/changelog.lua')
+    local popup = UIUtil.CreatePopup(GUI, LOC("<LOC lobui_0412>"), {526, 350}, {true, 'Xinnony'}, {'Ok'})
+    popup.button1.OnClick = function(self) Prefs.SetToCurrentProfile('LobbyChangelog', Changelog.last_version) popup.UI:Destroy() end
+
+    -- Info List
+    InfoList = ItemList(popup)
     InfoList:SetFont(UIUtil.bodyFont, 11)
     InfoList:SetColors(nil, "00000000")
     InfoList.Width:Set(498)
     InfoList.Height:Set(260)
-    LayoutHelpers.AtLeftIn(InfoList, dialog2, 10)
-    LayoutHelpers.AtRightIn(InfoList, dialog2, 26)
-    LayoutHelpers.AtTopIn(InfoList, dialog2, 38)
+    LayoutHelpers.AtLeftIn(InfoList, popup, 10)
+    LayoutHelpers.AtRightIn(InfoList, popup, 26)
+    LayoutHelpers.AtTopIn(InfoList, popup, 38)
     UIUtil.CreateLobbyVertScrollbar(InfoList)
     InfoList.OnClick = function(self)
     end
+
     -- See only new Changelog by version
-    local Changelog = import('/lua/ui/lobby/changelog.lua')
     local Last_Changelog_Version = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
     for i, d in Changelog.changelog do
         if Last_Changelog_Version < d.version then
@@ -6452,13 +6444,5 @@ function GUI_Changelog()
             end
             InfoList:AddItem('')
         end
-    end
-    -- OK button --
-    local OkButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Ok")
-    LayoutHelpers.AtLeftIn(OkButton, dialog2, 0)
-    LayoutHelpers.AtBottomIn(OkButton, dialog2, 10)
-    OkButton.OnClick = function(self)
-        Prefs.SetToCurrentProfile('LobbyChangelog', Changelog.last_version)
-        GROUP_Changelog:Destroy()
     end
 end
