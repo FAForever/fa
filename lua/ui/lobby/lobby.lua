@@ -3808,32 +3808,28 @@ function RefreshOptionDisplayData(scenarioInfo)
     nonDefaultFormattedOptions = {}
 
     --// Check Mod active
-    local modStr = false
+    local modStr = ''
     local modNum = table.getn(Mods.GetGameMods(gameInfo.GameMods)) or 0
     local modNumUI = table.getn(Mods.GetUiMods()) or 0
-    if modNum > 0 and modNumUI > 0 then
-        modStr = modNum..' Mods (and '..modNumUI..' UI Mods)'
-        if modNum == 1 and modNumUI > 1 then
-            modStr = modNum..' Mod (and '..modNumUI..' UI Mods)'
-        elseif modNum > 1 and modNumUI == 1 then
-            modStr = modNum..' Mods (and '..modNumUI..' UI Mod)'
-        elseif modNum == 1 and modNumUI == 1 then
-            modStr = modNum..' Mod (and '..modNumUI..' UI Mod)'
-        else
-            modStr = modNum..' Mods (and '..modNumUI..' UI Mods)'
-        end
-    elseif modNum > 0 and modNumUI == 0 then
+
+    if modNum == 1 then
+        modStr = modNum..' Mod'
+    elseif modNum > 1 then
         modStr = modNum..' Mods'
-        if modNum == 1 then
-            modStr = modNum..' Mod'
-        end
-    elseif modNum == 0 and modNumUI > 0 then
-        modStr = modNumUI..' UI Mods'
-        if modNum == 1 then
+    else
+        if modNumUI == 1 then
             modStr = modNumUI..' UI Mod'
+        elseif modNumUI > 1 then
+            modStr = modNumUI..' UI Mods'
         end
     end
-    if modStr then
+    if modNumUI == 1 then
+        modStr = modStr..' (and '..modNumUI..' UI Mod)'
+    elseif modNumUI > 1 then
+        modStr = modStr..' (and '..modNumUI..' UI Mods)'
+    end
+
+    if modStr ~= '' then
         local option = {
             text = modStr,
             value = LOC('<LOC lobby_0003>Check Mod Manager'),
