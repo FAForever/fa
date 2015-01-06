@@ -3883,8 +3883,7 @@ function RefreshOptionDisplayData(scenarioInfo)
         if not Warning_MAP and (optData.default == 0 or optData.default > table.getsize(optData.values)) then
             Warning_MAP = true
             AddChatText('The options included in this map are not compliant.')
-            AddChatText('The default option is a "index", not a "key" value !')
-            AddChatText('Please devlopper update the map.')
+            AddChatText('Please contact the author of the map.')
         end
 
         local option = {
