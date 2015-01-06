@@ -128,7 +128,8 @@ local playerDeviation = GetCommandLineArg("/deviation", 1)
 
 local ratingColor = GetCommandLineArg("/ratingcolor", 1)
 local numGames = GetCommandLineArg("/numgames", 1)
-
+initName = GetCommandLineArg("/init", 1)
+initName = tostring(initName[1])
 
 if ratingColor then
     ratingColor = tostring(ratingColor[1])
@@ -1664,6 +1665,38 @@ local function AlertHostMapMissing()
     end
 end
 
+function UpdateRankedLabel()
+    -- Check if Game is Ranked
+    if GUI.RankedLabel then
+        if initName == "init_faf.lua" then
+            local getVictory = gameInfo.GameOptions['Victory'] -- 'demoralization'
+            local getTimeout = gameInfo.GameOptions['Timeouts'] -- '3'
+            local getCheat = gameInfo.GameOptions['CheatsEnabled'] -- 'false'
+            local getCivilian = gameInfo.GameOptions['CivilianAlliance'] -- 'enemy'
+            local getSpeed = gameInfo.GameOptions['GameSpeed'] -- 'normal'
+            local getFog = gameInfo.GameOptions['FogOfWar'] -- 'explored'
+            local getUnitCap = gameInfo.GameOptions['UnitCap'] -- '1000'
+            local getPrebui = gameInfo.GameOptions['PrebuiltUnits'] -- 'Off'
+            local getNorush = gameInfo.GameOptions['NoRushOption'] -- 'Off'
+            local getNumbMod = table.getn(Mods.GetGameMods(gameInfo.GameMods)) -- 0 for the purposes of this function
+            local getRstric = gameInfo.GameOptions.RestrictedCategories or {} --can be nil or a table, even if no restrictions are present
+            if getVictory == 'demoralization' and getTimeout == '3' and getCheat == 'false' and getCivilian == 'enemy' and getSpeed == 'normal' and getFog == 'explored' and getUnitCap == '1000' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and (table.getn(getRstric) == 0) then
+                GUI.RankedLabel:SetText("Game is Ranked")
+                GUI.RankedLabel:SetColor("77ff77")
+                return true
+            else
+                GUI.RankedLabel:SetText("Game is not Ranked")
+                GUI.RankedLabel:SetColor("ff7777")
+                return false
+            end
+        else
+            GUI.RankedLabel:SetText("Game is not Ranked")
+            GUI.RankedLabel:SetColor("ff7777")
+            return false
+        end
+    end
+end
+
 -- Set the faction selector icons appropriately for the given selected faction.
 local function updateFactionSelectorIcons(enabled, faction)
     -- Possibly bolt "-dis" onto the pathname.
@@ -1768,7 +1801,8 @@ local function UpdateGame()
         local notReady = not playerOptions.Ready
 
         UIUtil.setEnabled(GUI.becomeObserver, notReady)
-        UIUtil.setEnabled(GUI.restrictedUnitsOrPresetsBtn, isHost and notReady)
+        local getRstric = gameInfo.GameOptions.RestrictedCategories or {} --can be nil or a table, even if no restrictions are present
+        UIUtil.setEnabled(GUI.restrictedUnitsOrPresetsBtn, (isHost or table.getn(getRstric) ~= 0) and notReady)
 
         UIUtil.setEnabled(GUI.LargeMapPreview, notReady)
         Faction_Selector_Set_Enabled(notReady, playerOptions.Faction)
@@ -1950,6 +1984,9 @@ local function UpdateGame()
         Tooltip.AddControlTooltip(GUI.MapNameLabel, mapTooltip)
         Tooltip.AddControlTooltip(GUI.GameQualityLabel, mapTooltip)
     end
+
+    -- Check if Game is Ranked
+    UpdateRankedLabel()
 end
 
 -- Update our local gameInfo.GameMods from selected map name and selected mods, then
@@ -2615,8 +2652,6 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtLeftTopIn(GUI.ModFeaturedLabel, GUI.panel, 50, 61)
 
     -- Set the mod name to a value appropriate for the mod in use.
-    local initName = GetCommandLineArg("/init", 1)
-    initName = tostring(initName[1])
     local modLabels = {
         ["init_faf.lua"] = "FA Forever",
         ["init_blackops.lua"] = "BlackOps",
@@ -2631,29 +2666,35 @@ function CreateUI(maxPlayers)
         ["init_xtremewars.lua"] = "XtremeWars",
 
     }
-    SetText2(GUI.ModFeaturedLabel, modLabels[initName] or "", 20)
+    SetText2(GUI.ModFeaturedLabel, modLabels[initName]..' - ' or "", 20)
 
-    --\\
-    --// Lobby options panel
+    -- Ranked Label
+    GUI.RankedLabel = UIUtil.CreateText(GUI.panel, "", 13, 'Arial Gras')
+    GUI.RankedLabel:SetColor(UIUtil.bodyColor)
+    LayoutHelpers.RightOf(GUI.RankedLabel, GUI.ModFeaturedLabel, 0)
+
+    -- Check if Game is Ranked
+    UpdateRankedLabel()
+
+    -- Lobby options panel
     GUI.LobbyOptions = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/BUTTON/small/', "Lobby Options")
     LayoutHelpers.AtTopIn(GUI.LobbyOptions, GUI.panel, 10)
     LayoutHelpers.AtHorizontalCenterIn(GUI.LobbyOptions, GUI, 0)
     GUI.LobbyOptions.OnClick = function()
         CreateOptionLobbyDialog()
     end
-    --\\
 
     -- Credits for the FAF lobby
     -- TODO: Localise
-    local Credits = 'Lobby by Xinnony and Barlots: V'..LOBBYversion..')'
+    local Credits = 'Lobby by Xinnony and Barlots: (v'..LOBBYversion..')'
     GUI.Credits_Text = UIUtil.CreateText(GUI.panel, Credits, 11, UIUtil.titleFont, true)
     SetText2(GUI.Credits_Text, Credits, 20)
     GUI.Credits_Text:SetColor("FFFFFF")
     LayoutHelpers.AtBottomIn(GUI.Credits_Text, GUI, 2)
     LayoutHelpers.AtRightIn(GUI.Credits_Text, GUI, 5)
-    --\\
 
-    -- FOR SEE THE GROUP POSITION, LOOK THIS SCREENSHOOT : http://img402.imageshack.us/img402/8826/falobbygroup.png
+    -- FOR SEE THE GROUP POSITION, LOOK THIS SCREENSHOT : http://img402.imageshack.us/img402/8826/falobbygroup.png
+    -- TODO: Replace this Screenshot
     GUI.playerPanel = Group(GUI.panel, "playerPanel") -- RED Square in Screenshoot
     LayoutHelpers.AtLeftTopIn(GUI.playerPanel, GUI.panel, 40, 66+40-4)
     GUI.playerPanel.Width:Set(706)

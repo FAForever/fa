@@ -1053,7 +1053,7 @@ end
 
 -- Create a popup
 function CreatePopup(parent, popup_Title, popup_width, popup_height, activeFog, popup_Credit, button1Text, button1Callback, button2Text, button2Callback)
-    -- TODO: Can choixe purcent opacity for the fog
+    -- TODO: Can choice purcent opacity for the fog
     -- TODO: No need popup.Ui:Destroy() for close the popup
     -- TODO: Top and Bottom textures are equal for the moment (merge?)
     local popup_Title = popup_Title or false
