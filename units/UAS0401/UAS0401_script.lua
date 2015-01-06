@@ -13,7 +13,7 @@ local AIFQuasarAntiTorpedoWeapon = WeaponsFile.AIFQuasarAntiTorpedoWeapon
 
 UAS0401 = Class(ASeaUnit) {
     BuildAttachBone = 'Attachpoint01',
-    
+
     Weapons = {
         MainGun = Class(ADFCannonOblivionWeapon) {},
         Torpedo01 = Class(AANChronoTorpedoWeapon) {},
@@ -107,30 +107,7 @@ UAS0401 = Class(ASeaUnit) {
             IssueMoveOffFactory({unitBuilding}, worldPos)
             ChangeState(self, self.IdleState)
         end,
-    },
-	
-	OnKilled = function(self, instigator, type, overkillRatio)
-		local nrofBones = self:GetBoneCount() -1
-		local watchBone = self:GetBlueprint().WatchBone or 0
-
- 		self:ForkThread(function()
-			local pos = self:GetPosition()
-			local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
-			while self:GetPosition(watchBone)[2] > seafloor do
-				WaitSeconds(0.1)
-			end
-			self:CreateWreckage(overkillRatio, instigator)
-			self:Destroy()
-		end)
-         
-        local layer = self:GetCurrentLayer()
-        self:DestroyIdleEffects()
-        if (layer == 'Water' or layer == 'Seabed' or layer == 'Sub') then
-            self.SinkExplosionThread = self:ForkThread(self.ExplosionThread)
-            self.SinkThread = self:ForkThread(self.SinkingThread)
-        end
-		ASeaUnit.OnKilled(self, instigator, type, overkillRatio)
-    end
+    }
 }
 
 TypeClass = UAS0401
