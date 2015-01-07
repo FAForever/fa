@@ -517,7 +517,6 @@ local function IsModAvailable(modId)
     return true
 end
 
-
 function Reset()
     lobbyComm = false
     wantToBeObserver = false
@@ -585,7 +584,6 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
         SetWindowedLobby(windowed == 'true')
     end
 end
-
 
 -- create the lobby as a host
 function HostGame(desiredGameName, scenarioFileName, inSinglePlayer)
@@ -949,7 +947,6 @@ local function GetRandomFactionIndex()
     return randomfaction
 end
 
-
 local function AssignRandomFactions(gameInfo)
     local randomFactionID = table.getn(FactionData.Factions) + 1
     for index, player in gameInfo.PlayerOptions do
@@ -961,9 +958,7 @@ local function AssignRandomFactions(gameInfo)
     end
 end
 
----------------------------
--- autobalance functions --
----------------------------
+-- autobalance functions
 local function team_sort_by_sum(t1, t2)
     return t1['sum'] < t2['sum']
 end
@@ -1370,7 +1365,6 @@ local function AssignAINames(gameInfo)
     end
 end
 
-
 -- call this whenever the lobby needs to exit and not go in to the game
 function ReturnToMenu(reconnect)
     if lobbyComm then
@@ -1669,6 +1663,9 @@ function UpdateRankedLabel()
     -- Check if Game is Ranked
     if GUI.RankedLabel then
         if initName == "init_faf.lua" then
+            local getScore = gameInfo.GameOptions['Score'] -- 'no',
+            local getTeamSpawn = gameInfo.GameOptions['TeamSpawn'] -- 'fixed',
+            local getTeamLock = gameInfo.GameOptions['TeamLock'] -- 'locked',
             local getVictory = gameInfo.GameOptions['Victory'] -- 'demoralization'
             local getTimeout = gameInfo.GameOptions['Timeouts'] -- '3'
             local getCheat = gameInfo.GameOptions['CheatsEnabled'] -- 'false'
@@ -1680,7 +1677,7 @@ function UpdateRankedLabel()
             local getNorush = gameInfo.GameOptions['NoRushOption'] -- 'Off'
             local getNumbMod = table.getn(Mods.GetGameMods(gameInfo.GameMods)) -- 0 for the purposes of this function
             local getRstric = gameInfo.GameOptions.RestrictedCategories or {} --can be nil or a table, even if no restrictions are present
-            if getVictory == 'demoralization' and getTimeout == '3' and getCheat == 'false' and getCivilian == 'enemy' and getSpeed == 'normal' and getFog == 'explored' and getUnitCap == '1000' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and (table.getn(getRstric) == 0) then
+            if getScore == 'no' and getTeamSpawn == 'fixed' and getTeamLock == 'locked' and getVictory == 'demoralization' and getTimeout == '3' and getCheat == 'false' and getCivilian == 'enemy' and getSpeed == 'normal' and getFog == 'explored' and getUnitCap == '1000' and getPrebui == 'Off' and getNorush == 'Off' and getNumbMod == 0 and (table.getn(getRstric) == 0) then
                 GUI.RankedLabel:SetText("Game is Ranked")
                 GUI.RankedLabel:SetColor("77ff77")
                 return true
@@ -2489,7 +2486,6 @@ function randomString(Length, CharSet)
         return table.concat(Result)
     end
 end
-
 
 function HostPlayerMissingMapAlert(id)
     local slot = FindSlotForID(id)
@@ -4024,7 +4020,6 @@ function EveryoneHasEstablishedConnections()
 end
 return result
 end
-
 
 function AddChatText(text)
     if not GUI.chatDisplay then
