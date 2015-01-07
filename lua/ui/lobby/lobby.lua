@@ -1661,6 +1661,7 @@ end
 
 function UpdateRankedLabel()
     -- Check if Game is Ranked
+    -- TODO: Add check if smurth player is here
     if GUI.RankedLabel then
         if initName == "init_faf.lua" then
             local getScore = gameInfo.GameOptions['Score'] -- 'no',
