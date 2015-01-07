@@ -5685,8 +5685,7 @@ end
 
 function CreateOptionLobbyDialog()
     -- TODO: Add "Show only players messages" option
-
-    local popup = UIUtil.CreatePopup(GUI, 'Lobby Options', {436, 240}, {true, 'Xinnony'}, {'Close'})
+    local popup = UIUtil.CreatePopup(GUI, 'Lobby Options', {436, 240}, {true, 'info', {'Information', 'Idea ?, Bug ?, you can contact Xinnony'}}, {'Close'})
 
     -- The provided radiobutton control doesn't allow satellite data, so we use the index in this
     -- list as our stored background mode value.
@@ -5784,9 +5783,11 @@ function GUI_PRESET()
     -- TODO: All variable to local and send variable to other function if neeeded
     -- TODO: Include the other function here
     -- TODO: Optimize the script
+    -- TODO: Hide "Rule :" if no rule
+    -- TODO: Separate Mod_SIM and Mod_UI
     local profiles = GetPreference("UserPresetLobby")
 
-    local popup = UIUtil.CreatePopup(GUI, 'Lobby Presets', {536, 400}, {true, 'Xinnony'})
+    local popup = UIUtil.CreatePopup(GUI, 'Lobby Presets', {536, 400}, {true, 'info', {'Information', 'Idea ?, Bug ?, you can contact Xinnony'}})
 
     -- Info text
     local text1 = UIUtil.CreateText(popup, 'Double-click to edit', 9, 'Arial', true)
@@ -5915,28 +5916,17 @@ function GUI_PRESET()
 end
 
 function GUI_PRESET_INPUT(tyype)
-    -- TODO: Include the uiutils.popup
-    local GUI_Preset_InputBox = Group(GUI)
-    LayoutHelpers.AtCenterIn(GUI_Preset_InputBox, GUI)
-    GUI_Preset_InputBox.Depth:Set(1999)
-    local background2 = Bitmap(GUI_Preset_InputBox, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby-small.dds'))
-    GUI_Preset_InputBox.Width:Set(background2.Width)
-    GUI_Preset_InputBox.Height:Set(background2.Height)
-    LayoutHelpers.FillParent(background2, GUI_Preset_InputBox)
-    local GUI_Preset_InputBox2 = Group(GUI_Preset_InputBox)
-    GUI_Preset_InputBox2.Width:Set(536)
-    GUI_Preset_InputBox2.Height:Set(400-240)
-    LayoutHelpers.AtCenterIn(GUI_Preset_InputBox2, GUI_Preset_InputBox)
+    local popup = UIUtil.CreatePopup(GUI, '', {536, 160}, {true, 'info', {'Information', 'Idea ?, Bug ?, you can contact Xinnony'}})
 
     -- Title
-    local text09 = UIUtil.CreateText(GUI_Preset_InputBox2, '', 17, 'Arial', true)
-    LayoutHelpers.AtHorizontalCenterIn(text09, GUI_Preset_InputBox2)
-    LayoutHelpers.AtTopIn(text09, GUI_Preset_InputBox2, 10)
+    local text09 = UIUtil.CreateText(popup, '', 17, 'Arial', true)
+    LayoutHelpers.AtHorizontalCenterIn(text09, popup)
+    LayoutHelpers.AtTopIn(text09, popup, 10)
 
     -- Edit
-    local nameEdit = Edit(GUI_Preset_InputBox2)
-    LayoutHelpers.AtHorizontalCenterIn(nameEdit, GUI_Preset_InputBox2)
-    LayoutHelpers.AtVerticalCenterIn(nameEdit, GUI_Preset_InputBox2)
+    local nameEdit = Edit(popup)
+    LayoutHelpers.AtHorizontalCenterIn(nameEdit, popup)
+    LayoutHelpers.AtVerticalCenterIn(nameEdit, popup)
     nameEdit.Width:Set(334)
     nameEdit.Height:Set(24)
     nameEdit:AcquireFocus()
@@ -5946,14 +5936,14 @@ function GUI_PRESET_INPUT(tyype)
                 -- No word in nameEdit
             else
                 applyCREATE_PRESET_IN_PREF(text)
-                GUI_Preset_InputBox:Destroy()
+                popup.UI:Destroy()
             end
         elseif tyype == 0 then
             if text == '' then
                 -- No word in nameEdit
             else
                 applyCREATE_PRESET_IN_PREF(text)
-                GUI_Preset_InputBox:Destroy()
+                popup.UI:Destroy()
             end
         elseif tyype == 1 then
             if text == '' then
@@ -5965,7 +5955,7 @@ function GUI_PRESET_INPUT(tyype)
                 LOAD_PresetProfils_For_PresetList()
                 PresetList:SetSelection(lastselect)
                 LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                GUI_Preset_InputBox:Destroy()
+                popup.UI:Destroy()
             end
         elseif tyype == 2 then
             if text == '' then
@@ -5974,38 +5964,38 @@ function GUI_PRESET_INPUT(tyype)
                 local profiles = GetPreference("UserPresetLobby")
                 SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.FAF_Title', tostring(text))
                 LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                GUI_Preset_InputBox:Destroy()
+                popup.UI:Destroy()
             end
         elseif tyype == 3 then
             if text == '' then
                 local profiles = GetPreference("UserPresetLobby")
                 SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', 'No Rule')
                 LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                GUI_Preset_InputBox:Destroy()
+                popup.UI:Destroy()
             else
                 local profiles = GetPreference("UserPresetLobby")
                 SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', tostring(text))
                 LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                GUI_Preset_InputBox:Destroy()
+                popup.UI:Destroy()
             end
         end
     end
 
     -- Exit button
-    local ExitButton = UIUtil.CreateButtonWithDropshadow(GUI_Preset_InputBox2, '/BUTTON/medium/', "Cancel")
-    LayoutHelpers.AtLeftIn(ExitButton, GUI_Preset_InputBox2, 70)
-    LayoutHelpers.AtBottomIn(ExitButton, GUI_Preset_InputBox2, 10)
+    local ExitButton = UIUtil.CreateButtonWithDropshadow(popup, '/BUTTON/medium/', "Cancel")
+    LayoutHelpers.AtLeftIn(ExitButton, popup, 70)
+    LayoutHelpers.AtBottomIn(ExitButton, popup, 10)
     ExitButton.OnClick = function(self)
-        GUI_Preset_InputBox:Destroy()
+        popup.UI:Destroy()
         if tyype == -1 then
             GUI_Preset:Destroy()
         end
     end
 
     -- Ok button
-    local OKButton = UIUtil.CreateButtonWithDropshadow(GUI_Preset_InputBox2, '/BUTTON/medium/', "Ok")
-    LayoutHelpers.AtRightIn(OKButton, GUI_Preset_InputBox2, 70)
-    LayoutHelpers.AtBottomIn(OKButton, GUI_Preset_InputBox2, 10)
+    local OKButton = UIUtil.CreateButtonWithDropshadow(popup, '/BUTTON/medium/', "Ok")
+    LayoutHelpers.AtRightIn(OKButton, popup, 70)
+    LayoutHelpers.AtBottomIn(OKButton, popup, 10)
     if tyype == -1 then
         -- TODO: Localize this
         text09:SetText('No presets found, choose a name for a new preset:')
@@ -6015,7 +6005,7 @@ function GUI_PRESET_INPUT(tyype)
                 -- No word in nameEdit
             else
                 applyCREATE_PRESET_IN_PREF(result)
-                GUI_Preset_InputBox:Destroy()
+                popup.UI:Destroy()
             end
         end
     elseif tyype == 0 then
@@ -6026,7 +6016,7 @@ function GUI_PRESET_INPUT(tyype)
                 -- No word in nameEdit
             else
                 applyCREATE_PRESET_IN_PREF(result)
-                GUI_Preset_InputBox:Destroy()
+                popup.UI:Destroy()
             end
         end
     elseif tyype == 1 then
@@ -6042,7 +6032,7 @@ function GUI_PRESET_INPUT(tyype)
                 LOAD_PresetProfils_For_PresetList()
                 PresetList:SetSelection(lastselect)
                 LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                GUI_Preset_InputBox:Destroy()
+                popup.UI:Destroy()
             end
         end
     elseif tyype == 2 then
@@ -6055,7 +6045,7 @@ function GUI_PRESET_INPUT(tyype)
                 local profiles = GetPreference("UserPresetLobby")
                 SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.FAF_Title', tostring(result))
                 LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                GUI_Preset_InputBox:Destroy()
+                popup.UI:Destroy()
             end
         end
     elseif tyype == 3 then
@@ -6066,12 +6056,12 @@ function GUI_PRESET_INPUT(tyype)
                 local profiles = GetPreference("UserPresetLobby")
                 SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', 'No Rule')
                 LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                GUI_Preset_InputBox:Destroy()
+                popup.UI:Destroy()
             else
                 local profiles = GetPreference("UserPresetLobby")
                 SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', tostring(result))
                 LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                GUI_Preset_InputBox:Destroy()
+                popup.UI:Destroy()
             end
         end
     end
@@ -6422,7 +6412,7 @@ end
 
 function GUI_Changelog()
     local Changelog = import('/lua/ui/lobby/changelog.lua')
-    local popup = UIUtil.CreatePopup(GUI, LOC("<LOC lobui_0412>"), {526, 350}, {true, 'Xinnony'}, {'Ok'})
+    local popup = UIUtil.CreatePopup(GUI, LOC("<LOC lobui_0412>"), {526, 350}, {true, 'info', {'Information', 'Idea ?, Bug ?, you can contact Xinnony'}}, {'Ok'})
     popup.button1.OnClick = function(self) Prefs.SetToCurrentProfile('LobbyChangelog', Changelog.last_version) popup.UI:Destroy() end
 
     -- Info List

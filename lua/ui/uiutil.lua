@@ -22,6 +22,7 @@ local Prefs = import('/lua/user/prefs.lua')
 local Border = import('/lua/maui/border.lua').Border
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local Layouts = import('/lua/skins/layouts.lua')
+local Tooltip = import('/lua/ui/game/tooltip.lua')
 
 --* Handy global variables to assist skinning
 buttonFont = import('/lua/lazyvar.lua').Create()            -- default font used for button faces
@@ -1057,15 +1058,17 @@ function CreatePopup(parent, title, layout, options, buttons)
     -- TODO: No need popup.Ui:Destroy() for close the popup
     -- TODO: Top and Bottom textures are equal for the moment (merge to one file ?) (not use texture ?, only 3 colors)
     -- TODO: Animate the popup appear ?
-    local popup_Title = title or false -- Popup Title [string] (optional)
-    local popup_width = layout[1] or 537 -- Popup width size [number]
-    local popup_height = layout[2] or 400 -- Popup height size [number]
-    local activeFog = options[1] or true -- Popup fog in background [true or false]
-    local popup_Credit = options[2] or false -- Popup credit [string]
-    local button1Text = buttons[1] or false -- Popup button name [string]
-    local button1Callback = buttons[2] or nil -- Popup button function [function]
-    local button2Text = buttons[3] or false -- Popup button name [string]
-    local button2Callback = buttons[4] or nil -- Popup button function [function]
+    local popup_Title = title or false -- Popup Title
+    local popup_width = layout[1] or 537 -- Popup width size
+    local popup_height = layout[2] or 400 -- Popup height size
+    local activeFog = options[1] or true -- Popup fog in background
+    local Credit_text = options[2] or false -- Popup credit
+    local Crdt_Tltip_Text = options[3][1] or false -- Credit tooltip text
+    local Crdt_Tltip_Descr = options[3][2] or false -- Credit tooltip description
+    local button1Text = buttons[1] or false -- Popup button name
+    local button1Callback = buttons[2] or nil -- Popup button function
+    local button2Text = buttons[3] or false -- Popup button name
+    local button2Callback = buttons[4] or nil -- Popup button function
 
     local popup_UI = Group(parent)
     LayoutHelpers.FillParent(popup_UI, parent)
@@ -1107,11 +1110,12 @@ function CreatePopup(parent, title, layout, options, buttons)
         LayoutHelpers.AtTopIn(popup.title, popup, 10)
     end
 
-    if popup_Credit then
-        popup.credit = CreateText(popup_UI, popup_Credit, 9, 'Arial', true)
+    if Credit_text then
+        popup.credit = CreateText(popup, Credit_text, 9, 'Arial', true)
         popup.credit:SetColor('808080')
-        LayoutHelpers.AtRightIn(popup.credit, popup, 0)
-        LayoutHelpers.AtBottomIn(popup.credit, popup, 2)
+        LayoutHelpers.AtRightBottomIn(popup.credit, popup, 0, 2)
+        if Crdt_Tltip_Text and Crdt_Tltip_Descr then Tooltip.AddControlTooltip(popup.credit, {text = Crdt_Tltip_Text, body = Crdt_Tltip_Descr})
+        elseif Crdt_Tltip_Text then Tooltip.AddControlTooltip(popup.credit, Crdt_Tltip_Text) end
     end
 
     if button1Text then
