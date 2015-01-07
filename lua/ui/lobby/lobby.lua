@@ -5783,7 +5783,6 @@ function GUI_PRESET()
     -- TODO: All variable to local and send variable to other function if neeeded
     -- TODO: Include the other function here
     -- TODO: Optimize the script
-    -- TODO: Hide "Rule :" if no rule
     -- TODO: Separate Mod_SIM and Mod_UI
     local profiles = GetPreference("UserPresetLobby")
 
@@ -6203,15 +6202,6 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
     local profiles = GetPreference("UserPresetLobby")
     if profiles then
         local Selected_Preset = table.KeyByIndex(profiles, PresetList:GetSelection())
-        --AddChatText('> PRESET > Name : '..Selected_Preset) -- Preset1
-        --AddChatText('> PRESET > PresetName : '..profiles[Selected_Preset].PresetName)
-        -- Set PresetName in list on Preset GUI
-        --AddChatText('> PRESET > MapName : '..profiles[Selected_Preset].MapName)
-        -- Set MapName in text on Preset GUI
-        --AddChatText('> PRESET > FAF_Title : '..profiles[Selected_Preset].FAF_Title)
-        -- Set Title on FAF Client
-        --AddChatText('> PRESET > Rule : '..profiles[Selected_Preset].Rule)
-        -- Set Rule Title in TextBox
         if profiles[Selected_Preset].Rule == '' or profiles[Selected_Preset].Rule == 'No Rule' then
             GUI.RuleLabel:DeleteAllItems()
             GUI.RuleLabel:AddItem('No Rules: Click to add rules')
@@ -6296,18 +6286,17 @@ function SAVE_PRESET_IN_PREF() -- GET OPTIONS ON LOBBY AND SAVE TO PRESET
     --AddChatText('> PRESET > Name : '..Selected_Preset) -- Preset1
 
     local Preset_Name = profiles[Selected_Preset].PresetName or 'ERROR, Set preset name here' -- Nom du PresetLobby
-    local Title_FAF = profiles[Selected_Preset].Title_FAF or '' -- Title is for FAF Client title in "Find Games" tabs
+
     local Rule_Text = GUI.RuleLabel:GetItem(0)..GUI.RuleLabel:GetItem(1)
     if Rule_Text == 'No Rules: Click to add rules' then
         Rule_Text = 'No Rule'
     end
+
     Rule_Text = string.gsub(Rule_Text, 'Rule : ', '') or profiles[Selected_Preset].Rule_Text or '' -- Rule text showing in top of Lobby
 
     SetPreference('UserPresetLobby.'..Selected_Preset, {}) -- Delete all value
-
     SetPreference('UserPresetLobby.'..Selected_Preset..'.PresetName', tostring(Preset_Name))
     SetPreference('UserPresetLobby.'..Selected_Preset..'.MapName', tostring(MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).name))
-    SetPreference('UserPresetLobby.'..Selected_Preset..'.FAF_Title', tostring(Title_FAF))
     SetPreference('UserPresetLobby.'..Selected_Preset..'.Rule', tostring(Rule_Text))
 
     for k, v in gameInfo.GameOptions do
@@ -6344,14 +6333,10 @@ function SAVE_PRESET_IN_PREF() -- GET OPTIONS ON LOBBY AND SAVE TO PRESET
     local uids = ""
     for k, v in mods do
         nummods = nummods + 1
-        --AddChatText('Mod : '..v.name)
-        --LOG('> k : '..k)
         SetPreference('UserPresetLobby.'..Selected_Preset..'.Mods.'..v.uid, true)
     end
     for k, v in modsUI do
         nummods = nummods + 1
-        --AddChatText('Mod UI : '..v.name)
-        --LOG('> k : '..k)
         SetPreference('UserPresetLobby.'..Selected_Preset..'.Mods.'..v.uid, true)
     end
     --LOG('> Num mods : '..nummods)
