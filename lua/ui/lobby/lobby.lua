@@ -5398,8 +5398,6 @@ function Country_GetTooltipValue(CountryResult, slot)
 end
 
 -- Rule title
-
--- Update the title to display the rule.
 function RuleTitle_SendMSG()
     if GUI.RuleLabel and lobbyComm:IsHost() then
         local getRule = {GUI.RuleLabel:GetItem(0), GUI.RuleLabel:GetItem(1)}
@@ -5688,7 +5686,7 @@ function ChangeBackgroundLobby(faction)
     end
 end
 
-
+-- Lobby Options
 function CreateOptionLobbyDialog()
     -- TODO: Add "Show only players messages" option
     local popup = UIUtil.CreatePopup(GUI, 'Lobby Options', {436, 240}, {true, 'info', {'Information', 'Idea ?, Bug ?, you can contact Xinnony'}}, {'Close'})
@@ -6210,6 +6208,8 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
     local profiles = GetPreference("UserPresetLobby")
     if profiles then
         local Selected_Preset = table.KeyByIndex(profiles, PresetList:GetSelection())
+        
+        -- Rule
         if profiles[Selected_Preset].Rule == '' or profiles[Selected_Preset].Rule == 'No Rule' then
             GUI.RuleLabel:DeleteAllItems()
             GUI.RuleLabel:AddItem('No Rules: Click to add rules')
@@ -6223,17 +6223,15 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
             GUI.RuleLabel:AddItem(wrapped[2] or '')
         end
         RuleTitle_SendMSG()
-        --AddChatText('> PRESET > MapPath : '..profiles[Selected_Preset].MapPath)
+        
+        -- Map
         if check_Map_Exist(profiles[Selected_Preset].MapPath) == true then
             SetGameOption('ScenarioFile', profiles[Selected_Preset].MapPath, false, true)
         else
             AddChatText('MAP NOT EXIST !')
         end
-        --gameInfo.GameOptions['ScenarioFile'] = profiles[Selected_Preset].MapPath
-        --Prefs.SetToCurrentProfile('LastScenario', profiles[Selected_Preset].MapPath)
 
-        --
-
+        -- Unit Restricts
         if profiles[Selected_Preset].UnitsRestricts then
             local urestrict = {}
             for k, v in profiles[Selected_Preset].UnitsRestricts do
@@ -6248,15 +6246,13 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
             SetGameOption('RestrictedCategories', {}, false, true)
         end
 
-        --
-
+        -- Mod
         local selectedMods = {}
         if profiles[Selected_Preset].Mods then
             for k, v in profiles[Selected_Preset].Mods do
                 if GetModUidExist(k) == true then
                     AddChatText('mod(+ui):'..k)
                     SetPreference('active_mods.'..k, true)
-                    -- table.insert(selectedMods, k = true)
                     selectedMods[k] = true
                 end
             end
@@ -6266,7 +6262,6 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
                 if GetModUidExist(k) == true then
                     AddChatText('modui:'..k)
                     SetPreference('active_mods.'..k, true)
-                    -- table.insert(selectedMods, k = true)
                     selectedMods[k] = true
                 end
             end
@@ -6278,8 +6273,7 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
             --UpdateGame() -- Rafraichie les mods (utile)
         end
 
-        --
-
+        -- Settings
         if profiles[Selected_Preset].Settings then
             for k, v in profiles[Selected_Preset].Settings do
                 -- k = (setting name), v = (value name), profiles[Selected_Preset].Settings[k] = (value name)
@@ -6292,8 +6286,6 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
                 end
             end
         end
-
-        --
 
         UpdateGame()
     end
