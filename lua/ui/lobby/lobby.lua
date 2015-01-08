@@ -31,6 +31,7 @@ local round = import('/lua/ui/lobby/trueskill.lua').round
 local Player = import('/lua/ui/lobby/trueskill.lua').Player
 local Rating = import('/lua/ui/lobby/trueskill.lua').Rating
 local Teams = import('/lua/ui/lobby/trueskill.lua').Teams
+local funcUtil = import('/lua/ui/funcUtil.lua')
 
 local IsSyncReplayServer = false
 
@@ -320,12 +321,6 @@ local slotMenuData = {
         },
     },
 }
-
-function tableLength(Table)
-    local count = 0
-    for _ in pairs(Table) do count = count + 1 end
-    return count
-end
 
 -- Populate the tables with the "move player to slot X" entries.
 for i = 1, numOpenSlots, 1 do
@@ -5705,7 +5700,7 @@ function CreateOptionLobbyDialog()
     LayoutHelpers.AtLeftTopIn(backgroundRadiobutton, popup, 20, 40)
 
     backgroundRadiobutton.OnChoose = function(self, button)
-        local backgroundMode = indexOf(backgroundStates, button)
+        local backgroundMode = funcUtil.indexOf(backgroundStates, button)
         Prefs.SetToCurrentProfile("LobbyBackground", backgroundMode)
         ChangeBackgroundLobby()
     end
@@ -6262,8 +6257,7 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
                 end
             end
         end
-        AddChatText('num:'..tostring(tableLength(selectedMods)))
-        if tableLength(selectedMods) > 0 then
+        if funcUtil.tableLength(selectedMods) > 0 then
             AddChatText('UPDATE')
             OnModsChanged(selectedMods, true)
             --UpdateGame() -- Rafraichie les mods (utile)
@@ -6348,17 +6342,6 @@ function SAVE_PRESET_IN_PREF() -- GET OPTIONS ON LOBBY AND SAVE TO PRESET
         SetPreference('UserPresetLobby.'..Selected_Preset..'.Mods_UI.'..v.uid, true)
     end
     --LOG('> Num mods : '..nummods)
-end
-
--- Find the key for the given value in a table.
--- Nil keys are not supported.
-function indexOf(table, needle)
-    for k, v in table do
-        if v == needle then
-            return k
-        end
-    end
-    return nil
 end
 
 -- Update the combobox for the given slot so it correctly shows the set of available colours.
