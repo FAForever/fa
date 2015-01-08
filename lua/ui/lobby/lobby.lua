@@ -5861,7 +5861,7 @@ function GUI_PRESET()
             PresetList:SetSelection(row)
             LoadButton.label:SetText('Create Preset')
             LoadButton.OnClick = function(self)
-                CREATE_PRESET_IN_PREF()
+                GUI_PRESET_INPUT(0)
             end
             InfoList:DeleteAllItems()
         else
@@ -6078,7 +6078,7 @@ function isUIMod_byUID(uid)
     return allMods[uid].ui_only
 end
 
--- Refresh List
+-- Refresh Preset List
 function LOAD_PresetProfils_For_PresetList()
     local profiles = GetPreference("UserPresetLobby")
     PresetList:DeleteAllItems()
@@ -6091,6 +6091,7 @@ function LOAD_PresetProfils_For_PresetList()
     PresetList:AddItem('> New Preset')
 end
 
+-- Refresh Info List
 function LOAD_PresetSettings_For_InfoList(Selected_Preset)
     local profiles = GetPreference("UserPresetLobby")
     local temp_UImod = {} -- For compatibility with old preset saved for modUI
@@ -6160,10 +6161,6 @@ function LOAD_PresetSettings_For_InfoList(Selected_Preset)
 end
 
 -- Create Preset in Pref
-function CREATE_PRESET_IN_PREF()
-    GUI_PRESET_INPUT(0)
-end
-
 function applyCREATE_PRESET_IN_PREF(presetname)
     local profiles = GetPreference("UserPresetLobby")
     if not profiles then -- SI aucun profils, création du premier
