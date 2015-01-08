@@ -321,6 +321,12 @@ local slotMenuData = {
     },
 }
 
+function tableLength(Table)
+    local count = 0
+    for _ in pairs(Table) do count = count + 1 end
+    return count
+end
+
 -- Populate the tables with the "move player to slot X" entries.
 for i = 1, numOpenSlots, 1 do
     table.insert(slotMenuData.player.host, 'move_player_to_slot'..i)
@@ -5783,7 +5789,8 @@ function GUI_PRESET()
     -- TODO: All variable to local and send variable to other function if neeeded
     -- TODO: Include the other function here
     -- TODO: Optimize the script
-    -- TODO: Separate Mod_SIM and Mod_UI
+    -- TODO: Can save AI, Color, Faction, Slot, Team
+    -- TODO: Can load Preset without set Mod UI
     local profiles = GetPreference("UserPresetLobby")
 
     local popup = UIUtil.CreatePopup(GUI, 'Lobby Presets', {536, 400}, {true, 'info', {'Information', 'Idea ?, Bug ?, you can contact Xinnony'}})
@@ -5956,15 +5963,6 @@ function GUI_PRESET_INPUT(tyype)
                 LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
                 popup.UI:Destroy()
             end
-        elseif tyype == 2 then
-            if text == '' then
-                -- No word in nameEdit
-            else
-                local profiles = GetPreference("UserPresetLobby")
-                SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.FAF_Title', tostring(text))
-                LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                popup.UI:Destroy()
-            end
         elseif tyype == 3 then
             if text == '' then
                 local profiles = GetPreference("UserPresetLobby")
@@ -6034,19 +6032,6 @@ function GUI_PRESET_INPUT(tyype)
                 popup.UI:Destroy()
             end
         end
-    elseif tyype == 2 then
-        text09:SetText('Rename your FAF Title:')
-        OKButton.OnClick = function(self)
-            local result = nameEdit:GetText()
-            if result == '' then
-                WARN('No new Title defined')
-            else
-                local profiles = GetPreference("UserPresetLobby")
-                SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.FAF_Title', tostring(result))
-                LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                popup.UI:Destroy()
-            end
-        end
     elseif tyype == 3 then
         text09:SetText('Rename your rule:')
         OKButton.OnClick = function(self)
@@ -6090,7 +6075,7 @@ function GetModUidExist(uid)
         return false
     end
 end
-function GetModUIorNotUIWithUid(uid)
+function isUIMod_byUID(uid)
     local allMods = Mods.AllMods()
     return allMods[uid].ui_only
 end
@@ -6110,16 +6095,19 @@ end
 
 function LOAD_PresetSettings_For_InfoList(Selected_Preset)
     local profiles = GetPreference("UserPresetLobby")
+    local temp_UImod = {} -- For compatibility with old preset saved for modUI
     InfoList:DeleteAllItems()
     InfoList:AddItem('Preset Name: '..profiles[Selected_Preset].PresetName)
     InfoList:AddItem('Rule: '..profiles[Selected_Preset].Rule)
     
+    -- Map
     if check_Map_Exist(profiles[Selected_Preset].MapPath) == true then
         InfoList:AddItem('Map: '..profiles[Selected_Preset].MapName)
     else
         InfoList:AddItem('Map: Unavailable ('..profiles[Selected_Preset].MapName..')')
     end
     
+    -- SIM Mod
     if profiles[Selected_Preset].Mods then
         InfoList:AddItem('')
         InfoList:AddItem('Mod :')
@@ -6127,14 +6115,34 @@ function LOAD_PresetSettings_For_InfoList(Selected_Preset)
             if GetModUidExist(k) == false then
                 InfoList:AddItem('- NOT AVAILABLE ('..k..')')
             else
-                if GetModUIorNotUIWithUid(k) then
-                    InfoList:AddItem('- '..GetModNameWithUid(k)..' [Mod UI]')
+                if isUIMod_byUID(k) then
+                    table.insert(temp_UImod, k)
                 else
                     InfoList:AddItem('- '..GetModNameWithUid(k))
                 end
             end
         end
     end
+    
+    -- UI Mod
+    if profiles[Selected_Preset].Mods_UI or table.getn(temp_UImod) > 0 then
+        InfoList:AddItem('')
+        InfoList:AddItem('Mod UI :')
+        if profiles[Selected_Preset].Mods_UI then
+            for k, v in profiles[Selected_Preset].Mods_UI do
+                if GetModUidExist(k) then
+                    InfoList:AddItem('- '..GetModNameWithUid(k))
+                end
+            end
+        end
+        for k, v in temp_UImod do
+            if GetModUidExist(v) then
+                InfoList:AddItem('- '..GetModNameWithUid(v))
+            end
+        end
+    end
+    
+    -- Unit Restrictions
     if profiles[Selected_Preset].UnitsRestricts then
         InfoList:AddItem('')
         InfoList:AddItem('Unit Restrictions :')
@@ -6142,6 +6150,8 @@ function LOAD_PresetSettings_For_InfoList(Selected_Preset)
             InfoList:AddItem('- '..k)
         end
     end
+    
+    -- Settings
     if profiles[Selected_Preset].Settings then
         InfoList:AddItem('')
         InfoList:AddItem('Settings :')
@@ -6161,7 +6171,6 @@ function applyCREATE_PRESET_IN_PREF(presetname)
     if not profiles then -- SI aucun profils, création du premier
         SetPreference('UserPresetLobby.Preset1.PresetName', tostring(presetname))
         SetPreference('UserPresetLobby.Preset1.MapName', tostring(MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).name))
-        SetPreference('UserPresetLobby.Preset1.FAF_Title', '')
         SetPreference('UserPresetLobby.Preset1.Rule', '')
         SetPreference('UserPresetLobby.Preset1.MapPath', tostring(gameInfo.GameOptions.ScenarioFile))
         SavePreferences()
@@ -6173,7 +6182,6 @@ function applyCREATE_PRESET_IN_PREF(presetname)
                 --AddChatText('> UserPresetLobby.Preset'..num)
                 SetPreference('UserPresetLobby.Preset'..num..'.PresetName', tostring(presetname))
                 SetPreference('UserPresetLobby.Preset'..num..'.MapName', tostring(MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).name))
-                SetPreference('UserPresetLobby.Preset'..num..'.FAF_Title', '')
                 SetPreference('UserPresetLobby.Preset'..num..'.Rule', '')
                 SetPreference('UserPresetLobby.Preset'..num..'.MapPath', tostring(gameInfo.GameOptions.ScenarioFile))
                 SavePreferences()
@@ -6242,18 +6250,30 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
 
         --
 
+        local selectedMods = {}
         if profiles[Selected_Preset].Mods then
-            selectedMods = {}
             for k, v in profiles[Selected_Preset].Mods do
-                --k = (uids), v = true
-                --AddChatText('> PRESET > Mods : '..k..' // v : '..tostring(v)) -->>> PRESET Mods : ['d5c7af75-6944-490b-b647-47dc1efffdc7'] = true
                 if GetModUidExist(k) == true then
+                    AddChatText('mod(+ui):'..k)
                     SetPreference('active_mods.'..k, true)
+                    -- table.insert(selectedMods, k = true)
                     selectedMods[k] = true
-                else
-                    --LOG('>> LOAD_PRESET_IN_PREF > Missing Mod : '..tostring(k))
                 end
             end
+        end
+        if profiles[Selected_Preset].Mods_UI then
+            for k, v in profiles[Selected_Preset].Mods_UI do
+                if GetModUidExist(k) == true then
+                    AddChatText('modui:'..k)
+                    SetPreference('active_mods.'..k, true)
+                    -- table.insert(selectedMods, k = true)
+                    selectedMods[k] = true
+                end
+            end
+        end
+        AddChatText('num:'..tostring(tableLength(selectedMods)))
+        if tableLength(selectedMods) > 0 then
+            AddChatText('UPDATE')
             OnModsChanged(selectedMods, true)
             --UpdateGame() -- Rafraichie les mods (utile)
         end
@@ -6337,7 +6357,7 @@ function SAVE_PRESET_IN_PREF() -- GET OPTIONS ON LOBBY AND SAVE TO PRESET
     end
     for k, v in modsUI do
         nummods = nummods + 1
-        SetPreference('UserPresetLobby.'..Selected_Preset..'.Mods.'..v.uid, true)
+        SetPreference('UserPresetLobby.'..Selected_Preset..'.Mods_UI.'..v.uid, true)
     end
     --LOG('> Num mods : '..nummods)
 end
