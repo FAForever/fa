@@ -1806,7 +1806,7 @@ local function UpdateGame()
 
         UIUtil.setEnabled(GUI.becomeObserver, notReady)
         local getRstric = gameInfo.GameOptions.RestrictedCategories or {} --can be nil or a table, even if no restrictions are present
-        UIUtil.setEnabled(GUI.restrictedUnitsOrPresetsBtn, (isHost or table.getn(getRstric) ~= 0) and notReady)
+        UIUtil.setEnabled(GUI.restrictedUnitsOrPresetsBtn, (isHost and notReady) or (not isHost and table.getn(getRstric) ~= 0))
 
         UIUtil.setEnabled(GUI.LargeMapPreview, notReady)
         Faction_Selector_Set_Enabled(notReady, playerOptions.Faction)
