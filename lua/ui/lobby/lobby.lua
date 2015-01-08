@@ -1886,7 +1886,6 @@ local function UpdateGame()
 
         -- Launch button enabled if everyone is ready.
         UIUtil.setEnabled(GUI.launchGameButton, singlePlayer or not playerNotReady)
-        UIUtil.setEnabled(GUI.randMap, quickRandMap)
     end
 
     GUI.allowObservers:SetCheck(gameInfo.GameOptions.AllowObservers, true)
