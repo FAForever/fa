@@ -5,7 +5,7 @@
 #**
 #**  Summary  : Functions for use in the Operations.
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 local TriggerFile = import('scenariotriggers.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')

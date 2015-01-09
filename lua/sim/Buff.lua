@@ -2,7 +2,7 @@
 #**
 #**  File     :  /lua/sim/buff.lua
 #**
-#**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2008 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 # The Unit's BuffTable for applied buffs looks like this:

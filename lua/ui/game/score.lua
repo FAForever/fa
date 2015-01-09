@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: In game score dialog
 --*
---* Copyright © :005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© :005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 -- current score will contain the most recent score update from the sync

@@ -4,7 +4,7 @@
 --* 
 --* Summary: translation of the mod dialogs
 --*
---* Copyright © 2007 SCA  All rights reserved.
+--* Copyright Â© 2007 SCA  All rights reserved.
 --*****************************************************************************
 
 english = {}
@@ -298,7 +298,7 @@ english = {
 
 francais = {
 
-	---------------------------------------------------- en français ------------------------------------------------
+	---------------------------------------------------- en francais ------------------------------------------------
 		cancel = 'Annuler',
 		apply = 'Appliquer',
 		save = 'Enreg.',

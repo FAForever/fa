@@ -5,7 +5,7 @@
 #**
 #**  Summary  : Units for Seraphim
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 #--------------------------------------------------------------------------
 # SERAPHIM DEFAULT UNITS

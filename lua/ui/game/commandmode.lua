@@ -4,7 +4,7 @@
 #* Summary: Manages the current command mode, which determines what action
 #* the mouse will take when next clicked in the world
 #*
-#* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#* Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 #*****************************************************************************
 local Dragger = import('/lua/maui/dragger.lua').Dragger
 local Construction = import('/lua/ui/game/construction.lua')

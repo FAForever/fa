@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Various utility functions to make UI scripts easier and more consistent
 --*
---* Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local LazyVar = import('/lua/lazyvar.lua')
