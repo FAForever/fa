@@ -65,7 +65,7 @@ function SetupSession()
     ScenarioInfo.PlatoonHandles = {}
     ScenarioInfo.UnitGroups = {}
     ScenarioInfo.UnitNames = {}
-    
+
     ScenarioInfo.VarTable = {}
     ScenarioInfo.OSPlatoonCounter = {}
     ScenarioInfo.BuilderTable = { Air = {}, Land = {}, Sea = {}, Gate = {} }
@@ -169,26 +169,26 @@ function BeginSession()
     if ScenarioInfo.Options.RestrictedCategories then
         local restrictedUnits = import('/lua/ui/lobby/restrictedUnitsData.lua').restrictedUnits
         for index, restriction in ScenarioInfo.Options.RestrictedCategories do
-		LOG('1 - '..restriction..' ['..index..']')
+        LOG('1 - '..restriction..' ['..index..']')
             local restrictedCategories = nil
             if restrictedUnits[restriction].categories then
-				for index, cat in restrictedUnits[restriction].categories do
-					LOG('2 - '..cat..' ['..index..']')
-					if restrictedCategories == nil then
-						restrictedCategories = categories[cat]
-					else
-						restrictedCategories = restrictedCategories + categories[cat]
-					end
-					LOG('2 - <<<')
-				end
-				LOG('1 - <<<')
-				if buildRestrictions == nil then
-					buildRestrictions = restrictedCategories
-				else
-					buildRestrictions = buildRestrictions + restrictedCategories
-				end
-				LOG('0 - <<<')
-			end
+                for index, cat in restrictedUnits[restriction].categories do
+                    LOG('2 - '..cat..' ['..index..']')
+                    if restrictedCategories == nil then
+                        restrictedCategories = categories[cat]
+                    else
+                        restrictedCategories = restrictedCategories + categories[cat]
+                    end
+                    LOG('2 - <<<')
+                end
+                LOG('1 - <<<')
+                if buildRestrictions == nil then
+                    buildRestrictions = restrictedCategories
+                else
+                    buildRestrictions = buildRestrictions + restrictedCategories
+                end
+                LOG('0 - <<<')
+            end
         end
     end
 
@@ -208,7 +208,7 @@ function BeginSession()
             ArmyBrains[index].RequestingAlliedVictory = true
         end
     end
-    
+
     # Create any effect markers on map
     local markers = import('/lua/sim/ScenarioUtilities.lua').GetMarkers()
     local Entity = import('/lua/sim/Entity.lua').Entity
@@ -217,25 +217,25 @@ function BeginSession()
         for k, v in markers do
             if v.type == 'Effect' then
                 local EffectMarkerEntity = Entity()
-                Warp( EffectMarkerEntity, v.position )   
-                EffectMarkerEntity:SetOrientation(OrientFromDir(v.orientation), true)   
-                for k, v in EffectTemplate [v.EffectTemplate] do        
-					CreateEmitterAtBone(EffectMarkerEntity,-2,-1,v):ScaleEmitter(v.scale or 1):OffsetEmitter(v.offset.x or 0, v.offset.y or 0, v.offset.z or 0)
-				end
+                Warp( EffectMarkerEntity, v.position )
+                EffectMarkerEntity:SetOrientation(OrientFromDir(v.orientation), true)
+                for k, v in EffectTemplate [v.EffectTemplate] do
+                    CreateEmitterAtBone(EffectMarkerEntity,-2,-1,v):ScaleEmitter(v.scale or 1):OffsetEmitter(v.offset.x or 0, v.offset.y or 0, v.offset.z or 0)
+                end
             end
         end
     end
 
 #for off-map prevention
     OnStartOffMapPreventionThread()
-    
+
 end
 
 ###for off-map prevention
 function OnStartOffMapPreventionThread()
-	OffMappingPreventThread = ForkThread( import('/lua/ScenarioFramework.lua').AntiOffMapMainThread)
-	ScenarioInfo.OffMapPreventionThreadAllowed = true
-	#WARN('success')
+    OffMappingPreventThread = ForkThread( import('/lua/ScenarioFramework.lua').AntiOffMapMainThread)
+    ScenarioInfo.OffMapPreventionThreadAllowed = true
+    #WARN('success')
 end
 
 #===================================================================================

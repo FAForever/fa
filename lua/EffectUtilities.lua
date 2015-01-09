@@ -94,10 +94,10 @@ function CreateBuildCubeThread( unitBeingBuilt, builder, OnBeingBuiltEffectsBag 
 
     local x = bp.Physics.MeshExtentsX or (bp.Footprint.SizeX * mul)
     local z = bp.Physics.MeshExtentsZ or (bp.Footprint.SizeZ * mul)
-    local y = bp.Physics.MeshExtentsY or (0.5 + (x + z) * 0.1) 
+    local y = bp.Physics.MeshExtentsY or (0.5 + (x + z) * 0.1)
 
     local SlicePeriod = 1.2
-    
+
     # Create a quick glow effect at location where unit is goig to be built
     proj = unitBeingBuilt:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
     proj:SetScale(x * 1.05, y * 0.2, z * 1.05)
@@ -116,11 +116,11 @@ function CreateBuildCubeThread( unitBeingBuilt, builder, OnBeingBuiltEffectsBag 
     if unitBeingBuilt:IsDead() then
         return
     end
-    
+
     if not BuildBaseEffect:BeenDestroyed() then
         BuildBaseEffect:SetVelocity(0)
     end
-    
+
     unitBeingBuilt:ShowBone(0, true)
     unitBeingBuilt:HideLandBones()
     unitBeingBuilt.BeingBuiltShowBoneTriggered = true
@@ -162,7 +162,7 @@ function CreateUEFBuildSliceBeams( builder, unitBeingBuilt, BuildEffectBones, Bu
     local BeamBuildEmtBp = '/effects/emitters/build_beam_01_emit.bp'
     local buildbp = unitBeingBuilt:GetBlueprint()
     local x, y, z = unpack(unitBeingBuilt:GetPosition())
-    y = y + (buildbp.Physics.MeshExtentsOffsetY or 0)    
+    y = y + (buildbp.Physics.MeshExtentsOffsetY or 0)
 
     # Create a projectile for the end of build effect and warp it to the unit
     local BeamEndEntity = unitBeingBuilt:CreateProjectile('/effects/entities/UEFBuild/UEFBuild01_proj.bp',0,0,0,nil,nil,nil)
@@ -173,7 +173,7 @@ function CreateUEFBuildSliceBeams( builder, unitBeingBuilt, BuildEffectBones, Bu
         local beamEffect = nil
         for i, BuildBone in BuildEffectBones do
             BuildEffectsBag:Add(AttachBeamEntityToEntity( builder, BuildBone, BeamEndEntity, -1, army, BeamBuildEmtBp ) )
-            BuildEffectsBag:Add( CreateAttachedEmitter( builder, BuildBone, army, '/effects/emitters/flashing_blue_glow_01_emit.bp' ) )             
+            BuildEffectsBag:Add( CreateAttachedEmitter( builder, BuildBone, army, '/effects/emitters/flashing_blue_glow_01_emit.bp' ) )
         end
     end
 
@@ -206,9 +206,9 @@ function CreateUEFBuildSliceBeams( builder, unitBeingBuilt, BuildEffectBones, Bu
     local velZ = 2 * (endVec2.z - endVec1.z)
 
     if unitBeingBuilt:GetFractionComplete() == 0 then
-        Warp( BeamEndEntity, Vector( (cx1 + cx2) * 0.5, ((cy1 + cy2) * 0.5) - oy, (cz1 + cz2) * 0.5 ) ) 
-        WaitSeconds( 0.8 )   
-    end 
+        Warp( BeamEndEntity, Vector( (cx1 + cx2) * 0.5, ((cy1 + cy2) * 0.5) - oy, (cz1 + cz2) * 0.5 ) )
+        WaitSeconds( 0.8 )
+    end
 
     local flipDirection = true
 
@@ -232,21 +232,21 @@ function CreateUEFCommanderBuildSliceBeams( builder, unitBeingBuilt, BuildEffect
     local BeamBuildEmtBp = '/effects/emitters/build_beam_01_emit.bp'
     local buildbp = unitBeingBuilt:GetBlueprint()
     local x, y, z = unpack(unitBeingBuilt:GetPosition())
-    y = y + (buildbp.Physics.MeshExtentsOffsetY or 0)    
+    y = y + (buildbp.Physics.MeshExtentsOffsetY or 0)
 
     # Create a projectile for the end of build effect and warp it to the unit
     local BeamEndEntity = unitBeingBuilt:CreateProjectile('/effects/entities/UEFBuild/UEFBuild01_proj.bp',0,0,0,nil,nil,nil)
     local BeamEndEntity2 = unitBeingBuilt:CreateProjectile('/effects/entities/UEFBuild/UEFBuild01_proj.bp',0,0,0,nil,nil,nil)
     BuildEffectsBag:Add( BeamEndEntity )
     BuildEffectsBag:Add( BeamEndEntity2 )
-    
+
     # Create build beams
     if BuildEffectBones ~= nil then
         local beamEffect = nil
         for i, BuildBone in BuildEffectBones do
             BuildEffectsBag:Add( AttachBeamEntityToEntity( builder, BuildBone, BeamEndEntity, -1, army, BeamBuildEmtBp ) )
             BuildEffectsBag:Add( AttachBeamEntityToEntity( builder, BuildBone, BeamEndEntity2, -1, army, BeamBuildEmtBp ) )
-            BuildEffectsBag:Add( CreateAttachedEmitter( builder, BuildBone, army, '/effects/emitters/flashing_blue_glow_01_emit.bp' ) )                                    
+            BuildEffectsBag:Add( CreateAttachedEmitter( builder, BuildBone, army, '/effects/emitters/flashing_blue_glow_01_emit.bp' ) )
         end
     end
 
@@ -279,10 +279,10 @@ function CreateUEFCommanderBuildSliceBeams( builder, unitBeingBuilt, BuildEffect
     local velZ = 2 * (endVec2.z - endVec1.z)
 
     if unitBeingBuilt:GetFractionComplete() == 0 then
-        Warp( BeamEndEntity, Vector( cx1, cy1 - oy, cz1 ) ) 
+        Warp( BeamEndEntity, Vector( cx1, cy1 - oy, cz1 ) )
         Warp( BeamEndEntity2, Vector( cx2, cy2 - oy, cz2 ) )
-        WaitSeconds( 0.8 )   
-    end    
+        WaitSeconds( 0.8 )
+    end
 
     local flipDirection = true
 
@@ -298,7 +298,7 @@ function CreateUEFCommanderBuildSliceBeams( builder, unitBeingBuilt, BuildEffect
             Warp( BeamEndEntity, Vector( cx2, (cy2 - (oy * unitBeingBuilt:GetFractionComplete())), cz2 ) )
             BeamEndEntity:SetVelocity( -velX, -velY, -velZ )
             Warp( BeamEndEntity2, Vector( cx1, (cy1 - (oy * unitBeingBuilt:GetFractionComplete())), cz1 ) )
-            BeamEndEntity2:SetVelocity( velX, velY, velZ )            
+            BeamEndEntity2:SetVelocity( velX, velY, velZ )
             flipDirection = true
         end
         WaitSeconds( 0.6 )
@@ -311,8 +311,8 @@ function CreateDefaultBuildBeams( builder, unitBeingBuilt, BuildEffectBones, Bui
     local BeamEndEntity = Entity()
     local army = builder:GetArmy()
     BuildEffectsBag:Add( BeamEndEntity )
-    Warp( BeamEndEntity, Vector(ox, oy, oz))   
-   
+    Warp( BeamEndEntity, Vector(ox, oy, oz))
+
     local BuildBeams = {}
 
     # Create build beams
@@ -323,7 +323,7 @@ function CreateDefaultBuildBeams( builder, unitBeingBuilt, BuildEffectBones, Bui
             table.insert( BuildBeams, beamEffect )
             BuildEffectsBag:Add(beamEffect)
         end
-    end    
+    end
 
     CreateEmitterOnEntity( BeamEndEntity, builder:GetArmy(),'/effects/emitters/sparks_08_emit.bp')
     local waitTime = util.GetRandomFloat( 0.3, 1.5 )
@@ -350,14 +350,14 @@ function CreateAeonBuildBaseThread( unitBeingBuilt, builder, EffectsBag )
     local BuildBaseEffect = unitBeingBuilt:CreateProjectile('/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', nil, 0, 0, nil, nil, nil )
     BuildBaseEffect:SetScale(sx, sy * 1.5, sz)
     Warp( BuildBaseEffect, Vector(x,y,z))
-    BuildBaseEffect:SetOrientation(unitBeingBuilt:GetOrientation(), true)    
+    BuildBaseEffect:SetOrientation(unitBeingBuilt:GetOrientation(), true)
     unitBeingBuilt.Trash:Add(BuildBaseEffect)
     EffectsBag:Add(BuildBaseEffect)
 
     CreateEmitterOnEntity(BuildBaseEffect, builder:GetArmy(),'/effects/emitters/aeon_being_built_ambient_01_emit.bp')
     :SetEmitterCurveParam('X_POSITION_CURVE',0,sx * 1.5)
     :SetEmitterCurveParam('Z_POSITION_CURVE',0,sz * 1.5)
-    
+
     CreateEmitterOnEntity(BuildBaseEffect, builder:GetArmy(),'/effects/emitters/aeon_being_built_ambient_03_emit.bp')
     :ScaleEmitter( (sx + sz) * 0.3 )
 
@@ -375,10 +375,10 @@ function CreateAeonBuildBaseThread( unitBeingBuilt, builder, EffectsBag )
     end
 
     if not BuildBaseEffect:BeenDestroyed() then
-	    BuildBaseEffect:SetScaleVelocity(-0.6, -0.6, -0.6)
-	end    
+        BuildBaseEffect:SetScaleVelocity(-0.6, -0.6, -0.6)
+    end
     slider:SetSpeed(2)
-	WaitSeconds(0.5)
+    WaitSeconds(0.5)
     slider:Destroy()
     BuildBaseEffect:Destroy()
 end
@@ -416,10 +416,10 @@ end
 
 function SpawnBuildBots( builder, unitBeingBuilt, numBots,  BuildEffectsBag )
     local builderArmy = builder:GetArmy()
-    
+
     #new
     local unitBeingBuiltArmy = unitBeingBuilt:GetArmy()
-    
+
     local BeamBuildEmtBp = '/effects/emitters/build_beam_02_emit.bp'
     local x, y, z = unpack(builder:GetPosition())
     local qx, qy, qz, qw = unpack(builder:GetOrientation())
@@ -434,29 +434,29 @@ function SpawnBuildBots( builder, unitBeingBuilt, numBots,  BuildEffectsBag )
     local zVec = 0
     local BuilderUnits = {}
     local tunit = nil
-	
-	#if is new, won't spawn build bots if they might accidentally capture the unit
-	if builderArmy == unitBeingBuiltArmy or IsHumanUnit(unitBeingBuilt)  then 
-    
-	    # Launch projectiles at semi-random angles away from the sphere, with enough
-	    # initial velocity to escape sphere core
-	    for i = 0, (numUnits - 1) do
-		xVec = math.sin(angleInitial + (i*angle)) * VecMul
-		zVec = math.cos(angleInitial + (i*angle)) * VecMul
-		tunit = CreateUnit('ura0001', builderArmy, x + xVec, y + yVec, z + zVec, qx, qy, qz, qw, 'Air' )
 
-		# Make build bots unkillable
-		tunit:SetCanTakeDamage(false)
-		tunit:SetCanBeKilled(false)
-		
-		table.insert( BuilderUnits, tunit )
-		BuildEffectsBag:Add(tunit)
-	    end
-	    IssueGuard( BuilderUnits, unitBeingBuilt )
-	    return BuilderUnits
-	else
-		return  
-	end
+    #if is new, won't spawn build bots if they might accidentally capture the unit
+    if builderArmy == unitBeingBuiltArmy or IsHumanUnit(unitBeingBuilt)  then
+
+        # Launch projectiles at semi-random angles away from the sphere, with enough
+        # initial velocity to escape sphere core
+        for i = 0, (numUnits - 1) do
+        xVec = math.sin(angleInitial + (i*angle)) * VecMul
+        zVec = math.cos(angleInitial + (i*angle)) * VecMul
+        tunit = CreateUnit('ura0001', builderArmy, x + xVec, y + yVec, z + zVec, qx, qy, qz, qw, 'Air' )
+
+        # Make build bots unkillable
+        tunit:SetCanTakeDamage(false)
+        tunit:SetCanBeKilled(false)
+
+        table.insert( BuilderUnits, tunit )
+        BuildEffectsBag:Add(tunit)
+        end
+        IssueGuard( BuilderUnits, unitBeingBuilt )
+        return BuilderUnits
+    else
+        return
+    end
 end
 
 function CreateCybranEngineerBuildEffects( builder, BuildBones, BuildBots, BuildEffectsBag )
@@ -479,8 +479,8 @@ function CreateCybranEngineerBuildEffects( builder, BuildBones, BuildBots, Build
             if not vBot or vBot:BeenDestroyed() then
                 continue
             end
-            
-            BuildEffectsBag:Add(AttachBeamEntityToEntity(builder, BuildBones[i], vBot, -1, army, '/effects/emitters/build_beam_03_emit.bp'))        
+
+            BuildEffectsBag:Add(AttachBeamEntityToEntity(builder, BuildBones[i], vBot, -1, army, '/effects/emitters/build_beam_03_emit.bp'))
             i = i + 1
         end
     end
@@ -496,13 +496,13 @@ function CreateCybranFactoryBuildEffects( builder, unitBeingBuilt, BuildBones, B
         '/effects/emitters/build_sparks_blue_02_emit.bp',
     }
     local army = builder:GetArmy()
-    
+
     for kB,vB in BuildBones.BuildEffectBones do
         for kE, vE in BuildEffects do
             BuildEffectsBag:Add( CreateAttachedEmitter(builder,vB,army,vE) )
-        end 
+        end
     end
-    
+
     BuildEffectsBag:Add( CreateAttachedEmitter( builder, BuildBones.BuildAttachBone, army, '/effects/emitters/cybran_factory_build_01_emit.bp' ) )
 
     #Add sparks to the collision box of the unit being built
@@ -510,14 +510,14 @@ function CreateCybranFactoryBuildEffects( builder, unitBeingBuilt, BuildBones, B
     while not unitBeingBuilt:IsDead() and unitBeingBuilt:GetFractionComplete() < 1 do
         sx, sy, sz = unitBeingBuilt:GetRandomOffset(1)
         for kE, vE in UnitBuildEffects do
-            CreateEmitterOnEntity(unitBeingBuilt,army,vE):OffsetEmitter(sx,sy,sz) 
-        end         
+            CreateEmitterOnEntity(unitBeingBuilt,army,vE):OffsetEmitter(sx,sy,sz)
+        end
         WaitSeconds(util.GetRandomFloat( 0.1, 0.6 ))
-    end    
+    end
 end
 
 function CreateAeonConstructionUnitBuildingEffects( builder, unitBeingBuilt, BuildEffectsBag )
-	local army = builder:GetArmy()
+    local army = builder:GetArmy()
     BuildEffectsBag:Add( CreateEmitterOnEntity(builder, army,'/effects/emitters/aeon_build_01_emit.bp') )
 
     local beamEnd = Entity()
@@ -525,26 +525,26 @@ function CreateAeonConstructionUnitBuildingEffects( builder, unitBeingBuilt, Bui
     Warp( beamEnd, unitBeingBuilt:GetPosition() )
 
     for k, v in EffectTemplate.AeonBuildBeams01 do
-		local beamEffect = AttachBeamEntityToEntity(builder, 0, beamEnd, -1, army, v )
-		beamEffect:SetEmitterParam( 'POSITION_Z', 0.45 )
-		BuildEffectsBag:Add(beamEffect)
-	end
+        local beamEffect = AttachBeamEntityToEntity(builder, 0, beamEnd, -1, army, v )
+        beamEffect:SetEmitterParam( 'POSITION_Z', 0.45 )
+        BuildEffectsBag:Add(beamEffect)
+    end
 end
 
 function CreateAeonCommanderBuildingEffects( builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag )
-	local army = builder:GetArmy()
+    local army = builder:GetArmy()
     local beamEnd = Entity()
     BuildEffectsBag:Add(beamEnd)
     Warp( beamEnd, unitBeingBuilt:GetPosition() )
 
     for kBone, vBone in BuildEffectBones do
-		BuildEffectsBag:Add( CreateAttachedEmitter( builder, vBone, army, '/effects/emitters/aeon_build_02_emit.bp' ) )
+        BuildEffectsBag:Add( CreateAttachedEmitter( builder, vBone, army, '/effects/emitters/aeon_build_02_emit.bp' ) )
 
-    	for k, v in EffectTemplate.AeonBuildBeams01 do
-			local beamEffect = AttachBeamEntityToEntity(builder, vBone, beamEnd, -1, army, v )
-			BuildEffectsBag:Add(beamEffect)
-		end
-	end
+        for k, v in EffectTemplate.AeonBuildBeams01 do
+            local beamEffect = AttachBeamEntityToEntity(builder, vBone, beamEnd, -1, army, v )
+            BuildEffectsBag:Add(beamEffect)
+        end
+    end
 end
 
 function CreateAeonFactoryBuildingEffects( builder, unitBeingBuilt, BuildEffectBones, BuildBone, EffectsBag )
@@ -561,7 +561,7 @@ function CreateAeonFactoryBuildingEffects( builder, unitBeingBuilt, BuildEffectB
     # Create a pool mercury that slow draws into the build unit
     local BuildBaseEffect = unitBeingBuilt:CreateProjectile('/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', 0,0,1, nil, nil, nil )
     BuildBaseEffect:SetScale(sx, 1, sz)
-    ###BuildBaseEffect:SetOrientation(unitBeingBuilt:GetOrientation(), true)    
+    ###BuildBaseEffect:SetOrientation(unitBeingBuilt:GetOrientation(), true)
     Warp( BuildBaseEffect, Vector(x,y-0.05,z))
     unitBeingBuilt.Trash:Add(BuildBaseEffect)
     EffectsBag:Add(BuildBaseEffect)
@@ -569,26 +569,26 @@ function CreateAeonFactoryBuildingEffects( builder, unitBeingBuilt, BuildEffectB
     CreateEmitterOnEntity(BuildBaseEffect, builder:GetArmy(),'/effects/emitters/aeon_being_built_ambient_02_emit.bp')
     :SetEmitterCurveParam('X_POSITION_CURVE',0,sx * 1.5)
     :SetEmitterCurveParam('Z_POSITION_CURVE',0,sz * 1.5)
-    
+
     CreateEmitterOnEntity(BuildBaseEffect, builder:GetArmy(),'/effects/emitters/aeon_being_built_ambient_03_emit.bp')
-    :ScaleEmitter( (sx + sz) * 0.3 )    
+    :ScaleEmitter( (sx + sz) * 0.3 )
 
     for kBone, vBone in BuildEffectBones do
-		EffectsBag:Add( CreateAttachedEmitter( builder, vBone, army, '/effects/emitters/aeon_build_03_emit.bp' ) )
-		for kBeam, vBeam in EffectTemplate.AeonBuildBeams02 do
-			local beamEffect = AttachBeamEntityToEntity(builder, vBone, builder, BuildBone, army, vBeam )
-			EffectsBag:Add(beamEffect)
-		end
-	end
+        EffectsBag:Add( CreateAttachedEmitter( builder, vBone, army, '/effects/emitters/aeon_build_03_emit.bp' ) )
+        for kBeam, vBeam in EffectTemplate.AeonBuildBeams02 do
+            local beamEffect = AttachBeamEntityToEntity(builder, vBone, builder, BuildBone, army, vBeam )
+            EffectsBag:Add(beamEffect)
+        end
+    end
 
     local slider = CreateSlider( unitBeingBuilt, 0 )
     unitBeingBuilt.Trash:Add(slider)
-    EffectsBag:Add(slider)    
+    EffectsBag:Add(slider)
     slider:SetWorldUnits(true)
     slider:SetGoal(0, -sy, 0)
     slider:SetSpeed(-1)
     WaitFor(slider)
-    if not unitBeingBuilt:IsDead() then 
+    if not unitBeingBuilt:IsDead() then
         slider:SetGoal(0,0,0)
         slider:SetSpeed(.05)
     end
@@ -597,13 +597,13 @@ function CreateAeonFactoryBuildingEffects( builder, unitBeingBuilt, BuildEffectB
     while not unitBeingBuilt:IsDead() and unitBeingBuilt:GetFractionComplete() < 0.8 do
         WaitSeconds(0.5)
     end
-    
+
     if not unitBeingBuilt:IsDead() then
-	    BuildBaseEffect:SetScaleVelocity(-0.6, -0.6, -0.6)
+        BuildBaseEffect:SetScaleVelocity(-0.6, -0.6, -0.6)
         slider:SetSpeed(2)
-	    WaitSeconds(0.5)
-	end
-	
+        WaitSeconds(0.5)
+    end
+
     slider:Destroy()
     BuildBaseEffect:Destroy()
 
@@ -611,16 +611,16 @@ end
 
 
 function CreateSeraphimUnitEngineerBuildingEffects( builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag )
-	local army = builder:GetArmy()
+    local army = builder:GetArmy()
 
     for kBone, vBone in BuildEffectBones do
-		BuildEffectsBag:Add( CreateAttachedEmitter( builder, vBone, army, '/effects/emitters/seraphim_build_01_emit.bp' ) )
+        BuildEffectsBag:Add( CreateAttachedEmitter( builder, vBone, army, '/effects/emitters/seraphim_build_01_emit.bp' ) )
 
-    	for k, v in EffectTemplate.SeraphimBuildBeams01 do
-			local beamEffect = AttachBeamEntityToEntity(builder, vBone, unitBeingBuilt, -1, army, v )
-			BuildEffectsBag:Add(beamEffect)
-		end
-	end
+        for k, v in EffectTemplate.SeraphimBuildBeams01 do
+            local beamEffect = AttachBeamEntityToEntity(builder, vBone, unitBeingBuilt, -1, army, v )
+            BuildEffectsBag:Add(beamEffect)
+        end
+    end
 end
 
 function CreateSeraphimFactoryBuildingEffects( builder, unitBeingBuilt, BuildEffectBones, BuildBone, EffectsBag )
@@ -637,30 +637,30 @@ function CreateSeraphimFactoryBuildingEffects( builder, unitBeingBuilt, BuildEff
     # Create a pool mercury that slow draws into the build unit
     local BuildBaseEffect = unitBeingBuilt:CreateProjectile('/effects/entities/SeraphimBuildEffect01/SeraphimBuildEffect01_proj.bp', nil, 0, 0, nil, nil, nil )
     BuildBaseEffect:SetScale(sx, 1, sz)
-    BuildBaseEffect:SetOrientation( unitBeingBuilt:GetOrientation(), true)    
+    BuildBaseEffect:SetOrientation( unitBeingBuilt:GetOrientation(), true)
     Warp( BuildBaseEffect, Vector(x,y-0.05,z))
     unitBeingBuilt.Trash:Add(BuildBaseEffect)
     EffectsBag:Add(BuildBaseEffect)
 
     for kBone, vBone in BuildEffectBones do
-		EffectsBag:Add( CreateAttachedEmitter( builder, vBone, army, '/effects/emitters/seraphim_build_01_emit.bp' ) )
-		for kBeam, vBeam in EffectTemplate.SeraphimBuildBeams01 do
-			EffectsBag:Add(AttachBeamEntityToEntity(builder, vBone, unitBeingBuilt, -1, army, vBeam ))
-			EffectsBag:Add(CreateAttachedEmitter( unitBeingBuilt, -1, builder:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_02_emit.bp'))
-			EffectsBag:Add(CreateAttachedEmitter( unitBeingBuilt, -1, builder:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_03_emit.bp'))			
-			EffectsBag:Add(CreateAttachedEmitter( unitBeingBuilt, -1, builder:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_04_emit.bp'))						
-			EffectsBag:Add(CreateAttachedEmitter( unitBeingBuilt, -1, builder:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_05_emit.bp'))				
-		end
-	end
+        EffectsBag:Add( CreateAttachedEmitter( builder, vBone, army, '/effects/emitters/seraphim_build_01_emit.bp' ) )
+        for kBeam, vBeam in EffectTemplate.SeraphimBuildBeams01 do
+            EffectsBag:Add(AttachBeamEntityToEntity(builder, vBone, unitBeingBuilt, -1, army, vBeam ))
+            EffectsBag:Add(CreateAttachedEmitter( unitBeingBuilt, -1, builder:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_02_emit.bp'))
+            EffectsBag:Add(CreateAttachedEmitter( unitBeingBuilt, -1, builder:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_03_emit.bp'))
+            EffectsBag:Add(CreateAttachedEmitter( unitBeingBuilt, -1, builder:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_04_emit.bp'))
+            EffectsBag:Add(CreateAttachedEmitter( unitBeingBuilt, -1, builder:GetArmy(), '/effects/emitters/seraphim_being_built_ambient_05_emit.bp'))
+        end
+    end
 
     local slider = CreateSlider( unitBeingBuilt, 0 )
     unitBeingBuilt.Trash:Add(slider)
-    EffectsBag:Add(slider)    
+    EffectsBag:Add(slider)
     slider:SetWorldUnits(true)
     slider:SetGoal(0, sy, 0)
     slider:SetSpeed(-1)
     WaitFor(slider)
-    if not unitBeingBuilt:IsDead() then 
+    if not unitBeingBuilt:IsDead() then
         slider:SetGoal(0,0,0)
         slider:SetSpeed(.05)
     end
@@ -669,21 +669,21 @@ function CreateSeraphimFactoryBuildingEffects( builder, unitBeingBuilt, BuildEff
     while not unitBeingBuilt:IsDead() and unitBeingBuilt:GetFractionComplete() < 0.8 do
         WaitSeconds(0.5)
     end
-    
+
     if not unitBeingBuilt:IsDead() then
         if not BuildBaseEffect:BeenDestroyed() then
-	        BuildBaseEffect:SetScaleVelocity(-0.6, -0.6, -0.6)
-	    end
-    	if not slider:BeenDestroyed() then
+            BuildBaseEffect:SetScaleVelocity(-0.6, -0.6, -0.6)
+        end
+        if not slider:BeenDestroyed() then
             slider:SetSpeed(2)
-        end            
-	    WaitSeconds(0.5)
-	end
-	
-	if not slider:BeenDestroyed() then
+        end
+        WaitSeconds(0.5)
+    end
+
+    if not slider:BeenDestroyed() then
         slider:Destroy()
     end
-    
+
     if not BuildBaseEffect:BeenDestroyed() then
         BuildBaseEffect:Destroy()
     end
@@ -702,7 +702,7 @@ function CreateSeraphimBuildBaseThread( unitBeingBuilt, builder, EffectsBag )
 
     local BuildBaseEffect = unitBeingBuilt:CreateProjectile('/effects/entities/SeraphimBuildEffect01/SeraphimBuildEffect01_proj.bp', nil, 0, 0, nil, nil, nil )
     BuildBaseEffect:SetScale(sx, 1, sz)
-    BuildBaseEffect:SetOrientation( unitBeingBuilt:GetOrientation(), true)    
+    BuildBaseEffect:SetOrientation( unitBeingBuilt:GetOrientation(), true)
     Warp( BuildBaseEffect, Vector(x,y,z))
     unitBeingBuilt.Trash:Add(BuildBaseEffect)
     EffectsBag:Add(BuildBaseEffect)
@@ -714,10 +714,10 @@ function CreateSeraphimBuildBaseThread( unitBeingBuilt, builder, EffectsBag )
     local BuildEffectsEmitters = {
         '/effects/emitters/seraphim_being_built_ambient_02_emit.bp',
         '/effects/emitters/seraphim_being_built_ambient_03_emit.bp',
-        '/effects/emitters/seraphim_being_built_ambient_04_emit.bp', 
-        '/effects/emitters/seraphim_being_built_ambient_05_emit.bp',       
+        '/effects/emitters/seraphim_being_built_ambient_04_emit.bp',
+        '/effects/emitters/seraphim_being_built_ambient_05_emit.bp',
     }
-    
+
     local AdjustedEmitters = {}
     local effect = nil
     for k, vEffect in BuildEffectsEmitters do
@@ -739,8 +739,8 @@ function CreateSeraphimBuildBaseThread( unitBeingBuilt, builder, EffectsBag )
         WaitSeconds(0.5)
         fractionComplete = unitBeingBuilt:GetFractionComplete()
         for k, vEffect in AdjustedEmitters do
-             vEffect:ScaleEmitter( 1 + (unitScaleMetric * fractionComplete))	    
-        end        
+             vEffect:ScaleEmitter( 1 + (unitScaleMetric * fractionComplete))
+        end
     end
 
     # The flash can now be seen only by the player owning the building, his allies or enemies who
@@ -751,11 +751,11 @@ function CreateSeraphimBuildBaseThread( unitBeingBuilt, builder, EffectsBag )
     local unitsArmy = unitBeingBuilt:GetArmy()
     local focusArmy = GetFocusArmy()
     if focusArmy == -1 or IsAlly(unitsArmy,focusArmy) then
-        CreateLightParticle( unitBeingBuilt, -1, unitBeingBuilt:GetArmy(), unitBeingBuilt:GetFootPrintSize() * 7, 8, 'glow_02', 'ramp_blue_22' ) 
+        CreateLightParticle( unitBeingBuilt, -1, unitBeingBuilt:GetArmy(), unitBeingBuilt:GetFootPrintSize() * 7, 8, 'glow_02', 'ramp_blue_22' )
     elseif IsEnemy(unitsArmy,focusArmy) then
         local blip = unitBeingBuilt:GetBlip(focusArmy)
         if blip ~= nil and blip:IsSeenNow(focusArmy) then
-            CreateLightParticle( unitBeingBuilt, -1, unitBeingBuilt:GetArmy(), unitBeingBuilt:GetFootPrintSize() * 7, 8, 'glow_02', 'ramp_blue_22' ) 
+            CreateLightParticle( unitBeingBuilt, -1, unitBeingBuilt:GetArmy(), unitBeingBuilt:GetFootPrintSize() * 7, 8, 'glow_02', 'ramp_blue_22' )
         end
     end
 
@@ -777,7 +777,7 @@ function CreateSeraphimExperimentalBuildBaseThread( unitBeingBuilt, builder, Eff
 
     local BuildBaseEffect = unitBeingBuilt:CreateProjectile('/effects/entities/SeraphimBuildEffect01/SeraphimBuildEffect01_proj.bp', nil, 0, 0, nil, nil, nil )
     BuildBaseEffect:SetScale(sx, 1, sz)
-    BuildBaseEffect:SetOrientation( unitBeingBuilt:GetOrientation(), true)    
+    BuildBaseEffect:SetOrientation( unitBeingBuilt:GetOrientation(), true)
     Warp( BuildBaseEffect, Vector(x,y,z))
     unitBeingBuilt.Trash:Add(BuildBaseEffect)
     EffectsBag:Add(BuildBaseEffect)
@@ -789,10 +789,10 @@ function CreateSeraphimExperimentalBuildBaseThread( unitBeingBuilt, builder, Eff
     local BuildEffectsEmitters = {
         '/effects/emitters/seraphim_being_built_ambient_02_emit.bp',
         '/effects/emitters/seraphim_being_built_ambient_03_emit.bp',
-        '/effects/emitters/seraphim_being_built_ambient_04_emit.bp', 
-        '/effects/emitters/seraphim_being_built_ambient_05_emit.bp',       
+        '/effects/emitters/seraphim_being_built_ambient_04_emit.bp',
+        '/effects/emitters/seraphim_being_built_ambient_05_emit.bp',
     }
-    
+
     local AdjustedEmitters = {}
     local effect = nil
     for k, vEffect in BuildEffectsEmitters do
@@ -815,8 +815,8 @@ function CreateSeraphimExperimentalBuildBaseThread( unitBeingBuilt, builder, Eff
         WaitSeconds(0.5)
         fractionComplete = unitBeingBuilt:GetFractionComplete()
         for k, vEffect in AdjustedEmitters do
-             vEffect:ScaleEmitter( 2 + (unitScaleMetric * fractionComplete) )	    
-        end        
+             vEffect:ScaleEmitter( 2 + (unitScaleMetric * fractionComplete) )
+        end
     end
 
     # The flash can now be seen only by the player owning the unit, his allies or enemies who
@@ -827,11 +827,11 @@ function CreateSeraphimExperimentalBuildBaseThread( unitBeingBuilt, builder, Eff
     local unitsArmy = unitBeingBuilt:GetArmy()
     local focusArmy = GetFocusArmy()
     if focusArmy == -1 or IsAlly(unitsArmy,focusArmy) then
-        CreateLightParticle( unitBeingBuilt, -1, unitBeingBuilt:GetArmy(), unitBeingBuilt:GetFootPrintSize() * 4, 6, 'glow_02', 'ramp_blue_22' ) 
+        CreateLightParticle( unitBeingBuilt, -1, unitBeingBuilt:GetArmy(), unitBeingBuilt:GetFootPrintSize() * 4, 6, 'glow_02', 'ramp_blue_22' )
     elseif IsEnemy(unitsArmy,focusArmy) then
         local blip = unitBeingBuilt:GetBlip(focusArmy)
         if blip ~= nil and blip:IsSeenNow(focusArmy) then
-            CreateLightParticle( unitBeingBuilt, -1, unitBeingBuilt:GetArmy(), unitBeingBuilt:GetFootPrintSize() * 4, 6, 'glow_02', 'ramp_blue_22' ) 
+            CreateLightParticle( unitBeingBuilt, -1, unitBeingBuilt:GetArmy(), unitBeingBuilt:GetFootPrintSize() * 4, 6, 'glow_02', 'ramp_blue_22' )
         end
     end
 
@@ -845,9 +845,9 @@ function CreateAdjacencyBeams( unit, adjacentUnit, AdjacencyBeamsBag )
         Unit = adjacentUnit,
         Trash = TrashBag(),
     }
-    
+
     table.insert(AdjacencyBeamsBag, info)
-    
+
     local uBp = unit:GetBlueprint()
     local aBp = adjacentUnit:GetBlueprint()
     local army = unit:GetArmy()
@@ -856,29 +856,29 @@ function CreateAdjacencyBeams( unit, adjacentUnit, AdjacencyBeamsBag )
     # Determine which effects we will be using
     local nodeMesh = nil
     local beamEffect = nil
-    local emitterNodeEffects = {}  
+    local emitterNodeEffects = {}
     local numNodes = 2
     local nodeList = {}
     local validAdjacency = true
 
 
-	local unitPos = unit:GetPosition()
-	local adjPos = adjacentUnit:GetPosition()
+    local unitPos = unit:GetPosition()
+    local adjPos = adjacentUnit:GetPosition()
 
-	# Create hub start/end and all midpoint nodes
+    # Create hub start/end and all midpoint nodes
     local unitHub = {
-		entity = Entity{},
-		pos = unit:GetPosition(),
-	}
-	local adjacentHub = {
-		entity = Entity{},
-		pos = adjacentUnit:GetPosition(),
-	}
+        entity = Entity{},
+        pos = unit:GetPosition(),
+    }
+    local adjacentHub = {
+        entity = Entity{},
+        pos = adjacentUnit:GetPosition(),
+    }
 
     local spec = {
         Owner = unit,
     }
-   
+
     if faction == 'Aeon' then
         nodeMesh = '/effects/entities/aeonadjacencynode/aeonadjacencynode_mesh'
         beamEffect = '/effects/emitters/adjacency_aeon_beam_0' .. util.GetRandomInt(1,3) .. '_emit.bp'
@@ -888,7 +888,7 @@ function CreateAdjacencyBeams( unit, adjacentUnit, AdjacencyBeamsBag )
         beamEffect = '/effects/emitters/adjacency_cybran_beam_01_emit.bp'
     elseif faction == 'UEF' then
         nodeMesh = '/effects/entities/uefadjacencynode/uefadjacencynode_mesh'
-        beamEffect = '/effects/emitters/adjacency_uef_beam_01_emit.bp'	
+        beamEffect = '/effects/emitters/adjacency_uef_beam_01_emit.bp'
     elseif faction == 'Seraphim' then
         nodeMesh = '/effects/entities/seraphimadjacencynode/seraphimadjacencynode_mesh'
         table.insert( emitterNodeEffects, EffectTemplate.SAdjacencyAmbient01 )
@@ -899,159 +899,159 @@ function CreateAdjacencyBeams( unit, adjacentUnit, AdjacencyBeamsBag )
             table.insert( emitterNodeEffects, EffectTemplate.SAdjacencyAmbient02 )
             table.insert( emitterNodeEffects, EffectTemplate.SAdjacencyAmbient03 )
         end
-    end    
+    end
 
     for i = 1, numNodes do
-		local node =
-		{
+        local node =
+        {
             entity = Entity(spec),
-			pos = {0,0,0},
-			mesh = nil,
-		}
+            pos = {0,0,0},
+            mesh = nil,
+        }
         node.entity:SetVizToNeutrals('Intel')
         node.entity:SetVizToEnemies('Intel')
-		table.insert( nodeList, node )
+        table.insert( nodeList, node )
     end
 
-	local verticalOffset = 0.05
+    local verticalOffset = 0.05
 
-	# Move Unit Pos towards adjacent unit by bounding box size
-	local uBpSizeX = uBp.SizeX * 0.5
-	local uBpSizeZ = uBp.SizeZ * 0.5
-	local aBpSizeX = aBp.SizeX * 0.5
-	local aBpSizeZ = aBp.SizeZ * 0.5
+    # Move Unit Pos towards adjacent unit by bounding box size
+    local uBpSizeX = uBp.SizeX * 0.5
+    local uBpSizeZ = uBp.SizeZ * 0.5
+    local aBpSizeX = aBp.SizeX * 0.5
+    local aBpSizeZ = aBp.SizeZ * 0.5
 
-	# To Determine positioning, need to use the bounding box or skirt size
-	local uBpSkirtX = uBp.Physics.SkirtSizeX * 0.5
-	local uBpSkirtZ = uBp.Physics.SkirtSizeZ * 0.5
-	local aBpSkirtX = aBp.Physics.SkirtSizeX * 0.5
-	local aBpSkirtZ = aBp.Physics.SkirtSizeZ * 0.5	
+    # To Determine positioning, need to use the bounding box or skirt size
+    local uBpSkirtX = uBp.Physics.SkirtSizeX * 0.5
+    local uBpSkirtZ = uBp.Physics.SkirtSizeZ * 0.5
+    local aBpSkirtX = aBp.Physics.SkirtSizeX * 0.5
+    local aBpSkirtZ = aBp.Physics.SkirtSizeZ * 0.5
 
-	# Get edge corner positions, { TOP, LEFT, BOTTOM, RIGHT }
-	local unitSkirtBounds = {
-		unitHub.pos[3] - uBpSkirtZ,
-		unitHub.pos[1] - uBpSkirtX,
-		unitHub.pos[3] + uBpSkirtZ,
-		unitHub.pos[1] + uBpSkirtX,
-	}
-	local adjacentSkirtBounds = {
-		adjacentHub.pos[3] - aBpSkirtZ,
-		adjacentHub.pos[1] - aBpSkirtX,
-		adjacentHub.pos[3] + aBpSkirtZ,
-		adjacentHub.pos[1] + aBpSkirtX,
-	}
+    # Get edge corner positions, { TOP, LEFT, BOTTOM, RIGHT }
+    local unitSkirtBounds = {
+        unitHub.pos[3] - uBpSkirtZ,
+        unitHub.pos[1] - uBpSkirtX,
+        unitHub.pos[3] + uBpSkirtZ,
+        unitHub.pos[1] + uBpSkirtX,
+    }
+    local adjacentSkirtBounds = {
+        adjacentHub.pos[3] - aBpSkirtZ,
+        adjacentHub.pos[1] - aBpSkirtX,
+        adjacentHub.pos[3] + aBpSkirtZ,
+        adjacentHub.pos[1] + aBpSkirtX,
+    }
 
-	# Figure out the best matching ogrid position on units bounding box
-	# depending on it's skirt size
+    # Figure out the best matching ogrid position on units bounding box
+    # depending on it's skirt size
 
-	# Unit bottom or top skirt is aligned to adjacent unit
-	if (unitSkirtBounds[3] == adjacentSkirtBounds[1]) or (unitSkirtBounds[1] == adjacentSkirtBounds[3]) then
-	
-		local sharedSkirtLower = unitSkirtBounds[4] - (unitSkirtBounds[4] - adjacentSkirtBounds[2])
-		local sharedSkirtUpper = unitSkirtBounds[4] - (unitSkirtBounds[4] - adjacentSkirtBounds[4])
-		local sharedSkirtLen = sharedSkirtUpper - sharedSkirtLower
-    	
-		# Depending on shared skirt bounds, determine the position of unit hub
-		# Find out how many times the shared skirt fits into the unit hub shared skirt
-		local numAdjSkirtsOnUnitSkirt = (uBpSkirtX * 2) / sharedSkirtLen
-		local numUnitSkirtsOnAdjSkirt = (aBpSkirtX * 2) / sharedSkirtLen
- 		
- 		# Z-offset, offset adjacency hub positions the proper direction
-		if unitSkirtBounds[3] == adjacentSkirtBounds[1] then
-			unitHub.pos[3] = unitHub.pos[3] + uBpSizeZ														 
-			adjacentHub.pos[3] = adjacentHub.pos[3] - aBpSizeZ
-		else # unitSkirtBounds[1] == adjacentSkirtBounds[3]
-			unitHub.pos[3] = unitHub.pos[3] - uBpSizeZ
-			adjacentHub.pos[3] = adjacentHub.pos[3] + aBpSizeZ			
-		end    
-		
-		# X-offset, Find the shared adjacent x position range			
-		# If we have more than skirt on this section, then we need to adjust the x position of the unit hub 
-		if numAdjSkirtsOnUnitSkirt > 1 or numUnitSkirtsOnAdjSkirt < 1 then
-			local uSkirtLen = (unitSkirtBounds[4] - unitSkirtBounds[2]) * 0.5           # Unit skirt length			
-			local uGridUnitSize = (uBpSizeX * 2) / uSkirtLen                            # Determine one grid of adjacency along that length
-			local xoffset = math.abs(unitSkirtBounds[2] - adjacentSkirtBounds[2]) * 0.5 # Get offset of the unit along the skirt
-			unitHub.pos[1] = (unitHub.pos[1] - uBpSizeX) + (xoffset * uGridUnitSize) + (uGridUnitSize * 0.5) # Now offset the position of adjacent point
-		end
-		
-		# If we have more than skirt on this section, then we need to adjust the x position of the adjacent hub 
-		if numUnitSkirtsOnAdjSkirt > 1  or numAdjSkirtsOnUnitSkirt < 1 then
-			local aSkirtLen = (adjacentSkirtBounds[4] - adjacentSkirtBounds[2]) * 0.5   # Adjacent unit skirt length			
-			local aGridUnitSize = (aBpSizeX * 2) / aSkirtLen                            # Determine one grid of adjacency along that length ??
-			local xoffset = math.abs(adjacentSkirtBounds[2] - unitSkirtBounds[2]) * 0.5	# Get offset of the unit along the adjacent unit
-			adjacentHub.pos[1] = (adjacentHub.pos[1] - aBpSizeX) + (xoffset * aGridUnitSize) + (aGridUnitSize * 0.5) # Now offset the position of adjacent point
-        end			
+    # Unit bottom or top skirt is aligned to adjacent unit
+    if (unitSkirtBounds[3] == adjacentSkirtBounds[1]) or (unitSkirtBounds[1] == adjacentSkirtBounds[3]) then
 
-	# Unit right or top left is aligned to adjacent unit
-	elseif (unitSkirtBounds[4] == adjacentSkirtBounds[2]) or (unitSkirtBounds[2] == adjacentSkirtBounds[4]) then
-	
-		local sharedSkirtLower = unitSkirtBounds[3] - (unitSkirtBounds[3] - adjacentSkirtBounds[1])
-		local sharedSkirtUpper = unitSkirtBounds[3] - (unitSkirtBounds[3] - adjacentSkirtBounds[3])
-		local sharedSkirtLen = sharedSkirtUpper - sharedSkirtLower
-   	
-		# Depending on shared skirt bounds, determine the position of unit hub
-		# Find out how many times the shared skirt fits into the unit hub shared skirt
-		local numAdjSkirtsOnUnitSkirt = (uBpSkirtX * 2) / sharedSkirtLen
-		local numUnitSkirtsOnAdjSkirt = (aBpSkirtX * 2) / sharedSkirtLen
-		    	
-		# X-offset
-		if (unitSkirtBounds[4] == adjacentSkirtBounds[2]) then
-			unitHub.pos[1] = unitHub.pos[1] + uBpSizeX
-			adjacentHub.pos[1] = adjacentHub.pos[1] - aBpSizeX
-		else # unitSkirtBounds[2] == adjacentSkirtBounds[4]   
-			unitHub.pos[1] = unitHub.pos[1] - uBpSizeX
-			adjacentHub.pos[1] = adjacentHub.pos[1] + aBpSizeX
-		end
-		
-		# Z-offset, Find the shared adjacent x position range			
-		# If we have more than skirt on this section, then we need to adjust the x position of the unit hub 
-		if numAdjSkirtsOnUnitSkirt > 1 or numUnitSkirtsOnAdjSkirt < 1 then
-			local uSkirtLen = (unitSkirtBounds[3] - unitSkirtBounds[1]) * 0.5           # Unit skirt length			
-			local uGridUnitSize = (uBpSizeZ * 2) / uSkirtLen                            # Determine one grid of adjacency along that length
-			local zoffset = math.abs(unitSkirtBounds[1] - adjacentSkirtBounds[1]) * 0.5 # Get offset of the unit along the skirt
-			unitHub.pos[3] = (unitHub.pos[3] - uBpSizeZ) + (zoffset * uGridUnitSize) + (uGridUnitSize * 0.5) # Now offset the position of adjacent point
-		end
-		
-		# If we have more than skirt on this section, then we need to adjust the x position of the adjacent hub 
-		if numUnitSkirtsOnAdjSkirt > 1 or numAdjSkirtsOnUnitSkirt < 1 then
-			local aSkirtLen = (adjacentSkirtBounds[3] - adjacentSkirtBounds[1]) * 0.5   # Adjacent unit skirt length			
-			local aGridUnitSize = (aBpSizeZ * 2) / aSkirtLen                            # Determine one grid of adjacency along that length ??
-			local zoffset = math.abs(adjacentSkirtBounds[1] - unitSkirtBounds[1]) * 0.5	# Get offset of the unit along the adjacent unit
-			adjacentHub.pos[3] = (adjacentHub.pos[3] - aBpSizeZ) + (zoffset * aGridUnitSize) + (aGridUnitSize * 0.5) # Now offset the position of adjacent point
-        end				
+        local sharedSkirtLower = unitSkirtBounds[4] - (unitSkirtBounds[4] - adjacentSkirtBounds[2])
+        local sharedSkirtUpper = unitSkirtBounds[4] - (unitSkirtBounds[4] - adjacentSkirtBounds[4])
+        local sharedSkirtLen = sharedSkirtUpper - sharedSkirtLower
+
+        # Depending on shared skirt bounds, determine the position of unit hub
+        # Find out how many times the shared skirt fits into the unit hub shared skirt
+        local numAdjSkirtsOnUnitSkirt = (uBpSkirtX * 2) / sharedSkirtLen
+        local numUnitSkirtsOnAdjSkirt = (aBpSkirtX * 2) / sharedSkirtLen
+
+         # Z-offset, offset adjacency hub positions the proper direction
+        if unitSkirtBounds[3] == adjacentSkirtBounds[1] then
+            unitHub.pos[3] = unitHub.pos[3] + uBpSizeZ
+            adjacentHub.pos[3] = adjacentHub.pos[3] - aBpSizeZ
+        else # unitSkirtBounds[1] == adjacentSkirtBounds[3]
+            unitHub.pos[3] = unitHub.pos[3] - uBpSizeZ
+            adjacentHub.pos[3] = adjacentHub.pos[3] + aBpSizeZ
+        end
+
+        # X-offset, Find the shared adjacent x position range
+        # If we have more than skirt on this section, then we need to adjust the x position of the unit hub
+        if numAdjSkirtsOnUnitSkirt > 1 or numUnitSkirtsOnAdjSkirt < 1 then
+            local uSkirtLen = (unitSkirtBounds[4] - unitSkirtBounds[2]) * 0.5           # Unit skirt length
+            local uGridUnitSize = (uBpSizeX * 2) / uSkirtLen                            # Determine one grid of adjacency along that length
+            local xoffset = math.abs(unitSkirtBounds[2] - adjacentSkirtBounds[2]) * 0.5 # Get offset of the unit along the skirt
+            unitHub.pos[1] = (unitHub.pos[1] - uBpSizeX) + (xoffset * uGridUnitSize) + (uGridUnitSize * 0.5) # Now offset the position of adjacent point
+        end
+
+        # If we have more than skirt on this section, then we need to adjust the x position of the adjacent hub
+        if numUnitSkirtsOnAdjSkirt > 1  or numAdjSkirtsOnUnitSkirt < 1 then
+            local aSkirtLen = (adjacentSkirtBounds[4] - adjacentSkirtBounds[2]) * 0.5   # Adjacent unit skirt length
+            local aGridUnitSize = (aBpSizeX * 2) / aSkirtLen                            # Determine one grid of adjacency along that length ??
+            local xoffset = math.abs(adjacentSkirtBounds[2] - unitSkirtBounds[2]) * 0.5    # Get offset of the unit along the adjacent unit
+            adjacentHub.pos[1] = (adjacentHub.pos[1] - aBpSizeX) + (xoffset * aGridUnitSize) + (aGridUnitSize * 0.5) # Now offset the position of adjacent point
+        end
+
+    # Unit right or top left is aligned to adjacent unit
+    elseif (unitSkirtBounds[4] == adjacentSkirtBounds[2]) or (unitSkirtBounds[2] == adjacentSkirtBounds[4]) then
+
+        local sharedSkirtLower = unitSkirtBounds[3] - (unitSkirtBounds[3] - adjacentSkirtBounds[1])
+        local sharedSkirtUpper = unitSkirtBounds[3] - (unitSkirtBounds[3] - adjacentSkirtBounds[3])
+        local sharedSkirtLen = sharedSkirtUpper - sharedSkirtLower
+
+        # Depending on shared skirt bounds, determine the position of unit hub
+        # Find out how many times the shared skirt fits into the unit hub shared skirt
+        local numAdjSkirtsOnUnitSkirt = (uBpSkirtX * 2) / sharedSkirtLen
+        local numUnitSkirtsOnAdjSkirt = (aBpSkirtX * 2) / sharedSkirtLen
+
+        # X-offset
+        if (unitSkirtBounds[4] == adjacentSkirtBounds[2]) then
+            unitHub.pos[1] = unitHub.pos[1] + uBpSizeX
+            adjacentHub.pos[1] = adjacentHub.pos[1] - aBpSizeX
+        else # unitSkirtBounds[2] == adjacentSkirtBounds[4]
+            unitHub.pos[1] = unitHub.pos[1] - uBpSizeX
+            adjacentHub.pos[1] = adjacentHub.pos[1] + aBpSizeX
+        end
+
+        # Z-offset, Find the shared adjacent x position range
+        # If we have more than skirt on this section, then we need to adjust the x position of the unit hub
+        if numAdjSkirtsOnUnitSkirt > 1 or numUnitSkirtsOnAdjSkirt < 1 then
+            local uSkirtLen = (unitSkirtBounds[3] - unitSkirtBounds[1]) * 0.5           # Unit skirt length
+            local uGridUnitSize = (uBpSizeZ * 2) / uSkirtLen                            # Determine one grid of adjacency along that length
+            local zoffset = math.abs(unitSkirtBounds[1] - adjacentSkirtBounds[1]) * 0.5 # Get offset of the unit along the skirt
+            unitHub.pos[3] = (unitHub.pos[3] - uBpSizeZ) + (zoffset * uGridUnitSize) + (uGridUnitSize * 0.5) # Now offset the position of adjacent point
+        end
+
+        # If we have more than skirt on this section, then we need to adjust the x position of the adjacent hub
+        if numUnitSkirtsOnAdjSkirt > 1 or numAdjSkirtsOnUnitSkirt < 1 then
+            local aSkirtLen = (adjacentSkirtBounds[3] - adjacentSkirtBounds[1]) * 0.5   # Adjacent unit skirt length
+            local aGridUnitSize = (aBpSizeZ * 2) / aSkirtLen                            # Determine one grid of adjacency along that length ??
+            local zoffset = math.abs(adjacentSkirtBounds[1] - unitSkirtBounds[1]) * 0.5    # Get offset of the unit along the adjacent unit
+            adjacentHub.pos[3] = (adjacentHub.pos[3] - aBpSizeZ) + (zoffset * aGridUnitSize) + (aGridUnitSize * 0.5) # Now offset the position of adjacent point
+        end
     end
 
-	# Setup our midpoint positions
-	if faction == 'Aeon' or faction == 'Seraphim' then
-		local DirectionVec = util.GetDifferenceVector( unitHub.pos, adjacentHub.pos )
-		local Dist = util.GetDistanceBetweenTwoVectors( unitHub.pos, adjacentHub.pos )
-		local PerpVec = util.Cross( DirectionVec, Vector(0,0.35,0) )
-		local segmentLen = 1 / (numNodes + 1)
-		local halfDist = Dist * 0.5
+    # Setup our midpoint positions
+    if faction == 'Aeon' or faction == 'Seraphim' then
+        local DirectionVec = util.GetDifferenceVector( unitHub.pos, adjacentHub.pos )
+        local Dist = util.GetDistanceBetweenTwoVectors( unitHub.pos, adjacentHub.pos )
+        local PerpVec = util.Cross( DirectionVec, Vector(0,0.35,0) )
+        local segmentLen = 1 / (numNodes + 1)
+        local halfDist = Dist * 0.5
 
-		if util.GetRandomInt(0,1) == 1 then
-			PerpVec[1] = -PerpVec[1]
-			PerpVec[2] = -PerpVec[2]
-			PerpVec[3] = -PerpVec[3]
-		end
+        if util.GetRandomInt(0,1) == 1 then
+            PerpVec[1] = -PerpVec[1]
+            PerpVec[2] = -PerpVec[2]
+            PerpVec[3] = -PerpVec[3]
+        end
 
-		local offsetMul = 0.15
+        local offsetMul = 0.15
 
-		for i = 1, numNodes do
-			local segmentMul = i * segmentLen
+        for i = 1, numNodes do
+            local segmentMul = i * segmentLen
 
-			if segmentMul <= 0.5 then
-				offsetMul = offsetMul + 0.12
-			else
-				offsetMul = offsetMul - 0.12
-			end
+            if segmentMul <= 0.5 then
+                offsetMul = offsetMul + 0.12
+            else
+                offsetMul = offsetMul - 0.12
+            end
 
-			nodeList[i].pos = {
-				unitHub.pos[1] - (DirectionVec[1] * segmentMul) - (PerpVec[1] * offsetMul),
-				nil,
-				unitHub.pos[3] - (DirectionVec[3] * segmentMul) - (PerpVec[3] * offsetMul),
-			}
-		end
+            nodeList[i].pos = {
+                unitHub.pos[1] - (DirectionVec[1] * segmentMul) - (PerpVec[1] * offsetMul),
+                nil,
+                unitHub.pos[3] - (DirectionVec[3] * segmentMul) - (PerpVec[3] * offsetMul),
+            }
+        end
     elseif faction == 'Cybran' then
         if (unitPos[1] == adjPos[1]) or (unitPos[3] == adjPos[3]) then
             local Dist = util.GetDistanceBetweenTwoVectors( unitHub.pos, adjacentHub.pos )
@@ -1102,7 +1102,7 @@ function CreateAdjacencyBeams( unit, adjacentUnit, AdjacencyBeamsBag )
                 nodeList[1].pos[3] = unitHub.pos[3]
                 nodeList[2].pos[3] = adjacentHub.pos[3]
             else
-                validAdjacency = false				
+                validAdjacency = false
             end
         end
     elseif faction == 'UEF' then
@@ -1118,7 +1118,7 @@ function CreateAdjacencyBeams( unit, adjacentUnit, AdjacencyBeamsBag )
 
             # Initialize 2 midpoint segments
             for k, v in nodeList do
-	            v.pos = util.GetMidPoint( unitHub.pos, adjacentHub.pos )
+                v.pos = util.GetMidPoint( unitHub.pos, adjacentHub.pos )
             end
 
             # Offset beam positions
@@ -1159,7 +1159,7 @@ function CreateAdjacencyBeams( unit, adjacentUnit, AdjacencyBeamsBag )
 
         unitHub.pos[2] = GetSurfaceHeight(unitHub.pos[1], unitHub.pos[3]) + verticalOffset
         adjacentHub.pos[2] = GetSurfaceHeight(adjacentHub.pos[1], adjacentHub.pos[3]) + verticalOffset
-        
+
         # Set the mesh of the entity and attach any node effects
         for i = 1, numNodes do
             nodeList[i].entity:SetMesh(nodeMesh, false)
@@ -1201,31 +1201,31 @@ function CreateAdjacencyBeams( unit, adjacentUnit, AdjacencyBeamsBag )
 end
 
 function PlaySacrificingEffects( unit, target_unit )
-	local army = unit:GetArmy()
-	local bp = unit:GetBlueprint()
-	local faction = bp.General.FactionName
+    local army = unit:GetArmy()
+    local bp = unit:GetBlueprint()
+    local faction = bp.General.FactionName
 
-	if faction == 'Aeon' then
-		for k, v in EffectTemplate.ASacrificeOfTheAeon01 do
-			unit.Trash:Add( CreateEmitterOnEntity( unit, army, v) )
-		end
-	end
+    if faction == 'Aeon' then
+        for k, v in EffectTemplate.ASacrificeOfTheAeon01 do
+            unit.Trash:Add( CreateEmitterOnEntity( unit, army, v) )
+        end
+    end
 end
 
 function PlaySacrificeEffects( unit, target_unit )
-	local army = unit:GetArmy()
-	local bp = unit:GetBlueprint()
-	local faction = bp.General.FactionName
+    local army = unit:GetArmy()
+    local bp = unit:GetBlueprint()
+    local faction = bp.General.FactionName
 
-	if faction == 'Aeon' then
-		for k, v in EffectTemplate.ASacrificeOfTheAeon02 do
-			CreateEmitterAtEntity( target_unit, army, v)
-		end
-	end
+    if faction == 'Aeon' then
+        for k, v in EffectTemplate.ASacrificeOfTheAeon02 do
+            CreateEmitterAtEntity( target_unit, army, v)
+        end
+    end
 end
 
 function PlayReclaimEffects( reclaimer, reclaimed, BuildEffectBones, EffectsBag )
-	local army = reclaimer:GetArmy()
+    local army = reclaimer:GetArmy()
     local pos = reclaimed:GetPosition()
     pos[2] = GetSurfaceHeight(pos[1], pos[3])
 
@@ -1234,15 +1234,15 @@ function PlayReclaimEffects( reclaimer, reclaimed, BuildEffectBones, EffectsBag 
     Warp( beamEnd, pos )
 
     for kBone, vBone in BuildEffectBones do
-		for kEmit, vEmit in EffectTemplate.ReclaimBeams do
-			local beamEffect = AttachBeamEntityToEntity(reclaimer, vBone, beamEnd, -1, army, vEmit )
-			EffectsBag:Add(beamEffect)
-		end
-	end
-	
-	for k, v in EffectTemplate.ReclaimObjectAOE do
-	    EffectsBag:Add( CreateEmitterOnEntity( reclaimed, army, v ) )
-	end
+        for kEmit, vEmit in EffectTemplate.ReclaimBeams do
+            local beamEffect = AttachBeamEntityToEntity(reclaimer, vBone, beamEnd, -1, army, vEmit )
+            EffectsBag:Add(beamEffect)
+        end
+    end
+
+    for k, v in EffectTemplate.ReclaimObjectAOE do
+        EffectsBag:Add( CreateEmitterOnEntity( reclaimed, army, v ) )
+    end
 end
 
 
@@ -1252,31 +1252,31 @@ function PlayReclaimEndEffects( reclaimer, reclaimed )
     if reclaimer then
         army = reclaimer:GetArmy()
     end
-	for k, v in EffectTemplate.ReclaimObjectEnd do
-	    CreateEmitterAtEntity( reclaimed, army, v )
-	end
-	
-	CreateLightParticleIntel( reclaimed, -1, army, 4, 6, 'glow_02', 'ramp_flare_02' )
-	
+    for k, v in EffectTemplate.ReclaimObjectEnd do
+        CreateEmitterAtEntity( reclaimed, army, v )
+    end
+
+    CreateLightParticleIntel( reclaimed, -1, army, 4, 6, 'glow_02', 'ramp_flare_02' )
+
 end
 
 function PlayCaptureEffects( capturer, captive, BuildEffectBones, EffectsBag )
-	local army = capturer:GetArmy()
+    local army = capturer:GetArmy()
 
     for kBone, vBone in BuildEffectBones do
-		for kEmit, vEmit in EffectTemplate.CaptureBeams do
-			local beamEffect = AttachBeamEntityToEntity(capturer, vBone, captive, -1, army, vEmit )
-			EffectsBag:Add(beamEffect)
-		end
-	end
-	
-	
+        for kEmit, vEmit in EffectTemplate.CaptureBeams do
+            local beamEffect = AttachBeamEntityToEntity(capturer, vBone, captive, -1, army, vEmit )
+            EffectsBag:Add(beamEffect)
+        end
+    end
+
+
 end
 
 function CreateCybranQuantumGateEffect( unit, bone1, bone2, TrashBag, startwaitSeed )
     # Adding a quick wait here so that unit bone positions are correct
     WaitSeconds( startwaitSeed )
-    
+
     local army = unit:GetArmy()
     local BeamEmtBp = '/effects/emitters/cybran_gate_beam_01_emit.bp'
     local pos1 = unit:GetPosition(bone1)
@@ -1288,10 +1288,10 @@ function CreateCybranQuantumGateEffect( unit, bone1, bone2, TrashBag, startwaitS
     local BeamStartEntity = unit:CreateProjectile('/effects/entities/UEFBuild/UEFBuild01_proj.bp',0,0,0,nil,nil,nil)
     TrashBag:Add( BeamStartEntity )
     Warp( BeamStartEntity, pos1)
-    
+
     local BeamEndEntity = unit:CreateProjectile('/effects/entities/UEFBuild/UEFBuild01_proj.bp',0,0,0,nil,nil,nil)
     TrashBag:Add( BeamEndEntity )
-    Warp( BeamEndEntity, pos2)    
+    Warp( BeamEndEntity, pos2)
 
     # Create beam effect
     TrashBag:Add(AttachBeamEntityToEntity(BeamStartEntity, -1, BeamEndEntity, -1, army, BeamEmtBp ))
@@ -1340,75 +1340,75 @@ function CleanupEffectBag( self, EffectBag )
 end
 
 function SeraphimRiftIn( unit )
-	local army = unit:GetArmy()
-	unit:HideBone(0, true)
-	
-	for k, v in EffectTemplate.SerRiftIn_Small do
-		CreateAttachedEmitter ( unit, -1, army, v )
-	end		
-	WaitSeconds (2.0)	
-	CreateLightParticle( unit, -1, army, 4, 15, 'glow_05', 'ramp_jammer_01' )	
-	WaitSeconds (0.1)	
-	unit:ShowBone(0, true)	
-	WaitSeconds (0.25)	
-	for k, v in EffectTemplate.SerRiftIn_SmallFlash do
-		CreateAttachedEmitter ( unit, -1, army, v )
-	end	
+    local army = unit:GetArmy()
+    unit:HideBone(0, true)
+
+    for k, v in EffectTemplate.SerRiftIn_Small do
+        CreateAttachedEmitter ( unit, -1, army, v )
+    end
+    WaitSeconds (2.0)
+    CreateLightParticle( unit, -1, army, 4, 15, 'glow_05', 'ramp_jammer_01' )
+    WaitSeconds (0.1)
+    unit:ShowBone(0, true)
+    WaitSeconds (0.25)
+    for k, v in EffectTemplate.SerRiftIn_SmallFlash do
+        CreateAttachedEmitter ( unit, -1, army, v )
+    end
 end
 
 function SeraphimRiftInLarge( unit )
-	local army = unit:GetArmy()
-	unit:HideBone(0, true)
-	
-	for k, v in EffectTemplate.SerRiftIn_Large do
-		CreateAttachedEmitter ( unit, -1, army, v )
-	end		
-	WaitSeconds (2.0)	
-	CreateLightParticle( unit, -1, army, 25, 15, 'glow_05', 'ramp_jammer_01' )	
-	WaitSeconds (0.1)	
-	unit:ShowBone(0, true)	
-	WaitSeconds (0.25)	
-	for k, v in EffectTemplate.SerRiftIn_LargeFlash do
-		CreateAttachedEmitter ( unit, -1, army, v )
-	end	
+    local army = unit:GetArmy()
+    unit:HideBone(0, true)
+
+    for k, v in EffectTemplate.SerRiftIn_Large do
+        CreateAttachedEmitter ( unit, -1, army, v )
+    end
+    WaitSeconds (2.0)
+    CreateLightParticle( unit, -1, army, 25, 15, 'glow_05', 'ramp_jammer_01' )
+    WaitSeconds (0.1)
+    unit:ShowBone(0, true)
+    WaitSeconds (0.25)
+    for k, v in EffectTemplate.SerRiftIn_LargeFlash do
+        CreateAttachedEmitter ( unit, -1, army, v )
+    end
 end
 
 function CybranBuildingInfection( unit )
-	local army = unit:GetArmy()
-	for k, v in EffectTemplate.CCivilianBuildingInfectionAmbient do
-		CreateAttachedEmitter ( unit, -1, army, v )
-	end	
+    local army = unit:GetArmy()
+    for k, v in EffectTemplate.CCivilianBuildingInfectionAmbient do
+        CreateAttachedEmitter ( unit, -1, army, v )
+    end
 end
 
 function CybranQaiShutdown( unit )
-	local army = unit:GetArmy()
-	for k, v in EffectTemplate.CQaiShutdown do
-		CreateAttachedEmitter ( unit, -1, army, v )
-	end	
+    local army = unit:GetArmy()
+    for k, v in EffectTemplate.CQaiShutdown do
+        CreateAttachedEmitter ( unit, -1, army, v )
+    end
 end
 
 function AeonHackACU( unit )
-	for k, v in EffectTemplate.AeonOpHackACU do
-		CreateAttachedEmitter ( unit, -1, unit:GetArmy(), v )
-	end		
+    for k, v in EffectTemplate.AeonOpHackACU do
+        CreateAttachedEmitter ( unit, -1, unit:GetArmy(), v )
+    end
 end
 
 
 #new function for insta capture fix
 IsHumanUnit = function(self)
-	local ArmyTable = ScenarioInfo.ArmySetup
-	local ArmyIndex = self:GetArmy()
-	
-	for ArmyName,Army in ArmyTable do
-		if Army.ArmyIndex == ArmyIndex then
-			if Army.Human == true then
-				return true
-			else
-				return false
-			end
-			
-		end
-	end
+    local ArmyTable = ScenarioInfo.ArmySetup
+    local ArmyIndex = self:GetArmy()
+
+    for ArmyName,Army in ArmyTable do
+        if Army.ArmyIndex == ArmyIndex then
+            if Army.Human == true then
+                return true
+            else
+                return false
+            end
+
+        end
+    end
 
 
 end
@@ -1826,7 +1826,7 @@ function DoTeleportInDamage(unit)
             local MeshExtentsY = (bp.Physics.MeshExtentsY or 1)
             for k, v in templ do
                 CreateEmitterAtEntity(unit, army, v):OffsetEmitter(0, Yoffset, 0)
-            end		
+            end
 
             DamageArea( unit, unit:GetPosition(), dmgRadius, dmg, dmgType, dmgFriendly )
         end

@@ -13,25 +13,25 @@ function GetDistanceBetweenTwoEntities(entity1, entity2)
 end
 
 function GetEnemyUnitsInSphere(unit, position, radius)
-	local x1 = position.x - radius
-	local y1 = position.y - radius
-	local z1 = position.z - radius
-	local x2 = position.x + radius
-	local y2 = position.y + radius
-	local z2 = position.z + radius
-	local UnitsinRec = GetUnitsInRect( Rect(x1, z1, x2, z2) )
+    local x1 = position.x - radius
+    local y1 = position.y - radius
+    local z1 = position.z - radius
+    local x2 = position.x + radius
+    local y2 = position.y + radius
+    local z2 = position.z + radius
+    local UnitsinRec = GetUnitsInRect( Rect(x1, z1, x2, z2) )
     --Check for empty rectangle
-	if not UnitsinRec then
-		return UnitsinRec
-	end
-	local RadEntities = {}
+    if not UnitsinRec then
+        return UnitsinRec
+    end
+    local RadEntities = {}
     for k, v in UnitsinRec do
-		local dist = VDist3(position, v:GetPosition())
-		if (unit:GetArmy() ~= v:GetArmy()) and (dist <= radius) then
-			table.insert(RadEntities, v)
-		end
-	end
-	return RadEntities
+        local dist = VDist3(position, v:GetPosition())
+        if (unit:GetArmy() ~= v:GetArmy()) and (dist <= radius) then
+            table.insert(RadEntities, v)
+        end
+    end
+    return RadEntities
 end
 
 function GetDistanceBetweenTwoPoints(x1, y1, z1, x2, y2, z2)
@@ -74,7 +74,7 @@ function GetScaledDirectionVector( v1, v2, scale )
 end
 
 function GetMidPoint( v1, v2 )
-	return Vector( (v1.x + v2.x) * 0.5, (v1.y + v2.y) * 0.5, (v1.z + v2.z) * 0.5 )
+    return Vector( (v1.x + v2.x) * 0.5, (v1.y + v2.y) * 0.5, (v1.z + v2.z) * 0.5 )
 end
 
 function GetRandomFloat( nmin, nmax)
@@ -116,13 +116,13 @@ function GetClosestVector( vFrom, vToList )
         if( dist > cDist) then
             dist = cDist
             retVec = vTo
-        end 
+        end
     end
     return retVec
 end
 
 function Cross( v1, v2 )
-	return Vector( (v1.y * v2.z) - (v1.z * v2.y), (v1.z * v2.x) - (v1.x * v2.z ), (v1.x * v2.y) - (v1.y - v2.x))
+    return Vector( (v1.y * v2.z) - (v1.z * v2.y), (v1.z * v2.x) - (v1.x * v2.z ), (v1.x * v2.y) - (v1.y - v2.x))
 end
 
 function DotP( v1, v2 )

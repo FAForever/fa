@@ -1,7 +1,7 @@
 #****************************************************************************
 #**
 #**  File     :  /lua/seraphimweapons.lua
-#**  Author(s):  Greg Kohne, Gordon Duclos, 
+#**  Author(s):  Greg Kohne, Gordon Duclos,
 #**              Matt Vainio, Aaron Lundquist, Dru Staltman, Jessica St. Croix
 #**
 #**  Summary  :  Default definitions of Seraphim weapons
@@ -63,56 +63,56 @@ SIFExperimentalStrategicMissile = Class(DefaultProjectileWeapon) {
 }
 
 SDFPhasicAutoGunWeapon = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = EffectTemplate.PhasicAutoGunMuzzleFlash,
+    FxMuzzleFlash = EffectTemplate.PhasicAutoGunMuzzleFlash,
 }
 
 SDFHeavyPhasicAutoGunTankWeapon = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = EffectTemplate.HeavyPhasicAutoGunTankMuzzleFlash,
+    FxMuzzleFlash = EffectTemplate.HeavyPhasicAutoGunTankMuzzleFlash,
 }
 
 SDFHeavyPhasicAutoGunWeapon = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = EffectTemplate.HeavyPhasicAutoGunMuzzleFlash,
+    FxMuzzleFlash = EffectTemplate.HeavyPhasicAutoGunMuzzleFlash,
 }
-    
+
 SDFOhCannon = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = EffectTemplate.OhCannonMuzzleFlash,
+    FxMuzzleFlash = EffectTemplate.OhCannonMuzzleFlash,
 }
 
 SDFOhCannon02 = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = EffectTemplate.OhCannonMuzzleFlash02,
+    FxMuzzleFlash = EffectTemplate.OhCannonMuzzleFlash02,
 }
 
 SDFShriekerCannon = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = EffectTemplate.ShriekerCannonMuzzleFlash,
+    FxMuzzleFlash = EffectTemplate.ShriekerCannonMuzzleFlash,
 }
 
 # Units: XSL0111
 SIFLaanseTacticalMissileLauncher = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = EffectTemplate.SLaanseMissleMuzzleFlash,
+    FxMuzzleFlash = EffectTemplate.SLaanseMissleMuzzleFlash,
 }
 
 # Units: XSB2303
 SIFZthuthaamArtilleryCannon = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash= EffectTemplate.SZthuthaamArtilleryMuzzleFlash,
-	FxChargeMuzzleFlash= EffectTemplate.SZthuthaamArtilleryChargeMuzzleFlash,
+    FxMuzzleFlash= EffectTemplate.SZthuthaamArtilleryMuzzleFlash,
+    FxChargeMuzzleFlash= EffectTemplate.SZthuthaamArtilleryChargeMuzzleFlash,
 }
 
 # Units: XSL0303
 SDFThauCannon = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = EffectTemplate.STauCannonMuzzleFlash,
-	FxMuzzleTerrainTypeName = 'ThauTerrainMuzzle',
-	
-	PlayFxMuzzleSequence = function(self, muzzle)
-		DefaultProjectileWeapon.PlayFxMuzzleSequence(self, muzzle)
+    FxMuzzleFlash = EffectTemplate.STauCannonMuzzleFlash,
+    FxMuzzleTerrainTypeName = 'ThauTerrainMuzzle',
+
+    PlayFxMuzzleSequence = function(self, muzzle)
+        DefaultProjectileWeapon.PlayFxMuzzleSequence(self, muzzle)
         local pos = self.unit:GetPosition()
         local TerrainType = GetTerrainType( pos.x,pos.z )
-        local effectTable = TerrainType.FXOther[self.unit:GetCurrentLayer()][self.FxMuzzleTerrainTypeName] 
+        local effectTable = TerrainType.FXOther[self.unit:GetCurrentLayer()][self.FxMuzzleTerrainTypeName]
         if effectTable ~= nil then
-            local army = self.unit:GetArmy() 
-			for k, v in effectTable do
-				CreateAttachedEmitter(self.unit, muzzle, army, v)
-			end
-		end
+            local army = self.unit:GetArmy()
+            for k, v in effectTable do
+                CreateAttachedEmitter(self.unit, muzzle, army, v)
+            end
+        end
     end,
 }
 
@@ -128,19 +128,19 @@ SDFAireauBolterWeapon02 = Class(DefaultProjectileWeapon) {
 
 # Units: XSL0303
 SANUallCavitationTorpedo = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = EffectTemplate.SUallTorpedoMuzzleFlash
+    FxMuzzleFlash = EffectTemplate.SUallTorpedoMuzzleFlash
 }
 
 SANAnaitTorpedo = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = EffectTemplate.SAnaitTorpedoMuzzleFlash
+    FxMuzzleFlash = EffectTemplate.SAnaitTorpedoMuzzleFlash
 }
 
 SANHeavyCavitationTorpedo = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = EffectTemplate.SHeavyCavitationTorpedoMuzzleFlash
+    FxMuzzleFlash = EffectTemplate.SHeavyCavitationTorpedoMuzzleFlash
 }
 
 SANHeavyCavitationTorpedo02 = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = EffectTemplate.SHeavyCavitationTorpedoMuzzleFlash02
+    FxMuzzleFlash = EffectTemplate.SHeavyCavitationTorpedoMuzzleFlash02
 }
 
 SDFChronotronCannonWeapon = Class(DefaultProjectileWeapon) {
@@ -149,7 +149,7 @@ SDFChronotronCannonWeapon = Class(DefaultProjectileWeapon) {
 }
 
 SDFChronotronCannonOverChargeWeapon = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = EffectTemplate.SChronotronCannonOverChargeMuzzle,
+    FxMuzzleFlash = EffectTemplate.SChronotronCannonOverChargeMuzzle,
 }
 
 # Units: XSL0301
@@ -182,21 +182,21 @@ SAALosaareAutoCannonWeaponSeaUnit = Class(DefaultProjectileWeapon) {
 
 
 SDFAjelluAntiTorpedoDefense = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = EffectTemplate.SDFAjelluAntiTorpedoLaunch01,
+    FxMuzzleFlash = EffectTemplate.SDFAjelluAntiTorpedoLaunch01,
 }
 
 SIFThunthoCannonWeapon = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = EffectTemplate.SThunderStormCannonMuzzleFlash,
+    FxMuzzleFlash = EffectTemplate.SThunderStormCannonMuzzleFlash,
 }
 
 SIFSuthanusArtilleryCannon = Class(DefaultProjectileWeapon) {
-	FxChargeMuzzleFlash = EffectTemplate.SRifterArtilleryChargeMuzzleFlash,
-	FxMuzzleFlash = EffectTemplate.SRifterArtilleryMuzzleFlash,
+    FxChargeMuzzleFlash = EffectTemplate.SRifterArtilleryChargeMuzzleFlash,
+    FxMuzzleFlash = EffectTemplate.SRifterArtilleryMuzzleFlash,
 }
 
 SIFSuthanusMobileArtilleryCannon = Class(DefaultProjectileWeapon) {
-	FxChargeMuzzleFlash = EffectTemplate.SRifterMobileArtilleryChargeMuzzleFlash,
-	FxMuzzleFlash = EffectTemplate.SRifterMobileArtilleryMuzzleFlash,
+    FxChargeMuzzleFlash = EffectTemplate.SRifterMobileArtilleryChargeMuzzleFlash,
+    FxMuzzleFlash = EffectTemplate.SRifterMobileArtilleryMuzzleFlash,
 }
 
 SDFExperimentalPhasonLaser = Class(DefaultBeamWeapon) {
@@ -299,7 +299,7 @@ SAMElectrumMissileDefense = Class(DefaultProjectileWeapon) {
 }
 
 SDFBombOtheWeapon = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = EffectTemplate.SOtheBombMuzzleFlash,
+    FxMuzzleFlash = EffectTemplate.SOtheBombMuzzleFlash,
 }
 
 SIFBombZhanaseeWeapon = Class(DefaultProjectileWeapon) {
@@ -307,15 +307,15 @@ SIFBombZhanaseeWeapon = Class(DefaultProjectileWeapon) {
 }
 
 SDFHeavyQuarnonCannon = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = EffectTemplate.SHeavyQuarnonCannonMuzzleFlash,
+    FxMuzzleFlash = EffectTemplate.SHeavyQuarnonCannonMuzzleFlash,
 }
 
 SDFSniperShotNormalMode = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = EffectTemplate.SDFSniperShotNormalMuzzleFlash,
+    FxMuzzleFlash = EffectTemplate.SDFSniperShotNormalMuzzleFlash,
 }
 
 SDFSniperShotSniperMode = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = EffectTemplate.SDFSniperShotMuzzleFlash,
+    FxMuzzleFlash = EffectTemplate.SDFSniperShotMuzzleFlash,
 }
 
 SB0OhwalliExperimentalStrategicBombWeapon = Class( DefaultProjectileWeapon) {

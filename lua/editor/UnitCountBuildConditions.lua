@@ -14,11 +14,11 @@ local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local Utils = import('/lua/utilities.lua')
 
 ##############################################################################################################
-# function: HaveEqualToUnitsWithCategory = BuildCondition	doc = "Please work function docs."
+# function: HaveEqualToUnitsWithCategory = BuildCondition    doc = "Please work function docs."
 #
-# parameter 0: string	aiBrain		= "default_brain"
-# parameter 1: int      numReq     	= 0					doc = "docs for param1"
-# parameter 2: expr   category        = categories.ALLUNITS			doc = "param2 docs"
+# parameter 0: string    aiBrain        = "default_brain"
+# parameter 1: int      numReq         = 0                    doc = "docs for param1"
+# parameter 2: expr   category        = categories.ALLUNITS            doc = "param2 docs"
 # parameter 3: bool   idleReq       = false         doc = "docs for param3"
 #
 ##############################################################################################################
@@ -40,11 +40,11 @@ function HaveEqualToUnitsWithCategory(aiBrain, numReq, category, idleReq)
 end
 
 ##############################################################################################################
-# function: HaveGreaterThanUnitsWithCategory = BuildCondition	doc = "Please work function docs."
+# function: HaveGreaterThanUnitsWithCategory = BuildCondition    doc = "Please work function docs."
 #
-# parameter 0: string   aiBrain		    = "default_brain"
-# parameter 1: int      numReq     = 0					doc = "docs for param1"
-# parameter 2: expr   category        = categories.ALLUNITS		doc = "param2 docs"
+# parameter 0: string   aiBrain            = "default_brain"
+# parameter 1: int      numReq     = 0                    doc = "docs for param1"
+# parameter 2: expr   category        = categories.ALLUNITS        doc = "param2 docs"
 # parameter 3: expr   idleReq       = false         doc = "docs for param3"
 #
 ##############################################################################################################
@@ -66,11 +66,11 @@ function HaveGreaterThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
 end
 
 ##############################################################################################################
-# function: HaveLessThanUnitsWithCategory = BuildCondition	doc = "Please work function docs."
+# function: HaveLessThanUnitsWithCategory = BuildCondition    doc = "Please work function docs."
 #
-# parameter 0: string	aiBrain		= "default_brain"
-# parameter 1: int	numReq          = 0				doc = "docs for param1"
-# parameter 2: expr   category        = categories.ALLUNITS		doc = "param2 docs"
+# parameter 0: string    aiBrain        = "default_brain"
+# parameter 1: int    numReq          = 0                doc = "docs for param1"
+# parameter 2: expr   category        = categories.ALLUNITS        doc = "param2 docs"
 # parameter 3: expr   idleReq       = false         doc = "docs for param3"
 #
 ##############################################################################################################
@@ -92,11 +92,11 @@ function HaveLessThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
 end
 
 ##############################################################################################################
-# function: HaveLessThanUnitsWithCategoryInArea = BuildCondition	doc = "Please work function docs."
+# function: HaveLessThanUnitsWithCategoryInArea = BuildCondition    doc = "Please work function docs."
 #
-# parameter 0: string	aiBrain	        = "default_brain"
-# parameter 1: int      numReq          = 0				doc = "docs for param1"
-# parameter 2: expr   category        = categories.ALLUNITS		doc = "param2 docs"
+# parameter 0: string    aiBrain            = "default_brain"
+# parameter 1: int      numReq          = 0                doc = "docs for param1"
+# parameter 2: expr   category        = categories.ALLUNITS        doc = "param2 docs"
 # parameter 3: string   area            = "Area_1"
 #
 ##############################################################################################################
@@ -109,10 +109,10 @@ function HaveLessThanUnitsWithCategoryInArea(aiBrain, numReq, category, area)
 end
 
 ##############################################################################################################
-# function: NumUnitsLessNearBase = BuildCondition	doc = "Please work function docs."
+# function: NumUnitsLessNearBase = BuildCondition    doc = "Please work function docs."
 #
-# parameter 0: string	aiBrain         = "default_brain"
-# parameter 1: string	baseName        = "MAIN"			doc = "docs for param1"
+# parameter 0: string    aiBrain         = "default_brain"
+# parameter 1: string    baseName        = "MAIN"            doc = "docs for param1"
 # parameter 2: expr   category        = categories.ALLUNITS
 # parameter 3: int      num             = 1
 #
@@ -139,10 +139,10 @@ end
 
 
 ##############################################################################################################
-# function: HaveLessThanUnitComparison = BuildCondition	doc = "Check to see if the number of units in category 1 is less than the number of units in category 2"
+# function: HaveLessThanUnitComparison = BuildCondition    doc = "Check to see if the number of units in category 1 is less than the number of units in category 2"
 #
-# parameter 0: string	aiBrain		= "default_brain"
-# parameter 1: expr	category1    = categories.ALLUNITS       doc = "Category of units to compare"
+# parameter 0: string    aiBrain        = "default_brain"
+# parameter 1: expr    category1    = categories.ALLUNITS       doc = "Category of units to compare"
 # parameter 2: expr     category2    = categories.ALLUNITS       doc = "Category of units to compare against"
 #
 ##############################################################################################################
@@ -164,10 +164,10 @@ function HaveLessThanUnitComparison(aiBrain, category1, category2)
 end
 
 ##############################################################################################################
-# function: HaveGreaterThanUnitComparison = BuildCondition	doc = "Check to see if the number of units in category 1 is greater than the number of units in category 2"
+# function: HaveGreaterThanUnitComparison = BuildCondition    doc = "Check to see if the number of units in category 1 is greater than the number of units in category 2"
 #
-# parameter 0: string	aiBrain		= "default_brain"
-# parameter 1: expr	category1    = categories.ALLUNITS       doc = "Category of units to compare"
+# parameter 0: string    aiBrain        = "default_brain"
+# parameter 1: expr    category1    = categories.ALLUNITS       doc = "Category of units to compare"
 # parameter 2: expr     category2    = categories.ALLUNITS       doc = "Category of units to compare against"
 #
 ##############################################################################################################
@@ -189,11 +189,11 @@ function HaveGreaterThanUnitComparison(aiBrain, category1, category2)
 end
 
 ##############################################################################################################
-# function: HaveLessThanVarTableUnitsWithCategory = BuildCondition	doc = "Please work function docs."
+# function: HaveLessThanVarTableUnitsWithCategory = BuildCondition    doc = "Please work function docs."
 #
-# parameter 0: string	aiBrain		= "default_brain"
-# parameter 1: string	varName     = "VarName"     			doc = "VarTable Name"
-# parameter 2: expr     category    = categories.ALLUNITS		doc = "param2 docs"
+# parameter 0: string    aiBrain        = "default_brain"
+# parameter 1: string    varName     = "VarName"                 doc = "VarTable Name"
+# parameter 2: expr     category    = categories.ALLUNITS        doc = "param2 docs"
 #
 ##############################################################################################################
 function HaveLessThanVarTableUnitsWithCategory(aiBrain, varName, category)
@@ -211,11 +211,11 @@ function HaveLessThanVarTableUnitsWithCategory(aiBrain, varName, category)
 end
 
 ##############################################################################################################
-# function: HaveGreaterThanVarTableUnitsWithCategory = BuildCondition	doc = "Please work function docs."
+# function: HaveGreaterThanVarTableUnitsWithCategory = BuildCondition    doc = "Please work function docs."
 #
-# parameter 0: string	aiBrain		= "default_brain"
-# parameter 1: string	varName     = "VarName"     			doc = "VarTable Name"
-# parameter 2: expr     category    = categories.ALLUNITS		doc = "param2 docs"
+# parameter 0: string    aiBrain        = "default_brain"
+# parameter 1: string    varName     = "VarName"                 doc = "VarTable Name"
+# parameter 2: expr     category    = categories.ALLUNITS        doc = "param2 docs"
 #
 ##############################################################################################################
 function HaveGreaterThanVarTableUnitsWithCategory(aiBrain, varName, category)
@@ -232,11 +232,11 @@ function HaveGreaterThanVarTableUnitsWithCategory(aiBrain, varName, category)
     return false
 end
 ##############################################################################################################
-# function: HaveLessThanVarTableUnitsWithCategoryInArea = BuildCondition	doc = "Please work function docs."
+# function: HaveLessThanVarTableUnitsWithCategoryInArea = BuildCondition    doc = "Please work function docs."
 #
-# parameter 0: string	aiBrain		= "default_brain"
-# parameter 1: string	varName     = "VarName"     			doc = "VarTable Name"
-# parameter 2: expr     category    = categories.ALLUNITS		doc = "param2 docs"
+# parameter 0: string    aiBrain        = "default_brain"
+# parameter 1: string    varName     = "VarName"                 doc = "VarTable Name"
+# parameter 2: expr     category    = categories.ALLUNITS        doc = "param2 docs"
 # parameter 3: string   area            = "Area_1"
 #
 ##############################################################################################################
@@ -254,11 +254,11 @@ function HaveLessThanVarTableUnitsWithCategoryInArea(aiBrain, varName, category,
     return false
 end
 ##############################################################################################################
-# function: HaveGreaterThanVarTableUnitsWithCategoryInArea = BuildCondition	doc = "Please work function docs."
+# function: HaveGreaterThanVarTableUnitsWithCategoryInArea = BuildCondition    doc = "Please work function docs."
 #
-# parameter 0: string	aiBrain		= "default_brain"
-# parameter 1: string	varName     = "VarName"     			doc = "VarTable Name"
-# parameter 2: expr     category    = categories.ALLUNITS		doc = "param2 docs"
+# parameter 0: string    aiBrain        = "default_brain"
+# parameter 1: string    varName     = "VarName"                 doc = "VarTable Name"
+# parameter 2: expr     category    = categories.ALLUNITS        doc = "param2 docs"
 # parameter 3: string   area            = "Area_1"
 #
 ##############################################################################################################
@@ -277,11 +277,11 @@ function HaveGreaterThanVarTableUnitsWithCategoryInArea(aiBrain, varName, catego
 end
 
 ##############################################################################################################
-# function: HaveGreaterThanUnitsInCategoryBeingBuilt = BuildCondition	doc = "Please work function docs."
+# function: HaveGreaterThanUnitsInCategoryBeingBuilt = BuildCondition    doc = "Please work function docs."
 #
-# parameter 0: string	aiBrain		= "default_brain"
-# parameter 1: int      numReq     	= 0					doc = "docs for param1"
-# parameter 2: expr   category        = categories.ALLUNITS			doc = "param2 docs"
+# parameter 0: string    aiBrain        = "default_brain"
+# parameter 1: int      numReq         = 0                    doc = "docs for param1"
+# parameter 2: expr   category        = categories.ALLUNITS            doc = "param2 docs"
 #
 ##############################################################################################################
 function HaveGreaterThanUnitsInCategoryBeingBuilt(aiBrain, numReq, category, constructionCat)
@@ -301,7 +301,7 @@ function HaveGreaterThanUnitsInCategoryBeingBuilt(aiBrain, numReq, category, con
     else
         numUnits = aiBrain:NumCurrentlyBuilding(cat, cat + categories.CONSTRUCTION)
     end
-    
+
     if numUnits > numReq then
         return true
     end
@@ -310,50 +310,50 @@ end
 
 
 ##############################################################################################################
-# function: HaveLessThanUnitsInCategoryBeingBuilt = BuildCondition	doc = "Please work function docs."
+# function: HaveLessThanUnitsInCategoryBeingBuilt = BuildCondition    doc = "Please work function docs."
 #
-# parameter 0: string	aiBrain		= "default_brain"
-# parameter 1: int      numReq     	= 0					doc = "docs for param1"
-# parameter 2: expr   category        = categories.ALLUNITS			doc = "param2 docs"
+# parameter 0: string    aiBrain        = "default_brain"
+# parameter 1: int      numReq         = 0                    doc = "docs for param1"
+# parameter 2: expr   category        = categories.ALLUNITS            doc = "param2 docs"
 #
 ##############################################################################################################
 function HaveLessThanUnitsInCategoryBeingBuilt(aiBrain, numunits, category)
     #DUNCAN - rewritten, credit to Sorian
-	if type(category) == 'string' then
+    if type(category) == 'string' then
         category = ParseEntityCategory(category)
     end
-	
+
     local unitsBuilding = aiBrain:GetListOfUnits( categories.CONSTRUCTION, false )
-	local numBuilding = 0
+    local numBuilding = 0
     for unitNum, unit in unitsBuilding do
         if not unit:BeenDestroyed() and unit:IsUnitState('Building') then
             local buildingUnit = unit:GetUnitBeingBuilt()
             if buildingUnit and not buildingUnit:IsDead() and EntityCategoryContains( category, buildingUnit ) then
-				numBuilding = numBuilding + 1	
+                numBuilding = numBuilding + 1
             end
         end
-		#DUNCAN - added to pick up engineers that havent started building yet... does it work?
-		if not unit:BeenDestroyed() and not unit:IsUnitState('Building') then
-			local buildingUnit = unit:GetUnitBeingBuilt()
+        #DUNCAN - added to pick up engineers that havent started building yet... does it work?
+        if not unit:BeenDestroyed() and not unit:IsUnitState('Building') then
+            local buildingUnit = unit:GetUnitBeingBuilt()
             if buildingUnit and not buildingUnit:IsDead() and EntityCategoryContains( category, buildingUnit ) then
-				#LOG('Engi building but not in building state...')
-				numBuilding = numBuilding + 1	
+                #LOG('Engi building but not in building state...')
+                numBuilding = numBuilding + 1
             end
-		end
-		if numunits <= numBuilding then
-			return false
-		end
+        end
+        if numunits <= numBuilding then
+            return false
+        end
     end
-	if numunits > numBuilding then
-		return true
-	end
-	return false
+    if numunits > numBuilding then
+        return true
+    end
+    return false
 end
 
 ##############################################################################################################
-# function: HaveLessThanUnitsAroundMarkerCategory = BuildCondition	doc = "Please work function docs."
+# function: HaveLessThanUnitsAroundMarkerCategory = BuildCondition    doc = "Please work function docs."
 #
-# parameter 0: string	aiBrain		= "default_brain"
+# parameter 0: string    aiBrain        = "default_brain"
 # parameter 1: string   markerType  = "Mass"
 # parameter 2: int      markerRadius = 50
 # parameter 3: string   locationType = "MAIN"
@@ -427,7 +427,7 @@ function DefensivePointNeedsStructure( aiBrain, locationType, locationRadius, ca
     if pos then
         return true
     end
-    return false    
+    return false
 end
 
 function NavalDefensivePointNeedsStructure( aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType )
@@ -435,7 +435,7 @@ function NavalDefensivePointNeedsStructure( aiBrain, locationType, locationRadiu
     if pos then
         return true
     end
-    return false    
+    return false
 end
 
 function HaveAreaWithUnitsFewWalls( aiBrain, locationType, locationRadius, unitCount, unitCategory, threatMin, threatMax, threatRings, threatType )
@@ -472,12 +472,12 @@ end
 
 
 ##############################################################################################################
-# function: HaveUnitsWithCategoryAndAlliance = BuildCondition	doc = "Please work function docs."
+# function: HaveUnitsWithCategoryAndAlliance = BuildCondition    doc = "Please work function docs."
 #
-# parameter 0: string   aiBrain		    = "default_brain"
+# parameter 0: string   aiBrain            = "default_brain"
 # parameter 1: bool   greater           = true          doc = "true = greater, false = less"
-# parameter 2: int    numReq     = 0					doc = "docs for param1"
-# parameter 3: expr   category        = categories.ALLUNITS		doc = "param2 docs"
+# parameter 2: int    numReq     = 0                    doc = "docs for param1"
+# parameter 3: expr   category        = categories.ALLUNITS        doc = "param2 docs"
 # parameter 4: expr   alliance       = false         doc = "docs for param3"
 #
 ##############################################################################################################
@@ -679,12 +679,12 @@ function LocationFactoriesBuildingComparison(aiBrain, locationType, unitCount, u
         WARN('*AI WARNING: LocationFactoriesBuildingComparison - Invalid location - ' .. locationType)
         return false
     end
-    
+
     local testFac = facCat or categories.ALLUNITS
     if type(facCat) == 'string' then
         testFac = ParseEntityCategory(facCat)
     end
-    
+
     local numUnits = factoryManager:GetNumCategoryBeingBuilt(testCat, testFac)
     return CompareBody(numUnits, unitCount, compareType)
 end
@@ -710,12 +710,12 @@ function LocationEngineersBuildingComparison(aiBrain, locationType, unitCount, u
         WARN('*AI WARNING: LocationEngineersBuildingComparison - Invalid location - ' .. locationType)
         return false
     end
-    
+
     local engCat = engCat or categories.ALLUNITS
     if type(engCat) == 'string' then
         engCat = ParseEntityCategory(engCat)
     end
-    
+
     local numUnits = engineerManager:GetNumCategoryBeingBuilt(testCat, engCat)
     return CompareBody(numUnits, unitCount, compareType)
 end
@@ -741,12 +741,12 @@ function LocationEngineersBuildingAssistanceComparison(aiBrain, locationType, un
         WARN('*AI WARNING: LocationEngineersBuildingAssistanceComparison - Invalid location - ' .. locationType)
         return false
     end
-    
+
     local engCat = engCat or categories.ALLUNITS
     if type(engCat) == 'string' then
         engCat = ParseEntityCategory(engCat)
     end
-    
+
     local numUnits = table.getn( engineerManager:GetEngineersWantingAssistance(testCat, engCat) )
     return CompareBody(numUnits, 0, compareType)
 end
@@ -783,7 +783,7 @@ function FactoryCapCheck(aiBrain, locationType, factoryType)
     end
     local numUnits = factoryManager:GetNumCategoryFactories(catCheck)
     numUnits = numUnits + aiBrain:GetEngineerManagerUnitsBeingBuilt(catCheck)
-    
+
     if numUnits < aiBrain.BuilderManagers[locationType].BaseSettings.FactoryCount[factoryType] then
         return true
     end
@@ -833,12 +833,12 @@ function AdjacencyCheck( aiBrain, locationType, category, radius, testUnit )
     if type(category) == 'string' then
         testCat = ParseEntityCategory(category)
     end
-    
+
     local reference  = AIUtils.GetOwnUnitsAroundPoint( aiBrain, testCat, factoryManager:GetLocationCoords(), radius )
-    if not reference or table.getn(reference) == 0 then 
-	    return false
-	end
-    
+    if not reference or table.getn(reference) == 0 then
+        return false
+    end
+
     local template = {}
     local unitSize = aiBrain:GetUnitBlueprint( testUnit ).Physics
     for k,v in reference do
@@ -863,7 +863,7 @@ function AdjacencyCheck( aiBrain, locationType, category, radius, testUnit )
             end
         end
     end
-    
+
     for k,v in template do
         if aiBrain:CanBuildStructureAt(testUnit, { v[1], 0, v[2] } ) then
             return true
@@ -904,7 +904,7 @@ end
 #     Unit Cap
 # ================ #
 function UnitCapCheckGreater(aiBrain, percent)
-    local currentCount = GetArmyUnitCostTotal(aiBrain:GetArmyIndex()) 
+    local currentCount = GetArmyUnitCostTotal(aiBrain:GetArmyIndex())
     local cap = GetArmyUnitCap(aiBrain:GetArmyIndex())
     if ( currentCount / cap ) > percent then
         return true
@@ -913,7 +913,7 @@ function UnitCapCheckGreater(aiBrain, percent)
 end
 
 function UnitCapCheckLess(aiBrain, percent)
-    local currentCount = GetArmyUnitCostTotal(aiBrain:GetArmyIndex()) 
+    local currentCount = GetArmyUnitCostTotal(aiBrain:GetArmyIndex())
     local cap = GetArmyUnitCap(aiBrain:GetArmyIndex())
     if ( currentCount / cap ) < percent then
         return true
@@ -939,13 +939,13 @@ function CheckUnitRange(aiBrain, locationType, unitType, category, factionIndex)
         WARN('*AI ERROR: Invalid building type - ' .. unitType)
         return false
     end
-    
+
     local bp = GetUnitBlueprintByName(buildingId)
     if not bp.Economy.BuildTime or not bp.Economy.BuildCostMass then
         WARN('*AI ERROR: Unit for EconomyCheckStructure is missing blueprint values - ' .. unitType )
         return false
     end
-    
+
     local range = false
     for k,v in bp.Weapon do
         if not range or v.MaxRadius > range then
@@ -956,12 +956,12 @@ function CheckUnitRange(aiBrain, locationType, unitType, category, factionIndex)
         WARN('*AI ERROR: No MaxRadius for unit type - ' .. unitType)
         return false
     end
-    
+
     local basePosition = aiBrain:GetLocationPosition(locationType)
-    
+
     # Check around basePosition for StructureThreat
     local unit = AIUtils.AIFindBrainTargetAroundPoint( aiBrain, basePosition, range, category )
-    
+
     if unit then
         return true
     end
@@ -974,13 +974,13 @@ function UnitToExpansionsValue(aiBrain, unitCategory, compareType, large, small,
     needCount = needCount + ( aiBrain:GetManagerCount('Expansion Area') * small )
 
     needCount = needCount + ( aiBrain:GetManagerCount('Naval Area') * naval )
-    
+
     local testCat = unitCategory
     if type(testCat) == 'string' then
         testCat = ParseEntityCategory(unitCategory)
     end
     local unitCount = aiBrain:GetCurrentUnits(testCat)
-    
+
     return CompareBody(unitCount, needCount, compareType)
 end
 
@@ -989,60 +989,60 @@ function UnitsGreaterThanExpansionValue(aiBrain, unitCategory, large, small, nav
 end
 
 function ExpansionBaseCheck(aiBrain)
-	local ArmyCount = 0
-	for index,brain in ArmyBrains do
+    local ArmyCount = 0
+    for index,brain in ArmyBrains do
         if not brain:IsDefeated() and not ArmyIsCivilian(brain:GetArmyIndex()) then
-			ArmyCount = ArmyCount + 1
-		end
-	end
-	
-	local checkNum = tonumber(ScenarioInfo.Options.LandExpansionsAllowed) or 3
-	
-	#LOG('AI brains is ' .. ArmyCount)
-	if ArmyCount >= 4 or ScenarioInfo.name == 'Seton\'s Clutch' then 
-		return ExpansionBaseCount(aiBrain, '<', 1)	
-	elseif ArmyCount > 2 then
-		return ExpansionBaseCount(aiBrain, '<', 2)
-	else 
-		return ExpansionBaseCount(aiBrain, '<', checkNum) 
-	end
+            ArmyCount = ArmyCount + 1
+        end
+    end
+
+    local checkNum = tonumber(ScenarioInfo.Options.LandExpansionsAllowed) or 3
+
+    #LOG('AI brains is ' .. ArmyCount)
+    if ArmyCount >= 4 or ScenarioInfo.name == 'Seton\'s Clutch' then
+        return ExpansionBaseCount(aiBrain, '<', 1)
+    elseif ArmyCount > 2 then
+        return ExpansionBaseCount(aiBrain, '<', 2)
+    else
+        return ExpansionBaseCount(aiBrain, '<', checkNum)
+    end
 end
 
 function NavalBaseCheck(aiBrain)
-	local ArmyCount = 0
-	for index,brain in ArmyBrains do
+    local ArmyCount = 0
+    for index,brain in ArmyBrains do
         if not brain:IsDefeated() and not ArmyIsCivilian(brain:GetArmyIndex()) then
-			ArmyCount = ArmyCount + 1
-		end
-	end
-	
-	local checkNum = tonumber(ScenarioInfo.Options.NavalExpansionsAllowed) or 2
-	
-	#LOG('AI brains is ' .. ArmyCount)
-	if ArmyCount >= 4 or ScenarioInfo.name == 'Seton\'s Clutch' then 
-		return NavalBaseCount(aiBrain, '<', 1)	
-	elseif ArmyCount > 2 then
-		return NavalBaseCount(aiBrain, '<', 2)
-	else 
-		return NavalBaseCount(aiBrain, '<', checkNum) 
-	end
+            ArmyCount = ArmyCount + 1
+        end
+    end
+
+    local checkNum = tonumber(ScenarioInfo.Options.NavalExpansionsAllowed) or 2
+
+    #LOG('AI brains is ' .. ArmyCount)
+    if ArmyCount >= 4 or ScenarioInfo.name == 'Seton\'s Clutch' then
+        return NavalBaseCount(aiBrain, '<', 1)
+    elseif ArmyCount > 2 then
+        return NavalBaseCount(aiBrain, '<', 2)
+    else
+        return NavalBaseCount(aiBrain, '<', checkNum)
+    end
 end
 
-#DUNCAN - added to limit expansion bases. 
+#DUNCAN - added to limit expansion bases.
 function ExpansionBaseCount(aiBrain, compareType, checkNum)
        local expBaseCount = aiBrain:GetManagerCount('Start Location')
-       expBaseCount = expBaseCount + aiBrain:GetManagerCount('Expansion Area')  
-	   #LOG('*AI DEBUG: Expansion base count is ' .. expBaseCount .. ' checkNum is ' .. checkNum)
-	   if expBaseCount > checkNum + 1 then
-			#LOG('*AI DEBUG: Expansion base count is ' .. expBaseCount .. ' checkNum is ' .. checkNum)
-	   end
+       expBaseCount = expBaseCount + aiBrain:GetManagerCount('Expansion Area')
+       #LOG('*AI DEBUG: Expansion base count is ' .. expBaseCount .. ' checkNum is ' .. checkNum)
+       if expBaseCount > checkNum + 1 then
+            #LOG('*AI DEBUG: Expansion base count is ' .. expBaseCount .. ' checkNum is ' .. checkNum)
+       end
        return CompareBody(expBaseCount, checkNum, compareType)
 end
 
-#DUNCAN - added to limit naval bases. 
+#DUNCAN - added to limit naval bases.
 function NavalBaseCount(aiBrain, compareType, checkNum)
-       local expBaseCount = aiBrain:GetManagerCount('Naval Area')  
-	   #LOG('*AI DEBUG: Naval base count is ' .. expBaseCount .. ' checkNum is ' .. checkNum)
+       local expBaseCount = aiBrain:GetManagerCount('Naval Area')
+       #LOG('*AI DEBUG: Naval base count is ' .. expBaseCount .. ' checkNum is ' .. checkNum)
        return CompareBody(expBaseCount, checkNum, compareType)
 end
 
@@ -1098,13 +1098,13 @@ function UnitsNeedGuard(aiBrain, category)
     if type(category) == 'string' then
         testCat = ParseEntityCategory(category)
     end
-	
-	local units = aiBrain:GetListOfUnits( testCat  , false )
-	for k,v in units do
-		if not v.BeingAirGuarded and not v.BeingLandGuarded then 
-			return true
-		end
-	end	
+
+    local units = aiBrain:GetListOfUnits( testCat  , false )
+    for k,v in units do
+        if not v.BeingAirGuarded and not v.BeingLandGuarded then
+            return true
+        end
+    end
 
     return false
 end
@@ -1118,51 +1118,51 @@ function T4BuildingCheck(aiBrain)
 end
 
 function DamagedStructuresInArea(aiBrain, locationtype)
-	local engineerManager = aiBrain.BuilderManagers[locationtype].EngineerManager
+    local engineerManager = aiBrain.BuilderManagers[locationtype].EngineerManager
     if not engineerManager then
         return false
     end
     local Structures = AIUtils.GetOwnUnitsAroundPoint( aiBrain, categories.STRUCTURE - (categories.TECH1 - categories.FACTORY), engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius() )
     for k,v in Structures do
         if not v:IsDead() and v:GetHealthPercent() < .8 then
-		#LOG('*AI DEBUG: DamagedStructuresInArea return true')
-			return true
+        #LOG('*AI DEBUG: DamagedStructuresInArea return true')
+            return true
         end
     end
-	#LOG('*AI DEBUG: DamagedStructuresInArea return false')
+    #LOG('*AI DEBUG: DamagedStructuresInArea return false')
     return false
 end
 
-function UnfinishedUnits(aiBrain, locationType, category)	
-	local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
+function UnfinishedUnits(aiBrain, locationType, category)
+    local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     if not engineerManager then
         return false
     end
-	local unfinished = aiBrain:GetUnitsAroundPoint( category, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius(), 'Ally' )
-	for num, unit in unfinished do
-		donePercent = unit:GetFractionComplete()
-		if donePercent < 1 and GetGuards(aiBrain, unit) < 1 then
-			return true
-		end
-	end
-	return false
+    local unfinished = aiBrain:GetUnitsAroundPoint( category, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius(), 'Ally' )
+    for num, unit in unfinished do
+        donePercent = unit:GetFractionComplete()
+        if donePercent < 1 and GetGuards(aiBrain, unit) < 1 then
+            return true
+        end
+    end
+    return false
 end
 
 function GetGuards(aiBrain, Unit)
-	local engs = aiBrain:GetUnitsAroundPoint( categories.ENGINEER, Unit:GetPosition(), 10, 'Ally' )
-	local count = 0
-	local UpgradesFrom = Unit:GetBlueprint().General.UpgradesFrom
-	for k,v in engs do
-		if v:GetUnitBeingBuilt() == Unit then
-			count = count + 1
-		end
-	end
-	if UpgradesFrom and UpgradesFrom ~= 'none' then -- Used to filter out upgrading units
-		local oldCat = ParseEntityCategory(UpgradesFrom)
-		local oldUnit = aiBrain:GetUnitsAroundPoint( oldCat, Unit:GetPosition(), 0, 'Ally' )
-		if oldUnit then
-			count = count + 1
-		end
-	end
-	return count
+    local engs = aiBrain:GetUnitsAroundPoint( categories.ENGINEER, Unit:GetPosition(), 10, 'Ally' )
+    local count = 0
+    local UpgradesFrom = Unit:GetBlueprint().General.UpgradesFrom
+    for k,v in engs do
+        if v:GetUnitBeingBuilt() == Unit then
+            count = count + 1
+        end
+    end
+    if UpgradesFrom and UpgradesFrom ~= 'none' then -- Used to filter out upgrading units
+        local oldCat = ParseEntityCategory(UpgradesFrom)
+        local oldUnit = aiBrain:GetUnitsAroundPoint( oldCat, Unit:GetPosition(), 0, 'Ally' )
+        if oldUnit then
+            count = count + 1
+        end
+    end
+    return count
 end

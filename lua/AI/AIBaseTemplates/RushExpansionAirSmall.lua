@@ -14,7 +14,7 @@ BaseBuilderTemplate {
         # Factory upgrades
         'T1BalancedUpgradeBuildersExpansion',
         'T2BalancedUpgradeBuildersExpansion',
-        
+
         # Engineer Builders
         'EngineerFactoryBuilders',
         'T1EngineerBuilders',
@@ -23,11 +23,11 @@ BaseBuilderTemplate {
         'EngineerFactoryConstruction',
         'EngineerFactoryConstructionAirHigherPriority',
         'AirInitialFactoryConstruction',
-        
+
         # Build Mass low pri at this base
         'EngineerMassBuildersLowerPri',
-		
-		# ==== UNIT CAP BUILDERS ==== #
+
+        # ==== UNIT CAP BUILDERS ==== #
         'UnitCapAirAttackFormBuilders',
         'UnitCapLandAttackFormBuilders',
 
@@ -37,9 +37,9 @@ BaseBuilderTemplate {
         'T3AirFactoryBuilders',
         'FrequentAirAttackFormBuilders',
         'MassHunterAirFormBuilders',
-        
+
         'ACUHunterAirFormBuilders',
-                
+
         'T1AntiAirBuilders',
         'T2AntiAirBuilders',
         'T3AntiAirBuilders',
@@ -52,14 +52,14 @@ BaseBuilderTemplate {
             Tech3 = 8,
             SCU = 1,
         },
-        
+
         FactoryCount = {
             Land = 0, #DUNCAN - was 0
             Air = 3, #DUNCAN - was 5
             Sea = 0,
             Gate = 0,
         },
-        
+
         MassToFactoryValues = {
             T1Value = 6,
             T2Value = 15,
@@ -72,7 +72,7 @@ BaseBuilderTemplate {
         if markerType ~= 'Expansion Area' then
             return 0
         end
-        
+
         local personality = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
         if not( personality == 'adaptive' or personality == 'rushair' ) then
             return 0
@@ -89,7 +89,7 @@ BaseBuilderTemplate {
         else # within 250
             return 10
         end
-        
+
         return 0
     end,
 }

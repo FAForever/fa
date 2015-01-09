@@ -14,7 +14,7 @@ BaseBuilderTemplate {
         # Factory upgrades
         'T1BalancedUpgradeBuildersExpansion',
         'T2BalancedUpgradeBuildersExpansion',
-        
+
         # Engineer Builders
         'EngineerFactoryBuilders',
         'T1EngineerBuilders',
@@ -23,18 +23,18 @@ BaseBuilderTemplate {
         'EngineerFactoryConstruction',
         'EngineerFactoryConstructionAirHigherPriority',
         'AirInitialFactoryConstruction',
-        
+
         # Build Mass low pri at this base
         'EngineerMassBuildersLowerPri',
-        
+
         # Build some power, but not much
         'EngineerEnergyBuildersExpansions',
-        
+
         # ==== EXPANSION ==== #
-		#DUNCAN - expansions dont build more expansions!
+        #DUNCAN - expansions dont build more expansions!
         #'EngineerExpansionBuildersFull',
         #'EngineerExpansionBuildersSmall',
-        
+
         # ==== DEFENSES ==== #
         'T1LightDefenses',
         'T2LightDefenses',
@@ -43,12 +43,12 @@ BaseBuilderTemplate {
         'T2MissileDefenses',
         'T3NukeDefenses',
         'T3NukeDefenseBehaviors',
-        
+
         'MiscDefensesEngineerBuilders',
-        
+
         # ==== NAVAL EXPANSION ==== #
         'NavalExpansionBuilders',
-        
+
         # ==== LAND UNIT BUILDERS ==== #
         'T1LandFactoryBuilders',
         'T2LandFactoryBuilders',
@@ -56,15 +56,15 @@ BaseBuilderTemplate {
         'FrequentLandAttackFormBuilders',
         'MassHunterLandFormBuilders',
         'MiscLandFormBuilders',
-        
+
         'T1LandAA',
         'T2LandAA',
 
         'T1ReactionDF',
         'T2ReactionDF',
         'T3ReactionDF',
-		
-		# ==== UNIT CAP BUILDERS ==== #
+
+        # ==== UNIT CAP BUILDERS ==== #
         'UnitCapAirAttackFormBuilders',
         'UnitCapLandAttackFormBuilders',
 
@@ -74,29 +74,29 @@ BaseBuilderTemplate {
         'T3AirFactoryBuilders',
         'BigAirAttackFormBuilders',
         'MassHunterAirFormBuilders',
-        
+
         'ACUHunterAirFormBuilders',
-        
+
         #'TransportFactoryBuilders', #DUNCAN - taked out
-        
+
         'T1AntiAirBuilders',
         'T2AntiAirBuilders',
         'T3AntiAirBuilders',
         'BaseGuardAirFormBuilders',
-        
+
         'MobileAirExperimentalEngineers',
         'MobileAirExperimentalForm',
     },
     NonCheatBuilders = {
         'AirScoutFactoryBuilders',
         'AirScoutFormBuilders',
-        
+
         'LandScoutFactoryBuilders',
         'LandScoutFormBuilders',
-        
+
         'RadarEngineerBuilders',
         'RadarUpgradeBuildersExpansion',
-        
+
         'CounterIntelBuilders',
     },
     BaseSettings = {
@@ -122,7 +122,7 @@ BaseBuilderTemplate {
         if markerType ~= 'Start Location' then
             return 0
         end
-        
+
         local personality = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
         if not( personality == 'adaptive' or personality == 'rushair' ) then
             return 0
@@ -139,7 +139,7 @@ BaseBuilderTemplate {
         else # within 250
             return 10
         end
-        
+
         return 0
     end,
 }

@@ -236,9 +236,9 @@ local function createPlayerTeamAssignmentMatrix(teamAssignmentsList, totalPlayer
     local totalPreviousPlayers = 0
 
     local teamAssignmentsListCount = table.getn(teamAssignmentsList:getTeams())
-         
+
     local currentColumn = 1
-             
+
     for i = 1, teamAssignmentsListCount - 1 do
         local currentTeam = teamAssignmentsList:getTeam(i)
 
@@ -433,36 +433,36 @@ end
 
 function computeQuality(team)
 
-	local skillsMatrix = getPlayerCovarianceMatrix(team)
+    local skillsMatrix = getPlayerCovarianceMatrix(team)
 
-	local meanVector = getPlayerMeansVector(team)
+    local meanVector = getPlayerMeansVector(team)
 
-	local meanVectorTranspose = meanVector:transpose()
+    local meanVectorTranspose = meanVector:transpose()
 
-	local playerTeamAssignmentsMatrix = createPlayerTeamAssignmentMatrix(team, meanVector.rowCount)
+    local playerTeamAssignmentsMatrix = createPlayerTeamAssignmentMatrix(team, meanVector.rowCount)
 
-	local  playerTeamAssignmentsMatrixTranspose = playerTeamAssignmentsMatrix:transpose()
+    local  playerTeamAssignmentsMatrixTranspose = playerTeamAssignmentsMatrix:transpose()
 
-	local betaSquared = 250 * 250
-	local start = matrixmult(meanVectorTranspose, playerTeamAssignmentsMatrix)
-	local aTa = matrixmult(scalarMultiply(playerTeamAssignmentsMatrixTranspose, betaSquared), playerTeamAssignmentsMatrix)
-	local tmp = matrixmult(playerTeamAssignmentsMatrixTranspose, skillsMatrix)
-	local aTSA =  matrixmult(tmp, playerTeamAssignmentsMatrix)
-	local middle = matrixAdd(aTa, aTSA)
-	local middleInverse = matrixInvert(middle)
+    local betaSquared = 250 * 250
+    local start = matrixmult(meanVectorTranspose, playerTeamAssignmentsMatrix)
+    local aTa = matrixmult(scalarMultiply(playerTeamAssignmentsMatrixTranspose, betaSquared), playerTeamAssignmentsMatrix)
+    local tmp = matrixmult(playerTeamAssignmentsMatrixTranspose, skillsMatrix)
+    local aTSA =  matrixmult(tmp, playerTeamAssignmentsMatrix)
+    local middle = matrixAdd(aTa, aTSA)
+    local middleInverse = matrixInvert(middle)
 
-	local theend = matrixmult(playerTeamAssignmentsMatrixTranspose, meanVector)
-	local part1 = matrixmult(start, middleInverse)
-	local part2 = matrixmult(part1, theend)
-	local expPartMatrix = scalarMultiply(part2, -0.5)
-	local expPart = expPartMatrix:getDeterminant()
+    local theend = matrixmult(playerTeamAssignmentsMatrixTranspose, meanVector)
+    local part1 = matrixmult(start, middleInverse)
+    local part2 = matrixmult(part1, theend)
+    local expPartMatrix = scalarMultiply(part2, -0.5)
+    local expPart = expPartMatrix:getDeterminant()
 
-	local sqrtPartNumerator = aTa:getDeterminant()
-	local sqrtPartDenominator = middle:getDeterminant()
-	local sqrtPart = sqrtPartNumerator / sqrtPartDenominator
+    local sqrtPartNumerator = aTa:getDeterminant()
+    local sqrtPartDenominator = middle:getDeterminant()
+    local sqrtPart = sqrtPartNumerator / sqrtPartDenominator
 
 
-	local result = math.exp(expPart) * math.sqrt(sqrtPart)
+    local result = math.exp(expPart) * math.sqrt(sqrtPart)
 
-	return round((result * 100), 2)
+    return round((result * 100), 2)
 end

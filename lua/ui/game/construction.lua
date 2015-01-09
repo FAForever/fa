@@ -156,9 +156,9 @@ function DecreaseBuildCountInQueue(unitIndex, count)
    if blueprint.Categories then
        for i,v in ipairs(blueprint.Categories) do
           if v == 'SUPPORTFACTORY' then
-    	 supportfactory = true
+         supportfactory = true
           elseif v == 'TECH3' then
-    	 tech3 = true
+         tech3 = true
           end
           if tech3 and supportfactory then break end
        end
@@ -1259,7 +1259,7 @@ function OnClickHandler(button, modifiers)
             else
                 if blueprint.Physics.MotionType == 'RULEUMT_None' or EntityCategoryContains(categories.NEEDMOBILEBUILD, item.id) then
                     # stationary means it needs to be placed, so go in to build mobile mode
-					import('/lua/ui/game/commandmode.lua').StartCommandMode(buildCmd, {name=item.id})
+                    import('/lua/ui/game/commandmode.lua').StartCommandMode(buildCmd, {name=item.id})
                 else
                     # if the item to build can move, it must be built by a factory
                     #TODO -what about mobile factories?
@@ -1393,11 +1393,11 @@ function OnClickHandler(button, modifiers)
             count = 5
         end
         if modifiers.Left then
-	   --LOG("unit++")
+       --LOG("unit++")
             IncreaseBuildCountInQueue(item.position, count)
         elseif modifiers.Right then
-	   --LOG("unit-- attempt")
-	   DecreaseBuildCountInQueue(item.position, count)
+       --LOG("unit-- attempt")
+       DecreaseBuildCountInQueue(item.position, count)
         end
     end
 end
@@ -2172,37 +2172,37 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         sortedOptions = {}
         UnitViewDetail.Hide()
 
-	-- Engymod addition by Rienzilla
-	-- Only honour CONSTRUCTIONSORTDOWN if we selected a factory
+    -- Engymod addition by Rienzilla
+    -- Only honour CONSTRUCTIONSORTDOWN if we selected a factory
         local allFactory = true
-	for i, v in selection do
-	   if allFactory and not v:IsInCategory('FACTORY') then
-	      allFactory = false
-	   end
-	end
+    for i, v in selection do
+       if allFactory and not v:IsInCategory('FACTORY') then
+          allFactory = false
+       end
+    end
 
-	if allFactory then
-	   local sortDowns = EntityCategoryFilterDown(categories.CONSTRUCTIONSORTDOWN, buildableUnits)
-	   sortedOptions.t1 = EntityCategoryFilterDown(categories.TECH1-categories.CONSTRUCTIONSORTDOWN, buildableUnits)
-	   sortedOptions.t2 = EntityCategoryFilterDown(categories.TECH2-categories.CONSTRUCTIONSORTDOWN, buildableUnits)
-	   sortedOptions.t3 = EntityCategoryFilterDown(categories.TECH3-categories.CONSTRUCTIONSORTDOWN, buildableUnits)
-	   sortedOptions.t4 = EntityCategoryFilterDown(categories.EXPERIMENTAL-categories.CONSTRUCTIONSORTDOWN, buildableUnits)
+    if allFactory then
+       local sortDowns = EntityCategoryFilterDown(categories.CONSTRUCTIONSORTDOWN, buildableUnits)
+       sortedOptions.t1 = EntityCategoryFilterDown(categories.TECH1-categories.CONSTRUCTIONSORTDOWN, buildableUnits)
+       sortedOptions.t2 = EntityCategoryFilterDown(categories.TECH2-categories.CONSTRUCTIONSORTDOWN, buildableUnits)
+       sortedOptions.t3 = EntityCategoryFilterDown(categories.TECH3-categories.CONSTRUCTIONSORTDOWN, buildableUnits)
+       sortedOptions.t4 = EntityCategoryFilterDown(categories.EXPERIMENTAL-categories.CONSTRUCTIONSORTDOWN, buildableUnits)
 
-	   for _, unit in sortDowns do
-	      if EntityCategoryContains(categories.EXPERIMENTAL, unit) then
-		 table.insert(sortedOptions.t3, unit)
-	      elseif EntityCategoryContains(categories.TECH3, unit) then
-		 table.insert(sortedOptions.t2, unit)
-	      elseif EntityCategoryContains(categories.TECH2, unit) then
-		 table.insert(sortedOptions.t1, unit)
-	      end
-	   end
-	else
-	   sortedOptions.t1 = EntityCategoryFilterDown(categories.TECH1, buildableUnits)
-	   sortedOptions.t2 = EntityCategoryFilterDown(categories.TECH2, buildableUnits)
-	   sortedOptions.t3 = EntityCategoryFilterDown(categories.TECH3, buildableUnits)
-	   sortedOptions.t4 = EntityCategoryFilterDown(categories.EXPERIMENTAL, buildableUnits)
-	end
+       for _, unit in sortDowns do
+          if EntityCategoryContains(categories.EXPERIMENTAL, unit) then
+         table.insert(sortedOptions.t3, unit)
+          elseif EntityCategoryContains(categories.TECH3, unit) then
+         table.insert(sortedOptions.t2, unit)
+          elseif EntityCategoryContains(categories.TECH2, unit) then
+         table.insert(sortedOptions.t1, unit)
+          end
+       end
+    else
+       sortedOptions.t1 = EntityCategoryFilterDown(categories.TECH1, buildableUnits)
+       sortedOptions.t2 = EntityCategoryFilterDown(categories.TECH2, buildableUnits)
+       sortedOptions.t3 = EntityCategoryFilterDown(categories.TECH3, buildableUnits)
+       sortedOptions.t4 = EntityCategoryFilterDown(categories.EXPERIMENTAL, buildableUnits)
+    end
 
         if table.getn(buildableUnits) > 0 then
             controls.constructionTab:Enable()

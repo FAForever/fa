@@ -41,7 +41,7 @@ function SpawnPing(data)
             ping:SetVizToNeutrals('Never')
             ping:SetMesh('/meshes/game/ping_'..data.Mesh)
             local animThread = ForkThread(AnimatePingMesh, ping)
-            ForkThread(function() 
+            ForkThread(function()
                 WaitSeconds(data.Lifetime)
                 KillThread(animThread)
                 ping:Destroy()
@@ -54,9 +54,9 @@ function SpawnPing(data)
         for num,brain in ArmyBrains do
             if data.Owner + 1 ~= num and IsAlly( num, data.Owner + 1) then
                 ArmyBrains[num]:DoPingCallbacks( data )
-				if not SUtils.IsAIArmy(data.Owner + 1) then
-					ArmyBrains[num]:DoAIPing( data )
-				end
+                if not SUtils.IsAIArmy(data.Owner + 1) then
+                    ArmyBrains[num]:DoAIPing( data )
+                end
             end
         end
 
@@ -65,7 +65,7 @@ function SpawnPing(data)
 end
 
 function SpawnSpecialPing(data)
-	#This function is used to generate automatic nuke pings    
+    #This function is used to generate automatic nuke pings
     local Entity = import('/lua/sim/Entity.lua').Entity
     data.Location[2] = data.Location[2]+2
     local pingSpec = {Owner = data.Owner, Location = data.Location}
@@ -77,11 +77,11 @@ function SpawnSpecialPing(data)
     ping:SetVizToNeutrals('Never')
     ping:SetMesh('/meshes/game/ping_'..data.Mesh)
     local animThread = ForkThread(AnimatePingMesh, ping)
-    ForkThread(function() 
+    ForkThread(function()
         WaitSeconds(data.Lifetime)
         KillThread(animThread)
         ping:Destroy()
-    end)        
+    end)
 
     SendData(data)
 
@@ -89,11 +89,11 @@ function SpawnSpecialPing(data)
     for num,brain in ArmyBrains do
         if data.Owner + 1 ~= num and IsAlly( num, data.Owner + 1) then
             ArmyBrains[num]:DoPingCallbacks( data )
-			if not SUtils.IsAIArmy(data.Owner + 1) then
-				ArmyBrains[num]:DoAIPing( data )
-			end
+            if not SUtils.IsAIArmy(data.Owner + 1) then
+                ArmyBrains[num]:DoAIPing( data )
+            end
         end
-    end    
+    end
 end
 
 function GetPingID(owner)
@@ -141,7 +141,7 @@ end
 
 function UpdateMarker(data)
     if PingMarkers[data.Owner][data.ID] or data.Action == 'renew' then
-        if data.Action == 'delete' then 
+        if data.Action == 'delete' then
             if OkayToMessWithArmy(data.Owner+1) then
                 PingMarkers[data.Owner][data.ID] = nil
             else

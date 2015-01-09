@@ -77,16 +77,16 @@ function AddToBuildQueue(aiBrain, builder, whatToBuild, buildLocation, relative)
     if not builder.EngineerBuildQueue then
         builder.EngineerBuildQueue = {}
     end
-    # put in build queue.. but will be removed afterwards... just so that it can iteratively find new spots to build  
-     AIUtils.EngineerTryReclaimCaptureAreaSorian(aiBrain, builder, BuildToNormalLocation(buildLocation)) 
-     aiBrain:BuildStructure( builder, whatToBuild, buildLocation, false )       
-    
+    # put in build queue.. but will be removed afterwards... just so that it can iteratively find new spots to build
+     AIUtils.EngineerTryReclaimCaptureAreaSorian(aiBrain, builder, BuildToNormalLocation(buildLocation))
+     aiBrain:BuildStructure( builder, whatToBuild, buildLocation, false )
+
     local newEntry = {whatToBuild, buildLocation, relative}
-    
+
     table.insert(builder.EngineerBuildQueue, newEntry)
 end
 
-# Build locations (from FindPlaceToBuild) come in as {x,z,dist}, 
+# Build locations (from FindPlaceToBuild) come in as {x,z,dist},
 # so we need to convert those to an actual 2D location format
 function BuildToNormalLocation(location)
     return {location[1], 0, location[2]}
@@ -135,7 +135,7 @@ function AIExecuteBuildStructure( aiBrain, builder, buildingType, closeToBuilder
             end
         end
     end
-    
+
     # if we have a location, build!
     if location then
         local relativeLoc = BuildToNormalLocation(location)
@@ -146,14 +146,14 @@ function AIExecuteBuildStructure( aiBrain, builder, buildingType, closeToBuilder
         AddToBuildQueue(aiBrain, builder, whatToBuild, NormalToBuildLocation(relativeLoc), false)
         return
     end
-    
+
     #otherwise, we're SOL, so move on to the next thing
 end
 
 
 function AIBuildBaseTemplate( aiBrain, builder, buildingType , closeToBuilder, relative, buildingTemplate, baseTemplate, reference, NearMarkerType)
     local whatToBuild = aiBrain:DecideWhatToBuild( builder, buildingType, buildingTemplate)
-    if whatToBuild then       
+    if whatToBuild then
         for _,bType in baseTemplate do
             for n,bString in bType[1] do
                 AIExecuteBuildStructure( aiBrain, builder, buildingType , closeToBuilder, relative, buildingTemplate, baseTemplate, reference)
@@ -168,7 +168,7 @@ end
 function DoHackyLogic(buildingType, builder)
     if buildingType == 'T2StrategicMissile' then
         local unitInstance = false
-        
+
         builder:ForkThread(function()
             while true do
                 if not unitInstance then
@@ -200,9 +200,9 @@ function AIBuildBaseTemplateOrdered( aiBrain, builder, buildingType , closeToBui
         else
             for l,bType in baseTemplate do
                 for m,bString in bType[1] do
-                    if bString == buildingType then       
+                    if bString == buildingType then
                         for n,position in bType do
-                            if n > 1 and aiBrain:CanBuildStructureAt( whatToBuild, BuildToNormalLocation(position)) then                  
+                            if n > 1 and aiBrain:CanBuildStructureAt( whatToBuild, BuildToNormalLocation(position)) then
                                  AddToBuildQueue(aiBrain, builder, whatToBuild, position, false )
                                  return DoHackyLogic(buildingType, builder)
                             end # if n > 1 and can build structure at
@@ -271,14 +271,14 @@ function AIBuildAdjacency( aiBrain, builder, buildingType , closeToBuilder, rela
         local baseLocation = {nil, nil, nil}
         if builder.BuildManagerData and builder.BuildManagerData.EngineerManager then
             baseLocation = builder.BuildManagerdata.EngineerManager.Location
-        end        
+        end
         local location = aiBrain:FindPlaceToBuild(buildingType, whatToBuild, template, false, builder, baseLocation[1], baseLocation[3])
         if location then
              AddToBuildQueue(aiBrain, builder, whatToBuild, location, false)
             return
         end
         ## Build in a regular spot if adjacency not found
-        return AIExecuteBuildStructure( aiBrain, builder, buildingType, builder, true,  buildingTemplate, baseTemplate )        
+        return AIExecuteBuildStructure( aiBrain, builder, buildingType, builder, true,  buildingTemplate, baseTemplate )
     end
     return false, false
 end
@@ -329,13 +329,13 @@ function AINewExpansionBase( aiBrain, baseName, position, builder, constructionD
             aiBrain.BuilderManagers[baseName].EngineerManager:AddUnit(builder, true)
             return
         end
-        
+
         aiBrain:AddBuilderManagers( position, radius, baseName, true )
-        
+
         # Move the engineer to the new base managers
         builder.BuilderManagerData.EngineerManager:RemoveUnit(builder)
         aiBrain.BuilderManagers[baseName].EngineerManager:AddUnit(builder, true)
-        
+
         # Iterate through bases finding the value of each expansion
         local baseValues = {}
         local highPri = false
@@ -346,7 +346,7 @@ function AINewExpansionBase( aiBrain, baseName, position, builder, constructionD
                 highPri = baseValue
             end
         end
-        
+
         # Random to get any picks of same value
         local validNames = {}
         for k,v in baseValues do
@@ -355,31 +355,31 @@ function AINewExpansionBase( aiBrain, baseName, position, builder, constructionD
             end
         end
         local pick = validNames[ Random( 1, table.getn(validNames) ) ]
-        
+
         # Error if no pick
         if not pick then
             LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': Layer Preference - ' .. per .. ' - yielded no base types at - ' .. locationType )
         end
 
-        # Setup base        
+        # Setup base
         #LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': Expanding using - ' .. pick .. ' at location ' .. baseName)
         import('/lua/ai/AIAddBuilderTable.lua').AddGlobalBaseTemplate(aiBrain, baseName, pick )
-        
+
         # If air base switch to building an air factory rather than land
         if ( string.find(pick, 'Air') or string.find(pick, 'Water') ) then
             #if constructionData.BuildStructures[1] == 'T1LandFactory' then
             #    constructionData.BuildStructures[1] = 'T1AirFactory'
             #end
-			local numToChange = BaseBuilderTemplates[pick].BaseSettings.FactoryCount.Land
-			for k,v in constructionData.BuildStructures do
-				if constructionData.BuildStructures[k] == 'T1LandFactory' and numToChange <= 0 then
-					constructionData.BuildStructures[k] = 'T1AirFactory'
-				elseif constructionData.BuildStructures[k] == 'T1LandFactory' and numToChange > 0 then
-					numToChange = numToChange - 1
-				end
-			end
+            local numToChange = BaseBuilderTemplates[pick].BaseSettings.FactoryCount.Land
+            for k,v in constructionData.BuildStructures do
+                if constructionData.BuildStructures[k] == 'T1LandFactory' and numToChange <= 0 then
+                    constructionData.BuildStructures[k] = 'T1AirFactory'
+                elseif constructionData.BuildStructures[k] == 'T1LandFactory' and numToChange > 0 then
+                    numToChange = numToChange - 1
+                end
+            end
         end
-    end    
+    end
 end
 
 function CheckExpansionType( typeString, typeTable )

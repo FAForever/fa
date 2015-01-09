@@ -21,7 +21,7 @@ BuffBlueprint {
     Duration = -1,
     Affects = {
         MaxHealth = {
-			DoNoFill = true,
+            DoNoFill = true,
             Add = 0,
             Mult = 1.1,
         },
@@ -36,7 +36,7 @@ BuffBlueprint {
     Duration = -1,
     Affects = {
         MaxHealth = {
-			DoNoFill = true,
+            DoNoFill = true,
             Add = 0,
             Mult = 1.2,
         },
@@ -51,7 +51,7 @@ BuffBlueprint {
     Duration = -1,
     Affects = {
         MaxHealth = {
-			DoNoFill = true,
+            DoNoFill = true,
             Add = 0,
             Mult = 1.3,
         },
@@ -66,7 +66,7 @@ BuffBlueprint {
     Duration = -1,
     Affects = {
         MaxHealth = {
-			DoNoFill = true,
+            DoNoFill = true,
             Add = 0,
             Mult = 1.4,
         },
@@ -81,7 +81,7 @@ BuffBlueprint {
     Duration = -1,
     Affects = {
         MaxHealth = {
-			DoNoFill = true,
+            DoNoFill = true,
             Add = 0,
             Mult = 1.5,
         },
