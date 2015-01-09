@@ -103,7 +103,7 @@ function CreateProfileButton(parent, exitBehavior, enterBehavior)
         local currentProfile = GetPreference("profile.current")
         if currentProfile then
             local profiles = GetPreference("profile.profiles")
-            if profiles[currentProfile] != nil then
+            if profiles[currentProfile] ~= nil then
                 currentProfileText:SetText(profiles[currentProfile].Name)
             else
                 SetPreference("profile.current", 0) -- if current profile is damaged, reset to 0

@@ -61,7 +61,7 @@ Builder = Class {
 				self.SetByStrat = true
 			end
         end
-        if val != self.Priority then
+        if val ~= self.Priority then
             self.PriorityAltered = true
         end
         self.Priority = val
@@ -79,7 +79,7 @@ Builder = Class {
         # Builders can have a function to update the priority
         if self.PriorityFunction then
             local newPri = self.PriorityFunction[1]( self, self.Brain, builderManager, unpack(self.PriorityFunction[2]) )
-            if newPri != self.Priority then
+            if newPri ~= self.Priority then
                 self.Priority = newPri
                 self.PriorityAltered = true
             end

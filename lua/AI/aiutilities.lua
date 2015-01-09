@@ -52,12 +52,12 @@ function AIGetEconomyNumbers(aiBrain)
         econ.MassEfficiencyOverTime = math.min(econTime.MassIncome / econTime.MassRequested, 2)
     end
         
-    if econ.MassStorageRatio != 0 then
+    if econ.MassStorageRatio ~= 0 then
         econ.MassMaxStored = econ.MassStorage / econ.MassStorageRatio
     else
         econ.MassMaxStored = econ.MassStorage
     end
-    if econ.EnergyStorageRatio != 0 then
+    if econ.EnergyStorageRatio ~= 0 then
         econ.EnergyMaxStored = econ.EnergyStorage / econ.EnergyStorageRatio
     else
         econ.EnergyMaxStored = econ.EnergyStorage
@@ -399,7 +399,7 @@ function GetAlliesThreat( aiBrain, marker, threatRings, threatType )
     local armyIndex = aiBrain:GetArmyIndex()
     local threat = 0
     for k,v in ArmyBrains do
-        if v != aiBrain and IsAlly( v:GetArmyIndex(), armyIndex ) then
+        if v ~= aiBrain and IsAlly( v:GetArmyIndex(), armyIndex ) then
             threat = aiBrain:GetNumUnitsAroundPoint( categories.ALLUNITS - categories.MASSEXTRACTION - categories.MOBILE, marker.Position, 30, 'Ally' )
             #threat = threat + aiBrain:GetThreatAtPosition( marker.Position, threatRings, true, threatType or 'Overall', v:GetArmyIndex() )
         end
@@ -457,7 +457,7 @@ function AIFindStartLocationNeedsEngineer( aiBrain, locationType, radius, tMin, 
     local startX, startZ = aiBrain:GetArmyStartPos()
     for k,v in positions do
         if string.sub(v.Name,1,5) == 'ARMY_' then
-            if startX != v.Position[1] and startZ != v.Position[3] then
+            if startX ~= v.Position[1] and startZ ~= v.Position[3] then
                 table.insert( validPos, v )
             end
         end
@@ -1515,7 +1515,7 @@ function UseTransports(units, transports, location, transportPlatoon)
     #LOG('*AI DEBUG: Transport loaded')
 
     
-    if table.getn(transports) != 0 then
+    if table.getn(transports) ~= 0 then
         #DUNCAN - if no location then we have loaded transports then return true
         if location then
             local safePath = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Air', transports[1]:GetPosition(), location, 200)
@@ -1733,7 +1733,7 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
             local pathSize = table.getn(path)
             # move to way points (but not to destination... leave that for the final command)
             for widx,waypointPath in path do
-                if pathSize != widx then
+                if pathSize ~= widx then
                     IssueMove({unit},waypointPath)
                 end
             end  
@@ -2052,7 +2052,7 @@ function EngineerMoveWithSafePathSorian(aiBrain, unit, destination)
             local pathSize = table.getn(path)
             # move to way points (but not to destination... leave that for the final command)
             for widx,waypointPath in path do
-                if pathSize != widx then
+                if pathSize ~= widx then
                     IssueMove({unit},waypointPath)
                 end
             end  
@@ -2198,7 +2198,7 @@ function AIFindStartLocationNeedsEngineerSorian( aiBrain, locationType, radius, 
     local startX, startZ = aiBrain:GetArmyStartPos()
     for k,v in positions do
         if string.sub(v.Name,1,5) == 'ARMY_' then
-            if startX != v.Position[1] and startZ != v.Position[3] then
+            if startX ~= v.Position[1] and startZ ~= v.Position[3] then
                 table.insert( validStartPos, v )
             end
         end
@@ -2863,7 +2863,7 @@ function AIFindFurthestStartLocationNeedsEngineer( aiBrain, locationType, radius
     local startX, startZ = aiBrain:GetArmyStartPos()
     for k,v in positions do
         if string.sub(v.Name,1,5) == 'ARMY_' then
-            if startX != v.Position[1] and startZ != v.Position[3] then
+            if startX ~= v.Position[1] and startZ ~= v.Position[3] then
                 table.insert( validPos, v )
             end
         end

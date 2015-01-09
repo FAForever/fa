@@ -133,9 +133,9 @@ function SetupPlayerLines()
         local group = Group(controls.bgStretch)
         local sw = 42
 
-        if (armyIndex != 0 and SessionIsReplay()) then
+        if (armyIndex ~= 0 and SessionIsReplay()) then
              group.faction = Bitmap(group)
-            if armyIndex != 0 then
+            if armyIndex ~= 0 then
                 group.faction:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(data.faction)))
             else
                 group.faction:SetTexture(UIUtil.UIFile('/widgets/faction-icons-alpha_bmp/observer_ico.dds'))
@@ -195,7 +195,7 @@ function SetupPlayerLines()
 
        else
             group.faction = Bitmap(group)
-            if armyIndex != 0 then
+            if armyIndex ~= 0 then
                 group.faction:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(data.faction)))
             else
                 group.faction:SetTexture(UIUtil.UIFile('/widgets/faction-icons-alpha_bmp/observer_ico.dds'))
@@ -384,7 +384,7 @@ end
         end
         controls.time:SetText(string.format("%s (%+d / %+d)", GetGameTime(), gameSpeed, GetSimRate()))
 
-        if sessionInfo.Options.NoRushOption and sessionInfo.Options.NoRushOption != 'Off' then
+        if sessionInfo.Options.NoRushOption and sessionInfo.Options.NoRushOption ~= 'Off' then
             if tonumber(sessionInfo.Options.NoRushOption) * 60 > GetGameTimeSeconds() then
                 local time = (tonumber(sessionInfo.Options.NoRushOption) * 60) - GetGameTimeSeconds()
                 controls.time:SetText(LOCF('%02d:%02d:%02d', math.floor(time / 3600), math.floor(time/60), math.mod(time, 60)))
@@ -578,7 +578,7 @@ end
 function InitialAnimation(state)
     controls.bg.Right:Set(savedParent.Right() + controls.bg.Width())
     controls.bg:Hide()
-    if Prefs.GetFromCurrentProfile("scoreoverlay") != false then
+    if Prefs.GetFromCurrentProfile("scoreoverlay") ~= false then
         controls.collapseArrow:SetCheck(false, true)
         controls.bg:Show()
         controls.bg:SetNeedsFrameUpdate(true)

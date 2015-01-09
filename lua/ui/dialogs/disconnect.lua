@@ -118,7 +118,7 @@ local function CreateDialog(clients)
     function parent.Update(self, clients)
 		--local all_connected = nil
 		--for index, client in clients do
-			--if client.quiet > 1 and all_connected != false then
+			--if client.quiet > 1 and all_connected ~= false then
 				--all_connected = true
 				--LOG('>>> Connected ('..index..' - '..client.name..')')
 			--else
@@ -184,7 +184,7 @@ local function CreateDialog(clients)
 			
             local ejectedBy = ''
             for k, v in client.ejectedBy do
-                if ejectedBy != '' then
+                if ejectedBy ~= '' then
                     ejectedBy = ejectedBy .. ', ' .. tostring(v)
                 else
                     ejectedBy = LOC('<LOC UI_Disco0006>Ejected by')..': '..tostring(v)

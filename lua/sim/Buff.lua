@@ -94,7 +94,7 @@ function ApplyBuff(unit, buffName, instigator)
     if def.Affects then
         for k,v in def.Affects do
             # Don't save off 'instant' type affects like health and energy
-            if k != 'Health' and k != 'Energy' then
+            if k ~= 'Health' and k ~= 'Energy' then
                 if not uaffects[k] then
                     uaffects[k] = {}
                 end
@@ -249,7 +249,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             for i = 1, unit:GetWeaponCount() do
         
                 local wep = unit:GetWeapon(i)
-                if wep.Label != 'DeathWeapon' and wep.Label != 'DeathImpact' then
+                if wep.Label ~= 'DeathWeapon' and wep.Label ~= 'DeathImpact' then
                     local wepbp = wep:GetBlueprint()
                     local wepdam = wepbp.Damage
                     local val = BuffCalculate(unit, buffName, 'Damage', wepdam)
@@ -442,7 +442,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
 #            
 #            end
            
-        elseif atype != 'Stun' then
+        elseif atype ~= 'Stun' then
             WARN("*WARNING: Tried to apply a buff with an unknown affect type of " .. atype .. " for buff " .. buffName)
         end
     end
@@ -463,7 +463,7 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
     
     for k, v in unit.Buffs.Affects[affectType] do
     
-        if v.Add and v.Add != 0 then
+        if v.Add and v.Add ~= 0 then
             adds = adds + (v.Add * v.Count)
         end
         

@@ -109,27 +109,27 @@ EngineerManager = Class(BuilderManager) {
         pauseVal = self:DisableMassGroup(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheck, categories.DEFENSE )
 
         # Disable shields
-        if pauseVal != true then
+        if pauseVal ~= true then
             pauseVal = self:DisableMassGroup(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheck, categories.SHIELD )
         end
         
         # Disable factory builders
-        if pauseVal != true then
+        if pauseVal ~= true then
             pauseVal = self:DisableMassGroup(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheck, categories.FACTORY * ( categories.TECH2 + categories.TECH3 ) )
         end
 
         # Disable those building mobile units (through assist or experimental)
-        if pauseVal != true then
+        if pauseVal ~= true then
             #pauseVal = self:DisableMassGroup(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ExperimentalCheck )
         end
 
         # Disable those building mobile units (through assist or experimental)
-        if pauseVal != true then
+        if pauseVal ~= true then
             #pauseVal = self:DisableMassGroup(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheck, categories.MOBILE - categories.EXPERIMENTAL )
         end
 
         # Disable those building mobile units (through assist or experimental)
-        if pauseVal != true then
+        if pauseVal ~= true then
             #pauseVal = self:DisableMassGroup(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheck, categories.STRUCTURE - categories.MASSEXTRACTION - categories.ENERGYPRODUCTION - categories.FACTORY - categories.EXPERIMENTAL )
         end
 
@@ -212,31 +212,31 @@ EngineerManager = Class(BuilderManager) {
         #LOG('*AI DEBUG: Shutting down units for energy needs')
         
         # Disable fabricators if mass in > mass out until 10% under
-        if pauseVal != true then
+        if pauseVal ~= true then
             pauseVal = self:DisableEnergyGroup(self.ConsumptionUnits.Fabricators, econ, pauseVal, self.MassDrainCheck)
         end
         
-        if pauseVal != true then
+        if pauseVal ~= true then
             pauseVal = self:DisableEnergyGroup(self.ConsumptionUnits.MobileIntel, econ, pauseVal)
         end
         
         # Disable engineers assisting non-econ until 10% under
-        if pauseVal != true then
+        if pauseVal ~= true then
             pauseVal = self:DisableEnergyGroup(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheck, categories.ALLUNITS - categories.ENERGYPRODUCTION - categories.MASSPRODUCTION)
         end
         
         # Disable Intel if mass in > mass out until 10% under
-        if pauseVal != true then
+        if pauseVal ~= true then
             pauseVal = self:DisableEnergyGroup(self.ConsumptionUnits.Intel, econ, pauseVal)
         end
 
         # Disable fabricators until 10% under
-        if pauseVal != true then
+        if pauseVal ~= true then
             pauseVal = self:DisableEnergyGroup(self.ConsumptionUnits.Fabricators, econ, pauseVal)
         end
 
         # Disable engineers until 10% under
-        if pauseVal != true then
+        if pauseVal ~= true then
             pauseVal = self:DisableEnergyGroup(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheck, categories.ALLUNITS - categories.ENERGYPRODUCTION)
         end
         
@@ -327,27 +327,27 @@ EngineerManager = Class(BuilderManager) {
         pauseVal = self:DisableMassGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.DEFENSE )
 
         # Disable shields
-        if pauseVal != true then
+        if pauseVal ~= true then
             pauseVal = self:DisableMassGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.SHIELD )
         end
         
         # Disable factory builders
-        if pauseVal != true then
+        if pauseVal ~= true then
             pauseVal = self:DisableMassGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.FACTORY * ( categories.TECH2 + categories.TECH3 ) )
         end
 
         # Disable those building mobile units (through assist or experimental)
-        if pauseVal != true then
+        if pauseVal ~= true then
             #pauseVal = self:DisableMassGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ExperimentalCheck )
         end
 
         # Disable those building mobile units (through assist or experimental)
-        if pauseVal != true then
+        if pauseVal ~= true then
             #pauseVal = self:DisableMassGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.MOBILE - categories.EXPERIMENTAL )
         end
 
         # Disable those building mobile units (through assist or experimental)
-        if pauseVal != true then
+        if pauseVal ~= true then
             #pauseVal = self:DisableMassGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.STRUCTURE - categories.MASSEXTRACTION - categories.ENERGYPRODUCTION - categories.FACTORY - categories.EXPERIMENTAL )
         end
 
@@ -414,31 +414,31 @@ EngineerManager = Class(BuilderManager) {
         LOG('*AI DEBUG: Shutting down units for energy needs')
         
         # Disable fabricators if mass in > mass out until 10% under
-        #if pauseVal != true then
+        #if pauseVal ~= true then
         #    pauseVal = self:DisableEnergyGroup(self.ConsumptionUnits.Fabricators, econ, pauseVal, self.MassDrainCheck)
         #end
         
-        #if pauseVal != true then
+        #if pauseVal ~= true then
         #    pauseVal = self:DisableEnergyGroup(self.ConsumptionUnits.MobileIntel, econ, pauseVal)
         #end
         
         # Disable engineers assisting non-econ until 10% under
-        if pauseVal != true then
+        if pauseVal ~= true then
             pauseVal = self:DisableEnergyGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.ALLUNITS - categories.ENERGYPRODUCTION - categories.MASSPRODUCTION)
         end
         
         # Disable Intel if mass in > mass out until 10% under
-        #if pauseVal != true then
+        #if pauseVal ~= true then
         #    pauseVal = self:DisableEnergyGroup(self.ConsumptionUnits.Intel, econ, pauseVal)
         #end
 
         # Disable fabricators until 10% under
-        #if pauseVal != true then
+        #if pauseVal ~= true then
         #    pauseVal = self:DisableEnergyGroup(self.ConsumptionUnits.Fabricators, econ, pauseVal)
         #end
 
         # Disable engineers until 10% under
-        if pauseVal != true then
+        if pauseVal ~= true then
             pauseVal = self:DisableEnergyGroupSorian(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheckSorian, categories.ALLUNITS - categories.ENERGYPRODUCTION)
         end
         

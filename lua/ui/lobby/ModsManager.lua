@@ -403,7 +403,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
             local function FUNC_RUN()
                 exclusiveMod = true
                 for index, control in scrollGroup.controlList do
-                    if control.actived and control != the_exclusif_mod then
+                    if control.actived and control ~= the_exclusif_mod then
                         UNActiveMod(control)
                     end
                 end

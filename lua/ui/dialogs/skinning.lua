@@ -123,7 +123,7 @@ function Set_Group_Texture(list,object,parent,path, grouptype, offsetTable, cent
 				LayoutHelpers.ResetBottom(object.middle)
 			end
 			LayoutHelpers.ResetBottom(object)
-			if list.Tiled != nil and list.Tiled then object.middle:SetTiled(true) end
+			if list.Tiled ~= nil and list.Tiled then object.middle:SetTiled(true) end
 			object.Width:Set(function() return object.right.Right()-object.left.Left() end)
 			object.Height:Set(function() return object.middle.Bottom()-object.middle.Top() end)
 		else
@@ -181,7 +181,7 @@ function Set_Group_Texture(list,object,parent,path, grouptype, offsetTable, cent
 				object.middle.Bottom:Set(object.bottom.Top)
 			end
 			LayoutHelpers.ResetRight(object)
-			if list.Tiled != nil and list.Tiled then object.middle:SetTiled(true) end
+			if list.Tiled ~= nil and list.Tiled then object.middle:SetTiled(true) end
 			object.Width:Set(function() return object.top.Right()-object.top.Left() end)
 			object.Height:Set(function() return object.bottom.Bottom()-object.top.Top() end)
 		end
@@ -227,32 +227,32 @@ function Set_Group_Texture(list,object,parent,path, grouptype, offsetTable, cent
 		object.left.Bottom:Set(function() return object.bottomleft.Top() end)
 		object.left.Left:Set(function() return object.Left() end)
 		object.left.Right:Set(function() return object.Left() + object.left.BitmapWidth() end)
-		if list.Tiled != nil and list.Tiled then object.left:SetTiled(true) end
+		if list.Tiled ~= nil and list.Tiled then object.left:SetTiled(true) end
 		
 		object.bottom.Top:Set(function() return object.Bottom() - object.bottom.BitmapHeight() end)
 		object.bottom.Bottom:Set(function() return object.Bottom() end)
 		object.bottom.Left:Set(function() return object.bottomleft.Right() end)
 		object.bottom.Right:Set(function() return object.bottomright.Left() end)
-		if list.Tiled != nil and list.Tiled then object.bottom:SetTiled(true) end
+		if list.Tiled ~= nil and list.Tiled then object.bottom:SetTiled(true) end
 		
 		object.top.Top:Set(function() return object.Top() end)
 		object.top.Bottom:Set(function() return object.Top() + object.top.BitmapHeight() end)
 		object.top.Left:Set(function() return object.topleft.Right() end)
 		object.top.Right:Set(function() return object.topright.Left() end)
-		if list.Tiled != nil and list.Tiled then object.top:SetTiled(true) end
+		if list.Tiled ~= nil and list.Tiled then object.top:SetTiled(true) end
 		
 		object.right.Top:Set(function() return object.topright.Bottom() end)
 		object.right.Bottom:Set(function() return object.bottomright.Top() end)
 		object.right.Left:Set(function() return object.Right() - object.right.BitmapWidth() end)
 		object.right.Right:Set(function() return object.Right() end)
-		if list.Tiled != nil and list.Tiled then object.right:SetTiled(true) end
+		if list.Tiled ~= nil and list.Tiled then object.right:SetTiled(true) end
 		
 		--center
 		object.middle.Left:Set(function() return object.left.Right() end)
 		object.middle.Right:Set(function() return object.right.Left() end)
 		object.middle.Top:Set(function() return object.top.Bottom() end)
 		object.middle.Bottom:Set(function() return object.bottom.Top() end)
-		if list.Tiled != nil and list.Tiled then object.middle:SetTiled(true) end
+		if list.Tiled ~= nil and list.Tiled then object.middle:SetTiled(true) end
 		
 		object.Width:Set(function() return object.right.Right()-object.left.Left() end)
 		object.Height:Set(function() return object.bottom.Bottom()-object.top.Top() end)
@@ -376,7 +376,7 @@ function GetSkin(name,object,parent, modifiers)
 	if object.grp then object.grp:Destroy() object.grp = false end
 	if object.middle then reset_obj(object) end
 --	if Prefs.GetFromCurrentProfile("uimanager_sav")["skin"] == 'Auto Faction' then
---		if uimod.factionTable[uimod.factionIndex] !=nil then
+--		if uimod.factionTable[uimod.factionIndex] ~=nil then
 --			faction = uimod.factionTable[uimod.factionIndex]
 --			currentskin = Prefs.GetFromCurrentProfile("uimanager_sav")[faction.."skin"]
 --		else currentskin="Default" LOG("Bug intercepted in skinning") end
@@ -406,20 +406,20 @@ function GetSkin(name,object,parent, modifiers)
 	local current=false
 	local imgpath = false
 	if modifiers then
-		if factionnal and currentskin!=nil and currentskin!="" and skin[currentskin][name][modifiers] != nil then
+		if factionnal and currentskin~=nil and currentskin~="" and skin[currentskin][name][modifiers] ~= nil then
 			current=skin[currentskin][name][modifiers]
 			imgpath = skin[currentskin].path
-		elseif skin.Default[name][modifiers] != nil then
+		elseif skin.Default[name][modifiers] ~= nil then
 			current=skin.Default[name][modifiers]
 			imgpath = skin.Default.path
 		else
 			return nil
 		end
 	else
-		if factionnal and currentskin!=nil and currentskin!="" and skin[currentskin][name] != nil then
+		if factionnal and currentskin~=nil and currentskin~="" and skin[currentskin][name] ~= nil then
 			current=skin[currentskin][name]
 			imgpath = skin[currentskin].path
-		elseif skin.Default[name] != nil then
+		elseif skin.Default[name] ~= nil then
 			current=skin.Default[name]
 			imgpath = skin.Default.path
 		else
@@ -573,10 +573,10 @@ function GetSkin(name,object,parent, modifiers)
 				--if it doesnt exist set  right and use bitmap width to set left
 				local oldLeft = false
 				local oldRight = false
-				if prefsaver[name]["Left"] == nil and prefsaver[name]["Right"] != nil then
+				if prefsaver[name]["Left"] == nil and prefsaver[name]["Right"] ~= nil then
 					oldRight = prefsaver[name]["Right"]
 					prefsaver[name]["Left"] = oldRight - object.BitmapWidth()					
-				elseif prefsaver[name]["Left"] != nil then
+				elseif prefsaver[name]["Left"] ~= nil then
 					oldLeft = prefsaver[name]["Left"]					
 					prefsaver[name]["Right"] = oldLeft + object.BitmapWidth()
 				end
@@ -585,10 +585,10 @@ function GetSkin(name,object,parent, modifiers)
 				--if it doesnt exist set  bottom and use bitmap height to set top
 				local oldTop = false
 				local oldBottom = false
-				if prefsaver[name]["Top"] == nil and prefsaver[name]["Bottom"] != nil then
+				if prefsaver[name]["Top"] == nil and prefsaver[name]["Bottom"] ~= nil then
 					oldBottom = prefsaver[name]["Bottom"]
 					prefsaver[name]["Top"] = oldBottom - object.BitmapHeight()
-				elseif prefsaver[name]["Top"] != nil then
+				elseif prefsaver[name]["Top"] ~= nil then
 					oldTop = prefsaver[name]["Top"]
 					prefsaver[name]["Bottom"] = oldTop + object.BitmapHeight()
 				end
@@ -640,14 +640,14 @@ function GetSkin(name,object,parent, modifiers)
 		LayoutHelpers.ResetRight(object)
 		LayoutHelpers.ResetBottom(object)
 	end
-	if current.x_right != nil then
+	if current.x_right ~= nil then
 		object.Right:Set(function() return parent.Right() - current.x_right end)
 	end
 
-	if current.y_bottom != nil then
+	if current.y_bottom ~= nil then
 		object.Bottom:Set(function() return parent.Bottom() - current.y_bottom end)
 	end
-	if current.code!=nil then 
+	if current.code~=nil then 
 		--current.code(object) 
 		object.name=full_name code[full_name]={} code[full_name].fct=current.code code[full_name].obj=object
 	end
@@ -660,9 +660,9 @@ function nnil(var)
 end
 
 function SetGridBounds(name, modifiers, minimap)
-	if currentskin!="" and skin[currentskin][name][modifiers] != nil then
+	if currentskin~="" and skin[currentskin][name][modifiers] ~= nil then
 		current=skin[currentskin][name][modifiers]
-	elseif skin.Default[name][modifiers] != nil then
+	elseif skin.Default[name][modifiers] ~= nil then
 		current=skin.Default[name][modifiers]
 	else
 --		UIManager.Output_text("# ERROR - about the Grid object ["..name.. ": " ..modifers.."] in the skin file ["..GetActualSkinFile().."].")
@@ -678,9 +678,9 @@ function SetGridBounds(name, modifiers, minimap)
 end
 
 --[[function SetText(name, control, parent, modifiers)
-	if currentskin!="" and skin[currentskin][name][modifiers] != nil then
+	if currentskin~="" and skin[currentskin][name][modifiers] ~= nil then
 		current=skin[currentskin][name][modifiers]
-	elseif skin.Default[name][modifiers] != nil then
+	elseif skin.Default[name][modifiers] ~= nil then
 		current=skin.Default[name][modifiers]
 	else
 --		UIManager.Output_text("# ERROR - setting text ["..name.. ": " ..modifers.."] in the skin file ["..GetActualSkinFile().."].")
@@ -717,10 +717,10 @@ end
 end--]]
 
 function SetStatusBar(name, parent, modifiers)
-	if currentskin!="" and skin[currentskin][name][modifiers] != nil then
+	if currentskin~="" and skin[currentskin][name][modifiers] ~= nil then
 		current=skin[currentskin][name][modifiers]
 		imgpath = skin[currentskin].path
-	elseif skin.Default[name][modifiers] != nil then
+	elseif skin.Default[name][modifiers] ~= nil then
 		current=skin.Default[name][modifiers]
 		imgpath = skin.Default.path
 	else
@@ -746,9 +746,9 @@ function SetStatusBar(name, parent, modifiers)
 end
 
 function SetOrdersGrid(name, control, parent, modifiers)
-	if currentskin!="" and skin[currentskin][name][modifiers] != nil then
+	if currentskin~="" and skin[currentskin][name][modifiers] ~= nil then
 		current=skin[currentskin][name][modifiers]
-	elseif skin.Default[name][modifiers] != nil then
+	elseif skin.Default[name][modifiers] ~= nil then
 		current=skin.Default[name][modifiers]
 	else
 --		UIManager.Output_text("# ERROR - setting ordergrid ["..name.. ": " ..modifers.."] in the skin file ["..GetActualSkinFile().."].")
@@ -768,9 +768,9 @@ end
 function GetOrdersButtonsPath(name, modifiers)
 	local btnpath = false
 	local currentpath=false
-	if currentskin!="" and skin[currentskin][name][modifiers] != nil then
+	if currentskin~="" and skin[currentskin][name][modifiers] ~= nil then
 		currentpath=skin[currentskin][name][modifiers]
-	elseif skin.Default[name][modifiers] != nil then
+	elseif skin.Default[name][modifiers] ~= nil then
 		currentpath=skin.Default[name][modifiers]
 	else
 --		UIManager.Output_text("# ERROR - setting order button path ["..name.. ": " ..modifers.."] in the skin file ["..GetActualSkinFile().."].")
@@ -780,9 +780,9 @@ function GetOrdersButtonsPath(name, modifiers)
 end
 
 function SetPosition(name, control, parent, modifiers, relative)
-	if currentskin!="" and skin[currentskin][name][modifiers] != nil then
+	if currentskin~="" and skin[currentskin][name][modifiers] ~= nil then
 		current=skin[currentskin][name][modifiers]
-	elseif skin.Default[name][modifiers] != nil then
+	elseif skin.Default[name][modifiers] ~= nil then
 		current=skin.Default[name][modifiers]
 	else
 --		UIManager.Output_text("# ERROR - setting ordergrid ["..name.. ": " ..modifers.."] in the skin file ["..GetActualSkinFile().."].")

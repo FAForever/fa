@@ -46,7 +46,7 @@ function CheckVictory(scenarioInfo)
         local draw = true
         for index,brain in stillAlive do
             for index2,other in stillAlive do
-                if index != index2 then
+                if index ~= index2 then
                     if not brain.RequestingAlliedVictory or not IsAlly(brain:GetArmyIndex(), other:GetArmyIndex()) then
                         win = false
                     end

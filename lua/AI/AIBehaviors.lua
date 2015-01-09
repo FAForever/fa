@@ -113,9 +113,9 @@ function CDROverCharge( aiBrain, cdr )
 	#DUNCAN - increase attack range for a few mins on small maps
 	if (cdr:GetHealthPercent() > .80) and GetGameTimeSeconds() < 660 and GetGameTimeSeconds() > 243 
 		and mapSizeX <= 512 and mapSizeZ <= 512 #and aiBrain:GetMapWaterRatio() < .4
-		and ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality != 'turtle' 
-		and ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality != 'defense'
-	    and ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality != 'rushnaval' 
+		and ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality ~= 'turtle' 
+		and ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality ~= 'defense'
+	    and ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality ~= 'rushnaval' 
 		then
 		maxRadius = 256
 		
@@ -327,7 +327,7 @@ function CommanderThread(cdr, platoon)
             if not cdr.EngineerBuildQueue or table.getn(cdr.EngineerBuildQueue) == 0 then
                 local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
                 aiBrain:AssignUnitsToPlatoon( pool, {cdr}, 'Unassigned', 'None' )
-            elseif cdr.EngineerBuildQueue and table.getn(cdr.EngineerBuildQueue) != 0 then
+            elseif cdr.EngineerBuildQueue and table.getn(cdr.EngineerBuildQueue) ~= 0 then
                 if not cdr.NotBuildingThread then
                     cdr.NotBuildingThread = cdr:ForkThread(platoon.WatchForNotBuilding)
                 end             
@@ -374,7 +374,7 @@ function CommanderThreadImproved(cdr, platoon)
 					cdr.PlatoonHandle:PlatoonDisband()
 				end
 				WaitSeconds(5)
-            elseif cdr.EngineerBuildQueue and table.getn(cdr.EngineerBuildQueue) != 0 then
+            elseif cdr.EngineerBuildQueue and table.getn(cdr.EngineerBuildQueue) ~= 0 then
                 if not cdr.NotBuildingThread then
                     cdr.NotBuildingThread = cdr:ForkThread(platoon.WatchForNotBuilding)
                 end             
@@ -1224,7 +1224,7 @@ CzarBehavior = function(self)
     local oldTargetUnit = nil
     while not experimental:IsDead() do
 
-        if targetUnit and targetUnit != oldTargetUnit then
+        if targetUnit and targetUnit ~= oldTargetUnit then
             IssueClearCommands({experimental})
             WaitTicks(5)
 			
@@ -1243,7 +1243,7 @@ CzarBehavior = function(self)
         local oldCommander = nil
         while nearCommander and not experimental:IsDead() and not experimental:IsIdleState() do
             
-            if nearCommander and nearCommander != oldCommander and nearCommander != targetUnit then
+            if nearCommander and nearCommander ~= oldCommander and nearCommander ~= targetUnit then
                 IssueClearCommands({experimental})
                 WaitTicks(5)
                 IssueAttack({experimental}, experimental:GetPosition())
@@ -1290,7 +1290,7 @@ AhwassaBehavior = function(self)
     local oldTargetLocation = nil
     while not experimental:IsDead() do
 
-        if targetLocation and targetLocation != oldTargetLocation then
+        if targetLocation and targetLocation ~= oldTargetLocation then
             IssueClearCommands({experimental})
             IssueAttack({experimental}, targetLocation)           
             WaitSeconds(25)
@@ -1327,7 +1327,7 @@ TickBehavior = function(self)
     local oldTargetLocation = nil
     while not experimental:IsDead() do
 
-        if targetLocation and targetLocation != oldTargetLocation then
+        if targetLocation and targetLocation ~= oldTargetLocation then
             IssueClearCommands({experimental})
             IssueAggressiveMove({experimental}, targetLocation)           
             WaitSeconds(25)
@@ -1389,7 +1389,7 @@ GetHighestThreatClusterLocation = function(aiBrain, experimental)
     for _,base in enemyBases do
         local threatTable = aiBrain:GetThreatsAroundPosition(base.Position, 1, true, 'Economy')
         
-        if table.getn(threatTable) != 0 then
+        if table.getn(threatTable) ~= 0 then
             if threatTable[1][3] > maxBaseThreat then
                 maxBaseThreat = threatTable[1][3]
                 bestBaseThreat = threatTable
@@ -1436,7 +1436,7 @@ GetHighestThreatClusterLocation = function(aiBrain, experimental)
             end
         end
         
-        if bestPos[1] != 0 and bestPos[3] != 0 then
+        if bestPos[1] ~= 0 and bestPos[3] ~= 0 then
             return bestPos
         end
     end
@@ -2105,7 +2105,7 @@ function CommanderThreadSorian(cdr, platoon)
 				#LOG('*AI DEBUG: '.. aiBrain.Nickname ..' CommanderThread Assign to pool')
                 local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
                 aiBrain:AssignUnitsToPlatoon( pool, {cdr}, 'Unassigned', 'None' )
-            elseif cdr.EngineerBuildQueue and table.getn(cdr.EngineerBuildQueue) != 0 then
+            elseif cdr.EngineerBuildQueue and table.getn(cdr.EngineerBuildQueue) ~= 0 then
                 if not cdr.NotBuildingThread then
 					#LOG('*AI DEBUG: '.. aiBrain.Nickname ..' CommanderThread Watch for not building')
                     cdr.NotBuildingThread = cdr:ForkThread(platoon.WatchForNotBuildingSorian)
@@ -2432,7 +2432,7 @@ GetHighestThreatClusterLocationSorian = function(aiBrain, experimental)
     for _,base in enemyBases do
         local threatTable = aiBrain:GetThreatsAroundPosition(base.Position, 1, true, 'Economy')
         
-        if table.getn(threatTable) != 0 then
+        if table.getn(threatTable) ~= 0 then
             if threatTable[1][3] > maxBaseThreat then
                 maxBaseThreat = threatTable[1][3]
                 bestBaseThreat = threatTable
@@ -2479,7 +2479,7 @@ GetHighestThreatClusterLocationSorian = function(aiBrain, experimental)
             end
         end
         
-        if bestPos[1] != 0 and bestPos[3] != 0 then
+        if bestPos[1] ~= 0 and bestPos[3] ~= 0 then
             return bestPos
         end
     end
@@ -2536,7 +2536,7 @@ CzarBehaviorSorian = function(self)
     while aiBrain:PlatoonExists(self) do #not experimental:IsDead() do
 		self:MergeWithNearbyPlatoonsSorian('ExperimentalAIHubSorian', 50, true)
 		
-        if (targetUnit and targetUnit != oldTargetUnit) or not self:IsCommandsActive(cmd) then			
+        if (targetUnit and targetUnit ~= oldTargetUnit) or not self:IsCommandsActive(cmd) then			
 			if targetUnit and VDist3( targetUnit:GetPosition(), self:GetPlatoonPosition() ) > 100 then #VDist3( targetUnit:GetPosition(), experimental:GetPosition() ) > 100 then
 			    IssueClearCommands(platoonUnits)
 				WaitTicks(5)
@@ -2553,7 +2553,7 @@ CzarBehaviorSorian = function(self)
         local nearCommander = CommanderOverrideCheckSorian(self)
         local oldCommander = nil
         while nearCommander and aiBrain:PlatoonExists(self) and self:IsCommandsActive(cmd) do
-            if nearCommander and nearCommander != oldCommander then
+            if nearCommander and nearCommander ~= oldCommander then
                 IssueClearCommands(platoonUnits)
                 WaitTicks(5)
                 cmd = self:AttackTarget(nearCommander)
@@ -2587,7 +2587,7 @@ AhwassaBehaviorSorian = function(self)
     while aiBrain:PlatoonExists(self) do
 		self:MergeWithNearbyPlatoonsSorian('ExperimentalAIHubSorian', 50, true)
 
-        if (targetLocation and targetLocation != oldTargetLocation) then
+        if (targetLocation and targetLocation ~= oldTargetLocation) then
             IssueClearCommands(platoonUnits)
 			cmd = ExpPathToLocation(aiBrain, self, 'Air', targetLocation, 'AttackDest', 62500)
             IssueAttack(platoonUnits, targetLocation)
@@ -2617,7 +2617,7 @@ TickBehaviorSorian = function(self)
     while aiBrain:PlatoonExists(self) do
 		self:MergeWithNearbyPlatoonsSorian('ExperimentalAIHubSorian', 50, true)
 
-        if (targetLocation and targetLocation != oldTargetLocation) or not self:IsCommandsActive(cmd) then
+        if (targetLocation and targetLocation ~= oldTargetLocation) or not self:IsCommandsActive(cmd) then
             IssueClearCommands(platoonUnits)
 			cmd = ExpPathToLocation(aiBrain, self, 'Air', targetLocation, false, 62500)
             WaitSeconds(25)

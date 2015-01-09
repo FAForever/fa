@@ -121,7 +121,7 @@ function OnArmyChange()
     if not Sync.Ping then Sync.Ping = {} end
     table.insert(Sync.Ping, {Action = 'flush'})
     --Add All of the relevant marker data on the next sync
-    if GetFocusArmy() != -1 then
+    if GetFocusArmy() ~= -1 then
         ForkThread(function()
             for ownerID, pingTable in PingMarkers do
                 if IsAlly(ownerID+1, GetFocusArmy()) then
@@ -169,7 +169,7 @@ function UpdateMarker(data)
 end
 
 function SendData(data)
-    if GetFocusArmy() != -1 then
+    if GetFocusArmy() ~= -1 then
         if IsAlly(data.Owner+1, GetFocusArmy()) then
             if not Sync.Ping then Sync.Ping = {} end
             table.insert(Sync.Ping, data)

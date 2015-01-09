@@ -780,7 +780,7 @@ end
 #       nil
 #-----------------------------------------------------
 function AISendChat(aigroup, ainickname, aiaction, targetnickname, extrachat)
-	if aigroup and not GetArmyData(ainickname):IsDefeated() and (aigroup !='allies' or AIHasAlly(GetArmyData(ainickname))) then
+	if aigroup and not GetArmyData(ainickname):IsDefeated() and (aigroup ~='allies' or AIHasAlly(GetArmyData(ainickname))) then
 		if aiaction and AIChatText[aiaction] then
 			local ranchat = Random(1, table.getn(AIChatText[aiaction]))
 			local chattext
@@ -1253,7 +1253,7 @@ function GetGuards(aiBrain, Unit)
 			count = count + 1
 		end
 	end
-	if UpgradesFrom and UpgradesFrom != 'none' then -- Used to filter out upgrading units
+	if UpgradesFrom and UpgradesFrom ~= 'none' then -- Used to filter out upgrading units
 		local oldCat = ParseEntityCategory(UpgradesFrom)
 		local oldUnit = aiBrain:GetUnitsAroundPoint( oldCat, Unit:GetPosition(), 0, 'Ally' )
 		if oldUnit then
@@ -1544,7 +1544,7 @@ end
 function GetNumberOfAIs(aiBrain)
 	local numberofAIs = 0
 	for k,v in ArmyBrains do
-		if not v:IsDefeated() and not ArmyIsCivilian(v:GetArmyIndex()) and v:GetArmyIndex() != aiBrain:GetArmyIndex() then
+		if not v:IsDefeated() and not ArmyIsCivilian(v:GetArmyIndex()) and v:GetArmyIndex() ~= aiBrain:GetArmyIndex() then
 			numberofAIs = numberofAIs + 1
 		end
 	end
@@ -1654,7 +1654,7 @@ end
 #-----------------------------------------------------
 function AIHasAlly(army)
 	for k, v in ArmyBrains do
-		if IsAlly(army:GetArmyIndex(), v:GetArmyIndex()) and army:GetArmyIndex() != v:GetArmyIndex() and not v:IsDefeated() then
+		if IsAlly(army:GetArmyIndex(), v:GetArmyIndex()) and army:GetArmyIndex() ~= v:GetArmyIndex() and not v:IsDefeated() then
 			return true
 		end
 	end

@@ -143,7 +143,7 @@ function SetLayout()
     controls.abilityBG.BR.Left:Set(controls.abilities.Right)
     controls.abilityBG.BR.Top:Set(controls.abilities.Bottom)
 
-    if options.gui_detailed_unitview != 0 then
+    if options.gui_detailed_unitview ~= 0 then
         LayoutHelpers.AtLeftTopIn(controls.healthBar, controls.bg, 66, 25)
         LayoutHelpers.Below(controls.shieldBar, controls.healthBar)
         controls.shieldBar.Height:Set(14)

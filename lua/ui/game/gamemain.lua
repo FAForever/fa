@@ -43,7 +43,7 @@ modifiersKeys = {}
 local currentKeyMap = import('/lua/keymap/keymapper.lua').GetKeyMappings(true)
 for key, action in currentKeyMap do
     if action["category"] == "hotbuilding" then
-        if key != nil then
+        if key ~= nil then
             if not import('/lua/keymap/keymapper.lua').IsKeyInMap("Shift-" .. key, currentKeyMap) then
                 modifiersKeys["Shift-" .. key] = action
             else
@@ -134,7 +134,7 @@ function OnFirstUpdate()
                end
                )
 
-    if Prefs.GetOption('skin_change_on_start') != 'no' then
+    if Prefs.GetOption('skin_change_on_start') ~= 'no' then
         local focusarmy = GetFocusArmy()
         local armyInfo = GetArmiesTable()
         if focusarmy >= 1 then
@@ -617,7 +617,7 @@ function NISMode(state)
             ConExecute(i..' false')
         end
         preNISSettings.gameSpeed = GetGameSpeed()
-        if preNISSettings.gameSpeed != 0 then
+        if preNISSettings.gameSpeed ~= 0 then
             SetGameSpeed(0)
         end
         preNISSettings.Units = GetSelectedUnits()
@@ -644,7 +644,7 @@ function NISMode(state)
                 ConExecute(i..' '..tostring(Prefs.GetFromCurrentProfile(i)))
             end
         end
-        if GetGameSpeed() != preNISSettings.gameSpeed then
+        if GetGameSpeed() ~= preNISSettings.gameSpeed then
             SetGameSpeed(preNISSettings.gameSpeed)
         end
         SelectUnits(preNISSettings.Units)
@@ -766,7 +766,7 @@ function SimChangeCameraZoom(newMult)
         defaultZoom = newMult
         local views = import('/lua/ui/game/worldview.lua').GetWorldViews()
         for _, viewControl in views do
-            if viewControl._cameraName != 'MiniMap' then
+            if viewControl._cameraName ~= 'MiniMap' then
                 GetCamera(viewControl._cameraName):SetMaxZoomMult(newMult)
             end
         end

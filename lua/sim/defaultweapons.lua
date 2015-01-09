@@ -46,7 +46,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         Weapon.OnCreate(self)
         local bp = self:GetBlueprint()
         self.WeaponCanFire = true
-        if bp.RackRecoilDistance != 0 then
+        if bp.RackRecoilDistance ~= 0 then
             self.RecoilManipulators = {}
         end
         if not bp.RackBones then
@@ -66,7 +66,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         end
         self.CurrentRackSalvoNumber = 1
         #Calculate recoil speed so that it finishes returning just as the next shot is ready.
-        if bp.RackRecoilDistance != 0 then
+        if bp.RackRecoilDistance ~= 0 then
             local dist = bp.RackRecoilDistance
             if bp.RackBones[1].TelescopeRecoilDistance then
                 local tpDist = bp.RackBones[1].TelescopeRecoilDistance
@@ -88,7 +88,7 @@ DefaultProjectileWeapon = Class(Weapon) {
             error(strg, 2)
             return false
         end
-        if bp.RackRecoilDistance != 0 and bp.MuzzleSalvoDelay != 0 then
+        if bp.RackRecoilDistance ~= 0 and bp.MuzzleSalvoDelay ~= 0 then
             local strg = '*ERROR: You can not have a RackRecoilDistance with a MuzzleSalvoDelay not equal to 0, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
             error(strg, 2)
             return false
@@ -247,7 +247,7 @@ DefaultProjectileWeapon = Class(Weapon) {
             local ix,iy,iz = self.unit:GetBoneDirection(bp.RackBones[self.CurrentRackSalvoNumber].RackBone)
             self.unit:RecoilImpulse(-ix,-iy,-iz)
         end
-        if bp.RackRecoilDistance != 0 then
+        if bp.RackRecoilDistance ~= 0 then
             self:PlayRackRecoil({bp.RackBones[self.CurrentRackSalvoNumber]})
         end
     end,
@@ -377,7 +377,7 @@ DefaultProjectileWeapon = Class(Weapon) {
             self:SetWeaponEnabled(true)
         elseif not self.WeaponWantEnabled and self.WeaponIsEnabled then
             local bp = self:GetBlueprint()
-            if bp.CountedProjectile != true then
+            if bp.CountedProjectile ~= true then
                 self.WeaponIsEnabled = false
                 self:SetWeaponEnabled(false)
             end
@@ -459,7 +459,7 @@ DefaultProjectileWeapon = Class(Weapon) {
 				self.unit:OnGotTarget(self)
 			end
 			
-            if (bp.WeaponUnpackLockMotion != true or (bp.WeaponUnpackLocksMotion == true and not self.unit:IsUnitState('Moving'))) then
+            if (bp.WeaponUnpackLockMotion ~= true or (bp.WeaponUnpackLocksMotion == true and not self.unit:IsUnitState('Moving'))) then
                 if bp.CountedProjectile == true and not self:CanFire() then
                     return
                 end
@@ -730,7 +730,7 @@ DefaultProjectileWeapon = Class(Weapon) {
                 ChangeState(self, self.RackSalvoChargeState)
             elseif self:WeaponHasTarget() and self:CanFire() then
                 ChangeState(self, self.RackSalvoFireReadyState)
-            elseif not self:WeaponHasTarget() and bp.WeaponUnpacks == true and bp.WeaponUnpackLocksMotion != true then
+            elseif not self:WeaponHasTarget() and bp.WeaponUnpacks == true and bp.WeaponUnpackLocksMotion ~= true then
                 ChangeState(self, self.WeaponPackingState)
             else
                 ChangeState(self, self.IdleState)

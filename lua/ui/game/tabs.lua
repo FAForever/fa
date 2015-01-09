@@ -463,7 +463,7 @@ function CommonLogic()
         else
             tab.OnCheck = function(self, checked)
                 for _, altTab in controls.tabs do
-                    if altTab != self and not altTab.Data.pause then
+                    if altTab ~= self and not altTab.Data.pause then
                         altTab:SetCheck(false, true)
                     end
                 end
@@ -979,7 +979,7 @@ function ToggleScore()
 end
 
 function ToggleTabDisplay(state)
-    if import('/lua/ui/game/gamemain.lua').gameUIHidden and state != nil then
+    if import('/lua/ui/game/gamemain.lua').gameUIHidden and state ~= nil then
         return
     end
     if UIUtil.GetAnimationPrefs() then

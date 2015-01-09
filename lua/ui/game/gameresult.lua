@@ -36,11 +36,11 @@ function DoGameResult(armyIndex, result)
 
 	LOG("GAMERESULT : ", result)
     local condPos = string.find(result, " ")
-	if condPos != 0 then
+	if condPos ~= 0 then
 		result = string.sub(result, 1, condPos - 1)
 	end
 
-	if result != 'score' then
+	if result ~= 'score' then
 	
 		if not announced[armyIndex] then
 			if armyIndex == GetFocusArmy() then

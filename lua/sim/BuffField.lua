@@ -39,7 +39,7 @@ BuffField = Class(Entity) {
         # fires when the field begins to work
 
         # show field FX
-        if self.FieldVisualEmitter and type(self.FieldVisualEmitter) == 'string' and self.FieldVisualEmitter != '' then
+        if self.FieldVisualEmitter and type(self.FieldVisualEmitter) == 'string' and self.FieldVisualEmitter ~= '' then
             local Owner = self:GetOwner()
             if not Owner.BuffFieldEffectsBag then
                 Owner.BuffFieldEffectsBag = {}
@@ -116,7 +116,7 @@ BuffField = Class(Entity) {
         local bp = self:GetBlueprint()
 
         # verifying blueprint
-        if not bp.Name or type(bp.Name) != 'string' or bp.Name == '' then WARN('BuffField: Invalid name or name not set!') end
+        if not bp.Name or type(bp.Name) ~= 'string' or bp.Name == '' then WARN('BuffField: Invalid name or name not set!') end
         if type(bp.AffectsUnitCategories) == 'string' then bp.AffectsUnitCategories = ParseEntityCategory(bp.AffectsUnitCategories) end
         if type(bp.Buffs) == 'string' then bp.Buffs = { bp.Buffs } end
         if table.getn(bp.Buffs) < 1 then WARN('BuffField: [..repr(bp.Name)..] no buffs specified!') end
@@ -218,7 +218,7 @@ BuffField = Class(Entity) {
                    continue
                 end
                 if not unit.HasBuffFieldThreadHandle[bp.Name] then
-                    if type(unit.HasBuffFieldThreadHandle) != 'table' then
+                    if type(unit.HasBuffFieldThreadHandle) ~= 'table' then
                         unit.HasBuffFieldThreadHandle = {}
                         unit.BuffFieldThreadHandle = {}
                     end

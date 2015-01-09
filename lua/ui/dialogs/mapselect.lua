@@ -306,14 +306,14 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
 	Tooltip.AddButtonTooltip(randomMapButton, 'lob_click_randmap')
 
 	randomMapButton.OnClick = function(self, modifiers)
-		if randMapList != 0 then
+		if randMapList ~= 0 then
 			local randomMapMessage
 			local nummapa
 			nummapa = math.random(1, randMapList)
 			if randMapList >= 2 and nummapa == doNotRepeatMap then
 				repeat
 					nummapa = math.random(1, randMapList)
-				until nummapa != doNotRepeatMap
+				until nummapa ~= doNotRepeatMap
 			end
 			doNotRepeatMap = nummapa
 			local scen = scenarios[scenarioKeymap[nummapa]]
@@ -343,7 +343,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
 			if randMapList >= 2 and nummapa == doNotRepeatMap then
 				repeat
 					nummapa = math.random(1, randMapList)
-				until nummapa != doNotRepeatMap
+				until nummapa ~= doNotRepeatMap
 			end
 			doNotRepeatMap = nummapa
 			local scen = scenarios[scenarioKeymap[nummapa]]
@@ -362,7 +362,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
 		if randMapList >= 2 and nummapa == doNotRepeatMap then
 			repeat
 				nummapa = math.random(1, randMapList)
-			until nummapa != doNotRepeatMap
+			until nummapa ~= doNotRepeatMap
 		end
 		doNotRepeatMap = nummapa
 		local scen = scenarios[scenarioKeymap[nummapa]]
@@ -742,9 +742,9 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
 					defValue = defValue
 				else
 					--LOG('> 3')
-					if data.default != nil and data.default <= table.getsize(data.data.values) then
+					if data.default ~= nil and data.default <= table.getsize(data.data.values) then
 						--LOG('> 3 > 1')
-						if line.combo.keyMap[curOptions[data.data.key]] != nil then
+						if line.combo.keyMap[curOptions[data.data.key]] ~= nil then
 							--LOG('> 3 > 1 > 1')
 						else
 							--LOG('> 3 > 1 > 2')
@@ -867,7 +867,7 @@ function PopulateMapList()
         local validMapSize = false
         local validMapPlayers = false
         local index = i
-        if currentFilters.map_select_supportedplayers != 0 then
+        if currentFilters.map_select_supportedplayers ~= 0 then
             if CompareFunc(table.getsize(sceninfo.Configurations.standard.teams[1].armies),
                 currentFilters.map_select_supportedplayers,
                 currentFilters.map_select_supportedplayers_limiter) then
@@ -876,14 +876,14 @@ function PopulateMapList()
         else
             validMapSize = true
         end
-        if currentFilters.map_select_size != 0 then
+        if currentFilters.map_select_size ~= 0 then
             if CompareFunc(sceninfo.size[1], currentFilters.map_select_size, currentFilters.map_select_size_limiter) then
                 validMapPlayers = true
             end
         else
             validMapPlayers = true
         end
-		if currentFilters.map_type != 0 then
+		if currentFilters.map_type ~= 0 then
 			local officialMap = CheckMapIsOfficial(sceninfo)
 			if not officialMap and currentFilters.map_type == 1 then
 				continue
@@ -893,7 +893,7 @@ function PopulateMapList()
 			end
 		end
 		###New scenario - Start
-		if currentFilters.map_ai_markers != 0 then
+		if currentFilters.map_ai_markers ~= 0 then
 			if not EnhancedLobby.CheckMapHasMarkers(sceninfo) and currentFilters.map_ai_markers == 1 then
 				continue
 			end

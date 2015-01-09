@@ -105,7 +105,7 @@ function FindSlotForID(id)
 end
 
 function IsPlayer(id)
-    return FindSlotForID(id) != nil
+    return FindSlotForID(id) ~= nil
 end
 
 local function HostAddPlayer(senderId, playerInfo)
@@ -143,9 +143,9 @@ local function CheckForLaunch()
     #counts the number of players in the game.  Include yourself by default.
     local playercount = 1
     for k,id in important do
-        if id != localPlayerID then
+        if id ~= localPlayerID then
             local peer = lobbyComm:GetPeer(id)
-            if peer.status != 'Established' then
+            if peer.status ~= 'Established' then
                 return
             end
             if not table.find(peer.establishedPeers, localPlayerID) then
@@ -153,7 +153,7 @@ local function CheckForLaunch()
             end
             playercount = playercount + 1
             for k2,other in important do
-                if id != other and not table.find(peer.establishedPeers, other) then
+                if id ~= other and not table.find(peer.establishedPeers, other) then
                     return
                 end
             end
@@ -182,7 +182,7 @@ end
 
 local function CreateUI()
 
-    if (connectdialog != false) then
+    if (connectdialog ~= false) then
         MenuCommon.MenuCleanup()
         connectdialog:Destroy()
         connectdialog = false

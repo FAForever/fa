@@ -63,7 +63,7 @@ function GetAbilityList(bp)
 end
     
 function CheckFormat()
-    if ViewState != Prefs.GetOption('uvd_format') then
+    if ViewState ~= Prefs.GetOption('uvd_format') then
         SetLayout()
     end
     if ViewState == "off" then
@@ -104,7 +104,7 @@ function ShowEnhancement(bp, bpID, iconID, iconPrefix, userUnit)
         local slotName = enhancementSlotNames[string.lower(bp.Slot)]
         slotName = slotName or bp.Slot
 
-        if bp.Name != nil then
+        if bp.Name ~= nil then
             View.UnitShortDesc:SetText(LOCF("%s: %s", bp.Name, slotName))
         else
             View.UnitShortDesc:SetText(LOC(slotName))
@@ -118,7 +118,7 @@ function ShowEnhancement(bp, bpID, iconID, iconPrefix, userUnit)
         local showAbilities = false
         local showUpKeep = false
         local time, energy, mass
-        if bp.Icon != nil and not string.find(bp.Name, 'Remove') then
+        if bp.Icon ~= nil and not string.find(bp.Name, 'Remove') then
             time, energy, mass = import('/lua/game.lua').GetConstructEconomyModel(userUnit, bp)
             time = math.max(time, 1)
             showUpKeep = DisplayResources(bp, time, energy, mass)
@@ -226,7 +226,7 @@ function Show(bp, buildingUnit, bpID)
         if GetTechLevelString(bp) then
             description = LOCF('Tech %d %s', GetTechLevelString(bp), description)
         end
-        if bp.General.UnitName != nil then
+        if bp.General.UnitName ~= nil then
             View.UnitShortDesc:SetText(LOCF("%s: %s", bp.General.UnitName, description))
         else
             View.UnitShortDesc:SetText(LOCF("%s", description))
@@ -238,7 +238,7 @@ function Show(bp, buildingUnit, bpID)
         local showecon = true
         local showUpKeep = false
         local showAbilities = false
-        if buildingUnit != nil then
+        if buildingUnit ~= nil then
 	   
 	   -- Differential upgrading. Check to see if building this would be an upgrade
 	   local targetBp = bp
@@ -250,7 +250,7 @@ function Show(bp, buildingUnit, bpID)
 	      performUpgrade = true
 	   elseif targetBp.General.UpgradesFrom == builderBp.General.UpgradesTo then
 	      performUpgrade = true
-	   elseif targetBp.General.UpgradesFromBase != "none" then
+	   elseif targetBp.General.UpgradesFromBase ~= "none" then
 	      # try testing against the base
 	      if targetBp.General.UpgradesFromBase == builderBp.BlueprintId then
 		 performUpgrade = true
@@ -321,7 +321,7 @@ function DisplayResources(bp, time, energy, mass)
     local upkeepEnergy = GetYield(negEnergyRate, plusEnergyRate)
     local upkeepMass = GetYield(negMassRate, plusMassRate)
     local showUpkeep = false
-    if upkeepEnergy != 0 or upkeepMass != 0 then
+    if upkeepEnergy ~= 0 or upkeepMass ~= 0 then
         View.UpkeepGroup.Label:SetText(LOC("<LOC uvd_0002>Yield"))
         View.UpkeepGroup.EnergyValue:SetText( string.format("%d",upkeepEnergy) )
         View.UpkeepGroup.MassValue:SetText( string.format("%d",upkeepMass) )
@@ -337,7 +337,7 @@ function DisplayResources(bp, time, energy, mass)
             View.UpkeepGroup.MassValue:SetColor( "FFF05050" )
         end
         showUpkeep = true
-    elseif bp.Economy and (bp.Economy.StorageEnergy != 0 or bp.Economy.StorageMass != 0) then
+    elseif bp.Economy and (bp.Economy.StorageEnergy ~= 0 or bp.Economy.StorageMass ~= 0) then
         View.UpkeepGroup.Label:SetText(LOC("<LOC uvd_0006>Storage"))
         local upkeepEnergy = bp.Economy.StorageEnergy or 0
         local upkeepMass = bp.Economy.StorageMass or 0

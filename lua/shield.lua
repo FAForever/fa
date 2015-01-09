@@ -28,7 +28,7 @@ Shield = Class(moho.shield_methods,Entity) {
         self.MeshZBp = spec.MeshZ
         self.ImpactMeshBp = spec.ImpactMesh
         self._IsUp = false
-        if spec.ImpactEffects != '' then
+        if spec.ImpactEffects ~= '' then
             self.ImpactEffects = EffectTemplate[spec.ImpactEffects]
         else
             self.ImpactEffects = {}
@@ -158,7 +158,7 @@ Shield = Class(moho.shield_methods,Entity) {
     end,
 
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
-        if self.Owner != instigator then
+        if self.Owner ~= instigator then
 
             local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
 
@@ -213,7 +213,7 @@ Shield = Class(moho.shield_methods,Entity) {
         local ImpactMesh = Entity { Owner = self.Owner }
         Warp( ImpactMesh, self:GetPosition())        
 
-        if self.ImpactMeshBp != '' then
+        if self.ImpactMeshBp ~= '' then
             ImpactMesh:SetMesh(self.ImpactMeshBp)
             ImpactMesh:SetDrawScale(self.Size)
             ImpactMesh:SetOrientation(OrientFromDir(Vector(-vector.x,-vector.y,-vector.z)),true)
@@ -229,7 +229,7 @@ Shield = Class(moho.shield_methods,Entity) {
 
     OnDestroy = function(self)
         self:SetMesh('')
-        if self.MeshZ != nil then
+        if self.MeshZ ~= nil then
             self.MeshZ:Destroy()
             self.MeshZ = nil
         end
@@ -278,7 +278,7 @@ Shield = Class(moho.shield_methods,Entity) {
         self:SetCollisionShape('None')
 
         self:SetMesh('')
-        if self.MeshZ != nil then
+        if self.MeshZ ~= nil then
             self.MeshZ:Destroy()
             self.MeshZ = nil
         end
@@ -383,7 +383,7 @@ Shield = Class(moho.shield_methods,Entity) {
                 self:UpdateShieldRatio(-1)
 
                 fraction = self.Owner:GetResourceConsumed()
-                if fraction != 1 and aiBrain:GetEconomyStored('ENERGY') <= 0 then
+                if fraction ~= 1 and aiBrain:GetEconomyStored('ENERGY') <= 0 then
                     if test then
                         on = false
                     else

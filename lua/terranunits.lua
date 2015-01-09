@@ -72,7 +72,7 @@ TAirFactoryUnit = Class(AirFactoryUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order )
         AirFactoryUnit.OnStartBuild(self, unitBeingBuilt, order )
-        if order != 'Upgrade' then
+        if order ~= 'Upgrade' then
             self:StartArmsMoving()
         end
     end,
@@ -127,7 +127,7 @@ TConstructionUnit = Class(ConstructionUnit) {
     CreateBuildEffects = function( self, unitBeingBuilt, order )
         local UpgradesFrom = unitBeingBuilt:GetBlueprint().General.UpgradesFrom
         # If we are assisting an upgrading unit, or repairing a unit, play seperate effects
-        if (order == 'Repair' and not unitBeingBuilt:IsBeingBuilt()) or (UpgradesFrom and UpgradesFrom != 'none' and self:IsUnitState('Guarding'))then
+        if (order == 'Repair' and not unitBeingBuilt:IsBeingBuilt()) or (UpgradesFrom and UpgradesFrom ~= 'none' and self:IsUnitState('Guarding'))then
             EffectUtil.CreateDefaultBuildBeams( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )
         else
             CreateUEFBuildSliceBeams( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )        
@@ -141,7 +141,7 @@ TConstructionUnit = Class(ConstructionUnit) {
                 self.TerrainLayerTransitionThread:Destroy()
                 self.TerrainLayerTransitionThread = nil
             end
-            if (new == 'Land') and (old != 'None') then
+            if (new == 'Land') and (old ~= 'None') then
                 self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, false)
             elseif (new == 'Water') then
                 self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, true)
@@ -218,7 +218,7 @@ TMassCollectionUnit = Class(MassCollectionUnit) {
     # once it is.
     StartBeingBuiltEffects = function(self, builder, layer)
 		self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
-        if self:GetBlueprint().General.UpgradesFrom != builder:GetUnitId() then
+        if self:GetBlueprint().General.UpgradesFrom ~= builder:GetUnitId() then
 			self:HideBone(0, true)        
             self.OnBeingBuiltEffectsBag:Add( self:ForkThread( CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag ))
         end
@@ -244,7 +244,7 @@ TMobileFactoryUnit = Class(LandUnit) {
 
     StartBeingBuiltEffects = function(self, builder, layer)
 		self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
-        if self:GetBlueprint().General.UpgradesFrom != builder:GetUnitId() then
+        if self:GetBlueprint().General.UpgradesFrom ~= builder:GetUnitId() then
 			self:HideBone(0, true)        
             self.OnBeingBuiltEffectsBag:Add( self:ForkThread( CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag ))
         end
@@ -290,7 +290,7 @@ TSeaFactoryUnit = Class(SeaFactoryUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order )
         SeaFactoryUnit.OnStartBuild(self, unitBeingBuilt, order )
-        if order != 'Upgrade' then
+        if order ~= 'Upgrade' then
             self:StartArmsMoving()
         end
     end,

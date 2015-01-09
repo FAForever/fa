@@ -66,7 +66,7 @@ end
 #------------------------------------------------------------------------------
 function table.subset(t1,t2)
     for k,v in t1 do
-        if t2[k] != v then return false end
+        if t2[k] ~= v then return false end
     end
     return true
 end
@@ -135,7 +135,7 @@ function table.merged(t1, t2)
         return t1
     end
 
-    if type(t1)!='table' or type(t2)!='table' then
+    if type(t1)~='table' or type(t2)~='table' then
         return t2
     end
 
@@ -144,7 +144,7 @@ function table.merged(t1, t2)
         if type(v)=='table' then
             v = table.merged(t1[k], v)
         end
-        if t1[k] != v then
+        if t1[k] ~= v then
             copied = copied or table.copy(t1)
             t1 = copied
             t1[k] = v
@@ -168,7 +168,7 @@ function table.cat(t1, t2)
         return t1
     end
 
-    if type(t1)!='table' or type(t2)!='table' then
+    if type(t1)~='table' or type(t2)~='table' then
         error('table.cat(t1, t2) : expects two tables as parameters',2)
     end
 
@@ -264,7 +264,7 @@ function sortedpairs(t, comp)
     local i=1
     return function()
         local k = keys[i]
-        if k!=nil then
+        if k~=nil then
             i=i+1
             return k,t[k]
         end
@@ -276,7 +276,7 @@ end
 # table.getsize(t) returns actual size of a table, including string keys
 #------------------------------------------------------------------------------
 function table.getsize(t)
-    if type(t) != 'table' then return end
+    if type(t) ~= 'table' then return end
     local size = 0
     for k, v in t do
         size = size + 1

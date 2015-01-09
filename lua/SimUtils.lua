@@ -262,7 +262,7 @@ end
 
 function GiveResourcesToPlayer(data)
 	SendChatToReplay(data)
-	if data.From != -1 then
+	if data.From ~= -1 then
 		if not OkayToMessWithArmy(data.From) then
 			return
 		end

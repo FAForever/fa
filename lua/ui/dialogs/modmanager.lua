@@ -548,7 +548,7 @@ function CreateDialog(over, inLobby, exitBehavior, useCover, modStatus)
                 exclusiveModSelected = bg
                 bg:Toggle()
                 for index, control in scrollGroup.controlList do
-                    if control != bg and control.active then
+                    if control ~= bg and control.active then
                         control:Toggle()
                     end
                 end
@@ -724,7 +724,7 @@ function CreateDialog(over, inLobby, exitBehavior, useCover, modStatus)
         for index, control in scrollGroup.controlList do
             local uid = control.modInfo.uid
             if not modStatus[uid].cantoggle then
-                if control.active != (selectedModsFromHost[uid] or false) then
+                if control.active ~= (selectedModsFromHost[uid] or false) then
                     control:Toggle()
                 end
             end

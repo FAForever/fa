@@ -355,7 +355,7 @@ end
 		end
 		
 		local function DataSize()
-			if GUI.chatContainer.prevtabsize != table.getn(chatHistory) then
+			if GUI.chatContainer.prevtabsize ~= table.getn(chatHistory) then
 				local size = 0
 				for i, v in chatHistory do
 					if IsValidEntry(v) then
@@ -765,14 +765,14 @@ end
 				end
 				msg.text = text
 				if ChatTo() == 'allies' then
-					if GetFocusArmy() != -1 then
+					if GetFocusArmy() ~= -1 then
 						SessionSendChatMessage(FindClients(), msg)
 					else
 						msg.Observer = true
 						SessionSendChatMessage(FindClients(), msg)
 					end
 				elseif type(ChatTo()) == 'number' then
-					if GetFocusArmy() != -1 then
+					if GetFocusArmy() ~= -1 then
 						SessionSendChatMessage(FindClients(ChatTo()), msg)
 						msg.echo = true
 						msg.from = GetArmyData(GetFocusArmy()).nickname
@@ -819,11 +819,11 @@ end
 		end
 		if type(msg) == 'string' then
 			msg = { text = msg }
-		elseif type(msg) != 'table' then
+		elseif type(msg) ~= 'table' then
 			msg = { text = repr(msg) }
 		end
 		local armyData = GetArmyData(sender)
-		if not armyData and GetFocusArmy() != -1 and not SessionIsReplay() then
+		if not armyData and GetFocusArmy() ~= -1 and not SessionIsReplay() then
 			return
 		end
 		local towho = LOC(ToStrings[msg.to].text) or LOC(ToStrings['private'].text)		
@@ -897,7 +897,7 @@ end
 	end
 	
 	function ActivateChat(modifiers)		
-		if type(ChatTo()) != 'number' then
+		if type(ChatTo()) ~= 'number' then
 			if modifiers.Shift then
 				ChatTo:Set('allies')
 			else
@@ -956,7 +956,7 @@ end
 		}
     
 		for armyID, armyData in armies.armiesTable do
-			if armyID != armies.focusArmy and not armyData.civilian then
+			if armyID ~= armies.focusArmy and not armyData.civilian then
 				table.insert(entries, {nickname = armyData.nickname, armyID = armyID})
 			end
 		end
@@ -1217,7 +1217,7 @@ end
 
 function ToggleChat()
     if GUI.bg:IsHidden() then
-        if GetFocusArmy() != -1 then
+        if GetFocusArmy() ~= -1 then
             GUI.bg:Show()
             GUI.chatEdit.edit:AcquireFocus()
             if not GUI.bg.pinned then
@@ -1238,8 +1238,8 @@ function ToggleChat()
 end
 
 function ActivateChat(modifiers)
-    if GetFocusArmy() != -1 then
-        if type(ChatTo()) != 'number' then
+    if GetFocusArmy() ~= -1 then
+        if type(ChatTo()) ~= 'number' then
             if modifiers.Shift then
                 ChatTo:Set('allies')
             else
@@ -1399,7 +1399,7 @@ function CreateConfigWindow()
             group.Width:Set(group.split.Width)
             group.Height:Set(group.split.Height)
         end
-        if data.type != 'splitter' then
+        if data.type ~= 'splitter' then
             Tooltip.AddControlTooltip(group, data.tooltip or 'chat_filter')
         end
         return group

@@ -110,7 +110,7 @@ CConstructionUnit = Class(ConstructionUnit){
                 self.TerrainLayerTransitionThread:Destroy()
                 self.TerrainLayerTransitionThread = nil
             end
-            if (new == 'Land') and (old != 'None') then
+            if (new == 'Land') and (old ~= 'None') then
                 self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, false)
             elseif (new == 'Water') then
                 self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, true)
@@ -262,7 +262,7 @@ CSeaFactoryUnit = Class(SeaFactoryUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order )
         SeaFactoryUnit.OnStartBuild(self, unitBeingBuilt, order )
-        if order != 'Upgrade' then
+        if order ~= 'Upgrade' then
             self:StartArmsMoving()
         end
     end,

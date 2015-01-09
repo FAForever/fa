@@ -58,7 +58,7 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
             self:DetachAll(bp.Display.BuildAttachBone or 0)
         end
         self:DestroyBuildRotator()
-        if order != 'Upgrade' then
+        if order ~= 'Upgrade' then
             ChangeState(self, self.RollingOffState)
         else
             self:SetBusy(false)
@@ -237,7 +237,7 @@ SConstructionUnit = Class(ConstructionUnit) {
     
     OnStartBuild = function(self, unitBeingBuilt, order)
         local bp = self:GetBlueprint()
-        if order != 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
+        if order ~= 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
             self:StartBuildingEffects(unitBeingBuilt, order)
         end
         self:DoOnStartBuildCallbacks(unitBeingBuilt)

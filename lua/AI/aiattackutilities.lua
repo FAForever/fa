@@ -290,7 +290,7 @@ function GetBestThreatTarget(aiBrain, platoon, bSkipPathability)
     for tIndex,threat in threatTable do 
         #check if we can path to the position or a position nearby
         if not bSkipPathability then
-            if platoon.MovementLayer != 'Water' then
+            if platoon.MovementLayer ~= 'Water' then
                 local success, bestGoalPos = CheckPlatoonPathingEx(platoon, {threat[1], 0, threat[2]})
                 logCount = logCount + 1
                 if not success then
@@ -679,8 +679,8 @@ function AIPlatoonNavalAttackVector( aiBrain, platoon )
     local path, reason
 	
     # if we don't have an old path or our old destination and new destination are different
-    if attackPos and (oldPathSize == 0 or attackPos[1] != platoon.LastAttackDestination[oldPathSize][1] or
-    attackPos[3] != platoon.LastAttackDestination[oldPathSize][3]) then
+    if attackPos and (oldPathSize == 0 or attackPos[1] ~= platoon.LastAttackDestination[oldPathSize][1] or
+    attackPos[3] ~= platoon.LastAttackDestination[oldPathSize][3]) then
         
         # check if we can path to here safely... give a large threat weight to sort by threat first
         path, reason = PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, platoon.PlatoonData.NodeWeight or 10 )
@@ -785,8 +785,8 @@ function AIPlatoonSquadAttackVector( aiBrain, platoon, bAggro )
     local oldPathSize = table.getn(platoon.LastAttackDestination)
     
     # if we don't have an old path or our old destination and new destination are different
-    if oldPathSize == 0 or attackPos[1] != platoon.LastAttackDestination[oldPathSize][1] or
-    attackPos[3] != platoon.LastAttackDestination[oldPathSize][3] then
+    if oldPathSize == 0 or attackPos[1] ~= platoon.LastAttackDestination[oldPathSize][1] or
+    attackPos[3] ~= platoon.LastAttackDestination[oldPathSize][3] then
         
         GetMostRestrictiveLayer(platoon)
         # check if we can path to here safely... give a large threat weight to sort by threat first
@@ -1280,7 +1280,7 @@ function PlatoonGenerateSafePathTo(aiBrain, platoonLayer, start, destination, op
 	local per = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
 
 	#If it is a Sorian AI or Duncane AI and not a water unit.
-	if (string.find(per, 'sorian') or DiskGetFileInfo('/lua/AI/altaiutilities.lua')) and platoonLayer != "Water" then
+	if (string.find(per, 'sorian') or DiskGetFileInfo('/lua/AI/altaiutilities.lua')) and platoonLayer ~= "Water" then
 		testPath = true
 	end
 	
@@ -1499,7 +1499,7 @@ function GeneratePath(aiBrain, startNode, endNode, threatType, threatWeight, des
 		aiBrain.PathCache[startNode.name][endNode.name] = {}
 	end
 	
-	if aiBrain.PathCache[startNode.name][endNode.name].path and aiBrain.PathCache[startNode.name][endNode.name].path != 'bad'
+	if aiBrain.PathCache[startNode.name][endNode.name].path and aiBrain.PathCache[startNode.name][endNode.name].path ~= 'bad'
 	and aiBrain.PathCache[startNode.name][endNode.name].settime + 60 > GetGameTimeSeconds() then
 		return aiBrain.PathCache[startNode.name][endNode.name].path
 	--elseif aiBrain.PathCache[startNode.name][endNode.name].path and aiBrain.PathCache[startNode.name][endNode.name].path == 'bad' then
@@ -1598,7 +1598,7 @@ function GeneratePathOld(aiBrain, startNode, endNode, threatType, threatWeight, 
 		aiBrain.PathCache[startNode.name][endNode.name] = {}
 	end
 	
-	if aiBrain.PathCache[startNode.name][endNode.name].path and aiBrain.PathCache[startNode.name][endNode.name].path != 'bad'
+	if aiBrain.PathCache[startNode.name][endNode.name].path and aiBrain.PathCache[startNode.name][endNode.name].path ~= 'bad'
 	and aiBrain.PathCache[startNode.name][endNode.name].settime + 60 > GetGameTimeSeconds() then
 		return aiBrain.PathCache[startNode.name][endNode.name].path
 	--elseif aiBrain.PathCache[startNode.name][endNode.name].path and aiBrain.PathCache[startNode.name][endNode.name].path == 'bad' then
@@ -2004,8 +2004,8 @@ function AIPlatoonSquadAttackVectorSorian( aiBrain, platoon, bAggro )
     local oldPathSize = table.getn(platoon.LastAttackDestination)
     
     # if we don't have an old path or our old destination and new destination are different
-    if oldPathSize == 0 or attackPos[1] != platoon.LastAttackDestination[oldPathSize][1] or
-    attackPos[3] != platoon.LastAttackDestination[oldPathSize][3] then
+    if oldPathSize == 0 or attackPos[1] ~= platoon.LastAttackDestination[oldPathSize][1] or
+    attackPos[3] ~= platoon.LastAttackDestination[oldPathSize][3] then
         
         GetMostRestrictiveLayer(platoon)
         # check if we can path to here safely... give a large threat weight to sort by threat first
@@ -2088,8 +2088,8 @@ function AIPlatoonNavalAttackVectorSorian( aiBrain, platoon )
     local oldPathSize = table.getn(platoon.LastAttackDestination)
     
     # if we don't have an old path or our old destination and new destination are different
-    if oldPathSize == 0 or attackPos[1] != platoon.LastAttackDestination[oldPathSize][1] or
-    attackPos[3] != platoon.LastAttackDestination[oldPathSize][3] then
+    if oldPathSize == 0 or attackPos[1] ~= platoon.LastAttackDestination[oldPathSize][1] or
+    attackPos[3] ~= platoon.LastAttackDestination[oldPathSize][3] then
         
         # check if we can path to here safely... give a large threat weight to sort by threat first
         local path, reason = PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, platoon.PlatoonData.NodeWeight or 10 )

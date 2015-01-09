@@ -328,7 +328,7 @@ function SyncScores()
             ####################
             ## General scores ##
             ####################
-            if scoreOption != 'no' then
+            if scoreOption ~= 'no' then
                 Sync.Score[index].general.score = ArmyScore[index].general.score
             else
                 Sync.Score[index].general.score = -1
@@ -383,7 +383,7 @@ AIBrain = Class(moho.aibrain_methods) {
             for name,data in ScenarioInfo.ArmySetup do
                 if name == self.Name then
                     self.handicap = Handicaps[data.Handicap]
-                    if self.handicap != 0 then
+                    if self.handicap ~= 0 then
                         HCapUtils.SetupHandicap(self)
                     end
                     break
@@ -426,7 +426,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 for name,data in ScenarioInfo.ArmySetup do
                     if name == self.Name then
                         self.handicap = Handicaps[data.Handicap]
-                        if self.handicap != 0 then
+                        if self.handicap ~= 0 then
                             HCapUtils.SetupHandicap(self)
                         end
                         break
@@ -522,7 +522,7 @@ AIBrain = Class(moho.aibrain_methods) {
             # place resource structures down
             for k, v in resourceStructures do
                 local unit = self:CreateResourceBuildingNearest(v, posX, posY)
-                if unit != nil and unit:GetBlueprint().Physics.FlattenSkirt then
+                if unit ~= nil and unit:GetBlueprint().Physics.FlattenSkirt then
                     unit:CreateTarmac(true, true, true, false, false)
                 end
             end
@@ -532,7 +532,7 @@ AIBrain = Class(moho.aibrain_methods) {
             # place initial units down
             for k, v in initialUnits do
                 local unit = self:CreateUnitNearSpot(v, posX, posY)
-                if unit != nil and unit:GetBlueprint().Physics.FlattenSkirt then
+                if unit ~= nil and unit:GetBlueprint().Physics.FlattenSkirt then
                     unit:CreateTarmac(true, true, true, false, false)
                 end
             end
@@ -595,7 +595,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ESMassStorageUpdate = function(self, newState)
-        if self.EconMassStorageState != newState then
+        if self.EconMassStorageState ~= newState then
             for k, v in self.EconStateUnits.MassStorage do
                 if not v:IsDead() then
                     v:OnMassStorageStateChange(newState)
@@ -630,7 +630,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ESEnergyStorageUpdate = function(self, newState)
-        if self.EconEnergyStorageState != newState then
+        if self.EconEnergyStorageState ~= newState then
             for k, v in self.EconStateUnits.EnergyStorage do
                 if not v:IsDead() then
                     v:OnEnergyStorageStateChange(newState)
@@ -868,7 +868,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ## ------------- AI BRAIN FUNCTIONS HANDLED HERE  ------------- ##
     ##################################################################
     ImportScenarioArmyPlans = function(self, planName)
-        if planName and planName != '' then
+        if planName and planName ~= '' then
             #LOG('*AI DEBUG: IMPORTING PLAN NAME = ', repr(planName))
             return import(planName).AIPlansList
         else
@@ -929,7 +929,7 @@ AIBrain = Class(moho.aibrain_methods) {
         SetArmyOutOfGame(self:GetArmyIndex())
 
 
-        if math.floor(self:GetArmyStat("FAFLose",0.0).Value) != -1 then
+        if math.floor(self:GetArmyStat("FAFLose",0.0).Value) ~= -1 then
             self:AddArmyStat("FAFLose", -1)
         end
 
@@ -1105,7 +1105,7 @@ AIBrain = Class(moho.aibrain_methods) {
             if bestPlan then
                 self:SetCurrentPlan( bestPlan )
                 local bPlan = import(bestPlan)
-                if bPlan != self.CurrentPlanScript then
+                if bPlan ~= self.CurrentPlanScript then
                     self.CurrentPlanScript = import(bestPlan)
                     self:SetRepeatExecution(true)
                     self:ExecutePlan(self.CurrentPlan)
@@ -1447,7 +1447,7 @@ AIBrain = Class(moho.aibrain_methods) {
             WaitSeconds(5)
             local changed = false
             for k,v in self.BuilderManagers do
-                if k != 'MAIN' and v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) <= 0 and v.FactoryManager:GetNumCategoryFactories(categories.ALLUNITS) <= 0 then
+                if k ~= 'MAIN' and v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) <= 0 and v.FactoryManager:GetNumCategoryFactories(categories.ALLUNITS) <= 0 then
             			if v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) <= 0 then
             	                    v.EngineerManager:SetEnabled(false)
             	                    v.FactoryManager:SetEnabled(false)
@@ -1473,7 +1473,7 @@ AIBrain = Class(moho.aibrain_methods) {
     RebuildTable = function(self, oldtable)
         local temptable = {}
         for k,v in oldtable do
-            if v != nil then
+            if v ~= nil then
                 if type(k) == 'string' then
                     temptable[k] = v
                 else
@@ -2828,7 +2828,7 @@ AIBrain = Class(moho.aibrain_methods) {
     #Sort platoon list
     #PlatoonType = 'Air', 'Land' or 'Sea'
     PBMSortPlatoonsViaPriority = function(self, platoonType)
-         if platoonType != 'Air' and platoonType != 'Land' and platoonType != 'Sea' and platoonType != 'Gate' then
+         if platoonType ~= 'Air' and platoonType ~= 'Land' and platoonType ~= 'Sea' and platoonType ~= 'Gate' then
             local strng = '*AI ERROR: TRYING TO SORT PLATOONS VIA PRIORITY BUT AN INVALID TYPE (', repr(platoonType),') WAS PASSED IN.'
             error(strng, 2)
             return false
@@ -4768,7 +4768,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
 
                 if enemy then
-                    if not self:GetCurrentEnemy() or self:GetCurrentEnemy() != enemy then
+                    if not self:GetCurrentEnemy() or self:GetCurrentEnemy() ~= enemy then
                         SUtils.AISendChat('allies', ArmyBrains[self:GetArmyIndex()].Nickname, 'targetchat', ArmyBrains[enemy:GetArmyIndex()].Nickname)
                     end
                     self:SetCurrentEnemy( enemy )

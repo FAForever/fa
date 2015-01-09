@@ -183,7 +183,7 @@ function OverrideKilled(self, instigator, type, overkillRatio)
 
     #If factory, destory what I'm building if I die
     if EntityCategoryContains(categories.FACTORY, self) then
-        if self.UnitBeingBuilt and not self.UnitBeingBuilt:IsDead() and self.UnitBeingBuilt:GetFractionComplete() != 1 then
+        if self.UnitBeingBuilt and not self.UnitBeingBuilt:IsDead() and self.UnitBeingBuilt:GetFractionComplete() ~= 1 then
             self.UnitBeingBuilt:Kill()
         end
     end
@@ -205,7 +205,7 @@ function OverrideKilled(self, instigator, type, overkillRatio)
     if instigator and IsUnit(instigator) then
         instigator:OnKilledUnit(self)
     end
-    if self.DeathWeaponEnabled != false then
+    if self.DeathWeaponEnabled ~= false then
         self:DoDeathWeapon()
     end
     self:DisableShield()
@@ -658,7 +658,7 @@ function SetupMFDSync(movieTable, text)
     local tempText = LOC(text)
     local tempData = {}
     local nameStart = string.find(tempText, ']')
-    if nameStart != nil then
+    if nameStart ~= nil then
         tempData.name = LOC("<LOC "..string.sub(tempText, 2, nameStart-1)..">")
         tempData.text = string.sub(tempText, nameStart+2)
     else
@@ -1907,7 +1907,7 @@ function EngineerBuildUnits( army, unitName, ... )
     local engUnit = ScenarioUtils.CreateArmyUnit(army, unitName)
     local aiBrain = engUnit:GetAIBrain()
     for k,v in arg do
-        if k != 'n' then
+        if k ~= 'n' then
             local unitData = ScenarioUtils.FindUnit(v, Scenario.Armies[army].Units)
             if not unitData then
                 WARN('*WARNING: Invalid unit name ' .. v)
@@ -2152,7 +2152,7 @@ function GetTimeIAmAllowedToBeOffMap(self)
 	
 	for i = 1, self:GetWeaponCount() do
 		local wep = self:GetWeapon(i)
-		if wep.Label != 'DeathWeapon' and wep.Label != 'DeathImpact' then
+		if wep.Label ~= 'DeathWeapon' and wep.Label ~= 'DeathImpact' then
 			if wep:GetCurrentTarget()  then
 				value = airspeed * 2
 			end

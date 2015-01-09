@@ -22,7 +22,7 @@ function FactoryFixes( FactoryClass )
          OnKilled = function(self, instigator, type, overkillRatio)
             StructureUnit.OnKilled(self, instigator, type, overkillRatio) # bypassing factoryunit onkilled event
             # added by brute51 - check if we're building a unit before destroying it [114]
-            if self.UnitBeingBuilt and not self.UnitBeingBuilt:BeenDestroyed() and self.UnitBeingBuilt:GetFractionComplete() != 1 then
+            if self.UnitBeingBuilt and not self.UnitBeingBuilt:BeenDestroyed() and self.UnitBeingBuilt:GetFractionComplete() ~= 1 then
                 self.UnitBeingBuilt:Destroy()
             end
         end,

@@ -94,7 +94,7 @@ function CreateUI()
         group.warningBG.flashMod = 1
         group.warningBG.warningBitmap = warningBitmap
         group.warningBG.SetToState = function(self, state)
-            if self.State != state then
+            if self.State ~= state then
                 if state == 'red' then
                     self:SetTexture(UIUtil.UIFile('/game/resource-panel/alert-'..self.warningBitmap..'-panel_bmp.dds'))
                     self.flashMod = 1.6
@@ -550,7 +550,7 @@ function _BeatFunction()
 end
 
 function ToggleEconPanel(state)
-    if import('/lua/ui/game/gamemain.lua').gameUIHidden and state != nil then
+    if import('/lua/ui/game/gamemain.lua').gameUIHidden and state ~= nil then
         return
     end
     import(UIUtil.GetLayoutFilename('economy')).TogglePanelAnimation(state)

@@ -82,24 +82,24 @@ local function EditActionKey(parent, action, currentKey)
     
     local function AddKey(keyCode, modifiers)
        
-        if keyCodeLookup[keyCode] != nil then
+        if keyCodeLookup[keyCode] ~= nil then
             local ctrl = false
             local alt = false
             local shift = false
 
             local key = keyCodeLookup[keyCode]
             
-            if key != 'Ctrl' then
+            if key ~= 'Ctrl' then
                 if modifiers.Ctrl == true then
                     ctrl = true
                 end
                 
-                if key != 'Shift' then
+                if key ~= 'Shift' then
                     if modifiers.Shift == true then
                         shift = true
                     end
                 
-                    if key != 'Alt' then
+                    if key ~= 'Alt' then
                         if modifiers.Alt == true then
                             alt = true
                         end
@@ -491,7 +491,7 @@ function FormatData()
     
     local index = 1
     for i, v in retkeys do
-        if index != 1 then
+        if index ~= 1 then
             KeyData[index] = {type = 'spacer'}
             index = index + 1
         end

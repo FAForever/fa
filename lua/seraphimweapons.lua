@@ -107,7 +107,7 @@ SDFThauCannon = Class(DefaultProjectileWeapon) {
         local pos = self.unit:GetPosition()
         local TerrainType = GetTerrainType( pos.x,pos.z )
         local effectTable = TerrainType.FXOther[self.unit:GetCurrentLayer()][self.FxMuzzleTerrainTypeName] 
-        if effectTable != nil then
+        if effectTable ~= nil then
             local army = self.unit:GetArmy() 
 			for k, v in effectTable do
 				CreateAttachedEmitter(self.unit, muzzle, army, v)
