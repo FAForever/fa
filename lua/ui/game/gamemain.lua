@@ -222,7 +222,9 @@ function CreateUI(isReplay)
     end
 
     Prefetcher:Update(prefetchTable)
-
+    -- UI assets should be loaded fast into memory to prevent stutter
+    ConExecute('res_AfterPrefetchDelay 100')
+    ConExecute('res_PrefetcherActivityDelay 1')
 
     ##below added for FAF
     import("/modules/displayrings.lua").Init()	##added for acu and engineer build radius ui mod
