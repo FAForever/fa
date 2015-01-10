@@ -122,6 +122,12 @@ end
 function GetStartPositions(scenario)
     local saveData = {}
     doscript('/lua/dataInit.lua', saveData)
+    
+    if not scenario.save then
+        WARN('No save file found for selected map')
+        return
+    end
+    
     doscript(scenario.save, saveData)
 
     local armyPositions = {}
