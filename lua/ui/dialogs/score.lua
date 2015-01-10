@@ -39,8 +39,8 @@ local campaignScore = ''
 
 scoreScreenActive = false
 
-# '<LOC SCORE_0058>Debrief'
-# '<LOC SCORE_0059>Combat Report'
+-- '<LOC SCORE_0058>Debrief'
+-- '<LOC SCORE_0059>Combat Report'
 
 local tabs = {
     {
@@ -247,7 +247,7 @@ function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
                 end
                 subtitleThread = ForkThread(
                     function()
-                        # Display subtitles
+                        -- Display subtitles
                         local lastOff = 0
                         for k,v in captions do
                             WaitSeconds(v.offset - lastOff)
@@ -444,7 +444,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
             operationVictoryTable.allSecondary = true
             CampaignManager.OperationVictory(operationVictoryTable, true)
         end
-        # Checking gpgnet too in case we switch to that
+        -- Checking gpgnet too in case we switch to that
         if HasCommandLineArg("/online") or HasCommandLineArg("/gpgnet") then
             ExitApplication()
         else
@@ -1054,13 +1054,13 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
 
         local curButton = UIUtil.CreateButtonStd(bg, '/scx_menu/tab_btn/tab', value.title, 16, nil, nil, "UI_Tab_Click_02", "UI_Tab_Rollover_02")
         if prev then
-            #curButton.Left:Set(function() return prev.Right() + 0 end)
-            #curButton.Bottom:Set(function() return prev.Bottom() end)
+            --curButton.Left:Set(function() return prev.Right() + 0 end)
+            --curButton.Bottom:Set(function() return prev.Bottom() end)
             LayoutHelpers.RightOf(curButton, prev, -5)
         else
-            #LayoutHelpers.RelativeTo(curButton, bg,
-            #    UIUtil.SkinnableFile('/dialogs/score-victory-defeat/score-victory-defeat_layout.lua'),
-            #    'l_general_btn', 'panel_bmp', -10)
+            --LayoutHelpers.RelativeTo(curButton, bg,
+            --    UIUtil.SkinnableFile('/dialogs/score-victory-defeat/score-victory-defeat_layout.lua'),
+            --    'l_general_btn', 'panel_bmp', -10)
             curButton.Left:Set(function() return bg.Left() + 17 end)
             curButton.Top:Set(function() return bg.Top() + 57 end)
             defaultTab = curButton

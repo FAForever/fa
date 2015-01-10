@@ -1,11 +1,11 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AINavalBuilders.lua
-#**
-#**  Summary  : Default Naval structure builders for skirmish
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AINavalBuilders.lua
+--**
+--**  Summary  : Default Naval structure builders for skirmish
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local BBTmplFile = '/lua/basetemplates.lua'
 local BuildingTmpl = 'BuildingTemplates'
@@ -23,7 +23,7 @@ local SAI = '/lua/ScenarioPlatoonAI.lua'
 local PlatoonFile = '/lua/platoon.lua'
 
 
-# For everything but Naval Rush
+-- For everything but Naval Rush
 BuilderGroup {
     BuilderGroupName = 'NavalExpansionBuilders',
     BuildersType = 'EngineerBuilder',
@@ -33,7 +33,7 @@ BuilderGroup {
         Priority = 922,
         InstanceCount = 1,
         BuilderConditions = {
-            #DUNCAN - Added to limit expansions
+            --DUNCAN - Added to limit expansions
             { UCBC, 'NavalBaseCount', { '<', 1 } },
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 250, -1000, 10, 1, 'AntiSurface' } },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
@@ -60,7 +60,7 @@ BuilderGroup {
                     'T1AADefense',
                     'T1SeaFactory',
                     'T1Sonar',
-                    #'T1NavalDefense',
+                    --'T1NavalDefense',
                 }
             }
         }
@@ -68,10 +68,10 @@ BuilderGroup {
     Builder {
         BuilderName = 'T2 Naval Builder',
         PlatoonTemplate = 'T2EngineerBuilder',
-        Priority = 0, #DUNCAN - was 922
+        Priority = 0, --DUNCAN - was 922
         InstanceCount = 1,
         BuilderConditions = {
-            #DUNCAN - Added to limit expansions
+            --DUNCAN - Added to limit expansions
             { UCBC, 'NavalBaseCount', { '<', 1 } },
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 250, -1000, 10, 1, 'AntiSurface' } },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
@@ -101,10 +101,10 @@ BuilderGroup {
     Builder {
         BuilderName = 'T3 Naval Builder',
         PlatoonTemplate = 'T3EngineerBuilder',
-        Priority = 0, #DUNCAN - was 922
+        Priority = 0, --DUNCAN - was 922
         InstanceCount = 1,
         BuilderConditions = {
-            #DUNCAN - Added to limit expansions
+            --DUNCAN - Added to limit expansions
             { UCBC, 'NavalBaseCount', { '<', 1 } },
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 250, -1000, 10, 1, 'AntiSurface' } },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
@@ -133,7 +133,7 @@ BuilderGroup {
     },
 }
 
-# Used in Naval Rush
+-- Used in Naval Rush
 BuilderGroup {
     BuilderGroupName = 'NavalExpansionBuilders HighPri',
     BuildersType = 'EngineerBuilder',
@@ -144,13 +144,13 @@ BuilderGroup {
         Priority = 985,
         InstanceCount = 1,
         BuilderConditions = {
-            #DUNCAN - Added to limit expansions
+            --DUNCAN - Added to limit expansions
             { UCBC, 'NavalBaseCount', { '<', 1 } },
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'FACTORY NAVAL' } },
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 500, -1000, 10, 1, 'AntiSurface' } },
             { UCBC, 'HaveLessThanUnitsWithCategory', { 1, 'FACTORY NAVAL TECH2, FACTORY NAVAL TECH3'}},
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'FACTORY NAVAL TECH2, FACTORY NAVAL TECH3' } },
-            #{ UCBC, 'UnitsGreaterThanExpansionValue', { 'MASSEXTRACTION', 6, 4, 6 } },
+            --{ UCBC, 'UnitsGreaterThanExpansionValue', { 'MASSEXTRACTION', 6, 4, 6 } },
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -174,7 +174,7 @@ BuilderGroup {
                     'T1SeaFactory',
                     'T1AADefense',
                     'T1Sonar',
-                    #'T1NavalDefense',
+                    --'T1NavalDefense',
                     'T1SeaFactory',
                 }
             }
@@ -186,7 +186,7 @@ BuilderGroup {
         Priority = 850,
         InstanceCount = 1,
         BuilderConditions = {
-            #DUNCAN - Added to limit expansions
+            --DUNCAN - Added to limit expansions
             { UCBC, 'NavalBaseCount', { '<', 2 } },
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'FACTORY NAVAL'}},
             { MIBC, 'MapGreaterThan', { 512, 512 }},
@@ -213,7 +213,7 @@ BuilderGroup {
                 BuildStructures = {
                     'T1SeaFactory',
                     'T1AADefense',
-                    #'T1NavalDefense',
+                    --'T1NavalDefense',
                     'T1Sonar',
                 }
             }
@@ -222,10 +222,10 @@ BuilderGroup {
     Builder {
         BuilderName = 'T2 Naval Builder HighPri',
         PlatoonTemplate = 'T2EngineerBuilder',
-        Priority = 0, #DUNCAN - was 850
+        Priority = 0, --DUNCAN - was 850
         InstanceCount = 1,
         BuilderConditions = {
-            #DUNCAN - Added to limit expansions
+            --DUNCAN - Added to limit expansions
             { UCBC, 'NavalBaseCount', { '<', 2 } },
             { MIBC, 'MapGreaterThan', { 512, 512 }},
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 500, -1000, 10, 1, 'AntiSurface' } },
@@ -256,10 +256,10 @@ BuilderGroup {
     Builder {
         BuilderName = 'T3 Naval Builder HighPri',
         PlatoonTemplate = 'T3EngineerBuilder',
-        Priority =  0, #DUNCAN - was 850
+        Priority =  0, --DUNCAN - was 850
         InstanceCount = 1,
         BuilderConditions = {
-            #DUNCAN - Added to limit expansions
+            --DUNCAN - Added to limit expansions
             { UCBC, 'NavalBaseCount', { '<', 2 } },
             { MIBC, 'MapGreaterThan', { 512, 512 }},
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 500, -1000, 10, 1, 'AntiSurface' } },
@@ -297,8 +297,8 @@ BuilderGroup {
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 850,
         BuilderConditions = {
-            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 2, 'MOBILE NAVAL'}},
-            #{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, 'ENGINEER TECH2, ENGINEER TECH3' } },
+            --{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 2, 'MOBILE NAVAL'}},
+            --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, 'ENGINEER TECH2, ENGINEER TECH3' } },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Sea' } },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
@@ -320,7 +320,7 @@ BuilderGroup {
         PlatoonTemplate = 'T2EngineerBuilder',
         Priority = 850,
         BuilderConditions = {
-            #{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, 'ENGINEER TECH3' } },
+            --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, 'ENGINEER TECH3' } },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Sea' } },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },

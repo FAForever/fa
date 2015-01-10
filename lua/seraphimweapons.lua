@@ -1,13 +1,13 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/seraphimweapons.lua
-#**  Author(s):  Greg Kohne, Gordon Duclos,
-#**              Matt Vainio, Aaron Lundquist, Dru Staltman, Jessica St. Croix
-#**
-#**  Summary  :  Default definitions of Seraphim weapons
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/seraphimweapons.lua
+--**  Author(s):  Greg Kohne, Gordon Duclos,
+--**              Matt Vainio, Aaron Lundquist, Dru Staltman, Jessica St. Croix
+--**
+--**  Summary  :  Default definitions of Seraphim weapons
+--**
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
 local CollisionBeamFile = import('defaultcollisionbeams.lua')
@@ -22,11 +22,11 @@ local PhasonLaserCollisionBeam = CollisionBeamFile.PhasonLaserCollisionBeam
 local TractorClawCollisionBeam = CollisionBeamFile.TractorClawCollisionBeam
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
-local Game = import('/lua/game.lua')   ##added for CBFP
-local DefaultBuffField = import('/lua/DefaultBuffField.lua').DefaultBuffField     ##added for CBFP
+local Game = import('/lua/game.lua')   ----added for CBFP
+local DefaultBuffField = import('/lua/DefaultBuffField.lua').DefaultBuffField     ----added for CBFP
 
-SeraphimBuffField = Class(DefaultBuffField) {     ##added for CBFP
-    FieldVisualEmitter = '/effects/emitters/seraphim_regenerative_aura_01_emit.bp',     ##added for CBFP
+SeraphimBuffField = Class(DefaultBuffField) {     ----added for CBFP
+    FieldVisualEmitter = '/effects/emitters/seraphim_regenerative_aura_01_emit.bp',     ----added for CBFP
 }
 
 
@@ -86,18 +86,18 @@ SDFShriekerCannon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.ShriekerCannonMuzzleFlash,
 }
 
-# Units: XSL0111
+-- Units: XSL0111
 SIFLaanseTacticalMissileLauncher = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.SLaanseMissleMuzzleFlash,
 }
 
-# Units: XSB2303
+-- Units: XSB2303
 SIFZthuthaamArtilleryCannon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash= EffectTemplate.SZthuthaamArtilleryMuzzleFlash,
     FxChargeMuzzleFlash= EffectTemplate.SZthuthaamArtilleryChargeMuzzleFlash,
 }
 
-# Units: XSL0303
+-- Units: XSL0303
 SDFThauCannon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.STauCannonMuzzleFlash,
     FxMuzzleTerrainTypeName = 'ThauTerrainMuzzle',
@@ -116,17 +116,17 @@ SDFThauCannon = Class(DefaultProjectileWeapon) {
     end,
 }
 
-# Units: XSL0303
+-- Units: XSL0303
 SDFAireauBolterWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.SAireauBolterMuzzleFlash,
 }
 
-# Units: XSL0202
+-- Units: XSL0202
 SDFAireauBolterWeapon02 = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.SAireauBolterMuzzleFlash02,
 }
 
-# Units: XSL0303
+-- Units: XSL0303
 SANUallCavitationTorpedo = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.SUallTorpedoMuzzleFlash
 }
@@ -152,7 +152,7 @@ SDFChronotronCannonOverChargeWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.SChronotronCannonOverChargeMuzzle,
 }
 
-# Units: XSL0301
+-- Units: XSL0301
 SDFLightChronotronCannonWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.SLightChronotronCannonMuzzleFlash,
 }
@@ -225,7 +225,7 @@ SIFCommanderDeathWeapon = Class(BareBonesWeapon) {
         BareBonesWeapon.OnCreate(self)
 
         local myBlueprint = self:GetBlueprint()
-        # The "or x" is supplying default values in case the blueprint doesn't have an overriding value
+        -- The "or x" is supplying default values in case the blueprint doesn't have an overriding value
         self.Data = {
             NukeOuterRingDamage = myBlueprint.NukeOuterRingDamage or 10,
             NukeOuterRingRadius = myBlueprint.NukeOuterRingRadius or 40,
@@ -256,7 +256,7 @@ SIFCommanderDeathWeapon = Class(BareBonesWeapon) {
 SDFUnstablePhasonBeam = Class(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.UnstablePhasonLaserCollisionBeam,
     FxMuzzleFlash = {},
-    FxChargeMuzzleFlash = {}, ####EffectTemplate.SExperimentalUnstablePhasonLaserMuzzle01,
+    FxChargeMuzzleFlash = {}, --------EffectTemplate.SExperimentalUnstablePhasonLaserMuzzle01,
     FxUpackingChargeEffects = EffectTemplate.CMicrowaveLaserCharge01,
     FxUpackingChargeEffectScale = 1,
 }

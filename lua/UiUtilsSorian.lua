@@ -1,11 +1,11 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/modules/AI/UiUtilsSorian.lua
-#**  Author(s): Sorian
-#**
-#**  Summary  :
-#**
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/modules/AI/UiUtilsSorian.lua
+--**  Author(s): Sorian
+--**
+--**  Summary  :
+--**
+--****************************************************************************
 function ProcessAIChat(to, from, text)
     local armies = GetArmiesTable()
     if (to == 'allies' or type(to) == 'number') then

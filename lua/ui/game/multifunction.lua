@@ -426,7 +426,7 @@ function CreateMapDropout(parent)
             
             return bg
         end
-        # Make an option group consisting of a checkbox and a name
+        -- Make an option group consisting of a checkbox and a name
         local group = Group(bg)
         local mapControl = inMapControl
         local camName = mapControl._cameraName

@@ -2,15 +2,15 @@
 --
 -- General Sim scripts
 
-#==============================================================================
-# Diplomacy
-#==============================================================================
+--==============================================================================
+-- Diplomacy
+--==============================================================================
 
 local sharedUnits = {}
 
 function BreakAlliance( data )
 
-    # You cannot change alliances in a team game
+    -- You cannot change alliances in a team game
     if ScenarioInfo.TeamGame then
         return
     end
@@ -27,7 +27,7 @@ function BreakAlliance( data )
 end
 
 function OnAllianceResult( resultData )
-    # You cannot change alliances in a team game
+    -- You cannot change alliances in a team game
     if ScenarioInfo.TeamGame then
         return
     end
@@ -80,8 +80,8 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         local bp = unit:GetBlueprint()
         local unitId = unit:GetUnitId()
 
-        # B E F O R E
-        local numNukes = unit:GetNukeSiloAmmoCount()  #looks like one of these 2 works for SMDs also
+        -- B E F O R E
+        local numNukes = unit:GetNukeSiloAmmoCount()  --looks like one of these 2 works for SMDs also
         local numTacMsl = unit:GetTacticalSiloAmmoCount()
         local unitKills = unit:GetStat('KILLS', 0).Value
         local xp = unit.xp
@@ -90,16 +90,16 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         local ShieldHealth = 0
         local hasFuel = false
         local fuelRatio = 0
-        local enh = {} # enhancements
+        local enh = {} -- enhancements
         local oldowner = unit.oldowner
 
         if unit.MyShield then
             shieldIsOn = unit:ShieldIsOn()
             ShieldHealth = unit.MyShield:GetHealth()
         end
-        if bp.Physics.FuelUseTime and bp.Physics.FuelUseTime > 0 then   # going through the BP to check for fuel
-            fuelRatio = unit:GetFuelRatio()                             # usage is more reliable then unit.HasFuel
-            hasFuel = true                                              # cause some buildings say they use fuel
+        if bp.Physics.FuelUseTime and bp.Physics.FuelUseTime > 0 then   -- going through the BP to check for fuel
+            fuelRatio = unit:GetFuelRatio()                             -- usage is more reliable then unit.HasFuel
+            hasFuel = true                                              -- cause some buildings say they use fuel
         end
         local posblEnh = bp.Enhancements
         if posblEnh then
@@ -110,7 +110,7 @@ function TransferUnitsOwnership(units, ToArmyIndex)
             end
         end
 
-        # changing owner
+        -- changing owner
         unit:OnBeforeTransferingOwnership(ToArmyIndex)
         unit = ChangeUnitArmy(unit,ToArmyIndex)
         if not unit then
@@ -185,7 +185,7 @@ function SetResourceSharing( data )
 end
 
 function RequestAlliedVictory( data )
-    # You cannot change this in a team game
+    -- You cannot change this in a team game
 
     if ScenarioInfo.TeamGame then
         return
@@ -205,11 +205,11 @@ function SetOfferDraw(data)
 end
 
 
-#==============================================================================
-# UNIT CAP
-#==============================================================================
+--==============================================================================
+-- UNIT CAP
+--==============================================================================
 function UpdateUnitCap(deadArmy)
-    # If we are asked to share out unit cap for the defeated army, do the following...
+    -- If we are asked to share out unit cap for the defeated army, do the following...
     local mode = ScenarioInfo.Options.ShareUnitCap
 
     if(not mode or mode == 'none') then

@@ -877,8 +877,8 @@ options = {
                 custom = {
                     states = {
                         {text = "<LOC OPTIONS_0029>Off", key = 0},
-                        ## the remaining values are populated at runtime from device caps
-                        ## what follows is just an example of the data which will be encountered
+                        ---- the remaining values are populated at runtime from device caps
+                        ---- what follows is just an example of the data which will be encountered
                         {text =  "2", key =  2},
                         {text =  "4", key =  4},
                         {text =  "8", key =  8},

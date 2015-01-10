@@ -31,11 +31,11 @@ local isReplay = false
 
 local waitingDialog = false
 
-###variables for FAF
+------variables for FAF
 local sendChat = import('/lua/ui/game/chat.lua').ReceiveChatFromSim
 local oldData = {}
 local lastObserving
-##end faf variables
+----end faf variables
 
 -- Hotbuild stuff
 modifiersKeys = {}
@@ -224,8 +224,8 @@ function CreateUI(isReplay)
     Prefetcher:Update(prefetchTable)
 
 
-    ##below added for FAF
-    import("/modules/displayrings.lua").Init()    ##added for acu and engineer build radius ui mod
+    ----below added for FAF
+    import("/modules/displayrings.lua").Init()    ----added for acu and engineer build radius ui mod
     if SessionIsReplay() then
         ForkThread(SendChat)
         lastObserving = true
@@ -440,8 +440,8 @@ function OnQueueChanged(newQueue)
     end
 end
 
-# Called after the Sim has confirmed the game is indeed paused. This will happen
-# on everyone's machine in a network game.
+-- Called after the Sim has confirmed the game is indeed paused. This will happen
+-- on everyone's machine in a network game.
 function OnPause(pausedBy, timeoutsRemaining)
     local isOwner = false
     if pausedBy == SessionGetLocalCommandSource() then
@@ -454,7 +454,7 @@ function OnPause(pausedBy, timeoutsRemaining)
     import('/lua/ui/game/missiontext.lua').OnGamePause(true)
 end
 
-# Called after the Sim has confirmed that the game has resumed.
+-- Called after the Sim has confirmed that the game has resumed.
 function OnResume()
     PauseSound("World",false)
     PauseSound("Music",false)
@@ -463,9 +463,9 @@ function OnResume()
     import('/lua/ui/game/missiontext.lua').OnGamePause(false)
 end
 
-# Called immediately when the user hits the pause button. This only ever gets
-# called on the machine that initiated the pause (i.e. other network players
-                                                  # won't call this)
+-- Called immediately when the user hits the pause button. This only ever gets
+-- called on the machine that initiated the pause (i.e. other network players
+                                                  -- won't call this)
 function OnUserPause(pause)
     local Tabs = import('/lua/ui/game/tabs.lua')
     local focus = GetArmiesTable().focusArmy
@@ -564,10 +564,10 @@ function HideGameUI(state)
     end
 end
 
-# Given a userunit that is adjacent to a given blueprint, does it yield a
-# bonus? Used by the UI to draw extra info
+-- Given a userunit that is adjacent to a given blueprint, does it yield a
+-- bonus? Used by the UI to draw extra info
 function OnDetectAdjacencyBonus(userUnit, otherBp)
-    # fixme: todo
+    -- fixme: todo
     return true
 end
 
@@ -633,7 +633,7 @@ function NISMode(state)
         end
         worldView.viewLeft:EnableResourceRendering(preNISSettings.Resources)
         worldView.viewLeft:SetCartographic(preNISSettings.Cartographic)
-        # Todo: Restore settings of overlays, lifebars properly
+        -- Todo: Restore settings of overlays, lifebars properly
         ConExecute('UI_RenderUnitBars true')
         ConExecute('UI_NisRenderIcons true')
         ConExecute('ren_SelectBoxes true')
@@ -773,7 +773,7 @@ function SimChangeCameraZoom(newMult)
     end
 end
 
-####below is FAF function
+--------below is FAF function
 
 function UiBeat()
     local observing = (GetFocusArmy() == -1)

@@ -1,11 +1,11 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AISeaAttackBuilders.lua
-#**
-#**  Summary  : Default economic builders for skirmish
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AISeaAttackBuilders.lua
+--**
+--**  Summary  : Default economic builders for skirmish
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local BBTmplFile = '/lua/basetemplates.lua'
 local BuildingTmpl = 'BuildingTemplates'
@@ -90,8 +90,8 @@ BuilderGroup {
         PlatoonTemplate = 'T1SeaAntiAir',
         Priority = 500,
         BuilderConditions = {
-            #DUNCAN - commented out as need some anti all the time.
-            #{ TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 10, 'Air' } },
+            --DUNCAN - commented out as need some anti all the time.
+            --{ TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 10, 'Air' } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
         },
@@ -110,7 +110,7 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'CRUISER'}},
             { IBC, 'BrainNotLowPowerMode', {} },
-            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }}, #DUNCAN - was 0.9
+            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }}, --DUNCAN - was 0.9
         },
     },
     Builder {
@@ -131,7 +131,7 @@ BuilderGroup {
         BuilderType = 'Sea',
         BuilderConditions = {
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'DESTROYER'}},
-            #{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, 'T1SUBMARINE'}},
+            --{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, 'T1SUBMARINE'}},
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
         },
@@ -183,7 +183,7 @@ BuilderGroup {
         Priority = 700,
         BuilderConditions = {
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'BATTLESHIP' } },
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.NUKE } }, #DUNCAN - added so it doesnt over build
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.NUKE } }, --DUNCAN - added so it doesnt over build
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
         },
@@ -231,15 +231,15 @@ BuilderGroup {
         BuilderName = 'Frequent Sea Attack T1',
         PlatoonTemplate = 'SeaAttack',
         Priority = 1,
-        InstanceCount = 10, #DUNCAN - was 5
+        InstanceCount = 10, --DUNCAN - was 5
         BuilderType = 'Any',
         BuilderData = {
             UseFormation = 'AttackFormation',
             ThreatWeights = {
-                IgnoreStrongerTargetsRatio = 100.0,  #DUNCAN - uncommented, was 100
+                IgnoreStrongerTargetsRatio = 100.0,  --DUNCAN - uncommented, was 100
                 PrimaryThreatTargetType = 'Naval',
                 SecondaryThreatTargetType = 'Economy',
-                SecondaryThreatWeight = 1, #DUNCAN - was 0.1
+                SecondaryThreatWeight = 1, --DUNCAN - was 0.1
                 WeakAttackThreatWeight = 1,
                 VeryNearThreatWeight = 10,
                 NearThreatWeight = 5,
@@ -257,12 +257,12 @@ BuilderGroup {
         BuilderName = 'Frequent Sea Attack T2',
         PlatoonTemplate = 'SeaAttack',
         Priority = 1,
-        InstanceCount = 10, #DUNCAN - was 5
+        InstanceCount = 10, --DUNCAN - was 5
         BuilderType = 'Any',
         BuilderData = {
             UseFormation = 'AttackFormation',
             ThreatWeights = {
-                IgnoreStrongerTargetsRatio = 100.0,  #DUNCAN - uncommented, was 100
+                IgnoreStrongerTargetsRatio = 100.0,  --DUNCAN - uncommented, was 100
                 PrimaryThreatTargetType = 'Naval',
                 SecondaryThreatTargetType = 'Economy',
                 SecondaryThreatWeight = 0.1,
@@ -275,19 +275,19 @@ BuilderGroup {
         },
         BuilderConditions = {
             { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, 'MOBILE TECH3 NAVAL' } },
-            { SeaAttackCondition, { 'LocationType', 50 } }, #DUNCAN - was 60
+            { SeaAttackCondition, { 'LocationType', 50 } }, --DUNCAN - was 60
         },
     },
     Builder {
         BuilderName = 'Frequent Sea Attack T3',
         PlatoonTemplate = 'SeaAttack',
         Priority = 1,
-        InstanceCount = 20,  #DUNCAN - was 5
+        InstanceCount = 20,  --DUNCAN - was 5
         BuilderType = 'Any',
         BuilderData = {
             UseFormation = 'AttackFormation',
             ThreatWeights = {
-                IgnoreStrongerTargetsRatio = 100.0, #DUNCAN - uncommented, was 100
+                IgnoreStrongerTargetsRatio = 100.0, --DUNCAN - uncommented, was 100
                 PrimaryThreatTargetType = 'Naval',
                 SecondaryThreatTargetType = 'Economy',
                 SecondaryThreatWeight = 0.1,
@@ -299,7 +299,7 @@ BuilderGroup {
             },
         },
         BuilderConditions = {
-            { SeaAttackCondition, { 'LocationType', 180 } }, #DUNCAN - was 180
+            { SeaAttackCondition, { 'LocationType', 180 } }, --DUNCAN - was 180
         },
     },
     Builder {
@@ -312,7 +312,7 @@ BuilderGroup {
         BuilderData = {
             UseFormation = 'AttackFormation',
             ThreatWeights = {
-                IgnoreStrongerTargetsRatio = 100.0, #DUNCAN - uncommented, was 100
+                IgnoreStrongerTargetsRatio = 100.0, --DUNCAN - uncommented, was 100
                 PrimaryThreatTargetType = 'Naval',
                 SecondaryThreatTargetType = 'Economy',
                 SecondaryThreatWeight = 0.1,
@@ -336,7 +336,7 @@ BuilderGroup {
         BuilderData = {
             UseFormation = 'AttackFormation',
             ThreatWeights = {
-                IgnoreStrongerTargetsRatio = 100.0, #DUNCAN - uncommented, was 100
+                IgnoreStrongerTargetsRatio = 100.0, --DUNCAN - uncommented, was 100
                 PrimaryThreatTargetType = 'Naval',
                 SecondaryThreatTargetType = 'Economy',
                 SecondaryThreatWeight = 0.1,
@@ -364,7 +364,7 @@ BuilderGroup {
         BuilderType = 'Any',
         BuilderData = {
             ThreatWeights = {
-                IgnoreStrongerTargetsRatio = 100.0,  #DUNCAN - uncommented
+                IgnoreStrongerTargetsRatio = 100.0,  --DUNCAN - uncommented
                 PrimaryThreatTargetType = 'Naval',
                 SecondaryThreatTargetType = 'Economic',
                 SecondaryThreatWeight = 0.1,
@@ -388,7 +388,7 @@ BuilderGroup {
         BuilderType = 'Any',
         BuilderData = {
             ThreatWeights = {
-                IgnoreStrongerTargetsRatio = 100.0,  #DUNCAN - uncommented
+                IgnoreStrongerTargetsRatio = 100.0,  --DUNCAN - uncommented
                 PrimaryThreatTargetType = 'Naval',
                 SecondaryThreatTargetType = 'Economic',
                 SecondaryThreatWeight = 0.1,
@@ -412,7 +412,7 @@ BuilderGroup {
         BuilderType = 'Any',
         BuilderData = {
             ThreatWeights = {
-                IgnoreStrongerTargetsRatio = 100.0, #DUNCAN - uncommented
+                IgnoreStrongerTargetsRatio = 100.0, --DUNCAN - uncommented
                 PrimaryThreatTargetType = 'Naval',
                 SecondaryThreatTargetType = 'Economic',
                 SecondaryThreatWeight = 0.1,

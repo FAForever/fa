@@ -1,11 +1,11 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/AI/CustomAITooltips/SorianTooltips.lua
-#**  Author(s): Michael Robbins aka Sorian
-#**
-#**  Summary  : Utility File to insert custom AI Tooltips into the game.
-#**
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/AI/CustomAITooltips/SorianTooltips.lua
+--**  Author(s): Michael Robbins aka Sorian
+--**
+--**  Summary  : Utility File to insert custom AI Tooltips into the game.
+--**
+--****************************************************************************
 
 Tooltips = {
     aitype_sorian = {

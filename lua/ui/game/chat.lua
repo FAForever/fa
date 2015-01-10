@@ -907,9 +907,9 @@ end
         ToggleChat()
     end
 
-    #############
-    #Added for sorian ai
-    #############
+    --------------------------
+    --Added for sorian ai
+    --------------------------
 
     function CreateChatList(parent)
         local armies = GetArmiesTable()

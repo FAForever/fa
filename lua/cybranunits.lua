@@ -1,15 +1,15 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/cybranunits.lua
-#**  Author(s):
-#**
-#**  Summary  :
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
-#--------------------------------------------------------------------------
-# CYBRAN DEFAULT UNITS
-#--------------------------------------------------------------------------
+--****************************************************************************
+--**
+--**  File     :  /lua/cybranunits.lua
+--**  Author(s):
+--**
+--**  Summary  :
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
+----------------------------------------------------------------------------
+-- CYBRAN DEFAULT UNITS
+----------------------------------------------------------------------------
 local DefaultUnitsFile = import('defaultunits.lua')
 local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
 local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
@@ -31,9 +31,9 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EffectUtil = import('EffectUtilities.lua')
 local CreateCybranBuildBeams = EffectUtil.CreateCybranBuildBeams
 
-#-------------------------------------------------------------
-#  AIR FACTORY STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  AIR FACTORY STRUCTURES
+---------------------------------------------------------------
 CAirFactoryUnit = Class(AirFactoryUnit) {
 
     CreateBuildEffects = function( self, unitBeingBuilt, order )
@@ -45,7 +45,7 @@ CAirFactoryUnit = Class(AirFactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
         if not unitBeingBuilt then return end
 
-        # Start build process
+        -- Start build process
         if not self.BuildAnimManip then
             self.BuildAnimManip = CreateAnimator(self)
             self.BuildAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationBuild, true):SetRate(0)
@@ -74,30 +74,30 @@ CAirFactoryUnit = Class(AirFactoryUnit) {
 
 }
 
-#-------------------------------------------------------------
-#  AIR STAGING STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  AIR STAGING STRUCTURES
+---------------------------------------------------------------
 CAirStagingPlatformUnit = Class(AirStagingPlatformUnit) {}
 
-#-------------------------------------------------------------
-#  AIR UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  AIR UNITS
+---------------------------------------------------------------
 CAirUnit = Class(AirUnit) {}
 
-#-------------------------------------------------------------
-#  WALL  STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  WALL  STRUCTURES
+---------------------------------------------------------------
 CConcreteStructureUnit = Class(ConcreteStructureUnit) {}
 
-#-------------------------------------------------------------
-#  CONSTRUCTION UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  CONSTRUCTION UNITS
+---------------------------------------------------------------
 CConstructionUnit = Class(ConstructionUnit){
 
 
     OnStopBeingBuilt = function(self,builder,layer)
         ConstructionUnit.OnStopBeingBuilt(self,builder,layer)
-        # If created with F2 on land, then play the transform anim.
+        -- If created with F2 on land, then play the transform anim.
         if(self:GetCurrentLayer() == 'Water') then
             self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, true)
         end
@@ -144,9 +144,9 @@ CConstructionUnit = Class(ConstructionUnit){
     end,
 }
 
-#-------------------------------------------------------------
-#  ENERGY CREATION UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  ENERGY CREATION UNITS
+---------------------------------------------------------------
 CEnergyCreationUnit = Class(DefaultUnitsFile.EnergyCreationUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
@@ -159,14 +159,14 @@ CEnergyCreationUnit = Class(DefaultUnitsFile.EnergyCreationUnit) {
     end,
 }
 
-#-------------------------------------------------------------
-# ENERGY STORAGE STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+-- ENERGY STORAGE STRUCTURES
+---------------------------------------------------------------
 CEnergyStorageUnit = Class(EnergyStorageUnit) {}
 
-#-------------------------------------------------------------
-#  LAND FACTORY STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  LAND FACTORY STRUCTURES
+---------------------------------------------------------------
 CLandFactoryUnit = Class(LandFactoryUnit) {
 
     CreateBuildEffects = function( self, unitBeingBuilt, order )
@@ -180,7 +180,7 @@ CLandFactoryUnit = Class(LandFactoryUnit) {
             unitBeingBuilt = self:GetFocusUnit()
         end
 
-        # Start build process
+        -- Start build process
         if not self.BuildAnimManip then
             self.BuildAnimManip = CreateAnimator(self)
             self.BuildAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationBuild, true):SetRate(0)
@@ -209,39 +209,39 @@ CLandFactoryUnit = Class(LandFactoryUnit) {
     end,
 }
 
-#-------------------------------------------------------------
-#  LAND UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  LAND UNITS
+---------------------------------------------------------------
 CLandUnit = Class(DefaultUnitsFile.LandUnit) {}
 
-#-------------------------------------------------------------
-#  MASS COLLECTION UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  MASS COLLECTION UNITS
+---------------------------------------------------------------
 CMassCollectionUnit = Class(DefaultUnitsFile.MassCollectionUnit) {}
 
-#-------------------------------------------------------------
-#   MASS FABRICATION UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--   MASS FABRICATION UNITS
+---------------------------------------------------------------
 CMassFabricationUnit = Class(DefaultUnitsFile.MassFabricationUnit) {}
 
-#-------------------------------------------------------------
-#   MASS STORAGE UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--   MASS STORAGE UNITS
+---------------------------------------------------------------
 CMassStorageUnit = Class(DefaultUnitsFile.MassStorageUnit) {}
 
-#-------------------------------------------------------------
-#  RADAR STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  RADAR STRUCTURES
+---------------------------------------------------------------
 CRadarUnit = Class(DefaultUnitsFile.RadarUnit) {}
 
-#-------------------------------------------------------------
-#  SONAR STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  SONAR STRUCTURES
+---------------------------------------------------------------
 CSonarUnit = Class(DefaultUnitsFile.SonarUnit) {}
 
-#-------------------------------------------------------------
-#  SEA FACTORY STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  SEA FACTORY STRUCTURES
+---------------------------------------------------------------
 CSeaFactoryUnit = Class(SeaFactoryUnit) {
 
     StartBuildingEffects = function( self, unitBeingBuilt, order )
@@ -292,64 +292,64 @@ CSeaFactoryUnit = Class(SeaFactoryUnit) {
     end,
 }
 
-#-------------------------------------------------------------
-#  SEA UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  SEA UNITS
+---------------------------------------------------------------
 CSeaUnit = Class(SeaUnit) {}
 
 
-#-------------------------------------------------------------
-#  SHIELD LAND UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  SHIELD LAND UNITS
+---------------------------------------------------------------
 CShieldLandUnit = Class(ShieldLandUnit) {}
 
-#-------------------------------------------------------------
-#  SHIELD STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  SHIELD STRUCTURES
+---------------------------------------------------------------
 CShieldStructureUnit = Class(ShieldStructureUnit) {}
 
-#-------------------------------------------------------------
-#  STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  STRUCTURES
+---------------------------------------------------------------
 CStructureUnit = Class(StructureUnit) {}
 
-#-------------------------------------------------------------
-#  SUBMARINE UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  SUBMARINE UNITS
+---------------------------------------------------------------
 CSubUnit = Class(DefaultUnitsFile.SubUnit) {}
 
-#-------------------------------------------------------------
-#  TRANSPORT BEACON UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  TRANSPORT BEACON UNITS
+---------------------------------------------------------------
 CTransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
 
-#-------------------------------------------------------------
-#  WALKING LAND UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  WALKING LAND UNITS
+---------------------------------------------------------------
 CWalkingLandUnit = Class(DefaultUnitsFile.WalkingLandUnit) {
     WalkingAnimRate = 1,
     IdleAnimRate = 1,
     DisabledBones = {},
 }
 
-#-------------------------------------------------------------
-#  WALL  STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  WALL  STRUCTURES
+---------------------------------------------------------------
 CWallStructureUnit = Class(DefaultUnitsFile.WallStructureUnit) {}
 
-#-------------------------------------------------------------
-#  CIVILIAN STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  CIVILIAN STRUCTURES
+---------------------------------------------------------------
 CCivilianStructureUnit = Class(CStructureUnit) {}
 
-#-------------------------------------------------------------
-#  QUANTUM GATE UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  QUANTUM GATE UNITS
+---------------------------------------------------------------
 CQuantumGateUnit = Class(QuantumGateUnit) {}
 
-#-------------------------------------------------------------
-#  RADAR JAMMER UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  RADAR JAMMER UNITS
+---------------------------------------------------------------
 CRadarJammerUnit = Class(RadarJammerUnit) {}
 
 CConstructionEggUnit = Class(CStructureUnit) {
@@ -377,7 +377,7 @@ CConstructionEggUnit = Class(CStructureUnit) {
                         self:PlaySound(bp.Audio['EggOpen'])
                         WaitFor(self.OpenAnimManip)
 
-                        #CreateSlider(unit, bone, [goal_x, goal_y, goal_z, [speed,
+                        --CreateSlider(unit, bone, [goal_x, goal_y, goal_z, [speed,
                         self.EggSlider = CreateSlider(self, 0, 0, -20, 0, 5)
                         self.Trash:Add(self.EggSlider)
 
@@ -388,7 +388,7 @@ CConstructionEggUnit = Class(CStructureUnit) {
                     end
                   )
 
-        #ChangeState( self, self.EggConstruction )
+        --ChangeState( self, self.EggConstruction )
     end,
 
     EggConstruction = State {
@@ -410,16 +410,16 @@ CConstructionEggUnit = Class(CStructureUnit) {
 }
 
 
-#TODO: This should be made more general and put in defaultunits.lua in case other factions get similar buildings
-##############################################################
-#  CConstructionStructureUnit
-##############################################################
+--TODO: This should be made more general and put in defaultunits.lua in case other factions get similar buildings
+-----------------------------------------------------------------------------
+--  CConstructionStructureUnit
+-----------------------------------------------------------------------------
 CConstructionStructureUnit = Class(CStructureUnit) {
     OnCreate = function(self)
-        #-- Structure stuff
+        ---- Structure stuff
         CStructureUnit.OnCreate(self)
 
-        #--Construction stuff
+        ----Construction stuff
         self.EffectsBag = {}
         if self:GetBlueprint().General.BuildBones then
             self:SetupBuildBones()
@@ -452,7 +452,7 @@ CConstructionStructureUnit = Class(CStructureUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         CStructureUnit.OnStopBeingBuilt(self,builder,layer)
-        # If created with F2 on land, then play the transform anim.
+        -- If created with F2 on land, then play the transform anim.
         if(self:GetCurrentLayer() == 'Water') then
             self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, true)
         end
@@ -468,7 +468,7 @@ CConstructionStructureUnit = Class(CStructureUnit) {
     end,
 
 
-    #-- This will only be called if not in StructureUnit's upgrade state
+    ---- This will only be called if not in StructureUnit's upgrade state
     OnStopBuild = function(self, unitBeingBuilt)
         CStructureUnit.OnStopBuild(self, unitBeingBuilt)
 
@@ -485,7 +485,7 @@ CConstructionStructureUnit = Class(CStructureUnit) {
     end,
 
     OnPaused = function(self)
-        #When factory is paused take some action
+        --When factory is paused take some action
         self:StopUnitAmbientSound( 'ConstructLoop' )
         CStructureUnit.OnPaused(self)
         if self.BuildingUnit then
@@ -521,7 +521,7 @@ CConstructionStructureUnit = Class(CStructureUnit) {
     OnPrepareArmToBuild = function(self)
         CStructureUnit.OnPrepareArmToBuild(self)
 
-        #LOG( 'OnPrepareArmToBuild' )
+        --LOG( 'OnPrepareArmToBuild' )
         if self.BuildingOpenAnimManip then
             self.BuildingOpenAnimManip:SetRate(self:GetBlueprint().Display.AnimationBuildRate or 1)
             if self.BuildArmManipulator then

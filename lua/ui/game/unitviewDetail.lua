@@ -95,7 +95,7 @@ end
 
 function ShowEnhancement(bp, bpID, iconID, iconPrefix, userUnit)
     if CheckFormat() then
-        # Name / Description
+        -- Name / Description
         View.UnitImg:SetTexture(UIUtil.UIFile(iconPrefix..'_btn_up.dds'))
 
         LayoutHelpers.AtTopIn(View.UnitShortDesc, View, 10)
@@ -211,7 +211,7 @@ end
 
 function Show(bp, buildingUnit, bpID)
     if CheckFormat() then
-        # Name / Description
+        -- Name / Description
         if false then
             local foo, iconName = GameCommon.GetCachedUnitIconFileNames(bp)
             if iconName then
@@ -251,7 +251,7 @@ function Show(bp, buildingUnit, bpID)
        elseif targetBp.General.UpgradesFrom == builderBp.General.UpgradesTo then
           performUpgrade = true
        elseif targetBp.General.UpgradesFromBase ~= "none" then
-          # try testing against the base
+          -- try testing against the base
           if targetBp.General.UpgradesFromBase == builderBp.BlueprintId then
          performUpgrade = true
           elseif targetBp.General.UpgradesFromBase == builderBp.General.UpgradesFromBase then
@@ -278,7 +278,7 @@ function Show(bp, buildingUnit, bpID)
             showecon = false
         end
 
-        # Health stat
+        -- Health stat
         View.HealthStat.Value:SetText(string.format("%d", bp.Defense.MaxHealth))
 
         if View.Description then
@@ -302,7 +302,7 @@ function Show(bp, buildingUnit, bpID)
 end
 
 function DisplayResources(bp, time, energy, mass)
-    # Cost Group
+    -- Cost Group
     if time > 0 then
         local consumeEnergy = -energy / time
         local consumeMass = -mass / time
@@ -313,7 +313,7 @@ function DisplayResources(bp, time, energy, mass)
         View.BuildCostGroup.MassValue:SetColor( "FFF05050" )
     end
 
-    # Upkeep Group
+    -- Upkeep Group
     local plusEnergyRate = bp.Economy.ProductionPerSecondEnergy or bp.ProductionPerSecondEnergy
     local negEnergyRate = bp.Economy.MaintenanceConsumptionPerSecondEnergy or bp.MaintenanceConsumptionPerSecondEnergy
     local plusMassRate = bp.Economy.ProductionPerSecondMass or bp.ProductionPerSecondMass

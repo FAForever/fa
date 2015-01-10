@@ -54,5 +54,5 @@ function UpdateDialog(beatNumber, strings)
             dialog.textControls[i]:SetText(strings[i])
         end
     end
-    dialog.textControls[9]:SetText(LOC("<LOC desync_0001>Beat# ") .. tostring(beatNumber))
+    dialog.textControls[9]:SetText(LOC("<LOC desync_0001>Beat-- ") .. tostring(beatNumber))
 end

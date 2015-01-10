@@ -346,7 +346,7 @@ function Test_Files_ok(files,path)
 --            else
 --                UIManager.Make_skin_info()
 --            end
---            UIManager.Output_text("# ERROR - File "..path..files.." is not found.")
+--            UIManager.Output_text("-- ERROR - File "..path..files.." is not found.")
             return false
         end
     elseif type(files)=="table" then
@@ -359,7 +359,7 @@ function Test_Files_ok(files,path)
 --                else
 --                    UIManager.Make_skin_info()
 --                end
---                UIManager.Output_text("# ERROR -  File "..path..v.." is not found (checked also the related file).")
+--                UIManager.Output_text("-- ERROR -  File "..path..v.." is not found (checked also the related file).")
                 return false
             end
         end
@@ -397,11 +397,11 @@ function GetSkin(name,object,parent, modifiers)
 
     local factionnal=true --if true all faction have a different skin
     if name=="" or name==nil  then
---        UIManager.Output_text("# ERROR - Empty name in the skin file!")
+--        UIManager.Output_text("-- ERROR - Empty name in the skin file!")
         return nil
     end
     if modifiers then full_name=name..":"..modifiers end
---    if object==nil or object==false then     UIManager.Output_text("# WARNING - non existant object in ["..full_name.."] in the skin file ["..GetActualSkinFile().."].")    end
+--    if object==nil or object==false then     UIManager.Output_text("-- WARNING - non existant object in ["..full_name.."] in the skin file ["..GetActualSkinFile().."].")    end
 
     local current=false
     local imgpath = false
@@ -427,7 +427,7 @@ function GetSkin(name,object,parent, modifiers)
         end
     end
     if parent==nil or parent==false then
---        UIManager.Output_text("# ERROR - non existant parent in ["..full_name.."] in the skin file ["..GetActualSkinFile().."].")
+--        UIManager.Output_text("-- ERROR - non existant parent in ["..full_name.."] in the skin file ["..GetActualSkinFile().."].")
         return nil
     end
 
@@ -540,7 +540,7 @@ function GetSkin(name,object,parent, modifiers)
             current.texture=add_extension(current.texture)
             local tex=imgpath .. current.texture
             if tex==nil or tex== "" then
---                UIManager.Output_text("# ERROR - non existant texture entry in ["..full_name.."] in the skin file ["..GetActualSkinFile().."].")
+--                UIManager.Output_text("-- ERROR - non existant texture entry in ["..full_name.."] in the skin file ["..GetActualSkinFile().."].")
                 return nil
             end
             if not Test_Files_ok(tex,"") then
@@ -548,21 +548,21 @@ function GetSkin(name,object,parent, modifiers)
             end
 
 
-#            if object.Type=='Group' then
-#                object=Bitmap(parent)
-#            end
+--            if object.Type=='Group' then
+--                object=Bitmap(parent)
+--            end
             if not(object)  then
                 object=Bitmap(parent)
                 LayoutHelpers.FillParent(object, parent)
             end
 
             object:SetTexture(tex)
-#            if not(object.middle) then
-#                object.middle=Bitmap(object)
-#                LayoutHelpers.FillParent(object.middle, object)
-#                object.middle.Width:Set(object.Width)
-#                object.middle.Height:Set(object.Height)
-#            end
+--            if not(object.middle) then
+--                object.middle=Bitmap(object)
+--                LayoutHelpers.FillParent(object.middle, object)
+--                object.middle.Width:Set(object.Width)
+--                object.middle.Height:Set(object.Height)
+--            end
 
             object.part=1
             if object.Resizer then
@@ -600,13 +600,13 @@ function GetSkin(name,object,parent, modifiers)
         elseif type(current.texture)=="table" then
             object=Set_Group_Texture(current.texture,object,parent,path)
         else
---            UIManager.Output_text("# ERROR - bad type of texture in ["..full_name.."] in the skin file ["..GetActualSkinFile().."].")
+--            UIManager.Output_text("-- ERROR - bad type of texture in ["..full_name.."] in the skin file ["..GetActualSkinFile().."].")
 
             return nil
         end
     end
 
---    if object ==nil then     UIManager.Output_text("# ERROR - object is nil in ["..full_name.."] in the skin file ["..GetActualSkinFile().."].") return nil end
+--    if object ==nil then     UIManager.Output_text("-- ERROR - object is nil in ["..full_name.."] in the skin file ["..GetActualSkinFile().."].") return nil end
 
     if modifiers then
         if obj[name]==nil then obj[name]={} end
@@ -665,7 +665,7 @@ function SetGridBounds(name, modifiers, minimap)
     elseif skin.Default[name][modifiers] ~= nil then
         current=skin.Default[name][modifiers]
     else
---        UIManager.Output_text("# ERROR - about the Grid object ["..name.. ": " ..modifers.."] in the skin file ["..GetActualSkinFile().."].")
+--        UIManager.Output_text("-- ERROR - about the Grid object ["..name.. ": " ..modifers.."] in the skin file ["..GetActualSkinFile().."].")
         return nil
     end
 
@@ -683,7 +683,7 @@ end
     elseif skin.Default[name][modifiers] ~= nil then
         current=skin.Default[name][modifiers]
     else
---        UIManager.Output_text("# ERROR - setting text ["..name.. ": " ..modifers.."] in the skin file ["..GetActualSkinFile().."].")
+--        UIManager.Output_text("-- ERROR - setting text ["..name.. ": " ..modifers.."] in the skin file ["..GetActualSkinFile().."].")
         return nil
     end
     if not current.font then
@@ -724,7 +724,7 @@ function SetStatusBar(name, parent, modifiers)
         current=skin.Default[name][modifiers]
         imgpath = skin.Default.path
     else
---        UIManager.Output_text("# ERROR - setting statusbar ["..name.. ": " ..modifers.."] in the skin file ["..GetActualSkinFile().."].")
+--        UIManager.Output_text("-- ERROR - setting statusbar ["..name.. ": " ..modifers.."] in the skin file ["..GetActualSkinFile().."].")
         return nil
     end
     local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
@@ -751,7 +751,7 @@ function SetOrdersGrid(name, control, parent, modifiers)
     elseif skin.Default[name][modifiers] ~= nil then
         current=skin.Default[name][modifiers]
     else
---        UIManager.Output_text("# ERROR - setting ordergrid ["..name.. ": " ..modifers.."] in the skin file ["..GetActualSkinFile().."].")
+--        UIManager.Output_text("-- ERROR - setting ordergrid ["..name.. ": " ..modifers.."] in the skin file ["..GetActualSkinFile().."].")
         return nil
     end
     control._itemWidth = current.width
@@ -773,7 +773,7 @@ function GetOrdersButtonsPath(name, modifiers)
     elseif skin.Default[name][modifiers] ~= nil then
         currentpath=skin.Default[name][modifiers]
     else
---        UIManager.Output_text("# ERROR - setting order button path ["..name.. ": " ..modifers.."] in the skin file ["..GetActualSkinFile().."].")
+--        UIManager.Output_text("-- ERROR - setting order button path ["..name.. ": " ..modifers.."] in the skin file ["..GetActualSkinFile().."].")
         return nil
     end
     return currentpath
@@ -785,7 +785,7 @@ function SetPosition(name, control, parent, modifiers, relative)
     elseif skin.Default[name][modifiers] ~= nil then
         current=skin.Default[name][modifiers]
     else
---        UIManager.Output_text("# ERROR - setting ordergrid ["..name.. ": " ..modifers.."] in the skin file ["..GetActualSkinFile().."].")
+--        UIManager.Output_text("-- ERROR - setting ordergrid ["..name.. ": " ..modifers.."] in the skin file ["..GetActualSkinFile().."].")
         return nil
     end
     if modifiers == 'abilitybox' or modifiers == 'helpbox' then

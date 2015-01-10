@@ -25,7 +25,7 @@ controls = {}
 savedParent = false
 local observerLine = false
 
-##  I switched the order of these because it was causing error, originally, the scoreoption line was first
+----  I switched the order of these because it was causing error, originally, the scoreoption line was first
 local sessionInfo = SessionGetScenarioInfo()
 local replayID = -1
 
@@ -487,7 +487,7 @@ function SetUnitText(current, cap)
 end
 
 function ToggleScoreControl(state)
-    # disable when in Screen Capture mode
+    -- disable when in Screen Capture mode
     if import('/lua/ui/game/gamemain.lua').gameUIHidden then
         return
     end

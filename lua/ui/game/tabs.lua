@@ -797,7 +797,7 @@ function ToggleGameInfo()
     ------------
     -- Script --
     
-    -- Configurations = { #Thermo 2vs2
+    -- Configurations = { --Thermo 2vs2
         -- standard = {
             -- customprops = {pas regarder}
             -- teams = {
@@ -826,7 +826,7 @@ function ToggleGameInfo()
         -- ... tout les réglage d'option de scenario
     -- }
     
-    --  size = { #Thermo, taille de la carte
+    --  size = { --Thermo, taille de la carte
         -- 1 : 512
         -- 2 : 512
     -- }

@@ -4,12 +4,12 @@ Mods
 All mods must be in subdirectories somewhere under /mods. Each mod has a
 mod_info.lua file which contains various bits of info:
 
-    name = "Happy mod"                          # Name to use for this mod
-    version = 123                               # Version number to use for this mod
-    copyright = "Copyright © 2006, Someone"     # Optional copyright info
+    name = "Happy mod"                          -- Name to use for this mod
+    version = 123                               -- Version number to use for this mod
+    copyright = "Copyright © 2006, Someone"     -- Optional copyright info
     description = "A long description of happy mod and why it will make you happy"
-    author = "Joe"                              # Optional author info
-    url = "http://www.gaspoweredgames.com"      # Optional URL to anywhere author likes
+    author = "Joe"                              -- Optional author info
+    url = "http://www.gaspoweredgames.com"      -- Optional URL to anywhere author likes
 
     uid = B019FBEE-E411-11DB-AFAE-13D355D89593
         Uniquely identify this mod. This defaults to the mods name, but that's
@@ -56,9 +56,9 @@ mod_info.lua file which contains various bits of info:
         mod_icon.dds in the same directory as the mod_info.lua file.
 
     requires = {
-        # Optionally indicates that this mod only works if another mod is also present.
-        # It might be nice if you add a comment after each uid to denote the name of the mod
-        # so mere mortals can maintain your list :)
+        -- Optionally indicates that this mod only works if another mod is also present.
+        -- It might be nice if you add a comment after each uid to denote the name of the mod
+        -- so mere mortals can maintain your list :)
         "fec58b30-0036-4b9e-9995-fe2d6fe4c6e9",     -- Chris' Whacky Mod
         "18e391bc-67aa-49fb-8a5f-34efec2d1c2c",     -- Jeffs Cool Mod
         "61d2cb50-08ac-46ba-b261-3c3e3372aef0",     -- Teds Dumb Mod
@@ -84,7 +84,7 @@ mod_info.lua file which contains various bits of info:
     }
 
     requiresNames = {
-        # an optional table which will map the required uids to friendly names so the user of the mod can determine what they are missing
+        -- an optional table which will map the required uids to friendly names so the user of the mod can determine what they are missing
         ["fec58b30-0036-4b9e-9995-fe2d6fe4c6e9"] = "Chris' Whacky Mod v123",
         ["18e391bc-67aa-49fb-8a5f-34efec2d1c2c"] = "Jeff's Cool Mod",
         ["61d2cb50-08ac-46ba-b261-3c3e3372aef0"] = "Ted's Dumb Mod",

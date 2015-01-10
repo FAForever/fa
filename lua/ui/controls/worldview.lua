@@ -1,9 +1,9 @@
-#*****************************************************************************
-#* File: lua/modules/ui/controls/worldview.lua
-#* Summary: World view control
-#*
-#* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
-#*****************************************************************************
+--*****************************************************************************
+--* File: lua/modules/ui/controls/worldview.lua
+--* Summary: World view control
+--*
+--* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
+--*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
@@ -93,7 +93,7 @@ DecalFunctions = {
         return invalidCursor, "/textures/ui/common/game/AreaTargetDecal/nuke_icon_small.dds", Vector(reticleSize, 1, reticleSize)
     end,
     RULEUCC_Attack = AttackDecalFunc,
-    #RULEUCC_Tactical = AttackDecalFunc,
+    --RULEUCC_Tactical = AttackDecalFunc,
 }
 
 WorldView = Class(moho.UIWorldView, Control) {

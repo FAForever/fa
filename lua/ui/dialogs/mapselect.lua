@@ -23,9 +23,9 @@ local Mods = import('/lua/mods.lua')
 local Combo = import('/lua/ui/controls/combo.lua').Combo
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local ModManager = import('/lua/ui/dialogs/modmanager.lua')
-###New local - Start
+------New local - Start
 local EnhancedLobby = import('/lua/EnhancedLobby.lua')
-###New local - End
+------New local - End
 
 local scenarios = MapUtil.EnumerateSkirmishScenarios()
 local selectedScenario = false
@@ -46,9 +46,9 @@ local currentFilters = {
     ['map_select_supportedplayers_limiter'] = "equal",
     ['map_select_size_limiter'] = "equal",
     ['map_type'] = 0,
-    ###New - Start
+    ------New - Start
     ['map_ai_markers'] = 0,
-    ###New - End
+    ------New - End
 }
 
 local scenarioKeymap = {}
@@ -100,7 +100,7 @@ mapFilters = {
             {text = "<LOC lobui_0577>Custom", key = 2},
         }
     },
-    ###New mapFilters - Start
+    ------New mapFilters - Start
     {
         FilterName = "<LOC lobui_0585>AI Markers",
         FilterKey = 'map_ai_markers',
@@ -111,7 +111,7 @@ mapFilters = {
             {text = "<LOC lobui_0588>No", key = 2},
         }
     },
-    ###New mapFilters - End
+    ------New mapFilters - End
 }
 
 -- Create a filter dropdown and title from the table above
@@ -381,15 +381,15 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     UIUtil.MakeInputModal(panel)
 
     mapListTitle = UIUtil.CreateText(panel, "<LOC sel_map_0005>Maps", 18)
-    LayoutHelpers.AtLeftTopIn(mapListTitle, panel, 360, 207)###New - Change value, originals: 360, 177--Notes: Title movement down
+    LayoutHelpers.AtLeftTopIn(mapListTitle, panel, 360, 207)------New - Change value, originals: 360, 177--Notes: Title movement down
 
     mapList = ItemList(panel, "mapselect:mapList")
     mapList:SetFont(UIUtil.bodyFont, 14)
     mapList:SetColors(UIUtil.fontColor, "00000000", "FF000000",  UIUtil.highlightColor, "ffbcfffe")
     mapList:ShowMouseoverItem(true)
     mapList.Width:Set(258)
-    mapList.Height:Set(409)###New - Change value, original: 438--Notes: Height of map selection scroll
-    LayoutHelpers.AtLeftTopIn(mapList, panel, 360, 232)###New - Change value, originals: 360, 202--Notes: Masp selection scroll move down
+    mapList.Height:Set(409)------New - Change value, original: 438--Notes: Height of map selection scroll
+    LayoutHelpers.AtLeftTopIn(mapList, panel, 360, 232)------New - Change value, originals: 360, 202--Notes: Masp selection scroll move down
     mapList.Depth:Set(function() return panel.Depth() + 10 end) --TODO what is this getting under when it's in over state?
     mapList:AcquireKeyboardFocus(true)
     mapList.OnDestroy = function(control)
@@ -683,7 +683,7 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
     end
     -- determines what controls should be visible or not
     OptionContainer.CalcVisible = function(self)
-        --LOG("### CalcVisible !")
+        --LOG("------ CalcVisible !")
         local function SetTextLine(line, data, lineID)
             if data.type == 'title' then
                 line.text:SetText(LOC(data.text))
@@ -833,13 +833,13 @@ function SetDescription(scen)
         description:AddItem(LOCF("<LOC map_select_0005>NO START SPOTS DEFINED"))
         errors = true
     end
-    ###New SetDescription - Start
+    ------New SetDescription - Start
     if EnhancedLobby.CheckMapHasMarkers(scen) then
         description:AddItem("AI Markers: Yes")
     else
         description:AddItem("AI Markers: No")
     end
-    ###New SetDescription - End
+    ------New SetDescription - End
     description:AddItem("")
     if scen.description then
         local textBoxWidth = description.Width()
@@ -892,7 +892,7 @@ function PopulateMapList()
                 continue
             end
         end
-        ###New scenario - Start
+        ------New scenario - Start
         if currentFilters.map_ai_markers ~= 0 then
             if not EnhancedLobby.CheckMapHasMarkers(sceninfo) and currentFilters.map_ai_markers == 1 then
                 continue
@@ -901,7 +901,7 @@ function PopulateMapList()
                 continue
             end
         end
-        ###New scenario - End
+        ------New scenario - End
         if validMapSize and validMapPlayers then
             table.insert(tempMaps, sceninfo)
             scenarioKeymap[count] = index

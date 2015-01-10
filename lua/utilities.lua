@@ -130,7 +130,7 @@ function DotP( v1, v2 )
 end
 
 function GetAngleInBetween(v1, v2)
-    #normalize the vectors
+    --normalize the vectors
     local vec1 = {}
     local vec2 = {}
     vec1 = NormalizeVector(v1)

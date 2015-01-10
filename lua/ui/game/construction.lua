@@ -1,10 +1,10 @@
-#*****************************************************************************
-#* File: lua/modules/ui/game/construction.lua
-#* Author: Chris Blackwell / Ted Snook
-#* Summary: Construction management UI
-#*
-#* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#*****************************************************************************
+--*****************************************************************************
+--* File: lua/modules/ui/game/construction.lua
+--* Author: Chris Blackwell / Ted Snook
+--* Summary: Construction management UI
+--*
+--* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local DiskGetFileInfo = UIUtil.DiskGetFileInfo
@@ -188,8 +188,8 @@ function CreateTab(parent, id, onCheckFunc)
         Checkbox.HandleEvent(self, event)
     end
 
-    # Do this to prevent errors if the tab is created and destroyed in the same frame
-    # Happens when people double click super fast to select units
+    -- Do this to prevent errors if the tab is created and destroyed in the same frame
+    -- Happens when people double click super fast to select units
     btn.OnDestroy = function(self)
         btn.disabledGroup.Depth:Set(1)
     end
@@ -536,7 +536,7 @@ function CommonLogic()
             control:Disable()
             control.StratIcon:SetSolidColor('00000000')
             control:SetSolidColor('00000000')
-#            control.ConsBar:SetAlpha(0, true)
+--            control.ConsBar:SetAlpha(0, true)
             control.BuildKey = nil
         elseif type == 'queuestack' or type == 'attachedunit' then
             SetIconTextures(control)
@@ -549,11 +549,11 @@ function CommonLogic()
             control.Width:Set(48)
             control.Icon.Height:Set(48)
             control.Icon.Width:Set(48)
-#            if __blueprints[control.Data.id].General.ConstructionBar then
-#                control.ConsBar:SetAlpha(1, true)
-#            else
-#                control.ConsBar:SetAlpha(0, true)
-#            end
+--            if __blueprints[control.Data.id].General.ConstructionBar then
+--                control.ConsBar:SetAlpha(1, true)
+--            else
+--                control.ConsBar:SetAlpha(0, true)
+--            end
             control.BuildKey = nil
             if control.Data.count > 1 then
                 control.Count:SetText(control.Data.count)
@@ -586,9 +586,9 @@ function CommonLogic()
         LayoutHelpers.AtRightIn(btn.Count, btn, 3)
         btn.Count.Depth:Set(function() return btn.Icon.Depth() + 10 end)
 
-#        btn.ConsBar = Bitmap(btn, UIUtil.UIFile('/icons/units/cons_bar.dds'))
-#        btn.ConsBar:DisableHitTest()
-#        LayoutHelpers.AtCenterIn(btn.ConsBar, btn)
+--        btn.ConsBar = Bitmap(btn, UIUtil.UIFile('/icons/units/cons_bar.dds'))
+--        btn.ConsBar:DisableHitTest()
+--        LayoutHelpers.AtCenterIn(btn.ConsBar, btn)
 
         btn.Glow = Bitmap(btn)
         btn.Glow:SetTexture(UIUtil.UIFile('/game/units_bmp/glow.dds'))
@@ -644,9 +644,9 @@ function CommonLogic()
         LayoutHelpers.AtBottomIn(btn.Count, btn)
         LayoutHelpers.AtRightIn(btn.Count, btn)
 
-#        btn.ConsBar = Bitmap(btn, UIUtil.UIFile('/icons/units/cons_bar.dds'))
-#        btn.ConsBar:DisableHitTest()
-#        LayoutHelpers.AtCenterIn(btn.ConsBar, btn)
+--        btn.ConsBar = Bitmap(btn, UIUtil.UIFile('/icons/units/cons_bar.dds'))
+--        btn.ConsBar:DisableHitTest()
+--        LayoutHelpers.AtCenterIn(btn.ConsBar, btn)
 
         btn.LowFuel = Bitmap(btn)
         btn.LowFuel:SetSolidColor('ffff0000')
@@ -750,7 +750,7 @@ function CommonLogic()
             control.Icon.Width:Set(30)
             control.StratIcon:SetSolidColor('00000000')
             control.LowFuel:SetAlpha(0, true)
-#            control.ConsBar:SetAlpha(0, true)
+--            control.ConsBar:SetAlpha(0, true)
             control.LowFuel:SetNeedsFrameUpdate(false)
             control.BuildKey = nil
         elseif type == 'spacer' then
@@ -770,7 +770,7 @@ function CommonLogic()
             control.StratIcon:SetSolidColor('00000000')
             control:SetSolidColor('00000000')
             control.LowFuel:SetAlpha(0, true)
-#            control.ConsBar:SetAlpha(0, true)
+--            control.ConsBar:SetAlpha(0, true)
             control.LowFuel:SetNeedsFrameUpdate(false)
             control.BuildKey = nil
         elseif type == 'enhancement' then
@@ -788,7 +788,7 @@ function CommonLogic()
             control.Count:SetText('')
             control.StratIcon:SetSolidColor('00000000')
             control.LowFuel:SetAlpha(0, true)
-#            control.ConsBar:SetAlpha(0, true)
+--            control.ConsBar:SetAlpha(0, true)
             control.LowFuel:SetNeedsFrameUpdate(false)
             control.BuildKey = nil
             if control.Data.Disabled then
@@ -825,7 +825,7 @@ function CommonLogic()
             control.Icon:Show()
             control:Enable()
             control.LowFuel:SetAlpha(0, true)
-#            control.ConsBar:SetAlpha(0, true)
+--            control.ConsBar:SetAlpha(0, true)
             control.LowFuel:SetNeedsFrameUpdate(false)
         elseif type == 'item' then
             SetIconTextures(control)
@@ -850,11 +850,11 @@ function CommonLogic()
             control.Icon:Show()
             control:Enable()
             control.LowFuel:SetAlpha(0, true)
-#            if __blueprints[control.Data.id].General.ConstructionBar then
-#                control.ConsBar:SetAlpha(1, true)
-#            else
-#                control.ConsBar:SetAlpha(0, true)
-#            end
+--            if __blueprints[control.Data.id].General.ConstructionBar then
+--                control.ConsBar:SetAlpha(1, true)
+--            else
+--                control.ConsBar:SetAlpha(0, true)
+--            end
             control.LowFuel:SetNeedsFrameUpdate(false)
             if newTechUnits and table.find(newTechUnits, control.Data.id) then
                 table.remove(newTechUnits, table.find(newTechUnits, control.Data.id))
@@ -907,11 +907,11 @@ function CommonLogic()
             control.Icon.Height:Set(48)
             control.Icon.Width:Set(48)
             control.LowFuel:SetAlpha(0, true)
-#            if __blueprints[control.Data.id].General.ConstructionBar then
-#                control.ConsBar:SetAlpha(1, true)
-#            else
-#                control.ConsBar:SetAlpha(0, true)
-#            end
+--            if __blueprints[control.Data.id].General.ConstructionBar then
+--                control.ConsBar:SetAlpha(1, true)
+--            else
+--                control.ConsBar:SetAlpha(0, true)
+--            end
             control.BuildKey = nil
             if control.Data.lowFuel then
                 control.LowFuel:SetNeedsFrameUpdate(true)
@@ -1231,19 +1231,19 @@ function OnClickHandler(button, modifiers)
         end
 
         if modifiers.Left then
-            # see if we are issuing an upgrade order
+            -- see if we are issuing an upgrade order
             if blueprint.General.UpgradesFrom == 'none' then
                 performUpgrade = false
             else
                 for i,v in sortedOptions.selection do
-                    if v then   # its possible that your unit will have died by the time this gets to it
+                    if v then   -- its possible that your unit will have died by the time this gets to it
                         local unitBp = v:GetBlueprint()
                         if blueprint.General.UpgradesFrom == unitBp.BlueprintId then
                             performUpgrade = true
                         elseif blueprint.General.UpgradesFrom == unitBp.General.UpgradesTo then
                             performUpgrade = true
                         elseif blueprint.General.UpgradesFromBase ~= "none" then
-                            # try testing against the base
+                            -- try testing against the base
                             if blueprint.General.UpgradesFromBase == unitBp.BlueprintId then
                                 performUpgrade = true
                             elseif blueprint.General.UpgradesFromBase == unitBp.General.UpgradesFromBase then
@@ -1258,11 +1258,11 @@ function OnClickHandler(button, modifiers)
                 IssueBlueprintCommand("UNITCOMMAND_Upgrade", item.id, 1, false)
             else
                 if blueprint.Physics.MotionType == 'RULEUMT_None' or EntityCategoryContains(categories.NEEDMOBILEBUILD, item.id) then
-                    # stationary means it needs to be placed, so go in to build mobile mode
+                    -- stationary means it needs to be placed, so go in to build mobile mode
                     import('/lua/ui/game/commandmode.lua').StartCommandMode(buildCmd, {name=item.id})
                 else
-                    # if the item to build can move, it must be built by a factory
-                    #TODO -what about mobile factories?
+                    -- if the item to build can move, it must be built by a factory
+                    --TODO -what about mobile factories?
                     IssueBlueprintCommand("UNITCOMMAND_BuildFactory", item.id, count)
                 end
             end
@@ -1360,14 +1360,14 @@ function OnClickHandler(button, modifiers)
                 "<LOC _Yes>", function()
                         ForkThread(function()
                             local orderData = {
-                                # UserVerifyScript='/lua/ui/game/EnhanceCommand.lua',
+                                -- UserVerifyScript='/lua/ui/game/EnhanceCommand.lua',
                                 TaskName = "EnhanceTask",
                                 Enhancement = existingEnhancements[item.enhTable.Slot]..'Remove',
                             }
                             IssueCommand("UNITCOMMAND_Script", orderData, true)
                             WaitSeconds(.5)
                             orderData = {
-                                # UserVerifyScript='/lua/ui/game/EnhanceCommand.lua',
+                                -- UserVerifyScript='/lua/ui/game/EnhanceCommand.lua',
                                 TaskName = "EnhanceTask",
                                 Enhancement = item.id,
                             }
@@ -1380,7 +1380,7 @@ function OnClickHandler(button, modifiers)
             end
         else
             local orderData = {
-                # UserVerifyScript='/lua/ui/game/EnhanceCommand.lua',
+                -- UserVerifyScript='/lua/ui/game/EnhanceCommand.lua',
                 TaskName = "EnhanceTask",
                 Enhancement = item.id,
             }
@@ -1967,7 +1967,7 @@ function FormatData(unitData, type)
         CreateExtraControls('templates')
         SetSecondaryDisplay('buildQueue')
     else
-        #Enhancements
+        --Enhancements
         local existingEnhancements = EnhanceCommon.GetEnhancements(sortedOptions.selection[1]:GetEntityId())
         local slotToIconName = {
             RCH = 'ra',
@@ -2161,7 +2161,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
 
     if table.getsize(selection) > 0 then
         capturingKeys = false
-        #Sorting down units
+        --Sorting down units
         local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
         if not isOldSelection then
             previousTabSet = nil
@@ -2492,7 +2492,7 @@ function NewTech(Data)
     end
 end
 
-# given a tech level, sets that tech level, returns false if tech level not available
+-- given a tech level, sets that tech level, returns false if tech level not available
 function SetCurrentTechTab(techLevel)
     if techLevel == 1 and GetTabByID('t1'):IsDisabled() then
         return false

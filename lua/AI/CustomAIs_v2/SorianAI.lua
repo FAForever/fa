@@ -1,11 +1,11 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/AI/CustomAIs_v2/SorianAI.lua
-#**  Author(s): Michael Robbins aka Sorian
-#**
-#**  Summary  : Utility File to insert custom AI into the game.
-#**
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/AI/CustomAIs_v2/SorianAI.lua
+--**  Author(s): Michael Robbins aka Sorian
+--**
+--**  Summary  : Utility File to insert custom AI into the game.
+--**
+--****************************************************************************
 
 AI = {
     Name = "Sorian AI",

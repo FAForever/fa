@@ -1,13 +1,13 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/SeaPlatoonTemplates.lua
-#**
-#**  Summary  : Global platoon templates
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/SeaPlatoonTemplates.lua
+--**
+--**  Summary  : Global platoon templates
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
-# ==== Global Form platoons ==== #
+-- ==== Global Form platoons ==== --
 PlatoonTemplate {
     Name = 'SeaAttack',
     Plan = 'NavalForceAI',
@@ -32,7 +32,7 @@ PlatoonTemplate {
     },
 }
 
-# ==== Faction build platoons ==== #
+-- ==== Faction build platoons ==== --
 PlatoonTemplate {
     Name = 'T1SeaFrigate',
     FactionSquads = {

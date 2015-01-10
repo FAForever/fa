@@ -1,11 +1,11 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AIArtilleryBuilders.lua
-#**
-#**  Summary  : Default artillery/nuke/etc builders for skirmish
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AIArtilleryBuilders.lua
+--**
+--**  Summary  : Default artillery/nuke/etc builders for skirmish
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local BBTmplFile = '/lua/basetemplates.lua'
 local BuildingTmpl = 'BuildingTemplates'
@@ -23,19 +23,19 @@ local TBC = '/lua/editor/ThreatBuildConditions.lua'
 local IBC = '/lua/editor/InstantBuildConditions.lua'
 local PlatoonFile = '/lua/platoon.lua'
 
-# T3 Artillery/Rapid Fire Artillery
+-- T3 Artillery/Rapid Fire Artillery
 BuilderGroup {
     BuilderGroupName = 'T3ArtilleryGroup',
     BuildersType = 'EngineerBuilder',
     Builder {
         BuilderName = 'T3 Artillery Engineer',
         PlatoonTemplate = 'T3EngineerBuilder',
-        Priority = 950, #DUNCAN - was 850
+        Priority = 950, --DUNCAN - was 850
         BuilderConditions = {
-            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.EXPERIMENTAL } }, #DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.EXPERIMENTAL } }, --DUNCAN - added
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.TECH3 * categories.ARTILLERY * categories.STRUCTURE }},
-            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.NUKE * categories.STRUCTURE}}, #DUNCAN - added
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.EXPERIMENTAL - categories.ORBITALSYSTEM} }, #DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.NUKE * categories.STRUCTURE}}, --DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.EXPERIMENTAL - categories.ORBITALSYSTEM} }, --DUNCAN - added
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.STRUCTURE * categories.TECH3 * categories.ANTIMISSILE}},
             { EBC, 'GreaterThanEconIncome', {15, 750}},
             { EBC, 'GreaterThanEconEfficiency', { 0.9, 1.2}},
@@ -56,12 +56,12 @@ BuilderGroup {
     Builder {
         BuilderName = 'Rapid T3 Artillery Engineer',
         PlatoonTemplate = 'AeonT3EngineerBuilder',
-        Priority = 950, #DUNCAN - was 850
+        Priority = 950, --DUNCAN - was 850
         BuilderConditions = {
-            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.EXPERIMENTAL } }, #DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.EXPERIMENTAL } }, --DUNCAN - added
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.TECH3 * categories.ARTILLERY * categories.STRUCTURE }},
-            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.NUKE * categories.STRUCTURE}}, #DUNCAN - added
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.EXPERIMENTAL - categories.ORBITALSYSTEM} }, #DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.NUKE * categories.STRUCTURE}}, --DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.EXPERIMENTAL - categories.ORBITALSYSTEM} }, --DUNCAN - added
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.STRUCTURE * categories.TECH3 * categories.ANTIMISSILE}},
             { EBC, 'GreaterThanEconIncome', {15, 750}},
             { EBC, 'GreaterThanEconEfficiency', { 0.9, 1.2}},
@@ -82,7 +82,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'T3EngineerAssistBuildHLRA',
         PlatoonTemplate = 'T3EngineerAssist',
-        Priority = 950, #DUNCAN - was 850
+        Priority = 950, --DUNCAN - was 850
         InstanceCount = 4,
         BuilderConditions = {
             { UCBC, 'LocationEngineersBuildingGreater', { 'LocationType', 0, categories.ARTILLERY * categories.TECH3 * categories.STRUCTURE}},
@@ -102,19 +102,19 @@ BuilderGroup {
     },
 }
 
-# T3 Artillery/Rapid Fire Artillery
+-- T3 Artillery/Rapid Fire Artillery
 BuilderGroup {
     BuilderGroupName = 'ExperimentalArtillery',
     BuildersType = 'EngineerBuilder',
     Builder {
         BuilderName = 'T4 Artillery Engineer',
         PlatoonTemplate = 'T3EngineerBuilder',
-        Priority = 950, #DUNCAN - was 850
+        Priority = 950, --DUNCAN - was 850
         BuilderConditions = {
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.EXPERIMENTAL}},
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.EXPERIMENTAL - categories.ORBITALSYSTEM } }, #DUNCAN - added
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.TECH3 * categories.ARTILLERY * categories.STRUCTURE } }, #DUNCAN - added
-            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.NUKE * categories.STRUCTURE}}, #DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.EXPERIMENTAL - categories.ORBITALSYSTEM } }, --DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.TECH3 * categories.ARTILLERY * categories.STRUCTURE } }, --DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.NUKE * categories.STRUCTURE}}, --DUNCAN - added
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.TECH3 * categories.ARTILLERY * categories.STRUCTURE }},
             { EBC, 'GreaterThanEconIncome', {30, 1000}},
             { EBC, 'GreaterThanEconEfficiency', { 0.9, 1.2}},
@@ -136,7 +136,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'T4EngineerAssistBuildHLRA',
         PlatoonTemplate = 'T3EngineerAssist',
-        Priority = 950, #DUNCAN - was 850
+        Priority = 950, --DUNCAN - was 850
         InstanceCount = 8,
         BuilderConditions = {
             { UCBC, 'LocationEngineersBuildingGreater', { 'LocationType', 0, categories.ARTILLERY * categories.TECH3 * categories.STRUCTURE}},
@@ -156,19 +156,19 @@ BuilderGroup {
     },
 }
 
-# Nukes
+-- Nukes
 BuilderGroup {
     BuilderGroupName = 'NukeBuildersEngineerBuilders',
     BuildersType = 'EngineerBuilder',
     Builder {
         BuilderName = 'Seraphim Exp Nuke Engineer',
         PlatoonTemplate = 'SeraphimT3EngineerBuilder',
-        Priority = 900, #DUNCAN - was 851
+        Priority = 900, --DUNCAN - was 851
         BuilderConditions = {
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.EXPERIMENTAL - categories.ORBITALSYSTEM}},
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.NUKE * categories.STRUCTURE}},
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.TECH3 * categories.ARTILLERY * categories.STRUCTURE }},
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL } }, #DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL } }, --DUNCAN - added
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
             { EBC, 'GreaterThanEconIncome', {22, 1000}},
             { EBC, 'GreaterThanEconEfficiency', { 0.9, 1.2}},
@@ -188,14 +188,14 @@ BuilderGroup {
     Builder {
         BuilderName = 'T3 Nuke Engineer',
         PlatoonTemplate = 'T3EngineerBuilder',
-        Priority = 900, #DUNCAN - was 850
+        Priority = 900, --DUNCAN - was 850
         BuilderConditions = {
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.EXPERIMENTAL - categories.ORBITALSYSTEM}},
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.NUKE * categories.STRUCTURE}},
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.TECH3 * categories.ARTILLERY * categories.STRUCTURE }},
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.ENERGYPRODUCTION * categories.TECH3 } }, #DUNCAN - was 3
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL } }, #DUNCAN - added
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 2, categories.NUKE * categories.STRUCTURE } }, #DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.ENERGYPRODUCTION * categories.TECH3 } }, --DUNCAN - was 3
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL } }, --DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 2, categories.NUKE * categories.STRUCTURE } }, --DUNCAN - added
             { EBC, 'GreaterThanEconIncome', {22, 1000}},
             { EBC, 'GreaterThanEconEfficiency', { 0.9, 1.2}},
             { IBC, 'BrainNotLowPowerMode', {} },
@@ -214,7 +214,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'T3 Engineer Assist Build Nuke',
         PlatoonTemplate = 'T3EngineerAssist',
-        Priority = 900, #DUNCAN - was 850
+        Priority = 900, --DUNCAN - was 850
         InstanceCount = 4,
         BuilderConditions = {
             { UCBC, 'LocationEngineersBuildingGreater', { 'LocationType', 0, categories.STRUCTURE * categories.NUKE}},

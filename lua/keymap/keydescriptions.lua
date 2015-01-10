@@ -78,7 +78,7 @@ keyDescriptions = {
     ['select_land'] = '<LOC key_desc_0058>Select all Land units',
     ['select_all_units_of_same_type'] = '<LOC key_desc_0059>Select all units similar to those selected',
     ['reset_camera'] = '<LOC key_desc_0060>Reset the Camera',
-    # ['build'] = '<LOC key_desc_0061>Silo Build mode',
+    -- ['build'] = '<LOC key_desc_0061>Silo Build mode',
     ['select_engineers'] = '<LOC key_desc_0062>Select all Engineers',
     ['repair'] = '<LOC key_desc_0036>Repair',
     ['reclaim'] = '<LOC key_desc_0037>Reclaim',
@@ -216,7 +216,7 @@ keyDescriptions = {
     
     ['show_objective_screen'] = 'Show Scenario Options/Objectives Window',
 
-    #GAZUI
+    --GAZUI
     ['toggle_repeat_build'] = 'Toggle factory repeat build',
     ['show_enemy_life'] = 'Show enemy life bars',
     ['show_network_stats'] = 'Show network stats window',
@@ -293,7 +293,7 @@ keyDescriptions = {
     ['select_air_transport'] = 'Select only transports',
     ['lock_zoom'] = 'lock the zoom to current level',
 
-    # hotbuild
+    -- hotbuild
     ['builders'] = 'build builders (factories, Quantum Gate & T1 engineers)',
     ['sensors'] = 'build sensors + T1 sub marines',
     ['shields'] = 'build shields/steath fields + LAB + Interceptors + Frigates',
@@ -315,7 +315,7 @@ keyDescriptions = {
     ['tml'] = 'build Tactical Missile Launchers + Shield disruptors + T3 mobile shields + T3 gunships + Missile Ship',
     ['upgrades'] = 'build upgrades + T3 Air Transport + T3 torpedo bomber',
 
-    # extra
+    -- extra
     ['land_factory'] = 'build Land Factory',
     ['air_factory'] = 'build Air Factory',
     ['naval_factory'] = 'build Naval Factory',

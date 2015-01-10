@@ -27,8 +27,8 @@ local Edit = import('/lua/maui/edit.lua').Edit
 local _InternalUpdateStatus
 
 
-# This function can be called while the ModManager is active, to update changes to the selected mods on the fly.
-# If called when the ModManger is -not- active, it is a no-op.
+-- This function can be called while the ModManager is active, to update changes to the selected mods on the fly.
+-- If called when the ModManger is -not- active, it is a no-op.
 function UpdateClientModStatus(selectedModsFromHost)
     if _InternalUpdateStatus then
         _InternalUpdateStatus(selectedModsFromHost)
@@ -248,7 +248,7 @@ local function CreateLoadPresetDialog(parent, scrollGroup)
             local name = presets:GetItem(index)
             UIUtil.QuickDialog(dialog, "<LOC lobui_0594>Are you sure you want to delete this preset?",
                 "<LOC _Yes>", function()
-                    #table.remove(userPresets, index + 1)
+                    --table.remove(userPresets, index + 1)
                     userPresets[name] = nil
                     Prefs.SetToCurrentProfile('UserPresets', userPresets)
                     fillPresetList()
@@ -748,7 +748,7 @@ function CreateDialog(over, inLobby, exitBehavior, useCover, modStatus)
             end
         end
 
-        # clear out the module var '_InternalUpdateStatus' to disable background updates
+        -- clear out the module var '_InternalUpdateStatus' to disable background updates
         _InternalUpdateStatus = nil
 
         if over then
