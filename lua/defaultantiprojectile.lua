@@ -23,7 +23,9 @@ Flare = Class(Entity) {
     # We only divert projectiles. The flare-projectile itself will be responsible for
     # accepting the collision and causing the hostile projectile to impact.
     OnCollisionCheck = function(self,other)
-        if EntityCategoryContains(ParseEntityCategory(self.RedirectCat), other) and (self:GetArmy() != other:GetArmy())then
+        myArmy = self:GetArmy()
+        otherArmy = other:GetArmy()
+        if EntityCategoryContains(ParseEntityCategory(self.RedirectCat), other) and myArmy != otherArmy and IsAlly(myArmy, otherArmy) == false then
             #LOG('*DEBUG FLARE COLLISION CHECK')
             other:SetNewTarget(self.Owner)
         end
