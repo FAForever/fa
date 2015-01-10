@@ -2,7 +2,6 @@ UnitBlueprint {
     AI = {
         InitialAutoMode = true,
         TargetBones = {
-            'URL0111',
             'Launcher',
         },
     },
