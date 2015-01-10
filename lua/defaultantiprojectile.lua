@@ -44,7 +44,9 @@ DepthCharge = Class(Entity) {
     # We only divert projectiles. The flare-projectile itself will be responsible for
     # accepting the collision and causing the hostile projectile to impact.
     OnCollisionCheck = function(self,other)
-        if EntityCategoryContains(categories.TORPEDO, other) and self:GetArmy() != other:GetArmy() then
+        myArmy = self:GetArmy()
+        otherArmy = other:GetArmy()
+        if EntityCategoryContains(categories.TORPEDO, other) and myArmy != otherArmy and IsAlly(myArmy, otherArmy) == false then
             other:SetNewTarget(self.Owner)
         end
         return false
