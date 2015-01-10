@@ -164,6 +164,9 @@ function TransferUnitsOwnership(units, ToArmyIndex)
                 unit:DisableShield()
             end
         end
+        if EntityCategoryContains(categories.ENGINEERSTATION, unit) then
+            unit:SetPaused(true)
+        end
         unit:OnAfterTransferingOwnership(owner)
     end
     return newUnits
