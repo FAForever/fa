@@ -635,7 +635,7 @@ UnitBlueprint {
             FiringRandomness = 1.1,
             FiringTolerance = 2,
             HeadingArcCenter = -75,
-            HeadingArcRange = 125,
+            HeadingArcRange = 120,
             Label = 'LeftTurret01',
             MaxRadius = 100,
             MuzzleSalvoDelay = 0,
