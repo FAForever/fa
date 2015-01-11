@@ -1,10 +1,10 @@
-#*****************************************************************************
-#* File: lua/modules/ui/game/construction.lua
-#* Author: Chris Blackwell / Ted Snook
-#* Summary: Construction management UI
-#*
-#* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#*****************************************************************************
+--*****************************************************************************
+--* File: lua/modules/ui/game/construction.lua
+--* Author: Chris Blackwell / Ted Snook
+--* Summary: Construction management UI
+--*
+--* Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local DiskGetFileInfo = UIUtil.DiskGetFileInfo
@@ -45,7 +45,7 @@ local prevBuildCategories = false
 
 local allFactories = nil
 
-if options.gui_templates_factory != 0 then
+if options.gui_templates_factory ~= 0 then
     allFactories = false
 end
 
@@ -58,7 +58,7 @@ local updateQueue = true    --if false then queue won't update in the ui
 local modified = false      --if false then buttonrelease will increase buildcount in queue
 local dragLock = false      --to disable quick successive drags, which doubles the units in the queue
 
-if options.gui_draggable_queue != 0 then
+if options.gui_draggable_queue ~= 0 then
     --add gameparent handleevent for if the drag ends outside the queue window
     local gameParent = import('gamemain.lua').GetGameParent()
     local oldGameParentHandleEvent = gameParent.HandleEvent
@@ -72,8 +72,8 @@ end
 
 local cutA = 0
 local cutB = 0
-if options.gui_visible_template_names != 0 then
-    if options.gui_template_name_cutoff != nil then
+if options.gui_visible_template_names ~= 0 then
+    if options.gui_template_name_cutoff ~= nil then
         cutA = options.gui_template_name_cutoff
         cutB = options.gui_template_name_cutoff
     end
@@ -156,9 +156,9 @@ function DecreaseBuildCountInQueue(unitIndex, count)
    if blueprint.Categories then
        for i,v in ipairs(blueprint.Categories) do
           if v == 'SUPPORTFACTORY' then
-    	 supportfactory = true
+         supportfactory = true
           elseif v == 'TECH3' then
-    	 tech3 = true
+         tech3 = true
           end
           if tech3 and supportfactory then break end
        end
@@ -188,8 +188,8 @@ function CreateTab(parent, id, onCheckFunc)
         Checkbox.HandleEvent(self, event)
     end
 
-    # Do this to prevent errors if the tab is created and destroyed in the same frame
-    # Happens when people double click super fast to select units
+    -- Do this to prevent errors if the tab is created and destroyed in the same frame
+    -- Happens when people double click super fast to select units
     btn.OnDestroy = function(self)
         btn.disabledGroup.Depth:Set(1)
     end
@@ -198,7 +198,7 @@ function CreateTab(parent, id, onCheckFunc)
     end
 
     btn.OnClick = function(self)
-        if self._checkState != 'checked' then
+        if self._checkState ~= 'checked' then
             self:ToggleCheck()
         end
     end
@@ -319,7 +319,7 @@ end
 function OnNestedTabCheck(self, checked)
     activeTab = self
     for _, tab in controls.tabs do
-        if tab != self then
+        if tab ~= self then
             tab:SetCheck(false, true)
         end
     end
@@ -331,7 +331,7 @@ function CreateTabs(type)
     local defaultTabOrder = {}
     local desiredTabs = 0
     -- construction tab, this is called before fac templates have been added
-    if type == 'construction' and allFactories and options.gui_templates_factory != 0 then
+    if type == 'construction' and allFactories and options.gui_templates_factory ~= 0 then
         -- nil value would cause refresh issues if templates tab is currently selected
         sortedOptions.templates = {}
 
@@ -429,7 +429,7 @@ function CreateTabs(type)
             tab:Disable()
         end
     end
-    if previousTabSet != type or previousTabSize != numActive then
+    if previousTabSet ~= type or previousTabSize ~= numActive then
         if defaultTab then
             defaultTab:SetCheck(true)
         end
@@ -536,7 +536,7 @@ function CommonLogic()
             control:Disable()
             control.StratIcon:SetSolidColor('00000000')
             control:SetSolidColor('00000000')
-#            control.ConsBar:SetAlpha(0, true)
+--            control.ConsBar:SetAlpha(0, true)
             control.BuildKey = nil
         elseif type == 'queuestack' or type == 'attachedunit' then
             SetIconTextures(control)
@@ -549,11 +549,11 @@ function CommonLogic()
             control.Width:Set(48)
             control.Icon.Height:Set(48)
             control.Icon.Width:Set(48)
-#            if __blueprints[control.Data.id].General.ConstructionBar then
-#                control.ConsBar:SetAlpha(1, true)
-#            else
-#                control.ConsBar:SetAlpha(0, true)
-#            end
+--            if __blueprints[control.Data.id].General.ConstructionBar then
+--                control.ConsBar:SetAlpha(1, true)
+--            else
+--                control.ConsBar:SetAlpha(0, true)
+--            end
             control.BuildKey = nil
             if control.Data.count > 1 then
                 control.Count:SetText(control.Data.count)
@@ -586,9 +586,9 @@ function CommonLogic()
         LayoutHelpers.AtRightIn(btn.Count, btn, 3)
         btn.Count.Depth:Set(function() return btn.Icon.Depth() + 10 end)
 
-#        btn.ConsBar = Bitmap(btn, UIUtil.UIFile('/icons/units/cons_bar.dds'))
-#        btn.ConsBar:DisableHitTest()
-#        LayoutHelpers.AtCenterIn(btn.ConsBar, btn)
+--        btn.ConsBar = Bitmap(btn, UIUtil.UIFile('/icons/units/cons_bar.dds'))
+--        btn.ConsBar:DisableHitTest()
+--        LayoutHelpers.AtCenterIn(btn.ConsBar, btn)
 
         btn.Glow = Bitmap(btn)
         btn.Glow:SetTexture(UIUtil.UIFile('/game/units_bmp/glow.dds'))
@@ -644,9 +644,9 @@ function CommonLogic()
         LayoutHelpers.AtBottomIn(btn.Count, btn)
         LayoutHelpers.AtRightIn(btn.Count, btn)
 
-#        btn.ConsBar = Bitmap(btn, UIUtil.UIFile('/icons/units/cons_bar.dds'))
-#        btn.ConsBar:DisableHitTest()
-#        LayoutHelpers.AtCenterIn(btn.ConsBar, btn)
+--        btn.ConsBar = Bitmap(btn, UIUtil.UIFile('/icons/units/cons_bar.dds'))
+--        btn.ConsBar:DisableHitTest()
+--        LayoutHelpers.AtCenterIn(btn.ConsBar, btn)
 
         btn.LowFuel = Bitmap(btn)
         btn.LowFuel:SetSolidColor('ffff0000')
@@ -750,7 +750,7 @@ function CommonLogic()
             control.Icon.Width:Set(30)
             control.StratIcon:SetSolidColor('00000000')
             control.LowFuel:SetAlpha(0, true)
-#            control.ConsBar:SetAlpha(0, true)
+--            control.ConsBar:SetAlpha(0, true)
             control.LowFuel:SetNeedsFrameUpdate(false)
             control.BuildKey = nil
         elseif type == 'spacer' then
@@ -770,7 +770,7 @@ function CommonLogic()
             control.StratIcon:SetSolidColor('00000000')
             control:SetSolidColor('00000000')
             control.LowFuel:SetAlpha(0, true)
-#            control.ConsBar:SetAlpha(0, true)
+--            control.ConsBar:SetAlpha(0, true)
             control.LowFuel:SetNeedsFrameUpdate(false)
             control.BuildKey = nil
         elseif type == 'enhancement' then
@@ -788,7 +788,7 @@ function CommonLogic()
             control.Count:SetText('')
             control.StratIcon:SetSolidColor('00000000')
             control.LowFuel:SetAlpha(0, true)
-#            control.ConsBar:SetAlpha(0, true)
+--            control.ConsBar:SetAlpha(0, true)
             control.LowFuel:SetNeedsFrameUpdate(false)
             control.BuildKey = nil
             if control.Data.Disabled then
@@ -825,7 +825,7 @@ function CommonLogic()
             control.Icon:Show()
             control:Enable()
             control.LowFuel:SetAlpha(0, true)
-#            control.ConsBar:SetAlpha(0, true)
+--            control.ConsBar:SetAlpha(0, true)
             control.LowFuel:SetNeedsFrameUpdate(false)
         elseif type == 'item' then
             SetIconTextures(control)
@@ -850,11 +850,11 @@ function CommonLogic()
             control.Icon:Show()
             control:Enable()
             control.LowFuel:SetAlpha(0, true)
-#            if __blueprints[control.Data.id].General.ConstructionBar then
-#                control.ConsBar:SetAlpha(1, true)
-#            else
-#                control.ConsBar:SetAlpha(0, true)
-#            end
+--            if __blueprints[control.Data.id].General.ConstructionBar then
+--                control.ConsBar:SetAlpha(1, true)
+--            else
+--                control.ConsBar:SetAlpha(0, true)
+--            end
             control.LowFuel:SetNeedsFrameUpdate(false)
             if newTechUnits and table.find(newTechUnits, control.Data.id) then
                 table.remove(newTechUnits, table.find(newTechUnits, control.Data.id))
@@ -907,11 +907,11 @@ function CommonLogic()
             control.Icon.Height:Set(48)
             control.Icon.Width:Set(48)
             control.LowFuel:SetAlpha(0, true)
-#            if __blueprints[control.Data.id].General.ConstructionBar then
-#                control.ConsBar:SetAlpha(1, true)
-#            else
-#                control.ConsBar:SetAlpha(0, true)
-#            end
+--            if __blueprints[control.Data.id].General.ConstructionBar then
+--                control.ConsBar:SetAlpha(1, true)
+--            else
+--                control.ConsBar:SetAlpha(0, true)
+--            end
             control.BuildKey = nil
             if control.Data.lowFuel then
                 control.LowFuel:SetNeedsFrameUpdate(true)
@@ -929,7 +929,7 @@ function CommonLogic()
             control:Enable()
         end
     end
-    if options.gui_bigger_strat_build_icons != 0 then
+    if options.gui_bigger_strat_build_icons ~= 0 then
         local oldSecondary = controls.secondaryChoices.SetControlToType
         local oldPrimary = controls.choices.SetControlToType
         -- norem add idle icon to buttons
@@ -988,7 +988,7 @@ function CommonLogic()
         end
     end
 
-    if options.gui_visible_template_names != 0 then
+    if options.gui_visible_template_names ~= 0 then
         local oldSecondary = controls.secondaryChoices.SetControlToType
         local oldPrimary = controls.choices.SetControlToType
         local oldPrimaryCreate = controls.choices.CreateElement
@@ -1044,7 +1044,7 @@ end
 function OnRolloverHandler(button, state)
     local item = button.Data
 
-    if options.gui_draggable_queue != 0 and item.type == 'queuestack' and prevSelection and EntityCategoryContains(categories.FACTORY, prevSelection[1]) then
+    if options.gui_draggable_queue ~= 0 and item.type == 'queuestack' and prevSelection and EntityCategoryContains(categories.FACTORY, prevSelection[1]) then
         if state == 'enter' then
             button.oldHandleEvent = button.HandleEvent
             --if we have entered the button and are dragging something then we want to replace it with what we are dragging
@@ -1144,7 +1144,7 @@ function OnClickHandler(button, modifiers)
     PlaySound(Sound({Cue = "UI_MFD_Click", Bank = "Interface"}))
     local item = button.Data
 
-    if options.gui_improved_unit_deselection != 0 then
+    if options.gui_improved_unit_deselection ~= 0 then
         --Improved unit deselection -ghaleon
         if item.type == 'unitstack' then
             if modifiers.Right then
@@ -1203,7 +1203,7 @@ function OnClickHandler(button, modifiers)
                 button.OptionMenu = CreateFacTemplateOptionsMenu(button)
             end
             for _, otherBtn in controls.choices.Items do
-                if button != otherBtn and otherBtn.OptionMenu then
+                if button ~= otherBtn and otherBtn.OptionMenu then
                     otherBtn.OptionMenu:Destroy()
                     otherBtn.OptionMenu = false
                 end
@@ -1231,19 +1231,19 @@ function OnClickHandler(button, modifiers)
         end
 
         if modifiers.Left then
-            # see if we are issuing an upgrade order
+            -- see if we are issuing an upgrade order
             if blueprint.General.UpgradesFrom == 'none' then
                 performUpgrade = false
             else
                 for i,v in sortedOptions.selection do
-                    if v then   # its possible that your unit will have died by the time this gets to it
+                    if v then   -- its possible that your unit will have died by the time this gets to it
                         local unitBp = v:GetBlueprint()
                         if blueprint.General.UpgradesFrom == unitBp.BlueprintId then
                             performUpgrade = true
                         elseif blueprint.General.UpgradesFrom == unitBp.General.UpgradesTo then
                             performUpgrade = true
-                        elseif blueprint.General.UpgradesFromBase != "none" then
-                            # try testing against the base
+                        elseif blueprint.General.UpgradesFromBase ~= "none" then
+                            -- try testing against the base
                             if blueprint.General.UpgradesFromBase == unitBp.BlueprintId then
                                 performUpgrade = true
                             elseif blueprint.General.UpgradesFromBase == unitBp.General.UpgradesFromBase then
@@ -1258,11 +1258,11 @@ function OnClickHandler(button, modifiers)
                 IssueBlueprintCommand("UNITCOMMAND_Upgrade", item.id, 1, false)
             else
                 if blueprint.Physics.MotionType == 'RULEUMT_None' or EntityCategoryContains(categories.NEEDMOBILEBUILD, item.id) then
-                    # stationary means it needs to be placed, so go in to build mobile mode
-					import('/lua/ui/game/commandmode.lua').StartCommandMode(buildCmd, {name=item.id})
+                    -- stationary means it needs to be placed, so go in to build mobile mode
+                    import('/lua/ui/game/commandmode.lua').StartCommandMode(buildCmd, {name=item.id})
                 else
-                    # if the item to build can move, it must be built by a factory
-                    #TODO -what about mobile factories?
+                    -- if the item to build can move, it must be built by a factory
+                    --TODO -what about mobile factories?
                     IssueBlueprintCommand("UNITCOMMAND_BuildFactory", item.id, count)
                 end
             end
@@ -1273,7 +1273,7 @@ function OnClickHandler(button, modifiers)
                     unitIndex = index
                 end
             end
-            if unitIndex != false then
+            if unitIndex ~= false then
                 DecreaseBuildCountInQueue(unitIndex, count)
             end
         end
@@ -1318,7 +1318,7 @@ function OnClickHandler(button, modifiers)
                 button.OptionMenu = CreateTemplateOptionsMenu(button)
             end
             for _, otherBtn in controls.choices.Items do
-                if button != otherBtn and otherBtn.OptionMenu then
+                if button ~= otherBtn and otherBtn.OptionMenu then
                     otherBtn.OptionMenu:Destroy()
                     otherBtn.OptionMenu = false
                 end
@@ -1328,7 +1328,7 @@ function OnClickHandler(button, modifiers)
             SetActiveBuildTemplate(item.template.templateData)
         end
 
-        if options.gui_template_rotator != 0 then
+        if options.gui_template_rotator ~= 0 then
             local item = button.Data
             local activeTemplate = item.template.templateData
             local worldview = import('/lua/ui/game/worldview.lua').viewLeft
@@ -1354,20 +1354,20 @@ function OnClickHandler(button, modifiers)
 
     elseif item.type == 'enhancement' then
         local existingEnhancements = EnhanceCommon.GetEnhancements(sortedOptions.selection[1]:GetEntityId())
-        if existingEnhancements[item.enhTable.Slot] and existingEnhancements[item.enhTable.Slot] != item.enhTable.Prerequisite then
-            if existingEnhancements[item.enhTable.Slot] != item.id then
+        if existingEnhancements[item.enhTable.Slot] and existingEnhancements[item.enhTable.Slot] ~= item.enhTable.Prerequisite then
+            if existingEnhancements[item.enhTable.Slot] ~= item.id then
             UIUtil.QuickDialog(GetFrame(0), "<LOC enhancedlg_0000>Choosing this enhancement will destroy the existing enhancement in this slot.  Are you sure?",
                 "<LOC _Yes>", function()
                         ForkThread(function()
                             local orderData = {
-                                # UserVerifyScript='/lua/ui/game/EnhanceCommand.lua',
+                                -- UserVerifyScript='/lua/ui/game/EnhanceCommand.lua',
                                 TaskName = "EnhanceTask",
                                 Enhancement = existingEnhancements[item.enhTable.Slot]..'Remove',
                             }
                             IssueCommand("UNITCOMMAND_Script", orderData, true)
                             WaitSeconds(.5)
                             orderData = {
-                                # UserVerifyScript='/lua/ui/game/EnhanceCommand.lua',
+                                -- UserVerifyScript='/lua/ui/game/EnhanceCommand.lua',
                                 TaskName = "EnhanceTask",
                                 Enhancement = item.id,
                             }
@@ -1380,7 +1380,7 @@ function OnClickHandler(button, modifiers)
             end
         else
             local orderData = {
-                # UserVerifyScript='/lua/ui/game/EnhanceCommand.lua',
+                -- UserVerifyScript='/lua/ui/game/EnhanceCommand.lua',
                 TaskName = "EnhanceTask",
                 Enhancement = item.id,
             }
@@ -1393,11 +1393,11 @@ function OnClickHandler(button, modifiers)
             count = 5
         end
         if modifiers.Left then
-	   --LOG("unit++")
+       --LOG("unit++")
             IncreaseBuildCountInQueue(item.position, count)
         elseif modifiers.Right then
-	   --LOG("unit-- attempt")
-	   DecreaseBuildCountInQueue(item.position, count)
+       --LOG("unit-- attempt")
+       DecreaseBuildCountInQueue(item.position, count)
         end
     end
 end
@@ -1463,7 +1463,7 @@ function CreateTemplateOptionsMenu(button)
             local contents = {}
             local controls = {}
             for _, entry in button.Data.template.templateData do
-                if type(entry) != 'table' then continue end
+                if type(entry) ~= 'table' then continue end
                 if not contents[entry[1]] then
                     contents[entry[1]] = true
                 end
@@ -1511,7 +1511,7 @@ function CreateTemplateOptionsMenu(button)
             local armies = GetArmiesTable().armiesTable
             local entries = {}
             for i, armyData in armies do
-                if i != GetFocusArmy() and armyData.human then
+                if i ~= GetFocusArmy() and armyData.human then
                     local entry = UIUtil.CreateText(group, armyData.nickname, 12, UIUtil.bodyFont)
                     entry.ID = i
                     table.insert(entries, entry)
@@ -1633,7 +1633,7 @@ function CreateSubMenu(parentMenu, contents, onClickFunc, setupOnClickHandler)
         else
             LayoutHelpers.Below(control, contents[i-1])
         end
-        if setupOnClickHandler != false then
+        if setupOnClickHandler ~= false then
             control.bg = Bitmap(control)
             control.bg.HandleEvent = function(self, event)
                 if event.Type == 'MouseEnter' then
@@ -1910,7 +1910,7 @@ function FormatData(unitData, type)
                lowFuelUnits[id] = {}
             end
             table.insert(lowFuelUnits[id], unit)
-         elseif options.gui_seperate_idle_builders != 0 and unit:IsInCategory('CONSTRUCTION') and unit:IsIdle() then
+         elseif options.gui_seperate_idle_builders ~= 0 and unit:IsInCategory('CONSTRUCTION') and unit:IsIdle() then
             if not idleConsUnits[id] then
                idleConsUnits[id] = {}
             end
@@ -1967,7 +1967,7 @@ function FormatData(unitData, type)
         CreateExtraControls('templates')
         SetSecondaryDisplay('buildQueue')
     else
-        #Enhancements
+        --Enhancements
         local existingEnhancements = EnhanceCommon.GetEnhancements(sortedOptions.selection[1]:GetEntityId())
         local slotToIconName = {
             RCH = 'ra',
@@ -2145,7 +2145,7 @@ end
 
 function OnSelection(buildableCategories, selection, isOldSelection)
 
-    if options.gui_templates_factory != 0 then
+    if options.gui_templates_factory ~= 0 then
         if table.empty(selection) then
             allFactories = false
         else
@@ -2161,7 +2161,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
 
     if table.getsize(selection) > 0 then
         capturingKeys = false
-        #Sorting down units
+        --Sorting down units
         local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
         if not isOldSelection then
             previousTabSet = nil
@@ -2172,37 +2172,37 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         sortedOptions = {}
         UnitViewDetail.Hide()
 
-	-- Engymod addition by Rienzilla
-	-- Only honour CONSTRUCTIONSORTDOWN if we selected a factory
+    -- Engymod addition by Rienzilla
+    -- Only honour CONSTRUCTIONSORTDOWN if we selected a factory
         local allFactory = true
-	for i, v in selection do
-	   if allFactory and not v:IsInCategory('FACTORY') then
-	      allFactory = false
-	   end
-	end
+    for i, v in selection do
+       if allFactory and not v:IsInCategory('FACTORY') then
+          allFactory = false
+       end
+    end
 
-	if allFactory then
-	   local sortDowns = EntityCategoryFilterDown(categories.CONSTRUCTIONSORTDOWN, buildableUnits)
-	   sortedOptions.t1 = EntityCategoryFilterDown(categories.TECH1-categories.CONSTRUCTIONSORTDOWN, buildableUnits)
-	   sortedOptions.t2 = EntityCategoryFilterDown(categories.TECH2-categories.CONSTRUCTIONSORTDOWN, buildableUnits)
-	   sortedOptions.t3 = EntityCategoryFilterDown(categories.TECH3-categories.CONSTRUCTIONSORTDOWN, buildableUnits)
-	   sortedOptions.t4 = EntityCategoryFilterDown(categories.EXPERIMENTAL-categories.CONSTRUCTIONSORTDOWN, buildableUnits)
+    if allFactory then
+       local sortDowns = EntityCategoryFilterDown(categories.CONSTRUCTIONSORTDOWN, buildableUnits)
+       sortedOptions.t1 = EntityCategoryFilterDown(categories.TECH1-categories.CONSTRUCTIONSORTDOWN, buildableUnits)
+       sortedOptions.t2 = EntityCategoryFilterDown(categories.TECH2-categories.CONSTRUCTIONSORTDOWN, buildableUnits)
+       sortedOptions.t3 = EntityCategoryFilterDown(categories.TECH3-categories.CONSTRUCTIONSORTDOWN, buildableUnits)
+       sortedOptions.t4 = EntityCategoryFilterDown(categories.EXPERIMENTAL-categories.CONSTRUCTIONSORTDOWN, buildableUnits)
 
-	   for _, unit in sortDowns do
-	      if EntityCategoryContains(categories.EXPERIMENTAL, unit) then
-		 table.insert(sortedOptions.t3, unit)
-	      elseif EntityCategoryContains(categories.TECH3, unit) then
-		 table.insert(sortedOptions.t2, unit)
-	      elseif EntityCategoryContains(categories.TECH2, unit) then
-		 table.insert(sortedOptions.t1, unit)
-	      end
-	   end
-	else
-	   sortedOptions.t1 = EntityCategoryFilterDown(categories.TECH1, buildableUnits)
-	   sortedOptions.t2 = EntityCategoryFilterDown(categories.TECH2, buildableUnits)
-	   sortedOptions.t3 = EntityCategoryFilterDown(categories.TECH3, buildableUnits)
-	   sortedOptions.t4 = EntityCategoryFilterDown(categories.EXPERIMENTAL, buildableUnits)
-	end
+       for _, unit in sortDowns do
+          if EntityCategoryContains(categories.EXPERIMENTAL, unit) then
+         table.insert(sortedOptions.t3, unit)
+          elseif EntityCategoryContains(categories.TECH3, unit) then
+         table.insert(sortedOptions.t2, unit)
+          elseif EntityCategoryContains(categories.TECH2, unit) then
+         table.insert(sortedOptions.t1, unit)
+          end
+       end
+    else
+       sortedOptions.t1 = EntityCategoryFilterDown(categories.TECH1, buildableUnits)
+       sortedOptions.t2 = EntityCategoryFilterDown(categories.TECH2, buildableUnits)
+       sortedOptions.t3 = EntityCategoryFilterDown(categories.TECH3, buildableUnits)
+       sortedOptions.t4 = EntityCategoryFilterDown(categories.EXPERIMENTAL, buildableUnits)
+    end
 
         if table.getn(buildableUnits) > 0 then
             controls.constructionTab:Enable()
@@ -2223,7 +2223,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
             if allMobile and not v:IsInCategory('MOBILE') then
                 allMobile = false
             end
-            if allSameUnit and bpID and bpID != v:GetBlueprint().BlueprintId then
+            if allSameUnit and bpID and bpID ~= v:GetBlueprint().BlueprintId then
                 allSameUnit = false
             else
                 bpID = v:GetBlueprint().BlueprintId
@@ -2306,7 +2306,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
             if allMobile and not v:IsInCategory('MOBILE') then
                 allMobile = false
             end
-            if allSameUnit and bpID and bpID != v:GetBlueprint().BlueprintId then
+            if allSameUnit and bpID and bpID ~= v:GetBlueprint().BlueprintId then
                 allSameUnit = false
             else
                 bpID = v:GetBlueprint().BlueprintId
@@ -2322,7 +2322,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         end
 
         --Allow all races to build other races templates
-        if options.gui_all_race_templates != 0 then
+        if options.gui_all_race_templates ~= 0 then
             local templates = Templates.GetTemplates()
             local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
             if allMobile and templates and table.getsize(templates) > 0 then
@@ -2492,7 +2492,7 @@ function NewTech(Data)
     end
 end
 
-# given a tech level, sets that tech level, returns false if tech level not available
+-- given a tech level, sets that tech level, returns false if tech level not available
 function SetCurrentTechTab(techLevel)
     if techLevel == 1 and GetTabByID('t1'):IsDisabled() then
         return false
@@ -2678,7 +2678,7 @@ function CreateFacTemplateOptionsMenu(button)
             local contents = {}
             local controls = {}
             for _, entry in button.Data.template.templateData do
-                if type(entry) != 'table' then continue end
+                if type(entry) ~= 'table' then continue end
                 if not contents[entry.id] then
                     contents[entry.id] = true
                 end

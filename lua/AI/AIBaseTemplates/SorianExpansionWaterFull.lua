@@ -1,111 +1,111 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AIBaseTemplates/SorianExpansionBalancedFull.lua
-#**  Author(s): Michael Robbins aka Sorian
-#**
-#**  Summary  : Manage engineers for a location
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AIBaseTemplates/SorianExpansionBalancedFull.lua
+--**  Author(s): Michael Robbins aka Sorian
+--**
+--**  Summary  : Manage engineers for a location
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 BaseBuilderTemplate {
     BaseTemplateName = 'SorianExpansionWaterFull',
     Builders = {
-        # ==== ECONOMY ==== #
-        # Factory upgrades
+        -- ==== ECONOMY ==== --
+        -- Factory upgrades
         'SorianT1BalancedUpgradeBuildersExpansion',
         'SorianT2BalancedUpgradeBuildersExpansion',
-        
-        # Engineer Builders
+
+        -- Engineer Builders
         'SorianEngineerFactoryBuilders',
         'SorianT1EngineerBuilders',
         'SorianT2EngineerBuilders',
         'SorianT3EngineerBuilders',
         'SorianEngineerFactoryConstruction',
         'SorianEngineerFactoryConstruction Balance',
-		
-		# SCU Upgrades
-		'SorianSCUUpgrades',
-        
-        # Build Mass low pri at this base
+
+        -- SCU Upgrades
+        'SorianSCUUpgrades',
+
+        -- Build Mass low pri at this base
         'SorianEngineerMassBuildersLowerPri',
-        
-        # Build some power, but not much
+
+        -- Build some power, but not much
         'SorianEngineerEnergyBuildersExpansions',
-        
-        # ==== EXPANSION ==== #
+
+        -- ==== EXPANSION ==== --
         'SorianEngineerExpansionBuildersFull',
         'SorianEngineerExpansionBuildersSmall',
-        
-        # ==== DEFENSES ==== #
+
+        -- ==== DEFENSES ==== --
         'SorianT1LightDefenses',
         'SorianT2LightDefenses',
         'SorianT3LightDefenses',
 
-		'SorianT2ArtilleryFormBuilders',
-		'SorianT3ArtilleryFormBuilders',
-		'SorianT4ArtilleryFormBuilders',
+        'SorianT2ArtilleryFormBuilders',
+        'SorianT3ArtilleryFormBuilders',
+        'SorianT4ArtilleryFormBuilders',
         'SorianT3NukeDefensesExp',
         'SorianT3NukeDefenseBehaviors',
-		'SorianT2ShieldsExpansion',
-		'SorianShieldUpgrades',
-		'SorianT3ShieldsExpansion',
-		'SorianAirStagingExpansion',
-		'SorianT2MissileDefenses',
-		
-		'SorianMassAdjacencyDefenses',
-        
-        # ==== NAVAL EXPANSION ==== #
-        #'SorianNavalExpansionBuilders',
-		'SorianNavalExpansionBuildersFast',
-        
-        # ==== AIR UNIT BUILDERS ==== #
+        'SorianT2ShieldsExpansion',
+        'SorianShieldUpgrades',
+        'SorianT3ShieldsExpansion',
+        'SorianAirStagingExpansion',
+        'SorianT2MissileDefenses',
+
+        'SorianMassAdjacencyDefenses',
+
+        -- ==== NAVAL EXPANSION ==== --
+        --'SorianNavalExpansionBuilders',
+        'SorianNavalExpansionBuildersFast',
+
+        -- ==== AIR UNIT BUILDERS ==== --
         'SorianT1AirFactoryBuilders',
         'SorianT2AirFactoryBuilders',
         'SorianT3AirFactoryBuilders',
         'SorianFrequentAirAttackFormBuilders',
         'SorianMassHunterAirFormBuilders',
-        
-		'SorianUnitCapAirAttackFormBuilders',
+
+        'SorianUnitCapAirAttackFormBuilders',
         'SorianACUHunterAirFormBuilders',
-		
-		'SorianAntiNavyAirFormBuilders',
-        
+
+        'SorianAntiNavyAirFormBuilders',
+
         'SorianTransportFactoryBuilders',
-		
-		'SorianExpResponseFormBuilders',
-        
+
+        'SorianExpResponseFormBuilders',
+
         'SorianT1AntiAirBuilders',
         'SorianT2AntiAirBuilders',
         'SorianT3AntiAirBuilders',
         'SorianBaseGuardAirFormBuilders',
-		
-		# ===== STRATEGIES ====== #
-		
-		'SorianParagonStrategyExp',
-		'SorianWaterMapLowLand',
-		
-		# == STRATEGY PLATOONS == #
-		
-		'SorianBalancedUpgradeBuildersExpansionStrategy',
 
-        # ==== EXPERIMENTALS ==== #
+        -- ===== STRATEGIES ====== --
+
+        'SorianParagonStrategyExp',
+        'SorianWaterMapLowLand',
+
+        -- == STRATEGY PLATOONS == --
+
+        'SorianBalancedUpgradeBuildersExpansionStrategy',
+
+        -- ==== EXPERIMENTALS ==== --
         'SorianMobileLandExperimentalEngineers',
         'SorianMobileLandExperimentalForm',
-        
+
         'SorianMobileAirExperimentalEngineers',
         'SorianMobileAirExperimentalForm',
-		
-        # ==== ARTILLERY BUILDERS ==== #
+
+        -- ==== ARTILLERY BUILDERS ==== --
         'SorianT3ArtilleryGroupExp',
     },
     NonCheatBuilders = {
-        #'SorianAirScoutFactoryBuilders',
-        #'SorianAirScoutFormBuilders',
-        
+        --'SorianAirScoutFactoryBuilders',
+        --'SorianAirScoutFormBuilders',
+
         'SorianRadarEngineerBuilders',
         'SorianRadarUpgradeBuildersExpansion',
-        
+
         'SorianCounterIntelBuilders',
     },
     BaseSettings = {
@@ -119,25 +119,25 @@ BaseBuilderTemplate {
             Land = 0,
             Air = 3,
             Sea = 0,
-            Gate = 0, #1,
+            Gate = 0, --1,
         },
         MassToFactoryValues = {
-            T1Value = 6, #8
-            T2Value = 15, #20
-            T3Value = 22.5, #27.5 
+            T1Value = 6, --8
+            T2Value = 15, --20
+            T3Value = 22.5, --27.5
         },
     },
     ExpansionFunction = function(aiBrain, location, markerType)
-        if markerType != 'Start Location' and markerType != 'Expansion Area' then
+        if markerType ~= 'Start Location' and markerType ~= 'Expansion Area' then
             return 0
         end
-        
+
         local personality = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
         if not (personality == 'sorianwater' or personality == 'sorianadaptive') then
             return 0
         end
-        
-        local threatCutoff = 10 # value of overall threat that determines where enemy bases are
+
+        local threatCutoff = 10 -- value of overall threat that determines where enemy bases are
         local distance = import('/lua/ai/AIUtilities.lua').GetThreatDistance( aiBrain, location, threatCutoff )
         if not distance or distance > 1000 then
             return 1000
@@ -145,10 +145,10 @@ BaseBuilderTemplate {
             return 750
         elseif distance > 250 then
             return 500
-        else # within 250
+        else -- within 250
             return 100
         end
-		
+
         return 0
     end,
 }

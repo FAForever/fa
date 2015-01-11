@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: handles multiplayer desyncs
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -15,7 +15,7 @@ local dialog = false
 function UpdateDialog(beatNumber, strings)
     if not dialog then
         dialog = Group(GetFrame(0), "updateDialogGroup")
-		LOG("Desynch at beat " .. beatNumber .. " tick " .. GetGameTimeSeconds())
+        LOG("Desynch at beat " .. beatNumber .. " tick " .. GetGameTimeSeconds())
         dialog.Width:Set(200)
         dialog.Height:Set(250)
         dialog.Depth:Set(GetFrame(0):GetTopmostDepth() + 10)
@@ -26,7 +26,7 @@ function UpdateDialog(beatNumber, strings)
         LayoutHelpers.AtTopIn(title, dialog, 5)
         LayoutHelpers.AtHorizontalCenterIn(title, dialog)
 
-        dialog.textControls = {}            
+        dialog.textControls = {}
         local prev = false
         for i = 1,9 do
             dialog.textControls[i] = UIUtil.CreateText(bg, "", 12, UIUtil.bodyFont)
@@ -38,7 +38,7 @@ function UpdateDialog(beatNumber, strings)
             end
             prev = dialog.textControls[i]
         end
-        
+
         local okBtn = UIUtil.CreateButtonStd(bg, '/widgets/small', "<LOC _Ok>", 10)
         okBtn.Top:Set(dialog.textControls[9].Bottom)
         LayoutHelpers.AtHorizontalCenterIn(okBtn, bg)
@@ -48,11 +48,11 @@ function UpdateDialog(beatNumber, strings)
             dialog = false
         end
     end
-    
+
     for i = 1,12 do
         if strings[i] then
             dialog.textControls[i]:SetText(strings[i])
         end
     end
-    dialog.textControls[9]:SetText(LOC("<LOC desync_0001>Beat# ") .. tostring(beatNumber))
+    dialog.textControls[9]:SetText(LOC("<LOC desync_0001>Beat-- ") .. tostring(beatNumber))
 end

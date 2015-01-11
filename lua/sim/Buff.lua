@@ -1,33 +1,33 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/sim/buff.lua
-#**
-#**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/sim/buff.lua
+--**
+--**  Copyright Â© 2008 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
-# The Unit's BuffTable for applied buffs looks like this:
-#
-# Unit.Buffs = {
-#    Affects = {
-#        <AffectType (Regen/MaxHealth/etc)> = {
-#            BuffName = {
-#                Count = i,
-#                Add = X,
-#                Mult = X,
-#            }
-#        }
-#    }
-#    BuffTable = {
-#        <BuffType (LEVEL/CATEGORY)> = {
-#            BuffName = {
-#                Count = i,
-#                Trash = trashbag,
-#            }
-#        }
-#    }
+-- The Unit's BuffTable for applied buffs looks like this:
+--
+-- Unit.Buffs = {
+--    Affects = {
+--        <AffectType (Regen/MaxHealth/etc)> = {
+--            BuffName = {
+--                Count = i,
+--                Add = X,
+--                Mult = X,
+--            }
+--        }
+--    }
+--    BuffTable = {
+--        <BuffType (LEVEL/CATEGORY)> = {
+--            BuffName = {
+--                Count = i,
+--                Trash = trashbag,
+--            }
+--        }
+--    }
 
-#Function to apply a buff to a unit.
-#This function is a fire-and-forget.  Apply this and it'll be applied over time if there is a duration.
+--Function to apply a buff to a unit.
+--This function is a fire-and-forget.  Apply this and it'll be applied over time if there is a duration.
 function ApplyBuff(unit, buffName, instigator)
 
     if unit:IsDead() then 
@@ -36,7 +36,7 @@ function ApplyBuff(unit, buffName, instigator)
     
     instigator = instigator or unit
 
-    #buff = table of buff data
+    --buff = table of buff data
     local def = Buffs[buffName]
     if not def then
         error("*ERROR: Tried to add a buff that doesn\'t exist! Name: ".. buffName, 2)
@@ -65,7 +65,7 @@ function ApplyBuff(unit, buffName, instigator)
     end
 
     
-    #If add this buff to the list of buffs the unit has becareful of stacking buffs.
+    --If add this buff to the list of buffs the unit has becareful of stacking buffs.
     if not ubt[def.BuffType] then
         ubt[def.BuffType] = {}
     end
@@ -76,7 +76,7 @@ function ApplyBuff(unit, buffName, instigator)
     
     local data = ubt[def.BuffType][buffName]
     if not data then
-        # This is a new buff (as opposed to an additional one being stacked)
+        -- This is a new buff (as opposed to an additional one being stacked)
         data = {
             Count = 1,
             Trash = TrashBag(),
@@ -84,8 +84,8 @@ function ApplyBuff(unit, buffName, instigator)
         }
         ubt[def.BuffType][buffName] = data
     else
-        # This buff is already on the unit so stack another by incrementing the
-        # counts. data.Count is how many times the buff has been applied
+        -- This buff is already on the unit so stack another by incrementing the
+        -- counts. data.Count is how many times the buff has been applied
         data.Count = data.Count + 1
         
     end
@@ -93,14 +93,14 @@ function ApplyBuff(unit, buffName, instigator)
     local uaffects = unit.Buffs.Affects
     if def.Affects then
         for k,v in def.Affects do
-            # Don't save off 'instant' type affects like health and energy
-            if k != 'Health' and k != 'Energy' then
+            -- Don't save off 'instant' type affects like health and energy
+            if k ~= 'Health' and k ~= 'Energy' then
                 if not uaffects[k] then
                     uaffects[k] = {}
                 end
                 
                 if not uaffects[k][buffName] then
-                    # This is a new affect.
+                    -- This is a new affect.
                     local affectdata = { 
                         BuffName = buffName, 
                         Count = 1, 
@@ -110,14 +110,14 @@ function ApplyBuff(unit, buffName, instigator)
                     end
                     uaffects[k][buffName] = affectdata
                 else
-                    # This affect is already there, increment the count
+                    -- This affect is already there, increment the count
                     uaffects[k][buffName].Count = uaffects[k][buffName].Count + 1
                 end
             end
         end
     end
     
-    #If the buff has a duration, then 
+    --If the buff has a duration, then 
     if def.Duration and def.Duration > 0 then
         local thread = ForkThread(BuffWorkThread, unit, buffName, instigator) 
         unit.Trash:Add(thread)
@@ -132,18 +132,18 @@ function ApplyBuff(unit, buffName, instigator)
         def:OnApplyBuff(unit, instigator)
     end
     
-    #LOG('*DEBUG: Applying buff :',buffName, ' to unit ',unit:GetUnitId())
-    #LOG('Buff = ',repr(ubt[def.BuffType][buffName]))
-    #LOG('Affects = ',repr(uaffects))
+    --LOG('*DEBUG: Applying buff :',buffName, ' to unit ',unit:GetUnitId())
+    --LOG('Buff = ',repr(ubt[def.BuffType][buffName]))
+    --LOG('Affects = ',repr(uaffects))
     BuffAffectUnit(unit, buffName, instigator, false)
 end
 
-#Function to do work on the buff.  Apply it over time and in pulses.
+--Function to do work on the buff.  Apply it over time and in pulses.
 function BuffWorkThread(unit, buffName, instigator)
     
     local buffTable = Buffs[buffName]
     
-    #Non-Pulsing Buff
+    --Non-Pulsing Buff
     local totPulses = buffTable.DurationPulse
     
     if not totPulses then
@@ -164,10 +164,10 @@ function BuffWorkThread(unit, buffName, instigator)
     RemoveBuff(unit, buffName)
 end
 
-#Function to affect the unit.  Everytime you want to affect a new part of unit, add it in here.
-#afterRemove is a bool that defines if this buff is affecting after the removal of a buff.  
-#We reaffect the unit to make sure that buff type is recalculated accurately without the buff that was on the unit.
-#However, this doesn't work for stunned units because it's a fire-and-forget type buff, not a fire-and-keep-track-of type buff.
+--Function to affect the unit.  Everytime you want to affect a new part of unit, add it in here.
+--afterRemove is a bool that defines if this buff is affecting after the removal of a buff.  
+--We reaffect the unit to make sure that buff type is recalculated accurately without the buff that was on the unit.
+--However, this doesn't work for stunned units because it's a fire-and-forget type buff, not a fire-and-keep-track-of type buff.
 function BuffAffectUnit(unit, buffName, instigator, afterRemove)
     
     local buffDef = Buffs[buffName]
@@ -182,14 +182,14 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
     
         if atype == 'Health' then
         
-            #Note: With health we don't actually look at the unit's table because it's an instant happening.  We don't want to overcalculate something as pliable as health.
+            --Note: With health we don't actually look at the unit's table because it's an instant happening.  We don't want to overcalculate something as pliable as health.
             
             local health = unit:GetHealth()
             local val = ((buffAffects.Health.Add or 0) + health) * (buffAffects.Health.Mult or 1)
             local healthadj = val - health
             
             if healthadj < 0 then
-                # fixme: DoTakeDamage shouldn't be called directly
+                -- fixme: DoTakeDamage shouldn't be called directly
                 local data = {
                     Instigator = instigator,
                     Amount = -1 * healthadj,
@@ -200,7 +200,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             else
                 unit:AdjustHealth(instigator, healthadj)
             
-                #LOG('*BUFF: Unit ', repr(unit:GetEntityId()), ' buffed health to ', repr(val))
+                --LOG('*BUFF: Unit ', repr(unit:GetEntityId()), ' buffed health to ', repr(val))
             end
         
         elseif atype == 'MaxHealth' then
@@ -220,7 +220,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
                 end
             end            
             
-            #LOG('*BUFF: Unit ', repr(unit:GetEntityId()), ' buffed max health to ', repr(val))
+            --LOG('*BUFF: Unit ', repr(unit:GetEntityId()), ' buffed max health to ', repr(val))
         
         elseif atype == 'Regen' then
             
@@ -229,16 +229,16 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
         
             unit:SetRegenRate(val)
         
-            #LOG('*BUFF: Unit ', repr(unit:GetEntityId()), ' buffed regen rate to ', repr(val))
+            --LOG('*BUFF: Unit ', repr(unit:GetEntityId()), ' buffed regen rate to ', repr(val))
         elseif atype == 'RegenPercent' then
             local val = false
                 
             if afterRemove then
-                #Restore normal regen value plus buffs so I don't break stuff. Love, Robert
+                --Restore normal regen value plus buffs so I don't break stuff. Love, Robert
                 local bpregn = unit:GetBlueprint().Defense.RegenRate or 0
                 val = BuffCalculate(unit, nil, 'Regen', bpregn)
             else
-                #Buff this sucka
+                --Buff this sucka
                 val = BuffCalculate(unit, buffName, 'RegenPercent', unit:GetMaxHealth())
             end
             
@@ -249,7 +249,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             for i = 1, unit:GetWeaponCount() do
         
                 local wep = unit:GetWeapon(i)
-                if wep.Label != 'DeathWeapon' and wep.Label != 'DeathImpact' then
+                if wep.Label ~= 'DeathWeapon' and wep.Label ~= 'DeathImpact' then
                     local wepbp = wep:GetBlueprint()
                     local wepdam = wepbp.Damage
                     local val = BuffCalculate(unit, buffName, 'Damage', wepdam)
@@ -261,7 +261,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
                     end
         
                     wep:ChangeDamage(val)
-                    #LOG('*BUFF: Unit ', repr(unit:GetEntityId()), ' buffed damage to ', repr(val))
+                    --LOG('*BUFF: Unit ', repr(unit:GetEntityId()), ' buffed damage to ', repr(val))
                 end
             end
         
@@ -276,7 +276,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
                 
                 wep:SetDamageRadius(val)
                 
-                #LOG('*BUFF: Unit ', repr(unit:GetEntityId()), ' buffed damage radius to ', repr(val))
+                --LOG('*BUFF: Unit ', repr(unit:GetEntityId()), ' buffed damage radius to ', repr(val))
             end
 
         elseif atype == 'MaxRadius' then
@@ -290,7 +290,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
         
                 wep:ChangeMaxRadius(val)
                 
-                #LOG('*BUFF: Unit ', repr(unit:GetEntityId()), ' buffed max radius to ', repr(val))
+                --LOG('*BUFF: Unit ', repr(unit:GetEntityId()), ' buffed max radius to ', repr(val))
             end
 
         elseif atype == 'MoveMult' then
@@ -301,13 +301,13 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             unit:SetAccMult(val)
             unit:SetTurnMult(val)
             
-            #LOG('*BUFF: Unit ', repr(unit:GetEntityId()), ' buffed speed/accel/turn mult to ', repr(val))
+            --LOG('*BUFF: Unit ', repr(unit:GetEntityId()), ' buffed speed/accel/turn mult to ', repr(val))
         
         elseif atype == 'Stun' and not afterRemove then
             
             unit:SetStunned(buffDef.Duration or 1, instigator)
             
-            #LOG('*BUFF: Unit ', repr(unit:GetEntityId()), ' buffed stunned for ', repr(buffDef.Duration or 1))
+            --LOG('*BUFF: Unit ', repr(unit:GetEntityId()), ' buffed stunned for ', repr(buffDef.Duration or 1))
             
             if unit.Anims then
                 for k, manip in unit.Anims do
@@ -360,42 +360,42 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             local val = BuffCalculate(unit, buffName, 'BuildRate', unit:GetBlueprint().Economy.BuildRate or 1)
             unit:SetBuildRate( val )
             
-        #### ADJACENCY BELOW ####
+        -------- ADJACENCY BELOW --------
         elseif atype == 'EnergyActive' then
             local val = BuffCalculate(unit, buffName, 'EnergyActive', 1)
             unit.EnergyBuildAdjMod = val
             unit:UpdateConsumptionValues()
-            #LOG('*BUFF: EnergyActive = ' ..  val)
+            --LOG('*BUFF: EnergyActive = ' ..  val)
             
         elseif atype == 'MassActive' then
             local val = BuffCalculate(unit, buffName, 'MassActive', 1)
             unit.MassBuildAdjMod = val
             unit:UpdateConsumptionValues()
-            #LOG('*BUFF: MassActive = ' ..  val)
+            --LOG('*BUFF: MassActive = ' ..  val)
             
         elseif atype == 'EnergyMaintenance' then
             local val = BuffCalculate(unit, buffName, 'EnergyMaintenance', 1)
             unit.EnergyMaintAdjMod = val
             unit:UpdateConsumptionValues()
-            #LOG('*BUFF: EnergyMaintenance = ' ..  val)
+            --LOG('*BUFF: EnergyMaintenance = ' ..  val)
             
         elseif atype == 'MassMaintenance' then
             local val = BuffCalculate(unit, buffName, 'MassMaintenance', 1)
             unit.MassMaintAdjMod = val
             unit:UpdateConsumptionValues()
-            #LOG('*BUFF: MassMaintenance = ' ..  val)
+            --LOG('*BUFF: MassMaintenance = ' ..  val)
             
         elseif atype == 'EnergyProduction' then
             local val = BuffCalculate(unit, buffName, 'EnergyProduction', 1)
             unit.EnergyProdAdjMod = val
             unit:UpdateProductionValues()
-            #LOG('*BUFF: EnergyProduction = ' .. val)
+            --LOG('*BUFF: EnergyProduction = ' .. val)
 
         elseif atype == 'MassProduction' then
             local val = BuffCalculate(unit, buffName, 'MassProduction', 1)
             unit.MassProdAdjMod = val
             unit:UpdateProductionValues()
-            #LOG('*BUFF: MassProduction = ' .. val)
+            --LOG('*BUFF: MassProduction = ' .. val)
             
         elseif atype == 'EnergyWeapon' then
             local val = BuffCalculate(unit, buffName, 'EnergyWeapon', 1)
@@ -405,7 +405,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
                     wep.AdjEnergyMod = val
                 end
             end
-            #LOG('*BUFF: EnergyWeapon = ' ..  val)
+            --LOG('*BUFF: EnergyWeapon = ' ..  val)
             
         elseif atype == 'RateOfFire' then
             for i = 1, unit:GetWeaponCount() do
@@ -413,45 +413,45 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
                 local wepbp = wep:GetBlueprint()
                 local weprof = wepbp.RateOfFire
 
-                # Set new rate of fire based on blueprint rate of fire.=
+                -- Set new rate of fire based on blueprint rate of fire.=
                 local val = BuffCalculate(unit, buffName, 'RateOfFire', 1)
                 
                 local delay = 1 / wepbp.RateOfFire
                 
                 wep:ChangeRateOfFire( 1 / ( val * delay ) )
-                #LOG('*BUFF: RateOfFire = ' ..  (1 / ( val * delay )) )
+                --LOG('*BUFF: RateOfFire = ' ..  (1 / ( val * delay )) )
             end
 
 
 
-#   CLOAKING is a can of worms.  Revisit later.
-#        elseif atype == 'Cloak' then
-#            
-#            local val, bool = BuffCalculate(unit, buffName, 'Cloak', 0)
-#            
-#            if unit:IsIntelEnabled('Cloak') then
-#
-#                if bool then
-#                    unit:InitIntel(unit:GetArmy(), 'Cloak')
-#                    unit:SetRadius('Cloak')
-#                    unit:EnableIntel('Cloak')
-#            
-#                elseif not bool then
-#                    unit:DisableIntel('Cloak')
-#                end
-#            
-#            end
+--   CLOAKING is a can of worms.  Revisit later.
+--        elseif atype == 'Cloak' then
+--            
+--            local val, bool = BuffCalculate(unit, buffName, 'Cloak', 0)
+--            
+--            if unit:IsIntelEnabled('Cloak') then
+--
+--                if bool then
+--                    unit:InitIntel(unit:GetArmy(), 'Cloak')
+--                    unit:SetRadius('Cloak')
+--                    unit:EnableIntel('Cloak')
+--            
+--                elseif not bool then
+--                    unit:DisableIntel('Cloak')
+--                end
+--            
+--            end
            
-        elseif atype != 'Stun' then
+        elseif atype ~= 'Stun' then
             WARN("*WARNING: Tried to apply a buff with an unknown affect type of " .. atype .. " for buff " .. buffName)
         end
     end
 end
 
-#Calculates the buff from all the buffs of the same time the unit has.
+--Calculates the buff from all the buffs of the same time the unit has.
 function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
     
-    #Add all the 
+    --Add all the 
     local adds = 0
     local mults = 1.0
     local bool = initialBool or false
@@ -463,7 +463,7 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
     
     for k, v in unit.Buffs.Affects[affectType] do
     
-        if v.Add and v.Add != 0 then
+        if v.Add and v.Add ~= 0 then
             adds = adds + (v.Add * v.Count)
         end
         
@@ -488,7 +488,7 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
         end
     end
     
-    #Adds are calculated first, then the mults.  May want to expand that later.
+    --Adds are calculated first, then the mults.  May want to expand that later.
     local returnVal = (initialVal + adds) * mults
     
     if lowestFloor and returnVal < lowestFloor then returnVal = lowestFloor end
@@ -498,7 +498,7 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
     return returnVal, bool
 end
 
-#Removes buffs
+--Removes buffs
 function RemoveBuff(unit, buffName, removeAllCounts, instigator)
     
     local def = Buffs[buffName]
@@ -508,9 +508,9 @@ function RemoveBuff(unit, buffName, removeAllCounts, instigator)
     for atype,_ in def.Affects do
         local list = unit.Buffs.Affects[atype]
         if list and list[buffName] then
-            # If we're removing all buffs of this name, only remove as 
-            # many affects as there are buffs since other buffs may have
-            # added these same affects.
+            -- If we're removing all buffs of this name, only remove as 
+            -- many affects as there are buffs since other buffs may have
+            -- added these same affects.
             if removeAllCounts then
                 list[buffName].Count = list[buffName].Count - unitBuff.Count
             else
@@ -532,7 +532,7 @@ function RemoveBuff(unit, buffName, removeAllCounts, instigator)
     end
 
     if removeAllCounts or unitBuff.Count <= 0 then
-        # unit:PlayEffect('RemoveBuff', buffName)
+        -- unit:PlayEffect('RemoveBuff', buffName)
         unitBuff.Trash:Destroy()
         unit.Buffs.BuffTable[def.BuffType][buffName] = nil
     end
@@ -541,10 +541,10 @@ function RemoveBuff(unit, buffName, removeAllCounts, instigator)
         def:OnBuffRemove(unit, instigator)
     end
 
-    # FIXME: This doesn't work because the magic sync table doesn't detect
-    # the change. Need to give all child tables magic meta tables too.
+    -- FIXME: This doesn't work because the magic sync table doesn't detect
+    -- the change. Need to give all child tables magic meta tables too.
     if def.Icon then
-        # If the user layer was displaying an icon, remove it from the sync table
+        -- If the user layer was displaying an icon, remove it from the sync table
         local newTable = unit.Sync.Buffs
         table.removeByValue(newTable,buffName)
         unit.Sync.Buffs = table.copy(newTable)
@@ -552,7 +552,7 @@ function RemoveBuff(unit, buffName, removeAllCounts, instigator)
 
     BuffAffectUnit(unit, buffName, unit, true)
     
-    #LOG('*BUFF: Removed ', buffName)
+    --LOG('*BUFF: Removed ', buffName)
 end
 
 function HasBuff(unit, buffName)
@@ -584,9 +584,9 @@ function PlayBuffEffect(unit, buffName, trsh)
     end
 end
 
-#
-# DEBUG FUNCTIONS
-# 
+--
+-- DEBUG FUNCTIONS
+-- 
 _G.PrintBuffs = function()
     local selection = DebugGetSelection()
     for k,unit in selection do

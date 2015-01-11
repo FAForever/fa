@@ -120,12 +120,12 @@ function Create()
                 if v.bg.id and v.bg.id == self.id then
                     v.bg:SetCheck(true, true)
                     ObjectiveLogData[v.bg.id].isChecked = true
-                elseif v.bg.id and v.bg.id != self.id then
+                elseif v.bg.id and v.bg.id ~= self.id then
                     v.bg:SetCheck(false, true)
                 end
             end
             for i, v in ObjectiveLogData do
-                if i != self.id then
+                if i ~= self.id then
                     v.isChecked = false
                 end
             end
@@ -482,7 +482,7 @@ function ToggleDisplay()
 end
 
 function GetTargetImages(data)
-    # look for an image to display
+    -- look for an image to display
     
     local overrideImage = data.targetImage
     
@@ -494,10 +494,10 @@ function GetTargetImages(data)
         for k,v in data.targets do
             if v.BlueprintId then
                 blueprint = __blueprints[v.BlueprintId]
-                #return GameCommon.GetCachedUnitIconFileNames(blueprint)
+                --return GameCommon.GetCachedUnitIconFileNames(blueprint)
             elseif v.Type == 'Area' then
                 iconName = UIUtil.UIFile('/game/target-area/target-area_bmp.dds')
-                #return iconName, iconName, iconName, iconName
+                --return iconName, iconName, iconName, iconName
             end
         end
         if blueprint then

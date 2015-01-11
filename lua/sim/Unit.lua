@@ -5,7 +5,7 @@
 --**
 --**  Summary  : The Unit lua module
 --**
---**  Copyright Š 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local Entity = import('/lua/sim/Entity.lua').Entity
@@ -263,7 +263,7 @@ Unit = Class(moho.unit_methods) {
         --Ensure transport slots are available
         self.attachmentBone = nil
         self.slotsFree = {}
-        
+
         -- Set up Adjacency container
         self.AdjacentUnits = {}
     end,
@@ -1044,15 +1044,15 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
-        
+
         -- Revoke transport protection for shielded transports when impacted by nuclear weaponry
         if EntityCategoryContains(categories.NUKE, instigator) and self.transportProtected == true then
             self.MyShield:RevokeTransportProtection()
         end
-    
+
         if self.CanTakeDamage then
             self:DoOnDamagedCallbacks(instigator)
-            
+
             --Pass damage to an active personal shield, as personal shields no longer have collisions
             if self:GetShieldType() == 'Personal' and self:ShieldIsOn() then
                 self.MyShield:ApplyDamage(instigator, amount, vector, damageType)
@@ -1220,7 +1220,7 @@ Unit = Class(moho.unit_methods) {
 
         if self.PlayDeathAnimation and not self:IsBeingBuilt() then
             self:ForkThread(self.PlayAnimationThread, 'AnimationDeath')
-	    self:SetCollisionShape('None')
+        self:SetCollisionShape('None')
         end
 
         self:DoUnitCallbacks( 'OnKilled' )
@@ -1458,7 +1458,7 @@ Unit = Class(moho.unit_methods) {
 
         -- Attempt to copy our animation pose to the prop. Only works if
         -- the mesh and skeletons are the same, but will not produce an error if not.
-        
+
         if layer ~= 'Air' then
             TryCopyPose(self, prop, true)
         end
@@ -3683,7 +3683,7 @@ Unit = Class(moho.unit_methods) {
         if self.VeteranLevel >= maxLevel then
             return
         end
-        
+
         local next = self.VeteranLevel + 1
         while self.xp >= levels[('Level' .. next)] and self.VeteranLevel < maxLevel do
              self:SetVeteranLevel(next)
@@ -4493,12 +4493,12 @@ Unit = Class(moho.unit_methods) {
         self:DoUnitCallbacks('OnCmdrUpgradeStart')
     end,
 
-    
-    OnShieldEnabled = function(self)		
+
+    OnShieldEnabled = function(self)
         WARN("Deprecated function unit:OnShieldEnabled() called")
-    end,		
-		
-    OnShieldDisabled = function(self)		
+    end,
+
+    OnShieldDisabled = function(self)
         WARN("Deprecated function unit:OnShieldDisabled() called")
     end,
 }

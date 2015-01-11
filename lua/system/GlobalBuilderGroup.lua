@@ -1,32 +1,32 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/system/GlobalBuilderGroup.lua
-#**
-#**  Summary  :  Global builder group table and blueprint methods
-#**
-#**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/system/GlobalBuilderGroup.lua
+--**
+--**  Summary  :  Global builder group table and blueprint methods
+--**
+--**  Copyright Â© 2008 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
-# Global list of all buffs found in the system.
+-- Global list of all buffs found in the system.
 BuilderGroups = {}
 
-# Buff blueprints are created by invoking BuffBlueprint() with a table
-# as the buff data. Buffs can be defined in any module at any time.
-# e.g.
-#
-# BuffBlueprint {
-#    Name = HealingOverTime1,
-#    DisplayName = 'Healing Over Time',
-#    [...]
-#    Affects = {
-#        Health = {
-#            Add = 10,
-#        },
-#    },
-# }
-#
-#
-#
+-- Buff blueprints are created by invoking BuffBlueprint() with a table
+-- as the buff data. Buffs can be defined in any module at any time.
+-- e.g.
+--
+-- BuffBlueprint {
+--    Name = HealingOverTime1,
+--    DisplayName = 'Healing Over Time',
+--    [...]
+--    Affects = {
+--        Health = {
+--            Add = 10,
+--        },
+--    },
+-- }
+--
+--
+--
 BuilderGroup = {}
 BuilderGroupDefMeta = {}
 
@@ -47,7 +47,7 @@ BuilderGroupDefMeta.__call = function(...)
         return
     end
     
-    if arg[2].BuildersType != 'EngineerBuilder' and arg[2].BuildersType != 'FactoryBuilder' and arg[2].BuildersType != 'PlatoonFormBuilder' and arg[2].BuildersType != 'StrategyBuilder' then
+    if arg[2].BuildersType ~= 'EngineerBuilder' and arg[2].BuildersType ~= 'FactoryBuilder' and arg[2].BuildersType ~= 'PlatoonFormBuilder' and arg[2].BuildersType ~= 'StrategyBuilder' then
         WARN('Invalid BuildersType for BuilderGroup definition - BuilderGroupName = ' .. arg[2].BuilderGroupName)
         return
     end
@@ -60,7 +60,7 @@ BuilderGroupDefMeta.__call = function(...)
     else
         BuilderGroups[arg[2].BuilderGroupName] = arg[2]
     end
-    #SPEW('BuilderGroup Registered: ', arg[2].BuilderGroupName)
+    --SPEW('BuilderGroup Registered: ', arg[2].BuilderGroupName)
     return arg[2].BuilderGroupName
 end
 

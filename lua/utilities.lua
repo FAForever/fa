@@ -1,37 +1,37 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/utilities.lua
-#**  Author(s):  John Comes, Gordon Duclos
-#**
-#**  Summary  :  Utility functions for scripts.
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/utilities.lua
+--**  Author(s):  John Comes, Gordon Duclos
+--**
+--**  Summary  :  Utility functions for scripts.
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 function GetDistanceBetweenTwoEntities(entity1, entity2)
     return VDist3(entity1:GetPosition(),entity2:GetPosition())
 end
 
 function GetEnemyUnitsInSphere(unit, position, radius)
-	local x1 = position.x - radius
-	local y1 = position.y - radius
-	local z1 = position.z - radius
-	local x2 = position.x + radius
-	local y2 = position.y + radius
-	local z2 = position.z + radius
-	local UnitsinRec = GetUnitsInRect( Rect(x1, z1, x2, z2) )
-	#Check for empty rectangle
-	if not UnitsinRec then
-		return UnitsinRec
-	end
-	local RadEntities = {}
+    local x1 = position.x - radius
+    local y1 = position.y - radius
+    local z1 = position.z - radius
+    local x2 = position.x + radius
+    local y2 = position.y + radius
+    local z2 = position.z + radius
+    local UnitsinRec = GetUnitsInRect( Rect(x1, z1, x2, z2) )
+    --Check for empty rectangle
+    if not UnitsinRec then
+        return UnitsinRec
+    end
+    local RadEntities = {}
     for k, v in UnitsinRec do
-		local dist = VDist3(position, v:GetPosition())
-		if (unit:GetArmy() != v:GetArmy()) and (dist <= radius) then
-			table.insert(RadEntities, v)
-		end
-	end
-	return RadEntities
+        local dist = VDist3(position, v:GetPosition())
+        if (unit:GetArmy() ~= v:GetArmy()) and (dist <= radius) then
+            table.insert(RadEntities, v)
+        end
+    end
+    return RadEntities
 end
 
 function GetDistanceBetweenTwoPoints(x1, y1, z1, x2, y2, z2)
@@ -74,7 +74,7 @@ function GetScaledDirectionVector( v1, v2, scale )
 end
 
 function GetMidPoint( v1, v2 )
-	return Vector( (v1.x + v2.x) * 0.5, (v1.y + v2.y) * 0.5, (v1.z + v2.z) * 0.5 )
+    return Vector( (v1.x + v2.x) * 0.5, (v1.y + v2.y) * 0.5, (v1.z + v2.z) * 0.5 )
 end
 
 function GetRandomFloat( nmin, nmax)
@@ -116,13 +116,13 @@ function GetClosestVector( vFrom, vToList )
         if( dist > cDist) then
             dist = cDist
             retVec = vTo
-        end 
+        end
     end
     return retVec
 end
 
 function Cross( v1, v2 )
-	return Vector( (v1.y * v2.z) - (v1.z * v2.y), (v1.z * v2.x) - (v1.x * v2.z ), (v1.x * v2.y) - (v1.y - v2.x))
+    return Vector( (v1.y * v2.z) - (v1.z * v2.y), (v1.z * v2.x) - (v1.x * v2.z ), (v1.x * v2.y) - (v1.y - v2.x))
 end
 
 function DotP( v1, v2 )
@@ -130,7 +130,7 @@ function DotP( v1, v2 )
 end
 
 function GetAngleInBetween(v1, v2)
-    #normalize the vectors
+    --normalize the vectors
     local vec1 = {}
     local vec2 = {}
     vec1 = NormalizeVector(v1)
@@ -146,13 +146,13 @@ function UserConRequest(string)
     table.insert(Sync.UserConRequests, string)
 end
 
-#---------------------------------------------------------------
-# TableCat - Concatenates multiple tables into one single table
-#---------------------------------------------------------------
+-----------------------------------------------------------------
+-- TableCat - Concatenates multiple tables into one single table
+-----------------------------------------------------------------
 function TableCat( ... )
     local ret = {}
     for index = 1, table.getn(arg) do
-        if arg[index] != nil then
+        if arg[index] ~= nil then
             for k, v in arg[index] do
                 table.insert( ret, v )
             end

@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Shows the first command in the queue for selected factories
 --*
---* Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local WorldMesh = import('/lua/ui/controls/worldmesh.lua').WorldMesh
@@ -26,9 +26,9 @@ local function AddRallyPoint(unit)
     table.insert(meshes, mesh)
     mesh:SetMesh({
         MeshName = rallyMeshes[commandOfInterest.type][1] or commandMeshResources[commandOfInterest.type][1],
-	    TextureName = rallyMeshes[commandOfInterest.type][2] or commandMeshResources[commandOfInterest.type][2],
-	    ShaderName = 'RallyPoint',
-	    UniformScale = 0.10
+        TextureName = rallyMeshes[commandOfInterest.type][2] or commandMeshResources[commandOfInterest.type][2],
+        ShaderName = 'RallyPoint',
+        UniformScale = 0.10
     })
     mesh:SetLifetimeParameter(10)
     mesh:SetStance(commandOfInterest.position)

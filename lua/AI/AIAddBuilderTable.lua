@@ -1,11 +1,11 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AIAddBuilderTable.lua
-#**
-#**  Summary  : Default economic builders for skirmish
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AIAddBuilderTable.lua
+--**
+--**  Summary  : Default economic builders for skirmish
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 function AddGlobalBaseTemplate(aiBrain, locationType, baseBuilderName)
     if not BaseBuilderTemplates[baseBuilderName] then
@@ -51,8 +51,8 @@ function AddBuilderTable(aiBrain, locationType, builderTable, tableName)
     end
     
     for k,v in builderTable do
-        if k != 'BuildersType' and k != 'BuilderGroupName' then
-            if type(v) != 'string' then
+        if k ~= 'BuildersType' and k ~= 'BuilderGroupName' then
+            if type(v) ~= 'string' then
                 error('*AI ERROR: Invalid builder type in BuilderGroup - ' .. tableName)
             end
             if not Builders[v] then

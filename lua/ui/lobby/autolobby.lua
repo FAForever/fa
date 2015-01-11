@@ -4,7 +4,7 @@
 --* Summary: Autolaunching games from GPGNet.  This is intentionally designed
 --* to have no user options as GPGNet is setting them for the player.
 --*
---* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -56,21 +56,21 @@ local connectedTo = {}
 local function MakeLocalPlayerInfo(name)
     local result = LobbyComm.GetDefaultPlayerOptions(name)
     result.Human = true
-    
+
     local factionData = import('/lua/factions.lua')
-    
+
     for index, tbl in factionData.Factions do
         if HasCommandLineArg("/" .. tbl.Key) then
             result.Faction = index
             break
         end
     end
-    
+
     result.Team = tonumber(GetCommandLineArg("/team", 1)[1])
-	result.DEV = tonumber(GetCommandLineArg("/deviation", 1)[1]) or ""	
-	result.MEAN = tonumber(GetCommandLineArg("/mean", 1)[1]) or ""	
-	result.NG = tonumber(GetCommandLineArg("/numgames", 1)[1]) or ""
-	result.PL = math.floor(result.MEAN - 3 * result.DEV)
+    result.DEV = tonumber(GetCommandLineArg("/deviation", 1)[1]) or ""
+    result.MEAN = tonumber(GetCommandLineArg("/mean", 1)[1]) or ""
+    result.NG = tonumber(GetCommandLineArg("/numgames", 1)[1]) or ""
+    result.PL = math.floor(result.MEAN - 3 * result.DEV)
     LOG('Local player info: ' .. repr(result))
     return result
 end
@@ -105,7 +105,7 @@ function FindSlotForID(id)
 end
 
 function IsPlayer(id)
-    return FindSlotForID(id) != nil
+    return FindSlotForID(id) ~= nil
 end
 
 local function HostAddPlayer(senderId, playerInfo)
@@ -118,7 +118,7 @@ local function HostAddPlayer(senderId, playerInfo)
 
     playerInfo.PlayerName = lobbyComm:MakeValidPlayerName(playerInfo.OwnerID,playerInfo.PlayerName)
 
-    # figure out a reasonable default color
+    -- figure out a reasonable default color
     for colorIndex,colorVal in gameColors.PlayerColors do
         if IsColorFree(colorIndex) then
             playerInfo.PlayerColor = colorIndex
@@ -140,12 +140,12 @@ local function CheckForLaunch()
         end
     end
 
-    #counts the number of players in the game.  Include yourself by default.
+    --counts the number of players in the game.  Include yourself by default.
     local playercount = 1
     for k,id in important do
-        if id != localPlayerID then
+        if id ~= localPlayerID then
             local peer = lobbyComm:GetPeer(id)
-            if peer.status != 'Established' then
+            if peer.status ~= 'Established' then
                 return
             end
             if not table.find(peer.establishedPeers, localPlayerID) then
@@ -153,7 +153,7 @@ local function CheckForLaunch()
             end
             playercount = playercount + 1
             for k2,other in important do
-                if id != other and not table.find(peer.establishedPeers, other) then
+                if id ~= other and not table.find(peer.establishedPeers, other) then
                     return
                 end
             end
@@ -163,14 +163,14 @@ local function CheckForLaunch()
     if playercount < requiredPlayers then
        return
     end
-	
-	local allRatings = {}
-	for k,v in gameInfo.PlayerOptions do
-		if v.Human and v.PL then
-			allRatings[v.PlayerName] = v.PL
-		end
-	end
-	gameInfo.GameOptions['Ratings'] = allRatings
+
+    local allRatings = {}
+    for k,v in gameInfo.PlayerOptions do
+        if v.Human and v.PL then
+            allRatings[v.PlayerName] = v.PL
+        end
+    end
+    gameInfo.GameOptions['Ratings'] = allRatings
 
     LOG("Host launching game.")
     lobbyComm:BroadcastData( { Type = 'Launch', GameInfo = gameInfo } )
@@ -182,7 +182,7 @@ end
 
 local function CreateUI()
 
-    if (connectdialog != false) then
+    if (connectdialog ~= false) then
         MenuCommon.MenuCleanup()
         connectdialog:Destroy()
         connectdialog = false
@@ -206,7 +206,7 @@ local function CreateUI()
 end
 
 
-# LobbyComm Callbacks
+-- LobbyComm Callbacks
 local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
     local controlGroup = Group(parent, "controlGroup")
     local LobCreateFunc = import('/lua/ui/lobby/lobbyComm.lua').CreateLobbyComm
@@ -271,12 +271,12 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         LOG('DATA RECEIVED: ', repr(data))
 
         if lobbyComm:IsHost() then
-            # Host Messages
+            -- Host Messages
             if data.Type == 'AddPlayer' then
                 HostAddPlayer( data.SenderID, data.PlayerInfo )
             end
         else
-            # Non-Host Messages
+            -- Non-Host Messages
             if data.Type == 'Launch' then
                 LOG(repr(data.GameInfo))
                 lobbyComm:LaunchGame(data.GameInfo)
@@ -301,10 +301,10 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         localPlayerID = lobbyComm:GetLocalPlayerID()
         hostID = localPlayerID
 
-        # Give myself the first slot
+        -- Give myself the first slot
         HostAddPlayer(hostID, MakeLocalPlayerInfo(localPlayerName))
 
-        # Fill in the desired scenario.
+        -- Fill in the desired scenario.
 
         gameInfo.GameOptions.ScenarioFile = self.desiredScenario
     end
@@ -324,7 +324,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         if IsPlayer(peerID) then
             local slot = FindSlotForID(peerID)
             if slot and lobbyComm:IsHost() then
-                gameInfo.PlayerOptions[slot] = nil        
+                gameInfo.PlayerOptions[slot] = nil
             end
         end
     end
@@ -363,9 +363,9 @@ function HostGame(gameName, scenarioFileName, singlePlayer)
         LOG("requiredPlayers was set to: "..requiredPlayers)
     end
 
-	
-	-- The guys at GPG were unable to make a standard for map. We dirty-solve it.
-	lobbyComm.desiredScenario = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
+
+    -- The guys at GPG were unable to make a standard for map. We dirty-solve it.
+    lobbyComm.desiredScenario = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
 
 
     lobbyComm:HostGame()
@@ -391,8 +391,8 @@ end
 
 function DisconnectFromPeer(uid)
     LOG("DisconnectFromPeer (uid=" .. uid ..")")
-    if wasConnected(uid) then 
-        table.remove(connectedTo, uid)         
+    if wasConnected(uid) then
+        table.remove(connectedTo, uid)
     end
     GpgNetSend('Disconnected', string.format("%d", uid))
     lobbyComm:DisconnectFromPeer(uid)

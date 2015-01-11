@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Accumulates score info during the game
 --*
---* Copyright © :005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© :005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 -- this table collects score info from the sync table and stores it for later use
@@ -120,9 +120,9 @@ fullSyncOccured = false
 scoreInterval = 10 -- FIXME: this should be synced from sim side
 
 function UpdateScoreData(newData)
-	if fullSyncOccured == false then
-		scoreData.current = table.deepcopy(newData)
-	end
+    if fullSyncOccured == false then
+        scoreData.current = table.deepcopy(newData)
+    end
 end
 
 function OnFullSync(accumData)

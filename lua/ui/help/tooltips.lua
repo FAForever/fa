@@ -1,16 +1,16 @@
-#****************************************************************************
-#**  File     :  lua/modules/ui/help/lua
-#**  Author(s):  Ted Snook
-#**
-#**  Summary  :  Strings and images for the tooltips System
-#**
-#**  Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**  File     :  lua/modules/ui/help/lua
+--**  Author(s):  Ted Snook
+--**
+--**  Summary  :  Strings and images for the tooltips System
+--**
+--**  Copyright пїЅ 2006 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 Tooltips = {
-    #*******************
-    #** Orders Strings
-    #*******************
+    --*******************
+    --** Orders Strings
+    --*******************
     move = {
         title = "<LOC tooltipui0000>Move",
         description = "",
@@ -298,7 +298,7 @@ Tooltips = {
         description = "<LOC tooltipui0364>Click here to toggle avatars on or off",
     },
     avatar_group = {
-        title = "<LOC tooltipui0365>Group [#]",
+        title = "<LOC tooltipui0365>Group [--]",
         description = "<LOC tooltipui0366>Click or press %s to select this group",
     },
     marker_move = {
@@ -314,9 +314,9 @@ Tooltips = {
         description = "",
     },
 
-    #**********************
-    #** Chat Strings
-    #**********************
+    --**********************
+    --** Chat Strings
+    --**********************
     chat_config = {
         title = "<LOC tooltipui0385>Configure Chat",
         description = "<LOC tooltipui0386>Click here to configure various chat options.",
@@ -391,9 +391,9 @@ Tooltips = {
         description = "<LOC tooltipui0420>Toggles option and MFD buttons on or off.",
     },
 
-    #**********************
-    #** AI Strings
-    #**********************
+    --**********************
+    --** AI Strings
+    --**********************
     aitype_easy = {
         title = "<LOC lobui_0347>AI: Easy",
         description = "<LOC lobui_0348>An AI for beginners",
@@ -402,11 +402,11 @@ Tooltips = {
         title = "<LOC lobui_0349>AI: Normal",
         description = "<LOC lobui_0350>An average AI",
     },
-    aitype_supreme = { # needed?
+    aitype_supreme = { -- needed?
         title = "<LOC lobui_0351>AI: Supreme",
         description = "<LOC lobui_0352>A very difficult AI",
     },
-    aitype_unleashed = { # needed?
+    aitype_unleashed = { -- needed?
         title = "<LOC lobui_0353>AI: Unleashed",
         description = "<LOC lobui_0354>The most difficult AI that follows its own rules",
     },
@@ -476,9 +476,9 @@ Tooltips = {
     },
 
 
-    #**********************
-    #** Economy Strings
-    #**********************
+    --**********************
+    --** Economy Strings
+    --**********************
     mass_rate = {
         title = "<LOC tooltipui0099>Economic Mass Rate",
         description = "<LOC tooltipui0100>Toggle between income-per-second and efficiency rating values",
@@ -509,9 +509,9 @@ Tooltips = {
     },
 
 
-    #**********************
-    #** Options Strings
-    #**********************
+    --**********************
+    --** Options Strings
+    --**********************
     options_wheel_sensitivity = {
         title = "<LOC OPTIONS_0001>Zoom Wheel Sensitivity",
         description = "<LOC OPTIONS_0035>Sets the Zoom Speed when using the Mouse Wheel",
@@ -766,9 +766,9 @@ Tooltips = {
         title = "<LOC OPTIONS_0213>Advanced Statistics",
         description = "<LOC OPTIONS_0221>If enabled, you will have advanced statistics of your game in the score screen.",
     },
-    #**********************
-    #** Lobby Strings
-    #**********************
+    --**********************
+    --** Lobby Strings
+    --**********************
     Lobby_Advanced = {
         title = "<LOC tooltipui0167>Advanced Options",
         description = "<LOC tooltipui0168>Sets Advanced Options for this Map",
@@ -1119,9 +1119,9 @@ Tooltips = {
         description = "<LOC lobui_0338>View what units are allowed to be played in game",
     },
 
-    #**********************
-    #** Power lobby Strings
-    #**********************    
+    --**********************
+    --** Power lobby Strings
+    --**********************    
     lob_click_randmap = {
         title = "<LOC lobui_0501>Random Map",
         description = "<LOC lobui_0502>When clicked, a random map will be selected",
@@ -1323,9 +1323,9 @@ Tooltips = {
         description = '<LOC lobui_0586>Select maps with AI Markers.',
     },
     
-    #**********************
-    #** Profile Strings
-    #**********************
+    --**********************
+    --** Profile Strings
+    --**********************
     Profile_name = {
         title = "<LOC tooltipui0183>Name",
         description = "<LOC tooltipui0184>The Name of this Profile",
@@ -1351,9 +1351,9 @@ Tooltips = {
         description = "<LOC tooltipui0194>All saved Profiles",
     },
 
-    #**********************
-    #** Options Strings
-    #**********************
+    --**********************
+    --** Options Strings
+    --**********************
     exit_menu = {
         title = "<LOC tooltipui0056>Menu",
         description = "<LOC tooltipui0057>Opens the Game Menu",
@@ -1376,7 +1376,7 @@ Tooltips = {
     },
     score = {
         title = "<LOC tooltipui0062>Score",
-        description = "<LOC tooltipui0063>Shows the Score, # of Units, and Elapsed Time",
+        description = "<LOC tooltipui0063>Shows the Score, -- of Units, and Elapsed Time",
         keyID = "toggle_score_screen",
     },
     diplomacy = {
@@ -1395,9 +1395,9 @@ Tooltips = {
         --description = "<LOC tooltipui0334>Resume Supreme Commander: Forged Alliance",
     },
 
-    #**********************
-    #** Construction Manager
-    #**********************
+    --**********************
+    --** Construction Manager
+    --**********************
     construction_tab_t1 = {
         title = "<LOC tooltipui0426>Tech 1",
         description = "",
@@ -1488,9 +1488,9 @@ Tooltips = {
     },
 
 
-    #**********************
-    #** In Game Replay Manager
-    #**********************
+    --**********************
+    --** In Game Replay Manager
+    --**********************
     esc_return = {
         title = "<LOC tooltipui0651>Return to Game",
         description = "<LOC tooltipui0652>Closes the menu and returns you to the current game",
@@ -1528,9 +1528,9 @@ Tooltips = {
         description = "<LOC tooltipui0341>Continue a Previously Saved Game",
     },
 
-    #**********************
-    #** In Game Replay Manager
-    #**********************
+    --**********************
+    --** In Game Replay Manager
+    --**********************
     replay_pause = {
         title = "<LOC tooltipui0195>Pause",
         description = "<LOC tooltipui0196>Pause or Resume the Replay",
@@ -1552,9 +1552,9 @@ Tooltips = {
         description = "<LOC tooltipui0204>Plays the Current Replay from the Beginning",
     },
 
-    #**********************
-    #** Post Game Score Screen
-    #**********************
+    --**********************
+    --** Post Game Score Screen
+    --**********************
     PostScore_campaign = {
         title = "<LOC tooltipui0653>Campaign",
         description = "<LOC tooltipui0654>Shows the Campaign Debriefing and Objectives",
@@ -1692,9 +1692,9 @@ Tooltips = {
         description = "<LOC tooltipui0272>Exit the Score Screen",
     },
 
-    #**********************
-    #** Campaign Score
-    #**********************
+    --**********************
+    --** Campaign Score
+    --**********************
 
     CampaignScore_Skip = {
         title = "<LOC tooltipui0381>Skip",
@@ -1705,9 +1705,9 @@ Tooltips = {
         description = "<LOC tooltipui0384>Restart this Operation from the beginning",
     },
 
-    #**********************
-    #** MFD Strings
-    #**********************
+    --**********************
+    --** MFD Strings
+    --**********************
     mfd_military = {
         title = "<LOC tooltipui0076>Strategic Overlay Toggle",
         description = "<LOC tooltipui0077>View weapon and intelligence ranges",
@@ -1781,9 +1781,9 @@ Tooltips = {
         keyID = "ping_marker",
     },
 
-    #**********************
-    #** Misc Strings
-    #**********************
+    --**********************
+    --** Misc Strings
+    --**********************
     infinite_toggle = {
         title = "<LOC tooltipui0096>Infinite Build",
         description = "<LOC tooltipui0097>Toggle infinite construction on/off for current build queue",
@@ -1876,9 +1876,9 @@ Tooltips = {
         description = "",
     },
 
-    #**********************
-    #** Front End Strings
-    #**********************
+    --**********************
+    --** Front End Strings
+    --**********************
     mainmenu_exit = {
         title = "<LOC tooltipui0133>Exit Game",
         description = "<LOC tooltipui0134>Close Supreme Commander: Forged Alliance",
@@ -2033,9 +2033,9 @@ Tooltips = {
         description = "<LOC tooltipui0574>Load a previously saved campaign game",
     },
 
-    #**********************
-    #** Campaign briefing
-    #**********************
+    --**********************
+    --** Campaign briefing
+    --**********************
     campaignbriefing_restart = {
         title = "<LOC tooltipui0575>Restart",
         description = "<LOC tooltipui0576>Start the briefing from the beginning",
@@ -2058,9 +2058,9 @@ Tooltips = {
     },
 
 
-    #**********************
-    #** Restricted Units
-    #**********************
+    --**********************
+    --** Restricted Units
+    --**********************
     restricted_units_T1 = {
         title = "<LOC tooltipui0508>No Tech 1",
         description = "<LOC tooltipui0509>Prevents all T1 units being built",
@@ -2187,9 +2187,9 @@ Tooltips = {
         description = "<LOC tooltipui0691>Save and load presets for game settings and maps"
     },
     
-    #**********************
-    #** Strategic overlay
-    #**********************
+    --**********************
+    --** Strategic overlay
+    --**********************
     overlay_conditions = {
         title = "<LOC tooltipui0583>Conditional Overlays",
         description = "<LOC tooltipui0584>Toggle all conditional overlays",
@@ -2263,9 +2263,9 @@ Tooltips = {
         description = "<LOC tooltipui0618>Combine all sub-filters into a single overlay",
     },
 
-    #**********************
-    #** Faction select
-    #**********************
+    --**********************
+    --** Faction select
+    --**********************
     faction_select_uef = {
         title = "<LOC tooltipui0619>UEF",
         description = "<LOC tooltipui0620>Play campaign as a UEF Commander",
@@ -2279,9 +2279,9 @@ Tooltips = {
         description = "<LOC tooltipui0624>Play campaign as an Aeon Commander",
     },
 
-    #**********************
-    #** Misc
-    #**********************
+    --**********************
+    --** Misc
+    --**********************
     minimap_reset = {
         title = "<LOC tooltipui0625>Reset Minimap",
         description = "<LOC tooltipui0626>Sets the minimap to its default position and size",
@@ -2295,9 +2295,9 @@ Tooltips = {
         description = "<LOC tooltipui0630>Creates construction template by saving units/structures and their position",
     },
 
-    #**********************
-    #** GazUI
-    #**********************
+    --**********************
+    --** GazUI
+    --**********************
 
     options_gui_bigger_strat_build_icons = {
         title = 'Bigger Strategic Build Icons',

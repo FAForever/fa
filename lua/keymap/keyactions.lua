@@ -252,7 +252,7 @@ keyActions = {
     ['pause_unit'] = {action =  'UI_Lua import("/lua/ui/game/construction.lua").ToggleUnitPause()',  
         category = 'orders', order = 31,},
     ['mode'] = {action =  'UI_Lua import("/lua/ui/game/orders.lua").CycleRetaliateStateUp()',  
-        category = 'orders', order = 32,}, #cut?
+        category = 'orders', order = 32,}, --cut?
     ['suicide'] = {action =  'UI_Lua import("/lua/ui/game/confirmunitdestroy.lua").ConfirmUnitDestruction()',  
         category = 'orders', order = 29,},
     ['spreadattack'] = {action =  'UI_Lua import("/lua/spreadattack.lua").SpreadAttack()',
@@ -280,7 +280,7 @@ keyActions = {
     ['show_objective_screen'] = {action = 'UI_Lua import("/lua/ui/game/objectiveDetail.lua").ToggleDisplay()',
         category = 'ui', order = 23},
 
-# GAZUI
+-- GAZUI
     ['toggle_repeat_build'] = {action = 'UI_Lua import("/modules/keymapping.lua").ToggleRepeatBuild()', category = 'orders', order = 1,},
     ['show_enemy_life'] = {action = 'UI_ForceLifbarsOnEnemy', category = 'ui', order = 2,},
     ['show_network_stats'] = {action =  'ren_ShowNetworkStats', category = 'ui', order = 3,},
@@ -360,8 +360,8 @@ keyActions = {
     ['select_air_transport'] = {action = 'UI_Lua import("/modules/keymapping.lua").airTransports()', category = 'selection', order =65,}, 
     ['lock_zoom'] = {action = 'UI_Lua import("/modules/keymapping.lua").lockZoom()', category = 'camera', order = 666,},         
 
-    ### HOTBUILD
-    # Order start at 1100
+    ------ HOTBUILD
+    -- Order start at 1100
     ['builders'] = {action = "UI_Lua import('/modules/hotbuild.lua').buildAction('Builders')", category = 'hotbuilding', order = 1101,},
     ['sensors'] = {action = "UI_Lua import('/modules/hotbuild.lua').buildAction('Sensors')", category = 'hotbuilding', order = 1102,},
     ['shields'] = {action = "UI_Lua import('/modules/hotbuild.lua').buildAction('Shields')", category = 'hotbuilding', order = 1103,},
@@ -383,8 +383,8 @@ keyActions = {
     ['tml'] = {action = "UI_Lua import('/modules/hotbuild.lua').buildAction('TML')", category = 'hotbuilding', order = 1119,},
     ['upgrades'] = {action = "UI_Lua import('/modules/hotbuild.lua').buildAction('Upgrades')", category = 'hotbuilding', order = 1120,},
 
-    #### EXTRA
-    # start at 1200
+    -------- EXTRA
+    -- start at 1200
     ['land_factory'] = {action = "UI_Lua import('/modules/hotbuild.lua').buildAction('Land_Factory')", category = 'hotbuildingExtra', order = 1200,},
     ['air_factory'] = {action = "UI_Lua import('/modules/hotbuild.lua').buildAction('Air_Factory')", category = 'hotbuildingExtra', order = 1201,},
     ['naval_factory'] = {action = "UI_Lua import('/modules/hotbuild.lua').buildAction('Naval_Factory')", category = 'hotbuildingExtra', order = 1202,},

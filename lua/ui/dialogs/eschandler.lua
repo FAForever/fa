@@ -49,7 +49,7 @@ function HandleEsc(yesNoOnly)
         else
             CreateYesNoDialog()
         end
-    elseif import('/lua/ui/game/commandmode.lua').GetCommandMode()[1] != false then
+    elseif import('/lua/ui/game/commandmode.lua').GetCommandMode()[1] ~= false then
     import('/lua/ui/game/commandmode.lua').EndCommandMode(true)
     elseif GetSelectedUnits() then
         SelectUnits(nil)

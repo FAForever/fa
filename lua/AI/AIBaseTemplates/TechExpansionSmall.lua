@@ -1,21 +1,21 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AIBaseTemplates/TechExpansionSmall.lua
-#**
-#**  Summary  : Manage engineers for a location
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AIBaseTemplates/TechExpansionSmall.lua
+--**
+--**  Summary  : Manage engineers for a location
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 BaseBuilderTemplate {
     BaseTemplateName = 'TechExpansionSmall',
     Builders = {
-        # ==== ECONOMY ==== #
-        # Factory upgrades
+        -- ==== ECONOMY ==== --
+        -- Factory upgrades
         'T2SpeedUpgradeBuildersExpansions',
         'T2SpeedUpgradeBuildersExpansions',
         
-        # Engineer Builders
+        -- Engineer Builders
         'EngineerFactoryBuilders',
         'T1EngineerBuilders',
         'T2EngineerBuilders',
@@ -24,7 +24,7 @@ BaseBuilderTemplate {
         'LandInitialFactoryConstruction',
         'EngineerFactoryConstructionLandHigherPriority',
         
-        # ==== DEFENSES ==== #
+        -- ==== DEFENSES ==== --
         'T1BaseDefenses',
         'T2BaseDefenses',
         'T3BaseDefenses',
@@ -42,10 +42,10 @@ BaseBuilderTemplate {
         
         'MiscDefensesEngineerBuilders',
         
-        # ==== NAVAL EXPANSION ==== #
+        -- ==== NAVAL EXPANSION ==== --
         'NavalExpansionBuilders',
         
-        # ==== LAND UNIT BUILDERS ==== #
+        -- ==== LAND UNIT BUILDERS ==== --
         'T1LandFactoryBuilders',
         'T2LandFactoryBuilders',
         'T3LandFactoryBuilders',
@@ -60,7 +60,7 @@ BaseBuilderTemplate {
         'T2ReactionDF',
         'T3ReactionDF',
 
-        # ==== AIR UNIT BUILDERS ==== #
+        -- ==== AIR UNIT BUILDERS ==== --
         'T2AirFactoryBuilders',
         'T3AirFactoryBuilders',
         'FrequentAirAttackFormBuilders',
@@ -75,11 +75,11 @@ BaseBuilderTemplate {
         'T3AntiAirBuilders',
         'BaseGuardAirFormBuilders',
 
-        # ==== UNIT CAP BUILDERS ==== #
+        -- ==== UNIT CAP BUILDERS ==== --
         'UnitCapAirAttackFormBuilders',
         'UnitCapLandAttackFormBuilders',
 
-        # ==== EXPERIMENTALS ==== #
+        -- ==== EXPERIMENTALS ==== --
         'MobileLandExperimentalEngineers',
         'MobileLandExperimentalForm',
     },
@@ -115,7 +115,7 @@ BaseBuilderTemplate {
         },
     },
     ExpansionFunction = function(aiBrain, location, markerType)
-        if markerType != 'Expansion Area' then
+        if markerType ~= 'Expansion Area' then
             return 0
         end
         
@@ -124,7 +124,7 @@ BaseBuilderTemplate {
             return 0
         end
 
-        local threatCutoff = 10 # value of overall threat that determines where enemy bases are
+        local threatCutoff = 10 -- value of overall threat that determines where enemy bases are
         local distance = import('/lua/ai/AIUtilities.lua').GetThreatDistance( aiBrain, location, threatCutoff )
         if not distance or distance > 1000 then
             return 100
@@ -132,7 +132,7 @@ BaseBuilderTemplate {
             return 75
         elseif distance > 250 then
             return 50
-        else # within 250
+        else -- within 250
             return 10
         end
         

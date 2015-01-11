@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: UI for the multifunction display
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -426,7 +426,7 @@ function CreateMapDropout(parent)
             
             return bg
         end
-        # Make an option group consisting of a checkbox and a name
+        -- Make an option group consisting of a checkbox and a name
         local group = Group(bg)
         local mapControl = inMapControl
         local camName = mapControl._cameraName
@@ -641,7 +641,7 @@ function CreateFilterDropout(parent)
                 self.check:Hide()
             end
             for _, control in bg.items do
-                if control.Data.Type == self.Data.Type and control != self then
+                if control.Data.Type == self.Data.Type and control ~= self then
                     if control.Data.Combo then
                         continue
                     end
@@ -986,7 +986,7 @@ end
 function CreateDropoutBG(createConnector)
     local bg = Bitmap(controls.bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_m.dds'))
     
-    if createConnector != false then
+    if createConnector ~= false then
         bg.connector = Bitmap(bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/energy-bar_bmp.dds'))
         LayoutHelpers.AtVerticalCenterIn(bg.connector, controls.bg)
         bg.connector.Left:Set(function() return controls.bg.Right() - 2 end)

@@ -1,13 +1,13 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/PureFactory.lua
-#**  Author(s):  Brute51
-#**
-#**  Summary  :  Additional code for factory units
-#**
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/PureFactory.lua
+--**  Author(s):  Brute51
+--**
+--**  Summary  :  Additional code for factory units
+--**
+--****************************************************************************
 
-# This function is makes sure (factory) units cannot reclaim and such [131]
+-- This function is makes sure (factory) units cannot reclaim and such [131]
 
 function PureFactory(superClass)
     return Class(superClass) {

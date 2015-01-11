@@ -44,7 +44,7 @@ local defaultBitmaps = {
        r = UIUtil.SkinnableFile('/widgets/drop-down/drop-box_brd_vert_r.dds'),
        ll = UIUtil.SkinnableFile('/widgets/drop-down/drop-box_brd_ll.dds'),
        lm = UIUtil.SkinnableFile('/widgets/drop-down/drop-box_brd_lm.dds'),
-       lr = UIUtil.SkinnableFile('/widgets/drop-down/drop-box_brd_lr.dds'), 
+       lr = UIUtil.SkinnableFile('/widgets/drop-down/drop-box_brd_lr.dds'),
     },
 }
 
@@ -58,7 +58,7 @@ Combo = Class(Group) {
         self.mRolloverCue = rolloverCue
         self.mClickCue = clickCue
         self.mItemCue = itemCue or "UI_Tab_Click_01"
-		self.EnableColor = EnableColor or true
+        self.EnableColor = EnableColor or true
 
         bitmaps = bitmaps or defaultBitmaps
 
@@ -74,7 +74,7 @@ Combo = Class(Group) {
         self._btnLeft:DisableHitTest()
         self._btnRight:DisableHitTest()
         self._btnMid:DisableHitTest()
-        
+
         LayoutHelpers.AtLeftIn(self._btnLeft, self)
         LayoutHelpers.AtTopIn(self._btnLeft, self)
         LayoutHelpers.AtRightIn(self._btnRight, self)
@@ -97,7 +97,7 @@ Combo = Class(Group) {
         self._dropdown.Top:Set(self.Bottom)
         self._dropdown.Right:Set(function() return self.Right() end)
         self._dropdown.Width:Set(function() return self.Width() - 5 end)
-    
+
         local ddul = Bitmap(self._dropdown, bitmaps.list.ul)
         local ddum = Bitmap(self._dropdown, bitmaps.list.um)
         local ddur = Bitmap(self._dropdown, bitmaps.list.ur)
@@ -108,7 +108,7 @@ Combo = Class(Group) {
         local ddlm = Bitmap(self._dropdown, bitmaps.list.lm)
         local ddlr = Bitmap(self._dropdown, bitmaps.list.lr)
 
-        -- top part is fixed under self        
+        -- top part is fixed under self
         LayoutHelpers.AtLeftIn(ddul, self._dropdown)
         LayoutHelpers.AtTopIn(ddul, self._dropdown)
         LayoutHelpers.AtRightIn(ddur, self._dropdown)
@@ -148,7 +148,7 @@ Combo = Class(Group) {
         self._list.Top:Set(ddm.Top)
         self._list.Left:Set(ddm.Left)
         self._list.Right:Set(ddm.Right)
-        
+
         self._list.HandleEvent = function(control, event)
             if event.Type == 'MouseExit' then
                 self:OnMouseExit()
@@ -158,7 +158,7 @@ Combo = Class(Group) {
         -- hide the list by default
         self._listhidden = true
         self._dropdown:Hide()
-      
+
         -- supress show when list is in hidden state
         self._dropdown.OnHide = function(ctrl, hidden)
             if not hidden and self._listhidden then
@@ -170,7 +170,7 @@ Combo = Class(Group) {
                 activeCombo = nil
                 return
             end
-            
+
             if not hidden then
                 self._btnLeft:SetTexture(bitmaps.button.left.down)
                 self._btnRight:SetTexture(bitmaps.button.right.down)
@@ -238,10 +238,10 @@ Combo = Class(Group) {
                 end
             end
             self:OnEvent(event)
-                        
+
             return eventHandled
         end
-        
+
         self.OnDisable = function(self)
             self._btnLeft:SetTexture(bitmaps.button.left.dis)
             self._btnRight:SetTexture(bitmaps.button.right.dis)
@@ -249,7 +249,7 @@ Combo = Class(Group) {
             if not self.EnableColor then self._text:SetColor(self._titleColor or UIUtil.fontColor) end
             self._dropdown:Hide()
         end
-        
+
         self.OnEnable = function(self)
             self._btnLeft:SetTexture(bitmaps.button.left.up)
             self._btnRight:SetTexture(bitmaps.button.right.up)
@@ -277,7 +277,7 @@ Combo = Class(Group) {
                 self:OnOverItem(row + 1, self._list:GetItem(row))
             end
         end
-        
+
         OnGlobalMouseClick = function(event)
             if self and self._list then
                 if not self._listhidden then
@@ -294,9 +294,9 @@ Combo = Class(Group) {
                 end
             end
         end
-        
+
         UIMain.AddOnMouseClickedFunc(OnGlobalMouseClick)
-        
+
         self.OnDestroy = function(self)
             UIMain.RemoveOnMouseClickedFunc(OnGlobalMouseClick)
         end
@@ -307,8 +307,8 @@ Combo = Class(Group) {
     AddItems = function(self, textArray, defaultItemIndex, realDefValue)
         local numItems = table.getn(textArray)
         local defaultItemIndex = defaultItemIndex or 1
-        
-		self._visibleItems:Set(math.min(numItems, self._maxVisibleItems))
+
+        self._visibleItems:Set(math.min(numItems, self._maxVisibleItems))
 
         if self._scrollbar then
             self._scrollbar:Destroy()
@@ -318,27 +318,27 @@ Combo = Class(Group) {
         end
 
         local realDefFinded = false
-		for i, text in ipairs(textArray) do
+        for i, text in ipairs(textArray) do
             if realDefValue and i == realDefValue then
-				if i == defaultItemIndex then realDefFinded = true end
-				self._list:AddItem(LOC(text)..' (default)')
-			elseif i ~= realDefValue then
-				self._list:AddItem(LOC(text))
-			end
+                if i == defaultItemIndex then realDefFinded = true end
+                self._list:AddItem(LOC(text)..' (default)')
+            elseif i ~= realDefValue then
+                self._list:AddItem(LOC(text))
+            end
         end
-		
-		if self.EnableColor and realDefFinded then
-			self._text:SetColor('DBDBBA') -- Yellow
-		end
+
+        if self.EnableColor and realDefFinded then
+            self._text:SetColor('DBDBBA') -- Yellow
+        end
 
         self:SetItem(defaultItemIndex)
     end,
-    
+
     ClearItems = function(self)
         self._visibleItems:Set(0)
         self._list:DeleteAllItems()
         self._text:SetText("")
-		self._text:SetColor(UIUtil.fontColor) -- Gris
+        self._text:SetColor(UIUtil.fontColor) -- Gris
         if self._scrollbar then
             self._scrollbar:Destroy()
             self._scrollbar = nil
@@ -364,7 +364,7 @@ Combo = Class(Group) {
     SetTitleText = function(self, text)
         self._text:SetText(text)
     end,
-    
+
     SetTitleTextColor = function(self, color)
         self._titleColor = color
         self._text:SetColor(color)
@@ -372,15 +372,15 @@ Combo = Class(Group) {
 
     -- overload to get clicks
     OnClick = function(self, index, text)
-		--if line.combo.EnableColor then line.combo:SetTitleTextColor('BADBBA') end -- Green
+        --if line.combo.EnableColor then line.combo:SetTitleTextColor('BADBBA') end -- Green
     end,
-    
+
     OnEvent = function(self)
     end,
-    
+
     OnMouseExit = function(self)
     end,
-    
+
     -- overload to get rolled over item index
     OnOverItem = function(self, index, text)
     end,
@@ -394,7 +394,7 @@ BitmapCombo = Class(Group) {
     __init = function(self, parent, bitmapArray, defaultIndex, isColor, bitmaps, rolloverCue, clickCue, debugName)
         Group.__init(self, parent)
         self:SetName(debugName or "BitmapCombo")
-        
+
         self.mRolloverCue = rolloverCue
         self.mClickCue = clickCue
 
@@ -406,7 +406,7 @@ BitmapCombo = Class(Group) {
         self._btnLeft:DisableHitTest()
         self._btnRight:DisableHitTest()
         self._btnMid:DisableHitTest()
-        
+
         self.Height:Set(self._btnMid.Height)
 
         LayoutHelpers.AtLeftTopIn(self._btnLeft, self)
@@ -424,7 +424,7 @@ BitmapCombo = Class(Group) {
         self._dropdown = Group(self)
         LayoutHelpers.DepthOverParent(self._dropdown, self._bitmap, 1)
         self._dropdown:Hide()
-    
+
         self._dropdown.HandleEvent = function(control, event)
             if event.Type == 'MouseExit' then
                 self:OnMouseExit()
@@ -547,7 +547,7 @@ BitmapCombo = Class(Group) {
                 end
             end
             self:OnEvent(event)
-                        
+
             return eventHandled
         end
 
@@ -557,13 +557,13 @@ BitmapCombo = Class(Group) {
             self._btnMid:SetTexture(self._bitmaps.button.mid.dis)
             self._dropdown:Hide()
         end
-        
+
         self.OnEnable = function(self)
             self._btnLeft:SetTexture(self._bitmaps.button.left.up)
             self._btnRight:SetTexture(self._bitmaps.button.right.up)
             self._btnMid:SetTexture(self._bitmaps.button.mid.up)
         end
-        
+
         OnGlobalMouseClick = function(event)
             if self and self._dropdown then
                 if not self._ddhidden then
@@ -574,9 +574,9 @@ BitmapCombo = Class(Group) {
                 end
             end
         end
-        
+
         UIMain.AddOnMouseClickedFunc(OnGlobalMouseClick)
-        
+
         self.OnDestroy = function(self)
             UIMain.RemoveOnMouseClickedFunc(OnGlobalMouseClick)
         end
@@ -625,7 +625,7 @@ BitmapCombo = Class(Group) {
                         return true
                     end
                 elseif event.Type == 'MouseExit' then
-                    if ctrl.highlight then 
+                    if ctrl.highlight then
                         ctrl.highlight:Destroy()
                         ctrl.highlight = nil
                         return true
@@ -682,7 +682,7 @@ BitmapCombo = Class(Group) {
 
     OnMouseExit = function(self)
     end,
-    
+
     -- overload to get rolled over item index
     OnOverItem = function(self, index, name)
     end,

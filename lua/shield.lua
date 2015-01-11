@@ -5,7 +5,7 @@
 --**
 --**  Summary  : Shield lua module
 --**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local Entity = import('/lua/sim/Entity.lua').Entity
@@ -28,7 +28,7 @@ Shield = Class(moho.shield_methods,Entity) {
         self.MeshZBp = spec.MeshZ
         self.ImpactMeshBp = spec.ImpactMesh
         self._IsUp = false
-        if spec.ImpactEffects != '' then
+        if spec.ImpactEffects ~= '' then
             self.ImpactEffects = EffectTemplate[spec.ImpactEffects]
         else
             self.ImpactEffects = {}
@@ -92,7 +92,7 @@ Shield = Class(moho.shield_methods,Entity) {
         self.SpillOverDmgMod = math.max(dmgMod, 0)
     end,
 
-    UpdateShieldRatio = function(self, value)        
+    UpdateShieldRatio = function(self, value)
         if value >= 0 then
             self.Owner:SetShieldRatio(value)
         else
@@ -134,7 +134,7 @@ Shield = Class(moho.shield_methods,Entity) {
                     return false
                 end
             end
-        end  
+        end
 
         return true
     end,
@@ -151,19 +151,19 @@ Shield = Class(moho.shield_methods,Entity) {
             finalVal = 0
         end
         return finalVal
-    end,    
+    end,
 
     OnDamage = function(self, instigator, amount, vector, dmgType)
         self:ApplyDamage(instigator, amount, vector, dmgType, true)
     end,
 
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
-        if self.Owner != instigator then
+        if self.Owner ~= instigator then
 
             local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
 
             if self.PassOverkillDamage then
-                local overkill = self:GetOverkill(instigator,amount,dmgType)    
+                local overkill = self:GetOverkill(instigator,amount,dmgType)
                 if self.Owner and IsUnit(self.Owner) and overkill > 0 then
                     self.Owner:DoTakeDamage(instigator, overkill, vector, dmgType)
                 end
@@ -185,9 +185,9 @@ Shield = Class(moho.shield_methods,Entity) {
                 end
             else
                 self:UpdateShieldRatio(0)
-            end		
-        end	
-        -- Only do overspill on events where we have an instigator. 
+            end
+        end
+        -- Only do overspill on events where we have an instigator.
         -- "Force" damage events from stratbombs are one example
         -- where we don't.
         if doOverspill and IsEntity(instigator) then
@@ -211,9 +211,9 @@ Shield = Class(moho.shield_methods,Entity) {
         local army = self:GetArmy()
         local OffsetLength = Util.GetVectorLength(vector)
         local ImpactMesh = Entity { Owner = self.Owner }
-        Warp( ImpactMesh, self:GetPosition())        
+        Warp( ImpactMesh, self:GetPosition())
 
-        if self.ImpactMeshBp != '' then
+        if self.ImpactMeshBp ~= '' then
             ImpactMesh:SetMesh(self.ImpactMeshBp)
             ImpactMesh:SetDrawScale(self.Size)
             ImpactMesh:SetOrientation(OrientFromDir(Vector(-vector.x,-vector.y,-vector.z)),true)
@@ -229,7 +229,7 @@ Shield = Class(moho.shield_methods,Entity) {
 
     OnDestroy = function(self)
         self:SetMesh('')
-        if self.MeshZ != nil then
+        if self.MeshZ ~= nil then
             self.MeshZ:Destroy()
             self.MeshZ = nil
         end
@@ -278,7 +278,7 @@ Shield = Class(moho.shield_methods,Entity) {
         self:SetCollisionShape('None')
 
         self:SetMesh('')
-        if self.MeshZ != nil then
+        if self.MeshZ ~= nil then
             self.MeshZ:Destroy()
             self.MeshZ = nil
         end
@@ -330,7 +330,7 @@ Shield = Class(moho.shield_methods,Entity) {
 
             self:UpdateShieldRatio( workProgress )
             WaitTicks(1)
-        end    
+        end
     end,
 
     OnState = State {
@@ -350,10 +350,10 @@ Shield = Class(moho.shield_methods,Entity) {
 
             -- We are no longer turned off
             self.OffHealth = -1
-            
+
             self:UpdateShieldRatio(-1)
             self:CreateShieldMesh()
-            
+
             --Code for Personal Bubbles, currently only the Harbinger
             local OwnerBp = self.Owner:GetBlueprint()
             local OwnerShield = OwnerBp.Defense.Shield
@@ -362,10 +362,10 @@ Shield = Class(moho.shield_methods,Entity) {
                 --Manually disable the bubble shield's collision sphere after its creation so it acts like the new personal shields
                 self:SetCollisionShape('None')
             end
-            
+
             self.Owner:PlayUnitSound('ShieldOn')
             self.Owner:SetMaintenanceConsumptionActive()
-            
+
             --Then we can make any units inside a transport with a Shield invulnerable here
             self:ProtectTransportedUnits()
 
@@ -383,7 +383,7 @@ Shield = Class(moho.shield_methods,Entity) {
                 self:UpdateShieldRatio(-1)
 
                 fraction = self.Owner:GetResourceConsumed()
-                if fraction != 1 and aiBrain:GetEconomyStored('ENERGY') <= 0 then
+                if fraction ~= 1 and aiBrain:GetEconomyStored('ENERGY') <= 0 then
                     if test then
                         on = false
                     else
@@ -422,14 +422,14 @@ Shield = Class(moho.shield_methods,Entity) {
             -- Get rid of the shield bar
             self:UpdateShieldRatio(0)
             self:RemoveShield()
-            
+
             --Code for Personal Bubbles, currently only the Harbinger
             local OwnerBp = self.Owner:GetBlueprint()
             local OwnerShield = OwnerBp.Defense.Shield
             if OwnerShield.PersonalBubble and OwnerShield.PersonalBubble == true then
                 self.Owner:SetCollisionShape('Box', 0, OwnerBp.SizeY * 0.5, 0, OwnerBp.SizeX * 0.5, OwnerBp.SizeY * 0.5, OwnerBp.SizeZ * 0.5)
             end
-            
+
             self.Owner:PlayUnitSound('ShieldOff')
             self.Owner:SetMaintenanceConsumptionInactive()
 
@@ -455,11 +455,11 @@ Shield = Class(moho.shield_methods,Entity) {
             if OwnerShield.PersonalBubble and OwnerShield.PersonalBubble == true then
                 self.Owner:SetCollisionShape('Box', 0, OwnerBp.SizeY * 0.5, 0, OwnerBp.SizeX * 0.5, OwnerBp.SizeY * 0.5, OwnerBp.SizeZ * 0.5)
             end
-            self.Owner:PlayUnitSound('ShieldOff')            
+            self.Owner:PlayUnitSound('ShieldOff')
 
             --Apply vulnerabilities
             self:RevokeTransportProtection()
-            
+
             -- We must make the unit charge up before getting its shield back
             self:ChargingUp(0, self.ShieldRechargeTime)
 
@@ -485,10 +485,10 @@ Shield = Class(moho.shield_methods,Entity) {
                 self.Owner:SetCollisionShape('Box', 0, OwnerBp.SizeY * 0.5, 0, OwnerBp.SizeX * 0.5, OwnerBp.SizeY * 0.5, OwnerBp.SizeZ * 0.5)
             end
             self.Owner:PlayUnitSound('ShieldOff')
-            
+
             --Apply vulnerabilities
             self:RevokeTransportProtection()
-            
+
             self:ChargingUp(0, self.ShieldEnergyDrainRechargeTime)
 
             -- If the unit is attached to a transport, make sure the shield goes to the off state
@@ -507,26 +507,26 @@ Shield = Class(moho.shield_methods,Entity) {
 
     ProtectTransportedUnits = function(self)
         if EntityCategoryContains(categories.TRANSPORTATION, self.Owner) then
-            self.Owner:SetCanTakeDamage(false)        
+            self.Owner:SetCanTakeDamage(false)
             local Cargo = self.Owner:GetCargo()
             for _, v in Cargo do
                 v:SetCanTakeDamage(false)
             end
-            self.Owner:IsTransportProtected(true)            
+            self.Owner:IsTransportProtected(true)
         end
     end,
-    
+
     RevokeTransportProtection = function(self)
-        if EntityCategoryContains(categories.TRANSPORTATION, self.Owner) then    
-            self.Owner:SetCanTakeDamage(true)        
+        if EntityCategoryContains(categories.TRANSPORTATION, self.Owner) then
+            self.Owner:SetCanTakeDamage(true)
             local Cargo = self.Owner:GetCargo()
             for _, v in Cargo do
                 v:SetCanTakeDamage(true)
             end
-            self.Owner:IsTransportProtected(false)            
+            self.Owner:IsTransportProtected(false)
         end
-    end,    
-    
+    end,
+
     DeadState = State {
         Main = function(self)
         end,
@@ -542,7 +542,7 @@ UnitShield = Class(Shield){
     OnCreate = function(self,spec)
         self.Trash = TrashBag()
         self.Owner = spec.Owner
-        self.ImpactEffects = EffectTemplate[spec.ImpactEffects]        
+        self.ImpactEffects = EffectTemplate[spec.ImpactEffects]
         self.CollisionSizeX = spec.CollisionSizeX or 1
         self.CollisionSizeY = spec.CollisionSizeY or 1
         self.CollisionSizeZ = spec.CollisionSizeZ or 1
@@ -637,7 +637,7 @@ AntiArtilleryShield = Class(Shield) {
                     return false
                 end
             end
-        end          
+        end
         if bp.ArtilleryShieldBlocks then
             return true
         end
