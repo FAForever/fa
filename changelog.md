@@ -45,6 +45,7 @@ Changelog for patch 3641
   floor with the very low mounted gun
 - Reclaimed mass now counts towards the score table
 - Reclaim/second now shown
+- Tiny changes to make Fatboy/Megalith/Spiderbot weapons symmetrical in behaviour where they should be
 
 Changelog for patch 3640
 ------------------------
