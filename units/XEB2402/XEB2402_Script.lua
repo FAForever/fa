@@ -7,15 +7,16 @@
 #**
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
-local TStructureUnit = import('/lua/terranunits.lua').TStructureUnit
+local TAirFactoryUnit = import('/lua/terranunits.lua').TAirFactoryUnit
 
-XEB2402 = Class(TStructureUnit) {   
+XEB2402 = Class(TAirFactoryUnit) {   
     DeathThreadDestructionWaitTime = 8,
     
     OnStopBeingBuilt = function(self)
-        TStructureUnit.OnStopBeingBuilt(self)
+        TAirFactoryUnit.OnStopBeingBuilt(self)
         ChangeState( self, self.OpenState )
     end,
+
     
     OpenState = State() {
 
@@ -26,11 +27,13 @@ XEB2402 = Class(TStructureUnit) {
             # to play one while being built and one when finished        
             # Can't use PermOpenAnimation because of the satellite
             local bp = self:GetBlueprint()
-            self.AnimManip = CreateAnimator(self)
-            self.AnimManip:PlayAnim( '/units/XEB2402/XEB2402_aopen.sca' )
-            self.Trash:Add(self.AnimManip)
-            self:PlayUnitSound('MoveArms')
-            WaitFor( self.AnimManip )
+            if not self.animDone then
+                self.AnimManip = CreateAnimator(self)
+                self.AnimManip:PlayAnim( '/units/XEB2402/XEB2402_aopen.sca' )
+                self:PlayUnitSound('MoveArms')
+                WaitFor(self.AnimManip)
+                self.Trash:Add(self.AnimManip)
+            end
             
             # Attach satellite to unit, play animation, release satellite
             # Create satellite and attach to attachpoint bone
@@ -55,11 +58,14 @@ XEB2402 = Class(TStructureUnit) {
             self.Satellite.Parent = self
             
             # Play open animation
-            self.AnimManip:PlayAnim( '/units/XEB2402/XEB2402_aopen01.sca' )
-            self:PlayUnitSound('LaunchSat')
-            WaitFor( self.AnimManip )
-			self.Trash:Add(CreateAttachedEmitter(self,'XEB2402',army, '/effects/emitters/uef_orbital_death_laser_launch_01_emit.bp'):OffsetEmitter(0.00, 0.00, 1.00))
-			self.Trash:Add(CreateAttachedEmitter(self,'XEB2402',army, '/effects/emitters/uef_orbital_death_laser_launch_02_emit.bp'):OffsetEmitter(0.00, 2.00, 1.00))
+            if not self.animDone then
+                self.AnimManip:PlayAnim( '/units/XEB2402/XEB2402_aopen01.sca' )
+                self:PlayUnitSound('LaunchSat')
+                WaitFor( self.AnimManip )
+                self.Trash:Add(CreateAttachedEmitter(self,'XEB2402',army, '/effects/emitters/uef_orbital_death_laser_launch_01_emit.bp'):OffsetEmitter(0.00, 0.00, 1.00))
+                self.Trash:Add(CreateAttachedEmitter(self,'XEB2402',army, '/effects/emitters/uef_orbital_death_laser_launch_02_emit.bp'):OffsetEmitter(0.00, 2.00, 1.00))
+                self.animDone = true
+            end
             
             # Release unit
             if newSat then
@@ -67,20 +73,41 @@ XEB2402 = Class(TStructureUnit) {
                 self.Satellite:Open()
             end
         end,
-    },   
+    },
+
+    OnStartBuild = function(self, unitBeingBuilt, order)
+        WARN('Starting build, self.Satellite is...')
+        if not self.Satellite then
+            WARN('Building...')
+            TAirFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
+        else
+            IssueStop({self})
+            IssueClearCommands({self})
+            WARN('not building, response from self.Satellite')
+        end
+    end,
+    
+    OnStopBuild = function(self, unitBeingBuilt, order )
+        unitBeingBuilt:Destroy()
+        IssueStop({self})
+        IssueClearCommands({self})
+        if not self.Satellite then
+            ChangeState(self, self.OpenState)
+        end
+    end,
     
     OnKilled = function(self, instigator, type, overkillRatio)
         if self.Satellite and not self.Satellite:IsDead() and not self.Satellite.IsDying then
             self.Satellite:Kill()
         end
-        TStructureUnit.OnKilled(self, instigator, type, overkillRatio)
+        TAirFactoryUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
     
     OnDestroy = function(self)
         if self.Satellite and not self.Satellite:IsDead() and not self.Satellite.IsDying then
             self.Satellite:Destroy()
         end
-        TStructureUnit.OnDestroy(self)
+        TAirFactoryUnit.OnDestroy(self)
     end,
     
     OnCaptured = function(self, captor)
