@@ -7153,6 +7153,8 @@ tooltipui0686="Sin Billy"
 tooltipui0687="Previene a los comandantes de la UEF mejorar su ACU con el arma nuclear táctica 'Billy'"
 tooltipui0688="Sin súper sistemas de intelegencia militar"
 tooltipui0689="Quita el Aeon Ojo de Rhianne y el Cybran Soothesayer"
+tooltipui0690="Drone Auto-Rebuild"
+tooltipui0691="Toggle if this drone rebuilds upon death"
 
 tooltipui0540="Restablecer ventana de chat"
 tooltipui0541="Restablece la posición y apariencia de la ventana de chat."
