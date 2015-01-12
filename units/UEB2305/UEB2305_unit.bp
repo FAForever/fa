@@ -80,6 +80,7 @@ UnitBlueprint {
     Display = {
         Abilities = {
             '<LOC ability_manuallaunch>Manual Launch',
+            '<LOC ability_deathaoe>Volatile',
         },
         AnimationOpen = '/units/ueb2305/ueb2305_aopen.sca',
         Mesh = {
