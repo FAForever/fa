@@ -73,9 +73,13 @@ UEL0301 = Class(CommandUnit) {
         end
     end,
     
-    NotifyOfPodDeath = function(self, pod)
-        if self.HasPod == true then
-            self.RebuildThread = self:ForkThread(self.RebuildPod)
+    NotifyOfPodDeath = function(self, pod, rebuildDrone)
+        if rebuildDrone == true then
+            if self.HasPod == true then
+                self.RebuildThread = self:ForkThread(self.RebuildPod)
+            end
+        else
+            self:CreateEnhancement('PodRemove')
         end
     end,
 
@@ -96,6 +100,7 @@ UEL0301 = Class(CommandUnit) {
                 self.HasPod = false
                 if self.Pod and not self.Pod:BeenDestroyed() then
                     self.Pod:Kill()
+                    self.Pod = nil
                 end
                 if self.RebuildingPod ~= nil then
                     RemoveEconomyEvent(self, self.RebuildingPod)
