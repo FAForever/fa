@@ -165,9 +165,16 @@ UnitBlueprint {
                 bitmapId = 'drone',
                 helpText = 'drone_ACU',
             },
+            RULEUTC_WeaponToggle = {
+                bitmapId = 'dronerebuild',
+                helpText = 'drone_rebuild',
+            },
         },
         SelectionPriority = 6,
         TechLevel = 'RULEUTL_Basic',
+        ToggleCaps = {
+            RULEUTC_WeaponToggle = true,
+        },
         UnitName = '<LOC uea0001_name>C-D1 "Rover"',
         UnitWeight = 1,
     },
