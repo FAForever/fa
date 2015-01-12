@@ -5063,6 +5063,8 @@ tooltipui0686="No Billy"
 tooltipui0687="Prevents UEF commanders from upgrading their ACU to have the 'Billy' tactical nuke upgrade"
 tooltipui0688="No Super-Intel"
 tooltipui0689="Removes the Aeon Eye of Rhianne and the Cybran Soothsayer"
+tooltipui0690="Drone Auto-Rebuild"
+tooltipui0691="Toggle if this drone rebuilds upon death"
 
 tooltipui0540="Reset Chat Window"
 tooltipui0541="Resets the position and layout of the chat window"
