@@ -31,7 +31,8 @@ XEA0002 = Class(TAirUnit) {
         end      
         
         self.IsDying = true
-        self.Parent:Kill(instigator, type, 0)
+        self.Parent.Satellite = nil
+        WARN('Satellite set to nil')
         
         TAirUnit.OnKilled(self, instigator, type, overkillRatio)        
     end,
