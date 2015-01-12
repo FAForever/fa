@@ -85,6 +85,7 @@ UnitBlueprint {
     Display = {
         Abilities = {
             '<LOC ability_manuallaunch>Manual Launch',
+            '<LOC ability_deathaoe>Volatile',
         },
         DamageEffects = {
             {

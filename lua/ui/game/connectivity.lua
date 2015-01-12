@@ -3,7 +3,7 @@
 --* Author: Ted Snook
 --* Summary: Connectivity Dialog
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -30,9 +30,9 @@ function PingUpdate()
             if clientInfo.connected then
                 GUI.slots[index].ping:SetText(LOCF("<LOC connectivity_0000>Ping (ms): %d", clientInfo.ping))
                 
-                if clientInfo.ping < 200 then
+                if clientInfo.ping < 400 then
                     GUI.slots[index].ping:SetColor('ff00ff00') -- Ping green color
-                elseif clientInfo.ping < 400 then
+                elseif clientInfo.ping < 500 then
                     GUI.slots[index].ping:SetColor('ffffff00') -- Ping yellow color
                 else
                     GUI.slots[index].ping:SetColor('ffff0000') -- Ping red color

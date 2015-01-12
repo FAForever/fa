@@ -85,6 +85,7 @@ UnitBlueprint {
     Display = {
         Abilities = {
             '<LOC ability_manuallaunch>Manual Launch',
+            '<LOC ability_deathaoe>Volatile',
         },
         AnimationOpen = '/units/uab2305/uab2305_aopen.sca',
         DamageEffects = {
