@@ -48,6 +48,7 @@ UnitBlueprint {
         'ANTINAVY',
         'DRAGBUILD',
         'SIZE4',
+        'COUNTERINTELLIGENCE',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYSONAR',
@@ -68,6 +69,7 @@ UnitBlueprint {
     Description = '<LOC xrb2308_desc>Torpedo Ambushing System',
     Display = {
         Abilities = {
+            '<LOC ability_personalstealth>Personal Stealth',
             '<LOC ability_sonar>Sonar',
             '<LOC ability_torpedo>Torpedoes',
         },
