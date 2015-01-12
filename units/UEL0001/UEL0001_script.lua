@@ -295,15 +295,19 @@ UEL0001 = Class(TWalkingLandUnit) {
         self:RequestRefreshUI()
     end,
 
-    NotifyOfPodDeath = function(self, pod)
-        if pod == 'LeftPod' then
-            if self.HasLeftPod == true then
-                self.RebuildThread = self:ForkThread(self.RebuildPod, 1)
+    NotifyOfPodDeath = function(self, pod, rebuildDrone)
+        if rebuildDrone == true then
+            if pod == 'LeftPod' then
+                if self.HasLeftPod == true then
+                    self.RebuildThread = self:ForkThread(self.RebuildPod, 1)
+                end
+            elseif pod == 'RightPod' then
+                if self.HasRightPod == true then
+                    self.RebuildThread2 = self:ForkThread(self.RebuildPod, 2)
+                end
             end
-        elseif pod == 'RightPod' then
-            if self.HasRightPod == true then
-                self.RebuildThread2 = self:ForkThread(self.RebuildPod, 2)
-            end
+        else
+            self:CreateEnhancement(pod..'Remove')
         end
     end,
 
@@ -333,6 +337,7 @@ UEL0001 = Class(TWalkingLandUnit) {
                 self.HasLeftPod = false
                 if self.LeftPod and not self.LeftPod:IsDead() then
                     self.LeftPod:Kill()
+                    self.LeftPod = nil
                 end
                 if self.RebuildingPod != nil then
                     RemoveEconomyEvent(self, self.RebuildingPod)
@@ -343,6 +348,7 @@ UEL0001 = Class(TWalkingLandUnit) {
                 self.HasRightPod = false
                 if self.RightPod and not self.RightPod:IsDead() then
                     self.RightPod:Kill()
+                    self.RightPod = nil
                 end
                 if self.RebuildingPod2 != nil then
                     RemoveEconomyEvent(self, self.RebuildingPod2)
