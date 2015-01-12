@@ -1,5 +1,15 @@
 UnitBlueprint {
     Audio = {
+        Construct = Sound {
+            Bank = 'UEB',
+            Cue = 'UEB0101_Construct_Start',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        ConstructLoop = Sound {
+            Bank = 'UEB',
+            Cue = 'UEB0101_Construct_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
         DeathExplosion = Sound {
             Bank = 'UELDestroy',
             Cue = 'UEB_Destroy_Lrg_PreDestroy',
@@ -28,6 +38,10 @@ UnitBlueprint {
     },
     Categories = {
         'PRODUCTFA',
+        'SORTCONSTRUCTION',
+        'SHOWQUEUE',
+        'FACTORY',
+        'CONSTRUCTION',
         'UEF',
         'STRUCTURE',
         'BUILTBYTIER3COMMANDER',
@@ -75,6 +89,7 @@ UnitBlueprint {
                 OffsetZ = 0.25,
             },
         },
+        BuildAttachBone = 'Attachpoint01',
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
@@ -113,7 +128,11 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 400000,
         BuildCostMass = 28000,
+        BuildRate = 300,
         BuildTime = 25000,
+        BuildableCategory = {
+            'SATELLITE',
+        },
         RebuildBonusIds = {
             'xeb2402',
         },
@@ -123,6 +142,12 @@ UnitBlueprint {
         SizeZ = 6,
     },
     General = {
+        BuildBones = {
+            BuildEffectBones = {
+                'ConstuctBeam01', -- No, this is not spelled incorrectly...
+                'ConstuctBeam02',
+            },
+        },
         Category = 'Defense',
         Classification = 'RULEUC_MiscSupport',
         CommandCaps = {
@@ -133,12 +158,14 @@ UnitBlueprint {
             RULEUCC_Move = false,
             RULEUCC_Nuke = false,
             RULEUCC_Patrol = false,
+            RULEUCC_Pause = true,
             RULEUCC_Reclaim = false,
             RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = false,
             RULEUCC_Stop = false,
             RULEUCC_Transport = false,
         },
+        ConstructionBar = true,
         FactionName = 'UEF',
         Icon = 'land',
         SelectionPriority = 5,
