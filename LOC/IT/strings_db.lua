@@ -7097,7 +7097,8 @@ tooltipui0686="No Billy"
 tooltipui0687="Rimuove la possibilita per i comandanti UEF di aggiungere al commander 'Billy' missile tattico nucleare"
 tooltipui0688="No Super-Intel"
 tooltipui0689="Rimuove l' Occhio di Arianna (Aeon) e il Controllo Perimetrale (Cibrano)"
-
+tooltipui0690="Drone Auto-Rebuild"
+tooltipui0691="Toggle if this drone rebuilds upon death"
 
 tooltipui0540="Ripristina finestra chat"
 tooltipui0541="Ripristina la posizione e la struttura della finestra della chat"

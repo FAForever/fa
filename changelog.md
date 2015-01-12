@@ -45,6 +45,7 @@ Changelog for patch 3641
   floor with the very low mounted gun
 - Reclaimed mass now counts towards the score table
 - Reclaim/second now shown
+- UEF ACU and SCU drones now have an on-drone button to toggle if they are rebuilt at death
 
 Changelog for patch 3640
 ------------------------
