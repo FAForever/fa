@@ -186,7 +186,6 @@ function GetStartPositions(scenario)
                 position[1] = pos[1]
                 position[2] = pos[3]
             else
-                WARN("No initial position marker for army " .. army .. " found in " .. scenario.save)
                 position[1] = 0
                 position[2] = 0
             end

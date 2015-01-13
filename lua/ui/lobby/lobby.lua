@@ -1494,7 +1494,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         if totalPlayers == 1 and coopGame == false then
             valid = false
         end
-        if not allFFA and not moreThanOneTeam then
+        if not allFFA and not moreThanOneTeam and coopGame == false then
             valid = false
         end
         if not valid then

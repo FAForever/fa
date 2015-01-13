@@ -1356,7 +1356,6 @@ function AddObjective(Type,         # 'primary', 'bonus', etc
             if not obj.Active then
                 return
             end
-            LOG('detected by ',armyindex, ' focus = ',GetFocusArmy())
             # now if we've been detected by the focus army ...
             if armyindex == GetFocusArmy() then
                 # get the blip that is associated with the unit

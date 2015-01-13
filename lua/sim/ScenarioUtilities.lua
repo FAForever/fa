@@ -532,8 +532,6 @@ function InitializeScenarioArmies()
 
         if tblData then
 
-            LOG('*DEBUG: InitializeScenarioArmies, army = ', strArmy)
-
             SetArmyEconomy( strArmy, tblData.Economy.mass, tblData.Economy.energy)
 
             if tblData.faction != nil then
