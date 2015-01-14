@@ -279,7 +279,7 @@ UnitBlueprint {
             Damage = 375,
             DamageType = 'Normal',
             DisplayName = 'Heavy Cavitation Cluster Torpedo Launcher',
-            DropBombShort = true
+            DropBombShort = 2
             EffectiveRadius = 19,
             FireTargetLayerCapsTable = {
                 Air = 'Seabed|Sub|Water',

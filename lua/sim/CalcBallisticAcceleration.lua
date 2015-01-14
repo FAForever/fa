@@ -84,7 +84,7 @@ CalculateBallisticAcceleration = function (weapon, proj, MuzzleSalvoSize, Muzzle
         -- Decide where vertically on the target to aim the bomb
         if weapon:GetBlueprint().DropBombShort then
             -- Deliberately launch Torpedo bombers short
-            alpha = 2 * (pos_proj[2] - GetSurfaceHeight(pos_target[1], pos_target[3]))
+            alpha = (weapon:GetBlueprint().DropBombShort) * (pos_proj[2] - GetSurfaceHeight(pos_target[1], pos_target[3]))
             pos_target[2] = GetSurfaceHeight(pos_target[1], pos_target[3]) - alpha
         else
             pos_target[2] = GetSurfaceHeight(pos_target[1], pos_target[3]) + alpha * unit_height

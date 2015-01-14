@@ -285,7 +285,7 @@ UnitBlueprint {
             Damage = 500,
             DamageType = 'Normal',
             DisplayName = 'Torpedo Cluster',
-            DropBombShort = true
+            DropBombShort = 2
             FireTargetLayerCapsTable = {
                 Air = 'Seabed|Sub|Water',
                 Land = 'Seabed|Sub|Water',

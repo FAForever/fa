@@ -289,7 +289,7 @@ UnitBlueprint {
             Damage = 375,
             DamageType = 'Normal',
             DisplayName = 'Angler Torpedo',
-            DropBombShort = true
+            DropBombShort = 2
             FireTargetLayerCapsTable = {
                 Air = 'Seabed|Sub|Water',
                 Land = 'Seabed|Sub|Water',
