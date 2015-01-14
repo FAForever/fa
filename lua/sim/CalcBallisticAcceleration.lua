@@ -30,8 +30,7 @@ local bomber_table = {}
 -- But normally that may never happen
 local default_value = 4.75
 
-CalculateBallisticAcceleration = function (weapon, proj, ProjectilesPerOnFire, MuzzleSalvoDelay)
-    WARN('Ballistics!')
+CalculateBallisticAcceleration = function (weapon, proj, MuzzleSalvoSize, MuzzleSalvoDelay)
     local launcher = proj:GetLauncher()
     if not launcher then return default_value end
 
@@ -57,7 +56,7 @@ CalculateBallisticAcceleration = function (weapon, proj, ProjectilesPerOnFire, M
         -- Get the target if it's an entity
         local target = launcher:GetTargetEntity()
 
-        if target and IsUnit(target) then          
+        if target and IsUnit(target) then
             -- Get target position
             pos_target = target:GetPosition()
           
@@ -83,7 +82,13 @@ CalculateBallisticAcceleration = function (weapon, proj, ProjectilesPerOnFire, M
         local unit_height = pos_target[2] - GetSurfaceHeight(pos_target[1], pos_target[3])
 
         -- Decide where vertically on the target to aim the bomb
-        pos_target[2] = GetSurfaceHeight(pos_target[1], pos_target[3]) + alpha * unit_height
+        if weapon:GetBlueprint().DropBombShort then
+            -- Deliberately launch Torpedo bombers short
+            alpha = 2 * (pos_proj[2] - GetSurfaceHeight(pos_target[1], pos_target[3]))
+            pos_target[2] = GetSurfaceHeight(pos_target[1], pos_target[3]) - alpha
+        else
+            pos_target[2] = GetSurfaceHeight(pos_target[1], pos_target[3]) + alpha * unit_height
+        end
 
         -- Get launcher unit's speed, which is also the velocity of the dropped bomb
         local ux, uy, uz = launcher:GetVelocity()
@@ -107,7 +112,7 @@ CalculateBallisticAcceleration = function (weapon, proj, ProjectilesPerOnFire, M
         -- the trajectory of first bomb, but as the result will be a carpet bomb, we try to have
         -- the target in the center of the flames, so the first bomb must fall before the target
         -- (0.1 is the delay between 2 drops)
-        local offset = (ProjectilesPerOnFire - 1) * MuzzleSalvoDelay * vhorz_launcher / 2
+        local offset = (MuzzleSalvoSize - 1) * MuzzleSalvoDelay * vhorz_launcher / 2
 
         dist = dist - offset  -- This is not exact in some cases, but should be good enough
 
@@ -128,7 +133,11 @@ CalculateBallisticAcceleration = function (weapon, proj, ProjectilesPerOnFire, M
         pos_target_t[3] = pos_target[3] + wz * t
 
         -- Calculate the position of the target vertically at time t
-        pos_target_t[2] = GetSurfaceHeight(pos_target_t[1], pos_target_t[3]) + alpha * unit_height
+        if weapon:GetBlueprint().DropBombShort then
+            pos_target_t[2] = GetSurfaceHeight(pos_target_t[1], pos_target_t[3]) - alpha
+        else
+            pos_target_t[2] = GetSurfaceHeight(pos_target_t[1], pos_target_t[3]) + alpha * unit_height
+        end
 
         -- Calculate the average vertical speed
         vvert = (pos_target_t[2] - pos_target[2]) / t
@@ -137,10 +146,10 @@ CalculateBallisticAcceleration = function (weapon, proj, ProjectilesPerOnFire, M
         acc = 2 * math.pow(1/t , 2) * (height - t * vvert)
 
         -- Fill bomber_table if several bombs must be dropped
-        if ProjectilesPerOnFire > 1 then
+        if MuzzleSalvoSize > 1 then
             bomber_table[entityId] = {}
             bomber_table[entityId].acc = acc
-            bomber_table[entityId].remaining_bombs = ProjectilesPerOnFire - 1
+            bomber_table[entityId].remaining_bombs = MuzzleSalvoSize - 1
         end
     end
 

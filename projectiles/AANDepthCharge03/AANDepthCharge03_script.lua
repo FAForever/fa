@@ -35,19 +35,19 @@ AANDepthCharge03 = Class(ADepthChargeProjectile) {
         end
 
         #self:SetMaxSpeed(20)
-        #self:SetVelocity(0)
+        self:SetVelocity(2)
         #self:SetAcceleration(5)
         self:TrackTarget(true)
         self:StayUnderwater(true)
         self:SetTurnRate(240)
         self:SetVelocityAlign(true)
         self:SetStayUpright(false)
-        #self:ForkThread(self.EnterWaterMovementThread)
+        self:ForkThread(self.EnterWaterMovementThread)
     end,
     
     EnterWaterMovementThread = function(self)
         WaitTicks(1)
-        self:SetVelocity(0.5)
+        self:SetVelocity(14)
     end,
 
     OnLostTarget = function(self)

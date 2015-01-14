@@ -279,6 +279,7 @@ UnitBlueprint {
             Damage = 375,
             DamageType = 'Normal',
             DisplayName = 'Harmonic Depth Charge',
+            DropBombShort = true
             EffectiveRadius = 19,
             FireTargetLayerCapsTable = {
                 Air = 'Seabed|Sub|Water',
@@ -286,12 +287,13 @@ UnitBlueprint {
             },
             FiringRandomness = 3,
             FiringTolerance = 6,
+            FixBombTrajectory = true,
             HeadingArcCenter = 0,
             HeadingArcRange = 30,
             Label = 'Bomb',
-            MaxRadius = 42,
+            MaxRadius = 60,
             MinRadius = 4,
-            MuzzleSalvoDelay = 1.8,
+            MuzzleSalvoDelay = 0.8,
             MuzzleSalvoSize = 2,
             MuzzleVelocity = 14,
             ProjectileId = '/projectiles/AANDepthCharge03/AANDepthCharge03_proj.bp',
