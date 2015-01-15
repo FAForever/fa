@@ -6242,7 +6242,6 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
         if profiles[Selected_Preset].Mods then
             for k, v in profiles[Selected_Preset].Mods do
                 if GetModUidExist(k) == true then
-                    AddChatText('mod(+ui):'..k)
                     SetPreference('active_mods.'..k, true)
                     selectedMods[k] = true
                 end
@@ -6258,7 +6257,6 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
             end
         end
         if funcUtil.tableLength(selectedMods) > 0 then
-            AddChatText('UPDATE')
             OnModsChanged(selectedMods, true)
             --UpdateGame() -- Rafraichie les mods (utile)
         end
