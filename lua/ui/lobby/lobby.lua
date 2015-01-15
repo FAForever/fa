@@ -2561,12 +2561,12 @@ function CreateSlotsUI(makeLabel)
         -- capture the index in the current closure so it's accessible on callbacks
         local curRow = i
 
-        GUI.slots[i] = Group(GUI.playerPanel, "playerSlot " .. tostring(i))
-        GUI.slots[i].closed = false
+        local newSlot = Group(GUI.playerPanel, "playerSlot " .. tostring(i))
+        newSlot.closed = false
         --TODO these need layout from art when available
-        GUI.slots[i].Width:Set(GUI.labelGroup.Width)
-        GUI.slots[i].Height:Set(GUI.labelGroup.Height)
-        GUI.slots[i]._slot = i
+        newSlot.Width:Set(GUI.labelGroup.Width)
+        newSlot.Height:Set(GUI.labelGroup.Height)
+        newSlot._slot = i
 
         -- Default mouse behaviours for the slot.
         local defaultHandler = function(self, event)
@@ -2584,74 +2584,83 @@ function CreateSlotsUI(makeLabel)
 
             return Group.HandleEvent(self, event)
         end
-        GUI.slots[i].HandleEvent = defaultHandler
+        newSlot.HandleEvent = defaultHandler
 
-        local bg = GUI.slots[i]
+        local bg = newSlot
 
         --// Slot Background
-        GUI.slots[i].SlotBackground = Bitmap(GUI, UIUtil.SkinnableFile("/SLOT/slot-dis.dds"))
-        LayoutHelpers.AtBottomIn(GUI.slots[i].SlotBackground, GUI.slots[i], -6)
-        LayoutHelpers.AtLeftIn(GUI.slots[i].SlotBackground, GUI.slots[i], 0)
+        newSlot.SlotBackground = Bitmap(GUI, UIUtil.SkinnableFile("/SLOT/slot-dis.dds"))
+        LayoutHelpers.AtBottomIn(newSlot.SlotBackground, newSlot, -6)
+        LayoutHelpers.AtLeftIn(newSlot.SlotBackground, newSlot, 0)
         --\\ Stop Slot Background
 
         --// COUNTRY
         -- Added a bitmap on the left of Rating, the bitmap is a Flag of Country
-        GUI.slots[i].KinderCountry = Bitmap(bg, UIUtil.SkinnableFile("/countries/world.dds"))
-        GUI.slots[i].KinderCountry.Width:Set(20)
-        GUI.slots[i].KinderCountry.Height:Set(17-2) -- 15=2pix marging || 17=1pix marging
-        LayoutHelpers.AtBottomIn(GUI.slots[i].KinderCountry, GUI.slots[i], -4) -- -5
-        LayoutHelpers.AtLeftIn(GUI.slots[i].KinderCountry, GUI.slots[i], 2) -- 1
+        local flag = Bitmap(bg, UIUtil.SkinnableFile("/countries/world.dds"))
+        newSlot.KinderCountry = flag
+        flag.Width:Set(20)
+        flag.Height:Set(15)
+        LayoutHelpers.AtBottomIn(flag, newSlot, -4)
+        LayoutHelpers.AtLeftIn(flag, newSlot, 2)
         --\\ Stop COUNTRY
 
         -- TODO: Factorise this boilerplate.
         --// Rating
-        GUI.slots[i].ratingGroup = Group(bg)
-        GUI.slots[i].ratingGroup.Width:Set(slotColumnSizes.rating.width)
-        GUI.slots[i].ratingGroup.Height:Set(GUI.slots[i].Height)
-        LayoutHelpers.AtLeftIn(GUI.slots[i].ratingGroup, GUI.panel, slotColumnSizes.rating.x)
-        LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].ratingGroup, GUI.slots[i], 6)
-        GUI.slots[i].ratingText = UIUtil.CreateText(GUI.slots[i].ratingGroup, "", 14, 'Arial')--14, UIUtil.bodyFont)
-        GUI.slots[i].ratingText:SetColor('B9BFB9')
-        GUI.slots[i].ratingText:SetDropShadow(true)
-        LayoutHelpers.AtBottomIn(GUI.slots[i].ratingText, GUI.slots[i].ratingGroup, 2)
-        LayoutHelpers.AtRightIn(GUI.slots[i].ratingText, GUI.slots[i].ratingGroup, 9)
-        GUI.slots[i].tooltiprating = Tooltip.AddControlTooltip(GUI.slots[i].ratingText, 'rating')
+        local ratingGroup = Group(bg)
+        newSlot.ratingGroup = ratingGroup
+        ratingGroup.Width:Set(slotColumnSizes.rating.width)
+        ratingGroup.Height:Set(newSlot.Height)
+        LayoutHelpers.AtLeftIn(ratingGroup, GUI.panel, slotColumnSizes.rating.x)
+        LayoutHelpers.AtVerticalCenterIn(ratingGroup, newSlot, 6)
+
+        local ratingText = UIUtil.CreateText(ratingGroup, "", 14, 'Arial')
+        newSlot.ratingText = ratingText
+        ratingText:SetColor('B9BFB9')
+        ratingText:SetDropShadow(true)
+        LayoutHelpers.AtBottomIn(ratingText, ratingGroup, 2)
+        LayoutHelpers.AtRightIn(ratingText, ratingGroup, 9)
+        newSlot.tooltiprating = Tooltip.AddControlTooltip(ratingText, 'rating')
 
         --// NumGame
-        GUI.slots[i].numGamesGroup = Group(bg)
-        GUI.slots[i].numGamesGroup.Width:Set(slotColumnSizes.games.width)
-        GUI.slots[i].numGamesGroup.Height:Set(GUI.slots[i].Height)
-        LayoutHelpers.AtLeftIn(GUI.slots[i].numGamesGroup, GUI.panel, slotColumnSizes.games.x)
-        LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].numGamesGroup, GUI.slots[i], 6)
-        GUI.slots[i].numGamesText = UIUtil.CreateText(GUI.slots[i].numGamesGroup, "", 14, 'Arial')--14, UIUtil.bodyFont)
-        GUI.slots[i].numGamesText:SetColor('B9BFB9')
-        GUI.slots[i].numGamesText:SetDropShadow(true)
-        Tooltip.AddControlTooltip(GUI.slots[i].numGamesText, 'num_games')
-        LayoutHelpers.AtBottomIn(GUI.slots[i].numGamesText, GUI.slots[i].numGamesGroup, 2)
-        LayoutHelpers.AtRightIn(GUI.slots[i].numGamesText, GUI.slots[i].numGamesGroup, 9)
+        local numGamesGroup = Group(bg)
+        newSlot.numGamesGroup = numGamesGroup
+        numGamesGroup.Width:Set(slotColumnSizes.games.width)
+        numGamesGroup.Height:Set(newSlot.Height)
+        LayoutHelpers.AtLeftIn(numGamesGroup, GUI.panel, slotColumnSizes.games.x)
+        LayoutHelpers.AtVerticalCenterIn(numGamesGroup, newSlot, 6)
+
+        local numGamesText = UIUtil.CreateText(numGamesGroup, "", 14, 'Arial')
+        newSlot.numGamesText = numGamesText
+        numGamesText:SetColor('B9BFB9')
+        numGamesText:SetDropShadow(true)
+        Tooltip.AddControlTooltip(numGamesText, 'num_games')
+        LayoutHelpers.AtBottomIn(numGamesText, numGamesGroup, 2)
+        LayoutHelpers.AtRightIn(numGamesText, numGamesGroup, 9)
 
         --// Name
-        GUI.slots[i].name = Combo(bg, 14, 12, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
-        GUI.slots[i].name._text:SetFont('Arial Gras', 15)
-        GUI.slots[i].name._text:SetDropShadow(true)
-        LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].name, GUI.slots[i], 8)
-        LayoutHelpers.AtLeftIn(GUI.slots[i].name, GUI.panel, slotColumnSizes.player.x)
-        GUI.slots[i].name.Width:Set(slotColumnSizes.player.width)
-        GUI.slots[i].name.row = i
+        local nameLabel = Combo(bg, 14, 12, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+        newSlot.name = nameLabel
+        nameLabel._text:SetFont('Arial Gras', 15)
+        nameLabel._text:SetDropShadow(true)
+        LayoutHelpers.AtVerticalCenterIn(nameLabel, newSlot, 8)
+        LayoutHelpers.AtLeftIn(nameLabel, GUI.panel, slotColumnSizes.player.x)
+        nameLabel.Width:Set(slotColumnSizes.player.width)
+        nameLabel.row = i
         -- left deal with name clicks
-        GUI.slots[i].name.OnEvent = defaultHandler
-        GUI.slots[i].name.OnClick = function(self, index, text)
+        nameLabel.OnEvent = defaultHandler
+        nameLabel.OnClick = function(self, index, text)
             DoSlotBehavior(self.row, self.slotKeys[index], text)
         end
 
         -- Color
-        GUI.slots[i].color = BitmapCombo(bg, gameColors.PlayerColors, 1, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+        local colorSelector = BitmapCombo(bg, gameColors.PlayerColors, 1, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+        newSlot.color = colorSelector
 
-        LayoutHelpers.AtLeftIn(GUI.slots[i].color, GUI.panel, slotColumnSizes.color.x)
-        LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].color, GUI.slots[i], 8)
-        GUI.slots[i].color.Width:Set(slotColumnSizes.color.width)
-        GUI.slots[i].color.row = i
-        GUI.slots[i].color.OnClick = function(self, index)
+        LayoutHelpers.AtLeftIn(colorSelector, GUI.panel, slotColumnSizes.color.x)
+        LayoutHelpers.AtVerticalCenterIn(colorSelector, newSlot, 8)
+        colorSelector.Width:Set(slotColumnSizes.color.width)
+        colorSelector.row = i
+        colorSelector.OnClick = function(self, index)
             if not lobbyComm:IsHost() then
                 lobbyComm:SendData(hostID, { Type = 'RequestColor', Color = index, Slot = self.row } )
                 gameInfo.PlayerOptions[self.row].PlayerColor = index
@@ -2668,72 +2677,77 @@ function CreateSlotsUI(makeLabel)
                 end
             end
         end
-        GUI.slots[i].color.OnEvent = defaultHandler
-        Tooltip.AddControlTooltip(GUI.slots[i].color, 'lob_color')
-        GUI.slots[i].color.row = i
+        colorSelector.OnEvent = defaultHandler
+        Tooltip.AddControlTooltip(colorSelector, 'lob_color')
+        colorSelector.row = i
 
         --// Faction
-        GUI.slots[i].faction = BitmapCombo(bg, factionBmps, table.getn(factionBmps), nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
-        LayoutHelpers.AtLeftIn(GUI.slots[i].faction, GUI.panel, slotColumnSizes.faction.x)
-        LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].faction, GUI.slots[i], 8)
-        GUI.slots[i].faction.Width:Set(slotColumnSizes.faction.width)
-        GUI.slots[i].faction.OnClick = function(self, index)
+        local factionSelector = BitmapCombo(bg, factionBmps, table.getn(factionBmps), nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+        newSlot.faction = factionSelector
+        LayoutHelpers.AtLeftIn(factionSelector, GUI.panel, slotColumnSizes.faction.x)
+        LayoutHelpers.AtVerticalCenterIn(factionSelector, newSlot, 8)
+        factionSelector.Width:Set(slotColumnSizes.faction.width)
+        factionSelector.OnClick = function(self, index)
             SetPlayerOption(self.row,'Faction',index)
             if curRow == FindSlotForID(FindIDForName(localPlayerName)) then
                 SetCurrentFactionTo_Faction_Selector()
             end
             Tooltip.DestroyMouseoverDisplay()
         end
-        Tooltip.AddControlTooltip(GUI.slots[i].faction, 'lob_faction')
-        Tooltip.AddComboTooltip(GUI.slots[i].faction, factionTooltips)
-        GUI.slots[i].faction.row = i
-        GUI.slots[i].faction.OnEvent = defaultHandler
+        Tooltip.AddControlTooltip(factionSelector, 'lob_faction')
+        Tooltip.AddComboTooltip(factionSelector, factionTooltips)
+        factionSelector.row = i
+        factionSelector.OnEvent = defaultHandler
         if not hasSupcom then
-            GUI.slots[i].faction:SetItem(4)
+            factionSelector:SetItem(4)
         end
 
         --// Team
-        GUI.slots[i].team = BitmapCombo(bg, teamIcons, 1, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
-        LayoutHelpers.AtLeftIn(GUI.slots[i].team, GUI.panel, slotColumnSizes.team.x)
-        LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].team, GUI.slots[i], 8)
-        GUI.slots[i].team.Width:Set(slotColumnSizes.team.width)
-        GUI.slots[i].team.row = i
-        GUI.slots[i].team.OnClick = function(self, index, text)
+        local teamSelector = BitmapCombo(bg, teamIcons, 1, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+        newSlot.team = teamSelector
+        LayoutHelpers.AtLeftIn(teamSelector, GUI.panel, slotColumnSizes.team.x)
+        LayoutHelpers.AtVerticalCenterIn(teamSelector, newSlot, 8)
+        teamSelector.Width:Set(slotColumnSizes.team.width)
+        teamSelector.row = i
+        teamSelector.OnClick = function(self, index, text)
             Tooltip.DestroyMouseoverDisplay()
             SetPlayerOption(self.row,'Team',index)
         end
-        Tooltip.AddControlTooltip(GUI.slots[i].team, 'lob_team')
-        Tooltip.AddComboTooltip(GUI.slots[i].team, teamTooltips)
-        GUI.slots[i].team.OnEvent = defaultHandler
+        Tooltip.AddControlTooltip(teamSelector, 'lob_team')
+        Tooltip.AddComboTooltip(teamSelector, teamTooltips)
+        teamSelector.OnEvent = defaultHandler
 
         -- Ping
-        GUI.slots[i].pingGroup = Group(bg)
-        GUI.slots[i].pingGroup.Width:Set(slotColumnSizes.ping.width)
-        GUI.slots[i].pingGroup.Height:Set(GUI.slots[i].Height)
-        LayoutHelpers.AtLeftIn(GUI.slots[i].pingGroup, GUI.panel, slotColumnSizes.ping.x)
-        LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].pingGroup, GUI.slots[i], 6)
+        local pingGroup = Group(bg)
+        newSlot.pingGroup = pingGroup
+        pingGroup.Width:Set(slotColumnSizes.ping.width)
+        pingGroup.Height:Set(newSlot.Height)
+        LayoutHelpers.AtLeftIn(pingGroup, GUI.panel, slotColumnSizes.ping.x)
+        LayoutHelpers.AtVerticalCenterIn(pingGroup, newSlot, 6)
 
-        GUI.slots[i].pingStatus = StatusBar(GUI.slots[i].pingGroup, 0, 1000, false, false,
+        local pingStatus = StatusBar(pingGroup, 0, 1000, false, false,
             UIUtil.SkinnableFile('/game/unit_bmp/bar-back_bmp.dds'),
             UIUtil.SkinnableFile('/game/unit_bmp/bar-01_bmp.dds'),
             true)
-        LayoutHelpers.AtTopIn(GUI.slots[i].pingStatus, GUI.slots[i].pingGroup, 5)
-        LayoutHelpers.AtLeftIn(GUI.slots[i].pingStatus, GUI.slots[i].pingGroup, 0)
-        LayoutHelpers.AtRightIn(GUI.slots[i].pingStatus, GUI.slots[i].pingGroup, 0)
+        newSlot.pingStatus = pingStatus
+        LayoutHelpers.AtTopIn(pingStatus, pingGroup, 5)
+        LayoutHelpers.AtLeftIn(pingStatus, pingGroup, 0)
+        LayoutHelpers.AtRightIn(pingStatus, pingGroup, 0)
 
         -- depending on if this is single player or multiplayer this displays different info
-        GUI.slots[i].multiSpace = Group(bg, "multiSpace " .. tonumber(i))
-        GUI.slots[i].multiSpace.Width:Set(slotColumnSizes.ready.width)
-        GUI.slots[i].multiSpace.Height:Set(GUI.slots[i].Height)
-        LayoutHelpers.AtLeftIn(GUI.slots[i].multiSpace, GUI.panel, slotColumnSizes.ready.x)
-        GUI.slots[i].multiSpace.Top:Set(GUI.slots[i].Top)
+        newSlot.multiSpace = Group(bg, "multiSpace " .. tonumber(i))
+        newSlot.multiSpace.Width:Set(slotColumnSizes.ready.width)
+        newSlot.multiSpace.Height:Set(newSlot.Height)
+        LayoutHelpers.AtLeftIn(newSlot.multiSpace, GUI.panel, slotColumnSizes.ready.x)
+        newSlot.multiSpace.Top:Set(newSlot.Top)
 
         -- Ready Checkbox
-        GUI.slots[i].ready = UIUtil.CreateCheckboxStd(GUI.slots[i].multiSpace, '/CHECKBOX/radio')
-        GUI.slots[i].ready.row = i
-        LayoutHelpers.AtVerticalCenterIn(GUI.slots[i].ready, GUI.slots[i].multiSpace, 8)
-        LayoutHelpers.AtLeftIn(GUI.slots[i].ready, GUI.slots[i].multiSpace, 0)
-        GUI.slots[i].ready.OnCheck = function(self, checked)
+        local readyBox = UIUtil.CreateCheckboxStd(newSlot.multiSpace, '/CHECKBOX/radio')
+        newSlot.ready = readyBox
+        readyBox.row = i
+        LayoutHelpers.AtVerticalCenterIn(readyBox, newSlot.multiSpace, 8)
+        LayoutHelpers.AtLeftIn(readyBox, newSlot.multiSpace, 0)
+        readyBox.OnCheck = function(self, checked)
             UIUtil.setEnabled(GUI.becomeObserver, not checked)
             if checked then
                 DisableSlot(self.row, true)
@@ -2745,17 +2759,19 @@ function CreateSlotsUI(makeLabel)
 
         if singlePlayer then
             -- TODO: Use of groups may allow this to be simplified...
-            GUI.slots[i].ready:Hide()
-            GUI.slots[i].pingGroup:Hide()
-            GUI.slots[i].pingStatus:Hide()
+            readyBox:Hide()
+            pingGroup:Hide()
+            pingStatus:Hide()
         end
 
 
         if i == 1 then
-            LayoutHelpers.Below(GUI.slots[i], GUI.labelGroup, -5)
+            LayoutHelpers.Below(newSlot, GUI.labelGroup, -5)
         else
-            LayoutHelpers.Below(GUI.slots[i], GUI.slots[i - 1], 3)
+            LayoutHelpers.Below(newSlot, GUI.slots[i - 1], 3)
         end
+
+        GUI.slots[i] = newSlot
 
         ClearSlotInfo(i)
     end
