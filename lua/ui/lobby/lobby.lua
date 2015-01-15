@@ -1813,7 +1813,7 @@ local function UpdateGame()
         local playerNotReady = GetPlayersNotReady() ~= false
 
         UIUtil.setEnabled(GUI.gameoptionsButton, playerNotReady)
-        UIUtil.setEnabled(GUI.rankedOptions, playerNotReady)
+        UIUtil.setEnabled(GUI.defaultOptions, playerNotReady)
         UIUtil.setEnabled(GUI.randMap, playerNotReady)
 
         -- Launch button enabled if everyone is ready.
@@ -1998,6 +1998,58 @@ local function HostUpdateMods(newPlayerID, newPlayerName)
         end
     end
 end
+
+-- Holds some utility functions to do with game option management.
+local OptionUtils = {
+    -- Expresses which options are acceptable for a game to be considered ranked.
+    -- A game is deemed "ranked" if, for every key k in gameOptions:
+    --    RANKED_OPTIONS[k] == nil  or
+    --    RANKED_OPTIONS[k] contains gameOptions[k]
+    RANKED_OPTIONS = {
+        Victory = {'demoralization'},
+        CheatsEnabled = {'false'},
+        CivilianAlliance = {'enemy'},
+        GameSpeed = {'normal'},
+        FogOfWar = {'explored'},
+        UnitCap = {'1000'},
+        PrebuiltUnits = {'Off'},
+        NoRushOption = {'Off'},
+        TeamSpawn = {'fixed'},
+        TeamLock = {'locked'},
+    },
+
+
+    -- Set all game options to their default values.
+    SetDefaults = function()
+        for index, option in globalOpts do
+            SetGameOption(option.key, option.values[option.default].key, true)
+        end
+
+        for index, option in teamOpts do
+            SetGameOption(option.key, option.values[option.default].key, true)
+        end
+
+        for index, option in AIOpts do
+            SetGameOption(option.key, option.values[option.default].key, true)
+        end
+
+        UpdateGame()
+    end,
+
+    -- Returns true if current game options are considered suitable for a ranked game, false
+    -- otherwise.
+    AreRanked = function(self)
+        for k, v in gameInfo.GameOptions do
+            if self.RANKED_OPTIONS[k] then
+                if not indexOf(self.RANKED_OPTIONS[k], v) then
+                    return false
+                end
+            end
+        end
+
+        return true
+    end
+}
 
 -- callback when Mod Manager dialog finishes (modlist==nil on cancel)
 -- FIXME: The mod manager should be given a list of game mods set by the host, which
@@ -3466,23 +3518,16 @@ function CreateUI(maxPlayers)
     end
     --end of auto teams code
 
-    -- DEFAULT OPTION BUTTON -- start of ranked options code
-    GUI.rankedOptions = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/defaultoption/')
-    LayoutHelpers.RightOf(GUI.rankedOptions, GUI.randTeam)
-    Tooltip.AddButtonTooltip(GUI.rankedOptions, 'lob_click_rankedoptions')
+    -- Default option button
+    GUI.defaultOptions = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/defaultoption/')
+    LayoutHelpers.RightOf(GUI.defaultOptions, GUI.randTeam)
+    Tooltip.AddButtonTooltip(GUI.defaultOptions, 'lob_click_rankedoptions')
     if not lobbyComm:IsHost() then
-        GUI.rankedOptions:Disable()
+        GUI.defaultOptions:Disable()
     else
-        GUI.rankedOptions.OnClick = function()
-            SetGameOption('Victory', 'demoralization', true)
-            SetGameOption('Timeouts', '3', true)
-            SetGameOption('CheatsEnabled', 'false', true)
-            SetGameOption('CivilianAlliance', 'enemy', true)
-            SetGameOption('GameSpeed', 'normal', true)
-            SetGameOption('FogOfWar', 'explored', true)
-            SetGameOption('UnitCap', '1000', true)
-            SetGameOption('PrebuiltUnits', 'Off',  true)
-            SetGameOption('NoRushOption', 'Off', true)
+        GUI.defaultOptions.OnClick = function()
+            -- Return all options to their default values.
+            OptionUtils.SetDefaults()
             lobbyComm:BroadcastData( { Type = "SetAllPlayerNotReady" } )
             UpdateGame()
         end
@@ -3493,7 +3538,7 @@ function CreateUI(maxPlayers)
     GUI.rerunBenchmark:Disable()
     -- Evil hack to eliminate the gap between the buttons. These negative offsets shouldn't be
     -- needed, but I just can't figure out why it's doing it :/
-    LayoutHelpers.RightOf(GUI.rerunBenchmark, GUI.rankedOptions, -3)
+    LayoutHelpers.RightOf(GUI.rerunBenchmark, GUI.defaultOptions, -3)
     Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text='Run CPU Benchmark Test', body='Recalculates your CPU rating.'})
 
     -- RANDOM MAP BUTTON --
@@ -3656,7 +3701,7 @@ function CreateUI(maxPlayers)
         GUI.becomeObserver:Hide()
         GUI.observerLabel:Hide()
         GUI.randTeam:Hide()
-        GUI.rankedOptions:Hide()
+        GUI.defaultOptions:Hide()
         GUI.rerunBenchmark:Hide()
         GUI.randMap:Hide()
         GUI.observerList:Hide()
