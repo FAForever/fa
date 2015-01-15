@@ -2,7 +2,7 @@
 --* File: lua/modules/ui/lobby/lobbyOptions.lua
 --* Summary: Lobby options
 --*
---* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 -- options that show up in the team options panel
@@ -13,7 +13,6 @@ teamOptions =
         label = "<LOC lobui_0088>Spawn",
         help = "<LOC lobui_0089>Determine what positions players spawn on the map",
         key = 'TeamSpawn',
-        pref = 'Lobby_Team_Spawn',
         values = {
             {
                 text = "<LOC lobui_0090>Random",
@@ -32,7 +31,6 @@ teamOptions =
         label = "<LOC lobui_0096>Team",
         help = "<LOC lobui_0097>Determines if players may switch teams while in game",
         key = 'TeamLock',
-        pref = 'Lobby_Team_Lock',
         values = {
             {
                 text = "<LOC lobui_0098>Locked",
@@ -51,7 +49,6 @@ teamOptions =
         label = "<LOC lobui_0532>Auto Teams",
         help = "<LOC lobui_0533>Auto ally the players before the game starts",
         key = 'AutoTeams',
-        pref = 'Lobby_Auto_Teams',
         values = {
             {
                 text = "<LOC lobui_0244>None",
@@ -88,7 +85,6 @@ globalOpts = {
         label = "<LOC lobui_0102>Unit Cap",
         help = "<LOC lobui_0103>Set the maximum number of units that can be in play",
         key = 'UnitCap',
-        pref = 'Lobby_Gen_Cap',
         values = {
           {
                 text = "<LOC lobui_0719>125",
@@ -147,7 +143,6 @@ globalOpts = {
         label = "Share Unit Cap at Death",
         help = "Enable this to share unitcap when a player dies",
         key = 'ShareUnitCap',
-        pref = 'Lobby_Gen_Share_Cap',
         values = {
           {
                 text = "None",
@@ -171,7 +166,6 @@ globalOpts = {
         label = "<LOC lobui_0112>Fog of War",
         help = "<LOC lobui_0113>Set up how fog of war will be visualized",
         key = 'FogOfWar',
-        pref = 'Lobby_Gen_Fog',
         values = {
             {
                 text = "<LOC lobui_0114>Explored",
@@ -190,7 +184,6 @@ globalOpts = {
         label = "<LOC lobui_0120>Victory Condition",
         help = "<LOC lobui_0121>Determines how a victory can be achieved",
         key = 'Victory',
-        pref = 'Lobby_Gen_Victory',
         values = {
             {
                 text = "<LOC lobui_0122>Assassination",
@@ -219,7 +212,6 @@ globalOpts = {
         label = "<LOC lobui_0242>Timeouts",
         help = "<LOC lobui_0243>Sets the number of timeouts each player can request",
         key = 'Timeouts',
-        pref = 'Lobby_Gen_Timeouts',
         mponly = true,
         values = {
             {
@@ -244,7 +236,6 @@ globalOpts = {
         label = "<LOC lobui_0258>Game Speed",
         help = "<LOC lobui_0259>Set the game speed",
         key = 'GameSpeed',
-        pref = 'Lobby_Gen_GameSpeed',
         values = {
             {
                 text = "<LOC lobui_0260>Normal",
@@ -268,7 +259,6 @@ globalOpts = {
         label = "<LOC lobui_0208>Cheating",
         help = "<LOC lobui_0209>Enable cheat codes",
         key = 'CheatsEnabled',
-        pref = 'Lobby_Gen_CheatsEnabled',
         values = {
             {
                 text = "<LOC _Off>Off",
@@ -287,7 +277,6 @@ globalOpts = {
         label = "<LOC lobui_0291>Civilians",
         help = "<LOC lobui_0292>Set how civilian units are used",
         key = 'CivilianAlliance',
-        pref = 'Lobby_Gen_Civilians',
         values = {
             {
                 text = "<LOC lobui_0293>Enemy",
@@ -311,7 +300,6 @@ globalOpts = {
         label = "<LOC lobui_0310>Prebuilt Units",
         help = "<LOC lobui_0311>Set whether the game starts with prebuilt units or not",
         key = 'PrebuiltUnits',
-        pref = 'Lobby_Prebuilt_Units',
         values = {
             {
                 text = "<LOC lobui_0312>Off",
@@ -330,7 +318,6 @@ globalOpts = {
         label = "<LOC lobui_0316>No Rush Option",
         help = "<LOC lobui_0317>Enforce No Rush rules for a certain period of time",
         key = 'NoRushOption',
-        pref = 'Lobby_NoRushOption',
         values = {
             {
                 text = "<LOC lobui_0318>Off",
@@ -359,7 +346,6 @@ globalOpts = {
         label = "<LOC lobui_0545>Random Map",
         help = "<LOC lobui_0546>If enabled, the game will selected a random map just before the game launch",
         key = 'RandomMap',
-        pref = 'Lobby_Random_Map',
         values = {
             {
                 text = "<LOC lobui_0312>Off",
@@ -383,7 +369,6 @@ globalOpts = {
         label = "<LOC lobui_0727>Score",
         help = "<LOC lobui_0728>Set score on or off during the game",
         key = 'Score',
-        pref = 'Lobby_Score',
         values = {
             {
                 text = "<LOC _On>On",
@@ -402,7 +387,6 @@ globalOpts = {
         label = "<LOC lobui_0740>Share Conditions",
         help = "<LOC lobui_0741>Kill all the units you shared to your allies and send back the units your allies shared with you when you die",
         key = 'Share',
-        pref = 'Lobby_Share',
         values = {
             {
                 text = "<LOC lobui_0742>Full Share",
@@ -424,7 +408,6 @@ AIOpts = {
         label = "AIx Cheat Multiplier",
         help = "Set the cheat multiplier for the cheating AIs.",
         key = 'CheatMult',
-        pref = 'Lobby_Cheat_Mult',
         values = {
             {
                 text = "1.0",
@@ -687,7 +670,6 @@ AIOpts = {
         label = "AIx Build Multiplier",
         help = "Set the build rate multiplier for the cheating AIs.",
         key = 'BuildMult',
-        pref = 'Lobby_Build_Mult',
         values = {
             {
                 text = "1.0",
@@ -950,7 +932,6 @@ AIOpts = {
         label = "AI TML Randomization",
         help = "Sets the randomization for the AI\'s TMLs making them miss more. Higher means less accurate.",
         key = 'TMLRandom',
-        pref = 'Lobby_TML_Randomization',
         values = {
             {
                 text = "None",
@@ -1003,7 +984,6 @@ AIOpts = {
         label = "AI Land Expansion Limit",
         help = "Set the limit for the number of land expansions that each AI can have (will still be modified by the number of AIs).",
         key = 'LandExpansionsAllowed',
-        pref = 'Lobby_Land_Expansions_Allowed',
         values = {
             {
                 text = "None",
@@ -1061,7 +1041,6 @@ AIOpts = {
         label = "AI Naval Expansion Limit",
         help = "Set the limit for the number of naval expansions that each AI can have.",
         key = 'NavalExpansionsAllowed',
-        pref = 'Lobby_Naval_Expansions_Allowed',
         values = {
             {
                 text = "None",
@@ -1119,7 +1098,6 @@ AIOpts = {
         label = "AIx Omni Setting",
         help = "Set the build rate multiplier for the cheating AIs.",
         key = 'OmniCheat',
-        pref = 'Lobby_Omni_Cheat',
         values = {
             {
                 text = "On",
