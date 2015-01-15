@@ -93,14 +93,6 @@ local PrefLanguageTooltipText={}
 
 local FACTION_PANELS = {}
 
-local PrefLanguage = GetCommandLineArg("/country", 1)
-if PrefLanguage[1] == '' or PrefLanguage[1] == '/init' or PrefLanguage == nil or PrefLanguage == false then
-    LOG('COUNTRY - Country has not been found "'..tostring(PrefLanguage[1])..'"')
-    PrefLanguage = "world"
-else
-    PrefLanguage = tostring(string.lower(PrefLanguage[1]))
-end
-
 local connectedTo = {} -- by UID
 CurrentConnection = {} -- by Name
 ConnectionEstablished = {} -- by Name
@@ -123,40 +115,28 @@ local lastUploadedMap = nil
 
 local CPU_Benchmarks = {} -- Stores CPU benchmark data
 
-local playerMean = GetCommandLineArg("/mean", 1)
-local playerDeviation = GetCommandLineArg("/deviation", 1)
+local function parseCommandlineArguments()
+    local function GetCommandLineArgOrDefault(argname, default)
+        local arg = GetCommandLineArg(argname, 1)
+        if arg then
+            return arg[1]
+        end
 
-local ratingColor = GetCommandLineArg("/ratingcolor", 1)
-local numGames = GetCommandLineArg("/numgames", 1)
+        return default
+    end
 
-
-if ratingColor then
-    ratingColor = tostring(ratingColor[1])
-else
-    ratingColor = "ffffffff"
+    return {
+        PrefLanguage = tostring(string.lower(GetCommandLineArgOrDefault("/country", "world"))),
+        initName = GetCommandLineArgOrDefault("/init", ""),
+        ratingColor = GetCommandLineArgOrDefault("/ratingcolor", "ffffffff"),
+        numGames = tonumber(GetCommandLineArgOrDefault("/numgames", 0)),
+        playerMean = tonumber(GetCommandLineArgOrDefault("/mean", 1500)),
+        playerDeviation = tonumber(GetCommandLineArgOrDefault("/deviation", 500)),
+    }
 end
+local argv = parseCommandlineArguments()
 
-if numGames then
-    numGames = tonumber(numGames[1])
-else
-    numGames = 0
-end
-
-if playerMean then
-    playerMean = tonumber(playerMean[1])
-else
-    playerMean = 1500
-end
-
-if playerDeviation then
-    playerDeviation = tonumber(playerDeviation[1])
-else
-    playerDeviation = 500
-end
-
-
-
-local playerRating = math.floor( Trueskill.round2((playerMean - 3 * playerDeviation) / 100.0) * 100 )
+local playerRating = math.floor( Trueskill.round2((argv.playerMean - 3 * argv.playerDeviation) / 100.0) * 100 )
 
 -- builds the faction tables, and then adds random faction icon to the end
 local factionBmps = {}
@@ -446,12 +426,12 @@ local function DoSlotBehavior(slot, key, name)
             if lobbyComm:IsHost() then
                 local requestedFaction = Prefs.GetFromCurrentProfile('LastFaction')
                 HostConvertObserverToPlayer(hostID, localPlayerName, FindObserverSlotForID(localPlayerID), slot,
-                                            requestedFaction, playerRating, ratingColor, numGames)
+                                            requestedFaction, playerRating, argv.ratingColor, argv.numGames)
             else
                 lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer', RequestedName = localPlayerName, ObserverSlot =
                                    FindObserverSlotForID(localPlayerID), PlayerSlot = slot, requestedFaction =
                                    Prefs.GetFromCurrentProfile('LastFaction'), requestedPL = playerRating,
-                                   requestedRC = ratingColor, requestedNG = numGames})
+                                   requestedRC = argv.ratingColor, requestedNG = argv.numGames})
             end
         end
     elseif key == 'pm' then
@@ -1777,22 +1757,12 @@ local function UpdateGame()
         -- TODO: Since these stats are all constants, we should figure out the right place to do this
         -- job once.
         if not playerOptions.MEAN then
-            SetPlayerOption(localPlayerSlot, 'MEAN', playerMean, true)
-        end
-        if not playerOptions.DEV then
-            SetPlayerOption(localPlayerSlot, 'DEV', playerDeviation, true)
-        end
-        if not playerOptions.COUNTRY then
-            SetPlayerOption(localPlayerSlot, 'COUNTRY', PrefLanguage, true)
-        end
-        if not playerOptions.PL then
+            SetPlayerOption(localPlayerSlot, 'MEAN', argv.playerMean, true)
+            SetPlayerOption(localPlayerSlot, 'DEV', argv.playerDeviation, true)
+            SetPlayerOption(localPlayerSlot, 'COUNTRY', argv.PrefLanguage, true)
             SetPlayerOption(localPlayerSlot, 'PL', playerRating, true)
-        end
-        if not playerOptions.RC then
-            SetPlayerOption(localPlayerSlot, 'RC', ratingColor, true)
-        end
-        if not playerOptions.NG then
-            SetPlayerOption(localPlayerSlot, 'NG', numGames, true)
+            SetPlayerOption(localPlayerSlot, 'RC', argv.ratingColor, true)
+            SetPlayerOption(localPlayerSlot, 'NG', argv.numGames, true)
         end
     end
 
@@ -2615,8 +2585,6 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtLeftTopIn(GUI.ModFeaturedLabel, GUI.panel, 50, 61)
 
     -- Set the mod name to a value appropriate for the mod in use.
-    local initName = GetCommandLineArg("/init", 1)
-    initName = tostring(initName[1])
     local modLabels = {
         ["init_faf.lua"] = "FA Forever",
         ["init_blackops.lua"] = "BlackOps",
@@ -2631,7 +2599,7 @@ function CreateUI(maxPlayers)
         ["init_xtremewars.lua"] = "XtremeWars",
 
     }
-    SetText2(GUI.ModFeaturedLabel, modLabels[initName] or "", 20)
+    SetText2(GUI.ModFeaturedLabel, modLabels[argv.initName] or "", 20)
 
     --\\
     --// Lobby options panel
@@ -4058,8 +4026,8 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
                             if lobbyComm:IsHost() then
                                 requestedFaction = Prefs.GetFromCurrentProfile('LastFaction')
                                 requestedPL = playerRating
-                                requestedRC = ratingColor
-                                requestedNG = numGames
+                                requestedRC = argv.ratingColor
+                                requestedNG = argv.numGames
                                 HostConvertObserverToPlayer(hostID, localPlayerName, FindObserverSlotForID(localPlayerID),
                                                             self.Slot, requestedFaction, requestedPL, requestedRC, requestedNG)
                             else
@@ -4067,8 +4035,8 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
                                                                       ObserverSlot = FindObserverSlotForID(localPlayerID), PlayerSlot =
                                                                       self.Slot, requestedFaction =
                                                                       Prefs.GetFromCurrentProfile('LastFaction'),
-                                                                      requestedPL = playerRating, requestedRC = ratingColor,
-                                                                      requestedNG = numGames})
+                                                                      requestedPL = playerRating, requestedRC = argv.ratingColor,
+                                                                      requestedNG = argv.numGames})
                             end
                         end
                     end
@@ -4257,7 +4225,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
         if wantToBeObserver then
             -- Ok, I'm connected to the host. Now request to become an observer
-            lobbyComm:SendData( hostID, { Type = 'AddObserver', RequestedObserverName = localPlayerName, RequestedPL = playerRating, RequestedColor = Prefs.GetFromCurrentProfile('LastColor'), RequestedFaction = requestedFaction, RequestedCOUNTRY = PrefLanguage, } )
+            lobbyComm:SendData( hostID, { Type = 'AddObserver', RequestedObserverName = localPlayerName, RequestedPL = playerRating, RequestedColor = Prefs.GetFromCurrentProfile('LastColor'), RequestedFaction = requestedFaction, RequestedCOUNTRY = argv.PrefLanguage, } )
 			LOGX('>> ConnectionToHostEstablished//SendData//playerRating='..tostring(playerRating), 'Connecting')
         else
             -- Ok, I'm connected to the host. Now request to become a player
@@ -4279,11 +4247,11 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                     RequestedColor = Prefs.GetFromCurrentProfile('LastColor'),
                     RequestedFaction = requestedFaction,
                     RequestedPL = playerRating,
-                    RequestedRC = ratingColor,
-                    RequestedNG = numGames,
-                    RequestedMEAN = playerMean,
-                    RequestedDEV = playerDeviation,
-                    RequestedCOUNTRY = PrefLanguage
+                    RequestedRC = argv.ratingColor,
+                    RequestedNG = argv.numGames,
+                    RequestedMEAN = argv.playerMean,
+                    RequestedDEV = argv.playerDeviation,
+                    RequestedCOUNTRY = argv.PrefLanguage
                 }
             )
         end
@@ -4562,7 +4530,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         gameInfo.PlayerOptions[1].Human = true
         gameInfo.PlayerOptions[1].PlayerColor = Prefs.GetFromCurrentProfile('LastColor') or 1
         gameInfo.PlayerOptions[1].ArmyColor = Prefs.GetFromCurrentProfile('LastColor') or 1
-        gameInfo.PlayerOptions[1].Country = PrefLanguage or 'world'
+        gameInfo.PlayerOptions[1].Country = argv.PrefLanguage
 
         local requestedFaction = Prefs.GetFromCurrentProfile('LastFaction')
         if (requestedFaction == nil) or (requestedFaction > table.getn(FactionData.Factions)) then
