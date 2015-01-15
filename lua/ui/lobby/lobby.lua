@@ -4771,45 +4771,46 @@ function SetGameOption(key, val, ignoreNilValue, ignoreRefresh)
         return
     end
 
-    if lobbyComm:IsHost() then
-        gameInfo.GameOptions[key] = val
+    if not lobbyComm:IsHost() then
+        WARN('Attempt to set game option by a non-host')
+        return
+    end
 
-        lobbyComm:BroadcastData {
-            Type = 'GameOption',
-            Key = key,
-            Value = val,
-        }
+    gameInfo.GameOptions[key] = val
 
-        LOG('SetGameOption(key='..repr(key)..',val='..repr(val)..')')
+    lobbyComm:BroadcastData {
+        Type = 'GameOption',
+        Key = key,
+        Value = val,
+    }
 
-        -- don't want to send all restricted categories to gpgnet, so just send bool
-        -- note if more things need to be translated to gpgnet, a translation table would be a better implementation
-        -- but since there's only one, we'll call it out here
-        if key == 'RestrictedCategories' then
-            local restrictionsEnabled = false
-            if val ~= nil then
-                if table.getn(val) ~= 0 then
-                    restrictionsEnabled = true
-                end
+    LOG('SetGameOption(key='..repr(key)..',val='..repr(val)..')')
+
+    -- don't want to send all restricted categories to gpgnet, so just send bool
+    -- note if more things need to be translated to gpgnet, a translation table would be a better implementation
+    -- but since there's only one, we'll call it out here
+    if key == 'RestrictedCategories' then
+        local restrictionsEnabled = false
+        if val ~= nil then
+            if table.getn(val) ~= 0 then
+                restrictionsEnabled = true
             end
-            GpgNetSend('GameOption', key, restrictionsEnabled)
-        elseif key == 'ScenarioFile' then
-            GpgNetSend('GameOption', key, val)
-            if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= '') then
-                scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-                if scenarioInfo and scenarioInfo.map and (scenarioInfo.map ~= '') then
-                    GpgNetSend('GameOption', 'Slots', table.getsize(scenarioInfo.Configurations.standard.teams[1].armies))
-                end
-            end
-        else
-            GpgNetSend('GameOption', key, val)
         end
-
-        if not ignoreRefresh then
-            UpdateGame()
+        GpgNetSend('GameOption', key, restrictionsEnabled)
+    elseif key == 'ScenarioFile' then
+        GpgNetSend('GameOption', key, val)
+        if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= '') then
+            scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+            if scenarioInfo and scenarioInfo.map and (scenarioInfo.map ~= '') then
+                GpgNetSend('GameOption', 'Slots', table.getsize(scenarioInfo.Configurations.standard.teams[1].armies))
+            end
         end
     else
-        WARN('Attempt to set game option by a non-host')
+        GpgNetSend('GameOption', key, val)
+    end
+
+    if not ignoreRefresh then
+        UpdateGame()
     end
 end
 
