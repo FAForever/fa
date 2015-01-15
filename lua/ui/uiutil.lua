@@ -22,6 +22,7 @@ local Prefs = import('/lua/user/prefs.lua')
 local Border = import('/lua/maui/border.lua').Border
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local Layouts = import('/lua/skins/layouts.lua')
+local Tooltip = import('/lua/ui/game/tooltip.lua')
 
 --* Handy global variables to assist skinning
 buttonFont = import('/lua/lazyvar.lua').Create()            -- default font used for button faces
@@ -563,8 +564,8 @@ end
 --* return the standard scrollbar
 function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom, offset_top)
     offset_right = offset_right or 0
-	offset_bottom = offset_bottom or 0
-	offset_top = offset_top or 0
+    offset_bottom = offset_bottom or 0
+    offset_top = offset_top or 0
     local textureName = filename or '/small-vert_scroll/'
     local scrollbg = textureName..'back_scr_mid.dds'
     local scrollbarmid = textureName..'bar-mid_scr_over.dds'
@@ -603,7 +604,7 @@ function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom,
     scrollUpButton.Left:Set(scrollbar.Left)
     scrollUpButton.Top:Set(function() return attachto.Top() + offset_top end)
 
-	scrollDownButton.Left:Set(scrollbar.Left)
+    scrollDownButton.Left:Set(scrollbar.Left)
     scrollDownButton.Bottom:Set(function() return attachto.Bottom() + offset_bottom end)
 
     scrollbar.Right:Set(scrollUpButton.Right)
@@ -681,8 +682,8 @@ function MakeInputModal(control, onEnterFunc, onEscFunc)
             end
             if control.oldHandleEvent then
                 return control.oldHandleEvent(self, event)
-			end
-			return true
+            end
+            return true
         end
     end
 end
@@ -768,9 +769,9 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
         if callback then
             button.OnClick = function(self)
                 callback()
-				if destroyOnCallback then
-					dialog:Destroy()
-				end
+                if destroyOnCallback then
+                    dialog:Destroy()
+                end
             end
         else
             button.OnClick = function(self)
@@ -1049,4 +1050,95 @@ function setVisible(control, visible)
     else
         control:Hide()
     end
+end
+
+-- Create a popup
+function CreatePopup(parent, title, layout, options, buttons)
+    -- TODO: Can choice purcent opacity for the fog
+    -- TODO: No need popup.Ui:Destroy() for close the popup
+    -- TODO: Top and Bottom textures are equal for the moment (merge to one file ?) (not use texture ?, only 3 colors)
+    -- TODO: Animate the popup appear ?
+    local popup_Title = title or false -- Popup Title
+    local popup_width = layout[1] or 537 -- Popup width size
+    local popup_height = layout[2] or 400 -- Popup height size
+    local activeFog = options[1] or true -- Popup fog in background
+    local Credit_text = options[2] or false -- Popup credit
+    local Crdt_Tltip_Text = options[3][1] or false -- Credit tooltip text
+    local Crdt_Tltip_Descr = options[3][2] or false -- Credit tooltip description
+    local button1Text = buttons[1] or false -- Popup button name
+    local button1Callback = buttons[2] or nil -- Popup button function
+    local button2Text = buttons[3] or false -- Popup button name
+    local button2Callback = buttons[4] or nil -- Popup button function
+
+    local popup_UI = Group(parent)
+    LayoutHelpers.FillParent(popup_UI, parent)
+    LayoutHelpers.DepthSetTopOverParent(popup_UI, parent)
+
+    if activeFog then
+        popup_UI.fog = Bitmap(popup_UI)
+        popup_UI.fog:SetSolidColor('780D0E0D')
+        LayoutHelpers.FillParent(popup_UI.fog, parent)
+    end
+
+    local popup = Group(popup_UI)
+    popup.Width:Set(popup_width)
+    popup.Height:Set(popup_height)
+    LayoutHelpers.AtCenterIn(popup, parent)
+    LayoutHelpers.DepthSetTopOverParent(popup, popup_UI)
+
+    popup.UI = popup_UI
+
+    popup.middle = Bitmap(popup_UI)
+    popup.middle:SetSolidColor('ff101010')
+    popup.middle.Width:Set(popup_width)
+    popup.middle.Height:Set(popup_height-8)
+    LayoutHelpers.AtLeftTopIn(popup.middle, popup, 0, 4)
+
+    popup.top = Bitmap(popup_UI, SkinnableFile('/scx_menu/lan-game-lobby/popup-t.png'))
+    popup.top.Width:Set(popup_width)
+    popup.top.Height:Set(4)
+    LayoutHelpers.AtLeftTopIn(popup.top, popup)
+
+    popup.bottom = Bitmap(popup_UI, SkinnableFile('/scx_menu/lan-game-lobby/popup-b.png'))
+    popup.bottom.Width:Set(popup_width)
+    popup.bottom.Height:Set(4)
+    LayoutHelpers.AtLeftBottomIn(popup.bottom, popup)
+
+    if popup_Title then
+        popup.title = CreateText(popup_UI, popup_Title, 17, 'Arial Gras', true)
+        LayoutHelpers.AtHorizontalCenterIn(popup.title, popup, 0)
+        LayoutHelpers.AtTopIn(popup.title, popup, 10)
+    end
+
+    if Credit_text then
+        popup.credit = CreateText(popup, Credit_text, 9, 'Arial', true)
+        popup.credit:SetColor('808080')
+        LayoutHelpers.AtRightBottomIn(popup.credit, popup, 0, 2)
+        if Crdt_Tltip_Text and Crdt_Tltip_Descr then Tooltip.AddControlTooltip(popup.credit, {text = Crdt_Tltip_Text, body = Crdt_Tltip_Descr})
+        elseif Crdt_Tltip_Text then Tooltip.AddControlTooltip(popup.credit, Crdt_Tltip_Text) end
+    end
+
+    if button1Text then
+        popup.button1 = CreateButtonWithDropshadow(popup, '/BUTTON/medium/', button1Text, -1)
+        if button1Callback then
+            popup.button1.OnClick = function(self) button1Callback() end
+        else
+            popup.button1.OnClick = function(self) popup_UI:Destroy() end
+        end
+        if button2Text then
+            LayoutHelpers.AtLeftBottomIn(popup.button1, popup, 0, 10)
+            popup.button2 = CreateButtonWithDropshadow(popup, '/BUTTON/medium/', button2Text, -1)
+            LayoutHelpers.AtRightBottomIn(popup.button2, popup, 0, 10)
+            if button2Callback then
+                popup.button2.OnClick = function(self) button2Callback() end
+            else
+                popup.button2.OnClick = function(self) popup_UI:Destroy() end
+            end
+        else
+            LayoutHelpers.AtHorizontalCenterIn(popup.button1, popup)
+            LayoutHelpers.AtBottomIn(popup.button1, popup, 10)
+        end
+    end
+
+    return popup
 end
