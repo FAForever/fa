@@ -3426,8 +3426,8 @@ function CreateUI(maxPlayers)
 
     -- FIXME : this is not needed anymore.
     if lobbyComm:IsHost() then
-        SetGameOption('RandomMap', 'Off', false, true) --make sure always create lobby with Random Map off
-        SetGameOption('RankedGame', 'Off', false, true) --make sure always create lobby with Ranked Game off
+        SetGameOption('RandomMap', 'Off', true) --make sure always create lobby with Random Map off
+        SetGameOption('RankedGame', 'Off', true) --make sure always create lobby with Ranked Game off
     end
 
     GUI.allowObservers = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/radio')
@@ -3438,7 +3438,7 @@ function CreateUI(maxPlayers)
     Tooltip.AddControlTooltip(GUI.observerLabel, 'lob_describe_observers')
     GUI.allowObservers:SetCheck(false)
     if lobbyComm:IsHost() then
-        SetGameOption("AllowObservers", false, false, true)
+        SetGameOption("AllowObservers", false, true)
         GUI.allowObservers.OnCheck = function(self, checked)
             SetGameOption("AllowObservers", checked)
         end
@@ -3517,15 +3517,15 @@ function CreateUI(maxPlayers)
             Prefs.SetToCurrentProfile('Lobby_Gen_Cap', 8)
             Prefs.SetToCurrentProfile('Lobby_Prebuilt_Units', 1)
             Prefs.SetToCurrentProfile('Lobby_NoRushOption', 1)
-            SetGameOption('Victory', 'demoralization', false, true)
-            SetGameOption('Timeouts', '3', false, true)
-            SetGameOption('CheatsEnabled', 'false', false, true)
-            SetGameOption('CivilianAlliance', 'enemy', false, true)
-            SetGameOption('GameSpeed', 'normal', false, true)
-            SetGameOption('FogOfWar', 'explored', false, true)
-            SetGameOption('UnitCap', '1000', false, true)
-            SetGameOption('PrebuiltUnits', 'Off', false, true)
-            SetGameOption('NoRushOption', 'Off', false, true)
+            SetGameOption('Victory', 'demoralization', true)
+            SetGameOption('Timeouts', '3', true)
+            SetGameOption('CheatsEnabled', 'false', true)
+            SetGameOption('CivilianAlliance', 'enemy', true)
+            SetGameOption('GameSpeed', 'normal', true)
+            SetGameOption('FogOfWar', 'explored', true)
+            SetGameOption('UnitCap', '1000', true)
+            SetGameOption('PrebuiltUnits', 'Off',  true)
+            SetGameOption('NoRushOption', 'Off', true)
             lobbyComm:BroadcastData( { Type = "SetAllPlayerNotReady" } )
             UpdateGame()
         end
@@ -4595,26 +4595,26 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         -- set default lobby values
         for index, option in globalOpts do
             local defValue = Prefs.GetFromCurrentProfile(option.pref) or option.default
-            SetGameOption(option.key,option.values[defValue].key, false, true)
+            SetGameOption(option.key,option.values[defValue].key, true)
         end
 
         for index, option in teamOpts do
             local defValue = Prefs.GetFromCurrentProfile(option.pref) or option.default
-            SetGameOption(option.key,option.values[defValue].key, false, true)
+            SetGameOption(option.key,option.values[defValue].key, true)
         end
 
         for index, option in AIOpts do
             local defValue = Prefs.GetFromCurrentProfile(option.pref) or option.default
-            SetGameOption(option.key,option.values[defValue].key, false, true)
+            SetGameOption(option.key,option.values[defValue].key, true)
         end
 
         if self.desiredScenario and self.desiredScenario ~= "" then
             Prefs.SetToCurrentProfile('LastScenario', self.desiredScenario)
-            SetGameOption('ScenarioFile',self.desiredScenario, false, true)
+            SetGameOption('ScenarioFile',self.desiredScenario, true)
         else
             local scen = Prefs.GetFromCurrentProfile('LastScenario')
             if scen and scen ~= "" then
-                SetGameOption('ScenarioFile',scen, false, true)
+                SetGameOption('ScenarioFile',scen, true)
             end
         end
 
@@ -4759,15 +4759,9 @@ function SetPlayerOption(slot, key, val, ignoreRefresh)
     end
 end
 
-function SetGameOption(key, val, ignoreNilValue, ignoreRefresh)
+function SetGameOption(key, val, ignoreRefresh)
     local scenarioInfo = nil
-    ignoreNilValue = ignoreNilValue or false
     ignoreRefresh = ignoreRefresh or false
-
-    if (not ignoreNilValue) and ((key == nil) or (val == nil)) then
-        WARN('Attempt to set nil lobby game option: ' .. tostring(key) .. ' ' .. tostring(val))
-        return
-    end
 
     if not lobbyComm:IsHost() then
         WARN('Attempt to set game option by a non-host')
@@ -6221,7 +6215,7 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
         RuleTitle_SendMSG()
         --AddChatText('> PRESET > MapPath : '..profiles[Selected_Preset].MapPath)
         if check_Map_Exist(profiles[Selected_Preset].MapPath) == true then
-            SetGameOption('ScenarioFile', profiles[Selected_Preset].MapPath, false, true)
+            SetGameOption('ScenarioFile', profiles[Selected_Preset].MapPath, true)
         else
             AddChatText('MAP NOT EXIST !')
         end
@@ -6238,10 +6232,10 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
                 --AddChatText('> PRESET > UnitsRestricts : '..k..' // '..tostring(profiles[Selected_Preset].UnitsRestricts[k])) -->>> PRESET UnitsRestricts : AIR = true
                 table.insert(urestrict, k)
             end
-            SetGameOption('RestrictedCategories', urestrict, false, true)
+            SetGameOption('RestrictedCategories', urestrict, true)
         else
             -- Clear Restricted
-            SetGameOption('RestrictedCategories', {}, false, true)
+            SetGameOption('RestrictedCategories', {}, true)
         end
 
         --
@@ -6270,9 +6264,9 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
                 --AddChatText('> PRESET > Settings : '..k..' // v : '..tostring(v)) -->>> PRESET Settings : UnitCap = disabled
                 --LOG('> PRESET > Settings : '..k..' // v : '..tostring(v)) -->>> PRESET Settings : UnitCap = disabled
                 if k == "AllowObservers" then
-                    SetGameOption("AllowObservers", v, false, true)
+                    SetGameOption("AllowObservers", v, true)
                 else
-                    SetGameOption(k, v, false, true)
+                    SetGameOption(k, v, true)
                 end
             end
         end
