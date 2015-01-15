@@ -889,22 +889,10 @@ end
 
 function CompareFunc(valA, valB, operatorVar)
     if operatorVar == 'equal' then
-        if valA == valB then
-            return true
-        else
-            return false
-        end
+        return valA == valB
     elseif operatorVar == 'less' then
-        if valA <= valB then
-            return true
-        else
-            return false
-        end
+        return valA <= valB
     elseif operatorVar == 'greater' then
-        if valA >= valB then
-            return true
-        else
-            return false
-        end
+        return valA >= valB
     end
 end
