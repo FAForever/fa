@@ -1768,7 +1768,9 @@ local function UpdateGame()
         local notReady = not playerOptions.Ready
 
         UIUtil.setEnabled(GUI.becomeObserver, notReady)
-        UIUtil.setEnabled(GUI.restrictedUnitsOrPresetsBtn, isHost and notReady)
+        -- This button is enabled for all non-host players to view the configuration, and for the
+        -- host to select presets (rather confusingly, one object represents both potential buttons)
+        UIUtil.setEnabled(GUI.restrictedUnitsOrPresetsBtn, not isHost or notReady)
 
         UIUtil.setEnabled(GUI.LargeMapPreview, notReady)
         Faction_Selector_Set_Enabled(notReady, playerOptions.Faction)
