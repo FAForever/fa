@@ -2745,22 +2745,21 @@ function CreateUI(maxPlayers)
             quickRandMap = false
             local function selectBehavior(selectedScenario, changedOptions, restrictedCategories)
                 if autoRandMap then
-                    Prefs.SetToCurrentProfile('LastScenario', selectedScenario.file)
                     gameInfo.GameOptions['ScenarioFile'] = selectedScenario.file
                 else
-                    Prefs.SetToCurrentProfile('LastScenario', selectedScenario.file)
                     mapSelectDialog:Destroy()
                     GUI.chatEdit:AcquireFocus()
                     for optionKey, data in changedOptions do
-                        Prefs.SetToCurrentProfile(data.pref, data.index)
                         SetGameOption(optionKey, data.value)
                     end
-                    --SendSystemMessage(selectedScenario.file)
 
-                    SetGameOption('ScenarioFile',selectedScenario.file)
+                    -- TODO: Merge with changedOptions so we don't do this work if the map hasn't
+                    -- really changed.
+                    SetGameOption('ScenarioFile', selectedScenario.file)
 
                     SetGameOption('RestrictedCategories', restrictedCategories, true)
-                    ClearBadMapFlags()  -- every new map, clear the flags, and clients will report if a new map is bad
+                    -- every new map, clear the flags, and clients will report if a new map is bad
+                    ClearBadMapFlags()
                     HostUpdateMods()
                     UpdateGame()
                 end
@@ -3478,23 +3477,18 @@ function CreateUI(maxPlayers)
     else
         GUI.randTeam.OnClick = function(self, modifiers)
             if gameInfo.GameOptions['AutoTeams'] == 'none' then
-                Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 2)
                 SetGameOption('AutoTeams', 'tvsb')
                 SendSystemMessage("Auto Teams option set: Top vs Bottom")
             elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
-                Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 3)
                 SetGameOption('AutoTeams', 'lvsr')
                 SendSystemMessage("Auto Teams option set: Left vs Right")
             elseif gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
-                Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 4)
                 SetGameOption('AutoTeams', 'pvsi')
                 SendSystemMessage("Auto Teams option set: Even Slots vs Odd Slots")
             elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' then
-                Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 5)
                 SetGameOption('AutoTeams', 'manual')
                 SendSystemMessage("Auto Teams option set: Manual Select")
             else
-                Prefs.SetToCurrentProfile('Lobby_Auto_Teams', 1)
                 SetGameOption('AutoTeams', 'none')
                 SendSystemMessage("Auto Teams option set: None")
             end
@@ -3510,15 +3504,6 @@ function CreateUI(maxPlayers)
         GUI.rankedOptions:Disable()
     else
         GUI.rankedOptions.OnClick = function()
-            Prefs.SetToCurrentProfile('Lobby_Gen_Victory', 1)
-            Prefs.SetToCurrentProfile('Lobby_Gen_Timeouts', 2)
-            Prefs.SetToCurrentProfile('Lobby_Gen_CheatsEnabled', 1)
-            Prefs.SetToCurrentProfile('Lobby_Gen_Civilians', 1)
-            Prefs.SetToCurrentProfile('Lobby_Gen_GameSpeed', 1)
-            Prefs.SetToCurrentProfile('Lobby_Gen_Fog', 1)
-            Prefs.SetToCurrentProfile('Lobby_Gen_Cap', 8)
-            Prefs.SetToCurrentProfile('Lobby_Prebuilt_Units', 1)
-            Prefs.SetToCurrentProfile('Lobby_NoRushOption', 1)
             SetGameOption('Victory', 'demoralization', true)
             SetGameOption('Timeouts', '3', true)
             SetGameOption('CheatsEnabled', 'false', true)
@@ -3558,14 +3543,11 @@ function CreateUI(maxPlayers)
             quickRandMap = false
             local function selectBehavior(selectedScenario, changedOptions, restrictedCategories)
                 if autoRandMap then
-                    Prefs.SetToCurrentProfile('LastScenario', selectedScenario.file)
                     gameInfo.GameOptions['ScenarioFile'] = selectedScenario.file
                 else
-                    Prefs.SetToCurrentProfile('LastScenario', selectedScenario.file)
                     mapSelectDialog:Destroy()
                     GUI.chatEdit:AcquireFocus()
                     for optionKey, data in changedOptions do
-                        Prefs.SetToCurrentProfile(data.pref, data.index)
                         SetGameOption(optionKey, data.value)
                     end
 
@@ -4594,30 +4576,28 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             gameInfo.PlayerOptions[1].Faction = 4
         end
 
+        -- Given an option key, find the value stored in the profile (if any) and assign either it,
+        -- or that option's default value, to the current game state.
+        local setOptionsFromPref = function(option)
+            local defValue = Prefs.GetFromCurrentProfile("LobbyOpt_" .. option.key) or option.default
+            SetGameOption(option.key, defValue, true)
+        end
+
         -- set default lobby values
         for index, option in globalOpts do
-            local defValue = Prefs.GetFromCurrentProfile(option.pref) or option.default
-            SetGameOption(option.key,option.values[defValue].key, true)
+            setOptionsFromPref(option)
         end
 
         for index, option in teamOpts do
-            local defValue = Prefs.GetFromCurrentProfile(option.pref) or option.default
-            SetGameOption(option.key,option.values[defValue].key, true)
+            setOptionsFromPref(option)
         end
 
         for index, option in AIOpts do
-            local defValue = Prefs.GetFromCurrentProfile(option.pref) or option.default
-            SetGameOption(option.key,option.values[defValue].key, true)
+            setOptionsFromPref(option)
         end
 
         if self.desiredScenario and self.desiredScenario ~= "" then
-            Prefs.SetToCurrentProfile('LastScenario', self.desiredScenario)
             SetGameOption('ScenarioFile',self.desiredScenario, true)
-        else
-            local scen = Prefs.GetFromCurrentProfile('LastScenario')
-            if scen and scen ~= "" then
-                SetGameOption('ScenarioFile',scen, true)
-            end
         end
 
         UpdateGame()
@@ -4770,6 +4750,7 @@ function SetGameOption(key, val, ignoreRefresh)
         return
     end
 
+    Prefs.SetToCurrentProfile('LobbyOpt_' .. key, val)
     gameInfo.GameOptions[key] = val
 
     lobbyComm:BroadcastData {
@@ -6193,8 +6174,6 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
         else
             AddChatText('MAP NOT EXIST !')
         end
-        --gameInfo.GameOptions['ScenarioFile'] = profiles[Selected_Preset].MapPath
-        --Prefs.SetToCurrentProfile('LastScenario', profiles[Selected_Preset].MapPath)
 
         --
 
