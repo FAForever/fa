@@ -2568,7 +2568,6 @@ function CreateSlotsUI(makeLabel)
         --TODO these need layout from art when available
         newSlot.Width:Set(GUI.labelGroup.Width)
         newSlot.Height:Set(GUI.labelGroup.Height)
-        newSlot._slot = i
 
         -- Default mouse behaviours for the slot.
         local defaultHandler = function(self, event)
@@ -2647,11 +2646,10 @@ function CreateSlotsUI(makeLabel)
         LayoutHelpers.AtVerticalCenterIn(nameLabel, newSlot, 8)
         LayoutHelpers.AtLeftIn(nameLabel, GUI.panel, slotColumnSizes.player.x)
         nameLabel.Width:Set(slotColumnSizes.player.width)
-        nameLabel.row = i
         -- left deal with name clicks
         nameLabel.OnEvent = defaultHandler
         nameLabel.OnClick = function(self, index, text)
-            DoSlotBehavior(self.row, self.slotKeys[index], text)
+            DoSlotBehavior(curRow, self.slotKeys[index], text)
         end
 
         -- Color
@@ -2661,27 +2659,25 @@ function CreateSlotsUI(makeLabel)
         LayoutHelpers.AtLeftIn(colorSelector, GUI.panel, slotColumnSizes.color.x)
         LayoutHelpers.AtVerticalCenterIn(colorSelector, newSlot, 8)
         colorSelector.Width:Set(slotColumnSizes.color.width)
-        colorSelector.row = i
         colorSelector.OnClick = function(self, index)
             if not lobbyComm:IsHost() then
-                lobbyComm:SendData(hostID, { Type = 'RequestColor', Color = index, Slot = self.row } )
-                gameInfo.PlayerOptions[self.row].PlayerColor = index
-                gameInfo.PlayerOptions[self.row].ArmyColor = index
+                lobbyComm:SendData(hostID, { Type = 'RequestColor', Color = index, Slot = curRow } )
+                gameInfo.PlayerOptions[curRow].PlayerColor = index
+                gameInfo.PlayerOptions[curRow].ArmyColor = index
                 UpdateGame()
             else
                 if IsColorFree(index) then
-                    lobbyComm:BroadcastData( { Type = 'SetColor', Color = index, Slot = self.row } )
-                    gameInfo.PlayerOptions[self.row].PlayerColor = index
-                    gameInfo.PlayerOptions[self.row].ArmyColor = index
+                    lobbyComm:BroadcastData( { Type = 'SetColor', Color = index, Slot = curRow } )
+                    gameInfo.PlayerOptions[curRow].PlayerColor = index
+                    gameInfo.PlayerOptions[curRow].ArmyColor = index
                     UpdateGame()
                 else
-                    self:SetItem( gameInfo.PlayerOptions[self.row].PlayerColor )
+                    self:SetItem( gameInfo.PlayerOptions[curRow].PlayerColor )
                 end
             end
         end
         colorSelector.OnEvent = defaultHandler
         Tooltip.AddControlTooltip(colorSelector, 'lob_color')
-        colorSelector.row = i
 
         --// Faction
         local factionSelector = BitmapCombo(bg, factionBmps, table.getn(factionBmps), nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
@@ -2690,15 +2686,15 @@ function CreateSlotsUI(makeLabel)
         LayoutHelpers.AtVerticalCenterIn(factionSelector, newSlot, 8)
         factionSelector.Width:Set(slotColumnSizes.faction.width)
         factionSelector.OnClick = function(self, index)
-            SetPlayerOption(self.row,'Faction',index)
+            SetPlayerOption(curRow, 'Faction', index)
             if curRow == FindSlotForID(FindIDForName(localPlayerName)) then
                 SetCurrentFactionTo_Faction_Selector()
             end
+
             Tooltip.DestroyMouseoverDisplay()
         end
         Tooltip.AddControlTooltip(factionSelector, 'lob_faction')
         Tooltip.AddComboTooltip(factionSelector, factionTooltips)
-        factionSelector.row = i
         factionSelector.OnEvent = defaultHandler
         if not hasSupcom then
             factionSelector:SetItem(4)
@@ -2710,10 +2706,9 @@ function CreateSlotsUI(makeLabel)
         LayoutHelpers.AtLeftIn(teamSelector, GUI.panel, slotColumnSizes.team.x)
         LayoutHelpers.AtVerticalCenterIn(teamSelector, newSlot, 8)
         teamSelector.Width:Set(slotColumnSizes.team.width)
-        teamSelector.row = i
         teamSelector.OnClick = function(self, index, text)
             Tooltip.DestroyMouseoverDisplay()
-            SetPlayerOption(self.row,'Team',index)
+            SetPlayerOption(curRow, 'Team', index)
         end
         Tooltip.AddControlTooltip(teamSelector, 'lob_team')
         Tooltip.AddComboTooltip(teamSelector, teamTooltips)
@@ -2746,17 +2741,16 @@ function CreateSlotsUI(makeLabel)
         -- Ready Checkbox
         local readyBox = UIUtil.CreateCheckboxStd(newSlot.multiSpace, '/CHECKBOX/radio')
         newSlot.ready = readyBox
-        readyBox.row = i
         LayoutHelpers.AtVerticalCenterIn(readyBox, newSlot.multiSpace, 8)
         LayoutHelpers.AtLeftIn(readyBox, newSlot.multiSpace, 0)
         readyBox.OnCheck = function(self, checked)
             UIUtil.setEnabled(GUI.becomeObserver, not checked)
             if checked then
-                DisableSlot(self.row, true)
+                DisableSlot(curRow, true)
             else
-                EnableSlot(self.row)
+                EnableSlot(curRow)
             end
-            SetPlayerOption(self.row,'Ready',checked)
+            SetPlayerOption(curRow,'Ready',checked)
         end
 
         if singlePlayer then
@@ -2765,7 +2759,6 @@ function CreateSlotsUI(makeLabel)
             pingGroup:Hide()
             pingStatus:Hide()
         end
-
 
         if i == 1 then
             LayoutHelpers.Below(newSlot, GUI.labelGroup, -5)
