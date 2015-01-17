@@ -3018,7 +3018,7 @@ function CreateUI(maxPlayers)
     -- set up map panel
     ---------------------------------------------------------------------------
     GUI.mapView = ResourceMapPreview(GUI.mapPanel, 198, 3, 5)
-    LayoutHelpers.AtLeftTopIn(GUI.mapView, GUI.mapPanel, 5, 6)
+    LayoutHelpers.AtLeftTopIn(GUI.mapView, GUI.mapPanel, 5, 5)
 
     GUI.LargeMapPreview = UIUtil.CreateButtonWithDropshadow(GUI.mapPanel, '/BUTTON/zoom/', "")
     LayoutHelpers.AtRightIn(GUI.LargeMapPreview, GUI.mapPanel, -3)
