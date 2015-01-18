@@ -61,32 +61,8 @@ local teamIcons = {
     '/lobby/team_icons/team_6_icon.dds',
 }
 
-DebugEnabled = Prefs.GetFromCurrentProfile('LobbyDebug') or ''
 local HideDefaultOptions = Prefs.GetFromCurrentProfile('LobbyHideDefaultOptions') == 'true'
-function LOGX(text, ttype)
-	-- onlyChat = for debug only in the Chat
-	-- onlyLOG = for debug only in the LOG
-	-- CLEAR = for disable the debug
-	-- Country, RuleTitle, Background
-	-- Disconnected, Connecting, UpdateGame
-	local text = tostring(text)
-	local onlyLOG = string.find(DebugEnabled, 'onlyLOG') or nil
-	local onlyChat = string.find(DebugEnabled, 'onlyChat') or nil
-	if ttype == nil then
-		LOG(text)
-	else
-		if string.find(DebugEnabled, ttype) and ttype ~= nil then
-			if onlyLOG ~= nil then
-				LOG(text)
-			elseif onlyChat ~= nil then
-				AddChatText(text)
-			else
-				LOG(text)
-				AddChatText(text)
-			end
-		end
-	end
-end
+
 -- Table of Tooltip Country
 local PrefLanguageTooltipTitle={}
 local PrefLanguageTooltipText={}
@@ -200,19 +176,6 @@ local function ParseWhisper(params)
     end
 end
 
-local function LOGXWhisper(params)
-	-- Exemple : Country Background useChat'
-	if string.find(params, 'CLEAR') then
-		DebugEnabled = ''
-		Prefs.SetToCurrentProfile('LobbyDebug', '')
-		AddChatText('Debug disabled')
-	else
-        DebugEnabled = params
-		Prefs.SetToCurrentProfile('LobbyDebug', params)
-		AddChatText('Debug actived : '..params)
-	end
-end
-
 local commands = {
     {
         key = 'pm',
@@ -229,11 +192,7 @@ local commands = {
     {
         key = 'whisper',
         action = ParseWhisper,
-    },
-	{
-        key = 'debug',
-        action = LOGXWhisper,
-    },
+    }
 }
 
 local Strings = LobbyComm.Strings
@@ -603,22 +562,19 @@ end
 function ConnectToPeer(addressAndPort,name,uid)
     if not string.find(addressAndPort, '127.0.0.1') then
         LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..")")
-		LOGX('>> ConnectToPeer > name='..tostring(name), 'Connecting')
     else
         DisconnectFromPeer(uid)
         LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..", USE PROXY)")
-		LOGX('>> ConnectToPeer > name='..tostring(name)..' (with PROXY)', 'Connecting')
         table.insert(ConnectedWithProxy, uid)
     end
     lobbyComm:ConnectToPeer(addressAndPort,name,uid)
 end
 
 function DisconnectFromPeer(uid)
-    LOG("DisconnectFromPeer (uid=" .. uid ..")")
+    LOG("DisconnectFromPeer (uid=" .. uid .. ", " .. "name=" .. tostring(FindNameForID(uid)) .. ")")
     if wasConnected(uid) then
         table.remove(connectedTo, uid)
     end
-	LOGX('>> DisconnectFromPeer > name='..tostring(FindNameForID(uid)), 'Disconnected')
     GpgNetSend('Disconnected', string.format("%d", uid))
     lobbyComm:DisconnectFromPeer(uid)
 end
@@ -1730,7 +1686,7 @@ local function refreshObserverList()
 end
 
 local function UpdateGame()
-    LOGX('>> UpdateGame', 'UpdateGame')
+    LOG('>> UpdateGame', 'UpdateGame')
     local scenarioInfo = nil
 
     if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
@@ -2086,7 +2042,7 @@ end
 
 -- slot less than 1 means try to find a slot
 function HostTryAddPlayer(senderID, slot, requestedPlayerName, human, aiPersonality, requestedColor, requestedFaction, requestedTeam, requestedPL, requestedRC, requestedNG, requestedMEAN, requestedDEV, requestedCOUNTRY)
-    LOGX('>> HostTryAddPlayer > requestedPlayerName='..tostring(requestedPlayerName), 'Connecting')
+    LOG('>> HostTryAddPlayer > requestedPlayerName='..tostring(requestedPlayerName), 'Connecting')
     --// RULE TITLE
     if not singlePlayer then
         RuleTitle_SendMSG()
@@ -2238,7 +2194,7 @@ function HostTryAddObserver( senderID, requestedObserverName, RequestedPL, Reque
         index = index + 1
     end
 
-    LOGX('>> HostTryAddObserver > requestedObserverName='..tostring(requestedObserverName), 'Connecting')
+    LOG('>> HostTryAddObserver > requestedObserverName='..tostring(requestedObserverName), 'Connecting')
 	local observerName = lobbyComm:MakeValidPlayerName(senderID,requestedObserverName)
     gameInfo.Observers[index] = {
         PlayerName = observerName,
@@ -4276,7 +4232,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         if wantToBeObserver then
             -- Ok, I'm connected to the host. Now request to become an observer
             lobbyComm:SendData( hostID, { Type = 'AddObserver', RequestedObserverName = localPlayerName, RequestedPL = playerRating, RequestedColor = Prefs.GetFromCurrentProfile('LastColor'), RequestedFaction = requestedFaction, RequestedCOUNTRY = PrefLanguage, } )
-			LOGX('>> ConnectionToHostEstablished//SendData//playerRating='..tostring(playerRating), 'Connecting')
+			LOG('>> ConnectionToHostEstablished//SendData//playerRating='..tostring(playerRating), 'Connecting')
         else
             -- Ok, I'm connected to the host. Now request to become a player
             local requestedFaction = Prefs.GetFromCurrentProfile('LastFaction')
@@ -4350,21 +4306,16 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             AddChatText("["..data.SenderName.."] "..data.Text)
         elseif data.Type == 'PrivateChat' then
             AddChatText("<<"..data.SenderName..">> "..data.Text)
-            --// RULE TITLE
         elseif data.Type == 'Rule_Title_MSG' then
-			LOGX('>> RECEIVE MSG Rule_Title_MSG : result='..data.Result1..' result2='..data.Result2, 'RuleTitle')
+			LOG('>> RECEIVE MSG Rule_Title_MSG : result='..data.Result1..' result2='..data.Result2, 'RuleTitle')
             RuleTitle_SetText(data.Result1 or "", data.Result2 or "")
-            --\\ Stop RULE TITLE
-            -- CPU benchmark code
         elseif data.Type == 'CPUBenchmark' then
-            --LOG("CPU Data: "..(data.PlayerName or "?")..", ".. (data.Result or "?"))
             CPU_Benchmarks[data.PlayerName] = data.Result
             local playerId = FindIDForName(data.PlayerName)
             local playerSlot = FindSlotForID(playerId)
             if playerSlot ~= nil then
                 SetSlotCPUBar(playerSlot, gameInfo.PlayerOptions[playerSlot])
             end
-            -- End CPU benchmark code
         elseif data.Type == 'SetPlayerNotReady' then
             EnableSlot(data.Slot)
             GUI.becomeObserver:Enable()
@@ -4431,7 +4382,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 GUI.becomeObserver:Enable()
                 SetPlayerOption(FindSlotForID(FindIDForName(localPlayerName)), 'Ready', false)
             elseif data.Type == 'Peer_Really_Disconnected' then
-				LOGX('>> DATA RECEIVE : Peer_Really_Disconnected (slot:'..data.Slot..')', 'Disconnected')
+				LOG('>> DATA RECEIVE : Peer_Really_Disconnected (slot:'..data.Slot..')', 'Disconnected')
                 if data.Options.OwnerID == localPlayerID then
                     lobbyComm:SendData( hostID, {Type = "GetGameInfo"} )
                 else
@@ -4661,7 +4612,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     end
 
     lobbyComm.PeerDisconnected = function(self,peerName,peerID) -- Lost connection or try connect with proxy
-		LOGX('>> PeerDisconnected : peerName='..peerName..' peerID='..peerID, 'Disconnected')
+		LOG('>> PeerDisconnected : peerName='..peerName..' peerID='..peerID, 'Disconnected')
         
          -- Search and Remove the peer disconnected
         for k, v in CurrentConnection do
@@ -5559,7 +5510,6 @@ function ChangeBackgroundLobby(faction)
     local LobbyBackground = Prefs.GetFromCurrentProfile('LobbyBackground') or 1
     if GUI.background and GUI.background2 then
         if LobbyBackground == 1 then -- Factions
-			LOGX('>> Background FACTION', 'Background')
             GUI.background:Show()
             GUI.background2:Hide()
             faction = faction or Prefs.GetFromCurrentProfile('LastFaction') or 0
@@ -5571,19 +5521,16 @@ function ChangeBackgroundLobby(faction)
             end
 
         elseif LobbyBackground == 2 then -- Concept art
-			LOGX('>> Background ART', 'Background')
             GUI.background:Show()
             GUI.background2:Hide()
             GUI.background:SetTexture("/textures/ui/common/BACKGROUND/art/art-background-paint0"..math.random(1, 5).."_bmp.dds")
 
         elseif LobbyBackground == 3 then -- Screenshot
-			LOGX('>> Background SCREENSHOT', 'Background')
             GUI.background:Show()
             GUI.background2:Hide()
             GUI.background:SetTexture("/textures/ui/common/BACKGROUND/scrn/scrn-background-paint"..math.random(1, 14).."_bmp.dds")
 
         elseif LobbyBackground == 4 then -- Map
-            LOGX('>> Background MAP', 'Background')
             GUI.background:Hide()
             GUI.background2:Show()
             local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
@@ -5601,13 +5548,11 @@ function ChangeBackgroundLobby(faction)
             end
 
         elseif LobbyBackground == 5 then -- None
-            LOGX('>> Background NOTHING', 'Background')
             GUI.background:Hide()
             GUI.background2:Hide()
             GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/background-paint_black_bmp.dds"))
 
         elseif LobbyBackground == 6 then -- Extra
-			LOGX('>> Background EXTRA', 'Background')
             GUI.background:Show()
             GUI.background2:Hide()
             faction = faction or Prefs.GetFromCurrentProfile('LastFaction') or 1
