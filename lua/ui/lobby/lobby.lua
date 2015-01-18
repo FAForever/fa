@@ -53,7 +53,7 @@ local formattedOptions = {}
 local nonDefaultFormattedOptions = {}
 local Warning_MAP = false
 
-local coopGame = nil
+local coopGame
 
 local teamIcons = {
     '/lobby/team_icons/team_no_icon.dds',
@@ -1105,6 +1105,14 @@ function autobalance_quality(players)
     return quality
 end
 
+local function GetArmyTable(scenarioInfo)
+    if coopGame then
+        return {"Player", "Coop1", "Coop2", "Coop3"}
+    else 
+        return MapUtil.GetArmies(scenarioInfo)
+    end
+end
+
 local function AssignRandomStartSpots(gameInfo)
     function teamsAddSpot(teams, team, spot)
         if(not teams[team]) then
@@ -1120,13 +1128,7 @@ local function AssignRandomStartSpots(gameInfo)
             scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
         end
         if scenarioInfo then
-            local armyTable = nil
-            if coopGame == true then
-                armyTable = {"Player", "Coop1", "Coop2", "Coop3"}
-            else
-                armyTable = MapUtil.GetArmies(scenarioInfo)
-            end
-            
+            local armyTable = GetArmyTable(scenarioInfo)
             if armyTable then
                 if gameInfo.GameOptions['RandomMap'] == 'Off' then
                     numAvailStartSpots = table.getn(armyTable)
@@ -1442,14 +1444,6 @@ function UpdateAvailableSlots( numAvailStartSpots )
     end
 end
 
-function IsCoopGame(type)
-    if type == "campaign_coop" then
-        return true
-    else
-        return false
-    end
-end
-
 local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObserversCheck)
     if not singlePlayer then
         local notReady = GetPlayersNotReady()
@@ -1464,7 +1458,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
     scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile) 
     
     -- Check if this is to be a Coop game
-    coopGame = IsCoopGame(scenarioInfo.type)
+    coopGame = scenarioInfo.type == "campaign_coop"
     
     -- make sure there are some players (could all be observers?)
     -- Also count teams. There needs to be at least 2 teams (or all FFA) represented
@@ -1491,10 +1485,10 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
     
     if gameInfo.GameOptions['Victory'] ~= 'sandbox' then
         local valid = true
-        if totalPlayers == 1 and coopGame == false then
+        if totalPlayers == 1 and not coopGame then
             valid = false
         end
-        if not allFFA and not moreThanOneTeam and coopGame == false then
+        if not allFFA and not moreThanOneTeam and not coopGame then
             valid = false
         end
         if not valid then
@@ -1509,12 +1503,10 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         return
     end
 
-
     if totalHumanPlayers == 0 and table.empty(gameInfo.Observers) then
         AddChatText(LOC("<LOC lobui_0239>There must be at least one non-ai player or one observer, can not continue"))
         return
     end
-
 
     if not EveryoneHasEstablishedConnections() then
         return
@@ -1639,7 +1631,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         lobbyComm:BroadcastData( { Type = 'Launch', GameInfo = gameInfo } )
 
         -- Set up campaign
-        if coopGame == true then
+        if coopGame then
             gameInfo.GameOptions['Difficulty'] = 3
             
             scenarioArmies = {}
@@ -1795,12 +1787,7 @@ local function UpdateGame()
 
     local numAvailStartSpots = LobbyComm.maxPlayerSlots
     if scenarioInfo then
-        local armyTable = nil
-        if coopGame == true then
-            armyTable = {"Player", "Coop1", "Coop2", "Coop3"}
-        else    
-            armyTable = MapUtil.GetArmies(scenarioInfo)
-        end
+        local armyTable = GetArmyTable(scenarioInfo)
         if armyTable then
             numAvailStartSpots = table.getn(armyTable)
         end
@@ -4037,12 +4024,7 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
     local mWidth = scenario.size[1]
     local mHeight = scenario.size[2]
 
-    local playerArmyArray = nil
-    if coopGame == true then
-        playerArmyArray = {"Player", "Coop1", "Coop2", "Coop3"}
-    else
-        playerArmyArray = MapUtil.GetArmies(scenario)
-    end
+    local playerArmyArray = GetArmyTable(scenarioInfo)
 
     for inSlot, army in playerArmyArray do
         local pos = startPos[army]
