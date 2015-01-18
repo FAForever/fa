@@ -506,7 +506,7 @@ Shield = Class(moho.shield_methods,Entity) {
     },
 
     ProtectTransportedUnits = function(self)
-        if EntityCategoryContains(categories.TRANSPORTATION, self.Owner) then
+        if EntityCategoryContains(categories.TRANSPORTATION, self.Owner) and self.Owner:IsDead() != true then
             self.Owner:SetCanTakeDamage(false)        
             local Cargo = self.Owner:GetCargo()
             for _, v in Cargo do
@@ -517,7 +517,7 @@ Shield = Class(moho.shield_methods,Entity) {
     end,
     
     RevokeTransportProtection = function(self)
-        if EntityCategoryContains(categories.TRANSPORTATION, self.Owner) then    
+        if EntityCategoryContains(categories.TRANSPORTATION, self.Owner) and self.Owner:IsDead() != true then
             self.Owner:SetCanTakeDamage(true)        
             local Cargo = self.Owner:GetCargo()
             for _, v in Cargo do
