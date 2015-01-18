@@ -33,7 +33,7 @@ function LoadScenario(scenName)
         return nil
     end
 
-    # Backward compatibility
+    -- Backward compatibility
     if env.version == 1 then
         local temp = env
         env = {

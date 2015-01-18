@@ -1,49 +1,49 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/SimObjectives.lua
-#**
-#**  Summary  : Sim side objectives
-#**
-#**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
-##
-## SUPPORTED OBJECTIVE TYPES:
-##      Kill
-##      Capture
-##      KillOrCapture
-##      Reclaim
-##      Locate
-##      SpecificUnitsInArea
-##      CategoriesInArea
-##      ArmyStatCompare
-##      UnitStatCompare
-##      CategoryStatCompare
-##      Protect
-##      Timer
-##      Unknown
-##
-##      Camera
+--****************************************************************************
+--**
+--**  File     :  /lua/SimObjectives.lua
+--**
+--**  Summary  : Sim side objectives
+--**
+--**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
+----
+---- SUPPORTED OBJECTIVE TYPES:
+----      Kill
+----      Capture
+----      KillOrCapture
+----      Reclaim
+----      Locate
+----      SpecificUnitsInArea
+----      CategoriesInArea
+----      ArmyStatCompare
+----      UnitStatCompare
+----      CategoryStatCompare
+----      Protect
+----      Timer
+----      Unknown
+----
+----      Camera
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local Triggers = import('/lua/scenariotriggers.lua')
 local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
-local objNum = 0 # Used to create unique tags for objectives
+local objNum = 0 -- Used to create unique tags for objectives
 local DecalLOD = 4000
 
 local objectiveDecal = '/env/utility/decals/objective_debug_albedo.dds'
 local SavedList = {}
 
-#
-# Camera objective by roates
-# Creates markers that satisfy the objective when they are all inside of the camera viewport
-#
-# Camera( objectiveType, completeState, title, description, positionTable)
-#
-# objectiveType = 'primary' or 'bonus' etc...
-# completeState = 'complete' or 'incomplete'
-# title = title string table from map's string file
-# description = description string table from map's string file
-# positionTable = table of position tables where markers will be created. { {x1, y1, z1}, {x2, y2, z2} } format
-#
+--
+-- Camera objective by roates
+-- Creates markers that satisfy the objective when they are all inside of the camera viewport
+--
+-- Camera( objectiveType, completeState, title, description, positionTable)
+--
+-- objectiveType = 'primary' or 'bonus' etc...
+-- completeState = 'complete' or 'incomplete'
+-- title = title string table from map's string file
+-- description = description string table from map's string file
+-- positionTable = table of position tables where markers will be created. { {x1, y1, z1}, {x2, y2, z2} } format
+--
 function Camera(objectiveType, completeState, title, description, positionTable)
     local numMarkers = 0
     local curMarkers = 0
@@ -79,32 +79,32 @@ function Camera(objectiveType, completeState, title, description, positionTable)
 end
 
 
-#
-# ControlGroup
-#   Complete when specified units matching the target blueprint types are in
-# a control group. We don't care exactly which units they are (pre-built or
-# newly constructed), as long as the requirements are ment. We just check
-# the area for what units are in control groups and look at the blueprints (and optionally
-# match the army, use -1 for don't care).
-#
-# Target = {
-#   Requirements = {
-#       {  Category=<cat1>, CompareOp=<op>, Value=<x>, [ArmyIndex=<index>]},
-#       {  Category=<cat2>, CompareOp=<op>, Value=<y>, [ArmyIndex=<index>] },
-#       ...
-#       {  Category=<cat3>, CompareOp=<op>, Value=<z>, [ArmyIndex=<index>] },
-#   }
-# }
-#
-# -- op is one of: '<=', '>=', '<', '>', or '=='
-#
+--
+-- ControlGroup
+--   Complete when specified units matching the target blueprint types are in
+-- a control group. We don't care exactly which units they are (pre-built or
+-- newly constructed), as long as the requirements are ment. We just check
+-- the area for what units are in control groups and look at the blueprints (and optionally
+-- match the army, use -1 for don't care).
+--
+-- Target = {
+--   Requirements = {
+--       {  Category=<cat1>, CompareOp=<op>, Value=<x>, [ArmyIndex=<index>]},
+--       {  Category=<cat2>, CompareOp=<op>, Value=<y>, [ArmyIndex=<index>] },
+--       ...
+--       {  Category=<cat3>, CompareOp=<op>, Value=<z>, [ArmyIndex=<index>] },
+--   }
+-- }
+--
+-- -- op is one of: '<=', '>=', '<', '>', or '=='
+--
 function ControlGroup(Type,Complete,Title,Description,Target)
 
     local image = GetActionIcon('group')
     local objective = AddObjective(Type, Complete, Title, Description, image, Target)
     local lastReqsMet = -1
 
-    # call ManualResult
+    -- call ManualResult
     objective.ManualResult = function(self, result)
         self.Active = false
         self:OnResult(result)
@@ -139,7 +139,7 @@ function ControlGroup(Type,Complete,Title,Description,Target)
                             end
                         end
                     end
-                    #LOG('debug: ControlGroup: reqsmet '..reqsMet..'count '.. cnt )
+                    --LOG('debug: ControlGroup: reqsmet '..reqsMet..'count '.. cnt )
                 end
                 if not requirement.CompareFunc then
                     requirement.CompareFunc = GetCompareFunc(requirement.CompareOp)
@@ -175,14 +175,14 @@ end
 
 
 
-#
-# CreateGroup
-#
-#   Takes list of objective tables which are produced by the objective creation
-# functions such as Kill, Protect, Capture, etc.
-#
-#   UserCallback is executed when all objectives in the list are complete
-#
+--
+-- CreateGroup
+--
+--   Takes list of objective tables which are produced by the objective creation
+-- functions such as Kill, Protect, Capture, etc.
+--
+--   UserCallback is executed when all objectives in the list are complete
+--
 function CreateGroup( name, userCallback, numRequired )
     LOG('Creating objective group ',name)
     local objectiveGroup =  {
@@ -191,8 +191,8 @@ function CreateGroup( name, userCallback, numRequired )
         Objectives = {},
         NumRequired = numRequired,
         NumCompleted = 0,
-        AddObjective = function(self,objective) end, # defined later
-        RemoveObjective = function(self,objective) end, # defined later
+        AddObjective = function(self,objective) end, -- defined later
+        RemoveObjective = function(self,objective) end, -- defined later
         OnComplete = userCallback,
     }
 
@@ -221,7 +221,7 @@ function CreateGroup( name, userCallback, numRequired )
             end
         end
 
-        # Complete!
+        -- Complete!
         objectiveGroup.Active = false
         objectiveGroup.OnComplete()
     end
@@ -238,9 +238,9 @@ function CreateGroup( name, userCallback, numRequired )
     return objectiveGroup
 end
 
-#
-# Kill
-#   Kill units
+--
+-- Kill
+--   Kill units
 function Kill(Type,Complete,Title,Description,Target)
     Target.killed = 0
     Target.total = table.getn(Target.Units)
@@ -248,7 +248,7 @@ function Kill(Type,Complete,Title,Description,Target)
     local image = GetActionIcon('kill')
     local objective = AddObjective(Type,Complete,Title,Description,image,Target)
 
-    # call ManualResult
+    -- call ManualResult
     objective.ManualResult = function(self, result)
         objective.Active = false
         objective:OnResult(result)
@@ -277,7 +277,7 @@ function Kill(Type,Complete,Title,Description,Target)
 
     for k,unit in Target.Units do
         if not unit:IsDead() then
-            # Mark the units unless MarkUnits == false
+            -- Mark the units unless MarkUnits == false
             if ( Target.MarkUnits == nil ) or Target.MarkUnits then
                 local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
                 local arrow = ObjectiveArrow { AttachTo = unit }
@@ -286,7 +286,7 @@ function Kill(Type,Complete,Title,Description,Target)
                 FlashViz( unit )
             end
             Triggers.CreateUnitDeathTrigger(OnUnitKilled, unit)
-            Triggers.CreateUnitReclaimedTrigger(OnUnitKilled, unit) #same as killing for our purposes
+            Triggers.CreateUnitReclaimedTrigger(OnUnitKilled, unit) --same as killing for our purposes
         else
             OnUnitKilled(unit)
         end
@@ -298,15 +298,15 @@ function Kill(Type,Complete,Title,Description,Target)
     return objective
 end
 
-#
-# Capture
-#   Capture units
-#
-# Target = {
-#       Units = <units>,
-#       NumRequired = <x>,
-# }
-#
+--
+-- Capture
+--   Capture units
+--
+-- Target = {
+--       Units = <units>,
+--       NumRequired = <x>,
+-- }
+--
 function Capture(Type,Complete,Title,Description,Target)
     Target.captured = 0
     Target.total = table.getn(Target.Units)
@@ -359,7 +359,7 @@ function Capture(Type,Complete,Title,Description,Target)
 
     for k,unit in Target.Units do
         if not unit:IsDead() then
-            # Mark the units unless MarkUnits == false
+            -- Mark the units unless MarkUnits == false
             if ( Target.MarkUnits == nil ) or Target.MarkUnits then
                 local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
                 local arrow = ObjectiveArrow { AttachTo = unit }
@@ -367,13 +367,13 @@ function Capture(Type,Complete,Title,Description,Target)
 
             Triggers.CreateUnitCapturedTrigger(nil,OnUnitCaptured,unit)
             Triggers.CreateUnitDeathTrigger(OnUnitKilled, unit)
-            Triggers.CreateUnitReclaimedTrigger(OnUnitKilled, unit) #same functionality as killed
+            Triggers.CreateUnitReclaimedTrigger(OnUnitKilled, unit) --same functionality as killed
 
             if Target.FlashVisible then
                 FlashViz( unit )
             end
         else
-            #treat as killed Matt 8.30.06
+            --treat as killed Matt 8.30.06
             OnUnitKilled(unit)
         end
     end
@@ -384,9 +384,9 @@ function Capture(Type,Complete,Title,Description,Target)
     return objective
 end
 
-#
-# Kill or Capture
-#   Kill or Capture units
+--
+-- Kill or Capture
+--   Kill or Capture units
 function KillOrCapture(Type,Complete,Title,Description,Target)
     Target.killed_or_captured = 0
     Target.total = table.getn(Target.Units)
@@ -406,13 +406,13 @@ function KillOrCapture(Type,Complete,Title,Description,Target)
         UpdateObjective( Title, 'complete', resultStr, self.Tag )
     end
 
-    # keep track of captured units so subsequent kills don't get counted
+    -- keep track of captured units so subsequent kills don't get counted
     local captured = {}
 
     local function OnUnitKilled(unit)
         for k,v in captured do
             if v == unit then
-                # ignore units already captured
+                -- ignore units already captured
                 return
             end
         end
@@ -461,7 +461,7 @@ function KillOrCapture(Type,Complete,Title,Description,Target)
 
     for k,unit in Target.Units do
         if not unit:IsDead() then
-            # Mark the units unless MarkUnits == false
+            -- Mark the units unless MarkUnits == false
             if ( Target.MarkUnits == nil ) or Target.MarkUnits then
                 local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
                 local arrow = ObjectiveArrow { AttachTo = unit }
@@ -471,8 +471,8 @@ function KillOrCapture(Type,Complete,Title,Description,Target)
                 FlashViz( unit )
             end
 
-            # note: you won't get an OnKilled after an OnCaptured because once
-            # captured it's actually a new unit with no callback.
+            -- note: you won't get an OnKilled after an OnCaptured because once
+            -- captured it's actually a new unit with no callback.
             Triggers.CreateUnitCapturedTrigger(nil,OnUnitCaptured,unit)
             Triggers.CreateUnitDeathTrigger(OnUnitKilled, unit)
             Triggers.CreateUnitReclaimedTrigger(OnUnitReclaimed, unit)
@@ -487,9 +487,9 @@ function KillOrCapture(Type,Complete,Title,Description,Target)
     return objective
 end
 
-#
-# Reclaim
-#   Reclaim units
+--
+-- Reclaim
+--   Reclaim units
 function Reclaim(Type,Complete,Title,Description,Target)
     Target.reclaimed = 0
     Target.total = table.getn(Target.Units)
@@ -497,7 +497,7 @@ function Reclaim(Type,Complete,Title,Description,Target)
     local image = GetActionIcon("reclaim")
     local objective = AddObjective(Type,Complete,Title,Description,image,Target)
 
-    # call ManualResult
+    -- call ManualResult
     objective.ManualResult = function(self, result)
         self.Active = false
         self:OnResult(result)
@@ -532,8 +532,8 @@ function Reclaim(Type,Complete,Title,Description,Target)
         UpdateObjective( Title, 'complete', 'failed', objective.Tag )
     end
 
-    # If the unit is captured it can still be reclaimed to complete the
-    # objective, so track the new unit created on a capture.
+    -- If the unit is captured it can still be reclaimed to complete the
+    -- objective, so track the new unit created on a capture.
     local function OnUnitCaptured(newUnit,captor)
         Triggers.CreateUnitCapturedTrigger(nil,OnUnitCaptured,newUnit)
         Triggers.CreateUnitDeathTrigger(OnUnitKilled, newUnit)
@@ -556,9 +556,9 @@ function Reclaim(Type,Complete,Title,Description,Target)
     return objective
 end
 
-#
-# Locate
-#   Locate units
+--
+-- Locate
+--   Locate units
 function Locate(Type,Complete,Title,Description,Target)
     Target.located = 0
     Target.total = table.getn(Target.Units)
@@ -596,11 +596,11 @@ function Locate(Type,Complete,Title,Description,Target)
     return objective
 end
 
-#
-# SpecificUnitsInArea
-#   Complete when specified units are in the target area. We don't care how
-# they got there (cheat teleport, etc), we just check if they're in there
-# ShowProgress, optional:
+--
+-- SpecificUnitsInArea
+--   Complete when specified units are in the target area. We don't care how
+-- they got there (cheat teleport, etc), we just check if they're in there
+-- ShowProgress, optional:
 function SpecificUnitsInArea(Type,Complete,Title,Description,Target)
     local image = GetActionIcon('Move')
     local objective = AddObjective(Type,Complete,Title,Description,image,Target)
@@ -608,7 +608,7 @@ function SpecificUnitsInArea(Type,Complete,Title,Description,Target)
     local numRequired = Target.NumRequired or total
     Target.Count = 0
 
-    # call ManualResult
+    -- call ManualResult
     objective.ManualResult = function(self, result)
         self.Active = false
         self:OnResult(result)
@@ -687,32 +687,32 @@ function SpecificUnitsInArea(Type,Complete,Title,Description,Target)
     return objective
 end
 
-#
-# CategoriesInArea
-#   Complete when specified units matching the target blueprint types are in
-# the target area. We don't care exactly which units they are (pre-built or
-# newly constructed) or how they got there (cheat teleport, etc). We just check
-# the area for what units are inside and look at the blueprints (and optionally
-# match the army, use -1 for don't care).
-#
-# Target = {
-#   Requirements = {
-#       { Area = <areaName>, Category=<cat1>, CompareOp=<op>, Value=<x>, [ArmyIndex=<index>]},
-#       { Area = <areaName>, Category=<cat2>, CompareOp=<op>, Value=<y>, [ArmyIndex=<index>] },
-#       ...
-#       { Area = <areaName>, Category=<cat3>, CompareOp=<op>, Value=<z>, [ArmyIndex=<index>] },
-#   }
-# }
-#
-# -- op is one of: '<=', '>=', '<', '>', or '=='
-#
+--
+-- CategoriesInArea
+--   Complete when specified units matching the target blueprint types are in
+-- the target area. We don't care exactly which units they are (pre-built or
+-- newly constructed) or how they got there (cheat teleport, etc). We just check
+-- the area for what units are inside and look at the blueprints (and optionally
+-- match the army, use -1 for don't care).
+--
+-- Target = {
+--   Requirements = {
+--       { Area = <areaName>, Category=<cat1>, CompareOp=<op>, Value=<x>, [ArmyIndex=<index>]},
+--       { Area = <areaName>, Category=<cat2>, CompareOp=<op>, Value=<y>, [ArmyIndex=<index>] },
+--       ...
+--       { Area = <areaName>, Category=<cat3>, CompareOp=<op>, Value=<z>, [ArmyIndex=<index>] },
+--   }
+-- }
+--
+-- -- op is one of: '<=', '>=', '<', '>', or '=='
+--
 function CategoriesInArea(Type,Complete,Title,Description,Action,Target)
 
     local image = GetActionIcon(Action)
     local objective = AddObjective(Type,Complete,Title,Description,image,Target)
     local lastReqsMet = 0
 
-    # call ManualResult
+    -- call ManualResult
     objective.ManualResult = function(self, result)
         self.Active = false
         self:OnResult(result)
@@ -749,7 +749,7 @@ function CategoriesInArea(Type,Complete,Title,Description,Action,Target)
                             end
                         end
                     end
-                    #LOG('debug: CategoriesInArea: reqsmet '..reqsMet..'count '.. cnt )
+                    --LOG('debug: CategoriesInArea: reqsmet '..reqsMet..'count '.. cnt )
                 end
                 if requirement.CompareFunc(cnt,requirement.Value) then
                     reqsMet = reqsMet +1
@@ -803,21 +803,21 @@ function CategoriesInArea(Type,Complete,Title,Description,Action,Target)
     return objective
 end
 
-#
-# ArmyStatCompare
-#   Army stat is compared <=, >=, >, <, or == to some value.
-#
-# Target = {
-#       Army=<index>,
-#       StatName=<name>,
-#       CompareOp=<op>,   -- op is one of: '<=', '>=', '<', '>', or '=='
-#       Value=<value>,
-#       [Category=<category>], -- optional to compare to a blueprint stat
-#       ShowProgress, optional: shows #/#. may not make sense for all compare types
-# }
-#
-# Note: Be careful when using '==' as the stat is only checked every 5 ticks.
-#
+--
+-- ArmyStatCompare
+--   Army stat is compared <=, >=, >, <, or == to some value.
+--
+-- Target = {
+--       Army=<index>,
+--       StatName=<name>,
+--       CompareOp=<op>,   -- op is one of: '<=', '>=', '<', '>', or '=='
+--       Value=<value>,
+--       [Category=<category>], -- optional to compare to a blueprint stat
+--       ShowProgress, optional: shows --/--. may not make sense for all compare types
+-- }
+--
+-- Note: Be careful when using '==' as the stat is only checked every 5 ticks.
+--
 function ArmyStatCompare(Type,Complete,Title,Description,Action,Target)
     local image = GetActionIcon(Action)
     local objective = AddObjective(Type,Complete,Title,Description,image,Target)
@@ -838,7 +838,7 @@ function ArmyStatCompare(Type,Complete,Title,Description,Action,Target)
 
             if (Target.ShowProgress) then
                 if (testVal ~= oldVal) then
-                    #LOG('*** progress! ', testVal, ' ', oldVal)
+                    --LOG('*** progress! ', testVal, ' ', oldVal)
                     local progress = string.format('(%s/%s)', testVal, value)
                     UpdateObjective( Title, 'Progress', progress, objective.Tag )
                     oldVal = testVal
@@ -877,19 +877,19 @@ function ArmyStatCompare(Type,Complete,Title,Description,Action,Target)
     return objective
 end
 
-#
-# UnitStatCompare
-#   A specified unit's stat is <=, >=, >, <, or == to some value.
-#
-# Target = {
-#       Unit=<unit>,
-#       StatName=<name>,
-#       CompareOp=<op>,   -- op is one of: '<=', '>=', '<', '>', or '=='
-#       Value=<value>,
-# }
-#
-# Note: Be careful when using '==' as the stat is only checked every 5 ticks.
-#
+--
+-- UnitStatCompare
+--   A specified unit's stat is <=, >=, >, <, or == to some value.
+--
+-- Target = {
+--       Unit=<unit>,
+--       StatName=<name>,
+--       CompareOp=<op>,   -- op is one of: '<=', '>=', '<', '>', or '=='
+--       Value=<value>,
+-- }
+--
+-- Note: Be careful when using '==' as the stat is only checked every 5 ticks.
+--
 function UnitStatCompare(Type,Complete,Title,Description,Action,Target)
     local image = GetActionIcon(Action)
     local objective = AddObjective(Type,Complete,Title,Description,image,Target)
@@ -914,21 +914,21 @@ function UnitStatCompare(Type,Complete,Title,Description,Action,Target)
     return objective
 end
 
-#
-# CategoryStatCompare
-#   Some unit belonging to specified category has a stat <=, >=, >, <, or ==
-# to some value.
-#
-# Target = {
-#       Army=<index>,
-#       Category=<unit>,
-#       StatName=<name>,
-#       CompareOp=<op>,   -- op is one of: '<=', '>=', '<', '>', or '=='
-#       Value=<value>,
-# }
-#
-# Note: Be careful when using '==' as the stat is only checked every 5 ticks.
-#
+--
+-- CategoryStatCompare
+--   Some unit belonging to specified category has a stat <=, >=, >, <, or ==
+-- to some value.
+--
+-- Target = {
+--       Army=<index>,
+--       Category=<unit>,
+--       StatName=<name>,
+--       CompareOp=<op>,   -- op is one of: '<=', '>=', '<', '>', or '=='
+--       Value=<value>,
+-- }
+--
+-- Note: Be careful when using '==' as the stat is only checked every 5 ticks.
+--
 function CategoryStatCompare(Type,Complete,Title,Description,Action,Target)
     local image = GetActionIcon(Action)
     local objective = AddObjective(Type,Complete,Title,Description,image,Target)
@@ -958,16 +958,16 @@ function CategoryStatCompare(Type,Complete,Title,Description,Action,Target)
     return objective
 end
 
-#
-# Protect
-#   Fails if # of units in list falls below NumRequired before the timer expires
-# or, in the case of no timer, the objective is manually update to complete.
-#
-# Target = {
-#       Units = {},
-#       Timer = <seconds> or nil,   -- if nil, requires manual completion
-#       NumRequired = <#>,          -- how many must survive
-# }
+--
+-- Protect
+--   Fails if -- of units in list falls below NumRequired before the timer expires
+-- or, in the case of no timer, the objective is manually update to complete.
+--
+-- Target = {
+--       Units = {},
+--       Timer = <seconds> or nil,   -- if nil, requires manual completion
+--       NumRequired = <-->,          -- how many must survive
+-- }
 function Protect(Type,Complete,Title,Description,Target)
 
     local image = GetActionIcon("protect")
@@ -989,7 +989,7 @@ function Protect(Type,Complete,Title,Description,Target)
             local progress = string.format('(%s/%s)', total, numRequired)
             UpdateObjective( Title, 'Progress', progress, objective.Tag )
         elseif (Target.PercentProgress) then
-            #local progress = LOCF('<LOC A02_M01_OBJ_010_113>(%s%%/%s%%)',math.ceil( total / max * 100),math.ceil( numRequired / max * 100))
+            --local progress = LOCF('<LOC A02_M01_OBJ_010_113>(%s%%/%s%%)',math.ceil( total / max * 100),math.ceil( numRequired / max * 100))
             local progress = string.format('(%s%%)',math.ceil( total / max * 100))
             UpdateObjective( Title, 'Progress', progress, objective.Tag )
         end
@@ -1043,7 +1043,7 @@ function Protect(Type,Complete,Title,Description,Target)
         local progress = string.format('(%s/%s)', total, numRequired)
         UpdateObjective( Title, 'Progress', progress, objective.Tag )
     elseif (Target.PercentProgress) then
-        #local progress = LOCF('<LOC A02_M01_OBJ_010_113>(%s%%/%s%%)',math.ceil( total / max * 100),math.ceil( numRequired / max * 100))
+        --local progress = LOCF('<LOC A02_M01_OBJ_010_113>(%s%%/%s%%)',math.ceil( total / max * 100),math.ceil( numRequired / max * 100))
         local progress = string.format('(%s%%)',math.ceil( total / max * 100))
         UpdateObjective( Title, 'Progress', progress, objective.Tag )
     end
@@ -1051,21 +1051,21 @@ function Protect(Type,Complete,Title,Description,Target)
     return objective
 end
 
-#
-# Timer
-#   OnResult() is called when the timer expires. The result depends on whether
-# ExpireResult is set to complete or failed.
-#
-# Target = {
-#       Timer = <seconds>
-#       ExpireResult = 'complete' or 'failed'
-# }
+--
+-- Timer
+--   OnResult() is called when the timer expires. The result depends on whether
+-- ExpireResult is set to complete or failed.
+--
+-- Target = {
+--       Timer = <seconds>
+--       ExpireResult = 'complete' or 'failed'
+-- }
 function Timer(Type,Complete,Title,Description,Target)
 
     local image = GetActionIcon("timer")
     local objective = AddObjective(Type,Complete,Title,Description,image,Target)
 
-    # call ManualResult
+    -- call ManualResult
     objective.ManualResult = function(self, result)
         self.Active = false
         self:OnResult(result)
@@ -1108,7 +1108,7 @@ end
 function Unknown(Type,Complete,Title,Description)
     local objective = AddObjective(Type,Complete,Title,Description)
 
-    # call ManualResult
+    -- call ManualResult
     objective.ManualResult = function(self, result)
         self.Active = false
         self:OnResult(result)
@@ -1127,7 +1127,7 @@ end
 function Basic(Type,Complete,Title,Description,Image,Target)
     local objective = AddObjective(Type,Complete,Title,Description,Image,Target)
 
-    # call ManualResult
+    -- call ManualResult
     objective.ManualResult = function(self, result)
         objective.Active = false
         objective:OnResult(result)
@@ -1205,21 +1205,21 @@ function Basic(Type,Complete,Title,Description,Image,Target)
 end
 
 
-### Adds objective for the objectives screen
-function AddObjective(Type,         # 'primary', 'bonus', etc
-                      Complete,     # 'complete', 'incomplete'
-                      Title,        # e.g. "Destroy Radar Stations"
-                      Description,  # e.g. "A reason why you need to destroy the radar stations"
-                      ActionImage,        # '/textures/ui/common/missions/mission1.dds'
-                      Target,       # Can be one of:
-                                    #   Units = { unit1, unit2, ... }
-                                    #   Areas = { 'areaName1', 'areaName2', ... }
-                      IsLoading,    # Are we loading a saved game?
-                      loadedTag     # If IsLoading is specified, what's the tag?
+------ Adds objective for the objectives screen
+function AddObjective(Type,         -- 'primary', 'bonus', etc
+                      Complete,     -- 'complete', 'incomplete'
+                      Title,        -- e.g. "Destroy Radar Stations"
+                      Description,  -- e.g. "A reason why you need to destroy the radar stations"
+                      ActionImage,        -- '/textures/ui/common/missions/mission1.dds'
+                      Target,       -- Can be one of:
+                                    --   Units = { unit1, unit2, ... }
+                                    --   Areas = { 'areaName1', 'areaName2', ... }
+                      IsLoading,    -- Are we loading a saved game?
+                      loadedTag     -- If IsLoading is specified, what's the tag?
                       )
 
     if Type == 'bonus' then
-        return {Tag = 'Invalid'} # bonus objectives cut
+        return {Tag = 'Invalid'} -- bonus objectives cut
     end
 
     if(not Sync.ObjectivesTable) then
@@ -1236,36 +1236,36 @@ function AddObjective(Type,         # 'primary', 'bonus', etc
         table.insert( SavedList, {AddArgs = {Type,Complete,Title,Description,ActionImage,Target,true,tag,n=8},Tag=tag} )
     end
 
-    #LOG("Debug: AddObjective: ", Title,":", Description, " (Tag=",tag,")")
+    --LOG("Debug: AddObjective: ", Title,":", Description, " (Tag=",tag,")")
 
-    # Set up objective table to return.
+    -- Set up objective table to return.
     local objective = {
-        # Used to synchronize sim objectives with user side objectives
+        -- Used to synchronize sim objectives with user side objectives
         Tag = tag,
 
-        # Whether the objective is in progress or not and does not indicate
-        # success or failure.
+        -- Whether the objective is in progress or not and does not indicate
+        -- success or failure.
         Active = true,
 
-        # success or failure.
+        -- success or failure.
         Complete = false,
 
-        # Decal table, key'd by area names
+        -- Decal table, key'd by area names
         Decals = {},
 
-        # Unit arrow table
+        -- Unit arrow table
         UnitMarkers = {},
 
-        # Visibility markers that we manage
+        -- Visibility markers that we manage
         VizMarkers = {},
 
-        # Single decal
+        -- Single decal
         Decal = false,
 
-        # Strategic icon overrides
+        -- Strategic icon overrides
         IconOverrides = {},
 
-        # For tracking targets
+        -- For tracking targets
         NextTargetTag = 0,
         PositionUpdateThreads = {},
 
@@ -1274,42 +1274,42 @@ function AddObjective(Type,         # 'primary', 'bonus', etc
 
         SimStartTime = GetGameTimeSeconds(),
 
-        # Called on success or failure
+        -- Called on success or failure
         ResultCallbacks = {},
         AddResultCallback = function(self,cb)
             table.insert(self.ResultCallbacks,cb)
         end,
 
-        # Some objective types can provide progress updates (not success/fail)
+        -- Some objective types can provide progress updates (not success/fail)
         ProgressCallbacks = {},
         AddProgressCallback = function(self,cb)
             table.insert(self.ProgressCallbacks,cb)
         end,
 
-        # Don't override these if you want notification. Call Add???Callback
-        # intead
+        -- Don't override these if you want notification. Call Add???Callback
+        -- intead
         OnResult = function(self,success,data)
 
             self.Complete = success
 
             for k,v in self.ResultCallbacks do v(success,data) end
 
-            # Destroy decals
+            -- Destroy decals
             for k,v in self.Decals do v:Destroy() end
 
-            # Destroy unit marker things
+            -- Destroy unit marker things
             for k,v in self.UnitMarkers do
                 v:Destroy()
             end
 
-            # Revert strategic icons
+            -- Revert strategic icons
             for k,v in self.IconOverrides do
                 if not v:BeenDestroyed() then
                     v:SetStrategicUnderlay("")
                 end
             end
 
-            # Destroy visibility markers
+            -- Destroy visibility markers
             for k,v in self.VizMarkers do
                 v:Destroy()
             end
@@ -1328,27 +1328,27 @@ function AddObjective(Type,         # 'primary', 'bonus', etc
             for k,v in self.ProgressCallbacks do v(current,total) end
         end,
 
-        # Call this to manually fail the objective
+        -- Call this to manually fail the objective
         Fail = function(self)
             self.Active = false
             self:OnResult(false)
             UpdateObjective(self.Title,'complete','failed',self.Tag)
         end,
 
-        AddUnitTarget = function(self,unit) end, # defined below
-        AddAreaTarget = function(self,area) end, # defined below
+        AddUnitTarget = function(self,unit) end, -- defined below
+        AddAreaTarget = function(self,area) end, -- defined below
     }
 
-    # Takes a unit that is an objective target and uses its recon detect
-    # event to notify the objectives that we have a blip for the unit.
+    -- Takes a unit that is an objective target and uses its recon detect
+    -- event to notify the objectives that we have a blip for the unit.
     local function SetupNotify(obj,unit,targetTag)
-		if GetFocusArmy() == -1 then
-			return
-		end
-        # Add a detectedBy callback to notify the user layer when our recon
-        # on the target comes in and out.
+        if GetFocusArmy() == -1 then
+            return
+        end
+        -- Add a detectedBy callback to notify the user layer when our recon
+        -- on the target comes in and out.
         local detectedByCB = function(cbunit,armyindex)
-            			
+                        
             if armyindex != 1 then
                 return
             end
@@ -1356,13 +1356,13 @@ function AddObjective(Type,         # 'primary', 'bonus', etc
             if not obj.Active then
                 return
             end
-            # now if we've been detected by the focus army ...
+            -- now if we've been detected by the focus army ...
             if armyindex == GetFocusArmy() then
-                # get the blip that is associated with the unit
+                -- get the blip that is associated with the unit
                 local blip = cbunit:GetBlip(armyindex)
 
-                # Only provide the target position to the user layer if
-                # the blip IsSeenEver() (i.e. has been identified).
+                -- Only provide the target position to the user layer if
+                -- the blip IsSeenEver() (i.e. has been identified).
                 obj.PositionUpdateThreads[targetTag] = ForkThread(
                     function()
                         while obj.Active do
@@ -1382,8 +1382,8 @@ function AddObjective(Type,         # 'primary', 'bonus', etc
                                                 },
                                                 obj.Tag )
 
-                                # If it's not mobile we can exit the thread since
-                                # the blip won't move.
+                                -- If it's not mobile we can exit the thread since
+                                -- the blip won't move.
                                 if not unit:IsDead() and not unit:BeenDestroyed() and not EntityCategoryContains( categories.MOBILE, unit ) then
                                     return
                                 end
@@ -1398,14 +1398,14 @@ function AddObjective(Type,         # 'primary', 'bonus', etc
                     end
 
                     if obj.PositionUpdateThreads[targetTag] then
-                        #LOG('killing thread')
+                        --LOG('killing thread')
                         KillThread( obj.PositionUpdateThreads[targetTag] )
                         obj.PositionUpdateThreads[targetTag] = false
                     end
 
-                    # when the blip is destroyed, tell objectives we dont
-                    # have a blip anymore. This doesn't necessarily mean the
-                    # unit is killed, we simply lost the blip.
+                    -- when the blip is destroyed, tell objectives we dont
+                    -- have a blip anymore. This doesn't necessarily mean the
+                    -- unit is killed, we simply lost the blip.
                     UpdateObjective(Title,
                                     'Target',
                                     {
@@ -1417,25 +1417,25 @@ function AddObjective(Type,         # 'primary', 'bonus', etc
                                     obj.Tag )
                 end
 
-                # When the blip is destroyed, have it call this callback
-                # function (defined above)
+                -- When the blip is destroyed, have it call this callback
+                -- function (defined above)
                 blip:AddDestroyHook(destroyCB)
             end
         end
 
-        # When the unit is detected by an army, have it call this callback
-        # function (defined above)
+        -- When the unit is detected by an army, have it call this callback
+        -- function (defined above)
         unit:AddDetectedByHook(detectedByCB)
 
-        # See if we can detect the unit right now
+        -- See if we can detect the unit right now
         local blip = unit:GetBlip(GetFocusArmy())
         if blip then
             detectedByCB(unit,GetFocusArmy())
         end
     end
 
-    # Take an objective target unit that is owned by the focus army
-    # Info passed to user layer to handle zoom to button and chiclet image
+    -- Take an objective target unit that is owned by the focus army
+    -- Info passed to user layer to handle zoom to button and chiclet image
     function SetupFocusNotify(obj, unit, targetTag)
         obj.PositionUpdateThreads[targetTag] = ForkThread(
             function()
@@ -1454,8 +1454,8 @@ function AddObjective(Type,         # 'primary', 'bonus', etc
                                     },
                                     obj.Tag )
 
-                    # If it's not mobile we can exit the thread since
-                    # the unit won't move.
+                    -- If it's not mobile we can exit the thread since
+                    -- the unit won't move.
                     if not unit:IsDead() and not unit:BeenDestroyed() and not EntityCategoryContains( categories.MOBILE, unit ) then
                         return
                     end
@@ -1470,14 +1470,14 @@ function AddObjective(Type,         # 'primary', 'bonus', etc
             end
 
             if obj.PositionUpdateThreads[targetTag] then
-                #LOG('killing thread')
+                --LOG('killing thread')
                 KillThread( obj.PositionUpdateThreads[targetTag] )
                 obj.PositionUpdateThreads[targetTag] = false
             end
 
-            # when the blip is destroyed, tell objectives we dont
-            # have a blip anymore. This doesn't necessarily mean the
-            # unit is killed, we simply lost the blip.
+            -- when the blip is destroyed, tell objectives we dont
+            -- have a blip anymore. This doesn't necessarily mean the
+            -- unit is killed, we simply lost the blip.
             UpdateObjective(Title,
                             'Target',
                             {
@@ -1489,8 +1489,8 @@ function AddObjective(Type,         # 'primary', 'bonus', etc
                             obj.Tag )
         end
 
-        # When the unit is destroyed have it call this callback
-        # function (defined above)
+        -- When the unit is destroyed have it call this callback
+        -- function (defined above)
         Triggers.CreateUnitDeathTrigger(destroyCB, unit )
     end
 
@@ -1623,7 +1623,7 @@ function AddObjective(Type,         # 'primary', 'bonus', etc
 
         table.insert(self.IconOverrides,unit)
 
-        # Mark the units unless MarkUnits == false
+        -- Mark the units unless MarkUnits == false
         if ( Target.MarkUnits == nil ) or Target.MarkUnits then
             if Type == 'primary' then
                 unit:SetStrategicUnderlay('icon_objective_primary')
@@ -1689,11 +1689,11 @@ function DeleteObjective(Objective, IsLoading)
     table.insert(Sync.ObjectivesUpdateTable, userObjectiveUpdate)
 end
 
-### Update legacy style objective using correct syntax
+------ Update legacy style objective using correct syntax
 function UpdateBasicObjective(Objective, UpdateField, NewData)
     UpdateObjective(Objective.Title, UpdateField, NewData, Objective.Tag)
 end
-### Updates an objective, referencing it by objective title
+------ Updates an objective, referencing it by objective title
 function UpdateObjective(Title, UpdateField, NewData, objTag, IsLoading, InTime)
 
     if objTag == 'Invalid' then
@@ -1711,15 +1711,15 @@ function UpdateObjective(Title, UpdateField, NewData, objTag, IsLoading, InTime)
     if type(UpdateField) ~= 'string' then
         error('SimObjectives error: Invalid type for UpdateField in UpdateObjective. String expected but got ' .. type(UpdateField), 2)
     end
-    #if type(Title) ~= 'string' then
-    #    error('SimObjectives error: Invalid type for Title in UpdateObjective. String expected but got ' .. type(Title), 2)
-    #end
+    --if type(Title) ~= 'string' then
+    --    error('SimObjectives error: Invalid type for Title in UpdateObjective. String expected but got ' .. type(Title), 2)
+    --end
 
     if not IsLoading then
         table.insert( SavedList, {UpdateArgs = {Title,UpdateField,NewData,objTag,true, GetGameTimeSeconds(),n=6},Tag=objTag} )
     end
 
-    # All fields are stored with lowercase names
+    -- All fields are stored with lowercase names
     UpdateField = string.lower(UpdateField)
     if not (
         (UpdateField == 'type') or
@@ -1778,7 +1778,7 @@ function GetActionIcon(actionString)
     if action == "locate"   then return "/game/orders/omni_btn_up.dds"          end
     if action == "group"    then return "/game/orders/move_btn_up.dds"          end
 
-     # todo: make 'kill or capture' icon?
+     -- todo: make 'kill or capture' icon?
     if action == "killorcapture" then return "/game/orders/attack_btn_up.dds" end
 
     return ""

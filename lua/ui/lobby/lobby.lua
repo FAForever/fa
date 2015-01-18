@@ -68,28 +68,28 @@ local teamIcons = {
 DebugEnabled = Prefs.GetFromCurrentProfile('LobbyDebug') or ''
 local HideDefaultOptions = Prefs.GetFromCurrentProfile('LobbyHideDefaultOptions') == 'true'
 function LOGX(text, ttype)
-	-- onlyChat = for debug only in the Chat
-	-- onlyLOG = for debug only in the LOG
-	-- CLEAR = for disable the debug
-	-- Country, RuleTitle, Background
-	-- Disconnected, Connecting, UpdateGame
-	local text = tostring(text)
-	local onlyLOG = string.find(DebugEnabled, 'onlyLOG') or nil
-	local onlyChat = string.find(DebugEnabled, 'onlyChat') or nil
-	if ttype == nil then
-		LOG(text)
-	else
-		if string.find(DebugEnabled, ttype) and ttype ~= nil then
-			if onlyLOG ~= nil then
-				LOG(text)
-			elseif onlyChat ~= nil then
-				AddChatText(text)
-			else
-				LOG(text)
-				AddChatText(text)
-			end
-		end
-	end
+    -- onlyChat = for debug only in the Chat
+    -- onlyLOG = for debug only in the LOG
+    -- CLEAR = for disable the debug
+    -- Country, RuleTitle, Background
+    -- Disconnected, Connecting, UpdateGame
+    local text = tostring(text)
+    local onlyLOG = string.find(DebugEnabled, 'onlyLOG') or nil
+    local onlyChat = string.find(DebugEnabled, 'onlyChat') or nil
+    if ttype == nil then
+        LOG(text)
+    else
+        if string.find(DebugEnabled, ttype) and ttype ~= nil then
+            if onlyLOG ~= nil then
+                LOG(text)
+            elseif onlyChat ~= nil then
+                AddChatText(text)
+            else
+                LOG(text)
+                AddChatText(text)
+            end
+        end
+    end
 end
 -- Table of Tooltip Country
 local PrefLanguageTooltipTitle={}
@@ -177,16 +177,16 @@ local function ParseWhisper(params)
 end
 
 local function LOGXWhisper(params)
-	-- Exemple : Country Background useChat'
-	if string.find(params, 'CLEAR') then
-		DebugEnabled = ''
-		Prefs.SetToCurrentProfile('LobbyDebug', '')
-		AddChatText('Debug disabled')
-	else
+    -- Exemple : Country Background useChat'
+    if string.find(params, 'CLEAR') then
+        DebugEnabled = ''
+        Prefs.SetToCurrentProfile('LobbyDebug', '')
+        AddChatText('Debug disabled')
+    else
         DebugEnabled = params
-		Prefs.SetToCurrentProfile('LobbyDebug', params)
-		AddChatText('Debug actived : '..params)
-	end
+        Prefs.SetToCurrentProfile('LobbyDebug', params)
+        AddChatText('Debug actived : '..params)
+    end
 end
 
 local commands = {
@@ -206,7 +206,7 @@ local commands = {
         key = 'whisper',
         action = ParseWhisper,
     },
-	{
+    {
         key = 'debug',
         action = LOGXWhisper,
     },
@@ -549,7 +549,7 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
         GUI.slots = {}
 
         GUI.connectdialog = UIUtil.ShowInfoDialog(GUI, Strings.TryingToConnect, Strings.AbortConnect, ReturnToMenu)
-		GUI.connectdialog.Depth:Set(GetFrame(GUI:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 999)
+        GUI.connectdialog.Depth:Set(GetFrame(GUI:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 999)
 
         InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
 
@@ -579,11 +579,11 @@ end
 function ConnectToPeer(addressAndPort,name,uid)
     if not string.find(addressAndPort, '127.0.0.1') then
         LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..")")
-		LOGX('>> ConnectToPeer > name='..tostring(name), 'Connecting')
+        LOGX('>> ConnectToPeer > name='..tostring(name), 'Connecting')
     else
         DisconnectFromPeer(uid)
         LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..", USE PROXY)")
-		LOGX('>> ConnectToPeer > name='..tostring(name)..' (with PROXY)', 'Connecting')
+        LOGX('>> ConnectToPeer > name='..tostring(name)..' (with PROXY)', 'Connecting')
         table.insert(ConnectedWithProxy, uid)
     end
     lobbyComm:ConnectToPeer(addressAndPort,name,uid)
@@ -594,7 +594,7 @@ function DisconnectFromPeer(uid)
     if wasConnected(uid) then
         table.remove(connectedTo, uid)
     end
-	LOGX('>> DisconnectFromPeer > name='..tostring(FindNameForID(uid)), 'Disconnected')
+    LOGX('>> DisconnectFromPeer > name='..tostring(FindNameForID(uid)), 'Disconnected')
     GpgNetSend('Disconnected', string.format("%d", uid))
     lobbyComm:DisconnectFromPeer(uid)
 end
@@ -671,11 +671,11 @@ end
 
 -- update the data in a player slot
 function SetSlotInfo(slot, playerInfo)
-	if (GUI.connectdialog ~= false) then -- Remove the ConnectDialog
-		GUI.connectdialog:Destroy()
-		GUI.connectdialog = false
-	end
-	local isLocallyOwned = IsLocallyOwned(slot)
+    if (GUI.connectdialog ~= false) then -- Remove the ConnectDialog
+        GUI.connectdialog:Destroy()
+        GUI.connectdialog = false
+    end
+    local isLocallyOwned = IsLocallyOwned(slot)
     if isLocallyOwned then
         if gameInfo.PlayerOptions[slot]['Ready'] then
             DisableSlot(slot, true)
@@ -1642,7 +1642,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         if coopGame == true then
             gameInfo.GameOptions['Difficulty'] = 3
             
-    		scenarioArmies = {}
+            scenarioArmies = {}
             for index, teamConfig in scenarioInfo.Configurations.standard.teams do
                 if teamConfig.name and (teamConfig.name == 'FFA') then
                     scenarioArmies =teamConfig.armies
@@ -2173,7 +2173,7 @@ function HostTryAddPlayer(senderID, slot, requestedPlayerName, human, aiPersonal
     if newSlot == -1 then
         PrivateChat( senderID, LOC("<LOC lobui_0237>No slots available, attempting to make you an observer"))
         if human then
-			HostTryAddObserver( senderID, requestedPlayerName, requestedPL, requestedColor, requestedFaction, requestedCOUNTRY )
+            HostTryAddObserver( senderID, requestedPlayerName, requestedPL, requestedColor, requestedFaction, requestedCOUNTRY )
         end
         return
     end
@@ -2291,14 +2291,14 @@ function HostTryAddObserver( senderID, requestedObserverName, RequestedPL, Reque
     end
 
     LOGX('>> HostTryAddObserver > requestedObserverName='..tostring(requestedObserverName), 'Connecting')
-	local observerName = lobbyComm:MakeValidPlayerName(senderID,requestedObserverName)
+    local observerName = lobbyComm:MakeValidPlayerName(senderID,requestedObserverName)
     gameInfo.Observers[index] = {
         PlayerName = observerName,
         OwnerID = senderID,
-		PL = RequestedPL,
-		oldColor = RequestedColor,
+        PL = RequestedPL,
+        oldColor = RequestedColor,
         oldFaction = RequestedFaction,
-		oldCountry= RequestedCOUNTRY,
+        oldCountry= RequestedCOUNTRY,
     }
 
     lobbyComm:BroadcastData(
@@ -4215,8 +4215,8 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
         if wantToBeObserver then
             -- Ok, I'm connected to the host. Now request to become an observer
-            lobbyComm:SendData( hostID, { Type = 'AddObserver', RequestedObserverName = localPlayerName, RequestedPL = playerRating, RequestedColor = Prefs.GetFromCurrentProfile('LastColor'), RequestedFaction = requestedFaction, RequestedCOUNTRY = argv.PrefLanguage, } )
-			LOGX('>> ConnectionToHostEstablished//SendData//playerRating='..tostring(playerRating), 'Connecting')
+            lobbyComm:SendData( hostID, { Type = 'AddObserver', RequestedObserverName = localPlayerName, RequestedPL = playerRating, RequestedColor = Prefs.GetFromCurrentProfile('LastColor'), RequestedFaction = requestedFaction, RequestedCOUNTRY = PrefLanguage, } )
+            LOGX('>> ConnectionToHostEstablished//SendData//playerRating='..tostring(playerRating), 'Connecting')
         else
             -- Ok, I'm connected to the host. Now request to become a player
             local requestedFaction = Prefs.GetFromCurrentProfile('LastFaction')
@@ -4292,7 +4292,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             AddChatText("<<"..data.SenderName..">> "..data.Text)
             --// RULE TITLE
         elseif data.Type == 'Rule_Title_MSG' then
-			LOGX('>> RECEIVE MSG Rule_Title_MSG : result='..data.Result1..' result2='..data.Result2, 'RuleTitle')
+            LOGX('>> RECEIVE MSG Rule_Title_MSG : result='..data.Result1..' result2='..data.Result2, 'RuleTitle')
             RuleTitle_SetText(data.Result1 or "", data.Result2 or "")
             --\\ Stop RULE TITLE
             -- CPU benchmark code
@@ -4371,7 +4371,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 GUI.becomeObserver:Enable()
                 SetPlayerOption(FindSlotForID(FindIDForName(localPlayerName)), 'Ready', false)
             elseif data.Type == 'Peer_Really_Disconnected' then
-				LOGX('>> DATA RECEIVE : Peer_Really_Disconnected (slot:'..data.Slot..')', 'Disconnected')
+                LOGX('>> DATA RECEIVE : Peer_Really_Disconnected (slot:'..data.Slot..')', 'Disconnected')
                 if data.Options.OwnerID == localPlayerID then
                     lobbyComm:SendData( hostID, {Type = "GetGameInfo"} )
                 else
@@ -4597,7 +4597,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     end
 
     lobbyComm.PeerDisconnected = function(self,peerName,peerID) -- Lost connection or try connect with proxy
-		LOGX('>> PeerDisconnected : peerName='..peerName..' peerID='..peerID, 'Disconnected')
+        LOGX('>> PeerDisconnected : peerName='..peerName..' peerID='..peerID, 'Disconnected')
         
          -- Search and Remove the peer disconnected
         for k, v in CurrentConnection do
@@ -5234,7 +5234,7 @@ function ChangeBackgroundLobby(faction)
     local LobbyBackground = Prefs.GetFromCurrentProfile('LobbyBackground') or 1
     if GUI.background and GUI.background2 then
         if LobbyBackground == 1 then -- Factions
-			LOGX('>> Background FACTION', 'Background')
+            LOGX('>> Background FACTION', 'Background')
             GUI.background:Show()
             GUI.background2:Hide()
             faction = faction or Prefs.GetFromCurrentProfile('LastFaction') or 0
@@ -5246,13 +5246,13 @@ function ChangeBackgroundLobby(faction)
             end
 
         elseif LobbyBackground == 2 then -- Concept art
-			LOGX('>> Background ART', 'Background')
+            LOGX('>> Background ART', 'Background')
             GUI.background:Show()
             GUI.background2:Hide()
             GUI.background:SetTexture("/textures/ui/common/BACKGROUND/art/art-background-paint0"..math.random(1, 5).."_bmp.dds")
 
         elseif LobbyBackground == 3 then -- Screenshot
-			LOGX('>> Background SCREENSHOT', 'Background')
+            LOGX('>> Background SCREENSHOT', 'Background')
             GUI.background:Show()
             GUI.background2:Hide()
             GUI.background:SetTexture("/textures/ui/common/BACKGROUND/scrn/scrn-background-paint"..math.random(1, 14).."_bmp.dds")
@@ -5332,24 +5332,25 @@ function CreateOptionLobbyDialog()
         Prefs.SetToCurrentProfile("LobbyBackground", index)
         ChangeBackgroundLobby()
     end
-	--
-	local Slider = import('/lua/maui/slider.lua').Slider
-	local currentFontSize = Prefs.GetFromCurrentProfile('LobbyChatFontSize') or 14
-	local slider_Chat_SizeFont_TEXT = UIUtil.CreateText(dialog2, LOC("<LOC lobui_0404> ").. currentFontSize, 14, 'Arial', true)
+    --
+    local Slider = import('/lua/maui/slider.lua').Slider
+    local currentFontSize = Prefs.GetFromCurrentProfile('LobbyChatFontSize') or 14
+    local slider_Chat_SizeFont_TEXT = UIUtil.CreateText(dialog2, LOC("<LOC lobui_0404> ").. currentFontSize, 14, 'Arial', true)
     LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont_TEXT, dialog2, 27, 136)
 
-	local slider_Chat_SizeFont = Slider(dialog2, false, 9, 18, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
+    local slider_Chat_SizeFont = Slider(dialog2, false, 9, 18, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
     LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont, dialog2, 20, 156)
     slider_Chat_SizeFont:SetValue(currentFontSize)
 
-	slider_Chat_SizeFont.OnValueChanged = function(self, newValue)
+    slider_Chat_SizeFont.OnValueChanged = function(self, newValue)
         local sliderValue = math.floor(slider_Chat_SizeFont._currentValue())
         slider_Chat_SizeFont_TEXT:SetText(LOC("<LOC lobui_0404> ").. sliderValue)
         GUI.chatDisplay:SetFont(UIUtil.bodyFont, sliderValue)
         Prefs.SetToCurrentProfile('LobbyChatFontSize', sliderValue)
 	end
-	--
+
     local cbox_WindowedLobby = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/', LOC("<LOC lobui_0402>"))
+
     LayoutHelpers.AtRightTopIn(cbox_WindowedLobby, dialog2, 20, 42)
     Tooltip.AddCheckboxTooltip(cbox_WindowedLobby, {text='Windowed mode', body=LOC("<LOC lobui_0403>")})
     cbox_WindowedLobby.OnCheck = function(self, checked)
@@ -5394,7 +5395,7 @@ function CreateOptionLobbyDialog()
 		-- Already set Windowed in Game
 		cbox_WindowedLobby:Disable()
 	end
-    --
+
     local LobbyBackgroundStretch = Prefs.GetFromCurrentProfile('LobbyBackgroundStretch') or 'true'
     cbox_StretchBG:SetCheck(LobbyBackgroundStretch == 'true', true)
 end
@@ -5632,9 +5633,9 @@ function GUI_PRESET_INPUT(tyype)
     LayoutHelpers.AtBottomIn(ExitButton, GUI_Preset_InputBox2, 10)
     ExitButton.OnClick = function(self)
         GUI_Preset_InputBox:Destroy()
-		if tyype == -1 then
-			GUI_Preset:Destroy()
-		end
+        if tyype == -1 then
+            GUI_Preset:Destroy()
+        end
     end
 
     -- Ok button
@@ -6042,16 +6043,16 @@ end
 
 -- Changelog dialog
 function Need_Changelog()
-	local Changelog = import('/lua/ui/lobby/changelog.lua').changelog
-	local Last_Changelog_Version = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
-	local result = false
-	for i, d in Changelog do
-		if Last_Changelog_Version < d.version then
-			result = true
-			break
-		end
-	end
-	return result
+    local Changelog = import('/lua/ui/lobby/changelog.lua').changelog
+    local Last_Changelog_Version = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
+    local result = false
+    for i, d in Changelog do
+        if Last_Changelog_Version < d.version then
+            result = true
+            break
+        end
+    end
+    return result
 end
 
 function GUI_Changelog()
@@ -6077,29 +6078,29 @@ function GUI_Changelog()
     InfoList.Width:Set(498)
     InfoList.Height:Set(260)
     LayoutHelpers.AtLeftIn(InfoList, dialog2, 10)
-	LayoutHelpers.AtRightIn(InfoList, dialog2, 26)
+    LayoutHelpers.AtRightIn(InfoList, dialog2, 26)
     LayoutHelpers.AtTopIn(InfoList, dialog2, 38)
     UIUtil.CreateLobbyVertScrollbar(InfoList)
-	InfoList.OnClick = function(self)
-	end
-	-- See only new Changelog by version
-	local Changelog = import('/lua/ui/lobby/changelog.lua')
-	local Last_Changelog_Version = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
-	for i, d in Changelog.changelog do
-		if Last_Changelog_Version < d.version then
-			InfoList:AddItem(d.name)
-			for k, v in d.description do
-				InfoList:AddItem(v)
-			end
-			InfoList:AddItem('')
-		end
-	end
+    InfoList.OnClick = function(self)
+    end
+    -- See only new Changelog by version
+    local Changelog = import('/lua/ui/lobby/changelog.lua')
+    local Last_Changelog_Version = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
+    for i, d in Changelog.changelog do
+        if Last_Changelog_Version < d.version then
+            InfoList:AddItem(d.name)
+            for k, v in d.description do
+                InfoList:AddItem(v)
+            end
+            InfoList:AddItem('')
+        end
+    end
     -- OK button --
     local OkButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Ok")
-	LayoutHelpers.AtLeftIn(OkButton, dialog2, 0)
+    LayoutHelpers.AtLeftIn(OkButton, dialog2, 0)
     LayoutHelpers.AtBottomIn(OkButton, dialog2, 10)
     OkButton.OnClick = function(self)
         Prefs.SetToCurrentProfile('LobbyChangelog', Changelog.last_version)
-		GROUP_Changelog:Destroy()
+        GROUP_Changelog:Destroy()
     end
 end
