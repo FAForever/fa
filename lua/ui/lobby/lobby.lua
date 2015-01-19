@@ -14,6 +14,7 @@ local MenuCommon = import('/lua/ui/menus/menucommon.lua')
 local Prefs = import('/lua/user/prefs.lua')
 local MapUtil = import('/lua/ui/maputil.lua')
 local Group = import('/lua/maui/group.lua').Group
+local RadioButton = import('/lua/ui/controls/radiobutton.lua').RadioButton
 local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
 local ResourceMapPreview = import('/lua/ui/controls/resmappreview.lua').ResourceMapPreview
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
@@ -140,13 +141,6 @@ local argv = parseCommandlineArguments()
 
 local playerRating = math.floor( Trueskill.round2((argv.playerMean - 3 * argv.playerDeviation) / 100.0) * 100 )
 
--- builds the faction tables, and then adds random faction icon to the end
-local factionBmps = {}
-local factionTooltips = {}
-for index, tbl in FactionData.Factions do
-    factionBmps[index] = tbl.SmallIcon
-    factionTooltips[index] = tbl.TooltipID
-end
 local teamTooltips = {
     'lob_team_none',
     'lob_team_one',
@@ -156,8 +150,6 @@ local teamTooltips = {
     'lob_team_five',
     'lob_team_six',
 }
-table.insert(factionBmps, "/faction_icon-sm/random_ico.dds")
-table.insert(factionTooltips, 'lob_random')
 
 local teamNumbers = {
     "<LOC _No>",
@@ -1644,36 +1636,6 @@ local function AlertHostMapMissing()
     end
 end
 
--- Set the faction selector icons appropriately for the given selected faction.
-local function updateFactionSelectorIcons(enabled, faction)
-    -- Possibly bolt "-dis" onto the pathname.
-    local dis = ""
-    if not enabled then
-        dis = "-dis"
-    end
-
-    -- Set everything to the small version.
-    for k, v in pairs(FACTION_PANELS) do
-        v:SetTexture("/textures/ui/common/FACTIONSELECTOR/" .. FACTION_NAMES[k] .. "_ico" .. dis .. ".png")
-    end
-
-    -- Set the selection faction icon to the large version.
-    FACTION_PANELS[faction]:SetTexture("/textures/ui/common/FACTIONSELECTOR/" .. FACTION_NAMES[faction] .. "_ico-large.png")
-end
-
--- Set the enabledness state of the faction selector to the given value.
--- The faction argument specifies the selected faction (the corresponding icon is shown larger than
--- the others.
-local function Faction_Selector_Set_Enabled(enabled, faction)
-    -- Update the images to reflect the new enabled state.
-    updateFactionSelectorIcons(enabled, faction)
-
-    -- Set the enabled state of the panel.
-    for k , v in pairs(FACTION_PANELS) do
-        UIUtil.setEnabled(v, enabled)
-    end
-end
-
 -- Refresh (with a sledgehammer) all the items in the observer list.
 local function refreshObserverList()
     GUI.observerList:DeleteAllItems()
@@ -1757,7 +1719,7 @@ local function UpdateGame()
         UIUtil.setEnabled(GUI.restrictedUnitsOrPresetsBtn, not isHost or notReady)
 
         UIUtil.setEnabled(GUI.LargeMapPreview, notReady)
-        Faction_Selector_Set_Enabled(notReady, playerOptions.Faction)
+        UIUtil.setEnabled(GUI.factionSelector, notReady)
 
         -- Set the info in a Slot
         -- TODO: Since these stats are all constants, we should figure out the right place to do this
@@ -2739,6 +2701,16 @@ function CreateSlotsUI(makeLabel)
         Tooltip.AddControlTooltip(colorSelector, 'lob_color')
 
         --// Faction
+        -- builds the faction tables, and then adds random faction icon to the end
+        local factionBmps = {}
+        local factionTooltips = {}
+        for index, tbl in FactionData.Factions do
+            factionBmps[index] = tbl.SmallIcon
+            factionTooltips[index] = tbl.TooltipID
+        end
+        table.insert(factionBmps, "/faction_icon-sm/random_ico.dds")
+        table.insert(factionTooltips, 'lob_random')
+
         local factionSelector = BitmapCombo(bg, factionBmps, table.getn(factionBmps), nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         newSlot.faction = factionSelector
         LayoutHelpers.AtLeftIn(factionSelector, GUI.panel, slotColumnSizes.faction.x)
@@ -2747,7 +2719,7 @@ function CreateSlotsUI(makeLabel)
         factionSelector.OnClick = function(self, index)
             SetPlayerOption(curRow, 'Faction', index)
             if curRow == FindSlotForID(FindIDForName(localPlayerName)) then
-                SetCurrentFactionTo_Faction_Selector()
+                GUI.factionSelector:SetSelected(index)
             end
 
             Tooltip.DestroyMouseoverDisplay()
@@ -2798,7 +2770,7 @@ function CreateSlotsUI(makeLabel)
         newSlot.multiSpace.Top:Set(newSlot.Top)
 
         -- Ready Checkbox
-        local readyBox = UIUtil.CreateCheckboxStd(newSlot.multiSpace, '/CHECKBOX/radio')
+        local readyBox = UIUtil.CreateCheckboxStd(newSlot.multiSpace, '/CHECKBOX/')
         newSlot.ready = readyBox
         LayoutHelpers.AtVerticalCenterIn(readyBox, newSlot.multiSpace, 8)
         LayoutHelpers.AtLeftIn(readyBox, newSlot.multiSpace, 0)
@@ -2843,7 +2815,8 @@ function CreateUI(maxPlayers)
     local Prefs = import('/lua/user/prefs.lua')
     local Tooltip = import('/lua/ui/game/tooltip.lua')
 
-    UIUtil.SetCurrentSkin('uef')
+    local lastFaction = Prefs.GetFromCurrentProfile('LastFaction') or 1
+    UIUtil.SetCurrentSkin(FACTION_NAMES[lastFaction])
 
     if (GUI.connectdialog ~= false) then
         MenuCommon.MenuCleanup()
@@ -3032,7 +3005,7 @@ function CreateUI(maxPlayers)
 
     -- Checkbox Show changed Options
     -- TODO: Localise!
-    local cbox_ShowChangedOption = UIUtil.CreateCheckboxStd(GUI.optionsPanel, '/CHECKBOX/radio', 'Hide default Options', true, 11)
+    local cbox_ShowChangedOption = UIUtil.CreateCheckboxStd(GUI.optionsPanel, '/CHECKBOX/', 'Hide default Options', true, 11)
     LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel, 3, 0)
 
     Tooltip.AddCheckboxTooltip(cbox_ShowChangedOption, {text='Hide default Options', body='Show only changed Options and Advanced Map Options'})
@@ -3458,7 +3431,7 @@ function CreateUI(maxPlayers)
     -- set up observer and limbo grid
     ---------------------------------------------------------------------------
 
-    GUI.allowObservers = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/radio', 'Observers in Game', true, 11)
+    GUI.allowObservers = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/', 'Observers in Game', true, 11)
     LayoutHelpers.AtLeftTopIn(GUI.allowObservers, GUI.buttonPanelTop)
     Tooltip.AddControlTooltip(GUI.allowObservers, 'lob_observers_allowed')
     GUI.allowObservers:SetCheck(false)
@@ -3654,7 +3627,7 @@ function CreateUI(maxPlayers)
     end
 
     if lobbyComm:IsHost() and not singlePlayer then
-        local autoKickBox = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/radio', "Auto kick", true, 11)
+        local autoKickBox = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/', "Auto kick", true, 11)
         LayoutHelpers.CenteredRightOf(autoKickBox, GUI.allowObservers, 10)
         Tooltip.AddControlTooltip(autoKickBox, 'lob_auto_kick')
         autoKick = true
@@ -3706,7 +3679,6 @@ function CreateUI(maxPlayers)
 
     -- Setup large pretty faction selector.
     CreateUI_Faction_Selector()
-    SetCurrentFactionTo_Faction_Selector()
 
     ---------------------------------------------------------------------------
     -- other logic, including lobby callbacks
@@ -5154,107 +5126,33 @@ end
 
 -- Faction selector
 function CreateUI_Faction_Selector()
-    local factionPanel = Group(GUI.panel, "factionPanel")
-    LayoutHelpers.AtLeftTopIn(factionPanel, GUI.panel, 410, 36) --Right:615
-    factionPanel.Width:Set(205)
-    factionPanel.Height:Set(60)
-
-    GUI.AeonFactionPanel = Bitmap(factionPanel, "/textures/ui/common/FACTIONSELECTOR/aeon_ico.png")
-    LayoutHelpers.AtLeftTopIn(GUI.AeonFactionPanel, factionPanel, 0, 0)
-    LayoutHelpers.AtVerticalCenterIn(GUI.AeonFactionPanel, factionPanel, 0)
-
-    GUI.CybranFactionPanel = Bitmap(factionPanel, "/textures/ui/common/FACTIONSELECTOR/cybran_ico.png")
-    LayoutHelpers.AtLeftTopIn(GUI.CybranFactionPanel, factionPanel, 45, 0)
-    LayoutHelpers.AtVerticalCenterIn(GUI.CybranFactionPanel, factionPanel, 0)
-
-    GUI.UEFFactionPanel = Bitmap(factionPanel, "/textures/ui/common/FACTIONSELECTOR/uef_ico.png")
-    LayoutHelpers.AtHorizontalCenterIn(GUI.UEFFactionPanel, factionPanel, 0)
-    LayoutHelpers.AtVerticalCenterIn(GUI.UEFFactionPanel, factionPanel, 0)
-
-    GUI.SeraphimFactionPanel = Bitmap(factionPanel, "/textures/ui/common/FACTIONSELECTOR/seraphim_ico.png")
-    LayoutHelpers.AtRightTopIn(GUI.SeraphimFactionPanel, factionPanel, 45, 0)
-    LayoutHelpers.AtVerticalCenterIn(GUI.SeraphimFactionPanel, factionPanel, 0)
-
-    GUI.RandomFactionPanel = Bitmap(factionPanel, "/textures/ui/common/FACTIONSELECTOR/random_ico.png")
-    LayoutHelpers.AtRightTopIn(GUI.RandomFactionPanel, factionPanel, 0, 0)
-    LayoutHelpers.AtVerticalCenterIn(GUI.RandomFactionPanel, factionPanel, 0)
-
-    GUI.factionPanel = factionPanel
-
-    -- Relate faction numbers to faction panels to simplify update.
-    FACTION_PANELS = {[1] = GUI.UEFFactionPanel, [2] = GUI.AeonFactionPanel,
-                      [3] = GUI.CybranFactionPanel, [4] = GUI.SeraphimFactionPanel, [5] = GUI.RandomFactionPanel }
-
-    -- Get a closure suitable for use as the event listener on a faction selection button.
-    -- targetFaction is the faction represented by the faction selection panel using this listener.
-    -- targetPanel is that faction selection panel.
-    local function getFactionEventListener(targetPanel, targetFaction)
-        return function(ctrl, event)
-            local faction = Prefs.GetFromCurrentProfile('LastFaction') or 1
-            local eventHandled = false
-            if faction == targetFaction then
-                targetPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/" .. FACTION_NAMES[targetFaction] .. "_ico-large.png")
-            elseif IsPlayer(localPlayerID) then
-                if event.Type == 'MouseEnter' then
-                    targetPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/" .. FACTION_NAMES[targetFaction] .. "_ico-hover.png")
-                    eventHandled = true
-                elseif event.Type == 'MouseExit' then
-                    targetPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/" .. FACTION_NAMES[targetFaction] .. "_ico.png")
-                    eventHandled = true
-                elseif event.Type == 'ButtonPress' then
-                    eventHandled = true
-
-                    local localSlot = FindSlotForID(localPlayerID)
-                    Prefs.SetToCurrentProfile('LastFaction', targetFaction)
-                    GUI.slots[localSlot].faction:SetItem(targetFaction)
-                    SetPlayerOption(localSlot, 'Faction', targetFaction)
-                    gameInfo.PlayerOptions[localSlot].Faction = targetFaction
-
-                    SetCurrentFactionTo_Faction_Selector(targetFaction)
-                end
-            end
-
-            return eventHandled
-        end
+    -- Build a list of button objects from the list of defined factions. Each faction will use the
+    -- faction key as its RadioButton texture path offset.
+    local buttons = {}
+    for i, faction in FactionData.Factions do
+        buttons[i] = {
+            texturePath = faction.Key
+        }
     end
 
-    GUI.AeonFactionPanel.HandleEvent = getFactionEventListener(GUI.AeonFactionPanel, 2)
-    GUI.CybranFactionPanel.HandleEvent = getFactionEventListener(GUI.CybranFactionPanel, 3)
-    GUI.UEFFactionPanel.HandleEvent = getFactionEventListener(GUI.UEFFactionPanel, 1)
-    GUI.SeraphimFactionPanel.HandleEvent = getFactionEventListener(GUI.SeraphimFactionPanel, 4)
-    GUI.RandomFactionPanel.HandleEvent = getFactionEventListener(GUI.RandomFactionPanel, 5)
-end
+    -- Special-snowflaking for the random faction.
+    table.insert(buttons, {
+        texturePath = "random"
+    })
 
-function SetCurrentFactionTo_Faction_Selector(input_faction)
-    local faction = input_faction or Prefs.GetFromCurrentProfile('LastFaction') or 1
+    local lastFaction = Prefs.GetFromCurrentProfile('LastFaction') or 1
+    local factionSelector = RadioButton(GUI.panel, "/factionselector/", buttons, lastFaction, true)
+    GUI.factionSelector = factionSelector
+    LayoutHelpers.AtLeftTopIn(factionSelector, GUI.panel, 410, 60)
+    factionSelector.OnChoose = function(self, targetFaction, key)
+        local localSlot = FindSlotForID(localPlayerID)
+        Prefs.SetToCurrentProfile('LastFaction', targetFaction)
+        GUI.slots[localSlot].faction:SetItem(targetFaction)
+        SetPlayerOption(localSlot, 'Faction', targetFaction)
+        gameInfo.PlayerOptions[localSlot].Faction = targetFaction
 
-    UIUtil.SetCurrentSkin(FACTION_NAMES[faction])
-    ChangeBackgroundLobby(faction)
-    if faction == 1 then
-        LayoutHelpers.AtLeftIn(GUI.AeonFactionPanel, GUI.factionPanel, 0)
-        LayoutHelpers.AtLeftIn(GUI.CybranFactionPanel, GUI.factionPanel, 45)
-        LayoutHelpers.AtRightIn(GUI.SeraphimFactionPanel, GUI.factionPanel, 45)
-        LayoutHelpers.AtRightIn(GUI.RandomFactionPanel, GUI.factionPanel, 0)
-    elseif faction == 2 then
-        LayoutHelpers.AtLeftIn(GUI.AeonFactionPanel, GUI.factionPanel, -15)
-        LayoutHelpers.AtLeftIn(GUI.CybranFactionPanel, GUI.factionPanel, 45)
-        LayoutHelpers.AtRightIn(GUI.SeraphimFactionPanel, GUI.factionPanel, 45)
-        LayoutHelpers.AtRightIn(GUI.RandomFactionPanel, GUI.factionPanel, 0)
-    elseif faction == 3 then
-        LayoutHelpers.AtLeftIn(GUI.AeonFactionPanel, GUI.factionPanel, 0)
-        LayoutHelpers.AtLeftIn(GUI.CybranFactionPanel, GUI.factionPanel, 45-15)
-        LayoutHelpers.AtRightIn(GUI.SeraphimFactionPanel, GUI.factionPanel, 45)
-        LayoutHelpers.AtRightIn(GUI.RandomFactionPanel, GUI.factionPanel, 0)
-    elseif faction == 4 then
-        LayoutHelpers.AtLeftIn(GUI.AeonFactionPanel, GUI.factionPanel, 0)
-        LayoutHelpers.AtLeftIn(GUI.CybranFactionPanel, GUI.factionPanel, 45)
-        LayoutHelpers.AtRightIn(GUI.SeraphimFactionPanel, GUI.factionPanel, 45-15)
-        LayoutHelpers.AtRightIn(GUI.RandomFactionPanel, GUI.factionPanel, 0)
-    elseif faction == 5 then
-        LayoutHelpers.AtLeftIn(GUI.AeonFactionPanel, GUI.factionPanel, 0)
-        LayoutHelpers.AtLeftIn(GUI.CybranFactionPanel, GUI.factionPanel, 45)
-        LayoutHelpers.AtRightIn(GUI.SeraphimFactionPanel, GUI.factionPanel, 45)
-        LayoutHelpers.AtRightIn(GUI.RandomFactionPanel, GUI.factionPanel, -15)
+        ChangeBackgroundLobby(targetFaction)
+        UIUtil.SetCurrentSkin(FACTION_NAMES[targetFaction])
     end
 end
 
@@ -5330,23 +5228,34 @@ function CreateOptionLobbyDialog()
     dialog2.Height:Set(240)
     LayoutHelpers.AtCenterIn(dialog2, dialog)
 
-    -- The provided radiobutton control doesn't allow satellite data, so we use the index in this
-    -- list as our stored background mode value.
-    local backgroundStates = {
-        LOC("<LOC lobui_0406>"), -- Factions
-        LOC("<LOC lobui_0407>"), -- Concept art
-        LOC("<LOC lobui_0408>"), -- Screenshot
-        LOC("<LOC lobui_0409>"), -- Map
-        LOC("<LOC lobui_0410>"), -- None
+    local buttons = {
+        {
+            label = LOC("<LOC lobui_0406>") -- Factions
+        },
+        {
+            label = LOC("<LOC lobui_0407>")  -- Concept art
+        },
+        {
+            label = LOC("<LOC lobui_0408>") -- Screenshot
+        },
+        {
+            label = LOC("<LOC lobui_0409>") -- Map
+        },
+        {
+            label = LOC("<LOC lobui_0410>") -- None
+        }
     }
-    local selectedBackgroundState = backgroundStates[Prefs.GetFromCurrentProfile("LobbyBackground") or 1]
-    local backgroundRadiobutton = UIUtil.CreateRadioButtonsStd(dialog2, '/CHECKBOX/radio', LOC("<LOC lobui_0405>"), backgroundStates, selectedBackgroundState)
 
-    LayoutHelpers.AtLeftTopIn(backgroundRadiobutton, dialog2, 20, 20)
+    -- Label shown above the background mode selection radiobutton.
+    local backgroundLabel = UIUtil.CreateText(dialog2, LOC("<LOC lobui_0405> "), 16, 'Arial', true)
+    local selectedBackgroundState = Prefs.GetFromCurrentProfile("LobbyBackground") or 1
+    local backgroundRadiobutton = RadioButton(dialog2, '/RADIOBOX/', buttons, selectedBackgroundState, false, true)
 
-    backgroundRadiobutton.OnChoose = function(self, button)
-        local backgroundMode = indexOf(backgroundStates, button)
-        Prefs.SetToCurrentProfile("LobbyBackground", backgroundMode)
+    LayoutHelpers.AtLeftTopIn(backgroundLabel, dialog2, 15, 15)
+    LayoutHelpers.AtLeftTopIn(backgroundRadiobutton, dialog2, 15, 40)
+
+    backgroundRadiobutton.OnChoose = function(self, index, key)
+        Prefs.SetToCurrentProfile("LobbyBackground", index)
         ChangeBackgroundLobby()
     end
 	--
@@ -5366,7 +5275,7 @@ function CreateOptionLobbyDialog()
         Prefs.SetToCurrentProfile('LobbyChatFontSize', sliderValue)
 	end
 	--
-    local cbox_WindowedLobby = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio', LOC("<LOC lobui_0402>"))
+    local cbox_WindowedLobby = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/', LOC("<LOC lobui_0402>"))
     LayoutHelpers.AtRightTopIn(cbox_WindowedLobby, dialog2, 20, 42)
     Tooltip.AddCheckboxTooltip(cbox_WindowedLobby, {text='Windowed mode', body=LOC("<LOC lobui_0403>")})
     cbox_WindowedLobby.OnCheck = function(self, checked)
@@ -5380,7 +5289,7 @@ function CreateOptionLobbyDialog()
         SetWindowedLobby(checked)
     end
     --
-    local cbox_StretchBG = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio', LOC("<LOC lobui_0400>"))
+    local cbox_StretchBG = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/', LOC("<LOC lobui_0400>"))
     LayoutHelpers.AtRightTopIn(cbox_StretchBG, dialog2, 20, 68)
     Tooltip.AddCheckboxTooltip(cbox_StretchBG, {text='Stretch Background', body=LOC("<LOC lobui_0401>")})
     cbox_StretchBG.OnCheck = function(self, checked)
