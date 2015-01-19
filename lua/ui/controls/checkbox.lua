@@ -22,11 +22,11 @@ Checkbox = Class(Group) {
         -- Escape early if the layout is the extremely trivial case...
         if not label then
             LayoutHelpers.SetDimensions(self, checkBmp:Width(), checkBmp:Height())
-            LayoutHelpers.AtLeftTopIn(checkBmp, self)
+            LayoutHelpers.AtCenterIn(checkBmp, self)
             return
         end
 
-        local textfield = UIUtil.CreateText(self, label, labelSize or 14, 'Arial', true)
+        local textfield = UIUtil.CreateText(self, label, labelSize or 13, 'Arial', true)
         textfield.Height:Set(checkBmp:Height())
         textfield:SetText(label)
 

@@ -1341,7 +1341,7 @@ function CreateConfigWindow()
         local group = Group(optionGroup)
         if data.type == 'filter' then
             group.name = UIUtil.CreateText(group, data.name, 14, "Arial")
-            group.check = UIUtil.CreateCheckboxStd(group, '/dialogs/check-box_btn/radio')
+            group.check = UIUtil.CreateCheckboxStd(group, '/dialogs/check-box_btn/')
             LayoutHelpers.AtLeftTopIn(group.check, group)
             LayoutHelpers.RightOf(group.name, group.check)
             LayoutHelpers.AtVerticalCenterIn(group.name, group.check)
