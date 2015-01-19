@@ -111,6 +111,7 @@ local commandQueueIndex = 0
 local commandQueue = {}
 
 local quickRandMap = true
+local autoKick = true
 
 local lastUploadedMap = nil
 
@@ -3658,22 +3659,20 @@ function CreateUI(maxPlayers)
                 UpdateGame()
             end
         end
-    end --end of random map code
+    end
 
-    --start of auto kick code
     if lobbyComm:IsHost() and not singlePlayer then
-        GUI.autoKick = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/radio')
-        LayoutHelpers.CenteredRightOf(GUI.autoKick, GUI.observerLabel, 10)
-        Tooltip.AddControlTooltip(GUI.autoKick, 'lob_auto_kick')
-        GUI.autoKickLabel = UIUtil.CreateText(GUI.autoKick, "Auto kick", 11, 'Arial', true)
-        LayoutHelpers.CenteredRightOf(GUI.autoKickLabel, GUI.autoKick, 0)
+        local autoKickBox = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/radio')
+        LayoutHelpers.CenteredRightOf(autoKickBox, GUI.observerLabel, 10)
+        Tooltip.AddControlTooltip(autoKickBox, 'lob_auto_kick')
+        GUI.autoKickLabel = UIUtil.CreateText(autoKickBox, "Auto kick", 11, 'Arial', true)
+        LayoutHelpers.CenteredRightOf(GUI.autoKickLabel, autoKickBox, 0)
         Tooltip.AddControlTooltip(GUI.autoKickLabel, 'lob_auto_kick')
         autoKick = true
-        GUI.autoKick.OnCheck = function(self, checked)
+        autoKickBox:SetCheck(true)
+        autoKickBox.OnCheck = function(self, checked)
             autoKick = checked
-            UpdateGame()
         end
-        GUI.autoKick:SetCheck(true)
     end
 
     GUI.observerList = ItemList(GUI.observerPanel, "observer list")
