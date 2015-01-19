@@ -3031,15 +3031,11 @@ function CreateUI(maxPlayers)
     end
 
     -- Checkbox Show changed Options
-    local cbox_ShowChangedOption = UIUtil.CreateCheckboxStd(GUI.optionsPanel, '/CHECKBOX/radio')
-    LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel, 3, 0)
     -- TODO: Localise!
+    local cbox_ShowChangedOption = UIUtil.CreateCheckboxStd(GUI.optionsPanel, '/CHECKBOX/radio', 'Hide default Options', true, 11)
+    LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel, 3, 0)
 
     Tooltip.AddCheckboxTooltip(cbox_ShowChangedOption, {text='Hide default Options', body='Show only changed Options and Advanced Map Options'})
-    local cbox_ShowChangedOption_TEXT = UIUtil.CreateText(cbox_ShowChangedOption, 'Hide default Options', 11, 'Arial', true)
-    cbox_ShowChangedOption_TEXT:SetColor('B9BFB9')
-    LayoutHelpers.AtLeftIn(cbox_ShowChangedOption_TEXT, cbox_ShowChangedOption, 25)
-    LayoutHelpers.AtVerticalCenterIn(cbox_ShowChangedOption_TEXT, cbox_ShowChangedOption)
     cbox_ShowChangedOption.OnCheck = function(self, checked)
         HideDefaultOptions = checked
         RefreshOptionDisplayData()
@@ -3462,12 +3458,9 @@ function CreateUI(maxPlayers)
     -- set up observer and limbo grid
     ---------------------------------------------------------------------------
 
-    GUI.allowObservers = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/radio')
-    LayoutHelpers.CenteredLeftOf(GUI.allowObservers, GUI.buttonPanelTop, -30)
+    GUI.allowObservers = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/radio', 'Observers in Game', true, 11)
+    LayoutHelpers.AtLeftTopIn(GUI.allowObservers, GUI.buttonPanelTop)
     Tooltip.AddControlTooltip(GUI.allowObservers, 'lob_observers_allowed')
-    GUI.observerLabel = UIUtil.CreateText(GUI.allowObservers, 'Observers in Game', 11, 'Arial', true)
-    LayoutHelpers.CenteredRightOf(GUI.observerLabel, GUI.allowObservers, 0)
-    Tooltip.AddControlTooltip(GUI.observerLabel, 'lob_describe_observers')
     GUI.allowObservers:SetCheck(false)
     if lobbyComm:IsHost() then
         SetGameOption("AllowObservers", false, true)
@@ -3476,7 +3469,6 @@ function CreateUI(maxPlayers)
         end
     else
         GUI.allowObservers:Disable()
-        GUI.observerLabel:Disable()
     end
 
     -- GO OBSERVER BUTTON --
@@ -3662,12 +3654,9 @@ function CreateUI(maxPlayers)
     end
 
     if lobbyComm:IsHost() and not singlePlayer then
-        local autoKickBox = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/radio')
-        LayoutHelpers.CenteredRightOf(autoKickBox, GUI.observerLabel, 10)
+        local autoKickBox = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/radio', "Auto kick", true, 11)
+        LayoutHelpers.CenteredRightOf(autoKickBox, GUI.allowObservers, 10)
         Tooltip.AddControlTooltip(autoKickBox, 'lob_auto_kick')
-        GUI.autoKickLabel = UIUtil.CreateText(autoKickBox, "Auto kick", 11, 'Arial', true)
-        LayoutHelpers.CenteredRightOf(GUI.autoKickLabel, autoKickBox, 0)
-        Tooltip.AddControlTooltip(GUI.autoKickLabel, 'lob_auto_kick')
         autoKick = true
         autoKickBox:SetCheck(true)
         autoKickBox.OnCheck = function(self, checked)
@@ -3706,7 +3695,6 @@ function CreateUI(maxPlayers)
 
         GUI.allowObservers:Hide()
         GUI.becomeObserver:Hide()
-        GUI.observerLabel:Hide()
         GUI.randTeam:Hide()
         GUI.defaultOptions:Hide()
         GUI.rerunBenchmark:Hide()
@@ -5333,6 +5321,8 @@ function CreateOptionLobbyDialog()
     local background = Bitmap(dialog, '/textures/ui/common/scx_menu/lan-game-lobby/optionlobby.dds')
     dialog.Width:Set(background.Width)
     dialog.Height:Set(background.Height)
+    WARN(background.Height)
+    WARN(background.Width)
     LayoutHelpers.FillParent(background, dialog)
 
     local dialog2 = Group(dialog)
@@ -5376,12 +5366,9 @@ function CreateOptionLobbyDialog()
         Prefs.SetToCurrentProfile('LobbyChatFontSize', sliderValue)
 	end
 	--
-    local cbox_WindowedLobby = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
+    local cbox_WindowedLobby = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio', LOC("<LOC lobui_0402>"))
     LayoutHelpers.AtRightTopIn(cbox_WindowedLobby, dialog2, 20, 42)
     Tooltip.AddCheckboxTooltip(cbox_WindowedLobby, {text='Windowed mode', body=LOC("<LOC lobui_0403>")})
-    local cbox_WindowedLobby_TEXT = UIUtil.CreateText(cbox_WindowedLobby, LOC("<LOC lobui_0402>"), 14, 'Arial', true)
-    LayoutHelpers.AtRightIn(cbox_WindowedLobby_TEXT, cbox_WindowedLobby, 25)
-    LayoutHelpers.AtVerticalCenterIn(cbox_WindowedLobby_TEXT, cbox_WindowedLobby)
     cbox_WindowedLobby.OnCheck = function(self, checked)
         local option
         if(checked) then
@@ -5393,12 +5380,9 @@ function CreateOptionLobbyDialog()
         SetWindowedLobby(checked)
     end
     --
-    local cbox_StretchBG = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
+    local cbox_StretchBG = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio', LOC("<LOC lobui_0400>"))
     LayoutHelpers.AtRightTopIn(cbox_StretchBG, dialog2, 20, 68)
     Tooltip.AddCheckboxTooltip(cbox_StretchBG, {text='Stretch Background', body=LOC("<LOC lobui_0401>")})
-    local cbox_StretchBG_TEXT = UIUtil.CreateText(cbox_StretchBG, LOC("<LOC lobui_0400>"), 14, 'Arial', true)
-    LayoutHelpers.AtRightIn(cbox_StretchBG_TEXT, cbox_StretchBG, 25)
-    LayoutHelpers.AtVerticalCenterIn(cbox_StretchBG_TEXT, cbox_StretchBG)
     cbox_StretchBG.OnCheck = function(self, checked)
         if checked then
             Prefs.SetToCurrentProfile('LobbyBackgroundStretch', 'true')
@@ -5426,8 +5410,6 @@ function CreateOptionLobbyDialog()
 	if defaultMode == 'windowed' then
 		-- Already set Windowed in Game
 		cbox_WindowedLobby:Disable()
-		cbox_WindowedLobby_TEXT:Disable()
-		cbox_WindowedLobby_TEXT:SetColor('5C5F5C')
 	end
     --
     local LobbyBackgroundStretch = Prefs.GetFromCurrentProfile('LobbyBackgroundStretch') or 'true'
