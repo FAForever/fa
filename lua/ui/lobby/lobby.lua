@@ -4523,8 +4523,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             SetGameOption('ScenarioFile',self.desiredScenario, true)
         end
 
-        UpdateGame()
-
         GUI.keepAliveThread = ForkThread(
         -- Eject players who haven't sent a heartbeat in a while
         function()
