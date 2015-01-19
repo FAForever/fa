@@ -1,109 +1,128 @@
+local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local UIUtil = import('/lua/ui/uiutil.lua')
+local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local Group = import('/lua/maui/group.lua').Group
 
-local Bitmap = import('bitmap.lua').Bitmap
-local Dragger = import('dragger.lua').Dragger
+Checkbox = Class(Group) {
+    __init = function(self, parent, normalUnchecked, normalChecked, overUnchecked, overChecked, disabledUnchecked, disabledChecked, label, labelRight, labelSize, clickCue, rolloverCue)
+        Group.__init(self, parent)
 
-Checkbox = Class(Bitmap)
-{
-    __init = function(self, parent, normalUnchecked, normalChecked, overUnchecked, overChecked, disabledUnchecked, disabledChecked, clickCue, rolloverCue, debugname)
-        Bitmap.__init(self, parent, normalUnchecked, debugname or "checkbox")
-        self._states =  {}
-        self._states.normal = {}
-        self._states.normal.checked = normalChecked
-        self._states.normal.unchecked = normalUnchecked
-        self._states.over = {}
-        self._states.over.checked = overChecked or normalChecked
-        self._states.over.unchecked = overUnchecked or normalUnchecked
-        self._states.disabled = {}
-        self._states.disabled.checked = disabledChecked or normalChecked
-        self._states.disabled.unchecked = disabledUnchecked or normalUnchecked
-        self.mRolloverCue = rolloverCue
-        self.mClickCue = clickCue
+        local checkBmp = Bitmap(self, normalUnchecked)
+        self.checkBmp = checkBmp
 
-        self._checkState = "unchecked"
-        self._controlState = "normal"
+        -- Sound effects
+        self.mRolloverCue = rolloverCue or 'UI_Mini_Rollover'
+        self.mClickCue = clickCue or 'UI_Mini_MouseDown'
+
+        self._checked = false
+        self._controlState = "up"
+
+        self:SetNewTextures(normalUnchecked, normalChecked, overUnchecked, overChecked, disabledUnchecked, disabledChecked)
+
+        -- Escape early if the layout is the extremely trivial case...
+        if not label then
+            LayoutHelpers.SetDimensions(self, checkBmp:Width(), checkBmp:Height())
+            LayoutHelpers.AtLeftTopIn(checkBmp, self)
+            return
+        end
+
+        local textfield = UIUtil.CreateText(self, label, labelSize or 14, 'Arial', true)
+        textfield.Height:Set(checkBmp:Height())
+        textfield:SetText(label)
+
+        -- Center the text inside the textfield (which we expand to be the whole height of the control)
+        textfield:SetCenteredVertically(true)
+        LayoutHelpers.SetDimensions(self, checkBmp:Width() + textfield:Width(), checkBmp:Height())
+        if labelRight then
+            LayoutHelpers.AtLeftTopIn(checkBmp, self)
+            LayoutHelpers.RightOf(textfield, checkBmp)
+        else
+            LayoutHelpers.AtRightTopIn(checkBmp, self)
+            LayoutHelpers.LeftOf(textfield, checkBmp)
+        end
+
+        -- Copy for closure
+        local enclosingInstance = self
+
+        -- Delegate clicks on the label to the main handler.
+        textfield.OnClick = function(this, modifiers)
+            enclosingInstance:OnClick(modifiers)
+        end
+
+        self.label = textfield
     end,
 
     SetNewTextures = function(self, normalUnchecked, normalChecked, overUnchecked, overChecked, disabledUnchecked, disabledChecked)
-        self._states.normal.checked = normalChecked
-        self._states.normal.unchecked = normalUnchecked
-        self._states.over.checked = overChecked or normalChecked
-        self._states.over.unchecked = overUnchecked or normalUnchecked
-        self._states.disabled.checked = disabledChecked or normalChecked
-        self._states.disabled.unchecked = disabledUnchecked or normalUnchecked
-        -- update current texture
-        self:SetTexture(self._states[self._controlState][self._checkState])
+        self.checkedStates = {
+            up = normalChecked,
+            over = overChecked or normalChecked,
+            disabled = disabledChecked or normalChecked
+        }
+
+        self.uncheckedStates = {
+            up = normalUnchecked,
+            over = overUnchecked or normalUnchecked,
+            disabled = disabledUnchecked or normalUnchecked
+        }
+
+        -- Trigger a redraw
+        self:SetCheck(self._checked, true)
+    end,
+
+    SetLabel = function(self, label)
+        self.label:SetText(label)
     end,
 
     SetCheck = function(self, isChecked, skipEvent)
-        if isChecked == true then
-            self._checkState = "checked"
+        self._checked = isChecked
+
+        -- Update the set of textures we're using to show the checkedness.
+        if isChecked then
+            self._states = self.checkedStates
         else
-            self._checkState = "unchecked"
+            self._states = self.uncheckedStates
         end
-        self:SetTexture(self._states[self._controlState][self._checkState])
+
+        self:_UpdateTexture()
         if not skipEvent then
             self:OnCheck(isChecked)
         end
     end,
 
     ToggleCheck = function(self)
-        if self._checkState == "checked" then
-            self:SetCheck(false)
-        else
-            self:SetCheck(true)
-        end
+        self:SetCheck(not self._checked)
     end,
 
     IsChecked = function(self)
-        return (self._checkState == "checked")
-    end,
-
-    OnDisable = function(self)
-        if self._controlState != "disabled" then
-            self._controlState = "disabled"
-            self:SetTexture(self._states[self._controlState][self._checkState])
-        end
-    end,
-
-    OnEnable = function(self)
-        if self._controlState != "enabled" then
-            self._controlState = "normal"
-            self:SetTexture(self._states[self._controlState][self._checkState])
-        end
+        return self._checked
     end,
 
     HandleEvent = function(self, event)
-        local eventHandled = false
-        if event.Type == 'MouseEnter' then
-            if self._controlState != "disabled" then
-                self._controlState = "over"
-                self:SetTexture(self._states[self._controlState][self._checkState])
-                if self.mRolloverCue != "NO_SOUND" then
-                    if self.mRolloverCue then
-                        local sound = Sound({Cue = self.mRolloverCue, Bank = "Interface",})
-                        PlaySound(sound)
-                    end
-                end
-                eventHandled = true
-            end
-        elseif event.Type == 'MouseExit' then
-            if self._controlState != "disabled" then
-                self._controlState = "normal"
-                self:SetTexture(self._states[self._controlState][self._checkState])
-                eventHandled = true
-            end
-        elseif event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
-            self:OnClick(event.Modifiers)
-            if self.mClickCue != "NO_SOUND" then
-                if self.mClickCue then
-                    local sound = Sound({Cue = self.mClickCue, Bank = "Interface",})
-                    PlaySound(sound)
-                end
-            end
-            eventHandled = true
+        if self._isDisabled then
+            return true
         end
 
-        return eventHandled
+        if event.Type == 'MouseEnter' then
+            self._controlState = "over"
+            self:_UpdateTexture()
+            if not  self.mRolloverCue or self.mRolloverCue == "NO_SOUND" then
+                return true
+            end
+
+            local sound = Sound({Cue = self.mRolloverCue, Bank = "Interface",})
+            PlaySound(sound)
+        elseif event.Type == 'MouseExit' then
+            self._controlState = "up"
+            self:_UpdateTexture()
+        elseif event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
+            self:OnClick(event.Modifiers)
+            if self.mClickCue and self.mClickCue ~= "NO_SOUND" then
+                local sound = Sound({Cue = self.mClickCue, Bank = "Interface",})
+                PlaySound(sound)
+            end
+        end
+
+        return false
     end,
 
     -- override this method to handle checks
@@ -112,5 +131,33 @@ Checkbox = Class(Bitmap)
     -- override this method to handle clicks differently than default (which is ToggleCheck)
     OnClick = function(self, modifiers)
         self:ToggleCheck()
+    end,
+
+    -- Ensure the textfield is enabled/disabled with the checkbox.
+    OnDisable = function(self)
+        self.checkBmp:Disable()
+        if self.label then
+            self.label:Disable()
+            self.label:SetColor(UIUtil.disabledColor)
+        end
+
+        self._controlState = "disabled"
+        self:_UpdateTexture()
+    end,
+
+    OnEnable = function(self)
+        self.checkBmp:Enable()
+        if self.label then
+            self.label:Enable()
+            self.label:SetColor(UIUtil.fontColor)
+        end
+
+        self._controlState = "up"
+        self:_UpdateTexture()
+    end,
+
+    -- Change the texture of the Bitmap to reflect the current state of this control.
+    _UpdateTexture = function(self)
+        self.checkBmp:SetTexture(self._states[self._controlState])
     end,
 }
