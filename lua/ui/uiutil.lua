@@ -521,26 +521,26 @@ function CreateButtonWithDropshadow(parent, filename, label, textOffsetVert, tex
         )
 end
 
-function CreateCheckboxStd(parent, filename, label, labelRight, labelSize, clickCue, rollCue)
+function CreateCheckboxStd(parent, texturePath, label, labelRight, labelSize, clickCue, rollCue)
     local checkbox = Checkbox(parent,
-        SkinnableFile(filename .. '-d_btn_up.dds'),
-        SkinnableFile(filename .. '-s_btn_up.dds'),
-        SkinnableFile(filename .. '-d_btn_over.dds'),
-        SkinnableFile(filename .. '-s_btn_over.dds'),
-        SkinnableFile(filename .. '-d_btn_dis.dds'),
-        SkinnableFile(filename .. '-s_btn_dis.dds'),
+        SkinnableFile(texturePath .. 'd_up.dds'),
+        SkinnableFile(texturePath .. 's_up.dds'),
+        SkinnableFile(texturePath .. 'd_over.dds'),
+        SkinnableFile(texturePath .. 's_over.dds'),
+        SkinnableFile(texturePath .. 'd_dis.dds'),
+        SkinnableFile(texturePath .. 's_dis.dds'),
         label, labelRight, labelSize, clickCue, rollCue)
     return checkbox
 end
 
-function CreateRadioButtonsStd(parent, filename, title, buttons, default)
+function CreateRadioButtonsStd(parent, texturePath, title, buttons, default)
     local radioButton = RadioButtons(parent, title, buttons, default, "Arial", 14, fontColor,
-        SkinnableFile(filename .. '-d_btn_up.dds'),
-        SkinnableFile(filename .. '-s_btn_up.dds'),
-        SkinnableFile(filename .. '-d_btn_over.dds'),
-        SkinnableFile(filename .. '-s_btn_over.dds'),
-        SkinnableFile(filename .. '-d_btn_dis.dds'),
-        SkinnableFile(filename .. '-s_btn_dis.dds'),
+        SkinnableFile(texturePath .. 'd_up.dds'),
+        SkinnableFile(texturePath .. 's_up.dds'),
+        SkinnableFile(texturePath .. 'd_over.dds'),
+        SkinnableFile(texturePath .. 's_over.dds'),
+        SkinnableFile(texturePath .. 'd_dis.dds'),
+        SkinnableFile(texturePath .. 's_dis.dds'),
         "")
     return radioButton
 end

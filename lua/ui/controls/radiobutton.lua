@@ -1,21 +1,32 @@
-local Group = import('group.lua').Group
-local Checkbox = import('checkbox.lua').Checkbox
-local Text = import('text.lua').Text
-local Border = import('border.lua').Border
-local LayoutHelpers = import('layouthelpers.lua')
+local Group = import('/lua/maui/group.lua').Group
+local UIUtil = import('/lua/ui/uiutil.lua')
+local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 
-RadioButtons = Class(Group)
-{
-    -- title is a string that will get displayed above the group
-    -- buttons is a table of strings that represent a button
-    -- default is the string that will be selected on start
-    -- font is the name of the font to use for the labels
-    -- fontsize is the size of the label font
-    -- unselected is the file name of the bitmap for the unselected buttons
-    -- selected is the file name of the bitmap for the selected buttons
-    __init = function(self, parent, title, buttons, default, font, fontsize, fontcolor, unselected, selected, overUn, overSel, disabledUn, disabledSel, debugname)
+RadioButton = Class(Group) {
+    -- title: A string displayed above the group. If nil, no textfield is created.
+    -- buttons: A table of tables describing buttons. Only one key is required:
+    --  Optional parameters are permitted:
+    --  label: A string to display beside the button.
+    --  texturePath: A string to be used as a directory offset relative to the object's texture path
+    --  to find button-specific textures. If omitted, textures from relative "./default" are used instead.
+    --
+    --  The required texture names are:
+    --  s_dis.png
+    --  s_up.png
+    --  s_over.png
+    --  d_dis.png
+    --  d_up.png
+    --  d_over.png
+    -- texturePath: The path from the style root to the texture directory for this radiobutton.
+    --              Button-specific texture paths are relative to this path (and both are subject to
+    --              the whims of the style engine.
+    -- default: The index in the buttons array of the value to be selected by default.
+    __init = function(self, parent, texturePath, buttons, default, horizontal, labelRight, font, fontSize, fontColor)
         Group.__init(self, parent)
-        self:SetName(debugname or "radiobuttons")
+
+        font = font or "Arial"
+        fontSize = fontSize or 13
+        fontColor = fontColor or UIUtil.fontColor
 
         -- get the buttons and do some setup
         local maxWidth = 0
@@ -25,89 +36,87 @@ RadioButtons = Class(Group)
 
         -- set up all the buttons
         for index, button in buttons do
-            self.mButtons[button] = {checkbox = Checkbox(self, unselected, selected, overUn, overSel, disabledUn, disabledSel),
-                                     label = Text(self)}
-            self.mButtons[button].label:SetFont(font, fontsize)
-            self.mButtons[button].label:SetColor(fontcolor)
-            self.mButtons[button].label:SetText(button)
-            LayoutHelpers.CenteredRightOf(self.mButtons[button].label, self.mButtons[button].checkbox)
-            local thisWidth = self.mButtons[button].checkbox.Width() + self.mButtons[button].label.Width()
-            if thisWidth > maxWidth then maxWidth = thisWidth end
-            height = height + math.max(self.mButtons[button].checkbox.Height(), self.mButtons[button].label.Height())            
-            
-            if button == default then
-                self.mButtons[button].checkbox:SetCheck(true)
+            local buttonTexturePath
+            if button.texturePath then
+                buttonTexturePath = texturePath .. button.texturePath .. '/'
+            else
+                buttonTexturePath = texturePath
             end
-            
-            -- label should forward all click events to checkbox for it to handle
-            self.mButtons[button].label.HandleEvent = function(control, event)
-                if event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
-                    for button in self.mButtons do
-                        if control == self.mButtons[button].label then
-                            self.mButtons[button].checkbox:HandleEvent(event)
-                            break
-                        end
-                    end
-                end
+            WARN(buttonTexturePath)
+
+            local checkbox = UIUtil.CreateCheckboxStd(self, buttonTexturePath, button.label, labelRight)
+
+            if button.label then
+                checkbox.label:SetFont(font, fontSize)
+                checkbox.label:SetColor(fontColor)
             end
 
-            self.mButtons[button].checkbox.HandleEvent = function(control, event)
-                if event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
-                    for button in self.mButtons do
-                        if control == self.mButtons[button].checkbox then
-                            if self.mCurSelection != button then
-                                self.mButtons[self.mCurSelection].checkbox:SetCheck(false)
-                                self.mCurSelection = button
-                                control:SetCheck(true)
-                                self:OnChoose(button)
-                            end
-                            break
-                        end
-                    end
-                end
+            height = height + checkbox.Height()
+
+            self.mButtons[index] = checkbox
+
+            local thisWidth = checkbox.Width()
+            if thisWidth > maxWidth then
+                maxWidth = thisWidth
+            end
+
+            -- Copy for closure
+            local optionIndex = index
+            checkbox.OnClick = function(control, modifiers)
+                -- Uncheck the currently selected one.
+                self.mButtons[self.mCurSelection]:SetCheck(false)
+
+                -- And select this one.
+                control:SetCheck(true)
+
+                self:OnChoose(optionIndex)
+                self.mCurSelection = optionIndex
             end
         end
-
-        -- calculate the layout once the buttons are all set up
-        self.mTitle = Text(self)
-        self.mTitle:SetFont(font, fontsize)
-        self.mTitle:SetColor(fontcolor)
-        self.mTitle:SetText(title)
-        self.mTitle.Top:Set(self.Top)
-        self.mTitle.Left:Set(self.Left)
-
-        -- make sure we fit the text label
-        if maxWidth < self.mTitle.Width() then maxWidth = self.mTitle.Width() end
-
-        self.mBorder = Border(self)
-        self.mBorder.Height:Set(height + 12)
-        self.mBorder.Width:Set(maxWidth + 12)
-        self.mBorder.Top:Set(self.mTitle.Bottom)
-        self.mBorder.Left:Set(self.mTitle.Left)
+        self.mButtons[default]:SetCheck(true)
 
         -- the group should be sized so we can click on the control if desired
-        self.Height:Set(function() return self.mBorder.Height() + self.mTitle.Height() end)
-        self.Width:Set(self.mBorder.Width)
+        self.Height:Set(function() return height + 12 end)
+        self.Width:Set(maxWidth + 12)
         self.Right:Set(function() return self.Left() + self.Width() end)
         self.Bottom:Set(function() return self.Top() + self.Height() end)
 
         -- add the buttons to the layout
         local isFirst = true
         local lastButton
-        for index, button in buttons do
+        for index, button in self.mButtons do
             if isFirst == true then
                 isFirst = false
-                lastButton = button
-                self.mButtons[button].checkbox.Left:Set(function() return self.mBorder.Left() + 6 end)
-                self.mButtons[button].checkbox.Top:Set(function() return self.mBorder.Top() + 6 end)
+                LayoutHelpers.AtLeftTopIn(button, self)
             else
-                self.mButtons[button].checkbox.Left:Set(self.mButtons[lastButton].checkbox.Left)
-                self.mButtons[button].checkbox.Top:Set(self.mButtons[lastButton].checkbox.Bottom)
-                lastButton = button
+                if horizontal then
+                    LayoutHelpers.AtTopIn(button, self)
+                    LayoutHelpers.RightOf(button, lastButton, 25)
+                else
+                    LayoutHelpers.AtLeftIn(button, self)
+                    LayoutHelpers.Below(button, lastButton)
+                end
             end
+            lastButton = button
         end
     end,
-    
-    -- overload this method to get events when item is choosen
-    OnChoose = function(self, button) end,
+
+    Disable = function(self)
+        for k, v in self.mButtons do
+           v:Disable()
+        end
+    end,
+
+    Enable = function(self)
+        for k, v in self.mButtons do
+            v:Enable()
+        end
+    end,
+
+    SetSelected = function(self, index)
+        self.mButtons[index]:OnClick()
+    end,
+
+    -- Overload this method to get events when item is chosen.
+    OnChoose = function(self, index) end,
 }
