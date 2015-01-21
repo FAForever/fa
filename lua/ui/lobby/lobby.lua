@@ -1220,12 +1220,12 @@ local function AssignRandomStartSpots(gameInfo)
         local results = {}
         table.insert(results, best)
 
-        -- add 100 random compositions and keep 3 with at least 90% of best quality
+        -- add 100 random compositions and keep 3 with at least 95% of best quality
         for i=1, 100 do
             r = autobalance_random(ratingTable, teams)
             q = autobalance_quality(r)
 
-            if(q > best.quality*0.9) then
+            if(q > best.quality*0.95) then
                 table.insert(results, {quality=q, result=r})
 
                 if(table.getsize(results) > 4) then break end
