@@ -21,11 +21,8 @@ local options = Prefs.GetFromCurrentProfile('options')
 
 local UIState = true
 
-local filteredEnergy = 1
-local filteredMass = 1
-local fullFlag = false
-local emptyFlag = false
-
+local lastEfficiency = {MASS=1, ENERGY=1}
+local Reclaim = {focus=-1, MASS={rate=0, history={}}, ENERGY={rate=0, history={}}}
 
 group = false
 savedParent = false
@@ -40,8 +37,6 @@ States = {
     massDetail = Prefs.GetFromCurrentProfile("massDetailedView"),
     massViewState = Prefs.GetFromCurrentProfile("massRateView") or 1,
 }
-
-local Reclaim = {focus=-1, MASS={rate=0, history={}}, ENERGY={rate=0, history={}}}
 
 if States.energyDetail == nil then
     States.energyDetail = true
@@ -96,7 +91,7 @@ function CreateUI()
         group.warningBG.flashMod = 1
         group.warningBG.warningBitmap = warningBitmap
         group.warningBG.SetToState = function(self, state)
-            if self.State != state then
+            if self.State ~= state then
                 if state == 'red' then
                     self:SetTexture(UIUtil.UIFile('/game/resource-panel/alert-'..self.warningBitmap..'-panel_bmp.dds'))
                     self.flashMod = 1.6
@@ -278,6 +273,10 @@ function CommonLogic()
     return GUI.mass, GUI.energy
 end
 
+function round(value)
+    return math.floor(value + .5)
+end
+
 function UpdateReclaim(econData)
     local INTERVAL = 10
     local HISTORY_SIZE = 5
@@ -294,284 +293,134 @@ function UpdateReclaim(econData)
             Reclaim[t].history[HISTORY_SIZE + 1] = nil
 
             local n = table.getsize(Reclaim[t].history)
-            Reclaim[t].rate = (reclaimed - Reclaim[t].history[n]) / (n / (10 / INTERVAL))
+            Reclaim[t].rate = round((reclaimed - Reclaim[t].history[n]) / (n / (10 / INTERVAL)))
         end
     end
 
-    TextLine02:SetText(string.format("%d (%d/s)", econData.reclaimed['MASS'], math.floor(Reclaim['MASS'].rate + .5)))
-    TextLine03:SetText(string.format("%d (%d/s)", econData.reclaimed['ENERGY'], math.floor(Reclaim['ENERGY'].rate + .5)))
+    TextLine02:SetText(string.format("%d (%d/s)", econData.reclaimed['MASS'], Reclaim['MASS'].rate))
+    TextLine03:SetText(string.format("%d (%d/s)", econData.reclaimed['ENERGY'], Reclaim['ENERGY'].rate))
+end
+
+local flags = {full=false, empty=false}
+function UpdateEconData(eco, type)
+    local smart = options.gui_smart_economy_indicators == 1
+    local lower_type = string.lower(type)
+    local tps = GetSimTicksPerSecond()
+    local controls = GUI[lower_type]
+    local viewstate = lower_type..'ViewState'
+    local stored = eco['stored'][type]
+    local maxStorage = eco['maxStorage'][type]
+    local ratio = stored / maxStorage
+    local income = eco['income'][type] * tps
+    local eff = lastEfficiency[type]
+
+    local key
+    if stored > 0.5 then
+        key = 'lastUseRequested'
+    else
+        key = 'lastUseActual'
+    end
+    local expense = eco[key][type] * tps
+    local rate = round(income - expense)
+
+    controls.storageBar:SetRange(0, maxStorage)
+    controls.storageBar:SetValue(stored)
+    controls.curStorage:SetText(round(stored))
+    controls.maxStorage:SetText(round(maxStorage))
+    controls.income:SetText(string.format("+%d", round(income)))
+    controls.expense:SetText(string.format("-%d", round(expense)))
+
+    if expense == 0 then
+        eff = 1
+    else
+        if smart then
+            eff = eff * 0.95 + (income / expense) * 0.05
+        else
+            eff = income / expense
+        end
+    end
+
+    local rate_str
+    if States[viewstate] == 2 then -- show efficiency
+        if expense == 0 then
+            rate_str = 'infinite'
+        else
+            rate_str = string.format("%d%%", round(eff * 100))
+        end
+    else
+        rate_str = string.format('%+d', round(rate))
+    end
+    controls.rate:SetText(rate_str)
+
+    local color = 'ffb7e75f'
+    if smart then
+        local flag = nil
+        if rate < 0 then
+            if type == 'ENERGY' and ratio < 0.2 then
+                flag = 'empty'
+            elseif eff > 0.8 and type == 'MASS' then
+            elseif eff > 0.5 then
+                color = 'yellow'
+            else
+                color = 'red'
+            end
+        elseif type == 'MASS' and ratio > 0.8 then
+            flag = 'full'
+        end
+
+        if flag then
+            if flags[flag] then
+                color = 'ff404040'
+            else
+                color = 'ffffffff'
+            end
+            flags[flag] = not flags[flag]
+        end
+    else
+        if rate < 0 then
+            if stored > 0 then
+                color = 'yellow'
+            else
+                color = 'red'
+            end
+        end
+    end
+    controls.rate:SetColor(color)
+
+    local state = 'hide'
+    if Prefs.GetOption('econ_warnings') and UIState then
+        if ratio < 0.2 then
+            if eff < 0.25 then
+                state = 'red'
+            elseif eff < 0.75 then
+                state = 'yellow'
+            end
+        elseif smart and ratio > 0.8 and type == 'MASS' then
+            if eff > 2.0 then
+                state = 'red'
+            elseif eff > 1.0 then
+                state = 'yellow'
+            end
+        end
+    end
+    controls.warningBG:SetToState(state)
+
+    lastEfficiency[type] = eff
 end
 
 function _BeatFunction()
     local econData = GetEconomyTotals()
-    local simFrequency = GetSimTicksPerSecond()
-
-    if options.gui_smart_economy_indicators == 1 then
-        local function DisplayEconData(controls, tableID, viewPref, filtered, warnfull)
-            local maxStorageVal = econData["maxStorage"][tableID]
-            local storedVal = econData["stored"][tableID]
-            local incomeVal = econData["income"][tableID]
-            local lastRequestedVal = econData["lastUseRequested"][tableID]
-            local lastActualVal = econData["lastUseActual"][tableID]
-
-            local requestedAvg = math.min(lastRequestedVal * simFrequency, 99999999)
-            local actualAvg = math.min(lastActualVal * simFrequency, 99999999)
-            local incomeAvg = math.min(incomeVal * simFrequency, 99999999)
-
-            controls.storageBar:SetRange(0, maxStorageVal)
-            controls.storageBar:SetValue(storedVal)
-            controls.curStorage:SetText(math.ceil(storedVal))
-            controls.maxStorage:SetText(math.ceil(maxStorageVal))
-
-            controls.income:SetText(string.format("+%d", math.ceil(incomeAvg)))
-            if (storedVal > 0.5) then
-                controls.expense:SetText(string.format("-%d", math.ceil(actualAvg)))
-            else
-                controls.expense:SetText(string.format("-%d", math.ceil(requestedAvg)))
-            end
-
-            local rateVal = 0
-            if storedVal > 0.5 then
-                rateVal = math.ceil(incomeAvg - actualAvg)
-            else
-                rateVal = math.ceil(incomeAvg - requestedAvg)
-            end
-
-
-            -- CHANGED by THYGRRR: Effective value calculation and rate calculation separated.
-            local rateStr = string.format('%+d', math.min(math.max(rateVal, -99999999), 99999999))
-            local effVal = 0
-            if (options.gui_smart_economy_indicators == 1) then
-                -- CHANGED BY THYGRRR: inlined local function to facilitate easier filtering
-                if (requestedAvg == 0) then
-                    effVal = "infinite"
-                else
-                    if (storedVal > 0.5) then
-                        filtered = filtered * 0.95 + (incomeAvg / actualAvg) * 0.05
-                        effVal = string.format("%d%%", math.ceil(filtered * 100))
-                    else
-                        filtered = filtered * 0.95 + (incomeAvg / requestedAvg) * 0.05
-                        effVal = string.format("%d%%", math.ceil(filtered * 100))
-                    end
-                end
-            else
-                -- CHANGED BY THYGRRR: option turned off, normal behavior (re-coded though)
-                if (requestedAvg == 0) then
-                    effVal = "100%"
-                    filtered = 1.0
-                else
-                    if (storedVal > 0.5) then
-                        filtered = (incomeAvg / actualAvg)
-                        effVal = string.format("%d%%", math.min(math.ceil(filtered * 100), 100))
-                    else
-                        filtered = (incomeAvg / requestedAvg)
-                        effVal = string.format("%d%%", math.min(math.ceil(filtered * 100), 100))
-                    end
-                end
-            end
-
-            -- CHOOSE RATE or EFFICIENCY STRING - CHANGED BY THYGRRR: Allow more than 100% - removed: math.min(effVal, 100)
-            if States[viewPref] == 2 then
-                controls.rate:SetText(effVal)
-            else
-                controls.rate:SetText(string.format("%+s", rateStr))
-            end
-
-            -- SET RATE/EFFICIENCY COLOR
-            local rateColor
-            if (rateVal < 0) then
-                if (options.gui_smart_economy_indicators == 1) and (not warnfull) and (storedVal / maxStorageVal < 0.2) then
-                    --THYGRRR: display flashing gray-white if low on resource and warnfull is false ('warnempty')
-                    if (emptyFlag) then
-                        emptyFlag = false
-                        rateColor = 'ff404040'
-                    else
-                        emptyFlag = true
-                        rateColor = 'ffffffff'
-                    end
-                else
-                    -- SITUATION SPECIFIC COLOR CODE, modified to use filtered value and go red below 50%, and green above 80%
-                    if (options.gui_smart_economy_indicators == 1) then
-                        if (filtered > 0.8) and (warnfull) then
-                            rateColor = 'ffb7e75f'
-                        else
-                            if (filtered > 0.5) then
-                                rateColor = 'yellow'
-                            else
-                                rateColor = 'red'
-                            end
-                        end
-                    else
-                        -- OLD COLOR CODE
-                        if (rateVal < 0) then
-                            if (storedVal > 0) then
-                                rateColor = 'yellow'
-                            else
-                                rateColor = 'red'
-                            end
-                        else
-                            rateColor = 'ffb7e75f'
-                        end
-                    end
-                end
-            else
-                if (options.gui_smart_economy_indicators == 1) and (warnfull) and (storedVal / maxStorageVal > 0.8) then
-                    --THYGRRR: display flashing gray-white if high on resource and warnfull is true
-                    if (fullFlag) then
-                        fullFlag = false
-                        rateColor = 'ff404040'
-                    else
-                        fullFlag = true
-                        rateColor = 'ffffffff'
-                    end
-                else
-                    -- ORIGINAL COLOR CODE
-                    rateColor = 'ffb7e75f'
-                end
-            end
-            controls.rate:SetColor(rateColor)
-
-            -- ECONOMY WARNINGS
-            -- CHANGED BY THYGRRR: Use the filtered value, which is cleaner
-            if Prefs.GetOption('econ_warnings') and UIState then
-                if (warnfull) and (options.gui_smart_economy_indicators == 1) then
-                    if (storedVal / maxStorageVal > 0.8) then
-                        if (filtered > 2.0) then
-                            controls.warningBG:SetToState('red')
-                        elseif (filtered > 1.0) then
-                            controls.warningBG:SetToState('yellow')
-                        elseif (filtered < 1.0) then
-                            controls.warningBG:SetToState('hide')
-                        end
-                    else
-                        controls.warningBG:SetToState('hide')
-                    end
-                else
-                    -- original behavior
-                    if (storedVal / maxStorageVal < 0.2) then
-                        if (filtered < 0.25) then
-                            controls.warningBG:SetToState('red')
-                        elseif (filtered < 0.75) then
-                            controls.warningBG:SetToState('yellow')
-                        elseif (filtered > 1.0) then
-                            controls.warningBG:SetToState('hide')
-                        end
-                    else
-                        controls.warningBG:SetToState('hide')
-                    end
-                end
-            else
-                controls.warningBG:SetToState('hide')
-            end
-
-            return filtered
-        end 
-
-        if options.gui_display_reclaim_totals == 1 then
-            UpdateReclaim(econData)
-        end
-
-        filteredEnergy = DisplayEconData(GUI.energy, 'ENERGY', 'energyViewState', filteredEnergy, false)
-        filteredMass = DisplayEconData(GUI.mass, 'MASS', 'massViewState', filteredMass, true)        
-
-    else
-        local function DisplayEconData(controls, tableID, viewPref)
-            local function FormatRateString(RateVal, StoredVal, IncomeAvg, ActualAvg, RequestedAvg)
-                
-                local retRateStr = string.format('%+d', math.min(math.max(RateVal, -99999999), 99999999))
-
-                local retEffVal = 0
-                if RequestedAvg == 0 then
-                    retEffVal = math.ceil(IncomeAvg) * 100
-                else
-                    if StoredVal > 0.5 then
-                        retEffVal = math.ceil( (IncomeAvg / ActualAvg) * 100 )
-                    else
-                        retEffVal = math.ceil( (IncomeAvg / RequestedAvg) * 100 )
-                    end    
-                end
-                return retRateStr, retEffVal
-            end
-            
-            local maxStorageVal = econData["maxStorage"][tableID]
-            local storedVal = econData["stored"][tableID]
-            local incomeVal = econData["income"][tableID]
-            local lastRequestedVal = econData["lastUseRequested"][tableID]
-            local lastActualVal = econData["lastUseActual"][tableID]
-        
-            local requestedAvg = math.min(lastRequestedVal * simFrequency, 99999999)
-            local actualAvg = math.min(lastActualVal * simFrequency, 9999999)
-            local incomeAvg = math.min(incomeVal * simFrequency, 99999999)
-            
-            controls.storageBar:SetRange(0, maxStorageVal)
-            controls.storageBar:SetValue(storedVal)
-            controls.curStorage:SetText(math.ceil(storedVal))
-            controls.maxStorage:SetText(math.ceil(maxStorageVal))
-            
-            controls.income:SetText(string.format("+%d", math.ceil(incomeAvg)))
-            if storedVal > 0.5 then
-                controls.expense:SetText(string.format("-%d", math.ceil(actualAvg)))
-            else
-                controls.expense:SetText(string.format("-%d", math.ceil(requestedAvg)))
-            end
-        
-            local rateVal = 0
-            if storedVal > 0.5 then
-                rateVal = math.ceil(incomeAvg - actualAvg)
-            else
-                rateVal = math.ceil(incomeAvg - requestedAvg)
-            end
-            local rateStr = string.format('%+d', math.min(math.max(rateVal, -99999999), 99999999))
-            local rateStr, effVal = FormatRateString(rateVal, storedVal, incomeAvg, actualAvg, requestedAvg)
-        -- CHOOSE RATE or EFFICIENCY STRING
-            if States[viewPref] == 2 then
-                controls.rate:SetText(string.format("%d%%", math.min(effVal, 100)))   
-            else
-                controls.rate:SetText(string.format("%+s", rateStr))
-            end
-        -- SET RATE/EFFICIENCY COLOR
-            local rateColor
-            if rateVal < 0 then
-                if storedVal > 0 then
-                    rateColor = 'yellow'
-                else
-                    rateColor = 'red'
-                end
-            else
-                rateColor = 'ffb7e75f'
-            end
-            controls.rate:SetColor(rateColor)
-            
-        -- ECONOMY WARNINGS        
-            if Prefs.GetOption('econ_warnings') and UIState then
-                if storedVal / maxStorageVal < .2 then
-                    if effVal < 25 then
-                        controls.warningBG:SetToState('red')
-                    elseif effVal < 75 then
-                        controls.warningBG:SetToState('yellow')
-                    elseif effVal > 100 then
-                        controls.warningBG:SetToState('hide')
-                    end
-                else
-                    controls.warningBG:SetToState('hide')
-                end
-            else
-                controls.warningBG:SetToState('hide')
-            end
-        end
-        
-        DisplayEconData(GUI.mass, 'MASS', 'massViewState')
-        DisplayEconData(GUI.energy, 'ENERGY', 'energyViewState')
-
-        if options.gui_display_reclaim_totals == 1 then
-            UpdateReclaim(econData)
-        end
-
+    
+    UpdateEconData(econData, 'MASS')
+    UpdateEconData(econData, 'ENERGY')
+    
+    if options.gui_display_reclaim_totals == 1 then
+        UpdateReclaim(econData)
     end
 end
 
 function ToggleEconPanel(state)
-    if import('/lua/ui/game/gamemain.lua').gameUIHidden and state != nil then
+    if import('/lua/ui/game/gamemain.lua').gameUIHidden and state ~= nil then
         return
     end
     import(UIUtil.GetLayoutFilename('economy')).TogglePanelAnimation(state)
