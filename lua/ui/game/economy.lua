@@ -41,6 +41,8 @@ States = {
     massViewState = Prefs.GetFromCurrentProfile("massRateView") or 1,
 }
 
+local Reclaim = {focus=-1, MASS={rate=0, history={}}, ENERGY={rate=0, history={}}}
+
 if States.energyDetail == nil then
     States.energyDetail = true
 end
@@ -276,15 +278,33 @@ function CommonLogic()
     return GUI.mass, GUI.energy
 end
 
+function UpdateReclaim(econData)
+    local INTERVAL = 10
+    local HISTORY_SIZE = 5
+    local focus = GetFocusArmy()
+    if Reclaim.focus ~= focus then
+        Reclaim = {focus=focus, MASS={rate=0, history={}}, ENERGY={rate=0, history={}}}
+    end
+
+    if not Reclaim.MASS.history or math.mod(GameTick(), INTERVAL) == 0 then
+        for _, t in {'MASS', 'ENERGY'} do
+            local reclaimed = econData.reclaimed[t]
+
+            table.insert(Reclaim[t].history, 1, reclaimed)
+            Reclaim[t].history[HISTORY_SIZE + 1] = nil
+
+            local n = table.getsize(Reclaim[t].history)
+            Reclaim[t].rate = (reclaimed - Reclaim[t].history[n]) / (n / (10 / INTERVAL))
+        end
+    end
+
+    TextLine02:SetText(string.format("%d (%d/s)", econData.reclaimed['MASS'], math.floor(Reclaim['MASS'].rate + .5)))
+    TextLine03:SetText(string.format("%d (%d/s)", econData.reclaimed['ENERGY'], math.floor(Reclaim['ENERGY'].rate + .5)))
+end
+
 function _BeatFunction()
     local econData = GetEconomyTotals()
     local simFrequency = GetSimTicksPerSecond()
-    if options.gui_display_reclaim_totals == 1 then
-    -- fetch & format reclaim values
-        reclaimedTotalsMass = math.ceil(econData.reclaimed.MASS)
-        reclaimedTotalsEnergy = math.ceil(econData.reclaimed.ENERGY)
-    end
-    
 
     if options.gui_smart_economy_indicators == 1 then
         local function DisplayEconData(controls, tableID, viewPref, filtered, warnfull)
@@ -445,11 +465,12 @@ function _BeatFunction()
             end
 
             return filtered
-        end        
+        end 
+
         if options.gui_display_reclaim_totals == 1 then
-            TextLine02:SetText(reclaimedTotalsMass)
-            TextLine03:SetText(reclaimedTotalsEnergy)
+            UpdateReclaim(econData)
         end
+
         filteredEnergy = DisplayEconData(GUI.energy, 'ENERGY', 'energyViewState', filteredEnergy, false)
         filteredMass = DisplayEconData(GUI.mass, 'MASS', 'massViewState', filteredMass, true)        
 
@@ -543,9 +564,9 @@ function _BeatFunction()
         DisplayEconData(GUI.energy, 'ENERGY', 'energyViewState')
 
         if options.gui_display_reclaim_totals == 1 then
-            TextLine02:SetText(reclaimedTotalsMass)
-            TextLine03:SetText(reclaimedTotalsEnergy)
+            UpdateReclaim(econData)
         end
+
     end
 end
 
