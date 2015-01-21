@@ -342,7 +342,7 @@ function UIFile(filespec)
             if not UIFileCache[useSkin] then UIFileCache[useSkin] = {} end
             UIFileCache[useSkin][filespec] = found
         else
-            LOG("Warning: Unable to find file ", filespec)
+            WARN(debug.traceback(nil, "Warning: Unable to find file: " .. filespec))
             return filespec
         end
     end
