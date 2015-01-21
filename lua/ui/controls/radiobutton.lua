@@ -42,7 +42,8 @@ RadioButton = Class(Group) {
             else
                 buttonTexturePath = texturePath
             end
-            WARN(buttonTexturePath)
+            WARN(debug.traceback(nil, "Texture for RadioButton not found: " ..buttonTexturePath))
+
 
             local checkbox = UIUtil.CreateCheckboxStd(self, buttonTexturePath, button.label, labelRight)
 
