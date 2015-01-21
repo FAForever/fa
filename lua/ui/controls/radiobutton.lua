@@ -23,7 +23,6 @@ RadioButton = Class(Group) {
     -- default: The index in the buttons array of the value to be selected by default.
     __init = function(self, parent, texturePath, buttons, default, horizontal, labelRight, font, fontSize, fontColor)
         Group.__init(self, parent)
-
         font = font or "Arial"
         fontSize = fontSize or 13
         fontColor = fontColor or UIUtil.fontColor
@@ -42,7 +41,6 @@ RadioButton = Class(Group) {
             else
                 buttonTexturePath = texturePath
             end
-            WARN(debug.traceback(nil, "Texture for RadioButton not found: " ..buttonTexturePath))
 
 
             local checkbox = UIUtil.CreateCheckboxStd(self, buttonTexturePath, button.label, labelRight)
