@@ -14,7 +14,9 @@ local MenuCommon = import('/lua/ui/menus/menucommon.lua')
 local Prefs = import('/lua/user/prefs.lua')
 local MapUtil = import('/lua/ui/maputil.lua')
 local Group = import('/lua/maui/group.lua').Group
+local RadioButton = import('/lua/ui/controls/radiobutton.lua').RadioButton
 local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
+local ResourceMapPreview = import('/lua/ui/controls/resmappreview.lua').ResourceMapPreview
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
@@ -110,6 +112,7 @@ local commandQueueIndex = 0
 local commandQueue = {}
 
 local quickRandMap = true
+local autoKick = true
 
 local lastUploadedMap = nil
 
@@ -138,13 +141,6 @@ local argv = parseCommandlineArguments()
 
 local playerRating = math.floor( Trueskill.round2((argv.playerMean - 3 * argv.playerDeviation) / 100.0) * 100 )
 
--- builds the faction tables, and then adds random faction icon to the end
-local factionBmps = {}
-local factionTooltips = {}
-for index, tbl in FactionData.Factions do
-    factionBmps[index] = tbl.SmallIcon
-    factionTooltips[index] = tbl.TooltipID
-end
 local teamTooltips = {
     'lob_team_none',
     'lob_team_one',
@@ -154,8 +150,6 @@ local teamTooltips = {
     'lob_team_five',
     'lob_team_six',
 }
-table.insert(factionBmps, "/faction_icon-sm/random_ico.dds")
-table.insert(factionTooltips, 'lob_random')
 
 local teamNumbers = {
     "<LOC _No>",
@@ -1145,8 +1139,7 @@ local function AssignRandomStartSpots(gameInfo)
 
                 if autoTeams == 'lvsr' then
                     local midLine = GUI.mapView.Left() + (GUI.mapView.Width() / 2)
-                    if(not GUI.markers[i].marker) then return end
-                    local markerPos = GUI.markers[i].marker.Left()
+                    local markerPos = GUI.mapView.startPositions[i].Left()
 
                     if markerPos < midLine then
                         team = 2
@@ -1155,7 +1148,7 @@ local function AssignRandomStartSpots(gameInfo)
                     end
                 elseif autoTeams == 'tvsb' then
                     local midLine = GUI.mapView.Top() + (GUI.mapView.Height() / 2)
-                    local markerPos = GUI.markers[i].marker.Top()
+                    local markerPos = GUI.mapView.startPositions[i].Top()
 
                     if markerPos < midLine then
                         team = 2
@@ -1276,7 +1269,7 @@ local function AssignRandomTeams(gameInfo)
         local midLine = GUI.mapView.Left() + (GUI.mapView.Width() / 2)
         for i = 1, LobbyComm.maxPlayerSlots do
             if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
-                local markerPos = GUI.markers[i].marker.Left()
+                local markerPos = GUI.mapView.startPositions[i].Left()
                 if markerPos < midLine then
                     gameInfo.PlayerOptions[i].Team = 2
                 else
@@ -1289,7 +1282,7 @@ local function AssignRandomTeams(gameInfo)
         local midLine = GUI.mapView.Top() + (GUI.mapView.Height() / 2)
         for i = 1, LobbyComm.maxPlayerSlots do
             if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
-                local markerPos = GUI.markers[i].marker.Top()
+                local markerPos = GUI.mapView.startPositions[i].Top()
                 if markerPos < midLine then
                     gameInfo.PlayerOptions[i].Team = 2
                 else
@@ -1309,7 +1302,7 @@ local function AssignRandomTeams(gameInfo)
     if gameInfo.GameOptions['AutoTeams'] == 'pvsi' or gameInfo.GameOptions['RandomMap'] ~= 'Off' then
         for i = 1, LobbyComm.maxPlayerSlots do
             if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
-                if i == 1 or i == 3 or i == 5 or i == 7 or i == 9 or i == 11 then
+                if math.mod(i, 2) ~= 0 then
                     gameInfo.PlayerOptions[i].Team = 2
                 else
                     gameInfo.PlayerOptions[i].Team = 3
@@ -1326,7 +1319,6 @@ local function AssignRandomTeams(gameInfo)
             end
         end
     end
-
 end
 
 local function AssignAINames(gameInfo)
@@ -1644,36 +1636,6 @@ local function AlertHostMapMissing()
     end
 end
 
--- Set the faction selector icons appropriately for the given selected faction.
-local function updateFactionSelectorIcons(enabled, faction)
-    -- Possibly bolt "-dis" onto the pathname.
-    local dis = ""
-    if not enabled then
-        dis = "-dis"
-    end
-
-    -- Set everything to the small version.
-    for k, v in pairs(FACTION_PANELS) do
-        v:SetTexture("/textures/ui/common/FACTIONSELECTOR/" .. FACTION_NAMES[k] .. "_ico" .. dis .. ".png")
-    end
-
-    -- Set the selection faction icon to the large version.
-    FACTION_PANELS[faction]:SetTexture("/textures/ui/common/FACTIONSELECTOR/" .. FACTION_NAMES[faction] .. "_ico-large.png")
-end
-
--- Set the enabledness state of the faction selector to the given value.
--- The faction argument specifies the selected faction (the corresponding icon is shown larger than
--- the others.
-local function Faction_Selector_Set_Enabled(enabled, faction)
-    -- Update the images to reflect the new enabled state.
-    updateFactionSelectorIcons(enabled, faction)
-
-    -- Set the enabled state of the panel.
-    for k , v in pairs(FACTION_PANELS) do
-        UIUtil.setEnabled(v, enabled)
-    end
-end
-
 -- Refresh (with a sledgehammer) all the items in the observer list.
 local function refreshObserverList()
     GUI.observerList:DeleteAllItems()
@@ -1711,6 +1673,12 @@ end
 
 local function UpdateGame()
     LOGX('>> UpdateGame', 'UpdateGame')
+    -- This allows us to assume the existence of UI elements throughout.
+    if not GUI.uiCreated then
+        WARN(debug.traceback(nil, "UpdateGame() pointlessly called before UI creation!"))
+        return
+    end
+
     local scenarioInfo = nil
 
     if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
@@ -1722,12 +1690,10 @@ local function UpdateGame()
         else
             AlertHostMapMissing()
         end
+
+        GUI.mapView:SetScenario(scenarioInfo)
     end
 
-    -- This allows us to assume the existence of UI elements throughout.
-    if not GUI.uiCreated then
-        return
-    end
 
     local isHost = lobbyComm:IsHost()
 
@@ -1753,7 +1719,7 @@ local function UpdateGame()
         UIUtil.setEnabled(GUI.restrictedUnitsOrPresetsBtn, not isHost or notReady)
 
         UIUtil.setEnabled(GUI.LargeMapPreview, notReady)
-        Faction_Selector_Set_Enabled(notReady, playerOptions.Faction)
+        UIUtil.setEnabled(GUI.factionSelector, notReady)
 
         -- Set the info in a Slot
         -- TODO: Since these stats are all constants, we should figure out the right place to do this
@@ -1795,13 +1761,10 @@ local function UpdateGame()
     end
 
     if scenarioInfo and scenarioInfo.map and (scenarioInfo.map ~= "") then
-        if not GUI.mapView:SetTexture(scenarioInfo.preview) then
-            GUI.mapView:SetTextureFromMap(scenarioInfo.map)
-        end
-        ShowMapPositions(GUI.mapView,scenarioInfo,numPlayers)
+        GUI.mapView:SetScenario(scenarioInfo)
+        ShowMapPositions(GUI.mapView, scenarioInfo, numPlayers)
     else
-        GUI.mapView:ClearTexture()
-        ShowMapPositions(nil, false)
+        GUI.mapView:Clear()
     end
 
     if not singlePlayer then
@@ -1922,6 +1885,9 @@ local function UpdateGame()
         Tooltip.AddControlTooltip(GUI.MapNameLabel, mapTooltip)
         Tooltip.AddControlTooltip(GUI.GameQualityLabel, mapTooltip)
     end
+
+    -- If the large map is shown, update it.
+    RefreshLargeMap()
 end
 
 -- Update our local gameInfo.GameMods from selected map name and selected mods, then
@@ -2623,14 +2589,17 @@ function CreateSlotsUI(makeLabel)
 
         -- Default mouse behaviours for the slot.
         local defaultHandler = function(self, event)
+            if curRow > numOpenSlots then
+                return
+            end
+
+            local associatedMarker = GUI.mapView.startPositions[curRow]
             if event.Type == 'MouseEnter' then
-                if gameInfo.GameOptions['TeamSpawn'] ~= 'random' and GUI.markers[curRow].Indicator then
-                    GUI.markers[curRow].Indicator:Play()
+                if gameInfo.GameOptions['TeamSpawn'] ~= 'random' then
+                    associatedMarker.indicator:Play()
                 end
             elseif event.Type == 'MouseExit' then
-                if GUI.markers[curRow].Indicator then
-                    GUI.markers[curRow].Indicator:Stop()
-                end
+                associatedMarker.indicator:Stop()
             elseif event.Type == 'ButtonDClick' then
                 DoSlotBehavior(curRow, 'occupy', '')
             end
@@ -2732,6 +2701,16 @@ function CreateSlotsUI(makeLabel)
         Tooltip.AddControlTooltip(colorSelector, 'lob_color')
 
         --// Faction
+        -- builds the faction tables, and then adds random faction icon to the end
+        local factionBmps = {}
+        local factionTooltips = {}
+        for index, tbl in FactionData.Factions do
+            factionBmps[index] = tbl.SmallIcon
+            factionTooltips[index] = tbl.TooltipID
+        end
+        table.insert(factionBmps, "/faction_icon-sm/random_ico.dds")
+        table.insert(factionTooltips, 'lob_random')
+
         local factionSelector = BitmapCombo(bg, factionBmps, table.getn(factionBmps), nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         newSlot.faction = factionSelector
         LayoutHelpers.AtLeftIn(factionSelector, GUI.panel, slotColumnSizes.faction.x)
@@ -2740,7 +2719,7 @@ function CreateSlotsUI(makeLabel)
         factionSelector.OnClick = function(self, index)
             SetPlayerOption(curRow, 'Faction', index)
             if curRow == FindSlotForID(FindIDForName(localPlayerName)) then
-                SetCurrentFactionTo_Faction_Selector()
+                GUI.factionSelector:SetSelected(index)
             end
 
             Tooltip.DestroyMouseoverDisplay()
@@ -2791,7 +2770,7 @@ function CreateSlotsUI(makeLabel)
         newSlot.multiSpace.Top:Set(newSlot.Top)
 
         -- Ready Checkbox
-        local readyBox = UIUtil.CreateCheckboxStd(newSlot.multiSpace, '/CHECKBOX/radio')
+        local readyBox = UIUtil.CreateCheckboxStd(newSlot.multiSpace, '/CHECKBOX/')
         newSlot.ready = readyBox
         LayoutHelpers.AtVerticalCenterIn(readyBox, newSlot.multiSpace, 8)
         LayoutHelpers.AtLeftIn(readyBox, newSlot.multiSpace, 0)
@@ -2828,6 +2807,7 @@ end
 function CreateUI(maxPlayers)
     local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
     local Text = import('/lua/maui/text.lua').Text
+    local ResourceMapPreview = import('/lua/ui/controls/resmappreview.lua').ResourceMapPreview
     local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
     local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
     local EffectHelpers = import('/lua/maui/effecthelpers.lua')
@@ -2835,7 +2815,8 @@ function CreateUI(maxPlayers)
     local Prefs = import('/lua/user/prefs.lua')
     local Tooltip = import('/lua/ui/game/tooltip.lua')
 
-    UIUtil.SetCurrentSkin('uef')
+    local lastFaction = Prefs.GetFromCurrentProfile('LastFaction') or 1
+    UIUtil.SetCurrentSkin(FACTION_NAMES[lastFaction])
 
     if (GUI.connectdialog ~= false) then
         MenuCommon.MenuCleanup()
@@ -3010,29 +2991,24 @@ function CreateUI(maxPlayers)
     ---------------------------------------------------------------------------
     -- set up map panel
     ---------------------------------------------------------------------------
-    GUI.mapView = MapPreview(GUI.mapPanel)
-    LayoutHelpers.AtLeftTopIn(GUI.mapView, GUI.mapPanel, 5, 6)--mapOverlay)
-    GUI.mapView.Width:Set(196+2)
-    GUI.mapView.Height:Set(194)
+    GUI.mapView = ResourceMapPreview(GUI.mapPanel, 198, 3, 5)
+    LayoutHelpers.AtLeftTopIn(GUI.mapView, GUI.mapPanel, 5, 5)
 
-    GUI.LargeMapPreview = UIUtil.CreateButtonWithDropshadow(GUI.mapView, '/BUTTON/zoom/', "")
-    LayoutHelpers.AtRightIn(GUI.LargeMapPreview, GUI.mapView, -3)
-    LayoutHelpers.AtBottomIn(GUI.LargeMapPreview, GUI.mapView, -3)
+    GUI.LargeMapPreview = UIUtil.CreateButtonWithDropshadow(GUI.mapPanel, '/BUTTON/zoom/', "")
+    LayoutHelpers.AtRightIn(GUI.LargeMapPreview, GUI.mapPanel, -3)
+    LayoutHelpers.AtBottomIn(GUI.LargeMapPreview, GUI.mapPanel, -3)
+    LayoutHelpers.DepthOverParent(GUI.LargeMapPreview, GUI.mapView, 2)
     Tooltip.AddButtonTooltip(GUI.LargeMapPreview, 'lob_click_LargeMapPreview')
     GUI.LargeMapPreview.OnClick = function()
-        CreateBigPreview(501, GUI)
+        ShowBigPreview()
     end
 
     -- Checkbox Show changed Options
-    local cbox_ShowChangedOption = UIUtil.CreateCheckboxStd(GUI.optionsPanel, '/CHECKBOX/radio')
-    LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel, 3, 0)
     -- TODO: Localise!
+    local cbox_ShowChangedOption = UIUtil.CreateCheckboxStd(GUI.optionsPanel, '/CHECKBOX/', 'Hide default Options', true, 11)
+    LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel, 3, 0)
 
     Tooltip.AddCheckboxTooltip(cbox_ShowChangedOption, {text='Hide default Options', body='Show only changed Options and Advanced Map Options'})
-    local cbox_ShowChangedOption_TEXT = UIUtil.CreateText(cbox_ShowChangedOption, 'Hide default Options', 11, 'Arial', true)
-    cbox_ShowChangedOption_TEXT:SetColor('B9BFB9')
-    LayoutHelpers.AtLeftIn(cbox_ShowChangedOption_TEXT, cbox_ShowChangedOption, 25)
-    LayoutHelpers.AtVerticalCenterIn(cbox_ShowChangedOption_TEXT, cbox_ShowChangedOption)
     cbox_ShowChangedOption.OnCheck = function(self, checked)
         HideDefaultOptions = checked
         RefreshOptionDisplayData()
@@ -3455,12 +3431,9 @@ function CreateUI(maxPlayers)
     -- set up observer and limbo grid
     ---------------------------------------------------------------------------
 
-    GUI.allowObservers = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/radio')
-    LayoutHelpers.CenteredLeftOf(GUI.allowObservers, GUI.buttonPanelTop, -30)
+    GUI.allowObservers = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/', 'Observers in Game', true, 11)
+    LayoutHelpers.AtLeftTopIn(GUI.allowObservers, GUI.buttonPanelTop)
     Tooltip.AddControlTooltip(GUI.allowObservers, 'lob_observers_allowed')
-    GUI.observerLabel = UIUtil.CreateText(GUI.allowObservers, 'Observers in Game', 11, 'Arial', true)
-    LayoutHelpers.CenteredRightOf(GUI.observerLabel, GUI.allowObservers, 0)
-    Tooltip.AddControlTooltip(GUI.observerLabel, 'lob_describe_observers')
     GUI.allowObservers:SetCheck(false)
     if lobbyComm:IsHost() then
         SetGameOption("AllowObservers", false, true)
@@ -3469,7 +3442,6 @@ function CreateUI(maxPlayers)
         end
     else
         GUI.allowObservers:Disable()
-        GUI.observerLabel:Disable()
     end
 
     -- GO OBSERVER BUTTON --
@@ -3652,22 +3624,17 @@ function CreateUI(maxPlayers)
                 UpdateGame()
             end
         end
-    end --end of random map code
+    end
 
-    --start of auto kick code
     if lobbyComm:IsHost() and not singlePlayer then
-        GUI.autoKick = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/radio')
-        LayoutHelpers.CenteredRightOf(GUI.autoKick, GUI.observerLabel, 10)
-        Tooltip.AddControlTooltip(GUI.autoKick, 'lob_auto_kick')
-        GUI.autoKickLabel = UIUtil.CreateText(GUI.autoKick, "Auto kick", 11, 'Arial', true)
-        LayoutHelpers.CenteredRightOf(GUI.autoKickLabel, GUI.autoKick, 0)
-        Tooltip.AddControlTooltip(GUI.autoKickLabel, 'lob_auto_kick')
+        local autoKickBox = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/', "Auto kick", true, 11)
+        LayoutHelpers.CenteredRightOf(autoKickBox, GUI.allowObservers, 10)
+        Tooltip.AddControlTooltip(autoKickBox, 'lob_auto_kick')
         autoKick = true
-        GUI.autoKick.OnCheck = function(self, checked)
+        autoKickBox:SetCheck(true)
+        autoKickBox.OnCheck = function(self, checked)
             autoKick = checked
-            UpdateGame()
         end
-        GUI.autoKick:SetCheck(true)
     end
 
     GUI.observerList = ItemList(GUI.observerPanel, "observer list")
@@ -3701,7 +3668,6 @@ function CreateUI(maxPlayers)
 
         GUI.allowObservers:Hide()
         GUI.becomeObserver:Hide()
-        GUI.observerLabel:Hide()
         GUI.randTeam:Hide()
         GUI.defaultOptions:Hide()
         GUI.rerunBenchmark:Hide()
@@ -3713,7 +3679,6 @@ function CreateUI(maxPlayers)
 
     -- Setup large pretty faction selector.
     CreateUI_Faction_Selector()
-    SetCurrentFactionTo_Faction_Selector()
 
     ---------------------------------------------------------------------------
     -- other logic, including lobby callbacks
@@ -4002,240 +3967,140 @@ function AddChatText(text)
 end
 
 function ShowMapPositions(mapCtrl, scenario, numPlayers)
-    if nil == scenario.starts then
-        scenario.starts = true
-    end
-
-    if GUI.posGroup then
-        GUI.posGroup:Destroy()
-        GUI.posGroup = false
-    end
-
-    if GUI.markers and table.getn(GUI.markers) > 0 then
-        for i, v in GUI.markers do
-            v.marker:Destroy()
-        end
-    end
-    GUI.markers = {}
-    if not scenario.starts then
-        return
-    end
-
-    if not scenario.size then
-        LOG("Lobby: Can't show map positions as size field isn't in scenario yet (must be resaved with new editor!)")
-        return
-    end
-
-    GUI.posGroup = Group(mapCtrl)
-    LayoutHelpers.FillParent(GUI.posGroup, mapCtrl)
-
     local startPos = MapUtil.GetStartPositions(scenario)
-
-    local cHeight = GUI.posGroup:Height()
-    local cWidth = GUI.posGroup:Width()
-
-    local mWidth = scenario.size[1]
-    local mHeight = scenario.size[2]
-
     local playerArmyArray = MapUtil.GetArmies(scenario)
 
     for inSlot, army in playerArmyArray do
         local pos = startPos[army]
         local slot = inSlot
-        GUI.markers[slot] = {}
-        GUI.markers[slot].marker = Bitmap(GUI.posGroup)
-        GUI.markers[slot].marker.Height:Set(10)
-        GUI.markers[slot].marker.Width:Set(8)
-        GUI.markers[slot].marker.Depth:Set(function() return GUI.posGroup.Depth() + 10 end)
-        GUI.markers[slot].marker:SetSolidColor('00777777')
 
-        GUI.markers[slot].teamIndicator = Bitmap(GUI.markers[slot].marker)
-        LayoutHelpers.AnchorToRight(GUI.markers[slot].teamIndicator, GUI.markers[slot].marker, 1)
-        LayoutHelpers.AtTopIn(GUI.markers[slot].teamIndicator, GUI.markers[slot].marker, 5)
-        GUI.markers[slot].teamIndicator:DisableHitTest()
+        -- The ACUButton instance representing this slot.
+        local marker = mapCtrl.startPositions[slot]
 
         if gameInfo.GameOptions['AutoTeams'] and not gameInfo.AutoTeams[slot] and lobbyComm:IsHost() then
             gameInfo.AutoTeams[slot] = 2
         end
 
-        local buttonImage = UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds')
-        GUI.markers[slot].markerOverlay = Button(GUI.markers[slot].marker,
-                                                 buttonImage, buttonImage, buttonImage, buttonImage)
-        LayoutHelpers.AtCenterIn(GUI.markers[slot].markerOverlay, GUI.markers[slot].marker)
-        GUI.markers[slot].markerOverlay.Slot = slot
-        GUI.markers[slot].markerOverlay.OnClick = function(self, modifiers)
-            if modifiers.Left then
-                if gameInfo.GameOptions['TeamSpawn'] ~= 'random' then
-                    if FindSlotForID(localPlayerID) ~= self.Slot and gameInfo.PlayerOptions[self.Slot] == nil then
-                        if IsPlayer(localPlayerID) then
-                            if lobbyComm:IsHost() then
-                                HostTryMovePlayer(hostID, FindSlotForID(localPlayerID), self.Slot)
-                            else
-                                lobbyComm:SendData(hostID, {Type = 'MovePlayer', CurrentSlot = FindSlotForID(localPlayerID), RequestedSlot =  self.Slot})
-                            end
-                        elseif IsObserver(localPlayerID) then
-                            if lobbyComm:IsHost() then
-                                requestedFaction = Prefs.GetFromCurrentProfile('LastFaction')
-                                requestedPL = playerRating
-                                requestedRC = argv.ratingColor
-                                requestedNG = argv.numGames
-                                HostConvertObserverToPlayer(hostID, localPlayerName, FindObserverSlotForID(localPlayerID),
-                                                            self.Slot, requestedFaction, requestedPL, requestedRC, requestedNG)
-                            else
-                                lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer', RequestedName = localPlayerName,
-                                                                      ObserverSlot = FindObserverSlotForID(localPlayerID), PlayerSlot =
-                                                                      self.Slot, requestedFaction =
-                                                                      Prefs.GetFromCurrentProfile('LastFaction'),
-                                                                      requestedPL = playerRating, requestedRC = argv.ratingColor,
-                                                                      requestedNG = argv.numGames})
-                            end
+        marker.OnClick = function(self)
+            if gameInfo.GameOptions['TeamSpawn'] ~= 'random' then
+                if FindSlotForID(localPlayerID) ~= slot and gameInfo.PlayerOptions[slot] == nil then
+                    if IsPlayer(localPlayerID) then
+                        if lobbyComm:IsHost() then
+                            HostTryMovePlayer(hostID, FindSlotForID(localPlayerID), slot)
+                        else
+                            lobbyComm:SendData(hostID, {Type = 'MovePlayer', CurrentSlot = FindSlotForID(localPlayerID), RequestedSlot =  slot})
+                        end
+                    elseif IsObserver(localPlayerID) then
+                        if lobbyComm:IsHost() then
+                            local requestedFaction = Prefs.GetFromCurrentProfile('LastFaction')
+                            HostConvertObserverToPlayer(hostID, localPlayerName, FindObserverSlotForID(localPlayerID),
+                                                        slot, requestedFaction, playerRating, argv.ratingColor, argv.numGames)
+                        else
+                            lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer',
+                                                        RequestedName = localPlayerName,
+                                                        ObserverSlot = FindObserverSlotForID(localPlayerID),
+                                                        PlayerSlot = slot,
+                                                        requestedFaction = Prefs.GetFromCurrentProfile('LastFaction'),
+                                                        requestedPL = playerRating,
+                                                        requestedRC = argv.ratingColor,
+                                                        requestedNG = argv.numGames})
                         end
                     end
+                end
+            else
+                if gameInfo.GameOptions['AutoTeams'] and lobbyComm:IsHost() then
+                    -- Handle the manual-mode reassignment of slots to teams.
+                    if gameInfo.GameOptions['AutoTeams'] == 'manual' then
+                        if not gameInfo.ClosedSlots[slot] and (gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] == 'random') then
+                            local targetTeam
+                            if gameInfo.AutoTeams[slot] == 7 then
+                                -- 2 here corresponds to team 1, since a team value of 1 represents
+                                -- "no team". Apparently GPG really, really didn't like zero.
+                                targetTeam = 2
+                            else
+                                targetTeam = gameInfo.AutoTeams[slot] + 1
+                            end
+
+                            marker:SetTeam(targetTeam)
+                            gameInfo.AutoTeams[slot] = targetTeam
+
+                            lobbyComm:BroadcastData(
+                                {
+                                    Type = 'AutoTeams',
+                                    Slots = slot,
+                                    Team = gameInfo.AutoTeams[slot],
+                                }
+                            )
+                            UpdateGame()
+                        end
+                    end
+                end
+            end
+        end
+
+        if lobbyComm:IsHost() then
+            marker.OnRightClick = function(self)
+                if gameInfo.ClosedSlots[slot] == nil then
+                    HostCloseSlot(hostID, slot)
                 else
-                    if gameInfo.GameOptions['AutoTeams'] and lobbyComm:IsHost() then
-                        if gameInfo.GameOptions['AutoTeams'] == 'manual' then
-                            if not gameInfo.ClosedSlots[slot] and (gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] == 'random') then
-                                local targetTeam
-                                if gameInfo.AutoTeams[slot] == 7 then
-                                    targetTeam = 2
-                                else
-                                    targetTeam = gameInfo.AutoTeams[slot] + 1
-                                end
-
-                                GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[targetTeam]))
-                                gameInfo.AutoTeams[slot] = targetTeam
-
-                                lobbyComm:BroadcastData(
-                                    {
-                                        Type = 'AutoTeams',
-                                        Slots = slot,
-                                        Team = gameInfo.AutoTeams[slot],
-                                    }
-                                )
-                                UpdateGame()
-                            end
-                        end
-                    end
-                end
-            elseif modifiers.Right then
-                if lobbyComm:IsHost() then
-                    if gameInfo.ClosedSlots[self.Slot] == nil then
-                        HostCloseSlot(hostID, self.Slot)
-                    else
-                        HostOpenSlot(hostID, self.Slot)
-                    end
+                    HostOpenSlot(hostID, slot)
                 end
             end
         end
-        GUI.markers[slot].markerOverlay.HandleEvent = function(self, event)
-            if event.Type == 'MouseEnter' then
-                if gameInfo.GameOptions['TeamSpawn'] ~= 'random' then
-                    GUI.slots[self.Slot].name.HandleEvent(self, event)
-                elseif gameInfo.GameOptions['AutoTeams'] == 'manual' and lobbyComm:IsHost() then
-                    GUI.markers[slot].Indicator:Play()
-                end
-            elseif event.Type == 'MouseExit' then
-                GUI.slots[self.Slot].name.HandleEvent(self, event)
-                if gameInfo.GameOptions['AutoTeams'] == 'manual' and lobbyComm:IsHost() then
-                    GUI.markers[slot].Indicator:Stop()
-                end
-            end
-            Button.HandleEvent(self, event)
-        end
-        LayoutHelpers.AtLeftTopIn(GUI.markers[slot].marker, GUI.posGroup,
-            ((pos[1] / mWidth) * cWidth) - (GUI.markers[slot].marker.Width() / 2),
-            ((pos[2] / mHeight) * cHeight) - (GUI.markers[slot].marker.Height() / 2))
 
-        local index = slot
-        GUI.markers[slot].Indicator = Bitmap(GUI.markers[slot].marker, UIUtil.UIFile('/game/beacons/beacon-quantum-gate_btn_up.dds'))
-        LayoutHelpers.AtCenterIn(GUI.markers[slot].Indicator, GUI.markers[slot].marker)
-        GUI.markers[slot].Indicator.Height:Set(function() return GUI.markers[index].Indicator.BitmapHeight() * .3 end)
-        GUI.markers[slot].Indicator.Width:Set(function() return GUI.markers[index].Indicator.BitmapWidth() * .3 end)
-        GUI.markers[slot].Indicator.Depth:Set(function() return GUI.markers[index].marker.Depth() - 1 end)
-        GUI.markers[slot].Indicator:Hide()
-        GUI.markers[slot].Indicator:DisableHitTest()
-        GUI.markers[slot].Indicator.Play = function(self)
-            self:SetAlpha(1)
-            self:Show()
-            self:SetNeedsFrameUpdate(true)
-            self.time = 0
-            self.OnFrame = function(control, time)
-                control.time = control.time + (time*4)
-                control:SetAlpha(MATH_Lerp(math.sin(control.time), -.5, .5, 0.3, 0.5))
-            end
-        end
-        GUI.markers[slot].Indicator.Stop = function(self)
-            self:SetAlpha(0)
-            self:Hide()
-            self:SetNeedsFrameUpdate(false)
+        -- Nothing more for us to do for a closed slot.
+        marker:SetClosed(gameInfo.ClosedSlots[slot] ~= nil)
+        if gameInfo.ClosedSlots[slot] then
+            return
         end
 
         if gameInfo.GameOptions['TeamSpawn'] == 'random' then
-            GUI.markers[slot].marker:SetSolidColor("00777777")
+            marker:SetColor("00777777")
         else
+            -- If spawns are fixed, show the colour/team of the person in this slot.
             if gameInfo.PlayerOptions[slot] then
-                GUI.markers[slot].marker:SetSolidColor(gameColors.PlayerColors[gameInfo.PlayerOptions[slot].PlayerColor])
-                if gameInfo.PlayerOptions[slot].Team == 1 then
-                    GUI.markers[slot].teamIndicator:SetSolidColor('00000000')
-                else
-                    GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[gameInfo.PlayerOptions[slot].Team]))
-                end
+                marker:SetColor(gameColors.PlayerColors[gameInfo.PlayerOptions[slot].PlayerColor])
+                marker:SetTeam(gameInfo.PlayerOptions[slot].Team)
             else
-                GUI.markers[slot].marker:SetSolidColor("00777777")
-                GUI.markers[slot].teamIndicator:SetSolidColor('00000000')
+                marker:Clear()
             end
         end
 
         if gameInfo.GameOptions['AutoTeams'] then
             if gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
-                local midLine = GUI.mapView.Left() + (GUI.mapView.Width() / 2)
-                if not gameInfo.ClosedSlots[slot] and (gameInfo.PlayerOptions[slot] or
-                    gameInfo.GameOptions['TeamSpawn'] == 'random') then
-                    local markerPos = GUI.markers[slot].marker.Left()
+                local midLine = mapCtrl.Left() + (mapCtrl.Width() / 2)
+                if gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] == 'random' then
+                    local markerPos = marker.Left()
                     if markerPos < midLine then
-                        GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[2]))
+                        marker:SetTeam(2)
                     else
-                        GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[3]))
+                        marker:SetTeam(3)
                     end
                 end
             elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
-                local midLine = GUI.mapView.Top() + (GUI.mapView.Height() / 2)
-                if not gameInfo.ClosedSlots[slot] and (gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] == 'random') then
-                    local markerPos = GUI.markers[slot].marker.Top()
+                local midLine = mapCtrl.Top() + (mapCtrl.Height() / 2)
+                if gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] == 'random' then
+                    local markerPos = marker.Top()
                     if markerPos < midLine then
-                        GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[2]))
+                        marker:SetTeam(2)
                     else
-                        GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[3]))
+                        marker:SetTeam(3)
                     end
                 end
             elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' then
-                if not gameInfo.ClosedSlots[slot] and (gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] == 'random') then
-                    if math.floor(slot, 2) ~= 0 then
-                        GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[2]))
+                if gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] == 'random' then
+                    if math.mod(slot, 2) ~= 0 then
+                        marker:SetTeam(2)
                     else
-                        GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[3]))
+                        marker:SetTeam(3)
                     end
                 end
             elseif gameInfo.GameOptions['AutoTeams'] == 'manual' and gameInfo.GameOptions['TeamSpawn'] == 'random' then
-                if not gameInfo.ClosedSlots[slot] and (gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] == 'random') then
-                    if gameInfo.AutoTeams[slot] then
-                        GUI.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[gameInfo.AutoTeams[slot]]))
-                    else
-                        GUI.markers[slot].teamIndicator:SetSolidColor('00000000')
-                    end
-                end
+                marker:SetTeam(gameInfo.AutoTeams[slot] or 1)
             end
         end
-
-        if gameInfo.ClosedSlots[slot] ~= nil then
-            local textOverlay = Text(GUI.markers[slot].markerOverlay)
-            textOverlay:SetFont(UIUtil.bodyFont, 14)
-            textOverlay:SetColor("Crimson")
-            textOverlay:SetText("X")
-            LayoutHelpers.AtCenterIn(textOverlay, GUI.markers[slot].markerOverlay)
-        end
     end
-end -- ShowMapPositions
+end
 
 -- LobbyComm Callbacks
 function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
@@ -4617,8 +4482,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             SetGameOption('ScenarioFile',self.desiredScenario, true)
         end
 
-        UpdateGame()
-
         GUI.keepAliveThread = ForkThread(
         -- Eject players who haven't sent a heartbeat in a while
         function()
@@ -4813,13 +4676,10 @@ function DebugDump()
 end
 
 local LrgMap = false
+
+-- Perform one-time setup of the large map preview
 function CreateBigPreview(depth, parent)
-    -- We don't want to create more than one!
     -- TODO: It might be nice to make clicking outside of the preview close it (or do nothing).
-    -- That might obviate this slight ugliness (recreating the control all the time)
-    if LrgMap then
-        LrgMap:Destroy()
-    end
 
     -- Size of the border image around the large map.
     local MAP_PREVIEW_BORDER_SIZE = 754
@@ -4842,9 +4702,8 @@ function CreateBigPreview(depth, parent)
     LrgMap.Depth:Set(depth)
 
     -- Create the map preview
-    local mapPreview = MapPreview(LrgMap)
-    mapPreview.Width:Set(MAP_PREVIEW_SIZE)
-    mapPreview.Height:Set(MAP_PREVIEW_SIZE)
+    local mapPreview = ResourceMapPreview(LrgMap, MAP_PREVIEW_SIZE, MASS_ICON_SIZE, HYDROCARBON_ICON_SIZE)
+    LrgMap.mapPreview = mapPreview
     LayoutHelpers.AtLeftTopIn(mapPreview, LrgMap, 19, 20)
 
     -- Place the border inside the group at the origin.
@@ -4867,218 +4726,39 @@ function CreateBigPreview(depth, parent)
     -- Keep the close button on top of the border (which is itself on top of the map preview)
     LayoutHelpers.DepthOverParent(closeBtn, border, 1)
 
-    -- Load the mass/hydrocarbon points and put them on the map.
+    RefreshLargeMap()
+end
+
+-- Refresh the large map preview (so it can update if something changes while it's open, and so we
+-- don't have to bother completely rebuilding it when it's opened/closed).
+function RefreshLargeMap()
+    if not LrgMap.visible then
+        return
+    end
+
     local scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-    if scenarioInfo and scenarioInfo.map and (scenarioInfo.map ~= '') then
-        if not mapPreview:SetTexture(scenarioInfo.preview) then
-            mapPreview:SetTextureFromMap(scenarioInfo.map)
-        end
+    LrgMap.mapPreview:SetScenario(scenarioInfo)
+    ShowMapPositions(LrgMap.mapPreview, scenarioInfo, GetPlayerCount())
+end
+
+function  ShowBigPreview()
+    if not LrgMap then
+        CreateBigPreview(501, GUI)
     end
 
-    local mapdata = {}
-    doscript('/lua/dataInit.lua', mapdata) -- needed for the format of _save files
-    doscript(scenarioInfo.save, mapdata)
+    LrgMap.visible = true
+    RefreshLargeMap()
 
-    local allmarkers = mapdata.Scenario.MasterChain['_MASTERCHAIN_'].Markers -- get the markers from the save file
-    local massmarkers = {}
-    local hydromarkers = {}
-
-    for markname in allmarkers do
-        if allmarkers[markname]['type'] == "Mass" then
-            table.insert(massmarkers, allmarkers[markname])
-        elseif allmarkers[markname]['type'] == "Hydrocarbon" then
-            table.insert(hydromarkers, allmarkers[markname])
-        end
-    end
-
-    -- Add the mass points.
-    local masses = {}
-    for i = 1, table.getn(massmarkers) do
-        masses[i] = Bitmap(mapPreview, UIUtil.SkinnableFile("/game/build-ui/icon-mass_bmp.dds"))
-        masses[i].Width:Set(MASS_ICON_SIZE)
-        masses[i].Height:Set(MASS_ICON_SIZE)
-
-        LayoutHelpers.AtLeftTopIn(masses[i], mapPreview,
-            massmarkers[i].position[1] / scenarioInfo.size[1] * MAP_PREVIEW_SIZE - MASS_ICON_SIZE / 2,
-            massmarkers[i].position[3] / scenarioInfo.size[2] * MAP_PREVIEW_SIZE - MASS_ICON_SIZE / 2)
-    end
-    mapPreview.massmarkers = masses
-
-    -- Add the hydrocarbon points.
-    local hydros = {}
-    for i = 1, table.getn(hydromarkers) do
-        hydros[i] = Bitmap(mapPreview, UIUtil.SkinnableFile("/game/build-ui/icon-energy_bmp.dds"))
-        hydros[i].Width:Set(HYDROCARBON_ICON_SIZE)
-        hydros[i].Height:Set(HYDROCARBON_ICON_SIZE)
-
-        LayoutHelpers.AtLeftTopIn(hydros[i], mapPreview,
-            hydromarkers[i].position[1] / scenarioInfo.size[1] * MAP_PREVIEW_SIZE - HYDROCARBON_ICON_SIZE / 2,
-            hydromarkers[i].position[3] / scenarioInfo.size[2]*  MAP_PREVIEW_SIZE - HYDROCARBON_ICON_SIZE / 2)
-    end
-    mapPreview.hydros = hydros
-
-    -- start positions
-    mapPreview.markers = {}
-    -- TODO: DIE DIE DIE.
-    NewShowMapPositions(mapPreview, scenarioInfo, GetPlayerCount())
+    LrgMap:Show()
 end
 
 function CloseBigPreview()
+    LrgMap.visible = false
     LrgMap:Hide()
 
     -- Restore the default escape handler.
     import('/lua/ui/uimain.lua').SetEscapeHandler(GUI.exitLobbyEscapeHandler)
 end
-
-local posGroup = false
--- copied from the old lobby.lua, needed to change GUI. into LrgMap. for a separately handled set of markers
--- TODO: We have these things called "function parameters".
-function NewShowMapPositions(mapCtrl, scenario, numPlayers)
-    if scenario.starts == nil then scenario.starts = true end
-
-    if posGroup then
-        posGroup:Destroy()
-        posGroup = false
-    end
-
-    if mapCtrl.markers and table.getn(mapCtrl.markers) > 0 then
-        for i, v in mapCtrl.markers do
-            v.marker:Destroy()
-        end
-    end
-
-    if not scenario.starts or not scenario.size then return end
-
-    local posGroup = Group(mapCtrl)
-    LayoutHelpers.FillParent(posGroup, mapCtrl)
-
-    local startPos = MapUtil.GetStartPositions(scenario)
-
-    local cHeight = posGroup:Height()
-    local cWidth = posGroup:Width()
-
-    local mWidth = scenario.size[1]
-    local mHeight = scenario.size[2]
-
-    local playerArmyArray = MapUtil.GetArmies(scenario)
-
-    for inSlot, army in playerArmyArray do
-        local pos = startPos[army]
-        local slot = inSlot
-        mapCtrl.markers[slot] = {}
-        mapCtrl.markers[slot].marker = Bitmap(posGroup)
-        mapCtrl.markers[slot].marker.Height:Set(10)
-        mapCtrl.markers[slot].marker.Width:Set(8)
-        mapCtrl.markers[slot].marker.Depth:Set(function() return posGroup.Depth() + 10 end)
-        mapCtrl.markers[slot].marker:SetSolidColor('00777777')
-
-        mapCtrl.markers[slot].teamIndicator = Bitmap(mapCtrl.markers[slot].marker)
-        LayoutHelpers.AnchorToRight(mapCtrl.markers[slot].teamIndicator, mapCtrl.markers[slot].marker, 1)
-        LayoutHelpers.AtTopIn(mapCtrl.markers[slot].teamIndicator, mapCtrl.markers[slot].marker, 5)
-        mapCtrl.markers[slot].teamIndicator:DisableHitTest()
-
-        local buttonImage = UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds')
-        mapCtrl.markers[slot].markerOverlay = Button(mapCtrl.markers[slot].marker, buttonImage, buttonImage, buttonImage, buttonImage)
-
-        LayoutHelpers.AtCenterIn(mapCtrl.markers[slot].markerOverlay, mapCtrl.markers[slot].marker)
-        mapCtrl.markers[slot].markerOverlay.Slot = slot
-        mapCtrl.markers[slot].markerOverlay.OnClick = function(self, modifiers)
-            if modifiers.Left then
-                if FindSlotForID(localPlayerID) ~= self.Slot and gameInfo.PlayerOptions[self.Slot] == nil then
-                    if IsPlayer(localPlayerID) then
-                        if lobbyComm:IsHost() then
-                            HostTryMovePlayer(hostID, FindSlotForID(localPlayerID), self.Slot)
-                        else
-                            lobbyComm:SendData(hostID, {Type = 'MovePlayer', CurrentSlot = FindSlotForID(localPlayerID),
-                            RequestedSlot =  self.Slot})
-                        end
-                    elseif IsObserver(localPlayerID) then
-                        if lobbyComm:IsHost() then
-                            HostConvertObserverToPlayer(hostID, localPlayerName, FindObserverSlotForID(localPlayerID),
-                            self.Slot)
-                        else
-                            lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer', RequestedName = localPlayerName,
-                            ObserverSlot = FindObserverSlotForID(localPlayerID),
-                            PlayerSlot = self.Slot})
-                        end
-                    end
-                end
-            elseif modifiers.Right then
-                if lobbyComm:IsHost() then
-                    if gameInfo.ClosedSlots[self.Slot] == nil then
-                        HostCloseSlot(hostID, self.Slot)
-                    else
-                        HostOpenSlot(hostID, self.Slot)
-                    end
-                end
-            end
-        end
-        mapCtrl.markers[slot].markerOverlay.HandleEvent = function(self, event)
-            if event.Type == 'MouseEnter' then
-                if gameInfo.GameOptions['TeamSpawn'] ~= 'random' then
-                    GUI.slots[self.Slot].name.HandleEvent(self, event)
-                    mapCtrl.markers[self.Slot].Indicator:Play()
-                end
-            elseif event.Type == 'MouseExit' then
-                GUI.slots[self.Slot].name.HandleEvent(self, event)
-                mapCtrl.markers[self.Slot].Indicator:Stop()
-            end
-            Button.HandleEvent(self, event)
-        end
-        LayoutHelpers.AtLeftTopIn(mapCtrl.markers[slot].marker, posGroup,
-        ((pos[1] / mWidth) * cWidth) - (mapCtrl.markers[slot].marker.Width() / 2),
-        ((pos[2] / mHeight) * cHeight) - (mapCtrl.markers[slot].marker.Height() / 2))
-
-        local index = slot
-        mapCtrl.markers[slot].Indicator = Bitmap(mapCtrl.markers[slot].marker,
-        UIUtil.UIFile('/game/beacons/beacon-quantum-gate_btn_up.dds'))
-        LayoutHelpers.AtCenterIn(mapCtrl.markers[slot].Indicator, mapCtrl.markers[slot].marker)
-        mapCtrl.markers[slot].Indicator.Height:Set(function() return mapCtrl.markers[index].Indicator.BitmapHeight() * .3 end)
-        mapCtrl.markers[slot].Indicator.Width:Set(function() return mapCtrl.markers[index].Indicator.BitmapWidth() * .3 end)
-        mapCtrl.markers[slot].Indicator.Depth:Set(function() return mapCtrl.markers[index].marker.Depth() - 1 end)
-        mapCtrl.markers[slot].Indicator:Hide()
-        mapCtrl.markers[slot].Indicator:DisableHitTest()
-        mapCtrl.markers[slot].Indicator.Play = function(self)
-            self:SetAlpha(1)
-            self:Show()
-            self:SetNeedsFrameUpdate(true)
-            self.time = 0
-            self.OnFrame = function(control, time)
-                control.time = control.time + (time*4)
-                control:SetAlpha(MATH_Lerp(math.sin(control.time), -.5, .5, 0.3, 0.5))
-            end
-        end
-        mapCtrl.markers[slot].Indicator.Stop = function(self)
-            self:SetAlpha(0)
-            self:Hide()
-            self:SetNeedsFrameUpdate(false)
-        end
-
-        if gameInfo.GameOptions['TeamSpawn'] == 'random' then
-            mapCtrl.markers[slot].marker:SetSolidColor("00777777")
-        else
-            if gameInfo.PlayerOptions[slot] then
-                mapCtrl.markers[slot].marker:SetSolidColor(gameColors.PlayerColors[gameInfo.PlayerOptions[slot].PlayerColor])
-                if gameInfo.PlayerOptions[slot].Team == 1 then
-                    mapCtrl.markers[slot].teamIndicator:SetSolidColor('00000000')
-                else
-                    mapCtrl.markers[slot].teamIndicator:SetTexture(UIUtil.UIFile(teamIcons[gameInfo.PlayerOptions[slot].Team]))
-                end
-            else
-                mapCtrl.markers[slot].marker:SetSolidColor("00777777")
-                mapCtrl.markers[slot].teamIndicator:SetSolidColor('00000000')
-            end
-        end
-
-        if gameInfo.ClosedSlots[slot] ~= nil then
-            local textOverlay = Text(mapCtrl.markers[slot].markerOverlay)
-            textOverlay:SetFont(UIUtil.bodyFont, 14)
-            textOverlay:SetColor("Crimson")
-            textOverlay:SetText("X")
-            LayoutHelpers.AtCenterIn(textOverlay, mapCtrl.markers[slot].markerOverlay)
-        end
-    end
-end -- NewShowMapPositions(...)
 
 --------------------------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------  Duck_42 Wall  --------------------------------------------------------
@@ -5446,107 +5126,33 @@ end
 
 -- Faction selector
 function CreateUI_Faction_Selector()
-    local factionPanel = Group(GUI.panel, "factionPanel")
-    LayoutHelpers.AtLeftTopIn(factionPanel, GUI.panel, 410, 36) --Right:615
-    factionPanel.Width:Set(205)
-    factionPanel.Height:Set(60)
-
-    GUI.AeonFactionPanel = Bitmap(factionPanel, "/textures/ui/common/FACTIONSELECTOR/aeon_ico.png")
-    LayoutHelpers.AtLeftTopIn(GUI.AeonFactionPanel, factionPanel, 0, 0)
-    LayoutHelpers.AtVerticalCenterIn(GUI.AeonFactionPanel, factionPanel, 0)
-
-    GUI.CybranFactionPanel = Bitmap(factionPanel, "/textures/ui/common/FACTIONSELECTOR/cybran_ico.png")
-    LayoutHelpers.AtLeftTopIn(GUI.CybranFactionPanel, factionPanel, 45, 0)
-    LayoutHelpers.AtVerticalCenterIn(GUI.CybranFactionPanel, factionPanel, 0)
-
-    GUI.UEFFactionPanel = Bitmap(factionPanel, "/textures/ui/common/FACTIONSELECTOR/uef_ico.png")
-    LayoutHelpers.AtHorizontalCenterIn(GUI.UEFFactionPanel, factionPanel, 0)
-    LayoutHelpers.AtVerticalCenterIn(GUI.UEFFactionPanel, factionPanel, 0)
-
-    GUI.SeraphimFactionPanel = Bitmap(factionPanel, "/textures/ui/common/FACTIONSELECTOR/seraphim_ico.png")
-    LayoutHelpers.AtRightTopIn(GUI.SeraphimFactionPanel, factionPanel, 45, 0)
-    LayoutHelpers.AtVerticalCenterIn(GUI.SeraphimFactionPanel, factionPanel, 0)
-
-    GUI.RandomFactionPanel = Bitmap(factionPanel, "/textures/ui/common/FACTIONSELECTOR/random_ico.png")
-    LayoutHelpers.AtRightTopIn(GUI.RandomFactionPanel, factionPanel, 0, 0)
-    LayoutHelpers.AtVerticalCenterIn(GUI.RandomFactionPanel, factionPanel, 0)
-
-    GUI.factionPanel = factionPanel
-
-    -- Relate faction numbers to faction panels to simplify update.
-    FACTION_PANELS = {[1] = GUI.UEFFactionPanel, [2] = GUI.AeonFactionPanel,
-                      [3] = GUI.CybranFactionPanel, [4] = GUI.SeraphimFactionPanel, [5] = GUI.RandomFactionPanel }
-
-    -- Get a closure suitable for use as the event listener on a faction selection button.
-    -- targetFaction is the faction represented by the faction selection panel using this listener.
-    -- targetPanel is that faction selection panel.
-    local function getFactionEventListener(targetPanel, targetFaction)
-        return function(ctrl, event)
-            local faction = Prefs.GetFromCurrentProfile('LastFaction') or 1
-            local eventHandled = false
-            if faction == targetFaction then
-                targetPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/" .. FACTION_NAMES[targetFaction] .. "_ico-large.png")
-            elseif IsPlayer(localPlayerID) then
-                if event.Type == 'MouseEnter' then
-                    targetPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/" .. FACTION_NAMES[targetFaction] .. "_ico-hover.png")
-                    eventHandled = true
-                elseif event.Type == 'MouseExit' then
-                    targetPanel:SetTexture("/textures/ui/common/FACTIONSELECTOR/" .. FACTION_NAMES[targetFaction] .. "_ico.png")
-                    eventHandled = true
-                elseif event.Type == 'ButtonPress' then
-                    eventHandled = true
-
-                    local localSlot = FindSlotForID(localPlayerID)
-                    Prefs.SetToCurrentProfile('LastFaction', targetFaction)
-                    GUI.slots[localSlot].faction:SetItem(targetFaction)
-                    SetPlayerOption(localSlot, 'Faction', targetFaction)
-                    gameInfo.PlayerOptions[localSlot].Faction = targetFaction
-
-                    SetCurrentFactionTo_Faction_Selector(targetFaction)
-                end
-            end
-
-            return eventHandled
-        end
+    -- Build a list of button objects from the list of defined factions. Each faction will use the
+    -- faction key as its RadioButton texture path offset.
+    local buttons = {}
+    for i, faction in FactionData.Factions do
+        buttons[i] = {
+            texturePath = faction.Key
+        }
     end
 
-    GUI.AeonFactionPanel.HandleEvent = getFactionEventListener(GUI.AeonFactionPanel, 2)
-    GUI.CybranFactionPanel.HandleEvent = getFactionEventListener(GUI.CybranFactionPanel, 3)
-    GUI.UEFFactionPanel.HandleEvent = getFactionEventListener(GUI.UEFFactionPanel, 1)
-    GUI.SeraphimFactionPanel.HandleEvent = getFactionEventListener(GUI.SeraphimFactionPanel, 4)
-    GUI.RandomFactionPanel.HandleEvent = getFactionEventListener(GUI.RandomFactionPanel, 5)
-end
+    -- Special-snowflaking for the random faction.
+    table.insert(buttons, {
+        texturePath = "random"
+    })
 
-function SetCurrentFactionTo_Faction_Selector(input_faction)
-    local faction = input_faction or Prefs.GetFromCurrentProfile('LastFaction') or 1
+    local lastFaction = Prefs.GetFromCurrentProfile('LastFaction') or 1
+    local factionSelector = RadioButton(GUI.panel, "/factionselector/", buttons, lastFaction, true)
+    GUI.factionSelector = factionSelector
+    LayoutHelpers.AtLeftTopIn(factionSelector, GUI.panel, 410, 60)
+    factionSelector.OnChoose = function(self, targetFaction, key)
+        local localSlot = FindSlotForID(localPlayerID)
+        Prefs.SetToCurrentProfile('LastFaction', targetFaction)
+        GUI.slots[localSlot].faction:SetItem(targetFaction)
+        SetPlayerOption(localSlot, 'Faction', targetFaction)
+        gameInfo.PlayerOptions[localSlot].Faction = targetFaction
 
-    UIUtil.SetCurrentSkin(FACTION_NAMES[faction])
-    ChangeBackgroundLobby(faction)
-    if faction == 1 then
-        LayoutHelpers.AtLeftIn(GUI.AeonFactionPanel, GUI.factionPanel, 0)
-        LayoutHelpers.AtLeftIn(GUI.CybranFactionPanel, GUI.factionPanel, 45)
-        LayoutHelpers.AtRightIn(GUI.SeraphimFactionPanel, GUI.factionPanel, 45)
-        LayoutHelpers.AtRightIn(GUI.RandomFactionPanel, GUI.factionPanel, 0)
-    elseif faction == 2 then
-        LayoutHelpers.AtLeftIn(GUI.AeonFactionPanel, GUI.factionPanel, -15)
-        LayoutHelpers.AtLeftIn(GUI.CybranFactionPanel, GUI.factionPanel, 45)
-        LayoutHelpers.AtRightIn(GUI.SeraphimFactionPanel, GUI.factionPanel, 45)
-        LayoutHelpers.AtRightIn(GUI.RandomFactionPanel, GUI.factionPanel, 0)
-    elseif faction == 3 then
-        LayoutHelpers.AtLeftIn(GUI.AeonFactionPanel, GUI.factionPanel, 0)
-        LayoutHelpers.AtLeftIn(GUI.CybranFactionPanel, GUI.factionPanel, 45-15)
-        LayoutHelpers.AtRightIn(GUI.SeraphimFactionPanel, GUI.factionPanel, 45)
-        LayoutHelpers.AtRightIn(GUI.RandomFactionPanel, GUI.factionPanel, 0)
-    elseif faction == 4 then
-        LayoutHelpers.AtLeftIn(GUI.AeonFactionPanel, GUI.factionPanel, 0)
-        LayoutHelpers.AtLeftIn(GUI.CybranFactionPanel, GUI.factionPanel, 45)
-        LayoutHelpers.AtRightIn(GUI.SeraphimFactionPanel, GUI.factionPanel, 45-15)
-        LayoutHelpers.AtRightIn(GUI.RandomFactionPanel, GUI.factionPanel, 0)
-    elseif faction == 5 then
-        LayoutHelpers.AtLeftIn(GUI.AeonFactionPanel, GUI.factionPanel, 0)
-        LayoutHelpers.AtLeftIn(GUI.CybranFactionPanel, GUI.factionPanel, 45)
-        LayoutHelpers.AtRightIn(GUI.SeraphimFactionPanel, GUI.factionPanel, 45)
-        LayoutHelpers.AtRightIn(GUI.RandomFactionPanel, GUI.factionPanel, -15)
+        ChangeBackgroundLobby(targetFaction)
+        UIUtil.SetCurrentSkin(FACTION_NAMES[targetFaction])
     end
 end
 
@@ -5613,6 +5219,8 @@ function CreateOptionLobbyDialog()
     local background = Bitmap(dialog, '/textures/ui/common/scx_menu/lan-game-lobby/optionlobby.dds')
     dialog.Width:Set(background.Width)
     dialog.Height:Set(background.Height)
+    WARN(background.Height)
+    WARN(background.Width)
     LayoutHelpers.FillParent(background, dialog)
 
     local dialog2 = Group(dialog)
@@ -5620,23 +5228,34 @@ function CreateOptionLobbyDialog()
     dialog2.Height:Set(240)
     LayoutHelpers.AtCenterIn(dialog2, dialog)
 
-    -- The provided radiobutton control doesn't allow satellite data, so we use the index in this
-    -- list as our stored background mode value.
-    local backgroundStates = {
-        LOC("<LOC lobui_0406>"), -- Factions
-        LOC("<LOC lobui_0407>"), -- Concept art
-        LOC("<LOC lobui_0408>"), -- Screenshot
-        LOC("<LOC lobui_0409>"), -- Map
-        LOC("<LOC lobui_0410>"), -- None
+    local buttons = {
+        {
+            label = LOC("<LOC lobui_0406>") -- Factions
+        },
+        {
+            label = LOC("<LOC lobui_0407>")  -- Concept art
+        },
+        {
+            label = LOC("<LOC lobui_0408>") -- Screenshot
+        },
+        {
+            label = LOC("<LOC lobui_0409>") -- Map
+        },
+        {
+            label = LOC("<LOC lobui_0410>") -- None
+        }
     }
-    local selectedBackgroundState = backgroundStates[Prefs.GetFromCurrentProfile("LobbyBackground") or 1]
-    local backgroundRadiobutton = UIUtil.CreateRadioButtonsStd(dialog2, '/CHECKBOX/radio', LOC("<LOC lobui_0405>"), backgroundStates, selectedBackgroundState)
 
-    LayoutHelpers.AtLeftTopIn(backgroundRadiobutton, dialog2, 20, 20)
+    -- Label shown above the background mode selection radiobutton.
+    local backgroundLabel = UIUtil.CreateText(dialog2, LOC("<LOC lobui_0405> "), 16, 'Arial', true)
+    local selectedBackgroundState = Prefs.GetFromCurrentProfile("LobbyBackground") or 1
+    local backgroundRadiobutton = RadioButton(dialog2, '/RADIOBOX/', buttons, selectedBackgroundState, false, true)
 
-    backgroundRadiobutton.OnChoose = function(self, button)
-        local backgroundMode = indexOf(backgroundStates, button)
-        Prefs.SetToCurrentProfile("LobbyBackground", backgroundMode)
+    LayoutHelpers.AtLeftTopIn(backgroundLabel, dialog2, 15, 15)
+    LayoutHelpers.AtLeftTopIn(backgroundRadiobutton, dialog2, 15, 40)
+
+    backgroundRadiobutton.OnChoose = function(self, index, key)
+        Prefs.SetToCurrentProfile("LobbyBackground", index)
         ChangeBackgroundLobby()
     end
 	--
@@ -5656,12 +5275,9 @@ function CreateOptionLobbyDialog()
         Prefs.SetToCurrentProfile('LobbyChatFontSize', sliderValue)
 	end
 	--
-    local cbox_WindowedLobby = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
+    local cbox_WindowedLobby = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/', LOC("<LOC lobui_0402>"))
     LayoutHelpers.AtRightTopIn(cbox_WindowedLobby, dialog2, 20, 42)
     Tooltip.AddCheckboxTooltip(cbox_WindowedLobby, {text='Windowed mode', body=LOC("<LOC lobui_0403>")})
-    local cbox_WindowedLobby_TEXT = UIUtil.CreateText(cbox_WindowedLobby, LOC("<LOC lobui_0402>"), 14, 'Arial', true)
-    LayoutHelpers.AtRightIn(cbox_WindowedLobby_TEXT, cbox_WindowedLobby, 25)
-    LayoutHelpers.AtVerticalCenterIn(cbox_WindowedLobby_TEXT, cbox_WindowedLobby)
     cbox_WindowedLobby.OnCheck = function(self, checked)
         local option
         if(checked) then
@@ -5673,12 +5289,9 @@ function CreateOptionLobbyDialog()
         SetWindowedLobby(checked)
     end
     --
-    local cbox_StretchBG = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/radio')
+    local cbox_StretchBG = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/', LOC("<LOC lobui_0400>"))
     LayoutHelpers.AtRightTopIn(cbox_StretchBG, dialog2, 20, 68)
     Tooltip.AddCheckboxTooltip(cbox_StretchBG, {text='Stretch Background', body=LOC("<LOC lobui_0401>")})
-    local cbox_StretchBG_TEXT = UIUtil.CreateText(cbox_StretchBG, LOC("<LOC lobui_0400>"), 14, 'Arial', true)
-    LayoutHelpers.AtRightIn(cbox_StretchBG_TEXT, cbox_StretchBG, 25)
-    LayoutHelpers.AtVerticalCenterIn(cbox_StretchBG_TEXT, cbox_StretchBG)
     cbox_StretchBG.OnCheck = function(self, checked)
         if checked then
             Prefs.SetToCurrentProfile('LobbyBackgroundStretch', 'true')
@@ -5706,8 +5319,6 @@ function CreateOptionLobbyDialog()
 	if defaultMode == 'windowed' then
 		-- Already set Windowed in Game
 		cbox_WindowedLobby:Disable()
-		cbox_WindowedLobby_TEXT:Disable()
-		cbox_WindowedLobby_TEXT:SetColor('5C5F5C')
 	end
     --
     local LobbyBackgroundStretch = Prefs.GetFromCurrentProfile('LobbyBackgroundStretch') or 'true'

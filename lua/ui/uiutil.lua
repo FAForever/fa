@@ -13,7 +13,7 @@ local Text = import('/lua/maui/text.lua').Text
 local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
 local Button = import('/lua/maui/button.lua').Button
 local Edit = import('/lua/maui/edit.lua').Edit
-local Checkbox = import('/lua/maui/Checkbox.lua').Checkbox
+local Checkbox = import('/lua/ui/controls/Checkbox.lua').Checkbox
 local RadioButtons = import('/lua/maui/radiobuttons.lua').RadioButtons
 local Scrollbar = import('/lua/maui/scrollbar.lua').Scrollbar
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
@@ -521,34 +521,26 @@ function CreateButtonWithDropshadow(parent, filename, label, textOffsetVert, tex
         )
 end
 
-function CreateCheckbox(parent, up, upsel, over, oversel, dis, dissel, clickCue, rollCue)
-    local clickSound = clickCue or 'UI_Mini_MouseDown'
-    local rollSound = rollCue or 'UI_Mini_Rollover'
-    local checkbox = Checkbox( parent, up, upsel, over, oversel, dis, dissel, clickSound, rollSound)
-    checkbox:UseAlphaHitTest(true)
+function CreateCheckboxStd(parent, texturePath, label, labelRight, labelSize, clickCue, rollCue)
+    local checkbox = Checkbox(parent,
+        SkinnableFile(texturePath .. 'd_up.dds'),
+        SkinnableFile(texturePath .. 's_up.dds'),
+        SkinnableFile(texturePath .. 'd_over.dds'),
+        SkinnableFile(texturePath .. 's_over.dds'),
+        SkinnableFile(texturePath .. 'd_dis.dds'),
+        SkinnableFile(texturePath .. 's_dis.dds'),
+        label, labelRight, labelSize, clickCue, rollCue)
     return checkbox
 end
 
-function CreateCheckboxStd(parent, filename, clickCue, rollCue)
-    local checkbox = CreateCheckbox( parent,
-        SkinnableFile(filename .. '-d_btn_up.dds'),
-        SkinnableFile(filename .. '-s_btn_up.dds'),
-        SkinnableFile(filename .. '-d_btn_over.dds'),
-        SkinnableFile(filename .. '-s_btn_over.dds'),
-        SkinnableFile(filename .. '-d_btn_dis.dds'),
-        SkinnableFile(filename .. '-s_btn_dis.dds'),
-        clickCue, rollCue)
-    return checkbox
-end
-
-function CreateRadioButtonsStd(parent, filename, title, buttons, default)
+function CreateRadioButtonsStd(parent, texturePath, title, buttons, default)
     local radioButton = RadioButtons(parent, title, buttons, default, "Arial", 14, fontColor,
-        SkinnableFile(filename .. '-d_btn_up.dds'),
-        SkinnableFile(filename .. '-s_btn_up.dds'),
-        SkinnableFile(filename .. '-d_btn_over.dds'),
-        SkinnableFile(filename .. '-s_btn_over.dds'),
-        SkinnableFile(filename .. '-d_btn_dis.dds'),
-        SkinnableFile(filename .. '-s_btn_dis.dds'),
+        SkinnableFile(texturePath .. 'd_up.dds'),
+        SkinnableFile(texturePath .. 's_up.dds'),
+        SkinnableFile(texturePath .. 'd_over.dds'),
+        SkinnableFile(texturePath .. 's_over.dds'),
+        SkinnableFile(texturePath .. 'd_dis.dds'),
+        SkinnableFile(texturePath .. 's_dis.dds'),
         "")
     return radioButton
 end

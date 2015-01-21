@@ -3,8 +3,8 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local EffectHelpers = import('/lua/maui/effecthelpers.lua')
 local Group = import('/lua/maui/group.lua').Group
+local Checkbox = import('/lua/ui/controls/checkbox.lua').Checkbox
 local Button = import('/lua/maui/button.lua').Button
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
 local Text = import('/lua/maui/text.lua').Text
 local Edit = import('/lua/maui/edit.lua').Edit
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
@@ -639,7 +639,7 @@ end
 			return btn
 		end
 		
-		group.camData = UIUtil.CreateCheckbox(group,
+		group.camData = Checkbox(group,
 			UIUtil.SkinnableFile('/game/camera-btn/pinned_btn_up.dds'),
 			UIUtil.SkinnableFile('/game/camera-btn/pinned_btn_down.dds'),
 			UIUtil.SkinnableFile('/game/camera-btn/pinned_btn_over.dds'),
@@ -1341,7 +1341,7 @@ function CreateConfigWindow()
         local group = Group(optionGroup)
         if data.type == 'filter' then
             group.name = UIUtil.CreateText(group, data.name, 14, "Arial")
-            group.check = UIUtil.CreateCheckboxStd(group, '/dialogs/check-box_btn/radio')
+            group.check = UIUtil.CreateCheckboxStd(group, '/dialogs/check-box_btn/')
             LayoutHelpers.AtLeftTopIn(group.check, group)
             LayoutHelpers.RightOf(group.name, group.check)
             LayoutHelpers.AtVerticalCenterIn(group.name, group.check)
