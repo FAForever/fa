@@ -3816,33 +3816,23 @@ function RefreshOptionDisplayData(scenarioInfo)
             tooltip = { text = optData.label, body = optData.help }
         }
 
-        -- Options are stored as keys from values array in optData. We want to display the
+        -- Options are stored as keys from the values array in optData. We want to display the
         -- descriptive string in the UI, so let's go dig it out.
 
-        -- If the is value is unset, it is definitely its default so we directly lookup what we want.
-        if not gameOption then
-            local val = optData.values[optData.default]
+        -- Scan the values array to find the one with the key matching our value for that option.
+        for k, val in optData.values do
+            if val.key == gameOption then
+                option.value = val.text
+                option.valueTooltip = {text = optData.label, body = val.help }
 
-            option.value = val.text
-            option.valueTooltip = {text = optData.label, body = val.help }
+                table.insert(formattedOptions, option)
 
-            table.insert(formattedOptions, option)
-        else
-            -- Scan the values array to find the one with the key matching our value for that option.
-            for k, val in optData.values do
-                if val.key == gameOption then
-                    option.value = val.text
-                    option.valueTooltip = {text = optData.label, body = val.help }
-
-                    table.insert(formattedOptions, option)
-
-                    -- Add this option to the non-default set for the UI.
-                    if k ~= optData.default then
-                        table.insert(nonDefaultFormattedOptions, option)
-                    end
-
-                    break
+                -- Add this option to the non-default set for the UI.
+                if k ~= optData.default then
+                    table.insert(nonDefaultFormattedOptions, option)
                 end
+
+                break
             end
         end
     end
@@ -4461,7 +4451,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         -- Given an option key, find the value stored in the profile (if any) and assign either it,
         -- or that option's default value, to the current game state.
         local setOptionsFromPref = function(option)
-            local defValue = Prefs.GetFromCurrentProfile("LobbyOpt_" .. option.key) or option.default
+            local defValue = Prefs.GetFromCurrentProfile("LobbyOpt_" .. option.key) or option.values[option.default].key
             SetGameOption(option.key, defValue, true)
         end
 
