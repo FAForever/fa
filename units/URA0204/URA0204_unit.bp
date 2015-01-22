@@ -294,7 +294,7 @@ UnitBlueprint {
             DisplayName = 'Nanite Torpedo',
             DoTPulses = 5,
             DoTTime = 1,
-            DropBombShort = 2
+            DropBombShort = 2,
             FireTargetLayerCapsTable = {
                 Air = 'Seabed|Sub|Water',
                 Land = 'Seabed|Sub|Water',

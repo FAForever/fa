@@ -279,7 +279,7 @@ UnitBlueprint {
             Damage = 375,
             DamageType = 'Normal',
             DisplayName = 'Harmonic Depth Charge',
-            DropBombShort = 2
+            DropBombShort = 2,
             EffectiveRadius = 19,
             FireTargetLayerCapsTable = {
                 Air = 'Seabed|Sub|Water',
