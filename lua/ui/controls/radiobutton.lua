@@ -43,7 +43,7 @@ RadioButton = Class(Group) {
             end
 
 
-            local checkbox = UIUtil.CreateCheckboxStd(self, buttonTexturePath, button.label, labelRight)
+            local checkbox = UIUtil.CreateCheckbox(self, buttonTexturePath, button.label, labelRight)
 
             if button.label then
                 checkbox.label:SetFont(font, fontSize)

@@ -2770,7 +2770,7 @@ function CreateSlotsUI(makeLabel)
         newSlot.multiSpace.Top:Set(newSlot.Top)
 
         -- Ready Checkbox
-        local readyBox = UIUtil.CreateCheckboxStd(newSlot.multiSpace, '/CHECKBOX/')
+        local readyBox = UIUtil.CreateCheckbox(newSlot.multiSpace, '/CHECKBOX/')
         newSlot.ready = readyBox
         LayoutHelpers.AtVerticalCenterIn(readyBox, newSlot.multiSpace, 8)
         LayoutHelpers.AtLeftIn(readyBox, newSlot.multiSpace, 0)
@@ -3005,7 +3005,7 @@ function CreateUI(maxPlayers)
 
     -- Checkbox Show changed Options
     -- TODO: Localise!
-    local cbox_ShowChangedOption = UIUtil.CreateCheckboxStd(GUI.optionsPanel, '/CHECKBOX/', 'Hide default Options', true, 11)
+    local cbox_ShowChangedOption = UIUtil.CreateCheckbox(GUI.optionsPanel, '/CHECKBOX/', 'Hide default Options', true, 11)
     LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel, 3, 0)
 
     Tooltip.AddCheckboxTooltip(cbox_ShowChangedOption, {text='Hide default Options', body='Show only changed Options and Advanced Map Options'})
@@ -3431,7 +3431,7 @@ function CreateUI(maxPlayers)
     -- set up observer and limbo grid
     ---------------------------------------------------------------------------
 
-    GUI.allowObservers = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/', 'Observers in Game', true, 11)
+    GUI.allowObservers = UIUtil.CreateCheckbox(GUI.buttonPanelTop, '/CHECKBOX/', 'Observers in Game', true, 11)
     LayoutHelpers.AtLeftTopIn(GUI.allowObservers, GUI.buttonPanelTop)
     Tooltip.AddControlTooltip(GUI.allowObservers, 'lob_observers_allowed')
     GUI.allowObservers:SetCheck(false)
@@ -3627,7 +3627,7 @@ function CreateUI(maxPlayers)
     end
 
     if lobbyComm:IsHost() and not singlePlayer then
-        local autoKickBox = UIUtil.CreateCheckboxStd(GUI.buttonPanelTop, '/CHECKBOX/', "Auto kick", true, 11)
+        local autoKickBox = UIUtil.CreateCheckbox(GUI.buttonPanelTop, '/CHECKBOX/', "Auto kick", true, 11)
         LayoutHelpers.CenteredRightOf(autoKickBox, GUI.allowObservers, 10)
         Tooltip.AddControlTooltip(autoKickBox, 'lob_auto_kick')
         autoKick = true
@@ -5275,7 +5275,7 @@ function CreateOptionLobbyDialog()
         Prefs.SetToCurrentProfile('LobbyChatFontSize', sliderValue)
 	end
 	--
-    local cbox_WindowedLobby = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/', LOC("<LOC lobui_0402>"))
+    local cbox_WindowedLobby = UIUtil.CreateCheckbox(dialog2, '/CHECKBOX/', LOC("<LOC lobui_0402>"))
     LayoutHelpers.AtRightTopIn(cbox_WindowedLobby, dialog2, 20, 42)
     Tooltip.AddCheckboxTooltip(cbox_WindowedLobby, {text='Windowed mode', body=LOC("<LOC lobui_0403>")})
     cbox_WindowedLobby.OnCheck = function(self, checked)
@@ -5289,7 +5289,7 @@ function CreateOptionLobbyDialog()
         SetWindowedLobby(checked)
     end
     --
-    local cbox_StretchBG = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/', LOC("<LOC lobui_0400>"))
+    local cbox_StretchBG = UIUtil.CreateCheckbox(dialog2, '/CHECKBOX/', LOC("<LOC lobui_0400>"))
     LayoutHelpers.AtRightTopIn(cbox_StretchBG, dialog2, 20, 68)
     Tooltip.AddCheckboxTooltip(cbox_StretchBG, {text='Stretch Background', body=LOC("<LOC lobui_0401>")})
     cbox_StretchBG.OnCheck = function(self, checked)

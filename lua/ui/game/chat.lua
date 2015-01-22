@@ -625,7 +625,7 @@ end
 		group.Height:Set(function() return group.edit.Height() end)
 		
 		local function CreateTestBtn(text)
-			local btn = UIUtil.CreateCheckboxStd(group, '/dialogs/toggle_btn/toggle')
+			local btn = UIUtil.CreateCheckbox(group, '/dialogs/toggle_btn/toggle')
 			btn.Depth:Set(function() return group.Depth() + 10 end)
 			btn.OnClick = function(self, modifiers)
 				if self._checkState == "unchecked" then
@@ -1341,7 +1341,7 @@ function CreateConfigWindow()
         local group = Group(optionGroup)
         if data.type == 'filter' then
             group.name = UIUtil.CreateText(group, data.name, 14, "Arial")
-            group.check = UIUtil.CreateCheckboxStd(group, '/dialogs/check-box_btn/')
+            group.check = UIUtil.CreateCheckbox(group, '/dialogs/check-box_btn/')
             LayoutHelpers.AtLeftTopIn(group.check, group)
             LayoutHelpers.RightOf(group.name, group.check)
             LayoutHelpers.AtVerticalCenterIn(group.name, group.check)
