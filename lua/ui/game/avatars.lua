@@ -132,8 +132,9 @@ function CreateAvatar(unit)
 
     bg.icon = Bitmap(bg)
     LayoutHelpers.AtLeftTopIn(bg.icon, bg, 5, 5)
-    if DiskGetFileInfo('/textures/ui/common/icons/units/'..bg.Blueprint.BlueprintId..'_icon.dds') then
-        bg.icon:SetTexture('/textures/ui/common/icons/units/'..bg.Blueprint.BlueprintId..'_icon.dds')
+    local icon = UIUtil.UIFile('/icons/units/'..bg.Blueprint.BlueprintId..'_icon.dds')
+    if DiskGetFileInfo(icon) then
+        bg.icon:SetTexture(icon)
     else
         bg.icon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
     end
