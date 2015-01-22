@@ -521,7 +521,13 @@ function CreateButtonWithDropshadow(parent, filename, label, textOffsetVert, tex
         )
 end
 
-function CreateCheckboxStd(parent, texturePath, label, labelRight, labelSize, clickCue, rollCue)
+-- Create a checkbox using the default checkbox texture. Kept as its own entry point for the benefit
+-- of retarded GPG code that things "radiobtn" is a sensible name for a checkbox texture.
+function CreateCheckboxStd(parent)
+    return CreateCheckbox(parent, '/dialogs/check-box_btn/')
+end
+
+function CreateCheckbox(parent, texturePath, label, labelRight, labelSize, clickCue, rollCue)
     local checkbox = Checkbox(parent,
         SkinnableFile(texturePath .. 'd_up.dds'),
         SkinnableFile(texturePath .. 's_up.dds'),

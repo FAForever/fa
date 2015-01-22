@@ -88,7 +88,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
     LayoutHelpers.AtBottomIn(SaveButton, dialog2, 10)
         
     -- Checkbox UI mod filter
-    local cbox_UI = UIUtil.CreateCheckboxStd(dialog2, '/RADIOBOX/')
+    local cbox_UI = UIUtil.CreateCheckbox(dialog2, '/RADIOBOX/')
     LayoutHelpers.AtLeftIn(cbox_UI, dialog2, 20+130+10)
     LayoutHelpers.AtBottomIn(cbox_UI, dialog2, 16)
     Tooltip.AddCheckboxTooltip(cbox_UI, {text='UI Mods', body='UI mods are activated only for you. You can have a mod of this type activated without the enemy knowing'})
@@ -101,7 +101,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
     cbox_UI:SetCheck(true, true)
             
     -- Checkbox game mod filter
-    local cbox_GAME = UIUtil.CreateCheckboxStd(dialog2, '/RADIOBOX/')
+    local cbox_GAME = UIUtil.CreateCheckbox(dialog2, '/RADIOBOX/')
     LayoutHelpers.AtLeftIn(cbox_GAME, dialog2, 20+130+100)
     LayoutHelpers.AtBottomIn(cbox_GAME, dialog2, 16)
     Tooltip.AddCheckboxTooltip(cbox_GAME, {text='Game Mods', body='Game mods are activated for all players, and all players must have the same version of the mod'})
@@ -114,7 +114,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
     cbox_GAME:SetCheck(false, true)
             
     -- Checkbox hide unselectable mods
-    local cbox_Act = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/')
+    local cbox_Act = UIUtil.CreateCheckbox(dialog2, '/CHECKBOX/')
     LayoutHelpers.AtLeftIn(cbox_Act, dialog2, 20+130+120+100)
     LayoutHelpers.AtBottomIn(cbox_Act, dialog2, 23)
     Tooltip.AddCheckboxTooltip(cbox_Act, {text='Hide Unselectable', body='Hide mods which are unselectable due to compatibility issues, or because a player in the lobby does not have them'})
@@ -127,7 +127,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
     cbox_Act:SetCheck(true, true)
             
     -- Checkbox condensed list
-    local cbox_Act2 = UIUtil.CreateCheckboxStd(dialog2, '/CHECKBOX/')
+    local cbox_Act2 = UIUtil.CreateCheckbox(dialog2, '/CHECKBOX/')
     LayoutHelpers.AtLeftIn(cbox_Act2, dialog2, 20+130+120+100)
     LayoutHelpers.AtBottomIn(cbox_Act2, dialog2, 6)
     Tooltip.AddCheckboxTooltip(cbox_Act2, {text='Condensed View', body='Displays mods as a simplified list'})
