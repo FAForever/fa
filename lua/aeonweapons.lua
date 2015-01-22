@@ -138,7 +138,14 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
         local pos1 = beam:GetPosition(1)
         local dist = VDist3(pos0, pos1) -- Length of the beam
         
+        -- Disable the target
         target:SetDoNotTarget(true)
+        target:SetCanTakeDamage(false)
+        if target:ShieldIsOn() then
+            target:DisableShield()
+            target:DisableDefaultToggleCaps()
+        end
+        
         self.Slider = CreateSlider(self.unit, muzzle, 0, 0, dist, -1, true)
         
         WaitTicks(1)
