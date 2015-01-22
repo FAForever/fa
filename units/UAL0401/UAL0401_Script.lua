@@ -20,17 +20,23 @@ UAL0401 = Class(AWalkingLandUnit) {
 
     OnKilled = function(self, instigator, type, overkillRatio)
         AWalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)
-        local wep = self:GetWeaponByLabel('EyeWeapon')
-        local bp = wep:GetBlueprint()
+        local eye = self:GetWeaponByLabel('EyeWeapon')
+        local bp = eye:GetBlueprint()
         if bp.Audio.BeamStop then
-            wep:PlaySound(bp.Audio.BeamStop)
+            eye:PlaySound(bp.Audio.BeamStop)
         end
-        if bp.Audio.BeamLoop and wep.Beams[1].Beam then
-            wep.Beams[1].Beam:SetAmbientSound(nil, nil)
+        if bp.Audio.BeamLoop and eye.Beams[1].Beam then
+            eye.Beams[1].Beam:SetAmbientSound(nil, nil)
         end
-        for k, v in wep.Beams do
+        for k, v in eye.Beams do
             v.Beam:Disable()
-        end     
+        end
+        
+        -- Clean up mid-tractor units
+        local claw1, claw2 = self:GetWeaponByLabel('RightArmTractor'), self:GetWeaponByLabel('LeftArmTractor')
+        claw1, claw2 = self:GetCurrentTarget(), self:GetCurrentTarget()
+        claw1:Destroy()
+        claw2:Destroy()
     end,
         
     DeathThread = function(self, overkillRatio, instigator)
