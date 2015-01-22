@@ -613,32 +613,36 @@ BitmapCombo = Class(Group) {
             end
             elementNum = elementNum + 1
 
+            -- A white-ish highlight that appears around an element when it is moused-over.
+            local highlight = Bitmap(listUIElement)
+            LayoutHelpers.FillParent(highlight, listUIElement)
+            highlight:SetSolidColor('00FFFFFF')
+
             -- The key in the input array with which the corresponding bitmap was associated.
-            listUIElement._index = index
-            listUIElement.HandleEvent = function(ctrl, event)
+            local elementIndex = index
+
+            local mouseEventHandler = function(ctrl, event)
                 if event.Type == 'MouseEnter' then
-                    if not ctrl.highlight then
-                        ctrl.highlight = Bitmap(ctrl, UIUtil.SkinnableFile('/widgets/drop-down/player-text-highlight_bmp.dds'))
-                        LayoutHelpers.FillParent(ctrl.highlight, ctrl)
-                        ctrl.highlight:DisableHitTest()
-                        self:OnOverItem(ctrl._index, self._array[ctrl._index])
-                        return true
-                    end
+                    highlight:SetSolidColor('44FFFFFF')
+                    self:OnOverItem(elementIndex, self._array[elementIndex])
+                    return true
                 elseif event.Type == 'MouseExit' then
-                    if ctrl.highlight then 
-                        ctrl.highlight:Destroy()
-                        ctrl.highlight = nil
-                        return true
-                    end
+                    highlight:SetSolidColor('00FFFFFF')
+                    return true
                 elseif event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
-                    self:SetItem(ctrl._index)
+                    self:SetItem(elementIndex)
                     self._ddhidden = true
                     self._dropdown:SetHidden(true)
-                    self:OnClick(ctrl._index, self._array[ctrl._index])
+                    self:OnClick(elementIndex, self._array[elementIndex])
                     return true
                 end
+
                 return false
             end
+
+            highlight.HandleEvent = mouseEventHandler
+            newBitmap.HandleEvent = mouseEventHandler
+
             prev = listUIElement
             self._list[elementNum] = listUIElement
         end
