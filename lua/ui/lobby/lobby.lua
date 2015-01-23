@@ -5287,48 +5287,48 @@ end
 
 -- Lobby Presets
 function GUI_PRESET()
+    if GUI.presetDialog then
+        GUI.presetDialog:Show()
+        return
+    end
+
     local profiles = GetPreference("UserPresetLobby")
 
-    GUI_Preset = Group(GUI)
-    LayoutHelpers.AtCenterIn(GUI_Preset, GUI)
-    GUI_Preset.Depth:Set(998)
-    local background = Bitmap(GUI_Preset, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby.dds'))
-    GUI_Preset.Width:Set(background.Width)
-    GUI_Preset.Height:Set(background.Height)
-    LayoutHelpers.FillParent(background, GUI_Preset)
-    local dialog2 = Group(GUI_Preset)
-    dialog2.Width:Set(536)
-    dialog2.Height:Set(400)
-    LayoutHelpers.AtCenterIn(dialog2, GUI_Preset)
+    local dialogContent = Group(GUI)
+    dialogContent.Width:Set(536)
+    dialogContent.Height:Set(400)
+
+    local presetDialog = Popup(GUI, dialogContent)
+    GUI.presetDialog = presetDialog
 
     -- Title
-    local text0 = UIUtil.CreateText(dialog2, 'Lobby Presets', 17, 'Arial Gras', true)
-    LayoutHelpers.AtHorizontalCenterIn(text0, dialog2, 0)
-    LayoutHelpers.AtTopIn(text0, dialog2, 30)
+    local text0 = UIUtil.CreateText(dialogContent, 'Lobby Presets', 17, 'Arial Gras', true)
+    LayoutHelpers.AtHorizontalCenterIn(text0, dialogContent, 0)
+    LayoutHelpers.AtTopIn(text0, dialogContent, 30)
 
     -- Info text
-    local text1 = UIUtil.CreateText(dialog2, 'Double-click to edit', 9, 'Arial', true)
+    local text1 = UIUtil.CreateText(dialogContent, 'Double-click to edit', 9, 'Arial', true)
     text1:SetColor('FFCC00')
     text1:Hide()
 
     -- Load button
-    local LoadButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Load Preset")
-    LayoutHelpers.AtLeftIn(LoadButton, dialog2, -10)
-    LayoutHelpers.AtBottomIn(LoadButton, dialog2, 30)
+    local LoadButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Load Preset")
+    LayoutHelpers.AtLeftIn(LoadButton, dialogContent, -10)
+    LayoutHelpers.AtBottomIn(LoadButton, dialogContent, 30)
     LoadButton.OnClick = function(self)
         LOAD_PRESET_IN_PREF()
     end
     
     -- Quit button
-    local QuitButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Cancel")
+    local QuitButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Cancel")
     LayoutHelpers.CenteredRightOf(QuitButton, LoadButton, -28)
     QuitButton.OnClick = function(self)
-        GUI_Preset:Destroy()
+        presetDialog:Hide()
     end
 
     -- Save button
-    local SaveButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Save Preset")
-    LayoutHelpers.AtRightIn(SaveButton, dialog2, -10)
+    local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Save Preset")
+    LayoutHelpers.AtRightIn(SaveButton, dialogContent, -10)
     LayoutHelpers.AtVerticalCenterIn(SaveButton, LoadButton)
     SaveButton.OnClick = function(self)
         SAVE_PRESET_IN_PREF()
@@ -5341,7 +5341,7 @@ function GUI_PRESET()
     end
 
     -- Delete button
-    local DeleteButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Delete Preset")
+    local DeleteButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Delete Preset")
     LayoutHelpers.CenteredLeftOf(DeleteButton, SaveButton, -28)
     LayoutHelpers.AtVerticalCenterIn(DeleteButton, LoadButton)
     DeleteButton.OnClick = function(self)
@@ -5356,14 +5356,14 @@ function GUI_PRESET()
     end
     
     -- Preset List
-    PresetList = ItemList(dialog2)
+    PresetList = ItemList(dialogContent)
     PresetList:SetFont(UIUtil.bodyFont, 14)
     PresetList:ShowMouseoverItem(true)
     PresetList.Width:Set(210)
     PresetList.Height:Set(280)
-    LayoutHelpers.DepthOverParent(PresetList, dialog2, 10)
-    LayoutHelpers.AtLeftIn(PresetList, dialog2, 10)
-    LayoutHelpers.AtTopIn(PresetList, dialog2, 52)
+    LayoutHelpers.DepthOverParent(PresetList, dialogContent, 10)
+    LayoutHelpers.AtLeftIn(PresetList, dialogContent, 10)
+    LayoutHelpers.AtTopIn(PresetList, dialogContent, 52)
     UIUtil.CreateLobbyVertScrollbar(PresetList)
     
     LOAD_PresetProfils_For_PresetList()
@@ -5393,14 +5393,14 @@ function GUI_PRESET()
     end
 
     -- Info List
-    InfoList = ItemList(dialog2)
+    InfoList = ItemList(dialogContent)
     InfoList:SetFont(UIUtil.bodyFont, 11)
     InfoList:SetColors(nil, "00000000")
     InfoList:ShowMouseoverItem(true)
     InfoList.Width:Set(262)
     InfoList.Height:Set(280)
-    LayoutHelpers.AtRightIn(InfoList, dialog2, 26)
-    LayoutHelpers.AtTopIn(InfoList, dialog2, 52)
+    LayoutHelpers.AtRightIn(InfoList, dialogContent, 26)
+    LayoutHelpers.AtTopIn(InfoList, dialogContent, 52)
     LayoutHelpers.Below(text1, InfoList, 0)
     LayoutHelpers.AtHorizontalCenterIn(text1, InfoList, 0)
     UIUtil.CreateLobbyVertScrollbar(InfoList)
