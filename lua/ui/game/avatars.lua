@@ -811,7 +811,7 @@ function AvatarUpdate()
         end
     end
 
-    if factories and table.getn(EntityCategoryFilterDown(categories.ALLUNITS - categories.GATE, factories)) > 0 then
+    if factories and table.getn(EntityCategoryFilterDown(categories.ALLUNITS - categories.GATE - categories.ORBITALSYSTEM, factories)) > 0 then
         if controls.idleFactories then
             controls.idleFactories:Update(EntityCategoryFilterDown(categories.ALLUNITS - categories.GATE, factories))
         else
