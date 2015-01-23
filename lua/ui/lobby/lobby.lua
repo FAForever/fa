@@ -2079,11 +2079,11 @@ end
 -- slot less than 1 means try to find a slot
 function HostTryAddPlayer(senderID, slot, requestedPlayerName, human, aiPersonality, requestedColor, requestedFaction, requestedTeam, requestedPL, requestedRC, requestedNG, requestedMEAN, requestedDEV, requestedCOUNTRY)
     LOGX('>> HostTryAddPlayer > requestedPlayerName='..tostring(requestedPlayerName), 'Connecting')
-    --// RULE TITLE
+
     if not singlePlayer then
-        RuleTitle_SendMSG()
+        BroadcastGameRules()
     end
-    --\\ Stop RULE TITLE
+
     -- CPU benchmark code
     if human and not singlePlayer then
         for name, benchmark in pairs(CPU_Benchmarks) do
@@ -2881,25 +2881,26 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtRightTopIn(GUI.GameQualityLabel, GUI.panel, 50, 61)
 
     -- Rule Label
-    GUI.RuleLabel = ItemList(GUI.panel)
-    GUI.RuleLabel:SetFont('Arial Gras', 11)
-    GUI.RuleLabel:SetColors("B9BFB9", "00000000", "B9BFB9", "00000000") -- colortxt, bg, colortxt selec, bg selec?
-    LayoutHelpers.AtLeftTopIn(GUI.RuleLabel, GUI.panel, 50, 81) --Right, Top
-    GUI.RuleLabel.Height:Set(34)
-    GUI.RuleLabel.Width:Set(350)
-    GUI.RuleLabel:DeleteAllItems()
+    local RuleLabel = ItemList(GUI.panel)
+    GUI.RuleLabel = RuleLabel
+    RuleLabel:SetFont('Arial Gras', 11)
+    RuleLabel:SetColors("B9BFB9", "00000000", "B9BFB9", "00000000") -- colortxt, bg, colortxt selec, bg selec?
+    LayoutHelpers.AtLeftTopIn(RuleLabel, GUI.panel, 50, 81) --Right, Top
+    RuleLabel.Height:Set(34)
+    RuleLabel.Width:Set(350)
+    RuleLabel:DeleteAllItems()
     local tmptext
     if lobbyComm:IsHost() then
         tmptext = 'No Rules: Click to add rules'
-        GUI.RuleLabel:SetColors("FFCC00")
+        RuleLabel:SetColors("FFCC00")
     else
         tmptext = 'Rule: No Rule'
     end
-    GUI.RuleLabel:AddItem(tmptext or '')
-    GUI.RuleLabel:AddItem('')
+    RuleLabel:AddItem(tmptext or '')
+    RuleLabel:AddItem('')
     if lobbyComm:IsHost() then
-        GUI.RuleLabel.OnClick = function(self)
-            RuleTitle_INPUT()
+        RuleLabel.OnClick = function(self)
+            ShowRuleDialog(RuleLabel)
         end
     end
 
@@ -4204,14 +4205,10 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             AddChatText("["..data.SenderName.."] "..data.Text)
         elseif data.Type == 'PrivateChat' then
             AddChatText("<<"..data.SenderName..">> "..data.Text)
-            --// RULE TITLE
         elseif data.Type == 'Rule_Title_MSG' then
-			LOGX('>> RECEIVE MSG Rule_Title_MSG : result='..data.Result1..' result2='..data.Result2, 'RuleTitle')
-            RuleTitle_SetText(data.Result1 or "", data.Result2 or "")
-            --\\ Stop RULE TITLE
+            SetRuleTitleText(data.Rule)
             -- CPU benchmark code
         elseif data.Type == 'CPUBenchmark' then
-            --LOG("CPU Data: "..(data.PlayerName or "?")..", ".. (data.Result or "?"))
             CPU_Benchmarks[data.PlayerName] = data.Result
             local playerId = FindIDForName(data.PlayerName)
             local playerSlot = FindSlotForID(playerId)
@@ -5010,106 +5007,81 @@ function Country_GetTooltipValue(CountryResult, slot)
 end
 
 -- Rule title
-
--- Update the title to display the rule.
-function RuleTitle_SendMSG()
-    if GUI.RuleLabel and lobbyComm:IsHost() then
-        local getRule = {GUI.RuleLabel:GetItem(0), GUI.RuleLabel:GetItem(1)}
-        if getRule[1]..getRule[2] == 'No Rules: Click to add rules' or getRule[1]..getRule[2] == 'No Rules: Click to add rules ' then
-            getRule[1] = 'Rule: No Rule'
-            getRule[2] = ''
+function SetRuleTitleText(rule)
+    GUI.RuleLabel:SetColors("B9BFB9")
+    if rule == '' then
+        if lobbyComm:IsHost() then
+            GUI.RuleLabel:SetColors("FFCC00")
+            rule = 'No Rules: Click to add rules.'
         else
-            getRule[1] = GUI.RuleLabel:GetItem(0)
-            getRule[2] = GUI.RuleLabel:GetItem(1)
+            rule = "No rules."
         end
-        lobbyComm:BroadcastData( { Type = 'Rule_Title_MSG', Result1 = getRule[1], Result2 = getRule[2] } )
     end
+
+    GUI.RuleLabel:DeleteAllItems()
+    -- We should probably use a TextField for this, but for now we do the slightly ridiculous thing
+    -- of wrapping across two rows in an ItemList.
+    local wrapped = import('/lua/maui/text.lua').WrapText('Rule : '..rule, 350, function(curText) return GUI.RuleLabel:GetStringAdvance(curText) end)
+    GUI.RuleLabel:AddItem(wrapped[1] or '')
+    GUI.RuleLabel:AddItem(wrapped[2] or '')
 end
 
-function RuleTitle_SetText(Result1, Result2)
-    if GUI.RuleLabel and not lobbyComm:IsHost() then
-        GUI.RuleLabel:DeleteAllItems()
-        GUI.RuleLabel:AddItem(Result1)
-        GUI.RuleLabel:AddItem(Result2)
-    end
+function BroadcastGameRules()
+    lobbyComm:BroadcastData({ Type = 'Rule_Title_MSG', Rule = gameInfo.GameOptions.GameRules or "" })
 end
 
-function RuleTitle_INPUT()
-    local GUI_Preset_InputBox = Group(GUI)
-    LayoutHelpers.AtCenterIn(GUI_Preset_InputBox, GUI)
-    GUI_Preset_InputBox.Depth:Set(1999)
-    local background2 = Bitmap(GUI_Preset_InputBox, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby-small.dds'))
-    GUI_Preset_InputBox.Width:Set(background2.Width)
-    GUI_Preset_InputBox.Height:Set(background2.Height)
-    LayoutHelpers.FillParent(background2, GUI_Preset_InputBox)
-    local GUI_Preset_InputBox2 = Group(GUI_Preset_InputBox)
-    GUI_Preset_InputBox2.Width:Set(536)
-    GUI_Preset_InputBox2.Height:Set(400-240)
-    LayoutHelpers.AtCenterIn(GUI_Preset_InputBox2, GUI_Preset_InputBox)
-    -----------
-    -- Title --
-    local text09 = UIUtil.CreateText(GUI_Preset_InputBox2, '', 17, 'Arial', true)
-    LayoutHelpers.AtHorizontalCenterIn(text09, GUI_Preset_InputBox2)
-    LayoutHelpers.AtTopIn(text09, GUI_Preset_InputBox2, 10)
-    ----------
-    -- Edit --
-    local nameEdit = Edit(GUI_Preset_InputBox2)
-    LayoutHelpers.AtHorizontalCenterIn(nameEdit, GUI_Preset_InputBox2)
-    LayoutHelpers.AtVerticalCenterIn(nameEdit, GUI_Preset_InputBox2)
+-- Show, creating if necessary, the rule change dialog.
+function ShowRuleDialog(RuleLabel)
+    if GUI.ruleDialog then
+        GUI.ruleDialog:Show()
+        return
+    end
+
+    -- Group to hold the UI controls to put in the popup.
+    local dialogContent = Group(GUI)
+    dialogContent.Width:Set(536)
+    dialogContent.Height:Set(160)
+
+    local ruleDialog = Popup(GUI, dialogContent)
+    GUI.ruleDialog = ruleDialog
+
+    -- Title
+    local text09 = UIUtil.CreateText(dialogContent, '', 17, 'Arial', true)
+    text09:SetText('Game Rules')
+    LayoutHelpers.AtHorizontalCenterIn(text09, dialogContent)
+    LayoutHelpers.AtTopIn(text09, dialogContent, 10)
+
+    -- Textfield
+    local nameEdit = Edit(dialogContent)
+    LayoutHelpers.AtHorizontalCenterIn(nameEdit, dialogContent)
+    LayoutHelpers.AtVerticalCenterIn(nameEdit, dialogContent)
     nameEdit.Width:Set(334)
     nameEdit.Height:Set(24)
     nameEdit:AcquireFocus()
-    nameEdit.OnEnterPressed = function(self, text)
-        if text == '' then
-            GUI_Preset_InputBox:Destroy()
-            GUI.RuleLabel:DeleteAllItems()
-            GUI.RuleLabel:AddItem('No Rules: Click to add rules')
-            GUI.RuleLabel:SetColors("FFCC00")
-            GUI.RuleLabel:AddItem('')
-            RuleTitle_SendMSG()
-        else
-            GUI_Preset_InputBox:Destroy()
-            wrapped = import('/lua/maui/text.lua').WrapText('Rule : '..text, 350, function(curText) return GUI.RuleLabel:GetStringAdvance(curText) end)
-            GUI.RuleLabel:DeleteAllItems()
-            GUI.RuleLabel:AddItem(wrapped[1] or '')
-            GUI.RuleLabel:SetColors("B9BFB9")
-            GUI.RuleLabel:AddItem(wrapped[2] or '')
-            RuleTitle_SendMSG()
-        end
+
+    -- Close the dialog and update the rules when the dialog is closed affirmatively.
+    local updateRules = function(self)
+        local text = nameEdit:GetText()
+        gameInfo.GameOptions.GameRules = text
+        SetRuleTitleText(text)
+        BroadcastGameRules()
+        ruleDialog:Hide()
     end
-    -------------------
-    -- Exit button --
-    local ExitButton = UIUtil.CreateButtonWithDropshadow(GUI_Preset_InputBox2, '/BUTTON/medium/', "Cancel")
-    LayoutHelpers.AtLeftIn(ExitButton, GUI_Preset_InputBox2, 70)
-    LayoutHelpers.AtBottomIn(ExitButton, GUI_Preset_InputBox2, 10)
+    nameEdit.OnEnterPressed = updateRules
+
+    -- Exit button
+    local ExitButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Cancel")
+    LayoutHelpers.AtLeftIn(ExitButton, dialogContent, 70)
+    LayoutHelpers.AtBottomIn(ExitButton, dialogContent, 10)
     ExitButton.OnClick = function(self)
-        GUI_Preset_InputBox:Destroy()
+        ruleDialog:Hide()
     end
-    -------------------
-    -- Ok button --
-    local OKButton = UIUtil.CreateButtonWithDropshadow(GUI_Preset_InputBox2, '/BUTTON/medium/', "Ok")
-    LayoutHelpers.AtRightIn(OKButton, GUI_Preset_InputBox2, 70)
-    LayoutHelpers.AtBottomIn(OKButton, GUI_Preset_InputBox2, 10)
-    text09:SetText('Game Rules')
-    OKButton.OnClick = function(self)
-        local result = nameEdit:GetText()
-        if result == '' then
-            GUI_Preset_InputBox:Destroy()
-            GUI.RuleLabel:DeleteAllItems()
-            GUI.RuleLabel:AddItem('No Rules: Click to add rules')
-            GUI.RuleLabel:SetColors("FFCC00")
-            GUI.RuleLabel:AddItem('')
-            RuleTitle_SendMSG()
-        else
-            GUI_Preset_InputBox:Destroy()
-            wrapped = import('/lua/maui/text.lua').WrapText('Rule : '..result, 350, function(curText) return GUI.RuleLabel:GetStringAdvance(curText) end)
-            GUI.RuleLabel:DeleteAllItems()
-            GUI.RuleLabel:AddItem(wrapped[1] or '')
-            GUI.RuleLabel:SetColors("B9BFB9")
-            GUI.RuleLabel:AddItem(wrapped[2] or '')
-            RuleTitle_SendMSG()
-        end
-    end
+
+    -- Ok button
+    local OKButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
+    LayoutHelpers.AtRightIn(OKButton, dialogContent, 70)
+    LayoutHelpers.AtBottomIn(OKButton, dialogContent, 10)
+    OKButton.OnClick = updateRules
 end
 
 -- Faction selector
@@ -5755,37 +5727,18 @@ function LOAD_PRESET_IN_PREF() -- GET OPTIONS IN PRESET AND SET TO LOBBY
     local profiles = GetPreference("UserPresetLobby")
     if profiles then
         local Selected_Preset = table.KeyByIndex(profiles, PresetList:GetSelection())
-        --AddChatText('> PRESET > Name : '..Selected_Preset) -- Preset1
-        --AddChatText('> PRESET > PresetName : '..profiles[Selected_Preset].PresetName)
-        -- Set PresetName in list on Preset GUI
-        --AddChatText('> PRESET > MapName : '..profiles[Selected_Preset].MapName)
-        -- Set MapName in text on Preset GUI
-        --AddChatText('> PRESET > FAF_Title : '..profiles[Selected_Preset].FAF_Title)
-        -- Set Title on FAF Client
-        --AddChatText('> PRESET > Rule : '..profiles[Selected_Preset].Rule)
-        -- Set Rule Title in TextBox
-        if profiles[Selected_Preset].Rule == '' or profiles[Selected_Preset].Rule == 'No Rule' then
-            GUI.RuleLabel:DeleteAllItems()
-            GUI.RuleLabel:AddItem('No Rules: Click to add rules')
-            GUI.RuleLabel:SetColors("FFCC00")
-            GUI.RuleLabel:AddItem('')
-        else
-            wrapped = import('/lua/maui/text.lua').WrapText('Rule: '..profiles[Selected_Preset].Rule, GUI.RuleLabel.Width(), function(curText) return GUI.RuleLabel:GetStringAdvance(curText) end)
-            GUI.RuleLabel:DeleteAllItems()
-            GUI.RuleLabel:AddItem(wrapped[1] or '')
-            GUI.RuleLabel:SetColors("B9BFB9")
-            GUI.RuleLabel:AddItem(wrapped[2] or '')
-        end
-        RuleTitle_SendMSG()
-        --AddChatText('> PRESET > MapPath : '..profiles[Selected_Preset].MapPath)
+
+        -- Load and broadcast the saved rules.
+        SetRuleTitleText(profiles[Selected_Preset].Rule)
+        gameInfo.GameOptions.GameRules = profiles[Selected_Preset].Rule
+        BroadcastGameRules()
+
         if check_Map_Exist(profiles[Selected_Preset].MapPath) == true then
             SetGameOption('ScenarioFile', profiles[Selected_Preset].MapPath, true)
         else
             AddChatText('MAP NOT EXIST !')
         end
-
         --
-
         if profiles[Selected_Preset].UnitsRestricts then
             local urestrict = {}
             for k, v in profiles[Selected_Preset].UnitsRestricts do
