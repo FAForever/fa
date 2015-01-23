@@ -943,12 +943,12 @@ end
 function CreateBorder(parent, addBg)
     local border = Border(parent)
     border:SetTextures(
-        SkinnableFile('/game/generic_brd/generic_brd_vert_l.dds'),
-        SkinnableFile('/game/generic_brd/generic_brd_horz_um.dds'),
-        SkinnableFile('/game/generic_brd/generic_brd_ul.dds'),
-        SkinnableFile('/game/generic_brd/generic_brd_ur.dds'),
-        SkinnableFile('/game/generic_brd/generic_brd_ll.dds'),
-        SkinnableFile('/game/generic_brd/generic_brd_lr.dds'))
+        SkinnableFile('/scx_menu/lan-game-lobby/dialog/background/side.png'),
+        SkinnableFile('/scx_menu/lan-game-lobby/dialog/background/bottom.png'),
+        SkinnableFile('/scx_menu/lan-game-lobby/dialog/background/bottom.png'),
+        SkinnableFile('/scx_menu/lan-game-lobby/dialog/background/bottom.png'),
+        SkinnableFile('/scx_menu/lan-game-lobby/dialog/background/bottom.png'),
+        SkinnableFile('/scx_menu/lan-game-lobby/dialog/background/bottom.png'))
     border:LayoutAroundControl(parent)
 
     local bg = nil
