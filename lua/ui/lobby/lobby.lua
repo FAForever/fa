@@ -5296,7 +5296,7 @@ function GUI_PRESET()
 
     local dialogContent = Group(GUI)
     dialogContent.Width:Set(536)
-    dialogContent.Height:Set(400)
+    dialogContent.Height:Set(360)
 
     local presetDialog = Popup(GUI, dialogContent)
     GUI.presetDialog = presetDialog
@@ -5304,7 +5304,7 @@ function GUI_PRESET()
     -- Title
     local text0 = UIUtil.CreateText(dialogContent, 'Lobby Presets', 17, 'Arial Gras', true)
     LayoutHelpers.AtHorizontalCenterIn(text0, dialogContent, 0)
-    LayoutHelpers.AtTopIn(text0, dialogContent, 30)
+    LayoutHelpers.AtTopIn(text0, dialogContent, 10)
 
     -- Info text
     local text1 = UIUtil.CreateText(dialogContent, 'Double-click to edit', 9, 'Arial', true)
@@ -5314,22 +5314,21 @@ function GUI_PRESET()
     -- Load button
     local LoadButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Load Preset")
     LayoutHelpers.AtLeftIn(LoadButton, dialogContent, -10)
-    LayoutHelpers.AtBottomIn(LoadButton, dialogContent, 30)
+    LayoutHelpers.AtBottomIn(LoadButton, dialogContent, 8)
     LoadButton.OnClick = function(self)
         LOAD_PRESET_IN_PREF()
     end
     
     -- Quit button
     local QuitButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Cancel")
-    LayoutHelpers.CenteredRightOf(QuitButton, LoadButton, -28)
+    LayoutHelpers.RightOf(QuitButton, LoadButton, -28)
     QuitButton.OnClick = function(self)
         presetDialog:Hide()
     end
 
     -- Save button
     local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Save Preset")
-    LayoutHelpers.AtRightIn(SaveButton, dialogContent, -10)
-    LayoutHelpers.AtVerticalCenterIn(SaveButton, LoadButton)
+    LayoutHelpers.RightOf(SaveButton, QuitButton, -28)
     SaveButton.OnClick = function(self)
         SAVE_PRESET_IN_PREF()
         local last_selected = PresetList:GetSelection()
@@ -5342,8 +5341,7 @@ function GUI_PRESET()
 
     -- Delete button
     local DeleteButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Delete Preset")
-    LayoutHelpers.CenteredLeftOf(DeleteButton, SaveButton, -28)
-    LayoutHelpers.AtVerticalCenterIn(DeleteButton, LoadButton)
+    LayoutHelpers.RightOf(DeleteButton, SaveButton, -28)
     DeleteButton.OnClick = function(self)
         local profiles = GetPreference("UserPresetLobby")
         local last_selected = table.KeyByIndex(profiles, PresetList:GetSelection())
@@ -5363,7 +5361,7 @@ function GUI_PRESET()
     PresetList.Height:Set(280)
     LayoutHelpers.DepthOverParent(PresetList, dialogContent, 10)
     LayoutHelpers.AtLeftIn(PresetList, dialogContent, 10)
-    LayoutHelpers.AtTopIn(PresetList, dialogContent, 52)
+    LayoutHelpers.AtTopIn(PresetList, dialogContent, 32)
     UIUtil.CreateLobbyVertScrollbar(PresetList)
     
     LOAD_PresetProfils_For_PresetList()
@@ -5400,7 +5398,7 @@ function GUI_PRESET()
     InfoList.Width:Set(262)
     InfoList.Height:Set(280)
     LayoutHelpers.AtRightIn(InfoList, dialogContent, 26)
-    LayoutHelpers.AtTopIn(InfoList, dialogContent, 52)
+    LayoutHelpers.AtTopIn(InfoList, dialogContent, 32)
     LayoutHelpers.Below(text1, InfoList, 0)
     LayoutHelpers.AtHorizontalCenterIn(text1, InfoList, 0)
     UIUtil.CreateLobbyVertScrollbar(InfoList)
@@ -5915,33 +5913,28 @@ function Need_Changelog()
 end
 
 function GUI_Changelog()
-    GROUP_Changelog = Group(GUI)
-    LayoutHelpers.AtCenterIn(GROUP_Changelog, GUI)
-    GROUP_Changelog.Depth:Set(GetFrame(GROUP_Changelog:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 1)
-    local background = Bitmap(GROUP_Changelog, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby.dds'))
-    GROUP_Changelog.Width:Set(background.Width)
-    GROUP_Changelog.Height:Set(background.Height)
-    LayoutHelpers.FillParent(background, GROUP_Changelog)
-    local dialog2 = Group(GROUP_Changelog)
-    dialog2.Width:Set(526)
-    dialog2.Height:Set(350)
-    LayoutHelpers.AtCenterIn(dialog2, GROUP_Changelog)
+    local dialogContent = Group(GROUP_Changelog)
+    dialogContent.Width:Set(526)
+    dialogContent.Height:Set(350)
+
+    GUI.changelogPopup = Popup(GUI, dialogContent)
+
     -- Title --
-    local text0 = UIUtil.CreateText(dialog2, LOC("<LOC lobui_0412>"), 17, 'Arial Gras', true)
-    LayoutHelpers.AtHorizontalCenterIn(text0, dialog2, 0)
-    LayoutHelpers.AtTopIn(text0, dialog2, 10)
+    local text0 = UIUtil.CreateText(dialogContent, LOC("<LOC lobui_0412>"), 17, 'Arial Gras', true)
+    LayoutHelpers.AtHorizontalCenterIn(text0, dialogContent, 0)
+    LayoutHelpers.AtTopIn(text0, dialogContent, 10)
+
     -- Info List --
-    InfoList = ItemList(dialog2)
+    local InfoList = ItemList(dialogContent)
     InfoList:SetFont(UIUtil.bodyFont, 11)
     InfoList:SetColors(nil, "00000000")
     InfoList.Width:Set(498)
     InfoList.Height:Set(260)
-    LayoutHelpers.AtLeftIn(InfoList, dialog2, 10)
-	LayoutHelpers.AtRightIn(InfoList, dialog2, 26)
-    LayoutHelpers.AtTopIn(InfoList, dialog2, 38)
+    LayoutHelpers.AtLeftIn(InfoList, dialogContent, 10)
+	LayoutHelpers.AtRightIn(InfoList, dialogContent, 26)
+    LayoutHelpers.AtTopIn(InfoList, dialogContent, 38)
     UIUtil.CreateLobbyVertScrollbar(InfoList)
-	InfoList.OnClick = function(self)
-	end
+	InfoList.OnClick = function(self) end
 	-- See only new Changelog by version
 	local Changelog = import('/lua/ui/lobby/changelog.lua')
 	local Last_Changelog_Version = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
@@ -5955,11 +5948,11 @@ function GUI_Changelog()
 		end
 	end
     -- OK button --
-    local OkButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Ok")
-	LayoutHelpers.AtLeftIn(OkButton, dialog2, 0)
-    LayoutHelpers.AtBottomIn(OkButton, dialog2, 10)
+    local OkButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
+	LayoutHelpers.AtLeftIn(OkButton, dialogContent, 0)
+    LayoutHelpers.AtBottomIn(OkButton, dialogContent, 10)
     OkButton.OnClick = function(self)
         Prefs.SetToCurrentProfile('LobbyChangelog', Changelog.last_version)
-		GROUP_Changelog:Destroy()
+        changelogPopup:Destroy()
     end
 end
