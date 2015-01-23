@@ -19,7 +19,7 @@ UnitBlueprint {
         KLift = 3,
         KLiftDamping = 2.5,
         KMove = 1,
-        KMoveDamping = 1,
+        KMoveDamping = 2,
         KRoll = 2,
         KRollDamping = 4,
         KTurn = 1,
@@ -300,7 +300,7 @@ UnitBlueprint {
                 Land = 'Seabed|Sub|Water',
             },
             FiringRandomness = 3,
-            FiringTolerance = 6, # [102]
+            FiringTolerance = 6,
             FixBombTrajectory = true,
             HeadingArcCenter = 0,
             HeadingArcRange = 30,

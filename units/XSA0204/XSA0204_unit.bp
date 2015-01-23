@@ -11,6 +11,8 @@ UnitBlueprint {
         EngageDistance = 75,
         KLift = 3,
         KLiftDamping = 2.5,
+        KMove = 1,
+        KMoveDamping = 2,
         KRoll = 2,
         KRollDamping = 4,
         KTurn = 1,
@@ -280,7 +282,6 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Heavy Cavitation Cluster Torpedo Launcher',
             DropBombShort = 2,
-            EffectiveRadius = 19,
             FireTargetLayerCapsTable = {
                 Air = 'Seabed|Sub|Water',
                 Land = 'Seabed|Sub|Water',
@@ -330,7 +331,6 @@ UnitBlueprint {
             WeaponCategory = 'Anti Navy',
         },
         {
-            AboveWaterTargetsOnly = true,
             Damage = 150,
             DamageFriendly = true,
             DamageRadius = 1,
@@ -339,7 +339,6 @@ UnitBlueprint {
             DummyWeapon = true,
             FiringTolerance = 2,
             Label = 'DeathImpact',
-            MaxRadius = 1,
             WeaponCategory = 'Death',
         },
     },
