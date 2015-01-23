@@ -153,25 +153,13 @@ ADepthChargeProjectile = Class(OnWaterEntryEmitterProjectile) {
     FxImpactUnderWater = EffectTemplate.ADepthChargeHitUnderWaterUnit01,
     FxImpactNone = {},
 
-    OnCreate = function(self, inWater)
-        OnWaterEntryEmitterProjectile.OnCreate(self)
-        #self:TrackTarget(true)
-    end,
-
     OnEnterWater = function(self)
         OnWaterEntryEmitterProjectile.OnEnterWater(self)
         local army = self:GetArmy()
 
-        for k, v in self.FxEnterWater do #splash
+        for k, v in self.FxEnterWater do
             CreateEmitterAtEntity(self,army,v)
         end
-
-        #self:TrackTarget(false)
-        #self:StayUnderwater(true)
-        #self:SetTurnRate(0)
-        #self:SetMaxSpeed(1)
-        #self:SetVelocity(0, -0.25, 0)
-        #self:SetVelocity(0.25)
     end,
 
     AddDepthCharge = function(self, tbl)
@@ -183,7 +171,6 @@ ADepthChargeProjectile = Class(OnWaterEntryEmitterProjectile) {
         }
         self.Trash:Add(self.MyDepthCharge)
     end,
-
 }
 
 #------------------------------------------------------------------------
@@ -749,7 +736,6 @@ ATorpedoShipProjectile = Class(OnWaterEntryEmitterProjectile) {
 
     OnCreate = function(self,inWater)
         OnWaterEntryEmitterProjectile.OnCreate(self,inWater)
-        # if we are starting in the water then immediately switch to tracking in water
         if inWater == true then
             self:TrackTarget(true):StayUnderwater(true)
             self:OnEnterWater(self)
