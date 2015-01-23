@@ -17,6 +17,8 @@ local Group = import('/lua/maui/group.lua').Group
 local RadioButton = import('/lua/ui/controls/radiobutton.lua').RadioButton
 local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
 local ResourceMapPreview = import('/lua/ui/controls/resmappreview.lua').ResourceMapPreview
+local Popup = import('/lua/ui/controls/popup.lua').Popup
+local Slider = import('/lua/maui/slider.lua').Slider
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
@@ -2922,25 +2924,21 @@ function CreateUI(maxPlayers)
     }
     SetText2(GUI.ModFeaturedLabel, modLabels[argv.initName] or "", 20)
 
-    --\\
-    --// Lobby options panel
+    -- Lobby options panel
     GUI.LobbyOptions = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/BUTTON/small/', "Lobby Options")
     LayoutHelpers.AtTopIn(GUI.LobbyOptions, GUI.panel, 10)
     LayoutHelpers.AtHorizontalCenterIn(GUI.LobbyOptions, GUI, 0)
     GUI.LobbyOptions.OnClick = function()
-        CreateOptionLobbyDialog()
+        ShowLobbyOptionsDialog()
     end
-    --\\
 
     -- Credits for the FAF lobby
-    -- TODO: Localise
     local Credits = 'Lobby by Xinnony and Barlots: V'..LOBBYversion..')'
     GUI.Credits_Text = UIUtil.CreateText(GUI.panel, Credits, 11, UIUtil.titleFont, true)
     SetText2(GUI.Credits_Text, Credits, 20)
     GUI.Credits_Text:SetColor("FFFFFF")
     LayoutHelpers.AtBottomIn(GUI.Credits_Text, GUI, 2)
     LayoutHelpers.AtRightIn(GUI.Credits_Text, GUI, 5)
-    --\\
 
     -- FOR SEE THE GROUP POSITION, LOOK THIS SCREENSHOOT : http://img402.imageshack.us/img402/8826/falobbygroup.png
     GUI.playerPanel = Group(GUI.panel, "playerPanel") -- RED Square in Screenshoot
@@ -5200,23 +5198,19 @@ function ChangeBackgroundLobby(faction)
     end
 end
 
+function ShowLobbyOptionsDialog()
+    -- If we built it before, don't build it again.
+    if GUI.lobbyOptionsDialog then
+        GUI.lobbyOptionsDialog:Show()
+        return
+    end
 
-function CreateOptionLobbyDialog()
-    local dialog = Group(GUI)
-    LayoutHelpers.AtCenterIn(dialog, GUI)
-    dialog.Depth:Set(GetFrame(dialog:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 1)
+    local dialogContent = Group(GUI)
+    dialogContent.Width:Set(420)
+    dialogContent.Height:Set(240)
 
-    local background = Bitmap(dialog, '/textures/ui/common/scx_menu/lan-game-lobby/optionlobby.dds')
-    dialog.Width:Set(background.Width)
-    dialog.Height:Set(background.Height)
-    WARN(background.Height)
-    WARN(background.Width)
-    LayoutHelpers.FillParent(background, dialog)
-
-    local dialog2 = Group(dialog)
-    dialog2.Width:Set(420)
-    dialog2.Height:Set(240)
-    LayoutHelpers.AtCenterIn(dialog2, dialog)
+    local dialog = Popup(GUI, dialogContent)
+    GUI.lobbyOptionsDialog = dialog
 
     local buttons = {
         {
@@ -5237,25 +5231,24 @@ function CreateOptionLobbyDialog()
     }
 
     -- Label shown above the background mode selection radiobutton.
-    local backgroundLabel = UIUtil.CreateText(dialog2, LOC("<LOC lobui_0405> "), 16, 'Arial', true)
+    local backgroundLabel = UIUtil.CreateText(dialogContent, LOC("<LOC lobui_0405> "), 16, 'Arial', true)
     local selectedBackgroundState = Prefs.GetFromCurrentProfile("LobbyBackground") or 1
-    local backgroundRadiobutton = RadioButton(dialog2, '/RADIOBOX/', buttons, selectedBackgroundState, false, true)
+    local backgroundRadiobutton = RadioButton(dialogContent, '/RADIOBOX/', buttons, selectedBackgroundState, false, true)
 
-    LayoutHelpers.AtLeftTopIn(backgroundLabel, dialog2, 15, 15)
-    LayoutHelpers.AtLeftTopIn(backgroundRadiobutton, dialog2, 15, 40)
+    LayoutHelpers.AtLeftTopIn(backgroundLabel, dialogContent, 15, 15)
+    LayoutHelpers.AtLeftTopIn(backgroundRadiobutton, dialogContent, 15, 40)
 
     backgroundRadiobutton.OnChoose = function(self, index, key)
         Prefs.SetToCurrentProfile("LobbyBackground", index)
         ChangeBackgroundLobby()
     end
 	--
-	local Slider = import('/lua/maui/slider.lua').Slider
 	local currentFontSize = Prefs.GetFromCurrentProfile('LobbyChatFontSize') or 14
-	local slider_Chat_SizeFont_TEXT = UIUtil.CreateText(dialog2, LOC("<LOC lobui_0404> ").. currentFontSize, 14, 'Arial', true)
-    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont_TEXT, dialog2, 27, 136)
+	local slider_Chat_SizeFont_TEXT = UIUtil.CreateText(dialogContent, LOC("<LOC lobui_0404> ").. currentFontSize, 14, 'Arial', true)
+    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont_TEXT, dialogContent, 27, 136)
 
-	local slider_Chat_SizeFont = Slider(dialog2, false, 9, 18, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
-    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont, dialog2, 20, 156)
+	local slider_Chat_SizeFont = Slider(dialogContent, false, 9, 18, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
+    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont, dialogContent, 20, 156)
     slider_Chat_SizeFont:SetValue(currentFontSize)
 
 	slider_Chat_SizeFont.OnValueChanged = function(self, newValue)
@@ -5265,12 +5258,12 @@ function CreateOptionLobbyDialog()
         Prefs.SetToCurrentProfile('LobbyChatFontSize', sliderValue)
 	end
 	--
-    local cbox_WindowedLobby = UIUtil.CreateCheckbox(dialog2, '/CHECKBOX/', LOC("<LOC lobui_0402>"))
-    LayoutHelpers.AtRightTopIn(cbox_WindowedLobby, dialog2, 20, 42)
+    local cbox_WindowedLobby = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', LOC("<LOC lobui_0402>"))
+    LayoutHelpers.AtRightTopIn(cbox_WindowedLobby, dialogContent, 20, 42)
     Tooltip.AddCheckboxTooltip(cbox_WindowedLobby, {text='Windowed mode', body=LOC("<LOC lobui_0403>")})
     cbox_WindowedLobby.OnCheck = function(self, checked)
         local option
-        if(checked) then
+        if checked then
             option = 'true'
         else
             option = 'false'
@@ -5279,8 +5272,8 @@ function CreateOptionLobbyDialog()
         SetWindowedLobby(checked)
     end
     --
-    local cbox_StretchBG = UIUtil.CreateCheckbox(dialog2, '/CHECKBOX/', LOC("<LOC lobui_0400>"))
-    LayoutHelpers.AtRightTopIn(cbox_StretchBG, dialog2, 20, 68)
+    local cbox_StretchBG = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', LOC("<LOC lobui_0400>"))
+    LayoutHelpers.AtRightTopIn(cbox_StretchBG, dialogContent, 20, 68)
     Tooltip.AddCheckboxTooltip(cbox_StretchBG, {text='Stretch Background', body=LOC("<LOC lobui_0401>")})
     cbox_StretchBG.OnCheck = function(self, checked)
         if checked then
@@ -5293,16 +5286,14 @@ function CreateOptionLobbyDialog()
             LayoutHelpers.FillParentPreserveAspectRatio(GUI.background2, GUI)
         end
     end
-    ------------------
-    -- Quit button --
-    local QuitButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Close")
-    LayoutHelpers.AtHorizontalCenterIn(QuitButton, dialog2, 0)
-    LayoutHelpers.AtBottomIn(QuitButton, dialog2, 10)
-    QuitButton.OnClick = function(self)
-        dialog:Destroy()
-        dialog2:Destroy()
-    end
+    -- Quit button
+    local QuitButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Close")
+    LayoutHelpers.AtHorizontalCenterIn(QuitButton, dialogContent, 0)
+    LayoutHelpers.AtBottomIn(QuitButton, dialogContent, 10)
 
+    QuitButton.OnClick = function(self)
+        dialog:Hide()
+    end
     --
     local WindowedLobby = Prefs.GetFromCurrentProfile('WindowedLobby') or 'true'
     cbox_WindowedLobby:SetCheck(WindowedLobby == 'true', true)
