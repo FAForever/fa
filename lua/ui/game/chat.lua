@@ -1217,41 +1217,6 @@ function CloseChat()
     end
 end
 
-function ToggleChat()
-    if GUI.bg:IsHidden() then
-        if GetFocusArmy() ~= -1 then
-            GUI.bg:Show()
-            GUI.chatEdit.edit:AcquireFocus()
-            if not GUI.bg.pinned then
-                GUI.bg:SetNeedsFrameUpdate(true)
-                GUI.bg.curTime = 0
-            end
-            for i, v in GUI.chatLines do
-                v:SetNeedsFrameUpdate(false)
-                v:Show()
-                v.OnFrame = nil
-            end
-        end
-    else
-        GUI.bg:Hide()
-        GUI.chatEdit.edit:AbandonFocus()
-        GUI.bg:SetNeedsFrameUpdate(false)
-    end
-end
-
-function ActivateChat(modifiers)
-    if GetFocusArmy() ~= -1 then
-        if type(ChatTo()) ~= 'number' then
-            if modifiers.Shift then
-                ChatTo:Set('allies')
-            else
-                ChatTo:Set('all')
-            end
-        end
-        ToggleChat()
-    end
-end
-
 function CreateConfigWindow()
     import('/lua/ui/game/multifunction.lua').CloseMapDialog()
     local windowTextures = {
