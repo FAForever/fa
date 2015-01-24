@@ -153,7 +153,15 @@ function OnCommandIssued(command)
         EndCommandMode(true)
     end
 
-    if command.CommandType == 'Guard' and command.Target.EntityId then
+    if command.CommandType == 'Attack' then
+        if command.Clear then
+            local cb = { Func = 'ClearTargets', Args = { } }
+            SimCallback(cb, true)
+        end
+
+        local cb = { Func = 'AddTarget', Args = { target = command.Target.EntityId, position = command.Target.Position } }
+        SimCallback(cb, true)
+    elseif command.CommandType == 'Guard' and command.Target.EntityId then
         local c = categories.STRUCTURE * categories.FACTORY
         if EntityCategoryContains(c, command.Blueprint) then
             local factories = EntityCategoryFilterDown(c, command.Units) or {}
