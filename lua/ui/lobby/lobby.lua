@@ -27,7 +27,6 @@ local Edit = import('/lua/maui/edit.lua').Edit
 local LobbyComm = import('/lua/ui/lobby/lobbyComm.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local Mods = import('/lua/mods.lua')
---local ModManager = import('/lua/ui/dialogs/modmanager.lua')
 local FactionData = import('/lua/factions.lua')
 local Text = import('/lua/maui/text.lua').Text
 local Trueskill = import('/lua/ui/lobby/trueskill.lua')

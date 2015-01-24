@@ -22,7 +22,7 @@ local MapUtil = import('/lua/ui/maputil.lua')
 local Mods = import('/lua/mods.lua')
 local Combo = import('/lua/ui/controls/combo.lua').Combo
 local Tooltip = import('/lua/ui/game/tooltip.lua')
-local ModManager = import('/lua/ui/dialogs/modmanager.lua')
+local ModManager = import('/lua/ui/lobby/ModsManager.lua')
 local EnhancedLobby = import('/lua/EnhancedLobby.lua')
 
 local scenarios = MapUtil.EnumerateSkirmishScenarios()
@@ -268,8 +268,8 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     selectButton.Depth:Set(function() return panel.Depth() + 10 end)
     Tooltip.AddButtonTooltip(modButton, "Lobby_Mods")
     modButton.OnClick = function(self, modifiers)
-        TheAvailableMods = import('/lua/ui/lobby/ModsManager.lua').HostModStatus(availableMods)
-        import('/lua/ui/lobby/ModsManager.lua').NEW_MODS_GUI(panel, true, nil, TheAvailableMods)
+        local availableMods = ModManager.HostModStatus(availableMods)
+        ModManager.NEW_MODS_GUI(panel, true, nil, availableMods)
     end
 
     local restrictedUnitsButton = UIUtil.CreateButtonStd(modButton, '/scx_menu/small-btn/small', "<LOC sel_map_0006>Unit Manager", 16, 2)
