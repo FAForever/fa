@@ -11,6 +11,7 @@ local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
+local Popup = import('/lua/ui/controls/popup.lua').Popup
 local Prefs = import('/lua/user/prefs.lua')
 local GUI_OPEN = false
 
@@ -51,46 +52,46 @@ function HostModStatus(availableMods)
     return r
 end
 
+local modsDialog
 function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
-    GUI = parent
+    -- Evil hack because something, somewher in this tangled mess of evil is Destroy()ing the
+    -- dialog between reuses and I can't be arsed to figure out what it is.
+    -- The contents of this file needs torching and rewriting.
+    if modsDialog then
+        modsDialog:Destroy()
+    end
+
     if IsHost then modstatus = false end
-    GUI_ModsManager = Group(GUI)
-    LayoutHelpers.AtCenterIn(GUI_ModsManager, GUI)
-    GUI_ModsManager.Depth:Set(GetFrame(parent:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 1)
-        
-    local background = Bitmap(GUI_ModsManager, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/Mod_Lobby.dds'))
-    GUI_ModsManager.Width:Set(background.Width)
-    GUI_ModsManager.Height:Set(background.Height)
-    LayoutHelpers.FillParent(background, GUI_ModsManager)
-        
-    local dialog2 = Group(GUI_ModsManager)
-    dialog2.Width:Set(537)
-    dialog2.Height:Set(548)
-    LayoutHelpers.AtCenterIn(dialog2, GUI_ModsManager)
-        
+
+    local dialogContent = Group(parent)
+    dialogContent.Width:Set(537)
+    dialogContent.Height:Set(548)
+
+    modsDialog = Popup(parent, dialogContent)
+
     -- Title
-    local text0 = UIUtil.CreateText(dialog2, 'Mod Manager', 17, 'Arial')
+    local text0 = UIUtil.CreateText(dialogContent, 'Mod Manager', 17, 'Arial')
     text0:SetColor('B9BFB9')
     text0:SetDropShadow(true)
-    LayoutHelpers.AtHorizontalCenterIn(text0, dialog2, 0)
-    LayoutHelpers.AtTopIn(text0, dialog2, 10)
+    LayoutHelpers.AtHorizontalCenterIn(text0, dialogContent, 0)
+    LayoutHelpers.AtTopIn(text0, dialogContent, 10)
         
     -- SubTitle
-    local text1 = UIUtil.CreateText(dialog2, '', 12, 'Arial')
+    local text1 = UIUtil.CreateText(dialogContent, '', 12, 'Arial')
     text1:SetColor('B9BFB9')
     text1:SetDropShadow(true)
-    LayoutHelpers.AtHorizontalCenterIn(text1, dialog2, 0)
-    LayoutHelpers.AtTopIn(text1, dialog2, 26)
+    LayoutHelpers.AtHorizontalCenterIn(text1, dialogContent, 0)
+    LayoutHelpers.AtTopIn(text1, dialogContent, 26)
         
     -- Save button
-    local SaveButton = UIUtil.CreateButtonWithDropshadow(dialog2, '/BUTTON/medium/', "Ok", -1)
-    LayoutHelpers.AtLeftIn(SaveButton, dialog2, 0)
-    LayoutHelpers.AtBottomIn(SaveButton, dialog2, 10)
+    local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok", -1)
+    LayoutHelpers.AtLeftIn(SaveButton, dialogContent, 0)
+    LayoutHelpers.AtBottomIn(SaveButton, dialogContent, 10)
         
     -- Checkbox UI mod filter
-    local cbox_UI = UIUtil.CreateCheckbox(dialog2, '/RADIOBOX/')
-    LayoutHelpers.AtLeftIn(cbox_UI, dialog2, 20+130+10)
-    LayoutHelpers.AtBottomIn(cbox_UI, dialog2, 16)
+    local cbox_UI = UIUtil.CreateCheckbox(dialogContent, '/RADIOBOX/')
+    LayoutHelpers.AtLeftIn(cbox_UI, dialogContent, 20+130+10)
+    LayoutHelpers.AtBottomIn(cbox_UI, dialogContent, 16)
     Tooltip.AddCheckboxTooltip(cbox_UI, {text='UI Mods', body='UI mods are activated only for you. You can have a mod of this type activated without the enemy knowing'})
     cbox_UI_TEXT = UIUtil.CreateText(cbox_UI, 'UI Mods', 14, 'Arial')
         
@@ -101,9 +102,9 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
     cbox_UI:SetCheck(true, true)
             
     -- Checkbox game mod filter
-    local cbox_GAME = UIUtil.CreateCheckbox(dialog2, '/RADIOBOX/')
-    LayoutHelpers.AtLeftIn(cbox_GAME, dialog2, 20+130+100)
-    LayoutHelpers.AtBottomIn(cbox_GAME, dialog2, 16)
+    local cbox_GAME = UIUtil.CreateCheckbox(dialogContent, '/RADIOBOX/')
+    LayoutHelpers.AtLeftIn(cbox_GAME, dialogContent, 20+130+100)
+    LayoutHelpers.AtBottomIn(cbox_GAME, dialogContent, 16)
     Tooltip.AddCheckboxTooltip(cbox_GAME, {text='Game Mods', body='Game mods are activated for all players, and all players must have the same version of the mod'})
     cbox_GAME_TEXT = UIUtil.CreateText(cbox_GAME, 'Game Mods', 14, 'Arial')
         
@@ -114,9 +115,9 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
     cbox_GAME:SetCheck(false, true)
             
     -- Checkbox hide unselectable mods
-    local cbox_Act = UIUtil.CreateCheckbox(dialog2, '/CHECKBOX/')
-    LayoutHelpers.AtLeftIn(cbox_Act, dialog2, 20+130+120+100)
-    LayoutHelpers.AtBottomIn(cbox_Act, dialog2, 23)
+    local cbox_Act = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/')
+    LayoutHelpers.AtLeftIn(cbox_Act, dialogContent, 20+130+120+100)
+    LayoutHelpers.AtBottomIn(cbox_Act, dialogContent, 23)
     Tooltip.AddCheckboxTooltip(cbox_Act, {text='Hide Unselectable', body='Hide mods which are unselectable due to compatibility issues, or because a player in the lobby does not have them'})
     cbox_Act_TEXT = UIUtil.CreateText(cbox_Act, 'Hide Unselectable', 14, 'Arial')
         
@@ -127,9 +128,9 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
     cbox_Act:SetCheck(true, true)
             
     -- Checkbox condensed list
-    local cbox_Act2 = UIUtil.CreateCheckbox(dialog2, '/CHECKBOX/')
-    LayoutHelpers.AtLeftIn(cbox_Act2, dialog2, 20+130+120+100)
-    LayoutHelpers.AtBottomIn(cbox_Act2, dialog2, 6)
+    local cbox_Act2 = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/')
+    LayoutHelpers.AtLeftIn(cbox_Act2, dialogContent, 20+130+120+100)
+    LayoutHelpers.AtBottomIn(cbox_Act2, dialogContent, 6)
     Tooltip.AddCheckboxTooltip(cbox_Act2, {text='Condensed View', body='Displays mods as a simplified list'})
     cbox_Act_TEXT2 = UIUtil.CreateText(cbox_Act2, 'Condensed View', 14, 'Arial')
     
@@ -195,10 +196,10 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
     end
 
     -- Mod list
-    local scrollGroup = Group(dialog2)
+    local scrollGroup = Group(dialogContent)
     scrollGroup.Width:Set(519)
     scrollGroup.Height:Set(450)
-    LayoutHelpers.AtLeftTopIn(scrollGroup, dialog2, 0, 47)
+    LayoutHelpers.AtLeftTopIn(scrollGroup, dialogContent, 0, 47)
     UIUtil.CreateLobbyVertScrollbar(scrollGroup)
     scrollGroup.controlList = {}
     scrollGroup.top = 1
@@ -243,7 +244,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
         save_mod()
         GUI_OPEN = false
         import('/lua/ui/lobby/lobby.lua').OnModsChanged(selectedMods)
-        GUI_ModsManager:Destroy()
+        modsDialog:Hide()
         return selectedMods
     end
     
