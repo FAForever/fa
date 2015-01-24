@@ -114,12 +114,28 @@ Callbacks.OnPlayerQueryResult = SimPlayerQuery.OnPlayerQueryResult
 
 Callbacks.PingGroupClick = import('/lua/SimPingGroup.lua').OnClickCallback
 
-
-
 Callbacks.AddTarget = function(data, units)
+    if type(data.target) == 'string' then
+        local entity = GetEntityById(data.target)
+        if entity then
+            local blipentity = entity:GetSource()
+            if blipentity and IsUnit(blipentity) then
+                for id, unit in units or {} do
+                    if OkayToMessWithArmy(unit:GetArmy()) then
+                        unit:addTarget(blipentity)
+                    end
+                end
+            end
+        end
+    end
 end
 
 Callbacks.ClearTargets = function(data, units)
+    for _, u in units do
+        if OkayToMessWithArmy(u:GetArmy()) then
+            u:clearTargets()
+        end
+    end
 end
 
 Callbacks.GiveOrders = import('/lua/spreadattack.lua').GiveOrders
