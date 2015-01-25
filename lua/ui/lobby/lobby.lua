@@ -4281,7 +4281,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             end
         else -- Non-host only messages
             if data.Type == 'SystemMessage' then
-                AddChatText(data)
+                AddChatText(data.Text)
             elseif data.Type == 'SetAllPlayerNotReady' then
                 EnableSlot(FindSlotForID(FindIDForName(localPlayerName)))
                 GUI.becomeObserver:Enable()
