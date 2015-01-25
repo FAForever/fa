@@ -129,6 +129,8 @@ InputDialog = Class(Popup) {
         OKButton.OnClick = dialogComplete
 
         Popup.__init(self, parent, dialogContent)
+
+        self.OnClosed = self.Destroy
     end,
 
     -- Called with the contents of the textfield when the presses enter or clicks the "OK" button.
