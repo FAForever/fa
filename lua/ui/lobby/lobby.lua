@@ -5242,7 +5242,7 @@ SetText2 = function(self, text, delay)
     end
 end
 
--- Lobby Presets
+-- Create lobby preset UI.
 function GUI_PRESET()
     if GUI.presetDialog then
         GUI.presetDialog:Show()
@@ -5364,19 +5364,42 @@ function GUI_PRESET()
     if profiles then
         LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, 0))
     end
-    
+
+    -- When the user double-clicks on a metadata field, give them a popup to change its value.
     InfoList.OnDoubleClick = function(self, row)
+        local ruleChanged = function(self, str)
+            if str == "" then
+                str = "No Rule"
+            end
+
+            local profiles = GetPreference("UserPresetLobby")
+            SetPreference('UserPresetLobby.' .. table.KeyByIndex(profiles, (PresetList:GetSelection())) .. '.Rule', str)
+            LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
+        end
+
+        local nameChanged = function(self, str)
+            if str == "" then
+                return
+            end
+
+            local profiles = GetPreference("UserPresetLobby")
+            SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.PresetName', str)
+            local lastselect = PresetList:GetSelection()
+            LOAD_PresetProfils_For_PresetList()
+            PresetList:SetSelection(lastselect)
+            LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
+        end
+
         if row == 0 then
-            GUI_PRESET_INPUT(1)
+            GUI_PRESET_INPUT(GUI, "Rename your preset", nameChanged)
         elseif row == 1 then
-            GUI_PRESET_INPUT(2)
-        elseif row == 2 then
-            GUI_PRESET_INPUT(3)
+            GUI_PRESET_INPUT(GUI, "Change your preset's rule", ruleChanged)
         end
     end
-    
+
+    -- Show the "Double-click to edit" tooltip when the user mouses-over a metadata field.
     InfoList.OnMouseoverItem = function(self, row)
-        if row == 0 or row == 1 or row == 2 then
+        if row == 0 or row == 1 then
             text1:Show()
         else
             text1:Hide()
@@ -5384,164 +5407,9 @@ function GUI_PRESET()
     end
 end
 
-function GUI_PRESET_INPUT(tyype)
-    if GUI.presetNameDialog then
-        GUI.presetNameDialog:Show()
-    end
-
-    local dialogContent = Group(GUI)
-    dialogContent.Width:Set(536)
-    dialogContent.Height:Set(160)
-
-    GUI.presetNameDialog = Popup(GUI, dialogContent)
-
-    -- Title
-    local text09 = UIUtil.CreateText(dialogContent, '', 17, 'Arial', true)
-    LayoutHelpers.AtHorizontalCenterIn(text09, dialogContent)
-    LayoutHelpers.AtTopIn(text09, dialogContent, 10)
-
-    -- Edit
-    local nameEdit = Edit(dialogContent)
-    LayoutHelpers.AtHorizontalCenterIn(nameEdit, dialogContent)
-    LayoutHelpers.AtVerticalCenterIn(nameEdit, dialogContent)
-    nameEdit.Width:Set(334)
-    nameEdit.Height:Set(24)
-    nameEdit:AcquireFocus()
-    nameEdit.OnEnterPressed = function(self, text)
-        if tyype == -1 then
-            if text == '' then
-                -- No word in nameEdit
-            else
-                applyCREATE_PRESET_IN_PREF(text)
-                GUI.presetNameDialog:Hide()
-            end
-        elseif tyype == 0 then
-            if text == '' then
-                -- No word in nameEdit
-            else
-                applyCREATE_PRESET_IN_PREF(text)
-                GUI.presetNameDialog:Hide()
-            end
-        elseif tyype == 1 then
-            if text == '' then
-                -- No word in nameEdit
-            else
-                local profiles = GetPreference("UserPresetLobby")
-                SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.PresetName', tostring(text))
-                local lastselect = PresetList:GetSelection()
-                LOAD_PresetProfils_For_PresetList()
-                PresetList:SetSelection(lastselect)
-                LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                GUI.presetNameDialog:Hide()
-            end
-        elseif tyype == 2 then
-            if text == '' then
-                -- No word in nameEdit
-            else
-                local profiles = GetPreference("UserPresetLobby")
-                SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.FAF_Title', tostring(text))
-                LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                GUI.presetNameDialog:Hide()
-            end
-        elseif tyype == 3 then
-            if text == '' then
-                local profiles = GetPreference("UserPresetLobby")
-                SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', 'No Rule')
-                LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                GUI.presetNameDialog:Hide()
-            else
-                local profiles = GetPreference("UserPresetLobby")
-                SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', tostring(text))
-                LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                GUI.presetNameDialog:Hide()
-            end
-        end
-    end
-
-    -- Exit button
-    local ExitButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Cancel")
-    LayoutHelpers.AtLeftIn(ExitButton, dialogContent, 70)
-    LayoutHelpers.AtBottomIn(ExitButton, dialogContent, 10)
-    ExitButton.OnClick = function(self)
-        GUI.presetNameDialog:Hide()
-		if tyype == -1 then
-			GUI_Preset:Destroy()
-		end
-    end
-
-    -- Ok button
-    local OKButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
-    LayoutHelpers.AtRightIn(OKButton, dialogContent, 70)
-    LayoutHelpers.AtBottomIn(OKButton, dialogContent, 10)
-    if tyype == -1 then
-        -- TODO: Localize this
-        text09:SetText('No presets found, choose a name for a new preset:')
-        OKButton.OnClick = function(self)
-            local result = nameEdit:GetText()
-            if result == '' then
-                -- No word in nameEdit
-            else
-                applyCREATE_PRESET_IN_PREF(result)
-                GUI.presetNameDialog:Hide()
-            end
-        end
-    elseif tyype == 0 then
-        text09:SetText('Set your preset name:')
-        OKButton.OnClick = function(self)
-            local result = nameEdit:GetText()
-            if result == '' then
-                -- No word in nameEdit
-            else
-                applyCREATE_PRESET_IN_PREF(result)
-                GUI.presetNameDialog:Hide()
-            end
-        end
-    elseif tyype == 1 then
-        text09:SetText('Rename your preset:')
-        OKButton.OnClick = function(self)
-            local result = nameEdit:GetText()
-            if result == '' then
-                -- No word in nameEdit
-            else
-                local profiles = GetPreference("UserPresetLobby")
-                SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.PresetName', tostring(result))
-                local lastselect = PresetList:GetSelection()
-                LOAD_PresetProfils_For_PresetList()
-                PresetList:SetSelection(lastselect)
-                LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                GUI.presetNameDialog:Hide()
-            end
-        end
-    elseif tyype == 2 then
-        text09:SetText('Rename your FAF Title:')
-        OKButton.OnClick = function(self)
-            local result = nameEdit:GetText()
-            if result == '' then
-                WARN('No new Title defined')
-            else
-                local profiles = GetPreference("UserPresetLobby")
-                SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.FAF_Title', tostring(result))
-                LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                GUI.presetNameDialog:Hide()
-            end
-        end
-    elseif tyype == 3 then
-        text09:SetText('Rename your rule:')
-        OKButton.OnClick = function(self)
-            local result = nameEdit:GetText()
-            if result == '' then
-                local profiles = GetPreference("UserPresetLobby")
-                SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', 'No Rule')
-                LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                GUI.presetNameDialog:Hide()
-            else
-                local profiles = GetPreference("UserPresetLobby")
-                SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', tostring(result))
-                LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                GUI.presetNameDialog:Hide()
-            end
-        end
-    end
+function GUI_PRESET_INPUT(parent, title, listener)
+    local dialog = InputDialog(parent, title, listener)
+    dialog.OnInput = listener
 end
 
 -- Other function
@@ -5631,7 +5499,13 @@ end
 
 -- Create Preset in Pref
 function CREATE_PRESET_IN_PREF()
-    GUI_PRESET_INPUT(0)
+    local dialogComplete = function(self, str)
+        if str ~= "" then
+            applyCREATE_PRESET_IN_PREF(str)
+        end
+    end
+
+    GUI_PRESET_INPUT(GUI, "Select name for new preset", dialogComplete)
 end
 
 function applyCREATE_PRESET_IN_PREF(presetname)
