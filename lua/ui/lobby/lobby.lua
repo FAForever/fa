@@ -4245,7 +4245,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
     lobbyComm.ConnectionFailed = function(self, reason)
         LOG("CONNECTION FAILED " .. reason)
-        GUI.connectionFailedDialog = UIUtil.ShowInfoDialog(GUI.panel, LOCF(lobbyComm.Strings.ConnectionFailed, lobbyComm.Strings[reason] or reason),
+        GUI.connectionFailedDialog = UIUtil.ShowInfoDialog(GUI.panel, LOCF(Strings.ConnectionFailed, Strings[reason] or reason),
                                                            "<LOC _OK>", ReturnToMenu)
 
         lobbyComm:Destroy()
@@ -4253,13 +4253,13 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     end
 
     lobbyComm.LaunchFailed = function(self,reasonKey)
-        AddChatText(LOC(lobbyComm.Strings[reasonKey] or reasonKey))
+        AddChatText(LOC(Strings[reasonKey] or reasonKey))
     end
 
     lobbyComm.Ejected = function(self,reason)
         LOG("EJECTED " .. reason)
 
-        GUI.connectionFailedDialog = UIUtil.ShowInfoDialog(GUI, LOCF(lobbyComm.Strings.Ejected, lobbyComm.Strings[reason] or reason), "<LOC _OK>", ReturnToMenu)
+        GUI.connectionFailedDialog = UIUtil.ShowInfoDialog(GUI, LOCF(Strings.Ejected, Strings[reason] or reason), "<LOC _OK>", ReturnToMenu)
         lobbyComm:Destroy()
         lobbyComm = nil
     end
