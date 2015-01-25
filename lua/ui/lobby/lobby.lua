@@ -5416,7 +5416,6 @@ function CreatePresetFromSettings(presetname)
     if not profiles then
         SetPreference('UserPresetLobby.Preset1.PresetName', tostring(presetname))
         SetPreference('UserPresetLobby.Preset1.MapName', tostring(MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).name))
-        SetPreference('UserPresetLobby.Preset1.FAF_Title', '')
         SetPreference('UserPresetLobby.Preset1.Rule', '')
         SetPreference('UserPresetLobby.Preset1.MapPath', tostring(gameInfo.GameOptions.ScenarioFile))
         SavePreferences()
@@ -5427,7 +5426,6 @@ function CreatePresetFromSettings(presetname)
             if not GetPreference("UserPresetLobby.Preset"..num) then
                 SetPreference('UserPresetLobby.Preset'..num..'.PresetName', tostring(presetname))
                 SetPreference('UserPresetLobby.Preset'..num..'.MapName', tostring(MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).name))
-                SetPreference('UserPresetLobby.Preset'..num..'.FAF_Title', '')
                 SetPreference('UserPresetLobby.Preset'..num..'.Rule', '')
                 SetPreference('UserPresetLobby.Preset'..num..'.MapPath', tostring(gameInfo.GameOptions.ScenarioFile))
                 SavePreferences()
@@ -5506,7 +5504,6 @@ function SavePreset()
     local Selected_Preset = table.KeyByIndex(profiles, PresetList:GetSelection())
 
     local Preset_Name = profiles[Selected_Preset].PresetName or 'ERROR, Set preset name here' -- Nom du PresetLobby
-    local Title_FAF = profiles[Selected_Preset].Title_FAF or '' -- Title is for FAF Client title in "Find Games" tabs
     local Rule_Text = GUI.RuleLabel:GetItem(0)..GUI.RuleLabel:GetItem(1)
     if Rule_Text == 'No Rules: Click to add rules' then
         Rule_Text = 'No Rule'
@@ -5517,7 +5514,6 @@ function SavePreset()
 
     SetPreference('UserPresetLobby.'..Selected_Preset..'.PresetName', tostring(Preset_Name))
     SetPreference('UserPresetLobby.'..Selected_Preset..'.MapName', tostring(MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).name))
-    SetPreference('UserPresetLobby.'..Selected_Preset..'.FAF_Title', tostring(Title_FAF))
     SetPreference('UserPresetLobby.'..Selected_Preset..'.Rule', tostring(Rule_Text))
 
     for k, v in gameInfo.GameOptions do
