@@ -28,6 +28,10 @@ ResourceMapPreview = Class(Group) {
         self.Width:Set(size)
         self.Height:Set(size)
 
+        self.massmarkers = {}
+        self.hydromarkers = {}
+        self.startPositions = {}
+
         self.mapPreview = MapPreview(self)
         self.mapPreview.Width:Set(size)
         self.mapPreview.Height:Set(size)
@@ -48,9 +52,9 @@ ResourceMapPreview = Class(Group) {
             v:Destroy()
         end
 
-        self.massmarkers = nil
-        self.hydromarkers = nil
-        self.startPositions = nil
+        self.massmarkers = {}
+        self.hydromarkers = {}
+        self.startPositions = {}
     end,
 
     Clear = function(self)
@@ -65,9 +69,7 @@ ResourceMapPreview = Class(Group) {
 
     -- Update the control to reflect a new Scenario.
     SetScenario = function(self, scenarioInfo)
-        if self.massmarkers then
-            self:DestroyResourceMarkers()
-        end
+        self:DestroyResourceMarkers()
 
         if not scenarioInfo then
             self.mapPreview:ClearTexture()
