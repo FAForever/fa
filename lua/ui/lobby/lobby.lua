@@ -1587,7 +1587,6 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         AssignRandomTeams(gameInfo)
         randstring = randomString(16, "%l%d")
         gameInfo.GameOptions['ReplayID'] = randstring
-        gameInfo.GameOptions['Rule'] = GUI.RuleLabel:GetItem(0)..GUI.RuleLabel:GetItem(1)
         AssignAINames(gameInfo)
         local allRatings = {}
         for k,v in gameInfo.PlayerOptions do
@@ -2052,10 +2051,6 @@ end
 -- slot less than 1 means try to find a slot
 function HostTryAddPlayer(senderID, slot, requestedPlayerName, human, aiPersonality, requestedColor, requestedFaction, requestedTeam, requestedPL, requestedRC, requestedNG, requestedMEAN, requestedDEV, requestedCOUNTRY)
     LOGX('>> HostTryAddPlayer > requestedPlayerName='..tostring(requestedPlayerName), 'Connecting')
-
-    if not singlePlayer then
-        BroadcastGameRules()
-    end
 
     -- CPU benchmark code
     if human and not singlePlayer then
@@ -4176,9 +4171,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             AddChatText("["..data.SenderName.."] "..data.Text)
         elseif data.Type == 'PrivateChat' then
             AddChatText("<<"..data.SenderName..">> "..data.Text)
-        elseif data.Type == 'Rule_Title_MSG' then
-            SetRuleTitleText(data.Rule)
-            -- CPU benchmark code
         elseif data.Type == 'CPUBenchmark' then
             CPU_Benchmarks[data.PlayerName] = data.Result
             local playerId = FindIDForName(data.PlayerName)
@@ -4186,7 +4178,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             if playerSlot ~= nil then
                 SetSlotCPUBar(playerSlot, gameInfo.PlayerOptions[playerSlot])
             end
-            -- End CPU benchmark code
         elseif data.Type == 'SetPlayerNotReady' then
             EnableSlot(data.Slot)
             GUI.becomeObserver:Enable()
@@ -4569,7 +4560,6 @@ end
 
 function SetGameOption(key, val, ignoreRefresh)
     local scenarioInfo = nil
-    ignoreRefresh = ignoreRefresh or false
 
     if not lobbyComm:IsHost() then
         WARN('Attempt to set game option by a non-host')
@@ -4601,11 +4591,21 @@ function SetGameOption(key, val, ignoreRefresh)
     elseif key == 'ScenarioFile' then
         GpgNetSend('GameOption', key, val)
         if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= '') then
+            -- Warn about attempts to load nonexistent maps.
+            if not DiskGetFileInfo(gameInfo.GameOptions.ScenarioFile) then
+                AddChatText('The selected map does not exist.')
+                return
+            end
+
             scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
             if scenarioInfo and scenarioInfo.map and (scenarioInfo.map ~= '') then
                 GpgNetSend('GameOption', 'Slots', table.getsize(scenarioInfo.Configurations.standard.teams[1].armies))
             end
         end
+    elseif key == "GameRules" then
+        -- Oh, the cargo-culting.
+        SetRuleTitleText(val)
+        GpgNetSend('GameOption', key, val)
     else
         GpgNetSend('GameOption', key, val)
     end
@@ -4937,18 +4937,12 @@ function SetRuleTitleText(rule)
     GUI.RuleLabel:AddItem(wrapped[2] or '')
 end
 
-function BroadcastGameRules()
-    lobbyComm:BroadcastData({ Type = 'Rule_Title_MSG', Rule = gameInfo.GameOptions.GameRules or "" })
-end
-
 -- Show the rule change dialog.
 function ShowRuleDialog(RuleLabel)
     local ruleDialog = InputDialog(GUI, 'Game Rules')
     GUI.ruleDialog = ruleDialog
     ruleDialog.OnInput = function(self, rules)
-        gameInfo.GameOptions.GameRules = rules
-        SetRuleTitleText(rules)
-        BroadcastGameRules()
+        SetGameOption("GameRules", rules, true)
     end
 end
 
@@ -5146,66 +5140,34 @@ SetText2 = function(self, text, delay)
     end
 end
 
+-- Load and return the current list of presets from persistent storage.
+function LoadPresetsList()
+    return Prefs.GetFromCurrentProfile("LobbyPresets") or {}
+end
+
+-- Write the given list of preset profiles to persistent storage.
+function SavePresetsList(list)
+    Prefs.SetToCurrentProfile("LobbyPresets", list)
+    SavePreferences()
+end
+
 -- Show the lobby preset UI.
 function ShowPresetDialog()
-    local profiles = GetPreference("UserPresetLobby")
-
     local dialogContent = Group(GUI)
     dialogContent.Width:Set(536)
     dialogContent.Height:Set(360)
 
     local presetDialog = Popup(GUI, dialogContent)
+    presetDialog.OnClosed = presetDialog.Destroy
     GUI.presetDialog = presetDialog
 
     -- Title
-    local text0 = UIUtil.CreateText(dialogContent, 'Lobby Presets', 17, 'Arial Gras', true)
-    LayoutHelpers.AtHorizontalCenterIn(text0, dialogContent, 0)
-    LayoutHelpers.AtTopIn(text0, dialogContent, 10)
+    local titleText = UIUtil.CreateText(dialogContent, 'Lobby Presets', 17, 'Arial Gras', true)
+    LayoutHelpers.AtHorizontalCenterIn(titleText, dialogContent, 0)
+    LayoutHelpers.AtTopIn(titleText, dialogContent, 10)
 
-    -- Load button
-    local LoadButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Load Preset")
-    LayoutHelpers.AtLeftIn(LoadButton, dialogContent, -10)
-    LayoutHelpers.AtBottomIn(LoadButton, dialogContent, 8)
-    LoadButton.OnClick = function(self)
-        LoadPreset()
-    end
-    
-    -- Quit button
-    local QuitButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Cancel")
-    LayoutHelpers.RightOf(QuitButton, LoadButton, -28)
-    QuitButton.OnClick = function(self)
-        presetDialog:Hide()
-    end
-
-    -- Save button
-    local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Save Preset")
-    LayoutHelpers.RightOf(SaveButton, QuitButton, -28)
-    SaveButton.OnClick = function(self)
-        SavePreset()
-        local last_selected = PresetList:GetSelection()
-        local profiles = GetPreference("UserPresetLobby")
-        RefreshAvailablePresetsList()
-        PresetList:SetSelection(last_selected)
-        ShowPresetDetails(table.KeyByIndex(profiles, last_selected))
-        SavePreferences()
-    end
-
-    -- Delete button
-    local DeleteButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Delete Preset")
-    LayoutHelpers.RightOf(DeleteButton, SaveButton, -28)
-    DeleteButton.OnClick = function(self)
-        local profiles = GetPreference("UserPresetLobby")
-        local last_selected = table.KeyByIndex(profiles, PresetList:GetSelection())
-        profiles[last_selected] = nil
-        SetPreference('UserPresetLobby', profiles)
-        RefreshAvailablePresetsList()
-        PresetList:SetSelection(0)
-        ShowPresetDetails(table.KeyByIndex(profiles, PresetList:GetSelection()))
-        SavePreferences()
-    end
-    
     -- Preset List
-    PresetList = ItemList(dialogContent)
+    local PresetList = ItemList(dialogContent)
     PresetList:SetFont(UIUtil.bodyFont, 14)
     PresetList:ShowMouseoverItem(true)
     PresetList.Width:Set(210)
@@ -5214,41 +5176,9 @@ function ShowPresetDialog()
     LayoutHelpers.AtLeftIn(PresetList, dialogContent, 10)
     LayoutHelpers.AtTopIn(PresetList, dialogContent, 32)
     UIUtil.CreateLobbyVertScrollbar(PresetList)
-    
-    RefreshAvailablePresetsList()
-    PresetList:SetSelection(0)
-    PresetList.OnClick = function(self, row)
-        if PresetList:GetItemCount() == (row+1) then
-            PresetList:SetSelection(row)
-            LoadButton.label:SetText('Create Preset')
-            LoadButton.OnClick = function(self)
-                local dialogComplete = function(self, str)
-                    if str ~= "" then
-                        CreatePresetFromSettings(str)
-                    end
-                end
-
-                CreateInputDialog(GUI, "Select name for new preset", dialogComplete)
-            end
-            InfoList:DeleteAllItems()
-        else
-            LoadButton.label:SetText('Load Preset')
-            LoadButton.OnClick = function(self)
-                LoadPreset()
-            end
-
-            PresetList:SetSelection(row)
-            local profiles = GetPreference("UserPresetLobby")
-            ShowPresetDetails(table.KeyByIndex(profiles, row))
-        end
-    end
-    
-    PresetList.OnDoubleClick = function(self, row)
-        LoadPreset()
-    end
 
     -- Info List
-    InfoList = ItemList(dialogContent)
+    local InfoList = ItemList(dialogContent)
     InfoList:SetFont(UIUtil.bodyFont, 11)
     InfoList:SetColors(nil, "00000000")
     InfoList:ShowMouseoverItem(true)
@@ -5257,52 +5187,156 @@ function ShowPresetDialog()
     LayoutHelpers.AtRightIn(InfoList, dialogContent, 26)
     LayoutHelpers.AtTopIn(InfoList, dialogContent, 32)
     UIUtil.CreateLobbyVertScrollbar(InfoList)
-    
-    local profiles = GetPreference("UserPresetLobby")
-    if profiles then
-        ShowPresetDetails(table.KeyByIndex(profiles, 0))
+
+    -- Quit button
+    local QuitButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Close")
+    LayoutHelpers.AtLeftIn(QuitButton, dialogContent, -10)
+    LayoutHelpers.AtBottomIn(QuitButton, dialogContent, 8)
+
+    -- Load button
+    local LoadButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Load Preset")
+    LayoutHelpers.RightOf(LoadButton, QuitButton, -28)
+    LoadButton:Hide()
+
+    -- Create button. Occupies the same space as the load button, when available.
+    local CreateButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Create Preset")
+    LayoutHelpers.RightOf(CreateButton, QuitButton, -28)
+
+    -- Save button
+    local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Save Preset")
+    LayoutHelpers.RightOf(SaveButton, LoadButton, -28)
+    SaveButton:Disable()
+
+    -- Delete button
+    local DeleteButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Delete Preset")
+    LayoutHelpers.RightOf(DeleteButton, SaveButton, -28)
+    DeleteButton:Disable()
+
+    LoadButton.OnClick = function(self)
+        LoadPreset(PresetList:GetSelection() + 1)
+    end
+
+    CreateButton.OnClick = function(self)
+        local dialogComplete = function(self, presetName)
+            if presetName == "" then
+                return
+            end
+
+            local profiles = LoadPresetsList()
+            table.insert(profiles, GetPresetFromSettings(presetName))
+            SavePresetsList(profiles)
+
+            RefreshAvailablePresetsList(PresetList)
+
+            PresetList:SetSelection(0)
+            PresetList:OnClick(0)
+        end
+
+        CreateInputDialog(GUI, "Select name for new preset", dialogComplete)
+    end
+
+    QuitButton.OnClick = function(self)
+        presetDialog:Hide()
+    end
+
+    SaveButton.OnClick = function(self)
+        -- Fucking hell, William.
+        local selectedPreset = PresetList:GetSelection() + 1
+
+        SavePreset(selectedPreset)
+        ShowPresetDetails(selectedPreset, InfoList)
+    end
+
+    DeleteButton.OnClick = function(self)
+        local profiles = LoadPresetsList()
+
+        -- Converting between zero-based indexing in the list and the table indexing...
+        table.remove(profiles, PresetList:GetSelection() + 1)
+
+        SavePresetsList(profiles)
+        RefreshAvailablePresetsList(PresetList)
+
+        -- Selection is lost, so change the button state...
+        LoadButton:Hide()
+        CreateButton:Show()
+
+        SaveButton:Disable()
+        DeleteButton:Disable()
+
+        -- And clear the detail view.
+        InfoList:DeleteAllItems()
+    end
+
+    -- Called when the selected item in the preset list changes.
+    local onListItemChanged = function(self, row)
+        if PresetList:GetItemCount() == (row+1) then
+            LoadButton:Hide()
+            CreateButton:Show()
+
+            SaveButton:Disable()
+            DeleteButton:Disable()
+
+            InfoList:DeleteAllItems()
+        else
+            LoadButton:Show()
+            CreateButton:Hide()
+
+            SaveButton:Enable()
+            DeleteButton:Enable()
+
+            ShowPresetDetails(row + 1, InfoList)
+        end
+    end
+
+    -- Because GPG's event model is painfully retarded..
+    PresetList.OnKeySelect = onListItemChanged
+    PresetList.OnClick = function(self, row, event)
+        self:SetSelection(row)
+        onListItemChanged(self, row)
+    end
+
+    PresetList.OnDoubleClick = function(self, row)
+        if PresetList:GetItemCount() == (row+1) then
+            CreateButton:OnClick()
+        else
+            LoadPreset(row)
+        end
     end
 
     -- When the user double-clicks on a metadata field, give them a popup to change its value.
     InfoList.OnDoubleClick = function(self, row)
-        local ruleChanged = function(self, str)
-            if str == "" then
-                str = "No Rule"
-            end
-
-            local profiles = GetPreference("UserPresetLobby")
-            SetPreference('UserPresetLobby.' .. table.KeyByIndex(profiles, (PresetList:GetSelection())) .. '.Rule', str)
-            ShowPresetDetails(table.KeyByIndex(profiles, PresetList:GetSelection()))
-        end
+        -- Closure copy, accounting for zero-based indexing in ItemList.
+        local theRow = row + 1
 
         local nameChanged = function(self, str)
             if str == "" then
                 return
             end
 
-            local profiles = GetPreference("UserPresetLobby")
-            SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.PresetName', str)
+            local profiles = LoadPresetsList()
+            profiles[theRow].Name = str
+            SavePresetsList(profiles)
+
+            -- Update the name displayed in the presets list, preserving selection.
             local lastselect = PresetList:GetSelection()
-            RefreshAvailablePresetsList()
+            RefreshAvailablePresetsList(PresetList)
             PresetList:SetSelection(lastselect)
-            ShowPresetDetails(table.KeyByIndex(profiles, PresetList:GetSelection()))
+
+            ShowPresetDetails(theRow, InfoList)
         end
 
         if row == 0 then
             CreateInputDialog(GUI, "Rename your preset", nameChanged)
-        elseif row == 1 then
-            CreateInputDialog(GUI, "Change your preset's rule", ruleChanged)
         end
     end
 
-    -- Show the "Double-click to edit" tooltip when the user mouses-over a metadata field.
+    -- Show the "Double-click to edit" tooltip when the user mouses-over an editable field.
     InfoList.OnMouseoverItem = function(self, row)
         -- Determine which metadata cell they moused-over, if any.
         local metadataType
+        -- For now, only name is editable. A nice mechanism to edit game preferences seems plausible.
         if row == 0 then
             metadataType = "Preset name"
-        elseif row == 1 then
-            metadataType = "Rule"
         else
             Tooltip.DestroyMouseoverDisplay()
             return
@@ -5315,24 +5349,14 @@ function ShowPresetDialog()
 
         Tooltip.CreateMouseoverDisplay(self, tooltip, 0, true)
     end
+
+    RefreshAvailablePresetsList(PresetList)
 end
 
 -- Create an input dialog with the given title and listener function.
 function CreateInputDialog(parent, title, listener)
     local dialog = InputDialog(parent, title, listener)
     dialog.OnInput = listener
-end
-
--- Other function
-function table.KeyByIndex(tablle, index)
-    local num = -1
-    for k, v in tablle do
-        num = num + 1
-        if num == index then
-            return k
-        end
-    end
-    return false
 end
 
 function GetModNameWithUid(uid)
@@ -5353,205 +5377,69 @@ function GetModUIorNotUIWithUid(uid)
 end
 
 -- Refresh list of presets
-function RefreshAvailablePresetsList()
-    local profiles = GetPreference("UserPresetLobby")
+function RefreshAvailablePresetsList(PresetList)
+    local profiles = LoadPresetsList()
     PresetList:DeleteAllItems()
 
-    if profiles then
-        for k, v in profiles do
-            PresetList:AddItem(profiles[k].PresetName)
-        end
+    for k, v in profiles do
+        WARN(k)
+        WARN(v.MapPath)
+        PresetList:AddItem(v.Name)
     end
+
     PresetList:AddItem('> New Preset')
 end
 
 -- Update the right-hand panel of the preset dialog to show the contents of the currently selected
 -- profile (passed by name as a parameter)
-function ShowPresetDetails(preset)
-    local profiles = GetPreference("UserPresetLobby")
+function ShowPresetDetails(preset, InfoList)
+    local profiles = LoadPresetsList()
     InfoList:DeleteAllItems()
-    InfoList:AddItem('Preset Name: '..profiles[preset].PresetName)
-    InfoList:AddItem('Rule: '..profiles[preset].Rule)
-    
-    if DiskGetFileInfo(profiles[preset].MapPath) == true then
-        InfoList:AddItem('Map: '..profiles[preset].MapName)
+    InfoList:AddItem('Preset Name: ' .. profiles[preset].Name)
+
+    if DiskGetFileInfo(profiles[preset].MapPath) then
+        InfoList:AddItem('Map: ' .. profiles[preset].MapName)
     else
-        InfoList:AddItem('Map: Unavailable ('..profiles[preset].MapName..')')
+        InfoList:AddItem('Map: Unavailable (' .. profiles[preset].MapName .. ')')
     end
-    
-    if profiles[preset].Mods then
-        InfoList:AddItem('')
-        InfoList:AddItem('Mod :')
-        for k, v in profiles[preset].Mods do
-            if GetModUidExist(k) == false then
-                InfoList:AddItem('- NOT AVAILABLE ('..k..')')
-            else
-                if GetModUIorNotUIWithUid(k) then
-                    InfoList:AddItem('- '..GetModNameWithUid(k)..' [Mod UI]')
-                else
-                    InfoList:AddItem('- '..GetModNameWithUid(k))
-                end
-            end
-        end
-    end
-    if profiles[preset].UnitsRestricts then
-        InfoList:AddItem('')
-        InfoList:AddItem('Unit Restrictions :')
-        for k, v in profiles[preset].UnitsRestricts do
-            InfoList:AddItem('- '..k)
-        end
-    end
-    if profiles[preset].Settings then
-        InfoList:AddItem('')
-        InfoList:AddItem('Settings :')
-        for k, v in profiles[preset].Settings do
-            InfoList:AddItem('- '..k..' : '..tostring(v))
-        end
+
+    InfoList:AddItem('')
+    InfoList:AddItem('Settings :')
+    for k, v in profiles[preset].GameOptions do
+        InfoList:AddItem('- '..k..' : '..tostring(v))
     end
 end
 
--- Create a preset from the current lobby settings.
-function CreatePresetFromSettings(presetname)
-    local profiles = GetPreference("UserPresetLobby")
-    if not profiles then
-        SetPreference('UserPresetLobby.Preset1.PresetName', tostring(presetname))
-        SetPreference('UserPresetLobby.Preset1.MapName', tostring(MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).name))
-        SetPreference('UserPresetLobby.Preset1.Rule', '')
-        SetPreference('UserPresetLobby.Preset1.MapPath', tostring(gameInfo.GameOptions.ScenarioFile))
-        SavePreferences()
-    else
-        local num = 0
-        while profiles do
-            num = num + 1
-            if not GetPreference("UserPresetLobby.Preset"..num) then
-                SetPreference('UserPresetLobby.Preset'..num..'.PresetName', tostring(presetname))
-                SetPreference('UserPresetLobby.Preset'..num..'.MapName', tostring(MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).name))
-                SetPreference('UserPresetLobby.Preset'..num..'.Rule', '')
-                SetPreference('UserPresetLobby.Preset'..num..'.MapPath', tostring(gameInfo.GameOptions.ScenarioFile))
-                SavePreferences()
-                break
-            end
-        end
-    end
-    RefreshAvailablePresetsList()
-    PresetList:SetSelection(0)
-    local profiles = GetPreference("UserPresetLobby")
-    ShowPresetDetails(table.KeyByIndex(profiles, 0))
+-- Create a preset table representing the current configuration.
+function GetPresetFromSettings(presetName)
+    return {
+        Name = presetName,
+        MapName = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).name,
+        MapPath = gameInfo.GameOptions.ScenarioFile,
+        GameOptions = gameInfo.GameOptions
+    }
 end
 
--- Load the preset currently selected in the preset list.
-function LoadPreset() -- GET OPTIONS IN PRESET AND SET TO LOBBY
-    local profiles = GetPreference("UserPresetLobby")
-    if profiles then
-        local Selected_Preset = table.KeyByIndex(profiles, PresetList:GetSelection())
+-- Load the given preset
+function LoadPreset(presetIndex)
+    local preset = LoadPresetsList()[presetIndex]
 
-        -- Load and broadcast the saved rules.
-        SetRuleTitleText(profiles[Selected_Preset].Rule)
-        gameInfo.GameOptions.GameRules = profiles[Selected_Preset].Rule
-        BroadcastGameRules()
-
-        if DiskGetFileInfo(profiles[Selected_Preset].MapPath) == true then
-            SetGameOption('ScenarioFile', profiles[Selected_Preset].MapPath, true)
-        else
-            AddChatText('MAP NOT EXIST !')
-        end
-        --
-        if profiles[Selected_Preset].UnitsRestricts then
-            local urestrict = {}
-            for k, v in profiles[Selected_Preset].UnitsRestricts do
-                table.insert(urestrict, k)
-            end
-            SetGameOption('RestrictedCategories', urestrict, true)
-        else
-            -- Clear Restricted
-            SetGameOption('RestrictedCategories', {}, true)
-        end
-
-        if profiles[Selected_Preset].Mods then
-            selectedMods = {}
-            for k, v in profiles[Selected_Preset].Mods do
-                if GetModUidExist(k) == true then
-                    SetPreference('active_mods.'..k, true)
-                    selectedMods[k] = true
-                end
-            end
-            OnModsChanged(selectedMods, true)
-            --UpdateGame() -- Rafraichie les mods (utile)
-        end
-
-        if profiles[Selected_Preset].Settings then
-            for k, v in profiles[Selected_Preset].Settings do
-                -- k = (setting name), v = (value name), profiles[Selected_Preset].Settings[k] = (value name)
-                --AddChatText('> PRESET > Settings : '..k..' // v : '..tostring(v)) -->>> PRESET Settings : UnitCap = disabled
-                --LOG('> PRESET > Settings : '..k..' // v : '..tostring(v)) -->>> PRESET Settings : UnitCap = disabled
-                if k == "AllowObservers" then
-                    SetGameOption("AllowObservers", v, true)
-                else
-                    SetGameOption(k, v, true)
-                end
-            end
-        end
-
-        UpdateGame()
-        GUI_Preset:Destroy()
+    for k, v in preset.GameOptions do
+        SetGameOption(k, v, true)
     end
+
+    GUI.presetDialog:Hide()
+    UpdateGame()
 end
 
--- Save the currently-selected preset into the user's profile.
-function SavePreset()
-    local profiles = GetPreference("UserPresetLobby")
+-- Write the current settings to the given preset profile index
+function SavePreset(index)
+    local profiles = LoadPresetsList()
 
-    local Selected_Preset = table.KeyByIndex(profiles, PresetList:GetSelection())
+    local selectedPreset = index
+    profiles[selectedPreset] = GetPresetFromSettings(profiles[selectedPreset].Name)
 
-    local Preset_Name = profiles[Selected_Preset].PresetName or 'ERROR, Set preset name here' -- Nom du PresetLobby
-    local Rule_Text = GUI.RuleLabel:GetItem(0)..GUI.RuleLabel:GetItem(1)
-    if Rule_Text == 'No Rules: Click to add rules' then
-        Rule_Text = 'No Rule'
-    end
-    Rule_Text = string.gsub(Rule_Text, 'Rule : ', '') or profiles[Selected_Preset].Rule_Text or '' -- Rule text showing in top of Lobby
-
-    SetPreference('UserPresetLobby.'..Selected_Preset, {}) -- Delete all value
-
-    SetPreference('UserPresetLobby.'..Selected_Preset..'.PresetName', tostring(Preset_Name))
-    SetPreference('UserPresetLobby.'..Selected_Preset..'.MapName', tostring(MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).name))
-    SetPreference('UserPresetLobby.'..Selected_Preset..'.Rule', tostring(Rule_Text))
-
-    for k, v in gameInfo.GameOptions do
-        if k == 'ScenarioFile' then -- MAP
-            --AddChatText('<<< gameInfo.GameOptions : '..k..' = '..tostring(gameInfo.GameOptions[k])) --EX: gameInfo.GameOptions : UnitCap = 500
-            SetPreference('UserPresetLobby.'..Selected_Preset..'.MapPath', gameInfo.GameOptions[k])
-
-        elseif k == 'AllowObservers' then
-            SetPreference('UserPresetLobby.'..Selected_Preset..'.Settings.AllowObservers', gameInfo.GameOptions[k])
-
-        elseif k == 'RestrictedCategories' then -- RESTRICTED UNITS
-            for kk, vv in gameInfo.GameOptions['RestrictedCategories'] do
-                SetPreference('UserPresetLobby.'..Selected_Preset..'.UnitsRestricts.'..vv, true) -- Enregistre les Restriction dans le Game.prefs
-            end
-
-        elseif k == 'Mods' then -- MODS
-            --for kk, vv in gameInfo.GameOptions['Mods'] do
-            --AddChatText('<<< ... Mods : '..kk..' = '..tostring(gameInfo.GameOptions['Mods'][kk]))
-            --SetPreference('UserPresetLobby.'..Selected_Preset..'.UnitsRestricts.'..k, tostring(gameInfo.GameOptions[k]))
-            --end
-
-        else -- SETTINGS
-            SetPreference('UserPresetLobby.'..Selected_Preset..'.Settings.'..k, gameInfo.GameOptions[k]) -- Enregistre les Options dans le Game.prefs
-        end
-    end
-
-    local mods = Mods.GetGameMods(gameInfo.GameMods)
-    local modsUI = Mods.GetUiMods()
-    local nummods = 0
-    local uids = ""
-    for k, v in mods do
-        nummods = nummods + 1
-        SetPreference('UserPresetLobby.'..Selected_Preset..'.Mods.'..v.uid, true)
-    end
-    for k, v in modsUI do
-        nummods = nummods + 1
-        SetPreference('UserPresetLobby.'..Selected_Preset..'.Mods.'..v.uid, true)
-    end
+    SavePresetsList(profiles)
 end
 
 -- Find the key for the given value in a table.
