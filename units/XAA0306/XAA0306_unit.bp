@@ -1,5 +1,7 @@
 UnitBlueprint {
     AI = {
+        GuardReturnRadius = 125,
+        GuardScanRadius = 100,
         TargetBones = {
             'XAA0306',
         },
