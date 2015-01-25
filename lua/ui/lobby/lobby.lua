@@ -5263,11 +5263,6 @@ function GUI_PRESET()
     LayoutHelpers.AtHorizontalCenterIn(text0, dialogContent, 0)
     LayoutHelpers.AtTopIn(text0, dialogContent, 10)
 
-    -- Info text
-    local text1 = UIUtil.CreateText(dialogContent, 'Double-click to edit', 9, 'Arial', true)
-    text1:SetColor('FFCC00')
-    text1:Hide()
-
     -- Load button
     local LoadButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Load Preset")
     LayoutHelpers.AtLeftIn(LoadButton, dialogContent, -10)
@@ -5356,8 +5351,6 @@ function GUI_PRESET()
     InfoList.Height:Set(280)
     LayoutHelpers.AtRightIn(InfoList, dialogContent, 26)
     LayoutHelpers.AtTopIn(InfoList, dialogContent, 32)
-    LayoutHelpers.Below(text1, InfoList, 0)
-    LayoutHelpers.AtHorizontalCenterIn(text1, InfoList, 0)
     UIUtil.CreateLobbyVertScrollbar(InfoList)
     
     local profiles = GetPreference("UserPresetLobby")
@@ -5399,11 +5392,23 @@ function GUI_PRESET()
 
     -- Show the "Double-click to edit" tooltip when the user mouses-over a metadata field.
     InfoList.OnMouseoverItem = function(self, row)
-        if row == 0 or row == 1 then
-            text1:Show()
+        -- Determine which metadata cell they moused-over, if any.
+        local metadataType
+        if row == 0 then
+            metadataType = "Preset name"
+        elseif row == 1 then
+            metadataType = "Rule"
         else
-            text1:Hide()
+            Tooltip.DestroyMouseoverDisplay()
+            return
         end
+
+        local tooltip = {
+            text = metadataType,
+            body = "Double-click to edit"
+        }
+
+        Tooltip.CreateMouseoverDisplay(self, tooltip, 0, true)
     end
 end
 
