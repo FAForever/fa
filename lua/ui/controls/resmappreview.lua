@@ -59,7 +59,7 @@ ResourceMapPreview = Class(Group) {
 
     Clear = function(self)
         self:DestroyResourceMarkers()
-        self.mapPreview:Destroy()
+        self.mapPreview:ClearTexture()
     end,
 
     -- Update the control with a named scenario file.
