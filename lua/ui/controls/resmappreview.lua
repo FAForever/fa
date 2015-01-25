@@ -54,7 +54,7 @@ ResourceMapPreview = Class(Group) {
     end,
 
     Clear = function(self)
-        DestroyResourceMarkers()
+        self:DestroyResourceMarkers()
         self.mapPreview:Destroy()
     end,
 
