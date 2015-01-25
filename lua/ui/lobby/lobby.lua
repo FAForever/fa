@@ -18,6 +18,7 @@ local RadioButton = import('/lua/ui/controls/radiobutton.lua').RadioButton
 local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
 local ResourceMapPreview = import('/lua/ui/controls/resmappreview.lua').ResourceMapPreview
 local Popup = import('/lua/ui/controls/popup.lua').Popup
+local InputDialog = import('/lua/ui/controls/popup.lua').InputDialog
 local Slider = import('/lua/maui/slider.lua').Slider
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
@@ -5029,58 +5030,15 @@ function BroadcastGameRules()
     lobbyComm:BroadcastData({ Type = 'Rule_Title_MSG', Rule = gameInfo.GameOptions.GameRules or "" })
 end
 
--- Show, creating if necessary, the rule change dialog.
+-- Show the rule change dialog.
 function ShowRuleDialog(RuleLabel)
-    if GUI.ruleDialog then
-        GUI.ruleDialog:Show()
-        return
-    end
-
-    -- Group to hold the UI controls to put in the popup.
-    local dialogContent = Group(GUI)
-    dialogContent.Width:Set(536)
-    dialogContent.Height:Set(160)
-
-    local ruleDialog = Popup(GUI, dialogContent)
+    local ruleDialog = InputDialog(GUI, 'Game Rules')
     GUI.ruleDialog = ruleDialog
-
-    -- Title
-    local text09 = UIUtil.CreateText(dialogContent, '', 17, 'Arial', true)
-    text09:SetText('Game Rules')
-    LayoutHelpers.AtHorizontalCenterIn(text09, dialogContent)
-    LayoutHelpers.AtTopIn(text09, dialogContent, 10)
-
-    -- Textfield
-    local nameEdit = Edit(dialogContent)
-    LayoutHelpers.AtHorizontalCenterIn(nameEdit, dialogContent)
-    LayoutHelpers.AtVerticalCenterIn(nameEdit, dialogContent)
-    nameEdit.Width:Set(334)
-    nameEdit.Height:Set(24)
-    nameEdit:AcquireFocus()
-
-    -- Close the dialog and update the rules when the dialog is closed affirmatively.
-    local updateRules = function(self)
-        local text = nameEdit:GetText()
-        gameInfo.GameOptions.GameRules = text
-        SetRuleTitleText(text)
+    ruleDialog.OnInput = function(self, rules)
+        gameInfo.GameOptions.GameRules = rules
+        SetRuleTitleText(rules)
         BroadcastGameRules()
-        ruleDialog:Hide()
     end
-    nameEdit.OnEnterPressed = updateRules
-
-    -- Exit button
-    local ExitButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Cancel")
-    LayoutHelpers.AtLeftIn(ExitButton, dialogContent, 70)
-    LayoutHelpers.AtBottomIn(ExitButton, dialogContent, 10)
-    ExitButton.OnClick = function(self)
-        ruleDialog:Hide()
-    end
-
-    -- Ok button
-    local OKButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
-    LayoutHelpers.AtRightIn(OKButton, dialogContent, 70)
-    LayoutHelpers.AtBottomIn(OKButton, dialogContent, 10)
-    OKButton.OnClick = updateRules
 end
 
 -- Faction selector
