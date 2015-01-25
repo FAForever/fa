@@ -5427,27 +5427,25 @@ function GUI_PRESET()
 end
 
 function GUI_PRESET_INPUT(tyype)
-    local GUI_Preset_InputBox = Group(GUI)
-    LayoutHelpers.AtCenterIn(GUI_Preset_InputBox, GUI)
-    GUI_Preset_InputBox.Depth:Set(1999)
-    local background2 = Bitmap(GUI_Preset_InputBox, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/optionlobby-small.dds'))
-    GUI_Preset_InputBox.Width:Set(background2.Width)
-    GUI_Preset_InputBox.Height:Set(background2.Height)
-    LayoutHelpers.FillParent(background2, GUI_Preset_InputBox)
-    local GUI_Preset_InputBox2 = Group(GUI_Preset_InputBox)
-    GUI_Preset_InputBox2.Width:Set(536)
-    GUI_Preset_InputBox2.Height:Set(400-240)
-    LayoutHelpers.AtCenterIn(GUI_Preset_InputBox2, GUI_Preset_InputBox)
+    if GUI.presetNameDialog then
+        GUI.presetNameDialog:Show()
+    end
+
+    local dialogContent = Group(GUI)
+    dialogContent.Width:Set(536)
+    dialogContent.Height:Set(160)
+
+    GUI.presetNameDialog = Popup(GUI, dialogContent)
 
     -- Title
-    local text09 = UIUtil.CreateText(GUI_Preset_InputBox2, '', 17, 'Arial', true)
-    LayoutHelpers.AtHorizontalCenterIn(text09, GUI_Preset_InputBox2)
-    LayoutHelpers.AtTopIn(text09, GUI_Preset_InputBox2, 10)
+    local text09 = UIUtil.CreateText(dialogContent, '', 17, 'Arial', true)
+    LayoutHelpers.AtHorizontalCenterIn(text09, dialogContent)
+    LayoutHelpers.AtTopIn(text09, dialogContent, 10)
 
     -- Edit
-    local nameEdit = Edit(GUI_Preset_InputBox2)
-    LayoutHelpers.AtHorizontalCenterIn(nameEdit, GUI_Preset_InputBox2)
-    LayoutHelpers.AtVerticalCenterIn(nameEdit, GUI_Preset_InputBox2)
+    local nameEdit = Edit(dialogContent)
+    LayoutHelpers.AtHorizontalCenterIn(nameEdit, dialogContent)
+    LayoutHelpers.AtVerticalCenterIn(nameEdit, dialogContent)
     nameEdit.Width:Set(334)
     nameEdit.Height:Set(24)
     nameEdit:AcquireFocus()
@@ -5457,14 +5455,14 @@ function GUI_PRESET_INPUT(tyype)
                 -- No word in nameEdit
             else
                 applyCREATE_PRESET_IN_PREF(text)
-                GUI_Preset_InputBox:Destroy()
+                GUI.presetNameDialog:Hide()
             end
         elseif tyype == 0 then
             if text == '' then
                 -- No word in nameEdit
             else
                 applyCREATE_PRESET_IN_PREF(text)
-                GUI_Preset_InputBox:Destroy()
+                GUI.presetNameDialog:Hide()
             end
         elseif tyype == 1 then
             if text == '' then
@@ -5476,7 +5474,7 @@ function GUI_PRESET_INPUT(tyype)
                 LOAD_PresetProfils_For_PresetList()
                 PresetList:SetSelection(lastselect)
                 LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                GUI_Preset_InputBox:Destroy()
+                GUI.presetNameDialog:Hide()
             end
         elseif tyype == 2 then
             if text == '' then
@@ -5485,38 +5483,38 @@ function GUI_PRESET_INPUT(tyype)
                 local profiles = GetPreference("UserPresetLobby")
                 SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.FAF_Title', tostring(text))
                 LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                GUI_Preset_InputBox:Destroy()
+                GUI.presetNameDialog:Hide()
             end
         elseif tyype == 3 then
             if text == '' then
                 local profiles = GetPreference("UserPresetLobby")
                 SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', 'No Rule')
                 LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                GUI_Preset_InputBox:Destroy()
+                GUI.presetNameDialog:Hide()
             else
                 local profiles = GetPreference("UserPresetLobby")
                 SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', tostring(text))
                 LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                GUI_Preset_InputBox:Destroy()
+                GUI.presetNameDialog:Hide()
             end
         end
     end
 
     -- Exit button
-    local ExitButton = UIUtil.CreateButtonWithDropshadow(GUI_Preset_InputBox2, '/BUTTON/medium/', "Cancel")
-    LayoutHelpers.AtLeftIn(ExitButton, GUI_Preset_InputBox2, 70)
-    LayoutHelpers.AtBottomIn(ExitButton, GUI_Preset_InputBox2, 10)
+    local ExitButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Cancel")
+    LayoutHelpers.AtLeftIn(ExitButton, dialogContent, 70)
+    LayoutHelpers.AtBottomIn(ExitButton, dialogContent, 10)
     ExitButton.OnClick = function(self)
-        GUI_Preset_InputBox:Destroy()
+        GUI.presetNameDialog:Hide()
 		if tyype == -1 then
 			GUI_Preset:Destroy()
 		end
     end
 
     -- Ok button
-    local OKButton = UIUtil.CreateButtonWithDropshadow(GUI_Preset_InputBox2, '/BUTTON/medium/', "Ok")
-    LayoutHelpers.AtRightIn(OKButton, GUI_Preset_InputBox2, 70)
-    LayoutHelpers.AtBottomIn(OKButton, GUI_Preset_InputBox2, 10)
+    local OKButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
+    LayoutHelpers.AtRightIn(OKButton, dialogContent, 70)
+    LayoutHelpers.AtBottomIn(OKButton, dialogContent, 10)
     if tyype == -1 then
         -- TODO: Localize this
         text09:SetText('No presets found, choose a name for a new preset:')
@@ -5526,7 +5524,7 @@ function GUI_PRESET_INPUT(tyype)
                 -- No word in nameEdit
             else
                 applyCREATE_PRESET_IN_PREF(result)
-                GUI_Preset_InputBox:Destroy()
+                GUI.presetNameDialog:Hide()
             end
         end
     elseif tyype == 0 then
@@ -5537,7 +5535,7 @@ function GUI_PRESET_INPUT(tyype)
                 -- No word in nameEdit
             else
                 applyCREATE_PRESET_IN_PREF(result)
-                GUI_Preset_InputBox:Destroy()
+                GUI.presetNameDialog:Hide()
             end
         end
     elseif tyype == 1 then
@@ -5553,7 +5551,7 @@ function GUI_PRESET_INPUT(tyype)
                 LOAD_PresetProfils_For_PresetList()
                 PresetList:SetSelection(lastselect)
                 LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                GUI_Preset_InputBox:Destroy()
+                GUI.presetNameDialog:Hide()
             end
         end
     elseif tyype == 2 then
@@ -5566,7 +5564,7 @@ function GUI_PRESET_INPUT(tyype)
                 local profiles = GetPreference("UserPresetLobby")
                 SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.FAF_Title', tostring(result))
                 LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                GUI_Preset_InputBox:Destroy()
+                GUI.presetNameDialog:Hide()
             end
         end
     elseif tyype == 3 then
@@ -5577,12 +5575,12 @@ function GUI_PRESET_INPUT(tyype)
                 local profiles = GetPreference("UserPresetLobby")
                 SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', 'No Rule')
                 LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                GUI_Preset_InputBox:Destroy()
+                GUI.presetNameDialog:Hide()
             else
                 local profiles = GetPreference("UserPresetLobby")
                 SetPreference('UserPresetLobby.'..table.KeyByIndex(profiles, (PresetList:GetSelection()))..'.Rule', tostring(result))
                 LOAD_PresetSettings_For_InfoList(table.KeyByIndex(profiles, PresetList:GetSelection()))
-                GUI_Preset_InputBox:Destroy()
+                GUI.presetNameDialog:Hide()
             end
         end
     end
