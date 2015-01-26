@@ -971,15 +971,6 @@ tooltip =
 		value="zw",
 		text="Zimbabwe",
 	},
-
-    -- Special Values
-
-    -- Xinnony's personal flag
-    {
-        value = "xinnony",
-        text = "Xinnony's flag !",
-    },
-
     -- No Nationality
     {
         value = "world",
