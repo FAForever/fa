@@ -655,8 +655,9 @@ end
 
 -- update the data in a player slot
 function SetSlotInfo(slot, playerInfo)
-	if (GUI.connectdialog ~= false) then -- Remove the ConnectDialog
+	if GUI.connectdialog then -- Remove the ConnectDialog
 		GUI.connectdialog:Hide()
+        GUI.connectdialog = nil
 	end
 	local isLocallyOwned = IsLocallyOwned(slot)
     if isLocallyOwned then
@@ -2785,7 +2786,7 @@ function CreateUI(maxPlayers)
     local lastFaction = Prefs.GetFromCurrentProfile('LastFaction') or 1
     UIUtil.SetCurrentSkin(FACTION_NAMES[lastFaction])
 
-    if (GUI.connectdialog ~= false) then
+    if GUI.connectdialog then
         MenuCommon.MenuCleanup()
     end
 
