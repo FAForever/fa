@@ -10,6 +10,7 @@ local Edit = import('/lua/maui/edit.lua').Edit
 Popup = Class(Group) {
     __init = function(self, GUI, content)
         Group.__init(self, GUI)
+        self.content = content
         content:SetParent(self)
         LayoutHelpers.AtLeftTopIn(content, self)
 
@@ -71,6 +72,7 @@ Popup = Class(Group) {
         -- having a class to handle stacking escape handlers, should we ever find we want to stack
         -- dialogs).
         self.OnHide = function(self, hidden)
+            self.isHidden = hidden
             if hidden then
                 self:OnClosed()
                 main.SetEscapeHandler(theGUI.exitLobbyEscapeHandler)
