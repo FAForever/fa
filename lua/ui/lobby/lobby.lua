@@ -5405,7 +5405,7 @@ function ShowPresetDetails(preset, InfoList)
 
     InfoList:AddItem('')
     InfoList:AddItem('Settings :')
-    for k, v in profiles[preset].GameOptions do
+    for k, v in sortedpairs(profiles[preset].GameOptions) do
         InfoList:AddItem('- '..k..' : '..tostring(v))
     end
 end
