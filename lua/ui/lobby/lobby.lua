@@ -5357,8 +5357,6 @@ function RefreshAvailablePresetsList(PresetList)
     PresetList:DeleteAllItems()
 
     for k, v in profiles do
-        WARN(k)
-        WARN(v.MapPath)
         PresetList:AddItem(v.Name)
     end
 
@@ -5379,6 +5377,16 @@ function ShowPresetDetails(preset, InfoList)
     end
 
     InfoList:AddItem('')
+
+    -- For each mod, look up its name and pretty-print it.
+    local allMods = Mods.AllMods()
+    for modId, v in profiles[preset].GameMods do
+        if v then
+            InfoList:AddItem('Mod: ' .. allMods[modId].name)
+        end
+    end
+
+    InfoList:AddItem('')
     InfoList:AddItem('Settings :')
     for k, v in sortedpairs(profiles[preset].GameOptions) do
         InfoList:AddItem('- '..k..' : '..tostring(v))
@@ -5391,7 +5399,8 @@ function GetPresetFromSettings(presetName)
         Name = presetName,
         MapName = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).name,
         MapPath = gameInfo.GameOptions.ScenarioFile,
-        GameOptions = gameInfo.GameOptions
+        GameOptions = gameInfo.GameOptions,
+        GameMods = gameInfo.GameMods
     }
 end
 
@@ -5402,6 +5411,23 @@ function LoadPreset(presetIndex)
     for k, v in preset.GameOptions do
         SetGameOption(k, v, true)
     end
+
+    -- gameInfo.GameMods is a map from mod identifiers to truthy values for every activated mod.
+    -- Unfortunately, HostUpdateMods is painfully stupid and reads selectedMods, which is a list of
+    -- mod identifiers to be activated.
+    -- Ultimately, we want to make HostUpdateMods not be stupid, so presets just pickle the GameMods
+    -- map directly. For now, though, that means we have the following stupid loop to keep the
+    -- retarded HostUpdateMods working.
+    --
+    -- Thanks, William.
+    selectedMods = {}
+    for k, v in preset.GameMods do
+        if v then
+            table.insert(selectedMods, k)
+        end
+    end
+
+    HostUpdateMods()
 
     GUI.presetDialog:Hide()
     UpdateGame()
