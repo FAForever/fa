@@ -225,9 +225,6 @@ local localPlayerID = false
 local gameInfo = false
 local pmDialog = false
 
-local hasSupcom = true
-local hasFA = true
-
 local defaultMode =(HasCommandLineArg("/windowed") and "windowed") or Prefs.GetFromCurrentProfile('options').primary_adapter
 local windowedMode = defaultMode == "windowed" or (HasCommandLineArg("/windowed"))
 
@@ -525,13 +522,6 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
         dl:Destroy()
         UIUtil.QuickDialog(GetFrame(0), "You dont have this map.", "Exit", function() ExitApplication() end)
     else
-        -- default to true, if the param is nil, then not playing through GPGnet
-        if playerHasSupcom == nil or playerHasSupcom == true then
-            hasSupcom = true
-        else
-            hasSupcom = true
-        end
-
         Reset()
 
         if GUI then
@@ -599,6 +589,7 @@ function DisconnectFromPeer(uid)
     lobbyComm:DisconnectFromPeer(uid)
 end
 
+-- These two are now exclusively used as an amusing hack to control synchronous replay watching.
 function SetHasSupcom(cmd)
     if IsSyncReplayServer then
         if cmd == 0 then
@@ -606,8 +597,6 @@ function SetHasSupcom(cmd)
         elseif cmd == 1 then
             SessionRequestPause()
         end
-    else
-        hasSupcom = cmd -- was: supcomInstalled
     end
 end
 
@@ -616,8 +605,6 @@ function SetHasForgedAlliance(speed)
         if GetGameSpeed() ~= speed then
             SetGameSpeed(speed)
         end
-    else
-        hadFA = speed -- was: faInstalled
     end
 end
 
@@ -681,9 +668,6 @@ function SetSlotInfo(slot, playerInfo)
             DisableSlot(slot, true)
         else
             EnableSlot(slot)
-        end
-        if not hasSupcom then
-            GUI.slots[slot].faction:Disable()
         end
     else
         DisableSlot(slot)
@@ -1703,15 +1687,6 @@ local function UpdateGame()
     if localPlayerSlot then
         local playerOptions = gameInfo.PlayerOptions[localPlayerSlot]
 
-        -- if anything happens to switch a no SupCom player to a faction other than Seraphim, switch them back
-        if not hasSupcom then
-            if playerOptions.Faction ~= 4 and not
-            IsObserver(localPlayerID) then
-                SetPlayerOption(localPlayerSlot, 'Faction', 4, true)
-                return
-            end
-        end
-
         -- Disable some controls if the user is ready.
         local notReady = not playerOptions.Ready
 
@@ -2123,12 +2098,9 @@ function HostTryAddPlayer(senderID, slot, requestedPlayerName, human, aiPersonal
     gameInfo.PlayerOptions[newSlot] = LobbyComm.GetDefaultPlayerOptions(playerName)
     gameInfo.PlayerOptions[newSlot].Human = human
     gameInfo.PlayerOptions[newSlot].OwnerID = senderID
-    if hasSupcom then
-        -- already assigned a default, but use requested if avail
-        gameInfo.PlayerOptions[newSlot].Faction = requestedFaction or gameInfo.PlayerOptions[newSlot].Faction
-    else
-        gameInfo.PlayerOptions[newSlot].Faction = 4
-    end
+
+    -- already assigned a default, but use requested if avail
+    gameInfo.PlayerOptions[newSlot].Faction = requestedFaction or gameInfo.PlayerOptions[newSlot].Faction
 
     if requestedTeam then
         gameInfo.PlayerOptions[newSlot].Team = requestedTeam
@@ -2729,9 +2701,6 @@ function CreateSlotsUI(makeLabel)
         Tooltip.AddControlTooltip(factionSelector, 'lob_faction')
         Tooltip.AddComboTooltip(factionSelector, factionTooltips)
         factionSelector.OnEvent = defaultHandler
-        if not hasSupcom then
-            factionSelector:SetItem(4)
-        end
 
         --// Team
         local teamSelector = BitmapCombo(bg, teamIcons, 1, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
@@ -4131,10 +4100,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 requestedFaction = table.getn(FactionData.Factions) + 1
             end
 
-            if hasSupcom == false then
-                requestedFaction = 4
-            end
-
             lobbyComm:SendData( hostID,
                 {
                     Type = 'AddPlayer',
@@ -4429,11 +4394,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         if (requestedFaction == nil) or (requestedFaction > table.getn(FactionData.Factions)) then
             requestedFaction = table.getn(FactionData.Factions) + 1
         end
-        if hasSupcom then
-            gameInfo.PlayerOptions[1].Faction = requestedFaction
-        else
-            gameInfo.PlayerOptions[1].Faction = 4
-        end
+        gameInfo.PlayerOptions[1].Faction = requestedFaction
 
         -- Given an option key, find the value stored in the profile (if any) and assign either it,
         -- or that option's default value, to the current game state.
@@ -4575,12 +4536,6 @@ function SetPlayerOption(slot, key, val, ignoreRefresh)
     if not IsLocallyOwned(slot) then
         WARN("Hey you can't set a player option on a slot you don't own. (slot:"..tostring(slot).." / key:"..tostring(key).." / val:"..tostring(val)..")")
         return
-    end
-
-    if not hasSupcom then
-        if key == 'Faction' then
-            val = 4
-        end
     end
 
     gameInfo.PlayerOptions[slot][key] = val
