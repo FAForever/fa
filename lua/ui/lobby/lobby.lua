@@ -2321,25 +2321,6 @@ function HostConvertObserverToPlayerWithoutSlot(senderID, name, fromObserverSlot
     HostConvertObserverToPlayer(senderID, name, fromObserverSlot, toPlayerSlot, requestedFaction, requestedPL, requestedRC, requestedNG, ignoreMsg)
 end
 
-function HostClearPlayer(uid)
-
-    local slot = FindSlotForID(peerID)
-    if slot then
-        ClearSlotInfo(slot)
-        gameInfo.PlayerOptions[slot] = nil
-        UpdateGame()
-    else
-        slot = FindObserverSlotForID(peerID)
-        if slot then
-            gameInfo.Observers[slot] = nil
-            UpdateGame()
-        end
-    end
-
-    availableMods[peerID] = nil
-    HostUpdateMods()
-end
-
 function HostRemoveAI(slot)
     if gameInfo.PlayerOptions[slot].Human then
         WARN('Use EjectPlayer to remove humans')
