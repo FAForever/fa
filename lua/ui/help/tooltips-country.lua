@@ -7,6 +7,54 @@
 
 tooltip =
 {
+    {
+        value="a1",
+        text="Anonymous Proxy"
+    },
+    {
+        value="a2",
+        text="Satellite Provider"
+    },
+    {
+        value="ap",
+        text="Asia/Pacific Region"
+    },
+    {
+        value="ax",
+        text="Aland Islands"
+    },
+    {
+        value="bl",
+        text="Saint Bartelemey"
+    },
+    {
+        value="eu",
+        text="Europe"
+    },
+    {
+        value="gg",
+        text="Guernsey"
+    },
+    {
+        value="im",
+        text="Isle of Man"
+    },
+    {
+        value="je",
+        text="Jersey"
+    },
+    {
+        value="mf",
+        text="Saint Martin"
+    },
+    {
+        value="ps",
+        text="Palestinian Territory"
+    },
+    {
+        value="tl",
+        text="Timor-Leste"
+    },
 	{
 		value="af",
 		text="Afghanistan",
@@ -250,10 +298,6 @@ tooltip =
 	{
 		value="do",
 		text="Dominican Republic",
-	},
-	{
-		value="tp",
-		text="East Timor",
 	},
 	{
 		value="ec",
@@ -794,10 +838,6 @@ tooltip =
 	{
 		value="za",
 		text="South Africa",
-	},
-	{
-		value="ss",
-		text="South Sudan",
 	},
 	{
 		value="gs",
