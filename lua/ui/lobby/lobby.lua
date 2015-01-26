@@ -2951,6 +2951,9 @@ function CreateUI(maxPlayers)
     GUI.mapView = ResourceMapPreview(GUI.mapPanel, 198, 3, 5)
     LayoutHelpers.AtLeftTopIn(GUI.mapView, GUI.mapPanel, 5, 5)
 
+    local mapBorder = UIUtil.CreateBorderStd(GUI.mapPanel, '/scx_menu/lan-game-lobby/frame/')
+    mapBorder:Surround(GUI.mapView, 62, 62)
+
     GUI.LargeMapPreview = UIUtil.CreateButtonWithDropshadow(GUI.mapPanel, '/BUTTON/zoom/', "")
     LayoutHelpers.AtRightIn(GUI.LargeMapPreview, GUI.mapPanel, -3)
     LayoutHelpers.AtBottomIn(GUI.LargeMapPreview, GUI.mapPanel, -3)
