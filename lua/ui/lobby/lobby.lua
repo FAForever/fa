@@ -1956,10 +1956,10 @@ local function HostUpdateMods(newPlayerID, newPlayerName)
                                'don\'t have the following mod(s):\n%s \nPlease, install the mod before you join the game lobby',
                                modnames))
             if FindNameForID(newPlayerID) then
-                AddChatText(FindNameForID(newPlayerID)..' is Auto Kicked because he not have this mod : '..modnames) -- not working ? -- XinnonyTest
+                AddChatText(FindNameForID(newPlayerID)..' is Auto Kicked because he not have this mod : '..modnames) -- not working ?
             else
                 if newPlayerName then
-                    AddChatText(newPlayerName..' is Auto Kicked because he not have this mod : '..modnames) -- not working ? -- XinnonyTest
+                    AddChatText(newPlayerName..' is Auto Kicked because he not have this mod : '..modnames) -- not working ?
                 else
                     AddChatText('The last player is Auto Kicked because he not have this mod : '..modnames)
                 end
@@ -2933,15 +2933,7 @@ function CreateUI(maxPlayers)
         ShowLobbyOptionsDialog()
     end
 
-    -- Credits for the FAF lobby
-    local Credits = 'Lobby by Xinnony and Barlots: V'..LOBBYversion..')'
-    GUI.Credits_Text = UIUtil.CreateText(GUI.panel, Credits, 11, UIUtil.titleFont, true)
-    SetText2(GUI.Credits_Text, Credits, 20)
-    GUI.Credits_Text:SetColor("FFFFFF")
-    LayoutHelpers.AtBottomIn(GUI.Credits_Text, GUI, 2)
-    LayoutHelpers.AtRightIn(GUI.Credits_Text, GUI, 5)
-
-    -- FOR SEE THE GROUP POSITION, LOOK THIS SCREENSHOOT : http://img402.imageshack.us/img402/8826/falobbygroup.png
+    -- FOR SEE THE GROUP POSITION, LOOK THIS SCREENSHOT : http://img402.imageshack.us/img402/8826/falobbygroup.png
     GUI.playerPanel = Group(GUI.panel, "playerPanel") -- RED Square in Screenshoot
     LayoutHelpers.AtLeftTopIn(GUI.playerPanel, GUI.panel, 40, 66+40-4)
     GUI.playerPanel.Width:Set(706)
