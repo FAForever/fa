@@ -1867,12 +1867,6 @@ end
 -- notify other clients about the change.
 local function HostUpdateMods(newPlayerID, newPlayerName)
     if lobbyComm:IsHost() then
-        if gameInfo.GameOptions['RankedGame'] and gameInfo.GameOptions['RankedGame'] ~= 'Off' then
-            gameInfo.GameMods = {}
-            gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
-            lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
-            return
-        end
         local newmods = {}
         local missingmods = {}
         for k,modId in selectedMods do
