@@ -531,15 +531,12 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
 
         GUI = UIUtil.CreateScreenGroup(over, "CreateLobby ScreenGroup")
 
-
         GUI.exitBehavior = exitBehavior
-
 
         GUI.optionControls = {}
         GUI.slots = {}
 
         GUI.connectdialog = UIUtil.ShowInfoDialog(GUI, Strings.TryingToConnect, Strings.AbortConnect, ReturnToMenu)
-		GUI.connectdialog.Depth:Set(GetFrame(GUI:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 999)
 
         InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
 
@@ -659,8 +656,7 @@ end
 -- update the data in a player slot
 function SetSlotInfo(slot, playerInfo)
 	if (GUI.connectdialog ~= false) then -- Remove the ConnectDialog
-		GUI.connectdialog:Destroy()
-		GUI.connectdialog = false
+		GUI.connectdialog:Hide()
 	end
 	local isLocallyOwned = IsLocallyOwned(slot)
     if isLocallyOwned then

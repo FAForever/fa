@@ -22,6 +22,7 @@ local Prefs = import('/lua/user/prefs.lua')
 local Border = import('/lua/maui/border.lua').Border
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local Layouts = import('/lua/skins/layouts.lua')
+local Popup = import('/lua/ui/controls/popup.lua').Popup
 
 --* Handy global variables to assist skinning
 buttonFont = import('/lua/lazyvar.lua').Create()            -- default font used for button faces
@@ -707,19 +708,12 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
 
     local dialog = Group(parent, "quickDialogGroup")
 
-    LayoutHelpers.AtCenterIn(dialog, parent)
-    dialog.Depth:Set(GetFrame(parent:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 1)
-    local background = Bitmap(dialog, SkinnableFile('/dialogs/dialog/panel_bmp_m.dds'))
-    dialog._background = background
-    dialog.Width:Set(background.Width)
-    dialog.Height:Set(background.Height)
-    LayoutHelpers.FillParent(background, dialog)
-
     local textLine = {}
     textLine[1] = CreateText(dialog, "", 18, titleFont)
-    textLine[1].Top:Set(background.Top)
+    LayoutHelpers.AtTopIn(textLine[1], dialog, 15)
     LayoutHelpers.AtHorizontalCenterIn(textLine[1], dialog)
 
+    dialog.Width:Set(428)
     local textBoxWidth = (dialog.Width() - 80)
     local tempTable = import('/lua/maui/text.lua').WrapText(LOC(dialogText), textBoxWidth,
     function(text)
@@ -728,6 +722,7 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
 
     local tempLines = table.getn(tempTable)
 
+    local textHeight = 0
     local prevControl = false
     for i, v in tempTable do
         if i == 1 then
@@ -739,40 +734,27 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
             LayoutHelpers.AtHorizontalCenterIn(textLine[i], dialog)
             prevControl = textLine[i]
         end
+
+        textHeight = textHeight + textLine[i]:Height()
     end
 
-    background:SetTiled(true)
-    background.Bottom:Set(textLine[tempLines].Bottom)
+    dialog.Height:Set(textHeight + 85)
 
-    local backgroundTop = Bitmap(dialog, SkinnableFile('/dialogs/dialog/panel_bmp_T.dds'))
-    backgroundTop.Bottom:Set(background.Top)
-    backgroundTop.Left:Set(background.Left)
-    local backgroundBottom = Bitmap(dialog, SkinnableFile('/dialogs/dialog/panel_bmp_b.dds'))
-    backgroundBottom.Top:Set(background.Bottom)
-    backgroundBottom.Left:Set(background.Left)
-
-    background.brackets = CreateDialogBrackets(background, 35, 65, 35, 115, true)
-
-    if not modalInfo or modalInfo.worldCover then
-        CreateWorldCover(dialog)
-    end
+    local popup = Popup(parent, dialog)
+    popup.OnClosed = popup.Destroy
 
     local function MakeButton(text, callback)
-        local button = CreateButtonStd( background
-                                        , '/scx_menu/small-btn/small'
-                                        , text
-                                        , 14
-                                        , 2)
+        local button = CreateButtonWithDropshadow(dialog, '/BUTTON/medium/', text)
         if callback then
             button.OnClick = function(self)
                 callback()
 				if destroyOnCallback then
-					dialog:Destroy()
+                    popup:Hide()
 				end
             end
         else
             button.OnClick = function(self)
-                dialog:Destroy()
+                popup:Hide()
             end
         end
         return button
@@ -784,40 +766,34 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
 
     if button1Text then
         dialog._button1 = MakeButton(button1Text, button1Callback)
-        LayoutHelpers.Below(dialog._button1, background, 0)
+        LayoutHelpers.AtBottomIn(dialog._button1, dialog, 10)
     end
     if button2Text then
         dialog._button2 = MakeButton(button2Text, button2Callback)
-        LayoutHelpers.Below(dialog._button2, background, 0)
+        LayoutHelpers.AtBottomIn(dialog._button2, dialog, 10)
     end
     if button3Text then
         dialog._button3 = MakeButton(button3Text, button3Callback)
-        LayoutHelpers.Below(dialog._button3, background, 0)
+        LayoutHelpers.AtBottomIn(dialog._button3, dialog, 10)
     end
 
     if dialog._button3 then
         -- center each button to one third of the dialog
         LayoutHelpers.AtHorizontalCenterIn(dialog._button2, dialog)
-        LayoutHelpers.LeftOf(dialog._button1, dialog._button2, -8)
+        LayoutHelpers.LeftOf(dialog._button1, dialog._button2)
         LayoutHelpers.ResetLeft(dialog._button1)
-        LayoutHelpers.RightOf(dialog._button3, dialog._button2, -8)
-        backgroundTop:SetTexture(SkinnableFile('/dialogs/dialog_02/panel_bmp_T.dds'))
-        backgroundBottom:SetTexture(SkinnableFile('/dialogs/dialog_02/panel_bmp_b.dds'))
-        background:SetTexture(SkinnableFile('/dialogs/dialog_02/panel_bmp_m.dds'))
+        LayoutHelpers.RightOf(dialog._button3, dialog._button2)
     elseif dialog._button2 then
         -- center each button to half the dialog
         dialog._button1.Left:Set(function()
-            return dialog.Left() + (((dialog.Width() / 2) - dialog._button1.Width()) / 2) + 8
+            return dialog.Left() + (((dialog.Width() / 2) - dialog._button1.Width()) / 2) - 30
         end)
         dialog._button2.Left:Set(function()
             local halfWidth = dialog.Width() / 2
-            return dialog.Left() + halfWidth + ((halfWidth - dialog._button2.Width()) / 2) - 8
+            return dialog.Left() + halfWidth + ((halfWidth - dialog._button2.Width()) / 2) + 30
         end)
     elseif dialog._button1 then
         LayoutHelpers.AtHorizontalCenterIn(dialog._button1, dialog)
-    else
-        backgroundBottom:SetTexture(UIFile('/dialogs/dialog/panel_bmp_alt_b.dds'))
-        background.brackets:Hide()
     end
 
     if modalInfo and not modalInfo.OnlyWorldCover then
@@ -860,7 +836,7 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
         MakeInputModal(dialog, OnEnterFunc, OnEscFunc)
     end
 
-    return dialog
+    return popup
 end
 
 function CreateWorldCover(parent, colorOverride)
