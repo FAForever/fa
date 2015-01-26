@@ -19,7 +19,7 @@ local Scrollbar = import('/lua/maui/scrollbar.lua').Scrollbar
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Cursor = import('/lua/maui/cursor.lua').Cursor
 local Prefs = import('/lua/user/prefs.lua')
-local Border = import('/lua/maui/border.lua').Border
+local Border = import('/lua/ui/controls/ninepatch.lua').Border
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local Layouts = import('/lua/skins/layouts.lua')
 local Popup = import('/lua/ui/controls/popup.lua').Popup
@@ -942,29 +942,6 @@ function CreateBox(parent)
     clientArea.Width:Set(function() return clientArea.Right() - clientArea.Left() end)
     clientArea.Height:Set(function() return clientAreat.Bottom() - clientArea.Top() end)
     return border, clientArea
-end
-
--- create borders around a control, with optional background
-function CreateBorder(parent, addBg)
-    local border = Border(parent)
-    border:SetTextures(
-        SkinnableFile('/scx_menu/lan-game-lobby/dialog/background/side.png'),
-        SkinnableFile('/scx_menu/lan-game-lobby/dialog/background/bottom.png'),
-        SkinnableFile('/scx_menu/lan-game-lobby/dialog/background/bottom.png'),
-        SkinnableFile('/scx_menu/lan-game-lobby/dialog/background/bottom.png'),
-        SkinnableFile('/scx_menu/lan-game-lobby/dialog/background/bottom.png'),
-        SkinnableFile('/scx_menu/lan-game-lobby/dialog/background/bottom.png'))
-    border:LayoutAroundControl(parent)
-
-    local bg = nil
-    if addBg then
-        bg = Bitmap(parent, SkinnableFile('/game/generic_brd/generic_brd_m.dds'))
-        border:LayoutControlInside(bg)
-        bg.Width:Set(function() return bg.Right() - bg.Left() end)
-        bg.Height:Set(function() return bg.Bottom() - bg.Top() end)
-    end
-
-    return border, bg
 end
 
 function GetFactionIcon(factionIndex)
