@@ -4606,53 +4606,33 @@ end
 local LrgMap = false
 
 -- Perform one-time setup of the large map preview
-function CreateBigPreview(depth, parent)
-    -- TODO: It might be nice to make clicking outside of the preview close it (or do nothing).
-
-    -- Size of the border image around the large map.
-    local MAP_PREVIEW_BORDER_SIZE = 754
-
-    -- Size of the actual map preview to generate.
+function CreateBigPreview(parent)
+    -- Size of the map preview to generate.
     local MAP_PREVIEW_SIZE = 713
 
     -- The size of the mass/hydrocarbon icons
     local HYDROCARBON_ICON_SIZE = 14
     local MASS_ICON_SIZE = 10
 
-    LrgMap = Group(parent)
-    LrgMap.Width:Set(MAP_PREVIEW_BORDER_SIZE)
-    LrgMap.Height:Set(MAP_PREVIEW_BORDER_SIZE)
+    local dialogContent = Group(parent)
+    dialogContent.Width:Set(MAP_PREVIEW_SIZE + 10)
+    dialogContent.Height:Set(MAP_PREVIEW_SIZE + 10)
 
-    -- Center the map group on the screen
-    LayoutHelpers.AtHorizontalCenterIn(LrgMap, parent)
-    LayoutHelpers.AtVerticalCenterIn(LrgMap, parent)
-
-    LrgMap.Depth:Set(depth)
+    LrgMap = Popup(parent, dialogContent)
 
     -- Create the map preview
-    local mapPreview = ResourceMapPreview(LrgMap, MAP_PREVIEW_SIZE, MASS_ICON_SIZE, HYDROCARBON_ICON_SIZE)
-    LrgMap.mapPreview = mapPreview
-    LayoutHelpers.AtLeftTopIn(mapPreview, LrgMap, 19, 20)
+    local mapPreview = ResourceMapPreview(dialogContent, MAP_PREVIEW_SIZE, MASS_ICON_SIZE, HYDROCARBON_ICON_SIZE)
+    dialogContent.mapPreview = mapPreview
+    LayoutHelpers.AtCenterIn(mapPreview, dialogContent)
 
-    -- Place the border inside the group at the origin.
-    local border = Bitmap(LrgMap, UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/map-pane-border-large.png"))
-    LayoutHelpers.AtLeftTopIn(border, LrgMap)
-    LayoutHelpers.DepthOverParent(border, mapPreview, 1)
-
-    local closeBtn = UIUtil.CreateButtonStd(LrgMap, '/dialogs/close_btn/close', "", 12, 2, 0, "UI_Tab_Click_01",
-    "UI_Tab_Rollover_01")
-    LayoutHelpers.AtRightTopIn(closeBtn, LrgMap, 20, 17)
+    local closeBtn = UIUtil.CreateButtonStd(dialogContent, '/dialogs/close_btn/close', "", 12, 2, 0, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
+    LayoutHelpers.AtRightTopIn(closeBtn, dialogContent)
     closeBtn.OnClick = function()
-        CloseBigPreview()
+        LrgMap:Hide()
     end
 
-    -- Close the large map when the escape key is pressed.
-    import('/lua/ui/uimain.lua').SetEscapeHandler(function()
-        CloseBigPreview()
-    end)
-
     -- Keep the close button on top of the border (which is itself on top of the map preview)
-    LayoutHelpers.DepthOverParent(closeBtn, border, 1)
+    LayoutHelpers.DepthOverParent(closeBtn, mapPreview, 1)
 
     RefreshLargeMap()
 end
@@ -4660,32 +4640,23 @@ end
 -- Refresh the large map preview (so it can update if something changes while it's open, and so we
 -- don't have to bother completely rebuilding it when it's opened/closed).
 function RefreshLargeMap()
-    if not LrgMap.visible then
+    if not LrgMap or LrgMap.isHidden then
         return
     end
 
     local scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-    LrgMap.mapPreview:SetScenario(scenarioInfo)
-    ShowMapPositions(LrgMap.mapPreview, scenarioInfo, GetPlayerCount())
+    LrgMap.content.mapPreview:SetScenario(scenarioInfo)
+    ShowMapPositions(LrgMap.content.mapPreview, scenarioInfo, GetPlayerCount())
 end
 
-function  ShowBigPreview()
+function ShowBigPreview()
     if not LrgMap then
-        CreateBigPreview(501, GUI)
+        CreateBigPreview(GUI)
+    else
+        RefreshLargeMap()
     end
 
-    LrgMap.visible = true
-    RefreshLargeMap()
-
     LrgMap:Show()
-end
-
-function CloseBigPreview()
-    LrgMap.visible = false
-    LrgMap:Hide()
-
-    -- Restore the default escape handler.
-    import('/lua/ui/uimain.lua').SetEscapeHandler(GUI.exitLobbyEscapeHandler)
 end
 
 --------------------------------------------------------------------------------------------------------------------------------
