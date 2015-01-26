@@ -5,7 +5,18 @@ NinePatch = Class(Group) {
     __init = function(self, parent, center, topLeft, topRight, bottomLeft, bottomRight, left, right, top, bottom)
         Group.__init(self, parent)
 
-        self.center = Bitmap(self, center)
+        -- Minor special-snowflaking for the sake of Border.
+        if center then
+            self.center = Bitmap(self, center)
+
+            self.center.Top:Set(self.Top)
+            self.center.Left:Set(self.Left)
+            self.center.Bottom:Set(self.Bottom)
+            self.center.Right:Set(self.Right)
+
+            self.center:SetTiled(true)
+        end
+
         self.tl = Bitmap(self, topLeft)
         self.tr = Bitmap(self, topRight)
         self.bl = Bitmap(self, bottomLeft)
@@ -46,12 +57,20 @@ NinePatch = Class(Group) {
         self.b.Top:Set(self.Bottom)
         self.b.Right:Set(self.Right)
         self.b.Left:Set(self.Left)
+    end
+}
 
-        self.center.Top:Set(self.Top)
-        self.center.Left:Set(self.Left)
-        self.center.Bottom:Set(self.Bottom)
-        self.center.Right:Set(self.Right)
+-- A nine-patch without a background, useful for laying out around things. An eight-patch.
+Border = Class(NinePatch) {
+    __init = function(self, parent, topLeft, topRight, bottomLeft, bottomRight, left, right, top, bottom)
+        NinePatch.__init(self, parent, nil, topLeft, topRight, bottomLeft, bottomRight, left, right, top, bottom)
+    end,
 
-        self.center:SetTiled(true)
+    -- Lay this border out around the given control
+    Surround = function(self, control, horizontalPadding, verticalPadding)
+        self.Left:Set(function() return control.Left() + horizontalPadding end)
+        self.Right:Set(function() return control.Right() - horizontalPadding end)
+        self.Top:Set(function() return control.Top() + verticalPadding end)
+        self.Bottom:Set(function() return control.Bottom() - verticalPadding end)
     end
 }

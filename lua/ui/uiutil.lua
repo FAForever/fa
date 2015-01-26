@@ -23,6 +23,7 @@ local Border = import('/lua/maui/border.lua').Border
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local Layouts = import('/lua/skins/layouts.lua')
 local Popup = import('/lua/ui/controls/popup.lua').Popup
+local NinePatch = import('/lua/ui/controls/ninepatch.lua').NinePatch
 
 --* Handy global variables to assist skinning
 buttonFont = import('/lua/lazyvar.lua').Create()            -- default font used for button faces
@@ -520,6 +521,34 @@ function CreateButtonWithDropshadow(parent, filename, label, textOffsetVert, tex
         , rolloverCue
         , true
         )
+end
+
+-- Create a ninepatch using a texture path and naming convention, instead of explicitly with 9 images.
+function CreateNinePatchStd(parent, texturePath)
+    return NinePatch(parent,
+        SkinnableFile(texturePath .. 'center.png'),
+        SkinnableFile(texturePath .. 'topLeft.png'),
+        SkinnableFile(texturePath .. 'topRight.png'),
+        SkinnableFile(texturePath .. 'bottomLeft.png'),
+        SkinnableFile(texturePath .. 'bottomRight.png'),
+        SkinnableFile(texturePath .. 'left.png'),
+        SkinnableFile(texturePath .. 'right.png'),
+        SkinnableFile(texturePath .. 'top.png'),
+        SkinnableFile(texturePath .. 'bottom.png')
+    )
+end
+
+function CreateBorderStd(parent, texturePath)
+    return Border(parent,
+        SkinnableFile(texturePath .. 'topLeft.png'),
+        SkinnableFile(texturePath .. 'topRight.png'),
+        SkinnableFile(texturePath .. 'bottomLeft.png'),
+        SkinnableFile(texturePath .. 'bottomRight.png'),
+        SkinnableFile(texturePath .. 'left.png'),
+        SkinnableFile(texturePath .. 'right.png'),
+        SkinnableFile(texturePath .. 'top.png'),
+        SkinnableFile(texturePath .. 'bottom.png')
+    )
 end
 
 -- Create a checkbox using the default checkbox texture. Kept as its own entry point for the benefit

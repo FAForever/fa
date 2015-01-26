@@ -2,7 +2,6 @@ local Group = import('/lua/maui/group.lua').Group
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local NinePatch = import('/lua/ui/controls/ninepatch.lua').NinePatch
 local Edit = import('/lua/maui/edit.lua').Edit
 
 -- A class for popups. A popup appears on top of other UI content, darkens the content behind it,
@@ -25,17 +24,7 @@ Popup = Class(Group) {
         self.Depth:Set(GetFrame(GUI:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 10)
         shadow:SetSolidColor('78000000')
 
-        local background = NinePatch(self,
-            UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/dialog/background/center.png'),
-            UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/dialog/background/topLeft.png'),
-            UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/dialog/background/topRight.png'),
-            UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/dialog/background/bottomLeft.png'),
-            UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/dialog/background/bottomRight.png'),
-            UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/dialog/background/left.png'),
-            UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/dialog/background/right.png'),
-            UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/dialog/background/top.png'),
-            UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/dialog/background/bottom.png')
-        )
+        local background = UIUtil.CreateNinePatchStd(self, '/scx_menu/lan-game-lobby/dialog/background/')
 
         background.Left:Set(function() return content.Left() + 64 end)
         background.Right:Set(function() return content.Right() - 64 end)
