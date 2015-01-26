@@ -5694,11 +5694,12 @@ function Need_Changelog()
 end
 
 function GUI_Changelog()
-    local dialogContent = Group(GROUP_Changelog)
+    local dialogContent = Group(GUI)
     dialogContent.Width:Set(526)
-    dialogContent.Height:Set(350)
+    dialogContent.Height:Set(450)
 
     GUI.changelogPopup = Popup(GUI, dialogContent)
+    GUI.changelogPopup.OnClosed = GUI.changelogPopup.Destroy
 
     -- Title --
     local text0 = UIUtil.CreateText(dialogContent, LOC("<LOC lobui_0412>"), 17, 'Arial Gras', true)
@@ -5710,7 +5711,7 @@ function GUI_Changelog()
     InfoList:SetFont(UIUtil.bodyFont, 11)
     InfoList:SetColors(nil, "00000000")
     InfoList.Width:Set(498)
-    InfoList.Height:Set(260)
+    InfoList.Height:Set(360)
     LayoutHelpers.AtLeftIn(InfoList, dialogContent, 10)
 	LayoutHelpers.AtRightIn(InfoList, dialogContent, 26)
     LayoutHelpers.AtTopIn(InfoList, dialogContent, 38)
@@ -5734,6 +5735,6 @@ function GUI_Changelog()
     LayoutHelpers.AtBottomIn(OkButton, dialogContent, 10)
     OkButton.OnClick = function(self)
         Prefs.SetToCurrentProfile('LobbyChangelog', Changelog.last_version)
-        changelogPopup:Destroy()
+        GUI.changelogPopup:Hide()
     end
 end
