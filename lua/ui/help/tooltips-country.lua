@@ -7,6 +7,16 @@
 
 tooltip =
 {
+    -- No Nationality
+    {
+        value = "world",
+        text = "Country not found. Please contact the development team on the forums, or ask a moderator for help",
+    },
+    -- Xinnony's personal flag
+    {
+        value = "xinnony",
+        text = "Xinnony's flag !",
+    },
     {
         value="a1",
         text="Anonymous Proxy"
@@ -1010,6 +1020,6 @@ tooltip =
     {
         value="zw",
         text="Zimbabwe",
-    },
+    }
 }
 
