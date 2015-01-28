@@ -1927,13 +1927,14 @@ local function HostUpdateMods(newPlayerID, newPlayerName)
             local reason = (LOCF('<LOC lobui_0588>You were automaticly removed from the lobby because you ' ..
                                'don\'t have the following mod(s):\n%s \nPlease, install the mod before you join the game lobby',
                                modnames))
+            -- TODO: Verify this functionality
             if FindNameForID(newPlayerID) then
-                AddChatText(FindNameForID(newPlayerID)..' is Auto Kicked because he not have this mod : '..modnames) -- not working ?
+                AddChatText(FindNameForID(newPlayerID)..' kicked because he does not have this mod : '..modnames)
             else
                 if newPlayerName then
-                    AddChatText(newPlayerName..' is Auto Kicked because he not have this mod : '..modnames) -- not working ?
+                    AddChatText(newPlayerName..' kicked because he does not have this mod : '..modnames)
                 else
-                    AddChatText('The last player is Auto Kicked because he not have this mod : '..modnames)
+                    AddChatText('The last player is kicked because he does not have this mod : '..modnames)
                 end
             end
             lobbyComm:EjectPeer(newPlayerID, reason)
@@ -2899,7 +2900,7 @@ function CreateUI(maxPlayers)
         ShowLobbyOptionsDialog()
     end
 
-    -- FOR SEE THE GROUP POSITION, LOOK THIS SCREENSHOT : http://img402.imageshack.us/img402/8826/falobbygroup.png
+    -- For the group position, look at this screenshot: http://img402.imageshack.us/img402/8826/falobbygroup.png
     GUI.playerPanel = Group(GUI.panel, "playerPanel") -- RED Square in Screenshoot
     LayoutHelpers.AtLeftTopIn(GUI.playerPanel, GUI.panel, 40, 66+40-4)
     GUI.playerPanel.Width:Set(706)
