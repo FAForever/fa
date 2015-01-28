@@ -794,35 +794,45 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
     dialog._button2 = false
     dialog._button3 = false
 
+    local numButtons = 0
     if button1Text then
+        numButtons = numButtons + 1
         dialog._button1 = MakeButton(button1Text, button1Callback)
         LayoutHelpers.AtBottomIn(dialog._button1, dialog, 10)
     end
     if button2Text then
+        numButtons = numButtons + 1
         dialog._button2 = MakeButton(button2Text, button2Callback)
         LayoutHelpers.AtBottomIn(dialog._button2, dialog, 10)
     end
     if button3Text then
+        numButtons = numButtons + 1
         dialog._button3 = MakeButton(button3Text, button3Callback)
         LayoutHelpers.AtBottomIn(dialog._button3, dialog, 10)
     end
 
-    if dialog._button3 then
-        -- center each button to one third of the dialog
-        LayoutHelpers.AtHorizontalCenterIn(dialog._button2, dialog)
-        LayoutHelpers.LeftOf(dialog._button1, dialog._button2)
-        LayoutHelpers.ResetLeft(dialog._button1)
-        LayoutHelpers.RightOf(dialog._button3, dialog._button2)
-    elseif dialog._button2 then
-        -- center each button to half the dialog
+    if numButtons > 1 then
+        -- A button to either size...
         dialog._button1.Left:Set(function()
             return dialog.Left() + (((dialog.Width() / 2) - dialog._button1.Width()) / 2) - 30
         end)
-        dialog._button2.Left:Set(function()
+
+        -- Handle stupid weird GPG convention...
+        local rightButton
+        if numButtons == 3 then
+            rightButton = dialog._button3
+
+            -- The third (second) button goes in the middle.
+            LayoutHelpers.AtHorizontalCenterIn(dialog._button2, dialog)
+        else
+            rightButton = dialog._button2
+        end
+
+        rightButton.Left:Set(function()
             local halfWidth = dialog.Width() / 2
             return dialog.Left() + halfWidth + ((halfWidth - dialog._button2.Width()) / 2) + 30
         end)
-    elseif dialog._button1 then
+    else
         LayoutHelpers.AtHorizontalCenterIn(dialog._button1, dialog)
     end
 
