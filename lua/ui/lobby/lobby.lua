@@ -518,7 +518,8 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
     if IsSyncReplayServer then
         SetFrontEndData('syncreplayid',localPlayerUID)
         dl = UIUtil.QuickDialog(GetFrame(0), "Downloading the replay file...")
-        LaunchReplaySession('gpgnet://' .. GetCommandLineArg('/gpgnet',1)[1] .. '/' .. import('/lua/user/prefs.lua').GetFromCurrentProfile('Name'))
+        UIUtil.SetCurrentSkin("uef")
+        LaunchReplaySession('gpgnet://' .. GetCommandLineArg('/gpgnet',1)[1] .. '/' .. Prefs.GetFromCurrentProfile('Name'))
         dl:Destroy()
         UIUtil.QuickDialog(GetFrame(0), "You dont have this map.", "Exit", function() ExitApplication() end)
     else
