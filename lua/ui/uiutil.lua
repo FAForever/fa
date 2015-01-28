@@ -647,6 +647,7 @@ function CreateLobbyVertScrollbar(attachto, offset_right, filename, offset_botto
 end
 
 function CreateHorzScrollbarFor(attachto, offset)
+    WARN("Use of deprecated UIUtil function CreateHorzScrollbarFor")
     offset = offset or 0
     local scrollbar = Scrollbar(attachto, import('/lua/maui/scrollbar.lua').ScrollAxis.Horz)
     local scrollRightButton = Button(  scrollbar
@@ -919,6 +920,7 @@ end
 
 -- create a table of sequential file names (useful for loading animations)
 function CreateSequentialFilenameTable(root, ext, first, last, numPlaces)
+    WARN("Use of deprecated UIUtil function CreateSequentialFilenameTable") 
     local retTable = {}
     local formatString = string.format("%%s%%0%dd.%%s", numPlaces)
     for index = first, last do
@@ -929,6 +931,7 @@ end
 
 -- create a box which is controlled by its external borders, and gives access to the "client" area as well
 function CreateBox(parent)
+    WARN("Use of deprecated UIUtil function CreateBox") 
     local border = Border(parent)
     border:SetTextures(
         SkinnableFile('/game/generic_brd/generic_brd_vert_l.dds'),
@@ -950,6 +953,7 @@ end
 
 -- make sure you lay out text box before you attempt to set text
 function CreateTextBox(parent)
+    WARN("Use of deprecated UIUtil function CreateTextBox") 
     local box = ItemList(parent)
     box:SetFont(bodyFont, 14)
     box:SetColors(bodyColor, "black",  highlightColor, "white")
@@ -958,6 +962,7 @@ function CreateTextBox(parent)
 end
 
 function SetTextBoxText(textBox, text)
+    WARN("Use of deprecated UIUtil function SetTextBoxText") 
     textBox:DeleteAllItems()
     local wrapped = import('/lua/maui/text.lua').WrapText(LOC(text), textBox.Width(), function(curText) return textBox:GetStringAdvance(curText) end)
     for i, line in wrapped do
