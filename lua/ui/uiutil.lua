@@ -646,41 +646,6 @@ function CreateLobbyVertScrollbar(attachto, offset_right, filename, offset_botto
     return CreateVertScrollbarFor(attachto, offset_right, "/SCROLLBAR_VERT/", offset_bottom, offset_top)
 end
 
-function CreateHorzScrollbarFor(attachto, offset)
-    WARN("Use of deprecated UIUtil function CreateHorzScrollbarFor")
-    offset = offset or 0
-    local scrollbar = Scrollbar(attachto, import('/lua/maui/scrollbar.lua').ScrollAxis.Horz)
-    local scrollRightButton = Button(  scrollbar
-                                    , SkinnableFile('/widgets/large-h_scr/arrow-right_scr_up.dds')
-                                    , SkinnableFile('/widgets/large-h_scr/arrow-right_scr_down.dds')
-                                    , SkinnableFile('/widgets/large-h_scr/arrow-right_scr_over.dds')
-                                    , SkinnableFile('/widgets/large-h_scr/arrow-right_scr_dis.dds'))
-    scrollRightButton.Right:Set(attachto.Right)
-    scrollRightButton.Bottom:Set(function() return attachto.Top() + offset end)
-
-    local scrollLeftButton = Button(  scrollbar
-                                    , SkinnableFile('/widgets/large-h_scr/arrow-left_scr_up.dds')
-                                    , SkinnableFile('/widgets/large-h_scr/arrow-left_scr_down.dds')
-                                    , SkinnableFile('/widgets/large-h_scr/arrow-left_scr_over.dds')
-                                    , SkinnableFile('/widgets/large-h_scr/arrow-left_scr_dis.dds'))
-    scrollLeftButton.Left:Set(attachto.Left)
-    scrollLeftButton.Bottom:Set(function() return attachto.Top() + offset end)
-
-    scrollbar:SetTextures(  UIFile('/widgets/back_scr/back_scr_mid.dds')
-                            ,UIFile('/widgets/large-h_scr/bar-mid_scr_over.dds')
-                            ,UIFile('/widgets/large-h_scr/bar-right_scr_over.dds')
-                            ,UIFile('/widgets/large-h_scr/bar-left_scr_over.dds'))
-    scrollbar.Left:Set(scrollLeftButton.Right)
-    scrollbar.Right:Set(scrollRightButton.Left)
-    scrollbar.Top:Set(scrollRightButton.Top)
-    scrollbar.Bottom:Set(scrollRightButton.Bottom)
-
-    scrollbar:AddButtons(scrollLeftButton, scrollRightButton)
-    scrollbar:SetScrollable(attachto)
-
-    return scrollbar
-end
-
 -- cause a dialog to get input focus, optional functions to perform when the user hits enter or escape
 -- functions signature is: function()
 function MakeInputModal(control, onEnterFunc, onEscFunc)
@@ -928,56 +893,8 @@ function ShowInfoDialog(parent, dialogText, buttonText, buttonCallback, destroyO
     return dlg
 end
 
--- create a table of sequential file names (useful for loading animations)
-function CreateSequentialFilenameTable(root, ext, first, last, numPlaces)
-    WARN("Use of deprecated UIUtil function CreateSequentialFilenameTable") 
-    local retTable = {}
-    local formatString = string.format("%%s%%0%dd.%%s", numPlaces)
-    for index = first, last do
-        retTable[(index - first) + 1] = SkinnableFile(string.format(formatString, root, index, ext))
-    end
-    return retTable
-end
-
--- create a box which is controlled by its external borders, and gives access to the "client" area as well
-function CreateBox(parent)
-    WARN("Use of deprecated UIUtil function CreateBox") 
-    local border = Border(parent)
-    border:SetTextures(
-        SkinnableFile('/game/generic_brd/generic_brd_vert_l.dds'),
-        SkinnableFile('/game/generic_brd/generic_brd_horz_um.dds'),
-        SkinnableFile('/game/generic_brd/generic_brd_ul.dds'),
-        SkinnableFile('/game/generic_brd/generic_brd_ur.dds'),
-        SkinnableFile('/game/generic_brd/generic_brd_ll.dds'),
-        SkinnableFile('/game/generic_brd/generic_brd_lr.dds'))
-    local clientArea = Bitmap(parent, SkinnableFile('/game/generic_brd/generic_brd_m.dds'))
-    border:LayoutControlInside(clientArea)
-    clientArea.Width:Set(function() return clientArea.Right() - clientArea.Left() end)
-    clientArea.Height:Set(function() return clientAreat.Bottom() - clientArea.Top() end)
-    return border, clientArea
-end
-
 function GetFactionIcon(factionIndex)
     return import('/lua/factions.lua').Factions[factionIndex + 1].Icon
-end
-
--- make sure you lay out text box before you attempt to set text
-function CreateTextBox(parent)
-    WARN("Use of deprecated UIUtil function CreateTextBox") 
-    local box = ItemList(parent)
-    box:SetFont(bodyFont, 14)
-    box:SetColors(bodyColor, "black",  highlightColor, "white")
-    CreateVertScrollbarFor(box)
-    return box
-end
-
-function SetTextBoxText(textBox, text)
-    WARN("Use of deprecated UIUtil function SetTextBoxText") 
-    textBox:DeleteAllItems()
-    local wrapped = import('/lua/maui/text.lua').WrapText(LOC(text), textBox.Width(), function(curText) return textBox:GetStringAdvance(curText) end)
-    for i, line in wrapped do
-        textBox:AddItem(line)
-    end
 end
 
 function CreateDialogBrackets(parent, leftOffset, topOffset, rightOffset, bottomOffset, altTextures)
