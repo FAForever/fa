@@ -3638,8 +3638,11 @@ function CreateUI(maxPlayers)
         GUI.readyLabel:Hide()
     end
 
-    -- Setup large pretty faction selector.
-    CreateUI_Faction_Selector()
+    -- Setup large pretty faction selector and set the factional background to its initial value.
+    local lastFaction = Prefs.GetFromCurrentProfile('LastFaction') or 1
+    CreateUI_Faction_Selector(lastFaction)
+
+    ChangeBackgroundLobby(lastFaction)
 
     ---------------------------------------------------------------------------
     -- other logic, including lobby callbacks
@@ -4961,7 +4964,7 @@ function ShowRuleDialog(RuleLabel)
 end
 
 -- Faction selector
-function CreateUI_Faction_Selector()
+function CreateUI_Faction_Selector(lastFaction)
     -- Build a list of button objects from the list of defined factions. Each faction will use the
     -- faction key as its RadioButton texture path offset.
     local buttons = {}
@@ -4976,7 +4979,6 @@ function CreateUI_Faction_Selector()
         texturePath = "random"
     })
 
-    local lastFaction = Prefs.GetFromCurrentProfile('LastFaction') or 1
     local factionSelector = RadioButton(GUI.panel, "/factionselector/", buttons, lastFaction, true)
     GUI.factionSelector = factionSelector
     LayoutHelpers.AtLeftTopIn(factionSelector, GUI.panel, 410, 60)
