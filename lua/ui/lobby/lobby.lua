@@ -1986,19 +1986,20 @@ local OptionUtils = {
 
     -- Set all game options to their default values.
     SetDefaults = function()
+        local options
         for index, option in globalOpts do
-            SetGameOption(option.key, option.values[option.default].key, true)
+            options[option.key] = option.values[option.default].key
         end
 
         for index, option in teamOpts do
-            SetGameOption(option.key, option.values[option.default].key, true)
+            options[option.key] = option.values[option.default].key
         end
 
         for index, option in AIOpts do
-            SetGameOption(option.key, option.values[option.default].key, true)
+            options[option.key] = option.values[option.default].key
         end
 
-        UpdateGame()
+        SetGameOptions(options)
     end,
 
     -- Returns true if current game options are considered suitable for a ranked game, false
@@ -2954,24 +2955,22 @@ function CreateUI(maxPlayers)
 
             autoRandMap = false
             local function selectBehavior(selectedScenario, changedOptions, restrictedCategories)
+                local options = {}
                 if autoRandMap then
-                    gameInfo.GameOptions['ScenarioFile'] = selectedScenario.file
+                    options['ScenarioFile'] = selectedScenario.file
                 else
                     mapSelectDialog:Destroy()
                     GUI.chatEdit:AcquireFocus()
                     for optionKey, data in changedOptions do
-                        SetGameOption(optionKey, data.value)
+                        options[optionKey] = data.value
                     end
+                    options['ScenarioFile'] = selectedScenario.file
+                    options['RestrictedCategories'] = restrictedCategories
 
-                    -- TODO: Merge with changedOptions so we don't do this work if the map hasn't
-                    -- really changed.
-                    SetGameOption('ScenarioFile', selectedScenario.file)
-
-                    SetGameOption('RestrictedCategories', restrictedCategories, true)
                     -- every new map, clear the flags, and clients will report if a new map is bad
                     ClearBadMapFlags()
                     HostUpdateMods()
-                    UpdateGame()
+                    SetGameOptions(options)
                 end
             end
 
@@ -4191,6 +4190,11 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             elseif data.Type == 'GameOption' then
                 gameInfo.GameOptions[data.Key] = data.Value
                 UpdateGame()
+            elseif data.Type == 'GameOptions' then
+                for key, value in data.Options do
+                    gameInfo.GameOptions[key] = value
+                end
+                UpdateGame()
             elseif data.Type == 'Launch' then
                 local info = data.GameInfo
                 info.GameMods = Mods.GetGameMods(info.GameMods)
@@ -4430,61 +4434,64 @@ function SetPlayerOption(slot, key, val, ignoreRefresh)
     end
 end
 
-function SetGameOption(key, val, ignoreRefresh)
-    local scenarioInfo = nil
-
+function SetGameOptions(options, ignoreRefresh)
     if not lobbyComm:IsHost() then
         WARN('Attempt to set game option by a non-host')
         return
     end
 
-    Prefs.SetToCurrentProfile('LobbyOpt_' .. key, val)
-    gameInfo.GameOptions[key] = val
+    for key, val in options do
+        LOG('SetGameOption(key='..repr(key)..',val='..repr(val)..')')
+        Prefs.SetToCurrentProfile('LobbyOpt_' .. key, val)
+        gameInfo.GameOptions[key] = val
+
+        -- don't want to send all restricted categories to gpgnet, so just send bool
+        -- note if more things need to be translated to gpgnet, a translation table would be a better implementation
+        -- but since there's only one, we'll call it out here
+        if key == 'RestrictedCategories' then
+            local restrictionsEnabled = false
+            if val ~= nil then
+                if table.getn(val) ~= 0 then
+                    restrictionsEnabled = true
+                end
+            end
+            GpgNetSend('GameOption', key, restrictionsEnabled)
+        elseif key == 'ScenarioFile' then
+            GpgNetSend('GameOption', key, val)
+            if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= '') then
+                -- Warn about attempts to load nonexistent maps.
+                if not DiskGetFileInfo(gameInfo.GameOptions.ScenarioFile) then
+                    AddChatText('The selected map does not exist.')
+                else
+                    local scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+                    if scenarioInfo and scenarioInfo.map and (scenarioInfo.map ~= '') then
+                        GpgNetSend('GameOption', 'Slots', table.getsize(scenarioInfo.Configurations.standard.teams[1].armies))
+                    end
+                end
+            end
+        elseif key == "GameRules" then
+            -- Oh, the cargo-culting.
+            SetRuleTitleText(val)
+            GpgNetSend('GameOption', key, val)
+        else
+            GpgNetSend('GameOption', key, val)
+        end
+    end
 
     lobbyComm:BroadcastData {
-        Type = 'GameOption',
-        Key = key,
-        Value = val,
+        Type = 'GameOptions',
+        Options = options
     }
-
-    LOG('SetGameOption(key='..repr(key)..',val='..repr(val)..')')
-
-    -- don't want to send all restricted categories to gpgnet, so just send bool
-    -- note if more things need to be translated to gpgnet, a translation table would be a better implementation
-    -- but since there's only one, we'll call it out here
-    if key == 'RestrictedCategories' then
-        local restrictionsEnabled = false
-        if val ~= nil then
-            if table.getn(val) ~= 0 then
-                restrictionsEnabled = true
-            end
-        end
-        GpgNetSend('GameOption', key, restrictionsEnabled)
-    elseif key == 'ScenarioFile' then
-        GpgNetSend('GameOption', key, val)
-        if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= '') then
-            -- Warn about attempts to load nonexistent maps.
-            if not DiskGetFileInfo(gameInfo.GameOptions.ScenarioFile) then
-                AddChatText('The selected map does not exist.')
-                return
-            end
-
-            scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-            if scenarioInfo and scenarioInfo.map and (scenarioInfo.map ~= '') then
-                GpgNetSend('GameOption', 'Slots', table.getsize(scenarioInfo.Configurations.standard.teams[1].armies))
-            end
-        end
-    elseif key == "GameRules" then
-        -- Oh, the cargo-culting.
-        SetRuleTitleText(val)
-        GpgNetSend('GameOption', key, val)
-    else
-        GpgNetSend('GameOption', key, val)
-    end
 
     if not ignoreRefresh then
         UpdateGame()
     end
+end
+
+function SetGameOption(key, val, ignoreRefresh)
+    local options = {}
+    options[key] = val
+    SetGameOptions(options, ignoreRefresh)
 end
 
 function DebugDump()
@@ -4492,6 +4499,7 @@ function DebugDump()
         lobbyComm:DebugDump()
     end
 end
+
 
 local LrgMap = false
 
@@ -5347,10 +5355,8 @@ end
 function LoadPreset(presetIndex)
     local preset = LoadPresetsList()[presetIndex]
 
-    for k, v in preset.GameOptions do
-        SetGameOption(k, v, true)
-    end
-
+    SetGameOptions(preset.GameOptions, true)
+    
     -- gameInfo.GameMods is a map from mod identifiers to truthy values for every activated mod.
     -- Unfortunately, HostUpdateMods is painfully stupid and reads selectedMods, which is a list of
     -- mod identifiers to be activated.
