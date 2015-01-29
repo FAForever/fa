@@ -2863,7 +2863,7 @@ function CreateUI(maxPlayers)
     SetText2(GUI.ModFeaturedLabel, modLabels[argv.initName] or "", 20)
 
     -- Lobby options panel
-    GUI.LobbyOptions = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/BUTTON/medium/', "Lobby Options")
+    GUI.LobbyOptions = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/BUTTON/medium/', "Options")
     LayoutHelpers.AtTopIn(GUI.LobbyOptions, GUI.panel, 10)
     LayoutHelpers.AtHorizontalCenterIn(GUI.LobbyOptions, GUI, 1)
     GUI.LobbyOptions.OnClick = function()
@@ -2953,7 +2953,7 @@ function CreateUI(maxPlayers)
 
     -- GAME OPTIONS // MODS MANAGER BUTTON --
     if lobbyComm:IsHost() then     -- GAME OPTION
-        GUI.gameoptionsButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Game Options")
+        GUI.gameoptionsButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Settings")
         Tooltip.AddButtonTooltip(GUI.gameoptionsButton, 'lob_select_map')
         GUI.gameoptionsButton.OnClick = function(self)
             local mapSelectDialog
@@ -3340,7 +3340,7 @@ function CreateUI(maxPlayers)
         GUI.restrictedUnitsOrPresetsBtn:Hide()
     elseif lobbyComm:IsHost() then
         -- TODO: Localise!
-        GUI.restrictedUnitsOrPresetsBtn.label:SetText("Lobby Presets")
+        GUI.restrictedUnitsOrPresetsBtn.label:SetText("Presets")
         GUI.restrictedUnitsOrPresetsBtn.OnClick = function(self, modifiers)
             ShowPresetDialog()
         end
@@ -4628,7 +4628,7 @@ function CreateBigPreview(parent)
     end
 
     -- Keep the close button on top of the border (which is itself on top of the map preview)
-    LayoutHelpers.DepthOverParent(closeBtn, mapPreview, 1)
+    LayoutHelpers.DepthOverParent(closeBtn, mapPreview, 2)
 
     RefreshLargeMap()
 end
