@@ -11,6 +11,7 @@ local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
+local RadioButton = import('/lua/ui/controls/radiobutton.lua').RadioButton
 local Popup = import('/lua/ui/controls/popup.lua').Popup
 local Prefs = import('/lua/user/prefs.lua')
 local GUI_OPEN = false
@@ -53,6 +54,9 @@ function HostModStatus(availableMods)
 end
 
 local modsDialog
+
+-- Show only UI mods?
+local uiOnly = true
 function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
     -- Evil hack because something, somewher in this tangled mess of evil is Destroy()ing the
     -- dialog between reuses and I can't be arsed to figure out what it is.
@@ -87,20 +91,17 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
     local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok", -1)
     LayoutHelpers.AtLeftIn(SaveButton, dialogContent, 0)
     LayoutHelpers.AtBottomIn(SaveButton, dialogContent, 10)
-        
+
     -- Checkbox UI mod filter
-    local cbox_UI = UIUtil.CreateCheckbox(dialogContent, '/RADIOBOX/', 'UI Mods')
-    LayoutHelpers.AtLeftIn(cbox_UI, dialogContent, 160)
-    LayoutHelpers.AtBottomIn(cbox_UI, dialogContent, 16)
-    cbox_UI:SetCheck(true, true)
-            
-    -- Checkbox game mod filter
-    local cbox_GAME = UIUtil.CreateCheckbox(dialogContent, '/RADIOBOX/', 'Game Mods')
-    LayoutHelpers.AtLeftIn(cbox_GAME, dialogContent, 250)
-    LayoutHelpers.AtBottomIn(cbox_GAME, dialogContent, 16)
-    Tooltip.AddCheckboxTooltip(cbox_GAME, {text='Game Mods', body='Game mods are activated for all players, and all players must have the same version of the mod'})
-    cbox_GAME:SetCheck(false, true)
-            
+    local filterButtons = {
+        { label = LOC("UI Mods") },
+        { label = LOC("Game Mods") }
+    }
+
+    local filterradio = RadioButton(dialogContent, '/RADIOBOX/', filterButtons, 1, true)
+    LayoutHelpers.AtLeftIn(filterradio, dialogContent, 160)
+    LayoutHelpers.AtBottomIn(filterradio, dialogContent, -23)
+
     -- Checkbox hide unselectable mods
     local cbox_Act = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', 'Hide Unselectable', true)
     LayoutHelpers.AtLeftIn(cbox_Act, dialogContent, 370)
@@ -110,9 +111,15 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
             
     -- Checkbox condensed list
     local cbox_Act2 = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', 'Condensed View', true)
-    LayoutHelpers.AtLeftIn(cbox_Act2, dialogContent, 20+130+120+100)
-    LayoutHelpers.AtBottomIn(cbox_Act2, dialogContent, 6)
+    LayoutHelpers.Below(cbox_Act2, cbox_Act, -9)
     Tooltip.AddCheckboxTooltip(cbox_Act2, {text='Condensed View', body='Displays mods as a simplified list'})
+
+    filterradio.OnChoose = function(self, index)
+        save_mod()
+        swiffer()
+        uiOnly = index == 1
+        Refresh_Mod_List(not uiOnly, uiOnly, cbox_Act:IsChecked(), IsHost, modstatus, cbox_Act2:IsChecked())
+    end
 
     local LobbyModManagerCondensedView = Prefs.GetFromCurrentProfile('LobbyModManagerCondensedView') or false
     if LobbyModManagerCondensedView then
@@ -121,52 +128,21 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
         cbox_Act2:SetCheck(false, true)
     end
     
-    if IsHost then
-        cbox_GAME:Enable()
-        cbox_Act:Enable()
-    else
-        cbox_GAME:Disable()
+    if not IsHost then
         cbox_Act:Disable()
-        cbox_GAME_TEXT:Disable()
-        cbox_Act_TEXT:Disable()
-        cbox_GAME:SetCheck(false, true)
         cbox_Act:SetCheck(false, true)
-        cbox_GAME_TEXT:SetColor('5C5F5C')
-        cbox_Act_TEXT:SetColor('5C5F5C')
-    end
-    cbox_GAME.OnCheck = function(self, checked)
-        if checked then
-            cbox_UI:SetCheck(false, true)
-            if IsHost then
-                save_mod()
-                swiffer()
-                Refresh_Mod_List(checked, cbox_UI:IsChecked(), cbox_Act:IsChecked(), IsHost, modstatus, cbox_Act2:IsChecked())
-            end
-        else
-            cbox_GAME:SetCheck(true, true)
-        end
-    end
-    cbox_UI.OnCheck = function(self, checked)
-        if checked then
-            cbox_GAME:SetCheck(false, true)
-            save_mod()
-            swiffer()
-            Refresh_Mod_List(cbox_GAME:IsChecked(), checked, cbox_Act:IsChecked(), IsHost, modstatus, cbox_Act2:IsChecked())
-        else
-            cbox_UI:SetCheck(true, true)
-        end
     end
     cbox_Act.OnCheck = function(self, checked)
         if IsHost then
             save_mod()
             swiffer()
-            Refresh_Mod_List(cbox_GAME:IsChecked(), cbox_UI:IsChecked(), checked, IsHost, modstatus, cbox_Act2:IsChecked())
+            Refresh_Mod_List(not uiOnly, uiOnly, checked, IsHost, modstatus, cbox_Act2:IsChecked())
         end
     end
     cbox_Act2.OnCheck = function(self, checked)
         save_mod()
         swiffer()
-        Refresh_Mod_List(cbox_GAME:IsChecked(), cbox_UI:IsChecked(), cbox_Act:IsChecked(), IsHost, modstatus, checked)
+        Refresh_Mod_List(not uiOnly, uiOnly, cbox_Act:IsChecked(), IsHost, modstatus, checked)
         Prefs.SetToCurrentProfile('LobbyModManagerCondensedView', checked)
     end
 
@@ -258,7 +234,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
         end
         import('/lua/mods.lua').SetSelectedMods(selectedMods)
     end
-    
+
     function Refresh_Mod_List(cbox_GAME, cbox_UI, cbox_Act, IsHost, modstatus, cbox_Act2)
         index = 0
         exclusiveMod = false
