@@ -82,56 +82,31 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
     LayoutHelpers.AtBottomIn(SaveButton, dialogContent, 10)
         
     -- Checkbox UI mod filter
-    local cbox_UI = UIUtil.CreateCheckbox(dialogContent, '/RADIOBOX/')
-    LayoutHelpers.AtLeftIn(cbox_UI, dialogContent, 20+130+10)
+    local cbox_UI = UIUtil.CreateCheckbox(dialogContent, '/RADIOBOX/', 'UI Mods')
+    LayoutHelpers.AtLeftIn(cbox_UI, dialogContent, 160)
     LayoutHelpers.AtBottomIn(cbox_UI, dialogContent, 16)
-    Tooltip.AddCheckboxTooltip(cbox_UI, {text='UI Mods', body='UI mods are activated only for you. You can have a mod of this type activated without the enemy knowing'})
-    cbox_UI_TEXT = UIUtil.CreateText(cbox_UI, 'UI Mods', 14, 'Arial')
-        
-    cbox_UI_TEXT:SetColor('B9BFB9')
-    cbox_UI_TEXT:SetDropShadow(true)
-    LayoutHelpers.AtLeftIn(cbox_UI_TEXT, cbox_UI, 25)
-    LayoutHelpers.AtVerticalCenterIn(cbox_UI_TEXT, cbox_UI)
     cbox_UI:SetCheck(true, true)
             
     -- Checkbox game mod filter
-    local cbox_GAME = UIUtil.CreateCheckbox(dialogContent, '/RADIOBOX/')
-    LayoutHelpers.AtLeftIn(cbox_GAME, dialogContent, 20+130+100)
+    local cbox_GAME = UIUtil.CreateCheckbox(dialogContent, '/RADIOBOX/', 'Game Mods')
+    LayoutHelpers.AtLeftIn(cbox_GAME, dialogContent, 250)
     LayoutHelpers.AtBottomIn(cbox_GAME, dialogContent, 16)
     Tooltip.AddCheckboxTooltip(cbox_GAME, {text='Game Mods', body='Game mods are activated for all players, and all players must have the same version of the mod'})
-    cbox_GAME_TEXT = UIUtil.CreateText(cbox_GAME, 'Game Mods', 14, 'Arial')
-        
-    cbox_GAME_TEXT:SetColor('B9BFB9')
-    cbox_GAME_TEXT:SetDropShadow(true)
-    LayoutHelpers.AtLeftIn(cbox_GAME_TEXT, cbox_GAME, 25)
-    LayoutHelpers.AtVerticalCenterIn(cbox_GAME_TEXT, cbox_GAME)
     cbox_GAME:SetCheck(false, true)
             
     -- Checkbox hide unselectable mods
-    local cbox_Act = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/')
-    LayoutHelpers.AtLeftIn(cbox_Act, dialogContent, 20+130+120+100)
+    local cbox_Act = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', 'Hide Unselectable', true)
+    LayoutHelpers.AtLeftIn(cbox_Act, dialogContent, 370)
     LayoutHelpers.AtBottomIn(cbox_Act, dialogContent, 23)
     Tooltip.AddCheckboxTooltip(cbox_Act, {text='Hide Unselectable', body='Hide mods which are unselectable due to compatibility issues, or because a player in the lobby does not have them'})
-    cbox_Act_TEXT = UIUtil.CreateText(cbox_Act, 'Hide Unselectable', 14, 'Arial')
-        
-    cbox_Act_TEXT:SetColor('B9BFB9')
-    cbox_Act_TEXT:SetDropShadow(true)
-    LayoutHelpers.AtLeftIn(cbox_Act_TEXT, cbox_Act, 25)
-    LayoutHelpers.AtVerticalCenterIn(cbox_Act_TEXT, cbox_Act)
     cbox_Act:SetCheck(true, true)
             
     -- Checkbox condensed list
-    local cbox_Act2 = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/')
+    local cbox_Act2 = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', 'Condensed View', true)
     LayoutHelpers.AtLeftIn(cbox_Act2, dialogContent, 20+130+120+100)
     LayoutHelpers.AtBottomIn(cbox_Act2, dialogContent, 6)
     Tooltip.AddCheckboxTooltip(cbox_Act2, {text='Condensed View', body='Displays mods as a simplified list'})
-    cbox_Act_TEXT2 = UIUtil.CreateText(cbox_Act2, 'Condensed View', 14, 'Arial')
-    
-    cbox_Act_TEXT2:SetColor('B9BFB9')
-    cbox_Act_TEXT2:SetDropShadow(true)
-    LayoutHelpers.AtLeftIn(cbox_Act_TEXT2, cbox_Act2, 25)
-    LayoutHelpers.AtVerticalCenterIn(cbox_Act_TEXT2, cbox_Act2)
-    
+
     local XinnoModsManagerLittleView = Prefs.GetFromCurrentProfile('XinnoModsManagerLittleView') or false
     if XinnoModsManagerLittleView then
         cbox_Act2:SetCheck(true, true)
