@@ -2863,9 +2863,9 @@ function CreateUI(maxPlayers)
     SetText2(GUI.ModFeaturedLabel, modLabels[argv.initName] or "", 20)
 
     -- Lobby options panel
-    GUI.LobbyOptions = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/BUTTON/small/', "Lobby Options")
+    GUI.LobbyOptions = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/BUTTON/medium/', "Lobby Options")
     LayoutHelpers.AtTopIn(GUI.LobbyOptions, GUI.panel, 10)
-    LayoutHelpers.AtHorizontalCenterIn(GUI.LobbyOptions, GUI, 0)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.LobbyOptions, GUI, 1)
     GUI.LobbyOptions.OnClick = function()
         ShowLobbyOptionsDialog()
     end
@@ -3009,15 +3009,15 @@ function CreateUI(maxPlayers)
         Tooltip.AddButtonTooltip(GUI.gameoptionsButton, 'Lobby_Mods')
     end
 
-    LayoutHelpers.AtBottomIn(GUI.gameoptionsButton, GUI.optionsPanel, -55)
-    LayoutHelpers.AtHorizontalCenterIn(GUI.gameoptionsButton, GUI.optionsPanel)
+    LayoutHelpers.AtBottomIn(GUI.gameoptionsButton, GUI.optionsPanel, -52)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.gameoptionsButton, GUI.optionsPanel, 1)
 
     ---------------------------------------------------------------------------
     -- set up launch panel
     ---------------------------------------------------------------------------
     -- LAUNCH THE GAME BUTTON --
     GUI.launchGameButton = UIUtil.CreateButtonWithDropshadow(GUI.launchPanel, '/BUTTON/large/', "Launch the Game")
-    LayoutHelpers.AtCenterIn(GUI.launchGameButton, GUI.launchPanel, 20, -345)
+    LayoutHelpers.AtCenterIn(GUI.launchGameButton, GUI.launchPanel, 13, -344)
     Tooltip.AddButtonTooltip(GUI.launchGameButton, 'Lobby_Launch')
     UIUtil.setVisible(GUI.launchGameButton, lobbyComm:IsHost())
     GUI.launchGameButton.OnClick = function(self)
@@ -3048,8 +3048,8 @@ function CreateUI(maxPlayers)
             {worldCover = true, enterButton = 1, escapeButton = 2}
         )
     end
-    LayoutHelpers.AtLeftIn(GUI.exitButton, GUI.chatPanel, 22)
-    LayoutHelpers.AtVerticalCenterIn(GUI.exitButton, GUI.launchGameButton)
+    LayoutHelpers.AtLeftIn(GUI.exitButton, GUI.chatPanel, 38)
+    LayoutHelpers.AtVerticalCenterIn(GUI.exitButton, GUI.launchGameButton, -3)
     GUI.exitButton.OnClick = GUI.exitLobbyEscapeHandler
     -- Behave as if the exit button was clicked when escape is pressed.
     EscapeHandler.PushEscapeHandler(GUI.exitLobbyEscapeHandler)
@@ -3355,7 +3355,7 @@ function CreateUI(maxPlayers)
         Tooltip.AddButtonTooltip(GUI.restrictedUnitsOrPresetsBtn, 'lob_RestrictedUnitsClient')
     end
     LayoutHelpers.AtHorizontalCenterIn(GUI.restrictedUnitsOrPresetsBtn, GUI.gameoptionsButton)
-    LayoutHelpers.AtVerticalCenterIn(GUI.restrictedUnitsOrPresetsBtn, GUI.exitButton)
+    LayoutHelpers.Below(GUI.restrictedUnitsOrPresetsBtn, GUI.gameoptionsButton, 7)
 
     ---------------------------------------------------------------------------
     -- Checkbox Show changed Options
@@ -3385,9 +3385,11 @@ function CreateUI(maxPlayers)
         GUI.allowObservers:Disable()
     end
 
+    -- Small buttons are 100 wide, 44 tall
+    
     -- GO OBSERVER BUTTON --
     GUI.becomeObserver = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/observer/')
-    LayoutHelpers.AtLeftTopIn(GUI.becomeObserver, GUI.buttonPanelRight, -40+4, 25)
+    LayoutHelpers.AtLeftTopIn(GUI.becomeObserver, GUI.buttonPanelRight, -19, 42)
     Tooltip.AddButtonTooltip(GUI.becomeObserver, 'lob_become_observer')
     GUI.becomeObserver.OnClick = function()
         if IsPlayer(localPlayerID) then
@@ -3407,7 +3409,7 @@ function CreateUI(maxPlayers)
 
     -- AUTO TEAM BUTTON -- start of auto teams code.
     GUI.randTeam = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/autoteam/')
-    LayoutHelpers.AtLeftTopIn(GUI.randTeam, GUI.buttonPanelRight, 40+8, 25)
+    LayoutHelpers.RightOf(GUI.randTeam, GUI.becomeObserver, -11)
     Tooltip.AddButtonTooltip(GUI.randTeam, 'lob_click_randteam')
     if not lobbyComm:IsHost() then
         GUI.randTeam:Disable()
@@ -3435,7 +3437,7 @@ function CreateUI(maxPlayers)
 
     -- Default option button
     GUI.defaultOptions = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/defaultoption/')
-    LayoutHelpers.RightOf(GUI.defaultOptions, GUI.randTeam)
+    LayoutHelpers.RightOf(GUI.defaultOptions, GUI.randTeam, -11)
     Tooltip.AddButtonTooltip(GUI.defaultOptions, 'lob_click_rankedoptions')
     if not lobbyComm:IsHost() then
         GUI.defaultOptions:Disable()
@@ -3453,12 +3455,12 @@ function CreateUI(maxPlayers)
     GUI.rerunBenchmark:Disable()
     -- Evil hack to eliminate the gap between the buttons. These negative offsets shouldn't be
     -- needed, but I just can't figure out why it's doing it :/
-    LayoutHelpers.RightOf(GUI.rerunBenchmark, GUI.defaultOptions, -3)
+    LayoutHelpers.Above(GUI.rerunBenchmark, GUI.randTeam, 4)
     Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text='Run CPU Benchmark Test', body='Recalculates your CPU rating.'})
 
     -- RANDOM MAP BUTTON --
     GUI.randMap = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/randommap/')
-    LayoutHelpers.RightOf(GUI.randMap, GUI.rerunBenchmark, -3)
+    LayoutHelpers.RightOf(GUI.randMap, GUI.rerunBenchmark, -11)
     Tooltip.AddButtonTooltip(GUI.randMap, 'lob_click_randmap')
     if not lobbyComm:IsHost() then
         GUI.randMap:Disable()
@@ -4601,7 +4603,7 @@ local LrgMap = false
 -- Perform one-time setup of the large map preview
 function CreateBigPreview(parent)
     -- Size of the map preview to generate.
-    local MAP_PREVIEW_SIZE = 713
+    local MAP_PREVIEW_SIZE = 721
 
     -- The size of the mass/hydrocarbon icons
     local HYDROCARBON_ICON_SIZE = 14
@@ -4618,8 +4620,8 @@ function CreateBigPreview(parent)
     dialogContent.mapPreview = mapPreview
     LayoutHelpers.AtCenterIn(mapPreview, dialogContent)
 
-    local closeBtn = UIUtil.CreateButtonStd(dialogContent, '/dialogs/close_btn/close', "", 12, 2, 0, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
-    LayoutHelpers.AtRightTopIn(closeBtn, dialogContent)
+    local closeBtn = UIUtil.CreateButtonStd(dialogContent, '/dialogs/close_btn/close')
+    LayoutHelpers.AtRightTopIn(closeBtn, dialogContent, 1, 1)
     closeBtn.OnClick = function()
         LrgMap:Close()
         LrgMap = false
@@ -4939,7 +4941,7 @@ function CreateUI_Faction_Selector(lastFaction)
 
     local factionSelector = RadioButton(GUI.panel, "/factionselector/", buttons, lastFaction, true)
     GUI.factionSelector = factionSelector
-    LayoutHelpers.AtLeftTopIn(factionSelector, GUI.panel, 410, 60)
+    LayoutHelpers.AtLeftTopIn(factionSelector, GUI.panel, 407, 69)
     factionSelector.OnChoose = function(self, targetFaction, key)
         local localSlot = FindSlotForID(localPlayerID)
         Prefs.SetToCurrentProfile('LastFaction', targetFaction)
@@ -5129,8 +5131,8 @@ end
 -- Show the lobby preset UI.
 function ShowPresetDialog()
     local dialogContent = Group(GUI)
-    dialogContent.Width:Set(536)
-    dialogContent.Height:Set(360)
+    dialogContent.Width:Set(459)
+    dialogContent.Height:Set(373)
 
     local presetDialog = Popup(GUI, dialogContent)
     presetDialog.OnClosed = presetDialog.Destroy
@@ -5139,7 +5141,7 @@ function ShowPresetDialog()
     -- Title
     local titleText = UIUtil.CreateText(dialogContent, 'Lobby Presets', 17, 'Arial Gras', true)
     LayoutHelpers.AtHorizontalCenterIn(titleText, dialogContent, 0)
-    LayoutHelpers.AtTopIn(titleText, dialogContent, 10)
+    LayoutHelpers.AtTopIn(titleText, dialogContent, 7)
 
     -- Preset List
     local PresetList = ItemList(dialogContent)
@@ -5164,31 +5166,33 @@ function ShowPresetDialog()
     UIUtil.CreateLobbyVertScrollbar(InfoList)
 
     -- Quit button
-    local QuitButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Close")
-    LayoutHelpers.AtLeftIn(QuitButton, dialogContent, -10)
-    LayoutHelpers.AtBottomIn(QuitButton, dialogContent, 8)
+    local QuitButton = UIUtil.CreateButtonStd(dialogContent, '/dialogs/close_btn/close')
+    LayoutHelpers.AtRightIn(QuitButton, dialogContent, 1)
+    LayoutHelpers.AtTopIn(QuitButton, dialogContent, 1)
 
     -- Load button
     local LoadButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Load Preset")
-    LayoutHelpers.RightOf(LoadButton, QuitButton, -28)
-    LoadButton:Hide()
+    LayoutHelpers.AtLeftIn(LoadButton, dialogContent, -2)
+    LayoutHelpers.AtBottomIn(LoadButton, dialogContent, 10)
 
     -- Create button. Occupies the same space as the load button, when available.
     local CreateButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Create Preset")
-    LayoutHelpers.RightOf(CreateButton, QuitButton, -28)
+    LayoutHelpers.RightOf(CreateButton, LoadButton, -19)
 
     -- Save button
     local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Save Preset")
-    LayoutHelpers.RightOf(SaveButton, LoadButton, -28)
-    SaveButton:Disable()
+    LayoutHelpers.RightOf(SaveButton, CreateButton, -19)
 
     -- Delete button
     local DeleteButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Delete Preset")
-    LayoutHelpers.RightOf(DeleteButton, SaveButton, -28)
-    DeleteButton:Disable()
+    LayoutHelpers.RightOf(DeleteButton, SaveButton, -19)
 
     LoadButton.OnClick = function(self)
         LoadPreset(PresetList:GetSelection() + 1)
+    end
+    
+    QuitButton.OnClick = function(self)
+        presetDialog:Hide()
     end
 
     CreateButton.OnClick = function(self)
@@ -5196,7 +5200,6 @@ function ShowPresetDialog()
             if presetName == "" then
                 return
             end
-
             local profiles = LoadPresetsList()
             table.insert(profiles, GetPresetFromSettings(presetName))
             SavePresetsList(profiles)
@@ -5208,10 +5211,6 @@ function ShowPresetDialog()
         end
 
         CreateInputDialog(GUI, "Select name for new preset", dialogComplete)
-    end
-
-    QuitButton.OnClick = function(self)
-        presetDialog:Hide()
     end
 
     SaveButton.OnClick = function(self)
@@ -5231,36 +5230,13 @@ function ShowPresetDialog()
         SavePresetsList(profiles)
         RefreshAvailablePresetsList(PresetList)
 
-        -- Selection is lost, so change the button state...
-        LoadButton:Hide()
-        CreateButton:Show()
-
-        SaveButton:Disable()
-        DeleteButton:Disable()
-
         -- And clear the detail view.
         InfoList:DeleteAllItems()
     end
 
     -- Called when the selected item in the preset list changes.
     local onListItemChanged = function(self, row)
-        if PresetList:GetItemCount() == (row+1) then
-            LoadButton:Hide()
-            CreateButton:Show()
-
-            SaveButton:Disable()
-            DeleteButton:Disable()
-
-            InfoList:DeleteAllItems()
-        else
-            LoadButton:Show()
-            CreateButton:Hide()
-
-            SaveButton:Enable()
-            DeleteButton:Enable()
-
-            ShowPresetDetails(row + 1, InfoList)
-        end
+        ShowPresetDetails(row + 1, InfoList)
     end
 
     -- Because GPG's event model is painfully retarded..
@@ -5271,11 +5247,7 @@ function ShowPresetDialog()
     end
 
     PresetList.OnDoubleClick = function(self, row)
-        if PresetList:GetItemCount() == (row+1) then
-            CreateButton:OnClick()
-        else
-            LoadPreset(row)
-        end
+        LoadPreset(row)
     end
 
     -- When the user double-clicks on a metadata field, give them a popup to change its value.
@@ -5326,7 +5298,14 @@ function ShowPresetDialog()
     end
 
     RefreshAvailablePresetsList(PresetList)
+    if PresetList:GetItemCount() == 0 then
+        --CreateHelpWindow()
+    end
 end
+
+--function CreateHelpWindow(parent, title)
+    --local dialog = Popup(parent, title)
+--end
 
 -- Create an input dialog with the given title and listener function.
 function CreateInputDialog(parent, title, listener)
@@ -5359,8 +5338,6 @@ function RefreshAvailablePresetsList(PresetList)
     for k, v in profiles do
         PresetList:AddItem(v.Name)
     end
-
-    PresetList:AddItem('> New Preset')
 end
 
 -- Update the right-hand panel of the preset dialog to show the contents of the currently selected
