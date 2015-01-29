@@ -107,8 +107,8 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
     LayoutHelpers.AtBottomIn(cbox_Act2, dialogContent, 6)
     Tooltip.AddCheckboxTooltip(cbox_Act2, {text='Condensed View', body='Displays mods as a simplified list'})
 
-    local XinnoModsManagerLittleView = Prefs.GetFromCurrentProfile('XinnoModsManagerLittleView') or false
-    if XinnoModsManagerLittleView then
+    local LobbyModManagerCondensedView = Prefs.GetFromCurrentProfile('LobbyModManagerCondensedView') or false
+    if LobbyModManagerCondensedView then
         cbox_Act2:SetCheck(true, true)
     else
         cbox_Act2:SetCheck(false, true)
@@ -160,7 +160,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
         save_mod()
         swiffer()
         Refresh_Mod_List(cbox_GAME:IsChecked(), cbox_UI:IsChecked(), cbox_Act:IsChecked(), IsHost, modstatus, checked)
-        Prefs.SetToCurrentProfile('XinnoModsManagerLittleView', checked)
+        Prefs.SetToCurrentProfile('LobbyModManagerCondensedView', checked)
     end
 
     -- Mod list
