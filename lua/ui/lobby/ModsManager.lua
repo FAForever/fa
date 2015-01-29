@@ -11,7 +11,7 @@ local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
-local Popup = import('/lua/ui/controls/popup.lua').Popup
+local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local Prefs = import('/lua/user/prefs.lua')
 local GUI_OPEN = false
 
