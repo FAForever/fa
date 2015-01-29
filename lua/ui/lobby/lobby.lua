@@ -3418,7 +3418,7 @@ function CreateUI(maxPlayers)
             UpdateGame()
         end
     end
-    
+
     -- RANDOM MAP BUTTON --
     GUI.randMap = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/randommap/')
     LayoutHelpers.RightOf(GUI.randMap, GUI.defaultOptions, -19)
@@ -3590,7 +3590,6 @@ function CreateUI(maxPlayers)
 
     -- CPU BENCH BUTTON --
     GUI.rerunBenchmark = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/cputest/', '', 11)
-    GUI.rerunBenchmark:Disable()
     LayoutHelpers.RightOf(GUI.rerunBenchmark, GUI.becomeObserver, -20)
     Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text='Run CPU Benchmark Test', body='Recalculates your CPU rating.'})
 
@@ -3670,7 +3669,7 @@ function CreateUI(maxPlayers)
 
     if not singlePlayer then
         CreateCPUMetricUI()
-        ForkThread(function() StressCPU(10) end)
+        ForkThread(function() UpdateBenchmark() end)
     end
 
     GUI.uiCreated = true
@@ -4698,7 +4697,6 @@ local scoreSkew1 = 0 --Skews all CPU scores up or down by the amount specified (
 local scoreSkew2 = 1.0 --Skews all CPU scores specified coefficient (1.0 = no skew)
 
 --Variables for CPU Test
-local firstCPUTest = true
 local BenchTime
 
 --------------------------------------------------
@@ -4777,7 +4775,7 @@ function CreateCPUMetricUI()
 
         GUI.rerunBenchmark.OnClick = function(self, modifiers)
             GUI.rerunBenchmark:Disable()
-            ForkThread(function() StressCPU(1) end)
+            ForkThread(function() UpdateBenchmark(true) end)
         end
     end
 end
@@ -4803,6 +4801,46 @@ function CPU_AddControlTooltip(control, delay, slotNumber)
     end
 end
 
+--- Get the CPU benchmark score for the local machine.
+-- If a previously-calculated benchmark score is found in the profile, it is returned immediately.
+-- Otherwise, a fresh score is calculated and stored (enjoy the lag!).
+--
+-- @param force If truthy, a fresh score is always calculated.
+-- @return A benchmark score between 0 and 450, or nil if StressCPU returned nil (which occurs iff
+--         the lobby is exited before the calculation is complete. Callers should abort gracefully
+--         in this situation).
+-- @see StressCPU
+function GetBenchmarkScore(force)
+    if force then
+        return StressCPU(0)
+    end
+
+    -- Benchmark scores are associated with the machine, not the profile: hence SetPreference.
+    local benchmark = GetPreference('CPUBenchmark')
+    if not benchmark then
+        -- We defer the calculation by 10s here because, often, non-forced requests are occurring on
+        -- startup, and we want to give other tasks, such as connection negotiation, a fighting
+        -- chance of completing before we ruin everything.
+        benchmark = StressCPU(10)
+        SetPreference('CPUBenchmark', benchmark)
+    end
+
+    return benchmark
+end
+
+--- Updates the displayed benchmark score for the local player.
+--
+-- @param force Passed as the `force` parameter to GetBenchmarkScore.
+-- @see GetBenchmarkScore
+function UpdateBenchmark(force)
+    local benchmark = GetBenchmarkScore(force)
+
+    if benchmark then
+        CPU_Benchmarks[localPlayerName] = benchmark
+        lobbyComm:BroadcastData({ Type = 'CPUBenchmark', PlayerName = localPlayerName, Result = benchmark })
+        UpdateCPUBar(localPlayerName)
+    end
+end
 
 -- This function instructs the PC to do a CPU score benchmark.
 -- It handles the necessary UI updates during the benchmark, sends
@@ -4810,7 +4848,7 @@ end
 -- user's UI with their new result.
 --    waitTime: The delay in seconds that this function should wait before starting the benchmark.
 function StressCPU(waitTime)
-
+    GUI.rerunBenchmark:Disable()
     for i = waitTime, 1, -1 do
         GUI.rerunBenchmark.label:SetText(i..'s')
         WaitSeconds(1)
@@ -4824,10 +4862,7 @@ function StressCPU(waitTime)
     end
 
     --Get our last benchmark (if there was one)
-    local currentBestBenchmark = CPU_Benchmarks[localPlayerName]
-    if currentBestBenchmark == nil then
-        currentBestBenchmark = 10000
-    end
+    local currentBestBenchmark = 10000
 
     --LOG('Beginning CPU benchmark')
     if GUI.rerunBenchmark.label then GUI.rerunBenchmark.label:SetText('. . .') end
@@ -4847,26 +4882,15 @@ function StressCPU(waitTime)
 
         --If this benchmark was better than our best so far...
         if BenchTime < currentBestBenchmark then
-            --Make this our best benchmark
             currentBestBenchmark = BenchTime
-
-            --Send it to the other players
-            lobbyComm:BroadcastData( { Type = 'CPUBenchmark', PlayerName = localPlayerName, Result = currentBestBenchmark} )
-
-            --Add the benchmark to the local benchmark table
-            CPU_Benchmarks[localPlayerName] = currentBestBenchmark
-
-            --Update the UI bar
-            UpdateCPUBar(localPlayerName)
         end
     end
-
-    --Set this flag so we'll know later
-    firstCPUTest = false
 
     --Reset Button UI
     GUI.rerunBenchmark:Enable()
     GUI.rerunBenchmark.label:SetText('')
+
+    return currentBestBenchmark
 end
 
 function UpdateCPUBar(playerName)
@@ -4883,6 +4907,7 @@ function SetSlotCPUBar(slot, playerInfo)
     --This function updates the UI with a CPU benchmark bar for the specified slot/playerInfo.
     --    slot: a numbered slot (1-however many slots there are for this map)
     --    playerInfo: The corresponding playerInfo object from gameInfo.PlayerOptions[slot].
+
 
     if GUI.slots[slot].CPUSpeedBar then
         GUI.slots[slot].CPUSpeedBar:Hide()
