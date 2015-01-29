@@ -2,10 +2,16 @@ local Group = import('/lua/maui/group.lua').Group
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local main = import('/lua/ui/uimain.lua')
 
--- A class for popups. A popup appears on top of other UI content, darkens the content behind it,
--- and draws a standard background behind its content.
+--- Base class for popups. A popup appears on top of other UI content, darkens the content behind it,
+-- and draws a standard background behind its content. You'll probably want to extend it to do
+-- something more involved, or use it as-is if you want to manually assemble your popup UI Group.
 Popup = Class(Group) {
+    --- Create a new popup
+    --
+    -- @param GUI A reference to the lobby's GUI object (dialogs should all be parented off there)
+    -- @param content A Group containing the UI to show inside the popup.
     __init = function(self, GUI, content)
         Group.__init(self, GUI)
         self.content = content
@@ -35,6 +41,7 @@ Popup = Class(Group) {
         -- Plant the dialog in the middle of the screen.
         LayoutHelpers.AtCenterIn(self, GUI)
 
+        -- Closure copy.
         local this = self
 
         -- Dismiss dialog when shadow is clicked.
@@ -44,33 +51,19 @@ Popup = Class(Group) {
             end
         end
 
-        local main = import('/lua/ui/uimain.lua')
-
         -- Close when the escape key is pressed.
-        local escapeHandler = function()
+        main.SetEscapeHandler(function()
             this:Hide()
-        end
-        main.SetEscapeHandler(escapeHandler)
-
-        -- Closure copy
-        local theGUI = GUI
-
-        -- When the visibility of the dialog is changed, drag the background along, too (and restore
-        -- the default lobby escape handler when the dialog is closed. It may be worth at some point
-        -- having a class to handle stacking escape handlers, should we ever find we want to stack
-        -- dialogs).
-        self.OnHide = function(self, hidden)
-            self.isHidden = hidden
-            if hidden then
-                self:OnClosed()
-                main.SetEscapeHandler(theGUI.exitLobbyEscapeHandler)
-            else
-                main.SetEscapeHandler(escapeHandler)
-            end
-            shadow:SetHidden(hidden)
-        end
+        end)
     end,
 
-    -- Override for closure events.
+    --- Close the dialog
+    Close = function(self)
+        main.SetEscapeHandler(self:GetParent().exitLobbyEscapeHandler)
+        self:OnClosed()
+        self:Destroy()
+    end,
+
+    --- Called when the dialog is closed.
     OnClosed = function(self) end
 }
