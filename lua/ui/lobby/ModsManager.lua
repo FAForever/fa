@@ -405,12 +405,11 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
                         if control.modInfo.uid == c then
                             exist = true
                             control.actived = true
+                            control.type:SetColor('101010')
                             if control.ui then
-                                control.type:SetColor('101010')
                                 control.type:SetText('UI Mod Activated')
                                 control.bg:SetTexture('/textures/ui/common/MODS/enable_ui.dds')
                             else
-                                control.type:SetColor('101010')
                                 control.type:SetText('Game Mod Activated')
                                 control.bg:SetTexture('/textures/ui/common/MODS/enable_game.dds')
                             end
@@ -420,12 +419,11 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
                         table.insert(scrollGroup.controlList, the_mod.pos+1, CreateListElementtt(scrollGroup, allMods[c], the_mod.pos, false))
                         control = scrollGroup.controlList[the_mod.pos+1]
                         control.actived = true
+                        control.type:SetColor('101010')
                         if control.ui then
-                            control.type:SetColor('101010')
                             control.type:SetText('UI Mod Activated')
                             control.bg:SetTexture('/textures/ui/common/MODS/enable_ui.dds')
                         else
-                            control.type:SetColor('101010')
                             control.type:SetText('Game Mod Activated')
                             control.bg:SetTexture('/textures/ui/common/MODS/enable_game.dds')
                         end
@@ -471,12 +469,11 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
             
             if not skipExit then
                 the_mod.actived = true
+                the_mod.type:SetColor('101010')
                 if the_mod.ui then
-                    the_mod.type:SetColor('101010')
                     the_mod.type:SetText('UI Mod Activated')
                     the_mod.bg:SetTexture('/textures/ui/common/MODS/enable_ui.dds')
                 else
-                    the_mod.type:SetColor('101010')
                     the_mod.type:SetText('Game Mod Activated')
                     the_mod.bg:SetTexture('/textures/ui/common/MODS/enable_game.dds')
                 end
