@@ -122,11 +122,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
     end
 
     local LobbyModManagerCondensedView = Prefs.GetFromCurrentProfile('LobbyModManagerCondensedView') or false
-    if LobbyModManagerCondensedView then
-        cbox_Act2:SetCheck(true, true)
-    else
-        cbox_Act2:SetCheck(false, true)
-    end
+    cbox_Act2:SetCheck(LobbyModManagerCondensedView, true)
     
     if not IsHost then
         cbox_Act:Disable()
