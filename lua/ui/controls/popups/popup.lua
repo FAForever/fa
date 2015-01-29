@@ -2,6 +2,7 @@ local Group = import('/lua/maui/group.lua').Group
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local EscapeHandler = import('/lua/ui/dialogs/eschandler.lua')
 
 --- Base class for popups. A popup appears on top of other UI content, darkens the content behind it,
 -- and draws a standard background behind its content. You'll probably want to extend it to do
@@ -22,7 +23,7 @@ Popup = Class(Group) {
 
         -- We parent the background off the parent so we can get a sensible answer for the dimensions
         -- of the dialog without the need for more magic.
-        local shadow = Bitmap(GUI)
+        local shadow = Bitmap(self)
         LayoutHelpers.FillParent(shadow, GUI)
         shadow.Depth:Set(GetFrame(GUI:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 10)
         self.Depth:Set(GetFrame(GUI:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 10)
@@ -50,17 +51,15 @@ Popup = Class(Group) {
             end
         end
 
-        local main = import('/lua/ui/uimain.lua')
         -- Close when the escape key is pressed.
-        main.SetEscapeHandler(function()
+        EscapeHandler.PushEscapeHandler(function()
             this:OnEscapePressed()
         end)
     end,
 
     --- Close the dialog.
     Close = function(self)
-        local main = import('/lua/ui/uimain.lua')
-        main.SetEscapeHandler(self:GetParent().exitLobbyEscapeHandler)
+        EscapeHandler.PopEscapeHandler()
         self:OnClosed()
         self:Destroy()
     end,
