@@ -2,7 +2,6 @@ local Group = import('/lua/maui/group.lua').Group
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local main = import('/lua/ui/uimain.lua')
 
 --- Base class for popups. A popup appears on top of other UI content, darkens the content behind it,
 -- and draws a standard background behind its content. You'll probably want to extend it to do
@@ -47,23 +46,35 @@ Popup = Class(Group) {
         -- Dismiss dialog when shadow is clicked.
         shadow.HandleEvent = function(shadow, event)
             if event.Type == 'ButtonPress' then
-                this:Hide()
+                this:OnShadowClicked()
             end
         end
 
+        local main = import('/lua/ui/uimain.lua')
         -- Close when the escape key is pressed.
         main.SetEscapeHandler(function()
-            this:Hide()
+            this:OnEscapePressed()
         end)
     end,
 
-    --- Close the dialog
+    --- Close the dialog.
     Close = function(self)
+        local main = import('/lua/ui/uimain.lua')
         main.SetEscapeHandler(self:GetParent().exitLobbyEscapeHandler)
         self:OnClosed()
         self:Destroy()
     end,
 
-    --- Called when the dialog is closed.
-    OnClosed = function(self) end
+    --- Called when escape is pressed if the dialog is open. Defaults to closing the dialog.
+    OnEscapePressed = function(self)
+        self:Close()
+    end,
+
+    --- Called when the shadow is clicked. Defaults to closing the dialog.
+    OnShadowClicked = function(self)
+        self:Close()
+    end,
+
+    --- Called when the dialog is closed via any method.
+    OnClosed = function(self) end,
 }

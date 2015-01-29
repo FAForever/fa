@@ -4,7 +4,7 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Edit = import('/lua/maui/edit.lua').Edit
 local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 
--- A popup that asks the user for a string.
+--- A popup that asks the user for a string.
 InputDialog = Class(Popup) {
     __init = function(self, parent, title)
         -- Set up the UI Group to pass to the Popup constructor.
@@ -18,7 +18,7 @@ InputDialog = Class(Popup) {
             LayoutHelpers.AtTopIn(titleText, dialogContent, 10)
         end
 
-        -- Textfield
+        -- Input textfield.
         local nameEdit = Edit(dialogContent)
         LayoutHelpers.AtHorizontalCenterIn(nameEdit, dialogContent)
         LayoutHelpers.AtVerticalCenterIn(nameEdit, dialogContent)
@@ -28,8 +28,9 @@ InputDialog = Class(Popup) {
 
         -- Called when the dialog is closed in the affirmative.
         local dialogComplete = function()
-            self:OnInput(nameEdit:GetText())
-            self:Hide()
+            if not self:OnInput(nameEdit:GetText()) then
+                self:Close()
+            end
         end
         nameEdit.OnEnterPressed = dialogComplete
 
@@ -38,7 +39,8 @@ InputDialog = Class(Popup) {
         LayoutHelpers.AtLeftIn(ExitButton, dialogContent, -5)
         LayoutHelpers.AtBottomIn(ExitButton, dialogContent, 10)
         ExitButton.OnClick = function()
-            self:Hide()
+            self:OnCancelled()
+            self:Close()
         end
 
         -- Ok button
@@ -49,9 +51,16 @@ InputDialog = Class(Popup) {
 
         Popup.__init(self, parent, dialogContent)
 
-        self.OnClosed = self.Destroy
+        -- Set up event listeners...
+        self.OnEscapePressed = self.OnCancelled
+        self.OnShadowClicked = self.OnCancelled
     end,
 
-    -- Called with the contents of the textfield when the presses enter or clicks the "OK" button.
-    OnInput = function(self, str) end
+    --- Called with the contents of the textfield when the presses enter or clicks the "OK" button.
+    -- If this function returns false, the dialog will remain open afterwards, allowing for input
+    -- validation (you should probably notify the user, too!)
+    OnInput = function(self, str) end,
+
+    --- Called when the user clicks "cancel", presses escape, or clicks outside the dialog.
+    OnCancelled = function(self) end
 }
