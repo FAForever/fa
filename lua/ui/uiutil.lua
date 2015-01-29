@@ -19,10 +19,10 @@ local Scrollbar = import('/lua/maui/scrollbar.lua').Scrollbar
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Cursor = import('/lua/maui/cursor.lua').Cursor
 local Prefs = import('/lua/user/prefs.lua')
-local Border = import('/lua/ui/controls/ninepatch.lua').Border
+local Border = import('/lua/ui/controls/border.lua').Border
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local Layouts = import('/lua/skins/layouts.lua')
-local Popup = import('/lua/ui/controls/popup.lua').Popup
+local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local NinePatch = import('/lua/ui/controls/ninepatch.lua').NinePatch
 
 --* Handy global variables to assist skinning
