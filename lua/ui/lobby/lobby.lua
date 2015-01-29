@@ -3387,57 +3387,9 @@ function CreateUI(maxPlayers)
 
     -- Small buttons are 100 wide, 44 tall
     
-    -- GO OBSERVER BUTTON --
-    GUI.becomeObserver = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/observer/')
-    LayoutHelpers.AtLeftTopIn(GUI.becomeObserver, GUI.buttonPanelRight, -19, 42)
-    Tooltip.AddButtonTooltip(GUI.becomeObserver, 'lob_become_observer')
-    GUI.becomeObserver.OnClick = function()
-        if IsPlayer(localPlayerID) then
-            if lobbyComm:IsHost() then
-                HostConvertPlayerToObserver(hostID, localPlayerName, FindSlotForID(localPlayerID))
-            else
-                lobbyComm:SendData(hostID, {Type = 'RequestConvertToObserver', RequestedName = localPlayerName, RequestedSlot = FindSlotForID(localPlayerID)})
-            end
-        elseif IsObserver(localPlayerID) then
-            if lobbyComm:IsHost() then
-                HostConvertObserverToPlayerWithoutSlot(hostID, localPlayerName, FindObserverSlotForID(localPlayerID))
-            else
-                lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayerWithoutSlot', RequestedName = localPlayerName, ObserverSlot = FindObserverSlotForID(localPlayerID)})
-            end
-        end
-    end
-
-    -- AUTO TEAM BUTTON -- start of auto teams code.
-    GUI.randTeam = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/autoteam/')
-    LayoutHelpers.RightOf(GUI.randTeam, GUI.becomeObserver, -11)
-    Tooltip.AddButtonTooltip(GUI.randTeam, 'lob_click_randteam')
-    if not lobbyComm:IsHost() then
-        GUI.randTeam:Disable()
-    else
-        GUI.randTeam.OnClick = function(self, modifiers)
-            if gameInfo.GameOptions['AutoTeams'] == 'none' then
-                SetGameOption('AutoTeams', 'tvsb')
-                SendSystemMessage("Auto Teams option set: Top vs Bottom")
-            elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
-                SetGameOption('AutoTeams', 'lvsr')
-                SendSystemMessage("Auto Teams option set: Left vs Right")
-            elseif gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
-                SetGameOption('AutoTeams', 'pvsi')
-                SendSystemMessage("Auto Teams option set: Even Slots vs Odd Slots")
-            elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' then
-                SetGameOption('AutoTeams', 'manual')
-                SendSystemMessage("Auto Teams option set: Manual Select")
-            else
-                SetGameOption('AutoTeams', 'none')
-                SendSystemMessage("Auto Teams option set: None")
-            end
-        end
-    end
-    --end of auto teams code
-
     -- Default option button
     GUI.defaultOptions = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/defaultoption/')
-    LayoutHelpers.RightOf(GUI.defaultOptions, GUI.randTeam, -11)
+    LayoutHelpers.AtLeftTopIn(GUI.defaultOptions, GUI.buttonPanelRight, -11, -2)
     Tooltip.AddButtonTooltip(GUI.defaultOptions, 'lob_click_rankedoptions')
     if not lobbyComm:IsHost() then
         GUI.defaultOptions:Disable()
@@ -3449,18 +3401,10 @@ function CreateUI(maxPlayers)
             UpdateGame()
         end
     end
-
-    -- CPU BENCH BUTTON --
-    GUI.rerunBenchmark = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/cputest/', '', 11)
-    GUI.rerunBenchmark:Disable()
-    -- Evil hack to eliminate the gap between the buttons. These negative offsets shouldn't be
-    -- needed, but I just can't figure out why it's doing it :/
-    LayoutHelpers.Above(GUI.rerunBenchmark, GUI.randTeam, 4)
-    Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text='Run CPU Benchmark Test', body='Recalculates your CPU rating.'})
-
+    
     -- RANDOM MAP BUTTON --
     GUI.randMap = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/randommap/')
-    LayoutHelpers.RightOf(GUI.randMap, GUI.rerunBenchmark, -11)
+    LayoutHelpers.RightOf(GUI.randMap, GUI.defaultOptions, -19)
     Tooltip.AddButtonTooltip(GUI.randMap, 'lob_click_randmap')
     if not lobbyComm:IsHost() then
         GUI.randMap:Disable()
@@ -3579,6 +3523,61 @@ function CreateUI(maxPlayers)
             autoKick = checked
         end
     end
+    
+    -- AUTO TEAM BUTTON -- start of auto teams code.
+    GUI.randTeam = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/autoteam/')
+    LayoutHelpers.RightOf(GUI.randTeam, GUI.randMap, -19)
+    Tooltip.AddButtonTooltip(GUI.randTeam, 'lob_click_randteam')
+    if not lobbyComm:IsHost() then
+        GUI.randTeam:Disable()
+    else
+        GUI.randTeam.OnClick = function(self, modifiers)
+            if gameInfo.GameOptions['AutoTeams'] == 'none' then
+                SetGameOption('AutoTeams', 'tvsb')
+                SendSystemMessage("Auto Teams option set: Top vs Bottom")
+            elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
+                SetGameOption('AutoTeams', 'lvsr')
+                SendSystemMessage("Auto Teams option set: Left vs Right")
+            elseif gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
+                SetGameOption('AutoTeams', 'pvsi')
+                SendSystemMessage("Auto Teams option set: Even Slots vs Odd Slots")
+            elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' then
+                SetGameOption('AutoTeams', 'manual')
+                SendSystemMessage("Auto Teams option set: Manual Select")
+            else
+                SetGameOption('AutoTeams', 'none')
+                SendSystemMessage("Auto Teams option set: None")
+            end
+        end
+    end
+    
+    -- GO OBSERVER BUTTON --
+    GUI.becomeObserver = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/observer/')
+    LayoutHelpers.AtLeftTopIn(GUI.becomeObserver, GUI.defaultOptions, 40, 47)
+    Tooltip.AddButtonTooltip(GUI.becomeObserver, 'lob_become_observer')
+    GUI.becomeObserver.OnClick = function()
+        if IsPlayer(localPlayerID) then
+            if lobbyComm:IsHost() then
+                HostConvertPlayerToObserver(hostID, localPlayerName, FindSlotForID(localPlayerID))
+            else
+                lobbyComm:SendData(hostID, {Type = 'RequestConvertToObserver', RequestedName = localPlayerName, RequestedSlot = FindSlotForID(localPlayerID)})
+            end
+        elseif IsObserver(localPlayerID) then
+            if lobbyComm:IsHost() then
+                HostConvertObserverToPlayerWithoutSlot(hostID, localPlayerName, FindObserverSlotForID(localPlayerID))
+            else
+                lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayerWithoutSlot', RequestedName = localPlayerName, ObserverSlot = FindObserverSlotForID(localPlayerID)})
+            end
+        end
+    end
+
+    -- CPU BENCH BUTTON --
+    GUI.rerunBenchmark = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/cputest/', '', 11)
+    GUI.rerunBenchmark:Disable()
+    -- Evil hack to eliminate the gap between the buttons. These negative offsets shouldn't be
+    -- needed, but I just can't figure out why it's doing it :/
+    LayoutHelpers.RightOf(GUI.rerunBenchmark, GUI.becomeObserver, -20)
+    Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text='Run CPU Benchmark Test', body='Recalculates your CPU rating.'})
 
     GUI.observerList = ItemList(GUI.observerPanel, "observer list")
     GUI.observerList:SetFont(UIUtil.bodyFont, 12)
