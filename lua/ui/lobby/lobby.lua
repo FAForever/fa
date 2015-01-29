@@ -4633,7 +4633,8 @@ function CreateBigPreview(parent)
     local closeBtn = UIUtil.CreateButtonStd(dialogContent, '/dialogs/close_btn/close', "", 12, 2, 0, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
     LayoutHelpers.AtRightTopIn(closeBtn, dialogContent)
     closeBtn.OnClick = function()
-        LrgMap:Hide()
+        LrgMap:Close()
+        LrgMap = false
     end
 
     -- Keep the close button on top of the border (which is itself on top of the map preview)
@@ -4642,8 +4643,7 @@ function CreateBigPreview(parent)
     RefreshLargeMap()
 end
 
--- Refresh the large map preview (so it can update if something changes while it's open, and so we
--- don't have to bother completely rebuilding it when it's opened/closed).
+-- Refresh the large map preview (so it can update if something changes while it's open)
 function RefreshLargeMap()
     if not LrgMap or LrgMap.isHidden then
         return
@@ -4655,13 +4655,7 @@ function RefreshLargeMap()
 end
 
 function ShowBigPreview()
-    if not LrgMap then
-        CreateBigPreview(GUI)
-    else
-        RefreshLargeMap()
-    end
-
-    LrgMap:Show()
+    CreateBigPreview(GUI)
 end
 
 --------------------------------------------------------------------------------------------------------------------------------
@@ -5047,12 +5041,6 @@ function ChangeBackgroundLobby(faction)
 end
 
 function ShowLobbyOptionsDialog()
-    -- If we built it before, don't build it again.
-    if GUI.lobbyOptionsDialog then
-        GUI.lobbyOptionsDialog:Show()
-        return
-    end
-
     local dialogContent = Group(GUI)
     dialogContent.Width:Set(420)
     dialogContent.Height:Set(240)
@@ -5163,11 +5151,6 @@ end
 
 -- Create lobby preset UI.
 function GUI_PRESET()
-    if GUI.presetDialog then
-        GUI.presetDialog:Show()
-        return
-    end
-
     local profiles = GetPreference("UserPresetLobby")
 
     local dialogContent = Group(GUI)

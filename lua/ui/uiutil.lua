@@ -736,7 +736,6 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
     dialog.Height:Set(textHeight + 85)
 
     local popup = Popup(parent, dialog)
-    popup.OnClosed = popup.Destroy
 
     local function MakeButton(text, callback)
         local button = CreateButtonWithDropshadow(dialog, '/BUTTON/medium/', text)
@@ -744,12 +743,12 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
             button.OnClick = function(self)
                 callback()
 				if destroyOnCallback then
-                    popup:Hide()
+                    popup:Close()
 				end
             end
         else
             button.OnClick = function(self)
-                popup:Hide()
+                popup:Close()
             end
         end
         return button
