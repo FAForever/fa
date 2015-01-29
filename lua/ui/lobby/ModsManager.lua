@@ -54,13 +54,6 @@ end
 
 local modsDialog
 function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
-    -- Evil hack because something, somewher in this tangled mess of evil is Destroy()ing the
-    -- dialog between reuses and I can't be arsed to figure out what it is.
-    -- The contents of this file needs torching and rewriting.
-    if modsDialog then
-        modsDialog:Destroy()
-    end
-
     if IsHost then modstatus = false end
 
     local dialogContent = Group(parent)
@@ -244,7 +237,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
         save_mod()
         GUI_OPEN = false
         import('/lua/ui/lobby/lobby.lua').OnModsChanged(selectedMods)
-        modsDialog:Hide()
+        modsDialog:Close()
         return selectedMods
     end
     

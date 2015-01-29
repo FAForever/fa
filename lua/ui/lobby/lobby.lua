@@ -35,6 +35,7 @@ local round = import('/lua/ui/lobby/trueskill.lua').round
 local Player = import('/lua/ui/lobby/trueskill.lua').Player
 local Rating = import('/lua/ui/lobby/trueskill.lua').Rating
 local Teams = import('/lua/ui/lobby/trueskill.lua').Teams
+local EscapeHandler = import('/lua/ui/dialogs/eschandler.lua')
 
 local IsSyncReplayServer = false
 
@@ -656,8 +657,7 @@ end
 -- update the data in a player slot
 function SetSlotInfo(slot, playerInfo)
 	if GUI.connectdialog then -- Remove the ConnectDialog
-		GUI.connectdialog:Hide()
-        GUI.connectdialog = nil
+		GUI.connectdialog:Close()
 	end
 	local isLocallyOwned = IsLocallyOwned(slot)
     if isLocallyOwned then
@@ -3078,7 +3078,7 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtVerticalCenterIn(GUI.exitButton, GUI.launchGameButton)
     GUI.exitButton.OnClick = GUI.exitLobbyEscapeHandler
     -- Behave as if the exit button was clicked when escape is pressed.
-    import('/lua/ui/uimain.lua').SetEscapeHandler(GUI.exitLobbyEscapeHandler)
+    EscapeHandler.PushEscapeHandler(GUI.exitLobbyEscapeHandler)
 
 
     ---------------------------------------------------------------------------
