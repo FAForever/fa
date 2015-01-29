@@ -2105,11 +2105,9 @@ end
 function HostTryAddPlayer(senderID, slot, playerData)
     LOGX('>> HostTryAddPlayer > requestedPlayerName='..tostring(playerData.PlayerName), 'Connecting')
 
+    -- CPU benchmark code
     if playerData.Human and not singlePlayer then
-        for name, benchmark in pairs(CPU_Benchmarks) do
-            -- If we're getting a new player, send them all our benchmark data for players who have joined already
-            lobbyComm:SendData(senderID, { Type = 'CPUBenchmark', PlayerName = name, Result = benchmark })
-        end
+        lobbyComm:SendData(senderID, {Type='CPUBenchmark', Benchmarks=CPU_Benchmarks})
     end
 
     local newSlot = slot
@@ -4042,11 +4040,21 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         elseif data.Type == 'PrivateChat' then
             AddChatText("<<"..data.SenderName..">> "..data.Text)
         elseif data.Type == 'CPUBenchmark' then
-            CPU_Benchmarks[data.PlayerName] = data.Result
-            local playerId = FindIDForName(data.PlayerName)
-            local playerSlot = FindSlotForID(playerId)
-            if playerSlot ~= nil then
-                SetSlotCPUBar(playerSlot, gameInfo.PlayerOptions[playerSlot])
+            -- CPU benchmark code
+            local benchmarks = {}
+            if data.PlayerName then
+                benchmarks[data.PlayerName] = data.Result
+            else
+                benchmarks = data.Benchmarks
+            end
+
+            for name, result in benchmarks do
+                CPU_Benchmarks[name] = result
+                local id = FindIDForName(name)
+                local slot = FindSlotForID(id)
+                if slot ~= nil then
+                    SetSlotCPUBar(slot, gameInfo.PlayerOptions[slot])
+                end
             end
         elseif data.Type == 'SetPlayerNotReady' then
             EnableSlot(data.Slot)
