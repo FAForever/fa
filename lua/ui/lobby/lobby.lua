@@ -1740,12 +1740,16 @@ local function UpdateGame()
         -- TODO: Since these stats are all constants, we should figure out the right place to do this
         -- job once.
         if not playerOptions.MEAN then
-            SetPlayerOption(localPlayerSlot, 'MEAN', argv.playerMean, true)
-            SetPlayerOption(localPlayerSlot, 'DEV', argv.playerDeviation, true)
-            SetPlayerOption(localPlayerSlot, 'COUNTRY', argv.PrefLanguage, true)
-            SetPlayerOption(localPlayerSlot, 'PL', playerRating, true)
-            SetPlayerOption(localPlayerSlot, 'RC', argv.ratingColor, true)
-            SetPlayerOption(localPlayerSlot, 'NG', argv.numGames, true)
+            local options = {
+                MEAN = argv.playerMean,
+                DEV = argv.playerDeviation,
+                COUNTRY=argv.PrefLanguage,
+                PL = playerRating,
+                RC = argv.ratingColor,
+                NG= argv.numGames,
+            }
+
+            SetPlayerOptions(localPlayerSlot, options, true)
         end
     end
 
@@ -2724,7 +2728,7 @@ function CreateSlotsUI(makeLabel)
             else
                 EnableSlot(curRow)
             end
-            SetPlayerOption(curRow,'Ready',checked)
+            SetPlayerOption(curRow, 'Ready', checked)
         end
 
         if singlePlayer then
@@ -4016,23 +4020,37 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
     lobbyComm.DataReceived = function(self,data)
         -- Messages anyone can receive
-        if data.Type == 'PlayerOption' then
-            if data.SenderID ~= hostID then
-                if gameInfo.PlayerOptions[data.Slot].OwnerID ~= data.SenderID then
-                    WARN("Attempt to set option on unowned slot.")
-                    return
-                end
-
-                if data.Key == "Team" and gameInfo.GameOption["AutoTeams"] ~= 'none' then
-                    WARN("Attempt to set Team while Auto Teams are on.")
-                    return
-                end
+        if data.Type == 'PlayerOption' or data.Type == 'PlayerOptions' then
+            local options
+            local isHost = lobbyComm:IsHost()
+            
+            if data.Type == 'PlayerOption' then
+                options[data.Key] = data.Value
+            else
+                options = data.Options
             end
 
-            if lobbyComm:IsHost() then
-                GpgNetSend('PlayerOption', data.Slot, data.Key, data.Value)
+            for key, val in options do
+                local valid = true
+
+                if data.SenderID ~= hostID then
+                    valid = false
+                    if key == 'Team' and gameInfo.GameOption['AutoTeams'] ~= 'none' then
+                        WARN("Attempt to set Team while Auto Teams are on.")
+                    elseif gameInfo.PlayerOptions[data.Slot].OwnerID ~= data.SenderID then
+                        WARN("Attempt to set option on unowned slot.")
+                    else
+                        valid = true
+                    end
+                end
+
+                if valid then
+                    gameInfo.PlayerOptions[data.Slot][key] = val
+                    if isHost then
+                        GpgNetSend('PlayerOption', data.Slot, data.Key, data.Value)
+                    end
+                end
             end
-            gameInfo.PlayerOptions[data.Slot][data.Key] = data.Value
             UpdateGame()
         elseif data.Type == 'PublicChat' then
             AddChatText("["..data.SenderName.."] "..data.Text)
@@ -4407,31 +4425,36 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     end
 end
 
-function SetPlayerOption(slot, key, val, ignoreRefresh)
-    ignoreRefresh = ignoreRefresh or false
-
+function SetPlayerOptions(slot, options, ignoreRefresh)
     if not IsLocallyOwned(slot) and not lobbyComm:IsHost() then
         WARN("Hey you can't set a player option on a slot you don't own. (slot:"..tostring(slot).." / key:"..tostring(key).." / val:"..tostring(val)..")")
         return
     end
 
-    if lobbyComm:IsHost() then
-        GpgNetSend('PlayerOption', slot, key, val)
+    local isHost = lobbyCommn:IsHost()
+    for key, val in options do
+        gameInfo.PlayerOptions[slot][key] = val
+        if isHost then
+            GpgNetSend('PlayerOption', slot, key, val)
+        end
     end
-
-    gameInfo.PlayerOptions[slot][key] = val
-
+        
     lobbyComm:BroadcastData(
     {
-        Type = 'PlayerOption',
-        Key = key,
-        Value = val,
+        Type = 'PlayerOptions',
+        Options = options,
         Slot = slot,
-    }
-    )
+    })
+
     if not ignoreRefresh then
         UpdateGame()
     end
+end
+
+function SetPlayerOption(slot, key, val, ignoreRefresh)
+    local options = {}
+    options[key] = val
+    SetPlayerOptions(slot, options, ignoreRefresh)
 end
 
 function SetGameOptions(options, ignoreRefresh)
