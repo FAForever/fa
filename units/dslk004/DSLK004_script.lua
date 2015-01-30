@@ -176,6 +176,8 @@ local PhasonCollisionBeam2 = Class(PhasonCollisionBeam) {
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
+        local Util = import('/lua/utilities.lua')
+
         while true do
             if Util.GetDistanceBetweenTwoVectors( CurrentPosition, LastPosition ) > 0.25 or skipCount > 100 then
                 CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 100, 100, army )
