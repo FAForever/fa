@@ -2917,24 +2917,31 @@ function CreateUI(maxPlayers)
     GUI.buttonPanelRight.Height:Set(89)
 
     GUI.observerPanel = Group(GUI.panel, "observerPanel") -- PINK Square in Screenshoot
+    UIUtil.SurroundWithBorder(GUI.observerPanel, '/scx_menu/lan-game-lobby/frame/')
     LayoutHelpers.AtLeftTopIn(GUI.observerPanel, GUI.panel, 458, 519)
     GUI.observerPanel.Width:Set(280)
-    GUI.observerPanel.Height:Set(152)
+    GUI.observerPanel.Height:Set(159)
 
-    GUI.chatPanel = Group(GUI.panel, "chatPanel") -- BLUE Square in Screenshoot
+    -- The chat view and input box, bottom left.
+    GUI.chatPanel = Group(GUI.panel, "chatPanel")
+    UIUtil.SurroundWithBorder(GUI.chatPanel, '/scx_menu/lan-game-lobby/frame/')
     LayoutHelpers.AtLeftTopIn(GUI.chatPanel, GUI.panel, 49, 458)
     GUI.chatPanel.Width:Set(388)
-    GUI.chatPanel.Height:Set(184)
+    GUI.chatPanel.Height:Set(220)
 
-    GUI.mapPanel = Group(GUI.panel, "mapPanel") -- YELLOW Square in Screenshoot
+    -- Contains the map preview, top-right.
+    GUI.mapPanel = Group(GUI.panel, "mapPanel")
+    UIUtil.SurroundWithBorder(GUI.mapPanel, '/scx_menu/lan-game-lobby/frame/')
     LayoutHelpers.AtLeftTopIn(GUI.mapPanel, GUI.panel, 763, 106)
-    GUI.mapPanel.Width:Set(208)
-    GUI.mapPanel.Height:Set(208+2)
+    GUI.mapPanel.Width:Set(198)
+    GUI.mapPanel.Height:Set(198)
 
     GUI.optionsPanel = Group(GUI.panel, "optionsPanel") -- ORANGE Square in Screenshoot
-    LayoutHelpers.AtLeftTopIn(GUI.optionsPanel, GUI.panel, 762, 353)
-    GUI.optionsPanel.Width:Set(209)
-    GUI.optionsPanel.Height:Set(284)
+    UIUtil.SurroundWithBorder(GUI.optionsPanel, '/scx_menu/lan-game-lobby/frame/')
+    LayoutHelpers.AtLeftTopIn(GUI.optionsPanel, GUI.panel, 763, 353)
+    GUI.optionsPanel.Width:Set(198)
+    GUI.optionsPanel.Height:Set(278)
+
 
     GUI.launchPanel = Group(GUI.panel, "controlGroup") -- BROWN Square in Screenshoot
     LayoutHelpers.AtLeftTopIn(GUI.launchPanel, GUI.panel, 735, 668)
@@ -2950,14 +2957,11 @@ function CreateUI(maxPlayers)
     -- set up map panel
     ---------------------------------------------------------------------------
     GUI.mapView = ResourceMapPreview(GUI.mapPanel, 198, 3, 5)
-    LayoutHelpers.AtLeftTopIn(GUI.mapView, GUI.mapPanel, 5, 5)
-
-    local mapBorder = UIUtil.CreateBorderStd(GUI.mapPanel, '/scx_menu/lan-game-lobby/frame/')
-    mapBorder:Surround(GUI.mapView, 62, 62)
+    LayoutHelpers.AtLeftTopIn(GUI.mapView, GUI.mapPanel)
 
     GUI.LargeMapPreview = UIUtil.CreateButtonWithDropshadow(GUI.mapPanel, '/BUTTON/zoom/', "")
-    LayoutHelpers.AtRightIn(GUI.LargeMapPreview, GUI.mapPanel, -3)
-    LayoutHelpers.AtBottomIn(GUI.LargeMapPreview, GUI.mapPanel, -3)
+    LayoutHelpers.AtRightIn(GUI.LargeMapPreview, GUI.mapPanel)
+    LayoutHelpers.AtBottomIn(GUI.LargeMapPreview, GUI.mapPanel)
     LayoutHelpers.DepthOverParent(GUI.LargeMapPreview, GUI.mapView, 2)
     Tooltip.AddButtonTooltip(GUI.LargeMapPreview, 'lob_click_LargeMapPreview')
     GUI.LargeMapPreview.OnClick = function()
@@ -2967,7 +2971,7 @@ function CreateUI(maxPlayers)
     -- Checkbox Show changed Options
     -- TODO: Localise!
     local cbox_ShowChangedOption = UIUtil.CreateCheckbox(GUI.optionsPanel, '/CHECKBOX/', 'Hide default Options', true, 11)
-    LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel, 3, 0)
+    LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel)
 
     Tooltip.AddCheckboxTooltip(cbox_ShowChangedOption, {text='Hide default Options', body='Show only changed Options and Advanced Map Options'})
     cbox_ShowChangedOption.OnCheck = function(self, checked)
@@ -3084,29 +3088,34 @@ function CreateUI(maxPlayers)
     ---------------------------------------------------------------------------
     -- set up chat display
     ---------------------------------------------------------------------------
-    GUI.chatEdit = Edit(GUI.chatPanel)
-    LayoutHelpers.AtLeftTopIn(GUI.chatEdit, GUI.chatPanel, 0+13, 184+7)
-    GUI.chatEdit.Width:Set(334)
-    GUI.chatEdit.Height:Set(24)
-    GUI.chatEdit:SetFont(UIUtil.bodyFont, 16)
-    GUI.chatEdit:SetForegroundColor(UIUtil.fontColor)
-    GUI.chatEdit:SetHighlightBackgroundColor('00000000')
-    GUI.chatEdit:SetHighlightForegroundColor(UIUtil.fontColor)
-    GUI.chatEdit:ShowBackground(false)
-    GUI.chatEdit:AcquireFocus()
-
     GUI.chatDisplay = ItemList(GUI.chatPanel)
     GUI.chatDisplay:SetFont(UIUtil.bodyFont, tonumber(Prefs.GetFromCurrentProfile('LobbyChatFontSize')) or 14)
     GUI.chatDisplay:SetColors(UIUtil.fontColor(), "00000000", UIUtil.fontColor(), "00000000")
-    LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.chatPanel, 8, 4) --Right, Top
-    GUI.chatDisplay.Bottom:Set(function() return GUI.chatEdit.Top() -6 end)
-    GUI.chatDisplay.Right:Set(function() return GUI.chatPanel.Right() -0 end)
-    GUI.chatDisplay.Height:Set(function() return GUI.chatDisplay.Bottom() - GUI.chatDisplay.Top() end)
-    GUI.chatDisplay.Width:Set(function() return GUI.chatDisplay.Right() - GUI.chatDisplay.Left() -20 end)
+    LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.chatPanel)
+    GUI.chatDisplay.Height:Set(function() return GUI.chatPanel.Height() - GUI.chatBG.Height() end)
+    -- Leave space for the scrollbar.
+    GUI.chatDisplay.Width:Set(function() return GUI.chatPanel.Width() - 16 end)
 
-    GUI.chatDisplayScroll = UIUtil.CreateLobbyVertScrollbar(GUI.chatDisplay, -21, nil, 30)
+    -- Annoying evil extra Bitmap to make chat box have padding inside its background.
+    local chatBG = Bitmap(GUI.chatPanel)
+    GUI.chatBG = chatBG
+    chatBG:SetSolidColor('FF212123')
+    LayoutHelpers.Below(chatBG, GUI.chatDisplay)
+    LayoutHelpers.AtLeftIn(chatBG, GUI.chatDisplay, -1)
+    chatBG.Width:Set(GUI.chatPanel.Width() + 3)
+    chatBG.Height:Set(24)
 
-    -- OnlineProvider.RegisterChatDisplay(GUI.chatDisplay)
+    GUI.chatEdit = Edit(GUI.chatPanel)
+    LayoutHelpers.AtLeftTopIn(GUI.chatEdit, GUI.chatBG, 3, 2)
+    GUI.chatEdit.Width:Set(GUI.chatPanel.Width() + 1)
+    GUI.chatEdit.Height:Set(22)
+    GUI.chatEdit:SetFont(UIUtil.bodyFont, 16)
+    GUI.chatEdit:SetForegroundColor(UIUtil.fontColor)
+    GUI.chatEdit:ShowBackground(false)
+    GUI.chatEdit:SetDropShadow(true)
+    GUI.chatEdit:AcquireFocus()
+
+    GUI.chatDisplayScroll = UIUtil.CreateLobbyVertScrollbar(GUI.chatDisplay)
 
     GUI.chatEdit:SetMaxChars(200)
     GUI.chatEdit.OnCharPressed = function(self, charcode)
@@ -3181,10 +3190,12 @@ function CreateUI(maxPlayers)
     -- Option display
     ---------------------------------------------------------------------------
     GUI.OptionContainer = Group(GUI.optionsPanel)
-    GUI.OptionContainer.Height:Set(260)
-    GUI.OptionContainer.Width:Set(209-9-17-1)
+    GUI.OptionContainer.Bottom:Set(GUI.optionsPanel.Bottom)
+
+    -- Leave space for the scrollbar.
+    GUI.OptionContainer.Width:Set(function() return GUI.optionsPanel.Width() - 16 end)
     GUI.OptionContainer.top = 0
-    LayoutHelpers.AtLeftTopIn(GUI.OptionContainer, GUI.optionsPanel, 0+4+1, 30-2) -- -24
+    LayoutHelpers.AtLeftTopIn(GUI.OptionContainer, GUI.optionsPanel, 0, 28)
 
     GUI.OptionDisplay = {}
 
@@ -3194,7 +3205,6 @@ function CreateUI(maxPlayers)
 
             element.Height:Set(36)
             element.Width:Set(GUI.OptionContainer.Width)
-            element.Depth:Set(function() return GUI.OptionContainer.Depth() + 10 end)
             element:DisableHitTest()
 
             element.text = UIUtil.CreateText(element, '', 14, "Arial")
@@ -3340,7 +3350,7 @@ function CreateUI(maxPlayers)
 
     RefreshOptionDisplayData()
 
-    UIUtil.CreateLobbyVertScrollbar(GUI.OptionContainer, 1, nil, -9, -24)
+    UIUtil.CreateLobbyVertScrollbar(GUI.OptionContainer)
 
     -- Create skirmish mode's "load game" button.
     GUI.loadButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/small/',"<LOC lobui_0176>Load")
@@ -3601,10 +3611,10 @@ function CreateUI(maxPlayers)
     GUI.observerList = ItemList(GUI.observerPanel, "observer list")
     GUI.observerList:SetFont(UIUtil.bodyFont, 12)
     GUI.observerList:SetColors(UIUtil.fontColor, "00000000", UIUtil.fontOverColor, UIUtil.highlightColor, "ffbcfffe")
-    GUI.observerList.Left:Set(function() return GUI.observerPanel.Left() + 6 end)
-    GUI.observerList.Bottom:Set(function() return GUI.observerPanel.Bottom() - 4 end)
-    GUI.observerList.Top:Set(function() return GUI.observerPanel.Top() + 4 end)
-    GUI.observerList.Right:Set(function() return GUI.observerPanel.Right() - 6 end)
+    GUI.observerList.Left:Set(function() return GUI.observerPanel.Left() end)
+    GUI.observerList.Bottom:Set(function() return GUI.observerPanel.Bottom() end)
+    GUI.observerList.Top:Set(function() return GUI.observerPanel.Top() end)
+    GUI.observerList.Right:Set(function() return GUI.observerPanel.Right() - 15 end)
     GUI.observerList.OnClick = function(self, row, event)
         if lobbyComm:IsHost() and event.Modifiers.Right then
             UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
@@ -3618,7 +3628,7 @@ function CreateUI(maxPlayers)
             )
         end
     end
-    UIUtil.CreateLobbyVertScrollbar(GUI.observerList, -15, nil, -1)
+    UIUtil.CreateLobbyVertScrollbar(GUI.observerList)
 
     if singlePlayer then
         -- observers are always allowed in skirmish games.
@@ -3633,7 +3643,7 @@ function CreateUI(maxPlayers)
         GUI.defaultOptions:Hide()
         GUI.rerunBenchmark:Hide()
         GUI.randMap:Hide()
-        GUI.observerList:Hide()
+        GUI.observerPanel:Hide()
         GUI.pingLabel:Hide()
         GUI.readyLabel:Hide()
     end
