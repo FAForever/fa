@@ -537,7 +537,29 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
         GUI.optionControls = {}
         GUI.slots = {}
 
+        -- Set up the base escape handler first: want this one at the bottom of the stack.
+        GUI.exitLobbyEscapeHandler = function()
+            WARN("Lobby escape handler called")
+            GUI.chatEdit:AbandonFocus()
+            UIUtil.QuickDialog(GUI,
+                "<LOC lobby_0000>Exit game lobby?",
+                "<LOC _Yes>", function()
+                    ReturnToMenu(false)
+                end,
+                "<LOC _Cancel>", function()
+                    GUI.chatEdit:AcquireFocus()
+                end,
+                nil, nil,
+                true,
+                {worldCover = true, enterButton = 1, escapeButton = 2}
+            )
+        end
+        EscapeHandler.PushEscapeHandler(GUI.exitLobbyEscapeHandler)
+
         GUI.connectdialog = UIUtil.ShowInfoDialog(GUI, Strings.TryingToConnect, Strings.AbortConnect, ReturnToMenu)
+        -- Prevent the dialog from being closed due to user action.
+        GUI.connectdialog.OnEscapePressed = function() end
+        GUI.connectdialog.OnShadowClicked = function() end
 
         InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
 
@@ -656,8 +678,19 @@ end
 
 -- update the data in a player slot
 function SetSlotInfo(slot, playerInfo)
-	if GUI.connectdialog then -- Remove the ConnectDialog
+    -- Remove the ConnectDialog. It probably makes more sense to do this when we get the game state.
+	if GUI.connectdialog then
 		GUI.connectdialog:Close()
+        GUI.connectdialog = nil
+
+        -- Among other things, this clears uimain's override escape handler, allowing our escape
+        -- handler manager to work.
+        MenuCommon.MenuCleanup()
+
+        -- Changelog, if necessary.
+        if Need_Changelog() then
+            GUI_Changelog()
+        end
 	end
 	local isLocallyOwned = IsLocallyOwned(slot)
     if isLocallyOwned then
@@ -2758,10 +2791,6 @@ function CreateUI(maxPlayers)
     local lastFaction = Prefs.GetFromCurrentProfile('LastFaction') or 1
     UIUtil.SetCurrentSkin(FACTION_NAMES[lastFaction])
 
-    if GUI.connectdialog then
-        MenuCommon.MenuCleanup()
-    end
-
     local title
     if GpgNetActive() then
         title = "FA FOREVER GAME LOBBY"
@@ -3044,27 +3073,9 @@ function CreateUI(maxPlayers)
         GUI.exitButton.label:SetText(LOC("<LOC _Back>"))
     end
 
-    -- A function to show the "Exit game lobby?" dialog.
-    GUI.exitLobbyEscapeHandler = function()
-        GUI.chatEdit:AbandonFocus()
-        UIUtil.QuickDialog(GUI,
-            "<LOC lobby_0000>Exit game lobby?",
-            "<LOC _Yes>", function()
-                ReturnToMenu(false)
-            end,
-            "<LOC _Cancel>", function()
-                GUI.chatEdit:AcquireFocus()
-            end,
-            nil, nil,
-            true,
-            {worldCover = true, enterButton = 1, escapeButton = 2}
-        )
-    end
     LayoutHelpers.AtLeftIn(GUI.exitButton, GUI.chatPanel, 38)
     LayoutHelpers.AtVerticalCenterIn(GUI.exitButton, GUI.launchGameButton, -3)
     GUI.exitButton.OnClick = GUI.exitLobbyEscapeHandler
-    -- Behave as if the exit button was clicked when escape is pressed.
-    EscapeHandler.PushEscapeHandler(GUI.exitLobbyEscapeHandler)
 
 
     ---------------------------------------------------------------------------
@@ -3683,10 +3694,6 @@ function CreateUI(maxPlayers)
     -- End CPU Benchmark code
 
     GUI.uiCreated = true
-
-    if Need_Changelog() then
-        GUI_Changelog()
-    end
 end
 
 function RefreshOptionDisplayData(scenarioInfo)
