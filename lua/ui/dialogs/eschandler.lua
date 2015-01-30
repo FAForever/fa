@@ -30,6 +30,9 @@ end
 -- Stack of escape handlers. The topmost one is called when escape is pressed.
 local escapeHandlers = {}
 
+-- The index in escapeHandlers of the currently active escape handler. The top of the stack.
+local topEscapeHandler = 0
+
 --- Push a new escape handler onto the stack. This becomes the current escape handler, ahead of the
 -- old one.
 --
@@ -38,18 +41,20 @@ local escapeHandlers = {}
 -- @see PopEscapeHandler
 function PushEscapeHandler(handler)
     table.insert(escapeHandlers, handler)
+    topEscapeHandler = topEscapeHandler + 1
 end
 
 --- Remove the current escape handler and restore the previous one pushed.
 function PopEscapeHandler()
     table.remove(escapeHandlers)
+    topEscapeHandler = topEscapeHandler - 1
 end
 
 -- If yesNoOnly is true, then the in game dialog will never be shown
 function HandleEsc(yesNoOnly)
     -- If we've registered a custom escape handler, call it.
-    if escapeHandlers[1] then
-        escapeHandlers[1]()
+    if escapeHandlers[topEscapeHandler] then
+        escapeHandlers[topEscapeHandler]()
         return
     end
 
