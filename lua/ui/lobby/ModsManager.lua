@@ -11,6 +11,7 @@ local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
+local RadioButton = import('/lua/ui/controls/radiobutton.lua').RadioButton
 local Popup = import('/lua/ui/controls/popup.lua').Popup
 local Prefs = import('/lua/user/prefs.lua')
 local GUI_OPEN = false
@@ -53,6 +54,9 @@ function HostModStatus(availableMods)
 end
 
 local modsDialog
+
+-- Show only UI mods?
+local uiOnly = true
 function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
     -- Evil hack because something, somewher in this tangled mess of evil is Destroy()ing the
     -- dialog between reuses and I can't be arsed to figure out what it is.
@@ -87,112 +91,55 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
     local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok", -1)
     LayoutHelpers.AtLeftIn(SaveButton, dialogContent, 0)
     LayoutHelpers.AtBottomIn(SaveButton, dialogContent, 10)
-        
+
     -- Checkbox UI mod filter
-    local cbox_UI = UIUtil.CreateCheckbox(dialogContent, '/RADIOBOX/')
-    LayoutHelpers.AtLeftIn(cbox_UI, dialogContent, 20+130+10)
-    LayoutHelpers.AtBottomIn(cbox_UI, dialogContent, 16)
-    Tooltip.AddCheckboxTooltip(cbox_UI, {text='UI Mods', body='UI mods are activated only for you. You can have a mod of this type activated without the enemy knowing'})
-    cbox_UI_TEXT = UIUtil.CreateText(cbox_UI, 'UI Mods', 14, 'Arial')
-        
-    cbox_UI_TEXT:SetColor('B9BFB9')
-    cbox_UI_TEXT:SetDropShadow(true)
-    LayoutHelpers.AtLeftIn(cbox_UI_TEXT, cbox_UI, 25)
-    LayoutHelpers.AtVerticalCenterIn(cbox_UI_TEXT, cbox_UI)
-    cbox_UI:SetCheck(true, true)
-            
-    -- Checkbox game mod filter
-    local cbox_GAME = UIUtil.CreateCheckbox(dialogContent, '/RADIOBOX/')
-    LayoutHelpers.AtLeftIn(cbox_GAME, dialogContent, 20+130+100)
-    LayoutHelpers.AtBottomIn(cbox_GAME, dialogContent, 16)
-    Tooltip.AddCheckboxTooltip(cbox_GAME, {text='Game Mods', body='Game mods are activated for all players, and all players must have the same version of the mod'})
-    cbox_GAME_TEXT = UIUtil.CreateText(cbox_GAME, 'Game Mods', 14, 'Arial')
-        
-    cbox_GAME_TEXT:SetColor('B9BFB9')
-    cbox_GAME_TEXT:SetDropShadow(true)
-    LayoutHelpers.AtLeftIn(cbox_GAME_TEXT, cbox_GAME, 25)
-    LayoutHelpers.AtVerticalCenterIn(cbox_GAME_TEXT, cbox_GAME)
-    cbox_GAME:SetCheck(false, true)
-            
+    local filterButtons = {
+        { label = LOC("UI Mods") },
+        { label = LOC("Game Mods") }
+    }
+
+    local filterradio = RadioButton(dialogContent, '/RADIOBOX/', filterButtons, 1, true)
+    LayoutHelpers.AtLeftIn(filterradio, dialogContent, 160)
+    LayoutHelpers.AtBottomIn(filterradio, dialogContent, -23)
+
     -- Checkbox hide unselectable mods
-    local cbox_Act = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/')
-    LayoutHelpers.AtLeftIn(cbox_Act, dialogContent, 20+130+120+100)
+    local cbox_Act = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', 'Hide Unselectable', true)
+    LayoutHelpers.AtLeftIn(cbox_Act, dialogContent, 370)
     LayoutHelpers.AtBottomIn(cbox_Act, dialogContent, 23)
     Tooltip.AddCheckboxTooltip(cbox_Act, {text='Hide Unselectable', body='Hide mods which are unselectable due to compatibility issues, or because a player in the lobby does not have them'})
-    cbox_Act_TEXT = UIUtil.CreateText(cbox_Act, 'Hide Unselectable', 14, 'Arial')
-        
-    cbox_Act_TEXT:SetColor('B9BFB9')
-    cbox_Act_TEXT:SetDropShadow(true)
-    LayoutHelpers.AtLeftIn(cbox_Act_TEXT, cbox_Act, 25)
-    LayoutHelpers.AtVerticalCenterIn(cbox_Act_TEXT, cbox_Act)
     cbox_Act:SetCheck(true, true)
             
     -- Checkbox condensed list
-    local cbox_Act2 = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/')
-    LayoutHelpers.AtLeftIn(cbox_Act2, dialogContent, 20+130+120+100)
-    LayoutHelpers.AtBottomIn(cbox_Act2, dialogContent, 6)
+    local cbox_Act2 = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', 'Condensed View', true)
+    LayoutHelpers.Below(cbox_Act2, cbox_Act, -9)
     Tooltip.AddCheckboxTooltip(cbox_Act2, {text='Condensed View', body='Displays mods as a simplified list'})
-    cbox_Act_TEXT2 = UIUtil.CreateText(cbox_Act2, 'Condensed View', 14, 'Arial')
-    
-    cbox_Act_TEXT2:SetColor('B9BFB9')
-    cbox_Act_TEXT2:SetDropShadow(true)
-    LayoutHelpers.AtLeftIn(cbox_Act_TEXT2, cbox_Act2, 25)
-    LayoutHelpers.AtVerticalCenterIn(cbox_Act_TEXT2, cbox_Act2)
-    
-    local XinnoModsManagerLittleView = Prefs.GetFromCurrentProfile('XinnoModsManagerLittleView') or false
-    if XinnoModsManagerLittleView then
-        cbox_Act2:SetCheck(true, true)
-    else
-        cbox_Act2:SetCheck(false, true)
+
+    filterradio.OnChoose = function(self, index)
+        save_mod()
+        swiffer()
+        uiOnly = index == 1
+        Refresh_Mod_List(not uiOnly, uiOnly, cbox_Act:IsChecked(), IsHost, modstatus, cbox_Act2:IsChecked())
     end
+
+    local LobbyModManagerCondensedView = Prefs.GetFromCurrentProfile('LobbyModManagerCondensedView') or false
+    cbox_Act2:SetCheck(LobbyModManagerCondensedView, true)
     
-    if IsHost then
-        cbox_GAME:Enable()
-        cbox_Act:Enable()
-    else
-        cbox_GAME:Disable()
+    if not IsHost then
         cbox_Act:Disable()
-        cbox_GAME_TEXT:Disable()
-        cbox_Act_TEXT:Disable()
-        cbox_GAME:SetCheck(false, true)
         cbox_Act:SetCheck(false, true)
-        cbox_GAME_TEXT:SetColor('5C5F5C')
-        cbox_Act_TEXT:SetColor('5C5F5C')
-    end
-    cbox_GAME.OnCheck = function(self, checked)
-        if checked then
-            cbox_UI:SetCheck(false, true)
-            if IsHost then
-                save_mod()
-                swiffer()
-                Refresh_Mod_List(checked, cbox_UI:IsChecked(), cbox_Act:IsChecked(), IsHost, modstatus, cbox_Act2:IsChecked())
-            end
-        else
-            cbox_GAME:SetCheck(true, true)
-        end
-    end
-    cbox_UI.OnCheck = function(self, checked)
-        if checked then
-            cbox_GAME:SetCheck(false, true)
-            save_mod()
-            swiffer()
-            Refresh_Mod_List(cbox_GAME:IsChecked(), checked, cbox_Act:IsChecked(), IsHost, modstatus, cbox_Act2:IsChecked())
-        else
-            cbox_UI:SetCheck(true, true)
-        end
     end
     cbox_Act.OnCheck = function(self, checked)
         if IsHost then
             save_mod()
             swiffer()
-            Refresh_Mod_List(cbox_GAME:IsChecked(), cbox_UI:IsChecked(), checked, IsHost, modstatus, cbox_Act2:IsChecked())
+            Refresh_Mod_List(not uiOnly, uiOnly, checked, IsHost, modstatus, cbox_Act2:IsChecked())
         end
     end
     cbox_Act2.OnCheck = function(self, checked)
         save_mod()
         swiffer()
-        Refresh_Mod_List(cbox_GAME:IsChecked(), cbox_UI:IsChecked(), cbox_Act:IsChecked(), IsHost, modstatus, checked)
-        Prefs.SetToCurrentProfile('XinnoModsManagerLittleView', checked)
+        Refresh_Mod_List(not uiOnly, uiOnly, cbox_Act:IsChecked(), IsHost, modstatus, checked)
+        Prefs.SetToCurrentProfile('LobbyModManagerCondensedView', checked)
     end
 
     -- Mod list
@@ -283,7 +230,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
         end
         import('/lua/mods.lua').SetSelectedMods(selectedMods)
     end
-    
+
     function Refresh_Mod_List(cbox_GAME, cbox_UI, cbox_Act, IsHost, modstatus, cbox_Act2)
         index = 0
         exclusiveMod = false
@@ -458,12 +405,11 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
                         if control.modInfo.uid == c then
                             exist = true
                             control.actived = true
+                            control.type:SetColor('101010')
                             if control.ui then
-                                control.type:SetColor('101010')
                                 control.type:SetText('UI Mod Activated')
                                 control.bg:SetTexture('/textures/ui/common/MODS/enable_ui.dds')
                             else
-                                control.type:SetColor('101010')
                                 control.type:SetText('Game Mod Activated')
                                 control.bg:SetTexture('/textures/ui/common/MODS/enable_game.dds')
                             end
@@ -473,12 +419,11 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
                         table.insert(scrollGroup.controlList, the_mod.pos+1, CreateListElementtt(scrollGroup, allMods[c], the_mod.pos, false))
                         control = scrollGroup.controlList[the_mod.pos+1]
                         control.actived = true
+                        control.type:SetColor('101010')
                         if control.ui then
-                            control.type:SetColor('101010')
                             control.type:SetText('UI Mod Activated')
                             control.bg:SetTexture('/textures/ui/common/MODS/enable_ui.dds')
                         else
-                            control.type:SetColor('101010')
                             control.type:SetText('Game Mod Activated')
                             control.bg:SetTexture('/textures/ui/common/MODS/enable_game.dds')
                         end
@@ -524,12 +469,11 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
             
             if not skipExit then
                 the_mod.actived = true
+                the_mod.type:SetColor('101010')
                 if the_mod.ui then
-                    the_mod.type:SetColor('101010')
                     the_mod.type:SetText('UI Mod Activated')
                     the_mod.bg:SetTexture('/textures/ui/common/MODS/enable_ui.dds')
                 else
-                    the_mod.type:SetColor('101010')
                     the_mod.type:SetText('Game Mod Activated')
                     the_mod.bg:SetTexture('/textures/ui/common/MODS/enable_game.dds')
                 end
