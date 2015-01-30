@@ -5297,14 +5297,7 @@ function ShowPresetDialog()
     end
 
     RefreshAvailablePresetsList(PresetList)
-    if PresetList:GetItemCount() == 0 then
-        --CreateHelpWindow()
-    end
 end
-
---function CreateHelpWindow(parent, title)
-    --local dialog = Popup(parent, title)
---end
 
 -- Create an input dialog with the given title and listener function.
 function CreateInputDialog(parent, title, listener)
