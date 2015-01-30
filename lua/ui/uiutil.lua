@@ -526,28 +526,28 @@ end
 -- Create a ninepatch using a texture path and naming convention, instead of explicitly with 9 images.
 function CreateNinePatchStd(parent, texturePath)
     return NinePatch(parent,
-        SkinnableFile(texturePath .. 'center.png'),
-        SkinnableFile(texturePath .. 'topLeft.png'),
-        SkinnableFile(texturePath .. 'topRight.png'),
-        SkinnableFile(texturePath .. 'bottomLeft.png'),
-        SkinnableFile(texturePath .. 'bottomRight.png'),
-        SkinnableFile(texturePath .. 'left.png'),
-        SkinnableFile(texturePath .. 'right.png'),
-        SkinnableFile(texturePath .. 'top.png'),
-        SkinnableFile(texturePath .. 'bottom.png')
+        SkinnableFile(texturePath .. 'center.dds'),
+        SkinnableFile(texturePath .. 'topLeft.dds'),
+        SkinnableFile(texturePath .. 'topRight.dds'),
+        SkinnableFile(texturePath .. 'bottomLeft.dds'),
+        SkinnableFile(texturePath .. 'bottomRight.dds'),
+        SkinnableFile(texturePath .. 'left.dds'),
+        SkinnableFile(texturePath .. 'right.dds'),
+        SkinnableFile(texturePath .. 'top.dds'),
+        SkinnableFile(texturePath .. 'bottom.dds')
     )
 end
 
 function CreateBorderStd(parent, texturePath)
     return Border(parent,
-        SkinnableFile(texturePath .. 'topLeft.png'),
-        SkinnableFile(texturePath .. 'topRight.png'),
-        SkinnableFile(texturePath .. 'bottomLeft.png'),
-        SkinnableFile(texturePath .. 'bottomRight.png'),
-        SkinnableFile(texturePath .. 'left.png'),
-        SkinnableFile(texturePath .. 'right.png'),
-        SkinnableFile(texturePath .. 'top.png'),
-        SkinnableFile(texturePath .. 'bottom.png')
+        SkinnableFile(texturePath .. 'topLeft.dds'),
+        SkinnableFile(texturePath .. 'topRight.dds'),
+        SkinnableFile(texturePath .. 'bottomLeft.dds'),
+        SkinnableFile(texturePath .. 'bottomRight.dds'),
+        SkinnableFile(texturePath .. 'left.dds'),
+        SkinnableFile(texturePath .. 'right.dds'),
+        SkinnableFile(texturePath .. 'top.dds'),
+        SkinnableFile(texturePath .. 'bottom.dds')
     )
 end
 
