@@ -4623,6 +4623,12 @@ local LrgMap = false
 
 -- Perform one-time setup of the large map preview
 function CreateBigPreview(parent)
+    if LrgMap then
+        LrgMap:Show()
+        LrgMap.isHidden = false
+        return
+    end
+
     -- Size of the map preview to generate.
     local MAP_PREVIEW_SIZE = 721
 
@@ -4636,6 +4642,14 @@ function CreateBigPreview(parent)
 
     LrgMap = Popup(parent, dialogContent)
 
+    -- The LrgMap shouldn't be destroyed due to issues related to texture pooling. Evil hack ensues.
+    local onTryMapClose = function()
+        LrgMap:Hide()
+        LrgMap.isHidden = true
+    end
+    LrgMap.OnEscapePressed = onTryMapClose
+    LrgMap.OnShadowClicked = onTryMapClose
+
     -- Create the map preview
     local mapPreview = ResourceMapPreview(dialogContent, MAP_PREVIEW_SIZE, MASS_ICON_SIZE, HYDROCARBON_ICON_SIZE)
     dialogContent.mapPreview = mapPreview
@@ -4643,10 +4657,7 @@ function CreateBigPreview(parent)
 
     local closeBtn = UIUtil.CreateButtonStd(dialogContent, '/dialogs/close_btn/close')
     LayoutHelpers.AtRightTopIn(closeBtn, dialogContent, 1, 1)
-    closeBtn.OnClick = function()
-        LrgMap:Close()
-        LrgMap = false
-    end
+    closeBtn.OnClick = onTryMapClose
 
     -- Keep the close button on top of the border (which is itself on top of the map preview)
     LayoutHelpers.DepthOverParent(closeBtn, mapPreview, 2)
