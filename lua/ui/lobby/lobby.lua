@@ -2754,6 +2754,7 @@ function CreateUI(maxPlayers)
     local Prefs = import('/lua/user/prefs.lua')
     local Tooltip = import('/lua/ui/game/tooltip.lua')
 
+    local isHost = lobbyComm:IsHost()
     local lastFaction = Prefs.GetFromCurrentProfile('LastFaction') or 1
     UIUtil.SetCurrentSkin(FACTION_NAMES[lastFaction])
 
@@ -2827,7 +2828,7 @@ function CreateUI(maxPlayers)
     RuleLabel.Width:Set(350)
     RuleLabel:DeleteAllItems()
     local tmptext
-    if lobbyComm:IsHost() then
+    if isHost then
         tmptext = 'No Rules: Click to add rules'
         RuleLabel:SetColors("FFCC00")
     else
@@ -2835,7 +2836,7 @@ function CreateUI(maxPlayers)
     end
     RuleLabel:AddItem(tmptext or '')
     RuleLabel:AddItem('')
-    if lobbyComm:IsHost() then
+    if isHost then
         RuleLabel.OnClick = function(self)
             ShowRuleDialog(RuleLabel)
         end
@@ -2888,9 +2889,20 @@ function CreateUI(maxPlayers)
 
     GUI.observerPanel = Group(GUI.panel, "observerPanel") -- PINK Square in Screenshoot
     UIUtil.SurroundWithBorder(GUI.observerPanel, '/scx_menu/lan-game-lobby/frame/')
-    LayoutHelpers.AtLeftTopIn(GUI.observerPanel, GUI.panel, 458, 519)
+
+    -- Scale the observer panel according to the buttons we are showing.
+    local obsOffset
+    local obsHeight
+    if isHost then
+        obsHeight = 129
+        obsOffset = 549
+    else
+        obsHeight = 169
+        obsOffset = 509
+    end
+    LayoutHelpers.AtLeftTopIn(GUI.observerPanel, GUI.panel, 458, obsOffset)
     GUI.observerPanel.Width:Set(280)
-    GUI.observerPanel.Height:Set(159)
+    GUI.observerPanel.Height:Set(obsHeight)
 
     -- The chat view and input box, bottom left.
     GUI.chatPanel = Group(GUI.panel, "chatPanel")
@@ -2952,7 +2964,7 @@ function CreateUI(maxPlayers)
     end
 
     -- GAME OPTIONS // MODS MANAGER BUTTON --
-    if lobbyComm:IsHost() then     -- GAME OPTION
+    if isHost then     -- GAME OPTION
         GUI.gameoptionsButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Settings")
         Tooltip.AddButtonTooltip(GUI.gameoptionsButton, 'lob_select_map')
         GUI.gameoptionsButton.OnClick = function(self)
@@ -3019,7 +3031,7 @@ function CreateUI(maxPlayers)
     GUI.launchGameButton = UIUtil.CreateButtonWithDropshadow(GUI.launchPanel, '/BUTTON/large/', "Launch the Game")
     LayoutHelpers.AtCenterIn(GUI.launchGameButton, GUI.launchPanel, 13, -344)
     Tooltip.AddButtonTooltip(GUI.launchGameButton, 'Lobby_Launch')
-    UIUtil.setVisible(GUI.launchGameButton, lobbyComm:IsHost())
+    UIUtil.setVisible(GUI.launchGameButton, isHost)
     GUI.launchGameButton.OnClick = function(self)
         TryLaunch(false)
     end
@@ -3338,7 +3350,7 @@ function CreateUI(maxPlayers)
 
     if singlePlayer then
         GUI.restrictedUnitsOrPresetsBtn:Hide()
-    elseif lobbyComm:IsHost() then
+    elseif isHost then
         -- TODO: Localise!
         GUI.restrictedUnitsOrPresetsBtn.label:SetText("Presets")
         GUI.restrictedUnitsOrPresetsBtn.OnClick = function(self, modifiers)
@@ -3376,7 +3388,7 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtLeftTopIn(GUI.allowObservers, GUI.buttonPanelTop)
     Tooltip.AddControlTooltip(GUI.allowObservers, 'lob_observers_allowed')
     GUI.allowObservers:SetCheck(false)
-    if lobbyComm:IsHost() then
+    if isHost then
         SetGameOption("AllowObservers", false, true)
         GUI.allowObservers.OnCheck = function(self, checked)
             SetGameOption("AllowObservers", checked)
@@ -3389,9 +3401,19 @@ function CreateUI(maxPlayers)
     
     -- Default option button
     GUI.defaultOptions = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/defaultoption/')
-    LayoutHelpers.AtLeftTopIn(GUI.defaultOptions, GUI.buttonPanelRight, -11, -2)
+    -- If we're the host, position the buttons lower down (and eventually shrink the observer panel)
+    local offset
+    if isHost then
+        offset = 30
+    else
+        -- We still position it, as it's used as the anchor point for the rest of the buttons.
+        offset = -15
+        GUI.defaultOptions:Hide()
+    end
+    LayoutHelpers.AtLeftTopIn(GUI.defaultOptions, GUI.buttonPanelRight, -11, offset)
+
     Tooltip.AddButtonTooltip(GUI.defaultOptions, 'lob_click_rankedoptions')
-    if not lobbyComm:IsHost() then
+    if not isHost then
         GUI.defaultOptions:Disable()
     else
         GUI.defaultOptions.OnClick = function()
@@ -3406,8 +3428,8 @@ function CreateUI(maxPlayers)
     GUI.randMap = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/randommap/')
     LayoutHelpers.RightOf(GUI.randMap, GUI.defaultOptions, -19)
     Tooltip.AddButtonTooltip(GUI.randMap, 'lob_click_randmap')
-    if not lobbyComm:IsHost() then
-        GUI.randMap:Disable()
+    if not isHost then
+        GUI.randMap:Hide()
     else
         GUI.randMap.OnClick = function()
             local randomMap
@@ -3513,7 +3535,7 @@ function CreateUI(maxPlayers)
         end
     end
 
-    if lobbyComm:IsHost() and not singlePlayer then
+    if isHost and not singlePlayer then
         local autoKickBox = UIUtil.CreateCheckbox(GUI.buttonPanelTop, '/CHECKBOX/', "Auto kick", true, 11)
         LayoutHelpers.CenteredRightOf(autoKickBox, GUI.allowObservers, 10)
         Tooltip.AddControlTooltip(autoKickBox, 'lob_auto_kick')
@@ -3528,8 +3550,8 @@ function CreateUI(maxPlayers)
     GUI.randTeam = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/autoteam/')
     LayoutHelpers.RightOf(GUI.randTeam, GUI.randMap, -19)
     Tooltip.AddButtonTooltip(GUI.randTeam, 'lob_click_randteam')
-    if not lobbyComm:IsHost() then
-        GUI.randTeam:Disable()
+    if not isHost then
+        GUI.randTeam:Hide()
     else
         GUI.randTeam.OnClick = function(self, modifiers)
             if gameInfo.GameOptions['AutoTeams'] == 'none' then
@@ -3557,13 +3579,13 @@ function CreateUI(maxPlayers)
     Tooltip.AddButtonTooltip(GUI.becomeObserver, 'lob_become_observer')
     GUI.becomeObserver.OnClick = function()
         if IsPlayer(localPlayerID) then
-            if lobbyComm:IsHost() then
+            if isHost then
                 HostConvertPlayerToObserver(hostID, localPlayerName, FindSlotForID(localPlayerID))
             else
                 lobbyComm:SendData(hostID, {Type = 'RequestConvertToObserver', RequestedName = localPlayerName, RequestedSlot = FindSlotForID(localPlayerID)})
             end
         elseif IsObserver(localPlayerID) then
-            if lobbyComm:IsHost() then
+            if isHost then
                 HostConvertObserverToPlayerWithoutSlot(hostID, localPlayerName, FindObserverSlotForID(localPlayerID))
             else
                 lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayerWithoutSlot', RequestedName = localPlayerName, ObserverSlot = FindObserverSlotForID(localPlayerID)})
@@ -3587,7 +3609,7 @@ function CreateUI(maxPlayers)
     GUI.observerList.Top:Set(function() return GUI.observerPanel.Top() end)
     GUI.observerList.Right:Set(function() return GUI.observerPanel.Right() - 15 end)
     GUI.observerList.OnClick = function(self, row, event)
-        if lobbyComm:IsHost() and event.Modifiers.Right then
+        if isHost and event.Modifiers.Right then
             UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
                                     "<LOC lobui_0167>Kick Player", function()
                                         lobbyComm:EjectPeer(gameInfo.Observers[row+1].OwnerID, "KickedByHost")
