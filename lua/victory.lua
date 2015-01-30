@@ -27,6 +27,7 @@ function CheckVictory(scenarioInfo)
         for index,brain in ArmyBrains do
             if not brain:IsDefeated() and not ArmyIsCivilian(brain:GetArmyIndex()) then
                 if brain:GetCurrentUnits(categoryCheck) == 0 then
+                    LOG("CheckVictory(): Player " .. index .. " is dead, calling OnDefeat()")
                     brain:OnDefeat()
                     CallEndGame(false, true)
                 else

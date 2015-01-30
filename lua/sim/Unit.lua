@@ -1192,12 +1192,13 @@ Unit = Class(moho.unit_methods) {
         end
 
         if EntityCategoryContains(categories.COMMAND, self) then
-            LOG('com is dead')
+            local logstr = 'OnKilled(): Commander is dead'
 
             --If there is a killer, and it's not me
             if instigator and instigator:GetArmy() ~= self:GetArmy() then
                 local instigatorBrain = ArmyBrains[instigator:GetArmy()]
                 if instigatorBrain and not instigatorBrain:IsDefeated() then
+                    logstr = logstr .. ', instigator found, FAFWin=1'
                     instigatorBrain:AddArmyStat("FAFWin", 1)
                 end
             end
@@ -1209,6 +1210,9 @@ Unit = Class(moho.unit_methods) {
                     table.insert( Sync.GameResult, { index, result } )
                 end
             end
+
+            logstr = logstr .. ', Sync.GameResult is:\n' .. repr(Sync.GameResult)
+            LOG(logstr)
         end
 
         --Destroy units being built if the Factory constructing them dies
