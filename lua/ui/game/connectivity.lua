@@ -18,61 +18,66 @@ local GUI = {
     bgBottom = false,
     group = false,
 }
+
+local updateThread = nil
+
 function PingUpdate()
-    local clients = GetSessionClients()
-	local armiesInfo = GetArmiesTable().armiesTable
-    
-	for i, clientInfo in clients do
-        local index = i
-        if GUI.slots[index] then
-            GUI.slots[index].name:SetText(clientInfo.name)
-            
-            if clientInfo.connected then
-                GUI.slots[index].ping:SetText(LOCF("<LOC connectivity_0000>Ping (ms): %d", clientInfo.ping))
-                
-                if clientInfo.ping < 200 then
-                    GUI.slots[index].ping:SetColor('ff00ff00') -- Ping green color
-                elseif clientInfo.ping < 400 then
-                    GUI.slots[index].ping:SetColor('ffffff00') -- Ping yellow color
+    while true do
+        local clients = GetSessionClients()
+        local armiesInfo = GetArmiesTable().armiesTable
+
+        for i, clientInfo in clients do
+            local index = i
+            local slot = GUI.slots[index]
+            if slot then
+                slot.name:SetText(clientInfo.name)
+
+                if clientInfo.connected then
+                    slot.ping:SetText(LOCF("<LOC connectivity_0000>Ping (ms): %d", clientInfo.ping))
+                    if clientInfo.ping < 200 then
+                        slot.ping:SetColor('ff00ff00') -- Ping green color
+                    elseif clientInfo.ping < 400 then
+                        slot.ping:SetColor('ffffff00') -- Ping yellow color
+                    else
+                        slot.ping:SetColor('ffff0000') -- Ping red color
+                    end
+
+                    if clientInfo.quiet > 3000 then
+                        local min = clientInfo.quiet / (1000 * 60)
+                        local sec = math.mod(clientInfo.quiet / 1000, 60)
+                        slot.quiet:SetText(LOCF("<LOC connectivity_0001>Quiet (m:s): %d:%02d", min, sec))
+                        slot.quiet:Show()
+                    else
+                        slot.quiet:Hide()
+                    end
+
+                    if armiesInfo[index].outOfGame then
+                        slot.conn:SetColor('ff00ff00')
+                        slot.conn:SetText(LOC("<LOC connectivity_0002>Connected"))
+                        slot.state:Show()
+                    else
+                        slot.conn:SetColor('ff00ff00')
+                        slot.conn:SetText(LOC("<LOC connectivity_0002>Connected"))
+                        slot.state:Hide()
+                    end
+                    slot.ping:Show()
                 else
-                    GUI.slots[index].ping:SetColor('ffff0000') -- Ping red color
+                    slot.ping:Hide()
+                    slot.quiet:Hide()
+                    slot.conn:SetColor('ffff0000')
+                    slot.conn:SetText(LOC("<LOC connectivity_0003>Not Connected"))
+                    slot.state:Show()
                 end
             
-                if clientInfo.quiet > 3000 then
-                    local min = clientInfo.quiet / (1000 * 60)
-                    local sec = math.mod(clientInfo.quiet / 1000, 60)
-                    GUI.slots[index].quiet:Show()
-                    GUI.slots[index].quiet:SetText(LOCF("<LOC connectivity_0001>Quiet (m:s): %d:%02d", min, sec))
+                if not clientInfo.connected or clientInfo.quiet > 3000 then
+                    slot.name:SetColor('ffff0000')
                 else
-                    GUI.slots[index].quiet:Hide()
+                    slot.name:SetColor('ffffffff')
                 end
-            
-				if armiesInfo[index].outOfGame then -- Player dead
-					GUI.slots[index].conn:SetColor('ff00ff00') -- Green
-					--GUI.slots[index].conn:SetColor('ffffff00') -- Yellow
-					GUI.slots[index].conn:SetText(LOC("<LOC connectivity_0002>Connected"))
-					GUI.slots[index].state:Show()
-				else -- Player not dead
-					GUI.slots[index].conn:SetColor('ff00ff00') -- Green
-					GUI.slots[index].conn:SetText(LOC("<LOC connectivity_0002>Connected"))
-					GUI.slots[index].state:Hide()
-				end
-                
-				GUI.slots[index].ping:Show()
-            else
-                GUI.slots[index].ping:Hide()
-                GUI.slots[index].quiet:Hide()
-                GUI.slots[index].conn:SetColor('ffff0000')
-                GUI.slots[index].conn:SetText(LOC("<LOC connectivity_0003>Not Connected"))
-				GUI.slots[index].state:Show()
-            end
-            
-            if not clientInfo.connected or clientInfo.quiet > 3000 then
-                GUI.slots[index].name:SetColor('ffff0000')
-            else
-                GUI.slots[index].name:SetColor('ffffffff')
             end
         end
+
+        WaitSeconds(.1)
     end
 end
     
@@ -124,37 +129,38 @@ function CreateUI()
     local height = 0
     
     for i, clientInfo in clients do
-        local index = i
-        GUI.slots[index] = {}
+        local slot = {}
         
-        GUI.slots[index].bg = Bitmap(GUI.group, UIUtil.UIFile('/scx_menu/panel-brd/conn-bg.dds'))
+        slot.bg = Bitmap(GUI.group, UIUtil.UIFile('/scx_menu/panel-brd/conn-bg.dds'))
         if prevControl then
-            LayoutHelpers.Below(GUI.slots[index].bg, prevControl)
+            LayoutHelpers.Below(slot.bg, prevControl)
         else
-            LayoutHelpers.AtTopIn(GUI.slots[index].bg, GUI.group)
-            LayoutHelpers.AtHorizontalCenterIn(GUI.slots[index].bg, GUI.group)
+            LayoutHelpers.AtTopIn(slot.bg, GUI.group)
+            LayoutHelpers.AtHorizontalCenterIn(slot.bg, GUI.group)
         end
         
-        GUI.slots[index].name = UIUtil.CreateText(GUI.slots[index].bg, '', 18, UIUtil.bodyFont)
-        LayoutHelpers.AtLeftTopIn(GUI.slots[index].name, GUI.slots[index].bg, 10, 2)
-		
-		GUI.slots[index].state = Bitmap(GUI.group)
-		GUI.slots[index].state:SetTexture(UIUtil.UIFile('/game/unit-over/icon-skull_bmp.dds')) -- Skull bitmap
-        GUI.slots[index].state:DisableHitTest()
-		GUI.slots[index].state:Hide()
-        LayoutHelpers.AtRightTopIn(GUI.slots[index].state, GUI.slots[index].bg, 2, 2)
+        slot.name = UIUtil.CreateText(slot.bg, '', 18, UIUtil.bodyFont)
+        LayoutHelpers.AtLeftTopIn(slot.name, slot.bg, 10, 2)
+
+        slot.state = Bitmap(GUI.group)
+        slot.state:SetTexture(UIUtil.UIFile('/game/unit-over/icon-skull_bmp.dds')) -- Skull bitmap
+        slot.state:DisableHitTest()
+        slot.state:Hide()
+        LayoutHelpers.AtRightTopIn(slot.state, slot.bg, 2, 2)
         
-        GUI.slots[index].ping = UIUtil.CreateText(GUI.slots[index].bg, '', 16, UIUtil.bodyFont)
-        LayoutHelpers.AtLeftTopIn(GUI.slots[index].ping, GUI.slots[index].bg, 10, 30)
+        slot.ping = UIUtil.CreateText(slot.bg, '', 16, UIUtil.bodyFont)
+        LayoutHelpers.AtLeftTopIn(slot.ping, slot.bg, 10, 30)
         
-        GUI.slots[index].quiet = UIUtil.CreateText(GUI.slots[index].bg, '', 16, UIUtil.bodyFont)
-        LayoutHelpers.AtLeftTopIn(GUI.slots[index].quiet, GUI.slots[index].bg, 150, 30)
+        slot.quiet = UIUtil.CreateText(slot.bg, '', 16, UIUtil.bodyFont)
+        LayoutHelpers.AtLeftTopIn(slot.quiet, slot.bg, 150, 30)
         
-        GUI.slots[index].conn = UIUtil.CreateText(GUI.slots[index].bg, '', 16, UIUtil.bodyFont)
-        LayoutHelpers.AtRightTopIn(GUI.slots[index].conn, GUI.slots[index].bg, 10, 30)
+        slot.conn = UIUtil.CreateText(slot.bg, '', 16, UIUtil.bodyFont)
+        LayoutHelpers.AtRightTopIn(slot.conn, slot.bg, 10, 30)
         
-        height = height + GUI.slots[index].bg.Height()
-        prevControl = GUI.slots[index].bg
+        height = height + slot.bg.Height()
+        prevControl = slot.bg
+
+        GUI.slots[i] = slot
     end
     
     GUI.group.Height:Set(height+12)
@@ -162,11 +168,16 @@ function CreateUI()
     
     LayoutHelpers.AtCenterIn(GUI.group, GetFrame(0))
     
-    GameMain.AddBeatFunction(PingUpdate)
+    if not updateThread then
+        updateThread = ForkThread(PingUpdate)
+    end
 end
 
 function CloseWindow()
-    GameMain.RemoveBeatFunction(PingUpdate)
+    if updateThread then
+        KillThread(updateThread)
+        updateThread = nil
+    end
     GUI.group:Destroy()
     GUI.group = false
 end
