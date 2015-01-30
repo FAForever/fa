@@ -73,5 +73,17 @@ changelog = {
             "- Prevented CPU benchmark from running once the game starts",
             "- General performance improvements"
         }
+    },
+    {
+        version = 7,
+        name = "Lobby 2.6.1",
+        description = {
+            "- Resources are now shown in all map previews",
+            "- The unit manager can once again be seen by non-host players",
+            "- Lots of UI polish",
+            "- Preset system now saves activated mods",
+            "- Observers can now open the chat menu by pushing ENTER",
+            "- Further performance improvements"
+        }
     }
 }
