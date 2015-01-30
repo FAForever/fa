@@ -4671,21 +4671,6 @@ function ShowBigPreview()
     CreateBigPreview(GUI)
 end
 
---------------------------------------------------------------------------------------------------------------------------------
---------------------------------------------------------  Duck_42 Wall  --------------------------------------------------------
---******************************************************************************************************
--- CPU Benchmark Code
--- Author: Duck_42
--- Date: 2013.04.05
---
--- 2013.09.24 - Significant change to benchmark logic.  This should improve accuracy and eliminate some
---              problems.
--- 2013.10.04 - Reverting back to previous CPU benchmark.  The new one doesn't appear to be
---              as accurate as the old one.
--- 2013.11.04 - Second attempt at improving the CPU benchmark.  This one has been tested much more and
---              should produce the desired results.
---******************************************************************************************************
-
 --CPU Status Bar Configuration
 local barMax = 450
 local barMin = 0
