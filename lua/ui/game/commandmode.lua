@@ -1,11 +1,11 @@
-#*****************************************************************************
-#* File: lua/modules/ui/game/commandmode.lua
-#* Author: Chris Blackwell
-#* Summary: Manages the current command mode, which determines what action
-#* the mouse will take when next clicked in the world
-#*
-#* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#*****************************************************************************
+--*****************************************************************************
+--* File: lua/modules/ui/game/commandmode.lua
+--* Author: Chris Blackwell
+--* Summary: Manages the current command mode, which determines what action
+--* the mouse will take when next clicked in the world
+--*
+--* Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--*****************************************************************************
 local Dragger = import('/lua/maui/dragger.lua').Dragger
 local Construction = import('/lua/ui/game/construction.lua')
 local UIMain = import('/lua/ui/uimain.lua')
@@ -15,7 +15,7 @@ local commandMeshResources = import('/lua/ui/game/commandmeshes.lua').commandMes
 --[[
  THESE TABLES ARE NOT ACTUALLY USED IN SCRIPT. Just here for reference
 
- # these are the strings which represent a command mode
+ -- these are the strings which represent a command mode
  commandModes = {
      "order",
      "build",
@@ -79,9 +79,9 @@ local startBehaviors = {}
 local endBehaviors = {}
 
 function OnCommandModeBeat()
-	if issuedOneCommand and not IsKeyDown('Shift') then
-		EndCommandMode(true)
-	end
+    if issuedOneCommand and not IsKeyDown('Shift') then
+        EndCommandMode(true)
+    end
 end
 
 import('/lua/ui/game/gamemain.lua').AddBeatFunction(OnCommandModeBeat)
@@ -122,42 +122,42 @@ function EndCommandMode(isCancel)
     
     commandMode = false
     modeData = false
-	issuedOneCommand = false
+    issuedOneCommand = false
 end
 
 function AddCommandFeedbackByType(pos, type)
 
-	if commandMeshResources[type] == nil then
-		return false;
-	else
-		AddCommandFeedbackBlip({
-					Position = pos, 
-					MeshName = commandMeshResources[type][1],
-					TextureName = commandMeshResources[type][2],
-					ShaderName = 'CommandFeedback',
-					UniformScale = 0.125,
-				}, 0.7)
-	end
-		
-	return true;
+    if commandMeshResources[type] == nil then
+        return false;
+    else
+        AddCommandFeedbackBlip({
+                    Position = pos, 
+                    MeshName = commandMeshResources[type][1],
+                    TextureName = commandMeshResources[type][2],
+                    ShaderName = 'CommandFeedback',
+                    UniformScale = 0.125,
+                }, 0.7)
+    end
+        
+    return true;
 end
-	
+    
 
 function OnCommandIssued(command)
     if not command.Clear then
-		issuedOneCommand = true
-	else
-		EndCommandMode(true)
-	end
-	
-	if command.CommandType == 'Attack' then
-		if command.Clear then
-			local cb = { Func = 'ClearTargets', Args = { } }
-			SimCallback(cb, true)
-		end
+        issuedOneCommand = true
+    else
+        EndCommandMode(true)
+    end
+    
+    if command.CommandType == 'Attack' then
+        if command.Clear then
+            local cb = { Func = 'ClearTargets', Args = { } }
+            SimCallback(cb, true)
+        end
 
-		local cb = { Func = 'AddTarget', Args = { target = command.Target.EntityId, position = command.Target.Position } } 
-		SimCallback(cb, true)
+        local cb = { Func = 'AddTarget', Args = { target = command.Target.EntityId, position = command.Target.Position } } 
+        SimCallback(cb, true)
     elseif command.CommandType == 'Guard' and command.Target.EntityId then
         local c = categories.STRUCTURE * categories.FACTORY
         if EntityCategoryContains(c, command.Blueprint) then
