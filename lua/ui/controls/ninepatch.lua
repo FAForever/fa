@@ -57,5 +57,7 @@ NinePatch = Class(Group) {
         self.b.Top:Set(self.Bottom)
         self.b.Right:Set(self.Right)
         self.b.Left:Set(self.Left)
+
+        self:DisableHitTest(true)
     end
 }
