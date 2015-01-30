@@ -1,16 +1,16 @@
-#****************************************************************************
-#**
-#**  Author(s):  Mikko Tyster, Atte Hulkkonen
-#**
-#**  Summary  :  Seraphim T3 Mobile Lightning Anti-Air
-#**
-#**  Copyright © 2008 Blade Braver!
-#****************************************************************************
+--****************************************************************************
+--**
+--**  Author(s):  Mikko Tyster, Atte Hulkkonen
+--**
+--**  Summary  :  Seraphim T3 Mobile Lightning Anti-Air
+--**
+--**  Copyright © 2008 Blade Braver!
+--****************************************************************************
 
 local SLandUnit = import('/lua/seraphimunits.lua').SLandUnit
-#local CollisionBeamFile = import('/lua/kirvesbeams.lua')
+--local CollisionBeamFile = import('/lua/kirvesbeams.lua')
 local DefaultBeamWeapon = import('/lua/sim/DefaultWeapons.lua').DefaultBeamWeapon
-#local Dummy = import('/lua/kirvesweapons.lua').Dummy
+--local Dummy = import('/lua/kirvesweapons.lua').Dummy
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
 local CollisionBeam = import('/lua/sim/CollisionBeam.lua').CollisionBeam
@@ -111,7 +111,7 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
     end,
 
     CreateBeamEffects = function(self)
-        # Destructively overwriting this function to make it use AttachBeamEntityToEntity()
+        -- Destructively overwriting this function to make it use AttachBeamEntityToEntity()
         local army = self:GetArmy()
         for k, y in self.FxBeamStartPoint do
             local fx = CreateAttachedEmitter(self, 0, army, y ):ScaleEmitter(self.FxBeamStartPointScale)
@@ -123,7 +123,7 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
             table.insert( self.BeamEffectsBag, fx)
             self.Trash:Add(fx)
         end
-        if table.getn(self.FxBeam) != 0 then
+        if table.getn(self.FxBeam) ~= 0 then
 
             local fxBeam
             local bp = self.FxBeam[Random(1, table.getn(self.FxBeam))]
@@ -134,7 +134,7 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
                 AttachBeamToEntity(fxBeam, self, 0, army)
             end
             
-            # collide on start if it's a continuous beam
+            -- collide on start if it's a continuous beam
             local weaponBlueprint = self.Weapon:GetBlueprint()
             local bCollideOnStart = weaponBlueprint.BeamLifetime <= 0
             self:SetBeamFx(fxBeam, bCollideOnStart)
