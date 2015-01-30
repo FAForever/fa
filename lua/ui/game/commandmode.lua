@@ -158,15 +158,16 @@ function OnCommandIssued(command)
 
 		local cb = { Func = 'AddTarget', Args = { target = command.Target.EntityId, position = command.Target.Position } } 
 		SimCallback(cb, true)
-
-	--else
-	--	local cc = { Func = 'ClearTargets', Args = { } }
-	--	SimCallback(cc, true)
-	end
-	
-	-- end of issue:#43
-	
-	if command.CommandType == 'BuildMobile' then				
+    elseif command.CommandType == 'Guard' and command.Target.EntityId then
+        local c = categories.STRUCTURE * categories.FACTORY
+        if EntityCategoryContains(c, command.Blueprint) then
+            local factories = EntityCategoryFilterDown(c, command.Units) or {}
+            if table.getsize(factories) > 0 then
+                local cb = { Func = 'ValidateAssist', Args = { target = command.Target.EntityId } }
+                SimCallback(cb, true)
+            end
+        end
+    elseif command.CommandType == 'BuildMobile' then
 		AddCommandFeedbackBlip({
 			Position = command.Target.Position, 
 			BlueprintID = command.Blueprint,			
@@ -175,8 +176,7 @@ function OnCommandIssued(command)
 			UniformScale = 1,
 		}, 0.7)	
 	else	
-	
-		if AddCommandFeedbackByType(command.Target.Position, command.CommandType) == false then	
+		if AddCommandFeedbackByType(command.Target.Position, command.CommandType) == false then
 			AddCommandFeedbackBlip({
 				Position = command.Target.Position, 
 				MeshName = '/meshes/game/flag02d_lod0.scm',
@@ -194,5 +194,6 @@ function OnCommandIssued(command)
 			}, 0.75)		
 		end		
 	end
+
 	import('/lua/spreadattack.lua').MakeShadowCopyOrders(command)
 end
