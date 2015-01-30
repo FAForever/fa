@@ -3829,10 +3829,13 @@ function wasConnected(peer)
     return false
 end
 
--- Return a status code representing the status of our connection to a peer.
--- 1: no connection
--- 2: half-duplex established or peer reports no connection to a peer we are connected to.
--- 3: full-duplex connection established
+--- Return a status code representing the status of our connection to a peer.
+-- @param peer, native table as returned by lobbyComm:GetPeer()
+-- @return A value describing the connectivity to given peer.
+-- 1 means no connectivity, 2 means they haven't reported that they can talk to us, 3 means
+--
+-- @todo: This function has side effects despite the naming suggesting that it shouldn't.
+--        These need to go away.
 function CalcConnectionStatus(peer)
     if peer.status ~= 'Established' then
         return 1
