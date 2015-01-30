@@ -4644,14 +4644,14 @@ function CreateBigPreview(parent)
     LayoutHelpers.AtCenterIn(mapPreview, dialogContent)
 
     local closeBtn = UIUtil.CreateButtonStd(dialogContent, '/dialogs/close_btn/close', "", 12, 2, 0, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
-    LayoutHelpers.AtRightTopIn(closeBtn, dialogContent)
+    LayoutHelpers.AtRightTopIn(closeBtn, dialogContent, 1, 1)
     closeBtn.OnClick = function()
         LrgMap:Close()
         LrgMap = false
     end
 
     -- Keep the close button on top of the border (which is itself on top of the map preview)
-    LayoutHelpers.DepthOverParent(closeBtn, mapPreview, 1)
+    LayoutHelpers.DepthOverParent(closeBtn, mapPreview, 2)
 
     RefreshLargeMap()
 end
