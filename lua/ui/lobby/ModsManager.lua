@@ -188,20 +188,20 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
         return selectedMods
     end
     
-    function count_mod_UI_actived()
+    function count_mod_UI_activated()
         count_ui = 0
         for k, v in scrollGroup.controlList do
-            if v.actived and v.modInfo.ui_only then
+            if v.activated and v.modInfo.ui_only then
                 count_ui = count_ui + 1
             end
         end
         return count_ui
     end
     
-    function count_mod_SIM_actived()
+    function count_mod_SIM_activated()
         count_sim = 0
         for k, v in scrollGroup.controlList do
-            if v.actived and not v.modInfo.ui_only then
+            if v.activated and not v.modInfo.ui_only then
                 count_sim = count_sim + 1
             end
         end
@@ -217,7 +217,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
     function save_mod()
         selectedMods = {}
         for index, control in scrollGroup.controlList do
-            if control.actived then
+            if control.activated then
                 selectedMods[control.modInfo.uid] = true
             end
         end
@@ -232,10 +232,10 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
         local allmods = Mods.AllSelectableMods()
         local selmods = Mods.GetSelectedMods()
         local unselmods = Mods.GetUnSelectedMods()
-        local GetUI_Activedmods = Mods.GetUiMods() -- Active UI
-        local GetUI_Unactivedmods = Mods.GetUiMods(unselmods) -- Active + Inactive UI
-        local GetSIM_Activedmods = Mods.GetGameMods() -- Active SIM
-        local GetSIM_Unactivedmods = Mods.GetGameMods(unselmods) -- Active + Inactive SIM
+        local GetUI_Activatedmods = Mods.GetUiMods() -- Active UI
+        local GetUI_Unactivatedmods = Mods.GetUiMods(unselmods) -- Active + Inactive UI
+        local GetSIM_Activatedmods = Mods.GetGameMods() -- Active SIM
+        local GetSIM_Unactivatedmods = Mods.GetGameMods(unselmods) -- Active + Inactive SIM
 
         if not IsHost then
             for k, v in allmods do
@@ -243,28 +243,28 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
                     table.insert(current_list, v)
                 end
             end
-            for k, v in GetUI_Activedmods do
+            for k, v in GetUI_Activatedmods do
                 table.insert(current_list, v)
             end
             if cbox_UI then
-                for k, v in GetUI_Unactivedmods do
+                for k, v in GetUI_Unactivatedmods do
                     table.insert(current_list, v)
                 end
             end
         else
-            for k, v in GetSIM_Activedmods do
+            for k, v in GetSIM_Activatedmods do
                 table.insert(current_list, v)
             end
-            for k, v in GetUI_Activedmods do
+            for k, v in GetUI_Activatedmods do
                 table.insert(current_list, v)
             end
             if cbox_GAME and IsHost then
-                for k, v in GetSIM_Unactivedmods do
+                for k, v in GetSIM_Unactivatedmods do
                     table.insert(current_list, v)
                 end
             end
             if cbox_UI then
-                for k, v in GetUI_Unactivedmods do
+                for k, v in GetUI_Unactivatedmods do
                     table.insert(current_list, v)
                 end
             end
@@ -297,7 +297,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
                 table.insert(scrollGroup.controlList, CreateListElementtt(scrollGroup, v, k, true))
             end
             if IsHost and selmods[v.uid] then
-                scrollGroup.controlList[k].actived = true
+                scrollGroup.controlList[k].activated = true
                 scrollGroup.controlList[k].type:SetColor('101010')
                 if v.ui_only then
                     scrollGroup.controlList[k].type:SetText('UI Mod Activated')
@@ -307,29 +307,29 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
                     scrollGroup.controlList[k].bg:SetTexture('/textures/ui/common/MODS/enable_game.dds')
                 end
             elseif not IsHost and modstatus[v.uid] and not v.ui_only then
-                scrollGroup.controlList[k].actived = true
+                scrollGroup.controlList[k].activated = true
                 scrollGroup.controlList[k].type:SetColor('101010')
                 scrollGroup.controlList[k].type:SetText('Game Mod Activated')
                 scrollGroup.controlList[k].bg:SetTexture('/textures/ui/common/MODS/enable_game.dds')
             elseif not IsHost and selmods[v.uid] and v.ui_only then
-                scrollGroup.controlList[k].actived = true
+                scrollGroup.controlList[k].activated = true
                 scrollGroup.controlList[k].type:SetColor('101010')
                 scrollGroup.controlList[k].type:SetText('UI Mod Activated')
                 scrollGroup.controlList[k].bg:SetTexture('/textures/ui/common/MODS/enable_ui.dds')
             end
             if scrollGroup.controlList[k].modInfo.exclusive and selmods[v.uid] then
                 exclusiveMod = true
-                scrollGroup.controlList[k].actived = true
+                scrollGroup.controlList[k].activated = true
                 scrollGroup.controlList[k].type:SetColor('101010')
                 scrollGroup.controlList[k].type:SetText('Exclusive Mod Activated')
                 scrollGroup.controlList[k].bg:SetTexture('/textures/ui/common/MODS/enable_excusif.dds')
             end
         end
         
-        text1:SetText(count_mod_SIM_actived()..' Game Mods and '..count_mod_UI_actived()..' UI Mods actived')
+        text1:SetText(count_mod_SIM_activated()..' Game Mods and '..count_mod_UI_activated()..' UI Mods activated')
         
         local function UNActiveMod(the_mod)
-            the_mod.actived = false
+            the_mod.activated = false
             the_mod.type:SetColor('B9BFB9')
             the_mod.bg:SetSolidColor('00000000')
             the_mod.bg0:SetSolidColor('00000000')
@@ -344,16 +344,16 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
             local function FUNC_RUN()
                 exclusiveMod = true
                 for index, control in scrollGroup.controlList do
-                    if control.actived and control != the_exclusif_mod then
+                    if control.activated and control != the_exclusif_mod then
                         UNActiveMod(control)
                     end
                 end
-                the_exclusif_mod.actived = true
+                the_exclusif_mod.activated = true
                 the_exclusif_mod.type:SetColor('101010')
                 the_exclusif_mod.type:SetText('Exclusive Mod Activated')
                 the_exclusif_mod.bg:SetTexture('/textures/ui/common/MODS/enable_excusif.dds')
                 PlaySound(Sound({Cue = "UI_Mod_Select", Bank = "Interface",}))
-                text1:SetText(count_mod_SIM_actived()..' Game Mods and '..count_mod_UI_actived()..' UI Mods actived')
+                text1:SetText(count_mod_SIM_activated()..' Game Mods and '..count_mod_UI_activated()..' UI Mods activated')
             end
             UIUtil.QuickDialog(GUI_ModsManager, 
                 "<LOC uimod_0010>The mod you have requested is marked as exclusive. If you select this mod, all other mods will be disabled. Do you wish to enable this mod?",
@@ -397,7 +397,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
                     for index, control in scrollGroup.controlList do
                         if control.modInfo.uid == c then
                             exist = true
-                            control.actived = true
+                            control.activated = true
                             control.type:SetColor('101010')
                             if control.ui then
                                 control.type:SetText('UI Mod Activated')
@@ -411,7 +411,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
                     if not exist then -- IF The mod is not listed in the GUI, create the mod in the list
                         table.insert(scrollGroup.controlList, the_mod.pos+1, CreateListElementtt(scrollGroup, allMods[c], the_mod.pos, false))
                         control = scrollGroup.controlList[the_mod.pos+1]
-                        control.actived = true
+                        control.activated = true
                         control.type:SetColor('101010')
                         if control.ui then
                             control.type:SetText('UI Mod Activated')
@@ -448,7 +448,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
                 end
                 for index, control in scrollGroup.controlList do -- Check if the conflict mod is active or not
                     for i, c in Tname do
-                        if control.modInfo.uid == c and control.actived then
+                        if control.modInfo.uid == c and control.activated then
                             conflict = true
                         end
                     end
@@ -461,7 +461,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
             end
             
             if not skipExit then
-                the_mod.actived = true
+                the_mod.activated = true
                 the_mod.type:SetColor('101010')
                 if the_mod.ui then
                     the_mod.type:SetText('UI Mod Activated')
@@ -478,13 +478,13 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
                 LOG('>> ActiveModAndRemoveExclusifMod')
                 exclusiveMod = false
                 for index, control in scrollGroup.controlList do
-                    if control.actived and control.modInfo.exclusive then
+                    if control.activated and control.modInfo.exclusive then
                         UNActiveMod(control)
                     end
                 end
                 ActiveMod(the_mod)
                 PlaySound(Sound({Cue = "UI_Mod_Select", Bank = "Interface",}))
-                text1:SetText(count_mod_SIM_actived()..' Game Mods and '..count_mod_UI_actived()..' UI Mods actived')
+                text1:SetText(count_mod_SIM_activated()..' Game Mods and '..count_mod_UI_activated()..' UI Mods activated')
             end
             UIUtil.QuickDialog(GUI_ModsManager,
                 "<LOC uimod_0011>You currently have an exclusive mod selected, do you wish to deselect it?",
@@ -509,7 +509,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
                                 self.type:SetText('One or more players do not have this mod')
                                 self.bg:SetTexture('/textures/ui/common/MODS/enable_not.dds')
                             else
-                                if self.actived then
+                                if self.activated then
                                     UNActiveMod(self)
                                 else
                                     if self.modInfo.exclusive then
@@ -523,11 +523,11 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
                                     end
                                 end
                                 PlaySound(Sound({Cue = "UI_Mod_Select", Bank = "Interface",}))
-                                text1:SetText(count_mod_SIM_actived()..' Game Mods and '..count_mod_UI_actived()..' UI Mods actived')
+                                text1:SetText(count_mod_SIM_activated()..' Game Mods and '..count_mod_UI_activated()..' UI Mods activated')
                             end
                         end
                     elseif event.Type == 'MouseEnter' then
-                        if self.actived then
+                        if self.activated then
                             self.bg0:SetTexture('/textures/ui/common/MODS/line_black.dds')
                         else
                             self.bg0:SetTexture('/textures/ui/common/MODS/line_blank.dds')
@@ -572,7 +572,7 @@ function CreateListElementtt(parent, modInfo, Pos, little)
     
     group.pos = Pos
     group.modInfo = modInfo
-    group.actived = false
+    group.activated = false
     
     group.bg = Bitmap(group)
         group.bg.Height:Set(group.Height())
