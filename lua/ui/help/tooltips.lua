@@ -679,11 +679,11 @@ Tooltips = {
         description = "<LOC OPTIONS_0144>Sort by Battlefield size",
     },
     map_select_maxplayers = {
-        title = "<LOC OPTIONS_0145>Supported Players",
+        title = "<LOC OPTIONS_0145>Max. Players",
         description = "",
     },
     map_select_supportedplayers = {
-        title = "<LOC OPTIONS_0145>Supported Players",
+        title = "<LOC OPTIONS_0145>Max. Players",
         description = "<LOC OPTIONS_0146>Sort by the maximum number of Players allowed",
     },
     options_vsync = {

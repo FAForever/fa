@@ -17,6 +17,7 @@ local Button = import('/lua/maui/button.lua').Button
 local Group = import('/lua/maui/group.lua').Group
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
 local ResourceMapPreview = import('/lua/ui/controls/resmappreview.lua').ResourceMapPreview
+local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local MainMenu = import('/lua/ui/menus/main.lua')
 local MapUtil = import('/lua/ui/maputil.lua')
 local Mods = import('/lua/mods.lua')
@@ -33,6 +34,7 @@ local posGroup = false
 local mapList = false
 local filters = {}
 local filterTitle = false
+local mapListTitle = false
 local mapsize = false
 local mapplayers = false
 local mapInfo = false
@@ -223,11 +225,19 @@ function CreateFilter(parent, filterData)
     group.title = UIUtil.CreateText(group, filterData.FilterName, 16, UIUtil.bodyFont)
     LayoutHelpers.AtLeftTopIn(group.title, group, 2)
     Tooltip.AddControlTooltip(group.title, filterData.FilterKey)
+    group.Height:Set(function() return group.title.Height() + 4 end)
 
     group.combo = Combo(group, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
     LayoutHelpers.AtVerticalCenterIn(group.combo, group.title)
-    group.combo.Right:Set(group.Right)
+    group.combo.Right:Set(function() return group.Right() - 10 end)
     group.combo.Width:Set(80)
+
+    local comboBg = Bitmap(group)
+    comboBg.Depth:Set(group.Depth)
+    comboBg.Width:Set(group.Width() + 4)
+    comboBg.Height:Set(group.Height() + 4)
+    LayoutHelpers.AtLeftTopIn(comboBg, group, -2, -4)
+    comboBg:SetTexture(UIUtil.UIFile('/dialogs/mapselect03/options-panel-bar_bmp.dds'))
 
     local itemArray = {}
     local keyMap = {}
@@ -303,57 +313,41 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     LoadScenarios()
 
     -- control layout
-    local parent = nil
-    local background = nil
-    if over then
-        parent = UIUtil.CreateScreenGroup(over, "<LOC MAPSEL_0001>Map Select Screen Group")
-        parent.Depth:Set(GetFrame(over:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 1)
-    else
-        parent = UIUtil.CreateScreenGroup(GetFrame(0), "<LOC MAPSEL_0002>Map Select Screen Group")
-        background = MenuCommon.SetupBackground(GetFrame(0))
-    end
+    local dialogContent = Group(over)
+    dialogContent.Width:Set(914)
+    dialogContent.Height:Set(692)
 
-    -- don't parent background to screen group so it doesn't get destroyed until we leave the menus
+    local popup = Popup(over, dialogContent)
 
-    local exitButton = nil
-    if background then
-        exitButton = MenuCommon.CreateExitMenuButton(parent, background, "<LOC _Back>")
-    end
+    local title = UIUtil.CreateText(dialogContent, "<LOC map_sel_0000>", 24)
+    LayoutHelpers.AtTopIn(title, dialogContent, 10)
+    LayoutHelpers.AtHorizontalCenterIn(title, dialogContent)
 
-    --TODO this panel needs to be moved to dialogs
-    local panel = Bitmap(parent, UIUtil.UIFile('/scx_menu/game-settings/panel_bmp.dds'))
-    panel.brackets = UIUtil.CreateDialogBrackets(panel, 40, 35, 40, 33)
-    LayoutHelpers.AtCenterIn(panel, parent)
+    local cancelButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Cancel>")
+    LayoutHelpers.AtRightIn(cancelButton, dialogContent, 3)
+    LayoutHelpers.AtBottomIn(cancelButton, dialogContent, 10)
 
-    local title = UIUtil.CreateText(panel, "<LOC map_sel_0000>", 24)
-    LayoutHelpers.AtTopIn(title, panel, 22)
-    LayoutHelpers.AtHorizontalCenterIn(title, panel)
+    selectButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _OK>")
+    LayoutHelpers.LeftOf(selectButton, cancelButton, 65)
 
-    local cancelButton = UIUtil.CreateButtonStd(panel, '/scx_menu/small-btn/small', "<LOC _Cancel>", 16, 2, 0, "UI_Menu_Cancel_02")
-    LayoutHelpers.AtRightTopIn(cancelButton, panel, 15, 645)
-
-    selectButton = UIUtil.CreateButtonStd(panel, '/scx_menu/small-btn/small', "<LOC _OK>", 16, 2)
-    LayoutHelpers.AtRightTopIn(selectButton, panel, 200, 645)
-
-    selectButton.Depth:Set(function() return panel.Depth() + 10 end) --TODO what is this getting under when it's in over state?
-
-    local modButton = UIUtil.CreateButtonStd(panel, '/scx_menu/small-btn/small', "<LOC tooltipui0145>", 16, 2)
-    LayoutHelpers.AtLeftTopIn(modButton, panel, 15, 645)
-    selectButton.Depth:Set(function() return panel.Depth() + 10 end)
+    local modButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC tooltipui0145>")
+    LayoutHelpers.LeftOf(modButton, selectButton, 65)
     Tooltip.AddButtonTooltip(modButton, "Lobby_Mods")
     modButton.OnClick = function(self, modifiers)
         local availableMods = ModManager.HostModStatus(availableMods)
-        ModManager.NEW_MODS_GUI(panel, true, nil, availableMods)
+        ModManager.NEW_MODS_GUI(dialogContent, true, nil, availableMods)
     end
 
-    local restrictedUnitsButton = UIUtil.CreateButtonStd(modButton, '/scx_menu/small-btn/small', "<LOC sel_map_0006>Unit Manager", 16, 2)
-    LayoutHelpers.AtLeftTopIn(restrictedUnitsButton, panel, 200, 645)
+    local restrictedUnitsButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC sel_map_0006>Unit Manager")
+    LayoutHelpers.LeftOf(restrictedUnitsButton, modButton, 65)
     Tooltip.AddButtonTooltip(restrictedUnitsButton, "lob_RestrictedUnits")
 
-    if not restrictedCategories then restrictedCategories = curOptions.RestrictedCategories end
+    if not restrictedCategories then
+        restrictedCategories = curOptions.RestrictedCategories
+    end
     restrictedUnitsButton.OnClick = function(self, modifiers)
         mapList:AbandonKeyboardFocus()
-        import('/lua/ui/lobby/restrictedUnitsDlg.lua').CreateDialog(parent,
+        import('/lua/ui/lobby/restrictedUnitsDlg.lua').CreateDialog(dialogContent,
             restrictedCategories,
             function(rc)
                 restrictedCategories = rc
@@ -366,10 +360,11 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     end
 
     local doNotRepeatMap
-    local randomMapButton = UIUtil.CreateButtonStd(modButton, '/scx_menu/small-btn/small', "<LOC lobui_0503>Random Map", 16, 2)
-    LayoutHelpers.AtLeftTopIn(randomMapButton, panel, 385, 645)
+    local randomMapButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC lobui_0503>Random Map")
+    LayoutHelpers.LeftOf(randomMapButton, restrictedUnitsButton, 65)
     Tooltip.AddButtonTooltip(randomMapButton, 'lob_click_randmap')
 
+    -- TODO: This logic is duplicated in lobby.lua (where there's another button to do the same job)
     randomMapButton.OnClick = function(self, modifiers)
         local randomMapIndex = math.floor(math.random(1, mapList:GetItemCount()))
         mapList:OnClick(randomMapIndex)
@@ -394,33 +389,86 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
         ResetFilters()
     end
 
-    UIUtil.MakeInputModal(panel)
+    UIUtil.MakeInputModal(dialogContent)
 
-    mapListTitle = UIUtil.CreateText(panel, "<LOC sel_map_0005>Maps", 18)
-    LayoutHelpers.AtLeftTopIn(mapListTitle, panel, 360, 207)
+    local MAP_PREVIEW_SIZE = 290
+    local preview = ResourceMapPreview(dialogContent, MAP_PREVIEW_SIZE, 5, 8, true)
+    UIUtil.SurroundWithBorder(preview, '/scx_menu/lan-game-lobby/frame/')
+    LayoutHelpers.AtLeftTopIn(preview, dialogContent, 20, 50)
 
-    mapList = ItemList(panel, "mapselect:mapList")
+    local nopreviewtext = UIUtil.CreateText(dialogContent, "<LOC _No_Preview>No Preview", 24)
+    LayoutHelpers.AtCenterIn(nopreviewtext, preview)
+    nopreviewtext:Hide()
+
+    -- A Group to enclose the map info elements.
+    local mapInfoGroup = Group(dialogContent)
+    mapInfoGroup.Width:Set(MAP_PREVIEW_SIZE)
+    LayoutHelpers.Below(mapInfoGroup, preview, 23)
+    local descriptionTitle = UIUtil.CreateText(dialogContent, "<LOC sel_map_0000>Map Info", 18)
+    LayoutHelpers.AtLeftTopIn(descriptionTitle, mapInfoGroup, 2, 2)
+
+    description = ItemList(mapInfoGroup, "mapselect:description")
+    description:SetFont(UIUtil.bodyFont, 14)
+    description:SetColors(UIUtil.fontColor, "00000000", UIUtil.fontColor, "00000000")
+    description.Width:Set(273)
+    description.Height:Set(236)
+    LayoutHelpers.Below(description, descriptionTitle)
+    UIUtil.CreateLobbyVertScrollbar(description)
+    mapInfoGroup.Bottom:Set(description.Bottom)
+    UIUtil.SurroundWithBorder(mapInfoGroup, '/scx_menu/lan-game-lobby/frame/')
+
+    -- A Group to contain the filter UI elements.
+    local filterGroup = Group(dialogContent)
+    UIUtil.SurroundWithBorder(filterGroup, '/scx_menu/lan-game-lobby/frame/')
+    LayoutHelpers.RightOf(filterGroup, preview, 23)
+
+    filterTitle = UIUtil.CreateText(dialogContent, "<LOC sel_map_0003>Filters", 18)
+    LayoutHelpers.AtLeftTopIn(filterTitle, filterGroup, 2, 2)
+
+    for i, filterData in mapFilters do
+        filters[i] = CreateFilter(filterTitle, filterData)
+        if i == 1 then
+            LayoutHelpers.Below(filters[1], filterTitle)
+        else
+            LayoutHelpers.Below(filters[i], filters[i - 1], 10)
+        end
+    end
+
+    -- Expand the group to encompass all the filter controls
+    filterGroup.Bottom:Set(function() return filters[table.getn(filters)].Bottom() + 3 end)
+    filterGroup.Right:Set(filters[table.getn(filters)].Right)
+
+    local mapSelectGroup = Group(dialogContent)
+    UIUtil.SurroundWithBorder(mapSelectGroup, '/scx_menu/lan-game-lobby/frame/')
+    mapSelectGroup.Right:Set(filterGroup.Right)
+    LayoutHelpers.Below(mapSelectGroup, filterGroup, 23)
+    mapListTitle = UIUtil.CreateText(dialogContent, "<LOC sel_map_0005>Maps", 18)
+    LayoutHelpers.AtLeftTopIn(mapListTitle, mapSelectGroup, 2, 2)
+
+    mapList = ItemList(dialogContent, "mapselect:mapList")
     mapList:SetFont(UIUtil.bodyFont, 14)
     mapList:SetColors(UIUtil.fontColor, "00000000", "FF000000",  UIUtil.highlightColor, "ffbcfffe")
     mapList:ShowMouseoverItem(true)
-    mapList.Width:Set(258)
-    mapList.Height:Set(409)
-    LayoutHelpers.AtLeftTopIn(mapList, panel, 360, 232)
     --TODO what is this getting under when it's in over state?
-    mapList.Depth:Set(function() return panel.Depth() + 10 end)
+    mapList.Depth:Set(function() return dialogContent.Depth() + 10 end)
+    -- Allocating space for the scrollbar.
+    mapList.Width:Set(function() return mapSelectGroup.Width() - 16 end)
+    mapList.Bottom:Set(mapInfoGroup.Bottom)
+    LayoutHelpers.Below(mapList, mapListTitle)
     mapList:AcquireKeyboardFocus(true)
     mapList.OnDestroy = function(control)
         mapList:AbandonKeyboardFocus()
         ItemList.OnDestroy(control)
     end
+    mapSelectGroup.Bottom:Set(mapList.Bottom)
 
     mapList.HandleEvent = function(self,event)
         if event.Type == 'KeyDown' then
             if event.KeyCode == UIUtil.VK_ESCAPE then
-                cancelButton.OnClick(cancelButton)
+                cancelButton:OnClick()
                 return true
             elseif event.KeyCode == UIUtil.VK_ENTER then
-                selectButton.OnClick(selectButton)
+                selectButton:OnClick()
                 return true
             end
         end
@@ -428,52 +476,17 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
         return ItemList.HandleEvent(self,event)
     end
 
-    UIUtil.CreateVertScrollbarFor(mapList)
-
-    local preview = ResourceMapPreview(panel, 290, 5, 8, true)
-    LayoutHelpers.AtLeftTopIn(preview, panel, 37, 102)
-
-    local previewOverlay = Bitmap(preview, UIUtil.UIFile('/dialogs/mapselect03/map-panel-glow_bmp.dds'))
-    LayoutHelpers.AtCenterIn(previewOverlay, preview)
-
-    local nopreviewtext = UIUtil.CreateText(panel, "<LOC _No_Preview>No Preview", 24)
-    LayoutHelpers.AtCenterIn(nopreviewtext, preview)
-    nopreviewtext:Hide()
-
-    descriptionTitle = UIUtil.CreateText(panel, "<LOC sel_map_0000>Map Info", 18)
-    LayoutHelpers.AtLeftTopIn(descriptionTitle, panel, 35, 420)
-
-    description = ItemList(panel, "mapselect:description")
-    description:SetFont(UIUtil.bodyFont, 14)
-    description:SetColors(UIUtil.fontColor, "00000000", UIUtil.fontColor, "00000000")
-    description.Width:Set(273)
-    description.Height:Set(180)
-    LayoutHelpers.AtLeftTopIn(description, panel, 33, 450)
-    UIUtil.CreateVertScrollbarFor(description)
-
-    filterTitle = UIUtil.CreateText(panel, "<LOC sel_map_0003>Filters", 18)
-    LayoutHelpers.AtLeftTopIn(filterTitle, panel, 360, 60)
-
-    for i, filterData in mapFilters do
-        filters[i] = CreateFilter(filterTitle, filterData)
-        if i == 1 then
-            LayoutHelpers.Below(filters[1], filterTitle, 10)
-        else
-            LayoutHelpers.Below(filters[i], filters[i - 1], 10)
-        end
-    end
+    UIUtil.CreateLobbyVertScrollbar(mapList)
 
     -- initialize controls
     PopulateMapList()
-    SetupOptionsPanel(panel, singlePlayer, curOptions)
 
-    --  control behvaior
-    if exitButton then
-        exitButton.OnClick = function(self)
-            exitBehavior()
-            ResetFilters()
-        end
-    end
+    local OptionGroup = Group(dialogContent)
+    UIUtil.SurroundWithBorder(OptionGroup, '/scx_menu/lan-game-lobby/frame/')
+    OptionGroup.Width:Set(250)
+    OptionGroup.Bottom:Set(mapSelectGroup.Bottom)
+    LayoutHelpers.RightOf(OptionGroup, filterGroup, 23)
+    SetupOptionsPanel(OptionGroup, singlePlayer, curOptions)
 
     selectButton.OnClick = function(self, modifiers)
         selectBehavior(selectedScenario, changedOptions, restrictedCategories)
@@ -545,13 +558,13 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     mapList:OnClick(defaultRow, true)
     mapList:ShowItem(defaultRow)
 
-    return parent
+    return popup
 end
 
 function RefreshOptions(skipRefresh, singlePlayer)
     -- a little weird, but the "skip refresh" is set to prevent calc visible from being called before the control is properly setup
     -- it also means it's a flag that tells you this is the first time the dialog has been opened
-    -- so we'll used this flag to reset the options sources so they can set up for multiplayer
+    -- so we'll use this flag to reset the options sources so they can set up for multiplayer
     if skipRefresh then
         OptionSource[1] = {title = "<LOC uilobby_0001>Team Options", options = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions}
         OptionSource[2] = {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts}
@@ -578,25 +591,21 @@ function RefreshOptions(skipRefresh, singlePlayer)
 end
 
 function SetupOptionsPanel(parent, singlePlayer, curOptions)
-    ---------------------------------------------
-    --Set Up Debriefing Area
-    ---------------------------------------------
     local title = UIUtil.CreateText(parent, '<LOC PROFILE_0012>', 18)
-    LayoutHelpers.AtLeftTopIn(title, parent, 660, 60)
+    LayoutHelpers.AtLeftTopIn(title, parent, 2, 2)
 
     OptionContainer = Group(parent)
-    OptionContainer.Height:Set(556)
-    OptionContainer.Width:Set(260)
+    OptionContainer.Height:Set(function() return parent.Height() - title.Height() - 2 end)
+    OptionContainer.Width:Set(function() return parent.Width() - 16 end)
     OptionContainer.top = 0
-    LayoutHelpers.AtLeftTopIn(OptionContainer, parent, 670, 84)
+    LayoutHelpers.Below(OptionContainer, title)
 
     local OptionDisplay = {}
     RefreshOptions(true, singlePlayer)
 
     local function CreateOptionCombo(parent, optionData, width)
         local combo = Combo(parent, nil, nil, nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
-        combo.Width:Set(240)
-        combo.Depth:Set(function() return parent.Depth() + 10 end)
+        combo.Width:Set(220)
         local itemArray = {}
         combo.keyMap = {}
         local tooltipTable = {}
@@ -617,7 +626,7 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
             OptionDisplay[index].bg = Bitmap(OptionDisplay[index])
             OptionDisplay[index].bg.Depth:Set(OptionDisplay[index].Depth)
             LayoutHelpers.FillParent(OptionDisplay[index].bg, OptionDisplay[index])
-            OptionDisplay[index].bg.Right:Set(function() return OptionDisplay[index].Right() - 10 end)
+            OptionDisplay[index].bg.Right:Set(function() return OptionDisplay[index].Right() - 2 end)
 
             OptionDisplay[index].text = UIUtil.CreateText(OptionContainer, '', 14, "Arial")
             OptionDisplay[index].text:DisableHitTest()
@@ -628,7 +637,7 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
         end
 
         CreateElement(1)
-        LayoutHelpers.AtLeftTopIn(OptionDisplay[1], OptionContainer)
+        LayoutHelpers.Below(OptionDisplay[1], title, -5)
 
         local index = 2
         while OptionDisplay[table.getsize(OptionDisplay)].Bottom() + OptionDisplay[1].Height() < OptionContainer.Bottom() do
@@ -775,7 +784,7 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
         end
     end
 
-    UIUtil.CreateVertScrollbarFor(OptionContainer)
+    UIUtil.CreateLobbyVertScrollbar(OptionContainer)
 end
 
 function SetDescription(scen)

@@ -92,6 +92,7 @@ Combo = Class(Group) {
         self._text.Left:Set(function() return self._btnLeft.Left() + 5 end)
         self._text.Right:Set(function() return self._btnMid.Right() + 5 end)
         self._text:SetClipToWidth(true)
+        self._text:SetDropShadow(true)
 
         self._dropdown = Group(self._text)
         self._dropdown.Top:Set(self.Bottom)

@@ -2622,7 +2622,6 @@ function CreateSlotsUI(makeLabel)
         local nameLabel = Combo(bg, 14, 12, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         newSlot.name = nameLabel
         nameLabel._text:SetFont('Arial Gras', 15)
-        nameLabel._text:SetDropShadow(true)
         LayoutHelpers.AtVerticalCenterIn(nameLabel, newSlot, 8)
         LayoutHelpers.AtLeftIn(nameLabel, GUI.panel, slotColumnSizes.player.x)
         nameLabel.Width:Set(slotColumnSizes.player.width)
@@ -3007,7 +3006,7 @@ function CreateUI(maxPlayers)
             end
 
             local function exitBehavior()
-                mapSelectDialog:Destroy()
+                mapSelectDialog:Close()
                 GUI.chatEdit:AcquireFocus()
                 UpdateGame()
             end
