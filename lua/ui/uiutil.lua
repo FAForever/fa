@@ -564,6 +564,7 @@ function SurroundWithBorder(control, texturePath, fudgeX, fudgeY)
     )
 
     border:Surround(control, fudgeX or 62, fudgeY or 62)
+    LayoutHelpers.DepthOverParent(border, control, 2)
 end
 
 -- Create a checkbox using the default checkbox texture. Kept as its own entry point for the benefit
@@ -627,15 +628,15 @@ function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom,
 
     local scrollUpButton = Button(  scrollbar
                                     , SkinnableFile(textureName..'arrow-up_scr_up.dds')
-                                    , SkinnableFile(textureName..'arrow-up_scr_over.dds')
                                     , SkinnableFile(textureName..'arrow-up_scr_down.dds')
+                                    , SkinnableFile(textureName..'arrow-up_scr_over.dds')
                                     , SkinnableFile(textureName..'arrow-up_scr_dis.dds')
                                     , "UI_Arrow_Click")
 
     local scrollDownButton = Button(  scrollbar
                                     , SkinnableFile(textureName..'arrow-down_scr_up.dds')
-                                    , SkinnableFile(textureName..'arrow-down_scr_over.dds')
                                     , SkinnableFile(textureName..'arrow-down_scr_down.dds')
+                                    , SkinnableFile(textureName..'arrow-down_scr_over.dds')
                                     , SkinnableFile(textureName..'arrow-down_scr_dis.dds')
                                     , "UI_Arrow_Click")
 
@@ -657,7 +658,7 @@ function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom,
     return scrollbar
 end
 
-function CreateLobbyVertScrollbar(attachto, offset_right, filename, offset_bottom, offset_top)
+function CreateLobbyVertScrollbar(attachto, offset_right, offset_bottom, offset_top)
     return CreateVertScrollbarFor(attachto, offset_right, "/SCROLLBAR_VERT/", offset_bottom, offset_top)
 end
 

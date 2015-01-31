@@ -3070,17 +3070,17 @@ function CreateUI(maxPlayers)
     GUI.chatDisplay = ItemList(GUI.chatPanel)
     GUI.chatDisplay:SetFont(UIUtil.bodyFont, tonumber(Prefs.GetFromCurrentProfile('LobbyChatFontSize')) or 14)
     GUI.chatDisplay:SetColors(UIUtil.fontColor(), "00000000", UIUtil.fontColor(), "00000000")
-    LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.chatPanel)
-    GUI.chatDisplay.Height:Set(function() return GUI.chatPanel.Height() - GUI.chatBG.Height() end)
+    LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.chatPanel, 2, 2)
+    GUI.chatDisplay.Height:Set(function() return GUI.chatPanel.Height() - GUI.chatBG.Height() - 2 end)
     -- Leave space for the scrollbar.
-    GUI.chatDisplay.Width:Set(function() return GUI.chatPanel.Width() - 16 end)
+    GUI.chatDisplay.Width:Set(function() return GUI.chatPanel.Width() - 17 end)
 
     -- Annoying evil extra Bitmap to make chat box have padding inside its background.
     local chatBG = Bitmap(GUI.chatPanel)
     GUI.chatBG = chatBG
     chatBG:SetSolidColor('FF212123')
     LayoutHelpers.Below(chatBG, GUI.chatDisplay)
-    LayoutHelpers.AtLeftIn(chatBG, GUI.chatDisplay, -1)
+    LayoutHelpers.AtLeftIn(chatBG, GUI.chatDisplay, -3)
     chatBG.Width:Set(GUI.chatPanel.Width() + 3)
     chatBG.Height:Set(24)
 
@@ -3094,7 +3094,7 @@ function CreateUI(maxPlayers)
     GUI.chatEdit:SetDropShadow(true)
     GUI.chatEdit:AcquireFocus()
 
-    GUI.chatDisplayScroll = UIUtil.CreateLobbyVertScrollbar(GUI.chatDisplay)
+    GUI.chatDisplayScroll = UIUtil.CreateLobbyVertScrollbar(GUI.chatDisplay, 1, 0, -2)
 
     GUI.chatEdit:SetMaxChars(200)
     GUI.chatEdit.OnCharPressed = function(self, charcode)
@@ -3172,7 +3172,7 @@ function CreateUI(maxPlayers)
     GUI.OptionContainer.Bottom:Set(GUI.optionsPanel.Bottom)
 
     -- Leave space for the scrollbar.
-    GUI.OptionContainer.Width:Set(function() return GUI.optionsPanel.Width() - 16 end)
+    GUI.OptionContainer.Width:Set(function() return GUI.optionsPanel.Width() - 15 end)
     GUI.OptionContainer.top = 0
     LayoutHelpers.AtLeftTopIn(GUI.OptionContainer, GUI.optionsPanel, 0, 28)
 
@@ -3181,6 +3181,20 @@ function CreateUI(maxPlayers)
     function CreateOptionElements()
         local function CreateElement(index)
             local element = Group(GUI.OptionContainer)
+
+            element.bg = Bitmap(element)
+            element.bg:SetSolidColor('ff333333')
+            element.bg.Left:Set(element.Left)
+            element.bg.Right:Set(element.Right)
+            element.bg.Bottom:Set(function() return element.value.Bottom() + 2 end)
+            element.bg.Top:Set(element.Top)
+
+            element.bg2 = Bitmap(element)
+            element.bg2:SetSolidColor('ff000000')
+            element.bg2.Left:Set(function() return element.bg.Left() + 1 end)
+            element.bg2.Right:Set(function() return element.bg.Right() - 1 end)
+            element.bg2.Bottom:Set(function() return element.bg.Bottom() - 1 end)
+            element.bg2.Top:Set(function() return element.value.Top() + 0 end)
 
             element.Height:Set(36)
             element.Width:Set(GUI.OptionContainer.Width)
@@ -3195,22 +3209,6 @@ function CreateUI(maxPlayers)
             element.value:SetColor(UIUtil.fontOverColor)
             element.value:DisableHitTest()
             LayoutHelpers.AtRightTopIn(element.value, element, 5, 16)
-
-            element.value.bg = Bitmap(element)
-            element.value.bg:SetSolidColor('ff333333')
-            element.value.bg.Left:Set(element.Left)
-            element.value.bg.Right:Set(element.Right)
-            element.value.bg.Bottom:Set(function() return element.value.Bottom() + 2 end)
-            element.value.bg.Top:Set(element.Top)
-            element.value.bg.Depth:Set(function() return element.Depth() - 2 end)
-
-            element.value.bg2 = Bitmap(element)
-            element.value.bg2:SetSolidColor('ff000000')
-            element.value.bg2.Left:Set(function() return element.value.bg.Left() + 1 end)
-            element.value.bg2.Right:Set(function() return element.value.bg.Right() - 1 end)
-            element.value.bg2.Bottom:Set(function() return element.value.bg.Bottom() - 1 end)
-            element.value.bg2.Top:Set(function() return element.value.Top() + 0 end)
-            element.value.bg2.Depth:Set(function() return element.value.bg.Depth() + 1 end)
 
             GUI.OptionDisplay[index] = element
         end
@@ -3287,14 +3285,14 @@ function CreateUI(maxPlayers)
                 LayoutHelpers.ResetLeft(line.value)
             end
             line.text:SetText(LOC(data.text))
-            line.value.bg:Show()
+            line.bg:Show()
             line.value:SetText(LOC(data.value))
-            line.value.bg2:Show()
-            line.value.bg.HandleEvent = Group.HandleEvent
-            line.value.bg2.HandleEvent = Bitmap.HandleEvent
+            line.bg2:Show()
+            line.bg.HandleEvent = Group.HandleEvent
+            line.bg2.HandleEvent = Bitmap.HandleEvent
             if data.tooltip then
-                Tooltip.AddControlTooltip(line.value.bg, data.tooltip)
-                Tooltip.AddControlTooltip(line.value.bg2, data.valueTooltip)
+                Tooltip.AddControlTooltip(line.bg, data.tooltip)
+                Tooltip.AddControlTooltip(line.bg2, data.valueTooltip)
             end
         end
 
@@ -3311,8 +3309,8 @@ function CreateUI(maxPlayers)
             else
                 v.text:SetText('')
                 v.value:SetText('')
-                v.value.bg:Hide()
-                v.value.bg2:Hide()
+                v.bg:Hide()
+                v.bg2:Hide()
             end
         end
     end
@@ -3329,7 +3327,7 @@ function CreateUI(maxPlayers)
 
     RefreshOptionDisplayData()
 
-    UIUtil.CreateLobbyVertScrollbar(GUI.OptionContainer)
+    UIUtil.CreateLobbyVertScrollbar(GUI.OptionContainer, 1)
 
     -- Create skirmish mode's "load game" button.
     GUI.loadButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/',"<LOC lobui_0176>Load")
@@ -3593,8 +3591,6 @@ function CreateUI(maxPlayers)
     -- CPU BENCH BUTTON --
     GUI.rerunBenchmark = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/cputest/', '', 11)
     GUI.rerunBenchmark:Disable()
-    -- Evil hack to eliminate the gap between the buttons. These negative offsets shouldn't be
-    -- needed, but I just can't figure out why it's doing it :/
     LayoutHelpers.RightOf(GUI.rerunBenchmark, GUI.becomeObserver, -20)
     Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text='Run CPU Benchmark Test', body='Recalculates your CPU rating.'})
 
