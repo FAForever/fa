@@ -297,34 +297,8 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     Tooltip.AddButtonTooltip(randomMapButton, 'lob_click_randmap')
 
     randomMapButton.OnClick = function(self, modifiers)
-        if randMapList ~= 0 then
-            local randomMapMessage
-            local nummapa
-            nummapa = math.random(1, randMapList)
-            if randMapList >= 2 and nummapa == doNotRepeatMap then
-                repeat
-                    nummapa = math.random(1, randMapList)
-                until nummapa ~= doNotRepeatMap
-            end
-            doNotRepeatMap = nummapa
-            local scen = scenarios[scenarioKeymap[nummapa]]
-            selectedScenario = scen
-            if not singlePlayer then
-                rMapName = scenarios[scenarioKeymap[nummapa]].name
-                rMapSize1 = scenarios[scenarioKeymap[nummapa]].size[1]/50
-                rMapSize2 = scenarios[scenarioKeymap[nummapa]].size[2]/50
-                rMapSizeFilLim = currentFilters.map_select_size_limiter
-                rMapSizeFil = currentFilters.map_select_size/50
-                rMapPlayersFilLim = currentFilters.map_select_supportedplayers_limiter
-                rMapPlayersFil = currentFilters.map_select_supportedplayers
-                rMapTypeFil = currentFilters.map_type
-            end
-            selectBehavior(selectedScenario, changedOptions, restrictedCategories)
-            ResetFilters()
-            if not singlePlayer then
-                randomMapMessage = import('/lua/ui/lobby/lobby.lua').sendRandMapMessage()
-            end
-        end
+        local randomMapIndex = math.floor(math.random(1, mapList:GetItemCount()))
+        mapList:OnClick(randomMapIndex)
     end
     if not singlePlayer then
         function randomLobbyMap()
@@ -489,22 +463,18 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
         end
     end
 
-    mapList.OnKeySelect = function(self,row)
+    -- Called when the selected map is changed.
+    local onItemChanged = function(self, row, noSound)
         mapList:SetSelection(row)
         PreloadMap(row)
-        local sound = Sound({Cue = "UI_Skirmish_Map_Select", Bank = "Interface",})
-        PlaySound(sound)
-    end
-
-    mapList.OnClick = function(self, row, noSound)
-        mapList:SetSelection(row)
-        PreloadMap(row)
-        local sound = Sound({Cue = "UI_Skirmish_Map_Select", Bank = "Interface",})
+        local sound = Sound({Cue = "UI_Skirmish_Map_Select", Bank = "Interface"})
         if not noSound then
             PlaySound(sound)
         end
     end
 
+    mapList.OnKeySelect = onItemChanged
+    mapList.OnClick = onItemChanged
     mapList.OnDoubleClick = function(self, row)
         mapList:SetSelection(row)
         PreloadMap(row)
