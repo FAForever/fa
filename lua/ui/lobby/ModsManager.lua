@@ -227,7 +227,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
     function Refresh_Mod_List(showGameMods, showUIMods, hideUnselected, IsHost, modstatus, useCompactView)
         index = 0
         exclusiveMod = false
-        current_list = {}
+        local current_list = {}
         scrollGroup.controlList = {}
         local allmods = Mods.AllSelectableMods()
         local selmods = Mods.GetSelectedMods()
@@ -246,11 +246,6 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
             for k, v in GetUI_Activatedmods do
                 table.insert(current_list, v)
             end
-            if showUIMods then
-                for k, v in GetUI_Unactivatedmods do
-                    table.insert(current_list, v)
-                end
-            end
         else
             for k, v in GetSIM_Activatedmods do
                 table.insert(current_list, v)
@@ -263,10 +258,10 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
                     table.insert(current_list, v)
                 end
             end
-            if showUIMods then
-                for k, v in GetUI_Unactivatedmods do
-                    table.insert(current_list, v)
-                end
+        end
+        if showUIMods then
+            for k, v in GetUI_Unactivatedmods do
+                table.insert(current_list, v)
             end
         end
         
