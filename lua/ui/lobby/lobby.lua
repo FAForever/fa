@@ -2962,7 +2962,7 @@ function CreateUI(maxPlayers)
     LayoutHelpers.DepthOverParent(GUI.LargeMapPreview, GUI.mapView, 2)
     Tooltip.AddButtonTooltip(GUI.LargeMapPreview, 'lob_click_LargeMapPreview')
     GUI.LargeMapPreview.OnClick = function()
-        ShowBigPreview()
+        CreateBigPreview(GUI)
     end
 
     -- Checkbox Show changed Options
@@ -4636,8 +4636,9 @@ local LrgMap = false
 -- Perform one-time setup of the large map preview
 function CreateBigPreview(parent)
     if LrgMap then
-        LrgMap:Show()
         LrgMap.isHidden = false
+        RefreshLargeMap()
+        LrgMap:Show()
         return
     end
 
@@ -4686,10 +4687,6 @@ function RefreshLargeMap()
     local scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
     LrgMap.content.mapPreview:SetScenario(scenarioInfo)
     ShowMapPositions(LrgMap.content.mapPreview, scenarioInfo, GetPlayerCount())
-end
-
-function ShowBigPreview()
-    CreateBigPreview(GUI)
 end
 
 --CPU Status Bar Configuration
