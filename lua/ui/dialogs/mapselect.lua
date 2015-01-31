@@ -38,14 +38,8 @@ local mapplayers = false
 local mapInfo = false
 local selectButton = false
 
-local currentFilters = {
-    ['map_select_supportedplayers'] = 0,
-    ['map_select_size'] = 0,
-    ['map_select_supportedplayers_limiter'] = "equal",
-    ['map_select_size_limiter'] = "equal",
-    ['map_type'] = 0,
-    ['map_ai_markers'] = 0,
-}
+-- Table contianing filter functions to apply to the map list.
+local currentFilters = {}
 
 local scenarioKeymap = {}
 local Options = {}
@@ -55,6 +49,74 @@ local advOptions = false
 local changedOptions = {}
 local restrictedCategories = nil
 
+-- Maps the names of all official maps to the value "true".
+local OFFICAL_MAPS = {
+    ['Burial Mounds'] = true,
+    ['Concord Lake'] = true,
+    ["Drake's Ravine"] = true,
+    ['Emerald Crater'] = true,
+    ["Gentleman's Reef"] = true,
+    ["Ian's Cross"] = true,
+    ['Open Palms'] = true,
+    ['Seraphim Glaciers'] = true,
+    ["Seton's Clutch"] = true,
+    ['Sung Island'] = true,
+    ['The Great Void'] = true,
+    ['Theta Passage'] = true,
+    ['Winter Duel'] = true,
+    ['The Bermuda Locket'] = true,
+    ['Fields of Isis'] = true,
+    ['Canis River'] = true,
+    ['Syrtis Major'] = true,
+    ['Sentry Point'] = true,
+    ["Finn's Revenge"] = true,
+    ['Roanoke Abyss'] = true,
+    ['Alpha 7 Quarantine'] = true,
+    ['Arctic Refuge'] = true,
+    ['Varga Pass'] = true,
+    ['Crossfire Canal'] = true,
+    ['Saltrock Colony'] = true,
+    ['Vya-3 Protectorate'] = true,
+    ['The Scar'] = true,
+    ['Hanna Oasis'] = true,
+    ['Betrayal Ocean'] = true,
+    ['Frostmill Ruins'] = true,
+    ['Four-Leaf Clover'] = true,
+    ['The Wilderness'] = true,
+    ['White Fire'] = true,
+    ['High Noon'] = true,
+    ['Paradise'] = true,
+    ['Blasted Rock'] = true,
+    ['Sludge'] = true,
+    ['Ambush Pass'] = true,
+    ['Four-Corners'] = true,
+    ['The Ditch'] = true,
+    ['Crag Dunes'] = true,
+    ["Williamson's Bridge"] = true,
+    ['Snoey Triangle'] = true,
+    ['Haven Reef'] = true,
+    ['The Dark Heart'] = true,
+    ["Daroza's Sanctuary"] = true,
+    ['Strip Mine'] = true,
+    ['Thawing Glacier'] = true,
+    ['Liberiam Battles'] = true,
+    ['Shards'] = true,
+    ['Shuriken Island'] = true,
+    ['Debris'] = true,
+    ['Flooded Strip Mine'] = true,
+    ['Eye of the Storm'] = true
+}
+
+function CheckMapIsOfficial(scenario)
+    return OFFICAL_MAPS[scenario.name] == true
+end
+
+-- Maps dropdown labels to comparator functions. Used by filter factories.
+local comparatorMap = {
+    function(a, b) return a == b end,
+    function(a, b) return a >= b end,
+    function(a, b) return a <= b end
+}
 mapFilters = {
     {
         FilterName = "<LOC MAPSEL_0009>Supported Players",
@@ -68,10 +130,24 @@ mapFilters = {
             {text = "<LOC MAPSEL_0015>6", key = 6},
             {text = "<LOC MAPSEL_0016>7", key = 7},
             {text = "<LOC MAPSEL_0017>8", key = 8},
-            {text = "<LOC lobui_0714>9", key = 9},
+            {text = "<LOC lobui_0714>9",  key = 9},
             {text = "<LOC lobui_0715>10", key = 10},
             {text = "<LOC lobui_0716>11", key = 11},
             {text = "<LOC lobui_0717>12", key = 12},
+        },
+        -- Builds specialised filtering closures for the given filter configuration.
+        FilterFactory = {
+            SelectedKey = 0,
+            SelectedComparator = 1,
+            Build = function(self)
+                -- Closure copy.
+                local compareFunc = comparatorMap[self.SelectedComparator]
+                local targetValue = self.SelectedKey
+                return function(scenInfo)
+                    local startPositions = table.getsize(scenInfo.Configurations.standard.teams[1].armies)
+                    return compareFunc(startPositions, targetValue)
+                end
+            end
         }
     },
     {
@@ -84,6 +160,17 @@ mapFilters = {
             {text = "<LOC MAPSEL_0028>20km", key = 1024},
             {text = "<LOC MAPSEL_0029>40km", key = 2048},
             {text = "<LOC MAPSEL_0030>81km", key = 4096},
+        },
+        FilterFactory = {
+            SelectedKey = 0,
+            SelectedComparator = 1,
+            Build = function(self)
+                local compareFunc = comparatorMap[self.SelectedComparator]
+                local targetValue = self.SelectedKey
+                return function(scenInfo)
+                    return compareFunc(scenInfo.size[1], targetValue)
+                end
+            end
         }
     },
     {
@@ -94,7 +181,17 @@ mapFilters = {
             {text = "<LOC MAPSEL_0025>All", key = 0},
             {text = "<LOC lobui_0576>Official", key = 1},
             {text = "<LOC lobui_0577>Custom", key = 2},
-        }
+        },
+        FilterFactory = {
+            SelectedKey = 0,
+            Filters = {
+                CheckMapIsOfficial,
+                function(scenInfo) return not CheckMapIsOfficial(scenInfo) end
+            },
+            Build = function(self)
+                return self.Filters[self.SelectedKey]
+            end
+        },
     },
     {
         FilterName = "<LOC lobui_0585>AI Markers",
@@ -104,18 +201,26 @@ mapFilters = {
             {text = "<LOC MAPSEL_0025>All", key = 0},
             {text = "<LOC lobui_0587>Yes", key = 1},
             {text = "<LOC lobui_0588>No", key = 2},
-        }
+        },
+        FilterFactory = {
+            SelectedKey = 0,
+            Filters = {
+                EnhancedLobby.CheckMapHasMarkers,
+                function(scenInfo) return not EnhancedLobby.CheckMapHasMarkers(scenInfo) end
+            },
+            Build = function(self)
+                return self.Filters[self.SelectedKey]
+            end
+        },
     },
 }
 
 -- Create a filter dropdown and title from the table above
 function CreateFilter(parent, filterData)
     local group = Group(parent)
-    group.Depth:Set(function() return parent.Depth() + 10 end)
     group.Width:Set(286)
 
-    local tempname = filterData.FilterName
-    group.title = UIUtil.CreateText(group, tempname, 16, UIUtil.bodyFont)
+    group.title = UIUtil.CreateText(group, filterData.FilterName, 16, UIUtil.bodyFont)
     LayoutHelpers.AtLeftTopIn(group.title, group, 2)
     Tooltip.AddControlTooltip(group.title, filterData.FilterKey)
 
@@ -125,16 +230,27 @@ function CreateFilter(parent, filterData)
     group.combo.Width:Set(80)
 
     local itemArray = {}
-    group.combo.keyMap = {}
+    local keyMap = {}
     for index, val in filterData.Options do
         itemArray[index] = val.text
-        group.combo.keyMap[index] = val.key
+        keyMap[index] = val.key
     end
-    group.combo.Key = filterData.FilterKey
+
+    local filterKey = filterData.FilterKey
+    local filterEntry = filterData -- Closure copy.
     group.combo:AddItems(itemArray, 1)
 
     group.combo.OnClick = function(self, index, text)
-        currentFilters[self.Key] = self.keyMap[index]
+        local factory = filterEntry.FilterFactory
+        factory.SelectedKey = keyMap[index]
+
+        -- Key zero represents the null filter.
+        if keyMap[index] == 0 then
+            currentFilters[filterKey] = nil
+        else
+            currentFilters[filterKey] = factory:Build()
+        end
+
         PopulateMapList()
     end
 
@@ -144,21 +260,17 @@ function CreateFilter(parent, filterData)
         group.comboFilter.Right:Set(function() return group.combo.Left() - 5 end)
         group.comboFilter.Width:Set(60)
 
-        local filterArray = {
-            {text = "=", key = "equal"},
-            {text = ">=", key = "greater"},
-            {text = "<=", key = "less"}}
-        local tempText = {}
-        group.comboFilter.keyMap = {}
-        for index, val in filterArray do
-            tempText[index] = val.text
-            group.comboFilter.keyMap[index] = val.key
-        end
-        group.comboFilter.Key = filterData.FilterKey.."_limiter"
-        group.comboFilter:AddItems(tempText, 1)
+        group.comboFilter:AddItems({"=", ">=", "<="}, 1)
 
         group.comboFilter.OnClick = function(self, index, text)
-            currentFilters[self.Key] = self.keyMap[index]
+            local factory = filterEntry.FilterFactory
+            factory.SelectedComparator = index
+
+            -- Don't activate the filter if the other dropdown has turned it off.
+            if factory.SelectedKey ~= 0 then
+                currentFilters[filterKey] = factory:Build()
+            end
+
             PopulateMapList()
         end
     end
@@ -169,14 +281,7 @@ function CreateFilter(parent, filterData)
 end
 
 local function ResetFilters()
-    currentFilters = {
-        ['map_select_supportedplayers'] = 0,
-        ['map_select_size'] = 0,
-        ['map_select_supportedplayers_limiter'] = "equal",
-        ['map_select_size_limiter'] = "equal",
-        ['map_type'] = 0,
-        ['map_ai_markers'] = 0,
-    }
+    currentFilters = {}
     changedOptions = {}
     selectedScenario = nil
     restrictedCategories = nil
@@ -210,21 +315,6 @@ local function ShowMapPositions(mapCtrl, scenario)
             ((pos[1] / mWidth) * cWidth) - (marker.Width() / 2),
             ((pos[2] / mHeight) * cHeight) - (marker.Height() / 2))
     end
-end
-
-function CheckMapIsOfficial(scenario)
-    local mapsList = {'Burial Mounds', 'Concord Lake', "Drake's Ravine", 'Emerald Crater', "Gentleman's Reef", "Ian's Cross", 'Open Palms', 'Seraphim Glaciers',
-        "Seton's Clutch", 'Sung Island', 'The Great Void', 'Theta Passage', 'Winter Duel', 'The Bermuda Locket', 'Fields of Isis', 'Canis River', 'Syrtis Major',
-        'Sentry Point', "Finn's Revenge", 'Roanoke Abyss', 'Alpha 7 Quarantine', 'Arctic Refuge', 'Varga Pass', 'Crossfire Canal', 'Saltrock Colony',
-        'Vya-3 Protectorate', 'The Scar', 'Hanna Oasis', 'Betrayal Ocean', 'Frostmill Ruins', 'Four-Leaf Clover', 'The Wilderness', 'White Fire', 'High Noon',
-        'Paradise', 'Blasted Rock', 'Sludge', 'Ambush Pass', 'Four-Corners', 'The Ditch', 'Crag Dunes', "Williamson's Bridge", 'Snoey Triangle', 'Haven Reef',
-        'The Dark Heart', "Daroza's Sanctuary", 'Strip Mine', 'Thawing Glacier', 'Liberiam Battles', 'Shards', 'Shuriken Island', 'Debris', 'Flooded Strip Mine', 'Eye of the Storm'}
-    for i, map in mapsList do
-        if scenario.name == map then
-            return true
-        end
-    end
-    return false
 end
 
 function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultScenarioName, curOptions, availableMods, OnModsChanged)
@@ -332,8 +422,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
         doNotRepeatMap = nummapa
         local scen = scenarios[scenarioKeymap[nummapa]]
         if official then
-            local officialMap = CheckMapIsOfficial(scen)
-            if not officialMap then
+            if not CheckMapIsOfficial(scen) then
                 return randomAutoMap(true)
             end
         end
@@ -403,12 +492,11 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     LayoutHelpers.AtLeftTopIn(filterTitle, panel, 360, 60)
 
     for i, filterData in mapFilters do
-        local index = i
-        filters[index] = CreateFilter(filterTitle, filterData)
-        if index == 1 then
+        filters[i] = CreateFilter(filterTitle, filterData)
+        if i == 1 then
             LayoutHelpers.Below(filters[1], filterTitle, 10)
         else
-            LayoutHelpers.Below(filters[index], filters[index-1], 10)
+            LayoutHelpers.Below(filters[i], filters[i - 1], 10)
         end
     end
 
@@ -785,59 +873,22 @@ end
 
 function PopulateMapList()
     mapList:DeleteAllItems()
-    local tempMaps = {}
     local count = 1
     for i,sceninfo in scenarios do
-        local validMapSize = false
-        local validMapPlayers = false
-        local index = i
-        if currentFilters.map_select_supportedplayers ~= 0 then
-            if CompareFunc(table.getsize(sceninfo.Configurations.standard.teams[1].armies),
-                currentFilters.map_select_supportedplayers,
-                currentFilters.map_select_supportedplayers_limiter) then
-                validMapSize = true
-            end
-        else
-            validMapSize = true
-        end
-        if currentFilters.map_select_size ~= 0 then
-            if CompareFunc(sceninfo.size[1], currentFilters.map_select_size, currentFilters.map_select_size_limiter) then
-                validMapPlayers = true
-            end
-        else
-            validMapPlayers = true
-        end
-        if currentFilters.map_type ~= 0 then
-            local officialMap = CheckMapIsOfficial(sceninfo)
-            if not officialMap and currentFilters.map_type == 1 then
-                continue
-            end
-            if officialMap and currentFilters.map_type == 2 then
-                continue
+        local passedFiltering = true
+        -- Subject this map to every activated filter.
+        for k, filter in currentFilters do
+            if not filter(sceninfo) then
+                passedFiltering = false
+                break
             end
         end
-        if currentFilters.map_ai_markers ~= 0 then
-            if not EnhancedLobby.CheckMapHasMarkers(sceninfo) and currentFilters.map_ai_markers == 1 then
-                continue
-            end
-            if EnhancedLobby.CheckMapHasMarkers(sceninfo) and currentFilters.map_ai_markers == 2 then
-                continue
-            end
-        end
-        if validMapSize and validMapPlayers then
-            table.insert(tempMaps, sceninfo)
-            scenarioKeymap[count] = index
-            count = count + 1
-        end
-    end
 
-    for i,sceninfo in tempMaps do
-        local name = sceninfo.name
-        local officialMap = CheckMapIsOfficial(sceninfo)
-        if not officialMap then
-            name = name .. " (" .. LOC("<LOC MAINMENU_0011>Custom") .. ")"
+        if passedFiltering then
+            scenarioKeymap[count] = i
+            count = count + 1
+            mapList:AddItem(LOC(sceninfo.name))
         end
-        mapList:AddItem(LOC(name))
     end
 
     randMapList = count - 1
@@ -848,15 +899,5 @@ function PopulateMapList()
         mapListTitle:SetText(LOCF("<LOC lobui_0580>%d Map Available", randMapList))
     else
         mapListTitle:SetText(LOCF("<LOC lobui_0581>%d Maps Available", randMapList))
-    end
-end
-
-function CompareFunc(valA, valB, operatorVar)
-    if operatorVar == 'equal' then
-        return valA == valB
-    elseif operatorVar == 'less' then
-        return valA <= valB
-    elseif operatorVar == 'greater' then
-        return valA >= valB
     end
 end
