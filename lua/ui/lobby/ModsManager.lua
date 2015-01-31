@@ -291,11 +291,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
         end)
 
         for k, v in current_list do
-            if not cbox_Act2 then
-                table.insert(scrollGroup.controlList, CreateListElementtt(scrollGroup, v, k, false))
-            else
-                table.insert(scrollGroup.controlList, CreateListElementtt(scrollGroup, v, k, true))
-            end
+            table.insert(scrollGroup.controlList, CreateListElementtt(scrollGroup, v, k, cbox_Act2))
             if IsHost and selmods[v.uid] then
                 scrollGroup.controlList[k].activated = true
                 scrollGroup.controlList[k].type:SetColor('101010')
