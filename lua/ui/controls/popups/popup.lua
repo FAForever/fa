@@ -24,7 +24,7 @@ Popup = Class(Group) {
         -- We parent the background off the parent so we can get a sensible answer for the dimensions
         -- of the dialog without the need for more magic.
         local shadow = Bitmap(self)
-        LayoutHelpers.FillParent(shadow, GUI)
+        LayoutHelpers.FillParent(shadow, GetFrame(0))
         shadow.Depth:Set(GetFrame(GUI:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 10)
         self.Depth:Set(GetFrame(GUI:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 10)
         shadow:SetSolidColor('78000000')
