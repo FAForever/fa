@@ -3346,7 +3346,7 @@ function CreateUI(maxPlayers)
     UIUtil.CreateLobbyVertScrollbar(GUI.OptionContainer)
 
     -- Create skirmish mode's "load game" button.
-    GUI.loadButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/small/',"<LOC lobui_0176>Load")
+    GUI.loadButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/',"<LOC lobui_0176>Load")
     UIUtil.setVisible(GUI.loadButton, singlePlayer)
     LayoutHelpers.LeftOf(GUI.loadButton, GUI.launchGameButton, 10)
     LayoutHelpers.AtVerticalCenterIn(GUI.loadButton, GUI.launchGameButton)
