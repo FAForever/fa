@@ -331,8 +331,8 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
         local function UNActiveMod(the_mod)
             the_mod.actived = false
             the_mod.type:SetColor('B9BFB9')
-            the_mod.bg:SetTexture('/textures/none.dds')
-            the_mod.bg0:SetTexture('/textures/none.dds')
+            the_mod.bg:SetSolidColor('00000000')
+            the_mod.bg0:SetSolidColor('00000000')
             if the_mod.ui then
                 the_mod.type:SetText('UI Mod')
             else
@@ -533,7 +533,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
                             self.bg0:SetTexture('/textures/ui/common/MODS/line_blank.dds')
                         end
                     elseif event.Type == 'MouseExit' then
-                        self.bg0:SetTexture('/textures/none.dds')
+                        self.bg0:SetSolidColor('00000000')
                     end
                 end
             end
@@ -574,12 +574,12 @@ function CreateListElementtt(parent, modInfo, Pos, little)
     group.modInfo = modInfo
     group.actived = false
     
-    group.bg = Bitmap(group, '/textures/none.dds')
+    group.bg = Bitmap(group)
         group.bg.Height:Set(group.Height())
         group.bg.Width:Set(group.Width())
         LayoutHelpers.AtLeftTopIn(group.bg, group, 0, 0)
     
-    group.bg0 = Bitmap(group, '/textures/none.dds')
+    group.bg0 = Bitmap(group)
         group.bg0.Height:Set(group.Height())
         group.bg0.Width:Set(group.Width())
         LayoutHelpers.AtLeftTopIn(group.bg0, group, 0, 0)
