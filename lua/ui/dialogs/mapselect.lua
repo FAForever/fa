@@ -25,7 +25,7 @@ local Tooltip = import('/lua/ui/game/tooltip.lua')
 local ModManager = import('/lua/ui/lobby/ModsManager.lua')
 local EnhancedLobby = import('/lua/EnhancedLobby.lua')
 
-local scenarios = MapUtil.EnumerateSkirmishScenarios()
+local scenarios = nil
 local selectedScenario = false
 local description = false
 local descText = false
@@ -287,7 +287,21 @@ local function ResetFilters()
     restrictedCategories = nil
 end
 
+--- Ensure that scenarios have been loaded from disk
+--
+-- @param force Reload the scenario files from disk even if we have a cached copy (use if you've
+-- caused map files to change on disk and want the results reflected)
+function LoadScenarios(force)
+    if not scenarios or force then
+        scenarios = MapUtil.EnumerateSkirmishScenarios()
+    end
+
+    return scenarios
+end
+
 function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultScenarioName, curOptions, availableMods, OnModsChanged)
+    LoadScenarios()
+
     -- control layout
     local parent = nil
     local background = nil
@@ -359,27 +373,6 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     randomMapButton.OnClick = function(self, modifiers)
         local randomMapIndex = math.floor(math.random(1, mapList:GetItemCount()))
         mapList:OnClick(randomMapIndex)
-    end
-    if not singlePlayer then
-        function randomLobbyMap()
-            local randomMapMessage
-            local nummapa
-            nummapa = math.random(1, randMapList)
-            if randMapList >= 2 and nummapa == doNotRepeatMap then
-                repeat
-                    nummapa = math.random(1, randMapList)
-                until nummapa ~= doNotRepeatMap
-            end
-            doNotRepeatMap = nummapa
-            local scen = scenarios[scenarioKeymap[nummapa]]
-            selectedScenario = scen
-            rMapName = scenarios[scenarioKeymap[nummapa]].name
-            rMapSize1 = scenarios[scenarioKeymap[nummapa]].size[1]/50
-            rMapSize2 = scenarios[scenarioKeymap[nummapa]].size[2]/50
-            selectBehavior(selectedScenario, changedOptions, restrictedCategories)
-            ResetFilters()
-            randomMapMessage = import('/lua/ui/lobby/lobby.lua').sendRandMapMessage()
-        end
     end
     function randomAutoMap(official)
         local nummapa
@@ -483,10 +476,6 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     end
 
     selectButton.OnClick = function(self, modifiers)
-        rMapSizeFilLim = currentFilters.map_select_size_limiter
-        rMapSizeFil = currentFilters.map_select_size/50
-        rMapPlayersFilLim = currentFilters.map_select_supportedplayers_limiter
-        rMapPlayersFil = currentFilters.map_select_supportedplayers
         selectBehavior(selectedScenario, changedOptions, restrictedCategories)
         ResetFilters()
     end
