@@ -321,26 +321,6 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
             randomMapMessage = import('/lua/ui/lobby/lobby.lua').sendRandMapMessage()
         end
     end
-    function randomAutoMap(official)
-        local nummapa
-        nummapa = math.random(1, randMapList)
-        if randMapList >= 2 and nummapa == doNotRepeatMap then
-            repeat
-                nummapa = math.random(1, randMapList)
-            until nummapa ~= doNotRepeatMap
-        end
-        doNotRepeatMap = nummapa
-        local scen = scenarios[scenarioKeymap[nummapa]]
-        if official then
-            local officialMap = CheckMapIsOfficial(scen)
-            if not officialMap then
-                return randomAutoMap(true)
-            end
-        end
-        selectedScenario = scen
-        selectBehavior(selectedScenario, changedOptions, restrictedCategories)
-        ResetFilters()
-    end
 
     UIUtil.MakeInputModal(panel)
 

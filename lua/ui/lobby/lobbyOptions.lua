@@ -343,29 +343,6 @@ globalOpts = {
     },
     {
         default = 1,
-        label = "<LOC lobui_0545>Random Map",
-        help = "<LOC lobui_0546>If enabled, the game will selected a random map just before the game launch",
-        key = 'RandomMap',
-        values = {
-            {
-                text = "<LOC lobui_0312>Off",
-                help = "<LOC lobui_0556>No random map",
-                key = 'Off',
-            },
-         {
-                text = "<LOC lobui_0553>Official Maps Only",
-                help = "<LOC lobui_0555>Random map set",
-                key = 'Official',
-            },
-            {
-                text = "<LOC lobui_0554>All Maps",
-                help = "<LOC lobui_0555>Random map set",
-                key = 'All',
-            },
-        },
-    },
-   {
-        default = 1,
         label = "<LOC lobui_0727>Score",
         help = "<LOC lobui_0728>Set score on or off during the game",
         key = 'Score',
