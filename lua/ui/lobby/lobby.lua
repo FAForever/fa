@@ -114,7 +114,6 @@ local selectedMods = nil
 local commandQueueIndex = 0
 local commandQueue = {}
 
-local quickRandMap = true
 local autoKick = true
 
 local lastUploadedMap = nil
@@ -1758,7 +1757,6 @@ local function UpdateGame()
 
         -- Launch button enabled if everyone is ready.
         UIUtil.setEnabled(GUI.launchGameButton, singlePlayer or not playerNotReady)
-        UIUtil.setEnabled(GUI.randMap, quickRandMap)
     end
 
     GUI.allowObservers:SetCheck(gameInfo.GameOptions.AllowObservers, true)
@@ -2986,7 +2984,6 @@ function CreateUI(maxPlayers)
             local mapSelectDialog
 
             autoRandMap = false
-            quickRandMap = false
             local function selectBehavior(selectedScenario, changedOptions, restrictedCategories)
                 if autoRandMap then
                     gameInfo.GameOptions['ScenarioFile'] = selectedScenario.file
@@ -3430,103 +3427,26 @@ function CreateUI(maxPlayers)
             local randomMap
             local mapSelectDialog
 
-            --In order for the RandMap button to work on lobby init, the PC needs a copy of the mapSelectDialog in memory.
-            --Destroy the window after it's loaded, so the player never sees it when clicking the random map button.
             autoRandMap = false
-            quickRandMap = false
-            local function selectBehavior(selectedScenario, changedOptions, restrictedCategories)
-                if autoRandMap then
-                    gameInfo.GameOptions['ScenarioFile'] = selectedScenario.file
-                else
-                    mapSelectDialog:Destroy()
-                    GUI.chatEdit:AcquireFocus()
-                    for optionKey, data in changedOptions do
-                        SetGameOption(optionKey, data.value)
-                    end
 
-                    SetGameOption('ScenarioFile',selectedScenario.file)
+            -- Load the set of all available maps, with a slight evil hack on the mapselect module.
+            local mapDialog = import('/lua/ui/dialogs/mapselect.lua')
+            local allMaps = mapDialog.LoadScenarios()  -- Result will be cached.
 
-                    SetGameOption('RestrictedCategories', restrictedCategories, true)
-                    ClearBadMapFlags()  -- every new map, clear the flags, and clients will report if a new map is bad
-                    HostUpdateMods()
-                    UpdateGame()
+            -- Only include maps which have enough slots for the players we have.
+            local filteredMaps = table.filter(allMaps,
+                function(scenInfo)
+                    local supportedPlayers = table.getsize(scenInfo.Configurations.standard.teams[1].armies)
+                    return supportedPlayers >= GetPlayerCount()
                 end
-            end
-
-            local function exitBehavior()
-                mapSelectDialog:Destroy()
-                GUI.chatEdit:AcquireFocus()
-                UpdateGame()
-            end
-
-            GUI.chatEdit:AbandonFocus()
-
-            mapSelectDialog = import('/lua/ui/dialogs/mapselect.lua').CreateDialog(
-                selectBehavior,
-                exitBehavior,
-                GUI,
-                singlePlayer,
-                gameInfo.GameOptions.ScenarioFile,
-                gameInfo.GameOptions,
-                availableMods,
-                OnModsChanged
             )
-            mapSelectDialog:Destroy()
-            GUI.chatEdit:AcquireFocus()
-            randomMap = import('/lua/ui/dialogs/mapselect.lua').randomLobbyMap()
-        end
-                    --
-        function sendRandMapMessage()
-            local rRankedLabel = import('/lua/ui/dialogs/mapselect.lua').rRankedLabel
-            local rMapSize1 = import('/lua/ui/dialogs/mapselect.lua').rMapSize1
-            local rMapSize2 = import('/lua/ui/dialogs/mapselect.lua').rMapSize2
-            local rMapSizeFil = import('/lua/ui/dialogs/mapselect.lua').rMapSizeFil
-            local rMapSizeFilLim = import('/lua/ui/dialogs/mapselect.lua').rMapSizeFilLim
-            local rMapPlayersFil = import('/lua/ui/dialogs/mapselect.lua').rMapPlayersFil
-            local rMapPlayersFilLim = import('/lua/ui/dialogs/mapselect.lua').rMapPlayersFilLim
-            local rMapTypeFil = import('/lua/ui/dialogs/mapselect.lua').rMapTypeFil
-            SendSystemMessage("-------------------------------------------------------------------------------"..
-            "--------------------")
-            SendSystemMessage(LOCF('%s %s', "<LOC lobui_0504>Randomly selected map: ", rRankedLabel))
-            SendSystemMessage(LOCF("<LOC map_select_0000>Map Size: %dkm x %dkm", rMapSize1, rMapSize2))
-            if rMapSizeFilLim == 'equal' then
-                rMapSizeFilLim = '='
-            elseif rMapSizeFilLim == 'less' then
-                rMapSizeFilLim = '<='
-            elseif rMapSizeFilLim == 'greater' then
-                rMapSizeFilLim = '>='
-            end
-            if rMapPlayersFilLim == 'equal' then
-                rMapPlayersFilLim = '='
-            elseif rMapPlayersFilLim == 'less' then
-                rMapPlayersFilLim = '<='
-            elseif rMapPlayersFilLim == 'greater' then
-                rMapPlayersFilLim = '>='
-            end
-            if rMapTypeFil == 1 then
-                rMapTypeFil = "<LOC lobui_0576>Official"
-            elseif rMapTypeFil == 2 then
-                rMapTypeFil = "<LOC lobui_0577>Custom"
-            end
-            if rMapSizeFil ~= 0 and rMapPlayersFil ~= 0 then
-                SendSystemMessage(LOCF("<LOC lobui_0516>Filters: Map Size is %s %dkm and Number of Players are %s %d",
-                    rMapSizeFilLim, rMapSizeFil, rMapPlayersFilLim, rMapPlayersFil))
-            elseif rMapSizeFil ~= 0 then
-                SendSystemMessage(LOCF("<LOC lobui_0517>Filters: Map Size is %s %dkm and Number of Players are ALL",
-                    rMapSizeFilLim, rMapSizeFil))
-            elseif rMapPlayersFil ~= 0 then
-                SendSystemMessage(LOCF("<LOC lobui_0518>Filters: Map Size is ALL and Number of Players are %s %d",
-                    rMapPlayersFilLim, rMapPlayersFil))
-            end
-            if rMapTypeFil ~= 0 then
-                SendSystemMessage(LOCF("<LOC lobui_0578>Map Type: %s", rMapTypeFil))
-            end
-            SendSystemMessage("---------------------------------------------------------------------------------------"..
-                "------------")
-            if not quickRandMap then
-                quickRandMap = true
-                UpdateGame()
-            end
+            local mapCount = table.getn(filteredMaps)
+            local selectedMap = filteredMaps[math.floor(math.random(1, mapCount))]
+
+            -- Set the new map.
+            SetGameOption('ScenarioFile', selectedMap.file)
+            ClearBadMapFlags()
+            UpdateGame()
         end
     end
 
