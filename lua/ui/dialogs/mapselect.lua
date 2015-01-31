@@ -287,36 +287,6 @@ local function ResetFilters()
     restrictedCategories = nil
 end
 
-local function ShowMapPositions(mapCtrl, scenario)
-    if posGroup then
-        posGroup:Destroy()
-        posGroup = false
-    end
-
-    if not scenario.size then
-        LOG("MapSelect: Can't show map positions as size field isn't in scenario yet (must be resaved with new editor!)")
-        return
-    end
-
-    posGroup = Group(mapCtrl)
-    LayoutHelpers.FillParent(posGroup, mapCtrl)
-
-    local startPos = MapUtil.GetStartPositions(scenario)
-
-    local cHeight = posGroup:Height()
-    local cWidth = posGroup:Width()
-
-    local mWidth = scenario.size[1]
-    local mHeight = scenario.size[2]
-
-    for army, pos in startPos do
-        local marker = Bitmap(posGroup, UIUtil.UIFile('/dialogs/mapselect02/commander.dds'))
-        LayoutHelpers.AtLeftTopIn(marker, posGroup,
-            ((pos[1] / mWidth) * cWidth) - (marker.Width() / 2),
-            ((pos[2] / mHeight) * cHeight) - (marker.Height() / 2))
-    end
-end
-
 function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultScenarioName, curOptions, availableMods, OnModsChanged)
     -- control layout
     local parent = nil
