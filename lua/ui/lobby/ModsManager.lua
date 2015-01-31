@@ -96,42 +96,42 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
     LayoutHelpers.AtBottomIn(filterradio, dialogContent, -23)
 
     -- Checkbox hide unselectable mods
-    local cbox_Act = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', 'Hide Unselectable', true)
-    LayoutHelpers.AtLeftIn(cbox_Act, dialogContent, 370)
-    LayoutHelpers.AtBottomIn(cbox_Act, dialogContent, 23)
-    Tooltip.AddCheckboxTooltip(cbox_Act, {text='Hide Unselectable', body='Hide mods which are unselectable due to compatibility issues, or because a player in the lobby does not have them'})
-    cbox_Act:SetCheck(true, true)
+    local hideUnselChkBox = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', 'Hide Unselectable', true)
+    LayoutHelpers.AtLeftIn(hideUnselChkBox, dialogContent, 370)
+    LayoutHelpers.AtBottomIn(hideUnselChkBox, dialogContent, 23)
+    Tooltip.AddCheckboxTooltip(hideUnselChkBox, {text='Hide Unselectable', body='Hide mods which are unselectable due to compatibility issues, or because a player in the lobby does not have them'})
+    hideUnselChkBox:SetCheck(true, true)
             
     -- Checkbox condensed list
-    local cbox_Act2 = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', 'Condensed View', true)
-    LayoutHelpers.Below(cbox_Act2, cbox_Act, -9)
-    Tooltip.AddCheckboxTooltip(cbox_Act2, {text='Condensed View', body='Displays mods as a simplified list'})
+    local condensedChk = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', 'Condensed View', true)
+    LayoutHelpers.Below(condensedChk, hideUnselChkBox, -9)
+    Tooltip.AddCheckboxTooltip(condensedChk, {text='Condensed View', body='Displays mods as a simplified list'})
 
     filterradio.OnChoose = function(self, index)
         save_mod()
         swiffer()
         uiOnly = index == 1
-        Refresh_Mod_List(not uiOnly, uiOnly, cbox_Act:IsChecked(), IsHost, modstatus, cbox_Act2:IsChecked())
+        Refresh_Mod_List(not uiOnly, uiOnly, hideUnselChkBox:IsChecked(), IsHost, modstatus, condensedChk:IsChecked())
     end
 
     local LobbyModManagerCondensedView = Prefs.GetFromCurrentProfile('LobbyModManagerCondensedView') or false
-    cbox_Act2:SetCheck(LobbyModManagerCondensedView, true)
+    condensedChk:SetCheck(LobbyModManagerCondensedView, true)
     
     if not IsHost then
-        cbox_Act:Disable()
-        cbox_Act:SetCheck(false, true)
+        hideUnselChkBox:Disable()
+        hideUnselChkBox:SetCheck(false, true)
     end
-    cbox_Act.OnCheck = function(self, checked)
+    hideUnselChkBox.OnCheck = function(self, checked)
         if IsHost then
             save_mod()
             swiffer()
-            Refresh_Mod_List(not uiOnly, uiOnly, checked, IsHost, modstatus, cbox_Act2:IsChecked())
+            Refresh_Mod_List(not uiOnly, uiOnly, checked, IsHost, modstatus, condensedChk:IsChecked())
         end
     end
-    cbox_Act2.OnCheck = function(self, checked)
+    condensedChk.OnCheck = function(self, checked)
         save_mod()
         swiffer()
-        Refresh_Mod_List(not uiOnly, uiOnly, cbox_Act:IsChecked(), IsHost, modstatus, checked)
+        Refresh_Mod_List(not uiOnly, uiOnly, hideUnselChkBox:IsChecked(), IsHost, modstatus, checked)
         Prefs.SetToCurrentProfile('LobbyModManagerCondensedView', checked)
     end
 
@@ -224,7 +224,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
         import('/lua/mods.lua').SetSelectedMods(selectedMods)
     end
 
-    function Refresh_Mod_List(cbox_GAME, cbox_UI, cbox_Act, IsHost, modstatus, cbox_Act2)
+    function Refresh_Mod_List(showGameMods, showUIMods, hideUnselected, IsHost, modstatus, useCompactView)
         index = 0
         exclusiveMod = false
         current_list = {}
@@ -246,7 +246,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
             for k, v in GetUI_Activatedmods do
                 table.insert(current_list, v)
             end
-            if cbox_UI then
+            if showUIMods then
                 for k, v in GetUI_Unactivatedmods do
                     table.insert(current_list, v)
                 end
@@ -258,12 +258,12 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
             for k, v in GetUI_Activatedmods do
                 table.insert(current_list, v)
             end
-            if cbox_GAME and IsHost then
+            if showGameMods and IsHost then
                 for k, v in GetSIM_Unactivatedmods do
                     table.insert(current_list, v)
                 end
             end
-            if cbox_UI then
+            if showUIMods then
                 for k, v in GetUI_Unactivatedmods do
                     table.insert(current_list, v)
                 end
@@ -271,7 +271,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
         end
         
         -- Remove mods which are unselectable because of conflicts or because not all the players have them
-        if cbox_Act then
+        if hideUnselected then
             for i, v in current_list do
                 if not v.selectable or availableMods[v.uid] == v.uid then
                     table.remove(current_list, i)
@@ -291,7 +291,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
         end)
 
         for k, v in current_list do
-            table.insert(scrollGroup.controlList, CreateListElementtt(scrollGroup, v, k, cbox_Act2))
+            table.insert(scrollGroup.controlList, CreateListElementtt(scrollGroup, v, k, useCompactView))
             if IsHost and selmods[v.uid] then
                 scrollGroup.controlList[k].activated = true
                 scrollGroup.controlList[k].type:SetColor('101010')
@@ -539,7 +539,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
         scrollGroup.top = 1
         scrollGroup:CalcVisible()
     end
-    Refresh_Mod_List(false, true, true, IsHost, modstatus, cbox_Act2:IsChecked())
+    Refresh_Mod_List(false, true, true, IsHost, modstatus, condensedChk:IsChecked())
 
     scrollGroup.HandleEvent = function(self, event)
         if event.Type == 'WheelRotation' then
