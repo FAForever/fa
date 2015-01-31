@@ -343,3 +343,20 @@ function table.shuffle(t)
     end
     return r
 end
+
+--- Filter a table using a function.
+--
+-- @param t Table to filter
+-- @param filterFunc Decision function to use to filter the table.
+-- @return A new table containing every mapping from t for which filterFunc returns `true` when
+--         passed the value.
+function table.filter(t, filterFunc)
+    local newTable = {}
+    for k, v in t do
+        if filterFunc(v) then
+            newTable[k] = v
+        end
+    end
+
+    return newTable
+end
