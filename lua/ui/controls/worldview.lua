@@ -129,8 +129,10 @@ WorldView = Class(moho.UIWorldView, Control) {
             self.LastCursor = nil
             if self.TargetDecal then
                 self.TargetDecal:Destroy()
-                self.TargetDecal2:Destroy()
-                self.TargetDecal2 = false
+                if self.TargetDecal2 then
+                    self.TargetDecal2:Destroy()
+                    self.TargetDecal2 = false
+                end
                 self.TargetDecal = false
                 self.DecalTexture = false
                 self.DecalScale = false
@@ -148,13 +150,19 @@ WorldView = Class(moho.UIWorldView, Control) {
         local outerScale = Vector(0,0,0)
         
         self.NeedTargetDecal = false
+        self.NeedOuterDecal = false
         if mode[1] == "order" then
             local showInvalidTargetCursor = false
             if self:ShowConvertToPatrolCursor() then
                 self.Cursor = {UIUtil.GetCursor("MOVE2PATROLCOMMAND")}
             else
                 if DecalFunctions[mode[2].name] then
-                    showInvalidTargetCursor, newDecalTexture, newScale, outer, outerScale = DecalFunctions[mode[2].name]()
+                    if mode[2].name == "RULEUCC_Nuke" then
+                        showInvalidTargetCursor, newDecalTexture, newScale, outer, outerScale = DecalFunctions[mode[2].name]()
+                        self.NeedOuterDecal = not showInvalidTargetCursor
+                    else
+                        showInvalidTargetCursor, newDecalTexture, newScale = DecalFunctions[mode[2].name]()
+                    end
                     self.NeedTargetDecal = not showInvalidTargetCursor
                 end
                 if showInvalidTargetCursor then
@@ -178,7 +186,7 @@ WorldView = Class(moho.UIWorldView, Control) {
         else
             local order = self:GetRightMouseButtonOrder()
             if order then
-                -- don't show the move cursor as a right mouse button hightlight state
+                -- Don't show the move cursor as a right mouse button hightlight state
                 if order == "RULEUCC_Move" then
                     self.Cursor = nil
                 else
@@ -188,7 +196,7 @@ WorldView = Class(moho.UIWorldView, Control) {
                 self.Cursor = nil
             end
 
-            -- catches if there is no order, or if there is no cursor assigned to the order
+            -- Catches if there is no order, or if there is no cursor assigned to the order
             if not self.Cursor then
                 GetCursor():Reset()
             end
@@ -196,25 +204,35 @@ WorldView = Class(moho.UIWorldView, Control) {
         if self.NeedTargetDecal then
             if not self.TargetDecal then
                 self.TargetDecal = UserDecal {}
-                self.TargetDecal2 = UserDecal {} -- Forces two textures to render for Nukes
+                if self.NeedOuterDecal then
+                    self.TargetDecal2 = UserDecal {} -- Forces two textures to render for Nukes
+                end
             end
             if newDecalTexture and self.DecalTexture != newDecalTexture then
                 self.TargetDecal:SetTexture(newDecalTexture)
                 self.DecalTexture = newDecalTexture
-                self.TargetDecal2:SetTexture(outer)--
+                if self.TargetDecal2 then
+                    self.TargetDecal2:SetTexture(outer)
+                end
             end
             if newScale and self.DecalScale != newScale then
                 self.TargetDecal:SetScale(newScale)
                 self.DecalScale = newScale
-                self.TargetDecal2:SetScale(outerScale)
+                if self.TargetDecal2 then
+                    self.TargetDecal2:SetScale(outerScale)
+                end
             end
             self.TargetDecal:SetPosition(GetMouseWorldPos())
-            self.TargetDecal2:SetPosition(GetMouseWorldPos())
+            if self.TargetDecal2 then
+                self.TargetDecal2:SetPosition(GetMouseWorldPos())
+            end
         elseif self.TargetDecal then
             self.TargetDecal:Destroy()
             self.TargetDecal = false
-            self.TargetDecal2:Destroy()
-            self.TargetDecal2 = false
+            if self.TargetDecal2 then
+                self.TargetDecal2:Destroy()
+                self.TargetDecal2 = false
+            end
             self.DecalTexture = false
             self.DecalScale = false
         end
