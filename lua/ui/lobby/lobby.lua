@@ -1136,11 +1136,7 @@ local function AssignRandomStartSpots(gameInfo)
         if scenarioInfo then
             local armyTable = MapUtil.GetArmies(scenarioInfo)
             if armyTable then
-                if gameInfo.GameOptions['RandomMap'] == 'Off' then
-                    numAvailStartSpots = table.getn(armyTable)
-                else
-                    numAvailStartSpots = numberOfPlayers
-                end
+                numAvailStartSpots = table.getn(armyTable)
             end
         else
             WARN("Can't assign random start spots, no scenario selected.")
@@ -1296,7 +1292,7 @@ local function AssignAutoTeams(gameInfo)
                 end
             end
         end
-    elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' or gameInfo.GameOptions['RandomMap'] ~= 'Off' then
+    elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' then
         for i = 1, LobbyComm.maxPlayerSlots do
             if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
 
@@ -1576,11 +1572,6 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
     numberOfPlayers = totalPlayers
 
     local function LaunchGame()
-        if gameInfo.GameOptions['RandomMap'] ~= 'Off' then
-            autoRandMap = true
-            autoMap()
-        end
-
         SetFrontEndData('NextOpBriefing', nil)
         -- assign random factions just as game is launched
         AssignRandomFactions(gameInfo)
@@ -2357,15 +2348,6 @@ function HostRemoveAI(slot)
     UpdateGame()
 end
 
-function autoMap()
-    local randomAutoMap
-    if gameInfo.GameOptions['RandomMap'] == 'Official' then
-        randomAutoMap = import('/lua/ui/dialogs/mapselect.lua').randomAutoMap(true)
-    else
-        randomAutoMap = import('/lua/ui/dialogs/mapselect.lua').randomAutoMap(false)
-    end
-end
-
 function randomString(Length, CharSet)
     -- Length (number)
     -- CharSet (string, optional); e.g. %l%d for lower case letters and digits
@@ -2985,28 +2967,23 @@ function CreateUI(maxPlayers)
         GUI.gameoptionsButton.OnClick = function(self)
             local mapSelectDialog
 
-            autoRandMap = false
             quickRandMap = false
             local function selectBehavior(selectedScenario, changedOptions, restrictedCategories)
-                if autoRandMap then
-                    gameInfo.GameOptions['ScenarioFile'] = selectedScenario.file
-                else
-                    mapSelectDialog:Destroy()
-                    GUI.chatEdit:AcquireFocus()
-                    for optionKey, data in changedOptions do
-                        SetGameOption(optionKey, data.value)
-                    end
-
-                    -- TODO: Merge with changedOptions so we don't do this work if the map hasn't
-                    -- really changed.
-                    SetGameOption('ScenarioFile', selectedScenario.file)
-
-                    SetGameOption('RestrictedCategories', restrictedCategories, true)
-                    -- every new map, clear the flags, and clients will report if a new map is bad
-                    ClearBadMapFlags()
-                    HostUpdateMods()
-                    UpdateGame()
+                mapSelectDialog:Destroy()
+                GUI.chatEdit:AcquireFocus()
+                for optionKey, data in changedOptions do
+                    SetGameOption(optionKey, data.value)
                 end
+
+                -- TODO: Merge with changedOptions so we don't do this work if the map hasn't
+                -- really changed.
+                SetGameOption('ScenarioFile', selectedScenario.file)
+
+                SetGameOption('RestrictedCategories', restrictedCategories, true)
+                -- every new map, clear the flags, and clients will report if a new map is bad
+                ClearBadMapFlags()
+                HostUpdateMods()
+                UpdateGame()
             end
 
             local function exitBehavior()
@@ -3432,25 +3409,20 @@ function CreateUI(maxPlayers)
 
             --In order for the RandMap button to work on lobby init, the PC needs a copy of the mapSelectDialog in memory.
             --Destroy the window after it's loaded, so the player never sees it when clicking the random map button.
-            autoRandMap = false
             quickRandMap = false
             local function selectBehavior(selectedScenario, changedOptions, restrictedCategories)
-                if autoRandMap then
-                    gameInfo.GameOptions['ScenarioFile'] = selectedScenario.file
-                else
-                    mapSelectDialog:Destroy()
-                    GUI.chatEdit:AcquireFocus()
-                    for optionKey, data in changedOptions do
-                        SetGameOption(optionKey, data.value)
-                    end
-
-                    SetGameOption('ScenarioFile',selectedScenario.file)
-
-                    SetGameOption('RestrictedCategories', restrictedCategories, true)
-                    ClearBadMapFlags()  -- every new map, clear the flags, and clients will report if a new map is bad
-                    HostUpdateMods()
-                    UpdateGame()
+                mapSelectDialog:Destroy()
+                GUI.chatEdit:AcquireFocus()
+                for optionKey, data in changedOptions do
+                    SetGameOption(optionKey, data.value)
                 end
+
+                SetGameOption('ScenarioFile',selectedScenario.file)
+
+                SetGameOption('RestrictedCategories', restrictedCategories, true)
+                ClearBadMapFlags()  -- every new map, clear the flags, and clients will report if a new map is bad
+                HostUpdateMods()
+                UpdateGame()
             end
 
             local function exitBehavior()
