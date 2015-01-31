@@ -183,7 +183,7 @@ local function LOGXWhisper(params)
 	else
         DebugEnabled = params
 		Prefs.SetToCurrentProfile('LobbyDebug', params)
-		AddChatText('Debug actived : '..params)
+		AddChatText('Debug activated : '..params)
 	end
 end
 
