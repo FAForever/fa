@@ -5077,20 +5077,20 @@ function ShowPresetDialog()
     PresetList:SetFont(UIUtil.bodyFont, 14)
     PresetList:ShowMouseoverItem(true)
     PresetList.Width:Set(190)
-    PresetList.Height:Set(280)
+    PresetList.Height:Set(279)
     LayoutHelpers.DepthOverParent(PresetList, dialogContent, 10)
     LayoutHelpers.AtLeftIn(PresetList, dialogContent, 10)
     LayoutHelpers.AtTopIn(PresetList, dialogContent, 32)
-    UIUtil.CreateLobbyVertScrollbar(PresetList)
+    UIUtil.CreateLobbyVertScrollbar(PresetList, 2)
 
     -- Info List
     local InfoList = ItemList(dialogContent)
     InfoList:SetFont(UIUtil.bodyFont, 11)
     InfoList:SetColors(nil, "00000000")
     InfoList:ShowMouseoverItem(true)
-    InfoList.Width:Set(218)
-    InfoList.Height:Set(280)
-    LayoutHelpers.RightOf(InfoList, PresetList, 20)
+    InfoList.Width:Set(220)
+    InfoList.Height:Set(279)
+    LayoutHelpers.RightOf(InfoList, PresetList, 22)
     UIUtil.CreateLobbyVertScrollbar(InfoList)
 
     -- Quit button
@@ -5099,21 +5099,24 @@ function ShowPresetDialog()
     LayoutHelpers.AtTopIn(QuitButton, dialogContent, 1)
 
     -- Load button
-    local LoadButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Load Preset")
+    local LoadButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Load")
     LayoutHelpers.AtLeftIn(LoadButton, dialogContent, -2)
     LayoutHelpers.AtBottomIn(LoadButton, dialogContent, 10)
+    LoadButton:Disable()
 
     -- Create button. Occupies the same space as the load button, when available.
-    local CreateButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Create Preset")
+    local CreateButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Create")
     LayoutHelpers.RightOf(CreateButton, LoadButton, -19)
 
     -- Save button
-    local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Save Preset")
+    local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Save")
     LayoutHelpers.RightOf(SaveButton, CreateButton, -19)
+    SaveButton:Disable()
 
     -- Delete button
-    local DeleteButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Delete Preset")
+    local DeleteButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Delete")
     LayoutHelpers.RightOf(DeleteButton, SaveButton, -19)
+    DeleteButton:Disable()
 
     LoadButton.OnClick = function(self)
         LoadPreset(PresetList:GetSelection() + 1)
@@ -5165,6 +5168,9 @@ function ShowPresetDialog()
     -- Called when the selected item in the preset list changes.
     local onListItemChanged = function(self, row)
         ShowPresetDetails(row + 1, InfoList)
+        LoadButton:Enable()
+        SaveButton:Enable()
+        DeleteButton:Enable()
     end
 
     -- Because GPG's event model is painfully retarded..
@@ -5226,6 +5232,41 @@ function ShowPresetDialog()
     end
 
     RefreshAvailablePresetsList(PresetList)
+    if PresetList:GetItemCount() == 0 then
+        CreateHelpWindow()
+    end
+end
+
+function CreateHelpWindow()
+    local dialogContent = Group(GUI)
+    dialogContent.Width:Set(400)
+    dialogContent.Height:Set(130)
+
+    GUI.changelogPopup = Popup(GUI, dialogContent)
+
+    -- Info List --
+    local InfoList = ItemList(dialogContent)
+    InfoList:SetFont(UIUtil.bodyFont, 11)
+    InfoList:SetColors(nil, "00000000")
+    InfoList.Width:Set(388)
+    InfoList.Height:Set(70)
+    LayoutHelpers.AtLeftIn(InfoList, dialogContent, 7)
+	LayoutHelpers.AtRightIn(InfoList, dialogContent, 5)
+    LayoutHelpers.AtTopIn(InfoList, dialogContent, 4)
+    local helpText = import('/lua/ui/lobby/presetHelp.lua').helpText
+    local wrapped = import('/lua/maui/text.lua').WrapText(helpText, InfoList.Width(),
+        function(curText) return InfoList:GetStringAdvance(curText) end)
+    for i, line in wrapped do
+        InfoList:AddItem(line)
+    end
+    
+    -- OK button
+    local OkButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
+	LayoutHelpers.AtLeftIn(OkButton, dialogContent, 135)
+    LayoutHelpers.AtBottomIn(OkButton, dialogContent, 15)
+    OkButton.OnClick = function(self)
+        GUI.changelogPopup:Destroy()
+    end
 end
 
 -- Create an input dialog with the given title and listener function.
