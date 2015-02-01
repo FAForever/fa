@@ -2819,7 +2819,7 @@ function CreateUI(maxPlayers)
     GUI.RuleLabel = RuleLabel
     RuleLabel:SetFont('Arial Gras', 11)
     RuleLabel:SetColors("B9BFB9", "00000000", "B9BFB9", "00000000")
-    LayoutHelpers.AtLeftTopIn(RuleLabel, GUI.panel, 43, 95)
+    LayoutHelpers.AtLeftTopIn(RuleLabel, GUI.panel, 43, 88)
     RuleLabel.Height:Set(34)
     RuleLabel.Width:Set(350)
     RuleLabel:DeleteAllItems()
@@ -2869,16 +2869,16 @@ function CreateUI(maxPlayers)
     
     -- Logo
     GUI.logo = Bitmap(GUI.panel, '/textures/ui/common/scx_menu/lan-game-lobby/logo.dds')
-    LayoutHelpers.AtLeftTopIn(GUI.logo, GUI.panel, 44, 36)
+    LayoutHelpers.AtLeftTopIn(GUI.logo, GUI.panel, 43, 43)
     
     -- Version texts
     local gameVersionText = UIUtil.CreateText(GUI.panel, GameVersion(), 14, UIUtil.bodyFont)
     gameVersionText:SetColor('677983')
-    LayoutHelpers.AtLeftTopIn(gameVersionText, GUI.logo, 55, 8)
+    LayoutHelpers.AtLeftTopIn(gameVersionText, GUI.logo, 34, -2)
     
     local lobbyVersionText = UIUtil.CreateText(GUI.panel, LobbyVersion(), 14, UIUtil.bodyFont)
     lobbyVersionText:SetColor('677983')
-    LayoutHelpers.AtLeftTopIn(lobbyVersionText, GUI.logo, 55, 26)
+    LayoutHelpers.AtLeftTopIn(lobbyVersionText, GUI.logo, 34, 16)
     
     -- Player Slots
     GUI.playerPanel = Group(GUI.panel, "playerPanel")
