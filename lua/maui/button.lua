@@ -1,4 +1,3 @@
-
 local Bitmap = import('bitmap.lua').Bitmap
 local Dragger = import('dragger.lua').Dragger
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -81,6 +80,9 @@ Button = Class(Bitmap) {
     end,
 
     HandleEvent = function(self, event)
+        if self._isDisabled then
+            return true
+        end
         local eventHandled = false
 
         if event.Type == 'MouseEnter' then
