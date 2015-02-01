@@ -5262,6 +5262,7 @@ function CreateHelpWindow()
     local OkButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
 	LayoutHelpers.AtLeftIn(OkButton, dialogContent, 145)
     LayoutHelpers.AtBottomIn(OkButton, dialogContent, 8)
+    LayoutHelpers.DepthOverParent(OkButton, InfoList, 5)
     OkButton.OnClick = function(self)
         GUI.changelogPopup:Destroy()
     end
