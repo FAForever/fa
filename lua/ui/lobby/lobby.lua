@@ -6,9 +6,8 @@
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
 
-LOBBYversion = import('/lua/version.lua').GetLobbyVersion()
-LOG('Lobby version : '..LOBBYversion)
-
+local GameVersion = import('/lua/version.lua').GetVersion
+local LobbyVersion = import('/lua/version.lua').GetLobbyVersion
 local UIUtil = import('/lua/ui/uiutil.lua')
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
 local Prefs = import('/lua/user/prefs.lua')
@@ -2777,15 +2776,6 @@ function CreateUI(maxPlayers)
     local lastFaction = Prefs.GetFromCurrentProfile('LastFaction') or 1
     UIUtil.SetCurrentSkin(FACTION_NAMES[lastFaction])
 
-    local title
-    if GpgNetActive() then
-        title = "FA FOREVER GAME LOBBY"
-    elseif singlePlayer then
-        title = LOC("<LOC _Skirmish_Setup>")
-    else
-        title = LOC("<LOC _LAN_Game_Lobby>")
-    end
-
     -- Setup custom backgrounds.
     local LobbyBackgroundStretch = Prefs.GetFromCurrentProfile('LobbyBackgroundStretch') or 'true'
     GUI.background = Bitmap(GUI, UIUtil.SkinnableFile('/BACKGROUND/background-paint_black_bmp.dds')) -- Background faction or art
@@ -2821,10 +2811,6 @@ function CreateUI(maxPlayers)
         return UIUtil.CreateText(GUI.panel, text, size, 'Arial Gras', true)
     end
 
-    -- Title Label
-    GUI.titleText = makeLabel(title, 17)
-    LayoutHelpers.AtLeftTopIn(GUI.titleText, GUI.panel, 50, 41)
-
     -- Map Name Label TODO: Localise!
     GUI.MapNameLabel = makeLabel("Loading...", 17)
     LayoutHelpers.AtRightTopIn(GUI.MapNameLabel, GUI.panel, 50, 41)
@@ -2837,8 +2823,8 @@ function CreateUI(maxPlayers)
     local RuleLabel = ItemList(GUI.panel)
     GUI.RuleLabel = RuleLabel
     RuleLabel:SetFont('Arial Gras', 11)
-    RuleLabel:SetColors("B9BFB9", "00000000", "B9BFB9", "00000000") -- colortxt, bg, colortxt selec, bg selec?
-    LayoutHelpers.AtLeftTopIn(RuleLabel, GUI.panel, 50, 81) --Right, Top
+    RuleLabel:SetColors("B9BFB9", "00000000", "B9BFB9", "00000000")
+    LayoutHelpers.AtLeftTopIn(RuleLabel, GUI.panel, 43, 95)
     RuleLabel.Height:Set(34)
     RuleLabel.Width:Set(350)
     RuleLabel:DeleteAllItems()
@@ -2885,81 +2871,77 @@ function CreateUI(maxPlayers)
     GUI.LobbyOptions.OnClick = function()
         ShowLobbyOptionsDialog()
     end
-
-    -- For the group position, look at this screenshot: http://img402.imageshack.us/img402/8826/falobbygroup.png
-    GUI.playerPanel = Group(GUI.panel, "playerPanel") -- RED Square in Screenshoot
-    LayoutHelpers.AtLeftTopIn(GUI.playerPanel, GUI.panel, 40, 66+40-4)
+    
+    -- Logo
+    GUI.logo = Bitmap(GUI.panel, '/textures/ui/common/scx_menu/lan-game-lobby/logo.dds')
+    LayoutHelpers.AtLeftTopIn(GUI.logo, GUI.panel, 44, 36)
+    
+    -- Version texts
+    local gameVersionText = UIUtil.CreateText(GUI.panel, GameVersion(), 14, UIUtil.bodyFont)
+    gameVersionText:SetColor('677983')
+    LayoutHelpers.AtLeftTopIn(gameVersionText, GUI.logo, 55, 8)
+    
+    local lobbyVersionText = UIUtil.CreateText(GUI.panel, LobbyVersion(), 14, UIUtil.bodyFont)
+    lobbyVersionText:SetColor('677983')
+    LayoutHelpers.AtLeftTopIn(lobbyVersionText, GUI.logo, 55, 26)
+    
+    -- Player Slots
+    GUI.playerPanel = Group(GUI.panel, "playerPanel")
+    LayoutHelpers.AtLeftTopIn(GUI.playerPanel, GUI.panel, 39, 102)
     GUI.playerPanel.Width:Set(706)
     GUI.playerPanel.Height:Set(307)
 
-    GUI.buttonPanelTop = Group(GUI.panel, "buttonPanelTop") -- GREEN Square in Screenshoot - Added group for Button
-    LayoutHelpers.AtLeftTopIn(GUI.buttonPanelTop, GUI.panel, 40, 383+48)
-    GUI.buttonPanelTop.Width:Set(706)
-    GUI.buttonPanelTop.Height:Set(19)
-
-    GUI.buttonPanelRight = Group(GUI.panel, "buttonPanelRight") -- PURPLE Square in Screenshoot - Added group for Button
-    LayoutHelpers.AtLeftTopIn(GUI.buttonPanelRight, GUI.panel, 481, 401+24)
-    GUI.buttonPanelRight.Width:Set(265)
-    GUI.buttonPanelRight.Height:Set(89)
-
-    GUI.observerPanel = Group(GUI.panel, "observerPanel") -- PINK Square in Screenshoot
+    -- Observer section
+    GUI.observerPanel = Group(GUI.panel, "observerPanel")
     UIUtil.SurroundWithBorder(GUI.observerPanel, '/scx_menu/lan-game-lobby/frame/')
 
     -- Scale the observer panel according to the buttons we are showing.
     local obsOffset
     local obsHeight
     if isHost then
-        obsHeight = 129
-        obsOffset = 549
+        obsHeight = 134
+        obsOffset = 544
     else
-        obsHeight = 169
-        obsOffset = 509
+        obsHeight = 181
+        obsOffset = 502
     end
-    LayoutHelpers.AtLeftTopIn(GUI.observerPanel, GUI.panel, 458, obsOffset)
-    GUI.observerPanel.Width:Set(280)
+    LayoutHelpers.AtLeftTopIn(GUI.observerPanel, GUI.panel, 460, obsOffset)
+    GUI.observerPanel.Width:Set(278)
     GUI.observerPanel.Height:Set(obsHeight)
 
-    -- The chat view and input box, bottom left.
+    -- Chat
     GUI.chatPanel = Group(GUI.panel, "chatPanel")
     UIUtil.SurroundWithBorder(GUI.chatPanel, '/scx_menu/lan-game-lobby/frame/')
     LayoutHelpers.AtLeftTopIn(GUI.chatPanel, GUI.panel, 49, 458)
     GUI.chatPanel.Width:Set(388)
     GUI.chatPanel.Height:Set(220)
 
-    -- Contains the map preview, top-right.
+    -- Map Preview
     GUI.mapPanel = Group(GUI.panel, "mapPanel")
     UIUtil.SurroundWithBorder(GUI.mapPanel, '/scx_menu/lan-game-lobby/frame/')
     LayoutHelpers.AtLeftTopIn(GUI.mapPanel, GUI.panel, 763, 106)
     GUI.mapPanel.Width:Set(198)
     GUI.mapPanel.Height:Set(198)
+    LayoutHelpers.DepthOverParent(GUI.mapPanel, GUI.panel, 2)
 
     GUI.optionsPanel = Group(GUI.panel, "optionsPanel") -- ORANGE Square in Screenshoot
     UIUtil.SurroundWithBorder(GUI.optionsPanel, '/scx_menu/lan-game-lobby/frame/')
-    LayoutHelpers.AtLeftTopIn(GUI.optionsPanel, GUI.panel, 763, 353)
+    LayoutHelpers.AtLeftTopIn(GUI.optionsPanel, GUI.panel, 763, 343)
     GUI.optionsPanel.Width:Set(198)
-    GUI.optionsPanel.Height:Set(278)
-
-
-    GUI.launchPanel = Group(GUI.panel, "controlGroup") -- BROWN Square in Screenshoot
-    LayoutHelpers.AtLeftTopIn(GUI.launchPanel, GUI.panel, 735, 668)
-    GUI.launchPanel.Width:Set(238)
-    GUI.launchPanel.Height:Set(66)
-
-    GUI.NEWlaunchPanel = Group(GUI.panel, "NEWlaunchPanel") -- BLACK Square in Screenshoot - Added group for Button
-    LayoutHelpers.AtLeftTopIn(GUI.NEWlaunchPanel, GUI.panel, 40, 667)
-    GUI.NEWlaunchPanel.Width:Set(948)
-    GUI.NEWlaunchPanel.Height:Set(68)
+    GUI.optionsPanel.Height:Set(288)
+    LayoutHelpers.DepthOverParent(GUI.optionsPanel, GUI.panel, 2)
 
     ---------------------------------------------------------------------------
     -- set up map panel
     ---------------------------------------------------------------------------
-    GUI.mapView = ResourceMapPreview(GUI.mapPanel, 198, 3, 5)
-    LayoutHelpers.AtLeftTopIn(GUI.mapView, GUI.mapPanel)
+    GUI.mapView = ResourceMapPreview(GUI.mapPanel, 200, 3, 5)
+    LayoutHelpers.AtLeftTopIn(GUI.mapView, GUI.mapPanel, -1, -1)
+    LayoutHelpers.DepthOverParent(GUI.mapView, GUI.mapPanel, -1)
 
     GUI.LargeMapPreview = UIUtil.CreateButtonWithDropshadow(GUI.mapPanel, '/BUTTON/zoom/', "")
-    LayoutHelpers.AtRightIn(GUI.LargeMapPreview, GUI.mapPanel)
-    LayoutHelpers.AtBottomIn(GUI.LargeMapPreview, GUI.mapPanel)
-    LayoutHelpers.DepthOverParent(GUI.LargeMapPreview, GUI.mapView, 2)
+    LayoutHelpers.AtRightIn(GUI.LargeMapPreview, GUI.mapPanel, -1)
+    LayoutHelpers.AtBottomIn(GUI.LargeMapPreview, GUI.mapPanel, -1)
+    LayoutHelpers.DepthOverParent(GUI.LargeMapPreview, GUI.mapPanel, 2)
     Tooltip.AddButtonTooltip(GUI.LargeMapPreview, 'lob_click_LargeMapPreview')
     GUI.LargeMapPreview.OnClick = function()
         CreateBigPreview(GUI)
@@ -2968,7 +2950,7 @@ function CreateUI(maxPlayers)
     -- Checkbox Show changed Options
     -- TODO: Localise!
     local cbox_ShowChangedOption = UIUtil.CreateCheckbox(GUI.optionsPanel, '/CHECKBOX/', 'Hide default Options', true, 11)
-    LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel)
+    LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel, 35, -32)
 
     Tooltip.AddCheckboxTooltip(cbox_ShowChangedOption, {text='Hide default Options', body='Show only changed Options and Advanced Map Options'})
     cbox_ShowChangedOption.OnCheck = function(self, checked)
@@ -3040,53 +3022,28 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtHorizontalCenterIn(GUI.gameoptionsButton, GUI.optionsPanel, 1)
 
     ---------------------------------------------------------------------------
-    -- set up launch panel
-    ---------------------------------------------------------------------------
-    -- LAUNCH THE GAME BUTTON --
-    GUI.launchGameButton = UIUtil.CreateButtonWithDropshadow(GUI.launchPanel, '/BUTTON/large/', "Launch the Game")
-    LayoutHelpers.AtCenterIn(GUI.launchGameButton, GUI.launchPanel, 13, -344)
-    Tooltip.AddButtonTooltip(GUI.launchGameButton, 'Lobby_Launch')
-    UIUtil.setVisible(GUI.launchGameButton, isHost)
-    GUI.launchGameButton.OnClick = function(self)
-        TryLaunch(false)
-    end
-
-    -- EXIT BUTTON --
-    GUI.exitButton = UIUtil.CreateButtonWithDropshadow(GUI.launchPanel, '/BUTTON/medium/','Exit')
-    if GpgNetActive() then
-        GUI.exitButton.label:SetText(LOC("<LOC _Exit>"))
-    else
-        GUI.exitButton.label:SetText(LOC("<LOC _Back>"))
-    end
-
-    LayoutHelpers.AtLeftIn(GUI.exitButton, GUI.chatPanel, 38)
-    LayoutHelpers.AtVerticalCenterIn(GUI.exitButton, GUI.launchGameButton, -3)
-    GUI.exitButton.OnClick = GUI.exitLobbyEscapeHandler
-
-
-    ---------------------------------------------------------------------------
     -- set up chat display
     ---------------------------------------------------------------------------
     GUI.chatDisplay = ItemList(GUI.chatPanel)
     GUI.chatDisplay:SetFont(UIUtil.bodyFont, tonumber(Prefs.GetFromCurrentProfile('LobbyChatFontSize')) or 14)
     GUI.chatDisplay:SetColors(UIUtil.fontColor(), "00000000", UIUtil.fontColor(), "00000000")
-    LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.chatPanel, 2, 2)
+    LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.chatPanel, 4, 2)
     GUI.chatDisplay.Height:Set(function() return GUI.chatPanel.Height() - GUI.chatBG.Height() - 2 end)
     -- Leave space for the scrollbar.
-    GUI.chatDisplay.Width:Set(function() return GUI.chatPanel.Width() - 17 end)
+    GUI.chatDisplay.Width:Set(function() return GUI.chatPanel.Width() - 20 end)
 
     -- Annoying evil extra Bitmap to make chat box have padding inside its background.
     local chatBG = Bitmap(GUI.chatPanel)
     GUI.chatBG = chatBG
     chatBG:SetSolidColor('FF212123')
-    LayoutHelpers.Below(chatBG, GUI.chatDisplay)
-    LayoutHelpers.AtLeftIn(chatBG, GUI.chatDisplay, -3)
-    chatBG.Width:Set(GUI.chatPanel.Width() + 3)
+    LayoutHelpers.Below(chatBG, GUI.chatDisplay, 1)
+    LayoutHelpers.AtLeftIn(chatBG, GUI.chatDisplay, -5)
+    chatBG.Width:Set(GUI.chatPanel.Width() - 16)
     chatBG.Height:Set(24)
 
     GUI.chatEdit = Edit(GUI.chatPanel)
-    LayoutHelpers.AtLeftTopIn(GUI.chatEdit, GUI.chatBG, 3, 2)
-    GUI.chatEdit.Width:Set(GUI.chatPanel.Width() + 1)
+    LayoutHelpers.AtLeftTopIn(GUI.chatEdit, GUI.chatBG, 4, 3)
+    GUI.chatEdit.Width:Set(GUI.chatBG.Width() - 9)
     GUI.chatEdit.Height:Set(22)
     GUI.chatEdit:SetFont(UIUtil.bodyFont, 16)
     GUI.chatEdit:SetForegroundColor(UIUtil.fontColor)
@@ -3094,7 +3051,7 @@ function CreateUI(maxPlayers)
     GUI.chatEdit:SetDropShadow(true)
     GUI.chatEdit:AcquireFocus()
 
-    GUI.chatDisplayScroll = UIUtil.CreateLobbyVertScrollbar(GUI.chatDisplay, 1, 0, -2)
+    GUI.chatDisplayScroll = UIUtil.CreateLobbyVertScrollbar(GUI.chatDisplay, 1, 24, -1)
 
     GUI.chatEdit:SetMaxChars(200)
     GUI.chatEdit.OnCharPressed = function(self, charcode)
@@ -3169,12 +3126,13 @@ function CreateUI(maxPlayers)
     -- Option display
     ---------------------------------------------------------------------------
     GUI.OptionContainer = Group(GUI.optionsPanel)
-    GUI.OptionContainer.Bottom:Set(GUI.optionsPanel.Bottom)
+    GUI.OptionContainer.Bottom:Set(function() return GUI.optionsPanel.Bottom() end)
 
     -- Leave space for the scrollbar.
-    GUI.OptionContainer.Width:Set(function() return GUI.optionsPanel.Width() - 15 end)
+    GUI.OptionContainer.Width:Set(function() return GUI.optionsPanel.Width() - 18 end)
     GUI.OptionContainer.top = 0
-    LayoutHelpers.AtLeftTopIn(GUI.OptionContainer, GUI.optionsPanel, 0, 28)
+    LayoutHelpers.AtLeftTopIn(GUI.OptionContainer, GUI.optionsPanel, 1, 1)
+    LayoutHelpers.DepthOverParent(GUI.OptionContainer, GUI.optionsPanel, -1)
 
     GUI.OptionDisplay = {}
 
@@ -3217,7 +3175,7 @@ function CreateUI(maxPlayers)
         LayoutHelpers.AtLeftTopIn(GUI.OptionDisplay[1], GUI.OptionContainer)
 
         local index = 2
-        while index ~= 8 do
+        while index ~= 9 do
             CreateElement(index)
             LayoutHelpers.Below(GUI.OptionDisplay[index], GUI.OptionDisplay[index-1])
             index = index + 1
@@ -3327,7 +3285,8 @@ function CreateUI(maxPlayers)
 
     RefreshOptionDisplayData()
 
-    UIUtil.CreateLobbyVertScrollbar(GUI.OptionContainer, 1)
+    GUI.OptionContainerScroll = UIUtil.CreateLobbyVertScrollbar(GUI.OptionContainer, 2)
+    LayoutHelpers.DepthOverParent(GUI.OptionContainerScroll, GUI.OptionContainer, 2)
 
     -- Create skirmish mode's "load game" button.
     GUI.loadButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/',"<LOC lobui_0176>Load")
@@ -3378,9 +3337,9 @@ function CreateUI(maxPlayers)
     ---------------------------------------------------------------------------
     -- set up observer and limbo grid
     ---------------------------------------------------------------------------
-
-    GUI.allowObservers = UIUtil.CreateCheckbox(GUI.buttonPanelTop, '/CHECKBOX/', 'Observers in Game', true, 11)
-    LayoutHelpers.AtLeftTopIn(GUI.allowObservers, GUI.buttonPanelTop)
+    
+    GUI.allowObservers = UIUtil.CreateCheckbox(GUI.chatPanel, '/CHECKBOX/', 'Observers in Game', true, 11)
+    LayoutHelpers.AtLeftTopIn(GUI.allowObservers, GUI.chatPanel, -11, -37)
     Tooltip.AddControlTooltip(GUI.allowObservers, 'lob_observers_allowed')
     GUI.allowObservers:SetCheck(false)
     if isHost then
@@ -3391,21 +3350,32 @@ function CreateUI(maxPlayers)
     else
         GUI.allowObservers:Disable()
     end
+    
+    -- Launch Button
+    GUI.launchGameButton = UIUtil.CreateButtonWithDropshadow(GUI.chatPanel, '/BUTTON/large/', "Launch the Game")
+    LayoutHelpers.AtCenterIn(GUI.launchGameButton, GUI.observerPanel, 103, -89)
+    Tooltip.AddButtonTooltip(GUI.launchGameButton, 'Lobby_Launch')
+    UIUtil.setVisible(GUI.launchGameButton, isHost)
+    GUI.launchGameButton.OnClick = function(self)
+        TryLaunch(false)
+    end
 
+    -- Exit Button
+    GUI.exitButton = UIUtil.CreateButtonWithDropshadow(GUI.chatPanel, '/BUTTON/medium/','Exit')
+    GUI.exitButton.label:SetText(LOC("<LOC _Exit>"))
+    LayoutHelpers.AtLeftIn(GUI.exitButton, GUI.chatPanel, 38)
+    LayoutHelpers.AtVerticalCenterIn(GUI.exitButton, GUI.launchGameButton, -3)
+    GUI.exitButton.OnClick = GUI.exitLobbyEscapeHandler
+    
     -- Small buttons are 100 wide, 44 tall
     
     -- Default option button
-    GUI.defaultOptions = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/defaultoption/')
+    GUI.defaultOptions = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/defaultoption/')
     -- If we're the host, position the buttons lower down (and eventually shrink the observer panel)
-    local offset
-    if isHost then
-        offset = 30
-    else
-        -- We still position it, as it's used as the anchor point for the rest of the buttons.
-        offset = -15
+    if not isHost then
         GUI.defaultOptions:Hide()
     end
-    LayoutHelpers.AtLeftTopIn(GUI.defaultOptions, GUI.buttonPanelRight, -11, offset)
+    LayoutHelpers.AtLeftTopIn(GUI.defaultOptions, GUI.observerPanel, 11, -94)
 
     Tooltip.AddButtonTooltip(GUI.defaultOptions, 'lob_click_rankedoptions')
     if not isHost then
@@ -3420,7 +3390,7 @@ function CreateUI(maxPlayers)
     end
 
     -- RANDOM MAP BUTTON --
-    GUI.randMap = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/randommap/')
+    GUI.randMap = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/randommap/')
     LayoutHelpers.RightOf(GUI.randMap, GUI.defaultOptions, -19)
     Tooltip.AddButtonTooltip(GUI.randMap, 'lob_click_randmap')
     if not isHost then
@@ -3531,7 +3501,7 @@ function CreateUI(maxPlayers)
     end
 
     if isHost and not singlePlayer then
-        local autoKickBox = UIUtil.CreateCheckbox(GUI.buttonPanelTop, '/CHECKBOX/', "Auto kick", true, 11)
+        local autoKickBox = UIUtil.CreateCheckbox(GUI.chatPanel, '/CHECKBOX/', "Auto kick", true, 11)
         LayoutHelpers.CenteredRightOf(autoKickBox, GUI.allowObservers, 10)
         Tooltip.AddControlTooltip(autoKickBox, 'lob_auto_kick')
         autoKick = true
@@ -3542,7 +3512,7 @@ function CreateUI(maxPlayers)
     end
     
     -- AUTO TEAM BUTTON -- start of auto teams code.
-    GUI.autoTeams = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/autoteam/')
+    GUI.autoTeams = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/autoteam/')
     LayoutHelpers.RightOf(GUI.autoTeams, GUI.randMap, -19)
     Tooltip.AddButtonTooltip(GUI.autoTeams, 'lob_click_randteam')
     if not isHost then
@@ -3569,7 +3539,7 @@ function CreateUI(maxPlayers)
     end
     
     -- GO OBSERVER BUTTON --
-    GUI.becomeObserver = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/observer/')
+    GUI.becomeObserver = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/observer/')
     LayoutHelpers.AtLeftTopIn(GUI.becomeObserver, GUI.defaultOptions, 40, 47)
     Tooltip.AddButtonTooltip(GUI.becomeObserver, 'lob_become_observer')
     GUI.becomeObserver.OnClick = function()
@@ -3589,16 +3559,17 @@ function CreateUI(maxPlayers)
     end
 
     -- CPU BENCH BUTTON --
-    GUI.rerunBenchmark = UIUtil.CreateButtonStd(GUI.buttonPanelRight, '/BUTTON/cputest/', '', 11)
+    GUI.rerunBenchmark = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/cputest/', '', 11)
     LayoutHelpers.RightOf(GUI.rerunBenchmark, GUI.becomeObserver, -20)
     Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text='Run CPU Benchmark Test', body='Recalculates your CPU rating.'})
 
+    -- Observer List
     GUI.observerList = ItemList(GUI.observerPanel, "observer list")
     GUI.observerList:SetFont(UIUtil.bodyFont, 12)
     GUI.observerList:SetColors(UIUtil.fontColor, "00000000", UIUtil.fontOverColor, UIUtil.highlightColor, "ffbcfffe")
-    GUI.observerList.Left:Set(function() return GUI.observerPanel.Left() end)
+    GUI.observerList.Left:Set(function() return GUI.observerPanel.Left() + 4 end)
     GUI.observerList.Bottom:Set(function() return GUI.observerPanel.Bottom() end)
-    GUI.observerList.Top:Set(function() return GUI.observerPanel.Top() end)
+    GUI.observerList.Top:Set(function() return GUI.observerPanel.Top() + 2 end)
     GUI.observerList.Right:Set(function() return GUI.observerPanel.Right() - 15 end)
     GUI.observerList.OnClick = function(self, row, event)
         if isHost and event.Modifiers.Right then
@@ -3613,7 +3584,7 @@ function CreateUI(maxPlayers)
             )
         end
     end
-    UIUtil.CreateLobbyVertScrollbar(GUI.observerList)
+    UIUtil.CreateLobbyVertScrollbar(GUI.observerList, 0, 0, -1)
 
     if singlePlayer then
         -- observers are always allowed in skirmish games.
@@ -4975,7 +4946,7 @@ function SetRuleTitleText(rule)
     GUI.RuleLabel:DeleteAllItems()
     -- We should probably use a TextField for this, but for now we do the slightly ridiculous thing
     -- of wrapping across two rows in an ItemList.
-    local wrapped = import('/lua/maui/text.lua').WrapText('Rule : '..rule, 350, function(curText) return GUI.RuleLabel:GetStringAdvance(curText) end)
+    local wrapped = import('/lua/maui/text.lua').WrapText('Rules: '..rule, 350, function(curText) return GUI.RuleLabel:GetStringAdvance(curText) end)
     GUI.RuleLabel:AddItem(wrapped[1] or '')
     GUI.RuleLabel:AddItem(wrapped[2] or '')
 end
