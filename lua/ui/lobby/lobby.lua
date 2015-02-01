@@ -4668,7 +4668,6 @@ function CreateCPUMetricUI()
         end
 
         GUI.rerunBenchmark.OnClick = function(self, modifiers)
-            GUI.rerunBenchmark:Disable()
             ForkThread(function() UpdateBenchmark(true) end)
         end
     end
@@ -4758,8 +4757,7 @@ function StressCPU(waitTime)
     --Get our last benchmark (if there was one)
     local currentBestBenchmark = 10000
 
-    --LOG('Beginning CPU benchmark')
-    if GUI.rerunBenchmark.label then GUI.rerunBenchmark.label:SetText('. . .') end
+    GUI.rerunBenchmark.label:SetText('. . .')
 
     --Run three benchmarks and keep the best one
     for i=1, 3, 1 do
