@@ -5168,8 +5168,8 @@ end
 -- Show the lobby preset UI.
 function ShowPresetDialog()
     local dialogContent = Group(GUI)
-    dialogContent.Width:Set(459)
-    dialogContent.Height:Set(373)
+    dialogContent.Width:Set(600)
+    dialogContent.Height:Set(530)
 
     local presetDialog = Popup(GUI, dialogContent)
     presetDialog.OnClosed = presetDialog.Destroy
@@ -5178,17 +5178,17 @@ function ShowPresetDialog()
     -- Title
     local titleText = UIUtil.CreateText(dialogContent, 'Lobby Presets', 17, 'Arial Gras', true)
     LayoutHelpers.AtHorizontalCenterIn(titleText, dialogContent, 0)
-    LayoutHelpers.AtTopIn(titleText, dialogContent, 7)
+    LayoutHelpers.AtTopIn(titleText, dialogContent, 10)
 
     -- Preset List
     local PresetList = ItemList(dialogContent)
     PresetList:SetFont(UIUtil.bodyFont, 14)
     PresetList:ShowMouseoverItem(true)
-    PresetList.Width:Set(190)
-    PresetList.Height:Set(279)
+    PresetList.Width:Set(265)
+    PresetList.Height:Set(430)
     LayoutHelpers.DepthOverParent(PresetList, dialogContent, 10)
-    LayoutHelpers.AtLeftIn(PresetList, dialogContent, 10)
-    LayoutHelpers.AtTopIn(PresetList, dialogContent, 32)
+    LayoutHelpers.AtLeftIn(PresetList, dialogContent, 14)
+    LayoutHelpers.AtTopIn(PresetList, dialogContent, 38)
     UIUtil.CreateLobbyVertScrollbar(PresetList, 2)
 
     -- Info List
@@ -5196,10 +5196,9 @@ function ShowPresetDialog()
     InfoList:SetFont(UIUtil.bodyFont, 11)
     InfoList:SetColors(nil, "00000000")
     InfoList:ShowMouseoverItem(true)
-    InfoList.Width:Set(220)
-    InfoList.Height:Set(279)
-    LayoutHelpers.RightOf(InfoList, PresetList, 22)
-    UIUtil.CreateLobbyVertScrollbar(InfoList)
+    InfoList.Width:Set(281)
+    InfoList.Height:Set(430)
+    LayoutHelpers.RightOf(InfoList, PresetList, 26)
 
     -- Quit button
     local QuitButton = UIUtil.CreateButtonStd(dialogContent, '/dialogs/close_btn/close')
@@ -5214,16 +5213,16 @@ function ShowPresetDialog()
 
     -- Create button. Occupies the same space as the load button, when available.
     local CreateButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Create")
-    LayoutHelpers.RightOf(CreateButton, LoadButton, -19)
+    LayoutHelpers.RightOf(CreateButton, LoadButton, 28)
 
     -- Save button
     local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Save")
-    LayoutHelpers.RightOf(SaveButton, CreateButton, -19)
+    LayoutHelpers.RightOf(SaveButton, CreateButton, 28)
     SaveButton:Disable()
 
     -- Delete button
     local DeleteButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Delete")
-    LayoutHelpers.RightOf(DeleteButton, SaveButton, -19)
+    LayoutHelpers.RightOf(DeleteButton, SaveButton, 28)
     DeleteButton:Disable()
 
     LoadButton.OnClick = function(self)
