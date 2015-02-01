@@ -167,16 +167,6 @@ function CreateUI()
     LayoutHelpers.AtHorizontalCenterIn(logo, border)
     LayoutHelpers.AtTopIn(logo, border)
     logo.Depth:Set(60)
-
-    -- version text
-    local versionText = UIUtil.CreateText(border, GetVersion(), 14, UIUtil.bodyFont)
-    versionText:SetColor('677983')
-    LayoutHelpers.AtRightTopIn(versionText, border, 0, 0)
-    
-    local versionTextBG = Bitmap(versionText)
-    versionTextBG:SetSolidColor('ff000000')
-    LayoutHelpers.FillParent(versionTextBG, versionText)
-    versionTextBG.Depth:Set(function() return versionText.Depth() - 1 end)
     
     -- Borders
     local topBorder = Bitmap(logo, UIUtil.UIFile('/scx_menu/main-menu/border-console-top_bmp.dds'))
