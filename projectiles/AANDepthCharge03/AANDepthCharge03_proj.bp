@@ -20,7 +20,6 @@ ProjectileBlueprint {
         'AEON',
         'PROJECTILE',
         'ANTINAVY',
-        'NOSPLASHDAMAGE',
     },
     Defense = {
         Health = 1,
@@ -31,19 +30,23 @@ ProjectileBlueprint {
         Mesh = {
             LODs = {
                 {
-                    AlbedoName = '/projectiles/AANTorpedoChronoPack01/AANTorpedoChronoPack01_albedo.dds',
-                    MeshName = '/projectiles/AANTorpedoChronoPack01/AANTorpedoChronoPack01_lod0.scm',
+                    AlbedoName = '/projectiles/AANDepthCharge01/AANDepthCharge01_albedo.dds',
+                    LODCutoff = 150,
+                    MeshName = '/projectiles/AANDepthCharge01/AANDepthCharge01_lod0.scm',
                     ShaderName = 'TMeshGlow',
                 },
             },
         },
-        StrategicIconSize = 2,
-        UniformScale = 0.05,
+        StrategicIconSize = 1,
+        UniformScale = 0.45,
+    },
+    DoNotCollideList = {
+        'TORPEDO',
     },
     General = {
         Category = 'Anti Navy',
         Faction = 'Aeon',
-        Weapon = 'Torpedo Cluster',
+        Weapon = 'Harmonic Depth Charge',
     },
     Interface = {
         HelpText = 0,

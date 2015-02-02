@@ -28,7 +28,7 @@ SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo) {
 		end
 		self.AirTrails:Destroy()
 		CreateEmitterOnEntity(self,army,EffectTemplate.SHeavyCavitationTorpedoFxTrails)
-				
+        self:SetMaxSpeed(2)
 		self:TrackTarget(true):StayUnderwater(true)
     	self:SetCollideSurface(false)
 		self:SetTurnRate(240)
@@ -42,7 +42,7 @@ SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo) {
         self.AirTrails = CreateEmitterOnEntity(self,self:GetArmy(),EffectTemplate.SHeavyCavitationTorpedoFxTrails02)
     end,
     
-	ProjectileSplit = function(self)
+	ProjectileSplit = function(self)    
 		WaitSeconds(1)
 		local ChildProjectileBP = '/projectiles/SANHeavyCavitationTorpedo04/SANHeavyCavitationTorpedo04_proj.bp'  
 		local vx, vy, vz = self:GetVelocity()

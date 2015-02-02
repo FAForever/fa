@@ -7,23 +7,21 @@ ProjectileBlueprint {
         },
         Impact = Sound {
             Bank = 'Impacts',
-            Cue = 'Impact_Water_Splash_AEON',
+            Cue = 'Impact_Water_Splash_UEF',
             LodCutoff = 'Weapon_LodCutoff',
         },
         ImpactWater = Sound {
             Bank = 'Impacts',
-            Cue = 'Impact_Water_Splash_AEON',
+            Cue = 'Impact_Water_Splash_UEF',
             LodCutoff = 'Weapon_LodCutoff',
         },
     },
     Categories = {
-        'AEON',
+        'UEF',
         'PROJECTILE',
         'ANTINAVY',
+        'TORPEDO',
         'NOSPLASHDAMAGE',
-    },
-    Defense = {
-        Health = 1,
     },
     Display = {
         CameraFollowTimeout = 2,
@@ -31,19 +29,18 @@ ProjectileBlueprint {
         Mesh = {
             LODs = {
                 {
-                    AlbedoName = '/projectiles/AANTorpedoChronoPack01/AANTorpedoChronoPack01_albedo.dds',
-                    MeshName = '/projectiles/AANTorpedoChronoPack01/AANTorpedoChronoPack01_lod0.scm',
                     ShaderName = 'TMeshGlow',
                 },
             },
         },
-        StrategicIconSize = 2,
-        UniformScale = 0.05,
+        MeshBlueprint = '/projectiles/TANAnglerTorpedo01/TANAnglerTorpedo01_mesh.bp',
+        StrategicIconSize = 1,
+        UniformScale = 0.15,
     },
     General = {
         Category = 'Anti Navy',
-        Faction = 'Aeon',
-        Weapon = 'Torpedo Cluster',
+        Faction = 'UEF',
+        Weapon = 'Angler Torpedo',
     },
     Interface = {
         HelpText = 0,
