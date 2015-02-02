@@ -366,7 +366,11 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
 
     -- TODO: This logic is duplicated in lobby.lua (where there's another button to do the same job)
     randomMapButton.OnClick = function(self, modifiers)
-        local randomMapIndex = math.floor(math.random(1, mapList:GetItemCount()))
+        local currentMap = mapList:GetSelection()
+        local randomMapIndex = currentMap
+        while randomMapIndex == currentMap do
+            randomMapIndex = math.random(0, (mapList:GetItemCount() - 1))
+        end
         mapList:OnClick(randomMapIndex)
     end
     function randomAutoMap(official)
