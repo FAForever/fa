@@ -364,9 +364,12 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     LayoutHelpers.LeftOf(randomMapButton, restrictedUnitsButton, 65)
     Tooltip.AddButtonTooltip(randomMapButton, 'lob_click_randmap')
 
-    -- TODO: This logic is duplicated in lobby.lua (where there's another button to do the same job)
     randomMapButton.OnClick = function(self, modifiers)
-        local randomMapIndex = math.floor(math.random(1, mapList:GetItemCount()))
+        local randomMapIndex
+        repeat
+            randomMapIndex = math.random(0, mapList:GetItemCount() - 1)
+        until randomMapIndex ~= mapList:GetSelection()
+
         mapList:OnClick(randomMapIndex)
     end
     function randomAutoMap(official)
