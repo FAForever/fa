@@ -367,6 +367,23 @@ Weapon = Class(moho.weapon_methods) {
     OnDestroy = function(self)
     end,
 
+    GetDefaultPriorities = function(self)
+        if not self.DefaultPriorities then
+            local bp = self:GetBlueprint().TargetPriorities
+            local prioTable = {}
+            if bp then
+                for k, v in bp do
+                    table.insert(prioTable, ParseEntityCategory(v))
+                end
+                self:SetTargetingPriorities(prioTable)
+            end
+
+            self.DefaultPriorities = prioTable
+        end
+
+        return self.DefaultPriorities
+    end,
+
     SetWeaponPriorities = function(self, priTable)
         if not priTable then
             local bp = self:GetBlueprint().TargetPriorities
