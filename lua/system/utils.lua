@@ -344,6 +344,35 @@ function table.shuffle(t)
     return r
 end
 
+-- Pretty-print a table. Depressingly large amount of wheel-reinvention were required, thanks to
+-- SC's Lua being a bit weird and the existing solutions to this problem being aggressively optimised
+-- for some stupid reason. :/
+function printField(k, v, prefix)
+    if "string" == type(v) then
+        WARN(prefix .. k .. " = " .. "\"" .. v .. "\"")
+    elseif "table" == type(v) then
+        WARN(prefix .. k .. " = ")
+        table.print(v, prefix .. "    ", WARN)
+    else
+        WARN(prefix .. k .. " = " .. tostring(v))
+    end
+end
+
+function table.print(tbl, prefix)
+    if not prefix then prefix = "" end
+    if not tbl then
+        WARN("nil")
+        return
+    end
+
+    WARN(prefix.."{")
+    for k, v in pairs(tbl) do
+        printField(k, v, prefix .. "    ", WARN)
+    end
+
+    WARN(prefix.."}")
+end
+
 --- Filter a table using a function.
 --
 -- @param t Table to filter
