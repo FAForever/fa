@@ -314,7 +314,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
 
     -- control layout
     local dialogContent = Group(over)
-    dialogContent.Width:Set(914)
+    dialogContent.Width:Set(956)
     dialogContent.Height:Set(692)
 
     local popup = Popup(over, dialogContent)
@@ -324,44 +324,16 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     LayoutHelpers.AtHorizontalCenterIn(title, dialogContent)
 
     local cancelButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Cancel>")
-    LayoutHelpers.AtRightIn(cancelButton, dialogContent, 3)
+    LayoutHelpers.AtRightIn(cancelButton, dialogContent, -2)
     LayoutHelpers.AtBottomIn(cancelButton, dialogContent, 10)
 
     selectButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _OK>")
-    LayoutHelpers.LeftOf(selectButton, cancelButton, 65)
-
-    local modButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC tooltipui0145>")
-    LayoutHelpers.LeftOf(modButton, selectButton, 65)
-    Tooltip.AddButtonTooltip(modButton, "Lobby_Mods")
-    modButton.OnClick = function(self, modifiers)
-        local availableMods = ModManager.HostModStatus(availableMods)
-        ModManager.NEW_MODS_GUI(dialogContent, true, nil, availableMods)
-    end
-
-    local restrictedUnitsButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC sel_map_0006>Unit Manager")
-    LayoutHelpers.LeftOf(restrictedUnitsButton, modButton, 65)
-    Tooltip.AddButtonTooltip(restrictedUnitsButton, "lob_RestrictedUnits")
-
-    if not restrictedCategories then
-        restrictedCategories = curOptions.RestrictedCategories
-    end
-    restrictedUnitsButton.OnClick = function(self, modifiers)
-        mapList:AbandonKeyboardFocus()
-        import('/lua/ui/lobby/restrictedUnitsDlg.lua').CreateDialog(dialogContent,
-            restrictedCategories,
-            function(rc)
-                restrictedCategories = rc
-                mapList:AcquireKeyboardFocus(true)
-            end,
-            function()
-                mapList:AcquireKeyboardFocus(true)
-            end,
-            true)
-    end
+    LayoutHelpers.LeftOf(selectButton, cancelButton, 72)
 
     local doNotRepeatMap
     local randomMapButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC lobui_0503>Random Map")
-    LayoutHelpers.LeftOf(randomMapButton, restrictedUnitsButton, 65)
+    LayoutHelpers.AtHorizontalCenterIn(randomMapButton, dialogContent)
+    LayoutHelpers.AtVerticalCenterIn(randomMapButton, selectButton)
     Tooltip.AddButtonTooltip(randomMapButton, 'lob_click_randmap')
 
     randomMapButton.OnClick = function(self, modifiers)
@@ -391,13 +363,42 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
         selectBehavior(selectedScenario, changedOptions, restrictedCategories)
         ResetFilters()
     end
+    
+    local restrictedUnitsButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC sel_map_0006>Unit Manager")
+    LayoutHelpers.LeftOf(restrictedUnitsButton, randomMapButton, 81)
+    Tooltip.AddButtonTooltip(restrictedUnitsButton, "lob_RestrictedUnits")
+    
+    if not restrictedCategories then
+        restrictedCategories = curOptions.RestrictedCategories
+    end
+    restrictedUnitsButton.OnClick = function(self, modifiers)
+        mapList:AbandonKeyboardFocus()
+        import('/lua/ui/lobby/restrictedUnitsDlg.lua').CreateDialog(dialogContent,
+            restrictedCategories,
+            function(rc)
+                restrictedCategories = rc
+                mapList:AcquireKeyboardFocus(true)
+            end,
+            function()
+                mapList:AcquireKeyboardFocus(true)
+            end,
+            true)
+    end
+    
+    local modButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC tooltipui0145>")
+    LayoutHelpers.LeftOf(modButton, restrictedUnitsButton, 74)
+    Tooltip.AddButtonTooltip(modButton, "Lobby_Mods")
+    modButton.OnClick = function(self, modifiers)
+        local availableMods = ModManager.HostModStatus(availableMods)
+        ModManager.NEW_MODS_GUI(dialogContent, true, nil, availableMods)
+    end
 
     UIUtil.MakeInputModal(dialogContent)
 
-    local MAP_PREVIEW_SIZE = 290
+    local MAP_PREVIEW_SIZE = 292
     local preview = ResourceMapPreview(dialogContent, MAP_PREVIEW_SIZE, 5, 8, true)
     UIUtil.SurroundWithBorder(preview, '/scx_menu/lan-game-lobby/frame/')
-    LayoutHelpers.AtLeftTopIn(preview, dialogContent, 20, 50)
+    LayoutHelpers.AtLeftTopIn(preview, dialogContent, 19, 50)
 
     local nopreviewtext = UIUtil.CreateText(dialogContent, "<LOC _No_Preview>No Preview", 24)
     LayoutHelpers.AtCenterIn(nopreviewtext, preview)
@@ -408,15 +409,15 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     mapInfoGroup.Width:Set(MAP_PREVIEW_SIZE)
     LayoutHelpers.Below(mapInfoGroup, preview, 23)
     local descriptionTitle = UIUtil.CreateText(dialogContent, "<LOC sel_map_0000>Map Info", 18)
-    LayoutHelpers.AtLeftTopIn(descriptionTitle, mapInfoGroup, 2, 2)
+    LayoutHelpers.AtLeftTopIn(descriptionTitle, mapInfoGroup, 4, 2)
 
     description = ItemList(mapInfoGroup, "mapselect:description")
     description:SetFont(UIUtil.bodyFont, 14)
     description:SetColors(UIUtil.fontColor, "00000000", UIUtil.fontColor, "00000000")
-    description.Width:Set(273)
-    description.Height:Set(236)
+    description.Width:Set(271)
+    description.Height:Set(234)
     LayoutHelpers.Below(description, descriptionTitle)
-    UIUtil.CreateLobbyVertScrollbar(description)
+    UIUtil.CreateLobbyVertScrollbar(description, 2, -1, -25)
     mapInfoGroup.Bottom:Set(description.Bottom)
     UIUtil.SurroundWithBorder(mapInfoGroup, '/scx_menu/lan-game-lobby/frame/')
 
@@ -426,12 +427,13 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     LayoutHelpers.RightOf(filterGroup, preview, 23)
 
     filterTitle = UIUtil.CreateText(dialogContent, "<LOC sel_map_0003>Filters", 18)
-    LayoutHelpers.AtLeftTopIn(filterTitle, filterGroup, 2, 2)
+    LayoutHelpers.AtLeftTopIn(filterTitle, filterGroup, 4, 2)
 
     for i, filterData in mapFilters do
         filters[i] = CreateFilter(filterTitle, filterData)
         if i == 1 then
             LayoutHelpers.Below(filters[1], filterTitle)
+            LayoutHelpers.AtLeftIn(filters[1], filterTitle, 1)
         else
             LayoutHelpers.Below(filters[i], filters[i - 1], 10)
         end
@@ -439,14 +441,14 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
 
     -- Expand the group to encompass all the filter controls
     filterGroup.Bottom:Set(function() return filters[table.getn(filters)].Bottom() + 3 end)
-    filterGroup.Right:Set(filters[table.getn(filters)].Right)
+    filterGroup.Right:Set(function() return filters[table.getn(filters)].Right() + 1 end)
 
     local mapSelectGroup = Group(dialogContent)
     UIUtil.SurroundWithBorder(mapSelectGroup, '/scx_menu/lan-game-lobby/frame/')
     mapSelectGroup.Right:Set(filterGroup.Right)
     LayoutHelpers.Below(mapSelectGroup, filterGroup, 23)
     mapListTitle = UIUtil.CreateText(dialogContent, "<LOC sel_map_0005>Maps", 18)
-    LayoutHelpers.AtLeftTopIn(mapListTitle, mapSelectGroup, 2, 2)
+    LayoutHelpers.AtLeftTopIn(mapListTitle, mapSelectGroup, 4, 2)
 
     mapList = ItemList(dialogContent, "mapselect:mapList")
     mapList:SetFont(UIUtil.bodyFont, 14)
@@ -455,7 +457,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     --TODO what is this getting under when it's in over state?
     mapList.Depth:Set(function() return dialogContent.Depth() + 10 end)
     -- Allocating space for the scrollbar.
-    mapList.Width:Set(function() return mapSelectGroup.Width() - 16 end)
+    mapList.Width:Set(function() return mapSelectGroup.Width() - 21 end)
     mapList.Bottom:Set(mapInfoGroup.Bottom)
     LayoutHelpers.Below(mapList, mapListTitle)
     mapList:AcquireKeyboardFocus(true)
@@ -479,14 +481,14 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
         return ItemList.HandleEvent(self,event)
     end
 
-    UIUtil.CreateLobbyVertScrollbar(mapList)
+    UIUtil.CreateLobbyVertScrollbar(mapList, 2, -1, -25)
 
     -- initialize controls
     PopulateMapList()
 
     local OptionGroup = Group(dialogContent)
     UIUtil.SurroundWithBorder(OptionGroup, '/scx_menu/lan-game-lobby/frame/')
-    OptionGroup.Width:Set(250)
+    OptionGroup.Width:Set(290)
     OptionGroup.Bottom:Set(mapSelectGroup.Bottom)
     LayoutHelpers.RightOf(OptionGroup, filterGroup, 23)
     SetupOptionsPanel(OptionGroup, singlePlayer, curOptions)
@@ -595,20 +597,20 @@ end
 
 function SetupOptionsPanel(parent, singlePlayer, curOptions)
     local title = UIUtil.CreateText(parent, '<LOC PROFILE_0012>', 18)
-    LayoutHelpers.AtLeftTopIn(title, parent, 2, 2)
+    LayoutHelpers.AtLeftTopIn(title, parent, 4, 2)
 
     OptionContainer = Group(parent)
-    OptionContainer.Height:Set(function() return parent.Height() - title.Height() - 2 end)
-    OptionContainer.Width:Set(function() return parent.Width() - 16 end)
+    OptionContainer.Height:Set(function() return parent.Height() - title.Height() end)
+    OptionContainer.Width:Set(function() return parent.Width() - 18 end)
     OptionContainer.top = 0
-    LayoutHelpers.Below(OptionContainer, title)
+    LayoutHelpers.Below(OptionContainer, title, 2)
 
     local OptionDisplay = {}
     RefreshOptions(true, singlePlayer)
 
     local function CreateOptionCombo(parent, optionData, width)
         local combo = Combo(parent, nil, nil, nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
-        combo.Width:Set(220)
+        combo.Width:Set(266)
         local itemArray = {}
         combo.keyMap = {}
         local tooltipTable = {}
@@ -624,12 +626,12 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
         local function CreateElement(index)
             OptionDisplay[index] = Group(OptionContainer)
             OptionDisplay[index].Height:Set(46)
-            OptionDisplay[index].Width:Set(OptionContainer.Width)
+            OptionDisplay[index].Width:Set(function() return OptionContainer.Width() + 4 end)
 
             OptionDisplay[index].bg = Bitmap(OptionDisplay[index])
             OptionDisplay[index].bg.Depth:Set(OptionDisplay[index].Depth)
             LayoutHelpers.FillParent(OptionDisplay[index].bg, OptionDisplay[index])
-            OptionDisplay[index].bg.Right:Set(function() return OptionDisplay[index].Right() - 2 end)
+            OptionDisplay[index].bg.Right:Set(OptionDisplay[index].Right)
 
             OptionDisplay[index].text = UIUtil.CreateText(OptionContainer, '', 14, "Arial")
             OptionDisplay[index].text:DisableHitTest()
@@ -640,7 +642,8 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
         end
 
         CreateElement(1)
-        LayoutHelpers.Below(OptionDisplay[1], title, -5)
+        LayoutHelpers.Below(OptionDisplay[1], title, -3)
+        LayoutHelpers.AtLeftIn(OptionDisplay[1], title, -5)
 
         local index = 2
         while OptionDisplay[table.getsize(OptionDisplay)].Bottom() + OptionDisplay[1].Height() < OptionContainer.Bottom() do
@@ -787,7 +790,7 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
         end
     end
 
-    UIUtil.CreateLobbyVertScrollbar(OptionContainer)
+    UIUtil.CreateLobbyVertScrollbar(OptionContainer, -1, -5, -27)
 end
 
 function SetDescription(scen)
