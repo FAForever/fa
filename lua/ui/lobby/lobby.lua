@@ -4174,9 +4174,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 gameInfo.PlayerOptions[data.Slot]:SetPlayerColor(data.Color)
                 SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
             elseif data.Type == 'GameInfo' then
-                -- Completely update the game state.
-                -- We should aim to use this exactly once: On first connection to the host. As-is,
-                -- it makes incremental UI updates problematic.
+                -- Completely update the game state. To be used exactly once: when first connecting.
                 local hostFlatInfo = data.GameInfo
                 table.print(hostFlatInfo)
                 gameInfo = GameInfo.CreateGameInfo(LobbyComm.maxPlayerSlots, hostFlatInfo)
