@@ -7,7 +7,6 @@
 --*****************************************************************************
 
 local GameVersion = import('/lua/version.lua').GetVersion
-local LobbyVersion = import('/lua/version.lua').GetLobbyVersion
 local UIUtil = import('/lua/ui/uiutil.lua')
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
 local Prefs = import('/lua/user/prefs.lua')
@@ -2814,12 +2813,16 @@ function CreateUI(maxPlayers)
     GUI.GameQualityLabel = makeLabel("", 13)
     LayoutHelpers.AtRightTopIn(GUI.GameQualityLabel, GUI.panel, 50, 61)
 
+    -- Title Label
+    GUI.titleText = makeLabel("FAF Game Lobby", 17)
+    LayoutHelpers.AtLeftTopIn(GUI.titleText, GUI.panel, 43, 46)
+    
     -- Rule Label
     local RuleLabel = ItemList(GUI.panel)
     GUI.RuleLabel = RuleLabel
     RuleLabel:SetFont('Arial Gras', 11)
     RuleLabel:SetColors("B9BFB9", "00000000", "B9BFB9", "00000000")
-    LayoutHelpers.AtLeftTopIn(RuleLabel, GUI.panel, 43, 88)
+    LayoutHelpers.AtLeftTopIn(RuleLabel, GUI.panel, 43, 83)
     RuleLabel.Height:Set(34)
     RuleLabel.Width:Set(350)
     RuleLabel:DeleteAllItems()
@@ -2868,17 +2871,13 @@ function CreateUI(maxPlayers)
     end
     
     -- Logo
-    GUI.logo = Bitmap(GUI.panel, '/textures/ui/common/scx_menu/lan-game-lobby/logo.dds')
-    LayoutHelpers.AtLeftTopIn(GUI.logo, GUI.panel, 43, 43)
+    GUI.logo = Bitmap(GUI, '/textures/ui/common/scx_menu/lan-game-lobby/logo.dds')
+    LayoutHelpers.AtLeftTopIn(GUI.logo, GUI, 10, 10)
     
     -- Version texts
-    local gameVersionText = UIUtil.CreateText(GUI.panel, GameVersion(), 14, UIUtil.bodyFont)
+    local gameVersionText = UIUtil.CreateText(GUI, GameVersion(), 14, UIUtil.bodyFont)
     gameVersionText:SetColor('677983')
-    LayoutHelpers.AtLeftTopIn(gameVersionText, GUI.logo, 34, -2)
-    
-    local lobbyVersionText = UIUtil.CreateText(GUI.panel, LobbyVersion(), 14, UIUtil.bodyFont)
-    lobbyVersionText:SetColor('677983')
-    LayoutHelpers.AtLeftTopIn(lobbyVersionText, GUI.logo, 34, 16)
+    LayoutHelpers.CenteredRightOf(gameVersionText, GUI.logo, 6)
     
     -- Player Slots
     GUI.playerPanel = Group(GUI.panel, "playerPanel")
