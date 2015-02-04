@@ -5175,7 +5175,6 @@ function ShowPresetDialog()
     end
 
     SaveButton.OnClick = function(self)
-        -- Fucking hell, William.
         local selectedPreset = PresetList:GetSelection() + 1
 
         SavePreset(selectedPreset)
@@ -5211,7 +5210,7 @@ function ShowPresetDialog()
     end
 
     PresetList.OnDoubleClick = function(self, row)
-        LoadPreset(row)
+        LoadPreset(row + 1)
     end
 
     -- When the user double-clicks on a metadata field, give them a popup to change its value.
