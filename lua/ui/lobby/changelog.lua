@@ -1,4 +1,4 @@
-last_version = 6
+last_version = 7
 changelog = {
     {
         version = 3,

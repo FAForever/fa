@@ -5471,6 +5471,9 @@ function GUI_Changelog()
 
     GUI.changelogPopup = Popup(GUI, dialogContent)
     GUI.changelogPopup.OnClosed = GUI.changelogPopup.Destroy
+    GUI.changelogPopup.OnShadowClicked = function(self)
+        OkButton.OnClick()
+    end
 
     -- Title --
     local text0 = UIUtil.CreateText(dialogContent, LOC("<LOC lobui_0412>"), 17, 'Arial Gras', true)
@@ -5500,6 +5503,7 @@ function GUI_Changelog()
 			InfoList:AddItem('')
 		end
 	end
+     
     -- OK button --
     local OkButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
 	LayoutHelpers.AtLeftIn(OkButton, dialogContent, 0)
