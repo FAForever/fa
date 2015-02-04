@@ -913,7 +913,7 @@ function ClearSlotInfo(slot)
     if stateKey == 'closed' then
         GUI.slots[slot].name:SetTitleTextColor("Crimson")
     else
-        GUI.slots[slot].name:SetTitleTextColor('B9BFB9')--UIUtil.fontColor)
+        GUI.slots[slot].name:SetTitleTextColor('B9BFB9')
     end
 
     if lobbyComm:IsHost() and stateKey == 'open' then
@@ -4201,10 +4201,10 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 import('/lua/ui/lobby/ModsManager.lua').UpdateClientModStatus(gameInfo.GameMods)
             elseif data.Type == 'SlotClose' then
                 gameInfo.ClosedSlots[data.Slot] = true
-                UpdateGame()
+                ClearSlotInfo(data.Slot)
             elseif data.Type == 'SlotOpen' then
                 gameInfo.ClosedSlots[data.Slot] = nil
-                UpdateGame()
+                ClearSlotInfo(data.Slot)
             end
         end
     end
