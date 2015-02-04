@@ -4095,6 +4095,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             elseif data.Type == 'AddObserver' then
                 -- create empty slot if possible and give it to the observer
                 if gameInfo.GameOptions.AllowObservers then
+                    SendCompleteGameStateToPeer(data.SenderID)
                     HostTryAddObserver(data.SenderID, PlayerData(data.PlayerOptions))
                 else
                     lobbyComm:EjectPeer(data.SenderID, 'NoObservers');
@@ -4163,14 +4164,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 ClearSlotInfo(data.OldSlot)
                 SetSlotInfo(data.NewSlot, gameInfo.PlayerOptions[data.NewSlot])
             elseif data.Type == 'ObserverAdded' then
-                if data.Options.OwnerID == localPlayerID then
-                    -- The new slot is for us. Request the full game info from the host
-                    localPlayerName = data.Options.PlayerName -- validated by server
-                    lobbyComm:SendData( hostID, {Type = "GetGameInfo"} )
-                else
-                    -- The new slot was someone else, just add that info.
-                    gameInfo.Observers[data.Slot] = PlayerData(data.Options)
-                end
+                gameInfo.Observers[data.Slot] = PlayerData(data.Options)
                 refreshObserverList()
             elseif data.Type == 'ConvertObserverToPlayer' then
                 gameInfo.Observers[data.OldSlot] = nil
