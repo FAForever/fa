@@ -2868,12 +2868,12 @@ function CreateUI(maxPlayers)
     
     -- Logo
     GUI.logo = Bitmap(GUI, '/textures/ui/common/scx_menu/lan-game-lobby/logo.dds')
-    LayoutHelpers.AtLeftTopIn(GUI.logo, GUI, 10, 10)
+    LayoutHelpers.AtLeftTopIn(GUI.logo, GUI, 1, 1)
     
     -- Version texts
-    local gameVersionText = UIUtil.CreateText(GUI, GameVersion(), 14, UIUtil.bodyFont)
+    local gameVersionText = UIUtil.CreateText(GUI, GameVersion(), 9, UIUtil.bodyFont)
     gameVersionText:SetColor('677983')
-    LayoutHelpers.CenteredRightOf(gameVersionText, GUI.logo, 6)
+    LayoutHelpers.CenteredRightOf(gameVersionText, GUI.logo, 4)
     
     -- Player Slots
     GUI.playerPanel = Group(GUI.panel, "playerPanel")
