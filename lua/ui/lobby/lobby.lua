@@ -4178,22 +4178,15 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 end
                 refreshObserverList()
             elseif data.Type == 'ConvertObserverToPlayer' then
-                if data.Options.OwnerID == localPlayerID then
-                    lobbyComm:SendData( hostID, {Type = "GetGameInfo"} )
-                else
-                    gameInfo.Observers[data.OldSlot] = nil
-                    gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
-                end
-                UpdateGame()
+                gameInfo.Observers[data.OldSlot] = nil
+                gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
+                refreshObserverList()
+                SetSlotInfo(data.NewSlot, gameInfo.PlayerOptions[data.NewSlot])
             elseif data.Type == 'ConvertPlayerToObserver' then
-                if data.Options.OwnerID == localPlayerID then
-                    lobbyComm:SendData( hostID, {Type = "GetGameInfo"} )
-                else
-                    gameInfo.Observers[data.NewSlot] = PlayerData(data.Options)
-                    gameInfo.PlayerOptions[data.OldSlot] = nil
-                end
+                gameInfo.Observers[data.NewSlot] = PlayerData(data.Options)
+                gameInfo.PlayerOptions[data.OldSlot] = nil
                 ClearSlotInfo(data.OldSlot)
-                UpdateGame()
+                refreshObserverList()
             elseif data.Type == 'SetColor' then
                 gameInfo.PlayerOptions[data.Slot]:SetPlayerColor(data.Color)
                 UpdateGame()
