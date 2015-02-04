@@ -25,7 +25,6 @@ bar_pos={Left=function() return 90 end, Top=function() return 140 end, Right=fun
 bt_pos_top=160
 
 local gamemain = import('/lua/ui/game/gamemain.lua')
-local skinning= import('/lua/ui/dialogs/skinning.lua')
 local info_dialog = {   -- CHANGE THE TEXT IN DIALOG_TXT.LUA !!!!!
  {name="total units built", path={"general","built","count"},key=1},
  {name="units still alive", path={"general","currentunits","count"},key=2},
@@ -1117,12 +1116,7 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
 	page_active.Top:Set(0)
 	page_active.Right:Set(0)
 	page_active.Bottom:Set(0)
-	
-	dialogBG = Bitmap(dialog)
-	LayoutHelpers.FillParent(dialogBG, dialog)
-	local obj=skinning.Set_Auto_9_Texture('main-bg', dialogBG, dialog, UIUtil.UIFile('/hotstats/score/'))
-	dialogBG.Depth:Set(dialog.Depth() - 1)
-	
+
     standardBtn = CreateDialogTabs(dialog, modcontrols_trad("Standard"), "l")
 	LayoutHelpers.AtLeftIn(standardBtn, dialog, 44)
 	standardBtn.Bottom:Set(dialog.Bottom() - 73)
