@@ -83,7 +83,8 @@ changelog = {
             "- Lots of UI polish",
             "- Preset system now saves activated mods",
             "- Observers can now open the chat menu by pushing ENTER",
-            "- Further performance improvements"
+            "- Further performance improvements",
+            "- Team selectors disabled when auto-teams is overriding them",
         }
     }
 }
