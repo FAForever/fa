@@ -4082,9 +4082,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
         if lobbyComm:IsHost() then
             -- Host only messages
-            if data.Type == 'GetGameInfo' then
-                SendCompleteGameStateToPeer(data.SenderID)
-            elseif data.Type == 'AddPlayer' then
+            if data.Type == 'AddPlayer' then
                 -- create empty slot if possible and give it to the player
                 SendCompleteGameStateToPeer(data.SenderID)
                 HostTryAddPlayer(data.SenderID, 0, PlayerData(data.PlayerOptions))
