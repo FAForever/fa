@@ -701,7 +701,7 @@ end
 -- update the data in a player slot
 -- TODO: With lazyvars, this function should be eliminated. Lazy-value-callbacks should be used
 -- instead to incrementaly update things.
-function SetSlotInfo(slot, playerInfo)
+function SetSlotInfo(slotNum, playerInfo)
     -- Remove the ConnectDialog. It probably makes more sense to do this when we get the game state.
 	if GUI.connectdialog then
 		GUI.connectdialog:Close()
@@ -717,15 +717,15 @@ function SetSlotInfo(slot, playerInfo)
         end
     end
 
-	local isLocallyOwned = IsLocallyOwned(slot)
+	local isLocallyOwned = IsLocallyOwned(slotNum)
     if isLocallyOwned then
-        if gameInfo.PlayerOptions[slot].Ready then
-            DisableSlot(slot, true)
+        if gameInfo.PlayerOptions[slotNum].Ready then
+            DisableSlot(slotNum, true)
         else
-            EnableSlot(slot)
+            EnableSlot(slotNum)
         end
     else
-        DisableSlot(slot)
+        DisableSlot(slotNum)
     end
 
     local hostKey
@@ -735,10 +735,12 @@ function SetSlotInfo(slot, playerInfo)
         hostKey = 'client'
     end
 
+    local slot = GUI.slots[slotNum]
+
     -- These states are used to select the appropriate strings with GetSlotMenuTables.
     local slotState
     if not playerInfo.Human then
-        GUI.slots[slot].ratingGroup:Hide()
+        slot.ratingGroup:Hide()
         slotState = 'ai'
     elseif not isLocallyOwned then
         slotState = 'player'
@@ -746,67 +748,67 @@ function SetSlotInfo(slot, playerInfo)
         slotState = nil
     end
 
-    GUI.slots[slot].name:ClearItems()
+    slot.name:ClearItems()
 
     if slotState then
-        GUI.slots[slot].name:Enable()
+        slot.name:Enable()
         local slotKeys, slotStrings = GetSlotMenuTables(slotState, hostKey)
-        GUI.slots[slot].name.slotKeys = slotKeys
+        slot.name.slotKeys = slotKeys
         if lobbyComm:IsHost() and slotState == 'ai' then
-            Tooltip.AddComboTooltip(GUI.slots[slot].name, GetAITooltipList())
+            Tooltip.AddComboTooltip(slot.name, GetAITooltipList())
         else
-            Tooltip.RemoveComboTooltip(GUI.slots[slot].name)
+            Tooltip.RemoveComboTooltip(slot.name)
         end
         if table.getn(slotKeys) > 0 then
-            GUI.slots[slot].name:AddItems(slotStrings)
-            GUI.slots[slot].name:Enable()
+            slot.name:AddItems(slotStrings)
+            slot.name:Enable()
         else
-            GUI.slots[slot].name.slotKeys = nil
-            GUI.slots[slot].name:Disable()
+            slot.name.slotKeys = nil
+            slot.name:Disable()
         end
     else
         -- no slotState indicate this must be ourself, and you can't do anything to yourself
-        GUI.slots[slot].name.slotKeys = nil
-        GUI.slots[slot].name:Disable()
+        slot.name.slotKeys = nil
+        slot.name:Disable()
     end
 
-    GUI.slots[slot].ratingGroup:Show()
+    slot.ratingGroup:Show()
     --if playerInfo.MEAN == '-9999' then -- The player is a Smurf (Banned)
     --GUI.slots[slot].ratingText:SetText('Banned')
     --GUI.slots[slot].ratingText:SetColor('Crimson') --= --dc143c
     --else
-    GUI.slots[slot].ratingText:SetText(playerInfo.PL)
+    slot.ratingText:SetText(playerInfo.PL)
     --end
-    GUI.slots[slot].ratingText:SetColor(playerInfo.RC)
+    slot.ratingText:SetColor(playerInfo.RC)
 
-    GUI.slots[slot].numGamesGroup:Show()
-    GUI.slots[slot].numGamesText:SetText(playerInfo.NG)
+    slot.numGamesGroup:Show()
+    slot.numGamesText:SetText(playerInfo.NG)
 
-    GUI.slots[slot].name:Show()
+    slot.name:Show()
     -- Color the Name in Slot by State
     if slotState == 'ai' then
-        GUI.slots[slot].name:SetTitleTextColor("dbdbb9") -- Beige Color for AI
-        GUI.slots[slot].name._text:SetFont('Arial Gras', 12)
-    elseif FindSlotForID(hostID) == slot then
-        GUI.slots[slot].name:SetTitleTextColor("ffc726") -- Orange Color for Host
-        GUI.slots[slot].name._text:SetFont('Arial Gras', 15)
+        slot.name:SetTitleTextColor("dbdbb9") -- Beige Color for AI
+        slot.name._text:SetFont('Arial Gras', 12)
+    elseif FindSlotForID(hostID) == slotNum then
+        slot.name:SetTitleTextColor("ffc726") -- Orange Color for Host
+        slot.name._text:SetFont('Arial Gras', 15)
     elseif slotState == 'player' then
-        GUI.slots[slot].name:SetTitleTextColor("64d264") -- Green Color for Players
-        GUI.slots[slot].name._text:SetFont('Arial Gras', 15)
+        slot.name:SetTitleTextColor("64d264") -- Green Color for Players
+        slot.name._text:SetFont('Arial Gras', 15)
     elseif isLocallyOwned then
-        GUI.slots[slot].name:SetTitleTextColor("6363d2") -- Blue Color for You
-        GUI.slots[slot].name._text:SetFont('Arial Gras', 15)
+        slot.name:SetTitleTextColor("6363d2") -- Blue Color for You
+        slot.name._text:SetFont('Arial Gras', 15)
     else
-        GUI.slots[slot].name:SetTitleTextColor(UIUtil.fontColor) -- Normal Color for Other
-        GUI.slots[slot].name._text:SetFont('Arial Gras', 12)
+        slot.name:SetTitleTextColor(UIUtil.fontColor) -- Normal Color for Other
+        slot.name._text:SetFont('Arial Gras', 12)
     end
 
     local playerName = playerInfo.PlayerName
 
     --\\ Stop - Color the Name in Slot by State
     if wasConnected(playerInfo.OwnerID) or isLocallyOwned then
-        GUI.slots[slot].name:SetTitleText(playerName)
-        GUI.slots[slot].name._text:SetFont('Arial Gras', 15)
+        slot.name:SetTitleText(playerName)
+        slot.name._text:SetFont('Arial Gras', 15)
         if not table.find(ConnectionEstablished, playerName) then
             if playerInfo.Human and not isLocallyOwned then
                 if table.find(ConnectedWithProxy, playerInfo.OwnerID) then
@@ -826,28 +828,28 @@ function SetSlotInfo(slot, playerInfo)
         end
     else
         -- TODO: Localise!
-        GUI.slots[slot].name:SetTitleText('Connecting to ... ' .. playerName)
-        GUI.slots[slot].name._text:SetFont('Arial Gras', 11)
+        slot.name:SetTitleText('Connecting to ... ' .. playerName)
+        slot.name._text:SetFont('Arial Gras', 11)
     end
 
-    GUI.slots[slot].faction:Show()
-    GUI.slots[slot].faction:SetItem(playerInfo.Faction)
+    slot.faction:Show()
+    slot.faction:SetItem(playerInfo.Faction)
 
-    GUI.slots[slot].color:Show()
-    Check_Availaible_Color(slot)
+    slot.color:Show()
+    Check_Availaible_Color(slotNum)
 
-    GUI.slots[slot].team:Show()
-    GUI.slots[slot].team:SetItem(playerInfo.Team)
+    slot.team:Show()
+    slot.team:SetItem(playerInfo.Team)
 
     if lobbyComm:IsHost() then
-        GpgNetSend('PlayerOption', string.format("faction %s %d %s", playerName, slot, playerInfo.Faction))
-        GpgNetSend('PlayerOption', string.format("color %s %d %s", playerName, slot, playerInfo.PlayerColor))
-        GpgNetSend('PlayerOption', string.format("team %s %d %s", playerName, slot, playerInfo.Team))
-        GpgNetSend('PlayerOption', string.format("startspot %s %d %s", playerName, slot, slot))
+        GpgNetSend('PlayerOption', string.format("faction %s %d %s", playerName, slotNum, playerInfo.Faction))
+        GpgNetSend('PlayerOption', string.format("color %s %d %s", playerName, slotNum, playerInfo.PlayerColor))
+        GpgNetSend('PlayerOption', string.format("team %s %d %s", playerName, slotNum, playerInfo.Team))
+        GpgNetSend('PlayerOption', string.format("startspot %s %d %s", playerName, slotNum, slotNum))
     end
 
-    UIUtil.setVisible(GUI.slots[slot].ready, playerInfo.Human and not singlePlayer)
-    GUI.slots[slot].ready:SetCheck(playerInfo.Ready, true)
+    UIUtil.setVisible(slot.ready, playerInfo.Human and not singlePlayer)
+    slot.ready:SetCheck(playerInfo.Ready, true)
 
     if isLocallyOwned and playerInfo.Human then
         Prefs.SetToCurrentProfile('LastColor', playerInfo.PlayerColor)
@@ -856,23 +858,23 @@ function SetSlotInfo(slot, playerInfo)
 
     -- Show the player's nationality
     if not playerInfo.Country then
-        GUI.slots[slot].KinderCountry:Hide()
+        slot.KinderCountry:Hide()
     else
-        GUI.slots[slot].KinderCountry:Show()
-        GUI.slots[slot].KinderCountry:SetTexture(UIUtil.UIFile('/countries/'..playerInfo.Country..'.dds'))
-        Country_GetTooltipValue(playerInfo.Country, slot)
-        Country_AddControlTooltip(GUI.slots[slot].KinderCountry, 0, slot)
+        slot.KinderCountry:Show()
+        slot.KinderCountry:SetTexture(UIUtil.UIFile('/countries/'..playerInfo.Country..'.dds'))
+        Country_GetTooltipValue(playerInfo.Country, slotNum)
+        Country_AddControlTooltip(slot.KinderCountry, 0, slotNum)
     end
 
     -- Disable team selection if "auto teams" is controlling it.
     local autoTeams = gameInfo.GameOptions['AutoTeams']
-    UIUtil.setEnabled(GUI.slots[slot].team,
+    UIUtil.setEnabled(slot.team,
         autoTeams == 'none' or
         (autoTeams == 'manual' and lobbyComm:IsHost())
     )
 
     -- Set the CPU bar
-    SetSlotCPUBar(slot, playerInfo)
+    SetSlotCPUBar(slotNum, playerInfo)
 end
 
 function ClearSlotInfo(slot)
