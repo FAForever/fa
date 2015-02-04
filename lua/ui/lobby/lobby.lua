@@ -4142,14 +4142,10 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 SetPlayerOption(FindSlotForID(FindIDForName(localPlayerName)), 'Ready', false)
             elseif data.Type == 'Peer_Really_Disconnected' then
 				LOGX('>> DATA RECEIVE : Peer_Really_Disconnected (slot:'..data.Slot..')', 'Disconnected')
-                if data.Options.OwnerID == localPlayerID then
-                    lobbyComm:SendData( hostID, {Type = "GetGameInfo"} )
-                else
-                    if data.Observ == false then
-                        gameInfo.PlayerOptions[data.Slot] = nil
-                    elseif data.Observ == true then
-                        gameInfo.Observers[data.Slot] = nil
-                    end
+                if data.Observ == false then
+                    gameInfo.PlayerOptions[data.Slot] = nil
+                elseif data.Observ == true then
+                    gameInfo.Observers[data.Slot] = nil
                 end
                 AddChatText(LOCF("<LOC Engine0003>Lost connection to %s.", data.Options.PlayerName), "Engine0003")
                 ClearSlotInfo(data.Slot)
