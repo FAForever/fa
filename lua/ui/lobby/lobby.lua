@@ -4158,15 +4158,10 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
                 UpdateGame()
             elseif data.Type == 'SlotMove' then
-                if data.Options.OwnerID == localPlayerID and data.Options.Human then
-                    localPlayerName = data.Options.PlayerName -- validated by server
-                    lobbyComm:SendData( hostID, {Type = "GetGameInfo"} )
-                else
-                    gameInfo.PlayerOptions[data.OldSlot] = nil
-                    gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
-                end
+                gameInfo.PlayerOptions[data.OldSlot] = nil
+                gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
                 ClearSlotInfo(data.OldSlot)
-                UpdateGame()
+                SetSlotInfo(data.NewSlot, gameInfo.PlayerOptions[data.NewSlot])
             elseif data.Type == 'ObserverAdded' then
                 if data.Options.OwnerID == localPlayerID then
                     -- The new slot is for us. Request the full game info from the host
