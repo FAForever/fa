@@ -5469,10 +5469,10 @@ function GUI_Changelog()
     dialogContent.Width:Set(526)
     dialogContent.Height:Set(450)
 
-    GUI.changelogPopup = Popup(GUI, dialogContent)
-    GUI.changelogPopup.OnClosed = GUI.changelogPopup.Destroy
-    GUI.changelogPopup.OnShadowClicked = function(self)
-        OkButton.OnClick()
+    local Changelog = import('/lua/ui/lobby/changelog.lua')
+    local changelogPopup = Popup(GUI, dialogContent)
+    changelogPopup.OnClosed = function()
+        Prefs.SetToCurrentProfile('LobbyChangelog', Changelog.last_version)
     end
 
     -- Title --
@@ -5492,7 +5492,6 @@ function GUI_Changelog()
     UIUtil.CreateLobbyVertScrollbar(InfoList)
 	InfoList.OnClick = function(self) end
 	-- See only new Changelog by version
-	local Changelog = import('/lua/ui/lobby/changelog.lua')
 	local Last_Changelog_Version = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
 	for i, d in Changelog.changelog do
 		if Last_Changelog_Version < d.version then
@@ -5508,8 +5507,5 @@ function GUI_Changelog()
     local OkButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
 	LayoutHelpers.AtLeftIn(OkButton, dialogContent, 0)
     LayoutHelpers.AtBottomIn(OkButton, dialogContent, 10)
-    OkButton.OnClick = function(self)
-        Prefs.SetToCurrentProfile('LobbyChangelog', Changelog.last_version)
-        GUI.changelogPopup:Hide()
-    end
+    OkButton.OnClick = changelogPopup.Close
 end
