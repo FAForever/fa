@@ -863,7 +863,14 @@ function SetSlotInfo(slot, playerInfo)
         Country_GetTooltipValue(playerInfo.Country, slot)
         Country_AddControlTooltip(GUI.slots[slot].KinderCountry, 0, slot)
     end
-    
+
+    -- Disable team selection if "auto teams" is controlling it.
+    local autoTeams = gameInfo.GameOptions['AutoTeams']
+    UIUtil.setEnabled(GUI.slots[slot].team,
+        autoTeams == 'none' or
+        (autoTeams == 'manual' and lobbyComm:IsHost())
+    )
+
     -- Set the CPU bar
     SetSlotCPUBar(slot, playerInfo)
 end
@@ -1794,22 +1801,6 @@ local function UpdateGame()
     GUI.allowObservers:SetCheck(gameInfo.GameOptions.AllowObservers, true)
 
     RefreshOptionDisplayData(scenarioInfo)
-
-    -- Disable team selection for Auto Teams
-    do
-        local autoTeams = gameInfo.GameOption['AuoTeams']
-        if autoTeams == 'none' or
-           (autoTeams == 'manual' and lobbyComm:IsHost())
-          then
-            for i= 1, LobbyComm.maxPlayerSlots do
-                GUI.slots[i].team:Enable()
-            end
-        else
-            for i= 1, LobbyComm.maxPlayerSlots do
-                GUI.slots[i].team:Disable()
-            end
-        end
-    end
 
     -- Update the map background to reflect the possibly-changed map.
     if Prefs.GetFromCurrentProfile('LobbyBackground') == 4 then
@@ -5296,6 +5287,7 @@ function RefreshAvailablePresetsList(PresetList)
     PresetList:DeleteAllItems()
 
     for k, v in profiles do
+        table.print(v)
         PresetList:AddItem(v.Name)
     end
 end
