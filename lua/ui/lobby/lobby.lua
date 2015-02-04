@@ -4197,7 +4197,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             elseif data.Type == 'ClearSlot' then
                 ClearSlotInfo(data.Slot)
                 gameInfo.PlayerOptions[data.Slot] = nil
-                UpdateGame()
             elseif data.Type == 'ClearObserver' then
                 gameInfo.Observers[data.Slot] = nil
                 UpdateGame()
