@@ -4113,9 +4113,9 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                     -- Color is available, let everyone else know
                     gameInfo.PlayerOptions[data.Slot]:SetPlayerColor(data.Color)
                     lobbyComm:BroadcastData( { Type = 'SetColor', Color = data.Color, Slot = data.Slot } )
-                    UpdateGame()
+                    SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
                 else
-                -- Sorry, it's not free. Force the player back to the color we have for him.
+                    -- Sorry, it's not free. Force the player back to the color we have for him.
                     lobbyComm:SendData( data.SenderID, { Type = 'SetColor', Color =
                     gameInfo.PlayerOptions[data.Slot].PlayerColor, Slot = data.Slot } )
                 end
