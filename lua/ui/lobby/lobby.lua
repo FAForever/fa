@@ -4172,7 +4172,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 refreshObserverList()
             elseif data.Type == 'SetColor' then
                 gameInfo.PlayerOptions[data.Slot]:SetPlayerColor(data.Color)
-                UpdateGame()
+                SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
             elseif data.Type == 'GameInfo' then
                 -- Completely update the game state.
                 -- We should aim to use this exactly once: On first connection to the host. As-is,
