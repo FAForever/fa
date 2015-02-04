@@ -4195,11 +4195,8 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 SetWindowedLobby(false)
                 lobbyComm:LaunchGame(info)
             elseif data.Type == 'ClearSlot' then
-                ClearSlotInfo(data.Slot)
                 gameInfo.PlayerOptions[data.Slot] = nil
-            elseif data.Type == 'ClearObserver' then
-                gameInfo.Observers[data.Slot] = nil
-                UpdateGame()
+                ClearSlotInfo(data.Slot)
             elseif data.Type == 'ModsChanged' then
                 gameInfo.GameMods = data.GameMods
                 UpdateGame()
