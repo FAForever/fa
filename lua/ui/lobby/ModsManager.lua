@@ -289,31 +289,26 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
             table.insert(scrollGroup.controlList, CreateListElementtt(scrollGroup, v, k, useCompactView))
             if IsHost and selmods[v.uid] then
                 scrollGroup.controlList[k].activated = true
-                scrollGroup.controlList[k].type:SetColor('101010')
+                scrollGroup.controlList[k].bg:SetTexture(UIUtil.SkinnableFile('/MODS/enabled.dds'))
                 if v.ui_only then
                     scrollGroup.controlList[k].type:SetText('UI Mod Activated')
-                    scrollGroup.controlList[k].bg:SetTexture('/textures/ui/common/MODS/enable_ui.dds')
                 else
                     scrollGroup.controlList[k].type:SetText('Game Mod Activated')
-                    scrollGroup.controlList[k].bg:SetTexture('/textures/ui/common/MODS/enable_game.dds')
                 end
             elseif not IsHost and modstatus[v.uid] and not v.ui_only then
                 scrollGroup.controlList[k].activated = true
-                scrollGroup.controlList[k].type:SetColor('101010')
                 scrollGroup.controlList[k].type:SetText('Game Mod Activated')
-                scrollGroup.controlList[k].bg:SetTexture('/textures/ui/common/MODS/enable_game.dds')
+                scrollGroup.controlList[k].bg:SetTexture(UIUtil.SkinnableFile('/MODS/enabled.dds'))
             elseif not IsHost and selmods[v.uid] and v.ui_only then
                 scrollGroup.controlList[k].activated = true
-                scrollGroup.controlList[k].type:SetColor('101010')
                 scrollGroup.controlList[k].type:SetText('UI Mod Activated')
-                scrollGroup.controlList[k].bg:SetTexture('/textures/ui/common/MODS/enable_ui.dds')
+                scrollGroup.controlList[k].bg:SetTexture(UIUtil.SkinnableFile('/MODS/enabled.dds'))
             end
             if scrollGroup.controlList[k].modInfo.exclusive and selmods[v.uid] then
                 exclusiveMod = true
                 scrollGroup.controlList[k].activated = true
-                scrollGroup.controlList[k].type:SetColor('101010')
                 scrollGroup.controlList[k].type:SetText('Exclusive Mod Activated')
-                scrollGroup.controlList[k].bg:SetTexture('/textures/ui/common/MODS/enable_excusif.dds')
+                scrollGroup.controlList[k].bg:SetTexture(UIUtil.SkinnableFile('/MODS/enabled.dds'))
             end
         end
         
@@ -340,9 +335,8 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
                     end
                 end
                 the_exclusif_mod.activated = true
-                the_exclusif_mod.type:SetColor('101010')
                 the_exclusif_mod.type:SetText('Exclusive Mod Activated')
-                the_exclusif_mod.bg:SetTexture('/textures/ui/common/MODS/enable_excusif.dds')
+                the_exclusif_mod.bg:SetTexture(UIUtil.SkinnableFile('/MODS/enabled.dds'))
                 PlaySound(Sound({Cue = "UI_Mod_Select", Bank = "Interface",}))
                 text1:SetText(count_mod_SIM_activated()..' Game Mods and '..count_mod_UI_activated()..' UI Mods activated')
             end
@@ -389,13 +383,11 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
                         if control.modInfo.uid == c then
                             exist = true
                             control.activated = true
-                            control.type:SetColor('101010')
+                            control.bg:SetTexture(UIUtil.SkinnableFile('/MODS/enabled.dds'))
                             if control.ui then
                                 control.type:SetText('UI Mod Activated')
-                                control.bg:SetTexture('/textures/ui/common/MODS/enable_ui.dds')
                             else
                                 control.type:SetText('Game Mod Activated')
-                                control.bg:SetTexture('/textures/ui/common/MODS/enable_game.dds')
                             end
                         end
                     end
@@ -403,13 +395,11 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
                         table.insert(scrollGroup.controlList, the_mod.pos+1, CreateListElementtt(scrollGroup, allMods[c], the_mod.pos, false))
                         control = scrollGroup.controlList[the_mod.pos+1]
                         control.activated = true
-                        control.type:SetColor('101010')
+                        control.bg:SetTexture(UIUtil.SkinnableFile('/MODS/enabled.dds'))
                         if control.ui then
                             control.type:SetText('UI Mod Activated')
-                            control.bg:SetTexture('/textures/ui/common/MODS/enable_ui.dds')
                         else
                             control.type:SetText('Game Mod Activated')
-                            control.bg:SetTexture('/textures/ui/common/MODS/enable_game.dds')
                         end
                         EVENT_Click()
                         scrollGroup:CalcVisible()
@@ -453,13 +443,11 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
             
             if not skipExit then
                 the_mod.activated = true
-                the_mod.type:SetColor('101010')
+                the_mod.bg:SetTexture(UIUtil.SkinnableFile('/MODS/enabled.dds'))
                 if the_mod.ui then
                     the_mod.type:SetText('UI Mod Activated')
-                    the_mod.bg:SetTexture('/textures/ui/common/MODS/enable_ui.dds')
                 else
                     the_mod.type:SetText('Game Mod Activated')
-                    the_mod.bg:SetTexture('/textures/ui/common/MODS/enable_game.dds')
                 end
             end
         end
@@ -490,15 +478,14 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
                         if not IsHost and not self.ui then
                             -- You can't enable Game Mod if you not the Host
                         else
+                            -- TODO: A disabled graphic for this situation.
                             if not self.modInfo.selectable then
                                 self.type:SetColor('B9BFB9')
                                 self.type:SetText('This mod cannot be selected')
-                                self.bg:SetTexture('/textures/ui/common/MODS/enable_not.dds')
                             elseif not availableMods[self.modInfo.uid] and not self.ui then
                                 -- If other player not have the mod
                                 self.type:SetColor('B9BFB9')
                                 self.type:SetText('One or more players do not have this mod')
-                                self.bg:SetTexture('/textures/ui/common/MODS/enable_not.dds')
                             else
                                 if self.activated then
                                     UNActiveMod(self)
@@ -518,11 +505,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
                             end
                         end
                     elseif event.Type == 'MouseEnter' then
-                        if self.activated then
-                            self.bg0:SetTexture('/textures/ui/common/MODS/line_black.dds')
-                        else
-                            self.bg0:SetTexture('/textures/ui/common/MODS/line_blank.dds')
-                        end
+                        self.bg0:SetTexture(UIUtil.SkinnableFile('/MODS/enabled.dds'))
                     elseif event.Type == 'MouseExit' then
                         self.bg0:SetSolidColor('00000000')
                     end
