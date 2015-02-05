@@ -363,6 +363,35 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
         selectBehavior(selectedScenario, changedOptions, restrictedCategories)
         ResetFilters()
     end
+    
+    local restrictedUnitsButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC sel_map_0006>Unit Manager")
+    LayoutHelpers.LeftOf(restrictedUnitsButton, randomMapButton, 81)
+    Tooltip.AddButtonTooltip(restrictedUnitsButton, "lob_RestrictedUnits")
+    
+    if not restrictedCategories then
+        restrictedCategories = curOptions.RestrictedCategories
+    end
+    restrictedUnitsButton.OnClick = function(self, modifiers)
+        mapList:AbandonKeyboardFocus()
+        import('/lua/ui/lobby/restrictedUnitsDlg.lua').CreateDialog(dialogContent,
+            restrictedCategories,
+            function(rc)
+                restrictedCategories = rc
+                mapList:AcquireKeyboardFocus(true)
+            end,
+            function()
+                mapList:AcquireKeyboardFocus(true)
+            end,
+            true)
+    end
+    
+    local modButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC tooltipui0145>")
+    LayoutHelpers.LeftOf(modButton, restrictedUnitsButton, 74)
+    Tooltip.AddButtonTooltip(modButton, "Lobby_Mods")
+    modButton.OnClick = function(self, modifiers)
+        local availableMods = ModManager.HostModStatus(availableMods)
+        ModManager.NEW_MODS_GUI(dialogContent, true, nil, availableMods)
+    end
 
     local restrictedUnitsButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC sel_map_0006>Unit Manager")
     LayoutHelpers.LeftOf(restrictedUnitsButton, randomMapButton, 81)
