@@ -4550,7 +4550,7 @@ function RefreshLargeMap()
     end
 
     local scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-    LrgMap.content.mapPreview:SetScenario(scenarioInfo)
+    LrgMap.content.mapPreview:SetScenario(scenarioInfo, true)
     ShowMapPositions(LrgMap.content.mapPreview, scenarioInfo, GetPlayerCount())
 end
 

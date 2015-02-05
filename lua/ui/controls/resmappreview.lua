@@ -22,12 +22,14 @@ ResourceMapPreview = Class(Group) {
         -- Bitmap pools for icons.
         self.massIconPool = TexturePool(UIUtil.SkinnableFile("/game/build-ui/icon-mass_bmp.dds"), self, massIconSize, massIconSize)
         self.hydroIconPool = TexturePool(UIUtil.SkinnableFile("/game/build-ui/icon-energy_bmp.dds"), self, hydroIconSize, hydroIconSize)
+        self.wreckageIconPool = TexturePool(UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/mappreview/wreckage.dds"), self, 6, 6)
 
         self.Width:Set(size)
         self.Height:Set(size)
 
         self.massmarkers = {}
         self.hydromarkers = {}
+        self.wreckagemarkers = {}
         self.startPositions = {}
 
         self.mapPreview = MapPreview(self)
@@ -44,6 +46,10 @@ ResourceMapPreview = Class(Group) {
 
         for k, v in pairs(self.hydromarkers) do
             self.hydroIconPool:Dispose(v)
+        end
+
+        for k, v in pairs(self.wreckagemarkers) do
+            self.wreckageIconPool:Dispose(v)
         end
 
         for k, v in pairs(self.startPositions) do
@@ -71,7 +77,7 @@ ResourceMapPreview = Class(Group) {
     --- Update the control to display the map given by a specific scenario object.
     --
     -- @param scenarioInfo Scenario info object from which to extract map data.
-    SetScenario = function(self, scenarioInfo)
+    SetScenario = function(self, scenarioInfo, enableWreckage)
         self:DestroyResourceMarkers()
 
         if not scenarioInfo then
@@ -104,6 +110,29 @@ ResourceMapPreview = Class(Group) {
         -- The width and height of the map.
         local mWidth = scenarioInfo.size[1]
         local mHeight = scenarioInfo.size[2]
+
+        -- Add the wreckage, if activated. (done first so the important things appear on top)
+        local wreckagemarkers = {}
+        if enableWreckage then
+            local armies = mapdata.Scenario.Armies
+
+            for _, army in armies do
+                -- This is so spectacularly brittle it's magnificent.
+                if army.Units and army.Units.Units and army.Units.Units.WRECKAGE and army.Units.Units.WRECKAGE.Units then
+                    for k, v in army.Units.Units.WRECKAGE.Units do
+                        local marker = self.wreckageIconPool:Get()
+                        table.insert(wreckagemarkers, marker)
+                        marker:Show()
+
+                        -- Yes, these ones have a capital Position, but the others have a lowercase.
+                        LayoutHelpers.AtLeftTopIn(marker, self.mapPreview,
+                            (v.Position[1] / mWidth) * self.size - 2,
+                            (v.Position[3] / mHeight) *  self.size - 2)
+                    end
+                end
+            end
+        end
+        self.wreckagemarkers = wreckagemarkers
 
         -- Add the mass points.
         local masses = {}
