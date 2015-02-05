@@ -21,7 +21,7 @@ Checkbox = Class(Group) {
 
         -- Escape early if the layout is the extremely trivial case...
         if not label then
-            LayoutHelpers.SetDimensions(self, checkBmp:Width(), checkBmp:Height())
+            LayoutHelpers.SetDimensions(self, checkBmp.Width(), checkBmp.Height())
             LayoutHelpers.AtCenterIn(checkBmp, self)
             return
         end
@@ -32,7 +32,7 @@ Checkbox = Class(Group) {
 
         -- Center the text inside the textfield (which we expand to be the whole height of the control)
         textfield:SetCenteredVertically(true)
-        LayoutHelpers.SetDimensions(self, checkBmp:Width() + textfield:Width(), checkBmp:Height())
+        LayoutHelpers.SetDimensions(self, function() return checkBmp.Width() + textfield.Width() end, checkBmp.Height)
         if labelRight then
             LayoutHelpers.AtLeftTopIn(checkBmp, self)
             LayoutHelpers.RightOf(textfield, checkBmp)
