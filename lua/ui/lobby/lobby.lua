@@ -5271,7 +5271,7 @@ function CreateHelpWindow()
     dialogContent.Width:Set(420)
     dialogContent.Height:Set(146)
 
-    GUI.changelogPopup = Popup(GUI, dialogContent)
+    local helpWindow = Popup(GUI, dialogContent)
 
     -- Info List --
     local InfoList = ItemList(dialogContent)
@@ -5294,7 +5294,7 @@ function CreateHelpWindow()
     LayoutHelpers.AtBottomIn(OkButton, dialogContent, 8)
     LayoutHelpers.DepthOverParent(OkButton, InfoList, 5)
     OkButton.OnClick = function(self)
-        GUI.changelogPopup:Destroy()
+        helpWindow:Close()
     end
 end
 
