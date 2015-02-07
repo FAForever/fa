@@ -4248,6 +4248,8 @@ lobui_0410="None"
 # Lobby changelog panel
 lobui_0412="What's new in Lobby?"
 
+lobui_0413="Country"
+
 main_menu_0000="Forged Alliance"
 main_menu_0001="Multiplayer LAN"
 main_menu_9586="Close Menu"
