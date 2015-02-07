@@ -1904,7 +1904,7 @@ Tooltips = {
         description = "<LOC tooltipui0144>View and adjust Gameplay, Interface, Video, and Sound options",
     },
     mainmenu_mod = {
-        title = "<LOC tooltipui0145>Mod Manager",
+        title = "<LOC tooltipui0145>Mods",
         description = "<LOC tooltipui0146>View, enable and disable all available Mods",
     },
     mainmenu_tutorial = {
