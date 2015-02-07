@@ -37,6 +37,7 @@ local Player = import('/lua/ui/lobby/trueskill.lua').Player
 local Rating = import('/lua/ui/lobby/trueskill.lua').Rating
 local Teams = import('/lua/ui/lobby/trueskill.lua').Teams
 local EscapeHandler = import('/lua/ui/dialogs/eschandler.lua')
+local CountryTooltips = import('/lua/ui/help/tooltips-country.lua').tooltip
 
 local IsSyncReplayServer = false
 
@@ -93,9 +94,6 @@ function LOGX(text, ttype)
 		end
 	end
 end
--- Table of Tooltip Country
-local PrefLanguageTooltipTitle={}
-local PrefLanguageTooltipText={}
 
 local FACTION_PANELS = {}
 
@@ -862,8 +860,8 @@ function SetSlotInfo(slotNum, playerInfo)
     else
         slot.KinderCountry:Show()
         slot.KinderCountry:SetTexture(UIUtil.UIFile('/countries/'..playerInfo.Country..'.dds'))
-        Country_GetTooltipValue(playerInfo.Country, slotNum)
-        Country_AddControlTooltip(slot.KinderCountry, 0, slotNum)
+
+        Tooltip.AddControlTooltip(slot.KinderCountry, {text=LOC("<LOC lobui_0413>Country"), body=CountryTooltips[playerInfo.Country]})
     end
 
     -- Disable team selection if "auto teams" is controlling it.
@@ -4791,35 +4789,6 @@ function SetSlotCPUBar(slot, playerInfo)
 
                 GUI.slots[slot].CPUSpeedBar:Show()
             end
-        end
-    end
-end
-
--- Flags
-function Country_AddControlTooltip(control, waitDelay, slotNumber)
-    local self = control
-    if not control.oldHandleEvent then
-        control.oldHandleEvent = control.HandleEvent
-    end
-    control.HandleEvent = function(self, event)
-        if event.Type == 'MouseEnter' then
-            local slot = slotNumber
-            Tooltip.CreateMouseoverDisplay(self, {text=PrefLanguageTooltipTitle[slot], body=PrefLanguageTooltipText[slot]}, waitDelay, true)
-        elseif event.Type == 'MouseExit' then
-            Tooltip.DestroyMouseoverDisplay()
-        end
-        return self.oldHandleEvent(self, event)
-    end
-end
-
-function Country_GetTooltipValue(CountryResult, slot)
-    local CountryOverrideTooltip = import('/lua/ui/help/tooltips-country.lua').tooltip
-    local find = 0
-    for index, option in CountryOverrideTooltip do
-        if option.value == CountryResult and find == 0 then
-            PrefLanguageTooltipTitle[slot] = option.title or "Country"
-            PrefLanguageTooltipText[slot] = option.text
-            find = 1
         end
     end
 end

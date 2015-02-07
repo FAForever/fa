@@ -5,1021 +5,259 @@
 -- Text : Text of Tooltip
 -- These codes retrieved from: http://www.worldatlas.com/aatlas/ctycodes.htm
 
-tooltip =
-{
-    -- No Nationality
-    {
-        value = "world",
-        text = "Country not found. Please contact the development team on the forums, or ask a moderator for help",
-    },
-    -- Xinnony's personal flag
-    {
-        value = "xinnony",
-        text = "Xinnony's flag !",
-    },
-    {
-        value="a1",
-        text="Anonymous Proxy"
-    },
-    {
-        value="a2",
-        text="Satellite Provider"
-    },
-    {
-        value="ap",
-        text="Asia/Pacific Region"
-    },
-    {
-        value="ax",
-        text="Aland Islands"
-    },
-    {
-        value="bl",
-        text="Saint Bartelemey"
-    },
-    {
-        value="eu",
-        text="Europe"
-    },
-    {
-        value="gg",
-        text="Guernsey"
-    },
-    {
-        value="im",
-        text="Isle of Man"
-    },
-    {
-        value="je",
-        text="Jersey"
-    },
-    {
-        value="mf",
-        text="Saint Martin"
-    },
-    {
-        value="ps",
-        text="Palestinian Territory"
-    },
-    {
-        value="tl",
-        text="Timor-Leste"
-    },
-    {
-        value="af",
-        text="Afghanistan",
-    },
-    {
-        value="al",
-        text="Albania",
-    },
-    {
-        value="dz",
-        text="Algeria",
-    },
-    {
-        value="as",
-        text="American Samoa",
-    },
-    {
-        value="ad",
-        text="Andorra",
-    },
-    {
-        value="ao",
-        text="Angola",
-    },
-    {
-        value="ai",
-        text="Anguilla",
-    },
-    {
-        value="aq",
-        text="Antarctica",
-    },
-    {
-        value="ag",
-        text="Antigua and Barbuda",
-    },
-    {
-        value="ar",
-        text="Argentina",
-    },
-    {
-        value="am",
-        text="Armenia",
-    },
-    {
-        value="aw",
-        text="Aruba",
-    },
-    {
-        value="au",
-        text="Australia",
-    },
-    {
-        value="at",
-        text="Austria",
-    },
-    {
-        value="az",
-        text="Azerbaijan",
-    },
-    {
-        value="bs",
-        text="Bahamas",
-    },
-    {
-        value="bh",
-        text="Bahrain",
-    },
-    {
-        value="bd",
-        text="Bangladesh",
-    },
-    {
-        value="bb",
-        text="Barbados",
-    },
-    {
-        value="by",
-        text="Belarus",
-    },
-    {
-        value="be",
-        text="Belgium",
-    },
-    {
-        value="bz",
-        text="Belize",
-    },
-    {
-        value="bj",
-        text="Benin",
-    },
-    {
-        value="bm",
-        text="Bermuda",
-    },
-    {
-        value="bt",
-        text="Bhutan",
-    },
-    {
-        value="bo",
-        text="Bolivia",
-    },
-    {
-        value="ba",
-        text="Bosnia and Herzegowina",
-    },
-    {
-        value="bw",
-        text="Botswana",
-    },
-    {
-        value="bv",
-        text="Bouvet Island",
-    },
-    {
-        value="br",
-        text="Brazil",
-    },
-    {
-        value="io",
-        text="British Indian Ocean Territory",
-    },
-    {
-        value="bn",
-        text="Brunei Darussalam",
-    },
-    {
-        value="bg",
-        text="Bulgaria",
-    },
-    {
-        value="bf",
-        text="Burkina Faso",
-    },
-    {
-        value="bi",
-        text="Burundi",
-    },
-    {
-        value="kh",
-        text="Cambodia",
-    },
-    {
-        value="cm",
-        text="Cameroon",
-    },
-    {
-        value="ca",
-        text="Canada",
-    },
-    {
-        value="cv",
-        text="Cape Verde",
-    },
-    {
-        value="ky",
-        text="Cayman Islands",
-    },
-    {
-        value="cf",
-        text="Central African Republic",
-    },
-    {
-        value="td",
-        text="Chad",
-    },
-    {
-        value="cl",
-        text="Chile",
-    },
-    {
-        value="cn",
-        text="China",
-    },
-    {
-        value="cx",
-        text="Christmas Island",
-    },
-    {
-        value="cc",
-        text="Cocos Islands",
-    },
-    {
-        value="co",
-        text="Colombia",
-    },
-    {
-        value="km",
-        text="Comoros",
-    },
-    {
-        value="cg",
-        text="Congo",
-    },
-    {
-        value="cd",
-        text="Democratic Republic of Congo",
-    },
-    {
-        value="ck",
-        text="Cook Islands",
-    },
-    {
-        value="cr",
-        text="Costa Rica",
-    },
-    {
-        value="ci",
-        text="Ivory Coast",
-    },
-    {
-        value="hr",
-        text="Croatia",
-    },
-    {
-        value="cu",
-        text="Cuba",
-    },
-    {
-        value="cy",
-        text="Cyprus",
-    },
-    {
-        value="cz",
-        text="Czech Republic",
-    },
-    {
-        value="dk",
-        text="Denmark",
-    },
-    {
-        value="dj",
-        text="Djibouti",
-    },
-    {
-        value="dm",
-        text="Dominica",
-    },
-    {
-        value="do",
-        text="Dominican Republic",
-    },
-    {
-        value="ec",
-        text="Ecuador",
-    },
-    {
-        value="eg",
-        text="Egypt",
-    },
-    {
-        value="sv",
-        text="El Salvador",
-    },
-    {
-        value="gq",
-        text="Equatorial Guinea",
-    },
-    {
-        value="er",
-        text="Eritrea",
-    },
-    {
-        value="ee",
-        text="Estonia",
-    },
-    {
-        value="et",
-        text="Ethiopia",
-    },
-    {
-        value="fk",
-        text="Falkland Islands",
-    },
-    {
-        value="fo",
-        text="Faroe Islands",
-    },
-    {
-        value="fj",
-        text="Fiji",
-    },
-    {
-        value="fi",
-        text="Finland",
-    },
-    {
-        value="fr",
-        text="France",
-    },
-    {
-        value="fx",
-        text="Metropolitan France",
-    },
-    {
-        value="gf",
-        text="French Guiana",
-    },
-    {
-        value="pf",
-        text="French Polynesia",
-    },
-    {
-        value="tf",
-        text="French Southern Territories",
-    },
-    {
-        value="ga",
-        text="Gabon",
-    },
-    {
-        value="gm",
-        text="Gambia",
-    },
-    {
-        value="ge",
-        text="Georgia",
-    },
-    {
-        value="de",
-        text="Germany",
-    },
-    {
-        value="gh",
-        text="Ghana",
-    },
-    {
-        value="gi",
-        text="Gibraltar",
-    },
-    {
-        value="gr",
-        text="Greece",
-    },
-    {
-        value="gl",
-        text="Greenland",
-    },
-    {
-        value="gd",
-        text="Grenada",
-    },
-    {
-        value="gp",
-        text="Guadeloupe",
-    },
-    {
-        value="gu",
-        text="Guam",
-    },
-    {
-        value="gt",
-        text="Guatemala",
-    },
-    {
-        value="gn",
-        text="Guinea",
-    },
-    {
-        value="gw",
-        text="Guinea-Bissau",
-    },
-    {
-        value="gy",
-        text="Guyana",
-    },
-    {
-        value="ht",
-        text="Haiti",
-    },
-    {
-        value="hm",
-        text="Heard and McDonald Islands",
-    },
-    {
-        value="va",
-        text="Vatican City",
-    },
-    {
-        value="hn",
-        text="Honduras",
-    },
-    {
-        value="hk",
-        text="Hong Kong",
-    },
-    {
-        value="hu",
-        text="Hungary",
-    },
-    {
-        value="is",
-        text="Iceland",
-    },
-    {
-        value="in",
-        text="India",
-    },
-    {
-        value="id",
-        text="Indonesia",
-    },
-    {
-        value="ir",
-        text="Iran",
-    },
-    {
-        value="iq",
-        text="Iraq",
-    },
-    {
-        value="ie",
-        text="Ireland",
-    },
-    {
-        value="il",
-        text="Israel",
-    },
-    {
-        value="it",
-        text="Italy",
-    },
-    {
-        value="jm",
-        text="Jamaica",
-    },
-    {
-        value="jp",
-        text="Japan",
-    },
-    {
-        value="jo",
-        text="Jordan",
-    },
-    {
-        value="kz",
-        text="Kazakhstan",
-    },
-    {
-        value="ke",
-        text="Kenya",
-    },
-    {
-        value="ki",
-        text="Kiribati",
-    },
-    {
-        value="kp",
-        text="North Korea",
-    },
-    {
-        value="kr",
-        text="South Korea",
-    },
-    {
-        value="kw",
-        text="Kuwait",
-    },
-    {
-        value="kg",
-        text="Kyrgyzstan",
-    },
-    {
-        value="la",
-        text="Laos",
-    },
-    {
-        value="lv",
-        text="Latvia",
-    },
-    {
-        value="lb",
-        text="Lebanon",
-    },
-    {
-        value="ls",
-        text="Lesotho",
-    },
-    {
-        value="lr",
-        text="Liberia",
-    },
-    {
-        value="ly",
-        text="Libyan Arab Jamahiriya",
-    },
-    {
-        value="li",
-        text="Liechtenstein",
-    },
-    {
-        value="lt",
-        text="Lithuania",
-    },
-    {
-        value="lu",
-        text="Luxembourg",
-    },
-    {
-        value="mo",
-        text="Macau",
-    },
-    {
-        value="mk",
-        text="Macedonia",
-    },
-    {
-        value="mg",
-        text="Madagascar",
-    },
-    {
-        value="mw",
-        text="Malawi",
-    },
-    {
-        value="my",
-        text="Malaysia",
-    },
-    {
-        value="mv",
-        text="Maldives",
-    },
-    {
-        value="ml",
-        text="Mali",
-    },
-    {
-        value="mt",
-        text="Malta",
-    },
-    {
-        value="mh",
-        text="Marshall Islands",
-    },
-    {
-        value="mq",
-        text="Martinique",
-    },
-    {
-        value="mr",
-        text="Mauritania",
-    },
-    {
-        value="mu",
-        text="Mauritius",
-    },
-    {
-        value="yt",
-        text="Mayotte",
-    },
-    {
-        value="mx",
-        text="Mexico",
-    },
-    {
-        value="fm",
-        text="Micronesia",
-    },
-    {
-        value="md",
-        text="Moldova",
-    },
-    {
-        value="mc",
-        text="Monaco",
-    },
-    {
-        value="mn",
-        text="Mongolia",
-    },
-    {
-        value="me",
-        text="Montenegro",
-    },
-    {
-        value="ms",
-        text="Montserrat",
-    },
-    {
-        value="ma",
-        text="Morocco",
-    },
-    {
-        value="mz",
-        text="Mozambique",
-    },
-    {
-        value="mm",
-        text="Myanmar",
-    },
-    {
-        value="na",
-        text="Namibia",
-    },
-    {
-        value="nr",
-        text="Nauru",
-    },
-    {
-        value="np",
-        text="Nepal",
-    },
-    {
-        value="nl",
-        text="Netherlands",
-    },
-    {
-        value="an",
-        text="Netherlands Antilles",
-    },
-    {
-        value="nc",
-        text="New Caledonia",
-    },
-    {
-        value="nz",
-        text="New Zealand",
-    },
-    {
-        value="ni",
-        text="Nicaragua",
-    },
-    {
-        value="ne",
-        text="Niger",
-    },
-    {
-        value="ng",
-        text="Nigeria",
-    },
-    {
-        value="nu",
-        text="Niue",
-    },
-    {
-        value="nf",
-        text="Norfolk Island",
-    },
-    {
-        value="mp",
-        text="Northern Mariana Islands",
-    },
-    {
-        value="no",
-        text="Norway",
-    },
-    {
-        value="om",
-        text="Oman",
-    },
-    {
-        value="pk",
-        text="Pakistan",
-    },
-    {
-        value="pw",
-        text="Palau",
-    },
-    {
-        value="pa",
-        text="Panama",
-    },
-    {
-        value="pg",
-        text="Papua New Guinea",
-    },
-    {
-        value="py",
-        text="Paraguay",
-    },
-    {
-        value="pe",
-        text="Peru",
-    },
-    {
-        value="ph",
-        text="Philippines",
-    },
-    {
-        value="pn",
-        text="Pitcairn",
-    },
-    {
-        value="pl",
-        text="Poland",
-    },
-    {
-        value="pt",
-        text="Portugal",
-    },
-    {
-        value="pr",
-        text="Puerto Rico",
-    },
-    {
-        value="qa",
-        text="Qatar",
-    },
-    {
-        value="re",
-        text="Reunion",
-    },
-    {
-        value="ro",
-        text="Romania",
-    },
-    {
-        value="ru",
-        text="Russian Federation",
-    },
-    {
-        value="rw",
-        text="Rwanda",
-    },
-    {
-        value="kn",
-        text="Saint Kitts and Nevis",
-    },
-    {
-        value="lc",
-        text="Saint Lucia",
-    },
-    {
-        value="vc",
-        text="Saint Vincent and The Grenadines",
-    },
-    {
-        value="ws",
-        text="Samoa",
-    },
-    {
-        value="sm",
-        text="San Marino",
-    },
-    {
-        value="st",
-        text="Sao Tome and Principe",
-    },
-    {
-        value="sa",
-        text="Saudi Arabia",
-    },
-    {
-        value="sn",
-        text="Senegal",
-    },
-    {
-        value="rs",
-        text="Serbia",
-    },
-    {
-        value="sc",
-        text="Seychelles",
-    },
-    {
-        value="sl",
-        text="Sierra Leone",
-    },
-    {
-        value="sg",
-        text="Singapore",
-    },
-    {
-        value="sk",
-        text="Slovakia",
-    },
-    {
-        value="si",
-        text="Slovenia",
-    },
-    {
-        value="sb",
-        text="Solomon Islands",
-    },
-    {
-        value="so",
-        text="Somalia",
-    },
-    {
-        value="za",
-        text="South Africa",
-    },
-    {
-        value="gs",
-        text="South Georgia and South S.S.",
-    },
-    {
-        value="es",
-        text="Spain",
-    },
-    {
-        value="lk",
-        text="Sri Lanka",
-    },
-    {
-        value="sh",
-        text="St. Helena",
-    },
-    {
-        value="pm",
-        text="St. Pierre and Miquelon",
-    },
-    {
-        value="sd",
-        text="Sudan",
-    },
-    {
-        value="sr",
-        text="Suriname",
-    },
-    {
-        value="sj",
-        text="Svalbard and Jan Mayen Islands",
-    },
-    {
-        value="sz",
-        text="Swaziland",
-    },
-    {
-        value="se",
-        text="Sweden",
-    },
-    {
-        value="ch",
-        text="Switzerland",
-    },
-    {
-        value="sy",
-        text="Syrian Arab Republic",
-    },
-    {
-        value="tw",
-        text="Taiwan",
-    },
-    {
-        value="tj",
-        text="Tajikistan",
-    },
-    {
-        value="tz",
-        text="Tanzania",
-    },
-    {
-        value="th",
-        text="Thailand",
-    },
-    {
-        value="tg",
-        text="Togo",
-    },
-    {
-        value="tk",
-        text="Tokelau",
-    },
-    {
-        value="to",
-        text="Tonga",
-    },
-    {
-        value="tt",
-        text="Trinidad and Tobago",
-    },
-    {
-        value="tn",
-        text="Tunisia",
-    },
-    {
-        value="tr",
-        text="Turkey",
-    },
-    {
-        value="tm",
-        text="Turkmenistan",
-    },
-    {
-        value="tc",
-        text="Turks and Caicos Islands",
-    },
-    {
-        value="tv",
-        text="Tuvalu",
-    },
-    {
-        value="ug",
-        text="Uganda",
-    },
-    {
-        value="ua",
-        text="Ukraine",
-    },
-    {
-        value="ae",
-        text="United Arab Emirates",
-    },
-    {
-        value="gb",
-        text="United Kingdom",
-    },
-    {
-        value="us",
-        text="United States",
-    },
-    {
-        value="um",
-        text="U.S. Minor Islands",
-    },
-    {
-        value="uy",
-        text="Uruguay",
-    },
-    {
-        value="uz",
-        text="Uzbekistan",
-    },
-    {
-        value="vu",
-        text="Vanuatu",
-    },
-    {
-        value="ve",
-        text="Venezuela",
-    },
-    {
-        value="vn",
-        text="Viet Nam",
-    },
-    {
-        value="vg",
-        text="Virgin Islands (British)",
-    },
-    {
-        value="vi",
-        text="Virgin Islands (U.S.)",
-    },
-    {
-        value="wf",
-        text="Wallis and Futuna Islands",
-    },
-    {
-        value="eh",
-        text="Western Sahara",
-    },
-    {
-        value="ye",
-        text="Yemen",
-    },
-    {
-        value="zm",
-        text="Zambia",
-    },
-    {
-        value="zw",
-        text="Zimbabwe",
-    }
+tooltip = {
+    world = "Country not found. Please contact the development team on the forums, or ask a moderator for help",
+    xinnony = "Xinnony's flag!",
+    a1 = "Anonymous Proxy",
+    a2 = "Satellite Provider",
+    ap = "Asia/Pacific Region",
+    ax = "Aland Islands",
+    bl = "Saint Bartelemey",
+    eu = "Europe",
+    gg = "Guernsey",
+    im = "Isle of Man",
+    je = "Jersey",
+    mf = "Saint Martin",
+    ps = "Palestinian Territory",
+    tl = "Timor-Leste",
+    af = "Afghanistan",
+    al = "Albania",
+    dz = "Algeria",
+    as = "American Samoa",
+    ad = "Andorra",
+    ao = "Angola",
+    ai = "Anguilla",
+    aq = "Antarctica",
+    ag = "Antigua and Barbuda",
+    ar = "Argentina",
+    am = "Armenia",
+    aw = "Aruba",
+    au = "Australia",
+    at = "Austria",
+    az = "Azerbaijan",
+    bs = "Bahamas",
+    bh = "Bahrain",
+    bd = "Bangladesh",
+    bb = "Barbados",
+    by = "Belarus",
+    be = "Belgium",
+    bz = "Belize",
+    bj = "Benin",
+    bm = "Bermuda",
+    bt = "Bhutan",
+    bo = "Bolivia",
+    ba = "Bosnia and Herzegowina",
+    bw = "Botswana",
+    bv = "Bouvet Island",
+    br = "Brazil",
+    io = "British Indian Ocean Territory",
+    bn = "Brunei Darussalam",
+    bg = "Bulgaria",
+    bf = "Burkina Faso",
+    bi = "Burundi",
+    kh = "Cambodia",
+    cm = "Cameroon",
+    ca = "Canada",
+    cv = "Cape Verde",
+    ky = "Cayman Islands",
+    cf = "Central African Republic",
+    td = "Chad",
+    cl = "Chile",
+    cn = "China",
+    cx = "Christmas Island",
+    cc = "Cocos Islands",
+    co = "Colombia",
+    km = "Comoros",
+    cg = "Congo",
+    cd = "Democratic Republic of Congo",
+    ck = "Cook Islands",
+    cr = "Costa Rica",
+    ci = "Ivory Coast",
+    hr = "Croatia",
+    cu = "Cuba",
+    cy = "Cyprus",
+    cz = "Czech Republic",
+    dk = "Denmark",
+    dj = "Djibouti",
+    dm = "Dominica",
+    ["do"] = "Dominican Republic",
+    ec = "Ecuador",
+    eg = "Egypt",
+    sv = "El Salvador",
+    gq = "Equatorial Guinea",
+    er = "Eritrea",
+    ee = "Estonia",
+    et = "Ethiopia",
+    fk = "Falkland Islands",
+    fo = "Faroe Islands",
+    fj = "Fiji",
+    fi = "Finland",
+    fr = "France",
+    fx = "Metropolitan France",
+    gf = "French Guiana",
+    pf = "French Polynesia",
+    tf = "French Southern Territories",
+    ga = "Gabon",
+    gm = "Gambia",
+    ge = "Georgia",
+    de = "Germany",
+    gh = "Ghana",
+    gi = "Gibraltar",
+    gr = "Greece",
+    gl = "Greenland",
+    gd = "Grenada",
+    gp = "Guadeloupe",
+    gu = "Guam",
+    gt = "Guatemala",
+    gn = "Guinea",
+    gw = "Guinea-Bissau",
+    gy = "Guyana",
+    ht = "Haiti",
+    hm = "Heard and McDonald Islands",
+    va = "Vatican City",
+    hn = "Honduras",
+    hk = "Hong Kong",
+    hu = "Hungary",
+    is = "Iceland",
+    ["in"] = "India",
+    id = "Indonesia",
+    ir = "Iran",
+    iq = "Iraq",
+    ie = "Ireland",
+    il = "Israel",
+    it = "Italy",
+    jm = "Jamaica",
+    jp = "Japan",
+    jo = "Jordan",
+    kz = "Kazakhstan",
+    ke = "Kenya",
+    ki = "Kiribati",
+    kp = "North Korea",
+    kr = "South Korea",
+    kw = "Kuwait",
+    kg = "Kyrgyzstan",
+    la = "Laos",
+    lv = "Latvia",
+    lb = "Lebanon",
+    ls = "Lesotho",
+    lr = "Liberia",
+    ly = "Libyan Arab Jamahiriya",
+    li = "Liechtenstein",
+    lt = "Lithuania",
+    lu = "Luxembourg",
+    mo = "Macau",
+    mk = "Macedonia",
+    mg = "Madagascar",
+    mw = "Malawi",
+    my = "Malaysia",
+    mv = "Maldives",
+    ml = "Mali",
+    mt = "Malta",
+    mh = "Marshall Islands",
+    mq = "Martinique",
+    mr = "Mauritania",
+    mu = "Mauritius",
+    yt = "Mayotte",
+    mx = "Mexico",
+    fm = "Micronesia",
+    md = "Moldova",
+    mc = "Monaco",
+    mn = "Mongolia",
+    me = "Montenegro",
+    ms = "Montserrat",
+    ma = "Morocco",
+    mz = "Mozambique",
+    mm = "Myanmar",
+    na = "Namibia",
+    nr = "Nauru",
+    np = "Nepal",
+    nl = "Netherlands",
+    an = "Netherlands Antilles",
+    nc = "New Caledonia",
+    nz = "New Zealand",
+    ni = "Nicaragua",
+    ne = "Niger",
+    ng = "Nigeria",
+    nu = "Niue",
+    nf = "Norfolk Island",
+    mp = "Northern Mariana Islands",
+    no = "Norway",
+    om = "Oman",
+    pk = "Pakistan",
+    pw = "Palau",
+    pa = "Panama",
+    pg = "Papua New Guinea",
+    py = "Paraguay",
+    pe = "Peru",
+    ph = "Philippines",
+    pn = "Pitcairn",
+    pl = "Poland",
+    pt = "Portugal",
+    pr = "Puerto Rico",
+    qa = "Qatar",
+    re = "Reunion",
+    ro = "Romania",
+    ru = "Russian Federation",
+    rw = "Rwanda",
+    kn = "Saint Kitts and Nevis",
+    lc = "Saint Lucia",
+    vc = "Saint Vincent and The Grenadines",
+    ws = "Samoa",
+    sm = "San Marino",
+    st = "Sao Tome and Principe",
+    sa = "Saudi Arabia",
+    sn = "Senegal",
+    rs = "Serbia",
+    sc = "Seychelles",
+    sl = "Sierra Leone",
+    sg = "Singapore",
+    sk = "Slovakia",
+    si = "Slovenia",
+    sb = "Solomon Islands",
+    so = "Somalia",
+    za = "South Africa",
+    gs = "South Georgia and South S.S.",
+    es = "Spain",
+    lk = "Sri Lanka",
+    sh = "St. Helena",
+    pm = "St. Pierre and Miquelon",
+    sd = "Sudan",
+    sr = "Suriname",
+    sj = "Svalbard and Jan Mayen Islands",
+    sz = "Swaziland",
+    se = "Sweden",
+    ch = "Switzerland",
+    sy = "Syrian Arab Republic",
+    tw = "Taiwan",
+    tj = "Tajikistan",
+    tz = "Tanzania",
+    th = "Thailand",
+    tg = "Togo",
+    tk = "Tokelau",
+    to = "Tonga",
+    tt = "Trinidad and Tobago",
+    tn = "Tunisia",
+    tr = "Turkey",
+    tm = "Turkmenistan",
+    tc = "Turks and Caicos Islands",
+    tv = "Tuvalu",
+    ug = "Uganda",
+    ua = "Ukraine",
+    ae = "United Arab Emirates",
+    gb = "United Kingdom",
+    us = "United States",
+    um = "U.S. Minor Islands",
+    uy = "Uruguay",
+    uz = "Uzbekistan",
+    vu = "Vanuatu",
+    ve = "Venezuela",
+    vn = "Viet Nam",
+    vg = "Virgin Islands (British)",
+    vi = "Virgin Islands (U.S.)",
+    wf = "Wallis and Futuna Islands",
+    eh = "Western Sahara",
+    ye = "Yemen",
+    zm = "Zambia",
+    zw = "Zimbabwe",
 }
 
