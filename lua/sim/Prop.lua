@@ -13,6 +13,8 @@
 local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
+RECLAIMLABEL_MIN_MASS = 20
+
 Prop = Class(moho.prop_methods, Entity) {
 
     -- Do not call the base class __init and __post_init, we already have a c++ object
@@ -24,16 +26,22 @@ Prop = Class(moho.prop_methods, Entity) {
     OnCreate = function(self)
         Entity.OnCreate(self)
         self.Trash = TrashBag()
-        local bp = self:GetBlueprint().Economy
-        self.MassReclaim = bp.ReclaimMassMax or 0
-        self.EnergyReclaim = bp.ReclaimEnergyMax or 0
-        self.ReclaimTimeMassMult = bp.ReclaimMassTimeMultiplier or 1
-        self.ReclaimTimeEnergyMult = bp.ReclaimEnergyTimeMultiplier or 1
-        self.MaxMassReclaim = bp.ReclaimMassMax or 0
-        self.MaxEnergyReclaim = bp.ReclaimEnergyMax or 0
-        self.CachePosition = self:GetPosition()
+        local bp = self:GetBlueprint()
+        local economy = bp.Economy
+        self.MassReclaim = economy.ReclaimMassMax or 0
+        self.EnergyReclaim = economy.ReclaimEnergyMax or 0
+        self.ReclaimTimeMassMult = economy.ReclaimMassTimeMultiplier or 1
+        self.ReclaimTimeEnergyMult = economy.ReclaimEnergyTimeMultiplier or 1
+        self.MaxMassReclaim = economy.ReclaimMassMax or 0
+        self.MaxEnergyReclaim = economy.ReclaimEnergyMax or 0
+        local pos = self:GetPosition()
+        self.CachePosition = pos
 
-        local defense = self:GetBlueprint().Defense
+        if self.MaxMassReclaim >= RECLAIMLABEL_MIN_MASS then
+            table.insert(Sync.Reclaim, {id=self:GetEntityId(), mass=self.MaxMassReclaim, position={pos[1], pos[2], pos[3]}})
+        end
+
+        local defense = bp.Defense
         local maxHealth = 50
         if defense then
             maxHealth = math.max(maxHealth,defense.MaxHealth)
@@ -90,6 +98,10 @@ Prop = Class(moho.prop_methods, Entity) {
     end,
 
     OnDestroy = function(self)
+        if self.IsWreckage or self.MaxMassReclaim >= RECLAIMLABEL_MIN_MASS then
+            table.insert(Sync.Reclaim, {id=self:GetEntityId(), destroy=true})
+        end
+
         self.Trash:Destroy()
     end,
 

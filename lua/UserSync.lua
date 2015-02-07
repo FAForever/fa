@@ -57,4 +57,14 @@ function OnSync()
     if Sync.NukeLaunchData then
 		import('/modules/nukelaunchping.lua').DoNukePing(Sync.NukeLaunchData)
 	end
+
+    if Sync.Reclaim then
+        for _, r in Sync.Reclaim do
+            if r.destroy then
+                import('/modules/reclaim.lua').DestroyReclaimLabel(r.id)
+            else
+                import('/modules/reclaim.lua').CreateReclaimLabel(r)
+            end
+        end
+    end
 end
