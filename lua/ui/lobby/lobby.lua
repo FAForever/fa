@@ -3276,14 +3276,15 @@ function CreateUI(maxPlayers)
     LayoutHelpers.DepthOverParent(GUI.OptionContainerScroll, GUI.OptionContainer, 2)
 
     -- Create skirmish mode's "load game" button.
-    GUI.loadButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/',"<LOC lobui_0176>Load")
-    UIUtil.setVisible(GUI.loadButton, singlePlayer)
-    LayoutHelpers.LeftOf(GUI.loadButton, GUI.launchGameButton, 10)
-    LayoutHelpers.AtVerticalCenterIn(GUI.loadButton, GUI.launchGameButton)
-    GUI.loadButton.OnClick = function(self, modifiers)
+    local loadButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/',"<LOC lobui_0176>Load")
+    GUI.loadButton = loadButton
+    UIUtil.setVisible(loadButton, singlePlayer)
+    LayoutHelpers.LeftOf(loadButton, GUI.launchGameButton, 10)
+    LayoutHelpers.AtVerticalCenterIn(loadButton, GUI.launchGameButton)
+    loadButton.OnClick = function(self, modifiers)
         import('/lua/ui/dialogs/saveload.lua').CreateLoadDialog(GUI)
     end
-    Tooltip.AddButtonTooltip(GUI.loadButton, 'Lobby_Load')
+    Tooltip.AddButtonTooltip(loadButton, 'Lobby_Load')
 
     -- Create the "Lobby presets" button for the host. If not the host, the same field is occupied
     -- instead by the read-only "Unit Manager" button.
