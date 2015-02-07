@@ -3275,12 +3275,22 @@ function CreateUI(maxPlayers)
     GUI.OptionContainerScroll = UIUtil.CreateLobbyVertScrollbar(GUI.OptionContainer, 2)
     LayoutHelpers.DepthOverParent(GUI.OptionContainerScroll, GUI.OptionContainer, 2)
 
+    -- Launch Button
+    local launchGameButton = UIUtil.CreateButtonWithDropshadow(GUI.chatPanel, '/BUTTON/large/', "Launch the Game")
+    GUI.launchGameButton = launchGameButton
+    LayoutHelpers.AtCenterIn(launchGameButton, GUI.observerPanel, 103, -89)
+    Tooltip.AddButtonTooltip(launchGameButton, 'Lobby_Launch')
+    UIUtil.setVisible(launchGameButton, isHost)
+    launchGameButton.OnClick = function(self)
+        TryLaunch(false)
+    end
+
     -- Create skirmish mode's "load game" button.
     local loadButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/',"<LOC lobui_0176>Load")
     GUI.loadButton = loadButton
     UIUtil.setVisible(loadButton, singlePlayer)
-    LayoutHelpers.LeftOf(loadButton, GUI.launchGameButton, 10)
-    LayoutHelpers.AtVerticalCenterIn(loadButton, GUI.launchGameButton)
+    LayoutHelpers.LeftOf(loadButton, launchGameButton, 10)
+    LayoutHelpers.AtVerticalCenterIn(loadButton, launchGameButton)
     loadButton.OnClick = function(self, modifiers)
         import('/lua/ui/dialogs/saveload.lua').CreateLoadDialog(GUI)
     end
@@ -3338,21 +3348,12 @@ function CreateUI(maxPlayers)
     else
         GUI.allowObservers:Disable()
     end
-    
-    -- Launch Button
-    GUI.launchGameButton = UIUtil.CreateButtonWithDropshadow(GUI.chatPanel, '/BUTTON/large/', "Launch the Game")
-    LayoutHelpers.AtCenterIn(GUI.launchGameButton, GUI.observerPanel, 103, -89)
-    Tooltip.AddButtonTooltip(GUI.launchGameButton, 'Lobby_Launch')
-    UIUtil.setVisible(GUI.launchGameButton, isHost)
-    GUI.launchGameButton.OnClick = function(self)
-        TryLaunch(false)
-    end
 
     -- Exit Button
     GUI.exitButton = UIUtil.CreateButtonWithDropshadow(GUI.chatPanel, '/BUTTON/medium/','Exit')
     GUI.exitButton.label:SetText(LOC("<LOC _Exit>"))
     LayoutHelpers.AtLeftIn(GUI.exitButton, GUI.chatPanel, 38)
-    LayoutHelpers.AtVerticalCenterIn(GUI.exitButton, GUI.launchGameButton, -3)
+    LayoutHelpers.AtVerticalCenterIn(GUI.exitButton, launchGameButton, -3)
     GUI.exitButton.OnClick = GUI.exitLobbyEscapeHandler
     
     -- Small buttons are 100 wide, 44 tall
