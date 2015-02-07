@@ -390,10 +390,8 @@ WorldView = Class(moho.UIWorldView, Control) {
                 PingGroup.Marker.HandleEvent = function(marker, event)
                     if event.Type == 'ButtonPress' then
                         if event.Modifiers.Right and event.Modifiers.Ctrl then
-                            if PingGroup.data.Owner == GetArmiesTable().focusArmy - 1 then
-                                local data = {Action = 'delete', ID = PingGroup.data.ID, Owner = PingGroup.data.Owner}
-                                Ping.UpdateMarker(data)
-                            end
+                            local data = {Action = 'delete', ID = PingGroup.data.ID, Owner = PingGroup.data.Owner}
+                            Ping.UpdateMarker(data)
                         elseif event.Modifiers.Left then
                             PingGroup.Marker:DisableHitTest()
                             PingGroup:SetNeedsFrameUpdate(false)
