@@ -45,7 +45,7 @@ end
 
 -- the default scenario enumerator sort method
 local function DefaultScenarioSorter(compa, compb)
-    return compa < compb
+    return string.upper(compa) < string.upper(compb)
 end
 
 -- given a scenario, determines if it can be played in skirmish mode
