@@ -6,17 +6,6 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
--- this table indicates the order prefixes will be sorted in the map select window
-local defaultPrefixOrder = {
-    scmp = 1,
-    scca = 2,
-    map = 3,
-    demo = 4,
-    art = 5,
-    test = 6,
-    dev = 7,
-}
-
 -- load a scenario based on a scenario file name
 function LoadScenario(scenName)
     -- TODO - expose FILE_IsAbsolute and if it's not, add the path and the _scenario.lua
@@ -56,27 +45,7 @@ end
 
 -- the default scenario enumerator sort method
 local function DefaultScenarioSorter(compa, compb)
-    local tSize = table.getsize(defaultPrefixOrder)
-
-    -- checks the prefix and returns a sort order if found
-    local function Classify(str)
-        for prefix, value in defaultPrefixOrder do
-            if string.find(string.lower(str), string.lower(prefix), 1, true) == 1 then   -- do a plain pattern match, a bit faster as no magic chars
-                return value    -- found it at position 1, return the compare value
-            end
-        end
-        return tSize + 1    -- if not found, return table size + 1 to get sorted to bottom
-    end
-
-    local aval = Classify(compa)
-    local bval = Classify(compb)
-
-    -- if class is equal, just do a string sort, otherwise use the sore val
-    if aval == bval then
-        return compa < compb
-    else
-        return aval < bval
-    end
+    return compa < compb
 end
 
 -- given a scenario, determines if it can be played in skirmish mode
