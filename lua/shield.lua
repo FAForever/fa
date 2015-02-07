@@ -160,6 +160,13 @@ Shield = Class(moho.shield_methods,Entity) {
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
         if self.Owner != instigator then
 
+            if EntityCategoryContains(categories.COMMAND, self.Owner) then
+                local aiBrain = self.Owner:GetAIBrain()
+                if aiBrain then
+                    aiBrain:OnPlayCommanderUnderAttackVO()
+                end
+            end
+        
             local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
 
             if self.PassOverkillDamage then
