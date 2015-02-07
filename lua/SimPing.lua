@@ -142,11 +142,7 @@ end
 function UpdateMarker(data)
     if PingMarkers[data.Owner][data.ID] or data.Action == 'renew' then
         if data.Action == 'delete' then 
-            if OkayToMessWithArmy(data.Owner+1) then
-                PingMarkers[data.Owner][data.ID] = nil
-            else
-                return
-            end
+            PingMarkers[data.Owner][data.ID] = nil
         elseif data.Action == 'move' then
             PingMarkers[data.Owner][data.ID].Location = data.Location
         elseif data.Action == 'rename' then
