@@ -1990,7 +1990,7 @@ local OptionUtils = {
 
     -- Set all game options to their default values.
     SetDefaults = function()
-        local options
+        local options = {}
         for index, option in globalOpts do
             options[option.key] = option.values[option.default].key
         end
