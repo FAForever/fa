@@ -905,7 +905,6 @@ function ToggleGameInfo()
 		PresetList:AddItem('Scenario Options :')
 		for k, v in SessionGetScenarioInfo().Options do
 			if k == 'ScenarioFile' then
-			elseif k == 'ReplayID' then
 			elseif k == 'Rule' then
 			elseif k == 'Ratings' then
 			elseif k == 'RestrictedCategories' then
