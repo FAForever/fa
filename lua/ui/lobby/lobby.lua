@@ -2131,8 +2131,6 @@ function HostTryAddPlayer(senderID, slot, playerData)
         SetPlayerColor(playerData, GetAvailableColor())
     end
 
-    AssignAutoTeams(gameInfo)
-
     if lobbyComm:IsHost() then
         for k,v in playerData:pairs() do
             GpgNetSend('PlayerOption', newSlot, k, v)
@@ -2147,7 +2145,8 @@ function HostTryAddPlayer(senderID, slot, playerData)
             Options = playerData:AsTable(),
         }
     )
-    UpdateGame()
+
+    SetSlotInfo(newSlot, gameInfo.PlayerOptions[newSlot])
 end
 
 function HostTryMovePlayer(senderID, currentSlot, requestedSlot)
