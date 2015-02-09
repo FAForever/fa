@@ -25,6 +25,7 @@ local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Button = import('/lua/maui/button.lua').Button
+local ToggleButton = import('/lua/ui/controls/togglebutton.lua').ToggleButton
 local Edit = import('/lua/maui/edit.lua').Edit
 local LobbyComm = import('/lua/ui/lobby/lobbyComm.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
@@ -1791,6 +1792,7 @@ local function UpdateGame()
         UIUtil.setEnabled(GUI.gameoptionsButton, playerNotReady)
         UIUtil.setEnabled(GUI.defaultOptions, playerNotReady)
         UIUtil.setEnabled(GUI.randMap, playerNotReady)
+        UIUtil.setEnabled(GUI.autoTeams, playerNotReady)
 
         -- Launch button enabled if everyone is ready.
         UIUtil.setEnabled(GUI.launchGameButton, singlePlayer or not playerNotReady)
@@ -3375,29 +3377,23 @@ function CreateUI(maxPlayers)
             autoKick = checked
         end
     end
-    
-    -- AUTO TEAM BUTTON -- start of auto teams code.
-    GUI.autoTeams = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/autoteam/')
+
+    local autoteamButtonStates = {
+        { key = 'tvsb', },
+        { key = 'lvsr' },
+        { key = 'pvsi' },
+        { key = 'manual' },
+        { key = 'none' },
+    }
+
+    GUI.autoTeams = ToggleButton(GUI.observerPanel, '/BUTTON/autoteam/', autoteamButtonStates, gameInfo.GameOptions.AutoTeams)
     LayoutHelpers.RightOf(GUI.autoTeams, GUI.randMap, -19)
-    Tooltip.AddButtonTooltip(GUI.autoTeams, 'lob_click_randteam')
+    Tooltip.AddControlTooltip(GUI.autoTeams, 'lob_click_randteam')
     if not isHost then
         GUI.autoTeams:Hide()
     else
-        GUI.autoTeams.OnClick = function(self, modifiers)
-            local next_states =
-            {
-                none = {'tvsb', 'Top vs Bottom', 2},
-                tvsb = {'lvsr', 'Left vs Right', 3},
-                lvsr = {'pvsi', 'Even Slots vs Odd Slots', 4},
-                pvsi = {'manual', 'Manual Select', 5},
-                manual = {'none', 'None', 1},
-            }
-            local next_state = next_states[gameInfo.GameOptions['AutoTeams']]
-
-            Prefs.SetToCurrentProfile('Lobby_Auto_Teams', next_state[3])
-            SetGameOption('AutoTeams', next_state[1])
-            SendSystemMessage("Auto Teams option set: "..next_state[2])
-
+        GUI.autoTeams.OnStateChanged = function(self, newState)
+            SetGameOption('AutoTeams', newState)
             AssignAutoTeams(gameInfo)
             UpdateGame()
         end
