@@ -1818,65 +1818,10 @@ local function UpdateGame()
         SetText2(GUI.MapNameLabel, scenarioInfo.name, 20)
     end
 
-    -- Auto-team logic.
-    if gameInfo.GameOptions['TeamSpawn'] ~= 'random' and
-       math.mod(numPlayers,2) == 0 and
-       gameInfo.GameOptions.AutoTeams ~= 'manual' and
-       gameInfo.GameOptions.AutoTeams ~= 'none' then
-
-        local teams = nil
-        local teamcreated = false
-        local correct = true
-
-        for i = 1, LobbyComm.maxPlayerSlots do
-            local playerOptions = gameInfo.PlayerOptions[i]
-            if playerOptions then
-
-                if playerOptions.Human then
-                    if playerOptions.MEAN and playerOptions.DEV then
-                        local player = Player.create(playerOptions.PlayerName,
-                                               Rating.create(playerOptions.MEAN, playerOptions.DEV))
-
-                        if playerOptions.Team == 2 then
-                            if teamcreated then
-                                teams:addPlayer(1, player)
-                            else
-                                teams = Teams.create(1, player)
-                                teamcreated = true
-                            end
-                        else
-                            if teamcreated then
-                                teams:addPlayer(2, player)
-                            else
-                                teams = Teams.create(2, player)
-                                teamcreated = true
-                            end
-                        end
-                    end
-                else
-                    correct = false
-                end
-            end
-        end
-
-        if correct and teams ~= nil then
-            local quality = Trueskill.computeQuality(teams)
-
-            if quality > 0 then
-                gameInfo.GameOptions['Quality'] = quality
-                SetText2(GUI.GameQualityLabel, "Game quality : "..quality.."%", 20)
-            else
-                SetText2(GUI.GameQualityLabel, "Game quality N/A", 20)
-            end
-        else
-            GUI.GameQualityLabel:SetText("")
-        end
-    else
-        GUI.GameQualityLabel:SetText("")
-    end
+    ShowGameQuality()
 
     -- Add Tooltip info on Map Name Label
-    if GUI.GameQualityLabel and scenarioInfo then
+    if scenarioInfo then
         local TTips_map_version = scenarioInfo.map_version or "1"
         local TTips_army = table.getsize(scenarioInfo.Configurations.standard.teams[1].armies) or "N/A"
         local TTips_sizeX = scenarioInfo.size[1] / 51.2 or "N/A"
@@ -1904,6 +1849,47 @@ local function UpdateGame()
 
     -- If the large map is shown, update it.
     RefreshLargeMap()
+end
+
+--- Update the game quality display
+function ShowGamequality()
+    GUI.GameQualityLabel:SetText("")
+
+    -- Can't compute a game quality for random spawns!
+    if gameInfo.GameOptions.TeamSpawn == 'random' then
+        return
+    end
+
+    local teams = Teams.create()
+
+    for i = 1, LobbyComm.maxPlayerSlots do
+        local playerOptions = gameInfo.PlayerOptions[i]
+        if playerOptions then
+            -- Can't do it for AI, either, not sensibly.
+            if not playerOptions.Human then
+                return
+            end
+
+            local player = Player.create(
+                playerOptions.PlayerName,
+                Rating.create(playerOptions.MEAN, playerOptions.DEV)
+            )
+
+            teams:addPlayer(playersOptions.Team, player)
+        end
+    end
+
+    -- Nothing to do if we have only one team...
+    if table.getSize(teams:getTeams()) < 2 then
+        return
+    end
+
+    local quality = Trueskill.computeQuality(teams)
+
+    if quality > 0 then
+        gameInfo.GameOptions.Quality = quality
+        SetText2(GUI.GameQualityLabel, "Game quality : " .. quality .. "%", 20)
+    end
 end
 
 -- Update our local gameInfo.GameMods from selected map name and selected mods, then

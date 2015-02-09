@@ -149,32 +149,29 @@ function Player:getRating()
     return self.rating
 end
 
-function Teams.create(team, player)
+--- Create an empty Teams object
+function Teams.create()
     local tm = {}
     setmetatable(tm,Teams)
-    tm.players = {}
-    tm.players[team] = {player}
+    -- Maps team numbers to lists of Players.
+    tm.teams = {}
     return tm
 end
 
 function Teams:addPlayer(team, player)
-    if self.players[team] == nil then
-        self.players[team] = {player}
+    if self.teams[team] == nil then
+        self.teams[team] = {player}
     else
-        table.insert(self.players[team], player)
+        table.insert(self.teams[team], player)
     end
 end
 
 function Teams:getTeams()
-    return self.players
+    return self.teams
 end
 
 function Teams:getTeam(num)
-    for i,v in ipairs(self.players) do
-        if i == num then
-            return v
-        end
-    end
+    return self.teams[num]
 end
 
 local function DiagonalMatrix(diagonalValues)
