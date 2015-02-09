@@ -1339,6 +1339,7 @@ local function AssignAutoTeams(gameInfo)
     for i = 1, LobbyComm.maxPlayerSlots do
         if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
             SetPlayerOption(i, "Team", getTeam(i), true)
+            SetSlotInfo(i, gameInfo.PlayerOptions[i])
         end
     end
 end
@@ -3400,7 +3401,6 @@ function CreateUI(maxPlayers)
         GUI.autoTeams.OnStateChanged = function(self, newState)
             SetGameOption('AutoTeams', newState)
             AssignAutoTeams(gameInfo)
-            UpdateGame()
         end
     end
     
