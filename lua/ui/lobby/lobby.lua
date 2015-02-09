@@ -4028,8 +4028,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 HostConvertPlayerToObserver(data.SenderID, data.RequestedSlot)
             elseif data.Type == 'RequestConvertToPlayer' then
                 HostConvertObserverToPlayer(data.SenderID, data.ObserverSlot, data.PlayerSlot)
-                AssignAutoTeams(gameInfo)
-                UpdateGame()
             elseif data.Type == 'RequestConvertToPlayerWithoutSlot' then
                 HostConvertObserverToPlayerWithoutSlot(data.SenderID, data.ObserverSlot)
                 AssignAutoTeams(gameInfo)
