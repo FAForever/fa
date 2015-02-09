@@ -2292,7 +2292,9 @@ function HostConvertObserverToPlayer(senderID, fromObserverSlot, toPlayerSlot, i
     if ignoreMsg then
         SendSystemMessage(LOCF("<LOC lobui_0227>%s has switched from an observer to player.", incomingPlayer.PlayerName), "lobui_0227")
     end
-    UpdateGame()
+
+    refreshObserverList()
+    SetSlotInfo(toPlayerSlot, gameInfo.PlayerOptions[toPlayerSlot])
 end
 
 function HostConvertObserverToPlayerWithoutSlot(senderID, fromObserverSlot, ignoreMsg)
