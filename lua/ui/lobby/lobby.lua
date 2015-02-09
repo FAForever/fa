@@ -2180,6 +2180,7 @@ function HostTryMovePlayer(senderID, currentSlot, requestedSlot)
     gameInfo.PlayerOptions[requestedSlot] = gameInfo.PlayerOptions[currentSlot]
     gameInfo.PlayerOptions[currentSlot] = nil
     ClearSlotInfo(currentSlot)
+    SetSlotInfo(requestedSlot, gameInfo.PlayerOptions[requestedSlot])
 
     lobbyComm:BroadcastData(
         {
@@ -2189,9 +2190,6 @@ function HostTryMovePlayer(senderID, currentSlot, requestedSlot)
             Options = gameInfo.PlayerOptions[requestedSlot]:AsTable(),
         }
     )
-
-    AssignAutoTeams(gameInfo)
-    UpdateGame()
 end
 
 --- Add an observer
