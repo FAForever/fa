@@ -2692,9 +2692,9 @@ function CreateSlotsUI(makeLabel)
         end
 
         if i == 1 then
-            LayoutHelpers.Below(newSlot, GUI.labelGroup, -5)
+            LayoutHelpers.Below(newSlot, GUI.labelGroup, -4)
         else
-            LayoutHelpers.Below(newSlot, GUI.slots[i - 1], 3)
+            LayoutHelpers.Below(newSlot, GUI.slots[i - 1])
         end
 
         GUI.slots[i] = newSlot
@@ -3290,7 +3290,7 @@ function CreateUI(maxPlayers)
     ---------------------------------------------------------------------------
 
     GUI.allowObservers = UIUtil.CreateCheckbox(GUI.chatPanel, '/CHECKBOX/', 'Observers in Game', true, 11)
-    LayoutHelpers.AtLeftTopIn(GUI.allowObservers, GUI.chatPanel, -11, -37)
+    LayoutHelpers.AtLeftTopIn(GUI.allowObservers, GUI.chatPanel, -11, -32)
     Tooltip.AddControlTooltip(GUI.allowObservers, 'lob_observers_allowed')
     GUI.allowObservers:SetCheck(false)
     if isHost then
