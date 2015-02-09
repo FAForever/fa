@@ -863,7 +863,7 @@ function SetSlotInfo(slotNum, playerInfo)
     end
 
     -- Disable team selection if "auto teams" is controlling it.
-    local autoTeams = gameInfo.GameOptions['AutoTeams']
+    local autoTeams = gameInfo.GameOptions.AutoTeams
     UIUtil.setEnabled(slot.team,
         autoTeams == 'none' or
         (autoTeams == 'manual' and lobbyComm:IsHost())
@@ -1182,7 +1182,7 @@ local function AssignRandomStartSpots(gameInfo)
             return
         end
 
-        local AutoTeams = gameInfo.GameOptions['AutoTeams']
+        local AutoTeams = gameInfo.GameOptions.AutoTeams
         local teams = {}
         for i = 1, numAvailStartSpots do
             if gameInfo.ClosedSlots[i] == nil then
@@ -1300,7 +1300,7 @@ local function AssignRandomStartSpots(gameInfo)
 end
 
 local function AssignAutoTeams(gameInfo)
-    if gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
+    if gameInfo.GameOptions.AutoTeams. == 'lvsr' then
         local midLine = GUI.mapView.Left() + (GUI.mapView.Width() / 2)
         for i = 1, LobbyComm.maxPlayerSlots do
             if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
@@ -1312,7 +1312,7 @@ local function AssignAutoTeams(gameInfo)
                 end
             end
         end
-    elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
+    elseif gameInfo.GameOptions.AutoTeams == 'tvsb' then
         local midLine = GUI.mapView.Top() + (GUI.mapView.Height() / 2)
         for i = 1, LobbyComm.maxPlayerSlots do
             if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
@@ -1324,7 +1324,7 @@ local function AssignAutoTeams(gameInfo)
                 end
             end
         end
-    elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' or gameInfo.GameOptions['RandomMap'] ~= 'Off' then
+    elseif gameInfo.GameOptions.AutoTeams == 'pvsi' or gameInfo.GameOptions['RandomMap'] ~= 'Off' then
         for i = 1, LobbyComm.maxPlayerSlots do
             if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
 
@@ -1543,7 +1543,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
                 end
                 i = i + 1
             until i == 9
-            if totalPlayers > 3 and not stillAllowLockedTeams and totalPlayers ~= n and gameInfo.GameOptions['AutoTeams']
+            if totalPlayers > 3 and not stillAllowLockedTeams and totalPlayers ~= n and gameInfo.GameOptions.AutoTeams
                 == 'none' then
                 UIUtil.QuickDialog(GUI, "<LOC lobui_0526>There are players for a team game and teams are locked.  Do you " ..
                                    "still wish to launch?",
@@ -1815,8 +1815,8 @@ local function UpdateGame()
     -- Auto-team logic.
     if gameInfo.GameOptions['TeamSpawn'] ~= 'random' and
        math.mod(numPlayers,2) == 0 and
-       gameInfo.GameOptions['AutoTeams'] ~= 'manual' and
-       gameInfo.GameOptions['AutoTeams'] ~= 'none' then
+       gameInfo.GameOptions.AutoTeams ~= 'manual' and
+       gameInfo.GameOptions.AutoTeams ~= 'none' then
 
         local teams = nil
         local teamcreated = false
@@ -3755,7 +3755,7 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
         -- The ACUButton instance representing this slot.
         local marker = mapCtrl.startPositions[slot]
 
-        if gameInfo.GameOptions['AutoTeams'] and not gameInfo.AutoTeams[slot] and lobbyComm:IsHost() then
+        if gameInfo.GameOptions.AutoTeams and not gameInfo.AutoTeams[slot] and lobbyComm:IsHost() then
             gameInfo.AutoTeams[slot] = 2
         end
 
@@ -3785,9 +3785,9 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
                     end
                 end
             else
-                if gameInfo.GameOptions['AutoTeams'] and lobbyComm:IsHost() then
+                if gameInfo.GameOptions.AutoTeams and lobbyComm:IsHost() then
                     -- Handle the manual-mode reassignment of slots to teams.
-                    if gameInfo.GameOptions['AutoTeams'] == 'manual' then
+                    if gameInfo.GameOptions.AutoTeams == 'manual' then
                         if not gameInfo.ClosedSlots[slot] and (gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] == 'random') then
                             local targetTeam
                             if gameInfo.AutoTeams[slot] == 7 then
@@ -3843,8 +3843,8 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
             end
         end
 
-        if gameInfo.GameOptions['AutoTeams'] then
-            if gameInfo.GameOptions['AutoTeams'] == 'lvsr' then
+        if gameInfo.GameOptions.AutoTeams then
+            if gameInfo.GameOptions.AutoTeams == 'lvsr' then
                 local midLine = mapCtrl.Left() + (mapCtrl.Width() / 2)
                 if gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] == 'random' then
                     local markerPos = marker.Left()
@@ -3854,7 +3854,7 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
                         marker:SetTeam(3)
                     end
                 end
-            elseif gameInfo.GameOptions['AutoTeams'] == 'tvsb' then
+            elseif gameInfo.GameOptions.AutoTeams == 'tvsb' then
                 local midLine = mapCtrl.Top() + (mapCtrl.Height() / 2)
                 if gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] == 'random' then
                     local markerPos = marker.Top()
@@ -3864,7 +3864,7 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
                         marker:SetTeam(3)
                     end
                 end
-            elseif gameInfo.GameOptions['AutoTeams'] == 'pvsi' then
+            elseif gameInfo.GameOptions.AutoTeams == 'pvsi' then
                 if gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] == 'random' then
                     if math.mod(slot, 2) ~= 0 then
                         marker:SetTeam(2)
@@ -3872,7 +3872,7 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
                         marker:SetTeam(3)
                     end
                 end
-            elseif gameInfo.GameOptions['AutoTeams'] == 'manual' and gameInfo.GameOptions['TeamSpawn'] == 'random' then
+            elseif gameInfo.GameOptions.AutoTeams == 'manual' and gameInfo.GameOptions['TeamSpawn'] == 'random' then
                 marker:SetTeam(gameInfo.AutoTeams[slot] or 1)
             end
         end
