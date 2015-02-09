@@ -1300,40 +1300,45 @@ local function AssignRandomStartSpots(gameInfo)
 end
 
 local function AssignAutoTeams(gameInfo)
-    if gameInfo.GameOptions.AutoTeams. == 'lvsr' then
+    -- A function to take a player index and return the team they should be on.
+    local getTeam
+    if gameInfo.GameOptions.AutoTeams == 'lvsr' then
         local midLine = GUI.mapView.Left() + (GUI.mapView.Width() / 2)
-        for i = 1, LobbyComm.maxPlayerSlots do
-            if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
-                local markerPos = GUI.mapView.startPositions[i].Left()
-                if markerPos < midLine then
-                    SetPlayerOption(i, "Team", 2, true)
-                else
-                    SetPlayerOption(i, "Team", 3, true)
-                end
+        local startPositions = GUI.mapView.startPositions
+
+        getTeam = function(playerIndex)
+            local markerPos = startPositions[playerIndex].Left()
+            if markerPos < midLine then
+                return 2
+            else
+                return 3
             end
         end
     elseif gameInfo.GameOptions.AutoTeams == 'tvsb' then
         local midLine = GUI.mapView.Top() + (GUI.mapView.Height() / 2)
-        for i = 1, LobbyComm.maxPlayerSlots do
-            if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
-                local markerPos = GUI.mapView.startPositions[i].Top()
-                if markerPos < midLine then
-                    SetPlayerOption(i, "Team", 2, true)
-                else
-                    SetPlayerOption(i, "Team", 3, true)
-                end
+        local startPositions = GUI.mapView.startPositions
+
+        getTeam = function(playerIndex)
+            local markerPos = startPositions[playerIndex].Top()
+            if markerPos < midLine then
+                return 2
+            else
+                return 3
             end
         end
     elseif gameInfo.GameOptions.AutoTeams == 'pvsi' or gameInfo.GameOptions['RandomMap'] ~= 'Off' then
-        for i = 1, LobbyComm.maxPlayerSlots do
-            if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
-
-                if math.mod(i, 2) ~= 0 then
-                    SetPlayerOption(i, "Team", 2, true)
-                else
-                    SetPlayerOption(i, "Team", 3, true)
-                end
+        getTeam = function(playerIndex)
+            if math.mod(playerIndex, 2) ~= 0 then
+                return 2
+            else
+                return 3
             end
+        end
+    end
+
+    for i = 1, LobbyComm.maxPlayerSlots do
+        if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
+            SetPlayerOption(i, "Team", getTeam(i), true)
         end
     end
 end
