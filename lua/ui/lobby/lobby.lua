@@ -2090,6 +2090,19 @@ function SetPlayerColor(playerData, newColor)
     playerData.PlayerColor = newColor
 end
 
+--- Find and return the id of an unoccupied slot.
+--
+-- @return The id of an empty slot, of -1 if none is available.
+function HostFindEmptySlot()
+    for i = 1, numOpenSlots do
+        if gameInfo.PlayerOptions[i] == nil and gameInfo.ClosedSlots[i] == nil then
+            return i
+        end
+    end
+
+    return -1
+end
+
 --- Attempt to add a player to a slot. If no is available, add them as an observer.
 --
 -- @param senderID The peer ID of the player we're adding.
@@ -2106,13 +2119,7 @@ function HostTryAddPlayer(senderID, slot, playerData)
     local newSlot = slot
 
     if not slot or slot < 1 or newSlot > numOpenSlots then
-        newSlot = -1
-        for i = 1, numOpenSlots do
-            if gameInfo.PlayerOptions[i] == nil and gameInfo.ClosedSlots[i] == nil then
-                newSlot = i
-                break
-            end
-        end
+        newSlot = HostFindEmptySlot()
     end
 
     -- if no slot available, and human, try to make them an observer
@@ -2262,6 +2269,11 @@ function HostConvertObserverToPlayer(senderID, fromObserverSlot, toPlayerSlot, i
         return
     end
 
+    -- If no slot is specified (user clicked "go player" button), select a default.
+    if not toPlayerSlot or toPlayerSlot < 1 or toPlayerSlot > numOpenSlots then
+        toPlayerSlot = HostFindEmptySlot()
+    end
+
     local incomingPlayer = gameInfo.Observers[fromObserverSlot]
 
     -- Give them a default colour if the one they already have isn't free.
@@ -2292,23 +2304,6 @@ function HostConvertObserverToPlayer(senderID, fromObserverSlot, toPlayerSlot, i
 
     refreshObserverList()
     SetSlotInfo(toPlayerSlot, gameInfo.PlayerOptions[toPlayerSlot])
-end
-
-function HostConvertObserverToPlayerWithoutSlot(senderID, fromObserverSlot, ignoreMsg)
-    local newSlot = -1
-    for i = 1, numOpenSlots do
-        if gameInfo.PlayerOptions[i] == nil and gameInfo.ClosedSlots[i] == nil then
-            newSlot = i
-            break
-        else
-        end
-    end
-    if newSlot == -1 then
-        return
-    end
-    local toPlayerSlot = newSlot
-
-    HostConvertObserverToPlayer(senderID, fromObserverSlot, toPlayerSlot, ignoreMsg)
 end
 
 function HostRemoveAI(slot)
@@ -3404,9 +3399,9 @@ function CreateUI(maxPlayers)
             end
         elseif IsObserver(localPlayerID) then
             if isHost then
-                HostConvertObserverToPlayerWithoutSlot(hostID, FindObserverSlotForID(localPlayerID))
+                HostConvertObserverToPlayer(hostID, FindObserverSlotForID(localPlayerID))
             else
-                lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayerWithoutSlot', ObserverSlot = FindObserverSlotForID(localPlayerID)})
+                lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer', ObserverSlot = FindObserverSlotForID(localPlayerID)})
             end
         end
     end
@@ -4027,10 +4022,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 HostConvertPlayerToObserver(data.SenderID, data.RequestedSlot)
             elseif data.Type == 'RequestConvertToPlayer' then
                 HostConvertObserverToPlayer(data.SenderID, data.ObserverSlot, data.PlayerSlot)
-            elseif data.Type == 'RequestConvertToPlayerWithoutSlot' then
-                HostConvertObserverToPlayerWithoutSlot(data.SenderID, data.ObserverSlot)
-                AssignAutoTeams(gameInfo)
-                UpdateGame()
             elseif data.Type == 'RequestColor' then
                 if IsColorFree(data.Color) then
                     -- Color is available, let everyone else know
