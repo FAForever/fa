@@ -871,6 +871,8 @@ function SetSlotInfo(slotNum, playerInfo)
 
     -- Set the CPU bar
     SetSlotCPUBar(slotNum, playerInfo)
+
+    ShowGameQuality()
 end
 
 function ClearSlotInfo(slot)
@@ -927,6 +929,8 @@ function ClearSlotInfo(slot)
     GUI.slots[slot].team:Hide()
     GUI.slots[slot].multiSpace:Hide()
     GUI.slots[slot].pingGroup:Hide()
+
+    ShowGameQuality()
 end
 
 function IsColorFree(colorIndex)
@@ -1817,8 +1821,6 @@ local function UpdateGame()
     if scenarioInfo.name then
         SetText2(GUI.MapNameLabel, scenarioInfo.name, 20)
     end
-
-    ShowGameQuality()
 
     -- Add Tooltip info on Map Name Label
     if scenarioInfo then
