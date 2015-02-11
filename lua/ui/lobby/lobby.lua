@@ -113,8 +113,6 @@ local selectedMods = nil
 local commandQueueIndex = 0
 local commandQueue = {}
 
-local autoKick = true
-
 local lastUploadedMap = nil
 
 local CPU_Benchmarks = {} -- Stores CPU benchmark data
@@ -1911,7 +1909,7 @@ local function HostUpdateMods(newPlayerID, newPlayerName)
                 table.insert(missingmods, modId)
             end
         end
-        if not table.equal(gameInfo.GameMods, newmods) and (not newPlayerID or not autoKick) then
+        if not table.equal(gameInfo.GameMods, newmods) and not newPlayerID then
             gameInfo.GameMods = newmods
             WARN("Sending ModsChanged...")
             lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
@@ -1924,7 +1922,7 @@ local function HostUpdateMods(newPlayerID, newPlayerName)
 
             GpgNetSend('GameMods', unpack(mods))
 
-        elseif not table.equal(gameInfo.GameMods, newmods) and newPlayerID and autoKick then
+        elseif not table.equal(gameInfo.GameMods, newmods) and newPlayerID then
             local modnames = ""
             local totalMissing = table.getn(missingmods)
             local totalListed = 0
@@ -3365,17 +3363,6 @@ function CreateUI(maxPlayers)
         end
     end
 
-    if isHost and not singlePlayer then
-        local autoKickBox = UIUtil.CreateCheckbox(GUI.chatPanel, '/CHECKBOX/', "Auto kick", true, 11)
-        LayoutHelpers.CenteredRightOf(autoKickBox, GUI.allowObservers, 10)
-        Tooltip.AddControlTooltip(autoKickBox, 'lob_auto_kick')
-        autoKick = true
-        autoKickBox:SetCheck(true)
-        autoKickBox.OnCheck = function(self, checked)
-            autoKick = checked
-        end
-    end
-    
     -- AUTO TEAM BUTTON -- start of auto teams code.
     GUI.autoTeams = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/autoteam/')
     LayoutHelpers.RightOf(GUI.autoTeams, GUI.randMap, -19)
