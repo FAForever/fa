@@ -214,7 +214,6 @@ local commands = {
 local Strings = LobbyComm.Strings
 
 local lobbyComm = false
-local wantToBeObserver = false
 local localPlayerName = ""
 local gameName = ""
 local hostID = false
@@ -519,7 +518,6 @@ end
 
 function Reset()
     lobbyComm = false
-    wantToBeObserver = false
     localPlayerName = ""
     gameName = ""
     hostID = false
@@ -601,7 +599,6 @@ end
 
 -- join an already existing lobby
 function JoinGame(address, asObserver, playerName, uid)
-    wantToBeObserver = asObserver
     lobbyComm:JoinGame(address, playerName, uid);
 end
 
@@ -3291,7 +3288,7 @@ function CreateUI(maxPlayers)
     ---------------------------------------------------------------------------
     -- set up observer and limbo grid
     ---------------------------------------------------------------------------
-    
+
     GUI.allowObservers = UIUtil.CreateCheckbox(GUI.chatPanel, '/CHECKBOX/', 'Observers in Game', true, 11)
     LayoutHelpers.AtLeftTopIn(GUI.allowObservers, GUI.chatPanel, -11, -37)
     Tooltip.AddControlTooltip(GUI.allowObservers, 'lob_observers_allowed')
@@ -3928,22 +3925,12 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         GpgNetSend('ConnectedToHost', hostID)
         lobbyComm:SendData(hostID, { Type = 'SetAvailableMods', Mods = GetLocallyAvailableMods(), Name = localPlayerName} )
 
-        if wantToBeObserver then
-            lobbyComm:SendData(hostID,
-                {
-                    Type = 'AddObserver',
-                    PlayerOptions = GetLocalPlayerData():AsTable()
-                }
-            )
-			LOGX('>> ConnectionToHostEstablished//SendData//playerRating='..tostring(playerRating), 'Connecting')
-        else
-            lobbyComm:SendData(hostID,
-                {
-                    Type = 'AddPlayer',
-                    PlayerOptions = GetLocalPlayerData():AsTable()
-                }
-            )
-        end
+        lobbyComm:SendData(hostID,
+            {
+                Type = 'AddPlayer',
+                PlayerOptions = GetLocalPlayerData():AsTable()
+            }
+        )
 
         local function KeepAliveThreadFunc()
             local threshold = LobbyComm.quietTimeout
@@ -4048,14 +4035,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             elseif data.Type == 'MovePlayer' then
                 -- attempt to move a player from current slot to empty slot
                 HostTryMovePlayer(data.SenderID, data.CurrentSlot, data.RequestedSlot)
-            elseif data.Type == 'AddObserver' then
-                -- create empty slot if possible and give it to the observer
-                if gameInfo.GameOptions.AllowObservers then
-                    SendCompleteGameStateToPeer(data.SenderID)
-                    HostTryAddObserver(data.SenderID, PlayerData(data.PlayerOptions))
-                else
-                    lobbyComm:EjectPeer(data.SenderID, 'NoObservers');
-                end
             elseif data.Type == 'RequestConvertToObserver' then
                 HostConvertPlayerToObserver(data.SenderID, data.RequestedSlot)
             elseif data.Type == 'RequestConvertToPlayer' then
