@@ -296,7 +296,6 @@ function table.getsize(t)
 end
 
 
-
 --==============================================================================
 -- table.inverse(t) returns a table with keys and values from t reversed.
 --

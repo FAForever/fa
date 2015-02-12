@@ -113,8 +113,6 @@ local selectedMods = nil
 local commandQueueIndex = 0
 local commandQueue = {}
 
-local autoKick = true
-
 local lastUploadedMap = nil
 
 local CPU_Benchmarks = {} -- Stores CPU benchmark data
@@ -1587,8 +1585,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
                 end
                 gameInfo.Observers = WatchedValueArray(LobbyComm.maxPlayerSlots)
             else
-                UIUtil.QuickDialog(GUI, "<LOC lobui_0278>There are players who are not assigned slots and observers are not " ..
-                                   "allowed.  Launching will cause them to be ejected.  Do you still wish to launch?",
+                UIUtil.QuickDialog(GUI, "<LOC lobui_0278>Launching will kick observers because \"allow observers\" is disabled.  Continue?",
                                    "<LOC _Yes>", function() TryLaunch(true, true, true) end,
                                    "<LOC _No>", nil,
                                    nil, nil,
@@ -1796,8 +1793,6 @@ local function UpdateGame()
         UIUtil.setEnabled(GUI.launchGameButton, singlePlayer or not playerNotReady)
     end
 
-    GUI.allowObservers:SetCheck(gameInfo.GameOptions.AllowObservers, true)
-
     RefreshOptionDisplayData(scenarioInfo)
 
     -- Update the map background to reflect the possibly-changed map.
@@ -1911,7 +1906,7 @@ local function HostUpdateMods(newPlayerID, newPlayerName)
                 table.insert(missingmods, modId)
             end
         end
-        if not table.equal(gameInfo.GameMods, newmods) and (not newPlayerID or not autoKick) then
+        if not table.equal(gameInfo.GameMods, newmods) and not newPlayerID then
             gameInfo.GameMods = newmods
             WARN("Sending ModsChanged...")
             lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
@@ -1924,7 +1919,7 @@ local function HostUpdateMods(newPlayerID, newPlayerName)
 
             GpgNetSend('GameMods', unpack(mods))
 
-        elseif not table.equal(gameInfo.GameMods, newmods) and newPlayerID and autoKick then
+        elseif not table.equal(gameInfo.GameMods, newmods) and newPlayerID then
             local modnames = ""
             local totalMissing = table.getn(missingmods)
             local totalListed = 0
@@ -2443,7 +2438,7 @@ function CreateSlotsUI(makeLabel)
     GUI.labelGroup = Group(GUI.playerPanel)
     GUI.labelGroup.Width:Set(690)
     GUI.labelGroup.Height:Set(21)
-    LayoutHelpers.AtLeftTopIn(GUI.labelGroup, GUI.playerPanel, 5, 5)
+    LayoutHelpers.AtLeftTopIn(GUI.labelGroup, GUI.playerPanel, 5, -1)
 
     GUI.ratingLabel = makeLabel("R", 14)
     LayoutHelpers.AtLeftIn(GUI.ratingLabel, GUI.panel, slotColumnSizes.rating.x+20) -- Offset Right
@@ -2694,7 +2689,7 @@ function CreateSlotsUI(makeLabel)
         if i == 1 then
             LayoutHelpers.Below(newSlot, GUI.labelGroup, -5)
         else
-            LayoutHelpers.Below(newSlot, GUI.slots[i - 1], 3)
+            LayoutHelpers.Below(newSlot, GUI.slots[i - 1])
         end
 
         GUI.slots[i] = newSlot
@@ -2842,11 +2837,11 @@ function CreateUI(maxPlayers)
     local obsOffset
     local obsHeight
     if isHost then
-        obsHeight = 134
-        obsOffset = 544
+        obsHeight = 122
+        obsOffset = 556
     else
-        obsHeight = 181
-        obsOffset = 502
+        obsHeight = 159
+        obsOffset = 514
     end
     LayoutHelpers.AtLeftTopIn(GUI.observerPanel, GUI.panel, 460, obsOffset)
     GUI.observerPanel.Width:Set(278)
@@ -2855,9 +2850,9 @@ function CreateUI(maxPlayers)
     -- Chat
     GUI.chatPanel = Group(GUI.panel, "chatPanel")
     UIUtil.SurroundWithBorder(GUI.chatPanel, '/scx_menu/lan-game-lobby/frame/')
-    LayoutHelpers.AtLeftTopIn(GUI.chatPanel, GUI.panel, 49, 458)
+    LayoutHelpers.AtLeftTopIn(GUI.chatPanel, GUI.panel, 49, 470)
     GUI.chatPanel.Width:Set(388)
-    GUI.chatPanel.Height:Set(220)
+    GUI.chatPanel.Height:Set(208)
 
     -- Map Preview
     GUI.mapPanel = Group(GUI.panel, "mapPanel")
@@ -3285,22 +3280,6 @@ function CreateUI(maxPlayers)
 
     -- For disgusting reasons, we pass the label factory as a parameter.
     CreateSlotsUI(makeLabel)
-    ---------------------------------------------------------------------------
-    -- set up observer and limbo grid
-    ---------------------------------------------------------------------------
-
-    GUI.allowObservers = UIUtil.CreateCheckbox(GUI.chatPanel, '/CHECKBOX/', 'Observers in Game', true, 11)
-    LayoutHelpers.AtLeftTopIn(GUI.allowObservers, GUI.chatPanel, -11, -37)
-    Tooltip.AddControlTooltip(GUI.allowObservers, 'lob_observers_allowed')
-    GUI.allowObservers:SetCheck(false)
-    if isHost then
-        SetGameOption("AllowObservers", false, true)
-        GUI.allowObservers.OnCheck = function(self, checked)
-            SetGameOption("AllowObservers", checked)
-        end
-    else
-        GUI.allowObservers:Disable()
-    end
 
     -- Exit Button
     GUI.exitButton = UIUtil.CreateButtonWithDropshadow(GUI.chatPanel, '/BUTTON/medium/','Exit')
@@ -3365,17 +3344,6 @@ function CreateUI(maxPlayers)
         end
     end
 
-    if isHost and not singlePlayer then
-        local autoKickBox = UIUtil.CreateCheckbox(GUI.chatPanel, '/CHECKBOX/', "Auto kick", true, 11)
-        LayoutHelpers.CenteredRightOf(autoKickBox, GUI.allowObservers, 10)
-        Tooltip.AddControlTooltip(autoKickBox, 'lob_auto_kick')
-        autoKick = true
-        autoKickBox:SetCheck(true)
-        autoKickBox.OnCheck = function(self, checked)
-            autoKick = checked
-        end
-    end
-    
     -- AUTO TEAM BUTTON -- start of auto teams code.
     GUI.autoTeams = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/autoteam/')
     LayoutHelpers.RightOf(GUI.autoTeams, GUI.randMap, -19)
@@ -3458,7 +3426,6 @@ function CreateUI(maxPlayers)
         -- mostly forget that we're in single-player mode everywhere else (stuff silently becomes a
         -- nop, instead of needing to keep checking if UI controls actually exist...
 
-        GUI.allowObservers:Hide()
         GUI.becomeObserver:Hide()
         GUI.autoTeams:Hide()
         GUI.defaultOptions:Hide()
@@ -4777,7 +4744,7 @@ function CreateUI_Faction_Selector(lastFaction)
 
     local factionSelector = RadioButton(GUI.panel, "/factionselector/", buttons, lastFaction, true)
     GUI.factionSelector = factionSelector
-    LayoutHelpers.AtLeftTopIn(factionSelector, GUI.panel, 407, 69)
+    LayoutHelpers.AtLeftTopIn(factionSelector, GUI.panel, 407, 66)
     factionSelector.OnChoose = function(self, targetFaction, key)
         local localSlot = FindSlotForID(localPlayerID)
         Prefs.SetToCurrentProfile('LastFaction', targetFaction)
