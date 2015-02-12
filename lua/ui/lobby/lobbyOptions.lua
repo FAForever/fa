@@ -256,6 +256,24 @@ globalOpts = {
     },
     {
         default = 1,
+        label = "<LOC lobui_0592>Allow Observers",
+        help = "<LOC lobui_0593>Are observers permitted after the game has started?",
+        key = 'AllowObservers',
+        values = {
+            {
+                text = "<LOC _Yes>Yes",
+                help = "<LOC lobui_0594>Observers are allowed",
+                key = true,
+            },
+            {
+                text = "<LOC _No>No",
+                help = "<LOC lobui_0595>Observers are not allowed",
+                key = false,
+            },
+        },
+    },
+    {
+        default = 1,
         label = "<LOC lobui_0208>Cheating",
         help = "<LOC lobui_0209>Enable cheat codes",
         key = 'CheatsEnabled',
