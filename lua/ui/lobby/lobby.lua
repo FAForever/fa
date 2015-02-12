@@ -2438,7 +2438,7 @@ function CreateSlotsUI(makeLabel)
     GUI.labelGroup = Group(GUI.playerPanel)
     GUI.labelGroup.Width:Set(690)
     GUI.labelGroup.Height:Set(21)
-    LayoutHelpers.AtLeftTopIn(GUI.labelGroup, GUI.playerPanel, 5, 5)
+    LayoutHelpers.AtLeftTopIn(GUI.labelGroup, GUI.playerPanel, 5, -1)
 
     GUI.ratingLabel = makeLabel("R", 14)
     LayoutHelpers.AtLeftIn(GUI.ratingLabel, GUI.panel, slotColumnSizes.rating.x+20) -- Offset Right
@@ -2687,7 +2687,7 @@ function CreateSlotsUI(makeLabel)
         end
 
         if i == 1 then
-            LayoutHelpers.Below(newSlot, GUI.labelGroup, -4)
+            LayoutHelpers.Below(newSlot, GUI.labelGroup, -5)
         else
             LayoutHelpers.Below(newSlot, GUI.slots[i - 1])
         end
@@ -2837,11 +2837,11 @@ function CreateUI(maxPlayers)
     local obsOffset
     local obsHeight
     if isHost then
-        obsHeight = 134
-        obsOffset = 544
+        obsHeight = 122
+        obsOffset = 556
     else
-        obsHeight = 181
-        obsOffset = 502
+        obsHeight = 159
+        obsOffset = 514
     end
     LayoutHelpers.AtLeftTopIn(GUI.observerPanel, GUI.panel, 460, obsOffset)
     GUI.observerPanel.Width:Set(278)
@@ -2850,9 +2850,9 @@ function CreateUI(maxPlayers)
     -- Chat
     GUI.chatPanel = Group(GUI.panel, "chatPanel")
     UIUtil.SurroundWithBorder(GUI.chatPanel, '/scx_menu/lan-game-lobby/frame/')
-    LayoutHelpers.AtLeftTopIn(GUI.chatPanel, GUI.panel, 49, 458)
+    LayoutHelpers.AtLeftTopIn(GUI.chatPanel, GUI.panel, 49, 470)
     GUI.chatPanel.Width:Set(388)
-    GUI.chatPanel.Height:Set(220)
+    GUI.chatPanel.Height:Set(208)
 
     -- Map Preview
     GUI.mapPanel = Group(GUI.panel, "mapPanel")
@@ -4744,7 +4744,7 @@ function CreateUI_Faction_Selector(lastFaction)
 
     local factionSelector = RadioButton(GUI.panel, "/factionselector/", buttons, lastFaction, true)
     GUI.factionSelector = factionSelector
-    LayoutHelpers.AtLeftTopIn(factionSelector, GUI.panel, 407, 69)
+    LayoutHelpers.AtLeftTopIn(factionSelector, GUI.panel, 407, 66)
     factionSelector.OnChoose = function(self, targetFaction, key)
         local localSlot = FindSlotForID(localPlayerID)
         Prefs.SetToCurrentProfile('LastFaction', targetFaction)
