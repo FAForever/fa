@@ -1338,6 +1338,8 @@ local function AssignAutoTeams(gameInfo)
                 return 3
             end
         end
+    else
+        return
     end
 
     for i = 1, LobbyComm.maxPlayerSlots do
