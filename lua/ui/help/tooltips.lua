@@ -1182,10 +1182,6 @@ Tooltips = {
         title = "<LOC lobui_0583>Map Type",
         description = "<LOC lobui_0584>Sort by official or custom maps",
     },
-    lob_auto_kick = {
-        title = "<LOC lobui_0590>Automaticly Remove",
-        description = "<LOC lobui_0591>Check if you want to automaticly remove the players who don't have the enabled mods",
-    },
     lob_reconnect = {
         title = "<LOC lobui_0736>Reconnect to Lobby",
         description = "<LOC lobui_0737>Click to leave and reconnect to the lobby",

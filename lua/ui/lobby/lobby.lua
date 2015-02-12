@@ -1585,8 +1585,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
                 end
                 gameInfo.Observers = WatchedValueArray(LobbyComm.maxPlayerSlots)
             else
-                UIUtil.QuickDialog(GUI, "<LOC lobui_0278>There are players who are not assigned slots and observers are not " ..
-                                   "allowed.  Launching will cause them to be ejected.  Do you still wish to launch?",
+                UIUtil.QuickDialog(GUI, "<LOC lobui_0278>Launching will kick observers because \"allow observers\" is disabled.  Continue?",
                                    "<LOC _Yes>", function() TryLaunch(true, true, true) end,
                                    "<LOC _No>", nil,
                                    nil, nil,
@@ -1793,8 +1792,6 @@ local function UpdateGame()
         -- Launch button enabled if everyone is ready.
         UIUtil.setEnabled(GUI.launchGameButton, singlePlayer or not playerNotReady)
     end
-
-    GUI.allowObservers:SetCheck(gameInfo.GameOptions.AllowObservers, true)
 
     RefreshOptionDisplayData(scenarioInfo)
 
@@ -3283,22 +3280,6 @@ function CreateUI(maxPlayers)
 
     -- For disgusting reasons, we pass the label factory as a parameter.
     CreateSlotsUI(makeLabel)
-    ---------------------------------------------------------------------------
-    -- set up observer and limbo grid
-    ---------------------------------------------------------------------------
-
-    GUI.allowObservers = UIUtil.CreateCheckbox(GUI.chatPanel, '/CHECKBOX/', 'Observers in Game', true, 11)
-    LayoutHelpers.AtLeftTopIn(GUI.allowObservers, GUI.chatPanel, -11, -32)
-    Tooltip.AddControlTooltip(GUI.allowObservers, 'lob_observers_allowed')
-    GUI.allowObservers:SetCheck(false)
-    if isHost then
-        SetGameOption("AllowObservers", false, true)
-        GUI.allowObservers.OnCheck = function(self, checked)
-            SetGameOption("AllowObservers", checked)
-        end
-    else
-        GUI.allowObservers:Disable()
-    end
 
     -- Exit Button
     GUI.exitButton = UIUtil.CreateButtonWithDropshadow(GUI.chatPanel, '/BUTTON/medium/','Exit')
@@ -3445,7 +3426,6 @@ function CreateUI(maxPlayers)
         -- mostly forget that we're in single-player mode everywhere else (stuff silently becomes a
         -- nop, instead of needing to keep checking if UI controls actually exist...
 
-        GUI.allowObservers:Hide()
         GUI.becomeObserver:Hide()
         GUI.autoTeams:Hide()
         GUI.defaultOptions:Hide()
