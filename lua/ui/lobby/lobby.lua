@@ -2829,11 +2829,11 @@ function CreateUI(maxPlayers)
     local obsOffset
     local obsHeight
     if isHost then
-        obsHeight = 134
-        obsOffset = 544
+        obsHeight = 159
+        obsOffset = 519
     else
-        obsHeight = 181
-        obsOffset = 502
+        obsHeight = 206
+        obsOffset = 477
     end
     LayoutHelpers.AtLeftTopIn(GUI.observerPanel, GUI.panel, 460, obsOffset)
     GUI.observerPanel.Width:Set(278)
@@ -2842,9 +2842,9 @@ function CreateUI(maxPlayers)
     -- Chat
     GUI.chatPanel = Group(GUI.panel, "chatPanel")
     UIUtil.SurroundWithBorder(GUI.chatPanel, '/scx_menu/lan-game-lobby/frame/')
-    LayoutHelpers.AtLeftTopIn(GUI.chatPanel, GUI.panel, 49, 458)
+    LayoutHelpers.AtLeftTopIn(GUI.chatPanel, GUI.panel, 49, 433)
     GUI.chatPanel.Width:Set(388)
-    GUI.chatPanel.Height:Set(220)
+    GUI.chatPanel.Height:Set(245)
 
     -- Map Preview
     GUI.mapPanel = Group(GUI.panel, "mapPanel")
@@ -2945,7 +2945,7 @@ function CreateUI(maxPlayers)
         Tooltip.AddButtonTooltip(GUI.gameoptionsButton, 'Lobby_Mods')
     end
 
-    LayoutHelpers.AtBottomIn(GUI.gameoptionsButton, GUI.optionsPanel, -52)
+    LayoutHelpers.AtBottomIn(GUI.gameoptionsButton, GUI.optionsPanel, -58)
     LayoutHelpers.AtHorizontalCenterIn(GUI.gameoptionsButton, GUI.optionsPanel, 1)
 
     ---------------------------------------------------------------------------
@@ -3218,7 +3218,8 @@ function CreateUI(maxPlayers)
     -- Launch Button
     local launchGameButton = UIUtil.CreateButtonWithDropshadow(GUI.chatPanel, '/BUTTON/large/', "Launch the Game")
     GUI.launchGameButton = launchGameButton
-    LayoutHelpers.AtCenterIn(launchGameButton, GUI.observerPanel, 103, -89)
+    LayoutHelpers.AtHorizontalCenterIn(launchGameButton, GUI)
+    LayoutHelpers.AtBottomIn(launchGameButton, GUI, 15)
     Tooltip.AddButtonTooltip(launchGameButton, 'Lobby_Launch')
     UIUtil.setVisible(launchGameButton, isHost)
     launchGameButton.OnClick = function(self)
