@@ -1854,7 +1854,7 @@ local function UpdateGame()
 end
 
 --- Update the game quality display
-function ShowGamequality()
+function ShowGameQuality()
     GUI.GameQualityLabel:SetText("")
 
     -- Can't compute a game quality for random spawns!
@@ -1877,12 +1877,12 @@ function ShowGamequality()
                 Rating.create(playerOptions.MEAN, playerOptions.DEV)
             )
 
-            teams:addPlayer(playersOptions.Team, player)
+            teams:addPlayer(playerOptions.Team, player)
         end
     end
 
     -- Nothing to do if we have only one team...
-    if table.getSize(teams:getTeams()) < 2 then
+    if table.getn(teams:getTeams()) < 2 then
         return
     end
 
