@@ -3948,15 +3948,9 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
     lobbyComm.DataReceived = function(self,data)
         -- Messages anyone can receive
-        if data.Type == 'PlayerOption' or data.Type == 'PlayerOptions' then
-            local options
+        if data.Type == 'PlayerOptions' then
+            local options = data.Options
             local isHost = lobbyComm:IsHost()
-            
-            if data.Type == 'PlayerOption' then
-                options[data.Key] = data.Value
-            else
-                options = data.Options
-            end
 
             for key, val in options do
                 local valid = true
