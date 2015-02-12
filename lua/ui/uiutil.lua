@@ -812,7 +812,7 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
             local halfWidth = dialog.Width() / 2
             return dialog.Left() + halfWidth + ((halfWidth - dialog._button2.Width()) / 2) + 44
         end)
-    else
+    elseif numButtons == 1 then
         LayoutHelpers.AtHorizontalCenterIn(dialog._button1, dialog)
     end
 
