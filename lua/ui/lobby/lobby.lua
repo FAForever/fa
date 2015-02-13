@@ -3944,7 +3944,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                     end
                 end
             end
-            UpdateGame()
+            SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
         elseif data.Type == 'PublicChat' then
             AddChatText("["..data.SenderName.."] "..data.Text)
         elseif data.Type == 'PrivateChat' then
