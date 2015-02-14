@@ -96,8 +96,6 @@ function LOGX(text, ttype)
 	end
 end
 
-local FACTION_PANELS = {}
-
 local connectedTo = {} -- by UID
 CurrentConnection = {} -- by Name
 ConnectionEstablished = {} -- by Name
