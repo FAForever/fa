@@ -3473,13 +3473,6 @@ function RefreshOptionDisplayData(scenarioInfo)
             return
         end
 
-        -- Verify that the map contains sane defaults.
-        if not Warning_MAP and (optData.default == 0 or optData.default > table.getsize(optData.values)) then
-            Warning_MAP = true
-            AddChatText('The options included in this map are not compliant.')
-            AddChatText('Please contact the author of the map.')
-        end
-
         local option = {
             text = optData.label,
             tooltip = { text = optData.label, body = optData.help }
@@ -3514,6 +3507,11 @@ function RefreshOptionDisplayData(scenarioInfo)
 
     -- Add options from the scenario object, if any are provided.
     if scenarioInfo.options then
+        if not MapUtil.ValidateScenarioOptions(scenarioInfo.options, true) then
+            AddChatText('The options included in this map specified invalid defaults. See moholog for details.')
+            AddChatText('An arbitrary option has been selected for now: check the game options screen!')
+        end
+
         for index, optData in scenarioInfo.options do
             addFormattedOption(optData, gameInfo.GameOptions[optData.key])
         end
