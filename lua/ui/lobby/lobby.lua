@@ -273,11 +273,7 @@ local slotMenuData = {
 
 local function GetAITooltipList()
     local aitypes = import('/lua/ui/lobby/aitypes.lua').aitypes
-    local retTable = {}
-    --this is to fix tooltip problem
-    for i = 1, 2 do
-        table.insert(retTable, nil)
-    end
+    local retTable = {nil, nil}
     --end new faf part
     for i, v in aitypes do
         table.insert(retTable, 'aitype_'..v.key)
