@@ -272,7 +272,6 @@ end
 
 -- String from which to build the various "Move player to slot" labels.
 -- TODO: This probably needs localising.
-local move_player_to_slot = "Move Player to slot "
 local slotMenuStrings = {
     open = "<LOC lobui_0219>Open",
     close = "<LOC lobui_0220>Close",
@@ -305,6 +304,7 @@ local slotMenuData = {
             'pm',
             'remove_to_observer',
             'remove_to_kik',
+            'move'
         },
         client = {
             'pm',
@@ -319,12 +319,6 @@ local slotMenuData = {
         },
     },
 }
-
--- Populate the tables with the "move player to slot X" entries.
-for i = 1, numOpenSlots, 1 do
-    table.insert(slotMenuData.player.host, 'move_player_to_slot'..i)
-    slotMenuStrings['move_player_to_slot' .. i] = move_player_to_slot .. i
-end
 
 local function GetAITooltipList()
     local aitypes = import('/lua/ui/lobby/aitypes.lua').aitypes
@@ -368,6 +362,12 @@ local function GetSlotMenuTables(stateKey, hostKey)
             for aiindex, aidata in aitypes do
                 table.insert(keys, aidata.key)
                 table.insert(strings, aidata.name)
+            end
+        elseif key == 'move' then
+            -- Generate the "move player to slot X" entries.
+            for i = 1, numOpenSlots, 1 do
+                table.insert(keys, 'move_player_to_slot' .. i)
+                table.insert(strings, LOCF("<LOC lobui_0596>Move Player to slot %s", i))
             end
         else
             if not (isPlayerReady and key == 'occupy') then
