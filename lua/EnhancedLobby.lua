@@ -1,15 +1,37 @@
 function GetAIList()
 	--Table of AI Names to return
-	local aitypes = {}
+	local aitypes = {
+        {
+            key = 'easy',
+            name = "<LOC lobui_0347>AI: Easy"
+        },
+        {
+            key = 'medium',
+            name = "<LOC lobui_0349>AI: Normal"
+        },
+        {
+            key = 'adaptive',
+            name = "<LOC lobui_0368>AI: Adaptive"
+        },
+        {
+            key = 'rush',
+            name = "<LOC lobui_0360>AI: Rush"
+        },
+        {
+            key = 'turtle',
+            name = "<LOC lobui_0372>AI: Turtle"
+        },
+        {
+            key = 'tech',
+            name = "<LOC lobui_0370>AI: Tech"
+        },
+        {
+            key = 'random',
+            name = "<LOC lobui_0374>AI: Random"
+        }
+    }
 	
 	--Defualt GPG AIs
-    table.insert(aitypes, { key = 'easy', name = "<LOC lobui_0347>AI: Easy" })
-    table.insert(aitypes, { key = 'medium', name = "<LOC lobui_0349>AI: Normal" })
-    table.insert(aitypes, { key = 'adaptive', name = "<LOC lobui_0368>AI: Adaptive" })
-    table.insert(aitypes, { key = 'rush', name = "<LOC lobui_0360>AI: Rush" })
-    table.insert(aitypes, { key = 'turtle', name = "<LOC lobui_0372>AI: Turtle" })
-    table.insert(aitypes, { key = 'tech', name = "<LOC lobui_0370>AI: Tech" })
-	table.insert(aitypes, { key = 'random', name = "<LOC lobui_0374>AI: Random" })
 	
 	local AIFiles = DiskFindFiles('/lua/AI/CustomAIs_v2', '*.lua')
 	local AIFilesold = DiskFindFiles('/lua/AI/CustomAIs', '*.lua')
