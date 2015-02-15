@@ -174,3 +174,27 @@ function GetExtraArmies(scenario)
         end
     end
 end
+
+--- Validate options provided by the scenario file.
+-- This function prints warnings about any defects and attempts to correct them with sane defaults.
+function ValidateScenarioOptions(scenarioOptions)
+    -- Most maps just don't have any options.
+    if not scenarioOptions then
+        return true
+    end
+
+    local failed = false
+    for k, optData in scenarioOptions do
+        -- Verify that all options have a sane default.
+        if optData.default <= 0 or optData.default > table.getn(optData.values) then
+            WARN("Invalid default option value " .. tostring(optData.default))
+            WARN("Remember: option defaults are 1-based indices into the `values' table, not values themselves")
+            WARN("Offending option table:")
+            table.print(optData)
+            optData.default = 1
+            failed = true
+        end
+    end
+
+    return failed
+end

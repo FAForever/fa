@@ -512,6 +512,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
         local mapfile = scen.map
         if DiskGetFileInfo(mapfile) then
             advOptions = scen.options
+            MapUtil.ValidateScenarioOptions(advOptions)
             RefreshOptions(false, singlePlayer)
             PrefetchSession(mapfile, Mods.GetGameMods(), false)
             preview:SetScenario(scen)
@@ -732,23 +733,10 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
                     end
                 end
 
-                if data.default == 0 or data.default > table.getsize(data.data.values) then
-                    -- TODO: This should probably be shown in the actual UI...
-                    WARN('THE MAP OPTIONS IS NOT RESPECTED, NEED FIX BY THE AUTHOR OF THIS MAP (default value is Index !)')
-                end
                 if changedOptions[data.data.key].index then
                     defValue = changedOptions[data.data.key].index
-                elseif defValue then -- IF already set and saved (curOptions exist)
-                    defValue = defValue
                 else
-                    if data.default ~= nil and data.default <= table.getsize(data.data.values) then
-                        defValue = changedOptions[data.data.key].index or line.combo.keyMap[curOptions[data.data.key]] or data.default or 1
-                        if data.default == 0 then -- THE MAP OPTIONS IS NOT RESPECTED
-                            defValue = line.combo.keyMap[curOptions[data.data.key]] or 1
-                        end
-                    else
-                        defValue = changedOptions[data.data.key].index or line.combo.keyMap[curOptions[data.data.key]] or 1
-                    end
+                    defValue = line.combo.keyMap[curOptions[data.data.key]] or data.data.default or 1
                 end
                 --
                 if data.data.default then realDefValue = data.data.default end
@@ -759,7 +747,7 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
                         line.combo._text:SetColor('DBBADB')
                     end
                 end
-                line.HandleEvent = Group.HandleEvent
+                line.HandleEvent = Group.HandleEventhg
                 Tooltip.AddControlTooltip(line, {text=data.data.label,body=data.data.help})
                 Tooltip.AddComboTooltip(line.combo, tooltipTable, line.combo._list)
                 line.combo.UpdateValue = function(key)
