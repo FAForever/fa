@@ -7535,3 +7535,5 @@ lobui_0592="Allow Observers"
 lobui_0593="Are observers permitted after the game has started?"
 lobui_0594="Observers are allowed"
 lobui_0595="Observers are not allowed"
+
+lobui_0596="Move Player to slot %s"
