@@ -45,7 +45,7 @@ function CreateDialog(parent, initialRestrictions, OnOk, OnCancel, isHost)
 
     local okBtn = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Ok>")
     LayoutHelpers.AtBottomIn(okBtn, dialogContent, 10)
-    LayoutHelpers.AtLeftIn(okBtn, dialogContent, -3)
+    LayoutHelpers.AtLeftIn(okBtn, dialogContent, -2)
 
     local resetBtn = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Reset>")
     LayoutHelpers.AtBottomIn(resetBtn, dialogContent, 10)
@@ -54,10 +54,10 @@ function CreateDialog(parent, initialRestrictions, OnOk, OnCancel, isHost)
 
     local cancelBtn = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Cancel>")
     LayoutHelpers.AtBottomIn(cancelBtn, dialogContent, 10)
-    LayoutHelpers.AtRightIn(cancelBtn, dialogContent, -3)
+    LayoutHelpers.AtRightIn(cancelBtn, dialogContent, -2)
 
     local buttonGroup = Group(dialogContent)
-    LayoutHelpers.AtLeftIn(buttonGroup, dialogContent, 2)
+    LayoutHelpers.AtLeftIn(buttonGroup, dialogContent, 13)
     buttonGroup.Top:Set(title.Bottom)
     buttonGroup.Bottom:Set(resetBtn.Top)
     buttonGroup.Width:Set(function() return dialogContent.Width() - 24 end)
@@ -81,8 +81,8 @@ function CreateDialog(parent, initialRestrictions, OnOk, OnCancel, isHost)
             LOC(restrictedUnits[restrictionKey].name), true)
         LayoutHelpers.AtLeftIn(checkbox.label, checkbox, 30)
         -- Evil layout hack:
-        checkbox.label.Width:Set(210)
-        checkbox.Width:Set(240)
+        checkbox.label.Width:Set(199)
+        checkbox.Width:Set(229)
 
         checkbox.restrictionKey = restrictionKey
 
