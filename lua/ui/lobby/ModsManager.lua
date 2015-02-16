@@ -82,7 +82,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
         
     -- Save button
     local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok", -1)
-    LayoutHelpers.AtLeftIn(SaveButton, dialogContent, 0)
+    LayoutHelpers.AtLeftIn(SaveButton, dialogContent, -2)
     LayoutHelpers.AtBottomIn(SaveButton, dialogContent, 10)
 
     -- Checkbox UI mod filter
@@ -140,7 +140,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
     scrollGroup.Width:Set(519)
     scrollGroup.Height:Set(450)
     LayoutHelpers.AtLeftTopIn(scrollGroup, dialogContent, 0, 47)
-    UIUtil.CreateLobbyVertScrollbar(scrollGroup)
+    UIUtil.CreateLobbyVertScrollbar(scrollGroup, 1, 48, -44)
     scrollGroup.controlList = {}
     scrollGroup.top = 1
     numElementsPerPage = 6
