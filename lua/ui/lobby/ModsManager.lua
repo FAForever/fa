@@ -20,7 +20,7 @@ function UpdateClientModStatus(mod_selec)
     if GUI_OPEN then
         IsHost = false
         modstatus = mod_selec
-        Refresh_Mod_List(false, true, true, IsHost, modstatus, false)
+        Refresh_Mod_List(false, true, true, IsHost, modstatus)
     end
 end
 
@@ -93,29 +93,21 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 
     local filterradio = RadioButton(dialogContent, '/RADIOBOX/', filterButtons, 1, true)
     LayoutHelpers.AtLeftIn(filterradio, dialogContent, 160)
-    LayoutHelpers.AtBottomIn(filterradio, dialogContent, -23)
+    LayoutHelpers.AtBottomIn(filterradio, dialogContent, -20)
 
     -- Checkbox hide unselectable mods
     local hideUnselChkBox = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', 'Hide Unselectable', true)
     LayoutHelpers.AtLeftIn(hideUnselChkBox, dialogContent, 370)
-    LayoutHelpers.AtBottomIn(hideUnselChkBox, dialogContent, 23)
+    LayoutHelpers.AtBottomIn(hideUnselChkBox, dialogContent, 18)
     Tooltip.AddCheckboxTooltip(hideUnselChkBox, {text='Hide Unselectable', body='Hide mods which are unselectable due to compatibility issues, or because a player in the lobby does not have them'})
     hideUnselChkBox:SetCheck(true, true)
-            
-    -- Checkbox condensed list
-    local condensedChk = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', 'Condensed View', true)
-    LayoutHelpers.Below(condensedChk, hideUnselChkBox, -9)
-    Tooltip.AddCheckboxTooltip(condensedChk, {text='Condensed View', body='Displays mods as a simplified list'})
 
     filterradio.OnChoose = function(self, index)
         save_mod()
         swiffer()
         uiOnly = index == 1
-        Refresh_Mod_List(not uiOnly, uiOnly, hideUnselChkBox:IsChecked(), IsHost, modstatus, condensedChk:IsChecked())
+        Refresh_Mod_List(not uiOnly, uiOnly, hideUnselChkBox:IsChecked(), IsHost, modstatus)
     end
-
-    local LobbyModManagerCondensedView = Prefs.GetFromCurrentProfile('LobbyModManagerCondensedView') or false
-    condensedChk:SetCheck(LobbyModManagerCondensedView, true)
     
     if not IsHost then
         hideUnselChkBox:Disable()
@@ -125,14 +117,8 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
         if IsHost then
             save_mod()
             swiffer()
-            Refresh_Mod_List(not uiOnly, uiOnly, checked, IsHost, modstatus, condensedChk:IsChecked())
+            Refresh_Mod_List(not uiOnly, uiOnly, checked, IsHost, modstatus)
         end
-    end
-    condensedChk.OnCheck = function(self, checked)
-        save_mod()
-        swiffer()
-        Refresh_Mod_List(not uiOnly, uiOnly, hideUnselChkBox:IsChecked(), IsHost, modstatus, checked)
-        Prefs.SetToCurrentProfile('LobbyModManagerCondensedView', checked)
     end
 
     -- Mod list
@@ -224,7 +210,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
         import('/lua/mods.lua').SetSelectedMods(selectedMods)
     end
 
-    function Refresh_Mod_List(showGameMods, showUIMods, hideUnselected, IsHost, modstatus, useCompactView)
+    function Refresh_Mod_List(showGameMods, showUIMods, hideUnselected, IsHost, modstatus)
         index = 0
         exclusiveMod = false
         local current_list = {}
@@ -286,7 +272,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
         end)
 
         for k, v in current_list do
-            table.insert(scrollGroup.controlList, CreateListElementtt(scrollGroup, v, k, useCompactView))
+            table.insert(scrollGroup.controlList, CreateListElementtt(scrollGroup, v, k))
             if IsHost and selmods[v.uid] then
                 scrollGroup.controlList[k].activated = true
                 scrollGroup.controlList[k].bg:SetTexture(UIUtil.SkinnableFile('/MODS/enabled.dds'))
@@ -392,7 +378,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
                         end
                     end
                     if not exist then -- IF The mod is not listed in the GUI, create the mod in the list
-                        table.insert(scrollGroup.controlList, the_mod.pos+1, CreateListElementtt(scrollGroup, allMods[c], the_mod.pos, false))
+                        table.insert(scrollGroup.controlList, the_mod.pos+1, CreateListElementtt(scrollGroup, allMods[c], the_mod.pos))
                         control = scrollGroup.controlList[the_mod.pos+1]
                         control.activated = true
                         control.bg:SetTexture(UIUtil.SkinnableFile('/MODS/enabled.dds'))
@@ -517,7 +503,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
         scrollGroup.top = 1
         scrollGroup:CalcVisible()
     end
-    Refresh_Mod_List(false, true, true, IsHost, modstatus, condensedChk:IsChecked())
+    Refresh_Mod_List(false, true, true, IsHost, modstatus)
 
     scrollGroup.HandleEvent = function(self, event)
         if event.Type == 'WheelRotation' then
@@ -532,15 +518,10 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
     GUI_OPEN = true
 end
 
-function CreateListElementtt(parent, modInfo, Pos, little)
+function CreateListElementtt(parent, modInfo, Pos)
     local group = Group(parent)
-        if little then
-            numElementsPerPage = 22
-            group.Height:Set(20)
-        else
-            numElementsPerPage = 6
-            group.Height:Set(function() return parent.Height() / numElementsPerPage  end)
-        end
+        numElementsPerPage = 6
+        group.Height:Set(function() return parent.Height() / numElementsPerPage  end)
         group.Width:Set(parent.Width)
         LayoutHelpers.AtLeftTopIn(group, parent, 0, group.Height()*(Pos-1))
     
@@ -559,32 +540,20 @@ function CreateListElementtt(parent, modInfo, Pos, little)
         LayoutHelpers.AtLeftTopIn(group.bg0, group, 0, 0)
     
     group.icon = Bitmap(group, modInfo.icon)
-        if little then
-            group.icon.Height:Set(20)
-            group.icon.Width:Set(20)
-            LayoutHelpers.AtLeftTopIn(group.icon, group, 0, 0)
-        else
-            group.icon.Height:Set(56)
-            group.icon.Width:Set(56)
-            LayoutHelpers.AtLeftTopIn(group.icon, group, 10, 10)
-        end
+        group.icon.Height:Set(56)
+        group.icon.Width:Set(56)
+        LayoutHelpers.AtLeftTopIn(group.icon, group, 10, 10)
     
     group.name = UIUtil.CreateText(group, modInfo.name, 14, UIUtil.bodyFont)
         group.name:SetColor('B9BFB9')
-        if little then
-            LayoutHelpers.AtLeftTopIn(group.name, group, 30, 1)
-        else
-            LayoutHelpers.AtLeftTopIn(group.name, group, 80, 10)
-        end
+        LayoutHelpers.AtLeftTopIn(group.name, group, 80, 10)
         group.name:SetDropShadow(true)
     
-    if not little then
         group.desc = MultiLineText(group, UIUtil.bodyFont, 12, 'B9BFB9')
             LayoutHelpers.AtLeftTopIn(group.desc, group, 80, 30)
             group.desc.Height:Set(40)
             group.desc.Width:Set(group.Width()-86)
             group.desc:SetText(modInfo.description)
-    end
     
     group.type = UIUtil.CreateText(group, '', 10, 'Arial Narrow Bold')
         group.type:SetColor('B9BFB9')
@@ -597,14 +566,7 @@ function CreateListElementtt(parent, modInfo, Pos, little)
             group.type:SetFont('Arial Black', 11)
             group.ui = false
         end
-        if little then
-            LayoutHelpers.AtRightTopIn(group.type, group, 12, 2)
-        else
-            LayoutHelpers.AtRightTopIn(group.type, group, 12, 4)
-        end
-    if little then
-        Tooltip.AddControlTooltip(group.bg, {text=modInfo.name, body=modInfo.description})
-    end
+        LayoutHelpers.AtRightTopIn(group.type, group, 12, 4)
     
     return group
 end
