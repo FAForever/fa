@@ -162,6 +162,7 @@ UnitBlueprint {
         'OVERLAYOMNI',
         'OVERLAYDIRECTFIRE',
         'OVERLAYINDIRECTFIRE',
+        'SHOWATTACKRETICLE'
     },
     CollisionOffsetZ = 0.2, # added
     Defense = {
