@@ -99,11 +99,14 @@ function StartCommandMode(newCommandMode, data)
     if commandMode then
         EndCommandMode(true)
     end
+
     commandMode = newCommandMode
     modeData = data
     for i,v in startBehaviors do
         v(commandMode, modeData)
     end
+
+    import('/lua/ui/controls/worldview.lua').OnStartCommandMode(newCommandMode, data)
 end
 
 function GetCommandMode()
@@ -119,7 +122,7 @@ function EndCommandMode(isCancel)
     if modeData.isCancel then
         ClearBuildTemplates()
     end
-    
+
     commandMode = false
     modeData = false
     issuedOneCommand = false
