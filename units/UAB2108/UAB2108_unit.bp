@@ -59,6 +59,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'OVERLAYINDIRECTFIRE',
         'SORTSTRATEGIC',
+        'SHOWATTACKRETICLE'
     },
     CollisionOffsetY = 0,
     Defense = {
