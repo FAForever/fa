@@ -40,7 +40,6 @@ local floor, huge, mod = math.floor, math.huge, math.mod
 local strrep, gsub, strsub, strbyte, strchar, strfind, strlen, strformat =
 string.rep, string.gsub, string.sub, string.byte, string.char,
 string.find, string.len, string.format
-local strmatch = string.match
 local concat = table.concat
 
 local json = { version = "dkjson 2.5" }
@@ -154,13 +153,13 @@ local function replace(str, o, n)
     end
 end
 
--- locale independent num2str and str2num functions
+-- Mostly locale independent num2str and str2num functions
 local decpoint, numfilter
 
 local function updatedecpoint ()
-    decpoint = strmatch(tostring(0.5), "([^05+])")
+    decpoint = "."
     -- build a filter that can be used to remove group separators
-    numfilter = "[^0-9%-%+eE" .. gsub(decpoint, "[%^%$%(%)%%%.%[%]%*%+%-%?]", "%%%0") .. "]+"
+    numfilter = "[^0-9%-%.%+eE]+"
 end
 
 updatedecpoint()
