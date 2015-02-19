@@ -1,7 +1,5 @@
 -- Module options:
 local always_try_using_lpeg = true
-local register_global_module_table = false
-local global_module_name = 'json'
 
 --[==[
 
@@ -53,10 +51,6 @@ local strmatch = string.match
 local concat = table.concat
 
 local json = { version = "dkjson 2.5" }
-
-if register_global_module_table then
-    _G[global_module_name] = json
-end
 
 local _ENV = nil -- blocking globals in Lua 5.2
 
