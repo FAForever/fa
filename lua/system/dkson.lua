@@ -1,46 +1,42 @@
---[==[
-
-David Kolf's JSON module for Lua 5.1/5.2
-
-Version 2.5
-
-
-For the documentation see the corresponding readme.txt or visit
-<http://dkolf.de/src/dkjson-lua.fsl/>.
-
-You can contact the author by sending an e-mail to 'david' at the
-domain 'dkolf.de'.
-
-
-Copyright (C) 2010-2013 David Heiko Kolf
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
-BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
---]==]
+--David Kolf's JSON module for Lua 5.1/5.2
+--
+--Version 2.5
+--
+--
+--For the documentation see the corresponding readme.txt or visit
+--<http://dkolf.de/src/dkjson-lua.fsl/>.
+--
+--You can contact the author by sending an e-mail to 'david' at the
+--domain 'dkolf.de'.
+--
+--
+--Copyright (C) 2010-2013 David Heiko Kolf
+--
+--Permission is hereby granted, free of charge, to any person obtaining
+--a copy of this software and associated documentation files (the
+--"Software"), to deal in the Software without restriction, including
+--without limitation the rights to use, copy, modify, merge, publish,
+--distribute, sublicense, and/or sell copies of the Software, and to
+--permit persons to whom the Software is furnished to do so, subject to
+--the following conditions:
+--
+--The above copyright notice and this permission notice shall be
+--included in all copies or substantial portions of the Software.
+--
+--THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+--EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+--MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+--NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+--BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+--ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+--CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--SOFTWARE.
 
 -- global dependencies:
 local pairs, type, tostring, tonumber, getmetatable, setmetatable, rawset =
 pairs, type, tostring, tonumber, getmetatable, setmetatable, rawset
-local error, require, pcall, select = error, require, pcall, select
-local floor, huge = math.floor, math.huge
+local error, require, pcall = error, require, pcall
+local floor, huge, mod = math.floor, math.huge, math.mod
 local strrep, gsub, strsub, strbyte, strchar, strfind, strlen, strformat =
 string.rep, string.gsub, string.sub, string.byte, string.char,
 string.find, string.len, string.format
@@ -114,7 +110,7 @@ local function escapeutf8 (uchar)
     elseif value <= 0x10ffff then
         -- encode as UTF-16 surrogate pair
         value = value - 0x10000
-        local highsur, lowsur = 0xD800 + floor (value/0x400), 0xDC00 + (value % 0x400)
+        local highsur, lowsur = 0xD800 + floor (value/0x400), 0xDC00 + (mod(value, 0x400))
         return strformat ("\\u%.4x\\u%.4x", highsur, lowsur)
     else
         return ""
@@ -192,7 +188,7 @@ end
 function json.addnewline (state)
     if state.indent then
         state.bufferlen = addnewline2 (state.level or 0,
-            state.buffer, state.bufferlen or #(state.buffer))
+            state.buffer, state.bufferlen or table.getn(state.buffer))
     end
 end
 
@@ -306,7 +302,7 @@ encode2 = function (value, indent, level, buffer, buflen, tables, globalorder, s
             local order = valmeta and valmeta.__jsonorder or globalorder
             if order then
                 local used = {}
-                n = #order
+                n = table.getn(order)
                 for i = 1, n do
                     local k = order[i]
                     local v = value[k]
@@ -416,16 +412,16 @@ local function unichar (value)
         return strchar (value)
     elseif value <= 0x07ff then
         return strchar (0xc0 + floor(value/0x40),
-            0x80 + (floor(value) % 0x40))
+            0x80 + (mod(floor(value), 0x40)))
     elseif value <= 0xffff then
         return strchar (0xe0 + floor(value/0x1000),
-            0x80 + (floor(value/0x40) % 0x40),
-            0x80 + (floor(value) % 0x40))
+            0x80 + (mod(floor(value/0x40), 0x40)),
+            0x80 + (mod(floor(value), 0x40)))
     elseif value <= 0x10ffff then
         return strchar (0xf0 + floor(value/0x40000),
-            0x80 + (floor(value/0x1000) % 0x40),
-            0x80 + (floor(value/0x40) % 0x40),
-            0x80 + (floor(value) % 0x40))
+            0x80 + (mod(floor(value/0x1000), 0x40)),
+            0x80 + (mod(floor(value/0x40), 0x40)),
+            0x80 + (mod(floor(value), 0x40)))
     else
         return nil
     end
@@ -575,20 +571,11 @@ scanvalue = function (str, pos, nullval, objectmeta, arraymeta)
     end
 end
 
-local function optionalmetatables(...)
-    if select("#", ...) > 0 then
-        return ...
-    else
-        return {__jsontype = 'object'}, {__jsontype = 'array'}
-    end
-end
-
-function json.decode (str, pos, nullval, ...)
-    local objectmeta, arraymeta = optionalmetatables(...)
+function json.decode (str, pos, nullval)
+    local objectmeta, arraymeta = {__jsontype = 'object'}, {__jsontype = 'array'}
     return scanvalue (str, pos, nullval, objectmeta, arraymeta)
 end
 
 json.using_lpeg = false
 
 return json
-
