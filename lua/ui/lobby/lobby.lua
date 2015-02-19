@@ -39,6 +39,7 @@ local Rating = import('/lua/ui/lobby/trueskill.lua').Rating
 local Teams = import('/lua/ui/lobby/trueskill.lua').Teams
 local EscapeHandler = import('/lua/ui/dialogs/eschandler.lua')
 local CountryTooltips = import('/lua/ui/help/tooltips-country.lua').tooltip
+local JSON = import('/lua/system/dkson.lua').json
 
 local IsSyncReplayServer = false
 
@@ -509,64 +510,124 @@ function Reset()
     gameInfo = GameInfo.CreateGameInfo(LobbyComm.maxPlayerSlots)
 end
 
--- Create a new unconnected lobby.
-function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider, over, exitBehavior,
-                     playerHasSupcom)
-    if IsSyncReplayServer then
-        SetFrontEndData('syncreplayid',localPlayerUID)
-        dl = UIUtil.QuickDialog(GetFrame(0), "Downloading the replay file...")
-        LaunchReplaySession('gpgnet://' .. GetCommandLineArg('/gpgnet',1)[1] .. '/' .. import('/lua/user/prefs.lua').GetFromCurrentProfile('Name'))
-        dl:Destroy()
-        UIUtil.QuickDialog(GetFrame(0), "You dont have this map.", "Exit", function() ExitApplication() end)
-    else
-        Reset()
+--- Create a new, unconnected lobby.
+function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider, over, exitBehavior, playerHasSupcom)
+    Reset()
 
-        if GUI then
-            WARN('CreateLobby called but I already have one setup...?')
-            GUI:Destroy()
-        end
-
-        GUI = UIUtil.CreateScreenGroup(over, "CreateLobby ScreenGroup")
-
-        GUI.exitBehavior = exitBehavior
-
-        GUI.optionControls = {}
-        GUI.slots = {}
-
-        -- Set up the base escape handler first: want this one at the bottom of the stack.
-        GUI.exitLobbyEscapeHandler = function()
-            WARN("Lobby escape handler called")
-            GUI.chatEdit:AbandonFocus()
-            UIUtil.QuickDialog(GUI,
-                "<LOC lobby_0000>Exit game lobby?",
-                "<LOC _Yes>", function()
-                    ReturnToMenu(false)
-                end,
-                "<LOC _Cancel>", function()
-                    GUI.chatEdit:AcquireFocus()
-                end,
-                nil, nil,
-                true,
-                {worldCover = true, enterButton = 1, escapeButton = 2}
-            )
-        end
-        EscapeHandler.PushEscapeHandler(GUI.exitLobbyEscapeHandler)
-
-        GUI.connectdialog = UIUtil.ShowInfoDialog(GUI, Strings.TryingToConnect, Strings.AbortConnect, ReturnToMenu)
-        -- Prevent the dialog from being closed due to user action.
-        GUI.connectdialog.OnEscapePressed = function() end
-        GUI.connectdialog.OnShadowClicked = function() end
-
-        InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
-
-        -- Store off the validated playername
-        localPlayerName = lobbyComm:GetLocalPlayerName()
-        local Prefs = import('/lua/user/prefs.lua')
-        local windowed = Prefs.GetFromCurrentProfile('WindowedLobby') or 'false'
-        SetWindowedLobby(windowed == 'true')
+    if GUI then
+        WARN('CreateLobby called twice for UI construction (Should be unreachable)')
+        GUI:Destroy()
+        return
     end
+
+    GUI = UIUtil.CreateScreenGroup(over, "CreateLobby ScreenGroup")
+
+    GUI.exitBehavior = exitBehavior
+
+    GUI.optionControls = {}
+    GUI.slots = {}
+
+    -- Set up the base escape handler first: want this one at the bottom of the stack.
+    GUI.exitLobbyEscapeHandler = function()
+        WARN("Lobby escape handler called")
+        GUI.chatEdit:AbandonFocus()
+        UIUtil.QuickDialog(GUI,
+            "<LOC lobby_0000>Exit game lobby?",
+            "<LOC _Yes>", function()
+                ReturnToMenu(false)
+            end,
+            "<LOC _Cancel>", function()
+                GUI.chatEdit:AcquireFocus()
+            end,
+            nil, nil,
+            true,
+            {worldCover = true, enterButton = 1, escapeButton = 2}
+        )
+    end
+    EscapeHandler.PushEscapeHandler(GUI.exitLobbyEscapeHandler)
+
+    GUI.connectdialog = UIUtil.ShowInfoDialog(GUI, Strings.TryingToConnect, Strings.AbortConnect, ReturnToMenu)
+    -- Prevent the dialog from being closed due to user action.
+    GUI.connectdialog.OnEscapePressed = function() end
+    GUI.connectdialog.OnShadowClicked = function() end
+
+    InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
+
+    -- Store off the validated playername
+    localPlayerName = lobbyComm:GetLocalPlayerName()
+    local Prefs = import('/lua/user/prefs.lua')
+    local windowed = Prefs.GetFromCurrentProfile('WindowedLobby') or 'false'
+    SetWindowedLobby(windowed == 'true')
 end
 
+-- A map from message types to functions that process particular message types.
+local MESSAGE_HANDLERS = {
+    -- TODO: Finalise signature and semantics.
+    ConnectivityState = function()
+    end
+}
+
+--- Handle an incoming message from the FAF client via the GPGNet protocol.
+--
+-- @param jsonBlob A JSON string containing the message to process.
+-- Messages are JSON strings containing two fields:
+-- command_id: A string identifying the type of message. This string is used as a key into
+--             MESSAGE_HANDLERS to find the function to use to process this message.
+-- arguments: An array of arguments that should be passed to the handler function.
+function HandleGPGNetMessage(jsonBlob)
+    local jsonObj = JSON.decode(jsonBlob)
+    table.print(jsonObj)
+    local handler = MESSAGE_HANDLERS[jsonObj.command_id]
+    if not handler then
+        WARN("Incomprehensible JSON message: \n" .. jsonBlob)
+        return
+    end
+
+    handler(unpack(jsonObj.arguments))
+end
+
+--- Start a synchronous replay session
+--
+-- @param replayID The ID of the replay to download and play.
+function StartSyncReplaySession(replayID)
+    SetFrontEndData('syncreplayid', replayID)
+    local dl = UIUtil.QuickDialog(GetFrame(0), "Downloading the replay file...")
+    LaunchReplaySession('gpgnet://' .. GetCommandLineArg('/gpgnet',1)[1] .. '/' .. import('/lua/user/prefs.lua').GetFromCurrentProfile('Name'))
+    dl:Destroy()
+    UIUtil.QuickDialog(GetFrame(0), "You dont have this map.", "Exit", function() ExitApplication() end)
+end
+
+--- Create a new unconnected lobby/Entry point for processing messages sent from the FAF lobby.
+--
+-- This function is called exactly once by the game when a new lobby should be created.
+-- @see ReallyCreateLobby
+--
+-- This function is called whenever the FAF lobby sends a message into the game, with the message
+-- in the desiredPlayerName parameter as a JSON string with a length no greater than 4061 bytes.
+-- This madness is justified by this being one of the smallish number of functions we can have
+-- called from outside.
+-- @see HandleGPGNetMessage
+--
+-- This function is also called by the sync replay server when a session should be started. (this
+-- should probably be refactored to use the JSON messenger protocol)
+-- @see StartSyncReplaySession
+function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider, over, exitBehavior, playerHasSupcom)
+    -- Is this an incoming GPGNet message?
+    if protocol == "gpgnet" then
+        HandleGPGNetMessage(desiredPlayerName)
+        return
+    end
+
+    -- Special-casing for sync-replay.
+    -- TODO: Consider replacing this with a gpgnet message type.
+    if IsSyncReplayServer then
+        StartSyncReplaySession(localPlayerUID)
+        return
+    end
+
+    -- Okay, so we actually are creating a lobby, instead of doing some ridiculous hack.
+    ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider, over, exitBehavior, playerHasSupcom)
+end
 
 -- create the lobby as a host
 function HostGame(desiredGameName, scenarioFileName, inSinglePlayer)
@@ -604,8 +665,8 @@ function DisconnectFromPeer(uid)
     lobbyComm:DisconnectFromPeer(uid)
 end
 
--- These two are now exclusively used as an amusing hack to control synchronous replay watching.
 function SetHasSupcom(cmd)
+    -- TODO: Refactor SyncReplayServer gubbins to use generalised JSON protocol.
     if IsSyncReplayServer then
         if cmd == 0 then
             SessionResume()
