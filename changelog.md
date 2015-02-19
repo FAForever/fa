@@ -1,11 +1,29 @@
 Changelog for patch 3641
 ------------------------
 
+*Exploits*
+- Instant crash exploit partially fixed
+
 *Bug fixes*
 - Seraphim sniperbot is able to hit Cybran MML again
+- T3 Torpedo Bomber can use Attack-Move properly again
 
 *Enhancements*
 - Scathis now has Amphibious build icon
+- Attack and Nuke reticles now scale with impact radius
+- Engineering Station units now pause on transfer from one player to another
+- Cybran Engineers now display a build beam to clearly show what they're tasked to
+- Reclaim/second now shown
+
+*Lobby*
+- Huge texture, layout, aesthetics and speed improvements all over the lobby
+- Map previews now display unit wreck reclaim as well as Mass points and Hydrocarbons
+- Unit manager can be seen again by non-host players
+- Preset system now saves active mods
+- Observers can now open the chat menu by pushing ENTER
+- CPU Benchmark results now cached, so running it once with nothing in the background is a good idea.
+  Dramatically reduces lobby lag
+- Maps are now sorted alphabetically ignoring case
 
 Changelog for patch 3640
 ------------------------
