@@ -2713,10 +2713,10 @@ function CreateUI(maxPlayers)
     GUI.panel = Bitmap(GUI, UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/lobby.dds"))
     LayoutHelpers.AtCenterIn(GUI.panel, GUI)
     GUI.panelWideLeft = Bitmap(GUI, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/wide.dds'))
-    LayoutHelpers.CenteredLeftOf(GUI.panelWideLeft, GUI.panel, -11)
+    LayoutHelpers.CenteredLeftOf(GUI.panelWideLeft, GUI.panel)
     GUI.panelWideLeft.Left:Set(function() return GUI.Left() end)
     GUI.panelWideRight = Bitmap(GUI, UIUtil.SkinnableFile('/scx_menu/lan-game-lobby/wide.dds'))
-    LayoutHelpers.CenteredRightOf(GUI.panelWideRight, GUI.panel, -11)
+    LayoutHelpers.CenteredRightOf(GUI.panelWideRight, GUI.panel)
     GUI.panelWideRight.Right:Set(function() return GUI.Right() end)
 
     -- Create a label with a given size and initial text
