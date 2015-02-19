@@ -42,7 +42,7 @@ string.rep, string.gsub, string.sub, string.byte, string.char,
 string.find, string.len, string.format
 local concat = table.concat
 
-local json = { version = "dkjson 2.5" }
+json = { version = "dkjson 2.5" }
 
 local _ENV = nil -- blocking globals in Lua 5.2
 
@@ -577,4 +577,3 @@ end
 
 json.using_lpeg = false
 
-return json
