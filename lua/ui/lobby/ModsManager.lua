@@ -87,8 +87,8 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
 
     -- Checkbox UI mod filter
     local filterButtons = {
-        { label = LOC("UI Mods") },
-        { label = LOC("Game Mods") }
+        { label = LOC("Game Mods") },
+        { label = LOC("UI Mods") }
     }
 
     local filterradio = RadioButton(dialogContent, '/RADIOBOX/', filterButtons, 1, true)
@@ -105,7 +105,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
     filterradio.OnChoose = function(self, index)
         save_mod()
         swiffer()
-        uiOnly = index == 1
+        uiOnly = index == 2
         Refresh_Mod_List(not uiOnly, uiOnly, hideUnselChkBox:IsChecked(), IsHost, modstatus)
     end
     
@@ -503,7 +503,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
         scrollGroup.top = 1
         scrollGroup:CalcVisible()
     end
-    Refresh_Mod_List(false, true, true, IsHost, modstatus)
+    Refresh_Mod_List(true, false, true, IsHost, modstatus)
 
     scrollGroup.HandleEvent = function(self, event)
         if event.Type == 'WheelRotation' then
