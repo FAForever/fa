@@ -91,7 +91,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
         { label = LOC("Game Mods") }
     }
 
-    local filterradio = RadioButton(dialogContent, '/RADIOBOX/', filterButtons, 1, true)
+    local filterradio = RadioButton(dialogContent, '/RADIOBOX/', filterButtons, 2, true)
     LayoutHelpers.AtLeftIn(filterradio, dialogContent, 160)
     LayoutHelpers.AtBottomIn(filterradio, dialogContent, -20)
 
@@ -503,7 +503,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
         scrollGroup.top = 1
         scrollGroup:CalcVisible()
     end
-    Refresh_Mod_List(false, true, true, IsHost, modstatus)
+    Refresh_Mod_List(true, false, true, IsHost, modstatus)
 
     scrollGroup.HandleEvent = function(self, event)
         if event.Type == 'WheelRotation' then
