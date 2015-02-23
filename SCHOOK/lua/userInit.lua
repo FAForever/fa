@@ -7,3 +7,8 @@ function PrintText(textData)
         import('/lua/ui/game/textdisplay.lua').PrintToScreen(data)
     end
 end
+
+local replayID = import('/lua/ui/uiutil.lua').GetReplayId()
+if replayID then
+    LOG("REPLAY ID: " .. replayID)
+end

@@ -869,14 +869,14 @@ function CreateWorldCover(parent, colorOverride)
             worldCovers[index].ID = index
             worldCovers[index].OnDestroy = function(self)
                 for h, x in worldCovers do
-                    if x and h ~= self.ID then 
+                    if x and h ~= self.ID then
                         x:Destroy()
                     end
                 end
             end
             worldCovers[index].OnHide = function(self, hidden)
                 for h, x in worldCovers do
-                    if x and h ~= self.ID then 
+                    if x and h ~= self.ID then
                         x:SetHidden(hidden)
                     end
                 end
@@ -976,4 +976,20 @@ function setVisible(control, visible)
     else
         control:Hide()
     end
+end
+
+function GetReplayId()
+    local id = nil
+
+    if HasCommandLineArg("/syncreplay") and HasCommandLineArg("/gpgnet") and GetFrontEndData('syncreplayid') ~= nil and GetFrontEndData('syncreplayid') ~= 0 then
+        id = GetFrontEndData('syncreplayid')
+    elseif HasCommandLineArg("/savereplay") then
+        local url = GetCommandLineArg("/savereplay", 1)[1]
+        local lastpos = string.find(url, "/", 20)
+        id = string.sub(url, 20, lastpos-1)
+    elseif HasCommandLineArg("/replayid") then
+        id =  GetCommandLineArg("/replayid", 1)[1]
+    end
+
+    return id
 end
