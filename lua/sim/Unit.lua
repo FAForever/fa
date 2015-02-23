@@ -67,7 +67,7 @@ Unit = Class(moho.unit_methods) {
     ShowUnitDestructionDebris = true,
     DestructionExplosionWaitDelayMin = 0,
     DestructionExplosionWaitDelayMax = 0.5,
-    DeathThreadDestructionWaitTime = 0,
+    DeathThreadDestructionWaitTime = 0.1,
     DestructionPartsHighToss = {},
     DestructionPartsLowToss = {},
     DestructionPartsChassisToss = {},
@@ -263,7 +263,7 @@ Unit = Class(moho.unit_methods) {
         --Ensure transport slots are available
         self.attachmentBone = nil
         self.slotsFree = {}
-        
+
         -- Set up Adjacency container
         self.AdjacentUnits = {}
     end,
@@ -1044,15 +1044,15 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
-        
+
         -- Revoke transport protection for shielded transports when impacted by nuclear weaponry
         if EntityCategoryContains(categories.NUKE, instigator) and self.transportProtected == true then
             self.MyShield:RevokeTransportProtection()
         end
-    
+
         if self.CanTakeDamage then
             self:DoOnDamagedCallbacks(instigator)
-            
+
             --Pass damage to an active personal shield, as personal shields no longer have collisions
             if self:GetShieldType() == 'Personal' and self:ShieldIsOn() then
                 self.MyShield:ApplyDamage(instigator, amount, vector, damageType)
@@ -1458,7 +1458,7 @@ Unit = Class(moho.unit_methods) {
 
         -- Attempt to copy our animation pose to the prop. Only works if
         -- the mesh and skeletons are the same, but will not produce an error if not.
-        
+
         if layer ~= 'Air' then
             TryCopyPose(self, prop, true)
         end
@@ -1642,7 +1642,9 @@ Unit = Class(moho.unit_methods) {
         end
 
         self:CreateWreckage( overkillRatio )
-        WaitSeconds(self.DeathThreadDestructionWaitTime)
+
+        -- wait at least 1 tick before destroying unit
+        WaitSeconds(math.max(0.1, self.DeathThreadDestructionWaitTime))
 
         if not isSinking then
             self:PlayUnitSound('Destroyed')
@@ -3683,7 +3685,7 @@ Unit = Class(moho.unit_methods) {
         if self.VeteranLevel >= maxLevel then
             return
         end
-        
+
         local next = self.VeteranLevel + 1
         while self.xp >= levels[('Level' .. next)] and self.VeteranLevel < maxLevel do
              self:SetVeteranLevel(next)
@@ -4493,12 +4495,12 @@ Unit = Class(moho.unit_methods) {
         self:DoUnitCallbacks('OnCmdrUpgradeStart')
     end,
 
-    
-    OnShieldEnabled = function(self)		
+
+    OnShieldEnabled = function(self)
         WARN("Deprecated function unit:OnShieldEnabled() called")
-    end,		
-		
-    OnShieldDisabled = function(self)		
+    end,
+
+    OnShieldDisabled = function(self)
         WARN("Deprecated function unit:OnShieldDisabled() called")
     end,
 }
