@@ -1789,7 +1789,7 @@ local function UpdateGame()
 
     -- Update the map background to reflect the possibly-changed map.
     if Prefs.GetFromCurrentProfile('LobbyBackground') == 4 then
-        ChangeBackgroundLobby()
+        RefreshLobbyBackground()
     end
 
     -- Set the map name at the top right corner in lobby
@@ -2684,24 +2684,6 @@ function CreateUI(maxPlayers)
     local lastFaction = Prefs.GetFromCurrentProfile('LastFaction') or 1
     UIUtil.SetCurrentSkin(FACTION_NAMES[lastFaction])
 
-    -- Setup custom backgrounds.
-    local LobbyBackgroundStretch = Prefs.GetFromCurrentProfile('LobbyBackgroundStretch') or 'true'
-    GUI.background = Bitmap(GUI, UIUtil.SkinnableFile('/BACKGROUND/background-paint_black_bmp.dds')) -- Background faction or art
-    LayoutHelpers.AtCenterIn(GUI.background, GUI)
-    if LobbyBackgroundStretch == 'true' then
-        LayoutHelpers.FillParent(GUI.background, GUI)
-    else
-        LayoutHelpers.FillParentPreserveAspectRatio(GUI.background, GUI)
-    end
-    GUI.background2 = MapPreview(GUI) -- Background map
-    LayoutHelpers.AtCenterIn(GUI.background2, GUI)
-    GUI.background2.Width:Set(400)
-    GUI.background2.Height:Set(400)
-    if LobbyBackgroundStretch == 'true' then
-        LayoutHelpers.FillParent(GUI.background2, GUI)
-    else
-        LayoutHelpers.FillParentPreserveAspectRatio(GUI.background2, GUI)
-    end
     ---------------------------------------------------------------------------
     -- Set up main control panels
     ---------------------------------------------------------------------------
@@ -3400,7 +3382,7 @@ function CreateUI(maxPlayers)
     local lastFaction = Prefs.GetFromCurrentProfile('LastFaction') or 1
     CreateUI_Faction_Selector(lastFaction)
 
-    ChangeBackgroundLobby(lastFaction)
+    RefreshLobbyBackground(lastFaction)
 
     ---------------------------------------------------------------------------
     -- other logic, including lobby callbacks
@@ -4706,62 +4688,49 @@ function CreateUI_Faction_Selector(lastFaction)
         SetPlayerOption(localSlot, 'Faction', targetFaction)
         gameInfo.PlayerOptions[localSlot].Faction = targetFaction
 
-        ChangeBackgroundLobby(targetFaction)
+        RefreshLobbyBackground(targetFaction)
         UIUtil.SetCurrentSkin(FACTION_NAMES[targetFaction])
     end
 end
 
-function ChangeBackgroundLobby(faction)
+function RefreshLobbyBackground(faction)
     local LobbyBackground = Prefs.GetFromCurrentProfile('LobbyBackground') or 1
-    if GUI.background and GUI.background2 then
-        if LobbyBackground == 1 then -- Factions
-			LOGX('>> Background FACTION', 'Background')
-            GUI.background:Show()
-            GUI.background2:Hide()
-            faction = faction or Prefs.GetFromCurrentProfile('LastFaction') or 0
-            -- Unknown faction
-            if faction < 1 then
-                GUI.background:SetTexture("/textures/ui/common/BACKGROUND/background-paint_black_bmp.dds")
-            else
-                GUI.background:SetTexture("/textures/ui/common/BACKGROUND/faction/faction-background-paint_" .. FACTION_NAMES[faction] .. "_bmp.dds")
-            end
-
-        elseif LobbyBackground == 2 then -- Concept art
-			LOGX('>> Background ART', 'Background')
-            GUI.background:Show()
-            GUI.background2:Hide()
-            GUI.background:SetTexture("/textures/ui/common/BACKGROUND/art/art-background-paint0"..math.random(1, 5).."_bmp.dds")
-
-        elseif LobbyBackground == 3 then -- Screenshot
-			LOGX('>> Background SCREENSHOT', 'Background')
-            GUI.background:Show()
-            GUI.background2:Hide()
-            GUI.background:SetTexture("/textures/ui/common/BACKGROUND/scrn/scrn-background-paint"..math.random(1, 14).."_bmp.dds")
-
-        elseif LobbyBackground == 4 then -- Map
-            LOGX('>> Background MAP', 'Background')
-            GUI.background:Hide()
-            GUI.background2:Show()
-            local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
-            if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= '') then
-                scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-                if scenarioInfo and scenarioInfo.map and (scenarioInfo.map ~= '') and scenarioInfo.preview then
-                    if not GUI.background2:SetTexture(scenarioInfo.preview) then
-                        GUI.background2:SetTextureFromMap(scenarioInfo.map)
-                    end
-                else
-                    GUI.background2:ClearTexture()
-                end
-            else
-                GUI.background2:ClearTexture()
-            end
-
-        elseif LobbyBackground == 5 then -- None
-            LOGX('>> Background NOTHING', 'Background')
-            GUI.background:Hide()
-            GUI.background2:Hide()
-            GUI.background:SetTexture(UIUtil.UIFile("/BACKGROUND/background-paint_black_bmp.dds"))
+    if GUI.background then
+        GUI.background:Destroy()
+    end
+    if LobbyBackground == 1 then -- Factions
+        faction = faction or Prefs.GetFromCurrentProfile('LastFaction') or 0
+        if FACTION_NAMES[faction] then
+            GUI.background = Bitmap(GUI, "/textures/ui/common/BACKGROUND/faction/faction-background-paint_" .. FACTION_NAMES[faction] .. "_bmp.dds")
+        else
+            return
         end
+    elseif LobbyBackground == 2 then -- Concept art
+        GUI.background = Bitmap(GUI, "/textures/ui/common/BACKGROUND/art/art-background-paint0" .. math.random(1, 5) .. "_bmp.dds")
+    elseif LobbyBackground == 3 then -- Screenshot
+        GUI.background = Bitmap(GUI, "/textures/ui/common/BACKGROUND/scrn/scrn-background-paint" .. math.random(1, 14) .. "_bmp.dds")
+    elseif LobbyBackground == 4 then -- Map
+        local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
+        GUI.background = MapPreview(GUI) -- Background map
+        if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= '') then
+            local scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+            if scenarioInfo and scenarioInfo.map and (scenarioInfo.map ~= '') and scenarioInfo.preview then
+                if not GUI.background:SetTexture(scenarioInfo.preview) then
+                    GUI.background:SetTextureFromMap(scenarioInfo.map)
+                end
+            end
+        end
+    elseif LobbyBackground == 5 then -- None
+        return
+    end
+
+    local LobbyBackgroundStretch = Prefs.GetFromCurrentProfile('LobbyBackgroundStretch') or 'true'
+    LayoutHelpers.AtCenterIn(GUI.background, GUI)
+    LayoutHelpers.DepthUnderParent(GUI.background, GUI.panel)
+    if LobbyBackgroundStretch == 'true' then
+        LayoutHelpers.FillParent(GUI.background, GUI)
+    else
+        LayoutHelpers.FillParentPreserveAspectRatio(GUI.background, GUI)
     end
 end
 
@@ -4801,7 +4770,7 @@ function ShowLobbyOptionsDialog()
 
     backgroundRadiobutton.OnChoose = function(self, index, key)
         Prefs.SetToCurrentProfile("LobbyBackground", index)
-        ChangeBackgroundLobby()
+        RefreshLobbyBackground()
     end
 	--
 	local currentFontSize = Prefs.GetFromCurrentProfile('LobbyChatFontSize') or 14
@@ -4839,13 +4808,10 @@ function ShowLobbyOptionsDialog()
     cbox_StretchBG.OnCheck = function(self, checked)
         if checked then
             Prefs.SetToCurrentProfile('LobbyBackgroundStretch', 'true')
-            LayoutHelpers.FillParent(GUI.background, GUI)
-            LayoutHelpers.FillParent(GUI.background2, GUI)
         else
             Prefs.SetToCurrentProfile('LobbyBackgroundStretch', 'false')
-            LayoutHelpers.FillParentPreserveAspectRatio(GUI.background, GUI)
-            LayoutHelpers.FillParentPreserveAspectRatio(GUI.background2, GUI)
         end
+        RefreshLobbyBackground()
     end
     -- Quit button
     local QuitButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Close")
