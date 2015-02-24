@@ -112,8 +112,6 @@ local selectedMods = nil
 local commandQueueIndex = 0
 local commandQueue = {}
 
-local lastUploadedMap = nil
-
 local CPU_Benchmarks = {} -- Stores CPU benchmark data
 
 local function parseCommandlineArguments()
