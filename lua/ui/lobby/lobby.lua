@@ -2965,7 +2965,7 @@ function CreateUI(maxPlayers)
             table.insert(commandQueue, 1, text)
             commandQueueIndex = 0
             if string.sub(text, 1, 1) == '/' then
-                local spaceStart = string.find(text, " ") or string.len(text)
+                local spaceStart = string.find(text, " ") or string.len(text) + 1
                 local comKey = string.sub(text, 2, spaceStart - 1)
                 local params = string.sub(text, spaceStart + 1)
                 local commandFunc = commands[string.lower(comKey)]
