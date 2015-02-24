@@ -109,9 +109,6 @@ availableColours = {}
 local availableMods = {} -- map from peer ID to set of available mods; each set is a map from "mod id"->true
 local selectedMods = nil
 
-local commandQueueIndex = 0
-local commandQueue = {}
-
 local CPU_Benchmarks = {} -- Stores CPU benchmark data
 
 local function parseCommandlineArguments()
@@ -2993,13 +2990,15 @@ function CreateUI(maxPlayers)
         GUI.chatEdit:AcquireFocus()
     end
 
+    local commandQueueIndex = 0
+    local commandQueue = {}
     GUI.chatEdit.OnEnterPressed = function(self, text)
         if text ~= "" then
             GpgNetSend('Chat', text)
             table.insert(commandQueue, 1, text)
             commandQueueIndex = 0
             if GUI.chatDisplay then
-                    --this next section just removes /commmands from broadcasting.
+                --this next section just removes /commmands from broadcasting.
                 if string.sub(text, 1, 1) == '/' then
                     local spaceStart = string.find(text, " ") or string.len(text)
                     local comKey = string.sub(text, 2, spaceStart - 1)
@@ -3022,6 +3021,7 @@ function CreateUI(maxPlayers)
         end
     end
 
+    --- Handle up/down arrow presses for the chat box.
     GUI.chatEdit.OnNonTextKeyPressed = function(self, keyCode)
         if commandQueue and table.getsize(commandQueue) > 0 then
             if keyCode == 38 then
@@ -3043,7 +3043,6 @@ function CreateUI(maxPlayers)
             end
         end
     end
-
 
     ---------------------------------------------------------------------------
     -- Option display
