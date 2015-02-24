@@ -181,26 +181,11 @@ local function LOGXWhisper(params)
 end
 
 local commands = {
-    {
-        key = 'pm',
-        action = ParseWhisper,
-    },
-    {
-        key = 'private',
-        action = ParseWhisper,
-    },
-    {
-        key = 'w',
-        action = ParseWhisper,
-    },
-    {
-        key = 'whisper',
-        action = ParseWhisper,
-    },
-	{
-        key = 'debug',
-        action = LOGXWhisper,
-    },
+    pm = ParseWhisper,
+    private = ParseWhisper,
+    w = ParseWhisper,
+    whisper = ParseWhisper,
+    debug = LOGXWhisper
 }
 
 local Strings = LobbyComm.Strings
@@ -2997,26 +2982,17 @@ function CreateUI(maxPlayers)
             GpgNetSend('Chat', text)
             table.insert(commandQueue, 1, text)
             commandQueueIndex = 0
-            if GUI.chatDisplay then
-                --this next section just removes /commmands from broadcasting.
-                if string.sub(text, 1, 1) == '/' then
-                    local spaceStart = string.find(text, " ") or string.len(text)
-                    local comKey = string.sub(text, 2, spaceStart - 1)
-                    local params = string.sub(text, spaceStart + 1)
-                    local found = false
-                    for i, command in commands do
-                        if command.key == string.lower(comKey) then
-                            command.action(params)
-                            found = true
-                            break
-                        end
-                    end
-                    if not found then
-                        AddChatText(LOCF("<LOC lobui_0396>Command Not Known: %s", comKey))
-                    end
-                else
-                    PublicChat(text)
+            if string.sub(text, 1, 1) == '/' then
+                local spaceStart = string.find(text, " ") or string.len(text)
+                local comKey = string.sub(text, 2, spaceStart - 1)
+                local params = string.sub(text, spaceStart + 1)
+                local commandFunc = commands[string.lower(comKey)]
+                if not commandFunc then
+                    AddChatText(LOCF("<LOC lobui_0396>Command Not Known: %s", comKey))
+                    return
                 end
+            else
+                PublicChat(text)
             end
         end
     end
