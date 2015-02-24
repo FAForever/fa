@@ -2991,6 +2991,8 @@ function CreateUI(maxPlayers)
                     AddChatText(LOCF("<LOC lobui_0396>Command Not Known: %s", comKey))
                     return
                 end
+
+                commandFunc(params)
             else
                 PublicChat(text)
             end
@@ -5097,23 +5099,6 @@ end
 function CreateInputDialog(parent, title, listener)
     local dialog = InputDialog(parent, title, listener)
     dialog.OnInput = listener
-end
-
-function GetModNameWithUid(uid)
-    local allMods = Mods.AllMods()
-    return allMods[uid].name
-end
-function GetModUidExist(uid)
-    local allMods = Mods.AllMods()
-    if allMods[uid].name ~= nil then
-        return true
-    else
-        return false
-    end
-end
-function GetModUIorNotUIWithUid(uid)
-    local allMods = Mods.AllMods()
-    return allMods[uid].ui_only
 end
 
 -- Refresh list of presets
