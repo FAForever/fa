@@ -5323,5 +5323,7 @@ function GUI_Changelog()
     local OkButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
 	LayoutHelpers.AtLeftIn(OkButton, dialogContent, 0)
     LayoutHelpers.AtBottomIn(OkButton, dialogContent, 10)
-    OkButton.OnClick = changelogPopup.Close
+    OkButton.OnClick = function()
+        changelogPopup:Close()
+    end
 end
