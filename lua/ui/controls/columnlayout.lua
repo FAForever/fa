@@ -21,6 +21,6 @@ ColumnLayout = Class(Group) {
         self.numChildren = self.numChildren + 1
         control.Width:Set(self.widths[self.numChildren])
         LayoutHelpers.AtLeftIn(control, self, self.positions[self.numChildren])
-        LayoutHelpers.AtVerticalCenterIn(control, self, -1)
+        LayoutHelpers.AtVerticalCenterIn(control, self, 1)
     end
 }
