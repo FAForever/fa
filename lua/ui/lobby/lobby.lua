@@ -712,7 +712,7 @@ function SetSlotInfo(slotNum, playerInfo)
     -- These states are used to select the appropriate strings with GetSlotMenuTables.
     local slotState
     if not playerInfo.Human then
-        slot.ratingGroup:Hide()
+        slot.ratingText:Hide()
         slotState = 'ai'
     elseif not isLocallyOwned then
         slotState = 'player'
@@ -744,7 +744,7 @@ function SetSlotInfo(slotNum, playerInfo)
         slot.name:Disable()
     end
 
-    slot.ratingGroup:Show()
+    slot.ratingText:Show()
     --if playerInfo.MEAN == '-9999' then -- The player is a Smurf (Banned)
     --GUI.slots[slot].ratingText:SetText('Banned')
     --GUI.slots[slot].ratingText:SetColor('Crimson') --= --dc143c
@@ -753,7 +753,7 @@ function SetSlotInfo(slotNum, playerInfo)
     --end
     slot.ratingText:SetColor(playerInfo.RC)
 
-    slot.numGamesGroup:Show()
+    slot.numGamesText:Show()
     slot.numGamesText:SetText(playerInfo.NG)
 
     slot.name:Show()
@@ -898,12 +898,12 @@ function ClearSlotInfo(slot)
 
     -- hide these to clear slot of visible data
     GUI.slots[slot].KinderCountry:Hide()
-    GUI.slots[slot].ratingGroup:Hide()
-    GUI.slots[slot].numGamesGroup:Hide()
+    GUI.slots[slot].ratingText:Hide()
+    GUI.slots[slot].numGamesText:Hide()
     GUI.slots[slot].faction:Hide()
     GUI.slots[slot].color:Hide()
     GUI.slots[slot].team:Hide()
-    GUI.slots[slot].multiSpace:Hide()
+    GUI.slots[slot].ready:Hide()
     GUI.slots[slot].pingGroup:Hide()
 
     ShowGameQuality()
@@ -2393,59 +2393,66 @@ function CreateSlotsUI(makeLabel)
     local Combo = import('/lua/ui/controls/combo.lua').Combo
     local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo
     local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
+    local ColumnLayout = import('/lua/ui/controls/columnlayout.lua').ColumnLayout
 
-    GUI.labelGroup = Group(GUI.playerPanel)
-    GUI.labelGroup.Width:Set(791)
-    GUI.labelGroup.Height:Set(10)
-    LayoutHelpers.AtLeftTopIn(GUI.labelGroup, GUI.playerPanel, 0, -4)
+    -- The dimensions of the columns used for slot UI controls.
+    local COLUMN_POSITIONS = {0, 47, 91, 120, 472, 542, 612, 682, 754}
+    local COLUMN_WIDTHS = {20, 45, 45, 264, 59, 59, 59, 62, 51}
 
-    GUI.ratingLabel = makeLabel("R", 14)
-    LayoutHelpers.AtLeftIn(GUI.ratingLabel, GUI.panel, 47)
-    LayoutHelpers.AtVerticalCenterIn(GUI.ratingLabel, GUI.labelGroup)
-    Tooltip.AddControlTooltip(GUI.ratingLabel, 'rating')
+    local labelGroup = ColumnLayout(GUI.playerPanel, COLUMN_POSITIONS, COLUMN_WIDTHS)
 
-    GUI.numGamesLabel = makeLabel("G", 14)
-    LayoutHelpers.AtLeftIn(GUI.numGamesLabel, GUI.panel, 91)
-    LayoutHelpers.AtVerticalCenterIn(GUI.numGamesLabel, GUI.labelGroup)
-    Tooltip.AddControlTooltip(GUI.numGamesLabel, 'num_games')
+    -- No label required for the first column (flag), so skip it. (evil hack)
+    labelGroup.numChildren = 1
 
-    GUI.nameLabel = makeLabel("Nickname", 14)
-    LayoutHelpers.AtLeftIn(GUI.nameLabel, GUI.panel, 120)
-    LayoutHelpers.AtVerticalCenterIn(GUI.nameLabel, GUI.labelGroup)
-    Tooltip.AddControlTooltip(GUI.nameLabel, 'lob_slot')
+    GUI.labelGroup = labelGroup
+    labelGroup.Width:Set(791)
+    labelGroup.Height:Set(21)
+    LayoutHelpers.AtLeftTopIn(labelGroup, GUI.playerPanel, 5, 5)
 
-    GUI.colorLabel = makeLabel("Color", 14)
-    LayoutHelpers.AtLeftIn(GUI.colorLabel, GUI.panel, 472)
-    LayoutHelpers.AtVerticalCenterIn(GUI.colorLabel, GUI.labelGroup)
-    Tooltip.AddControlTooltip(GUI.colorLabel, 'lob_color')
+    local ratingLabel = makeLabel("R", 14)
+    labelGroup:AddChild(ratingLabel)
+    Tooltip.AddControlTooltip(ratingLabel, 'rating')
 
-    GUI.factionLabel = makeLabel("Faction", 14)
-    LayoutHelpers.AtLeftIn(GUI.factionLabel, GUI.panel, 542)
-    LayoutHelpers.AtVerticalCenterIn(GUI.factionLabel, GUI.labelGroup)
-    Tooltip.AddControlTooltip(GUI.factionLabel, 'lob_faction')
+    local numGamesLabel = makeLabel("G", 14)
+    labelGroup:AddChild(numGamesLabel)
+    Tooltip.AddControlTooltip(numGamesLabel, 'num_games')
 
-    GUI.teamLabel = makeLabel("Team", 14)
-    LayoutHelpers.AtLeftIn(GUI.teamLabel, GUI.panel, 612)
-    LayoutHelpers.AtVerticalCenterIn(GUI.teamLabel, GUI.labelGroup)
-    Tooltip.AddControlTooltip(GUI.teamLabel, 'lob_team')
+    local nameLabel = makeLabel("Nickname", 14)
+    labelGroup:AddChild(nameLabel)
+    Tooltip.AddControlTooltip(nameLabel, 'lob_slot')
 
-    GUI.pingLabel = makeLabel("Ping/CPU", 14)
-    LayoutHelpers.AtLeftIn(GUI.pingLabel, GUI.panel, 682)
-    LayoutHelpers.AtVerticalCenterIn(GUI.pingLabel, GUI.labelGroup)
+    local colorLabel = makeLabel("Color", 14)
+    labelGroup:AddChild(colorLabel)
+    Tooltip.AddControlTooltip(colorLabel, 'lob_color')
 
-    GUI.readyLabel = makeLabel("Ready", 14)
-    LayoutHelpers.AtLeftIn(GUI.readyLabel, GUI.panel, 754)
-    LayoutHelpers.AtVerticalCenterIn(GUI.readyLabel, GUI.labelGroup)
+    local factionLabel = makeLabel("Faction", 14)
+    labelGroup:AddChild(factionLabel)
+    Tooltip.AddControlTooltip(factionLabel, 'lob_faction')
+
+    local teamLabel = makeLabel("Team", 14)
+    labelGroup:AddChild(teamLabel)
+    Tooltip.AddControlTooltip(teamLabel, 'lob_team')
+
+    if not singlePlayer then
+        labelGroup:AddChild(makeLabel("Ping/CPU", 14))
+        labelGroup:AddChild(makeLabel("Ready", 14))
+    end
 
     for i= 1, LobbyComm.maxPlayerSlots do
-        -- capture the index in the current closure so it's accessible on callbacks
+        -- Capture the index in the current closure so it's accessible on callbacks
         local curRow = i
 
-        local newSlot = Group(GUI.playerPanel, "playerSlot " .. tostring(i))
+        -- The background is parented on the GUI so it doesn't vanish when we hide the slot.
+        local slotBackground = Bitmap(GUI, UIUtil.SkinnableFile("/SLOT/slot-dis.dds"))
+
+        -- Inherit dimensions of the slot control from the background image.
+        local newSlot = ColumnLayout(GUI.playerPanel, COLUMN_POSITIONS, COLUMN_WIDTHS)
+        newSlot.Width:Set(slotBackground.Width)
+        newSlot.Height:Set(slotBackground.Height)
+
+        LayoutHelpers.AtLeftTopIn(slotBackground, newSlot)
+        newSlot.SlotBackground = slotBackground
         newSlot.closed = false
-        --TODO these need layout from art when available
-        newSlot.Width:Set(GUI.labelGroup.Width)
-        newSlot.Height:Set(21)
 
         -- Default mouse behaviours for the slot.
         local defaultHandler = function(self, event)
@@ -2468,59 +2475,36 @@ function CreateSlotsUI(makeLabel)
         end
         newSlot.HandleEvent = defaultHandler
 
-        local bg = newSlot
-
-        --Slot Background
-        newSlot.SlotBackground = Bitmap(GUI, UIUtil.SkinnableFile("/SLOT/slot-dis.dds"))
-        LayoutHelpers.AtBottomIn(newSlot.SlotBackground, newSlot, -9)
-        LayoutHelpers.AtLeftIn(newSlot.SlotBackground, newSlot, 0)
-
         -- COUNTRY
         -- Added a bitmap on the left of Rating, the bitmap is a Flag of Country
-        local flag = Bitmap(bg, UIUtil.SkinnableFile("/countries/world.dds"))
+        local flag = Bitmap(newSlot, UIUtil.SkinnableFile("/countries/world.dds"))
         newSlot.KinderCountry = flag
         flag.Width:Set(20)
         flag.Height:Set(15)
-        LayoutHelpers.AtBottomIn(flag, newSlot, -4)
-        LayoutHelpers.AtLeftIn(flag, newSlot, 2)
+        newSlot:AddChild(flag)
 
         -- TODO: Factorise this boilerplate.
         -- Rating
-        local ratingGroup = Group(bg)
-        newSlot.ratingGroup = ratingGroup
-        ratingGroup.Width:Set(45)
-        ratingGroup.Height:Set(newSlot.Height)
-        LayoutHelpers.AtLeftIn(ratingGroup, GUI.panel, 30)
-        LayoutHelpers.AtVerticalCenterIn(ratingGroup, newSlot, 6)
-
-        local ratingText = UIUtil.CreateText(ratingGroup, "", 14, 'Arial')
+        local ratingText = UIUtil.CreateText(newSlot, "", 14, 'Arial')
         newSlot.ratingText = ratingText
         ratingText:SetColor('B9BFB9')
         ratingText:SetDropShadow(true)
-        LayoutHelpers.AtCenterIn(ratingText, ratingGroup)
+        newSlot:AddChild(ratingText)
         newSlot.tooltiprating = Tooltip.AddControlTooltip(ratingText, 'rating')
 
         -- NumGame
-        local numGamesGroup = Group(bg)
-        newSlot.numGamesGroup = numGamesGroup
-        numGamesGroup.Width:Set(45)
-        numGamesGroup.Height:Set(newSlot.Height)
-        LayoutHelpers.AtLeftIn(numGamesGroup, GUI.panel, 75)
-        LayoutHelpers.AtVerticalCenterIn(numGamesGroup, newSlot, 6)
-
-        local numGamesText = UIUtil.CreateText(numGamesGroup, "", 14, 'Arial')
+        local numGamesText = UIUtil.CreateText(newSlot, "", 14, 'Arial')
         newSlot.numGamesText = numGamesText
         numGamesText:SetColor('B9BFB9')
         numGamesText:SetDropShadow(true)
         Tooltip.AddControlTooltip(numGamesText, 'num_games')
-        LayoutHelpers.AtCenterIn(numGamesText, numGamesGroup)
+        newSlot:AddChild(numGamesText)
 
         -- Name
-        local nameLabel = Combo(bg, 14, 12, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+        local nameLabel = Combo(newSlot, 14, 12, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         newSlot.name = nameLabel
         nameLabel._text:SetFont('Arial Gras', 15)
-        LayoutHelpers.AtVerticalCenterIn(nameLabel, newSlot, 8)
-        LayoutHelpers.AtLeftIn(nameLabel, GUI.panel, 120)
+        newSlot:AddChild(nameLabel)
         nameLabel.Width:Set(341)
         -- left deal with name clicks
         nameLabel.OnEvent = defaultHandler
@@ -2529,11 +2513,10 @@ function CreateSlotsUI(makeLabel)
         end
 
         -- Color
-        local colorSelector = BitmapCombo(bg, gameColors.PlayerColors, 1, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+        local colorSelector = BitmapCombo(newSlot, gameColors.PlayerColors, 1, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         newSlot.color = colorSelector
 
-        LayoutHelpers.AtLeftIn(colorSelector, GUI.panel, 472)
-        LayoutHelpers.AtVerticalCenterIn(colorSelector, newSlot, 8)
+        newSlot:AddChild(colorSelector)
         colorSelector.Width:Set(59)
         colorSelector.OnClick = function(self, index)
             if not lobbyComm:IsHost() then
@@ -2564,10 +2547,9 @@ function CreateSlotsUI(makeLabel)
         table.insert(factionBmps, "/faction_icon-sm/random_ico.dds")
         table.insert(factionTooltips, 'lob_random')
 
-        local factionSelector = BitmapCombo(bg, factionBmps, table.getn(factionBmps), nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+        local factionSelector = BitmapCombo(newSlot, factionBmps, table.getn(factionBmps), nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         newSlot.faction = factionSelector
-        LayoutHelpers.AtLeftIn(factionSelector, GUI.panel, 542)
-        LayoutHelpers.AtVerticalCenterIn(factionSelector, newSlot, 8)
+        newSlot:AddChild(factionSelector)
         factionSelector.Width:Set(59)
         factionSelector.OnClick = function(self, index)
             SetPlayerOption(curRow, 'Faction', index)
@@ -2582,10 +2564,9 @@ function CreateSlotsUI(makeLabel)
         factionSelector.OnEvent = defaultHandler
 
         -- Team
-        local teamSelector = BitmapCombo(bg, teamIcons, 1, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+        local teamSelector = BitmapCombo(newSlot, teamIcons, 1, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         newSlot.team = teamSelector
-        LayoutHelpers.AtLeftIn(teamSelector, GUI.panel, 612)
-        LayoutHelpers.AtVerticalCenterIn(teamSelector, newSlot, 8)
+        newSlot:AddChild(teamSelector)
         teamSelector.Width:Set(59)
         teamSelector.OnClick = function(self, index, text)
             Tooltip.DestroyMouseoverDisplay()
@@ -2596,12 +2577,11 @@ function CreateSlotsUI(makeLabel)
         teamSelector.OnEvent = defaultHandler
 
         -- Ping
-        local pingGroup = Group(bg)
+        local pingGroup = Group(newSlot)
         newSlot.pingGroup = pingGroup
         pingGroup.Width:Set(62)
         pingGroup.Height:Set(newSlot.Height)
-        LayoutHelpers.AtLeftIn(pingGroup, GUI.panel, 682)
-        LayoutHelpers.AtVerticalCenterIn(pingGroup, newSlot, 6)
+        newSlot:AddChild(pingGroup)
 
         local pingStatus = StatusBar(pingGroup, 0, 1000, false, false,
             UIUtil.SkinnableFile('/game/unit_bmp/bar-back_bmp.dds'),
@@ -2612,18 +2592,10 @@ function CreateSlotsUI(makeLabel)
         LayoutHelpers.AtLeftIn(pingStatus, pingGroup, 0)
         LayoutHelpers.AtRightIn(pingStatus, pingGroup, 0)
 
-        -- depending on if this is single player or multiplayer this displays different info
-        newSlot.multiSpace = Group(bg, "multiSpace " .. tonumber(i))
-        newSlot.multiSpace.Width:Set(51)
-        newSlot.multiSpace.Height:Set(newSlot.Height)
-        LayoutHelpers.AtLeftIn(newSlot.multiSpace, GUI.panel, 755)
-        newSlot.multiSpace.Top:Set(newSlot.Top)
-
         -- Ready Checkbox
-        local readyBox = UIUtil.CreateCheckbox(newSlot.multiSpace, '/CHECKBOX/')
+        local readyBox = UIUtil.CreateCheckbox(newSlot, '/CHECKBOX/')
         newSlot.ready = readyBox
-        LayoutHelpers.AtVerticalCenterIn(readyBox, newSlot.multiSpace, 8)
-        LayoutHelpers.AtLeftIn(readyBox, newSlot.multiSpace, 7)
+        newSlot:AddChild(readyBox)
         readyBox.OnCheck = function(self, checked)
             UIUtil.setEnabled(GUI.becomeObserver, not checked)
             if checked then
@@ -2642,7 +2614,7 @@ function CreateSlotsUI(makeLabel)
         end
 
         if i == 1 then
-            LayoutHelpers.Below(newSlot, GUI.labelGroup, -1)
+            LayoutHelpers.Below(newSlot, GUI.labelGroup)
         else
             LayoutHelpers.Below(newSlot, GUI.slots[i - 1], 3)
         end
@@ -3358,8 +3330,6 @@ function CreateUI(maxPlayers)
         GUI.rerunBenchmark:Hide()
         GUI.randMap:Hide()
         GUI.observerPanel:Hide()
-        GUI.pingLabel:Hide()
-        GUI.readyLabel:Hide()
     end
 
     -- Setup large pretty faction selector and set the factional background to its initial value.
