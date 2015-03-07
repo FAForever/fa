@@ -624,7 +624,10 @@ FactoryUnit = Class(StructureUnit) {
         if order ~= 'Upgrade' then
             ChangeState(self, self.BuildingState)
             self.BuildingUnit = false
+        else
+            self:RemoveCommandCap('RULEUCC_Guard')
         end
+
         self.FactoryBuildFailed = false
     end,
 
@@ -638,6 +641,11 @@ FactoryUnit = Class(StructureUnit) {
             self:StopBuildFx()
             self:ForkThread(self.FinishBuildThread, unitBeingBuilt, order )
         end
+
+        if order == 'Upgrade' then
+            self:AddCommandCap('RULEUCC_Guard')
+        end
+
         self.BuildingUnit = false
     end,
 
