@@ -148,16 +148,18 @@ function UpdateMarker(data)
         elseif data.Action == 'rename' then
             PingMarkers[data.Owner][data.ID].Name = data.Name
         elseif data.Action == 'renew' then
-            ForkThread(function()
-                for ownerID, pingTable in PingMarkers do
-                    if IsAlly(ownerID+1, GetFocusArmy()) then
-                        for pingID, ping in pingTable do
-                            ping.Renew = true
-                            SendData(ping)
+            if GetFocusArmy() ~= -1 then
+                ForkThread(function()
+                    for ownerID, pingTable in PingMarkers do
+                        if IsAlly(ownerID+1, GetFocusArmy()) then
+                            for pingID, ping in pingTable do
+                                ping.Renew = true
+                                SendData(ping)
+                            end
                         end
                     end
-                end
-            end)
+                end)
+            end
             return
         end
         SendData(data)
