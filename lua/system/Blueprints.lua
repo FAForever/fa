@@ -447,6 +447,11 @@ function PreModBlueprints(all_bps)
             }
         end
 
+        -- make it possible to pause all mobile units, stopping in this case means pause at next order in command queue
+        if cats.MOBILE then
+            bp.General.CommandCaps.RULEUCC_Pause = true
+        end
+
         -- mod in AI.GuardScanRadius = Weapon.MaxRadius + Intel.VisionRadius
         -- fixes move-attack range issues
         -- Most Air units have the GSR defined already, this is just making certain they don't get included
