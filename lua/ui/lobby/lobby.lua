@@ -4551,17 +4551,23 @@ end
 --         in this situation).
 -- @see StressCPU
 function GetBenchmarkScore(force)
+    local wait = 10
+    local benchmark
+
     if force then
-        return StressCPU(0)
+        wait = 0
+    else
+        benchmark = GetPreference('CPUBenchmark')
     end
 
-    -- Benchmark scores are associated with the machine, not the profile: hence SetPreference.
-    local benchmark = GetPreference('CPUBenchmark')
     if not benchmark then
         -- We defer the calculation by 10s here because, often, non-forced requests are occurring on
         -- startup, and we want to give other tasks, such as connection negotiation, a fighting
         -- chance of completing before we ruin everything.
-        benchmark = StressCPU(10)
+        --
+        -- Benchmark scores are associated with the machine, not the profile: hence SetPreference.
+
+        benchmark = StressCPU(wait)
         SetPreference('CPUBenchmark', benchmark)
     end
 
