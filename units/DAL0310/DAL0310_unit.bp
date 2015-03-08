@@ -274,6 +274,7 @@ UnitBlueprint {
             SlavedToBodyArcRange = 5,
             TargetCheckInterval = 0.75,
             TargetPriorities = {
+                'SHIELD',
                 'SPECIALHIGHPRI',
                 'MOBILE',
                 'STRUCTURE DEFENSE',
