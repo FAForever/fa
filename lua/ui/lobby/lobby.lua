@@ -96,8 +96,6 @@ function LOGX(text, ttype)
 	end
 end
 
-local FACTION_PANELS = {}
-
 local connectedTo = {} -- by UID
 CurrentConnection = {} -- by Name
 ConnectionEstablished = {} -- by Name
@@ -3219,7 +3217,7 @@ function CreateUI(maxPlayers)
     local launchGameButton = UIUtil.CreateButtonWithDropshadow(GUI.chatPanel, '/BUTTON/large/', "Launch the Game")
     GUI.launchGameButton = launchGameButton
     LayoutHelpers.AtHorizontalCenterIn(launchGameButton, GUI)
-    LayoutHelpers.AtBottomIn(launchGameButton, GUI, 15)
+    LayoutHelpers.AtBottomIn(launchGameButton, GUI.panel, 10)
     Tooltip.AddButtonTooltip(launchGameButton, 'Lobby_Launch')
     UIUtil.setVisible(launchGameButton, isHost)
     launchGameButton.OnClick = function(self)
@@ -3278,7 +3276,7 @@ function CreateUI(maxPlayers)
     GUI.exitButton = UIUtil.CreateButtonWithDropshadow(GUI.chatPanel, '/BUTTON/medium/','Exit')
     GUI.exitButton.label:SetText(LOC("<LOC _Exit>"))
     LayoutHelpers.AtLeftIn(GUI.exitButton, GUI.chatPanel, 38)
-    LayoutHelpers.AtVerticalCenterIn(GUI.exitButton, launchGameButton, -3)
+    LayoutHelpers.AtVerticalCenterIn(GUI.exitButton, launchGameButton)
     GUI.exitButton.OnClick = GUI.exitLobbyEscapeHandler
     
     -- Small buttons are 100 wide, 44 tall
@@ -5325,5 +5323,7 @@ function GUI_Changelog()
     local OkButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
 	LayoutHelpers.AtLeftIn(OkButton, dialogContent, 0)
     LayoutHelpers.AtBottomIn(OkButton, dialogContent, 10)
-    OkButton.OnClick = changelogPopup.Close
+    OkButton.OnClick = function()
+        changelogPopup:Close()
+    end
 end
