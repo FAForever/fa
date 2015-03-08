@@ -94,7 +94,7 @@ function ShowView(showUpKeep, enhancement, showecon, showShield)
 end
 
 function ShowEnhancement(bp, bpID, iconID, iconPrefix, userUnit)
-    if CheckFormat() then
+    if CheckFormat() and bp.Slot then
         # Name / Description
         View.UnitImg:SetTexture(UIUtil.UIFile(iconPrefix..'_btn_up.dds'))
 
