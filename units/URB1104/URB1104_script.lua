@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/URB1104/URB1104_script.lua
-#**  Author(s):  Jessica St. Croix, David Tomandl
-#**
-#**  Summary  :  Cybran Mass Fabricator
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/URB1104/URB1104_script.lua
+--**  Author(s):  Jessica St. Croix, David Tomandl
+--**
+--**  Summary  :  Cybran Mass Fabricator
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local CMassFabricationUnit = import('/lua/cybranunits.lua').CMassFabricationUnit
 
 URB1104 = Class(CMassFabricationUnit) {
@@ -22,13 +22,17 @@ URB1104 = Class(CMassFabricationUnit) {
 
     OnProductionUnpaused = function(self)
         CMassFabricationUnit.OnProductionUnpaused(self)
-        self.Rotator:SetTargetSpeed(150)
+        if self.Rotator then
+            self.Rotator:SetTargetSpeed(150)
+        end
     end,
 
     OnProductionPaused = function(self)
         CMassFabricationUnit.OnProductionPaused(self)
-        self.Rotator:SetTargetSpeed(0)
-    end,
+        if self.Rotator then
+            self.Rotator:SetTargetSpeed(0)
+        end
+    end
 }
 
 TypeClass = URB1104
