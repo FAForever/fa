@@ -23,6 +23,7 @@ local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local CampaignManager = import('/lua/ui/campaign/campaignmanager.lua')
 local Prefs = import('/lua/user/prefs.lua')
 local hotstats = import('/lua/ui/dialogs/hotstats.lua')
+local EscapeHandler = import('/lua/ui/dialogs/eschandler.lua')
 
 dialog = false
 local currentPage = false
@@ -446,15 +447,11 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
             operationVictoryTable.allSecondary = true
             CampaignManager.OperationVictory(operationVictoryTable, true)
         end
-        # Checking gpgnet too in case we switch to that
-        if HasCommandLineArg("/online") or HasCommandLineArg("/gpgnet") then
-            ExitApplication()
-        else
-            ExitGame()
-        end
+
+        EscapeHandler.SafeQuit()
     end
     Tooltip.AddButtonTooltip(bg.continueBtn, 'PostScore_Quit')
-    
+
     if showCampaign and not operationVictoryTable.success then
         bg.continueBtn.label:SetText(LOC('<LOC _Skip>Skip'))
         bg.continueBtn.HandleEvent = bg.continueBtn.oldHandleEvent

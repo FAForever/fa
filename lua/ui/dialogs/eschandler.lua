@@ -12,19 +12,25 @@ local Utils = import('/lua/system/utils.lua')
 
 local quickDialog = false
 
--- Ridiculous evil hack to perform graceful game exits.
--- Instead of just killing the app (which leads everyone to have to wait for a timeout), we call
--- the methods involved in terminating a game session. This will broadcast a message on the next
--- tick that will have everyone else boot us: we just have to keep the app alive long enough for
--- that to happen. A second *should* be sufficient, as more than that would've been lagging like a
--- fish in play anyway...
--- We use safeCall because none of these things will work sensibly if not in a game. It allows those
--- useless calls to be skipped over and an exit to be achieved in the usual case.
 function SafeQuit()
-    ExitGame()
-    Utils.safecall("Don't panic.", SessionEndGame)
-    Utils.safecall("Don't panic.", WaitSeconds, 1)
-    ExitApplication()
+    local full_exit = HasCommandLineArg("/online") or HasCommandLineArg("/gpgnet") or HasCommandLineArg("/replay")
+
+    if not full_exit then
+        ExitGame()
+        return
+    end
+
+    if SessionIsActive() then
+        ForkThread(function ()
+            ConExecute('ren_oblivion true')
+            ConExecute('ren_ui false')
+            SessionEndGame()
+            WaitSeconds(1)
+            ExitApplication()
+        end)
+    else
+        ExitApplication()
+    end
 end
 
 -- Stack of escape handlers. The topmost one is called when escape is pressed.
