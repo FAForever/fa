@@ -20,7 +20,7 @@ function SafeQuit()
         return
     end
 
-    if SessionIsActive() then
+    if SessionIsActive() and not SessionIsReplay() then
         ForkThread(function ()
             ConExecute('ren_oblivion true')
             ConExecute('ren_ui false')
