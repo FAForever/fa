@@ -59,7 +59,7 @@ end
 function TransferUnitsOwnership(units, ToArmyIndex)
     local toBrain = GetArmyBrain(ToArmyIndex)
     if not toBrain or toBrain:IsDefeated() or not units or table.getn(units) < 1 then
-        return
+        return {}
     end
 
     local newUnits = {}
