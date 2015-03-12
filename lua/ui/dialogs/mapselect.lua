@@ -513,7 +513,6 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
         if DiskGetFileInfo(mapfile) then
             advOptions = scen.options
             RefreshOptions(false, singlePlayer)
-            PrefetchSession(mapfile, Mods.GetGameMods(), false)
             preview:SetScenario(scen)
             nopreviewtext:Hide()
             SetDescription(scen)
