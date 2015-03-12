@@ -316,10 +316,11 @@ function UpdateEconData(eco, type)
 
     local key
     if stored > 0.5 then
-        key = 'lastUseRequested'
-    else
         key = 'lastUseActual'
+    else
+        key = 'lastUseRequested'
     end
+    
     local expense = eco[key][type] * tps
     local rate = round(income - expense)
 
