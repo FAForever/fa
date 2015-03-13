@@ -1710,10 +1710,7 @@ local function UpdateGame()
     if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
 
-        if scenarioInfo and scenarioInfo.map and scenarioInfo.map ~= '' then
-            local mods = Mods.GetGameMods(gameInfo.GameMods)
-            PrefetchSession(scenarioInfo.map, mods, true)
-        else
+        if not (scenarioInfo and scenarioInfo.map and scenarioInfo.map ~= '') then
             AlertHostMapMissing()
         end
 
