@@ -1120,8 +1120,12 @@ function OnRolloverHandler(button, state)
                 button.dragMarker:Destroy()
                 button.dragMarker = false
             end
-            button.Glow:SetNeedsFrameUpdate(false)
-            button.Glow:SetAlpha(0)
+
+            if button.Glow then
+                button.Glow:SetNeedsFrameUpdate(false)
+                button.Glow:SetAlpha(0)
+            end
+
             UnitViewDetail.Hide()
         end
     else
