@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Rollover unit view control
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -448,25 +448,29 @@ function UpdateWindow(info)
                 end
             end
 
-            if info.shieldRatio > 0 and info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth then
-                local ShieldMaxHealth = info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth
-                controls.shieldText:Show()
-                if info.userUnit:GetBlueprint().Defense.Shield.ShieldRegenRate then
-                    controls.shieldText:SetText(string.format("%d / %d +%d/s", math.floor(ShieldMaxHealth*info.shieldRatio), info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth , info.userUnit:GetBlueprint().Defense.Shield.ShieldRegenRate))
-                else
-                    controls.shieldText:SetText(string.format("%d / %d", math.floor(ShieldMaxHealth*info.shieldRatio), info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth ))
-                end
-            end
-
-            if info.shieldRatio > 0 and info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth == nil then
-                local ShieldMaxHealth = info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId).Back].ShieldMaxHealth
-                controls.shieldText:Show()
-                if info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId).Back].ShieldRegenRate then
-                    controls.shieldText:SetText(string.format("%d / %d +%d/s", math.floor(ShieldMaxHealth*info.shieldRatio), ShieldMaxHealth , info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId).Back].ShieldRegenRate))
-                else
-                    controls.shieldText:SetText(string.format("%d / %d", math.floor(ShieldMaxHealth*info.shieldRatio), ShieldMaxHealth ))
-                end
-            end
+	if info.shieldRatio > 0 then
+	   local unitBp = info.userUnit:GetBlueprint()
+	   local ShieldMaxHealth, ShieldRegenRate
+	   if unitBp.Defense.Shield.ShieldMaxHealth > 0 then
+	      ShieldMaxHealth = unitBp.Defense.Shield.ShieldMaxHealth
+	      ShieldRegenRate = unitBp.Defense.Shield.ShieldRegenRate or 0
+	   elseif unitBp.Enhancements[getEnh.GetEnhancements(info.entityId).Back].ShieldMaxHealth > 0 then
+	      ShieldMaxHealth = unitBp.Enhancements[getEnh.GetEnhancements(info.entityId).Back].ShieldMaxHealth
+	      ShieldRegenRate = unitBp.Enhancements[getEnh.GetEnhancements(info.entityId).Back].ShieldRegenRate or 0
+	   elseif GetShieldParams(info.userUnit, 'MyShield') then
+	      local CustomShield = GetShieldParams(info.userUnit, 'MyShield')
+	      ShieldMaxHealth = CustomShield.ShieldMaxHealth or 0
+	      ShieldRegenRate = CustomShield.ShieldRegenRate or 0
+	   end
+	   if ShieldMaxHealth > 0 then
+	      controls.shieldText:Show()
+	      if ShieldRegenRate > 0 then
+	         controls.shieldText:SetText(string.format("%d / %d +%d/s", math.floor(ShieldMaxHealth*info.shieldRatio), ShieldMaxHealth, ShieldRegenRate))
+	      else
+	         controls.shieldText:SetText(string.format("%d / %d", math.floor(ShieldMaxHealth*info.shieldRatio), ShieldMaxHealth))
+	      end
+	   end
+	end
 
             if info.userUnit ~= nil and info.userUnit:GetBuildRate() >= 2 then
                 controls.Buildrate:SetText(string.format("%d",math.floor(info.userUnit:GetBuildRate())))
