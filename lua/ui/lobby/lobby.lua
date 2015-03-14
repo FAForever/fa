@@ -3849,7 +3849,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 if valid then
                     gameInfo.PlayerOptions[data.Slot][key] = val
                     if isHost then
-                        GpgNetSend('PlayerOption', data.Slot, data.Key, data.Value)
+                        GpgNetSend('PlayerOption', data.Slot, key, val)
                     end
                 end
             end
