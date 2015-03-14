@@ -3939,7 +3939,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             elseif data.Type == 'SlotAssigned' then
                 gameInfo.PlayerOptions[data.Slot] = PlayerData(data.Options)
                 PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
-                SetSlotInfo(data.NewSlot, gameInfo.PlayerOptions[data.NewSlot])
+                SetSlotInfo(data.NewSlot, gameInfo.PlayerOptions[data.Slot])
             elseif data.Type == 'SlotMove' then
                 gameInfo.PlayerOptions[data.OldSlot] = nil
                 gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
