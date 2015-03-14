@@ -2236,17 +2236,17 @@ function HostConvertPlayerToObserver(senderID, playerSlot, ignoreMsg)
 end
 
 function HostConvertObserverToPlayer(senderID, fromObserverSlot, toPlayerSlot, ignoreMsg)
+    -- If no slot is specified (user clicked "go player" button), select a default.
+    if not toPlayerSlot or toPlayerSlot < 1 or toPlayerSlot > numOpenSlots then
+        toPlayerSlot = HostFindEmptySlot()
+    end
+
     if gameInfo.Observers[fromObserverSlot] == nil then -- IF no Observer on the current slot : QUIT
         return
     elseif gameInfo.PlayerOptions[toPlayerSlot] ~= nil then -- IF Player is in the target slot : QUIT
         return
     elseif gameInfo.ClosedSlots[toPlayerSlot] ~= nil then -- IF target slot is Closed : QUIT
         return
-    end
-
-    -- If no slot is specified (user clicked "go player" button), select a default.
-    if not toPlayerSlot or toPlayerSlot < 1 or toPlayerSlot > numOpenSlots then
-        toPlayerSlot = HostFindEmptySlot()
     end
 
     local incomingPlayer = gameInfo.Observers[fromObserverSlot]
