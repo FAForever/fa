@@ -3642,6 +3642,12 @@ return result
 end
 
 function AddChatText(text)
+    if not GUI.chatDisplay then
+        LOG("Can't add chat text -- no chat display")
+        LOG("text=" .. repr(text))
+        return
+    end
+
     local textBoxWidth = GUI.chatDisplay.Width()
     local wrapped = import('/lua/maui/text.lua').WrapText(text, textBoxWidth,
     function(curText) return GUI.chatDisplay:GetStringAdvance(curText) end)
