@@ -1374,7 +1374,7 @@ Unit = Class(moho.unit_methods) {
         -- Attempt to copy our animation pose to the prop. Only works if
         -- the mesh and skeletons are the same, but will not produce an error if not.
 
-        if layer ~= 'Air' then
+        if layer ~= 'Air' and self.PlayDeathAnimation then
             TryCopyPose(self, prop, true)
         end
 
