@@ -1358,7 +1358,7 @@ Unit = Class(moho.unit_methods) {
         local prop = CreateProp( pos, wreck )
 
         --Keep track of the global wreckage count to avoid performance issues
-        prop:AddBoundedProp(mass)
+        --prop:AddBoundedProp(mass)
 
         prop:SetScale(bp.Display.UniformScale)
         prop:SetOrientation(self:GetOrientation(), true)
@@ -1394,6 +1394,7 @@ Unit = Class(moho.unit_methods) {
         --Create some ambient wreckage smoke
         explosion.CreateWreckageEffects(self,prop)
         prop.IsWreckage = true
+        import('/lua/ScenarioFramework.lua').GCWreckID(prop)
         return prop
     end,
 
