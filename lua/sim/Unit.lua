@@ -2267,7 +2267,8 @@ Unit = Class(moho.unit_methods) {
         self:DoOnStartBuildCallbacks(unitBeingBuilt)
         self:PlayUnitSound('Construct')
         self:PlayUnitAmbientSound('ConstructLoop')
-        if bp.General.UpgradesTo and unitBeingBuilt:GetUnitId() == bp.General.UpgradesTo and order == 'Upgrade' then
+
+        if order == 'Upgrade' and unitBeingBuilt:GetBlueprint().General.UpgradesFrom == self:GetUnitId() then
             unitBeingBuilt.DisallowCollisions = true
             unitBeingBuilt:SetCanTakeDamage(false)
         end
