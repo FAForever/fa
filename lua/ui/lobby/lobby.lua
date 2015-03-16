@@ -1250,7 +1250,7 @@ local function AssignRandomStartSpots(gameInfo)
         local AutoTeams = gameInfo.GameOptions.AutoTeams
         local teams = {}
         for i = 1, numAvailStartSpots do
-            if gameInfo.ClosedSlots[i] == nil then
+            if not gameInfo.ClosedSlots[i] then
                 local team = nil
 
                 if AutoTeams == 'lvsr' then
@@ -2118,7 +2118,7 @@ end
 -- @return The id of an empty slot, of -1 if none is available.
 function HostFindEmptySlot()
     for i = 1, numOpenSlots do
-        if gameInfo.PlayerOptions[i] == nil and gameInfo.ClosedSlots[i] == nil then
+        if not gameInfo.PlayerOptions[i] and not gameInfo.ClosedSlots[i] then
             return i
         end
     end
@@ -2192,7 +2192,7 @@ function HostTryMovePlayer(senderID, currentSlot, requestedSlot)
         return
     end
 
-    if gameInfo.ClosedSlots[requestedSlot] ~= nil then
+    if gameInfo.ClosedSlots[requestedSlot] then
         LOG("HostTryMovePlayer: requested slot " .. requestedSlot .. " is closed")
         return
     end
@@ -2289,11 +2289,11 @@ function HostConvertObserverToPlayer(senderID, fromObserverSlot, toPlayerSlot, i
         toPlayerSlot = HostFindEmptySlot()
     end
 
-    if gameInfo.Observers[fromObserverSlot] == nil then -- IF no Observer on the current slot : QUIT
+    if not gameInfo.Observers[fromObserverSlot] then -- IF no Observer on the current slot : QUIT
         return
-    elseif gameInfo.PlayerOptions[toPlayerSlot] ~= nil then -- IF Player is in the target slot : QUIT
+    elseif gameInfo.PlayerOptions[toPlayerSlot] then -- IF Player is in the target slot : QUIT
         return
-    elseif gameInfo.ClosedSlots[toPlayerSlot] ~= nil then -- IF target slot is Closed : QUIT
+    elseif gameInfo.ClosedSlots[toPlayerSlot] then -- IF target slot is Closed : QUIT
         return
     end
 
