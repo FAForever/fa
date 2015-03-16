@@ -410,13 +410,9 @@ end
 
 local function DoSlotBehavior(slot, key, name)
     if key == 'open' then
-        if lobbyComm:IsHost() then
-            HostOpenSlot(hostID, slot)
-        end
+        HostSetSlotClosed(hostID, slot, false)
     elseif key == 'close' then
-        if lobbyComm:IsHost() then
-            HostCloseSlot(hostID, slot)
-        end
+        HostSetSlotClosed(hostID, slot, true)
     elseif key == 'occupy' then
         if IsPlayer(localPlayerID) then
             if lobbyComm:IsHost() then
@@ -2080,50 +2076,23 @@ function OnModsChanged(modlist, ignoreRefresh)
     end
 end
 
--- host makes a specific slot closed to players
-function HostCloseSlot(senderID, slot)
-    -- don't close an already closed slot or an occupied slot
-    if gameInfo.ClosedSlots[slot] ~= nil or gameInfo.PlayerOptions[slot] ~= nil then
+function HostSetSlotClosed(senderID, slot, closed)
+    if gameInfo.PlayerOptions[slot] then
         return
     end
 
-    if lobbyComm:IsHost() then
-        GpgNetSend('SlotOption', slot, "Closed", true)
-    end
-
-    gameInfo.ClosedSlots[slot] = true
+    GpgNetSend('SlotOption', slot, "Closed", closed)
 
     lobbyComm:BroadcastData(
         {
-            Type = 'SlotClose',
+            Type = 'SlotClosed',
             Slot = slot,
+            Closed = closed
         }
     )
 
+    gameInfo.ClosedSlots[slot] = closed
     ClearSlotInfo(slot)
-end
-
--- host makes a specific slot open for players
-function HostOpenSlot(senderID, slot)
-    -- don't try to open an already open slot
-    if gameInfo.ClosedSlots[slot] == nil then
-        return
-    end
-
-    if lobbyComm:IsHost() then
-        GpgNetSend('SlotOption', slot, "Closed", false)
-    end
-
-    gameInfo.ClosedSlots[slot] = nil
-
-    lobbyComm:BroadcastData(
-        {
-            Type = 'SlotOpen',
-            Slot = slot,
-        }
-    )
-
-    UpdateGame()
 end
 
 function GetAvailableColor()
@@ -3700,7 +3669,7 @@ function RefreshMapPosition(mapCtrl, slotIndex)
     end
 
     -- Nothing more for us to do for a closed slot.
-    marker:SetClosed(gameInfo.ClosedSlots[slotIndex] ~= nil)
+    marker:SetClosed(gameInfo.ClosedSlots[slotIndex])
     if gameInfo.ClosedSlots[slotIndex] then
         return
     end
@@ -3835,11 +3804,7 @@ function ConfigureMapListeners(mapCtrl, scenario)
 
         if lobbyComm:IsHost() then
             marker.OnRightClick = function(self)
-                if gameInfo.ClosedSlots[slot] == nil then
-                    HostCloseSlot(hostID, slot)
-                else
-                    HostOpenSlot(hostID, slot)
-                end
+                HostSetSlotClosed(hostID, slot, not gameInfo.ClosedSlots[slot])
             end
         end
     end
