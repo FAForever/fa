@@ -10,6 +10,7 @@ local DEFAULT_MAPPING = {
     StartSpot = 1,
     Ready = false,
     Faction = table.getn(import('/lua/factions.lua').Factions) + 1, -- Random faction
+    PlayerClan = "",
     PlayerName = "player",
     AIPersonality = "",
     Human = true,
