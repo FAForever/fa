@@ -2249,6 +2249,7 @@ end
 function HostConvertPlayerToObserver(senderID, playerSlot, ignoreMsg)
     -- make sure player exists
     if not gameInfo.PlayerOptions[playerSlot] then
+        WARN("HostConvertPlayerToObserver for nonexistent player in slot " .. tostring(playerSlot))
         return
     end
 
