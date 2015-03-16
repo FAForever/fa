@@ -636,7 +636,7 @@ end
 
 -- join an already existing lobby
 function JoinGame(address, asObserver, playerName, uid)
-    lobbyComm:JoinGame(address, playerName, uid);
+    lobbyComm:JoinGame(address, playerName, uid)
 end
 
 function ConnectToPeer(addressAndPort,name,uid)
