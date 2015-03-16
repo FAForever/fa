@@ -734,6 +734,18 @@ function IsObserver(id)
     return FindObserverSlotForID(id) ~= nil
 end
 
+function UpdateSlotBackground(slotIndex)
+    if gameInfo.ClosedSlots[slotIndex] then
+        GUI.slots[slotIndex].SlotBackground:SetTexture(UIUtil.UIFile('/SLOT/slot-dis.dds'))
+    else
+        if gameInfo.PlayerOptions[slotIndex] then
+            GUI.slots[slotIndex].SlotBackground:SetTexture(UIUtil.UIFile('/SLOT/slot-player.dds'))
+        else
+            GUI.slots[slotIndex].SlotBackground:SetTexture(UIUtil.UIFile('/SLOT/slot-player_other.dds'))
+        end
+    end
+end
+
 -- update the data in a player slot
 -- TODO: With lazyvars, this function should be eliminated. Lazy-value-callbacks should be used
 -- instead to incrementaly update things.
@@ -915,6 +927,7 @@ function SetSlotInfo(slotNum, playerInfo)
         autoTeams == 'none' or
         (autoTeams == 'manual' and lobbyComm:IsHost())
     )
+    UpdateSlotBackground(slotNum)
 
     -- Set the CPU bar
     SetSlotCPUBar(slotNum, playerInfo)
@@ -980,6 +993,7 @@ function ClearSlotInfo(slotIndex)
     slot.ready:Hide()
     slot.pingGroup:Hide()
 
+    UpdateSlotBackground(slotIndex)
     ShowGameQuality()
     RefreshMapPositionForAllControls(slotIndex)
 end
@@ -1819,16 +1833,15 @@ local function UpdateGame()
 
     UpdateAvailableSlots(numAvailStartSpots)
 
+    -- Update all slots.
     for i = 1, LobbyComm.maxPlayerSlots do
-        if gameInfo.ClosedSlots[i] then
-            GUI.slots[i].SlotBackground:SetTexture(UIUtil.UIFile('/SLOT/slot-dis.dds')) -- Change the Slot Background by Slot State
+        if gameInfo.ClosedSlots[slotIndex] then
+            UpdateSlotBackground(slotIndex)
         else
             if gameInfo.PlayerOptions[i] then
                 SetSlotInfo(i, gameInfo.PlayerOptions[i])
-                GUI.slots[i].SlotBackground:SetTexture(UIUtil.UIFile('/SLOT/slot-player.dds'))
             else
                 ClearSlotInfo(i)
-                GUI.slots[i].SlotBackground:SetTexture(UIUtil.UIFile('/SLOT/slot-player_other.dds'))
             end
         end
     end
