@@ -979,15 +979,7 @@ function ClearSlotInfo(slotIndex)
         Tooltip.RemoveComboTooltip(slot.name)
     end
 
-    -- hide these to clear slot of visible data
-    slot.KinderCountry:Hide()
-    slot.ratingText:Hide()
-    slot.numGamesText:Hide()
-    slot.faction:Hide()
-    slot.color:Hide()
-    slot.team:Hide()
-    slot.ready:Hide()
-    slot.pingGroup:Hide()
+    slot:HideControls()
 
     UpdateSlotBackground(slotIndex)
     ShowGameQuality()
@@ -2653,6 +2645,19 @@ function CreateSlotsUI(makeLabel)
             end
             SetPlayerOption(curRow, 'Ready', checked)
         end
+
+        newSlot.HideControls = function()
+            -- hide these to clear slot of visible data
+            flag:Hide()
+            ratingText:Hide()
+            numGamesText:Hide()
+            factionSelector:Hide()
+            colorSelector:Hide()
+            teamSelector:Hide()
+            readyBox:Hide()
+            pingGroup:Hide()
+        end
+        newSlot.HideControls()
 
         if singlePlayer then
             -- TODO: Use of groups may allow this to be simplified...
