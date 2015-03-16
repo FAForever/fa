@@ -2259,6 +2259,7 @@ function HostConvertPlayerToObserver(senderID, playerSlot, ignoreMsg)
     end
 
     ClearSlotInfo(playerSlot)
+    refreshObserverList()
 
     -- TODO: can probably avoid transmitting the options map here. The slot number should be enough.
     lobbyComm:BroadcastData(
@@ -2273,7 +2274,6 @@ function HostConvertPlayerToObserver(senderID, playerSlot, ignoreMsg)
     if ignoreMsg then
         SendSystemMessage(LOCF("<LOC lobui_0226>%s has switched from a player to an observer.", gameInfo.Observers[index].PlayerName), "lobui_0226")
     end
-    UpdateGame()
 end
 
 function HostConvertObserverToPlayer(senderID, fromObserverSlot, toPlayerSlot, ignoreMsg)
