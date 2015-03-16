@@ -1485,8 +1485,8 @@ function UpdateAvailableSlots( numAvailStartSpots )
         numOpenSlots = numAvailStartSpots
         for i = 1, LobbyComm.maxPlayerSlots do
             if i <= numAvailStartSpots then
-                if GUI.slots[i].closed then
-                    GUI.slots[i].closed = false
+                if gameInfo.ClosedSlots[i] then
+                    gameInfo.ClosedSlots[i] = nil
                     GUI.slots[i]:Show()
                     if not gameInfo.PlayerOptions[i] then
                         ClearSlotInfo(i)
@@ -1496,7 +1496,7 @@ function UpdateAvailableSlots( numAvailStartSpots )
                     end
                 end
             else
-                if not GUI.slots[i].closed then
+                if not gameInfo.ClosedSlots[i] then
                     if lobbyComm:IsHost() and gameInfo.PlayerOptions[i] then
                         local info = gameInfo.PlayerOptions[i]
                         if info.Human then
@@ -1507,7 +1507,7 @@ function UpdateAvailableSlots( numAvailStartSpots )
                     end
                     DisableSlot(i)
                     GUI.slots[i]:Hide()
-                    GUI.slots[i].closed = true
+                    gameInfo.ClosedSlots[i] = true
                 end
             end
         end
@@ -1820,7 +1820,7 @@ local function UpdateGame()
     UpdateAvailableSlots(numAvailStartSpots)
 
     for i = 1, LobbyComm.maxPlayerSlots do
-        if GUI.slots[i].closed then
+        if gameInfo.ClosedSlots[i] then
             GUI.slots[i].SlotBackground:SetTexture(UIUtil.UIFile('/SLOT/slot-dis.dds')) -- Change the Slot Background by Slot State
         else
             if gameInfo.PlayerOptions[i] then
@@ -2519,7 +2519,6 @@ function CreateSlotsUI(makeLabel)
 
         LayoutHelpers.AtLeftTopIn(slotBackground, newSlot)
         newSlot.SlotBackground = slotBackground
-        newSlot.closed = false
 
         -- Default mouse behaviours for the slot.
         local defaultHandler = function(self, event)
