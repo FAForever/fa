@@ -127,6 +127,7 @@ local function parseCommandlineArguments()
         ratingColor = GetCommandLineArgOrDefault("/ratingcolor", "ffffffff"),
         numGames = tonumber(GetCommandLineArgOrDefault("/numgames", 0)),
         playerMean = tonumber(GetCommandLineArgOrDefault("/mean", 1500)),
+        playerClan = tostring(GetCommandLineArgOrDefault("/clan", "")),
         playerDeviation = tonumber(GetCommandLineArgOrDefault("/deviation", 500)),
     }
 end
@@ -382,6 +383,7 @@ function GetLocalPlayerData()
             Human = true,
             PlayerColor = Prefs.GetFromCurrentProfile('LastColor'),
             Faction = Prefs.GetFromCurrentProfile('LastFaction'),
+            PlayerClan = argv.playerClan,
             PL = playerRating,
             RC = argv.ratingColor,
             NG = argv.numGames,
@@ -775,7 +777,13 @@ function SetSlotInfo(slotNum, playerInfo)
         slot.name._text:SetFont('Arial Gras', 12)
     end
 
-    local playerName = playerInfo.PlayerName
+
+    local playerName = ""
+    if playerInfo.PlayerClan ~= "" then
+        playerName = string.format("[%s] %s", playerInfo.PlayerClan, playerInfo.PlayerName)
+    else
+        playerName = playerInfo.PlayerName
+    end
 
     --\\ Stop - Color the Name in Slot by State
     if wasConnected(playerInfo.OwnerID) or isLocallyOwned then
