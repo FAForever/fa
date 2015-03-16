@@ -4402,7 +4402,7 @@ function RefreshLargeMap()
 
     local scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
     LrgMap.content.mapPreview:SetScenario(scenarioInfo, true)
-    ConfigureMapListeners(LrgMap.content, scenarioInfo)
+    ConfigureMapListeners(LrgMap.content.mapPreview, scenarioInfo)
     ShowMapPositions(LrgMap.content.mapPreview, scenarioInfo)
 end
 
