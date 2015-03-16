@@ -814,10 +814,11 @@ function SetSlotInfo(slotNum, playerInfo)
     slot.team:SetItem(playerInfo.Team)
 
     if lobbyComm:IsHost() then
-        GpgNetSend('PlayerOption', string.format("faction %s %d %s", playerName, slotNum, playerInfo.Faction))
-        GpgNetSend('PlayerOption', string.format("color %s %d %s", playerName, slotNum, playerInfo.PlayerColor))
-        GpgNetSend('PlayerOption', string.format("team %s %d %s", playerName, slotNum, playerInfo.Team))
-        GpgNetSend('PlayerOption', string.format("startspot %s %d %s", playerName, slotNum, slotNum))
+        local playerId = playerInfo.OwnerID
+        GpgNetSend('PlayerOption', "Faction", playerId, playerInfo.Faction)
+        GpgNetSend('PlayerOption', "Color", playerId, playerInfo.PlayerColor)
+        GpgNetSend('PlayerOption', "Team", playerId, playerInfo.Team)
+        GpgNetSend('PlayerOption', "StartSpot", playerId, slotNum)
     end
 
     UIUtil.setVisible(slot.ready, playerInfo.Human and not singlePlayer)
@@ -2008,7 +2009,7 @@ function HostCloseSlot(senderID, slot)
     end
 
     if lobbyComm:IsHost() then
-        GpgNetSend('PlayerOption', slot, "Closed", true)
+        GpgNetSend('SlotOption', slot, "Closed", true)
     end
 
     gameInfo.ClosedSlots[slot] = true
@@ -2032,7 +2033,7 @@ function HostOpenSlot(senderID, slot)
     end
 
     if lobbyComm:IsHost() then
-        GpgNetSend('PlayerOption', slot, "Closed", false)
+        GpgNetSend('SlotOption', slot, "Closed", false)
     end
 
     gameInfo.ClosedSlots[slot] = nil
@@ -2115,7 +2116,7 @@ function HostTryAddPlayer(senderID, slot, playerData)
 
     if lobbyComm:IsHost() then
         for k,v in playerData:pairs() do
-            GpgNetSend('PlayerOption', newSlot, k, v)
+            GpgNetSend('PlayerOption', senderID, k, v)
         end
     end
 
@@ -2155,7 +2156,7 @@ function HostTryMovePlayer(senderID, currentSlot, requestedSlot)
     end
 
     if lobbyComm:IsHost() then
-        GpgNetSend('PlayerOption', currentSlot, "StartSpot", requestedSlot)
+        GpgNetSend('PlayerOption', senderID, "StartSpot", requestedSlot)
     end
 
     gameInfo.PlayerOptions[requestedSlot] = gameInfo.PlayerOptions[currentSlot]
@@ -2214,7 +2215,7 @@ function HostConvertPlayerToObserver(senderID, playerSlot, ignoreMsg)
     gameInfo.PlayerOptions[playerSlot] = nil
 
     if lobbyComm:IsHost() then
-        GpgNetSend('PlayerOption', playerSlot, "StartSpot", -index)
+        GpgNetSend('PlayerOption', senderID, "StartSpot", -index)
     end
 
     ClearSlotInfo(playerSlot)
@@ -2258,7 +2259,7 @@ function HostConvertObserverToPlayer(senderID, fromObserverSlot, toPlayerSlot, i
     end
 
     if lobbyComm:IsHost() then
-        GpgNetSend('PlayerOption', -fromObserverSlot, "StartSpot", toPlayerSlot)
+        GpgNetSend('PlayerOption', senderID, "StartSpot", toPlayerSlot)
     end
 
     gameInfo.PlayerOptions[toPlayerSlot] = incomingPlayer
@@ -2288,7 +2289,7 @@ function HostRemoveAI(slot)
     end
 
     if lobbyComm:IsHost() then
-        GpgNetSend('PlayerOption', slot, "Clear")
+        GpgNetSend('SlotOption', slot, "Clear")
     end
 
     ClearSlotInfo(slot)
@@ -3849,7 +3850,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 if valid then
                     gameInfo.PlayerOptions[data.Slot][key] = val
                     if isHost then
-                        GpgNetSend('PlayerOption', data.Slot, key, val)
+                        GpgNetSend('PlayerOption', data.SenderID, key, val)
                     end
                 end
             end
@@ -4050,7 +4051,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         local myPlayerData = GetLocalPlayerData()
 
         for k,v in myPlayerData:pairs() do
-            GpgNetSend('PlayerOption', 1, k, v)
+            GpgNetSend('PlayerOption', localPlayerID, k, v)
         end
         gameInfo.PlayerOptions[1] = myPlayerData
 
@@ -4137,7 +4138,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         if IsPlayer(peerID) then
             local slot = FindSlotForID(peerID)
             if slot and lobbyComm:IsHost() then
-                GpgNetSend('PlayerOption', slot, "Clear")
+                GpgNetSend('PlayerOption', peerID, "Clear")
                 PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04717'}, true)
                 lobbyComm:BroadcastData(
                 {
@@ -4154,7 +4155,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         elseif IsObserver(peerID) then
             local slot2 = FindObserverSlotForID(peerID)
             if slot2 and lobbyComm:IsHost() then
-                GpgNetSend('PlayerOption', -slot2, "Clear")
+                GpgNetSend('PlayerOption', peerID, "Clear")
                 lobbyComm:BroadcastData(
                 {
                     Type = 'Peer_Really_Disconnected',
@@ -4193,7 +4194,7 @@ function SetPlayerOptions(slot, options, ignoreRefresh)
     for key, val in options do
         gameInfo.PlayerOptions[slot][key] = val
         if isHost then
-            GpgNetSend('PlayerOption', slot, key, val)
+            GpgNetSend('PlayerOption', gameInfo.PlayerOptions[slot].OwnerID, key, val)
         end
     end
         
