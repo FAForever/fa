@@ -1835,8 +1835,8 @@ local function UpdateGame()
 
     -- Update all slots.
     for i = 1, LobbyComm.maxPlayerSlots do
-        if gameInfo.ClosedSlots[slotIndex] then
-            UpdateSlotBackground(slotIndex)
+        if gameInfo.ClosedSlots[i] then
+            UpdateSlotBackground(i)
         else
             if gameInfo.PlayerOptions[i] then
                 SetSlotInfo(i, gameInfo.PlayerOptions[i])
@@ -2100,8 +2100,7 @@ function HostCloseSlot(senderID, slot)
         }
     )
 
-    UpdateGame()
-
+    ClearSlotInfo(slot)
 end
 
 -- host makes a specific slot open for players
