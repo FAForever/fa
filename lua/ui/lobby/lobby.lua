@@ -2328,9 +2328,7 @@ function HostRemoveAI(slot)
         return
     end
 
-    if lobbyComm:IsHost() then
-        GpgNetSend('SlotOption', slot, "Clear")
-    end
+    GpgNetSend('SlotOption', slot, "Clear")
 
     ClearSlotInfo(slot)
     gameInfo.PlayerOptions[slot] = nil
@@ -2340,7 +2338,6 @@ function HostRemoveAI(slot)
             Slot = slot,
         }
     )
-    UpdateGame()
 end
 
 function autoMap()
