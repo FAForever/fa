@@ -598,7 +598,7 @@ function DisconnectFromPeer(uid)
         table.remove(connectedTo, uid)
     end
 	LOGX('>> DisconnectFromPeer > name='..tostring(FindNameForID(uid)), 'Disconnected')
-    GpgNetSend('Disconnected', string.format("%d", uid))
+    GpgNetSend('Disconnected', uid)
     lobbyComm:DisconnectFromPeer(uid)
 end
 
@@ -4080,6 +4080,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 for k,peer in peers do
                     if peer.quiet > LobbyComm.quietTimeout then
                         lobbyComm:EjectPeer(peer.id,'TimedOutToHost')
+                        GpgNetSend('Disconnected', peer.id)
                         SendSystemMessage(LOCF("<LOC lobui_0226>%s timed out.", peer.name), "lobui_0205")
                         
                         -- Search and Remove the peer disconnected
