@@ -59,6 +59,7 @@ local FACTION_NAMES = {[1] = "uef", [2] = "aeon", [3] = "cybran", [4] = "seraphi
 local formattedOptions = {}
 local nonDefaultFormattedOptions = {}
 local Warning_MAP = false
+local LrgMap = false
 
 local teamIcons = {
     '/lobby/team_icons/team_no_icon.dds',
@@ -919,6 +920,7 @@ function SetSlotInfo(slotNum, playerInfo)
     SetSlotCPUBar(slotNum, playerInfo)
 
     ShowGameQuality()
+    RefreshMapPositionForAllControls(slotNum)
 end
 
 function ClearSlotInfo(slot)
@@ -977,6 +979,7 @@ function ClearSlotInfo(slot)
     GUI.slots[slot].pingGroup:Hide()
 
     ShowGameQuality()
+    RefreshMapPositionForAllControls(slot)
 end
 
 function IsColorFree(colorIndex)
@@ -1753,21 +1756,20 @@ local function UpdateGame()
         return
     end
 
-    local scenarioInfo = nil
+    local scenarioInfo
 
     if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
 
         if scenarioInfo and scenarioInfo.map and scenarioInfo.map ~= '' then
-            local mods = Mods.GetGameMods(gameInfo.GameMods)
-            PrefetchSession(scenarioInfo.map, mods, true)
+            GUI.mapView:SetScenario(scenarioInfo)
+            ShowMapPositions(GUI.mapView, scenarioInfo)
+            ConfigureMapListeners(GUI.mapView, scenarioInfo)
         else
             AlertHostMapMissing()
+            GUI.mapView:Clear()
         end
-
-        GUI.mapView:SetScenario(scenarioInfo)
     end
-
 
     local isHost = lobbyComm:IsHost()
 
@@ -1827,13 +1829,6 @@ local function UpdateGame()
                 GUI.slots[i].SlotBackground:SetTexture(UIUtil.UIFile('/SLOT/slot-player_other.dds'))
             end
         end
-    end
-
-    if scenarioInfo and scenarioInfo.map and (scenarioInfo.map ~= "") then
-        GUI.mapView:SetScenario(scenarioInfo)
-        ShowMapPositions(GUI.mapView, scenarioInfo, numPlayers)
-    else
-        GUI.mapView:Clear()
     end
 
     if not singlePlayer then
@@ -2690,8 +2685,6 @@ function CreateSlotsUI(makeLabel)
         end
 
         GUI.slots[i] = newSlot
-
-        ClearSlotInfo(i)
     end
 end
 
@@ -3681,20 +3674,95 @@ function AddChatText(text)
     GUI.chatDisplay:ScrollToBottom()
 end
 
-function ShowMapPositions(mapCtrl, scenario, numPlayers)
-    local startPos = MapUtil.GetStartPositions(scenario)
+--- Update a slot display in a single map control.
+function RefreshMapPosition(mapCtrl, slotIndex)
+    -- The ACUButton instance representing this slot.
+    local marker = mapCtrl.startPositions[slotIndex]
+
+    local playerInfo = gameInfo.PlayerOptions[slotIndex]
+
+    -- Evil autoteams voodoo.
+    if gameInfo.GameOptions.AutoTeams and not gameInfo.AutoTeams[slotIndex] and lobbyComm:IsHost() then
+        gameInfo.AutoTeams[slotIndex] = 2
+    end
+
+    -- Nothing more for us to do for a closed slot.
+    marker:SetClosed(gameInfo.ClosedSlots[slotIndex] ~= nil)
+    if gameInfo.ClosedSlots[slotIndex] then
+        return
+    end
+
+    if gameInfo.GameOptions['TeamSpawn'] == 'random' then
+        marker:SetColor("00777777")
+    else
+        -- If spawns are fixed, show the colour/team of the person in this slot.
+        if playerInfo then
+            marker:SetColor(gameColors.PlayerColors[playerInfo.PlayerColor])
+            marker:SetTeam(playerInfo.Team)
+        else
+            marker:Clear()
+        end
+    end
+
+    if gameInfo.GameOptions.AutoTeams then
+        if gameInfo.GameOptions.AutoTeams == 'lvsr' then
+            local midLine = mapCtrl.Left() + (mapCtrl.Width() / 2)
+            if gameInfo.GameOptions['TeamSpawn'] == 'random' then
+                local markerPos = marker.Left()
+                if markerPos < midLine then
+                    marker:SetTeam(2)
+                else
+                    marker:SetTeam(3)
+                end
+            end
+        elseif gameInfo.GameOptions.AutoTeams == 'tvsb' then
+            local midLine = mapCtrl.Top() + (mapCtrl.Height() / 2)
+            if gameInfo.GameOptions['TeamSpawn'] == 'random' then
+                local markerPos = marker.Top()
+                if markerPos < midLine then
+                    marker:SetTeam(2)
+                else
+                    marker:SetTeam(3)
+                end
+            end
+        elseif gameInfo.GameOptions.AutoTeams == 'pvsi' then
+            if gameInfo.GameOptions['TeamSpawn'] == 'random' then
+                if math.mod(slotIndex, 2) ~= 0 then
+                    marker:SetTeam(2)
+                else
+                    marker:SetTeam(3)
+                end
+            end
+        elseif gameInfo.GameOptions.AutoTeams == 'manual' and gameInfo.GameOptions['TeamSpawn'] == 'random' then
+            marker:SetTeam(gameInfo.AutoTeams[slotIndex] or 1)
+        end
+    end
+end
+
+--- Update a single slot in all displayed map controls.
+function RefreshMapPositionForAllControls(slot)
+    RefreshMapPosition(GUI.mapView, slot)
+    if LrgMap and not LrgMap.isHidden then
+        RefreshMapPosition(LrgMap.content, slot)
+    end
+end
+
+function ShowMapPositions(mapCtrl, scenario)
     local playerArmyArray = MapUtil.GetArmies(scenario)
 
     for inSlot, army in playerArmyArray do
-        local pos = startPos[army]
-        local slot = inSlot
+        RefreshMapPosition(mapCtrl, inSlot)
+    end
+end
+
+function ConfigureMapListeners(mapCtrl, scenario)
+    local playerArmyArray = MapUtil.GetArmies(scenario)
+
+    for inSlot, army in playerArmyArray do
+        local slot = inSlot -- Closure copy.
 
         -- The ACUButton instance representing this slot.
-        local marker = mapCtrl.startPositions[slot]
-
-        if gameInfo.GameOptions.AutoTeams and not gameInfo.AutoTeams[slot] and lobbyComm:IsHost() then
-            gameInfo.AutoTeams[slot] = 2
-        end
+        local marker = mapCtrl.startPositions[inSlot]
 
         marker.OnClick = function(self)
             if gameInfo.GameOptions['TeamSpawn'] ~= 'random' then
@@ -3759,58 +3827,6 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
                 else
                     HostOpenSlot(hostID, slot)
                 end
-            end
-        end
-
-        -- Nothing more for us to do for a closed slot.
-        marker:SetClosed(gameInfo.ClosedSlots[slot] ~= nil)
-        if gameInfo.ClosedSlots[slot] then
-            return
-        end
-
-        if gameInfo.GameOptions['TeamSpawn'] == 'random' then
-            marker:SetColor("00777777")
-        else
-            -- If spawns are fixed, show the colour/team of the person in this slot.
-            if gameInfo.PlayerOptions[slot] then
-                marker:SetColor(gameColors.PlayerColors[gameInfo.PlayerOptions[slot].PlayerColor])
-                marker:SetTeam(gameInfo.PlayerOptions[slot].Team)
-            else
-                marker:Clear()
-            end
-        end
-
-        if gameInfo.GameOptions.AutoTeams then
-            if gameInfo.GameOptions.AutoTeams == 'lvsr' then
-                local midLine = mapCtrl.Left() + (mapCtrl.Width() / 2)
-                if gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] == 'random' then
-                    local markerPos = marker.Left()
-                    if markerPos < midLine then
-                        marker:SetTeam(2)
-                    else
-                        marker:SetTeam(3)
-                    end
-                end
-            elseif gameInfo.GameOptions.AutoTeams == 'tvsb' then
-                local midLine = mapCtrl.Top() + (mapCtrl.Height() / 2)
-                if gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] == 'random' then
-                    local markerPos = marker.Top()
-                    if markerPos < midLine then
-                        marker:SetTeam(2)
-                    else
-                        marker:SetTeam(3)
-                    end
-                end
-            elseif gameInfo.GameOptions.AutoTeams == 'pvsi' then
-                if gameInfo.PlayerOptions[slot] or gameInfo.GameOptions['TeamSpawn'] == 'random' then
-                    if math.mod(slot, 2) ~= 0 then
-                        marker:SetTeam(2)
-                    else
-                        marker:SetTeam(3)
-                    end
-                end
-            elseif gameInfo.GameOptions.AutoTeams == 'manual' and gameInfo.GameOptions['TeamSpawn'] == 'random' then
-                marker:SetTeam(gameInfo.AutoTeams[slot] or 1)
             end
         end
     end
@@ -4352,9 +4368,6 @@ function DebugDump()
     end
 end
 
-
-local LrgMap = false
-
 -- Perform one-time setup of the large map preview
 function CreateBigPreview(parent)
     if LrgMap then
@@ -4408,7 +4421,8 @@ function RefreshLargeMap()
 
     local scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
     LrgMap.content.mapPreview:SetScenario(scenarioInfo, true)
-    ShowMapPositions(LrgMap.content.mapPreview, scenarioInfo, GetPlayerCount())
+    ConfigureMapListeners(LrgMap.content, scenarioInfo)
+    ShowMapPositions(LrgMap.content.mapPreview, scenarioInfo)
 end
 
 --CPU Status Bar Configuration
