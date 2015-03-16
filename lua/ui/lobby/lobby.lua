@@ -923,7 +923,9 @@ function SetSlotInfo(slotNum, playerInfo)
     RefreshMapPositionForAllControls(slotNum)
 end
 
-function ClearSlotInfo(slot)
+function ClearSlotInfo(slotIndex)
+    local slot = GUI.slots[slotIndex]
+
     local hostKey
     if lobbyComm:IsHost() then
         hostKey = 'host'
@@ -933,7 +935,7 @@ function ClearSlotInfo(slot)
 
     local stateKey
     local stateText
-    if gameInfo.ClosedSlots[slot] then
+    if gameInfo.ClosedSlots[slotIndex] then
         stateKey = 'closed'
         stateText = slotMenuStrings.closed
     else
@@ -944,42 +946,42 @@ function ClearSlotInfo(slot)
     local slotKeys, slotStrings = GetSlotMenuTables(stateKey, hostKey)
 
     -- set the text appropriately
-    GUI.slots[slot].name:ClearItems()
-    GUI.slots[slot].name:SetTitleText(LOC(stateText))
+    slot.name:ClearItems()
+    slot.name:SetTitleText(LOC(stateText))
     if table.getn(slotKeys) > 0 then
-        GUI.slots[slot].name.slotKeys = slotKeys
-        GUI.slots[slot].name:AddItems(slotStrings)
-        GUI.slots[slot].name:Enable()
+        slot.name.slotKeys = slotKeys
+        slot.name:AddItems(slotStrings)
+        slot.name:Enable()
     else
-        GUI.slots[slot].name.slotKeys = nil
-        GUI.slots[slot].name:Disable()
+        slot.name.slotKeys = nil
+        slot.name:Disable()
     end
 
-    GUI.slots[slot].name._text:SetFont('Arial Gras', 12)
+    slot.name._text:SetFont('Arial Gras', 12)
     if stateKey == 'closed' then
-        GUI.slots[slot].name:SetTitleTextColor("Crimson")
+        slot.name:SetTitleTextColor("Crimson")
     else
-        GUI.slots[slot].name:SetTitleTextColor('B9BFB9')
+        slot.name:SetTitleTextColor('B9BFB9')
     end
 
     if lobbyComm:IsHost() and stateKey == 'open' then
-        Tooltip.AddComboTooltip(GUI.slots[slot].name, GetAITooltipList())
+        Tooltip.AddComboTooltip(slot.name, GetAITooltipList())
     else
-        Tooltip.RemoveComboTooltip(GUI.slots[slot].name)
+        Tooltip.RemoveComboTooltip(slot.name)
     end
 
     -- hide these to clear slot of visible data
-    GUI.slots[slot].KinderCountry:Hide()
-    GUI.slots[slot].ratingText:Hide()
-    GUI.slots[slot].numGamesText:Hide()
-    GUI.slots[slot].faction:Hide()
-    GUI.slots[slot].color:Hide()
-    GUI.slots[slot].team:Hide()
-    GUI.slots[slot].ready:Hide()
-    GUI.slots[slot].pingGroup:Hide()
+    slot.KinderCountry:Hide()
+    slot.ratingText:Hide()
+    slot.numGamesText:Hide()
+    slot.faction:Hide()
+    slot.color:Hide()
+    slot.team:Hide()
+    slot.ready:Hide()
+    slot.pingGroup:Hide()
 
     ShowGameQuality()
-    RefreshMapPositionForAllControls(slot)
+    RefreshMapPositionForAllControls(slotIndex)
 end
 
 function IsColorFree(colorIndex)
