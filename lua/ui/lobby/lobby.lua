@@ -610,7 +610,7 @@ end
 -- @see StartSyncReplaySession
 function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider, over, exitBehavior, playerHasSupcom)
     -- Is this an incoming GPGNet message?
-    if protocol == "gpgnet" then
+    if localPort == -1 then
         HandleGPGNetMessage(desiredPlayerName)
         return
     end
