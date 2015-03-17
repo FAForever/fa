@@ -4021,6 +4021,16 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
     if not scenario.starts then
         return
     end
+    -- The ACUButton instance representing this slot, if any.
+    local marker = mapCtrl.startPositions[slotIndex]
+    if marker then
+        marker:SetClosed(gameInfo.ClosedSlots[slotIndex])
+    end
+
+    -- Nothing more for us to do for a closed or missing slot.
+    if gameInfo.ClosedSlots[slotIndex] or not marker then
+        return
+    end
 
     if not scenario.size then
         LOG("Lobby: Can't show map positions as size field isn't in scenario yet (must be resaved with new editor!)")
