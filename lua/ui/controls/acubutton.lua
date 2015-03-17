@@ -101,6 +101,9 @@ ACUButton = Class(Group) {
             self.markerOverlay:SetHidden(hidden)
             self.marker:SetHidden(hidden)
             self.teamIndicator:SetHidden(hidden)
+            if self.textOverlay then
+                self.textOverlay:SetHidden(hidden)
+            end
             return true
         end
     end,
