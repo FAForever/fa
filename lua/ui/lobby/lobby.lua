@@ -5029,7 +5029,7 @@ end
 function CreateHelpWindow()
     local dialogContent = Group(GUI)
     dialogContent.Width:Set(420)
-    dialogContent.Height:Set(146)
+    dialogContent.Height:Set(225)
 
     local helpWindow = Popup(GUI, dialogContent)
 
@@ -5037,8 +5037,8 @@ function CreateHelpWindow()
     local InfoList = ItemList(dialogContent)
     InfoList:SetFont(UIUtil.bodyFont, 14)
     InfoList:SetColors(nil, "00000000")
-    InfoList.Width:Set(408)
-    InfoList.Height:Set(120)
+    InfoList.Width:Set(400)
+    InfoList.Height:Set(163)
     LayoutHelpers.AtLeftIn(InfoList, dialogContent, 13)
     LayoutHelpers.AtTopIn(InfoList, dialogContent, 10)
     local helpText = import('/lua/ui/lobby/presetHelp.lua').helpText
@@ -5050,9 +5050,8 @@ function CreateHelpWindow()
     
     -- OK button
     local OkButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
-	LayoutHelpers.AtLeftIn(OkButton, dialogContent, 145)
+	LayoutHelpers.AtHorizontalCenterIn(OkButton, dialogContent)
     LayoutHelpers.AtBottomIn(OkButton, dialogContent, 8)
-    LayoutHelpers.DepthOverParent(OkButton, InfoList, 5)
     OkButton.OnClick = function(self)
         helpWindow:Close()
     end
