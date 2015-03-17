@@ -3701,7 +3701,7 @@ end
 function RefreshMapPositionForAllControls(slot)
     RefreshMapPosition(GUI.mapView, slot)
     if LrgMap and not LrgMap.isHidden then
-        RefreshMapPosition(LrgMap.content, slot)
+        RefreshMapPosition(LrgMap.content.mapPreview, slot)
     end
 end
 
