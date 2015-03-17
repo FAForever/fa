@@ -117,10 +117,14 @@ end
 
 -- called by the engine when escape is pressed but there's no specific handler for it
 function EscapeHandler()
+    WARN(debug.traceback(nil, "ESC!"))
+    WARN("UIMain EscapeHandler called!")
     if not WorldIsLoading() and (import('/lua/ui/game/gamemain.lua').supressExitDialog != true) then
     if escapeHandler then
+        WARN("Delegating to escapeHandler()")
         escapeHandler()
     else
+        WARN("Delegating to HandleEsc()")
         import('/lua/ui/dialogs/eschandler.lua').HandleEsc()
     end
     end
