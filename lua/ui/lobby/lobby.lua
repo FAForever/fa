@@ -4058,6 +4058,12 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 break
             end
         end
+
+        -- Force observers to start with the UEF skin to prevent them from launching as "random".
+        if IsObserver(localPlayerID) then
+            UIUtil.SetCurrentSkin("uef")
+        end
+
         GpgNetSend('GameState', 'Launching')
         if GUI.pingThread then
             KillThread(GUI.pingThread)
