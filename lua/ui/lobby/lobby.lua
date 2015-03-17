@@ -814,12 +814,7 @@ function SetSlotInfo(slotNum, playerInfo)
     end
 
     slot.ratingText:Show()
-    --if playerInfo.MEAN == '-9999' then -- The player is a Smurf (Banned)
-    --GUI.slots[slot].ratingText:SetText('Banned')
-    --GUI.slots[slot].ratingText:SetColor('Crimson') --= --dc143c
-    --else
     slot.ratingText:SetText(playerInfo.PL)
-    --end
     slot.ratingText:SetColor(playerInfo.RC)
 
     slot.numGamesText:Show()
