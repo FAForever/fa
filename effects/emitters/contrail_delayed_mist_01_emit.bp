@@ -10,7 +10,7 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = false,
 	Flat = false,
-	LODCutoff = 0.00,
+	LODCutoff = 128.00,
 	EmitIfVisible = true,
 	CatchupEmit = false,
 	CreateIfVisible = false,
@@ -19,6 +19,9 @@ EmitterBlueprint {
 	InterpolateEmission = true,
 	TextureStripcount = 1.00,
 	SortOrder = 0.00,
+	LowFidelity = false,
+	MedFidelity = true,
+	HighFidelity = true,
 	Texture = [[/textures/particles/cloud_smoke_alpha_10.dds]],
 	RampTexture = [[/textures/particles/ramp_white_19.dds]],
 	XDirectionCurve = {
@@ -42,19 +45,19 @@ EmitterBlueprint {
 	EmitRateCurve = {
 		XRange = 1.00,
 		Keys = {
-			{ x=0.50,y=3.50,z=4.00 },
+			{ x=0.50,y=2.50,z=1 },
 		},
 	},
 	LifetimeCurve = {
 		XRange = 1.00,
 		Keys = {
-			{ x=0.48,y=30.00,z=10.00 },
+			{ x=0.48,y=20.00,z=5.00 },
 		},
 	},
 	VelocityCurve = {
 		XRange = 1.00,
 		Keys = {
-			{ x=0.50,y=1.00,z=0.00 },
+			{ x=0.50,y=1.50,z=0.50 },
 		},
 	},
 	XAccelCurve = {
@@ -108,7 +111,7 @@ EmitterBlueprint {
 	EndSizeCurve = {
 		XRange = 1.00,
 		Keys = {
-			{ x=0.52,y=0.55,z=0.40 },
+			{ x=0.52,y=1.00,z=1.00 },
 		},
 	},
 	InitialRotationCurve = {
@@ -120,7 +123,7 @@ EmitterBlueprint {
 	RotationRateCurve = {
 		XRange = 1.00,
 		Keys = {
-			{ x=0.50,y=0.00,z=1.00 },
+			{ x=0.50,y=0.00,z=2.00 },
 		},
 	},
 	FrameRateCurve = {
