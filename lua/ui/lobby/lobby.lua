@@ -2527,12 +2527,12 @@ function CreateSlotsUI(makeLabel)
         colorSelector.OnClick = function(self, index)
             if not lobbyComm:IsHost() then
                 lobbyComm:SendData(hostID, { Type = 'RequestColor', Color = index, Slot = curRow } )
-                gameInfo.PlayerOptions[curRow]:SetPlayerColor(index)
+                SetPlayerColor(gameInfo.PlayerOptions[curRow], index)
                 UpdateGame()
             else
                 if IsColorFree(index) then
                     lobbyComm:BroadcastData( { Type = 'SetColor', Color = index, Slot = curRow } )
-                    gameInfo.PlayerOptions[curRow]:SetPlayerColor(index)
+                    SetPlayerColor(gameInfo.PlayerOptions[curRow], index)
                     UpdateGame()
                 else
                     self:SetItem( gameInfo.PlayerOptions[curRow].PlayerColor )
@@ -3933,7 +3933,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             elseif data.Type == 'RequestColor' then
                 if IsColorFree(data.Color) then
                     -- Color is available, let everyone else know
-                    gameInfo.PlayerOptions[data.Slot]:SetPlayerColor(data.Color)
+                    SetPlayerColor(gameInfo.PlayerOptions[data.Slot], data.Color)
                     lobbyComm:BroadcastData( { Type = 'SetColor', Color = data.Color, Slot = data.Slot } )
                     SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
                 else
@@ -3993,7 +3993,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 ClearSlotInfo(data.OldSlot)
                 refreshObserverList()
             elseif data.Type == 'SetColor' then
-                gameInfo.PlayerOptions[data.Slot]:SetPlayerColor(data.Color)
+                SetPlayerColor(gameInfo.PlayerOptions[data.Slot], data.Color)
                 SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
             elseif data.Type == 'GameInfo' then
                 -- Completely update the game state. To be used exactly once: when first connecting.
