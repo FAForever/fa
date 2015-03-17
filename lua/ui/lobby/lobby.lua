@@ -1478,6 +1478,9 @@ function UpdateAvailableSlots( numAvailStartSpots )
         WARN("Lobby requests " .. numAvailStartSpots .. " but there are only " .. LobbyComm.maxPlayerSlots .. " available")
     end
 
+    WARN("Slots")
+    WARN(numAvailStartSpots)
+
     -- if number of available slots has changed, update it
     if numOpenSlots == numAvailStartSpots then
         return
@@ -3630,8 +3633,6 @@ end
 
 --- Update a slot display in a single map control.
 function RefreshMapPosition(mapCtrl, slotIndex)
-    -- The ACUButton instance representing this slot.
-    local marker = mapCtrl.startPositions[slotIndex]
 
     local playerInfo = gameInfo.PlayerOptions[slotIndex]
 
@@ -3640,9 +3641,14 @@ function RefreshMapPosition(mapCtrl, slotIndex)
         gameInfo.AutoTeams[slotIndex] = 2
     end
 
-    -- Nothing more for us to do for a closed slot.
-    marker:SetClosed(gameInfo.ClosedSlots[slotIndex])
-    if gameInfo.ClosedSlots[slotIndex] then
+    -- The ACUButton instance representing this slot, if any.
+    local marker = mapCtrl.startPositions[slotIndex]
+    if marker then
+        marker:SetClosed(gameInfo.ClosedSlots[slotIndex])
+    end
+
+    -- Nothing more for us to do for a closed or missing slot.
+    if gameInfo.ClosedSlots[slotIndex] or not marker then
         return
     end
 
