@@ -87,6 +87,11 @@ function CreateDialog(parent, initialRestrictions, OnOk, OnCancel, isHost)
         checkbox.restrictionKey = restrictionKey
 
         checkbox:SetCheck(initialRestrictedSet[restrictionKey], true)
+        if not isHost then
+            -- We use this instead of calling Disable() as a slightly elegant way of killing the
+            -- mouse-over events, too.
+            checkbox.HandleEvent = function() end
+        end
 
         if restrictedUnits[restrictionKey].tooltip then
             Tooltip.AddControlTooltip(checkbox, restrictedUnits[restrictionKey].tooltip)
