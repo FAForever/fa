@@ -171,7 +171,7 @@ UnitBlueprint {
                         Bones = {
                             'Exhaust',
                         },
-                        Type = 'AirExhaust01',
+                        Type = 'AirMoveExhaust01',
                     },
                 },
             },
