@@ -3369,11 +3369,12 @@ function CreateUI(maxPlayers)
             for slot, player in gameInfo.PlayerOptions:pairs() do
                 if player.Human and player.OwnerID ~= localPlayerID then
                     local peer = lobbyComm:GetPeer(player.OwnerID)
-                    local ping = peer.ping and math.floor(peer.ping)
+                    local ping = peer.ping
                     local connectionStatus = CalcConnectionStatus(peer)
                     if ping then
+                        ping = math.floor(peer.ping)
                         GUI.slots[slot].pingStatus:SetValue(ping)
-                        UIUtil.setEnabled(GUI.slots[slot].pingStatus, ping >= 500 or connectionStatus ~= 3)
+                        UIUtil.setEnabled(GUI.slots[slot].pingStatus, ping >= 500)
 
                         -- Set the ping bar to a colour representing the status of our connection.
                         GUI.slots[slot].pingStatus._bar:SetTexture(UIUtil.SkinnableFile('/game/unit_bmp/bar-0' .. connectionStatus .. '_bmp.dds'))
