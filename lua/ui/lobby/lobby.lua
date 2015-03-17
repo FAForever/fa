@@ -1791,22 +1791,6 @@ local function UpdateGame()
 
         UIUtil.setEnabled(GUI.LargeMapPreview, notReady)
         UIUtil.setEnabled(GUI.factionSelector, notReady)
-
-        -- Set the info in a Slot
-        -- TODO: Since these stats are all constants, we should figure out the right place to do this
-        -- job once.
-        if not playerOptions.MEAN then
-            local options = {
-                MEAN = argv.playerMean,
-                DEV = argv.playerDeviation,
-                COUNTRY=argv.PrefLanguage,
-                PL = playerRating,
-                RC = argv.ratingColor,
-                NG= argv.numGames,
-            }
-
-            SetPlayerOptions(localPlayerSlot, options, true)
-        end
     end
 
     local numPlayers = GetPlayerCount()
