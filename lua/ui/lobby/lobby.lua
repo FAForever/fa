@@ -1479,35 +1479,37 @@ function UpdateAvailableSlots( numAvailStartSpots )
     end
 
     -- if number of available slots has changed, update it
-    if numOpenSlots ~= numAvailStartSpots then
-        numOpenSlots = numAvailStartSpots
-        for i = 1, LobbyComm.maxPlayerSlots do
-            if i <= numAvailStartSpots then
-                if gameInfo.ClosedSlots[i] then
-                    gameInfo.ClosedSlots[i] = nil
-                    GUI.slots[i]:Show()
-                    if not gameInfo.PlayerOptions[i] then
-                        ClearSlotInfo(i)
-                    end
-                    if not gameInfo.PlayerOptions[i].Ready then
-                        EnableSlot(i)
-                    end
-                end
-            else
-                if not gameInfo.ClosedSlots[i] then
-                    if lobbyComm:IsHost() and gameInfo.PlayerOptions[i] then
-                        local info = gameInfo.PlayerOptions[i]
-                        if info.Human then
-                            HostConvertPlayerToObserver(info.OwnerID, i)
-                        else
-                            HostRemoveAI(i)
-                        end
-                    end
-                    DisableSlot(i)
-                    GUI.slots[i]:Hide()
-                    gameInfo.ClosedSlots[i] = true
+    if numOpenSlots == numAvailStartSpots then
+        return
+    end
+
+    numOpenSlots = numAvailStartSpots
+    for i = 1, numAvailStartSpots do
+        if gameInfo.ClosedSlots[i] then
+            gameInfo.ClosedSlots[i] = nil
+            GUI.slots[i]:Show()
+            if not gameInfo.PlayerOptions[i] then
+                ClearSlotInfo(i)
+            end
+            if not gameInfo.PlayerOptions[i].Ready then
+                EnableSlot(i)
+            end
+        end
+    end
+
+    for i = numAvailStartSpots + 1, LobbyComm.maxPlayerSlots do
+        if not gameInfo.ClosedSlots[i] then
+            if lobbyComm:IsHost() and gameInfo.PlayerOptions[i] then
+                local info = gameInfo.PlayerOptions[i]
+                if info.Human then
+                    HostConvertPlayerToObserver(info.OwnerID, i)
+                else
+                    HostRemoveAI(i)
                 end
             end
+            DisableSlot(i)
+            GUI.slots[i]:Hide()
+            gameInfo.ClosedSlots[i] = true
         end
     end
 end
