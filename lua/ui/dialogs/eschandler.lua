@@ -58,6 +58,7 @@ end
 
 -- If yesNoOnly is true, then the in game dialog will never be shown
 function HandleEsc(yesNoOnly)
+    WARN("Base escape handler called")
     -- If we've registered a custom escape handler, call it.
     if escapeHandlers[topEscapeHandler] then
         escapeHandlers[topEscapeHandler]()
@@ -86,7 +87,7 @@ function HandleEsc(yesNoOnly)
             CreateYesNoDialog()
         end
     elseif import('/lua/ui/game/commandmode.lua').GetCommandMode()[1] != false then
-    import('/lua/ui/game/commandmode.lua').EndCommandMode(true)
+        import('/lua/ui/game/commandmode.lua').EndCommandMode(true)
     elseif GetSelectedUnits() then
         SelectUnits(nil)
     end

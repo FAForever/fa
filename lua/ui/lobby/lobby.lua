@@ -528,6 +528,7 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
             "<LOC lobby_0000>Exit game lobby?",
             "<LOC _Yes>", function()
                 ReturnToMenu(false)
+                EscapeHandler.PopEscapeHandler()
             end,
             "<LOC _Cancel>", function()
                 GUI.chatEdit:AcquireFocus()
@@ -1851,20 +1852,22 @@ local function UpdateGame()
     end
 
     -- Add Tooltip info on Map Name Label
-    local TTips_map_version = scenarioInfo.map_version or "1"
-    local TTips_army = table.getsize(scenarioInfo.Configurations.standard.teams[1].armies) or "N/A"
-    local TTips_sizeX = scenarioInfo.size[1] / 51.2 or "N/A"
-    local TTips_sizeY = scenarioInfo.size[2] / 51.2 or "N/A"
+    if scenarioInfo then
+        local TTips_map_version = scenarioInfo.map_version or "1"
+        local TTips_army = table.getsize(scenarioInfo.Configurations.standard.teams[1].armies)
+        local TTips_sizeX = scenarioInfo.size[1] / 51.2
+        local TTips_sizeY = scenarioInfo.size[2] / 51.2
 
-    local mapTooltip = {
-        text = scenarioInfo.name or "N/A",
-        body = '- Map version : '..TTips_map_version..'\n '..
-               '- Max Players : '..TTips_army..' max'..'\n '..
-               '- Map Size : '..TTips_sizeX..'km x '..TTips_sizeY..'km'
-    }
+        local mapTooltip = {
+            text = scenarioInfo.name,
+            body = '- Map version : '..TTips_map_version..'\n '..
+                   '- Max Players : '..TTips_army..' max'..'\n '..
+                   '- Map Size : '..TTips_sizeX..'km x '..TTips_sizeY..'km'
+        }
 
-    Tooltip.AddControlTooltip(GUI.MapNameLabel, mapTooltip)
-    Tooltip.AddControlTooltip(GUI.GameQualityLabel, mapTooltip)
+        Tooltip.AddControlTooltip(GUI.MapNameLabel, mapTooltip)
+        Tooltip.AddControlTooltip(GUI.GameQualityLabel, mapTooltip)
+    end
 
     -- If the large map is shown, update it.
     RefreshLargeMap()
