@@ -1850,31 +1850,20 @@ local function UpdateGame()
     end
 
     -- Add Tooltip info on Map Name Label
-    if scenarioInfo then
-        local TTips_map_version = scenarioInfo.map_version or "1"
-        local TTips_army = table.getsize(scenarioInfo.Configurations.standard.teams[1].armies) or "N/A"
-        local TTips_sizeX = scenarioInfo.size[1] / 51.2 or "N/A"
-        local TTips_sizeY = scenarioInfo.size[2] / 51.2 or "N/A"
+    local TTips_map_version = scenarioInfo.map_version or "1"
+    local TTips_army = table.getsize(scenarioInfo.Configurations.standard.teams[1].armies) or "N/A"
+    local TTips_sizeX = scenarioInfo.size[1] / 51.2 or "N/A"
+    local TTips_sizeY = scenarioInfo.size[2] / 51.2 or "N/A"
 
-        local mapTooltip = {
-            text = scenarioInfo.name,
-            body = '- Map version : '..TTips_map_version..'\n '..
-                   '- Max Players : '..TTips_army..' max'..'\n '..
-                   '- Map Size : '..TTips_sizeX..'km x '..TTips_sizeY..'km'
-        }
+    local mapTooltip = {
+        text = scenarioInfo.name or "N/A",
+        body = '- Map version : '..TTips_map_version..'\n '..
+               '- Max Players : '..TTips_army..' max'..'\n '..
+               '- Map Size : '..TTips_sizeX..'km x '..TTips_sizeY..'km'
+    }
 
-        Tooltip.AddControlTooltip(GUI.MapNameLabel, mapTooltip)
-        Tooltip.AddControlTooltip(GUI.GameQualityLabel, mapTooltip)
-    else
-        local mapTooltip = {
-            text="N/A",
-            body='- Map version : N/A\n '..
-                 '- Max Players : N/A max\n '..
-                 '- Map Size : N/Akm x N/Akm'
-        }
-        Tooltip.AddControlTooltip(GUI.MapNameLabel, mapTooltip)
-        Tooltip.AddControlTooltip(GUI.GameQualityLabel, mapTooltip)
-    end
+    Tooltip.AddControlTooltip(GUI.MapNameLabel, mapTooltip)
+    Tooltip.AddControlTooltip(GUI.GameQualityLabel, mapTooltip)
 
     -- If the large map is shown, update it.
     RefreshLargeMap()
