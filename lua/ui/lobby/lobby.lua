@@ -4107,8 +4107,10 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             setOptionsFromPref(option)
         end
 
+        -- The key, LastScenario, is referred to from GPG code we don't hook.
+        self.desiredScenario = self.desiredScenario or Prefs.GetFromCurrentProfile("LastScenario")
         if self.desiredScenario and self.desiredScenario ~= "" then
-            SetGameOption('ScenarioFile',self.desiredScenario, true)
+            SetGameOption('ScenarioFile', self.desiredScenario, true)
         end
 
         GUI.keepAliveThread = ForkThread(
@@ -4279,6 +4281,8 @@ function SetGameOptions(options, ignoreRefresh)
             end
             GpgNetSend('GameOption', key, restrictionsEnabled)
         elseif key == 'ScenarioFile' then
+            -- Special-snowflake the LastScenario key (used by GPG code).
+            Prefs.SetToCurrentProfile('LastScenario', val)
             GpgNetSend('GameOption', key, val)
             if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= '') then
                 -- Warn about attempts to load nonexistent maps.
