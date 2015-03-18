@@ -7,6 +7,7 @@ Bugs
 - Fixed issue with half built units from naval factories
 - Fixed issue with sometimes being unable to quit the game
 - Cybran ([ ] UEF) buildbots no longer explode with the no air restriction
+- Fixed issue with being unable to reclaim mexes that are being upgraded
 
 Enhancements
 ------------
