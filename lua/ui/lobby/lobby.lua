@@ -32,6 +32,7 @@ local Tooltip = import('/lua/ui/game/tooltip.lua')
 local Mods = import('/lua/mods.lua')
 local FactionData = import('/lua/factions.lua')
 local Text = import('/lua/maui/text.lua').Text
+local TextArea = import('/lua/ui/controls/textarea.lua').TextArea
 local Trueskill = import('/lua/ui/lobby/trueskill.lua')
 local round = import('/lua/ui/lobby/trueskill.lua').round
 local Player = import('/lua/ui/lobby/trueskill.lua').Player
@@ -2880,13 +2881,14 @@ function CreateUI(maxPlayers)
     ---------------------------------------------------------------------------
     -- set up chat display
     ---------------------------------------------------------------------------
-    GUI.chatDisplay = ItemList(GUI.chatPanel)
+    GUI.chatDisplay = TextArea(
+        GUI.chatPanel,
+        function() return GUI.chatPanel.Width() - 20 end,
+        function() return GUI.chatPanel.Height() - GUI.chatBG.Height() - 2 end
+    )
     GUI.chatDisplay:SetFont(UIUtil.bodyFont, tonumber(Prefs.GetFromCurrentProfile('LobbyChatFontSize')) or 14)
     GUI.chatDisplay:SetColors(UIUtil.fontColor(), "00000000", UIUtil.fontColor(), "00000000")
     LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.chatPanel, 4, 2)
-    GUI.chatDisplay.Height:Set(function() return GUI.chatPanel.Height() - GUI.chatBG.Height() - 2 end)
-    -- Leave space for the scrollbar.
-    GUI.chatDisplay.Width:Set(function() return GUI.chatPanel.Width() - 20 end)
 
     -- Annoying evil extra Bitmap to make chat box have padding inside its background.
     local chatBG = Bitmap(GUI.chatPanel)
@@ -3614,12 +3616,7 @@ function AddChatText(text)
         return
     end
 
-    local textBoxWidth = GUI.chatDisplay.Width()
-    local wrapped = import('/lua/maui/text.lua').WrapText(text, textBoxWidth,
-    function(curText) return GUI.chatDisplay:GetStringAdvance(curText) end)
-    for i, line in wrapped do
-        GUI.chatDisplay:AddItem(line)
-    end
+    GUI.chatDisplay:AppendLine(text)
     GUI.chatDisplay:ScrollToBottom()
 end
 
