@@ -2577,11 +2577,11 @@ Unit = Class(moho.unit_methods) {
         end
         if tempEnhanceBp.Prerequisite then
             if unitEnhancements[tempEnhanceBp.Slot] ~= tempEnhanceBp.Prerequisite then
-                error('*ERROR: Ordered enhancement does not have the proper prereq!', 2)
+                -- Ordered enhancement does not have the proper prereq
                 return false
             end
         elseif unitEnhancements[tempEnhanceBp.Slot] then
-            error('*ERROR: Ordered enhancement does not have the proper slot available!', 2)
+            -- Ordered enhancement does not have the proper slot available
             return false
         end
         self.WorkItem = tempEnhanceBp
