@@ -507,6 +507,10 @@ end
 function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider, over, exitBehavior, playerHasSupcom)
     Reset()
 
+    -- Among other things, this clears uimain's override escape handler, allowing our escape
+    -- handler manager to work.
+    MenuCommon.MenuCleanup()
+
     if GUI then
         WARN('CreateLobby called twice for UI construction (Should be unreachable)')
         GUI:Destroy()
@@ -534,8 +538,7 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
                 GUI.chatEdit:AcquireFocus()
             end,
             nil, nil,
-            true,
-            {worldCover = true, enterButton = 1, escapeButton = 2}
+            true
         )
     end
     EscapeHandler.PushEscapeHandler(GUI.exitLobbyEscapeHandler)
@@ -747,10 +750,6 @@ function SetSlotInfo(slotNum, playerInfo)
 	if GUI.connectdialog then
 		GUI.connectdialog:Close()
         GUI.connectdialog = nil
-
-        -- Among other things, this clears uimain's override escape handler, allowing our escape
-        -- handler manager to work.
-        MenuCommon.MenuCleanup()
 
         -- Changelog, if necessary.
         if Need_Changelog() then
