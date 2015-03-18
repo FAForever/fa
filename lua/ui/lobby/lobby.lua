@@ -1492,19 +1492,17 @@ function UpdateAvailableSlots( numAvailStartSpots )
     end
 
     for i = numAvailStartSpots + 1, LobbyComm.maxPlayerSlots do
-        if not gameInfo.ClosedSlots[i] then
-            if lobbyComm:IsHost() and gameInfo.PlayerOptions[i] then
-                local info = gameInfo.PlayerOptions[i]
-                if info.Human then
-                    HostConvertPlayerToObserver(info.OwnerID, i)
-                else
-                    HostRemoveAI(i)
-                end
+        if lobbyComm:IsHost() and gameInfo.PlayerOptions[i] then
+            local info = gameInfo.PlayerOptions[i]
+            if info.Human then
+                HostConvertPlayerToObserver(info.OwnerID, i)
+            else
+                HostRemoveAI(i)
             end
-            DisableSlot(i)
-            GUI.slots[i]:Hide()
-            gameInfo.ClosedSlots[i] = true
         end
+        DisableSlot(i)
+        GUI.slots[i]:Hide()
+        gameInfo.ClosedSlots[i] = true
     end
 end
 
