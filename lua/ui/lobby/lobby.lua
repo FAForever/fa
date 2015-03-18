@@ -2685,13 +2685,11 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtLeftTopIn(GUI.titleText, GUI.panel, 5, 20)
     
     -- Rule Label
-    local RuleLabel = ItemList(GUI.panel)
+    local RuleLabel = TextArea(GUI.panel, 350, 34)
     GUI.RuleLabel = RuleLabel
     RuleLabel:SetFont('Arial Gras', 11)
     RuleLabel:SetColors("B9BFB9", "00000000", "B9BFB9", "00000000")
     LayoutHelpers.AtLeftTopIn(RuleLabel, GUI.panel, 5, 44)
-    RuleLabel.Height:Set(34)
-    RuleLabel.Width:Set(350)
     RuleLabel:DeleteAllItems()
     local tmptext
     if isHost then
@@ -2700,8 +2698,7 @@ function CreateUI(maxPlayers)
     else
         tmptext = 'Rule: No Rule'
     end
-    RuleLabel:AddItem(tmptext or '')
-    RuleLabel:AddItem('')
+    RuleLabel:SetText(tmptext)
     if isHost then
         RuleLabel.OnClick = function(self)
             ShowRuleDialog(RuleLabel)
@@ -4639,12 +4636,7 @@ function SetRuleTitleText(rule)
         end
     end
 
-    GUI.RuleLabel:DeleteAllItems()
-    -- We should probably use a TextField for this, but for now we do the slightly ridiculous thing
-    -- of wrapping across two rows in an ItemList.
-    local wrapped = import('/lua/maui/text.lua').WrapText('Rules: '..rule, 350, function(curText) return GUI.RuleLabel:GetStringAdvance(curText) end)
-    GUI.RuleLabel:AddItem(wrapped[1] or '')
-    GUI.RuleLabel:AddItem(wrapped[2] or '')
+    GUI.RuleLabel:SetText(rule)
 end
 
 -- Show the rule change dialog.
