@@ -1679,6 +1679,11 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         end
         gameInfo.GameOptions['Ratings'] = allRatings
 
+        -- Force observers to start with the UEF skin to prevent them from launching as "random".
+        if IsObserver(localPlayerID) then
+            UIUtil.SetCurrentSkin("uef")
+        end
+
         -- Eliminate the WatchedValue structures.
         gameInfo = GameInfo.Flatten(gameInfo)
 
@@ -4040,11 +4045,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 UIUtil.SetCurrentSkin(FACTION_NAMES[v.faction])
                 break
             end
-        end
-
-        -- Force observers to start with the UEF skin to prevent them from launching as "random".
-        if IsObserver(localPlayerID) then
-            UIUtil.SetCurrentSkin("uef")
         end
 
         GpgNetSend('GameState', 'Launching')

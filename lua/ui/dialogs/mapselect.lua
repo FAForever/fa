@@ -514,7 +514,6 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
             advOptions = scen.options
             MapUtil.ValidateScenarioOptions(advOptions)
             RefreshOptions(false, singlePlayer)
-            PrefetchSession(mapfile, Mods.GetGameMods(), false)
             preview:SetScenario(scen)
             nopreviewtext:Hide()
             SetDescription(scen)
