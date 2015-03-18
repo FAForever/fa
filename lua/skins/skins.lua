@@ -160,3 +160,14 @@ skins = {
         },
     },
 }
+
+    -- Flatten skins for performance. Note that this doesn't avoid the need to scan texture paths.
+    for k, v in skins do
+        local default = skins[v.default]
+        while default do
+            -- Copy the entire default chain into the toplevel skin.
+            table.assimilate(v, default)
+
+            default = skins[default.default]
+        end
+    end
