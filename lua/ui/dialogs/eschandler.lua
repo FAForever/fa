@@ -58,7 +58,6 @@ end
 
 -- If yesNoOnly is true, then the in game dialog will never be shown
 function HandleEsc(yesNoOnly)
-    WARN("Base escape handler called")
     -- If we've registered a custom escape handler, call it.
     if escapeHandlers[topEscapeHandler] then
         escapeHandlers[topEscapeHandler]()
