@@ -188,36 +188,38 @@ end
 function SetCurrentSkin(skin)
     local skins = import('/lua/skins/skins.lua').skins
 
-    if skins[skin] == nil then
+    local skinTable = skins[skin]
+    if not skinTable then
         skin = 'uef'
+        skinTable = skins[skin]
     end
 
     currentSkin:Set(skin)
 
-    tooltipTitleColor:Set(skins[skin].tooltipTitleColor or skins['default'].tooltipTitleColor)
-    tooltipBorderColor:Set(skins[skin].tooltipBorderColor or skins['default'].tooltipBorderColor)
-    buttonFont:Set(skins[skin].buttonFont or skins['default'].buttonFont)
-    factionFont:Set(skins[skin].factionFont or skins['default'].factionFont)
-    dialogButtonFont:Set(skins[skin].dialogButtonFont or skins['default'].dialogButtonFont)
-    bodyFont:Set(skins[skin].bodyFont or skins['default'].bodyFont)
-    fixedFont:Set(skins[skin].fixedFont or skins['default'].fixedFont)
-    titleFont:Set(skins[skin].titleFont or skins['default'].titleFont)
-    bodyColor:Set(skins[skin].bodyColor or skins['default'].bodyColor)
-    fontColor:Set(skins[skin].fontColor or skins['default'].fontColor)
-    fontOverColor:Set(skins[skin].fontOverColor or skins['default'].fontOverColor)
-    fontDownColor:Set(skins[skin].fontDownColor or skins['default'].fontDownColor)
-    dialogCaptionColor:Set(skins[skin].dialogCaptionColor or skins['default'].dialogCaptionColor)
-    dialogColumnColor:Set(skins[skin].dialogColumnColor or skins['default'].dialogColumnColor)
-    dialogButtonColor:Set(skins[skin].dialogButtonColor or skins['default'].dialogButtonColor)
-    highlightColor:Set(skins[skin].highlightColor or skins['default'].highlightColor)
-    disabledColor:Set(skins[skin].disabledColor or skins['default'].disabledColor)
-    panelColor:Set(skins[skin].panelColor or skins['default'].panelColor)
-    transparentPanelColor:Set(skins[skin].transparentPanelColor or skins['default'].transparentPanelColor)
-    consoleBGColor:Set(skins[skin].consoleBGColor or skins['default'].consoleBGColor)
-    consoleFGColor:Set(skins[skin].consoleFGColor or skins['default'].consoleFGColor)
-    consoleTextBGColor:Set(skins[skin].consoleTextBGColor or skins['default'].consoleTextBGColor)
-    menuFontSize:Set(skins[skin].menuFontSize or skins['default'].menuFontSize)
-    layouts = skins[skin].layouts or skins['default'].layouts
+    tooltipTitleColor:Set(skinTable.tooltipTitleColor)
+    tooltipBorderColor:Set(skinTable.tooltipBorderColor)
+    buttonFont:Set(skinTable.buttonFont)
+    factionFont:Set(skinTable.factionFont)
+    dialogButtonFont:Set(skinTable.dialogButtonFont)
+    bodyFont:Set(skinTable.bodyFont)
+    fixedFont:Set(skinTable.fixedFont)
+    titleFont:Set(skinTable.titleFont)
+    bodyColor:Set(skinTable.bodyColor)
+    fontColor:Set(skinTable.fontColor)
+    fontOverColor:Set(skinTable.fontOverColor)
+    fontDownColor:Set(skinTable.fontDownColor)
+    dialogCaptionColor:Set(skinTable.dialogCaptionColor)
+    dialogColumnColor:Set(skinTable.dialogColumnColor)
+    dialogButtonColor:Set(skinTable.dialogButtonColor)
+    highlightColor:Set(skinTable.highlightColor)
+    disabledColor:Set(skinTable.disabledColor)
+    panelColor:Set(skinTable.panelColor)
+    transparentPanelColor:Set(skinTable.transparentPanelColor)
+    consoleBGColor:Set(skinTable.consoleBGColor)
+    consoleFGColor:Set(skinTable.consoleFGColor)
+    consoleTextBGColor:Set(skinTable.consoleTextBGColor)
+    menuFontSize:Set(skinTable.menuFontSize)
+    layouts = skinTable.layouts
 
     UpdateWorldBorderState(skin)
 
