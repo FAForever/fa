@@ -504,7 +504,11 @@ function RemoveBuff(unit, buffName, removeAllCounts, instigator)
     local def = Buffs[buffName]
 
     local unitBuff = unit.Buffs.BuffTable[def.BuffType][buffName]
-    
+    if not unitBuff.Count or unitBuff.Count <= 0 then
+        -- This buff wasn't previously applied to the unit
+        return
+    end
+
     for atype,_ in def.Affects do
         local list = unit.Buffs.Affects[atype]
         if list and list[buffName] then
@@ -523,13 +527,7 @@ function RemoveBuff(unit, buffName, removeAllCounts, instigator)
         end
     end
     
-    
-    if not unitBuff.Count then
-        local stg = "*WARNING: BUFF: unitBuff.Count is nil.  Unit: "..unit:GetUnitId().." Buff Name: ".. buffName.." Unit BuffTable: ", repr(unitBuff)
-        error(stg, 2)
-    else
-        unitBuff.Count = unitBuff.Count - 1
-    end
+    unitBuff.Count = unitBuff.Count - 1
 
     if removeAllCounts or unitBuff.Count <= 0 then
         -- unit:PlayEffect('RemoveBuff', buffName)
@@ -551,8 +549,6 @@ function RemoveBuff(unit, buffName, removeAllCounts, instigator)
     end
 
     BuffAffectUnit(unit, buffName, unit, true)
-    
-    --LOG('*BUFF: Removed ', buffName)
 end
 
 function HasBuff(unit, buffName)
