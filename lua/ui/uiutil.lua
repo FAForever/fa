@@ -188,7 +188,6 @@ end
 function SetCurrentSkin(skin)
     local skins = import('/lua/skins/skins.lua').skins
 
-    -- Flatly refuse to assign the "random"
     if skins[skin] == nil then
         skin = 'uef'
     end

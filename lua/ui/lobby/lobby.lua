@@ -526,7 +526,6 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
 
     -- Set up the base escape handler first: want this one at the bottom of the stack.
     GUI.exitLobbyEscapeHandler = function()
-        WARN("Lobby escape handler called")
         GUI.chatEdit:AbandonFocus()
         UIUtil.QuickDialog(GUI,
             "<LOC lobby_0000>Exit game lobby?",
@@ -1472,9 +1471,6 @@ function UpdateAvailableSlots( numAvailStartSpots )
     if numAvailStartSpots > LobbyComm.maxPlayerSlots then
         WARN("Lobby requests " .. numAvailStartSpots .. " but there are only " .. LobbyComm.maxPlayerSlots .. " available")
     end
-
-    WARN("Slots")
-    WARN(numAvailStartSpots)
 
     -- if number of available slots has changed, update it
     if numOpenSlots == numAvailStartSpots then
