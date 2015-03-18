@@ -560,11 +560,7 @@ function HasBuff(unit, buffName)
     if not def then
         return false
     end
-    local bonu = unit.Buffs.BuffTable[def.BuffType][buffName]
-    if bonu then
-        return true
-    end
-    return false
+    return unit.Buffs.BuffTable[def.BuffType][buffName] ~= nil
 end
 
 function PlayBuffEffect(unit, buffName, trsh)
