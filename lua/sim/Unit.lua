@@ -1820,6 +1820,7 @@ Unit = Class(moho.unit_methods) {
             builder:SetHealth(builder, newHealthAmount) --Seems like the engine uses builder to determine new HP
             self.DisallowCollisions = false
             self:SetCanTakeDamage(true)
+            self:RevertCollisionShape()
         end
 
         --Turn off land bones if this unit has them.
@@ -2153,6 +2154,7 @@ Unit = Class(moho.unit_methods) {
         if order == 'Upgrade' and bp.General.UpgradesFrom == self:GetUnitId() then
             built.DisallowCollisions = true
             built:SetCanTakeDamage(false)
+            built:SetCollisionShape('None')
         end
     end,
 
