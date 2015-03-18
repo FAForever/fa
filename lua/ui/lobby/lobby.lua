@@ -5022,20 +5022,13 @@ function CreateHelpWindow()
 
     local helpWindow = Popup(GUI, dialogContent)
 
-    -- Info List --
-    local InfoList = ItemList(dialogContent)
-    InfoList:SetFont(UIUtil.bodyFont, 14)
-    InfoList:SetColors(nil, "00000000")
-    InfoList.Width:Set(400)
-    InfoList.Height:Set(163)
-    LayoutHelpers.AtLeftIn(InfoList, dialogContent, 13)
-    LayoutHelpers.AtTopIn(InfoList, dialogContent, 10)
-    local helpText = import('/lua/ui/lobby/presetHelp.lua').helpText
-    local wrapped = import('/lua/maui/text.lua').WrapText(helpText, InfoList.Width(),
-        function(curText) return InfoList:GetStringAdvance(curText) end)
-    for i, line in wrapped do
-        InfoList:AddItem(line)
-    end
+    -- Help textfield
+    local textArea = TextArea(dialogContent, 400, 163)
+    textArea:SetFont(UIUtil.bodyFont, 14)
+    textArea:SetColors(nil, "00000000", nil, "00000000")
+    LayoutHelpers.AtLeftIn(textArea, dialogContent, 13)
+    LayoutHelpers.AtTopIn(textArea, dialogContent, 10)
+    textArea:SetText(import('/lua/ui/lobby/presetHelp.lua').helpText)
     
     -- OK button
     local OkButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
