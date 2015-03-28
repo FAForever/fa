@@ -7528,4 +7528,4 @@ lobui_0501="Random Map"
 lobui_0502="When clicked, a random map will be selected"
 lobui_0590="Automatically Remove"
 lobui_0591="Check if you want to automatically remove players who don't have selected mods"
-
+lobui_0596="Move Player to slot %s"

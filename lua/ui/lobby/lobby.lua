@@ -272,7 +272,6 @@ end
 
 -- String from which to build the various "Move player to slot" labels.
 -- TODO: This probably needs localising.
-local move_player_to_slot = "Move Player to slot "
 local slotMenuStrings = {
     open = "<LOC lobui_0219>Open",
     close = "<LOC lobui_0220>Close",
@@ -305,6 +304,7 @@ local slotMenuData = {
             'pm',
             'remove_to_observer',
             'remove_to_kik',
+            'move'
         },
         client = {
             'pm',
@@ -319,12 +319,6 @@ local slotMenuData = {
         },
     },
 }
-
--- Populate the tables with the "move player to slot X" entries.
-for i = 1, numOpenSlots, 1 do
-    table.insert(slotMenuData.player.host, 'move_player_to_slot'..i)
-    slotMenuStrings['move_player_to_slot' .. i] = move_player_to_slot .. i
-end
 
 local function GetAITooltipList()
     local aitypes = import('/lua/ui/lobby/aitypes.lua').aitypes
@@ -368,6 +362,12 @@ local function GetSlotMenuTables(stateKey, hostKey)
             for aiindex, aidata in aitypes do
                 table.insert(keys, aidata.key)
                 table.insert(strings, aidata.name)
+            end
+        elseif key == 'move' then
+            -- Generate the "move player to slot X" entries.
+            for i = 1, numOpenSlots, 1 do
+                table.insert(keys, 'move_player_to_slot' .. i)
+                table.insert(strings, LOCF("<LOC lobui_0596>Move Player to slot %s", i))
             end
         else
             if not (isPlayerReady and key == 'occupy') then
@@ -1768,7 +1768,9 @@ local function UpdateGame()
         local notReady = not playerOptions.Ready
 
         UIUtil.setEnabled(GUI.becomeObserver, notReady)
-        UIUtil.setEnabled(GUI.restrictedUnitsOrPresetsBtn, isHost and notReady)
+        -- This button is enabled for all non-host players to view the configuration, and for the
+        -- host to select presets (rather confusingly, one object represents both potential buttons)
+        UIUtil.setEnabled(GUI.restrictedUnitsOrPresetsBtn, not isHost or notReady)
 
         UIUtil.setEnabled(GUI.LargeMapPreview, notReady)
         Faction_Selector_Set_Enabled(notReady, playerOptions.Faction)
@@ -4019,6 +4021,16 @@ function ShowMapPositions(mapCtrl, scenario, numPlayers)
     if not scenario.starts then
         return
     end
+    -- The ACUButton instance representing this slot, if any.
+    local marker = mapCtrl.startPositions[slotIndex]
+    if marker then
+        marker:SetClosed(gameInfo.ClosedSlots[slotIndex])
+    end
+
+    -- Nothing more for us to do for a closed or missing slot.
+    if gameInfo.ClosedSlots[slotIndex] or not marker then
+        return
+    end
 
     if not scenario.size then
         LOG("Lobby: Can't show map positions as size field isn't in scenario yet (must be resaved with new editor!)")
@@ -4245,7 +4257,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
     lobbyComm.ConnectionFailed = function(self, reason)
         LOG("CONNECTION FAILED " .. reason)
-        GUI.connectionFailedDialog = UIUtil.ShowInfoDialog(GUI.panel, LOCF(lobbyComm.Strings.ConnectionFailed, lobbyComm.Strings[reason] or reason),
+        GUI.connectionFailedDialog = UIUtil.ShowInfoDialog(GUI.panel, LOCF(Strings.ConnectionFailed, Strings[reason] or reason),
                                                            "<LOC _OK>", ReturnToMenu)
 
         lobbyComm:Destroy()
@@ -4253,13 +4265,13 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     end
 
     lobbyComm.LaunchFailed = function(self,reasonKey)
-        AddChatText(LOC(lobbyComm.Strings[reasonKey] or reasonKey))
+        AddChatText(LOC(Strings[reasonKey] or reasonKey))
     end
 
     lobbyComm.Ejected = function(self,reason)
         LOG("EJECTED " .. reason)
 
-        GUI.connectionFailedDialog = UIUtil.ShowInfoDialog(GUI, LOCF(lobbyComm.Strings.Ejected, lobbyComm.Strings[reason] or reason), "<LOC _OK>", ReturnToMenu)
+        GUI.connectionFailedDialog = UIUtil.ShowInfoDialog(GUI, LOCF(Strings.Ejected, Strings[reason] or reason), "<LOC _OK>", ReturnToMenu)
         lobbyComm:Destroy()
         lobbyComm = nil
     end
