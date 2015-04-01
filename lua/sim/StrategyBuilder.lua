@@ -4,7 +4,7 @@
 #**
 #**  Summary  : Strategy Builder class
 #**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local AIUtils = import('/lua/ai/aiutilities.lua')

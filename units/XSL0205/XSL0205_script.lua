@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Seraphim Iashavoh Mobile Anit-Air Cannon
 #**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 #changed from SLandUnit

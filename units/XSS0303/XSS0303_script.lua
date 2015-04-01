@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Seraphim Aircraft Carrier Script
 #**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local SSeaUnit = import('/lua/seraphimunits.lua').SSeaUnit

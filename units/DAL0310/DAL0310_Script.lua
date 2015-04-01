@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Aeon Shield Disruptor Script
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 #changes from ALandUnit to AHoverLandUnit

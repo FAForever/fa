@@ -4,7 +4,6 @@
 --#**
 --#**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 --#****************************************************************************
-
 --# The Unit's BuffTable for applied buffs looks like this:
 --#
 --# Unit.Buffs = {

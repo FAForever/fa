@@ -5,7 +5,7 @@
 #**  Summary  : Monitors conditions for a brain and stores them in a keyed
 #**             table
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 BrainConditionsMonitor = Class {
