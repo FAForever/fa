@@ -4,7 +4,7 @@
 #**
 #**  Summary  : Manage engineers for a location
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 BaseBuilderTemplate {
