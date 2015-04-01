@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Aeon Mobile Flak Artillery Script
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 #Below, changed from ALandUnit to AHoverLandUnit

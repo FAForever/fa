@@ -2,7 +2,7 @@
 --* File: lua/modules/ui/lobby/lobbyOptions.lua
 --* Summary: Lobby options
 --*
---* Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 -- options that show up in the team options panel

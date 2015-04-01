@@ -4,7 +4,7 @@
 #**
 #**  Summary  :  Seraphim Sniper Bot Script
 #**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 local SLandUnit = import('/lua/seraphimunits.lua').SLandUnit
 local SeraphimWeapons = import('/lua/seraphimweapons.lua')
