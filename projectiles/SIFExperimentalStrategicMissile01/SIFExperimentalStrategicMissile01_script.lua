@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Experimental Strategic Missile Projectile script, XSB2401
 #**
-#**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local SExperimentalStrategicMissile = import('/lua/seraphimprojectiles.lua').SExperimentalStrategicMissile

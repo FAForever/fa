@@ -5,7 +5,7 @@
 -- **
 -- **  Summary  :  Aeon Commander Script
 -- **
--- **  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
 local ACUUnit = import('/lua/defaultunits.lua').ACUUnit

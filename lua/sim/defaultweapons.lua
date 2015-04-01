@@ -2,7 +2,7 @@
 -- File     :  /lua/sim/DefaultWeapons.lua
 -- Author(s):  John Comes
 -- Summary  :  Default definitions of weapons
--- Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 local Weapon = import('/lua/sim/Weapon.lua').Weapon
 local CollisionBeam = import('/lua/sim/CollisionBeam.lua').CollisionBeam

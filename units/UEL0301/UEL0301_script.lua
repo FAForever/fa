@@ -2,7 +2,7 @@
 -- File     :  /cdimage/units/UEL0301/UEL0301_script.lua
 -- Author(s):  Jessica St. Croix, Gordon Duclos
 -- Summary  :  UEF Sub Commander Script
--- Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 local Shield = import('/lua/shield.lua').Shield
 local EffectUtil = import('/lua/EffectUtilities.lua')

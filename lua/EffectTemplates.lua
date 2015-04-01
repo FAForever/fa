@@ -5,7 +5,7 @@
 -- **
 -- **  Summary  :  Generic templates for commonly used effects
 -- **
--- **  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 EmtBpPath = '/effects/emitters/'
 EmitterTempEmtBpPath = '/effects/emitters/temp/'
