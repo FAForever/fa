@@ -1190,7 +1190,7 @@ end
 
 function GetArmyData(army)
     local armies = GetArmiesTable()
-    local result = nil
+    local result
     if type(army) == 'number' then
         if armies.armiesTable[army] then
             result = armies.armiesTable[army]

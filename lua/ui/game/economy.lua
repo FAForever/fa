@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Economy bar UI
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -355,7 +355,7 @@ function UpdateEconData(eco, type)
 
     local color = 'ffb7e75f'
     if smart then
-        local flag = nil
+        local flag
         if rate < 0 then
             if type == 'ENERGY' and ratio < 0.2 then
                 flag = 'empty'

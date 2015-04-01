@@ -19,7 +19,7 @@ local GUI = {
     group = false,
 }
 
-local updateThread = nil
+local updateThread
 
 function PingUpdate()
     while true do
