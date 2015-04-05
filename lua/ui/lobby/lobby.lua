@@ -658,7 +658,7 @@ function DisconnectFromPeer(uid)
         table.remove(connectedTo, uid)
     end
 	LOGX('>> DisconnectFromPeer > name='..tostring(FindNameForID(uid)), 'Disconnected')
-    GpgNetSend('Disconnected', uid)
+    GpgNetSend('Disconnected', string.format("%d", uid))
     lobbyComm:DisconnectFromPeer(uid)
 end
 
@@ -883,11 +883,10 @@ function SetSlotInfo(slotNum, playerInfo)
     slot.team:SetItem(playerInfo.Team)
 
     if lobbyComm:IsHost() then
-        local playerId = playerInfo.OwnerID
-        GpgNetSend('PlayerOption', "Faction", playerId, playerInfo.Faction)
-        GpgNetSend('PlayerOption', "Color", playerId, playerInfo.PlayerColor)
-        GpgNetSend('PlayerOption', "Team", playerId, playerInfo.Team)
-        GpgNetSend('PlayerOption', "StartSpot", playerId, slotNum)
+        GpgNetSend('PlayerOption', string.format("faction %s %d %s", playerName, slotNum, playerInfo.Faction))
+        GpgNetSend('PlayerOption', string.format("color %s %d %s", playerName, slotNum, playerInfo.PlayerColor))
+        GpgNetSend('PlayerOption', string.format("team %s %d %s", playerName, slotNum, playerInfo.Team))
+        GpgNetSend('PlayerOption', string.format("startspot %s %d %s", playerName, slotNum, slotNum))
     end
 
     UIUtil.setVisible(slot.ready, playerInfo.Human and not singlePlayer)
@@ -1923,17 +1922,24 @@ local function HostUpdateMods(newPlayerID, newPlayerName)
         end
         if not table.equal(gameInfo.GameMods, newmods) and not newPlayerID then
             gameInfo.GameMods = newmods
-            WARN("Sending ModsChanged...")
             lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
-            WARN("Sent ModsChanged")
+            local nummods = 0
+            local uids = ""
 
-            local mods = {}
-            for uid, _ in gameInfo.GameMods do
-                table.insert(mods, uid)
+            for k in gameInfo.GameMods do
+                nummods = nummods + 1
+                if uids == "" then
+                    uids =  k
+                else
+                    uids = string.format("%s %s", uids, k)
+                end
+
             end
+            GpgNetSend('GameMods', "activated", nummods)
 
-            GpgNetSend('GameMods', unpack(mods))
-
+            if nummods > 0 then
+                GpgNetSend('GameMods', "uids", uids)
+            end
         elseif not table.equal(gameInfo.GameMods, newmods) and newPlayerID then
             local modnames = ""
             local totalMissing = table.getn(missingmods)
@@ -2044,8 +2050,6 @@ function HostSetSlotClosed(senderID, slot, closed)
         return
     end
 
-    GpgNetSend('SlotOption', slot, "Closed", closed)
-
     lobbyComm:BroadcastData(
         {
             Type = 'SlotClosed',
@@ -2124,12 +2128,6 @@ function HostTryAddPlayer(senderID, slot, playerData)
         SetPlayerColor(playerData, GetAvailableColor())
     end
 
-    if lobbyComm:IsHost() then
-        for k,v in playerData:pairs() do
-            GpgNetSend('PlayerOption', senderID, k, v)
-        end
-    end
-
     gameInfo.PlayerOptions[newSlot] = playerData
     lobbyComm:BroadcastData(
         {
@@ -2163,10 +2161,6 @@ function HostTryMovePlayer(senderID, currentSlot, requestedSlot)
     if requestedSlot > numOpenSlots or requestedSlot < 1 then
         LOG("HostTryMovePlayer: requested slot " .. requestedSlot .. " is out of range")
         return
-    end
-
-    if lobbyComm:IsHost() then
-        GpgNetSend('PlayerOption', senderID, "StartSpot", requestedSlot)
     end
 
     gameInfo.PlayerOptions[requestedSlot] = gameInfo.PlayerOptions[currentSlot]
@@ -2222,11 +2216,12 @@ function HostConvertPlayerToObserver(senderID, playerSlot, ignoreMsg)
         index = index + 1
     end
 
+    local playerName = gameInfo.PlayerOptions[playerSlot].PlayerName
     gameInfo.Observers[index] = gameInfo.PlayerOptions[playerSlot]
     gameInfo.PlayerOptions[playerSlot] = nil
 
     if lobbyComm:IsHost() then
-        GpgNetSend('PlayerOption', senderID, "StartSpot", -index)
+        GpgNetSend('PlayerOption', string.format("team %s %d %s", playerName, -1, 0))
     end
 
     ClearSlotInfo(playerSlot)
@@ -2269,10 +2264,6 @@ function HostConvertObserverToPlayer(senderID, fromObserverSlot, toPlayerSlot, i
         SetPlayerColor(incomingPlayer, newColour)
     end
 
-    if lobbyComm:IsHost() then
-        GpgNetSend('PlayerOption', senderID, "StartSpot", toPlayerSlot)
-    end
-
     gameInfo.PlayerOptions[toPlayerSlot] = incomingPlayer
     gameInfo.Observers[fromObserverSlot] = nil
 
@@ -2298,8 +2289,6 @@ function HostRemoveAI(slot)
         WARN('Use EjectPlayer to remove humans')
         return
     end
-
-    GpgNetSend('SlotOption', slot, "Clear")
 
     ClearSlotInfo(slot)
     gameInfo.PlayerOptions[slot] = nil
@@ -3818,7 +3807,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         localPlayerID = myID
         localPlayerName = myName
 
-        GpgNetSend('ConnectedToHost', hostID)
+        GpgNetSend('connectedToHost', string.format("%d", hostID))
         lobbyComm:SendData(hostID, { Type = 'SetAvailableMods', Mods = GetLocallyAvailableMods(), Name = localPlayerName} )
 
         lobbyComm:SendData(hostID,
@@ -3882,7 +3871,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 if valid then
                     gameInfo.PlayerOptions[data.Slot][key] = val
                     if isHost then
-                        GpgNetSend('PlayerOption', data.SenderID, key, val)
+                        GpgNetSend('PlayerOption', data.Slot, key, val)
                     end
                 end
             end
@@ -4083,9 +4072,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         -- Give myself the first slot
         local myPlayerData = GetLocalPlayerData()
 
-        for k,v in myPlayerData:pairs() do
-            GpgNetSend('PlayerOption', localPlayerID, k, v)
-        end
         gameInfo.PlayerOptions[1] = myPlayerData
 
         -- set default lobby values
@@ -4115,7 +4101,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 for k,peer in peers do
                     if peer.quiet > LobbyComm.quietTimeout then
                         lobbyComm:EjectPeer(peer.id,'TimedOutToHost')
-                        GpgNetSend('Disconnected', peer.id)
                         SendSystemMessage(LOCF("<LOC lobui_0226>%s timed out.", peer.name), "lobui_0205")
                         
                         -- Search and Remove the peer disconnected
@@ -4174,7 +4159,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         if IsPlayer(peerID) then
             local slot = FindSlotForID(peerID)
             if slot and lobbyComm:IsHost() then
-                GpgNetSend('PlayerOption', peerID, "Clear")
                 PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04717'}, true)
                 lobbyComm:BroadcastData(
                 {
@@ -4191,7 +4175,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         elseif IsObserver(peerID) then
             local slot2 = FindObserverSlotForID(peerID)
             if slot2 and lobbyComm:IsHost() then
-                GpgNetSend('PlayerOption', peerID, "Clear")
                 lobbyComm:BroadcastData(
                 {
                     Type = 'Peer_Really_Disconnected',
@@ -4229,9 +4212,6 @@ function SetPlayerOptions(slot, options, ignoreRefresh)
     local isHost = lobbyComm:IsHost()
     for key, val in options do
         gameInfo.PlayerOptions[slot][key] = val
-        if isHost then
-            GpgNetSend('PlayerOption', gameInfo.PlayerOptions[slot].OwnerID, key, val)
-        end
     end
         
     lobbyComm:BroadcastData(
