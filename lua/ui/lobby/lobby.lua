@@ -1351,6 +1351,15 @@ local function AssignRandomStartSpots(gameInfo)
     end
 end
 
+-- This function is used to double check the observers.
+-- TODO: IT MUST DIE.
+local function sendObserversList(gameInfo)
+    for k,observer in gameInfo.Observers do
+        GpgNetSend('PlayerOption', string.format("team %s %d %s", observer.PlayerName, -1, 0))
+    end
+end
+
+
 local function AssignAutoTeams(gameInfo)
     -- A function to take a player index and return the team they should be on.
     local getTeam
@@ -1678,6 +1687,8 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         --assign the teams just before launch
         AssignAutoTeams(gameInfo)
         AssignAINames(gameInfo)
+        -- Redundantly send the observer list, because we're mental.
+        sendObserversList(gameInfo)
         local allRatings = {}
         for k,v in gameInfo.PlayerOptions:pairs() do
             if v.Human and v.PL then
