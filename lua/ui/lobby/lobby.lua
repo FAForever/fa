@@ -1388,8 +1388,11 @@ local function AssignAutoTeams(gameInfo)
 
     for i = 1, LobbyComm.maxPlayerSlots do
         if not gameInfo.ClosedSlots[i] and gameInfo.PlayerOptions[i] then
-            SetPlayerOption(i, "Team", getTeam(i), true)
-            SetSlotInfo(i, gameInfo.PlayerOptions[i])
+            local correctTeam = getTeam(i)
+            if gameInfo.PlayerOptions[i].Team ~= correctTeam then
+                SetPlayerOption(i, "Team", correctTeam, true)
+                SetSlotInfo(i, gameInfo.PlayerOptions[i])
+            end
         end
     end
 end
