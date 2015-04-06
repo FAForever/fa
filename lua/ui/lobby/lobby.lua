@@ -1354,7 +1354,7 @@ end
 -- This function is used to double check the observers.
 -- TODO: IT MUST DIE.
 local function sendObserversList(gameInfo)
-    for k,observer in gameInfo.Observers do
+    for k, observer in gameInfo.Observers:pairs() do
         GpgNetSend('PlayerOption', string.format("team %s %d %s", observer.PlayerName, -1, 0))
     end
 end
