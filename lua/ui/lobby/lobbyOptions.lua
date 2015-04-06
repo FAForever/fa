@@ -255,7 +255,7 @@ globalOpts = {
         },
     },
     {
-        default = 1,
+        default = 2,
         label = "<LOC lobui_0592>Allow Observers",
         help = "<LOC lobui_0593>Are observers permitted after the game has started?",
         key = 'AllowObservers',
