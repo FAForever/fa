@@ -1896,6 +1896,23 @@ function ShowGameQuality()
 
     local teams = Teams.create()
 
+    -- Everything catches fire if the teams aren't numbered sequentially from 1.
+    -- I hope it is not the case that everything catches fire when there are >2 teams, but in
+    -- principle that should work...
+
+    -- Start by creating a map from each *used* team to an element from an ascending set of integers.
+    local tsTeam = 1
+    local teamMap = {}
+    for i = 1, LobbyComm.maxPlayerSlots do
+        local playerOptions = gameInfo.PlayerOptions[i]
+        -- Team 1 represents "No team", so these people are all singleton teams.
+        if playerOptions and (teamMap[playerOptions.Team] == nil or playerOptions.Team == 1) then
+            teamMap[playerOptions.Team] = tsTeam
+            tsTeam = tsTeam + 1
+        end
+    end
+
+    -- Now we just use the map to relate real teams to trueSkill teams.
     for i = 1, LobbyComm.maxPlayerSlots do
         local playerOptions = gameInfo.PlayerOptions[i]
         if playerOptions then
@@ -1909,7 +1926,7 @@ function ShowGameQuality()
                 Rating.create(playerOptions.MEAN, playerOptions.DEV)
             )
 
-            teams:addPlayer(playerOptions.Team, player)
+            teams:addPlayer(teamMap[playerOptions.Team], player)
         end
     end
 
