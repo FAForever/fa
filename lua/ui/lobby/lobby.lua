@@ -3865,24 +3865,20 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             local isHost = lobbyComm:IsHost()
 
             for key, val in options do
-                local valid = true
-
+                -- The host *is* allowed to set options on slots he doesn't own, of course.
                 if data.SenderID ~= hostID then
-                    valid = false
                     if key == 'Team' and gameInfo.GameOption['AutoTeams'] ~= 'none' then
                         WARN("Attempt to set Team while Auto Teams are on.")
+                        return
                     elseif gameInfo.PlayerOptions[data.Slot].OwnerID ~= data.SenderID then
                         WARN("Attempt to set option on unowned slot.")
-                    else
-                        valid = true
+                        return
                     end
                 end
 
-                if valid then
-                    gameInfo.PlayerOptions[data.Slot][key] = val
-                    if isHost then
-                        GpgNetSend('PlayerOption', data.Slot, key, val)
-                    end
+                gameInfo.PlayerOptions[data.Slot][key] = val
+                if isHost then
+                    GpgNetSend('PlayerOption', data.Slot, key, val)
                 end
             end
             SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
