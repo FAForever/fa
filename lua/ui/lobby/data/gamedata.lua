@@ -17,7 +17,6 @@ function CreateGameInfo(maxPlayerSlots, initialValues)
     }
 
     if not initialValues then
-        WARN("No initialValues found!")
         return gameInfo
     end
 

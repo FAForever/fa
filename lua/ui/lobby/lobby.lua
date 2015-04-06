@@ -1766,6 +1766,21 @@ local function refreshObserverList()
     end
 end
 
+--- Called by the host when someone's readyness state changes to update the enabledness of buttons.
+local function HostRefreshButtonEnabledness()
+    -- disable options when all players are marked ready
+    -- Is at least one person not ready?
+    local playerNotReady = GetPlayersNotReady() ~= false
+
+    UIUtil.setEnabled(GUI.gameoptionsButton, playerNotReady)
+    UIUtil.setEnabled(GUI.defaultOptions, playerNotReady)
+    UIUtil.setEnabled(GUI.randMap, playerNotReady)
+    UIUtil.setEnabled(GUI.autoTeams, playerNotReady)
+
+    -- Launch button enabled if everyone is ready.
+    UIUtil.setEnabled(GUI.launchGameButton, singlePlayer or not playerNotReady)
+end
+
 local function UpdateGame()
     LOGX('>> UpdateGame', 'UpdateGame')
     -- This allows us to assume the existence of UI elements throughout.
@@ -1836,21 +1851,7 @@ local function UpdateGame()
         refreshObserverList()
     end
 
-    -- deal with options display
-    if isHost then
-        -- disable options when all players are marked ready
-        -- Is at least one person not ready?
-        local playerNotReady = GetPlayersNotReady() ~= false
-
-        UIUtil.setEnabled(GUI.gameoptionsButton, playerNotReady)
-        UIUtil.setEnabled(GUI.defaultOptions, playerNotReady)
-        UIUtil.setEnabled(GUI.randMap, playerNotReady)
-        UIUtil.setEnabled(GUI.autoTeams, playerNotReady)
-
-        -- Launch button enabled if everyone is ready.
-        UIUtil.setEnabled(GUI.launchGameButton, singlePlayer or not playerNotReady)
-    end
-
+    HostRefreshButtonEnabledness()
     RefreshOptionDisplayData(scenarioInfo)
 
     -- Update the map background to reflect the possibly-changed map.
@@ -3911,6 +3912,13 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 gameInfo.PlayerOptions[data.Slot][key] = val
                 if isHost then
                     GpgNetSend('PlayerOption', data.Slot, key, val)
+
+                    -- TODO: This should be a global listener on PlayerData objects, but I'm in too
+                    -- much pain to implement that listener system right now. EVIL HACK TIME
+                    if key == "Ready" then
+                        HostRefreshButtonEnabledness()
+                    end
+                    -- DONE.
                 end
             end
             SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
@@ -4253,7 +4261,6 @@ function SetPlayerOptions(slot, options, ignoreRefresh)
         return
     end
 
-    local isHost = lobbyComm:IsHost()
     for key, val in options do
         gameInfo.PlayerOptions[slot][key] = val
     end
