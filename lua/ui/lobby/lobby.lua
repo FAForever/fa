@@ -2721,7 +2721,7 @@ function CreateUI(maxPlayers)
     SetText2(GUI.ModFeaturedLabel, modLabels[argv.initName] or "", 20)
 
     -- Lobby options panel
-    GUI.LobbyOptions = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/BUTTON/medium/', "Options")
+    GUI.LobbyOptions = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/BUTTON/medium/', "Settings")
     LayoutHelpers.AtRightTopIn(GUI.LobbyOptions, GUI.panel, 44, 3)
     GUI.LobbyOptions.OnClick = function()
         ShowLobbyOptionsDialog()
@@ -2813,7 +2813,7 @@ function CreateUI(maxPlayers)
 
     -- GAME OPTIONS // MODS MANAGER BUTTON --
     if isHost then     -- GAME OPTION
-        GUI.gameoptionsButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Settings")
+        GUI.gameoptionsButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "<LOC _Options>")
         Tooltip.AddButtonTooltip(GUI.gameoptionsButton, 'lob_select_map')
         GUI.gameoptionsButton.OnClick = function(self)
             local mapSelectDialog
