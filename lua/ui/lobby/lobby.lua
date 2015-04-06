@@ -839,16 +839,17 @@ function SetSlotInfo(slotNum, playerInfo)
     end
 
 
-    local playerName = ""
+    local playerName = playerInfo.PlayerName
+    local displayName = ""
     if playerInfo.PlayerClan ~= "" then
-        playerName = string.format("[%s] %s", playerInfo.PlayerClan, playerInfo.PlayerName)
+        displayName = string.format("[%s] %s", playerInfo.PlayerClan, playerInfo.PlayerName)
     else
-        playerName = playerInfo.PlayerName
+        displayName = playerInfo.PlayerName
     end
 
     --\\ Stop - Color the Name in Slot by State
     if wasConnected(playerInfo.OwnerID) or isLocallyOwned then
-        slot.name:SetTitleText(playerName)
+        slot.name:SetTitleText(displayName)
         slot.name._text:SetFont('Arial Gras', 15)
         if not table.find(ConnectionEstablished, playerName) then
             if playerInfo.Human and not isLocallyOwned then
