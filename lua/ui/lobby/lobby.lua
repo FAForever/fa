@@ -4887,7 +4887,7 @@ function ShowPresetDialog()
 
     CreateButton.OnClick = function(self)
         local dialogComplete = function(self, presetName)
-            if presetName == "" then
+            if not presetName or presetName == "" then
                 return
             end
             local profiles = LoadPresetsList()
