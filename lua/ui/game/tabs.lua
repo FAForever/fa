@@ -18,7 +18,7 @@ local pauseBtn = false
 
 timeoutsRemaining = false
 
-if SessionIsMultiplayer() then
+if SessionIsActive() and SessionIsMultiplayer() then
     local scenInfo = SessionGetScenarioInfo()
     timeoutsRemaining = tonumber(scenInfo.Options.Timeouts)
 end
