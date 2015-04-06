@@ -2403,8 +2403,8 @@ function CreateSlotsUI(makeLabel)
     local ColumnLayout = import('/lua/ui/controls/columnlayout.lua').ColumnLayout
 
     -- The dimensions of the columns used for slot UI controls.
-    local COLUMN_POSITIONS = {1, 47, 91, 120, 472, 542, 612, 682, 754}
-    local COLUMN_WIDTHS = {20, 45, 45, 264, 59, 59, 59, 62, 51}
+    local COLUMN_POSITIONS = {1, 47, 91, 135, 472, 542, 612, 682, 754}
+    local COLUMN_WIDTHS = {20, 45, 45, 249, 59, 59, 59, 62, 51}
 
     local labelGroup = ColumnLayout(GUI.playerPanel, COLUMN_POSITIONS, COLUMN_WIDTHS)
 
@@ -2511,7 +2511,7 @@ function CreateSlotsUI(makeLabel)
         newSlot.name = nameLabel
         nameLabel._text:SetFont('Arial Gras', 15)
         newSlot:AddChild(nameLabel)
-        nameLabel.Width:Set(341)
+        nameLabel.Width:Set(326)
         -- left deal with name clicks
         nameLabel.OnEvent = defaultHandler
         nameLabel.OnClick = function(self, index, text)
