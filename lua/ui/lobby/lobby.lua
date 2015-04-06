@@ -3945,9 +3945,13 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             if data.Type == 'SystemMessage' then
                 AddChatText(data.Text)
             elseif data.Type == 'SetAllPlayerNotReady' then
-                EnableSlot(FindSlotForID(FindIDForName(localPlayerName)))
+                if not IsPlayer(localPlayerID) then
+                    return
+                end
+                local localSlot = FindSlotForID(localPlayerID)
+                EnableSlot(localSlot)
                 GUI.becomeObserver:Enable()
-                SetPlayerOption(FindSlotForID(FindIDForName(localPlayerName)), 'Ready', false)
+                SetPlayerOption(localSlot, 'Ready', false)
             elseif data.Type == 'Peer_Really_Disconnected' then
 				LOGX('>> DATA RECEIVE : Peer_Really_Disconnected (slot:'..data.Slot..')', 'Disconnected')
                 if data.Observ == false then
