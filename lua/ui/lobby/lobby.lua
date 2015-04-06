@@ -3262,7 +3262,8 @@ function CreateUI(maxPlayers)
         { key = 'none' },
     }
 
-    GUI.autoTeams = ToggleButton(GUI.observerPanel, '/BUTTON/autoteam/', autoteamButtonStates, 'tvsb')
+    local initialState = Prefs.GetFromCurrentProfile("LobbyOpt_AutoTeams") or "none"
+    GUI.autoTeams = ToggleButton(GUI.observerPanel, '/BUTTON/autoteam/', autoteamButtonStates, initialState)
 
     LayoutHelpers.RightOf(GUI.autoTeams, GUI.randMap, -19)
     Tooltip.AddControlTooltip(GUI.autoTeams, 'lob_click_randteam')
