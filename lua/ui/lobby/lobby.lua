@@ -2142,6 +2142,8 @@ function HostTryAddPlayer(senderID, slot, playerData)
     )
 
     SetSlotInfo(newSlot, gameInfo.PlayerOptions[newSlot])
+    -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
+    AssignAutoTeams(gameInfo)
 end
 
 function HostTryMovePlayer(senderID, currentSlot, requestedSlot)
@@ -2180,6 +2182,9 @@ function HostTryMovePlayer(senderID, currentSlot, requestedSlot)
             Options = gameInfo.PlayerOptions[requestedSlot]:AsTable(),
         }
     )
+
+    -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
+    AssignAutoTeams(gameInfo)
 end
 
 --- Add an observer
