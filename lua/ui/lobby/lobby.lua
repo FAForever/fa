@@ -909,9 +909,9 @@ function SetSlotInfo(slotNum, playerInfo)
 
     -- Disable team selection if "auto teams" is controlling it.
     local autoTeams = gameInfo.GameOptions.AutoTeams
-    UIUtil.setEnabled(slot.team,
-        autoTeams == 'none' or
-        (autoTeams == 'manual' and lobbyComm:IsHost())
+    UIUtil.setEnabled(
+        slot.team,
+        autoTeams == 'none' and (lobbyComm:IsHost() or isLocallyOwned)
     )
     UpdateSlotBackground(slotNum)
 
