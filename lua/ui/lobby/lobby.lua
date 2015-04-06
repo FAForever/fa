@@ -3899,8 +3899,10 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 CPU_Benchmarks[name] = result
                 local id = FindIDForName(name)
                 local slot = FindSlotForID(id)
-                if slot ~= nil then
+                if slot then
                     SetSlotCPUBar(slot, gameInfo.PlayerOptions[slot])
+                else
+                    refreshObserverList()
                 end
             end
         elseif data.Type == 'SetPlayerNotReady' then
@@ -4522,7 +4524,11 @@ function UpdateBenchmark(force)
     if benchmark then
         CPU_Benchmarks[localPlayerName] = benchmark
         lobbyComm:BroadcastData({ Type = 'CPUBenchmark', PlayerName = localPlayerName, Result = benchmark })
-        UpdateCPUBar(localPlayerName)
+        if FindObserverSlotForID(localPlayerID) then
+            refreshObserverList()
+        else
+            UpdateCPUBar(localPlayerName)
+        end
     end
 end
 
