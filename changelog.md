@@ -1,10 +1,3 @@
-Changelog for patch 3641
-------------------------
-
-*Bug fixes*
-- Seraphim sniperbot is able to hit Cybran MML again
-
-
 Changelog for patch 3640
 ------------------------
 

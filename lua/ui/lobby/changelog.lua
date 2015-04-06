@@ -76,15 +76,18 @@ changelog = {
     },
     {
         version = 7,
-        name = "Lobby 2.6.1",
+        name = "Lobby 2.7.0",
         description = {
+            "- Lots of bug fixes",
+            "- Lots of UI polish",
             "- Resources are now shown in all map previews",
             "- The unit manager can once again be seen by non-host players",
-            "- Lots of UI polish",
             "- Preset system now saves activated mods",
             "- Observers can now open the chat menu by pushing ENTER",
             "- Further performance improvements",
             "- Team selectors disabled when auto-teams is overriding them",
+            "- Fixed issue with idle engineer lists",
+            "- Clan tags are now shown in lobby"
         }
     }
 }
