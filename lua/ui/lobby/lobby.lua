@@ -3867,7 +3867,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             for key, val in options do
                 -- The host *is* allowed to set options on slots he doesn't own, of course.
                 if data.SenderID ~= hostID then
-                    if key == 'Team' and gameInfo.GameOption['AutoTeams'] ~= 'none' then
+                    if key == 'Team' and gameInfo.GameOptions['AutoTeams'] ~= 'none' then
                         WARN("Attempt to set Team while Auto Teams are on.")
                         return
                     elseif gameInfo.PlayerOptions[data.Slot].OwnerID ~= data.SenderID then
