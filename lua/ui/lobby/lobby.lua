@@ -875,11 +875,14 @@ function SetSlotInfo(slotNum, playerInfo)
         slot.name._text:SetFont('Arial Gras', 11)
     end
 
+    local facColEnabled = isLocallyOwned or (isHost and not playerInfo.Human)
     slot.faction:Show()
     slot.faction:SetItem(playerInfo.Faction)
+    UIUtil.setEnabled(slot.faction, facColEnabled)
 
     slot.color:Show()
     Check_Availaible_Color(slotNum)
+    UIUtil.setEnabled(slot.color, facColEnabled)
 
     slot.team:Show()
     slot.team:SetItem(playerInfo.Team)
