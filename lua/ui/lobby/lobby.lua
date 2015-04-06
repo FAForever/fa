@@ -2324,6 +2324,9 @@ function HostConvertObserverToPlayer(senderID, fromObserverSlot, toPlayerSlot, i
 
     refreshObserverList()
     SetSlotInfo(toPlayerSlot, gameInfo.PlayerOptions[toPlayerSlot])
+
+    -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
+    AssignAutoTeams(gameInfo)
 end
 
 function HostRemoveAI(slot)
