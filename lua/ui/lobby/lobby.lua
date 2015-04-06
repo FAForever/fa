@@ -5025,7 +5025,7 @@ function CreateHelpWindow()
     -- Help textfield
     local textArea = TextArea(dialogContent, 400, 163)
     textArea:SetFont(UIUtil.bodyFont, 14)
-    textArea:SetColors(nil, "00000000", nil, "00000000")
+    textArea:SetColors(UIUtil.fontColor(), "00000000", UIUtil.fontColor(), "00000000")
     LayoutHelpers.AtLeftIn(textArea, dialogContent, 13)
     LayoutHelpers.AtTopIn(textArea, dialogContent, 10)
     textArea:SetText(import('/lua/ui/lobby/presetHelp.lua').helpText)
