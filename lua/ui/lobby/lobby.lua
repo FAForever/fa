@@ -768,8 +768,9 @@ function SetSlotInfo(slotNum, playerInfo)
         DisableSlot(slotNum)
     end
 
+    local isHost = lobbyComm:IsHost()
     local hostKey
-    if lobbyComm:IsHost() then
+    if isHost then
         hostKey = 'host'
     else
         hostKey = 'client'
@@ -794,7 +795,7 @@ function SetSlotInfo(slotNum, playerInfo)
         slot.name:Enable()
         local slotKeys, slotStrings = GetSlotMenuTables(slotState, hostKey)
         slot.name.slotKeys = slotKeys
-        if lobbyComm:IsHost() and slotState == 'ai' then
+        if isHost and slotState == 'ai' then
             Tooltip.AddComboTooltip(slot.name, GetAITooltipList())
         else
             Tooltip.RemoveComboTooltip(slot.name)
@@ -883,7 +884,7 @@ function SetSlotInfo(slotNum, playerInfo)
     slot.team:Show()
     slot.team:SetItem(playerInfo.Team)
 
-    if lobbyComm:IsHost() then
+    if isHost then
         GpgNetSend('PlayerOption', string.format("faction %s %d %s", playerName, slotNum, playerInfo.Faction))
         GpgNetSend('PlayerOption', string.format("color %s %d %s", playerName, slotNum, playerInfo.PlayerColor))
         GpgNetSend('PlayerOption', string.format("team %s %d %s", playerName, slotNum, playerInfo.Team))
@@ -912,7 +913,7 @@ function SetSlotInfo(slotNum, playerInfo)
     local autoTeams = gameInfo.GameOptions.AutoTeams
     UIUtil.setEnabled(
         slot.team,
-        autoTeams == 'none' and (lobbyComm:IsHost() or isLocallyOwned)
+        autoTeams == 'none' and (isHost or isLocallyOwned)
     )
     UpdateSlotBackground(slotNum)
 
