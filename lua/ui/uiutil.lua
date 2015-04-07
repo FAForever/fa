@@ -346,7 +346,7 @@ function UIFile(filespec)
             if not UIFileCache[useSkin] then UIFileCache[useSkin] = {} end
             UIFileCache[useSkin][filespec] = found
         else
-            WARN(debug.traceback(nil, "Warning: Unable to find file: " .. currentPath .. filespec))
+            WARN(debug.traceback(nil, "Warning: Unable to find file: " .. skins[useSkin].texturesPath .. filespec))
             return filespec
         end
     end
