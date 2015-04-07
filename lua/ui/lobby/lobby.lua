@@ -869,7 +869,7 @@ function SetSlotInfo(slotNum, playerInfo)
                 end
             end
         end
-    else
+    elseif playerInfo.Human then
         -- TODO: Localise!
         slot.name:SetTitleText('Connecting to ... ' .. playerName)
         slot.name._text:SetFont('Arial Gras', 11)
