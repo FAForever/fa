@@ -4048,10 +4048,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 gameInfo.GameOptions[data.Key] = data.Value
                 UpdateGame()
             elseif data.Type == 'GameOptions' then
-                for key, value in data.Options do
-                    gameInfo.GameOptions[key] = value
-                end
-                UpdateGame()
+                SetGameOptions(data.Options)
             elseif data.Type == 'Launch' then
                 local info = data.GameInfo
                 info.GameMods = Mods.GetGameMods(info.GameMods)
