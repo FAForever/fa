@@ -879,7 +879,7 @@ function SetSlotInfo(slotNum, playerInfo)
     end
 
     --\\ Stop - Color the Name in Slot by State
-    if wasConnected(playerInfo.OwnerID) or isLocallyOwned then
+    if wasConnected(playerInfo.OwnerID) or isLocallyOwned or not playerInfo.Human then
         slot.name:SetTitleText(displayName)
         slot.name._text:SetFont('Arial Gras', 15)
         if not table.find(ConnectionEstablished, playerName) then
@@ -899,7 +899,7 @@ function SetSlotInfo(slotNum, playerInfo)
                 end
             end
         end
-    elseif playerInfo.Human then
+    else
         -- TODO: Localise!
         slot.name:SetTitleText('Connecting to ... ' .. playerName)
         slot.name._text:SetFont('Arial Gras', 11)
