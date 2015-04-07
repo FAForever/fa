@@ -407,9 +407,9 @@ end
 
 local function DoSlotBehavior(slot, key, name)
     if key == 'open' then
-        HostSetSlotClosed(hostID, slot, false)
+        HostSetSlotClosed(slot, false)
     elseif key == 'close' then
-        HostSetSlotClosed(hostID, slot, true)
+        HostSetSlotClosed(slot, true)
     elseif key == 'occupy' then
         if IsPlayer(localPlayerID) then
             if lobbyComm:IsHost() then
@@ -2082,7 +2082,7 @@ function OnModsChanged(modlist, ignoreRefresh)
     end
 end
 
-function HostSetSlotClosed(senderID, slot, closed)
+function HostSetSlotClosed(slot, closed)
     if gameInfo.PlayerOptions[slot] then
         return
     end
@@ -3808,7 +3808,7 @@ function ConfigureMapListeners(mapCtrl, scenario)
 
         if lobbyComm:IsHost() then
             marker.OnRightClick = function(self)
-                HostSetSlotClosed(hostID, slot, not gameInfo.ClosedSlots[slot])
+                HostSetSlotClosed(slot, not gameInfo.ClosedSlots[slot])
             end
         end
     end
