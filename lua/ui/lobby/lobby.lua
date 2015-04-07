@@ -1661,7 +1661,6 @@ local function TryLaunch(skipNoObserversCheck)
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
         SetWindowedLobby(false)
 
-        table.print(gameInfo)
         lobbyComm:LaunchGame(gameInfo)
     end
 
@@ -3989,7 +3988,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             elseif data.Type == 'GameInfo' then
                 -- Completely update the game state. To be used exactly once: when first connecting.
                 local hostFlatInfo = data.GameInfo
-                table.print(hostFlatInfo)
                 gameInfo = GameInfo.CreateGameInfo(LobbyComm.maxPlayerSlots, hostFlatInfo)
                 UpdateGame()
             elseif data.Type == 'GameOptions' then
@@ -5028,7 +5026,6 @@ function RefreshAvailablePresetsList(PresetList)
     PresetList:DeleteAllItems()
 
     for k, v in profiles do
-        table.print(v)
         PresetList:AddItem(v.Name)
     end
 end
