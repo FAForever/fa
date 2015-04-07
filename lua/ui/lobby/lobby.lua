@@ -1033,6 +1033,12 @@ local function AssignRandomFactions(gameInfo)
         if player.Faction >= randomFactionID then
             player.Faction = GetRandomFactionIndex()
         end
+
+        -- Set the skin to the faction you'll be playing as, whatever that may be. (prevents
+        -- random-faction people from ending up with something retarded)
+        if player.OwnerID == localPlayerID then
+            UIUtil.SetCurrentSkin(FACTION_NAMES[player.Faction])
+        end
     end
 end
 
@@ -4020,10 +4026,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         for i, v in gameInfo.PlayerOptions do
             if v.Human and v.OwnerID == player then
                 Prefs.SetToCurrentProfile('LoadingFaction', v.Faction)
-
-                -- Set current skin to the actual faction you'll be playing as (the skin may not be
-                -- correct if the player chose "random").
-                UIUtil.SetCurrentSkin(FACTION_NAMES[v.faction])
                 break
             end
         end
