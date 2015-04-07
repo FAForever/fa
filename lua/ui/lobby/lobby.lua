@@ -1824,7 +1824,7 @@ local function UpdateGame()
     -- If the large map is shown, update it.
     RefreshLargeMap()
 
-    SetRuleTitleText(gameInfo.GameOptions.GameRules)
+    SetRuleTitleText(gameInfo.GameOptions.GameRules or "")
 end
 
 --- Update the game quality display
