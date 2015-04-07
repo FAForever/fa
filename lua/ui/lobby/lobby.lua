@@ -1823,6 +1823,8 @@ local function UpdateGame()
 
     -- If the large map is shown, update it.
     RefreshLargeMap()
+
+    SetRuleTitleText(gameInfo.GameOptions.GameRules)
 end
 
 --- Update the game quality display
@@ -3985,7 +3987,11 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 gameInfo = GameInfo.CreateGameInfo(LobbyComm.maxPlayerSlots, hostFlatInfo)
                 UpdateGame()
             elseif data.Type == 'GameOptions' then
-                SetGameOptions(data.Options)
+                for key, value in data.Options do
+                    gameInfo.GameOptions[key] = value
+                end
+
+                UpdateGame()
             elseif data.Type == 'Launch' then
                 local info = data.GameInfo
                 info.GameMods = Mods.GetGameMods(info.GameMods)
