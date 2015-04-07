@@ -1534,45 +1534,37 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         end
     end
 
+    local teamsPresent = {}
+
     -- make sure there are some players (could all be observers?)
     -- Also count teams. There needs to be at least 2 teams (or all FFA) represented
-    local totalPlayers = 0
-    local totalHumanPlayers = 0
-    local lastTeam = false
-    local allFFA = true
-    local moreThanOneTeam = false
+    local numPlayers = 0
+    local numHumanPlayers = 0
+    local numTeams = 0
     for slot, player in gameInfo.PlayerOptions:pairs() do
         if player then
-            totalPlayers = totalPlayers + 1
+            numPlayers = numPlayers + 1
+
             if player.Human then
-                totalHumanPlayers = totalHumanPlayers + 1
+                numHumanPlayers = numHumanPlayers + 1
             end
-            if not moreThanOneTeam and lastTeam and lastTeam ~= player.Team then
-                moreThanOneTeam = true
+
+            -- Make sure to increment numTeams for people in the special "-" team, represented by 1.
+            if not teamsPresent[player.Team] or teamsPresent[player.Team] == 1 then
+                teamsPresent[player.Team] = true
+                numTeams = numTeams + 1
             end
-            if player.Team ~= 1 then
-                allFFA = false
-            end
-            lastTeam = player.Team
         end
     end
 
-    if gameInfo.GameOptions['Victory'] ~= 'sandbox' then
-        local valid = true
-        if totalPlayers == 1 then
-            valid = false
-        end
-        if not allFFA and not moreThanOneTeam then
-            valid = false
-        end
-        if not valid then
-            AddChatText(LOC("<LOC lobui_0241>There must be more than one player or team or the Victory Condition must be set "..
-                            "to Sandbox."))
-            return
-        end
+    -- Ensure, for a non-sandbox game, there are some teams to fight.
+    if gameInfo.GameOptions['Victory'] ~= 'sandbox' and numTeams < 2 then
+        AddChatText(LOC("<LOC lobui_0241>There must be more than one player or team or the Victory Condition must be set "..
+                "to Sandbox."))
+        return
     end
 
-    if totalPlayers == 0 then
+    if numPlayers == 0 then
         AddChatText(LOC("<LOC lobui_0233>There are no players assigned to player slots, can not continue"))
         return
     end
@@ -1583,7 +1575,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
 
     if not singlePlayer then
         if gameInfo.GameOptions.AllowObservers then
-            if totalPlayers > 3 and not stillAllowObservers then
+            if numPlayers > 3 and not stillAllowObservers then
                 UIUtil.QuickDialog(GUI, "<LOC lobui_0521>There are players for a team game and allow observers is enabled. "..
                                    "Do you still wish to launch?",
                                    "<LOC _Yes>", function()
@@ -1608,7 +1600,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
                 end
                 i = i + 1
             until i == 9
-            if totalPlayers > 3 and not stillAllowLockedTeams and totalPlayers ~= n and gameInfo.GameOptions.AutoTeams
+            if numPlayers > 3 and not stillAllowLockedTeams and numPlayers ~= n and gameInfo.GameOptions.AutoTeams
                 == 'none' then
                 UIUtil.QuickDialog(GUI, "<LOC lobui_0526>There are players for a team game and teams are locked.  Do you " ..
                                    "still wish to launch?",
@@ -1665,7 +1657,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         end
     end
 
-    numberOfPlayers = totalPlayers
+    numberOfPlayers = numPlayers
 
     local function LaunchGame()
         if gameInfo.GameOptions['RandomMap'] ~= 'Off' then
