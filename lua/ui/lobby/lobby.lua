@@ -1015,7 +1015,7 @@ end
 function GetPlayerCount()
     local numPlayers = 0
     for k,player in gameInfo.PlayerOptions:pairs() do
-        if player.Team >= 0 then
+        if player then
             numPlayers = numPlayers + 1
         end
     end
