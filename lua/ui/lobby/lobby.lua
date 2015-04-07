@@ -1033,12 +1033,6 @@ local function AssignRandomFactions(gameInfo)
         if player.Faction >= randomFactionID then
             player.Faction = GetRandomFactionIndex()
         end
-
-        -- Set the skin to the faction you'll be playing as, whatever that may be. (prevents
-        -- random-faction people from ending up with something retarded)
-        if player.OwnerID == localPlayerID then
-            UIUtil.SetCurrentSkin(FACTION_NAMES[player.Faction])
-        end
     end
 end
 
@@ -4000,6 +3994,16 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 local info = data.GameInfo
                 info.GameMods = Mods.GetGameMods(info.GameMods)
                 SetWindowedLobby(false)
+
+                -- Evil hack to correct the skin for randomfaction players before launch.
+                for index, player in info.PlayerOptions do
+                    -- Set the skin to the faction you'll be playing as, whatever that may be. (prevents
+                    -- random-faction people from ending up with something retarded)
+                    if player.OwnerID == localPlayerID then
+                        UIUtil.SetCurrentSkin(FACTION_NAMES[player.Faction])
+                    end
+                 end
+
                 lobbyComm:LaunchGame(info)
             elseif data.Type == 'ClearSlot' then
                 gameInfo.PlayerOptions[data.Slot] = nil
