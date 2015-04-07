@@ -2083,6 +2083,7 @@ function OnModsChanged(modlist, ignoreRefresh)
 end
 
 function HostSetSlotClosed(slot, closed)
+    -- Don't close an occupied slot.
     if gameInfo.PlayerOptions[slot] then
         return
     end
@@ -4058,11 +4059,8 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 gameInfo.GameMods = data.GameMods
                 UpdateGame()
                 import('/lua/ui/lobby/ModsManager.lua').UpdateClientModStatus(gameInfo.GameMods)
-            elseif data.Type == 'SlotClose' then
-                gameInfo.ClosedSlots[data.Slot] = true
-                ClearSlotInfo(data.Slot)
-            elseif data.Type == 'SlotOpen' then
-                gameInfo.ClosedSlots[data.Slot] = nil
+            elseif data.Type == 'SlotClosed' then
+                gameInfo.ClosedSlots[data.Slot] = data.Closed
                 ClearSlotInfo(data.Slot)
             end
         end
