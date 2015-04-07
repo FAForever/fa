@@ -4044,9 +4044,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 table.print(hostFlatInfo)
                 gameInfo = GameInfo.CreateGameInfo(LobbyComm.maxPlayerSlots, hostFlatInfo)
                 UpdateGame()
-            elseif data.Type == 'GameOption' then
-                gameInfo.GameOptions[data.Key] = data.Value
-                UpdateGame()
             elseif data.Type == 'GameOptions' then
                 SetGameOptions(data.Options)
             elseif data.Type == 'Launch' then
