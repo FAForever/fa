@@ -1523,7 +1523,7 @@ function UpdateAvailableSlots( numAvailStartSpots )
     end
 end
 
-local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObserversCheck)
+local function TryLaunch(skipNoObserversCheck)
     if not singlePlayer then
         local notReady = GetPlayersNotReady()
         if notReady then
@@ -1573,52 +1573,6 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         return
     end
 
-    if not singlePlayer then
-        if gameInfo.GameOptions.AllowObservers then
-            if numPlayers > 3 and not stillAllowObservers then
-                UIUtil.QuickDialog(GUI, "<LOC lobui_0521>There are players for a team game and allow observers is enabled. "..
-                                   "Do you still wish to launch?",
-                                   "<LOC _Yes>", function()
-                                       TryLaunch(true, false, false)
-                                       stillAllowObservers = true
-                                   end,
-                                   "<LOC _No>",
-                                   nil,
-                                   nil, nil,
-                                   true,
-                                   {worldCover = false, enterButton = 1, escapeButton = 2}
-                                   )
-                return
-            end
-        end
-        if gameInfo.GameOptions['TeamLock'] == 'locked' then
-            local i = 1
-            local n = 0
-            repeat
-                if gameInfo.PlayerOptions[i].Team ~= 1 then
-                    n = n + 1
-                end
-                i = i + 1
-            until i == 9
-            if numPlayers > 3 and not stillAllowLockedTeams and numPlayers ~= n and gameInfo.GameOptions.AutoTeams
-                == 'none' then
-                UIUtil.QuickDialog(GUI, "<LOC lobui_0526>There are players for a team game and teams are locked.  Do you " ..
-                                   "still wish to launch?",
-                                   "<LOC _Yes>", function()
-                                       TryLaunch(true, true, false)
-                                       stillAllowLockedTeams = true
-                                   end,
-                                   "<LOC _No>",
-                                   nil,
-                                   nil, nil,
-                                   true,
-                                   {worldCover = false, enterButton = 1, escapeButton = 2}
-                                   )
-                return
-            end
-        end
-    end
-
     if not gameInfo.GameOptions.AllowObservers then
         local hostIsObserver = false
         local anyOtherObservers = false
@@ -1646,7 +1600,7 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
                 gameInfo.Observers = WatchedValueArray(LobbyComm.maxPlayerSlots)
             else
                 UIUtil.QuickDialog(GUI, "<LOC lobui_0278>Launching will kick observers because \"allow observers\" is disabled.  Continue?",
-                                   "<LOC _Yes>", function() TryLaunch(true, true, true) end,
+                                   "<LOC _Yes>", function() TryLaunch(true) end,
                                    "<LOC _No>", nil,
                                    nil, nil,
                                    true,
