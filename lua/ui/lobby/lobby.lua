@@ -1550,7 +1550,7 @@ local function TryLaunch(skipNoObserversCheck)
             end
 
             -- Make sure to increment numTeams for people in the special "-" team, represented by 1.
-            if not teamsPresent[player.Team] or teamsPresent[player.Team] == 1 then
+            if not teamsPresent[player.Team] or player.Team == 1 then
                 teamsPresent[player.Team] = true
                 numTeams = numTeams + 1
             end
