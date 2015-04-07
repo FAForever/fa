@@ -757,9 +757,19 @@ function SetSlotInfo(slotNum, playerInfo)
         end
     end
 
-	local isLocallyOwned = IsLocallyOwned(slotNum)
+    local slot = GUI.slots[slotNum]
+    local isHost = lobbyComm:IsHost()
+    local isLocallyOwned = IsLocallyOwned(slotNum)
+
+    -- Set enabledness of controls according to host privelage etc.
+    -- Yeah, we set it twice. No, it's not brilliant. Blurgh.
+    local facColEnabled = isLocallyOwned or (isHost and not playerInfo.Human)
+    UIUtil.setEnabled(slot.faction, facColEnabled)
+    UIUtil.setEnabled(slot.color, facColEnabled)
+
+    -- Possibly override it due to the ready box.
     if isLocallyOwned then
-        if gameInfo.PlayerOptions[slotNum].Ready then
+        if playerInfo.Ready then
             DisableSlot(slotNum, true)
         else
             EnableSlot(slotNum)
@@ -768,15 +778,35 @@ function SetSlotInfo(slotNum, playerInfo)
         DisableSlot(slotNum)
     end
 
-    local isHost = lobbyComm:IsHost()
+    --- Returns true if the team selector for this slot should be enabled.
+    --
+    -- The predicate was getting unpleasantly long to read.
+    function teamSelectionEnabled(autoTeams, ready, locallyOwned, isHost)
+        -- If autoteams has control, no selector for you.
+        if autoTeams ~= 'none' then
+            return false
+        end
+
+        -- You can control your own one when you're not ready.
+        if locallyOwned then
+            return not ready
+        end
+
+        -- The host can control that of others. TODO: Prevent him from doing this while ready
+        -- himself. We need some sort of sane state-of-self tracking for this...
+        return isHost
+    end
+
+    -- Disable team selection if "auto teams" is controlling it. Moderatelty ick.
+    local autoTeams = gameInfo.GameOptions.AutoTeams
+    UIUtil.setEnabled(slot.team, teamSelectionEnabled(autoTeams, playerInfo.Ready, isLocallyOwned, isHost))
+
     local hostKey
     if isHost then
         hostKey = 'host'
     else
         hostKey = 'client'
     end
-
-    local slot = GUI.slots[slotNum]
 
     -- These states are used to select the appropriate strings with GetSlotMenuTables.
     local slotState
@@ -875,14 +905,11 @@ function SetSlotInfo(slotNum, playerInfo)
         slot.name._text:SetFont('Arial Gras', 11)
     end
 
-    local facColEnabled = isLocallyOwned or (isHost and not playerInfo.Human)
     slot.faction:Show()
     slot.faction:SetItem(playerInfo.Faction)
-    UIUtil.setEnabled(slot.faction, facColEnabled)
 
     slot.color:Show()
     Check_Availaible_Color(slotNum)
-    UIUtil.setEnabled(slot.color, facColEnabled)
 
     slot.team:Show()
     slot.team:SetItem(playerInfo.Team)
@@ -912,12 +939,6 @@ function SetSlotInfo(slotNum, playerInfo)
         Tooltip.AddControlTooltip(slot.KinderCountry, {text=LOC("<LOC lobui_0413>Country"), body=CountryTooltips[playerInfo.Country]})
     end
 
-    -- Disable team selection if "auto teams" is controlling it.
-    local autoTeams = gameInfo.GameOptions.AutoTeams
-    UIUtil.setEnabled(
-        slot.team,
-        autoTeams == 'none' and (isHost or isLocallyOwned)
-    )
     UpdateSlotBackground(slotNum)
 
     -- Set the CPU bar
