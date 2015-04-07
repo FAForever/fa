@@ -1577,13 +1577,6 @@ local function TryLaunch(stillAllowObservers, stillAllowLockedTeams, skipNoObser
         return
     end
 
-
-    if totalHumanPlayers == 0 and gameInfo.Observers:isEmpty() then
-        AddChatText(LOC("<LOC lobui_0239>There must be at least one non-ai player or one observer, can not continue"))
-        return
-    end
-
-
     if not EveryoneHasEstablishedConnections() then
         return
     end
