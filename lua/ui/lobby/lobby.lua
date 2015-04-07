@@ -1025,7 +1025,7 @@ local function GetRandomFactionIndex()
 end
 
 
-local function AssignRandomFactions(gameInfo)
+local function AssignRandomFactions()
     local randomFactionID = table.getn(FactionData.Factions) + 1
     for index, player in gameInfo.PlayerOptions:pairs() do
         -- note that this doesn't need to be aware if player has supcom or not since they would only be able to select
@@ -1206,7 +1206,7 @@ function autobalance_quality(players)
     return quality
 end
 
-local function AssignRandomStartSpots(gameInfo)
+local function AssignRandomStartSpots()
     function teamsAddSpot(teams, team, spot)
         if(not teams[team]) then
             teams[team] = {}
@@ -1332,21 +1332,20 @@ local function AssignRandomStartSpots(gameInfo)
         best = table.remove(results, 1)
         gameInfo.GameOptions['Quality'] = best.quality
 
-        -- TODO: LazyVars may very well have killed this. *ahem*.
-        local orgPlayerOptions = table.deepcopy(gameInfo.PlayerOptions)
+        -- Copy a reference to each of the PlayerData objects indexed by their original slots.
+        local orgPlayerOptions = {}
         for k, p in gameInfo.PlayerOptions:pairs() do
-            orgPlayerOptions[k] = table.deepcopy(p)
+            orgPlayerOptions[k] = p
         end
 
-        gameInfo.PlayerOptions = WatchedValueArray(LobbyComm.maxPlayerSlots)
+        -- Rearrange the players in the slots to match the chosen configuration. The result object
+        -- maps old slots to new slots, and we use orgPlayerOptions to avoid losing a reference to
+        -- an object (and because swapping is too much like hard work).
         for _, r in best.result do
-            local slot = r['slot']
-            local player = r['player']
-            local team = r['team']
-            gameInfo.PlayerOptions[slot] = table.deepcopy(orgPlayerOptions[player])
-            -- TODO: Is this actually a field we want?
-            gameInfo.PlayerOptions[slot].StartSpot = slot
-            gameInfo.PlayerOptions[slot].Team = team
+            local playerOptions = orgPlayerOptions[r.player]
+            gameInfo.PlayerOptions[r.slot] = playerOptions
+            playerOptions.StartSpot = r.slot
+            playerOptions.Team = r.team
         end
     end
 end
@@ -1360,7 +1359,7 @@ local function sendObserversList(gameInfo)
 end
 
 
-local function AssignAutoTeams(gameInfo)
+local function AssignAutoTeams()
     -- A function to take a player index and return the team they should be on.
     local getTeam
     if gameInfo.GameOptions.AutoTeams == 'lvsr' then
@@ -1410,7 +1409,7 @@ local function AssignAutoTeams(gameInfo)
     end
 end
 
-local function AssignAINames(gameInfo)
+local function AssignAINames()
     local aiNames = import('/lua/ui/lobby/aiNames.lua').ainames
     local nameSlotsTaken = {}
     for index, faction in FactionData.Factions do
@@ -1621,11 +1620,11 @@ local function TryLaunch(skipNoObserversCheck)
 
         SetFrontEndData('NextOpBriefing', nil)
         -- assign random factions just as game is launched
-        AssignRandomFactions(gameInfo)
-        AssignRandomStartSpots(gameInfo)
+        AssignRandomFactions()
+        AssignRandomStartSpots()
         --assign the teams just before launch
-        AssignAutoTeams(gameInfo)
-        AssignAINames(gameInfo)
+        AssignAutoTeams()
+        AssignAINames()
         -- Redundantly send the observer list, because we're mental.
         sendObserversList(gameInfo)
         local allRatings = {}
