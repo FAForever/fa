@@ -769,7 +769,7 @@ function SetSlotInfo(slotNum, playerInfo)
 
     -- Possibly override it due to the ready box.
     if isLocallyOwned then
-        if playerInfo.Ready then
+        if playerInfo.Ready and playerInfo.Human then
             DisableSlot(slotNum, true)
         else
             EnableSlot(slotNum)
