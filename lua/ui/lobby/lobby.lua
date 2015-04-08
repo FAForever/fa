@@ -782,6 +782,10 @@ function SetSlotInfo(slotNum, playerInfo)
     --
     -- The predicate was getting unpleasantly long to read.
     function teamSelectionEnabled(autoTeams, ready, locallyOwned, isHost)
+        if isHost and not playerInfo.Human then
+            return true
+        end
+
         -- If autoteams has control, no selector for you.
         if autoTeams ~= 'none' then
             return false
