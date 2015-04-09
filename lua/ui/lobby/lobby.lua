@@ -1366,11 +1366,12 @@ local function AssignRandomStartSpots()
         -- Rearrange the players in the slots to match the chosen configuration. The result object
         -- maps old slots to new slots, and we use orgPlayerOptions to avoid losing a reference to
         -- an object (and because swapping is too much like hard work).
+        gameInfo.PlayerOptions = {}
         for _, r in best.result do
             local playerOptions = orgPlayerOptions[r.player]
-            gameInfo.PlayerOptions[r.slot] = playerOptions
-            playerOptions.StartSpot = r.slot
             playerOptions.Team = r.team
+            playerOptions.StartSpot = r.slot
+            gameInfo.PlayerOptions[r.slot] = playerOptions
         end
     end
 end
