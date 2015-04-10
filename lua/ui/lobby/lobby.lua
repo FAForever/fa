@@ -1642,6 +1642,15 @@ local function TryLaunch(skipNoObserversCheck)
         -- Redundantly send the observer list, because we're mental.
         sendObserversList()
 
+        -- These two things must happen before the flattening step, mostly for terrible reasons.
+        -- This isn't ideal, as it leads to redundant UI repaints :/
+        AssignAutoTeams()
+
+        -- Force observers to start with the UEF skin to prevent them from launching as "random".
+        if IsObserver(localPlayerID) then
+            UIUtil.SetCurrentSkin("uef")
+        end
+
         -- Eliminate the WatchedValue structures.
         gameInfo = GameInfo.Flatten(gameInfo)
 
@@ -1654,8 +1663,6 @@ local function TryLaunch(skipNoObserversCheck)
         -- assign random factions just as game is launched
         AssignRandomFactions()
         AssignRandomStartSpots()
-        --assign the teams just before launch
-        AssignAutoTeams()
         AssignAINames()
         local allRatings = {}
         for k,v in gameInfo.PlayerOptions do
@@ -1664,11 +1671,6 @@ local function TryLaunch(skipNoObserversCheck)
             end
         end
         gameInfo.GameOptions['Ratings'] = allRatings
-
-        -- Force observers to start with the UEF skin to prevent them from launching as "random".
-        if IsObserver(localPlayerID) then
-            UIUtil.SetCurrentSkin("uef")
-        end
 
         -- Tell everyone else to launch and then launch ourselves.
         -- TODO: Sending gamedata here isn't necessary unless lobbyComm is fucking stupid and allows
