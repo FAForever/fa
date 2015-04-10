@@ -1217,14 +1217,14 @@ function autobalance_quality(players)
         local player = Player.create(playerInfo.PlayerName,
                                      Rating.create(playerInfo.MEAN or 1500, playerInfo.DEV or 500))
 
-        if(not teams) then
-            teams = Teams.create(team, player)
-        else
-            teams:addPlayer(team, player)
+        if not teams then
+            teams = Teams.create()
         end
+
+        teams:addPlayer(team, player)
     end
 
-    if(teams) then
+    if teams then
         quality = Trueskill.computeQuality(teams)
     end
 
