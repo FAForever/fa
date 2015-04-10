@@ -1825,7 +1825,7 @@ local function UpdateGame()
 
     -- Set the map name at the top right corner in lobby
     if scenarioInfo.name then
-        SetText2(GUI.MapNameLabel, scenarioInfo.name, 20)
+        GUI.MapNameLabel:StreamText(scenarioInfo.name, 20)
     end
 
     -- Add Tooltip info on Map Name Label
@@ -1906,7 +1906,7 @@ function ShowGameQuality()
 
     if quality > 0 then
         gameInfo.GameOptions.Quality = quality
-        SetText2(GUI.GameQualityLabel, "Game quality : " .. quality .. "%", 20)
+        GUI.GameQualityLabel:StreamText("Game quality : " .. quality .. "%", 20)
     end
 end
 
@@ -2730,7 +2730,7 @@ function CreateUI(maxPlayers)
         ["init_xtremewars.lua"] = "XtremeWars",
 
     }
-    SetText2(GUI.ModFeaturedLabel, modLabels[argv.initName] or "", 20)
+    GUI.ModFeaturedLabel:StreamText(modLabels[argv.initName] or "", 20)
 
     -- Lobby options panel
     GUI.LobbyOptions = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/BUTTON/medium/', "Settings")
@@ -4822,13 +4822,6 @@ function ShowLobbyOptionsDialog()
     --
     local LobbyBackgroundStretch = Prefs.GetFromCurrentProfile('LobbyBackgroundStretch') or 'true'
     cbox_StretchBG:SetCheck(LobbyBackgroundStretch == 'true', true)
-end
-
--- Experimental Animated Text Function
-SetText2 = function(self, text, delay)
-    if self:GetText() ~= text then
-        self:StreamText(text, delay)
-    end
 end
 
 -- Load and return the current list of presets from persistent storage.
