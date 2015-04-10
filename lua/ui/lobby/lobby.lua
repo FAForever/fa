@@ -1052,7 +1052,7 @@ end
 
 local function AssignRandomFactions()
     local randomFactionID = table.getn(FactionData.Factions) + 1
-    for index, player in gameInfo.PlayerOptions:pairs() do
+    for index, player in gameInfo.PlayerOptions do
         -- note that this doesn't need to be aware if player has supcom or not since they would only be able to select
         -- the random faction ID if they have supcom
         if player.Faction >= randomFactionID then
@@ -1359,7 +1359,7 @@ local function AssignRandomStartSpots()
 
         -- Copy a reference to each of the PlayerData objects indexed by their original slots.
         local orgPlayerOptions = {}
-        for k, p in gameInfo.PlayerOptions:pairs() do
+        for k, p in gameInfo.PlayerOptions do
             orgPlayerOptions[k] = p
         end
 
@@ -1440,7 +1440,7 @@ local function AssignAINames()
     for index, faction in FactionData.Factions do
         nameSlotsTaken[index] = {}
     end
-    for index, player in gameInfo.PlayerOptions:pairs() do
+    for index, player in gameInfo.PlayerOptions do
         if not player.Human then
             local playerFaction = player.Faction
             local factionNames = aiNames[FactionData.Factions[playerFaction].Key]
@@ -1638,6 +1638,12 @@ local function TryLaunch(skipNoObserversCheck)
     numberOfPlayers = numPlayers
 
     local function LaunchGame()
+        -- Redundantly send the observer list, because we're mental.
+        sendObserversList(gameInfo)
+
+        -- Eliminate the WatchedValue structures.
+        gameInfo = GameInfo.Flatten(gameInfo)
+
         if gameInfo.GameOptions['RandomMap'] ~= 'Off' then
             autoRandMap = true
             autoMap()
@@ -1650,10 +1656,8 @@ local function TryLaunch(skipNoObserversCheck)
         --assign the teams just before launch
         AssignAutoTeams()
         AssignAINames()
-        -- Redundantly send the observer list, because we're mental.
-        sendObserversList(gameInfo)
         local allRatings = {}
-        for k,v in gameInfo.PlayerOptions:pairs() do
+        for k,v in gameInfo.PlayerOptions do
             if v.Human and v.PL then
                 allRatings[v.PlayerName] = v.PL
             end
@@ -1664,9 +1668,6 @@ local function TryLaunch(skipNoObserversCheck)
         if IsObserver(localPlayerID) then
             UIUtil.SetCurrentSkin("uef")
         end
-
-        -- Eliminate the WatchedValue structures.
-        gameInfo = GameInfo.Flatten(gameInfo)
 
         -- Tell everyone else to launch and then launch ourselves.
         -- TODO: Sending gamedata here isn't necessary unless lobbyComm is fucking stupid and allows
