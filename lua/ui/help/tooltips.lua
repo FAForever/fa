@@ -1140,7 +1140,7 @@ Tooltips = {
     },
     lob_auto_manual = {
         title = "<LOC lobui_0604>Manual Autoteams",
-        description = "<LOC lobui_0605>Start positions are bound to teams in a way defined by the host by clicking on the positions on the map",
+        description = "<LOC lobui_0605>Start positions are bound to teams in a way defined by the host by clicking on the positions on the map. For stupid reasons, this currently only works when 'random' (that is, automatically balanced) spawns are enabled",
     },
     lob_auto_none = {
         title = "<LOC lobui_0602>Off",
