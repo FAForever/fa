@@ -39,9 +39,6 @@ EnhanceTask = Class(ScriptTask) {
             else
                 unit:OnWorkBegin(self.CommandData.Enhancement)
                 ChangeState(self, self.Enhancing)
-                if unit.UpdateAssistersConsumption then
-                    unit:UpdateAssistersConsumption()
-                end
                 return TASKSTATUS.Repeat
             end
         end,
