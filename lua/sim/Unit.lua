@@ -905,19 +905,26 @@ Unit = Class(moho.unit_methods) {
     end,
 
     UpdateAssistersConsumption = function(self)
-        local guards = self:GetGuards()
+        local units = {}
         --We need to check all the units assisting.
-        for k,v in guards do
+        for k,v in self:GetGuards() do
             if not v:IsDead() then
-                v:UpdateConsumptionValues()
+                table.insert(units, v)
             end
         end
 
-        --Are there any units repairing?
         local workers = self:GetAIBrain():GetUnitsAroundPoint(( categories.REPAIR), self:GetPosition(), 50, 'Ally' )
         for k,v in workers do
-            if not v:IsDead() and v:IsUnitState('Repairing')  then
+            if not v:IsDead() and v:IsUnitState('Repairing') and v:GetFocusUnit() == self then
+                table.insert(units, v)
+            end
+        end
+
+        for _, v in units do
+            if not v.updatedConsumption then
+                v.updatedConsumption = true -- recursive protection
                 v:UpdateConsumptionValues()
+                v.updatedConsumption = false
             end
         end
     end,
@@ -945,15 +952,12 @@ Unit = Class(moho.unit_methods) {
             local targetData
             local baseData
 
-            if focus and focus.WorkItem and focus.WorkProgress < 1 then
+            if focus then -- always inherit work status of focus
                 self:InheritWork(focus)
             end
 
             if self.WorkItem then --Enhancement
                 targetData = self.WorkItem
-                if self.WorkItem and (self_state == 'Enhancing' or self_state == 'Upgrading') then
-                    self:UpdateAssistersConsumption()
-                end
             elseif focus then --Handling upgrades
                 if self_state == 'Upgrading' then
                     baseData = self:GetBlueprint().Economy --Upgrading myself, substract ev. baseCost
@@ -984,6 +988,8 @@ Unit = Class(moho.unit_methods) {
             energy_rate = energy / time
             mass_rate = mass / time
         end
+
+        self:UpdateAssistersConsumption()
 
         local myBlueprint = self:GetBlueprint()
         if self.MaintenanceConsumption then
@@ -2594,10 +2600,11 @@ Unit = Class(moho.unit_methods) {
         self:PlayUnitAmbientSound('EnhanceLoop')
         self:UpdateConsumptionValues()
         self:CreateEnhancementEffects(work)
-        ChangeState(self,self.WorkingState)
+        ChangeState(self, self.WorkingState)
     end,
 
     OnWorkEnd = function(self, work)
+        self:ClearWork()
         self:SetActiveConsumptionInactive()
         self:PlayUnitSound('EnhanceEnd')
         self:StopUnitAmbientSound('EnhanceLoop')
@@ -2605,10 +2612,10 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnWorkFail = function(self, work)
+        self:ClearWork()
         self:SetActiveConsumptionInactive()
         self:PlayUnitSound('EnhanceFail')
         self:StopUnitAmbientSound('EnhanceLoop')
-        self:ClearWork()
         self:CleanupEnhancementEffects()
     end,
 
@@ -3544,14 +3551,11 @@ Unit = Class(moho.unit_methods) {
         end,
 
         OnWorkEnd = function(self, work)
+            self:ClearWork()
             self:SetActiveConsumptionInactive()
             AddUnitEnhancement(self, work)
             self:CleanupEnhancementEffects(work)
             self:CreateEnhancement(work)
-            self.WorkItem = nil
-            self.WorkItemBuildCostEnergy = nil
-            self.WorkItemBuildCostMass = nil
-            self.WorkItemBuildTime = nil
             self:PlayUnitSound('EnhanceEnd')
             self:StopUnitAmbientSound('EnhanceLoop')
             self:EnableDefaultToggleCaps()
