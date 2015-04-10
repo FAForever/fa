@@ -7544,7 +7544,7 @@ lobui_0601="Odd numbered slots vs even numbered slots. Subject to map design, yo
 lobui_0602="Off"
 lobui_0603="No automatic teams"
 lobui_0604="Manual Autoteams"
-lobui_0605="Start positions are bound to teams in a way defined by the host by clicking on the positions on the map"
+lobui_0605="Start positions are bound to teams in a way defined by the host by clicking on the positions on the map. This only works when random spawns are enabled."
 lobui_0606="Left vs Right"
 
 desync_0002="Don't tell me any more"
