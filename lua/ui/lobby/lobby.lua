@@ -373,6 +373,19 @@ local function HandleSlotSwitches(moveFrom, moveTo)
     SendSystemMessage(fromOpts.PlayerName..' has switched with '..toOpts.PlayerName, 'switch')
 end
 
+--- Get the value of the LastFaction, sanitised in case it's an unsafe value.
+--
+-- This means when some retarded mod (*cough*Nomads*cough*) writes a large number to LastFaction, we
+-- don't catch fire.
+function GetSanitisedLastFaction()
+    local lastFaction = Prefs.GetFromCurrentProfile('LastFaction') or 1
+    if lastFaction > table.getn(FactionData.Factions) + 1 or lastFaction < 1 then
+        lastFaction = 1
+    end
+
+    return lastFaction
+end
+
 --- Get a PlayerData object for the local player, configured using data from their profile.
 function GetLocalPlayerData()
     return PlayerData(
@@ -381,7 +394,7 @@ function GetLocalPlayerData()
             OwnerID = localPlayerID,
             Human = true,
             PlayerColor = Prefs.GetFromCurrentProfile('LastColor'),
-            Faction = Prefs.GetFromCurrentProfile('LastFaction'),
+            Faction = GetSanitisedLastFaction(),
             PlayerClan = argv.playerClan,
             PL = playerRating,
             RC = argv.ratingColor,
@@ -420,7 +433,7 @@ local function DoSlotBehavior(slot, key, name)
             end
         elseif IsObserver(localPlayerID) then
             if lobbyComm:IsHost() then
-                local requestedFaction = Prefs.GetFromCurrentProfile('LastFaction')
+                local requestedFaction = GetSanitisedLastFaction()
                 HostConvertObserverToPlayer(hostID, FindObserverSlotForID(localPlayerID), slot)
             else
                 lobbyComm:SendData(
@@ -2660,7 +2673,7 @@ function CreateUI(maxPlayers)
     local Tooltip = import('/lua/ui/game/tooltip.lua')
 
     local isHost = lobbyComm:IsHost()
-    local lastFaction = Prefs.GetFromCurrentProfile('LastFaction') or 1
+    local lastFaction = GetSanitisedLastFaction()
     UIUtil.SetCurrentSkin(FACTION_NAMES[lastFaction])
 
     ---------------------------------------------------------------------------
@@ -3367,7 +3380,7 @@ function CreateUI(maxPlayers)
     end
 
     -- Setup large pretty faction selector and set the factional background to its initial value.
-    local lastFaction = Prefs.GetFromCurrentProfile('LastFaction') or 1
+    local lastFaction = GetSanitisedLastFaction()
     CreateUI_Faction_Selector(lastFaction)
 
     RefreshLobbyBackground(lastFaction)
@@ -3743,7 +3756,7 @@ function ConfigureMapListeners(mapCtrl, scenario)
                         end
                     elseif IsObserver(localPlayerID) then
                         if lobbyComm:IsHost() then
-                            local requestedFaction = Prefs.GetFromCurrentProfile('LastFaction')
+                            local requestedFaction = GetSanitisedLastFaction()
                             HostConvertObserverToPlayer(hostID, FindObserverSlotForID(localPlayerID), slot)
                         else
                             lobbyComm:SendData(
@@ -4705,7 +4718,7 @@ function RefreshLobbyBackground(faction)
         GUI.background:Destroy()
     end
     if LobbyBackground == 1 then -- Factions
-        faction = faction or Prefs.GetFromCurrentProfile('LastFaction') or 0
+        faction = faction or GetSanitisedLastFaction()
         if FACTION_NAMES[faction] then
             GUI.background = Bitmap(GUI, "/textures/ui/common/BACKGROUND/faction/faction-background-paint_" .. FACTION_NAMES[faction] .. "_bmp.dds")
         else
