@@ -26,6 +26,7 @@ Checkbox = Class(Group) {
             return
         end
 
+        label = LOC(label)
         local textfield = UIUtil.CreateText(self, label, labelSize or 13, 'Arial', true)
         textfield.Height:Set(checkBmp:Height())
         textfield:SetText(label)

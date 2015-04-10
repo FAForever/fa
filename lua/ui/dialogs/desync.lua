@@ -3,56 +3,69 @@
 --* Author: Chris Blackwell
 --* Summary: handles multiplayer desyncs
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Group = import('/lua/maui/group.lua').Group
+local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
+local TextArea = import('/lua/ui/controls/textarea.lua').TextArea
 
 local dialog = false
+local doesntCare = false
 
 function UpdateDialog(beatNumber, strings)
-    if not dialog then
-        dialog = Group(GetFrame(0), "updateDialogGroup")
-		LOG("Desynch at beat " .. beatNumber .. " tick " .. GetGameTimeSeconds())
-        dialog.Width:Set(200)
-        dialog.Height:Set(250)
-        dialog.Depth:Set(GetFrame(0):GetTopmostDepth() + 10)
-        LayoutHelpers.AtCenterIn(dialog, GetFrame(0))
-        local border, bg = UIUtil.CreateBorder(dialog, true)
+    WARN("Desynch at beat " .. beatNumber .. " tick " .. GetGameTimeSeconds())
+    if doesntCare or dialog then
+        return
+    end
 
-        local title = UIUtil.CreateText(bg, "<LOC desync_0000>Desync Detected", 14, UIUtil.titleFont)
-        LayoutHelpers.AtTopIn(title, dialog, 5)
-        LayoutHelpers.AtHorizontalCenterIn(title, dialog)
+    local dialogContent = Group(GetFrame(0))
+    dialogContent.Width:Set(400)
+    dialogContent.Height:Set(320)
 
-        dialog.textControls = {}            
-        local prev = false
-        for i = 1,9 do
-            dialog.textControls[i] = UIUtil.CreateText(bg, "", 12, UIUtil.bodyFont)
-            if prev then
-                LayoutHelpers.Below(dialog.textControls[i], prev, 5)
-            else
-                LayoutHelpers.AtLeftIn(dialog.textControls[i], bg, 5)
-                dialog.textControls[i].Top:Set(function() return title.Bottom() + 5 end)
-            end
-            prev = dialog.textControls[i]
-        end
-        
-        local okBtn = UIUtil.CreateButtonStd(bg, '/widgets/small', "<LOC _Ok>", 10)
-        okBtn.Top:Set(dialog.textControls[9].Bottom)
-        LayoutHelpers.AtHorizontalCenterIn(okBtn, bg)
+    dialog = Popup(GetFrame(0), dialogContent)
 
-        okBtn.OnClick = function(self, modifiers)
-            dialog:Destroy()
-            dialog = false
+    local title = UIUtil.CreateText(dialogContent, "<LOC desync_0000>Desync Detected", 14, UIUtil.titleFont)
+    LayoutHelpers.AtTopIn(title, dialogContent, 5)
+    LayoutHelpers.AtHorizontalCenterIn(title, dialogContent)
+
+    local infoText = TextArea(dialogContent, 390, 80)
+    infoText:SetText(LOC("<LOC desync_0003>"))
+    LayoutHelpers.Below(infoText, title)
+    LayoutHelpers.AtLeftIn(infoText, dialogContent, 5)
+
+    local subtitle = UIUtil.CreateText(dialogContent, "<LOC desync_0004>Diagnostic Info", 14, UIUtil.titleFont)
+    LayoutHelpers.Below(subtitle, infoText, 5)
+    LayoutHelpers.AtHorizontalCenterIn(subtitle, dialogContent)
+
+    dialog.diagnosticBox = TextArea(dialogContent, 390, 130)
+    dialog.diagnosticBox:SetFont(UIUtil.bodyFont, 10)
+    LayoutHelpers.Below(dialog.diagnosticBox, subtitle, 5)
+    LayoutHelpers.AtHorizontalCenterIn(dialog.diagnosticBox, dialogContent)
+
+    local dontCare = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', "<LOC desync_0002>Don't tell me any more", true, 11)
+    LayoutHelpers.AtBottomIn(dontCare, dialogContent, 15)
+    LayoutHelpers.AtLeftIn(dontCare, dialogContent, 5)
+
+    local okBtn = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Ok>")
+    LayoutHelpers.AtHorizontalCenterIn(okBtn, dialogContent)
+    LayoutHelpers.AtBottomIn(okBtn, dialogContent, 5)
+
+    okBtn.OnClick = function(self, modifiers)
+        dialog:Close()
+    end
+
+    dialog.OnClosed = function(self)
+        dialog = false
+        doesntCare = dontCare:IsChecked()
+    end
+
+    for k, v in strings do
+        if v then
+            dialog.diagnosticBox:AppendLine(v)
         end
     end
-    
-    for i = 1,12 do
-        if strings[i] then
-            dialog.textControls[i]:SetText(strings[i])
-        end
-    end
-    dialog.textControls[9]:SetText(LOC("<LOC desync_0001>Beat# ") .. tostring(beatNumber))
+    dialog.diagnosticBox:AppendLine(LOC("<LOC desync_0001>Beat# ") .. tostring(beatNumber))
 end

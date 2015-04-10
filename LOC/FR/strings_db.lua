@@ -7542,3 +7542,8 @@ lobui_0603="No automatic teams"
 lobui_0604="Manual Autoteams"
 lobui_0605="Start positions are bound to teams in a way defined by the host by clicking on the positions on the map"
 lobui_0606="Left vs Right"
+
+desync_0002="Don't tell me any more"
+desync_0003="Game state has become inconsistent between the players in this game. This means the simulation may evolve differently for different players from this point. The game is extremely likely to terminate abruptly quite soon."
+desync_0004="Diagnostic Info"
+

@@ -2892,7 +2892,6 @@ function CreateUI(maxPlayers)
         function() return GUI.chatPanel.Height() - GUI.chatBG.Height() - 2 end
     )
     GUI.chatDisplay:SetFont(UIUtil.bodyFont, tonumber(Prefs.GetFromCurrentProfile('LobbyChatFontSize')) or 14)
-    GUI.chatDisplay:SetColors(UIUtil.fontColor(), "00000000", UIUtil.fontColor(), "00000000")
     LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.chatPanel, 4, 2)
 
     -- Annoying evil extra Bitmap to make chat box have padding inside its background.
@@ -5038,8 +5037,6 @@ function CreateHelpWindow()
 
     -- Help textfield
     local textArea = TextArea(dialogContent, 400, 163)
-    textArea:SetFont(UIUtil.bodyFont, 14)
-    textArea:SetColors(UIUtil.fontColor(), "00000000", UIUtil.fontColor(), "00000000")
     LayoutHelpers.AtLeftIn(textArea, dialogContent, 13)
     LayoutHelpers.AtTopIn(textArea, dialogContent, 10)
     textArea:SetText(import('/lua/ui/lobby/presetHelp.lua').helpText)
