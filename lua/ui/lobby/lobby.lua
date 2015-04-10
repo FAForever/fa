@@ -1378,7 +1378,7 @@ end
 
 -- This function is used to double check the observers.
 -- TODO: IT MUST DIE.
-local function sendObserversList(gameInfo)
+local function sendObserversList()
     for k, observer in gameInfo.Observers:pairs() do
         GpgNetSend('PlayerOption', string.format("team %s %d %s", observer.PlayerName, -1, 0))
     end
@@ -1640,7 +1640,7 @@ local function TryLaunch(skipNoObserversCheck)
 
     local function LaunchGame()
         -- Redundantly send the observer list, because we're mental.
-        sendObserversList(gameInfo)
+        sendObserversList()
 
         -- Eliminate the WatchedValue structures.
         gameInfo = GameInfo.Flatten(gameInfo)
@@ -2143,7 +2143,7 @@ function HostTryAddPlayer(senderID, slot, playerData)
 
     SetSlotInfo(newSlot, gameInfo.PlayerOptions[newSlot])
     -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
-    AssignAutoTeams(gameInfo)
+    AssignAutoTeams()
 end
 
 function HostTryMovePlayer(senderID, currentSlot, requestedSlot)
@@ -2184,7 +2184,7 @@ function HostTryMovePlayer(senderID, currentSlot, requestedSlot)
     )
 
     -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
-    AssignAutoTeams(gameInfo)
+    AssignAutoTeams()
 end
 
 --- Add an observer
@@ -2293,7 +2293,7 @@ function HostConvertObserverToPlayer(senderID, fromObserverSlot, toPlayerSlot, i
     SetSlotInfo(toPlayerSlot, gameInfo.PlayerOptions[toPlayerSlot])
 
     -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
-    AssignAutoTeams(gameInfo)
+    AssignAutoTeams()
 end
 
 function HostRemoveAI(slot)
@@ -3298,7 +3298,7 @@ function CreateUI(maxPlayers)
     else
         GUI.autoTeams.OnStateChanged = function(self, newState)
             SetGameOption('AutoTeams', newState)
-            AssignAutoTeams(gameInfo)
+            AssignAutoTeams()
         end
     end
     
