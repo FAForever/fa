@@ -3267,18 +3267,32 @@ function CreateUI(maxPlayers)
     end
 
     local autoteamButtonStates = {
-        { key = 'tvsb', },
-        { key = 'lvsr' },
-        { key = 'pvsi' },
-        { key = 'manual' },
-        { key = 'none' },
+        {
+            key = 'tvsb',
+            tooltip = 'lob_auto_tvsb'
+        },
+        {
+            key = 'lvsr',
+            tooltip = 'lob_auto_lvsr'
+        },
+        {
+            key = 'pvsi',
+            tooltip = 'lob_auto_pvsi'
+        },
+        {
+            key = 'manual',
+            tooltip = 'lob_auto_manual'
+        },
+        {
+            key = 'none',
+            tooltip = 'lob_auto_none'
+        },
     }
 
     local initialState = Prefs.GetFromCurrentProfile("LobbyOpt_AutoTeams") or "none"
     GUI.autoTeams = ToggleButton(GUI.observerPanel, '/BUTTON/autoteam/', autoteamButtonStates, initialState)
 
     LayoutHelpers.RightOf(GUI.autoTeams, GUI.randMap, -19)
-    Tooltip.AddControlTooltip(GUI.autoTeams, 'lob_click_randteam')
     if not isHost then
         GUI.autoTeams:Hide()
     else

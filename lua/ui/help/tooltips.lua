@@ -1121,14 +1121,30 @@ Tooltips = {
 
     #**********************
     #** Power lobby Strings
-    #**********************    
+    #**********************
     lob_click_randmap = {
         title = "<LOC lobui_0501>Random Map",
         description = "<LOC lobui_0502>When clicked, a random map will be selected",
     },
-    lob_click_randteam = {
-        title = "<LOC lobui_0507>Auto Teams",
-        description = "<LOC lobui_0508>Click to change the auto teams settings",
+    lob_auto_tvsb = {
+        title = "<LOC lobui_0597>Top vs Bottom",
+        description = "<LOC lobui_0598>Slots in the upper half of the map against those in the lower half",
+    },
+    lob_auto_lvsr = {
+        title = "<LOC lobui_0606>Left vs Right",
+        description = "<LOC lobui_0599>Slots in the left half of the map against those in the right half",
+    },
+    lob_auto_pvsi = {
+        title = "<LOC lobui_0600>Odd vs Even",
+        description = "<LOC lobui_0601>Odd numbered slots vs even numbered slots. Subject to map design, your mileage may vary",
+    },
+    lob_auto_manual = {
+        title = "<LOC lobui_0604>Manual Autoteams",
+        description = "<LOC lobui_0605>Start positions are bound to teams in a way defined by the host by clicking on the positions on the map",
+    },
+    lob_auto_none = {
+        title = "<LOC lobui_0602>Off",
+        description = "<LOC lobui_0603>No automatic teams",
     },
     lob_click_rankedoptions = {
         title = "<LOC lobui_0523>Ranked Settings",

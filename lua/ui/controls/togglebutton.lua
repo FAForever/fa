@@ -1,6 +1,7 @@
 local Group = import('/lua/maui/group.lua').Group
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local Tooltip = import('/lua/ui/game/tooltip.lua')
 
 --- Represents a button with multiple states.
 -- A ToggleButton is a button that, when clicked, moves to the next state (or back to the first state
@@ -17,6 +18,7 @@ ToggleButton = Class(Group) {
     --               key: A value to uniquely identify this state. This will be passed to
     --                    OnStateChanged when the control transitions to this state.
     --               label (optional): The string label to put on the button when in this state.
+    --               tooltip (optional): A tooltip id to use when the button is in this state.
     -- @param defaultKey The key of the state the control should start in.
     __init = function(self, parent, texturePath, states, defaultKey)
         Group.__init(self, parent)
@@ -30,6 +32,9 @@ ToggleButton = Class(Group) {
             local btnKey = v.key
 
             local btn = UIUtil.CreateButtonStd(self, texturePath .. btnKey .. "/", v.label)
+            if v.tooltip then
+                Tooltip.AddButtonTooltip(btn, v.tooltip)
+            end
             LayoutHelpers.AtLeftTopIn(btn, self)
 
             -- Hide this button if it is not the default.
@@ -59,8 +64,13 @@ ToggleButton = Class(Group) {
         for k, v in self.buttonmap do
             v:Hide()
         end
-        self.buttonmap[stateKey]:Show()
-        self.buttonmap[stateKey]:EnableHitTest()
+        local newBtn = self.buttonmap[stateKey]
+        newBtn:Show()
+        newBtn:EnableHitTest()
+
+        -- Synthesie a mouse
+        Tooltip.DestroyMouseoverDisplay()
+        newBtn:HandleEvent({Type = "MouseEnter"})
 
         -- Possibly call the event listener.
         if not ignoreEvent then
