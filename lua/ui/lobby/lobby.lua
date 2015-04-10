@@ -1251,149 +1251,152 @@ function autobalance_quality(players)
     return quality
 end
 
+--- Assign the "random" (really autobalanced) start positions.
 local function AssignRandomStartSpots()
+    if gameInfo.GameOptions['TeamSpawn'] ~= 'random' then
+        return
+    end
+
     function teamsAddSpot(teams, team, spot)
-        if(not teams[team]) then
+        if not teams[team] then
             teams[team] = {}
         end
         table.insert(teams[team], spot)
     end
 
-    if gameInfo.GameOptions['TeamSpawn'] == 'random' then
-        local numAvailStartSpots = nil
-        local scenarioInfo = nil
-        if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
-            scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+    local numAvailStartSpots = nil
+    local scenarioInfo = nil
+    if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
+        scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+    end
+    if scenarioInfo then
+        local armyTable = MapUtil.GetArmies(scenarioInfo)
+        if armyTable then
+            if gameInfo.GameOptions['RandomMap'] == 'Off' then
+                numAvailStartSpots = table.getn(armyTable)
+            else
+                numAvailStartSpots = numberOfPlayers
+            end
         end
-        if scenarioInfo then
-            local armyTable = MapUtil.GetArmies(scenarioInfo)
-            if armyTable then
-                if gameInfo.GameOptions['RandomMap'] == 'Off' then
-                    numAvailStartSpots = table.getn(armyTable)
+    else
+        WARN("Can't assign random start spots, no scenario selected.")
+        return
+    end
+
+    local AutoTeams = gameInfo.GameOptions.AutoTeams
+    local teams = {}
+    for i = 1, numAvailStartSpots do
+        if not gameInfo.ClosedSlots[i] then
+            local team = nil
+
+            if AutoTeams == 'lvsr' then
+                local midLine = GUI.mapView.Left() + (GUI.mapView.Width() / 2)
+                local markerPos = GUI.mapView.startPositions[i].Left()
+
+                if markerPos < midLine then
+                    team = 2
                 else
-                    numAvailStartSpots = numberOfPlayers
+                    team = 3
                 end
+            elseif AutoTeams == 'tvsb' then
+                local midLine = GUI.mapView.Top() + (GUI.mapView.Height() / 2)
+                local markerPos = GUI.mapView.startPositions[i].Top()
+
+                if markerPos < midLine then
+                    team = 2
+                else
+                    team = 3
+                end
+            elseif AutoTeams == 'pvsi' then
+                if math.mod(i, 2) ~= 0 then
+                    team = 2
+                else
+                    team = 3
+                end
+            elseif AutoTeams == 'manual' then
+                team = gameInfo.AutoTeams[i]
+            else -- none
+                team = gameInfo.PlayerOptions[i].Team
             end
-        else
-            WARN("Can't assign random start spots, no scenario selected.")
-            return
-        end
 
-        local AutoTeams = gameInfo.GameOptions.AutoTeams
-        local teams = {}
-        for i = 1, numAvailStartSpots do
-            if not gameInfo.ClosedSlots[i] then
-                local team = nil
-
-                if AutoTeams == 'lvsr' then
-                    local midLine = GUI.mapView.Left() + (GUI.mapView.Width() / 2)
-                    local markerPos = GUI.mapView.startPositions[i].Left()
-
-                    if markerPos < midLine then
-                        team = 2
-                    else
-                        team = 3
-                    end
-                elseif AutoTeams == 'tvsb' then
-                    local midLine = GUI.mapView.Top() + (GUI.mapView.Height() / 2)
-                    local markerPos = GUI.mapView.startPositions[i].Top()
-
-                    if markerPos < midLine then
-                        team = 2
-                    else
-                        team = 3
-                    end
-                elseif AutoTeams == 'pvsi' then
-                    if math.mod(i, 2) ~= 0 then
-                        team = 2
-                    else
-                        team = 3
-                    end
-                elseif AutoTeams == 'manual' then
-                    team = gameInfo.AutoTeams[i]
-                else -- none
-                    team = gameInfo.PlayerOptions[i].Team
-                end
-
-                if team ~= nil then
-                    teamsAddSpot(teams, team, i)
-                end
+            if team ~= nil then
+                teamsAddSpot(teams, team, i)
             end
         end
-        -- shuffle the array for randomness.
-        for i, team in teams do
-            teams[i] = table.shuffle(team)
+    end
+    -- shuffle the array for randomness.
+    for i, team in teams do
+        teams[i] = table.shuffle(team)
+    end
+    teams = table.shuffle(teams)
+
+    local ratingTable = {}
+    for i = 1, numAvailStartSpots do
+        local playerInfo = gameInfo.PlayerOptions[i]
+        if playerInfo then
+            table.insert(ratingTable, { pos=i, rating = playerInfo.MEAN - playerInfo.DEV * 3 })
         end
-        teams = table.shuffle(teams)
+    end
 
-        local ratingTable = {}
-        for i = 1, numAvailStartSpots do
-            local playerInfo = gameInfo.PlayerOptions[i]
-            if playerInfo then
-                table.insert(ratingTable, { pos=i, rating = playerInfo.MEAN - playerInfo.DEV * 3 })
-            end
-        end
+    ratingTable = table.shuffle(ratingTable) -- random order for people with same rating
+    table.sort(ratingTable, function(a, b) return a['rating'] > b['rating'] end)
 
-        ratingTable = table.shuffle(ratingTable) -- random order for people with same rating
-        table.sort(ratingTable, function(a, b) return a['rating'] > b['rating'] end)
+    local functions = {
+        rr=autobalance_rr,
+        bestworst=autobalance_bestworst,
+        avg=autobalance_avg,
+    }
 
-        local functions = {
-            rr=autobalance_rr,
-            bestworst=autobalance_bestworst,
-            avg=autobalance_avg,
-        }
-
-        local best = {quality=0, result=nil}
-        local r, q
-        for fname, f in functions do
-            r = f(ratingTable, teams)
-            if r then
-                q = autobalance_quality(r)
-
-                -- when all functions fail, use one as default
-                if q > best.quality or best.result == nil then
-                    best.result = r
-                    best.quality = q
-                end
-            end
-        end
-
-        local results = {}
-        table.insert(results, best)
-
-        -- add 100 random compositions and keep 3 with at least 95% of best quality
-        for i=1, 100 do
-            r = autobalance_random(ratingTable, teams)
+    local best = {quality=0, result=nil}
+    local r, q
+    for fname, f in functions do
+        r = f(ratingTable, teams)
+        if r then
             q = autobalance_quality(r)
 
-            if(q > best.quality*0.95) then
-                table.insert(results, {quality=q, result=r})
-
-                if(table.getsize(results) > 4) then break end
+            -- when all functions fail, use one as default
+            if q > best.quality or best.result == nil then
+                best.result = r
+                best.quality = q
             end
         end
+    end
 
-        results = table.shuffle(results)
-        best = table.remove(results, 1)
-        gameInfo.GameOptions['Quality'] = best.quality
+    local results = {}
+    table.insert(results, best)
 
-        -- Copy a reference to each of the PlayerData objects indexed by their original slots.
-        local orgPlayerOptions = {}
-        for k, p in gameInfo.PlayerOptions do
-            orgPlayerOptions[k] = p
+    -- add 100 random compositions and keep 3 with at least 95% of best quality
+    for i=1, 100 do
+        r = autobalance_random(ratingTable, teams)
+        q = autobalance_quality(r)
+
+        if(q > best.quality*0.95) then
+            table.insert(results, {quality=q, result=r})
+
+            if(table.getsize(results) > 4) then break end
         end
+    end
 
-        -- Rearrange the players in the slots to match the chosen configuration. The result object
-        -- maps old slots to new slots, and we use orgPlayerOptions to avoid losing a reference to
-        -- an object (and because swapping is too much like hard work).
-        gameInfo.PlayerOptions = {}
-        for _, r in best.result do
-            local playerOptions = orgPlayerOptions[r.player]
-            playerOptions.Team = r.team + 1
-            playerOptions.StartSpot = r.slot
-            gameInfo.PlayerOptions[r.slot] = playerOptions
-            HostSendPlayerSettingsToServer(r.slot)
-        end
+    results = table.shuffle(results)
+    best = table.remove(results, 1)
+    gameInfo.GameOptions['Quality'] = best.quality
+
+    -- Copy a reference to each of the PlayerData objects indexed by their original slots.
+    local orgPlayerOptions = {}
+    for k, p in gameInfo.PlayerOptions do
+        orgPlayerOptions[k] = p
+    end
+
+    -- Rearrange the players in the slots to match the chosen configuration. The result object
+    -- maps old slots to new slots, and we use orgPlayerOptions to avoid losing a reference to
+    -- an object (and because swapping is too much like hard work).
+    gameInfo.PlayerOptions = {}
+    for _, r in best.result do
+        local playerOptions = orgPlayerOptions[r.player]
+        playerOptions.Team = r.team + 1
+        playerOptions.StartSpot = r.slot
+        gameInfo.PlayerOptions[r.slot] = playerOptions
+        HostSendPlayerSettingsToServer(r.slot)
     end
 end
 
