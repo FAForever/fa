@@ -1382,7 +1382,7 @@ local function AssignRandomStartSpots()
         gameInfo.PlayerOptions = {}
         for _, r in best.result do
             local playerOptions = orgPlayerOptions[r.player]
-            playerOptions.Team = r.team
+            playerOptions.Team = r.team + 1
             playerOptions.StartSpot = r.slot
             gameInfo.PlayerOptions[r.slot] = playerOptions
         end
