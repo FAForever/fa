@@ -2941,6 +2941,9 @@ function CreateUI(maxPlayers)
         end
     end
 
+    -- We work extremely hard to keep keyboard focus on the chat box, otherwise users can trigger
+    -- in-game keybindings in the lobby.
+    -- That would be very bad. We should probably instead just not assign those keybindings yet...
     GUI.chatEdit.OnLoseKeyboardFocus = function(self)
         GUI.chatEdit:AcquireFocus()
     end

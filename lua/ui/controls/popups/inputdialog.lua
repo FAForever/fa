@@ -38,10 +38,12 @@ InputDialog = Class(Popup) {
         local ExitButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Cancel")
         LayoutHelpers.AtLeftIn(ExitButton, dialogContent, -5)
         LayoutHelpers.AtBottomIn(ExitButton, dialogContent, 10)
-        ExitButton.OnClick = function()
+        local dialogCancelled = function()
             self:OnCancelled()
             self:Close()
         end
+
+        ExitButton.OnClick = dialogCancelled
 
         -- Ok button
         local OKButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
@@ -52,8 +54,8 @@ InputDialog = Class(Popup) {
         Popup.__init(self, parent, dialogContent)
 
         -- Set up event listeners...
-        self.OnEscapePressed = self.OnCancelled
-        self.OnShadowClicked = self.OnCancelled
+        self.OnEscapePressed = dialogCancelled
+        self.OnShadowClicked = dialogCancelled
     end,
 
     --- Called with the contents of the textfield when the presses enter or clicks the "OK" button.
