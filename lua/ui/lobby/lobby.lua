@@ -755,6 +755,16 @@ function UpdateSlotBackground(slotIndex)
     end
 end
 
+--- Send player settings to the server
+function HostSendPlayerSettingsToServer(slotNum)
+    local playerInfo = gameInfo.PlayerOptions[slotNum]
+    local playerName = playerInfo.PlayerName
+    GpgNetSend('PlayerOption', string.format("faction %s %d %s", playerName, slotNum, playerInfo.Faction))
+    GpgNetSend('PlayerOption', string.format("color %s %d %s", playerName, slotNum, playerInfo.PlayerColor))
+    GpgNetSend('PlayerOption', string.format("team %s %d %s", playerName, slotNum, playerInfo.Team))
+    GpgNetSend('PlayerOption', string.format("startspot %s %d %s", playerName, slotNum, slotNum))
+end
+
 -- update the data in a player slot
 -- TODO: With lazyvars, this function should be eliminated. Lazy-value-callbacks should be used
 -- instead to incrementaly update things.
@@ -932,10 +942,7 @@ function SetSlotInfo(slotNum, playerInfo)
     slot.team:SetItem(playerInfo.Team)
 
     if isHost then
-        GpgNetSend('PlayerOption', string.format("faction %s %d %s", playerName, slotNum, playerInfo.Faction))
-        GpgNetSend('PlayerOption', string.format("color %s %d %s", playerName, slotNum, playerInfo.PlayerColor))
-        GpgNetSend('PlayerOption', string.format("team %s %d %s", playerName, slotNum, playerInfo.Team))
-        GpgNetSend('PlayerOption', string.format("startspot %s %d %s", playerName, slotNum, slotNum))
+        HostSendPlayerSettingsToServer(slotNum)
     end
 
     UIUtil.setVisible(slot.ready, playerInfo.Human and not singlePlayer)
@@ -1385,6 +1392,7 @@ local function AssignRandomStartSpots()
             playerOptions.Team = r.team + 1
             playerOptions.StartSpot = r.slot
             gameInfo.PlayerOptions[r.slot] = playerOptions
+            HostSendPlayerSettingsToServer(r.slot)
         end
     end
 end
