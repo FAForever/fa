@@ -276,6 +276,13 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
 
     lobbyComm.GameLaunched = function(self)
         GpgNetSend('GameState', 'Launching')
+        for i, v in gameInfo.PlayerOptions do
+            if v.Human and v.OwnerID == lobbyComm:GetLocalPlayerID() then
+                Prefs.SetToCurrentProfile('LoadingFaction', v.Faction)
+                break
+            end
+        end
+
         parent:Destroy()
         parent = false
         MenuCommon.MenuCleanup()
