@@ -14,10 +14,6 @@ local MenuCommon = import('/lua/ui/menus/menucommon.lua')
 local LobbyComm = import('/lua/ui/lobby/lobbyComm.lua')
 local gameColors = import('/lua/gameColors.lua').GameColors
 
-
-
-
-
 local connectdialog = false
 local parent = false
 local localPlayerName = false
@@ -48,9 +44,7 @@ local gameInfo = {
 }
 
 local Strings = LobbyComm.Strings
-
 local lobbyComm = false
-
 local connectedTo = {}
 
 local function MakeLocalPlayerInfo(name)
@@ -75,9 +69,8 @@ local function MakeLocalPlayerInfo(name)
     return result
 end
 
-
 local function IsColorFree(colorIndex)
-    for id,player in gameInfo.PlayerOptions do
+    for id, player in gameInfo.PlayerOptions do
         if player.PlayerColor == colorIndex then
             return false
         end
@@ -87,7 +80,7 @@ local function IsColorFree(colorIndex)
 end
 
 function wasConnected(peer)
-    for _,v in pairs(connectedTo) do
+    for _, v in pairs(connectedTo) do
         if v == peer then
             return true
         end
@@ -96,7 +89,7 @@ function wasConnected(peer)
 end
 
 function FindSlotForID(id)
-    for k,player in gameInfo.PlayerOptions do
+    for k, player in gameInfo.PlayerOptions do
         if player.OwnerID == id and player.Human then
             return k
         end
@@ -105,7 +98,7 @@ function FindSlotForID(id)
 end
 
 function IsPlayer(id)
-    return FindSlotForID(id) != nil
+    return FindSlotForID(id) ~= nil
 end
 
 local function HostAddPlayer(senderId, playerInfo)
@@ -116,10 +109,10 @@ local function HostAddPlayer(senderId, playerInfo)
         slot = slot + 1
     end
 
-    playerInfo.PlayerName = lobbyComm:MakeValidPlayerName(playerInfo.OwnerID,playerInfo.PlayerName)
+    playerInfo.PlayerName = lobbyComm:MakeValidPlayerName(playerInfo.OwnerID, playerInfo.PlayerName)
 
-    # figure out a reasonable default color
-    for colorIndex,colorVal in gameColors.PlayerColors do
+    -- figure out a reasonable default color
+    for colorIndex, colorVal in gameColors.PlayerColors do
         if IsColorFree(colorIndex) then
             playerInfo.PlayerColor = colorIndex
             break
@@ -133,27 +126,27 @@ end
 local function CheckForLaunch()
 
     local important = {}
-    for slot,player in gameInfo.PlayerOptions do
+    for slot, player in gameInfo.PlayerOptions do
         GpgNetSend('PlayerOption', string.format("startspot %s %d %s", player.PlayerName, slot, slot))
         if not table.find(important, player.OwnerID) then
             table.insert(important, player.OwnerID)
         end
     end
 
-    #counts the number of players in the game.  Include yourself by default.
+    -- counts the number of players in the game.  Include yourself by default.
     local playercount = 1
-    for k,id in important do
-        if id != localPlayerID then
+    for k, id in important do
+        if id ~= localPlayerID then
             local peer = lobbyComm:GetPeer(id)
-            if peer.status != 'Established' then
+            if peer.status ~= 'Established' then
                 return
             end
             if not table.find(peer.establishedPeers, localPlayerID) then
                 return
             end
             playercount = playercount + 1
-            for k2,other in important do
-                if id != other and not table.find(peer.establishedPeers, other) then
+            for k2, other in important do
+                if id ~= other and not table.find(peer.establishedPeers, other) then
                     return
                 end
             end
@@ -165,7 +158,7 @@ local function CheckForLaunch()
     end
 	
 	local allRatings = {}
-	for k,v in gameInfo.PlayerOptions do
+	for k, v in gameInfo.PlayerOptions do
 		if v.Human and v.PL then
 			allRatings[v.PlayerName] = v.PL
 		end
@@ -178,11 +171,8 @@ local function CheckForLaunch()
     lobbyComm:LaunchGame(gameInfo)
 end
 
-
-
 local function CreateUI()
-
-    if (connectdialog != false) then
+    if connectdialog ~= false then
         MenuCommon.MenuCleanup()
         connectdialog:Destroy()
         connectdialog = false
@@ -192,11 +182,8 @@ local function CreateUI()
     if not parent then parent = UIUtil.CreateScreenGroup(GetFrame(0), "Lobby CreateUI ScreenGroup") end
 
     local background = MenuCommon.SetupBackground(GetFrame(0))
-    --local exitButton = MenuCommon.CreateExitMenuButton(parent, background, "<LOC _Exit>")
 
-    ---------------------------------------------------------------------------
-    -- set up map panel
-    ---------------------------------------------------------------------------
+    -- Create the automatch dialog.
     local controlGroup = Group(parent, "controlGroup")
     LayoutHelpers.AtCenterIn(controlGroup, parent)
     controlGroup.Width:Set(970)
@@ -205,8 +192,7 @@ local function CreateUI()
     UIUtil.ShowInfoDialog(controlGroup, "<LOC lobui_0201>Setting up automatch...", "<LOC _Cancel>", ExitApplication)
 end
 
-
-# LobbyComm Callbacks
+-- LobbyComm Callbacks
 local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
     local controlGroup = Group(parent, "controlGroup")
     local LobCreateFunc = import('/lua/ui/lobby/lobbyComm.lua').CreateLobbyComm
@@ -234,13 +220,13 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         connectionFailedDialog = UIUtil.ShowInfoDialog(controlGroup, LOCF(Strings.ConnectionFailed, reason), "<LOC _OK>", CleanupAndExit)
     end
 
-    lobbyComm.LaunchFailed = function(self,reasonKey)
+    lobbyComm.LaunchFailed = function(self, reasonKey)
         LOG("LAUNCH FAILED")
         if connectingDialog then
             connectingDialog:Destroy()
         end
 
-        local failedDlg = UIUtil.ShowInfoDialog(controlGroup, LOCF(Strings.LaunchFailed,LOC(reasonKey)), "<LOC _OK>", CleanupAndExit)
+        local failedDlg = UIUtil.ShowInfoDialog(controlGroup, LOCF(Strings.LaunchFailed, LOC(reasonKey)), "<LOC _OK>", CleanupAndExit)
     end
 
     lobbyComm.Ejected = function(self, reason)
@@ -252,7 +238,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         local failedDlg = UIUtil.ShowInfoDialog(controlGroup, Strings.Ejected, CleanupAndExit)
     end
 
-    lobbyComm.ConnectionToHostEstablished = function(self,myID,newLocalName,theHostID)
+    lobbyComm.ConnectionToHostEstablished = function(self, myID, newLocalName, theHostID)
         LOG("CONNECTED TO HOST")
         if connectingDialog then
             connectingDialog:Destroy()
@@ -267,16 +253,16 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         lobbyComm:SendData( hostID, { Type = 'AddPlayer', PlayerInfo = MakeLocalPlayerInfo(newLocalName), } )
     end
 
-    lobbyComm.DataReceived = function(self,data)
+    lobbyComm.DataReceived = function(self, data)
         LOG('DATA RECEIVED: ', repr(data))
 
         if lobbyComm:IsHost() then
-            # Host Messages
+            -- Host Messages
             if data.Type == 'AddPlayer' then
                 HostAddPlayer( data.SenderID, data.PlayerInfo )
             end
         else
-            # Non-Host Messages
+            -- Non-Host Messages
             if data.Type == 'Launch' then
                 LOG(repr(data.GameInfo))
                 lobbyComm:LaunchGame(data.GameInfo)
@@ -285,7 +271,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
     end
 
     lobbyComm.SystemMessage = function(self, text)
-        LOG("System: ",text)
+        LOG("System: ", text)
     end
 
     lobbyComm.GameLaunched = function(self)
@@ -301,10 +287,10 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         localPlayerID = lobbyComm:GetLocalPlayerID()
         hostID = localPlayerID
 
-        # Give myself the first slot
+        -- Give myself the first slot
         HostAddPlayer(hostID, MakeLocalPlayerInfo(localPlayerName))
 
-        # Fill in the desired scenario.
+        -- Fill in the desired scenario.
 
         gameInfo.GameOptions.ScenarioFile = self.desiredScenario
     end
@@ -319,7 +305,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         end
     end
 
-    lobbyComm.PeerDisconnected = function(self,peerName,peerID)
+    lobbyComm.PeerDisconnected = function(self, peerName, peerID)
         LOG('>DEBUG> PeerDisconnected : peerName='..peerName..' peerID='..peerID)
         if IsPlayer(peerID) then
             local slot = FindSlotForID(peerID)
@@ -328,10 +314,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
             end
         end
     end
-
 end
-
-
 
 -- Create a new unconnected lobby.
 function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
@@ -351,7 +334,6 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
     localPlayerName = lobbyComm:GetLocalPlayerName()
 end
 
-
 -- create the lobby as a host
 function HostGame(gameName, scenarioFileName, singlePlayer)
     CreateUI()
@@ -363,11 +345,8 @@ function HostGame(gameName, scenarioFileName, singlePlayer)
         LOG("requiredPlayers was set to: "..requiredPlayers)
     end
 
-	
 	-- The guys at GPG were unable to make a standard for map. We dirty-solve it.
 	lobbyComm.desiredScenario = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
-
-
     lobbyComm:HostGame()
 end
 
@@ -379,14 +358,14 @@ function JoinGame(address, asObserver, playerName, uid)
     lobbyComm:JoinGame(address, playerName, uid)
 end
 
-function ConnectToPeer(addressAndPort,name,uid)
+function ConnectToPeer(addressAndPort, name, uid)
     if not string.find(addressAndPort, '127.0.0.1') then
         LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..")")
     else
         DisconnectFromPeer(uid)
         LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..", USE PROXY)")
     end
-    lobbyComm:ConnectToPeer(addressAndPort,name,uid)
+    lobbyComm:ConnectToPeer(addressAndPort, name, uid)
 end
 
 function DisconnectFromPeer(uid)
@@ -397,4 +376,3 @@ function DisconnectFromPeer(uid)
     GpgNetSend('Disconnected', string.format("%d", uid))
     lobbyComm:DisconnectFromPeer(uid)
 end
-
