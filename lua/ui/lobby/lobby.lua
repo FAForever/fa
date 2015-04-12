@@ -1285,6 +1285,9 @@ local function AssignRandomStartSpots()
 
     local AutoTeams = gameInfo.GameOptions.AutoTeams
     local teams = {}
+
+    -- Used to actualise the virtual teams produced by the "Team -" no-team team.
+    local synthesizedTeamCounter = 9
     for i = 1, numAvailStartSpots do
         if not gameInfo.ClosedSlots[i] then
             local team = nil
@@ -1320,6 +1323,12 @@ local function AssignRandomStartSpots()
             end
 
             if team ~= nil then
+                -- Team 1 secretly represents "No team", so give them a real team (but one that
+                -- nobody else can possibly have)
+                if team == 1 then
+                    team = synthesizedTeamCounter
+                    synthesizedTeamCounter = synthesizedTeamCounter + 1
+                end
                 teamsAddSpot(teams, team, i)
             end
         end
