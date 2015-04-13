@@ -20,7 +20,6 @@ local AntiArtilleryShield = import('/lua/shield.lua').AntiArtilleryShield
 local Buff = import('/lua/sim/buff.lua')
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local BuffFieldBlueprints = import('/lua/sim/BuffField.lua').BuffFieldBlueprints
-local RRBC = import('/lua/sim/RebuildBonusCallback.lua').RegisterRebuildBonusCheck
 
 SyncMeta = {
     __index = function(t,key)
@@ -72,6 +71,7 @@ Unit = Class(moho.unit_methods) {
     DestructionPartsLowToss = {},
     DestructionPartsChassisToss = {},
     EconomyProductionInitiallyActive = true,
+    RebuildBP = false,
 
     --Used to toggle damage protection on shielded transports
     transportProtected = false,
@@ -1916,85 +1916,6 @@ Unit = Class(moho.unit_methods) {
         end
 
         self.originalBuilder = builder
-
-        --Rebuild bonus check 1. Added by Brute51
-        local builderUpgradesTo = builder:GetBlueprint().General.UpgradesTo or false
-        if not builderUpgradesTo or self:GetUnitId() ~= builderUpgradesTo then    --Avoid upgrades
-            if EntityCategoryContains( categories.STRUCTURE, self) then
-                builder:ForkThread( builder.CheckFractionComplete, self )
-            end
-
-            --Rebuild bonus check 2. brute51
-            if builder.VerifyRebuildBonus then
-                builder.VerifyRebuildBonus = nil
-                self:ForkThread( self.CheckRebuildBonus )
-            end
-        end
-    end,
-
-    GetRebuildBonus = function(self, rebuildUnitBP)
-        --'self' is the engineer building the structure. brute51
-        self.InitialFractionComplete = 0.5
-        self.VerifyRebuildBonus = true
-    return self.InitialFractionComplete
-
-    end,
-
-
-    CheckFractionComplete = function(self, unitBeingBuilt, threadCount)
-        --This code checks if the unit is allowed to be accelerate-built. If not the unit is destroyed (for lack
-        --of a SetFractionComplete() function). Added by brute51
-        local fraction = unitBeingBuilt:GetFractionComplete()
-        if fraction > (self.InitialFractionComplete or 0) then
-            unitBeingBuilt:OnRebuildBonusIsIllegal()
-        end
-        self.InitialFractionComplete = nil
-    end,
-
-    CheckRebuildBonus = function(self)
-        -- this section is rebuild bonus check 2 [159]
-        -- This code checks if the unit is allowed to be accelerate-built. If not the unit is destroyed (for lack
-        -- of a SetFractionComplete() function). Added by brute51
-        if self:GetFractionComplete() > 0 then
-            local cb = function(bpUnitId)
-            local ourUnit = self:GetUnitId()
-            if ourUnit == bpUnitId then
-                self:OnRebuildBonusIsLegal()
-            else
-                while true do
-                    bpUnitId = GetUnitBlueprintByName(bpUnitId).General.UpgradesFrom
-                    if bpUnitId == ourUnit then
-                        self:OnRebuildBonusIsLegal()
-                        break
-                    elseif bpUnitId == nil then
-                        break
-                    end
-                end
-            end
-        end
-        RRBC( self:GetPosition(), cb)
-            self.RebuildBonusIllegalThread = self:ForkThread(
-                function(self)
-                    WaitTicks(1)
-                    self:OnRebuildBonusIsIllegal()
-                end
-            )
-        end
-    end,
-
-    OnRebuildBonusIsLegal = function(self)
-        -- rebuild bonus check 2 [159]
-        -- this doesn't always run. In fact, in most of the time it doesn't. brute51
-        if self.RebuildBonusIllegalThread then
-            KillThread(self.RebuildBonusIllegalThread)
-        end
-    end,
-
-    OnRebuildBonusIsIllegal = function(self)
-        -- rebuild bonus check 1 and 2 [159]
-        -- this doesn't always run. In fact, in most of the time it doesn't. brute51
-        self:Destroy()
-        LOG ('unit killed due to illegal copy')
     end,
 
     UnitBuiltPercentageCallbackThread = function(self, percent, callback)
@@ -2251,7 +2172,35 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    GetRebuildBonus = function(self, bp)
+        self.RebuildBP = bp
+        return 0 -- take care of rebuild bonus in unit:OnStartBuild()
+    end,
+
+    SetRebuildProgress = function(self, unit)
+        local upos = unit:GetPosition()
+        local props = GetReclaimablesInRect(Rect(upos[1], upos[3], upos[1], upos[3]))
+        local wreckage = {}
+        local bpid = unit:GetUnitId()
+
+        for _, p in props do
+            local pos = p.CachePosition
+            if p.IsWreckage and p.AssociatedBP == bpid and upos[1] == pos[1] and upos[3] == pos[3] then
+                local progress = p:GetFractionComplete() * 0.5
+                -- set health according to how much is left of the wreck
+                unit:SetHealth(self, unit:GetMaxHealth()*progress)
+            end
+        end
+    end,
+
     OnStartBuild = function(self, unitBeingBuilt, order)
+        if self.RebuildBP then -- builder is rebuilding something
+            if unitBeingBuilt:GetHealth() == 1 then -- rebuilt unit starts with 1 HP
+                self:SetRebuildProgress(unitBeingBuilt)
+            end
+            self.RebuildBP = false
+        end
+
         if order == 'Repair' then
             if unitBeingBuilt.WorkItem ~= self.WorkItem then
                 self:InheritWork(unitBeingBuilt)
