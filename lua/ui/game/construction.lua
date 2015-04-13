@@ -1366,24 +1366,21 @@ function OnClickHandler(button, modifiers)
             end
         else
             local orderData = {
-                -- UserVerifyScript='/lua/ui/game/EnhanceCommand.lua',
                 TaskName = "EnhanceTask",
                 Enhancement = item.id,
             }
             IssueCommand("UNITCOMMAND_Script", orderData, true)
         end
     elseif item.type == 'queuestack' then
-       --LOG("clicked a queuestack in construction.lua")
         local count = 1
         if modifiers.Shift or modifiers.Ctrl then
             count = 5
         end
+
         if modifiers.Left then
-	   --LOG("unit++")
             IncreaseBuildCountInQueue(item.position, count)
         elseif modifiers.Right then
-	   --LOG("unit-- attempt")
-	   DecreaseBuildCountInQueue(item.position, count)
+	        DecreaseBuildCountInQueue(item.position, count)
         end
     end
 end
@@ -1606,7 +1603,7 @@ function CreateTemplateOptionsMenu(button)
         RefreshUI()
     end
 
-    local bg = CreateMenuBorder(group)
+    UIUtil.SurroundWithNinePatch(group, "/game/chat_brd/", 4, 4)
 
     group.HandleEvent = function(self, event)
         return true
@@ -1656,61 +1653,8 @@ function CreateSubMenu(parentMenu, contents, onClickFunc, setupOnClickHandler)
 
     menu.Height:Set(totHeight)
     menu.Width:Set(maxWidth)
-    local bg = CreateMenuBorder(menu)
+    UIUtil.SurroundWithNinePatch(menu, "/game/chat_brd/", 4, 4)
     return menu
-end
-
-function CreateMenuBorder(group)
-    local bg = Bitmap(group, UIUtil.UIFile('/game/chat_brd/drop-box_brd_m.dds'))
-    bg.tl = Bitmap(group, UIUtil.UIFile('/game/chat_brd/drop-box_brd_ul.dds'))
-    bg.tm = Bitmap(group, UIUtil.UIFile('/game/chat_brd/drop-box_brd_horz_um.dds'))
-    bg.tr = Bitmap(group, UIUtil.UIFile('/game/chat_brd/drop-box_brd_ur.dds'))
-    bg.l = Bitmap(group, UIUtil.UIFile('/game/chat_brd/drop-box_brd_vert_l.dds'))
-    bg.r = Bitmap(group, UIUtil.UIFile('/game/chat_brd/drop-box_brd_vert_r.dds'))
-    bg.bl = Bitmap(group, UIUtil.UIFile('/game/chat_brd/drop-box_brd_ll.dds'))
-    bg.bm = Bitmap(group, UIUtil.UIFile('/game/chat_brd/drop-box_brd_lm.dds'))
-    bg.br = Bitmap(group, UIUtil.UIFile('/game/chat_brd/drop-box_brd_lr.dds'))
-
-    LayoutHelpers.FillParent(bg, group)
-    bg.Depth:Set(group.Depth)
-
-    bg.tl.Bottom:Set(group.Top)
-    bg.tl.Right:Set(group.Left)
-    bg.tl.Depth:Set(group.Depth)
-
-    bg.tm.Bottom:Set(group.Top)
-    bg.tm.Right:Set(group.Right)
-    bg.tm.Left:Set(group.Left)
-    bg.tm.Depth:Set(group.Depth)
-
-    bg.tr.Bottom:Set(group.Top)
-    bg.tr.Left:Set(group.Right)
-    bg.tr.Depth:Set(group.Depth)
-
-    bg.l.Bottom:Set(group.Bottom)
-    bg.l.Right:Set(group.Left)
-    bg.l.Top:Set(group.Top)
-    bg.l.Depth:Set(group.Depth)
-
-    bg.r.Bottom:Set(group.Bottom)
-    bg.r.Left:Set(group.Right)
-    bg.r.Top:Set(group.Top)
-    bg.r.Depth:Set(group.Depth)
-
-    bg.bl.Top:Set(group.Bottom)
-    bg.bl.Right:Set(group.Left)
-    bg.bl.Depth:Set(group.Depth)
-
-    bg.br.Top:Set(group.Bottom)
-    bg.br.Left:Set(group.Right)
-    bg.br.Depth:Set(group.Depth)
-
-    bg.bm.Top:Set(group.Bottom)
-    bg.bm.Right:Set(group.Right)
-    bg.bm.Left:Set(group.Left)
-    bg.bm.Depth:Set(group.Depth)
-
-    return bg
 end
 
 function GetTabByID(id)
@@ -2814,7 +2758,7 @@ function CreateFacTemplateOptionsMenu(button)
         RefreshUI()
     end
 
-    local bg = CreateMenuBorder(group)
+    UIUtil.SurroundWithNinePatch(group, "/game/chat_brd/", 4, 4)
 
     group.HandleEvent = function(self, event)
         return true
