@@ -112,12 +112,6 @@ local enhancementTooltips = {
     Back = 'construction_tab_enhancment_back',
 }
 
-local whatIfBuilder = nil
-local whatIfBlueprintID = nil
-local selectedwhatIfBuilder = nil
-local selectedwhatIfBlueprintID = nil
-
-
 --
 -- Workaround for an apparent engine bug that appeared when engymod was deployed (by Rienzilla)
 --
