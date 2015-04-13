@@ -522,7 +522,6 @@ function CommonLogic()
             control:Disable()
             control.StratIcon:SetSolidColor('00000000')
             control:SetSolidColor('00000000')
---            control.ConsBar:SetAlpha(0, true)
             control.BuildKey = nil
         elseif type == 'queuestack' or type == 'attachedunit' then
             SetIconTextures(control)
@@ -535,11 +534,6 @@ function CommonLogic()
             control.Width:Set(48)
             control.Icon.Height:Set(48)
             control.Icon.Width:Set(48)
---            if __blueprints[control.Data.id].General.ConstructionBar then
---                control.ConsBar:SetAlpha(1, true)
---            else
---                control.ConsBar:SetAlpha(0, true)
---            end
             control.BuildKey = nil
             if control.Data.count > 1 then
                 control.Count:SetText(control.Data.count)
@@ -571,11 +565,6 @@ function CommonLogic()
         LayoutHelpers.AtBottomIn(btn.Count, btn, 4)
         LayoutHelpers.AtRightIn(btn.Count, btn, 3)
         btn.Count.Depth:Set(function() return btn.Icon.Depth() + 10 end)
-
---        btn.ConsBar = Bitmap(btn, UIUtil.UIFile('/icons/units/cons_bar.dds'))
---        btn.ConsBar:DisableHitTest()
---        LayoutHelpers.AtCenterIn(btn.ConsBar, btn)
-
         btn.Glow = Bitmap(btn)
         btn.Glow:SetTexture(UIUtil.UIFile('/game/units_bmp/glow.dds'))
         btn.Glow:DisableHitTest()
@@ -629,11 +618,6 @@ function CommonLogic()
         btn.Count:DisableHitTest()
         LayoutHelpers.AtBottomIn(btn.Count, btn)
         LayoutHelpers.AtRightIn(btn.Count, btn)
-
---        btn.ConsBar = Bitmap(btn, UIUtil.UIFile('/icons/units/cons_bar.dds'))
---        btn.ConsBar:DisableHitTest()
---        LayoutHelpers.AtCenterIn(btn.ConsBar, btn)
-
         btn.LowFuel = Bitmap(btn)
         btn.LowFuel:SetSolidColor('ffff0000')
         btn.LowFuel:DisableHitTest()
@@ -736,7 +720,6 @@ function CommonLogic()
             control.Icon.Width:Set(30)
             control.StratIcon:SetSolidColor('00000000')
             control.LowFuel:SetAlpha(0, true)
---            control.ConsBar:SetAlpha(0, true)
             control.LowFuel:SetNeedsFrameUpdate(false)
             control.BuildKey = nil
         elseif type == 'spacer' then
@@ -756,7 +739,6 @@ function CommonLogic()
             control.StratIcon:SetSolidColor('00000000')
             control:SetSolidColor('00000000')
             control.LowFuel:SetAlpha(0, true)
---            control.ConsBar:SetAlpha(0, true)
             control.LowFuel:SetNeedsFrameUpdate(false)
             control.BuildKey = nil
         elseif type == 'enhancement' then
@@ -774,7 +756,6 @@ function CommonLogic()
             control.Count:SetText('')
             control.StratIcon:SetSolidColor('00000000')
             control.LowFuel:SetAlpha(0, true)
---            control.ConsBar:SetAlpha(0, true)
             control.LowFuel:SetNeedsFrameUpdate(false)
             control.BuildKey = nil
             if control.Data.Disabled then
@@ -811,7 +792,6 @@ function CommonLogic()
             control.Icon:Show()
             control:Enable()
             control.LowFuel:SetAlpha(0, true)
---            control.ConsBar:SetAlpha(0, true)
             control.LowFuel:SetNeedsFrameUpdate(false)
         elseif type == 'item' then
             SetIconTextures(control)
@@ -836,11 +816,6 @@ function CommonLogic()
             control.Icon:Show()
             control:Enable()
             control.LowFuel:SetAlpha(0, true)
---            if __blueprints[control.Data.id].General.ConstructionBar then
---                control.ConsBar:SetAlpha(1, true)
---            else
---                control.ConsBar:SetAlpha(0, true)
---            end
             control.LowFuel:SetNeedsFrameUpdate(false)
             if newTechUnits and table.find(newTechUnits, control.Data.id) then
                 table.remove(newTechUnits, table.find(newTechUnits, control.Data.id))
@@ -893,11 +868,6 @@ function CommonLogic()
             control.Icon.Height:Set(48)
             control.Icon.Width:Set(48)
             control.LowFuel:SetAlpha(0, true)
---            if __blueprints[control.Data.id].General.ConstructionBar then
---                control.ConsBar:SetAlpha(1, true)
---            else
---                control.ConsBar:SetAlpha(0, true)
---            end
             control.BuildKey = nil
             if control.Data.lowFuel then
                 control.LowFuel:SetNeedsFrameUpdate(true)
