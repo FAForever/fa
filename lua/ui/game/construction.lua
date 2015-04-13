@@ -1381,10 +1381,16 @@ function ProcessKeybinding(key, templateID)
     end
 end
 
-function CreateTemplateOptionsMenu(button)
+function CreateTemplateOptionMenu(button, templateObj)
     local group = Group(button)
     group.Depth:Set(button:GetRootFrame():GetTopmostDepth() + 1)
     local title = Edit(group)
+
+    -- Closure copy
+    local templates = templateObj
+    local btn = button
+    local theTemplate = btn.Data.template
+
     local items = {
         {
             label = '<LOC _Rename>Rename',
@@ -1394,10 +1400,11 @@ function CreateTemplateOptionsMenu(button)
         },
         {
             label = '<LOC _Change_Icon>Change Icon',
+            arrow = true,
             action = function()
                 local contents = {}
                 local controls = {}
-                for _, entry in button.Data.template.templateData do
+                for _, entry in theTemplate.templateData do
                     if type(entry) == 'table' then
                         if not contents[entry[1]] then
                             contents[entry[1]] = true
@@ -1412,11 +1419,10 @@ function CreateTemplateOptionsMenu(button)
                     table.insert(controls, bmp)
                 end
                 group.SubMenu = CreateSubMenu(group, controls, function(id)
-                    Templates.SetTemplateIcon(button.Data.template.templateID, id)
+                    templates.SetTemplateIcon(theTemplate.templateID, id)
                     RefreshUI()
                 end)
-            end,
-            arrow = true
+            end
         },
         {
             label = '<LOC _Change_Keybinding>Change Keybinding',
@@ -1426,7 +1432,7 @@ function CreateTemplateOptionsMenu(button)
                     text:AcquireKeyboardFocus(false)
                     text.HandleEvent = function(self, event)
                         if event.Type == 'KeyDown' then
-                            ProcessKeybinding(event.KeyCode, button.Data.template.templateID)
+                            ProcessKeybinding(event.KeyCode, theTemplate.templateID)
                         end
                         return true
                     end
@@ -1436,17 +1442,18 @@ function CreateTemplateOptionsMenu(button)
                         oldTextOnDestroy(self)
                     end
                 else
-                    capturingKeys = button.Data.template.templateID
+                    capturingKeys = theTemplate.templateID
                 end
                 warningtext = text
                 group.SubMenu = CreateSubMenu(group, { text }, function(id)
-                    Templates.SetTemplateKey(button.Data.template.templateID, id)
+                    templates.SetTemplateKey(theTemplate.templateID, id)
                     RefreshUI()
                 end, false)
             end
         },
         {
             label = '<LOC _Send_to>Send to',
+            arrow = true,
             action = function()
                 local armies = GetArmiesTable().armiesTable
                 local entries = {}
@@ -1459,28 +1466,24 @@ function CreateTemplateOptionsMenu(button)
                 end
                 if table.getsize(entries) > 0 then
                     group.SubMenu = CreateSubMenu(group, entries, function(id)
-                        Templates.SendTemplate(button.Data.template.templateID, id)
+                        templates.SendTemplate(theTemplate.templateID, id)
                         RefreshUI()
                     end)
                 end
             end,
             disabledFunc = function()
-                if table.getsize(GetSessionClients()) > 1 then
-                    return false
-                else
-                    return true
-                end
-            end,
-            arrow = true
+                return table.getsize(GetSessionClients()) <= 1
+            end
         },
         {
             label = '<LOC _Delete>Delete',
             action = function()
-                Templates.RemoveTemplate(button.Data.template.templateID)
+                templates.RemoveTemplate(theTemplate.templateID)
                 RefreshUI()
             end
         }
     }
+
     local function CreateItem(data)
         local bg = Bitmap(group)
         bg:SetSolidColor('00000000')
@@ -1549,7 +1552,7 @@ function CreateTemplateOptionsMenu(button)
         return true
     end
     title.OnEnterPressed = function(self, text)
-        Templates.RenameTemplate(button.Data.template.templateID, text)
+        templates.RenameTemplate(button.Data.template.templateID, text)
         RefreshUI()
     end
 
@@ -1560,6 +1563,14 @@ function CreateTemplateOptionsMenu(button)
     end
 
     return group
+end
+
+function CreateTemplateOptionsMenu(button)
+    return CreateTemplateOptionMenu(button, Templates)
+end
+
+function CreateFacTemplateOptionsMenu(button)
+    return CreateTemplateOptionMenu(button, TemplatesFactory)
 end
 
 function CreateSubMenu(parentMenu, contents, onClickFunc, setupOnClickHandler)
@@ -2558,167 +2569,4 @@ function ButtonReleaseCallback()
         --nothing is now selected
         index = nil
     end
-end
-
-function CreateFacTemplateOptionsMenu(button)
-    local group = Group(button)
-    group.Depth:Set(button:GetRootFrame():GetTopmostDepth() + 1)
-    local title = Edit(group)
-    local items = {
-        {
-            label = '<LOC _Rename>Rename',
-            action = function()
-                title:AcquireFocus()
-            end
-        },
-        {
-            label = '<LOC _Change_Icon>Change Icon',
-            action = function()
-                local contents = {}
-                local controls = {}
-                for _, entry in button.Data.template.templateData do
-                    if type(entry) == 'table' then
-                        if not contents[entry.id] then
-                            contents[entry.id] = true
-                        end
-                    end
-                end
-                for iconType, _ in contents do
-                    local bmp = Bitmap(group, '/textures/ui/common/icons/units/' .. iconType .. '_icon.dds')
-                    bmp.Height:Set(30)
-                    bmp.Width:Set(30)
-                    bmp.ID = iconType
-                    table.insert(controls, bmp)
-                end
-                group.SubMenu = CreateSubMenu(group, controls, function(id)
-                    TemplatesFactory.SetTemplateIcon(button.Data.template.templateID, id)
-                    RefreshUI()
-                end)
-            end,
-            arrow = true
-        },
-        {
-            label = '<LOC _Change_Keybinding>Change Keybinding',
-            action = function()
-                local text = UIUtil.CreateText(group, "<LOC CONSTRUCT_0008>Press a key to bind", 12, UIUtil.bodyFont)
-                if not BuildMode.IsInBuildMode() then
-                    text:AcquireKeyboardFocus(false)
-                    text.HandleEvent = function(self, event)
-                        if event.Type == 'KeyDown' then
-                            ProcessKeybinding(event.KeyCode, button.Data.template.templateID)
-                        end
-                        return true
-                    end
-                    local oldTextOnDestroy = text.OnDestroy
-                    text.OnDestroy = function(self)
-                        text:AbandonKeyboardFocus()
-                        oldTextOnDestroy(self)
-                    end
-                else
-                    capturingKeys = button.Data.template.templateID
-                end
-                warningtext = text
-                group.SubMenu = CreateSubMenu(group, { text }, function(id)
-                    TemplatesFactory.SetTemplateKey(button.Data.template.templateID, id)
-                    RefreshUI()
-                end, false)
-            end
-        },
-        {
-            label = '<LOC _Send_to>Send to',
-            -- menu item disabled but not removed, to be consistent with standard templates menu
-            action = function()
-                LOG('Send templates disabled')
-            end,
-            disabledFunc = function()
-                return true
-            end
-        },
-        {
-            label = '<LOC _Delete>Delete',
-            action = function()
-                TemplatesFactory.RemoveTemplate(button.Data.template.templateID)
-                RefreshUI()
-            end
-        },
-    }
-    local function CreateItem(data)
-        local bg = Bitmap(group)
-        bg:SetSolidColor('00000000')
-        bg.label = UIUtil.CreateText(bg, LOC(data.label), 12, UIUtil.bodyFont)
-        bg.label:DisableHitTest()
-        LayoutHelpers.AtLeftTopIn(bg.label, bg, 2)
-        bg.Height:Set(function() return bg.label.Height() + 2 end)
-        bg.HandleEvent = function(self, event)
-            if event.Type == 'MouseEnter' then
-                self:SetSolidColor('ff777777')
-            elseif event.Type == 'MouseExit' then
-                self:SetSolidColor('00000000')
-            elseif event.Type == 'ButtonPress' then
-                if group.SubMenu then
-                    group.SubMenu:Destroy()
-                    group.SubMenu = false
-                end
-                data.action()
-            end
-            return true
-        end
-
-        if data.disabledFunc and data.disabledFunc() then
-            bg:Disable()
-            bg.label:SetColor('ff777777')
-        end
-
-        return bg
-    end
-
-    local totHeight = 0
-    local maxWidth = 0
-    title.Height:Set(function() return title:GetFontHeight() end)
-    title.Width:Set(function() return title:GetStringAdvance(LOC(button.Data.template.name)) end)
-    UIUtil.SetupEditStd(title, "ffffffff", nil, "ffaaffaa", UIUtil.highlightColor, UIUtil.bodyFont, 14, 200)
-    title:SetDropShadow(true)
-    title:ShowBackground(true)
-    title:SetText(LOC(button.Data.template.name))
-    LayoutHelpers.AtLeftTopIn(title, group)
-    totHeight = totHeight + title.Height()
-    maxWidth = math.max(maxWidth, title.Width())
-    local itemControls = {}
-    local prevControl = false
-    for index, actionData in items do
-        local i = index
-        itemControls[i] = CreateItem(actionData)
-        if prevControl then
-            LayoutHelpers.Below(itemControls[i], prevControl)
-        else
-            LayoutHelpers.Below(itemControls[i], title)
-        end
-        totHeight = totHeight + itemControls[i].Height()
-        maxWidth = math.max(maxWidth, itemControls[i].label.Width() + 4)
-        prevControl = itemControls[i]
-    end
-    for _, control in itemControls do
-        control.Width:Set(maxWidth)
-    end
-    title.Width:Set(maxWidth)
-    group.Height:Set(totHeight)
-    group.Width:Set(maxWidth)
-    LayoutHelpers.Above(group, button, 10)
-
-    title.HandleEvent = function(self, event)
-        Edit.HandleEvent(self, event)
-        return true
-    end
-    title.OnEnterPressed = function(self, text)
-        TemplatesFactory.RenameTemplate(button.Data.template.templateID, text)
-        RefreshUI()
-    end
-
-    UIUtil.SurroundWithNinePatch(group, "/game/chat_brd/", 4, 4)
-
-    group.HandleEvent = function(self, event)
-        return true
-    end
-
-    return group
 end
