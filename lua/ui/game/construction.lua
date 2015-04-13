@@ -35,6 +35,7 @@ local prevBuildables = false
 local prevSelection = false
 local prevBuildCategories = false
 
+-- Flag to indicate if every selected unit is a factory
 local allFactories = nil
 
 if options.gui_templates_factory ~= 0 then
@@ -429,17 +430,14 @@ end
 function GetBackgroundTextures(unitID)
     local bp = __blueprints[unitID]
     local validIcons = { land = true, air = true, sea = true, amph = true }
-    if validIcons[bp.General.Icon] then
-        return UIUtil.UIFile('/icons/units/' .. bp.General.Icon .. '_up.dds'),
-        UIUtil.UIFile('/icons/units/' .. bp.General.Icon .. '_down.dds'),
-        UIUtil.UIFile('/icons/units/' .. bp.General.Icon .. '_over.dds'),
-        UIUtil.UIFile('/icons/units/' .. bp.General.Icon .. '_up.dds')
-    else
-        return UIUtil.UIFile('/icons/units/land_up.dds'),
-        UIUtil.UIFile('/icons/units/land_down.dds'),
-        UIUtil.UIFile('/icons/units/land_over.dds'),
-        UIUtil.UIFile('/icons/units/land_up.dds')
+    if not validIcons[bp.General.Icon] then
+        WARN(debug.traceback(nil, "Invalid icon: " .. bp.General.Icon .. " for unitID " + tostring(unitID)))
+        bp.General.Icon = "land"
     end
+        return UIUtil.UIFile('/icons/units/' .. bp.General.Icon .. '_up.dds'),
+               UIUtil.UIFile('/icons/units/' .. bp.General.Icon .. '_down.dds'),
+               UIUtil.UIFile('/icons/units/' .. bp.General.Icon .. '_over.dds'),
+               UIUtil.UIFile('/icons/units/' .. bp.General.Icon .. '_up.dds')
 end
 
 function GetEnhancementPrefix(unitID, iconID)
