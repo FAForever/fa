@@ -31,14 +31,6 @@ local Effect = import('/lua/maui/effecthelpers.lua')
 local TemplatesFactory = import('/modules/templates_factory.lua')
 local straticonsfile = import('/modules/straticons.lua')
 
-local unitGridPages = {
-    RULEUTL_Basic = {Order = 0, Label = "<LOC CONSTRUCT_0000>T1"},
-    RULEUTL_Advanced = {Order = 1, Label = "<LOC CONSTRUCT_0001>T2"},
-    RULEUTL_Secret = {Order = 2, Label = "<LOC CONSTRUCT_0002>T3"},
-    RULEUTL_Experimental = {Order = 3, Label = "<LOC CONSTRUCT_0003>Exp"},
-    RULEUTL_Munition = {Order = 4, Label = "<LOC CONSTRUCT_0004>Munition"},   -- note that this doesn't exist yet
-}
-
 local prevBuildables = false
 local prevSelection = false
 local prevBuildCategories = false
