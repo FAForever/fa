@@ -2041,10 +2041,6 @@ local OptionUtils = {
             options[option.key] = option.values[option.default].key
         end
 
-        for index, option in teamOpts do
-            options[option.key] = option.values[option.default].key
-        end
-
         for index, option in AIOpts do
             options[option.key] = option.values[option.default].key
         end
