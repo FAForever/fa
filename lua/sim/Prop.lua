@@ -13,12 +13,6 @@
 local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
---for CBFP:
-local Game = import('/lua/game.lua')
-local RebuildBonusCheckCallback = import('/lua/sim/RebuildBonusCallback.lua').RunRebuildBonusCallback
-
-
-
 Prop = Class(moho.prop_methods, Entity) {
 
     -- Do not call the base class __init and __post_init, we already have a c++ object
@@ -96,9 +90,6 @@ Prop = Class(moho.prop_methods, Entity) {
     end,
 
     OnDestroy = function(self)
-        if self.IsWreckage and not self.DestroyCalled then
-            RebuildBonusCheckCallback(self:GetPosition(), self.AssociatedBP)
-        end
         self.Trash:Destroy()
     end,
 
