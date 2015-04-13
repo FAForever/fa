@@ -1139,10 +1139,9 @@ function OnClickHandler(button, modifiers)
                     end
                     SelectUnits(selection)
                 end
+
+                return
             end
-            -- override default rightclick handler
-            if modifiers.Right then return end
-            -- else new code does not work as intended
         end
     end
 
