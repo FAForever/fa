@@ -1387,45 +1387,30 @@ end
 
 local warningtext = false
 function ProcessKeybinding(key, templateID)
+    local templateObject
     if allFactories then
-        if key == UIUtil.VK_ESCAPE then
-            TemplatesFactory.ClearTemplateKey(capturingKeys or templateID)
-            RefreshUI()
-        elseif key == string.byte('b') or key == string.byte('B') then
-            warningtext:SetText(LOC("<LOC CONSTRUCT_0005>Key must not be b!"))
-        else
-            if (key >= string.byte('A') and key <= string.byte('Z')) or (key >= string.byte('a') and key <= string.byte('z')) then
-                if (key >= string.byte('a') and key <= string.byte('z')) then
-                    key = string.byte(string.upper(string.char(key)))
-                end
-                if TemplatesFactory.SetTemplateKey(capturingKeys or templateID, key) then
-                    RefreshUI()
-                else
-                    warningtext:SetText(LOCF("<LOC CONSTRUCT_0006>%s is already used!", string.char(key)))
-                end
-            else
-                warningtext:SetText(LOC("<LOC CONSTRUCT_0007>Key must be a-z!"))
-            end
-        end
+        templateObject = TemplatesFactory
     else
-        if key == UIUtil.VK_ESCAPE then
-            Templates.ClearTemplateKey(capturingKeys or templateID)
-            RefreshUI()
-        elseif key == string.byte('b') or key == string.byte('B') then
-            warningtext:SetText(LOC("<LOC CONSTRUCT_0005>Key must not be b!"))
-        else
-            if (key >= string.byte('A') and key <= string.byte('Z')) or (key >= string.byte('a') and key <= string.byte('z')) then
-                if (key >= string.byte('a') and key <= string.byte('z')) then
-                    key = string.byte(string.upper(string.char(key)))
-                end
-                if Templates.SetTemplateKey(capturingKeys or templateID, key) then
-                    RefreshUI()
-                else
-                    warningtext:SetText(LOCF("<LOC CONSTRUCT_0006>%s is already used!", string.char(key)))
-                end
-            else
-                warningtext:SetText(LOC("<LOC CONSTRUCT_0007>Key must be a-z!"))
+        templateObject = Templates
+    end
+
+    if key == UIUtil.VK_ESCAPE then
+        templateObject.ClearTemplateKey(capturingKeys or templateID)
+        RefreshUI()
+    elseif key == string.byte('b') or key == string.byte('B') then
+        warningtext:SetText(LOC("<LOC CONSTRUCT_0005>Key must not be b!"))
+    else
+        if (key >= string.byte('A') and key <= string.byte('Z')) or (key >= string.byte('a') and key <= string.byte('z')) then
+            if (key >= string.byte('a') and key <= string.byte('z')) then
+                key = string.byte(string.upper(string.char(key)))
             end
+            if templateObject.SetTemplateKey(capturingKeys or templateID, key) then
+                RefreshUI()
+            else
+                warningtext:SetText(LOCF("<LOC CONSTRUCT_0006>%s is already used!", string.char(key)))
+            end
+        else
+            warningtext:SetText(LOC("<LOC CONSTRUCT_0007>Key must be a-z!"))
         end
     end
 end
