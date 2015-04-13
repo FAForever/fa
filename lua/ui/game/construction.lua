@@ -1407,7 +1407,6 @@ function ProcessKeybinding(key, templateID)
                 warningtext:SetText(LOC("<LOC CONSTRUCT_0007>Key must be a-z!"))
             end
         end
-        return true
     else
         if key == UIUtil.VK_ESCAPE then
             Templates.ClearTemplateKey(capturingKeys or templateID)
@@ -1428,7 +1427,6 @@ function ProcessKeybinding(key, templateID)
                 warningtext:SetText(LOC("<LOC CONSTRUCT_0007>Key must be a-z!"))
             end
         end
-        return true
     end
 end
 
