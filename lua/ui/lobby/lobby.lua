@@ -2016,24 +2016,6 @@ end
 
 -- Holds some utility functions to do with game option management.
 local OptionUtils = {
-    -- Expresses which options are acceptable for a game to be considered ranked.
-    -- A game is deemed "ranked" if, for every key k in gameOptions:
-    --    RANKED_OPTIONS[k] == nil  or
-    --    RANKED_OPTIONS[k] contains gameOptions[k]
-    RANKED_OPTIONS = {
-        Victory = {'demoralization'},
-        CheatsEnabled = {'false'},
-        CivilianAlliance = {'enemy'},
-        GameSpeed = {'normal'},
-        FogOfWar = {'explored'},
-        UnitCap = {'1000'},
-        PrebuiltUnits = {'Off'},
-        NoRushOption = {'Off'},
-        TeamSpawn = {'fixed'},
-        TeamLock = {'locked'},
-    },
-
-
     -- Set all game options to their default values.
     SetDefaults = function()
         local options = {}
@@ -2046,20 +2028,6 @@ local OptionUtils = {
         end
 
         SetGameOptions(options)
-    end,
-
-    -- Returns true if current game options are considered suitable for a ranked game, false
-    -- otherwise.
-    AreRanked = function(self)
-        for k, v in gameInfo.GameOptions do
-            if self.RANKED_OPTIONS[k] then
-                if not indexOf(self.RANKED_OPTIONS[k], v) then
-                    return false
-                end
-            end
-        end
-
-        return true
     end
 }
 
