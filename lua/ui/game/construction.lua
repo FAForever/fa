@@ -473,9 +473,12 @@ function CommonLogic()
 
     controls.secondaryProgress:SetNeedsFrameUpdate(true)
     controls.secondaryProgress.OnFrame = function(self, delta)
-        if sortedOptions.selection[1] and not sortedOptions.selection[1]:IsDead() and sortedOptions.selection[1]:GetWorkProgress() then
-            controls.secondaryProgress:SetValue(sortedOptions.selection[1]:GetWorkProgress())
+        local frontOfQueue = sortedOptions.selection[1]
+        if not frontOfQueue or frontOfQueue:IsDead() then
+            return
         end
+
+        controls.secondaryProgress:SetValue(frontOfQueue:GetWorkProgress() or 0)
         if controls.secondaryChoices.top == 1 and not controls.selectionTab:IsChecked() and not controls.constructionGroup:IsHidden() then
             self:SetAlpha(1, true)
         else
