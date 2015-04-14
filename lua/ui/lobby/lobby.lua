@@ -984,6 +984,9 @@ function ClearSlotInfo(slotIndex)
 
     local hostKey
     if lobbyComm:IsHost() then
+        -- Somewhat brute force, but with the current 'state machine'
+        -- this is my best bet at ensuring consistent state on the server
+        GpgNetSend('ClearSlot', slotIndex)
         hostKey = 'host'
     else
         hostKey = 'client'
