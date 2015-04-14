@@ -3491,6 +3491,12 @@ function RefreshOptionDisplayData(scenarioInfo)
             return
         end
 
+        -- Don't bother for options with only one value. These are usually someone trying to do
+        -- something clever with a mod or such, not "real" options we care about.
+        if table.getn(optData.values) <= 1 then
+            return
+        end
+
         local option = {
             text = optData.label,
             tooltip = { text = optData.label, body = optData.help }

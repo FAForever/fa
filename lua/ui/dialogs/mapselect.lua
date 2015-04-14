@@ -584,7 +584,7 @@ function RefreshOptions(skipRefresh, singlePlayer)
         if table.getsize(OptionTable.options) > 0 then
             table.insert(Options, {type = 'title', text = OptionTable.title})
             for optionIndex, optionData in OptionTable.options do
-                if not(singlePlayer and optionData.mponly == true) then
+                if not(singlePlayer and optionData.mponly == true) and table.getn(optionData.values) > 1 then
                     table.insert(Options, {type = 'option', text = optionData.label, data = optionData, default = optionData.default}) -- option1 for teamOptions for exemple
                 end
             end
