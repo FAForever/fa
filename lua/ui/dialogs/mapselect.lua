@@ -584,7 +584,7 @@ function RefreshOptions(skipRefresh, singlePlayer)
         if table.getsize(OptionTable.options) > 0 then
             table.insert(Options, {type = 'title', text = OptionTable.title})
             for optionIndex, optionData in OptionTable.options do
-                if not(singlePlayer and optionData.mponly == true) then
+                if not(singlePlayer and optionData.mponly == true) and table.getn(optionData.values) > 1 then
                     table.insert(Options, {type = 'option', text = optionData.label, data = optionData, default = optionData.default}) -- option1 for teamOptions for exemple
                 end
             end
@@ -624,21 +624,22 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
 
     local function CreateOptionElements()
         local function CreateElement(index)
-            OptionDisplay[index] = Group(OptionContainer)
-            OptionDisplay[index].Height:Set(46)
-            OptionDisplay[index].Width:Set(function() return OptionContainer.Width() + 4 end)
+            local optionGroup = Group(OptionContainer)
+            optionGroup.Height:Set(46)
+            optionGroup.Width:Set(function() return OptionContainer.Width() + 4 end)
 
-            OptionDisplay[index].bg = Bitmap(OptionDisplay[index])
-            OptionDisplay[index].bg.Depth:Set(OptionDisplay[index].Depth)
-            LayoutHelpers.FillParent(OptionDisplay[index].bg, OptionDisplay[index])
-            OptionDisplay[index].bg.Right:Set(OptionDisplay[index].Right)
+            optionGroup.bg = Bitmap(optionGroup)
+            optionGroup.bg.Depth:Set(optionGroup.Depth)
+            LayoutHelpers.FillParent(optionGroup.bg, optionGroup)
+            optionGroup.bg.Right:Set(optionGroup.Right)
 
-            OptionDisplay[index].text = UIUtil.CreateText(OptionContainer, '', 14, "Arial")
-            OptionDisplay[index].text:DisableHitTest()
-            LayoutHelpers.AtLeftTopIn(OptionDisplay[index].text, OptionDisplay[index], 10)
+            optionGroup.text = UIUtil.CreateText(OptionContainer, '', 14, "Arial")
+            optionGroup.text:DisableHitTest()
+            LayoutHelpers.AtLeftTopIn(optionGroup.text, optionGroup, 10)
 
-            OptionDisplay[index].combo = CreateOptionCombo(OptionDisplay[index])
-            LayoutHelpers.AtLeftTopIn(OptionDisplay[index].combo, OptionDisplay[index], 5, 22)
+            optionGroup.combo = CreateOptionCombo(optionGroup)
+            LayoutHelpers.AtLeftTopIn(optionGroup.combo, optionGroup, 5, 22)
+            OptionDisplay[index] = optionGroup
         end
 
         CreateElement(1)
