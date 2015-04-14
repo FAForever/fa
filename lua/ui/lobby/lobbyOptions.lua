@@ -71,8 +71,8 @@ teamOptions =
                 key = 'pvsi',
             },
             {
-                text = "<LOC lobui_0585>Manual Select",
-                help = "<LOC lobui_0586>You can select the teams clicking on the icons in the map preview, it only works with random spawn",
+                text = "<LOC lobui_0604>Manual Select",
+                help = "<LOC lobui_0605>You can select the teams clicking on the icons in the map preview, it only works with random spawn",
                 key = 'manual',
             },
         },
