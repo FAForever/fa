@@ -4099,10 +4099,29 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         selectedMods = table.map(function (m) return m.uid end, Mods.GetGameMods())
         HostUpdateMods()
 
+        --- Returns true if the given option has the given key as a valid setting.
+        local function keyIsValidForOption(option, key)
+            for k, v in option.values do
+                if v.key == key then
+                    return true
+                end
+            end
+
+            return false
+        end
+
         -- Given an option key, find the value stored in the profile (if any) and assign either it,
         -- or that option's default value, to the current game state.
         local setOptionsFromPref = function(option)
-            local defValue = Prefs.GetFromCurrentProfile("LobbyOpt_" .. option.key) or option.values[option.default].key
+            local defValue = Prefs.GetFromCurrentProfile("LobbyOpt_" .. option.key)
+
+            -- Do the slightly stupid thing to check if the option we found in the profile is
+            -- a valid key for this option. Some mods muck about with the possibilities, so we
+            -- need to make sure we use a sane default if that's happened.
+            if not defValue or not keyIsValidForOption(option, defValue) then
+                defValue = option.values[option.default].key
+            end
+
             SetGameOption(option.key, defValue, true)
         end
 
