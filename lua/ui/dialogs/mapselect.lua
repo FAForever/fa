@@ -624,21 +624,22 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
 
     local function CreateOptionElements()
         local function CreateElement(index)
-            OptionDisplay[index] = Group(OptionContainer)
-            OptionDisplay[index].Height:Set(46)
-            OptionDisplay[index].Width:Set(function() return OptionContainer.Width() + 4 end)
+            local optionGroup = Group(OptionContainer)
+            optionGroup.Height:Set(46)
+            optionGroup.Width:Set(function() return OptionContainer.Width() + 4 end)
 
-            OptionDisplay[index].bg = Bitmap(OptionDisplay[index])
-            OptionDisplay[index].bg.Depth:Set(OptionDisplay[index].Depth)
-            LayoutHelpers.FillParent(OptionDisplay[index].bg, OptionDisplay[index])
-            OptionDisplay[index].bg.Right:Set(OptionDisplay[index].Right)
+            optionGroup.bg = Bitmap(optionGroup)
+            optionGroup.bg.Depth:Set(optionGroup.Depth)
+            LayoutHelpers.FillParent(optionGroup.bg, optionGroup)
+            optionGroup.bg.Right:Set(optionGroup.Right)
 
-            OptionDisplay[index].text = UIUtil.CreateText(OptionContainer, '', 14, "Arial")
-            OptionDisplay[index].text:DisableHitTest()
-            LayoutHelpers.AtLeftTopIn(OptionDisplay[index].text, OptionDisplay[index], 10)
+            optionGroup.text = UIUtil.CreateText(OptionContainer, '', 14, "Arial")
+            optionGroup.text:DisableHitTest()
+            LayoutHelpers.AtLeftTopIn(optionGroup.text, optionGroup, 10)
 
-            OptionDisplay[index].combo = CreateOptionCombo(OptionDisplay[index])
-            LayoutHelpers.AtLeftTopIn(OptionDisplay[index].combo, OptionDisplay[index], 5, 22)
+            optionGroup.combo = CreateOptionCombo(optionGroup)
+            LayoutHelpers.AtLeftTopIn(optionGroup.combo, optionGroup, 5, 22)
+            OptionDisplay[index] = optionGroup
         end
 
         CreateElement(1)
