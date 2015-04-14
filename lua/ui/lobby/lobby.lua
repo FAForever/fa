@@ -3517,11 +3517,17 @@ function RefreshOptionDisplayData(scenarioInfo)
         end
     end
 
-    -- Add options from globalOpts to the formattedOption lists.
-    for index, optData in globalOpts do
-        local gameOption = gameInfo.GameOptions[optData.key]
-        addFormattedOption(optData, gameOption)
+    local function addOptionsFrom(optionObject)
+        for index, optData in optionObject do
+            local gameOption = gameInfo.GameOptions[optData.key]
+            addFormattedOption(optData, gameOption)
+        end
     end
+
+    -- Add the core options to the formatted option lists
+    addOptionsFrom(globalOpts)
+    addOptionsFrom(teamOptions)
+    addOptionsFrom(AIOpts)
 
     -- Add options from the scenario object, if any are provided.
     if scenarioInfo.options then
