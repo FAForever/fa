@@ -251,7 +251,7 @@ english = {
 		Score="Score",
 		Chart="Chart",
 		Graph="Graph",
-		noData="no data avaible",
+		noData="No data available",
 		
 		-- title bar
 		mass_histo="Mass details",
