@@ -78,12 +78,12 @@ After all FAF-files have been loaded, the init file loads the base-game .scd fil
 Hooking
 -------
 
-Hooking with the FA virtual file system simply means [i]concatenating files[/i].
+Hooking with the FA virtual file system simply means `concatenating files`.
 
 Given the following directories and load-order:
 
 *cool_mod* directory containing:
-- `/schook/lua/file.lua`
+- `/hook/lua/file.lua`
 
 *FAF.scd* containing:
 - `/lua/file.lua`
@@ -94,11 +94,11 @@ Given the following directories and load-order:
 
 What ends up in the actual filesystem used by FA is:
 
-`/lua/file.lua` = `FAF.scd/lua/file.lua` + `cool_mod/schook/lua/file.lua` + `FAF.scd/schook/lua/file.lua`
+`/lua/file.lua` = `FAF.scd/lua/file.lua` + `cool_mod/hook/lua/file.lua` + `FAF.scd/schook/lua/file.lua`
 
 Where "`fileA` + `fileB`" means that `fileB` has been appended to `fileA`.
 
-The directory that is used for hooks can be configured in the init.lua file.
+The directory that is used for hooks can be configured in the init.lua file, and it customizable for each mod in the `mod_info.lua` file.
 
 Setting up a development init file
 ----------------------------------
