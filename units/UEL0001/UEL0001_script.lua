@@ -2,7 +2,7 @@
 -- File     :  /cdimage/units/UEL0001/UEL0001_script.lua
 -- Author(s):  John Comes, David Tomandl, Jessica St. Croix
 -- Summary  :  UEF Commander Script
--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 local Shield = import('/lua/shield.lua').Shield
 local TWalkingLandUnit = import('/lua/terranunits.lua').TWalkingLandUnit

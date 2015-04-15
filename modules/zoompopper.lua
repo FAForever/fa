@@ -3,7 +3,7 @@
 --* Author: III_Demon (Edited for FA by Warma)
 --* Summary: Zoom POP! FAST!
 --*
---* Copyright © 2xxx me,  All wrongs reversed.
+--* Copyright Â© 2xxx me,  All wrongs reversed.
 --*****************************************************************************
 
 function ToggleZoomPop()
