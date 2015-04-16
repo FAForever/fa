@@ -55,7 +55,7 @@ function ShowRanges()
 			ring:Destroy()
 			showRangeTable[id] = nil
 		end
-	end
+    end
 end
 
 function Init()
