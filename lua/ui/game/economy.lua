@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Economy bar UI
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -284,7 +284,6 @@ function _BeatFunction()
         reclaimedTotalsMass = math.ceil(econData.reclaimed.MASS)
         reclaimedTotalsEnergy = math.ceil(econData.reclaimed.ENERGY)
     end
-    
 
     if options.gui_smart_economy_indicators == 1 then
         local function DisplayEconData(controls, tableID, viewPref, filtered, warnfull)
@@ -321,32 +320,16 @@ function _BeatFunction()
             -- CHANGED by THYGRRR: Effective value calculation and rate calculation separated.
             local rateStr = string.format('%+d', math.min(math.max(rateVal, -99999999), 99999999))
             local effVal = 0
-            if (options.gui_smart_economy_indicators == 1) then
-                -- CHANGED BY THYGRRR: inlined local function to facilitate easier filtering
-                if (requestedAvg == 0) then
-                    effVal = "infinite"
-                else
-                    if (storedVal > 0.5) then
-                        filtered = filtered * 0.95 + (incomeAvg / actualAvg) * 0.05
-                        effVal = string.format("%d%%", math.ceil(filtered * 100))
-                    else
-                        filtered = filtered * 0.95 + (incomeAvg / requestedAvg) * 0.05
-                        effVal = string.format("%d%%", math.ceil(filtered * 100))
-                    end
-                end
+            -- CHANGED BY THYGRRR: inlined local function to facilitate easier filtering
+            if (requestedAvg == 0) then
+                effVal = "infinite"
             else
-                -- CHANGED BY THYGRRR: option turned off, normal behavior (re-coded though)
-                if (requestedAvg == 0) then
-                    effVal = "100%"
-                    filtered = 1.0
+                if (storedVal > 0.5) then
+                    filtered = filtered * 0.95 + (incomeAvg / actualAvg) * 0.05
+                    effVal = string.format("%d%%", math.ceil(filtered * 100))
                 else
-                    if (storedVal > 0.5) then
-                        filtered = (incomeAvg / actualAvg)
-                        effVal = string.format("%d%%", math.min(math.ceil(filtered * 100), 100))
-                    else
-                        filtered = (incomeAvg / requestedAvg)
-                        effVal = string.format("%d%%", math.min(math.ceil(filtered * 100), 100))
-                    end
+                    filtered = filtered * 0.95 + (incomeAvg / requestedAvg) * 0.05
+                    effVal = string.format("%d%%", math.ceil(filtered * 100))
                 end
             end
 
@@ -360,7 +343,7 @@ function _BeatFunction()
             -- SET RATE/EFFICIENCY COLOR
             local rateColor
             if (rateVal < 0) then
-                if (options.gui_smart_economy_indicators == 1) and (not warnfull) and (storedVal / maxStorageVal < 0.2) then
+                if not warnfull and storedVal / maxStorageVal < 0.2 then
                     --THYGRRR: display flashing gray-white if low on resource and warnfull is false ('warnempty')
                     if (emptyFlag) then
                         emptyFlag = false
@@ -371,31 +354,18 @@ function _BeatFunction()
                     end
                 else
                     -- SITUATION SPECIFIC COLOR CODE, modified to use filtered value and go red below 50%, and green above 80%
-                    if (options.gui_smart_economy_indicators == 1) then
-                        if (filtered > 0.8) and (warnfull) then
-                            rateColor = 'ffb7e75f'
-                        else
-                            if (filtered > 0.5) then
-                                rateColor = 'yellow'
-                            else
-                                rateColor = 'red'
-                            end
-                        end
+                    if (filtered > 0.8) and (warnfull) then
+                        rateColor = 'ffb7e75f'
                     else
-                        -- OLD COLOR CODE
-                        if (rateVal < 0) then
-                            if (storedVal > 0) then
-                                rateColor = 'yellow'
-                            else
-                                rateColor = 'red'
-                            end
+                        if (filtered > 0.5) then
+                            rateColor = 'yellow'
                         else
-                            rateColor = 'ffb7e75f'
+                            rateColor = 'red'
                         end
                     end
                 end
             else
-                if (options.gui_smart_economy_indicators == 1) and (warnfull) and (storedVal / maxStorageVal > 0.8) then
+                if warnfull and storedVal / maxStorageVal > 0.8 then
                     --THYGRRR: display flashing gray-white if high on resource and warnfull is true
                     if (fullFlag) then
                         fullFlag = false
@@ -414,7 +384,7 @@ function _BeatFunction()
             -- ECONOMY WARNINGS
             -- CHANGED BY THYGRRR: Use the filtered value, which is cleaner
             if Prefs.GetOption('econ_warnings') and UIState then
-                if (warnfull) and (options.gui_smart_economy_indicators == 1) then
+                if warnfull then
                     if (storedVal / maxStorageVal > 0.8) then
                         if (filtered > 2.0) then
                             controls.warningBG:SetToState('red')
