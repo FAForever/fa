@@ -94,7 +94,7 @@ function CreateUI()
         group.warningBG.flashMod = 1
         group.warningBG.warningBitmap = warningBitmap
         group.warningBG.SetToState = function(self, state)
-            if self.State != state then
+            if self.State ~= state then
                 if state == 'red' then
                     self:SetTexture(UIUtil.UIFile('/game/resource-panel/alert-'..self.warningBitmap..'-panel_bmp.dds'))
                     self.flashMod = 1.6
@@ -290,11 +290,13 @@ function _BeatFunction()
             local maxStorageVal = econData["maxStorage"][tableID]
             local storedVal = econData["stored"][tableID]
             local incomeVal = econData["income"][tableID]
-            local lastRequestedVal = econData["lastUseRequested"][tableID]
-            local lastActualVal = econData["lastUseActual"][tableID]
+            local average
+            if storedVal > 0.5 then
+                average = math.min(econData["lastUseActual"][tableID] * simFrequency, 99999999)
+            else
+                average = math.min(econData["lastUseRequested"][tableID] * simFrequency, 99999999)
+            end
 
-            local requestedAvg = math.min(lastRequestedVal * simFrequency, 99999999)
-            local actualAvg = math.min(lastActualVal * simFrequency, 99999999)
             local incomeAvg = math.min(incomeVal * simFrequency, 99999999)
 
             controls.storageBar:SetRange(0, maxStorageVal)
@@ -303,34 +305,19 @@ function _BeatFunction()
             controls.maxStorage:SetText(math.ceil(maxStorageVal))
 
             controls.income:SetText(string.format("+%d", math.ceil(incomeAvg)))
-            if (storedVal > 0.5) then
-                controls.expense:SetText(string.format("-%d", math.ceil(actualAvg)))
-            else
-                controls.expense:SetText(string.format("-%d", math.ceil(requestedAvg)))
-            end
+            controls.expense:SetText(string.format("-%d", math.ceil(average)))
 
-            local rateVal = 0
-            if storedVal > 0.5 then
-                rateVal = math.ceil(incomeAvg - actualAvg)
-            else
-                rateVal = math.ceil(incomeAvg - requestedAvg)
-            end
-
+            local rateVal = math.ceil(incomeAvg - average)
 
             -- CHANGED by THYGRRR: Effective value calculation and rate calculation separated.
             local rateStr = string.format('%+d', math.min(math.max(rateVal, -99999999), 99999999))
             local effVal = 0
             -- CHANGED BY THYGRRR: inlined local function to facilitate easier filtering
-            if (requestedAvg == 0) then
+            if average == 0 then
                 effVal = "infinite"
             else
-                if (storedVal > 0.5) then
-                    filtered = filtered * 0.95 + (incomeAvg / actualAvg) * 0.05
-                    effVal = string.format("%d%%", math.ceil(filtered * 100))
-                else
-                    filtered = filtered * 0.95 + (incomeAvg / requestedAvg) * 0.05
-                    effVal = string.format("%d%%", math.ceil(filtered * 100))
-                end
+                filtered = filtered * 0.95 + (incomeAvg / average) * 0.05
+                effVal = string.format("%d%%", math.ceil(filtered * 100))
             end
 
             -- CHOOSE RATE or EFFICIENCY STRING - CHANGED BY THYGRRR: Allow more than 100% - removed: math.min(effVal, 100)
@@ -425,19 +412,14 @@ function _BeatFunction()
 
     else
         local function DisplayEconData(controls, tableID, viewPref)
-            local function FormatRateString(RateVal, StoredVal, IncomeAvg, ActualAvg, RequestedAvg)
-                
+            local function FormatRateString(RateVal, StoredVal, IncomeAvg, average)
                 local retRateStr = string.format('%+d', math.min(math.max(RateVal, -99999999), 99999999))
 
                 local retEffVal = 0
-                if RequestedAvg == 0 then
+                if average == 0 then
                     retEffVal = math.ceil(IncomeAvg) * 100
                 else
-                    if StoredVal > 0.5 then
-                        retEffVal = math.ceil( (IncomeAvg / ActualAvg) * 100 )
-                    else
-                        retEffVal = math.ceil( (IncomeAvg / RequestedAvg) * 100 )
-                    end    
+                    retEffVal = math.ceil((IncomeAvg / average) * 100)
                 end
                 return retRateStr, retEffVal
             end
@@ -445,11 +427,14 @@ function _BeatFunction()
             local maxStorageVal = econData["maxStorage"][tableID]
             local storedVal = econData["stored"][tableID]
             local incomeVal = econData["income"][tableID]
-            local lastRequestedVal = econData["lastUseRequested"][tableID]
-            local lastActualVal = econData["lastUseActual"][tableID]
-        
-            local requestedAvg = math.min(lastRequestedVal * simFrequency, 99999999)
-            local actualAvg = math.min(lastActualVal * simFrequency, 9999999)
+
+            local average
+            if storedVal > 0.5 then
+                average = math.min(econData["lastUseActual"][tableID] * simFrequency, 99999999)
+            else
+                average = math.min(econData["lastUseRequested"][tableID] * simFrequency, 99999999)
+            end
+
             local incomeAvg = math.min(incomeVal * simFrequency, 99999999)
             
             controls.storageBar:SetRange(0, maxStorageVal)
@@ -458,27 +443,18 @@ function _BeatFunction()
             controls.maxStorage:SetText(math.ceil(maxStorageVal))
             
             controls.income:SetText(string.format("+%d", math.ceil(incomeAvg)))
-            if storedVal > 0.5 then
-                controls.expense:SetText(string.format("-%d", math.ceil(actualAvg)))
-            else
-                controls.expense:SetText(string.format("-%d", math.ceil(requestedAvg)))
-            end
+            controls.expense:SetText(string.format("-%d", math.ceil(average)))
         
-            local rateVal = 0
-            if storedVal > 0.5 then
-                rateVal = math.ceil(incomeAvg - actualAvg)
-            else
-                rateVal = math.ceil(incomeAvg - requestedAvg)
-            end
+            local rateVal = math.ceil(incomeAvg - average)
             local rateStr = string.format('%+d', math.min(math.max(rateVal, -99999999), 99999999))
-            local rateStr, effVal = FormatRateString(rateVal, storedVal, incomeAvg, actualAvg, requestedAvg)
-        -- CHOOSE RATE or EFFICIENCY STRING
+            local rateStr, effVal = FormatRateString(rateVal, storedVal, incomeAvg, average)
+            -- CHOOSE RATE or EFFICIENCY STRING
             if States[viewPref] == 2 then
                 controls.rate:SetText(string.format("%d%%", math.min(effVal, 100)))   
             else
                 controls.rate:SetText(string.format("%+s", rateStr))
             end
-        -- SET RATE/EFFICIENCY COLOR
+            -- SET RATE/EFFICIENCY COLOR
             local rateColor
             if rateVal < 0 then
                 if storedVal > 0 then
@@ -491,7 +467,7 @@ function _BeatFunction()
             end
             controls.rate:SetColor(rateColor)
             
-        -- ECONOMY WARNINGS        
+            -- ECONOMY WARNINGS
             if Prefs.GetOption('econ_warnings') and UIState then
                 if storedVal / maxStorageVal < .2 then
                     if effVal < 25 then
@@ -520,7 +496,7 @@ function _BeatFunction()
 end
 
 function ToggleEconPanel(state)
-    if import('/lua/ui/game/gamemain.lua').gameUIHidden and state != nil then
+    if import('/lua/ui/game/gamemain.lua').gameUIHidden and state ~= nil then
         return
     end
     import(UIUtil.GetLayoutFilename('economy')).TogglePanelAnimation(state)
