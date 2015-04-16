@@ -413,15 +413,14 @@ function _BeatFunction()
     else
         local function DisplayEconData(controls, tableID, viewPref)
             local function FormatRateString(RateVal, StoredVal, IncomeAvg, average)
-                local retRateStr = string.format('%+d', math.min(math.max(RateVal, -99999999), 99999999))
-
-                local retEffVal = 0
+                local retEffVal
                 if average == 0 then
                     retEffVal = math.ceil(IncomeAvg) * 100
                 else
                     retEffVal = math.ceil((IncomeAvg / average) * 100)
                 end
-                return retRateStr, retEffVal
+
+                return retEffVal
             end
             
             local maxStorageVal = econData["maxStorage"][tableID]
@@ -447,7 +446,7 @@ function _BeatFunction()
         
             local rateVal = math.ceil(incomeAvg - average)
             local rateStr = string.format('%+d', math.min(math.max(rateVal, -99999999), 99999999))
-            local rateStr, effVal = FormatRateString(rateVal, storedVal, incomeAvg, average)
+            local effVal = FormatRateString(rateVal, storedVal, incomeAvg, average)
             -- CHOOSE RATE or EFFICIENCY STRING
             if States[viewPref] == 2 then
                 controls.rate:SetText(string.format("%d%%", math.min(effVal, 100)))   
