@@ -280,9 +280,9 @@ function _BeatFunction()
     local econData = GetEconomyTotals()
     local simFrequency = GetSimTicksPerSecond()
     if options.gui_display_reclaim_totals == 1 then
-    -- fetch & format reclaim values
-        reclaimedTotalsMass = math.ceil(econData.reclaimed.MASS)
-        reclaimedTotalsEnergy = math.ceil(econData.reclaimed.ENERGY)
+        -- Show, if enabled, the reclaim values.
+        TextLine02:SetText(math.ceil(econData.reclaimed.MASS))
+        TextLine03:SetText(math.ceil(econData.reclaimed.ENERGY))
     end
 
     if options.gui_smart_economy_indicators == 1 then
@@ -402,14 +402,9 @@ function _BeatFunction()
             end
 
             return filtered
-        end        
-        if options.gui_display_reclaim_totals == 1 then
-            TextLine02:SetText(reclaimedTotalsMass)
-            TextLine03:SetText(reclaimedTotalsEnergy)
         end
         filteredEnergy = DisplayEconData(GUI.energy, 'ENERGY', 'energyViewState', filteredEnergy, false)
         filteredMass = DisplayEconData(GUI.mass, 'MASS', 'massViewState', filteredMass, true)        
-
     else
         local function DisplayEconData(controls, tableID, viewPref)
             local function FormatRateString(RateVal, StoredVal, IncomeAvg, average)
@@ -486,11 +481,6 @@ function _BeatFunction()
         
         DisplayEconData(GUI.mass, 'MASS', 'massViewState')
         DisplayEconData(GUI.energy, 'ENERGY', 'energyViewState')
-
-        if options.gui_display_reclaim_totals == 1 then
-            TextLine02:SetText(reclaimedTotalsMass)
-            TextLine03:SetText(reclaimedTotalsEnergy)
-        end
     end
 end
 
