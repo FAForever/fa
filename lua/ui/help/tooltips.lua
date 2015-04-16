@@ -2048,8 +2048,4 @@ Tooltips = {
         title = 'Zoom Pop Distance',
         description = 'Adjusts distance to which Zoom Pop zooms to.',
     },
-    options_gui_smart_economy_indicators = {
-        title = 'Smart Economy Indicators',
-        description = 'Smart Economy indicators. Rate display works differently now. Efficiency is "infinite" when consumption is zero. Values greater than 100% are possible again. Mass rate begins to flash bright white if stored mass is > 80% and rate is climbing. Energy rate begins to flash bright white if stored energy is < 20% and rate is sinking. Mass and energy bars are vertically exchanged (mass is heavier, thus it is below energy - TA style). Mass bar, as well as income and store numbers, are gray - TA style.',
-    },
 }
