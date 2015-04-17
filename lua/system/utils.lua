@@ -174,15 +174,6 @@ end
 --
 --------------------------------------------------------------------------------
 function table.cat(t1, t2)
-
-    if t1==t2 then
-        return t1
-    end
-
-    if type(t1)~='table' or type(t2)~='table' then
-        error('table.cat(t1, t2) : expects two tables as parameters',2)
-    end
-
     local tRet = {}
 
     for i,v in t1 do
