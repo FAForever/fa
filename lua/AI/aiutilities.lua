@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/AI/aiutilities.lua
-#**  Author(s): John Comes, Dru Staltman
-#**
-#**  Summary  :
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+-- ****************************************************************************
+-- **
+-- **  File     :  /lua/AI/aiutilities.lua
+-- **  Author(s): John Comes, Dru Staltman
+-- **
+-- **  Summary  :
+-- **
+-- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- ****************************************************************************
 local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
 local UnitTemplates = import('/lua/unittemplates.lua').UnitTemplates
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
@@ -14,14 +14,14 @@ local Utils = import('/lua/utilities.lua')
 local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
 local Buff = import('/lua/sim/Buff.lua')
 
-#sorian AI imports
+-- sorian AI imports
 local SUtils = import('/lua/AI/sorianutilities.lua')
 local AIBehaviors = import('/lua/ai/AIBehaviors.lua')
-#end sorian ai imports
+-- end sorian ai imports
 
 
 function AIGetEconomyNumbers(aiBrain)
-    #LOG('*AI DEBUG: RETURNING ECONOMY NUMBERS FROM AIBRAIN ', repr(aiBrain))
+    -- LOG('*AI DEBUG: RETURNING ECONOMY NUMBERS FROM AIBRAIN ', repr(aiBrain))
     local econ = {}
     econ.MassTrend = aiBrain:GetEconomyTrend('MASS')
     econ.EnergyTrend = aiBrain:GetEconomyTrend('ENERGY')
@@ -52,12 +52,12 @@ function AIGetEconomyNumbers(aiBrain)
         econ.MassEfficiencyOverTime = math.min(econTime.MassIncome / econTime.MassRequested, 2)
     end
         
-    if econ.MassStorageRatio != 0 then
+    if econ.MassStorageRatio ~= 0 then
         econ.MassMaxStored = econ.MassStorage / econ.MassStorageRatio
     else
         econ.MassMaxStored = econ.MassStorage
     end
-    if econ.EnergyStorageRatio != 0 then
+    if econ.EnergyStorageRatio ~= 0 then
         econ.EnergyMaxStored = econ.EnergyStorage / econ.EnergyStorageRatio
     else
         econ.EnergyMaxStored = econ.EnergyStorage
@@ -167,7 +167,7 @@ function AIGetSortedNavalLocations(aiBrain, maxNum)
     return AISortMarkersFromLastPos(aiBrain, markerList, maxNum or 1000)
 end
 
-# Function sorts the points by which is closest to a defensive point
+-- Function sorts the points by which is closest to a defensive point
 function SortLocationsClosestToDefensivePoints( aiBrain, points )
     local defPoints = AIGetMarkerLocations(aiBrain, 'Defensive Point')
     defPoints = AISortMarkersFromLastPos(aiBrain, defPoints, 5, nil, nil, nil, nil, points[1])
@@ -177,7 +177,7 @@ function SortLocationsClosestToDefensivePoints( aiBrain, points )
         local shortest = 320000
         local key, value
         for k, v in points do
-            # Get distance from all poitns here
+            -- Get distance from all poitns here
             local closeDist = false
             for _,marker in defPoints do
                 local dist = VDist3( v, marker )
@@ -209,14 +209,14 @@ function AISortMarkersFromStartPos(aiBrain, markerList, maxNumber, tMin, tMax, t
         startPosX = position[1]
         startPosZ = position[3]
     end
-    #Simple selection sort, this can be made faster later if we decide we need it.
+    -- Simple selection sort, this can be made faster later if we decide we need it.
     local sortedMarkerList = {}
     if table.getn(markerList) == 0 then return {} end
     local num = table.getsize(markerList)
     if maxNumber < num then
         num = maxNumber
     end
-    #LOG('*AI DEBUG: ARMY 2: LINE 112 of aiutilities.lua, NUM =', repr(num))
+    -- LOG('*AI DEBUG: ARMY 2: LINE 112 of aiutilities.lua, NUM =', repr(num))
     for i = 1, num do
         local lowest = nil
         local czX, czZ, distance, key, pos
@@ -257,7 +257,7 @@ function AISortMarkersFromLastPos(aiBrain, markerList, maxNumber, tMin, tMax, tR
         startPosX = position[1]
         startPosZ = position[3]
     end
-    #Simple selection sort, this can be made faster later if we decide we need it.
+    -- Simple selection sort, this can be made faster later if we decide we need it.
     local sortedMarkerList = {}
     local lastX = startPosX
     local lastZ = startPosZ
@@ -295,7 +295,7 @@ end
 
 
 function AIGetMarkerLocations(aiBrain, markerType)
-    #LOG('*AI DEBUG: ARMY 2: Getting Marker Locations of Type ', markerType)
+    -- LOG('*AI DEBUG: ARMY 2: Getting Marker Locations of Type ', markerType)
     local markerList = {}
     
     if markerType == 'Start Location' then
@@ -320,10 +320,10 @@ function AIGetMarkerLocations(aiBrain, markerType)
 end
 
 function AIGetMarkerLocationsEx(aiBrain, markerType)
-    #LOG('*AI DEBUG: ARMY 2: Getting Marker Locations of Type ', markerType)
+    -- LOG('*AI DEBUG: ARMY 2: Getting Marker Locations of Type ', markerType)
     local markers = ScenarioUtils.GetMarkers()
     local markerList = {}
-    #Make a list of all the markers in the scenario that are of the markerType
+    -- Make a list of all the markers in the scenario that are of the markerType
     if markers then
         for k, v in markers do
             if v.type == markerType then
@@ -392,16 +392,16 @@ function AIGetMarkerLeastUnits( aiBrain, markerType, markerRadius, pos, posRad, 
     return retPos, retName
 end
 
-# ================================================================= #
-#     Expansion functions - Finds bases needing expansion bases
-# ================================================================= #
+-- ================================================================= -- 
+--     Expansion functions - Finds bases needing expansion bases
+-- ================================================================= -- 
 function GetAlliesThreat( aiBrain, marker, threatRings, threatType )
     local armyIndex = aiBrain:GetArmyIndex()
     local threat = 0
     for k,v in ArmyBrains do
-        if v != aiBrain and IsAlly( v:GetArmyIndex(), armyIndex ) then
+        if v ~= aiBrain and IsAlly( v:GetArmyIndex(), armyIndex ) then
             threat = aiBrain:GetNumUnitsAroundPoint( categories.ALLUNITS - categories.MASSEXTRACTION - categories.MOBILE, marker.Position, 30, 'Ally' )
-            #threat = threat + aiBrain:GetThreatAtPosition( marker.Position, threatRings, true, threatType or 'Overall', v:GetArmyIndex() )
+            -- threat = threat + aiBrain:GetThreatAtPosition( marker.Position, threatRings, true, threatType or 'Overall', v:GetArmyIndex() )
         end
     end
     return threat
@@ -411,7 +411,7 @@ function AIFilterAlliedBases( aiBrain, positions )
     local retPositions = {}
     for k,v in positions do
         local threat = GetAlliesThreat( aiBrain, v, 2, 'StructuresNotMex' )
-        #LOG('*AI DEBUG: Threat = ' .. threat)
+        -- LOG('*AI DEBUG: Threat = ' .. threat)
         if threat == 0 then
             table.insert(retPositions, v)
         end
@@ -444,7 +444,7 @@ function AIFindMarkerNeedsEngineer( aiBrain, pos, radius, tMin, tMax, tRings, tT
     return retPos, retName
 end
 
-# We use both Blank Marker that are army names as well as the new Large Expansion Area to determine big expansion bases
+-- We use both Blank Marker that are army names as well as the new Large Expansion Area to determine big expansion bases
 function AIFindStartLocationNeedsEngineer( aiBrain, locationType, radius, tMin, tMax, tRings, tType, eng)
     local pos = aiBrain:PBMGetLocationCoords( locationType )
     if not pos then
@@ -457,7 +457,7 @@ function AIFindStartLocationNeedsEngineer( aiBrain, locationType, radius, tMin, 
     local startX, startZ = aiBrain:GetArmyStartPos()
     for k,v in positions do
         if string.sub(v.Name,1,5) == 'ARMY_' then
-            if startX != v.Position[1] and startZ != v.Position[3] then
+            if startX ~= v.Position[1] and startZ ~= v.Position[3] then
                 table.insert( validPos, v )
             end
         end
@@ -550,17 +550,17 @@ function AIFindDefensivePointNeedsStructure( aiBrain, locationType, radius, cate
 end
 
 function AIFindFirebaseLocation( aiBrain, locationType, radius, markerType, tMin, tMax, tRings, tType, maxUnits, unitCat, markerRadius)
-    #Get location of commander
-    #local threatPos, threatVal = aiBrain:GetHighestThreatPosition(0, true, 'Commander', aiBrain:GetCurrentEnemy():GetArmyIndex())
-    #if threatVal == 0 then
-    #    local threatPos, threatVal = aiBrain:GetHighestThreatPosition(1, true, tType or 'Structures', aiBrain:GetCurrentEnemy():GetArmyIndex())
-    #end
+    -- Get location of commander
+    -- local threatPos, threatVal = aiBrain:GetHighestThreatPosition(0, true, 'Commander', aiBrain:GetCurrentEnemy():GetArmyIndex())
+    -- if threatVal == 0 then
+    --    local threatPos, threatVal = aiBrain:GetHighestThreatPosition(1, true, tType or 'Structures', aiBrain:GetCurrentEnemy():GetArmyIndex())
+    -- end
     local estartX, estartZ = aiBrain:GetCurrentEnemy():GetArmyStartPos()
     local threatPos = {estartX, 0, estartZ}
-    #Get markers
+    -- Get markers
     local markerList = AIGetMarkerLocations(aiBrain, markerType)
     
-    #For each marker, check against threatpos. Save markers that are within the FireBaseRange
+    -- For each marker, check against threatpos. Save markers that are within the FireBaseRange
     local inRangeList = {}
     for _,marker in markerList do
         local distSq = VDist2Sq(marker.Position[1], marker.Position[3], threatPos[1], threatPos[3])
@@ -570,7 +570,7 @@ function AIFindFirebaseLocation( aiBrain, locationType, radius, markerType, tMin
         end
     end
     
-    #Pick the closest, least-threatening position in range
+    -- Pick the closest, least-threatening position in range
     local bestDistSq = 9999999999
     local bestThreat = 9999999999
     local bestMarker = false
@@ -657,7 +657,7 @@ end
 function AIGetClosestThreatMarkerLoc(aiBrain, markerType, startX, startZ, threatMin, threatMax, rings, threatType)
     local markerList = AIGetMarkerLocations(aiBrain, markerType)
     local loc, name, distance, lowest = nil
-    #local threatAtLoc
+    -- local threatAtLoc
     for k, v in markerList do
         local x = v.Position[1]
         local z = v.Position[3]
@@ -667,16 +667,16 @@ function AIGetClosestThreatMarkerLoc(aiBrain, markerType, startX, startZ, threat
             loc = v.Position
             name = v.Name
             lowest = distance
-            #threatAtLoc = threat
+            -- threatAtLoc = threat
         end
     end
-    #LOG('*AI DEBUG: MARKER: Threat Marker, TYPE = ', markerType, ' Threat = ', threatAtLoc, ' LOC = ', repr(loc))
+    -- LOG('*AI DEBUG: MARKER: Threat Marker, TYPE = ', markerType, ' Threat = ', threatAtLoc, ' LOC = ', repr(loc))
     return loc, name
 end
 
 function AIFindDefensiveArea( aiBrain, unit, category, range )
     if not unit:IsDead() then
-        # Build a grid to find units near
+        -- Build a grid to find units near
         local gridSize = range / 5
         if gridSize > 150 then
             gridSize = 150
@@ -794,13 +794,13 @@ function AIGetReclaimablesAroundLocation( aiBrain, locationType )
     return GetReclaimablesInRect( rect )
 end
 
-# ================================ #
-#     Assist Utility functions
-# ================================ #
+-- ================================ -- 
+--     Assist Utility functions
+-- ================================ -- 
 
 function GetAssistees(aiBrain, locationType, assisteeType, buildingCategory, assisteeCategory )
     if assisteeType == 'Factory' then
-        # Sift through the factories in the location
+        -- Sift through the factories in the location
         local manager = aiBrain.BuilderManagers[locationType].FactoryManager
         return manager:GetFactoriesWantingAssistance(buildingCategory, assisteeCategory)
     elseif assisteeType == 'Engineer' then
@@ -815,7 +815,7 @@ function GetAssistees(aiBrain, locationType, assisteeType, buildingCategory, ass
     return false    
 end
 
-# Assist factories based on what factories have less units helping
+-- Assist factories based on what factories have less units helping
 function AIEngineersAssistFactories( aiBrain, engineers, factories )
     local facsAssisting = 0
     local factoryData = {}
@@ -829,7 +829,7 @@ function AIEngineersAssistFactories( aiBrain, engineers, factories )
             break
         end
     end
-    # Sort Factories based on number of guards
+    -- Sort Factories based on number of guards
     for i = 1,table.getn(factories) do
         lowNum = false
         key = -1
@@ -837,7 +837,7 @@ function AIEngineersAssistFactories( aiBrain, engineers, factories )
         tempActive = false
 
         for j,v in factories do
-            # We only want factories that are actively doin stuff and aren\'t like dead
+            -- We only want factories that are actively doin stuff and aren\'t like dead
             local guards = v:GetGuards()
             local tempNum = 0
             for n,g in guards do
@@ -869,7 +869,7 @@ function AIEngineersAssistFactories( aiBrain, engineers, factories )
         end
     end
 
-    # Find a factory for each engineer and update number of guards
+    -- Find a factory for each engineer and update number of guards
     for unitNum, unit in engineers do
         lowNum = false
         key = 0
@@ -889,7 +889,7 @@ function AIEngineersAssistFactories( aiBrain, engineers, factories )
     return true
 end
 
-# Find all units working together on a builder and return all factories
+-- Find all units working together on a builder and return all factories
 function AIReturnAssistingFactories( factory )
     local guards = factory:GetGuards()
     local guardFacs = {}
@@ -938,7 +938,7 @@ function GetBasePatrolPoints( aiBrain, location, radius, layer )
     local lastZ = location[3]
     if table.getsize(locList) == 0 then return {} end
     local num = table.getsize(locList)
-    #Sort the locations from point to closest point, that way it  makes a nice patrol path
+    -- Sort the locations from point to closest point, that way it  makes a nice patrol path
     for i = 1, num do
         local lowest
         local czX, czZ, pos, distance, key
@@ -1186,10 +1186,10 @@ end
 
 
 
-# -------------------------------------------------------
-# Utility Function
-# Returns the number of slots the transport has available
-# -------------------------------------------------------
+-- -------------------------------------------------------
+-- Utility Function
+-- Returns the number of slots the transport has available
+-- -------------------------------------------------------
 function GetNumTransportSlots(unit)
     local bones = {
         Large = 0,
@@ -1210,10 +1210,10 @@ function GetNumTransportSlots(unit)
     return bones
 end
 
-# -------------------------------------------------------------
-# Utility Function
-# Returns the number of transports required to move the platoon
-# -------------------------------------------------------------
+-- -------------------------------------------------------------
+-- Utility Function
+-- Returns the number of transports required to move the platoon
+-- -------------------------------------------------------------
 function GetNumTransports(units)
     local transportNeeded = {
         Small = 0,
@@ -1239,10 +1239,10 @@ function GetNumTransports(units)
     return transportNeeded
 end
 
-# -----------------------------------------------------------------
-# Utility Function
-# Function that gets the correct number of transports for a platoon
-# -----------------------------------------------------------------
+-- -----------------------------------------------------------------
+-- Utility Function
+-- Function that gets the correct number of transports for a platoon
+-- -----------------------------------------------------------------
 function GetTransports(platoon, units)
     local data = platoon.PlatoonData
     local aiBrain = platoon:GetBrain()
@@ -1251,7 +1251,7 @@ function GetTransports(platoon, units)
         units = platoon:GetPlatoonUnits()
     end
     
-    # check for empty platoon
+    -- check for empty platoon
     if table.getn(units) == 0 then
         return 0
     end
@@ -1266,7 +1266,7 @@ function GetTransports(platoon, units)
 
     local pool = aiBrain:GetPlatoonUniquelyNamed( 'ArmyPool' )
 
-    # make sure more are needed
+    -- make sure more are needed
     local tempNeeded = {}
     tempNeeded.Small = neededTable.Small
     tempNeeded.Medium = neededTable.Medium
@@ -1274,16 +1274,16 @@ function GetTransports(platoon, units)
 
     local location = platoon:GetPlatoonPosition()
     if not location then 
-        # we can assume we have at least one unit here
+        -- we can assume we have at least one unit here
         location = units[1]:GetCachePosition()
     end
     if not location then
-        #LOG("*AI DEBUG: Passed in no units into AIUtilities' GetTransports" )
+        -- LOG("*AI DEBUG: Passed in no units into AIUtilities' GetTransports" )
         return 0
     end
 
     local transports = {}
-    # Determine distance of transports from platoon
+    -- Determine distance of transports from platoon
     for k,unit in pool:GetPlatoonUnits() do
         if not unit:IsDead() and EntityCategoryContains( categories.TRANSPORTATION - categories.uea0203, unit ) and not unit:IsUnitState('Busy') and not unit:IsUnitState('TransportLoading') and table.getn(unit:GetCargo()) < 1 and unit:GetFractionComplete() == 1 then
             local unitPos = unit:GetPosition()
@@ -1294,7 +1294,7 @@ function GetTransports(platoon, units)
     end
     if table.getn(transports) > 0 then
         local sortedList = {}
-        # Sort distances
+        -- Sort distances
         for k = 1,table.getn(transports) do
             local lowest = -1
             local key, value
@@ -1306,12 +1306,12 @@ function GetTransports(platoon, units)
                 end
             end
             sortedList[k] = value
-            # remove from unsorted table
+            -- remove from unsorted table
             table.remove( transports, key )
         end
 
 
-        # Take transports as needed
+        -- Take transports as needed
         for i=1,table.getn(sortedList) do
             if transportsNeeded and table.getn(sortedList[i].Unit:GetCargo()) < 1 and not sortedList[i].Unit:IsUnitState('TransportLoading') then
                 local id = sortedList[i].Id
@@ -1324,7 +1324,7 @@ function GetTransports(platoon, units)
                 tempSlots.Small = transSlotTable[id].Small
                 tempSlots.Medium = transSlotTable[id].Medium
                 tempSlots.Large = transSlotTable[id].Large
-                # update number of slots needed
+                -- update number of slots needed
                 while tempNeeded.Large > 0 and tempSlots.Large > 0 do
                     tempNeeded.Large = tempNeeded.Large - 1
                     tempSlots.Large = tempSlots.Large - 1
@@ -1348,9 +1348,9 @@ function GetTransports(platoon, units)
     end
 
     if transportsNeeded then
-#        if platoon:GetSquadUnits('Scout') then
-#            LOG('*AI DEBUG: Attack force attempting to get enough transport failed: TransTotal - ' .. repr(table.getn(platoon:GetSquadUnits('Scout'))) .. ' Large - ' .. repr(tempNeeded.Large) .. ' Medium - ' .. repr(tempNeeded.Medium) .. ' Small - ' .. repr(tempNeeded.Small) )
-#        end
+--        if platoon:GetSquadUnits('Scout') then
+--            LOG('*AI DEBUG: Attack force attempting to get enough transport failed: TransTotal - ' .. repr(table.getn(platoon:GetSquadUnits('Scout'))) .. ' Large - ' .. repr(tempNeeded.Large) .. ' Medium - ' .. repr(tempNeeded.Medium) .. ' Small - ' .. repr(tempNeeded.Small) )
+--        end
         ReturnTransportsToPool( platoon:GetSquadUnits('Scout'), false )
         return false, tempNeeded.Small, tempNeeded.Medium, tempNeeded.Large
     else
@@ -1360,10 +1360,10 @@ function GetTransports(platoon, units)
 end
 
 
-# ------------------------------------------
-# Utility Function
-# Get and load transports with platoon units
-# ------------------------------------------
+-- ------------------------------------------
+-- Utility Function
+-- Get and load transports with platoon units
+-- ------------------------------------------
 function UseTransports(units, transports, location, transportPlatoon)
     local aiBrain
     for k,v in units do
@@ -1373,17 +1373,17 @@ function UseTransports(units, transports, location, transportPlatoon)
         end
     end
     if not aiBrain then
-        #LOG('*AI DEBUG: Attack force failed no brain - transports')
+        -- LOG('*AI DEBUG: Attack force failed no brain - transports')
         return false
     end
-        # Load transports
+        -- Load transports
     local transportTable = {}
     local transSlotTable = {}
     if not transports then
-        #LOG('*AI DEBUG: Attack force failed no transports')
+        -- LOG('*AI DEBUG: Attack force failed no transports')
         return false
     end
-    #LOG('*AI DEBUG: Attack force using Transports')
+    -- LOG('*AI DEBUG: Attack force using Transports')
     for num,unit in transports do
         local id = unit:GetUnitId()
         if not transSlotTable[id] then
@@ -1409,7 +1409,7 @@ function UseTransports(units, transports, location, transportPlatoon)
         if not unit:IsDead() then
             if unit:IsUnitState( 'Attached' ) then
                 aiBrain:AssignUnitsToPlatoon( pool, {unit}, 'Unassigned', 'None' )
-                #LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': Already Attached units adding to pool' )
+                -- LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': Already Attached units adding to pool' )
             elseif EntityCategoryContains( categories.url0306 + categories.DEFENSE, unit ) then
                 table.insert( shields, unit )
             elseif unit:GetBlueprint().Transport.TransportClass == 3 then
@@ -1423,10 +1423,10 @@ function UseTransports(units, transports, location, transportPlatoon)
             end
         end
     end
-#    LOG( '*AI DEBUG: NUM SHIELDS= ', table.getn( shields ) )
-#    LOG( '*AI DEBUG: NUM LARGE = ', table.getn( remainingSize3 ) )
-#    LOG( '*AI DEBUG: NUM MEDIUM = ', table.getn( remainingSize2 ) )
-#    LOG( '*AI DEBUG: NUM SMALL = ', table.getn( remainingSize1 ) )
+--    LOG( '*AI DEBUG: NUM SHIELDS= ', table.getn( shields ) )
+--    LOG( '*AI DEBUG: NUM LARGE = ', table.getn( remainingSize3 ) )
+--    LOG( '*AI DEBUG: NUM MEDIUM = ', table.getn( remainingSize2 ) )
+--    LOG( '*AI DEBUG: NUM SMALL = ', table.getn( remainingSize1 ) )
 
     local needed = GetNumTransports(units)
     local largeHave = 0
@@ -1458,7 +1458,7 @@ function UseTransports(units, transports, location, transportPlatoon)
         transportPlatoon.UsingTransport = true
     end
 
-    #LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': Loading Attack force on transports - Faction = ' .. aiBrain:GetFactionIndex() )
+    -- LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': Loading Attack force on transports - Faction = ' .. aiBrain:GetFactionIndex() )
     local monitorUnits = {}
     for num, data in transportTable do
         if table.getn( data.Units ) > 0 then
@@ -1494,7 +1494,7 @@ function UseTransports(units, transports, location, transportPlatoon)
             end
         end
     until attached
-    # Any units that aren't transports and aren't attached send back to pool
+    -- Any units that aren't transports and aren't attached send back to pool
     for k,unit in units do
         if not unit:IsDead() and not EntityCategoryContains( categories.TRANSPORTATION, unit ) then
             if not unit:IsUnitState('Attached') then
@@ -1505,32 +1505,32 @@ function UseTransports(units, transports, location, transportPlatoon)
 			table.remove(transports, k)
         end
     end
-    #DUNCAN - if some transports have no units return to pool
+    -- DUNCAN - if some transports have no units return to pool
     for k,t in transports do
         if not t:IsDead() and table.getn(t:GetCargo()) < 1 then
             aiBrain:AssignUnitsToPlatoon( 'ArmyPool', {t}, 'Scout', 'None' )
             table.remove( transports, k )
         end
     end
-    #LOG('*AI DEBUG: Transport loaded')
+    -- LOG('*AI DEBUG: Transport loaded')
 
     
-    if table.getn(transports) != 0 then
-        #DUNCAN - if no location then we have loaded transports then return true
+    if table.getn(transports) ~= 0 then
+        -- DUNCAN - if no location then we have loaded transports then return true
         if location then
             local safePath = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Air', transports[1]:GetPosition(), location, 200)
             if safePath then 
                 for _,p in safePath do
                     IssueMove(transports, p)
                 end
-                #LOG('*AI DEBUG: Transport using safe path')
+                -- LOG('*AI DEBUG: Transport using safe path')
             end
         else
-            #LOG('No transport location supplied, units not unloaded.')
+            -- LOG('No transport location supplied, units not unloaded.')
             return true
         end
     else
-        #DUNCAN - if no transports return false
+        -- DUNCAN - if no transports return false
         return false
     end
 
@@ -1562,13 +1562,13 @@ function UseTransports(units, transports, location, transportPlatoon)
         transportPlatoon.UsingTransport = false
     end    
     ReturnTransportsToPool( transports, true )
-    #LOG('*AI DEBUG: Finished using transports')
+    -- LOG('*AI DEBUG: Finished using transports')
     return true
 end
-# ------------------------------------------------
-# Utility function
-# Sorts units onto transports distributing equally
-# ------------------------------------------------
+-- ------------------------------------------------
+-- Utility function
+-- Sorts units onto transports distributing equally
+-- ------------------------------------------------
 function SortUnitsOnTransports( transportTable, unitTable, numSlots )
     local leftoverUnits = {}
     numSlots = numSlots or -1
@@ -1613,11 +1613,11 @@ function SortUnitsOnTransports( transportTable, unitTable, numSlots )
                 elseif remainingSml > 0 then
                     transportTable[transSlotNum].SmallSlots = transportTable[transSlotNum].SmallSlots - 1
                 else
-                    #LOG('*AI DEBUG: FOUND TRANSPORT NOT ENOUGH SLOTS')
+                    -- LOG('*AI DEBUG: FOUND TRANSPORT NOT ENOUGH SLOTS')
                     table.insert(leftoverUnits, unit)
                 end
             else
-                #LOG('*AI DEBUG: NO TRANSPORT FOUND')
+                -- LOG('*AI DEBUG: NO TRANSPORT FOUND')
                 table.insert(leftoverUnits, unit)
             end
         end
@@ -1625,12 +1625,12 @@ function SortUnitsOnTransports( transportTable, unitTable, numSlots )
     return transportTable, leftoverUnits
 end
 
-# ------------------------------------------------------------------------------------
-# Utility Function
-# Takes transports in platoon, returns them to pool, flys them back to return location
-# ------------------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------------
+-- Utility Function
+-- Takes transports in platoon, returns them to pool, flys them back to return location
+-- ------------------------------------------------------------------------------------
 function ReturnTransportsToPool(units, move)
-    # Put transports back in TPool
+    -- Put transports back in TPool
     local unit
     if not units then
         return false
@@ -1664,10 +1664,10 @@ function ReturnTransportsToPool(units, move)
     end
 end
 
-# ------------------------------------------------------------------------------------
-# Utility Function
-# Removes excess units from a platoon we want to transport 
-# ------------------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------------
+-- Utility Function
+-- Removes excess units from a platoon we want to transport 
+-- ------------------------------------------------------------------------------------
 function SplitTransportOverflow(units, overflowSm, overflowMd, overflowLg)
     local leftovers = {}
     local goodUnits = {}
@@ -1698,7 +1698,7 @@ function SplitTransportOverflow(units, overflowSm, overflowMd, overflowLg)
     return goodUnits, leftovers
 end
 
-# used by engineers to move to a safe location
+-- used by engineers to move to a safe location
 function EngineerMoveWithSafePath(aiBrain, unit, destination)
     if not destination then
         return false
@@ -1707,41 +1707,41 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
     local result, bestPos = unit:CanPathTo( destination )
 
     local bUsedTransports = false
-    #DUNCAN - increase check to 300 for transports
+    -- DUNCAN - increase check to 300 for transports
     if not result or VDist2Sq(pos[1], pos[3], destination[1], destination[3]) > 300*300 
     and unit.PlatoonHandle and not EntityCategoryContains(categories.COMMAND, unit) then
-        # if we can't path to our destination, we need, rather than want, transports
+        -- if we can't path to our destination, we need, rather than want, transports
         local needTransports = not result
-        if VDist2Sq( pos[1], pos[3], destination[1], destination[3] ) > 512*512 then #and unit.PlatoonHandle.PlatoonData.RequireTransport then
+        if VDist2Sq( pos[1], pos[3], destination[1], destination[3] ) > 512*512 then -- and unit.PlatoonHandle.PlatoonData.RequireTransport then
             needTransports = true
         end
-        # skip the last move... we want to return and do a build
+        -- skip the last move... we want to return and do a build
         bUsedTransports = AIAttackUtils.SendPlatoonWithTransportsNoCheck(aiBrain, unit.PlatoonHandle, destination, needTransports, true, false)
         
         if bUsedTransports then
             return true
         elseif VDist2Sq( pos[1], pos[3], destination[1], destination[3] ) > 512*512 then
-            #DUNCAN - if over 512 and no transports dont try and walk!
+            -- DUNCAN - if over 512 and no transports dont try and walk!
             return false
         end
     end
     
-    # if we're here, we haven't used transports and we can path to the destination
+    -- if we're here, we haven't used transports and we can path to the destination
     if result then
         local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Amphibious', unit:GetPosition(), destination)
         if path then
             local pathSize = table.getn(path)
-            # move to way points (but not to destination... leave that for the final command)
+            -- move to way points (but not to destination... leave that for the final command)
             for widx,waypointPath in path do
-                if pathSize != widx then
+                if pathSize ~= widx then
                     IssueMove({unit},waypointPath)
                 end
             end  
-        #else
-            #IssueMove({unit},destination)
+        -- else
+            -- IssueMove({unit},destination)
         end
-        # if there wasn't a *safe* path (but dest was pathable), then the last move would have been to go there directly
-        # so don't bother... the build/capture/reclaim command will take care of that after we return
+        -- if there wasn't a *safe* path (but dest was pathable), then the last move would have been to go there directly
+        -- so don't bother... the build/capture/reclaim command will take care of that after we return
         return true
     end
     
@@ -1754,9 +1754,9 @@ function EngineerTryReclaimCaptureArea(aiBrain, eng, pos)
         return false
     end
     
-    # Check if enemy units are at location
+    -- Check if enemy units are at location
     local checkUnits = aiBrain:GetUnitsAroundPoint( categories.STRUCTURE + ( categories.MOBILE * categories.LAND), pos, 10, 'Enemy' )
-    #( Rect( pos[1] - 7, pos[3] - 7, pos[1] + 7, pos[3] + 7 ) )
+    -- ( Rect( pos[1] - 7, pos[3] - 7, pos[1] + 7, pos[3] + 7 ) )
     if checkUnits and table.getn(checkUnits) > 0 then
         for num,unit in checkUnits do
             if not unit:IsDead() and EntityCategoryContains( categories.ENGINEER, unit ) and ( unit:GetAIBrain():GetFactionIndex() ~= aiBrain:GetFactionIndex() ) then
@@ -1803,9 +1803,9 @@ function GetThreatDistance(aiBrain, position, threatCutoff )
     return closestHighThreat
 end
 
-# ======================= #
-#     Cheat Utilities     #
-# ======================= #
+-- ======================= -- 
+--     Cheat Utilities     -- 
+-- ======================= -- 
 function SetupCheat(aiBrain, cheatBool)
     if cheatBool then
         aiBrain.CheatEnabled = true
@@ -1813,17 +1813,17 @@ function SetupCheat(aiBrain, cheatBool)
         local buffDef = Buffs['CheatBuildRate']
         local buffAffects = buffDef.Affects
         buffAffects.BuildRate.Mult = tonumber(ScenarioInfo.Options.BuildMult)
-        #LOG('*AI DEBUG: Build Rate Modified to: '..tonumber(ScenarioInfo.Options.BuildMult))
+        -- LOG('*AI DEBUG: Build Rate Modified to: '..tonumber(ScenarioInfo.Options.BuildMult))
 
         buffDef = Buffs['CheatIncome']
         buffAffects = buffDef.Affects
         buffAffects.EnergyProduction.Mult = tonumber(ScenarioInfo.Options.CheatMult)
         buffAffects.MassProduction.Mult = tonumber(ScenarioInfo.Options.CheatMult)
-        #LOG('*AI DEBUG: Resource Rate Modified to: '..tonumber(ScenarioInfo.Options.CheatMult))
+        -- LOG('*AI DEBUG: Resource Rate Modified to: '..tonumber(ScenarioInfo.Options.CheatMult))
 
         local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
         for k,v in pool:GetPlatoonUnits() do
-            # Apply build rate and income buffs
+            -- Apply build rate and income buffs
             ApplyCheatBuffs(v)
         end
         
@@ -1833,15 +1833,15 @@ end
 function ApplyCheatBuffs(unit)
     if EntityCategoryContains( categories.COMMAND, unit ) and ScenarioInfo.Options.OmniCheat == "on" then
         Buff.ApplyBuff(unit, 'IntelCheat')
-        #LOG('*AI DEBUG: Omni Cheat is: '..ScenarioInfo.Options.OmniCheat)
+        -- LOG('*AI DEBUG: Omni Cheat is: '..ScenarioInfo.Options.OmniCheat)
     end
     Buff.ApplyBuff(unit, 'CheatIncome')
     Buff.ApplyBuff(unit, 'CheatBuildRate')
 end
 
-#########################################
-#below this line is sorian AI functions
-########################################
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+-- below this line is sorian AI functions
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 
 
 function EngineerTryReclaimCaptureAreaSorian(aiBrain, eng, pos)
@@ -1849,7 +1849,7 @@ function EngineerTryReclaimCaptureAreaSorian(aiBrain, eng, pos)
         return false
     end
     
-    # Check if enemy units are at location
+    -- Check if enemy units are at location
 	local checkCats = { categories.ENGINEER - categories.COMMAND, categories.STRUCTURE + ( categories.MOBILE * categories.LAND - categories.ENGINEER - categories.COMMAND) }
 	for k,v in checkCats do
 		local checkUnits = aiBrain:GetUnitsAroundPoint( v, pos, 10, 'Enemy' )
@@ -1868,7 +1868,7 @@ end
 
 function GetAssisteesSorian(aiBrain, locationType, assisteeType, buildingCategory, assisteeCategory )
     if assisteeType == 'Factory' then
-        # Sift through the factories in the location
+        -- Sift through the factories in the location
         local manager = aiBrain.BuilderManagers[locationType].FactoryManager
         return manager:GetFactoriesWantingAssistance(buildingCategory, assisteeCategory)
     elseif assisteeType == 'Engineer' then
@@ -1885,7 +1885,6 @@ function GetAssisteesSorian(aiBrain, locationType, assisteeType, buildingCategor
     return false    
 end
 
-
 function GetUnitsBeingBuilt(aiBrain, locationType, assisteeCategory)
 	if not aiBrain or not locationType or not assisteeCategory then
 		WARN('*AI ERROR: GetUnitsBeingBuilt missing data!')
@@ -1900,12 +1899,9 @@ function GetUnitsBeingBuilt(aiBrain, locationType, assisteeCategory)
 	local retUnits = {}
 	
 	for k,v in filterUnits do
-            
-		if not v:IsUnitState('Building') and not v:IsUnitState('Upgrading') then
-			continue
-		end
-		
-		table.insert( retUnits, v )
+		if v:IsUnitState('Building') or v:IsUnitState('Upgrading') then
+		    table.insert(retUnits, v)
+        end
 	end
 	return retUnits
 end
@@ -1950,7 +1946,7 @@ function GetBasePatrolPointsSorian( aiBrain, location, radius, layer )
 	local tempdistance = false
 	local edistance
 	local closeX, closeZ
-    #Sort the locations from point to closest point, that way it  makes a nice patrol path
+    -- Sort the locations from point to closest point, that way it  makes a nice patrol path
 	for k,v in ArmyBrains do
         if IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
 			local estartX, estartZ = v:GetArmyStartPos()
@@ -2013,31 +2009,31 @@ function AIGetSortedHydroLocations(aiBrain, maxNum, tMin, tMax, tRings, tType, p
     return AISortMarkersFromLastPos(aiBrain, newList, maxNum, tMin, tMax, tRings, tType, position)
 end
 
-# used by engineers to move to a safe location
+-- used by engineers to move to a safe location
 function EngineerMoveWithSafePathSorian(aiBrain, unit, destination)
     if not destination then
         return false
     end
     local pos = unit:GetPosition()
-    local result, bestPos = false #unit:CanPathTo( destination )
+    local result, bestPos = false -- unit:CanPathTo( destination )
 	result, bestPos = AIAttackUtils.CanGraphTo(unit, destination, 'Land')
 	if not result then
 		result, bestPos = AIAttackUtils.CanGraphTo(unit, destination, 'Amphibious')
 		if not result and not SUtils.CheckForMapMarkers(aiBrain) then
-			#LOG('*AI DEBUG: EngineerMoveWithSafePathSorian got to CanPathTo')
+			-- LOG('*AI DEBUG: EngineerMoveWithSafePathSorian got to CanPathTo')
 			result, bestPos	= unit:CanPathTo( destination )
 		end
 	end
 
     local bUsedTransports = false
     if not result or VDist2Sq(pos[1], pos[3], destination[1], destination[3]) > 65536 and unit.PlatoonHandle and not EntityCategoryContains(categories.COMMAND, unit) then
-        # if we can't path to our destination, we need, rather than want, transports
+        -- if we can't path to our destination, we need, rather than want, transports
         local needTransports = not result
-		# if distance > 512
-        if VDist2Sq( pos[1], pos[3], destination[1], destination[3] ) > 262144 then #and unit.PlatoonHandle.PlatoonData.RequireTransport then
+		-- if distance > 512
+        if VDist2Sq( pos[1], pos[3], destination[1], destination[3] ) > 262144 then -- and unit.PlatoonHandle.PlatoonData.RequireTransport then
             needTransports = true
         end
-        # skip the last move... we want to return and do a build
+        -- skip the last move... we want to return and do a build
         bUsedTransports = AIAttackUtils.SendPlatoonWithTransportsSorian(aiBrain, unit.PlatoonHandle, destination, needTransports, true, needTransports)
         
         if bUsedTransports then
@@ -2045,20 +2041,20 @@ function EngineerMoveWithSafePathSorian(aiBrain, unit, destination)
         end
     end
     
-    # if we're here, we haven't used transports and we can path to the destination
+    -- if we're here, we haven't used transports and we can path to the destination
     if result then
         local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Amphibious', unit:GetPosition(), destination, 10)
         if path then
             local pathSize = table.getn(path)
-            # move to way points (but not to destination... leave that for the final command)
+            -- move to way points (but not to destination... leave that for the final command)
             for widx,waypointPath in path do
-                if pathSize != widx then
+                if pathSize ~= widx then
                     IssueMove({unit},waypointPath)
                 end
             end  
         end
-        # if there wasn't a *safe* path (but dest was pathable), then the last move would have been to go there directly
-        # so don't bother... the build/capture/reclaim command will take care of that after we return
+        -- if there wasn't a *safe* path (but dest was pathable), then the last move would have been to go there directly
+        -- so don't bother... the build/capture/reclaim command will take care of that after we return
         return true
     end
     
@@ -2185,7 +2181,7 @@ function AIFindAirAttackTargetInRangeSorian( aiBrain, platoon, squad, atkPri, po
 	return false
 end
 
-# We use both Blank Marker that are army names as well as the new Large Expansion Area to determine big expansion bases
+-- We use both Blank Marker that are army names as well as the new Large Expansion Area to determine big expansion bases
 function AIFindStartLocationNeedsEngineerSorian( aiBrain, locationType, radius, tMin, tMax, tRings, tType, eng)
     local pos = aiBrain:PBMGetLocationCoords( locationType )
     if not pos then
@@ -2198,7 +2194,7 @@ function AIFindStartLocationNeedsEngineerSorian( aiBrain, locationType, radius, 
     local startX, startZ = aiBrain:GetArmyStartPos()
     for k,v in positions do
         if string.sub(v.Name,1,5) == 'ARMY_' then
-            if startX != v.Position[1] and startZ != v.Position[3] then
+            if startX ~= v.Position[1] and startZ ~= v.Position[3] then
                 table.insert( validStartPos, v )
             end
         end
@@ -2342,7 +2338,7 @@ function AIFindBrainNukeTargetInRangeSorian( aiBrain, platoon, maxRange, atkPri,
     if not aiBrain or not position or not maxRange then
         return false
     end
-	#local nukeBP = platoon:GetBlueprint().Weapon[1].ProjectileId
+	-- local nukeBP = platoon:GetBlueprint().Weapon[1].ProjectileId
 	local massCost = 12000
     local targetUnits = aiBrain:GetUnitsAroundPoint( categories.ALLUNITS, position, maxRange, 'Enemy' )
     for k,v in atkPri do
@@ -2354,7 +2350,7 @@ function AIFindBrainNukeTargetInRangeSorian( aiBrain, platoon, maxRange, atkPri,
         for num, unit in targetUnits do
             if not unit:IsDead() and EntityCategoryContains( category, unit ) then
                 local unitPos = unit:GetPosition()
-				#local antiNukes = aiBrain:GetNumUnitsAroundPoint( categories.ANTIMISSILE * categories.TECH3 * categories.STRUCTURE, unitPos, 90, 'Enemy' )
+				-- local antiNukes = aiBrain:GetNumUnitsAroundPoint( categories.ANTIMISSILE * categories.TECH3 * categories.STRUCTURE, unitPos, 90, 'Enemy' )
 				local antiNukes = SUtils.NumberofUnitsBetweenPoints(aiBrain, position, unitPos, categories.ANTIMISSILE * categories.TECH3 * categories.STRUCTURE, 90, 'Enemy')
 				if not SUtils.CheckCost(aiBrain, unitPos, massCost * antiNukes) then continue end
 				local dupTarget = false
@@ -2381,7 +2377,7 @@ function AIFindBrainNukeTargetInRangeSorian( aiBrain, platoon, maxRange, atkPri,
 						for j=-1,1 do
 							if i ~= 0 and j~= 0 then
 								local pos = {unitPos[1] + (i * 10), 0, unitPos[3] + (j * 10)}
-								#antiNukes = aiBrain:GetNumUnitsAroundPoint( categories.ANTIMISSILE * categories.TECH3 * categories.STRUCTURE, pos, 90, 'Enemy' )
+								-- antiNukes = aiBrain:GetNumUnitsAroundPoint( categories.ANTIMISSILE * categories.TECH3 * categories.STRUCTURE, pos, 90, 'Enemy' )
 								antiNukes = SUtils.NumberofUnitsBetweenPoints(aiBrain, position, pos, categories.ANTIMISSILE * categories.TECH3 * categories.STRUCTURE, 90, 'Enemy')
 								if (antiNukes + 2 < nukeCount or antiNukes == 0) then
 									retUnit = unit
@@ -2473,7 +2469,7 @@ end
 
 function AIFindDefensiveAreaSorian( aiBrain, unit, category, range, runShield )
     if not unit:IsDead() then
-        # Build a grid to find units near
+        -- Build a grid to find units near
         local gridSize = range / 5
         if gridSize > 150 then
             gridSize = 150
@@ -2613,17 +2609,17 @@ function AIFindDefensivePointNeedsStructureSorian( aiBrain, locationType, radius
 end
 
 function AIFindFirebaseLocationSorian( aiBrain, locationType, radius, markerType, tMin, tMax, tRings, tType, maxUnits, unitCat, markerRadius)
-    #Get location of commander
-    #local threatPos, threatVal = aiBrain:GetHighestThreatPosition(0, true, 'Commander', aiBrain:GetCurrentEnemy():GetArmyIndex())
-    #if threatVal == 0 then
-    #    local threatPos, threatVal = aiBrain:GetHighestThreatPosition(1, true, tType or 'Structures', aiBrain:GetCurrentEnemy():GetArmyIndex())
-    #end
+    -- Get location of commander
+    -- local threatPos, threatVal = aiBrain:GetHighestThreatPosition(0, true, 'Commander', aiBrain:GetCurrentEnemy():GetArmyIndex())
+    -- if threatVal == 0 then
+    --    local threatPos, threatVal = aiBrain:GetHighestThreatPosition(1, true, tType or 'Structures', aiBrain:GetCurrentEnemy():GetArmyIndex())
+    -- end
     local estartX, estartZ = aiBrain:GetCurrentEnemy():GetArmyStartPos()
 	local threatPos = {estartX, 0, estartZ}
-    #Get markers
+    -- Get markers
     local markerList = AIGetMarkerLocationsSorian(aiBrain, markerType)
     
-    #For each marker, check against threatpos. Save markers that are within the FireBaseRange
+    -- For each marker, check against threatpos. Save markers that are within the FireBaseRange
     local inRangeList = {}
     for _,marker in markerList do
         local distSq = VDist2Sq(marker.Position[1], marker.Position[3], threatPos[1], threatPos[3])
@@ -2633,7 +2629,7 @@ function AIFindFirebaseLocationSorian( aiBrain, locationType, radius, markerType
         end
     end
     
-    #Pick the closest, least-threatening position in range
+    -- Pick the closest, least-threatening position in range
     local bestDistSq = 9999999999
     local bestThreat = 9999999999
     local bestMarker = false
@@ -2682,17 +2678,17 @@ function UseTransportsGhetto(units, transports)
         end
     end
     if not aiBrain then
-        #LOG('*AI DEBUG: Attack force failed no brain - transports')
+        -- LOG('*AI DEBUG: Attack force failed no brain - transports')
         return false
     end
-        # Load transports
+        -- Load transports
     local transportTable = {}
     local transSlotTable = {}
     if not transports then
-        #LOG('*AI DEBUG: Attack force failed no transports')
+        -- LOG('*AI DEBUG: Attack force failed no transports')
         return false
     end
-    #LOG('*AI DEBUG: Attack force using Transports')
+    -- LOG('*AI DEBUG: Attack force using Transports')
     for num,unit in transports do
         local id = unit:GetUnitId()
         if not transSlotTable[id] then
@@ -2718,7 +2714,7 @@ function UseTransportsGhetto(units, transports)
         if not unit:IsDead() then
             if unit:IsUnitState( 'Attached' ) then
                 aiBrain:AssignUnitsToPlatoon( pool, {unit}, 'Unassigned', 'None' )
-                #LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': Already Attached units adding to pool' )
+                -- LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': Already Attached units adding to pool' )
             elseif EntityCategoryContains( categories.url0306 + categories.DEFENSE, unit ) then
                 table.insert( shields, unit )
             elseif unit:GetBlueprint().Transport.TransportClass == 3 then
@@ -2732,10 +2728,10 @@ function UseTransportsGhetto(units, transports)
             end
         end
     end
-#    LOG( '*AI DEBUG: NUM SHIELDS= ', table.getn( shields ) )
-#    LOG( '*AI DEBUG: NUM LARGE = ', table.getn( remainingSize3 ) )
-#    LOG( '*AI DEBUG: NUM MEDIUM = ', table.getn( remainingSize2 ) )
-#    LOG( '*AI DEBUG: NUM SMALL = ', table.getn( remainingSize1 ) )
+--    LOG( '*AI DEBUG: NUM SHIELDS= ', table.getn( shields ) )
+--    LOG( '*AI DEBUG: NUM LARGE = ', table.getn( remainingSize3 ) )
+--    LOG( '*AI DEBUG: NUM MEDIUM = ', table.getn( remainingSize2 ) )
+--    LOG( '*AI DEBUG: NUM SMALL = ', table.getn( remainingSize1 ) )
 
     local needed = GetNumTransports(units)
     local largeHave = 0
@@ -2767,7 +2763,7 @@ function UseTransportsGhetto(units, transports)
         transportPlatoon.UsingTransport = true
     end
 
-    #LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': Loading Attack force on transports - Faction = ' .. aiBrain:GetFactionIndex() )
+    -- LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': Loading Attack force on transports - Faction = ' .. aiBrain:GetFactionIndex() )
     local monitorUnits = {}
     for num, data in transportTable do
         if table.getn( data.Units ) > 0 then
@@ -2803,7 +2799,7 @@ function UseTransportsGhetto(units, transports)
             end
         end
     until attached
-    # Any units that aren't transports and aren't attached send back to pool
+    -- Any units that aren't transports and aren't attached send back to pool
     for k,unit in units do
         if not unit:IsDead() and not EntityCategoryContains( categories.TRANSPORTATION, unit ) then
             if not unit:IsUnitState('Attached') then
@@ -2814,7 +2810,7 @@ function UseTransportsGhetto(units, transports)
 			table.remove(transports, k)
         end
     end
-    # Return empty transports to base
+    -- Return empty transports to base
 	for k,v in transports do
         if not v:IsDead() and EntityCategoryContains( categories.TRANSPORTATION, v ) and table.getn(v:GetCargo()) < 1 then
             ReturnTransportsToPool({v}, true)
@@ -2824,7 +2820,7 @@ function UseTransportsGhetto(units, transports)
     return true
 end
 
-#DUNCAN - added
+-- DUNCAN - added
 function AIFindFurthestMarkerNeedsEngineer( aiBrain, pos, radius, tMin, tMax, tRings, tType, positions )
    local closest = false
    local retPos, retName
@@ -2850,7 +2846,7 @@ function AIFindFurthestMarkerNeedsEngineer( aiBrain, pos, radius, tMin, tMax, tR
    return retPos, retName
 end
 
-# We use both Blank Marker that are army names as well as the new Large Expansion Area to determine big expansion bases
+-- We use both Blank Marker that are army names as well as the new Large Expansion Area to determine big expansion bases
 function AIFindFurthestStartLocationNeedsEngineer( aiBrain, locationType, radius, tMin, tMax, tRings, tType, eng)
     local pos = aiBrain:PBMGetLocationCoords( locationType )
     if not pos then
@@ -2863,13 +2859,13 @@ function AIFindFurthestStartLocationNeedsEngineer( aiBrain, locationType, radius
     local startX, startZ = aiBrain:GetArmyStartPos()
     for k,v in positions do
         if string.sub(v.Name,1,5) == 'ARMY_' then
-            if startX != v.Position[1] and startZ != v.Position[3] then
+            if startX ~= v.Position[1] and startZ ~= v.Position[3] then
                 table.insert( validPos, v )
             end
         end
     end
     
-    #DUNCAN - change to look for furtherest away!
+    -- DUNCAN - change to look for furtherest away!
     local retPos, retName
     if eng then
         retPos, retName = AIFindFurthestMarkerNeedsEngineer( aiBrain, eng:GetPosition(), radius, tMin, tMax, tRings, tType, validPos )
@@ -2887,7 +2883,7 @@ function AIFindFurthestExpansionAreaNeedsEngineer( aiBrain, locationType, radius
     end
     local positions = AIGetMarkersAroundLocation( aiBrain, 'Expansion Area', pos, radius, tMin, tMax, tRings, tType)
     
-    #DUNCAN - change to look for furtherest away!
+    -- DUNCAN - change to look for furtherest away!
     local retPos, retName
     if eng then
         retPos, retName = AIFindFurthestMarkerNeedsEngineer( aiBrain, eng:GetPosition(), radius, tMin, tMax, tRings, tType, positions )
