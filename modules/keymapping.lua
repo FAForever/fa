@@ -130,49 +130,30 @@ function toggleOverlay(type)
     import('/lua/ui/game/multifunction.lua').UpdateActiveFilters()
 end
 
-local currentLandFactoryIndex = 1
-local currentAirFactoryIndex = 1
-local currentNavalFactoryIndex = 1
+--- Function builder for "Get next factory of type" functions
+--
+-- @param factoryType The type of factory (LAND, AIR, NAVAL) for which a cycling function is wanted.
+function getGetNextFactory(factoryType)
+    local currentFactoryIndex = 1
+    local categoryFilter = "FACTORY * " .. factoryType
 
-
-function GetNextLandFactory()
-    UISelectionByCategory("FACTORY * LAND", false, false, false, false)
-    local FactoryList = GetSelectedUnits()
-    if FactoryList then
-        local nextFac = FactoryList[currentLandFactoryIndex] or FactoryList[1]
-        currentLandFactoryIndex = currentLandFactoryIndex + 1
-        if currentLandFactoryIndex > table.getn(FactoryList) then
-            currentLandFactoryIndex = 1
+    return function()
+        UISelectionByCategory(categoryFilter, false, false, false, false)
+        local factoryList = GetSelectedUnits()
+        if factoryList then
+            local nextFac = factoryList[currentFactoryIndex] or factoryList[1]
+            currentFactoryIndex = currentFactoryIndex + 1
+            if currentFactoryIndex > table.getn(factoryList) then
+                currentFactoryIndex = 1
+            end
+            SelectUnits({nextFac})
         end
-        SelectUnits({nextFac})
     end
 end
 
-function GetNextAirFactory()
-    UISelectionByCategory("FACTORY * AIR", false, false, false, false)
-    local FactoryList = GetSelectedUnits()
-    if FactoryList then
-        local nextFac = FactoryList[currentAirFactoryIndex] or FactoryList[1]
-        currentAirFactoryIndex = currentAirFactoryIndex + 1
-        if currentAirFactoryIndex > table.getn(FactoryList) then
-            currentAirFactoryIndex = 1
-        end
-        SelectUnits({nextFac})
-    end
-end
-
-function GetNextNavalFactory()
-    UISelectionByCategory("FACTORY * NAVAL", false, false, false, false)
-    local FactoryList = GetSelectedUnits()
-    if FactoryList then
-        local nextFac = FactoryList[currentNavalFactoryIndex] or FactoryList[1]
-        currentNavalFactoryIndex = currentNavalFactoryIndex + 1
-        if currentNavalFactoryIndex > table.getn(FactoryList) then
-            currentNavalFactoryIndex = 1
-        end
-        SelectUnits({nextFac})
-    end
-end
+GetNextLandFactory = getGetNextFactory("LAND")
+GetNextAirFactory = getGetNextFactory("AIR")
+GetNextNavalFactory = getGetNextFactory("NAVAL")
 
 function GetNearestIdleLTMex()
     local tech = 1
