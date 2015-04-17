@@ -187,6 +187,16 @@ function table.cat(t1, t2)
     return tRet
 end
 
+--- Destructively concatenate two tables. (numerical keys only)
+--
+-- Appends the keys of t2 onto t1, returning it. The original t1 is destroyed, but this avoids the
+-- need to copy the values in t1, saving some time.
+function table.destructiveCat(t1, t2)
+    for k, v in t2 do
+        table.insert(t1, v)
+    end
+end
+
 --==============================================================================
 -- table.sorted(t, [comp]) is the same as table.sort(t, comp) except it returns
 -- a sorted copy of t, leaving the original unchanged.
