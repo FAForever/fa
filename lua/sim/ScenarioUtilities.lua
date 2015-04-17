@@ -5,12 +5,12 @@
 ----[  Summary  : Utility functions for use with scenario save file.              ]--
 ----[             Created from examples provided by Jeff Petkau.                  ]--
 ----[                                                                             ]--
-----[  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.             ]--
+----[  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.             ]--
 local Entity = import('/lua/sim/Entity.lua').Entity
 
 function EnableLoadBalance(enabled, unitThreshold) --distributeTime)
-    if not ScenarioInfo.LoadBalance then 
-        ScenarioInfo.LoadBalance = 
+    if not ScenarioInfo.LoadBalance then
+        ScenarioInfo.LoadBalance =
         {
             Accumulator = 0,
             Enabled = false,
@@ -18,32 +18,32 @@ function EnableLoadBalance(enabled, unitThreshold) --distributeTime)
             PlatoonGroups = {},
         }
     end
-    
+
     if enabled == ScenarioInfo.LoadBalance.Enabled then return end
-    
-    ScenarioInfo.LoadBalance.Enabled = enabled 
-    
+
+    ScenarioInfo.LoadBalance.Enabled = enabled
+
     if enabled then
         ScenarioInfo.LoadBalance.UnitThreshold = unitThreshold or 50
     else
-        ForkThread(function()       
+        ForkThread(function()
             --local timePerGroup = ScenarioInfo.DistributeTime/table.getn(ScenarioInfo.LoadBalance.SpawnGroups)
-            
+
             --Get time
             local time = GetSystemTimeSecondsOnlyForProfileUse()
-            
+
             --Spawn bases
             while table.getn(ScenarioInfo.LoadBalance.SpawnGroups) > 0 do
                 local base, name, uncapturable = unpack(table.remove( ScenarioInfo.LoadBalance.SpawnGroups, 1))
                 base:SpawnGroup( name, uncapturable, true )
             end
-            
+
             --Spawn units
             while table.getn(ScenarioInfo.LoadBalance.PlatoonGroups) > 0 do
-                local strArmy, strGroup, formation, callback = unpack(table.remove( ScenarioInfo.LoadBalance.PlatoonGroups, 1)) 
+                local strArmy, strGroup, formation, callback = unpack(table.remove( ScenarioInfo.LoadBalance.PlatoonGroups, 1))
                 CreateArmyGroupAsPlatoonBalanced(strArmy, strGroup, formation, callback)
             end
-            
+
             --Report time taken
             LOG("Time to spawn: " .. (GetSystemTimeSecondsOnlyForProfileUse() - time))
         end)
@@ -209,7 +209,7 @@ function CreateArmyUnit(strArmy,strUnit)
         )
         if unit:GetBlueprint().Physics.FlattenSkirt then
             unit:CreateTarmac(true, true, true, false, false)
-        end             
+        end
         local platoon
         local brain = GetArmyBrain(strArmy)
         if tblUnit.platoon ~= nil and tblUnit.platoon ~= '' then
@@ -454,7 +454,7 @@ function InitializeArmies()
             --LOG('*DEBUG: InitializeArmies, army = ', strArmy)
 
             SetArmyEconomy( strArmy, tblData.Economy.mass, tblData.Economy.energy)
-            
+
             --GetArmyBrain(strArmy):InitializePlatoonBuildManager()
             --LoadArmyPBMBuilders(strArmy)
             if GetArmyBrain(strArmy).SkirmishSystems then
@@ -481,8 +481,6 @@ function InitializeArmies()
                 end
             end
 
-
-
             ----[ irumsey                                                         ]--
             ----[ Temporary defaults.  Make sure some fighting will break out.    ]--
             for iEnemy, strEnemy in pairs(tblArmy) do
@@ -498,10 +496,7 @@ function InitializeArmies()
                     SetAlliance( iArmy, iEnemy, 'Neutral')
                 end
             end
-
-
         end
-
     end
 
     return tblGroups
@@ -523,7 +518,7 @@ function InitializeScenarioArmies()
     import('/lua/sim/simuistate.lua').IsCampaign(true)
 
     for iArmy, strArmy in pairs(tblArmy) do
-        
+
         local tblData = Scenario.Armies[strArmy]
 
         tblGroups[ strArmy ] = {}
@@ -535,7 +530,7 @@ function InitializeScenarioArmies()
             SetArmyEconomy( strArmy, tblData.Economy.mass, tblData.Economy.energy)
 
             if tblData.faction ~= nil then
-                
+
                 if ScenarioInfo.ArmySetup[strArmy].Human then
                     local factionIndex = math.min(math.max(ScenarioInfo.ArmySetup[strArmy].Faction, 1), table.getsize(factions.Factions))
                     SetArmyFactionIndex( strArmy, factionIndex - 1 )
@@ -644,7 +639,7 @@ end
 
 function CountChildUnits(tblNode)
     local count = 0
-    
+
     for k,v in pairs(tblNode.Units) do
         if v.type == 'GROUP' then
             count = count + CountChildUnits(v)
@@ -652,9 +647,9 @@ function CountChildUnits(tblNode)
             count = count + 1
         end
     end
-    
+
     tblNode.TotalUnits = count
-    
+
     return count
 end
 
@@ -695,28 +690,28 @@ function CreatePlatoons( strArmy, tblNode, tblResult, platoonList, currPlatoon, 
     --local timePerChild = nil
 
     --[[
-    if timeLeft and not tblNode.TotalUnits then 
-        --Calculate the number of units 
+    if timeLeft and not tblNode.TotalUnits then
+        --Calculate the number of units
         local totalUnits = CountChildUnits(tblNode)
     end
-    
-    if timeLeft then 
+
+    if timeLeft then
         timePerChild = (timeLeft/tblNode.TotalUnits)
     end
-    ]]-- 
+    ]]--
 
-    for strName, tblData in pairs(tblNode.Units) do        
+    for strName, tblData in pairs(tblNode.Units) do
         if 'GROUP' == tblData.type then
             --[[
-            if timeLeft and tblData.TotalUnits > 0 then 
+            if timeLeft and tblData.TotalUnits > 0 then
                 timePerChild = (timeLeft/tblNode.TotalUnits)*tblData.TotalUnits
             end
-            --]]--  
-            
+            --]]--
+
             platoonList, tblResult, treeResult[strName] = CreatePlatoons(strArmy, tblData, tblResult,
-                                                                         platoonList, currPlatoon, treeResult[strName], balance)  
-                                                                         
-        else            
+                                                                         platoonList, currPlatoon, treeResult[strName], balance)
+
+        else
             unit = CreateUnitHPR( tblData.type,
                                  strArmy,
                                  tblData.Position[1], tblData.Position[2], tblData.Position[3],
@@ -724,7 +719,7 @@ function CreatePlatoons( strArmy, tblNode, tblResult, platoonList, currPlatoon, 
                              )
             if unit:GetBlueprint().Physics.FlattenSkirt then
                 unit:CreateTarmac(true, true, true, false, false)
-            end                               
+            end
             table.insert(tblResult, unit)
             treeResult[strName] = unit
             if ScenarioInfo.UnitNames[armyIndex] then
@@ -766,12 +761,12 @@ function CreatePlatoons( strArmy, tblNode, tblResult, platoonList, currPlatoon, 
                     reversePlatoon = false
                 end
             end
-            
+
             if balance then
                 --Accumulate for one tick so we don't get too much overhead from thread switching...
                 --ScenarioInfo.LoadBalance.Accumulator = ScenarioInfo.LoadBalance.Accumulator + timePerChild
                 ScenarioInfo.LoadBalance.Accumulator = ScenarioInfo.LoadBalance.Accumulator + 1
-                
+
                 if ScenarioInfo.LoadBalance.Accumulator > ScenarioInfo.LoadBalance.UnitThreshold then
                     WaitSeconds(0)
                     ScenarioInfo.LoadBalance.Accumulator = 0
@@ -848,7 +843,7 @@ function CreateArmyGroupAsPlatoon(strArmy, strGroup, formation, tblNode, platoon
         table.insert(ScenarioInfo.LoadBalance.PlatoonGroups, {strArmy, strGroup, formation, tblNode})
         return
     end
-    
+
     local tblNode = tblNode or FindUnitGroup(strGroup, Scenario.Armies[strArmy].Units)
     if not tblNode then
         error('*SCENARIO UTILS ERROR: No group named- ' .. strGroup .. ' found for army- ' .. strArmy, 2)
@@ -878,16 +873,16 @@ function CreateArmyGroupAsPlatoon(strArmy, strGroup, formation, tblNode, platoon
                              )
             if unit:GetBlueprint().Physics.FlattenSkirt then
                 unit:CreateTarmac(true, true, true, false, false)
-            end                               
+            end
             if ScenarioInfo.UnitNames[armyIndex] then
                 ScenarioInfo.UnitNames[armyIndex][strName] = unit
             end
             unit.UnitName = strName
             brain:AssignUnitsToPlatoon(platoon, {unit}, 'Attack', formation)
-            
+
             if balance then
                 ScenarioInfo.LoadBalance.Accumulator = ScenarioInfo.LoadBalance.Accumulator + 1
-                
+
                 if ScenarioInfo.LoadBalance.Accumulator > ScenarioInfo.LoadBalance.UnitThreshold/5 then
                     WaitSeconds(0)
                     ScenarioInfo.LoadBalance.Accumulator = 0
@@ -909,8 +904,8 @@ function CreateArmyGroupAsPlatoonVeteran(strArmy, strGroup, formation, veteranLe
         v:SetVeterancy(veteranLevel)
     end
     return plat
-end  
-    
+end
+
 function FlattenTreeGroup( strArmy, strGroup, tblData, unitGroup )
     tblData = tblData or FindUnitGroup( strGroup, Scenario.Armies[strArmy].Units )
     unitGroup = unitGroup or {}
@@ -1128,10 +1123,10 @@ end
 function LoadOSB(buildName, strArmy, builderData)
     local buildNameNew, location, globalName, childPart
     local saveFile
-    
+
     if type(buildName) == 'table' then
         saveFile = {Scenario = buildName}
-        
+
         buildNameNew = 'OSB_' .. saveFile.Scenario.Name
         globalName = saveFile.Scenario.Name
         location = false --string.gsub(builderData.LocationType, '_', '')
@@ -1141,7 +1136,7 @@ function LoadOSB(buildName, strArmy, builderData)
         local fileName = '/lua/ai/OpAI/' .. globalName .. '_save.lua'
         saveFile = import(fileName)
     end
-   
+
     local platoons = saveFile.Scenario.Platoons
     local aiBrain = GetArmyBrain(strArmy)
     if not aiBrain.OSBuilders then
@@ -1232,8 +1227,8 @@ function LoadOSB(buildName, strArmy, builderData)
                 else
                     spec.PlatoonTemplate = table.deepcopy(platoons[v.PlatoonTemplate])
                 end
-                
-                
+
+
             end
             if builderData.PlatoonData.PlatoonMultiplier then
                 local squadNum = 3
