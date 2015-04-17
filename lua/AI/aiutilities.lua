@@ -108,10 +108,10 @@ function AIGetSortedScoutingLocations(aiBrain, maxNum)
     end
     
     local expansionMarkers = AIGetMarkerLocations(aiBrain, 'Expansion Area')
-    markerList = table.cat(markerList, expansionMarkers)
+    markerList = table.destructiveCat(markerList, expansionMarkers)
     
     local navalMarkers = AIGetMarkerLocations(aiBrain, 'Naval Area')
-    markerList = table.cat(markerList, navalMarkers)
+    markerList = table.destructiveCat(markerList, navalMarkers)
         
     local markers = AISortMarkersFromStartPos(aiBrain, markerList, maxNum or 1000)
     local retMarkers = {}
