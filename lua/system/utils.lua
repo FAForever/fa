@@ -187,6 +187,22 @@ function table.cat(t1, t2)
     return tRet
 end
 
+--- Concatenate arbitrarily-many tables (equivalent to table.cat, but varargs. Slightly more
+-- overhead, but can constructvely concat *all* the things)
+function table.concatenate(...)
+    local ret = {}
+
+    for index = 1, table.getn(arg) do
+        if arg[index] then
+            for k, v in arg[index] do
+                table.insert(ret, v)
+            end
+        end
+    end
+
+    return ret
+end
+
 --- Destructively concatenate two tables. (numerical keys only)
 --
 -- Appends the keys of t2 onto t1, returning it. The original t1 is destroyed, but this avoids the
