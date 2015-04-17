@@ -78,51 +78,31 @@ function toggleAllScript(name)
     end
 end
 
-local MilitaryFilters = {"Defense","AntiNavy","Miscellaneous","AntiAir","DirectFire","IndirectFire"}
-local IntelFilters = {"CounterIntel", "Omni", "Radar", "Sonar"}
+local FILTERS = {
+    Military = {"defense", "antinavy", "miscellaneous", "antiair", "directfire", "indirectfire"},
+    Intel = {"counterintel", "omni", "radar", "sonar" }
+}
 
 function toggleOverlay(type)
     local currentFilters = Prefs.GetFromCurrentProfile('activeFilters') or {}
-    local tempFilters = {}
-    local MilitaryActive = false
-    local IntelActive = false
-    for i, filter in MilitaryFilters do
-        if currentFilters[string.lower(filter)] then
-            MilitaryActive = true
-        end
-    end
-    for i, filter in IntelFilters do
-        if currentFilters[string.lower(filter)] then
-            IntelActive = true
+
+    local filterSet = FILTERS[type]
+
+    -- Determine if any of the filters from the selected filter set are active.
+    local filtersAreActive = false
+    for i, filter in filterSet do
+        if currentFilters[filter] then
+            filtersAreActive = true
+            break
         end
     end
 
-    local function toggleFilters(filterTable, active)
-        for i, filter in filterTable do
-            if active then
-                currentFilters[string.lower(filter)] = nil
-            else
-                currentFilters[string.lower(filter)] = true
-                table.insert(tempFilters, filter)
-            end
-        end
-    end
-
-    if type == 'Military' then
-        toggleFilters(MilitaryFilters, MilitaryActive)
-        if IntelActive then
-            for i, filter in IntelFilters do
-                table.insert(tempFilters, filter)
-            end
-        end
-    end
-
-    if type == 'Intel' then
-        toggleFilters(IntelFilters, IntelActive)
-        if MilitaryActive then
-            for i, filter in MilitaryFilters do
-                table.insert(tempFilters, filter)
-            end
+    -- If any filters are active, turn them all off. Otherwise turn them all on.
+    for i, filter in filterSet do
+        if filtersAreActive then
+            currentFilters[filter] = nil
+        else
+            currentFilters[filter] = true
         end
     end
 
