@@ -485,15 +485,23 @@ function InitializeArmies()
             ----[ Temporary defaults.  Make sure some fighting will break out.    ]--
             for iEnemy, strEnemy in pairs(tblArmy) do
                 local enemyIsCiv = ScenarioInfo.ArmySetup[strEnemy].Civilian
+                local a, e = iArmy, iEnemy
+                local state = 'Enemy'
 
-                if iArmy ~= iEnemy and strArmy ~= 'NEUTRAL_CIVILIAN' and strEnemy ~= 'NEUTRAL_CIVILIAN' then
-                    if (armyIsCiv or enemyIsCiv) and civOpt == 'neutral' then
-                        SetAlliance( iArmy, iEnemy, 'Neutral')
-                    else
-                        SetAlliance( iArmy, iEnemy, 'Enemy')
+                if a ~= e then
+                    if armyIsCiv or enemyIsCiv then
+                        if civOpt == 'neutral' or strArmy == 'NEUTRAL_CIVILIAN' or strEnemy == 'NEUTRAL_CIVILIAN' then
+                            state = 'Neutral'
+                        else
+                            state = 'Ally'
+                            ForkThread(function()
+                                WaitSeconds(1)
+                                SetAlliance(a, e, 'Enemy')
+                            end)
+                        end
                     end
-                elseif strArmy == 'NEUTRAL_CIVILIAN' or strEnemy == 'NEUTRAL_CIVILIAN' then
-                    SetAlliance( iArmy, iEnemy, 'Neutral')
+
+                    SetAlliance(a, e, state)
                 end
             end
         end
