@@ -25,9 +25,6 @@ WorldViewParams = {
 	ui_MaxExtractSnapPixels = 1000,
 }
 
-local playersPinging = {}
-local pingLoopsRemaining = {}
-
 local CommandDecals = {}
 
 function OnStartCommandMode(command_mode, command_data)
@@ -272,42 +269,39 @@ WorldView = Class(moho.UIWorldView, Control) {
     end,
     
     DisplayPing = function(self, pingData)
-		---------------------------------------------------
-		--BEGIN CODE FOR PING SOURCE IDENTIFICATION
-		--Duck_42
-		---------------------------------------------------
-		local function IndicatePingSource(pingOwner)
-			--Get the scoreborad object from the appropriate lua file
-			local scoreBoardControls = import('/lua/ui/game/score.lua').controls
-			local timesToFlash = 8
-			local flashInterval = 0.4
-			
-			if playersPinging[pingOwner + 1] then
-				pingLoopsRemaining[pingOwner + 1] = timesToFlash
-			else
-				pingLoopsRemaining[pingOwner + 1] = timesToFlash
-				while pingLoopsRemaining[pingOwner + 1] > 0 do
-					for _, line in scoreBoardControls.armyLines do
-						--Find the line associated with the ping owner...yes, pingOwner + 1 is correct
-						if line.armyID == (pingOwner + 1) then
-							--Switch their faction icon on and off 
-							line.faction:Hide()
-							WaitSeconds(flashInterval)
-							line.faction:Show()
-							WaitSeconds(flashInterval)
-							pingLoopsRemaining[pingOwner + 1] =  pingLoopsRemaining[pingOwner + 1] - 1
-						end
-					end
-				end
-				playersPinging[pingOwner + 1] = false
-			end
+        -- Flash the scoreboard faction icon for the ping owner to indicate the source.
+        if not pingData.Marker and not pingData.Renew then
+            -- Zero-based indices FTW...
+            local pingOwnerIndex = pingData.Owner + 1
+
+            -- The faction icon for the pingOwner.
+            local toFlash
+
+            -- Find the UI element we need to flash.
+            local scoreBoardControls = import('/lua/ui/game/score.lua').controls
+            for _, line in scoreBoardControls.armyLines do
+                if line.armyID == pingOwnerIndex then
+                    toFlash = line.faction
+                    break
+                end
+            end
+
+            local flashesRemaining = 8
+            local flashInterval = 0.4
+            local pingSourceIndicator = function()
+                -- Flash the icon the appropriate number of times.
+                while flashesRemaining > 0 do
+                    toFlash:Hide()
+                    WaitSeconds(flashInterval)
+                    toFlash:Show()
+                    WaitSeconds(flashInterval)
+
+                    flashesRemaining = flashesRemaining - 1
+                end
+            end
+
+			ForkThread(pingSourceIndicator)
 		end
-		if not pingData.Marker and not pingData.Renew then
-			ForkThread(function() IndicatePingSource(pingData.Owner) end)
-		end
-		---------------------------------------------------
-		--END CODE FOR PING SOURCE IDENTIFICATION
-		---------------------------------------------------
 		
         if not self:IsHidden() and pingData.Location then
             local coords = self:Project(Vector(pingData.Location[1], pingData.Location[2], pingData.Location[3]))
