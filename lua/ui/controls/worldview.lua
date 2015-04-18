@@ -61,9 +61,6 @@ local function NukeDecalFunc()
     if weapons then 
         for _, w in weapons do
             if w.CountedProjectile and w.NukeWeapon then
-                innerSize = w.NukeInnerRingRadius * 2
-                outerSize = w.NukeOuterRingRadius * 2
-
                 if w.NukeInnerRingRadius and w.NukeOuterRingRadius then
                     local decals = {}
                     local prefix = '/textures/ui/common/game/AreaTargetDecal/nuke_icon_'
