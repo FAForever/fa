@@ -4692,7 +4692,7 @@ end
 
 -- Show the rule change dialog.
 function ShowRuleDialog(RuleLabel)
-    CreateInputDialog(GUI, "Game Rules", 
+    CreateInputDialog(GUI, "Game Rules",
         function(self, rules)
             SetGameOption("GameRules", rules, true)
         end
@@ -5083,7 +5083,7 @@ end
 
 -- Create an input dialog with the given title and listener function.
 function CreateInputDialog(parent, title, listener)
-    local dialog = InputDialog(parent, title, listener)
+    local dialog = InputDialog(parent, title, GUI.chatEdit)
     dialog.OnInput = listener
 end
 

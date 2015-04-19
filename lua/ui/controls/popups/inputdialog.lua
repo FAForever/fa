@@ -6,7 +6,15 @@ local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 
 --- A popup that asks the user for a string.
 InputDialog = Class(Popup) {
-    __init = function(self, parent, title)
+    __init = function(self, parent, title, fallbackInputbox)
+        -- For ridiculous reasons, the lobby *must* keep keyboard focus on the chat input, or
+        -- in-game keybindings can be called and cause the world to end.
+        -- This parameter allows you to pass the box you insist we always keep focus on to the input
+        -- dialog, so when the dialog closes (and focus on its input box is lost) it can restore it
+        -- to the fallback box.
+        -- WHAAAAA.
+        self.closeBox = fallbackInputbox
+
         -- Set up the UI Group to pass to the Popup constructor.
         local dialogContent = Group(parent)
         dialogContent.Width:Set(364)
@@ -20,11 +28,16 @@ InputDialog = Class(Popup) {
 
         -- Input textfield.
         local nameEdit = Edit(dialogContent)
+        self.inputBox = nameEdit
         LayoutHelpers.AtHorizontalCenterIn(nameEdit, dialogContent)
         LayoutHelpers.AtVerticalCenterIn(nameEdit, dialogContent)
         nameEdit.Width:Set(334)
         nameEdit.Height:Set(24)
         nameEdit:AcquireFocus()
+
+        nameEdit.OnLoseKeyboardFocus = function(self)
+            nameEdit:AcquireFocus()
+        end
 
         -- Called when the dialog is closed in the affirmative.
         local dialogComplete = function()
@@ -56,6 +69,16 @@ InputDialog = Class(Popup) {
         -- Set up event listeners...
         self.OnEscapePressed = dialogCancelled
         self.OnShadowClicked = dialogCancelled
+    end,
+
+    Close = function(self)
+        -- Don't want to restore focus to the dialog's input box any more...
+        self.inputBox.OnLoseKeyboardFocus = nil
+        if self.closeBox then
+            self.closeBox:AcquireFocus()
+        end
+
+        Popup.Close(self)
     end,
 
     --- Called with the contents of the textfield when the presses enter or clicks the "OK" button.
