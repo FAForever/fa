@@ -541,18 +541,25 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
     -- Set up the base escape handler first: want this one at the bottom of the stack.
     GUI.exitLobbyEscapeHandler = function()
         GUI.chatEdit:AbandonFocus()
-        UIUtil.QuickDialog(GUI,
+        local quitDialog = UIUtil.QuickDialog(GUI,
             "<LOC lobby_0000>Exit game lobby?",
             "<LOC _Yes>", function()
                 ReturnToMenu(false)
                 EscapeHandler.PopEscapeHandler()
             end,
-            "<LOC _Cancel>", function()
-                GUI.chatEdit:AcquireFocus()
-            end,
+            "<LOC _Cancel>", function() end,
             nil, nil,
             true
         )
+
+        -- Prevent the dialog from being dismissed
+        quitDialog.OnEscapePressed = function() end
+        quitDialog.OnShadowClicked = function() end
+
+        -- Fight to keep our focus on the chat input box, to prevent keybinding madness.
+        quitDialog.OnClosed = function()
+            GUI.chatEdit:AcquireFocus()
+        end
     end
     EscapeHandler.PushEscapeHandler(GUI.exitLobbyEscapeHandler)
 
@@ -2954,6 +2961,15 @@ function CreateUI(maxPlayers)
                 PublicChat(text)
             end
         end
+    end
+
+    GUI.chatEdit.OnEscPressed = function(self, text)
+        -- The default behaviour buggers up our escape handlers. Just delegate the escape push to
+        -- the escape handling mechanism.
+        EscapeHandler.HandleEsc(true)
+
+        -- Don't clear the textbox, either.
+        return true
     end
 
     --- Handle up/down arrow presses for the chat box.
