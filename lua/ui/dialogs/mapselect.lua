@@ -201,8 +201,8 @@ mapFilters = {
         NoDelimiter = true,
         Options = {
             {text = "<LOC MAPSEL_0025>All", key = 0},
-            {text = "<LOC lobui_0587>Yes", key = 1},
-            {text = "<LOC lobui_0588>No", key = 2},
+            {text = "<LOC _Yes>Yes", key = 1},
+            {text = "<LOC _No>No", key = 2},
         },
         FilterFactory = {
             SelectedKey = 0,

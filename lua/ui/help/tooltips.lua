@@ -769,25 +769,17 @@ Tooltips = {
     -- **********************
     -- ** Lobby Strings
     -- **********************
-    Lobby_Advanced = {
-        title = "<LOC tooltipui0167>Advanced Options",
-        description = "<LOC tooltipui0168>Sets Advanced Options for this Map",
-    },
-    Lobby_Ready = {
-        title = "<LOC tooltipui0291>Ready",
-        description = "<LOC tooltipui0292>Click here when Ready to play",
-    },
     Lobby_BuildRestrict_Option = {
         title = "<LOC tooltipui0666>Build Restrictions Enabled",
         description = "<LOC tooltipui0667>The host has enabled build restrictions. Be sure to check the restriction manager.",
     },
-    Lobby_Mod_Option = {
-        title = "<LOC tooltipui0668>Mods Enabled",
-        description = "<LOC tooltipui0669>The host has enabled mods. Be sure to check the mod manager.",
-    },
     Lobby_Mods = {
         title = "<LOC tooltipui0169>Mod Manager",
         description = "<LOC tooltipui0170>View, enable and disable all available Mods",
+    },
+    Lobby_Mod_Option = {
+        title = "<LOC tooltipui0668>Mods Enabled",
+        description = "<LOC tooltipui0669>The host has enabled mods. Be sure to check the mod manager.",
     },
     Lobby_Load = {
         title = "<LOC tooltipui0171>Load",
@@ -796,131 +788,6 @@ Tooltips = {
     Lobby_Launch = {
         title = "<LOC tooltipui0173>Launch Game",
         description = "<LOC tooltipui0174>Launch the Game with the Current Settings",
-    },
-    Lobby_Launch_Waiting = {
-        title = "<LOC tooltipui0565>Unable To Launch",
-        description = "<LOC tooltipui0566>Waiting for all players to check the ready checkbox",
-    },
-    Lobby_Back = {
-        title = "<LOC tooltipui0175>Back",
-        description = "<LOC tooltipui0176>Go Back to the Main Menu",
-    },
-    Lobby_Add_AI = {
-        title = "<LOC tooltipui0177>Add AI",
-        description = "<LOC tooltipui0178>Click here to Add an AI Player",
-    },
-    Lobby_Del_AI = {
-        title = "<LOC tooltipui0179>Delete AI",
-        description = "<LOC tooltipui0180>Click here to Delete this AI Player",
-    },
-    Lobby_Kick = {
-        title = "<LOC tooltipui0181>Kick",
-        description = "<LOC tooltipui0182>Click here to Eject this Player from the Game",
-    },
-    Lobby_Team_Spawn = {
-        title = "<LOC lobui_0088>",
-        description = "<LOC lobui_0089>",
-    },
-    Lobby_Gen_ShareResources = {
-        title = "<LOC tooltipui0107>Share Resources",
-        description = "<LOC tooltipui0108>Determines whether Allies share Resources with each other",
-    },
-    Lobby_Gen_ShareUnits = {
-        title = "<LOC tooltipui0109>Share Units",
-        description = "<LOC tooltipui0110>Specifies how much control Teams have over each others Units",
-    },
-    Lobby_Gen_Deployment = {
-        title = "<LOC tooltipui0111>Deployment",
-        description = "<LOC tooltipui0112>Determines your Starting Forces",
-    },
-    Lobby_Gen_Victory = {
-        title = "<LOC tooltipui0113>Victory Conditions",
-        description = "<LOC lobui_0121>",
-    },
-    Lobby_Gen_Fog = {
-        title = "<LOC tooltipui0115>Fog of War",
-        description = "<LOC lobui_0113>",
-    },
-    Lobby_Gen_Cap = {
-        title = "<LOC tooltipui0117>Unit Cap",
-        description = "<LOC tooltipui0118>Set individual Army unit limit",
-    },
-    Lobby_Gen_CheatsEnabled = {
-        title = "<LOC tooltipui0345>Cheating",
-        description = "<LOC tooltipui0346>Enable or disable Cheats in the game",
-    },
-        Lobby_Gen_Timeouts = {
-        title = "<LOC tooltipui0357>Timeouts",
-        description = "<LOC tooltipui0358>Set number of Pauses each Player is allowed",
-    },
-        Lobby_Gen_GameSpeed = {
-        title = "<LOC tooltipui0359>Game Speed",
-        description = "<LOC tooltipui0360>Set how quickly the Game runs",
-    },
-    Lobby_Team_Lock = {
-        title = "<LOC tooltipui0119>Teams",
-        description = "<LOC lobui_0097>",
-    },
-        Lobby_Gen_Civilians = {
-        title = "<LOC tooltipui0367>Civilians",
-        description = "<LOC lobui_0280>Set civilian unit behavior",
-    },
-        Lob_CivilianAlliance_enemy = {
-        title = "<LOC tooltipui0368>Enemy",
-        description = "<LOC lobui_0281>Civilian units will attack",
-    },
-        Lob_CivilianAlliance_neutral = {
-        title = "<LOC tooltipui0369>Neutral",
-        description = "<LOC lobui_0282>Civilian units will ignore other factions",
-    },
-        Lob_CivilianAlliance_removed = {
-        title = "<LOC tooltipui0370>Removed",
-        description = "<LOC lobui_0283>No civilian units are present",
-    },
-    Lobby_NoRushOption = {
-        title = "<LOC OPTIONS_0188>No Rush Option",
-        description = "<LOC OPTIONS_0189>Set a time in which players may not expand past their initial starting area",
-    },
-    lob_NoRushOption_Off = {
-        title = "<LOC OPTIONS_0190>No Time",
-        description = "<LOC OPTIONS_0191>You may expand past your starting area immediately",
-    },
-    lob_NoRushOption_5 = {
-        title = "<LOC OPTIONS_0192>5 Minutes",
-        description = "<LOC OPTIONS_0193>You must stay in your starting area for 5 minutes",
-    },
-    lob_NoRushOption_10 = {
-        title = "<LOC OPTIONS_0194>10 Minutes",
-        description = "<LOC OPTIONS_0195>You must stay in your starting area for 10 minutes",
-    },
-    lob_NoRushOption_20 = {
-        title = "<LOC OPTIONS_0196>20 Minutes",
-        description = "<LOC OPTIONS_0197>You must stay in your starting area for 20 minutes",
-    },
-    Lobby_Gen_DisplayScores = {
-        title = "<LOC OPTIONS_0198>Display Scores",
-        description = "<LOC OPTIONS_0199>Turn the in game display of army scores on or off",
-    },
-    lob_DisplayScores_off = {
-        title = "<LOC OPTIONS_0200>No Scores",
-        description = "<LOC OPTIONS_0201>No scores will be displayed until the game is over",
-    },
-    lob_DisplayScores_on = {
-        title = "<LOC OPTIONS_0202>Scores On",
-        description = "<LOC OPTIONS_0203>The scores are displayed during gameplay",
-    },
-    Lobby_Prebuilt_Units = {
-        title = "<LOC lobui_0310>Prebuilt Units",
-        description = "<LOC lobui_0326>Each army will start with a basic prebuilt base",
-        image = ""
-    },
-    lob_PrebuiltUnits_Off = {
-        title = "<LOC lobui_0312>Off",
-        description = "<LOC lobui_0327>No prebuilt base",
-    },
-    lob_PrebuiltUnits_On = {
-        title = "<LOC lobui_0314>On",
-        description = "<LOC lobui_0328>Prebuilt bases are on",
     },
     lob_slot = {
         title = "<LOC tooltipui0121>Player Slot",
@@ -982,77 +849,13 @@ Tooltips = {
         title = '<LOC tooltipui0635>Team 4',
         description = '',
     },
-    lob_GameSpeed_normal = {
-        title = '<LOC lobui_0260>',
-        description = '<LOC lobui_0261>',
+    lob_team_five = {
+        title = '<LOC lobui_0746>Team 5',
+        description = '',
     },
-    lob_GameSpeed_fast = {
-        title = '<LOC lobui_0262>',
-        description = '<LOC lobui_0263>',
-    },
-    lob_GameSpeed_adjustable = {
-        title = '<LOC lobui_0264>',
-        description = '<LOC lobui_0265>',
-    },
-    lob_UnitCap_100 = {
-        title = '<LOC lobui_0168>',
-        description = '<LOC lobui_0169>',
-    },
-    lob_UnitCap_250 = {
-        title = '<LOC lobui_0170>',
-        description = '<LOC lobui_0171>',
-    },
-    lob_UnitCap_500 = {
-        title = '<LOC lobui_0172>',
-        description = '<LOC lobui_0173>',
-    },
-    lob_UnitCap_750 = {
-        title = '<LOC lobui_0174>',
-        description = '<LOC lobui_0175>',
-    },
-    lob_UnitCap_1000 = {
-        title = '<LOC lobui_0235>',
-        description = '<LOC lobui_0236>',
-    },
-    lob_FogOfWar_explored = {
-        title = '<LOC lobui_0114>',
-        description = '<LOC lobui_0115>',
-    },
-    lob_FogOfWar_unexplored = {
-        title = '<LOC lobui_0116>',
-        description = '<LOC lobui_0117>',
-    },
-    lob_FogOfWar_none = {
-        title = '<LOC lobui_0118>',
-        description = '<LOC lobui_0119>',
-    },
-    lob_Victory_demoralization = {
-        title = '<LOC lobui_0122>',
-        description = '<LOC lobui_0123>',
-    },
-    lob_Victory_domination = {
-        title = '<LOC lobui_0124>',
-        description = '<LOC lobui_0125>',
-    },
-    lob_Victory_eradication = {
-        title = '<LOC lobui_0126>',
-        description = '<LOC lobui_0127>',
-    },
-    lob_Victory_sandbox = {
-        title = '<LOC lobui_0128>',
-        description = '<LOC lobui_0129>',
-    },
-    lob_Timeouts_0 = {
-        title = '<LOC lobui_0244>',
-        description = '<LOC lobui_0245>',
-    },
-    lob_Timeouts_3 = {
-        title = '<LOC lobui_0246>',
-        description = '<LOC lobui_0247>',
-    },
-    ['lob_Timeouts_-1'] = {
-        title = '<LOC lobui_0248>',
-        description = '<LOC lobui_0249>',
+    lob_team_six = {
+        title = '<LOC lobui_0747>Team 6',
+        description = '',
     },
     ['Give Units'] = {
         title = '<LOC tooltips_0000>Give Units',
@@ -1062,53 +865,9 @@ Tooltips = {
         title = '<LOC tooltips_0001>Give Resources',
         description = '',
     },
-    lob_CheatsEnabled_false = {
-        title = '<LOC _Off>',
-        description = '<LOC lobui_0210>',
-    },
-    lob_CheatsEnabled_true = {
-        title = '<LOC _On>',
-        description = '<LOC lobui_0211>',
-    },
-    lob_TeamSpawn_random = {
-        title = '<LOC lobui_0090>',
-        description = '<LOC lobui_0091>',
-    },
-    lob_TeamSpawn_fixed = {
-        title = '<LOC lobui_0092>',
-        description = '<LOC lobui_0093>',
-    },
-    lob_TeamLock_locked = {
-        title = '<LOC lobui_0098>',
-        description = '<LOC lobui_0099>',
-    },
-    lob_TeamLock_unlocked = {
-        title = '<LOC lobui_0100>',
-        description = '<LOC lobui_0101>',
-    },
-    lob_describe_observers = {
-        title = "<LOC lobui_0284>Observers",
-        description = "<LOC lobui_0285>Observers are clients connected to the lobby who will not participate directly in gameplay. Right click an observers name to remove an observer from the lobby.",
-    },
-    lob_observers_allowed = {
-        title = "<LOC lobui_0286>Allow Observers",
-        description = "<LOC lobui_0287>If checked, participants can join the game as an impartial observer (Unchecking this option will boot potential observers from the lobby)",
-    },
     lob_become_observer = {
         title = "<LOC lobui_0288>Become Observer",
         description = "<LOC lobui_0289>When clicked, a player will become an observer",
-    },
-    lob_CivilianAlliance_enemy = {
-        title = "<LOC lobui_0293>",
-        description = "<LOC lobui_0294>",
-    },
-    lob_CivilianAlliance_neutral = {
-        title = "<LOC lobui_0295>",
-        description = "<LOC lobui_0296>",
-    },
-    lob_CivilianAlliance_removed = {
-        title = "<LOC lobui_0297>",
-        description = "<LOC lobui_0298>",
     },
     lob_RestrictedUnits = {
         title = "<LOC lobui_0332>Unit Manager",
@@ -1154,97 +913,13 @@ Tooltips = {
         title='<LOC lobui_0752>Rerun CPU Benchmark',
         description='<LOC lobui_0753>Recalculates your CPU rating.'
     },
-    Lobby_Auto_Teams = {
-        title = "<LOC lobui_0537>Automatic Teams",
-        description = "<LOC lobui_0538>Determine if the game will form the teams automaticly",
-    },
-    lob_AutoTeams_none = {
-        title = "<LOC lobui_0539>None",
-        description = "<LOC lobui_0540>No automatic teams",
-    },
-    lob_AutoTeams_lvsr = {
-        title = "<LOC lobui_0541>Left vs Right",
-        description = "<LOC lobui_0542>The game will form the teams based on Left vs Right",
-    },
-    lob_AutoTeams_tvsb = {
-        title = "<LOC lobui_0543>Top vs Button",
-        description = "<LOC lobui_0544>The game will form the teams based on Top vs Button",
-    },
-    lob_AutoTeams_pvsi = {
-        title = "<LOC lobui_0573>Even Slots vs Odd Slots",
-        description = "<LOC lobui_0574>The game will form the teams based on Even Slots vs Odd Slots",
-    },
-    lob_AutoTeams_manual = {
-        title = "<LOC lobui_0585>Manual Select",
-        description = "<LOC lobui_0587>The game will form the teams based on how you select them in the map preview",
-    },
-    Lobby_Random_Map = {
-        title = "<LOC lobui_0547>Random Map at Start",
-        description = "<LOC lobui_0548>Determine if the game will choose a random map just before the game launch",
-    },
-    lob_RandomMap_Off = {
-        title = "<LOC lobui_0549>Disabled",
-        description = "<LOC lobui_0550>No random map",
-    },
-    lob_RandomMap_Official = {
-        title = "<LOC lobui_0551>Official Maps Only",
-        description = "<LOC lobui_0552>The game will choose a random map just before the game launch",
-    },
-    lob_RandomMap_All = {
-        title = "<LOC lobui_0557>All Maps",
-        description = "<LOC lobui_0552>The game will choose a random map just before the game launch",
-    },
     map_type = {
         title = "<LOC lobui_0583>Map Type",
         description = "<LOC lobui_0584>Sort by official or custom maps",
     },
-    lob_reconnect = {
-        title = "<LOC lobui_0736>Reconnect to Lobby",
-        description = "<LOC lobui_0737>Click to leave and reconnect to the lobby",
-    },
-    lob_upload_map = {
-        title = "<LOC lobui_0738>Upload Current Map",
-        description = "<LOC lobui_0739>Upload the current map to server",
-    },
     lob_disable_allmods = {
         title = "<LOC lobui_0600>Disable All Mods",
         description = "<LOC lobui_0601>Click to disable all the mods at once",
-    },
-    Lobby_Ranked_Game = {
-        title = "<LOC lobui_0606>Play in Ranked Mode",
-        description = "<LOC lobui_0607>When enabled, the game will count as Ranked Mode",
-    },
-    lob_RankedGame_Off = {
-        title = "<LOC lobui_0608>Disabled",
-        description = "<LOC lobui_0609>No Ranked Mode",
-    },
-    lob_RankedGame_On = {
-        title = "<LOC lobui_0610>Enabled",
-        description = "<LOC lobui_0611>Ranked Mode enabled",
-    },
-    Lobby_Score = {
-        title = "<LOC lobui_0731>Game Score",
-        description = "<LOC lobui_0728>Set score on or off during the game",
-    },
-    lob_Score_no = {
-        title = "<LOC lobui_0608>Disabled",
-        description = "<LOC lobui_0732>No Score",
-    },
-    lob_Score_yes = {
-        title = "<LOC lobui_0610>Enabled",
-        description = "<LOC lobui_0733>With Score",
-    },
-    Lobby_Share = {
-        title = "<LOC lobui_0740>Share Conditions",
-        description = "<LOC lobui_0741>Choose between destroying or not the units you shared to your allies when you die",
-    },
-    lob_Share_no = {
-        title = "<LOC lobui_0742>Full Share",
-        description = "<LOC lobui_0743>You can give units to your allies and they will not be destroyed when you die",
-    },
-    lob_Share_yes = {
-        title = "<LOC lobui_0744>Share Until Death",
-        description = "<LOC lobui_0745>All the units you gave to your allies will be destroyed when you die",
     },
     lob_UnitCap_125 = {
         title = "<LOC lobui_0719>125",
@@ -1313,14 +988,6 @@ Tooltips = {
     aitype_sorianadaptivecheat = {
         title = "<LOC sorian_0023>AIx: Sorian Adaptive Cheat",
         description = "<LOC sorian_0024>Chooses a Sorian cheating AI based on the map. Use this if you can\'t decide on an AI.",
-    },
-    lob_team_five = {
-        title = '<LOC lobui_0746>Team 5',
-        description = '',
-    },
-    lob_team_six = {
-        title = '<LOC lobui_0747>Team 6',
-        description = '',
     },
     num_games = {
         title = '<LOC lobui_0748>Number of Games',
