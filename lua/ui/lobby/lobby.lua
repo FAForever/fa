@@ -4692,11 +4692,11 @@ end
 
 -- Show the rule change dialog.
 function ShowRuleDialog(RuleLabel)
-    local ruleDialog = InputDialog(GUI, 'Game Rules')
-    GUI.ruleDialog = ruleDialog
-    ruleDialog.OnInput = function(self, rules)
-        SetGameOption("GameRules", rules, true)
-    end
+    CreateInputDialog(GUI, "Game Rules", 
+        function(self, rules)
+            SetGameOption("GameRules", rules, true)
+        end
+    )
 end
 
 -- Faction selector
