@@ -51,6 +51,9 @@ local advOptions = false
 local changedOptions = {}
 local restrictedCategories = nil
 
+local popup = nil
+local dialogContent = nil
+
 -- Maps the names of all official maps to the value "true".
 local OFFICAL_MAPS = {
     ['Burial Mounds'] = true,
@@ -313,28 +316,32 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     LoadScenarios()
 
     -- control layout
-    local dialogContent = Group(over)
+    dialogContent = Group(over)
     dialogContent.Width:Set(956)
     dialogContent.Height:Set(692)
 
-    local popup = Popup(over, dialogContent)
+    popup = Popup(over, dialogContent)
 
     local title = UIUtil.CreateText(dialogContent, "<LOC map_sel_0000>", 24)
     LayoutHelpers.AtTopIn(title, dialogContent, 10)
     LayoutHelpers.AtHorizontalCenterIn(title, dialogContent)
+    dialogContent.title = title
 
     local cancelButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Cancel>")
     LayoutHelpers.AtRightIn(cancelButton, dialogContent, -2)
     LayoutHelpers.AtBottomIn(cancelButton, dialogContent, 10)
+    dialogContent.cancelButton = cancelButton
 
     selectButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _OK>")
     LayoutHelpers.LeftOf(selectButton, cancelButton, 72)
+    dialogContent.selectButton = selectButton
 
     local doNotRepeatMap
     local randomMapButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC lobui_0503>Random Map")
     LayoutHelpers.AtHorizontalCenterIn(randomMapButton, dialogContent)
     LayoutHelpers.AtVerticalCenterIn(randomMapButton, selectButton)
     Tooltip.AddButtonTooltip(randomMapButton, 'lob_click_randmap')
+    dialogContent.randomMapButton = randomMapButton
 
     randomMapButton.OnClick = function(self, modifiers)
         local randomMapIndex
@@ -367,6 +374,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     local restrictedUnitsButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC sel_map_0006>Unit Manager")
     LayoutHelpers.LeftOf(restrictedUnitsButton, randomMapButton, 81)
     Tooltip.AddButtonTooltip(restrictedUnitsButton, "lob_RestrictedUnits")
+    dialogContent.restrictedUnitsButton = restrictedUnitsButton
 
     if not restrictedCategories then
         restrictedCategories = curOptions.RestrictedCategories
@@ -392,6 +400,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
         local availableMods = ModManager.HostModStatus(availableMods)
         ModManager.NEW_MODS_GUI(dialogContent, true, nil, availableMods)
     end
+    dialogContent.modButton = modButton
 
     UIUtil.MakeInputModal(dialogContent)
 
@@ -399,17 +408,21 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     local preview = ResourceMapPreview(dialogContent, MAP_PREVIEW_SIZE, 5, 8, true)
     UIUtil.SurroundWithBorder(preview, '/scx_menu/lan-game-lobby/frame/')
     LayoutHelpers.AtLeftTopIn(preview, dialogContent, 19, 50)
+    dialogContent.preview = preview
 
     local nopreviewtext = UIUtil.CreateText(dialogContent, "<LOC _No_Preview>No Preview", 24)
     LayoutHelpers.AtCenterIn(nopreviewtext, preview)
     nopreviewtext:Hide()
+    dialogContent.nopreviewtext = nopreviewtext
 
     -- A Group to enclose the map info elements.
     local mapInfoGroup = Group(dialogContent)
     mapInfoGroup.Width:Set(MAP_PREVIEW_SIZE)
     LayoutHelpers.Below(mapInfoGroup, preview, 23)
+    dialogContent.mapInfoGroup = mapInfoGroup
     local descriptionTitle = UIUtil.CreateText(dialogContent, "<LOC sel_map_0000>Map Info", 18)
     LayoutHelpers.AtLeftTopIn(descriptionTitle, mapInfoGroup, 4, 2)
+    mapInfoGroup.title = descriptionTitle
 
     description = ItemList(mapInfoGroup, "mapselect:description")
     description:SetFont(UIUtil.bodyFont, 14)
@@ -420,14 +433,17 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     UIUtil.CreateLobbyVertScrollbar(description, 2, -1, -25)
     mapInfoGroup.Bottom:Set(description.Bottom)
     UIUtil.SurroundWithBorder(mapInfoGroup, '/scx_menu/lan-game-lobby/frame/')
+    mapInfoGroup.description = description
 
     -- A Group to contain the filter UI elements.
     local filterGroup = Group(dialogContent)
     UIUtil.SurroundWithBorder(filterGroup, '/scx_menu/lan-game-lobby/frame/')
     LayoutHelpers.RightOf(filterGroup, preview, 23)
+    dialogContent.filterGroup = filterGroup
 
     filterTitle = UIUtil.CreateText(dialogContent, "<LOC sel_map_0003>Filters", 18)
     LayoutHelpers.AtLeftTopIn(filterTitle, filterGroup, 4, 2)
+    filterGroup.title = filterTitle
 
     for i, filterData in mapFilters do
         filters[i] = CreateFilter(filterTitle, filterData)
@@ -444,13 +460,16 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     filterGroup.Right:Set(function() return filters[table.getn(filters)].Right() + 1 end)
 
     local mapSelectGroup = Group(dialogContent)
+    dialogContent.mapSelectGroup = mapSelectGroup
     UIUtil.SurroundWithBorder(mapSelectGroup, '/scx_menu/lan-game-lobby/frame/')
     mapSelectGroup.Right:Set(filterGroup.Right)
     LayoutHelpers.Below(mapSelectGroup, filterGroup, 23)
     mapListTitle = UIUtil.CreateText(dialogContent, "<LOC sel_map_0005>Maps", 18)
     LayoutHelpers.AtLeftTopIn(mapListTitle, mapSelectGroup, 4, 2)
+    mapSelectGroup.title = mapListTitle
 
     mapList = ItemList(dialogContent, "mapselect:mapList")
+    mapSelectGroup.mapList = mapList
     mapList:SetFont(UIUtil.bodyFont, 14)
     mapList:SetColors(UIUtil.fontColor, "00000000", "FF000000",  UIUtil.highlightColor, "ffbcfffe")
     mapList:ShowMouseoverItem(true)
@@ -487,6 +506,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     PopulateMapList()
 
     local OptionGroup = Group(dialogContent)
+    dialogContent.OptionGroup = OptionGroup
     UIUtil.SurroundWithBorder(OptionGroup, '/scx_menu/lan-game-lobby/frame/')
     OptionGroup.Width:Set(290)
     OptionGroup.Bottom:Set(mapSelectGroup.Bottom)
@@ -598,6 +618,7 @@ end
 function SetupOptionsPanel(parent, singlePlayer, curOptions)
     local title = UIUtil.CreateText(parent, '<LOC PROFILE_0012>', 18)
     LayoutHelpers.AtLeftTopIn(title, parent, 4, 2)
+    parent.title = title
 
     OptionContainer = Group(parent)
     OptionContainer.Height:Set(function() return parent.Height() - title.Height() end)
