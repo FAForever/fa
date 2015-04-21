@@ -75,7 +75,7 @@ UnitBlueprint {
         'TRANSPORTBUILTBYTIER3FACTORY',
         'AEON',
         'MOBILE',
-        'HIGHPRIAIR',
+        'SPECIALHIGHPRI',
         'AIR',
         'TECH2',
         'BOMBER',
