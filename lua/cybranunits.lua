@@ -139,7 +139,7 @@ CConstructionUnit = Class(ConstructionUnit){
     end,
 
     CreateBuildEffects = function( self, unitBeingBuilt, order )
-        local buildbots = EffectUtil.SpawnBuildBots( self, unitBeingBuilt, table.getn(self:GetBlueprint().General.BuildBones.BuildEffectBones), self.BuildEffectsBag )
+        local buildbots = EffectUtil.SpawnBuildBots( self, unitBeingBuilt, self.BuildEffectsBag)
         EffectUtil.CreateCybranBuildBeams( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )
     end,
 }

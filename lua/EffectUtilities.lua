@@ -414,7 +414,8 @@ function CreateCybranBuildBeams( builder, unitBeingBuilt, BuildEffectBones, Buil
     end
 end
 
-function SpawnBuildBots( builder, unitBeingBuilt, numBots,  BuildEffectsBag )
+function SpawnBuildBots( builder, unitBeingBuilt, BuildEffectsBag)
+    local numBots = math.ceil((10+builder:GetBuildRate()) / 15)
     if not builder.buildBots then
         builder.buildBots = {}
     end
