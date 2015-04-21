@@ -362,11 +362,6 @@ UnitBlueprint {
             SlavedToBodyArcRange = 10,
             TargetCheckInterval = 0.4,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
-                'MOBILE',
-                'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
             TrackingRadius = 1.15,

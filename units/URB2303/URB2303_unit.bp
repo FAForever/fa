@@ -228,10 +228,6 @@ UnitBlueprint {
             RenderFireClock = true,
             TargetCheckInterval = 4,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
-                'STRUCTURE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Turret_Muzzle',

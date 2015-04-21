@@ -340,16 +340,6 @@ UnitBlueprint {
             SlavedToBodyArcRange = 65,
             TargetCheckInterval = 0.25,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
-                'EXPERIMENTAL',
-                'SUBCOMMANDER',
-                'TECH3 MOBILE',
-                'STRUCTURE DEFENSE',#
-		'TECH3 STRUCTURE',#
-                'TECH2 MOBILE',
-                'TECH1 MOBILE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Head_Muzzle',
@@ -417,13 +407,6 @@ UnitBlueprint {
             RateOfFire = 1,
             TargetCheckInterval = 2.5,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
-                'TECH3 MOBILE',
-                'TECH2 MOBILE',
-                'TECH1 MOBILE',
-                'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
 
@@ -508,13 +491,6 @@ UnitBlueprint {
             RateOfFire = 1,
             TargetCheckInterval = 2.5,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
-                'TECH3 MOBILE',
-                'TECH2 MOBILE',
-                'TECH1 MOBILE',
-                'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
 

@@ -290,10 +290,6 @@ UnitBlueprint {
             SlavedToBody = true,
             TargetCheckInterval = 3.5,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
-                'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,
@@ -370,10 +366,6 @@ UnitBlueprint {
             SlavedToBody = true,
             TargetCheckInterval = 3.5,
             TargetPriorities = {
-                'SPECIALHIGHPRI',
-                'STRUCTURE DEFENSE',
-                'SPECIALLOWPRI',
-                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,
