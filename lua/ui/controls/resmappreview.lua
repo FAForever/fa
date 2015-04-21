@@ -111,6 +111,28 @@ ResourceMapPreview = Class(Group) {
         local mWidth = scenarioInfo.size[1]
         local mHeight = scenarioInfo.size[2]
 
+        -- Ratio of width to height: map previews are always sqaures, but maps are not.
+        -- It appears nonsquare maps always provide preview images with the map centered (and we're
+        -- unable to either check if this is true or do anything about it if it's not anyway), so we
+        -- assume it.
+
+        local xOffset = 0
+        local xFactor = 1
+        local yOffset = 0
+        local yFactor = 1
+
+        local longEdge
+        local shortEdge
+        if mWidth > mHeight then
+            local ratio = mHeight/mWidth   -- 1/2
+            yOffset = ((self.size / ratio) - self.size) / 4
+            yFactor = ratio
+        else
+            local ratio = mWidth/mHeight
+            xOffset = ((self.size / ratio) - self.size) / 4
+            xFactor = ratio
+        end
+
         -- Add the wreckage, if activated. (done first so the important things appear on top)
         local wreckagemarkers = {}
         if enableWreckage then
@@ -129,8 +151,8 @@ ResourceMapPreview = Class(Group) {
 
                             -- Yes, these ones have a capital Position, but the others have a lowercase.
                             LayoutHelpers.AtLeftTopIn(marker, self.mapPreview,
-                                (v.Position[1] / mWidth) * self.size - 2,
-                                (v.Position[3] / mHeight) *  self.size - 2)
+                                xOffset + (v.Position[1] / mWidth) * (self.size - 2) * xFactor,
+                                yOffset + (v.Position[3] / mHeight) * (self.size - 2) * yFactor)
                         end
                     end
                 end
@@ -139,26 +161,28 @@ ResourceMapPreview = Class(Group) {
         self.wreckagemarkers = wreckagemarkers
 
         -- Add the mass points.
+        local halfMassIconSize = self.massIconSize / 2
         local masses = {}
         for i = 1, table.getn(massmarkers) do
             masses[i] = self.massIconPool:Get()
             masses[i]:Show()
 
             LayoutHelpers.AtLeftTopIn(masses[i], self.mapPreview,
-                massmarkers[i].position[1] / mWidth * self.size - self.massIconSize / 2,
-                massmarkers[i].position[3] / mHeight * self.size - self.massIconSize / 2)
+                xOffset + (massmarkers[i].position[1] / mWidth) * (self.size * xFactor)  - halfMassIconSize,
+                yOffset + (massmarkers[i].position[3] / mHeight) * (self.size * yFactor) - halfMassIconSize)
         end
         self.massmarkers = masses
 
         -- Add the hydrocarbon points.
         local hydros = {}
+        local halfHydroIconSize = self.hydroIconSize / 2
         for i = 1, table.getn(hydromarkers) do
             hydros[i] = self.hydroIconPool:Get()
             hydros[i]:Show()
 
             LayoutHelpers.AtLeftTopIn(hydros[i], self.mapPreview,
-                hydromarkers[i].position[1] / mWidth * self.size - self.hydroIconSize / 2,
-                hydromarkers[i].position[3] / mHeight*  self.size - self.hydroIconSize / 2)
+                xOffset + (hydromarkers[i].position[1] / mWidth) * (self.size * xFactor)  - halfHydroIconSize,
+                yOffset + (hydromarkers[i].position[3] / mHeight) * (self.size * yFactor) - halfHydroIconSize)
         end
         self.hydromarkers = hydros
 
@@ -176,8 +200,8 @@ ResourceMapPreview = Class(Group) {
             local marker = ACUButton(self.mapPreview, not self.buttonsDisabled)
 
             LayoutHelpers.AtLeftTopIn(marker, self.mapPreview,
-                ((pos[1] / mWidth) * self.size) - (marker.Width() / 2),
-                ((pos[2] / mHeight) * self.size) - (marker.Height() / 2))
+                xOffset + ((pos[1] / mWidth) * self.size * xFactor) - (marker.Width() / 2),
+                yOffset + ((pos[2] / mHeight) * self.size * yFactor) - (marker.Height() / 2))
 
             startPositions[slot] = marker
         end
