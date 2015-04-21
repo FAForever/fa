@@ -110,9 +110,9 @@ URL0301 = Class(CWalkingLandUnit) {
         self:SetWeaponEnabledByLabel('RightDisintegrator', true)
         self:GetWeaponManipulatorByLabel('RightDisintegrator'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
     end,
-    
+
     CreateBuildEffects = function( self, unitBeingBuilt, order )
-       EffectUtil.SpawnBuildBots( self, unitBeingBuilt, 3, self.BuildEffectsBag )
+       EffectUtil.SpawnBuildBots( self, unitBeingBuilt, self.BuildEffectsBag )
        EffectUtil.CreateCybranBuildBeams( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )
     end,
 
