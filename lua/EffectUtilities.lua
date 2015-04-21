@@ -497,6 +497,8 @@ function CreateCybranFactoryBuildEffects( builder, unitBeingBuilt, BuildBones, B
     }
     local army = builder:GetArmy()
 
+    CreateCybranBuildBeams(builder, unitBeingBuilt, BuildBones.BuildEffectBones, BuildEffectsBag)
+
     for kB,vB in BuildBones.BuildEffectBones do
         for kE, vE in BuildEffects do
             BuildEffectsBag:Add( CreateAttachedEmitter(builder,vB,army,vE) )
