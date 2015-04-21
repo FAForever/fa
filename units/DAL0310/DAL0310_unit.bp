@@ -235,10 +235,9 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_LowArc',
             CollideFriendly = false,
-            Damage = 5,
+            Damage = 1300,
             DamageRadius = 0,
-            DamageToShields = 1300,
-            DamageType = 'Normal',
+            DamageType = 'AntiShield',
             DisplayName = 'Shield Disruptor Cannon',
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
@@ -275,6 +274,7 @@ UnitBlueprint {
             SlavedToBodyArcRange = 5,
             TargetCheckInterval = 0.75,
             TargetPriorities = {
+                'SHIELD',
                 'SPECIALHIGHPRI',
                 'MOBILE',
                 'STRUCTURE DEFENSE',
