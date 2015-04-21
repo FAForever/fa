@@ -165,16 +165,27 @@ function UpdateWorldBorderState(skin, isOn)
                 MapBorderClear()
                 --Set the world mesh to the skins world mesh
                 local size = SessionGetScenarioInfo().size
-                if size[1] == 2048 and size[2] == 1024 then
+                local mapWidth = size[1]
+                local mapHeight = size[2]
+
+                -- The meshes used here are, due to limitations of native code, only capable of
+                -- scaling preserving aspect ratio.
+                -- GPG forgot to include one for tall-thin maps, but here we make optimal use of the
+                -- two they did give us :/
+                if mapWidth == mapHeight * 2 then
+                    -- Wide maps
                     MapBorderAdd(skins[skin].imagerMeshHorz)
                     if skins[skin].imagerMeshDetailsHorz then
                         MapBorderAdd(skins[skin].imagerMeshDetailsHorz)
                     end
-                else
+                elseif mapWidth == mapHeight then
+                    -- Squares
                     MapBorderAdd(skins[skin].imagerMesh)
                     if skins[skin].imagerMeshDetails then
                         MapBorderAdd(skins[skin].imagerMeshDetails)
                     end
+                elseif mapHeight == mapWidth * 2 then
+                   -- TODO: Someone please make a mesh for this case.
                 end
             end
         else
