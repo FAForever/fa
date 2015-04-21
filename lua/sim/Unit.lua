@@ -2320,6 +2320,11 @@ Unit = Class(moho.unit_methods) {
 
     StopBuildingEffects = function(self, unitBeingBuilt)
         self.BuildEffectsBag:Destroy()
+        if self.buildBots then
+            for _, b in self.buildBots do
+                ChangeState(b, b.IdleState)
+            end
+        end
     end,
 
     OnStartSacrifice = function(self, target_unit)

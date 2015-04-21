@@ -415,45 +415,53 @@ function CreateCybranBuildBeams( builder, unitBeingBuilt, BuildEffectBones, Buil
 end
 
 function SpawnBuildBots( builder, unitBeingBuilt, numBots,  BuildEffectsBag )
-    local builderArmy = builder:GetArmy()
-
-    --new
+    if not builder.buildBots then
+        builder.buildBots = {}
+    end
+	local builderArmy = builder:GetArmy()
     local unitBeingBuiltArmy = unitBeingBuilt:GetArmy()
 
-    local BeamBuildEmtBp = '/effects/emitters/build_beam_02_emit.bp'
-    local x, y, z = unpack(builder:GetPosition())
-    local qx, qy, qz, qw = unpack(builder:GetOrientation())
+    --if is new, won't spawn build bots if they might accidentally capture the unit
+	if builderArmy == unitBeingBuiltArmy or IsHumanUnit(unitBeingBuilt) then
+        for k, b in builder.buildBots do
+            if b:BeenDestroyed() then
+                builder.buildBots[k] = nil
+            end
+        end
 
-    local numUnits = numBots
-    local angle = (2*math.pi) / numUnits
-    local angleInitial = 180
-    local VecMul = 0.5
+        local numUnits = numBots - table.getsize(builder.buildBots)
+        if numUnits > 0 then
+            local x, y, z = unpack(builder:GetPosition())
+            local qx, qy, qz, qw = unpack(builder:GetOrientation())
+            local angleInitial = 180
+            local VecMul = 0.5
+            local xVec = 0
+            local yVec = builder:GetBlueprint().SizeY * 0.5
+            local zVec = 0
 
-    local xVec = 0
-    local yVec = builder:GetBlueprint().SizeY * 0.5
-    local zVec = 0
-    local BuilderUnits = {}
-    local tunit = nil
+            local angle = (2*math.pi) / numUnits
 
-	--if is new, won't spawn build bots if they might accidentally capture the unit
-	if builderArmy == unitBeingBuiltArmy or IsHumanUnit(unitBeingBuilt)  then
-	    -- Launch projectiles at semi-random angles away from the sphere, with enough
-	    -- initial velocity to escape sphere core
-	    for i = 0, (numUnits - 1) do
-            xVec = math.sin(angleInitial + (i*angle)) * VecMul
-            zVec = math.cos(angleInitial + (i*angle)) * VecMul
-            tunit = CreateUnit('ura0001', builderArmy, x + xVec, y + yVec, z + zVec, qx, qy, qz, qw, 'Air' )
+            -- Launch projectiles at semi-random angles away from the sphere, with enough
+            -- initial velocity to escape sphere core
+            for i = 0, (numUnits - 1) do
+                xVec = math.sin(angleInitial + (i*angle)) * VecMul
+                zVec = math.cos(angleInitial + (i*angle)) * VecMul
+                local bot = CreateUnit('ura0001', builderArmy, x + xVec, y + yVec, z + zVec, qx, qy, qz, qw, 'Air' )
 
-            -- Make build bots unkillable
-            tunit:SetCanTakeDamage(false)
-            tunit:SetCanBeKilled(false)
+                -- Make build bots unkillable
+                bot:SetCanTakeDamage(false)
+                bot:SetCanBeKilled(false)
+                bot.spawnedBy = builder
 
-            table.insert( BuilderUnits, tunit )
-    		BuildEffectsBag:Add(tunit)
-	    end
+                table.insert(builder.buildBots, bot)
+            end
+        end
 
-	    IssueGuard( BuilderUnits, unitBeingBuilt )
-	    return BuilderUnits
+        for _, bot in builder.buildBots do
+            ChangeState(bot, bot.BuildState)
+        end
+
+        return builder.buildBots
 	else
 		return
 	end
