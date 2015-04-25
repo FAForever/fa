@@ -183,7 +183,7 @@ function ValidateScenarioOptions(scenarioOptions)
         return true
     end
 
-    local failed = false
+    local passed = true
     for k, optData in scenarioOptions do
         -- Verify that all options have a sane default.
         if optData.default <= 0 or optData.default > table.getn(optData.values) then
@@ -192,9 +192,9 @@ function ValidateScenarioOptions(scenarioOptions)
             WARN("Offending option table:")
             table.print(optData)
             optData.default = 1
-            failed = true
+            passed = false
         end
     end
 
-    return failed
+    return passed
 end
