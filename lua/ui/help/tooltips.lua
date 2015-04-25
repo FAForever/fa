@@ -390,6 +390,10 @@ Tooltips = {
         title = "<LOC tooltipui0419>Toggle Option Buttons",
         description = "<LOC tooltipui0420>Toggles option and MFD buttons on or off.",
     },
+    drone_rebuild = {
+        title = "<LOC tooltipui0690>Drone Auto-Rebuild",
+        description = "<LOC tooltipui0691>Toggle if this drone rebuilds upon death",
+    },
 
     #**********************
     #** AI Strings
