@@ -369,7 +369,7 @@ local function HandleSlotSwitches(moveFrom, moveTo)
 
     HostConvertPlayerToObserver(moveTo, false) -- Move Slot moveTo to Observer
     HostTryMovePlayer(moveFrom, moveTo) -- Move Player moveFrom to Slot moveTo
-    HostConvertObserverToPlayer(toOpts.OwnerID, FindObserverSlotForID(toOpts.OwnerID), moveFrom)
+    HostConvertObserverToPlayer(FindObserverSlotForID(toOpts.OwnerID), moveFrom)
     SendSystemMessage(fromOpts.PlayerName..' has switched with '..toOpts.PlayerName, 'switch')
 end
 
@@ -434,7 +434,7 @@ local function DoSlotBehavior(slot, key, name)
         elseif IsObserver(localPlayerID) then
             if lobbyComm:IsHost() then
                 local requestedFaction = GetSanitisedLastFaction()
-                HostConvertObserverToPlayer(hostID, FindObserverSlotForID(localPlayerID), slot)
+                HostConvertObserverToPlayer(FindObserverSlotForID(localPlayerID), slot)
             else
                 lobbyComm:SendData(
                     hostID,
@@ -2264,7 +2264,7 @@ function HostConvertPlayerToObserver(playerSlot, ignoreMsg)
     end
 end
 
-function HostConvertObserverToPlayer(senderID, fromObserverSlot, toPlayerSlot, ignoreMsg)
+function HostConvertObserverToPlayer(fromObserverSlot, toPlayerSlot, ignoreMsg)
     -- If no slot is specified (user clicked "go player" button), select a default.
     if not toPlayerSlot or toPlayerSlot < 1 or toPlayerSlot > numOpenSlots then
         toPlayerSlot = HostFindEmptySlot()
@@ -3339,7 +3339,7 @@ function CreateUI(maxPlayers)
             end
         elseif IsObserver(localPlayerID) then
             if isHost then
-                HostConvertObserverToPlayer(hostID, FindObserverSlotForID(localPlayerID))
+                HostConvertObserverToPlayer(FindObserverSlotForID(localPlayerID))
             else
                 lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer', ObserverSlot = FindObserverSlotForID(localPlayerID)})
             end
@@ -3779,7 +3779,7 @@ function ConfigureMapListeners(mapCtrl, scenario)
                     elseif IsObserver(localPlayerID) then
                         if lobbyComm:IsHost() then
                             local requestedFaction = GetSanitisedLastFaction()
-                            HostConvertObserverToPlayer(hostID, FindObserverSlotForID(localPlayerID), slot)
+                            HostConvertObserverToPlayer(FindObserverSlotForID(localPlayerID), slot)
                         else
                             lobbyComm:SendData(
                                 hostID,
@@ -3985,7 +3985,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             elseif data.Type == 'RequestConvertToObserver' then
                 HostConvertPlayerToObserver(data.RequestedSlot)
             elseif data.Type == 'RequestConvertToPlayer' then
-                HostConvertObserverToPlayer(data.SenderID, data.ObserverSlot, data.PlayerSlot)
+                HostConvertObserverToPlayer(data.ObserverSlot, data.PlayerSlot)
             elseif data.Type == 'RequestColor' then
                 if IsColorFree(data.Color) then
                     -- Color is available, let everyone else know
