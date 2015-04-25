@@ -341,45 +341,6 @@ local function setPlayerNotReady(slot)
     end
 end
 
--- Called by the host when a "move player to slot X" option is clicked.
-local function HandleSlotSwitches(moveFrom, moveTo)
-    -- Bail out early for the stupid cases.
-    if moveFrom == moveTo then
-        AddChatText('You cannot move the Player in slot '..moveFrom..' to the same slot!')
-        return
-    end
-
-    local fromOpts = gameInfo.PlayerOptions[moveFrom]
-    local toOpts = gameInfo.PlayerOptions[moveTo]
-
-    -- Unready the move-ee
-    if fromOpts.Human then
-        setPlayerNotReady(moveFrom)
-    end
-
-    -- If we're moving a human onto an AI, evict the AI and move the player into the space.
-    if not toOpts.Human then
-        HostUtils.RemoveAI(moveTo)
-        HostUtils.MovePlayerToEmptySlot(moveFrom, moveTo)
-        return
-    end
-
-    -- If we're moving onto a blank, take the easy way out.
-    if not toOpts then
-        HostUtils.MovePlayerToEmptySlot(moveFrom, moveTo)
-        return
-    end
-
-    -- So we're switching two humans. Time to do the stupid thing until we make a saner way.
-    -- Clear the ready flag for both targets.
-    setPlayerNotReady(moveTo)
-
-    HostUtils.ConvertPlayerToObserver(moveTo, false) -- Move Slot moveTo to Observer
-    HostUtils.MovePlayerToEmptySlot(moveFrom, moveTo) -- Move Player moveFrom to Slot moveTo
-    HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(toOpts.OwnerID), moveFrom)
-    SendSystemMessage(fromOpts.PlayerName..' has switched with '..toOpts.PlayerName, 'switch')
-end
-
 --- Get the value of the LastFaction, sanitised in case it's an unsafe value.
 --
 -- This means when some retarded mod (*cough*Nomads*cough*) writes a large number to LastFaction, we
@@ -459,13 +420,12 @@ local function DoSlotBehavior(slot, key, name)
         end
     -- Handle the various "Move to slot X" options.
     elseif string.sub(key, 1, 19) == 'move_player_to_slot' then
-        HandleSlotSwitches(slot, tonumber(string.sub(key, 20)))
+        HostUtils.SwapPlayers(slot, tonumber(string.sub(key, 20)))
     elseif key == 'remove_to_observer' then
         local playerInfo = gameInfo.PlayerOptions[slot]
         if playerInfo.Human then
             HostUtils.ConvertPlayerToObserver(slot)
         end
-        --\\ Stop Move Player slot to Observer
     elseif key == 'remove_to_kik' then
         if gameInfo.PlayerOptions[slot].Human then
             UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
@@ -5065,6 +5025,33 @@ function InitHostUtils()
             )
         end,
 
+        --- Returns false if there's an obvious reason why a slot movement between the two given
+        -- slots will fail.
+        --
+        -- @param moveFrom Slot number to move from
+        -- @param moveTo Slot number to move to.
+        SanityCheckSlotMovement = function(moveFrom, moveTo)
+            if gameInfo.PlayerOptions[moveTo] then
+                LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. moveTo .. " already occupied")
+                return
+            end
+
+            if gameInfo.ClosedSlots[moveTo] then
+                LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. moveTo .. " is closed")
+                return
+            end
+
+            if moveTo > numOpenSlots or moveTo < 1 then
+                LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. moveTo .. " is out of range")
+                return
+            end
+
+            if moveFrom > numOpenSlots or moveFrom < 1 then
+                LOG("HostUtils.MovePlayerToEmptySlot: target slot " .. moveFrom .. " is out of range")
+                return
+            end
+        end,
+
         --- Move a player from one slot to another, unoccupied one. Is a no-op if the requested slot
         -- is occupied, closed, or out of range. Races over network may cause this to occur during
         -- normal operation.
@@ -5072,18 +5059,8 @@ function InitHostUtils()
         -- @param currentSlot The slot occupied by the player to move
         -- @param requestedSlot The slot to move this player to.
         MovePlayerToEmptySlot = function(currentSlot, requestedSlot)
-            if gameInfo.PlayerOptions[requestedSlot] then
-                LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. requestedSlot .. " already occupied")
-                return
-            end
-
-            if gameInfo.ClosedSlots[requestedSlot] then
-                LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. requestedSlot .. " is closed")
-                return
-            end
-
-            if requestedSlot > numOpenSlots or requestedSlot < 1 then
-                LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. requestedSlot .. " is out of range")
+            -- Bail out early for the stupid cases.
+            if not HostUtils.SanityCheckSlotMovement(currentSlot, requestedSlot) then
                 return
             end
 
@@ -5103,6 +5080,54 @@ function InitHostUtils()
 
             -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
             AssignAutoTeams()
+        end,
+
+        --- Swap the players in the two given slots.
+        --
+        -- If the target slot is unoccupied, the player in the first slot is simply moved there.
+        -- If an AI occupies the target slot, it is deleted and the player moved there.
+        -- If the target slot is closed, this is a no-op.
+        -- If a human occupies both slots, they are swapped.
+        SwapPlayers = function(moveFrom, moveTo)
+            -- Bail out early for the stupid cases.
+            if not HostUtils.SanityCheckSlotMovement(moveFrom, moveTo) then
+                return
+            end
+
+            local fromOpts = gameInfo.PlayerOptions[moveFrom]
+            local toOpts = gameInfo.PlayerOptions[moveTo]
+
+            -- Unready the move-ee
+            if fromOpts.Human then
+                setPlayerNotReady(moveFrom)
+            end
+
+            -- If we're moving onto a blank, take the easy way out.
+            if not toOpts then
+                HostUtils.MovePlayerToEmptySlot(moveFrom, moveTo)
+                return
+            end
+
+            -- If we're moving a human onto an AI, evict the AI and move the player into the space.
+            if not toOpts.Human then
+                HostUtils.RemoveAI(moveTo)
+                HostUtils.MovePlayerToEmptySlot(moveFrom, moveTo)
+                return
+            end
+
+            -- So we're switching two humans. Time to do the stupid thing until we make a saner way.
+            -- Clear the ready flag for the other target.
+            setPlayerNotReady(moveTo)
+
+            -- Move the player in the target slot to observers.
+            HostUtils.ConvertPlayerToObserver(moveTo, false)
+
+            -- Move the other player into the slot.
+            HostUtils.MovePlayerToEmptySlot(moveFrom, moveTo)
+
+            -- Move the observer into the slot the first player came from.
+            HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(toOpts.OwnerID), moveFrom)
+            SendSystemMessage(fromOpts.PlayerName..' has switched with '..toOpts.PlayerName, 'switch')
         end,
 
         --- Add an observer
