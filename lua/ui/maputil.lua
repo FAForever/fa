@@ -199,6 +199,19 @@ function ValidateScenarioOptions(scenarioOptions)
             WARN("Offending option table:")
             table.print(optData)
             passed = false
+
+            -- Nearly everyone who gets here has just been a dipshit and used the value they want as
+            -- their default value: something we can recover from gracefully.
+            local replacementValue = 1
+            for k, v in optData.values do
+                if v.key == optData.default then
+                    -- Huzzah, we found it!
+                    replacementValue = k
+                    break
+                end
+            end
+
+            optData.default = replacementValue
         end
     end
 
