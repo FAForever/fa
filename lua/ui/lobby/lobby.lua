@@ -364,7 +364,13 @@ local function HandleSlotSwitches(moveFrom, moveTo)
         return
     end
 
-    -- So we're switching two humans. (or moving a human to a blank).
+    -- If we're moving onto a blank, take the easy way out.
+    if not toOpts then
+        HostUtils.TryMovePlayer(moveFrom, moveTo)
+        return
+    end
+
+    -- So we're switching two humans. Time to do the stupid thing until we make a saner way.
     -- Clear the ready flag for both targets.
     setPlayerNotReady(moveTo)
 
