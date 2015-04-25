@@ -352,11 +352,6 @@ local function HandleSlotSwitches(moveFrom, moveTo)
     local fromOpts = gameInfo.PlayerOptions[moveFrom]
     local toOpts = gameInfo.PlayerOptions[moveTo]
 
-    if not fromOpts.Human then
-        AddChatText('You cannot move the Player in slot '..moveFrom..' because they are not human.')
-        return
-    end
-
     -- If we're moving a human onto an AI, evict the AI and move the player into the space.
     if not toOpts.Human then
         HostUtils.RemoveAI(moveTo)
