@@ -352,6 +352,11 @@ local function HandleSlotSwitches(moveFrom, moveTo)
     local fromOpts = gameInfo.PlayerOptions[moveFrom]
     local toOpts = gameInfo.PlayerOptions[moveTo]
 
+    -- Unready the move-ee
+    if fromOpts.Human then
+        setPlayerNotReady(moveFrom)
+    end
+
     -- If we're moving a human onto an AI, evict the AI and move the player into the space.
     if not toOpts.Human then
         HostUtils.RemoveAI(moveTo)
@@ -362,7 +367,6 @@ local function HandleSlotSwitches(moveFrom, moveTo)
     -- So we're switching two humans. (or moving a human to a blank).
     -- Clear the ready flag for both targets.
     setPlayerNotReady(moveTo)
-    setPlayerNotReady(moveFrom)
 
     HostUtils.ConvertPlayerToObserver(moveTo, false) -- Move Slot moveTo to Observer
     HostUtils.TryMovePlayer(moveFrom, moveTo) -- Move Player moveFrom to Slot moveTo
