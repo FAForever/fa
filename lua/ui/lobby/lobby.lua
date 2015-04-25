@@ -360,13 +360,13 @@ local function HandleSlotSwitches(moveFrom, moveTo)
     -- If we're moving a human onto an AI, evict the AI and move the player into the space.
     if not toOpts.Human then
         HostUtils.RemoveAI(moveTo)
-        HostUtils.TryMovePlayer(moveFrom, moveTo)
+        HostUtils.MovePlayerToEmptySlot(moveFrom, moveTo)
         return
     end
 
     -- If we're moving onto a blank, take the easy way out.
     if not toOpts then
-        HostUtils.TryMovePlayer(moveFrom, moveTo)
+        HostUtils.MovePlayerToEmptySlot(moveFrom, moveTo)
         return
     end
 
@@ -375,7 +375,7 @@ local function HandleSlotSwitches(moveFrom, moveTo)
     setPlayerNotReady(moveTo)
 
     HostUtils.ConvertPlayerToObserver(moveTo, false) -- Move Slot moveTo to Observer
-    HostUtils.TryMovePlayer(moveFrom, moveTo) -- Move Player moveFrom to Slot moveTo
+    HostUtils.MovePlayerToEmptySlot(moveFrom, moveTo) -- Move Player moveFrom to Slot moveTo
     HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(toOpts.OwnerID), moveFrom)
     SendSystemMessage(fromOpts.PlayerName..' has switched with '..toOpts.PlayerName, 'switch')
 end
@@ -433,7 +433,7 @@ local function DoSlotBehavior(slot, key, name)
     elseif key == 'occupy' then
         if IsPlayer(localPlayerID) then
             if lobbyComm:IsHost() then
-                HostUtils.TryMovePlayer(FindSlotForID(localPlayerID), slot)
+                HostUtils.MovePlayerToEmptySlot(FindSlotForID(localPlayerID), slot)
             else
                 lobbyComm:SendData(hostID, {Type = 'MovePlayer', CurrentSlot = FindSlotForID(localPlayerID),
                                    RequestedSlot = slot})
@@ -3401,7 +3401,7 @@ function ConfigureMapListeners(mapCtrl, scenario)
                 if FindSlotForID(localPlayerID) ~= slot and gameInfo.PlayerOptions[slot] == nil then
                     if IsPlayer(localPlayerID) then
                         if lobbyComm:IsHost() then
-                            HostUtils.TryMovePlayer(FindSlotForID(localPlayerID), slot)
+                            HostUtils.MovePlayerToEmptySlot(FindSlotForID(localPlayerID), slot)
                         else
                             lobbyComm:SendData(hostID, {Type = 'MovePlayer', CurrentSlot = FindSlotForID(localPlayerID), RequestedSlot = slot})
                         end
@@ -3609,8 +3609,13 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 HostUtils.TryAddPlayer(data.SenderID, 0, PlayerData(data.PlayerOptions))
                 PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
             elseif data.Type == 'MovePlayer' then
-                -- attempt to move a player from current slot to empty slot
-                HostUtils.TryMovePlayer(data.CurrentSlot, data.RequestedSlot)
+                -- Handle ready-races.
+                if gameInfo.PlayerOptions[data.CurrentSlot].Ready then
+                    return
+                end
+
+                -- Player requests to be moved to a different empty slot.
+                HostUtils.MovePlayerToEmptySlot(data.CurrentSlot, data.RequestedSlot)
             elseif data.Type == 'RequestConvertToObserver' then
                 HostUtils.ConvertPlayerToObserver(data.RequestedSlot)
             elseif data.Type == 'RequestConvertToPlayer' then
@@ -5060,8 +5065,28 @@ function InitHostUtils()
             )
         end,
 
-        --- Move a player from one slot to another. Shall only be called by the host.
-        MovePlayer = function(currentSlot, requestedSlot)
+        --- Move a player from one slot to another, unoccupied one. Is a no-op if the requested slot
+        -- is occupied, closed, or out of range. Races over network may cause this to occur during
+        -- normal operation.
+        --
+        -- @param currentSlot The slot occupied by the player to move
+        -- @param requestedSlot The slot to move this player to.
+        MovePlayerToEmptySlot = function(currentSlot, requestedSlot)
+            if gameInfo.PlayerOptions[requestedSlot] then
+                LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. requestedSlot .. " already occupied")
+                return
+            end
+
+            if gameInfo.ClosedSlots[requestedSlot] then
+                LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. requestedSlot .. " is closed")
+                return
+            end
+
+            if requestedSlot > numOpenSlots or requestedSlot < 1 then
+                LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. requestedSlot .. " is out of range")
+                return
+            end
+
             gameInfo.PlayerOptions[requestedSlot] = gameInfo.PlayerOptions[currentSlot]
             gameInfo.PlayerOptions[currentSlot] = nil
             ClearSlotInfo(currentSlot)
@@ -5078,34 +5103,6 @@ function InitHostUtils()
 
             -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
             AssignAutoTeams()
-        end,
-
-        --- Move a player from one slot to another subject to sanity checks.
-        -- Shall only be called by the host.
-        TryMovePlayer = function(currentSlot, requestedSlot)
-            LOG(" currentSlot: " .. currentSlot .. " requestedSlot: " .. requestedSlot)
-
-            if gameInfo.PlayerOptions[currentSlot].Ready then
-                LOG("HostUtils.TryMovePlayer: player is marked ready and can not move")
-                return
-            end
-
-            if gameInfo.PlayerOptions[requestedSlot] then
-                LOG("HostUtils.TryMovePlayer: requested slot " .. requestedSlot .. " already occupied")
-                return
-            end
-
-            if gameInfo.ClosedSlots[requestedSlot] then
-                LOG("HostUtils.TryMovePlayer: requested slot " .. requestedSlot .. " is closed")
-                return
-            end
-
-            if requestedSlot > numOpenSlots or requestedSlot < 1 then
-                LOG("HostUtils.TryMovePlayer: requested slot " .. requestedSlot .. " is out of range")
-                return
-            end
-
-            HostUtils.MovePlayer(currentSlot, requestedSlot)
         end,
 
         --- Add an observer
