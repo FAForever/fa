@@ -330,17 +330,6 @@ local function GetSlotMenuTables(stateKey, hostKey)
     return keys, strings
 end
 
--- Instruct a player to unset their "ready" status. Should be called only by the host.
-local function setPlayerNotReady(slot)
-    local slotOptions = gameInfo.PlayerOptions[slot]
-    if slotOptions.Ready then
-        if not IsLocallyOwned(slot) then
-            lobbyComm:SendData(slotOptions.OwnerID, {Type = 'SetPlayerNotReady', Slot = slot})
-        end
-        slotOptions.Ready = false
-    end
-end
-
 --- Get the value of the LastFaction, sanitised in case it's an unsafe value.
 --
 -- This means when some retarded mod (*cough*Nomads*cough*) writes a large number to LastFaction, we
@@ -4907,8 +4896,21 @@ function InitHostUtils()
     end
 
     HostUtils = {
+        --- Cause a player's ready box to become unchecked.
+        --
+        -- @param slot The slot number of the target player.
+        SetPlayerNotReady = function(slot)
+            local slotOptions = gameInfo.PlayerOptions[slot]
+            if slotOptions.Ready then
+                if not IsLocallyOwned(slot) then
+                    lobbyComm:SendData(slotOptions.OwnerID, {Type = 'SetPlayerNotReady', Slot = slot})
+                end
+                slotOptions.Ready = false
+            end
+        end,
+
         SetSlotClosed = function(slot, closed)
-        -- Don't close an occupied slot.
+            -- Don't close an occupied slot.
             if gameInfo.PlayerOptions[slot] then
                 return
             end
@@ -4926,7 +4928,7 @@ function InitHostUtils()
         end,
 
         ConvertPlayerToObserver = function(playerSlot, ignoreMsg)
-        -- make sure player exists
+            -- make sure player exists
             if not gameInfo.PlayerOptions[playerSlot] then
                 WARN("HostUtils.ConvertPlayerToObserver for nonexistent player in slot " .. tostring(playerSlot))
                 return
@@ -4965,7 +4967,7 @@ function InitHostUtils()
         end,
 
         ConvertObserverToPlayer = function(fromObserverSlot, toPlayerSlot, ignoreMsg)
-        -- If no slot is specified (user clicked "go player" button), select a default.
+            -- If no slot is specified (user clicked "go player" button), select a default.
             if not toPlayerSlot or toPlayerSlot < 1 or toPlayerSlot > numOpenSlots then
                 toPlayerSlot = HostUtils.FindEmptySlot()
             end
@@ -5099,7 +5101,7 @@ function InitHostUtils()
 
             -- Unready the move-ee
             if fromOpts.Human then
-                setPlayerNotReady(moveFrom)
+                HostUtils.SetPlayerNotReady(moveFrom)
             end
 
             -- If we're moving onto a blank, take the easy way out.
@@ -5117,7 +5119,7 @@ function InitHostUtils()
 
             -- So we're switching two humans. Time to do the stupid thing until we make a saner way.
             -- Clear the ready flag for the other target.
-            setPlayerNotReady(moveTo)
+            HostUtils.SetPlayerNotReady(moveTo)
 
             -- Move the player in the target slot to observers.
             HostUtils.ConvertPlayerToObserver(moveTo, false)
@@ -5257,8 +5259,8 @@ function InitHostUtils()
 
         --- Called by the host when someone's readyness state changes to update the enabledness of buttons.
         RefreshButtonEnabledness = function()
-        -- disable options when all players are marked ready
-        -- Is at least one person not ready?
+            -- disable options when all players are marked ready
+            -- Is at least one person not ready?
             local playerNotReady = GetPlayersNotReady() ~= false
 
             UIUtil.setEnabled(GUI.gameoptionsButton, playerNotReady)
