@@ -186,12 +186,18 @@ function ValidateScenarioOptions(scenarioOptions)
     local passed = true
     for k, optData in scenarioOptions do
         -- Verify that all options have a sane default.
-        if optData.default <= 0 or optData.default > table.getn(optData.values) then
+        if not optData.default then
+            optData.default = 1
+            WARN("No default option specified for this option:")
+            table.print(optData)
+            passed = false
+        elseif type(optData.default) ~= "number" or
+                optData.default <= 0 or
+                optData.default > table.getn(optData.values) then
             WARN("Invalid default option value " .. tostring(optData.default))
             WARN("Remember: option defaults are 1-based indices into the `values' table, not values themselves")
             WARN("Offending option table:")
             table.print(optData)
-            optData.default = 1
             passed = false
         end
     end
