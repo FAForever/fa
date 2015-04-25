@@ -62,6 +62,8 @@ local nonDefaultFormattedOptions = {}
 local Warning_MAP = false
 local LrgMap = false
 
+local HostUtils
+
 local teamIcons = {
     '/lobby/team_icons/team_no_icon.dds',
     '/lobby/team_icons/team_1_icon.dds',
@@ -357,8 +359,8 @@ local function HandleSlotSwitches(moveFrom, moveTo)
 
     -- If we're moving a human onto an AI, evict the AI and move the player into the space.
     if not toOpts.Human then
-        HostRemoveAI(moveTo)
-        HostTryMovePlayer(moveFrom, moveTo)
+        HostUtils.RemoveAI(moveTo)
+        HostUtils.TryMovePlayer(moveFrom, moveTo)
         return
     end
 
@@ -367,9 +369,9 @@ local function HandleSlotSwitches(moveFrom, moveTo)
     setPlayerNotReady(moveTo)
     setPlayerNotReady(moveFrom)
 
-    HostConvertPlayerToObserver(moveTo, false) -- Move Slot moveTo to Observer
-    HostTryMovePlayer(moveFrom, moveTo) -- Move Player moveFrom to Slot moveTo
-    HostConvertObserverToPlayer(FindObserverSlotForID(toOpts.OwnerID), moveFrom)
+    HostUtils.ConvertPlayerToObserver(moveTo, false) -- Move Slot moveTo to Observer
+    HostUtils.TryMovePlayer(moveFrom, moveTo) -- Move Player moveFrom to Slot moveTo
+    HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(toOpts.OwnerID), moveFrom)
     SendSystemMessage(fromOpts.PlayerName..' has switched with '..toOpts.PlayerName, 'switch')
 end
 
@@ -420,13 +422,13 @@ end
 
 local function DoSlotBehavior(slot, key, name)
     if key == 'open' then
-        HostSetSlotClosed(slot, false)
+        HostUtils.SetSlotClosed(slot, false)
     elseif key == 'close' then
-        HostSetSlotClosed(slot, true)
+        HostUtils.SetSlotClosed(slot, true)
     elseif key == 'occupy' then
         if IsPlayer(localPlayerID) then
             if lobbyComm:IsHost() then
-                HostTryMovePlayer(FindSlotForID(localPlayerID), slot)
+                HostUtils.TryMovePlayer(FindSlotForID(localPlayerID), slot)
             else
                 lobbyComm:SendData(hostID, {Type = 'MovePlayer', CurrentSlot = FindSlotForID(localPlayerID),
                                    RequestedSlot = slot})
@@ -434,7 +436,7 @@ local function DoSlotBehavior(slot, key, name)
         elseif IsObserver(localPlayerID) then
             if lobbyComm:IsHost() then
                 local requestedFaction = GetSanitisedLastFaction()
-                HostConvertObserverToPlayer(FindObserverSlotForID(localPlayerID), slot)
+                HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(localPlayerID), slot)
             else
                 lobbyComm:SendData(
                     hostID,
@@ -456,7 +458,7 @@ local function DoSlotBehavior(slot, key, name)
     elseif key == 'remove_to_observer' then
         local playerInfo = gameInfo.PlayerOptions[slot]
         if playerInfo.Human then
-            HostConvertPlayerToObserver(slot)
+            HostUtils.ConvertPlayerToObserver(slot)
         end
         --\\ Stop Move Player slot to Observer
     elseif key == 'remove_to_kik' then
@@ -470,7 +472,7 @@ local function DoSlotBehavior(slot, key, name)
                                {worldCover = false, enterButton = 1, escapeButton = 2})
         else
             if lobbyComm:IsHost() then
-                HostRemoveAI(slot)
+                HostUtils.RemoveAI(slot)
             else
                 lobbyComm:SendData( hostID, { Type = 'ClearSlot', Slot = slot } )
             end
@@ -478,7 +480,7 @@ local function DoSlotBehavior(slot, key, name)
     else
         -- We're adding an AI of some sort.
         if lobbyComm:IsHost() then
-            HostTryAddPlayer(hostID, slot, GetAIPlayerData(name, key))
+            HostUtils.TryAddPlayer(hostID, slot, GetAIPlayerData(name, key))
         end
     end
 end --\\ End DoSlotBehavior()
@@ -762,16 +764,6 @@ function UpdateSlotBackground(slotIndex)
     end
 end
 
---- Send player settings to the server
-function HostSendPlayerSettingsToServer(slotNum)
-    local playerInfo = gameInfo.PlayerOptions[slotNum]
-    local playerName = playerInfo.PlayerName
-    GpgNetSend('PlayerOption', string.format("faction %s %d %s", playerName, slotNum, playerInfo.Faction))
-    GpgNetSend('PlayerOption', string.format("color %s %d %s", playerName, slotNum, playerInfo.PlayerColor))
-    GpgNetSend('PlayerOption', string.format("team %s %d %s", playerName, slotNum, playerInfo.Team))
-    GpgNetSend('PlayerOption', string.format("startspot %s %d %s", playerName, slotNum, slotNum))
-end
-
 -- update the data in a player slot
 -- TODO: With lazyvars, this function should be eliminated. Lazy-value-callbacks should be used
 -- instead to incrementaly update things.
@@ -949,7 +941,7 @@ function SetSlotInfo(slotNum, playerInfo)
     slot.team:SetItem(playerInfo.Team)
 
     if isHost then
-        HostSendPlayerSettingsToServer(slotNum)
+        HostUtils.SendPlayerSettingsToServer(slotNum)
     end
 
     UIUtil.setVisible(slot.ready, playerInfo.Human and not singlePlayer)
@@ -1412,7 +1404,7 @@ local function AssignRandomStartSpots()
         playerOptions.Team = r.team + 1
         playerOptions.StartSpot = r.slot
         gameInfo.PlayerOptions[r.slot] = playerOptions
-        HostSendPlayerSettingsToServer(r.slot)
+        HostUtils.SendPlayerSettingsToServer(r.slot)
     end
 end
 
@@ -1577,9 +1569,9 @@ function UpdateAvailableSlots( numAvailStartSpots )
         if lobbyComm:IsHost() and gameInfo.PlayerOptions[i] then
             local info = gameInfo.PlayerOptions[i]
             if info.Human then
-                HostConvertPlayerToObserver(i)
+                HostUtils.ConvertPlayerToObserver(i)
             else
-                HostRemoveAI(i)
+                HostUtils.RemoveAI(i)
             end
         end
         DisableSlot(i)
@@ -1731,7 +1723,7 @@ end
 
 local function AlertHostMapMissing()
     if lobbyComm:IsHost() then
-        HostPlayerMissingMapAlert(localPlayerID)
+        HostUtils.PlayerMissingMapAlert(localPlayerID)
     else
         lobbyComm:SendData(hostID, {Type = 'MissingMap', Id = localPlayerID})
     end
@@ -1770,21 +1762,6 @@ local function refreshObserverList()
 
         GUI.observerList:AddItem(observer_label)
     end
-end
-
---- Called by the host when someone's readyness state changes to update the enabledness of buttons.
-local function HostRefreshButtonEnabledness()
-    -- disable options when all players are marked ready
-    -- Is at least one person not ready?
-    local playerNotReady = GetPlayersNotReady() ~= false
-
-    UIUtil.setEnabled(GUI.gameoptionsButton, playerNotReady)
-    UIUtil.setEnabled(GUI.defaultOptions, playerNotReady)
-    UIUtil.setEnabled(GUI.randMap, playerNotReady)
-    UIUtil.setEnabled(GUI.autoTeams, playerNotReady)
-
-    -- Launch button enabled if everyone is ready.
-    UIUtil.setEnabled(GUI.launchGameButton, singlePlayer or not playerNotReady)
 end
 
 local function UpdateGame()
@@ -1857,7 +1834,7 @@ local function UpdateGame()
         refreshObserverList()
     end
 
-    HostRefreshButtonEnabledness()
+    HostUtils.RefreshButtonEnabledness()
     RefreshOptionDisplayData(scenarioInfo)
 
     -- Update the map background to reflect the possibly-changed map.
@@ -1952,75 +1929,6 @@ function ShowGameQuality()
     end
 end
 
--- Update our local gameInfo.GameMods from selected map name and selected mods, then
--- notify other clients about the change.
-local function HostUpdateMods(newPlayerID, newPlayerName)
-    if lobbyComm:IsHost() then
-        local newmods = {}
-        local missingmods = {}
-        for k,modId in selectedMods do
-            if IsModAvailable(modId) then
-                newmods[modId] = true
-            else
-                table.insert(missingmods, modId)
-            end
-        end
-        if not table.equal(gameInfo.GameMods, newmods) and not newPlayerID then
-            gameInfo.GameMods = newmods
-            lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
-            local nummods = 0
-            local uids = ""
-
-            for k in gameInfo.GameMods do
-                nummods = nummods + 1
-                if uids == "" then
-                    uids =  k
-                else
-                    uids = string.format("%s %s", uids, k)
-                end
-
-            end
-            GpgNetSend('GameMods', "activated", nummods)
-
-            if nummods > 0 then
-                GpgNetSend('GameMods', "uids", uids)
-            end
-        elseif not table.equal(gameInfo.GameMods, newmods) and newPlayerID then
-            local modnames = ""
-            local totalMissing = table.getn(missingmods)
-            local totalListed = 0
-            if totalMissing > 0 then
-                for index, id in missingmods do
-                    for k,mod in Mods.GetGameMods() do
-                        if mod.uid == id then
-                            totalListed = totalListed + 1
-                            if totalMissing == totalListed then
-                                modnames = modnames .. " " .. mod.name
-                            else
-                                modnames = modnames .. " " .. mod.name .. " + "
-                            end
-                        end
-                    end
-                end
-            end
-            local reason = (LOCF('<LOC lobui_0588>You were automaticly removed from the lobby because you ' ..
-                               'don\'t have the following mod(s):\n%s \nPlease, install the mod before you join the game lobby',
-                               modnames))
-            -- TODO: Verify this functionality
-            if FindNameForID(newPlayerID) then
-                AddChatText(FindNameForID(newPlayerID)..' kicked because he does not have this mod : '..modnames)
-            else
-                if newPlayerName then
-                    AddChatText(newPlayerName..' kicked because he does not have this mod : '..modnames)
-                else
-                    AddChatText('The last player is kicked because he does not have this mod : '..modnames)
-                end
-            end
-            lobbyComm:EjectPeer(newPlayerID, reason)
-        end
-    end
-end
-
 -- Holds some utility functions to do with game option management.
 local OptionUtils = {
     -- Set all game options to their default values.
@@ -2046,30 +1954,12 @@ function OnModsChanged(modlist, ignoreRefresh)
         Mods.SetSelectedMods(modlist)
         if lobbyComm:IsHost() then
             selectedMods = table.map(function (m) return m.uid end, Mods.GetGameMods())
-            HostUpdateMods()
+            HostUtils.UpdateMods()
         end
         if not ignoreRefresh then
             UpdateGame()
         end
     end
-end
-
-function HostSetSlotClosed(slot, closed)
-    -- Don't close an occupied slot.
-    if gameInfo.PlayerOptions[slot] then
-        return
-    end
-
-    lobbyComm:BroadcastData(
-        {
-            Type = 'SlotClosed',
-            Slot = slot,
-            Closed = closed
-        }
-    )
-
-    gameInfo.ClosedSlots[slot] = closed
-    ClearSlotInfo(slot)
 end
 
 function GetAvailableColor()
@@ -2090,278 +1980,12 @@ function SetPlayerColor(playerData, newColor)
     playerData.PlayerColor = newColor
 end
 
---- Find and return the id of an unoccupied slot.
---
--- @return The id of an empty slot, of -1 if none is available.
-function HostFindEmptySlot()
-    for i = 1, numOpenSlots do
-        if not gameInfo.PlayerOptions[i] and not gameInfo.ClosedSlots[i] then
-            return i
-        end
-    end
-
-    return -1
-end
-
---- Attempt to add a player to a slot. If no is available, add them as an observer.
---
--- @param senderID The peer ID of the player we're adding.
--- @param slot The slot to insert the player to. A value of less than 1 indicates "any slot"
--- @param playerData A PlayerData object representing the player to add.
-function HostTryAddPlayer(senderID, slot, playerData)
-    LOGX('>> HostTryAddPlayer > requestedPlayerName='..tostring(playerData.PlayerName), 'Connecting')
-
-    -- CPU benchmark code
-    if playerData.Human and not singlePlayer then
-        lobbyComm:SendData(senderID, {Type='CPUBenchmark', Benchmarks=CPU_Benchmarks})
-    end
-
-    local newSlot = slot
-
-    if not slot or slot < 1 or newSlot > numOpenSlots then
-        newSlot = HostFindEmptySlot()
-    end
-
-    -- if no slot available, and human, try to make them an observer
-    if newSlot == -1 then
-        PrivateChat(senderID, LOC("<LOC lobui_0237>No slots available, attempting to make you an observer"))
-        if playerData.Human then
-			HostTryAddObserver(senderID, playerData)
-        end
-        return
-    end
-
-    playerData.PlayerName = lobbyComm:MakeValidPlayerName(senderID, playerData.PlayerName)
-
-    -- if a color is requested, attempt to use that color if available, otherwise, assign first available
-    if not IsColorFree(playerData.PlayerColor) then
-        SetPlayerColor(playerData, GetAvailableColor())
-    end
-
-    gameInfo.PlayerOptions[newSlot] = playerData
-    lobbyComm:BroadcastData(
-        {
-            Type = 'SlotAssigned',
-            Slot = newSlot,
-            Options = playerData:AsTable(),
-        }
-    )
-
-    SetSlotInfo(newSlot, gameInfo.PlayerOptions[newSlot])
-    -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
-    AssignAutoTeams()
-end
-
---- Move a player from one slot to another. Shall only be called by the host.
-function HostMovePlayer(currentSlot, requestedSlot)
-    gameInfo.PlayerOptions[requestedSlot] = gameInfo.PlayerOptions[currentSlot]
-    gameInfo.PlayerOptions[currentSlot] = nil
-    ClearSlotInfo(currentSlot)
-    SetSlotInfo(requestedSlot, gameInfo.PlayerOptions[requestedSlot])
-
-    lobbyComm:BroadcastData(
-        {
-            Type = 'SlotMove',
-            OldSlot = currentSlot,
-            NewSlot = requestedSlot,
-            Options = gameInfo.PlayerOptions[requestedSlot]:AsTable(),
-        }
-    )
-
-    -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
-    AssignAutoTeams()
-end
-
---- Move a player from one slot to another subject to sanity checks.
--- Shall only be called by the host.
-function HostTryMovePlayer(currentSlot, requestedSlot)
-    LOG(" currentSlot: " .. currentSlot .. " requestedSlot: " .. requestedSlot)
-
-    if gameInfo.PlayerOptions[currentSlot].Ready then
-        LOG("HostTryMovePlayer: player is marked ready and can not move")
-        return
-    end
-
-    if gameInfo.PlayerOptions[requestedSlot] then
-        LOG("HostTryMovePlayer: requested slot " .. requestedSlot .. " already occupied")
-        return
-    end
-
-    if gameInfo.ClosedSlots[requestedSlot] then
-        LOG("HostTryMovePlayer: requested slot " .. requestedSlot .. " is closed")
-        return
-    end
-
-    if requestedSlot > numOpenSlots or requestedSlot < 1 then
-        LOG("HostTryMovePlayer: requested slot " .. requestedSlot .. " is out of range")
-        return
-    end
-
-    HostMovePlayer(currentSlot, requestedSlot)
-end
-
---- Add an observer
---
--- @param observerData A PlayerData object representing this observer.
-function HostTryAddObserver(senderID, observerData)
-    local index = 1
-    while gameInfo.Observers[index] do
-        index = index + 1
-    end
-
-    LOGX('>> HostTryAddObserver > requestedObserverName='..tostring(observerData.PlayerName), 'Connecting')
-    observerData.PlayerName = lobbyComm:MakeValidPlayerName(senderID, observerData.PlayerName)
-
-    gameInfo.Observers[index] = observerData
-
-    lobbyComm:BroadcastData(
-        {
-            Type = 'ObserverAdded',
-            Slot = index,
-            Options = observerData:AsTable(),
-        }
-    )
-    SendSystemMessage(LOCF("<LOC lobui_0202>%s has joined as an observer.",observerName), "lobui_0202")
-    refreshObserverList()
-end
-
-function HostConvertPlayerToObserver(playerSlot, ignoreMsg)
-    -- make sure player exists
-    if not gameInfo.PlayerOptions[playerSlot] then
-        WARN("HostConvertPlayerToObserver for nonexistent player in slot " .. tostring(playerSlot))
-        return
-    end
-
-    -- find a free observer slot
-    local index = 1
-    while gameInfo.Observers[index] do
-        index = index + 1
-    end
-
-    local playerName = gameInfo.PlayerOptions[playerSlot].PlayerName
-    gameInfo.Observers[index] = gameInfo.PlayerOptions[playerSlot]
-    gameInfo.PlayerOptions[playerSlot] = nil
-
-    if lobbyComm:IsHost() then
-        GpgNetSend('PlayerOption', string.format("team %s %d %s", playerName, -1, 0))
-    end
-
-    ClearSlotInfo(playerSlot)
-    refreshObserverList()
-
-    -- TODO: can probably avoid transmitting the options map here. The slot number should be enough.
-    lobbyComm:BroadcastData(
-        {
-            Type = 'ConvertPlayerToObserver',
-            OldSlot = playerSlot,
-            NewSlot = index,
-            Options = gameInfo.Observers[index]:AsTable(),
-        }
-    )
-
-    if ignoreMsg then
-        SendSystemMessage(LOCF("<LOC lobui_0226>%s has switched from a player to an observer.", gameInfo.Observers[index].PlayerName), "lobui_0226")
-    end
-end
-
-function HostConvertObserverToPlayer(fromObserverSlot, toPlayerSlot, ignoreMsg)
-    -- If no slot is specified (user clicked "go player" button), select a default.
-    if not toPlayerSlot or toPlayerSlot < 1 or toPlayerSlot > numOpenSlots then
-        toPlayerSlot = HostFindEmptySlot()
-    end
-
-    if not gameInfo.Observers[fromObserverSlot] then -- IF no Observer on the current slot : QUIT
-        return
-    elseif gameInfo.PlayerOptions[toPlayerSlot] then -- IF Player is in the target slot : QUIT
-        return
-    elseif gameInfo.ClosedSlots[toPlayerSlot] then -- IF target slot is Closed : QUIT
-        return
-    end
-
-    local incomingPlayer = gameInfo.Observers[fromObserverSlot]
-
-    -- Give them a default colour if the one they already have isn't free.
-    if not IsColorFree(incomingPlayer.PlayerColor) then
-        local newColour = GetAvailableColor()
-        SetPlayerColor(incomingPlayer, newColour)
-    end
-
-    gameInfo.PlayerOptions[toPlayerSlot] = incomingPlayer
-    gameInfo.Observers[fromObserverSlot] = nil
-
-    lobbyComm:BroadcastData(
-        {
-            Type = 'ConvertObserverToPlayer',
-            OldSlot = fromObserverSlot,
-            NewSlot = toPlayerSlot,
-            Options =  gameInfo.PlayerOptions[toPlayerSlot]:AsTable(),
-        }
-    )
-
-    if ignoreMsg then
-        SendSystemMessage(LOCF("<LOC lobui_0227>%s has switched from an observer to player.", incomingPlayer.PlayerName), "lobui_0227")
-    end
-
-    refreshObserverList()
-    SetSlotInfo(toPlayerSlot, gameInfo.PlayerOptions[toPlayerSlot])
-
-    -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
-    AssignAutoTeams()
-end
-
-function HostRemoveAI(slot)
-    if gameInfo.PlayerOptions[slot].Human then
-        WARN('Use EjectPlayer to remove humans')
-        return
-    end
-
-    ClearSlotInfo(slot)
-    gameInfo.PlayerOptions[slot] = nil
-    lobbyComm:BroadcastData(
-        {
-            Type = 'ClearSlot',
-            Slot = slot,
-        }
-    )
-end
-
 function autoMap()
     local randomAutoMap
     if gameInfo.GameOptions['RandomMap'] == 'Official' then
         randomAutoMap = import('/lua/ui/dialogs/mapselect.lua').randomAutoMap(true)
     else
         randomAutoMap = import('/lua/ui/dialogs/mapselect.lua').randomAutoMap(false)
-    end
-end
-
-function HostPlayerMissingMapAlert(id)
-    local slot = FindSlotForID(id)
-    local name
-    local needMessage = false
-    if slot then
-        name = gameInfo.PlayerOptions[slot].PlayerName
-        if not gameInfo.PlayerOptions[slot].BadMap then
-            needMessage = true
-        end
-        gameInfo.PlayerOptions[slot].BadMap = true
-    else
-        slot = FindObserverSlotForID(id)
-        if slot then
-            name = gameInfo.Observers[slot].PlayerName
-            if not gameInfo.Observers[slot].BadMap then
-                needMessage = true
-            end
-            gameInfo.Observers[slot].BadMap = true
-        end
-    end
-
-    if needMessage then
-        SendSystemMessage(LOCF("<LOC lobui_0330>%s is missing map %s.", name, gameInfo.GameOptions.ScenarioFile))
-        LOG('>> '..name..' is missing map '..gameInfo.GameOptions.ScenarioFile)
-        if name == localPlayerName then
-            LOG('>> '..gameInfo.GameOptions.ScenarioFile..' replaced with '..'SCMP_009')
-            SetGameOption('ScenarioFile', '/maps/scmp_009/scmp_009_scenario.lua')
-        end
     end
 end
 
@@ -2859,7 +2483,7 @@ function CreateUI(maxPlayers)
 
                     -- every new map, clear the flags, and clients will report if a new map is bad
                     ClearBadMapFlags()
-                    HostUpdateMods()
+                    HostUtils.UpdateMods()
                     SetGameOptions(options)
                 end
             end
@@ -3333,13 +2957,13 @@ function CreateUI(maxPlayers)
     GUI.becomeObserver.OnClick = function()
         if IsPlayer(localPlayerID) then
             if isHost then
-                HostConvertPlayerToObserver(FindSlotForID(localPlayerID))
+                HostUtils.ConvertPlayerToObserver(FindSlotForID(localPlayerID))
             else
                 lobbyComm:SendData(hostID, {Type = 'RequestConvertToObserver', RequestedSlot = FindSlotForID(localPlayerID)})
             end
         elseif IsObserver(localPlayerID) then
             if isHost then
-                HostConvertObserverToPlayer(FindObserverSlotForID(localPlayerID))
+                HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(localPlayerID))
             else
                 lobbyComm:SendData(hostID, {Type = 'RequestConvertToPlayer', ObserverSlot = FindObserverSlotForID(localPlayerID)})
             end
@@ -3772,14 +3396,14 @@ function ConfigureMapListeners(mapCtrl, scenario)
                 if FindSlotForID(localPlayerID) ~= slot and gameInfo.PlayerOptions[slot] == nil then
                     if IsPlayer(localPlayerID) then
                         if lobbyComm:IsHost() then
-                            HostTryMovePlayer(FindSlotForID(localPlayerID), slot)
+                            HostUtils.TryMovePlayer(FindSlotForID(localPlayerID), slot)
                         else
                             lobbyComm:SendData(hostID, {Type = 'MovePlayer', CurrentSlot = FindSlotForID(localPlayerID), RequestedSlot = slot})
                         end
                     elseif IsObserver(localPlayerID) then
                         if lobbyComm:IsHost() then
                             local requestedFaction = GetSanitisedLastFaction()
-                            HostConvertObserverToPlayer(FindObserverSlotForID(localPlayerID), slot)
+                            HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(localPlayerID), slot)
                         else
                             lobbyComm:SendData(
                                 hostID,
@@ -3825,7 +3449,7 @@ function ConfigureMapListeners(mapCtrl, scenario)
 
         if lobbyComm:IsHost() then
             marker.OnRightClick = function(self)
-                HostSetSlotClosed(slot, not gameInfo.ClosedSlots[slot])
+                HostUtils.SetSlotClosed(slot, not gameInfo.ClosedSlots[slot])
             end
         end
     end
@@ -3936,7 +3560,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                     -- TODO: This should be a global listener on PlayerData objects, but I'm in too
                     -- much pain to implement that listener system right now. EVIL HACK TIME
                     if key == "Ready" then
-                        HostRefreshButtonEnabledness()
+                        HostUtils.RefreshButtonEnabledness()
                     end
                     -- DONE.
                 end
@@ -3977,15 +3601,15 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             if data.Type == 'AddPlayer' then
                 -- create empty slot if possible and give it to the player
                 SendCompleteGameStateToPeer(data.SenderID)
-                HostTryAddPlayer(data.SenderID, 0, PlayerData(data.PlayerOptions))
+                HostUtils.TryAddPlayer(data.SenderID, 0, PlayerData(data.PlayerOptions))
                 PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
             elseif data.Type == 'MovePlayer' then
                 -- attempt to move a player from current slot to empty slot
-                HostTryMovePlayer(data.CurrentSlot, data.RequestedSlot)
+                HostUtils.TryMovePlayer(data.CurrentSlot, data.RequestedSlot)
             elseif data.Type == 'RequestConvertToObserver' then
-                HostConvertPlayerToObserver(data.RequestedSlot)
+                HostUtils.ConvertPlayerToObserver(data.RequestedSlot)
             elseif data.Type == 'RequestConvertToPlayer' then
-                HostConvertObserverToPlayer(data.ObserverSlot, data.PlayerSlot)
+                HostUtils.ConvertObserverToPlayer(data.ObserverSlot, data.PlayerSlot)
             elseif data.Type == 'RequestColor' then
                 if IsColorFree(data.Color) then
                     -- Color is available, let everyone else know
@@ -3999,15 +3623,15 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 end
             elseif data.Type == 'ClearSlot' then
                 if gameInfo.PlayerOptions[data.Slot].OwnerID == data.SenderID then
-                    HostRemoveAI(data.Slot)
+                    HostUtils.RemoveAI(data.Slot)
                 else
                     WARN("Attempt to clear unowned slot")
                 end
             elseif data.Type == 'SetAvailableMods' then
                 availableMods[data.SenderID] = data.Mods
-                HostUpdateMods(data.SenderID, data.Name)
+                HostUtils.UpdateMods(data.SenderID, data.Name)
             elseif data.Type == 'MissingMap' then
-                HostPlayerMissingMapAlert(data.Id)
+                HostUtils.PlayerMissingMapAlert(data.Id)
             end
         else -- Non-host only messages
             if data.Type == 'SystemMessage' then
@@ -4129,10 +3753,12 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     end
 
     lobbyComm.Hosting = function(self)
+        InitHostUtils()
+
         localPlayerID = lobbyComm:GetLocalPlayerID()
         hostID = localPlayerID
         selectedMods = table.map(function (m) return m.uid end, Mods.GetGameMods())
-        HostUpdateMods()
+        HostUtils.UpdateMods()
 
         --- Returns true if the given option has the given key as a valid setting.
         local function keyIsValidForOption(option, key)
@@ -4280,7 +3906,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         end
 
         availableMods[peerID] = nil
-        HostUpdateMods()
+        HostUtils.UpdateMods()
     end
 
     lobbyComm.GameConfigRequested = function(self)
@@ -5168,11 +4794,11 @@ function LoadPreset(presetIndex)
     SetGameOptions(preset.GameOptions, true)
     
     -- gameInfo.GameMods is a map from mod identifiers to truthy values for every activated mod.
-    -- Unfortunately, HostUpdateMods is painfully stupid and reads selectedMods, which is a list of
+    -- Unfortunately, HostUtils.UpdateMods is painfully stupid and reads selectedMods, which is a list of
     -- mod identifiers to be activated.
-    -- Ultimately, we want to make HostUpdateMods not be stupid, so presets just pickle the GameMods
+    -- Ultimately, we want to make HostUtils.UpdateMods not be stupid, so presets just pickle the GameMods
     -- map directly. For now, though, that means we have the following stupid loop to keep the
-    -- retarded HostUpdateMods working.
+    -- retarded HostUtils.UpdateMods working.
     --
     -- Thanks, William.
     selectedMods = {}
@@ -5182,7 +4808,7 @@ function LoadPreset(presetIndex)
         end
     end
 
-    HostUpdateMods()
+    HostUtils.UpdateMods()
 
     GUI.presetDialog:Hide()
     UpdateGame()
@@ -5298,4 +4924,396 @@ function GUI_Changelog()
     OkButton.OnClick = function()
         changelogPopup:Close()
     end
+end
+
+--- Create the HostUtils object, containing host-only functions. By not assigning this for non-host
+-- players, we ensure a hard crash should a non-host somehow end up trying to call them, simplifying
+-- debugging somewhat (as well as reducing the number of toplevel definitions a fair bit).
+-- This is clearly not a security feature.
+function InitHostUtils()
+    if not lobbyComm:IsHost() then
+        WARN(debug.traceback(nil, "Attempt to create HostUtils by non-host."))
+        return
+    end
+
+    HostUtils = {
+        SetSlotClosed = function(slot, closed)
+        -- Don't close an occupied slot.
+            if gameInfo.PlayerOptions[slot] then
+                return
+            end
+
+            lobbyComm:BroadcastData(
+                {
+                    Type = 'SlotClosed',
+                    Slot = slot,
+                    Closed = closed
+                }
+            )
+
+            gameInfo.ClosedSlots[slot] = closed
+            ClearSlotInfo(slot)
+        end,
+
+        ConvertPlayerToObserver = function(playerSlot, ignoreMsg)
+        -- make sure player exists
+            if not gameInfo.PlayerOptions[playerSlot] then
+                WARN("HostUtils.ConvertPlayerToObserver for nonexistent player in slot " .. tostring(playerSlot))
+                return
+            end
+
+            -- find a free observer slot
+            local index = 1
+            while gameInfo.Observers[index] do
+                index = index + 1
+            end
+
+            local playerName = gameInfo.PlayerOptions[playerSlot].PlayerName
+            gameInfo.Observers[index] = gameInfo.PlayerOptions[playerSlot]
+            gameInfo.PlayerOptions[playerSlot] = nil
+
+            if lobbyComm:IsHost() then
+                GpgNetSend('PlayerOption', string.format("team %s %d %s", playerName, -1, 0))
+            end
+
+            ClearSlotInfo(playerSlot)
+            refreshObserverList()
+
+            -- TODO: can probably avoid transmitting the options map here. The slot number should be enough.
+            lobbyComm:BroadcastData(
+                {
+                    Type = 'ConvertPlayerToObserver',
+                    OldSlot = playerSlot,
+                    NewSlot = index,
+                    Options = gameInfo.Observers[index]:AsTable(),
+                }
+            )
+
+            if ignoreMsg then
+                SendSystemMessage(LOCF("<LOC lobui_0226>%s has switched from a player to an observer.", gameInfo.Observers[index].PlayerName), "lobui_0226")
+            end
+        end,
+
+        ConvertObserverToPlayer = function(fromObserverSlot, toPlayerSlot, ignoreMsg)
+        -- If no slot is specified (user clicked "go player" button), select a default.
+            if not toPlayerSlot or toPlayerSlot < 1 or toPlayerSlot > numOpenSlots then
+                toPlayerSlot = HostUtils.FindEmptySlot()
+            end
+
+            if not gameInfo.Observers[fromObserverSlot] then -- IF no Observer on the current slot : QUIT
+                return
+            elseif gameInfo.PlayerOptions[toPlayerSlot] then -- IF Player is in the target slot : QUIT
+                return
+            elseif gameInfo.ClosedSlots[toPlayerSlot] then -- IF target slot is Closed : QUIT
+                return
+            end
+
+            local incomingPlayer = gameInfo.Observers[fromObserverSlot]
+
+            -- Give them a default colour if the one they already have isn't free.
+            if not IsColorFree(incomingPlayer.PlayerColor) then
+                local newColour = GetAvailableColor()
+                SetPlayerColor(incomingPlayer, newColour)
+            end
+
+            gameInfo.PlayerOptions[toPlayerSlot] = incomingPlayer
+            gameInfo.Observers[fromObserverSlot] = nil
+
+            lobbyComm:BroadcastData(
+                {
+                    Type = 'ConvertObserverToPlayer',
+                    OldSlot = fromObserverSlot,
+                    NewSlot = toPlayerSlot,
+                    Options =  gameInfo.PlayerOptions[toPlayerSlot]:AsTable(),
+                }
+            )
+
+            if ignoreMsg then
+                SendSystemMessage(LOCF("<LOC lobui_0227>%s has switched from an observer to player.", incomingPlayer.PlayerName), "lobui_0227")
+            end
+
+            refreshObserverList()
+            SetSlotInfo(toPlayerSlot, gameInfo.PlayerOptions[toPlayerSlot])
+
+            -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
+            AssignAutoTeams()
+        end,
+
+        RemoveAI = function(slot)
+            if gameInfo.PlayerOptions[slot].Human then
+                WARN('Use EjectPlayer to remove humans')
+                return
+            end
+
+            ClearSlotInfo(slot)
+            gameInfo.PlayerOptions[slot] = nil
+            lobbyComm:BroadcastData(
+                {
+                    Type = 'ClearSlot',
+                    Slot = slot,
+                }
+            )
+        end,
+
+        --- Move a player from one slot to another. Shall only be called by the host.
+        MovePlayer = function(currentSlot, requestedSlot)
+            gameInfo.PlayerOptions[requestedSlot] = gameInfo.PlayerOptions[currentSlot]
+            gameInfo.PlayerOptions[currentSlot] = nil
+            ClearSlotInfo(currentSlot)
+            SetSlotInfo(requestedSlot, gameInfo.PlayerOptions[requestedSlot])
+
+            lobbyComm:BroadcastData(
+                {
+                    Type = 'SlotMove',
+                    OldSlot = currentSlot,
+                    NewSlot = requestedSlot,
+                    Options = gameInfo.PlayerOptions[requestedSlot]:AsTable(),
+                }
+            )
+
+            -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
+            AssignAutoTeams()
+        end,
+
+        --- Move a player from one slot to another subject to sanity checks.
+        -- Shall only be called by the host.
+        TryMovePlayer = function(currentSlot, requestedSlot)
+            LOG(" currentSlot: " .. currentSlot .. " requestedSlot: " .. requestedSlot)
+
+            if gameInfo.PlayerOptions[currentSlot].Ready then
+                LOG("HostUtils.TryMovePlayer: player is marked ready and can not move")
+                return
+            end
+
+            if gameInfo.PlayerOptions[requestedSlot] then
+                LOG("HostUtils.TryMovePlayer: requested slot " .. requestedSlot .. " already occupied")
+                return
+            end
+
+            if gameInfo.ClosedSlots[requestedSlot] then
+                LOG("HostUtils.TryMovePlayer: requested slot " .. requestedSlot .. " is closed")
+                return
+            end
+
+            if requestedSlot > numOpenSlots or requestedSlot < 1 then
+                LOG("HostUtils.TryMovePlayer: requested slot " .. requestedSlot .. " is out of range")
+                return
+            end
+
+            HostUtils.MovePlayer(currentSlot, requestedSlot)
+        end,
+
+        --- Add an observer
+        --
+        -- @param observerData A PlayerData object representing this observer.
+        TryAddObserver = function(senderID, observerData)
+            local index = 1
+            while gameInfo.Observers[index] do
+                index = index + 1
+            end
+
+            LOGX('>> HostUtils.TryAddObserver > requestedObserverName='..tostring(observerData.PlayerName), 'Connecting')
+            observerData.PlayerName = lobbyComm:MakeValidPlayerName(senderID, observerData.PlayerName)
+
+            gameInfo.Observers[index] = observerData
+
+            lobbyComm:BroadcastData(
+                {
+                    Type = 'ObserverAdded',
+                    Slot = index,
+                    Options = observerData:AsTable(),
+                }
+            )
+            SendSystemMessage(LOCF("<LOC lobui_0202>%s has joined as an observer.",observerName), "lobui_0202")
+            refreshObserverList()
+        end,
+
+
+        --- Attempt to add a player to a slot. If no is available, add them as an observer.
+        --
+        -- @param senderID The peer ID of the player we're adding.
+        -- @param slot The slot to insert the player to. A value of less than 1 indicates "any slot"
+        -- @param playerData A PlayerData object representing the player to add.
+        TryAddPlayer = function(senderID, slot, playerData)
+            LOGX('>> HostUtils.TryAddPlayer > requestedPlayerName='..tostring(playerData.PlayerName), 'Connecting')
+
+            -- CPU benchmark code
+            if playerData.Human and not singlePlayer then
+                lobbyComm:SendData(senderID, {Type='CPUBenchmark', Benchmarks=CPU_Benchmarks})
+            end
+
+            local newSlot = slot
+
+            if not slot or slot < 1 or newSlot > numOpenSlots then
+                newSlot = HostUtils.FindEmptySlot()
+            end
+
+            -- if no slot available, and human, try to make them an observer
+            if newSlot == -1 then
+                PrivateChat(senderID, LOC("<LOC lobui_0237>No slots available, attempting to make you an observer"))
+                if playerData.Human then
+                    HostUtils.TryAddObserver(senderID, playerData)
+                end
+                return
+            end
+
+            playerData.PlayerName = lobbyComm:MakeValidPlayerName(senderID, playerData.PlayerName)
+
+            -- if a color is requested, attempt to use that color if available, otherwise, assign first available
+            if not IsColorFree(playerData.PlayerColor) then
+                SetPlayerColor(playerData, GetAvailableColor())
+            end
+
+            gameInfo.PlayerOptions[newSlot] = playerData
+            lobbyComm:BroadcastData(
+                {
+                    Type = 'SlotAssigned',
+                    Slot = newSlot,
+                    Options = playerData:AsTable(),
+                }
+            )
+
+            SetSlotInfo(newSlot, gameInfo.PlayerOptions[newSlot])
+            -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
+            AssignAutoTeams()
+        end,
+
+        PlayerMissingMapAlert = function(id)
+            local slot = FindSlotForID(id)
+            local name
+            local needMessage = false
+            if slot then
+                name = gameInfo.PlayerOptions[slot].PlayerName
+                if not gameInfo.PlayerOptions[slot].BadMap then
+                    needMessage = true
+                end
+                gameInfo.PlayerOptions[slot].BadMap = true
+            else
+                slot = FindObserverSlotForID(id)
+                if slot then
+                    name = gameInfo.Observers[slot].PlayerName
+                    if not gameInfo.Observers[slot].BadMap then
+                        needMessage = true
+                    end
+                    gameInfo.Observers[slot].BadMap = true
+                end
+            end
+
+            if needMessage then
+                SendSystemMessage(LOCF("<LOC lobui_0330>%s is missing map %s.", name, gameInfo.GameOptions.ScenarioFile))
+                LOG('>> '..name..' is missing map '..gameInfo.GameOptions.ScenarioFile)
+                if name == localPlayerName then
+                    LOG('>> '..gameInfo.GameOptions.ScenarioFile..' replaced with '..'SCMP_009')
+                    SetGameOption('ScenarioFile', '/maps/scmp_009/scmp_009_scenario.lua')
+                end
+            end
+        end,
+
+        --- Send player settings to the server
+        SendPlayerSettingsToServer = function(slotNum)
+            local playerInfo = gameInfo.PlayerOptions[slotNum]
+            local playerName = playerInfo.PlayerName
+            GpgNetSend('PlayerOption', string.format("faction %s %d %s", playerName, slotNum, playerInfo.Faction))
+            GpgNetSend('PlayerOption', string.format("color %s %d %s", playerName, slotNum, playerInfo.PlayerColor))
+            GpgNetSend('PlayerOption', string.format("team %s %d %s", playerName, slotNum, playerInfo.Team))
+            GpgNetSend('PlayerOption', string.format("startspot %s %d %s", playerName, slotNum, slotNum))
+        end,
+
+        --- Called by the host when someone's readyness state changes to update the enabledness of buttons.
+        RefreshButtonEnabledness = function()
+        -- disable options when all players are marked ready
+        -- Is at least one person not ready?
+            local playerNotReady = GetPlayersNotReady() ~= false
+
+            UIUtil.setEnabled(GUI.gameoptionsButton, playerNotReady)
+            UIUtil.setEnabled(GUI.defaultOptions, playerNotReady)
+            UIUtil.setEnabled(GUI.randMap, playerNotReady)
+            UIUtil.setEnabled(GUI.autoTeams, playerNotReady)
+
+            -- Launch button enabled if everyone is ready.
+            UIUtil.setEnabled(GUI.launchGameButton, singlePlayer or not playerNotReady)
+        end,
+
+        -- Update our local gameInfo.GameMods from selected map name and selected mods, then
+        -- notify other clients about the change.
+        UpdateMods = function(newPlayerID, newPlayerName)
+            if lobbyComm:IsHost() then
+                local newmods = {}
+                local missingmods = {}
+                for k,modId in selectedMods do
+                    if IsModAvailable(modId) then
+                        newmods[modId] = true
+                    else
+                        table.insert(missingmods, modId)
+                    end
+                end
+                if not table.equal(gameInfo.GameMods, newmods) and not newPlayerID then
+                    gameInfo.GameMods = newmods
+                    lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
+                    local nummods = 0
+                    local uids = ""
+
+                    for k in gameInfo.GameMods do
+                        nummods = nummods + 1
+                        if uids == "" then
+                            uids =  k
+                        else
+                            uids = string.format("%s %s", uids, k)
+                        end
+
+                    end
+                    GpgNetSend('GameMods', "activated", nummods)
+
+                    if nummods > 0 then
+                        GpgNetSend('GameMods', "uids", uids)
+                    end
+                elseif not table.equal(gameInfo.GameMods, newmods) and newPlayerID then
+                    local modnames = ""
+                    local totalMissing = table.getn(missingmods)
+                    local totalListed = 0
+                    if totalMissing > 0 then
+                        for index, id in missingmods do
+                            for k,mod in Mods.GetGameMods() do
+                                if mod.uid == id then
+                                    totalListed = totalListed + 1
+                                    if totalMissing == totalListed then
+                                        modnames = modnames .. " " .. mod.name
+                                    else
+                                        modnames = modnames .. " " .. mod.name .. " + "
+                                    end
+                                end
+                            end
+                        end
+                    end
+                    local reason = (LOCF('<LOC lobui_0588>You were automaticly removed from the lobby because you ' ..
+                            'don\'t have the following mod(s):\n%s \nPlease, install the mod before you join the game lobby',
+                        modnames))
+                    -- TODO: Verify this functionality
+                    if FindNameForID(newPlayerID) then
+                        AddChatText(FindNameForID(newPlayerID)..' kicked because he does not have this mod : '..modnames)
+                    else
+                        if newPlayerName then
+                            AddChatText(newPlayerName..' kicked because he does not have this mod : '..modnames)
+                        else
+                            AddChatText('The last player is kicked because he does not have this mod : '..modnames)
+                        end
+                    end
+                    lobbyComm:EjectPeer(newPlayerID, reason)
+                end
+            end
+        end,
+
+        --- Find and return the id of an unoccupied slot.
+        --
+        -- @return The id of an empty slot, of -1 if none is available.
+        FindEmptySlot = function()
+            for i = 1, numOpenSlots do
+                if not gameInfo.PlayerOptions[i] and not gameInfo.ClosedSlots[i] then
+                    return i
+                end
+            end
+
+            return -1
+        end
+    }
 end
