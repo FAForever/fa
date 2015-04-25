@@ -358,7 +358,7 @@ local function HandleSlotSwitches(moveFrom, moveTo)
     -- If we're moving a human onto an AI, evict the AI and move the player into the space.
     if not toOpts.Human then
         HostRemoveAI(moveTo)
-        HostTryMovePlayer(fromOpts.OwnerID, moveFrom, moveTo)
+        HostTryMovePlayer(moveFrom, moveTo)
         return
     end
 
@@ -368,7 +368,7 @@ local function HandleSlotSwitches(moveFrom, moveTo)
     setPlayerNotReady(moveFrom)
 
     HostConvertPlayerToObserver(toOpts.OwnerID, moveTo, false) -- Move Slot moveTo to Observer
-    HostTryMovePlayer(fromOpts.OwnerID, moveFrom, moveTo) -- Move Player moveFrom to Slot moveTo
+    HostTryMovePlayer(moveFrom, moveTo) -- Move Player moveFrom to Slot moveTo
     HostConvertObserverToPlayer(toOpts.OwnerID, FindObserverSlotForID(toOpts.OwnerID), moveFrom)
     SendSystemMessage(fromOpts.PlayerName..' has switched with '..toOpts.PlayerName, 'switch')
 end
@@ -426,7 +426,7 @@ local function DoSlotBehavior(slot, key, name)
     elseif key == 'occupy' then
         if IsPlayer(localPlayerID) then
             if lobbyComm:IsHost() then
-                HostTryMovePlayer(hostID, FindSlotForID(localPlayerID), slot)
+                HostTryMovePlayer(FindSlotForID(localPlayerID), slot)
             else
                 lobbyComm:SendData(hostID, {Type = 'MovePlayer', CurrentSlot = FindSlotForID(localPlayerID),
                                    RequestedSlot = slot})
@@ -2152,8 +2152,30 @@ function HostTryAddPlayer(senderID, slot, playerData)
     AssignAutoTeams()
 end
 
-function HostTryMovePlayer(senderID, currentSlot, requestedSlot)
-    LOG("SenderID: " .. senderID .. " currentSlot: " .. currentSlot .. " requestedSlot: " .. requestedSlot)
+--- Move a player from one slot to another. Shall only be called by the host.
+function HostMovePlayer(currentSlot, requestedSlot)
+    gameInfo.PlayerOptions[requestedSlot] = gameInfo.PlayerOptions[currentSlot]
+    gameInfo.PlayerOptions[currentSlot] = nil
+    ClearSlotInfo(currentSlot)
+    SetSlotInfo(requestedSlot, gameInfo.PlayerOptions[requestedSlot])
+
+    lobbyComm:BroadcastData(
+        {
+            Type = 'SlotMove',
+            OldSlot = currentSlot,
+            NewSlot = requestedSlot,
+            Options = gameInfo.PlayerOptions[requestedSlot]:AsTable(),
+        }
+    )
+
+    -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
+    AssignAutoTeams()
+end
+
+--- Move a player from one slot to another subject to sanity checks.
+-- Shall only be called by the host.
+function HostTryMovePlayer(currentSlot, requestedSlot)
+    LOG(" currentSlot: " .. currentSlot .. " requestedSlot: " .. requestedSlot)
 
     if gameInfo.PlayerOptions[currentSlot].Ready then
         LOG("HostTryMovePlayer: player is marked ready and can not move")
@@ -2175,22 +2197,7 @@ function HostTryMovePlayer(senderID, currentSlot, requestedSlot)
         return
     end
 
-    gameInfo.PlayerOptions[requestedSlot] = gameInfo.PlayerOptions[currentSlot]
-    gameInfo.PlayerOptions[currentSlot] = nil
-    ClearSlotInfo(currentSlot)
-    SetSlotInfo(requestedSlot, gameInfo.PlayerOptions[requestedSlot])
-
-    lobbyComm:BroadcastData(
-        {
-            Type = 'SlotMove',
-            OldSlot = currentSlot,
-            NewSlot = requestedSlot,
-            Options = gameInfo.PlayerOptions[requestedSlot]:AsTable(),
-        }
-    )
-
-    -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
-    AssignAutoTeams()
+    HostMovePlayer(currentSlot, requestedSlot)
 end
 
 --- Add an observer
@@ -3765,7 +3772,7 @@ function ConfigureMapListeners(mapCtrl, scenario)
                 if FindSlotForID(localPlayerID) ~= slot and gameInfo.PlayerOptions[slot] == nil then
                     if IsPlayer(localPlayerID) then
                         if lobbyComm:IsHost() then
-                            HostTryMovePlayer(hostID, FindSlotForID(localPlayerID), slot)
+                            HostTryMovePlayer(FindSlotForID(localPlayerID), slot)
                         else
                             lobbyComm:SendData(hostID, {Type = 'MovePlayer', CurrentSlot = FindSlotForID(localPlayerID), RequestedSlot = slot})
                         end
@@ -3974,7 +3981,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
             elseif data.Type == 'MovePlayer' then
                 -- attempt to move a player from current slot to empty slot
-                HostTryMovePlayer(data.SenderID, data.CurrentSlot, data.RequestedSlot)
+                HostTryMovePlayer(data.CurrentSlot, data.RequestedSlot)
             elseif data.Type == 'RequestConvertToObserver' then
                 HostConvertPlayerToObserver(data.SenderID, data.RequestedSlot)
             elseif data.Type == 'RequestConvertToPlayer' then
