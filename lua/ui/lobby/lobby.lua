@@ -367,7 +367,7 @@ local function HandleSlotSwitches(moveFrom, moveTo)
     setPlayerNotReady(moveTo)
     setPlayerNotReady(moveFrom)
 
-    HostConvertPlayerToObserver(toOpts.OwnerID, moveTo, false) -- Move Slot moveTo to Observer
+    HostConvertPlayerToObserver(moveTo, false) -- Move Slot moveTo to Observer
     HostTryMovePlayer(moveFrom, moveTo) -- Move Player moveFrom to Slot moveTo
     HostConvertObserverToPlayer(toOpts.OwnerID, FindObserverSlotForID(toOpts.OwnerID), moveFrom)
     SendSystemMessage(fromOpts.PlayerName..' has switched with '..toOpts.PlayerName, 'switch')
@@ -456,7 +456,7 @@ local function DoSlotBehavior(slot, key, name)
     elseif key == 'remove_to_observer' then
         local playerInfo = gameInfo.PlayerOptions[slot]
         if playerInfo.Human then
-            HostConvertPlayerToObserver(playerInfo.OwnerID, slot)
+            HostConvertPlayerToObserver(slot)
         end
         --\\ Stop Move Player slot to Observer
     elseif key == 'remove_to_kik' then
@@ -1577,7 +1577,7 @@ function UpdateAvailableSlots( numAvailStartSpots )
         if lobbyComm:IsHost() and gameInfo.PlayerOptions[i] then
             local info = gameInfo.PlayerOptions[i]
             if info.Human then
-                HostConvertPlayerToObserver(info.OwnerID, i)
+                HostConvertPlayerToObserver(i)
             else
                 HostRemoveAI(i)
             end
@@ -2225,7 +2225,7 @@ function HostTryAddObserver(senderID, observerData)
     refreshObserverList()
 end
 
-function HostConvertPlayerToObserver(senderID, playerSlot, ignoreMsg)
+function HostConvertPlayerToObserver(playerSlot, ignoreMsg)
     -- make sure player exists
     if not gameInfo.PlayerOptions[playerSlot] then
         WARN("HostConvertPlayerToObserver for nonexistent player in slot " .. tostring(playerSlot))
@@ -3333,7 +3333,7 @@ function CreateUI(maxPlayers)
     GUI.becomeObserver.OnClick = function()
         if IsPlayer(localPlayerID) then
             if isHost then
-                HostConvertPlayerToObserver(hostID, FindSlotForID(localPlayerID))
+                HostConvertPlayerToObserver(FindSlotForID(localPlayerID))
             else
                 lobbyComm:SendData(hostID, {Type = 'RequestConvertToObserver', RequestedSlot = FindSlotForID(localPlayerID)})
             end
@@ -3983,7 +3983,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 -- attempt to move a player from current slot to empty slot
                 HostTryMovePlayer(data.CurrentSlot, data.RequestedSlot)
             elseif data.Type == 'RequestConvertToObserver' then
-                HostConvertPlayerToObserver(data.SenderID, data.RequestedSlot)
+                HostConvertPlayerToObserver(data.RequestedSlot)
             elseif data.Type == 'RequestConvertToPlayer' then
                 HostConvertObserverToPlayer(data.SenderID, data.ObserverSlot, data.PlayerSlot)
             elseif data.Type == 'RequestColor' then
