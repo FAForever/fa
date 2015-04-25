@@ -480,7 +480,7 @@ local function DoSlotBehavior(slot, key, name)
     else
         -- We're adding an AI of some sort.
         if lobbyComm:IsHost() then
-            HostUtils.TryAddPlayer(hostID, slot, GetAIPlayerData(name, key))
+            HostUtils.AddAI(name, key, slot)
         end
     end
 end --\\ End DoSlotBehavior()
@@ -5128,7 +5128,6 @@ function InitHostUtils()
             refreshObserverList()
         end,
 
-
         --- Attempt to add a player to a slot. If no is available, add them as an observer.
         --
         -- @param senderID The peer ID of the player we're adding.
@@ -5176,6 +5175,16 @@ function InitHostUtils()
             SetSlotInfo(newSlot, gameInfo.PlayerOptions[newSlot])
             -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
             AssignAutoTeams()
+        end,
+
+        --- Add an AI to the game in the given slot.
+        --
+        -- @param name The name to use in the player list for this AI.
+        -- @param personality The "personality" key, such as "adaptive" or "easy", for this AI.
+        -- @param slot (optional) The slot into which to put this AI. Defaults to the first empty
+        --                        slot from the top of the list.
+        AddAI = function(name, personality, slot)
+            HostUtils.TryAddPlayer(hostID, slot, GetAIPlayerData(name, personality))
         end,
 
         PlayerMissingMapAlert = function(id)
