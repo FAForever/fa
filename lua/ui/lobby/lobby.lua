@@ -278,13 +278,13 @@ local slotMenuData = {
 }
 
 function AddLobbyManagerSlotMenuData()
-	-- This function is used by the lobby manager to insert its slot commands.
-	-- This is done separately in order to allow the lobby manager to be switched off.
-	
-	table.insert(slotMenuData.player.host, 'ban')
+    -- This function is used by the lobby manager to insert its slot commands.
+    -- This is done separately in order to allow the lobby manager to be switched off.
+    
+    table.insert(slotMenuData.player.host, 'ban')
     table.insert(slotMenuData.player.host, 'warn')
     table.insert(slotMenuData.player.host, 'note')
-	table.insert(slotMenuData.player.client, 'ban')
+    table.insert(slotMenuData.player.client, 'ban')
     table.insert(slotMenuData.player.client, 'warn')
     table.insert(slotMenuData.player.client, 'note')
     slotMenuStrings['ban'] = 'Ban Player'
@@ -293,7 +293,7 @@ function AddLobbyManagerSlotMenuData()
 end
 
 if LobbyManagerEnabled then
-	AddLobbyManagerSlotMenuData()
+    AddLobbyManagerSlotMenuData()
 end
 
 
@@ -455,35 +455,35 @@ local function DoSlotBehavior(slot, key, name)
             end
         end
     elseif key == 'ban' then
-		local data = {}
-		data.pId = gameInfo.PlayerOptions[slot].OwnerID
-		data.pName = LobbyManager_FindNameForId(data.pId)	
-		data.action = 'ban'
+        local data = {}
+        data.pId = gameInfo.PlayerOptions[slot].OwnerID
+        data.pName = LobbyManager_FindNameForId(data.pId)    
+        data.action = 'ban'
         LOG('Ban Action Logged '..slot..' '..data.pId..' '..data.pName)
         local whenDoneOkfn = function(aData)
             LobbyManager_CheckPlayer(aData.data.UID, aData.data.OriginalName)
         end
-		import('/lua/ui/lobby/lobbymanager/LobbyManager_BanProbation.lua').CreateDialog(GUI.panel, data, whenDoneOkfn, function() end, false)        
+        import('/lua/ui/lobby/lobbymanager/LobbyManager_BanProbation.lua').CreateDialog(GUI.panel, data, whenDoneOkfn, function() end, false)        
     elseif key == 'warn' then
-		local data = {}
-		data.pId = gameInfo.PlayerOptions[slot].OwnerID
-		data.pName = LobbyManager_FindNameForId(data.pId)	
-		data.action = 'warn'
+        local data = {}
+        data.pId = gameInfo.PlayerOptions[slot].OwnerID
+        data.pName = LobbyManager_FindNameForId(data.pId)    
+        data.action = 'warn'
         local whenDoneOkfn = function(aData)
             LobbyManager_CheckPlayer(aData.data.UID, aData.data.OriginalName)
         end
-    	LOG('Warn Action Logged '..slot..' '..data.pId..' '..data.pName)
-		import('/lua/ui/lobby/lobbymanager/LobbyManager_BanProbation.lua').CreateDialog(GUI.panel, data, whenDoneOkfn, function() end, false)
+        LOG('Warn Action Logged '..slot..' '..data.pId..' '..data.pName)
+        import('/lua/ui/lobby/lobbymanager/LobbyManager_BanProbation.lua').CreateDialog(GUI.panel, data, whenDoneOkfn, function() end, false)
     elseif key == 'note' then
-		local data = {}
-		data.pId = gameInfo.PlayerOptions[slot].OwnerID
-		data.pName = LobbyManager_FindNameForId(data.pId)	
-		data.action = 'note'
+        local data = {}
+        data.pId = gameInfo.PlayerOptions[slot].OwnerID
+        data.pName = LobbyManager_FindNameForId(data.pId)
+        data.action = 'note'
         local whenDoneOkfn = function(aData)
             LobbyManager_CheckPlayer(aData.data.UID, aData.data.OriginalName)
         end
-    	LOG('Note Action Logged '..slot..' '..data.pId..' '..data.pName)
-		import('/lua/ui/lobby/lobbymanager/LobbyManager_BanProbation.lua').CreateDialog(GUI.panel, data, whenDoneOkfn, function() end, false)
+        LOG('Note Action Logged '..slot..' '..data.pId..' '..data.pName)
+        import('/lua/ui/lobby/lobbymanager/LobbyManager_BanProbation.lua').CreateDialog(GUI.panel, data, whenDoneOkfn, function() end, false)
     else
         -- We're adding an AI of some sort.
         if lobbyComm:IsHost() then
@@ -3004,21 +3004,21 @@ function CreateUI(maxPlayers)
         end
     end
     UIUtil.CreateLobbyVertScrollbar(GUI.observerList, 0, 0, -1)
-	
-	---------------------------------------------------------------------------
+    
+    ---------------------------------------------------------------------------
     -- Lobby Manager
-    ---------------------------------------------------------------------------	
-	if LobbyManagerEnabled then
-		GUI.showLobbyManagerOptions = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/BUTTON/medium/', 'Lobby Man.')	
-		LayoutHelpers.RightOf(GUI.showLobbyManagerOptions, GUI.launchGameButton, 23)
-		LayoutHelpers.AtVerticalCenterIn(GUI.showLobbyManagerOptions, GUI.launchGameButton, -6)
-	
-		GUI.showLobbyManagerOptions.OnClick = function(self, modifiers)
-			ShowLobbyManagerOptionsGUI()
-		end
-		
-		LobbyManager.Initialize()
-	end	
+    ---------------------------------------------------------------------------    
+    if LobbyManagerEnabled then
+        GUI.showLobbyManagerOptions = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/BUTTON/medium/', 'Lobby Man.')    
+        LayoutHelpers.RightOf(GUI.showLobbyManagerOptions, GUI.launchGameButton, 23)
+        LayoutHelpers.AtVerticalCenterIn(GUI.showLobbyManagerOptions, GUI.launchGameButton, -6)
+    
+        GUI.showLobbyManagerOptions.OnClick = function(self, modifiers)
+            ShowLobbyManagerOptionsGUI()
+        end
+        
+        LobbyManager.Initialize()
+    end    
 
     if singlePlayer then
         -- observers are always allowed in skirmish games.
@@ -3555,12 +3555,12 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
         GUI.keepAliveThread = ForkThread(KeepAliveThreadFunc)
         CreateUI(LobbyComm.maxPlayerSlots)
-		
-		--Check the player who just joined and see if the lobby manager
-		--has any information about them.
-		if LobbyManagerEnabled then
-			LobbyManager_CheckPlayer(theHostID,  LobbyManager_FindNameForId(theHostID))
-		end
+        
+        --Check the player who just joined and see if the lobby manager
+        --has any information about them.
+        if LobbyManagerEnabled then
+            LobbyManager_CheckPlayer(theHostID,  LobbyManager_FindNameForId(theHostID))
+        end
     end
 
     lobbyComm.DataReceived = function(self,data)
@@ -3642,19 +3642,19 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             elseif data.Type == 'RequestConvertToObserver' then
                 HostUtils.ConvertPlayerToObserver(data.RequestedSlot)
             elseif data.Type == 'RequestConvertToPlayer' then
-				--Prevent banned players from moving out of observer if so configured
-				local doOperation = true
-				if LobbyManagerEnabled then
-					local cfg = LobbyManager.LoadConfig()
-					local playerStatus = LobbyManager.GetPlayerInfo(data.senderID)
-					if playerStatus.code == 'banned' and cfg.LockBannedInObserver then
-						doOperation = false
-					end
-				end
-				
-				if doOperation then
-					HostUtils.ConvertObserverToPlayer(data.ObserverSlot, data.PlayerSlot)		
-				end
+                --Prevent banned players from moving out of observer if so configured
+                local doOperation = true
+                if LobbyManagerEnabled then
+                    local cfg = LobbyManager.LoadConfig()
+                    local playerStatus = LobbyManager.GetPlayerInfo(data.senderID)
+                    if playerStatus.code == 'banned' and cfg.LockBannedInObserver then
+                        doOperation = false
+                    end
+                end
+                
+                if doOperation then
+                    HostUtils.ConvertObserverToPlayer(data.ObserverSlot, data.PlayerSlot)        
+                end
             elseif data.Type == 'RequestColor' then
                 if IsColorFree(data.Color) then
                     -- Color is available, let everyone else know
@@ -4544,8 +4544,8 @@ function ShowLobbyOptionsDialog()
         end
         RefreshLobbyBackground()
     end
-	
-	local cbox_EnableLobbyManager = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', LOC("Enable Lobby Manager"))
+    
+    local cbox_EnableLobbyManager = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', LOC("Enable Lobby Manager"))
     LayoutHelpers.AtRightTopIn(cbox_EnableLobbyManager, dialogContent, 20, 94)
     Tooltip.AddCheckboxTooltip(cbox_EnableLobbyManager, {text='Enable Lobby Manager', body=LOC("Enable/Disable Lobby Manager (requires restart of FA)")})
     cbox_EnableLobbyManager.OnCheck = function(self, checked)
@@ -4555,7 +4555,7 @@ function ShowLobbyOptionsDialog()
             Prefs.SetToCurrentProfile('LobbyManagerEnabled', 'false')
         end
     end
-	
+    
     -- Quit button
     local QuitButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Close")
     LayoutHelpers.AtHorizontalCenterIn(QuitButton, dialogContent, 0)
@@ -4574,9 +4574,9 @@ function ShowLobbyOptionsDialog()
     --
     local LobbyBackgroundStretch = Prefs.GetFromCurrentProfile('LobbyBackgroundStretch') or 'true'
     cbox_StretchBG:SetCheck(LobbyBackgroundStretch == 'true', true)
-	
-	local LobbyManagerIsEnabled = Prefs.GetFromCurrentProfile('LobbyManagerEnabled') or 'false'
-	cbox_EnableLobbyManager:SetCheck(LobbyManagerIsEnabled == 'true', true)
+    
+    local LobbyManagerIsEnabled = Prefs.GetFromCurrentProfile('LobbyManagerEnabled') or 'false'
+    cbox_EnableLobbyManager:SetCheck(LobbyManagerIsEnabled == 'true', true)
 end
 
 -- Load and return the current list of presets from persistent storage.
@@ -5305,12 +5305,12 @@ function InitHostUtils()
             SetSlotInfo(newSlot, gameInfo.PlayerOptions[newSlot])
             -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
             AssignAutoTeams()
-			
-			--Check the player who just joined and see if the lobby manager
-			--has any information about them.
-			if LobbyManagerEnabled then
-				LobbyManager_CheckPlayer(senderID, playerData.PlayerName)
-			end
+            
+            --Check the player who just joined and see if the lobby manager
+            --has any information about them.
+            if LobbyManagerEnabled then
+                LobbyManager_CheckPlayer(senderID, playerData.PlayerName)
+            end
         end,
 
         --- Add an AI to the game in the given slot.
@@ -5467,18 +5467,18 @@ end
 -- Lobby Manager Functions
 ---------------------------------------------------------------
 function LobbyManager_CheckPlayer(pid, playerName)    
-	if lobbyComm:IsHost() then
-		LobbyManager_CheckPlayerHost(pid, playerName)
-	else
-		LobbyManager_CheckPlayerClient(pid, playerName)
-	end
+    if lobbyComm:IsHost() then
+        LobbyManager_CheckPlayerHost(pid, playerName)
+    else
+        LobbyManager_CheckPlayerClient(pid, playerName)
+    end
 end
 
 function LobbyManager_CheckPlayerHost(pid, playerName)
-	local playerStatus = LobbyManager.GetPlayerInfo(pid)
-	local reasonTbl = import('/lua/ui/lobby/lobbymanager/LobbyManager.lua').reasonTable
-	local cfg = LobbyManager.LoadConfig()
-	if playerStatus.code == 'banned' then
+    local playerStatus = LobbyManager.GetPlayerInfo(pid)
+    local reasonTbl = import('/lua/ui/lobby/lobbymanager/LobbyManager.lua').reasonTable
+    local cfg = LobbyManager.LoadConfig()
+    if playerStatus.code == 'banned' then
         --Notify all players of ban
         local t = "LOBBY MANAGER: Player ".. playerName.." with uid "..pid.." has been banned by this host ("..localPlayerName..") "
         if cfg.AutoKickBannedPlayers and not cfg.PromptBeforeKickBanned then
@@ -5494,7 +5494,7 @@ function LobbyManager_CheckPlayerHost(pid, playerName)
             for i,v in playerStatus.data.BanReasons do
                 SendSystemMessage(reasonTbl[v])
             end
-		end
+        end
         
         if cfg.ShowNotes then
             --Show notes (if any) to host
@@ -5555,20 +5555,20 @@ function LobbyManager_CheckPlayerHost(pid, playerName)
 end
 
 function LobbyManager_CheckPlayerClient(pid, playerName)
-	--This function only runs when we are not hosting
-	--It is used to provide notification that a banned or probationary player has joined
-	local playerStatus = LobbyManager.GetPlayerInfo(pid)
-	local reasonTbl = import('/lua/ui/lobby/lobbymanager/LobbyManager.lua').reasonTable
-	local cfg = LobbyManager.LoadConfig()
-	if playerStatus.code == 'banned' then
-		--Notify only this client of ban
-		AddChatText("WARNING: Player ".. playerName.." with uid "..pid.." is in your ban list.")
+    --This function only runs when we are not hosting
+    --It is used to provide notification that a banned or probationary player has joined
+    local playerStatus = LobbyManager.GetPlayerInfo(pid)
+    local reasonTbl = import('/lua/ui/lobby/lobbymanager/LobbyManager.lua').reasonTable
+    local cfg = LobbyManager.LoadConfig()
+    if playerStatus.code == 'banned' then
+        --Notify only this client of ban
+        AddChatText("WARNING: Player ".. playerName.." with uid "..pid.." is in your ban list.")
         if cfg.ShowReasons then
             AddChatText("Reason(s):")
             for i,v in playerStatus.data.BanReasons do
                 AddChatText(reasonTbl[v])
             end
-		end
+        end
         
         
         --Show notes (if configured and available)
@@ -5577,9 +5577,9 @@ function LobbyManager_CheckPlayerClient(pid, playerName)
             AddChatText("   NOTES: "..playerStatus.data.Notes)
             
         end
-	elseif playerStatus.code == 'probation' then
-		--Show private notes
-		AddChatText("WARNING: Player ".. playerName.." with uid "..pid.." is in your probationary list.")
+    elseif playerStatus.code == 'probation' then
+        --Show private notes
+        AddChatText("WARNING: Player ".. playerName.." with uid "..pid.." is in your probationary list.")
         if cfg.ShowReasons then
             AddChatText("Reason(s):")
             for i,v in playerStatus.data.BanReasons do
@@ -5597,12 +5597,11 @@ function LobbyManager_CheckPlayerClient(pid, playerName)
             AddChatText("LOBBY MANAGER: Your private notes about player with uid ".. pid.. " ("..playerName..")")
             AddChatText("   NOTES: "..playerStatus.data.Notes)
         end
-	end	
+    end    
 end
 
 function ShowLobbyManagerOptionsGUI()
-	--import('/lua/ui/lobby/lobbymanager/LobbyManager_Options.lua').CreateDialog(GUI.panel, nil, function() end, function() end, false)
-	import('/lua/ui/lobby/lobbymanager/LobbyManager_Options.lua').CreateDialog2(GUI.panel)
+    import('/lua/ui/lobby/lobbymanager/LobbyManager_Options.lua').CreateDialog2(GUI.panel)
 end
 
 function LobbyManager_FindNameForId(peerid)

@@ -106,28 +106,28 @@ function CreateScoreUI(parent)
     end
     controls.collapseArrow:SetCheck(true, true)
 
-	CreateLobbyManagerUI()
+    CreateLobbyManagerUI()
 end
 
 function CreateLobbyManagerUI()
-	if not SessionIsReplay() then
-		for _, line in controls.armyLines do
-			--Loop through the lines on the scoreboard and add context function
-			local armiesInfo = GetArmiesTable()
-			local focusArmy = armiesInfo.focusArmy
-			local playerName = armiesInfo.armiesTable[focusArmy].nickname
-			if line.faction and armiesInfo[line.armyID].nickname ~= playerName then
-				line.faction.HandleEvent = function(self, event) 
-					local idx = self:GetParent().armyID
-					local n = GetArmiesTable().armiesTable[idx].nickname
-					if event.Type == 'ButtonPress' and n then
-						import('/lua/ui/lobby/lobbymanager/LobbyManager_InGame.lua').CreateLobbyManagerOptionsMenu(self, n)
-					end
-				end
-				line.faction:EnableHitTest()
-			end
-		end
-	end
+    if not SessionIsReplay() then
+        for _, line in controls.armyLines do
+            --Loop through the lines on the scoreboard and add context function
+            local armiesInfo = GetArmiesTable()
+            local focusArmy = armiesInfo.focusArmy
+            local playerName = armiesInfo.armiesTable[focusArmy].nickname
+            if line.faction and armiesInfo[line.armyID].nickname ~= playerName then
+                line.faction.HandleEvent = function(self, event) 
+                    local idx = self:GetParent().armyID
+                    local n = GetArmiesTable().armiesTable[idx].nickname
+                    if event.Type == 'ButtonPress' and n then
+                        import('/lua/ui/lobby/lobbymanager/LobbyManager_InGame.lua').CreateLobbyManagerOptionsMenu(self, n)
+                    end
+                end
+                line.faction:EnableHitTest()
+            end
+        end
+    end
 end
 
 function fmtnum(ns)
