@@ -1788,7 +1788,9 @@ local function UpdateGame()
         refreshObserverList()
     end
 
-    HostUtils.RefreshButtonEnabledness()
+    if isHost then
+        HostUtils.RefreshButtonEnabledness()
+    end
     RefreshOptionDisplayData(scenarioInfo)
 
     -- Update the map background to reflect the possibly-changed map.
