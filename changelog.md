@@ -7,6 +7,7 @@ Changelog for patch 3641
 *Bug fixes*
 - Seraphim sniperbot is able to hit Cybran MML again
 - T3 Torpedo Bomber can use Attack-Move properly again
+- Shield disruptor now works on personal shields
 
 *Enhancements*
 - Scathis now has Amphibious build icon
