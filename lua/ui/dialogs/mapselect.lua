@@ -441,7 +441,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     LayoutHelpers.RightOf(filterGroup, preview, 23)
     dialogContent.filterGroup = filterGroup
 
-    filterTitle = UIUtil.CreateText(dialogContent, "<LOC sel_map_0003>Filters", 18)
+    filterTitle = UIUtil.CreateText(filterGroup, "<LOC sel_map_0003>Filters", 18)
     LayoutHelpers.AtLeftTopIn(filterTitle, filterGroup, 4, 2)
     filterGroup.title = filterTitle
 
