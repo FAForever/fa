@@ -5037,23 +5037,25 @@ function InitHostUtils()
         SanityCheckSlotMovement = function(moveFrom, moveTo)
             if gameInfo.PlayerOptions[moveTo] then
                 LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. moveTo .. " already occupied")
-                return
+                return false
             end
 
             if gameInfo.ClosedSlots[moveTo] then
                 LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. moveTo .. " is closed")
-                return
+                return false
             end
 
             if moveTo > numOpenSlots or moveTo < 1 then
                 LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. moveTo .. " is out of range")
-                return
+                return false
             end
 
             if moveFrom > numOpenSlots or moveFrom < 1 then
                 LOG("HostUtils.MovePlayerToEmptySlot: target slot " .. moveFrom .. " is out of range")
-                return
+                return false
             end
+
+            return true
         end,
 
         --- Move a player from one slot to another, unoccupied one. Is a no-op if the requested slot
