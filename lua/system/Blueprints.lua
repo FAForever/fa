@@ -393,6 +393,80 @@ function HandleUnitWithBuildPresets(bps, allUnitBlueprints)
     end
 end
 
+function TPWeapon(bp, weapon)
+    if weapon.DummyWeapon or not weapon.TargetPriorities then return end
+
+    local prios = weapon.TargetPriorities
+
+    cats = {}
+    for k, cat in bp.Categories do
+        cats[cat] = true
+    end
+
+    table.insert(prios, 'SPECIALHIGHPRI')
+
+    local add = {}
+
+    if weapon.RangeCategory == 'UWRC_AntiNavy' then
+        add = {
+            'MOBILE',
+            'STRUCTURE DEFENSE',
+        }
+    elseif weapon.RangeCategory == 'UWRC_AntiAir' then
+        if cats.AIR then
+            add = {
+                'AIR MOBILE',
+                'AIR MOBILE -INTELLIGENCE',
+            }
+        else
+            add = {
+                'AIR MOBILE EXPERIMENTAL',
+                'AIR MOBILE TECH3 BOMBER',
+                'AIR MOBILE BOMBER',
+                'AIR MOBILE GROUNDATTACK',
+                'AIR MOBILE TRANSPORTATION',
+                'AIR MOBILE',
+            }
+        end
+    elseif weapon.RangeCategory == 'UWRC_IndirectFire' then -- missiles / arty
+        if cats.NAVAL then -- cruisers
+            table.insert(add, 'MOBILE NAVAL')
+        end
+
+        table.insert(add,  'STRUCTURE DEFENSE')
+    elseif weapon.RangeCategory == 'UWRC_DirectFire' then
+        if cats.EXPERIMENTAL then
+            add = {'EXPERIMENTAL', 'SUBCOMMANDER', 'MOBILE TECH3', 'STRUCTURE DEFENSE',
+                   'STRUCTURE TECH3', 'MOBILE TECH2', 'MOBILE TECH1'}
+        else
+            if cats.COMMAND then
+                add = {'MOBILE'}
+            elseif cats.NAVAL then
+                add = {'MOBILE NAVAL'}
+            elseif cats.TECH1 or (weapon.RateOfFire >= 2 and weapon.Damage < 100) then
+                add = {'MOBILE TECH1', 'MOBILE TECH2', 'MOBILE TECH3', 'SUBCOMMANDER', 'EXPERIMENTAL'}
+            else
+                add = {'EXPERIMENTAL', 'SUBCOMMANDER', 'MOBILE TECH3', 'MOBILE TECH2', 'MOBILE TECH1'}
+            end
+
+            table.insert(add, 'STRUCTURE DEFENSE')
+        end
+    end
+
+    table.insert(add, 'SPECIALLOWPRI')
+    table.insert(add, 'ALLUNITS')
+    weapon.TargetPriorities = table.cat(prios, add)
+end
+
+function AddTargetPriorities(bp)
+    if bp.Weapon then
+        for i, weapon in bp.Weapon do
+            TPWeapon(bp, weapon)
+        end
+    end
+end
+
+
 -- Mod unit blueprints before allowing mods to modify it aswell, to pass the most correct unit blueprint to mods
 function PreModBlueprints(all_bps)
 
@@ -481,6 +555,8 @@ function PreModBlueprints(all_bps)
                 bp.AI.GuardScanRadius = br
             end
         end
+
+        AddTargetPriorities(bp)
 
         BlueprintLoaderUpdateProgress()
     end
