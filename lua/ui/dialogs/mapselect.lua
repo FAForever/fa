@@ -600,8 +600,21 @@ function RefreshOptions(skipRefresh, singlePlayer)
 
     Options = {}
 
+    --- Check that the given option source has at least one option with at least 2 possibilities, or
+    -- there's no need to draw the UI. Maps/mods can cause whole categories to vanish, and we don't
+    -- want to leave a dangling title.
+    local function ShouldShowOptionCategory(options)
+        for k, optionData in options do
+            if table.getn(optionData.values) > 1 then
+                return true
+            end
+        end
+
+        return false
+    end
+
     for _, OptionTable in OptionSource do
-        if table.getsize(OptionTable.options) > 0 then
+        if ShouldShowOptionCategory(OptionTable.options) then
             table.insert(Options, {type = 'title', text = OptionTable.title})
             for optionIndex, optionData in OptionTable.options do
                 if not(singlePlayer and optionData.mponly == true) and table.getn(optionData.values) > 1 then
