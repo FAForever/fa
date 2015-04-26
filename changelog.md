@@ -8,13 +8,26 @@ Changelog for patch 3641
 - Seraphim sniperbot is able to hit Cybran MML again
 - T3 Torpedo Bomber can use Attack-Move properly again
 - Shield disruptor now works on personal shields
+- Fixed wrong consumption when repairing ACU after an upgrade finished
+- Support factories no longer lose progress if they are damaged during upgrade
 
 *Enhancements*
 - Scathis now has Amphibious build icon
 - Attack and Nuke reticles now scale with impact radius
+- TMLs now show the splash damage radius in targeting mode
 - Engineering Station units now pause on transfer from one player to another
 - Cybran Engineers now display a build beam to clearly show what they're tasked to
+- Cybran factories now have red build beams
+- Number of Cybran build bots scale with buildpower of the engineer
+- Cybran build bots now can assist next build project without respawning
 - Reclaim/second now shown
+- 34 new taunts
+- The least valueable units are destroyed at unit transfer if unitcap is hit
+- "Commander under attack" now works on shielded ACUs
+- Remove owner-check on text pings so anyone can delete them
+- Disable assist command on upgrading factories to prevent accidental cancelling
+- Ping values under "Connectivity" (F11) now update during game stop/stall
+- Show reclaim / second
 
 *Lobby*
 - Huge texture, layout, aesthetics and speed improvements all over the lobby
