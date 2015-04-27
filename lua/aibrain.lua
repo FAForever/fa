@@ -909,6 +909,8 @@ AIBrain = Class(moho.aibrain_methods) {
 
 
     OnDefeat = function(self)
+        local logstr = 'OnDefeat(): Player ' .. self:GetArmyIndex()
+
         ##For Sorian AI
         if self.BrainType == 'AI' then
             SUtils.AISendChat('enemies', ArmyBrains[self:GetArmyIndex()].Nickname, 'ilost')
@@ -923,13 +925,14 @@ AIBrain = Class(moho.aibrain_methods) {
         # But we only want it one time !
 
         if ArmyIsOutOfGame(self:GetArmyIndex()) then
+            LOG(logstr .. ' ArmyIsOutOfGame')
             return
         end
 
         SetArmyOutOfGame(self:GetArmyIndex())
 
-
         if math.floor(self:GetArmyStat("FAFLose",0.0).Value) != -1 then
+            logstr = logstr .. ' FAFLose -1'
             self:AddArmyStat("FAFLose", -1)
         end
 
@@ -943,6 +946,8 @@ AIBrain = Class(moho.aibrain_methods) {
                 table.insert( Sync.GameResult, { index, result } )
             end
         end
+
+        LOG(logstr .. ' Sync.GameResult\n' .. repr(Sync.GameResult))
 
         import('/lua/SimUtils.lua').UpdateUnitCap(self:GetArmyIndex())
         import('/lua/SimPing.lua').OnArmyDefeat(self:GetArmyIndex())
@@ -4211,6 +4216,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
 
     AbandonedByPlayer = function(self)
+        LOG("AbandonedByPlayer(): index " .. self:GetArmyIndex())
         if not IsGameOver() then
             self:OnDefeat()
         end
