@@ -410,41 +410,35 @@ function UpdateWindow(info)
 
             local getEnh = import('/lua/enhancementcommon.lua')
             if info.userUnit ~= nil then
-                local enhRegen , regenBase = 0 , 0
-                if getEnh.GetEnhancements(info.entityId) ~= nil then
-                    for k,v in getEnh.GetEnhancements(info.entityId) do
-                        if info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId)[k]].NewRegenRate ~= nil then
-                            enhRegen = info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId)[k]].NewRegenRate
+                local bp = info.userUnit:GetBlueprint()
+                local regen = bp.Defense.RegenRate or 0
+                local current_enh = getEnh.GetEnhancements(info.entityId)
+
+                if current_enh ~= nil then
+                    local enhancements = bp.Enhancements
+                    for k,v in current_enh do
+                        if enhancements[current_enh[k]].NewRegenRate ~= nil then
+                            regen = enhancements[current_enh[k]].NewRegenRate
                         end
                     end
                 end
-                local veterancyLevels = info.userUnit:GetBlueprint().Veteran or veterancyDefaults
-                if info.kills >= veterancyLevels[string.format('Level%d', 1)] then
+
+                local veterancyLevels = bp.Veteran or veterancyDefaults
+                local xp = UnitData[info.entityId].xp
+                if xp >= veterancyLevels[string.format('Level%d', 1)] then
+                    local vetRegen = 0
                     local lvl = 1
+
                     for i = 2,5 do
-                        if info.kills >= veterancyLevels[string.format('Level%d', i)] then
+                        if xp >= veterancyLevels[string.format('Level%d', i)] then
                             lvl = i
                         end
                     end
-                    local addRegen = info.userUnit:GetBlueprint().Buffs.Regen[string.format('Level%d', lvl)]
-                    local regenTotal
-                    if info.userUnit ~= nil and info.health then
-                        if math.floor(info.userUnit:GetBlueprint().Defense.RegenRate) > 0 then
-                            regenTotal = math.floor(  (info.userUnit:GetBlueprint().Defense.RegenRate) + addRegen   )
-                            regenBase = math.floor(info.userUnit:GetBlueprint().Defense.RegenRate + enhRegen)
-                        else
-                            regenTotal = math.floor(addRegen)
-                        end
-                        if regenTotal > 0 and regenBase > 0 then
-                            controls.health:SetText(string.format("%d / %d +%d(%d)/s", info.health, info.maxHealth, regenBase ,regenTotal ))
-                        else
-                            controls.health:SetText(string.format("%d / %d +%d/s", info.health, info.maxHealth ,regenTotal ))
-                        end
-                    end
+
+                    vetRegen = bp.Buffs.Regen[string.format('Level%d', lvl)]
+                    controls.health:SetText(string.format("%d / %d +%d(+%d)/s", info.health, info.maxHealth, regen, vetRegen))
                 else
-                    if info.userUnit ~= nil and info.health and info.userUnit:GetBlueprint().Defense.RegenRate > 0 then
-                        controls.health:SetText(string.format("%d / %d +%d/s", info.health, info.maxHealth,math.floor(info.userUnit:GetBlueprint().Defense.RegenRate + enhRegen)))
-                    end
+                    controls.health:SetText(string.format("%d / %d +%d/s", info.health, info.maxHealth, regen))
                 end
             end
 
