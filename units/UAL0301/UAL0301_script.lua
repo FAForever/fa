@@ -160,9 +160,27 @@ UAL0301 = Class(AWalkingLandUnit) {
             end
         --SystemIntegrityCompensator
         elseif enh == 'SystemIntegrityCompensator' then
-            self:SetRegenRate(bp.NewRegenRate or 0)
+            local name = 'AeonSCURegenRate'
+            if not Buffs[name] then
+                BuffBlueprint {
+                    Name = name,
+                    DisplayName = name,
+                    BuffType = 'SCUREGENRATE',
+                    Stacks = 'REPLACE',
+                    Duration = -1,
+                    Affects = {
+                        Regen = {
+                            Add =  bp.NewRegenRate - self:GetBlueprint().Defense.RegenRate,
+                            Mult = 1,
+                        },
+                    },
+                }
+            end
+            Buff.ApplyBuff(self, name)
         elseif enh == 'SystemIntegrityCompensatorRemove' then
-            self:RevertRegenRate()
+            if Buff.HasBuff( self, 'AeonSCURegenRate' ) then
+                Buff.RemoveBuff( self, 'AeonSCURegenRate' )
+            end
         --Sacrifice
         elseif enh == 'Sacrifice' then
             self:AddCommandCap('RULEUCC_Sacrifice')
