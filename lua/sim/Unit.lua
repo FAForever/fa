@@ -1169,6 +1169,7 @@ Unit = Class(moho.unit_methods) {
             self.DisallowCollisions = true
         end
 
+        self:HandleStorage()
         self:DoUnitCallbacks( 'OnKilled' )
 
         if self.UnitBeingTeleported and not self.UnitBeingTeleported.Dead then
@@ -1236,6 +1237,27 @@ Unit = Class(moho.unit_methods) {
                     self:ForkThread(self.DeathWeaponDamageThread, v.DamageRadius, v.Damage, v.DamageType, v.DamageFriendly)
                 end
                 break
+            end
+        end
+    end,
+
+    HandleStorage = function(self, to_army)
+        if EntityCategoryContains(categories.MOBILE, self) then
+            return -- Exclude SCU / sparky
+        end
+
+        local bp = self:GetBlueprint()
+        local brain = GetArmyBrain(self:GetArmy())
+        for _, t in {'Mass', 'Energy'} do
+            if bp.Economy['Storage' .. t] then
+                local type = string.upper(t)
+                local amount = bp.Economy['Storage' .. t] * brain:GetEconomyStoredRatio(type)
+
+                brain:TakeResource(type, amount)
+                if to_army then
+                    local to = GetArmyBrain(to_army)
+                    to:GiveResource(type, amount)
+                end
             end
         end
     end,

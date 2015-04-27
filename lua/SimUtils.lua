@@ -65,7 +65,7 @@ function TransferUnitsOwnership(units, ToArmyIndex)
     table.sort(units, function (a, b) return a:GetBlueprint().Economy.BuildCostMass > b:GetBlueprint().Economy.BuildCostMass end)
 
     local newUnits = {}
-    for k,v in units do
+    for k, v in units do
         local owner = v:GetArmy()
         -- Only allow units not attached to be given. This is because units will give all of it's children over
         -- aswell, so we only want the top level units to be given.
@@ -165,7 +165,9 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         if EntityCategoryContains(categories.ENGINEERSTATION, unit) then
             unit:SetPaused(true)
         end
+        v:HandleStorage(ToArmyIndex)
     end
+
     return newUnits
 end
 
