@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAL0301/UAL0301_script.lua
-#**  Author(s):  Jessica St. Croix
-#**
-#**  Summary  :  Aeon Sub Commander Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAL0301/UAL0301_script.lua
+--**  Author(s):  Jessica St. Croix
+--**
+--**  Summary  :  Aeon Sub Commander Script
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local AWalkingLandUnit = import('/lua/aeonunits.lua').AWalkingLandUnit
 
@@ -16,12 +16,12 @@ local AIFCommanderDeathWeapon = AWeapons.AIFCommanderDeathWeapon
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local Buff = import('/lua/sim/Buff.lua')
 
-UAL0301 = Class(AWalkingLandUnit) {    
+UAL0301 = Class(AWalkingLandUnit) {
     Weapons = {
         RightReactonCannon = Class(ADFReactonCannon) {},
         DeathWeapon = Class(AIFCommanderDeathWeapon) {},
     },
-    
+
     OnPrepareArmToBuild = function(self)
         AWalkingLandUnit.OnPrepareArmToBuild(self)
         self:BuildManipulatorSetEnabled(true)
@@ -29,7 +29,7 @@ UAL0301 = Class(AWalkingLandUnit) {
         self:SetWeaponEnabledByLabel('RightReactonCannon', false)
         self.BuildArmManipulator:SetHeadingPitch( self:GetWeaponManipulatorByLabel('RightReactonCannon'):GetHeadingPitch() )
     end,
-        
+
     OnStopCapture = function(self, target)
         AWalkingLandUnit.OnStopCapture(self, target)
         self:BuildManipulatorSetEnabled(false)
@@ -37,7 +37,7 @@ UAL0301 = Class(AWalkingLandUnit) {
         self:SetWeaponEnabledByLabel('RightReactonCannon', true)
         self:GetWeaponManipulatorByLabel('RightReactonCannon'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
     end,
-    
+
     OnFailedCapture = function(self, target)
         AWalkingLandUnit.OnFailedCapture(self, target)
         self:BuildManipulatorSetEnabled(false)
@@ -45,7 +45,7 @@ UAL0301 = Class(AWalkingLandUnit) {
         self:SetWeaponEnabledByLabel('RightReactonCannon', true)
         self:GetWeaponManipulatorByLabel('RightReactonCannon'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
     end,
-    
+
     OnStopReclaim = function(self, target)
         AWalkingLandUnit.OnStopReclaim(self, target)
         self:BuildManipulatorSetEnabled(false)
@@ -61,13 +61,13 @@ UAL0301 = Class(AWalkingLandUnit) {
         self:SetWeaponEnabledByLabel('RightReactonCannon', true)
         self:GetWeaponManipulatorByLabel('RightReactonCannon'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
     end,
-    
+
     OnStartBuild = function(self, unitBeingBuilt, order)
         AWalkingLandUnit.OnStartBuild(self, unitBeingBuilt, order)
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
-        self.BuildingUnit = true     
-    end,    
+        self.BuildingUnit = true
+    end,
 
     OnStopBuild = function(self, unitBeingBuilt)
         AWalkingLandUnit.OnStopBuild(self, unitBeingBuilt)
@@ -77,10 +77,10 @@ UAL0301 = Class(AWalkingLandUnit) {
         self:GetWeaponManipulatorByLabel('RightReactonCannon'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
         self.UnitBeingBuilt = nil
         self.UnitBuildOrder = nil
-        self.BuildingUnit = false          
+        self.BuildingUnit = false
     end,
 
-    
+
     OnFailedToBuild = function(self)
         AWalkingLandUnit.OnFailedToBuild(self)
         self:BuildManipulatorSetEnabled(false)
@@ -88,28 +88,28 @@ UAL0301 = Class(AWalkingLandUnit) {
         self:SetWeaponEnabledByLabel('RightReactonCannon', true)
         self:GetWeaponManipulatorByLabel('RightReactonCannon'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
     end,
-    
+
     OnCreate = function(self)
         AWalkingLandUnit.OnCreate(self)
         self:SetCapturable(false)
         self:HideBone('Turbine', true)
         self:SetupBuildBones()
     end,
-    
+
     CreateBuildEffects = function( self, unitBeingBuilt, order )
         EffectUtil.CreateAeonCommanderBuildingEffects( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )
-    end,      
-    
+    end,
+
     CreateEnhancement = function(self, enh)
         AWalkingLandUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
         if not bp then return end
-        #Teleporter
+        --Teleporter
         if enh == 'Teleporter' then
             self:AddCommandCap('RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
             self:RemoveCommandCap('RULEUCC_Teleport')
-        #Shields
+        --Shields
         elseif enh == 'Shield' then
             self:AddToggleCap('RULEUTC_ShieldToggle')
             self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
@@ -124,8 +124,8 @@ UAL0301 = Class(AWalkingLandUnit) {
         elseif enh == 'ShieldHeavyRemove' then
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
-            self:RemoveToggleCap('RULEUTC_ShieldToggle') 
-        #ResourceAllocation              
+            self:RemoveToggleCap('RULEUTC_ShieldToggle')
+        --ResourceAllocation
         elseif enh =='ResourceAllocation' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
@@ -136,7 +136,7 @@ UAL0301 = Class(AWalkingLandUnit) {
             local bpEcon = self:GetBlueprint().Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
-        #Engineering Focus Module
+        --Engineering Focus Module
         elseif enh =='EngineeringFocusingModule' then
             if not Buffs['AeonSCUBuildRate'] then
                 BuffBlueprint {
@@ -158,17 +158,17 @@ UAL0301 = Class(AWalkingLandUnit) {
             if Buff.HasBuff( self, 'AeonSCUBuildRate' ) then
                 Buff.RemoveBuff( self, 'AeonSCUBuildRate' )
             end
-        #SystemIntegrityCompensator
+        --SystemIntegrityCompensator
         elseif enh == 'SystemIntegrityCompensator' then
             self:SetRegenRate(bp.NewRegenRate or 0)
         elseif enh == 'SystemIntegrityCompensatorRemove' then
             self:RevertRegenRate()
-        #Sacrifice
+        --Sacrifice
         elseif enh == 'Sacrifice' then
             self:AddCommandCap('RULEUCC_Sacrifice')
         elseif enh == 'SacrificeRemove' then
-            self:RemoveCommandCap('RULEUCC_Sacrifice')  
-        #StabilitySupressant
+            self:RemoveCommandCap('RULEUCC_Sacrifice')
+        --StabilitySupressant
         elseif enh =='StabilitySuppressant' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
             wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
@@ -179,21 +179,21 @@ UAL0301 = Class(AWalkingLandUnit) {
             wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
         end
     end,
-    
+
     CreateHeavyShield = function(self, bp)
         WaitTicks(1)
         self:CreatePersonalShield(bp)
-        self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)     
+        self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
         self:SetMaintenanceConsumptionActive()
-    end,    
-    
+    end,
+
     OnPaused = function(self)
         AWalkingLandUnit.OnPaused(self)
         if self.BuildingUnit then
             AWalkingLandUnit.StopBuildingEffects(self, self:GetUnitBeingBuilt())
-        end    
+        end
     end,
-    
+
     OnUnpaused = function(self)
         if self.BuildingUnit then
             AWalkingLandUnit.StartBuildingEffects(self, self:GetUnitBeingBuilt(), self.UnitBuildOrder)
