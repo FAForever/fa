@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aeon Sub Commander Script
 --**
-#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
