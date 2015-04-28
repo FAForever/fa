@@ -85,6 +85,7 @@ UnitBlueprint {
     Display = {
         Abilities = {
             '<LOC ability_manuallaunch>Manual Launch',
+            '<LOC ability_immunateownmissile>Immunate own missile',
         },
         DamageEffects = {
             {
