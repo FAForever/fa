@@ -12,6 +12,8 @@ Changelog for patch 3641
 - Support factories no longer lose progress if they are damaged during upgrade
 - Units with weapon range upgrades now stop at maximum range when using attack-move 
 - Aeon SCUs with nano + vet now get correct regen rate 
+- Disable build effect beams on sinking engineers
+- Projectiles no longer collide with sinking units
 
 *Enhancements*
 - Scathis now has Amphibious build icon
