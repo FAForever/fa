@@ -1612,6 +1612,7 @@ Unit = Class(moho.unit_methods) {
         self:DestroyTopSpeedEffects()
         self:DestroyIdleEffects()
         self:DestroyBeamExhaust()
+        self:DestroyAllBuildEffects()
 
         if self.PlayDestructionEffects then
             self:CreateDestructionEffects(overkillRatio)
@@ -1660,6 +1661,27 @@ Unit = Class(moho.unit_methods) {
         self:Destroy()
     end,
 
+    DestroyAllBuildEffects = function(self)
+        if self.BuildEffectsBag then
+            self.BuildEffectsBag:Destroy()
+        end
+        if self.CaptureEffectsBag then
+            self.CaptureEffectsBag:Destroy()
+        end
+        if self.ReclaimEffectsBag then
+            self.ReclaimEffectsBag:Destroy()
+        end
+        if self.OnBeingBuiltEffectsBag then
+            self.OnBeingBuiltEffectsBag:Destroy()
+        end
+        if self.UpgradeEffectsBag then
+            self.UpgradeEffectsBag:Destroy()
+        end
+        if self.TeleportFxBag then
+            self.TeleportFxBag:Destroy()
+        end
+    end,
+
     OnDestroy = function(self)
         self.Dead = true
 
@@ -1682,24 +1704,8 @@ Unit = Class(moho.unit_methods) {
 
         --Destroy everything added to the trash
         self.Trash:Destroy()
-        if self.BuildEffectsBag then
-            self.BuildEffectsBag:Destroy()
-        end
-        if self.CaptureEffectsBag then
-            self.CaptureEffectsBag:Destroy()
-        end
-        if self.ReclaimEffectsBag then
-            self.ReclaimEffectsBag:Destroy()
-        end
-        if self.OnBeingBuiltEffectsBag then
-            self.OnBeingBuiltEffectsBag:Destroy()
-        end
-        if self.UpgradeEffectsBag then
-            self.UpgradeEffectsBag:Destroy()
-        end
-        if self.TeleportFxBag then
-            self.TeleportFxBag:Destroy()
-        end
+
+        self:DestroyAllBuildEffects()
 
         if self.TeleportDrain then
             RemoveEconomyEvent( self, self.TeleportDrain)
