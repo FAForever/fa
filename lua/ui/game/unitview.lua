@@ -448,23 +448,21 @@ function UpdateWindow(info)
                 end
             end
 
-            if info.shieldRatio > 0 and info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth then
-                local ShieldMaxHealth = info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth
-                controls.shieldText:Show()
-                if info.userUnit:GetBlueprint().Defense.Shield.ShieldRegenRate then
-                    controls.shieldText:SetText(string.format("%d / %d +%d/s", math.floor(ShieldMaxHealth*info.shieldRatio), info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth , info.userUnit:GetBlueprint().Defense.Shield.ShieldRegenRate))
-                else
-                    controls.shieldText:SetText(string.format("%d / %d", math.floor(ShieldMaxHealth*info.shieldRatio), info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth ))
+            if info.shieldRatio > 0 then
+                local unitBp = info.userUnit:GetBlueprint()
+                local shield = unitBp.Defense.Shield
+                if not shield.ShieldMaxHealth then
+                    shield = unitBp.Enhancements[getEnh.GetEnhancements(info.entityId).Back]
                 end
-            end
-
-            if info.shieldRatio > 0 and info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth == nil then
-                local ShieldMaxHealth = info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId).Back].ShieldMaxHealth
-                controls.shieldText:Show()
-                if info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId).Back].ShieldRegenRate then
-                    controls.shieldText:SetText(string.format("%d / %d +%d/s", math.floor(ShieldMaxHealth*info.shieldRatio), ShieldMaxHealth , info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId).Back].ShieldRegenRate))
-                else
-                    controls.shieldText:SetText(string.format("%d / %d", math.floor(ShieldMaxHealth*info.shieldRatio), ShieldMaxHealth ))
+                local shieldMaxHealth, shieldRegenRate = shield.ShieldMaxHealth or 0, shield.ShieldRegenRate or 0
+                if shieldMaxHealth > 0 then
+                    local shieldHealth = math.floor(shieldMaxHealth*info.shieldRatio)
+                    local shieldText = string.format("%d / %d", shieldHealth, shieldMaxHealth)
+                    if shieldRegenRate > 0 then
+                        shieldText = shieldText .. string.format("+%d/s", shieldRegenRate)
+                    end
+                    controls.shieldText:Show()
+                    controls.shieldText:SetText(shieldText)
                 end
             end
 
