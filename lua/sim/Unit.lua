@@ -1620,6 +1620,7 @@ Unit = Class(moho.unit_methods) {
 
         -- Make sure Naval units use their animation to sink
         if isSinking and not (isNaval and self.DeathAnimManip) then
+            self.DisallowCollisions = true
             self:ForkThread(self.SinkThread)
         end
 
