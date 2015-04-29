@@ -3511,8 +3511,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
                 gameInfo.PlayerOptions[data.Slot][key] = val
                 if isHost then
-                    GpgNetSend('PlayerOption', data.Slot, key, val)
-
                     -- TODO: This should be a global listener on PlayerData objects, but I'm in too
                     -- much pain to implement that listener system right now. EVIL HACK TIME
                     if key == "Ready" then
