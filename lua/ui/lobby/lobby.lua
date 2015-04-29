@@ -5035,11 +5035,6 @@ function InitHostUtils()
         -- @param moveFrom Slot number to move from
         -- @param moveTo Slot number to move to.
         SanityCheckSlotMovement = function(moveFrom, moveTo)
-            if gameInfo.PlayerOptions[moveTo] then
-                LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. moveTo .. " already occupied")
-                return false
-            end
-
             if gameInfo.ClosedSlots[moveTo] then
                 LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. moveTo .. " is closed")
                 return false
@@ -5068,6 +5063,12 @@ function InitHostUtils()
             -- Bail out early for the stupid cases.
             if not HostUtils.SanityCheckSlotMovement(currentSlot, requestedSlot) then
                 return
+            end
+
+            -- This one's only specific to moving to an empty slot, naturally.
+            if gameInfo.PlayerOptions[requestedSlot] then
+                LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. moveTo .. " already occupied")
+                return false
             end
 
             gameInfo.PlayerOptions[requestedSlot] = gameInfo.PlayerOptions[currentSlot]
