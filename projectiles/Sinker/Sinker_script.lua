@@ -3,6 +3,7 @@ local EffectUtil = import('/lua/EffectUtilities.lua')
 local explosion = import('/lua/defaultexplosions.lua')
 local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
 local Projectile = import('/lua/sim/projectile.lua').Projectile
+local rand = import('/lua/utilities.lua').GetRandomFloat
 
 Sinker = Class(Projectile) {
     OnCreate = function(self, inWater)
@@ -12,62 +13,62 @@ Sinker = Class(Projectile) {
         self:SetVizToAllies('Never')
         self:SetVizToNeutrals('Never')
         self:SetStayUpright(false)
+        self:SetCollideSurface(true)
     end,
 
-    PassData = function(self, data)
-        if not self.Data then
-            if not data.TargetBone or not data.TargetEntity then
-                return
-            end
+    Attach = function(self, unit)
+        local mult
+        local acc
+        local v1, v2, v3 = unit:GetVelocity()
+        local layer = unit:GetCurrentLayer()
 
-            self.Data = data
-            self:Sink_Effects()
-            return true
-        end
-
-        return false
-    end,
-
-    Sink_Effects = function(self)
-        local target = self.Data.TargetEntity
-
-        if not target:IsDead() or target:BeenDestroyed() then
-            self:Destroy()
-            return
-        end
-
-        if not target:IsValidBone(self.Data.TargetBone) then
-            target:Destroy()
-            self:Destroy()
-            return
-        end
-
-        Warp( self, target:CalculateWorldPositionFromRelative({0, 0, 0}) , target:GetOrientation() )
-        target:AttachBoneTo(self.Data.TargetBone, self, 'anchor')
-    end,
-
-    Start = function( self, delay)
-        if delay and delay > 0 then
-            self:ForkThread( function(self, delay) WaitTicks( delay) if self then self:StartSinking() end end, delay)
+        if layer == 'Water' then
+            mult = 6
+            acc = -0.05
         else
-            self:StartSinking()
+            mult = 10
+            acc = -4.90
         end
-    end,
 
-    StartSinking = function( self)
-        if self and not self:BeenDestroyed() and self.Data.TargetEntity and not self.Data.TargetEntity:BeenDestroyed() then
-            local bp = self:GetBlueprint()
-            local acc = -bp.Physics.SinkSpeed or -0.05
-            self:SetBallisticAcceleration( acc + GetRandomFloat(-0.02, 0.02) )
-        end
+        unit:AttachBoneTo(0, self, 'anchor')
+        self:SetVelocity(v1 * mult * rand(0.80, 1.20), v2 * mult * rand(0.80, 1.20), v3 * mult * rand(0.80, 1.20))
+
+        local lv = math.max(v1, v2, v3) * mult * 0.2
+        self:SetLocalAngularVelocity(rand(-lv, lv), rand(-lv, lv), rand(-lv, lv))
+        self:SetBallisticAcceleration(acc)
+
+        self.unit = unit
     end,
 
     OnImpact = function(self, targetType, targetEntity)
-        if targetType == 'Terrain' then
-            self.Data.ImpactedWith = 'Seabed'
-            self.Data.TargetEntity.StopSink = true
-            self:Destroy()
-        end
+        self.unit:OnImpact(targetType)
+        self:Destroy()
+    end,
+
+    OnEnterWater = function(self)
+        self.unit:OnImpact('Water')
+        self:StayUnderwater(true)
+
+        local v1, v2, v3 = self:GetVelocity()
+        self:SetVelocity(6*v1, 6*v2, 6*v3)
+
+        ForkThread(function()
+            while self:GetCurrentSpeed() > 0.1 do
+                WaitSeconds(0.1)
+                v1, v2, v3 = self:GetVelocity()
+                self:SetVelocity(7*v1, 7*v2, 7*v3)
+            end
+
+            self:SetLocalAngularVelocity(0.1, 0.1, 0.1)
+            self:SetBallisticAcceleration(-0.05 + GetRandomFloat(-0.02, 0.02))
+        end)
+    end,
+
+    OnDestroy = function(self)
+        self.unit:DetachAll(0)
+        self:DetachAll('anchor')
+        self.unit.StopSink = true
+        self.unit:SetImmobile(false)
     end,
 }
 TypeClass = Sinker

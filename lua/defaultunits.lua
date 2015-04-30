@@ -1535,6 +1535,7 @@ AirUnit = Class(MobileUnit) {
         if self.DeathBounce then
             return
         end
+
         self.DeathBounce = true
 
         -- Damage the area we have impacted with.
@@ -1553,6 +1554,7 @@ AirUnit = Class(MobileUnit) {
             self:PlayUnitSound('AirUnitWaterImpact')
             EffectUtil.CreateEffects( self, self:GetArmy(), EffectTemplate.DefaultProjectileWaterImpact )
         end
+
         self:ForkThread(self.DeathThread, self.OverKillRatio )
     end,
 
