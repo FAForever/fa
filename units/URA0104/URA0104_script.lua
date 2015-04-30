@@ -56,13 +56,6 @@ URA0104 = Class(CAirUnit) {
         attached:DetachFrom()
     end,
 
-    OnKilled = function(self, instigator, type, overkillRatio)
-        CAirUnit.OnKilled(self, instigator, type, overkillRatio)
-        -- TransportDetachAllUnits takes 1 bool parameter. If true, randomly destroys some of the transported
-        -- units, otherwise successfully detaches all.
-        self:TransportDetachAllUnits(true)
-    end,
-
     OnMotionVertEventChange = function(self, new, old)
         --LOG( 'OnMotionVertEventChange, new = ', new, ', old = ', old )
         CAirUnit.OnMotionVertEventChange(self, new, old)

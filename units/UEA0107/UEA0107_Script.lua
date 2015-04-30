@@ -56,13 +56,6 @@ UEA0107 = Class(TAirUnit)
         attached:DetachFrom()
     end,
 
-    OnKilled = function(self, instigator, type, overkillRatio)
-        TAirUnit.OnKilled(self, instigator, type, overkillRatio)
-        -- TransportDetachAllUnits takes 1 bool parameter. If true, randomly destroys some of the transported
-        -- units, otherwise successfully detaches all.
-        self:TransportDetachAllUnits(true)
-    end,
-
     OnMotionVertEventChange = function(self, new, old)
         TAirUnit.OnMotionVertEventChange(self, new, old)
         if (new == 'Down') then
