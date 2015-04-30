@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/URA0107/URA0107_script.lua
-#**  Author(s):  John Comes, David Tomandl
-#**
-#**  Summary  :  Cybran T1 Air Transport Script
-#**
-#**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/URA0107/URA0107_script.lua
+--**  Author(s):  John Comes, David Tomandl
+--**
+--**  Summary  :  Cybran T1 Air Transport Script
+--**
+--**  Copyright Â© 2006 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
 local explosion = import('/lua/defaultexplosions.lua')
@@ -31,35 +31,35 @@ URA0107 = Class(CAirUnit) {
         self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationTakeOff, false):SetRate(1)
     end,
 
-    # When one of our attached units gets killed, detach it
+    -- When one of our attached units gets killed, detach it
     OnAttachedKilled = function(self, attached)
         attached:DetachFrom()
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
         CAirUnit.OnKilled(self, instigator, type, overkillRatio)
-        # TransportDetachAllUnits takes 1 bool parameter. If true, randomly destroys some of the transported
-        # units, otherwise successfully detaches all.
+        -- TransportDetachAllUnits takes 1 bool parameter. If true, randomly destroys some of the transported
+        -- units, otherwise successfully detaches all.
         self:TransportDetachAllUnits(true)
     end,
 
     OnMotionVertEventChange = function(self, new, old)
-        #LOG( 'OnMotionVertEventChange, new = ', new, ', old = ', old )
+        --LOG( 'OnMotionVertEventChange, new = ', new, ', old = ', old )
         CAirUnit.OnMotionVertEventChange(self, new, old)
-        #Aborting a landing
+        --Aborting a landing
         if ((new == 'Top' or new == 'Up') and old == 'Down') then
             self.AnimManip:SetRate(-1)
         elseif (new == 'Down') then
             self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationLand, false):SetRate(1.5)
-#NOTE: We need to add funtionality to fit this guy on the platform            
-#        elseif (new == 'Bottom') then
-#            self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationIdle, true):SetRate(1)
+--NOTE: We need to add funtionality to fit this guy on the platform
+--        elseif (new == 'Bottom') then
+--            self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationIdle, true):SetRate(1)
         elseif (new == 'Up') then
             self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationTakeOff, false):SetRate(1)
         end
     end,
 
-    # Override air destruction effects so we can do something custom here
+    -- Override air destruction effects so we can do something custom here
     CreateUnitAirDestructionEffects = function( self, scale )
         self:ForkThread(self.AirDestructionEffectsThread, self )
     end,

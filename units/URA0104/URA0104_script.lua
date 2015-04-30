@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/URA0104/URA0104_script.lua
-#**  Author(s):  John Comes, David Tomandl
-#**
-#**  Summary  :  Cybran T2 Air Transport Script
-#**
-#**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/URA0104/URA0104_script.lua
+--**  Author(s):  John Comes, David Tomandl
+--**
+--**  Summary  :  Cybran T2 Air Transport Script
+--**
+--**  Copyright Â© 2006 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
 local explosion = import('/lua/defaultexplosions.lua')
@@ -29,7 +29,7 @@ URA0104 = Class(CAirUnit) {
 
     BeamExhaustIdle = '/effects/emitters/missile_exhaust_fire_beam_05_emit.bp',
     BeamExhaustCruise = '/effects/emitters/missile_exhaust_fire_beam_04_emit.bp',
-    
+
     OnCreate = function( self )
         CAirUnit.OnCreate(self)
         if not self.OpenAnim then
@@ -51,22 +51,22 @@ URA0104 = Class(CAirUnit) {
         self.OpenAnim:PlayAnim(self:GetBlueprint().Display.AnimationOpen, false):SetRate(1)
     end,
 
-    # When one of our attached units gets killed, detach it
+    -- When one of our attached units gets killed, detach it
     OnAttachedKilled = function(self, attached)
         attached:DetachFrom()
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
         CAirUnit.OnKilled(self, instigator, type, overkillRatio)
-        # TransportDetachAllUnits takes 1 bool parameter. If true, randomly destroys some of the transported
-        # units, otherwise successfully detaches all.
+        -- TransportDetachAllUnits takes 1 bool parameter. If true, randomly destroys some of the transported
+        -- units, otherwise successfully detaches all.
         self:TransportDetachAllUnits(true)
     end,
 
     OnMotionVertEventChange = function(self, new, old)
-        #LOG( 'OnMotionVertEventChange, new = ', new, ', old = ', old )
+        --LOG( 'OnMotionVertEventChange, new = ', new, ', old = ', old )
         CAirUnit.OnMotionVertEventChange(self, new, old)
-        #Aborting a landing
+        --Aborting a landing
         if ((new == 'Top' or new == 'Up') and old == 'Down') then
             self.AnimManip:SetRate(-1)
         elseif (new == 'Down') then
@@ -76,7 +76,7 @@ URA0104 = Class(CAirUnit) {
         end
     end,
 
-    # Override air destruction effects so we can do something custom here
+    -- Override air destruction effects so we can do something custom here
     CreateUnitAirDestructionEffects = function( self, scale )
         self:ForkThread(self.AirDestructionEffectsThread, self )
     end,

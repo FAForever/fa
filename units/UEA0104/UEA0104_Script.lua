@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UEA0104/UEA0104_script.lua
-#**  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Gordon Duclos, Andres Mendez
-#**
-#**  Summary  :  UEF T2 Transport Script
-#**
-#**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UEA0104/UEA0104_script.lua
+--**  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Gordon Duclos, Andres Mendez
+--**
+--**  Summary  :  UEF T2 Transport Script
+--**
+--**  Copyright Â© 2006 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local explosion = import('/lua/defaultexplosions.lua')
 local util = import('/lua/utilities.lua')
@@ -39,14 +39,14 @@ UEA0104 = Class(TAirUnit) {
         TAirUnit.OnStopBeingBuilt(self,builder,layer)
         self.EngineManipulators = {}
 
-        # create the engine thrust manipulators
+        -- create the engine thrust manipulators
         for k, v in self.EngineRotateBones do
             table.insert(self.EngineManipulators, CreateThrustController(self, "thruster", v))
         end
 
-        # set up the thursting arcs for the engines
+        -- set up the thursting arcs for the engines
         for keys,values in self.EngineManipulators do
-            #                      XMAX,XMIN,YMAX,YMIN,ZMAX,ZMIN, TURNMULT, TURNSPEED
+            --                      XMAX,XMIN,YMAX,YMIN,ZMAX,ZMIN, TURNMULT, TURNSPEED
             values:SetThrustingParam( -0.25, 0.25, -0.75, 0.75, -0.0, 0.0, 1.0, 0.25 )
         end
 
@@ -57,15 +57,15 @@ UEA0104 = Class(TAirUnit) {
         self:ForkThread(self.ExpandThread)
     end,
 
-    # When one of our attached units gets killed, detach it
+    -- When one of our attached units gets killed, detach it
     OnAttachedKilled = function(self, attached)
         attached:DetachFrom()
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
         TAirUnit.OnKilled(self, instigator, type, overkillRatio)
-        # TransportDetachAllUnits takes 1 bool parameter. If true, randomly destroys some of the transported
-        # units, otherwise successfully detaches all.
+        -- TransportDetachAllUnits takes 1 bool parameter. If true, randomly destroys some of the transported
+        -- units, otherwise successfully detaches all.
         self:TransportDetachAllUnits(true)
     end,
 
@@ -78,7 +78,7 @@ UEA0104 = Class(TAirUnit) {
         end
     end,
 
-    # Override air destruction effects so we can do something custom here
+    -- Override air destruction effects so we can do something custom here
     CreateUnitAirDestructionEffects = function( self, scale )
         self:ForkThread(self.AirDestructionEffectsThread, self )
     end,
@@ -93,7 +93,7 @@ UEA0104 = Class(TAirUnit) {
 
     OnCreate = function(self)
         TAirUnit.OnCreate(self)
-        #CreateSlider(unit, bone, [goal_x, goal_y, goal_z, [speed,
+        --CreateSlider(unit, bone, [goal_x, goal_y, goal_z, [speed,
         self.Sliders = {}
         self.Sliders[1] = CreateSlider(self, 'Char01')
         self.Sliders[1]:SetGoal(0, 0, -35)

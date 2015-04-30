@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/units/XEA0306/XEA0306_script.lua
-#**  Author(s):  Jessica St. Croix
-#**
-#**  Summary  :  UEF Heavy Air Transport Script
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/units/XEA0306/XEA0306_script.lua
+--**  Author(s):  Jessica St. Croix
+--**
+--**  Summary  :  UEF Heavy Air Transport Script
+--**
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local explosion = import('/lua/defaultexplosions.lua')
 local util = import('/lua/utilities.lua')
@@ -38,10 +38,10 @@ XEA0306 = Class(TAirUnit) {
 
     DestructionTicks = 250,
     EngineRotateBones = {'FrontRight_Engine', 'FrontLeft_Engine', 'BackRight_Engine', 'BackLeft_Engine', },
-    
+
     OnCreate = function(self)
         TAirUnit.OnCreate(self)
-        
+
         self.UnfoldAnim = CreateAnimator(self)
         self.UnfoldAnim:PlayAnim('/units/xea0306/xea0306_aunfold.sca')
         self.UnfoldAnim:SetRate(0)
@@ -50,17 +50,17 @@ XEA0306 = Class(TAirUnit) {
     OnStopBeingBuilt = function(self,builder,layer)
         TAirUnit.OnStopBeingBuilt(self,builder,layer)
         self.EngineManipulators = {}
-        
+
         self.UnfoldAnim:SetRate(1)
-        
-        # create the engine thrust manipulators
+
+        -- create the engine thrust manipulators
         for k, v in self.EngineRotateBones do
             table.insert(self.EngineManipulators, CreateThrustController(self, "thruster", v))
         end
 
-        # set up the thursting arcs for the engines
+        -- set up the thursting arcs for the engines
         for keys,values in self.EngineManipulators do
-            #                      XMAX,XMIN,YMAX,YMIN,ZMAX,ZMIN, TURNMULT, TURNSPEED
+            --                      XMAX,XMIN,YMAX,YMIN,ZMAX,ZMIN, TURNMULT, TURNSPEED
             values:SetThrustingParam( -0.25, 0.25, -0.75, 0.75, -0.0, 0.0, 1.0, 0.25 )
         end
 
@@ -69,10 +69,9 @@ XEA0306 = Class(TAirUnit) {
         self.Trash:Add(self.LandingAnimManip)
         self.LandingAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationLand):SetRate(1)
     end,
-	
---Shielding Fix moved functionally to Unit.lua and Shield.lua
-	
-    # When one of our attached units gets killed, detach it
+
+    --Shielding Fix moved functionally to Unit.lua and Shield.lua
+    -- When one of our attached units gets killed, detach it
     OnAttachedKilled = function(self, attached)
         attached:DetachFrom()
     end,
@@ -93,7 +92,7 @@ XEA0306 = Class(TAirUnit) {
         end
     end,
 
-    # Override air destruction effects so we can do something custom here
+    -- Override air destruction effects so we can do something custom here
     CreateUnitAirDestructionEffects = function( self, scale )
         self:ForkThread(self.AirDestructionEffectsThread, self )
     end,
@@ -105,7 +104,7 @@ XEA0306 = Class(TAirUnit) {
             WaitSeconds( util.GetRandomFloat( 0.2, 0.9 ))
         end
     end,
-    
+
     GetUnitSizes = function(self)
         local bp = self:GetBlueprint()
         if self:GetFractionComplete() < 1.0 then
@@ -113,7 +112,7 @@ XEA0306 = Class(TAirUnit) {
         else
             return bp.SizeX, bp.SizeY, bp.SizeZ
         end
-    end,    
+    end,
 }
 
 TypeClass = XEA0306
