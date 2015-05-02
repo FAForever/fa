@@ -5033,6 +5033,10 @@ function InitHostUtils()
         -- @param moveFrom Slot number to move from
         -- @param moveTo Slot number to move to.
         SanityCheckSlotMovement = function(moveFrom, moveTo)
+            if moveFrom == moveTo then
+                LOG("HostUtils.MovePlayerToEmptySlot: Attempt to move player onto themselves")
+            end
+
             if gameInfo.ClosedSlots[moveTo] then
                 LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. moveTo .. " is closed")
                 return false
