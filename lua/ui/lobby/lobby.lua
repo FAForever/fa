@@ -5065,7 +5065,7 @@ function InitHostUtils()
 
             -- This one's only specific to moving to an empty slot, naturally.
             if gameInfo.PlayerOptions[requestedSlot] then
-                LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. moveTo .. " already occupied")
+                LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. requestedSlot .. " already occupied")
                 return false
             end
 
