@@ -2984,17 +2984,16 @@ Unit = Class(moho.unit_methods) {
 
             if not vTypeGroup.Bones or (vTypeGroup.Bones and (table.getn(vTypeGroup.Bones) == 0)) then
                 LOG('*WARNING: No effect bones defined for layer group ',repr(self:GetUnitId()),', Add these to a table in Display.[EffectGroup].', self:GetCurrentLayer(), '.Effects { Bones ={} } in unit blueprint.' )
-                continue
-            end
-
-            for kb, vBone in vTypeGroup.Bones do
-                for ke, vEffect in effects do
-                    emit = CreateAttachedEmitter(self,vBone,army,vEffect):ScaleEmitter(vTypeGroup.Scale or 1)
-                    if vTypeGroup.Offset then
-                        emit:OffsetEmitter(vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0,vTypeGroup.Offset[3] or 0)
-                    end
-                    if EffectBag then
-                        table.insert( EffectBag, emit )
+            else
+                for kb, vBone in vTypeGroup.Bones do
+                    for ke, vEffect in effects do
+                        emit = CreateAttachedEmitter(self,vBone,army,vEffect):ScaleEmitter(vTypeGroup.Scale or 1)
+                        if vTypeGroup.Offset then
+                            emit:OffsetEmitter(vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0,vTypeGroup.Offset[3] or 0)
+                        end
+                        if EffectBag then
+                            table.insert( EffectBag, emit )
+                        end
                     end
                 end
             end
@@ -4219,15 +4218,13 @@ Unit = Class(moho.unit_methods) {
                 local BuffFieldBp = BuffFieldBlueprints[bp.BuffFields[scriptName]]
                 if not BuffFieldBp or type(BuffFieldBp) ~= 'table' then
                     WARN('BuffField: no blueprint data for buff field '..repr(scriptName))
-                    continue
+                else
+                    --We need a different buff field instance for each unit. This takes care of that.
+                    if not self.MyBuffFields then
+                        self.MyBuffFields = {}
+                    end
+                    self.MyBuffFields[scriptName] = self:CreateBuffField(scriptName, BuffFieldBp)
                 end
-
-                --We need a different buff field instance for each unit. This takes care of that.
-                if not self.MyBuffFields then
-                    self.MyBuffFields = {}
-                end
-                self.MyBuffFields[scriptName] = self:CreateBuffField(scriptName, BuffFieldBp)
-
             end
         end
     end,
