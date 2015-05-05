@@ -210,7 +210,7 @@ BuffField = Class(Entity) {
         --LOG('Buffield: ['..repr(self.Name)..'] FieldThread')
         local bp = self:GetBlueprint()
 
-        while self:IsEnabled() and not Owner:IsDead() do
+        while not Owner:IsDead() do
             --LOG('BuffField: ['..repr(self.Name)..'] check new units')
             local units = self.GetNearbyAffectableUnits()
             for k, unit in units do
