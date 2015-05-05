@@ -1219,13 +1219,6 @@ Unit = Class(moho.unit_methods) {
             end
         end
 
-        --Destroy units being built if the Factory constructing them dies
-        if EntityCategoryContains(categories.FACTORY, self) then
-            if self.UnitBeingBuilt and not self.UnitBeingBuilt:IsDead() and self.UnitBeingBuilt:GetFractionComplete() ~= 1 then
-                self.UnitBeingBuilt:Kill()
-            end
-        end
-
         if self.PlayDeathAnimation and not self:IsBeingBuilt() then
             self:ForkThread(self.PlayAnimationThread, 'AnimationDeath')
             self.DisallowCollisions = true
