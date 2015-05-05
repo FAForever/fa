@@ -1193,7 +1193,6 @@ Unit = Class(moho.unit_methods) {
         end
 
         self:DoUnitCallbacks( 'OnKilled' )
-        self:OnKilledVO()
 
         if self.UnitBeingTeleported and not self.UnitBeingTeleported:IsDead() then
             self.UnitBeingTeleported:Destroy()
@@ -1790,34 +1789,6 @@ Unit = Class(moho.unit_methods) {
                 else
                     if bp['NuclearLaunchDetected'] then
                         aiBrain:NuclearLaunchDetected(bp['NuclearLaunchDetected'])
-                    end
-                end
-            end
-        end
-    end,
-
-    OnKilledVO = function(self)
-        local bp = self:GetBlueprint().Audio
-        if bp then
-            for num, aiBrain in ArmyBrains do
-                local factionIndex = aiBrain:GetFactionIndex()
-                if factionIndex == 1 then
-                    if bp['ExperimentalUnitDestroyedUEF'] then
-                        aiBrain:ExperimentalUnitDestroyed(bp['ExperimentalUnitDestroyedUEF'])
-                    elseif bp['BattleshipDestroyedUEF'] then
-                        aiBrain:BattleshipDestroyed(bp['BattleshipDestroyedUEF'])
-                    end
-                elseif factionIndex == 2 then
-                    if bp['ExperimentalUnitDestroyedAeon'] then
-                        aiBrain:ExperimentalUnitDestroyed(bp['ExperimentalUnitDestroyedAeon'])
-                    elseif bp['BattleshipDestroyedAeon'] then
-                        aiBrain:BattleshipDestroyed(bp['BattleshipDestroyedAeon'])
-                    end
-                elseif factionIndex == 3 then
-                    if bp['ExperimentalUnitDestroyedCybran'] then
-                        aiBrain:ExperimentalUnitDestroyed(bp['ExperimentalUnitDestroyedCybran'])
-                    elseif bp['BattleshipDestroyedCybran'] then
-                        aiBrain:BattleshipDestroyed(bp['BattleshipDestroyedCybran'])
                     end
                 end
             end

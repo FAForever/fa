@@ -192,7 +192,6 @@ function OverrideKilled(self, instigator, type, overkillRatio)
         self:ForkThread(self.PlayAnimationThread, 'AnimationDeath')
         self:SetCollisionShape('None')
     end
-    self:OnKilledVO()
     self:DoUnitCallbacks( 'OnKilled' )
     self:DestroyTopSpeedEffects()
 

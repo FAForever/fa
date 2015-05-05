@@ -78,7 +78,6 @@ local VOReplayTime = {
     OnPlayBusyStagingPlatformsVO = 5,
     OnCommanderUnderAttackVO = 15,
     ExperimentalDetected = 60,
-    ExperimentalUnitDestroyed = 5,
     FerryPointSet = 5,
     CoordinatedAttackInitiated = 5,
     BaseUnderAttack = 30,
@@ -87,7 +86,6 @@ local VOReplayTime = {
     NukeArmed = 1,
     NuclearLaunchInitiated = 1,
     NuclearLaunchDetected = 1,
-    BattleshipDestroyed = 5,
     EnemyNavalForcesDetected = 60,
 }
 
@@ -1331,18 +1329,6 @@ AIBrain = Class(moho.aibrain_methods) {
     NuclearLaunchDetected = function(self,sound)
         if self.VOTable and not self.VOTable['NuclearLaunchDetected'] then
             self.VOTable['NuclearLaunchDetected'] = ForkThread(self.PlayVOSound, self, sound, 'NuclearLaunchDetected')
-        end
-    end,
-
-    ExperimentalUnitDestroyed = function(self,sound)
-        if self.VOTable and not self.VOTable['ExperimentalUnitDestroyed'] then
-            self.VOTable['ExperimentalUnitDestroyed'] = ForkThread(self.PlayVOSound, self, sound, 'ExperimentalUnitDestroyed')
-        end
-    end,
-
-    BattleshipDestroyed = function(self,sound)
-        if self.VOTable and not self.VOTable['BattleshipDestroyed'] then
-            self.VOTable['BattleshipDestroyed'] = ForkThread(self.PlayVOSound, self, sound, 'BattleshipDestroyed')
         end
     end,
 
