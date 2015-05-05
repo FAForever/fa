@@ -113,7 +113,6 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         end
 
         # changing owner
-        unit:OnBeforeTransferingOwnership(ToArmyIndex)
         unit = ChangeUnitArmy(unit,ToArmyIndex)
         if not unit then
             continue
@@ -170,7 +169,6 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         if EntityCategoryContains(categories.ENGINEERSTATION, unit) then
             unit:SetPaused(true)
         end
-        unit:OnAfterTransferingOwnership(owner)
     end
     return newUnits
 end
