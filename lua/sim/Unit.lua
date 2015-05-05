@@ -123,32 +123,9 @@ Unit = Class(moho.unit_methods) {
             ProjectileDamaged = {},
             SpecialToggleEnableFunction = false,
             SpecialToggleDisableFunction = false,
-            OnCreated = {},
-            OnTransportAttach = {},
-            OnTransportDetach = {},
-            OnShieldIsUp = {},
-            OnShieldIsDown = {},
-            OnShieldIsCharging = {},
-            OnPaused = {},  --Triggered by the pause button
-            OnUnpaused = {},
-            OnProductionPaused = {}, --Production toggle for Mass Fabricators etc
-            OnProductionUnpaused = {},
-            OnTMLAmmoIncrease = {}, --Use AddOnMLammoIncreaseCallback function. Uses 6 sec interval polling so not accurate
-            OnTMLaunched = {},
-            OnSMLAmmoIncrease = {}, --Use AddOnMLammoIncreaseCallback function. Uses 6 sec interval polling so not accurate
-            OnSMLaunched = {},
-            OnStartRefueling = {},
-            OnRunOutOfFuel = {},
-            OnGotFuel = {}, --Fires when the meter isn't empty any more.
-            OnCmdrUpgradeFinished = {}, --Triggers on Commander unit upgrade
-            OnCmdrUpgradeStart = {},
-            OnTeleportCharging = {}, --Returns self, location
-            OnTeleported = {}, --Returns self, location
-            OnTimedEvent = {}, --Returns self, variable (Can be anything, value is determined when adding event callback)
+
             OnAttachedToTransport = {}, --Returns self, transport
             OnDetachedToTransport = {}, --Returns self, transport
-            OnBeforeTransferingOwnership = {},
-            OnAfterTransferingOwnership = {},
         }
     end,
 
@@ -624,7 +601,6 @@ Unit = Class(moho.unit_methods) {
     OnPaused = function(self)
         self:SetActiveConsumptionInactive()
         self:StopUnitAmbientSound( 'ConstructLoop' )
-        self:DoUnitCallbacks('OnPaused')
     end,
 
     OnUnpaused = function(self)
@@ -632,7 +608,6 @@ Unit = Class(moho.unit_methods) {
             self:SetActiveConsumptionActive()
             self:PlayUnitAmbientSound( 'ConstructLoop' )
         end
-        self:DoUnitCallbacks('OnUnpaused')
     end,
 
     EnableSpecialToggle = function(self)
@@ -872,15 +847,11 @@ Unit = Class(moho.unit_methods) {
     OnProductionPaused = function(self)
         self:SetMaintenanceConsumptionInactive()
         self:SetProductionActive(false)
-        --Added by brute51
-        self:DoUnitCallbacks('OnProductionPaused')
     end,
 
     OnProductionUnpaused = function(self)
         self:SetMaintenanceConsumptionActive()
         self:SetProductionActive(true)
-        --Added by brute51
-        self:DoUnitCallbacks('OnProductionUnpaused')
     end,
 
     SetBuildTimeMultiplier = function(self, time_mult)
@@ -3190,21 +3161,15 @@ Unit = Class(moho.unit_methods) {
 
     OnStartRefueling = function(self)
         self:PlayUnitSound('Refueling')
-        --Added by brute51
-        self:DoUnitCallbacks('OnStartRefueling')
     end,
 
     OnRunOutOfFuel = function(self)
         self.HasFuel = false
         self:DestroyTopSpeedEffects()
-        --Added by brute51
-        self:DoUnitCallbacks('OnRunOutOfFuel')
     end,
 
     OnGotFuel = function(self)
         self.HasFuel = true
-        --Added by brute51
-        self:DoUnitCallbacks('OnGotFuel')
     end,
 
     GetWeaponClass = function(self, label)
@@ -3476,8 +3441,6 @@ Unit = Class(moho.unit_methods) {
 
     WorkingState = State {
         Main = function(self)
-            --Added by brute51
-            self:OnCmdrUpgradeStart()
             while self.WorkProgress < 1 and not self:IsDead() do
                 WaitSeconds(0.1)
             end
@@ -3493,8 +3456,6 @@ Unit = Class(moho.unit_methods) {
             self:StopUnitAmbientSound('EnhanceLoop')
             self:EnableDefaultToggleCaps()
             ChangeState(self, self.IdleState)
-            --Added by brute51
-            self:OnCmdrUpgradeFinished()
         end,
     },
 
@@ -3929,7 +3890,6 @@ Unit = Class(moho.unit_methods) {
         end
         --Added by brute51
         unit:OnAttachedToTransport(self, attachBone)
-        self:DoUnitCallbacks( 'OnTransportAttach', unit )
     end,
 
     OnTransportDetach = function(self, attachBone, unit)
@@ -3943,7 +3903,6 @@ Unit = Class(moho.unit_methods) {
         end
         unit:TransportAnimation(-1)
         unit:OnDetachedToTransport(self)
-        self:DoUnitCallbacks( 'OnTransportDetach', unit )
     end,
 
     --This function is called from Shield.lua to tell the unit when the protection status changes
@@ -4181,9 +4140,7 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    OnCreated = function(self)
-        self:DoUnitCallbacks('OnCreated')
-    end,
+    OnCreated = function(self) end,
 
     --Buff Fields
     InitBuffFields = function(self)
@@ -4263,17 +4220,7 @@ Unit = Class(moho.unit_methods) {
 
     end,
 
-    OnTimedEvent = function(self, interval, passData)
-        self:DoOnTimedEventCallbacks(interval, passData)
-    end,
-
-    OnBeforeTransferingOwnership = function(self, ToArmy)
-        self:DoUnitCallbacks('OnBeforeTransferingOwnership')
-    end,
-
-    OnAfterTransferingOwnership = function(self, FromArmy)
-        self:DoUnitCallbacks('OnAfterTransferingOwnership')
-    end,
+    OnTimedEvent = function(self, interval, passData) end,
 
     OnCountedMissileLaunch = function(self, missileType)
         --Called in defaultweapons.lua when a counted missile (tactical, nuke) is launched
@@ -4284,13 +4231,8 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    OnTMLaunched = function(self)
-        self:DoUnitCallbacks('OnTMLaunched')
-    end,
-
-    OnSMLaunched = function(self)
-        self:DoUnitCallbacks('OnSMLaunched')
-    end,
+    OnTMLaunched = function(self) end,
+    OnSMLaunched = function(self) end,
 
     --Be sure to fork this
     CheckCountedMissileAmmoIncrease = function(self)
@@ -4317,62 +4259,16 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    OnTMLAmmoIncrease = function(self)
-        self:DoUnitCallbacks('OnTMLAmmoIncrease')
-    end,
-
-    OnSMLAmmoIncrease = function(self)
-        self:DoUnitCallbacks('OnSMLAmmoIncrease')
-    end,
-
-    AddOnMLammoIncreaseCallback = function(self, fn) --Specialized because this starts the ammo check thread
-        if not fn then
-            error('*ERROR: Tried to add a callback type - OnTMLAmmoIncrease with a nil function')
-            return
-        end
-        table.insert( self.EventCallbacks.OnTMLAmmoIncrease, fn )
-        if not self.MLAmmoCheckThread then
-            self.MLAmmoCheckThread = self:ForkThread(self.CheckCountedMissileAmmoIncrease)
-        end
-    end,
-
-    AddOnTimedEventCallback = function(self, fn, interval, passData)
-        --Specialized because this starts a timed event thread (interval = seconds between events, passData can be
-        --anything, is passed to callback when event is fired)
-        if not fn then
-            error('*ERROR: Tried to add a callback type - OnTimedEvent with a nil function')
-            return
-        end
-        table.insert( self.EventCallbacks.OnTimedEvent, {fn = fn, interval = interval} )
-        self:ForkThread(self.TimedEventThread, interval, passData)
-    end,
-
-    DoOnTimedEventCallbacks = function(self, interval, passData)
-        local type = 'OnTimedEvent'
-        if ( self.EventCallbacks[type] ) then
-            for num,cb in self.EventCallbacks[type] do
-                if cb and cb['fn'] and cb['interval'] == interval then
-                    cb['fn']( self, passData )
-                end
-            end
-        end
-    end,
+    OnTMLAmmoIncrease = function(self) end,
+    OnSMLAmmoIncrease = function(self) end,
 
     -------------------------------------------------------------------------------------------
     -- SHIELDS
     -------------------------------------------------------------------------------------------
     -- Added by brute51, fires shield events for units. The other shield events don't run at the correct times (Too early)
-    OnShieldIsUp = function(self)
-        self:DoUnitCallbacks('OnShieldIsUp')
-    end,
-
-    OnShieldIsDown = function(self)
-        self:DoUnitCallbacks('OnShieldIsDown')
-    end,
-
-    OnShieldIsCharging = function(self)
-        self:DoUnitCallbacks('OnShieldIsCharging')
-    end,
+    OnShieldIsUp = function(self) end,
+    OnShieldIsDown = function(self) end,
+    OnShieldIsCharging = function(self) end,
 
     OnAttachedToTransport = function(self, transport, bone)
 
@@ -4398,27 +4294,8 @@ Unit = Class(moho.unit_methods) {
     end,
 
 
-    OnTeleportCharging = function(self, location)
-        self:DoUnitCallbacks('OnTeleportCharging', location)
-    end,
-
-    OnTeleported = function(self, location)
-        self:DoUnitCallbacks('OnTeleported', self, location)
-    end,
-
-    -------------------------------------------------------------------------------------------
-    -- COMMANDER ENHANCING
-    -------------------------------------------------------------------------------------------
-    -- Events that happen when a commander unit (ACU or SCU) is enhanced with a new toy
-
-    OnCmdrUpgradeFinished = function(self)
-        self:DoUnitCallbacks('OnCmdrUpgradeFinished')
-    end,
-
-    OnCmdrUpgradeStart = function(self)
-        self:DoUnitCallbacks('OnCmdrUpgradeStart')
-    end,
-
+    OnTeleportCharging = function(self, location) end,
+    OnTeleported = function(self, location)  end,
 
     OnShieldEnabled = function(self)
         WARN("Deprecated function unit:OnShieldEnabled() called")
