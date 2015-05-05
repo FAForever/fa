@@ -806,8 +806,8 @@ FactoryUnit = Class(StructureUnit) {
 
     OnKilled = function(self, instigator, type, overkillRatio)
         StructureUnit.OnKilled(self, instigator, type, overkillRatio)
-        if self.UnitBeingBuilt then
-            self.UnitBeingBuilt:Destroy()
+        if self.UnitBeingBuilt and not self.UnitBeingBuilt:IsDead() and self.UnitBeingBuilt:GetFractionComplete() ~= 1 then
+            self.UnitBeingBuilt:Kill()
         end
     end,
 }
