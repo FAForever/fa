@@ -165,7 +165,7 @@ BuffField = Class(Entity) {
     end,
 
     IsEnabled = function(self)
-        return self.Enabled or false
+        return self.Enabled
     end,
 
     GetBuffs = function(self)
