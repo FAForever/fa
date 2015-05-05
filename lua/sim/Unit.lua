@@ -133,7 +133,6 @@ Unit = Class(moho.unit_methods) {
             OnUnpaused = {},
             OnProductionPaused = {}, --Production toggle for Mass Fabricators etc
             OnProductionUnpaused = {},
-            OnHealthChanged = {}, --Returns self, newHP, oldHP
             OnTMLAmmoIncrease = {}, --Use AddOnMLammoIncreaseCallback function. Uses 6 sec interval polling so not accurate
             OnTMLaunched = {},
             OnSMLAmmoIncrease = {}, --Use AddOnMLammoIncreaseCallback function. Uses 6 sec interval polling so not accurate
@@ -1160,8 +1159,6 @@ Unit = Class(moho.unit_methods) {
 
     OnHealthChanged = function(self, new, old)
         self:ManageDamageEffects(new, old)
-        --Added by brute51
-        self:DoOnHealthChangedCallbacks(self, new, old)
     end,
 
     DestroyAllDamageEffects = function(self)
@@ -4333,18 +4330,6 @@ Unit = Class(moho.unit_methods) {
 
     OnSMLAmmoIncrease = function(self)
         self:DoUnitCallbacks('OnSMLAmmoIncrease')
-    end,
-
-    --Use addunitcallback and dounitcallback for normal callback handling. These are special cases
-    DoOnHealthChangedCallbacks = function(self, newHP, oldHP)
-        local type = 'OnHealthChanged'
-        if ( self.EventCallbacks[type] ) then
-            for num,cb in self.EventCallbacks[type] do
-                if cb then
-                    cb( self, newHP, oldHP )
-                end
-            end
-        end
     end,
 
     AddOnMLammoIncreaseCallback = function(self, fn) --Specialized because this starts the ammo check thread
