@@ -1576,7 +1576,6 @@ AirUnit = Class(MobileUnit) {
             self.OverKillRatio = overkillRatio
             self:PlayUnitSound('Killed')
             self:DoUnitCallbacks('OnKilled')
-            self:OnKilledVO()
             if instigator and IsUnit(instigator) then
                 instigator:OnKilledUnit(self)
             end
