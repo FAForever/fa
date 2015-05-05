@@ -243,17 +243,16 @@ BuffField = Class(Entity) {
             --LOG('BuffField: ['..repr(self.Name)..'] check new units')
             local units = self.GetNearbyAffectableUnits()
             for k, unit in units do
-                if unit == Owner and not bp.AffectsSelf then
-                   continue
-                end
-                if not unit.HasBuffFieldThreadHandle[bp.Name] then
-                    if type(unit.HasBuffFieldThreadHandle) ~= 'table' then
-                        unit.HasBuffFieldThreadHandle = {}
-                        unit.BuffFieldThreadHandle = {}
+                if unit ~= Owner or bp.AffectsSelf then
+                    if not unit.HasBuffFieldThreadHandle[bp.Name] then
+                        if type(unit.HasBuffFieldThreadHandle) ~= 'table' then
+                            unit.HasBuffFieldThreadHandle = {}
+                            unit.BuffFieldThreadHandle = {}
+                        end
+                        --LOG('BuffField: ['..repr(self.Name)..'] new unit')
+                        unit.BuffFieldThreadHandle[bp.Name] = unit:ForkThread(self.UnitBuffFieldThread, Owner, self)
+                        unit.HasBuffFieldThreadHandle[bp.Name] = true
                     end
-                    --LOG('BuffField: ['..repr(self.Name)..'] new unit')
-                    unit.BuffFieldThreadHandle[bp.Name] = unit:ForkThread(self.UnitBuffFieldThread, Owner, self)
-                    unit.HasBuffFieldThreadHandle[bp.Name] = true
                 end
             end
             self:OnNewUnitsInFieldCheck()
