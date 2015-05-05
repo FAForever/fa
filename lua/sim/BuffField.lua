@@ -7,9 +7,7 @@
 --**
 --****************************************************************************
 
-local AIUtils = import('/lua/ai/aiutilities.lua')
 local Buff = import('/lua/sim/Buff.lua')
-local BuffDefinitions = import('/lua/sim/BuffDefinitions.lua')
 local Entity = import('/lua/sim/Entity.lua').Entity
 
 BuffFieldBlueprints = {
