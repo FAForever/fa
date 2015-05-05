@@ -507,11 +507,10 @@ StructureUnit = Class(Unit) {
 ---------------------------------------------------------------
 FactoryUnit = Class(StructureUnit) {
     OnCreate = function(self)
-
-    -- Engymod addition: If a normal factory is created, we should check for research stations
-    if EntityCategoryContains(categories.FACTORY, self) then
-       self:updateBuildRestrictions()
-    end
+        -- Engymod addition: If a normal factory is created, we should check for research stations
+        if EntityCategoryContains(categories.FACTORY, self) then
+           self:updateBuildRestrictions()
+        end
 
         StructureUnit.OnCreate(self)
         self.BuildingUnit = false
@@ -521,15 +520,15 @@ FactoryUnit = Class(StructureUnit) {
     OnDestroy = function(self)
         -- Figure out if we're a research station
         if EntityCategoryContains(categories.RESEARCH, self) then
-        local aiBrain = self:GetAIBrain()
-        local buildRestrictionVictims = aiBrain:GetListOfUnits(categories.FACTORY+categories.ENGINEER, false)
+            local aiBrain = self:GetAIBrain()
+            local buildRestrictionVictims = aiBrain:GetListOfUnits(categories.FACTORY+categories.ENGINEER, false)
 
-        for id, unit in buildRestrictionVictims do
-            unit:updateBuildRestrictions()
+            for id, unit in buildRestrictionVictims do
+                unit:updateBuildRestrictions()
+            end
         end
-    end
 
-    StructureUnit.OnDestroy(self)
+        StructureUnit.OnDestroy(self)
     end,
 
     OnPaused = function(self)
