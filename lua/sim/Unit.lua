@@ -2680,14 +2680,8 @@ Unit = Class(moho.unit_methods) {
         local layer = self:GetCurrentLayer()
 
         if ( old == 'Stopped' or (old == 'Stopping' and (new == 'Cruise' or new == 'TopSpeed'))) then
-            --This will play the first appropriate StartMove sound that it finds
-            if not (
-                (layer == 'Water' and self:PlayUnitSound('StartMoveWater')) or
-                (layer == 'Sub' and self:PlayUnitAmbientSound('StartMoveSub')) or
-                (layer == 'Land' and self:PlayUnitSound('StartMoveLand')) or
-                (layer == 'Air' and self:PlayUnitSound('StartMoveAir'))
-                )
-            then
+            -- Try the specialised sound, fall back to the general one.
+            if not self:PlayUnitSound('StartMove' .. layer) then
                 self:PlayUnitSound('StartMove')
             end
 
@@ -2707,19 +2701,13 @@ Unit = Class(moho.unit_methods) {
         end
 
         if ((new == 'Stopped' or new == 'Stopping') and (old == 'Cruise' or old == 'TopSpeed')) then
-            --This will play the first appropriate StopMove sound that it finds
-            if not (
-                (layer == 'Water' and self:PlayUnitSound('StopMoveWater')) or
-                (layer == 'Sub' and self:PlayUnitSound('StopMoveSub')) or
-                (layer == 'Land' and self:PlayUnitSound('StopMoveLand')) or
-                (layer == 'Air' and self:PlayUnitSound('StopMoveAir'))
-                )
-            then
+            -- Try the specialised sound, fall back to the general one.
+            if not self:PlayUnitSound('StopMove' .. layer) then
                 self:PlayUnitSound('StopMove')
             end
 
             --Units in the water will rock back and forth a bit
-            if ( layer == 'Water' ) then
+            if layer == 'Water' then
                 self:StartRocking()
             end
         end
