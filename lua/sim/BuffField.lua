@@ -132,6 +132,52 @@ BuffField = Class(Entity) {
             return
         end
 
+        -- Set up the get-nearby-units function to include the units we care about.
+        local aiBrain = Owner:GetAIBrain()
+        local pos = Owner:GetPosition()
+        local AffectsUnitCategories = bp.AffectsUnitCategories
+        local Radius = bp.Radius
+
+        if bp.AffectsOwnUnits and bp.AffectsAllies and bp.AffectsVisibleEnemies then
+            -- Affect *all* the things!
+            self.GetNearbyAffectableUnits = function()
+                return aiBrain:GetUnitsAroundPoint(AffectsUnitCategories, pos, Radius)
+            end
+        elseif bp.AffectsOwnUnits and bp.AffectsAllies then
+            -- All friendlies, no enemies.
+            self.GetNearbyAffectableUnits = function()
+                return aiBrain:GetUnitsAroundPoint(AffectsUnitCategories, pos, Radius, 'Ally')
+            end
+        elseif bp.AffectsOwnUnits and bp.AffectsVisibleEnemies then
+            -- Self and enemies, not allies.
+            self.GetNearbyAffectableUnits = function()
+                return table.merged(
+                    aiBrain:GetOwnUnitsAroundPoint(AffectsUnitCategories, pos, Radius, 'Ally'),
+                    aiBrain:GetUnitsAroundPoint(AffectsUnitCategories, pos, Radius, 'Enemy')
+                )
+            end
+        elseif bp.AffectsOwnUnits then
+            -- Own units only.
+            self.GetNearbyAffectableUnits = function()
+                return aiBrain:GetOwnUnitsAroundPoint(AffectsUnitCategories, pos, Radius)
+            end
+        elseif bp.AffectsVisibleEnemies then
+            -- Enemies units only.
+            self.GetNearbyAffectableUnits = function()
+                return aiBrain:GetUnitsAroundPoint(AffectsUnitCategories, pos, Radius, 'Enemy')
+            end
+        elseif bp.AffectsAllies then
+            -- Allies only. This wasn't supported before and is stupid anyway, but until we change
+            -- the configuration so it's unrepresentable let's do it anyway...
+            self.GetNearbyAffectableUnits = function()
+                local mine = aiBrain:GetOwnUnitsAroundPoint(AffectsUnitCategories, pos, Radius, 'Enemy')
+                local allied = aiBrain:GetUnitsAroundPoint(AffectsUnitCategories, pos, Radius, 'Ally')
+
+                -- Subtract mine from allied and you get the allies only.
+                return table.subtract(allied, mine)
+            end
+        end
+
         -- event stuff
         Entity.OnCreate(self)
 
@@ -193,26 +239,9 @@ BuffField = Class(Entity) {
         --LOG('Buffield: ['..repr(self.Name)..'] FieldThread')
         local bp = self:GetBlueprint()
 
-        local function GetNearbyAffectableUnits()
-            local units = {}
-            local aiBrain = Owner:GetAIBrain()
-            local pos = Owner:GetPosition()
-            if bp.AffectsOwnUnits then
-                units = table.merged(units, AIUtils.GetOwnUnitsAroundPoint(Owner:GetAIBrain(), bp.AffectsUnitCategories, pos, bp.Radius))
-            end
-            if bp.AffectsAllies then
-                units = table.merged(units, aiBrain:GetUnitsAroundPoint( bp.AffectsUnitCategories, pos, bp.Radius, 'Ally' ))
-                -- civilians are not considered allies
-            end
-            if bp.AffectsVisibleEnemies then
-                units = table.merged(units, aiBrain:GetUnitsAroundPoint( bp.AffectsUnitCategories, pos, bp.Radius, 'Enemy' ))
-            end
-            return units
-        end
-
         while self:IsEnabled() and not Owner:IsDead() do
             --LOG('BuffField: ['..repr(self.Name)..'] check new units')
-            local units = GetNearbyAffectableUnits()
+            local units = self.GetNearbyAffectableUnits()
             for k, unit in units do
                 if unit == Owner and not bp.AffectsSelf then
                    continue

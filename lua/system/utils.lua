@@ -165,6 +165,15 @@ function table.assimilate(t1, t2)
     return t1
 end
 
+--- Remove all keys in t2 from t2.
+function table.subtract(t1, t2)
+    for k, v in t2 do
+        t1[k] = nil
+    end
+
+    return t1
+end
+
 --==============================================================================
 -- table.cat(t1, t2) performs a shallow "merge" of t1 and t2, where t1 and t2
 -- are expected to be numerically keyed (existing keys are discarded).
