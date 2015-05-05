@@ -65,35 +65,6 @@ BuffField = Class(Entity) {
         end
     end,
 
-    OnNewUnitsInFieldCheck = function(self)
-        -- fires when another check is done to find new units in range that aren't yet under the influence of the
-        -- field. This happens approximately every 4.9 seconds.
-    end,
-
-    OnPreUnitEntersField = function(self, unit)
-        -- fired before unit receives the buffs, but it will. Any data returned by this event function is used as an
-        -- argument for OnUnitEntersField, OnPreUnitLeavesField and OnUnitLeavesField
-    end,
-
-    OnUnitEntersField = function(self, unit, OnPreUnitEntersFieldData)
-        -- fired when a new unit begins being affected by the field. the unit argument contains the newly affected 
-        -- unit. The OnPreUnitEntersFieldData argument is the data (if any) returned by OnPreUnitEntersField. Any
-        -- data returned by this event function is used as an argument for OnPreUnitLeavesField and
-        -- OnUnitLeavesField
-    end,
-
-    OnPreUnitLeavesField = function(self, unit, OnPreUnitEntersFieldData, OnUnitEntersFieldData)
-        -- fired when a unit leaves the field, just before the field buffs are removed. The OnPreUnitEntersFieldData
-        -- argument is the data (if any) returned by OnPreUnitEntersField and the OnUnitEntersFieldData argument
-        -- is the data (if any) returned by OnUnitEntersField. Any data returned by this event function is used as 
-        -- an argument for OnUnitLeavesField.
-    end,
-
-    OnUnitLeavesField = function(self, unit, OnPreUnitEntersFieldData, OnUnitEntersFieldData, OnPreUnitLeavesField)
-        -- fired after a unit left the field and the field buffs have been removed. the last 3 arguments contain
-        -- data returned by the other events.
-    end,
-
     -- ----------------------------------------------------------------------------------------------------------
     -- ACTUAL CODE (dont change anything)
 
@@ -266,11 +237,9 @@ BuffField = Class(Entity) {
 
     UnitBuffFieldThread = function(self, instigator, BuffField)
         local bp = BuffField:GetBlueprint()
-        local PreEnterData = BuffField:OnPreUnitEntersField(self)
         for _, buff in bp.Buffs do
             Buff.ApplyBuff(self, buff)
         end
-        local EnterData = BuffField:OnUnitEntersField(self, PreEnterData)
         while not self:IsDead() and not instigator:IsDead() and BuffField:IsEnabled() do
             --LOG('BuffField: ['..repr(bp.Name)..'] unit thread check distance')
             dist = VDist3( self:GetPosition(), instigator:GetPosition() )
@@ -279,13 +248,11 @@ BuffField = Class(Entity) {
             end
             WaitSeconds(5)
         end
-        local PreLeaveData = BuffField:OnPreUnitLeavesField(self, PreEnterData, EnterData)
         for _, buff in bp.Buffs do
             if Buff.HasBuff(self, buff) then
                 Buff.RemoveBuff( self, buff)
             end
         end
-        BuffField:OnUnitLeavesField(self, PreEnterData, EnterData, PreLeaveData)
         self.HasBuffFieldThreadHandle[bp.Name] = false
         --LOG('BuffField: ['..repr(bp.Name)..'] end unit thread')
     end,
