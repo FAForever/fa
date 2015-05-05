@@ -85,6 +85,12 @@ BuffField = Class(Entity) {
         if type(bp.AffectsUnitCategories) == 'string' then bp.AffectsUnitCategories = ParseEntityCategory(bp.AffectsUnitCategories) end
         if type(bp.Buffs) == 'string' then bp.Buffs = { bp.Buffs } end
         if table.getn(bp.Buffs) < 1 then WARN('BuffField: [..repr(bp.Name)..] no buffs specified!') end
+        if not bp.Duration then
+            WARN('BuffField: [..repr(bp.Name)..] Duration must be specified for a buff field buff.')
+        end
+        if not bp.Stacks ~= "REPLACE" then
+            WARN('BuffField: [..repr(bp.Name)..] You almost certainly want buff fields to be Stack-type REPLACE.')
+        end
 
         for k, v in bp.Buffs do
             if not Buffs[v] then
@@ -201,54 +207,20 @@ BuffField = Class(Entity) {
     -- Owner is the unit that carries the field. This is a bit weird to have it like this but its the result of
     -- of the forkthread in the enable function.
     FieldThread = function(Owner, self)
-        --LOG('Buffield: ['..repr(self.Name)..'] FieldThread')
         local bp = self:GetBlueprint()
 
         while not Owner:IsDead() do
-            --LOG('BuffField: ['..repr(self.Name)..'] check new units')
             local units = self.GetNearbyAffectableUnits()
             for k, unit in units do
                 if unit ~= Owner or bp.AffectsSelf then
-                    if not unit.HasBuffFieldThreadHandle[bp.Name] then
-                        if type(unit.HasBuffFieldThreadHandle) ~= 'table' then
-                            unit.HasBuffFieldThreadHandle = {}
-                            unit.BuffFieldThreadHandle = {}
-                        end
-                        --LOG('BuffField: ['..repr(self.Name)..'] new unit')
-                        unit.BuffFieldThreadHandle[bp.Name] = unit:ForkThread(self.UnitBuffFieldThread, Owner, self)
-                        unit.HasBuffFieldThreadHandle[bp.Name] = true
+                    for _, buff in bp.Buffs do
+                        Buff.ApplyBuff(unit, buff)
                     end
                 end
             end
-            self:OnNewUnitsInFieldCheck()
+
             WaitSeconds(4.9) -- this should be anything but 5 (of the other wait) to help spread the cpu load
         end
-    end,
-
-    -- ============================================================================================
-
-    -- this will be run on the units affected by the field so self means the unit that is affected by the field
-
-    UnitBuffFieldThread = function(self, instigator, BuffField)
-        local bp = BuffField:GetBlueprint()
-        for _, buff in bp.Buffs do
-            Buff.ApplyBuff(self, buff)
-        end
-        while not self:IsDead() and not instigator:IsDead() and BuffField:IsEnabled() do
-            --LOG('BuffField: ['..repr(bp.Name)..'] unit thread check distance')
-            dist = VDist3( self:GetPosition(), instigator:GetPosition() )
-            if dist > bp.Radius then
-                break -- ideally we should check for another nearby buff field emitting unit but it doesn't really matter (no more than 5 sec anyway)
-            end
-            WaitSeconds(5)
-        end
-        for _, buff in bp.Buffs do
-            if Buff.HasBuff(self, buff) then
-                Buff.RemoveBuff( self, buff)
-            end
-        end
-        self.HasBuffFieldThreadHandle[bp.Name] = false
-        --LOG('BuffField: ['..repr(bp.Name)..'] end unit thread')
     end,
 
     -- ============================================================================================
