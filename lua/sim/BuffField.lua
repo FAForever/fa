@@ -6,10 +6,6 @@
 --**  Summary  :  Low level buff field class (version 3)
 --**
 --****************************************************************************
---**
---** READ DOCUMENTATION BEFORE USING THIS!!
---**
---****************************************************************************
 
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local Buff = import('/lua/sim/Buff.lua')
