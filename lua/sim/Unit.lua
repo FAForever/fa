@@ -2682,10 +2682,10 @@ Unit = Class(moho.unit_methods) {
         if ( old == 'Stopped' or (old == 'Stopping' and (new == 'Cruise' or new == 'TopSpeed'))) then
             --This will play the first appropriate StartMove sound that it finds
             if not (
-                ((self:GetCurrentLayer() == 'Water') and self:PlayUnitSound('StartMoveWater')) or
-                ((self:GetCurrentLayer() == 'Sub') and self:PlayUnitAmbientSound('StartMoveSub')) or
-                ((self:GetCurrentLayer() == 'Land') and self:PlayUnitSound('StartMoveLand')) or
-                ((self:GetCurrentLayer() == 'Air') and self:PlayUnitSound('StartMoveAir'))
+                (layer == 'Water' and self:PlayUnitSound('StartMoveWater')) or
+                (layer == 'Sub' and self:PlayUnitAmbientSound('StartMoveSub')) or
+                (layer == 'Land' and self:PlayUnitSound('StartMoveLand')) or
+                (layer == 'Air' and self:PlayUnitSound('StartMoveAir'))
                 )
             then
                 self:PlayUnitSound('StartMove')
@@ -2695,9 +2695,9 @@ Unit = Class(moho.unit_methods) {
             --Note that there is not currently an 'Air' version, and that
             --AmbientMoveWater plays if the unit is in either the Water or Seabed layer.
             if not (
-                (((self:GetCurrentLayer() == 'Water') or (self:GetCurrentLayer() == 'Seabed')) and self:PlayUnitAmbientSound('AmbientMoveWater')) or
-                ((self:GetCurrentLayer() == 'Sub') and self:PlayUnitAmbientSound('AmbientMoveSub')) or
-                ((self:GetCurrentLayer() == 'Land') and self:PlayUnitAmbientSound('AmbientMoveLand'))
+                ((layer == 'Water' or layer == 'Seabed') and self:PlayUnitAmbientSound('AmbientMoveWater')) or
+                (layer == 'Sub' and self:PlayUnitAmbientSound('AmbientMoveSub')) or
+                (layer == 'Land' and self:PlayUnitAmbientSound('AmbientMoveLand'))
                 )
             then
                 self:PlayUnitAmbientSound('AmbientMove')
@@ -2709,17 +2709,17 @@ Unit = Class(moho.unit_methods) {
         if ((new == 'Stopped' or new == 'Stopping') and (old == 'Cruise' or old == 'TopSpeed')) then
             --This will play the first appropriate StopMove sound that it finds
             if not (
-                ((self:GetCurrentLayer() == 'Water') and self:PlayUnitSound('StopMoveWater')) or
-                ((self:GetCurrentLayer() == 'Sub') and self:PlayUnitSound('StopMoveSub')) or
-                ((self:GetCurrentLayer() == 'Land') and self:PlayUnitSound('StopMoveLand')) or
-                ((self:GetCurrentLayer() == 'Air') and self:PlayUnitSound('StopMoveAir'))
+                (layer == 'Water' and self:PlayUnitSound('StopMoveWater')) or
+                (layer == 'Sub' and self:PlayUnitSound('StopMoveSub')) or
+                (layer == 'Land' and self:PlayUnitSound('StopMoveLand')) or
+                (layer == 'Air' and self:PlayUnitSound('StopMoveAir'))
                 )
             then
                 self:PlayUnitSound('StopMove')
             end
 
             --Units in the water will rock back and forth a bit
-            if ( self:GetCurrentLayer() == 'Water' ) then
+            if ( layer == 'Water' ) then
                 self:StartRocking()
             end
         end
