@@ -10,6 +10,7 @@ Changelog for patch 3641
 - Shield disruptor now works on personal shields
 - Fixed wrong consumption when repairing ACU after an upgrade finished
 - Support factories no longer lose progress if they are damaged during upgrade
+- Units with weapon range upgrades now stop at maximum range when using attack-move 
 
 *Enhancements*
 - Scathis now has Amphibious build icon
