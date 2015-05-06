@@ -408,18 +408,15 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             --LOG('*BUFF: EnergyWeapon = ' ..  val)
             
         elseif atype == 'RateOfFire' then
+            local val = BuffCalculate(unit, buffName, 'RateOfFire', 1)
+
             for i = 1, unit:GetWeaponCount() do
                 local wep = unit:GetWeapon(i)
-                local wepbp = wep:GetBlueprint()
-                local weprof = wepbp.RateOfFire
-
-                -- Set new rate of fire based on blueprint rate of fire.=
-                local val = BuffCalculate(unit, buffName, 'RateOfFire', 1)
+                local bp = wep:GetBlueprint()
                 
-                local delay = 1 / wepbp.RateOfFire
-                
-                wep:ChangeRateOfFire( 1 / ( val * delay ) )
-                --LOG('*BUFF: RateOfFire = ' ..  (1 / ( val * delay )) )
+                -- Set new rate of fire based on blueprint rate of fire
+                wep:ChangeRateOfFire(bp.RateOfFire / val)
+                wep.AdjRoFMod = val
             end
 
 

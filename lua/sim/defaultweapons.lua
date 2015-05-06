@@ -57,6 +57,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         end
         
         self.CurrentRackSalvoNumber = 1
+        local rof = self:GetWeaponRoF()
         
         -- Calculate recoil speed so that it finishes returning just as the next shot is ready
         if bp.RackRecoilDistance != 0 then
@@ -67,7 +68,7 @@ DefaultProjectileWeapon = Class(Weapon) {
                     dist = tpDist
                 end
             end
-            self.RackRecoilReturnSpeed = bp.RackRecoilReturnSpeed or math.abs( dist / (( 1 / bp.RateOfFire ) - (bp.MuzzleChargeDelay or 0))) * 1.25
+            self.RackRecoilReturnSpeed = bp.RackRecoilReturnSpeed or math.abs( dist / (( 1 / rof ) - (bp.MuzzleChargeDelay or 0))) * 1.25
         end
         
         -- Ensure firing cycle is compatible internally
@@ -77,7 +78,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         end
         self.NumMuzzles = self.NumMuzzles / table.getn(bp.RackBones)
         local totalMuzzleFiringTime = (self.NumMuzzles - 1) * bp.MuzzleSalvoDelay
-        if totalMuzzleFiringTime > (1 / bp.RateOfFire) then
+        if totalMuzzleFiringTime > (1 / rof) then
             local strg = '*ERROR: The total time to fire muzzles is longer than the RateOfFire allows, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
             error(strg, 2)
             return false
@@ -217,10 +218,16 @@ DefaultProjectileWeapon = Class(Weapon) {
         return weapNRG
     end,
 
-    -- Effect Functions Section
-    -- Play visual effects, animations, recoil etc
+    GetWeaponRoF = function(self)
+        local bp = self:GetBlueprint()
 
-    -- Played when a muzzle is fired. Mostly used for muzzle flashes
+        return bp.RateOfFire / (self.AdjRoFMod or 1)
+    end,
+
+ -- Effect Functions Section
+ -- Play visual effects, animations, recoil etc
+
+ -- Played when a muzzle is fired. Mostly used for muzzle flashes
     PlayFxMuzzleSequence = function(self, muzzle)
         local bp = self:GetBlueprint()
         for k, v in self.FxMuzzleFlash do
@@ -599,8 +606,9 @@ DefaultProjectileWeapon = Class(Weapon) {
         Main = function(self)
             self.unit:SetBusy(true)
             self:DestroyRecoilManips()
-            
-            local bp = self:GetBlueprint()
+
+            local bp = self:GetBlueprint()            
+            local rof = self:GetWeaponRoF()
             local numRackFiring = self.CurrentRackSalvoNumber
             
             --This is done to make sure that when racks should fire together, they do
@@ -609,11 +617,9 @@ DefaultProjectileWeapon = Class(Weapon) {
             end
 
             -- Fork timer counter thread carefully
-            if not self:BeenDestroyed() and
-               not self.unit.Dead then
-                if bp.RenderFireClock and bp.RateOfFire > 0 then
-                    local rof = 1 / bp.RateOfFire
-                    self:ForkThread(self.RenderClockThread, rof)
+            if not self:BeenDestroyed() and not self.unit:IsDead() then
+                if bp.RenderFireClock and rof > 0 then
+                    self:ForkThread(self.RenderClockThread, 1/rof)
                 end
             end
 

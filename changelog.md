@@ -50,6 +50,10 @@ Bugs
 
 - Flares and depth-chages no longer draw in friendly projectiles
 
+- Fixed Adjacency affecting RateOfFire
+
+- Fixed reload bar on units not refilling when RateOfFire has changed
+
 
 Enhancements
 ------------
