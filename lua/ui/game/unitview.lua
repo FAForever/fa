@@ -18,10 +18,10 @@ local Factions = import('/lua/factions.lua')
 local Prefs = import('/lua/user/prefs.lua')
 local EnhancementCommon = import('/lua/enhancementcommon.lua')
 local options = Prefs.GetFromCurrentProfile('options')
+local GetUnitRolloverInfo = import("/modules/selectedinfo.lua").GetUnitRolloverInfo
 
-local rolloverInfo = false
-local consTrue = false
-local focusBool = false
+local selectedUnit = nil
+local updateThread = nil
 
 controls = {}
 
@@ -385,6 +385,8 @@ function UpdateWindow(info)
         elseif not controls.abilities:IsHidden() then
             controls.abilities:Hide()
         end
+
+        import(UIUtil.GetLayoutFilename('unitview')).PositionWindow()
     end
     if options.gui_scu_manager ~= 0 then
         controls.SCUType:Hide()
@@ -508,17 +510,7 @@ function CreateUI()
     end
 
     controls.bg.OnFrame = function(self, delta)
-    local info = GetRolloverInfo()
-        if options.gui_enhanced_unitview ~= 0 then
-            -- If no rollover, then see if we have a single unit selected
-            if not info and import("/modules/selectedinfo.lua").SelectedInfoOn then
-                local selUnits = GetSelectedUnits()
-                if selUnits and table.getn(selUnits) == 1 and import('/lua/ui/game/unitviewDetail.lua').View.Hiding then
-                    info = import("/modules/selectedinfo.lua").GetUnitRolloverInfo(selUnits[1])
-                    --LOG(repr(import('/lua/enhancementcommon.lua').GetEnhancements(info.entityId)))
-                end
-            end
-        end
+        --[[
 
         if info then
             UpdateWindow(info)
@@ -528,8 +520,8 @@ function CreateUI()
             import(UIUtil.GetLayoutFilename('unitview')).PositionWindow()
         elseif self:GetAlpha() > 0 then
             self:SetAlpha(math.max(self:GetAlpha() - (delta*3), 0), true)
-
         end
+        ]]
     end
 
     if options.gui_scu_manager ~= 0 then
@@ -538,4 +530,46 @@ function CreateUI()
         LayoutHelpers.AtBottomIn(controls.SCUType, controls.icon)
     end
 
+    controls.bg:Hide()
 end
+
+function UpdateUnitInfo()
+    local currentInfo = GetRolloverInfo() or (selectedUnit and GetUnitRolloverInfo(selectedUnit))
+
+    if currentInfo and table.getsize(currentInfo) > 0 then
+        controls.bg:Show()
+        UpdateWindow(currentInfo)
+
+        if not updateThread then
+            updateThread = ForkThread(function()
+                while currentInfo do
+                    WaitSeconds(.1)
+                    UpdateUnitInfo()
+                end
+            end)
+        end
+    else
+        if updateThread then
+            KillThread(updateThread)
+            updateThread = nil
+        end
+
+        currentInfo = nil
+        controls.bg:Hide()
+    end
+end
+
+function OnSelection(units)
+    if units and table.getn(units) == 1 and import('/lua/ui/game/unitviewDetail.lua').View.Hiding then
+        selectedUnit = units[1]
+    else
+        selectedUnit = nil
+    end
+
+    UpdateUnitInfo()
+end
+
+function OnRolloverUpdate(info)
+    UpdateUnitInfo()
+end
+

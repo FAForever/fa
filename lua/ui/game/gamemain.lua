@@ -446,6 +446,8 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
             end
         end
     end
+
+    import('/lua/ui/game/unitview.lua').OnSelection(newSelection)
 end
 
 function OnQueueChanged(newQueue)
