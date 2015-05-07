@@ -408,41 +408,14 @@ function UpdateWindow(info)
             controls.Buildrate:Hide()
             controls.shieldText:Hide()
 
-            local getEnh = import('/lua/enhancementcommon.lua')
             if info.userUnit ~= nil then
                 local bp = info.userUnit:GetBlueprint()
-                local regen = bp.Defense.RegenRate or 0
-                local current_enh = getEnh.GetEnhancements(info.entityId)
-
-                if current_enh ~= nil then
-                    local enhancements = bp.Enhancements
-                    for k,v in current_enh do
-                        if enhancements[current_enh[k]].NewRegenRate ~= nil then
-                            regen = enhancements[current_enh[k]].NewRegenRate
-                        end
-                    end
-                end
-
-                local veterancyLevels = bp.Veteran or veterancyDefaults
-                local xp = UnitData[info.entityId].xp
-                if xp >= veterancyLevels[string.format('Level%d', 1)] then
-                    local vetRegen = 0
-                    local lvl = 1
-
-                    for i = 2,5 do
-                        if xp >= veterancyLevels[string.format('Level%d', i)] then
-                            lvl = i
-                        end
-                    end
-
-                    vetRegen = bp.Buffs.Regen[string.format('Level%d', lvl)]
-                    controls.health:SetText(string.format("%d / %d +%d(+%d)/s", info.health, info.maxHealth, regen, vetRegen))
-                else
-                    controls.health:SetText(string.format("%d / %d +%d/s", info.health, info.maxHealth, regen))
-                end
+                local regen = UnitData[info.entityId].regen or bp.Defense.RegenRate
+                controls.health:SetText(string.format("%d / %d +%d/s", info.health, info.maxHealth, regen))
             end
 
             if info.shieldRatio > 0 then
+                local getEnh = import('/lua/enhancementcommon.lua')
                 local unitBp = info.userUnit:GetBlueprint()
                 local shield = unitBp.Defense.Shield
                 if not shield.ShieldMaxHealth then

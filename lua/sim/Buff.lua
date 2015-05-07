@@ -227,7 +227,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             local bpregn = unit:GetBlueprint().Defense.RegenRate or 0
             local val = BuffCalculate(unit, buffName, 'Regen', bpregn)
 
-            unit:SetRegenRate(val)
+            unit:SetRegen(val)
 
             --LOG('*BUFF: Unit ', repr(unit:GetEntityId()), ' buffed regen rate to ', repr(val))
         elseif atype == 'RegenPercent' then
