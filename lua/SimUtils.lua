@@ -123,13 +123,14 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         unit.oldowner = oldowner
 
         if IsAlly(owner, ToArmyIndex) then
-            if unit.oldowner == nil then
+            if not unit.oldowner then
                 unit.oldowner = owner
-                if not sharedUnits[owner] then
-                    sharedUnits[owner] = {}
-                end
-                table.insert(sharedUnits[owner], unit)
             end
+
+            if not sharedUnits[unit.oldowner] then
+                sharedUnits[unit.oldowner] = {}
+            end
+            table.insert(sharedUnits[unit.oldowner], unit)
         end
 
         -- A F T E R
