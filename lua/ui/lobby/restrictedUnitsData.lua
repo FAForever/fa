@@ -132,9 +132,9 @@ restrictedUnits = {
         name = "<LOC restricted_units_data_023>No Engineering Stations",
         tooltip = "restricted_units_engineeringstation",
     },
-    SALVAMAVOSCATH = {
-        categories = {"xab2307", "ueb2401", "url0401"},
-        name = "<LOC restricted_units_data_024>No Super-Artillery",
+    SUPERGAMEENDERS = {
+        categories = {"xab2307", "ueb2401", "url0401", "xsb2401"},
+        name = "<LOC restricted_units_data_024>No Super-Game-Enders",
         tooltip = "restricted_units_superarty",
     },
     PARAGON = {
@@ -189,7 +189,7 @@ sortOrder = {
     "T3MOBILEAA",
     "WALL",
     "ENGISTATION",
-    "SALVAMAVOSCATH",
+    "SUPERGAMEENDERS",
     "PARAGON",
     "SATELLITE",    
     "TELE",
