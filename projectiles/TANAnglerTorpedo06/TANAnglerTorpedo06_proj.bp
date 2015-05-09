@@ -26,13 +26,6 @@ ProjectileBlueprint {
     Display = {
         CameraFollowTimeout = 2,
         CameraFollowsProjectile = true,
-        Mesh = {
-            LODs = {
-                {
-                    ShaderName = 'TMeshGlow',
-                },
-            },
-        },
         MeshBlueprint = '/projectiles/TANAnglerTorpedo01/TANAnglerTorpedo01_mesh.bp',
         StrategicIconSize = 1,
         UniformScale = 0.15,
