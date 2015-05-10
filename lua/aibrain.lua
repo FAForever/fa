@@ -112,81 +112,93 @@ end
 function CollectCurrentScores()
     -- Initialize the score data stucture
     for index, brain in ArmyBrains do
-       ArmyScore[index] = {}
+        ArmyScore[index] = {
+            -- General scores
+            general = {
+                score = 0,
+                mass = 0,
+                energy = 0,
+                kills = {
+                    count = 0,
+                    mass = 0,
+                    energy = 0
+                },
+                built = {
+                    count = 0,
+                    mass = 0,
+                    energy = 0
+                },
+                lost = {
+                    count = 0,
+                    mass = 0,
+                    energy = 0
+                },
+                currentunits = {
+                    count = 0
+                },
+                currentcap = {
+                    count = 0
+                }
+            },
 
-       ----------------------------------------
-       ---- General scores ----
-       ----------------------------------------
-       ArmyScore[index].general = {}
-       ArmyScore[index].general.score = 0
-       ArmyScore[index].general.mass = 0
-       ArmyScore[index].general.energy = 0
-       ArmyScore[index].general.kills = {}
-       ArmyScore[index].general.kills.count = 0
-       ArmyScore[index].general.kills.mass = 0
-       ArmyScore[index].general.kills.energy = 0
-       ArmyScore[index].general.built = {}
-       ArmyScore[index].general.built.count = 0
-       ArmyScore[index].general.built.mass = 0
-       ArmyScore[index].general.built.energy = 0
-       ArmyScore[index].general.lost = {}
-       ArmyScore[index].general.lost.count = 0
-       ArmyScore[index].general.lost.mass = 0
-       ArmyScore[index].general.lost.energy = 0
-       ArmyScore[index].general.currentunits = {}
-       ArmyScore[index].general.currentunits.count = 0
-       ArmyScore[index].general.currentcap = {}
-       ArmyScore[index].general.currentcap.count = 0
+            -- Unit scores
+            units = {
+                cdr = {
+                    kills = 0,
+                    built = 0,
+                    lost = 0
+                },
+                land = {
+                    kills = 0,
+                    built = 0,
+                    lost = 0
+                },
+                air = {
+                    kills = 0,
+                    built = 0,
+                    lost = 0
+                },
+                naval = {
+                    kills = 0,
+                    built = 0,
+                    lost = 0
+                },
+                structures = {
+                    kills = 0,
+                    built = 0,
+                    lost = 0
+                },
+                experimental = {
+                    kills = 0,
+                    built = 0,
+                    lost = 0
+                }
+            },
 
-       ----------------------------------
-       ---- unit scores ----
-       ----------------------------------
-       ArmyScore[index].units = {}
-       ArmyScore[index].units.cdr = {}
-       ArmyScore[index].units.cdr.kills = 0
-       ArmyScore[index].units.cdr.built = 0
-       ArmyScore[index].units.cdr.lost = 0
-       ArmyScore[index].units.land = {}
-       ArmyScore[index].units.land.kills = 0
-       ArmyScore[index].units.land.built = 0
-       ArmyScore[index].units.land.lost = 0
-       ArmyScore[index].units.air = {}
-       ArmyScore[index].units.air.kills = 0
-       ArmyScore[index].units.air.built = 0
-       ArmyScore[index].units.air.lost = 0
-       ArmyScore[index].units.naval = {}
-       ArmyScore[index].units.naval.kills = 0
-       ArmyScore[index].units.naval.built = 0
-       ArmyScore[index].units.naval.lost = 0
-       ArmyScore[index].units.structures = {}
-       ArmyScore[index].units.structures.kills = 0
-       ArmyScore[index].units.structures.built = 0
-       ArmyScore[index].units.structures.lost = 0
-       ArmyScore[index].units.experimental = {}
-       ArmyScore[index].units.experimental.kills = 0
-       ArmyScore[index].units.experimental.built = 0
-       ArmyScore[index].units.experimental.lost = 0
-
-       ------------------------------------------
-       ---- resource scores ----
-       ------------------------------------------
-       ArmyScore[index].resources = {}
-       ArmyScore[index].resources.massin = {}
-       ArmyScore[index].resources.massin.total = 0
-       ArmyScore[index].resources.massin.rate = 0
-       ArmyScore[index].resources.massout = {}
-       ArmyScore[index].resources.massout.total = 0
-       ArmyScore[index].resources.massout.rate = 0
-       ArmyScore[index].resources.massover = 0
-       ArmyScore[index].resources.energyin = {}
-       ArmyScore[index].resources.energyin.total = 0
-       ArmyScore[index].resources.energyin.rate = 0
-       ArmyScore[index].resources.energyout = {}
-       ArmyScore[index].resources.energyout.total = 0
-       ArmyScore[index].resources.energyout.rate = 0
-       ArmyScore[index].resources.energyover = 0
-       UpdateScoreData(ArmyScore)
+            -- Resource scores
+            resources = {
+                massin = {
+                    total = 0,
+                    rate = 0
+                },
+                massout = {
+                    total = 0,
+                    rate = 0
+                },
+                energyin = {
+                    total = 0,
+                    rate = 0
+                },
+                energyout = {
+                    total = 0,
+                    rate = 0
+                },
+                massover = 0,
+                energyover = 0
+            }
+        }
     end
+    UpdateScoreData(ArmyScore)
 
     -- Collect the various scores at regular intervals
     while true do
