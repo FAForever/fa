@@ -1,57 +1,36 @@
 --****************************************************************************
 --**
---**  File     :  /data/units/XEA0306/XEA0306_script.lua
---**  Author(s):  Jessica St. Croix
+--**  File     :  /cdimage/units/UEA0107/UEA0107_script.lua
+--**  Author(s):  Andres Mendez
 --**
---**  Summary  :  UEF Heavy Air Transport Script
+--**  Summary  :  UEF T1 Transport Script
 --**
---**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local explosion = import('/lua/defaultexplosions.lua')
 local util = import('/lua/utilities.lua')
-local WeaponsFile = import('/lua/terranweapons.lua')
+
 local TAirUnit = import('/lua/terranunits.lua').TAirUnit
-local TSAMLauncher = import('/lua/terranweapons.lua').TSAMLauncher
-local TWeapons = import('/lua/terranweapons.lua')
-local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
 
-XEA0306 = Class(TAirUnit) {
-    AirDestructionEffectBones = {'FrontRight_Engine_Exhaust','FrontLeft_Engine_Exhaust','BackRight_Engine_Exhaust','BackLeft_Engine_Exhaust'},
-
-    ShieldEffects = {
-        '/effects/emitters/terran_shield_generator_mobile_01_emit.bp',
-        '/effects/emitters/terran_shield_generator_mobile_02_emit.bp',
-    },
+UEA0107 = Class(TAirUnit)
+{
+    AirDestructionEffectBones = { 'Front_Right_Exhaust','Front_Left_Exhaust','Back_Right_Exhaust','Back_Left_Exhaust',
+                                'Left_Front_Leg','Right_Front_Leg','Left_Back_Leg','Right_Back_Leg'},
 
     BeamExhaustCruise = '/effects/emitters/transport_thruster_beam_01_emit.bp',
     BeamExhaustIdle = '/effects/emitters/transport_thruster_beam_02_emit.bp',
 
-    Weapons = {
-        MissleRackFrontLeft = Class(TSAMLauncher) {},
-        MissleRackBackLeft = Class(TSAMLauncher) {},
-        MissleRackBackRight = Class(TSAMLauncher) {},
-        MissleRackFrontRight = Class(TSAMLauncher) {},
-        PlasmaLeft = Class(TDFHeavyPlasmaCannonWeapon) {},
-        PlasmaRight = Class(TDFHeavyPlasmaCannonWeapon) {},
-    },
-
     DestructionTicks = 250,
-    EngineRotateBones = {'FrontRight_Engine', 'FrontLeft_Engine', 'BackRight_Engine', 'BackLeft_Engine', },
+    EngineRotateBones = {'Front_Right_Engine', 'Front_Left_Engine', 'Back_Left_Engine', 'Back_Right_Engine', },
 
-    OnCreate = function(self)
-        TAirUnit.OnCreate(self)
-
-        self.UnfoldAnim = CreateAnimator(self)
-        self.UnfoldAnim:PlayAnim('/units/xea0306/xea0306_aunfold.sca')
-        self.UnfoldAnim:SetRate(0)
-    end,
+    PlayDestructionEffects = true,
+    DamageEffectPullback = 0.25,
+    DestroySeconds = 7.5,
 
     OnStopBeingBuilt = function(self,builder,layer)
         TAirUnit.OnStopBeingBuilt(self,builder,layer)
         self.EngineManipulators = {}
-
-        self.UnfoldAnim:SetRate(1)
 
         -- create the engine thrust manipulators
         for k, v in self.EngineRotateBones do
@@ -68,9 +47,10 @@ XEA0306 = Class(TAirUnit) {
         self.LandingAnimManip:SetPrecedence(0)
         self.Trash:Add(self.LandingAnimManip)
         self.LandingAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationLand):SetRate(1)
+        self:ForkThread(self.ExpandThread)
     end,
 
-    --Shielding Fix moved functionally to Unit.lua and Shield.lua
+
     -- When one of our attached units gets killed, detach it
     OnAttachedKilled = function(self, attached)
         attached:DetachFrom()
@@ -98,6 +78,32 @@ XEA0306 = Class(TAirUnit) {
         end
     end,
 
+    OnCreate = function(self)
+        TAirUnit.OnCreate(self)
+        self.Sliders = {}
+        self.Sliders[1] = CreateSlider(self, 'Tail')
+        self.Sliders[1]:SetGoal(0, 0, 15)
+        self.Sliders[2] = CreateSlider(self, 'Head')
+        self.Sliders[2]:SetGoal(0, 0, -15)
+        for k, v in self.Sliders do
+            v:SetSpeed(-1)
+            self.Trash:Add(v)
+        end
+    end,
+
+    ExpandThread = function(self)
+        if self.Sliders then
+            for k, v in self.Sliders do
+                v:SetGoal(0, 0, 0)
+                v:SetSpeed(10)
+            end
+            WaitFor(self.Sliders[2])
+            for k, v in self.Sliders do
+                v:Destroy()
+            end
+        end
+    end,
+
     GetUnitSizes = function(self)
         local bp = self:GetBlueprint()
         if self:GetFractionComplete() < 1.0 then
@@ -106,6 +112,7 @@ XEA0306 = Class(TAirUnit) {
             return bp.SizeX, bp.SizeY, bp.SizeZ
         end
     end,
+
 }
 
-TypeClass = XEA0306
+TypeClass = UEA0107

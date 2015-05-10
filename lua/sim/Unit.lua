@@ -1050,7 +1050,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
-
         -- Revoke transport protection for shielded transports when impacted by nuclear weaponry
         if EntityCategoryContains(categories.NUKE, instigator) and self.transportProtected == true then
             self.MyShield:RevokeTransportProtection()
@@ -1070,30 +1069,62 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    ReleaseCargo = function(self, n)
+        if EntityCategoryContains(categories.TRANSPORTATION, self) and not self:IsDead() then
+            local units = self:GetCargo()
+            local n_units = table.getsize(units)
+
+            if table.getsize(units) then
+                if n then
+                    n = math.min(n, n_units)
+                    table.shuffle(units)
+                else
+                    n = n_units
+                end
+
+                local i = 1
+                while i <= n do
+                    units[i]:DetachFrom()
+                    units[i]:SinkThread()
+                    i = i + 1
+                end
+            end
+        end
+    end,
+
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         local preAdjHealth = self:GetHealth()
         self:AdjustHealth(instigator, -amount)
         local health = self:GetHealth()
-        if( health < 1 ) then
-            if( damageType == 'Reclaimed' ) then
+        local maxHealth = self:GetMaxHealth()
+
+        if EntityCategoryContains(categories.TRANSPORTATION, self) and Random() > (health / maxHealth + 0.6) then
+            self:ReleaseCargo(Random(1, 2))
+        end
+
+        if health < 1 then
+            if damageType == 'Reclaimed' then
                 self:Destroy()
             else
                 local excessDamageRatio = 0.0
                 --Calculate the excess damage amount
                 local excess = preAdjHealth - amount
-                local maxHealth = self:GetMaxHealth()
-                if(excess < 0 and maxHealth > 0) then
+
+                if excess < 0 and maxHealth > 0 then
                     excessDamageRatio = -excess / maxHealth
                 end
+
                 self:Kill(instigator, damageType, excessDamageRatio)
             end
         end
+
         if EntityCategoryContains(categories.COMMAND, self) then
             local aiBrain = self:GetAIBrain()
             if aiBrain then
                 aiBrain:OnPlayCommanderUnderAttackVO()
             end
         end
+
         if health < 1 or self:IsDead() then
             if vector then
                 self.debris_Vector = vector
@@ -1179,6 +1210,7 @@ Unit = Class(moho.unit_methods) {
     --On killed: this function plays when the unit takes a mortal hit. Plays death effects and spawns wreckage, dependant on overkill
     OnKilled = function(self, instigator, type, overkillRatio)
         local layer = self:GetCurrentLayer()
+
         self.Dead = true
 
         --Units killed while being invisible because they're teleporting should show when they're killed
@@ -1586,20 +1618,38 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    OnImpact = function(self, with, other) -- falling land units
+        if with == 'Water' then
+            self:PlayUnitSound('AirUnitWaterImpact')
+            local entity = explosion.CreateUnitExplosionEntity(self, 1)
+            entity.Spec.Layer = 'Water'
+            ForkThread(explosion._CreateScalableUnitExplosion, entity)
+        else
+            local bp = self:GetBlueprint()
+            local scale = ((bp.SizeX or 0 + bp.SizeZ or 0))
+            local unitDamage = Random(bp.Defense.MaxHealth/2, bp.Defense.MaxHealth*2)
+            local areaDamage = math.min(2000, scale*500)
+            self:OnDamage(self, unitDamage, Vector(0, 0, 0), 'Normal')
+            DamageArea(self, self:GetPosition(), 3,  areaDamage, 'Normal', true, false)
+        end
+    end,
+
     SinkThread = function(self)
         local bp = self:GetBlueprint()
-        local scale = ((bp.SizeX or 0 + bp.SizeZ or 0) * 0.5)
-        local bone = 0
-        local data = {
-            TargetBone = bone,
-            TargetEntity = self,
-        }
 
         --Create sinker projectile
-        local proj = self:CreateProjectileAtBone('/projectiles/Sinker/Sinker_proj.bp', bone)
-        proj:PassData( data )
-        proj:Start(10 * math.max(2, math.min(7, scale)))
+        local proj = self:CreateProjectileAtBone('/projectiles/Sinker/Sinker_proj.bp', 0)
+        proj:Attach(self)
         self.Trash:Add(proj)
+
+        if bp.Display.AnimationWalk then
+            if not self.Animator then
+                self.Animator = CreateAnimator(self, true)
+            end
+
+            self.Animator:PlayAnim(bp.Display.AnimationWalk, true)
+            self.Animator:SetRate(bp.Display.AnimationWalkRate or 1)
+        end
     end,
 
     DeathThread = function( self, overkillRatio, instigator)
