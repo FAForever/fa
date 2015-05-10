@@ -5,6 +5,7 @@ local EmitterProjectile = import('/lua/sim/defaultprojectiles.lua').EmitterProje
 
 SCUDeathShockwave01 = Class(EmitterProjectile) {
     FxTrails = {'/effects/emitters/shockwave_smoke_01_emit.bp',},
+    FxTrailScale = 2.5,
 }
 
 TypeClass = SCUDeathShockwave01

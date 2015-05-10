@@ -49,23 +49,23 @@ SCUDeath01 = Class(NullShell) {
         self:ForkThread(self.CreateOuterRingWaveSmokeRing)
 
         # Create full-screen glow flash
-        CreateLightParticle(self, -1, army, 10, 4, 'glow_02', 'ramp_red_02')
+        CreateLightParticle(self, -1, army, 25, 4, 'glow_02', 'ramp_red_02')
         WaitSeconds( 0.25 )
-        CreateLightParticle(self, -1, army, 10, 20, 'glow_03', 'ramp_fire_06')
+        CreateLightParticle(self, -1, army, 25, 20, 'glow_03', 'ramp_fire_06')
         WaitSeconds( 0.55 )
         
-        CreateLightParticle(self, -1, army, 20, 250, 'glow_03', 'ramp_nuke_04')
+        CreateLightParticle(self, -1, army, 50, 250, 'glow_03', 'ramp_nuke_04')
         
         # Create ground decals
         local orientation = RandomFloat( 0, 2 * math.pi )
-        CreateDecal(position, orientation, 'Crater01_albedo', '', 'Albedo', 20, 20, 1200, 0, army)
-        CreateDecal(position, orientation, 'Crater01_normals', '', 'Normals', 20, 20, 1200, 0, army)       
-        CreateDecal(position, orientation, 'nuke_scorch_003_albedo', '', 'Albedo', 20, 20, 1200, 0, army)    
+        CreateDecal(position, orientation, 'Crater01_albedo', '', 'Albedo', 50, 50, 1200, 0, army)
+        CreateDecal(position, orientation, 'Crater01_normals', '', 'Normals', 50, 50, 1200, 0, army)       
+        CreateDecal(position, orientation, 'nuke_scorch_003_albedo', '', 'Albedo', 50, 50, 1200, 0, army)    
 
 		# Knockdown force rings
-        DamageRing(self, position, 0.1, 15, 1, 'Force', true)
+        DamageRing(self, position, 15, 25, 1, 'Force', true)
         WaitSeconds(0.1)
-        DamageRing(self, position, 0.1, 15, 1, 'Force', true)
+        DamageRing(self, position, 15, 25, 1, 'Force', true)
     end,
     
     CreateOuterRingWaveSmokeRing = function(self)
