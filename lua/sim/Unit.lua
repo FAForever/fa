@@ -1158,9 +1158,7 @@ Unit = Class(moho.unit_methods) {
         local bp = self:GetBlueprint()
         if layer == 'Water' and bp.Physics.MotionType == 'RULEUMT_Hover' then
             self:PlayUnitSound('HoverKilledOnWater')
-        end
-
-        if layer == 'Land' and bp.Physics.MotionType == 'RULEUMT_AmphibiousFloating' then
+        elseif layer == 'Land' and bp.Physics.MotionType == 'RULEUMT_AmphibiousFloating' then
             --Handle ships that can walk on land
             self:PlayUnitSound('AmphibiousFloatingKilledOnLand')
         else
