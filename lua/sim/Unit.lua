@@ -1508,7 +1508,7 @@ Unit = Class(moho.unit_methods) {
         local surfaceHeight = GetSurfaceHeight(pos[1], pos[3])
         local i = 0
 
-        while true do
+        while i < 1 do
             local randBone = Util.GetRandomInt( 0, numBones)
             local boneHeight = self:GetPosition(randBone)[2]
             local toSurface = surfaceHeight - boneHeight
