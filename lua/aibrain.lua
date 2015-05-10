@@ -54,17 +54,6 @@ local historicalUpdateThread = ForkThread(function()
     end
 end)
 
-
-
-
---Support for Handicap mod
-local Handicaps = {-5,-4,-3,-2,-1,0,1,2,3,4,5}
-local HCapUtils
-local Handicaps = {-5,-4,-3,-2,-1,0,1,2,3,4,5}
-local HCapUtils
-if DiskGetFileInfo('/lua/HandicapUtilities.lua') then
-    HCapUtils = import('/lua/HandicapUtilities.lua')
-end
 ----end sorian ai imports
 
 ------------------------------------------------------------------------------------------
@@ -369,21 +358,6 @@ AIBrain = Class(moho.aibrain_methods) {
    ------------------------------------------------------
     OnCreateHuman = function(self, planName)
         self:CreateBrainShared(planName)
-
-        --------For handicap mod compatibility
-        if DiskGetFileInfo('/lua/HandicapUtilities.lua') then
-            for name,data in ScenarioInfo.ArmySetup do
-                if name == self.Name then
-                    self.handicap = Handicaps[data.Handicap]
-                    if self.handicap != 0 then
-                        HCapUtils.SetupHandicap(self)
-                    end
-                    break
-                end
-            end
-        end
-        ------End handicap mod compatibility
-
         self:InitializeEconomyState()
         self:InitializeVO()
         self.BrainType = 'Human'
@@ -412,20 +386,6 @@ AIBrain = Class(moho.aibrain_methods) {
                 AIUtils.SetupCheat(self, true)
                 ScenarioInfo.ArmySetup[self.Name].AIPersonality = string.sub( per, 1, cheatPos - 1 )
             end
-
-            --------For handicap mod compatibility
-            if DiskGetFileInfo('/lua/HandicapUtilities.lua') then
-                for name,data in ScenarioInfo.ArmySetup do
-                    if name == self.Name then
-                        self.handicap = Handicaps[data.Handicap]
-                        if self.handicap != 0 then
-                            HCapUtils.SetupHandicap(self)
-                        end
-                        break
-                    end
-                end
-            end
-            --------end handicap mod compatibility
 
 
             self.CurrentPlan = self.AIPlansList[self:GetFactionIndex()][1]
