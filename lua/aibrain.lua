@@ -296,7 +296,7 @@ function CollectCurrentScores()
            ---- Resource scores 1 ----
            ----------------------------------------------
            ArmyScore[index].resources.massin.total = brain:GetArmyStat("Economy_TotalProduced_Mass", 0.0).Value
-           ArmyScore[index].resources.massin.rate = brain:GetArmyStat("Economy_Income_Mass", 0.0).Value - brain:GetArmyStat("Economy_income_reclaimed_Mass", 0.0).Value
+           ArmyScore[index].resources.massin.rate = brain:GetArmyStat("Economy_Income_Mass", 0.0).Value
            ArmyScore[index].resources.massout.total = brain:GetArmyStat("Economy_TotalConsumed_Mass", 0.0).Value
            ArmyScore[index].resources.massout.rate = brain:GetArmyStat("Economy_Output_Mass", 0.0).Value
            ArmyScore[index].resources.massover = brain:GetArmyStat("Economy_AccumExcess_Mass", 0.0).Value
@@ -308,7 +308,7 @@ function CollectCurrentScores()
            ---- Resource scores 2 ----
            ----------------------------------------------
            ArmyScore[index].resources.energyin.total = brain:GetArmyStat("Economy_TotalProduced_Energy", 0.0).Value
-           ArmyScore[index].resources.energyin.rate = brain:GetArmyStat("Economy_Income_Energy", 0.0).Value - brain:GetArmyStat("Economy_income_reclaimed_Energy", 0.0).Value
+           ArmyScore[index].resources.energyin.rate = brain:GetArmyStat("Economy_Income_Energy", 0.0).Value
            ArmyScore[index].resources.energyout.total = brain:GetArmyStat("Economy_TotalConsumed_Energy", 0.0).Value
            ArmyScore[index].resources.energyout.rate = brain:GetArmyStat("Economy_Output_Energy", 0.0).Value
            ArmyScore[index].resources.energyover = brain:GetArmyStat("Economy_AccumExcess_Energy", 0.0).Value
@@ -350,26 +350,6 @@ function SyncScores()
     end
 
 
-end
-
-function UpdateReclaimStat()
-    -- this function update the reclaim income stat.
-    while true do
-        for index, brain in ArmyBrains do
-
-            local reclaimedMass     = brain:GetArmyStat("Economy_Reclaimed_Mass", 0.0).Value
-            local oldReclaimedMass  = brain:GetArmyStat("Economy_old_Reclaimed_Mass", 0.0).Value
-            brain:SetArmyStat("Economy_income_reclaimed_Mass", reclaimedMass - oldReclaimedMass)
-            brain:SetArmyStat("Economy_old_Reclaimed_Mass", reclaimedMass)
-
-            local reclaimedEnergy     = brain:GetArmyStat("Economy_Reclaimed_Energy", 0.0).Value
-            local oldReclaimedEnergy  = brain:GetArmyStat("Economy_old_Reclaimed_Energy", 0.0).Value
-            brain:SetArmyStat("Economy_income_reclaimed_Energy", reclaimedEnergy - oldReclaimedEnergy)
-            brain:SetArmyStat("Economy_old_Reclaimed_Energy", reclaimedEnergy)
-
-        end
-       WaitSeconds(.1)  -- update the stat every tick
-    end
 end
 
 function SyncCurrentScores()
