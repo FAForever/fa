@@ -22,9 +22,21 @@ local GUI = {
 local updateThread = nil
 
 function PingUpdate()
+    function PingColor(text, ping)
+        if ping < 200 then
+            text:SetColor('ff00ff00') -- Ping green color
+        elseif ping < 400 then
+            text:SetColor('ffffff00') -- Ping yellow color
+        else
+            text:SetColor('ffff0000') -- Ping red color
+        end
+    end
+
     while true do
         local clients = GetSessionClients()
         local armiesInfo = GetArmiesTable().armiesTable
+        local worstPings = import('/modules/netlag.lua').worstPings
+        local netLag = import('/modules/netlag.lua').netLag
 
         for i, clientInfo in clients do
             local index = i
@@ -34,18 +46,16 @@ function PingUpdate()
 
                 if clientInfo.connected then
                     slot.ping:SetText(LOCF("<LOC connectivity_0000>Ping (ms): %d", clientInfo.ping))
-                    if clientInfo.ping < 200 then
-                        slot.ping:SetColor('ff00ff00') -- Ping green color
-                    elseif clientInfo.ping < 400 then
-                        slot.ping:SetColor('ffffff00') -- Ping yellow color
-                    else
-                        slot.ping:SetColor('ffff0000') -- Ping red color
-                    end
+                    PingColor(slot.ping, clientInfo.ping)
 
                     if clientInfo.quiet > 3000 then
                         local min = clientInfo.quiet / (1000 * 60)
                         local sec = math.mod(clientInfo.quiet / 1000, 60)
                         slot.quiet:SetText(LOCF("<LOC connectivity_0001>Quiet (m:s): %d:%02d", min, sec))
+                        slot.quiet:Show()
+                    elseif worstPings[index] then
+                        slot.quiet:SetText(LOCF("Worst (ms): %d", worstPings[index]))
+                        PingColor(slot.quiet, worstPings[index])
                         slot.quiet:Show()
                     else
                         slot.quiet:Hide()
@@ -77,6 +87,8 @@ function PingUpdate()
             end
         end
 
+        GUI.netLag:SetText(LOCF("Command lag (ms): %d", netLag))
+        PingColor(GUI.netLag, netLag)
         WaitSeconds(.1)
     end
 end
@@ -162,7 +174,15 @@ function CreateUI()
 
         GUI.slots[i] = slot
     end
-    
+
+    local bg = Bitmap(GUI.group)
+    bg.Height:Set(20)
+    LayoutHelpers.Below(bg, prevControl)
+    GUI.netLag = UIUtil.CreateText(bg, 'NetLag', 16, UIUtil.bodyFont)
+    GUI.netLag:SetColor('ffffffff')
+    LayoutHelpers.AtLeftTopIn(GUI.netLag, bg, 10, 5)
+    height = height + bg.Height()
+
     GUI.group.Height:Set(height+12)
     GUI.group.Width:Set(function() return GUI.slots[1].bg.Width() - 80 end)
     
