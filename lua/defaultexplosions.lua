@@ -5,7 +5,7 @@
 --**
 --**  Summary  :
 --**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local Entity = import('/lua/sim/entity.lua').Entity
@@ -176,7 +176,7 @@ function _CreateScalableUnitExplosion( obj )
 
     -- Merge resulting tables to final explosion emitter list
     if table.getn(EnvironmentalEffectTable) ~= 0 then
-        EffectTable = table.destructiveCat(BaseEffectTable, EnvironmentalEffectTable)
+        EffectTable = table.cat(BaseEffectTable, EnvironmentalEffectTable)
     else
         EffectTable = BaseEffectTable
     end
