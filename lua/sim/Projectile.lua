@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Base Projectile Definition
 --**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local Entity = import('/lua/sim/Entity.lua').Entity

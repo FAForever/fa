@@ -1347,10 +1347,6 @@ Unit = Class(moho.unit_methods) {
                 sinkAnim:SetRate(rate)
                 self.Trash:Add(sinkAnim)
                 WaitFor(sinkAnim)
-
-                if EntityCategoryContains(categories.NAVAL, self) then
-                    self.StopSink = true --Stop sinking when animation is complete
-                end
             end
         end
     end,
@@ -1484,20 +1480,6 @@ Unit = Class(moho.unit_methods) {
         DamageArea(self, self:GetPosition(), damageRadius or 1, damage or 1, damageType or 'Normal', damageFriendly or false)
     end,
 
-    SeabedWatcher = function(self)
-        local pos = self:GetPosition()
-        local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
-        local watchBone = self:GetBlueprint().WatchBone or 0
-
-        self.StopSink = false
-        while not self.StopSink do
-            WaitTicks(1)
-            if(self:GetPosition(watchBone)[2]-0.2 <= seafloor) then
-                self.StopSink = true
-            end
-        end
-    end,
-
     SinkDestructionEffects = function(self)
         local Util = utilities
         local sx, sy, sz = self:GetUnitSizes()
@@ -1544,25 +1526,23 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    StartSinking = function(self)
+    StartSinking = function(self, callback)
         local bp = self:GetBlueprint()
         local scale = ((bp.SizeX or 0 + bp.SizeZ or 0) * 0.5)
         local bone = 0
-        local data = {
-            TargetBone = bone,
-            TargetEntity = self,
-        }
 
         --Create sinker projectile
         local proj = self:CreateProjectileAtBone('/projectiles/Sinker/Sinker_proj.bp', bone)
-        proj:PassData(data)
 
-        -- Start the sinking after a delay of the given number of seconds.
-        proj:Start(10 * math.max(2, math.min(7, scale)))
+        -- Start the sinking after a delay of the given number of seconds, attaching to a given bone
+        -- and entity.
+        proj:Start(10 * math.max(2, math.min(7, scale)), self, bone, callback)
         self.Trash:Add(proj)
     end,
 
     DeathThread = function( self, overkillRatio, instigator)
+        WARN(repr(getmetatable(selfForkThread(function()end))))
+
         local layer = self:GetCurrentLayer()
         local isNaval = EntityCategoryContains(categories.NAVAL, self)
         local isSinking = layer == 'Water' or layer == 'Sub'
@@ -1578,47 +1558,50 @@ Unit = Class(moho.unit_methods) {
             self:CreateDestructionEffects(overkillRatio)
         end
 
-        -- Make sure Naval units use their animation to sink
-        if isSinking and not (isNaval and self.DeathAnimManip) then
-            self.DisallowCollisions = true
-            self:StartSinking()
+        if self.ShowUnitDestructionDebris and overkillRatio then
+            self.CreateUnitDestructionDebris(self, true, true, overkillRatio > 2)
         end
 
-        if((self.ShowUnitDestructionDebris and overkillRatio)) then
-            if overkillRatio <= 1 then
-                self.CreateUnitDestructionDebris( self, true, true, false )
-            elseif overkillRatio <= 2 then
-                self.CreateUnitDestructionDebris( self, true, true, false )
-            elseif overkillRatio <= 3 then
-                self.CreateUnitDestructionDebris( self, true, true, true )
-            else --VAPORIZED
-                self.CreateUnitDestructionDebris( self, true, true, true )
-            end
-        end
-
-        if self.DeathAnimManip and not isNaval then --Wait for non naval-units death animations
-            if not isSinking then
-                WaitFor(self.DeathAnimManip)
-            end
+        if self.DeathAnimManip then --Wait for death animations
+            WaitFor(self.DeathAnimManip)
 
             if self.PlayDestructionEffects and self.PlayEndAnimDestructionEffects then
-                self:CreateDestructionEffects(overkillRatio )
+                self:CreateDestructionEffects(overkillRatio)
             end
         end
 
+        -- Make sure Naval units use their animation to sink
         if isSinking and not isNavalFactory then
+            self.DisallowCollisions = true
+            local this = self
+            self:StartSinking(
+                function()
+                    this:DestroyUnit(overkillRatio)
+                end
+            )
+
             self:ForkThread(self.SinkDestructionEffects)
-            self:SeabedWatcher() -- Finishes when unit reached seabed
+
+            -- Avoid slightly ugly need to propagate this through callback hell...
+            self.overkillRatio = overkillRatio
+
+            -- Wait for the sinking callback to actually destroy the unit.
+            return
         end
 
-        self:CreateWreckage( overkillRatio )
+        -- If we're not doing fancy sinking rubbish, just blow the damn thing up.
+        self:PlayUnitSound('Destroyed')
+        self:DestroyUnit(overkillRatio)
+    end,
+
+    --- Called at the end of the destruction thread: play the destruction sound, create the wreckage
+    -- and Destroy this unit.
+    DestroyUnit = function(self, overkillRatio)
+        self:CreateWreckage(overkillRatio or self.overkillRatio)
 
         -- wait at least 1 tick before destroying unit
         WaitSeconds(math.max(0.1, self.DeathThreadDestructionWaitTime))
 
-        if not isSinking then
-            self:PlayUnitSound('Destroyed')
-        end
         self:Destroy()
     end,
 
