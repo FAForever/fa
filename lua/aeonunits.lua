@@ -5,7 +5,7 @@
 #**
 #**  Summary  :
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 #--------------------------------------------------------------------------
 # AEON DEFAULT UNITS
@@ -242,9 +242,7 @@ ATransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
 #-------------------------------------------------------------
 #  WALKING LAND UNITS
 #-------------------------------------------------------------
-AWalkingLandUnit = Class(DefaultUnitsFile.WalkingLandUnit) {
-    DisabledBones = {},
-}
+AWalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
 
 #-------------------------------------------------------------
 #  WALL  STRUCTURES

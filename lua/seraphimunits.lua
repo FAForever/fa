@@ -5,7 +5,7 @@
 #**
 #**  Summary  : Units for Seraphim
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 #--------------------------------------------------------------------------
 # SERAPHIM DEFAULT UNITS
@@ -583,9 +583,7 @@ STransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
 #-------------------------------------------------------------
 #  WALKING LAND UNITS
 #-------------------------------------------------------------
-SWalkingLandUnit = Class(DefaultUnitsFile.WalkingLandUnit) {
-    DisabledBones = {},
-}
+SWalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
 
 #-------------------------------------------------------------
 #  WALL  STRUCTURES

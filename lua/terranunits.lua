@@ -5,7 +5,7 @@
 #**
 #**  Summary  :
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 #--------------------------------------------------------------------------
 # TERRAN DEFAULT UNITS
@@ -378,13 +378,7 @@ TTransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
 #-------------------------------------------------------------
 #  WALKING LAND UNITS
 #-------------------------------------------------------------
-TWalkingLandUnit = Class(WalkingLandUnit) {
-
-    WalkingAnimRate = 1,
-    IdleAnimRate = 1,
-    DisabledBones = {},
-    
-}
+TWalkingLandUnit = WalkingLandUnit
 
 #-------------------------------------------------------------
 #  WALL  STRUCTURES

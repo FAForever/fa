@@ -326,11 +326,7 @@ CTransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
 ---------------------------------------------------------------
 --  WALKING LAND UNITS
 ---------------------------------------------------------------
-CWalkingLandUnit = Class(DefaultUnitsFile.WalkingLandUnit) {
-    WalkingAnimRate = 1,
-    IdleAnimRate = 1,
-    DisabledBones = {},
-}
+CWalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
 
 ---------------------------------------------------------------
 --  WALL  STRUCTURES
