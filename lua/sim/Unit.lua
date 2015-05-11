@@ -1516,8 +1516,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     DeathThread = function( self, overkillRatio, instigator)
-        WARN(repr(getmetatable(selfForkThread(function()end))))
-
         local layer = self:GetCurrentLayer()
         local isNaval = EntityCategoryContains(categories.NAVAL, self)
         local isSinking = layer == 'Water' or layer == 'Sub'
