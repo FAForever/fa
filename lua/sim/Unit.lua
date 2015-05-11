@@ -1544,7 +1544,7 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    SinkThread = function(self)
+    StartSinking = function(self)
         local bp = self:GetBlueprint()
         local scale = ((bp.SizeX or 0 + bp.SizeZ or 0) * 0.5)
         local bone = 0
@@ -1555,7 +1555,9 @@ Unit = Class(moho.unit_methods) {
 
         --Create sinker projectile
         local proj = self:CreateProjectileAtBone('/projectiles/Sinker/Sinker_proj.bp', bone)
-        proj:PassData( data )
+        proj:PassData(data)
+
+        -- Start the sinking after a delay of the given number of seconds.
         proj:Start(10 * math.max(2, math.min(7, scale)))
         self.Trash:Add(proj)
     end,
@@ -1579,7 +1581,7 @@ Unit = Class(moho.unit_methods) {
         -- Make sure Naval units use their animation to sink
         if isSinking and not (isNaval and self.DeathAnimManip) then
             self.DisallowCollisions = true
-            self:ForkThread(self.SinkThread)
+            self:StartSinking()
         end
 
         if((self.ShowUnitDestructionDebris and overkillRatio)) then
