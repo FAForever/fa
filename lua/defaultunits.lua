@@ -1766,6 +1766,14 @@ CommandUnit = Class(WalkingLandUnit) {
         end
     end,
 
+    DoTakeDamage = function(self, instigator, amount, vector, damageType)
+        WalkingLandUnit.DoTakeDamage(self, instigator, amount, vector, damageType)
+        local aiBrain = self:GetAIBrain()
+        if aiBrain then
+            aiBrain:OnPlayCommanderUnderAttackVO()
+        end
+    end,
+
     ResetRightArm = function(self)
         self:BuildManipulatorSetEnabled(false)
         self.BuildArmManipulator:SetPrecedence(0)

@@ -1058,12 +1058,7 @@ Unit = Class(moho.unit_methods) {
                 self:Kill(instigator, damageType, excessDamageRatio)
             end
         end
-        if EntityCategoryContains(categories.COMMAND, self) then
-            local aiBrain = self:GetAIBrain()
-            if aiBrain then
-                aiBrain:OnPlayCommanderUnderAttackVO()
-            end
-        end
+
         if health < 1 or self:IsDead() then
             if vector then
                 self.debris_Vector = vector
