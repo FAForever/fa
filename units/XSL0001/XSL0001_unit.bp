@@ -322,7 +322,6 @@ UnitBlueprint {
             'BUILTBYTIER2COMMANDER SERAPHIM',
             'BUILTBYTIER3COMMANDER SERAPHIM',
         },
-        InitialRemoteViewingEnergyDrain = 3000,
         MaxBuildDistance = 10,
         NaturalProducer = true,
         NeedToFaceTargetToBuild = false,
@@ -819,7 +818,6 @@ UnitBlueprint {
     Intel = {
         FreeIntel = true,
         OmniRadius = 26,
-        RemoteViewingRadius = 100,
         VisionRadius = 26,
         WaterVisionRadius = 26,
     },

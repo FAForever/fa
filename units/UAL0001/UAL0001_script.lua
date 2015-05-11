@@ -1,15 +1,14 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAL0001/UAL0001_script.lua
-#**  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Gordon Duclos
-#**
-#**  Summary  :  Aeon Commander Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+-- ****************************************************************************
+-- **
+-- **  File     :  /cdimage/units/UAL0001/UAL0001_script.lua
+-- **  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Gordon Duclos
+-- **
+-- **  Summary  :  Aeon Commander Script
+-- **
+-- **  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+-- ****************************************************************************
 
-local AWalkingLandUnit = import('/lua/aeonunits.lua').AWalkingLandUnit
-
+local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
 local AWeapons = import('/lua/aeonweapons.lua')
 local ADFDisruptorCannonWeapon = AWeapons.ADFDisruptorCannonWeapon
 local AIFCommanderDeathWeapon = AWeapons.AIFCommanderDeathWeapon
@@ -19,10 +18,7 @@ local ADFOverchargeWeapon = AWeapons.ADFOverchargeWeapon
 local ADFChronoDampener = AWeapons.ADFChronoDampener
 local Buff = import('/lua/sim/Buff.lua')
 
-UAL0001 = Class(AWalkingLandUnit) {
-
-    DeathThreadDestructionWaitTime = 2,
-
+UAL0001 = Class(CommandUnit) {
     Weapons = {
         DeathWeapon = Class(AIFCommanderDeathWeapon) {},
         RightDisruptor = Class(ADFDisruptorCannonWeapon) {},
@@ -30,100 +26,35 @@ UAL0001 = Class(AWalkingLandUnit) {
         OverCharge = Class(ADFOverchargeWeapon) {},
     },
 
+    __init = function(self)
+        CommandUnit.__init(self, 'RightDisruptor')
+    end,
+
     OnCreate = function(self)
-        AWalkingLandUnit.OnCreate(self)
+        CommandUnit.OnCreate(self)
         self:SetCapturable(false)
         self:SetWeaponEnabledByLabel('ChronoDampener', false)
         self:SetupBuildBones()
         self:HideBone('Back_Upgrade', true)
         self:HideBone('Right_Upgrade', true)        
         self:HideBone('Left_Upgrade', true)            
-        # Restrict what enhancements will enable later
+        -- Restrict what enhancements will enable later
         self:AddBuildRestriction( categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
     end,
 
-    OnPrepareArmToBuild = function(self)
-        AWalkingLandUnit.OnPrepareArmToBuild(self)
-        if self:BeenDestroyed() then return end
-        self:BuildManipulatorSetEnabled(true)
-        self.BuildArmManipulator:SetPrecedence(20)
-        self:SetWeaponEnabledByLabel('RightDisruptor', false)
-        self:SetWeaponEnabledByLabel('OverCharge', false)
-        self.BuildArmManipulator:SetHeadingPitch( self:GetWeaponManipulatorByLabel('RightDisruptor'):GetHeadingPitch() )
-    end,
-
-    OnStopCapture = function(self, target)
-        AWalkingLandUnit.OnStopCapture(self, target)
-        if self:BeenDestroyed() then return end
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('RightDisruptor', true)
-        self:SetWeaponEnabledByLabel('OverCharge', false)
-        self:GetWeaponManipulatorByLabel('RightDisruptor'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-    end,
-
-    OnFailedCapture = function(self, target)
-        AWalkingLandUnit.OnFailedCapture(self, target)
-        if self:BeenDestroyed() then return end
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('RightDisruptor', true)
-        self:SetWeaponEnabledByLabel('OverCharge', false)
-        self:GetWeaponManipulatorByLabel('RightDisruptor'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-    end,
-
-    OnStopReclaim = function(self, target)
-        AWalkingLandUnit.OnStopReclaim(self, target)
-        if self:BeenDestroyed() then return end
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('RightDisruptor', true)
-        self:SetWeaponEnabledByLabel('OverCharge', false)
-        self:GetWeaponManipulatorByLabel('RightDisruptor'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-    end,
-
     OnStopBeingBuilt = function(self,builder,layer)
-        AWalkingLandUnit.OnStopBeingBuilt(self,builder,layer)
+        CommandUnit.OnStopBeingBuilt(self,builder,layer)
         self:SetWeaponEnabledByLabel('RightDisruptor', true)
         self:ForkThread(self.GiveInitialResources)
     end,
 
-    OnFailedToBuild = function(self)
-        AWalkingLandUnit.OnFailedToBuild(self)
-        if self:BeenDestroyed() then return end
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('RightDisruptor', true)
-        self:SetWeaponEnabledByLabel('OverCharge', false)
-        self:GetWeaponManipulatorByLabel('RightDisruptor'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-    end,
-    
     OnStartBuild = function(self, unitBeingBuilt, order)
-        AWalkingLandUnit.OnStartBuild(self, unitBeingBuilt, order)
+        CommandUnit.OnStartBuild(self, unitBeingBuilt, order)
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
         self.BuildingUnit = true     
     end,
 
-    OnStopBuild = function(self, unitBeingBuilt)
-        AWalkingLandUnit.OnStopBuild(self, unitBeingBuilt)
-        if self:BeenDestroyed() then return end
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('RightDisruptor', true)
-        self:SetWeaponEnabledByLabel('OverCharge', false)
-        self:GetWeaponManipulatorByLabel('RightDisruptor'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-        self.UnitBeingBuilt = nil
-        self.UnitBuildOrder = nil
-        self.BuildingUnit = false          
-    end,
-
-    GiveInitialResources = function(self)
-        WaitTicks(2)
-        self:GetAIBrain():GiveResource('Energy', self:GetBlueprint().Economy.StorageEnergy)
-        self:GetAIBrain():GiveResource('Mass', self:GetBlueprint().Economy.StorageMass)
-    end,
-    
     CreateBuildEffects = function( self, unitBeingBuilt, order )
         EffectUtil.CreateAeonCommanderBuildingEffects( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )
     end,  
@@ -161,9 +92,9 @@ UAL0001 = Class(AWalkingLandUnit) {
     end,
 
     CreateEnhancement = function(self, enh)
-        AWalkingLandUnit.CreateEnhancement(self, enh)
+        CommandUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
-        #Resource Allocation
+        -- Resource Allocation
         if enh == 'ResourceAllocation' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
@@ -184,7 +115,7 @@ UAL0001 = Class(AWalkingLandUnit) {
             local bpEcon = self:GetBlueprint().Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
-        #Shields
+        -- Shields
         elseif enh == 'Shield' then
             self:AddToggleCap('RULEUTC_ShieldToggle')
             self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
@@ -201,17 +132,17 @@ UAL0001 = Class(AWalkingLandUnit) {
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
-        #Teleporter
+        -- Teleporter
         elseif enh == 'Teleporter' then
             self:AddCommandCap('RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
             self:RemoveCommandCap('RULEUCC_Teleport')
-        #Chrono Dampener
+        -- Chrono Dampener
         elseif enh == 'ChronoDampener' then
             self:SetWeaponEnabledByLabel('ChronoDampener', true)
         elseif enh == 'ChronoDampenerRemove' then
             self:SetWeaponEnabledByLabel('ChronoDampener', false)
-        #T2 Engineering
+        -- T2 Engineering
         elseif enh =='AdvancedEngineering' then
             local bp = self:GetBlueprint().Enhancements[enh]
             if not bp then return end
@@ -254,7 +185,7 @@ UAL0001 = Class(AWalkingLandUnit) {
 	     end
 	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
 	    self:updateBuildRestrictions()
-        #T3 Engineering
+        -- T3 Engineering
         elseif enh =='T3Engineering' then
             local bp = self:GetBlueprint().Enhancements[enh]
             if not bp then return end
@@ -296,7 +227,7 @@ UAL0001 = Class(AWalkingLandUnit) {
 	     end
 	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
 	    self:updateBuildRestrictions()
-        #Crysalis Beam
+        -- Crysalis Beam
         elseif enh == 'CrysalisBeam' then
             local wep = self:GetWeaponByLabel('RightDisruptor')
             wep:ChangeMaxRadius(bp.NewMaxRadius or 44)
@@ -308,7 +239,7 @@ UAL0001 = Class(AWalkingLandUnit) {
             wep:ChangeMaxRadius(bpDisrupt or 22)
             local oc = self:GetWeaponByLabel('OverCharge')
             oc:ChangeMaxRadius(bpDisrupt or 22)
-        #Heat Sink Augmentation
+        -- Heat Sink Augmentation
         elseif enh == 'HeatSink' then
             local wep = self:GetWeaponByLabel('RightDisruptor')
             wep:ChangeRateOfFire(bp.NewRateOfFire or 2)
@@ -316,7 +247,7 @@ UAL0001 = Class(AWalkingLandUnit) {
             local wep = self:GetWeaponByLabel('RightDisruptor')
             local bpDisrupt = self:GetBlueprint().Weapon[1].RateOfFire
             wep:ChangeRateOfFire(bpDisrupt or 1)
-        #Enhanced Sensor Systems
+        -- Enhanced Sensor Systems
         elseif enh == 'EnhancedSensors' then
             self:SetIntelRadius('Vision', bp.NewVisionRadius or 104)
             self:SetIntelRadius('Omni', bp.NewOmniRadius or 104)
@@ -332,22 +263,7 @@ UAL0001 = Class(AWalkingLandUnit) {
         self:CreatePersonalShield(bp)
         self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
         self:SetMaintenanceConsumptionActive()
-    end,
-    
-    OnPaused = function(self)
-        AWalkingLandUnit.OnPaused(self)
-        if self.BuildingUnit then
-            AWalkingLandUnit.StopBuildingEffects(self, self:GetUnitBeingBuilt())
-        end    
-    end,
-    
-    OnUnpaused = function(self)
-        if self.BuildingUnit then
-            AWalkingLandUnit.StartBuildingEffects(self, self:GetUnitBeingBuilt(), self.UnitBuildOrder)
-        end
-        AWalkingLandUnit.OnUnpaused(self)
-    end,     
-
+    end
 }
 
 TypeClass = UAL0001

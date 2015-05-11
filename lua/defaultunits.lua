@@ -5,7 +5,7 @@
 -- **
 -- **  Summary  :  Default definitions of units
 -- **
--- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- **  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
 local Unit = import('/lua/sim/Unit.lua').Unit
@@ -1735,6 +1735,110 @@ SeaUnit = Class(MobileUnit){
 ---------------------------------------------------------------
 
 HoverLandUnit = Class(MobileUnit) {
+}
+
+--- Base class for ACUs.
+CommandUnit = Class(WalkingLandUnit) {
+    DeathThreadDestructionWaitTime = 2,
+
+    __init = function(self, rightGunName)
+        self.rightGunLabel = rightGunName
+    end,
+
+    OnKilled = function(self, instigator, type, overkillRatio)
+        WalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)
+        LOG('com is dead')
+
+        --If there is a killer, and it's not me
+        if instigator and instigator:GetArmy() ~= self:GetArmy() then
+            local instigatorBrain = ArmyBrains[instigator:GetArmy()]
+            if instigatorBrain and not instigatorBrain:IsDefeated() then
+                instigatorBrain:AddArmyStat("FAFWin", 1)
+            end
+        end
+
+        --Score change, we send the score of all players
+        for index, brain in ArmyBrains do
+            if brain and not brain:IsDefeated() then
+                local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
+                table.insert(Sync.GameResult, { index, result })
+            end
+        end
+    end,
+
+    ResetRightArm = function(self)
+        self:BuildManipulatorSetEnabled(false)
+        self.BuildArmManipulator:SetPrecedence(0)
+        self:SetWeaponEnabledByLabel(self.rightGunLabel, true)
+        self:SetWeaponEnabledByLabel('OverCharge', false)
+        self:GetWeaponManipulatorByLabel(self.rightGunLabel):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
+    end,
+
+    OnFailedToBuild = function(self)
+        WalkingLandUnit.OnFailedToBuild(self)
+        if self:BeenDestroyed() then return end
+        self:ResetRightArm()
+    end,
+
+    OnStopCapture = function(self, target)
+        WalkingLandUnit.OnStopCapture(self, target)
+        if self:BeenDestroyed() then return end
+        self:ResetRightArm()
+    end,
+
+    OnFailedCapture = function(self, target)
+        WalkingLandUnit.OnFailedCapture(self, target)
+        if self:BeenDestroyed() then return end
+        self:ResetRightArm()
+    end,
+
+    OnStopReclaim = function(self, target)
+        WalkingLandUnit.OnStopReclaim(self, target)
+        if self:BeenDestroyed() then return end
+        self:ResetRightArm()
+    end,
+
+    OnPrepareArmToBuild = function(self)
+        WalkingLandUnit.OnPrepareArmToBuild(self)
+        if self:BeenDestroyed() then return end
+        self:ResetRightArm()
+
+        self:BuildManipulatorSetEnabled(true)
+        self.BuildArmManipulator:SetPrecedence(20)
+        self:SetWeaponEnabledByLabel(self.rightGunLabel, false)
+        self:SetWeaponEnabledByLabel('OverCharge', false)
+        self.BuildArmManipulator:SetHeadingPitch(self:GetWeaponManipulatorByLabel(self.rightGunLabel):GetHeadingPitch())
+    end,
+
+    OnStopBuild = function(self, unitBeingBuilt)
+        WalkingLandUnit.OnStopBuild(self, unitBeingBuilt)
+        if self:BeenDestroyed() then return end
+        self:ResetRightArm()
+
+        self.UnitBeingBuilt = nil
+        self.UnitBuildOrder = nil
+        self.BuildingUnit = false
+    end,
+
+    OnPaused = function(self)
+        WalkingLandUnit.OnPaused(self)
+        if self.BuildingUnit then
+            WalkingLandUnit.StopBuildingEffects(self, self:GetUnitBeingBuilt())
+        end
+    end,
+
+    OnUnpaused = function(self)
+        if self.BuildingUnit then
+            WalkingLandUnit.StartBuildingEffects(self, self:GetUnitBeingBuilt(), self.UnitBuildOrder)
+        end
+        WalkingLandUnit.OnUnpaused(self)
+    end,
+
+    GiveInitialResources = function(self)
+        WaitTicks(2)
+        self:GetAIBrain():GiveResource('Energy', self:GetBlueprint().Economy.StorageEnergy)
+        self:GetAIBrain():GiveResource('Mass', self:GetBlueprint().Economy.StorageMass)
+    end,
 }
 
 

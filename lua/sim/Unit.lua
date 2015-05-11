@@ -1165,26 +1165,6 @@ Unit = Class(moho.unit_methods) {
             self:PlayUnitSound('Killed')
         end
 
-        if EntityCategoryContains(categories.COMMAND, self) then
-            LOG('com is dead')
-
-            --If there is a killer, and it's not me
-            if instigator and instigator:GetArmy() ~= self:GetArmy() then
-                local instigatorBrain = ArmyBrains[instigator:GetArmy()]
-                if instigatorBrain and not instigatorBrain:IsDefeated() then
-                    instigatorBrain:AddArmyStat("FAFWin", 1)
-                end
-            end
-
-            --Score change, we send the score of all players
-            for index, brain in ArmyBrains do
-                if brain and not brain:IsDefeated() then
-                    local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
-                    table.insert( Sync.GameResult, { index, result } )
-                end
-            end
-        end
-
         if self.PlayDeathAnimation and not self:IsBeingBuilt() then
             self:ForkThread(self.PlayAnimationThread, 'AnimationDeath')
             self.DisallowCollisions = true
@@ -1562,7 +1542,8 @@ Unit = Class(moho.unit_methods) {
             self.CreateUnitDestructionDebris(self, true, true, overkillRatio > 2)
         end
 
-        if self.DeathAnimManip then --Wait for death animations
+        --Wait for death animations
+        if self.DeathAnimManip then
             WaitFor(self.DeathAnimManip)
 
             if self.PlayDestructionEffects and self.PlayEndAnimDestructionEffects then
@@ -1570,7 +1551,6 @@ Unit = Class(moho.unit_methods) {
             end
         end
 
-        -- Make sure Naval units use their animation to sink
         if isSinking and not isNavalFactory then
             self.DisallowCollisions = true
             local this = self
