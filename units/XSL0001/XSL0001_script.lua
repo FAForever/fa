@@ -111,7 +111,7 @@ XSL0001 = Class(CommandUnit) {
         local bp = self:GetBlueprint().Enhancements.RegenAura
         local unitCat = ParseEntityCategory( bp.UnitCategory or 'BUILTBYTIER3FACTORY + BUILTBYQUANTUMGATE + NEEDMOBILEBUILD')
 
-        while not self:IsDead() do
+        while not self.Dead do
             --Get friendly units in the area (including self)
             local units = AIUtils.GetOwnUnitsAroundPoint(self:GetAIBrain(), unitCat, self:GetPosition(), bp.Radius)
             
@@ -129,7 +129,7 @@ XSL0001 = Class(CommandUnit) {
         local bp = self:GetBlueprint().Enhancements.AdvancedRegenAura
         local unitCat = ParseEntityCategory( bp.UnitCategory or 'BUILTBYTIER3FACTORY + BUILTBYQUANTUMGATE + NEEDMOBILEBUILD')
 
-        while not self:IsDead() do
+        while not self.Dead do
             --Get friendly units in the area (including self)
             local units = AIUtils.GetOwnUnitsAroundPoint(self:GetAIBrain(), unitCat, self:GetPosition(), bp.Radius)
             

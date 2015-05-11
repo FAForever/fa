@@ -5,7 +5,7 @@
 #**
 #**  Summary  : Functions for use in the Operations.
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 local TriggerFile = import('scenariotriggers.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
@@ -123,7 +123,7 @@ function CreateUnitDeathTrigger( cb, unit, camera )
 end
 
 function PauseUnitDeath( unit )
-    if unit and not unit:IsDead() then
+    if unit and not unit.Dead then
         unit.OnKilled = OverrideKilled
         unit:SetCanBeKilled(false)
         unit.DoTakeDamage = OverrideDoDamage
@@ -183,7 +183,7 @@ function OverrideKilled(self, instigator, type, overkillRatio)
 
     #If factory, destory what I'm building if I die
     if EntityCategoryContains(categories.FACTORY, self) then
-        if self.UnitBeingBuilt and not self.UnitBeingBuilt:IsDead() and self.UnitBeingBuilt:GetFractionComplete() != 1 then
+        if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() != 1 then
             self.UnitBeingBuilt:Kill()
         end
     end
@@ -195,7 +195,7 @@ function OverrideKilled(self, instigator, type, overkillRatio)
     self:DoUnitCallbacks( 'OnKilled' )
     self:DestroyTopSpeedEffects()
 
-    if self.UnitBeingTeleported and not self.UnitBeingTeleported:IsDead() then
+    if self.UnitBeingTeleported and not self.UnitBeingTeleported.Dead then
         self.UnitBeingTeleported:Destroy()
         self.UnitBeingTeleported = nil
     end
@@ -593,7 +593,7 @@ function GroupProgressTimerThread( group, time )
     local currTime = 0
     while currTime < time do
         for k,v in group do
-            if not v:IsDead() then
+            if not v.Dead then
                 v:SetWorkProgress(currTime/time)
             end
         end
@@ -615,7 +615,7 @@ end
 #   - delay: time before begin next dialogue in table in second
 function Dialogue( dialogueTable, callback, critical, speaker )
     local canSpeak = true
-    if speaker and speaker:IsDead() then
+    if speaker and speaker.Dead then
         canSpeak = false
     end
     if canSpeak then
@@ -816,7 +816,7 @@ end
 ### returns true if all units in group are dead
 function GroupDeathCheck( group )
     for k,v in group do
-        if not v:IsDead() then
+        if not v.Dead then
             return false
         end
     end
@@ -1262,7 +1262,7 @@ function PlatoonAttackWithTransportsThread( platoon, landingChain, attackChain, 
             WaitSeconds(3)
             local allDead = true
             for k,v in transports do
-                if not v:IsDead() then
+                if not v.Dead then
                     allDead = false
                     break
                 end
@@ -1272,7 +1272,7 @@ function PlatoonAttackWithTransportsThread( platoon, landingChain, attackChain, 
             end
             attached = false
             for num, unit in units do
-                if not unit:IsDead() and unit:IsUnitState('Attached') then
+                if not unit.Dead and unit:IsUnitState('Attached') then
                     attached = true
                     break
                 end
@@ -1490,7 +1490,7 @@ function KillBaseInArea( brain, area, category )
     local filteredUnits = {}
     if unitTable then
         for num,unit in unitTable do
-            if not unit:IsDead() and unit:GetAIBrain() == brain and EntityCategoryContains( category, unit ) then
+            if not unit.Dead and unit:GetAIBrain() == brain and EntityCategoryContains( category, unit ) then
                 table.insert( filteredUnits, unit )
             end
         end
@@ -1502,7 +1502,7 @@ function KillBaseInAreaThread(unitTable)
     local numUnits = table.getn(unitTable)
     local waitNum = math.floor(numUnits / 20)
     for num, unit in unitTable do
-        if not unit:IsDead() then
+        if not unit.Dead then
             unit:Kill()
         end
         if waitNum > 0 and num >= waitNum and math.mod(waitNum, num) == 0 then
@@ -1548,7 +1548,7 @@ function EndOperationSafety( units )
         end
         if units and table.getn( units ) > 0 then
             for subk, subv in units do
-                if not subv:IsDead() then
+                if not subv.Dead then
                     subv:SetCanTakeDamage(false)
                     subv:SetCanBeKilled(false)
                 end
@@ -1849,7 +1849,7 @@ end
 
 function FlagUnkillableSelect( armyNumber, units )
     for k,v in units do
-        if not v:IsDead() and v:GetAIBrain():GetArmyIndex() == armyNumber then
+        if not v.Dead and v:GetAIBrain():GetArmyIndex() == armyNumber then
             if not v.CanTakeDamage then
                 v.UndamagableFlagSet = true
             end
@@ -2082,7 +2082,7 @@ function IAmOffMap(self)
 	self.TimeIHaveBeenOffMap = 0
 	self.TimeIHaveBeenOnMap = 0
 	self.TimeIAmAllowedToBeOffMap = GetTimeIAmAllowedToBeOffMap(self)
-	while not self:IsDead() do
+	while not self.Dead do
 		#local playableArea = ScenarioInfo.PlayableArea
 		if IsUnitInPlayableArea(self) then
 			self.TimeIHaveBeenOnMap = (self.TimeIHaveBeenOnMap + 1)

@@ -191,7 +191,7 @@ UEL0001 = Class(CommandUnit) {
         elseif enh == 'LeftPodRemove' or enh == 'RightPodRemove' then
             if self.HasLeftPod == true then
                 self.HasLeftPod = false
-                if self.LeftPod and not self.LeftPod:IsDead() then
+                if self.LeftPod and not self.LeftPod.Dead then
                     self.LeftPod:Kill()
                 end
                 if self.RebuildingPod ~= nil then
@@ -201,7 +201,7 @@ UEL0001 = Class(CommandUnit) {
             end
             if self.HasRightPod == true then
                 self.HasRightPod = false
-                if self.RightPod and not self.RightPod:IsDead() then
+                if self.RightPod and not self.RightPod.Dead then
                     self.RightPod:Kill()
                 end
                 if self.RebuildingPod2 ~= nil then

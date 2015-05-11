@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Effect Utility functions for scripts.
 --**
---**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local util = import('utilities.lua')
@@ -102,7 +102,7 @@ function CreateBuildCubeThread( unitBeingBuilt, builder, OnBeingBuiltEffectsBag 
     proj = unitBeingBuilt:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
     proj:SetScale(x * 1.05, y * 0.2, z * 1.05)
     WaitSeconds(0.1)
-    if unitBeingBuilt:IsDead() then
+    if unitBeingBuilt.Dead then
         return
     end
     local BuildBaseEffect = unitBeingBuilt:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect03_proj.bp', 0, 0, 0, nil, nil, nil )
@@ -113,7 +113,7 @@ function CreateBuildCubeThread( unitBeingBuilt, builder, OnBeingBuiltEffectsBag 
     BuildBaseEffect:SetVelocity(0, 1.4 * y, 0)
 
     WaitSeconds( 0.8 )
-    if unitBeingBuilt:IsDead() then
+    if unitBeingBuilt.Dead then
         return
     end
 
@@ -127,14 +127,14 @@ function CreateBuildCubeThread( unitBeingBuilt, builder, OnBeingBuiltEffectsBag 
 
     local lComplete = unitBeingBuilt:GetFractionComplete()
     WaitSeconds(0.3)
-    if unitBeingBuilt:IsDead() then
+    if unitBeingBuilt.Dead then
         return
     end
     local cComplete = unitBeingBuilt:GetFractionComplete()
 
 
     -- Create glow slice cuts and resize base cube
-    while not unitBeingBuilt:IsDead() and  cComplete < 1.0 do
+    while not unitBeingBuilt.Dead and  cComplete < 1.0 do
         if lComplete < cComplete and not BuildBaseEffect:BeenDestroyed() then
             proj = BuildBaseEffect:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,y * (1-cComplete),0, nil, nil, nil )
             OnBeingBuiltEffectsBag:Add(proj)
@@ -143,7 +143,7 @@ function CreateBuildCubeThread( unitBeingBuilt, builder, OnBeingBuiltEffectsBag 
             BuildBaseEffect:SetScale(x, y * (1-cComplete), z)
         end
         WaitSeconds(SlicePeriod)
-        if unitBeingBuilt:IsDead() then
+        if unitBeingBuilt.Dead then
             break
         end
         lComplete = cComplete
@@ -370,7 +370,7 @@ function CreateAeonBuildBaseThread( unitBeingBuilt, builder, EffectsBag )
     slider:SetSpeed(.05)
 
     -- Wait till we are 80% done building, then snap our slider to
-    while not unitBeingBuilt:IsDead() and unitBeingBuilt:GetFractionComplete() < 1.0 do
+    while not unitBeingBuilt.Dead and unitBeingBuilt:GetFractionComplete() < 1.0 do
         WaitSeconds(0.5)
     end
 
@@ -518,7 +518,7 @@ function CreateCybranFactoryBuildEffects( builder, unitBeingBuilt, BuildBones, B
 
     --Add sparks to the collision box of the unit being built
     local sx, sy, sz = 0
-    while not unitBeingBuilt:IsDead() and unitBeingBuilt:GetFractionComplete() < 1 do
+    while not unitBeingBuilt.Dead and unitBeingBuilt:GetFractionComplete() < 1 do
         sx, sy, sz = unitBeingBuilt:GetRandomOffset(1)
         for kE, vE in UnitBuildEffects do
             CreateEmitterOnEntity(unitBeingBuilt,army,vE):OffsetEmitter(sx,sy,sz)
@@ -599,17 +599,17 @@ function CreateAeonFactoryBuildingEffects( builder, unitBeingBuilt, BuildEffectB
     slider:SetGoal(0, -sy, 0)
     slider:SetSpeed(-1)
     WaitFor(slider)
-    if not unitBeingBuilt:IsDead() then
+    if not unitBeingBuilt.Dead then
         slider:SetGoal(0,0,0)
         slider:SetSpeed(.05)
     end
 
     -- Wait till we are 80% done building, then snap our slider to
-    while not unitBeingBuilt:IsDead() and unitBeingBuilt:GetFractionComplete() < 0.8 do
+    while not unitBeingBuilt.Dead and unitBeingBuilt:GetFractionComplete() < 0.8 do
         WaitSeconds(0.5)
     end
 
-    if not unitBeingBuilt:IsDead() then
+    if not unitBeingBuilt.Dead then
 	    BuildBaseEffect:SetScaleVelocity(-0.6, -0.6, -0.6)
         slider:SetSpeed(2)
 	    WaitSeconds(0.5)
@@ -671,17 +671,17 @@ function CreateSeraphimFactoryBuildingEffects( builder, unitBeingBuilt, BuildEff
     slider:SetGoal(0, sy, 0)
     slider:SetSpeed(-1)
     WaitFor(slider)
-    if not unitBeingBuilt:IsDead() then
+    if not unitBeingBuilt.Dead then
         slider:SetGoal(0,0,0)
         slider:SetSpeed(.05)
     end
 
     -- Wait till we are 80% done building, then snap our slider to
-    while not unitBeingBuilt:IsDead() and unitBeingBuilt:GetFractionComplete() < 0.8 do
+    while not unitBeingBuilt.Dead and unitBeingBuilt:GetFractionComplete() < 0.8 do
         WaitSeconds(0.5)
     end
 
-    if not unitBeingBuilt:IsDead() then
+    if not unitBeingBuilt.Dead then
         if not BuildBaseEffect:BeenDestroyed() then
 	        BuildBaseEffect:SetScaleVelocity(-0.6, -0.6, -0.6)
 	    end
@@ -746,7 +746,7 @@ function CreateSeraphimBuildBaseThread( unitBeingBuilt, builder, EffectsBag )
     -- Poll the unit being built every 0.5 a second to adjust the effects to match
     local fractionComplete = unitBeingBuilt:GetFractionComplete()
     local unitScaleMetric = unitBeingBuilt:GetFootPrintSize() * 0.65
-    while not unitBeingBuilt:IsDead() and fractionComplete < 1.0 do
+    while not unitBeingBuilt.Dead and fractionComplete < 1.0 do
         WaitSeconds(0.5)
         fractionComplete = unitBeingBuilt:GetFractionComplete()
         for k, vEffect in AdjustedEmitters do
@@ -822,7 +822,7 @@ function CreateSeraphimExperimentalBuildBaseThread( unitBeingBuilt, builder, Eff
     -- Poll the unit being built every 0.5 a second to adjust the effects to match
     local fractionComplete = unitBeingBuilt:GetFractionComplete()
     local unitScaleMetric = unitBeingBuilt:GetFootPrintSize() * 0.65
-    while not unitBeingBuilt:IsDead() and fractionComplete < 1.0 do
+    while not unitBeingBuilt.Dead and fractionComplete < 1.0 do
         WaitSeconds(0.5)
         fractionComplete = unitBeingBuilt:GetFractionComplete()
         for k, vEffect in AdjustedEmitters do
@@ -1469,7 +1469,7 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
                 WaitSeconds(0.5)
 
                 -- continuously create flashes of the cube
-                while unit and not unit:IsDead() and cube1 do
+                while unit and not unit.Dead and cube1 do
                     cfx:Destroy()
                     cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
                     Warp(cfx, pos, unit:GetOrientation())

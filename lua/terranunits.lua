@@ -456,7 +456,7 @@ TPodTowerUnit = Class(TStructureUnit) {
         # Iterate through pod data, kill all the pods and set them inactive
         if self.PodData then
             for k,v in self.PodData do
-                if v.Active and not v.PodHandle:IsDead() then
+                if v.Active and not v.PodHandle.Dead then
                     v.PodHandle:Kill()
                 end
             end
@@ -665,12 +665,12 @@ TPodTowerUnit = Class(TStructureUnit) {
                 self:StartUpgradeEffects(unitBuilding)
                 self.AnimatorUpgradeManip:PlayAnim(bp.AnimationUpgrade, false):SetRate(0)
 
-                while fractionOfComplete < 1 and not self:IsDead() do
+                while fractionOfComplete < 1 and not self.Dead do
                     fractionOfComplete = unitBuilding:GetFractionComplete()
                     self.AnimatorUpgradeManip:SetAnimationFraction(fractionOfComplete)
                     WaitTicks(1)
                 end
-                if not self:IsDead() then
+                if not self.Dead then
                     self.AnimatorUpgradeManip:SetRate(1)
                 end
             end

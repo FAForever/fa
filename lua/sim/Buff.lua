@@ -30,7 +30,7 @@
 -- This function is a fire-and-forget.  Apply this and it'll be applied over time if there is a duration.
 function ApplyBuff(unit, buffName, instigator)
 
-    if unit:IsDead() then 
+    if unit.Dead then
         return 
     end
     
@@ -152,7 +152,7 @@ function BuffWorkThread(unit, buffName, instigator)
         local pulse = 0
         local pulseTime = buffTable.Duration / totPulses
     
-        while pulse <= totPulses and not unit:IsDead() do
+        while pulse <= totPulses and not unit.Dead do
     
             WaitSeconds(pulseTime)
             BuffAffectUnit(unit, buffName, instigator, false)

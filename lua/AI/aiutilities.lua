@@ -675,7 +675,7 @@ function AIGetClosestThreatMarkerLoc(aiBrain, markerType, startX, startZ, threat
 end
 
 function AIFindDefensiveArea( aiBrain, unit, category, range )
-    if not unit:IsDead() then
+    if not unit.Dead then
         -- Build a grid to find units near
         local gridSize = range / 5
         if gridSize > 150 then
@@ -824,7 +824,7 @@ function AIEngineersAssistFactories( aiBrain, engineers, factories )
 
     local active = false
     for k,v in factories do
-        if not v:IsDead() and ( v:IsUnitState('Building') or v:GetNumBuildOrders(categories.ALLUNITS) > 0 ) then
+        if not v.Dead and ( v:IsUnitState('Building') or v:GetNumBuildOrders(categories.ALLUNITS) > 0 ) then
             active = true
             break
         end
@@ -845,7 +845,7 @@ function AIEngineersAssistFactories( aiBrain, engineers, factories )
                     tempNum = tempNum + 1
                 end
             end
-            if not v:IsDead() then
+            if not v.Dead then
                 setVal = false
                 tempActive = v:IsUnitState('Building') or ( v:GetNumBuildOrders(categories.ALLUNITS) > 0 )
                 if not active and tempActive then
@@ -895,7 +895,7 @@ function AIReturnAssistingFactories( factory )
     local guardFacs = {}
     table.insert( guardFacs, factory )
     for k,v in guards do
-        if not v:IsDead() and EntityCategoryContains( categories.FACTORY, v ) then
+        if not v.Dead and EntityCategoryContains( categories.FACTORY, v ) then
             table.insert( guardFacs, v )
         end
     end
@@ -962,7 +962,7 @@ function GetBasePatrolPoints( aiBrain, location, radius, layer )
 end
 
 function GetUnitBaseStructureVector( unit )
-    if not unit:IsDead() then
+    if not unit.Dead then
         local pos = unit:GetPosition()
         pos[1] = pos[1] + 16
         pos[3] = pos[3] + 16
@@ -987,7 +987,7 @@ function GetOwnUnitsAroundPoint( aiBrain, category, location, radius, min, max, 
         checkThreat = true
     end
     for k,v in units do
-        if not v:IsDead() and not v:IsBeingBuilt() and v:GetAIBrain():GetArmyIndex() == index then
+        if not v.Dead and not v:IsBeingBuilt() and v:GetAIBrain():GetArmyIndex() == index then
             if checkThreat then
                 local threat = aiBrain:GetThreatAtPosition( v:GetPosition(), rings, true, tType or 'Overall' )
                 if threat >= min and threat <= max then
@@ -1006,7 +1006,7 @@ function GetBrainUnitsAroundPoint( aiBrain, category, location, radius, tBrain )
     local tIndex = tBrain:GetArmyIndex()
     local retTable = {}
     for k,v in units do
-        if not v:IsDead() and v:GetAIBrain():GetArmyIndex() == tIndex then
+        if not v.Dead and v:GetAIBrain():GetArmyIndex() == tIndex then
             table.insert( retTable, v )
         end
     end
@@ -1052,7 +1052,7 @@ function GetNearestPathingPoint( position )
 end
 
 function CheckUnitPathingEx( destPos, curlocation, unit )
-    if unit:IsDead() then
+    if unit.Dead then
         return false
     end
     local pathingType = 'Land'
@@ -1106,7 +1106,7 @@ function AIFindBrainTargetInRange( aiBrain, platoon, squad, maxRange, atkPri, en
         local retUnit = false
         local distance = false
         for num, unit in targetUnits do
-            if not unit:IsDead() and EntityCategoryContains( category, unit ) and unit:GetAIBrain():GetArmyIndex() == enemyIndex and platoon:CanAttackTarget( squad, unit ) then
+            if not unit.Dead and EntityCategoryContains( category, unit ) and unit:GetAIBrain():GetArmyIndex() == enemyIndex and platoon:CanAttackTarget( squad, unit ) then
                 local unitPos = unit:GetPosition()
                 if not retUnit or Utils.XZDistanceTwoVectors( position, unitPos ) < distance then
                     retUnit = unit
@@ -1136,7 +1136,7 @@ function AIFindBrainTargetAroundPoint( aiBrain, position, maxRange, category )
     local retUnit = false
     local distance = false
     for num, unit in targetUnits do
-        if not unit:IsDead() then
+        if not unit.Dead then
             local unitPos = unit:GetPosition()
             if not retUnit or Utils.XZDistanceTwoVectors( position, unitPos ) < distance then
                 retUnit = unit
@@ -1222,7 +1222,7 @@ function GetNumTransports(units)
     }
     local transportClass
     for k, v in units do
-        if not v:IsDead() then
+        if not v.Dead then
             transportClass = v:GetBlueprint().Transport.TransportClass
             if(transportClass == 1) then
                 transportNeeded.Small = transportNeeded.Small + 1
@@ -1285,7 +1285,7 @@ function GetTransports(platoon, units)
     local transports = {}
     -- Determine distance of transports from platoon
     for k,unit in pool:GetPlatoonUnits() do
-        if not unit:IsDead() and EntityCategoryContains( categories.TRANSPORTATION - categories.uea0203, unit ) and not unit:IsUnitState('Busy') and not unit:IsUnitState('TransportLoading') and table.getn(unit:GetCargo()) < 1 and unit:GetFractionComplete() == 1 then
+        if not unit.Dead and EntityCategoryContains( categories.TRANSPORTATION - categories.uea0203, unit ) and not unit:IsUnitState('Busy') and not unit:IsUnitState('TransportLoading') and table.getn(unit:GetCargo()) < 1 and unit:GetFractionComplete() == 1 then
             local unitPos = unit:GetPosition()
             local curr = { Unit=unit, Distance=VDist2( unitPos[1], unitPos[3], location[1], location[3] ),
                            Id = unit:GetUnitId() }
@@ -1367,7 +1367,7 @@ end
 function UseTransports(units, transports, location, transportPlatoon)
     local aiBrain
     for k,v in units do
-        if not v:IsDead() then
+        if not v.Dead then
             aiBrain = v:GetAIBrain()
             break
         end
@@ -1406,7 +1406,7 @@ function UseTransports(units, transports, location, transportPlatoon)
     local remainingSize1 = {}
     local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
     for num, unit in units do
-        if not unit:IsDead() then
+        if not unit.Dead then
             if unit:IsUnitState( 'Attached' ) then
                 aiBrain:AssignUnitsToPlatoon( pool, {unit}, 'Unassigned', 'None' )
                 -- LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': Already Attached units adding to pool' )
@@ -1474,13 +1474,13 @@ function UseTransports(units, transports, location, transportPlatoon)
         local allDead = true
 		local transDead = true
         for k,v in units do
-            if not v:IsDead() then
+            if not v.Dead then
                 allDead = false
                 break
             end
         end
         for k,v in transports do
-            if not v:IsDead() then
+            if not v.Dead then
                 transDead = false
                 break
             end
@@ -1488,7 +1488,7 @@ function UseTransports(units, transports, location, transportPlatoon)
         if allDead or transDead then return false end
         attached = true
         for k,v in monitorUnits do
-            if not v:IsDead() and not v:IsIdleState() then
+            if not v.Dead and not v:IsIdleState() then
                 attached = false
                 break
             end
@@ -1496,18 +1496,18 @@ function UseTransports(units, transports, location, transportPlatoon)
     until attached
     -- Any units that aren't transports and aren't attached send back to pool
     for k,unit in units do
-        if not unit:IsDead() and not EntityCategoryContains( categories.TRANSPORTATION, unit ) then
+        if not unit.Dead and not EntityCategoryContains( categories.TRANSPORTATION, unit ) then
             if not unit:IsUnitState('Attached') then
                 aiBrain:AssignUnitsToPlatoon( pool, {unit}, 'Unassigned', 'None' )
             end
-        elseif not unit:IsDead() and EntityCategoryContains( categories.TRANSPORTATION, unit ) and table.getn(unit:GetCargo()) < 1 then
+        elseif not unit.Dead and EntityCategoryContains( categories.TRANSPORTATION, unit ) and table.getn(unit:GetCargo()) < 1 then
             ReturnTransportsToPool({unit}, true)
 			table.remove(transports, k)
         end
     end
     -- DUNCAN - if some transports have no units return to pool
     for k,t in transports do
-        if not t:IsDead() and table.getn(t:GetCargo()) < 1 then
+        if not t.Dead and table.getn(t:GetCargo()) < 1 then
             aiBrain:AssignUnitsToPlatoon( 'ArmyPool', {t}, 'Scout', 'None' )
             table.remove( transports, k )
         end
@@ -1541,7 +1541,7 @@ function UseTransports(units, transports, location, transportPlatoon)
         WaitSeconds(2)
         local allDead = true
         for k,v in transports do
-            if not v:IsDead() then
+            if not v.Dead then
                 allDead = false
                 break
             end
@@ -1551,7 +1551,7 @@ function UseTransports(units, transports, location, transportPlatoon)
         end
         attached = false
         for num, unit in units do
-            if not unit:IsDead() and unit:IsUnitState('Attached') then
+            if not unit.Dead and unit:IsUnitState('Attached') then
                 attached = true
                 break
             end
@@ -1636,7 +1636,7 @@ function ReturnTransportsToPool(units, move)
         return false
     end
     for k,v in units do
-        if not v:IsDead() then
+        if not v.Dead then
             unit = v
             break
         end
@@ -1649,7 +1649,7 @@ function ReturnTransportsToPool(units, move)
     local position = RandomLocation(x,z)
     local safePath, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Air', unit:GetPosition(), position, 200)
     for k,unit in units do
-        if not unit:IsDead() and EntityCategoryContains( categories.TRANSPORTATION, unit ) then
+        if not unit.Dead and EntityCategoryContains( categories.TRANSPORTATION, unit ) then
             aiBrain:AssignUnitsToPlatoon( 'ArmyPool', {unit}, 'Scout', 'None' )
             if move then
                 if safePath then
@@ -1759,7 +1759,7 @@ function EngineerTryReclaimCaptureArea(aiBrain, eng, pos)
     -- ( Rect( pos[1] - 7, pos[3] - 7, pos[1] + 7, pos[3] + 7 ) )
     if checkUnits and table.getn(checkUnits) > 0 then
         for num,unit in checkUnits do
-            if not unit:IsDead() and EntityCategoryContains( categories.ENGINEER, unit ) and ( unit:GetAIBrain():GetFactionIndex() ~= aiBrain:GetFactionIndex() ) then
+            if not unit.Dead and EntityCategoryContains( categories.ENGINEER, unit ) and ( unit:GetAIBrain():GetFactionIndex() ~= aiBrain:GetFactionIndex() ) then
                 IssueReclaim( {eng}, unit )
             elseif not EntityCategoryContains( categories.COMMAND, eng ) then
                 IssueCapture( {eng}, unit )
@@ -1854,10 +1854,10 @@ function EngineerTryReclaimCaptureAreaSorian(aiBrain, eng, pos)
 	for k,v in checkCats do
 		local checkUnits = aiBrain:GetUnitsAroundPoint( v, pos, 10, 'Enemy' )
 		for num,unit in checkUnits do
-			if not unit:IsDead() and EntityCategoryContains( categories.ENGINEER, unit ) then
+			if not unit.Dead and EntityCategoryContains( categories.ENGINEER, unit ) then
 				IssueCapture( {eng}, unit )
 				return true
-			elseif not unit:IsDead() and not EntityCategoryContains( categories.ENGINEER, unit ) then
+			elseif not unit.Dead and not EntityCategoryContains( categories.ENGINEER, unit ) then
 				IssueReclaim( {eng}, unit )
 				return true
 			end
@@ -2099,7 +2099,7 @@ function AIFindPingTargetInRangeSorian( aiBrain, platoon, squad, maxRange, atkPr
 			local distance = false
 			local targetShields = 9999
 			for num, unit in targetUnits do
-				if not unit:IsDead() and EntityCategoryContains( category, unit ) and platoon:CanAttackTarget( squad, unit ) then
+				if not unit.Dead and EntityCategoryContains( category, unit ) and platoon:CanAttackTarget( squad, unit ) then
 					local unitPos = unit:GetPosition()
 					if avoidbases then
 						for k,v in ArmyBrains do
@@ -2122,7 +2122,7 @@ function AIFindPingTargetInRangeSorian( aiBrain, platoon, squad, maxRange, atkPr
 			if retUnit and targetShields > 0 then
 				local platoonUnits = platoon:GetPlatoonUnits()
 				for k,v in platoonUnits do
-					if not v:IsDead() then
+					if not v.Dead then
 						unit = v
 						break
 					end
@@ -2151,7 +2151,7 @@ function AIFindAirAttackTargetInRangeSorian( aiBrain, platoon, squad, atkPri, po
 		local distance = false
 		local targetShields = 9999
 		for num, unit in targetUnits do
-			if not unit:IsDead() and EntityCategoryContains( category, unit ) and platoon:CanAttackTarget( squad, unit ) then
+			if not unit.Dead and EntityCategoryContains( category, unit ) and platoon:CanAttackTarget( squad, unit ) then
 				local unitPos = unit:GetPosition()
 				local numShields = aiBrain:GetNumUnitsAroundPoint( categories.DEFENSE * categories.SHIELD * categories.STRUCTURE, unitPos, 50, 'Enemy' )
 				if not retUnit or numShields < targetShields or (numShields == targetShields and Utils.XZDistanceTwoVectors( position, unitPos ) < distance) then
@@ -2164,7 +2164,7 @@ function AIFindAirAttackTargetInRangeSorian( aiBrain, platoon, squad, atkPri, po
 		if retUnit and targetShields > 0 then
 			local platoonUnits = platoon:GetPlatoonUnits()
 			for k,v in platoonUnits do
-				if not v:IsDead() then
+				if not v.Dead then
 					unit = v
 					break
 				end
@@ -2249,7 +2249,7 @@ function AIFindBrainTargetInRangeSorian( aiBrain, platoon, squad, maxRange, atkP
         local distance = false
 		local targetShields = 9999
         for num, unit in targetUnits do
-            if not unit:IsDead() and EntityCategoryContains( category, unit ) and platoon:CanAttackTarget( squad, unit ) then
+            if not unit.Dead and EntityCategoryContains( category, unit ) and platoon:CanAttackTarget( squad, unit ) then
                 local unitPos = unit:GetPosition()
 				if avoidbases then
 					for k,v in ArmyBrains do
@@ -2272,7 +2272,7 @@ function AIFindBrainTargetInRangeSorian( aiBrain, platoon, squad, maxRange, atkP
 		if retUnit and targetShields > 0 then
 			local platoonUnits = platoon:GetPlatoonUnits()
 			for k,v in platoonUnits do
-				if not v:IsDead() then
+				if not v.Dead then
 					unit = v
 					break
 				end
@@ -2303,7 +2303,7 @@ function AIFindUndefendedBrainTargetInRangeSorian( aiBrain, platoon, squad, maxR
         local distance = false
 		local targetShields = 9999
         for num, unit in targetUnits do
-            if not unit:IsDead() and EntityCategoryContains( category, unit ) and platoon:CanAttackTarget( squad, unit ) then
+            if not unit.Dead and EntityCategoryContains( category, unit ) and platoon:CanAttackTarget( squad, unit ) then
                 local unitPos = unit:GetPosition()
 				local numShields = aiBrain:GetNumUnitsAroundPoint( categories.DEFENSE * categories.SHIELD * categories.STRUCTURE, unitPos, 46, 'Enemy' )
                 if numShields < maxShields and (not retUnit or numShields < targetShields or (numShields == targetShields and Utils.XZDistanceTwoVectors( position, unitPos ) < distance)) then
@@ -2316,7 +2316,7 @@ function AIFindUndefendedBrainTargetInRangeSorian( aiBrain, platoon, squad, maxR
 		if retUnit and targetShields > 0 then
 			local platoonUnits = platoon:GetPlatoonUnits()
 			for k,v in platoonUnits do
-				if not v:IsDead() then
+				if not v.Dead then
 					unit = v
 					break
 				end
@@ -2348,14 +2348,14 @@ function AIFindBrainNukeTargetInRangeSorian( aiBrain, platoon, maxRange, atkPri,
 		local retAntis = 0
         local distance = false
         for num, unit in targetUnits do
-            if not unit:IsDead() and EntityCategoryContains( category, unit ) then
+            if not unit.Dead and EntityCategoryContains( category, unit ) then
                 local unitPos = unit:GetPosition()
 				-- local antiNukes = aiBrain:GetNumUnitsAroundPoint( categories.ANTIMISSILE * categories.TECH3 * categories.STRUCTURE, unitPos, 90, 'Enemy' )
 				local antiNukes = SUtils.NumberofUnitsBetweenPoints(aiBrain, position, unitPos, categories.ANTIMISSILE * categories.TECH3 * categories.STRUCTURE, 90, 'Enemy')
 				if not SUtils.CheckCost(aiBrain, unitPos, massCost * antiNukes) then continue end
 				local dupTarget = false
 				for x,z in oldTarget do
-					if unit == z or (not z:IsDead() and Utils.XZDistanceTwoVectors( z:GetPosition(), unitPos ) < 30) then
+					if unit == z or (not z.Dead and Utils.XZDistanceTwoVectors( z:GetPosition(), unitPos ) < 30) then
 						dupTarget = true
 					end
 				end
@@ -2410,7 +2410,7 @@ function GetOwnUnitsAroundPointSorian( aiBrain, category, location, radius, min,
         checkThreat = true
     end
     for k,v in units do
-        if not v:IsDead() and not v:IsBeingBuilt() and v:GetAIBrain():GetArmyIndex() == index then
+        if not v.Dead and not v:IsBeingBuilt() and v:GetAIBrain():GetArmyIndex() == index then
 			local loc = v:GetPosition()
 			if VDist2Sq(location[1], location[3], loc[1], loc[3]) > minDist then
 				if checkThreat then
@@ -2433,7 +2433,7 @@ function FindUnclutteredArea( aiBrain, category, location, radius, maxUnits, max
     local index = aiBrain:GetArmyIndex()
     local retUnits = {}
     for k,v in units do
-        if not v:IsDead() and not v:IsBeingBuilt() and v:GetAIBrain():GetArmyIndex() == index then
+        if not v.Dead and not v:IsBeingBuilt() and v:GetAIBrain():GetArmyIndex() == index then
 			local nearby = aiBrain:GetNumUnitsAroundPoint( avoidCat, v:GetPosition(), maxRadius, 'Ally' )
 			if nearby < maxUnits then
 				table.insert(retUnits, v)
@@ -2468,7 +2468,7 @@ end
 
 
 function AIFindDefensiveAreaSorian( aiBrain, unit, category, range, runShield )
-    if not unit:IsDead() then
+    if not unit.Dead then
         -- Build a grid to find units near
         local gridSize = range / 5
         if gridSize > 150 then
@@ -2672,7 +2672,7 @@ end
 function UseTransportsGhetto(units, transports)
     local aiBrain
     for k,v in units do
-        if not v:IsDead() then
+        if not v.Dead then
             aiBrain = v:GetAIBrain()
             break
         end
@@ -2711,7 +2711,7 @@ function UseTransportsGhetto(units, transports)
     local remainingSize1 = {}
     local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
     for num, unit in units do
-        if not unit:IsDead() then
+        if not unit.Dead then
             if unit:IsUnitState( 'Attached' ) then
                 aiBrain:AssignUnitsToPlatoon( pool, {unit}, 'Unassigned', 'None' )
                 -- LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': Already Attached units adding to pool' )
@@ -2779,13 +2779,13 @@ function UseTransportsGhetto(units, transports)
         local allDead = true
 		local transDead = true
         for k,v in units do
-            if not v:IsDead() then
+            if not v.Dead then
                 allDead = false
                 break
             end
         end
         for k,v in transports do
-            if not v:IsDead() then
+            if not v.Dead then
                 transDead = false
                 break
             end
@@ -2793,7 +2793,7 @@ function UseTransportsGhetto(units, transports)
         if allDead or transDead then return false end
         attached = true
         for k,v in monitorUnits do
-            if not v:IsDead() and not v:IsIdleState() then
+            if not v.Dead and not v:IsIdleState() then
                 attached = false
                 break
             end
@@ -2801,18 +2801,18 @@ function UseTransportsGhetto(units, transports)
     until attached
     -- Any units that aren't transports and aren't attached send back to pool
     for k,unit in units do
-        if not unit:IsDead() and not EntityCategoryContains( categories.TRANSPORTATION, unit ) then
+        if not unit.Dead and not EntityCategoryContains( categories.TRANSPORTATION, unit ) then
             if not unit:IsUnitState('Attached') then
                 aiBrain:AssignUnitsToPlatoon( pool, {unit}, 'Unassigned', 'None' )
             end
-        elseif not unit:IsDead() and EntityCategoryContains( categories.TRANSPORTATION, unit ) and table.getn(unit:GetCargo()) < 1 then
+        elseif not unit.Dead and EntityCategoryContains( categories.TRANSPORTATION, unit ) and table.getn(unit:GetCargo()) < 1 then
             ReturnTransportsToPool({unit}, true)
 			table.remove(transports, k)
         end
     end
     -- Return empty transports to base
 	for k,v in transports do
-        if not v:IsDead() and EntityCategoryContains( categories.TRANSPORTATION, v ) and table.getn(v:GetCargo()) < 1 then
+        if not v.Dead and EntityCategoryContains( categories.TRANSPORTATION, v ) and table.getn(v:GetCargo()) < 1 then
             ReturnTransportsToPool({v}, true)
 			table.remove(transports, k)
         end

@@ -547,7 +547,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ESMassStorageUpdate = function(self, newState)
         if self.EconMassStorageState != newState then
             for k, v in self.EconStateUnits.MassStorage do
-                if not v:IsDead() then
+                if not v.Dead then
                     v:OnMassStorageStateChange(newState)
                 else
                     table.remove(self.EconStateUnits.MassStorage, k)
@@ -582,7 +582,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ESEnergyStorageUpdate = function(self, newState)
         if self.EconEnergyStorageState != newState then
             for k, v in self.EconStateUnits.EnergyStorage do
-                if not v:IsDead() then
+                if not v.Dead then
                     v:OnEnergyStorageStateChange(newState)
                 else
                     table.remove(self.EconStateUnits.EnergyStorage, k)
@@ -696,7 +696,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
 
     IsUnitTargeatable = function(self, blip, unit)
-        if unit and not unit:IsDead() and IsUnit(unit) then
+        if unit and not unit.Dead and IsUnit(unit) then
             -- if we've got a LOS, then we can fire.
             if blip:IsSeenNow(self:GetArmyIndex()) then
                 return true
@@ -717,7 +717,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     SetUnitIntelTable = function(self, unit, reconType, val)
-        if unit and not unit:IsDead() and IsUnit(unit) then
+        if unit and not unit.Dead and IsUnit(unit) then
 
             local UnitId = unit:GetEntityId()
             if not self.UnitIntelList[UnitId] and val then
@@ -2415,7 +2415,7 @@ AIBrain = Class(moho.aibrain_methods) {
             end
             local afac, lfac, sfac, gatefac
             if table.getn(airFactories) > 0 then
-                if not v.PrimaryFactories.Air or v.PrimaryFactories.Air:IsDead()
+                if not v.PrimaryFactories.Air or v.PrimaryFactories.Air.Dead
                     or v.PrimaryFactories.Air:IsUnitState('Upgrading')
                     or self:PBMCheckHighestTechFactory(airFactories, v.PrimaryFactories.Air) then
                         fac = self:PBMGetPrimaryFactory(airFactories)
@@ -2424,7 +2424,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 self:PBMAssistGivenFactory( airFactories, v.PrimaryFactories.Air )
             end
             if table.getn(landFactories) > 0 then
-                if not v.PrimaryFactories.Land or v.PrimaryFactories.Land:IsDead()
+                if not v.PrimaryFactories.Land or v.PrimaryFactories.Land.Dead
                     or v.PrimaryFactories.Land:IsUnitState('Upgrading')
                     or self:PBMCheckHighestTechFactory(landFactories, v.PrimaryFactories.Land) then
                         lfac = self:PBMGetPrimaryFactory(landFactories)
@@ -2433,7 +2433,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 self:PBMAssistGivenFactory( landFactories, v.PrimaryFactories.Land )
             end
             if table.getn(seaFactories) > 0 then
-                if not v.PrimaryFactories.Sea or v.PrimaryFactories.Sea:IsDead()
+                if not v.PrimaryFactories.Sea or v.PrimaryFactories.Sea.Dead
                     or v.PrimaryFactories.Sea:IsUnitState('Upgrading')
                     or self:PBMCheckHighestTechFactory(seaFactories, v.PrimaryFactories.Sea) then
                         sfac = self:PBMGetPrimaryFactory(seaFactories)
@@ -2442,7 +2442,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 self:PBMAssistGivenFactory( seaFactories, v.PrimaryFactories.Sea )
             end
             if table.getn(gates) > 0 then
-                if not v.PrimaryFactories.Gate or v.PrimaryFactories.Gate:IsDead() then
+                if not v.PrimaryFactories.Gate or v.PrimaryFactories.Gate.Dead then
                     gatefac = self:PBMGetPrimaryFactory(gates)
                     v.PrimaryFactories.Gate = gatefac
                 end
@@ -2459,7 +2459,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     PBMAssistGivenFactory = function( self, factories, primary )
         for k,v in factories do
-            if not v:IsDead() and not ( v:IsUnitState('Building') or v:IsUnitState('Upgrading') ) then
+            if not v.Dead and not ( v:IsUnitState('Building') or v:IsUnitState('Upgrading') ) then
                 local guarded = v:GetGuardedUnit()
                 if not guarded or guarded:GetEntityId() ~= primary:GetEntityId() then
                     IssueClearCommands( {v} )
@@ -2557,7 +2557,7 @@ AIBrain = Class(moho.aibrain_methods) {
         for catNum, cat in catTable do
             if catNum > catLevel then
                 for unitNum, unit in factories do
-                    if not unit:IsDead() and EntityCategoryContains( cat, unit ) and not unit:IsUnitState('Upgrading') then
+                    if not unit.Dead and EntityCategoryContains( cat, unit ) and not unit:IsUnitState('Upgrading') then
                         return true
                     end
                 end
@@ -2738,7 +2738,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 local facs = {}
                 for k,v in loc.PrimaryFactories do
                     table.insert( facs, v )
-                    if not v:IsDead() then
+                    if not v.Dead then
                         for fNum, fac in v:GetGuards() do
                             if EntityCategoryContains( categories.FACTORY, fac ) then
                                 table.insert( facs, fac )
@@ -2812,7 +2812,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
         local poolTransfer = {}
         for k,v in poolPlat:GetPlatoonUnits() do
-            if not v:IsDead() and EntityCategoryContains( categories.FACTORY - categories.MOBILE, v ) then
+            if not v.Dead and EntityCategoryContains( categories.FACTORY - categories.MOBILE, v ) then
                 if v:IsUnitState( 'Building' ) or v:IsUnitState( 'Upgrading' ) then
                     table.insert( poolTransfer, v )
                 end
@@ -2821,7 +2821,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
         local busyTransfer = {}
         for k,v in busyPlat:GetPlatoonUnits() do
-            if not v:IsDead() and not v:IsUnitState( 'Building' ) and not v:IsUnitState( 'Upgrading' ) then
+            if not v.Dead and not v:IsUnitState( 'Building' ) and not v:IsUnitState( 'Upgrading' ) then
                 table.insert( busyTransfer, v )
             end
         end
@@ -2987,7 +2987,7 @@ AIBrain = Class(moho.aibrain_methods) {
                             if v.PrimaryFactories[typev] then
                                 local priFac = v.PrimaryFactories[typev]
                                 local numBuildOrders = nil
-                                if priFac and not priFac:IsDead() then
+                                if priFac and not priFac.Dead then
                                     numBuildOrders = priFac:GetNumBuildOrders(categories.ALLUNITS)
                                     if numBuildOrders == 0 then
                                         local guards = priFac:GetGuards()
@@ -3953,7 +3953,7 @@ AIBrain = Class(moho.aibrain_methods) {
         local indexChecker = {}
 
         for k,v in structures do
-            if not v:IsDead() then
+            if not v.Dead then
                 local pos = AIUtils.GetUnitBaseStructureVector( v )
                 if pos then
                     if not indexChecker[pos[1]] then
@@ -4291,7 +4291,7 @@ AIBrain = Class(moho.aibrain_methods) {
         end
 
         for idx,loc in self.InterestList.MustScout do
-            if not loc.TaggedBy or loc.TaggedBy:IsDead() then
+            if not loc.TaggedBy or loc.TaggedBy.Dead then
                 return loc, idx
             end
         end

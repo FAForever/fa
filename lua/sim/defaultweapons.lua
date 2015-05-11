@@ -2,7 +2,7 @@
 -- File     :  /lua/sim/DefaultWeapons.lua
 -- Author(s):  John Comes
 -- Summary  :  Default definitions of weapons
--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 local Weapon = import('/lua/sim/Weapon.lua').Weapon
 local CollisionBeam = import('/lua/sim/CollisionBeam.lua').CollisionBeam
@@ -446,7 +446,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         WeaponAimWantEnabled = true,
 
         Main = function(self)
-            if self.unit:IsDead() then return end
+            if self.unit.Dead then return end
             self.unit:SetBusy(false)
             self:WaitForAndDestroyManips()
             
@@ -589,7 +589,7 @@ DefaultProjectileWeapon = Class(Weapon) {
             local totalTime = clockTime
             while clockTime > 0.0 and
                   not self:BeenDestroyed() and
-                  not self.unit:IsDead() do
+                  not self.unit.Dead do
                 self.unit:SetWorkProgress( 1 - clockTime / totalTime )
                 clockTime = clockTime - 0.1
                 WaitSeconds(0.1)
@@ -610,7 +610,7 @@ DefaultProjectileWeapon = Class(Weapon) {
 
             -- Fork timer counter thread carefully
             if not self:BeenDestroyed() and
-               not self.unit:IsDead() then
+               not self.unit.Dead then
                 if bp.RenderFireClock and bp.RateOfFire > 0 then
                     local rof = 1 / bp.RateOfFire
                     self:ForkThread(self.RenderClockThread, rof)
@@ -1106,7 +1106,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
     
     -- Kill the beam
     PlayFxBeamEnd = function(self, beam)
-        if not self.unit:IsDead() then
+        if not self.unit.Dead then
             local bp = self:GetBlueprint()
             if bp.Audio.BeamStop and self.BeamStarted then
                 self:PlaySound(bp.Audio.BeamStop)

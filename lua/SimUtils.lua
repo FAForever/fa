@@ -1,4 +1,4 @@
--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --
 -- General Sim scripts
 
@@ -48,7 +48,7 @@ import('/lua/SimPlayerQuery.lua').AddResultListener( "OfferAlliance", OnAlliance
 function KillSharedUnits(owner)
     if sharedUnits[owner] and table.getn(sharedUnits[owner]) > 0 then
         for index,unit in sharedUnits[owner] do
-            if not unit:IsDead() and unit.oldowner == owner then
+            if not unit.Dead and unit.oldowner == owner then
                 unit:Kill()
             end
         end

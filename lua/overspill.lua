@@ -22,7 +22,7 @@ function GetOverlappingShields(source)
 
     local obp, oOverlapRadius, vpos, OverlapDist
     for k, v in units do
-        if v and IsUnit(v) and not v:IsDead()
+        if v and IsUnit(v) and not v.Dead
              and v.MyShield and v.MyShield:IsUp()
              and v.MyShield.Size and v.MyShield.Size > 0
              and source.Owner != v then

@@ -6,7 +6,7 @@
 #**  Summary  : Generic AI Platoon Build Conditions
 #**             Build conditions always return true or false
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local ScenarioFramework = import('/lua/scenarioframework.lua')
@@ -328,14 +328,14 @@ function HaveLessThanUnitsInCategoryBeingBuilt(aiBrain, numunits, category)
     for unitNum, unit in unitsBuilding do
         if not unit:BeenDestroyed() and unit:IsUnitState('Building') then
             local buildingUnit = unit:GetUnitBeingBuilt()
-            if buildingUnit and not buildingUnit:IsDead() and EntityCategoryContains( category, buildingUnit ) then
+            if buildingUnit and not buildingUnit.Dead and EntityCategoryContains( category, buildingUnit ) then
 				numBuilding = numBuilding + 1	
             end
         end
 		#DUNCAN - added to pick up engineers that havent started building yet... does it work?
 		if not unit:BeenDestroyed() and not unit:IsUnitState('Building') then
 			local buildingUnit = unit:GetUnitBeingBuilt()
-            if buildingUnit and not buildingUnit:IsDead() and EntityCategoryContains( category, buildingUnit ) then
+            if buildingUnit and not buildingUnit.Dead and EntityCategoryContains( category, buildingUnit ) then
 				#LOG('Engi building but not in building state...')
 				numBuilding = numBuilding + 1	
             end
@@ -842,7 +842,7 @@ function AdjacencyCheck( aiBrain, locationType, category, radius, testUnit )
     local template = {}
     local unitSize = aiBrain:GetUnitBlueprint( testUnit ).Physics
     for k,v in reference do
-        if not v:IsDead() then
+        if not v.Dead then
             local targetSize = v:GetBlueprint().Physics
             local targetPos = v:GetPosition()
             targetPos[1] = targetPos[1] - (targetSize.SkirtSizeX/2)
@@ -1124,7 +1124,7 @@ function DamagedStructuresInArea(aiBrain, locationtype)
     end
     local Structures = AIUtils.GetOwnUnitsAroundPoint( aiBrain, categories.STRUCTURE - (categories.TECH1 - categories.FACTORY), engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius() )
     for k,v in Structures do
-        if not v:IsDead() and v:GetHealthPercent() < .8 then
+        if not v.Dead and v:GetHealthPercent() < .8 then
 		#LOG('*AI DEBUG: DamagedStructuresInArea return true')
 			return true
         end

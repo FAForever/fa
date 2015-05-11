@@ -223,7 +223,7 @@ function HaveLessThanUnitsInCategoryBeingBuilt(aiBrain, numunits, category)
     for unitNum, unit in unitsBuilding do
         if not unit:BeenDestroyed() and unit:IsUnitState('Building') then
             local buildingUnit = unit:GetUnitBeingBuilt()
-            if buildingUnit and not buildingUnit:IsDead() and EntityCategoryContains( category, buildingUnit ) then
+            if buildingUnit and not buildingUnit.Dead and EntityCategoryContains( category, buildingUnit ) then
 				numBuilding = numBuilding + 1	
             end
         end
@@ -255,7 +255,7 @@ function HaveGreaterThanUnitsInCategoryBeingBuilt(aiBrain, numunits, category)
     for unitNum, unit in unitsBuilding do
         if not unit:BeenDestroyed() and unit:IsUnitState('Building') then
             local buildingUnit = unit:GetUnitBeingBuilt()
-            if buildingUnit and not buildingUnit:IsDead() and EntityCategoryContains( category, buildingUnit ) then
+            if buildingUnit and not buildingUnit.Dead and EntityCategoryContains( category, buildingUnit ) then
 				numBuilding = numBuilding + 1	
             end
         end
@@ -305,7 +305,7 @@ function GreaterThanEconEfficiencyOverTimeExp(aiBrain, MassEfficiency, EnergyEff
     for unitNum, unit in unitsBuilding do
         if not unit:BeenDestroyed() and unit:IsUnitState('Building') then
             local buildingUnit = unit:GetUnitBeingBuilt()
-            if buildingUnit and not buildingUnit:IsDead() and EntityCategoryContains( categories.EXPERIMENTAL, buildingUnit ) then
+            if buildingUnit and not buildingUnit.Dead and EntityCategoryContains( categories.EXPERIMENTAL, buildingUnit ) then
 				numBuilding = numBuilding + 1	
             end
         end

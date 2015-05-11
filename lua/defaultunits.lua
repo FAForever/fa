@@ -274,12 +274,12 @@ StructureUnit = Class(Unit) {
                 self:StartUpgradeEffects(unitBuilding)
                 self.AnimatorUpgradeManip:PlayAnim(bp.AnimationUpgrade, false):SetRate(0)
 
-                while fractionOfComplete < 1 and not self:IsDead() do
+                while fractionOfComplete < 1 and not self.Dead do
                     fractionOfComplete = unitBuilding:GetFractionComplete()
                     self.AnimatorUpgradeManip:SetAnimationFraction(fractionOfComplete)
                     WaitTicks(1)
                 end
-                if not self:IsDead() then
+                if not self.Dead then
                     self.AnimatorUpgradeManip:SetRate(1)
                 end
             end
@@ -494,7 +494,7 @@ StructureUnit = Class(Unit) {
         if not self.AdjacencyBeamsBag then return end
 
         for k, v in self.AdjacencyBeamsBag do
-            if v.Unit:BeenDestroyed() or v.Unit:IsDead() then
+            if v.Unit:BeenDestroyed() or v.Unit.Dead then
                 v.Trash:Destroy()
                 self.AdjacencyBeamsBag[k] = nil
             end
@@ -659,7 +659,7 @@ FactoryUnit = Class(StructureUnit) {
             WaitTicks(1)
             WaitFor(self.RollOffAnim)
         end
-        if unitBeingBuilt and not unitBeingBuilt:IsDead() then
+        if unitBeingBuilt and not unitBeingBuilt.Dead then
             unitBeingBuilt:DetachFrom(true)
         end
         self:DetachAll(bp.Display.BuildAttachBone or 0)
@@ -763,7 +763,7 @@ FactoryUnit = Class(StructureUnit) {
         self:SetBlockCommandQueue(true)
         self:PlayFxRollOff()
         -- Wait until unit has left the factory
-        while not self.UnitBeingBuilt:IsDead() and self.MoveCommand and not IsCommandDone(self.MoveCommand) do
+        while not self.UnitBeingBuilt.Dead and self.MoveCommand and not IsCommandDone(self.MoveCommand) do
             WaitSeconds(0.5)
         end
         self.MoveCommand = nil
@@ -805,7 +805,7 @@ FactoryUnit = Class(StructureUnit) {
 
     OnKilled = function(self, instigator, type, overkillRatio)
         StructureUnit.OnKilled(self, instigator, type, overkillRatio)
-        if self.UnitBeingBuilt and not self.UnitBeingBuilt:IsDead() and self.UnitBeingBuilt:GetFractionComplete() ~= 1 then
+        if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() ~= 1 then
             self.UnitBeingBuilt:Kill()
         end
     end,
@@ -969,7 +969,7 @@ MassCollectionUnit = Class(StructureUnit) {
             return fraction
         end
 
-        while not self:IsDead() do
+        while not self.Dead do
             local massProduction = bp.Economy.ProductionPerSecondMass * (self.MassProdAdjMod or 1)
             if self:IsPaused() then
                 -- paused mex upgrade (another bug here that caused paused upgrades to continue use resources)
@@ -1186,7 +1186,7 @@ SonarUnit = Class(StructureUnit) {
         local pos = self:GetPosition()
 
         if self.TimedSonarTTIdleEffects then
-            while not self:IsDead() do
+            while not self.Dead do
                 for kTypeGroup, vTypeGroup in self.TimedSonarTTIdleEffects do
                     local effects = self.GetTerrainTypeEffects( 'FXIdle', layer, pos, vTypeGroup.Type, nil )
 
@@ -1416,9 +1416,9 @@ WalkingLandUnit = Class(MobileUnit) {
         elseif ( new == 'Stopped' ) then
             -- only keep the animator around if we are dying and playing a death anim
             -- or if we have an idle anim
-            if(self.IdleAnim and not self:IsDead()) then
+            if(self.IdleAnim and not self.Dead) then
                 self.Animator:PlayAnim(self.IdleAnim, true)
-            elseif(not self.DeathAnim or not self:IsDead()) then
+            elseif(not self.DeathAnim or not self.Dead) then
                 self.Animator:Destroy()
                 self.Animator = false
             end

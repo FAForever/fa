@@ -5,7 +5,7 @@
 #**
 #**  Summary  :
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 #
 # Basic create formation scripts
@@ -800,7 +800,7 @@ function GuardFormation( formationUnits )
     local naval = false
     local sizeMult = 3
     for k,v in formationUnits do
-        if not v:IsDead() and EntityCategoryContains( categories.NAVAL * categories.MOBILE, v ) then
+        if not v.Dead and EntityCategoryContains( categories.NAVAL * categories.MOBILE, v ) then
             naval = true
             sizeMult = 8
             break

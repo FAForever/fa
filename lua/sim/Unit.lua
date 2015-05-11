@@ -259,14 +259,14 @@ Unit = Class(moho.unit_methods) {
 
     --Add a target to the weapon list for this unit
     addTargetWeapon = function(self, target)
-        if not target:IsDead() then
+        if not target.Dead then
             table.insert(self.WeaponTargets, target)
         end
     end,
 
     --Add a target to the list for this unit
     addTarget = function(self, target)
-        if not target:IsDead() then
+        if not target.Dead then
             table.insert(self.Targets, target)
         end
     end,
@@ -275,7 +275,7 @@ Unit = Class(moho.unit_methods) {
     clearTarget = function(self)
         --Tell our target we are no longer a threat
         for k, ent in self.Targets do
-            if not ent:IsDead() then
+            if not ent.Dead then
                 ent:removeAttacker(self)
             end
         end
@@ -439,13 +439,13 @@ Unit = Class(moho.unit_methods) {
             end
 
             for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH2 * faction, false, true) do
-                if not unit:IsDead() and not unit:IsBeingBuilt() then
+                if not unit.Dead and not unit:IsBeingBuilt() then
                     self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE * categories.CONSTRUCTION)
                 end
             end
 
             for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH3 * faction, false, true) do
-                if not unit:IsDead() and not unit:IsBeingBuilt() then
+                if not unit.Dead and not unit:IsBeingBuilt() then
                     self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE * categories.CONSTRUCTION)
                     self:RemoveBuildRestriction(categories.TECH3 * categories.MOBILE * categories.CONSTRUCTION)
                     break
@@ -453,14 +453,14 @@ Unit = Class(moho.unit_methods) {
             end
 
             for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH2 * faction * type, false, true) do
-                if not unit:IsDead() and not unit:IsBeingBuilt() then
+                if not unit.Dead and not unit:IsBeingBuilt() then
                     self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE)
                     break
                 end
             end
 
             for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH3 * faction * type, false, true) do
-                if not unit:IsDead() and not unit:IsBeingBuilt() then
+                if not unit.Dead and not unit:IsBeingBuilt() then
                     self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE)
                     self:RemoveBuildRestriction(categories.TECH3 * categories.MOBILE)
                     self:RemoveBuildRestriction(categories.TECH3 * categories.FACTORY * categories.SUPPORTFACTORY)
@@ -471,7 +471,7 @@ Unit = Class(moho.unit_methods) {
             for i,researchType in ipairs({categories.LAND, categories.AIR, categories.NAVAL}) do
                 --If there is a research station of the appropriate type, enable support factory construction
                 for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH2 * faction * researchType, false, true) do
-                    if not unit:IsDead() and not unit:IsBeingBuilt() then
+                    if not unit.Dead and not unit:IsBeingBuilt() then
                         --Special case for the Commander, since its engineering upgrades are implemented using build restrictions
                         --In future, figure out a way to query existing legal builds? For example, check if you can build T2, if you can, enable support factory too
                         if EntityCategoryContains(categories.COMMAND, self) then
@@ -486,7 +486,7 @@ Unit = Class(moho.unit_methods) {
                 end
 
                 for id, unit in aiBrain:GetListOfUnits(categories.RESEARCH * categories.TECH3 * faction * researchType, false, true) do
-                    if not unit:IsDead() and not unit:IsBeingBuilt() then
+                    if not unit.Dead and not unit:IsBeingBuilt() then
 
                         --Special case for the commander, since its engineering upgrades are implemented using build restrictions
                         if EntityCategoryContains(categories.COMMAND, self) then
@@ -753,7 +753,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnCaptured = function(self, captor)
-        if self and not self:IsDead() and captor and not captor:IsDead() and self:GetAIBrain() ~= captor:GetAIBrain() then
+        if self and not self.Dead and captor and not captor.Dead and self:GetAIBrain() ~= captor:GetAIBrain() then
             if not self:IsCapturable() then
                 self:Kill()
                 return
@@ -762,7 +762,7 @@ Unit = Class(moho.unit_methods) {
             if EntityCategoryContains( categories.TRANSPORTATION, self ) then
                 local cargo = self:GetCargo()
                 for _,v in cargo do
-                    if not v:IsDead() and not v:IsCapturable() then
+                    if not v.Dead and not v:IsCapturable() then
                         v:Kill()
                     end
                 end
@@ -878,14 +878,14 @@ Unit = Class(moho.unit_methods) {
         local units = {}
         --We need to check all the units assisting.
         for k,v in self:GetGuards() do
-            if not v:IsDead() then
+            if not v.Dead then
                 table.insert(units, v)
             end
         end
 
         local workers = self:GetAIBrain():GetUnitsAroundPoint(( categories.REPAIR), self:GetPosition(), 50, 'Ally' )
         for k,v in workers do
-            if not v:IsDead() and v:IsUnitState('Repairing') and v:GetFocusUnit() == self then
+            if not v.Dead and v:IsUnitState('Repairing') and v:GetFocusUnit() == self then
                 table.insert(units, v)
             end
         end
@@ -931,7 +931,7 @@ Unit = Class(moho.unit_methods) {
             elseif focus then --Handling upgrades
                 if self_state == 'Upgrading' then
                     baseData = self:GetBlueprint().Economy --Upgrading myself, substract ev. baseCost
-                elseif focus.originalBuilder and not focus.originalBuilder:IsDead() and focus.originalBuilder:IsUnitState('Upgrading') then
+                elseif focus.originalBuilder and not focus.originalBuilder.Dead and focus.originalBuilder:IsUnitState('Upgrading') then
                     baseData = focus.originalBuilder:GetBlueprint().Economy
                 end
 
@@ -1059,7 +1059,7 @@ Unit = Class(moho.unit_methods) {
             end
         end
 
-        if health < 1 or self:IsDead() then
+        if health < 1 or self.Dead then
             if vector then
                 self.debris_Vector = vector
             else
@@ -1167,7 +1167,7 @@ Unit = Class(moho.unit_methods) {
 
         self:DoUnitCallbacks( 'OnKilled' )
 
-        if self.UnitBeingTeleported and not self.UnitBeingTeleported:IsDead() then
+        if self.UnitBeingTeleported and not self.UnitBeingTeleported.Dead then
             self.UnitBeingTeleported:Destroy()
             self.UnitBeingTeleported = nil
         end
@@ -1614,7 +1614,7 @@ Unit = Class(moho.unit_methods) {
 
         --Destroy units under construction if their Factory dies
         if EntityCategoryContains(categories.FACTORY, self) then
-            if self.UnitBeingBuilt and not self.UnitBeingBuilt:IsDead() and self.UnitBeingBuilt:GetFractionComplete() ~= 1 then
+            if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() ~= 1 then
                 self.UnitBeingBuilt:Destroy()
             end
         end
@@ -1822,7 +1822,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     UnitBuiltPercentageCallbackThread = function(self, percent, callback)
-        while not self:IsDead() and self:GetHealthPercent() < percent do
+        while not self.Dead and self:GetHealthPercent() < percent do
             WaitSeconds(1)
         end
         local aiBrain = self:GetAIBrain()
@@ -2017,7 +2017,7 @@ Unit = Class(moho.unit_methods) {
         --Creating the preset enhancements on SCUs after they've been constructed. Delaying this by 1 tick to fix a problem where cloak and
         --stealth enhancements work incorrectly.
         WaitTicks(1)
-        if self and not self:IsDead() then
+        if self and not self.Dead then
             self:CreatePresetEnhancements()
         end
     end,
@@ -2067,7 +2067,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     BuildManipulatorSetEnabled = function(self, enable)
-        if self:IsDead() or not self.BuildArmManipulator then return end
+        if self.Dead or not self.BuildArmManipulator then return end
         if enable then
             self.BuildArmManipulator:Enable()
         else
@@ -2576,7 +2576,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnMotionHorzEventChange = function( self, new, old )
-        if self:IsDead() then
+        if self.Dead then
             return
         end
         local layer = self:GetCurrentLayer()
@@ -2636,7 +2636,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnMotionVertEventChange = function( self, new, old )
-        if self:IsDead() then
+        if self.Dead then
             return
         end
         local layer = self:GetCurrentLayer()
@@ -2695,7 +2695,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnMotionTurnEventChange = function(self, newEvent, oldEvent)
-        if self:IsDead() then
+        if self.Dead then
             return
         end
 
@@ -3269,7 +3269,7 @@ Unit = Class(moho.unit_methods) {
 
     DoOnStartBuildCallbacks = function(self, unit)
         for k,v in self.EventCallbacks.OnStartBuild do
-            if v and unit and not unit:IsDead() and EntityCategoryContains(v.Category, unit) then
+            if v and unit and not unit.Dead and EntityCategoryContains(v.Category, unit) then
                 v.CallbackFunction(self, unit)
             end
         end
@@ -3300,7 +3300,7 @@ Unit = Class(moho.unit_methods) {
     DoOnUnitBuiltCallbacks = function(self, unit)
         if self.EventCallbacks.OnUnitBuilt then
             for k, v in self.EventCallbacks.OnUnitBuilt do
-                if v and unit and not unit:IsDead() and EntityCategoryContains(v.Category, unit) then
+                if v and unit and not unit.Dead and EntityCategoryContains(v.Category, unit) then
                     --Function will call back with both the unit's and the unit being built's handle
                     v.CallBackFunction(self, unit)
                 end
@@ -3375,7 +3375,7 @@ Unit = Class(moho.unit_methods) {
 
     WorkingState = State {
         Main = function(self)
-            while self.WorkProgress < 1 and not self:IsDead() do
+            while self.WorkProgress < 1 and not self.Dead do
                 WaitSeconds(0.1)
             end
         end,
@@ -4045,16 +4045,16 @@ Unit = Class(moho.unit_methods) {
 
     RockingThread = function(self)
         local bp = self:GetBlueprint().Display
-        if not self.RockManip and not self:IsDead() and (bp.MaxRockSpeed and bp.MaxRockSpeed > 0) then
+        if not self.RockManip and not self.Dead and (bp.MaxRockSpeed and bp.MaxRockSpeed > 0) then
             self.RockManip = CreateRotator( self, 0, 'z', nil, 0, (bp.MaxRockSpeed or 1.5) / 5, (bp.MaxRockSpeed or 1.5) * 3 / 5 )
             self.Trash:Add(self.RockManip)
             self.RockManip:SetPrecedence(0)
             while (true) do
                 WaitFor( self.RockManip )
-                if self:IsDead() then break end --Abort if the unit died
+                if self.Dead then break end --Abort if the unit died
                 self.RockManip:SetTargetSpeed( -(bp.MaxRockSpeed or 1.5) )
                 WaitFor( self.RockManip )
-                if self:IsDead() then break end --Abort if the unit died
+                if self.Dead then break end --Abort if the unit died
                 self.RockManip:SetTargetSpeed( bp.MaxRockSpeed or 1.5 )
             end
         end
@@ -4175,7 +4175,7 @@ Unit = Class(moho.unit_methods) {
         local lastTimeNukeCount = nukeCount
         local tacticalCount = self:GetTacticalSiloAmmoCount() or 0
         local lastTimeTacticalCount = tacticalCount
-        while not self:IsDead() do
+        while not self.Dead do
             nukeCount = self:GetNukeSiloAmmoCount() or 0
             tacticalCount = self:GetTacticalSiloAmmoCount() or 0
 

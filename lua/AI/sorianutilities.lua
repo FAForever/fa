@@ -52,7 +52,7 @@ function GiveAwayMyCrap(aiBrain)
 	if giveTo then
 		local myUnits = aiBrain:GetListOfUnits(categories.ALLUNITS, false)
 		for k,v in myUnits do
-			if not v:IsDead() then
+			if not v.Dead then
 				if v.PlatoonHandle and aiBrain:PlatoonExists(v.PlatoonHandle) then
 					v.PlatoonHandle:Stop()
 					v.PlatoonHandle:PlatoonDisbandNoAssign()
@@ -540,7 +540,7 @@ function ThreatBugcheck(aiBrain)
 	local unitThreat = 0
 	local units = AIUtils.GetOwnUnitsAroundPoint( aiBrain, categories.ALLUNITS, {myStartX, 0, myStartZ}, 200 )
 	for k,v in units do
-		if not v:IsDead() then
+		if not v.Dead then
 			unitThreat = (v:GetBlueprint().Defense.SurfaceThreatLevel or 0) + (v:GetBlueprint().Defense.AirThreatLevel or 0) + (v:GetBlueprint().Defense.SubThreatLevel or 0) + (v:GetBlueprint().Defense.EconomyThreatLevel or 0)
 			myThreat = myThreat + unitThreat
 		end
@@ -856,7 +856,7 @@ function FinishAIChat(data)
 		for _, cat in cats do
 			local engies = aiBrain:GetListOfUnits(categories.ENGINEER * cat - categories.COMMAND - categories.SUBCOMMANDER - categories.ENGINEERSTATION, false)
 			for k,v in engies do
-				if not v:IsDead() and v:GetParent() == v then
+				if not v.Dead and v:GetParent() == v then
 					if v.PlatoonHandle and aiBrain:PlatoonExists(v.PlatoonHandle) then
 						v.PlatoonHandle:RemoveEngineerCallbacksSorian()
 						v.PlatoonHandle:Stop()
@@ -959,7 +959,7 @@ function FindClosestUnitPosToAttack( aiBrain, platoon, squad, maxRange, atkCat, 
     local retUnit = false
     local distance = 999999
     for num, unit in targetUnits do
-        if not unit:IsDead() then
+        if not unit.Dead then
             local unitPos = unit:GetPosition()
 			#If unit is close enough, can be attacked, and not obstructed
             if (not retUnit or Utils.XZDistanceTwoVectors( position, unitPos ) < distance) and platoon:CanAttackTarget( squad, unit ) and (not turretPitch or not CheckBlockingTerrain(position, unitPos, selectedWeaponArc, turretPitch)) then
@@ -1278,7 +1278,7 @@ function GetGuardCount(aiBrain, Unit, cat)
 	local guards = Unit:GetGuards()
 	local count = 0
 	for k,v in guards do
-		if not v:IsDead() and EntityCategoryContains(cat, v) then
+		if not v.Dead and EntityCategoryContains(cat, v) then
 			count = count + 1
 		end
 	end
@@ -1378,7 +1378,7 @@ function CheckCost(aiBrain, pos, massCost)
 	local units = aiBrain:GetUnitsAroundPoint( categories.ALLUNITS, pos, 30, 'Enemy' )
 	local massValue = 0
 	for k,v in units do
-		if not v:IsDead() then
+		if not v.Dead then
 			local unitValue = (v:GetBlueprint().Economy.BuildCostMass * v:GetFractionComplete())
 			massValue = massValue + unitValue
 		end
@@ -1454,7 +1454,7 @@ function FindDamagedShield(aiBrain, locationType, buildCat)
 	local shields = aiBrain:GetUnitsAroundPoint( buildCat, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius(), 'Ally' )
 	local retShield = false
 	for num, unit in shields do
-		if not unit:IsDead() and unit:ShieldIsOn() then
+		if not unit.Dead and unit:ShieldIsOn() then
 			shieldPercent = (unit.MyShield:GetHealth() / unit.MyShield:GetMaxHealth())
 			if shieldPercent < 1 and GetGuards(aiBrain, unit) < 3 then
 				retShield = unit

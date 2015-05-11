@@ -4,7 +4,7 @@
 #**
 #**  Summary  : Manage builders
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local BuilderManager = import('/lua/sim/BuilderManager.lua').BuilderManager
@@ -118,7 +118,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     GetFactoriesBuildingCategory = function(self, category, facCategory )
         local units = {}
         for k,v in EntityCategoryFilterDown( facCategory, self.FactoryList ) do
-            if v:IsDead() then
+            if v.Dead then
                 continue
             end
             
@@ -127,7 +127,7 @@ FactoryBuilderManager = Class(BuilderManager) {
             end
             
             local beingBuiltUnit = v:GetUnitBeingBuilt()
-            if not beingBuiltUnit or beingBuiltUnit:IsDead() then
+            if not beingBuiltUnit or beingBuiltUnit.Dead then
                 continue
             end
             
@@ -235,7 +235,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     FactoryDestroyed = function(self, factory)
         local guards = factory:GetGuards()
         for k,v in guards do
-            if not v:IsDead() and v.AssistPlatoon then
+            if not v.Dead and v.AssistPlatoon then
                 if self.Brain:PlatoonExists(v.AssistPlatoon) then
                     v.AssistPlatoon:ForkThread(v.AssistPlatoon.EconAssistBody)
                 else
@@ -249,7 +249,7 @@ FactoryBuilderManager = Class(BuilderManager) {
             end
         end
         for k,v in self.FactoryList do
-            if not v:IsDead() then
+            if not v.Dead then
                 return
             end
         end
@@ -260,7 +260,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     DelayBuildOrder = function(self,factory,bType,time)
         local guards = factory:GetGuards()
         for k,v in guards do
-            if not v:IsDead() and v.AssistPlatoon then
+            if not v.Dead and v.AssistPlatoon then
                 if self.Brain:PlatoonExists(v.AssistPlatoon) then
                     v.AssistPlatoon:ForkThread(v.AssistPlatoon.EconAssistBody)
                 else
@@ -365,7 +365,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     
     AssignBuildOrder = function(self,factory,bType)
         # Find a builder the factory can build
-        if factory:IsDead() then
+        if factory.Dead then
             return
         end
         local builder = self:GetHighestBuilder(bType,{factory})
@@ -436,7 +436,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     
     DelayRallyPoint = function(self, factory)
         WaitSeconds(1)
-        if not factory:IsDead() then
+        if not factory.Dead then
             self:SetRallyPoint(factory)
         end
     end,

@@ -209,7 +209,7 @@ BuffField = Class(Entity) {
     FieldThread = function(Owner, self)
         local bp = self:GetBlueprint()
 
-        while not Owner:IsDead() do
+        while not Owner.Dead do
             local units = self.GetNearbyAffectableUnits()
             for k, unit in units do
                 if unit ~= Owner or bp.AffectsSelf then

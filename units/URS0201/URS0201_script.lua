@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Cybran Destroyer Script
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
@@ -46,7 +46,7 @@ URS0201 = Class(CSeaUnit) {
 
     OnMotionHorzEventChange = function(self, new, old)
         CSeaUnit.OnMotionHorzEventChange(self, new, old)
-        if self:IsDead() then return end
+        if self.Dead then return end
         if( not self.IsWaiting ) then
             if( self.Walking ) then
                 if( old == 'Stopped' ) then

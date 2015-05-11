@@ -5,7 +5,7 @@
 #**
 #**  Summary  : Foundation script for all structure building in the AI.
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 local BaseTmplFile = import('/lua/basetemplates.lua')
 local BaseTemplates = import('/lua/basetemplates.lua').BaseTemplates
@@ -246,7 +246,7 @@ function AIBuildAdjacency( aiBrain, builder, buildingType , closeToBuilder, rela
         table.insert( template, {} )
         table.insert( template[1], { buildingType } )
         for k,v in reference do
-            if not v:IsDead() then
+            if not v.Dead then
                 local targetSize = v:GetBlueprint().Physics
                 local targetPos = v:GetPosition()
                 targetPos[1] = targetPos[1] - (targetSize.SkirtSizeX/2)

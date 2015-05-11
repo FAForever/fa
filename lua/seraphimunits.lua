@@ -52,7 +52,7 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
     FinishBuildThread = function(self, unitBeingBuilt, order )
         self:SetBusy(true)
         self:SetBlockCommandQueue(true)
-        if unitBeingBuilt and not unitBeingBuilt:IsDead() and EntityCategoryContains( categories.AIR, unitBeingBuilt ) then
+        if unitBeingBuilt and not unitBeingBuilt.Dead and EntityCategoryContains( categories.AIR, unitBeingBuilt ) then
             unitBeingBuilt:DetachFrom(true)
             local bp = self:GetBlueprint()
             self:DetachAll(bp.Display.BuildAttachBone or 0)
@@ -117,7 +117,7 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
             WaitFor( self.AttachmentSliderManip )
             self.AttachmentSliderManip:SetGoal(0, -55, 60)
             WaitFor( self.AttachmentSliderManip )
-            if not unitBuilding:IsDead() then
+            if not unitBuilding.Dead then
                 unitBuilding:DetachFrom(true)
                 self:DetachAll(bp.Display.BuildAttachBone or 0)
                 #local worldPos = self:CalculateWorldPositionFromRelative({0, 0, -15})
@@ -275,7 +275,7 @@ SConstructionUnit = Class(ConstructionUnit) {
 
     BuildManipulatorSetEnabled = function(self, enable)
         ConstructionUnit.BuildManipulatorSetEnabled(self, enable)
-        if not self or self:IsDead() then return end
+        if not self or self.Dead then return end
         if not self.BuildArm2Manipulator then return end
         if enable then
             self.BuildArm2Manipulator:Enable()
