@@ -1334,12 +1334,7 @@ Unit = Class(moho.unit_methods) {
         end
         --Check if wrecks are allowed
         if self:GetBlueprint().Wreckage.WreckageLayers[self:GetCurrentLayer()] then
-            local wreckage = self:CreateWreckageProp(overkillRatio)
-            --Exploit fix
-            if wreckage then
-                wreckage.bpid = self:GetBlueprint().BlueprintId
-            end
-            return wreckage
+             return self:CreateWreckageProp(overkillRatio)
         end
     end,
 
