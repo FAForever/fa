@@ -2692,19 +2692,9 @@ Unit = Class(moho.unit_methods) {
         self:CreateMotionChangeEffects(new,old)
     end,
 
-    OnMotionTurnEventChange = function(self, newEvent, oldEvent)
-        if self.Dead then
-            return
-        end
-
-        if newEvent == 'Straight' then
-            self:PlayUnitSound('MoveStraight')
-        elseif newEvent == 'Turn' then
-            self:PlayUnitSound('MoveTurn')
-        elseif newEvent == 'SharpTurn' then
-            self:PlayUnitSound('MoveSharpTurn')
-        end
-    end,
+    -- Called as planes whoosh round corners. No sounds were shipped for use with this and it was a
+    -- cycle eater, so we killed it.
+    OnMotionTurnEventChange = function() end,
 
     OnTerrainTypeChange = function(self, new, old)
         if self.MovementEffectsExist then
