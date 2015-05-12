@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/units/XEA0306/XEA0306_script.lua
-#**  Author(s):  Jessica St. Croix
-#**
-#**  Summary  :  UEF Heavy Air Transport Script
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+-- ****************************************************************************
+-- **
+-- **  File     :  /data/units/XEA0306/XEA0306_script.lua
+-- **  Author(s):  Jessica St. Croix
+-- **
+-- **  Summary  :  UEF Heavy Air Transport Script
+-- **
+-- **  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+-- ****************************************************************************
 
 local explosion = import('/lua/defaultexplosions.lua')
 local util = import('/lua/utilities.lua')
@@ -53,14 +53,14 @@ XEA0306 = Class(TAirUnit) {
         
         self.UnfoldAnim:SetRate(1)
         
-        # create the engine thrust manipulators
+        -- create the engine thrust manipulators
         for k, v in self.EngineRotateBones do
             table.insert(self.EngineManipulators, CreateThrustController(self, "thruster", v))
         end
 
-        # set up the thursting arcs for the engines
+        -- set up the thursting arcs for the engines
         for keys,values in self.EngineManipulators do
-            #                      XMAX,XMIN,YMAX,YMIN,ZMAX,ZMIN, TURNMULT, TURNSPEED
+            --                      XMAX,XMIN,YMAX,YMIN,ZMAX,ZMIN, TURNMULT, TURNSPEED
             values:SetThrustingParam( -0.25, 0.25, -0.75, 0.75, -0.0, 0.0, 1.0, 0.25 )
         end
 
@@ -72,15 +72,15 @@ XEA0306 = Class(TAirUnit) {
 	
 --Shielding Fix moved functionally to Unit.lua and Shield.lua
 	
-    # When one of our attached units gets killed, detach it
+    -- When one of our attached units gets killed, detach it
     OnAttachedKilled = function(self, attached)
         attached:DetachFrom()
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
         TAirUnit.OnKilled(self, instigator, type, overkillRatio)
-        # TransportDetachAllUnits takes 1 bool parameter. If true, randomly destroys some of the transported
-        # units, otherwise successfully detaches all.
+        -- TransportDetachAllUnits takes 1 bool parameter. If true, randomly destroys some of the transported
+        -- units, otherwise successfully detaches all.
         self:TransportDetachAllUnits(true)
     end,
 
@@ -93,7 +93,7 @@ XEA0306 = Class(TAirUnit) {
         end
     end,
 
-    # Override air destruction effects so we can do something custom here
+    -- Override air destruction effects so we can do something custom here
     CreateUnitAirDestructionEffects = function( self, scale )
         self:ForkThread(self.AirDestructionEffectsThread, self )
     end,
