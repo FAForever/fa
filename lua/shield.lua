@@ -5,7 +5,7 @@
 --**
 --**  Summary  : Shield lua module
 --**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local Entity = import('/lua/sim/Entity.lua').Entity
@@ -13,11 +13,32 @@ local Overspill = import('/lua/overspill.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local Util = import('utilities.lua')
 
-Shield = Class(moho.shield_methods,Entity) {
-
+-- Default values for a shield specification table (to be passed to native code)
+local DEFAULT_OPTIONS = {
+    Mesh = '',
+    MeshZ = '',
+    ImpactMesh = '',
+    ImpactEffects = '',
+    Size = 10,
+    ShieldMaxHealth = 250,
+    ShieldRechargeTime = 10,
+    ShieldEnergyDrainRechargeTime = 10,
     ShieldVerticalOffset = -1,
+    ShieldRegenRate = 1,
+    ShieldRegenStartTime = 5,
+    PassOverkillDamage = false,
 
-    __init = function(self,spec)
+}
+
+Shield = Class(moho.shield_methods,Entity) {
+    __init = function(self, spec, owner)
+        -- This key deviates in name from the blueprints...
+        spec.Size = spec.ShieldSize
+
+        -- Apply default options
+        local spec = table.assimilate(spec, DEFAULT_OPTIONS)
+        spec.Owner = owner
+
         _c_CreateShield(self,spec)
     end,
 
@@ -361,15 +382,6 @@ Shield = Class(moho.shield_methods,Entity) {
             self:UpdateShieldRatio(-1)
             self:CreateShieldMesh()
             
-            --Code for Personal Bubbles, currently only the Harbinger
-            local OwnerBp = self.Owner:GetBlueprint()
-            local OwnerShield = OwnerBp.Defense.Shield
-            if OwnerShield.PersonalBubble and OwnerShield.PersonalBubble == true then
-                self.Owner:SetCollisionShape('Sphere', 0, OwnerBp.SizeY * 0.5, 0, OwnerShield.ShieldSize * 0.5)
-                --Manually disable the bubble shield's collision sphere after its creation so it acts like the new personal shields
-                self:SetCollisionShape('None')
-            end
-            
             self.Owner:PlayUnitSound('ShieldOn')
             self.Owner:SetMaintenanceConsumptionActive()
             
@@ -429,14 +441,7 @@ Shield = Class(moho.shield_methods,Entity) {
             -- Get rid of the shield bar
             self:UpdateShieldRatio(0)
             self:RemoveShield()
-            
-            --Code for Personal Bubbles, currently only the Harbinger
-            local OwnerBp = self.Owner:GetBlueprint()
-            local OwnerShield = OwnerBp.Defense.Shield
-            if OwnerShield.PersonalBubble and OwnerShield.PersonalBubble == true then
-                self.Owner:SetCollisionShape('Box', 0, OwnerBp.SizeY * 0.5, 0, OwnerBp.SizeX * 0.5, OwnerBp.SizeY * 0.5, OwnerBp.SizeZ * 0.5)
-            end
-            
+
             self.Owner:PlayUnitSound('ShieldOff')
             self.Owner:SetMaintenanceConsumptionInactive()
 
@@ -456,13 +461,7 @@ Shield = Class(moho.shield_methods,Entity) {
         Main = function(self)
             self:RemoveShield()
 
-            --Code for Personal Bubbles, currently only the Harbinger
-            local OwnerBp = self.Owner:GetBlueprint()
-            local OwnerShield = OwnerBp.Defense.Shield
-            if OwnerShield.PersonalBubble and OwnerShield.PersonalBubble == true then
-                self.Owner:SetCollisionShape('Box', 0, OwnerBp.SizeY * 0.5, 0, OwnerBp.SizeX * 0.5, OwnerBp.SizeY * 0.5, OwnerBp.SizeZ * 0.5)
-            end
-            self.Owner:PlayUnitSound('ShieldOff')            
+            self.Owner:PlayUnitSound('ShieldOff')
 
             --Apply vulnerabilities
             self:RevokeTransportProtection()
@@ -485,12 +484,6 @@ Shield = Class(moho.shield_methods,Entity) {
     EnergyDrainRechargeState = State {
         Main = function(self)
             self:RemoveShield()
-            --Code for Personal Bubbles, currently only the Harbinger
-            local OwnerBp = self.Owner:GetBlueprint()
-            local OwnerShield = OwnerBp.Defense.Shield
-            if OwnerShield.PersonalBubble and OwnerShield.PersonalBubble == true then
-                self.Owner:SetCollisionShape('Box', 0, OwnerBp.SizeY * 0.5, 0, OwnerBp.SizeX * 0.5, OwnerBp.SizeY * 0.5, OwnerBp.SizeZ * 0.5)
-            end
             self.Owner:PlayUnitSound('ShieldOff')
             
             --Apply vulnerabilities
@@ -544,12 +537,72 @@ Shield = Class(moho.shield_methods,Entity) {
     },
 }
 
+--- A bubble shield attached to a single unit.
+PersonalBubble = Class(Shield) {
+    OnCreate = function(self, spec)
+        Shield.OnCreate(self, spec)
+
+        -- Store off useful values from the blueprint
+        local OwnerBp = self.Owner:GetBlueprint()
+
+        self.SizeX = OwnerBp.SizeX
+        self.SizeY = OwnerBp.SizeY
+        self.SizeZ = OwnerBp.SizeZ
+
+        self.ShieldSize = spec.ShieldSize
+
+        --Manually disable the bubble shield's collision sphere after its creation so it acts like the new personal shields
+        self:SetCollisionShape('None')
+        self:SetType('Personal')
+    end,
+
+    OnState = State(Shield.OnState) {
+        Main = function(self)
+            Shield.OnState.Main(self)
+
+            -- Set the collision profile of the unit to match the apparent shield sphere.
+            -- Since the collision handler in Unit deals with personal shields, the damage will be
+            -- passed to the shield.
+            self.Owner:SetCollisionShape('Sphere', 0, self.SizeY * 0.5, 0, self.ShieldSize * 0.5)
+        end
+    },
+
+    OffState = State(Shield.OffState) {
+        Main = function(self)
+            Shield.OffState.Main(self)
+
+            -- When the shield is down for some reason, reset the unit's collision profile so it can
+            -- again be hit.
+            self.Owner:SetCollisionShape('Box', 0, self.SizeY * 0.5, 0, self.SizeX * 0.5, self.SizeY * 0.5, self.SizeZ * 0.5)
+        end
+    },
+
+    DamageRechargeState = State(Shield.DamageRechargeState) {
+        Main = function(self)
+            Shield.DamageRechargeState.Main(self)
+
+            self.Owner:SetCollisionShape('Box', 0, self.SizeY * 0.5, 0, self.SizeX * 0.5, self.SizeY * 0.5, self.SizeZ * 0.5)
+         end
+    },
+
+    EnergyDrainRechargeState = State(Shield.EnergyDrainRechargeState) {
+        Main = function(self)
+            Shield.EnergyDrainRechargeState.Main(self)
+
+            self.Owner:SetCollisionShape('Box', 0, self.SizeY * 0.5, 0, self.SizeX * 0.5, self.SizeY * 0.5, self.SizeZ * 0.5)
+        end
+    }
+}
+
+--- A shield that sticks to the surface of the unit. Doesn't have its own collision physics, just
+-- grants extra health.
 UnitShield = Class(Shield){
 
     OnCreate = function(self,spec)
         self.Trash = TrashBag()
         self.Owner = spec.Owner
-        self.ImpactEffects = EffectTemplate[spec.ImpactEffects]        
+
+        self.ImpactEffects = EffectTemplate[spec.ImpactEffects]
         self.CollisionSizeX = spec.CollisionSizeX or 1
         self.CollisionSizeY = spec.CollisionSizeY or 1
         self.CollisionSizeZ = spec.CollisionSizeZ or 1

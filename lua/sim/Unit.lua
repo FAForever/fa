@@ -15,6 +15,7 @@ local EffectUtilities = import('/lua/EffectUtilities.lua')
 local Game = import('/lua/game.lua')
 local utilities = import('/lua/utilities.lua')
 local Shield = import('/lua/shield.lua').Shield
+local PersonalBubble = import('/lua/shield.lua').PersonalBubble
 local UnitShield = import('/lua/shield.lua').UnitShield
 local AntiArtilleryShield = import('/lua/shield.lua').AntiArtilleryShield
 local Buff = import('/lua/sim/buff.lua')
@@ -1874,16 +1875,17 @@ Unit = Class(moho.unit_methods) {
         end
 
         --If we have a shield specified, create it.
-        if bp.Defense.Shield.ShieldSize > 0 then
-            if bp.Defense.Shield.StartOn ~= false then
-                if bp.Defense.Shield.PersonalShield == true then
-                    self:CreatePersonalShield(bp.Defense.Shield)
-                elseif bp.Defense.Shield.AntiArtilleryShield then
-                    self:CreateAntiArtilleryShield(bp.Defense.Shield)
-                elseif bp.Defense.Shield.PersonalBubble then
-                    self:CreatePersonalBubbleShield(bp.Defense.Shield)
+        local bpShield = bp.Defense.Shield
+        if bpShield.ShieldSize > 0 then
+            if bpShield.StartOn ~= false then
+                if bpShield.PersonalShield == true then
+                    self:CreatePersonalShield(bpShield)
+                elseif bpShield.AntiArtilleryShield then
+                    self:CreateAntiArtilleryShield(bpShield)
+                elseif bpShield.PersonalBubble then
+                    self:CreatePersonalBubbleShield(bpShield)
                 else
-                    self:CreateShield(bp.Defense.Shield)
+                    self:CreateShield(bpShield)
                 end
             end
         end
@@ -3612,69 +3614,36 @@ Unit = Class(moho.unit_methods) {
     -- SHIELDS
     -------------------------------------------------------------------------------------------
     CreateShield = function(self, bpShield)
+        local bpShield = table.deepcopy(bpShield)
         self:DestroyShield()
-        self.MyShield = Shield {
-            Owner = self,
-            Mesh = bpShield.Mesh or '',
-            MeshZ = bpShield.MeshZ or '',
-            ImpactMesh = bpShield.ImpactMesh or '',
-            ImpactEffects = bpShield.ImpactEffects or '',
-            Size = bpShield.ShieldSize or 10,
-            ShieldMaxHealth = bpShield.ShieldMaxHealth or 250,
-            ShieldRechargeTime = bpShield.ShieldRechargeTime or 10,
-            ShieldEnergyDrainRechargeTime = bpShield.ShieldEnergyDrainRechargeTime or 10,
-            ShieldVerticalOffset = bpShield.ShieldVerticalOffset or -1,
-            ShieldRegenRate = bpShield.ShieldRegenRate or 1,
-            ShieldRegenStartTime = bpShield.ShieldRegenStartTime or 5,
-            PassOverkillDamage = bpShield.PassOverkillDamage or false,
-
-            SpillOverDamageMod = bpShield.ShieldSpillOverDamageMod,
-            DamageThresholdToSpillOver = bpShield.ShieldDamageThresholdToSpillOver,
-        }
+        self.MyShield = Shield (bpShield, self)
         self:SetFocusEntity(self.MyShield)
         self:EnableShield()
         self.Trash:Add(self.MyShield)
     end,
 
-    CreatePersonalBubbleShield = function(self, shieldSpec)
-        
+    CreatePersonalBubbleShield = function(self, bpShield)
+        local bpShield = table.deepcopy(bpShield)
+        self:DestroyShield()
+        self.MyShield = PersonalBubble (bpShield, self)
+        self:SetFocusEntity(self.MyShield)
+        self:EnableShield()
+        self.Trash:Add(self.MyShield)
     end,
 
     CreatePersonalShield = function(self, bpShield)
+        local bpShield = table.deepcopy(bpShield)
         self:DestroyShield()
-        self.MyShield = UnitShield {
-            Owner = self,
-            ImpactEffects = bpShield.ImpactEffects or '',
-            OwnerShieldMesh = bpShield.OwnerShieldMesh,
-            ShieldMaxHealth = bpShield.ShieldMaxHealth or 250,
-            ShieldRechargeTime = bpShield.ShieldRechargeTime or 10,
-            ShieldEnergyDrainRechargeTime = bpShield.ShieldEnergyDrainRechargeTime or 10,
-            ShieldRegenRate = bpShield.ShieldRegenRate or 1,
-            ShieldRegenStartTime = bpShield.ShieldRegenStartTime or 5,
-            PassOverkillDamage = bpShield.PassOverkillDamage ~= false, --Default to true
-        }
+        self.MyShield = UnitShield (bpShield, self)
         self:SetFocusEntity(self.MyShield)
         self:EnableShield()
         self.Trash:Add(self.MyShield)
     end,
 
     CreateAntiArtilleryShield = function(self, bpShield)
+        local bpShield = table.deepcopy(bpShield)
         self:DestroyShield()
-        self.MyShield = AntiArtilleryShield {
-            Owner = self,
-            Mesh = bpShield.Mesh or '',
-            MeshZ = bpShield.MeshZ or '',
-            ImpactMesh = bpShield.ImpactMesh or '',
-            ImpactEffects = bpShield.ImpactEffects or '',
-            Size = bpShield.ShieldSize or 10,
-            ShieldMaxHealth = bpShield.ShieldMaxHealth or 250,
-            ShieldRechargeTime = bpShield.ShieldRechargeTime or 10,
-            ShieldEnergyDrainRechargeTime = bpShield.ShieldEnergyDrainRechargeTime or 10,
-            ShieldVerticalOffset = bpShield.ShieldVerticalOffset or -1,
-            ShieldRegenRate = bpShield.ShieldRegenRate or 1,
-            ShieldRegenStartTime = bpShield.ShieldRegenStartTime or 5,
-            PassOverkillDamage = bpShield.PassOverkillDamage or false,
-        }
+        self.MyShield = AntiArtilleryShield (bpShield, self)
         self:SetFocusEntity(self.MyShield)
         self:EnableShield()
         self.Trash:Add(self.MyShield)

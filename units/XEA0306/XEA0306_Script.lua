@@ -38,10 +38,10 @@ XEA0306 = Class(TAirUnit) {
 
     DestructionTicks = 250,
     EngineRotateBones = {'FrontRight_Engine', 'FrontLeft_Engine', 'BackRight_Engine', 'BackLeft_Engine', },
-    
+
     OnCreate = function(self)
         TAirUnit.OnCreate(self)
-        
+
         self.UnfoldAnim = CreateAnimator(self)
         self.UnfoldAnim:PlayAnim('/units/xea0306/xea0306_aunfold.sca')
         self.UnfoldAnim:SetRate(0)
@@ -50,9 +50,9 @@ XEA0306 = Class(TAirUnit) {
     OnStopBeingBuilt = function(self,builder,layer)
         TAirUnit.OnStopBeingBuilt(self,builder,layer)
         self.EngineManipulators = {}
-        
+
         self.UnfoldAnim:SetRate(1)
-        
+
         -- create the engine thrust manipulators
         for k, v in self.EngineRotateBones do
             table.insert(self.EngineManipulators, CreateThrustController(self, "thruster", v))
@@ -69,9 +69,9 @@ XEA0306 = Class(TAirUnit) {
         self.Trash:Add(self.LandingAnimManip)
         self.LandingAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationLand):SetRate(1)
     end,
-	
+
 --Shielding Fix moved functionally to Unit.lua and Shield.lua
-	
+
     -- When one of our attached units gets killed, detach it
     OnAttachedKilled = function(self, attached)
         attached:DetachFrom()
