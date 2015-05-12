@@ -1518,33 +1518,36 @@ Unit = Class(moho.unit_methods) {
     DeathThread = function( self, overkillRatio, instigator)
         local layer = self:GetCurrentLayer()
         local isNaval = EntityCategoryContains(categories.NAVAL, self)
-        local isSinking = layer == 'Water' or layer == 'Sub'
-        local isNavalFactory = (EntityCategoryContains(categories.FACTORY, self) and EntityCategoryContains(categories.STRUCTURE, self) and EntityCategoryContains(categories.NAVAL, self))
-        WaitSeconds( utilities.GetRandomFloat( self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax) )
+        local shallSink = (
+            not isNaval and  -- Naval units use an animation to sink, not our sinking code.
+            (layer == 'Water' or layer == 'Sub') and  -- In a layer for which sinking is meaningful
+            not EntityCategoryContains(categories.FACTORY * categories.STRUCTURE * categories.NAVAL, self)  -- Exclude naval factories
+        )
+        WaitSeconds(utilities.GetRandomFloat( self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax) )
         self:DestroyAllDamageEffects()
         self:DestroyTopSpeedEffects()
         self:DestroyIdleEffects()
         self:DestroyBeamExhaust()
         self:DestroyAllBuildEffects()
 
+        -- BOOM!
         if self.PlayDestructionEffects then
             self:CreateDestructionEffects(overkillRatio)
         end
 
+        -- Flying bits of metal and whatnot. More bits for more overkill.
         if self.ShowUnitDestructionDebris and overkillRatio then
             self.CreateUnitDestructionDebris(self, true, true, overkillRatio > 2)
         end
 
-        --Wait for death animations
+        -- Wait for death animations, if any (sinking ships)
         if self.DeathAnimManip then
             WaitFor(self.DeathAnimManip)
-
-            if self.PlayDestructionEffects and self.PlayEndAnimDestructionEffects then
-                self:CreateDestructionEffects(overkillRatio)
-            end
         end
 
-        if isSinking and not isNavalFactory then
+        -- A non-naval unit dying over water needs to sink, but lacks an animation for it. Let's
+        -- make one up.
+        if shallSink then
             self.DisallowCollisions = true
             local this = self
             self:StartSinking(
@@ -1553,6 +1556,7 @@ Unit = Class(moho.unit_methods) {
                 end
             )
 
+            -- Bubbles and stuff coming off the sinking wreck.
             self:ForkThread(self.SinkDestructionEffects)
 
             -- Avoid slightly ugly need to propagate this through callback hell...
@@ -1567,8 +1571,7 @@ Unit = Class(moho.unit_methods) {
         self:DestroyUnit(overkillRatio)
     end,
 
-    --- Called at the end of the destruction thread: play the destruction sound, create the wreckage
-    -- and Destroy this unit.
+    --- Called at the end of the destruction thread: create the wreckage and Destroy this unit.
     DestroyUnit = function(self, overkillRatio)
         self:CreateWreckage(overkillRatio or self.overkillRatio)
 
