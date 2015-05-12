@@ -1877,11 +1877,13 @@ Unit = Class(moho.unit_methods) {
         if bp.Defense.Shield.ShieldSize > 0 then
             if bp.Defense.Shield.StartOn ~= false then
                 if bp.Defense.Shield.PersonalShield == true then
-                    self:CreatePersonalShield()
+                    self:CreatePersonalShield(bp.Defense.Shield)
                 elseif bp.Defense.Shield.AntiArtilleryShield then
-                    self:CreateAntiArtilleryShield()
+                    self:CreateAntiArtilleryShield(bp.Defense.Shield)
+                elseif bp.Defense.Shield.PersonalBubble then
+                    self:CreatePersonalBubbleShield(bp.Defense.Shield)
                 else
-                    self:CreateShield()
+                    self:CreateShield(bp.Defense.Shield)
                 end
             end
         end
@@ -3609,94 +3611,73 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
     -- SHIELDS
     -------------------------------------------------------------------------------------------
-    CreateShield = function(self, shieldSpec)
-        local bp = self:GetBlueprint()
-        local bpShield = shieldSpec
-        if not shieldSpec then
-            bpShield = bp.Defense.Shield
-        end
-        if bpShield then
-            self:DestroyShield()
-            self.MyShield = Shield {
-                Owner = self,
-                Mesh = bpShield.Mesh or '',
-                MeshZ = bpShield.MeshZ or '',
-                ImpactMesh = bpShield.ImpactMesh or '',
-                ImpactEffects = bpShield.ImpactEffects or '',
-                Size = bpShield.ShieldSize or 10,
-                ShieldMaxHealth = bpShield.ShieldMaxHealth or 250,
-                ShieldRechargeTime = bpShield.ShieldRechargeTime or 10,
-                ShieldEnergyDrainRechargeTime = bpShield.ShieldEnergyDrainRechargeTime or 10,
-                ShieldVerticalOffset = bpShield.ShieldVerticalOffset or -1,
-                ShieldRegenRate = bpShield.ShieldRegenRate or 1,
-                ShieldRegenStartTime = bpShield.ShieldRegenStartTime or 5,
-                PassOverkillDamage = bpShield.PassOverkillDamage or false,
+    CreateShield = function(self, bpShield)
+        self:DestroyShield()
+        self.MyShield = Shield {
+            Owner = self,
+            Mesh = bpShield.Mesh or '',
+            MeshZ = bpShield.MeshZ or '',
+            ImpactMesh = bpShield.ImpactMesh or '',
+            ImpactEffects = bpShield.ImpactEffects or '',
+            Size = bpShield.ShieldSize or 10,
+            ShieldMaxHealth = bpShield.ShieldMaxHealth or 250,
+            ShieldRechargeTime = bpShield.ShieldRechargeTime or 10,
+            ShieldEnergyDrainRechargeTime = bpShield.ShieldEnergyDrainRechargeTime or 10,
+            ShieldVerticalOffset = bpShield.ShieldVerticalOffset or -1,
+            ShieldRegenRate = bpShield.ShieldRegenRate or 1,
+            ShieldRegenStartTime = bpShield.ShieldRegenStartTime or 5,
+            PassOverkillDamage = bpShield.PassOverkillDamage or false,
 
-                SpillOverDamageMod = bpShield.ShieldSpillOverDamageMod,
-                DamageThresholdToSpillOver = bpShield.ShieldDamageThresholdToSpillOver,
-            }
-            self:SetFocusEntity(self.MyShield)
-            self:EnableShield()
-            self.Trash:Add(self.MyShield)
-        end
+            SpillOverDamageMod = bpShield.ShieldSpillOverDamageMod,
+            DamageThresholdToSpillOver = bpShield.ShieldDamageThresholdToSpillOver,
+        }
+        self:SetFocusEntity(self.MyShield)
+        self:EnableShield()
+        self.Trash:Add(self.MyShield)
     end,
 
-    CreatePersonalShield = function(self, shieldSpec)
-        local bp = self:GetBlueprint()
-        local bpShield = shieldSpec
-        if not shieldSpec then
-            bpShield = bp.Defense.Shield
-        end
-        if bpShield then
-            self:DestroyShield()
-            if bpShield.OwnerShieldMesh then
-                self.MyShield = UnitShield {
-                    Owner = self,
-                    ImpactEffects = bpShield.ImpactEffects or '',
-                    OwnerShieldMesh = bpShield.OwnerShieldMesh,
-                    ShieldMaxHealth = bpShield.ShieldMaxHealth or 250,
-                    ShieldRechargeTime = bpShield.ShieldRechargeTime or 10,
-                    ShieldEnergyDrainRechargeTime = bpShield.ShieldEnergyDrainRechargeTime or 10,
-                    ShieldRegenRate = bpShield.ShieldRegenRate or 1,
-                    ShieldRegenStartTime = bpShield.ShieldRegenStartTime or 5,
-                    PassOverkillDamage = bpShield.PassOverkillDamage ~= false, --Default to true
-                }
-                self:SetFocusEntity(self.MyShield)
-                self:EnableShield()
-                self.Trash:Add(self.MyShield)
-            else
-                LOG('*WARNING: TRYING TO CREATE PERSONAL SHIELD ON UNIT ',repr(self:GetUnitId()),', but it does not have an OwnerShieldMesh=<meshBpName> defined in the Blueprint.')
-            end
-        end
+    CreatePersonalBubbleShield = function(self, shieldSpec)
+        
     end,
 
-    CreateAntiArtilleryShield = function(self, shieldSpec)
-        local bp = self:GetBlueprint()
-        local bpShield = shieldSpec
-        if not shieldSpec then
-            bpShield = bp.Defense.Shield
-        end
-        if bpShield then
-            self:DestroyShield()
-            self.MyShield = AntiArtilleryShield {
-                Owner = self,
-                Mesh = bpShield.Mesh or '',
-                MeshZ = bpShield.MeshZ or '',
-                ImpactMesh = bpShield.ImpactMesh or '',
-                ImpactEffects = bpShield.ImpactEffects or '',
-                Size = bpShield.ShieldSize or 10,
-                ShieldMaxHealth = bpShield.ShieldMaxHealth or 250,
-                ShieldRechargeTime = bpShield.ShieldRechargeTime or 10,
-                ShieldEnergyDrainRechargeTime = bpShield.ShieldEnergyDrainRechargeTime or 10,
-                ShieldVerticalOffset = bpShield.ShieldVerticalOffset or -1,
-                ShieldRegenRate = bpShield.ShieldRegenRate or 1,
-                ShieldRegenStartTime = bpShield.ShieldRegenStartTime or 5,
-                PassOverkillDamage = bpShield.PassOverkillDamage or false,
-            }
-            self:SetFocusEntity(self.MyShield)
-            self:EnableShield()
-            self.Trash:Add(self.MyShield)
-        end
+    CreatePersonalShield = function(self, bpShield)
+        self:DestroyShield()
+        self.MyShield = UnitShield {
+            Owner = self,
+            ImpactEffects = bpShield.ImpactEffects or '',
+            OwnerShieldMesh = bpShield.OwnerShieldMesh,
+            ShieldMaxHealth = bpShield.ShieldMaxHealth or 250,
+            ShieldRechargeTime = bpShield.ShieldRechargeTime or 10,
+            ShieldEnergyDrainRechargeTime = bpShield.ShieldEnergyDrainRechargeTime or 10,
+            ShieldRegenRate = bpShield.ShieldRegenRate or 1,
+            ShieldRegenStartTime = bpShield.ShieldRegenStartTime or 5,
+            PassOverkillDamage = bpShield.PassOverkillDamage ~= false, --Default to true
+        }
+        self:SetFocusEntity(self.MyShield)
+        self:EnableShield()
+        self.Trash:Add(self.MyShield)
+    end,
+
+    CreateAntiArtilleryShield = function(self, bpShield)
+        self:DestroyShield()
+        self.MyShield = AntiArtilleryShield {
+            Owner = self,
+            Mesh = bpShield.Mesh or '',
+            MeshZ = bpShield.MeshZ or '',
+            ImpactMesh = bpShield.ImpactMesh or '',
+            ImpactEffects = bpShield.ImpactEffects or '',
+            Size = bpShield.ShieldSize or 10,
+            ShieldMaxHealth = bpShield.ShieldMaxHealth or 250,
+            ShieldRechargeTime = bpShield.ShieldRechargeTime or 10,
+            ShieldEnergyDrainRechargeTime = bpShield.ShieldEnergyDrainRechargeTime or 10,
+            ShieldVerticalOffset = bpShield.ShieldVerticalOffset or -1,
+            ShieldRegenRate = bpShield.ShieldRegenRate or 1,
+            ShieldRegenStartTime = bpShield.ShieldRegenStartTime or 5,
+            PassOverkillDamage = bpShield.PassOverkillDamage or false,
+        }
+        self:SetFocusEntity(self.MyShield)
+        self:EnableShield()
+        self.Trash:Add(self.MyShield)
     end,
 
     EnableShield = function(self)
