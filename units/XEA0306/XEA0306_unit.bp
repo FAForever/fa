@@ -154,6 +154,7 @@ UnitBlueprint {
             ShieldSize = 8.5,
             ShieldSpillOverDamageMod = 0.5,
             ShieldVerticalOffset = -1,
+            TransportShield = true
         },
         SubThreatLevel = 0,
         SurfaceThreatLevel = 18,

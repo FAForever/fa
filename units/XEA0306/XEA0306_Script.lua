@@ -70,7 +70,25 @@ XEA0306 = Class(TAirUnit) {
         self.LandingAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationLand):SetRate(1)
     end,
 
---Shielding Fix moved functionally to Unit.lua and Shield.lua
+    -- When a unit attaches or detaches, tell the shield about it.
+    OnTransportAttach = function(self, attachBone, unit)
+        TAirUnit.OnTransportAttach(self, attachBone, unit)
+        self.MyShield:AddProtectedUnit(unit)
+    end,
+
+
+    OnTransportDetach = function(self, attachBone, unit)
+        TAirUnit.OnTransportDetach(self, attachBone, unit)
+        self.MyShield:RemoveProtectedUnit(unit)
+    end,
+
+    OnDamage = function(self, instigator, amount, vector, damageType)
+        if EntityCategoryContains(categories.NUKE, instigator) then
+            self.MyShield:SetContentsVulnerable()
+        end
+
+        TAirUnit.OnDamage(self, instigator, amount, vector, damageType)
+    end,
 
     -- When one of our attached units gets killed, detach it
     OnAttachedKilled = function(self, attached)

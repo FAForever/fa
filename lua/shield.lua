@@ -27,7 +27,6 @@ local DEFAULT_OPTIONS = {
     ShieldRegenRate = 1,
     ShieldRegenStartTime = 5,
     PassOverkillDamage = false,
-
 }
 
 Shield = Class(moho.shield_methods,Entity) {
@@ -376,9 +375,6 @@ Shield = Class(moho.shield_methods,Entity) {
             
             self.Owner:PlayUnitSound('ShieldOn')
             self.Owner:SetMaintenanceConsumptionActive()
-            
-            --Then we can make any units inside a transport with a Shield invulnerable here
-            self:ProtectTransportedUnits()
 
             local aiBrain = self.Owner:GetAIBrain()
 
@@ -420,7 +416,6 @@ Shield = Class(moho.shield_methods,Entity) {
     -- When manually turned off
     OffState = State {
         Main = function(self)
-
             -- No regen during off state
             if self.RegenThread then
                 KillThread(self.RegenThread)
@@ -437,9 +432,6 @@ Shield = Class(moho.shield_methods,Entity) {
             self.Owner:PlayUnitSound('ShieldOff')
             self.Owner:SetMaintenanceConsumptionInactive()
 
-            --Apply vulnerabilities
-            self:RevokeTransportProtection()
-
             WaitSeconds(1)
         end,
 
@@ -454,9 +446,6 @@ Shield = Class(moho.shield_methods,Entity) {
             self:RemoveShield()
 
             self.Owner:PlayUnitSound('ShieldOff')
-
-            --Apply vulnerabilities
-            self:RevokeTransportProtection()
             
             -- We must make the unit charge up before getting its shield back
             self:ChargingUp(0, self.ShieldRechargeTime)
@@ -477,10 +466,7 @@ Shield = Class(moho.shield_methods,Entity) {
         Main = function(self)
             self:RemoveShield()
             self.Owner:PlayUnitSound('ShieldOff')
-            
-            --Apply vulnerabilities
-            self:RevokeTransportProtection()
-            
+
             self:ChargingUp(0, self.ShieldEnergyDrainRechargeTime)
 
             -- If the unit is attached to a transport, make sure the shield goes to the off state
@@ -497,28 +483,6 @@ Shield = Class(moho.shield_methods,Entity) {
         end,
     },
 
-    ProtectTransportedUnits = function(self)
-        if EntityCategoryContains(categories.TRANSPORTATION, self.Owner) then
-            self.Owner:SetCanTakeDamage(false)        
-            local Cargo = self.Owner:GetCargo()
-            for _, v in Cargo do
-                v:SetCanTakeDamage(false)
-            end
-            self.Owner:IsTransportProtected(true)            
-        end
-    end,
-    
-    RevokeTransportProtection = function(self)
-        if EntityCategoryContains(categories.TRANSPORTATION, self.Owner) then    
-            self.Owner:SetCanTakeDamage(true)        
-            local Cargo = self.Owner:GetCargo()
-            for _, v in Cargo do
-                v:SetCanTakeDamage(true)
-            end
-            self.Owner:IsTransportProtected(false)            
-        end
-    end,    
-    
     DeadState = State {
         Main = function(self)
         end,
@@ -550,38 +514,95 @@ PersonalBubble = Class(Shield) {
 
     OnState = State(Shield.OnState) {
         Main = function(self)
-            Shield.OnState.Main(self)
-
             -- Set the collision profile of the unit to match the apparent shield sphere.
             -- Since the collision handler in Unit deals with personal shields, the damage will be
             -- passed to the shield.
             self.Owner:SetCollisionShape('Sphere', 0, self.SizeY * 0.5, 0, self.ShieldSize * 0.5)
+            Shield.OnState.Main(self)
         end
     },
 
     OffState = State(Shield.OffState) {
         Main = function(self)
-            Shield.OffState.Main(self)
-
             -- When the shield is down for some reason, reset the unit's collision profile so it can
             -- again be hit.
             self.Owner:SetCollisionShape('Box', 0, self.SizeY * 0.5, 0, self.SizeX * 0.5, self.SizeY * 0.5, self.SizeZ * 0.5)
+            Shield.OffState.Main(self)
         end
     },
 
     DamageRechargeState = State(Shield.DamageRechargeState) {
         Main = function(self)
-            Shield.DamageRechargeState.Main(self)
-
             self.Owner:SetCollisionShape('Box', 0, self.SizeY * 0.5, 0, self.SizeX * 0.5, self.SizeY * 0.5, self.SizeZ * 0.5)
+            Shield.DamageRechargeState.Main(self)
          end
     },
 
     EnergyDrainRechargeState = State(Shield.EnergyDrainRechargeState) {
         Main = function(self)
-            Shield.EnergyDrainRechargeState.Main(self)
-
             self.Owner:SetCollisionShape('Box', 0, self.SizeY * 0.5, 0, self.SizeX * 0.5, self.SizeY * 0.5, self.SizeZ * 0.5)
+            Shield.EnergyDrainRechargeState.Main(self)
+        end
+    }
+}
+
+--- A personal bubble that can render a set of encompassed units invincible.
+-- Useful for shielded transports (to work around the area-damage bug).
+TransportShield = Class(Shield) {
+    SetContentsVulnerable = function(self, canTakeDamage)
+        for k, v in self.protectedUnits do
+            k:SetCanTakeDamage(canTakeDamage)
+        end
+    end,
+
+    RemoveProtectedUnit = function(self, unit)
+        self.protectedUnits[unit] = nil
+        unit:SetCanTakeDamage(true)
+    end,
+
+    AddProtectedUnit = function(self, unit)
+        self.protectedUnits[unit] = true
+    end,
+
+    OnCreate = function(self, spec)
+        Shield.OnCreate(self, spec)
+
+        self.protectedUnits = {}
+    end,
+
+    -- Protect the contents while the shield is up.
+    OnState = State(Shield.OnState) {
+        Main = function(self)
+            self:SetContentsVulnerable(false)
+
+            Shield.OnState.Main(self)
+        end,
+
+        AddProtectedUnit = function(self, unit)
+            self.protectedUnits[unit] = true
+            unit:SetCanTakeDamage(false)
+        end
+    },
+
+    -- Set the contents vulnerable in the various shield-down states.
+    OffState = State(Shield.OffState) {
+        Main = function(self)
+            self:SetContentsVulnerable(true)
+            Shield.OffState.Main(self)
+        end,
+    },
+
+    DamageRechargeState = State(Shield.DamageRechargeState) {
+        Main = function(self)
+            self:SetContentsVulnerable(true)
+            Shield.DamageRechargeState.Main(self)
+        end
+    },
+
+    EnergyDrainRechargeState = State(Shield.EnergyDrainRechargeState) {
+        Main = function(self)
+            self:SetContentsVulnerable(true)
+            Shield.EnergyDrainRechargeState.Main(self)
         end
     }
 }

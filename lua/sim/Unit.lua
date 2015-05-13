@@ -16,6 +16,7 @@ local Game = import('/lua/game.lua')
 local utilities = import('/lua/utilities.lua')
 local Shield = import('/lua/shield.lua').Shield
 local PersonalBubble = import('/lua/shield.lua').PersonalBubble
+local TransportShield = import('/lua/shield.lua').TransportShield
 local UnitShield = import('/lua/shield.lua').UnitShield
 local AntiArtilleryShield = import('/lua/shield.lua').AntiArtilleryShield
 local Buff = import('/lua/sim/buff.lua')
@@ -73,9 +74,6 @@ Unit = Class(moho.unit_methods) {
     DestructionPartsChassisToss = {},
     EconomyProductionInitiallyActive = true,
     RebuildBP = false,
-
-    --Used to toggle damage protection on shielded transports
-    transportProtected = false,
 
     GetSync = function(self)
         if not Sync.UnitData[self:GetEntityId()] then
@@ -1021,12 +1019,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
-
-        -- Revoke transport protection for shielded transports when impacted by nuclear weaponry
-        if EntityCategoryContains(categories.NUKE, instigator) and self.transportProtected == true then
-            self.MyShield:RevokeTransportProtection()
-        end
-
         if self.CanTakeDamage then
             self:DoOnDamagedCallbacks(instigator)
 
@@ -3614,6 +3606,8 @@ Unit = Class(moho.unit_methods) {
             self.MyShield = AntiArtilleryShield(bpShield, self)
         elseif bpShield.PersonalBubble then
             self.MyShield = PersonalBubble(bpShield, self)
+        elseif bpShield.TransportShield then
+            self.MyShield = TransportShield(bpShield, self)
         else
             self.MyShield = Shield(bpShield, self)
         end
@@ -3721,10 +3715,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnTransportAttach = function(self, attachBone, unit)
-        --Protect units boarding a shielded Transport if the shield is up
-        if self:ShieldIsOn() then
-            unit:SetCanTakeDamage(false)
-        end
         self:PlayUnitSound('Load')
         self:MarkWeaponsOnTransport(unit, true)
         if unit:ShieldIsOn() then
@@ -3741,7 +3731,6 @@ Unit = Class(moho.unit_methods) {
     OnTransportDetach = function(self, attachBone, unit)
         self:PlayUnitSound('Unload')
         self:MarkWeaponsOnTransport(unit, false)
-        unit:SetCanTakeDamage(true)    --Ensure any protected units are made vulnerable again
         unit:EnableShield()
         unit:EnableDefaultToggleCaps()
         if not EntityCategoryContains(categories.PODSTAGINGPLATFORM, self) then
@@ -3749,11 +3738,6 @@ Unit = Class(moho.unit_methods) {
         end
         unit:TransportAnimation(-1)
         unit:OnDetachedToTransport(self)
-    end,
-
-    --This function is called from Shield.lua to tell the unit when the protection status changes
-    IsTransportProtected = function(self, value)
-        self.transportProtected = value
     end,
 
     OnStartTransportLoading = function(self)
