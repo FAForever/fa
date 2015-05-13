@@ -120,7 +120,7 @@ UAL0001 = Class(CommandUnit) {
             self:AddToggleCap('RULEUTC_ShieldToggle')
             self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
-            self:CreatePersonalShield(bp)
+            self:CreateShield(bp)
         elseif enh == 'ShieldRemove' then
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
@@ -260,7 +260,7 @@ UAL0001 = Class(CommandUnit) {
 
     CreateHeavyShield = function(self, bp)
         WaitTicks(1)
-        self:CreatePersonalShield(bp)
+        self:CreateShield(bp)
         self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
         self:SetMaintenanceConsumptionActive()
     end

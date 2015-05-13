@@ -2,7 +2,7 @@
 -- File     :  /cdimage/units/UEL0301/UEL0301_script.lua
 -- Author(s):  Jessica St. Croix, Gordon Duclos
 -- Summary  :  UEF Sub Commander Script
--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 local Shield = import('/lua/shield.lua').Shield
 local EffectUtil = import('/lua/EffectUtilities.lua')
@@ -160,7 +160,7 @@ UEL0301 = Class(TWalkingLandUnit) {
             self:AddToggleCap('RULEUTC_ShieldToggle')
             self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
-            self:CreatePersonalShield(bp)
+            self:CreateShield(bp)
         elseif enh == 'ShieldRemove' then
             RemoveUnitEnhancement(self, 'Shield')
             self:DestroyShield()

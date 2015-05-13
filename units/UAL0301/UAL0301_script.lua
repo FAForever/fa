@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aeon Sub Commander Script
 --**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local AWalkingLandUnit = import('/lua/aeonunits.lua').AWalkingLandUnit
@@ -114,7 +114,7 @@ UAL0301 = Class(AWalkingLandUnit) {
             self:AddToggleCap('RULEUTC_ShieldToggle')
             self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
-            self:CreatePersonalShield(bp)
+            self:CreateShield(bp)
         elseif enh == 'ShieldRemove' then
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
@@ -200,7 +200,7 @@ UAL0301 = Class(AWalkingLandUnit) {
 
     CreateHeavyShield = function(self, bp)
         WaitTicks(1)
-        self:CreatePersonalShield(bp)
+        self:CreateShield(bp)
         self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
         self:SetMaintenanceConsumptionActive()
     end,

@@ -1876,18 +1876,8 @@ Unit = Class(moho.unit_methods) {
 
         --If we have a shield specified, create it.
         local bpShield = bp.Defense.Shield
-        if bpShield.ShieldSize > 0 then
-            if bpShield.StartOn ~= false then
-                if bpShield.PersonalShield == true then
-                    self:CreatePersonalShield(bpShield)
-                elseif bpShield.AntiArtilleryShield then
-                    self:CreateAntiArtilleryShield(bpShield)
-                elseif bpShield.PersonalBubble then
-                    self:CreatePersonalBubbleShield(bpShield)
-                else
-                    self:CreateShield(bpShield)
-                end
-            end
+        if bpShield.StartOn ~= false then
+            self:CreateShield(bpShield)
         end
 
         if bp.Display.AnimationPermOpen then
@@ -3614,36 +3604,20 @@ Unit = Class(moho.unit_methods) {
     -- SHIELDS
     -------------------------------------------------------------------------------------------
     CreateShield = function(self, bpShield)
+        -- Copy the shield template so we don't alter the blueprint table.
         local bpShield = table.deepcopy(bpShield)
         self:DestroyShield()
-        self.MyShield = Shield (bpShield, self)
-        self:SetFocusEntity(self.MyShield)
-        self:EnableShield()
-        self.Trash:Add(self.MyShield)
-    end,
 
-    CreatePersonalBubbleShield = function(self, bpShield)
-        local bpShield = table.deepcopy(bpShield)
-        self:DestroyShield()
-        self.MyShield = PersonalBubble (bpShield, self)
-        self:SetFocusEntity(self.MyShield)
-        self:EnableShield()
-        self.Trash:Add(self.MyShield)
-    end,
+        if bpShield.PersonalShield then
+            self.MyShield = UnitShield(bpShield, self)
+        elseif bpShield.AntiArtilleryShield then
+            self.MyShield = AntiArtilleryShield(bpShield, self)
+        elseif bpShield.PersonalBubble then
+            self.MyShield = PersonalBubble(bpShield, self)
+        else
+            self.MyShield = Shield(bpShield, self)
+        end
 
-    CreatePersonalShield = function(self, bpShield)
-        local bpShield = table.deepcopy(bpShield)
-        self:DestroyShield()
-        self.MyShield = UnitShield (bpShield, self)
-        self:SetFocusEntity(self.MyShield)
-        self:EnableShield()
-        self.Trash:Add(self.MyShield)
-    end,
-
-    CreateAntiArtilleryShield = function(self, bpShield)
-        local bpShield = table.deepcopy(bpShield)
-        self:DestroyShield()
-        self.MyShield = AntiArtilleryShield (bpShield, self)
         self:SetFocusEntity(self.MyShield)
         self:EnableShield()
         self.Trash:Add(self.MyShield)

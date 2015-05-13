@@ -217,7 +217,7 @@ UEL0001 = Class(CommandUnit) {
             self:RemoveCommandCap('RULEUCC_Teleport')
         elseif enh == 'Shield' then
             self:AddToggleCap('RULEUTC_ShieldToggle')
-            self:CreatePersonalShield(bp)
+            self:CreateShield(bp)
             self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
         elseif enh == 'ShieldRemove' then
