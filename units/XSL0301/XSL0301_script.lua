@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/XSL0301/XSL0301_script.lua
-#**  Author(s):  Jessica St. Croix, Gordon Duclos
-#**
-#**  Summary  :  Seraphim Sub Commander Script
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+-- ****************************************************************************
+-- **
+-- **  File     :  /cdimage/units/XSL0301/XSL0301_script.lua
+-- **  Author(s):  Jessica St. Croix, Gordon Duclos
+-- **
+-- **  Summary  :  Seraphim Sub Commander Script
+-- **
+-- **  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+-- ****************************************************************************
 
 local SWalkingLandUnit = import('/lua/seraphimunits.lua').SWalkingLandUnit
 local AWeapons = import('/lua/aeonweapons.lua')
@@ -75,7 +75,7 @@ XSL0301 = Class(SWalkingLandUnit) {
     
     OnStartBuild = function(self, unitBeingBuilt, order)
         local bp = self:GetBlueprint()
-        if order != 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
+        if order ~= 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
             self:StartBuildingEffects(unitBeingBuilt, order)
         end
         self:DoOnStartBuildCallbacks(unitBeingBuilt)
@@ -115,7 +115,7 @@ XSL0301 = Class(SWalkingLandUnit) {
     OnCreate = function(self)
         SWalkingLandUnit.OnCreate(self)
         self:SetCapturable(false)
-        #self:HideBone('Turbine', true)
+        -- self:HideBone('Turbine', true)
         self:HideBone('Back_Upgrade', true)
         self:SetupBuildBones()
     end,
@@ -128,7 +128,7 @@ XSL0301 = Class(SWalkingLandUnit) {
         SWalkingLandUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
         if not bp then return end
-        #Teleporter
+        -- Teleporter
         if enh == 'Teleporter' then
         WarpInEffectThread = function(self)
         self:PlayUnitSound('CommanderArrival')
@@ -155,7 +155,7 @@ XSL0301 = Class(SWalkingLandUnit) {
             self:AddCommandCap('RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
             self:RemoveCommandCap('RULEUCC_Teleport')
-        # Missile
+        -- Missile
         elseif enh == 'Missile' then
             self:AddCommandCap('RULEUCC_Tactical')
             self:AddCommandCap('RULEUCC_SiloBuildTactical')
@@ -164,7 +164,7 @@ XSL0301 = Class(SWalkingLandUnit) {
             self:RemoveCommandCap('RULEUCC_Tactical')
             self:RemoveCommandCap('RULEUCC_SiloBuildTactical')
             self:SetWeaponEnabledByLabel('Missile', false)
-        #Shields
+        -- Shields
         elseif enh == 'Shield' then
             self:AddToggleCap('RULEUTC_ShieldToggle')
             self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
@@ -174,14 +174,14 @@ XSL0301 = Class(SWalkingLandUnit) {
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
-        #Overcharge
+        -- Overcharge
         elseif enh == 'Overcharge' then
       	    self:AddCommandCap('RULEUCC_Overcharge')
       	    self:SetWeaponEnabledByLabel('OverCharge', true)
         elseif enh == 'OverchargeRemove' then
       	    self:RemoveCommandCap('RULEUCC_Overcharge')
       	    self:SetWeaponEnabledByLabel('OverCharge', false)
-        #Engineering Throughput Upgrade
+        -- Engineering Throughput Upgrade
         elseif enh =='EngineeringThroughput' then
             if not Buffs['SeraphimSCUBuildRate'] then
                 BuffBlueprint {
@@ -203,7 +203,7 @@ XSL0301 = Class(SWalkingLandUnit) {
             if Buff.HasBuff( self, 'SeraphimSCUBuildRate' ) then
                 Buff.RemoveBuff( self, 'SeraphimSCUBuildRate' )
             end
-        #Damage Stabilization
+        -- Damage Stabilization
         elseif enh == 'DamageStabilization' then
             if not Buffs['SeraphimSCUDamageStabilization'] then
                BuffBlueprint {
@@ -232,7 +232,7 @@ XSL0301 = Class(SWalkingLandUnit) {
             if Buff.HasBuff( self, 'SeraphimSCUDamageStabilization' ) then
                 Buff.RemoveBuff( self, 'SeraphimSCUDamageStabilization' )
             end  
-        #Enhanced Sensor Systems
+        -- Enhanced Sensor Systems
         elseif enh == 'EnhancedSensors' then
             self:SetIntelRadius('Vision', bp.NewVisionRadius or 104)
             self:SetIntelRadius('Omni', bp.NewOmniRadius or 104)
