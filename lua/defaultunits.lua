@@ -1745,6 +1745,22 @@ CommandUnit = Class(WalkingLandUnit) {
         self.rightGunLabel = rightGunName
     end,
 
+    CreateShield = function(self, bpShield)
+        WalkingLandUnit.CreateShield(self, bpShield)
+
+        local aiBrain = self:GetAIBrain()
+
+        -- Mutate the OnDamage function for this one very special shield.
+        local oldOnDamage = self.MyShield.OnDamage
+        local newOnDamage = function(shield, instigator, amount, vector, dmgType)
+            oldOnDamage(shield, instigator, amount, vector, dmgType)
+
+            aiBrain:OnPlayCommanderUnderAttackVO()
+        end
+
+        self.MyShield.OnDamage = newOnDamage
+    end,
+
     OnKilled = function(self, instigator, type, overkillRatio)
         WalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)
         LOG('com is dead')
