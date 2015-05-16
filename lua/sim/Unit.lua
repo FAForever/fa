@@ -1868,7 +1868,7 @@ Unit = Class(moho.unit_methods) {
 
         --If we have a shield specified, create it.
         local bpShield = bp.Defense.Shield
-        if bpShield.StartOn ~= false then
+        if bpShield.StartOn == true then
             self:CreateShield(bpShield)
         end
 
