@@ -1369,6 +1369,7 @@ Unit = Class(moho.unit_methods) {
                 sinkAnim:SetRate(rate)
                 self.Trash:Add(sinkAnim)
                 WaitFor(sinkAnim)
+                self.StopSink = true
             end
         end
     end,
@@ -1559,11 +1560,24 @@ Unit = Class(moho.unit_methods) {
         self.Trash:Add(proj)
     end,
 
+    SeabedWatcher = function(self)
+        local pos = self:GetPosition()
+        local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
+        local watchBone = self:GetBlueprint().WatchBone or 0
+
+        self.StopSink = false
+        while not self.StopSink do
+            WaitTicks(2)
+            if self:GetPosition(watchBone)[2]-0.2 <= seafloor then
+                self.StopSink = true
+            end
+        end
+    end,
+
     DeathThread = function( self, overkillRatio, instigator)
         local layer = self:GetCurrentLayer()
         local isNaval = EntityCategoryContains(categories.NAVAL, self)
         local shallSink = (
-            not isNaval and  -- Naval units use an animation to sink, not our sinking code.
             (layer == 'Water' or layer == 'Sub') and  -- In a layer for which sinking is meaningful
             not EntityCategoryContains(categories.FACTORY * categories.STRUCTURE * categories.NAVAL, self)  -- Exclude naval factories
         )
@@ -1584,21 +1598,8 @@ Unit = Class(moho.unit_methods) {
             self.CreateUnitDestructionDebris(self, true, true, overkillRatio > 2)
         end
 
-        -- Wait for death animations, if any (sinking ships)
-        if self.DeathAnimManip then
-            WaitFor(self.DeathAnimManip)
-        end
-
-        -- A non-naval unit dying over water needs to sink, but lacks an animation for it. Let's
-        -- make one up.
         if shallSink then
             self.DisallowCollisions = true
-            local this = self
-            self:StartSinking(
-                function()
-                    this:DestroyUnit(overkillRatio)
-                end
-            )
 
             -- Bubbles and stuff coming off the sinking wreck.
             self:ForkThread(self.SinkDestructionEffects)
@@ -1606,8 +1607,23 @@ Unit = Class(moho.unit_methods) {
             -- Avoid slightly ugly need to propagate this through callback hell...
             self.overkillRatio = overkillRatio
 
-            -- Wait for the sinking callback to actually destroy the unit.
-            return
+            if isNaval then
+                -- Waits for wreck to hit bottom or end of animation
+                self:SeabedWatcher()
+            else
+                -- A non-naval unit dying over water needs to sink, but lacks an animation for it. Let's
+                -- make one up.
+
+                local this = self
+                self:StartSinking(
+                    function()
+                        this:DestroyUnit(overkillRatio)
+                    end
+                )
+
+                -- Wait for the sinking callback to actually destroy the unit.
+                return
+            end
         end
 
         -- If we're not doing fancy sinking rubbish, just blow the damn thing up.
