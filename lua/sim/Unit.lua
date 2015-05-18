@@ -1046,15 +1046,15 @@ Unit = Class(moho.unit_methods) {
         local preAdjHealth = self:GetHealth()
         self:AdjustHealth(instigator, -amount)
         local health = self:GetHealth()
-        if( health < 1 ) then
-            if( damageType == 'Reclaimed' ) then
+        if health < 1 then
+            if damageType == 'Reclaimed' then
                 self:Destroy()
             else
                 local excessDamageRatio = 0.0
                 --Calculate the excess damage amount
                 local excess = preAdjHealth - amount
                 local maxHealth = self:GetMaxHealth()
-                if(excess < 0 and maxHealth > 0) then
+                if excess < 0 and maxHealth > 0 then
                     excessDamageRatio = -excess / maxHealth
                 end
                 self:Kill(instigator, damageType, excessDamageRatio)
@@ -1205,9 +1205,11 @@ Unit = Class(moho.unit_methods) {
         if instigator and IsUnit(instigator) then
             instigator:OnKilledUnit(self)
         end
+
         if self.DeathWeaponEnabled ~= false then
             self:DoDeathWeapon()
         end
+
         self:DisableShield()
         self:DisableUnitIntel()
         self:ForkThread(self.DeathThread, overkillRatio , instigator)
@@ -1244,23 +1246,110 @@ Unit = Class(moho.unit_methods) {
     DoDeathWeapon = function(self)
         if self:IsBeingBuilt() then return end
         local bp = self:GetBlueprint()
-        for k, v in bp.Weapon do
-            if(v.Label == 'DeathWeapon') then
-                if v.FireOnDeath == true then
+        for _, w in bp.Weapon do
+            if w.Label == 'DeathWeapon' then
+                if w.FireOnDeath == true and not w.Delay then
                     self:SetWeaponEnabledByLabel('DeathWeapon', true)
                     self:GetWeaponByLabel('DeathWeapon'):Fire()
                 else
-                    self:ForkThread(self.DeathWeaponDamageThread, v.DamageRadius, v.Damage, v.DamageType, v.DamageFriendly)
+                    self:ForkThread(self.DeathWeaponDamageThread, w)
                 end
                 break
             end
         end
     end,
 
+    DoDeathDamage = function(self, bone, data)
+        local scale = data.scale
+        local args = table.deepcopy(data)
+
+        args.Instigator = self
+
+        explosion.CreateDebrisProjectiles(self, scale, {self:GetUnitSizes()})
+        if bone then
+            args.Position = self:GetPosition(bone)
+            args.Damage = data.BoneDamage or (data.Damage / data.numBones)
+            args.DamageRadius = data.BoneDamageRadius or data.DamageRadius
+        else
+            args.Position = nil
+            args.Damage = args.Damage - args.damageDealt
+        end
+
+        if args.Damage > 0 then
+            if bone then
+                explosion.CreateDefaultHitExplosionAtBone( self, bone, scale)
+            end
+            import('/lua/sim/defaultdamage.lua').AreaDamage(args)
+
+            data.damageDealt = data.damageDealt + args.Damage
+        end
+    end,
+
+    DeathWeaponDamageThread = function(self, weapon)
+        self.finalDeathWeapon = false
+
+        local data = table.deepcopy(weapon)
+        if weapon.Delay == 'Animation' and self.DeathAnimManip then
+            WaitFor(self.DeathAnimManip)
+        else
+            local delay = tonumber(weapon.Delay)
+
+            if delay > 0 then
+                WaitSeconds(delay)
+            end
+        end
+
+        data.Damage = weapon.Damage or 1
+        data.DamageRadius = weapon.DamageRadius or 1
+        data.DamageFriendly = weapon.DamageFriendly or false
+        data.damageDealt = 0
+        data.numBones = 0
+
+        local bones = weapon.BoneImpact
+        local numBones = 0
+        local pos = self:GetPosition()
+        local ground = GetTerrainHeight(pos[1], pos[3])
+
+        if bones then
+            -- support both array and single var
+            if type(bones) ~= 'table' then bones = {bones} end
+
+            bones = table.deepcopy(bones)
+            data.numBones = table.getsize(bones)
+        end
+
+        data.scale = explosion.GetAverageBoundingXYZRadius(self) / data.numBones
+
+        local doDamage = true
+
+        while bones and not self.finalDeathWeapon do
+            local bone = nil
+            local pos = self:GetPosition()
+
+            for i, b in bones do
+                local bpos = self:GetPosition(b)
+                if math.abs(bpos[2] - ground) < 0.5 then
+                    bone = b
+                    bones[i] = nil
+                end
+            end
+
+            if bone then
+                self:DoDeathDamage(bone, data)
+            else
+                WaitTicks(1)
+            end
+        end
+
+        -- deal rest of the death damage
+        self:DoDeathDamage(nil, data)
+    end,
+
     OnCollisionCheck = function(self, other, firingWeapon)
         if self.DisallowCollisions then
             return false
         end
+
         if EntityCategoryContains(categories.PROJECTILE, other) then
             if self:GetArmy() == other:GetArmy() then
                 return other:GetCollideFriendly()
@@ -1285,6 +1374,7 @@ Unit = Class(moho.unit_methods) {
                 end
             end
         end
+
         return true
     end,
 
@@ -1489,10 +1579,6 @@ Unit = Class(moho.unit_methods) {
         explosion.CreateScalableUnitExplosion( self, overKillRatio )
     end,
 
-    DeathWeaponDamageThread = function( self , damageRadius, damage, damageType, damageFriendly)
-        WaitSeconds( 0.1 )
-        DamageArea(self, self:GetPosition(), damageRadius or 1, damage or 1, damageType or 'Normal', damageFriendly or false)
-    end,
 
     SeabedWatcher = function(self)
         local pos = self:GetPosition()
@@ -1502,7 +1588,7 @@ Unit = Class(moho.unit_methods) {
         self.StopSink = false
         while not self.StopSink do
             WaitTicks(1)
-            if(self:GetPosition(watchBone)[2]-0.2 <= seafloor) then
+            if self:GetPosition(watchBone)[2]-0.2 <= seafloor then
                 self.StopSink = true
             end
         end
@@ -1524,11 +1610,11 @@ Unit = Class(moho.unit_methods) {
             local toSurface = surfaceHeight - boneHeight
             local y = toSurface
             local rx, ry, rz = self:GetRandomOffset(0.3)
-            local rs = math.max(math.min(2.5, vol / 20), 0.5)
+            local rs = math.max(math.min(4, vol / 20), 0.2)
             local scale = Util.GetRandomFloat(rs/2, rs)
 
             self:DestroyAllDamageEffects()
-            if(toSurface < 1) then
+            if toSurface < 1 then
                 CreateAttachedEmitter(self, randBone, army,'/effects/emitters/destruction_water_sinking_ripples_01_emit.bp'):OffsetEmitter(rx, y, rz):ScaleEmitter(scale)
                 CreateAttachedEmitter(self, randBone, army, '/effects/emitters/destruction_water_sinking_wash_01_emit.bp'):OffsetEmitter(rx, y, rz):ScaleEmitter(scale)
             end
@@ -1538,7 +1624,7 @@ Unit = Class(moho.unit_methods) {
             else
                 local lifetime = Util.GetRandomInt(50, 200)
 
-                if(toSurface > 1) then
+                if toSurface > 1 then
                     CreateEmitterAtBone( self, randBone, army, '/effects/emitters/underwater_bubbles_01_emit.bp'):OffsetEmitter(rx, ry, rz)
                         :ScaleEmitter(scale)
                         :SetEmitterParam('LIFETIME', lifetime)
@@ -1592,7 +1678,7 @@ Unit = Class(moho.unit_methods) {
             self:ForkThread(self.SinkThread)
         end
 
-        if((self.ShowUnitDestructionDebris and overkillRatio)) then
+        if self.ShowUnitDestructionDebris and overkillRatio then
             if overkillRatio <= 1 then
                 self.CreateUnitDestructionDebris( self, true, true, false )
             elseif overkillRatio <= 2 then
@@ -1614,10 +1700,14 @@ Unit = Class(moho.unit_methods) {
             end
         end
 
+
+
         if isSinking and not isNavalFactory then
             self:ForkThread(self.SinkDestructionEffects)
             self:SeabedWatcher() -- Finishes when unit reached seabed
         end
+
+        self.finalDeathWeapon = true
 
         self:CreateWreckage( overkillRatio )
 
@@ -1923,7 +2013,7 @@ Unit = Class(moho.unit_methods) {
         self:DoUnitCallbacks('OnStopBeingBuilt')
 
         --Create any idle effects on unit
-        if( table.getn( self.IdleEffectsBag ) == 0) then
+        if table.getn(self.IdleEffectsBag) == 0 then
             self:CreateIdleEffects()
         end
 
@@ -2610,13 +2700,13 @@ Unit = Class(moho.unit_methods) {
             self:EnableIntel('WaterVision')
         end
 
-        if( new == 'Land' ) then
+        if new == 'Land' then
             self:PlayUnitSound('TransitionLand')
             self:PlayUnitAmbientSound('AmbientMoveLand')
-        elseif(( new == 'Water' ) or ( new == 'Seabed' )) then
+        elseif new == 'Water'  or new == 'Seabed' then
             self:PlayUnitSound('TransitionWater')
             self:PlayUnitAmbientSound('AmbientMoveWater')
-        elseif ( new == 'Sub' ) then
+        elseif new == 'Sub' then
             self:PlayUnitAmbientSound('AmbientMoveSub')
         end
 
@@ -2666,7 +2756,7 @@ Unit = Class(moho.unit_methods) {
             end
         end
 
-        if( new == 'Stopped' or new == 'Stopping' ) then
+        if new == 'Stopped' or new == 'Stopping' then
             --Stop ambient sounds
             self:StopUnitAmbientSound( 'AmbientMove' )
             self:StopUnitAmbientSound( 'AmbientMoveWater' )
@@ -2835,7 +2925,7 @@ Unit = Class(moho.unit_methods) {
         local layer = self:GetCurrentLayer()
         local bpMTable = self:GetBlueprint().Display.MovementEffects
 
-        if( old == 'TopSpeed' ) then
+        if old == 'TopSpeed' then
             --Destroy top speed contrails and exhaust effects
             self:DestroyTopSpeedEffects()
         end

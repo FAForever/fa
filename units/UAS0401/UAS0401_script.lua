@@ -118,30 +118,7 @@ UAS0401 = Class(ASeaUnit) {
     },
 	
 	OnKilled = function(self, instigator, type, overkillRatio)
-		local nrofBones = self:GetBoneCount() -1
-		local watchBone = self:GetBlueprint().WatchBone or 0
-		LOG(self:GetBlueprint().Description, " watchbone is ", watchBone)
-
- 		self:ForkThread(function()
-			-- LOG("Sinker thread created")
-			local pos = self:GetPosition()
-			local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
-			while self:GetPosition(watchBone)[2] > seafloor do
-				WaitSeconds(0.1)
-				-- LOG("Sinker: ", repr(self:GetPosition()))
-			end
-			#CreateScaledBoom(self, overkillRatio, watchBone)
-			self:CreateWreckage(overkillRatio, instigator)
-			self:Destroy()
-		end)
-         
-        local layer = self:GetCurrentLayer()
-        self:DestroyIdleEffects()
-        if (layer == 'Water' or layer == 'Seabed' or layer == 'Sub') then
-            self.SinkExplosionThread = self:ForkThread(self.ExplosionThread)
-            self.SinkThread = self:ForkThread(self.SinkingThread)
-        end
-		ASeaUnit.OnKilled(self, instigator, type, overkillRatio)
+  		ASeaUnit.OnKilled(self, instigator, type, overkillRatio)
     end
 }
 
