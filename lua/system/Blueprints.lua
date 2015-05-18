@@ -452,7 +452,8 @@ function PreModBlueprints(all_bps)
             bp.General.CommandCaps.RULEUCC_Pause = true
         end
 
-        -- mod in AI.GuardScanRadius = Weapon.MaxRadius + Intel.VisionRadius
+        -- Mod in AI.GuardScanRadius = Longest weapon range * longest tracking radius
+        -- Takes ACU/SCU enhancements into account
         -- fixes move-attack range issues
         -- Most Air units have the GSR defined already, this is just making certain they don't get included
         if cats.MOBILE and (cats.LAND or cats.NAVAL) and (cats.DIRECTFIRE or cats.INDIRECTFIRE or cats.ENGINEER) and not (bp.AI and bp.AI.GuardScanRadius) then
