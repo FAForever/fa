@@ -512,6 +512,16 @@ PersonalBubble = Class(Shield) {
         self:SetType('Personal')
     end,
 
+    CreateShieldMesh = function(self)
+        Shield.CreateShieldMesh(self)
+        self:SetCollisionShape('None')
+    end,
+
+    RemoveShield = function(self)
+        Shield.RemoveShield(self)
+        self:SetCollisionShape('None')
+    end,
+
     OnState = State(Shield.OnState) {
         Main = function(self)
             -- Set the collision profile of the unit to match the apparent shield sphere.
