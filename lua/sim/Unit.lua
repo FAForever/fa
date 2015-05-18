@@ -1009,7 +1009,6 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
     -- DAMAGE
     -------------------------------------------------------------------------------------------
-    --Argument val is true or false. False = takes no damage
     SetCanTakeDamage = function(self, val)
         self.CanTakeDamage = val
     end,
@@ -1037,15 +1036,15 @@ Unit = Class(moho.unit_methods) {
         local preAdjHealth = self:GetHealth()
         self:AdjustHealth(instigator, -amount)
         local health = self:GetHealth()
-        if( health < 1 ) then
-            if( damageType == 'Reclaimed' ) then
+        if health < 1 then
+            if damageType == 'Reclaimed' then
                 self:Destroy()
             else
                 local excessDamageRatio = 0.0
-                --Calculate the excess damage amount
+                -- Calculate the excess damage amount
                 local excess = preAdjHealth - amount
                 local maxHealth = self:GetMaxHealth()
-                if(excess < 0 and maxHealth > 0) then
+                if excess < 0 and maxHealth > 0 then
                     excessDamageRatio = -excess / maxHealth
                 end
                 self:Kill(instigator, damageType, excessDamageRatio)
@@ -1053,11 +1052,7 @@ Unit = Class(moho.unit_methods) {
         end
 
         if health < 1 or self.Dead then
-            if vector then
-                self.debris_Vector = vector
-            else
-                self.debris_Vector = ''
-            end
+            self.debris_Vector = vector or ''
         end
     end,
 
@@ -3132,57 +3127,26 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    AddOnStartBuildCallback = function(self, fn, category)
-        if not fn then
-            error('*ERROR: Tried to add an OnStartBuild callback with a nil function')
-            return
-        end
-        local insertedTable = {
-                CallbackFunction = fn,
-                Category = category
-            }
-        table.insert(self.EventCallbacks.OnStartBuild, insertedTable)
+    --- Add a callback to be invoked when this unit starts building another. The unit being built is
+    -- passed as a parameter to the callback function.
+    AddOnStartBuildCallback = function(self, fn)
+        self:AddUnitCallback("OnStartBuild", fn)
     end,
 
     DoOnStartBuildCallbacks = function(self, unit)
-        for k,v in self.EventCallbacks.OnStartBuild do
-            if v and unit and not unit.Dead and EntityCategoryContains(v.Category, unit) then
-                v.CallbackFunction(self, unit)
-            end
-        end
+        self:DoUnitCallbacks("OnStartBuild", unit)
     end,
 
     DoOnFailedToBuildCallbacks = function(self)
-        if self.EventCallbacks.OnFailedToBuild then
-            for k, cb in self.EventCallbacks.OnFailedToBuild do
-                if cb then
-                    cb(self)
-                end
-            end
-        end
+        self:DoUnitCallbacks("OnFailedToBuild")
     end,
 
-    AddOnUnitBuiltCallback = function(self, fn, category)
-        if not fn then
-            error('*ERROR: Tried to add an OnUnitBuilt callback with a nil function')
-            return
-        end
-        local insertedTable = {
-                CallBackFunction = fn,
-                Category = category
-            }
-        table.insert(self.EventCallbacks.OnUnitBuilt, insertedTable)
+    AddOnUnitBuiltCallback = function(self, fn)
+        self:AddUnitCallback("OnUnitBuilt", fn)
     end,
 
     DoOnUnitBuiltCallbacks = function(self, unit)
-        if self.EventCallbacks.OnUnitBuilt then
-            for k, v in self.EventCallbacks.OnUnitBuilt do
-                if v and unit and not unit.Dead and EntityCategoryContains(v.Category, unit) then
-                    --Function will call back with both the unit's and the unit being built's handle
-                    v.CallBackFunction(self, unit)
-                end
-            end
-        end
+        self:DoUnitCallbacks("OnUnitBuilt", unit)
     end,
 
     AddOnHorizontalStartMoveCallback = function(self, fn)
