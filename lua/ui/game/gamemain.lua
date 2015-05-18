@@ -242,6 +242,8 @@ function CreateUI(isReplay)
         import('/modules/console_commands.lua').Init()
     end
 
+    import('/modules/reclaim.lua').Init()
+
 end
 
 local provider = false
