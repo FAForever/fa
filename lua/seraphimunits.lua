@@ -1,15 +1,15 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/lua/seraphimunits.lua
-#**  Author(s): Dru Staltman, Jessica St. Croix
-#**
-#**  Summary  : Units for Seraphim
-#**
-#**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
-#--------------------------------------------------------------------------
-# SERAPHIM DEFAULT UNITS
-#--------------------------------------------------------------------------
+-- ****************************************************************************
+-- **
+-- **  File     :  /cdimage/lua/seraphimunits.lua
+-- **  Author(s): Dru Staltman, Jessica St. Croix
+-- **
+-- **  Summary  : Units for Seraphim
+-- **
+-- **  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-- ****************************************************************************
+---------------------------------------------------------------------------
+-- SERAPHIM DEFAULT UNITS
+---------------------------------------------------------------------------
 local DefaultUnitsFile = import('defaultunits.lua')
 local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
 local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
@@ -38,9 +38,9 @@ local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
-#-------------------------------------------------------------
-#  AIR STRUCTURES
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  AIR STRUCTURES
+--------------------------------------------------------------
 SAirFactoryUnit = Class(AirFactoryUnit) {
 
     StartBuildFx = function( self, unitBeingBuilt )
@@ -58,7 +58,7 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
             self:DetachAll(bp.Display.BuildAttachBone or 0)
         end
         self:DestroyBuildRotator()
-        if order != 'Upgrade' then
+        if order ~= 'Upgrade' then
             ChangeState(self, self.RollingOffState)
         else
             self:SetBusy(false)
@@ -102,17 +102,17 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
         self:SetBusy(true)
         local unitBuilding = self.UnitBeingBuilt
         
-        # If the unit being built isn't an engineer use normal rolloff
+        -- If the unit being built isn't an engineer use normal rolloff
         if not EntityCategoryContains( categories.LAND, unitBuilding ) then
             AirFactoryUnit.RolloffBody(self)
         else
-            # Engineers need to be slid off the factory
+            -- Engineers need to be slid off the factory
             local bp = self:GetBlueprint()
             if not self.AttachmentSliderManip then
                 self.AttachmentSliderManip = CreateSlider(self, bp.Display.BuildAttachBone or 0)
             end
             self:CreateRollOffEffects()
-            self.AttachmentSliderManip:SetSpeed(50)  #was 30, increased to help engineers move faster off of it
+            self.AttachmentSliderManip:SetSpeed(50)  -- was 30, increased to help engineers move faster off of it
             self.AttachmentSliderManip:SetGoal(0, 0, 60)
             WaitFor( self.AttachmentSliderManip )
             self.AttachmentSliderManip:SetGoal(0, -55, 60)
@@ -120,8 +120,8 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
             if not unitBuilding.Dead then
                 unitBuilding:DetachFrom(true)
                 self:DetachAll(bp.Display.BuildAttachBone or 0)
-                #local worldPos = self:CalculateWorldPositionFromRelative({0, 0, -15})
-                #IssueMoveOffFactory({unitBuilding}, worldPos)
+                -- local worldPos = self:CalculateWorldPositionFromRelative({0, 0, -15})
+                -- IssueMoveOffFactory({unitBuilding}, worldPos)
             end
             if self.AttachmentSliderManip then
                 self.AttachmentSliderManip:Destroy()
@@ -135,17 +135,17 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
     
     
     OnStartBuild = function(self, unitBeingBuilt, order )
-        # Set goal for rotator
+        -- Set goal for rotator
         local unitid = self:GetBlueprint().General.UpgradesTo
         if unitBeingBuilt:GetUnitId() == unitid and order == 'Upgrade' then
-            #stop pods that exist in the upgraded unit
+            -- stop pods that exist in the upgraded unit
             local savedAngle
             if (self.Rotator1) then
                 savedAngle = self.Rotator1:GetCurrentAngle()
                 self.Rotator1:SetGoal(savedAngle)
                 unitBeingBuilt.Rotator1:SetCurrentAngle(savedAngle)
                 unitBeingBuilt.Rotator1:SetGoal(savedAngle)
-                #freeze the next rotator to 0, since that's where it will be
+                -- freeze the next rotator to 0, since that's where it will be
                 unitBeingBuilt.Rotator2:SetCurrentAngle(0)
                 unitBeingBuilt.Rotator2:SetGoal(0)
             end
@@ -167,7 +167,7 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
     UpgradingState = State(AirFactoryUnit.UpgradingState) {   
         OnStopBuild = function(self, unitBuilding)
             if unitBuilding:GetFractionComplete() == 1 then
-                #start halted rotators on upgraded unit
+                -- start halted rotators on upgraded unit
                 if (unitBuilding.Rotator1) then
                     unitBuilding.Rotator1:ClearGoal()
                 end
@@ -183,7 +183,7 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
 
         OnFailedToBuild = function(self)
            AirFactoryUnit.UpgradingState.OnFailedToBuild(self)
-           # failed to build, so resume rotators
+           -- failed to build, so resume rotators
            if (self.Rotator1) then
                self.Rotator1:ClearGoal()
                self.Rotator1:SetSpeed(5)
@@ -197,28 +197,28 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
     }, 
 }
 
-#-------------------------------------------------------------
-#  AIR UNITS
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  AIR UNITS
+--------------------------------------------------------------
 SAirUnit = Class(AirUnit) {
     ContrailEffects = {'/effects/emitters/contrail_ser_polytrail_01_emit.bp',},
 }
 
-#-------------------------------------------------------------
-#  AIR STAGING STRUCTURES
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  AIR STAGING STRUCTURES
+--------------------------------------------------------------
 SAirStagingPlatformUnit = Class(AirStagingPlatformUnit) {}
 
-#-------------------------------------------------------------
-#  WALL  STRUCTURES
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  WALL  STRUCTURES
+--------------------------------------------------------------
 SConcreteStructureUnit = Class(ConcreteStructureUnit) {
     AdjacencyBeam = false,
 }
 
-#-------------------------------------------------------------
-#  Construction Units
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  Construction Units
+--------------------------------------------------------------
 SConstructionUnit = Class(ConstructionUnit) {
          
     OnCreate = function(self)
@@ -237,7 +237,7 @@ SConstructionUnit = Class(ConstructionUnit) {
     
     OnStartBuild = function(self, unitBeingBuilt, order)
         local bp = self:GetBlueprint()
-        if order != 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
+        if order ~= 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
             self:StartBuildingEffects(unitBeingBuilt, order)
         end
         self:DoOnStartBuildCallbacks(unitBeingBuilt)
@@ -304,9 +304,9 @@ SConstructionUnit = Class(ConstructionUnit) {
 
 }
 
-#-------------------------------------------------------------
-#  ENERGY CREATION UNITS
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  ENERGY CREATION UNITS
+--------------------------------------------------------------
 SEnergyCreationUnit = Class(EnergyCreationUnit) {
 
     OnCreate = function(self)
@@ -325,24 +325,24 @@ SEnergyCreationUnit = Class(EnergyCreationUnit) {
     end,
 }
 
-#-------------------------------------------------------------
-# ENERGY STORAGE STRUCTURES
-#-------------------------------------------------------------
+--------------------------------------------------------------
+-- ENERGY STORAGE STRUCTURES
+--------------------------------------------------------------
 SEnergyStorageUnit = Class(EnergyStorageUnit) {
 }
 
-#-------------------------------------------------------------
-#  HOVERING LAND UNITS
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  HOVERING LAND UNITS
+--------------------------------------------------------------
 SHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
     FxHoverScale = 1,
     HoverEffects = nil,
     HoverEffectBones = nil,
 }
 
-#-------------------------------------------------------------
-#  LAND FACTORY STRUCTURES
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  LAND FACTORY STRUCTURES
+--------------------------------------------------------------
 SLandFactoryUnit = Class(LandFactoryUnit) {
     StartBuildFx = function( self, unitBeingBuilt )
 		local BuildBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
@@ -351,17 +351,17 @@ SLandFactoryUnit = Class(LandFactoryUnit) {
     end,
     
     OnStartBuild = function(self, unitBeingBuilt, order )
-        # Set goal for rotator
+        -- Set goal for rotator
         local unitid = self:GetBlueprint().General.UpgradesTo
         if unitBeingBuilt:GetUnitId() == unitid and order == 'Upgrade' then
-            #stop pods that exist in the upgraded unit
+            -- stop pods that exist in the upgraded unit
             local savedAngle
             if (self.Rotator1) then
                 savedAngle = self.Rotator1:GetCurrentAngle()
                 self.Rotator1:SetGoal(savedAngle)
                 unitBeingBuilt.Rotator1:SetCurrentAngle(savedAngle)
                 unitBeingBuilt.Rotator1:SetGoal(savedAngle)
-                #freeze the next rotator to 0, since that's where it will be
+                -- freeze the next rotator to 0, since that's where it will be
                 unitBeingBuilt.Rotator2:SetCurrentAngle(0)
                 unitBeingBuilt.Rotator2:SetGoal(0)
             end
@@ -383,7 +383,7 @@ SLandFactoryUnit = Class(LandFactoryUnit) {
     UpgradingState = State(LandFactoryUnit.UpgradingState) {   
         OnStopBuild = function(self, unitBuilding)
             if unitBuilding:GetFractionComplete() == 1 then
-                #start halted rotators on upgraded unit
+                -- start halted rotators on upgraded unit
                 if (unitBuilding.Rotator1) then
                     unitBuilding.Rotator1:ClearGoal()
                 end
@@ -399,7 +399,7 @@ SLandFactoryUnit = Class(LandFactoryUnit) {
 
         OnFailedToBuild = function(self)
            LandFactoryUnit.UpgradingState.OnFailedToBuild(self)
-           # failed to build, so resume rotators
+           -- failed to build, so resume rotators
            if (self.Rotator1) then
                self.Rotator1:ClearGoal()
                self.Rotator1:SetSpeed(5)
@@ -414,43 +414,43 @@ SLandFactoryUnit = Class(LandFactoryUnit) {
     
 }
 
-#-------------------------------------------------------------
-#  LAND UNITS
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  LAND UNITS
+--------------------------------------------------------------
 SLandUnit = Class(DefaultUnitsFile.LandUnit) { }
 
-#-------------------------------------------------------------
-#  MASS COLLECTION UNITS
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  MASS COLLECTION UNITS
+--------------------------------------------------------------
 SMassCollectionUnit = Class(MassCollectionUnit) {
 }
 
-#-------------------------------------------------------------
-#  MASS FABRICATION STRUCTURES
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  MASS FABRICATION STRUCTURES
+--------------------------------------------------------------
 SMassFabricationUnit = Class(MassFabricationUnit) {
 }
 
-#-------------------------------------------------------------
-#  MASS STORAGE UNITS
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  MASS STORAGE UNITS
+--------------------------------------------------------------
 SMassStorageUnit = Class(MassStorageUnit) {
 }
 
-#-------------------------------------------------------------
-#  RADAR STRUCTURES
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  RADAR STRUCTURES
+--------------------------------------------------------------
 SRadarUnit = Class(RadarUnit) {
 }
 
-#-------------------------------------------------------------
-#  RADAR STRUCTURES
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  RADAR STRUCTURES
+--------------------------------------------------------------
 SSonarUnit = Class(SonarUnit) {}
 
-#-------------------------------------------------------------
-#  SEA FACTORY STRUCTURES
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  SEA FACTORY STRUCTURES
+--------------------------------------------------------------
 SSeaFactoryUnit = Class(SeaFactoryUnit) {
     StartBuildFx = function( self, unitBeingBuilt )
 		local BuildBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
@@ -460,17 +460,17 @@ SSeaFactoryUnit = Class(SeaFactoryUnit) {
     
 
     OnStartBuild = function(self, unitBeingBuilt, order )
-        # Set goal for rotator
+        -- Set goal for rotator
         local unitid = self:GetBlueprint().General.UpgradesTo
         if unitBeingBuilt:GetUnitId() == unitid and order == 'Upgrade' then
-            #stop pods that exist in the upgraded unit
+            -- stop pods that exist in the upgraded unit
             local savedAngle
             if (self.Rotator1) then
                 savedAngle = self.Rotator1:GetCurrentAngle()
                 self.Rotator1:SetGoal(savedAngle)
                 unitBeingBuilt.Rotator1:SetCurrentAngle(savedAngle)
                 unitBeingBuilt.Rotator1:SetGoal(savedAngle)
-                #freeze the next rotator to 0, since that's where it will be
+                -- freeze the next rotator to 0, since that's where it will be
                 unitBeingBuilt.Rotator2:SetCurrentAngle(0)
                 unitBeingBuilt.Rotator2:SetGoal(0)
             end
@@ -492,7 +492,7 @@ SSeaFactoryUnit = Class(SeaFactoryUnit) {
     UpgradingState = State(SeaFactoryUnit.UpgradingState) {   
         OnStopBuild = function(self, unitBuilding)
             if unitBuilding:GetFractionComplete() == 1 then
-                #start halted rotators on upgraded unit
+                -- start halted rotators on upgraded unit
                 if (unitBuilding.Rotator1) then
                     unitBuilding.Rotator1:ClearGoal()
                 end
@@ -508,7 +508,7 @@ SSeaFactoryUnit = Class(SeaFactoryUnit) {
 
         OnFailedToBuild = function(self)
            SeaFactoryUnit.UpgradingState.OnFailedToBuild(self)
-           # failed to build, so resume rotators
+           -- failed to build, so resume rotators
            if (self.Rotator1) then
                self.Rotator1:ClearGoal()
                self.Rotator1:SetSpeed(5)
@@ -523,24 +523,24 @@ SSeaFactoryUnit = Class(SeaFactoryUnit) {
 }
 
 
-#-------------------------------------------------------------
-#  SEA UNITS
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  SEA UNITS
+--------------------------------------------------------------
 SSeaUnit = Class(DefaultUnitsFile.SeaUnit) {}
 
-#-------------------------------------------------------------
-#  SHIELD LAND UNITS
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  SHIELD LAND UNITS
+--------------------------------------------------------------
 SShieldHoverLandUnit = Class(ShieldHoverLandUnit) {}
 
-#-------------------------------------------------------------
-#  SHIELD LAND UNITS
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  SHIELD LAND UNITS
+--------------------------------------------------------------
 SShieldLandUnit = Class(ShieldLandUnit) {}
 
-#-------------------------------------------------------------
-#  SHIELD STRUCTURES
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  SHIELD STRUCTURES
+--------------------------------------------------------------
 SShieldStructureUnit = Class(ShieldStructureUnit) {
     OnShieldEnabled = function(self)
         ShieldStructureUnit.OnShieldEnabled(self)
@@ -561,54 +561,54 @@ SShieldStructureUnit = Class(ShieldStructureUnit) {
     end,
 }
 
-#-------------------------------------------------------------
-#  STRUCTURES
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  STRUCTURES
+--------------------------------------------------------------
 SStructureUnit = Class(StructureUnit) {}
 
-#-------------------------------------------------------------
-#  SUBMARINE UNITS
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  SUBMARINE UNITS
+--------------------------------------------------------------
 SSubUnit = Class(DefaultUnitsFile.SubUnit) {
     IdleSubBones = {},
     IdleSubEffects = {}
 }
 
 
-#-------------------------------------------------------------
-#  TRANSPORT BEACON UNITS
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  TRANSPORT BEACON UNITS
+--------------------------------------------------------------
 STransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
 
-#-------------------------------------------------------------
-#  WALKING LAND UNITS
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  WALKING LAND UNITS
+--------------------------------------------------------------
 SWalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
 
-#-------------------------------------------------------------
-#  WALL  STRUCTURES
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  WALL  STRUCTURES
+--------------------------------------------------------------
 SWallStructureUnit = Class(DefaultUnitsFile.WallStructureUnit) {}
 
-#-------------------------------------------------------------
-#  CIVILIAN STRUCTURES
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  CIVILIAN STRUCTURES
+--------------------------------------------------------------
 SCivilianStructureUnit = Class(SStructureUnit) {}
 
-#-------------------------------------------------------------
-#  QUANTUM GATE UNITS
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  QUANTUM GATE UNITS
+--------------------------------------------------------------
 SQuantumGateUnit = Class(QuantumGateUnit) {}
 
-#-------------------------------------------------------------
-#  RADAR JAMMER UNITS
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  RADAR JAMMER UNITS
+--------------------------------------------------------------
 SRadarJammerUnit = Class(RadarJammerUnit) {}
 
 
-#-------------------------------------------------------------
-#  Seraphim energy ball units
-#-------------------------------------------------------------
+--------------------------------------------------------------
+--  Seraphim energy ball units
+--------------------------------------------------------------
 SEnergyBallUnit = Class(SHoverLandUnit) {
     timeAlive = 0,
     
@@ -636,7 +636,7 @@ SEnergyBallUnit = Class(SHoverLandUnit) {
                 IssueMove({self}, {x + Random(-bp.MaxMoveRange, bp.MaxMoveRange), y, z + Random(-bp.MaxMoveRange, bp.MaxMoveRange)})
             end
 
-            # weapon information
+            -- weapon information
             local weaponMaxRange = bp.Weapon[1].MaxRadius
             local weaponMinRange = bp.Weapon[1].MinRadius or 0
             local beamLifetime = bp.Weapon[1].BeamLifetime or 1
@@ -662,7 +662,7 @@ SEnergyBallUnit = Class(SHoverLandUnit) {
                 else
                     weapon:SetTargetGround( { location[1] + Random(-20, 20), location[2], location[3] + Random(-20, 20) } )
                 end
-                # Wait a tick to let the target update awesomely.
+                -- Wait a tick to let the target update awesomely.
                 WaitSeconds(.1)
                 self.timeAlive = self.timeAlive + .1
                 weapon:FireWeapon()
@@ -672,7 +672,7 @@ SEnergyBallUnit = Class(SHoverLandUnit) {
                 WaitSeconds(reaquireTime)
                 --self:ComputeWaitTime()
 		    end
-		    #ChangeState( self, self.DeathState )
+		    -- ChangeState( self, self.DeathState )
         end,
         
         ComputeWaitTime = function(self)
