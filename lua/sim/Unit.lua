@@ -3552,12 +3552,6 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    OnTransportAborted = function(self)
-    end,
-
-    OnTransportOrdered = function(self)
-    end,
-
     MarkWeaponsOnTransport = function(self, unit, transport)
         --Mark the weapons on a transport
         if unit then
@@ -3566,44 +3560,6 @@ Unit = Class(moho.unit_methods) {
                 wep:SetOnTransport(transport)
             end
         end
-    end,
-
-    DestroyedOnTransport = function(self)
-    end,
-
-    DestroyedOnTransport = function(self)
-    end,
-
-    OnTransportAttach = function(self, attachBone, unit)
-        self:PlayUnitSound('Load')
-        self:MarkWeaponsOnTransport(unit, true)
-        if unit:ShieldIsOn() then
-            unit:DisableShield()
-            unit:DisableDefaultToggleCaps()
-        end
-        if not EntityCategoryContains(categories.PODSTAGINGPLATFORM, self) then
-            self:RequestRefreshUI()
-        end
-        --Added by brute51
-        unit:OnAttachedToTransport(self, attachBone)
-    end,
-
-    OnTransportDetach = function(self, attachBone, unit)
-        self:PlayUnitSound('Unload')
-        self:MarkWeaponsOnTransport(unit, false)
-        unit:EnableShield()
-        unit:EnableDefaultToggleCaps()
-        if not EntityCategoryContains(categories.PODSTAGINGPLATFORM, self) then
-            self:RequestRefreshUI()
-        end
-        unit:TransportAnimation(-1)
-        unit:OnDetachedToTransport(self)
-    end,
-
-    OnStartTransportLoading = function(self)
-    end,
-
-    OnStopTransportLoading = function(self)
     end,
 
     OnAddToStorage = function(self, unit)
@@ -3650,11 +3606,7 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    GetTransportClass = function(self)
-        local bp = self:GetBlueprint().Transport
-        return bp.TransportClass
-    end,
-
+    -- Animation when being dropped from a transport.
     TransportAnimation = function(self, rate)
         self:ForkThread( self.TransportAnimationThread, rate )
     end,

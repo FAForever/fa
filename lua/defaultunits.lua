@@ -1603,6 +1603,75 @@ AirUnit = Class(MobileUnit) {
     end,
 }
 
+--- Base class for air transports.
+AirTransport = Class(AirUnit) {
+    OnTransportAttach = function(self, attachBone, unit)
+        self:PlayUnitSound('Load')
+        self:MarkWeaponsOnTransport(unit, true)
+        if unit:ShieldIsOn() then
+            unit:DisableShield()
+            unit:DisableDefaultToggleCaps()
+        end
+        if not EntityCategoryContains(categories.PODSTAGINGPLATFORM, self) then
+            self:RequestRefreshUI()
+        end
+        --Added by brute51
+        unit:OnAttachedToTransport(self, attachBone)
+    end,
+
+    OnTransportDetach = function(self, attachBone, unit)
+        self:PlayUnitSound('Unload')
+        self:MarkWeaponsOnTransport(unit, false)
+        unit:EnableShield()
+        unit:EnableDefaultToggleCaps()
+        if not EntityCategoryContains(categories.PODSTAGINGPLATFORM, self) then
+            self:RequestRefreshUI()
+        end
+        unit:TransportAnimation(-1)
+        unit:OnDetachedToTransport(self)
+    end,
+
+    -- When one of our attached units gets killed, detach it
+    OnAttachedKilled = function(self, attached)
+        attached:DetachFrom()
+    end,
+
+    OnKilled = function(self, instigator, type, overkillRatio)
+        AirUnit.OnKilled(self, instigator, type, overkillRatio)
+
+        local units = self:GetCargo()
+        for k, v in units do
+            v:DetachFrom()
+        end
+    end,
+
+    GetTransportClass = function(self)
+        local bp = self:GetBlueprint().Transport
+        return bp.TransportClass
+    end,
+
+    OnStartTransportLoading = function(...)
+        WARN("Start loading!")
+        for k, v in arg do
+            WARN(v)
+        end
+    end,
+
+    OnStopTransportLoading = function(...)
+        WARN("Stop loading!")
+        for k, v in arg do
+            WARN(v)
+        end
+    end,
+
+    DestroyedOnTransport = function(self)
+        WARN("DestroyedOnTransport!")
+        for k, v in arg do
+            WARN(v)
+        end
+    end
+}
+
 ---------------------------------------------------------------
 --  LAND UNITS
 ---------------------------------------------------------------
