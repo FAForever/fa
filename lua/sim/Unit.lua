@@ -3022,8 +3022,7 @@ Unit = Class(moho.unit_methods) {
             return time, target_bp.Economy.BuildCostEnergy, target_bp.Economy.BuildCostMass
 
         elseif IsProp(target_entity) then
-            local time, energy, mass =  target_entity:GetReclaimCosts(self)
-            return time, energy, mass
+            return target_entity:GetReclaimCosts(self)
         end
     end,
 
@@ -3105,26 +3104,19 @@ Unit = Class(moho.unit_methods) {
             error('*ERROR: Tried to add a callback type - ' .. type .. ' with a nil function')
             return
         end
-        table.insert( self.EventCallbacks[type], fn )
+        table.insert(self.EventCallbacks[type], fn)
     end,
 
     DoUnitCallbacks = function(self, type, param)
-        if ( self.EventCallbacks[type] ) then
+        if self.EventCallbacks[type] then
             for num,cb in self.EventCallbacks[type] do
-                if cb then
-                    cb( self, param )
-                end
+                cb(self, param)
             end
         end
     end,
 
-
-    AddProjectileDamagedCallback = function( self, fn )
-        if not fn then
-            error('*ERROR: tried to add a projectile damaged callback with a nil function')
-            return
-        end
-        table.insert( self.EventCallbacks.ProjectileDamaged, fn )
+    AddProjectileDamagedCallback = function(self, fn)
+        self:AddUnitCallback(fn, "ProjectileDamaged")
     end,
 
     AddOnCapturedCallback = function(self, cbOldUnit, cbNewUnit)
@@ -3194,25 +3186,14 @@ Unit = Class(moho.unit_methods) {
     end,
 
     AddOnHorizontalStartMoveCallback = function(self, fn)
-        if not fn then
-            error('*ERROR: Tried to add an OnHorizontalMove callback with a nil function')
-            return
-        end
-        table.insert(self.EventCallbacks.OnHorizontalStartMove, fn)
+        self:AddUnitCallback(fn, "OnHorizontalStartMove")
     end,
 
     DoOnHorizontalStartMoveCallbacks = function(self)
-        if self.EventCallbacks.OnHorizontalStartMove then
-            for k, cb in self.EventCallbacks.OnHorizontalStartMove do
-                if cb then
-                    cb(self)
-                end
-            end
-        end
+        self:DoUnitCallbacks("OnHorizontalStartMove")
     end,
 
     RemoveCallback = function(self, fn)
-        --EventCallbacks has "SpecialToggle(Enable/Disable)Function" booleans in it so skip over those.
         for k, v in self.EventCallbacks do
             if type(v) == "table" then
                 for kcb, vcb in v do
