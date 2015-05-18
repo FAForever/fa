@@ -1025,9 +1025,7 @@ Unit = Class(moho.unit_methods) {
             if self:GetShieldType() == 'Personal' and self:ShieldIsOn() then
                 self.MyShield:ApplyDamage(instigator, amount, vector, damageType)
             else
-                if damageType ~= 'AntiShield' then
-                    self:DoTakeDamage(instigator, amount, vector, damageType)
-                end
+                self:DoTakeDamage(instigator, amount, vector, damageType)
             end
         end
     end,
