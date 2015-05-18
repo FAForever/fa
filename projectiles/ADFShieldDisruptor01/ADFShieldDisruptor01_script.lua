@@ -10,17 +10,18 @@
 local ADisruptorProjectile = import('/lua/aeonprojectiles.lua').AShieldDisruptorProjectile
 
 ADFShieldDisruptor01 = Class(ADisruptorProjectile) {
-		OnImpact = function(self, TargetType, TargetEntity)
-			ADisruptorProjectile.OnImpact(self, TargetType, TargetEntity)
-			if TargetType == 'Shield' then
-			    if self.Data > TargetEntity:GetHealth() then
-			        Damage(self, {0,0,0}, TargetEntity, TargetEntity:GetHealth(), 'Normal')
-			    else
-					Damage(self, {0,0,0}, TargetEntity, self.Data, 'Normal')
-		        end
-			end				
-		end,
-	}
+    OnImpact = function(self, TargetType, TargetEntity)
+        ADisruptorProjectile.OnImpact(self, TargetType, TargetEntity)
+        if TargetType ~= 'Shield' then
+            TargetEntity = TargetEntity.MyShield
+        end
+
+        if not TargetEntity then return end
+
+        -- Never cause overspill damage to the unit.
+        local damage = math.min(self.Data, TargetEntity:GetHealth())
+        Damage(self, {0,0,0}, TargetEntity, damage, 'Normal')
+    end,
+}
 
 TypeClass = ADFShieldDisruptor01
-
