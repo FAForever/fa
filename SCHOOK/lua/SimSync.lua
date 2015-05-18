@@ -22,6 +22,8 @@ ResetSyncTable = function()
     # Player to player queries that can affect the Sim
     Sync.PlayerQueries = {}
     Sync.QueryResults = {}
+
+    Sync.Reclaim = {}
 end
 
 SimUnitEnhancements = {}
