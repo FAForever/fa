@@ -1674,66 +1674,16 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    OnDamageBy = function(self,index)
-        local bp = self:GetBlueprint().Audio
-        if bp then
-            local aiBrain = self:GetAIBrain()
-            local factionIndex = aiBrain:GetFactionIndex()
-            if factionIndex == 1 then
-                if bp['UnderAttackUEF'] then
-                    aiBrain:UnderAttack(bp['UnderAttackUEF'])
-                end
-                if EntityCategoryContains(categories.STRUCTURE, self) then
-                    if bp['BaseUnderAttackUEF'] then
-                        aiBrain:BaseUnderAttack(bp['BaseUnderAttackUEF'])
-                    end
-                end
-            elseif factionIndex == 2 then
-                if bp['UnderAttackAeon'] then
-                    aiBrain:UnderAttack(bp['UnderAttackAeon'])
-                end
-                if EntityCategoryContains(categories.STRUCTURE, self) then
-                    if bp['BaseUnderAttackAeon'] then
-                        aiBrain:BaseUnderAttack(bp['BaseUnderAttackAeon'])
-                    end
-                end
-            elseif factionIndex == 3 then
-                if bp['UnderAttackCybran'] then
-                    aiBrain:UnderAttack(bp['UnderAttackCybran'])
-                end
-                if EntityCategoryContains(categories.STRUCTURE, self) then
-                    if bp['BaseUnderAttackCybran'] then
-                        aiBrain:BaseUnderAttack(bp['BaseUnderAttackCybran'])
-                    end
-                end
-            end
-        end
-    end,
+    --- Called under mysterous circumstances, previously held logic for nonexistent sound effects.
+    OnDamageBy = function(self,index) end,
 
-    OnNukeArmed = function(self)
-        local bp = self:GetBlueprint().Audio
-        if bp then
-            local aiBrain = self:GetAIBrain()
-            local factionIndex = aiBrain:GetFactionIndex()
-            if factionIndex == 1 then
-                if bp['NukeArmedUEF'] then
-                    aiBrain:NukeArmed(bp['NukeArmedUEF'])
-                end
-            elseif factionIndex == 2 then
-                if bp['NukeArmedAeon'] then
-                    aiBrain:NukeArmed(bp['NukeArmedAeon'])
-                end
-            elseif factionIndex == 3 then
-                if bp['NukeArmedCybran'] then
-                    aiBrain:NukeArmed(bp['NukeArmedCybran'])
-                end
-            end
-        end
-    end,
+    --- Called when a nuke is armed, played a nonexistent sound effect
+    OnNukeArmed = function(self) end,
 
     OnNukeLaunched = function(self)
     end,
 
+    --- STRATEGIC LAUNCH DETECTED
     NukeCreatedAtUnit = function(self)
         if self:GetNukeSiloAmmoCount() <= 0 then
             return
@@ -1743,14 +1693,9 @@ Unit = Class(moho.unit_methods) {
         if bp then
             for num, aiBrain in ArmyBrains do
                 local factionIndex = aiBrain:GetFactionIndex()
-                if unitBrain == aiBrain then
-                    if bp['NuclearLaunchInitiated'] then
-                        aiBrain:NuclearLaunchInitiated(bp['NuclearLaunchInitiated'])
-                    end
-                else
-                    if bp['NuclearLaunchDetected'] then
-                        aiBrain:NuclearLaunchDetected(bp['NuclearLaunchDetected'])
-                    end
+
+                if bp['NuclearLaunchDetected'] then
+                    aiBrain:NuclearLaunchDetected(bp['NuclearLaunchDetected'])
                 end
             end
         end
@@ -2361,33 +2306,7 @@ Unit = Class(moho.unit_methods) {
                 v(self,index)
             end
         end
-
-        local bp = self:GetBlueprint().Audio
-        if bp then
-            local aiBrain = ArmyBrains[index]
-            local factionIndex = aiBrain:GetFactionIndex()
-            if factionIndex == 1 then
-                if bp['ExperimentalDetectedByUEF'] then
-                    aiBrain:ExperimentalDetected(bp['ExperimentalDetectedByUEF'])
-                elseif bp['EnemyForcesDetectedByUEF'] then
-                    aiBrain:EnemyForcesDetected(bp['EnemyForcesDetectedByUEF'])
-                end
-            elseif factionIndex == 2 then
-                if bp['ExperimentalDetectedByAeon'] then
-                    aiBrain:ExperimentalDetected(bp['ExperimentalDetectedByAeon'])
-                elseif bp['EnemyForcesDetectedByAeon'] then
-                    aiBrain:EnemyForcesDetected(bp['EnemyForcesDetectedByAeon'])
-                end
-            elseif factionIndex == 3 then
-                if bp['ExperimentalDetectedByCybran'] then
-                    aiBrain:ExperimentalDetected(bp['ExperimentalDetectedByCybran'])
-                elseif bp['EnemyForcesDetectedByCybran'] then
-                    aiBrain:EnemyForcesDetected(bp['EnemyForcesDetectedByCybran'])
-                end
-            end
-        end
     end,
-
 
     -------------------------------------------------------------------------------------------
     -- GENERIC WORK

@@ -69,13 +69,7 @@ local VOReplayTime = {
     ExperimentalDetected = 60,
     FerryPointSet = 5,
     CoordinatedAttackInitiated = 5,
-    BaseUnderAttack = 30,
-    UnderAttack = 60,
-    EnemyForcesDetected = 120,
-    NukeArmed = 1,
-    NuclearLaunchInitiated = 1,
     NuclearLaunchDetected = 1,
-    EnemyNavalForcesDetected = 60,
 }
 
 ------------------------------------------------------------------------------------------
@@ -1217,33 +1211,9 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-    ExperimentalDetected = function(self, sound)
-        if self.VOTable and not self.VOTable['ExperimentalDetected'] then
-            self.VOTable['ExperimentalDetected'] = ForkThread(self.PlayVOSound, self, sound, 'ExperimentalDetected')
-        end
-    end,
-
-    EnemyForcesDetected = function(self, sound)
-        if self.VOTable and not self.VOTable['EnemyForcesDetected'] then
-            self.VOTable['EnemyForcesDetected'] = ForkThread(self.PlayVOSound, self, sound, 'EnemyForcesDetected')
-        end
-    end,
-
-    EnemyNavalForcesDetected = function(self, sound)
-        if self.VOTable and not self.VOTable['EnemyNavalForcesDetected'] then
-            self.VOTable['EnemyNavalForcesDetected'] = ForkThread(self.PlayVOSound, self, sound, 'EnemyNavalForcesDetected')
-        end
-    end,
-
     FerryPointSet = function(self,sound)
         if self.VOTable and not self.VOTable['FerryPointSet'] then
             self.VOTable['FerryPointSet'] = ForkThread(self.PlayVOSound, self, sound, 'FerryPointSet')
-        end
-    end,
-
-    UnderAttack = function(self,sound)
-        if self.VOTable and not self.VOTable['UnderAttack'] then
-            self.VOTable['UnderAttack'] = ForkThread(self.PlayVOSound, self, sound, 'UnderAttack')
         end
     end,
 
@@ -1257,24 +1227,6 @@ AIBrain = Class(moho.aibrain_methods) {
             if self.VOTable and not self.VOTable['OnCommanderUnderAttackVO'] then
                 self.VOTable['OnCommanderUnderAttackVO'] = ForkThread(self.PlayVOSound, self, Voice, 'OnCommanderUnderAttackVO')
             end
-        end
-    end,
-
-    BaseUnderAttack = function(self,sound)
-        if self.VOTable and not self.VOTable['BaseUnderAttack'] then
-            self.VOTable['BaseUnderAttack'] = ForkThread(self.PlayVOSound, self, sound, 'BaseUnderAttack')
-        end
-    end,
-
-    NukeArmed = function(self,sound)
-        if self.VOTable and not self.VOTable['NukeArmed'] then
-            self.VOTable['NukeArmed'] = ForkThread(self.PlayVOSound, self, sound, 'NukeArmed')
-        end
-    end,
-
-    NuclearLaunchInitiated = function(self,sound)
-        if self.VOTable and not self.VOTable['NuclearLaunchInitiated'] then
-            self.VOTable['NuclearLaunchInitiated'] = ForkThread(self.PlayVOSound, self, sound, 'NuclearLaunchInitiated')
         end
     end,
 
