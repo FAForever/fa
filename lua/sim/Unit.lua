@@ -170,8 +170,6 @@ Unit = Class(moho.unit_methods) {
         self.UpgradeEffectsBag = TrashBag()
         self.TeleportFxBag = TrashBag()
 
-        self.HasFuel = true
-
         --Store targets and attackers for proper Stealth management
         self.Targets = {}
         self.WeaponTargets = {}
@@ -2991,19 +2989,6 @@ Unit = Class(moho.unit_methods) {
             end
         end
         return true
-    end,
-
-    OnStartRefueling = function(self)
-        self:PlayUnitSound('Refueling')
-    end,
-
-    OnRunOutOfFuel = function(self)
-        self.HasFuel = false
-        self:DestroyTopSpeedEffects()
-    end,
-
-    OnGotFuel = function(self)
-        self.HasFuel = true
     end,
 
     GetWeaponClass = function(self, label)

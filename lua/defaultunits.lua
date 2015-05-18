@@ -1458,6 +1458,7 @@ AirUnit = Class(MobileUnit) {
 
     OnCreate = function(self)
         MobileUnit.OnCreate(self)
+        self.HasFuel = true
         self:AddPingPong()
     end,
 
@@ -1514,8 +1515,14 @@ AirUnit = Class(MobileUnit) {
         end
     end,
 
+    OnStartRefueling = function(self)
+        self:PlayUnitSound('Refueling')
+    end,
+
     OnRunOutOfFuel = function(self)
-        MobileUnit.OnRunOutOfFuel(self)
+        self.HasFuel = false
+        self:DestroyTopSpeedEffects()
+
         -- penalize movement for running out of fuel
         self:SetSpeedMult(0.35)     -- change the speed of the unit by this mult
         self:SetAccMult(0.25)       -- change the acceleration of the unit by this mult
@@ -1523,7 +1530,7 @@ AirUnit = Class(MobileUnit) {
     end,
 
     OnGotFuel = function(self)
-        MobileUnit.OnGotFuel(self)
+        self.HasFuel = true
         -- revert these values to the blueprint values
         self:SetSpeedMult(1)
         self:SetAccMult(1)
