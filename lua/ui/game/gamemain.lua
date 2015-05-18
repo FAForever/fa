@@ -428,14 +428,27 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         import('/lua/ui/game/rallypoint.lua').OnSelectionChanged(newSelection)
     end
 
-    local selUnits = newSelection
+    if newSelection then
+        local n = table.getn(newSelection)
 
-    if selUnits and table.getn(selUnits) == 1 and import('/modules/selectedinfo.lua').SelectedOverlayOn then
-        import('/modules/selectedinfo.lua').ActivateSingleRangeOverlay()
-    else
-        import('/modules/selectedinfo.lua').DeactivateSingleRangeOverlay()
-    end   
+        if n == 1 and import('/modules/selectedinfo.lua').SelectedOverlayOn then
+            import('/modules/selectedinfo.lua').ActivateSingleRangeOverlay()
+        else
+            import('/modules/selectedinfo.lua').DeactivateSingleRangeOverlay()
+        end
 
+        -- if something died in selection, restore command mode
+        if n > 0 and table.getsize(removed) > 0 and table.getsize(added) == 0 then
+            local CM = import('/lua/ui/game/commandmode.lua')
+            local mode, data = unpack(CM.GetCommandMode())
+
+            if mode then
+                ForkThread(function()
+                    CM.StartCommandMode(mode, data)
+                end)
+            end
+        end
+    end
 end
 
 function OnQueueChanged(newQueue)

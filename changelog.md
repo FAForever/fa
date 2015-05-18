@@ -22,6 +22,7 @@ Changelog for patch 3641
 - Optimised the range-rings shader to reduce the way FPS falls off a cliff
 - T3 Transport now leaves a wreck in water
 - Minimap now remembers whether to show resource icons or not
+- Current commandmode no longer reset if an engineer dies in the current selection 
 
 *Enhancements*
 - Scathis now has Amphibious build icon
