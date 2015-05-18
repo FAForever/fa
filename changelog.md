@@ -15,6 +15,7 @@ Changelog for patch 3641
 - Disable build effect beams on sinking engineers
 - Projectiles no longer collide with sinking units
 - Fixed share until death bug with dual-given units
+- Fixed bug with insta-disappearing wrecks due to garbage collect 
 
 *Enhancements*
 - Scathis now has Amphibious build icon
@@ -32,8 +33,9 @@ Changelog for patch 3641
 - Remove owner-check on text pings so anyone can delete them
 - Disable assist command on upgrading factories to prevent accidental cancelling
 - Ping values under "Connectivity" (F11) now update during game stop/stall
-- Show reclaim / second
 - Added Yolona Oss to Mavor/Salvation/Scathis build restriction and renamed it Super-Game-Enders
+- New option: Show reclaim value of wreckage on map
+- ASF effects tweaked for performance (less effects on low fidelty)
 
 *Lobby*
 - Huge texture, layout, aesthetics and speed improvements all over the lobby
