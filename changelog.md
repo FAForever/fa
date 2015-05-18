@@ -15,7 +15,10 @@ Changelog for patch 3641
 - Disable build effect beams on sinking engineers
 - Projectiles no longer collide with sinking units
 - Fixed share until death bug with dual-given units
-- Fixed bug with insta-disappearing wrecks due to garbage collect 
+- Fixed bug with insta-disappearing wrecks due to garbage collect
+- Fixed SCUs not being hit properly by laser weapons
+- Optimised the range-rings shader to reduce the way FPS falls off a cliff
+- T3 Transport now leaves a wreck in water
 
 *Enhancements*
 - Scathis now has Amphibious build icon
@@ -26,7 +29,6 @@ Changelog for patch 3641
 - Cybran factories now have red build beams
 - Number of Cybran build bots scale with buildpower of the engineer
 - Cybran build bots now can assist next build project without respawning
-- Reclaim/second now shown
 - 34 new taunts
 - The least valueable units are destroyed at unit transfer if unitcap is hit
 - "Commander under attack" now works on shielded ACUs
@@ -36,16 +38,12 @@ Changelog for patch 3641
 - Added Yolona Oss to Mavor/Salvation/Scathis build restriction and renamed it Super-Game-Enders
 - New option: Show reclaim value of wreckage on map
 - ASF effects tweaked for performance (less effects on low fidelty)
+- Smart selection feature allowing hotkeys to select units by category
+- Absolver shield disrupter now hovers higher so it's less likely to hit the floor with the very
+--- low mounted gun
+- Reclaimed mass now counts towards the score table
 
-*Lobby*
-- Huge texture, layout, aesthetics and speed improvements all over the lobby
-- Map previews now display unit wreck reclaim as well as Mass points and Hydrocarbons
-- Unit manager can be seen again by non-host players
-- Preset system now saves active mods
-- Observers can now open the chat menu by pushing ENTER
-- CPU Benchmark results now cached, so running it once with nothing in the background is a good idea.
-  Dramatically reduces lobby lag
-- Maps are now sorted alphabetically ignoring case
+- Reclaim/second now shown ------reverted?
 
 Changelog for patch 3640
 ------------------------
