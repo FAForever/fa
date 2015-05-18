@@ -536,21 +536,21 @@ PersonalBubble = Class(Shield) {
         Main = function(self)
             -- When the shield is down for some reason, reset the unit's collision profile so it can
             -- again be hit.
-            self.Owner:SetCollisionShape('Box', 0, self.SizeY * 0.5, 0, self.SizeX * 0.5, self.SizeY * 0.5, self.SizeZ * 0.5)
+            self.Owner:RevertCollisionShape()
             Shield.OffState.Main(self)
         end
     },
 
     DamageRechargeState = State(Shield.DamageRechargeState) {
         Main = function(self)
-            self.Owner:SetCollisionShape('Box', 0, self.SizeY * 0.5, 0, self.SizeX * 0.5, self.SizeY * 0.5, self.SizeZ * 0.5)
+            self.Owner:RevertCollisionShape()
             Shield.DamageRechargeState.Main(self)
          end
     },
 
     EnergyDrainRechargeState = State(Shield.EnergyDrainRechargeState) {
         Main = function(self)
-            self.Owner:SetCollisionShape('Box', 0, self.SizeY * 0.5, 0, self.SizeX * 0.5, self.SizeY * 0.5, self.SizeZ * 0.5)
+            self.Owner:RevertCollisionShape()
             Shield.EnergyDrainRechargeState.Main(self)
         end
     }
