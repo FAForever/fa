@@ -8,7 +8,7 @@
 -- **  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
-local SWalkingLandUnit = import('/lua/seraphimunits.lua').SWalkingLandUnit
+local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
 local AWeapons = import('/lua/aeonweapons.lua')
 local SWeapons = import('/lua/seraphimweapons.lua')
 local Buff = import('/lua/sim/Buff.lua')
@@ -19,8 +19,7 @@ local SIFLaanseTacticalMissileLauncher = SWeapons.SIFLaanseTacticalMissileLaunch
 local AIFCommanderDeathWeapon = AWeapons.AIFCommanderDeathWeapon
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
-XSL0301 = Class(SWalkingLandUnit) {
-    
+XSL0301 = Class(CommandUnit) {
     Weapons = {
         LightChronatronCannon = Class(SDFLightChronotronCannonWeapon) {},
         DeathWeapon = Class(AIFCommanderDeathWeapon) {},
@@ -32,47 +31,11 @@ XSL0301 = Class(SWalkingLandUnit) {
             end,
         },
     },
-    
-    OnPrepareArmToBuild = function(self)
-        SWalkingLandUnit.OnPrepareArmToBuild(self)
-        self:BuildManipulatorSetEnabled(true)
-        self.BuildArmManipulator:SetPrecedence(20)
-        self:SetWeaponEnabledByLabel('LightChronatronCannon', false)
-        self.BuildArmManipulator:SetHeadingPitch( self:GetWeaponManipulatorByLabel('LightChronatronCannon'):GetHeadingPitch() )
-    end,
-        
-    OnStopCapture = function(self, target)
-        SWalkingLandUnit.OnStopCapture(self, target)
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('LightChronatronCannon', true)
-        self:GetWeaponManipulatorByLabel('LightChronatronCannon'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-    end,
-    
-    OnFailedCapture = function(self, target)
-        SWalkingLandUnit.OnFailedCapture(self, target)
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('LightChronatronCannon', true)
-        self:GetWeaponManipulatorByLabel('LightChronatronCannon'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-    end,
-    
-    OnStopReclaim = function(self, target)
-        SWalkingLandUnit.OnStopReclaim(self, target)
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('LightChronatronCannon', true)
-        self:GetWeaponManipulatorByLabel('LightChronatronCannon'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
+
+    __init = function(self)
+        CommandUnit.__init(self, 'LightChronatronCannon')
     end,
 
-    OnFailedToBuild = function(self)
-        SWalkingLandUnit.OnFailedToBuild(self)
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('LightChronatronCannon', true)
-        self:GetWeaponManipulatorByLabel('LightChronatronCannon'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-    end,
-    
     OnStartBuild = function(self, unitBeingBuilt, order)
         local bp = self:GetBlueprint()
         if order ~= 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
@@ -92,28 +55,8 @@ XSL0301 = Class(SWalkingLandUnit) {
         self.BuildingUnit = true
     end,    
 
-    OnStopBuild = function(self, unitBeingBuilt)
-        SWalkingLandUnit.OnStopBuild(self, unitBeingBuilt)
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('LightChronatronCannon', true)
-        self:GetWeaponManipulatorByLabel('LightChronatronCannon'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-        self.UnitBeingBuilt = nil
-        self.UnitBuildOrder = nil
-        self.BuildingUnit = false          
-    end,
-
-    
-    OnFailedToBuild = function(self)
-        SWalkingLandUnit.OnFailedToBuild(self)
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('LightChronatronCannon', true)
-        self:GetWeaponManipulatorByLabel('LightChronatronCannon'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-    end,
-    
     OnCreate = function(self)
-        SWalkingLandUnit.OnCreate(self)
+        CommandUnit.OnCreate(self)
         self:SetCapturable(false)
         -- self:HideBone('Turbine', true)
         self:HideBone('Back_Upgrade', true)
@@ -125,33 +68,34 @@ XSL0301 = Class(SWalkingLandUnit) {
     end,  
     
     CreateEnhancement = function(self, enh)
-        SWalkingLandUnit.CreateEnhancement(self, enh)
+        CommandUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
         if not bp then return end
         -- Teleporter
         if enh == 'Teleporter' then
-        WarpInEffectThread = function(self)
-        self:PlayUnitSound('CommanderArrival')
-        self:CreateProjectile( '/effects/entities/UnitTeleport01/UnitTeleport01_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
-        WaitSeconds(2.1)
-        self:ShowBone(0, true)
-        self:HideBone('Back_Upgrade', true)
-        self:HideBone('Right_Upgrade', true)
-        self:HideBone('Left_Upgrade', true)
-        self:SetUnSelectable(false)
-        self:SetBusy(false)
-        self:SetBlockCommandQueue(false)
+            -- WHY IS THIS UNUSED. WHAT HAVE YOU DONE ZEP.
+            WarpInEffectThread = function(self)
+                self:PlayUnitSound('CommanderArrival')
+                self:CreateProjectile( '/effects/entities/UnitTeleport01/UnitTeleport01_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
+                WaitSeconds(2.1)
+                self:ShowBone(0, true)
+                self:HideBone('Back_Upgrade', true)
+                self:HideBone('Right_Upgrade', true)
+                self:HideBone('Left_Upgrade', true)
+                self:SetUnSelectable(false)
+                self:SetBusy(false)
+                self:SetBlockCommandQueue(false)
 
-        local totalBones = self:GetBoneCount() - 1
-        local army = self:GetArmy()
-        for k, v in EffectTemplate.UnitTeleportSteam01 do
-            for bone = 1, totalBones do
-                CreateAttachedEmitter(self,bone,army, v)
-            end
-        end
+                local totalBones = self:GetBoneCount() - 1
+                local army = self:GetArmy()
+                for k, v in EffectTemplate.UnitTeleportSteam01 do
+                    for bone = 1, totalBones do
+                        CreateAttachedEmitter(self,bone,army, v)
+                    end
+                end
 
-        WaitSeconds(6)
-    end,
+                WaitSeconds(6)
+            end,
             self:AddCommandCap('RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
             self:RemoveCommandCap('RULEUCC_Teleport')
@@ -249,21 +193,7 @@ XSL0301 = Class(SWalkingLandUnit) {
             local wep = self:GetWeaponByLabel('OverCharge')
             wep:ChangeMaxRadius(bp.NewMaxRadius or 25)
         end
-    end,
-    
-    OnPaused = function(self)
-        SWalkingLandUnit.OnPaused(self)
-        if self.BuildingUnit then
-            SWalkingLandUnit.StopBuildingEffects(self, self:GetUnitBeingBuilt())
-        end    
-    end,
-    
-    OnUnpaused = function(self)
-        if self.BuildingUnit then
-            SWalkingLandUnit.StartBuildingEffects(self, self:GetUnitBeingBuilt(), self.UnitBuildOrder)
-        end
-        SWalkingLandUnit.OnUnpaused(self)
-    end,    
+    end
 }
 
 TypeClass = XSL0301

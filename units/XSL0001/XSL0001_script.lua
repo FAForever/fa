@@ -7,7 +7,7 @@
 --**
 --**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
+local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
 local Buff = import('/lua/sim/Buff.lua')
 local SWeapons = import('/lua/seraphimweapons.lua')
 local SDFChronotronCannonWeapon = SWeapons.SDFChronotronCannonWeapon
@@ -18,7 +18,7 @@ local EffectUtil = import('/lua/EffectUtilities.lua')
 local SIFLaanseTacticalMissileLauncher = SWeapons.SIFLaanseTacticalMissileLauncher
 local AIUtils = import('/lua/ai/aiutilities.lua')
 
-XSL0001 = Class(CommandUnit) {
+XSL0001 = Class(ACUUnit) {
     Weapons = {
         DeathWeapon = Class(SIFCommanderDeathWeapon) {},
         ChronotronCannon = Class(SDFChronotronCannonWeapon) {},
@@ -32,11 +32,11 @@ XSL0001 = Class(CommandUnit) {
     },
 
     __init = function(self)
-        CommandUnit.__init(self, 'ChronotronCannon')
+        ACUUnit.__init(self, 'ChronotronCannon')
     end,
 
     OnCreate = function(self)
-        CommandUnit.OnCreate(self)
+        ACUUnit.OnCreate(self)
         self:SetCapturable(false)
         self:SetupBuildBones()
         self:HideBone('Back_Upgrade', true)
@@ -47,7 +47,7 @@ XSL0001 = Class(CommandUnit) {
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)
-        CommandUnit.OnStopBeingBuilt(self,builder,layer)
+        ACUUnit.OnStopBeingBuilt(self,builder,layer)
         self:SetWeaponEnabledByLabel('ChronotronCannon', true)
         self:ForkThread(self.GiveInitialResources)
         self.ShieldEffectsBag = {}
@@ -144,7 +144,7 @@ XSL0001 = Class(CommandUnit) {
     end,
 
     CreateEnhancement = function(self, enh)
-        CommandUnit.CreateEnhancement(self, enh)
+        ACUUnit.CreateEnhancement(self, enh)
 
         local bp = self:GetBlueprint().Enhancements[enh]
         

@@ -5,7 +5,7 @@
 -- Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 local Shield = import('/lua/shield.lua').Shield
-local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
+local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
 local TerranWeaponFile = import('/lua/terranweapons.lua')
 local TDFZephyrCannonWeapon = TerranWeaponFile.TDFZephyrCannonWeapon
 local TIFCommanderDeathWeapon = TerranWeaponFile.TIFCommanderDeathWeapon
@@ -15,7 +15,7 @@ local TDFOverchargeWeapon = TerranWeaponFile.TDFOverchargeWeapon
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local Buff = import('/lua/sim/Buff.lua')
 
-UEL0001 = Class(CommandUnit) {
+UEL0001 = Class(ACUUnit) {
     Weapons = {
         DeathWeapon = Class(TIFCommanderDeathWeapon) {},
         RightZephyr = Class(TDFZephyrCannonWeapon) {},
@@ -27,11 +27,11 @@ UEL0001 = Class(CommandUnit) {
     },
 
     __init = function(self)
-        CommandUnit.__init(self, 'RightZephyr')
+        ACUUnit.__init(self, 'RightZephyr')
     end,
 
     OnCreate = function(self)
-        CommandUnit.OnCreate(self)
+        ACUUnit.OnCreate(self)
         self:SetCapturable(false)
         self:HideBone('Right_Upgrade', true)
         self:HideBone('Left_Upgrade', true)
@@ -44,7 +44,7 @@ UEL0001 = Class(CommandUnit) {
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)
-        CommandUnit.OnStopBeingBuilt(self,builder,layer)
+        ACUUnit.OnStopBeingBuilt(self,builder,layer)
         if self:BeenDestroyed() then return end
         self.Animator = CreateAnimator(self)
         self.Animator:SetPrecedence(0)
@@ -95,7 +95,7 @@ UEL0001 = Class(CommandUnit) {
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
-        CommandUnit.OnStartBuild(self, unitBeingBuilt, order)
+        ACUUnit.OnStartBuild(self, unitBeingBuilt, order)
         if self.Animator then
             self.Animator:SetRate(0)
         end
@@ -168,7 +168,7 @@ UEL0001 = Class(CommandUnit) {
     end,
 
     CreateEnhancement = function(self, enh)
-        CommandUnit.CreateEnhancement(self, enh)
+        ACUUnit.CreateEnhancement(self, enh)
 
         local bp = self:GetBlueprint().Enhancements[enh]
         if not bp then return end

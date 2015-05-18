@@ -6,12 +6,12 @@
 -----------------------------------------------------------------
 local Shield = import('/lua/shield.lua').Shield
 local EffectUtil = import('/lua/EffectUtilities.lua')
-local TWalkingLandUnit = import('/lua/terranunits.lua').TWalkingLandUnit
+local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
 local TWeapons = import('/lua/terranweapons.lua')
 local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
 local TIFCommanderDeathWeapon = TWeapons.TIFCommanderDeathWeapon
 
-UEL0301 = Class(TWalkingLandUnit) {
+UEL0301 = Class(CommandUnit) {
     IntelEffects = {
         {
             Bones = {
@@ -31,79 +31,26 @@ UEL0301 = Class(TWalkingLandUnit) {
     },
 
     OnCreate = function(self)
-        TWalkingLandUnit.OnCreate(self)
+        CommandUnit.OnCreate(self)
         self:SetCapturable(false)
         self:HideBone('Jetpack', true)
         self:HideBone('SAM', true)
         self:SetupBuildBones()
-        
+    end,
+
+    __init = function(self)
+        CommandUnit.__init(self, 'RightHeavyPlasmaCannon')
     end,
     
     OnStopBeingBuilt = function(self, builder, layer)
-        TWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
+        CommandUnit.OnStopBeingBuilt(self, builder, layer)
         self:DisableUnitIntel('Jammer')
     end,
 
-    OnPrepareArmToBuild = function(self)
-        TWalkingLandUnit.OnPrepareArmToBuild(self)
-        self:BuildManipulatorSetEnabled(true)
-        self.BuildArmManipulator:SetPrecedence(20)
-        self:SetWeaponEnabledByLabel('RightHeavyPlasmaCannon', false)
-        self.BuildArmManipulator:SetHeadingPitch( self:GetWeaponManipulatorByLabel('RightHeavyPlasmaCannon'):GetHeadingPitch() )
-    end,
-    
-    OnStopCapture = function(self, target)
-        TWalkingLandUnit.OnStopCapture(self, target)
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('RightHeavyPlasmaCannon', true)
-        self:GetWeaponManipulatorByLabel('RightHeavyPlasmaCannon'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-    end,
-
-    OnFailedCapture = function(self, target)
-        TWalkingLandUnit.OnFailedCapture(self, target)
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('RightHeavyPlasmaCannon', true)
-        self:GetWeaponManipulatorByLabel('RightHeavyPlasmaCannon'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-    end,
-    
-    OnStopReclaim = function(self, target)
-        TWalkingLandUnit.OnStopReclaim(self, target)
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('RightHeavyPlasmaCannon', true)
-        self:GetWeaponManipulatorByLabel('RightHeavyPlasmaCannon'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-    end,
-    
-    OnStartBuild = function(self, unitBeingBuilt, order)    
-        TWalkingLandUnit.OnStartBuild(self, unitBeingBuilt, order)
-        self.UnitBeingBuilt = unitBeingBuilt
-        self.UnitBuildOrder = order
-        self.BuildingUnit = true        
-    end,    
-
-    OnStopBuild = function(self, unitBeingBuilt)
-        TWalkingLandUnit.OnStopBuild(self, unitBeingBuilt)
-        self.UnitBeingBuilt = nil
-        self.UnitBuildOrder = nil
-        self.BuildingUnit = false      
-        self:SetWeaponEnabledByLabel('RightHeavyPlasmaCannon', true)    
-        self:GetWeaponManipulatorByLabel('RightHeavyPlasmaCannon'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-    end,     
-    
-    OnFailedToBuild = function(self)
-        TWalkingLandUnit.OnFailedToBuild(self)
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('RightHeavyPlasmaCannon', true)
-        self:GetWeaponManipulatorByLabel('RightHeavyPlasmaCannon'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-    end,
-    
     CreateBuildEffects = function( self, unitBeingBuilt, order )
         local UpgradesFrom = unitBeingBuilt:GetBlueprint().General.UpgradesFrom
         -- If we are assisting an upgrading unit, or repairing a unit, play separate effects
-        if (order == 'Repair' and not unitBeingBuilt:IsBeingBuilt()) or (UpgradesFrom and UpgradesFrom != 'none' and self:IsUnitState('Guarding'))then
+        if (order == 'Repair' and not unitBeingBuilt:IsBeingBuilt()) or (UpgradesFrom and UpgradesFrom ~= 'none' and self:IsUnitState('Guarding'))then
             EffectUtil.CreateDefaultBuildBeams( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )
         else
             EffectUtil.CreateUEFCommanderBuildSliceBeams( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )   
@@ -133,7 +80,7 @@ UEL0301 = Class(TWalkingLandUnit) {
     end,
 
     CreateEnhancement = function(self, enh)
-        TWalkingLandUnit.CreateEnhancement(self, enh)
+        CommandUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
         if not bp then return end
         if enh == 'Pod' then
@@ -150,7 +97,7 @@ UEL0301 = Class(TWalkingLandUnit) {
                 if self.Pod and not self.Pod:BeenDestroyed() then
                     self.Pod:Kill()
                 end
-                if self.RebuildingPod != nil then
+                if self.RebuildingPod ~= nil then
                     RemoveEconomyEvent(self, self.RebuildingPod)
                     self.RebuildingPod = nil
                 end
@@ -224,7 +171,7 @@ UEL0301 = Class(TWalkingLandUnit) {
     end,
 
     OnIntelEnabled = function(self)
-        TWalkingLandUnit.OnIntelEnabled(self)
+        CommandUnit.OnIntelEnabled(self)
         if self.RadarJammerEnh and self:IsIntelEnabled('Jammer') then 
             if self.IntelEffects then
                 self.IntelEffectsBag = {}
@@ -236,28 +183,14 @@ UEL0301 = Class(TWalkingLandUnit) {
     end,
 
     OnIntelDisabled = function(self)
-        TWalkingLandUnit.OnIntelDisabled(self)
+        CommandUnit.OnIntelDisabled(self)
         if self.RadarJammerEnh and not self:IsIntelEnabled('Jammer') then
             self:SetMaintenanceConsumptionInactive()
             if self.IntelEffectsBag then
                 EffectUtil.CleanupEffectBag(self,'IntelEffectsBag')
             end
         end       
-    end,     
-    
-    OnPaused = function(self)
-        TWalkingLandUnit.OnPaused(self)
-        if self.BuildingUnit then
-            TWalkingLandUnit.StopBuildingEffects(self, self:GetUnitBeingBuilt())
-        end    
-    end,
-    
-    OnUnpaused = function(self)
-        if self.BuildingUnit then
-            TWalkingLandUnit.StartBuildingEffects(self, self:GetUnitBeingBuilt(), self.UnitBuildOrder)
-        end
-        TWalkingLandUnit.OnUnpaused(self)
-    end,     
+    end
 }
 
 TypeClass = UEL0301

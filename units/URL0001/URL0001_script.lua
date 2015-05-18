@@ -8,7 +8,7 @@
 --**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
+local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
 local CWeapons = import('/lua/cybranweapons.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
@@ -22,7 +22,7 @@ local CDFOverchargeWeapon = CWeapons.CDFOverchargeWeapon
 local CANTorpedoLauncherWeapon = CWeapons.CANTorpedoLauncherWeapon
 local Entity = import('/lua/sim/Entity.lua').Entity
 
-URL0001 = Class(CommandUnit) {
+URL0001 = Class(ACUUnit) {
     Weapons = {
         DeathWeapon = Class(CIFCommanderDeathWeapon) {},
         RightRipper = Class(CCannonMolecularWeapon) {},
@@ -48,14 +48,14 @@ URL0001 = Class(CommandUnit) {
     },
 
     __init = function(self)
-        CommandUnit.__init(self, 'RightRipper')
+        ACUUnit.__init(self, 'RightRipper')
     end,
 
     -- ********
     -- Creation
     -- ********
     OnCreate = function(self)
-        CommandUnit.OnCreate(self)
+        ACUUnit.OnCreate(self)
         self:SetCapturable(false)
         self:HideBone('Back_Upgrade', true)
         self:HideBone('Right_Upgrade', true)
@@ -67,7 +67,7 @@ URL0001 = Class(CommandUnit) {
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)
-        CommandUnit.OnStopBeingBuilt(self,builder,layer)
+        ACUUnit.OnStopBeingBuilt(self,builder,layer)
         self:SetWeaponEnabledByLabel('RightRipper', true)
         self:SetWeaponEnabledByLabel('MLG', false)
         self:SetWeaponEnabledByLabel('Torpedo', false)
@@ -82,7 +82,7 @@ URL0001 = Class(CommandUnit) {
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
-        CommandUnit.OnStartBuild(self, unitBeingBuilt, order)
+        ACUUnit.OnStartBuild(self, unitBeingBuilt, order)
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
         self.BuildingUnit = true
@@ -153,7 +153,7 @@ URL0001 = Class(CommandUnit) {
     end,
 
     CreateEnhancement = function(self, enh)
-        CommandUnit.CreateEnhancement(self, enh)
+        ACUUnit.CreateEnhancement(self, enh)
         if enh == 'Teleporter' then
             self:AddCommandCap('RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
@@ -386,7 +386,7 @@ URL0001 = Class(CommandUnit) {
     },
 
     OnIntelEnabled = function(self)
-        CommandUnit.OnIntelEnabled(self)
+        ACUUnit.OnIntelEnabled(self)
         if self.CloakEnh and self:IsIntelEnabled('Cloak') then
             self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['CloakingGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
@@ -405,7 +405,7 @@ URL0001 = Class(CommandUnit) {
     end,
 
     OnIntelDisabled = function(self)
-        CommandUnit.OnIntelDisabled(self)
+        ACUUnit.OnIntelDisabled(self)
         if self.IntelEffectsBag then
             EffectUtil.CleanupEffectBag(self,'IntelEffectsBag')
             self.IntelEffectsBag = nil
@@ -433,7 +433,7 @@ URL0001 = Class(CommandUnit) {
 			self:AddBuff(bp)
         end
         --otherwise, we should finish killing the unit
-        CommandUnit.OnKilled(self, instigator, type, overkillRatio)
+        ACUUnit.OnKilled(self, instigator, type, overkillRatio)
     end
 }
 

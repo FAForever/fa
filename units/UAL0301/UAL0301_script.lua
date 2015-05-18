@@ -8,7 +8,7 @@
 --**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AWalkingLandUnit = import('/lua/aeonunits.lua').AWalkingLandUnit
+local CommandUnit = import('/lua/defualtunits.lua').CommandUnit
 
 local AWeapons = import('/lua/aeonweapons.lua')
 local ADFReactonCannon = AWeapons.ADFReactonCannon
@@ -16,61 +16,25 @@ local AIFCommanderDeathWeapon = AWeapons.AIFCommanderDeathWeapon
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local Buff = import('/lua/sim/Buff.lua')
 
-UAL0301 = Class(AWalkingLandUnit) {
+UAL0301 = Class(CommandUnit) {
     Weapons = {
         RightReactonCannon = Class(ADFReactonCannon) {},
         DeathWeapon = Class(AIFCommanderDeathWeapon) {},
     },
 
-    OnPrepareArmToBuild = function(self)
-        AWalkingLandUnit.OnPrepareArmToBuild(self)
-        self:BuildManipulatorSetEnabled(true)
-        self.BuildArmManipulator:SetPrecedence(20)
-        self:SetWeaponEnabledByLabel('RightReactonCannon', false)
-        self.BuildArmManipulator:SetHeadingPitch( self:GetWeaponManipulatorByLabel('RightReactonCannon'):GetHeadingPitch() )
-    end,
-
-    OnStopCapture = function(self, target)
-        AWalkingLandUnit.OnStopCapture(self, target)
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('RightReactonCannon', true)
-        self:GetWeaponManipulatorByLabel('RightReactonCannon'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-    end,
-
-    OnFailedCapture = function(self, target)
-        AWalkingLandUnit.OnFailedCapture(self, target)
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('RightReactonCannon', true)
-        self:GetWeaponManipulatorByLabel('RightReactonCannon'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-    end,
-
-    OnStopReclaim = function(self, target)
-        AWalkingLandUnit.OnStopReclaim(self, target)
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('RightReactonCannon', true)
-        self:GetWeaponManipulatorByLabel('RightReactonCannon'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-    end,
-
-    OnFailedToBuild = function(self)
-        AWalkingLandUnit.OnFailedToBuild(self)
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('RightReactonCannon', true)
-        self:GetWeaponManipulatorByLabel('RightReactonCannon'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
+    __init = function(self)
+        CommandUnit.__init(self, 'RightReactonCannon')
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
-        AWalkingLandUnit.OnStartBuild(self, unitBeingBuilt, order)
+        CommandUnit.OnStartBuild(self, unitBeingBuilt, order)
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
         self.BuildingUnit = true
     end,
 
     OnStopBuild = function(self, unitBeingBuilt)
-        AWalkingLandUnit.OnStopBuild(self, unitBeingBuilt)
+        CommandUnit.OnStopBuild(self, unitBeingBuilt)
         self:BuildManipulatorSetEnabled(false)
         self.BuildArmManipulator:SetPrecedence(0)
         self:SetWeaponEnabledByLabel('RightReactonCannon', true)
@@ -80,17 +44,8 @@ UAL0301 = Class(AWalkingLandUnit) {
         self.BuildingUnit = false
     end,
 
-
-    OnFailedToBuild = function(self)
-        AWalkingLandUnit.OnFailedToBuild(self)
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('RightReactonCannon', true)
-        self:GetWeaponManipulatorByLabel('RightReactonCannon'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-    end,
-
     OnCreate = function(self)
-        AWalkingLandUnit.OnCreate(self)
+        CommandUnit.OnCreate(self)
         self:SetCapturable(false)
         self:HideBone('Turbine', true)
         self:SetupBuildBones()
@@ -101,7 +56,7 @@ UAL0301 = Class(AWalkingLandUnit) {
     end,
 
     CreateEnhancement = function(self, enh)
-        AWalkingLandUnit.CreateEnhancement(self, enh)
+        CommandUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
         if not bp then return end
         --Teleporter
@@ -203,21 +158,7 @@ UAL0301 = Class(AWalkingLandUnit) {
         self:CreateShield(bp)
         self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
         self:SetMaintenanceConsumptionActive()
-    end,
-
-    OnPaused = function(self)
-        AWalkingLandUnit.OnPaused(self)
-        if self.BuildingUnit then
-            AWalkingLandUnit.StopBuildingEffects(self, self:GetUnitBeingBuilt())
-        end
-    end,
-
-    OnUnpaused = function(self)
-        if self.BuildingUnit then
-            AWalkingLandUnit.StartBuildingEffects(self, self:GetUnitBeingBuilt(), self.UnitBuildOrder)
-        end
-        AWalkingLandUnit.OnUnpaused(self)
-    end,
+    end
 }
 
 TypeClass = UAL0301

@@ -8,7 +8,7 @@
 -- **  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
-local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
+local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
 local AWeapons = import('/lua/aeonweapons.lua')
 local ADFDisruptorCannonWeapon = AWeapons.ADFDisruptorCannonWeapon
 local AIFCommanderDeathWeapon = AWeapons.AIFCommanderDeathWeapon
@@ -18,7 +18,7 @@ local ADFOverchargeWeapon = AWeapons.ADFOverchargeWeapon
 local ADFChronoDampener = AWeapons.ADFChronoDampener
 local Buff = import('/lua/sim/Buff.lua')
 
-UAL0001 = Class(CommandUnit) {
+UAL0001 = Class(ACUUnit) {
     Weapons = {
         DeathWeapon = Class(AIFCommanderDeathWeapon) {},
         RightDisruptor = Class(ADFDisruptorCannonWeapon) {},
@@ -27,11 +27,11 @@ UAL0001 = Class(CommandUnit) {
     },
 
     __init = function(self)
-        CommandUnit.__init(self, 'RightDisruptor')
+        ACUUnit.__init(self, 'RightDisruptor')
     end,
 
     OnCreate = function(self)
-        CommandUnit.OnCreate(self)
+        ACUUnit.OnCreate(self)
         self:SetCapturable(false)
         self:SetWeaponEnabledByLabel('ChronoDampener', false)
         self:SetupBuildBones()
@@ -43,13 +43,13 @@ UAL0001 = Class(CommandUnit) {
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)
-        CommandUnit.OnStopBeingBuilt(self,builder,layer)
+        ACUUnit.OnStopBeingBuilt(self,builder,layer)
         self:SetWeaponEnabledByLabel('RightDisruptor', true)
         self:ForkThread(self.GiveInitialResources)
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
-        CommandUnit.OnStartBuild(self, unitBeingBuilt, order)
+        ACUUnit.OnStartBuild(self, unitBeingBuilt, order)
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
         self.BuildingUnit = true     
@@ -92,7 +92,7 @@ UAL0001 = Class(CommandUnit) {
     end,
 
     CreateEnhancement = function(self, enh)
-        CommandUnit.CreateEnhancement(self, enh)
+        ACUUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
         -- Resource Allocation
         if enh == 'ResourceAllocation' then
