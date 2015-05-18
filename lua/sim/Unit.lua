@@ -1812,8 +1812,14 @@ Unit = Class(moho.unit_methods) {
         end
 
         --If we have a shield specified, create it.
+        -- Blueprint registration always creates a dummy Shield entry:
+        -- {
+        --     ShieldSize = 0
+        --     RegenAssistMult = 1
+        -- }
+        -- ... Which we must carefully ignore.
         local bpShield = bp.Defense.Shield
-        if bpShield.StartOn == true then
+        if bpShield.ShieldSize ~= 0 then
             self:CreateShield(bpShield)
         end
 
