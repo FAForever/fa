@@ -15,8 +15,9 @@ Changelog for patch 3641
 - Disable build effect beams on sinking engineers
 - Projectiles no longer collide with sinking units
 - Fixed share until death bug with dual-given units
-- Fixed bug with insta-disappearing wrecks due to garbage collect 
+- Fixed bug with insta-disappearing wrecks due to garbage collect
 - Cybran ACU can now fire the laser when standing in water
+- Fixed Seraphim T1 Mobile Artillery not firing at fast targets properly
 
 *Enhancements*
 - Scathis now has Amphibious build icon
