@@ -695,6 +695,7 @@ Unit = Class(moho.unit_methods) {
     OnFailedCapture = function(self, target)
         self:DoUnitCallbacks( 'OnFailedCapture', target )
         self:StopCaptureEffects(target)
+        self:StopUnitAmbientSound('CaptureLoop')
         self:PlayUnitSound('FailedCapture')
     end,
 
