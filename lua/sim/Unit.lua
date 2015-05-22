@@ -25,6 +25,8 @@ local BuffFieldBlueprints = import('/lua/sim/BuffField.lua').BuffFieldBlueprints
 
 local RECLAIMLABEL_MIN_MASS = import('/lua/sim/prop.lua').RECLAIMLABEL_MIN_MASS
 
+-- Used to give AddBoundedProp a way to delete oldest wreck first
+
 SyncMeta = {
     __index = function(t,key)
         local id = rawget(t,'id')
@@ -1351,7 +1353,7 @@ Unit = Class(moho.unit_methods) {
         local prop = CreateProp( pos, wreck )
 
         --Keep track of the global wreckage count to avoid performance issues
-        prop:AddBoundedProp(mass)
+        prop:AddBoundedProp(GetGameTick()/20+mass)
 
         prop:SetScale(bp.Display.UniformScale)
         prop:SetOrientation(self:GetOrientation(), true)
@@ -1377,7 +1379,7 @@ Unit = Class(moho.unit_methods) {
         -- Attempt to copy our animation pose to the prop. Only works if
         -- the mesh and skeletons are the same, but will not produce an error if not.
 
-        if layer ~= 'Air' then
+        if layer ~= 'Air' and self.PlayDeathAnimation then
             TryCopyPose(self, prop, true)
         end
 
