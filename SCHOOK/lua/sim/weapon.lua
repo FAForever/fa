@@ -48,4 +48,21 @@ Weapon = Class(MohoWeapon) {
         end  
         return damageTable
     end,
+
+    GetDefaultPriorities = function(self)
+        if not self.DefaultPriorities then
+            local bp = self:GetBlueprint().TargetPriorities
+            if bp then
+                local priorityTable = {}
+                for k, v in bp do
+                    table.insert(priorityTable, ParseEntityCategory(v))
+                end
+                self:SetTargetingPriorities(priorityTable)
+            end
+
+            self.DefaultPriorities = prioTable
+        end
+
+        return self.DefaultPriorities
+    end,
 }
