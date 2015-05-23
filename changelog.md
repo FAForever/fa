@@ -21,6 +21,7 @@ Changelog for patch 3641
 - Fixed SCUs not being hit properly by laser weapons
 - Optimised the range-rings shader to reduce the way FPS falls off a cliff
 - T3 Transport now leaves a wreck in water
+- Flares etc no longer draw in friendly projectiles
 
 *Enhancements*
 - Scathis now has Amphibious build icon
