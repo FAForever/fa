@@ -1350,9 +1350,6 @@ Unit = Class(moho.unit_methods) {
 
         local prop = CreateProp( pos, wreck )
 
-        --Keep track of the global wreckage count to avoid performance issues
-        prop:AddBoundedProp(mass)
-
         prop:SetScale(bp.Display.UniformScale)
         prop:SetOrientation(self:GetOrientation(), true)
         prop:SetPropCollision('Box', bp.CollisionOffsetX, bp.CollisionOffsetY, bp.CollisionOffsetZ, bp.SizeX* 0.5, bp.SizeY* 0.5, bp.SizeZ * 0.5)
