@@ -352,6 +352,14 @@ Shield = Class(moho.shield_methods,Entity) {
         end    
     end,
 
+    UnitOnShieldEnabled = function(self)
+        self.Owner:OnShieldEnabled()
+    end,
+    
+    UnitOnShieldDisabled = function(self)
+        self.Owner:OnShieldDisabled()
+    end,
+    
     OnState = State {
         Main = function(self)
 
@@ -375,6 +383,8 @@ Shield = Class(moho.shield_methods,Entity) {
             
             self.Owner:PlayUnitSound('ShieldOn')
             self.Owner:SetMaintenanceConsumptionActive()
+            
+            self:UnitOnShieldEnabled()
 
             local aiBrain = self.Owner:GetAIBrain()
 
@@ -431,6 +441,8 @@ Shield = Class(moho.shield_methods,Entity) {
 
             self.Owner:PlayUnitSound('ShieldOff')
             self.Owner:SetMaintenanceConsumptionInactive()
+            
+            self:UnitOnShieldDisabled()
 
             WaitSeconds(1)
         end,
@@ -446,6 +458,8 @@ Shield = Class(moho.shield_methods,Entity) {
             self:RemoveShield()
 
             self.Owner:PlayUnitSound('ShieldOff')
+            
+            self:UnitOnShieldDisabled()
             
             -- We must make the unit charge up before getting its shield back
             self:ChargingUp(0, self.ShieldRechargeTime)
@@ -466,6 +480,8 @@ Shield = Class(moho.shield_methods,Entity) {
         Main = function(self)
             self:RemoveShield()
             self.Owner:PlayUnitSound('ShieldOff')
+            
+            self:UnitOnShieldDisabled()
 
             self:ChargingUp(0, self.ShieldEnergyDrainRechargeTime)
 
@@ -521,6 +537,14 @@ PersonalBubble = Class(Shield) {
         Shield.RemoveShield(self)
         self:SetCollisionShape('None')
     end,
+    
+    UnitOnShieldEnabled = function(self)
+        -- Function killed so only base-class units call OnShieldEnabled
+    end,
+    
+    UnitOnShieldDisabled = function(self)
+        -- Function killed so only base-class units call OnShieldDisabled
+    end,
 
     OnState = State(Shield.OnState) {
         Main = function(self)
@@ -553,7 +577,7 @@ PersonalBubble = Class(Shield) {
             self.Owner:RevertCollisionShape()
             Shield.EnergyDrainRechargeState.Main(self)
         end
-    }
+    },
 }
 
 --- A personal bubble that can render a set of encompassed units invincible.
@@ -578,6 +602,14 @@ TransportShield = Class(Shield) {
         Shield.OnCreate(self, spec)
 
         self.protectedUnits = {}
+    end,
+    
+    UnitOnShieldEnabled = function(self)
+        -- Function killed so only base-class units call OnShieldEnabled
+    end,
+    
+    UnitOnShieldDisabled = function(self)
+        -- Function killed so only base-class units call OnShieldDisabled
     end,
 
     -- Protect the contents while the shield is up.
@@ -614,7 +646,7 @@ TransportShield = Class(Shield) {
             self:SetContentsVulnerable(true)
             Shield.EnergyDrainRechargeState.Main(self)
         end
-    }
+    },
 }
 
 --- A shield that sticks to the surface of the unit. Doesn't have its own collision physics, just
@@ -696,7 +728,14 @@ UnitShield = Class(Shield){
         self:UpdateShieldRatio(0)
         ChangeState(self, self.DeadState)
     end,
-
+    
+    UnitOnShieldEnabled = function(self)
+        -- Function killed so only base-class units call OnShieldEnabled
+    end,
+    
+    UnitOnShieldDisabled = function(self)
+        -- Function killed so only base-class units call OnShieldDisabled
+    end,
 }
 
 AntiArtilleryShield = Class(Shield) {
