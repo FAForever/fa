@@ -577,7 +577,7 @@ PersonalBubble = Class(Shield) {
             self.Owner:RevertCollisionShape()
             Shield.EnergyDrainRechargeState.Main(self)
         end
-    }
+    },
 }
 
 --- A personal bubble that can render a set of encompassed units invincible.
@@ -646,7 +646,7 @@ TransportShield = Class(Shield) {
             self:SetContentsVulnerable(true)
             Shield.EnergyDrainRechargeState.Main(self)
         end
-    }
+    },
 }
 
 --- A shield that sticks to the surface of the unit. Doesn't have its own collision physics, just
