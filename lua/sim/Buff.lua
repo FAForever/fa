@@ -347,18 +347,14 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
                 end
             end
         elseif atype == 'RateOfFire' then
+            local val = BuffCalculate(unit, buffName, 'RateOfFire', 1)
+
             for i = 1, unit:GetWeaponCount() do
                 local wep = unit:GetWeapon(i)
-                local wepbp = wep:GetBlueprint()
-                local weprof = wepbp.RateOfFire
-
-                -- Set new rate of fire based on blueprint rate of fire.=
-                local val = BuffCalculate(unit, buffName, 'RateOfFire', 1)
-
-                local delay = 1 / wepbp.RateOfFire
-
-                wep:ChangeRateOfFire( 1 / ( val * delay ) )
-                --LOG('*BUFF: RateOfFire = ' ..  (1 / ( val * delay )) )
+                local bp = wep:GetBlueprint()
+                -- Set new rate of fire based on blueprint rate of fire
+                wep:ChangeRateOfFire(bp.RateOfFire / val)
+                wep.AdjRoFMod = val
             end
         elseif atype ~= 'Stun' then
             WARN("*WARNING: Tried to apply a buff with an unknown affect type of " .. atype .. " for buff " .. buffName)
