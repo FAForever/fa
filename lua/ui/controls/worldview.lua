@@ -37,14 +37,14 @@ function OnStartCommandMode(command_mode, command_data)
     end
 end
 
--- Gets the weapons of the selected units, if all selected units are of the same type. Otherwise
--- returns nill. Catches fire if no units are selected.
-local function GetAttackerWeapons(forceReticle)
+-- If all selected units with the SHOWATTACKRETICLE flag set are of the same type, return the weapon
+-- table from their blueprint. Otherwise returns null.
+local function GetSelectedWeaponsWithReticules()
     local attackers = GetSelectedUnits()
     local bp = nil
 
     for i, u in attackers do
-        if forceReticle or EntityCategoryContains(categories.SHOWATTACKRETICLE, u) then
+        if EntityCategoryContains(categories.SHOWATTACKRETICLE, u) then
             if not bp then
                 bp = u:GetBlueprint()
             elseif bp.BlueprintId ~= u:GetBlueprint().BlueprintId then
@@ -57,7 +57,7 @@ local function GetAttackerWeapons(forceReticle)
 end
 
 local function NukeDecalFunc()
-    local weapons = GetAttackerWeapons(true)
+    local weapons = GetSelectedWeaponsWithReticules()
 
     if weapons then
         for _, w in weapons do
@@ -78,7 +78,7 @@ local function NukeDecalFunc()
 end
 
 local function TacticalDecalFunc()
-    local weapons = GetAttackerWeapons()
+    local weapons = GetSelectedWeaponsWithReticules()
 
     if weapons then
         for _, w in weapons do
@@ -97,7 +97,7 @@ local function TacticalDecalFunc()
 end
 
 local function AttackDecalFunc(mode)
-    local weapons = GetAttackerWeapons()
+    local weapons = GetSelectedWeaponsWithReticules()
 
     if weapons then
         local weapon = weapons[1]
