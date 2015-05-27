@@ -8,7 +8,7 @@
 --**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CommandUnit = import('/lua/defualtunits.lua').CommandUnit
+local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
 
 local AWeapons = import('/lua/aeonweapons.lua')
 local ADFReactonCannon = AWeapons.ADFReactonCannon
