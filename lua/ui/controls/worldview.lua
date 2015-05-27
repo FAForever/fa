@@ -37,19 +37,18 @@ function OnStartCommandMode(command_mode, command_data)
     end
 end
 
--- Gets the weapons of attackers, nil if not same units
+-- Gets the weapons of the selected units, if all selected units are of the same type. Otherwise
+-- returns nill. Catches fire if no units are selected.
 local function GetAttackerWeapons(forceReticle)
     local attackers = GetSelectedUnits()
     local bp = nil
 
-    if attackers then
-        for i, u in attackers do
-            if forceReticle or EntityCategoryContains(categories.SHOWATTACKRETICLE, u) then
-                if not bp then
-                    bp = u:GetBlueprint()
-                elseif bp.BlueprintId ~= u:GetBlueprint().BlueprintId then
-                    return nil
-                end
+    for i, u in attackers do
+        if forceReticle or EntityCategoryContains(categories.SHOWATTACKRETICLE, u) then
+            if not bp then
+                bp = u:GetBlueprint()
+            elseif bp.BlueprintId ~= u:GetBlueprint().BlueprintId then
+                return nil
             end
         end
     end
