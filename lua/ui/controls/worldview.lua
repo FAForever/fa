@@ -61,8 +61,7 @@ local function NukeDecalFunc()
 
     if weapons then
         for _, w in weapons do
-            if w.CountedProjectile and w.NukeWeapon then
-                local decals = {}
+            if w.NukeWeapon then
                 local prefix = '/textures/ui/common/game/AreaTargetDecal/nuke_icon_'
 
                 table.insert(decals, {texture = prefix .. 'outer.dds', scale=w.NukeOuterRingRadius * 2})
