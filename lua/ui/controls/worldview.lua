@@ -76,8 +76,7 @@ local function NukeDecalFunc()
         end
     end
 
-    WARN('Nuke decal called for non-nuclear weapon')
-
+    WARN(debug.traceback(nil, "Nuke decal called for non-nuclear weapon"))
     return false
 end
 
