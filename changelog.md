@@ -23,6 +23,7 @@ Changelog for patch 3641
 - T3 Transport now leaves a wreck in water
 - Minimap now remembers whether to show resource icons or not
 - Current commandmode no longer reset if an engineer dies in the current selection 
+- Fix shots sometimes going right through Walled PD
 
 *Enhancements*
 - Scathis now has Amphibious build icon
