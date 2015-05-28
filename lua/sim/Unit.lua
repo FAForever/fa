@@ -699,17 +699,76 @@ Unit = Class(moho.unit_methods) {
         self:PlayUnitSound('FailedCapture')
     end,
 
+    CheckCaptor = function(self, captor)
+        if captor.Dead or captor:GetFocusUnit() ~= self then
+            self:RemoveCaptor(captor)
+        else
+            local progress = captor:GetWorkProgress()
+            if not self.CaptureProgress or progress > self.CaptureProgress then
+                self.CaptureProgress = progress
+            elseif progress < self.CaptureProgress then
+                captor:SetWorkProgress(self.CaptureProgress)
+            end
+        end
+    end,
+
+    AddCaptor = function(self, captor)
+        if not self.Captors then
+            self.Captors = {}
+        end
+
+        self.Captors[captor:GetEntityId()] = captor
+
+        if not self.CaptureThread then
+            self.CaptureThread = self:ForkThread(function()
+                local captors = self:GetCaptors()
+                while table.getsize(captors) > 0 do
+                    for _, c in captors do
+                        self:CheckCaptor(c)
+                    end
+
+                    WaitTicks(1)
+                    captors = self:GetCaptors()
+                end
+            end)
+        end
+    end,
+
+    ResetCaptors = function(self)
+        if self.CaptureThread then
+            KillThread(self.CaptureThread)
+        end
+        self.Captors = {}
+        self.CaptureThread = nil
+        self.CaptureProgress = nil
+    end,
+
+    RemoveCaptor = function(self, captor)
+        self.Captors[captor:GetEntityId()] = nil
+
+        if table.getsize(self.Captors) == 0 then
+            self:ResetCaptors()
+        end
+    end,
+
+    GetCaptors = function(self)
+        return self.Captors or {}
+    end,
+
     OnStartBeingCaptured = function(self, captor)
+        self:AddCaptor(captor)
         self:DoUnitCallbacks( 'OnStartBeingCaptured', captor )
         self:PlayUnitSound('StartBeingCaptured')
     end,
 
     OnStopBeingCaptured = function(self, captor)
+        self:RemoveCaptor(captor)
         self:DoUnitCallbacks( 'OnStopBeingCaptured', captor )
         self:PlayUnitSound('StopBeingCaptured')
     end,
 
     OnFailedBeingCaptured = function(self, captor)
+        self:RemoveCaptor(captor)
         self:DoUnitCallbacks( 'OnFailedBeingCaptured', captor )
         self:PlayUnitSound('FailedBeingCaptured')
     end,
@@ -788,6 +847,7 @@ Unit = Class(moho.unit_methods) {
             end
 
             --Fix captured units not retaining their data
+            self:ResetCaptors()
             local newUnits = import('/lua/SimUtils.lua').TransferUnitsOwnership( {self}, captorArmyIndex)
 
             --The unit transfer function returns a table of units. Since we transferred 1 unit, the table contains 1 unit (The new unit).
