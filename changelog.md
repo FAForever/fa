@@ -99,6 +99,7 @@ Enhancements
 
 - Reclaim/second now shown
 - UEF ACU and SCU drones now have an on-drone button to toggle if they are rebuilt at death
+- UEF SCU Drone can now capture, the same as the ACU ones
 
 - Tiny changes to make Fatboy/Megalith/Spiderbot weapons symmetrical in
   behaviour where they should be
