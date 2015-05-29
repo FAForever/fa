@@ -2282,7 +2282,7 @@ function CreateUI(maxPlayers)
     -- Title Label
     GUI.titleText = makeLabel("FAF Game Lobby", 17)
     LayoutHelpers.AtLeftTopIn(GUI.titleText, GUI.panel, 5, 20)
-    
+
     -- Rule Label
     local RuleLabel = TextArea(GUI.panel, 350, 34)
     GUI.RuleLabel = RuleLabel
@@ -2331,16 +2331,16 @@ function CreateUI(maxPlayers)
     GUI.LobbyOptions.OnClick = function()
         ShowLobbyOptionsDialog()
     end
-    
+
     -- Logo
     GUI.logo = Bitmap(GUI, '/textures/ui/common/scx_menu/lan-game-lobby/logo.dds')
     LayoutHelpers.AtLeftTopIn(GUI.logo, GUI, 1, 1)
-    
+
     -- Version texts
     local gameVersionText = UIUtil.CreateText(GUI, GameVersion(), 9, UIUtil.bodyFont)
     gameVersionText:SetColor('677983')
     LayoutHelpers.CenteredRightOf(gameVersionText, GUI.logo, 4)
-    
+
     -- Player Slots
     GUI.playerPanel = Group(GUI.panel, "playerPanel")
     LayoutHelpers.AtLeftTopIn(GUI.playerPanel, GUI.panel, 6, 70)
@@ -2813,9 +2813,9 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtLeftIn(GUI.exitButton, GUI.chatPanel, 33)
     LayoutHelpers.AtVerticalCenterIn(GUI.exitButton, launchGameButton, 7)
     GUI.exitButton.OnClick = GUI.exitLobbyEscapeHandler
-    
+
     -- Small buttons are 100 wide, 44 tall
-    
+
     -- Default option button
     GUI.defaultOptions = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/defaultoption/')
     -- If we're the host, position the buttons lower down (and eventually shrink the observer panel)
@@ -2905,7 +2905,7 @@ function CreateUI(maxPlayers)
             AssignAutoTeams()
         end
     end
-    
+
     -- GO OBSERVER BUTTON --
     GUI.becomeObserver = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/observer/')
     LayoutHelpers.AtLeftTopIn(GUI.becomeObserver, GUI.defaultOptions, 40, 47)
@@ -3780,7 +3780,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                     if peer.quiet > LobbyComm.quietTimeout then
                         lobbyComm:EjectPeer(peer.id,'TimedOutToHost')
                         SendSystemMessage(LOCF("<LOC lobui_0226>%s timed out.", peer.name), "lobui_0205")
-                        
+
                         -- Search and Remove the peer disconnected
                         for k, v in CurrentConnection do
                             if v == peer.name then
@@ -3813,7 +3813,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
     lobbyComm.PeerDisconnected = function(self,peerName,peerID) -- Lost connection or try connect with proxy
 		LOGX('>> PeerDisconnected : peerName='..peerName..' peerID='..peerID, 'Disconnected')
-        
+
          -- Search and Remove the peer disconnected
         for k, v in CurrentConnection do
             if v == peerName then
@@ -3833,7 +3833,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 break
             end
         end
-        
+
         if IsPlayer(peerID) then
             local slot = FindSlotForID(peerID)
             if slot and lobbyComm:IsHost() then
@@ -3890,7 +3890,7 @@ function SetPlayerOptions(slot, options, ignoreRefresh)
     for key, val in options do
         gameInfo.PlayerOptions[slot][key] = val
     end
-        
+
     lobbyComm:BroadcastData(
     {
         Type = 'PlayerOptions',
@@ -4554,7 +4554,7 @@ function ShowPresetDialog()
     LoadButton.OnClick = function(self)
         LoadPreset(PresetList:GetSelection() + 1)
     end
-    
+
     QuitButton.OnClick = function(self)
         presetDialog:Hide()
     end
@@ -4681,7 +4681,7 @@ function CreateHelpWindow()
     LayoutHelpers.AtLeftIn(textArea, dialogContent, 13)
     LayoutHelpers.AtTopIn(textArea, dialogContent, 10)
     textArea:SetText(import('/lua/ui/lobby/presetHelp.lua').helpText)
-    
+
     -- OK button
     local OkButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
 	LayoutHelpers.AtHorizontalCenterIn(OkButton, dialogContent)
@@ -4753,7 +4753,7 @@ function LoadPreset(presetIndex)
     local preset = LoadPresetsList()[presetIndex]
 
     SetGameOptions(preset.GameOptions, true)
-    
+
     -- gameInfo.GameMods is a map from mod identifiers to truthy values for every activated mod.
     -- Unfortunately, HostUtils.UpdateMods is painfully stupid and reads selectedMods, which is a list of
     -- mod identifiers to be activated.
@@ -4877,7 +4877,7 @@ function GUI_Changelog()
 			InfoList:AddItem('')
 		end
 	end
-     
+
     -- OK button --
     local OkButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
 	LayoutHelpers.AtLeftIn(OkButton, dialogContent, 0)
