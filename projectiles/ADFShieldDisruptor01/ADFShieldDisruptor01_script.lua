@@ -18,8 +18,8 @@ ADFShieldDisruptor01 = Class(ADisruptorProjectile) {
 
         if not TargetEntity then return end
 
-        -- Never cause overspill damage to the unit.
-        local damage = math.min(self.Data, TargetEntity:GetHealth())
+        -- Never cause overspill damage to the unit, 1 min to avoid logspam with 0 declared damage
+        local damage = math.max(math.min(self.Data, TargetEntity:GetHealth()), 1)
         Damage(self, {0,0,0}, TargetEntity, damage, 'Normal')
     end,
 }
