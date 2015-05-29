@@ -1651,9 +1651,13 @@ local function TryLaunch(skipNoObserversCheck)
         AssignRandomStartSpots()
         AssignAINames()
         local allRatings = {}
-        for k,v in gameInfo.PlayerOptions do
-            if v.Human and v.PL then
-                allRatings[v.PlayerName] = v.PL
+        for k, player in gameInfo.PlayerOptions do
+            if player.Human and player.PL then
+                allRatings[player.PlayerName] = player.PL
+            end
+
+            if player.OwnerID == localPlayerID then
+                UIUtil.SetCurrentSkin(FACTION_NAMES[player.Faction])
             end
         end
         gameInfo.GameOptions['Ratings'] = allRatings
@@ -2954,6 +2958,14 @@ function CreateUI(maxPlayers)
     end
     UIUtil.CreateLobbyVertScrollbar(GUI.observerList, 0, 0, -1)
 
+    -- Setup large pretty faction selector and set the factional background to its initial value.
+    local lastFaction = GetSanitisedLastFaction()
+    CreateUI_Faction_Selector(lastFaction)
+
+    RefreshLobbyBackground(lastFaction)
+
+    GUI.uiCreated = true
+
     if singlePlayer then
         -- observers are always allowed in skirmish games.
         SetGameOption("AllowObservers",true)
@@ -2968,12 +2980,6 @@ function CreateUI(maxPlayers)
         GUI.randMap:Hide()
         GUI.observerPanel:Hide()
     end
-
-    -- Setup large pretty faction selector and set the factional background to its initial value.
-    local lastFaction = GetSanitisedLastFaction()
-    CreateUI_Faction_Selector(lastFaction)
-
-    RefreshLobbyBackground(lastFaction)
 
     ---------------------------------------------------------------------------
     -- other logic, including lobby callbacks
@@ -3008,8 +3014,6 @@ function CreateUI(maxPlayers)
         CreateCPUMetricUI()
         ForkThread(function() UpdateBenchmark() end)
     end
-
-    GUI.uiCreated = true
 end
 
 function RefreshOptionDisplayData(scenarioInfo)
