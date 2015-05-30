@@ -348,6 +348,7 @@ function ChangeState(obj, newstate)
 
     -- Ignore redundant state changes.
     if getmetatable(obj)==newstate then
+        debug.traceback(nil, "Ignoring no-op state change...")
         return
     end
 
