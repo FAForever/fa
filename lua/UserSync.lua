@@ -61,9 +61,9 @@ function OnSync()
     if Sync.Reclaim then
         for _, r in Sync.Reclaim do
             if r.destroy then
-                import('/modules/reclaim.lua').DestroyReclaimLabel(r.id)
+                import('/modules/reclaim.lua').RemoveReclaim(r)
             else
-                import('/modules/reclaim.lua').CreateReclaimLabel(r)
+                import('/modules/reclaim.lua').AddReclaim(r)
             end
         end
     end
