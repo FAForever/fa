@@ -366,8 +366,8 @@ function ConfigureBeatFunction()
         local warningBG = GUI.warningBG
 
         local showReclaim = options.gui_display_reclaim_totals == 1
-        local reclaimed = nil
-        if showReclaim == 1 then
+        local reclaimed
+        if showReclaim then
             reclaimed = GUI.reclaimed
         end
 
@@ -416,7 +416,7 @@ function ConfigureBeatFunction()
 
             if showReclaim then
                 -- Show, if enabled, the reclaim values.
-                reclaimed:SetText(math.ceil(econData.reclaimed[tableID]))
+                reclaimed:SetText(math.ceil(econData.reclaimed[resourceType]))
             end
 
             -- Extract the economy data from the economy data.
