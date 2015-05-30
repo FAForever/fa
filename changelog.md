@@ -1,58 +1,110 @@
-Changelog for patch 3641
-------------------------
+Patch 3641
+==========
 
-*Exploits*
+Exploits
+--------
+
 - Instant crash exploit partially fixed
 
-*Bug fixes*
+
+Bugs
+----
+
 - Seraphim sniperbot is able to hit Cybran MML again
+
 - T3 Torpedo Bomber can use Attack-Move properly again
+
 - Shield disruptor now works on personal shields
+
 - Fixed wrong consumption when repairing ACU after an upgrade finished
+
 - Support factories no longer lose progress if they are damaged during upgrade
+
 - Units with weapon range upgrades now stop at maximum range when using attack-move 
+
 - Aeon SCUs with nano + vet now get correct regen rate 
+
 - Disable build effect beams on sinking engineers
+
 - Projectiles no longer collide with sinking units
+
 - Fixed share until death bug with dual-given units
+
 - Fixed bug with insta-disappearing wrecks due to garbage collect
+
 - Cybran ACU can now fire the laser when standing in water
+
 - Fixed Seraphim T1 Mobile Artillery not firing at fast targets properly
+
 - Fixed SCUs not being hit properly by laser weapons
+
 - Optimised the range-rings shader to reduce the way FPS falls off a cliff
+
 - T3 Transport now leaves a wreck in water
+
 - Minimap now remembers whether to show resource icons or not
+
 - Current commandmode no longer reset if an engineer dies in the current selection 
+
 - Fix shots sometimes going right through Walled PD
+
 - Flares and depth-chages no longer draw in friendly projectiles
 
-*Enhancements*
+
+Enhancements
+------------
+
 - Scathis now has Amphibious build icon
+
 - Attack and Nuke reticles now scale with impact radius
+
 - TMLs now show the splash damage radius in targeting mode
+
 - Engineering Station units now pause on transfer from one player to another
+
 - Cybran Engineers now display a build beam to clearly show what they're tasked to
+
 - Cybran factories now have red build beams
+
 - Number of Cybran build bots scale with buildpower of the engineer
+
 - Cybran build bots now can assist next build project without respawning
+
 - 34 new taunts
+
 - The least valueable units are destroyed at unit transfer if unitcap is hit
+
 - "Commander under attack" now works on shielded ACUs
+
 - Remove owner-check on text pings so anyone can delete them
-- Disable assist command on upgrading factories to prevent accidental cancelling
+
+- Disable assist command on upgrading factories to prevent accidental
+  cancelling
+
 - Ping values under "Connectivity" (F11) now update during game stop/stall
-- Added Yolona Oss to Mavor/Salvation/Scathis build restriction and renamed it Super-Game-Enders
+
+- Added Yolona Oss to Mavor/Salvation/Scathis build restriction and renamed it
+  Super-Game-Enders
+
 - New option: Show reclaim value of wreckage on map
+
 - ASF effects tweaked for performance (less effects on low fidelty)
+
 - Smart selection feature allowing hotkeys to select units by category
+
 - Absolver shield disrupter now hovers higher, so it's less likely to hit the
   floor with the very low mounted gun
-- Reclaimed mass now counts towards the score table
-- Reclaim/second now shown
-- Tiny changes to make Fatboy/Megalith/Spiderbot weapons symmetrical in behaviour where they should be
 
-Changelog for patch 3640
-------------------------
+- Reclaimed mass now counts towards the score table
+
+- Reclaim/second now shown
+
+- Tiny changes to make Fatboy/Megalith/Spiderbot weapons symmetrical in
+  behaviour where they should be
+
+
+Patch 3640
+==========
 
 - Adress an issue that causes the game to crash with core dumps in long games
 
@@ -122,15 +174,15 @@ Contributors:
  - Sheeo
  - Xinnony
 
-Changelog for patch 3638
-------------------------
+Patch 3638
+==========
 
 - Added christmas presents for reclaim
 
 Big thanks to ozonex for this contribution!
 
-Changelog for hotfix-patch 3637
--------------------------------
+Patch 3637
+==========
 
 *Bug fixes*
 - Selection Range Overlay works for multiple units again
@@ -144,8 +196,8 @@ Notes:
 - It's still likely that there are incompatibilities with mods. Please let us know your exact setup of the game when reporting issues
 
 
-Changelog for patch 3636
-------------------------
+Patch 3636
+==========
 
 *Exploit Fixes*
 -  Fixed infinite economy exploit
