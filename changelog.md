@@ -1,5 +1,5 @@
-Patch 3641
-==========
+Patch 3641 (Unreleased)
+=======================
 
 Exploits
 --------
@@ -103,13 +103,26 @@ Enhancements
   behaviour where they should be
 
 
-Patch 3640
+Contributors
+------------
+
+- Crotalus
+- Exotic Retard
+- IceDreamer
+- Partytime
+- ResinSmoker
+- Sheeo
+- ckitching
+- shalkya
+
+Patch 3640 (Jan 6, 2015)
 ==========
 
 - Adress an issue that causes the game to crash with core dumps in long games
 
-Changelog for patch 3639
-------------------------
+
+Patch 3639 (Jan 5, 2015)
+========================
 
 *General changes*
 - Christmas presents for reclaim have been removed
@@ -174,15 +187,16 @@ Contributors:
  - Sheeo
  - Xinnony
 
-Patch 3638
-==========
+Patch 3638 (Dec 24, 2014)
+=========================
 
 - Added christmas presents for reclaim
 
+
 Big thanks to ozonex for this contribution!
 
-Patch 3637
-==========
+Patch 3637 (Dec 12, 2014)
+=========================
 
 *Bug fixes*
 - Selection Range Overlay works for multiple units again
@@ -196,8 +210,8 @@ Notes:
 - It's still likely that there are incompatibilities with mods. Please let us know your exact setup of the game when reporting issues
 
 
-Patch 3636
-==========
+Patch 3636 (Dec 12, 2014)
+=========================
 
 *Exploit Fixes*
 -  Fixed infinite economy exploit
