@@ -17,8 +17,6 @@ local UserDecal = import('/lua/user/UserDecal.lua').UserDecal
 local WorldViewMgr = import('/lua/ui/game/worldview.lua')
 local Prefs = import('/lua/user/prefs.lua')
 
-local options = Prefs.GetFromCurrentProfile('options')
-
 WorldViewParams = {
 	ui_SelectTolerance = 7.0,
 	ui_DisableCursorFixing = false,
@@ -39,79 +37,91 @@ end
 
 -- If all selected units with the SHOWATTACKRETICLE flag set are of the same type, return the weapon
 -- table from their blueprint. Otherwise returns null.
-local function GetSelectedWeaponsWithReticules()
-    local attackers = GetSelectedUnits()
+local function GetSelectedWeaponsWithReticules(filterFunc)
+    local selectedUnits = GetSelectedUnits()
     local bp = nil
 
-    for i, u in attackers do
+    local weapons = {};
+
+    for i, u in selectedUnits do
         if EntityCategoryContains(categories.SHOWATTACKRETICLE, u) then
-            if not bp then
-                bp = u:GetBlueprint()
-            elseif bp.BlueprintId ~= u:GetBlueprint().BlueprintId then
-                return nil
+            local bp = u:GetBlueprint()
+            for k, v in bp.Weapon do
+                if filterFunc(v) then
+                    weapons[bp.BlueprintId] = v
+                end
             end
         end
     end
 
-    return bp.Weapon
+    return weapons
 end
 
-local function NukeDecalFunc()
-    local weapons = GetSelectedWeaponsWithReticules()
+--- A generic decal function that maximises the available DamageRadius values.
+local function RadiusDecalFuntion(filterFunc)
+    local weapons = GetSelectedWeaponsWithReticules(filterFunc)
 
-    if weapons then
-        for _, w in weapons do
-            if w.NukeWeapon then
-                local prefix = '/textures/ui/common/game/AreaTargetDecal/nuke_icon_'
-
-                table.insert(decals, {texture = prefix .. 'outer.dds', scale=w.NukeOuterRingRadius * 2})
-                table.insert(decals, {texture = prefix .. 'inner.dds', scale=w.NukeInnerRingRadius * 2})
-
-                return decals
-            end
+    -- The maximum damage radius of a selected missile weapon.
+    local maxRadius = 0
+    for _, w in weapons do
+        if w.DamageRadius > maxRadius then
+            maxRadius = w.DamageRadius
         end
     end
 
-    WARN(debug.traceback(nil, "Nuke decal called for non-nuclear weapon"))
+    if maxRadius > 0 then
+        return {
+            {
+                texture = "/textures/ui/common/game/AreaTargetDecal/weapon_icon_small.dds",
+                scale = maxRadius * 2
+            }
+        }
+    end
+
     return false
+end
+
+--- Specialised decal function for nukes: draws the inner/outer radii separately.
+local function NukeDecalFunc()
+    local weapons = GetSelectedWeaponsWithReticules(
+        function(w)
+            return w.NukeWeapon
+        end
+    )
+
+    local inner = 0
+    local outer = 0
+    for _, w in weapons do
+
+        if w.NukeOuterRingRadius > outer then
+            outer = w.NukeOuterRingRadius
+        end
+
+        if w.NukeInnerRingRadius > inner then
+            inner = w.NukeInnerRingRadius
+        end
+    end
+
+    if inner > 0 and outer > 0 then
+        local prefix = '/textures/ui/common/game/AreaTargetDecal/nuke_icon_'
+        return {
+            { texture = prefix .. 'outer.dds', scale = outer * 2 },
+            { texture = prefix .. 'inner.dds', scale = inner* 2 }
+        }
+    end
 end
 
 local function TacticalDecalFunc()
-    local weapons = GetSelectedWeaponsWithReticules()
-
-    if weapons then
-        for _, w in weapons do
-            if w.WeaponCategory == 'Missile' then
-                local decal = {texture="/textures/ui/common/game/AreaTargetDecal/weapon_icon_small.dds", scale=0}
-                if w.DamageRadius then
-                    decal.scale = w.DamageRadius * 2
-                end
-
-                return {decal}
-            end
+    return RadiusDecalFuntion(
+        function(w)
+            return w.WeaponCategory == 'Missile' and w.DamageRadius
         end
-    end
-
-    return false
+    )
 end
 
 local function AttackDecalFunc(mode)
-    local weapons = GetSelectedWeaponsWithReticules()
-
-    if weapons then
-        local weapon = weapons[1]
-        local decal = {texture="/textures/ui/common/game/AreaTargetDecal/weapon_icon_small.dds", scale=0}
-
-        if weapon.DamageRadius then
-            decal.scale = weapon.DamageRadius * 2
-        end
-
-        return {decal}
-    end
-
-    return false
+    return RadiusDecalFuntion(function() return true end)
 end
-
 
 DecalFunctions = {
     RULEUCC_Attack = AttackDecalFunc,
@@ -126,7 +136,6 @@ WorldView = Class(moho.UIWorldView, Control) {
     EventRedirect = nil,
     _pingAnimationThreads = {},
     Decals = {},
-    currentRO = {},
 
     HandleEvent = function(self, event)
         if self.EventRedirect then
@@ -148,15 +157,6 @@ WorldView = Class(moho.UIWorldView, Control) {
             self.LastCursor = nil
             self:ResetDecals()
         end
-
-        if options.gui_enhanced_unitview ~= 0 then
-            local ro = GetRolloverInfo() or {}
-            if ro.entityId ~= self.currentRO.entityId or ro.blueprintId ~= self.currentRO.blueprintId then
-                self.currentRO = ro
-                import('/lua/ui/game/unitview.lua').OnRolloverUpdate(ro)
-            end
-        end
-
         return false
     end,
 
@@ -241,10 +241,10 @@ WorldView = Class(moho.UIWorldView, Control) {
             self:ApplyCursor()
         end
     end,
-
+    
     OnDestroy = function(self)
         self:ResetDecals()
-
+        
         for i, v in self._pingAnimationThreads do
             if v then KillThread(v) end
         end
@@ -271,7 +271,7 @@ WorldView = Class(moho.UIWorldView, Control) {
             GetCursor():SetTexture(unpack(self.Cursor))
         end
     end,
-
+    
     DisplayPing = function(self, pingData)
         -- Flash the scoreboard faction icon for the ping owner to indicate the source.
         if not pingData.Marker and not pingData.Renew then
@@ -306,7 +306,7 @@ WorldView = Class(moho.UIWorldView, Control) {
 
 			ForkThread(pingSourceIndicator)
 		end
-
+		
         if not self:IsHidden() and pingData.Location then
             local coords = self:Project(Vector(pingData.Location[1], pingData.Location[2], pingData.Location[3]))
             if not pingData.Renew then
@@ -361,7 +361,7 @@ WorldView = Class(moho.UIWorldView, Control) {
                     if Arrow then Arrow:Destroy() end
                 end))
             end
-
+            
             --If this ping is a marker, create the edit controls for it.
             if not self._disableMarkers and pingData.Marker then
                 if not self.Markers then self.Markers = {} end
@@ -380,7 +380,7 @@ WorldView = Class(moho.UIWorldView, Control) {
                 PingGroup.Marker.TeamColor.Width:Set(12)
                 PingGroup.Marker.TeamColor.Depth:Set(function() return PingGroup.Marker.Depth() - 1 end)
                 LayoutHelpers.AtCenterIn(PingGroup.Marker.TeamColor, PingGroup.Marker)
-
+                
                 PingGroup.Marker.HandleEvent = function(marker, event)
                     if event.Type == 'ButtonPress' then
                         if event.Modifiers.Right and event.Modifiers.Ctrl then
@@ -427,41 +427,41 @@ WorldView = Class(moho.UIWorldView, Control) {
                         end
                     end
                 end
-
+                
                 PingGroup.BGMid = Bitmap(PingGroup, UIUtil.UIFile('/game/ping-info-panel/bg-mid.dds'))
                 LayoutHelpers.AtCenterIn(PingGroup.BGMid, PingGroup, 17)
                 PingGroup.BGMid.Depth:Set(function() return PingGroup.Marker.Depth() - 2 end)
-
+                
                 PingGroup.Name = UIUtil.CreateText(PingGroup, PingGroup.data.Name, 14, UIUtil.bodyFont)
                 PingGroup.Name:DisableHitTest()
                 PingGroup.Name:SetDropShadow(true)
                 PingGroup.Name:SetColor('ff00cc00')
                 LayoutHelpers.AtCenterIn(PingGroup.Name, PingGroup.BGMid)
-
+                
                 PingGroup.BGRight = Bitmap(PingGroup, UIUtil.UIFile('/game/ping-info-panel/bg-right.dds'))
                 LayoutHelpers.AtVerticalCenterIn(PingGroup.BGRight, PingGroup.BGMid, 1)
                 PingGroup.BGRight.Left:Set(function() return math.max(PingGroup.Name.Right(), PingGroup.BGMid.Right()) end)
                 PingGroup.BGRight.Depth:Set(PingGroup.BGMid.Depth)
-
+                
                 PingGroup.BGLeft = Bitmap(PingGroup, UIUtil.UIFile('/game/ping-info-panel/bg-left.dds'))
                 LayoutHelpers.AtVerticalCenterIn(PingGroup.BGLeft, PingGroup.BGMid, 1)
                 PingGroup.BGLeft.Right:Set(function() return math.min(PingGroup.Name.Left(), PingGroup.BGMid.Left()) end)
                 PingGroup.BGLeft.Depth:Set(PingGroup.BGMid.Depth)
-
+                
                 if PingGroup.Name.Width() > PingGroup.BGMid.Width() then
                     PingGroup.StretchLeft = Bitmap(PingGroup, UIUtil.UIFile('/game/ping-info-panel/bg-stretch.dds'))
                     LayoutHelpers.AtVerticalCenterIn(PingGroup.StretchLeft, PingGroup.BGMid, 1)
                     PingGroup.StretchLeft.Left:Set(PingGroup.BGLeft.Right)
                     PingGroup.StretchLeft.Right:Set(PingGroup.BGMid.Left)
                     PingGroup.StretchLeft.Depth:Set(function() return PingGroup.BGMid.Depth() - 1 end)
-
+                    
                     PingGroup.StretchRight = Bitmap(PingGroup, UIUtil.UIFile('/game/ping-info-panel/bg-stretch.dds'))
                     LayoutHelpers.AtVerticalCenterIn(PingGroup.StretchRight, PingGroup.BGMid, 1)
                     PingGroup.StretchRight.Left:Set(PingGroup.BGMid.Right)
                     PingGroup.StretchRight.Right:Set(PingGroup.BGRight.Left)
                     PingGroup.StretchRight.Depth:Set(function() return PingGroup.BGMid.Depth() - 1 end)
                 end
-
+                
                 PingGroup.Height:Set(5)
                 PingGroup.Width:Set(5)
                 PingGroup.Left:Set(function() return PingGroup.coords.x - PingGroup.Height() / 2 end)
@@ -470,7 +470,7 @@ WorldView = Class(moho.UIWorldView, Control) {
                 PingGroup.OnFrame = function(pinggrp, deltaTime)
                     pinggrp.coords = self:Project(Vector(PingGroup.data.Location[1], PingGroup.data.Location[2], PingGroup.data.Location[3]))
                     PingGroup.Left:Set(function() return self.Left() + (PingGroup.coords.x - PingGroup.Height() / 2) end)
-                    PingGroup.Top:Set(function() return self.Top() + (PingGroup.coords.y - PingGroup.Width() / 2) end)
+                    PingGroup.Top:Set(function() return self.Top() + (PingGroup.coords.y - PingGroup.Width() / 2) end)    
                     if pinggrp.NewPosition then
                         pinggrp:Hide()
                         pinggrp.Marker:Hide()
@@ -496,7 +496,7 @@ WorldView = Class(moho.UIWorldView, Control) {
             end
         end
     end,
-
+    
     UpdatePing = function(self, pingData)
         if pingData.Action == 'flush' and self.Markers then
             for ownerID, pingTable in self.Markers do
@@ -523,7 +523,7 @@ WorldView = Class(moho.UIWorldView, Control) {
             end
         end
     end,
-
+    
     ShowPings = function(self, show)
         self.PingVis = show
         if not self:IsHidden() and self.Markers then
@@ -539,8 +539,8 @@ WorldView = Class(moho.UIWorldView, Control) {
             end
         end
     end,
-
-    CreateCameraIndicator = function(self, parent, location, color, stayOnScreen)
+    
+    CreateCameraIndicator = function(self, parent, location, color, stayOnScreen) 
         local Arrow = Button(parent, UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_b_up.dds'),
                 UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_b_down.dds'),
                 UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_b_over.dds'),
@@ -643,7 +643,7 @@ WorldView = Class(moho.UIWorldView, Control) {
         end
         return Arrow
     end,
-
+    
     Register = function(self, cameraName, disableMarkers, displayName, order)
         self._cameraName = cameraName
         self._disableMarkers = disableMarkers
