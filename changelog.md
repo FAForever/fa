@@ -88,6 +88,7 @@ Other
   behaviour where they should be
 - Added templates for all support factories. AI in coop missions is now able to
   rebuild support factories
+- Assist now prioritize building over repair
 
 Contributors
 ------------

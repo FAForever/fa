@@ -2093,6 +2093,30 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    CheckAssistFocus = function(self)
+        if not (self and EntityCategoryContains(categories.ENGINEER, self)) or self.Dead then
+            return
+        end
+
+        local f = self:GetGuardedUnit()
+        if f and not f.Dead and f:IsUnitState('Building') then
+            local built = f:GetFocusUnit()
+            if built then
+                IssueClearCommands({self})
+                IssueRepair({self}, built)
+                IssueGuard({self}, f)
+            end
+        end
+    end,
+
+    CheckAssistersFocus = function(self)
+        for _, u in self:GetGuards() do
+            if u:IsUnitState('Repairing') then
+                u:CheckAssistFocus()
+            end
+        end
+    end,
+
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- We just started a construction (and haven't just been tasked to work on a half-done
         -- project.)
@@ -2106,7 +2130,19 @@ Unit = Class(moho.unit_methods) {
                 self:InheritWork(unitBeingBuilt)
             end
             self:SetUnitState('Repairing', true)
+
+            -- Force assist over repair when unit is assisting something
+            if built:GetFocusUnit() and built:IsUnitState('Building') then
+                self:ForkThread(function()
+                    self:CheckAssistFocus()
+                end)
+            end
+        elseif self:GetHealth() < self:GetMaxHealth() and table.getsize(self:GetGuards()) > 0 then
+            -- unit building something is damaged and has assisters, check their focus
+            self:CheckAssistersFocus()
         end
+
+
 
         local bp = self:GetBlueprint()
         if order ~= 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
