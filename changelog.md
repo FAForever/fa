@@ -6,6 +6,8 @@ Exploits
 
 - Instant crash exploit partially fixed
 
+- No longer possible to give away units in progress of being captured
+
 
 Bugs
 ----
@@ -20,9 +22,11 @@ Bugs
 
 - Support factories no longer lose progress if they are damaged during upgrade
 
-- Units with weapon range upgrades now stop at maximum range when using attack-move 
+- Units with weapon range upgrades now stop at maximum range when using attack-move
 
-- Aeon SCUs with nano + vet now get correct regen rate 
+- Aeon SCUs with nano + vet now get correct regen rate
+
+- Fixed wrong regen values being reported on UI-side
 
 - Disable build effect beams on sinking engineers
 
@@ -32,6 +36,8 @@ Bugs
 
 - Fixed bug with insta-disappearing wrecks due to garbage collect
 
+- UEF T3 Transport now leaves wreck in water
+
 - Cybran ACU can now fire the laser when standing in water
 
 - Fixed Seraphim T1 Mobile Artillery not firing at fast targets properly
@@ -40,15 +46,19 @@ Bugs
 
 - Optimised the range-rings shader to reduce the way FPS falls off a cliff
 
-- T3 Transport now leaves a wreck in water
-
 - Minimap now remembers whether to show resource icons or not
 
-- Current commandmode no longer reset if an engineer dies in the current selection 
+- Current commandmode no longer reset if an engineer dies in the current selection
 
 - Fix shots sometimes going right through Walled PD
 
 - Flares and depth-chages no longer draw in friendly projectiles
+
+- Fixed bug with capture progress bar not being synced if using multiple engineers
+
+- Yolonna Oss now deals damage to itself
+
+
 
 
 Enhancements
@@ -86,7 +96,8 @@ Enhancements
 - Added Yolona Oss to Mavor/Salvation/Scathis build restriction and renamed it
   Super-Game-Enders
 
-- New option: Show reclaim value of wreckage on map
+- New option: Show reclaim value of wreckage on map by pressing Ctrl-Shift
+  (need to enable it in Options / Interface and restart game)
 
 - ASF effects tweaked for performance (less effects on low fidelty)
 
@@ -101,6 +112,8 @@ Enhancements
 
 - Tiny changes to make Fatboy/Megalith/Spiderbot weapons symmetrical in
   behaviour where they should be
+
+- Now possible to pause units to make them pause execution of queued up orders
 
 
 Contributors
