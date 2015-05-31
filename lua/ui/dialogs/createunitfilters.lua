@@ -3,39 +3,13 @@ Filters = {
         title = 'Search',
         key = 'custominput',
         sortFunc = function(unitID, text)
-            local foundUnit = true
-            local txti = 1
-            for i = 1, string.len(unitID) do
-                if string.sub(text, txti, txti) == '' then
-                    break
-                end
-                if string.sub(unitID, i, i) == string.sub(text, txti, txti) then
-                    txti = txti + 1
-                elseif string.sub(text, txti, txti) == '*' then
-                    txti = txti + 1
-                else
-                    foundUnit = false
-                    break
-                end
+            local bp = __blueprints[unitID]
+            local desc = string.lower(LOC(bp.Description or ''))
+            local name = string.lower(LOC(bp.General.UnitName or ''))
+            text = string.lower(text)
+            if string.find(unitID, text) or string.find(desc, text) or string.find(name, text) then
+                return true
             end
-            local foundDesc = true
-            local txti = 1
-            local desc = string.lower(LOC(__blueprints[unitID].Description))
-            local textDesc = string.lower(text)
-            for i = 1, string.len(desc) do
-                if string.sub(textDesc, txti, txti) == '' then
-                    break
-                end
-                if string.sub(desc, i, i) == string.sub(textDesc, txti, txti) then
-                    txti = txti + 1
-                elseif string.sub(textDesc, txti, txti) == '*' then
-                    txti = txti + 1
-                else
-                    foundDesc = false
-                    break
-                end
-            end
-            return foundUnit or foundDesc
         end,
     },
     {

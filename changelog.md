@@ -115,6 +115,8 @@ Enhancements
 
 - Now possible to pause units to make them pause execution of queued up orders
 
+- Debug window: Searching for units now supports unit name and substrings 
+
 
 Contributors
 ------------
