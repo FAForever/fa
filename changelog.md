@@ -6,6 +6,8 @@ Exploits
 
 - Instant crash exploit partially fixed
 
+- No longer possible to give away units in progress of being captured
+
 
 Bugs
 ----
@@ -20,9 +22,9 @@ Bugs
 
 - Support factories no longer lose progress if they are damaged during upgrade
 
-- Units with weapon range upgrades now stop at maximum range when using attack-move 
+- Units with weapon range upgrades now stop at maximum range when using attack-move
 
-- Aeon SCUs with nano + vet now get correct regen rate 
+- Aeon SCUs with nano + vet now get correct regen rate
 
 - Disable build effect beams on sinking engineers
 
@@ -44,11 +46,13 @@ Bugs
 
 - Minimap now remembers whether to show resource icons or not
 
-- Current commandmode no longer reset if an engineer dies in the current selection 
+- Current commandmode no longer reset if an engineer dies in the current selection
 
 - Fix shots sometimes going right through Walled PD
 
 - Flares and depth-chages no longer draw in friendly projectiles
+
+- Fixed bug with capture progress bar not being synced if using multiple engineers
 
 
 Enhancements
