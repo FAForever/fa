@@ -40,21 +40,38 @@ end
 -- Gets the weapons of attackers, nil if not same units
 local function GetAttackerWeapons(forceReticle)
     local attackers = GetSelectedUnits()
-    local bp = nil
+    local returnWeapons = nil
 
     if attackers then
+        local doneIds = {}
+        local totalMaxRadius = 0
         for i, u in attackers do
             if forceReticle or EntityCategoryContains(categories.SHOWATTACKRETICLE, u) then
-                if not bp then
-                    bp = u:GetBlueprint()
-                elseif bp.BlueprintId ~= u:GetBlueprint().BlueprintId then
-                    return nil
+                local bp = u:GetBlueprint()
+                local Id = bp.BlueprintId
+                if not doneIds.Id then
+                    table.insert(doneIds, Id)
+
+                    local Weapons = bp.Weapon
+                    local MaxRadius = 0
+                    for k, v in Weapons do
+                        if v.DamageRadius then
+                            MaxRadius = math.max(v.DamageRadius, MaxRadius)
+                        end
+                        if v.NukeOuterRingRadius then
+                            MaxRadius = math.max(v.NukeOuterRingRadius, MaxRadius)
+                        end
+                    end
+                    if MaxRadius > totalMaxRadius then
+                        totalMaxRadius = MaxRadius
+                        returnWeapons = Weapons
+                    end
                 end
             end
         end
     end
-
-    return bp.Weapon
+    
+    return returnWeapons
 end
 
 local function NukeDecalFunc()
