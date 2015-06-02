@@ -5,7 +5,7 @@
 -- **
 -- **  Summary  :  Seraphim Sub Commander Script
 -- **
--- **  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+-- **  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
 local CommandUnit = import('/lua/defaultunits.lua').CommandUnit

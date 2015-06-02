@@ -5,7 +5,7 @@
 -- **
 -- **  Summary  :  UEF T2 Transport Script
 -- **
--- **  Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.
+-- **  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
 local explosion = import('/lua/defaultexplosions.lua')

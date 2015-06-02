@@ -5,7 +5,7 @@
 -- **
 -- **  Summary  :  Cybran T1 Air Transport Script
 -- **
--- **  Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.
+-- **  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
 local AirTransport = import('/lua/defaultunits.lua').AirTransport

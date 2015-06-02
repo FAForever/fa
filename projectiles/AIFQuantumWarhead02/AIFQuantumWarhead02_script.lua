@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  EMP Flux Warhead Impact effects projectile
 #**
-#**  Copyright © 2005,2006 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2005,2006 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell

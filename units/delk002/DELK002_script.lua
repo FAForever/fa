@@ -4,7 +4,7 @@
 #**
 #**  Summary  :  UEF T3 Anti-Air
 #**
-#**  Copyright © 2008 Blade Braver!
+#**  Copyright Â© 2008 Blade Braver!
 #****************************************************************************
 local TLandUnit = import('/lua/terranunits.lua').TLandUnit
 local TWeapons = import('/lua/terranweapons.lua')

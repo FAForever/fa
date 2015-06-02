@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Seraphim Destroyer Script
 #**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 local SSubUnit = import('/lua/seraphimunits.lua').SSubUnit
 local SeraphimWeapons = import('/lua/seraphimweapons.lua')

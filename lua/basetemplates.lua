@@ -5,7 +5,7 @@
 #**
 #**  Summary  : File with buildable locations for skirmish AI buildings
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 ########################################
 # Base Templates                       #

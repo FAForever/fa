@@ -5,7 +5,7 @@
 -- **
 -- **  Summary  :  Aeon Shield Disruptor Projectile, DAL0310
 -- **
--- **  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+-- **  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 local ADisruptorProjectile = import('/lua/aeonprojectiles.lua').AShieldDisruptorProjectile
 

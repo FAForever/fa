@@ -5,7 +5,7 @@
 #**
 #**  Summary  : The base weapon class for all weapons in the game.  Hooked for SC.
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local MohoWeapon = Weapon
