@@ -1718,27 +1718,6 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    OnFerryPointSet = function(self)
-        local bp = self:GetBlueprint().Audio
-        if bp then
-            local aiBrain = self:GetAIBrain()
-            local factionIndex = aiBrain:GetFactionIndex()
-            if factionIndex == 1 then
-                if bp['FerryPointSetByUEF'] then
-                    aiBrain:FerryPointSet(bp['FerryPointSetByUEF'])
-                end
-            elseif factionIndex == 2 then
-                if bp['FerryPointSetByAeon'] then
-                    aiBrain:FerryPointSet(bp['FerryPointSetByAeon'])
-                end
-            elseif factionIndex == 3 then
-                if bp['FerryPointSetByCybran'] then
-                    aiBrain:FerryPointSet(bp['FerryPointSetByCybran'])
-                end
-            end
-        end
-    end,
-
     --- Called under mysterous circumstances, previously held logic for nonexistent sound effects.
     OnDamageBy = function(self,index) end,
 
