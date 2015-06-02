@@ -660,19 +660,6 @@ options = {
             },
 
             {
-                title = "Smart Economy Indicators",
-                key = 'gui_smart_economy_indicators',
-                type = 'toggle',
-                default = 0,
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
-                    },
-                },
-            },
-
-            {
                 title = "Show reclaim mass value",
                 tip = "Ctrl+Shift shows value of reclaim on map",
                 key = 'gui_show_reclaim',
