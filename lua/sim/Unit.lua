@@ -3924,34 +3924,6 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    --Be sure to fork this
-    CheckCountedMissileAmmoIncrease = function(self)
-        --Polls the ammo count every 6 seconds
-        local nukeCount = self:GetNukeSiloAmmoCount() or 0
-        local lastTimeNukeCount = nukeCount
-        local tacticalCount = self:GetTacticalSiloAmmoCount() or 0
-        local lastTimeTacticalCount = tacticalCount
-        while not self.Dead do
-            nukeCount = self:GetNukeSiloAmmoCount() or 0
-            tacticalCount = self:GetTacticalSiloAmmoCount() or 0
-
-            if nukeCount > lastTimeNukeCount then
-                self:OnSMLAmmoIncrease()
-            end
-
-            if tacticalCount > lastTimeTacticalCount then
-                self:OnTMLAmmoIncrease()
-            end
-
-            lastTimeNukeCount = nukeCount
-            lastTimeTacticalCount = tacticalCount
-            WaitSeconds(6)
-        end
-    end,
-
-    OnTMLAmmoIncrease = function(self) end,
-    OnSMLAmmoIncrease = function(self) end,
-
     OnAttachedToTransport = function(self, transport, bone)
         self:DoUnitCallbacks( 'OnAttachedToTransport', transport )
         for i=1,transport:GetBoneCount() do
