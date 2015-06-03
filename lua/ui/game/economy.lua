@@ -409,14 +409,26 @@ function ConfigureBeatFunction()
             end
         end
 
+        -- The quantity of the appropriate resource that had been reclaimed at the end of the last
+        -- tick (captured into the returned closure).
+        local lastReclaim = 0
+
         -- Finally, glue all the bits together into a a resource-update function.
         return function()
             local econData = GetEconomyTotals()
             local simFrequency = GetSimTicksPerSecond()
 
             if showReclaim then
-                -- Show, if enabled, the reclaim values.
-                reclaimed:SetText(math.ceil(econData.reclaimed[resourceType]))
+                local totalReclaimed = math.ceil(econData.reclaimed[resourceType])
+
+                -- Reclaimed this tick
+                local thisTick = totalReclaimed - lastReclaim
+
+                -- The quantity we'd gain if we reclaimed at this rate for a full second.
+                local rate = thisTick * simFrequency
+
+                reclaimed:SetText(string.format("%d (%d/s)", totalReclaimed, rate))
+                lastReclaim = totalReclaimed
             end
 
             -- Extract the economy data from the economy data.
