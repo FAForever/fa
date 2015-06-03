@@ -3922,20 +3922,7 @@ Unit = Class(moho.unit_methods) {
                 end
             end
         end
-
     end,
-
-    OnCountedMissileLaunch = function(self, missileType)
-        --Called in defaultweapons.lua when a counted missile (tactical, nuke) is launched
-        if missileType == 'nuke' then
-            self:OnSMLaunched()
-        else
-            self:OnTMLaunched()
-        end
-    end,
-
-    OnTMLaunched = function(self) end,
-    OnSMLaunched = function(self) end,
 
     --Be sure to fork this
     CheckCountedMissileAmmoIncrease = function(self)

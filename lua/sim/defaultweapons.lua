@@ -131,7 +131,6 @@ DefaultProjectileWeapon = Class(Weapon) {
         end
 
         self:CheckBallisticAcceleration(proj)  -- Check weapon blueprint for trajectory fix request
-        self:CheckCountedMissileLaunch()
 
         return proj
     end,
@@ -167,18 +166,6 @@ DefaultProjectileWeapon = Class(Weapon) {
     -- Called on horizontal motion event
     PackAndMove = function(self)
         ChangeState(self, self.WeaponPackingState)
-    end,
-    
-    -- Differentiates between Tactical and Nuclear missiles
-    CheckCountedMissileLaunch = function(self)
-        local bp = self:GetBlueprint()
-        if bp.CountedProjectile then
-            if bp.NukeWeapon then
-                self.unit:OnCountedMissileLaunch('nuke')
-            else
-                self.unit:OnCountedMissileLaunch('tactical')
-            end
-        end
     end,
 
     -- Create an economy event for those weapons which require Energy to fire
