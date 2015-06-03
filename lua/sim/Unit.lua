@@ -3925,8 +3925,6 @@ Unit = Class(moho.unit_methods) {
 
     end,
 
-    OnTimedEvent = function(self, interval, passData) end,
-
     OnCountedMissileLaunch = function(self, missileType)
         --Called in defaultweapons.lua when a counted missile (tactical, nuke) is launched
         if missileType == 'nuke' then
@@ -3967,16 +3965,7 @@ Unit = Class(moho.unit_methods) {
     OnTMLAmmoIncrease = function(self) end,
     OnSMLAmmoIncrease = function(self) end,
 
-    -------------------------------------------------------------------------------------------
-    -- SHIELDS
-    -------------------------------------------------------------------------------------------
-    -- Added by brute51, fires shield events for units. The other shield events don't run at the correct times (Too early)
-    OnShieldIsUp = function(self) end,
-    OnShieldIsDown = function(self) end,
-    OnShieldIsCharging = function(self) end,
-
     OnAttachedToTransport = function(self, transport, bone)
-
         self:DoUnitCallbacks( 'OnAttachedToTransport', transport )
         for i=1,transport:GetBoneCount() do
             if transport:GetBoneName(i) == bone then
@@ -3997,10 +3986,6 @@ Unit = Class(moho.unit_methods) {
         transport.slotsFree[self.attachmentBone] = true
         self.attachmentBone = nil
     end,
-
-
-    OnTeleportCharging = function(self, location) end,
-    OnTeleported = function(self, location)  end,
 
     OnShieldEnabled = function(self)
         WARN("Deprecated function unit:OnShieldEnabled() called")
