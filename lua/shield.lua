@@ -367,6 +367,8 @@ Shield = Class(moho.shield_methods,Entity) {
                 end
             end
 
+            self.Owner:OnShieldEnabled()
+
             -- We are no longer turned off
             self.OffHealth = -1
             
@@ -416,6 +418,8 @@ Shield = Class(moho.shield_methods,Entity) {
     -- When manually turned off
     OffState = State {
         Main = function(self)
+            self.Owner:OnShieldDisabled()
+
             -- No regen during off state
             if self.RegenThread then
                 KillThread(self.RegenThread)
@@ -445,6 +449,7 @@ Shield = Class(moho.shield_methods,Entity) {
         Main = function(self)
             self:RemoveShield()
 
+            self.Owner:OnShieldDisabled()
             self.Owner:PlayUnitSound('ShieldOff')
             
             -- We must make the unit charge up before getting its shield back
@@ -465,6 +470,8 @@ Shield = Class(moho.shield_methods,Entity) {
     EnergyDrainRechargeState = State {
         Main = function(self)
             self:RemoveShield()
+
+            self.Owner:OnShieldDisabled()
             self.Owner:PlayUnitSound('ShieldOff')
 
             self:ChargingUp(0, self.ShieldEnergyDrainRechargeTime)
