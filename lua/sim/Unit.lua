@@ -3944,5 +3944,8 @@ Unit = Class(moho.unit_methods) {
         self:DoUnitCallbacks( 'OnDetachedToTransport', transport )
         transport.slotsFree[self.attachmentBone] = true
         self.attachmentBone = nil
-    end
+    end,
+
+    OnShieldEnabled = function(self) end,
+    OnShieldDisabled = function(self) end
 }
