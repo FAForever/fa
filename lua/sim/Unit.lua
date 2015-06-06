@@ -3944,13 +3944,5 @@ Unit = Class(moho.unit_methods) {
         self:DoUnitCallbacks( 'OnDetachedToTransport', transport )
         transport.slotsFree[self.attachmentBone] = true
         self.attachmentBone = nil
-    end,
-
-    OnShieldEnabled = function(self)
-        WARN("Deprecated function unit:OnShieldEnabled() called")
-    end,
-
-    OnShieldDisabled = function(self)
-        WARN("Deprecated function unit:OnShieldDisabled() called")
-    end,
+    end
 }
