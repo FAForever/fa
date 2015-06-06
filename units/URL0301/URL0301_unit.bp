@@ -2,10 +2,10 @@ UnitBlueprint {
     AI = {
         GuardRadius = 10,
         TargetBones = {
+            'Torso',
             'Head',
             'Right_Arm01',
             'Left_Arm01',
-            'Torso',
             'Left_Thigh',
             'Right_Thigh',
         },
