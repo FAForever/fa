@@ -44,6 +44,8 @@ Bugs
 
 - Fixed SCUs not being hit properly by laser weapons
 
+- Fixed units aiming too high on the UEF and Aeon SCUs
+
 - Optimised the range-rings shader to reduce the way FPS falls off a cliff
 
 - Minimap now remembers whether to show resource icons or not
@@ -57,6 +59,8 @@ Bugs
 - Fixed bug with capture progress bar not being synced if using multiple engineers
 
 - Yolonna Oss now deals damage to itself
+
+- Fixed shield structure glows and rotations not playing
 
 
 
@@ -109,7 +113,9 @@ Enhancements
 - Reclaimed mass now counts towards the score table
 
 - Reclaim/second now shown
+
 - UEF ACU and SCU drones now have an on-drone button to toggle if they are rebuilt at death
+
 - UEF SCU Drone can now capture, the same as the ACU ones
 
 - Tiny changes to make Fatboy/Megalith/Spiderbot weapons symmetrical in
@@ -117,7 +123,11 @@ Enhancements
 
 - Now possible to pause units to make them pause execution of queued up orders
 
-- Debug window: Searching for units now supports unit name and substrings 
+- Debug window: Searching for units now supports unit name and substrings
+
+- Cybran engineering build bots now crash when their owner dies rather than just vanishing
+
+- Cybran engineering build bots no longer display the heads-up consumption overlay
 
 
 Contributors
