@@ -463,8 +463,6 @@ function SpawnBuildBots( builder, unitBeingBuilt, BuildEffectsBag)
         end
 
         return builder.buildBots
-	else
-		return
 	end
 end
 

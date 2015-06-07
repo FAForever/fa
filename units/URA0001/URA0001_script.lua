@@ -39,6 +39,9 @@ URA0001 = Class(CAirUnit) {
         ChangeState(self, self.IdleState)
     end,
 
+    -- Prevent the unit from reporting consumption values (avoids junk in the resource overlay)
+    UpdateConsumptionValues = function() end,
+
     IdleState = State {
         Main = function(self)
             IssueClearCommands({self})
