@@ -274,19 +274,10 @@ local slotMenuData = {
     },
 }
 
-local function GetAITooltipList()
-    local aitypes = import('/lua/ui/lobby/aitypes.lua').aitypes
-    local retTable = {nil, nil}
-    --end new faf part
-    for i, v in aitypes do
-        table.insert(retTable, 'aitype_'..v.key)
-    end
-    return retTable
-end
-
 local function GetSlotMenuTables(stateKey, hostKey)
     local keys = {}
     local strings = {}
+    local tooltips = {}
 
     if not slotMenuData[stateKey] then
         WARN("Invalid slot menu state selected: " .. stateKey)
@@ -312,22 +303,26 @@ local function GetSlotMenuTables(stateKey, hostKey)
             for aiindex, aidata in aitypes do
                 table.insert(keys, aidata.key)
                 table.insert(strings, aidata.name)
+                table.insert(tooltips, 'aitype_'..aidata.key)
             end
         elseif key == 'move' then
             -- Generate the "move player to slot X" entries.
             for i = 1, numOpenSlots, 1 do
                 table.insert(keys, 'move_player_to_slot' .. i)
                 table.insert(strings, LOCF("<LOC lobui_0596>Move Player to slot %s", i))
+                table.insert(tooltips, nil)
             end
         else
             if not (isPlayerReady and key == 'occupy') then
                 table.insert(keys, key)
                 table.insert(strings, slotMenuStrings[key])
+                -- Add a tooltip key here if we ever get any interesting options.
+                table.insert(tooltips, nil)
             end
         end
     end
 
-    return keys, strings
+    return keys, strings, tooltips
 end
 
 --- Get the value of the LastFaction, sanitised in case it's an unsafe value.
@@ -803,19 +798,17 @@ function SetSlotInfo(slotNum, playerInfo)
 
     if slotState then
         slot.name:Enable()
-        local slotKeys, slotStrings = GetSlotMenuTables(slotState, hostKey)
+        local slotKeys, slotStrings, slotTooltips = GetSlotMenuTables(slotState, hostKey)
         slot.name.slotKeys = slotKeys
-        if isHost and slotState == 'ai' then
-            Tooltip.AddComboTooltip(slot.name, GetAITooltipList())
-        else
-            Tooltip.RemoveComboTooltip(slot.name)
-        end
+
         if table.getn(slotKeys) > 0 then
             slot.name:AddItems(slotStrings)
             slot.name:Enable()
+            Tooltip.AddComboTooltip(slot.name, slotTooltips)
         else
             slot.name.slotKeys = nil
             slot.name:Disable()
+            Tooltip.RemoveComboTooltip(slot.name)
         end
     else
         -- no slotState indicate this must be ourself, and you can't do anything to yourself
@@ -945,7 +938,7 @@ function ClearSlotInfo(slotIndex)
         stateText = slotMenuStrings.open
     end
 
-    local slotKeys, slotStrings = GetSlotMenuTables(stateKey, hostKey)
+    local slotKeys, slotStrings, slotTooltips = GetSlotMenuTables(stateKey, hostKey)
 
     -- set the text appropriately
     slot.name:ClearItems()
@@ -953,10 +946,12 @@ function ClearSlotInfo(slotIndex)
     if table.getn(slotKeys) > 0 then
         slot.name.slotKeys = slotKeys
         slot.name:AddItems(slotStrings)
+        Tooltip.AddComboTooltip(slot.name, slotTooltips)
         slot.name:Enable()
     else
         slot.name.slotKeys = nil
         slot.name:Disable()
+        Tooltip.RemoveComboTooltip(slot.name)
     end
 
     slot.name._text:SetFont('Arial Gras', 12)
@@ -964,12 +959,6 @@ function ClearSlotInfo(slotIndex)
         slot.name:SetTitleTextColor("Crimson")
     else
         slot.name:SetTitleTextColor('B9BFB9')
-    end
-
-    if lobbyComm:IsHost() and stateKey == 'open' then
-        Tooltip.AddComboTooltip(slot.name, GetAITooltipList())
-    else
-        Tooltip.RemoveComboTooltip(slot.name)
     end
 
     slot:HideControls()
