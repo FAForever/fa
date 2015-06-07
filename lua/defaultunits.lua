@@ -1817,7 +1817,7 @@ SeaUnit = Class(MobileUnit){
 
 
 ---------------------------------------------------------------
---  HOVERING LAND UNITS   --return this entire section to HoverLandUnit = Class(MobileUnit){} if it does not work
+--  HOVERING LAND UNITS
 ---------------------------------------------------------------
 
 HoverLandUnit = Class(MobileUnit) {
