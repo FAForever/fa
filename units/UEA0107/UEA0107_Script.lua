@@ -11,7 +11,7 @@
 local explosion = import('/lua/defaultexplosions.lua')
 local util = import('/lua/utilities.lua')
 
-local AirTransport = import('/lua/defaultunits.lua').AirTransport
+local AirTransport = import('/lua/sim/units/AirTransportUnit.lua').AirTransportUnit
 
 UEA0107 = Class(AirTransport) {
         AirDestructionEffectBones = { 'Front_Right_Exhaust','Front_Left_Exhaust','Back_Right_Exhaust','Back_Left_Exhaust',

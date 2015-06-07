@@ -10,25 +10,35 @@
 ----------------------------------------------------------------------------
 -- CYBRAN DEFAULT UNITS
 ----------------------------------------------------------------------------
-local DefaultUnitsFile = import('defaultunits.lua')
-local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
-local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
-local AirUnit = DefaultUnitsFile.AirUnit
-local ConcreteStructureUnit = DefaultUnitsFile.ConcreteStructureUnit
-local ConstructionUnit = DefaultUnitsFile.ConstructionUnit
-local EnergyStorageUnit = DefaultUnitsFile.EnergyStorageUnit
-local LandFactoryUnit = DefaultUnitsFile.LandFactoryUnit
-local SeaFactoryUnit = DefaultUnitsFile.SeaFactoryUnit
-local SeaUnit = DefaultUnitsFile.SeaUnit
-local ShieldLandUnit = DefaultUnitsFile.ShieldLandUnit
-local ShieldStructureUnit = DefaultUnitsFile.ShieldStructureUnit
-local StructureUnit = DefaultUnitsFile.StructureUnit
-local QuantumGateUnit = DefaultUnitsFile.QuantumGateUnit
-local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
+local AirFactoryUnit = import('/lua/sim/units/AirFactoryUnit.lua').AirFactoryUnit
+local AirStagingPlatformUnit = import('/lua/sim/units/AirStagingPlatformUnit.lua').AirStagingPlatformUnit
+local AirUnit = import('/lua/sim/units/AirUnit.lua').AirUnit
+local ConcreteStructureUnit = import('/lua/sim/units/ConcreteStructureUnit.lua').ConcreteStructureUnit
+local ConstructionUnit = import('/lua/sim/units/ConstructionUnit.lua').ConstructionUnit
+local EnergyStorageUnit = import('/lua/sim/units/EnergyStorageUnit.lua').EnergyStorageUnit
+local EnergyCreationUnit = import('/lua/sim/units/EnergyCreationUnit.lua').EnergyCreationUnit
+local LandUnit = import('/lua/sim/units/LandUnit.lua').LandUnit
+local LandFactoryUnit = import('/lua/sim/units/LandFactoryUnit.lua').LandFactoryUnit
+local SeaFactoryUnit = import('/lua/sim/units/SeaFactoryUnit.lua').SeaFactoryUnit
+local SeaUnit = import('/lua/sim/units/SeaUnit.lua').SeaUnit
+local ShieldLandUnit = import('/lua/sim/units/ShieldLandUnit.lua').ShieldLandUnit
+local ShieldStructureUnit = import('/lua/sim/units/ShieldStructureUnit.lua').ShieldStructureUnit
+local StructureUnit = import('/lua/sim/units/StructureUnit.lua').StructureUnit
+local SubUnit = import('/lua/sim/units/SubUnit.lua').SubUnit
+local QuantumGateUnit = import('/lua/sim/units/QuantumGateUnit.lua').QuantumGateUnit
+local RadarJammerUnit = import('/lua/sim/units/RadarJammerUnit.lua').RadarJammerUnit
+local MassCollectionUnit = import('/lua/sim/units/MassCollectionUnit.lua').MassCollectionUnit
+local MassFabricationUnit = import('/lua/sim/units/MassFabricationUnit.lua').MassFabricationUnit
+local MassStorageUnit = import('/lua/sim/units/MassStorageUnit.lua').MassStorageUnit
+local RadarUnit = import('/lua/sim/units/RadarUnit.lua').RadarUnit
+local SonarUnit = import('/lua/sim/units/SonarUnit.lua').SonarUnit
+local TransportBeaconUnit = import('/lua/sim/units/TransportBeaconUnit.lua').TransportBeaconUnit
+local WalkingLandUnit = import('/lua/sim/units/WalkingLandUnit.lua').WalkingLandUnit
+local WallStructureUnit = import('/lua/sim/units/WallStructureUnit.lua').WallStructureUnit
 
-local Util = import('utilities.lua')
+local Util = import('/lua/utilities.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
-local EffectUtil = import('EffectUtilities.lua')
+local EffectUtil = import('/lua/EffectUtilities.lua')
 local CreateCybranBuildBeams = EffectUtil.CreateCybranBuildBeams
 
 ---------------------------------------------------------------
@@ -147,10 +157,10 @@ CConstructionUnit = Class(ConstructionUnit){
 ---------------------------------------------------------------
 --  ENERGY CREATION UNITS
 ---------------------------------------------------------------
-CEnergyCreationUnit = Class(DefaultUnitsFile.EnergyCreationUnit) {
+CEnergyCreationUnit = Class(EnergyCreationUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
-        DefaultUnitsFile.EnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
+        EnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
         if self.AmbientEffects then
             for k, v in EffectTemplate[self.AmbientEffects] do
                 CreateAttachedEmitter(self, 0, self:GetArmy(), v)
@@ -212,32 +222,32 @@ CLandFactoryUnit = Class(LandFactoryUnit) {
 ---------------------------------------------------------------
 --  LAND UNITS
 ---------------------------------------------------------------
-CLandUnit = Class(DefaultUnitsFile.LandUnit) {}
+CLandUnit = Class(LandUnit) {}
 
 ---------------------------------------------------------------
 --  MASS COLLECTION UNITS
 ---------------------------------------------------------------
-CMassCollectionUnit = Class(DefaultUnitsFile.MassCollectionUnit) {}
+CMassCollectionUnit = Class(MassCollectionUnit) {}
 
 ---------------------------------------------------------------
 --   MASS FABRICATION UNITS
 ---------------------------------------------------------------
-CMassFabricationUnit = Class(DefaultUnitsFile.MassFabricationUnit) {}
+CMassFabricationUnit = Class(MassFabricationUnit) {}
 
 ---------------------------------------------------------------
 --   MASS STORAGE UNITS
 ---------------------------------------------------------------
-CMassStorageUnit = Class(DefaultUnitsFile.MassStorageUnit) {}
+CMassStorageUnit = Class(MassStorageUnit) {}
 
 ---------------------------------------------------------------
 --  RADAR STRUCTURES
 ---------------------------------------------------------------
-CRadarUnit = Class(DefaultUnitsFile.RadarUnit) {}
+CRadarUnit = Class(RadarUnit) {}
 
 ---------------------------------------------------------------
 --  SONAR STRUCTURES
 ---------------------------------------------------------------
-CSonarUnit = Class(DefaultUnitsFile.SonarUnit) {}
+CSonarUnit = Class(SonarUnit) {}
 
 ---------------------------------------------------------------
 --  SEA FACTORY STRUCTURES
@@ -316,22 +326,22 @@ CStructureUnit = Class(StructureUnit) {}
 ---------------------------------------------------------------
 --  SUBMARINE UNITS
 ---------------------------------------------------------------
-CSubUnit = Class(DefaultUnitsFile.SubUnit) {}
+CSubUnit = Class(SubUnit) {}
 
 ---------------------------------------------------------------
 --  TRANSPORT BEACON UNITS
 ---------------------------------------------------------------
-CTransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
+CTransportBeaconUnit = Class(TransportBeaconUnit) {}
 
 ---------------------------------------------------------------
 --  WALKING LAND UNITS
 ---------------------------------------------------------------
-CWalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
+CWalkingLandUnit = WalkingLandUnit
 
 ---------------------------------------------------------------
 --  WALL  STRUCTURES
 ---------------------------------------------------------------
-CWallStructureUnit = Class(DefaultUnitsFile.WallStructureUnit) {}
+CWallStructureUnit = Class(WallStructureUnit) {}
 
 ---------------------------------------------------------------
 --  CIVILIAN STRUCTURES
@@ -404,7 +414,6 @@ CConstructionEggUnit = Class(CStructureUnit) {
         end
     end,
 }
-
 
 --TODO: This should be made more general and put in defaultunits.lua in case other factions get similar buildings
 ----------------------------------------------------------------------------------------------------------------------------

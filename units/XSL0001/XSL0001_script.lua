@@ -7,7 +7,7 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
+local ACUUnit = import('/lua/sim/units/ACUUnit.lua').ACUUnit
 local Buff = import('/lua/sim/Buff.lua')
 local SWeapons = import('/lua/seraphimweapons.lua')
 local SDFChronotronCannonWeapon = SWeapons.SDFChronotronCannonWeapon

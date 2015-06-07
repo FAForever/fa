@@ -7,7 +7,7 @@
 --**
 --****************************************************************************
 
-local Util = import('utilities.lua')
+local Util = import('/lua/utilities.lua')
 
 local largestShieldDiameter = 120
 local overspills = {}

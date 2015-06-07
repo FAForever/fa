@@ -5,7 +5,7 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 local Shield = import('/lua/shield.lua').Shield
-local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
+local ACUUnit = import('/lua/sim/units/ACUUnit.lua').ACUUnit
 local TerranWeaponFile = import('/lua/terranweapons.lua')
 local TDFZephyrCannonWeapon = TerranWeaponFile.TDFZephyrCannonWeapon
 local TIFCommanderDeathWeapon = TerranWeaponFile.TIFCommanderDeathWeapon

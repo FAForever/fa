@@ -8,7 +8,7 @@
 -- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
-local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
+local ACUUnit = import('/lua/sim/units/ACUUnit.lua').ACUUnit
 local AWeapons = import('/lua/aeonweapons.lua')
 local ADFDisruptorCannonWeapon = AWeapons.ADFDisruptorCannonWeapon
 local AIFCommanderDeathWeapon = AWeapons.AIFCommanderDeathWeapon

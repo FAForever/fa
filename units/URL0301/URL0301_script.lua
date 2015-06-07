@@ -7,7 +7,7 @@
 -- **
 -- **  Copyright Š 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
-local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
+local CommandUnit = import('/lua/sim/units/CommandUnit.lua').CommandUnit
 local CWeapons = import('/lua/cybranweapons.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local Buff = import('/lua/sim/Buff.lua')

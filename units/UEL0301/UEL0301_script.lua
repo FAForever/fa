@@ -6,7 +6,7 @@
 -----------------------------------------------------------------
 local Shield = import('/lua/shield.lua').Shield
 local EffectUtil = import('/lua/EffectUtilities.lua')
-local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
+local CommandUnit = import('/lua/sim/units/CommandUnit.lua').CommandUnit
 local TWeapons = import('/lua/terranweapons.lua')
 local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
 local TIFCommanderDeathWeapon = TWeapons.TIFCommanderDeathWeapon

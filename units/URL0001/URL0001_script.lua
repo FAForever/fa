@@ -8,7 +8,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
+local ACUUnit = import('/lua/sim/units/ACUUnit.lua').ACUUnit
 local CWeapons = import('/lua/cybranweapons.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
 

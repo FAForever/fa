@@ -1,44 +1,50 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/aeonunits.lua
-#**  Author(s): John Comes, Gordon Duclos
-#**
-#**  Summary  :
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
-#--------------------------------------------------------------------------
-# AEON DEFAULT UNITS
-#--------------------------------------------------------------------------
-local DefaultUnitsFile = import('defaultunits.lua')
-local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
-local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
-local AirUnit = DefaultUnitsFile.AirUnit
-local ConcreteStructureUnit = DefaultUnitsFile.ConcreteStructureUnit
-local ConstructionUnit = DefaultUnitsFile.ConstructionUnit
-local EnergyCreationUnit = DefaultUnitsFile.EnergyCreationUnit
-local EnergyStorageUnit = DefaultUnitsFile.EnergyStorageUnit
-local LandFactoryUnit = DefaultUnitsFile.LandFactoryUnit
-local MassCollectionUnit = DefaultUnitsFile.MassCollectionUnit
-local MassFabricationUnit = DefaultUnitsFile.MassFabricationUnit
-local MassStorageUnit = DefaultUnitsFile.MassStorageUnit
-local RadarUnit = DefaultUnitsFile.RadarUnit
-local SeaFactoryUnit = DefaultUnitsFile.SeaFactoryUnit
-local ShieldHoverLandUnit = DefaultUnitsFile.ShieldHoverLandUnit
-local ShieldLandUnit = DefaultUnitsFile.ShieldLandUnit
-local ShieldStructureUnit = DefaultUnitsFile.ShieldStructureUnit
-local SonarUnit = DefaultUnitsFile.SonarUnit
-local StructureUnit = DefaultUnitsFile.StructureUnit
-local QuantumGateUnit = DefaultUnitsFile.QuantumGateUnit
-local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
+--****************************************************************************
+--**
+--**  File     :  /lua/aeonunits.lua
+--**  Author(s): John Comes, Gordon Duclos
+--**
+--**  Summary  :
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
+----------------------------------------------------------------------------
+-- AEON DEFAULT UNITS
+----------------------------------------------------------------------------
+local AirFactoryUnit = import('/lua/sim/units/AirFactoryUnit.lua').AirFactoryUnit
+local AirStagingPlatformUnit = import('/lua/sim/units/AirStagingPlatformUnit.lua').AirStagingPlatformUnit
+local AirUnit = import('/lua/sim/units/AirUnit.lua').AirUnit
+local ConcreteStructureUnit = import('/lua/sim/units/ConcreteStructureUnit.lua').ConcreteStructureUnit
+local ConstructionUnit = import('/lua/sim/units/ConstructionUnit.lua').ConstructionUnit
+local EnergyCreationUnit = import('/lua/sim/units/EnergyCreationUnit.lua').EnergyCreationUnit
+local EnergyStorageUnit = import('/lua/sim/units/EnergyStorageUnit.lua').EnergyStorageUnit
+local HoverLandUnit = import('/lua/sim/units/HoverLandUnit.lua').HoverLandUnit
+local LandUnit = import('/lua/sim/units/LandUnit.lua').LandUnit
+local LandFactoryUnit = import('/lua/sim/units/LandFactoryUnit.lua').LandFactoryUnit
+local MassCollectionUnit = import('/lua/sim/units/MassCollectionUnit.lua').MassCollectionUnit
+local MassFabricationUnit = import('/lua/sim/units/MassFabricationUnit.lua').MassFabricationUnit
+local MassStorageUnit = import('/lua/sim/units/MassStorageUnit.lua').MassStorageUnit
+local RadarUnit = import('/lua/sim/units/RadarUnit.lua').RadarUnit
+local SeaUnit = import('/lua/sim/units/SeaUnit.lua').SeaUnit
+local SeaFactoryUnit = import('/lua/sim/units/SeaFactoryUnit.lua').SeaFactoryUnit
+local ShieldHoverLandUnit = import('/lua/sim/units/ShieldHoverLandUnit.lua').ShieldHoverLandUnit
+local ShieldLandUnit = import('/lua/sim/units/ShieldLandUnit.lua').ShieldLandUnit
+local ShieldStructureUnit = import('/lua/sim/units/ShieldStructureUnit.lua').ShieldStructureUnit
+local SonarUnit = import('/lua/sim/units/SonarUnit.lua').SonarUnit
+local StructureUnit = import('/lua/sim/units/StructureUnit.lua').StructureUnit
+local SubUnit = import('/lua/sim/units/SubUnit.lua').SubUnit
+local TransportBeaconUnit = import('/lua/sim/units/TransportBeaconUnit.lua').TransportBeaconUnit
+local QuantumGateUnit = import('/lua/sim/units/QuantumGateUnit.lua').QuantumGateUnit
+local RadarJammerUnit = import('/lua/sim/units/RadarJammerUnit.lua').RadarJammerUnit
+local WallStructureUnit = import('/lua/sim/units/WallStructureUnit.lua').WallStructureUnit
+local WalkingLandUnit = import('/lua/sim/units/WalkingLandUnit.lua').WalkingLandUnit
 
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local CreateAeonFactoryBuildingEffects = EffectUtil.CreateAeonFactoryBuildingEffects
 
-#-------------------------------------------------------------
-#  AIR STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  AIR STRUCTURES
+---------------------------------------------------------------
 AAirFactoryUnit = Class(AirFactoryUnit) {
     StartBuildFx = function( self, unitBeingBuilt )
         local thread = self:ForkThread( EffectUtil.CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag )
@@ -46,27 +52,27 @@ AAirFactoryUnit = Class(AirFactoryUnit) {
     end,
 }
 
-#-------------------------------------------------------------
-#  AIR UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  AIR UNITS
+---------------------------------------------------------------
 AAirUnit = Class(AirUnit) {}
 
-#-------------------------------------------------------------
-#  AIR STAGING STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  AIR STAGING STRUCTURES
+---------------------------------------------------------------
 AAirStagingPlatformUnit = Class(AirStagingPlatformUnit) {}
 
-#-------------------------------------------------------------
-#  WALL  STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  WALL  STRUCTURES
+---------------------------------------------------------------
 AConcreteStructureUnit = Class(ConcreteStructureUnit) {
     AdjacencyBeam = false,
 
 }
 
-#-------------------------------------------------------------
-#  Construction Units
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  Construction Units
+---------------------------------------------------------------
 AConstructionUnit = Class(ConstructionUnit) {
     CreateBuildEffects = function( self, unitBeingBuilt, order )
         EffectUtil.CreateAeonConstructionUnitBuildingEffects( self, unitBeingBuilt, self.BuildEffectsBag )
@@ -74,9 +80,9 @@ AConstructionUnit = Class(ConstructionUnit) {
 }
 
 
-#-------------------------------------------------------------
-#  ENERGY CREATION UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  ENERGY CREATION UNITS
+---------------------------------------------------------------
 AEnergyCreationUnit = Class(EnergyCreationUnit) {
 
     OnCreate = function(self)
@@ -95,24 +101,24 @@ AEnergyCreationUnit = Class(EnergyCreationUnit) {
     end,
 }
 
-#-------------------------------------------------------------
-# ENERGY STORAGE STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+-- ENERGY STORAGE STRUCTURES
+---------------------------------------------------------------
 AEnergyStorageUnit = Class(EnergyStorageUnit) {
 }
 
-#-------------------------------------------------------------
-#  HOVERING LAND UNITS
-#-------------------------------------------------------------
-AHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
+---------------------------------------------------------------
+--  HOVERING LAND UNITS
+---------------------------------------------------------------
+AHoverLandUnit = Class(HoverLandUnit) {
     FxHoverScale = 1,
     HoverEffects = nil,
     HoverEffectBones = nil,
 }
 
-#-------------------------------------------------------------
-#  LAND FACTORY STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  LAND FACTORY STRUCTURES
+---------------------------------------------------------------
 ALandFactoryUnit = Class(LandFactoryUnit) {
     StartBuildFx = function( self, unitBeingBuilt )
         local thread = self:ForkThread( EffectUtil.CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag )
@@ -120,43 +126,43 @@ ALandFactoryUnit = Class(LandFactoryUnit) {
     end,
 }
 
-#-------------------------------------------------------------
-#  LAND UNITS
-#-------------------------------------------------------------
-ALandUnit = Class(DefaultUnitsFile.LandUnit) { }
+---------------------------------------------------------------
+--  LAND UNITS
+---------------------------------------------------------------
+ALandUnit = Class(LandUnit) { }
 
-#-------------------------------------------------------------
-#  MASS COLLECTION UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  MASS COLLECTION UNITS
+---------------------------------------------------------------
 AMassCollectionUnit = Class(MassCollectionUnit) {
 }
 
-#-------------------------------------------------------------
-#  MASS FABRICATION STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  MASS FABRICATION STRUCTURES
+---------------------------------------------------------------
 AMassFabricationUnit = Class(MassFabricationUnit) {
 }
 
-#-------------------------------------------------------------
-#  MASS STORAGE UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  MASS STORAGE UNITS
+---------------------------------------------------------------
 AMassStorageUnit = Class(MassStorageUnit) {
 }
 
-#-------------------------------------------------------------
-#  RADAR STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  RADAR STRUCTURES
+---------------------------------------------------------------
 ARadarUnit = Class(RadarUnit) {
 }
 
-#-------------------------------------------------------------
-#  RADAR STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  RADAR STRUCTURES
+---------------------------------------------------------------
 ASonarUnit = Class(SonarUnit) {}
 
-#-------------------------------------------------------------
-#  SEA FACTORY STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  SEA FACTORY STRUCTURES
+---------------------------------------------------------------
 ASeaFactoryUnit = Class(SeaFactoryUnit) {
     StartBuildFx = function( self, unitBeingBuilt )
         local thread = self:ForkThread( EffectUtil.CreateAeonFactoryBuildingEffects, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, 'Attachpoint01', self.BuildEffectsBag )
@@ -164,25 +170,24 @@ ASeaFactoryUnit = Class(SeaFactoryUnit) {
     end,	
 }
 
+---------------------------------------------------------------
+--  SEA UNITS
+---------------------------------------------------------------
+ASeaUnit = Class(SeaUnit) {}
 
-#-------------------------------------------------------------
-#  SEA UNITS
-#-------------------------------------------------------------
-ASeaUnit = Class(DefaultUnitsFile.SeaUnit) {}
-
-#-------------------------------------------------------------
-#  SHIELD LAND UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  SHIELD LAND UNITS
+---------------------------------------------------------------
 AShieldHoverLandUnit = Class(ShieldHoverLandUnit) {}
 
-#-------------------------------------------------------------
-#  SHIELD LAND UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  SHIELD LAND UNITS
+---------------------------------------------------------------
 AShieldLandUnit = Class(ShieldLandUnit) {}
 
-#-------------------------------------------------------------
-#  SHIELD STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  SHIELD STRUCTURES
+---------------------------------------------------------------
 AShieldStructureUnit = Class(ShieldStructureUnit) {
     
     RotateSpeed = 60,
@@ -219,49 +224,47 @@ AShieldStructureUnit = Class(ShieldStructureUnit) {
 
 }
 
-#-------------------------------------------------------------
-#  STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  STRUCTURES
+---------------------------------------------------------------
 AStructureUnit = Class(StructureUnit) {}
 
-#-------------------------------------------------------------
-#  SUBMARINE UNITS
-#-------------------------------------------------------------
-ASubUnit = Class(DefaultUnitsFile.SubUnit) {
-
+---------------------------------------------------------------
+--  SUBMARINE UNITS
+---------------------------------------------------------------
+ASubUnit = Class(SubUnit) {
     IdleSubBones = {},
     IdleSubEffects = {}
 }
 
+---------------------------------------------------------------
+--  TRANSPORT BEACON UNITS
+---------------------------------------------------------------
+ATransportBeaconUnit = Class(TransportBeaconUnit) {}
 
-#-------------------------------------------------------------
-#  TRANSPORT BEACON UNITS
-#-------------------------------------------------------------
-ATransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
+---------------------------------------------------------------
+--  WALKING LAND UNITS
+---------------------------------------------------------------
+AWalkingLandUnit = WalkingLandUnit
 
-#-------------------------------------------------------------
-#  WALKING LAND UNITS
-#-------------------------------------------------------------
-AWalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
+---------------------------------------------------------------
+--  WALL  STRUCTURES
+---------------------------------------------------------------
+AWallStructureUnit = Class(WallStructureUnit) {}
 
-#-------------------------------------------------------------
-#  WALL  STRUCTURES
-#-------------------------------------------------------------
-AWallStructureUnit = Class(DefaultUnitsFile.WallStructureUnit) {}
-
-#-------------------------------------------------------------
-#  CIVILIAN STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  CIVILIAN STRUCTURES
+---------------------------------------------------------------
 ACivilianStructureUnit = Class(AStructureUnit) {}
 
-#-------------------------------------------------------------
-#  QUANTUM GATE UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  QUANTUM GATE UNITS
+---------------------------------------------------------------
 AQuantumGateUnit = Class(QuantumGateUnit) {}
 
-#-------------------------------------------------------------
-#  RADAR JAMMER UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  RADAR JAMMER UNITS
+---------------------------------------------------------------
 ARadarJammerUnit = Class(RadarJammerUnit) {
     
     RotateSpeed = 60,

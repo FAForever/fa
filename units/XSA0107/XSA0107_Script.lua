@@ -8,7 +8,7 @@
 -- **  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
-local AirTransport = import('/lua/defaultunits.lua').AirTransport
+local AirTransport = import('/lua/sim/units/AirTransportUnit.lua').AirTransportUnit
 
 XSA0107 = Class(AirTransport) {
     Weapons = {},

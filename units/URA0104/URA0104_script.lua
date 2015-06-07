@@ -8,7 +8,7 @@
 -- **  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
-local AirTransport = import('/lua/defaultunits.lua').AirTransport
+local AirTransport = import('/lua/sim/units/AirTransportUnit.lua').AirTransportUnit
 local explosion = import('/lua/defaultexplosions.lua')
 local util = import('/lua/utilities.lua')
 local Weapon = import('/lua/sim/Weapon.lua').Weapon

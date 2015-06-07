@@ -1,53 +1,54 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/terranunits.lua
-#**  Author(s): John Comes, Dave Tomandl, Gordon Duclos
-#**
-#**  Summary  :
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
-#--------------------------------------------------------------------------
-# TERRAN DEFAULT UNITS
-#--------------------------------------------------------------------------
+--****************************************************************************
+--**
+--**  File     :  /lua/terranunits.lua
+--**  Author(s): John Comes, Dave Tomandl, Gordon Duclos
+--**
+--**  Summary  :
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
+----------------------------------------------------------------------------
+-- TERRAN DEFAULT UNITS
+----------------------------------------------------------------------------
 local Entity = import('/lua/sim/Entity.lua').Entity
-local util = import('utilities.lua')
+local util = import('/lua/utilities.lua')
 
-local DefaultUnitsFile = import('defaultunits.lua')
-local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
-local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
-local AirUnit = DefaultUnitsFile.AirUnit
-local ConcreteStructureUnit = DefaultUnitsFile.ConcreteStructureUnit
-local ConstructionUnit = DefaultUnitsFile.ConstructionUnit
-local EnergyCreationUnit = DefaultUnitsFile.EnergyCreationUnit
-local EnergyStorageUnit = DefaultUnitsFile.EnergyStorageUnit
-local LandFactoryUnit = DefaultUnitsFile.LandFactoryUnit
-local LandUnit = DefaultUnitsFile.LandUnit
-local MassCollectionUnit = DefaultUnitsFile.MassCollectionUnit
-local MassFabricationUnit = DefaultUnitsFile.MassFabricationUnit
-local MassStorageUnit = DefaultUnitsFile.MassStorageUnit
-local RadarUnit = DefaultUnitsFile.RadarUnit
-local SeaFactoryUnit = DefaultUnitsFile.SeaFactoryUnit
-local SeaUnit = DefaultUnitsFile.SeaUnit
-local ShieldLandUnit = DefaultUnitsFile.ShieldLandUnit
-local ShieldStructureUnit = DefaultUnitsFile.ShieldStructureUnit
-local SonarUnit = DefaultUnitsFile.SonarUnit
-local StructureUnit = DefaultUnitsFile.StructureUnit
-local SubUnit = DefaultUnitsFile.SubUnit
-local WalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
-local WallStructureUnit = DefaultUnitsFile.WallStructureUnit
-local QuantumGateUnit = DefaultUnitsFile.QuantumGateUnit
-local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
-local ShieldSeaUnit = DefaultUnitsFile.ShieldSeaUnit
+local AirFactoryUnit = import('/lua/sim/units/AirFactoryUnit.lua').AirFactoryUnit
+local AirStagingPlatformUnit = import('/lua/sim/units/AirStagingPlatformUnit.lua').AirStagingPlatformUnit
+local AirUnit = import('/lua/sim/units/AirUnit.lua').AirUnit
+local ConcreteStructureUnit = import('/lua/sim/units/ConcreteStructureUnit.lua').ConcreteStructureUnit
+local ConstructionUnit = import('/lua/sim/units/ConstructionUnit.lua').ConstructionUnit
+local EnergyCreationUnit = import('/lua/sim/units/EnergyCreationUnit.lua').EnergyCreationUnit
+local EnergyStorageUnit = import('/lua/sim/units/EnergyStorageUnit.lua').EnergyStorageUnit
+local HoverLandUnit = import('/lua/sim/units/HoverLandUnit.lua').HoverLandUnit
+local LandFactoryUnit = import('/lua/sim/units/LandFactoryUnit.lua').LandFactoryUnit
+local LandUnit = import('/lua/sim/units/LandUnit.lua').LandUnit
+local MassCollectionUnit = import('/lua/sim/units/MassCollectionUnit.lua').MassCollectionUnit
+local MassFabricationUnit = import('/lua/sim/units/MassFabricationUnit.lua').MassFabricationUnit
+local MassStorageUnit = import('/lua/sim/units/MassStorageUnit.lua').MassStorageUnit
+local RadarUnit = import('/lua/sim/units/RadarUnit.lua').RadarUnit
+local SeaFactoryUnit = import('/lua/sim/units/SeaFactoryUnit.lua').SeaFactoryUnit
+local SeaUnit = import('/lua/sim/units/SeaUnit.lua').SeaUnit
+local ShieldLandUnit = import('/lua/sim/units/ShieldLandUnit.lua').ShieldLandUnit
+local ShieldStructureUnit = import('/lua/sim/units/ShieldStructureUnit.lua').ShieldStructureUnit
+local SonarUnit = import('/lua/sim/units/SonarUnit.lua').SonarUnit
+local StructureUnit = import('/lua/sim/units/StructureUnit.lua').StructureUnit
+local SubUnit = import('/lua/sim/units/SubUnit.lua').SubUnit
+local WalkingLandUnit = import('/lua/sim/units/WalkingLandUnit.lua').WalkingLandUnit
+local WallStructureUnit = import('/lua/sim/units/WallStructureUnit.lua').WallStructureUnit
+local QuantumGateUnit = import('/lua/sim/units/QuantumGateUnit.lua').QuantumGateUnit
+local RadarJammerUnit = import('/lua/sim/units/RadarJammerUnit.lua').RadarJammerUnit
+local ShieldSeaUnit = import('/lua/sim/units/ShieldSeaUnit.lua').ShieldSeaUnit
+local TransportBeaconUnit = import('/lua/sim/units/TransportBeaconUnit.lua').TransportBeaconUnit
 
-local EffectUtil = import('EffectUtilities.lua')
+local EffectUtil = import('/lua/EffectUtilities.lua')
 local PlayEffectsAtBones = EffectUtil.CreateBoneTableRangedScaleEffects
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
 local CreateUEFBuildSliceBeams = EffectUtil.CreateUEFBuildSliceBeams
 
-#-------------------------------------------------------------
-#  AIR FACTORY STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  AIR FACTORY STRUCTURES
+---------------------------------------------------------------
 TAirFactoryUnit = Class(AirFactoryUnit) {
     
     CreateBuildEffects = function( self, unitBeingBuilt, order )
@@ -102,31 +103,31 @@ TAirFactoryUnit = Class(AirFactoryUnit) {
     end,
 }
 
-#-------------------------------------------------------------
-#  AIR STAGING STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  AIR STAGING STRUCTURES
+---------------------------------------------------------------
 TAirStagingPlatformUnit = Class(AirStagingPlatformUnit) {
 }
 
-#-------------------------------------------------------------
-#  AIR UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  AIR UNITS
+---------------------------------------------------------------
 TAirUnit = Class(AirUnit) {}
 
-#-------------------------------------------------------------
-#  WALL  STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  WALL  STRUCTURES
+---------------------------------------------------------------
 TConcreteStructureUnit = Class(ConcreteStructureUnit) {
 }
 
-#-------------------------------------------------------------
-#  Construction Units
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  Construction Units
+---------------------------------------------------------------
 TConstructionUnit = Class(ConstructionUnit) {
 
     CreateBuildEffects = function( self, unitBeingBuilt, order )
         local UpgradesFrom = unitBeingBuilt:GetBlueprint().General.UpgradesFrom
-        # If we are assisting an upgrading unit, or repairing a unit, play seperate effects
+        -- If we are assisting an upgrading unit, or repairing a unit, play seperate effects
         if (order == 'Repair' and not unitBeingBuilt:IsBeingBuilt()) or (UpgradesFrom and UpgradesFrom != 'none' and self:IsUnitState('Guarding'))then
             EffectUtil.CreateDefaultBuildBeams( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )
         else
@@ -170,27 +171,27 @@ TConstructionUnit = Class(ConstructionUnit) {
     end,
 }
 
-#-------------------------------------------------------------
-# ENERGY CREATION STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+-- ENERGY CREATION STRUCTURES
+---------------------------------------------------------------
 TEnergyCreationUnit = Class(EnergyCreationUnit) {
 }
 
-#-------------------------------------------------------------
-# ENERGY STORAGE STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+-- ENERGY STORAGE STRUCTURES
+---------------------------------------------------------------
 TEnergyStorageUnit = Class(EnergyStorageUnit) {
 }
 
-#-------------------------------------------------------------
-#  HOVER LAND UNITS
-#-------------------------------------------------------------
-THoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
+---------------------------------------------------------------
+--  HOVER LAND UNITS
+---------------------------------------------------------------
+THoverLandUnit = Class(HoverLandUnit) {
 }
 
-#-------------------------------------------------------------
-#  LAND FACTORY STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  LAND FACTORY STRUCTURES
+---------------------------------------------------------------
 TLandFactoryUnit = Class(LandFactoryUnit) {
     CreateBuildEffects = function( self, unitBeingBuilt, order )
         WaitSeconds( 0.1 )
@@ -201,21 +202,21 @@ TLandFactoryUnit = Class(LandFactoryUnit) {
     end,
 }
 
-#-------------------------------------------------------------
-#  LAND UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  LAND UNITS
+---------------------------------------------------------------
 TLandUnit = Class(LandUnit) {
 
 }
 
-#-------------------------------------------------------------
-#  MASS COLLECTION UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  MASS COLLECTION UNITS
+---------------------------------------------------------------
 TMassCollectionUnit = Class(MassCollectionUnit) {
 
-    ### FIXME ### Until these units get an upgrade animation, these will be visible during upgrade
-    # This causes them both to be shown while it upgrades, this over-riden function can be removed
-    # once it is.
+    ------ FIXME ------ Until these units get an upgrade animation, these will be visible during upgrade
+    -- This causes them both to be shown while it upgrades, this over-riden function can be removed
+    -- once it is.
     StartBeingBuiltEffects = function(self, builder, layer)
 		self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
         if self:GetBlueprint().General.UpgradesFrom != builder:GetUnitId() then
@@ -225,21 +226,21 @@ TMassCollectionUnit = Class(MassCollectionUnit) {
     end,    
 }
 
-#-------------------------------------------------------------
-# MASS FABRICATION STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+-- MASS FABRICATION STRUCTURES
+---------------------------------------------------------------
 TMassFabricationUnit = Class(MassFabricationUnit) {
 }
 
-#-------------------------------------------------------------
-# MASS STORAGE STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+-- MASS STORAGE STRUCTURES
+---------------------------------------------------------------
 TMassStorageUnit = Class(MassStorageUnit) {
 }
 
-#-------------------------------------------------------------
-#  MOBILE FACTORY UNIT
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  MOBILE FACTORY UNIT
+---------------------------------------------------------------
 TMobileFactoryUnit = Class(LandUnit) {
 
     StartBeingBuiltEffects = function(self, builder, layer)
@@ -251,21 +252,21 @@ TMobileFactoryUnit = Class(LandUnit) {
     end,   
 }
 
-#-------------------------------------------------------------
-#  RADAR STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  RADAR STRUCTURES
+---------------------------------------------------------------
 TRadarUnit = Class(RadarUnit) {
 }
 
-#-------------------------------------------------------------
-#  SONAR STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  SONAR STRUCTURES
+---------------------------------------------------------------
 TSonarUnit = Class(SonarUnit) {
 }
 
-#-------------------------------------------------------------
-#  SEA FACTORY STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  SEA FACTORY STRUCTURES
+---------------------------------------------------------------
 TSeaFactoryUnit = Class(SeaFactoryUnit) {
     
     CreateBuildEffects = function( self, unitBeingBuilt, order )
@@ -320,19 +321,19 @@ TSeaFactoryUnit = Class(SeaFactoryUnit) {
     end,
 }
 
-#-------------------------------------------------------------
-#  SEA UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  SEA UNITS
+---------------------------------------------------------------
 TSeaUnit = Class(SeaUnit) {}
 
-#-------------------------------------------------------------
-#  SHIELD LAND UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  SHIELD LAND UNITS
+---------------------------------------------------------------
 TShieldLandUnit = Class(ShieldLandUnit) {}
 
-#-------------------------------------------------------------
-#  SHIELD STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  SHIELD STRUCTURES
+---------------------------------------------------------------
 TShieldStructureUnit = Class(ShieldStructureUnit) {
     StartBeingBuiltEffects = function(self,builder,layer)
     	self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
@@ -343,9 +344,9 @@ TShieldStructureUnit = Class(ShieldStructureUnit) {
     end,
 }
 
-#-------------------------------------------------------------
-#  STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  STRUCTURES
+---------------------------------------------------------------
 TStructureUnit = Class(StructureUnit) {
 }
 
@@ -365,47 +366,47 @@ TRadarJammerUnit = Class(RadarJammerUnit) {
     end,
 }
 
-#-------------------------------------------------------------
-#  SUBMARINE UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  SUBMARINE UNITS
+---------------------------------------------------------------
 TSubUnit = Class(SubUnit) {}
 
-#-------------------------------------------------------------
-#  TRANSPORT BEACON UNITS
-#-------------------------------------------------------------
-TTransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
+---------------------------------------------------------------
+--  TRANSPORT BEACON UNITS
+---------------------------------------------------------------
+TTransportBeaconUnit = Class(TransportBeaconUnit) {}
 
-#-------------------------------------------------------------
-#  WALKING LAND UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  WALKING LAND UNITS
+---------------------------------------------------------------
 TWalkingLandUnit = WalkingLandUnit
 
-#-------------------------------------------------------------
-#  WALL  STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  WALL  STRUCTURES
+---------------------------------------------------------------
 TWallStructureUnit = Class(WallStructureUnit) {
 }
 
-#-------------------------------------------------------------
-#  CIVILIAN STRUCTURES
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  CIVILIAN STRUCTURES
+---------------------------------------------------------------
 TCivilianStructureUnit = Class(StructureUnit) {}
 
-#-------------------------------------------------------------
-#  QUANTUM GATE UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  QUANTUM GATE UNITS
+---------------------------------------------------------------
 TQuantumGateUnit = Class(QuantumGateUnit) {
 
 }
 
-#-------------------------------------------------------------
-#  SHIELD SEA UNITS
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  SHIELD SEA UNITS
+---------------------------------------------------------------
 TShieldSeaUnit = Class(ShieldSeaUnit) {}
 
-#-------------------------------------------------------------
-#  Pod Tower Unit (Kennels)
-#-------------------------------------------------------------
+---------------------------------------------------------------
+--  Pod Tower Unit (Kennels)
+---------------------------------------------------------------
 TPodTowerUnit = Class(TStructureUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         TStructureUnit.OnStopBeingBuilt(self, builder, layer)
@@ -413,7 +414,7 @@ TPodTowerUnit = Class(TStructureUnit) {
     end,
     
     PodTransfer = function(self, pod, podData)
-        # Set the pod as active, set new parent and creator for the pod, store the pod handle
+        -- Set the pod as active, set new parent and creator for the pod, store the pod handle
         if not self.PodData[pod.PodName].Active then
             if not self.PodData then
                 self.PodData = {}
@@ -425,19 +426,19 @@ TPodTowerUnit = Class(TStructureUnit) {
     end,
     
     OnCaptured = function(self, captor)
-        # Iterate through pod data and set up callbacks for transfer of pods.
-        # We never get the handle to the new tower, so we set up a new unit capture trigger to do the same thing
-        # not the most efficient thing ever but it makes for never having to update the capture codepath here
+        -- Iterate through pod data and set up callbacks for transfer of pods.
+        -- We never get the handle to the new tower, so we set up a new unit capture trigger to do the same thing
+        -- not the most efficient thing ever but it makes for never having to update the capture codepath here
         for k,v in self.PodData do
             if v.Active then
                 v.Active = false
             
-                # store off the pod name so we can give to new unit
+                -- store off the pod name so we can give to new unit
                 local podName = k
                 local newPod = import('/lua/ScenarioFramework.lua').GiveUnitToArmy( v.PodHandle, captor:GetArmy() )
                 newPod.PodName = podName
                 
-                # create a callback for when the unit is flipped.  set creator for the new pod to the new tower
+                -- create a callback for when the unit is flipped.  set creator for the new pod to the new tower
                 self:AddUnitCallback(
                     function(newUnit, captor)
                         newUnit:PodTransfer( newPod, v )
@@ -447,13 +448,13 @@ TPodTowerUnit = Class(TStructureUnit) {
             end
         end
         
-        # Calling the parent OnCaptured will cause all the callbacks to happen and happiness will reign !
+        -- Calling the parent OnCaptured will cause all the callbacks to happen and happiness will reign !
         TStructureUnit.OnCaptured(self, captor)
     end,
     
     OnDestroy = function(self)
         TStructureUnit.OnDestroy(self)
-        # Iterate through pod data, kill all the pods and set them inactive
+        -- Iterate through pod data, kill all the pods and set them inactive
         if self.PodData then
             for k,v in self.PodData do
                 if v.Active and not v.PodHandle.Dead then
@@ -505,13 +506,13 @@ TPodTowerUnit = Class(TStructureUnit) {
     
     SetPodConsumptionRebuildRate = function(self, podData)
         local bp = self:GetBlueprint()
-        # Get build rate of tower
+        -- Get build rate of tower
         local buildRate = bp.Economy.BuildRate
         
         local energy_rate = ( podData.BuildCostEnergy / podData.BuildTime ) * buildRate
         local mass_rate = ( podData.BuildCostMass / podData.BuildTime ) * buildRate
         
-        # Set Consumption - Buff system will replace this here
+        -- Set Consumption - Buff system will replace this here
         self:SetConsumptionPerSecondEnergy(energy_rate)
         self:SetConsumptionPerSecondMass(mass_rate)
         self:SetConsumptionActive(true)
@@ -536,12 +537,12 @@ TPodTowerUnit = Class(TStructureUnit) {
     
     FinishedBeingBuilt = State {
         Main = function(self)
-            # Wait one tick to make sure this wasn't captured and we don't create an extra pod
+            -- Wait one tick to make sure this wasn't captured and we don't create an extra pod
             WaitSeconds(0.1)
             
-            # Create the pod for the kennel.  DO NOT ADD TO TRASH.
-            # This pod may have to be passed to another unit after it upgrades.  We cannot let the trash clean it up
-            # when this unit is destroyed at the tail end of the upgrade.  Make sure the unit dies properly elsewhere.
+            -- Create the pod for the kennel.  DO NOT ADD TO TRASH.
+            -- This pod may have to be passed to another unit after it upgrades.  We cannot let the trash clean it up
+            -- when this unit is destroyed at the tail end of the upgrade.  Make sure the unit dies properly elsewhere.
 
             self.TowerCaptured = nil
             local bp = self:GetBlueprint()
@@ -569,9 +570,9 @@ TPodTowerUnit = Class(TStructureUnit) {
             local bp = self:GetBlueprint()
             while true and not self.Rebuilding do
                 for k,v in bp.Economy.EngineeringPods do
-                    # Check if all the pods are active
+                    -- Check if all the pods are active
                     if not self.PodData[v.PodName].Active then
-                        # Cost of new pod
+                        -- Cost of new pod
                         local podBP = self:GetAIBrain():GetUnitBlueprint( v.PodUnitID )
                         self.PodData[v.PodName].EnergyRemain = podBP.Economy.BuildCostEnergy
                         self.PodData[v.PodName].MassRemain = podBP.Economy.BuildCostMass
@@ -581,10 +582,10 @@ TPodTowerUnit = Class(TStructureUnit) {
                         
                         self.PodData[v.PodName].BuildTime = podBP.Economy.BuildTime
                         
-                        # Enable consumption for the rebuilding
+                        -- Enable consumption for the rebuilding
                         self:SetPodConsumptionRebuildRate(self.PodData[v.PodName])
                        
-                        # Change to RebuildingPodState
+                        -- Change to RebuildingPodState
                         self.Rebuilding = v.PodName
                         self:SetWorkProgress(0.01)
                         ChangeState( self, self.RebuildingPodState )
@@ -605,8 +606,8 @@ TPodTowerUnit = Class(TStructureUnit) {
             local podData = self.PodData[ self.Rebuilding ]
             repeat
                 WaitTicks(1)
-                # While the pod being built isn't finished
-                # Update mass and energy given to new pod - update build bar
+                -- While the pod being built isn't finished
+                -- Update mass and energy given to new pod - update build bar
                 local fraction = self:GetResourceConsumed()
                 local energy = self:GetConsumptionPerSecondEnergy() * fraction * 0.1
                 local mass = self:GetConsumptionPerSecondMass() * fraction * 0.1
@@ -621,7 +622,7 @@ TPodTowerUnit = Class(TStructureUnit) {
                 end
             until rebuildFinished
             
-            # create pod, deactivate consumption, clear building
+            -- create pod, deactivate consumption, clear building
             self:CreatePod( self.Rebuilding )
             self.Rebuilding = false
             self:SetWorkProgress(0)
@@ -691,7 +692,7 @@ TPodTowerUnit = Class(TStructureUnit) {
                 NotifyUpgrade(self, unitBuilding)
                 self:StopUpgradeEffects(unitBuilding)
                 self:PlayUnitSound('UpgradeEnd')
-                # Iterate through pod data and transfer pods to the new unit
+                -- Iterate through pod data and transfer pods to the new unit
                 for k,v in self.PodData do
                     if v.Active then
                         unitBuilding:PodTransfer(v.PodHandle, v)

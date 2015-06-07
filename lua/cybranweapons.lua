@@ -18,7 +18,7 @@ local OverchargeWeapon = WeaponFile.OverchargeWeapon
 local CollisionBeamFile = import('defaultcollisionbeams.lua')
 local Explosion = import('defaultexplosions.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
-local Util = import('utilities.lua')
+local Util = import('/lua/utilities.lua')
 
 CDFBrackmanCrabHackPegLauncherWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/proton_cannon_muzzle_01_emit.bp',

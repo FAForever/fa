@@ -10,27 +10,33 @@
 ---------------------------------------------------------------------------
 -- SERAPHIM DEFAULT UNITS
 ---------------------------------------------------------------------------
-local DefaultUnitsFile = import('defaultunits.lua')
-local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
-local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
-local AirUnit = DefaultUnitsFile.AirUnit
-local ConcreteStructureUnit = DefaultUnitsFile.ConcreteStructureUnit
-local ConstructionUnit = DefaultUnitsFile.ConstructionUnit
-local EnergyCreationUnit = DefaultUnitsFile.EnergyCreationUnit
-local EnergyStorageUnit = DefaultUnitsFile.EnergyStorageUnit
-local LandFactoryUnit = DefaultUnitsFile.LandFactoryUnit
-local MassCollectionUnit = DefaultUnitsFile.MassCollectionUnit
-local MassFabricationUnit = DefaultUnitsFile.MassFabricationUnit
-local MassStorageUnit = DefaultUnitsFile.MassStorageUnit
-local RadarUnit = DefaultUnitsFile.RadarUnit
-local SeaFactoryUnit = DefaultUnitsFile.SeaFactoryUnit
-local ShieldHoverLandUnit = DefaultUnitsFile.ShieldHoverLandUnit
-local ShieldLandUnit = DefaultUnitsFile.ShieldLandUnit
-local ShieldStructureUnit = DefaultUnitsFile.ShieldStructureUnit
-local SonarUnit = DefaultUnitsFile.SonarUnit
-local StructureUnit = DefaultUnitsFile.StructureUnit
-local QuantumGateUnit = DefaultUnitsFile.QuantumGateUnit
-local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
+local AirFactoryUnit = import('/lua/sim/units/AirFactoryUnit.lua').AirFactoryUnit
+local AirStagingPlatformUnit = import('/lua/sim/units/AirStagingPlatformUnit.lua').AirStagingPlatformUnit
+local AirUnit = import('/lua/sim/units/AirUnit.lua').AirUnit
+local ConcreteStructureUnit = import('/lua/sim/units/ConcreteStructureUnit.lua').ConcreteStructureUnit
+local ConstructionUnit = import('/lua/sim/units/ConstructionUnit.lua').ConstructionUnit
+local EnergyCreationUnit = import('/lua/sim/units/EnergyCreationUnit.lua').EnergyCreationUnit
+local EnergyStorageUnit = import('/lua/sim/units/EnergyStorageUnit.lua').EnergyStorageUnit
+local HoverLandUnit = import('/lua/sim/units/HoverLandUnit.lua').HoverLandUnit
+local LandUnit = import('/lua/sim/units/LandUnit.lua').LandUnit
+local LandFactoryUnit = import('/lua/sim/units/LandFactoryUnit.lua').LandFactoryUnit
+local MassCollectionUnit = import('/lua/sim/units/MassCollectionUnit.lua').MassCollectionUnit
+local MassFabricationUnit = import('/lua/sim/units/MassFabricationUnit.lua').MassFabricationUnit
+local MassStorageUnit = import('/lua/sim/units/MassStorageUnit.lua').MassStorageUnit
+local RadarUnit = import('/lua/sim/units/RadarUnit.lua').RadarUnit
+local SeaUnit = import('/lua/sim/units/SeaUnit.lua').SeaUnit
+local SeaFactoryUnit = import('/lua/sim/units/SeaFactoryUnit.lua').SeaFactoryUnit
+local ShieldHoverLandUnit = import('/lua/sim/units/ShieldHoverLandUnit.lua').ShieldHoverLandUnit
+local ShieldLandUnit = import('/lua/sim/units/ShieldLandUnit.lua').ShieldLandUnit
+local ShieldStructureUnit = import('/lua/sim/units/ShieldStructureUnit.lua').ShieldStructureUnit
+local SonarUnit = import('/lua/sim/units/SonarUnit.lua').SonarUnit
+local StructureUnit = import('/lua/sim/units/StructureUnit.lua').StructureUnit
+local SubUnit = import('/lua/sim/units/SubUnit.lua').SubUnit
+local TransportBeaconUnit = import('/lua/sim/units/TransportBeaconUnit.lua').TransportBeaconUnit
+local QuantumGateUnit = import('/lua/sim/units/QuantumGateUnit.lua').QuantumGateUnit
+local RadarJammerUnit = import('/lua/sim/units/RadarJammerUnit.lua').RadarJammerUnit
+local WalkingLandUnit = import('/lua/sim/units/WalkingLandUnit.lua').WalkingLandUnit
+local WallStructureUnit = import('/lua/sim/units/WallStructureUnit.lua').WallStructureUnit
 
 local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
@@ -334,7 +340,7 @@ SEnergyStorageUnit = Class(EnergyStorageUnit) {
 --------------------------------------------------------------
 --  HOVERING LAND UNITS
 --------------------------------------------------------------
-SHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
+SHoverLandUnit = Class(HoverLandUnit) {
     FxHoverScale = 1,
     HoverEffects = nil,
     HoverEffectBones = nil,
@@ -417,7 +423,7 @@ SLandFactoryUnit = Class(LandFactoryUnit) {
 --------------------------------------------------------------
 --  LAND UNITS
 --------------------------------------------------------------
-SLandUnit = Class(DefaultUnitsFile.LandUnit) { }
+SLandUnit = Class(LandUnit) { }
 
 --------------------------------------------------------------
 --  MASS COLLECTION UNITS
@@ -526,7 +532,7 @@ SSeaFactoryUnit = Class(SeaFactoryUnit) {
 --------------------------------------------------------------
 --  SEA UNITS
 --------------------------------------------------------------
-SSeaUnit = Class(DefaultUnitsFile.SeaUnit) {}
+SSeaUnit = Class(SeaUnit) {}
 
 --------------------------------------------------------------
 --  SHIELD LAND UNITS
@@ -569,7 +575,7 @@ SStructureUnit = Class(StructureUnit) {}
 --------------------------------------------------------------
 --  SUBMARINE UNITS
 --------------------------------------------------------------
-SSubUnit = Class(DefaultUnitsFile.SubUnit) {
+SSubUnit = Class(SubUnit) {
     IdleSubBones = {},
     IdleSubEffects = {}
 }
@@ -578,17 +584,17 @@ SSubUnit = Class(DefaultUnitsFile.SubUnit) {
 --------------------------------------------------------------
 --  TRANSPORT BEACON UNITS
 --------------------------------------------------------------
-STransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
+STransportBeaconUnit = Class(TransportBeaconUnit) {}
 
 --------------------------------------------------------------
 --  WALKING LAND UNITS
 --------------------------------------------------------------
-SWalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
+SWalkingLandUnit = WalkingLandUnit
 
 --------------------------------------------------------------
 --  WALL  STRUCTURES
 --------------------------------------------------------------
-SWallStructureUnit = Class(DefaultUnitsFile.WallStructureUnit) {}
+SWallStructureUnit = Class(WallStructureUnit) {}
 
 --------------------------------------------------------------
 --  CIVILIAN STRUCTURES

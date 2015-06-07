@@ -10,12 +10,12 @@
 
 local Entity = import('/lua/sim/entity.lua').Entity
 local EffectTemplate = import('/lua/EffectTemplates.lua')
-local util = import('utilities.lua')
+local util = import('/lua/utilities.lua')
 local GetRandomFloat = util.GetRandomFloat
 local GetRandomInt = util.GetRandomInt
 local GetRandomOffset = util.GetRandomOffset
 local GetRandomOffset2 = util.GetRandomOffset2
-local EfctUtil = import('EffectUtilities.lua')
+local EfctUtil = import('/lua/EffectUtilities.lua')
 local CreateEffects = EfctUtil.CreateEffects
 local CreateEffectsWithOffset = EfctUtil.CreateEffectsWithOffset
 local CreateEffectsWithRandomOffset = EfctUtil.CreateEffectsWithRandomOffset
