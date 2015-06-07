@@ -126,7 +126,30 @@ FactoryUnit = Class(StructureUnit) {
         self.FactoryBuildFailed = false
     end,
 
+    -- Introduce a rolloff delay, where defined.
     OnStopBuild = function(self, unitBeingBuilt, order )
+        local bp = self:GetBlueprint()
+        if bp.General.RolloffDelay and bp.General.RolloffDelay > 0 and not self.FactoryBuildFailed then
+            self:ForkThread(self.PauseThread, bp.General.RolloffDelay, unitBeingBuilt, order)
+        else
+            self:DoStopBuild(unitBeingBuilt, order)
+        end
+    end,
+
+    --- Adds a pause between unit productions
+    PauseThread = function(self, productionpause, unitBeingBuilt, order)
+        self:StopBuildFx()
+        self:SetBusy(true)
+        self:SetBlockCommandQueue(true)
+
+        WaitSeconds(productionpause)
+
+        self:SetBusy(false)
+        self:SetBlockCommandQueue(false)
+        self:DoStopBuild(unitBeingBuilt, order)
+    end,
+
+    DoStopBuild = function(self, unitBeingBuilt, order )
         StructureUnit.OnStopBuild(self, unitBeingBuilt, order )
 
         if not self.FactoryBuildFailed then
