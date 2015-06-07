@@ -39,6 +39,11 @@ URA0001 = Class(CAirUnit) {
         ChangeState(self, self.IdleState)
     end,
 
+    --- Don't explode when killed, merely fall out of the sky.
+    OnKilled = function(self)
+        self:StopBuildingEffects()
+    end,
+
     -- Prevent the unit from reporting consumption values (avoids junk in the resource overlay)
     UpdateConsumptionValues = function() end,
 
@@ -47,7 +52,7 @@ URA0001 = Class(CAirUnit) {
             IssueClearCommands({self})
             IssueMove({self}, self:GetPosition())
             WaitSeconds(0.5)
-            IssueMove({self}, self.spawnedBy)
+            IssueMove({self}, self.spawnedBy:GetPosition())
 
             local delay = 0.1
             local wait = 0

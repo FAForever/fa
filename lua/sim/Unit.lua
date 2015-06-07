@@ -1660,6 +1660,20 @@ Unit = Class(moho.unit_methods) {
         if self.TeleportFxBag then
             self.TeleportFxBag:Destroy()
         end
+
+        -- This really shouldn't be here...
+        if self.buildBots then
+            for _, bot in self.buildBots do
+                if not bot:BeenDestroyed() then
+                    bot:SetCanTakeDamage(true)
+                    bot:SetCanBeKilled(true)
+
+                    bot:Kill(nil, "Normal", 1)
+                end
+            end
+
+            self.buildBots = nil
+        end
     end,
 
     OnDestroy = function(self)
