@@ -4,6 +4,7 @@ UnitBlueprint {
             'Abovetgt',
             'Turret_Barrel',
             'URB2205',
+            'Turret_Barrel',
         },
     },
     Audio = {
@@ -189,7 +190,7 @@ UnitBlueprint {
     SelectionSizeZ = 1,
     SelectionThickness = 0.4,
     SizeX = 1.5,
-    SizeY = 2.2,
+    SizeY = 1.7,
     SizeZ = 1.5,
     StrategicIconName = 'icon_structure2_antinavy',
     StrategicIconSortPriority = 200,
