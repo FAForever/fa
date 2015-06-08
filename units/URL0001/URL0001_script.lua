@@ -250,8 +250,6 @@ URL0001 = Class(ACUUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'CybranACUT2BuildRate')
-	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-	    self:updateBuildRestrictions()
         elseif enh =='AdvancedEngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -260,8 +258,6 @@ URL0001 = Class(ACUUnit) {
             if Buff.HasBuff( self, 'CybranACUT2BuildRate' ) then
                 Buff.RemoveBuff( self, 'CybranACUT2BuildRate' )
             end
-	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-	    self:updateBuildRestrictions()
         --T3 Engineering
         elseif enh =='T3Engineering' then
             local bp = self:GetBlueprint().Enhancements[enh]
@@ -292,8 +288,6 @@ URL0001 = Class(ACUUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'CybranACUT3BuildRate')
-	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-	    self:updateBuildRestrictions()
         elseif enh =='T3EngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -302,9 +296,6 @@ URL0001 = Class(ACUUnit) {
                 Buff.RemoveBuff( self, 'CybranACUT3BuildRate' )
             end
             self:AddBuildRestriction( categories.CYBRAN * ( categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
-
-	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-	    self:updateBuildRestrictions()
         elseif enh =='CoolingUpgrade' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local wep = self:GetWeaponByLabel('RightRipper')
