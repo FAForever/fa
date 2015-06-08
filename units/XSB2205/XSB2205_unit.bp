@@ -1,8 +1,10 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
-            'Abovetgt',
-            'XSB2205',
+            'Abovetgt',      
+            'Turret',
+            'Muzzle03',
+            'Muzzle02',
         },
     },
     Audio = {
@@ -58,7 +60,8 @@ UnitBlueprint {
         'OVERLAYDEFENSE',
         'SORTDEFENSE',
     },
-    CollisionOffsetY = -1,
+    CollisionOffsetY = -0.3,
+    CollisionOffsetZ = 0.1,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
@@ -222,7 +225,7 @@ UnitBlueprint {
     SelectionSizeZ = 1.3,
     SelectionThickness = 0.34,
     SizeX = 1.5,
-    SizeY = 2.2,
+    SizeY = 1.2,
     SizeZ = 1.5,
     StrategicIconName = 'icon_structure2_antinavy',
     StrategicIconSortPriority = 200,
