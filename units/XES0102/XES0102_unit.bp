@@ -1,4 +1,11 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'XES0102',
+            'Anti_Torpedo_Right',
+            'Anti_Torpedo_Left',
+        },
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'XES',
@@ -54,8 +61,7 @@ UnitBlueprint {
         'OVERLAYDEFENSE',
         'OVERLAYANTINAVY',
     },
-    CollisionOffsetY = -0.25,
-    CollisionOffsetZ = 0.1,
+    CollisionOffsetY = -0.2,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
@@ -204,8 +210,8 @@ UnitBlueprint {
     SelectionSizeX = 0.36,
     SelectionSizeZ = 1.3,
     SelectionThickness = 0.31,
-    SizeX = 0.6,
-    SizeY = 0.65,
+    SizeX = 0.7,
+    SizeY = 0.6,
     SizeZ = 2,
     StrategicIconName = 'icon_ship2_antinavy',
     StrategicIconSortPriority = 165,
