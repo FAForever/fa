@@ -1,4 +1,10 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'Deck03',
+            'URS0305',
+        },
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'URS',
@@ -53,6 +59,7 @@ UnitBlueprint {
 		'NAVAL', #for shipwreck mod
     },
     CollisionOffsetY = -0.25,
+    CollisionOffsetZ = -0.05,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
@@ -207,7 +214,7 @@ UnitBlueprint {
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.78,
     SizeX = 0.8,
-    SizeY = 1.2,
+    SizeY = 1.0,
     SizeZ = 0.8,
     StrategicIconName = 'icon_structure3_intel',
     StrategicIconSortPriority = 230,
