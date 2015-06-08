@@ -3,7 +3,8 @@ UnitBlueprint {
         TargetBones = {
             'Abovetgt',
             'UEB3202'
-        }
+            'B13',
+        },
     },
     Audio = {
         Destroyed = Sound {
@@ -43,7 +44,7 @@ UnitBlueprint {
         'OVERLAYSONAR',
         'SORTINTEL',
     },
-    CollisionOffsetY = -0.25,
+    CollisionOffsetY = -0.3,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
@@ -196,9 +197,9 @@ UnitBlueprint {
     SelectionSizeX = 0.55,
     SelectionSizeZ = 0.55,
     SelectionThickness = 0.7,
-    SizeX = 0.5,
-    SizeY = 0.5,
-    SizeZ = 0.5,
+    SizeX = 0.9,
+    SizeY = 0.8,
+    SizeZ = 0.9,
     StrategicIconName = 'icon_structure2_intel',
     StrategicIconSortPriority = 230,
     Wreckage = {
