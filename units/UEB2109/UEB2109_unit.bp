@@ -2,6 +2,7 @@ UnitBlueprint {
     AI = {
         TargetBones = {
             'Abovetgt',
+            'UEB2109',
             'Turret',
         },
     },
@@ -52,8 +53,7 @@ UnitBlueprint {
         'OVERLAYSONAR',
         'SORTDEFENSE',
     },
-    CollisionOffsetY = -1,
-    CollisionOffsetZ = 0.05,
+    CollisionOffsetY = -0.5,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
@@ -174,9 +174,9 @@ UnitBlueprint {
     SelectionSizeX = 0.75,
     SelectionSizeZ = 0.75,
     SelectionThickness = 0.5,
-    SizeX = 0.9,
-    SizeY = 2,
-    SizeZ = 0.9,
+    SizeX = 1.1,
+    SizeY = 1,
+    SizeZ = 1.1,
     StrategicIconName = 'icon_structure1_antinavy',
     StrategicIconSortPriority = 205,
     Veteran = {
