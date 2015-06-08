@@ -1,4 +1,10 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'XRS0205',
+            'Radar_B01'
+        },
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'XRS',
@@ -46,8 +52,7 @@ UnitBlueprint {
         'OVERLAYRADAR',
         'OVERLAYSONAR',
     },
-    CollisionOffsetY = -0.25,
-    CollisionOffsetZ = 0.1,
+    CollisionOffsetY = -0.1,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
@@ -209,9 +214,9 @@ UnitBlueprint {
     SelectionSizeX = 0.45,
     SelectionSizeZ = 1.55,
     SelectionThickness = 0.27,
-    SizeX = 0.75,
-    SizeY = 0.6,
-    SizeZ = 2.5,
+    SizeX = 0.6,
+    SizeY = 0.8,
+    SizeZ = 2.3,
     StrategicIconName = 'icon_ship2_counterintel',
     StrategicIconSortPriority = 165,
     Weapon = {
