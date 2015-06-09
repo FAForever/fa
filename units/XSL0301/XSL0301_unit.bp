@@ -491,6 +491,7 @@ UnitBlueprint {
             MaintenanceConsumptionPerSecondEnergy = 300,
             Name = '<LOC enhancements_0028>Personal Shield Generator',
             OwnerShieldMesh = '/units/xsl0301/xsl0301_personalshield_mesh',
+            PersonalShield = true,
             RegenAssistMult = 10,
             ShieldEnergyDrainRechargeTime = 5,
             ShieldMaxHealth = 25000,
