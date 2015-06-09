@@ -152,6 +152,7 @@ SDFChronotronCannonWeapon = Class(DefaultProjectileWeapon) {
 
 SDFChronotronCannonOverChargeWeapon = Class(OverchargeWeapon) {
     FxMuzzleFlash = EffectTemplate.SChronotronCannonOverChargeMuzzle,
+    DesiredWeaponLabel = 'ChronatronCannon'
 }
 
 -- Units: XSL0301
@@ -161,6 +162,7 @@ SDFLightChronotronCannonWeapon = Class(DefaultProjectileWeapon) {
 
 SDFLightChronotronCannonOverchargeWeapon = Class(OverchargeWeapon) {
     FxMuzzleFlash = EffectTemplate.SLightChronotronCannonOverChargeMuzzleFlash,
+    DesiredWeaponLabel = 'LightChronatronCannon'
 }
 
 SAAShleoCannonWeapon = Class(DefaultProjectileWeapon) {

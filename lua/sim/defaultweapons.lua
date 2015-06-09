@@ -863,28 +863,6 @@ BareBonesWeapon = Class(Weapon) {
 }
 
 OverchargeWeapon = Class(DefaultProjectileWeapon) {
-
-    -- Called in OnCreate
-    GetWeaponLabelByFaction = function(self)
-        local Faction = self.unit:GetBlueprint().General.FactionName
-        local Label = nil
-        if Faction == 'Aeon' then
-            Label = 'RightDisruptor'
-        elseif Faction == 'UEF' then
-            Label = 'RightZephyr'
-        elseif Faction == 'Cybran' then
-            Label = 'RightRipper'
-        elseif Faction == 'Seraphim' then
-            if EntityCategoryContains(categories.REBUILDER, self) then -- Rebuilder is an sACU only Category at present
-                Label = 'LightChronatronCannon'
-            else
-                Label = 'ChronotronCannon'
-            end
-        end
-        
-        return Label
-    end,
-    
     -- The Overcharge cool-down function
     PauseOvercharge = function(self)
         if not self.unit:IsOverchargePaused() then
@@ -900,9 +878,6 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         self.AimControl:SetEnabled(false)
         self.AimControl:SetPrecedence(0)
         self.unit:SetOverchargePaused(false)
-        
-        -- Differentiate weapon label by faction
-        self.DesiredWeaponLabel = self:GetWeaponLabelByFaction()
     end,
     
     OnFire = function(self)

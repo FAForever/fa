@@ -41,6 +41,7 @@ CDFHvyProtonCannonWeapon = Class(DefaultProjectileWeapon) {
 
 CDFOverchargeWeapon = Class(OverchargeWeapon) {
     FxMuzzleFlash = EffectTemplate.CMolecularRipperOverChargeFlash01,
+    DesiredWeaponLabel = 'RightRipper'
 }
 
 -- COMMANDER ENHANCEMENT WEAPON!
