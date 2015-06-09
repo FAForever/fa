@@ -1612,10 +1612,7 @@ AirTransport = Class(AirUnit) {
             unit:DisableShield()
             unit:DisableDefaultToggleCaps()
         end
-        if not EntityCategoryContains(categories.PODSTAGINGPLATFORM, self) then
-            self:RequestRefreshUI()
-        end
-        --Added by brute51
+        self:RequestRefreshUI()
         unit:OnAttachedToTransport(self, attachBone)
     end,
 
@@ -1624,9 +1621,7 @@ AirTransport = Class(AirUnit) {
         self:MarkWeaponsOnTransport(unit, false)
         unit:EnableShield()
         unit:EnableDefaultToggleCaps()
-        if not EntityCategoryContains(categories.PODSTAGINGPLATFORM, self) then
-            self:RequestRefreshUI()
-        end
+        self:RequestRefreshUI()
         unit:TransportAnimation(-1)
         unit:OnDetachedToTransport(self)
     end,
