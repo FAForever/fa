@@ -526,12 +526,14 @@ TPodTowerUnit = Class(TStructureUnit) {
     
     OnTransportAttach = function(self, bone, attachee)
         attachee:SetDoNotTarget(true)
-        TStructureUnit.OnTransportAttach(self, bone, attachee)
+        self:PlayUnitSound('Load')
+        attachee:OnAttachedToTransport(self, attachBone)
     end,
     
     OnTransportDetach = function(self, bone, attachee)
         attachee:SetDoNotTarget(false)
-        TStructureUnit.OnTransportDetach(self, bone, attachee)
+        self:PlayUnitSound('Load')
+        attachee:OnDetachedToTransport(self, attachBone)
     end,
     
     FinishedBeingBuilt = State {
