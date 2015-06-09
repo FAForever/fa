@@ -1905,14 +1905,11 @@ ACUUnit = Class(CommandUnit) {
         local aiBrain = self:GetAIBrain()
 
         -- Mutate the OnDamage function for this one very special shield.
-        local oldOnDamage = self.MyShield.OnDamage
-        local newOnDamage = function(shield, instigator, amount, vector, dmgType)
-            oldOnDamage(shield, instigator, amount, vector, dmgType)
-
+        local oldApplyDamage = self.MyShield.ApplyDamage
+        self.MyShield.ApplyDamage = function(...)
+            oldApplyDamage(unpack(arg))
             aiBrain:OnPlayCommanderUnderAttackVO()
         end
-
-        self.MyShield.OnDamage = newOnDamage
     end,
 
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
