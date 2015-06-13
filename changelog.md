@@ -51,6 +51,7 @@ Other
 - Fixed bug with chat messages having wrong recipients in replay
 - Seraphim and Aeon T2 shields can now pause while upgrading to T3
 - Fixed RateOfFire buffs not being applied correctly
+- Engineers no longer drain resources to repair a unit which is in the process of blowing up
 
 Enhancements
 ------------

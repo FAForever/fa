@@ -925,7 +925,7 @@ Unit = Class(moho.unit_methods) {
             end
         end
 
-        local workers = self:GetAIBrain():GetUnitsAroundPoint(( categories.REPAIR), self:GetPosition(), 50, 'Ally' )
+        local workers = self:GetAIBrain():GetUnitsAroundPoint((categories.REPAIR), self:GetPosition(), 50, 'Ally')
         for k,v in workers do
             if not v.Dead and v:IsUnitState('Repairing') and v:GetFocusUnit() == self then
                 table.insert(units, v)
@@ -933,10 +933,20 @@ Unit = Class(moho.unit_methods) {
         end
 
         for _, v in units do
-            if not v.updatedConsumption then
-                v.updatedConsumption = true -- recursive protection
-                v:UpdateConsumptionValues()
-                v.updatedConsumption = false
+            -- Set to dead at the very start of OnKilled
+            if self.Dead then
+                v:OnStopBuild(self)
+                v:OnStopBuilderTracking()
+                local stuff = v:GetCommandQueue()
+                WARN('Printing command queue')
+                LOG(stuff)
+                LOG(repr(stuff))
+            else
+                if not v.updatedConsumption then
+                    v.updatedConsumption = true -- Recursive protection
+                    v:UpdateConsumptionValues()
+                    v.updatedConsumption = false
+                end
             end
         end
     end,
@@ -944,6 +954,12 @@ Unit = Class(moho.unit_methods) {
     --Called when we start building a unit, turn on/off, get/lose bonuses, or on
     --any other change that might affect our build rate or resource use.
     UpdateConsumptionValues = function(self)
+        if self.Dead then
+            -- Engine will take care of us, but not repairers
+            self:UpdateAssistersConsumption()
+            return
+        end
+
         local focus = self:GetFocusUnit()
         local energy_rate = 0
         local mass_rate = 0
@@ -1173,6 +1189,10 @@ Unit = Class(moho.unit_methods) {
         local layer = self:GetCurrentLayer()
         self.Dead = true
 
+        -- Make sure assisting/repairing/capturing units recognise death and cease
+        -- Engine does this for Destroy(), but Kill() only stops the unit itself
+        self:UpdateConsumptionValues()
+        
         --Units killed while being invisible because they're teleporting should show when they're killed
         if self.TeleportFx_IsInvisible then
             self:ShowBone(0, true)
@@ -1193,8 +1213,8 @@ Unit = Class(moho.unit_methods) {
             self:ForkThread(self.PlayAnimationThread, 'AnimationDeath')
             self.DisallowCollisions = true
         end
-
-        self:DoUnitCallbacks( 'OnKilled' )
+        
+        self:DoUnitCallbacks('OnKilled')
 
         if self.UnitBeingTeleported and not self.UnitBeingTeleported.Dead then
             self.UnitBeingTeleported:Destroy()
@@ -1454,7 +1474,7 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    CreateDestructionEffects = function( self, overKillRatio )
+    CreateDestructionEffects = function(self, overKillRatio)
         explosion.CreateScalableUnitExplosion( self, overKillRatio )
     end,
 
