@@ -1,3 +1,11 @@
+Patch 3643 (Balance)
+==========================
+
+Bugs
+----
+
+- Engineers no longer drain resources to repair a unit which is in the process of blowing up
+
 Patch 3642 (July 13, 2015)
 ==========================
 
