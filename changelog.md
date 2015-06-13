@@ -84,6 +84,8 @@ Other
 - UEF SCU Drone can now capture, the same as the ACU ones
 - Tiny changes to make Fatboy/Megalith/Spiderbot weapons symmetrical in
   behaviour where they should be
+- Added templates for all support factories. AI in coop missions is now able to
+  rebuild support factories
 
 Contributors
 ------------
