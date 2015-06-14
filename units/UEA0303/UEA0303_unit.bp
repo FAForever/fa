@@ -288,8 +288,8 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Ginsu Pulse Beam',
             FireTargetLayerCapsTable = {
-                Air = 'Air|Land',
-                Land = 'Air|Land',
+                Air = 'Air|Land|Water',
+                Land = 'Air|Land|Water',
             },
             FiringTolerance = 0,
             Label = 'LeftBeam',
@@ -361,8 +361,8 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Ginsu Pulse Beam',
             FireTargetLayerCapsTable = {
-                Air = 'Air|Land',
-                Land = 'Air|Land',
+                Air = 'Air|Land|Water',
+                Land = 'Air|Land|Water',
             },
             FiringTolerance = 0,
             Label = 'RightBeam',
