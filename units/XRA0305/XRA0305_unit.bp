@@ -191,9 +191,9 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 42000,		#52500
-        BuildCostMass = 1260,			#1680
-        BuildTime = 6300,			#8400
+        BuildCostEnergy = 42000,
+        BuildCostMass = 1260,
+        BuildTime = 6300,
         MaintenanceConsumptionPerSecondEnergy = 25,
     },
     Footprint = {
@@ -301,7 +301,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_LowArc',
             ChargeDelay = 0.5,
             CollideFriendly = false,
-            Damage = 140,					#150
+            Damage = 140,
             DamageType = 'Normal',
             DisplayName = 'Disintegrator Pulse Laser',
             FireTargetLayerCapsTable = {
@@ -340,7 +340,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
-            RateOfFire = 1.6,					#2
+            RateOfFire = 1.6,
             TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
@@ -382,8 +382,8 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Nanite Missile Launcher',
             FireTargetLayerCapsTable = {
-                Air = 'Air|Land',
-                Land = 'Air|Land',
+                Air = 'Air|Land|Water',
+                Land = 'Air|Land|Water',
             },
             FiringTolerance = 2,
             Label = 'Missiles1',
