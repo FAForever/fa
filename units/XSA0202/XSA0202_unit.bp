@@ -297,8 +297,8 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Shleo AA Autogun',
             FireTargetLayerCapsTable = {
-                Air = 'Air|Land',
-                Land = 'Air|Land',
+                Air = 'Air|Land|Water',
+                Land = 'Air|Land|Water',
             },
             FiringTolerance = 0,
             Label = 'ShleoAAGun01',
@@ -372,8 +372,8 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Shleo AA Autogun',
             FireTargetLayerCapsTable = {
-                Air = 'Air|Land',
-                Land = 'Air|Land',
+                Air = 'Air|Land|Water',
+                Land = 'Air|Land|Water',
             },
             FiringTolerance = 0,
             Label = 'ShleoAAGun02',
