@@ -79,8 +79,6 @@ Other
 - Engineering Station units now pause on transfer from one player to another
 - Cybran build bots now can assist next build project without respawning
 - The least valuable units are destroyed at unit transfer if unitcap is hit
-- Disable assist command on upgrading factories to prevent accidental
-  cancelling
 - Absolver shield disrupter now hovers higher, so it's less likely to hit the
   floor with the very low mounted gun
 - UEF SCU Drone can now capture, the same as the ACU ones
