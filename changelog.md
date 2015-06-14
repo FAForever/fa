@@ -32,6 +32,7 @@ Physics
 - Yolonna Oss now deals damage to itself
 - Flares and depth-chages no longer draw in friendly projectiles
 - Fix shots sometimes going right through Walled PD
+- Airborne AA weapons can now hit Transports which have landed on water
 
 Other
 - T3 Torpedo Bomber can use Attack-Move properly again
@@ -91,13 +92,19 @@ Contributors
 ------------
 
 - Crotalus
-- Exotic Retard
 - IceDreamer
-- Partytime
 - ResinSmoker
 - Sheeo
 - ckitching
 - shalkya
+- Eximius
+- Speed2
+- anihilnine
+
+Special Thanks To
+- Softly
+- Exotic Retard
+- Partytime
 
 Patch 3640 (Jan 6, 2015)
 ==========
