@@ -26,6 +26,8 @@ Hitboxes
 - Fixed SCUs not being hit properly by laser weapons
 - Fixed units aiming too high on the UEF and Aeon SCUs
 - Torpedo/sonar platforms no longer confuse surface weaponry
+- Fixed a swathe of units, mostly naval, with hitbox/targetbone combinations which made properly
+  targeting the unit either hard, or in many cases impossible
 
 Visual
 - Fixed shield structure glows and rotations not playing
