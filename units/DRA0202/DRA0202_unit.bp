@@ -282,8 +282,8 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Nanite Missile System',
             FireTargetLayerCapsTable = {
-                Air = 'Air|Land',
-                Land = 'Air|Land',
+                Air = 'Air|Land|Water',
+                Land = 'Air|Land|Water',
             },
             FiringTolerance = 2,
             Label = 'AntiAirMissiles',
@@ -366,7 +366,7 @@ UnitBlueprint {
             FiringTolerance = 6,
             Label = 'GroundMissile',
             LeadTarget = true,
-            MaxRadius = 40, # 45
+            MaxRadius = 40,
             MuzzleSalvoDelay = 0.05,
             MuzzleSalvoSize = 4,
             MuzzleVelocity = 30,#35

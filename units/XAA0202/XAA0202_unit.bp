@@ -283,8 +283,8 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Light Displacement Missile',
             FireTargetLayerCapsTable = {
-                Air = 'Air|Land',
-                Land = 'Air|Land',
+                Air = 'Air|Land|Water',
+                Land = 'Air|Land|Water',
             },
             FiringTolerance = 2,
             Label = 'AutoCannon1',
