@@ -347,7 +347,7 @@ UnitBlueprint {
                 'SPECIALLOWPRI',
                 'ALLUNITS',
             },
-            TargetRestrictDisallow = 'HIGHALTAIR, UNTARGETABLE',
+            TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Front_Down_Turret_Muzzle',
             TurretBonePitch = 'Front_Down_Turret',
