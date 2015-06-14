@@ -13,7 +13,7 @@ UnitBlueprint {
         CanFly = true,
         CombatTurnSpeed = 1.5,
         EngageDistance = 50,
-        KLift = 2, # 3
+        KLift = 2,
         KLiftDamping = 2.5,
         KMove = 1,
         KMoveDamping = 1,
@@ -21,7 +21,7 @@ UnitBlueprint {
         KRollDamping = 1,
         KTurn = 1,
         KTurnDamping = 1.5,
-        LiftFactor = 10, # 7
+        LiftFactor = 10,
         MaxAirspeed = 15,
         MinAirspeed = 10,
         PredictAheadForBombDrop = 4,
@@ -299,8 +299,8 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Linked Railgun',
             FireTargetLayerCapsTable = {
-                Air = 'Air|Land',
-                Land = 'Air|Land',
+                Air = 'Air|Land|Water',
+                Land = 'Air|Land|Water',
             },
             FiringTolerance = 1,
             Label = 'LeftBeam',
@@ -377,8 +377,8 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Linked Railgun',
             FireTargetLayerCapsTable = {
-                Air = 'Air|Land',
-                Land = 'Air|Land',
+                Air = 'Air|Land|Water',
+                Land = 'Air|Land|Water',
             },
             FiringTolerance = 1,
             Label = 'RightBeam',
@@ -451,7 +451,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             BombDropThreshold = 4,
             CollideFriendly = false,
-            Damage = 5, # 10
+            Damage = 5,
             DamageFriendly = true,
             DamageRadius = 3,
             DamageType = 'Normal',
@@ -465,9 +465,9 @@ UnitBlueprint {
             },
             FiringRandomness = 0.1,
             FiringTolerance = 6,
-            InitialDamage = 75, # added
+            InitialDamage = 75,
             Label = 'Bomb',
-            MaxRadius = 60, # 45
+            MaxRadius = 60,
             MuzzleSalvoDelay = 0.25,
             MuzzleSalvoSize = 8,
             MuzzleVelocity = 0,
