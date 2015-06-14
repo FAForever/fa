@@ -379,8 +379,8 @@ UnitBlueprint {
             DisplayName = 'Electron Autocannon',
             EffectiveRadius = 17,
             FireTargetLayerCapsTable = {
-                Air = 'Air|Land',
-                Land = 'Air|Land',
+                Air = 'Air|Land|Water',
+                Land = 'Air|Land|Water',
             },
             FiringTolerance = 0.2,
             Label = 'AAAutocannon',
