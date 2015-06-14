@@ -89,13 +89,18 @@ Contributors
 ------------
 
 - Crotalus
-- Exotic Retard
+- Eximius
 - IceDreamer
-- Partytime
 - ResinSmoker
 - Sheeo
+- Speed2
+- anihilnine
 - ckitching
 - shalkya
+
+Special Thanks To
+- Softly
+- Exotic Retard
 
 Patch 3640 (Jan 6, 2015)
 ==========
