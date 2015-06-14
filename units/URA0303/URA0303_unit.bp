@@ -288,8 +288,8 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Nanite Missile System',
             FireTargetLayerCapsTable = {
-                Air = 'Air|Land',
-                Land = 'Air|Land',
+                Air = 'Air|Land|Water',
+                Land = 'Air|Land|Water',
             },
             FiringTolerance = 2,
             Label = 'Missiles1',
@@ -362,8 +362,8 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Nanite Missile System',
             FireTargetLayerCapsTable = {
-                Air = 'Air|Land',
-                Land = 'Air|Land',
+                Air = 'Air|Land|Water',
+                Land = 'Air|Land|Water',
             },
             FiringTolerance = 2,
             Label = 'Missiles2',
