@@ -160,7 +160,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 64000,
         BuildCostMass = 1200,
-        BuildTime = 6000,			#4800
+        BuildTime = 6000,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -324,8 +324,8 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Zealot AA Missile',
             FireTargetLayerCapsTable = {
-                Air = 'Air|Land',
-                Land = 'Air|Land',
+                Air = 'Air|Land|Water',
+                Land = 'Air|Land|Water',
             },
             FiringTolerance = 180,
             Label = 'AAGun01',
@@ -397,8 +397,8 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Zealot AA Missile',
             FireTargetLayerCapsTable = {
-                Air = 'Air|Land',
-                Land = 'Air|Land',
+                Air = 'Air|Land|Water',
+                Land = 'Air|Land|Water',
             },
             FiringTolerance = 180,
             Label = 'AAGun02',
