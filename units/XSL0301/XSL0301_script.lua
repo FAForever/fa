@@ -36,25 +36,6 @@ XSL0301 = Class(CommandUnit) {
         CommandUnit.__init(self, 'LightChronatronCannon')
     end,
 
-    OnStartBuild = function(self, unitBeingBuilt, order)
-        local bp = self:GetBlueprint()
-        if order ~= 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
-            self:StartBuildingEffects(unitBeingBuilt, order)
-        end
-        self:DoOnStartBuildCallbacks(unitBeingBuilt)
-        self:SetActiveConsumptionActive()
-        self:PlayUnitSound('Construct')
-        self:PlayUnitAmbientSound('ConstructLoop')
-        if bp.General.UpgradesTo and unitBeingBuilt:GetUnitId() == bp.General.UpgradesTo and order == 'Upgrade' then
-            self.Upgrading = true
-            self.BuildingUnit = false        
-            unitBeingBuilt.DisallowCollisions = true
-        end
-        self.UnitBeingBuilt = unitBeingBuilt
-        self.UnitBuildOrder = order
-        self.BuildingUnit = true
-    end,    
-
     OnCreate = function(self)
         CommandUnit.OnCreate(self)
         self:SetCapturable(false)
