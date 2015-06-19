@@ -3199,7 +3199,7 @@ Unit = Class(moho.unit_methods) {
     --- Add a callback to be invoked when this unit starts building another. The unit being built is
     -- passed as a parameter to the callback function.
     AddOnStartBuildCallback = function(self, fn)
-        self:AddUnitCallback("OnStartBuild", fn)
+        self:AddUnitCallback(fn, "OnStartBuild")
     end,
 
     DoOnStartBuildCallbacks = function(self, unit)
@@ -3210,12 +3210,16 @@ Unit = Class(moho.unit_methods) {
         self:DoUnitCallbacks("OnFailedToBuild")
     end,
 
-    AddOnUnitBuiltCallback = function(self, fn)
-        self:AddUnitCallback("OnUnitBuilt", fn)
+    AddOnUnitBuiltCallback = function(self, fn, category)
+        table.insert(self.EventCallbacks['OnUnitBuilt'], {category=category, cb=fn})
     end,
 
     DoOnUnitBuiltCallbacks = function(self, unit)
-        self:DoUnitCallbacks("OnUnitBuilt", unit)
+        for _, v in self.EventCallbacks['OnUnitBuilt'] or {} do
+            if unit and not unit.Dead and EntityCategoryContains(v.category, unit) then
+                v.cb(self, unit)
+            end
+        end
     end,
 
     AddOnHorizontalStartMoveCallback = function(self, fn)
