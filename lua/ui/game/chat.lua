@@ -841,10 +841,10 @@ function ReceiveChatFromSim(sender, msg)
         towho = string.format("%s %s:", LOC(ToStrings.to.text), GetArmyData(msg.to).nickname)
     end
     local name = sender .. ' ' .. towho
+
     if msg.echo then
         if msg.from and SessionIsReplay() then
-            name = string.format("%s %s:", LOC(ToStrings.to.text), sender)
-            name = msg.from.." "..name
+            name = string.format("%s %s %s:", msg.from, LOC(ToStrings.to.text), GetArmyData(msg.to).nickname)
         else
             name = string.format("%s %s:", LOC(ToStrings.to.caps), sender)
         end
@@ -854,14 +854,17 @@ function ReceiveChatFromSim(sender, msg)
     if table.getn(tempText) == 0 then
         tempText = {""}
     end
-    local entry = {name = name,
+    local entry = {
+        name = name,
         tokey = tokey,
         color = (armyData.color or "ffffffff"),
         armyID = (armyData.ArmyID or 1),
         faction = (armyData.faction or (table.getn(FactionsIcon)-1))+1,
         text = msg.text,
         wrappedtext = tempText,
-        new = true}
+        new = true
+    }
+
     if msg.camera then
         entry.camera = msg.camera
     end
