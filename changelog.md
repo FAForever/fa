@@ -59,6 +59,7 @@ Visual
   Super-Game-Enders
 - ASF effects tweaked for performance (less effects on low fidelty)
 - Cybran engineering build bots now crash when their owner dies rather than just vanishing
+- Quantum Gateways now can assist eachother
 
 
 UI
