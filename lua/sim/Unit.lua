@@ -240,10 +240,6 @@ Unit = Class(moho.unit_methods) {
         self.AdjacentUnits = {}
     end,
 
-    getDeathVector = function(self)
-        return self.debris_Vector
-    end,
-
     -------------------------------------------------------------------------------------------
     -- TARGET AND ATTACKERS FUNCTIONS
     ------------------------------------------------------------------------------------------
