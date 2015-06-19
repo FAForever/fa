@@ -116,15 +116,8 @@ function GetConstructEconomyModel(builder, targetData, upgradeBaseData)
    return buildtime/rate, energy, mass
 end
 
-
-
--- -- -- added for CBFP
-
-
-SpecialWepRestricted = false
 UnitCatRestricted = false
 _UnitRestricted_cache = {}
-
 
 -- -------------------------------------------------------------------------------------------------------------
 -- UNIT RESTRICTION FUNCTIONS   [119] [157]
@@ -154,28 +147,6 @@ function UnitRestricted(unit)
     return _UnitRestricted_cache[unitId]
 end
 
-
-function WeaponRestricted(weaponLabel)
-    -- tells you whether a weapon should be disabled (according to the unit restrictions)
-
-    if not CheckUnitRestrictionsEnabled() then     -- if no restrictions defined then dont bother
-        return false
-    end
-    CacheRestrictedUnitLists()
-    return SpecialWepRestricted[weaponLabel]
-end
-
-
-function NukesRestricted()
-    return WeaponRestricted('StrategicMissile')
-end
-
-
-function TacticalMissilesRestricted()
-    return WeaponRestricted('TacticalMissile')
-end
-
-
 -- -------------------------------------------------------------------------------------------------------------
 -- HELPER FUNCTIONS
 
@@ -193,7 +164,6 @@ function CacheRestrictedUnitLists()
         return
     end
 
-    SpecialWepRestricted = {}
     UnitCatRestricted = {}
     local restrictedUnits = import('/lua/ui/lobby/restrictedUnitsData.lua').restrictedUnits
     local c
@@ -208,25 +178,6 @@ function CacheRestrictedUnitLists()
                 c = cat
                 if type(c) == 'string' then c = ParseEntityCategory(c) end
                 table.insert( UnitCatRestricted, c )
-            end
-        end
-
-        -- create a list of restricted special weapons (nukes, tactical missiles)
-        if restrictedUnits[restriction].specialweapons then   
-            for l, cat in restrictedUnits[restriction].specialweapons do
-
-                -- strategic missiles
-                if cat == 'StrategicMissile' or cat == 'strategicmissile' or cat == 'sm' or cat == 'SM' then
-                    SpecialWepRestricted['StrategicMissile'] = true
-
-                -- tactical missiles
-                elseif cat == 'TacticalMissile' or cat == 'tacticalmissile' or cat == 'tm' or cat == 'TM' then
-                    SpecialWepRestricted['TacticalMissile'] = true
-
-                -- mod added weapons
-                else
-                    SpecialWepRestricted[cat] = true
-                end
             end
         end
     end

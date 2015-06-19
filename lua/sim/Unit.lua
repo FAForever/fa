@@ -232,7 +232,6 @@ Unit = Class(moho.unit_methods) {
             self:RemoveTransportForcedAttachPoints()
         end
         self:InitBuffFields()
-        self:DisableRestrictedWeapons()
         self:OnCreated()
 
         --Ensure transport slots are available
@@ -3909,30 +3908,6 @@ Unit = Class(moho.unit_methods) {
                 local fieldBP = field:GetBlueprint()
                 if fieldBP.Name == name then
                     return field
-                end
-            end
-        end
-    end,
-
-    --Disables some weapons as defined in the unit restriction list, if unit restrictions enabled of course.
-    --Removing the weapon in the blueprint would break compatibility with other
-    --mods that might change nuke weapons. So I'm just disabling it and removing the icons, the next best thing.
-    DisableRestrictedWeapons = function(self)
-        local noNukes = Game.NukesRestricted()
-        local noTacMsl = Game.TacticalMissilesRestricted()
-        for i = 1, self:GetWeaponCount() do
-            local wep = self:GetWeapon(i)
-            local bp = wep:GetBlueprint()
-            if bp.CountedProjectile then
-                if noNukes and bp.NukeWeapon then
-                    wep:SetWeaponEnabled(false)
-                    self:RemoveCommandCap('RULEUCC_Nuke')
-                    self:RemoveCommandCap('RULEUCC_SiloBuildNuke')
-                elseif noTacMsl then
-                    wep:SetWeaponEnabled(false)
-                    --To do: Tthis may not be sufficient for all units. ACUs with a tactical missile enhancements may bypass this
-                    self:RemoveCommandCap('RULEUCC_Tactical')
-                    self:RemoveCommandCap('RULEUCC_SiloBuildTactical')
                 end
             end
         end
