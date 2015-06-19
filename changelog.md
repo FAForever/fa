@@ -43,6 +43,7 @@ Other
 - Fixed share until death bug with dual-given units
 - Minimap now remembers whether to show resource icons or not
 - Current commandmode no longer reset if an engineer dies in the current selection
+- Fixed bug with chat messages having wrong recipients in replay
 
 Enhancements
 ------------
