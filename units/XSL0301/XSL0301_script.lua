@@ -62,11 +62,11 @@ XSL0301 = Class(CommandUnit) {
         self:HideBone('Back_Upgrade', true)
         self:SetupBuildBones()
     end,
-    
+
     CreateBuildEffects = function( self, unitBeingBuilt, order )
         EffectUtil.CreateSeraphimUnitEngineerBuildingEffects( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )
-    end,  
-    
+    end,
+
     CreateEnhancement = function(self, enh)
         CommandUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
@@ -166,16 +166,16 @@ XSL0301 = Class(CommandUnit) {
                             Mult = 1.0,
                         },
                     },
-                } 
+                }
             end
             if Buff.HasBuff( self, 'SeraphimSCUDamageStabilization' ) then
                 Buff.RemoveBuff( self, 'SeraphimSCUDamageStabilization' )
-            end  
-            Buff.ApplyBuff(self, 'SeraphimSCUDamageStabilization')            
+            end
+            Buff.ApplyBuff(self, 'SeraphimSCUDamageStabilization')
       	elseif enh == 'DamageStabilizationRemove' then
             if Buff.HasBuff( self, 'SeraphimSCUDamageStabilization' ) then
                 Buff.RemoveBuff( self, 'SeraphimSCUDamageStabilization' )
-            end  
+            end
         -- Enhanced Sensor Systems
         elseif enh == 'EnhancedSensors' then
             self:SetIntelRadius('Vision', bp.NewVisionRadius or 104)
