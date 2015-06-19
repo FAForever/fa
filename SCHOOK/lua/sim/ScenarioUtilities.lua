@@ -13,7 +13,7 @@ function CreateArmyGroupAsPlatoonVeteran(strArmy, strGroup, formation, veteranLe
     local plat = CreateArmyGroupAsPlatoon(strArmy, strGroup, formation)
     veteranLevel = veteranLevel or 5
     for k,v in plat:GetPlatoonUnits() do
-        v:SetVeterancy(veteranLevel)
+        v:SetVeteranLevel(veteranLevel)
     end
     return plat
 end
