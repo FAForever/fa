@@ -221,6 +221,16 @@ function CreateUI()
         end
     end
     
+	local function UnbindCurrentSelection()
+		local Keymapper = import('/lua/keymap/keymapper.lua')
+        for k, v in keyTable do
+            if v._selected then
+                Keymapper.ClearUserKeyMapping(v.key)
+                break
+            end
+        end
+    end
+	
     panel = Bitmap(GetFrame(0), UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_m.dds'))
     panel.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
     panel.Height:Set(390)
@@ -254,6 +264,12 @@ function CreateUI()
         AssignCurrentSelection()
     end
     
+	local unbindKeyButton = UIUtil.CreateButtonStd(panel, "/widgets/small02", LOC("<LOC key_binding_0007>Unbind Key"), 12)
+    LayoutHelpers.Below(unbindKeyButton, assignKeyButton, 0)
+    unbindKeyButton.OnClick = function(self, modifiers)
+        UnbindCurrentSelection()
+    end
+	
     local resetButton = UIUtil.CreateButtonStd(panel, "/widgets/small02", LOC("<LOC key_binding_0004>Reset"), 12)
     LayoutHelpers.RightOf(resetButton, closeButton, 10)
     resetButton.OnClick = function(self, modifiers)
