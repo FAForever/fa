@@ -1913,6 +1913,12 @@ Unit = Class(moho.unit_methods) {
             self:SetPosition({Position[1], Position[2] + bp.RaiseDistance, Position[3]}, true)
         end
 
+        -- If someone thinks they're being clever by using a UI mod to violate unit restrictions,
+        -- thoroughly ruin their day.
+        if Game.UnitRestricted(self:GetUnitId(), self) then
+            self:Kill()
+        end
+
         --Added by Brute51 for unit enhancement presets
         if bp.EnhancementPresetAssigned then
             self:ForkThread(self.CreatePresetEnhancementsThread)

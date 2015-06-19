@@ -82,6 +82,27 @@ function SetupSession()
     --===================================================================================
     ScenarioInfo.Env = import('/lua/scenarioEnvironment.lua')
 
+    -- if build restrictions chosen, set them up
+    local buildRestrictions = nil
+    if ScenarioInfo.Options.RestrictedCategories then
+        local restrictedUnits = import('/lua/ui/lobby/restrictedUnitsData.lua').restrictedUnits
+        for index, restriction in ScenarioInfo.Options.RestrictedCategories do
+            if restrictedUnits[restriction].categories then
+                for index, cat in restrictedUnits[restriction].categories do
+                    if buildRestrictions == nil then
+                        buildRestrictions = categories[cat]
+                    else
+                        buildRestrictions = buildRestrictions + categories[cat]
+                    end
+                end
+            end
+        end
+    end
+
+    if buildRestrictions then
+        import('/lua/game.lua').SetRestrictions(buildRestrictions)
+        ScenarioInfo.BuildRestrictions = buildRestrictions
+    end
 
     --===========================================================================
     -- Load the scenario save and script files
@@ -99,7 +120,6 @@ function SetupSession()
     doscript(ScenarioInfo.script, ScenarioInfo.Env)
 
     ResetSyncTable()
-
 end
 
 
@@ -121,6 +141,12 @@ function OnCreateArmyBrain(index, brain, name, nickname)
     ScenarioInfo.UnitNames[index] = {}
 
     InitializeArmyAI(name)
+
+    -- Add build restrictions to the army, if any are configured.
+    if ScenarioInfo.BuildRestrictions then
+        AddBuildRestriction(index, ScenarioInfo.BuildRestrictions)
+    end
+
     --brain:InitializePlatoonBuildManager()
     --ScenarioUtils.LoadArmyPBMBuilders(name)
     --LOG('*SCENARIO DEBUG: ON POP, ARMY BRAINS = ', repr(ArmyBrains))
@@ -162,36 +188,6 @@ function BeginSession()
         -- be disabled.
         ScenarioInfo.TeamGame = true
         Sync.LockTeams = true
-    end
-
-    -- if build restrictions chosen, set them up
-    local buildRestrictions = nil
-    if ScenarioInfo.Options.RestrictedCategories then
-        local restrictedUnits = import('/lua/ui/lobby/restrictedUnitsData.lua').restrictedUnits
-        for index, restriction in ScenarioInfo.Options.RestrictedCategories do
-            local restrictedCategories = nil
-            if restrictedUnits[restriction].categories then
-				for index, cat in restrictedUnits[restriction].categories do
-					if restrictedCategories == nil then
-						restrictedCategories = categories[cat]
-					else
-						restrictedCategories = restrictedCategories + categories[cat]
-					end
-				end
-				if buildRestrictions == nil then
-					buildRestrictions = restrictedCategories
-				else
-					buildRestrictions = buildRestrictions + restrictedCategories
-				end
-			end
-        end
-    end
-
-    if buildRestrictions then
-        local tblArmies = ListArmies()
-        for index, name in tblArmies do
-            AddBuildRestriction(index, buildRestrictions)
-        end
     end
 
     -- Set up the teams we found
