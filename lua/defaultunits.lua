@@ -65,8 +65,24 @@ StructureUnit = Class(Unit) {
         end
     end,
 
+    OnStartBeingBuilt = function(self, builder, layer)
+        Unit.OnStartBeingBuilt(self, builder, layer)
+        local bp = self:GetBlueprint()
+        if bp.Physics.FlattenSkirt and not self:HasTarmac() and bp.General.FactionName ~= "Seraphim" then
+            if self.TarmacBag then
+                self:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP)
+            else
+                self:CreateTarmac(true, true, true, false, false)
+            end
+        end
+    end,
+
     OnStopBeingBuilt = function(self,builder,layer)
         Unit.OnStopBeingBuilt(self,builder,layer)
+        -- Whaa why can't we have sane inheritance chains :/
+        if self:GetBlueprint().General.FactionName == "Seraphim" then
+            self:CreateTarmac(true, true, true, false, false)
+        end
         self:PlayActiveAnimation()
     end,
 

@@ -2125,17 +2125,10 @@ Unit = Class(moho.unit_methods) {
         self:PlayUnitSound('Construct')
         self:PlayUnitAmbientSound('ConstructLoop')
 
-        if order == 'Upgrade' and unitBeingBuilt:GetBlueprint().General.UpgradesFrom == self:GetUnitId() then
+        local bp = unitBeingBuilt:GetBlueprint()
+        if order == 'Upgrade' and bp.General.UpgradesFrom == self:GetUnitId() then
             unitBeingBuilt.DisallowCollisions = true
             unitBeingBuilt:SetCanTakeDamage(false)
-        end
-
-        if unitBeingBuilt:GetBlueprint().Physics.FlattenSkirt and not unitBeingBuilt:HasTarmac() then
-            if self.TarmacBag and self:HasTarmac() then
-                unitBeingBuilt:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP )
-            else
-                unitBeingBuilt:CreateTarmac(true, true, true, false, false)
-            end
         end
     end,
 
