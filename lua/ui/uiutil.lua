@@ -582,8 +582,16 @@ end
 
 -- Create a checkbox using the default checkbox texture. Kept as its own entry point for the benefit
 -- of retarded GPG code that things "radiobtn" is a sensible name for a checkbox texture.
-function CreateCheckboxStd(parent)
-    return CreateCheckbox(parent, '/dialogs/check-box_btn/')
+function CreateCheckboxStd(parent, texturePath)
+    local checkbox = Checkbox(parent,
+        SkinnableFile(texturePath .. '-d_btn_up.dds'),
+        SkinnableFile(texturePath .. '-s_btn_up.dds'),
+        SkinnableFile(texturePath .. '-d_btn_over.dds'),
+        SkinnableFile(texturePath .. '-s_btn_over.dds'),
+        SkinnableFile(texturePath .. '-d_btn_dis.dds'),
+        SkinnableFile(texturePath .. '-s_btn_dis.dds')
+    )
+    return checkbox
 end
 
 function CreateCheckbox(parent, texturePath, label, labelRight, labelSize, clickCue, rollCue)
