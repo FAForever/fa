@@ -526,12 +526,10 @@ TPodTowerUnit = Class(TStructureUnit) {
     
     OnTransportAttach = function(self, bone, attachee)
         attachee:SetDoNotTarget(true)
-        attachee:OnAttachedToTransport(self, attachBone)
     end,
     
     OnTransportDetach = function(self, bone, attachee)
         attachee:SetDoNotTarget(false)
-        attachee:OnDetachedToTransport(self, attachBone)
     end,
     
     FinishedBeingBuilt = State {
