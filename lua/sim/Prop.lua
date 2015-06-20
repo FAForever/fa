@@ -156,7 +156,7 @@ Prop = Class(moho.prop_methods, Entity) {
         if radius and shape == 'Sphere' then
             self:SetCollisionShape(shape, centerx, centery, centerz, radius)
         else
-            self:SetCollisionShape(shape, centerx, centery, centerz, sizex, sizey, sizez)
+            self:SetCollisionShape(shape, centerx, centery + sizey, centerz, sizex, sizey, sizez)
         end
     end,
 
