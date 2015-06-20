@@ -75,7 +75,6 @@ Unit = Class(moho.unit_methods) {
     DestructionPartsLowToss = {},
     DestructionPartsChassisToss = {},
     EconomyProductionInitiallyActive = true,
-    RebuildBP = false,
 
     GetSync = function(self)
         if not Sync.UnitData[self:GetEntityId()] then
@@ -2081,10 +2080,11 @@ Unit = Class(moho.unit_methods) {
     end,
 
     GetRebuildBonus = function(self, bp)
-        self.RebuildBP = bp
         return 0 -- take care of rebuild bonus in unit:OnStartBuild()
     end,
 
+    --- Look for a wreck of the thing we just started building at the same location. If there is
+    -- one, give the rebuild bonus.
     SetRebuildProgress = function(self, unit)
         local upos = unit:GetPosition()
         local props = GetReclaimablesInRect(Rect(upos[1], upos[3], upos[1], upos[3]))
@@ -2102,11 +2102,10 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
-        if self.RebuildBP then -- builder is rebuilding something
-            if unitBeingBuilt:GetHealth() == 1 then -- rebuilt unit starts with 1 HP
-                self:SetRebuildProgress(unitBeingBuilt)
-            end
-            self.RebuildBP = false
+        -- We just started a construction (and haven't just been tasked to work on a half-done
+        -- project.
+        if unitBeingBuilt:GetHealth() == 1 then
+            self:SetRebuildProgress(unitBeingBuilt)
         end
 
         if order == 'Repair' then
