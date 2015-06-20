@@ -1,10 +1,10 @@
-#*****************************************************************************
-#* File: lua/modules/ui/game/orders.lua
-#* Author: Chris Blackwell
-#* Summary: Unit orders UI
-#*
-#* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#*****************************************************************************
+-- *****************************************************************************
+-- * File: lua/modules/ui/game/orders.lua
+-- * Author: Chris Blackwell
+-- * Summary: Unit orders UI
+-- *
+-- * Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+-- *****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
@@ -31,12 +31,12 @@ controls =
     mfdControl = false,
 }
 
-# positioning controls, don't belong to file
+-- positioning controls, don't belong to file
 local layoutVar = false
 local glowThread = false
 
-# these variables control the number of slots available for orders
-# though they are fixed, the code is written so they could easily be made soft
+-- these variables control the number of slots available for orders
+-- though they are fixed, the code is written so they could easily be made soft
 local numSlots = 12
 local firstAltSlot = 7
 local vertRows = 3
@@ -110,7 +110,7 @@ function CreateMouseoverDisplay(parent, ID)
     local text = TooltipInfo['Tooltips'][ID]['title'] or ID
     local desc = TooltipInfo['Tooltips'][ID]['description'] or ID
     
-    if TooltipInfo['Tooltips'][ID]['keyID'] and TooltipInfo['Tooltips'][ID]['keyID'] != "" then
+    if TooltipInfo['Tooltips'][ID]['keyID'] and TooltipInfo['Tooltips'][ID]['keyID'] ~= "" then
         for i, v in Keymapping do
             if v == TooltipInfo['Tooltips'][ID]['keyID'] then
                 local properkeyname = import('/lua/ui/dialogs/keybindings.lua').formatkeyname(i)
@@ -157,16 +157,16 @@ local function CreateOrderButtonGrid()
 	controls.orderButtonGrid:DeleteAll()
 end
 
-# local logic data
+-- local logic data
 local orderCheckboxMap = false
 local currentSelection = false
 
-# helper function to create order bitmaps
-# note, your bitmaps must be in /game/orders/ and have the standard button naming convention
+-- helper function to create order bitmaps
+-- note, your bitmaps must be in /game/orders/ and have the standard button naming convention
 local function GetOrderBitmapNames(bitmapId)
     if bitmapId == nil then
         LOG("Error - nil bitmap passed to GetOrderBitmapNames")
-        bitmapId = "basic-empty"    # TODO do I really want to default it?
+        bitmapId = "basic-empty"    -- TODO do I really want to default it?
     end
     
     local button_prefix = "/game/orders/" .. bitmapId .. "_btn_"
@@ -176,13 +176,13 @@ local function GetOrderBitmapNames(bitmapId)
         ,  UIUtil.SkinnableFile(button_prefix .. "over_sel.dds")
         ,  UIUtil.SkinnableFile(button_prefix .. "dis.dds")
         ,  UIUtil.SkinnableFile(button_prefix .. "dis_sel.dds")
-        , "UI_Action_MouseDown", "UI_Action_Rollover"   # sets click and rollover cues
+        , "UI_Action_MouseDown", "UI_Action_Rollover"   -- sets click and rollover cues
 end
 
-# used by most orders, which start and stop a command mode, so they toggle on when pressed
-# and toggle off when done
+-- used by most orders, which start and stop a command mode, so they toggle on when pressed
+-- and toggle off when done
 local function StandardOrderBehavior(self, modifiers)
-    # if we're checked, end the current command mode, otherwise start it
+    -- if we're checked, end the current command mode, otherwise start it
     if self:IsChecked() then
         import('/lua/ui/game/commandmode.lua').EndCommandMode(true)
     else
@@ -190,7 +190,7 @@ local function StandardOrderBehavior(self, modifiers)
     end
 end
 
-# used by orders that happen immediately and don't change the command mode (ie the stop button)
+-- used by orders that happen immediately and don't change the command mode (ie the stop button)
 local function DockOrderBehavior(self, modifiers)
     if modifiers.Shift then
         IssueDockCommand(false)
@@ -200,13 +200,13 @@ local function DockOrderBehavior(self, modifiers)
     self:SetCheck(false)
 end
 
-# used by orders that happen immediately and don't change the command mode (ie the stop button)
+-- used by orders that happen immediately and don't change the command mode (ie the stop button)
 local function MomentaryOrderBehavior(self, modifiers)
     IssueCommand(GetUnitCommandFromCommandCap(self._order))
     self:SetCheck(false)
 end
 
-# used by things that build weapons, etc
+-- used by things that build weapons, etc
 local function BuildOrderBehavior(self, modifiers)
     if modifiers.Left then
 	    IssueCommand(GetUnitCommandFromCommandCap(self._order))
@@ -237,7 +237,7 @@ local function BuildInitFunction(control, unitList)
     end
 end
 
-# used by subs that can dive/surface
+-- used by subs that can dive/surface
 local function DiveOrderBehavior(self, modifiers)
     if modifiers.Left then
 	    IssueCommand(GetUnitCommandFromCommandCap(self._order))
@@ -319,8 +319,8 @@ function ToggleDiveOrder()
     end
 end
 
-# pause button specific behvior
-# TODO pause button will be moved to construction manager
+-- pause button specific behvior
+-- TODO pause button will be moved to construction manager
 local function PauseOrderBehavior(self, modifiers)
 	Checkbox.OnClick(self)
 	SetPaused(currentSelection, self:IsChecked())
@@ -335,9 +335,9 @@ function TogglePauseState()
     SetPaused(currentSelection, not pauseState)
 end
 
-# some toggleable abilities need reverse semantics.
+-- some toggleable abilities need reverse semantics.
 local function CheckReverseSemantics(scriptBit)
-    if scriptBit == 0 then # shields
+    if scriptBit == 0 then -- shields
         return true
     end
     
@@ -357,7 +357,7 @@ local function AbilityButtonBehavior(self, modifiers)
     end
 end
 
-# generic script button specific behvior
+-- generic script button specific behvior
 local function ScriptButtonOrderBehavior(self, modifiers)
     local state = self:IsChecked()
     if self._mixedIcon then
@@ -379,7 +379,7 @@ local function ScriptButtonInitFunction(control, unitList)
         if result == nil then
             result = thisUnitStatus
         else
-            if thisUnitStatus != result then
+            if thisUnitStatus ~= result then
                 mixed = true
                 result = true
                 break
@@ -495,7 +495,7 @@ local function CreateFirestatePopup(parent, selected)
     local i = 1
     bg.buttons = {}
     for index, state in retaliateStateInfo do
-        if index != -1 then
+        if index ~= -1 then
             bg.buttons[i] = CreateButton(index, state)
             if i == 1 then
                 LayoutHelpers.AtBottomIn(bg.buttons[i], bg)
@@ -687,13 +687,13 @@ local function OverChargeFrame(self, deltaTime)
     end
 end
 
-# sets up an orderInfo for each order that comes in
-# preferredSlot is custom data that is used to determine what slot the order occupies
-# initialStateFunc is a function that gets called once the control is created and allows you to set the initial state of the button
-#      the function should have this declaration: function(checkbox, unitList)
-# extraInfo is used for storing any extra information required in setting up the button
+-- sets up an orderInfo for each order that comes in
+-- preferredSlot is custom data that is used to determine what slot the order occupies
+-- initialStateFunc is a function that gets called once the control is created and allows you to set the initial state of the button
+--      the function should have this declaration: function(checkbox, unitList)
+-- extraInfo is used for storing any extra information required in setting up the button
 local defaultOrdersTable = {
-    # Common rules
+    -- Common rules
     RULEUCC_Move = {                helpText = "move",          bitmapId = 'move',                  preferredSlot = 1,  behavior = StandardOrderBehavior,},
     RULEUCC_Attack = {              helpText = "attack",        bitmapId = 'attack',                preferredSlot = 2,  behavior = StandardOrderBehavior, },
     RULEUCC_Patrol = {              helpText = "patrol",        bitmapId = 'patrol',                preferredSlot = 3,  behavior = StandardOrderBehavior, },
@@ -701,7 +701,7 @@ local defaultOrdersTable = {
     RULEUCC_Guard = {               helpText = "assist",        bitmapId = 'guard',                 preferredSlot = 5,  behavior = StandardOrderBehavior, },
     RULEUCC_RetaliateToggle = {     helpText = "mode",          bitmapId = 'stand-ground',          preferredSlot = 6,  behavior = RetaliateOrderBehavior,      initialStateFunc = RetaliateInitFunction, },
 
-    # Unit specific rules
+    -- Unit specific rules
     RULEUCC_SiloBuildTactical = {   helpText = "build_tactical",bitmapId = 'silo-build-tactical',   preferredSlot = 7,  behavior = BuildOrderBehavior,          initialStateFunc = BuildInitFunction,},
     RULEUCC_SiloBuildNuke = {       helpText = "build_nuke",    bitmapId = 'silo-build-nuke',       preferredSlot = 7,  behavior = BuildOrderBehavior,          initialStateFunc = BuildInitFunction,},
     RULEUCC_Overcharge = {          helpText = "overcharge",    bitmapId = 'overcharge',            preferredSlot = 7,  behavior = StandardOrderBehavior,       onframe = OverChargeFrame},
@@ -721,7 +721,7 @@ local defaultOrdersTable = {
     DroneL = {              helpText = "drone",        bitmapId = 'unload02',                preferredSlot = 11, behavior = DroneBehavior,initialStateFunc = DroneInit,},
     DroneR = {              helpText = "drone",        bitmapId = 'unload02',                preferredSlot = 11, behavior = DroneBehavior,initialStateFunc = DroneInit,},
 
-    # Unit toggle rules
+    -- Unit toggle rules
     RULEUTC_ShieldToggle = {        helpText = "toggle_shield",     bitmapId = 'shield',                preferredSlot = 7,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 0,},
     RULEUTC_WeaponToggle = {        helpText = "toggle_weapon",     bitmapId = 'toggle-weapon',         preferredSlot = 7,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 1,},    
     RULEUTC_JammingToggle = {       helpText = "toggle_jamming",    bitmapId = 'jamming',               preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 2,},
@@ -740,7 +740,7 @@ local specialOrdersTable = {
 }
 
 
-# this is a used as a set
+-- this is a used as a set
 local commonOrders = {
     RULEUCC_Move = true,
     RULEUCC_Attack = true,
@@ -837,7 +837,7 @@ local function AddOrder(orderInfo, slot, batchMode)
         end
     end
 
-    # set up tooltips
+    -- set up tooltips
     checkbox.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
             if controls.orderGlow then
@@ -860,7 +860,7 @@ local function AddOrder(orderInfo, slot, batchMode)
         Checkbox.HandleEvent(self, event)
     end
 
-    # calculate row and column, remove old item, add new checkbox
+    -- calculate row and column, remove old item, add new checkbox
     local cols, rows = controls.orderButtonGrid:GetDimensions()
     local row = math.ceil(slot / cols)
     local col = math.mod(slot - 1, cols) + 1
@@ -870,7 +870,7 @@ local function AddOrder(orderInfo, slot, batchMode)
     return checkbox
 end
 
-# creates the buttons for the common orders, and then disables them if they aren't in the order set
+-- creates the buttons for the common orders, and then disables them if they aren't in the order set
 local function CreateCommonOrders(availableOrders, init)
     for key in commonOrders do
         local orderInfo = standardOrdersTable[key]
@@ -889,7 +889,7 @@ local function CreateCommonOrders(availableOrders, init)
     end
     
     for index, availOrder in availableOrders do
-        if not standardOrdersTable[availOrder] then continue end   # skip any orders we don't have in our table
+        if not standardOrdersTable[availOrder] then continue end   -- skip any orders we don't have in our table
         if commonOrders[availOrder] then
             local ck = orderCheckboxMap[availOrder]
             ck:Enable()
@@ -897,10 +897,10 @@ local function CreateCommonOrders(availableOrders, init)
     end
 end
 
-# creates the buttons for the alt orders, placing them as possible
+-- creates the buttons for the alt orders, placing them as possible
 local function CreateAltOrders(availableOrders, availableToggles, units)
-#TODO? it would indeed be easier if the alt orders slot was in the blueprint, but for now try
-#to determine where they go by using preferred slots
+-- TODO? it would indeed be easier if the alt orders slot was in the blueprint, but for now try
+-- to determine where they go by using preferred slots
 
     --Look for units in the selection that have special ability buttons
     --If any are found, add the ability information to the standard order table
@@ -909,7 +909,7 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
             local tempBP = UnitData[unit:GetEntityId()]
             if tempBP.Abilities then
                 for abilityIndex, ability in tempBP.Abilities do
-                    if ability.Active != false then
+                    if ability.Active ~= false then
                         table.insert(availableOrders, abilityIndex)
                         standardOrdersTable[abilityIndex] = table.merged(ability, import('/lua/abilitydefinition.lua').abilities[abilityIndex])
                         standardOrdersTable[abilityIndex].behavior = AbilityButtonBehavior
@@ -943,8 +943,8 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
         end
     end
     
-    # determine what slots to put alt orders
-    # we first want a table of slots we want to fill, and what orders want to fill them
+    -- determine what slots to put alt orders
+    -- we first want a table of slots we want to fill, and what orders want to fill them
     local desiredSlot = {}
     local usedSpecials = {}
     for index, availOrder in availableOrders do
@@ -955,7 +955,7 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
             end
             table.insert(desiredSlot[preferredSlot], availOrder)
         else
-            if specialOrdersTable[availOrder] != nil then
+            if specialOrdersTable[availOrder] ~= nil then
                 specialOrdersTable[availOrder].behavior()
                 usedSpecials[availOrder] = true
             end
@@ -970,7 +970,7 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
             end
             table.insert(desiredSlot[preferredSlot], availToggle)
         else
-            if specialOrdersTable[availToggle] != nil then
+            if specialOrdersTable[availToggle] ~= nil then
                 specialOrdersTable[availToggle].behavior()
                 usedSpecials[availToggle] = true
             end
@@ -983,18 +983,18 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
         end
     end
 
-    # now go through that table and determine what doesn't fit and look for slots that are empty
-    # since this is only alt orders, just deal with slots 7-12
+    -- now go through that table and determine what doesn't fit and look for slots that are empty
+    -- since this is only alt orders, just deal with slots 7-12
     local orderInSlot = {}
     
-    # go through first time and add all the first entries to their preferred slot
+    -- go through first time and add all the first entries to their preferred slot
     for slot = firstAltSlot,numSlots do
         if desiredSlot[slot] then
             orderInSlot[slot] = desiredSlot[slot][1]
         end
     end
 
-    # now put any additional entries wherever they will fit
+    -- now put any additional entries wherever they will fit
     for slot = firstAltSlot,numSlots do
         if desiredSlot[slot] and table.getn(desiredSlot[slot]) > 1 then
             for index, item in desiredSlot[slot] do
@@ -1009,23 +1009,23 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
                     end
                     if not foundFreeSlot then
                         WARN("No free slot for order: " .. item)
-                        # could break here, but don't, then you'll know how many extra orders you have
+                        -- could break here, but don't, then you'll know how many extra orders you have
                     end
                 end
             end
         end
     end
 
-    # now map it the other direction so it's order to slot
+    -- now map it the other direction so it's order to slot
     local slotForOrder = {}
     for slot, order in orderInSlot do
         slotForOrder[order] = slot
     end
     --LOG(repr(availableOrders), repr(orderInSlot), repr(slotForOrder))
     
-    # create the alt order buttons
+    -- create the alt order buttons
     for index, availOrder in availableOrders do
-        if not standardOrdersTable[availOrder] then continue end   # skip any orders we don't have in our table
+        if not standardOrdersTable[availOrder] then continue end   -- skip any orders we don't have in our table
         if not commonOrders[availOrder] then
             local orderInfo = standardOrdersTable[availOrder] or AbilityInformation[availOrder]
             local orderCheckbox = AddOrder(orderInfo, slotForOrder[availOrder], true)
@@ -1053,7 +1053,7 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
     end
 
     for index, availToggle in availableToggles do
-        if not standardOrdersTable[availToggle] then continue end   # skip any orders we don't have in our table
+        if not standardOrdersTable[availToggle] then continue end   -- skip any orders we don't have in our table
         if not commonOrders[availToggle] then
             local orderInfo = standardOrdersTable[availToggle] or AbilityInformation[availToggle]
             local orderCheckbox = AddOrder(orderInfo, slotForOrder[availToggle], true)
@@ -1079,10 +1079,10 @@ end
 
 -- called by gamemain when new orders are available, 
 function SetAvailableOrders(availableOrders, availableToggles, newSelection)
-    # save new selection
-    #LOG('available orders: ', repr(availableOrders))
+    -- save new selection
+    -- LOG('available orders: ', repr(availableOrders))
     currentSelection = newSelection
-    # clear existing orders
+    -- clear existing orders
     orderCheckboxMap = {}
     controls.orderButtonGrid:DestroyAllItems(true)
 
@@ -1109,7 +1109,7 @@ function SetAvailableOrders(availableOrders, availableToggles, newSelection)
                 if orderDiffs == nil then
                     orderDiffs = {}
                 end
-                if orderDiffs[orderKey] != nil and (orderDiffs[orderKey].bitmapId != override.bitmapId or orderDiffs[orderKey].helpText != override.helpText) then
+                if orderDiffs[orderKey] ~= nil and (orderDiffs[orderKey].bitmapId ~= override.bitmapId or orderDiffs[orderKey].helpText ~= override.helpText) then
                     -- found order diff already, so mark it false so it gets ignored when applying to table
                     orderDiffs[orderKey] = false
                 else
@@ -1120,9 +1120,9 @@ function SetAvailableOrders(availableOrders, availableToggles, newSelection)
     end
     
     -- apply overrides
-    if orderDiffs != nil then
+    if orderDiffs ~= nil then
         for orderKey, override in orderDiffs do
-            if override and override != false then
+            if override and override ~= false then
                 if override.bitmapId then
                     standardOrdersTable[orderKey].bitmapId = override.bitmapId
                 end
@@ -1196,7 +1196,7 @@ end
 function SetLayout(layout)
     layoutVar = layout
 
-    # clear existing orders
+    -- clear existing orders
     orderCheckboxMap = {}
     if controls and controls.orderButtonGrid then
         controls.orderButtonGrid:DeleteAndDestroyAll(true)
@@ -1205,7 +1205,7 @@ function SetLayout(layout)
     CreateControls()
     import(UIUtil.GetLayoutFilename('orders')).SetLayout()
 
-    # created greyed out orders on setup
+    -- created greyed out orders on setup
     CreateCommonOrders({}, true)
 
     --controls.orderButtonGrid:EndBatch()
