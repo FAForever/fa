@@ -99,9 +99,6 @@ UEL0001 = Class(ACUUnit) {
         if self.Animator then
             self.Animator:SetRate(0)
         end
-        self.UnitBeingBuilt = unitBeingBuilt
-        self.UnitBuildOrder = order
-        self.BuildingUnit = true        
     end,
 
     CreateBuildEffects = function( self, unitBeingBuilt, order )

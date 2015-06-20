@@ -48,13 +48,6 @@ UAL0001 = Class(ACUUnit) {
         self:ForkThread(self.GiveInitialResources)
     end,
 
-    OnStartBuild = function(self, unitBeingBuilt, order)
-        ACUUnit.OnStartBuild(self, unitBeingBuilt, order)
-        self.UnitBeingBuilt = unitBeingBuilt
-        self.UnitBuildOrder = order
-        self.BuildingUnit = true     
-    end,
-
     CreateBuildEffects = function( self, unitBeingBuilt, order )
         EffectUtil.CreateAeonCommanderBuildingEffects( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )
     end,  

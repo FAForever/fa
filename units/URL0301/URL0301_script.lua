@@ -57,13 +57,6 @@ URL0301 = Class(CommandUnit) {
     -- ********
     -- Engineering effects
     -- ********
-    OnStartBuild = function(self, unitBeingBuilt, order)
-        CommandUnit.OnStartBuild(self, unitBeingBuilt, order)
-        self.UnitBeingBuilt = unitBeingBuilt
-        self.UnitBuildOrder = order
-        self.BuildingUnit = true
-    end,
-
     CreateBuildEffects = function( self, unitBeingBuilt, order )
        EffectUtil.SpawnBuildBots( self, unitBeingBuilt, self.BuildEffectsBag )
        EffectUtil.CreateCybranBuildBeams( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )

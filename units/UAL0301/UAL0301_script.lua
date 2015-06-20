@@ -26,13 +26,6 @@ UAL0301 = Class(CommandUnit) {
         CommandUnit.__init(self, 'RightReactonCannon')
     end,
 
-    OnStartBuild = function(self, unitBeingBuilt, order)
-        CommandUnit.OnStartBuild(self, unitBeingBuilt, order)
-        self.UnitBeingBuilt = unitBeingBuilt
-        self.UnitBuildOrder = order
-        self.BuildingUnit = true
-    end,
-
     OnStopBuild = function(self, unitBeingBuilt)
         CommandUnit.OnStopBuild(self, unitBeingBuilt)
         self:BuildManipulatorSetEnabled(false)

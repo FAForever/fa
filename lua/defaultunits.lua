@@ -1875,6 +1875,14 @@ CommandUnit = Class(WalkingLandUnit) {
         self.BuildArmManipulator:SetHeadingPitch(self:GetWeaponManipulatorByLabel(self.rightGunLabel):GetHeadingPitch())
     end,
 
+    OnStartBuild = function(self, unitBeingBuilt, order)
+        WalkingLandUnit.OnStartBuild(self, unitBeingBuilt, order)
+        local bp = self:GetBlueprint()
+        if order ~= 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
+            self:StartBuildingEffects(unitBeingBuilt, order)
+        end
+    end,
+
     OnStopBuild = function(self, unitBeingBuilt)
         WalkingLandUnit.OnStopBuild(self, unitBeingBuilt)
         if self:BeenDestroyed() then return end
