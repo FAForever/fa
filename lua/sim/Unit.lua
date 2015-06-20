@@ -2096,14 +2096,15 @@ Unit = Class(moho.unit_methods) {
             if p.IsWreckage and p.AssociatedBP == bpid and upos[1] == pos[1] and upos[3] == pos[3] then
                 local progress = p:GetFractionComplete() * 0.5
                 -- set health according to how much is left of the wreck
-                unit:SetHealth(self, unit:GetMaxHealth()*progress)
+                unit:SetHealth(self, unit:GetMaxHealth() * progress)
+                return
             end
         end
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- We just started a construction (and haven't just been tasked to work on a half-done
-        -- project.
+        -- project.)
         if unitBeingBuilt:GetHealth() == 1 then
             self:SetRebuildProgress(unitBeingBuilt)
         end
