@@ -2100,6 +2100,11 @@ Unit = Class(moho.unit_methods) {
                 return
             end
         end
+
+        -- If control reaches this point, we're reproducing the remote-wreck-deletion bug.
+        -- Native code marks a wreck for deletion due to this construction when we plant a template
+        -- atop it. If we then move the template somewhere else and start the build, the wreck is
+        -- deleted, even if it is elsewhere.
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
