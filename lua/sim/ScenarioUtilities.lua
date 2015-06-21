@@ -8,6 +8,8 @@
 ----[  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.             ]--
 local Entity = import('/lua/sim/Entity.lua').Entity
 
+RECLAIMLABEL_MIN_MASS = 20
+
 function EnableLoadBalance(enabled, unitThreshold) --distributeTime)
     if not ScenarioInfo.LoadBalance then
         ScenarioInfo.LoadBalance =

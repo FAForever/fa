@@ -23,7 +23,7 @@ local Buff = import('/lua/sim/buff.lua')
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local BuffFieldBlueprints = import('/lua/sim/BuffField.lua').BuffFieldBlueprints
 
-local RECLAIMLABEL_MIN_MASS = import('/lua/sim/prop.lua').RECLAIMLABEL_MIN_MASS
+
 
 SyncMeta = {
     __index = function(t,key)
