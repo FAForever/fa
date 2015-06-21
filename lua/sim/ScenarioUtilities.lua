@@ -365,9 +365,46 @@ function CreateProps()
     end
 end
 
-#--[  CreateResources                                                            ]--
-#--[                                                                             ]--
-#--[                                                                             ]--
+function CreateWreckage(propid, pos, ori, bp, max_fraction, reclaimed)
+    local prop = CreatePropHPR(propid, pos[1], pos[2], pos[3], ori[1], ori[2], ori[3])
+    prop.IsWreckage = true
+    prop.AssociatedBP = bp.BlueprintId
+
+    prop:SetScale(bp.Display.UniformScale)
+    prop:SetPropCollision('Box', bp.CollisionOffsetX, bp.CollisionOffsetY, bp.CollisionOffsetZ, bp.SizeX* 0.5, bp.SizeY* 0.5, bp.SizeZ * 0.5)
+    prop:SetMaxHealth(bp.Defense.Health)
+    prop:SetHealth(prop, bp.Defense.Health * (bp.Wreckage.HealthMult or 1))
+
+    if not bp.Wreckage.UseCustomMesh then
+        prop:SetMesh(bp.Display.MeshBlueprintWrecked)
+    end
+
+    local time = bp.Wreckage.ReclaimTimeMultiplier or 1
+    local mass = bp.Economy.BuildCostMass * (bp.Wreckage.MassMult or 0) * (max_fraction or 1)
+    local energy = bp.Economy.BuildCostEnergy * (bp.Wreckage.EnergyMult or 0) * (max_fraction or 1)
+
+    prop:SetMaxReclaimValues(time, time, mass, energy)
+
+    if reclaimed then
+        -- fraction reclaimed / overkilled
+        local left = 1 - math.min(1, math.max(0, reclaimed))
+        mass = mass * left
+        energy = energy * left
+        time = time * left
+    end
+
+    prop:SetReclaimValues(time, time, mass, energy)
+
+    if prop.MaxMassReclaim > RECLAIMLABEL_MIN_MASS then
+        table.insert(Sync.Reclaim, {id=prop:GetEntityId(), mass=prop.MassReclaim*0.9, position={pos[1], pos[2], pos[3]}})
+    end
+
+    return prop
+end
+
+----[  CreateResources                                                            ]--
+----[                                                                             ]--
+----[                                                                             ]--
 function CreateResources()
     local markers = GetMarkers()
     for i, tblData in pairs(markers) do
