@@ -24,8 +24,6 @@ local AIUtils = import('/lua/ai/aiutilities.lua')
 local BuffFieldBlueprints = import('/lua/sim/BuffField.lua').BuffFieldBlueprints
 local Wreckage = import('/lua/wreckage.lua')
 
-local RECLAIMLABEL_MIN_MASS = import('/lua/sim/prop.lua').RECLAIMLABEL_MIN_MASS
-
 SyncMeta = {
     __index = function(t,key)
         local id = rawget(t,'id')
@@ -1422,10 +1420,6 @@ Unit = Class(moho.unit_methods) {
 
         --Create some ambient wreckage smoke
         explosion.CreateWreckageEffects(self,prop)
-
-        if prop.MaxMassReclaim > RECLAIMLABEL_MIN_MASS then
-            table.insert(Sync.Reclaim, {id=prop:GetEntityId(), mass=prop.MassReclaim*0.9, position={pos[1], pos[2], pos[3]}})
-        end
 
         return prop
     end,

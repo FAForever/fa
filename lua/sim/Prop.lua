@@ -28,18 +28,18 @@ Prop = Class(moho.prop_methods, Entity) {
         self.Trash = TrashBag()
         local bp = self:GetBlueprint()
         local economy = bp.Economy
-        self.MassReclaim = economy.ReclaimMassMax or 0
-        self.EnergyReclaim = economy.ReclaimEnergyMax or 0
-        -- Never defined in any blueprint...
-        self.ReclaimTimeMult = economy.ReclaimTimeMultiplier or economy.ReclaimMassTimeMultiplier or economy.ReclaimEnergyTimeMultiplier or 1
+
         self.MaxMassReclaim = economy.ReclaimMassMax or 0
         self.MaxEnergyReclaim = economy.ReclaimEnergyMax or 0
+        self:SetReclaimValues(
+            -- Never defined in any blueprint...
+            economy.ReclaimTimeMultiplier or economy.ReclaimMassTimeMultiplier or economy.ReclaimEnergyTimeMultiplier or 1,
+            economy.ReclaimMassMax or 0,
+            economy.ReclaimEnergyMax or 0
+        )
+
         local pos = self:GetPosition()
         self.CachePosition = pos
-
-        if self.MaxMassReclaim >= RECLAIMLABEL_MIN_MASS then
-            table.insert(Sync.Reclaim, {id=self:GetEntityId(), mass=self.MaxMassReclaim, position={pos[1], pos[2], pos[3]}})
-        end
 
         local defense = bp.Defense
         local maxHealth = 50
@@ -135,6 +135,10 @@ Prop = Class(moho.prop_methods, Entity) {
         self.EnergyReclaim = math.max(0, energy)
         self.ReclaimTimeMassMult = time
         self.ReclaimTimeEnergyMult = time
+
+        if self.MaxMassReclaim >= RECLAIMLABEL_MIN_MASS then
+            table.insert(Sync.Reclaim, {id = self:GetEntityId(), mass = self.MassReclaim * 0.9, position = self.CachePosition})
+        end
     end,
 
     SetPropCollision = function(self, shape, centerx, centery, centerz, sizex, sizey, sizez, radius)
@@ -161,8 +165,8 @@ Prop = Class(moho.prop_methods, Entity) {
     -- Energy Time = energy reclaim value / buildrate of thing reclaiming it * BP set energy mult
     -- The time to reclaim is the highest of the two values above.
     GetReclaimCosts = function(self, reclaimer)
-        local mtime = self.ReclaimTimeMult * (self.MassReclaim / reclaimer:GetBuildRate() )
-        local etime = self.ReclaimTimeMult * (self.EnergyReclaim / reclaimer:GetBuildRate() )
+        local mtime = self.ReclaimTimeMassMult * (self.MassReclaim / reclaimer:GetBuildRate() )
+        local etime = self.ReclaimTimeEnergyMult * (self.EnergyReclaim / reclaimer:GetBuildRate() )
         local time = mtime
         if mtime < etime then
             time = etime
