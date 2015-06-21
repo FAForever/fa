@@ -1403,15 +1403,14 @@ Unit = Class(moho.unit_methods) {
             --Reduce the mass value of submerged wrecks
             mass = mass * 0.5
             energy = energy * 0.5
-        end
-
-        if layer == 'Air' or EntityCategoryContains(categories.NAVAL - categories.STRUCTURE, self) then -- make sure air / naval wrecks stick to ground / seabottom
+        elseif layer == 'Air' or EntityCategoryContains(categories.NAVAL - categories.STRUCTURE, self) then -- make sure air / naval wrecks stick to ground / seabottom
             pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
         end
 
-        mass = (mass - (mass * (overkillRatio or 1))) * self:GetFractionComplete()
-        energy = (energy - (energy * (overkillRatio or 1))) * self:GetFractionComplete()
-        time = time - (time * (overkillRatio or 1))
+        local overkillMultiplier = 1 - (overkillRatio or 1)
+        mass = mass * overkillMultiplier * self:GetFractionComplete()
+        energy = energy * overkillMultiplier * self:GetFractionComplete()
+        time = time * overkillMultiplier
 
         local prop = Wreckage.CreateWreckage(bp, pos, self:GetOrientation(), mass, energy, time)
 
@@ -2059,7 +2058,11 @@ Unit = Class(moho.unit_methods) {
     end,
 
     GetRebuildBonus = function(self, bp)
-        return 0 -- take care of rebuild bonus in unit:OnStartBuild()
+        -- The engine intends to delete a wreck when our next build job starts. Remember this so we
+        -- can regenerate the wreck if it's got the wrong one.
+        self.EngineIsDeletingWreck = true
+
+        return 0
     end,
 
     --- Look for a wreck of the thing we just started building at the same location. If there is
@@ -2080,10 +2083,29 @@ Unit = Class(moho.unit_methods) {
             end
         end
 
-        -- If control reaches this point, we're reproducing the remote-wreck-deletion bug.
-        -- Native code marks a wreck for deletion due to this construction when we plant a template
-        -- atop it. If we then move the template somewhere else and start the build, the wreck is
-        -- deleted, even if it is elsewhere.
+        if self.EngineIsDeletingWreck then
+            -- Control reaches this point when:
+            --  A structure build template was created atop a wreck of the same building type.
+            --  The build template was then moved somewhere else.
+            --  The build template was not moved back onto the wreck before construction started.
+
+            -- This is a pretty hilariously rare case (in reality, it's probably only going to arise
+            -- rarely, or when someone is trying to use the remote-wreck-deletion exploit).
+            -- As such, I don't feel especially guilty doing the following. This approach means we
+            -- don't have to waste a ton of memory keeping lists of wrecks of various sorts, we just
+            -- do this one hideously expensive routine in the exceptionally rare circumstance that
+            -- the badness happens.
+
+            local x, y = GetMapSize()
+            local reclaimables = GetReclaimablesInRect(0, 0, x, y)
+
+            for _, r in reclaimables do
+                if r.IsWreckage and r.AssociatedBP == bpid and r:BeenDestroyed() then
+                    r:Clone()
+                    return
+                end
+            end
+        end
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
@@ -2091,6 +2113,7 @@ Unit = Class(moho.unit_methods) {
         -- project.)
         if unitBeingBuilt:GetHealth() == 1 then
             self:SetRebuildProgress(unitBeingBuilt)
+            self.EngineIsDeletingWreck = nil
         end
 
         if order == 'Repair' then

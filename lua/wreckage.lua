@@ -13,6 +13,7 @@ Wreckage = Class(Prop) {
     OnCreate = function(self)
         Prop.OnCreate(self)
         self.IsWreckage = true
+        self.OrientationCache = self:GetOrientation()
     end,
     
     OnDamage = function(self, instigator, amount, vector, damageType)
@@ -60,9 +61,25 @@ Wreckage = Class(Prop) {
 
     --- Create and return an identical wreckage prop. Useful for replacing this one when something
     -- (a stupid engine bug) deleted it when we don't want it to.
+    -- This function has the handle the case when *this* unit has already been destroyed. Notably,
+    -- this means we have to calculate the health from the reclaim values, instead of going the
+    -- other way.
     Clone = function(self)
-        local clone = GetWreckageForBlueprint(self.AssociatedBP, self:GetPosition(), self:GetOrientation(), self.MassReclaim, self.EnergyReclaim, self.ReclaimTimeMassMult)
-        clone:SetHealth(self:GetHealth())
+        local clone = CreateWreckage(self.UnitBlueprint, self.CachePosition, self.OrientationCache, self.MassReclaim, self.EnergyReclaim, self.ReclaimTimeMassMult)
+
+        -- Figure out the health this wreck had before it was deleted. We can't use any native
+        -- functions like GetHealth(), so we work backwards what what we do have: the reclaim value.
+        local healthFraction
+        if self.MassReclaim > 0 then
+            healthFraction = self.MassReclaim/self.MaxMassReclaim
+        elseif self.EnergyReclaim then
+            healthFraction = self.EnergyReclaim/self.MaxEnergyReclaim
+        else
+            -- This wreck had no value anyway. We don't care about recreating it.
+            return
+        end
+
+        clone:SetHealth(nil, clone:GetMaxHealth() * healthFraction)
         clone:SetReclaimValuesByHealth()
 
         return clone
@@ -70,13 +87,15 @@ Wreckage = Class(Prop) {
 
 }
 
+--- Create a wreckage prop.
 function CreateWreckage(bp, position, orientation, mass, energy, time)
     local bpWreck = bp.Wreckage.Blueprint
 
     local prop = CreateProp(position, bpWreck)
-    prop:SetScale(bp.Display.UniformScale)
     prop:SetOrientation(orientation, true)
-    prop:SetPropCollision('Box', bp.CollisionOffsetX, bp.CollisionOffsetY, bp.CollisionOffsetZ, bp.SizeX* 0.5, bp.SizeY* 0.5, bp.SizeZ * 0.5)
+
+    prop:SetScale(bp.Display.UniformScale)
+    prop:SetPropCollision('Box', bp.CollisionOffsetX, bp.CollisionOffsetY, bp.CollisionOffsetZ, bp.SizeX * 0.5, bp.SizeY * 0.5, bp.SizeZ * 0.5)
 
     prop:SetMaxHealth(bp.Defense.Health)
     prop:SetHealth(nil, bp.Defense.Health * (bp.Wreckage.HealthMult or 1))
@@ -92,7 +111,9 @@ function CreateWreckage(bp, position, orientation, mass, energy, time)
         prop:SetMesh(bp.Display.MeshBlueprintWrecked)
     end
 
+    -- This field cannot be renamed or the magical native code that detects rebuild bonuses breaks.
     prop.AssociatedBP = bp.BlueprintId
+    prop.UnitBlueprint = bp
 
     return prop
 end
