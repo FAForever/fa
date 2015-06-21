@@ -97,9 +97,27 @@ Prop = Class(moho.prop_methods, Entity) {
         Entity.Destroy(self)
     end,
 
+    CloneWreck = function(self)
+        local propid = self:GetBlueprint().BlueprintId
+        local pos = self.CachePosition
+        local ori = self:GetOrientation()
+        local unitbp = __blueprints[self.AssociatedBP]
+        local max = self.MaxMassReclaim / (unitbp.Economy.BuildCostMass * (unitbp.Wreckage.MassMult or 0))
+        local reclaimed = 1 - (self.MassReclaim / self.MaxMassReclaim) * self:GetFractionComplete()
+        local prop = import('/lua/sim/ScenarioUtilities.lua').CreateWreckage(propid, pos, ori, unitbp, max, reclaimed)
+
+        return prop
+    end,
+
     OnDestroy = function(self)
-        if self.IsWreckage or self.MaxMassReclaim >= RECLAIMLABEL_MIN_MASS then
-            table.insert(Sync.Reclaim, {id=self:GetEntityId(), destroy=true})
+        if self.IsWreckage then
+            if self.MaxMassReclaim >= RECLAIMLABEL_MIN_MASS then
+                table.insert(Sync.Reclaim, {id=self:GetEntityId(), destroy=true})
+            end
+
+            if self.checkForRebuild == GetGameTick() then
+                self:CloneWreck()
+            end
         end
 
         self.Trash:Destroy()

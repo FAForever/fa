@@ -75,6 +75,7 @@ Unit = Class(moho.unit_methods) {
     DestructionPartsLowToss = {},
     DestructionPartsChassisToss = {},
     EconomyProductionInitiallyActive = true,
+    rebuildBP = false,
 
     GetSync = function(self)
         if not Sync.UnitData[self:GetEntityId()] then
@@ -2041,6 +2042,8 @@ Unit = Class(moho.unit_methods) {
     end,
 
     GetRebuildBonus = function(self, bp)
+        self.rebuildBP = bp.BlueprintId
+
         return 0 -- take care of rebuild bonus in unit:OnStartBuild()
     end,
 
@@ -2051,6 +2054,9 @@ Unit = Class(moho.unit_methods) {
         local props = GetReclaimablesInRect(Rect(upos[1], upos[3], upos[1], upos[3]))
         local wreckage = {}
         local bpid = unit:GetUnitId()
+        local rbp = self.rebuildBP
+
+        self.rebuildBP = false
 
         for _, p in props do
             local pos = p.CachePosition
@@ -2066,6 +2072,16 @@ Unit = Class(moho.unit_methods) {
         -- Native code marks a wreck for deletion due to this construction when we plant a template
         -- atop it. If we then move the template somewhere else and start the build, the wreck is
         -- deleted, even if it is elsewhere.
+
+        if rbp then
+            local x, y = GetMapSize()
+            props = GetReclaimablesInRect(0, 0, x, y)
+            for _, p in props do
+                if p.IsWreckage and p.AssociatedBP == rbp then
+                    p.checkForRebuild = GetGameTick()
+                end
+            end
+        end
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
