@@ -22,6 +22,7 @@ local AntiArtilleryShield = import('/lua/shield.lua').AntiArtilleryShield
 local Buff = import('/lua/sim/buff.lua')
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local BuffFieldBlueprints = import('/lua/sim/BuffField.lua').BuffFieldBlueprints
+local Wreckage = import('/lua/wreckage.lua')
 
 local RECLAIMLABEL_MIN_MASS = import('/lua/sim/prop.lua').RECLAIMLABEL_MIN_MASS
 
@@ -1408,42 +1409,20 @@ Unit = Class(moho.unit_methods) {
             pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
         end
 
-        local prop = CreateProp( pos, wreck )
-
-        prop:SetScale(bp.Display.UniformScale)
-        prop:SetOrientation(self:GetOrientation(), true)
-        prop:SetPropCollision('Box', bp.CollisionOffsetX, bp.CollisionOffsetY, bp.CollisionOffsetZ, bp.SizeX* 0.5, bp.SizeY* 0.5, bp.SizeZ * 0.5)
-        prop:SetMaxReclaimValues(time, time, mass, energy)
-
         mass = (mass - (mass * (overkillRatio or 1))) * self:GetFractionComplete()
         energy = (energy - (energy * (overkillRatio or 1))) * self:GetFractionComplete()
         time = time - (time * (overkillRatio or 1))
 
-        prop:SetReclaimValues(time, time, mass, energy)
-        prop:SetMaxHealth(bp.Defense.Health)
-        prop:SetHealth(self, bp.Defense.Health * (bp.Wreckage.HealthMult or 1))
-
-        --FIXME: SetVizToNeurals('Intel') is correct here, so you can't see enemy wreckage appearing
-        -- under the fog. However the engine has a bug with prop intel that makes the wreckage
-        -- never appear at all, even when you drive up to it, so this is disabled for now.
-        --prop:SetVizToNeutrals('Intel')
-        if not bp.Wreckage.UseCustomMesh then
-            prop:SetMesh(bp.Display.MeshBlueprintWrecked)
-        end
+        local prop = Wreckage.CreateWreckage(bp, pos, self:GetOrientation(), mass, energy, time)
 
         -- Attempt to copy our animation pose to the prop. Only works if
         -- the mesh and skeletons are the same, but will not produce an error if not.
-
         if layer ~= 'Air' and self.PlayDeathAnimation then
             TryCopyPose(self, prop, true)
         end
 
-        --Prevent rebuild exploit
-        prop.AssociatedBP = self:GetBlueprint().BlueprintId
-
         --Create some ambient wreckage smoke
         explosion.CreateWreckageEffects(self,prop)
-        prop.IsWreckage = true
 
         if prop.MaxMassReclaim > RECLAIMLABEL_MIN_MASS then
             table.insert(Sync.Reclaim, {id=prop:GetEntityId(), mass=prop.MassReclaim*0.9, position={pos[1], pos[2], pos[3]}})
