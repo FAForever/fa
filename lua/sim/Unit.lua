@@ -1384,70 +1384,31 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    CreateWreckageProp = function( self, overkillRatio )
+    CreateWreckageProp = function(self, overKillRatio)
         local bp = self:GetBlueprint()
-        local wreck = bp.Wreckage.Blueprint
+        local propid = bp.Wreckage.Blueprint
 
-        if not wreck then
+        if not propid then
             return nil
         end
 
-        local mass = bp.Economy.BuildCostMass * (bp.Wreckage.MassMult or 0)
-        local energy = bp.Economy.BuildCostEnergy * (bp.Wreckage.EnergyMult or 0)
-        local time = (bp.Wreckage.ReclaimTimeMultiplier or 1)
         local pos = self:GetPosition()
         local layer = self:GetCurrentLayer()
-
-        if layer == 'Water' then
-            --Reduce the mass value of submerged wrecks
-            mass = mass * 0.5
-            energy = energy * 0.5
-        end
 
         if layer == 'Air' or EntityCategoryContains(categories.NAVAL - categories.STRUCTURE, self) then -- make sure air / naval wrecks stick to ground / seabottom
             pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
         end
 
-        local prop = CreateProp( pos, wreck )
-
-        prop:SetScale(bp.Display.UniformScale)
-        prop:SetOrientation(self:GetOrientation(), true)
-        prop:SetPropCollision('Box', bp.CollisionOffsetX, bp.CollisionOffsetY, bp.CollisionOffsetZ, bp.SizeX* 0.5, bp.SizeY* 0.5, bp.SizeZ * 0.5)
-        prop:SetMaxReclaimValues(time, time, mass, energy)
-
-        mass = (mass - (mass * (overkillRatio or 1))) * self:GetFractionComplete()
-        energy = (energy - (energy * (overkillRatio or 1))) * self:GetFractionComplete()
-        time = time - (time * (overkillRatio or 1))
-
-        prop:SetReclaimValues(time, time, mass, energy)
-        prop:SetMaxHealth(bp.Defense.Health)
-        prop:SetHealth(self, bp.Defense.Health * (bp.Wreckage.HealthMult or 1))
-
-        --FIXME: SetVizToNeurals('Intel') is correct here, so you can't see enemy wreckage appearing
-        -- under the fog. However the engine has a bug with prop intel that makes the wreckage
-        -- never appear at all, even when you drive up to it, so this is disabled for now.
-        --prop:SetVizToNeutrals('Intel')
-        if not bp.Wreckage.UseCustomMesh then
-            prop:SetMesh(bp.Display.MeshBlueprintWrecked)
-        end
-
-        -- Attempt to copy our animation pose to the prop. Only works if
-        -- the mesh and skeletons are the same, but will not produce an error if not.
+        local max_fraction = layer == 'Water' and 0.5 or 1
+        local reclaimed = (1 - self:GetFractionComplete()) * (1 - (overKillRatio or 1))
+        local ori = self:GetOrientation()
+        local prop = import('/lua/sim/ScenarioUtilities.lua').CreateWreckage(propid, pos, ori, bp, max_fraction, reclaimed)
 
         if layer ~= 'Air' and self.PlayDeathAnimation then
             TryCopyPose(self, prop, true)
         end
 
-        --Prevent rebuild exploit
-        prop.AssociatedBP = self:GetBlueprint().BlueprintId
-
-        --Create some ambient wreckage smoke
         explosion.CreateWreckageEffects(self,prop)
-        prop.IsWreckage = true
-
-        if prop.MaxMassReclaim > RECLAIMLABEL_MIN_MASS then
-            table.insert(Sync.Reclaim, {id=prop:GetEntityId(), mass=prop.MassReclaim*0.9, position={pos[1], pos[2], pos[3]}})
-        end
 
         return prop
     end,
