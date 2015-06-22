@@ -7,6 +7,7 @@ local options = Prefs.GetFromCurrentProfile('options')
 local reclaim = {}
 
 function AddReclaim(r)
+    DestroyReclaimLabel(r)
     reclaim[r.id] = r
 end
 
