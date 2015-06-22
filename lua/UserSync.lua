@@ -60,7 +60,7 @@ function OnSync()
 
     if Sync.Reclaim then
         for _, r in Sync.Reclaim do
-            if r.destroy then
+            if not r.mass or r.mass < 1 then
                 import('/modules/reclaim.lua').RemoveReclaim(r)
             else
                 import('/modules/reclaim.lua').AddReclaim(r)

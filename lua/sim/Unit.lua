@@ -784,6 +784,9 @@ Unit = Class(moho.unit_methods) {
         self:StopReclaimEffects(target)
         self:StopUnitAmbientSound('ReclaimLoop')
         self:PlayUnitSound('StopReclaim')
+        if target.MaxMassReclaim then -- this is a prop
+            target:UpdateReclaimLeft()
+        end
     end,
 
     StartReclaimEffects = function( self, target )
