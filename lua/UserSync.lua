@@ -33,7 +33,7 @@ function OnSync()
     if Sync.ToggleLifeBarsOn then
         ConExecute('UI_RenderUnitBars true')
     end
-	
+
 	if not table.empty(Sync.AIChat) then
 		for k, v in Sync.AIChat do
 			import('/lua/AIChatSorian.lua').AIChat(v.group, v.text, v.sender)
@@ -45,15 +45,15 @@ function OnSync()
             ConExecute(execRequest)
         end
     end
-    
+
     if not table.empty(Sync.UnitData) then
         UnitData = table.merged(UnitData,Sync.UnitData)
     end
-    
+
     for id,v in Sync.ReleaseIds do
         UnitData[id] = nil
     end
-    
+
     if Sync.NukeLaunchData then
 		import('/modules/nukelaunchping.lua').DoNukePing(Sync.NukeLaunchData)
 	end
