@@ -16,6 +16,7 @@ local Ping = import('/lua/ui/game/ping.lua')
 local UserDecal = import('/lua/user/UserDecal.lua').UserDecal
 local WorldViewMgr = import('/lua/ui/game/worldview.lua')
 local Prefs = import('/lua/user/prefs.lua')
+local options = Prefs.GetFromCurrentProfile('options')
 
 WorldViewParams = {
 	ui_SelectTolerance = 7.0,
@@ -136,6 +137,7 @@ WorldView = Class(moho.UIWorldView, Control) {
     EventRedirect = nil,
     _pingAnimationThreads = {},
     Decals = {},
+    currentRO = {},
 
     HandleEvent = function(self, event)
         if self.EventRedirect then
@@ -157,6 +159,15 @@ WorldView = Class(moho.UIWorldView, Control) {
             self.LastCursor = nil
             self:ResetDecals()
         end
+
+        if options.gui_enhanced_unitview ~= 0 then
+            local ro = GetRolloverInfo() or {}
+            if ro.entityId ~= self.currentRO.entityId or ro.blueprintId ~= self.currentRO.blueprintId then
+                self.currentRO = ro
+                import('/lua/ui/game/unitview.lua').OnRolloverUpdate(ro)
+            end
+        end
+
         return false
     end,
 
