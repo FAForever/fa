@@ -2117,17 +2117,17 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    OnStartBuild = function(self, unitBeingBuilt, order)
+    OnStartBuild = function(self, built, order)
         -- We just started a construction (and haven't just been tasked to work on a half-done
         -- project.)
-        if unitBeingBuilt:GetHealth() == 1 then
-            self:SetRebuildProgress(unitBeingBuilt)
+        if built:GetHealth() == 1 then
+            self:SetRebuildProgress(built)
             self.EngineIsDeletingWreck = nil
         end
 
         if order == 'Repair' then
-            if unitBeingBuilt.WorkItem ~= self.WorkItem then
-                self:InheritWork(unitBeingBuilt)
+            if built.WorkItem ~= self.WorkItem then
+                self:InheritWork(built)
             end
             self:SetUnitState('Repairing', true)
 
@@ -2146,24 +2146,24 @@ Unit = Class(moho.unit_methods) {
 
         local bp = self:GetBlueprint()
         if order ~= 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
-            self:StartBuildingEffects(unitBeingBuilt, order)
+            self:StartBuildingEffects(built, order)
         end
         self:SetActiveConsumptionActive()
-        self:DoOnStartBuildCallbacks(unitBeingBuilt)
+        self:DoOnStartBuildCallbacks(built)
         self:PlayUnitSound('Construct')
         self:PlayUnitAmbientSound('ConstructLoop')
 
-        local bp = unitBeingBuilt:GetBlueprint()
+        local bp = built:GetBlueprint()
         if order == 'Upgrade' and bp.General.UpgradesFrom == self:GetUnitId() then
-            unitBeingBuilt.DisallowCollisions = true
-            unitBeingBuilt:SetCanTakeDamage(false)
+            built.DisallowCollisions = true
+            built:SetCanTakeDamage(false)
         end
     end,
 
-    OnStopBuild = function(self, unitBeingBuilt)
-        self:StopBuildingEffects(unitBeingBuilt)
+    OnStopBuild = function(self, built)
+        self:StopBuildingEffects(built)
         self:SetActiveConsumptionInactive()
-        self:DoOnUnitBuiltCallbacks(unitBeingBuilt)
+        self:DoOnUnitBuiltCallbacks(built)
         self:StopUnitAmbientSound('ConstructLoop')
         self:PlayUnitSound('ConstructStop')
     end,
@@ -2189,14 +2189,14 @@ Unit = Class(moho.unit_methods) {
     OnBuildProgress = function(self, unit, oldProg, newProg)
     end,
 
-    StartBuildingEffects = function(self, unitBeingBuilt, order)
-        self.BuildEffectsBag:Add( self:ForkThread( self.CreateBuildEffects, unitBeingBuilt, order ) )
+    StartBuildingEffects = function(self, built, order)
+        self.BuildEffectsBag:Add( self:ForkThread( self.CreateBuildEffects, built, order ) )
     end,
 
-    CreateBuildEffects = function( self, unitBeingBuilt, order )
+    CreateBuildEffects = function( self, built, order )
     end,
 
-    StopBuildingEffects = function(self, unitBeingBuilt)
+    StopBuildingEffects = function(self, built)
         self.BuildEffectsBag:Destroy()
         if self.buildBots then
             for _, b in self.buildBots do
