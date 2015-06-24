@@ -24,6 +24,18 @@ local AIUtils = import('/lua/ai/aiutilities.lua')
 local BuffFieldBlueprints = import('/lua/sim/BuffField.lua').BuffFieldBlueprints
 local Wreckage = import('/lua/wreckage.lua')
 
+-- TODO: We should really introduce a veterancy module at some point.
+-- XP gained for killing various unit types.
+local STRUCTURE_XP = 1
+local TECH1_XP = 1
+local TECH2_XP = 3
+local TECH3_XP = 6
+local COMMAND_XP = 6
+local EXPERIMENTAL_XP = 50
+
+-- For killing any unit that doesn't match any of the other categories.
+local DEFAULT_XP = 1
+
 SyncMeta = {
     __index = function(t,key)
         local id = rawget(t,'id')
@@ -1232,26 +1244,34 @@ Unit = Class(moho.unit_methods) {
         self.CanBeKilled = val
     end,
 
+    --- Called when this unit kills another. Chiefly responsible for the veterancy system for now.
     OnKilledUnit = function(self, unitKilled)
-        --Veterancy system
-        if not IsAlly(self:GetArmy(), unitKilled:GetArmy()) then
-            if unitKilled:GetFractionComplete() == 1 then
-                if EntityCategoryContains( categories.STRUCTURE, unitKilled ) then
-                    self:AddXP(1)
-                elseif EntityCategoryContains( categories.TECH1, unitKilled )  then
-                    self:AddXP(1)
-                elseif EntityCategoryContains( categories.TECH2, unitKilled ) then
-                    self:AddXP(3)
-                elseif EntityCategoryContains( categories.TECH3, unitKilled ) then
-                    self:AddXP(6)
-                elseif EntityCategoryContains( categories.COMMAND, unitKilled ) then
-                    self:AddXP(6)
-                elseif EntityCategoryContains( categories.EXPERIMENTAL, unitKilled ) then
-                    self:AddXP(50)
-                else
-                    self:AddXP(1)
-                end
-            end
+        -- No XP for friendly fire...
+        if IsAlly(self:GetArmy(), unitKilled:GetArmy()) then
+            return
+        end
+
+        -- ... Or for killing incomplete units.
+        if unitKilled:GetFractionComplete() ~= 1 then
+            return
+        end
+
+        -- Assign XP according to the category of unit killed.
+        -- TODO: We can very possibly do this more cheaply and clearly by using RTTI on unitKilled?
+        if EntityCategoryContains(categories.STRUCTURE, unitKilled) then
+            self:AddXP(STRUCTURE_XP)
+        elseif EntityCategoryContains(categories.TECH1, unitKilled) then
+            self:AddXP(TECH1_XP)
+        elseif EntityCategoryContains(categories.TECH2, unitKilled) then
+            self:AddXP(TECH2_XP)
+        elseif EntityCategoryContains(categories.TECH3, unitKilled) then
+            self:AddXP(TECH3_XP)
+        elseif EntityCategoryContains(categories.EXPERIMENTAL, unitKilled) then
+            self:AddXP(EXPERIMENTAL_XP)
+        elseif EntityCategoryContains(categories.COMMAND, unitKilled) then
+            self:AddXP(COMMAND_XP)
+        else
+            self:AddXP(DEFAULT_XP)
         end
     end,
 
