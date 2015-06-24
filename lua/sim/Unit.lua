@@ -1232,20 +1232,25 @@ Unit = Class(moho.unit_methods) {
         self.CanBeKilled = val
     end,
 
-    OnKilledUnit = function(self, unit)
+    OnKilledUnit = function(self, unitKilled)
         --Veterancy system
-        if not IsAlly(self:GetArmy(), unit:GetArmy()) then
-            if unit:GetFractionComplete() == 1 then
-                local types = {EXPERIMENTAL=50, COMMAND=6, TECH3=6, TECH2=3}
-                local xp = 1
-
-                for category, points in types do
-                    if EntityCategoryContains(categories[category], unit) then
-                        xp = points
-                        break
-                    end
+        if not IsAlly(self:GetArmy(), unitKilled:GetArmy()) then
+            if unitKilled:GetFractionComplete() == 1 then
+                if EntityCategoryContains( categories.STRUCTURE, unitKilled ) then
+                    self:AddXP(1)
+                elseif EntityCategoryContains( categories.TECH1, unitKilled )  then
+                    self:AddXP(1)
+                elseif EntityCategoryContains( categories.TECH2, unitKilled ) then
+                    self:AddXP(3)
+                elseif EntityCategoryContains( categories.TECH3, unitKilled ) then
+                    self:AddXP(6)
+                elseif EntityCategoryContains( categories.COMMAND, unitKilled ) then
+                    self:AddXP(6)
+                elseif EntityCategoryContains( categories.EXPERIMENTAL, unitKilled ) then
+                    self:AddXP(50)
+                else
+                    self:AddXP(1)
                 end
-                self:AddXP(xp)
             end
         end
     end,
