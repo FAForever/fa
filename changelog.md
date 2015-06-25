@@ -44,6 +44,7 @@ Other
 - Minimap now remembers whether to show resource icons or not
 - Current commandmode no longer reset if an engineer dies in the current selection
 - Fixed bug with chat messages having wrong recipients in replay
+- Seraphim and Aeon T2 shields can now pause while upgrading to T3
 
 Enhancements
 ------------
