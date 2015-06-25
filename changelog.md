@@ -12,7 +12,7 @@ Bugs
 ----
 
 Hitboxes
-- Seraphim sniperbot is able to hit Cybran MML again
+- Seraphim sniper bot is able to hit Cybran MML again
 - Fixed SCUs not being hit properly by laser weapons
 - Fixed units aiming too high on the UEF and Aeon SCUs
 
@@ -20,7 +20,7 @@ Visual
 - Fixed shield structure glows and rotations not playing
 - Fixed bug with capture progress bar not being synced if using multiple engineers
 - Optimised the range-rings shader to reduce the way FPS falls off a cliff
-- Fixed bug with insta-disappearing wrecks due to garbage collect
+- Fixed bug with instantly disappearing wrecks due to garbage collection
 - Fixed wrong regen values being reported on UI-side
 - Disable build effect beams on sinking engineers
 
@@ -29,8 +29,8 @@ Physics
 - UEF T3 Transport now leaves wreck in water
 - Cybran ACU can now fire the laser when standing in water
 - Fixed Seraphim T1 Mobile Artillery not firing at fast targets properly
-- Yolonna Oss now deals damage to itself
-- Flares and depth-chages no longer draw in friendly projectiles
+- Yolona Oss now deals damage to itself
+- Flares and depth charges no longer draw in friendly projectiles
 - Fix shots sometimes going right through Walled PD
 
 Other
@@ -41,8 +41,8 @@ Other
 - Support factories no longer lose progress if they are damaged during upgrade
 - Aeon SCUs with nano + vet now get correct regen rate
 - Fixed share until death bug with dual-given units
-- Minimap now remembers whether to show resource icons or not
-- Current commandmode no longer reset if an engineer dies in the current selection
+- Mini map now remembers whether to show resource icons or not
+- Current command mode no longer reset if an engineer dies in the current selection
 - Fixed bug with chat messages having wrong recipients in replay
 - Seraphim and Aeon T2 shields can now pause while upgrading to T3
 
@@ -59,9 +59,9 @@ Visual
 - Ping values under "Connectivity" (F11) now update during game stop/stall
 - Added Yolona Oss to Mavor/Salvation/Scathis build restriction and renamed it
   Super-Game-Enders
-- ASF effects tweaked for performance (less effects on low fidelty)
+- ASF effects tweaked for performance (less effects on low fidelity)
 - Cybran engineering build bots now crash when their owner dies rather than just vanishing
-- Quantum Gateways now can assist eachother
+- Quantum Gateways now can assist each other
 
 
 UI
