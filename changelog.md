@@ -6,6 +6,8 @@ Exploits
 
 - Instant crash exploit partially fixed
 - No longer possible to give away units in progress of being captured
+- No longer possible to bypass unit restrictions with sneaky UI mods
+- Fixed being able to remotely destroy wreckage anywhere on the battlefield
 
 
 Bugs
@@ -23,6 +25,9 @@ Visual
 - Fixed bug with instantly disappearing wrecks due to garbage collection
 - Fixed wrong regen values being reported on UI-side
 - Disable build effect beams on sinking engineers
+- Reload bar refill rate now scales with RateOfFire buffs
+- Legacy checkbox UI code working again
+- Fixed Engineers spawning the wrong tarmacs when building Seraphim buildings
 
 Physics
 - Projectiles no longer collide with sinking units
@@ -45,6 +50,7 @@ Other
 - Current command mode no longer reset if an engineer dies in the current selection
 - Fixed bug with chat messages having wrong recipients in replay
 - Seraphim and Aeon T2 shields can now pause while upgrading to T3
+- Fixed RateOfFire buffs not being applied correctly
 
 Enhancements
 ------------
@@ -62,6 +68,7 @@ Visual
 - ASF effects tweaked for performance (less effects on low fidelity)
 - Cybran engineering build bots now crash when their owner dies rather than just vanishing
 - Quantum Gateways now can assist each other
+- Enhanced Seraphim tarmacs
 
 
 UI
@@ -103,6 +110,7 @@ Contributors
 - anihilnine
 - ckitching
 - shalkya
+- bamboofats
 
 Special Thanks To
 - Softly
