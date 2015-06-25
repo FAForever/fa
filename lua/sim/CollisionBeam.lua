@@ -12,6 +12,7 @@
 -- that may or may not exist depending on how the simulation is executing.
 -- 
 local DefaultDamage = import('/lua/sim/defaultdamage.lua')
+local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 
 CollisionBeam = Class(moho.CollisionBeamEntity) {
 
@@ -58,10 +59,29 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
         self:DestroyBeamEffects()
         self:DestroyTerrainEffects()
         self.LastTerrainType = nil
+        self:HideBeamSource()
+    end,
+
+    OnOwningUnitDetected = function(unit, detectingArmy)
+        if unit.ignoreDetectionFrom[detectingArmy] then
+            return
+        end
+
+        unit.reallyDetectedBy[detectingArmy] = true
     end,
 
     SetParentWeapon = function(self, weapon)
         self.Weapon = weapon
+        self.unit = weapon.unit
+
+        -- The detected-by hook fires whenever a unit is detected (Not just for the first time) by a particular army.
+        -- We need to distinguish "real" detection from detection due to beam-origin-exposure. While performing beam
+        -- origin exposure, we ignore detection events. Once we get a non-beam-origin-exposure detection event, we stop
+        -- flushing the intel rect around the source of this beam when the beam is extinguished (thus preventing
+        -- buildings with beams from presents a persistent intel blip due to beam-origin-exposure).
+        self.unit:AddDetectedByHook(self.OnOwningUnitDetected)
+        self.unit.reallyDetectedBy = {}
+        self.unit.ignoreDetectionFrom = {}
     end,
 
     DoDamage = function(self, instigator, damageData, targetEntity)
@@ -179,6 +199,34 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
         end
     end,
 
+    --- Show the origin of this beam weapon to the target army for the duration of the firing.
+    ShowBeamSource = function(self, target)
+        local targetArmy = target:GetArmy()
+
+        self.unit.ignoreDetectionFrom[targetArmy] = true
+        self.needIntelClear = not self.unit.reallyDetectedBy[targetArmy]
+
+        self.exposingShooter = true
+
+        self:InitIntel(targetArmy, 'Vision', 2)
+        self:EnableIntel('Vision')
+    end,
+
+    HideBeamSource = function(self)
+        self.unit.ignoreDetectionFrom = {}
+
+        if not self.exposingShooter then
+            self.exposingShooter = nil
+            return
+        end
+        self:DisableIntel('Vision')
+
+        if self.needIntelClear then
+            ScenarioFramework.ClearIntel(self:GetPosition(), 2)
+            self.needIntelClear = nil
+        end
+    end,
+
     -- This is called when the collision beam hits something new. Because the beam
     -- is continuously detecting collisions it only executes this function when the
     -- thing it is touching changes. Expect Impacts with non-physical things like
@@ -199,7 +247,16 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
         --  'Prop'
         --  'Shield'
 
-        local instigator = self:GetLauncher()
+        if impactType == 'Unit' or impactType == 'UnitAir' or impactType == 'UnitUnderwater' then
+            if not self:GetLauncher() then
+                return
+            end
+
+            self:ShowBeamSource(targetEntity)
+        else
+            self:HideBeamSource()
+        end
+
         if not self.DamageTable then
             self:SetDamageTable()
         end
@@ -212,7 +269,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
         end
 
         -- Do Damage
-        self:DoDamage( instigator, damageData, targetEntity)
+        self:DoDamage(self:GetLauncher(), damageData, targetEntity)
 
         local ImpactEffects = {}
         local ImpactEffectScale = 1
