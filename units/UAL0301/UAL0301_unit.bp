@@ -724,7 +724,7 @@ UnitBlueprint {
     SelectionYOffset = 0,
     SizeX = 1,
     SizeY = 1.85,
-    SizeZ = 0.9,
+    SizeZ = 1.1,
     StrategicIconName = 'icon_commander_generic',
     StrategicIconSortPriority = 1,
     Transport = {
