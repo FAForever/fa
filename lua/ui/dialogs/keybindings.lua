@@ -28,7 +28,7 @@ local function ResetKeyMap()
 end
 
 local function ConfirmNewKeyMap()
-	--add option to accept the changes to the key map?
+    --add option to accept the changes to the key map?
     IN_AddKeyMapTable(import('/lua/keymap/keymapper.lua').GetKeyMappings(true))
     -- Update hotbuild modifiers
     if SessionIsActive() then
@@ -221,6 +221,16 @@ function CreateUI()
         end
     end
     
+    local function UnbindCurrentSelection()
+        local Keymapper = import('/lua/keymap/keymapper.lua')
+        for k, v in keyTable do
+            if v._selected then
+                Keymapper.ClearUserKeyMapping(v.key)
+                break
+            end
+        end
+    end
+    
     panel = Bitmap(GetFrame(0), UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_m.dds'))
     panel.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
     panel.Height:Set(390)
@@ -243,7 +253,7 @@ function CreateUI()
     LayoutHelpers.AtTopIn(closeButton, panel.border.bm, -20)
     LayoutHelpers.AtHorizontalCenterIn(closeButton, panel)
     closeButton.OnClick = function(self, modifiers)
-		ConfirmNewKeyMap()
+        ConfirmNewKeyMap()
         panel:Destroy()
         panel = false
     end
@@ -252,6 +262,12 @@ function CreateUI()
     LayoutHelpers.LeftOf(assignKeyButton, closeButton, 10)
     assignKeyButton.OnClick = function(self, modifiers)
         AssignCurrentSelection()
+    end
+    
+    local unbindKeyButton = UIUtil.CreateButtonStd(panel, "/widgets/small02", LOC("<LOC key_binding_0007>Unbind Key"), 12)
+    LayoutHelpers.Below(unbindKeyButton, assignKeyButton, 0)
+    unbindKeyButton.OnClick = function(self, modifiers)
+        UnbindCurrentSelection()
     end
     
     local resetButton = UIUtil.CreateButtonStd(panel, "/widgets/small02", LOC("<LOC key_binding_0004>Reset"), 12)

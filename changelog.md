@@ -77,6 +77,7 @@ UI
 - Cybran engineering build bots no longer display the heads-up consumption overlay
 - "Commander under attack" now plays for shielded ACUs
 - 34 new taunts
+- Added a button to unbind key mappings
 
 Other
 - Engineering Station units now pause on transfer from one player to another
@@ -103,6 +104,7 @@ Contributors
 - anihilnine
 - ckitching
 - shalkya
+- quark036
 
 Special Thanks To
 - Softly
