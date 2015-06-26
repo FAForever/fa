@@ -708,6 +708,16 @@ function UpdateSlotBackground(slotIndex)
     end
 end
 
+function GetPlayerDisplayName(playerInfo)
+    local playerName = playerInfo.PlayerName
+    local displayName = ""
+    if playerInfo.PlayerClan ~= "" then
+        return string.format("[%s] %s", playerInfo.PlayerClan, playerInfo.PlayerName)
+    else
+        return playerInfo.PlayerName
+    end
+end
+
 -- update the data in a player slot
 -- TODO: With lazyvars, this function should be eliminated. Lazy-value-callbacks should be used
 -- instead to incrementaly update things.
@@ -837,18 +847,9 @@ function SetSlotInfo(slotNum, playerInfo)
         slot.name._text:SetFont('Arial Gras', 12)
     end
 
-
-    local playerName = playerInfo.PlayerName
-    local displayName = ""
-    if playerInfo.PlayerClan ~= "" then
-        displayName = string.format("[%s] %s", playerInfo.PlayerClan, playerInfo.PlayerName)
-    else
-        displayName = playerInfo.PlayerName
-    end
-
     --\\ Stop - Color the Name in Slot by State
     if wasConnected(playerInfo.OwnerID) or isLocallyOwned or not playerInfo.Human then
-        slot.name:SetTitleText(displayName)
+        slot.name:SetTitleText(GetPlayerDisplayName(playerInfo))
         slot.name._text:SetFont('Arial Gras', 15)
         if not table.find(ConnectionEstablished, playerName) then
             if playerInfo.Human and not isLocallyOwned then
@@ -3163,10 +3164,13 @@ function CalcConnectionStatus(peer)
     else
         if not wasConnected(peer.id) then
             local peerSlot = FindSlotForID(peer.id)
-            GUI.slots[peerSlot].name:SetTitleText(peer.name)
-            GUI.slots[peerSlot].name._text:SetFont('Arial Gras', 15)
+            local slot = GUI.slots[peerSlot]
+            local playerInfo = gameInfo.PlayerOptions[peerSlot]
+
+            slot.name:SetTitleText(GetPlayerDisplayName(playerInfo))
+            slot.name._text:SetFont('Arial Gras', 15)
             if not table.find(ConnectionEstablished, peer.name) then
-                if gameInfo.PlayerOptions[peerSlot].Human and not IsLocallyOwned(peerSlot) then
+                if playerInfo.Human and not IsLocallyOwned(peerSlot) then
                     if table.find(ConnectedWithProxy, peer.id) then
                         AddChatText(LOCF("<LOC Engine0032>Connected to %s via the FAF proxy.", peer.name), "Engine0032")
                     end
