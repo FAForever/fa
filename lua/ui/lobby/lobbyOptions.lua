@@ -401,7 +401,7 @@ globalOpts = {
         },
     },
    {
-        default = 1,
+        default = 2,
         label = "<LOC lobui_0740>Share Conditions",
         help = "<LOC lobui_0741>Kill all the units you shared to your allies and send back the units your allies shared with you when you die",
         key = 'Share',
