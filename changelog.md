@@ -37,6 +37,7 @@ Physics
 - Yolona Oss now deals damage to itself
 - Flares and depth charges no longer draw in friendly projectiles
 - Fix shots sometimes going right through Walled PD
+- Increased Aeon T3 Artillery MuzzleVelocity to allow it to fire at its maximum range
 
 Other
 - T3 Torpedo Bomber can use Attack-Move properly again
