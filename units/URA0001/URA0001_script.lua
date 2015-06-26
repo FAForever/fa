@@ -22,6 +22,7 @@ URA0001 = Class(CAirUnit) {
         self.BuildArmManipulator:SetAimingArc(-180, 180, 360, -90, 90, 360)
         self.BuildArmManipulator:SetPrecedence(5)
         self.Trash:Add(self.BuildArmManipulator)
+        self:SetConsumptionActive(false)
     end,
 
     CreateBuildEffects = function( self, unitBeingBuilt, order )
