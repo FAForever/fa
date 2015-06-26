@@ -85,6 +85,7 @@ UI
 - "Commander under attack" now plays for shielded ACUs
 - 34 new taunts
 - Added a button to unbind key mappings
+- Share Until Death is now default
 
 Other
 - Engineering Station units now pause on transfer from one player to another
