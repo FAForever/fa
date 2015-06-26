@@ -117,6 +117,7 @@ Contributors
 Special Thanks To
 - Softly
 - Exotic Retard
+- Nyx
 
 Patch 3640 (Jan 6, 2015)
 ==========
