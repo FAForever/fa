@@ -498,19 +498,14 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
                 ReturnToMenu(false)
                 EscapeHandler.PopEscapeHandler()
             end,
-            "<LOC _Cancel>", function() end,
+
+            -- Fight to keep our focus on the chat input box, to prevent keybinding madness.
+            "<LOC _Cancel>", function()
+                GUI.chatEdit:AcquireFocus()
+            end,
             nil, nil,
             true
         )
-
-        -- Prevent the dialog from being dismissed
-        quitDialog.OnEscapePressed = function() end
-        quitDialog.OnShadowClicked = function() end
-
-        -- Fight to keep our focus on the chat input box, to prevent keybinding madness.
-        quitDialog.OnClosed = function()
-            GUI.chatEdit:AcquireFocus()
-        end
     end
     EscapeHandler.PushEscapeHandler(GUI.exitLobbyEscapeHandler)
 

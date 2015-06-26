@@ -775,6 +775,7 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
     local popup = Popup(parent, dialog)
     -- Don't close when the shadow is clicked.
     popup.OnShadowClicked = function() end
+    popup.OnEscapePressed = function() end
 
     local function MakeButton(text, callback)
         local button = CreateButtonWithDropshadow(dialog, '/BUTTON/medium/', text)
