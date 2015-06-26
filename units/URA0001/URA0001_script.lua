@@ -16,8 +16,6 @@ URA0001 = Class(CAirUnit) {
 
     OnCreate = function(self)
         CAirUnit.OnCreate(self)
-        --CreateBuilderArmController(unit,turretBone, [barrelBone], [aimBone])
-        --BuilderArmManipulator:SetAimingArc(minHeading, maxHeading, headingMaxSlew, minPitch, maxPitch, pitchMaxSlew)
         self.BuildArmManipulator = CreateBuilderArmController(self, 'URA0001' , 'URA0001', 0)
         self.BuildArmManipulator:SetAimingArc(-180, 180, 360, -90, 90, 360)
         self.BuildArmManipulator:SetPrecedence(5)
