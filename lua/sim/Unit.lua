@@ -261,32 +261,6 @@ Unit = Class(moho.unit_methods) {
     OnLostTarget = function(self, Weapon)
     end,
 
-    --Add a target to the weapon list for this unit
-    addTargetWeapon = function(self, target)
-        if not target.Dead then
-            table.insert(self.WeaponTargets, target)
-        end
-    end,
-
-    --Add a target to the list for this unit
-    addTarget = function(self, target)
-        if not target.Dead then
-            table.insert(self.Targets, target)
-        end
-    end,
-
-    --Remove all the targets for this unit
-    clearTarget = function(self)
-        --Tell our target we are no longer a threat
-        for k, ent in self.Targets do
-            if not ent.Dead then
-                ent:removeAttacker(self)
-            end
-        end
-        --Clear the list
-        self.Targets = {}
-    end,
-
     -------------------------------------------------------------------------------------------
     ---- MISC FUNCTIONS
     -------------------------------------------------------------------------------------------
