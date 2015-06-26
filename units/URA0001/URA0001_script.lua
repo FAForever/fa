@@ -45,7 +45,7 @@ URA0001 = Class(CAirUnit) {
     end,
 
     -- Prevent the unit from reporting consumption values (avoids junk in the resource overlay)
-    UpdateConsumptionValues = function() end,
+    UpdateConsumptionValues = function(self) end,
 
     IdleState = State {
         Main = function(self)
