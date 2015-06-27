@@ -302,10 +302,6 @@ function ConfigureBeatFunction()
                 local fractionFull = storedVal / maxStorageVal
 
                 if rateVal < 0 then
-                    if fractionFull > 0.5 then
-                        return 'ffb7e75f'
-                    end
-
                     if storedVal > 0 then
                         return 'yellow'
                     else
@@ -313,6 +309,7 @@ function ConfigureBeatFunction()
                     end
                 end
 
+                -- Positive rate, check if we're wasting money (and flash irritatingly if so)
                 if fractionFull > 0.9 then
                     -- Display flashing gray-white if high on resource.
                     blinkyFlag = not blinkyFlag
@@ -321,9 +318,9 @@ function ConfigureBeatFunction()
                     else
                         return 'ffffffff'
                     end
-                else
-                    return 'ffb7e75f'
                 end
+
+                return 'ffb7e75f'
             end
         else
             return function(rateVal, storedVal, maxStorageVal)
@@ -342,12 +339,12 @@ function ConfigureBeatFunction()
                         else
                             return 'ffffffff'
                         end
-                    else
-                        return 'yellow'
                     end
-                else
-                    return 'ffb7e75f'
+
+                    return 'yellow'
                 end
+
+                return 'ffb7e75f'
             end
         end
     end
