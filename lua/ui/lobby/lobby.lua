@@ -848,6 +848,7 @@ function SetSlotInfo(slotNum, playerInfo)
     end
 
     --\\ Stop - Color the Name in Slot by State
+    local playerName = playerInfo.PlayerName
     if wasConnected(playerInfo.OwnerID) or isLocallyOwned or not playerInfo.Human then
         slot.name:SetTitleText(GetPlayerDisplayName(playerInfo))
         slot.name._text:SetFont('Arial Gras', 15)
@@ -860,7 +861,7 @@ function SetSlotInfo(slotNum, playerInfo)
                 end
 
                 table.insert(ConnectionEstablished, playerName)
-                for k, v in CurrentConnection do -- Remove PlayerName in this Table
+                for k, v in CurrentConnection do
                     if v == playerName then
                         CurrentConnection[k] = nil
                         break
