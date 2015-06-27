@@ -16,18 +16,15 @@ XEB2402 = Class(TAirFactoryUnit) {
     
     OpenState = State() {
 
-        Main = function(self)            
-            local newSat = not self.Satellite
+        Main = function(self)
+            local bp = self:GetBlueprint()
             
             -- Play arm opening animation
-            local bp = self:GetBlueprint()
-            if not self.Open then
-                self.AnimManip = CreateAnimator(self)
-                self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen.sca')
-                self:PlayUnitSound('MoveArms')
-                WaitFor(self.AnimManip)
-                self.Trash:Add(self.AnimManip)
-            end
+            self.AnimManip = CreateAnimator(self)
+            self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen.sca')
+            self:PlayUnitSound('MoveArms')
+            WaitFor(self.AnimManip)
+            self.Trash:Add(self.AnimManip)
             
             -- Create Satellite, attach it to unit, play animation, release satellite
             local location = self:GetPosition('Attachpoint01')
@@ -41,7 +38,7 @@ XEB2402 = Class(TAirFactoryUnit) {
             self.Trash:Add(CreateAttachedEmitter(self,'ConstuctBeam01',army, '/effects/emitters/light_red_rotator_01_emit.bp'):ScaleEmitter( 2.00 ))
             self.Trash:Add(CreateAttachedEmitter(self,'ConstuctBeam02',army, '/effects/emitters/light_red_rotator_01_emit.bp'):ScaleEmitter( 2.00 ))
             
-            if newSat then
+            if not self.Satellite then
                 self.Satellite = CreateUnitHPR('XEA0002', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
                 self.Trash:Add(self.Satellite)
                 self.Satellite:AttachTo(self, 'Attachpoint01')
@@ -51,32 +48,31 @@ XEB2402 = Class(TAirFactoryUnit) {
             self.Satellite.Parent = self
             
             -- Play ejection animation
-            if not self.Open then
-                self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen01.sca')
-                self:PlayUnitSound('LaunchSat')
-                WaitFor(self.AnimManip)
-                self.Trash:Add(CreateAttachedEmitter(self,'XEB2402',army, '/effects/emitters/uef_orbital_death_laser_launch_01_emit.bp'):OffsetEmitter(0.00, 0.00, 1.00))
-                self.Trash:Add(CreateAttachedEmitter(self,'XEB2402',army, '/effects/emitters/uef_orbital_death_laser_launch_02_emit.bp'):OffsetEmitter(0.00, 2.00, 1.00))
-                self.Open = true
-            end
+            self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen01.sca')
+            self:PlayUnitSound('LaunchSat')
+            WaitFor(self.AnimManip)
+            self.Trash:Add(CreateAttachedEmitter(self,'XEB2402',army, '/effects/emitters/uef_orbital_death_laser_launch_01_emit.bp'):OffsetEmitter(0.00, 0.00, 1.00))
+            self.Trash:Add(CreateAttachedEmitter(self,'XEB2402',army, '/effects/emitters/uef_orbital_death_laser_launch_02_emit.bp'):OffsetEmitter(0.00, 2.00, 1.00))
             
             -- Release unit
-            if newSat then
+            if self.Satellite then
                 self.Satellite:DetachFrom()
                 self.Satellite:Open()
+                -- Try to reverse the animations, closing everything up to be ready for reconstruction
+                WaitSeconds(2)
+                self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen01.sca'):SetRate(-1)
+                self:PlayUnitSound('LaunchSat')
+                WaitFor(self.AnimManip)
+                self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen.sca'):SetRate(-1)
+                self:PlayUnitSound('MoveArms')
+                WaitFor(self.AnimManip)
             end
         end,
     },
 
     OnStartBuild = function(self, unitBeingBuilt, order)
-        WARN('Starting build, self.Satellite is...')
         if not self.Satellite then
-            WARN('Building...')
             TAirFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
-        else
-            IssueStop({self})
-            IssueClearCommands({self})
-            WARN('not building, response from self.Satellite')
         end
     end,
     
@@ -105,62 +101,46 @@ XEB2402 = Class(TAirFactoryUnit) {
     
     OnCaptured = function(self, captor)
         if self and not self:IsDead() and self.Satellite and not self.Satellite:IsDead() and captor and not captor:IsDead() and self:GetAIBrain() ~= captor:GetAIBrain() then
+            local captorArmyIndex = captor:GetArmy()
+            local captorBrain = false
+            
+            -- Do callbacks
             self:DoUnitCallbacks('OnCaptured', captor)
+            self.Satellite:DoUnitCallbacks('OnCaptured', captor)
+            
+            -- Create new callbacks
             local newUnitCallbacks = {}
             if self.EventCallbacks.OnCapturedNewUnit then
                 newUnitCallbacks = self.EventCallbacks.OnCapturedNewUnit
             end
             
-            -- Do we need this? Can Sat ever get enhancements?
-            local entId = self:GetEntityId()
-            local unitEnh = SimUnitEnhancements[entId]
-            local captorArmyIndex = captor:GetArmy()
-            local captorBrain = false
+            local newSatUnitCallbacks = {}
+            if self.Satellite.EventCallbacks.OnCapturedNewUnit then
+                newSatUnitCallbacks = self.Satellite.EventCallbacks.OnCapturedNewUnit
+            end
             
-            -- For campaigns:
-            -- We need the brain to ignore army cap when transfering the unit
-            -- do all necessary steps to set brain to ignore, then un-ignore if necessary the unit cap
-            
+            -- Disable unit cap for campaigns
             if ScenarioInfo.CampaignMode then
                 captorBrain = captor:GetAIBrain()
                 SetIgnoreArmyUnitCap(captorArmyIndex, true)
             end
             
-            -- Satellite stuff
-            self.Satellite:DoUnitCallbacks('OnCaptured', captor)
-            local newSatUnitCallbacks = {}
-            if self.Satellite.EventCallbacks.OnCapturedNewUnit then
-                newSatUnitCallbacks = self.Satellite.EventCallbacks.OnCapturedNewUnit
-            end
-            local satId = self:GetEntityId()
-            local satEnh = SimUnitEnhancements[satId]
+            -- Shift the two units to the new army
             local sat = ChangeUnitArmy(self.Satellite, captorArmyIndex)
-            
-            -- Unit stuff
             local newUnit = ChangeUnitArmy(self, captorArmyIndex)
             if newUnit then
                 newUnit.Satellite = sat
             end
 
+            -- Reapply unit cap checks
             if ScenarioInfo.CampaignMode and not captorBrain.IgnoreArmyCaps then
                 SetIgnoreArmyUnitCap(captorArmyIndex, false)
             end
             
-            if unitEnh then
-                for k,v in unitEnh do
-                    newUnit:CreateEnhancement(v)
-                end
-            end
+            -- Do custom callbacks
             for k,cb in newUnitCallbacks do
                 if cb then
                     cb(newUnit, captor)
-                end
-            end
-            
-            -- Satellite stuff
-            if satEnh then
-                for k,v in satEnh do
-                    sat:CreateEnhancement(v)
                 end
             end
             for k,cb in newSatUnitCallbacks do
