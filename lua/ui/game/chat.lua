@@ -283,6 +283,14 @@ function CreateChatLines()
                 end
             end
         end
+        
+        line.textBG2 = Bitmap(line)
+        line.textBG2.Depth:Set(function() return line.text.Depth() - 1 end)
+        line.textBG2.Left:Set(line.nameBG.Left)
+        line.textBG2.Top:Set(line.teamColor.Top)
+        line.textBG2.Right:Set(line.text.Right)
+        line.textBG2.Bottom:Set(line.teamColor.Bottom)
+        line.textBG2:Disable()
 
         return line
     end
@@ -419,6 +427,11 @@ function SetupChatScroll()
         local curEntry = 1
         local curTop = 1
         local tempsize = 0
+        
+        if GUI.bg:IsHidden() then
+            tempTop = math.max(DataSize() - numLines()+1, 1)
+        end
+        
         for i, v in chatHistory do
             if IsValidEntry(v) then
                 if tempsize + table.getsize(v.wrappedtext) < tempTop then
@@ -501,25 +514,44 @@ function SetupChatScroll()
                 GUI.chatLines[index].textBG:SetSolidColor('00000000')
                 GUI.chatLines[index].nameBG:SetSolidColor('00000000')
                 GUI.chatLines[index].EntryID = curEntry
-                if chatHistory[curEntry].new and GUI.bg:IsHidden() then
-                    GUI.chatLines[index]:Show()
-                    GUI.chatLines[index].topBG:Hide()
-                    GUI.chatLines[index].rightBG:Hide()
-                    GUI.chatLines[index].leftBG:Hide()
-                    if GUI.chatLines[index].name:GetText() == '' then
-                        GUI.chatLines[index].teamColor:Hide()
+                
+                if GUI.bg:IsHidden() then
+                    if Prefs.GetFromCurrentProfile('options').gui_chat_feed_background then
+                        GUI.chatLines[index].textBG2:SetSolidColor('aa000000')
+                    else
+                        GUI.chatLines[index].textBG2:SetSolidColor('00000000')
                     end
-                    GUI.chatLines[index].time = 0
-                    GUI.chatLines[index].OnFrame = function(self, delta)
-                        self.time = self.time + delta
-                        if self.time > ChatOptions.fade_time then
-                            if GUI.bg:IsHidden() then
-                                self:Hide()
+                
+                    if chatHistory[curEntry].new or GUI.chatLines[index].time == nil then
+                        GUI.chatLines[index].time = 0
+                    end
+                    
+                    GUI.chatLines[index].curHistory = chatHistory[curEntry]
+                    if GUI.chatLines[index].curHistory then
+                        if GUI.chatLines[index].curHistory.time ~= nil then
+                            GUI.chatLines[index].time = GUI.chatLines[index].curHistory.time
+                        end
+                        if GUI.chatLines[index].time < ChatOptions.fade_time then
+                            GUI.chatLines[index]:Show()
+                            GUI.chatLines[index].topBG:Hide()
+                            GUI.chatLines[index].rightBG:Hide()
+                            GUI.chatLines[index].leftBG:Hide()
+                            if GUI.chatLines[index].name:GetText() == '' then
+                                GUI.chatLines[index].teamColor:Hide()
                             end
-                            self:SetNeedsFrameUpdate(false)
+                            GUI.chatLines[index].OnFrame = function(self, delta)
+                                self.time = self.time + delta
+                                self.curHistory.time = self.time
+                                if self.time > ChatOptions.fade_time then
+                                    if GUI.bg:IsHidden() then
+                                        self:Hide()
+                                    end
+                                    self:SetNeedsFrameUpdate(false)
+                                end
+                            end
+                            GUI.chatLines[index]:SetNeedsFrameUpdate(true)        
                         end
                     end
-                    GUI.chatLines[index]:SetNeedsFrameUpdate(true)
                 end
             else
                 GUI.chatLines[index].nameBG:Disable()
@@ -892,14 +924,28 @@ function ToggleChat()
             GUI.bg.curTime = 0
         end
         for i, v in GUI.chatLines do
+            if Prefs.GetFromCurrentProfile('options').gui_chat_feed_background then
+                v.textBG2:SetSolidColor('00000000')
+            end
             v:SetNeedsFrameUpdate(false)
             v:Show()
-            v.OnFrame = nil
         end
+        GUI.chatContainer:CalcVisible()
     else
         GUI.bg:Hide()
         GUI.chatEdit.edit:AbandonFocus()
         GUI.bg:SetNeedsFrameUpdate(false)
+        
+        if Prefs.GetFromCurrentProfile('options').gui_persist_chat then
+            GUI.chatContainer:CalcVisible()
+        else
+            for i, v in GUI.chatLines do
+                v.time = ChatOptions.fade_time + 1
+                if v.curHistory and v.curHistory.time ~= nil then
+                    v.curHistory.time = v.time
+                end
+            end
+        end
     end
 end
 

@@ -672,6 +672,33 @@ options = {
                     },
                 },
             },
+            
+            {
+                title = "Chat Feed Background",
+                key = 'gui_chat_feed_background',
+                type = 'toggle',
+                default = false,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = false },
+                        {text = "<LOC _On>", key = true },
+                    },
+                },
+            },
+            
+            {
+                title = "Persist Chat Feed Timeout",
+                tip = "Allows chat to timeout normally in the chat feed after closing the chat window",
+                key = 'gui_persist_chat',
+                type = 'toggle',
+                default = false,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = false },
+                        {text = "<LOC _On>", key = true },
+                    },
+                },
+            },
         },
     },
     video = {
