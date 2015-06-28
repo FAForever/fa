@@ -381,7 +381,6 @@ Tooltips = {
         title = "Persist Chat Feed Timeout",
         description = "Allows chat to timeout normally in the chat feed after closing the chat window",
     },
-    
     minimap_reset = {
         title = "<LOC tooltipui0649>Reset Minimap Window",
         description = "<LOC tooltipui0650>Resets the position and layout of the minimap window",

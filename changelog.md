@@ -87,6 +87,8 @@ UI
 - 34 new taunts
 - Added a button to unbind key mappings
 - Drop shadow for chat messages
+- Chat Option: Add background to chat messages when chat window is closed
+- Chat Option: Allow chat to timeout normally in the feed after closing window
 
 Other
 - Engineering Station units now pause on transfer from one player to another
