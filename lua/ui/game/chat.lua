@@ -35,9 +35,16 @@ local defOptions = { all_color = 1,
         link_color = 4,
         font_size = 14,
         fade_time = 15,
-        win_alpha = 1}
+        win_alpha = 1,
+        feed_background = false,
+        feed_persist = true}
 
-local ChatOptions = Prefs.GetFromCurrentProfile("chatoptions") or defOptions
+local ChatOptions = Prefs.GetFromCurrentProfile("chatoptions")
+for option, value in defOptions do
+     if ChatOptions[option] == nil then
+        ChatOptions[option] = value
+    end
+end
 
 GUI = {
     bg = false,
@@ -516,7 +523,7 @@ function SetupChatScroll()
                 GUI.chatLines[index].EntryID = curEntry
                 
                 if GUI.bg:IsHidden() then
-                    if Prefs.GetFromCurrentProfile('options').gui_chat_feed_background then
+                    if ChatOptions.feed_background then
                         GUI.chatLines[index].textBG2:SetSolidColor('aa000000')
                     else
                         GUI.chatLines[index].textBG2:SetSolidColor('00000000')
@@ -924,9 +931,7 @@ function ToggleChat()
             GUI.bg.curTime = 0
         end
         for i, v in GUI.chatLines do
-            if Prefs.GetFromCurrentProfile('options').gui_chat_feed_background then
-                v.textBG2:SetSolidColor('00000000')
-            end
+            v.textBG2:SetSolidColor('00000000')
             v:SetNeedsFrameUpdate(false)
             v:Show()
         end
@@ -936,7 +941,7 @@ function ToggleChat()
         GUI.chatEdit.edit:AbandonFocus()
         GUI.bg:SetNeedsFrameUpdate(false)
         
-        if Prefs.GetFromCurrentProfile('options').gui_persist_chat then
+        if ChatOptions.feed_persist then
             GUI.chatContainer:CalcVisible()
         else
             for i, v in GUI.chatLines do
@@ -1331,6 +1336,9 @@ function CreateConfigWindow()
                 {type = 'slider', name = '<LOC chat_0009>Chat Font Size', key = 'font_size', tooltip = 'chat_fontsize', min = 12, max = 18, inc = 2},
                 {type = 'slider', name = '<LOC chat_0010>Window Fade Time', key = 'fade_time', tooltip = 'chat_fadetime', min = 5, max = 30, inc = 1},
                 {type = 'slider', name = '<LOC chat_0011>Window Alpha', key = 'win_alpha', tooltip = 'chat_alpha', min = 20, max = 100, inc = 1},
+                {type = 'splitter'},
+                {type = 'filter', name = '<LOC chat_0014>Show Feed Background', key = 'feed_background', tooltip = 'chat_feed_background'},
+                {type = 'filter', name = '<LOC chat_0015>Persist Feed Timeout', key = 'feed_persist', tooltip = 'chat_feed_persist'},
         },
     }
 
@@ -1470,6 +1478,9 @@ function CreateConfigWindow()
             else
                 LayoutHelpers.RightOf(optionGroup.options[index], optionGroup.options[index-1])
             end
+        elseif v.type == 'filter' then
+            LayoutHelpers.Below(optionGroup.options[index], optionGroup.options[index-1], 4)
+            LayoutHelpers.AtLeftIn(optionGroup.options[index], WindowTitle)
         else
             LayoutHelpers.Below(optionGroup.options[index], optionGroup.options[index-1], 4)
             LayoutHelpers.AtHorizontalCenterIn(optionGroup.options[index], optionGroup)
@@ -1492,6 +1503,8 @@ function CreateConfigWindow()
                         control.slider:SetValue(value)
                     elseif control.Data.type == 'color' then
                         control.color:SetItem(value)
+                    elseif control.Data.type == 'filter' then
+                        control.check:SetCheck(value, true)
                     end
                     UpdateOption(option, value)
                     break

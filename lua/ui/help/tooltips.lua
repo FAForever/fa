@@ -373,6 +373,15 @@ Tooltips = {
         title = "<LOC tooltipui0540>Reset Chat Window",
         description = "<LOC tooltipui0541>Resets the position and layout of the chat window",
     },
+    chat_feed_background = {
+        title = 'Chat Feed Background',
+        description = "Adds a black bar behind chat lines when the chat window is closed",
+    },
+    chat_feed_persist = {
+        title = "Persist Chat Feed Timeout",
+        description = "Allows chat to timeout normally in the chat feed after closing the chat window",
+    },
+    
     minimap_reset = {
         title = "<LOC tooltipui0649>Reset Minimap Window",
         description = "<LOC tooltipui0650>Resets the position and layout of the minimap window",
