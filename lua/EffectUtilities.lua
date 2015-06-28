@@ -416,6 +416,11 @@ end
 
 function SpawnBuildBots( builder, unitBeingBuilt, BuildEffectsBag)
     local numBots = math.ceil((10+builder:GetBuildRate()) / 15)
+    -- Do not spam the heck out of buildbots if build power > 150
+    if numBots > 10 then
+        numBots = 10
+    end
+    
     if not builder.buildBots then
         builder.buildBots = {}
     end
