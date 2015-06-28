@@ -373,6 +373,15 @@ Tooltips = {
         title = "<LOC tooltipui0540>Reset Chat Window",
         description = "<LOC tooltipui0541>Resets the position and layout of the chat window",
     },
+    chat_feed_background = {
+        title = 'Chat Feed Background',
+        description = "Adds a black bar behind chat lines when the chat window is closed",
+    },
+    chat_feed_persist = {
+        title = "Persist Chat Feed Timeout",
+        description = "Allows chat to timeout normally in the chat feed after closing the chat window",
+    },
+    
     minimap_reset = {
         title = "<LOC tooltipui0649>Reset Minimap Window",
         description = "<LOC tooltipui0650>Resets the position and layout of the minimap window",
@@ -2052,12 +2061,4 @@ Tooltips = {
         title = 'Smart Economy Indicators',
         description = 'Smart Economy indicators. Rate display works differently now. Efficiency is "infinite" when consumption is zero. Values greater than 100% are possible again. Mass rate begins to flash bright white if stored mass is > 80% and rate is climbing. Energy rate begins to flash bright white if stored energy is < 20% and rate is sinking. Mass and energy bars are vertically exchanged (mass is heavier, thus it is below energy - TA style). Mass bar, as well as income and store numbers, are gray - TA style.',
     },
-    options_gui_chat_feed_background = {
-        title = 'Chat Feed Background',
-        description = "Adds a black bar behind chat lines when the chat window is closed",
-    },
-    options_gui_persist_chat = {
-        title = "Persist Chat Feed Timeout",
-        description = "Allows chat to timeout normally in the chat feed after closing the chat window",
-    },    
 }
