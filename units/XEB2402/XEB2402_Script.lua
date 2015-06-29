@@ -16,7 +16,6 @@ XEB2402 = Class(TAirFactoryUnit) {
     
     OpenState = State() {
         Main = function(self)
-            WARN('In Main')
             local bp = self:GetBlueprint()
             
             -- Play arm opening animation
@@ -26,10 +25,12 @@ XEB2402 = Class(TAirFactoryUnit) {
             WaitFor(self.AnimManip)
             self.Trash:Add(self.AnimManip)
             
-            WARN('Past anim')
-            
             -- Create Satellite, attach it to unit, play animation, release satellite
             local location = self:GetPosition('Attachpoint01')
+            self.Satellite = CreateUnitHPR('XEA0002', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+            self.Trash:Add(self.Satellite)
+            self.Satellite:AttachTo(self, 'Attachpoint01')
+            
             local army = self:GetArmy()
             self.Trash:Add(CreateAttachedEmitter(self,'Tower_B04',army, '/effects/emitters/light_blue_blinking_01_emit.bp'):OffsetEmitter(0.06, -0.10, 1.90))
             self.Trash:Add(CreateAttachedEmitter(self,'Tower_B04',army, '/effects/emitters/light_blue_blinking_01_emit.bp'):OffsetEmitter(-0.06, -0.10, 1.90))
@@ -40,13 +41,7 @@ XEB2402 = Class(TAirFactoryUnit) {
             self.Trash:Add(CreateAttachedEmitter(self,'ConstuctBeam01',army, '/effects/emitters/light_red_rotator_01_emit.bp'):ScaleEmitter( 2.00 ))
             self.Trash:Add(CreateAttachedEmitter(self,'ConstuctBeam02',army, '/effects/emitters/light_red_rotator_01_emit.bp'):ScaleEmitter( 2.00 ))
             
-            if not self.Satellite then
-                self.Satellite = CreateUnitHPR('XEA0002', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
-                self.Trash:Add(self.Satellite)
-                self.Satellite:AttachTo(self, 'Attachpoint01')
-            end
-            
-            --Tell the satellite that we're its parent
+            -- Tell the satellite that we're its parent
             self.Satellite.Parent = self
             
             -- Play ejection animation
@@ -56,39 +51,36 @@ XEB2402 = Class(TAirFactoryUnit) {
             self.Trash:Add(CreateAttachedEmitter(self,'XEB2402',army, '/effects/emitters/uef_orbital_death_laser_launch_01_emit.bp'):OffsetEmitter(0.00, 0.00, 1.00))
             self.Trash:Add(CreateAttachedEmitter(self,'XEB2402',army, '/effects/emitters/uef_orbital_death_laser_launch_02_emit.bp'):OffsetEmitter(0.00, 2.00, 1.00))
             
-            -- Release unit
-            if self.Satellite then
-                self.Satellite:DetachFrom()
-                self.Satellite:Open()
-                -- Try to reverse the animations, closing everything up to be ready for reconstruction
-                WaitSeconds(2)
-                self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen01.sca'):SetRate(-1)
-                self:PlayUnitSound('LaunchSat')
-                WaitFor(self.AnimManip)
-                self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen.sca'):SetRate(-1)
-                self:PlayUnitSound('MoveArms')
-                WaitFor(self.AnimManip)
-            end
+            -- Release unit            
+            self.Satellite:DetachFrom()
+            self.Satellite:Open()
+
+            -- Reopen the cage and arms, to keep up the illusion
+            self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen01.sca'):SetRate(-1)
+            WaitSeconds(1)
+            self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen.sca'):SetRate(-1)
+            self:PlayUnitSound('MoveArms')
         end,
     },
 
     OnStartBuild = function(self, unitBeingBuilt, order)
-        if not self.Satellite then
-            TAirFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
-        else
+        if self.Satellite then
+            IssueStop({self})
             IssueClearCommands({self})
+        else
+            TAirFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
         end
     end,
-    
+
     OnStopBuild = function(self, unitBeingBuilt, order)
-        WARN('OnStopBuild')
-        unitBeingBuilt:Destroy()
-        WARN('1')
-        IssueClearCommands({self})
-        WARN('2')
-        if not self.Satellite then
-            WARN('3')
-            ChangeState(self, self.OpenState)
+        if self.Satellite then
+            return
+        else
+            -- Brute-force the system by just creating a new unit outright
+            local location = self:GetPosition()
+            CreateUnitHPR('XEB2402', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+            unitBeingBuilt:Destroy()
+            self:Destroy()
         end
     end,
     
