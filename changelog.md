@@ -116,6 +116,7 @@ Contributors
 - shalkya
 - bamboofats
 - quark036
+- DukeOfEarl
 
 Special Thanks To
 - Softly
