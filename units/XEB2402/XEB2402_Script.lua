@@ -15,8 +15,8 @@ XEB2402 = Class(TAirFactoryUnit) {
     end,
     
     OpenState = State() {
-
         Main = function(self)
+            WARN('In Main')
             local bp = self:GetBlueprint()
             
             -- Play arm opening animation
@@ -25,6 +25,8 @@ XEB2402 = Class(TAirFactoryUnit) {
             self:PlayUnitSound('MoveArms')
             WaitFor(self.AnimManip)
             self.Trash:Add(self.AnimManip)
+            
+            WARN('Past anim')
             
             -- Create Satellite, attach it to unit, play animation, release satellite
             local location = self:GetPosition('Attachpoint01')
@@ -73,14 +75,19 @@ XEB2402 = Class(TAirFactoryUnit) {
     OnStartBuild = function(self, unitBeingBuilt, order)
         if not self.Satellite then
             TAirFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
+        else
+            IssueClearCommands({self})
         end
     end,
     
-    OnStopBuild = function(self, unitBeingBuilt, order )
+    OnStopBuild = function(self, unitBeingBuilt, order)
+        WARN('OnStopBuild')
         unitBeingBuilt:Destroy()
-        IssueStop({self})
+        WARN('1')
         IssueClearCommands({self})
+        WARN('2')
         if not self.Satellite then
+            WARN('3')
             ChangeState(self, self.OpenState)
         end
     end,

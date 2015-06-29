@@ -39,6 +39,7 @@ UnitBlueprint {
     Categories = {
         'PRODUCTFA',
         'SORTCONSTRUCTION',
+        --'CONSTRUCTIONSORTDOWN',
         'SHOWQUEUE',
         'FACTORY',
         'CONSTRUCTION',
@@ -54,9 +55,6 @@ UnitBlueprint {
         'RECLAIMABLE',
         'DRAGBUILD',
     },
-    CollisionOffsetX = 0,
-    CollisionOffsetY = 0,
-    CollisionOffsetZ = 0,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
