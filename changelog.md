@@ -107,18 +107,19 @@ Other
 Contributors
 ------------
 
+- CodingSquirrel
 - Crotalus
+- DukeOfEarl
 - Eximius
 - IceDreamer
 - ResinSmoker
 - Sheeo
 - Speed2
 - anihilnine
-- ckitching
-- shalkya
 - bamboofats
+- ckitching
 - quark036
-- DukeOfEarl
+- shalkya
 
 Special Thanks To
 - Softly
