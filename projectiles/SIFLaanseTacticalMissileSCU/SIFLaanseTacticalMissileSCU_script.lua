@@ -1,9 +1,9 @@
 #****************************************************************************
 #**
-#**  File     :  /data/projectiles/SIFLaanseTacticalMissile01/SIFLaanseTacticalMissile01_script.lua
+#**  File     :  /data/projectiles/SIFLaanseTacticalMissile01/SIFLaanseTacticalMissileSCU_script.lua
 #**  Author(s):  Gordon Duclos, Aaron Lundquist
 #**
-#**  Summary  :  Laanse Tactical Missile Projectile script, XSL0111
+#**  Summary  :  Laanse Tactical Missile Projectile script, XSL0301
 #**
 #**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
