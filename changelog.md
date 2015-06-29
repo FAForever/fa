@@ -61,7 +61,7 @@ Visual
 - TMLs now show the splash damage radius in targeting mode
 - Cybran Engineers now display a build beam to clearly show what they're tasked to
 - Cybran factories now have red build beams
-- Number of Cybran build bots scale with buildpower of the engineer
+- Number of Cybran build bots scale with buildpower of the engineer, to a maximum of 10
 - Ping values under "Connectivity" (F11) now update during game stop/stall
 - Added Yolona Oss to Mavor/Salvation/Scathis build restriction and renamed it
   Super-Game-Enders
@@ -69,6 +69,7 @@ Visual
 - Cybran engineering build bots now crash when their owner dies rather than just vanishing
 - Quantum Gateways now can assist each other
 - Enhanced Seraphim tarmacs
+- Beams originating inside Fog of War will no longer be invisible
 
 
 UI
@@ -85,7 +86,7 @@ UI
 - "Commander under attack" now plays for shielded ACUs
 - 34 new taunts
 - Added a button to unbind key mappings
-- Share Until Death is now default
+- Drop shadow for chat messages
 
 Other
 - Engineering Station units now pause on transfer from one player to another
@@ -99,6 +100,7 @@ Other
 - Added templates for all support factories. AI in coop missions is now able to
   rebuild support factories
 - Assist now prioritize building over repair
+- Share Until Death is now default
 
 Contributors
 ------------
