@@ -39,7 +39,7 @@ local defOptions = { all_color = 1,
         feed_background = false,
         feed_persist = true}
 
-local ChatOptions = Prefs.GetFromCurrentProfile("chatoptions")
+local ChatOptions = Prefs.GetFromCurrentProfile("chatoptions") or {}
 for option, value in defOptions do
      if ChatOptions[option] == nil then
         ChatOptions[option] = value
