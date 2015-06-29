@@ -1,0 +1,71 @@
+ProjectileBlueprint {
+    Audio = {
+        Impact = Sound {
+            Bank = 'Impacts',
+            Cue = 'UEF_Expl_Med_Impact',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactTerrain = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Land_Gen_UEF',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactWater = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Water_Splash_UEF',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+    },
+    Categories = {
+        'UEF',
+        'PROJECTILE',
+        'INDIRECTFIRE',
+        'TACTICAL',
+        'MISSILE',
+        'NOSPLASHDAMAGE',
+    },
+    Defense = {
+        Health = 3,
+        MaxHealth = 3,
+    },
+    Display = {
+        CameraFollowTimeout = 2,
+        CameraFollowsProjectile = true,
+        Mesh = {
+            LODs = {
+                {
+                    AlbedoName = '/projectiles/tifmissilecruise01/tifmissilecruise01_albedo.dds',
+                    MeshName = '/projectiles/tifmissilecruise01/tifmissilecruise01_lod0.scm',
+                    ShaderName = 'TMeshAlpha',
+                },
+            },
+        },
+        StrategicIconSize = 2,
+        UniformScale = 0.15,
+    },
+    Economy = {
+        BuildCostEnergy = 3600,
+        BuildCostMass = 180,
+        BuildTime = 840, #300
+    },
+    General = {
+        Category = 'Missile',
+        Faction = 'UEF',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        Acceleration = 3,
+        DestroyOnWater = false,
+        InitialSpeed = 3,
+        MaxSpeed = 12,
+        RotationalVelocity = 0,
+        RotationalVelocityRange = 0,
+        TrackTarget = true,
+        TrackTargetGround = true,
+        TurnRate = 0,
+        UseGravity = false,
+        VelocityAlign = true,
+    },
+}
