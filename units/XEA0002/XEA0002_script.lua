@@ -14,7 +14,7 @@ local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
 XEA0002 = Class(TAirUnit) {
     DestroyNoFallRandomChance = 1.1,
     
-    HideBones = { 'Shell01', 'Shell02', 'Shell03', 'Shell04', },
+    HideBones = {'Shell01', 'Shell02', 'Shell03', 'Shell04',},
     
     Weapons = {
         OrbitalDeathLaserWeapon = Class(TOrbitalDeathLaserBeamWeapon){},
@@ -22,7 +22,7 @@ XEA0002 = Class(TAirUnit) {
     
     OnKilled = function(self, instigator, type, overkillRatio)
         if self.IsDying then 
-            return 
+            return
         end
         
         local wep = self:GetWeaponByLabel('OrbitalDeathLaserWeapon')
@@ -32,31 +32,29 @@ XEA0002 = Class(TAirUnit) {
         
         self.IsDying = true
         self.Parent.Satellite = nil
-        WARN('Satellite set to nil')
-        
         TAirUnit.OnKilled(self, instigator, type, overkillRatio)        
     end,
     
     Open = function(self)
-        ChangeState( self, self.OpenState )
+        ChangeState(self, self.OpenState)
     end,
     
     OpenState = State() {
         Main = function(self)
             self.OpenAnim = CreateAnimator(self)
-            self.OpenAnim:PlayAnim( '/units/XEA0002/xea0002_aopen01.sca' )
-            self.Trash:Add( self.OpenAnim )
-            WaitFor( self.OpenAnim )
+            self.OpenAnim:PlayAnim('/units/XEA0002/xea0002_aopen01.sca')
+            self.Trash:Add(self.OpenAnim)
+            WaitFor(self.OpenAnim)
             
-            self.OpenAnim:PlayAnim( '/units/XEA0002/xea0002_aopen02.sca' )
+            self.OpenAnim:PlayAnim('/units/XEA0002/xea0002_aopen02.sca' )
             
             for k,v in self.HideBones do
-                self:HideBone( v, true )
+                self:HideBone(v, true)
             end
         end,
     },
     
-    --Make this unit invulnerable - Not any more! (IceDreamer)
+    -- Make this unit ignore all but nuclear damage (Kills it when parked above a launcher)
     OnDamage = function(self, instigator, amount, vector, damageType)
 		if EntityCategoryContains(categories.NUKE, instigator) then
 			self:Destroy()
