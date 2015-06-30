@@ -117,9 +117,25 @@ local selectedMods = nil
 local CPU_Benchmarks = {} -- Stores CPU benchmark data
 
 local function parseCommandlineArguments()
+    -- Set of all possible command line option keys.
+    -- The client sometimes gives us empty-string as some args, which gets interpreted as that key
+    -- having as value the name of the next key. This set lets us interpret that case using the
+    -- default option.
+    local CMDLINE_ARGUMENT_KEYS = {
+        ["/init"] = true,
+        ["/country"] = true,
+        ["/ratingcolor"] = true,
+        ["/numgames"] = true,
+        ["/mean"] = true,
+        ["/clan"] = true,
+        ["/deviation"] = true,
+        ["/joincustom"] = true,
+        ["/gpgnet"] = true,
+    }
+
     local function GetCommandLineArgOrDefault(argname, default)
         local arg = GetCommandLineArg(argname, 1)
-        if arg then
+        if arg and not CMDLINE_ARGUMENT_KEYS[arg[1]] then
             return arg[1]
         end
 
