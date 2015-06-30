@@ -1782,7 +1782,9 @@ Unit = Class(moho.unit_methods) {
             end
         end
 
-        self.originalBuilder = builder
+        if builder:IsUnitState('Upgrading') then
+            self.originalBuilder = builder
+        end
     end,
 
     UnitBuiltPercentageCallbackThread = function(self, percent, callback)
@@ -1887,6 +1889,8 @@ Unit = Class(moho.unit_methods) {
         if bp.EnhancementPresetAssigned then
             self:ForkThread(self.CreatePresetEnhancementsThread)
         end
+
+        self.originalBuilder = nil
     end,
 
     StartBeingBuiltEffects = function(self, builder, layer)
