@@ -88,6 +88,18 @@ UnitBlueprint {
             Green = '/effects/emitters/light_green_03_emit.bp',
             Red = '/effects/emitters/light_red_blinking_02_emit.bp',
         },
+        IdleEffects = {
+            Land = {
+                Effects = {
+                    {
+                        Bones = {
+                            'B04_Tower',
+                        },
+                        Type = 'Radar01',
+                    },
+                },
+            },
+        },
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
