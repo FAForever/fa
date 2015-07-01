@@ -1014,12 +1014,7 @@ Unit = Class(moho.unit_methods) {
 
         self:SetConsumptionPerSecondEnergy(energy_rate)
         self:SetConsumptionPerSecondMass(mass_rate)
-
-        if (energy_rate > 0) or (mass_rate > 0) then
-            self:SetConsumptionActive(true)
-        else
-            self:SetConsumptionActive(false)
-        end
+        self:SetConsumptionActive(energy_rate > 0 or mass_rate > 0)
     end,
 
     UpdateProductionValues = function(self)
