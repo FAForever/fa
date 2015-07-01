@@ -947,14 +947,6 @@ Unit = Class(moho.unit_methods) {
         local focus = self:GetFocusUnit()
         local energy_rate = 0
         local mass_rate = 0
-        local states = {'Enhancing',  'Upgrading', 'SiloBuildingAmmo', 'Building', 'Repairing'}
-        local self_state
-        local focus_state
-
-        for _, state in states do
-            if not self_state and self:IsUnitState(state) then self_state = state end
-            if focus and not focus_state and focus:IsUnitState(state) then focus_state = state end
-        end
 
         if self.ActiveConsumption then
             local focus = self:GetFocusUnit()
@@ -971,7 +963,7 @@ Unit = Class(moho.unit_methods) {
             if self.WorkItem then --Enhancement
                 targetData = self.WorkItem
             elseif focus then --Handling upgrades
-                if self_state == 'Upgrading' then
+                if self:IsUnitState('Upgrading') then
                     baseData = self:GetBlueprint().Economy --Upgrading myself, substract ev. baseCost
                 elseif focus.originalBuilder and not focus.originalBuilder.Dead and focus.originalBuilder:IsUnitState('Upgrading') then
                     baseData = focus.originalBuilder:GetBlueprint().Economy
@@ -985,7 +977,7 @@ Unit = Class(moho.unit_methods) {
             if targetData then --Upgrade/enhancement
                 time, energy, mass = Game.GetConstructEconomyModel(self, targetData, baseData)
             elseif focus then --Building/repairing something
-                if focus_state == 'SiloBuildingAmmo' then
+                if focus:IsUnitState('SiloBuildingAmmo') then
                     local siloBuildRate = focus:GetBuildRate() or 1
                     time, energy, mass = focus:GetBuildCosts(focus.SiloProjectile)
                     energy = (energy / siloBuildRate) * (self:GetBuildRate() or 1)
