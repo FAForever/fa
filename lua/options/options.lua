@@ -411,7 +411,7 @@ options = {
                 },
             },
             {
-              title = "cycle reset time (ms)",
+              title = "Cycle reset time (ms)",
               key = 'hotbuild_cycle_reset_time',
               type = 'slider',
               default = 1100,
