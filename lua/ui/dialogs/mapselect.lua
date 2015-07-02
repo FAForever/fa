@@ -758,7 +758,7 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
                 
                 for index, val in data.data.values do
                     itemArray[index] = val.text
-                    line.combo.keyMap[tostring(val.key)] = index
+                    line.combo.keyMap[val.key] = index
                     tooltipTable[index]={text=data.data.label,body=val.help}
                     --
                     if curOptions[data.data.key] and val.key == curOptions[data.data.key] then
