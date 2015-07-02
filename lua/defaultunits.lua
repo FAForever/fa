@@ -643,7 +643,30 @@ FactoryUnit = Class(StructureUnit) {
         self.FactoryBuildFailed = false
     end,
 
+    --- Introduce a rolloff delay, where defined.
     OnStopBuild = function(self, unitBeingBuilt, order )
+        local bp = self:GetBlueprint()
+        if bp.General.RolloffDelay and bp.General.RolloffDelay > 0 and not self.FactoryBuildFailed then
+            self:ForkThread(self.PauseThread, bp.General.RolloffDelay, unitBeingBuilt, order)
+        else
+            self:DoStopBuild(unitBeingBuilt, order)
+        end
+    end,
+
+    --- Adds a pause between unit productions
+    PauseThread = function(self, productionpause, unitBeingBuilt, order)
+        self:StopBuildFx()
+        self:SetBusy(true)
+        self:SetBlockCommandQueue(true)
+
+        WaitSeconds(productionpause)
+
+        self:SetBusy(false)
+        self:SetBlockCommandQueue(false)
+        self:DoStopBuild(unitBeingBuilt, order)
+    end,
+
+    DoStopBuild = function(self, unitBeingBuilt, order )
         StructureUnit.OnStopBuild(self, unitBeingBuilt, order )
 
         if not self.FactoryBuildFailed then
@@ -1967,37 +1990,6 @@ ACUUnit = Class(CommandUnit) {
         self:GetAIBrain():GiveResource('Mass', self:GetBlueprint().Economy.StorageMass)
     end,
 }
-
--- This entire section is for factory fixes from CBFP.  If no workie, just remove everything below this line to restore
-
-local Game = import('/lua/game.lua')
-local FactoryFixes = import('/lua/FactoryFixes.lua').FactoryFixes
-
--- The altered factory unit class would be ideal except that it doesn't work. The code in this file gets appended at
--- the end to the existing file from stock FA. Because the air, ground and naval factory classes are generated before
--- this script is even executed the altered factory class won't be used. I can ofcourse re-generate the factory
--- classes but that will affect already loaded mods that change this code aswell. So the best sollution to the problem
--- is to apply the bug fix that was originally meant to go in the factory unit class to each dedicated factory class.
-
----------------------------------------------------------------
---  FACTORY  UNITS
----------------------------------------------------------------
-FactoryUnit = FactoryFixes(FactoryUnit)
-
----------------------------------------------------------------
---  AIR FACTORY UNITS
----------------------------------------------------------------
-AirFactoryUnit = FactoryFixes(AirFactoryUnit)
-
----------------------------------------------------------------
---  LAND FACTORY UNITS
----------------------------------------------------------------
-LandFactoryUnit = FactoryFixes(LandFactoryUnit)
-
----------------------------------------------------------------
---  SEA FACTORY UNITS
----------------------------------------------------------------
-SeaFactoryUnit = FactoryFixes(SeaFactoryUnit)
 
 ---------------------------------------------------------------
 --  SHIELD HOVER UNITS
