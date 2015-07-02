@@ -781,7 +781,7 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
                         line.combo._text:SetColor('DBBADB')
                     end
                 end
-                line.HandleEvent = Group.HandleEventhg
+                line.HandleEvent = Group.HandleEvent
                 Tooltip.AddControlTooltip(line, {text=data.data.label,body=data.data.help})
                 Tooltip.AddComboTooltip(line.combo, tooltipTable, line.combo._list)
                 line.combo.UpdateValue = function(key)
