@@ -3414,26 +3414,6 @@ Unit = Class(moho.unit_methods) {
         self:CheckVeteranLevel()
     end,
 
-    --This function should be used for kills made through the script, since kills through the engine (projectiles etc...) are already counted.
-    AddKills = function(self, numKills)
-        local unitKills = self:GetStat('KILLS', 0).Value + numKills
-        self:SetStat('KILLS', unitKills)
-    end,
-
-    --Use this to go through the AddXP function rather than directly setting Veterancy
-    SetVeterancy = function(self, veteranLevel)
-        veteranLevel = veteranLevel or 5
-        if veteranLevel == 0 or veteranLevel > 5 then return end
-        local bp = self:GetBlueprint()
-        local lvl = 'Level' .. veteranLevel
-        local xp = bp.Veteran[lvl] or import('/lua/game.lua').VeteranDefault[lvl]
-        if xp then
-            self:AddXP(xp)
-        else
-             error('Invalid veteran level - ' .. veteranLevel)
-        end
-    end,
-
     --Return the unit's current vet level
     GetVeteranLevel = function(self)
         return self.VeteranLevel
