@@ -217,3 +217,28 @@ function ValidateScenarioOptions(scenarioOptions)
 
     return passed
 end
+
+--- Checks a map for Land Path nodes.
+--
+-- @param scenario Scenario info
+-- @return true if the map has Land Path nodes, false otherwise.
+function CheckMapHasMarkers(scenario)
+    if not DiskGetFileInfo(scenario.save) then
+        return false
+    end
+    local saveData = {}
+    doscript('/lua/dataInit.lua', saveData)
+    doscript(scenario.save, saveData)
+
+    if saveData and saveData.Scenario and saveData.Scenario.MasterChain and
+            saveData.Scenario.MasterChain['_MASTERCHAIN_'] and saveData.Scenario.MasterChain['_MASTERCHAIN_'].Markers then
+        for marker, data in saveData.Scenario.MasterChain['_MASTERCHAIN_'].Markers do
+            if string.find( string.lower(marker), 'landpn') then
+                return true
+            end
+        end
+    else
+        WARN('Map '..scenario.name..' has no marker chain')
+    end
+    return false
+end

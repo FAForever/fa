@@ -24,7 +24,6 @@ local Mods = import('/lua/mods.lua')
 local Combo = import('/lua/ui/controls/combo.lua').Combo
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local ModManager = import('/lua/ui/lobby/ModsManager.lua')
-local EnhancedLobby = import('/lua/EnhancedLobby.lua')
 
 local scenarios = nil
 local selectedScenario = false
@@ -210,8 +209,8 @@ mapFilters = {
         FilterFactory = {
             SelectedKey = 0,
             Filters = {
-                EnhancedLobby.CheckMapHasMarkers,
-                function(scenInfo) return not EnhancedLobby.CheckMapHasMarkers(scenInfo) end
+                MapUtil.CheckMapHasMarkers,
+                function(scenInfo) return not MapUtil.CheckMapHasMarkers(scenInfo) end
             },
             Build = function(self)
                 return self.Filters[self.SelectedKey]
@@ -842,7 +841,7 @@ function SetDescription(scen)
         errors = true
     end
 
-    if EnhancedLobby.CheckMapHasMarkers(scen) then
+    if MapUtil.CheckMapHasMarkers(scen) then
         description:AddItem("AI Markers: Yes")
     else
         description:AddItem("AI Markers: No")
