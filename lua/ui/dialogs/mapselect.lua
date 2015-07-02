@@ -642,7 +642,7 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
     local OptionDisplay = {}
     RefreshOptions(true, singlePlayer)
 
-    local function CreateOptionCombo(parent, optionData, width)
+    local function CreateOptionCombo(parent)
         local combo = Combo(parent, nil, nil, nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         combo.Width:Set(266)
         local itemArray = {}
