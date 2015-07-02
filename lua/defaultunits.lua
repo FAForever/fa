@@ -1904,6 +1904,16 @@ CommandUnit = Class(WalkingLandUnit) {
         if order ~= 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
             self:StartBuildingEffects(unitBeingBuilt, order)
         end
+
+        -- Check if we're about to try and build something we shouldn't. This can only happen due to
+        -- a native code bug in the SCU REBUILDER behaviour.
+        -- FractionComplete is zero only if we're the initiating builder. Clearly, we want to allow
+        -- assisting builds of other races, just not *starting* them.
+        if unitBeingBuilt:GetFractionComplete() == 0 and not self:CanBuild(unitBeingBuilt:GetBlueprint().BlueprintId) then
+            IssueStop({self})
+            IssueClearCommands({self})
+            unitBeingBuilt:Destroy()
+        end
     end,
 
     OnStopBuild = function(self, unitBeingBuilt)
