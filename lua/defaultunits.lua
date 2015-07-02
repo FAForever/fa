@@ -1909,7 +1909,9 @@ CommandUnit = Class(WalkingLandUnit) {
         -- a native code bug in the SCU REBUILDER behaviour.
         -- FractionComplete is zero only if we're the initiating builder. Clearly, we want to allow
         -- assisting builds of other races, just not *starting* them.
-        if unitBeingBuilt:GetFractionComplete() == 0 and not self:CanBuild(unitBeingBuilt:GetBlueprint().BlueprintId) then
+        -- We skip the check if we're assisting another builder: it's up to them to have the ability
+        -- to start this build, not us.
+        if not self:GetGuardedUnit() and unitBeingBuilt:GetFractionComplete() == 0 and not self:CanBuild(unitBeingBuilt:GetBlueprint().BlueprintId) then
             IssueStop({self})
             IssueClearCommands({self})
             unitBeingBuilt:Destroy()
