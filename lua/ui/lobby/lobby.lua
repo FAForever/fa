@@ -290,7 +290,7 @@ local slotMenuData = {
     },
 }
 
-local function GetSlotMenuTables(stateKey, hostKey)
+local function GetSlotMenuTables(stateKey, hostKey, slotNum)
     local keys = {}
     local strings = {}
     local tooltips = {}
@@ -324,9 +324,11 @@ local function GetSlotMenuTables(stateKey, hostKey)
         elseif key == 'move' then
             -- Generate the "move player to slot X" entries.
             for i = 1, numOpenSlots, 1 do
-                table.insert(keys, 'move_player_to_slot' .. i)
-                table.insert(strings, LOCF("<LOC lobui_0596>Move Player to slot %s", i))
-                table.insert(tooltips, nil)
+                if i ~= slotNum then
+                    table.insert(keys, 'move_player_to_slot' .. i)
+                    table.insert(strings, LOCF("<LOC lobui_0596>Move Player to slot %s", i))
+                    table.insert(tooltips, nil)
+                end
             end
         else
             if not (isPlayerReady and key == 'occupy') then
@@ -819,7 +821,7 @@ function SetSlotInfo(slotNum, playerInfo)
 
     if slotState then
         slot.name:Enable()
-        local slotKeys, slotStrings, slotTooltips = GetSlotMenuTables(slotState, hostKey)
+        local slotKeys, slotStrings, slotTooltips = GetSlotMenuTables(slotState, hostKey, slotNum)
         slot.name.slotKeys = slotKeys
 
         if table.getn(slotKeys) > 0 then
