@@ -112,13 +112,14 @@ UnitBlueprint {
         UniformScale = 0.2,
     },
     Economy = {
-        BuildCostEnergy = 3000,
-        BuildCostMass = 300,
+        BuildCostEnergy = 5000,
+        BuildCostMass = 460,
         BuildRate = 13.34,
         BuildTime = 466,
         BuildableCategory = {
             'urb4205',
         },
+        DifferentialUpgradeCostCalculation = true,
         MaintenanceConsumptionPerSecondEnergy = 200,
     },
     Footprint = {
