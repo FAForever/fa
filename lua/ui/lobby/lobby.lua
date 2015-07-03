@@ -1655,9 +1655,11 @@ local function TryLaunch(skipNoObserversCheck)
         AssignRandomStartSpots()
         AssignAINames()
         local allRatings = {}
+        local clanTags = {}
         for k, player in gameInfo.PlayerOptions do
             if player.Human and player.PL then
                 allRatings[player.PlayerName] = player.PL
+                clanTags[player.PlayerName] = player.PlayerClan
             end
 
             if player.OwnerID == localPlayerID then
@@ -1665,6 +1667,7 @@ local function TryLaunch(skipNoObserversCheck)
             end
         end
         gameInfo.GameOptions['Ratings'] = allRatings
+        gameInfo.GameOptions['ClanTags'] = clanTags
 
         -- Tell everyone else to launch and then launch ourselves.
         -- TODO: Sending gamedata here isn't necessary unless lobbyComm is fucking stupid and allows

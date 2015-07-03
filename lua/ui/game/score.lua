@@ -352,11 +352,18 @@ function SetupPlayerLines()
 
     for _, line in controls.armyLines do
         local playerName = line.name:GetText()
-        local playerRating = sessionInfo.Options.Ratings[playerName]
-        if (playerRating) then
-            playerNameLine = playerName..' ['..math.floor(playerRating+0.5)..']'
-            line.name:SetText(playerNameLine)
+        local playerRating = sessionInfo.Options.Ratings[playerName] or ""
+        local playerClan = sessionInfo.Options.ClanTags[playerName] or ""
+
+        if playerClan then
+            playerClan = '[' .. playerClan .. '] '
         end
+
+        if playerRating then
+            playerRating = ' [' .. math.floor(playerRating+0.5) .. ']'
+        end
+
+        line.name:SetText(playerClan .. playerName .. playerRating)
     end
 
     mapData = {}
