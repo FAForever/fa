@@ -31,19 +31,19 @@ AANDepthCharge03 = Class(ADepthChargeProjectile) {
             CreateEmitterAtEntity(self,army,self.FxEnterWater[i])
         end
 
-        --self:SetMaxSpeed(20)
-        --self:SetVelocity(0)
-        --self:SetAcceleration(5)
+        self:SetMaxSpeed(25)
+        self:SetVelocity(0)
+        self:SetAcceleration(5)
         self:TrackTarget(true)
         self:StayUnderwater(true)
-        self:SetTurnRate(240)
+        self:SetTurnRate(720)
         self:SetVelocityAlign(true)
         self:SetStayUpright(false)
     end,
 
     OnLostTarget = function(self)
-        self:SetMaxSpeed(2)
-        self:SetAcceleration(-0.6)
+        self:SetMaxSpeed(5)
+        self:SetAcceleration(-5)
         self:ForkThread(self.CountdownMovement)
     end,
 
