@@ -142,6 +142,7 @@ UnitBlueprint {
         BuildCostMass = 1050,
         BuildRate = 75,
         BuildTime = 1171,
+        DifferentialUpgradeCostCalculation = true,
         MaxBuildDistance = 25,
         RebuildBonusIds = {
             'xrb0104',

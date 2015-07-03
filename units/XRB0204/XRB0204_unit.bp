@@ -146,6 +146,7 @@ UnitBlueprint {
         BuildableCategory = {
             'xrb0304',
         },
+        DifferentialUpgradeCostCalculation = true,
         MaxBuildDistance = 20,
         RebuildBonusIds = {
             'xrb0104',
