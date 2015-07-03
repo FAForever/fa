@@ -310,7 +310,7 @@ function ConfigureBeatFunction()
                 end
 
                 -- Positive rate, check if we're wasting money (and flash irritatingly if so)
-                if fractionFull > 0.9 then
+                if fractionFull >= 1 then
                     -- Display flashing gray-white if high on resource.
                     blinkyFlag = not blinkyFlag
                     if blinkyFlag then
