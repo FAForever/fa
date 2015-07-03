@@ -28,6 +28,7 @@ Visual
 - Reload bar refill rate now scales with RateOfFire buffs
 - Legacy checkbox UI code working again
 - Fixed Engineers spawning the wrong tarmacs when building Seraphim buildings
+- Engineering stations no longer exhibit a model bug when rebuilt by an assisting SCU
 
 Physics
 - Projectiles no longer collide with sinking units
@@ -51,6 +52,8 @@ Other
 - Fixed bug with chat messages having wrong recipients in replay
 - Seraphim and Aeon T2 shields can now pause while upgrading to T3
 - Fixed RateOfFire buffs not being applied correctly
+- SCUs will no longer rebuild buildings they lack to ability to build
+- Upgraded buildings rebuilt by assisting SCUs will now cost the correct amount
 
 Enhancements
 ------------
@@ -70,6 +73,7 @@ Visual
 - Quantum Gateways now can assist each other
 - Enhanced Seraphim tarmacs
 - Beams originating inside Fog of War will no longer be invisible
+- Cybran buildbots are no longer invisible to other players
 
 
 UI
@@ -103,6 +107,7 @@ Other
   rebuild support factories
 - Assist now prioritize building over repair
 - Share Until Death is now default
+- Mod size reduced by about 30 MB
 
 Contributors
 ------------
