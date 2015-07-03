@@ -1,20 +1,16 @@
-#****************************************************************************
-#**
-#**  File     :  /data/projectiles/AANTorpedoClusterSplit01/AANTorpedoClusterSplit01_script.lua
-#**  Author(s):  Gordon Duclos
-#**
-#**  Summary  :  Aeon Torpedo Cluster Projectile script, XAA0306
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
-
+---------------------------------------------------------------------------------------------
+-- File     :  /data/projectiles/AANTorpedoClusterSplit01/AANTorpedoClusterSplit01_script.lua
+-- Author(s):  Gordon Duclos
+-- Summary  :  Aeon Torpedo Cluster Projectile script, XAA0306
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+---------------------------------------------------------------------------------------------
 local ATorpedoCluster = import('/lua/aeonprojectiles.lua').ATorpedoCluster
 local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
 
 AANTorpedoCluster01 = Class(ATorpedoCluster) {
 
     CountdownLength = 10,
-    FxEnterWater= { '/effects/emitters/water_splash_ripples_ring_01_emit.bp',
+    FxEnterWater= {'/effects/emitters/water_splash_ripples_ring_01_emit.bp',
                     '/effects/emitters/water_splash_plume_01_emit.bp',},
 
     OnCreate = function(self)
@@ -22,8 +18,7 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
         self.HasImpacted = false
         self:ForkThread(self.CountdownExplosion)
 
-		CreateTrail(self, -1, self:GetArmy(), import('/lua/EffectTemplates.lua').ATorpedoPolyTrails01)
-        
+        CreateTrail(self, -1, self:GetArmy(), import('/lua/EffectTemplates.lua').ATorpedoPolyTrails01)
     end,
 
     CountdownExplosion = function(self)
@@ -37,18 +32,14 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
     OnEnterWater = function(self)
         ATorpedoCluster.OnEnterWater(self)
         local army = self:GetArmy()
-        for i in self.FxEnterWater do #splash
+        for i in self.FxEnterWater do -- Splash
             CreateEmitterAtEntity(self,army,self.FxEnterWater[i])
         end
         self:ForkThread(self.EnterWaterMovementThread)
     end,
     
     EnterWaterMovementThread = function(self)
-        #self:SetMaxSpeed(20)
-        #self:SetVelocity(1)
-        #WaitSeconds(0.1)
         self:SetAcceleration(2.5)
-		    #self:SetVelocity(2)
         self:TrackTarget(true)
         self:StayUnderwater(true)
         self:SetTurnRate(180)
