@@ -114,6 +114,7 @@ UnitBlueprint {
         BuildCostEnergy = 67666,
         BuildCostMass = 4260,
         BuildTime = 1654,
+        DifferentialUpgradeCostCalculation = true,
         MaintenanceConsumptionPerSecondEnergy = 500,
     },
     Footprint = {

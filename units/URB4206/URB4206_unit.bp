@@ -119,6 +119,7 @@ UnitBlueprint {
         BuildableCategory = {
             'urb4207',
         },
+        DifferentialUpgradeCostCalculation = true,
         MaintenanceConsumptionPerSecondEnergy = 400,
     },
     Footprint = {
