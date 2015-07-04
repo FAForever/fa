@@ -135,11 +135,6 @@ function LayoutResourceGroup(group, groupType)
         group.reclaimTotal:SetColor('FFF8C000')
     end
     
-    group.hideTarget.Top:Set(group.Top)
-    group.hideTarget.Bottom:Set(group.Bottom)
-    group.hideTarget.Left:Set(function() return math.max(group.rate.Right() + 10, math.min(group.expense.Left() - 10, group.income.Left() - 10)) end)
-    group.hideTarget.Right:Set(group.Right)
-    
     group.Height:Set(25)
     group.Width:Set(296)
 end

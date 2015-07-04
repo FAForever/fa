@@ -62,7 +62,6 @@ function SetLayout(layout)
     return CommonLogic()
 end
 
-
 function CreateEconomyBar(parent)
     savedParent = parent
     CreateUI()
@@ -152,9 +151,6 @@ function CreateUI()
         group.income:SetDropShadow(true)
         group.expense = UIUtil.CreateText(group.warningBG, '', 10, UIUtil.bodyFont)
         group.expense:SetDropShadow(true)
-        
-        group.hideTarget = Group(group)
-        group.hideTarget.Depth:Set(function() return group.income.Depth() + 1 end)
 
         group.reclaimDelta = UIUtil.CreateText(group.warningBG, '', 10, UIUtil.bodyFont)
         group.reclaimDelta:SetDropShadow(true)
@@ -166,10 +162,6 @@ function CreateUI()
         group.curStorage:DisableHitTest()
         group.maxStorage:DisableHitTest()
         group.storageBar:DisableHitTest()
-        group.income:DisableHitTest()
-        group.expense:DisableHitTest()
-        group.reclaimDelta:DisableHitTest(true)
-        group.reclaimTotal:DisableHitTest(true)
         
         return group
     end
@@ -190,36 +182,12 @@ function CommonLogic()
             end
             return true
         end
-        
-        group.hideTarget.HandleEvent = function(self, event)
-            if event.Type == 'MouseEnter' then
-                if States[prefix.."Detail"] == false then
-                    group.income:Show()
-                    group.expense:Show()
-                end
-                Tooltip.CreateMouseoverDisplay(self, prefix .. "_extended_display", nil, true)
-                local sound = Sound({Bank = 'Interface', Cue = 'UI_Economy_Rollover'})
-                PlaySound(sound)
-            elseif event.Type == 'MouseExit' then
-                Tooltip.DestroyMouseoverDisplay()
-                if States[prefix.."Detail"] == false then
-                    group.income:Hide()
-                    group.expense:Hide()
-                end
-            elseif event.Type == 'ButtonPress' then
-                local sound = Sound({Bank = 'Interface', Cue = 'UI_Economy_Click'})
-                PlaySound(sound)
-                States[prefix.."Detail"] = not States[prefix.."Detail"]
-                group.income:SetHidden(not States[prefix.."Detail"])
-                group.expense:SetHidden(not States[prefix.."Detail"])
-                Prefs.SetToCurrentProfile(prefix.."DetailedView", States[prefix.."Detail"])
-            end
-            return true
-        end
-        
--- this causes errors, need to investigate why
---        Tooltip.AddControlTooltip(group.icon, prefix..'_button')
-        
+
+        Tooltip.AddControlTooltip(group.reclaimDelta, prefix..'_reclaim_display')
+        Tooltip.AddControlTooltip(group.reclaimTotal, prefix..'_reclaim_display')
+        Tooltip.AddControlTooltip(group.income, prefix..'_income_display')
+        Tooltip.AddControlTooltip(group.expense, prefix..'_income_display')
+
         group.storageTooltipGroup.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then
                 Tooltip.CreateMouseoverDisplay(self, prefix .. "_storage", nil, true)
@@ -340,7 +308,6 @@ function ConfigureBeatFunction()
         local rateTxt = GUI.rate
         local warningBG = GUI.warningBG
 
-        local showReclaim = options.gui_display_reclaim_totals == 1
         local reclaimDelta = GUI.reclaimDelta
         local reclaimTotal = GUI.reclaimTotal
 
@@ -391,20 +358,18 @@ function ConfigureBeatFunction()
             local econData = GetEconomyTotals()
             local simFrequency = GetSimTicksPerSecond()
 
-            if showReclaim then
-                local totalReclaimed = math.ceil(econData.reclaimed[resourceType])
+            local totalReclaimed = math.ceil(econData.reclaimed[resourceType])
 
-                -- Reclaimed this tick
-                local thisTick = totalReclaimed - lastReclaim
+            -- Reclaimed this tick
+            local thisTick = totalReclaimed - lastReclaim
 
-                -- The quantity we'd gain if we reclaimed at this rate for a full second.
-                local rate = thisTick * simFrequency
+            -- The quantity we'd gain if we reclaimed at this rate for a full second.
+            local rate = thisTick * simFrequency
 
-                reclaimDelta:SetText('+'..rate)
-                reclaimTotal:SetText(totalReclaimed)
+            reclaimDelta:SetText('+'..rate)
+            reclaimTotal:SetText(totalReclaimed)
 
-                lastReclaim = totalReclaimed
-            end
+            lastReclaim = totalReclaimed
 
             -- Extract the economy data from the economy data.
             local maxStorageVal = econData.maxStorage[resourceType]

@@ -602,19 +602,6 @@ options = {
             },
 
             {
-                title = "Show reclaim info",
-                key = 'gui_display_reclaim_totals',
-                type = 'toggle',
-                default = 1,
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
-                    },
-                },
-            },
-
-            {
                 title = "Always Render Custom Names",
                 key = 'gui_render_custom_names',
                 type = 'toggle',
