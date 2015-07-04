@@ -17,6 +17,8 @@ local properKeyNames = import('/lua/keymap/properKeyNames.lua').properKeyNames
 local keyNames = import('/lua/keymap/keyNames.lua').keyNames
 local keyCategories = import('/lua/keymap/keycategories.lua').keyCategories
 
+local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
+
 local panel
 local keyContainer
 local keyTable
@@ -205,7 +207,7 @@ function CreateUI()
     end
 
     if panel then 
-        panel:Destroy()
+        panel:Close()
         panel = false
         return
     end
@@ -230,48 +232,44 @@ function CreateUI()
             end
         end
     end
-    
-    panel = Bitmap(GetFrame(0), UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_m.dds'))
-    panel.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
-    panel.Height:Set(390)
-    panel.Width:Set(530)
-    LayoutHelpers.AtCenterIn(panel, GetFrame(0))
+
+    local dialogContent = Group(GetFrame(0))
+    dialogContent.Width:Set(593)
+    dialogContent.Height:Set(530)
+
+    panel = Popup(GetFrame(0), dialogContent)
+
     panel.OnDestroy = function(self)
-        RemoveInputCapture(panel)
+        RemoveInputCapture(dialogContent)
     end
+
+    local title = UIUtil.CreateText(dialogContent, LOC("<LOC key_binding_0000>Key Bindings"), 22)
+    LayoutHelpers.AtTopIn(title, dialogContent, 12)
+    LayoutHelpers.AtHorizontalCenterIn(title, dialogContent)
     
-    panel.border = CreateBorder(panel)
-    panel.brackets = UIUtil.CreateDialogBrackets(panel, 106, 110, 110, 108, true)
-    
-    local worldCover = UIUtil.CreateWorldCover(panel)
-    
-    local title = UIUtil.CreateText(panel, LOC("<LOC key_binding_0000>Key Bindings"), 22)
-    LayoutHelpers.AtTopIn(title, panel.border.tm, 12)
-    LayoutHelpers.AtHorizontalCenterIn(title, panel)
-    
-    local closeButton = UIUtil.CreateButtonStd(panel, "/scx_menu/small-btn/small", LOC("<LOC _Close>"), 14, 2)
-    LayoutHelpers.AtTopIn(closeButton, panel.border.bm, -20)
-    LayoutHelpers.AtHorizontalCenterIn(closeButton, panel)
+    local closeButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC _Close>"))
+    LayoutHelpers.AtBottomIn(closeButton, dialogContent, 9)
+    LayoutHelpers.AtRightIn(closeButton, dialogContent, -2)
     closeButton.OnClick = function(self, modifiers)
         ConfirmNewKeyMap()
-        panel:Destroy()
+        panel:Close()
         panel = false
     end
 
-    local assignKeyButton = UIUtil.CreateButtonStd(panel, "/widgets/small02", LOC("<LOC key_binding_0003>Assign Key"), 12)
-    LayoutHelpers.LeftOf(assignKeyButton, closeButton, 10)
+    local assignKeyButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC key_binding_0003>Assign Key"))
+    LayoutHelpers.LeftOf(assignKeyButton, closeButton, 27)
     assignKeyButton.OnClick = function(self, modifiers)
         AssignCurrentSelection()
     end
     
-    local unbindKeyButton = UIUtil.CreateButtonStd(panel, "/widgets/small02", LOC("<LOC key_binding_0007>Unbind Key"), 12)
-    LayoutHelpers.Below(unbindKeyButton, assignKeyButton, 0)
+    local unbindKeyButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC key_binding_0007>Unbind Key"))
+    LayoutHelpers.LeftOf(unbindKeyButton, assignKeyButton, 27)
     unbindKeyButton.OnClick = function(self, modifiers)
         UnbindCurrentSelection()
     end
     
-    local resetButton = UIUtil.CreateButtonStd(panel, "/widgets/small02", LOC("<LOC key_binding_0004>Reset"), 12)
-    LayoutHelpers.RightOf(resetButton, closeButton, 10)
+    local resetButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC key_binding_0004>Reset"))
+    LayoutHelpers.LeftOf(resetButton, unbindKeyButton, 27)
     resetButton.OnClick = function(self, modifiers)
         UIUtil.QuickDialog(panel, "<LOC key_binding_0005>Are you sure you want to reset all key bindings to the default keybindings?",
             "<LOC _Yes>", ResetKeyMap,
@@ -281,8 +279,7 @@ function CreateUI()
             {escapeButton = 2, enterButton = 1, worldCover = false})
     end
 
-
-    panel.HandleEvent = function(self, event)
+    dialogContent.HandleEvent = function(self, event)
         if event.Type == 'KeyDown' then
             if event.KeyCode == UIUtil.VK_ESCAPE or event.KeyCode == UIUtil.VK_ENTER or event.KeyCode == 342 then
                 closeButton:OnClick()
@@ -290,42 +287,43 @@ function CreateUI()
         end
     end
     
-    AddInputCapture(panel)
+    AddInputCapture(dialogContent)
 
-    keyContainer = Group(panel)
-    keyContainer.Height:Set(385)
-    keyContainer.Width:Set(593)
+    keyContainer = Group(dialogContent)
+    keyContainer.Height:Set(421)
+    keyContainer.Width:Set(562)
     keyContainer.top = 0
     
-    LayoutHelpers.AtLeftTopIn(keyContainer, panel, -46)
-    UIUtil.CreateVertScrollbarFor(keyContainer)
+    LayoutHelpers.AtLeftTopIn(keyContainer, dialogContent, 10, 50)
+    UIUtil.CreateLobbyVertScrollbar(keyContainer)
     
     local keyEntries = {}
     
     local function CreateElement(index)
-        keyEntries[index] = {}
-        keyEntries[index].bg = Bitmap(keyContainer)
-        keyEntries[index].bg.Left:Set(keyContainer.Left)
-        keyEntries[index].bg.Right:Set(keyContainer.Right)
-        
-        keyEntries[index].key = UIUtil.CreateText(keyEntries[1].bg, '', 16, "Arial")
-        keyEntries[index].key:DisableHitTest()
-        
-        keyEntries[index].description = UIUtil.CreateText(keyEntries[1].bg, '', 16, "Arial")
-        keyEntries[index].description:DisableHitTest()
-        keyEntries[index].description:SetClipToWidth(true)
-        keyEntries[index].description.Width:Set(keyEntries[index].bg.Right() - keyEntries[index].bg.Left() - 150) -- this is not meant to be a lazy var function since the layout is static
-        
-        keyEntries[index].bg.Height:Set(function() return keyEntries[index].key.Height() + 4 end)
-        
-        LayoutHelpers.AtVerticalCenterIn(keyEntries[index].key, keyEntries[index].bg)
-        LayoutHelpers.AtLeftIn(keyEntries[index].description, keyEntries[index].bg, 150)
-        LayoutHelpers.AtVerticalCenterIn(keyEntries[index].description, keyEntries[index].bg)
+        local entry = {}
+        keyEntries[index] = entry
 
-        keyEntries[index].bg.HandleEvent = function(self, event)
+        entry.bg = Bitmap(keyContainer)
+        entry.bg.Left:Set(keyContainer.Left)
+        entry.bg.Right:Set(keyContainer.Right)
+        
+        entry.key = UIUtil.CreateText(keyEntries[1].bg, '', 16, "Arial")
+        entry.key:DisableHitTest()
+        
+        entry.description = UIUtil.CreateText(keyEntries[1].bg, '', 16, "Arial")
+        entry.description:DisableHitTest()
+        entry.description:SetClipToWidth(true)
+        -- this is not meant to be a lazy var function since the layout is static
+        entry.description.Width:Set(entry.bg.Right() - entry.bg.Left() - 150)
+        
+        entry.bg.Height:Set(function() return entry.key.Height() + 4 end)
+        
+        LayoutHelpers.AtVerticalCenterIn(entry.key, entry.bg)
+        LayoutHelpers.AtLeftIn(entry.description, entry.bg, 150)
+        LayoutHelpers.AtVerticalCenterIn(entry.description, entry.bg)
+
+        entry.bg.HandleEvent = function(self, event)
             local eventHandled = false
-
--- removed keybinding work
 
             local function SelectLine()
                 for k, v in keyTable do
@@ -346,8 +344,7 @@ function CreateUI()
                 SelectLine()
                 eventHandled = true
             end
-       
-            
+
             return eventHandled
         end
     end
@@ -408,9 +405,9 @@ function CreateUI()
                 return 'ff880000'
             end
             if math.mod(lineID, 2) == 1 then
-                return 'ff202020'
+                return 'ff313131'
             else
-                return 'ff000000'
+                return 'ff202020'
             end
         end
         local function SetTextLine(line, data, lineID)
@@ -507,7 +504,7 @@ function FormatData()
     
     local index = 1
     for i, v in retkeys do
-        if index != 1 then
+        if index ~= 1 then
             KeyData[index] = {type = 'spacer'}
             index = index + 1
         end
@@ -546,55 +543,4 @@ function formatkeyname(key)
     end
 
     return result..LookupToken(key)
-end
-
-function CreateBorder(parent)
-    local tbl = {}
-    tbl.tl = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_ul.dds'))
-    tbl.tm = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_horz_um.dds'))
-    tbl.tr = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_ur.dds'))
-    tbl.l = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_vert_l.dds'))
-    tbl.r = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_vert_r.dds'))
-    tbl.bl = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_ll.dds'))
-    tbl.bm = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_lm.dds'))
-    tbl.br = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_lr.dds'))
-    
-    tbl.tl.Bottom:Set(parent.Top)
-    tbl.tl.Right:Set(parent.Left)
-    
-    tbl.tr.Bottom:Set(parent.Top)
-    tbl.tr.Left:Set(parent.Right)
-    
-    tbl.tm.Bottom:Set(parent.Top)
-    tbl.tm.Right:Set(parent.Right)
-    tbl.tm.Left:Set(parent.Left)
-    
-    tbl.l.Bottom:Set(parent.Bottom)
-    tbl.l.Top:Set(parent.Top)
-    tbl.l.Right:Set(parent.Left)
-    
-    tbl.r.Bottom:Set(parent.Bottom)
-    tbl.r.Top:Set(parent.Top)
-    tbl.r.Left:Set(parent.Right)
-    
-    tbl.bl.Top:Set(parent.Bottom)
-    tbl.bl.Right:Set(parent.Left)
-    
-    tbl.br.Top:Set(parent.Bottom)
-    tbl.br.Left:Set(parent.Right)
-    
-    tbl.bm.Top:Set(parent.Bottom)
-    tbl.bm.Right:Set(parent.Right)
-    tbl.bm.Left:Set(parent.Left)
-    
-    tbl.tl.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.tm.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.tr.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.l.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.r.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.bl.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.bm.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.br.Depth:Set(function() return parent.Depth() - 1 end)
-    
-    return tbl
 end
