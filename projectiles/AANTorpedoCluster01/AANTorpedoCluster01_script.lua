@@ -29,6 +29,8 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
         local angleIncrement = angleRange / NumberOfChildProjectiles
         local angleVariation = angleIncrement * 0.4
         local angle, ca, sa, x, z, proj, mul
+        self:Setvelocity(0.5)
+        self:SetTurnRate(720)
         
         self:StayUnderwater(true)
         for i = 0, NumberOfChildProjectiles  do
@@ -40,7 +42,7 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
             proj = self:CreateChildProjectile(ChildProjectileBP)
             proj:PassDamageData(self.DamageData)
             mul = RandomFloat(1,3)
-        end            
+        end
         
         local pos = self:GetPosition()
         local spec = {
