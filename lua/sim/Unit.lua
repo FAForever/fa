@@ -1381,6 +1381,10 @@ Unit = Class(moho.unit_methods) {
             --Reduce the mass value of submerged wrecks
             mass = mass * 0.5
             energy = energy * 0.5
+            if self.SeabedWatcherComplete then
+                pos[2] = self.SeabedWatcherComplete
+                self.SeabedWatcherComplete = nil
+            end
         elseif layer == 'Air' or EntityCategoryContains(categories.NAVAL - categories.STRUCTURE, self) then -- make sure air / naval wrecks stick to ground / seabottom
             pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
         end
@@ -1522,6 +1526,9 @@ Unit = Class(moho.unit_methods) {
                 self.StopSink = true
             end
         end
+        
+        -- Record and pass on data for watched units to avoid checking bps so frequently during wreckage creation
+        self.SeabedWatcherComplete = seafloor
     end,
 
     DeathThread = function( self, overkillRatio, instigator)
@@ -1557,11 +1564,11 @@ Unit = Class(moho.unit_methods) {
             -- Avoid slightly ugly need to propagate this through callback hell...
             self.overkillRatio = overkillRatio
 
-            if isNaval then
+            if isNaval and self:GetBlueprint().Display.AnimationDeath then
                 -- Waits for wreck to hit bottom or end of animation
                 self:SeabedWatcher()
             else
-                -- A non-naval unit dying over water needs to sink, but lacks an animation for it. Let's
+                -- A non-naval unit or boat with no sinking animation dying over water needs to sink, but lacks an animation for it. Let's
                 -- make one up.
 
                 local this = self
