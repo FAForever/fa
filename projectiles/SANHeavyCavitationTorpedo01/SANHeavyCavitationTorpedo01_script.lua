@@ -24,10 +24,10 @@ SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo) {
         end
         self.AirTrails:Destroy()
         CreateEmitterOnEntity(self,army,EffectTemplate.SHeavyCavitationTorpedoFxTrails)
-                
+
         self:TrackTarget(true):StayUnderwater(true)
         self:SetCollideSurface(false)
-        self:SetTurnRate(240)
+        self:SetTurnRate(1440)
         self:ForkThread(self.ProjectileSplit)
     end,
         
@@ -67,7 +67,7 @@ SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo) {
         for k, v in FxFragEffect do
             CreateEmitterAtEntity(self, self:GetArmy(), v)
         end
-        
+
         -- Launch projectiles at semi-random angles away from split location
         for i = 0, (numProjectiles -1) do
             xVec = vx + (math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
