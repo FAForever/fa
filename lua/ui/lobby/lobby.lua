@@ -4315,7 +4315,7 @@ end
 
 -- Show the rule change dialog.
 function ShowRuleDialog(RuleLabel)
-    UIUtil.CreateInputDialog(GUI, "Game Rules",
+    CreateInputDialog(GUI, "Game Rules",
         function(self, rules)
             SetGameOption("GameRules", rules, true)
         end
@@ -4504,6 +4504,11 @@ function SavePresetsList(list)
     SavePreferences()
 end
 
+--- Delegate to UIUtil's CreateInputDialog, adding the ridiculus chatEdit hack.
+function CreateInputDialog(parent, title, listener)
+    UIUtil.CreateInputDialog(parent, title, listener, GUI.chatEdit)
+end
+
 -- Show the lobby preset UI.
 function ShowPresetDialog()
     local dialogContent = Group(GUI)
@@ -4587,7 +4592,7 @@ function ShowPresetDialog()
             PresetList:OnClick(0)
         end
 
-        UIUtil.CreateInputDialog(GUI, "Select name for new preset", dialogComplete)
+        CreateInputDialog(GUI, "Select name for new preset", dialogComplete)
     end
 
     SaveButton.OnClick = function(self)
@@ -4652,7 +4657,7 @@ function ShowPresetDialog()
         end
 
         if row == 0 then
-            UIUtil.CreateInputDialog(GUI, "Rename your preset", nameChanged)
+            CreateInputDialog(GUI, "Rename your preset", nameChanged)
         end
     end
 

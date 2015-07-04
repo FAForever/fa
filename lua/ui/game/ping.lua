@@ -56,62 +56,15 @@ function NamePing(callback, curName)
     -- Dialog already showing? Don't show another one
     if dialog then return end
 
-    local mapGroup = import('/lua/ui/game/borders.lua').GetMapGroup()
-
-    dialog = Bitmap(mapGroup, UIUtil.SkinnableFile('/dialogs/dialog_02/panel_bmp.dds'), "Marker Name Dialog")
-    LayoutHelpers.AtCenterIn(dialog, mapGroup)
-    dialog.Depth:Set(GetFrame(0):GetTopmostDepth() + 10)
-    
-    dialog.brackets = UIUtil.CreateDialogBrackets(dialog, 30, 36, 32, 34, true)
-    
-    local label = UIUtil.CreateText(dialog, "<LOC markers_0000>Enter Marker Name", 16, UIUtil.buttonFont)
-    label.Top:Set(function() return dialog.Top() + 30 end)
-    label.Left:Set(function() return dialog.Left() + 35 end)
-    
-    local cancelButton = UIUtil.CreateButtonStd(dialog, '/scx_menu/small-btn/small', "<LOC _CANCEL>", 14, 2)
-    cancelButton.Top:Set(function() return dialog.Top() + 80 end)
-    cancelButton.Left:Set(function() return dialog.Left() + (((dialog.Width() / 4) * 3) - (cancelButton.Width() / 2)) end)
-    cancelButton.OnClick = function(self, modifiers)
-        dialog:Destroy()
-        dialog = false
-    end
-
-    --TODO this should be in layout
-    local nameEdit = Edit(dialog)
-    LayoutHelpers.AtLeftTopIn(nameEdit, dialog, 35, 60)
-    nameEdit.Width:Set(283)
-    nameEdit.Height:Set(nameEdit:GetFontHeight())
-    nameEdit:ShowBackground(false)
-    nameEdit:AcquireFocus()
-    UIUtil.SetupEditStd(nameEdit, UIUtil.fontColor, nil, nil, nil, UIUtil.bodyFont, 16, 30)
-
-    local firstTime = true
-
-    local currentName = curName or ''
-
-    dialog:SetNeedsFrameUpdate(true)
-    dialog.OnFrame = function(self, elapsedTime)
-        -- this works around the fact that wxWindows processes keys and then generates a wmChar message
-        -- so if you don't set the text you'll see the hotkey that made this dialog
-        if firstTime then
-            nameEdit:SetText(currentName)
-            firstTime = false
-            self:SetNeedsFrameUpdate(false)
+    local cb = callback
+    dialog = UIUtil.CreateInputDialog(GetFrame(0), LOC("<LOC markers_0000>Enter Marker Name"),
+        function(self, markerName)
+            cb(markerName)
         end
-    end
+    )
 
-    local okButton = UIUtil.CreateButtonStd(dialog, '/scx_menu/small-btn/small', "<LOC _OK>", 14, 2)
-    okButton.Top:Set(function() return dialog.Top() + 80 end)
-    okButton.Left:Set(function() return dialog.Left() + (((dialog.Width() / 4) * 1) - (okButton.Width() / 2)) end)
-    okButton.OnClick = function(self, modifiers)
-        local newName = nameEdit:GetText()
-        callback(newName)
-        dialog:Destroy()
-        dialog = false
-    end
-    
-    nameEdit.OnEnterPressed = function(self, text)
-        okButton.OnClick()
+    dialog.OnClose = function()
+        dialog = nil
     end
 end
 
