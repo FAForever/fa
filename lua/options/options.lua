@@ -602,10 +602,10 @@ options = {
             },
 
             {
-                title = "Display Reclaim Window",
+                title = "Show reclaim info",
                 key = 'gui_display_reclaim_totals',
                 type = 'toggle',
-                default = 0,
+                default = 1,
                 custom = {
                     states = {
                         {text = "<LOC _Off>", key = 0 },

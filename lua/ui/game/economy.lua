@@ -155,49 +155,27 @@ function CreateUI()
         
         group.hideTarget = Group(group)
         group.hideTarget.Depth:Set(function() return group.income.Depth() + 1 end)
-        
+
+        group.reclaimDelta = UIUtil.CreateText(group.warningBG, '', 10, UIUtil.bodyFont)
+        group.reclaimDelta:SetDropShadow(true)
+
+        group.reclaimTotal = UIUtil.CreateText(group.warningBG, '', 10, UIUtil.bodyFont)
+        group.reclaimTotal:SetDropShadow(true)
+
         group.warningBG:DisableHitTest()
         group.curStorage:DisableHitTest()
         group.maxStorage:DisableHitTest()
         group.storageBar:DisableHitTest()
         group.income:DisableHitTest()
         group.expense:DisableHitTest()
+        group.reclaimDelta:DisableHitTest(true)
+        group.reclaimTotal:DisableHitTest(true)
         
         return group
     end
     
     GUI.mass = CreateResourceGroup('mass')
     GUI.energy = CreateResourceGroup('energy')
-
-    if options.gui_display_reclaim_totals == 1 then
-        ecostats = Bitmap(GetFrame(0))
-        ecostats:SetTexture('/textures/ui/common/game/economic-overlay/econ_bmp_m.dds')
-        ecostats.Depth:Set(99)
-        LayoutHelpers.AtLeftTopIn(ecostats, GetFrame(0), 340, 8)
-        ecostats.Height:Set(36)
-        ecostats.Width:Set(80)
-        ecostats:DisableHitTest(true)
-        local reclaimedTitle = UIUtil.CreateText(ecostats, 'reclaimed', 10, UIUtil.bodyFont)
-
-        local massReclaimed = UIUtil.CreateText(ecostats, '', 10, UIUtil.bodyFont)
-        massReclaimed:SetColor('FFB8F400')
-
-        local energyReclaimed = UIUtil.CreateText(ecostats, '', 10, UIUtil.bodyFont)
-        energyReclaimed:SetColor('FFF8C000')
-
-        -- Attach the textfields to the appropriate GUI groups (slightly hacky, makes life easier
-        -- for the beat function though)
-        GUI.mass.reclaimed = massReclaimed
-        GUI.energy.reclaimed = energyReclaimed
-
-        reclaimedTitle:DisableHitTest(true)
-        massReclaimed:DisableHitTest(true)
-        energyReclaimed:DisableHitTest(true)
-
-        LayoutHelpers.CenteredAbove(reclaimedTitle, ecostats, -12)
-        LayoutHelpers.AtRightTopIn(massReclaimed, ecostats, 4, 10)
-        LayoutHelpers.AtRightTopIn(energyReclaimed, ecostats, 4, 20)
-    end
 end
 
 function CommonLogic()
@@ -363,10 +341,8 @@ function ConfigureBeatFunction()
         local warningBG = GUI.warningBG
 
         local showReclaim = options.gui_display_reclaim_totals == 1
-        local reclaimed
-        if showReclaim then
-            reclaimed = GUI.reclaimed
-        end
+        local reclaimDelta = GUI.reclaimDelta
+        local reclaimTotal = GUI.reclaimTotal
 
         local warnOnResourceFull = resourceType == "MASS"
         local getRateColour = getGetRateColour(warnOnResourceFull)
@@ -424,7 +400,11 @@ function ConfigureBeatFunction()
                 -- The quantity we'd gain if we reclaimed at this rate for a full second.
                 local rate = thisTick * simFrequency
 
-                reclaimed:SetText(string.format("%d (%d/s)", totalReclaimed, rate))
+                reclaimDelta:SetText('+'..rate)
+                reclaimTotal:SetText(totalReclaimed)
+
+--                                reclaimDelta:SetText('+100000')
+--                                reclaimTotal:SetText('100000')
                 lastReclaim = totalReclaimed
             end
 
@@ -447,8 +427,10 @@ function ConfigureBeatFunction()
             curStorage:SetText(math.ceil(storedVal))
             maxStorage:SetText(math.ceil(maxStorageVal))
 
-            incomeTxt:SetText(string.format("+%d", math.ceil(incomeAvg)))
-            expenseTxt:SetText(string.format("-%d", math.ceil(average)))
+                        incomeTxt:SetText(string.format("+%d", math.ceil(incomeAvg)))
+                        expenseTxt:SetText(string.format("-%d", math.ceil(average)))
+--                        incomeTxt:SetText('+100000')
+--                        expenseTxt:SetText('-100000')
 
             local rateVal = math.ceil(incomeAvg - average)
             local rateStr = string.format('%+d', math.min(math.max(rateVal, -99999999), 99999999))
