@@ -24,6 +24,7 @@ local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local Layouts = import('/lua/skins/layouts.lua')
 local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local NinePatch = import('/lua/ui/controls/ninepatch.lua').NinePatch
+local InputDialog = import('/lua/ui/controls/popups/inputdialog.lua').InputDialog
 
 --* Handy global variables to assist skinning
 buttonFont = import('/lua/lazyvar.lua').Create()            -- default font used for button faces
@@ -1016,4 +1017,10 @@ function GetReplayId()
     end
 
     return id
+end
+
+-- Create an input dialog with the given title and listener function.
+function CreateInputDialog(parent, title, listener)
+    local dialog = InputDialog(parent, title, GUI.chatEdit)
+    dialog.OnInput = listener
 end

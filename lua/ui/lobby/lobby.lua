@@ -16,7 +16,6 @@ local RadioButton = import('/lua/ui/controls/radiobutton.lua').RadioButton
 local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
 local ResourceMapPreview = import('/lua/ui/controls/resmappreview.lua').ResourceMapPreview
 local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
-local InputDialog = import('/lua/ui/controls/popups/inputdialog.lua').InputDialog
 local Slider = import('/lua/maui/slider.lua').Slider
 local PlayerData = import('/lua/ui/lobby/data/playerdata.lua').PlayerData
 local GameInfo = import('/lua/ui/lobby/data/gamedata.lua')
@@ -4316,7 +4315,7 @@ end
 
 -- Show the rule change dialog.
 function ShowRuleDialog(RuleLabel)
-    CreateInputDialog(GUI, "Game Rules",
+    UIUtil.CreateInputDialog(GUI, "Game Rules",
         function(self, rules)
             SetGameOption("GameRules", rules, true)
         end
@@ -4588,7 +4587,7 @@ function ShowPresetDialog()
             PresetList:OnClick(0)
         end
 
-        CreateInputDialog(GUI, "Select name for new preset", dialogComplete)
+        UIUtil.CreateInputDialog(GUI, "Select name for new preset", dialogComplete)
     end
 
     SaveButton.OnClick = function(self)
@@ -4653,7 +4652,7 @@ function ShowPresetDialog()
         end
 
         if row == 0 then
-            CreateInputDialog(GUI, "Rename your preset", nameChanged)
+            UIUtil.CreateInputDialog(GUI, "Rename your preset", nameChanged)
         end
     end
 
@@ -4703,12 +4702,6 @@ function CreateHelpWindow()
     OkButton.OnClick = function(self)
         helpWindow:Close()
     end
-end
-
--- Create an input dialog with the given title and listener function.
-function CreateInputDialog(parent, title, listener)
-    local dialog = InputDialog(parent, title, GUI.chatEdit)
-    dialog.OnInput = listener
 end
 
 -- Refresh list of presets
