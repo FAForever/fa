@@ -403,8 +403,6 @@ function ConfigureBeatFunction()
                 reclaimDelta:SetText('+'..rate)
                 reclaimTotal:SetText(totalReclaimed)
 
---                                reclaimDelta:SetText('+100000')
---                                reclaimTotal:SetText('100000')
                 lastReclaim = totalReclaimed
             end
 
@@ -427,10 +425,8 @@ function ConfigureBeatFunction()
             curStorage:SetText(math.ceil(storedVal))
             maxStorage:SetText(math.ceil(maxStorageVal))
 
-                        incomeTxt:SetText(string.format("+%d", math.ceil(incomeAvg)))
-                        expenseTxt:SetText(string.format("-%d", math.ceil(average)))
---                        incomeTxt:SetText('+100000')
---                        expenseTxt:SetText('-100000')
+            incomeTxt:SetText(string.format("+%d", math.ceil(incomeAvg)))
+            expenseTxt:SetText(string.format("-%d", math.ceil(average)))
 
             local rateVal = math.ceil(incomeAvg - average)
             local rateStr = string.format('%+d', math.min(math.max(rateVal, -99999999), 99999999))
