@@ -79,10 +79,10 @@ function LayoutResourceGroup(group, groupType)
     group.icon:SetTexture(UIUtil.UIFile(style[groupType].iconTexture))
     if groupType == 'mass' then
         group.icon.Width:Set(44)
-        LayoutHelpers.AtLeftIn(group.icon, group, -8)
+        LayoutHelpers.AtLeftIn(group.icon, group, -14)
     elseif groupType == 'energy' then
         group.icon.Width:Set(36)
-        LayoutHelpers.AtLeftIn(group.icon, group, -4)
+        LayoutHelpers.AtLeftIn(group.icon, group, -10)
     end
     group.icon.Height:Set(36)
     LayoutHelpers.AtVerticalCenterIn(group.icon, group)
@@ -92,7 +92,7 @@ function LayoutResourceGroup(group, groupType)
     group.storageBar.Width:Set(100)
     group.storageBar.Height:Set(10)
     group.storageBar._bar:SetTexture(UIUtil.UIFile(style[groupType].barTexture))
-    LayoutHelpers.AtLeftTopIn(group.storageBar, group, 30, 2)
+    LayoutHelpers.AtLeftTopIn(group.storageBar, group, 22, 2)
     
     LayoutHelpers.Below(group.curStorage, group.storageBar)
     LayoutHelpers.AtLeftIn(group.curStorage, group.storageBar)
@@ -108,24 +108,24 @@ function LayoutResourceGroup(group, groupType)
     group.storageTooltipGroup.Top:Set(group.storageBar.Top)
     group.storageTooltipGroup.Bottom:Set(group.maxStorage.Bottom)
     
-    LayoutHelpers.RightOf(group.rate, group.storageBar, 10)
+    LayoutHelpers.RightOf(group.rate, group.storageBar, 4)
     LayoutHelpers.AtVerticalCenterIn(group.rate, group)
     
-    LayoutHelpers.AtRightIn(group.income, group, 7)
+    LayoutHelpers.AtRightIn(group.income, group, 2)
     LayoutHelpers.AtTopIn(group.income, group)
     group.income:SetColor('ffb7e75f')
 
-    LayoutHelpers.AtRightIn(group.expense, group, 7)
+    LayoutHelpers.AtRightIn(group.expense, group, 2)
     LayoutHelpers.AtBottomIn(group.expense, group)
     LayoutHelpers.ResetTop(group.expense)
     group.expense:SetColor('fff30017')
 
     -- Reclaim info
-    LayoutHelpers.AtRightIn(group.reclaimDelta, group, 68)
+    LayoutHelpers.AtRightIn(group.reclaimDelta, group, 49)
     LayoutHelpers.AtTopIn(group.reclaimDelta, group)
     group.reclaimDelta:SetColor('ffb7e75f')
 
-    LayoutHelpers.AtRightIn(group.reclaimTotal, group, 68)
+    LayoutHelpers.AtRightIn(group.reclaimTotal, group, 49)
     LayoutHelpers.AtBottomIn(group.reclaimTotal, group)
     LayoutHelpers.ResetTop(group.reclaimTotal)
 
