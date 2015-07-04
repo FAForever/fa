@@ -1,4 +1,10 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'Abovetgt',
+            'UES0305'
+        }
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'UES',
@@ -59,7 +65,7 @@ UnitBlueprint {
         'OVERLAYANTINAVY',
         'DRAGBUILD',
         'SORTINTEL',
-		'NAVAL', #added for shipwreck mod
+		'NAVAL',
     },
     CollisionOffsetY = -0.25,
     Defense = {
