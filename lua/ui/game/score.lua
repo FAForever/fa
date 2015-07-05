@@ -352,8 +352,8 @@ function SetupPlayerLines()
 
     for _, line in controls.armyLines do
         local playerName = line.name:GetText()
-        local playerRating = sessionInfo.Options.Ratings[playerName] or ""
-        local playerClan = sessionInfo.Options.ClanTags[playerName] or ""
+        local playerRating = sessionInfo.Options.Ratings[playerName] or 0
+        local playerClan = sessionInfo.Options.ClanTags[playerName]
 
         if playerClan then
             playerClan = '[' .. playerClan .. '] '
