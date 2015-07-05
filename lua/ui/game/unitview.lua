@@ -449,6 +449,7 @@ function UpdateWindow(info)
             end
         end
     end
+end
 
 function ShowROBox()
 end
