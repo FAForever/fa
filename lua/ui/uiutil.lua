@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Various utility functions to make UI scripts easier and more consistent
 --*
---* Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local LazyVar = import('/lua/lazyvar.lua')
@@ -24,6 +24,7 @@ local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local Layouts = import('/lua/skins/layouts.lua')
 local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local NinePatch = import('/lua/ui/controls/ninepatch.lua').NinePatch
+local InputDialog = import('/lua/ui/controls/popups/inputdialog.lua').InputDialog
 
 --* Handy global variables to assist skinning
 buttonFont = import('/lua/lazyvar.lua').Create()            -- default font used for button faces
@@ -582,8 +583,16 @@ end
 
 -- Create a checkbox using the default checkbox texture. Kept as its own entry point for the benefit
 -- of retarded GPG code that things "radiobtn" is a sensible name for a checkbox texture.
-function CreateCheckboxStd(parent)
-    return CreateCheckbox(parent, '/dialogs/check-box_btn/')
+function CreateCheckboxStd(parent, texturePath)
+    local checkbox = Checkbox(parent,
+        SkinnableFile(texturePath .. '-d_btn_up.dds'),
+        SkinnableFile(texturePath .. '-s_btn_up.dds'),
+        SkinnableFile(texturePath .. '-d_btn_over.dds'),
+        SkinnableFile(texturePath .. '-s_btn_over.dds'),
+        SkinnableFile(texturePath .. '-d_btn_dis.dds'),
+        SkinnableFile(texturePath .. '-s_btn_dis.dds')
+    )
+    return checkbox
 end
 
 function CreateCheckbox(parent, texturePath, label, labelRight, labelSize, clickCue, rollCue)
@@ -765,6 +774,9 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
     dialog.Height:Set(textHeight + 85)
 
     local popup = Popup(parent, dialog)
+    -- Don't close when the shadow is clicked.
+    popup.OnShadowClicked = function() end
+    popup.OnEscapePressed = function() end
 
     local function MakeButton(text, callback)
         local button = CreateButtonWithDropshadow(dialog, '/BUTTON/medium/', text)
@@ -1005,4 +1017,12 @@ function GetReplayId()
     end
 
     return id
+end
+
+-- Create an input dialog with the given title and listener function.
+function CreateInputDialog(parent, title, listener, fallbackBox)
+    local dialog = InputDialog(parent, title, fallbackBox)
+    dialog.OnInput = listener
+
+    return dialog
 end

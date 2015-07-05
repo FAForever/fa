@@ -1211,12 +1211,6 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-    FerryPointSet = function(self,sound)
-        if self.VOTable and not self.VOTable['FerryPointSet'] then
-            self.VOTable['FerryPointSet'] = ForkThread(self.PlayVOSound, self, sound, 'FerryPointSet')
-        end
-    end,
-
     OnPlayCommanderUnderAttackVO = function(self)
         if GetFocusArmy() == self:GetArmyIndex() then
             local Voice = Sound {

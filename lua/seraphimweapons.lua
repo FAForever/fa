@@ -6,7 +6,7 @@
 --**
 --**  Summary  :  Default definitions of Seraphim weapons
 --**
---**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
@@ -152,6 +152,7 @@ SDFChronotronCannonWeapon = Class(DefaultProjectileWeapon) {
 
 SDFChronotronCannonOverChargeWeapon = Class(OverchargeWeapon) {
     FxMuzzleFlash = EffectTemplate.SChronotronCannonOverChargeMuzzle,
+    DesiredWeaponLabel = 'ChronotronCannon'
 }
 
 -- Units: XSL0301
@@ -161,6 +162,7 @@ SDFLightChronotronCannonWeapon = Class(DefaultProjectileWeapon) {
 
 SDFLightChronotronCannonOverchargeWeapon = Class(OverchargeWeapon) {
     FxMuzzleFlash = EffectTemplate.SLightChronotronCannonOverChargeMuzzleFlash,
+    DesiredWeaponLabel = 'LightChronatronCannon'
 }
 
 SAAShleoCannonWeapon = Class(DefaultProjectileWeapon) {

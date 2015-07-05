@@ -6,7 +6,7 @@
 #**  Summary  : This file was completely rewritten to best take advantage of
 #**             the new influence map stuff Daniel provided. 
 #**
-#**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
 local UnitTemplates = import('/lua/unittemplates.lua').UnitTemplates

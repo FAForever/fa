@@ -4,7 +4,7 @@
 --**
 --**  Summary  :  Seraphim T3 Mobile Lightning Anti-Air
 --**
---**  Copyright © 2008 Blade Braver!
+--**  Copyright Â© 2008 Blade Braver!
 --****************************************************************************
 
 local SLandUnit = import('/lua/seraphimunits.lua').SLandUnit

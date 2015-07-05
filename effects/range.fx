@@ -19,7 +19,7 @@ Vertex vertexShader( float3 vertex : POSITION0, float2 coeff : TEXCOORD0, float2
 {
   Vertex result = (Vertex)0;
 
-  vertex.xz = coeff.y * radius.y * vertex.xz + position.xy;
+  vertex.xz = dot(coeff, radius) * vertex.xz + position.xy;
   result.position = mul(float4(vertex,1),mul(viewMatrix,projMatrix));
   return result;
 }

@@ -1,10 +1,10 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
+            'Torso',
             'AttachPoint',
             'Leg_Left_B02',
             'Leg_Right_B02',
-            'Torso',
         },
     },
     Audio = {
@@ -300,14 +300,14 @@ UnitBlueprint {
             'BUILTBYTIER3ENGINEER AEON',
         },
         MaxBuildDistance = 10,
-	NaturalProducer = true,
+        NaturalProducer = true,
         ProductionPerSecondEnergy = 20,
         ProductionPerSecondMass = 1,
         SacrificeEnergyMult = 0.9,
         SacrificeMassMult = 0.9,
         StorageEnergy = 500,
         StorageMass = 275,
-        TeleportEnergyMod = 5.16, # 3
+        TeleportEnergyMod = 5.16,
         TeleportMassMod = 0,
         TeleportTimeMod = 0.0001,
     },
@@ -396,6 +396,7 @@ UnitBlueprint {
             MaintenanceConsumptionPerSecondEnergy = 300,
             Name = '<LOC enhancements_0028>Personal Shield Generator',
             OwnerShieldMesh = '/units/ual0301/ual0301_personalshield_mesh',
+            PersonalShield = true,
             RegenAssistMult = 10,
             ShieldEnergyDrainRechargeTime = 5,
             ShieldMaxHealth = 20000,
@@ -422,6 +423,7 @@ UnitBlueprint {
             MaintenanceConsumptionPerSecondEnergy = 600,
             Name = '<LOC enhancements_0029>Heavy Personal Shield Generator',
             OwnerShieldMesh = '/units/ual0301/ual0301_personalshield_mesh',
+            PersonalShield = true,
             Prerequisite = 'Shield',
             ShieldEnergyDrainRechargeTime = 5,
             ShieldMaxHealth = 35000,

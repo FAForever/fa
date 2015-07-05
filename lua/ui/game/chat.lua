@@ -35,9 +35,16 @@ local defOptions = { all_color = 1,
         link_color = 4,
         font_size = 14,
         fade_time = 15,
-        win_alpha = 1}
+        win_alpha = 1,
+        feed_background = false,
+        feed_persist = true}
 
-local ChatOptions = Prefs.GetFromCurrentProfile("chatoptions") or defOptions
+local ChatOptions = Prefs.GetFromCurrentProfile("chatoptions") or {}
+for option, value in defOptions do
+     if ChatOptions[option] == nil then
+        ChatOptions[option] = value
+    end
+end
 
 GUI = {
     bg = false,
@@ -213,6 +220,7 @@ function CreateChatLines()
         line.name.Depth:Set(function() return line.Depth() + 10 end)
         line.name:SetColor('ffffffff')
         line.name:DisableHitTest()
+        line.name:SetDropShadow(true)
 
         line.nameBG = Bitmap(line.name)
         line.nameBG:SetSolidColor('00000000')
@@ -247,6 +255,7 @@ function CreateChatLines()
         line.text:SetClipToWidth(true)
         line.text:DisableHitTest()
         line.text:SetColor('ffc2f6ff')
+        line.text:SetDropShadow(true)
         LayoutHelpers.AtVerticalCenterIn(line.text, line.teamColor)
 
         line.textBG = Bitmap(line)
@@ -281,6 +290,14 @@ function CreateChatLines()
                 end
             end
         end
+        
+        line.textBG2 = Bitmap(line)
+        line.textBG2.Depth:Set(function() return line.text.Depth() - 1 end)
+        line.textBG2.Left:Set(line.nameBG.Left)
+        line.textBG2.Top:Set(line.teamColor.Top)
+        line.textBG2.Right:Set(line.text.Right)
+        line.textBG2.Bottom:Set(line.teamColor.Bottom)
+        line.textBG2:Disable()
 
         return line
     end
@@ -417,6 +434,11 @@ function SetupChatScroll()
         local curEntry = 1
         local curTop = 1
         local tempsize = 0
+        
+        if GUI.bg:IsHidden() then
+            tempTop = math.max(DataSize() - numLines()+1, 1)
+        end
+        
         for i, v in chatHistory do
             if IsValidEntry(v) then
                 if tempsize + table.getsize(v.wrappedtext) < tempTop then
@@ -499,25 +521,44 @@ function SetupChatScroll()
                 GUI.chatLines[index].textBG:SetSolidColor('00000000')
                 GUI.chatLines[index].nameBG:SetSolidColor('00000000')
                 GUI.chatLines[index].EntryID = curEntry
-                if chatHistory[curEntry].new and GUI.bg:IsHidden() then
-                    GUI.chatLines[index]:Show()
-                    GUI.chatLines[index].topBG:Hide()
-                    GUI.chatLines[index].rightBG:Hide()
-                    GUI.chatLines[index].leftBG:Hide()
-                    if GUI.chatLines[index].name:GetText() == '' then
-                        GUI.chatLines[index].teamColor:Hide()
+                
+                if GUI.bg:IsHidden() then
+                    if ChatOptions.feed_background then
+                        GUI.chatLines[index].textBG2:SetSolidColor('aa000000')
+                    else
+                        GUI.chatLines[index].textBG2:SetSolidColor('00000000')
                     end
-                    GUI.chatLines[index].time = 0
-                    GUI.chatLines[index].OnFrame = function(self, delta)
-                        self.time = self.time + delta
-                        if self.time > ChatOptions.fade_time then
-                            if GUI.bg:IsHidden() then
-                                self:Hide()
+                
+                    if chatHistory[curEntry].new or GUI.chatLines[index].time == nil then
+                        GUI.chatLines[index].time = 0
+                    end
+                    
+                    GUI.chatLines[index].curHistory = chatHistory[curEntry]
+                    if GUI.chatLines[index].curHistory then
+                        if GUI.chatLines[index].curHistory.time ~= nil then
+                            GUI.chatLines[index].time = GUI.chatLines[index].curHistory.time
+                        end
+                        if GUI.chatLines[index].time < ChatOptions.fade_time then
+                            GUI.chatLines[index]:Show()
+                            GUI.chatLines[index].topBG:Hide()
+                            GUI.chatLines[index].rightBG:Hide()
+                            GUI.chatLines[index].leftBG:Hide()
+                            if GUI.chatLines[index].name:GetText() == '' then
+                                GUI.chatLines[index].teamColor:Hide()
                             end
-                            self:SetNeedsFrameUpdate(false)
+                            GUI.chatLines[index].OnFrame = function(self, delta)
+                                self.time = self.time + delta
+                                self.curHistory.time = self.time
+                                if self.time > ChatOptions.fade_time then
+                                    if GUI.bg:IsHidden() then
+                                        self:Hide()
+                                    end
+                                    self:SetNeedsFrameUpdate(false)
+                                end
+                            end
+                            GUI.chatLines[index]:SetNeedsFrameUpdate(true)        
                         end
                     end
-                    GUI.chatLines[index]:SetNeedsFrameUpdate(true)
                 end
             else
                 GUI.chatLines[index].nameBG:Disable()
@@ -841,10 +882,10 @@ function ReceiveChatFromSim(sender, msg)
         towho = string.format("%s %s:", LOC(ToStrings.to.text), GetArmyData(msg.to).nickname)
     end
     local name = sender .. ' ' .. towho
+
     if msg.echo then
         if msg.from and SessionIsReplay() then
-            name = string.format("%s %s:", LOC(ToStrings.to.text), sender)
-            name = msg.from.." "..name
+            name = string.format("%s %s %s:", msg.from, LOC(ToStrings.to.text), GetArmyData(msg.to).nickname)
         else
             name = string.format("%s %s:", LOC(ToStrings.to.caps), sender)
         end
@@ -854,14 +895,17 @@ function ReceiveChatFromSim(sender, msg)
     if table.getn(tempText) == 0 then
         tempText = {""}
     end
-    local entry = {name = name,
+    local entry = {
+        name = name,
         tokey = tokey,
         color = (armyData.color or "ffffffff"),
         armyID = (armyData.ArmyID or 1),
         faction = (armyData.faction or (table.getn(FactionsIcon)-1))+1,
         text = msg.text,
         wrappedtext = tempText,
-        new = true}
+        new = true
+    }
+
     if msg.camera then
         entry.camera = msg.camera
     end
@@ -887,14 +931,26 @@ function ToggleChat()
             GUI.bg.curTime = 0
         end
         for i, v in GUI.chatLines do
+            v.textBG2:SetSolidColor('00000000')
             v:SetNeedsFrameUpdate(false)
             v:Show()
-            v.OnFrame = nil
         end
+        GUI.chatContainer:CalcVisible()
     else
         GUI.bg:Hide()
         GUI.chatEdit.edit:AbandonFocus()
         GUI.bg:SetNeedsFrameUpdate(false)
+        
+        if ChatOptions.feed_persist then
+            GUI.chatContainer:CalcVisible()
+        else
+            for i, v in GUI.chatLines do
+                v.time = ChatOptions.fade_time + 1
+                if v.curHistory and v.curHistory.time ~= nil then
+                    v.curHistory.time = v.time
+                end
+            end
+        end
     end
 end
 
@@ -1280,6 +1336,9 @@ function CreateConfigWindow()
                 {type = 'slider', name = '<LOC chat_0009>Chat Font Size', key = 'font_size', tooltip = 'chat_fontsize', min = 12, max = 18, inc = 2},
                 {type = 'slider', name = '<LOC chat_0010>Window Fade Time', key = 'fade_time', tooltip = 'chat_fadetime', min = 5, max = 30, inc = 1},
                 {type = 'slider', name = '<LOC chat_0011>Window Alpha', key = 'win_alpha', tooltip = 'chat_alpha', min = 20, max = 100, inc = 1},
+                {type = 'splitter'},
+                {type = 'filter', name = '<LOC chat_0014>Show Feed Background', key = 'feed_background', tooltip = 'chat_feed_background'},
+                {type = 'filter', name = '<LOC chat_0015>Persist Feed Timeout', key = 'feed_persist', tooltip = 'chat_feed_persist'},
         },
     }
 
@@ -1419,6 +1478,9 @@ function CreateConfigWindow()
             else
                 LayoutHelpers.RightOf(optionGroup.options[index], optionGroup.options[index-1])
             end
+        elseif v.type == 'filter' then
+            LayoutHelpers.Below(optionGroup.options[index], optionGroup.options[index-1], 4)
+            LayoutHelpers.AtLeftIn(optionGroup.options[index], WindowTitle)
         else
             LayoutHelpers.Below(optionGroup.options[index], optionGroup.options[index-1], 4)
             LayoutHelpers.AtHorizontalCenterIn(optionGroup.options[index], optionGroup)
@@ -1441,6 +1503,8 @@ function CreateConfigWindow()
                         control.slider:SetValue(value)
                     elseif control.Data.type == 'color' then
                         control.color:SetItem(value)
+                    elseif control.Data.type == 'filter' then
+                        control.check:SetCheck(value, true)
                     end
                     UpdateOption(option, value)
                     break

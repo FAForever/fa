@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Dialog to facilitate map selection
 --*
---* Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -24,7 +24,6 @@ local Mods = import('/lua/mods.lua')
 local Combo = import('/lua/ui/controls/combo.lua').Combo
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local ModManager = import('/lua/ui/lobby/ModsManager.lua')
-local EnhancedLobby = import('/lua/EnhancedLobby.lua')
 
 local scenarios = nil
 local selectedScenario = false
@@ -210,8 +209,8 @@ mapFilters = {
         FilterFactory = {
             SelectedKey = 0,
             Filters = {
-                EnhancedLobby.CheckMapHasMarkers,
-                function(scenInfo) return not EnhancedLobby.CheckMapHasMarkers(scenInfo) end
+                MapUtil.CheckMapHasMarkers,
+                function(scenInfo) return not MapUtil.CheckMapHasMarkers(scenInfo) end
             },
             Build = function(self)
                 return self.Filters[self.SelectedKey]
@@ -595,7 +594,6 @@ function RefreshOptions(skipRefresh, singlePlayer)
         OptionSource[2] = {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts}
         OptionSource[3] = {title = "AI Options", options = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts}
     end
-    OptionSource[4] = {}
     OptionSource[4] = {title = "<LOC lobui_0164>Advanced", options = advOptions or {}}
 
     Options = {}
@@ -642,7 +640,7 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
     local OptionDisplay = {}
     RefreshOptions(true, singlePlayer)
 
-    local function CreateOptionCombo(parent, optionData, width)
+    local function CreateOptionCombo(parent)
         local combo = Combo(parent, nil, nil, nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         combo.Width:Set(266)
         local itemArray = {}
@@ -759,7 +757,7 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
                 
                 for index, val in data.data.values do
                     itemArray[index] = val.text
-                    line.combo.keyMap[tostring(val.key)] = index
+                    line.combo.keyMap[val.key] = index
                     tooltipTable[index]={text=data.data.label,body=val.help}
                     --
                     if curOptions[data.data.key] and val.key == curOptions[data.data.key] then
@@ -781,7 +779,7 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
                         line.combo._text:SetColor('DBBADB')
                     end
                 end
-                line.HandleEvent = Group.HandleEventhg
+                line.HandleEvent = Group.HandleEvent
                 Tooltip.AddControlTooltip(line, {text=data.data.label,body=data.data.help})
                 Tooltip.AddComboTooltip(line.combo, tooltipTable, line.combo._list)
                 line.combo.UpdateValue = function(key)
@@ -842,7 +840,7 @@ function SetDescription(scen)
         errors = true
     end
 
-    if EnhancedLobby.CheckMapHasMarkers(scen) then
+    if MapUtil.CheckMapHasMarkers(scen) then
         description:AddItem("AI Markers: Yes")
     else
         description:AddItem("AI Markers: No")

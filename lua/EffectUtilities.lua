@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Effect Utility functions for scripts.
 --**
---**  Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local util = import('utilities.lua')
@@ -415,7 +415,12 @@ function CreateCybranBuildBeams( builder, unitBeingBuilt, BuildEffectBones, Buil
 end
 
 function SpawnBuildBots( builder, unitBeingBuilt, BuildEffectsBag)
-    local numBots = math.ceil((10+builder:GetBuildRate()) / 15)
+    -- Buildbots are scaled: ~ 1 pr 15 units of BP
+    -- clamped to a max of 10 to avoid insane FPS drop
+    -- with mods that modify BP
+    local numBots = math.min(math.ceil((10+builder:GetBuildRate()) / 15),
+                             10)
+
     if not builder.buildBots then
         builder.buildBots = {}
     end
@@ -463,8 +468,6 @@ function SpawnBuildBots( builder, unitBeingBuilt, BuildEffectsBag)
         end
 
         return builder.buildBots
-	else
-		return
 	end
 end
 
@@ -700,7 +703,7 @@ function CreateSeraphimFactoryBuildingEffects( builder, unitBeingBuilt, BuildEff
     end
 end
 
-function CreateSeraphimBuildBaseThread( unitBeingBuilt, builder, EffectsBag )
+function CreateSeraphimBuildThread(unitBeingBuilt, builder, EffectsBag, scaleFactor)
     local bp = unitBeingBuilt:GetBlueprint()
     local x, y, z = unpack(unitBeingBuilt:GetPosition())
     local mul = 0.5
@@ -732,13 +735,13 @@ function CreateSeraphimBuildBaseThread( unitBeingBuilt, builder, EffectsBag )
     local AdjustedEmitters = {}
     local effect = nil
     for k, vEffect in BuildEffectsEmitters do
-        effect = CreateAttachedEmitter( unitBeingBuilt, -1, builder:GetArmy(), vEffect)
+        effect = CreateAttachedEmitter( unitBeingBuilt, -1, builder:GetArmy(), vEffect):ScaleEmitter(scaleFactor)
         table.insert( AdjustedEmitters, effect )
         EffectsBag:Add(effect)
     end
 
     for k, vEffect in BuildEffectBaseEmitters do
-        effect = CreateAttachedEmitter( BuildBaseEffect, -1, builder:GetArmy(), vEffect)
+        effect = CreateAttachedEmitter( BuildBaseEffect, -1, builder:GetArmy(), vEffect):ScaleEmitter(scaleFactor)
         table.insert( AdjustedEmitters, effect )
         EffectsBag:Add(effect)
     end
@@ -750,15 +753,12 @@ function CreateSeraphimBuildBaseThread( unitBeingBuilt, builder, EffectsBag )
         WaitSeconds(0.5)
         fractionComplete = unitBeingBuilt:GetFractionComplete()
         for k, vEffect in AdjustedEmitters do
-             vEffect:ScaleEmitter( 1 + (unitScaleMetric * fractionComplete))
+            vEffect:ScaleEmitter(scaleFactor + (unitScaleMetric * fractionComplete))
         end
     end
 
     -- The flash can now be seen only by the player owning the building, his allies or enemies who
-    -- have a visual of the building. By Maranovski [148]
-    -- Brute51: Maranovski, if you ever read this, there was a bug that occured when watching a game with a Seraphim
-    -- player in it as observer (focusArmy == -1). Fixed it.
-
+    -- have a visual of the building.
     local unitsArmy = unitBeingBuilt:GetArmy()
     local focusArmy = GetFocusArmy()
     if focusArmy == -1 or IsAlly(unitsArmy,focusArmy) then
@@ -770,84 +770,16 @@ function CreateSeraphimBuildBaseThread( unitBeingBuilt, builder, EffectsBag )
         end
     end
 
-    unitBeingBuilt:CreateTarmac(true, true, true, false, false)
     WaitSeconds(0.5)
     BuildBaseEffect:Destroy()
 end
 
-function CreateSeraphimExperimentalBuildBaseThread( unitBeingBuilt, builder, EffectsBag )
-    local bp = unitBeingBuilt:GetBlueprint()
-    local x, y, z = unpack(unitBeingBuilt:GetPosition())
-    local mul = 0.5
-    local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
-    local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ * mul
-    local sy = bp.Physics.MeshExtentsY or sx + sz
+function CreateSeraphimBuildBaseThread(unitBeingBuilt, builder, EffectsBag)
+    CreateSeraphimBuildThread(unitBeingBuilt, builder, EffectsBag, 1)
+end
 
-    local slice = nil
-    WaitSeconds(0.1)
-
-    local BuildBaseEffect = unitBeingBuilt:CreateProjectile('/effects/entities/SeraphimBuildEffect01/SeraphimBuildEffect01_proj.bp', nil, 0, 0, nil, nil, nil )
-    BuildBaseEffect:SetScale(sx, 1, sz)
-    BuildBaseEffect:SetOrientation( unitBeingBuilt:GetOrientation(), true)
-    Warp( BuildBaseEffect, Vector(x,y,z))
-    unitBeingBuilt.Trash:Add(BuildBaseEffect)
-    EffectsBag:Add(BuildBaseEffect)
-
-    local BuildEffectBaseEmitters = {
-        '/effects/emitters/seraphim_being_built_ambient_01_emit.bp',
-    }
-
-    local BuildEffectsEmitters = {
-        '/effects/emitters/seraphim_being_built_ambient_02_emit.bp',
-        '/effects/emitters/seraphim_being_built_ambient_03_emit.bp',
-        '/effects/emitters/seraphim_being_built_ambient_04_emit.bp',
-        '/effects/emitters/seraphim_being_built_ambient_05_emit.bp',
-    }
-
-    local AdjustedEmitters = {}
-    local effect = nil
-    for k, vEffect in BuildEffectsEmitters do
-        effect = CreateAttachedEmitter( unitBeingBuilt, -1, builder:GetArmy(), vEffect ):ScaleEmitter(2)
-        table.insert( AdjustedEmitters, effect )
-        EffectsBag:Add(effect)
-    end
-
-    for k, vEffect in BuildEffectBaseEmitters do
-        effect = CreateAttachedEmitter( BuildBaseEffect, -1, builder:GetArmy(), vEffect ):ScaleEmitter(2)
-        table.insert( AdjustedEmitters, effect )
-        EffectsBag:Add(effect)
-    end
-
-
-    -- Poll the unit being built every 0.5 a second to adjust the effects to match
-    local fractionComplete = unitBeingBuilt:GetFractionComplete()
-    local unitScaleMetric = unitBeingBuilt:GetFootPrintSize() * 0.65
-    while not unitBeingBuilt.Dead and fractionComplete < 1.0 do
-        WaitSeconds(0.5)
-        fractionComplete = unitBeingBuilt:GetFractionComplete()
-        for k, vEffect in AdjustedEmitters do
-             vEffect:ScaleEmitter( 2 + (unitScaleMetric * fractionComplete) )
-        end
-    end
-
-    -- The flash can now be seen only by the player owning the unit, his allies or enemies who
-    -- have a visual of the building. By Maranovski [148]
-    -- Brute51: Maranovski, if you ever read this, there was a bug that occured when watching a game with a Seraphim
-    -- player in it as observer (focusArmy == -1). Fixed it.
-
-    local unitsArmy = unitBeingBuilt:GetArmy()
-    local focusArmy = GetFocusArmy()
-    if focusArmy == -1 or IsAlly(unitsArmy,focusArmy) then
-        CreateLightParticle( unitBeingBuilt, -1, unitBeingBuilt:GetArmy(), unitBeingBuilt:GetFootPrintSize() * 4, 6, 'glow_02', 'ramp_blue_22' )
-    elseif IsEnemy(unitsArmy,focusArmy) then
-        local blip = unitBeingBuilt:GetBlip(focusArmy)
-        if blip ~= nil and blip:IsSeenNow(focusArmy) then
-            CreateLightParticle( unitBeingBuilt, -1, unitBeingBuilt:GetArmy(), unitBeingBuilt:GetFootPrintSize() * 4, 6, 'glow_02', 'ramp_blue_22' )
-        end
-    end
-
-    WaitSeconds(0.5)
-    BuildBaseEffect:Destroy()
+function CreateSeraphimExperimentalBuildBaseThread(unitBeingBuilt, builder, EffectsBag)
+    CreateSeraphimBuildThread(unitBeingBuilt, builder, EffectsBag, 2)
 end
 
 function CreateAdjacencyBeams( unit, adjacentUnit, AdjacencyBeamsBag )

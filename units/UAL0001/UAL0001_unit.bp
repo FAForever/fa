@@ -294,7 +294,7 @@
         BuildCostEnergy = 5000000,
         BuildCostMass = 18000,
         BuildRate = 10,
-        BuildTime = 6000000,  #was 60000
+        BuildTime = 6000000,
         BuildableCategory = {
             'BUILTBYCOMMANDER AEON',
             'BUILTBYTIER2COMMANDER AEON',
@@ -833,8 +833,8 @@
     SelectionSizeZ = 0.6,
     SelectionThickness = 0.9,
     SelectionYOffset = 0,
-    SizeX = 1.2, #from 1
-    SizeY = 2.2,
+    SizeX = 1.2,
+    SizeY = 1.9,
     SizeZ = 1.2,
     StrategicIconName = 'icon_commander_generic',
     StrategicIconSortPriority = 0,

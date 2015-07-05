@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: In game score dialog
 --*
---* Copyright © :005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© :005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 -- current score will contain the most recent score update from the sync
@@ -352,11 +352,18 @@ function SetupPlayerLines()
 
     for _, line in controls.armyLines do
         local playerName = line.name:GetText()
-        local playerRating = sessionInfo.Options.Ratings[playerName]
-        if (playerRating) then
-            playerNameLine = playerName..' ['..math.floor(playerRating+0.5)..']'
-            line.name:SetText(playerNameLine)
+        local playerRating = sessionInfo.Options.Ratings[playerName] or 0
+        local playerClan = sessionInfo.Options.ClanTags[playerName]
+
+        if playerClan then
+            playerClan = '[' .. playerClan .. '] '
         end
+
+        if playerRating then
+            playerRating = ' [' .. math.floor(playerRating+0.5) .. ']'
+        end
+
+        line.name:SetText(playerClan .. playerName .. playerRating)
     end
 
     mapData = {}

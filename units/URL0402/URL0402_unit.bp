@@ -83,7 +83,7 @@ UnitBlueprint {
         'OVERLAYCOUNTERINTEL',
         'OVERLAYANTIAIR',
         'OVERLAYANTINAVY',
-		'OVERLAYINDIRECTFIRE',   # Added for range ring issue [155]
+		'OVERLAYINDIRECTFIRE',
     },
     CollisionOffsetY = 0,
     Defense = {
@@ -350,11 +350,11 @@ UnitBlueprint {
             },
             AutoInitiateAttackCommand = false,
             BallisticArc = 'RULEUBA_None',
-            BeamCollisionDelay = 0,		#0.1
+            BeamCollisionDelay = 0,
             BeamLifetime = 0,
             CollideFriendly = false,
             ContinuousBeam = true,
-            Damage = 400,			#800
+            Damage = 400,
             DamageRadius = 0.5,
             DamageType = 'Normal',
             DisplayName = 'Heavy Microwave Laser',
@@ -363,7 +363,7 @@ UnitBlueprint {
                 Seabed = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 0,		#2
+            FiringTolerance = 0,
             Label = 'MainGun',
             LeadTarget = false,
             MaxRadius = 30,
@@ -387,8 +387,8 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
-            RateOfFire = 10,		#3
-            TargetCheckInterval = 0.1,		#0.5
+            RateOfFire = 10,
+            TargetCheckInterval = 0.1,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'EXPERIMENTAL',
@@ -463,7 +463,7 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RangeCategory = 'UWRC_IndirectFire',  # changing the range rings of the heavy bolters to indirect fire
+            RangeCategory = 'UWRC_IndirectFire',
             RateOfFire = 1.5,
             SlavedToBody = false,
             TargetCheckInterval = 0.5,
@@ -539,7 +539,7 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RangeCategory = 'UWRC_IndirectFire',  # changing the range rings of the heavy bolters to indirect fire
+            RangeCategory = 'UWRC_IndirectFire',
             RateOfFire = 1.5,
             SlavedToBody = false,
             TargetCheckInterval = 0.5,
@@ -793,9 +793,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, #from false
-            Sub = true, #from false
-            Water = true, #from false
+            Seabed = true,
+            Sub = true,
+            Water = true,
         },
     },
 }

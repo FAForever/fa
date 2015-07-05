@@ -4,7 +4,7 @@
 #**
 #**  Summary  :  Cybran T3 Mobile AA
 #**
-#**  Copyright © 2008 Blade Braver!
+#**  Copyright Â© 2008 Blade Braver!
 #****************************************************************************
 
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit

@@ -241,9 +241,6 @@ function CreateUI(isReplay)
     if options.gui_render_enemy_lifebars == 1 or options.gui_render_custom_names == 0 then
         import('/modules/console_commands.lua').Init()
     end
-
-    import('/modules/reclaim.lua').Init()
-
 end
 
 local provider = false
@@ -449,6 +446,8 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
             end
         end
     end
+
+    import('/lua/ui/game/unitview.lua').OnSelection(newSelection)
 end
 
 function OnQueueChanged(newQueue)

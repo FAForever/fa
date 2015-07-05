@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Shows the first command in the queue for selected factories
 --*
---* Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local WorldMesh = import('/lua/ui/controls/worldmesh.lua').WorldMesh
@@ -44,7 +44,7 @@ end
 
 local function OnBeat()
     for index, mesh in meshes do
-        if not mesh.unit.Dead then
+        if not mesh.unit:IsDead() then
             local commandQueue = mesh.unit:GetCommandQueue()
             mesh:SetStance(commandQueue[table.getn(commandQueue)].position)
         end

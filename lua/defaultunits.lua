@@ -5,7 +5,7 @@
 -- **
 -- **  Summary  :  Default definitions of units
 -- **
--- **  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
 local Unit = import('/lua/sim/Unit.lua').Unit
@@ -65,8 +65,24 @@ StructureUnit = Class(Unit) {
         end
     end,
 
+    OnStartBeingBuilt = function(self, builder, layer)
+        Unit.OnStartBeingBuilt(self, builder, layer)
+        local bp = self:GetBlueprint()
+        if bp.Physics.FlattenSkirt and not self:HasTarmac() and bp.General.FactionName ~= "Seraphim" then
+            if self.TarmacBag then
+                self:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP)
+            else
+                self:CreateTarmac(true, true, true, false, false)
+            end
+        end
+    end,
+
     OnStopBeingBuilt = function(self,builder,layer)
         Unit.OnStopBeingBuilt(self,builder,layer)
+        -- Whaa why can't we have sane inheritance chains :/
+        if self:GetBlueprint().General.FactionName == "Seraphim" then
+            self:CreateTarmac(true, true, true, false, false)
+        end
         self:PlayActiveAnimation()
     end,
 
@@ -623,14 +639,34 @@ FactoryUnit = Class(StructureUnit) {
         if order ~= 'Upgrade' then
             ChangeState(self, self.BuildingState)
             self.BuildingUnit = false
-        else
-            self:RemoveCommandCap('RULEUCC_Guard')
         end
-
         self.FactoryBuildFailed = false
     end,
 
+    --- Introduce a rolloff delay, where defined.
     OnStopBuild = function(self, unitBeingBuilt, order )
+        local bp = self:GetBlueprint()
+        if bp.General.RolloffDelay and bp.General.RolloffDelay > 0 and not self.FactoryBuildFailed then
+            self:ForkThread(self.PauseThread, bp.General.RolloffDelay, unitBeingBuilt, order)
+        else
+            self:DoStopBuild(unitBeingBuilt, order)
+        end
+    end,
+
+    --- Adds a pause between unit productions
+    PauseThread = function(self, productionpause, unitBeingBuilt, order)
+        self:StopBuildFx()
+        self:SetBusy(true)
+        self:SetBlockCommandQueue(true)
+
+        WaitSeconds(productionpause)
+
+        self:SetBusy(false)
+        self:SetBlockCommandQueue(false)
+        self:DoStopBuild(unitBeingBuilt, order)
+    end,
+
+    DoStopBuild = function(self, unitBeingBuilt, order )
         StructureUnit.OnStopBuild(self, unitBeingBuilt, order )
 
         if not self.FactoryBuildFailed then
@@ -640,11 +676,6 @@ FactoryUnit = Class(StructureUnit) {
             self:StopBuildFx()
             self:ForkThread(self.FinishBuildThread, unitBeingBuilt, order )
         end
-
-        if order == 'Upgrade' then
-            self:AddCommandCap('RULEUCC_Guard')
-        end
-
         self.BuildingUnit = false
     end,
 
@@ -1612,10 +1643,7 @@ AirTransport = Class(AirUnit) {
             unit:DisableShield()
             unit:DisableDefaultToggleCaps()
         end
-        if not EntityCategoryContains(categories.PODSTAGINGPLATFORM, self) then
-            self:RequestRefreshUI()
-        end
-        --Added by brute51
+        self:RequestRefreshUI()
         unit:OnAttachedToTransport(self, attachBone)
     end,
 
@@ -1624,9 +1652,7 @@ AirTransport = Class(AirUnit) {
         self:MarkWeaponsOnTransport(unit, false)
         unit:EnableShield()
         unit:EnableDefaultToggleCaps()
-        if not EntityCategoryContains(categories.PODSTAGINGPLATFORM, self) then
-            self:RequestRefreshUI()
-        end
+        self:RequestRefreshUI()
         unit:TransportAnimation(-1)
         unit:OnDetachedToTransport(self)
     end,
@@ -1817,7 +1843,7 @@ SeaUnit = Class(MobileUnit){
 
 
 ---------------------------------------------------------------
---  HOVERING LAND UNITS   --return this entire section to HoverLandUnit = Class(MobileUnit){} if it does not work
+--  HOVERING LAND UNITS
 ---------------------------------------------------------------
 
 HoverLandUnit = Class(MobileUnit) {
@@ -1872,6 +1898,26 @@ CommandUnit = Class(WalkingLandUnit) {
         self.BuildArmManipulator:SetHeadingPitch(self:GetWeaponManipulatorByLabel(self.rightGunLabel):GetHeadingPitch())
     end,
 
+    OnStartBuild = function(self, unitBeingBuilt, order)
+        WalkingLandUnit.OnStartBuild(self, unitBeingBuilt, order)
+        local bp = self:GetBlueprint()
+        if order ~= 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
+            self:StartBuildingEffects(unitBeingBuilt, order)
+        end
+
+        -- Check if we're about to try and build something we shouldn't. This can only happen due to
+        -- a native code bug in the SCU REBUILDER behaviour.
+        -- FractionComplete is zero only if we're the initiating builder. Clearly, we want to allow
+        -- assisting builds of other races, just not *starting* them.
+        -- We skip the check if we're assisting another builder: it's up to them to have the ability
+        -- to start this build, not us.
+        if not self:GetGuardedUnit() and unitBeingBuilt:GetFractionComplete() == 0 and not self:CanBuild(unitBeingBuilt:GetBlueprint().BlueprintId) then
+            IssueStop({self})
+            IssueClearCommands({self})
+            unitBeingBuilt:Destroy()
+        end
+    end,
+
     OnStopBuild = function(self, unitBeingBuilt)
         WalkingLandUnit.OnStopBuild(self, unitBeingBuilt)
         if self:BeenDestroyed() then return end
@@ -1905,14 +1951,11 @@ ACUUnit = Class(CommandUnit) {
         local aiBrain = self:GetAIBrain()
 
         -- Mutate the OnDamage function for this one very special shield.
-        local oldOnDamage = self.MyShield.OnDamage
-        local newOnDamage = function(shield, instigator, amount, vector, dmgType)
-            oldOnDamage(shield, instigator, amount, vector, dmgType)
-
+        local oldApplyDamage = self.MyShield.ApplyDamage
+        self.MyShield.ApplyDamage = function(...)
+            oldApplyDamage(unpack(arg))
             aiBrain:OnPlayCommanderUnderAttackVO()
         end
-
-        self.MyShield.OnDamage = newOnDamage
     end,
 
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
@@ -1959,37 +2002,6 @@ ACUUnit = Class(CommandUnit) {
         self:GetAIBrain():GiveResource('Mass', self:GetBlueprint().Economy.StorageMass)
     end,
 }
-
--- This entire section is for factory fixes from CBFP.  If no workie, just remove everything below this line to restore
-
-local Game = import('/lua/game.lua')
-local FactoryFixes = import('/lua/FactoryFixes.lua').FactoryFixes
-
--- The altered factory unit class would be ideal except that it doesn't work. The code in this file gets appended at
--- the end to the existing file from stock FA. Because the air, ground and naval factory classes are generated before
--- this script is even executed the altered factory class won't be used. I can ofcourse re-generate the factory
--- classes but that will affect already loaded mods that change this code aswell. So the best sollution to the problem
--- is to apply the bug fix that was originally meant to go in the factory unit class to each dedicated factory class.
-
----------------------------------------------------------------
---  FACTORY  UNITS
----------------------------------------------------------------
-FactoryUnit = FactoryFixes(FactoryUnit)
-
----------------------------------------------------------------
---  AIR FACTORY UNITS
----------------------------------------------------------------
-AirFactoryUnit = FactoryFixes(AirFactoryUnit)
-
----------------------------------------------------------------
---  LAND FACTORY UNITS
----------------------------------------------------------------
-LandFactoryUnit = FactoryFixes(LandFactoryUnit)
-
----------------------------------------------------------------
---  SEA FACTORY UNITS
----------------------------------------------------------------
-SeaFactoryUnit = FactoryFixes(SeaFactoryUnit)
 
 ---------------------------------------------------------------
 --  SHIELD HOVER UNITS

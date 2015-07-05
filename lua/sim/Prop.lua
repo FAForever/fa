@@ -5,7 +5,7 @@
 --**
 --**  Summary  :
 --**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 --
 -- The base Prop lua class
@@ -28,38 +28,26 @@ Prop = Class(moho.prop_methods, Entity) {
         self.Trash = TrashBag()
         local bp = self:GetBlueprint()
         local economy = bp.Economy
-        self.MassReclaim = economy.ReclaimMassMax or 0
-        self.EnergyReclaim = economy.ReclaimEnergyMax or 0
-        self.ReclaimTimeMassMult = economy.ReclaimMassTimeMultiplier or 1
-        self.ReclaimTimeEnergyMult = economy.ReclaimEnergyTimeMultiplier or 1
-        self.MaxMassReclaim = economy.ReclaimMassMax or 0
-        self.MaxEnergyReclaim = economy.ReclaimEnergyMax or 0
+
+        -- These values are used in world props like rocks / stones / trees
+        self:SetMaxReclaimValues(
+            economy.ReclaimTimeMultiplier or economy.ReclaimMassTimeMultiplier or economy.ReclaimEnergyTimeMultiplier or 1,
+            economy.ReclaimMassMax or 0,
+            economy.ReclaimEnergyMax or 0
+        )
+
         local pos = self:GetPosition()
         self.CachePosition = pos
-
-        if self.MaxMassReclaim >= RECLAIMLABEL_MIN_MASS then
-            table.insert(Sync.Reclaim, {id=self:GetEntityId(), mass=self.MaxMassReclaim, position={pos[1], pos[2], pos[3]}})
-        end
-
-        local defense = bp.Defense
-        local maxHealth = 50
-        if defense then
-            maxHealth = math.max(maxHealth,defense.MaxHealth)
-        end
-        self:SetMaxHealth(maxHealth)
-        self:SetHealth(self,maxHealth)
-        if not EntityCategoryContains(categories.INVULNERABLE, self) then
-            self:SetCanTakeDamage(true)
-        else
-            self:SetCanTakeDamage(false)
-        end
-
+        local max = math.max(50, bp.Defense.MaxHealth)
+        self:SetMaxHealth(max)
+        self:SetHealth(self, max)
+        self:SetCanTakeDamage(not EntityCategoryContains(categories.INVULNERABLE, self))
         self:SetCanBeKilled(true)
     end,
 
     --Returns the cache position of the prop, since it doesn't move, it's a big optimization
     GetCachePosition = function(self)
-        return self.CachePosition
+        return self.CachePosition or self:GetPosition()
     end,
 
     --Sets if the unit can take damage.  val = true means it can take damage.
@@ -97,11 +85,23 @@ Prop = Class(moho.prop_methods, Entity) {
         Entity.Destroy(self)
     end,
 
-    OnDestroy = function(self)
-        if self.IsWreckage or self.MaxMassReclaim >= RECLAIMLABEL_MIN_MASS then
-            table.insert(Sync.Reclaim, {id=self:GetEntityId(), destroy=true})
-        end
+    SyncMassLabel = function(self)
+        if self.MaxMassReclaim >= RECLAIMLABEL_MIN_MASS then
+            local data = {id = self:GetEntityId()}
 
+            if self:BeenDestroyed() then
+                data.mass = 0
+            else
+                data.mass = self.MaxMassReclaim * self.ReclaimLeft
+                data.position = self:GetCachePosition()
+            end
+
+            table.insert(Sync.Reclaim, data)
+        end
+    end,
+
+    OnDestroy = function(self)
+        self:UpdateReclaimLeft()
         self.Trash:Destroy()
     end,
 
@@ -110,19 +110,21 @@ Prop = Class(moho.prop_methods, Entity) {
         local preAdjHealth = self:GetHealth()
         self:AdjustHealth(instigator, -amount)
         local health = self:GetHealth()
-        if( health <= 0 ) then
-            if( damageType == 'Reclaimed' ) then
+        if health <= 0 then
+            if damageType == 'Reclaimed' then
                 self:Destroy()
             else
                 local excessDamageRatio = 0.0
                 -- Calculate the excess damage amount
                 local excess = preAdjHealth - amount
                 local maxHealth = self:GetMaxHealth()
-                if(excess < 0 and maxHealth > 0) then
+                if excess < 0 and maxHealth > 0 then
                     excessDamageRatio = -excess / maxHealth
                 end
                 self:Kill(instigator, damageType, excessDamageRatio)
             end
+        else
+            self:UpdateReclaimLeft()
         end
     end,
 
@@ -130,18 +132,29 @@ Prop = Class(moho.prop_methods, Entity) {
         return true
     end,
 
-    SetReclaimValues = function(self, masstimemult, energytimemult, mass, energy)
-        self.MassReclaim = math.max( 0, mass )
-        self.EnergyReclaim = math.max( 0, energy )
-        self.ReclaimTimeMassMult = masstimemult
-        self.ReclaimTimeEnergyMult = energytimemult
+    --- Set the mass/energy value of this wreck when at full health, and the time coefficient
+    -- that determine how quickly it can be reclaimed.
+    -- These values are used to set the real reclaim values as fractions of the health as the wreck
+    -- takes damage.
+    SetMaxReclaimValues = function(self, time, mass, energy)
+        self.MaxMassReclaim = mass
+        self.MaxEnergyReclaim = energy
+        self.TimeReclaim = time
+
+        self:UpdateReclaimLeft()
     end,
 
-    SetMaxReclaimValues = function(self, masstimemult, energytimemult, mass, energy)
-        self.MaxMassReclaim = math.max( 0, mass )
-        self.MaxEnergyReclaim = math.max( 0, energy )
-        self.ReclaimTimeMassMult = masstimemult
-        self.ReclaimTimeEnergyMult = energytimemult
+    -- This function mimics the engine's behavior when calculating what value is left of a prop
+    UpdateReclaimLeft = function(self)
+        if not self:BeenDestroyed() then
+            local max = self:GetMaxHealth()
+            local ratio = (max and max > 0 and self:GetHealth() / max) or 1
+            -- we have to take into account if the wreck has been partly reclaimed by an engineer
+            self.ReclaimLeft = ratio * self:GetFractionComplete()
+        end
+
+        -- Notify UI about the mass change
+        self:SyncMassLabel()
     end,
 
     SetPropCollision = function(self, shape, centerx, centery, centerz, sizex, sizey, sizez, radius)
@@ -154,12 +167,11 @@ Prop = Class(moho.prop_methods, Entity) {
         self.CollisionCenterZ = centerz
         self.CollisionShape = shape
         if radius and shape == 'Sphere' then
-            self:SetCollisionShape(shape, centerx, centery, centerz, sizex, sizey, sizez, radius)
+            self:SetCollisionShape(shape, centerx, centery, centerz, radius)
         else
-            self:SetCollisionShape(shape, centerx, centery, centerz, sizex, sizey, sizez)
+            self:SetCollisionShape(shape, centerx, centery + sizey, centerz, sizex, sizey, sizez)
         end
     end,
-
 
     --Prop reclaiming
     -- time = the greater of either time to reclaim mass or energy
@@ -168,18 +180,10 @@ Prop = Class(moho.prop_methods, Entity) {
     -- Energy Time = energy reclaim value / buildrate of thing reclaiming it * BP set energy mult
     -- The time to reclaim is the highest of the two values above.
     GetReclaimCosts = function(self, reclaimer)
-        local rbp = reclaimer:GetBlueprint()
-        local mtime = self.ReclaimTimeMassMult * (self.MassReclaim / reclaimer:GetBuildRate() )
-        local etime = self.ReclaimTimeEnergyMult * (self.EnergyReclaim / reclaimer:GetBuildRate() )
-        local time = mtime
-        if mtime < etime then
-            time = etime
-        end
-        time = math.max( (time/10), 0.0001)  -- this should never be 0 or we'll divide by 0!
-        return time, self.EnergyReclaim, self.MassReclaim
+        local time = self.TimeReclaim * (math.max(self.MaxMassReclaim, self.MaxEnergyReclaim) / reclaimer:GetBuildRate())
+        time = math.max(time / 10, 0.0001)  -- this should never be 0 or we'll divide by 0!
+        return time, self.MaxEnergyReclaim, self.MaxMassReclaim
     end,
-
-
 
     --
     -- Split this prop into multiple sub-props, placing one at each of our bone locations.

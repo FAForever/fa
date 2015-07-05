@@ -2,7 +2,7 @@
 --* File: lua/modules/ui/game/gameresult.lua
 --* Summary: Victory and Defeat behavior
 --*
---* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')

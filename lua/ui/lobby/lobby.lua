@@ -16,7 +16,6 @@ local RadioButton = import('/lua/ui/controls/radiobutton.lua').RadioButton
 local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
 local ResourceMapPreview = import('/lua/ui/controls/resmappreview.lua').ResourceMapPreview
 local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
-local InputDialog = import('/lua/ui/controls/popups/inputdialog.lua').InputDialog
 local Slider = import('/lua/maui/slider.lua').Slider
 local PlayerData = import('/lua/ui/lobby/data/playerdata.lua').PlayerData
 local GameInfo = import('/lua/ui/lobby/data/gamedata.lua')
@@ -117,9 +116,25 @@ local selectedMods = nil
 local CPU_Benchmarks = {} -- Stores CPU benchmark data
 
 local function parseCommandlineArguments()
+    -- Set of all possible command line option keys.
+    -- The client sometimes gives us empty-string as some args, which gets interpreted as that key
+    -- having as value the name of the next key. This set lets us interpret that case using the
+    -- default option.
+    local CMDLINE_ARGUMENT_KEYS = {
+        ["/init"] = true,
+        ["/country"] = true,
+        ["/ratingcolor"] = true,
+        ["/numgames"] = true,
+        ["/mean"] = true,
+        ["/clan"] = true,
+        ["/deviation"] = true,
+        ["/joincustom"] = true,
+        ["/gpgnet"] = true,
+    }
+
     local function GetCommandLineArgOrDefault(argname, default)
         local arg = GetCommandLineArg(argname, 1)
-        if arg then
+        if arg and not CMDLINE_ARGUMENT_KEYS[arg[1]] then
             return arg[1]
         end
 
@@ -274,19 +289,10 @@ local slotMenuData = {
     },
 }
 
-local function GetAITooltipList()
-    local aitypes = import('/lua/ui/lobby/aitypes.lua').aitypes
-    local retTable = {nil, nil}
-    --end new faf part
-    for i, v in aitypes do
-        table.insert(retTable, 'aitype_'..v.key)
-    end
-    return retTable
-end
-
-local function GetSlotMenuTables(stateKey, hostKey)
+local function GetSlotMenuTables(stateKey, hostKey, slotNum)
     local keys = {}
     local strings = {}
+    local tooltips = {}
 
     if not slotMenuData[stateKey] then
         WARN("Invalid slot menu state selected: " .. stateKey)
@@ -312,22 +318,28 @@ local function GetSlotMenuTables(stateKey, hostKey)
             for aiindex, aidata in aitypes do
                 table.insert(keys, aidata.key)
                 table.insert(strings, aidata.name)
+                table.insert(tooltips, 'aitype_'..aidata.key)
             end
         elseif key == 'move' then
             -- Generate the "move player to slot X" entries.
             for i = 1, numOpenSlots, 1 do
-                table.insert(keys, 'move_player_to_slot' .. i)
-                table.insert(strings, LOCF("<LOC lobui_0596>Move Player to slot %s", i))
+                if i ~= slotNum then
+                    table.insert(keys, 'move_player_to_slot' .. i)
+                    table.insert(strings, LOCF("<LOC lobui_0596>Move Player to slot %s", i))
+                    table.insert(tooltips, nil)
+                end
             end
         else
             if not (isPlayerReady and key == 'occupy') then
                 table.insert(keys, key)
                 table.insert(strings, slotMenuStrings[key])
+                -- Add a tooltip key here if we ever get any interesting options.
+                table.insert(tooltips, nil)
             end
         end
     end
 
-    return keys, strings
+    return keys, strings, tooltips
 end
 
 --- Get the value of the LastFaction, sanitised in case it's an unsafe value.
@@ -503,19 +515,14 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
                 ReturnToMenu(false)
                 EscapeHandler.PopEscapeHandler()
             end,
-            "<LOC _Cancel>", function() end,
+
+            -- Fight to keep our focus on the chat input box, to prevent keybinding madness.
+            "<LOC _Cancel>", function()
+                GUI.chatEdit:AcquireFocus()
+            end,
             nil, nil,
             true
         )
-
-        -- Prevent the dialog from being dismissed
-        quitDialog.OnEscapePressed = function() end
-        quitDialog.OnShadowClicked = function() end
-
-        -- Fight to keep our focus on the chat input box, to prevent keybinding madness.
-        quitDialog.OnClosed = function()
-            GUI.chatEdit:AcquireFocus()
-        end
     end
     EscapeHandler.PushEscapeHandler(GUI.exitLobbyEscapeHandler)
 
@@ -718,6 +725,16 @@ function UpdateSlotBackground(slotIndex)
     end
 end
 
+function GetPlayerDisplayName(playerInfo)
+    local playerName = playerInfo.PlayerName
+    local displayName = ""
+    if playerInfo.PlayerClan ~= "" then
+        return string.format("[%s] %s", playerInfo.PlayerClan, playerInfo.PlayerName)
+    else
+        return playerInfo.PlayerName
+    end
+end
+
 -- update the data in a player slot
 -- TODO: With lazyvars, this function should be eliminated. Lazy-value-callbacks should be used
 -- instead to incrementaly update things.
@@ -803,19 +820,17 @@ function SetSlotInfo(slotNum, playerInfo)
 
     if slotState then
         slot.name:Enable()
-        local slotKeys, slotStrings = GetSlotMenuTables(slotState, hostKey)
+        local slotKeys, slotStrings, slotTooltips = GetSlotMenuTables(slotState, hostKey, slotNum)
         slot.name.slotKeys = slotKeys
-        if isHost and slotState == 'ai' then
-            Tooltip.AddComboTooltip(slot.name, GetAITooltipList())
-        else
-            Tooltip.RemoveComboTooltip(slot.name)
-        end
+
         if table.getn(slotKeys) > 0 then
             slot.name:AddItems(slotStrings)
             slot.name:Enable()
+            Tooltip.AddComboTooltip(slot.name, slotTooltips)
         else
             slot.name.slotKeys = nil
             slot.name:Disable()
+            Tooltip.RemoveComboTooltip(slot.name)
         end
     else
         -- no slotState indicate this must be ourself, and you can't do anything to yourself
@@ -849,18 +864,10 @@ function SetSlotInfo(slotNum, playerInfo)
         slot.name._text:SetFont('Arial Gras', 12)
     end
 
-
-    local playerName = playerInfo.PlayerName
-    local displayName = ""
-    if playerInfo.PlayerClan ~= "" then
-        displayName = string.format("[%s] %s", playerInfo.PlayerClan, playerInfo.PlayerName)
-    else
-        displayName = playerInfo.PlayerName
-    end
-
     --\\ Stop - Color the Name in Slot by State
+    local playerName = playerInfo.PlayerName
     if wasConnected(playerInfo.OwnerID) or isLocallyOwned or not playerInfo.Human then
-        slot.name:SetTitleText(displayName)
+        slot.name:SetTitleText(GetPlayerDisplayName(playerInfo))
         slot.name._text:SetFont('Arial Gras', 15)
         if not table.find(ConnectionEstablished, playerName) then
             if playerInfo.Human and not isLocallyOwned then
@@ -871,7 +878,7 @@ function SetSlotInfo(slotNum, playerInfo)
                 end
 
                 table.insert(ConnectionEstablished, playerName)
-                for k, v in CurrentConnection do -- Remove PlayerName in this Table
+                for k, v in CurrentConnection do
                     if v == playerName then
                         CurrentConnection[k] = nil
                         break
@@ -945,7 +952,7 @@ function ClearSlotInfo(slotIndex)
         stateText = slotMenuStrings.open
     end
 
-    local slotKeys, slotStrings = GetSlotMenuTables(stateKey, hostKey)
+    local slotKeys, slotStrings, slotTooltips = GetSlotMenuTables(stateKey, hostKey)
 
     -- set the text appropriately
     slot.name:ClearItems()
@@ -953,10 +960,12 @@ function ClearSlotInfo(slotIndex)
     if table.getn(slotKeys) > 0 then
         slot.name.slotKeys = slotKeys
         slot.name:AddItems(slotStrings)
+        Tooltip.AddComboTooltip(slot.name, slotTooltips)
         slot.name:Enable()
     else
         slot.name.slotKeys = nil
         slot.name:Disable()
+        Tooltip.RemoveComboTooltip(slot.name)
     end
 
     slot.name._text:SetFont('Arial Gras', 12)
@@ -964,12 +973,6 @@ function ClearSlotInfo(slotIndex)
         slot.name:SetTitleTextColor("Crimson")
     else
         slot.name:SetTitleTextColor('B9BFB9')
-    end
-
-    if lobbyComm:IsHost() and stateKey == 'open' then
-        Tooltip.AddComboTooltip(slot.name, GetAITooltipList())
-    else
-        Tooltip.RemoveComboTooltip(slot.name)
     end
 
     slot:HideControls()
@@ -1651,9 +1654,11 @@ local function TryLaunch(skipNoObserversCheck)
         AssignRandomStartSpots()
         AssignAINames()
         local allRatings = {}
+        local clanTags = {}
         for k, player in gameInfo.PlayerOptions do
             if player.Human and player.PL then
                 allRatings[player.PlayerName] = player.PL
+                clanTags[player.PlayerName] = player.PlayerClan
             end
 
             if player.OwnerID == localPlayerID then
@@ -1661,6 +1666,7 @@ local function TryLaunch(skipNoObserversCheck)
             end
         end
         gameInfo.GameOptions['Ratings'] = allRatings
+        gameInfo.GameOptions['ClanTags'] = clanTags
 
         -- Tell everyone else to launch and then launch ourselves.
         -- TODO: Sending gamedata here isn't necessary unless lobbyComm is fucking stupid and allows
@@ -3179,10 +3185,13 @@ function CalcConnectionStatus(peer)
     else
         if not wasConnected(peer.id) then
             local peerSlot = FindSlotForID(peer.id)
-            GUI.slots[peerSlot].name:SetTitleText(peer.name)
-            GUI.slots[peerSlot].name._text:SetFont('Arial Gras', 15)
+            local slot = GUI.slots[peerSlot]
+            local playerInfo = gameInfo.PlayerOptions[peerSlot]
+
+            slot.name:SetTitleText(GetPlayerDisplayName(playerInfo))
+            slot.name._text:SetFont('Arial Gras', 15)
             if not table.find(ConnectionEstablished, peer.name) then
-                if gameInfo.PlayerOptions[peerSlot].Human and not IsLocallyOwned(peerSlot) then
+                if playerInfo.Human and not IsLocallyOwned(peerSlot) then
                     if table.find(ConnectedWithProxy, peer.id) then
                         AddChatText(LOCF("<LOC Engine0032>Connected to %s via the FAF proxy.", peer.name), "Engine0032")
                     end
@@ -4495,6 +4504,11 @@ function SavePresetsList(list)
     SavePreferences()
 end
 
+--- Delegate to UIUtil's CreateInputDialog, adding the ridiculus chatEdit hack.
+function CreateInputDialog(parent, title, listener)
+    UIUtil.CreateInputDialog(parent, title, listener, GUI.chatEdit)
+end
+
 -- Show the lobby preset UI.
 function ShowPresetDialog()
     local dialogContent = Group(GUI)
@@ -4693,12 +4707,6 @@ function CreateHelpWindow()
     OkButton.OnClick = function(self)
         helpWindow:Close()
     end
-end
-
--- Create an input dialog with the given title and listener function.
-function CreateInputDialog(parent, title, listener)
-    local dialog = InputDialog(parent, title, GUI.chatEdit)
-    dialog.OnInput = listener
 end
 
 -- Refresh list of presets
@@ -5071,7 +5079,7 @@ function InitHostUtils()
 
             -- This one's only specific to moving to an empty slot, naturally.
             if gameInfo.PlayerOptions[requestedSlot] then
-                LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. moveTo .. " already occupied")
+                LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. requestedSlot .. " already occupied")
                 return false
             end
 

@@ -1,21 +1,19 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/XSS0201/XSS0201_script.lua
-#**  Author(s):  Greg Kohne, Gordon Duclos, Aaron Lundquist
-#**
-#**  Summary  :  Seraphim Destroyer Script
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/XSS0201/XSS0201_script.lua
+--**  Author(s):  Greg Kohne, Gordon Duclos, Aaron Lundquist
+--**
+--**  Summary  :  Seraphim Destroyer Script
+--**
+--**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local SSubUnit = import('/lua/seraphimunits.lua').SSubUnit
 local SeraphimWeapons = import('/lua/seraphimweapons.lua')
 local SDFUltraChromaticBeamGenerator = SeraphimWeapons.SDFUltraChromaticBeamGenerator02
 local SANAnaitTorpedo = SeraphimWeapons.SANAnaitTorpedo
 local SDFAjelluAntiTorpedoDefense = SeraphimWeapons.SDFAjelluAntiTorpedoDefense
-#we're making it a sea unit... just to see how it goes
-local SSeaUnit = import('/lua/seraphimunits.lua').SSeaUnit
 
-XSS0201 = Class(SSeaUnit) {
+XSS0201 = Class(SSubUnit) {
     BackWakeEffect = {},
     Weapons = {
         FrontTurret = Class(SDFUltraChromaticBeamGenerator) {},
@@ -48,8 +46,8 @@ XSS0201 = Class(SSeaUnit) {
         for k, v in wep2.Beams do
             v.Beam:Disable()
         end
-        
-        SSeaUnit.OnKilled(self, instigator, type, overkillRatio)
+
+        SSubUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
     
     OnMotionVertEventChange = function( self, new, old )
@@ -62,10 +60,5 @@ XSS0201 = Class(SSeaUnit) {
             self:SetWeaponEnabledByLabel('BackTurret', false)
         end
     end,
-    
-	OnStopBeingBuilt = function(self, builder, layer)
-		SSubUnit.OnStopBeingBuilt(self, builder, layer)
-		IssueDive({self})
-	end,
 }
 TypeClass = XSS0201

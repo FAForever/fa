@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aeon Sub Commander Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
@@ -24,13 +24,6 @@ UAL0301 = Class(CommandUnit) {
 
     __init = function(self)
         CommandUnit.__init(self, 'RightReactonCannon')
-    end,
-
-    OnStartBuild = function(self, unitBeingBuilt, order)
-        CommandUnit.OnStartBuild(self, unitBeingBuilt, order)
-        self.UnitBeingBuilt = unitBeingBuilt
-        self.UnitBuildOrder = order
-        self.BuildingUnit = true
     end,
 
     OnStopBuild = function(self, unitBeingBuilt)

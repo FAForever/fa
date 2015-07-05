@@ -5,115 +5,132 @@ Exploits
 --------
 
 - Instant crash exploit partially fixed
+- No longer possible to give away units in progress of being captured
+- No longer possible to bypass unit restrictions with sneaky UI mods
+- Fixed being able to remotely destroy wreckage anywhere on the battlefield
 
 
 Bugs
 ----
 
-- Seraphim sniperbot is able to hit Cybran MML again
-
-- T3 Torpedo Bomber can use Attack-Move properly again
-
-- Shield disruptor now works on personal shields
-
-- Fixed wrong consumption when repairing ACU after an upgrade finished
-
-- Support factories no longer lose progress if they are damaged during upgrade
-
-- Units with weapon range upgrades now stop at maximum range when using attack-move 
-
-- Aeon SCUs with nano + vet now get correct regen rate 
-
-- Disable build effect beams on sinking engineers
-
-- Projectiles no longer collide with sinking units
-
-- Fixed share until death bug with dual-given units
-
-- Fixed bug with insta-disappearing wrecks due to garbage collect
-
-- Cybran ACU can now fire the laser when standing in water
-
-- Fixed Seraphim T1 Mobile Artillery not firing at fast targets properly
-
+Hitboxes
+- Seraphim sniper bot is able to hit Cybran MML again
 - Fixed SCUs not being hit properly by laser weapons
+- Fixed units aiming too high on the UEF and Aeon SCUs
 
+Visual
+- Fixed shield structure glows and rotations not playing
+- Fixed bug with capture progress bar not being synced if using multiple engineers
 - Optimised the range-rings shader to reduce the way FPS falls off a cliff
+- Fixed bug with instantly disappearing wrecks due to garbage collection
+- Fixed wrong regen values being reported on UI-side
+- Disable build effect beams on sinking engineers
+- Reload bar refill rate now scales with RateOfFire buffs
+- Legacy checkbox UI code working again
+- Fixed Engineers spawning the wrong tarmacs when building Seraphim buildings
+- Engineering stations no longer exhibit a model bug when rebuilt by an assisting SCU
 
-- T3 Transport now leaves a wreck in water
-
-- Minimap now remembers whether to show resource icons or not
-
-- Current commandmode no longer reset if an engineer dies in the current selection 
-
+Physics
+- Projectiles no longer collide with sinking units
+- UEF T3 Transport now leaves wreck in water
+- Cybran ACU can now fire the laser when standing in water
+- Fixed Seraphim T1 Mobile Artillery not firing at fast targets properly
+- Yolona Oss now deals damage to itself
+- Flares and depth charges no longer draw in friendly projectiles
 - Fix shots sometimes going right through Walled PD
+- Increased Aeon T3 Artillery MuzzleVelocity to allow it to fire at its maximum range
 
-- Flares and depth-chages no longer draw in friendly projectiles
-
+Other
+- T3 Torpedo Bomber can use Attack-Move properly again
+- Units with weapon range upgrades now stop at maximum range when using attack-move
+- Shield disruptor now works on personal shields
+- Fixed wrong consumption when repairing ACU after an upgrade finished
+- Support factories no longer lose progress if they are damaged during upgrade
+- Aeon SCUs with nano + vet now get correct regen rate
+- Fixed share until death bug with dual-given units
+- Mini map now remembers whether to show resource icons or not
+- Current command mode no longer reset if an engineer dies in the current selection
+- Fixed bug with chat messages having wrong recipients in replay
+- Seraphim and Aeon T2 shields can now pause while upgrading to T3
+- Fixed RateOfFire buffs not being applied correctly
+- SCUs will no longer rebuild buildings they lack to ability to build
+- Upgraded buildings rebuilt by assisting SCUs will now cost the correct amount
 
 Enhancements
 ------------
 
+Visual
 - Scathis now has Amphibious build icon
-
 - Attack and Nuke reticles now scale with impact radius
-
 - TMLs now show the splash damage radius in targeting mode
-
-- Engineering Station units now pause on transfer from one player to another
-
 - Cybran Engineers now display a build beam to clearly show what they're tasked to
-
 - Cybran factories now have red build beams
-
-- Number of Cybran build bots scale with buildpower of the engineer
-
-- Cybran build bots now can assist next build project without respawning
-
-- 34 new taunts
-
-- The least valueable units are destroyed at unit transfer if unitcap is hit
-
-- "Commander under attack" now works on shielded ACUs
-
-- Remove owner-check on text pings so anyone can delete them
-
-- Disable assist command on upgrading factories to prevent accidental
-  cancelling
-
+- Number of Cybran build bots scale with buildpower of the engineer, to a maximum of 10
 - Ping values under "Connectivity" (F11) now update during game stop/stall
-
 - Added Yolona Oss to Mavor/Salvation/Scathis build restriction and renamed it
   Super-Game-Enders
+- ASF effects tweaked for performance (less effects on low fidelity)
+- Cybran engineering build bots now crash when their owner dies rather than just vanishing
+- Quantum Gateways now can assist each other
+- Enhanced Seraphim tarmacs
+- Beams originating inside Fog of War will no longer be invisible
+- Cybran buildbots are no longer invisible to other players
 
-- New option: Show reclaim value of wreckage on map
 
-- ASF effects tweaked for performance (less effects on low fidelty)
-
+UI
+- New option: Show reclaim value of wreckage on map by pressing Ctrl-Shift
+  (need to enable it in Options / Interface and restart game)
 - Smart selection feature allowing hotkeys to select units by category
+- Remove owner-check on text pings so anyone can delete them
+- Reclaim/second now shown
+- Reclaimed mass now counts towards the score table
+- UEF ACU and SCU drones now have an on-drone button to toggle if they are rebuilt at death
+- Now possible to pause units to make them pause execution of queued up orders
+- Debug window: Searching for units now supports unit name and substrings
+- Cybran engineering build bots no longer display the heads-up consumption overlay
+- "Commander under attack" now plays for shielded ACUs
+- 34 new taunts
+- Added a button to unbind key mappings
+- Drop shadow for chat messages
+- Chat Option: Add background to chat messages when chat window is closed
+- Chat Option: Allow chat to timeout normally in the feed after closing window
 
+Other
+- Engineering Station units now pause on transfer from one player to another
+- Cybran build bots now can assist next build project without respawning
+- The least valuable units are destroyed at unit transfer if unitcap is hit
 - Absolver shield disrupter now hovers higher, so it's less likely to hit the
   floor with the very low mounted gun
-
-- Reclaimed mass now counts towards the score table
-
-- Reclaim/second now shown
-
+- UEF SCU Drone can now capture, the same as the ACU ones
 - Tiny changes to make Fatboy/Megalith/Spiderbot weapons symmetrical in
   behaviour where they should be
-
+- Added templates for all support factories. AI in coop missions is now able to
+  rebuild support factories
+- Assist now prioritize building over repair
+- Share Until Death is now default
+- Mod size reduced by about 30 MB
 
 Contributors
 ------------
 
+- CodingSquirrel
 - Crotalus
-- Exotic Retard
+- DukeOfEarl
+- Eximius
 - IceDreamer
-- Partytime
 - ResinSmoker
 - Sheeo
+- Speed2
+- anihilnine
+- bamboofats
 - ckitching
+- quark036
 - shalkya
+
+Special Thanks To
+- Softly
+- Exotic Retard
+- Nyx
 
 Patch 3640 (Jan 6, 2015)
 ==========

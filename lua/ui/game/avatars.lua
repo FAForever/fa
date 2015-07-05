@@ -3,7 +3,7 @@
 --* Author: Ted Snook
 --* Summary: In Game Avatar Icons
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -746,8 +746,11 @@ function AvatarUpdate()
     local needsAvatarLayout = false
     local validAvatars = {}
 
-    currentFaction = GetArmiesTable().armiesTable[GetFocusArmy()].faction + 1
-
+    -- Find the faction key (1 - 4 valid. 5+ happen for Civilian, default to 4 to use Seraphim textures)
+    -- armiesTable[GetFocusArmy()].faction returns 0 = UEF, 1 = Aeon, 2 = Cybran, 3 = Seraphim, 4 = Civilian Army, 5 = Civilian Neutral
+    -- We want 1 - 4, with 4 max
+    currentFaction = math.min(GetArmiesTable().armiesTable[GetFocusArmy()].faction + 1, 4)
+    
     if avatars then
         for _, unit in avatars do
             if controls.avatars[unit:GetEntityId()] then

@@ -4,7 +4,7 @@
 #**
 #**  Summary  :  Global builder group table and blueprint methods
 #**
-#**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2008 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 # Global list of all buffs found in the system.

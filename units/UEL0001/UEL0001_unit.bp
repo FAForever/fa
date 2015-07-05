@@ -149,6 +149,7 @@ UnitBlueprint {
         'OVERLAYOMNI',
         'OVERLAYDEFENSE',
         'BUBBLESHIELDSPILLOVERCHECK',
+        'SHOWATTACKRETICLE',
     },
     Defense = {
         AirThreatLevel = 0,

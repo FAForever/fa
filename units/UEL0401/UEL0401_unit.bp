@@ -18,13 +18,13 @@ UnitBlueprint {
             'UEL0401',
         },
 		AddTargetBones = {
-            'Turret_Left01_Barrel02',  # added to make unit targetable even when almost submerged [141]
+            'Turret_Left01_Barrel02',
             'Turret_Left02_Barrel02',
-            'Turret_Right01_Barrel02', #from Turret_Right01_Barrel02
+            'Turret_Right01_Barrel02',
             'Turret_Right02_Barrel02',
-			'Attachpoint3', 			#this is new, it's the rear-most air staging facility
-			'Turret_Left_AA',		#new	
-			'Turret_Right_AA',		#new
+			'Attachpoint3',
+			'Turret_Left_AA',
+			'Turret_Right_AA',
         },
     },
     Audio = {
@@ -152,7 +152,7 @@ UnitBlueprint {
             ShieldRegenRate = 64,
             ShieldRegenStartTime = 1,
             ShieldSize = 25,
-            ShieldSpillOverDamageMod = 0, # we keep it different from other mobile shields
+            ShieldSpillOverDamageMod = 0,
             ShieldVerticalOffset = -7,
         },
         SubThreatLevel = 40,
@@ -1183,8 +1183,8 @@ UnitBlueprint {
             Air = false,
             Land = true,
             Seabed = true,
-            Sub = true, #from false
-            Water = true, #from false
+            Sub = true,
+            Water = true,
         },
     },
 }
