@@ -4,7 +4,7 @@
 #**
 #**  Summary  : Default economic builders for skirmish
 #**
-#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 function AddGlobalBaseTemplate(aiBrain, locationType, baseBuilderName)

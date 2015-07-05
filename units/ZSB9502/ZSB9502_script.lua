@@ -4,7 +4,7 @@
 #**
 #**  Summary  :  Seraphim T2 Air Factory Script
 #**
-#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 local SAirFactoryUnit = import('/lua/seraphimunits.lua').SAirFactoryUnit
 ZSB9502 = Class(SAirFactoryUnit) {

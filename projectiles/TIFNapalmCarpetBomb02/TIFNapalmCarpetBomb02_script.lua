@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Heavy Napalm Bomb, DEA0202
 #**
-#**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 local TNapalmHvyCarpetBombProjectile = import('/lua/terranprojectiles.lua').TNapalmHvyCarpetBombProjectile
 local EffectTemplate = import('/lua/EffectTemplates.lua')

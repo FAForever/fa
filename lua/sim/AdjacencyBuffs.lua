@@ -2,7 +2,7 @@
 #**
 #**  File     :  /lua/sim/AdjacencyBuffs.lua
 #**
-#**  Copyright Â© 2008 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local AdjBuffFuncs = import('/lua/sim/AdjacencyBuffFunctions.lua')

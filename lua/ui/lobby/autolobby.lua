@@ -4,7 +4,7 @@
 --* Summary: Autolaunching games from GPGNet.  This is intentionally designed
 --* to have no user options as GPGNet is setting them for the player.
 --*
---* Copyright Â© 2006 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')

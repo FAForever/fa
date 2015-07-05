@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Accumulates score info during the game
 --*
---* Copyright Â© :005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright © :005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 -- this table collects score info from the sync table and stores it for later use

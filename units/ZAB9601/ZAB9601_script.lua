@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Aeon Land Factory Tier 3 Script
 #**
-#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local ALandFactoryUnit = import('/lua/aeonunits.lua').ALandFactoryUnit

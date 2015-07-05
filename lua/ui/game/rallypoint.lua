@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Shows the first command in the queue for selected factories
 --*
---* Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local WorldMesh = import('/lua/ui/controls/worldmesh.lua').WorldMesh

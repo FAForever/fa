@@ -4,7 +4,7 @@
 #**
 #**  Summary  : Builder definitions for expansion bases
 #**
-#**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local BBTmplFile = '/lua/basetemplates.lua'

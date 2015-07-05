@@ -6,7 +6,7 @@ mod_info.lua file which contains various bits of info:
 
     name = "Happy mod"                          # Name to use for this mod
     version = 123                               # Version number to use for this mod
-    copyright = "Copyright Â© 2006, Someone"     # Optional copyright info
+    copyright = "Copyright © 2006, Someone"     # Optional copyright info
     description = "A long description of happy mod and why it will make you happy"
     author = "Joe"                              # Optional author info
     url = "http://www.gaspoweredgames.com"      # Optional URL to anywhere author likes

@@ -2,7 +2,7 @@
 #**
 #**  File     :  /lua/sim/buffdefinition.lua
 #**
-#**  Copyright Â© 2008 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 import('/lua/sim/AdjacencyBuffs.lua')

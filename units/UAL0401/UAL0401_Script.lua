@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Aeon Galactic Colossus Script
 #**
-#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 local AWalkingLandUnit = import('/lua/aeonunits.lua').AWalkingLandUnit
 local WeaponsFile = import ('/lua/aeonweapons.lua')

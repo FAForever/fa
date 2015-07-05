@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Uall Cavitation Torpedo Projectile script, XSS0203
 #**
-#**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 SANUallCavitationTorpedo02 = Class(import('/lua/seraphimprojectiles.lua').SUallCavitationTorpedo) {

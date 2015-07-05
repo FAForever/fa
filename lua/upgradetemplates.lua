@@ -6,7 +6,7 @@
 #**  Summary  :  This is a list of all units that upgrade, and what
 #**              they upgrade to.
 #**
-#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 UnitUpgradeTemplates =

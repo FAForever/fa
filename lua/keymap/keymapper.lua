@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Utility functions to map keys to actions
 --*
---* Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local Prefs = import('/lua/user/prefs.lua')

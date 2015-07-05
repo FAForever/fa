@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Seraphim Commander Script
 --**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
 local Buff = import('/lua/sim/Buff.lua')

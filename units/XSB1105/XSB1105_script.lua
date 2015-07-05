@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Aeon Energy Storage
 #**
-#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 local SEnergyStorageUnit = import('/lua/seraphimunits.lua').SEnergyStorageUnit
 

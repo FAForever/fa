@@ -4,7 +4,7 @@
 #**
 #**  Summary  : Manage Skirmish Strategies
 #**
-#**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved. All lefts reserved too.
+#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved. All lefts reserved too.
 #****************************************************************************
 
 local BuilderManager = import('/lua/sim/BuilderManager.lua').BuilderManager

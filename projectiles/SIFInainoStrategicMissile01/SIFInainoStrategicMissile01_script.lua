@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Inaino Strategic Missile Projectile script, XSB2305
 #**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 local SIFInainoStrategicMissile = import('/lua/seraphimprojectiles.lua').SIFInainoStrategicMissile
 

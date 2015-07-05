@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Heavy Cavitation Torpedo Projectile script, XSA0204
 #**
-#**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local SHeavyCavitationTorpedo = import('/lua/seraphimprojectiles.lua').SHeavyCavitationTorpedo

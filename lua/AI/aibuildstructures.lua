@@ -5,7 +5,7 @@
 #**
 #**  Summary  : Foundation script for all structure building in the AI.
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 local BaseTmplFile = import('/lua/basetemplates.lua')
 local BaseTemplates = import('/lua/basetemplates.lua').BaseTemplates

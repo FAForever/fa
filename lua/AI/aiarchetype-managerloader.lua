@@ -4,7 +4,7 @@
 #**
 #**  Summary  : Rush AI
 #**
-#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local AIBuildUnits = import('/lua/ai/aibuildunits.lua')

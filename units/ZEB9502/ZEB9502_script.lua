@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  UEF T2 Air Factory Script
 #**
-#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local TAirFactoryUnit = import('/lua/terranunits.lua').TAirFactoryUnit

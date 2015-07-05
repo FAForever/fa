@@ -4,7 +4,7 @@
 #**
 #**  Summary  :  UEF Combat Engineer T2
 #**
-#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local EffectTemplate = import('/lua/EffectTemplates.lua')

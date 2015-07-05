@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  UEF Tier 2 Land Factory Script
 #**
-#**  Copyright Â© 2006 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local TLandFactoryUnit = import('/lua/terranunits.lua').TLandFactoryUnit
