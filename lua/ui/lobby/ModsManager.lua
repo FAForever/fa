@@ -67,18 +67,18 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
     modsDialog = Popup(parent, dialogContent)
 
     -- Title
-    local text0 = UIUtil.CreateText(dialogContent, 'Mod Manager', 17, 'Arial')
-    text0:SetColor('B9BFB9')
-    text0:SetDropShadow(true)
-    LayoutHelpers.AtHorizontalCenterIn(text0, dialogContent, 0)
-    LayoutHelpers.AtTopIn(text0, dialogContent, 10)
+    local title = UIUtil.CreateText(dialogContent, 'Mod Manager', 17, 'Arial')
+    title:SetColor('B9BFB9')
+    title:SetDropShadow(true)
+    LayoutHelpers.AtHorizontalCenterIn(title, dialogContent, 0)
+    LayoutHelpers.AtTopIn(title, dialogContent, 10)
         
     -- SubTitle
-    local text1 = UIUtil.CreateText(dialogContent, '', 12, 'Arial')
-    text1:SetColor('B9BFB9')
-    text1:SetDropShadow(true)
-    LayoutHelpers.AtHorizontalCenterIn(text1, dialogContent, 0)
-    LayoutHelpers.AtTopIn(text1, dialogContent, 26)
+    local subtitle = UIUtil.CreateText(dialogContent, '', 12, 'Arial')
+    subtitle:SetColor('B9BFB9')
+    subtitle:SetDropShadow(true)
+    LayoutHelpers.AtHorizontalCenterIn(subtitle, dialogContent, 0)
+    LayoutHelpers.AtTopIn(subtitle, dialogContent, 26)
         
     -- Save button
     local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok", -1)
@@ -298,7 +298,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
             end
         end
         
-        text1:SetText(count_mod_SIM_activated()..' Game Mods and '..count_mod_UI_activated()..' UI Mods activated')
+        subtitle:SetText(count_mod_SIM_activated()..' Game Mods and '..count_mod_UI_activated()..' UI Mods activated')
         
         local function UNActiveMod(the_mod)
             the_mod.activated = false
@@ -324,7 +324,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
                 the_exclusif_mod.type:SetText('Exclusive Mod Activated')
                 the_exclusif_mod.bg:SetTexture(UIUtil.SkinnableFile('/MODS/enabled.dds'))
                 PlaySound(Sound({Cue = "UI_Mod_Select", Bank = "Interface",}))
-                text1:SetText(count_mod_SIM_activated()..' Game Mods and '..count_mod_UI_activated()..' UI Mods activated')
+                subtitle:SetText(count_mod_SIM_activated()..' Game Mods and '..count_mod_UI_activated()..' UI Mods activated')
             end
             UIUtil.QuickDialog(GUI_ModsManager, 
                 "<LOC uimod_0010>The mod you have requested is marked as exclusive. If you select this mod, all other mods will be disabled. Do you wish to enable this mod?",
@@ -449,7 +449,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
                 end
                 ActiveMod(the_mod)
                 PlaySound(Sound({Cue = "UI_Mod_Select", Bank = "Interface",}))
-                text1:SetText(count_mod_SIM_activated()..' Game Mods and '..count_mod_UI_activated()..' UI Mods activated')
+                subtitle:SetText(count_mod_SIM_activated()..' Game Mods and '..count_mod_UI_activated()..' UI Mods activated')
             end
             UIUtil.QuickDialog(GUI_ModsManager,
                 "<LOC uimod_0011>You currently have an exclusive mod selected, do you wish to deselect it?",
@@ -487,7 +487,7 @@ function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
                                     end
                                 end
                                 PlaySound(Sound({Cue = "UI_Mod_Select", Bank = "Interface",}))
-                                text1:SetText(count_mod_SIM_activated()..' Game Mods and '..count_mod_UI_activated()..' UI Mods activated')
+                                subtitle:SetText(count_mod_SIM_activated()..' Game Mods and '..count_mod_UI_activated()..' UI Mods activated')
                             end
                         end
                     elseif event.Type == 'MouseEnter' then
