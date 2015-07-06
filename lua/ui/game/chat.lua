@@ -182,20 +182,20 @@ function CreateChatLines()
     local function CreateChatLine()
         local line = Group(GUI.chatContainer)
 
+        -- Draw the faction icon with a colour representing the team behind it.
         line.teamColor = Bitmap(line)
         line.teamColor:SetSolidColor('00000000')
         line.teamColor.Height:Set(line.Height)
         line.teamColor.Width:Set(line.Height)
-        line.teamColor.Left:Set(line.Left)
-        line.teamColor.Top:Set(line.Top)
+        LayoutHelpers.AtLeftTopIn(line.teamColor, line)
 
         line.factionIcon = Bitmap(line.teamColor)
         line.factionIcon:SetSolidColor('00000000')
         LayoutHelpers.FillParent(line.factionIcon, line.teamColor)
 
+        -- Player name
         line.name = UIUtil.CreateText(line, '', ChatOptions.font_size, "Arial Bold")
-        line.name.Left:Set(function() return line.teamColor.Right() + 4 end)
-        LayoutHelpers.AtVerticalCenterIn(line.name, line.teamColor)
+        LayoutHelpers.CenteredRightOf(line.name, line.teamColor, 4)
         line.name.Depth:Set(function() return line.Depth() + 10 end)
         line.name:SetColor('ffffffff')
         line.name:DisableHitTest()
