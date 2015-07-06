@@ -397,6 +397,8 @@ function SetupChatScroll()
             end
         end
         while GUI.chatLines[index] do
+            local line = GUI.chatLines[index]
+
             if not chatHistory[curEntry].wrappedtext[curTop] then
                 if chatHistory[curEntry].new then chatHistory[curEntry].new = nil end
                 curTop = 1
@@ -408,76 +410,76 @@ function SetupChatScroll()
             if chatHistory[curEntry] then
                 local Index = index
                 if curTop == 1 then
-                    GUI.chatLines[index].name:SetText(chatHistory[curEntry].name)
+                    line.name:SetText(chatHistory[curEntry].name)
                     if chatHistory[curEntry].armyID == GetFocusArmy() then
-                        GUI.chatLines[index].name:Disable()
+                        line.name:Disable()
                     else
-                        GUI.chatLines[index].name:Enable()
+                        line.name:Enable()
                     end
-                    GUI.chatLines[index].text:SetText(chatHistory[curEntry].wrappedtext[curTop] or "")
-                    GUI.chatLines[index].teamColor:SetSolidColor(chatHistory[curEntry].color)
-                    GUI.chatLines[index].factionIcon:SetTexture(UIUtil.UIFile(FactionsIcon[chatHistory[curEntry].faction]))
-                    GUI.chatLines[index].IsTop = true
-                    GUI.chatLines[index].chatID = chatHistory[curEntry].armyID
-                    if chatHistory[curEntry].camera and not GUI.chatLines[index].camIcon then
-                        GUI.chatLines[index].camIcon = Bitmap(GUI.chatLines[index].text, UIUtil.UIFile('/game/camera-btn/pinned_btn_up.dds'))
-                        GUI.chatLines[index].camIcon.Height:Set(16)
-                        GUI.chatLines[index].camIcon.Width:Set(20)
-                        LayoutHelpers.AtVerticalCenterIn(GUI.chatLines[index].camIcon, GUI.chatLines[index].teamColor)
-                        GUI.chatLines[index].camIcon.Left:Set(function() return GUI.chatLines[Index].name.Right() + 4 end)
-                        GUI.chatLines[index].text.Left:Set(function() return GUI.chatLines[Index].camIcon.Right() + 4 end)
-                    elseif not chatHistory[curEntry].camera and GUI.chatLines[index].camIcon then
-                        GUI.chatLines[index].camIcon:Destroy()
-                        GUI.chatLines[index].camIcon = false
-                        GUI.chatLines[index].text.Left:Set(function() return GUI.chatLines[Index].name.Right() + 2 end)
+                    line.text:SetText(chatHistory[curEntry].wrappedtext[curTop] or "")
+                    line.teamColor:SetSolidColor(chatHistory[curEntry].color)
+                    line.factionIcon:SetTexture(UIUtil.UIFile(FactionsIcon[chatHistory[curEntry].faction]))
+                    line.IsTop = true
+                    line.chatID = chatHistory[curEntry].armyID
+                    if chatHistory[curEntry].camera and not line.camIcon then
+                        line.camIcon = Bitmap(line.text, UIUtil.UIFile('/game/camera-btn/pinned_btn_up.dds'))
+                        line.camIcon.Height:Set(16)
+                        line.camIcon.Width:Set(20)
+                        LayoutHelpers.AtVerticalCenterIn(line.camIcon, line.teamColor)
+                        line.camIcon.Left:Set(function() return line.name.Right() + 4 end)
+                        line.text.Left:Set(function() return line.camIcon.Right() + 4 end)
+                    elseif not chatHistory[curEntry].camera and line.camIcon then
+                        line.camIcon:Destroy()
+                        line.camIcon = false
+                        line.text.Left:Set(function() return line.name.Right() + 2 end)
                     end
                 else
-                    GUI.chatLines[index].name:Disable()
-                    GUI.chatLines[index].name:SetText('')
-                    GUI.chatLines[index].text:SetText(chatHistory[curEntry].wrappedtext[curTop] or "")
-                    GUI.chatLines[index].teamColor:SetSolidColor('00000000')
-                    GUI.chatLines[index].factionIcon:SetSolidColor('00000000')
-                    GUI.chatLines[index].IsTop = false
-                    if GUI.chatLines[index].camIcon then
-                        GUI.chatLines[index].camIcon:Destroy()
-                        GUI.chatLines[index].camIcon = false
-                        GUI.chatLines[index].text.Left:Set(function() return GUI.chatLines[Index].name.Right() + 2 end)
+                    line.name:Disable()
+                    line.name:SetText('')
+                    line.text:SetText(chatHistory[curEntry].wrappedtext[curTop] or "")
+                    line.teamColor:SetSolidColor('00000000')
+                    line.factionIcon:SetSolidColor('00000000')
+                    line.IsTop = false
+                    if line.camIcon then
+                        line.camIcon:Destroy()
+                        line.camIcon = false
+                        line.text.Left:Set(function() return line.name.Right() + 2 end)
                     end
                 end
                 if chatHistory[curEntry].camera then
-                    GUI.chatLines[index].cameraData = chatHistory[curEntry].camera
-                    GUI.chatLines[index].text:Enable()
-                    GUI.chatLines[index].text:SetColor(chatColors[ChatOptions.link_color])
+                    line.cameraData = chatHistory[curEntry].camera
+                    line.text:Enable()
+                    line.text:SetColor(chatColors[ChatOptions.link_color])
                 else
-                    GUI.chatLines[index].text:Disable()
-                    GUI.chatLines[index].text:SetColor('ffc2f6ff')
-                    GUI.chatLines[index].text:SetColor(chatColors[ChatOptions[chatHistory[curEntry].tokey]])
+                    line.text:Disable()
+                    line.text:SetColor('ffc2f6ff')
+                    line.text:SetColor(chatColors[ChatOptions[chatHistory[curEntry].tokey]])
                 end
 
-                GUI.chatLines[index].EntryID = curEntry
+                line.EntryID = curEntry
                 
                 if GUI.bg:IsHidden() then
                     if ChatOptions.feed_background then
-                        GUI.chatLines[index].textBG2:SetSolidColor('aa000000')
+                        line.textBG2:SetSolidColor('aa000000')
                     else
-                        GUI.chatLines[index].textBG2:SetSolidColor('00000000')
+                        line.textBG2:SetSolidColor('00000000')
                     end
                 
-                    if chatHistory[curEntry].new or GUI.chatLines[index].time == nil then
-                        GUI.chatLines[index].time = 0
+                    if chatHistory[curEntry].new or line.time == nil then
+                        line.time = 0
                     end
                     
-                    GUI.chatLines[index].curHistory = chatHistory[curEntry]
-                    if GUI.chatLines[index].curHistory then
-                        if GUI.chatLines[index].curHistory.time ~= nil then
-                            GUI.chatLines[index].time = GUI.chatLines[index].curHistory.time
+                    line.curHistory = chatHistory[curEntry]
+                    if line.curHistory then
+                        if line.curHistory.time ~= nil then
+                            line.time = line.curHistory.time
                         end
-                        if GUI.chatLines[index].time < ChatOptions.fade_time then
-                            GUI.chatLines[index]:Show()
-                            if GUI.chatLines[index].name:GetText() == '' then
-                                GUI.chatLines[index].teamColor:Hide()
+                        if line.time < ChatOptions.fade_time then
+                            line:Show()
+                            if line.name:GetText() == '' then
+                                line.teamColor:Hide()
                             end
-                            GUI.chatLines[index].OnFrame = function(self, delta)
+                            line.OnFrame = function(self, delta)
                                 self.time = self.time + delta
                                 self.curHistory.time = self.time
                                 if self.time > ChatOptions.fade_time then
@@ -487,17 +489,17 @@ function SetupChatScroll()
                                     self:SetNeedsFrameUpdate(false)
                                 end
                             end
-                            GUI.chatLines[index]:SetNeedsFrameUpdate(true)        
+                            line:SetNeedsFrameUpdate(true)
                         end
                     end
                 end
             else
-                GUI.chatLines[index].name:Disable()
-                GUI.chatLines[index].name:SetText('')
-                GUI.chatLines[index].text:SetText('')
-                GUI.chatLines[index].teamColor:SetSolidColor('00000000')
+                line.name:Disable()
+                line.name:SetText('')
+                line.text:SetText('')
+                line.teamColor:SetSolidColor('00000000')
             end
-            GUI.chatLines[index]:SetAlpha(ChatOptions.win_alpha, true)
+            line:SetAlpha(ChatOptions.win_alpha, true)
             curTop = curTop + 1
             index = index + 1
         end
