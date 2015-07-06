@@ -1330,14 +1330,11 @@ function CreateConfigWindow()
     local function CreateEntry(data)
         local group = Group(optionGroup)
         if data.type == 'filter' then
-            group.name = UIUtil.CreateText(group, data.name, 14, "Arial")
-            group.check = UIUtil.CreateCheckbox(group, '/dialogs/check-box_btn/')
+            group.check = UIUtil.CreateCheckbox(group, '/dialogs/check-box_btn/', data.name, true)
             LayoutHelpers.AtLeftTopIn(group.check, group)
-            LayoutHelpers.RightOf(group.name, group.check)
-            LayoutHelpers.AtVerticalCenterIn(group.name, group.check)
             group.check.key = data.key
             group.Height:Set(group.check.Height)
-            group.Width:Set(function() return group.check.Width() + group.name.Width() end)
+            group.Width:Set(function() return group.check.Width() end)
             group.check.OnCheck = function(self, checked)
                 UpdateOption(self.key, checked)
             end
