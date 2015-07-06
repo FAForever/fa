@@ -189,27 +189,6 @@ function CreateChatLines()
         line.teamColor.Left:Set(line.Left)
         line.teamColor.Top:Set(line.Top)
 
-        line.topBG = Bitmap(line)
-        line.topBG:SetSolidColor('00000000')
-        line.topBG.Height:Set(2)
-        line.topBG.Left:Set(line.Left)
-        line.topBG.Right:Set(line.Right)
-        line.topBG.Bottom:Set(line.Top)
-
-        line.leftBG = Bitmap(line)
-        line.leftBG:SetSolidColor('00000000')
-        line.leftBG.Width:Set(1)
-        line.leftBG.Right:Set(line.Left)
-        line.leftBG.Top:Set(line.topBG.Top)
-        line.leftBG.Bottom:Set(line.Bottom)
-
-        line.rightBG = Bitmap(line)
-        line.rightBG:SetSolidColor('00000000')
-        line.rightBG.Width:Set(1)
-        line.rightBG.Left:Set(line.Right)
-        line.rightBG.Top:Set(line.topBG.Top)
-        line.rightBG.Bottom:Set(line.Bottom)
-
         line.factionIcon = Bitmap(line.teamColor)
         line.factionIcon:SetSolidColor('00000000')
         LayoutHelpers.FillParent(line.factionIcon, line.teamColor)
@@ -269,7 +248,6 @@ function CreateChatLines()
             if event.Type == 'MouseEnter' then
                 for i, v in GUI.chatLines do
                     if v.EntryID == line.EntryID then
-                        v.topBG.Right:Set(v.Right)
                         v.nameBG:SetSolidColor('00000000')
                         v.textBG:SetSolidColor('00000000')
                     end
@@ -277,9 +255,6 @@ function CreateChatLines()
             elseif event.Type == 'MouseExit' then
                 for i, v in GUI.chatLines do
                     if v.EntryID == line.EntryID then
-                        if not v.IsTop then
-                            v.topBG.Right:Set(v.teamColor.Right)
-                        end
                         v.nameBG:SetSolidColor('00000000')
                         v.textBG:SetSolidColor('00000000')
                     end
@@ -476,7 +451,6 @@ function SetupChatScroll()
                     GUI.chatLines[index].text:SetText(chatHistory[curEntry].wrappedtext[curTop] or "")
                     GUI.chatLines[index].teamColor:SetSolidColor(chatHistory[curEntry].color)
                     GUI.chatLines[index].factionIcon:SetTexture(UIUtil.UIFile(FactionsIcon[chatHistory[curEntry].faction]))
-                    GUI.chatLines[index].topBG.Right:Set(GUI.chatLines[index].Right)
                     GUI.chatLines[index].IsTop = true
                     GUI.chatLines[index].chatID = chatHistory[curEntry].armyID
                     if chatHistory[curEntry].camera and not GUI.chatLines[index].camIcon then
@@ -492,7 +466,6 @@ function SetupChatScroll()
                         GUI.chatLines[index].text.Left:Set(function() return GUI.chatLines[Index].nameBG.Right() + 2 end)
                     end
                 else
-                    GUI.chatLines[index].topBG.Right:Set(GUI.chatLines[index].teamColor.Right)
                     GUI.chatLines[index].nameBG:Disable()
                     GUI.chatLines[index].name:SetText('')
                     GUI.chatLines[index].text:SetText(chatHistory[curEntry].wrappedtext[curTop] or "")
@@ -514,10 +487,7 @@ function SetupChatScroll()
                     GUI.chatLines[index].text:SetColor('ffc2f6ff')
                     GUI.chatLines[index].text:SetColor(chatColors[ChatOptions[chatHistory[curEntry].tokey]])
                 end
-                if not GUI.bg:IsHidden() then
-                    GUI.chatLines[index].rightBG:Show()
-                    GUI.chatLines[index].leftBG:Show()
-                end
+
                 GUI.chatLines[index].textBG:SetSolidColor('00000000')
                 GUI.chatLines[index].nameBG:SetSolidColor('00000000')
                 GUI.chatLines[index].EntryID = curEntry
@@ -540,9 +510,6 @@ function SetupChatScroll()
                         end
                         if GUI.chatLines[index].time < ChatOptions.fade_time then
                             GUI.chatLines[index]:Show()
-                            GUI.chatLines[index].topBG:Hide()
-                            GUI.chatLines[index].rightBG:Hide()
-                            GUI.chatLines[index].leftBG:Hide()
                             if GUI.chatLines[index].name:GetText() == '' then
                                 GUI.chatLines[index].teamColor:Hide()
                             end
@@ -567,9 +534,6 @@ function SetupChatScroll()
                 GUI.chatLines[index].teamColor:SetSolidColor('00000000')
                 GUI.chatLines[index].textBG:SetSolidColor('00000000')
                 GUI.chatLines[index].nameBG:SetSolidColor('00000000')
-                GUI.chatLines[index].topBG:SetSolidColor('00000000')
-                GUI.chatLines[index].leftBG:SetSolidColor('00000000')
-                GUI.chatLines[index].rightBG:SetSolidColor('00000000')
             end
             GUI.chatLines[index]:SetAlpha(ChatOptions.win_alpha, true)
             curTop = curTop + 1
