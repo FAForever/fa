@@ -55,12 +55,14 @@ function SetLayout()
     controls.fuelBar._bar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/fuelbar.dds'))
     LayoutHelpers.AtCenterIn(controls.health, controls.healthBar)
     controls.health:SetDropShadow(true)
-    
+
     local iconPositions = {
         [1] = {Left = 70, Top = 60},
-		[3] = {Left = 190, Top = 60},
-        [4] = {Left = 130, Top = 60},
-        [6] = {Left = 190, Top = 80},
+        [2] = {Left = 70, Top = 80},
+        [3] = {Left = 190, Top = 60},
+        [5] = {Left = 130, Top = 60},
+        [6] = {Left = 130, Top = 80},
+        [7] = {Left = 190, Top = 80}
     }
     local iconTextures = {
         UIUtil.UIFile('/game/unit_view_icons/mass.dds'),

@@ -59,9 +59,11 @@ function SetLayout()
     
     local iconPositions = {
         [1] = {Left = 70, Top = 60},
+        [2] = {Left = 70, Top = 80},
 		[3] = {Left = 190, Top = 60},
-        [4] = {Left = 130, Top = 60},
-        [6] = {Left = 190, Top = 80}
+        [5] = {Left = 130, Top = 60},
+        [6] = {Left = 130, Top = 80},
+        [7] = {Left = 190, Top = 80}
     }
     local iconTextures = {
         UIUtil.UIFile('/game/unit_view_icons/mass.dds'),
