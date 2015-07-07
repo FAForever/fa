@@ -231,14 +231,14 @@ function CreateChatLines()
                 end
             end
         end
-        
-        line.textBG2 = Bitmap(line)
-        line.textBG2.Depth:Set(function() return line.text.Depth() - 1 end)
-        line.textBG2.Left:Set(line.name.Left)
-        line.textBG2.Top:Set(line.teamColor.Top)
-        line.textBG2.Right:Set(line.text.Right)
-        line.textBG2.Bottom:Set(line.teamColor.Bottom)
-        line.textBG2:Disable()
+
+        -- A background for the line that persists after the chat panel is closed (to help with
+        -- readability against the simulation)
+        line.lineStickybg = Bitmap(line)
+        line.lineStickybg:DisableHitTest()
+        line.lineStickybg:SetSolidColor('aa000000')
+        LayoutHelpers.FillParent(line.lineStickybg, line.text)
+        LayoutHelpers.DepthUnderParent(line.lineStickybg, line.text)
 
         return line
     end
@@ -460,9 +460,9 @@ function SetupChatScroll()
                 
                 if GUI.bg:IsHidden() then
                     if ChatOptions.feed_background then
-                        line.textBG2:SetSolidColor('aa000000')
+                        line.lineStickybg:Show()
                     else
-                        line.textBG2:SetSolidColor('00000000')
+                        line.lineStickybg:Hide()
                     end
                 
                     if chatHistory[curEntry].new or line.time == nil then
@@ -859,7 +859,7 @@ function ToggleChat()
             GUI.bg.curTime = 0
         end
         for i, v in GUI.chatLines do
-            v.textBG2:SetSolidColor('00000000')
+            v.lineStickybg:Hide()
             v:SetNeedsFrameUpdate(false)
             v:Show()
         end
