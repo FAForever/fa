@@ -31,19 +31,9 @@ GUI = {
 }
 
 States = {
-    energyDetail = Prefs.GetFromCurrentProfile("energyDetailedView"),
     energyViewState = Prefs.GetFromCurrentProfile("energyRateView") or 1,
-    massDetail = Prefs.GetFromCurrentProfile("massDetailedView"),
     massViewState = Prefs.GetFromCurrentProfile("massRateView") or 1,
 }
-
-if States.energyDetail == nil then
-    States.energyDetail = true
-end
-
-if States.massDetail == nil then
-    States.massDetail = true
-end
 
 function Contract() 
     UIState = false
@@ -173,13 +163,13 @@ end
 function CommonLogic()
     local function AddGroupLogic(group, prefix)
         group.warningBG.OnHide = function(self, hidden)
-            if hidden then
-                group.income:SetHidden(true)
-                group.expense:SetHidden(true)
-            else
-                group.income:SetHidden(not States[prefix.."Detail"])
-                group.expense:SetHidden(not States[prefix.."Detail"])
-            end
+            -- This prevents the text controls appearing at game-start before the scroll-in
+            -- animation has taken place.
+            group.income:SetHidden(hidden)
+            group.expense:SetHidden(hidden)
+            group.reclaimDelta:SetHidden(hidden)
+            group.reclaimTotal:SetHidden(hidden)
+
             return true
         end
 
