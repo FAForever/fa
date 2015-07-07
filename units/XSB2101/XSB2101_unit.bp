@@ -177,7 +177,7 @@ UnitBlueprint {
     SizeY = 0.9,
     SizeZ = 0.5,
     StrategicIconName = 'icon_structure1_directfire',
-    StrategicIconSortPriority = 205,
+    StrategicIconSortPriority = 64,
     Veteran = {
         Level1 = 6,
         Level2 = 12,
