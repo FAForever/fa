@@ -305,13 +305,11 @@ function SetupChatScroll()
     GUI.chatContainer.prevsize = 0
 
     local function IsValidEntry(entryData)
-        local result = true
         if entryData.camera then
-            result = ChatOptions.links
-        else
-            result = ChatOptions[entryData.armyID]
+            return ChatOptions.links
         end
-        return result
+
+        return ChatOptions[entryData.armyID]
     end
 
     local function DataSize()
@@ -785,27 +783,32 @@ function ReceiveChatFromSim(sender, msg)
         print(LOCF("%s %s", sender, msg.ConsoleOutput))
         return
     end
+
     if not msg.Chat then
         return
     end
+
     if type(msg) == 'string' then
         msg = { text = msg }
     elseif type(msg) ~= 'table' then
         msg = { text = repr(msg) }
     end
+
     local armyData = GetArmyData(sender)
     if not armyData and GetFocusArmy() ~= -1 and not SessionIsReplay() then
         return
     end
+
     local towho = LOC(ToStrings[msg.to].text) or LOC(ToStrings['private'].text)
     local tokey = ToStrings[msg.to].colorkey or ToStrings['private'].colorkey
     if msg.Observer then
-        towho = LOC("<LOC lobui_0592>to observes:")
+        towho = LOC("<LOC lobui_0592>to observers:")
         tokey = "link_color"
+        if armyData.faction then
+            armyData.faction = table.getn(FactionsIcon) - 1
+        end
     end
-    if msg.Observer and armyData.faction then
-        armyData.faction = table.getn(FactionsIcon) - 1
-    end
+
     if type(msg.to) == 'number' and SessionIsReplay() then
         towho = string.format("%s %s:", LOC(ToStrings.to.text), GetArmyData(msg.to).nickname)
     end
@@ -831,12 +834,10 @@ function ReceiveChatFromSim(sender, msg)
         faction = (armyData.faction or (table.getn(FactionsIcon)-1))+1,
         text = msg.text,
         wrappedtext = tempText,
-        new = true
+        new = true,
+        camera = msg.camera
     }
 
-    if msg.camera then
-        entry.camera = msg.camera
-    end
     table.insert(chatHistory, entry)
     if ChatOptions[entry.armyID] then
         if table.getsize(chatHistory) == 1 then
@@ -1161,10 +1162,11 @@ end
 function WrapText(data)
     return import('/lua/maui/text.lua').WrapText(data.text,
             function(line)
+                local firstLine = GUI.chatLines[1]
                 if line == 1 then
-                    return GUI.chatLines[1].Right() - (GUI.chatLines[1].teamColor.Right() + GUI.chatLines[1].name:GetStringAdvance(data.name) + 4)
+                    return firstLine.Right() - firstLine.teamColor.Right() + firstLine.name:GetStringAdvance(data.name) + 4
                 else
-                    return GUI.chatLines[1].Right() - GUI.chatLines[1].name.Right()
+                    return firstLine.Right() - firstLine.name.Right()
                 end
             end,
             function(text)
