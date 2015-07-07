@@ -860,9 +860,9 @@ function ToggleChat()
             GUI.bg.curTime = 0
         end
         for i, v in GUI.chatLines do
-            v.lineStickybg:Hide()
             v:SetNeedsFrameUpdate(false)
             v:Show()
+            v.lineStickybg:Hide()
         end
         GUI.chatContainer:CalcVisible()
     else
