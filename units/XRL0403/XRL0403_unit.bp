@@ -1,6 +1,7 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
+            'Centraltgt',
             'Left_Turret',
             'Right_Turret',
             'AA_Turret',

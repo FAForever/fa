@@ -357,6 +357,8 @@ function SetupPlayerLines()
 
         if playerClan then
             playerClan = '[' .. playerClan .. '] '
+        else
+            playerClan = ""
         end
 
         if playerRating then
