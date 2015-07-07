@@ -17,6 +17,7 @@ Hitboxes
 - Seraphim sniper bot is able to hit Cybran MML again
 - Fixed SCUs not being hit properly by laser weapons
 - Fixed units aiming too high on the UEF and Aeon SCUs
+- Torpedo/sonar platforms no longer confuse surface weaponry
 
 Visual
 - Fixed shield structure glows and rotations not playing
@@ -95,6 +96,7 @@ UI
 - Drop shadow for chat messages
 - Chat Option: Add background to chat messages when chat window is closed
 - Chat Option: Allow chat to timeout normally in the feed after closing window
+- Reclaim window merged with main resources UI
 
 Other
 - Engineering Station units now pause on transfer from one player to another
