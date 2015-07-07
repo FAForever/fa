@@ -55,6 +55,7 @@ Other
 - Fixed RateOfFire buffs not being applied correctly
 - SCUs will no longer rebuild buildings they lack to ability to build
 - Upgraded buildings rebuilt by assisting SCUs will now cost the correct amount
+- FAF no longer blows up if the game hasn't first been launched to create a profile
 
 Enhancements
 ------------
