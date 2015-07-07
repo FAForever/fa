@@ -63,7 +63,7 @@ function NamePing(callback, curName)
         end
     )
 
-    dialog.OnClose = function()
+    dialog.OnClosed = function()
         dialog = nil
     end
 end
