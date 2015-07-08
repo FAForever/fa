@@ -184,6 +184,7 @@ function CreateChatLines()
 
         -- Draw the faction icon with a colour representing the team behind it.
         line.teamColor = Bitmap(line)
+        line.teamColor.Depth:Set(function() return line.Depth() + 10 end)
         line.teamColor:SetSolidColor('00000000')
         line.teamColor.Height:Set(line.Height)
         line.teamColor.Width:Set(line.Height)
@@ -237,8 +238,9 @@ function CreateChatLines()
         line.lineStickybg = Bitmap(line)
         line.lineStickybg:DisableHitTest()
         line.lineStickybg:SetSolidColor('aa000000')
-        LayoutHelpers.FillParent(line.lineStickybg, line.text)
+        LayoutHelpers.FillParent(line.lineStickybg, line)
         LayoutHelpers.DepthUnderParent(line.lineStickybg, line.text)
+        line.lineStickybg:Hide()
 
         return line
     end
@@ -457,11 +459,6 @@ function SetupChatScroll()
                 line.EntryID = curEntry
                 
                 if GUI.bg:IsHidden() then
-                    if ChatOptions.feed_background then
-                        line.lineStickybg:Show()
-                    else
-                        line.lineStickybg:Hide()
-                    end
                 
                     line.curHistory = chatHistory[curEntry]
                     if line.curHistory.new or line.curHistory.time == nil then
@@ -470,6 +467,13 @@ function SetupChatScroll()
                     
                     if line.curHistory.time < ChatOptions.fade_time then
                         line:Show()
+                        
+                        if ChatOptions.feed_background then
+                            line.lineStickybg:Show()
+                        else
+                            line.lineStickybg:Hide()
+                        end
+                        
                         if line.name:GetText() == '' then
                             line.teamColor:Hide()
                         end
@@ -484,6 +488,7 @@ function SetupChatScroll()
                         end
                         line:SetNeedsFrameUpdate(true)
                     end
+                    
                 end
             else
                 line.name:Disable()
