@@ -237,8 +237,9 @@ function CreateChatLines()
         line.lineStickybg = Bitmap(line)
         line.lineStickybg:DisableHitTest()
         line.lineStickybg:SetSolidColor('aa000000')
-        LayoutHelpers.FillParent(line.lineStickybg, line.text)
-        LayoutHelpers.DepthUnderParent(line.lineStickybg, line.text)
+        LayoutHelpers.FillParent(line.lineStickybg, line)
+        LayoutHelpers.DepthUnderParent(line.lineStickybg, line)
+        line.lineStickybg:Hide()
 
         return line
     end
@@ -457,11 +458,6 @@ function SetupChatScroll()
                 line.EntryID = curEntry
                 
                 if GUI.bg:IsHidden() then
-                    if ChatOptions.feed_background then
-                        line.lineStickybg:Show()
-                    else
-                        line.lineStickybg:Hide()
-                    end
                 
                     line.curHistory = chatHistory[curEntry]
                     if line.curHistory.new or line.curHistory.time == nil then
@@ -470,6 +466,9 @@ function SetupChatScroll()
                     
                     if line.curHistory.time < ChatOptions.fade_time then
                         line:Show()
+
+                        UIUtil.setVisible(line.lineStickybg, ChatOptions.feed_background)
+                        
                         if line.name:GetText() == '' then
                             line.teamColor:Hide()
                         end
@@ -484,6 +483,7 @@ function SetupChatScroll()
                         end
                         line:SetNeedsFrameUpdate(true)
                     end
+                    
                 end
             else
                 line.name:Disable()
