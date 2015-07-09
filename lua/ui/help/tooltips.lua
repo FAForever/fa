@@ -2060,12 +2060,4 @@ Tooltips = {
         title = 'Zoom Pop Distance',
         description = 'Adjusts distance to which Zoom Pop zooms to.',
     },
-    options_gui_chat_feed_background = {
-        title = 'Chat Feed Background',
-        description = "Adds a black bar behind chat lines when the chat window is closed",
-    },
-    options_gui_persist_chat = {
-        title = "Persist Chat Feed Timeout",
-        description = "Allows chat to timeout normally in the chat feed after closing the chat window",
-    },    
 }
