@@ -247,7 +247,7 @@ UnitBlueprint {
     SizeY = 1.4,
     SizeZ = 0.5,
     StrategicIconName = 'icon_structure2_intel',
-    StrategicIconSortPriority = 230,
+    StrategicIconSortPriority = 64,
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
         EnergyMult = 0,
