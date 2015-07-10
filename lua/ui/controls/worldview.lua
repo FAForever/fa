@@ -59,7 +59,7 @@ local function GetSelectedWeaponsWithReticules(filterFunc)
 end
 
 --- A generic decal function that maximises the available DamageRadius values.
-local function RadiusDecalFuntion(filterFunc)
+local function RadiusDecalFunction(filterFunc)
     local weapons = GetSelectedWeaponsWithReticules(filterFunc)
 
     -- The maximum damage radius of a selected missile weapon.
@@ -113,7 +113,7 @@ local function NukeDecalFunc()
 end
 
 local function TacticalDecalFunc()
-    return RadiusDecalFuntion(
+    return RadiusDecalFunction(
         function(w)
             return w.WeaponCategory == 'Missile' and w.DamageRadius and not w.NukeWeapon
         end
@@ -121,7 +121,11 @@ local function TacticalDecalFunc()
 end
 
 local function AttackDecalFunc(mode)
-    return RadiusDecalFuntion(function() return true end)
+    return RadiusDecalFunction(
+        function(w)
+            return w.ManualFire == false and w.WeaponCategory ~= 'Teleport'
+        end
+    )
 end
 
 DecalFunctions = {
