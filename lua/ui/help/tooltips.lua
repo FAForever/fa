@@ -111,6 +111,10 @@ Tooltips = {
         title = "<LOC tooltipui0665>Build Advanced Tactical Missile",
         description = "<LOC tooltipui0013>",
     },
+    build_billy_auto = {
+        title = "<LOC tooltipui0665>Build Advanced Tactical Missile",
+        description = "<LOC tooltipui0013>",
+    },
     fire_tactical = {
         title = "<LOC tooltipui0022>Launch Missile",
         description = "",
