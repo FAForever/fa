@@ -184,6 +184,7 @@ function CreateChatLines()
 
         -- Draw the faction icon with a colour representing the team behind it.
         line.teamColor = Bitmap(line)
+        line.teamColor.Depth:Set(function() return line.Depth() + 10 end)
         line.teamColor:SetSolidColor('00000000')
         line.teamColor.Height:Set(line.Height)
         line.teamColor.Width:Set(line.Height)
@@ -237,8 +238,9 @@ function CreateChatLines()
         line.lineStickybg = Bitmap(line)
         line.lineStickybg:DisableHitTest()
         line.lineStickybg:SetSolidColor('aa000000')
-        LayoutHelpers.FillParent(line.lineStickybg, line.text)
+        LayoutHelpers.FillParent(line.lineStickybg, line)
         LayoutHelpers.DepthUnderParent(line.lineStickybg, line.text)
+        line.lineStickybg:Hide()
 
         return line
     end
@@ -457,39 +459,36 @@ function SetupChatScroll()
                 line.EntryID = curEntry
                 
                 if GUI.bg:IsHidden() then
-                    if ChatOptions.feed_background then
-                        line.lineStickybg:Show()
-                    else
-                        line.lineStickybg:Hide()
-                    end
                 
-                    if chatHistory[curEntry].new or line.time == nil then
-                        line.time = 0
+                    line.curHistory = chatHistory[curEntry]
+                    if line.curHistory.new or line.curHistory.time == nil then
+                        line.curHistory.time = 0
                     end
                     
-                    line.curHistory = chatHistory[curEntry]
-                    if line.curHistory then
-                        if line.curHistory.time ~= nil then
-                            line.time = line.curHistory.time
+                    if line.curHistory.time < ChatOptions.fade_time then
+                        line:Show()
+                        
+                        if ChatOptions.feed_background then
+                            line.lineStickybg:Show()
+                        else
+                            line.lineStickybg:Hide()
                         end
-                        if line.time < ChatOptions.fade_time then
-                            line:Show()
-                            if line.name:GetText() == '' then
-                                line.teamColor:Hide()
-                            end
-                            line.OnFrame = function(self, delta)
-                                self.time = self.time + delta
-                                self.curHistory.time = self.time
-                                if self.time > ChatOptions.fade_time then
-                                    if GUI.bg:IsHidden() then
-                                        self:Hide()
-                                    end
-                                    self:SetNeedsFrameUpdate(false)
+                        
+                        if line.name:GetText() == '' then
+                            line.teamColor:Hide()
+                        end
+                        line.OnFrame = function(self, delta)
+                            self.curHistory.time = self.curHistory.time + delta
+                            if self.curHistory.time > ChatOptions.fade_time then
+                                if GUI.bg:IsHidden() then
+                                    self:Hide()
                                 end
+                                self:SetNeedsFrameUpdate(false)
                             end
-                            line:SetNeedsFrameUpdate(true)
                         end
+                        line:SetNeedsFrameUpdate(true)
                     end
+                    
                 end
             else
                 line.name:Disable()
@@ -874,9 +873,8 @@ function ToggleChat()
             GUI.chatContainer:CalcVisible()
         else
             for i, v in GUI.chatLines do
-                v.time = ChatOptions.fade_time + 1
                 if v.curHistory and v.curHistory.time ~= nil then
-                    v.curHistory.time = v.time
+                    v.curHistory.time = ChatOptions.fade_time + 1
                 end
             end
         end
