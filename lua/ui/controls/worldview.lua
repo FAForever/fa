@@ -50,6 +50,7 @@ local function GetSelectedWeaponsWithReticules(filterFunc)
             for k, v in bp.Weapon do
                 if filterFunc(v) then
                     weapons[bp.BlueprintId] = v
+                    break
                 end
             end
         end
