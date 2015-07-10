@@ -489,16 +489,6 @@ function CreateUI()
 
     controls.abilities = Group(controls.bg)
     controls.abilityText = {}
-    controls.abilityBG = {}
-    controls.abilityBG.TL = Bitmap(controls.abilities)
-    controls.abilityBG.TR = Bitmap(controls.abilities)
-    controls.abilityBG.TM = Bitmap(controls.abilities)
-    controls.abilityBG.ML = Bitmap(controls.abilities)
-    controls.abilityBG.MR = Bitmap(controls.abilities)
-    controls.abilityBG.M = Bitmap(controls.abilities)
-    controls.abilityBG.BL = Bitmap(controls.abilities)
-    controls.abilityBG.BR = Bitmap(controls.abilities)
-    controls.abilityBG.BM = Bitmap(controls.abilities)
 
     controls.bg:DisableHitTest(true)
 
