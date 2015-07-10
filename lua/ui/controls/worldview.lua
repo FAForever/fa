@@ -124,7 +124,7 @@ end
 local function AttackDecalFunc(mode)
     return RadiusDecalFunction(
         function(w)
-            return w.ManualFire == false and w.WeaponCategory ~= 'Teleport'
+            return w.ManualFire == false and w.WeaponCategory ~= 'Teleport' and w.WeaponCategory ~= "Death"
         end
     )
 end
