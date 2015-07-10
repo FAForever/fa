@@ -1617,6 +1617,7 @@ AirUnit = Class(MobileUnit) {
     -- GROUND AND WHEN IT IMPACTS IT WILL DESTROY ITSELF
     OnKilled = function(self, instigator, type, overkillRatio)
         local bp = self:GetBlueprint()
+        -- UGH
         if self:GetCurrentLayer() == 'Air' then
             self.CreateUnitAirDestructionEffects( self, 1.0 )
             self:DestroyTopSpeedEffects()
@@ -1624,6 +1625,7 @@ AirUnit = Class(MobileUnit) {
             self.OverKillRatio = overkillRatio
             self:PlayUnitSound('Killed')
             self:DoUnitCallbacks('OnKilled')
+            self:DisableShield()
             if instigator and IsUnit(instigator) then
                 instigator:OnKilledUnit(self)
             end
