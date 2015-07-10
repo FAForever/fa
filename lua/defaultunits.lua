@@ -1677,17 +1677,9 @@ AirTransport = Class(AirUnit) {
     end,
 
     OnStartTransportLoading = function(...)
-        WARN("Start loading!")
-        for k, v in arg do
-            WARN(v)
-        end
     end,
 
     OnStopTransportLoading = function(...)
-        WARN("Stop loading!")
-        for k, v in arg do
-            WARN(v)
-        end
     end,
 
     DestroyedOnTransport = function(self)
