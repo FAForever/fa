@@ -536,7 +536,7 @@ end
 function UpdateUnitInfo()
     local currentInfo = GetRolloverInfo() or (selectedUnit and GetUnitRolloverInfo(selectedUnit))
 
-    if currentInfo and table.getsize(currentInfo) > 0 then
+    if currentInfo and table.getsize(currentInfo) > 0 and import('/lua/ui/game/unitviewDetail.lua').View.Hiding then
         controls.bg:Show()
         UpdateWindow(currentInfo)
 
@@ -549,7 +549,7 @@ function UpdateUnitInfo()
             end)
         end
     else
-        if updateThread then
+        if updateThread and not selectedUnit then
             KillThread(updateThread)
             updateThread = nil
         end
@@ -560,7 +560,7 @@ function UpdateUnitInfo()
 end
 
 function OnSelection(units)
-    if units and table.getn(units) == 1 and import('/lua/ui/game/unitviewDetail.lua').View.Hiding then
+    if units and table.getn(units) == 1 then
         selectedUnit = units[1]
     else
         selectedUnit = nil
