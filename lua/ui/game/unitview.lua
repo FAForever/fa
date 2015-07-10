@@ -509,21 +509,6 @@ function CreateUI()
         controls.Buildrate = UIUtil.CreateText(controls.bg, '', 12, UIUtil.bodyFont)
     end
 
-    controls.bg.OnFrame = function(self, delta)
-        --[[
-
-        if info then
-            UpdateWindow(info)
-            if self:GetAlpha() < 1 then
-                self:SetAlpha(math.min(self:GetAlpha() + (delta*3), 1), true)
-            end
-            import(UIUtil.GetLayoutFilename('unitview')).PositionWindow()
-        elseif self:GetAlpha() > 0 then
-            self:SetAlpha(math.max(self:GetAlpha() - (delta*3), 0), true)
-        end
-        ]]
-    end
-
     if options.gui_scu_manager ~= 0 then
         controls.SCUType = Bitmap(controls.bg)
         LayoutHelpers.AtRightIn(controls.SCUType, controls.icon)
