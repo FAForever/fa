@@ -115,7 +115,7 @@ end
 local function TacticalDecalFunc()
     return RadiusDecalFuntion(
         function(w)
-            return w.WeaponCategory == 'Missile' and w.DamageRadius
+            return w.WeaponCategory == 'Missile' and w.DamageRadius and not w.NukeWeapon
         end
     )
 end
