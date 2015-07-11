@@ -355,7 +355,7 @@ function SetupPlayerLines()
         local playerRating = sessionInfo.Options.Ratings[playerName] or 0
         local playerClan = sessionInfo.Options.ClanTags[playerName]
 
-        if playerClan then
+        if playerClan and playerClan ~= "" then
             playerClan = '[' .. playerClan .. '] '
         else
             playerClan = ""
