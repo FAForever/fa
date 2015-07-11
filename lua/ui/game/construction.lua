@@ -464,10 +464,6 @@ function GetEnhancementTextures(unitID, iconID)
     UIUtil.UIFile(prefix .. '_btn_sel.dds')
 end
 
-local UPPER_GLOW_THRESHHOLD = .5
-local LOWER_GLOW_THRESHHOLD = .1
-local GLOW_SPEED = 2
-
 function CommonLogic()
     controls.choices:SetupScrollControls(controls.scrollMin, controls.scrollMax, controls.pageMin, controls.pageMax)
     controls.secondaryChoices:SetupScrollControls(controls.secondaryScrollMin, controls.secondaryScrollMax, controls.secondaryPageMin, controls.secondaryPageMax)
@@ -567,24 +563,6 @@ function CommonLogic()
         LayoutHelpers.AtBottomIn(btn.Count, btn, 4)
         LayoutHelpers.AtRightIn(btn.Count, btn, 3)
         btn.Count.Depth:Set(function() return btn.Icon.Depth() + 10 end)
-        btn.Glow = Bitmap(btn)
-        btn.Glow:SetTexture(UIUtil.UIFile('/game/units_bmp/glow.dds'))
-        btn.Glow:DisableHitTest()
-        LayoutHelpers.FillParent(btn.Glow, btn)
-        btn.Glow:SetAlpha(0)
-        btn.Glow.Incrementing = 1
-        btn.Glow.OnFrame = function(glow, elapsedTime)
-            local curAlpha = glow:GetAlpha()
-            curAlpha = curAlpha + (elapsedTime * glow.Incrementing * GLOW_SPEED)
-            if curAlpha > UPPER_GLOW_THRESHHOLD then
-                curAlpha = UPPER_GLOW_THRESHHOLD
-                glow.Incrementing = -1
-            elseif curAlpha < LOWER_GLOW_THRESHHOLD then
-                curAlpha = LOWER_GLOW_THRESHHOLD
-                glow.Incrementing = 1
-            end
-            glow:SetAlpha(curAlpha)
-        end
 
         btn.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then
@@ -645,26 +623,6 @@ function CommonLogic()
             end
             glow:SetAlpha(curAlpha)
         end
-
-        btn.Glow = Bitmap(btn)
-        btn.Glow:SetTexture(UIUtil.UIFile('/game/units_bmp/glow.dds'))
-        btn.Glow:DisableHitTest()
-        LayoutHelpers.FillParent(btn.Glow, btn)
-        btn.Glow:SetAlpha(0)
-        btn.Glow.Incrementing = 1
-        btn.Glow.OnFrame = function(glow, elapsedTime)
-            local curAlpha = glow:GetAlpha()
-            curAlpha = curAlpha + (elapsedTime * glow.Incrementing * GLOW_SPEED)
-            if curAlpha > UPPER_GLOW_THRESHHOLD then
-                curAlpha = UPPER_GLOW_THRESHHOLD
-                glow.Incrementing = -1
-            elseif curAlpha < LOWER_GLOW_THRESHHOLD then
-                curAlpha = LOWER_GLOW_THRESHHOLD
-                glow.Incrementing = 1
-            end
-            glow:SetAlpha(curAlpha)
-        end
-
 
         btn.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then
@@ -1065,7 +1023,6 @@ function OnRolloverHandler(button, state)
                     button.oldHandleEvent(self, event)
                 end
             end
-            button.Glow:SetNeedsFrameUpdate(true)
         else
             if button.oldHandleEvent then
                 button.HandleEvent = button.oldHandleEvent
@@ -1076,21 +1033,16 @@ function OnRolloverHandler(button, state)
                 button.dragMarker:Destroy()
                 button.dragMarker = false
             end
-            button.Glow:SetNeedsFrameUpdate(false)
-            button.Glow:SetAlpha(0)
             UnitViewDetail.Hide()
         end
     else
         if state == 'enter' then
-            button.Glow:SetNeedsFrameUpdate(true)
             if item.type == 'item' then
                 UnitViewDetail.Show(__blueprints[item.id], sortedOptions.selection[1], item.id)
             elseif item.type == 'enhancement' then
                 UnitViewDetail.ShowEnhancement(item.enhTable, item.unitID, item.icon, GetEnhancementPrefix(item.unitID, item.icon), sortedOptions.selection[1])
             end
         else
-            button.Glow:SetNeedsFrameUpdate(false)
-            button.Glow:SetAlpha(0)
             UnitViewDetail.Hide()
         end
     end
