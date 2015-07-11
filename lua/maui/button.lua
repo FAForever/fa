@@ -4,9 +4,8 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 
 Button = Class(Bitmap) {
 
-    __init = function(self, parent, normal, active, highlight, disabled, clickCue, rolloverCue, frameRate, debugname)
+    __init = function(self, parent, normal, active, highlight, disabled, clickCue, rolloverCue, frameRate)
         Bitmap.__init(self, parent, normal)
-        self:SetName(debugname or "button")
         self.mNormal = normal
         self.mActive = active
         self.mHighlight = highlight
@@ -14,11 +13,6 @@ Button = Class(Bitmap) {
         self.mMouseOver = false
         self.mClickCue = clickCue
         self.mRolloverCue = rolloverCue
-        self.mAltToggledFlag = false
-        self.mAltNormal = normal
-        self.mAltActive = active
-        self.mAltHighlight = highlight
-        self.mAltDisabled = disabled
         if frameRate then
             self:SetFrameRate(frameRate)
         end
@@ -33,37 +27,11 @@ Button = Class(Bitmap) {
         self.mDisabled = disabled
     end,
 
-    SetUpAltButtons = function(self, normal, active, highlight, disabled)
-        self.mAltNormal = normal
-        self.mAltActive = active
-        self.mAltHighlight = highlight
-        self.mAltDisabled = disabled
-    end,
-
     ApplyTextures = function(self)
-        if self.mAltToggledFlag then
-            if self._isDisabled and self.mAltDisabled then
-                self:SetTexture(self.mAltDisabled)
-            elseif self.mAltNormal then
-                self:SetTexture(self.mAltNormal)
-            end
-        else
-            if self._isDisabled and self.mDisabled then
-                self:SetTexture(self.mDisabled)
-            elseif self.mNormal then
-                self:SetTexture(self.mNormal)
-            end
-        end
-        self:Play()
-    end,
-
-    OnAltToggle = function(self)
-        if self.mAltToggledFlag then
-            self.mAltToggledFlag = false
-            self:SetTexture(self.mActive)
-        else
-            self.mAltToggledFlag = true
-            self:SetTexture(self.mAltActive)
+        if self._isDisabled and self.mDisabled then
+            self:SetTexture(self.mDisabled)
+        elseif self.mNormal then
+            self:SetTexture(self.mNormal)
         end
         self:Play()
     end,
@@ -83,53 +51,35 @@ Button = Class(Bitmap) {
         if self._isDisabled then
             return true
         end
-        local eventHandled = false
 
         if event.Type == 'MouseEnter' then
             if self.mDragger then
-                if self.mAltToggledFlag then
-                    self:SetTexture(self.mAltActive)
-                else
-                    self:SetTexture(self.mActive)
-                end
+                self:SetTexture(self.mActive)
                 self:OnRolloverEvent('enter')
                 self:Play()
             else
-                if self.mAltToggledFlag then
-                    self:SetTexture(self.mAltHighlight)
-                else
-                    self:SetTexture(self.mHighlight)
-                end
+                self:SetTexture(self.mHighlight)
                 self:OnRolloverEvent('enter')
                 self:Play()
                 if self.mRolloverCue then
-                    local sound = Sound({Cue = self.mRolloverCue, Bank = "Interface",})
-                    PlaySound(sound)
+                    PlaySound(Sound({Cue = self.mRolloverCue, Bank = "Interface"}))
                 end
             end
             self.mMouseOver = true
-            eventHandled = true
+            return true
         elseif event.Type == 'MouseExit' then
-            if self.mAltToggledFlag then
-                self:SetTexture(self.mAltNormal)
-            else
-                self:SetTexture(self.mNormal)
-            end
+            self:SetTexture(self.mNormal)
             self:OnRolloverEvent('exit')
             self:Play()
             self.mMouseOver = false
-            eventHandled = true
+            return true
         elseif event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
             local dragger = Dragger()
             dragger.OnRelease = function(dragger, x, y)
                 dragger:Destroy()
                 self.mDragger = nil
                 if self.mMouseOver then
-                    if self.mAltToggledFlag then
-                        self:SetTexture(self.mAltHighlight)
-                    else
-                        self:SetTexture(self.mHighlight)
-                    end
+                    self:SetTexture(self.mHighlight)
                     self:OnRolloverEvent('exit')
                     self:Play()
                     self:OnClick(event.Modifiers)
@@ -137,11 +87,7 @@ Button = Class(Bitmap) {
             end
             dragger.OnCancel = function(dragger)
                 if self.mMouseOver then
-                    if self.mAltToggledFlag then
-                        self:SetTexture(self.mAltHighlight)
-                    else
-                        self:SetTexture(self.mHighlight)
-                    end
+                    self:SetTexture(self.mHighlight)
                     self:Play()
                 end
                 dragger:Destroy()
@@ -152,20 +98,104 @@ Button = Class(Bitmap) {
                 local sound = Sound({Cue = self.mClickCue, Bank = "Interface",})
                 PlaySound(sound)
             end
-            if self.mAltToggledFlag then
-                self:SetTexture(self.mAltActive)
-            else
-                self:SetTexture(self.mActive)
-            end
+            self:SetTexture(self.mActive)
             self:OnRolloverEvent('down')
             self:Play()
             PostDragger(self:GetRootFrame(), event.KeyCode, dragger)
-            eventHandled = true
+            return true
         end
 
-        return eventHandled
+        return false
     end,
 
     OnClick = function(self, modifiers) end
 
+}
+
+-- CONSIDERED HARMFUL
+--- A button that can optionally have its textures "fixed" to some value. This is special-snowflaking
+-- for the retarded construction UI, and can probably be got rid of when we think of a better way of
+-- doing this. For now this at least gets this bollocks out of the Button class.
+FixableButton = Class(Button) {
+    __init = function(self, parent, normal, active, highlight, disabled, clickCue, rolloverCue, frameRate)
+        Button.__init(self, parent, normal, active, highlight, disabled, clickCue, rolloverCue, frameRate)
+    end,
+
+    SetOverrideTexture = function(self, texture)
+        self.textureOverride = texture
+    end,
+
+    OverrideHandleEvent = function(self, event)
+        if self._isDisabled then
+            return true
+        end
+
+        if event.Type == 'MouseEnter' then
+            if self.mDragger then
+                self:OnRolloverEvent('enter')
+            else
+                self:OnRolloverEvent('enter')
+                if self.mRolloverCue then
+                    PlaySound(Sound({Cue = self.mRolloverCue, Bank = "Interface"}))
+                end
+            end
+            self.mMouseOver = true
+            return true
+        elseif event.Type == 'MouseExit' then
+            self:OnRolloverEvent('exit')
+            self.mMouseOver = false
+            return true
+        elseif event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
+            local dragger = Dragger()
+            dragger.OnRelease = function(dragger, x, y)
+                dragger:Destroy()
+                self.mDragger = nil
+                if self.mMouseOver then
+                    self:OnRolloverEvent('exit')
+                    self:OnClick(event.Modifiers)
+                end
+            end
+            dragger.OnCancel = function(dragger)
+                dragger:Destroy()
+                self.mDragger = nil
+            end
+            self.mDragger = dragger
+            if self.mClickCue then
+                PlaySound(Sound({Cue = self.mClickCue, Bank = "Interface"}))
+            end
+            self:OnRolloverEvent('down')
+            PostDragger(self:GetRootFrame(), event.KeyCode, dragger)
+            return true
+        end
+
+        return false
+    end,
+
+    EnableOverride = function(self)
+        self:SetTexture(self.textureOverride)
+        self.HandleEvent = FixableButton.OverrideHandleEvent
+        self.ApplyTextures = function() end
+    end,
+
+    DisableOverride = function(self)
+        self.HandleEvent = Button.HandleEvent
+        self.ApplyTextures = Button.ApplyTextures
+        self:ApplyTextures()
+    end,
+
+    SetOverrideEnabled = function(self, flag)
+        if flag then
+            self:EnableOverride()
+        else
+            self:DisableOverride()
+        end
+    end,
+
+    GetOverrideEnabled = function(self)
+        return self.HandleEvent == FixableButton.OverrideHandleEvent
+    end,
+
+    ToggleOverride = function(self)
+        self:SetOverrideEnabled(not self:GetOverrideEnabled())
+    end
 }

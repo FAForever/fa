@@ -14,6 +14,7 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local SpecialGrid = import('/lua/ui/controls/specialgrid.lua').SpecialGrid
 local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
 local Button = import('/lua/maui/button.lua').Button
+local FixableButton = import('/lua/maui/button.lua').FixableButton
 local Edit = import('/lua/maui/edit.lua').Edit
 local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
 local GameCommon = import('/lua/ui/game/gamecommon.lua')
@@ -528,9 +529,9 @@ function CommonLogic()
             SetIconTextures(control)
             local up, down, over, dis = GetBackgroundTextures(control.Data.id)
             control:SetNewTextures(up, down, over, dis)
-            control:SetUpAltButtons(down, down, down, down)
+            control:SetOverrideTexture(down)
             control.tooltipID = LOC(__blueprints[control.Data.id].Description) or 'no description'
-            control.mAltToggledFlag = false
+            control:DisableOverride()
             control.Height:Set(48)
             control.Width:Set(48)
             control.Icon.Height:Set(48)
@@ -548,7 +549,7 @@ function CommonLogic()
     end
 
     controls.secondaryChoices.CreateElement = function()
-        local btn = Button(controls.choices)
+        local btn = FixableButton(controls.choices)
 
         btn.Icon = Bitmap(btn)
         btn.Icon:DisableHitTest()
@@ -602,7 +603,7 @@ function CommonLogic()
     end
 
     controls.choices.CreateElement = function()
-        local btn = Button(controls.choices)
+        local btn = FixableButton(controls.choices)
 
         btn.Icon = Bitmap(btn)
         btn.Icon:DisableHitTest()
@@ -744,11 +745,11 @@ function CommonLogic()
             control.BuildKey = nil
         elseif type == 'enhancement' then
             control.Icon:SetSolidColor('00000000')
-            control:SetNewTextures(GetEnhancementTextures(control.Data.unitID, control.Data.icon))
-            local _, down, over, _, up = GetEnhancementTextures(control.Data.unitID, control.Data.icon)
-            control:SetUpAltButtons(up, up, up, up)
+            local up, down, over, _, selected = GetEnhancementTextures(control.Data.unitID, control.Data.icon)
+            control:SetNewTextures(up, down, over, up)
+            control:SetOverrideTexture(selected)
             control.tooltipID = LOC(control.Data.enhTable.Name) or 'no description'
-            control.mAltToggledFlag = control.Data.Selected
+            control:SetOverrideEnabled(control.Data.Selected)
             control.Height:Set(48)
             control.Width:Set(48)
             control.Icon.Height:Set(48)
@@ -768,7 +769,7 @@ function CommonLogic()
                 control:Enable()
             end
         elseif type == 'templates' then
-            control.mAltToggledFlag = false
+            control:DisableOverride()
             SetIconTextures(control, control.Data.template.icon)
             control:SetNewTextures(GetBackgroundTextures(control.Data.template.icon))
             control.Height:Set(48)
@@ -799,8 +800,8 @@ function CommonLogic()
             control:SetNewTextures(GetBackgroundTextures(control.Data.id))
             local _, down = GetBackgroundTextures(control.Data.id)
             control.tooltipID = LOC(__blueprints[control.Data.id].Description) or 'no description'
-            control:SetUpAltButtons(down, down, down, down)
-            control.mAltToggledFlag = false
+            control:SetOverrideTexture(down)
+            control:DisableOverride()
             control.Height:Set(48)
             control.Width:Set(48)
             control.Icon.Height:Set(48)
@@ -863,7 +864,7 @@ function CommonLogic()
             SetIconTextures(control)
             control:SetNewTextures(GetBackgroundTextures(control.Data.id))
             control.tooltipID = LOC(__blueprints[control.Data.id].Description) or 'no description'
-            control.mAltToggledFlag = false
+            control:DisableOverride()
             control.Height:Set(48)
             control.Width:Set(48)
             control.Icon.Height:Set(48)
@@ -1253,10 +1254,10 @@ function OnClickHandler(button, modifiers)
     elseif item.type == 'attachedunit' then
         if modifiers.Left then
             -- Toggling selection of the entity
-            button:OnAltToggle()
+            button:ToggleOverride()
 
             -- Add or Remove the entity to the session selection
-            if button.mAltToggledFlag then
+            if button:GetOverrideEnabled() then
                 AddToSessionExtraSelectList(item.unit)
             else
                 RemoveFromSessionExtraSelectList(item.unit)
