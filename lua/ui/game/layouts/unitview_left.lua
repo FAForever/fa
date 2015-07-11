@@ -103,6 +103,7 @@ function SetLayout()
     controls.abilities.Height:Set(50)
     controls.abilities.Width:Set(200)
 
+    if controls.abilityBG then controls.abilityBG:Destroy() end
     controls.abilityBG = NinePatch(controls.abilities,
         UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_m.dds'),
         UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_ul.dds'),
