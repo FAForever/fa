@@ -511,7 +511,7 @@ end
 function UpdateUnitInfo()
     local currentInfo = GetRolloverInfo() or (selectedUnit and GetUnitRolloverInfo(selectedUnit))
 
-    if currentInfo and table.getsize(currentInfo) > 0 and import('/lua/ui/game/unitviewDetail.lua').View.Hiding then
+    if currentInfo and table.getsize(currentInfo) > 0 and import('/lua/ui/game/unitviewDetail.lua').View:IsHidden() then
         controls.bg:Show()
         UpdateWindow(currentInfo)
 
