@@ -30,6 +30,8 @@ Visual
 - Legacy checkbox UI code working again
 - Fixed Engineers spawning the wrong tarmacs when building Seraphim buildings
 - Engineering stations no longer exhibit a model bug when rebuilt by an assisting SCU
+- Fuel indicator no longer falls off the unit detail window
+- Seraphim ACU and SCU no longer show the tac missile counter if they don't have the upgrade
 
 Physics
 - Projectiles no longer collide with sinking units
@@ -77,6 +79,7 @@ Visual
 - Enhanced Seraphim tarmacs
 - Beams originating inside Fog of War will no longer be invisible
 - Cybran buildbots are no longer invisible to other players
+- MEx, T1 PD, and Radar strategic icons will appear above other building icons when zoomed out
 
 
 UI
