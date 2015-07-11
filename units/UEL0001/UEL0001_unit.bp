@@ -1079,7 +1079,7 @@ UnitBlueprint {
             CollideFriendly = false,
             CountedProjectile = true,
             Damage = 6000,
-            DamageFriendly = true,
+            DamageFriendly = false,#true
             DamageRadius = 2,
             DamageType = 'Normal',
             DisplayName = 'Tactical Warhead',

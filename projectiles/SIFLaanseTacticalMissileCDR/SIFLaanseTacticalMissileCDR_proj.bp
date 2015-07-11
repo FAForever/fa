@@ -25,8 +25,8 @@ ProjectileBlueprint {
         'NOSPLASHDAMAGE',
     },
     Defense = {
-        Health = 3,
-        MaxHealth = 3,
+        Health = 2,#3
+        MaxHealth = 2,#3
     },
     Display = {
         CameraFollowTimeout = 2,
