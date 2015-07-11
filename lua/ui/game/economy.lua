@@ -233,6 +233,9 @@ function ConfigureBeatFunction()
         -- Flags to make things blink.
         local blinkyFlag = true
 
+        -- Counter to give up if the user stopped caring.
+        local blinkyCounter = 0
+
         if warnFull then
             return function(rateVal, storedVal, maxStorageVal)
                 local fractionFull = storedVal / maxStorageVal
@@ -247,6 +250,11 @@ function ConfigureBeatFunction()
 
                 -- Positive rate, check if we're wasting money (and flash irritatingly if so)
                 if fractionFull >= 1 then
+                    blinkyCounter = blinkyCounter + 1
+                    if blinkyCounter > 100 then
+                        return 'ffffffff'
+                    end
+
                     -- Display flashing gray-white if high on resource.
                     blinkyFlag = not blinkyFlag
                     if blinkyFlag then
@@ -254,6 +262,8 @@ function ConfigureBeatFunction()
                     else
                         return 'ffffffff'
                     end
+                else
+                    blinkyCounter = 0
                 end
 
                 return 'ffb7e75f'
