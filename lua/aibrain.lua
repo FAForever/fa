@@ -1148,35 +1148,7 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-    OnUnitCapLimitReached = function(self)
-
-        if GetFocusArmy() == self:GetArmyIndex() then
-
-            local warningVoice = nil
-            local factionIndex = self:GetFactionIndex()
-            if factionIndex == 1 then
-                warningVoice = Sound {
-                    Bank = 'COMPUTER_UEF_VO',
-                    Cue = 'UEFComputer_CommandCap_01298',
-                }
-            elseif factionIndex == 2 then
-                warningVoice = Sound {
-                    Bank = 'COMPUTER_AEON_VO',
-                    Cue = 'AeonComputer_CommandCap_01298',
-                }
-            elseif factionIndex == 3 then
-                warningVoice = Sound {
-                    Bank = 'COMPUTER_CYBRAN_VO',
-                    Cue = 'CybranComputer_CommandCap_01298',
-                }
-            end
-
-            if self.VOTable and not self.VOTable['OnUnitCapLimitReached'] then
-                self.VOTable['OnUnitCapLimitReached'] = ForkThread(self.PlayVOSound, self, warningVoice, 'OnUnitCapLimitReached')
-            end
-
-        end
-    end,
+    OnUnitCapLimitReached = function(self) end,
 
     OnFailedUnitTransfer = function(self)
 
