@@ -42,10 +42,6 @@ OnSync = function()
             PlayVoice(Sound{ Bank=v.Bank, Cue=v.Cue }, true)
         end
     end
-    
-    if Sync.NewTech then
-        import('/lua/ui/game/construction.lua').NewTech(Sync.NewTech)
-    end
 
     if Sync.AddTransmissions then
         import('/lua/ui/game/transmissionlog.lua').OnPostLoad(Sync.AddTransmissions)

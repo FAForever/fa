@@ -85,7 +85,6 @@ local capturingKeys = false
 local layoutVar = false
 local DisplayData = {}
 local sortedOptions = {}
-local newTechUnits = {}
 local currentCommandQueue = false
 local previousTabSet = nil
 local previousTabSize = nil
@@ -777,47 +776,6 @@ function CommonLogic()
             control:Enable()
             control.LowFuel:SetAlpha(0, true)
             control.LowFuel:SetNeedsFrameUpdate(false)
-            if newTechUnits and table.find(newTechUnits, control.Data.id) then
-                table.remove(newTechUnits, table.find(newTechUnits, control.Data.id))
-                control.NewInd = Bitmap(control, UIUtil.UIFile('/game/selection/selection_brackets_player_highlighted.dds'))
-                control.NewInd.Height:Set(80)
-                control.NewInd.Width:Set(80)
-                LayoutHelpers.AtCenterIn(control.NewInd, control)
-                control.NewInd:DisableHitTest()
-                control.NewInd.Incrementing = false
-                control.NewInd:SetNeedsFrameUpdate(true)
-                control.NewInd.OnFrame = function(ind, delta)
-                    local newAlpha = ind:GetAlpha() - delta / 5
-                    if newAlpha < 0 then
-                        ind:SetAlpha(0)
-                        ind:SetNeedsFrameUpdate(false)
-                        return
-                    else
-                        ind:SetAlpha(newAlpha)
-                    end
-                    if ind.Incrementing then
-                        local newheight = ind.Height() + delta * 100
-                        if newheight > 80 then
-                            ind.Height:Set(80)
-                            ind.Width:Set(80)
-                            ind.Incrementing = false
-                        else
-                            ind.Height:Set(newheight)
-                            ind.Width:Set(newheight)
-                        end
-                    else
-                        local newheight = ind.Height() - delta * 100
-                        if newheight < 50 then
-                            ind.Height:Set(50)
-                            ind.Width:Set(50)
-                            ind.Incrementing = true
-                        else
-                            ind.Height:Set(newheight)
-                            ind.Width:Set(newheight)
-                        end
-                    end
-                end
-            end
         elseif type == 'unitstack' then
             SetIconTextures(control)
             control:SetNewTextures(GetBackgroundTextures(control.Data.id))
@@ -2343,15 +2301,6 @@ function SetupConstructionControl(parent, inMFDControl, inOrdersControl)
     SetLayout(UIUtil.currentLayout)
 
     return controls.constructionGroup
-end
-
-
-function NewTech(Data)
-    for _, unitList in Data do
-        for _, unit in unitList do
-            table.insert(newTechUnits, unit)
-        end
-    end
 end
 
 -- given a tech level, sets that tech level, returns false if tech level not available
