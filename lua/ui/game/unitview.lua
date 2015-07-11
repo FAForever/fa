@@ -140,7 +140,7 @@ local statFuncs = {
             if info.userUnit:IsInCategory('VERIFYMISSILEUI') then
                 local curEnh = EnhancementCommon.GetEnhancements(info.userUnit:GetEntityId())
                 if curEnh then
-                    if curEnh.Back == 'TacticalMissile' then
+                    if curEnh.Back == 'TacticalMissile' or curEnh.Back == 'Missile' then
                         return string.format('%d / %d', info.tacticalSiloStorageCount, info.tacticalSiloMaxStorageCount), 'tactical'
                     elseif curEnh.Back == 'TacticalNukeMissile' then
                         return string.format('%d / %d', info.nukeSiloStorageCount, info.nukeSiloMaxStorageCount), 'strategic'
