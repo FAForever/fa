@@ -60,7 +60,8 @@ function SetLayout()
         [1] = {Left = 70, Top = 60},
         [2] = {Left = 70, Top = 80},
         [3] = {Left = 190, Top = 60},
-        [5] = {Left = 130, Top = 60},
+        [4] = {Left = 130, Top = 60},
+        [5] = {Left = 130, Top = 80},
         [6] = {Left = 130, Top = 80},
         [7] = {Left = 190, Top = 80}
     }
