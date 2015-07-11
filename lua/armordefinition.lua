@@ -1,4 +1,4 @@
-#****************************************************************************
+﻿#****************************************************************************
 #**
 #**  File     :  /lua/armordefinition.lua
 #**  Author(s):
@@ -69,5 +69,13 @@ armordefinition = {
         # Armor Definition
         'Normal 1.0',        
         'CzarBeam 0.25',   
+    },
+    {
+        # Armor Type name
+        'TMD',
+        
+        # Armor Definition
+        'Normal 1.0',        
+        'TacticalMissile 0.55',   
     },
 }
