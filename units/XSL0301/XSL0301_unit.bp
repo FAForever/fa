@@ -932,7 +932,7 @@ UnitBlueprint {
             CollideFriendly = false,
             CountedProjectile = true,
             Damage = 6000,
-            DamageFriendly = true,
+            DamageFriendly = false,#true
             DamageRadius = 3,
             DamageType = 'Normal',
             DisplayName = 'Laanse Tactical Missile Launcher',
@@ -952,7 +952,7 @@ UnitBlueprint {
             MuzzleChargeDelay = 0.2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 5,
+            MuzzleVelocity = 10,
             ProjectileId = '/projectiles/SIFLaanseTacticalMissileSCU/SIFLaanseTacticalMissileSCU_proj.bp',
             ProjectileLifetime = 80,
             ProjectilesPerOnFire = 1,
