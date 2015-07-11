@@ -1214,8 +1214,8 @@ AIBrain = Class(moho.aibrain_methods) {
         if GetFocusArmy() == self:GetArmyIndex() then
 
             local Voice = Sound {
-                Bank = 'COMPUTER_UEF_VO',
-                Cue = 'UEFComputer_TransportIsFull',
+                Bank = 'XGG',
+                Cue = 'XGG_Computer_CV01_04755',
             }
 
             if self.VOTable and not self.VOTable['OnPlayBusyStagingPlatformsVO'] then
