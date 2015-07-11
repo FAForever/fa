@@ -8,7 +8,7 @@
 -- **  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
-local AAirUnit = import('/lua/aeonunits.lua').AAirUnit
+local AirTransport = import('/lua/defaultunits.lua').AirTransport
 local aWeapons = import('/lua/aeonweapons.lua')
 local AQuantumBeamGenerator = aWeapons.AQuantumBeamGenerator
 local AAAZealotMissileWeapon = aWeapons.AAAZealotMissileWeapon
@@ -16,7 +16,7 @@ local AANDepthChargeBombWeapon = aWeapons.AANDepthChargeBombWeapon
 local AAATemporalFizzWeapon = aWeapons.AAATemporalFizzWeapon
 local explosion = import('/lua/defaultexplosions.lua')
 
-UAA0310 = Class(AAirUnit) {
+UAA0310 = Class(AirTransport) {
     DestroyNoFallRandomChance = 1.1,
     Weapons = {
 
@@ -51,7 +51,7 @@ UAA0310 = Class(AAirUnit) {
         self.detector:Enable()
 
 
-        AAirUnit.OnKilled(self, instigator, type, overkillRatio)
+        AirTransport.OnKilled(self, instigator, type, overkillRatio)
     end,
 
     OnAnimTerrainCollision = function(self, bone,x,y,z)
@@ -63,12 +63,12 @@ UAA0310 = Class(AAirUnit) {
     BuildAttachBone = 'UAA0310',
 
     OnStopBeingBuilt = function(self,builder,layer)
-        AAirUnit.OnStopBeingBuilt(self,builder,layer)
+        AirTransport.OnStopBeingBuilt(self,builder,layer)
         ChangeState(self, self.IdleState)
     end,
 
     OnFailedToBuild = function(self)
-        AAirUnit.OnFailedToBuild(self)
+        AirTransport.OnFailedToBuild(self)
         ChangeState(self, self.IdleState)
     end,
 
@@ -79,7 +79,7 @@ UAA0310 = Class(AAirUnit) {
         end,
 
         OnStartBuild = function(self, unitBuilding, order)
-            AAirUnit.OnStartBuild(self, unitBuilding, order)
+            AirTransport.OnStartBuild(self, unitBuilding, order)
             self.UnitBeingBuilt = unitBuilding
             ChangeState(self, self.BuildingState)
         end,
@@ -96,7 +96,7 @@ UAA0310 = Class(AAirUnit) {
         end,
 
         OnStopBuild = function(self, unitBeingBuilt)
-            AAirUnit.OnStopBuild(self, unitBeingBuilt)
+            AirTransport.OnStopBuild(self, unitBeingBuilt)
             ChangeState(self, self.FinishedBuildingState)
         end,
     },
@@ -118,7 +118,7 @@ UAA0310 = Class(AAirUnit) {
             self:RequestRefreshUI()
             ChangeState(self, self.IdleState)
         end,
-    },
+    }
 }
 
 TypeClass = UAA0310

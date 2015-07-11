@@ -1636,8 +1636,9 @@ AirUnit = Class(MobileUnit) {
     end,
 }
 
---- Base class for air transports.
-AirTransport = Class(AirUnit) {
+--- Mixin transports (air, sea, space, whatever). Sellotape onto concrete transport base classes as
+-- desired.
+BaseTransport = Class() {
     OnTransportAttach = function(self, attachBone, unit)
         self:PlayUnitSound('Load')
         self:MarkWeaponsOnTransport(unit, true)
@@ -1664,32 +1665,38 @@ AirTransport = Class(AirUnit) {
         attached:DetachFrom()
     end,
 
-    OnKilled = function(self, instigator, type, overkillRatio)
-        AirUnit.OnKilled(self, instigator, type, overkillRatio)
-
-        local units = self:GetCargo()
-        for k, v in units do
-            v:DetachFrom()
-        end
-    end,
-
     GetTransportClass = function(self)
         local bp = self:GetBlueprint().Transport
         return bp.TransportClass
     end,
 
-    OnStartTransportLoading = function(...)
+    OnStartTransportLoading = function(self)
+        -- We keep the aibrain up to date with the last transport to start loading so, among other
+        -- things, we can determine which transport is being referenced during an OnTransportFull
+        -- event (As this function is called immediately before that one).
+        self:GetAIBrain().loadingTransport = self
     end,
 
     OnStopTransportLoading = function(...)
     end,
 
     DestroyedOnTransport = function(self)
-        WARN("DestroyedOnTransport!")
-        for k, v in arg do
-            WARN(v)
+    end,
+
+    DetachCargo = function(self)
+        local units = self:GetCargo()
+        for k, v in units do
+            v:DetachFrom()
         end
     end
+}
+
+--- Base class for air transports.
+AirTransport = Class(AirUnit, BaseTransport) {
+    OnKilled = function(self, instigator, type, overkillRatio)
+        AirUnit.OnKilled(self, instigator, type, overkillRatio)
+        self:DetachCargo()
+    end,
 }
 
 ---------------------------------------------------------------
@@ -1835,6 +1842,13 @@ SeaUnit = Class(MobileUnit){
     end,
 }
 
+--- Base class for aircraft carriers.
+AircraftCarrier = Class(SeaUnit, BaseTransport) {
+    OnKilled = function(self, instigator, type, overkillRatio)
+        SeaUnit.OnKilled(self, instigator, type, overkillRatio)
+        self:DetachCargo()
+    end,
+}
 
 ---------------------------------------------------------------
 --  HOVERING LAND UNITS

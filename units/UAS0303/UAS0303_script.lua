@@ -1,36 +1,25 @@
--- ****************************************************************************
--- **
--- **  File     :  /cdimage/units/URS0303/URS0303_script.lua
--- **  Author(s):  David Tomandl, Andres Mendez
--- **
--- **  Summary  :  Cybran Aircraft Carrier Script
--- **
--- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
--- ****************************************************************************
+#****************************************************************************
+#**
+#**  File     :  /cdimage/units/UAS0303/UAS0303_script.lua
+#**  Author(s):  John Comes
+#**
+#**  Summary  :  Aeon Aircraft Carrier Script
+#**
+#**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+#****************************************************************************
 
 local AircraftCarrier = import('/lua/defaultunits.lua').AircraftCarrier
-local CybranWeaponsFile = import('/lua/cybranweapons.lua')
-local CAAAutocannon = CybranWeaponsFile.CAAAutocannon
-local CAMZapperWeapon = CybranWeaponsFile.CAMZapperWeapon
-local loading = false
+local WeaponsFile = import('/lua/aeonweapons.lua')
+local AAAZealotMissileWeapon = WeaponsFile.AAAZealotMissileWeapon
 
-URS0303 = Class(AircraftCarrier) {
+UAS0303 = Class(AircraftCarrier) {
 
     Weapons = {
-    -- Weapons
-    --  4 AA Autocannon w/ Guided Rounds
-    --  1 "Zapper" Anti-Missile
-
-        AAGun01 = Class(CAAAutocannon) {},
-        AAGun02 = Class(CAAAutocannon) {},
-        AAGun03 = Class(CAAAutocannon) {},
-        AAGun04 = Class(CAAAutocannon) {},
-
-        Zapper = Class(CAMZapperWeapon) {},
-
+        AntiAirMissiles01 = Class(AAAZealotMissileWeapon) {},
+        AntiAirMissiles02 = Class(AAAZealotMissileWeapon) {},
     },
 
-    BuildAttachBone = 'Attachpoint',
+    BuildAttachBone = 'UAS0303',
 
     OnStopBeingBuilt = function(self,builder,layer)
         AircraftCarrier.OnStopBeingBuilt(self,builder,layer)
@@ -89,9 +78,7 @@ URS0303 = Class(AircraftCarrier) {
             ChangeState(self, self.IdleState)
         end,
     },
-
-
 }
 
-TypeClass = URS0303
+TypeClass = UAS0303
 
