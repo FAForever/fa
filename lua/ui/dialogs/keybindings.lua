@@ -27,6 +27,8 @@ local function ResetKeyMap()
     IN_ClearKeyMap()
     import('/lua/keymap/keymapper.lua').ClearUserKeyMap()
     IN_AddKeyMapTable(import('/lua/keymap/keymapper.lua').GetKeyActions(true))
+    keyTable = FormatData()
+    keyContainer:CalcVisible()
 end
 
 local function ConfirmNewKeyMap()
@@ -201,6 +203,8 @@ function CreateUI()
                 break
             end
         end
+        keyTable = FormatData()
+        keyContainer:CalcVisible()
     end
 
     local dialogContent = Group(GetFrame(0))
