@@ -129,18 +129,6 @@ options = {
                 },
             },
             {
-                title = "<LOC OPTIONS_0076>Economy Warnings",
-                key = 'econ_warnings',
-                type = 'toggle',
-                default = true,
-                custom = {
-                    states = {
-                        {text = "<LOC _On>", key = true,},
-                        {text = "<LOC _Off>", key = false,},
-                    },
-                },
-            },
-            {
                 title = "<LOC OPTIONS_0215>Show Waypoint ETAs",
                 key = 'display_eta',
                 type = 'toggle',
@@ -310,6 +298,18 @@ options = {
                     states = {
                         {text = "<LOC _On>", key = true},
                         {text = "<LOC _Off>", key = false},
+                    },
+                },
+            },
+            {
+                title = "<LOC OPTIONS_0076>Economy Warnings",
+                key = 'econ_warnings',
+                type = 'toggle',
+                default = true,
+                custom = {
+                    states = {
+                        {text = "<LOC _On>", key = true,},
+                        {text = "<LOC _Off>", key = false,},
                     },
                 },
             },
