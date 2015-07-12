@@ -294,9 +294,8 @@ function CreateUI()
         LayoutHelpers.AtLeftIn(entry.description, entry.bg, 150)
         LayoutHelpers.AtVerticalCenterIn(entry.description, entry.bg)
 
+        -- USE A SODDING ITEMLIST YOU PRUNES
         entry.bg.HandleEvent = function(self, event)
-            local eventHandled = false
-
             local function SelectLine()
                 for k, v in keyTable do
                     if v._selected then
@@ -311,13 +310,14 @@ function CreateUI()
             
             if event.Type == 'ButtonPress' then
                 SelectLine()
-                eventHandled = true
+                return true
             elseif event.Type == 'ButtonDClick' then
                 SelectLine()
-                eventHandled = true
+                AssignCurrentSelection()
+                return true
             end
 
-            return eventHandled
+            return false
         end
     end
     
