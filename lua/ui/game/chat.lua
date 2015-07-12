@@ -1157,7 +1157,7 @@ function WrapText(data)
             function(line)
                 local firstLine = GUI.chatLines[1]
                 if line == 1 then
-                    return firstLine.Right() - firstLine.teamColor.Right() + firstLine.name:GetStringAdvance(data.name) + 4
+                    return firstLine.Right() - (firstLine.teamColor.Right() + firstLine.name:GetStringAdvance(data.name) + 4)
                 else
                     return firstLine.Right() - firstLine.name.Right()
                 end
