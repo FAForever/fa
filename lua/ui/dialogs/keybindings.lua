@@ -39,113 +39,83 @@ local function ConfirmNewKeyMap()
 end
 
 local function EditActionKey(parent, action, currentKey)
-    local dialog = Group(parent, "editActionKeyDialog")
-    LayoutHelpers.AtCenterIn(dialog, parent)
-    LayoutHelpers.DepthOverParent(dialog, parent, 100)
-    dialog.Height:Set(100)
-    
-    local background = Bitmap(dialog, UIUtil.SkinnableFile('/dialogs/dialog_02/panel_bmp_m.dds'))
-    background:SetTiled(true)
-    dialog.Width:Set(background.Width)
-    LayoutHelpers.FillParent(background, dialog)
+    local dialogContent = Group(parent)
+    dialogContent.Height:Set(130)
+    dialogContent.Width:Set(400)
 
-    local backgroundTop = Bitmap(dialog, UIUtil.SkinnableFile('/dialogs/dialog_02/panel_bmp_T.dds'))
-    LayoutHelpers.Above(backgroundTop, background)
-    local backgroundBottom = Bitmap(dialog, UIUtil.SkinnableFile('/dialogs/dialog_02/panel_bmp_b.dds'))
-    LayoutHelpers.Below(backgroundBottom, background)
-    
-    local okButton = UIUtil.CreateButtonStd( background, '/widgets/small', "<LOC _Ok>", 12, 0)
-    LayoutHelpers.AtBottomIn(okButton, backgroundBottom, 25)
-    LayoutHelpers.AtLeftIn(okButton, backgroundBottom, 30)           
+    local keyPopup = Popup(panel, dialogContent)
 
-    local cancelButton = UIUtil.CreateButtonStd( background, '/widgets/small', "<LOC _Cancel>", 12, 0)
-    LayoutHelpers.AtBottomIn(cancelButton, backgroundBottom, 25)
-    LayoutHelpers.AtRightIn(cancelButton, backgroundBottom, 30)
+    local cancelButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Cancel>")
+    LayoutHelpers.AtBottomIn(cancelButton, dialogContent, 9)
+    LayoutHelpers.AtRightIn(cancelButton, dialogContent, -2)
     cancelButton.OnClick = function(self, modifiers)
-        dialog:Destroy()
-    end          
-    
-    local helpText = UIUtil.CreateText(background, "<LOC key_binding_0002>Hit the key combination you'd like to assign", 16)
-    LayoutHelpers.AtTopIn(helpText, background)
-    LayoutHelpers.AtHorizontalCenterIn(helpText, background)
-    
-    local keyText = UIUtil.CreateText(background, formatkeyname(currentKey), 24)
-    LayoutHelpers.AtTopIn(keyText, background, 40)
-    LayoutHelpers.AtHorizontalCenterIn(keyText, background)
+        keyPopup:Close()
+    end
 
-    dialog:AcquireKeyboardFocus(false)
-    dialog.OnDestroy = function(self)
-        dialog:AbandonKeyboardFocus()
+    local okButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Ok>")
+    LayoutHelpers.LeftOf(okButton, cancelButton, 145)
+    
+    local helpText = UIUtil.CreateText(dialogContent, "<LOC key_binding_0002>Hit the key combination you'd like to assign", 16)
+    LayoutHelpers.AtTopIn(helpText, dialogContent, 10)
+    LayoutHelpers.AtHorizontalCenterIn(helpText, dialogContent)
+    
+    local keyText = UIUtil.CreateText(dialogContent, formatkeyname(currentKey), 24)
+    LayoutHelpers.AtTopIn(keyText, dialogContent, 40)
+    LayoutHelpers.AtHorizontalCenterIn(keyText, dialogContent)
+
+    dialogContent:AcquireKeyboardFocus(false)
+    keyPopup.OnClose = function(self)
+        dialogContent:AbandonKeyboardFocus()
     end
 
     local keyCodeLookup = import('/lua/keymap/keymapper.lua').GetKeyCodeLookup()
     local keyAdder = {}
     local currentKeyPattern
-    
+
     local function AddKey(keyCode, modifiers)
-       
-        if keyCodeLookup[keyCode] != nil then
-            local ctrl = false
-            local alt = false
-            local shift = false
-
-            local key = keyCodeLookup[keyCode]
-            
-            if key != 'Ctrl' then
-                if modifiers.Ctrl == true then
-                    ctrl = true
-                end
-                
-                if key != 'Shift' then
-                    if modifiers.Shift == true then
-                        shift = true
-                    end
-                
-                    if key != 'Alt' then
-                        if modifiers.Alt == true then
-                            alt = true
-                        end
-                    end
-                end
-
-            end
-            
-            local keyComboName = ""
-            currentKeyPattern = ""
-            
-            if ctrl == true then
-                currentKeyPattern = currentKeyPattern .. keyNames['11'] .. "-"
-                keyComboName = keyComboName .. LOC(properKeyNames[keyNames['11']]) .. "-"
-            end
-            
-            if shift == true  then
-                currentKeyPattern = currentKeyPattern .. keyNames['10'] .. "-"
-                keyComboName = keyComboName .. LOC(properKeyNames[keyNames['10']]) .. "-"
-            end
-            
-            if alt == true  then
-                currentKeyPattern = currentKeyPattern .. keyNames['12'] .. "-"
-                keyComboName = keyComboName .. LOC(properKeyNames[keyNames['12']]) .. "-"
-            end
-    
-            currentKeyPattern = currentKeyPattern .. key
-            keyComboName = keyComboName .. LOC(properKeyNames[key])
-            
-            keyText:SetText(keyComboName)        
-            
+        local key = keyCodeLookup[keyCode]
+        if not key then
+            return
         end
+
+        local keyComboName = ""
+        currentKeyPattern = ""
+
+        -- Sellotape on modifier keys...
+        if key ~= 'Ctrl' and modifiers.Ctrl then
+            currentKeyPattern = currentKeyPattern .. keyNames['11'] .. "-"
+            keyComboName = keyComboName .. LOC(properKeyNames[keyNames['11']]) .. "-"
+        end
+
+        if key ~= 'Alt' and modifiers.Alt then
+            currentKeyPattern = currentKeyPattern .. keyNames['12'] .. "-"
+            keyComboName = keyComboName .. LOC(properKeyNames[keyNames['12']]) .. "-"
+        end
+
+        if key ~= 'Shift' and modifiers.Shift then
+            currentKeyPattern = currentKeyPattern .. keyNames['10'] .. "-"
+            keyComboName = keyComboName .. LOC(properKeyNames[keyNames['10']]) .. "-"
+        end
+
+        currentKeyPattern = currentKeyPattern .. key
+        keyComboName = keyComboName .. LOC(properKeyNames[key])
+
+        keyText:SetText(keyComboName)
     end
-    
-    dialog.HandleEvent = function(self, event)
+
+    local oldHandleEvent = dialogContent.HandleEvent
+    dialogContent.HandleEvent = function(self, event)
         if event.Type == 'KeyDown' then
             AddKey(event.RawKeyCode, event.Modifiers)
         end
-    end    
+
+        oldHandleEvent(self, event)
+    end
 
     local function AssignKey()
         -- check if key is already assigned to something else
         local Keymapper = import('/lua/keymap/keymapper.lua')
-        
+
         local function ClearShiftKey()
             Keymapper.ClearUserKeyMapping("Shift-" .. currentKeyPattern)
             LOG("clearing Shift-"..currentKeyPattern)
@@ -165,7 +135,7 @@ local function EditActionKey(parent, action, currentKey)
                         "<LOC _Yes>", ClearShiftKey,
                         "<LOC _No>", nil,
                         nil, nil,
-                        true, 
+                        true,
                         {escapeButton = 2, enterButton = 1, worldCover = false})
                 end
 
@@ -174,7 +144,7 @@ local function EditActionKey(parent, action, currentKey)
                         "<LOC _Yes>", ClearAltKey,
                         "<LOC _No>", nil,
                         nil, nil,
-                        true, 
+                        true,
                         {escapeButton = 2, enterButton = 1, worldCover = false})
                 end
             end
@@ -186,18 +156,18 @@ local function EditActionKey(parent, action, currentKey)
                 "<LOC _Yes>", MapKey,
                 "<LOC _No>", nil,
                 nil, nil,
-                true, 
+                true,
                 {escapeButton = 2, enterButton = 1, worldCover = false})
-            
+
         else
             MapKey()
         end
     end
-    
+
     okButton.OnClick = function(self, modifiers)
         AssignKey()
-        dialog:Destroy()
-    end          
+        keyPopup:Close()
+    end
 
 end
 
@@ -286,8 +256,6 @@ function CreateUI()
             end
         end
     end
-    
-    AddInputCapture(dialogContent)
 
     keyContainer = Group(dialogContent)
     keyContainer.Height:Set(421)
