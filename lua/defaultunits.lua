@@ -1749,12 +1749,11 @@ ConstructionUnit = Class(MobileUnit) {
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order )
-
-    if unitBeingBuilt.WorkItem.Slot and unitBeingBuilt.WorkProgress == 0 then
-        return
-    else
-        MobileUnit.OnStartBuild(self,unitBeingBuilt, order)
-    end
+        if unitBeingBuilt.WorkItem.Slot and unitBeingBuilt.WorkProgress == 0 then
+            return
+        else
+            MobileUnit.OnStartBuild(self,unitBeingBuilt, order)
+        end
         -- Fix up info on the unit id from the blueprint and see if it matches the 'UpgradeTo' field in the BP.
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
@@ -1908,8 +1907,17 @@ CommandUnit = Class(WalkingLandUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order)
         WalkingLandUnit.OnStartBuild(self, unitBeingBuilt, order)
+        self.UnitBeingBuilt = unitBeingBuilt
+
         local bp = self:GetBlueprint()
-        if order ~= 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
+        local isUpgrade = order == 'Upgrade'
+        local showEffects = not isUpgrade or bp.Display.ShowBuildEffectsDuringUpgrade
+
+        if not isUpgrade then
+            self.BuildingUnit = true
+        end
+
+        if showEffects then
             self:StartBuildingEffects(unitBeingBuilt, order)
         end
 
