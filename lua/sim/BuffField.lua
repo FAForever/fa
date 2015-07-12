@@ -1,19 +1,13 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/sim/defaultbufffield.lua
-#**  Author(s):  Brute51
-#**
-#**  Summary  :  Low level buff field class (version 3)
-#**
-#****************************************************************************
-#**
-#** READ DOCUMENTATION BEFORE USING THIS!!
-#**
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/sim/defaultbufffield.lua
+--**  Author(s):  Brute51
+--**
+--**  Summary  :  Low level buff field class (version 3)
+--**
+--****************************************************************************
 
-local AIUtils = import('/lua/ai/aiutilities.lua')
 local Buff = import('/lua/sim/Buff.lua')
-local BuffDefinitions = import('/lua/sim/BuffDefinitions.lua')
 local Entity = import('/lua/sim/Entity.lua').Entity
 
 BuffFieldBlueprints = {
@@ -21,14 +15,14 @@ BuffFieldBlueprints = {
 
 BuffField = Class(Entity) {
 
-    # change these in an inheriting class if you want
-    FieldVisualEmitter = '',   # the FX on the unit that carries the buff field
+    -- change these in an inheriting class if you want
+    FieldVisualEmitter = '',   -- the FX on the unit that carries the buff field
 
-    # ----------------------------------------------------------------------------------------------------------
-    # EVENTS
+    -- ----------------------------------------------------------------------------------------------------------
+    -- EVENTS
 
     OnCreated = function(self)    
-        # fires when the field is initalised
+        -- fires when the field is initalised
         local bp = self:GetBlueprint()
         if bp.InitiallyEnabled then
             self:Enable()
@@ -36,10 +30,10 @@ BuffField = Class(Entity) {
     end,
 
     OnEnabled = function(self)
-        # fires when the field begins to work
+        -- fires when the field begins to work
 
-        # show field FX
-        if self.FieldVisualEmitter and type(self.FieldVisualEmitter) == 'string' and self.FieldVisualEmitter != '' then
+        -- show field FX
+        if self.FieldVisualEmitter and type(self.FieldVisualEmitter) == 'string' and self.FieldVisualEmitter ~= '' then
             local Owner = self:GetOwner()
             if not Owner.BuffFieldEffectsBag then
                 Owner.BuffFieldEffectsBag = {}
@@ -50,9 +44,9 @@ BuffField = Class(Entity) {
     end,
 
     OnDisabled = function(self)
-        # fires when the field stops working
+        -- fires when the field stops working
 
-        # remove field FX
+        -- remove field FX
         local Owner = self:GetOwner()
         if self.Emitter and Owner.BuffFieldEffectsBag then
             for k, v in Owner.BuffFieldEffectsBag do
@@ -65,37 +59,8 @@ BuffField = Class(Entity) {
         end
     end,
 
-    OnNewUnitsInFieldCheck = function(self)
-        # fires when another check is done to find new units in range that aren't yet under the influence of the
-        # field. This happens approximately every 4.9 seconds.
-    end,
-
-    OnPreUnitEntersField = function(self, unit)
-        # fired before unit receives the buffs, but it will. Any data returned by this event function is used as an
-        # argument for OnUnitEntersField, OnPreUnitLeavesField and OnUnitLeavesField
-    end,
-
-    OnUnitEntersField = function(self, unit, OnPreUnitEntersFieldData)
-        # fired when a new unit begins being affected by the field. the unit argument contains the newly affected 
-        # unit. The OnPreUnitEntersFieldData argument is the data (if any) returned by OnPreUnitEntersField. Any
-        # data returned by this event function is used as an argument for OnPreUnitLeavesField and
-        # OnUnitLeavesField
-    end,
-
-    OnPreUnitLeavesField = function(self, unit, OnPreUnitEntersFieldData, OnUnitEntersFieldData)
-        # fired when a unit leaves the field, just before the field buffs are removed. The OnPreUnitEntersFieldData
-        # argument is the data (if any) returned by OnPreUnitEntersField and the OnUnitEntersFieldData argument
-        # is the data (if any) returned by OnUnitEntersField. Any data returned by this event function is used as 
-        # an argument for OnUnitLeavesField.
-    end,
-
-    OnUnitLeavesField = function(self, unit, OnPreUnitEntersFieldData, OnUnitEntersFieldData, OnPreUnitLeavesField)
-        # fired after a unit left the field and the field buffs have been removed. the last 3 arguments contain
-        # data returned by the other events.
-    end,
-
-    # ----------------------------------------------------------------------------------------------------------
-    # ACTUAL CODE (dont change anything)
+    -- ----------------------------------------------------------------------------------------------------------
+    -- ACTUAL CODE (dont change anything)
 
     __init = function(self, spec)
         Entity.__init(self, spec)
@@ -110,16 +75,22 @@ BuffField = Class(Entity) {
     end,
 
     OnCreate = function(self)
-        #LOG('Buffield: ['..repr(BuffFieldName)..'] OnCreate')
+        --LOG('Buffield: ['..repr(BuffFieldName)..'] OnCreate')
 
         local Owner = self:GetOwner()
         local bp = self:GetBlueprint()
 
-        # verifying blueprint
-        if not bp.Name or type(bp.Name) != 'string' or bp.Name == '' then WARN('BuffField: Invalid name or name not set!') end
+        -- verifying blueprint
+        if not bp.Name or type(bp.Name) ~= 'string' or bp.Name == '' then WARN('BuffField: Invalid name or name not set!') end
         if type(bp.AffectsUnitCategories) == 'string' then bp.AffectsUnitCategories = ParseEntityCategory(bp.AffectsUnitCategories) end
         if type(bp.Buffs) == 'string' then bp.Buffs = { bp.Buffs } end
         if table.getn(bp.Buffs) < 1 then WARN('BuffField: [..repr(bp.Name)..] no buffs specified!') end
+        if not bp.Duration then
+            WARN('BuffField: [..repr(bp.Name)..] Duration must be specified for a buff field buff.')
+        end
+        if not bp.Stacks ~= "REPLACE" then
+            WARN('BuffField: [..repr(bp.Name)..] You almost certainly want buff fields to be Stack-type REPLACE.')
+        end
 
         for k, v in bp.Buffs do
             if not Buffs[v] then
@@ -132,7 +103,53 @@ BuffField = Class(Entity) {
             return
         end
 
-        # event stuff
+        -- Set up the get-nearby-units function to include the units we care about.
+        local aiBrain = Owner:GetAIBrain()
+        local pos = Owner:GetPosition()
+        local AffectsUnitCategories = bp.AffectsUnitCategories
+        local Radius = bp.Radius
+
+        if bp.AffectsOwnUnits and bp.AffectsAllies and bp.AffectsVisibleEnemies then
+            -- Affect *all* the things!
+            self.GetNearbyAffectableUnits = function()
+                return aiBrain:GetUnitsAroundPoint(AffectsUnitCategories, pos, Radius)
+            end
+        elseif bp.AffectsOwnUnits and bp.AffectsAllies then
+            -- All friendlies, no enemies.
+            self.GetNearbyAffectableUnits = function()
+                return aiBrain:GetUnitsAroundPoint(AffectsUnitCategories, pos, Radius, 'Ally')
+            end
+        elseif bp.AffectsOwnUnits and bp.AffectsVisibleEnemies then
+            -- Self and enemies, not allies.
+            self.GetNearbyAffectableUnits = function()
+                return table.merged(
+                    aiBrain:GetOwnUnitsAroundPoint(AffectsUnitCategories, pos, Radius, 'Ally'),
+                    aiBrain:GetUnitsAroundPoint(AffectsUnitCategories, pos, Radius, 'Enemy')
+                )
+            end
+        elseif bp.AffectsOwnUnits then
+            -- Own units only.
+            self.GetNearbyAffectableUnits = function()
+                return aiBrain:GetOwnUnitsAroundPoint(AffectsUnitCategories, pos, Radius)
+            end
+        elseif bp.AffectsVisibleEnemies then
+            -- Enemies units only.
+            self.GetNearbyAffectableUnits = function()
+                return aiBrain:GetUnitsAroundPoint(AffectsUnitCategories, pos, Radius, 'Enemy')
+            end
+        elseif bp.AffectsAllies then
+            -- Allies only. This wasn't supported before and is stupid anyway, but until we change
+            -- the configuration so it's unrepresentable let's do it anyway...
+            self.GetNearbyAffectableUnits = function()
+                local mine = aiBrain:GetOwnUnitsAroundPoint(AffectsUnitCategories, pos, Radius, 'Enemy')
+                local allied = aiBrain:GetUnitsAroundPoint(AffectsUnitCategories, pos, Radius, 'Ally')
+
+                -- Subtract mine from allied and you get the allies only.
+                return table.subtract(allied, mine)
+            end
+        end
+
+        -- event stuff
         Entity.OnCreate(self)
 
         if bp.DisableInTransport then
@@ -148,7 +165,7 @@ BuffField = Class(Entity) {
     end,
 
     IsEnabled = function(self)
-        return self.Enabled or false
+        return self.Enabled
     end,
 
     GetBuffs = function(self)
@@ -160,9 +177,9 @@ BuffField = Class(Entity) {
     end,
 
     Enable = function(self)
-        #LOG('Buffield: ['..repr(self.Name)..'] enable')
+        --LOG('Buffield: ['..repr(self.Name)..'] enable')
         if not self:IsEnabled() then
-            #LOG('Buffield: ['..repr(self.Name)..'] enabling buff field')
+            --LOG('Buffield: ['..repr(self.Name)..'] enabling buff field')
             local Owner = self:GetOwner()
             local bp = self:GetBlueprint()
 
@@ -176,7 +193,7 @@ BuffField = Class(Entity) {
     end,
 
     Disable = function(self)
-        #LOG('Buffield: ['..repr(self.Name)..'] disable')
+        --LOG('Buffield: ['..repr(self.Name)..'] disable')
         if self:IsEnabled() then
             local Owner = self:GetOwner()
             Owner:SetMaintenanceConsumptionInactive()
@@ -186,86 +203,30 @@ BuffField = Class(Entity) {
         end
     end,
 
-    # applies the buff to any unit in range each 5 seconds
-    # Owner is the unit that carries the field. This is a bit weird to have it like this but its the result of
-    # of the forkthread in the enable function.
+    -- applies the buff to any unit in range each 5 seconds
+    -- Owner is the unit that carries the field. This is a bit weird to have it like this but its the result of
+    -- of the forkthread in the enable function.
     FieldThread = function(Owner, self)
-        #LOG('Buffield: ['..repr(self.Name)..'] FieldThread')
         local bp = self:GetBlueprint()
 
-        local function GetNearbyAffectableUnits()
-            local units = {}
-            local aiBrain = Owner:GetAIBrain()
-            local pos = Owner:GetPosition()
-            if bp.AffectsOwnUnits then
-                units = table.merged(units, AIUtils.GetOwnUnitsAroundPoint(Owner:GetAIBrain(), bp.AffectsUnitCategories, pos, bp.Radius))
-            end
-            if bp.AffectsAllies then
-                units = table.merged(units, aiBrain:GetUnitsAroundPoint( bp.AffectsUnitCategories, pos, bp.Radius, 'Ally' ))
-                # civilians are not considered allies
-            end
-            if bp.AffectsVisibleEnemies then
-                units = table.merged(units, aiBrain:GetUnitsAroundPoint( bp.AffectsUnitCategories, pos, bp.Radius, 'Enemy' ))
-            end
-            return units
-        end
-
-        while self:IsEnabled() and not Owner:IsDead() do
-            #LOG('BuffField: ['..repr(self.Name)..'] check new units')
-            local units = GetNearbyAffectableUnits()
+        while not Owner.Dead do
+            local units = self.GetNearbyAffectableUnits()
             for k, unit in units do
-                if unit == Owner and not bp.AffectsSelf then
-                   continue
-                end
-                if not unit.HasBuffFieldThreadHandle[bp.Name] then
-                    if type(unit.HasBuffFieldThreadHandle) != 'table' then
-                        unit.HasBuffFieldThreadHandle = {}
-                        unit.BuffFieldThreadHandle = {}
+                if unit ~= Owner or bp.AffectsSelf then
+                    for _, buff in bp.Buffs do
+                        Buff.ApplyBuff(unit, buff)
                     end
-                    #LOG('BuffField: ['..repr(self.Name)..'] new unit')
-                    unit.BuffFieldThreadHandle[bp.Name] = unit:ForkThread(self.UnitBuffFieldThread, Owner, self)
-                    unit.HasBuffFieldThreadHandle[bp.Name] = true
                 end
             end
-            self:OnNewUnitsInFieldCheck()
-            WaitSeconds(4.9) # this should be anything but 5 (of the other wait) to help spread the cpu load
+
+            WaitSeconds(4.9) -- this should be anything but 5 (of the other wait) to help spread the cpu load
         end
     end,
 
-    # ============================================================================================
+    -- ============================================================================================
 
-    # this will be run on the units affected by the field so self means the unit that is affected by the field
-
-    UnitBuffFieldThread = function(self, instigator, BuffField)
-        local bp = BuffField:GetBlueprint()
-        local PreEnterData = BuffField:OnPreUnitEntersField(self)
-        for _, buff in bp.Buffs do
-            Buff.ApplyBuff(self, buff)
-        end
-        local EnterData = BuffField:OnUnitEntersField(self, PreEnterData)
-        while not self:IsDead() and not instigator:IsDead() and BuffField:IsEnabled() do
-            #LOG('BuffField: ['..repr(bp.Name)..'] unit thread check distance')
-            dist = VDist3( self:GetPosition(), instigator:GetPosition() )
-            if dist > bp.Radius then
-                break # ideally we should check for another nearby buff field emitting unit but it doesn't really matter (no more than 5 sec anyway)
-            end
-            WaitSeconds(5)
-        end
-        local PreLeaveData = BuffField:OnPreUnitLeavesField(self, PreEnterData, EnterData)
-        for _, buff in bp.Buffs do
-            if Buff.HasBuff(self, buff) then
-                Buff.RemoveBuff( self, buff)
-            end
-        end
-        BuffField:OnUnitLeavesField(self, PreEnterData, EnterData, PreLeaveData)
-        self.HasBuffFieldThreadHandle[bp.Name] = false
-        #LOG('BuffField: ['..repr(bp.Name)..'] end unit thread')
-    end,
-
-    # ============================================================================================
-
-    # these 2 are a bit weird. they are supposed to disable the enabled fields when on a transport and re-enable the
-    # fields that were enabled and leave the disabled fields off.
+    -- these 2 are a bit weird. they are supposed to disable the enabled fields when on a transport and re-enable the
+    -- fields that were enabled and leave the disabled fields off.
 
     DisableInTransport = function(Owner, Transport)
         for k, field in Owner.BuffFields do
@@ -275,7 +236,7 @@ BuffField = Class(Entity) {
                 if Enabled then
                     field:Disable()
                 end
-                field.DisabledForTransporting = true # to make sure the above is done once even if we have 2 fields or more
+                field.DisabledForTransporting = true -- to make sure the above is done once even if we have 2 fields or more
             end
         end
     end,
@@ -293,12 +254,12 @@ BuffField = Class(Entity) {
 }
 
 
-# this function is for registering new buff fields. Don't remove.
+-- this function is for registering new buff fields. Don't remove.
 function BuffFieldBlueprint( bpData)
     if not bpData.Name then
         WARN('BuffFieldBlueprint: Encountered blueprint with no name, ignoring it.')
     elseif bpData.Merge then
-        # Merging blueprints
+        -- Merging blueprints
         if not BuffFieldBlueprints[bpData.Name] then
             WARN('BuffFieldBlueprint: Trying to merge blueprint "'..bpData.Name..'" with a non-existing one.')
         else
@@ -306,7 +267,7 @@ function BuffFieldBlueprint( bpData)
             BuffFieldBlueprints[bpData.Name] = table.merged( BuffFieldBlueprints[bpData.Name], bpData )
         end
     else
-        # Adding new blueprint if it doesn't exist yet
+        -- Adding new blueprint if it doesn't exist yet
         BuffFieldBlueprints[bpData.Name] = bpData
     end
 end

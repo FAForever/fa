@@ -91,8 +91,7 @@ UnitBlueprint {
             ShieldRegenRate = 2,
             ShieldRegenStartTime = 3,
             ShieldSize = 3,
-            ShieldVerticalOffset = 0,
-            StartOn = true,
+            ShieldVerticalOffset = 0
         },
         SubThreatLevel = 0,
         SurfaceThreatLevel = 6,

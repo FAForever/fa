@@ -2,10 +2,10 @@
 -- File     :  /cdimage/units/UEL0001/UEL0001_script.lua
 -- Author(s):  John Comes, David Tomandl, Jessica St. Croix
 -- Summary  :  UEF Commander Script
--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 local Shield = import('/lua/shield.lua').Shield
-local TWalkingLandUnit = import('/lua/terranunits.lua').TWalkingLandUnit
+local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
 local TerranWeaponFile = import('/lua/terranweapons.lua')
 local TDFZephyrCannonWeapon = TerranWeaponFile.TDFZephyrCannonWeapon
 local TIFCommanderDeathWeapon = TerranWeaponFile.TIFCommanderDeathWeapon
@@ -15,92 +15,23 @@ local TDFOverchargeWeapon = TerranWeaponFile.TDFOverchargeWeapon
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local Buff = import('/lua/sim/Buff.lua')
 
-UEL0001 = Class(TWalkingLandUnit) {    
-    DeathThreadDestructionWaitTime = 2,
-
+UEL0001 = Class(ACUUnit) {
     Weapons = {
         DeathWeapon = Class(TIFCommanderDeathWeapon) {},
         RightZephyr = Class(TDFZephyrCannonWeapon) {},
-        OverCharge = Class(TDFOverchargeWeapon) {
-
-            OnCreate = function(self)
-                TDFOverchargeWeapon.OnCreate(self)
-                self:SetWeaponEnabled(false)
-                self.AimControl:SetEnabled(false)
-                self.AimControl:SetPrecedence(0)
-                self.unit:SetOverchargePaused(false)
-            end,
-
-            OnEnableWeapon = function(self)
-                if self:BeenDestroyed() then return end
-                self:SetWeaponEnabled(true)
-                self.unit:SetWeaponEnabledByLabel('RightZephyr', false)
-                self.unit:ResetWeaponByLabel('RightZephyr')
-                self.unit:BuildManipulatorSetEnabled(false)
-                self.AimControl:SetEnabled(true)
-                self.AimControl:SetPrecedence(20)
-                self.unit.BuildArmManipulator:SetPrecedence(0)
-                self.AimControl:SetHeadingPitch( self.unit:GetWeaponManipulatorByLabel('RightZephyr'):GetHeadingPitch() )
-            end,
-
-            OnWeaponFired = function(self)
-                TDFOverchargeWeapon.OnWeaponFired(self)
-                self:OnDisableWeapon()
-                self:ForkThread(self.PauseOvercharge)
-            end,
-            
-            OnDisableWeapon = function(self)
-                if self.unit:BeenDestroyed() then return end
-                self:SetWeaponEnabled(false)
-                self.unit:SetWeaponEnabledByLabel('RightZephyr', true)
-                self.unit:BuildManipulatorSetEnabled(false)
-                self.AimControl:SetEnabled(false)
-                self.AimControl:SetPrecedence(0)
-                self.unit.BuildArmManipulator:SetPrecedence(0)
-                self.unit:GetWeaponManipulatorByLabel('RightZephyr'):SetHeadingPitch( self.AimControl:GetHeadingPitch() )
-            end,
-            
-            PauseOvercharge = function(self)
-                if not self.unit:IsOverchargePaused() then
-                    self.unit:SetOverchargePaused(true)
-                    WaitSeconds(1/self:GetBlueprint().RateOfFire)
-                    self.unit:SetOverchargePaused(false)
-                end
-            end,
-            
-            OnFire = function(self)
-                if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
-                    TDFOverchargeWeapon.OnFire(self)
-                end
-            end,
-            IdleState = State(TDFOverchargeWeapon.IdleState) {
-                OnGotTarget = function(self)
-                    if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
-                        TDFOverchargeWeapon.IdleState.OnGotTarget(self)
-                    end
-                end,            
-                OnFire = function(self)
-                    if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
-                        ChangeState(self, self.RackSalvoFiringState)
-                    end
-                end,
-            },
-            RackSalvoFireReadyState = State(TDFOverchargeWeapon.RackSalvoFireReadyState) {
-                OnFire = function(self)
-                    if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
-                        TDFOverchargeWeapon.RackSalvoFireReadyState.OnFire(self)
-                    end
-                end,
-            },
-        },
+        OverCharge = Class(TDFOverchargeWeapon) {},
         TacMissile = Class(TIFCruiseMissileLauncher) {
         },
         TacNukeMissile = Class(TIFCruiseMissileLauncher) {
         },
     },
 
+    __init = function(self)
+        ACUUnit.__init(self, 'RightZephyr')
+    end,
+
     OnCreate = function(self)
-        TWalkingLandUnit.OnCreate(self)
+        ACUUnit.OnCreate(self)
         self:SetCapturable(false)
         self:HideBone('Right_Upgrade', true)
         self:HideBone('Left_Upgrade', true)
@@ -112,53 +43,8 @@ UEL0001 = Class(TWalkingLandUnit) {
         self:AddBuildRestriction( categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
     end,
 
-    OnPrepareArmToBuild = function(self)
-        TWalkingLandUnit.OnPrepareArmToBuild(self)
-        if self:BeenDestroyed() then return end
-        self:BuildManipulatorSetEnabled(true)
-        self.BuildArmManipulator:SetPrecedence(20)
-        self:SetWeaponEnabledByLabel('RightZephyr', false)
-        self:SetWeaponEnabledByLabel('OverCharge', false)
-        self.BuildArmManipulator:SetHeadingPitch( self:GetWeaponManipulatorByLabel('RightZephyr'):GetHeadingPitch() )
-    end,
-
-    OnStopCapture = function(self, target)
-        TWalkingLandUnit.OnStopCapture(self, target)
-        if self:BeenDestroyed() then return end
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('RightZephyr', true)
-        self:SetWeaponEnabledByLabel('OverCharge', false)
-        self:GetWeaponManipulatorByLabel('RightZephyr'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-    end,
-
-    OnFailedCapture = function(self, target)
-        TWalkingLandUnit.OnFailedCapture(self, target)
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('RightZephyr', true)
-        self:SetWeaponEnabledByLabel('OverCharge', false)
-        self:GetWeaponManipulatorByLabel('RightZephyr'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-    end,
-
-    OnStopReclaim = function(self, target)
-        TWalkingLandUnit.OnStopReclaim(self, target)
-        if self:BeenDestroyed() then return end
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('RightZephyr', true)
-        self:SetWeaponEnabledByLabel('OverCharge', false)
-        self:GetWeaponManipulatorByLabel('RightZephyr'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-    end,
-
-    GiveInitialResources = function(self)
-        WaitTicks(5)
-        self:GetAIBrain():GiveResource('Energy', self:GetBlueprint().Economy.StorageEnergy)
-        self:GetAIBrain():GiveResource('Mass', self:GetBlueprint().Economy.StorageMass)
-    end,
-
     OnStopBeingBuilt = function(self,builder,layer)
-        TWalkingLandUnit.OnStopBeingBuilt(self,builder,layer)
+        ACUUnit.OnStopBeingBuilt(self,builder,layer)
         if self:BeenDestroyed() then return end
         self.Animator = CreateAnimator(self)
         self.Animator:SetPrecedence(0)
@@ -209,55 +95,26 @@ UEL0001 = Class(TWalkingLandUnit) {
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
-        TWalkingLandUnit.OnStartBuild(self, unitBeingBuilt, order)
+        ACUUnit.OnStartBuild(self, unitBeingBuilt, order)
         if self.Animator then
             self.Animator:SetRate(0)
         end
-        self.UnitBeingBuilt = unitBeingBuilt
-        self.UnitBuildOrder = order
-        self.BuildingUnit = true        
-    end,
-
-    OnFailedToBuild = function(self)
-        TWalkingLandUnit.OnFailedToBuild(self)
-        if self:BeenDestroyed() then return end
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('RightZephyr', true)
-        self:SetWeaponEnabledByLabel('OverCharge', false)
-        self:GetWeaponManipulatorByLabel('RightZephyr'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
     end,
 
     CreateBuildEffects = function( self, unitBeingBuilt, order )
         local UpgradesFrom = unitBeingBuilt:GetBlueprint().General.UpgradesFrom
         -- If we are assisting an upgrading unit, or repairing a unit, play separate effects
-        if (order == 'Repair' and not unitBeingBuilt:IsBeingBuilt()) or (UpgradesFrom and UpgradesFrom != 'none' and self:IsUnitState('Guarding'))then
+        if (order == 'Repair' and not unitBeingBuilt:IsBeingBuilt()) or (UpgradesFrom and UpgradesFrom ~= 'none' and self:IsUnitState('Guarding'))then
             EffectUtil.CreateDefaultBuildBeams( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )
         else
             EffectUtil.CreateUEFCommanderBuildSliceBeams( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )        
         end           
     end,
 
-    OnStopBuild = function(self, unitBeingBuilt)
-        TWalkingLandUnit.OnStopBuild(self, unitBeingBuilt)
-        if self:BeenDestroyed() then return end
-        if (self.IdleAnim and not self:IsDead()) then
-            self.Animator:PlayAnim(self.IdleAnim, true)
-        end
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('RightZephyr', true)
-        self:SetWeaponEnabledByLabel('OverCharge', false)
-        self:GetWeaponManipulatorByLabel('RightZephyr'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-        self.UnitBeingBuilt = nil
-        self.UnitBuildOrder = nil
-        self.BuildingUnit = false          
-    end,
-
     RebuildPod = function(self, PodNumber)
         if PodNumber == 1 then
             -- Force pod rebuilds to queue up
-            if self.RebuildingPod2 != nil then
+            if self.RebuildingPod2 ~= nil then
                 WaitFor(self.RebuildingPod2)
             end
             if self.HasLeftPod == true then
@@ -275,7 +132,7 @@ UEL0001 = Class(TWalkingLandUnit) {
             end
         elseif PodNumber == 2 then
             -- Force pod rebuilds to queue up
-            if self.RebuildingPod != nil then
+            if self.RebuildingPod ~= nil then
                 WaitFor(self.RebuildingPod)
             end
             if self.HasRightPod == true then
@@ -295,20 +152,24 @@ UEL0001 = Class(TWalkingLandUnit) {
         self:RequestRefreshUI()
     end,
 
-    NotifyOfPodDeath = function(self, pod)
-        if pod == 'LeftPod' then
-            if self.HasLeftPod == true then
-                self.RebuildThread = self:ForkThread(self.RebuildPod, 1)
+    NotifyOfPodDeath = function(self, pod, rebuildDrone)
+        if rebuildDrone == true then
+            if pod == 'LeftPod' then
+                if self.HasLeftPod == true then
+                    self.RebuildThread = self:ForkThread(self.RebuildPod, 1)
+                end
+            elseif pod == 'RightPod' then
+                if self.HasRightPod == true then
+                    self.RebuildThread2 = self:ForkThread(self.RebuildPod, 2)
+                end
             end
-        elseif pod == 'RightPod' then
-            if self.HasRightPod == true then
-                self.RebuildThread2 = self:ForkThread(self.RebuildPod, 2)
-            end
+        else
+            self:CreateEnhancement(pod..'Remove')
         end
     end,
 
     CreateEnhancement = function(self, enh)
-        TWalkingLandUnit.CreateEnhancement(self, enh)
+        ACUUnit.CreateEnhancement(self, enh)
 
         local bp = self:GetBlueprint().Enhancements[enh]
         if not bp then return end
@@ -331,20 +192,22 @@ UEL0001 = Class(TWalkingLandUnit) {
         elseif enh == 'LeftPodRemove' or enh == 'RightPodRemove' then
             if self.HasLeftPod == true then
                 self.HasLeftPod = false
-                if self.LeftPod and not self.LeftPod:IsDead() then
+                if self.LeftPod and not self.LeftPod.Dead then
                     self.LeftPod:Kill()
+                    self.LeftPod = nil
                 end
-                if self.RebuildingPod != nil then
+                if self.RebuildingPod ~= nil then
                     RemoveEconomyEvent(self, self.RebuildingPod)
                     self.RebuildingPod = nil
                 end
             end
             if self.HasRightPod == true then
                 self.HasRightPod = false
-                if self.RightPod and not self.RightPod:IsDead() then
+                if self.RightPod and not self.RightPod.Dead then
                     self.RightPod:Kill()
+                    self.RightPod = nil
                 end
-                if self.RebuildingPod2 != nil then
+                if self.RebuildingPod2 ~= nil then
                     RemoveEconomyEvent(self, self.RebuildingPod2)
                     self.RebuildingPod2 = nil
                 end
@@ -357,7 +220,7 @@ UEL0001 = Class(TWalkingLandUnit) {
             self:RemoveCommandCap('RULEUCC_Teleport')
         elseif enh == 'Shield' then
             self:AddToggleCap('RULEUTC_ShieldToggle')
-            self:CreatePersonalShield(bp)
+            self:CreateShield(bp)
             self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
         elseif enh == 'ShieldRemove' then
@@ -529,21 +392,7 @@ UEL0001 = Class(TWalkingLandUnit) {
             self:RemoveNukeSiloAmmo(amt or 0)
             self:StopSiloBuild()
         end
-    end,
-    
-    OnPaused = function(self)
-        TWalkingLandUnit.OnPaused(self)
-        if self.BuildingUnit then
-            TWalkingLandUnit.StopBuildingEffects(self, self:GetUnitBeingBuilt())
-        end    
-    end,
-    
-    OnUnpaused = function(self)
-        if self.BuildingUnit then
-            TWalkingLandUnit.StartBuildingEffects(self, self:GetUnitBeingBuilt(), self.UnitBuildOrder)
-        end
-        TWalkingLandUnit.OnUnpaused(self)
-    end,      
+    end
 }
 
 TypeClass = UEL0001

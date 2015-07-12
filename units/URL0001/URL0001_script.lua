@@ -1,181 +1,73 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/URL0001/URL0001_script.lua
-#**  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Gordon Duclos, Andres Mendez
-#**
-#**  Summary  :  Cybran Commander Unit Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
-local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/URL0001/URL0001_script.lua
+--**  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Gordon Duclos, Andres Mendez
+--**
+--**  Summary  :  Cybran Commander Unit Script
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
+
+local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
 local CWeapons = import('/lua/cybranweapons.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
-local Buff = import('/lua/sim/Buff.lua')
 
-#local CAAMissileNaniteWeapon = CWeapons.CAAMissileNaniteWeapon
+local Buff = import('/lua/sim/Buff.lua')
 local CCannonMolecularWeapon = CWeapons.CCannonMolecularWeapon
 local CIFCommanderDeathWeapon = CWeapons.CIFCommanderDeathWeapon
+
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local CDFHeavyMicrowaveLaserGeneratorCom = CWeapons.CDFHeavyMicrowaveLaserGeneratorCom
 local CDFOverchargeWeapon = CWeapons.CDFOverchargeWeapon
 local CANTorpedoLauncherWeapon = CWeapons.CANTorpedoLauncherWeapon
 local Entity = import('/lua/sim/Entity.lua').Entity
 
-URL0001 = Class(CWalkingLandUnit) {
-    DeathThreadDestructionWaitTime = 2,
-
+URL0001 = Class(ACUUnit) {
     Weapons = {
         DeathWeapon = Class(CIFCommanderDeathWeapon) {},
         RightRipper = Class(CCannonMolecularWeapon) {},
         Torpedo = Class(CANTorpedoLauncherWeapon) {},
         MLG = Class(CDFHeavyMicrowaveLaserGeneratorCom) {
             DisabledFiringBones = {'Turret_Muzzle_03'},
-            
+
             SetOnTransport = function(self, transportstate)
                 CDFHeavyMicrowaveLaserGeneratorCom.SetOnTransport(self, transportstate)
                 self:ForkThread(self.OnTransportWatch)
             end,
-            
+
             OnTransportWatch = function(self)
                 while self:GetOnTransport() do
                     self:PlayFxBeamEnd()
                     self:SetWeaponEnabled(false)
                     WaitSeconds(0.3)
                 end
-            end,          
+            end,
         },
 
-        OverCharge = Class(CDFOverchargeWeapon) {
-            OnCreate = function(self)
-                CDFOverchargeWeapon.OnCreate(self)
-                self:SetWeaponEnabled(false)
-                self.AimControl:SetEnabled(false)
-                self.AimControl:SetPrecedence(0)
-				self.unit:SetOverchargePaused(false)
-            end,
-
-            OnEnableWeapon = function(self)
-                if self:BeenDestroyed() then return end
-                CDFOverchargeWeapon.OnEnableWeapon(self)
-                self:SetWeaponEnabled(true)
-                self.unit:SetWeaponEnabledByLabel('RightRipper', false)
-                self.unit:BuildManipulatorSetEnabled(false)
-                self.AimControl:SetEnabled(true)
-                self.AimControl:SetPrecedence(20)
-                self.unit.BuildArmManipulator:SetPrecedence(0)
-                self.AimControl:SetHeadingPitch( self.unit:GetWeaponManipulatorByLabel('RightRipper'):GetHeadingPitch() )
-            end,
-
-            OnWeaponFired = function(self)
-                CDFOverchargeWeapon.OnWeaponFired(self)
-                self:OnDisableWeapon()
-                self:ForkThread(self.PauseOvercharge)
-            end,
-            
-            OnDisableWeapon = function(self)
-                if self.unit:BeenDestroyed() then return end
-                self:SetWeaponEnabled(false)
-                self.unit:SetWeaponEnabledByLabel('RightRipper', true)
-                self.unit:BuildManipulatorSetEnabled(false)
-                self.AimControl:SetEnabled(false)
-                self.AimControl:SetPrecedence(0)
-                self.unit.BuildArmManipulator:SetPrecedence(0)
-                self.unit:GetWeaponManipulatorByLabel('RightRipper'):SetHeadingPitch( self.AimControl:GetHeadingPitch() )
-            end,
-            
-            PauseOvercharge = function(self)
-                if not self.unit:IsOverchargePaused() then
-                    self.unit:SetOverchargePaused(true)
-                    WaitSeconds(1/self:GetBlueprint().RateOfFire)
-                    self.unit:SetOverchargePaused(false)
-                end
-            end,
-            
-            OnFire = function(self)
-                if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
-                    CDFOverchargeWeapon.OnFire(self)
-                end
-            end,
-            IdleState = State(CDFOverchargeWeapon.IdleState) {
-                OnGotTarget = function(self)
-                    if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
-                        CDFOverchargeWeapon.IdleState.OnGotTarget(self)
-                    end
-                end,            
-                OnFire = function(self)
-                    if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
-                        ChangeState(self, self.RackSalvoFiringState)
-                    end
-                end,
-            },
-            RackSalvoFireReadyState = State(CDFOverchargeWeapon.RackSalvoFireReadyState) {
-                OnFire = function(self)
-                    if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
-                        CDFOverchargeWeapon.RackSalvoFireReadyState.OnFire(self)
-                    end
-                end,
-            },    
-        },
+        OverCharge = Class(CDFOverchargeWeapon) {},
     },
 
-    # ********
-    # Creation
-    # ********
+    __init = function(self)
+        ACUUnit.__init(self, 'RightRipper')
+    end,
+
+    -- ********
+    -- Creation
+    -- ********
     OnCreate = function(self)
-        CWalkingLandUnit.OnCreate(self)
+        ACUUnit.OnCreate(self)
         self:SetCapturable(false)
         self:HideBone('Back_Upgrade', true)
         self:HideBone('Right_Upgrade', true)
         if self:GetBlueprint().General.BuildBones then
             self:SetupBuildBones()
         end
-        # Restrict what enhancements will enable later
+        -- Restrict what enhancements will enable later
         self:AddBuildRestriction( categories.CYBRAN * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER) )
     end,
 
-
-    OnPrepareArmToBuild = function(self)
-        CWalkingLandUnit.OnPrepareArmToBuild(self)
-        if self:BeenDestroyed() then return end
-        self:BuildManipulatorSetEnabled(true)
-        self.BuildArmManipulator:SetPrecedence(20)
-        self:SetWeaponEnabledByLabel('RightRipper', false)
-        self:SetWeaponEnabledByLabel('OverCharge', false)
-        self.BuildArmManipulator:SetHeadingPitch( self:GetWeaponManipulatorByLabel('RightRipper'):GetHeadingPitch() )
-    end,
-
-    OnStopCapture = function(self, target)
-        CWalkingLandUnit.OnStopCapture(self, target)
-        if self:BeenDestroyed() then return end
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('RightRipper', true)
-        self:SetWeaponEnabledByLabel('OverCharge', false)
-        self:GetWeaponManipulatorByLabel('RightRipper'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-    end,
-
-    OnFailedCapture = function(self, target)
-        CWalkingLandUnit.OnFailedCapture(self, target)
-        if self:BeenDestroyed() then return end
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('RightRipper', true)
-        self:SetWeaponEnabledByLabel('OverCharge', false)
-        self:GetWeaponManipulatorByLabel('RightRipper'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-    end,
-
-    OnStopReclaim = function(self, target)
-        CWalkingLandUnit.OnStopReclaim(self, target)
-        if self:BeenDestroyed() then return end
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('RightRipper', true)
-        self:SetWeaponEnabledByLabel('OverCharge', false)
-        self:GetWeaponManipulatorByLabel('RightRipper'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-    end,
-
     OnStopBeingBuilt = function(self,builder,layer)
-        CWalkingLandUnit.OnStopBeingBuilt(self,builder,layer)
+        ACUUnit.OnStopBeingBuilt(self,builder,layer)
         self:SetWeaponEnabledByLabel('RightRipper', true)
         self:SetWeaponEnabledByLabel('MLG', false)
         self:SetWeaponEnabledByLabel('Torpedo', false)
@@ -189,40 +81,17 @@ URL0001 = Class(CWalkingLandUnit) {
         self:ForkThread(self.GiveInitialResources)
     end,
 
-    OnFailedToBuild = function(self)
-        CWalkingLandUnit.OnFailedToBuild(self)
-        if self:BeenDestroyed() then return end
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('RightRipper', true)
-        self:SetWeaponEnabledByLabel('OverCharge', false)
-        self:GetWeaponManipulatorByLabel('RightRipper'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-    end,
-
-    OnStartBuild = function(self, unitBeingBuilt, order)    
-        CWalkingLandUnit.OnStartBuild(self, unitBeingBuilt, order)
+    OnStartBuild = function(self, unitBeingBuilt, order)
+        ACUUnit.OnStartBuild(self, unitBeingBuilt, order)
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
-        self.BuildingUnit = true        
-    end,    
-
-    OnStopBuild = function(self, unitBeingBuilt)
-        CWalkingLandUnit.OnStopBuild(self, unitBeingBuilt)
-        if self:BeenDestroyed() then return end
-        self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
-        self:SetWeaponEnabledByLabel('RightRipper', true)
-        self:SetWeaponEnabledByLabel('OverCharge', false)
-        self:GetWeaponManipulatorByLabel('RightRipper'):SetHeadingPitch( self.BuildArmManipulator:GetHeadingPitch() )
-        self.UnitBeingBuilt = nil
-        self.UnitBuildOrder = nil
-        self.BuildingUnit = false          
+        self.BuildingUnit = true
     end,
 
     PlayCommanderWarpInEffect = function(self)
         self:HideBone(0, true)
         self:SetUnSelectable(true)
-        self:SetBusy(true)        
+        self:SetBusy(true)
         self:SetBlockCommandQueue(true)
         self:ForkThread(self.WarpInEffectThread)
     end,
@@ -236,7 +105,7 @@ URL0001 = Class(CWalkingLandUnit) {
         self:HideBone('Back_Upgrade', true)
         self:HideBone('Right_Upgrade', true)
         self:SetUnSelectable(false)
-        self:SetBusy(false)        
+        self:SetBusy(false)
         self:SetBlockCommandQueue(false)
 
         local totalBones = self:GetBoneCount() - 1
@@ -249,30 +118,22 @@ URL0001 = Class(CWalkingLandUnit) {
 
         WaitSeconds(6)
         self:SetMesh(self:GetBlueprint().Display.MeshBlueprint, true)
-    end,    
-
-    GiveInitialResources = function(self)
-        WaitTicks(2)
-        self:GetAIBrain():GiveResource('Energy', self:GetBlueprint().Economy.StorageEnergy)
-        self:GetAIBrain():GiveResource('Mass', self:GetBlueprint().Economy.StorageMass)
     end,
-    
-
 
     OnScriptBitSet = function(self, bit)
-        if bit == 8 then # cloak toggle
+        if bit == 8 then -- cloak toggle
             self:StopUnitAmbientSound( 'ActiveLoop' )
             self:SetMaintenanceConsumptionInactive()
             self:DisableUnitIntel('Cloak')
             self:DisableUnitIntel('RadarStealth')
             self:DisableUnitIntel('RadarStealthField')
             self:DisableUnitIntel('SonarStealth')
-            self:DisableUnitIntel('SonarStealthField')          
+            self:DisableUnitIntel('SonarStealthField')
         end
     end,
 
     OnScriptBitClear = function(self, bit)
-        if bit == 8 then # cloak toggle
+        if bit == 8 then -- cloak toggle
             self:PlayUnitAmbientSound( 'ActiveLoop' )
             self:SetMaintenanceConsumptionActive()
             self:EnableUnitIntel('Cloak')
@@ -283,18 +144,16 @@ URL0001 = Class(CWalkingLandUnit) {
         end
     end,
 
-    
-
-    # *************
-    # Build/Upgrade
-    # *************
+    -- *************
+    -- Build/Upgrade
+    -- *************
     CreateBuildEffects = function( self, unitBeingBuilt, order )
-       EffectUtil.SpawnBuildBots( self, unitBeingBuilt, 5, self.BuildEffectsBag )
-       EffectUtil.CreateCybranBuildBeams( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )
+        EffectUtil.SpawnBuildBots( self, unitBeingBuilt, self.BuildEffectsBag )
+        EffectUtil.CreateCybranBuildBeams( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )
     end,
 
     CreateEnhancement = function(self, enh)
-        CWalkingLandUnit.CreateEnhancement(self, enh)
+        ACUUnit.CreateEnhancement(self, enh)
         if enh == 'Teleporter' then
             self:AddCommandCap('RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
@@ -307,18 +166,18 @@ URL0001 = Class(CWalkingLandUnit) {
                 EffectUtil.CleanupEffectBag(self,'IntelEffectsBag')
                 self.IntelEffectsBag = nil
             end
-            self.CloakEnh = false        
+            self.CloakEnh = false
             self.StealthEnh = true
             self:EnableUnitIntel('RadarStealth')
             self:EnableUnitIntel('SonarStealth')
         elseif enh == 'StealthGeneratorRemove' then
             self:RemoveToggleCap('RULEUTC_CloakToggle')
             self:DisableUnitIntel('RadarStealth')
-            self:DisableUnitIntel('SonarStealth')           
+            self:DisableUnitIntel('SonarStealth')
             self.StealthEnh = false
-            self.CloakEnh = false 
+            self.CloakEnh = false
             self.StealthFieldEffects = false
-            self.CloakingEffects = false     
+            self.CloakingEffects = false
         elseif enh == 'ResourceAllocation' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
@@ -333,7 +192,7 @@ URL0001 = Class(CWalkingLandUnit) {
             local bp = self:GetBlueprint().Enhancements[enh]
             if not bp then return end
             self.StealthEnh = false
-			self.CloakEnh = true 
+			self.CloakEnh = true
             self:EnableUnitIntel('Cloak')
             if not Buffs['CybranACUCloakBonus'] then
                BuffBlueprint {
@@ -348,20 +207,20 @@ URL0001 = Class(CWalkingLandUnit) {
                             Mult = 1.0,
                         },
                     },
-                } 
+                }
             end
             if Buff.HasBuff( self, 'CybranACUCloakBonus' ) then
                 Buff.RemoveBuff( self, 'CybranACUCloakBonus' )
-            end  
-            Buff.ApplyBuff(self, 'CybranACUCloakBonus')                		
+            end
+            Buff.ApplyBuff(self, 'CybranACUCloakBonus')
         elseif enh == 'CloakingGeneratorRemove' then
             self:RemoveToggleCap('RULEUTC_CloakToggle')
             self:DisableUnitIntel('Cloak')
-            self.CloakEnh = false 
+            self.CloakEnh = false
             if Buff.HasBuff( self, 'CybranACUCloakBonus' ) then
                 Buff.RemoveBuff( self, 'CybranACUCloakBonus' )
-            end              
-        #T2 Engineering
+            end
+        --T2 Engineering
         elseif enh =='AdvancedEngineering' then
             local bp = self:GetBlueprint().Enhancements[enh]
             if not bp then return end
@@ -403,7 +262,7 @@ URL0001 = Class(CWalkingLandUnit) {
             end
 	    -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
 	    self:updateBuildRestrictions()
-        #T3 Engineering
+        --T3 Engineering
         elseif enh =='T3Engineering' then
             local bp = self:GetBlueprint().Enhancements[enh]
             if not bp then return end
@@ -459,12 +318,12 @@ URL0001 = Class(CWalkingLandUnit) {
             local wep = self:GetWeaponByLabel('RightRipper')
             local bpDisrupt = self:GetBlueprint().Weapon[1].RateOfFire
             wep:ChangeRateOfFire(bpDisrupt or 1)
-            bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius            
+            bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius
             wep:ChangeMaxRadius(bpDisrupt or 22)
             local microwave = self:GetWeaponByLabel('MLG')
             microwave:ChangeMaxRadius(bpDisrupt or 22)
             local oc = self:GetWeaponByLabel('OverCharge')
-            oc:ChangeMaxRadius(bpDisrupt or 22)            
+            oc:ChangeMaxRadius(bpDisrupt or 22)
         elseif enh == 'MicrowaveLaserGenerator' then
             self:SetWeaponEnabledByLabel('MLG', true)
         elseif enh == 'MicrowaveLaserGeneratorRemove' then
@@ -475,12 +334,12 @@ URL0001 = Class(CWalkingLandUnit) {
         elseif enh == 'NaniteTorpedoTubeRemove' then
             self:SetWeaponEnabledByLabel('Torpedo', false)
 			self:DisableUnitIntel('Sonar')
-        end             
+        end
     end,
-    
-    # **********
-    # Intel
-    # **********    
+
+    -- **********
+    -- Intel
+    -- **********
     IntelEffects = {
 		Cloak = {
 		    {
@@ -522,31 +381,31 @@ URL0001 = Class(CWalkingLandUnit) {
 			    },
 			    Scale = 1.6,
 			    Type = 'Cloak01',
-		    },	
-        },	
+		    },
+        },
     },
-    
+
     OnIntelEnabled = function(self)
-        CWalkingLandUnit.OnIntelEnabled(self)
-        if self.CloakEnh and self:IsIntelEnabled('Cloak') then 
+        ACUUnit.OnIntelEnabled(self)
+        if self.CloakEnh and self:IsIntelEnabled('Cloak') then
             self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['CloakingGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
             if not self.IntelEffectsBag then
 			    self.IntelEffectsBag = {}
 			    self.CreateTerrainTypeEffects( self, self.IntelEffects.Cloak, 'FXIdle',  self:GetCurrentLayer(), nil, self.IntelEffectsBag )
-			end            
+			end
         elseif self.StealthEnh and self:IsIntelEnabled('RadarStealth') and self:IsIntelEnabled('SonarStealth') then
             self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['StealthGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
-            self:SetMaintenanceConsumptionActive()  
-            if not self.IntelEffectsBag then 
+            self:SetMaintenanceConsumptionActive()
+            if not self.IntelEffectsBag then
 	            self.IntelEffectsBag = {}
 		        self.CreateTerrainTypeEffects( self, self.IntelEffects.Field, 'FXIdle',  self:GetCurrentLayer(), nil, self.IntelEffectsBag )
-		    end                  
-        end		
+		    end
+        end
     end,
 
     OnIntelDisabled = function(self)
-        CWalkingLandUnit.OnIntelDisabled(self)
+        ACUUnit.OnIntelDisabled(self)
         if self.IntelEffectsBag then
             EffectUtil.CleanupEffectBag(self,'IntelEffectsBag')
             self.IntelEffectsBag = nil
@@ -555,41 +414,27 @@ URL0001 = Class(CWalkingLandUnit) {
             self:SetMaintenanceConsumptionInactive()
         elseif self.StealthEnh and not self:IsIntelEnabled('RadarStealth') and not self:IsIntelEnabled('SonarStealth') then
             self:SetMaintenanceConsumptionInactive()
-        end          
+        end
     end,
-        
-    # *****
-    # Death
-    # *****
+
+    -- *****
+    -- Death
+    -- *****
     OnKilled = function(self, instigator, type, overkillRatio)
         local bp
         for k, v in self:GetBlueprint().Buffs do
             if v.Add.OnDeath then
                 bp = v
             end
-        end 
-        #if we could find a blueprint with v.Add.OnDeath, then add the buff 
-        if bp != nil then 
-            #Apply Buff
+        end
+        --if we could find a blueprint with v.Add.OnDeath, then add the buff
+        if bp ~= nil then
+            --Apply Buff
 			self:AddBuff(bp)
         end
-        #otherwise, we should finish killing the unit
-        CWalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)
-    end,
-    
-    OnPaused = function(self)
-        CWalkingLandUnit.OnPaused(self)
-        if self.BuildingUnit then
-            CWalkingLandUnit.StopBuildingEffects(self, self:GetUnitBeingBuilt())
-        end    
-    end,
-    
-    OnUnpaused = function(self)
-        if self.BuildingUnit then
-            CWalkingLandUnit.StartBuildingEffects(self, self:GetUnitBeingBuilt(), self.UnitBuildOrder)
-        end
-        CWalkingLandUnit.OnUnpaused(self)
-    end,     
-}   
-    
+        --otherwise, we should finish killing the unit
+        ACUUnit.OnKilled(self, instigator, type, overkillRatio)
+    end
+}
+
 TypeClass = URL0001

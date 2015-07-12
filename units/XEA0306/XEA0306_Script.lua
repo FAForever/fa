@@ -1,22 +1,22 @@
-#****************************************************************************
-#**
-#**  File     :  /data/units/XEA0306/XEA0306_script.lua
-#**  Author(s):  Jessica St. Croix
-#**
-#**  Summary  :  UEF Heavy Air Transport Script
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+-- ****************************************************************************
+-- **
+-- **  File     :  /data/units/XEA0306/XEA0306_script.lua
+-- **  Author(s):  Jessica St. Croix
+-- **
+-- **  Summary  :  UEF Heavy Air Transport Script
+-- **
+-- **  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+-- ****************************************************************************
 
 local explosion = import('/lua/defaultexplosions.lua')
 local util = import('/lua/utilities.lua')
 local WeaponsFile = import('/lua/terranweapons.lua')
-local TAirUnit = import('/lua/terranunits.lua').TAirUnit
+local AirTransport = import('/lua/defaultunits.lua').AirTransport
 local TSAMLauncher = import('/lua/terranweapons.lua').TSAMLauncher
 local TWeapons = import('/lua/terranweapons.lua')
 local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
 
-XEA0306 = Class(TAirUnit) {
+XEA0306 = Class(AirTransport) {
     AirDestructionEffectBones = {'FrontRight_Engine_Exhaust','FrontLeft_Engine_Exhaust','BackRight_Engine_Exhaust','BackLeft_Engine_Exhaust'},
 
     ShieldEffects = {
@@ -38,29 +38,29 @@ XEA0306 = Class(TAirUnit) {
 
     DestructionTicks = 250,
     EngineRotateBones = {'FrontRight_Engine', 'FrontLeft_Engine', 'BackRight_Engine', 'BackLeft_Engine', },
-    
+
     OnCreate = function(self)
-        TAirUnit.OnCreate(self)
-        
+        AirTransport.OnCreate(self)
+
         self.UnfoldAnim = CreateAnimator(self)
         self.UnfoldAnim:PlayAnim('/units/xea0306/xea0306_aunfold.sca')
         self.UnfoldAnim:SetRate(0)
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)
-        TAirUnit.OnStopBeingBuilt(self,builder,layer)
+        AirTransport.OnStopBeingBuilt(self,builder,layer)
         self.EngineManipulators = {}
-        
+
         self.UnfoldAnim:SetRate(1)
-        
-        # create the engine thrust manipulators
+
+        -- create the engine thrust manipulators
         for k, v in self.EngineRotateBones do
             table.insert(self.EngineManipulators, CreateThrustController(self, "thruster", v))
         end
 
-        # set up the thursting arcs for the engines
+        -- set up the thursting arcs for the engines
         for keys,values in self.EngineManipulators do
-            #                      XMAX,XMIN,YMAX,YMIN,ZMAX,ZMIN, TURNMULT, TURNSPEED
+            --                      XMAX,XMIN,YMAX,YMIN,ZMAX,ZMIN, TURNMULT, TURNSPEED
             values:SetThrustingParam( -0.25, 0.25, -0.75, 0.75, -0.0, 0.0, 1.0, 0.25 )
         end
 
@@ -69,23 +69,29 @@ XEA0306 = Class(TAirUnit) {
         self.Trash:Add(self.LandingAnimManip)
         self.LandingAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationLand):SetRate(1)
     end,
-	
---Shielding Fix moved functionally to Unit.lua and Shield.lua
-	
-    # When one of our attached units gets killed, detach it
-    OnAttachedKilled = function(self, attached)
-        attached:DetachFrom()
+
+    -- When a unit attaches or detaches, tell the shield about it.
+    OnTransportAttach = function(self, attachBone, unit)
+        AirTransport.OnTransportAttach(self, attachBone, unit)
+        self.MyShield:AddProtectedUnit(unit)
     end,
 
-    OnKilled = function(self, instigator, type, overkillRatio)
-        TAirUnit.OnKilled(self, instigator, type, overkillRatio)
-        # TransportDetachAllUnits takes 1 bool parameter. If true, randomly destroys some of the transported
-        # units, otherwise successfully detaches all.
-        self:TransportDetachAllUnits(true)
+
+    OnTransportDetach = function(self, attachBone, unit)
+        AirTransport.OnTransportDetach(self, attachBone, unit)
+        self.MyShield:RemoveProtectedUnit(unit)
+    end,
+
+    OnDamage = function(self, instigator, amount, vector, damageType)
+        if EntityCategoryContains(categories.NUKE, instigator) then
+            self.MyShield:SetContentsVulnerable()
+        end
+
+        AirTransport.OnDamage(self, instigator, amount, vector, damageType)
     end,
 
     OnMotionVertEventChange = function(self, new, old)
-        TAirUnit.OnMotionVertEventChange(self, new, old)
+        AirTransport.OnMotionVertEventChange(self, new, old)
         if (new == 'Down') then
             self.LandingAnimManip:SetRate(-1)
         elseif (new == 'Up') then
@@ -93,7 +99,7 @@ XEA0306 = Class(TAirUnit) {
         end
     end,
 
-    # Override air destruction effects so we can do something custom here
+    -- Override air destruction effects so we can do something custom here
     CreateUnitAirDestructionEffects = function( self, scale )
         self:ForkThread(self.AirDestructionEffectsThread, self )
     end,

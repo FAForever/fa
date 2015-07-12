@@ -70,7 +70,7 @@ UnitBlueprint {
         },
         Killed = Sound {
             Bank = 'Impacts',
-            Cue = 'XSB2305_Impact', # fix for ACU killed sound missing [144]
+            Cue = 'XSB2305_Impact',
             LodCutoff = 'UnitMove_LodCutoff',
         },
         ReclaimLoop = Sound {
@@ -80,7 +80,7 @@ UnitBlueprint {
         },
         StartCapture = Sound {
             Bank = 'XSL',
-            Cue = 'XSL0105_Capture_Start', # fix for ACU missing capture sound [144]
+            Cue = 'XSL0105_Capture_Start',
             LodCutoff = 'UnitMove_LodCutoff',
         },
         StartMove = Sound {
@@ -162,8 +162,10 @@ UnitBlueprint {
         'OVERLAYOMNI',
         'OVERLAYDIRECTFIRE',
         'OVERLAYINDIRECTFIRE',
+        'VERIFYMISSILEUI',
+        'SHOWATTACKRETICLE'
     },
-    CollisionOffsetZ = 0.2, # added
+    CollisionOffsetZ = 0.2,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Commander',
@@ -315,13 +317,12 @@ UnitBlueprint {
         BuildCostEnergy = 5000000,
         BuildCostMass = 18000,
         BuildRate = 10,
-        BuildTime = 6000000,  #was 60000
+        BuildTime = 6000000,
         BuildableCategory = {
             'BUILTBYCOMMANDER SERAPHIM',
             'BUILTBYTIER2COMMANDER SERAPHIM',
             'BUILTBYTIER3COMMANDER SERAPHIM',
         },
-        InitialRemoteViewingEnergyDrain = 3000,
         MaxBuildDistance = 10,
         NaturalProducer = true,
         NeedToFaceTargetToBuild = false,
@@ -373,20 +374,20 @@ UnitBlueprint {
             Slot = 'LCH',
         },
         AdvancedRegenAura = {
-            ACUAddHealth = 2500, #added
+            ACUAddHealth = 2500,
             BuildCostEnergy = 31250,
             BuildCostMass = 1500,
             BuildTime = 1250,
             Icon = 'anrf',
             Name = '<LOC enhancements_0127>Rapid Restoration Field',
             Prerequisite = 'RegenAura',
-            Radius = 30, # 25
+            Radius = 30,
             RegenCeiling = 200,
             RegenFloor = 0,
-            MaxHealthFactor = 1.1, # 1
+            MaxHealthFactor = 1.1,
             RegenPerSecond = 0.01111111111, 
             Slot = 'RCH',
-            UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD',		#	added
+            UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD',
             UpgradeEffectBones = {
                 'Right_Upgrade',
                 'Right_Turret_Muzzle',
@@ -586,21 +587,21 @@ UnitBlueprint {
             Slot = 'RCH',
         },
         RegenAura = {
-            ACUAddHealth = 1000,			#added
+            ACUAddHealth = 1000,
             BuildCostEnergy = 4500,
             BuildCostMass = 600,
             BuildTime = 600,
             Icon = 'nrf',
             Name = '<LOC enhancements_0125>Restoration Field',
-            Radius = 22, # 15
-            RegenCeiling = 15, # 75
+            Radius = 22,
+            RegenCeiling = 15,
             RegenFloor = 0,
-            RegenPerSecond = 0.02, # 0.0055555555
+            RegenPerSecond = 0.02,
             ShowBones = {
                 'Right_Upgrade',
             },
             Slot = 'RCH',
-            UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD',		#added
+            UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD',
             UpgradeEffectBones = {
                 'Right_Upgrade',
                 'Right_Turret_Muzzle',
@@ -818,7 +819,6 @@ UnitBlueprint {
     Intel = {
         FreeIntel = true,
         OmniRadius = 26,
-        RemoteViewingRadius = 100,
         VisionRadius = 26,
         WaterVisionRadius = 26,
     },
@@ -856,7 +856,7 @@ UnitBlueprint {
     SelectionYOffset = 0,
     SizeX = 1,
     SizeY = 2.2,
-    SizeZ = 1.2, # from 0.7
+    SizeZ = 1.2,
     StrategicIconName = 'icon_commander_generic',
     StrategicIconSortPriority = 0,
     Transport = {

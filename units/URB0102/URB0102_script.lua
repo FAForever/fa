@@ -32,7 +32,7 @@ URB0102 = Class(CAirFactoryUnit) {
             WaitTicks(1)
             WaitFor(self.RollOffAnim)
         end
-        if unitBeingBuilt and not unitBeingBuilt:IsDead() then
+        if unitBeingBuilt and not unitBeingBuilt.Dead then
             unitBeingBuilt:DetachFrom(true)
         end
         self:DetachAll(bp.Display.BuildAttachBone or 0)

@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Rollover unit view control
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -18,10 +18,10 @@ local Factions = import('/lua/factions.lua')
 local Prefs = import('/lua/user/prefs.lua')
 local EnhancementCommon = import('/lua/enhancementcommon.lua')
 local options = Prefs.GetFromCurrentProfile('options')
+local GetUnitRolloverInfo = import("/modules/selectedinfo.lua").GetUnitRolloverInfo
 
-local rolloverInfo = false
-local consTrue = false
-local focusBool = false
+local selectedUnit = nil
+local updateThread = nil
 
 controls = {}
 
@@ -140,7 +140,7 @@ local statFuncs = {
             if info.userUnit:IsInCategory('VERIFYMISSILEUI') then
                 local curEnh = EnhancementCommon.GetEnhancements(info.userUnit:GetEntityId())
                 if curEnh then
-                    if curEnh.Back == 'TacticalMissile' then
+                    if curEnh.Back == 'TacticalMissile' or curEnh.Back == 'Missile' then
                         return string.format('%d / %d', info.tacticalSiloStorageCount, info.tacticalSiloMaxStorageCount), 'tactical'
                     elseif curEnh.Back == 'TacticalNukeMissile' then
                         return string.format('%d / %d', info.nukeSiloStorageCount, info.nukeSiloMaxStorageCount), 'strategic'
@@ -385,6 +385,8 @@ function UpdateWindow(info)
         elseif not controls.abilities:IsHidden() then
             controls.abilities:Hide()
         end
+
+        import(UIUtil.GetLayoutFilename('unitview')).PositionWindow()
     end
     if options.gui_scu_manager ~= 0 then
         controls.SCUType:Hide()
@@ -408,63 +410,28 @@ function UpdateWindow(info)
             controls.Buildrate:Hide()
             controls.shieldText:Hide()
 
-            local getEnh = import('/lua/enhancementcommon.lua')
             if info.userUnit ~= nil then
-                local enhRegen , regenBase = 0 , 0
-                if getEnh.GetEnhancements(info.entityId) ~= nil then
-                    for k,v in getEnh.GetEnhancements(info.entityId) do
-                        if info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId)[k]].NewRegenRate ~= nil then
-                            enhRegen = info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId)[k]].NewRegenRate
-                        end
-                    end
-                end
-                local veterancyLevels = info.userUnit:GetBlueprint().Veteran or veterancyDefaults
-                if info.kills >= veterancyLevels[string.format('Level%d', 1)] then
-                    local lvl = 1
-                    for i = 2,5 do
-                        if info.kills >= veterancyLevels[string.format('Level%d', i)] then
-                            lvl = i
-                        end
-                    end
-                    local addRegen = info.userUnit:GetBlueprint().Buffs.Regen[string.format('Level%d', lvl)]
-                    local regenTotal
-                    if info.userUnit ~= nil and info.health then
-                        if math.floor(info.userUnit:GetBlueprint().Defense.RegenRate) > 0 then
-                            regenTotal = math.floor(  (info.userUnit:GetBlueprint().Defense.RegenRate) + addRegen   )
-                            regenBase = math.floor(info.userUnit:GetBlueprint().Defense.RegenRate + enhRegen)
-                        else
-                            regenTotal = math.floor(addRegen)
-                        end
-                        if regenTotal > 0 and regenBase > 0 then
-                            controls.health:SetText(string.format("%d / %d +%d(%d)/s", info.health, info.maxHealth, regenBase ,regenTotal ))
-                        else
-                            controls.health:SetText(string.format("%d / %d +%d/s", info.health, info.maxHealth ,regenTotal ))
-                        end
-                    end
-                else
-                    if info.userUnit ~= nil and info.health and info.userUnit:GetBlueprint().Defense.RegenRate > 0 then
-                        controls.health:SetText(string.format("%d / %d +%d/s", info.health, info.maxHealth,math.floor(info.userUnit:GetBlueprint().Defense.RegenRate + enhRegen)))
-                    end
-                end
+                local bp = info.userUnit:GetBlueprint()
+                local regen = UnitData[info.entityId].regen or bp.Defense.RegenRate
+                controls.health:SetText(string.format("%d / %d +%d/s", info.health, info.maxHealth, regen))
             end
 
-            if info.shieldRatio > 0 and info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth then
-                local ShieldMaxHealth = info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth
-                controls.shieldText:Show()
-                if info.userUnit:GetBlueprint().Defense.Shield.ShieldRegenRate then
-                    controls.shieldText:SetText(string.format("%d / %d +%d/s", math.floor(ShieldMaxHealth*info.shieldRatio), info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth , info.userUnit:GetBlueprint().Defense.Shield.ShieldRegenRate))
-                else
-                    controls.shieldText:SetText(string.format("%d / %d", math.floor(ShieldMaxHealth*info.shieldRatio), info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth ))
+            if info.shieldRatio > 0 then
+                local getEnh = import('/lua/enhancementcommon.lua')
+                local unitBp = info.userUnit:GetBlueprint()
+                local shield = unitBp.Defense.Shield
+                if not shield.ShieldMaxHealth then
+                    shield = unitBp.Enhancements[getEnh.GetEnhancements(info.entityId).Back]
                 end
-            end
-
-            if info.shieldRatio > 0 and info.userUnit:GetBlueprint().Defense.Shield.ShieldMaxHealth == nil then
-                local ShieldMaxHealth = info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId).Back].ShieldMaxHealth
-                controls.shieldText:Show()
-                if info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId).Back].ShieldRegenRate then
-                    controls.shieldText:SetText(string.format("%d / %d +%d/s", math.floor(ShieldMaxHealth*info.shieldRatio), ShieldMaxHealth , info.userUnit:GetBlueprint().Enhancements[getEnh.GetEnhancements(info.entityId).Back].ShieldRegenRate))
-                else
-                    controls.shieldText:SetText(string.format("%d / %d", math.floor(ShieldMaxHealth*info.shieldRatio), ShieldMaxHealth ))
+                local shieldMaxHealth, shieldRegenRate = shield.ShieldMaxHealth or 0, shield.ShieldRegenRate or 0
+                if shieldMaxHealth > 0 then
+                    local shieldHealth = math.floor(shieldMaxHealth*info.shieldRatio)
+                    local shieldText = string.format("%d / %d", shieldHealth, shieldMaxHealth)
+                    if shieldRegenRate > 0 then
+                        shieldText = shieldText .. string.format("+%d/s", shieldRegenRate)
+                    end
+                    controls.shieldText:Show()
+                    controls.shieldText:SetText(shieldText)
                 end
             end
 
@@ -522,16 +489,6 @@ function CreateUI()
 
     controls.abilities = Group(controls.bg)
     controls.abilityText = {}
-    controls.abilityBG = {}
-    controls.abilityBG.TL = Bitmap(controls.abilities)
-    controls.abilityBG.TR = Bitmap(controls.abilities)
-    controls.abilityBG.TM = Bitmap(controls.abilities)
-    controls.abilityBG.ML = Bitmap(controls.abilities)
-    controls.abilityBG.MR = Bitmap(controls.abilities)
-    controls.abilityBG.M = Bitmap(controls.abilities)
-    controls.abilityBG.BL = Bitmap(controls.abilities)
-    controls.abilityBG.BR = Bitmap(controls.abilities)
-    controls.abilityBG.BM = Bitmap(controls.abilities)
 
     controls.bg:DisableHitTest(true)
 
@@ -542,35 +499,52 @@ function CreateUI()
         controls.Buildrate = UIUtil.CreateText(controls.bg, '', 12, UIUtil.bodyFont)
     end
 
-    controls.bg.OnFrame = function(self, delta)
-    local info = GetRolloverInfo()
-        if options.gui_enhanced_unitview ~= 0 then
-            -- If no rollover, then see if we have a single unit selected
-            if not info and import("/modules/selectedinfo.lua").SelectedInfoOn then
-                local selUnits = GetSelectedUnits()
-                if selUnits and table.getn(selUnits) == 1 and import('/lua/ui/game/unitviewDetail.lua').View.Hiding then
-                    info = import("/modules/selectedinfo.lua").GetUnitRolloverInfo(selUnits[1])
-                    --LOG(repr(import('/lua/enhancementcommon.lua').GetEnhancements(info.entityId)))
-                end
-            end
-        end
-
-        if info then
-            UpdateWindow(info)
-            if self:GetAlpha() < 1 then
-                self:SetAlpha(math.min(self:GetAlpha() + (delta*3), 1), true)
-            end
-            import(UIUtil.GetLayoutFilename('unitview')).PositionWindow()
-        elseif self:GetAlpha() > 0 then
-            self:SetAlpha(math.max(self:GetAlpha() - (delta*3), 0), true)
-
-        end
-    end
-
     if options.gui_scu_manager ~= 0 then
         controls.SCUType = Bitmap(controls.bg)
         LayoutHelpers.AtRightIn(controls.SCUType, controls.icon)
         LayoutHelpers.AtBottomIn(controls.SCUType, controls.icon)
     end
 
+    controls.bg:Hide()
 end
+
+function UpdateUnitInfo()
+    local currentInfo = GetRolloverInfo() or (selectedUnit and GetUnitRolloverInfo(selectedUnit))
+
+    if currentInfo and table.getsize(currentInfo) > 0 and import('/lua/ui/game/unitviewDetail.lua').View:IsHidden() then
+        controls.bg:Show()
+        UpdateWindow(currentInfo)
+
+        if not updateThread then
+            updateThread = ForkThread(function()
+                while currentInfo do
+                    WaitSeconds(.1)
+                    UpdateUnitInfo()
+                end
+            end)
+        end
+    else
+        if updateThread and not selectedUnit then
+            KillThread(updateThread)
+            updateThread = nil
+        end
+
+        currentInfo = nil
+        controls.bg:Hide()
+    end
+end
+
+function OnSelection(units)
+    if units and table.getn(units) == 1 then
+        selectedUnit = units[1]
+    else
+        selectedUnit = nil
+    end
+
+    UpdateUnitInfo()
+end
+
+function OnRolloverUpdate(info)
+    UpdateUnitInfo()
+end
+

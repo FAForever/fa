@@ -5,7 +5,7 @@
 #**
 #**  Summary  :
 #**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 #########################################
 # Platoon Lua Module                    #
@@ -202,7 +202,7 @@ Platoon = Class(moho.platoon_methods) {
     
     OnUnitsAddedToPlatoon = function(self)
         for k,v in self:GetPlatoonUnits() do
-            if not v:IsDead() then
+            if not v.Dead then
                 v.PlatoonHandle = self
             end 
         end
@@ -215,7 +215,7 @@ Platoon = Class(moho.platoon_methods) {
         end
         for k,v in self:GetPlatoonUnits() do
             v.PlatoonHandle = nil
-            if not v:IsDead() and v.BuilderManagerData then
+            if not v.Dead and v.BuilderManagerData then
                 if self.CreationTime == GetGameTimeSeconds() and v.BuilderManagerData.EngineerManager then
                     if self.BuilderName then
                         #LOG('*AI DEBUG: ERROR - Platoon disbanded same tick as created - ' .. self.BuilderName .. ' - Army: ' .. self:GetBrain():GetArmyIndex() .. ' - Location: ' .. v.BuilderManagerData.LocationType )
@@ -275,7 +275,7 @@ Platoon = Class(moho.platoon_methods) {
     BuildOnceAI = function(self)
         local aiBrain = self:GetBrain()
         for k,v in self:GetPlatoonUnits() do
-            if not v:IsDead() then
+            if not v.Dead then
                 v.PreviousPriority = aiBrain:PBMGetPriority(self)
                 v.Platoon = self
             end
@@ -311,7 +311,7 @@ Platoon = Class(moho.platoon_methods) {
 			repeat
 				WaitSeconds(5)
 				#LOG('*AI DEBUG: '..aiBrain.Nickname..' Com still upgrading ')
-			until unit:IsDead() or unit:HasEnhancement(lastEnhancement)
+			until unit.Dead or unit:HasEnhancement(lastEnhancement)
 			LOG('*AI DEBUG: '..aiBrain.Nickname..' Com finished upgrading ')
 		end
         self:PlatoonDisband()
@@ -402,7 +402,7 @@ Platoon = Class(moho.platoon_methods) {
                     end
                 end
             end
-            if not target:IsDead() then
+            if not target.Dead then
                 #LOG('*AI DEBUG: Firing Tactical Missile at enemy swine!')
                 IssueTactical({unit}, target)
             end
@@ -627,15 +627,15 @@ Platoon = Class(moho.platoon_methods) {
             end
             
             local guardTime = 0
-            if unitToGuard and not unitToGuard:IsDead() then
+            if unitToGuard and not unitToGuard.Dead then
                 IssueGuard(self:GetPlatoonUnits(), unitToGuard)
                 
-                while aiBrain:PlatoonExists(self) and not unitToGuard:IsDead() do
+                while aiBrain:PlatoonExists(self) and not unitToGuard.Dead do
                     guardTime = guardTime + 5
                     WaitSeconds(5)
                     
                     if self.PlatoonData.EngineerGuardTimeLimit and guardTime >= self.PlatoonData.EngineerGuardTimeLimit 
-                    or (not unitToGuard:IsDead() and unitToGuard:GetCurrentLayer() == 'Seabed' and self.MovementLayer == 'Land') then
+                    or (not unitToGuard.Dead and unitToGuard:GetCurrentLayer() == 'Seabed' and self.MovementLayer == 'Land') then
                         break
                     end
                 end
@@ -691,22 +691,22 @@ Platoon = Class(moho.platoon_methods) {
 		end
             
         local guardTime = 0
-        if unitToGuard and not unitToGuard:IsDead() then
+        if unitToGuard and not unitToGuard.Dead then
 			IssueGuard(self:GetPlatoonUnits(), unitToGuard)
 			
-			while aiBrain:PlatoonExists(self) and not unitToGuard:IsDead() do
+			while aiBrain:PlatoonExists(self) and not unitToGuard.Dead do
 				guardTime = guardTime + 5
 				WaitSeconds(5)
 				
 				if self.PlatoonData.GuardTimeLimit and guardTime >= self.PlatoonData.GuardTimeLimit 
-				or (not unitToGuard:IsDead() and unitToGuard:GetCurrentLayer() == 'Seabed' and self.MovementLayer == 'Land') then
+				or (not unitToGuard.Dead and unitToGuard:GetCurrentLayer() == 'Seabed' and self.MovementLayer == 'Land') then
 					break
 				end
 			end
-			if not unitToGuard:IsDead() and self.MovementLayer == 'Air' then
+			if not unitToGuard.Dead and self.MovementLayer == 'Air' then
                 unitToGuard.BeingAirGuarded = false
             end
-			if not unitToGuard:IsDead() and (self.MovementLayer == 'Land' or self.MovementLayer == 'Amphibious') then
+			if not unitToGuard.Dead and (self.MovementLayer == 'Land' or self.MovementLayer == 'Amphibious') then
                 unitToGuard.BeingLandGuarded = false
             end
 		else
@@ -1024,7 +1024,7 @@ Platoon = Class(moho.platoon_methods) {
 				end
 				
                 #DUNCAN - use the base position to work out radius rather than self:GetPlatoonPosition()
-				if target and not target:IsDead() and VDist3( target:GetPosition(), basePosition ) < guardRadius then
+				if target and not target.Dead and VDist3( target:GetPosition(), basePosition ) < guardRadius then
                     self:Stop()
                     self:AggressiveMoveToLocation( target:GetPosition() )
                 elseif VDist3( basePosition, self:GetPlatoonPosition() ) > homeRadius then
@@ -1060,7 +1060,7 @@ Platoon = Class(moho.platoon_methods) {
 			scout:SetScriptBit('RULEUTC_CloakToggle', false)
         end
                
-        while not scout:IsDead() do
+        while not scout.Dead do
             #Head towards the the area that has not had a scout sent to it in a while           
             local targetData = false
             
@@ -1100,7 +1100,7 @@ Platoon = Class(moho.platoon_methods) {
                 self:MoveToLocation(targetData.Position, false)  
                 
                 #Scout until we reach our destination
-                while not scout:IsDead() and not scout:IsIdleState() do                                       
+                while not scout.Dead and not scout:IsIdleState() do
                     WaitSeconds(2.5)
                 end
             end
@@ -1171,7 +1171,7 @@ Platoon = Class(moho.platoon_methods) {
             scout:EnableUnitIntel('Cloak')
         end
         
-        while not scout:IsDead() do
+        while not scout.Dead do
             local targetArea = false
             local highPri = false
             
@@ -1222,7 +1222,7 @@ Platoon = Class(moho.platoon_methods) {
                 
                 local vec = self:DoAirScoutVecs(scout, targetArea)
                 
-                while not scout:IsDead() and not scout:IsIdleState() do                   
+                while not scout.Dead and not scout:IsIdleState() do
                     
                     #If we're close enough...
                     if VDist2Sq(vec[1], vec[3], scout:GetPosition()[1], scout:GetPosition()[3]) < 15625 then
@@ -1280,7 +1280,7 @@ Platoon = Class(moho.platoon_methods) {
         local first = true
         local unit = false
         for k,v in self:GetPlatoonUnits() do
-            if not v:IsDead() and EntityCategoryContains( categories.MOBILE * categories.LAND, v ) then
+            if not v.Dead and EntityCategoryContains( categories.MOBILE * categories.LAND, v ) then
                 unit = v
                 break
             end
@@ -1489,7 +1489,7 @@ Platoon = Class(moho.platoon_methods) {
         end
         while aiBrain:PlatoonExists( self ) do
             local target = AIAttackUtils.AIFindUnitRadiusThreat( aiBrain, 'Enemy', data.Categories, pos, radius, data.ThreatMin, data.ThreatMax, data.ThreatRings )
-            if target and not target:IsDead() then
+            if target and not target.Dead then
                 local blip = target:GetBlip(index)
                 if blip then
                     IssueClearCommands( self:GetPlatoonUnits() )
@@ -1497,7 +1497,7 @@ Platoon = Class(moho.platoon_methods) {
                     local guardTarget
                     
                     for i, unit in engineers do
-                        if not unit:IsDead() then
+                        if not unit.Dead then
                             IssueGuard( notEngineers, unit)
                             break
                         end
@@ -1511,7 +1511,7 @@ Platoon = Class(moho.platoon_methods) {
                         end
                         allIdle = true
                         for k,v in self:GetPlatoonUnits() do
-                            if not v:IsDead() and not v:IsIdleState() then
+                            if not v.Dead and not v:IsIdleState() then
                                 allIdle = false
                                 break
                             end
@@ -1528,7 +1528,7 @@ Platoon = Class(moho.platoon_methods) {
                         local alive = 0
                         local cnt = 0
                         for k,unit in self:GetPlatoonUnits() do
-                            if not unit:IsDead() then
+                            if not unit.Dead then
                                 alive = alive + 1
                                 
                                 if ScenarioUtils.InRect( unit:GetPosition(), rect ) then
@@ -1571,14 +1571,14 @@ Platoon = Class(moho.platoon_methods) {
 				local reclaimcat = ParseEntityCategory(cat)
 				local reclaimables = aiBrain:GetListOfUnits( reclaimcat, false )
 				for k,v in reclaimables do
-					if not v:IsDead() and (not reclaimunit or VDist3(unitPos, v:GetPosition()) < distance) then
+					if not v.Dead and (not reclaimunit or VDist3(unitPos, v:GetPosition()) < distance) then
 						reclaimunit = v
 						distance = VDist3(unitPos, v:GetPosition())
 					end
 				end
 				if reclaimunit then break end
 			end
-            if reclaimunit and not reclaimunit:IsDead() then
+            if reclaimunit and not reclaimunit.Dead then
                 counter = 0
                 IssueReclaim( self:GetPlatoonUnits(), reclaimunit )
                 local allIdle
@@ -1589,7 +1589,7 @@ Platoon = Class(moho.platoon_methods) {
                     end
                     allIdle = true
                     for k,v in self:GetPlatoonUnits() do
-                        if not v:IsDead() and not v:IsIdleState() then
+                        if not v.Dead and not v:IsIdleState() then
                             allIdle = false
                             break
                         end
@@ -1731,7 +1731,7 @@ Platoon = Class(moho.platoon_methods) {
         end
         while aiBrain:PlatoonExists(self) do
             local target = AIAttackUtils.AIFindUnitRadiusThreat( aiBrain, 'Enemy', data.Categories, pos, radius, data.ThreatMin, data.ThreatMax, data.ThreatRings )
-            if target and not target:IsDead() then
+            if target and not target.Dead then
                 local blip = target:GetBlip(index)
                 if blip then
                     IssueClearCommands( self:GetPlatoonUnits() )
@@ -1744,7 +1744,7 @@ Platoon = Class(moho.platoon_methods) {
                         end
                         allIdle = true
                         for k,v in self:GetPlatoonUnits() do
-                            if not v:IsDead() and not v:IsIdleState() then
+                            if not v.Dead and not v:IsIdleState() then
                                 allIdle = false
                                 break
                             end
@@ -1773,7 +1773,7 @@ Platoon = Class(moho.platoon_methods) {
 		local engineerManager = aiBrain.BuilderManagers[self.PlatoonData.LocationType].EngineerManager
         local Structures = AIUtils.GetOwnUnitsAroundPoint( aiBrain, categories.STRUCTURE - (categories.TECH1 - categories.FACTORY), engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius() )
         for k,v in Structures do
-            if not v:IsDead() and v:GetHealthPercent() < .8 then
+            if not v.Dead and v:GetHealthPercent() < .8 then
                 self:Stop()
                 IssueRepair( self:GetPlatoonUnits(), v )
 				break
@@ -1957,9 +1957,9 @@ Platoon = Class(moho.platoon_methods) {
         if not aiBrain:PlatoonExists(self) then
             return
         end
-        if not eng:IsDead() then
+        if not eng.Dead then
             local guardedUnit = eng:GetGuardedUnit()
-            if guardedUnit and not guardedUnit:IsDead() then
+            if guardedUnit and not guardedUnit.Dead then
                 if eng.AssistSet and assistData.PermanentAssist then
                     return
                 end
@@ -1978,9 +1978,9 @@ Platoon = Class(moho.platoon_methods) {
                 for catNum, buildeeCat in assistData.BeingBuiltCategories do
                     local buildCat = ParseEntityCategory(buildeeCat)
                     for unitNum, unit in unitsBuilding do
-                        if not unit:IsDead() and ( unit:IsUnitState('Building') or unit:IsUnitState('Upgrading') ) then
+                        if not unit.Dead and ( unit:IsUnitState('Building') or unit:IsUnitState('Upgrading') ) then
                             local buildingUnit = unit:GetUnitBeingBuilt()
-                            if buildingUnit and not buildingUnit:IsDead() and EntityCategoryContains( buildCat, buildingUnit ) then
+                            if buildingUnit and not buildingUnit.Dead and EntityCategoryContains( buildCat, buildingUnit ) then
                                 local unitPos = unit:GetPosition()
                                 if unitPos and platoonPos and VDist2(platoonPos[1], platoonPos[3], unitPos[1], unitPos[3]) < assistRange then
                                     assistee = unit
@@ -1999,7 +1999,7 @@ Platoon = Class(moho.platoon_methods) {
                 for catNum, buildCat in assistData.BuilderCategories do
                     local unitsBuilding = aiBrain:GetListOfUnits( ParseEntityCategory(buildCat), false )
                     for unitNum, unit in unitsBuilding do
-                        if not unit:IsDead() and unit:IsUnitState('Building') then
+                        if not unit.Dead and unit:IsUnitState('Building') then
                             local unitPos = unit:GetPosition()
                             if unitPos and platoonPos and VDist2(platoonPos[1], platoonPos[3], unitPos[1], unitPos[3]) < assistRange then
                                 assistee = unit
@@ -2011,9 +2011,9 @@ Platoon = Class(moho.platoon_methods) {
             end
             # If the unit to be assisted is a factory, assist whatever it is assisting or is assisting it
             # Makes sure all factories have someone helping out to load balance better
-            if assistee and not assistee:IsDead() and EntityCategoryContains( categories.FACTORY, assistee ) then
+            if assistee and not assistee.Dead and EntityCategoryContains( categories.FACTORY, assistee ) then
                 local guardee = assistee:GetGuardedUnit()
-                if guardee and not guardee:IsDead() and EntityCategoryContains( categories.FACTORY, guardee ) then
+                if guardee and not guardee.Dead and EntityCategoryContains( categories.FACTORY, guardee ) then
                     local factories = AIUtils.AIReturnAssistingFactories( guardee )
                     table.insert(factories, assistee)
                     AIUtils.AIEngineersAssistFactories( aiBrain, platoonUnits, factories )
@@ -2026,7 +2026,7 @@ Platoon = Class(moho.platoon_methods) {
                 end
             end
         end
-        if assistee and not assistee:IsDead() then
+        if assistee and not assistee.Dead then
             if not assistingBool then
                 eng.AssistSet = true
                 IssueGuard( platoonUnits, assistee )
@@ -2090,7 +2090,7 @@ Platoon = Class(moho.platoon_methods) {
 
         local eng
         for k, v in platoonUnits do
-            if not v:IsDead() and EntityCategoryContains(categories.ENGINEER, v ) then #DUNCAN - was construction
+            if not v.Dead and EntityCategoryContains(categories.ENGINEER, v ) then #DUNCAN - was construction
                 if not eng then
                     eng = v
                 else
@@ -2100,7 +2100,7 @@ Platoon = Class(moho.platoon_methods) {
             end
         end
 
-        if not eng or eng:IsDead() then
+        if not eng or eng.Dead then
             WaitTicks(1)
             self:PlatoonDisband()
             return
@@ -2216,7 +2216,7 @@ Platoon = Class(moho.platoon_methods) {
             if cons.FireBase or cons.ExpansionBase then
                 local guards = eng:GetGuards()
                 for k,v in guards do
-                    if not v:IsDead() and v.PlatoonHandle then
+                    if not v.Dead and v.PlatoonHandle then
                         v.PlatoonHandle:PlatoonDisband()
                     end
                 end
@@ -2341,7 +2341,7 @@ Platoon = Class(moho.platoon_methods) {
             closeToBuilder = eng
             local guards = eng:GetGuards()
             for k,v in guards do
-                if not v:IsDead() and v.PlatoonHandle and aiBrain:PlatoonExists(v.PlatoonHandle) then
+                if not v.Dead and v.PlatoonHandle and aiBrain:PlatoonExists(v.PlatoonHandle) then
                     #WaitTicks(1)
                     v.PlatoonHandle:PlatoonDisband()
                 end
@@ -2355,7 +2355,7 @@ Platoon = Class(moho.platoon_methods) {
         for baseNum, baseListData in baseTmplList do
             for k, v in cons.BuildStructures do
                 if aiBrain:PlatoonExists(self) then
-                    if not eng:IsDead() then
+                    if not eng.Dead then
                   local faction = SUtils.GetEngineerFaction(eng)
                   if aiBrain.CustomUnits[v] and aiBrain.CustomUnits[v][faction] then
                      local replacement = SUtils.GetTemplateReplacement(aiBrain, v, faction)
@@ -2379,7 +2379,7 @@ Platoon = Class(moho.platoon_methods) {
         end
         
         # wait in case we're still on a base
-        if not eng:IsDead() then
+        if not eng.Dead then
             local count = 0
             while eng:IsUnitState( 'Attached' ) and count < 2 do
                 WaitSeconds(6)
@@ -2414,7 +2414,7 @@ Platoon = Class(moho.platoon_methods) {
             WaitSeconds(3)
             upgrading = false
             for k, v in platoonUnits do
-                if v and not v:IsDead() then
+                if v and not v.Dead then
                     upgrading = true
                 end
             end
@@ -2572,7 +2572,7 @@ Platoon = Class(moho.platoon_methods) {
         local maxRadius = data.SearchRadius or 50
         local movingToScout = false
         while aiBrain:PlatoonExists(self) do
-            if not target or target:IsDead() then
+            if not target or target.Dead then
                 if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy():IsDefeated() then
                     aiBrain:PickEnemyLogic()
                 end
@@ -2644,7 +2644,7 @@ Platoon = Class(moho.platoon_methods) {
         local maxRadius = data.SearchRadius or 50
         local movingToScout = false
         while aiBrain:PlatoonExists(self) do
-            if not target or target:IsDead() then
+            if not target or target.Dead then
                 if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy():IsDefeated() then
                     aiBrain:PickEnemyLogic()
                 end
@@ -2829,7 +2829,7 @@ Platoon = Class(moho.platoon_methods) {
         # Set priorities on the unit so if the target has died it will reprioritize before the platoon does
         local unit = false
         for k,v in self:GetPlatoonUnits() do
-            if not v:IsDead() then
+            if not v.Dead then
                 unit = v
                 break
             end
@@ -2881,7 +2881,7 @@ Platoon = Class(moho.platoon_methods) {
         self:SetPlatoonFormationOverride(PlatoonFormation)
         
         for k,v in self:GetPlatoonUnits() do
-            if v:IsDead() then
+            if v.Dead then
                 continue
             end
             
@@ -2923,7 +2923,7 @@ Platoon = Class(moho.platoon_methods) {
             local cmdQ = {} 
             # fill cmdQ with current command queue for each unit
             for k,v in self:GetPlatoonUnits() do
-                if not v:IsDead() then
+                if not v.Dead then
                     local unitCmdQ = v:GetCommandQueue()
                     for cmdIdx,cmdVal in unitCmdQ do
                         table.insert(cmdQ, cmdVal)
@@ -3128,7 +3128,7 @@ Platoon = Class(moho.platoon_methods) {
             local cmdQ = {} 
             # fill cmdQ with current command queue for each unit
             for k,v in platoonUnits do
-                if not v:IsDead() then
+                if not v.Dead then
                     local unitCmdQ = v:GetCommandQueue()
                     for cmdIdx,cmdVal in unitCmdQ do
                         table.insert(cmdQ, cmdVal)
@@ -3370,7 +3370,7 @@ Platoon = Class(moho.platoon_methods) {
                 local validUnits = {}
                 local bValidUnits = false
                 for _,u in units do
-                    if not u:IsDead() and not u:IsUnitState( 'Attached' ) then
+                    if not u.Dead and not u:IsUnitState( 'Attached' ) then
                         table.insert(validUnits, u)
                         bValidUnits = true
                     end
@@ -3456,19 +3456,19 @@ Platoon = Class(moho.platoon_methods) {
     
     
     SetupEngineerCallbacks = function(eng)
-        if eng and not eng:IsDead() and not eng.BuildDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then                
+        if eng and not eng.Dead and not eng.BuildDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
             import('/lua/ScenarioTriggers.lua').CreateUnitBuiltTrigger(eng.PlatoonHandle.EngineerBuildDone, eng, categories.ALLUNITS)
             eng.BuildDoneCallbackSet = true
         end
-        if eng and not eng:IsDead() and not eng.CaptureDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
+        if eng and not eng.Dead and not eng.CaptureDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
             import('/lua/ScenarioTriggers.lua').CreateUnitStopCaptureTrigger(eng.PlatoonHandle.EngineerCaptureDone, eng )
             eng.CaptureDoneCallbackSet = true
         end
-        if eng and not eng:IsDead() and not eng.ReclaimDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
+        if eng and not eng.Dead and not eng.ReclaimDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
             import('/lua/ScenarioTriggers.lua').CreateUnitStopReclaimTrigger(eng.PlatoonHandle.EngineerReclaimDone, eng )
             eng.ReclaimDoneCallbackSet = true
         end
-        if eng and not eng:IsDead() and not eng.FailedToBuildCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
+        if eng and not eng.Dead and not eng.FailedToBuildCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
             import('/lua/ScenarioTriggers.lua').CreateOnFailedToBuildTrigger(eng.PlatoonHandle.EngineerFailedToBuild, eng )
             eng.FailedToBuildCallbackSet = true
         end      
@@ -3528,7 +3528,7 @@ Platoon = Class(moho.platoon_methods) {
         local aiBrain = eng:GetAIBrain()
 		
 		#DUNCAN - Trying to stop commander leaving projects, also added moving as well.
-        while not eng:IsDead() and (eng.GoingHome or eng:IsUnitState("Building") or 
+        while not eng.Dead and (eng.GoingHome or eng:IsUnitState("Building") or
                   eng:IsUnitState("Attacking") or eng:IsUnitState("Repairing") or eng:IsUnitState("Guarding") or
                   eng:IsUnitState("Reclaiming") or eng:IsUnitState("Capturing") or eng.ProcessBuild != nil
 				  or eng.UnitBeingBuiltBehavior or eng:IsUnitState("Moving") or eng:IsUnitState("Upgrading") or eng:IsUnitState("Enhancing")
@@ -3553,7 +3553,7 @@ Platoon = Class(moho.platoon_methods) {
 		#end
 		 
         eng.NotBuildingThread = nil
-        if not eng:IsDead() and eng:IsIdleState() and table.getn(eng.EngineerBuildQueue) != 0 and eng.PlatoonHandle then
+        if not eng.Dead and eng:IsIdleState() and table.getn(eng.EngineerBuildQueue) != 0 and eng.PlatoonHandle then
             eng.PlatoonHandle.SetupEngineerCallbacks(eng)
             if not eng.ProcessBuild then
                 eng.ProcessBuild = eng:ForkThread(eng.PlatoonHandle.ProcessBuildCommand, true)
@@ -3575,7 +3575,7 @@ Platoon = Class(moho.platoon_methods) {
     #-----------------------------------------------------
     ProcessBuildCommand = function(eng, removeLastBuild)
 		#DUNCAN - Trying to stop commander leaving projects
-        if not eng or eng:IsDead() or not eng.PlatoonHandle or eng.GoingHome or eng.UnitBeingBuiltBehavior or eng:IsUnitState("Upgrading") or eng:IsUnitState("Enhancing") or eng:IsUnitState("Guarding") then
+        if not eng or eng.Dead or not eng.PlatoonHandle or eng.GoingHome or eng.UnitBeingBuiltBehavior or eng:IsUnitState("Upgrading") or eng:IsUnitState("Enhancing") or eng:IsUnitState("Guarding") then
 			if eng then eng.ProcessBuild = nil end
 			#LOG('*AI DEBUG: Commander skipping process build.')
             return
@@ -3586,7 +3586,7 @@ Platoon = Class(moho.platoon_methods) {
 		end
 		
         local aiBrain = eng.PlatoonHandle:GetBrain()            
-        if not aiBrain or eng:IsDead() or not eng.EngineerBuildQueue or table.getn(eng.EngineerBuildQueue) == 0 then
+        if not aiBrain or eng.Dead or not eng.EngineerBuildQueue or table.getn(eng.EngineerBuildQueue) == 0 then
             if aiBrain:PlatoonExists(eng.PlatoonHandle) then
                 #LOG("*AI DEBUG: Disbanding Engineer Platoon in ProcessBuildCommand top " .. eng.Sync.id)
                 #if eng.CDRHome then LOG('*AI DEBUG: Commander process build platoon disband...') end
@@ -3612,13 +3612,13 @@ Platoon = Class(moho.platoon_methods) {
         eng.ProcessBuildDone = false  
         IssueClearCommands({eng}) 
         local commandDone = false
-        while not eng:IsDead() and not commandDone and table.getn(eng.EngineerBuildQueue) > 0  do
+        while not eng.Dead and not commandDone and table.getn(eng.EngineerBuildQueue) > 0  do
             local whatToBuild = eng.EngineerBuildQueue[1][1]
             local buildLocation = BuildToNormalLocation(eng.EngineerBuildQueue[1][2])
             local buildRelative = eng.EngineerBuildQueue[1][3]
             # see if we can move there first  
             if AIUtils.EngineerMoveWithSafePath(aiBrain, eng, buildLocation) then
-                if not eng or eng:IsDead() or not eng.PlatoonHandle or not aiBrain:PlatoonExists(eng.PlatoonHandle) then
+                if not eng or eng.Dead or not eng.PlatoonHandle or not aiBrain:PlatoonExists(eng.PlatoonHandle) then
                     if eng then eng.ProcessBuild = nil end
                     return
                 end
@@ -3628,7 +3628,7 @@ Platoon = Class(moho.platoon_methods) {
 				end
 				
 				local engpos = eng:GetPosition()
-				while not eng:IsDead() and eng:IsUnitState("Moving") and VDist2(engpos[1], engpos[3], buildLocation[1], buildLocation[3] ) > 15 do				
+				while not eng.Dead and eng:IsUnitState("Moving") and VDist2(engpos[1], engpos[3], buildLocation[1], buildLocation[3] ) > 15 do
 					WaitSeconds(2) 
 				end
 				
@@ -3651,7 +3651,7 @@ Platoon = Class(moho.platoon_methods) {
         end
         
         # final check for if we should disband
-        if not eng or eng:IsDead() or table.getn(eng.EngineerBuildQueue) <= 0 then
+        if not eng or eng.Dead or table.getn(eng.EngineerBuildQueue) <= 0 then
             if eng.PlatoonHandle and aiBrain:PlatoonExists(eng.PlatoonHandle) then
                 #LOG("*AI DEBUG: Disbanding Engineer Platoon in ProcessBuildCommand bottom " .. eng.Sync.id)
                 eng.PlatoonHandle:PlatoonDisband()
@@ -3742,7 +3742,7 @@ Platoon = Class(moho.platoon_methods) {
                local antiAirThreat = aiBrain:GetThreatAtPosition(table.copy(target:GetPosition()), 1, true, 'AntiAir') 
                #LOG("AntiAir threat: " .. antiAirThreat)
                if antiAirThreat < 6 then
-                   while not target:IsDead() do
+                   while not target.Dead do
                        local targetLocation =target:GetPosition()
                        local closeLocation = {targetLocation[1] + 4, targetLocation[2] + 0.2, targetLocation[3] + 2 }
                        IssueMove( self:GetSquadUnits('Scout' ), closeLocation)
@@ -3933,7 +3933,7 @@ Platoon = Class(sorianoldPlatoon) {
 			local transporting = false
 			units = self:GetPlatoonUnits()
 			for k, v in units do
-				if not v:IsDead() and v:IsUnitState( 'Attached' ) then
+				if not v.Dead and v:IsUnitState( 'Attached' ) then
 					transporting = true
 				end
 				if transporting then break end
@@ -4015,15 +4015,15 @@ Platoon = Class(sorianoldPlatoon) {
 					if not oldPlan then
 						units = self:GetPlatoonUnits()
 						for k, v in units do
-							if not v:IsDead() and EntityCategoryContains(categories.MOBILE * categories.EXPERIMENTAL, v) then
+							if not v.Dead and EntityCategoryContains(categories.MOBILE * categories.EXPERIMENTAL, v) then
 								oldPlan = 'ExperimentalAIHubSorian'
-							elseif not v:IsDead() and EntityCategoryContains(categories.MOBILE * categories.LAND - categories.EXPERIMENTAL, v) then
+							elseif not v.Dead and EntityCategoryContains(categories.MOBILE * categories.LAND - categories.EXPERIMENTAL, v) then
 								oldPlan = 'AttackForceAISorian'
-							elseif not v:IsDead() and EntityCategoryContains(categories.AIR * categories.MOBILE * categories.ANTIAIR - categories.BOMBER - categories.TRANSPORTFOCUS - categories.EXPERIMENTAL, v) then
+							elseif not v.Dead and EntityCategoryContains(categories.AIR * categories.MOBILE * categories.ANTIAIR - categories.BOMBER - categories.TRANSPORTFOCUS - categories.EXPERIMENTAL, v) then
 								oldPlan = 'FighterHuntAI'
-							elseif not v:IsDead() and EntityCategoryContains(categories.AIR * categories.MOBILE * categories.BOMBER - categories.EXPERIMENTAL, v) then
+							elseif not v.Dead and EntityCategoryContains(categories.AIR * categories.MOBILE * categories.BOMBER - categories.EXPERIMENTAL, v) then
 								oldPlan = 'AirHuntAI'
-							elseif not v:IsDead() and EntityCategoryContains(categories.MOBILE * categories.NAVAL - categories.EXPERIMENTAL, v) then
+							elseif not v.Dead and EntityCategoryContains(categories.MOBILE * categories.NAVAL - categories.EXPERIMENTAL, v) then
 								oldPlan = 'NavalForceAISorian'
 							end
 							if oldPlan then break end
@@ -4130,7 +4130,7 @@ Platoon = Class(sorianoldPlatoon) {
 					numLoop = 0
 				end
 				#LOG('*AI DEBUG: '..aiBrain.Nickname..' EnhanceAI loop. numLoop = '..numLoop)
-            until unit:IsDead() or numLoop > 1 or unit:HasEnhancement(lastEnhancement)
+            until unit.Dead or numLoop > 1 or unit:HasEnhancement(lastEnhancement)
 			#LOG('*AI DEBUG: '..aiBrain.Nickname..' EnhanceAI exited loop. numLoop = '..numLoop)
 			unit.Upgrading = false
 		end
@@ -4169,7 +4169,7 @@ Platoon = Class(sorianoldPlatoon) {
             WaitSeconds(3)
             upgrading = false
             for k, v in platoonUnits do
-                if v and not v:IsDead() then
+                if v and not v.Dead then
                     upgrading = true
                 end
             end
@@ -4195,7 +4195,7 @@ Platoon = Class(sorianoldPlatoon) {
         # Set priorities on the unit so if the target has died it will reprioritize before the platoon does
         local unit = false
         for k,v in self:GetPlatoonUnits() do
-            if not v:IsDead() then
+            if not v.Dead then
                 unit = v
                 break
             end
@@ -4219,7 +4219,7 @@ Platoon = Class(sorianoldPlatoon) {
 						target = newtarget
 					end
 				end
-                if target and not unit:IsDead() then
+                if target and not unit.Dead then
 					#self:Stop()
 					#self:AttackTarget(target)
                     IssueClearCommands( {unit} )
@@ -4265,7 +4265,7 @@ Platoon = Class(sorianoldPlatoon) {
 				#		target = newtarget
 				#	end
 				#end
-                if target and target != oldTarget and not target:IsDead() then
+                if target and target != oldTarget and not target.Dead then
 					self:Stop()
 					self:AttackTarget(target)
 					oldTarget = target
@@ -4335,7 +4335,7 @@ Platoon = Class(sorianoldPlatoon) {
                     end
                 end
             end
-            if not target:IsDead() then
+            if not target.Dead then
                 #LOG('*AI DEBUG: Firing Tactical Missile at enemy swine!')
 				if EntityCategoryContains(categories.STRUCTURE, target) then
 					IssueTactical({unit}, target)
@@ -4405,7 +4405,7 @@ Platoon = Class(sorianoldPlatoon) {
 			repeat
 				WaitSeconds(1)
 				waitLoop = waitLoop + 1
-			until waitLoop >= 17 or (target and (target:IsDead() or not target:GetPosition()))
+			until waitLoop >= 17 or (target and (target.Dead or not target:GetPosition()))
 			if aiBrain:PlatoonExists(self) and AIAttackUtils.GetSurfaceThreatOfUnits(self) <= 0 then
 				return self:FighterHuntAI()
 			end				
@@ -4504,7 +4504,7 @@ Platoon = Class(sorianoldPlatoon) {
 			repeat
 				WaitSeconds(1)
 				waitLoop = waitLoop + 1
-			until waitLoop >= 17 or (target and (target:IsDead() or not target:GetPosition()))
+			until waitLoop >= 17 or (target and (target.Dead or not target:GetPosition()))
         end
     end,	
           
@@ -4820,13 +4820,13 @@ Platoon = Class(sorianoldPlatoon) {
 						target = newtarget
 					end
 				end
-                if target and newtarget and not target:IsDead() and target:GetFractionComplete() == 1
+                if target and newtarget and not target.Dead and target:GetFractionComplete() == 1
 				and SUtils.XZDistanceTwoVectorsSq( target:GetPosition(), basePosition ) < T4Radius * T4Radius then
                     blip = target:GetBlip(armyIndex)
                     self:Stop()
                     self:AttackTarget( target )
 					patrolling = false
-                elseif target and not target:IsDead() and SUtils.XZDistanceTwoVectorsSq( target:GetPosition(), basePosition ) < guardRadius * guardRadius then
+                elseif target and not target.Dead and SUtils.XZDistanceTwoVectorsSq( target:GetPosition(), basePosition ) < guardRadius * guardRadius then
                     self:Stop()
                     self:AggressiveMoveToLocation( target:GetPosition() )
 					patrolling = false
@@ -4862,7 +4862,7 @@ Platoon = Class(sorianoldPlatoon) {
         self:SetPlatoonFormationOverride(PlatoonFormation)
         
         for k,v in self:GetPlatoonUnits() do
-            if v:IsDead() then
+            if v.Dead then
                 continue
             end
             
@@ -4909,7 +4909,7 @@ Platoon = Class(sorianoldPlatoon) {
             local cmdQ = {} 
             # fill cmdQ with current command queue for each unit
             for k,v in platoonUnits do
-                if not v:IsDead() then
+                if not v.Dead then
                     local unitCmdQ = v:GetCommandQueue()
                     for cmdIdx,cmdVal in unitCmdQ do
                         table.insert(cmdQ, cmdVal)
@@ -5007,7 +5007,7 @@ Platoon = Class(sorianoldPlatoon) {
         local pos = self:GetPlatoonPosition()
         local unitsSet = true
         for k,v in self:GetPlatoonUnits() do
-            if not v:IsDead() and SUtils.XZDistanceTwoVectorsSq(v:GetPosition(), pos) > 3600 then #60
+            if not v.Dead and SUtils.XZDistanceTwoVectorsSq(v:GetPosition(), pos) > 3600 then #60
                unitsSet = false
                break
             end
@@ -5031,7 +5031,7 @@ Platoon = Class(sorianoldPlatoon) {
                 end
 				unitsSet = true
 				for k,v in self:GetPlatoonUnits() do
-					if not v:IsDead() and SUtils.XZDistanceTwoVectorsSq(v:GetPosition(), gatherPoint) > 3600 then #60
+					if not v.Dead and SUtils.XZDistanceTwoVectorsSq(v:GetPosition(), gatherPoint) > 3600 then #60
 						unitsSet = false
 						break
 					end
@@ -5146,7 +5146,7 @@ Platoon = Class(sorianoldPlatoon) {
             local cmdQ = {} 
             # fill cmdQ with current command queue for each unit
             for k,v in platoonUnits do
-                if not v:IsDead() then
+                if not v.Dead then
                     local unitCmdQ = v:GetCommandQueue()
                     for cmdIdx,cmdVal in unitCmdQ do
                         table.insert(cmdQ, cmdVal)
@@ -5233,10 +5233,10 @@ Platoon = Class(sorianoldPlatoon) {
 		end
 
 		local guardTime = 0
-		if unitToGuard and not unitToGuard:IsDead() then
+		if unitToGuard and not unitToGuard.Dead then
 			IssueGuard(self:GetPlatoonUnits(), unitToGuard)
 
-			while aiBrain:PlatoonExists(self) and not unitToGuard:IsDead() do
+			while aiBrain:PlatoonExists(self) and not unitToGuard.Dead do
 				guardTime = guardTime + 5
 				WaitSeconds(5)
 				
@@ -5248,7 +5248,7 @@ Platoon = Class(sorianoldPlatoon) {
 				end
 					
 				if self.PlatoonData.T4GuardTimeLimit and guardTime >= self.PlatoonData.T4GuardTimeLimit 
-				or (not unitToGuard:IsDead() and unitToGuard:GetCurrentLayer() == 'Seabed' and self.MovementLayer == 'Land') then
+				or (not unitToGuard.Dead and unitToGuard:GetCurrentLayer() == 'Seabed' and self.MovementLayer == 'Land') then
 					break
 				end
 			end
@@ -5282,14 +5282,14 @@ Platoon = Class(sorianoldPlatoon) {
 				local reclaimcat = ParseEntityCategory(cat)
 				local reclaimables = aiBrain:GetListOfUnits( reclaimcat, false )
 				for k,v in reclaimables do
-					if not v:IsDead() and (not reclaimunit or VDist3(unitPos, v:GetPosition()) < distance) then
+					if not v.Dead and (not reclaimunit or VDist3(unitPos, v:GetPosition()) < distance) then
 						reclaimunit = v
 						distance = VDist3(unitPos, v:GetPosition())
 					end
 				end
 				if reclaimunit then break end
 			end
-            if reclaimunit and not reclaimunit:IsDead() then
+            if reclaimunit and not reclaimunit.Dead then
                 counter = 0
                 IssueReclaim( self:GetPlatoonUnits(), reclaimunit )
                 local allIdle
@@ -5300,7 +5300,7 @@ Platoon = Class(sorianoldPlatoon) {
                     end
                     allIdle = true
                     for k,v in self:GetPlatoonUnits() do
-                        if not v:IsDead() and not v:IsIdleState() then
+                        if not v.Dead and not v:IsIdleState() then
                             allIdle = false
                             break
                         end
@@ -5432,7 +5432,7 @@ Platoon = Class(sorianoldPlatoon) {
 		local engineerManager = aiBrain.BuilderManagers[self.PlatoonData.LocationType].EngineerManager
         local Structures = AIUtils.GetOwnUnitsAroundPoint( aiBrain, categories.STRUCTURE - (categories.TECH1 - categories.FACTORY), engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius() )
         for k,v in Structures do
-            if not v:IsDead() and v:GetHealthPercent() < .8 then
+            if not v.Dead and v:GetHealthPercent() < .8 then
                 self:Stop()
                 IssueRepair( self:GetPlatoonUnits(), v )
 				break
@@ -5671,7 +5671,7 @@ Platoon = Class(sorianoldPlatoon) {
 			scout:SetScriptBit('RULEUTC_CloakToggle', false)
         end
                
-        while not scout:IsDead() do
+        while not scout.Dead do
             #Head towards the the area that has not had a scout sent to it in a while           
             local targetData = false
             
@@ -5711,7 +5711,7 @@ Platoon = Class(sorianoldPlatoon) {
                 self:MoveToLocation(targetData.Position, false)  
                 
                 #Scout until we reach our destination
-                while not scout:IsDead() and not scout:IsIdleState() do                                       
+                while not scout.Dead and not scout:IsIdleState() do
                     WaitSeconds(2.5)
                 end
             end
@@ -5732,7 +5732,7 @@ Platoon = Class(sorianoldPlatoon) {
 			scout:SetScriptBit('RULEUTC_CloakToggle', false)
         end
         
-        while not scout:IsDead() do
+        while not scout.Dead do
             local targetArea = false
             local highPri = false
             
@@ -5784,7 +5784,7 @@ Platoon = Class(sorianoldPlatoon) {
                 
                 local vec = self:DoAirScoutVecs(scout, targetArea)
                 
-                while not scout:IsDead() and not scout:IsIdleState() do                   
+                while not scout.Dead and not scout:IsIdleState() do
                     
                     #If we're close enough...
                     if VDist2Sq(vec[1], vec[3], scout:GetPosition()[1], scout:GetPosition()[3]) < 15625 then
@@ -5859,7 +5859,7 @@ Platoon = Class(sorianoldPlatoon) {
         local maxRadius = 6000
         for k,v in platoonUnits do
 
-            if v:IsDead() then
+            if v.Dead then
                 continue
             end
             
@@ -5938,7 +5938,7 @@ Platoon = Class(sorianoldPlatoon) {
 		local platoonUnits = self:GetPlatoonUnits()
         local eng
         for k, v in platoonUnits do
-            if not v:IsDead() and EntityCategoryContains(categories.COMMAND, v ) then
+            if not v.Dead and EntityCategoryContains(categories.COMMAND, v ) then
                 eng = v
             end
         end
@@ -5960,7 +5960,7 @@ Platoon = Class(sorianoldPlatoon) {
 			local pos = self:GetPlatoonPosition()
             if self:IsOpponentAIRunning() then
                 local target = self:FindClosestUnit('support', 'Enemy', true, categories.ALLUNITS - categories.AIR - categories.NAVAL - categories.SCOUT)
-				if target and not target:IsDead() and SUtils.XZDistanceTwoVectorsSq(target:GetPosition(), eng.CDRHome) < (leashRange * leashRange) and
+				if target and not target.Dead and SUtils.XZDistanceTwoVectorsSq(target:GetPosition(), eng.CDRHome) < (leashRange * leashRange) and
 				aiBrain:GetThreatBetweenPositions(pos, target:GetPosition(), nil, 'AntiSurface') < mySurfaceThreat then
 				--aiBrain:GetThreatAtPosition( target:GetPosition(), 1, true, 'AntiSurface') < mySurfaceThreat * 1.5 then
 					movingToScout = false
@@ -6163,7 +6163,7 @@ Platoon = Class(sorianoldPlatoon) {
             local cmdQ = {} 
             # fill cmdQ with current command queue for each unit
             for k,v in platoonUnits do
-                if not v:IsDead() then
+                if not v.Dead then
                     local unitCmdQ = v:GetCommandQueue()
                     for cmdIdx,cmdVal in unitCmdQ do
                         table.insert(cmdQ, cmdVal)
@@ -6356,7 +6356,7 @@ Platoon = Class(sorianoldPlatoon) {
 					oldTarget = false
 				end
 			end
-            if not target or target:IsDead() or not target:GetPosition() then
+            if not target or target.Dead or not target:GetPosition() then
                 if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy():IsDefeated() then
                     aiBrain:PickEnemyLogicSorian()
                 end
@@ -6438,7 +6438,7 @@ Platoon = Class(sorianoldPlatoon) {
 				repeat
 					WaitSeconds(1)
 					waitLoop = waitLoop + 1
-				until waitLoop >= 7 or (target and (target:IsDead() or not target:GetPosition()))
+				until waitLoop >= 7 or (target and (target.Dead or not target:GetPosition()))
 			else
 				WaitSeconds( 7 )
 			end
@@ -6486,7 +6486,7 @@ Platoon = Class(sorianoldPlatoon) {
 
         local eng
         for k, v in platoonUnits do
-            if not v:IsDead() and EntityCategoryContains(categories.CONSTRUCTION, v ) then
+            if not v.Dead and EntityCategoryContains(categories.CONSTRUCTION, v ) then
                 if not eng then
                     eng = v
                 else
@@ -6496,7 +6496,7 @@ Platoon = Class(sorianoldPlatoon) {
             end
         end
 
-        if not eng or eng:IsDead() then
+        if not eng or eng.Dead then
             WaitTicks(1)
             self:PlatoonDisband()
             return
@@ -6598,7 +6598,7 @@ Platoon = Class(sorianoldPlatoon) {
             if cons.FireBase or cons.ExpansionBase then
                 local guards = eng:GetGuards()
                 for k,v in guards do
-                    if not v:IsDead() and v.PlatoonHandle and EntityCategoryContains(categories.CONSTRUCTION, v ) then
+                    if not v.Dead and v.PlatoonHandle and EntityCategoryContains(categories.CONSTRUCTION, v ) then
                         v.PlatoonHandle:PlatoonDisband()
                     end
                 end
@@ -6730,7 +6730,7 @@ Platoon = Class(sorianoldPlatoon) {
             closeToBuilder = eng
             local guards = eng:GetGuards()
             for k,v in guards do
-                if not v:IsDead() and v.PlatoonHandle and aiBrain:PlatoonExists(v.PlatoonHandle) and EntityCategoryContains(categories.CONSTRUCTION, v ) then
+                if not v.Dead and v.PlatoonHandle and aiBrain:PlatoonExists(v.PlatoonHandle) and EntityCategoryContains(categories.CONSTRUCTION, v ) then
                     #WaitTicks(1)
                     v.PlatoonHandle:PlatoonDisband()
                 end
@@ -6744,7 +6744,7 @@ Platoon = Class(sorianoldPlatoon) {
         for baseNum, baseListData in baseTmplList do
             for k, v in cons.BuildStructures do
                 if aiBrain:PlatoonExists(self) then
-                    if not eng:IsDead() then
+                    if not eng.Dead then
 						local faction = SUtils.GetEngineerFaction(eng)
 						if aiBrain.CustomUnits[v] and aiBrain.CustomUnits[v][faction] then
 							local replacement = SUtils.GetTemplateReplacement(aiBrain, v, faction)
@@ -6768,7 +6768,7 @@ Platoon = Class(sorianoldPlatoon) {
         end
         
         # wait in case we're still on a base
-        if not eng:IsDead() then
+        if not eng.Dead then
             local count = 0
             while eng:IsUnitState( 'Attached' ) and count < 2 do
                 WaitSeconds(6)
@@ -6782,19 +6782,19 @@ Platoon = Class(sorianoldPlatoon) {
     end,
 	
     SetupEngineerCallbacksSorian = function(eng)
-        if eng and not eng:IsDead() and not eng.BuildDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then                
+        if eng and not eng.Dead and not eng.BuildDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
             import('/lua/ScenarioTriggers.lua').CreateUnitBuiltTrigger(eng.PlatoonHandle.EngineerBuildDoneSorian, eng, categories.ALLUNITS)
             eng.BuildDoneCallbackSet = true
         end
-        if eng and not eng:IsDead() and not eng.CaptureDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
+        if eng and not eng.Dead and not eng.CaptureDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
             import('/lua/ScenarioTriggers.lua').CreateUnitStopCaptureTrigger(eng.PlatoonHandle.EngineerCaptureDoneSorian, eng )
             eng.CaptureDoneCallbackSet = true
         end
-        if eng and not eng:IsDead() and not eng.ReclaimDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
+        if eng and not eng.Dead and not eng.ReclaimDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
             import('/lua/ScenarioTriggers.lua').CreateUnitStopReclaimTrigger(eng.PlatoonHandle.EngineerReclaimDoneSorian, eng )
             eng.ReclaimDoneCallbackSet = true
         end
-        if eng and not eng:IsDead() and not eng.FailedToBuildCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
+        if eng and not eng.Dead and not eng.FailedToBuildCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
             import('/lua/ScenarioTriggers.lua').CreateOnFailedToBuildTrigger(eng.PlatoonHandle.EngineerFailedToBuildSorian, eng )
             eng.FailedToBuildCallbackSet = true
         end      
@@ -6873,14 +6873,14 @@ Platoon = Class(sorianoldPlatoon) {
         local aiBrain = eng:GetAIBrain()
 		local engLastPos = false
 		local stuckCount = 0
-        while not eng:IsDead() and (eng.GoingHome or eng.Upgrading or eng.Fighting or eng:IsUnitState("Building") or 
+        while not eng.Dead and (eng.GoingHome or eng.Upgrading or eng.Fighting or eng:IsUnitState("Building") or
                   eng:IsUnitState("Attacking") or eng:IsUnitState("Repairing") or eng:IsUnitState("WaitingForTransport") or
                   eng:IsUnitState("Reclaiming") or eng:IsUnitState("Capturing") or eng:IsUnitState("Moving") or eng:IsUnitState("Enhancing") or eng:IsUnitState("Upgrading") or eng.ProcessBuild != nil 
 				  or eng.UnitBeingBuiltBehavior) do
                   
             WaitSeconds(3)
 			local engPos = eng:GetPosition()
-			if not eng:IsDead() and engLastPos and eng:IsUnitState("Building") and not eng:IsUnitState("Capturing") and not eng:IsUnitState("Reclaiming")
+			if not eng.Dead and engLastPos and eng:IsUnitState("Building") and not eng:IsUnitState("Capturing") and not eng:IsUnitState("Reclaiming")
 			and not eng:IsUnitState("Repairing") and eng:GetWorkProgress() == 0 and VDist2Sq(engLastPos[1], engLastPos[3], engPos[1], engPos[3]) < 1 then
 				if stuckCount > 10 then
 					stuckCount = 0
@@ -6897,7 +6897,7 @@ Platoon = Class(sorianoldPlatoon) {
             #if eng.CDRHome then eng:PrintCommandQueue() end
         end
         eng.NotBuildingThread = nil
-        if not eng:IsDead() and eng:IsIdleState() and table.getn(eng.EngineerBuildQueue) != 0 and eng.PlatoonHandle then
+        if not eng.Dead and eng:IsIdleState() and table.getn(eng.EngineerBuildQueue) != 0 and eng.PlatoonHandle then
             eng.PlatoonHandle.SetupEngineerCallbacksSorian(eng)
             if not eng.ProcessBuild then
                 eng.ProcessBuild = eng:ForkThread(eng.PlatoonHandle.ProcessBuildCommandSorian, true)
@@ -6918,13 +6918,13 @@ Platoon = Class(sorianoldPlatoon) {
     #       nil (tail calls into a behavior function)
     #-----------------------------------------------------
     ProcessBuildCommandSorian = function(eng, removeLastBuild)	
-		if not eng or eng:IsDead() or not eng.PlatoonHandle or eng:IsUnitState("Enhancing") or eng:IsUnitState("Upgrading") or eng.Upgrading or eng.GoingHome or eng.Fighting or eng.UnitBeingBuiltBehavior then
+		if not eng or eng.Dead or not eng.PlatoonHandle or eng:IsUnitState("Enhancing") or eng:IsUnitState("Upgrading") or eng.Upgrading or eng.GoingHome or eng.Fighting or eng.UnitBeingBuiltBehavior then
             if eng then eng.ProcessBuild = nil end
             return
         end
 		local aiBrain = eng.PlatoonHandle:GetBrain()
         
-        if not aiBrain or eng:IsDead() or not eng.EngineerBuildQueue or table.getn(eng.EngineerBuildQueue) == 0 then
+        if not aiBrain or eng.Dead or not eng.EngineerBuildQueue or table.getn(eng.EngineerBuildQueue) == 0 then
             if aiBrain:PlatoonExists(eng.PlatoonHandle) then
                 #LOG("*AI DEBUG: Disbanding Engineer Platoon in ProcessBuildCommand " .. eng.Sync.id)
 				#if EntityCategoryContains( categories.COMMAND, eng ) then
@@ -6952,14 +6952,14 @@ Platoon = Class(sorianoldPlatoon) {
         eng.ProcessBuildDone = false  
         IssueClearCommands({eng}) 
         local commandDone = false
-        while not eng:IsDead() and not commandDone and table.getn(eng.EngineerBuildQueue) > 0 do
+        while not eng.Dead and not commandDone and table.getn(eng.EngineerBuildQueue) > 0 do
             local whatToBuild = eng.EngineerBuildQueue[1][1]
             local buildLocation = BuildToNormalLocation(eng.EngineerBuildQueue[1][2])
             local buildRelative = eng.EngineerBuildQueue[1][3]
 			local threadStarted = false
             # see if we can move there first        
             if AIUtils.EngineerMoveWithSafePathSorian(aiBrain, eng, buildLocation) then
-                if not eng or eng:IsDead() or not eng.PlatoonHandle or not aiBrain:PlatoonExists(eng.PlatoonHandle) then
+                if not eng or eng.Dead or not eng.PlatoonHandle or not aiBrain:PlatoonExists(eng.PlatoonHandle) then
                     if eng then eng.ProcessBuild = nil end
                     return
                 end
@@ -6986,7 +6986,7 @@ Platoon = Class(sorianoldPlatoon) {
         end
         
         # final check for if we should disband
-        if not eng or eng:IsDead() or table.getn(eng.EngineerBuildQueue) == 0 then
+        if not eng or eng.Dead or table.getn(eng.EngineerBuildQueue) == 0 then
             if eng.PlatoonHandle and aiBrain:PlatoonExists(eng.PlatoonHandle) then
                 #LOG("*AI DEBUG: Disbanding Engineer Platoon in ProcessBuildCommand " .. eng.Sync.id)
 				#if EntityCategoryContains( categories.COMMAND, eng ) then
@@ -7059,7 +7059,7 @@ Platoon = Class(sorianoldPlatoon) {
                 local validUnits = {}
                 local bValidUnits = false
                 for _,u in units do
-                    if not u:IsDead() and not u:IsUnitState( 'Attached' ) then
+                    if not u.Dead and not u:IsUnitState( 'Attached' ) then
                         table.insert(validUnits, u)
                         bValidUnits = true
                     end

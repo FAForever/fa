@@ -13,6 +13,7 @@ local KamikazeWeapon = WeaponFile.KamikazeWeapon
 local BareBonesWeapon = WeaponFile.BareBonesWeapon
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
+local OverchargeWeapon = WeaponFile.OverchargeWeapon
 
 local CollisionBeamFile = import('defaultcollisionbeams.lua')
 local Explosion = import('defaultexplosions.lua')
@@ -38,8 +39,9 @@ CDFHvyProtonCannonWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.CHvyProtonCannonMuzzleflash,
 }
 
-CDFOverchargeWeapon = Class(DefaultProjectileWeapon) {
+CDFOverchargeWeapon = Class(OverchargeWeapon) {
     FxMuzzleFlash = EffectTemplate.CMolecularRipperOverChargeFlash01,
+    DesiredWeaponLabel = 'RightRipper'
 }
 
 -- COMMANDER ENHANCEMENT WEAPON!

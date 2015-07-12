@@ -4,7 +4,7 @@
 #**
 #**  Summary  :  Strings and images for the unit rollover System
 #**
-#**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2006 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
  
 Description = {
@@ -109,7 +109,7 @@ Description = {
    
    ['ueb2101'] = "<LOC Unit_Description_0057> Low-end defensive tower that attacks land- and sea-based units. Does not engage aircraft or submerged units.",
    ['ueb2104'] = "<LOC Unit_Description_0058> Anti-air tower. Designed to engage low-end aircraft.",
-	 ['ueb2109'] = "<LOC Unit_Description_0059> Anti-naval defense system.",
+	 ['ueb2109'] = "<LOC Unit_Description_0059>Basic anti-naval defense system.",
    ['ueb5101'] = "<LOC Unit_Description_0060> Restricts the movement of enemy units. Offers minimal protection from enemy fire.",
    ['ueb2301'] = "<LOC Unit_Description_0061> Heavily armored defensive tower that attacks land- and sea-based units. Does not engage aircraft or submerged units.",
    ['ueb2204'] = "<LOC Unit_Description_0062> Anti-air tower. Designed to engage mid-level aircraft.",

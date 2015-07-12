@@ -12,14 +12,9 @@ local Utils = import('/lua/system/utils.lua')
 
 local quickDialog = false
 
+-- Terminate the game in a vaguely graceful fashion. This may or may not reduce the amount of times
+-- sudden quits lead to players having to wait for a timeout.
 function SafeQuit()
-    local full_exit = HasCommandLineArg("/online") or HasCommandLineArg("/gpgnet") or HasCommandLineArg("/replay")
-
-    if not full_exit then
-        ExitGame()
-        return
-    end
-
     if SessionIsActive() and not SessionIsReplay() then
         ForkThread(function ()
             ConExecute('ren_oblivion true')

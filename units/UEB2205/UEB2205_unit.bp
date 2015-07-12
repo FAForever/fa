@@ -1,6 +1,8 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
+            'Abovetgt',
+            'Turret',
             'UEB2205',
         },
     },
@@ -66,6 +68,7 @@ UnitBlueprint {
     Display = {
         Abilities = {
             '<LOC ability_sonar>Sonar',
+            '<LOC ability_personalstealth>Personal Stealth',
             '<LOC ability_torpedo>Torpedoes',
         },
         IdleEffects = {

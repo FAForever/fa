@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Inaino Strategic Missile Projectile script, XSS0302
 #**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 local SIFInainoStrategicMissile = import('/lua/seraphimprojectiles.lua').SIFInainoStrategicMissile
 
@@ -34,7 +34,7 @@ SIFInainoStrategicMissile02 = Class(SIFInainoStrategicMissile) {
     OnCreate = function(self)
         SIFInainoStrategicMissile.OnCreate(self)
         local launcher = self:GetLauncher()
-        if launcher and not launcher:IsDead() and launcher.EventCallbacks.ProjectileDamaged then
+        if launcher and not launcher.Dead and launcher.EventCallbacks.ProjectileDamaged then
             self.ProjectileDamaged = {}
             for k,v in launcher.EventCallbacks.ProjectileDamaged do
                 table.insert( self.ProjectileDamaged, v )

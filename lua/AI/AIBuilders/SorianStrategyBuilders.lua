@@ -4,7 +4,7 @@
 #**
 #**  Summary  : Default Naval structure builders for skirmish
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local BBTmplFile = '/lua/basetemplates.lua'
@@ -47,7 +47,7 @@ function EconWatch(aiBrain)
 			local units = aiBrain:GetListOfUnits( cat, false )
 			if table.getn(units) <= 0 then continue end
 			for k, unit in units do
-				if unit:IsDead() then continue end
+				if unit.Dead then continue end
 				local upgradeID
 				if EntityCategoryContains(categories.MOBILE, unit ) then
 					upgradeID = aiBrain:FindUpgradeBP(unit:GetUnitId(), UnitUpgradeTemplates[factionIndex])
@@ -212,7 +212,7 @@ BuilderGroup {
 					return
 				end
 				for k,v in plat:GetPlatoonUnits() do
-					if not v:IsDead() then
+					if not v.Dead then
 						allDead = false
 					end
 					if not v:HasEnhancement(upgrades[2]) then

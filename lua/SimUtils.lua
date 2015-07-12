@@ -1,16 +1,16 @@
--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --
 -- General Sim scripts
 
-#==============================================================================
-# Diplomacy
-#==============================================================================
+-- ==============================================================================
+-- Diplomacy
+-- ==============================================================================
 
 local sharedUnits = {}
 
 function BreakAlliance( data )
 
-    # You cannot change alliances in a team game
+    -- You cannot change alliances in a team game
     if ScenarioInfo.TeamGame then
         return
     end
@@ -27,7 +27,7 @@ function BreakAlliance( data )
 end
 
 function OnAllianceResult( resultData )
-    # You cannot change alliances in a team game
+    -- You cannot change alliances in a team game
     if ScenarioInfo.TeamGame then
         return
     end
@@ -48,7 +48,7 @@ import('/lua/SimPlayerQuery.lua').AddResultListener( "OfferAlliance", OnAlliance
 function KillSharedUnits(owner)
     if sharedUnits[owner] and table.getn(sharedUnits[owner]) > 0 then
         for index,unit in sharedUnits[owner] do
-            if not unit:IsDead() and unit.oldowner == owner then
+            if not unit.Dead and unit.oldowner == owner then
                 unit:Kill()
             end
         end
@@ -62,17 +62,19 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         return
     end
 
+    table.sort(units, function (a, b) return a:GetBlueprint().Economy.BuildCostMass > b:GetBlueprint().Economy.BuildCostMass end)
+
     local newUnits = {}
     for k,v in units do
         local owner = v:GetArmy()
-        --if owner == ToArmyIndex or GetArmyBrain(owner):IsDefeated() then
-        if owner == ToArmyIndex then
-            continue
-        end
-
         -- Only allow units not attached to be given. This is because units will give all of it's children over
-        -- aswell, so we only want the top level units to be given. Also, don't allow commanders to be given.
-        if v:GetParent() ~= v or (v.Parent and v.Parent ~= v) then
+        -- aswell, so we only want the top level units to be given.
+        -- Units currently being captured is also denied
+        local disallowTransfer = owner == ToArmyIndex or
+                                 v:GetParent() ~= v or (v.Parent and v.Parent ~= v) or
+                                 v.CaptureProgress > 0
+
+        if disallowTransfer then
             continue
         end
 
@@ -80,26 +82,25 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         local bp = unit:GetBlueprint()
         local unitId = unit:GetUnitId()
 
-        # B E F O R E
-        local numNukes = unit:GetNukeSiloAmmoCount()  #looks like one of these 2 works for SMDs also
+        -- B E F O R E
+        local numNukes = unit:GetNukeSiloAmmoCount()  -- looks like one of these 2 works for SMDs also
         local numTacMsl = unit:GetTacticalSiloAmmoCount()
-        local unitKills = unit:GetStat('KILLS', 0).Value
         local xp = unit.xp
         local unitHealth = unit:GetHealth()
         local shieldIsOn = false
         local ShieldHealth = 0
         local hasFuel = false
         local fuelRatio = 0
-        local enh = {} # enhancements
+        local enh = {} -- enhancements
         local oldowner = unit.oldowner
 
         if unit.MyShield then
             shieldIsOn = unit:ShieldIsOn()
             ShieldHealth = unit.MyShield:GetHealth()
         end
-        if bp.Physics.FuelUseTime and bp.Physics.FuelUseTime > 0 then   # going through the BP to check for fuel
-            fuelRatio = unit:GetFuelRatio()                             # usage is more reliable then unit.HasFuel
-            hasFuel = true                                              # cause some buildings say they use fuel
+        if bp.Physics.FuelUseTime and bp.Physics.FuelUseTime > 0 then   -- going through the BP to check for fuel
+            fuelRatio = unit:GetFuelRatio()                             -- usage is more reliable then unit.HasFuel
+            hasFuel = true                                              -- cause some buildings say they use fuel
         end
         local posblEnh = bp.Enhancements
         if posblEnh then
@@ -110,8 +111,7 @@ function TransferUnitsOwnership(units, ToArmyIndex)
             end
         end
 
-        # changing owner
-        unit:OnBeforeTransferingOwnership(ToArmyIndex)
+        -- changing owner
         unit = ChangeUnitArmy(unit,ToArmyIndex)
         if not unit then
             continue
@@ -122,19 +122,17 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         unit.oldowner = oldowner
 
         if IsAlly(owner, ToArmyIndex) then
-            if unit.oldowner == nil then
+            if not unit.oldowner then
                 unit.oldowner = owner
-                if not sharedUnits[owner] then
-                    sharedUnits[owner] = {}
-                end
-                table.insert(sharedUnits[owner], unit)
             end
+
+            if not sharedUnits[unit.oldowner] then
+                sharedUnits[unit.oldowner] = {}
+            end
+            table.insert(sharedUnits[unit.oldowner], unit)
         end
 
         -- A F T E R
-        if unitKills and unitKills > 0 then
-            unit:AddKills( unitKills )
-        end
         if xp and xp > 0 then
             unit:AddXP(xp)
         end
@@ -164,7 +162,9 @@ function TransferUnitsOwnership(units, ToArmyIndex)
                 unit:DisableShield()
             end
         end
-        unit:OnAfterTransferingOwnership(owner)
+        if EntityCategoryContains(categories.ENGINEERSTATION, unit) then
+            unit:SetPaused(true)
+        end
     end
     return newUnits
 end
@@ -185,7 +185,7 @@ function SetResourceSharing( data )
 end
 
 function RequestAlliedVictory( data )
-    # You cannot change this in a team game
+    -- You cannot change this in a team game
 
     if ScenarioInfo.TeamGame then
         return
@@ -205,11 +205,11 @@ function SetOfferDraw(data)
 end
 
 
-#==============================================================================
-# UNIT CAP
-#==============================================================================
+-- ==============================================================================
+-- UNIT CAP
+-- ==============================================================================
 function UpdateUnitCap(deadArmy)
-    # If we are asked to share out unit cap for the defeated army, do the following...
+    -- If we are asked to share out unit cap for the defeated army, do the following...
     local mode = ScenarioInfo.Options.ShareUnitCap
 
     if(not mode or mode == 'none') then

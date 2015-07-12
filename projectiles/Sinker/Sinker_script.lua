@@ -1,11 +1,8 @@
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local EffectUtil = import('/lua/EffectUtilities.lua')
-local explosion = import('/lua/defaultexplosions.lua')
 local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
 local Projectile = import('/lua/sim/projectile.lua').Projectile
 
 Sinker = Class(Projectile) {
-    OnCreate = function(self, inWater)
+    OnCreate = function(self)
         Projectile.OnCreate(self)
 
         self:SetVizToFocusPlayer('Never')
@@ -14,59 +11,44 @@ Sinker = Class(Projectile) {
         self:SetStayUpright(false)
     end,
 
-    PassData = function(self, data)
-        if not self.Data then
-            if not data.TargetBone or not data.TargetEntity then
-                return
-            end
+    --- Start the sinking after the given delay for the given entity/bone.
+    -- Invokes sunkCallback when the unit reaches the bottom of the ocean.
+    Start = function(self, delay, targEntity, targBone, sunkCallback)
+        self.callback = sunkCallback
+        if delay > 0 then
+            -- Closure copies. Woot.
+            local targetEntity = targEntity
+            local targetBone = targBone
+            local sinker = self
+            local wait = delay
 
-            self.Data = data
-            self:Sink_Effects()
-            return true
-        end
-
-        return false
-    end,
-
-    Sink_Effects = function(self)
-        local target = self.Data.TargetEntity
-
-        if not target:IsDead() or target:BeenDestroyed() then
-            self:Destroy()
-            return
-        end
-
-        if not target:IsValidBone(self.Data.TargetBone) then
-            target:Destroy()
-            self:Destroy()
-            return
-        end
-
-        Warp( self, target:CalculateWorldPositionFromRelative({0, 0, 0}) , target:GetOrientation() )
-        target:AttachBoneTo(self.Data.TargetBone, self, 'anchor')
-    end,
-
-    Start = function( self, delay)
-        if delay and delay > 0 then
-            self:ForkThread( function(self, delay) WaitTicks( delay) if self then self:StartSinking() end end, delay)
+            self:ForkThread(
+                function()
+                    WaitTicks(wait)
+                    sinker:StartSinking(targetEntity, targetBone)
+                end
+            )
         else
-            self:StartSinking()
+            self:StartSinking(targEntity, targBone)
         end
     end,
 
-    StartSinking = function( self)
-        if self and not self:BeenDestroyed() and self.Data.TargetEntity and not self.Data.TargetEntity:BeenDestroyed() then
+    StartSinking = function(self, targetEntity, targetBone)
+        Warp(self, targetEntity:CalculateWorldPositionFromRelative({0, 0, 0}) , targetEntity:GetOrientation() )
+        targetEntity:AttachBoneTo(targetBone, self, 'anchor')
+
+        if not targetEntity:BeenDestroyed() then
             local bp = self:GetBlueprint()
-            local acc = -bp.Physics.SinkSpeed or -0.05
-            self:SetBallisticAcceleration( acc + GetRandomFloat(-0.02, 0.02) )
+            local acc = -bp.Physics.SinkSpeed
+            self:SetBallisticAcceleration(acc + GetRandomFloat(-0.02, 0.02))
         end
     end,
 
+    --- Destroy the sinking unit when it hits the bottom of the ocean.
     OnImpact = function(self, targetType, targetEntity)
         if targetType == 'Terrain' then
-            self.Data.ImpactedWith = 'Seabed'
-            self.Data.TargetEntity.StopSink = true
             self:Destroy()
+            ForkThread(self.callback)
         end
     end,
 }

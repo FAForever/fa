@@ -1,6 +1,7 @@
 local Group = import('/lua/maui/group.lua').Group
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local Tooltip = import('/lua/ui/game/tooltip.lua')
 
 RadioButton = Class(Group) {
     -- title: A string displayed above the group. If nil, no textfield is created.
@@ -8,7 +9,8 @@ RadioButton = Class(Group) {
     --  Optional parameters are permitted:
     --  label: A string to display beside the button.
     --  texturePath: A string to be used as a directory offset relative to the object's texture path
-    --  to find button-specific textures. If omitted, textures from relative "./default" are used instead.
+    --               to find button-specific textures. If omitted, textures from relative "./default"
+    --               are used instead.
     --
     --  The required texture names are:
     --  s_dis.png
@@ -17,20 +19,40 @@ RadioButton = Class(Group) {
     --  d_dis.png
     --  d_up.png
     --  d_over.png
+    --
+    --  key: An arbitrary piece of satellite data to be passed to onChoose when the corresponding
+    --       item is selected
+    --  tooltipID: A tooltip ID to add to the checkbox control for this elements
+    --
     -- texturePath: The path from the style root to the texture directory for this radiobutton.
     --              Button-specific texture paths are relative to this path (and both are subject to
     --              the whims of the style engine.
     -- default: The index in the buttons array of the value to be selected by default.
     __init = function(self, parent, texturePath, buttons, default, horizontal, labelRight, font, fontSize, fontColor)
         Group.__init(self, parent)
+
+        if buttons then
+            self:SetOptions(buttons, texturePath, default, horizontal, labelRight, font, fontSize, fontColor)
+        end
+    end,
+
+    SetOptions = function(self, buttons, texturePath, default, horizontal, labelRight, font, fontSize, fontColor)
+        -- Destroy any existing contents.
+        if self.mButtons then
+            for k, v in self.mButtons do
+                v:Destroy()
+            end
+        end
+        self.mButtons = {}
+
         font = font or "Arial"
         fontSize = fontSize or 13
         fontColor = fontColor or UIUtil.fontColor
 
-        -- get the buttons and do some setup
         local maxWidth = 0
         local height = 0
-        self.mButtons = {}
+
+        -- get the buttons and do some setup
         self.mCurSelection = default
 
         -- set up all the buttons
@@ -42,8 +64,11 @@ RadioButton = Class(Group) {
                 buttonTexturePath = texturePath
             end
 
-
             local checkbox = UIUtil.CreateCheckbox(self, buttonTexturePath, button.label, labelRight)
+            checkbox.radioKey = button.key
+            if button.tooltipID then
+                Tooltip.AddCheckboxTooltip(checkbox, button.tooltipID)
+            end
 
             if button.label then
                 checkbox.label:SetFont(font, fontSize)
@@ -62,13 +87,13 @@ RadioButton = Class(Group) {
             -- Copy for closure
             local optionIndex = index
             checkbox.OnClick = function(control, modifiers)
-                -- Uncheck the currently selected one.
+            -- Uncheck the currently selected one.
                 self.mButtons[self.mCurSelection]:SetCheck(false)
 
                 -- And select this one.
                 control:SetCheck(true)
 
-                self:OnChoose(optionIndex)
+                self:OnChoose(optionIndex, control.radioKey)
                 self.mCurSelection = optionIndex
             end
         end
@@ -117,5 +142,5 @@ RadioButton = Class(Group) {
     end,
 
     -- Overload this method to get events when item is chosen.
-    OnChoose = function(self, index) end,
+    OnChoose = function(self, index, key) end,
 }

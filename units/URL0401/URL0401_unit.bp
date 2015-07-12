@@ -199,7 +199,7 @@ UnitBlueprint {
             RULEUCC_Transport = false,
         },
         FactionName = 'Cybran',
-        Icon = 'land',
+        Icon = 'amph',
         TechLevel = 'RULEUTL_Secret',
         UnitName = '<LOC url0401_name>Scathis',
         UnitWeight = 1,

@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Cybran T3 Land Factory Unit Script
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 local CLandFactoryUnit = import('/lua/cybranunits.lua').CLandFactoryUnit
 

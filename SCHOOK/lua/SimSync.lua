@@ -22,6 +22,8 @@ ResetSyncTable = function()
     # Player to player queries that can affect the Sim
     Sync.PlayerQueries = {}
     Sync.QueryResults = {}
+
+    Sync.Reclaim = {}
 end
 
 SimUnitEnhancements = {}
@@ -40,7 +42,7 @@ function AddUnitEnhancement(unit, enhancement, slot)
 end
 
 function RemoveUnitEnhancement(unit, enhancement)
-    if not unit or unit:IsDead() then return end
+    if not unit or unit.Dead then return end
     local id = unit:GetEntityId()
     local slots = SimUnitEnhancements[id]
     if not slots then return end

@@ -4,7 +4,7 @@
 #**
 #**  Summary  : Manage engineers for a location
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local BuilderManager = import('/lua/sim/BuilderManager.lua').BuilderManager
@@ -43,7 +43,7 @@ EngineerManager = Class(BuilderManager) {
     # ================================== #
     EnableGroup = function(self, group)
         for k,v in group.Units do
-            if not v.Status and v.Unit and not v.Unit:IsDead() then
+            if not v.Status and v.Unit and not v.Unit.Dead then
                 v.Unit:OnUnpaused()
                 v.Status = true
             end
@@ -53,7 +53,7 @@ EngineerManager = Class(BuilderManager) {
     # Check to see if the unit is buildings something in the category given
     ProductionCheck = function(unit, econ, pauseVal, category)
         local beingBuilt = false
-        if not unit or unit:IsDead() or not IsUnit(unit) then
+        if not unit or unit.Dead or not IsUnit(unit) then
             return false
         end
         if unit:IsUnitState('Building') then
@@ -61,7 +61,7 @@ EngineerManager = Class(BuilderManager) {
             return false
         elseif unit:IsUnitState('Guarding') then
             local guardedUnit = unit:GetGuardedUnit() 
-            if guardedUnit and not guardedUnit:IsDead() and IsUnit(guardedUnit) and guardedUnit:IsUnitState('Building') then
+            if guardedUnit and not guardedUnit.Dead and IsUnit(guardedUnit) and guardedUnit:IsUnitState('Building') then
                 beingBuilt = guardedUnit:GetUnitBeingBuilt()
             end
         end
@@ -75,12 +75,12 @@ EngineerManager = Class(BuilderManager) {
     # only pause the assisters of experimentals
     ExperimentalCheck = function(unit, econ, pauseVal, category)
         local beingBuilt = false
-        if not unit or unit:IsDead() or not IsUnit(unit) then
+        if not unit or unit.Dead or not IsUnit(unit) then
             return false
         end
         if unit:IsUnitState('Guarding') then
             local guardedUnit = unit:GetGuardedUnit() 
-            if guardedUnit and not guardedUnit:IsDead() and IsUnit(guardedUnit) and guardedUnit:IsUnitState('Building') then
+            if guardedUnit and not guardedUnit.Dead and IsUnit(guardedUnit) and guardedUnit:IsUnitState('Building') then
                 beingBuilt = guardedUnit:GetUnitBeingBuilt()
             end
         end
@@ -162,7 +162,7 @@ EngineerManager = Class(BuilderManager) {
     
     DisableMassGroup = function(self, group, econ, pauseVal, unitCheckFunc, category)
         for k,v in group.Units do
-            if not v.Unit:IsDead() and not EntityCategoryContains( categories.COMMAND, v.Unit ) and ( not unitCheckFunc or unitCheckFunc(v.Unit, econ, pauseVal, category) ) then
+            if not v.Unit.Dead and not EntityCategoryContains( categories.COMMAND, v.Unit ) and ( not unitCheckFunc or unitCheckFunc(v.Unit, econ, pauseVal, category) ) then
                 #LOG('*AI DEBUG: Disabling unit')
                 v.Unit:OnPaused()
                 pauseVal = pauseVal + v.Unit:GetConsumptionPerSecondMass()
@@ -190,7 +190,7 @@ EngineerManager = Class(BuilderManager) {
     
     DisableEnergyGroup = function(self, group, econ, pauseVal, unitCheckFunc, category)
         for k,v in group.Units do
-            if not v.Unit:IsDead() and not EntityCategoryContains( categories.COMMAND, v.Unit ) and ( not unitCheckFunc or unitCheckFunc(v.Unit, econ, pauseVal, category) ) then
+            if not v.Unit.Dead and not EntityCategoryContains( categories.COMMAND, v.Unit ) and ( not unitCheckFunc or unitCheckFunc(v.Unit, econ, pauseVal, category) ) then
                 #LOG('*AI DEBUG: Disabling unit')
                 v.Unit:OnPaused()
                 pauseVal = pauseVal + v.Unit:GetConsumptionPerSecondEnergy()
@@ -279,7 +279,7 @@ EngineerManager = Class(BuilderManager) {
 	
     ProductionCheckSorian = function(unit, econ, pauseVal, category)
         local beingBuilt = false
-        if not unit or unit:IsDead() or not IsUnit(unit) then
+        if not unit or unit.Dead or not IsUnit(unit) then
             return false
         end
         if unit:IsUnitState('Building') then
@@ -287,7 +287,7 @@ EngineerManager = Class(BuilderManager) {
             #return false
         elseif unit:IsUnitState('Guarding') then
             local guardedUnit = unit:GetGuardedUnit() 
-            if guardedUnit and not guardedUnit:IsDead() and IsUnit(guardedUnit) and guardedUnit:IsUnitState('Building') then
+            if guardedUnit and not guardedUnit.Dead and IsUnit(guardedUnit) and guardedUnit:IsUnitState('Building') then
                 beingBuilt = guardedUnit:GetUnitBeingBuilt()
             end
         end
@@ -303,7 +303,7 @@ EngineerManager = Class(BuilderManager) {
     # ================================== #
     EnableGroupSorian = function(self, group)
         for k,v in group.Units do
-            if not v.Status and v.Unit and not v.Unit:IsDead() then
+            if not v.Status and v.Unit and not v.Unit.Dead then
 				LOG('*AI DEBUG: Enabling units')
                 #v.Unit:OnUnpaused()
 				IssuePause(v.Unit)
@@ -371,7 +371,7 @@ EngineerManager = Class(BuilderManager) {
     
     DisableMassGroupSorian = function(self, group, econ, pauseVal, unitCheckFunc, category)
         for k,v in group.Units do
-            if not v.Unit:IsDead() and not EntityCategoryContains( categories.COMMAND, v.Unit ) and ( not unitCheckFunc or unitCheckFunc(v.Unit, econ, pauseVal, category) ) then
+            if not v.Unit.Dead and not EntityCategoryContains( categories.COMMAND, v.Unit ) and ( not unitCheckFunc or unitCheckFunc(v.Unit, econ, pauseVal, category) ) then
                 LOG('*AI DEBUG: Disabling unit for mass')
                 #v.Unit:OnPaused()
 				IssuePause(v.Unit)
@@ -391,7 +391,7 @@ EngineerManager = Class(BuilderManager) {
     
     DisableEnergyGroupSorian = function(self, group, econ, pauseVal, unitCheckFunc, category)
         for k,v in group.Units do
-            if not v.Unit:IsDead() and not EntityCategoryContains( categories.COMMAND, v.Unit ) and ( not unitCheckFunc or unitCheckFunc(v.Unit, econ, pauseVal, category) ) then
+            if not v.Unit.Dead and not EntityCategoryContains( categories.COMMAND, v.Unit ) and ( not unitCheckFunc or unitCheckFunc(v.Unit, econ, pauseVal, category) ) then
                 LOG('*AI DEBUG: Disabling unit for energy')
                 #v.Unit:OnPaused()
 				IssuePause(v.Unit)
@@ -571,7 +571,7 @@ EngineerManager = Class(BuilderManager) {
         local engs = self:GetUnits( 'Engineers', engCategory )
         local units = {}
         for k,v in engs do
-            if v:IsDead() then
+            if v.Dead then
                 continue
             end
             
@@ -580,7 +580,7 @@ EngineerManager = Class(BuilderManager) {
             end
             
             local beingBuiltUnit = v:GetUnitBeingBuilt()
-            if not beingBuiltUnit or beingBuiltUnit:IsDead() then
+            if not beingBuiltUnit or beingBuiltUnit.Dead then
                 continue
             end
             
@@ -634,7 +634,7 @@ EngineerManager = Class(BuilderManager) {
         local engs = self:GetUnits( 'Engineers', categories.ALLUNITS )
         local units = {}
         for k,v in engs do
-            if v:IsDead() then
+            if v.Dead then
                 continue
             end
             
@@ -664,7 +664,7 @@ EngineerManager = Class(BuilderManager) {
 		local engs = self:GetUnits( 'Engineers', categories.ALLUNITS )
 		local units = {}
 		for k,v in engs do
-			if v:IsDead() then
+			if v.Dead then
 				continue
 			end
             
@@ -723,7 +723,7 @@ EngineerManager = Class(BuilderManager) {
     RemoveUnit = function(self, unit)
         local guards = unit:GetGuards()
         for k,v in guards do
-            if not v:IsDead() and v.AssistPlatoon then
+            if not v.Dead and v.AssistPlatoon then
 				local per = ScenarioInfo.ArmySetup[self.Brain.Name].AIPersonality
 				if string.find(per, 'sorian') and self.Brain:PlatoonExists(v.AssistPlatoon) then
 					v.AssistPlatoon:ForkThread(v.AssistPlatoon.SorianEconAssistBody)
@@ -771,7 +771,7 @@ EngineerManager = Class(BuilderManager) {
 			end
         end
         self:RemoveUnit(unit)
-        if bestManager and not unit:IsDead() then
+        if bestManager and not unit.Dead then
             bestManager:AddUnit(unit)
         end
     end,
@@ -815,7 +815,7 @@ EngineerManager = Class(BuilderManager) {
 		end
         local guards = unit:GetGuards()
         for k,v in guards do
-            if not v:IsDead() and v.AssistPlatoon then
+            if not v.Dead and v.AssistPlatoon then
 				local per = ScenarioInfo.ArmySetup[self.Brain.Name].AIPersonality
 				if string.find(per, 'sorian') and self.Brain:PlatoonExists(v.AssistPlatoon) then
 					v.AssistPlatoon:ForkThread(v.AssistPlatoon.SorianEconAssistBody)
@@ -873,7 +873,7 @@ EngineerManager = Class(BuilderManager) {
     
     DelayAssignBody = function( unit, manager )
         WaitSeconds(1)
-        if not unit:IsDead() then
+        if not unit.Dead then
             manager:AssignEngineerTask(unit)
         end
         unit.DelayThread = nil
@@ -978,7 +978,7 @@ EngineerManager = Class(BuilderManager) {
         
         # Check if the category of the unit matches the category of the builder
         local template = self:GetEngineerPlatoonTemplate( builder:GetPlatoonTemplate() )
-        if not unit:IsDead() and EntityCategoryContains( template[3][1], unit ) and builder:CheckInstanceCount() then 
+        if not unit.Dead and EntityCategoryContains( template[3][1], unit ) and builder:CheckInstanceCount() then
             return true
         end
         

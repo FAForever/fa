@@ -130,7 +130,7 @@ UnitBlueprint {
             RULEUCC_Transport = false,
         },
         FactionName = 'UEF',
-        Icon = 'land',
+        Icon = 'amph',
         SelectionPriority = 5,
         TechLevel = 'RULEUTL_Basic',
         ToggleCaps = {
@@ -178,7 +178,7 @@ UnitBlueprint {
     SizeY = 1.4,
     SizeZ = 0.75,
     StrategicIconName = 'icon_structure1_mass',
-    StrategicIconSortPriority = 250,
+    StrategicIconSortPriority = 64,
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
         EnergyMult = 0,

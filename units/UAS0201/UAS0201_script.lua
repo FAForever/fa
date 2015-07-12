@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Aeon Destroyer Script
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local ASeaUnit = import('/lua/aeonunits.lua').ASeaUnit

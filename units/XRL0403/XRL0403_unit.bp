@@ -1,6 +1,7 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
+            'Centraltgt',
             'Left_Turret',
             'Right_Turret',
             'AA_Turret',
@@ -345,8 +346,6 @@ UnitBlueprint {
             },
             FiringRandomness = 0.3,
             FiringTolerance = 2,
-            HeadingArcCenter = 0,
-            HeadingArcRange = 55,
             Label = 'ParticleGunRight',
             MaxRadius = 64,
             MinRadius = 4,
@@ -487,7 +486,7 @@ UnitBlueprint {
             TurretPitchRange = 90,
             TurretPitchSpeed = 90,
             TurretYaw = 0,
-            TurretYawRange = 65,
+            TurretYawRange = 55,
             TurretYawSpeed = 45,
             Turreted = true,
             WeaponCategory = 'Direct Fire Naval',

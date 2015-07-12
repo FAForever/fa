@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Aeon Experimental Sub
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local ASubUnit = import('/lua/aeonunits.lua').ASubUnit
@@ -83,7 +83,7 @@ UAS0401 = Class(ASeaUnit) {
             self:SetBusy(true)
             local bone = self.BuildAttachBone
             self:DetachAll(bone)
-            if not self.UnitBeingBuilt:IsDead() then
+            if not self.UnitBeingBuilt.Dead then
                 unitBuilding:AttachBoneTo( -2, self, bone )
                 if EntityCategoryContains( categories.ENGINEER + categories.uas0102 + categories.uas0103, unitBuilding ) then
                     unitBuilding:SetParentOffset( {0,0,1} )

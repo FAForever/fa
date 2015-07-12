@@ -1,11 +1,11 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/sim/BuilderManager.lua
-#**
-#**  Summary  : Manage builders
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+-- ***************************************************************************
+-- *
+-- **  File     :  /lua/sim/BuilderManager.lua
+-- **
+-- **  Summary  : Manage builders
+-- **
+-- **  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+-- ****************************************************************************
 
 local BuilderManager = import('/lua/sim/BuilderManager.lua').BuilderManager
 local AIUtils = import('/lua/ai/aiutilities.lua')
@@ -45,12 +45,12 @@ FactoryBuilderManager = Class(BuilderManager) {
 	RallyPointMonitor = function(self)
 		while true do
 			if self.LocationActive and self.RallyPoint then
-				#LOG('*AI DEBUG: Checking Active Rally Point')
+				-- LOG('*AI DEBUG: Checking Active Rally Point')
 				local newRally = false
 				local bestDist = 99999
 				local rallyheight = GetTerrainHeight( self.RallyPoint[1], self.RallyPoint[3] )
 				if self.Brain:GetNumUnitsAroundPoint( categories.STRUCTURE, self.RallyPoint, 15, 'Ally') > 0 then
-					#LOG('*AI DEBUG: Searching for a new Rally Point Location')
+					-- LOG('*AI DEBUG: Searching for a new Rally Point Location')
 					for x = -30, 30, 5 do
 						for z = -30, 30, 5 do
 							local height = GetTerrainHeight( self.RallyPoint[1] + x, self.RallyPoint[3] + z )
@@ -69,7 +69,7 @@ FactoryBuilderManager = Class(BuilderManager) {
 					end
 					if newRally then
 						self.RallyPoint = newRally
-						#LOG('*AI DEBUG: Setting a new Rally Point Location')
+						-- LOG('*AI DEBUG: Setting a new Rally Point Location')
 						for k,v in self.FactoryList do
 							IssueClearFactoryCommands( {v} )
 							IssueFactoryRallyPoint({v}, self.RallyPoint)
@@ -118,7 +118,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     GetFactoriesBuildingCategory = function(self, category, facCategory )
         local units = {}
         for k,v in EntityCategoryFilterDown( facCategory, self.FactoryList ) do
-            if v:IsDead() then
+            if v.Dead then
                 continue
             end
             
@@ -127,7 +127,7 @@ FactoryBuilderManager = Class(BuilderManager) {
             end
             
             local beingBuiltUnit = v:GetUnitBeingBuilt()
-            if not beingBuiltUnit or beingBuiltUnit:IsDead() then
+            if not beingBuiltUnit or beingBuiltUnit.Dead then
                 continue
             end
             
@@ -200,14 +200,14 @@ FactoryBuilderManager = Class(BuilderManager) {
                 v.BuilderManagerData = { FactoryBuildManager = self, BuilderType = bType, }
                 
                 local factoryDestroyed = function(v)
-                                            # Call function on builder manager; let it handle death of factory
+                                            -- Call function on builder manager; let it handle death of factory
                                             self:FactoryDestroyed(v)
                                         end
                 import('/lua/ScenarioTriggers.lua').CreateUnitDestroyedTrigger(factoryDestroyed, v )
 										
                 local factoryNewlyCaptured = function(unit, captor)
 											local aiBrain = captor:GetAIBrain()
-											#LOG('*AI DEBUG: FACTORY: I was Captured by '..aiBrain.Nickname..'!')
+											-- LOG('*AI DEBUG: FACTORY: I was Captured by '..aiBrain.Nickname..'!')
 											if aiBrain.BuilderManagers then
 												local facManager = aiBrain.BuilderManagers[captor.BuilderManagerData.LocationType].FactoryManager
 												if facManager then
@@ -223,7 +223,7 @@ FactoryBuilderManager = Class(BuilderManager) {
                 import('/lua/ScenarioTriggers.lua').CreateStartBuildTrigger(factoryWorkStart, v, categories.ALLUNITS)
                 
                 local factoryWorkFinish = function(v, finishedUnit)
-                                            # Call function on builder manager; let it handle the finish of work
+                                            -- Call function on builder manager; let it handle the finish of work
                                             self:FactoryFinishBuilding(v, finishedUnit)
                                         end
                 import('/lua/ScenarioTriggers.lua').CreateUnitBuiltTrigger(factoryWorkFinish, v, categories.ALLUNITS)
@@ -235,7 +235,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     FactoryDestroyed = function(self, factory)
         local guards = factory:GetGuards()
         for k,v in guards do
-            if not v:IsDead() and v.AssistPlatoon then
+            if not v.Dead and v.AssistPlatoon then
                 if self.Brain:PlatoonExists(v.AssistPlatoon) then
                     v.AssistPlatoon:ForkThread(v.AssistPlatoon.EconAssistBody)
                 else
@@ -249,7 +249,7 @@ FactoryBuilderManager = Class(BuilderManager) {
             end
         end
         for k,v in self.FactoryList do
-            if not v:IsDead() then
+            if not v.Dead then
                 return
             end
         end
@@ -260,7 +260,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     DelayBuildOrder = function(self,factory,bType,time)
         local guards = factory:GetGuards()
         for k,v in guards do
-            if not v:IsDead() and v.AssistPlatoon then
+            if not v.Dead and v.AssistPlatoon then
                 if self.Brain:PlatoonExists(v.AssistPlatoon) then
                     v.AssistPlatoon:ForkThread(v.AssistPlatoon.EconAssistBody)
                 else
@@ -319,7 +319,7 @@ FactoryBuilderManager = Class(BuilderManager) {
         if faction and templateData.FactionSquads[faction] then
             for k,v in templateData.FactionSquads[faction] do
 				if customData and customData[faction] then
-					#LOG('*AI DEBUG: Replacement unit found!')
+					-- LOG('*AI DEBUG: Replacement unit found!')
 					local replacement = self:GetCustomReplacement(v, templateName, faction)
 					if replacement then
 						table.insert( template, replacement )
@@ -331,7 +331,7 @@ FactoryBuilderManager = Class(BuilderManager) {
 				end
             end
 		elseif faction and customData and customData[faction] then
-			#LOG('*AI DEBUG: New unit found!')
+			-- LOG('*AI DEBUG: New unit found!')
 			local replacement = self:GetCustomReplacement(templateData.FactionSquads[1], templateName, faction)
 			if replacement then
 				table.insert( template, replacement )
@@ -344,19 +344,19 @@ FactoryBuilderManager = Class(BuilderManager) {
 		local retTemplate = false
 		local templateData = self.Brain.CustomUnits[templateName]
 		if templateData and templateData[faction] then
-			#LOG('*AI DEBUG: Replacement for '..templateName..' exists.')
+			-- LOG('*AI DEBUG: Replacement for '..templateName..' exists.')
 			local rand = Random(1,100)
 			local possibles = {}
 			for k,v in templateData[faction] do
 				if rand <= v[2] then
-					#LOG('*AI DEBUG: Insert possibility.')
+					-- LOG('*AI DEBUG: Insert possibility.')
 					table.insert(possibles, v[1])
 				end
 			end
 			if table.getn(possibles) > 0 then
 				rand = Random(1,table.getn(possibles))
 				local customUnitID = possibles[rand]
-				#LOG('*AI DEBUG: Replaced with '..customUnitID)
+				-- LOG('*AI DEBUG: Replaced with '..customUnitID)
 				retTemplate = { customUnitID, template[2], template[3], template[4], template[5] }
 			end
 		end
@@ -364,18 +364,18 @@ FactoryBuilderManager = Class(BuilderManager) {
 	end,
     
     AssignBuildOrder = function(self,factory,bType)
-        # Find a builder the factory can build
-        if factory:IsDead() then
+        -- Find a builder the factory can build
+        if factory.Dead then
             return
         end
         local builder = self:GetHighestBuilder(bType,{factory})
         if builder then
             local personality = self.Brain:GetPersonality()
             local template = self:GetFactoryTemplate( builder:GetPlatoonTemplate(), factory )
-            #LOG('*AI DEBUG: ARMY ', repr(self.Brain:GetArmyIndex()),': Factory Builder Manager Building - ',repr(builder.BuilderName))
+            -- LOG('*AI DEBUG: ARMY ', repr(self.Brain:GetArmyIndex()),': Factory Builder Manager Building - ',repr(builder.BuilderName))
             self.Brain:BuildPlatoon( template, {factory}, 1 )
         else
-            # No builder found setup way to check again
+            -- No builder found setup way to check again
             self:ForkThread(self.DelayBuildOrder, factory, bType, 2)
         end
     end,
@@ -413,16 +413,16 @@ FactoryBuilderManager = Class(BuilderManager) {
         self:AssignBuildOrder(factory, factory.BuilderManagerData.BuilderType)
     end,
     
-    # Check if given factory can build the builder
+    -- Check if given factory can build the builder
     BuilderParamCheck = function(self,builder,params)
-        # params[1] is factory, no other params
+        -- params[1] is factory, no other params
         local template = self:GetFactoryTemplate( builder:GetPlatoonTemplate(), params[1] )
         if not template then
             WARN('*Factory Builder Error: Could not find template named: ' .. builder:GetPlatoonTemplate() )
             return false
         end
         
-        # This faction doesn't have unit of this type
+        -- This faction doesn't have unit of this type
         if table.getn(template) == 2 then
             return false
         end
@@ -430,13 +430,13 @@ FactoryBuilderManager = Class(BuilderManager) {
         local personality = self.Brain:GetPersonality()
         local ptnSize = personality:GetPlatoonSize()
         
-        # This function takes a table of factories to determine if it can build
+        -- This function takes a table of factories to determine if it can build
         return self.Brain:CanBuildPlatoon( template, params )
     end,
     
     DelayRallyPoint = function(self, factory)
         WaitSeconds(1)
-        if not factory:IsDead() then
+        if not factory.Dead then
             self:SetRallyPoint(factory)
         end
     end,
@@ -457,10 +457,10 @@ FactoryBuilderManager = Class(BuilderManager) {
         end
         
         if not self.UseCenterPoint then
-            # Find closest marker to averaged location
+            -- Find closest marker to averaged location
             rally = AIUtils.AIGetClosestMarkerLocation( self, rallyType, position[1], position[3] )
         elseif self.UseCenterPoint then
-            # use BuilderManager location
+            -- use BuilderManager location
             rally = AIUtils.AIGetClosestMarkerLocation( self, rallyType, position[1], position[3] )
             local expPoint = AIUtils.AIGetClosestMarkerLocation( self, 'Expansion Area', position[1], position[3] )
             
@@ -474,9 +474,9 @@ FactoryBuilderManager = Class(BuilderManager) {
             end
         end
 
-        # Use factory location if no other rally or if rally point is far away
+        -- Use factory location if no other rally or if rally point is far away
         if not rally or VDist2( rally[1], rally[3], position[1], position[3] ) > 75 then
-            #DUNCAN - added to try and vary the rally points.
+            -- DUNCAN - added to try and vary the rally points.
 			position = AIUtils.RandomLocation(position[1],position[3])
 			rally = position
         end

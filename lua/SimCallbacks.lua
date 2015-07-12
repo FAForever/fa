@@ -114,12 +114,26 @@ Callbacks.OnPlayerQueryResult = SimPlayerQuery.OnPlayerQueryResult
 
 Callbacks.PingGroupClick = import('/lua/SimPingGroup.lua').OnClickCallback
 
-
-
-Callbacks.AddTarget = function(data, units)
-end
-
-Callbacks.ClearTargets = function(data, units)
-end
-
 Callbacks.GiveOrders = import('/lua/spreadattack.lua').GiveOrders
+
+Callbacks.ValidateAssist = function(data, units)
+    local target = GetEntityById(data.target)
+    if units and target then
+        for k, u in units do
+            if IsEntity(u) and OkayToMessWithArmy(target:GetArmy()) and IsInvalidAssist(u, target) then
+                IssueClearCommands({target})
+                return
+            end
+        end
+    end
+end
+
+function IsInvalidAssist(unit, target)
+    if target and target:GetEntityId() == unit:GetEntityId() then
+        return true
+    elseif not target or not target:GetGuardedUnit() then
+        return false
+    else
+        return IsInvalidAssist(unit, target:GetGuardedUnit())
+    end
+end

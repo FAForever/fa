@@ -1,7 +1,8 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
-            'UAB2205',
+            'Abovetgt',
+            'XSB2205',
         },
     },
     Audio = {
@@ -72,6 +73,7 @@ UnitBlueprint {
     Display = {
         Abilities = {
             '<LOC ability_sonar>Sonar',
+            '<LOC ability_personalstealth>Personal Stealth',
             '<LOC ability_torpedo>Torpedoes',
             '<LOC ability_torpedodef>Torpedo Defense',
         },

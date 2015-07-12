@@ -20,12 +20,11 @@ local enhancementSlotNames =
 }
 
 function Contract()
-    View:SetNeedsFrameUpdate(false)
-    View:SetAlpha(0)
+    View:Hide()
 end
 
 function Expand()
-    View:SetNeedsFrameUpdate(true)
+    View:Show()
 end
 
 function GetTechLevelString(bp)
@@ -75,7 +74,7 @@ end
     
 function ShowView(showUpKeep, enhancement, showecon, showShield)
     import('/lua/ui/game/unitview.lua').ShowROBox(false, false)
-    View.Hiding = false
+    View:Show()
     
     View.UpkeepGroup:SetHidden(not showUpKeep)
     
@@ -363,14 +362,12 @@ end
 
 function OnNIS()
     if View then
-        View:SetAlpha(0, true)
-        View:SetNeedsFrameUpdate(false)
+        View:Hide()
     end
 end
 
 function Hide()
-    View.Time = 0
-    View.Hiding = true
+    View:Hide()
 end
 
 function SetLayout()
@@ -384,21 +381,6 @@ function SetupUnitViewLayout(parent)
     end
     MapView = parent
     SetLayout()
-    View:SetAlpha(0, true)
-    View:SetNeedsFrameUpdate(true)
-    View.Hiding = true
+    View:Hide()
     View:DisableHitTest(true)
-    View.OnFrame = function(self, delta)
-        if self.Hiding then
-            local newAlpha = self:GetAlpha() - (delta * 3)
-            if newAlpha < 0 then
-                newAlpha = 0
-                self.Hiding = true
-            end
-            self:SetAlpha(newAlpha, true)
-        elseif self:GetAlpha() < 1 then
-            local newAlpha = math.min(self:GetAlpha() + (delta * 9), 1)
-            self:SetAlpha(newAlpha, true)
-        end
-    end
 end

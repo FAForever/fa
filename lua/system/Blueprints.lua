@@ -447,15 +447,21 @@ function PreModBlueprints(all_bps)
             }
         end
 
-        -- mod in AI.GuardScanRadius = Weapon.MaxRadius + Intel.VisionRadius
+        -- make it possible to pause all mobile units, stopping in this case means pause at next order in command queue
+        if cats.MOBILE then
+            bp.General.CommandCaps.RULEUCC_Pause = true
+        end
+
+        -- Mod in AI.GuardScanRadius = Longest weapon range * longest tracking radius
+        -- Takes ACU/SCU enhancements into account
         -- fixes move-attack range issues
         -- Most Air units have the GSR defined already, this is just making certain they don't get included
         if cats.MOBILE and (cats.LAND or cats.NAVAL) and (cats.DIRECTFIRE or cats.INDIRECTFIRE or cats.ENGINEER) and not (bp.AI and bp.AI.GuardScanRadius) then
             local br = nil
 
-            if(cats.ENGINEER) then
+            if cats.ENGINEER and not cats.SUBCOMMANDER then
                 br = 26
-            elseif(cats.SCOUT) then
+            elseif cats.SCOUT then
                 br = 10
             elseif bp.Weapon then
                 local range = 0
@@ -473,10 +479,18 @@ function PreModBlueprints(all_bps)
                     end
                 end
 
+                for name, array in bp.Enhancements or {} do
+                    for key, value in array do
+                        if key == 'NewMaxRadius' then
+                            range = math.max(value, range)
+                        end
+                    end
+                end
+
                 br = (range * tracking)
             end
 
-            if(br) then
+            if br then
                 if not bp.AI then bp.AI = {} end
                 bp.AI.GuardScanRadius = br
             end

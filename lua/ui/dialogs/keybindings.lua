@@ -3,7 +3,7 @@
 --* Author: Ted Snook
 --* Summary: Help Text Popup
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -17,6 +17,8 @@ local properKeyNames = import('/lua/keymap/properKeyNames.lua').properKeyNames
 local keyNames = import('/lua/keymap/keyNames.lua').keyNames
 local keyCategories = import('/lua/keymap/keycategories.lua').keyCategories
 
+local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
+
 local panel
 local keyContainer
 local keyTable
@@ -25,10 +27,12 @@ local function ResetKeyMap()
     IN_ClearKeyMap()
     import('/lua/keymap/keymapper.lua').ClearUserKeyMap()
     IN_AddKeyMapTable(import('/lua/keymap/keymapper.lua').GetKeyActions(true))
+    keyTable = FormatData()
+    keyContainer:CalcVisible()
 end
 
 local function ConfirmNewKeyMap()
-	--add option to accept the changes to the key map?
+    --add option to accept the changes to the key map?
     IN_AddKeyMapTable(import('/lua/keymap/keymapper.lua').GetKeyMappings(true))
     -- Update hotbuild modifiers
     if SessionIsActive() then
@@ -37,113 +41,83 @@ local function ConfirmNewKeyMap()
 end
 
 local function EditActionKey(parent, action, currentKey)
-    local dialog = Group(parent, "editActionKeyDialog")
-    LayoutHelpers.AtCenterIn(dialog, parent)
-    LayoutHelpers.DepthOverParent(dialog, parent, 100)
-    dialog.Height:Set(100)
-    
-    local background = Bitmap(dialog, UIUtil.SkinnableFile('/dialogs/dialog_02/panel_bmp_m.dds'))
-    background:SetTiled(true)
-    dialog.Width:Set(background.Width)
-    LayoutHelpers.FillParent(background, dialog)
+    local dialogContent = Group(parent)
+    dialogContent.Height:Set(130)
+    dialogContent.Width:Set(400)
 
-    local backgroundTop = Bitmap(dialog, UIUtil.SkinnableFile('/dialogs/dialog_02/panel_bmp_T.dds'))
-    LayoutHelpers.Above(backgroundTop, background)
-    local backgroundBottom = Bitmap(dialog, UIUtil.SkinnableFile('/dialogs/dialog_02/panel_bmp_b.dds'))
-    LayoutHelpers.Below(backgroundBottom, background)
-    
-    local okButton = UIUtil.CreateButtonStd( background, '/widgets/small', "<LOC _Ok>", 12, 0)
-    LayoutHelpers.AtBottomIn(okButton, backgroundBottom, 25)
-    LayoutHelpers.AtLeftIn(okButton, backgroundBottom, 30)           
+    local keyPopup = Popup(panel, dialogContent)
 
-    local cancelButton = UIUtil.CreateButtonStd( background, '/widgets/small', "<LOC _Cancel>", 12, 0)
-    LayoutHelpers.AtBottomIn(cancelButton, backgroundBottom, 25)
-    LayoutHelpers.AtRightIn(cancelButton, backgroundBottom, 30)
+    local cancelButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Cancel>")
+    LayoutHelpers.AtBottomIn(cancelButton, dialogContent, 9)
+    LayoutHelpers.AtRightIn(cancelButton, dialogContent, -2)
     cancelButton.OnClick = function(self, modifiers)
-        dialog:Destroy()
-    end          
-    
-    local helpText = UIUtil.CreateText(background, "<LOC key_binding_0002>Hit the key combination you'd like to assign", 16)
-    LayoutHelpers.AtTopIn(helpText, background)
-    LayoutHelpers.AtHorizontalCenterIn(helpText, background)
-    
-    local keyText = UIUtil.CreateText(background, formatkeyname(currentKey), 24)
-    LayoutHelpers.AtTopIn(keyText, background, 40)
-    LayoutHelpers.AtHorizontalCenterIn(keyText, background)
+        keyPopup:Close()
+    end
 
-    dialog:AcquireKeyboardFocus(false)
-    dialog.OnDestroy = function(self)
-        dialog:AbandonKeyboardFocus()
+    local okButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Ok>")
+    LayoutHelpers.LeftOf(okButton, cancelButton, 145)
+    
+    local helpText = UIUtil.CreateText(dialogContent, "<LOC key_binding_0002>Hit the key combination you'd like to assign", 16)
+    LayoutHelpers.AtTopIn(helpText, dialogContent, 10)
+    LayoutHelpers.AtHorizontalCenterIn(helpText, dialogContent)
+    
+    local keyText = UIUtil.CreateText(dialogContent, formatkeyname(currentKey), 24)
+    LayoutHelpers.AtTopIn(keyText, dialogContent, 40)
+    LayoutHelpers.AtHorizontalCenterIn(keyText, dialogContent)
+
+    dialogContent:AcquireKeyboardFocus(false)
+    keyPopup.OnClose = function(self)
+        dialogContent:AbandonKeyboardFocus()
     end
 
     local keyCodeLookup = import('/lua/keymap/keymapper.lua').GetKeyCodeLookup()
     local keyAdder = {}
     local currentKeyPattern
-    
+
     local function AddKey(keyCode, modifiers)
-       
-        if keyCodeLookup[keyCode] != nil then
-            local ctrl = false
-            local alt = false
-            local shift = false
-
-            local key = keyCodeLookup[keyCode]
-            
-            if key != 'Ctrl' then
-                if modifiers.Ctrl == true then
-                    ctrl = true
-                end
-                
-                if key != 'Shift' then
-                    if modifiers.Shift == true then
-                        shift = true
-                    end
-                
-                    if key != 'Alt' then
-                        if modifiers.Alt == true then
-                            alt = true
-                        end
-                    end
-                end
-
-            end
-            
-            local keyComboName = ""
-            currentKeyPattern = ""
-            
-            if ctrl == true then
-                currentKeyPattern = currentKeyPattern .. keyNames['11'] .. "-"
-                keyComboName = keyComboName .. LOC(properKeyNames[keyNames['11']]) .. "-"
-            end
-            
-            if shift == true  then
-                currentKeyPattern = currentKeyPattern .. keyNames['10'] .. "-"
-                keyComboName = keyComboName .. LOC(properKeyNames[keyNames['10']]) .. "-"
-            end
-            
-            if alt == true  then
-                currentKeyPattern = currentKeyPattern .. keyNames['12'] .. "-"
-                keyComboName = keyComboName .. LOC(properKeyNames[keyNames['12']]) .. "-"
-            end
-    
-            currentKeyPattern = currentKeyPattern .. key
-            keyComboName = keyComboName .. LOC(properKeyNames[key])
-            
-            keyText:SetText(keyComboName)        
-            
+        local key = keyCodeLookup[keyCode]
+        if not key then
+            return
         end
+
+        local keyComboName = ""
+        currentKeyPattern = ""
+
+        -- Sellotape on modifier keys...
+        if key ~= 'Ctrl' and modifiers.Ctrl then
+            currentKeyPattern = currentKeyPattern .. keyNames['11'] .. "-"
+            keyComboName = keyComboName .. LOC(properKeyNames[keyNames['11']]) .. "-"
+        end
+
+        if key ~= 'Alt' and modifiers.Alt then
+            currentKeyPattern = currentKeyPattern .. keyNames['12'] .. "-"
+            keyComboName = keyComboName .. LOC(properKeyNames[keyNames['12']]) .. "-"
+        end
+
+        if key ~= 'Shift' and modifiers.Shift then
+            currentKeyPattern = currentKeyPattern .. keyNames['10'] .. "-"
+            keyComboName = keyComboName .. LOC(properKeyNames[keyNames['10']]) .. "-"
+        end
+
+        currentKeyPattern = currentKeyPattern .. key
+        keyComboName = keyComboName .. LOC(properKeyNames[key])
+
+        keyText:SetText(keyComboName)
     end
-    
-    dialog.HandleEvent = function(self, event)
+
+    local oldHandleEvent = dialogContent.HandleEvent
+    dialogContent.HandleEvent = function(self, event)
         if event.Type == 'KeyDown' then
             AddKey(event.RawKeyCode, event.Modifiers)
         end
-    end    
+
+        oldHandleEvent(self, event)
+    end
 
     local function AssignKey()
         -- check if key is already assigned to something else
         local Keymapper = import('/lua/keymap/keymapper.lua')
-        
+
         local function ClearShiftKey()
             Keymapper.ClearUserKeyMapping("Shift-" .. currentKeyPattern)
             LOG("clearing Shift-"..currentKeyPattern)
@@ -163,7 +137,7 @@ local function EditActionKey(parent, action, currentKey)
                         "<LOC _Yes>", ClearShiftKey,
                         "<LOC _No>", nil,
                         nil, nil,
-                        true, 
+                        true,
                         {escapeButton = 2, enterButton = 1, worldCover = false})
                 end
 
@@ -172,7 +146,7 @@ local function EditActionKey(parent, action, currentKey)
                         "<LOC _Yes>", ClearAltKey,
                         "<LOC _No>", nil,
                         nil, nil,
-                        true, 
+                        true,
                         {escapeButton = 2, enterButton = 1, worldCover = false})
                 end
             end
@@ -184,18 +158,18 @@ local function EditActionKey(parent, action, currentKey)
                 "<LOC _Yes>", MapKey,
                 "<LOC _No>", nil,
                 nil, nil,
-                true, 
+                true,
                 {escapeButton = 2, enterButton = 1, worldCover = false})
-            
+
         else
             MapKey()
         end
     end
-    
+
     okButton.OnClick = function(self, modifiers)
         AssignKey()
-        dialog:Destroy()
-    end          
+        keyPopup:Close()
+    end
 
 end
 
@@ -205,7 +179,7 @@ function CreateUI()
     end
 
     if panel then 
-        panel:Destroy()
+        panel:Close()
         panel = false
         return
     end
@@ -221,41 +195,55 @@ function CreateUI()
         end
     end
     
-    panel = Bitmap(GetFrame(0), UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_m.dds'))
-    panel.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
-    panel.Height:Set(390)
-    panel.Width:Set(530)
-    LayoutHelpers.AtCenterIn(panel, GetFrame(0))
-    panel.OnDestroy = function(self)
-        RemoveInputCapture(panel)
+    local function UnbindCurrentSelection()
+        local Keymapper = import('/lua/keymap/keymapper.lua')
+        for k, v in keyTable do
+            if v._selected then
+                Keymapper.ClearUserKeyMapping(v.key)
+                break
+            end
+        end
+        keyTable = FormatData()
+        keyContainer:CalcVisible()
     end
+
+    local dialogContent = Group(GetFrame(0))
+    dialogContent.Width:Set(593)
+    dialogContent.Height:Set(530)
+
+    panel = Popup(GetFrame(0), dialogContent)
+
+    panel.OnDestroy = function(self)
+        RemoveInputCapture(dialogContent)
+    end
+
+    local title = UIUtil.CreateText(dialogContent, LOC("<LOC key_binding_0000>Key Bindings"), 22)
+    LayoutHelpers.AtTopIn(title, dialogContent, 12)
+    LayoutHelpers.AtHorizontalCenterIn(title, dialogContent)
     
-    panel.border = CreateBorder(panel)
-    panel.brackets = UIUtil.CreateDialogBrackets(panel, 106, 110, 110, 108, true)
-    
-    local worldCover = UIUtil.CreateWorldCover(panel)
-    
-    local title = UIUtil.CreateText(panel, LOC("<LOC key_binding_0000>Key Bindings"), 22)
-    LayoutHelpers.AtTopIn(title, panel.border.tm, 12)
-    LayoutHelpers.AtHorizontalCenterIn(title, panel)
-    
-    local closeButton = UIUtil.CreateButtonStd(panel, "/scx_menu/small-btn/small", LOC("<LOC _Close>"), 14, 2)
-    LayoutHelpers.AtTopIn(closeButton, panel.border.bm, -20)
-    LayoutHelpers.AtHorizontalCenterIn(closeButton, panel)
+    local closeButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC _Close>"))
+    LayoutHelpers.AtBottomIn(closeButton, dialogContent, 9)
+    LayoutHelpers.AtRightIn(closeButton, dialogContent, -2)
     closeButton.OnClick = function(self, modifiers)
-		ConfirmNewKeyMap()
-        panel:Destroy()
+        ConfirmNewKeyMap()
+        panel:Close()
         panel = false
     end
 
-    local assignKeyButton = UIUtil.CreateButtonStd(panel, "/widgets/small02", LOC("<LOC key_binding_0003>Assign Key"), 12)
-    LayoutHelpers.LeftOf(assignKeyButton, closeButton, 10)
+    local assignKeyButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC key_binding_0003>Assign Key"))
+    LayoutHelpers.LeftOf(assignKeyButton, closeButton, 27)
     assignKeyButton.OnClick = function(self, modifiers)
         AssignCurrentSelection()
     end
     
-    local resetButton = UIUtil.CreateButtonStd(panel, "/widgets/small02", LOC("<LOC key_binding_0004>Reset"), 12)
-    LayoutHelpers.RightOf(resetButton, closeButton, 10)
+    local unbindKeyButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC key_binding_0007>Unbind Key"))
+    LayoutHelpers.LeftOf(unbindKeyButton, assignKeyButton, 27)
+    unbindKeyButton.OnClick = function(self, modifiers)
+        UnbindCurrentSelection()
+    end
+    
+    local resetButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC key_binding_0004>Reset"))
+    LayoutHelpers.LeftOf(resetButton, unbindKeyButton, 27)
     resetButton.OnClick = function(self, modifiers)
         UIUtil.QuickDialog(panel, "<LOC key_binding_0005>Are you sure you want to reset all key bindings to the default keybindings?",
             "<LOC _Yes>", ResetKeyMap,
@@ -265,52 +253,49 @@ function CreateUI()
             {escapeButton = 2, enterButton = 1, worldCover = false})
     end
 
-
-    panel.HandleEvent = function(self, event)
+    dialogContent.HandleEvent = function(self, event)
         if event.Type == 'KeyDown' then
             if event.KeyCode == UIUtil.VK_ESCAPE or event.KeyCode == UIUtil.VK_ENTER or event.KeyCode == 342 then
                 closeButton:OnClick()
             end
         end
     end
-    
-    AddInputCapture(panel)
 
-    keyContainer = Group(panel)
-    keyContainer.Height:Set(385)
-    keyContainer.Width:Set(593)
+    keyContainer = Group(dialogContent)
+    keyContainer.Height:Set(421)
+    keyContainer.Width:Set(562)
     keyContainer.top = 0
     
-    LayoutHelpers.AtLeftTopIn(keyContainer, panel, -46)
-    UIUtil.CreateVertScrollbarFor(keyContainer)
+    LayoutHelpers.AtLeftTopIn(keyContainer, dialogContent, 10, 50)
+    UIUtil.CreateLobbyVertScrollbar(keyContainer)
     
     local keyEntries = {}
     
     local function CreateElement(index)
-        keyEntries[index] = {}
-        keyEntries[index].bg = Bitmap(keyContainer)
-        keyEntries[index].bg.Left:Set(keyContainer.Left)
-        keyEntries[index].bg.Right:Set(keyContainer.Right)
-        
-        keyEntries[index].key = UIUtil.CreateText(keyEntries[1].bg, '', 16, "Arial")
-        keyEntries[index].key:DisableHitTest()
-        
-        keyEntries[index].description = UIUtil.CreateText(keyEntries[1].bg, '', 16, "Arial")
-        keyEntries[index].description:DisableHitTest()
-        keyEntries[index].description:SetClipToWidth(true)
-        keyEntries[index].description.Width:Set(keyEntries[index].bg.Right() - keyEntries[index].bg.Left() - 150) -- this is not meant to be a lazy var function since the layout is static
-        
-        keyEntries[index].bg.Height:Set(function() return keyEntries[index].key.Height() + 4 end)
-        
-        LayoutHelpers.AtVerticalCenterIn(keyEntries[index].key, keyEntries[index].bg)
-        LayoutHelpers.AtLeftIn(keyEntries[index].description, keyEntries[index].bg, 150)
-        LayoutHelpers.AtVerticalCenterIn(keyEntries[index].description, keyEntries[index].bg)
+        local entry = {}
+        keyEntries[index] = entry
 
-        keyEntries[index].bg.HandleEvent = function(self, event)
-            local eventHandled = false
+        entry.bg = Bitmap(keyContainer)
+        entry.bg.Left:Set(keyContainer.Left)
+        entry.bg.Right:Set(keyContainer.Right)
+        
+        entry.key = UIUtil.CreateText(keyEntries[1].bg, '', 16, "Arial")
+        entry.key:DisableHitTest()
+        
+        entry.description = UIUtil.CreateText(keyEntries[1].bg, '', 16, "Arial")
+        entry.description:DisableHitTest()
+        entry.description:SetClipToWidth(true)
+        -- this is not meant to be a lazy var function since the layout is static
+        entry.description.Width:Set(entry.bg.Right() - entry.bg.Left() - 150)
+        
+        entry.bg.Height:Set(function() return entry.key.Height() + 4 end)
+        
+        LayoutHelpers.AtVerticalCenterIn(entry.key, entry.bg)
+        LayoutHelpers.AtLeftIn(entry.description, entry.bg, 150)
+        LayoutHelpers.AtVerticalCenterIn(entry.description, entry.bg)
 
--- removed keybinding work
-
+        -- USE A SODDING ITEMLIST YOU PRUNES
+        entry.bg.HandleEvent = function(self, event)
             local function SelectLine()
                 for k, v in keyTable do
                     if v._selected then
@@ -325,14 +310,14 @@ function CreateUI()
             
             if event.Type == 'ButtonPress' then
                 SelectLine()
-                eventHandled = true
+                return true
             elseif event.Type == 'ButtonDClick' then
                 SelectLine()
-                eventHandled = true
+                AssignCurrentSelection()
+                return true
             end
-       
-            
-            return eventHandled
+
+            return false
         end
     end
     
@@ -392,9 +377,9 @@ function CreateUI()
                 return 'ff880000'
             end
             if math.mod(lineID, 2) == 1 then
-                return 'ff202020'
+                return 'ff313131'
             else
-                return 'ff000000'
+                return 'ff202020'
             end
         end
         local function SetTextLine(line, data, lineID)
@@ -491,7 +476,7 @@ function FormatData()
     
     local index = 1
     for i, v in retkeys do
-        if index != 1 then
+        if index ~= 1 then
             KeyData[index] = {type = 'spacer'}
             index = index + 1
         end
@@ -530,55 +515,4 @@ function formatkeyname(key)
     end
 
     return result..LookupToken(key)
-end
-
-function CreateBorder(parent)
-    local tbl = {}
-    tbl.tl = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_ul.dds'))
-    tbl.tm = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_horz_um.dds'))
-    tbl.tr = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_ur.dds'))
-    tbl.l = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_vert_l.dds'))
-    tbl.r = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_vert_r.dds'))
-    tbl.bl = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_ll.dds'))
-    tbl.bm = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_lm.dds'))
-    tbl.br = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_lr.dds'))
-    
-    tbl.tl.Bottom:Set(parent.Top)
-    tbl.tl.Right:Set(parent.Left)
-    
-    tbl.tr.Bottom:Set(parent.Top)
-    tbl.tr.Left:Set(parent.Right)
-    
-    tbl.tm.Bottom:Set(parent.Top)
-    tbl.tm.Right:Set(parent.Right)
-    tbl.tm.Left:Set(parent.Left)
-    
-    tbl.l.Bottom:Set(parent.Bottom)
-    tbl.l.Top:Set(parent.Top)
-    tbl.l.Right:Set(parent.Left)
-    
-    tbl.r.Bottom:Set(parent.Bottom)
-    tbl.r.Top:Set(parent.Top)
-    tbl.r.Left:Set(parent.Right)
-    
-    tbl.bl.Top:Set(parent.Bottom)
-    tbl.bl.Right:Set(parent.Left)
-    
-    tbl.br.Top:Set(parent.Bottom)
-    tbl.br.Left:Set(parent.Right)
-    
-    tbl.bm.Top:Set(parent.Bottom)
-    tbl.bm.Right:Set(parent.Right)
-    tbl.bm.Left:Set(parent.Left)
-    
-    tbl.tl.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.tm.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.tr.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.l.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.r.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.bl.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.bm.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.br.Depth:Set(function() return parent.Depth() - 1 end)
-    
-    return tbl
 end

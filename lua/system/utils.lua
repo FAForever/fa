@@ -165,6 +165,15 @@ function table.assimilate(t1, t2)
     return t1
 end
 
+--- Remove all keys in t2 from t2.
+function table.subtract(t1, t2)
+    for k, v in t2 do
+        t1[k] = nil
+    end
+
+    return t1
+end
+
 --==============================================================================
 -- table.cat(t1, t2) performs a shallow "merge" of t1 and t2, where t1 and t2
 -- are expected to be numerically keyed (existing keys are discarded).
@@ -174,15 +183,6 @@ end
 --
 --------------------------------------------------------------------------------
 function table.cat(t1, t2)
-
-    if t1==t2 then
-        return t1
-    end
-
-    if type(t1)~='table' or type(t2)~='table' then
-        error('table.cat(t1, t2) : expects two tables as parameters',2)
-    end
-
     local tRet = {}
 
     for i,v in t1 do
@@ -194,6 +194,32 @@ function table.cat(t1, t2)
     end
 
     return tRet
+end
+
+--- Concatenate arbitrarily-many tables (equivalent to table.cat, but varargs. Slightly more
+-- overhead, but can constructvely concat *all* the things)
+function table.concatenate(...)
+    local ret = {}
+
+    for index = 1, table.getn(arg) do
+        if arg[index] then
+            for k, v in arg[index] do
+                table.insert(ret, v)
+            end
+        end
+    end
+
+    return ret
+end
+
+--- Destructively concatenate two tables. (numerical keys only)
+--
+-- Appends the keys of t2 onto t1, returning it. The original t1 is destroyed, but this avoids the
+-- need to copy the values in t1, saving some time.
+function table.destructiveCat(t1, t2)
+    for k, v in t2 do
+        table.insert(t1, v)
+    end
 end
 
 --==============================================================================

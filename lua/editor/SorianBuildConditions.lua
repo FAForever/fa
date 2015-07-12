@@ -253,7 +253,7 @@ function DamagedStructuresInArea(aiBrain, locationtype)
     end
     local Structures = AIUtils.GetOwnUnitsAroundPoint( aiBrain, categories.STRUCTURE - (categories.TECH1 - categories.FACTORY), engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius() )
     for k,v in Structures do
-        if not v:IsDead() and v:GetHealthPercent() < .8 then
+        if not v.Dead and v:GetHealthPercent() < .8 then
 		#LOG('*AI DEBUG: DamagedStructuresInArea return true')
 			return true
         end
@@ -462,7 +462,7 @@ function ShieldDamaged(aiBrain, locationType)
     end
 	local shields = aiBrain:GetUnitsAroundPoint( categories.STRUCTURE * categories.SHIELD, engineerManager:GetLocationCoords(), engineerManager:GetLocationRadius(), 'Ally' )
 	for num, unit in shields do
-		if not unit:IsDead() and unit:ShieldIsOn() then
+		if not unit.Dead and unit:ShieldIsOn() then
 			shieldPercent = (unit.MyShield:GetHealth() / unit.MyShield:GetMaxHealth())
 			if shieldPercent < 1 and SUtils.GetGuards(aiBrain, unit) < 3 then
 				return true

@@ -59,5 +59,13 @@ NinePatch = Class(Group) {
         self.b.Left:Set(self.Left)
 
         self:DisableHitTest(true)
+    end,
+
+    -- Lay this NinePatch out around the given control
+    Surround = function(self, control, horizontalPadding, verticalPadding)
+        self.Left:Set(function() return control.Left() + horizontalPadding end)
+        self.Right:Set(function() return control.Right() - horizontalPadding end)
+        self.Top:Set(function() return control.Top() + verticalPadding end)
+        self.Bottom:Set(function() return control.Bottom() - verticalPadding end)
     end
 }

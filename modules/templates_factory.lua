@@ -62,6 +62,10 @@ function SetTemplateIcon(templateID, iconPath)
     Prefs.SetToCurrentProfile('build_templates_factory', templates)
 end
 
+function SendTemplate(templateID, armyIndex)
+    WARN("Not implemented yet. Shhhh.")
+end
+
 function SetTemplateKey(templateID, key)
     local used = false
     for i, template in templates do

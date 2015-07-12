@@ -78,51 +78,31 @@ function toggleAllScript(name)
     end
 end
 
-local MilitaryFilters = {"Defense","AntiNavy","Miscellaneous","AntiAir","DirectFire","IndirectFire"}
-local IntelFilters = {"CounterIntel", "Omni", "Radar", "Sonar"}
+local FILTERS = {
+    Military = {"defense", "antinavy", "miscellaneous", "antiair", "directfire", "indirectfire"},
+    Intel = {"counterintel", "omni", "radar", "sonar" }
+}
 
 function toggleOverlay(type)
     local currentFilters = Prefs.GetFromCurrentProfile('activeFilters') or {}
-    local tempFilters = {}
-    local MilitaryActive = false
-    local IntelActive = false
-    for i, filter in MilitaryFilters do
-        if currentFilters[string.lower(filter)] then
-            MilitaryActive = true
-        end
-    end
-    for i, filter in IntelFilters do
-        if currentFilters[string.lower(filter)] then
-            IntelActive = true
+
+    local filterSet = FILTERS[type]
+
+    -- Determine if any of the filters from the selected filter set are active.
+    local filtersAreActive = false
+    for i, filter in filterSet do
+        if currentFilters[filter] then
+            filtersAreActive = true
+            break
         end
     end
 
-    local function toggleFilters(filterTable, active)
-        for i, filter in filterTable do
-            if active then
-                currentFilters[string.lower(filter)] = nil
-            else
-                currentFilters[string.lower(filter)] = true
-                table.insert(tempFilters, filter)
-            end
-        end
-    end
-
-    if type == 'Military' then
-        toggleFilters(MilitaryFilters, MilitaryActive)
-        if IntelActive then
-            for i, filter in IntelFilters do
-                table.insert(tempFilters, filter)
-            end
-        end
-    end
-
-    if type == 'Intel' then
-        toggleFilters(IntelFilters, IntelActive)
-        if MilitaryActive then
-            for i, filter in MilitaryFilters do
-                table.insert(tempFilters, filter)
-            end
+    -- If any filters are active, turn them all off. Otherwise turn them all on.
+    for i, filter in filterSet do
+        if filtersAreActive then
+            currentFilters[filter] = nil
+        else
+            currentFilters[filter] = true
         end
     end
 
@@ -130,49 +110,30 @@ function toggleOverlay(type)
     import('/lua/ui/game/multifunction.lua').UpdateActiveFilters()
 end
 
-local currentLandFactoryIndex = 1
-local currentAirFactoryIndex = 1
-local currentNavalFactoryIndex = 1
+--- Function builder for "Get next factory of type" functions
+--
+-- @param factoryType The type of factory (LAND, AIR, NAVAL) for which a cycling function is wanted.
+function getGetNextFactory(factoryType)
+    local currentFactoryIndex = 1
+    local categoryFilter = "FACTORY * " .. factoryType
 
-
-function GetNextLandFactory()
-    UISelectionByCategory("FACTORY * LAND", false, false, false, false)
-    local FactoryList = GetSelectedUnits()
-    if FactoryList then
-        local nextFac = FactoryList[currentLandFactoryIndex] or FactoryList[1]
-        currentLandFactoryIndex = currentLandFactoryIndex + 1
-        if currentLandFactoryIndex > table.getn(FactoryList) then
-            currentLandFactoryIndex = 1
+    return function()
+        UISelectionByCategory(categoryFilter, false, false, false, false)
+        local factoryList = GetSelectedUnits()
+        if factoryList then
+            local nextFac = factoryList[currentFactoryIndex] or factoryList[1]
+            currentFactoryIndex = currentFactoryIndex + 1
+            if currentFactoryIndex > table.getn(factoryList) then
+                currentFactoryIndex = 1
+            end
+            SelectUnits({nextFac})
         end
-        SelectUnits({nextFac})
     end
 end
 
-function GetNextAirFactory()
-    UISelectionByCategory("FACTORY * AIR", false, false, false, false)
-    local FactoryList = GetSelectedUnits()
-    if FactoryList then
-        local nextFac = FactoryList[currentAirFactoryIndex] or FactoryList[1]
-        currentAirFactoryIndex = currentAirFactoryIndex + 1
-        if currentAirFactoryIndex > table.getn(FactoryList) then
-            currentAirFactoryIndex = 1
-        end
-        SelectUnits({nextFac})
-    end
-end
-
-function GetNextNavalFactory()
-    UISelectionByCategory("FACTORY * NAVAL", false, false, false, false)
-    local FactoryList = GetSelectedUnits()
-    if FactoryList then
-        local nextFac = FactoryList[currentNavalFactoryIndex] or FactoryList[1]
-        currentNavalFactoryIndex = currentNavalFactoryIndex + 1
-        if currentNavalFactoryIndex > table.getn(FactoryList) then
-            currentNavalFactoryIndex = 1
-        end
-        SelectUnits({nextFac})
-    end
-end
+GetNextLandFactory = getGetNextFactory("LAND")
+GetNextAirFactory = getGetNextFactory("AIR")
+GetNextNavalFactory = getGetNextFactory("NAVAL")
 
 function GetNearestIdleLTMex()
     local tech = 1

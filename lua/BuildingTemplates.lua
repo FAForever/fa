@@ -5,7 +5,7 @@
 #**
 #**  Summary  :
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 ########################################
 # Base Templates                       #
@@ -69,8 +69,16 @@ BuildingTemplates =
             'ueb0201',
         },
         {
+            'T2SupportLandFactory',
+            'zeb9501',
+        },
+        {
             'T3LandFactory',
             'ueb0301',
+        },
+        {
+            'T3SupportLandFactory',
+            'zeb9601',
         },
         {
             'T3QuantumGate',
@@ -88,8 +96,16 @@ BuildingTemplates =
             'ueb0202',
         },
         {
+            'T2SupportAirFactory',
+            'zeb9502',
+        },
+        {
             'T3AirFactory',
             'ueb0302',
+        },
+        {
+            'T3SupportAirFactory',
+            'zeb9602',
         },
 
         # Sea Factory Structures
@@ -102,8 +118,16 @@ BuildingTemplates =
             'ueb0203',
         },
         {
+            'T2SupportSeaFactory',
+            'zeb9503',
+        },
+        {
             'T3SeaFactory',
             'ueb0303',
+        },
+        {
+            'T3SupportSeaFactory',
+            'zeb9603',
         },
 
         # Storage Structures
@@ -334,8 +358,16 @@ BuildingTemplates =
             'uab0201',
         },
         {
+            'T2SupportLandFactory',
+            'zab9501',
+        },
+        {
             'T3LandFactory',
             'uab0301',
+        },
+        {
+            'T3SupportLandFactory',
+            'zab9601',
         },
         {
             'T3QuantumGate',
@@ -352,8 +384,16 @@ BuildingTemplates =
             'uab0202',
         },
         {
+            'T2SupportAirFactory',
+            'zab9502',
+        },
+        {
             'T3AirFactory',
             'uab0302',
+        },
+        {
+            'T3SupportAirFactory',
+            'zab9602',
         },
 
         # Sea Factory Structures
@@ -366,8 +406,16 @@ BuildingTemplates =
             'uab0203',
         },
         {
+            'T2SupportSeaFactory',
+            'zab9503',
+        },
+        {
             'T3SeaFactory',
             'uab0303',
+        },
+        {
+            'T3SupportSeaFactory',
+            'zab9603',
         },
 
         # Storage Structures
@@ -592,8 +640,16 @@ BuildingTemplates =
             'urb0201',
         },
         {
+            'T2SupportLandFactory',
+            'zrb9501',
+        },
+        {
             'T3LandFactory',
             'urb0301',
+        },
+        {
+            'T3SupportLandFactory',
+            'zrb9601',
         },
         {
             'T3QuantumGate',
@@ -610,8 +666,16 @@ BuildingTemplates =
             'urb0202',
         },
         {
+            'T2SupportAirFactory',
+            'zrb9502',
+        },
+        {
             'T3AirFactory',
             'urb0302',
+        },
+        {
+            'T3SupportAirFactory',
+            'zrb9602',
         },
 
         # Sea Factory Structures
@@ -624,8 +688,16 @@ BuildingTemplates =
             'urb0203',
         },
         {
+            'T2SupportSeaFactory',
+            'zrb9503',
+        },
+        {
             'T3SeaFactory',
             'urb0303',
+        },
+        {
+            'T3SupportSeaFactory',
+            'zrb9603',
         },
 
         # Storage Structures
@@ -854,8 +926,16 @@ BuildingTemplates =
             'xsb0201',
         },
         {
+            'T2SupportLandFactory',
+            'zsb9501',
+        },
+        {
             'T3LandFactory',
             'xsb0301',
+        },
+        {
+            'T3SupportLandFactory',
+            'zsb9601',
         },
         {
             'T3QuantumGate',
@@ -872,8 +952,16 @@ BuildingTemplates =
             'xsb0202',
         },
         {
+            'T2SupportAirFactory',
+            'zsb9502',
+        },
+        {
             'T3AirFactory',
             'xsb0302',
+        },
+        {
+            'T3SupportAirFactory',
+            'zsb9602',
         },
 
         # Sea Factory Structures
@@ -886,8 +974,16 @@ BuildingTemplates =
             'xsb0203',
         },
         {
+            'T2SupportSeaFactory',
+            'zsb9503',
+        },
+        {
             'T3SeaFactory',
             'xsb0303',
+        },
+        {
+            'T3SupportSeaFactory',
+            'zsb9603',
         },
 
         # Storage Structures

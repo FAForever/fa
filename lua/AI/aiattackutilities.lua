@@ -6,7 +6,7 @@
 #**  Summary  : This file was completely rewritten to best take advantage of
 #**             the new influence map stuff Daniel provided. 
 #**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
 local UnitTemplates = import('/lua/unittemplates.lua').UnitTemplates
@@ -45,7 +45,7 @@ function GetThreatOfUnits(platoon)
     
     local units = platoon:GetPlatoonUnits()
     for _,u in units do
-        if not u:IsDead() then        
+        if not u.Dead then
             if platoon.MovementLayer == 'Land' then
                 bpThreat = u:GetBlueprint().Defense.SurfaceThreatLevel
             elseif platoon.MovementLayer == 'Water' then
@@ -502,7 +502,7 @@ function GetNavalPlatoonMaxRange(aiBrain, platoon)
     local maxRange = 0
     local platoonUnits = platoon:GetPlatoonUnits()
     for _,unit in platoonUnits do
-        if unit:IsDead() then
+        if unit.Dead then
             continue
         end
         
@@ -713,7 +713,7 @@ function AIPlatoonNavalAttackVector( aiBrain, platoon )
     # return current command queue 
     local cmd = {}
     for k,v in platoon:GetPlatoonUnits() do
-        if not v:IsDead() then
+        if not v.Dead then
             local unitCmdQ = v:GetCommandQueue()
             for cmdIdx,cmdVal in unitCmdQ do
                 table.insert(cmd, cmdVal)
@@ -834,7 +834,7 @@ function AIPlatoonSquadAttackVector( aiBrain, platoon, bAggro )
     # return current command queue 
     local cmd = {}
     for k,v in platoon:GetPlatoonUnits() do
-        if not v:IsDead() then
+        if not v.Dead then
             local unitCmdQ = v:GetCommandQueue()
             for cmdIdx,cmdVal in unitCmdQ do
                 table.insert(cmd, cmdVal)
@@ -910,7 +910,7 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSk
                     if table.getn(goodunits) > numOverflow and numOverflow > 0 then
                         local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
                         for _,v in overflow do
-                            if not v:IsDead() then
+                            if not v.Dead then
                                 aiBrain:AssignUnitsToPlatoon( pool, {v}, 'Unassigned', 'None' )
                             end
                         end
@@ -933,7 +933,7 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSk
                 
                 local survivors = {}
                 for _,v in units do
-                    if not v:IsDead() then
+                    if not v.Dead then
                         table.insert(survivors, v)
                     end
                 end
@@ -989,7 +989,7 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSk
 	    
 	    # just in case we're still landing...
         for _,v in units do
-            if not v:IsDead() then
+            if not v.Dead then
                 if v:IsUnitState( 'Attached' ) then
                    WaitSeconds(2)
                 end
@@ -1079,7 +1079,7 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
                     if table.getn(goodunits) > numOverflow and numOverflow > 0 then
                         local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
                         for _,v in overflow do
-                            if not v:IsDead() then
+                            if not v.Dead then
                                 aiBrain:AssignUnitsToPlatoon( pool, {v}, 'Unassigned', 'None' )
                             end
                         end
@@ -1102,7 +1102,7 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
                 
                 local survivors = {}
                 for _,v in units do
-                    if not v:IsDead() then
+                    if not v.Dead then
                         table.insert(survivors, v)
                     end
                 end
@@ -1170,7 +1170,7 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
 	    
 	    # just in case we're still landing...
         for _,v in units do
-            if not v:IsDead() then
+            if not v.Dead then
                 if v:IsUnitState( 'Attached' ) then
                    WaitSeconds(2)
                 end
@@ -1230,7 +1230,7 @@ function GetMostRestrictiveLayer(platoon)
     local unit = false
     platoon.MovementLayer = 'Air'
     for k,v in platoon:GetPlatoonUnits() do
-        if not v:IsDead() then
+        if not v.Dead then
             local mType = v:GetBlueprint().Physics.MotionType
             if ( mType == 'RULEUMT_AmphibiousFloating' or mType == 'RULEUMT_Hover' or mType == 'RULEUMT_Amphibious' ) and ( platoon.MovementLayer == 'Air' or platoon.MovementLayer == 'Water' ) then
                 platoon.MovementLayer = 'Amphibious'
@@ -1813,7 +1813,7 @@ function AIFindUnitRadiusThreat( aiBrain, alliance, priTable, position, radius, 
     local retUnit = false
     for tNum, catList in unitTable do
         for num, unit in catList do
-            if not unit:IsDead() then
+            if not unit.Dead then
                 local unitPos = unit:GetPosition()
                 local useUnit = true
                 if checkThreat then
@@ -1850,7 +1850,7 @@ function GetNavalPlatoonMaxRangeSorian(aiBrain, platoon)
 	local turretPitch = nil
     local platoonUnits = platoon:GetPlatoonUnits()
     for _,unit in platoonUnits do
-        if unit:IsDead() then
+        if unit.Dead then
             continue
         end
         
@@ -1896,7 +1896,7 @@ function GetLandPlatoonMaxRangeSorian(aiBrain, platoon)
 	local turretPitch = nil
     local platoonUnits = platoon:GetPlatoonUnits()
     for _,unit in platoonUnits do
-        if unit:IsDead() then
+        if unit.Dead then
             continue
         end
         
@@ -2063,7 +2063,7 @@ function AIPlatoonSquadAttackVectorSorian( aiBrain, platoon, bAggro )
     # return current command queue 
     local cmd = {}
     for k,v in platoon:GetPlatoonUnits() do
-        if not v:IsDead() then
+        if not v.Dead then
             local unitCmdQ = v:GetCommandQueue()
             for cmdIdx,cmdVal in unitCmdQ do
                 table.insert(cmd, cmdVal)
@@ -2121,7 +2121,7 @@ function AIPlatoonNavalAttackVectorSorian( aiBrain, platoon )
     # return current command queue 
     local cmd = {}
     for k,v in platoon:GetPlatoonUnits() do
-        if not v:IsDead() then
+        if not v.Dead then
             local unitCmdQ = v:GetCommandQueue()
             for cmdIdx,cmdVal in unitCmdQ do
                 table.insert(cmd, cmdVal)
@@ -2183,7 +2183,7 @@ function SendPlatoonWithTransportsSorian(aiBrain, platoon, destination, bRequire
                     if table.getn(goodunits) > numOverflow * 2 and numOverflow > 0 then
                         local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
                         for _,v in overflow do
-                            if not v:IsDead() then
+                            if not v.Dead then
                                 aiBrain:AssignUnitsToPlatoon( pool, {v}, 'Unassigned', 'None' )
                             end
                         end
@@ -2206,7 +2206,7 @@ function SendPlatoonWithTransportsSorian(aiBrain, platoon, destination, bRequire
                 
                 local survivors = {}
                 for _,v in units do
-                    if not v:IsDead() then
+                    if not v.Dead then
                         table.insert(survivors, v)
                     end
                 end
@@ -2297,7 +2297,7 @@ function SendPlatoonWithTransportsSorian(aiBrain, platoon, destination, bRequire
 	    
 	    # just in case we're still landing...
         for _,v in units do
-            if not v:IsDead() then
+            if not v.Dead then
                 if v:IsUnitState( 'Attached' ) then
                    WaitSeconds(2)
                 end

@@ -1,11 +1,11 @@
-#*****************************************************************************
-#* File: lua/modules/ui/game/commandmode.lua
-#* Author: Chris Blackwell
-#* Summary: Manages the current command mode, which determines what action
-#* the mouse will take when next clicked in the world
-#*
-#* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#*****************************************************************************
+--*****************************************************************************
+--* File: lua/modules/ui/game/commandmode.lua
+--* Author: Chris Blackwell
+--* Summary: Manages the current command mode, which determines what action
+--* the mouse will take when next clicked in the world
+--*
+--* Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--*****************************************************************************
 local Dragger = import('/lua/maui/dragger.lua').Dragger
 local Construction = import('/lua/ui/game/construction.lua')
 local UIMain = import('/lua/ui/uimain.lua')
@@ -15,7 +15,7 @@ local commandMeshResources = import('/lua/ui/game/commandmeshes.lua').commandMes
 --[[
  THESE TABLES ARE NOT ACTUALLY USED IN SCRIPT. Just here for reference
 
- # these are the strings which represent a command mode
+ -- these are the strings which represent a command mode
  commandModes = {
      "order",
      "build",
@@ -79,9 +79,9 @@ local startBehaviors = {}
 local endBehaviors = {}
 
 function OnCommandModeBeat()
-	if issuedOneCommand and not IsKeyDown('Shift') then
-		EndCommandMode(true)
-	end
+    if issuedOneCommand and not IsKeyDown('Shift') then
+        EndCommandMode(true)
+    end
 end
 
 import('/lua/ui/game/gamemain.lua').AddBeatFunction(OnCommandModeBeat)
@@ -99,11 +99,14 @@ function StartCommandMode(newCommandMode, data)
     if commandMode then
         EndCommandMode(true)
     end
+
     commandMode = newCommandMode
     modeData = data
     for i,v in startBehaviors do
         v(commandMode, modeData)
     end
+
+    import('/lua/ui/controls/worldview.lua').OnStartCommandMode(newCommandMode, data)
 end
 
 function GetCommandMode()
@@ -119,54 +122,47 @@ function EndCommandMode(isCancel)
     if modeData.isCancel then
         ClearBuildTemplates()
     end
-    
+
     commandMode = false
     modeData = false
-	issuedOneCommand = false
+    issuedOneCommand = false
 end
 
 function AddCommandFeedbackByType(pos, type)
 
-	if commandMeshResources[type] == nil then
-		return false;
-	else
-		AddCommandFeedbackBlip({
-					Position = pos, 
-					MeshName = commandMeshResources[type][1],
-					TextureName = commandMeshResources[type][2],
-					ShaderName = 'CommandFeedback',
-					UniformScale = 0.125,
-				}, 0.7)
-	end
-		
-	return true;
+    if commandMeshResources[type] == nil then
+        return false;
+    else
+        AddCommandFeedbackBlip({
+                    Position = pos, 
+                    MeshName = commandMeshResources[type][1],
+                    TextureName = commandMeshResources[type][2],
+                    ShaderName = 'CommandFeedback',
+                    UniformScale = 0.125,
+                }, 0.7)
+    end
+        
+    return true;
 end
-	
+    
 
 function OnCommandIssued(command)
     if not command.Clear then
-		issuedOneCommand = true
-	else
-		EndCommandMode(true)
-	end
-	
-	if command.CommandType == 'Attack' then
-		if command.Clear then
-			local cb = { Func = 'ClearTargets', Args = { } }
-			SimCallback(cb, true)
-		end
+        issuedOneCommand = true
+    else
+        EndCommandMode(true)
+    end
 
-		local cb = { Func = 'AddTarget', Args = { target = command.Target.EntityId, position = command.Target.Position } } 
-		SimCallback(cb, true)
-
-	--else
-	--	local cc = { Func = 'ClearTargets', Args = { } }
-	--	SimCallback(cc, true)
-	end
-	
-	-- end of issue:#43
-	
-	if command.CommandType == 'BuildMobile' then				
+    if command.CommandType == 'Guard' and command.Target.EntityId then
+        local c = categories.STRUCTURE * categories.FACTORY
+        if EntityCategoryContains(c, command.Blueprint) then
+            local factories = EntityCategoryFilterDown(c, command.Units) or {}
+            if table.getsize(factories) > 0 then
+                local cb = { Func = 'ValidateAssist', Args = { target = command.Target.EntityId } }
+                SimCallback(cb, true)
+            end
+        end
+    elseif command.CommandType == 'BuildMobile' then
 		AddCommandFeedbackBlip({
 			Position = command.Target.Position, 
 			BlueprintID = command.Blueprint,			
@@ -175,8 +171,7 @@ function OnCommandIssued(command)
 			UniformScale = 1,
 		}, 0.7)	
 	else	
-	
-		if AddCommandFeedbackByType(command.Target.Position, command.CommandType) == false then	
+		if AddCommandFeedbackByType(command.Target.Position, command.CommandType) == false then
 			AddCommandFeedbackBlip({
 				Position = command.Target.Position, 
 				MeshName = '/meshes/game/flag02d_lod0.scm',
@@ -194,5 +189,6 @@ function OnCommandIssued(command)
 			}, 0.75)		
 		end		
 	end
+
 	import('/lua/spreadattack.lua').MakeShadowCopyOrders(command)
 end

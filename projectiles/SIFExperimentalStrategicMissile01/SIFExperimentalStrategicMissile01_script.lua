@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Experimental Strategic Missile Projectile script, XSB2401
 #**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local SExperimentalStrategicMissile = import('/lua/seraphimprojectiles.lua').SExperimentalStrategicMissile
@@ -34,7 +34,7 @@ SIFExperimentalStrategicMissile01 = Class(SExperimentalStrategicMissile) {
     OnCreate = function(self)
         SExperimentalStrategicMissile.OnCreate(self)
         local launcher = self:GetLauncher()
-        if launcher and not launcher:IsDead() and launcher.EventCallbacks.ProjectileDamaged then
+        if launcher and not launcher.Dead and launcher.EventCallbacks.ProjectileDamaged then
             self.ProjectileDamaged = {}
             for k,v in launcher.EventCallbacks.ProjectileDamaged do
                 table.insert( self.ProjectileDamaged, v )

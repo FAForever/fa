@@ -129,18 +129,6 @@ options = {
                 },
             },
             {
-                title = "<LOC OPTIONS_0076>Economy Warnings",
-                key = 'econ_warnings',
-                type = 'toggle',
-                default = true,
-                custom = {
-                    states = {
-                        {text = "<LOC _On>", key = true,},
-                        {text = "<LOC _Off>", key = false,},
-                    },
-                },
-            },
-            {
                 title = "<LOC OPTIONS_0215>Show Waypoint ETAs",
                 key = 'display_eta',
                 type = 'toggle',
@@ -314,6 +302,18 @@ options = {
                 },
             },
             {
+                title = "<LOC OPTIONS_0076>Economy Warnings",
+                key = 'econ_warnings',
+                type = 'toggle',
+                default = true,
+                custom = {
+                    states = {
+                        {text = "<LOC _On>", key = true,},
+                        {text = "<LOC _Off>", key = false,},
+                    },
+                },
+            },
+            {
                 title = "<LOC OPTIONS_0078>Tooltip Delay",
                 key = 'tooltip_delay',
                 type = 'slider',
@@ -411,7 +411,7 @@ options = {
                 },
             },
             {
-              title = "cycle reset time (ms)",
+              title = "Cycle reset time (ms)",
               key = 'hotbuild_cycle_reset_time',
               type = 'slider',
               default = 1100,
@@ -602,19 +602,6 @@ options = {
             },
 
             {
-                title = "Display Reclaim Window",
-                key = 'gui_display_reclaim_totals',
-                type = 'toggle',
-                default = 0,
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
-                    },
-                },
-            },
-
-            {
                 title = "Always Render Custom Names",
                 key = 'gui_render_custom_names',
                 type = 'toggle',
@@ -660,10 +647,10 @@ options = {
             },
 
             {
-                title = "Smart Economy Indicators",
-                key = 'gui_smart_economy_indicators',
+                title = "Show reclaim mass value",
+                key = 'gui_show_reclaim',
                 type = 'toggle',
-                default = 0,
+                default = 1,
                 custom = {
                     states = {
                         {text = "<LOC _Off>", key = 0 },

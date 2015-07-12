@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /effects/Entities/UEFNukeEffectController01/UEFNukeEffectController01_script.lua
-#**  Author(s):  Gordon Duclos
-#**
-#**  Summary  :  Nuclear explosion script
-#**
-#**  Copyright © 2005,2006 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+-- ****************************************************************************
+-- **
+-- **  File     :  /effects/Entities/UEFNukeEffectController01/UEFNukeEffectController01_script.lua
+-- **  Author(s):  Gordon Duclos
+-- **
+-- **  Summary  :  Nuclear explosion script
+-- **
+-- **  Copyright Â© 2005,2006 Gas Powered Games, Inc.  All rights reserved.
+-- ****************************************************************************
 
 local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
 local EffectTemplate = import('/lua/EffectTemplates.lua')
@@ -25,8 +25,8 @@ UEFNukeEffectController01 = Class(NullShell) {
     NukeInnerRingTotalTime = 0,
    
     
-    # NOTE: This script has been modified to REQUIRE that data is passed in!  The nuke won't explode until this happens!
-    #OnCreate = function(self)
+    -- NOTE: This script has been modified to REQUIRE that data is passed in!  The nuke won't explode until this happens!
+    -- OnCreate = function(self)
 
     PassData = function(self, Data)
         if Data.NukeOuterRingDamage then self.NukeOuterRingDamage = Data.NukeOuterRingDamage end
@@ -44,16 +44,16 @@ UEFNukeEffectController01 = Class(NullShell) {
     CreateNuclearExplosion = function(self)
         local myBlueprint = self:GetBlueprint()
             
-        # Play the "NukeExplosion" sound
+        -- Play the "NukeExplosion" sound
         if myBlueprint.Audio.NukeExplosion then
             self:PlaySound(myBlueprint.Audio.NukeExplosion)
         end
     
-    # Create Damage Threads
+    -- Create Damage Threads
         self:ForkThread(self.InnerRingDamage)
         self:ForkThread(self.OuterRingDamage)
 
-    # Create thread that spawns and controls effects
+    -- Create thread that spawns and controls effects
         self:ForkThread(self.EffectThread)
     end,    
 
@@ -64,12 +64,12 @@ UEFNukeEffectController01 = Class(NullShell) {
         else
             local ringWidth = ( self.NukeOuterRingRadius / self.NukeOuterRingTicks )
             local tickLength = ( self.NukeOuterRingTotalTime / self.NukeOuterRingTicks )
-            # Since we're not allowed to have an inner radius of 0 in the DamageRing function,
-            # I'm manually executing the first tick of damage with a DamageArea function.
+            -- Since we're not allowed to have an inner radius of 0 in the DamageRing function,
+            -- I'm manually executing the first tick of damage with a DamageArea function.
             DamageArea(self:GetLauncher(), myPos, ringWidth, self.NukeOuterRingDamage, 'Normal', true, true)
             WaitSeconds(tickLength)
             for i = 2, self.NukeOuterRingTicks do
-                #print('Damage Ring: MaxRadius:' .. 2*i)
+                -- print('Damage Ring: MaxRadius:' .. 2*i)
                 DamageRing(self:GetLauncher(), myPos, ringWidth * (i - 1), ringWidth * i, self.NukeOuterRingDamage, self.DamageData.DamageType, true, true)
                 WaitSeconds(tickLength)
             end
@@ -83,12 +83,12 @@ UEFNukeEffectController01 = Class(NullShell) {
         else
             local ringWidth = ( self.NukeInnerRingRadius / self.NukeInnerRingTicks )
             local tickLength = ( self.NukeInnerRingTotalTime / self.NukeInnerRingTicks )
-            # Since we're not allowed to have an inner radius of 0 in the DamageRing function,
-            # I'm manually executing the first tick of damage with a DamageArea function.
+            -- Since we're not allowed to have an inner radius of 0 in the DamageRing function,
+            -- I'm manually executing the first tick of damage with a DamageArea function.
             DamageArea(self:GetLauncher(), myPos, ringWidth, self.NukeInnerRingDamage, 'Normal', true, true)
             WaitSeconds(tickLength)
             for i = 2, self.NukeInnerRingTicks do
-                #LOG('Damage Ring: MaxRadius:' .. ringWidth * i)
+                -- LOG('Damage Ring: MaxRadius:' .. ringWidth * i)
                 DamageRing(self:GetLauncher(), myPos, ringWidth * (i - 1), ringWidth * i, self.NukeInnerRingDamage, self.DamageData.DamageType, true, true)
                 WaitSeconds(tickLength)
             end
@@ -99,16 +99,16 @@ UEFNukeEffectController01 = Class(NullShell) {
         local army = self:GetArmy()
         local position = self:GetPosition()
 
-        # Create full-screen glow flash
+        -- Create full-screen glow flash
         CreateLightParticle(self, -1, army, 35, 4, 'glow_02', 'ramp_red_02')
         WaitSeconds(0.25)
         CreateLightParticle(self, -1, army, 80, 20, 'glow_03', 'ramp_fire_06')
 
-        # Create initial fireball dome effect
+        -- Create initial fireball dome effect
         local FireballDomeYOffset = -5
         self:CreateProjectile('/effects/entities/UEFNukeEffect01/UEFNukeEffect01_proj.bp',0,FireballDomeYOffset,0,0,0,1)
         
-        # Create projectile that controls plume effects
+        -- Create projectile that controls plume effects
         local PlumeEffectYOffset = 1
         self:CreateProjectile('/effects/entities/UEFNukeEffect02/UEFNukeEffect02_proj.bp',0,PlumeEffectYOffset,0,0,0,1)        
         
@@ -126,13 +126,13 @@ UEFNukeEffectController01 = Class(NullShell) {
         
         CreateLightParticle(self, -1, army, 300, 250, 'glow_03', 'ramp_nuke_04')
         
-        # Create ground decals
+        -- Create ground decals
         local orientation = RandomFloat(0,2*math.pi)
         CreateDecal(position, orientation, 'Crater01_albedo', '', 'Albedo', 50, 50, 1200, 0, army)
         CreateDecal(position, orientation, 'Crater01_normals', '', 'Normals', 50, 50, 1200, 0, army)       
         CreateDecal(position, orientation, 'nuke_scorch_003_albedo', '', 'Albedo', 60, 60, 1200, 0, army)    
 
-    # Knockdown force rings
+    -- Knockdown force rings
         DamageRing(self, position, 0.1, 45, 1, 'Force', true)
         WaitSeconds(0.1)
         DamageRing(self, position, 0.1, 45, 1, 'Force', true)
@@ -173,7 +173,7 @@ UEFNukeEffectController01 = Class(NullShell) {
         
         WaitSeconds( 3 )
 
-        # Slow projectiles down to normal speed
+        -- Slow projectiles down to normal speed
         for k, v in projectiles do
             v:SetAcceleration(-0.45)
         end         
@@ -191,12 +191,12 @@ UEFNukeEffectController01 = Class(NullShell) {
         local zVec = 0
         local velocity = 0
 
-        # yVec -0.2, requires 2 initial velocity to start
-        # yVec 0.3, requires 3 initial velocity to start
-        # yVec 1.8, requires 8.5 initial velocity to start
+        -- yVec -0.2, requires 2 initial velocity to start
+        -- yVec 0.3, requires 3 initial velocity to start
+        -- yVec 1.8, requires 8.5 initial velocity to start
 
-        # Launch projectiles at semi-random angles away from the sphere, with enough
-        # initial velocity to escape sphere core
+        -- Launch projectiles at semi-random angles away from the sphere, with enough
+        -- initial velocity to escape sphere core
         for i = 0, (numProjectiles -1) do
             xVec = math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))
             yVec = RandomFloat(0.2, 1)
@@ -207,7 +207,7 @@ UEFNukeEffectController01 = Class(NullShell) {
 
         WaitSeconds( 3 )
 
-        # Slow projectiles down to normal speed
+        -- Slow projectiles down to normal speed
         for k, v in projectiles do
             v:SetVelocity(2):SetBallisticAcceleration(-0.15)
         end

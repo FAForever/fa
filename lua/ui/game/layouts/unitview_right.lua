@@ -1,8 +1,8 @@
-
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Prefs = import('/lua/user/prefs.lua')
 local options = Prefs.GetFromCurrentProfile('options')
+local NinePatch = import('/lua/ui/controls/ninepatch.lua').NinePatch
 
 function SetLayout()
     local controls = import('/lua/ui/game/unitview.lua').controls
@@ -55,12 +55,15 @@ function SetLayout()
     controls.fuelBar._bar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/fuelbar.dds'))
     LayoutHelpers.AtCenterIn(controls.health, controls.healthBar)
     controls.health:SetDropShadow(true)
-    
+
     local iconPositions = {
         [1] = {Left = 70, Top = 60},
-		[3] = {Left = 190, Top = 60},
+        [2] = {Left = 70, Top = 80},
+        [3] = {Left = 190, Top = 60},
         [4] = {Left = 130, Top = 60},
-        [6] = {Left = 190, Top = 80},
+        [5] = {Left = 130, Top = 80},
+        [6] = {Left = 130, Top = 80},
+        [7] = {Left = 190, Top = 80}
     }
     local iconTextures = {
         UIUtil.UIFile('/game/unit_view_icons/mass.dds'),
@@ -93,48 +96,22 @@ function SetLayout()
     controls.abilities.Bottom:Set(function() return controls.bg.Bottom() - 24 end)
     controls.abilities.Height:Set(50)
     controls.abilities.Width:Set(200)
-    
-    controls.abilityBG.TL:SetTexture(UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_ul.dds'))
-    controls.abilityBG.TL.Right:Set(controls.abilities.Left)
-    controls.abilityBG.TL.Bottom:Set(controls.abilities.Top)
-    
-    controls.abilityBG.TM:SetTexture(UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_horz_um.dds'))
-    controls.abilityBG.TM.Right:Set(controls.abilityBG.TL.Right)
-    controls.abilityBG.TM.Bottom:Set(function() return controls.abilities.Top() end)
-    controls.abilityBG.TM.Left:Set(controls.abilityBG.TR.Left)
-    
-    controls.abilityBG.TR:SetTexture(UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_ur.dds'))
-    controls.abilityBG.TR.Left:Set(controls.abilities.Right)
-    controls.abilityBG.TR.Bottom:Set(controls.abilities.Top)
-    
-    controls.abilityBG.ML:SetTexture(UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_vert_l.dds'))
-    controls.abilityBG.ML.Right:Set(controls.abilities.Left)
-    controls.abilityBG.ML.Top:Set(controls.abilityBG.TL.Bottom)
-    controls.abilityBG.ML.Bottom:Set(controls.abilityBG.BL.Top)
-    
-    controls.abilityBG.M:SetTexture(UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_m.dds'))
-    controls.abilityBG.M.Top:Set(controls.abilityBG.TM.Bottom)
-    controls.abilityBG.M.Left:Set(controls.abilityBG.ML.Right)
-    controls.abilityBG.M.Right:Set(controls.abilityBG.MR.Left)
-    controls.abilityBG.M.Bottom:Set(controls.abilityBG.BM.Top)
-    
-    controls.abilityBG.MR:SetTexture(UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_vert_r.dds'))
-    controls.abilityBG.MR.Left:Set(controls.abilities.Right)
-    controls.abilityBG.MR.Top:Set(controls.abilityBG.TR.Bottom)
-    controls.abilityBG.MR.Bottom:Set(controls.abilityBG.BR.Top)
-    
-    controls.abilityBG.BL:SetTexture(UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_ll.dds'))
-    controls.abilityBG.BL.Right:Set(controls.abilities.Left)
-    controls.abilityBG.BL.Top:Set(controls.abilities.Bottom)
-    
-    controls.abilityBG.BM:SetTexture(UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_lm.dds'))
-    controls.abilityBG.BM.Right:Set(controls.abilityBG.BL.Right)
-    controls.abilityBG.BM.Top:Set(function() return controls.abilities.Bottom() end)
-    controls.abilityBG.BM.Left:Set(controls.abilityBG.BR.Left)
-    
-    controls.abilityBG.BR:SetTexture(UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_lr.dds'))
-    controls.abilityBG.BR.Left:Set(controls.abilities.Right)
-    controls.abilityBG.BR.Top:Set(controls.abilities.Bottom)
+
+    if controls.abilityBG then controls.abilityBG:Destroy() end
+    controls.abilityBG = NinePatch(controls.abilities,
+        UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_m.dds'),
+        UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_ul.dds'),
+        UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_ur.dds'),
+        UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_ll.dds'),
+        UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_lr.dds'),
+        UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_vert_l.dds'),
+        UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_vert_r.dds'),
+        UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_horz_um.dds'),
+        UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_lm.dds')
+    )
+
+    controls.abilityBG:Surround(controls.abilities, 3, 5)
+    LayoutHelpers.DepthUnderParent(controls.abilityBG, controls.abilities)
 
     if options.gui_detailed_unitview != 0 then
         LayoutHelpers.AtLeftTopIn(controls.healthBar, controls.bg, 66, 25)

@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Utility functions for scripts.
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 function GetDistanceBetweenTwoEntities(entity1, entity2)
@@ -144,19 +144,4 @@ function UserConRequest(string)
         Sync.UserConRequests = {}
     end
     table.insert(Sync.UserConRequests, string)
-end
-
-#---------------------------------------------------------------
-# TableCat - Concatenates multiple tables into one single table
-#---------------------------------------------------------------
-function TableCat( ... )
-    local ret = {}
-    for index = 1, table.getn(arg) do
-        if arg[index] != nil then
-            for k, v in arg[index] do
-                table.insert( ret, v )
-            end
-        end
-    end
-    return ret
 end

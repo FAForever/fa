@@ -5,15 +5,15 @@
 #**
 #**  Summary  :  Seraphim Aircraft Carrier Script
 #**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
-local SSeaUnit = import('/lua/seraphimunits.lua').SSeaUnit
+local AircraftCarrier = import('/lua/defaultunits.lua').AircraftCarrier
 local SeraphimWeapons = import('/lua/seraphimweapons.lua')
 local SAALosaareAutoCannonWeapon = SeraphimWeapons.SAALosaareAutoCannonWeaponSeaUnit
 local SLaanseMissileWeapon = SeraphimWeapons.SLaanseMissileWeapon
 
-XSS0303 = Class(SSeaUnit) {
+XSS0303 = Class(AircraftCarrier) {
 
     Weapons = {
         AntiAirRight = Class(SAALosaareAutoCannonWeapon) {},
@@ -25,12 +25,12 @@ XSS0303 = Class(SSeaUnit) {
     BuildAttachBone = 'XSS0303',
 
     OnStopBeingBuilt = function(self,builder,layer)
-        SSeaUnit.OnStopBeingBuilt(self,builder,layer)
+        AircraftCarrier.OnStopBeingBuilt(self,builder,layer)
         ChangeState(self, self.IdleState)
     end,
 
     OnFailedToBuild = function(self)
-        SSeaUnit.OnFailedToBuild(self)
+        AircraftCarrier.OnFailedToBuild(self)
         ChangeState(self, self.IdleState)
     end,
 
@@ -41,7 +41,7 @@ XSS0303 = Class(SSeaUnit) {
         end,
 
         OnStartBuild = function(self, unitBuilding, order)
-            SSeaUnit.OnStartBuild(self, unitBuilding, order)
+            AircraftCarrier.OnStartBuild(self, unitBuilding, order)
             self.UnitBeingBuilt = unitBuilding
             ChangeState(self, self.BuildingState)
         end,
@@ -58,7 +58,7 @@ XSS0303 = Class(SSeaUnit) {
         end,
 
         OnStopBuild = function(self, unitBeingBuilt)
-            SSeaUnit.OnStopBuild(self, unitBeingBuilt)
+            AircraftCarrier.OnStopBuild(self, unitBeingBuilt)
             ChangeState(self, self.FinishedBuildingState)
         end,
     },

@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Base Projectile Definition
 --**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local Entity = import('/lua/sim/Entity.lua').Entity
@@ -152,7 +152,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
         end
     end,
 
-    OnCollisionCheck = function(self,other)
+    OnCollisionCheck = function(self, other)
         -- If we return false the thing hitting us has no idea that it came into contact with us.
         -- By default, anything hitting us should know about it so we return true.
         if (EntityCategoryContains(categories.TORPEDO, self) and EntityCategoryContains(categories.TORPEDO, other)) or

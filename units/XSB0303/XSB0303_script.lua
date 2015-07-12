@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Aeon Tier 3 Naval Factory Script
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local SSeaFactoryUnit = import('/lua/seraphimunits.lua').SSeaFactoryUnit

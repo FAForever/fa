@@ -2,7 +2,7 @@
 #* File: lua/modules/ui/controls/worldview.lua
 #* Summary: World view control
 #*
-#* Copyright � 2008 Gas Powered Games, Inc.  All rights reserved.
+#* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 #*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -16,6 +16,7 @@ local Ping = import('/lua/ui/game/ping.lua')
 local UserDecal = import('/lua/user/UserDecal.lua').UserDecal
 local WorldViewMgr = import('/lua/ui/game/worldview.lua')
 local Prefs = import('/lua/user/prefs.lua')
+local options = Prefs.GetFromCurrentProfile('options')
 
 WorldViewParams = {
 	ui_SelectTolerance = 7.0,
@@ -25,81 +26,113 @@ WorldViewParams = {
 	ui_MaxExtractSnapPixels = 1000,
 }
 
-local playersPinging = {}
-local pingLoopsRemaining = {}
+local CommandDecals = {}
 
-function AttackDecalFunc()
-    local attackReticleSize = 0
-    local selection = GetSelectedUnits()
-    local validAttackersSelection = GetValidAttackingUnits()
-    if selection and validAttackersSelection then
-        if table.getn(validAttackersSelection) == 1 then
-            if EntityCategoryContains(categories.SHOWATTACKRETICLE, validAttackersSelection[1]) then
-                attackReticleSize = validAttackersSelection[1]:GetBlueprint().Display.TacticalReticleSize or
-                    validAttackersSelection[1]:GetBlueprint().Display.AttackReticleSize or 
-                    validAttackersSelection[1]:GetBlueprint().Weapon[1].DamageRadius * 2
-            end
-        elseif table.getn(validAttackersSelection) > 1 then
-            local sameUnit = false
-            local unitID = false
-            local reticleSize = false
-            for index, unit in validAttackersSelection do
-                if EntityCategoryContains(categories.SHOWATTACKRETICLE, unit) then
-                    if unitID then
-                        if unitID != unit:GetBlueprint().BlueprintId then
-                            sameUnit = false
-                            break
-                        end
-                    else
-                        unitID = unit:GetBlueprint().BlueprintId
-                    end
-                else
-                    sameUnit = false
-                    break
-                end
-            end
-            if sameUnit then
-                attackReticleSize = validAttackersSelection[1]:GetBlueprint().Display.TacticalReticleSize or
-                    validAttackersSelection[1]:GetBlueprint().Display.AttackReticleSize or 
-                    validAttackersSelection[1]:GetBlueprint().Weapon[1].DamageRadius * 2
-            end
-        else
-            attackReticleSize = 0
-        end
-        return false, "/textures/ui/common/game/AreaTargetDecal/weapon_icon_small.dds", Vector(attackReticleSize,1,attackReticleSize)
+function OnStartCommandMode(command_mode, command_data)
+    if command_mode == 'order' and DecalFunctions[command_data.name] then
+        CommandDecals = DecalFunctions[command_data.name]()
     else
-        return true, "/textures/ui/common/game/AreaTargetDecal/weapon_icon_small.dds", Vector(0,1,0)
+        CommandDecals = {}
     end
 end
 
-DecalFunctions = {
-    RULEUCC_Nuke = function()
-        local innerSize = nil
-        local outerSize = nil
-        local invalid = false
-        local validAttackers = GetValidAttackingUnits()
-        
-        if validAttackers and table.getn(validAttackers) > 0 then
-            for index, unit in validAttackers do
-                local bp = unit:GetBlueprint()
-                for i, w in bp.Weapon do
-                    if w.CountedProjectile == true and w.NukeWeapon == true then
-                        -- Needs to be re-scaled to correspond to ingame radius values
-                        innerSize = w.NukeInnerRingRadius * 2
-                        outerSize = w.NukeOuterRingRadius * 2
-                    end
+-- If all selected units with the SHOWATTACKRETICLE flag set are of the same type, return the weapon
+-- table from their blueprint. Otherwise returns null.
+local function GetSelectedWeaponsWithReticules(filterFunc)
+    local selectedUnits = GetSelectedUnits()
+    local bp = nil
+
+    local weapons = {};
+
+    for i, u in selectedUnits do
+        if EntityCategoryContains(categories.SHOWATTACKRETICLE, u) then
+            local bp = u:GetBlueprint()
+            for k, v in bp.Weapon do
+                if filterFunc(v) then
+                    weapons[bp.BlueprintId] = v
+                    break
                 end
             end
-        else
-            invalid = true
         end
-        
-        if not innerSize or not outerSize then
-            WARN('Nuke decal called for non-nuclear weapon')
+    end
+
+    return weapons
+end
+
+--- A generic decal function that maximises the available DamageRadius values.
+local function RadiusDecalFunction(filterFunc)
+    local weapons = GetSelectedWeaponsWithReticules(filterFunc)
+
+    -- The maximum damage radius of a selected missile weapon.
+    local maxRadius = 0
+    for _, w in weapons do
+        if w.DamageRadius > maxRadius then
+            maxRadius = w.DamageRadius
         end
-        return invalid, "/textures/ui/common/game/AreaTargetDecal/nuke_icon_outer.dds", Vector(outerSize, 1, outerSize), "/textures/ui/common/game/AreaTargetDecal/nuke_icon_inner.dds", Vector(innerSize, 1, innerSize)
-    end,
+    end
+
+    if maxRadius > 0 then
+        return {
+            {
+                texture = "/textures/ui/common/game/AreaTargetDecal/weapon_icon_small.dds",
+                scale = maxRadius * 2
+            }
+        }
+    end
+
+    return false
+end
+
+--- Specialised decal function for nukes: draws the inner/outer radii separately.
+local function NukeDecalFunc()
+    local weapons = GetSelectedWeaponsWithReticules(
+        function(w)
+            return w.NukeWeapon
+        end
+    )
+
+    local inner = 0
+    local outer = 0
+    for _, w in weapons do
+
+        if w.NukeOuterRingRadius > outer then
+            outer = w.NukeOuterRingRadius
+        end
+
+        if w.NukeInnerRingRadius > inner then
+            inner = w.NukeInnerRingRadius
+        end
+    end
+
+    if inner > 0 and outer > 0 then
+        local prefix = '/textures/ui/common/game/AreaTargetDecal/nuke_icon_'
+        return {
+            { texture = prefix .. 'outer.dds', scale = outer * 2 },
+            { texture = prefix .. 'inner.dds', scale = inner* 2 }
+        }
+    end
+end
+
+local function TacticalDecalFunc()
+    return RadiusDecalFunction(
+        function(w)
+            return w.WeaponCategory == 'Missile' and w.DamageRadius and not w.NukeWeapon
+        end
+    )
+end
+
+local function AttackDecalFunc(mode)
+    return RadiusDecalFunction(
+        function(w)
+            return w.ManualFire == false and w.WeaponCategory ~= 'Teleport' and w.WeaponCategory ~= "Death"
+        end
+    )
+end
+
+DecalFunctions = {
     RULEUCC_Attack = AttackDecalFunc,
+    RULEUCC_Nuke = NukeDecalFunc,
+    RULEUCC_Tactical = TacticalDecalFunc
 }
 
 WorldView = Class(moho.UIWorldView, Control) {
@@ -108,6 +141,8 @@ WorldView = Class(moho.UIWorldView, Control) {
     bMouseIn = false,
     EventRedirect = nil,
     _pingAnimationThreads = {},
+    Decals = {},
+    currentRO = {},
 
     HandleEvent = function(self, event)
         if self.EventRedirect then
@@ -127,127 +162,105 @@ WorldView = Class(moho.UIWorldView, Control) {
             self.bMouseIn = false
             GetCursor():Reset()
             self.LastCursor = nil
-            if self.TargetDecal then
-                self.TargetDecal:Destroy()
-                if self.TargetDecal2 then
-                    self.TargetDecal2:Destroy()
-                    self.TargetDecal2 = false
-                end
-                self.TargetDecal = false
-                self.DecalTexture = false
-                self.DecalScale = false
+            self:ResetDecals()
+        end
+
+        if options.gui_enhanced_unitview ~= 0 then
+            local ro = GetRolloverInfo() or {}
+            if ro.entityId ~= self.currentRO.entityId or ro.blueprintId ~= self.currentRO.blueprintId then
+                self.currentRO = ro
+                import('/lua/ui/game/unitview.lua').OnRolloverUpdate(ro)
             end
         end
+
         return false
+    end,
+
+    ResetDecals = function(self)
+        for _, d in self.Decals do
+            d:Destroy()
+        end
+        self.Decals = {}
     end,
 
     OnUpdateCursor = function(self)
         local oldCursor = self.Cursor
-        local newDecalTexture = false
-        local newScale = Vector(0,0,0)
-        local mode = import('/lua/ui/game/commandmode.lua').GetCommandMode()
-        local outer = false
-        local outerScale = Vector(0,0,0)
-        
-        self.NeedTargetDecal = false
-        self.NeedOuterDecal = false
-        if mode[1] == "order" then
-            local showInvalidTargetCursor = false
-            if self:ShowConvertToPatrolCursor() then
-                self.Cursor = {UIUtil.GetCursor("MOVE2PATROLCOMMAND")}
-            else
-                if DecalFunctions[mode[2].name] then
-                    if mode[2].name == "RULEUCC_Nuke" then
-                        showInvalidTargetCursor, newDecalTexture, newScale, outer, outerScale = DecalFunctions[mode[2].name]()
-                        self.NeedOuterDecal = not showInvalidTargetCursor
-                    else
-                        showInvalidTargetCursor, newDecalTexture, newScale = DecalFunctions[mode[2].name]()
-                    end
-                    self.NeedTargetDecal = not showInvalidTargetCursor
-                end
-                if showInvalidTargetCursor then
-                    self.Cursor = {UIUtil.GetCursor('RULEUCC_Invalid')}
-                elseif mode[2].cursor then
-                    self.Cursor = {UIUtil.GetCursor(mode[2].cursor)}
+        local command_mode, command_data = unpack(import('/lua/ui/game/commandmode.lua').GetCommandMode())
+
+        if not command_mode then -- no current command command_mode
+            if self:HasHighlightCommand() then
+                if self:ShowConvertToPatrolCursor() then
+                    self.Cursor = {UIUtil.GetCursor("MOVE2PATROLCOMMAND")}
                 else
-                    self.Cursor = {UIUtil.GetCursor(mode[2].name)}
+                    self.Cursor = {UIUtil.GetCursor('HOVERCOMMAND')}
+                end
+            else
+                local order = self:GetRightMouseButtonOrder()
+                -- Don't show the move cursor as a right mouse button hightlight state
+                if order and order ~= 'RULEUCC_Move' then
+                    self.Cursor = {UIUtil.GetCursor(order)}
+                else
+                    self.Cursor = nil
+                end
+
+                -- Catches if there is no order, or if there is no cursor assigned to the order
+                if not self.Cursor then
+                    GetCursor():Reset()
                 end
             end
-        elseif mode[1] == "build" then
-            self.Cursor = {UIUtil.GetCursor('BUILD')}
-        elseif mode[1] == "ping" then
-            self.Cursor = {UIUtil.GetCursor(mode[2].cursor)}
-        elseif self:HasHighlightCommand() then
+        elseif command_mode == "order" then
             if self:ShowConvertToPatrolCursor() then
                 self.Cursor = {UIUtil.GetCursor("MOVE2PATROLCOMMAND")}
             else
-                self.Cursor = {UIUtil.GetCursor('HOVERCOMMAND')}
+                if command_data.cursor then
+                    self.Cursor = {UIUtil.GetCursor(command_data.cursor)}
+                else
+                    self.Cursor = {UIUtil.GetCursor(command_data.name)}
+                end
+            end
+        elseif command_mode == "build" then
+            self.Cursor = {UIUtil.GetCursor('BUILD')}
+        elseif command_mode == "ping" then
+            self.Cursor = {UIUtil.GetCursor(command_data.cursor)}
+        end
+
+        if CommandDecals[1] and command_mode then
+            local valid = GetValidAttackingUnits()
+            if not valid then
+                self.Cursor = {UIUtil.GetCursor('RULEUCC_Invalid')}
+                self:ResetDecals()
+            else
+                for i, cd in CommandDecals do
+                    if not self.Decals[i] then
+                        self.Decals[i] = UserDecal()
+                    end
+
+                    local cursor_decal = self.Decals[i]
+                    if cursor_decal.texture ~= cd.texture then
+                        cursor_decal:SetTexture(cd.texture)
+                        cursor_decal.texture = cd.texture
+                    end
+
+                    if cursor_decal.scale ~= cd.scale then
+                        cursor_decal:SetScale(Vector(cd.scale, 1, cd.scale))
+                        cursor_decal.scale = cd.scale
+                    end
+
+                    cursor_decal:SetPosition(GetMouseWorldPos())
+                end
             end
         else
-            local order = self:GetRightMouseButtonOrder()
-            if order then
-                -- Don't show the move cursor as a right mouse button hightlight state
-                if order == "RULEUCC_Move" then
-                    self.Cursor = nil
-                else
-                    self.Cursor = {UIUtil.GetCursor(order)}
-                end
-            else
-                self.Cursor = nil
-            end
+            self:ResetDecals()
+        end
 
-            -- Catches if there is no order, or if there is no cursor assigned to the order
-            if not self.Cursor then
-                GetCursor():Reset()
-            end
-        end
-        if self.NeedTargetDecal then
-            if not self.TargetDecal then
-                self.TargetDecal = UserDecal {}
-                if self.NeedOuterDecal then
-                    self.TargetDecal2 = UserDecal {} -- Forces two textures to render for Nukes
-                end
-            end
-            if newDecalTexture and self.DecalTexture != newDecalTexture then
-                self.TargetDecal:SetTexture(newDecalTexture)
-                self.DecalTexture = newDecalTexture
-                if self.TargetDecal2 then
-                    self.TargetDecal2:SetTexture(outer)
-                end
-            end
-            if newScale and self.DecalScale != newScale then
-                self.TargetDecal:SetScale(newScale)
-                self.DecalScale = newScale
-                if self.TargetDecal2 then
-                    self.TargetDecal2:SetScale(outerScale)
-                end
-            end
-            self.TargetDecal:SetPosition(GetMouseWorldPos())
-            if self.TargetDecal2 then
-                self.TargetDecal2:SetPosition(GetMouseWorldPos())
-            end
-        elseif self.TargetDecal then
-            self.TargetDecal:Destroy()
-            self.TargetDecal = false
-            if self.TargetDecal2 then
-                self.TargetDecal2:Destroy()
-                self.TargetDecal2 = false
-            end
-            self.DecalTexture = false
-            self.DecalScale = false
-        end
-        if (self.Cursor == nil) or (oldCursor == nil) or (self.Cursor[1] != oldCursor[1]) then
+        if not (self.Cursor and oldCursor) or self.Cursor[1] ~= oldCursor[1] then
             self:ApplyCursor()
         end
     end,
     
     OnDestroy = function(self)
-        if self.TargetDecal then    
-            self.TargetDecal:Destroy()
-            self.TargetDecal = false
-            self.DecalTexture = false
-            self.DecalScale = false
-        end
+        self:ResetDecals()
+        
         for i, v in self._pingAnimationThreads do
             if v then KillThread(v) end
         end
@@ -276,42 +289,39 @@ WorldView = Class(moho.UIWorldView, Control) {
     end,
     
     DisplayPing = function(self, pingData)
-		---------------------------------------------------
-		--BEGIN CODE FOR PING SOURCE IDENTIFICATION
-		--Duck_42
-		---------------------------------------------------
-		local function IndicatePingSource(pingOwner)
-			--Get the scoreborad object from the appropriate lua file
-			local scoreBoardControls = import('/lua/ui/game/score.lua').controls
-			local timesToFlash = 8
-			local flashInterval = 0.4
-			
-			if playersPinging[pingOwner + 1] then
-				pingLoopsRemaining[pingOwner + 1] = timesToFlash
-			else
-				pingLoopsRemaining[pingOwner + 1] = timesToFlash
-				while pingLoopsRemaining[pingOwner + 1] > 0 do
-					for _, line in scoreBoardControls.armyLines do
-						--Find the line associated with the ping owner...yes, pingOwner + 1 is correct
-						if line.armyID == (pingOwner + 1) then
-							--Switch their faction icon on and off 
-							line.faction:Hide()
-							WaitSeconds(flashInterval)
-							line.faction:Show()
-							WaitSeconds(flashInterval)
-							pingLoopsRemaining[pingOwner + 1] =  pingLoopsRemaining[pingOwner + 1] - 1
-						end
-					end
-				end
-				playersPinging[pingOwner + 1] = false
-			end
+        -- Flash the scoreboard faction icon for the ping owner to indicate the source.
+        if not pingData.Marker and not pingData.Renew then
+            -- Zero-based indices FTW...
+            local pingOwnerIndex = pingData.Owner + 1
+
+            -- The faction icon for the pingOwner.
+            local toFlash
+
+            -- Find the UI element we need to flash.
+            local scoreBoardControls = import('/lua/ui/game/score.lua').controls
+            for _, line in scoreBoardControls.armyLines do
+                if line.armyID == pingOwnerIndex then
+                    toFlash = line.faction
+                    break
+                end
+            end
+
+            local flashesRemaining = 8
+            local flashInterval = 0.4
+            local pingSourceIndicator = function()
+                -- Flash the icon the appropriate number of times.
+                while flashesRemaining > 0 do
+                    toFlash:Hide()
+                    WaitSeconds(flashInterval)
+                    toFlash:Show()
+                    WaitSeconds(flashInterval)
+
+                    flashesRemaining = flashesRemaining - 1
+                end
+            end
+
+			ForkThread(pingSourceIndicator)
 		end
-		if not pingData.Marker and not pingData.Renew then
-			ForkThread(function() IndicatePingSource(pingData.Owner) end)
-		end
-		---------------------------------------------------
-		--END CODE FOR PING SOURCE IDENTIFICATION
-		---------------------------------------------------
 		
         if not self:IsHidden() and pingData.Location then
             local coords = self:Project(Vector(pingData.Location[1], pingData.Location[2], pingData.Location[3]))
@@ -390,10 +400,8 @@ WorldView = Class(moho.UIWorldView, Control) {
                 PingGroup.Marker.HandleEvent = function(marker, event)
                     if event.Type == 'ButtonPress' then
                         if event.Modifiers.Right and event.Modifiers.Ctrl then
-                            if PingGroup.data.Owner == GetArmiesTable().focusArmy - 1 then
-                                local data = {Action = 'delete', ID = PingGroup.data.ID, Owner = PingGroup.data.Owner}
-                                Ping.UpdateMarker(data)
-                            end
+                            local data = {Action = 'delete', ID = PingGroup.data.ID, Owner = PingGroup.data.Owner}
+                            Ping.UpdateMarker(data)
                         elseif event.Modifiers.Left then
                             PingGroup.Marker:DisableHitTest()
                             PingGroup:SetNeedsFrameUpdate(false)
