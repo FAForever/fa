@@ -228,10 +228,11 @@ function ConfigureBeatFunction()
     --- Get a `getRateColour` function.
     --
     -- @param warnFull Should the returned getRateColour function use warning colours for fullness?
-    local function getGetRateColour(warnFull)
+    local function getGetRateColour(warnFull, blink)
         local getRateColour
         -- Flags to make things blink.
         local blinkyFlag = true
+        local blink = blink
 
         -- Counter to give up if the user stopped caring.
         local blinkyCounter = 0
@@ -249,7 +250,7 @@ function ConfigureBeatFunction()
                 end
 
                 -- Positive rate, check if we're wasting money (and flash irritatingly if so)
-                if fractionFull >= 1 then
+                if fractionFull >= 1 and blink then
                     blinkyCounter = blinkyCounter + 1
                     if blinkyCounter > 100 then
                         return 'ffffffff'
@@ -277,7 +278,7 @@ function ConfigureBeatFunction()
                         return 'red'
                     end
 
-                    if fractionFull < 0.2 then
+                    if fractionFull < 0.2 and blink then
                         -- Display flashing gray-white if low on resource.
                         blinkyFlag = not blinkyFlag
                         if blinkyFlag then
@@ -311,11 +312,12 @@ function ConfigureBeatFunction()
         local reclaimDelta = GUI.reclaimDelta
         local reclaimTotal = GUI.reclaimTotal
 
-        local warnOnResourceFull = resourceType == "MASS"
-        local getRateColour = getGetRateColour(warnOnResourceFull)
+        local econ_warnings = Prefs.GetOption('econ_warnings')
+        local warnOnResourceFull = resourceType == "MASS" and econ_warnings
+        local getRateColour = getGetRateColour(warnOnResourceFull, econ_warnings)
 
         local ShowUIWarnings
-        if not Prefs.GetOption('econ_warnings') then
+        if not econ_warnings then
             ShowUIWarnings = function() end
         else
             if warnOnResourceFull then
