@@ -132,6 +132,8 @@ Contributors
 - ckitching
 - quark036
 - shalkya
+- pip
+- zock
 
 Special Thanks To
 - Softly
