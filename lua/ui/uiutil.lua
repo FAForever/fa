@@ -205,11 +205,6 @@ function SetCurrentSkin(skin)
         skinTable = skins[skin]
     end
 
-    if currentSkin() == skin then
-        WARN("Redundant skin setting avoided")
-        return
-    end
-
     currentSkin:Set(skin)
 
     tooltipTitleColor:Set(skinTable.tooltipTitleColor)
