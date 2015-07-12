@@ -25,6 +25,7 @@ local Layouts = import('/lua/skins/layouts.lua')
 local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local NinePatch = import('/lua/ui/controls/ninepatch.lua').NinePatch
 local InputDialog = import('/lua/ui/controls/popups/inputdialog.lua').InputDialog
+local skins = import('/lua/skins/skins.lua').skins
 
 --* Handy global variables to assist skinning
 buttonFont = import('/lua/lazyvar.lua').Create()            -- default font used for button faces
@@ -198,8 +199,6 @@ end
 
 --* skin control, sets the current skin table
 function SetCurrentSkin(skin)
-    local skins = import('/lua/skins/skins.lua').skins
-
     local skinTable = skins[skin]
     if not skinTable then
         skin = 'uef'

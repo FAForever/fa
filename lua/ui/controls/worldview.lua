@@ -50,6 +50,7 @@ local function GetSelectedWeaponsWithReticules(filterFunc)
             for k, v in bp.Weapon do
                 if filterFunc(v) then
                     weapons[bp.BlueprintId] = v
+                    break
                 end
             end
         end
@@ -59,7 +60,7 @@ local function GetSelectedWeaponsWithReticules(filterFunc)
 end
 
 --- A generic decal function that maximises the available DamageRadius values.
-local function RadiusDecalFuntion(filterFunc)
+local function RadiusDecalFunction(filterFunc)
     local weapons = GetSelectedWeaponsWithReticules(filterFunc)
 
     -- The maximum damage radius of a selected missile weapon.
@@ -113,15 +114,19 @@ local function NukeDecalFunc()
 end
 
 local function TacticalDecalFunc()
-    return RadiusDecalFuntion(
+    return RadiusDecalFunction(
         function(w)
-            return w.WeaponCategory == 'Missile' and w.DamageRadius
+            return w.WeaponCategory == 'Missile' and w.DamageRadius and not w.NukeWeapon
         end
     )
 end
 
 local function AttackDecalFunc(mode)
-    return RadiusDecalFuntion(function() return true end)
+    return RadiusDecalFunction(
+        function(w)
+            return w.ManualFire == false and w.WeaponCategory ~= 'Teleport' and w.WeaponCategory ~= "Death"
+        end
+    )
 end
 
 DecalFunctions = {

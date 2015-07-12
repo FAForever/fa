@@ -140,7 +140,7 @@ local statFuncs = {
             if info.userUnit:IsInCategory('VERIFYMISSILEUI') then
                 local curEnh = EnhancementCommon.GetEnhancements(info.userUnit:GetEntityId())
                 if curEnh then
-                    if curEnh.Back == 'TacticalMissile' then
+                    if curEnh.Back == 'TacticalMissile' or curEnh.Back == 'Missile' then
                         return string.format('%d / %d', info.tacticalSiloStorageCount, info.tacticalSiloMaxStorageCount), 'tactical'
                     elseif curEnh.Back == 'TacticalNukeMissile' then
                         return string.format('%d / %d', info.nukeSiloStorageCount, info.nukeSiloMaxStorageCount), 'strategic'
@@ -495,16 +495,6 @@ function CreateUI()
 
     controls.abilities = Group(controls.bg)
     controls.abilityText = {}
-    controls.abilityBG = {}
-    controls.abilityBG.TL = Bitmap(controls.abilities)
-    controls.abilityBG.TR = Bitmap(controls.abilities)
-    controls.abilityBG.TM = Bitmap(controls.abilities)
-    controls.abilityBG.ML = Bitmap(controls.abilities)
-    controls.abilityBG.MR = Bitmap(controls.abilities)
-    controls.abilityBG.M = Bitmap(controls.abilities)
-    controls.abilityBG.BL = Bitmap(controls.abilities)
-    controls.abilityBG.BR = Bitmap(controls.abilities)
-    controls.abilityBG.BM = Bitmap(controls.abilities)
 
     controls.bg:DisableHitTest(true)
 
@@ -513,21 +503,6 @@ function CreateUI()
     if options.gui_detailed_unitview ~= 0 then
         controls.shieldText = UIUtil.CreateText(controls.bg, '', 13, UIUtil.bodyFont)
         controls.Buildrate = UIUtil.CreateText(controls.bg, '', 12, UIUtil.bodyFont)
-    end
-
-    controls.bg.OnFrame = function(self, delta)
-        --[[
-
-        if info then
-            UpdateWindow(info)
-            if self:GetAlpha() < 1 then
-                self:SetAlpha(math.min(self:GetAlpha() + (delta*3), 1), true)
-            end
-            import(UIUtil.GetLayoutFilename('unitview')).PositionWindow()
-        elseif self:GetAlpha() > 0 then
-            self:SetAlpha(math.max(self:GetAlpha() - (delta*3), 0), true)
-        end
-        ]]
     end
 
     if options.gui_scu_manager ~= 0 then
@@ -542,7 +517,7 @@ end
 function UpdateUnitInfo()
     local currentInfo = GetRolloverInfo() or (selectedUnit and GetUnitRolloverInfo(selectedUnit))
 
-    if currentInfo and table.getsize(currentInfo) > 0 then
+    if currentInfo and table.getsize(currentInfo) > 0 and import('/lua/ui/game/unitviewDetail.lua').View:IsHidden() then
         controls.bg:Show()
         UpdateWindow(currentInfo)
 
@@ -555,7 +530,7 @@ function UpdateUnitInfo()
             end)
         end
     else
-        if updateThread then
+        if updateThread and not selectedUnit then
             KillThread(updateThread)
             updateThread = nil
         end
@@ -566,7 +541,7 @@ function UpdateUnitInfo()
 end
 
 function OnSelection(units)
-    if units and table.getn(units) == 1 and import('/lua/ui/game/unitviewDetail.lua').View.Hiding then
+    if units and table.getn(units) == 1 then
         selectedUnit = units[1]
     else
         selectedUnit = nil

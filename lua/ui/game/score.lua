@@ -355,8 +355,10 @@ function SetupPlayerLines()
         local playerRating = sessionInfo.Options.Ratings[playerName] or 0
         local playerClan = sessionInfo.Options.ClanTags[playerName]
 
-        if playerClan then
+        if playerClan and playerClan ~= "" then
             playerClan = '[' .. playerClan .. '] '
+        else
+            playerClan = ""
         end
 
         if playerRating then
@@ -398,6 +400,8 @@ end
             end
             if not issuedNoRushWarning and tonumber(sessionInfo.Options.NoRushOption) * 60 == math.floor(GetGameTimeSeconds()) then
                 import('/lua/ui/game/announcement.lua').CreateAnnouncement('<LOC score_0001>No Rush Time Elapsed', controls.time)
+                local sound = Sound{ Bank = 'XGG', Cue = 'XGG_Computer_CV01_04766' }
+                PlayVoice(sound)
                 issuedNoRushWarning = true
             end
         end

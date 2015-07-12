@@ -19,7 +19,6 @@ XRL0302 = Class(CWalkingLandUnit) {
         
         Suicide = Class(CMobileKamikazeBombWeapon) {   
 			OnFire = function(self)		
-				#disable death weapon
 				self.unit:SetDeathWeaponEnabled(false)
 				CMobileKamikazeBombWeapon.OnFire(self)
 			end,
@@ -37,6 +36,10 @@ XRL0302 = Class(CWalkingLandUnit) {
 			self:GetWeaponByLabel('Suicide'):FireWeapon()
 		end
     end,
-	
+
+    OnLayerChange = function(self, new, old)
+        WARN(new)
+        self:SetDeathWeaponEnabled(new == "Seabed" or new == "Land")
+    end
 }
 TypeClass = XRL0302

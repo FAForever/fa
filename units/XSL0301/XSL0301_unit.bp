@@ -149,6 +149,7 @@ UnitBlueprint {
         'SHOWQUEUE',
         'OVERLAYOMNI',
         'OVERLAYDIRECTFIRE',
+        'VERIFYMISSILEUI',
         'USEBUILDPRESETS',
     },
     CollisionOffsetX = -0.04,
@@ -729,7 +730,7 @@ UnitBlueprint {
     SelectionYOffset = 0,
     SizeX = 1,
     SizeY = 2.2,
-    SizeZ = 1,
+    SizeZ = 1.1,
     StrategicIconName = 'icon_commander_generic',
     StrategicIconSortPriority = 1,
     Transport = {

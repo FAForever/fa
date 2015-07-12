@@ -499,6 +499,11 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
         return
     end
 
+    -- Make sure we have a profile
+    if not GetPreference("profile.current") then
+        CreateProfile("FAF_"..desiredPlayerName)
+    end
+
     GUI = UIUtil.CreateScreenGroup(over, "CreateLobby ScreenGroup")
 
     GUI.exitBehavior = exitBehavior

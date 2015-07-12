@@ -14,6 +14,7 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local SpecialGrid = import('/lua/ui/controls/specialgrid.lua').SpecialGrid
 local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
 local Button = import('/lua/maui/button.lua').Button
+local FixableButton = import('/lua/maui/button.lua').FixableButton
 local Edit = import('/lua/maui/edit.lua').Edit
 local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
 local GameCommon = import('/lua/ui/game/gamecommon.lua')
@@ -84,7 +85,6 @@ local capturingKeys = false
 local layoutVar = false
 local DisplayData = {}
 local sortedOptions = {}
-local newTechUnits = {}
 local currentCommandQueue = false
 local previousTabSet = nil
 local previousTabSize = nil
@@ -463,10 +463,6 @@ function GetEnhancementTextures(unitID, iconID)
     UIUtil.UIFile(prefix .. '_btn_sel.dds')
 end
 
-local UPPER_GLOW_THRESHHOLD = .5
-local LOWER_GLOW_THRESHHOLD = .1
-local GLOW_SPEED = 2
-
 function CommonLogic()
     controls.choices:SetupScrollControls(controls.scrollMin, controls.scrollMax, controls.pageMin, controls.pageMax)
     controls.secondaryChoices:SetupScrollControls(controls.secondaryScrollMin, controls.secondaryScrollMax, controls.secondaryPageMin, controls.secondaryPageMax)
@@ -528,9 +524,9 @@ function CommonLogic()
             SetIconTextures(control)
             local up, down, over, dis = GetBackgroundTextures(control.Data.id)
             control:SetNewTextures(up, down, over, dis)
-            control:SetUpAltButtons(down, down, down, down)
+            control:SetOverrideTexture(down)
             control.tooltipID = LOC(__blueprints[control.Data.id].Description) or 'no description'
-            control.mAltToggledFlag = false
+            control:DisableOverride()
             control.Height:Set(48)
             control.Width:Set(48)
             control.Icon.Height:Set(48)
@@ -548,7 +544,7 @@ function CommonLogic()
     end
 
     controls.secondaryChoices.CreateElement = function()
-        local btn = Button(controls.choices)
+        local btn = FixableButton(controls.choices)
 
         btn.Icon = Bitmap(btn)
         btn.Icon:DisableHitTest()
@@ -566,24 +562,6 @@ function CommonLogic()
         LayoutHelpers.AtBottomIn(btn.Count, btn, 4)
         LayoutHelpers.AtRightIn(btn.Count, btn, 3)
         btn.Count.Depth:Set(function() return btn.Icon.Depth() + 10 end)
-        btn.Glow = Bitmap(btn)
-        btn.Glow:SetTexture(UIUtil.UIFile('/game/units_bmp/glow.dds'))
-        btn.Glow:DisableHitTest()
-        LayoutHelpers.FillParent(btn.Glow, btn)
-        btn.Glow:SetAlpha(0)
-        btn.Glow.Incrementing = 1
-        btn.Glow.OnFrame = function(glow, elapsedTime)
-            local curAlpha = glow:GetAlpha()
-            curAlpha = curAlpha + (elapsedTime * glow.Incrementing * GLOW_SPEED)
-            if curAlpha > UPPER_GLOW_THRESHHOLD then
-                curAlpha = UPPER_GLOW_THRESHHOLD
-                glow.Incrementing = -1
-            elseif curAlpha < LOWER_GLOW_THRESHHOLD then
-                curAlpha = LOWER_GLOW_THRESHHOLD
-                glow.Incrementing = 1
-            end
-            glow:SetAlpha(curAlpha)
-        end
 
         btn.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then
@@ -602,7 +580,7 @@ function CommonLogic()
     end
 
     controls.choices.CreateElement = function()
-        local btn = Button(controls.choices)
+        local btn = FixableButton(controls.choices)
 
         btn.Icon = Bitmap(btn)
         btn.Icon:DisableHitTest()
@@ -644,26 +622,6 @@ function CommonLogic()
             end
             glow:SetAlpha(curAlpha)
         end
-
-        btn.Glow = Bitmap(btn)
-        btn.Glow:SetTexture(UIUtil.UIFile('/game/units_bmp/glow.dds'))
-        btn.Glow:DisableHitTest()
-        LayoutHelpers.FillParent(btn.Glow, btn)
-        btn.Glow:SetAlpha(0)
-        btn.Glow.Incrementing = 1
-        btn.Glow.OnFrame = function(glow, elapsedTime)
-            local curAlpha = glow:GetAlpha()
-            curAlpha = curAlpha + (elapsedTime * glow.Incrementing * GLOW_SPEED)
-            if curAlpha > UPPER_GLOW_THRESHHOLD then
-                curAlpha = UPPER_GLOW_THRESHHOLD
-                glow.Incrementing = -1
-            elseif curAlpha < LOWER_GLOW_THRESHHOLD then
-                curAlpha = LOWER_GLOW_THRESHHOLD
-                glow.Incrementing = 1
-            end
-            glow:SetAlpha(curAlpha)
-        end
-
 
         btn.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then
@@ -744,11 +702,11 @@ function CommonLogic()
             control.BuildKey = nil
         elseif type == 'enhancement' then
             control.Icon:SetSolidColor('00000000')
-            control:SetNewTextures(GetEnhancementTextures(control.Data.unitID, control.Data.icon))
-            local _, down, over, _, up = GetEnhancementTextures(control.Data.unitID, control.Data.icon)
-            control:SetUpAltButtons(up, up, up, up)
+            local up, down, over, _, selected = GetEnhancementTextures(control.Data.unitID, control.Data.icon)
+            control:SetNewTextures(up, down, over, up)
+            control:SetOverrideTexture(selected)
             control.tooltipID = LOC(control.Data.enhTable.Name) or 'no description'
-            control.mAltToggledFlag = control.Data.Selected
+            control:SetOverrideEnabled(control.Data.Selected)
             control.Height:Set(48)
             control.Width:Set(48)
             control.Icon.Height:Set(48)
@@ -768,7 +726,7 @@ function CommonLogic()
                 control:Enable()
             end
         elseif type == 'templates' then
-            control.mAltToggledFlag = false
+            control:DisableOverride()
             SetIconTextures(control, control.Data.template.icon)
             control:SetNewTextures(GetBackgroundTextures(control.Data.template.icon))
             control.Height:Set(48)
@@ -799,8 +757,8 @@ function CommonLogic()
             control:SetNewTextures(GetBackgroundTextures(control.Data.id))
             local _, down = GetBackgroundTextures(control.Data.id)
             control.tooltipID = LOC(__blueprints[control.Data.id].Description) or 'no description'
-            control:SetUpAltButtons(down, down, down, down)
-            control.mAltToggledFlag = false
+            control:SetOverrideTexture(down)
+            control:DisableOverride()
             control.Height:Set(48)
             control.Width:Set(48)
             control.Icon.Height:Set(48)
@@ -818,52 +776,11 @@ function CommonLogic()
             control:Enable()
             control.LowFuel:SetAlpha(0, true)
             control.LowFuel:SetNeedsFrameUpdate(false)
-            if newTechUnits and table.find(newTechUnits, control.Data.id) then
-                table.remove(newTechUnits, table.find(newTechUnits, control.Data.id))
-                control.NewInd = Bitmap(control, UIUtil.UIFile('/game/selection/selection_brackets_player_highlighted.dds'))
-                control.NewInd.Height:Set(80)
-                control.NewInd.Width:Set(80)
-                LayoutHelpers.AtCenterIn(control.NewInd, control)
-                control.NewInd:DisableHitTest()
-                control.NewInd.Incrementing = false
-                control.NewInd:SetNeedsFrameUpdate(true)
-                control.NewInd.OnFrame = function(ind, delta)
-                    local newAlpha = ind:GetAlpha() - delta / 5
-                    if newAlpha < 0 then
-                        ind:SetAlpha(0)
-                        ind:SetNeedsFrameUpdate(false)
-                        return
-                    else
-                        ind:SetAlpha(newAlpha)
-                    end
-                    if ind.Incrementing then
-                        local newheight = ind.Height() + delta * 100
-                        if newheight > 80 then
-                            ind.Height:Set(80)
-                            ind.Width:Set(80)
-                            ind.Incrementing = false
-                        else
-                            ind.Height:Set(newheight)
-                            ind.Width:Set(newheight)
-                        end
-                    else
-                        local newheight = ind.Height() - delta * 100
-                        if newheight < 50 then
-                            ind.Height:Set(50)
-                            ind.Width:Set(50)
-                            ind.Incrementing = true
-                        else
-                            ind.Height:Set(newheight)
-                            ind.Width:Set(newheight)
-                        end
-                    end
-                end
-            end
         elseif type == 'unitstack' then
             SetIconTextures(control)
             control:SetNewTextures(GetBackgroundTextures(control.Data.id))
             control.tooltipID = LOC(__blueprints[control.Data.id].Description) or 'no description'
-            control.mAltToggledFlag = false
+            control:DisableOverride()
             control.Height:Set(48)
             control.Width:Set(48)
             control.Icon.Height:Set(48)
@@ -1064,7 +981,6 @@ function OnRolloverHandler(button, state)
                     button.oldHandleEvent(self, event)
                 end
             end
-            button.Glow:SetNeedsFrameUpdate(true)
         else
             if button.oldHandleEvent then
                 button.HandleEvent = button.oldHandleEvent
@@ -1075,21 +991,16 @@ function OnRolloverHandler(button, state)
                 button.dragMarker:Destroy()
                 button.dragMarker = false
             end
-            button.Glow:SetNeedsFrameUpdate(false)
-            button.Glow:SetAlpha(0)
             UnitViewDetail.Hide()
         end
     else
         if state == 'enter' then
-            button.Glow:SetNeedsFrameUpdate(true)
             if item.type == 'item' then
                 UnitViewDetail.Show(__blueprints[item.id], sortedOptions.selection[1], item.id)
             elseif item.type == 'enhancement' then
                 UnitViewDetail.ShowEnhancement(item.enhTable, item.unitID, item.icon, GetEnhancementPrefix(item.unitID, item.icon), sortedOptions.selection[1])
             end
         else
-            button.Glow:SetNeedsFrameUpdate(false)
-            button.Glow:SetAlpha(0)
             UnitViewDetail.Hide()
         end
     end
@@ -1253,10 +1164,10 @@ function OnClickHandler(button, modifiers)
     elseif item.type == 'attachedunit' then
         if modifiers.Left then
             -- Toggling selection of the entity
-            button:OnAltToggle()
+            button:ToggleOverride()
 
             -- Add or Remove the entity to the session selection
-            if button.mAltToggledFlag then
+            if button:GetOverrideEnabled() then
                 AddToSessionExtraSelectList(item.unit)
             else
                 RemoveFromSessionExtraSelectList(item.unit)
@@ -2390,15 +2301,6 @@ function SetupConstructionControl(parent, inMFDControl, inOrdersControl)
     SetLayout(UIUtil.currentLayout)
 
     return controls.constructionGroup
-end
-
-
-function NewTech(Data)
-    for _, unitList in Data do
-        for _, unit in unitList do
-            table.insert(newTechUnits, unit)
-        end
-    end
 end
 
 -- given a tech level, sets that tech level, returns false if tech level not available

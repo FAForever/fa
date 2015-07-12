@@ -1,28 +1,36 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/XSS0303/XSS0303_script.lua
-#**  Author(s):  Greg Kohne, Drew Staltman, Gordon Duclos, Aaron Lundquist
-#**
-#**  Summary  :  Seraphim Aircraft Carrier Script
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+-- ****************************************************************************
+-- **
+-- **  File     :  /cdimage/units/URS0303/URS0303_script.lua
+-- **  Author(s):  David Tomandl, Andres Mendez
+-- **
+-- **  Summary  :  Cybran Aircraft Carrier Script
+-- **
+-- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- ****************************************************************************
 
 local AircraftCarrier = import('/lua/defaultunits.lua').AircraftCarrier
-local SeraphimWeapons = import('/lua/seraphimweapons.lua')
-local SAALosaareAutoCannonWeapon = SeraphimWeapons.SAALosaareAutoCannonWeaponSeaUnit
-local SLaanseMissileWeapon = SeraphimWeapons.SLaanseMissileWeapon
+local CybranWeaponsFile = import('/lua/cybranweapons.lua')
+local CAAAutocannon = CybranWeaponsFile.CAAAutocannon
+local CAMZapperWeapon = CybranWeaponsFile.CAMZapperWeapon
+local loading = false
 
-XSS0303 = Class(AircraftCarrier) {
+URS0303 = Class(AircraftCarrier) {
 
     Weapons = {
-        AntiAirRight = Class(SAALosaareAutoCannonWeapon) {},
-        AntiAirLeft = Class(SAALosaareAutoCannonWeapon) {},
-        CruiseMissiles = Class(SLaanseMissileWeapon) {},
+    -- Weapons
+    --  4 AA Autocannon w/ Guided Rounds
+    --  1 "Zapper" Anti-Missile
+
+        AAGun01 = Class(CAAAutocannon) {},
+        AAGun02 = Class(CAAAutocannon) {},
+        AAGun03 = Class(CAAAutocannon) {},
+        AAGun04 = Class(CAAAutocannon) {},
+
+        Zapper = Class(CAMZapperWeapon) {},
+
     },
-    
-    
-    BuildAttachBone = 'XSS0303',
+
+    BuildAttachBone = 'Attachpoint',
 
     OnStopBeingBuilt = function(self,builder,layer)
         AircraftCarrier.OnStopBeingBuilt(self,builder,layer)
@@ -81,7 +89,9 @@ XSS0303 = Class(AircraftCarrier) {
             ChangeState(self, self.IdleState)
         end,
     },
+
+
 }
 
-TypeClass = XSS0303
+TypeClass = URS0303
 

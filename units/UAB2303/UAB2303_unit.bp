@@ -43,6 +43,7 @@ UnitBlueprint {
         'SIZE4',
         'VISIBLETORECON',
         'RECLAIMABLE',
+        'SHOWATTACKRETICLE',
         'OVERLAYINDIRECTFIRE',
         'SORTSTRATEGIC',
     },

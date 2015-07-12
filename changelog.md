@@ -1,4 +1,4 @@
-Patch 3641 (Unreleased)
+Patch 3641 (July 12, 2015)
 =======================
 
 Exploits
@@ -17,6 +17,7 @@ Hitboxes
 - Seraphim sniper bot is able to hit Cybran MML again
 - Fixed SCUs not being hit properly by laser weapons
 - Fixed units aiming too high on the UEF and Aeon SCUs
+- Torpedo/sonar platforms no longer confuse surface weaponry
 
 Visual
 - Fixed shield structure glows and rotations not playing
@@ -29,6 +30,8 @@ Visual
 - Legacy checkbox UI code working again
 - Fixed Engineers spawning the wrong tarmacs when building Seraphim buildings
 - Engineering stations no longer exhibit a model bug when rebuilt by an assisting SCU
+- Fuel indicator no longer falls off the unit detail window
+- Seraphim ACU and SCU no longer show the tac missile counter if they don't have the upgrade
 
 Physics
 - Projectiles no longer collide with sinking units
@@ -55,6 +58,7 @@ Other
 - Fixed RateOfFire buffs not being applied correctly
 - SCUs will no longer rebuild buildings they lack to ability to build
 - Upgraded buildings rebuilt by assisting SCUs will now cost the correct amount
+- FAF no longer blows up if the game hasn't first been launched to create a profile
 
 Enhancements
 ------------
@@ -75,6 +79,7 @@ Visual
 - Enhanced Seraphim tarmacs
 - Beams originating inside Fog of War will no longer be invisible
 - Cybran buildbots are no longer invisible to other players
+- MEx, T1 PD, and Radar strategic icons will appear above other building icons when zoomed out
 
 
 UI
@@ -94,6 +99,7 @@ UI
 - Drop shadow for chat messages
 - Chat Option: Add background to chat messages when chat window is closed
 - Chat Option: Allow chat to timeout normally in the feed after closing window
+- Reclaim window merged with main resources UI
 
 Other
 - Engineering Station units now pause on transfer from one player to another
@@ -126,6 +132,8 @@ Contributors
 - ckitching
 - quark036
 - shalkya
+- pip
+- zock
 
 Special Thanks To
 - Softly

@@ -1617,6 +1617,7 @@ AirUnit = Class(MobileUnit) {
     -- GROUND AND WHEN IT IMPACTS IT WILL DESTROY ITSELF
     OnKilled = function(self, instigator, type, overkillRatio)
         local bp = self:GetBlueprint()
+        -- UGH
         if self:GetCurrentLayer() == 'Air' then
             self.CreateUnitAirDestructionEffects( self, 1.0 )
             self:DestroyTopSpeedEffects()
@@ -1624,6 +1625,7 @@ AirUnit = Class(MobileUnit) {
             self.OverKillRatio = overkillRatio
             self:PlayUnitSound('Killed')
             self:DoUnitCallbacks('OnKilled')
+            self:DisableShield()
             if instigator and IsUnit(instigator) then
                 instigator:OnKilledUnit(self)
             end
@@ -1634,8 +1636,9 @@ AirUnit = Class(MobileUnit) {
     end,
 }
 
---- Base class for air transports.
-AirTransport = Class(AirUnit) {
+--- Mixin transports (air, sea, space, whatever). Sellotape onto concrete transport base classes as
+-- desired.
+BaseTransport = Class() {
     OnTransportAttach = function(self, attachBone, unit)
         self:PlayUnitSound('Load')
         self:MarkWeaponsOnTransport(unit, true)
@@ -1662,40 +1665,38 @@ AirTransport = Class(AirUnit) {
         attached:DetachFrom()
     end,
 
-    OnKilled = function(self, instigator, type, overkillRatio)
-        AirUnit.OnKilled(self, instigator, type, overkillRatio)
-
-        local units = self:GetCargo()
-        for k, v in units do
-            v:DetachFrom()
-        end
-    end,
-
     GetTransportClass = function(self)
         local bp = self:GetBlueprint().Transport
         return bp.TransportClass
     end,
 
-    OnStartTransportLoading = function(...)
-        WARN("Start loading!")
-        for k, v in arg do
-            WARN(v)
-        end
+    OnStartTransportLoading = function(self)
+        -- We keep the aibrain up to date with the last transport to start loading so, among other
+        -- things, we can determine which transport is being referenced during an OnTransportFull
+        -- event (As this function is called immediately before that one).
+        self:GetAIBrain().loadingTransport = self
     end,
 
     OnStopTransportLoading = function(...)
-        WARN("Stop loading!")
-        for k, v in arg do
-            WARN(v)
-        end
     end,
 
     DestroyedOnTransport = function(self)
-        WARN("DestroyedOnTransport!")
-        for k, v in arg do
-            WARN(v)
+    end,
+
+    DetachCargo = function(self)
+        local units = self:GetCargo()
+        for k, v in units do
+            v:DetachFrom()
         end
     end
+}
+
+--- Base class for air transports.
+AirTransport = Class(AirUnit, BaseTransport) {
+    OnKilled = function(self, instigator, type, overkillRatio)
+        AirUnit.OnKilled(self, instigator, type, overkillRatio)
+        self:DetachCargo()
+    end,
 }
 
 ---------------------------------------------------------------
@@ -1748,12 +1749,11 @@ ConstructionUnit = Class(MobileUnit) {
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order )
-
-    if unitBeingBuilt.WorkItem.Slot and unitBeingBuilt.WorkProgress == 0 then
-        return
-    else
-        MobileUnit.OnStartBuild(self,unitBeingBuilt, order)
-    end
+        if unitBeingBuilt.WorkItem.Slot and unitBeingBuilt.WorkProgress == 0 then
+            return
+        else
+            MobileUnit.OnStartBuild(self,unitBeingBuilt, order)
+        end
         -- Fix up info on the unit id from the blueprint and see if it matches the 'UpgradeTo' field in the BP.
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
@@ -1841,6 +1841,13 @@ SeaUnit = Class(MobileUnit){
     end,
 }
 
+--- Base class for aircraft carriers.
+AircraftCarrier = Class(SeaUnit, BaseTransport) {
+    OnKilled = function(self, instigator, type, overkillRatio)
+        SeaUnit.OnKilled(self, instigator, type, overkillRatio)
+        self:DetachCargo()
+    end,
+}
 
 ---------------------------------------------------------------
 --  HOVERING LAND UNITS
@@ -1900,8 +1907,17 @@ CommandUnit = Class(WalkingLandUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order)
         WalkingLandUnit.OnStartBuild(self, unitBeingBuilt, order)
+        self.UnitBeingBuilt = unitBeingBuilt
+
         local bp = self:GetBlueprint()
-        if order ~= 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
+        local isUpgrade = order == 'Upgrade'
+        local showEffects = not isUpgrade or bp.Display.ShowBuildEffectsDuringUpgrade
+
+        if not isUpgrade then
+            self.BuildingUnit = true
+        end
+
+        if showEffects then
             self:StartBuildingEffects(unitBeingBuilt, order)
         end
 
