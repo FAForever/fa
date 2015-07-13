@@ -84,6 +84,7 @@ UnitBlueprint {
             ImpactEffects = 'AeonShieldHit01',
             OwnerShieldMesh = '/units/ual0202/ual0202_personalshield_mesh',
             PersonalShield = true,
+            PassOverkillDamage = true,
             RegenAssistMult = 60,
             ShieldEnergyDrainRechargeTime = 5,
             ShieldMaxHealth = 1500,
