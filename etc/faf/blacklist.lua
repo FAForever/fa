@@ -1,11 +1,11 @@
 -- A set of mod uids we don't approve of, and explanations for why we don't like them.
 
-local INCOMPATIBLE = "Incompatible with current FAF"
-local UPGRADE = "Please update to newest version"
-local INTEGRATED = "Integrated with FAF"
-local BROKEN = "Broken"
-local OBSOLETE = "Obsolete"
-local HARMFUL = "Considered harmful"
+local INCOMPATIBLE = "<LOC uimod_0021>Incompatible with current FAF"
+local UPGRADE = "<LOC uimod_0022>Please update to newest version"
+local INTEGRATED = "<LOC uimod_0023>Integrated with FAF"
+local BROKEN = "<LOC uimod_0024>Broken"
+local OBSOLETE = "<LOC uimod_0025>Obsolete"
+local HARMFUL = "<LOC uimod_0026>Considered harmful"
 
 Blacklist = {
     -- PWN Desync

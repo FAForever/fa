@@ -165,7 +165,7 @@ function table.assimilate(t1, t2)
     return t1
 end
 
---- Remove all keys in t2 from t2.
+--- Remove all keys in t2 from t1.
 function table.subtract(t1, t2)
     for k, v in t2 do
         t1[k] = nil

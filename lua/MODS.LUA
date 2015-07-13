@@ -199,6 +199,8 @@ Mod initialization issues
 '
 -------------------------------------------------------------------------------------------------------------------- ]]
 
+local SetUtils = import('/lua/system/setutils.lua')
+
 -- Table of all mods found on disk, indexed by id
 local _mod_cache = nil
 
@@ -217,25 +219,35 @@ function SetSelectedMods(s)
     end
 end
 
+function GetLocallyAvailableMods()
+    local result = {}
+    for k,mod in AllMods() do
+        if not mod.ui_only then
+            result[mod.uid] = true
+        end
+    end
+    return result
+end
 
 function GetSelectedMods()
     return GetPreference('active_mods') or {}
 end
 
-function GetUnSelectedMods()
-    local selectMod = GetSelectedMods()
-	local allMod = AllMods()
-	local tableUnselectMod = {}
-	for k, v in allMod do
-		if not selectMod[v.uid] then
-			--LOG('>>> '..v.name..' - '..v.uid)
-			tableUnselectMod[v.uid] = true
-			--table.insert(tableUnselectMod, v.uid)
-		end
-	end
-	return tableUnselectMod, true
+function GetSelectedSimMods()
+    return SetUtils.PredicateFilter(GetSelectedMods(),
+        function(uid)
+            return not AllMods()[uid].ui_only
+        end
+    )
 end
 
+function GetSelectedUIMods()
+    return SetUtils.PredicateFilter(GetSelectedMods(),
+        function(uid)
+            return AllMods()[uid].ui_only
+        end
+    )
+end
 
 local function LoadModInfo(filename)
     -- Fill in some defaults to start with...
@@ -371,6 +383,11 @@ function GetDependencies(uid)
                     ret.conflicts[conflict] = true
                 end
             end
+        end
+
+        -- Exclusive mods conflict with everything.
+        if allMods[uid].exclusive then
+            ret.conflicts = table.map(function() return true end, allMods)
         end
 
         -- check if any other mods list this mod as a conflict
