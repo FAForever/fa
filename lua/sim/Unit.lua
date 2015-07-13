@@ -53,7 +53,8 @@ SyncMeta = {
         end
         UnitData[id].Data[key] = val
 
-        if army == GetFocusArmy() then
+        local focus = GetFocusArmy()
+        if army == focus or focus == -1 then -- let observers get unit data
             if not Sync.UnitData[id] then
                 Sync.UnitData[id] = {}
             end

@@ -4,7 +4,7 @@ UnitData = {}
 
 ResetSyncTable = function()
     oldResetSyncTable()
-    
+
     # A list of camera control operations that we'd like the user layer to perform.
     Sync.CameraRequests = {}
     Sync.Sounds = {}
@@ -95,8 +95,8 @@ end
 
 function OnPostLoad()
     local focus = GetFocusArmy()
-    for entityID, data in UnitData do 
-        if data.OwnerArmy == focus then
+    for entityID, data in UnitData do
+        if data.OwnerArmy == focus or focus == -1 then
             Sync.UnitData[entityID] = data.Data
         end
     end
@@ -106,7 +106,7 @@ end
 function NoteFocusArmyChanged(new, old)
     #LOG('NoteFocusArmyChanged(new=' .. repr(new) .. ', old=' .. repr(old) .. ')')
     import('/lua/SimPing.lua').OnArmyChange()
-    for entityID, data in UnitData do 
+    for entityID, data in UnitData do
         if data.OwnerArmy == old then
             Sync.ReleaseIds[entityID] = true
         elseif data.OwnerArmy == new then

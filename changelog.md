@@ -6,10 +6,26 @@ Bugs
 
 - [ ] Issue with half built units from naval factories fixed
 
+Enhancements
+------------
+
+- Added ability to see unit data (xp/regen rate) as observer
+
 Lobby
 -----
 
 - [ ] The mod manager can now blacklist incompatible mods
+
+
+Contributors
+------------
+
+- CodingSquirrel
+- Crotalus
+- Gorton
+- Sheeo
+- ckitching
+- ggwpez
 
 
 Patch 3642 (July 13, 2015)
