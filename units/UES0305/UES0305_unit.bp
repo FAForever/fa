@@ -2,8 +2,11 @@ UnitBlueprint {
     AI = {
         TargetBones = {
             'Abovetgt',
-            'UES0305'
-        }
+            'B13',
+            'UES0305',
+            'B02',
+            'B14',
+        },
     },
     Audio = {
         AmbientMove = Sound {
@@ -67,7 +70,7 @@ UnitBlueprint {
         'SORTINTEL',
 		'NAVAL',
     },
-    CollisionOffsetY = -0.25,
+    CollisionOffsetY = -1.8,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
@@ -215,9 +218,9 @@ UnitBlueprint {
     SelectionSizeX = 0.65,
     SelectionSizeZ = 0.65,
     SelectionThickness = 0.6,
-    SizeX = 1,
-    SizeY = 1.1,
-    SizeZ = 1,
+    SizeX = 1.1,
+    SizeY = 2.4,
+    SizeZ = 1.1,
     StrategicIconName = 'icon_structure3_intel',
     StrategicIconSortPriority = 230,
     Veteran = {

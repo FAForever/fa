@@ -1,4 +1,10 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'Turret',
+            'XSL0203',
+        },
+    },
     Audio = {
         AmbientMoveLand = Sound {
             Bank = 'XSL',
@@ -72,6 +78,7 @@ UnitBlueprint {
         'TANK',
         'OVERLAYDIRECTFIRE',
     },
+    CollisionOffsetX = 0.14,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
@@ -271,7 +278,7 @@ UnitBlueprint {
     SelectionSizeX = 0.5,
     SelectionSizeZ = 0.8,
     SelectionThickness = 0.5,
-    SizeX = 0.9,
+    SizeX = 0.7,
     SizeY = 0.5,
     SizeZ = 1.2,
     StrategicIconName = 'icon_land2_directfire',

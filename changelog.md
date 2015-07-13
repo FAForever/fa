@@ -1,5 +1,13 @@
+Patch 3642 (July 13, 2015)
+==========================
+
+Bugs
+----
+
+- Obsidians and titans die to overcharge again
+
 Patch 3641 (July 12, 2015)
-=======================
+==========================
 
 Exploits
 --------
@@ -18,6 +26,8 @@ Hitboxes
 - Fixed SCUs not being hit properly by laser weapons
 - Fixed units aiming too high on the UEF and Aeon SCUs
 - Torpedo/sonar platforms no longer confuse surface weaponry
+- Fixed a swathe of units, mostly naval, with hitbox/targetbone combinations which made properly
+  targeting the unit either hard, or in many cases impossible
 
 Visual
 - Fixed shield structure glows and rotations not playing
