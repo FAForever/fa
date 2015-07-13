@@ -501,7 +501,7 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
 
     -- Make sure we have a profile
     if not GetPreference("profile.current") then
-        CreateProfile("FAF_"..desiredPlayerName)
+        Prefs.CreateProfile("FAF_"..desiredPlayerName)
     end
 
     GUI = UIUtil.CreateScreenGroup(over, "CreateLobby ScreenGroup")
