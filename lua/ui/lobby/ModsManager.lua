@@ -15,6 +15,7 @@ local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local RadioButton = import('/lua/ui/controls/radiobutton.lua').RadioButton
 local Prefs = import('/lua/user/prefs.lua')
 local GUI_OPEN = false
+local IsHost = false
 
 function UpdateClientModStatus(mod_selec)
     if GUI_OPEN then
@@ -24,41 +25,17 @@ function UpdateClientModStatus(mod_selec)
     end
 end
 
-function HostModStatus(availableMods)
-    Mods.ClearCache() -- Force reload of mod info to pick up changes on disk
-    local my_all = Mods.AllSelectableMods()
-    local my_sel = Mods.GetSelectedMods()
-    local r = {}
-
-    local function everyoneHas(uid)
-        for peer, modset in availableMods do
-            if not modset[uid] then
-                return false
-            end
-        end
-        return true
-    end
-
-    for uid,mod in my_all do
-        if mod.ui_only or everyoneHas(uid) then
-            if mod.ui_only then
-                r[uid] = true
-            else
-                r[uid] = true
-            end
-        else
-            r[uid] = false
-        end
-    end
-    return r
-end
-
 local modsDialog
 
 -- Show only UI mods?
 local uiOnly = true
-function NEW_MODS_GUI(parent, IsHost, modstatus, availableMods)
-    if IsHost then modstatus = false end
+
+--- Show the dialog
+-- @param parent UI control to create the dialog within.
+-- @param IsHost Is the user opening the control the host (and hence able to edit?)
+-- @param availableMods Present only if user is host. The availableMods map from lobby.lua.
+function NEW_MODS_GUI(parent, availableMods)
+    IsHost = availableMods ~= nil
 
     local dialogContent = Group(parent)
     dialogContent.Width:Set(537)

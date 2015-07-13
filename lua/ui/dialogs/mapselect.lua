@@ -396,8 +396,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     LayoutHelpers.LeftOf(modButton, restrictedUnitsButton, 74)
     Tooltip.AddButtonTooltip(modButton, "Lobby_Mods")
     modButton.OnClick = function(self, modifiers)
-        local availableMods = ModManager.HostModStatus(availableMods)
-        ModManager.NEW_MODS_GUI(dialogContent, true, nil, availableMods)
+        ModManager.NEW_MODS_GUI(dialogContent, availableMods)
     end
     dialogContent.modButton = modButton
 
