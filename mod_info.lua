@@ -3,7 +3,7 @@
 -- Documentation for the extended FAF mod_info.lua format can be found here:
 -- https://github.com/FAForever/fa/wiki/mod_info.lua-documentation
 name = "Forged Alliance Forever"
-version = 3641
+version = 3642
 copyright = "Forged Alliance Forever Community"
 description = "Forged Alliance Forever extends Forged Alliance, bringing new patches, game modes, units, ladder, and much more!"
 author = "Forged Alliance Forever Community"
@@ -13,6 +13,7 @@ selectable = false
 exclusive = false
 ui_only = false
 conflicts = {}
+_faf_modname = 'balancetesting'
 mountpoints = {
     ENV = "/env",
     LOC = '/loc',
