@@ -72,6 +72,7 @@ UnitBlueprint {
             ImpactEffects = 'UEFShieldHit01',
             OwnerShieldMesh = '/units/uel0303/UEL0303_PersonalShield_mesh',
             PersonalShield = true,
+            PassOverkillDamage = true,
             RegenAssistMult = 60,
             ShieldEnergyDrainRechargeTime = 5,
             ShieldMaxHealth = 1200,
