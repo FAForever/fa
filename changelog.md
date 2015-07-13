@@ -1,5 +1,13 @@
+Patch 3642 (July 13, 2015)
+==========================
+
+Bugs
+----
+
+- Obsidians and titans die to overcharge again
+
 Patch 3641 (July 12, 2015)
-=======================
+==========================
 
 Exploits
 --------
