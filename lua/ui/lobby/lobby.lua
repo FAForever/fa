@@ -2481,7 +2481,7 @@ function CreateUI(maxPlayers)
     else
         GUI.gameoptionsButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Mods Manager")
         GUI.gameoptionsButton.OnClick = function(self, modifiers)
-            import('/lua/ui/lobby/ModsManager.lua').NEW_MODS_GUI(GUI)
+            import('/lua/ui/lobby/ModsManager.lua').CreateDialog(GUI)
         end
         Tooltip.AddButtonTooltip(GUI.gameoptionsButton, 'Lobby_Mods')
     end
