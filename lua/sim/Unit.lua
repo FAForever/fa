@@ -925,7 +925,7 @@ Unit = Class(moho.unit_methods) {
             end
         end
 
-        local workers = self:GetAIBrain():GetUnitsAroundPoint(( categories.REPAIR), self:GetPosition(), 50, 'Ally' )
+        local workers = self:GetAIBrain():GetUnitsAroundPoint((categories.REPAIR), self:GetPosition(), 50, 'Ally')
         for k,v in workers do
             if not v.Dead and v:IsUnitState('Repairing') and v:GetFocusUnit() == self then
                 table.insert(units, v)
@@ -933,10 +933,20 @@ Unit = Class(moho.unit_methods) {
         end
 
         for _, v in units do
-            if not v.updatedConsumption then
-                v.updatedConsumption = true -- recursive protection
-                v:UpdateConsumptionValues()
-                v.updatedConsumption = false
+            -- Set to dead at the very start of OnKilled
+            if self.Dead then
+                v:OnStopBuild(self)
+                v:OnStopBuilderTracking()
+                local stuff = v:GetCommandQueue()
+                WARN('Printing command queue')
+                LOG(stuff)
+                LOG(repr(stuff))
+            else
+                if not v.updatedConsumption then
+                    v.updatedConsumption = true -- Recursive protection
+                    v:UpdateConsumptionValues()
+                    v.updatedConsumption = false
+                end
             end
         end
     end,
@@ -944,6 +954,12 @@ Unit = Class(moho.unit_methods) {
     --Called when we start building a unit, turn on/off, get/lose bonuses, or on
     --any other change that might affect our build rate or resource use.
     UpdateConsumptionValues = function(self)
+        if self.Dead then
+            -- Engine will take care of us, but not repairers
+            self:UpdateAssistersConsumption()
+            return
+        end
+
         local focus = self:GetFocusUnit()
         local energy_rate = 0
         local mass_rate = 0
@@ -1160,6 +1176,10 @@ Unit = Class(moho.unit_methods) {
         local layer = self:GetCurrentLayer()
         self.Dead = true
 
+        -- Make sure assisting/repairing/capturing units recognise death and cease
+        -- Engine does this for Destroy(), but Kill() only stops the unit itself
+        self:UpdateConsumptionValues()
+        
         --Units killed while being invisible because they're teleporting should show when they're killed
         if self.TeleportFx_IsInvisible then
             self:ShowBone(0, true)
@@ -1180,15 +1200,15 @@ Unit = Class(moho.unit_methods) {
             self:ForkThread(self.PlayAnimationThread, 'AnimationDeath')
             self.DisallowCollisions = true
         end
-
-        self:DoUnitCallbacks( 'OnKilled' )
+        
+        self:DoUnitCallbacks('OnKilled')
 
         if self.UnitBeingTeleported and not self.UnitBeingTeleported.Dead then
             self.UnitBeingTeleported:Destroy()
             self.UnitBeingTeleported = nil
         end
 
-        --Notify instigator of kill
+        -- Notify instigator of kill
         if instigator and IsUnit(instigator) then
             instigator:OnKilledUnit(self)
         end
@@ -1200,12 +1220,12 @@ Unit = Class(moho.unit_methods) {
         self:ForkThread(self.DeathThread, overkillRatio , instigator)
     end,
 
-    --Argument val is true or false. False = cannot be killed
+    -- Argument val is true or false. False = cannot be killed
     SetCanBeKilled = function(self, val)
         self.CanBeKilled = val
     end,
 
-    --- Called when this unit kills another. Chiefly responsible for the veterancy system for now.
+    -- Called when this unit kills another. Chiefly responsible for the veterancy system for now.
     OnKilledUnit = function(self, unitKilled)
         -- No XP for friendly fire...
         if IsAlly(self:GetArmy(), unitKilled:GetArmy()) then
@@ -1262,7 +1282,7 @@ Unit = Class(moho.unit_methods) {
             end
         end
 
-        --Check for specific non-collisions
+        -- Check for specific non-collisions
         local bp = other:GetBlueprint()
         if bp.DoNotCollideList then
             for k, v in pairs(bp.DoNotCollideList) do
@@ -1289,7 +1309,7 @@ Unit = Class(moho.unit_methods) {
             return false
         end
         local weaponBP = firingWeapon:GetBlueprint()
-        --Skip friendly collisions
+        -- Skip friendly collisions
         local collide = weaponBP.CollideFriendly
         if collide == false then
             if self:GetArmy() == firingWeapon.unit:GetArmy() then
@@ -1297,7 +1317,7 @@ Unit = Class(moho.unit_methods) {
             end
         end
 
-        --Check for specific non-collisions
+        -- Check for specific non-collisions
         if weaponBP.DoNotCollideList then
             for k, v in pairs(weaponBP.DoNotCollideList) do
                 if EntityCategoryContains(ParseEntityCategory(v), self) then
@@ -1351,19 +1371,18 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    --Create a unit's wrecked mesh blueprint from its regular mesh blueprint, by changing the shader and albedo
-
+    -- Create a unit's wrecked mesh blueprint from its regular mesh blueprint, by changing the shader and albedo
     CreateWreckage = function (self, overkillRatio)
         if overkillRatio and overkillRatio > 1.0 then
             return
         end
-        --Check if wrecks are allowed
+        -- Check if wrecks are allowed
         if self:GetBlueprint().Wreckage.WreckageLayers[self:GetCurrentLayer()] then
              return self:CreateWreckageProp(overkillRatio)
         end
     end,
 
-    CreateWreckageProp = function( self, overkillRatio )
+    CreateWreckageProp = function(self, overkillRatio)
         local bp = self:GetBlueprint()
         local wreck = bp.Wreckage.Blueprint
 
@@ -1378,7 +1397,7 @@ Unit = Class(moho.unit_methods) {
         local layer = self:GetCurrentLayer()
 
         if layer == 'Water' then
-            --Reduce the mass value of submerged wrecks
+            -- Reduce the mass value of submerged wrecks
             mass = mass * 0.5
             energy = energy * 0.5
         end
@@ -1444,12 +1463,12 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    CreateDestructionEffects = function( self, overKillRatio )
-        explosion.CreateScalableUnitExplosion( self, overKillRatio )
+    CreateDestructionEffects = function(self, overKillRatio)
+        explosion.CreateScalableUnitExplosion(self, overKillRatio)
     end,
 
-    DeathWeaponDamageThread = function( self , damageRadius, damage, damageType, damageFriendly)
-        WaitSeconds( 0.1 )
+    DeathWeaponDamageThread = function(self, damageRadius, damage, damageType, damageFriendly)
+        WaitSeconds(0.1)
         DamageArea(self, self:GetPosition(), damageRadius or 1, damage or 1, damageType or 'Normal', damageFriendly or false)
     end,
 
