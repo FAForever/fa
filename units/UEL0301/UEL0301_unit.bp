@@ -812,13 +812,11 @@ UnitBlueprint {
         },
         {
             CollideFriendly = false,
-            Damage = 100,#1000
+            Damage = 1000,
             DamageFriendly = true,
             DamageRadius = 10,
             DamageType = 'Normal',
             DisplayName = 'Death Nuke',
-            DoTPulses = 15,#added
-            DoTTime = 5,#added
             FireOnDeath = true,
             FiringTolerance = 2,
             Label = 'DeathWeapon',
