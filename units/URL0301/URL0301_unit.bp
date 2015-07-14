@@ -404,7 +404,7 @@ UnitBlueprint {
             BuildTime = 6720,
             Icon = 'srs',
             Name = '<LOC enhancements_0099>Nano-Repair System',
-            NewRegenRate = 400,
+            NewRegenRate = 375,
             Slot = 'Back',
             UpgradeUnitAmbientBones = {
                 'URL0301',
@@ -629,7 +629,7 @@ UnitBlueprint {
         MotionType = 'RULEUMT_Amphibious',
         StandUpright = true,
         TurnRadius = 10,
-        TurnRate = 150,
+        TurnRate = 90,#150
     },
     SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = -0.1,
@@ -637,9 +637,9 @@ UnitBlueprint {
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.7,
     SelectionYOffset = 0,
-    SizeX = 1.1,
+    SizeX = 1.2,
     SizeY = 1.9,
-    SizeZ = 1.1,
+    SizeZ = 1.2,
     StrategicIconName = 'icon_commander_generic',
     StrategicIconSortPriority = 1,
     Transport = {
@@ -674,8 +674,30 @@ UnitBlueprint {
                     BuffType = 'STUN',
                     Duration = 4,
                     Radius = 3,
-                    TargetAllow = 'MOBILE',
-                    TargetDisallow = 'EXPERIMENTAL,SUBCOMMANDER,COMMAND,WALL',
+                    TargetAllow = 'TECH1',
+                    TargetDisallow = 'TECH2,TECH3,EXPERIMENTAL,COMMAND,SUBCOMMANDER,SHIELD,WALL',
+                },
+                {
+                    Add = {
+                        OnImpact = true,
+                    },
+                    AppliedToTarget = true,
+                    BuffType = 'STUN',
+                    Duration = 3,
+                    Radius = 3,
+                    TargetAllow = 'TECH2,SHIELD',
+                    TargetDisallow = 'TECH1,TECH3,EXPERIMENTAL,COMMAND,SUBCOMMANDER,WALL',
+                },
+                {
+                    Add = {
+                        OnImpact = true,
+                    },
+                    AppliedToTarget = true,
+                    BuffType = 'STUN',
+                    Duration = 2,
+                    Radius = 3,
+                    TargetAllow = 'TECH3',
+                    TargetDisallow = 'TECH1,TECH2,EXPERIMENTAL,COMMAND,SUBCOMMANDER,SHIELD,WALL',
                 },
             },
             ChargeDelay = 0.5,
@@ -732,7 +754,7 @@ UnitBlueprint {
             TurretPitchSpeed = 90,
             TurretYaw = 0,
             TurretYawRange = 180,
-            TurretYawSpeed = 180,
+            TurretYawSpeed = 90,#180
             Turreted = true,
             UseFiringSolutionInsteadOfAimBone = true,
             WeaponCategory = 'Direct Fire',
@@ -750,7 +772,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 300,
+            Damage = 400,
             DamageRadius = 1.5,
             DamageType = 'Normal',
             DisplayName = 'Nanite Missile System',
@@ -789,7 +811,7 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 0.3,
-            TargetCheckInterval = 0.3,
+            TargetCheckInterval = 0.333,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'AIR MOBILE HIGHPRIAIR',
@@ -819,11 +841,13 @@ UnitBlueprint {
         {
             AboveWaterTargetsOnly = true,
             CollideFriendly = false,
-            Damage = 1000,
+            Damage = 100,#1000
             DamageFriendly = true,
             DamageRadius = 10,
             DamageType = 'Normal',
             DisplayName = 'Death Nuke',
+            DoTPulses = 15,#added
+            DoTTime = 5,#added
             FireOnDeath = true,
             FiringTolerance = 2,
             Label = 'DeathWeapon',
@@ -846,6 +870,20 @@ UnitBlueprint {
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
             WeaponCategory = 'Death',
+        },
+    },
+    Wreckage = {
+        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+        EnergyMult = 0,
+        HealthMult = 0.9,
+        MassMult = 0.9,
+        ReclaimTimeMultiplier = 1,
+        WreckageLayers = {
+            Air = false,
+            Land = true,
+            Seabed = false,
+            Sub = false,
+            Water = false,
         },
     },
 }

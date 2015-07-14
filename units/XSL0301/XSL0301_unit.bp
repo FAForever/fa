@@ -722,15 +722,15 @@ UnitBlueprint {
         MotionType = 'RULEUMT_Amphibious',
         StandUpright = true,
         TurnRadius = 10,
-        TurnRate = 150,
+        TurnRate = 90,
     },
     SelectionSizeX = 0.55,
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.7,
     SelectionYOffset = 0,
-    SizeX = 1,
+    SizeX = 1.2,
     SizeY = 2.2,
-    SizeZ = 1.1,
+    SizeZ = 1.2,
     StrategicIconName = 'icon_commander_generic',
     StrategicIconSortPriority = 1,
     Transport = {
@@ -812,7 +812,7 @@ UnitBlueprint {
             TurretPitchSpeed = 90,
             TurretYaw = 0,
             TurretYawRange = 360,
-            TurretYawSpeed = 180,
+            TurretYawSpeed = 90,
             Turreted = true,
             UseFiringSolutionInsteadOfAimBone = true,
             WeaponCategory = 'Direct Fire',
@@ -829,14 +829,14 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 12000,
+            Damage = 6000,#12000
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = 'Overcharge',
             DisplayName = 'Light Chronotron Overcharge Cannon',
             EnergyChargeForFirstShot = false,
-            EnergyDrainPerSecond = 5000,
-            EnergyRequired = 5000,
+            EnergyDrainPerSecond = 2500,#5000
+            EnergyRequired = 2500,#5000
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',
@@ -851,7 +851,7 @@ UnitBlueprint {
             MuzzleVelocity = 22,
             OverChargeWeapon = true,
             ProjectileId = '/projectiles/SDFLightChronatronCannon02/SDFLightChronatronCannon02_proj.bp',
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 2,#1.15
             RackBones = {
                 {
                     MuzzleBones = {
@@ -868,7 +868,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
-            RateOfFire = 0.2,
+            RateOfFire = 0.333,#0.2
             SlavedToBody = false,
             TargetCheckInterval = 0.16,
             TargetRestrictDisallow = 'UNTARGETABLE',
@@ -891,11 +891,13 @@ UnitBlueprint {
         {
             AboveWaterTargetsOnly = true,
             CollideFriendly = false,
-            Damage = 1000,
+            Damage = 100,#1000
             DamageFriendly = true,
             DamageRadius = 10,
             DamageType = 'Normal',
             DisplayName = 'Death Nuke',
+            DoTPulses = 15,#added
+            DoTTime = 5,#added
             FireOnDeath = true,
             FiringTolerance = 2,
             Label = 'DeathWeapon',
@@ -997,6 +999,20 @@ UnitBlueprint {
             MaxRadius = 1,
             RateOfFire = 1,
             WeaponCategory = 'Teleport',
+        },
+    },
+    Wreckage = {
+        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+        EnergyMult = 0,
+        HealthMult = 0.9,
+        MassMult = 0.9,
+        ReclaimTimeMultiplier = 1,
+        WreckageLayers = {
+            Air = false,
+            Land = true,
+            Seabed = false,
+            Sub = false,
+            Water = false,
         },
     },
 }
