@@ -30,8 +30,8 @@ UnitBlueprint {
         KTurn = 0.8,
         KTurnDamping = 1.2,
         LiftFactor = 7,
-        MaxAirspeed = 20,
-        MinAirspeed = 18,
+        MaxAirspeed = 18,#20
+        MinAirspeed = 16,#18
         PredictAheadForBombDrop = 3,
         StartTurnDistance = 15,
         TightTurnMultiplier = 0,
@@ -280,11 +280,11 @@ UnitBlueprint {
         TransportClass = 10,
     },
     Veteran = {
-        Level1 = 50,
-        Level2 = 100,
-        Level3 = 150,
-        Level4 = 200,
-        Level5 = 250,
+        Level1 = 100,
+        Level2 = 200,
+        Level3 = 300,
+        Level4 = 400,
+        Level5 = 500,
     },
     Weapon = {
         {
@@ -303,7 +303,7 @@ UnitBlueprint {
             Damage = 11000,
             DamageFriendly = true,
             DamageRadius = 20,
-            DamageType = 'Normal',
+            DamageType = 'OtheTacticalBomb',
             DisplayName = 'Othe Tactical Bomb',
             FireTargetLayerCapsTable = {
                 Air = 'Land|Water|Seabed',
