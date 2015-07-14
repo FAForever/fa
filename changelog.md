@@ -62,7 +62,7 @@ Other
 - Mini map now remembers whether to show resource icons or not
 - Current command mode no longer reset if an engineer dies in the current selection
 - Fixed bug with chat messages having wrong recipients in replay
-- Seraphim and Aeon T2 shields can now pause while upgrading to T3
+- Seraphim shields can now pause while upgrading to T3
 - Fixed RateOfFire buffs not being applied correctly
 - SCUs will no longer rebuild buildings they lack to ability to build
 - Upgraded buildings rebuilt by assisting SCUs will now cost the correct amount
