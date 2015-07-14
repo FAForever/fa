@@ -619,6 +619,16 @@ UnitBlueprint {
             SortCategory = 'SORTOTHER',
             UnitName = '<LOC ual0301_Rambo_name>SACU (Rambo preset)',
         },
+        RAS = {
+            BuildIconSortPriority = 10,
+            Description = '<LOC ual0301_RAS_desc>Support Armored Command Unit (RAS preset)',
+            Enhancements = {
+                'ResourceAllocation',
+            },
+            HelpText = '<LOC ual0301_RAS_help>Support Armored Command Unit. Enhanced during construction with a Resource Allocation System.',
+            SortCategory = 'SORTOTHER',
+            UnitName = '<LOC ual0301_RAS_name>SACU (RAS preset)',
+        },
         ShieldCombat = {
             BuildIconSortPriority = 30,
             Description = '<LOC ual0301_ShieldCombat_desc>Support Armored Command Unit (Shield Combatant preset)',
