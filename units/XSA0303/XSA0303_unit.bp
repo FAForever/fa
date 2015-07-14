@@ -284,8 +284,8 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Losaare AA Autocannon',
             FireTargetLayerCapsTable = {
-                Air = 'Air|Land',
-                Land = 'Air|Land',
+                Air = 'Air|Land|Water',
+                Land = 'Air|Land|Water',
             },
             FiringTolerance = 2, # 0
             Label = 'AutoCannon1',
