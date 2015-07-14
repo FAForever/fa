@@ -1,4 +1,4 @@
-#****************************************************************************
+﻿#****************************************************************************
 #**
 #**  File     :  /lua/sim/AdjacencyBuffs.lua
 #**
@@ -1687,7 +1687,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.0125,#-0.005
+            Add = -0.0075,#-0.005
             Mult = 1.0,
         },
     },
@@ -1796,7 +1796,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.15,#-0.075
+            Add = -0.0225,#-0.075
             Mult = 1.0,
         },
     },
