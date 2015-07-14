@@ -385,8 +385,6 @@ function UpdateWindow(info)
         elseif not controls.abilities:IsHidden() then
             controls.abilities:Hide()
         end
-
-        import(UIUtil.GetLayoutFilename('unitview')).PositionWindow()
     end
     if options.gui_scu_manager ~= 0 then
         controls.SCUType:Hide()
@@ -498,6 +496,23 @@ function CreateUI()
         controls.shieldText = UIUtil.CreateText(controls.bg, '', 13, UIUtil.bodyFont)
         controls.Buildrate = UIUtil.CreateText(controls.bg, '', 12, UIUtil.bodyFont)
     end
+    
+    controls.bg.OnFrame = function(self, delta)
+        local info = GetRolloverInfo()
+        if not info and selectedUnit then
+            info = GetUnitRolloverInfo(selectedUnit)
+        end
+
+        if info and import('/lua/ui/game/unitviewDetail.lua').View:IsHidden() then
+            UpdateWindow(info)
+            if self:GetAlpha() < 1 then
+                self:SetAlpha(1, true)
+            end
+            import(UIUtil.GetLayoutFilename('unitview')).PositionWindow()
+        elseif self:GetAlpha() > 0 then
+            self:SetAlpha(0, true)
+        end
+    end
 
     if options.gui_scu_manager ~= 0 then
         controls.SCUType = Bitmap(controls.bg)
@@ -505,46 +520,16 @@ function CreateUI()
         LayoutHelpers.AtBottomIn(controls.SCUType, controls.icon)
     end
 
-    controls.bg:Hide()
-end
-
-function UpdateUnitInfo()
-    local currentInfo = GetRolloverInfo() or (selectedUnit and GetUnitRolloverInfo(selectedUnit))
-
-    if currentInfo and table.getsize(currentInfo) > 0 and import('/lua/ui/game/unitviewDetail.lua').View:IsHidden() then
-        controls.bg:Show()
-        UpdateWindow(currentInfo)
-
-        if not updateThread then
-            updateThread = ForkThread(function()
-                while currentInfo do
-                    WaitSeconds(.1)
-                    UpdateUnitInfo()
-                end
-            end)
-        end
-    else
-        if updateThread and not selectedUnit then
-            KillThread(updateThread)
-            updateThread = nil
-        end
-
-        currentInfo = nil
-        controls.bg:Hide()
-    end
 end
 
 function OnSelection(units)
+    if options.gui_enhanced_unitview == 0 then
+        return
+    end
+    
     if units and table.getn(units) == 1 then
         selectedUnit = units[1]
     else
         selectedUnit = nil
     end
-
-    UpdateUnitInfo()
 end
-
-function OnRolloverUpdate(info)
-    UpdateUnitInfo()
-end
-
