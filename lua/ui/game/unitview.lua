@@ -509,14 +509,14 @@ function CreateUI()
             info = GetUnitRolloverInfo(selectedUnit)
         end
 
-        if info and import('/lua/ui/game/unitviewDetail.lua').View:IsHidden() then
+        if info and import('/lua/ui/game/unitviewDetail.lua').View.Hiding then
             UpdateWindow(info)
             if self:GetAlpha() < 1 then
-                self:SetAlpha(1, true)
+                self:SetAlpha(math.min(self:GetAlpha() + (delta*3), 1), true)
             end
             import(UIUtil.GetLayoutFilename('unitview')).PositionWindow()
         elseif self:GetAlpha() > 0 then
-            self:SetAlpha(0, true)
+            self:SetAlpha(math.max(self:GetAlpha() - (delta*3), 0), true)
         end
     end
 
