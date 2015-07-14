@@ -163,7 +163,7 @@ UnitBlueprint {
         BuildCostEnergy = 9600,
         BuildCostMass = 840,
         BuildRate = 3,
-        BuildTime = 3600,
+        BuildTime = 4500,#3600
         MaintenanceConsumptionPerSecondEnergy = 25,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
@@ -247,11 +247,11 @@ UnitBlueprint {
         TransportClass = 3,
     },
     Veteran = {
-        Level1 = 15,
-        Level2 = 30,
-        Level3 = 45,
-        Level4 = 60,
-        Level5 = 75,
+        Level1 = 18,
+        Level2 = 36,
+        Level3 = 54,
+        Level4 = 72,
+        Level5 = 90,
     },
     Weapon = {
         {
