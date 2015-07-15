@@ -33,6 +33,7 @@ ProjectileBlueprint {
         StrategicIconSize = 1,
     },
     DoNotCollideList = {
+        'PROJECTILE',
         'TORPEDO',
     },
     General = {
@@ -53,7 +54,7 @@ ProjectileBlueprint {
         MaxSpeed = 12,
         StayUnderwater = true,
         TrackTarget = false,
-        TurnRate = 230,
+        TurnRate = 360,#230
         UseGravity = false,
         VelocityAlign = true,
     },
