@@ -202,7 +202,7 @@ UnitBlueprint {
             CountedProjectile = true,
             Damage = 6000,
             DamageRadius = 2,
-            DamageType = 'Normal',
+            DamageType = 'TacticalMissile',
             DisplayName = 'Loa Tactical Missile',
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
