@@ -20,14 +20,20 @@ ProjectileBlueprint {
         'SERAPHIM',
         'PROJECTILE',
         'ANTINAVY',
-        'TORPEDO',
+#        'TORPEDO',
 		'NOSPLASHDAMAGE',
+    },
+    Defense = {
+        Health = 1,
     },
     Display = {
         ImpactEffects = {
             Type = 'Small01',
         },
         StrategicIconSize = 1,
+    },
+    DoNotCollideList = {
+        'TORPEDO',
     },
     General = {
         Category = 'Anti Navy',
