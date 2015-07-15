@@ -129,9 +129,9 @@ UnitBlueprint {
     },
     Economy = {
         BuildCostEnergy = 12000,
-        BuildCostMass = 400,
+        BuildCostMass = 1000,#400
         BuildTime = 750,
-        MaintenanceConsumptionPerSecondEnergy = 100,
+        MaintenanceConsumptionPerSecondEnergy = 250,#100
     },
     Footprint = {
         MinWaterDepth = 1.5,
