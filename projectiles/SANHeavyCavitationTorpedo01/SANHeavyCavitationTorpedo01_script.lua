@@ -21,6 +21,7 @@ SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo) {
 
 	OnEnterWater = function(self)
 		SHeavyCavitationTorpedo.OnEnterWater(self)
+                self:SetCollisionShape('Sphere', 0, 0, 0, 0.1)
 		local army = self:GetArmy()
 
 		for i in self.FxEnterWaterEmitter do #splash
@@ -43,7 +44,7 @@ SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo) {
     end,
     
 	ProjectileSplit = function(self)
-		WaitSeconds(1)
+		WaitSeconds(0.1)
 		local ChildProjectileBP = '/projectiles/SANHeavyCavitationTorpedo04/SANHeavyCavitationTorpedo04_proj.bp'  
 		local vx, vy, vz = self:GetVelocity()
 		local velocity = 10

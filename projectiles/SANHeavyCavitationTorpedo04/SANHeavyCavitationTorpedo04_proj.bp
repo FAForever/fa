@@ -33,6 +33,7 @@ ProjectileBlueprint {
         StrategicIconSize = 1,
     },
     DoNotCollideList = {
+        'PROJECTILE',
         'TORPEDO',
     },
     General = {
@@ -45,9 +46,9 @@ ProjectileBlueprint {
         HelpText = 0,
     },
     Physics = {
-        Acceleration = 0,
+        Acceleration = 2,
         DestroyOnWater = false,
-        InitialSpeed = 14,
+        InitialSpeed = 7,#14
         MaxSpeed = 14,
         StayUnderwater = true,
         TrackTarget = false,
