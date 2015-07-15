@@ -1,4 +1,4 @@
-#****************************************************************************
+﻿#****************************************************************************
 #**
 #**  File     :  /data/projectiles/SANHeavyCavitationTorpedo01/SANHeavyCavitationTorpedo01_script.lua
 #**  Author(s):  Gordon Duclos
@@ -31,7 +31,7 @@ SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo) {
 				
 		self:TrackTarget(true):StayUnderwater(true)
     	self:SetCollideSurface(false)
-		self:SetTurnRate(240)
+		self:SetTurnRate(360)
 		self:ForkThread(self.ProjectileSplit)
 	end,
 		
