@@ -532,7 +532,10 @@ FactoryUnit = Class(StructureUnit) {
         self.BuildingUnit = false
     end,
 
-    -- Added to add engymod logic
+    GetUnitBeingBuilt = function(self)
+        return self.UnitBeingBuilt
+    end,
+
     OnDestroy = function(self)
         -- Figure out if we're a research station
         if EntityCategoryContains(categories.RESEARCH, self) then
@@ -578,11 +581,11 @@ FactoryUnit = Class(StructureUnit) {
         if EntityCategoryContains(categories.RESEARCH, self) then
             local buildRestrictionVictims = aiBrain:GetListOfUnits(categories.FACTORY + categories.ENGINEER, false)
             for id, unit in buildRestrictionVictims do
-            unit:updateBuildRestrictions()
+                unit:updateBuildRestrictions()
+            end
         end
-    end
 
-    StructureUnit.OnStopBeingBuilt(self,builder,layer)
+        StructureUnit.OnStopBeingBuilt(self,builder,layer)
     end,
 
     ChangeBlinkingLights = function(self, state)
@@ -669,7 +672,7 @@ FactoryUnit = Class(StructureUnit) {
     DoStopBuild = function(self, unitBeingBuilt, order )
         StructureUnit.OnStopBuild(self, unitBeingBuilt, order )
 
-        if not self.FactoryBuildFailed then
+        if not self.FactoryBuildFailed and not self.Dead then
             if not EntityCategoryContains(categories.AIR, unitBeingBuilt) then
                 self:RollOffUnit()
             end
@@ -721,8 +724,7 @@ FactoryUnit = Class(StructureUnit) {
 
     RollOffUnit = function(self)
         local spin, x, y, z = self:CalculateRollOffPoint()
-        local units = { self.UnitBeingBuilt }
-        self.MoveCommand = IssueMove(units, Vector(x, y, z))
+        self.MoveCommand = IssueMove({self.UnitBeingBuilt}, Vector(x, y, z))
     end,
 
     CalculateRollOffPoint = function(self)
@@ -836,8 +838,13 @@ FactoryUnit = Class(StructureUnit) {
 
     OnKilled = function(self, instigator, type, overkillRatio)
         StructureUnit.OnKilled(self, instigator, type, overkillRatio)
-        if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() ~= 1 then
-            self.UnitBeingBuilt:Kill()
+
+        if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() < 1 then
+            if self.UnitBeingBuilt:GetFractionComplete() > 0.5 then
+                self.UnitBeingBuilt:Kill()
+            else
+                self.UnitBeingBuilt:Destroy()
+            end
         end
     end,
 }
@@ -1266,6 +1273,15 @@ SeaFactoryUnit = Class(FactoryUnit) {
 
     StopRocking = function(self)
     end,
+
+    -- Sinking causes problems with incomplete units, so we just delete the half-built unit in all
+    -- cases for naval factories.
+    OnKilled = function(self, instigator, type, overkillRatio)
+        StructureUnit.OnKilled(self, instigator, type, overkillRatio)
+        if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() < 1 then
+            self.UnitBeingBuilt:Destroy()
+        end
+    end,
 }
 
 
@@ -1612,13 +1628,14 @@ AirUnit = Class(MobileUnit) {
         end
     end,
 
-    -- ON KILLED: THIS FUNCTION PLAYS WHEN THE UNIT TAKES A MORTAL HIT.  IT PLAYS ALL THE DEFAULT DEATH EFFECT
-    -- IT ALSO SPAWNS THE WRECKAGE BASED UPON HOW MUCH IT WAS OVERKILLED. UNIT WILL SPIN OUT OF CONTROL TOWARDS
-    -- GROUND AND WHEN IT IMPACTS IT WILL DESTROY ITSELF
+    --- Called when the unit is killed, but before it falls out of the sky and blows up.
     OnKilled = function(self, instigator, type, overkillRatio)
         local bp = self:GetBlueprint()
-        -- UGH
-        if self:GetCurrentLayer() == 'Air' then
+
+        -- A completed, flying plane expects an OnImpact event due to air crash.
+        -- An incomplete unit in the factory still reports as being in layer "Air", so needs this
+        -- stupid check.
+        if self:GetCurrentLayer() == 'Air' and self:GetFractionComplete() == 1  then
             self.CreateUnitAirDestructionEffects( self, 1.0 )
             self:DestroyTopSpeedEffects()
             self:DestroyBeamExhaust()
