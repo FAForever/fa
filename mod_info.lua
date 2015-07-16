@@ -14,6 +14,7 @@ selectable = false
 exclusive = false
 ui_only = false
 conflicts = {}
+_faf_modname = 'balancetesting'
 mountpoints = {
     env = "/env",
     loc = '/loc',
