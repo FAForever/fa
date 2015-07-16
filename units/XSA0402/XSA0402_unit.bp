@@ -30,8 +30,8 @@ UnitBlueprint {
         KTurn = 0.8,
         KTurnDamping = 1.2,
         LiftFactor = 7,
-        MaxAirspeed = 18,#20
-        MinAirspeed = 16,#18
+        MaxAirspeed = 19,
+        MinAirspeed = 17,
         PredictAheadForBombDrop = 3,
         StartTurnDistance = 15,
         TightTurnMultiplier = 0,
@@ -336,8 +336,8 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 0.1,
-	    RenderFireClock = true, # added
+            RateOfFire = 0.0714,
+	    RenderFireClock = true,
             TargetCheckInterval = 3,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
