@@ -201,7 +201,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 1320,
         BuildCostMass = 220,
-        BuildTime = 1050,#880
+        BuildTime = 1050,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -265,6 +265,7 @@ UnitBlueprint {
         TurnFacingRate = 120,
         TurnRadius = 0,
         TurnRate = 90,
+        WaterSpeedMultiplier = 0.928,
         WobbleFactor = 0.05,
         WobbleSpeed = 0.001,
     },
@@ -368,9 +369,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, #from false
-            Sub = true, #from false
-            Water = true, #from false
+            Seabed = true,
+            Sub = true,
+            Water = true,
         },
     },
 }
