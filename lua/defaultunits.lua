@@ -1862,9 +1862,11 @@ SlowHoverLandUnit = Class(HoverLandUnit) {
         -- Slow these units down when they transition from land to water
         -- The mult is applied twice thanks to an engine bug, so careful when adjusting it
         -- Newspeed = oldspeed * mult * mult
-        if old == 'Land' and new == 'Water' then
-            self:SetSpeedMult(0.928)
-        elseif old == 'Water' and new == 'Land' then
+        
+        local mult = self:GetBlueprint().Physics.WaterSpeedMultiplier
+        if new == 'Water' then
+            self:SetSpeedMult(mult)
+        else
             self:SetSpeedMult(1)
         end
     end,
