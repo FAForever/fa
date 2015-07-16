@@ -863,7 +863,8 @@ KamikazeWeapon = Class(Weapon) {
     OnFire = function(self)
         local myBlueprint = self:GetBlueprint()
         DamageArea(self.unit, self.unit:GetPosition(), myBlueprint.DamageRadius, myBlueprint.Damage, myBlueprint.DamageType or 'Normal', myBlueprint.DamageFriendly or false)
-        self.unit:Kill()
+        self.unit:PlayUnitSound('Destroyed')
+        self.unit:Destroy()
     end,
 }
 
