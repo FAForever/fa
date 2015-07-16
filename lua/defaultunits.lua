@@ -1856,6 +1856,20 @@ AircraftCarrier = Class(SeaUnit, BaseTransport) {
 HoverLandUnit = Class(MobileUnit) {
 }
 
+SlowHoverLandUnit = Class(HoverLandUnit) {
+    OnLayerChange = function(self, new, old)
+        HoverLandUnit.OnLayerChange(self, new, old)
+        -- Slow these units down when they transition from land to water
+        -- The mult is applied twice thanks to an engine bug, so careful when adjusting it
+        -- Newspeed = oldspeed * mult * mult
+        if old == 'Land' and new == 'Water' then
+            self:SetSpeedMult(0.928)
+        elseif old == 'Water' and new == 'Land' then
+            self:SetSpeedMult(1)
+        end
+    end,
+}
+
 --- Base class for command units.
 CommandUnit = Class(WalkingLandUnit) {
     DeathThreadDestructionWaitTime = 2,
