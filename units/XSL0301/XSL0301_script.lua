@@ -1,18 +1,13 @@
-﻿-- ****************************************************************************
--- **
--- **  File     :  /cdimage/units/XSL0301/XSL0301_script.lua
--- **  Author(s):  Jessica St. Croix, Gordon Duclos
--- **
--- **  Summary  :  Seraphim Sub Commander Script
--- **
--- **  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
--- ****************************************************************************
-
+﻿-----------------------------------------------------------------
+-- File     :  /cdimage/units/XSL0301/XSL0301_script.lua
+-- Author(s):  Jessica St. Croix, Gordon Duclos
+-- Summary  :  Seraphim Sub Commander Script
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
 local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
 local AWeapons = import('/lua/aeonweapons.lua')
 local SWeapons = import('/lua/seraphimweapons.lua')
 local Buff = import('/lua/sim/Buff.lua')
-
 local SDFLightChronotronCannonWeapon = SWeapons.SDFLightChronotronCannonWeapon
 local SDFOverChargeWeapon = SWeapons.SDFLightChronotronCannonOverchargeWeapon
 local SIFLaanseTacticalMissileLauncher = SWeapons.SIFLaanseTacticalMissileLauncher
@@ -39,7 +34,6 @@ XSL0301 = Class(CommandUnit) {
     OnCreate = function(self)
         CommandUnit.OnCreate(self)
         self:SetCapturable(false)
-        -- self:HideBone('Turbine', true)
         self:HideBone('Back_Upgrade', true)
         self:SetupBuildBones()
     end,

@@ -486,7 +486,7 @@ UnitBlueprint {
             PersonalShield = true,
             RegenAssistMult = 10,
             ShieldEnergyDrainRechargeTime = 5,
-            ShieldMaxHealth = 26000,#32000
+            ShieldMaxHealth = 26000,
             ShieldRechargeTime = 170,
             ShieldRegenRate = 50,
             ShieldRegenStartTime = 1,
@@ -722,7 +722,7 @@ UnitBlueprint {
         MotionType = 'RULEUMT_Amphibious',
         StandUpright = true,
         TurnRadius = 10,
-        TurnRate = 90,#150
+        TurnRate = 90,
     },
     SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = -0.1,
@@ -765,7 +765,7 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Heavy Plasma Cannon',
             FireTargetLayerCapsTable = {
-                Land = 'Land|Water|Seabed',                    --Seabed fire caps removed (IceDreamer)
+                Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
             FiringTolerance = 2,
@@ -813,7 +813,7 @@ UnitBlueprint {
             TurretPitchSpeed = 90,
             TurretYaw = 0,
             TurretYawRange = 180,
-            TurretYawSpeed = 90,#180
+            TurretYawSpeed = 90,
             Turreted = true,
             UseFiringSolutionInsteadOfAimBone = true,
             WeaponCategory = 'Direct Fire',

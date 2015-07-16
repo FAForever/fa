@@ -58,7 +58,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWQUEUE',
         'SORTCONSTRUCTION',
-	'RESEARCH',
+    'RESEARCH',
     },
     CollisionOffsetY = 0,
     Defense = {
@@ -157,8 +157,8 @@ UnitBlueprint {
         BuildCostEnergy = 39900,
         BuildCostMass = 4440,
         BuildRate = 90,
-        BuildTime = 11000,#9400
-	DifferentialUpgradeCostCalculation = true, 
+        BuildTime = 11000,
+    DifferentialUpgradeCostCalculation = true, 
         RebuildBonusIds = {
             'xsb0301',
         },
@@ -237,127 +237,127 @@ UnitBlueprint {
         MotionType = 'RULEUMT_None',
         RaisedPlatforms = {
 
-            # Platform 1
-            # TopLeft Offset From Center
-            # x
+            -- Platform 1
+            -- TopLeft Offset From Center
+            -- x
             -1.1,
 
-            # z
+            -- z
             -0.7,
 
-            # y
+            -- y
             0.65,
 
-            # TopRight Offset From Center
-            # x
+            -- TopRight Offset From Center
+            -- x
             1.1,
 
-            # z
+            -- z
             -0.7,
 
-            # y
+            -- y
             0.65,
 
-            # BottomLeft Offset From Center
-            # x
+            -- BottomLeft Offset From Center
+            -- x
             -1.1,
 
-            # z
+            -- z
             0.6,
 
-            # y
+            -- y
             0.65,
 
-            # BottomRight Offset From Center
-            # x
+            -- BottomRight Offset From Center
+            -- x
             1.1,
 
-            # z
+            -- z
             0.6,
 
-            # y
+            -- y
             0.65,
 
-            # Platform 2
-            # TopLeft Offset From Center
-            # x
+            -- Platform 2
+            -- TopLeft Offset From Center
+            -- x
             -2,
 
-            # z
+            -- z
             -0.47,
 
-            # y
+            -- y
             0,
 
-            # TopRight Offset From Center
-            # x
+            -- TopRight Offset From Center
+            -- x
             -1.1,
 
-            # z
+            -- z
             -0.7,
 
-            # y
+            -- y
             0.65,
 
-            # BottomLeft Offset From Center
-            # x
+            -- BottomLeft Offset From Center
+            -- x
             -2,
 
-            # z
+            -- z
             0.5,
 
-            # y
+            -- y
             0,
 
-            # BottomRight Offset From Center
-            # x
+            -- BottomRight Offset From Center
+            -- x
             -1.1,
 
-            # z
+            -- z
             0.6,
 
-            # y
+            -- y
             0.65,
 
-            # Platform 3
-            # TopLeft Offset From Center
-            # x
+            -- Platform 3
+            -- TopLeft Offset From Center
+            -- x
             1.1,
 
-            # z
+            -- z
             -0.7,
 
-            # y
+            -- y
             0.65,
 
-            # TopRight Offset From Center
-            # x
+            -- TopRight Offset From Center
+            -- x
             2,
 
-            # z
+            -- z
             -0.47,
 
-            # y
+            -- y
             0,
 
-            # BottomLeft Offset From Center
-            # x
+            -- BottomLeft Offset From Center
+            -- x
             1.1,
 
-            # z
+            -- z
             0.6,
 
-            # y
+            -- y
             0.65,
 
-            # BottomRight Offset From Center
-            # x
+            -- BottomRight Offset From Center
+            -- x
             2,
 
-            # z
+            -- z
             0.5,
 
-            # y
+            -- y
             0,
         },
         RollOffPoints = {

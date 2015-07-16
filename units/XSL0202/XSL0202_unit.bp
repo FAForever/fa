@@ -142,7 +142,7 @@ UnitBlueprint {
         },
         TransportDropAnimation = {
             {
-                Animation = '[...]XSL0202_aunfold.sca', # /units/XSL0202/XSL0202_aunfold.sca   [146]
+                Animation = '[...]XSL0202_aunfold.sca',
                 Weight = 100,
             },
         },
@@ -223,13 +223,13 @@ UnitBlueprint {
     SizeX = 1,
     SizeY = 1.1,
     SizeZ = 0.9,
-    StrategicIconName = 'icon_bot2_directfire', # used wrong icon [138]
+    StrategicIconName = 'icon_bot2_directfire',
     StrategicIconSortPriority = 125,
     Transport = {
         TransportClass = 2,
     },
     Veteran = {
-        Level1 = 10, #9/18, etc
+        Level1 = 10,
         Level2 = 20,
         Level3 = 30,
         Level4 = 40,
@@ -311,7 +311,7 @@ UnitBlueprint {
             TurretPitchSpeed = 60,
             TurretYaw = 0,
             TurretYawRange = 180,
-            TurretYawSpeed = 90,#180
+            TurretYawSpeed = 90,
             Turreted = true,
             WeaponCategory = 'Direct Fire',
             WeaponRepackTimeout = 0,

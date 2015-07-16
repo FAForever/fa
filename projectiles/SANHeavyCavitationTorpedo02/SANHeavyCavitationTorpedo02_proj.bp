@@ -20,8 +20,7 @@ ProjectileBlueprint {
         'SERAPHIM',
         'PROJECTILE',
         'ANTINAVY',
-#        'TORPEDO',
-	'NOSPLASHDAMAGE',
+        'NOSPLASHDAMAGE',
     },
     Defense = {
         Health = 1,
@@ -52,7 +51,7 @@ ProjectileBlueprint {
         MaxSpeed = 18,
         StayUnderwater = true,
         TrackTarget = true,
-        TurnRate = 360,#230
+        TurnRate = 360,
         UseGravity = false,
         VelocityAlign = true,
     },

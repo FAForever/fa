@@ -1,16 +1,10 @@
-﻿#****************************************************************************
-#**
-#**  File     :  /lua/sim/AdjacencyBuffs.lua
-#**
-#**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
-
+﻿-----------------------------------------------------------------
+-- File     :  /lua/sim/AdjacencyBuffs.lua
+-- Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
 local AdjBuffFuncs = import('/lua/sim/AdjacencyBuffFunctions.lua')
 
-##################################################################
-## TIER 1 POWER GEN BUFF TABLE
-##################################################################
-
+-- TIER 1 POWER GEN BUFF TABLE
 T1PowerGeneratorAdjacencyBuffs = {
     'T1PowerEnergyBuildBonusSize4',
     'T1PowerEnergyBuildBonusSize8',
@@ -34,10 +28,7 @@ T1PowerGeneratorAdjacencyBuffs = {
     'T1PowerRateOfFireBonusSize20',
 }
 
-##################################################################
-## ENERGY BUILD BONUS - TIER 1 POWER GENS
-##################################################################
-
+-- ENERGY BUILD BONUS - TIER 1 POWER GENS
 BuffBlueprint {
     Name = 'T1PowerEnergyBuildBonusSize4',
     DisplayName = 'T1PowerEnergyBuildBonus',
@@ -128,10 +119,7 @@ BuffBlueprint {
     },
 }
 
-##################################################################
-## ENERGY MAINTENANCE BONUS - TIER 1 POWER GENS
-##################################################################
-
+-- ENERGY MAINTENANCE BONUS - TIER 1 POWER GENS
 BuffBlueprint {
     Name = 'T1PowerEnergyMaintenanceBonusSize4',
     DisplayName = 'T1PowerEnergyMaintenanceBonus',
@@ -222,10 +210,7 @@ BuffBlueprint {
     },
 }
 
-##################################################################
-## ENERGY WEAPON BONUS - TIER 1 POWER GENS
-##################################################################
-
+-- ENERGY WEAPON BONUS - TIER 1 POWER GENS
 BuffBlueprint {
     Name = 'T1PowerEnergyWeaponBonusSize4',
     DisplayName = 'T1PowerEnergyWeaponBonus',
@@ -316,10 +301,7 @@ BuffBlueprint {
     },
 }
 
-##################################################################
-## RATE OF FIRE WEAPON BONUS - TIER 1 POWER GENS
-##################################################################
-
+-- RATE OF FIRE WEAPON BONUS - TIER 1 POWER GENS
 BuffBlueprint {
     Name = 'T1PowerRateOfFireBonusSize4',
     DisplayName = 'T1PowerRateOfFireBonus',
@@ -332,7 +314,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.RateOfFireBuffRemove,
     Affects = {
         RateOfFire = {
-            Add = -0.04,#-0.025
+            Add = -0.04,
             Mult = 1.0,
         },
     },
@@ -410,14 +392,7 @@ BuffBlueprint {
     },
 }
 
-
-
-
-
-##################################################################
-## HYDROCARBON POWER GEN BUFF TABLE
-##################################################################
-
+-- HYDROCARBON POWER GEN BUFF TABLE
 HydrocarbonAdjacencyBuffs = {
     'T2PowerEnergyBuildBonusSize4',
     'T2PowerEnergyBuildBonusSize8',
@@ -441,11 +416,7 @@ HydrocarbonAdjacencyBuffs = {
     'T2PowerRateOfFireBonusSize20',
 }
 
-
-##################################################################
-## TIER 2 POWER GEN BUFF TABLE
-##################################################################
-
+-- TIER 2 POWER GEN BUFF TABLE
 T2PowerGeneratorAdjacencyBuffs = {
     'T2PowerEnergyBuildBonusSize4',
     'T2PowerEnergyBuildBonusSize8',
@@ -469,11 +440,7 @@ T2PowerGeneratorAdjacencyBuffs = {
     'T2PowerRateOfFireBonusSize20',
 }
 
-
-##################################################################
-## ENERGY BUILD BONUS - TIER 2 POWER GENS
-##################################################################
-
+-- ENERGY BUILD BONUS - TIER 2 POWER GENS
 BuffBlueprint {
     Name = 'T2PowerEnergyBuildBonusSize4',
     DisplayName = 'T2PowerEnergyBuildBonus',
@@ -564,10 +531,7 @@ BuffBlueprint {
     },
 }
 
-##################################################################
-## ENERGY MAINTENANCE BONUS - TIER 2 POWER GENS
-##################################################################
-
+-- ENERGY MAINTENANCE BONUS - TIER 2 POWER GENS
 BuffBlueprint {
     Name = 'T2PowerEnergyMaintenanceBonusSize4',
     DisplayName = 'T2PowerEnergyMaintenanceBonus',
@@ -658,10 +622,7 @@ BuffBlueprint {
     },
 }
 
-##################################################################
-## ENERGY WEAPON BONUS - TIER 2 POWER GENS
-##################################################################
-
+-- ENERGY WEAPON BONUS - TIER 2 POWER GENS
 BuffBlueprint {
     Name = 'T2PowerEnergyWeaponBonusSize4',
     DisplayName = 'T2PowerEnergyWeaponBonus',
@@ -752,10 +713,7 @@ BuffBlueprint {
     },
 }
 
-##################################################################
-## RATE OF FIRE WEAPON BONUS - TIER 2 POWER GENS
-##################################################################
-
+-- RATE OF FIRE WEAPON BONUS - TIER 2 POWER GENS
 BuffBlueprint {
     Name = 'T2PowerRateOfFireBonusSize4',
     DisplayName = 'T2PowerRateOfFireBonus',
@@ -768,7 +726,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.RateOfFireBuffRemove,
     Affects = {
         RateOfFire = {
-            Add = -0.0625,#-0.05
+            Add = -0.0625,
             Mult = 1.0,
         },
     },
@@ -786,7 +744,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.RateOfFireBuffRemove,
     Affects = {
         RateOfFire = {
-            Add = -0.0625,#-0.05
+            Add = -0.0625,
             Mult = 1.0,
         },
     },
@@ -804,7 +762,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.RateOfFireBuffRemove,
     Affects = {
         RateOfFire = {
-            Add = -0.0625,#-0.05
+            Add = -0.0625,
             Mult = 1.0,
         },
     },
@@ -822,7 +780,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.RateOfFireBuffRemove,
     Affects = {
         RateOfFire = {
-            Add = -0.0625,#-0.05
+            Add = -0.0625,
             Mult = 1.0,
         },
     },
@@ -840,20 +798,13 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.RateOfFireBuffRemove,
     Affects = {
         RateOfFire = {
-            Add = -0.0625,#-0.05
+            Add = -0.0625,
             Mult = 1.0,
         },
     },
 }
 
-
-
-
-
-##################################################################
-## TIER 3 POWER GEN BUFF TABLE
-##################################################################
-
+-- TIER 3 POWER GEN BUFF TABLE
 T3PowerGeneratorAdjacencyBuffs = {
     'T3PowerEnergyBuildBonusSize4',
     'T3PowerEnergyBuildBonusSize8',
@@ -877,11 +828,7 @@ T3PowerGeneratorAdjacencyBuffs = {
     'T3PowerRateOfFireBonusSize20',
 }
 
-
-##################################################################
-## ENERGY BUILD BONUS - TIER 3 POWER GENS
-##################################################################
-
+-- ENERGY BUILD BONUS - TIER 3 POWER GENS
 BuffBlueprint {
     Name = 'T3PowerEnergyBuildBonusSize4',
     DisplayName = 'T3PowerEnergyBuildBonus',
@@ -972,10 +919,7 @@ BuffBlueprint {
     },
 }
 
-##################################################################
-## ENERGY MAINTENANCE BONUS - TIER 3 POWER GENS
-##################################################################
-
+-- ENERGY MAINTENANCE BONUS - TIER 3 POWER GENS
 BuffBlueprint {
     Name = 'T3PowerEnergyMaintenanceBonusSize4',
     DisplayName = 'T3PowerEnergyMaintenanceBonus',
@@ -1066,10 +1010,7 @@ BuffBlueprint {
     },
 }
 
-##################################################################
-## ENERGY WEAPON BONUS - TIER 3 POWER GENS
-##################################################################
-
+-- ENERGY WEAPON BONUS - TIER 3 POWER GENS
 BuffBlueprint {
     Name = 'T3PowerEnergyWeaponBonusSize4',
     DisplayName = 'T3PowerEnergyWeaponBonus',
@@ -1160,10 +1101,7 @@ BuffBlueprint {
     },
 }
 
-##################################################################
-## RATE OF FIRE WEAPON BONUS - TIER 3 POWER GENS
-##################################################################
-
+-- RATE OF FIRE WEAPON BONUS - TIER 3 POWER GENS
 BuffBlueprint {
     Name = 'T3PowerRateOfFireBonusSize4',
     DisplayName = 'T3PowerRateOfFireBonus',
@@ -1176,7 +1114,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.RateOfFireBuffRemove,
     Affects = {
         RateOfFire = {
-            Add = -0.1,#-0.075
+            Add = -0.1,
             Mult = 1.0,
         },
     },
@@ -1194,7 +1132,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.RateOfFireBuffRemove,
     Affects = {
         RateOfFire = {
-            Add = -0.1,#-0.075
+            Add = -0.1,
             Mult = 1.0,
         },
     },
@@ -1212,7 +1150,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.RateOfFireBuffRemove,
     Affects = {
         RateOfFire = {
-            Add = -0.1,#-0.075
+            Add = -0.1,
             Mult = 1.0,
         },
     },
@@ -1230,7 +1168,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.RateOfFireBuffRemove,
     Affects = {
         RateOfFire = {
-            Add = -0.1,#-0.075
+            Add = -0.1,
             Mult = 1.0,
         },
     },
@@ -1248,19 +1186,13 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.RateOfFireBuffRemove,
     Affects = {
         RateOfFire = {
-            Add = -0.1,#-0.075
+            Add = -0.1,
             Mult = 1.0,
         },
     },
 }
 
-
-
-
-##################################################################
-## TIER 1 MASS EXTRACTOR BUFF TABLE
-##################################################################
-
+-- TIER 1 MASS EXTRACTOR BUFF TABLE
 T1MassExtractorAdjacencyBuffs = {
     'T1MEXMassBuildBonusSize4',
     'T1MEXMassBuildBonusSize8',
@@ -1269,10 +1201,7 @@ T1MassExtractorAdjacencyBuffs = {
     'T1MEXMassBuildBonusSize20',
 }
 
-##################################################################
-## MASS BUILD BONUS - TIER 1 MASS EXTRACTOR
-##################################################################
-
+-- MASS BUILD BONUS - TIER 1 MASS EXTRACTOR
 BuffBlueprint {
     Name = 'T1MEXMassBuildBonusSize4',
     DisplayName = 'T1MEXMassBuildBonus',
@@ -1339,7 +1268,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.075, #-0.025
+            Add = -0.075,
             Mult = 1.0,
         },
     },
@@ -1357,20 +1286,13 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.075, #-0.02
+            Add = -0.075,
             Mult = 1.0,
         },
     },
 }
 
-
-
-
-
-##################################################################
-## TIER 2 MASS EXTRACTOR BUFF TABLE
-##################################################################
-
+-- TIER 2 MASS EXTRACTOR BUFF TABLE
 T2MassExtractorAdjacencyBuffs = {
     'T2MEXMassBuildBonusSize4',
     'T2MEXMassBuildBonusSize8',
@@ -1379,10 +1301,7 @@ T2MassExtractorAdjacencyBuffs = {
     'T2MEXMassBuildBonusSize20',
 }
 
-##################################################################
-## MASS BUILD BONUS - TIER 2 MASS EXTRACTOR
-##################################################################
-
+-- MASS BUILD BONUS - TIER 2 MASS EXTRACTOR
 BuffBlueprint {
     Name = 'T2MEXMassBuildBonusSize4',
     DisplayName = 'T2MEXMassBuildBonus',
@@ -1449,7 +1368,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.1,#-0.0375
+            Add = -0.1,
             Mult = 1.0,
         },
     },
@@ -1467,20 +1386,13 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.1,#-0.03
+            Add = -0.1,
             Mult = 1.0,
         },
     },
 }
 
-
-
-
-
-##################################################################
-## TIER 3 MASS EXTRACTOR BUFF TABLE
-##################################################################
-
+-- TIER 3 MASS EXTRACTOR BUFF TABLE
 T3MassExtractorAdjacencyBuffs = {
     'T3MEXMassBuildBonusSize4',
     'T3MEXMassBuildBonusSize8',
@@ -1489,10 +1401,7 @@ T3MassExtractorAdjacencyBuffs = {
     'T3MEXMassBuildBonusSize20',
 }
 
-##################################################################
-## MASS BUILD BONUS - TIER 3 MASS EXTRACTOR
-##################################################################
-
+-- MASS BUILD BONUS - TIER 3 MASS EXTRACTOR
 BuffBlueprint {
     Name = 'T3MEXMassBuildBonusSize4',
     DisplayName = 'T3MEXMassBuildBonus',
@@ -1559,7 +1468,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.125, #-0.05
+            Add = -0.125,
             Mult = 1.0,
         },
     },
@@ -1577,20 +1486,13 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.125,#-0.04
+            Add = -0.125,
             Mult = 1.0,
         },
     },
 }
 
-
-
-
-
-##################################################################
-## TIER 1 MASS FABRICATOR BUFF TABLE
-##################################################################
-
+-- TIER 1 MASS FABRICATOR BUFF TABLE
 T1MassFabricatorAdjacencyBuffs = {
     'T1FabricatorMassBuildBonusSize4',
     'T1FabricatorMassBuildBonusSize8',
@@ -1599,10 +1501,7 @@ T1MassFabricatorAdjacencyBuffs = {
     'T1FabricatorMassBuildBonusSize20',
 }
 
-##################################################################
-## MASS BUILD BONUS - TIER 1 MASS FABRICATOR
-##################################################################
-
+-- MASS BUILD BONUS - TIER 1 MASS FABRICATOR
 BuffBlueprint {
     Name = 'T1FabricatorMassBuildBonusSize4',
     DisplayName = 'T1FabricatorMassBuildBonus',
@@ -1669,7 +1568,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.0125 ,#-0.00625
+            Add = -0.0125,
             Mult = 1.0,
         },
     },
@@ -1687,19 +1586,13 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.0075,#-0.005
+            Add = -0.0075,
             Mult = 1.0,
         },
     },
 }
 
-
-
-
-##################################################################
-## TIER 3 MASS FABRICATOR BUFF TABLE
-##################################################################
-
+-- TIER 3 MASS FABRICATOR BUFF TABLE
 T3MassFabricatorAdjacencyBuffs = {
     'T3FabricatorMassBuildBonusSize4',
     'T3FabricatorMassBuildBonusSize8',
@@ -1708,10 +1601,7 @@ T3MassFabricatorAdjacencyBuffs = {
     'T3FabricatorMassBuildBonusSize20',
 }
 
-##################################################################
-## MASS BUILD BONUS - TIER 3 MASS FABRICATOR
-##################################################################
-
+-- MASS BUILD BONUS - TIER 3 MASS FABRICATOR
 BuffBlueprint {
     Name = 'T3FabricatorMassBuildBonusSize4',
     DisplayName = 'T3FabricatorMassBuildBonus',
@@ -1778,7 +1668,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.2,#-0.075
+            Add = -0.2,
             Mult = 1.0,
         },
     },
@@ -1796,19 +1686,13 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.MassBuildBuffRemove,
     Affects = {
         MassActive = {
-            Add = -0.0225,#-0.075
+            Add = -0.0225,
             Mult = 1.0,
         },
     },
 }
 
-
-
-
-##################################################################
-## TIER 1 ENERGY STORAGE
-##################################################################
-
+-- TIER 1 ENERGY STORAGE
 T1EnergyStorageAdjacencyBuffs = {
     'T1EnergyStorageEnergyProductionBonusSize4',
     'T1EnergyStorageEnergyProductionBonusSize8',
@@ -1817,10 +1701,7 @@ T1EnergyStorageAdjacencyBuffs = {
     'T1EnergyStorageEnergyProductionBonusSize20',
 }
 
-##################################################################
-## ENERGY PRODUCTION BONUS - TIER 1 ENERGY STORAGE
-##################################################################
-
+-- ENERGY PRODUCTION BONUS - TIER 1 ENERGY STORAGE#
 BuffBlueprint {
     Name = 'T1EnergyStorageEnergyProductionBonusSize4',
     DisplayName = 'T1EnergyStorageEnergyProductionBonus',
@@ -1911,13 +1792,7 @@ BuffBlueprint {
     },
 }
 
-
-
-
-##################################################################
-## TIER 1 MASS STORAGE
-##################################################################
-
+-- TIER 1 MASS STORAGE
 T1MassStorageAdjacencyBuffs = {
     'T1MassStorageMassProductionBonusSize4',
     'T1MassStorageMassProductionBonusSize8',
@@ -1926,10 +1801,7 @@ T1MassStorageAdjacencyBuffs = {
     'T1MassStorageMassProductionBonusSize20',
 }
 
-##################################################################
-## MASS PRODUCTION BONUS - TIER 1 MASS STORAGE
-##################################################################
-
+-- MASS PRODUCTION BONUS - TIER 1 MASS STORAGE
 BuffBlueprint {
     Name = 'T1MassStorageMassProductionBonusSize4',
     DisplayName = 'T1MassStorageMassProductionBonus',
@@ -2019,4 +1891,3 @@ BuffBlueprint {
         },
     },
 }
-

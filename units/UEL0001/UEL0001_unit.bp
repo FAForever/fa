@@ -171,8 +171,6 @@ UnitBlueprint {
             '<LOC ability_omni>Omni Sensor',
             '<LOC ability_deathaoe>Volatile',
         },
-
-        -- AnimationIdle = '/units/uel0001/uel0001_a002.sca',
         AnimationWalk = '/units/uel0001/uel0001_a001.sca',
         AnimationWalkRate = 1.7,
         AttackReticleSize = 55,
@@ -322,7 +320,7 @@ UnitBlueprint {
                 Weight = 100,
             },
         },
-        UniformScale = 0.105, -- if changed dont forget to update AvatarUEL0001 at /effects/Entities/UEFTeleport/AvatarUEL0001
+        UniformScale = 0.105, -- If changed don't forget to update AvatarUEL0001 at /effects/Entities/UEFTeleport/AvatarUEL0001
     },
     Economy = {
         -- If modifying Energy or Mass costs, modify Score component in aibrain.lua search battleResults
@@ -613,7 +611,7 @@ UnitBlueprint {
             ShieldRegenRate = 42,
             ShieldRegenStartTime = 1,
             ShieldSize = 16,
-            ShieldSpillOverDamageMod = 0, -- we will keep it at 0 to keep this upgrade efficient / special
+            ShieldSpillOverDamageMod = 0, -- We will keep it at 0 to keep this upgrade efficient / special
             ShieldVerticalOffset = -3,
             Slot = 'Back',
             UpgradeEffectBones = {
@@ -682,7 +680,7 @@ UnitBlueprint {
             Name = '<LOC enhancements_0053>Tech 3 Engineering Suite',
             NewBuildRate = 126,
             NewHealth = 6000,
-            NewRegenRate = 35, -- fixes lower regen rate with t3 suite. this is t2 regen + t3 regen [130]
+            NewRegenRate = 35,
             Prerequisite = 'AdvancedEngineering',
             Slot = 'LCH',
             UpgradeEffectBones = {
@@ -1079,7 +1077,7 @@ UnitBlueprint {
             CollideFriendly = false,
             CountedProjectile = true,
             Damage = 6000,
-            DamageFriendly = false,#true
+            DamageFriendly = false,
             DamageRadius = 2,
             DamageType = 'Normal',
             DisplayName = 'Tactical Warhead',
