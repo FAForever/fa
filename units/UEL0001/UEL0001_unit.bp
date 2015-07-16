@@ -1079,7 +1079,7 @@ UnitBlueprint {
             CollideFriendly = false,
             CountedProjectile = true,
             Damage = 6000,
-            DamageFriendly = false,#true
+            DamageFriendly = true,
             DamageRadius = 2,
             DamageType = 'Normal',
             DisplayName = 'Tactical Warhead',
@@ -1096,11 +1096,11 @@ UnitBlueprint {
             ManualFire = true,
             MaxProjectileStorage = 1,
             MaxRadius = 256,
-            MinRadius = 5,
+            MinRadius = 15,
             MuzzleChargeDelay = 0,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 10,
+            MuzzleVelocity = 7,
             ProjectileId = '/projectiles/TIFMissileCruiseCDR/TIFMissileCruiseCDR_proj.bp',
             ProjectileLifetime = 80,
             RackBones = {
