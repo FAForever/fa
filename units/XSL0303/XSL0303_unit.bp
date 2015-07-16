@@ -243,9 +243,9 @@ UnitBlueprint {
             LAYER_Water = false,
         },
         DragCoefficient = 0.2,
-        MaxAcceleration = 2.7,#2.5
-        MaxBrake = 2.7,#2.5
-        MaxSpeed = 2.7,#2.5
+        MaxAcceleration = 2.7,
+        MaxBrake = 2.7,
+        MaxSpeed = 2.7,
         MaxSpeedReverse = 0,
         MaxSteerForce = 10,
         MeshExtentsX = 1,
@@ -255,9 +255,9 @@ UnitBlueprint {
         MotionType = 'RULEUMT_Amphibious',
         RotateOnSpot = true,
         RotateOnSpotThreshold = 0.1,
-        StandUpright = false, # bug fix for tank not following contours of terrain [139]
+        StandUpright = false,
         TurnRadius = 0,
-        TurnRate = 90,#75
+        TurnRate = 90,
     },
     SelectionSizeX = 0.7,
     SelectionSizeZ = 1.4,
@@ -567,9 +567,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, #from false
-            Sub = true, #from false
-            Water = true, #from false
+            Seabed = true,
+            Sub = true,
+            Water = true,
         },
     },
 }

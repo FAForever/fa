@@ -639,7 +639,7 @@ UnitBlueprint {
         MotionType = 'RULEUMT_Amphibious',
         StandUpright = true,
         TurnRadius = 10,
-        TurnRate = 90,#150
+        TurnRate = 90,
     },
     SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = -0.1,
@@ -716,7 +716,7 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Disintegrator Pulse Laser',
             FireTargetLayerCapsTable = {
-                Land = 'Land|Water|Seabed',                            --Seabed fire caps removed (IceDreamer)
+                Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
             FiringTolerance = 2,
@@ -764,7 +764,7 @@ UnitBlueprint {
             TurretPitchSpeed = 90,
             TurretYaw = 0,
             TurretYawRange = 180,
-            TurretYawSpeed = 90,#180
+            TurretYawSpeed = 90,
             Turreted = true,
             UseFiringSolutionInsteadOfAimBone = true,
             WeaponCategory = 'Direct Fire',

@@ -1,12 +1,9 @@
-﻿--****************************************************************************
---**
---**  File     :  /cdimage/units/UAL0301/UAL0301_script.lua
---**  Author(s):  Jessica St. Croix
---**
---**  Summary  :  Aeon Sub Commander Script
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+﻿-----------------------------------------------------------------
+-- File     :  /cdimage/units/UAL0301/UAL0301_script.lua
+-- Author(s):  Jessica St. Croix
+-- Summary  :  Aeon Sub Commander Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
 
 local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
 
@@ -52,12 +49,12 @@ UAL0301 = Class(CommandUnit) {
         CommandUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
         if not bp then return end
-        --Teleporter
+        -- Teleporter
         if enh == 'Teleporter' then
             self:AddCommandCap('RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
             self:RemoveCommandCap('RULEUCC_Teleport')
-        --Shields
+        -- Shields
         elseif enh == 'Shield' then
             self:AddToggleCap('RULEUTC_ShieldToggle')
             self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
@@ -73,7 +70,7 @@ UAL0301 = Class(CommandUnit) {
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
-        --ResourceAllocation
+        -- ResourceAllocation
         elseif enh =='ResourceAllocation' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
@@ -84,7 +81,7 @@ UAL0301 = Class(CommandUnit) {
             local bpEcon = self:GetBlueprint().Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
-        --Engineering Focus Module
+        -- Engineering Focus Module
         elseif enh =='EngineeringFocusingModule' then
             if not Buffs['AeonSCUBuildRate'] then
                 BuffBlueprint {
@@ -106,7 +103,7 @@ UAL0301 = Class(CommandUnit) {
             if Buff.HasBuff( self, 'AeonSCUBuildRate' ) then
                 Buff.RemoveBuff( self, 'AeonSCUBuildRate' )
             end
-        --SystemIntegrityCompensator
+        -- SystemIntegrityCompensator
         elseif enh == 'SystemIntegrityCompensator' then
             local name = 'AeonSCURegenRate'
             if not Buffs[name] then
@@ -129,12 +126,12 @@ UAL0301 = Class(CommandUnit) {
             if Buff.HasBuff( self, 'AeonSCURegenRate' ) then
                 Buff.RemoveBuff( self, 'AeonSCURegenRate' )
             end
-        --Sacrifice
+        -- Sacrifice
         elseif enh == 'Sacrifice' then
             self:AddCommandCap('RULEUCC_Sacrifice')
         elseif enh == 'SacrificeRemove' then
             self:RemoveCommandCap('RULEUCC_Sacrifice')
-        --StabilitySupressant
+        -- StabilitySupressant
         elseif enh =='StabilitySuppressant' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
             wep:AddDamageMod(bp.NewDamageMod or 0)
