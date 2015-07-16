@@ -1,3 +1,17 @@
+Patch 3643 Unreleased
+=====================
+
+Bugs
+----
+
+- [ ] Issue with half built units from naval factories fixed
+
+Lobby
+-----
+
+- [ ] The mod manager can now blacklist incompatible mods
+
+
 Patch 3642 (July 13, 2015)
 ==========================
 
