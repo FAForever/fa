@@ -326,6 +326,7 @@ UnitBlueprint {
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
             AimsStraightOnDisable = true,
+            AlwaysRecheckTarget = false,
             Audio = {
                 BeamLoop = Sound {
                     Bank = 'URLWeapon',
@@ -388,7 +389,7 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 10,
-            TargetCheckInterval = 0.1,
+            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'EXPERIMENTAL',
