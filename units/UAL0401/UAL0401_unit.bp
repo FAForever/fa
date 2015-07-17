@@ -272,6 +272,7 @@ UnitBlueprint {
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
             AimsStraightOnDisable = true,
+            AlwaysRecheckTarget = false,
             Audio = {
                 BeamLoop = Sound {
                     Bank = 'UALWeapon',
@@ -296,11 +297,11 @@ UnitBlueprint {
             },
             AutoInitiateAttackCommand = false,
             BallisticArc = 'RULEUBA_None',
-            BeamCollisionDelay = 0,		#0.1
+            BeamCollisionDelay = 0,
             BeamLifetime = 0,
             CollideFriendly = false,
             ContinuousBeam = true,
-            Damage = 250,		#500
+            Damage = 250,
             DamageRadius = 0.5,
             DamageType = 'Normal',
             DisplayName = 'Phason Laser',
@@ -312,7 +313,7 @@ UnitBlueprint {
                 Seabed = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 0,	#2
+            FiringTolerance = 0,
             Label = 'EyeWeapon',
             MaxRadius = 40,
             MinRadius = 2,
@@ -335,10 +336,10 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
-            RateOfFire = 10,	#3				
+            RateOfFire = 10,
             SlavedToBody = true,
             SlavedToBodyArcRange = 65,
-            TargetCheckInterval = 0.25,
+            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'EXPERIMENTAL',

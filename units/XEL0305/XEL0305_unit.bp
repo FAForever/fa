@@ -1,9 +1,10 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
+            'Torso', 
             'Turret',
-            'Torso',
-			'Turret_Barrel',  # added to make unit targetable even when almost submerged [141]
+            'AttachPoint',
+#            'Turret_Barrel',
         },
     },
     Audio = {
@@ -207,9 +208,9 @@ UnitBlueprint {
     SelectionSizeX = 0.55,
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.7,
-    SizeX = 0.8,
+    SizeX = 1,
     SizeY = 1.6,
-    SizeZ = 0.8,
+    SizeZ = 1,
     StrategicIconName = 'icon_bot3_armored',
     StrategicIconSortPriority = 115,
     Transport = {
