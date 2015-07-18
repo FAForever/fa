@@ -46,7 +46,7 @@ function compile(strExpression)
   result.others = {}
   result.negatives = {}
 
-  local tokens = utils.StringSplit(strExpression, "%s") -- split by space
+  local tokens = utils.StringSplit(strExpression, " ") -- split by space
   for k,v in tokens do
    
     if utils.StringStartsWith(v, "-") then

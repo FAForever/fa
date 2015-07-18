@@ -39,9 +39,6 @@ local mapplayers = false
 local mapInfo = false
 local selectButton = false
 
--- Table contianing filter functions to apply to the map list.
-local currentFilters = {}
-
 local scenarioKeymap = {}
 local Options = {}
 local OptionSource = {}
@@ -178,13 +175,13 @@ mapFilters = {
         }
     },
     {
-        FilterName = "<LOC lobui_0575>Map Type",
+        FilterName = "<LOC MAPSEL_0032>Map Type",
         FilterKey = 'map_type',
         NoDelimiter = true,
         Options = {
             {text = "<LOC MAPSEL_0025>All", key = 0},
-            {text = "<LOC lobui_0576>Official", key = 1},
-            {text = "<LOC lobui_0577>Custom", key = 2},
+            {text = "<LOC MAPSEL_0033>Official", key = 1},
+            {text = "<LOC MAPSEL_0034>Custom", key = 2},
         },
         FilterFactory = {
             SelectedKey = 0,
@@ -217,7 +214,28 @@ mapFilters = {
             end
         },
     },
+    {
+        FilterName = "<LOC MAPSEL_0035>Hide Obsolete",
+        FilterKey = 'map_obsolete',
+        NoDelimiter = true,
+        Options = {
+            {text = "<LOC _Yes>Yes", key = 1},
+            {text = "<LOC _No>No", key = 0},
+        },
+        FilterFactory = {
+            SelectedKey = 1,
+            Filters = {
+                function(scenInfo) return not scenInfo.Outdated end
+            },
+            Build = function(self)
+                return self.Filters[self.SelectedKey]
+            end
+        },
+    },
 }
+
+-- Table contianing filter functions to apply to the map list.
+local currentFilters = {map_obsolete = mapFilters[5].FilterFactory:Build()}
 
 -- Create a filter dropdown and title from the table above
 function CreateFilter(parent, filterData)

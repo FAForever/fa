@@ -6,6 +6,9 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
+local OutdatedMaps = import('/etc/faf/mapblacklist.lua').MapBlacklist
+local Utils = import('/lua/system/utils.lua')
+
 -- load a scenario based on a scenario file name
 function LoadScenario(scenName)
     -- TODO - expose FILE_IsAbsolute and if it's not, add the path and the _scenario.lua
@@ -35,9 +38,13 @@ function LoadScenario(scenName)
         local optionsEnv = {}
         doscript(optionsFileName, optionsEnv)
         if optionsEnv.options ~= nil then
-        env.ScenarioInfo.options = optionsEnv.options
+            env.ScenarioInfo.options = optionsEnv.options
         end
     end
+
+    -- Is this map flagged out of date? *CACKLES INSANELY*
+    local pathBits = Utils.StringSplit(scenName, '/')
+    env.ScenarioInfo.Outdated = OutdatedMaps[pathBits[2]]
 
     env.ScenarioInfo.file = scenName -- stuff the file name in so we have that
     return env.ScenarioInfo
