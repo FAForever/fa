@@ -210,9 +210,9 @@ UnitBlueprint {
         UniformScale = 0.09,
     },
     Economy = {
-        BuildCostEnergy = 2000,#1980
+        BuildCostEnergy = 2000,-- 1980
         BuildCostMass = 360,
-        BuildTime = 1600,#1320
+        BuildTime = 1600,-- 1320
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -276,6 +276,7 @@ UnitBlueprint {
         TurnFacingRate = 120,
         TurnRadius = 5,
         TurnRate = 90,
+        WaterSpeedMultiplier = 0.928,
         WobbleFactor = 0.05,
         WobbleSpeed = 0.001,
     },
