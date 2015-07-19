@@ -1,3 +1,23 @@
+Patch 3643 (Unreleased)
+=======================
+
+Bugs
+----
+
+- Fixed issue with half built units from naval factories
+- Fixed issue with sometimes being unable to quit the game
+
+Enhancements
+------------
+
+- Added ability to see unit data (xp/regen rate) as observer
+
+Lobby
+-----
+
+- [ ] The mod manager can now blacklist incompatible mods
+
+
 Patch 3642 (July 13, 2015)
 ==========================
 
