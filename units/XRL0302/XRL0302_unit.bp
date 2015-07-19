@@ -201,7 +201,6 @@ UnitBlueprint {
             DisplayName = 'Suicide',
             FireOnSelfDestruct = true,
             FireTargetLayerCapsTable = {
-                Air = 'Land|Water|Seabed',
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
