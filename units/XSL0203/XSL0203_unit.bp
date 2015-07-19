@@ -265,7 +265,7 @@ UnitBlueprint {
         TurnFacingRate = 120,
         TurnRadius = 0,
         TurnRate = 90,
-        WaterSpeedMultiplier = 0.928,
+        WaterSpeedMultiplier = 0.84,
         WobbleFactor = 0.05,
         WobbleSpeed = 0.001,
     },

@@ -242,7 +242,7 @@ UnitBlueprint {
         TurnFacingRate = 120,
         TurnRadius = 0,
         TurnRate = 90,
-        WaterSpeedMultiplier = 0.928,
+        WaterSpeedMultiplier = 0.84,
     },
     SelectionSizeX = 0.6,
     SelectionSizeZ = 0.95,
