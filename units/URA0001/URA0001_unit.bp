@@ -22,9 +22,6 @@ UnitBlueprint {
         Winged = false,
     },
     Categories = {
-        'CYBRAN',
-        'AIR',
-        'TECH1',
         'CONSTRUCTION',
         'ENGINEER',
         'REPAIR',

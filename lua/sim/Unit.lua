@@ -1177,7 +1177,7 @@ Unit = Class(moho.unit_methods) {
             self:PlayUnitSound('Killed')
         end
 
-        if self.PlayDeathAnimation and not self:IsBeingBuilt() then
+        if self.PlayDeathAnimation and self:GetFractionComplete() > 0.5 then
             self:ForkThread(self.PlayAnimationThread, 'AnimationDeath')
             self.DisallowCollisions = true
         end
@@ -1358,14 +1358,13 @@ Unit = Class(moho.unit_methods) {
         if overkillRatio and overkillRatio > 1.0 then
             return
         end
-        --Check if wrecks are allowed
-        if self:GetBlueprint().Wreckage.WreckageLayers[self:GetCurrentLayer()] then
-             return self:CreateWreckageProp(overkillRatio)
-        end
+
+        return self:CreateWreckageProp(overkillRatio)
     end,
 
     CreateWreckageProp = function( self, overkillRatio )
         local bp = self:GetBlueprint()
+
         local wreck = bp.Wreckage.Blueprint
 
         if not wreck then
@@ -1384,8 +1383,10 @@ Unit = Class(moho.unit_methods) {
             energy = energy * 0.5
         end
 
-        -- make sure air / naval wrecks stick to ground / seabottom
-        if layer == 'Air' or EntityCategoryContains(categories.NAVAL - categories.STRUCTURE, self) then
+        local halfBuilt = self:GetFractionComplete() < 1
+
+        -- make sure air / naval wrecks stick to ground / seabottom, unless they're in a factory.
+        if not halfBuilt and (layer == 'Air' or EntityCategoryContains(categories.NAVAL - categories.STRUCTURE, self)) then
             pos[2] = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
         end
 
@@ -1398,7 +1399,7 @@ Unit = Class(moho.unit_methods) {
 
         -- Attempt to copy our animation pose to the prop. Only works if
         -- the mesh and skeletons are the same, but will not produce an error if not.
-        if layer ~= 'Air' and self.PlayDeathAnimation then
+        if (layer ~= 'Air' and self.PlayDeathAnimation) or (layer == "Air" and halfBuilt) then
             TryCopyPose(self, prop, true)
         end
 
@@ -1642,13 +1643,6 @@ Unit = Class(moho.unit_methods) {
 
         --Let the user layer know this id is gone
         Sync.ReleaseIds[self:GetEntityId()] = true
-
-        --Destroy units under construction if their Factory dies
-        if EntityCategoryContains(categories.FACTORY, self) then
-            if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() ~= 1 then
-                self.UnitBeingBuilt:Destroy()
-            end
-        end
 
         --Destroy everything added to the trash
         self.Trash:Destroy()
@@ -2163,10 +2157,6 @@ Unit = Class(moho.unit_methods) {
         self:DoOnUnitBuiltCallbacks(built)
         self:StopUnitAmbientSound('ConstructLoop')
         self:PlayUnitSound('ConstructStop')
-    end,
-
-    GetUnitBeingBuilt = function(self)
-        return self.UnitBeingBuilt
     end,
 
     OnFailedToBuild = function(self)

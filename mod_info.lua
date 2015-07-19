@@ -4,6 +4,7 @@
 -- https://github.com/FAForever/fa/wiki/mod_info.lua-documentation
 name = "Forged Alliance Forever"
 version = 3643
+_faf_modname='faf'
 copyright = "Forged Alliance Forever Community"
 description = "Forged Alliance Forever extends Forged Alliance, bringing new patches, game modes, units, ladder, and much more!"
 author = "Forged Alliance Forever Community"

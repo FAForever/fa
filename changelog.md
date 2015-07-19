@@ -1,10 +1,10 @@
-Patch 3643 Unreleased
-=====================
+Patch 3643 (Unreleased)
 
 Bugs
 ----
 
-- [ ] Issue with half built units from naval factories fixed
+- Fixed issue with half built units from naval factories
+- Fixed issue with sometimes being unable to quit the game
 
 Enhancements
 ------------
@@ -27,6 +27,8 @@ Contributors
 - ckitching
 - ggwpez
 
+
+=======
 
 Patch 3642 (July 13, 2015)
 ==========================

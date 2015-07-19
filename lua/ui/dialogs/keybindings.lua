@@ -226,7 +226,9 @@ function CreateUI()
     LayoutHelpers.AtRightIn(closeButton, dialogContent, -2)
     closeButton.OnClick = function(self, modifiers)
         ConfirmNewKeyMap()
-        panel:Close()
+    end
+
+    panel.OnClosed = function(self)
         panel = false
     end
 
