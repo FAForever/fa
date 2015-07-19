@@ -122,7 +122,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.EnergyBuildBuffRemove,
     Affects = {
         EnergyActive = {
-            Add = -0.00625,
+            Add = -0.0025,
             Mult = 1.0,
         },
     },
@@ -558,7 +558,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.EnergyBuildBuffRemove,
     Affects = {
         EnergyActive = {
-            Add = -0.05,
+            Add = -0.025,
             Mult = 1.0,
         },
     },
@@ -966,7 +966,7 @@ BuffBlueprint {
     OnBuffRemove = AdjBuffFuncs.EnergyBuildBuffRemove,
     Affects = {
         EnergyActive = {
-            Add = -0.1,
+            Add = -0.05,
             Mult = 1.0,
         },
     },
