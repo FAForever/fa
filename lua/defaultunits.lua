@@ -15,6 +15,7 @@ local Util = import('utilities.lua')
 local EffectUtil = import('EffectUtilities.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 local EffectUtil = import('EffectUtilities.lua')
 local Entity = import('/lua/sim/Entity.lua').Entity
 local Buff = import('/lua/sim/Buff.lua')
@@ -515,6 +516,11 @@ StructureUnit = Class(Unit) {
                 self.AdjacencyBeamsBag[k] = nil
             end
         end
+    end,
+
+    OnDestroy = function(self)
+        Unit.OnDestroy(self)
+        ScenarioFramework.ClearIntel(self:GetPosition(), 2)
     end,
 }
 

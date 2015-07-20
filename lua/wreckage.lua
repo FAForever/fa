@@ -75,7 +75,8 @@ function CreateWreckage(bp, position, orientation, mass, energy, time)
     --FIXME: SetVizToNeurals('Intel') is correct here, so you can't see enemy wreckage appearing
     -- under the fog. However the engine has a bug with prop intel that makes the wreckage
     -- never appear at all, even when you drive up to it, so this is disabled for now.
-    --prop:SetVizToNeutrals('Intel')
+    prop:SetVizToNeutrals('Intel')
+    prop:SetVizToEnemies('Intel')
     if not bp.Wreckage.UseCustomMesh then
         prop:SetMesh(bp.Display.MeshBlueprintWrecked)
     end
