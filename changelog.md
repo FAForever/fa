@@ -8,6 +8,7 @@ Bugs
 - Fixed issue with sometimes being unable to quit the game
 - Cybran ([ ] UEF) buildbots no longer explode with the no air restriction
 - Fixed issue with being unable to reclaim mexes that are being upgraded
+- Seraphim ACU minimum range for normal gun and OC adjusted to be the same as other ACU's
 
 Enhancements
 ------------
