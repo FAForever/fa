@@ -493,6 +493,9 @@ function PreModBlueprints(all_bps)
             if br then
                 if not bp.AI then bp.AI = {} end
                 bp.AI.GuardScanRadius = br
+                if not bp.AI.GuardReturnRadius then
+                    bp.AI.GuardReturnRadius = 3
+                end
             end
         end
 
