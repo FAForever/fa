@@ -255,9 +255,9 @@ UnitBlueprint {
         MotionType = 'RULEUMT_Amphibious',
         RotateOnSpot = true,
         RotateOnSpotThreshold = 0.1,
-        StandUpright = false, # bug fix for tank not following contours of terrain [139]
+        StandUpright = false, -- bug fix for tank not following contours of terrain [139]
         TurnRadius = 0,
-        TurnRate = 90,#75
+        TurnRate = 75,
     },
     SelectionSizeX = 0.7,
     SelectionSizeZ = 1.4,
