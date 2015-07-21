@@ -271,9 +271,9 @@ UnitBlueprint {
     },
     Enhancements = {
         CloakingGenerator = {
-            BuildCostEnergy = 500000,
+            BuildCostEnergy = 382200,
             BuildCostMass = 5000,
-            BuildTime = 14000,
+            BuildTime = 13800,
             Icon = 'cfs',
             MaintenanceConsumptionPerSecondEnergy = 3500,
             Name = '<LOC enhancements_0089>Personal Cloaking Generator',
@@ -301,7 +301,7 @@ UnitBlueprint {
         EMPCharge = {
             BuildCostEnergy = 60000,
             BuildCostMass = 1000,
-            BuildTime = 3360,
+            BuildTime = 3600,
             Icon = 'emp',
             Name = '<LOC enhancements_0091>EMP Burst',
             Slot = 'LCH',
@@ -325,7 +325,7 @@ UnitBlueprint {
         FocusConvertor = {
             BuildCostEnergy = 24000,
             BuildCostMass = 800,
-            BuildTime = 3360,
+            BuildTime = 3000,
             Icon = 'fc',
             Name = '<LOC enhancements_0093>Disintegrator Amplifier',
             NewDamageMod = 250,
@@ -349,9 +349,9 @@ UnitBlueprint {
             Slot = 'RCH',
         },
         NaniteMissileSystem = {
-            BuildCostEnergy = 30000,
+            BuildCostEnergy = 20000,
             BuildCostMass = 800,
-            BuildTime = 3360,
+            BuildTime = 3000,
             Icon = 'nms',
             Name = '<LOC enhancements_0095>Nanite Missile System',
             Slot = 'Back',
@@ -373,7 +373,7 @@ UnitBlueprint {
             Slot = 'Back',
         },
         ResourceAllocation = {
-            BuildCostEnergy = 60000,
+            BuildCostEnergy = 68600,
             BuildCostMass = 4500,
             BuildTime = 8400,
             Icon = 'ras',
@@ -399,9 +399,9 @@ UnitBlueprint {
             Slot = 'RCH',
         },
         SelfRepairSystem = {
-            BuildCostEnergy = 105000,
+            BuildCostEnergy = 103500,
             BuildCostMass = 2000,
-            BuildTime = 6720,
+            BuildTime = 6000,
             Icon = 'srs',
             Name = '<LOC enhancements_0099>Nano-Repair System',
             NewRegenRate = 375,
@@ -441,9 +441,9 @@ UnitBlueprint {
             },
         },
         StealthGenerator = {
-            BuildCostEnergy = 18000,
-            BuildCostMass = 600,
-            BuildTime = 2240,
+            BuildCostEnergy = 7400,
+            BuildCostMass = 400,
+            BuildTime = 1800,
             Icon = 'sfs',
             MaintenanceConsumptionPerSecondEnergy = 100,
             Name = '<LOC enhancements_0101>Personal Stealth Generator',
@@ -466,7 +466,7 @@ UnitBlueprint {
             Slot = 'Back',
         },
         Switchback = {
-            BuildCostEnergy = 50000,
+            BuildCostEnergy = 51100,
             BuildCostMass = 800,
             BuildTime = 4200,
             Icon = 'ses',
@@ -494,7 +494,7 @@ UnitBlueprint {
     EnhancementPresets = {
         AntiAir = {
             BuildIconSortPriority = 45,
-            Description = '<LOC url0301_AntiAir_desc>Support Armored Command Unit (Anti-Air preset)',
+            Description = '<LOC url0301_AntiAir_desc>SACU (Anti-Air preset)',
             Enhancements = {
                 'NaniteMissileSystem',
             },
@@ -504,7 +504,7 @@ UnitBlueprint {
         },
         Cloak = {
             BuildIconSortPriority = 35,
-            Description = '<LOC url0301_Cloak_desc>Support Armored Command Unit (Cloak preset)',
+            Description = '<LOC url0301_Cloak_desc>SACU (Cloak preset)',
             Enhancements = {
                 'FocusConvertor',
                 'StealthGenerator',
@@ -516,7 +516,7 @@ UnitBlueprint {
         },
         Combat = {
             BuildIconSortPriority = 15,
-            Description = '<LOC url0301_Combat_desc>Support Armored Command Unit (Combatant preset)',
+            Description = '<LOC url0301_Combat_desc>SACU (Combatant preset)',
             Enhancements = {
                 'EMPCharge',
                 'FocusConvertor',
@@ -527,7 +527,7 @@ UnitBlueprint {
         },
         Engineer = {
             BuildIconSortPriority = 20,
-            Description = '<LOC url0301_Engineer_desc>Support Armored Command Unit (Engineer preset)',
+            Description = '<LOC url0301_Engineer_desc>SACU (Engineer preset)',
             Enhancements = {
                 'Switchback',
             },
@@ -549,7 +549,7 @@ UnitBlueprint {
         },
         RAS = {
             BuildIconSortPriority = 10,
-            Description = '<LOC url0301_RAS_desc>Support Armored Command Unit (RAS preset)',
+            Description = '<LOC url0301_RAS_desc>SACU (RAS preset)',
             Enhancements = {
                 'ResourceAllocation',
             },
@@ -559,7 +559,7 @@ UnitBlueprint {
         },
         Stealth = {
             BuildIconSortPriority = 30,
-            Description = 'url0301_Stealth_desc>Support Armored Command Unit (Stealth preset)',
+            Description = '<LOC url0301_Stealth_desc>SACU (Stealth preset)',
             Enhancements = {
                 'StealthGenerator',
             },

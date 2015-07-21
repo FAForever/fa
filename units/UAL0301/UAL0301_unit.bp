@@ -313,7 +313,7 @@ UnitBlueprint {
     },
     Enhancements = {
         EngineeringFocusingModule = {
-            BuildCostEnergy = 50000,
+            BuildCostEnergy = 50500,
             BuildCostMass = 800,
             BuildTime = 4200,
             Icon = 'efm',
@@ -338,7 +338,7 @@ UnitBlueprint {
             Slot = 'LCH',
         },
         ResourceAllocation = {
-            BuildCostEnergy = 60000,
+            BuildCostEnergy = 68000,
             BuildCostMass = 4500,
             BuildTime = 8400,
             Icon = 'ras',
@@ -388,7 +388,7 @@ UnitBlueprint {
             Slot = 'LCH',
         },
         Shield = {
-            BuildCostEnergy = 60000,
+            BuildCostEnergy = 64950,
             BuildCostMass = 1200,
             BuildTime = 5040,
             Icon = 'tsg',
@@ -517,7 +517,7 @@ UnitBlueprint {
             Slot = 'RCH',
         },
         SystemIntegrityCompensator = {
-            BuildCostEnergy = 75000,
+            BuildCostEnergy = 74000,
             BuildCostMass = 1500,
             BuildTime = 6720,
             Icon = 'sic',
@@ -588,7 +588,7 @@ UnitBlueprint {
     EnhancementPresets = {
         Engineer = {
             BuildIconSortPriority = 20,
-            Description = '<LOC ual0301_Engineer_desc>Support Armored Command Unit (Engineer preset)',
+            Description = '<LOC ual0301_Engineer_desc>SACU (Engineer preset)',
             Enhancements = {
                 'EngineeringFocusingModule',
             },
@@ -598,7 +598,7 @@ UnitBlueprint {
         },
         NanoCombat = {
             BuildIconSortPriority = 25,
-            Description = '<LOC ual0301_NanoCombat_desc>Support Armored Command Unit (Nano Combatant preset)',
+            Description = '<LOC ual0301_NanoCombat_desc>SACU (Nano Combatant preset)',
             Enhancements = {
                 'StabilitySuppressant',
                 'SystemIntegrityCompensator',
@@ -609,7 +609,7 @@ UnitBlueprint {
         }, 
         Rambo = {
             BuildIconSortPriority = 35,
-            Description = '<LOC ual0301_Rambo_desc>Support Armored Command Unit (Rambo preset)',
+            Description = '<LOC ual0301_Rambo_desc>SACU (Rambo preset)',
             Enhancements = {
                 'StabilitySuppressant',
                 'Shield',
@@ -621,7 +621,7 @@ UnitBlueprint {
         },
         RAS = {
             BuildIconSortPriority = 10,
-            Description = '<LOC ual0301_RAS_desc>Support Armored Command Unit (RAS preset)',
+            Description = '<LOC ual0301_RAS_desc>SACU (RAS preset)',
             Enhancements = {
                 'ResourceAllocation',
             },
@@ -631,7 +631,7 @@ UnitBlueprint {
         },
         ShieldCombat = {
             BuildIconSortPriority = 30,
-            Description = '<LOC ual0301_ShieldCombat_desc>Support Armored Command Unit (Shield Combatant preset)',
+            Description = '<LOC ual0301_ShieldCombat_desc>SACU (Shield Combatant preset)',
             Enhancements = {
                 'StabilitySuppressant',
                 'Shield',
@@ -642,7 +642,7 @@ UnitBlueprint {
         },
         SimpleCombat = {
             BuildIconSortPriority = 15,
-            Description = '<LOC ual0301_SimpleCombat_desc>Support Armored Command Unit (Combatant preset)',
+            Description = '<LOC ual0301_SimpleCombat_desc>SACU (Combatant preset)',
             Enhancements = {
                 'StabilitySuppressant',
             },
