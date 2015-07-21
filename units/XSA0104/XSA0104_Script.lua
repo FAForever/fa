@@ -18,6 +18,8 @@ local AirTransport = import('/lua/defaultunits.lua').AirTransport
 
 XSA0104 = Class(AirTransport) {
 
+    ContrailEffects = {'/effects/emitters/contrail_ser_polytrail_01_emit.bp',},
+
     AirDestructionEffectBones = { 'XSA0104','Left_Attachpoint08','Right_Attachpoint02'},
 
     Weapons = {
