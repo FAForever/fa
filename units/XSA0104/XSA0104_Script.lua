@@ -5,7 +5,7 @@
 #**
 #**  Summary  : Seraphim T2 Transport Script
 #**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local SAirUnit = import('/lua/seraphimunits.lua').SAirUnit
@@ -15,7 +15,9 @@ local SeraphimWeapons = import('/lua/seraphimweapons.lua')
 local SAAShleoCannonWeapon = SeraphimWeapons.SAAShleoCannonWeapon
 local SDFHeavyPhasicAutoGunWeapon = SeraphimWeapons.SDFHeavyPhasicAutoGunWeapon
 
-XSA0104 = Class(SAirUnit) {
+local AirTransport = import('/lua/defaultunits.lua').AirTransport
+
+XSA0104 = Class(AirTransport) {
 
     AirDestructionEffectBones = { 'XSA0104','Left_Attachpoint08','Right_Attachpoint02'},
 
