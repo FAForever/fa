@@ -551,6 +551,13 @@ function CreateNinePatchStd(parent, texturePath)
     )
 end
 
+function SurroundWithNinePatch(parent, texturePath, fudgeX, fudgeY)
+    local patch = CreateNinePatchStd(parent, texturePath)
+
+    patch:Surround(parent, fudgeX or 62, fudgeY or 62)
+    LayoutHelpers.DepthUnderParent(patch, parent, 2)
+end
+
 --- Surround the given control with an eight-patch dynamically-scaling Border constructed using
  -- standard names from the given texture path.
  -- The expected names of texture components are:
