@@ -48,6 +48,11 @@ XSS0201 = Class(SSubUnit) {
         end
 
         SSubUnit.OnKilled(self, instigator, type, overkillRatio)
+		
+		OnStopBeingBuilt = function(self, builder, layer)
+			SSubUnit.OnStopBeingBuilt(self, builder, layer)
+			if self:GetIsSubmerged == -1 then
+				self:IssueDive
     end,
     
     OnMotionVertEventChange = function( self, new, old )
