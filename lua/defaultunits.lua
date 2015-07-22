@@ -1402,16 +1402,6 @@ MobileUnit = Class(Unit) {
         Unit.OnKilled(self, instigator, type, overkillRatio)
     end,
 
-    OnPaused = function(self)
-        self:SetBlockCommandQueue(true)
-        Unit.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        self:SetBlockCommandQueue(false)
-        Unit.OnUnpaused(self)
-    end,
-
     StartBeingBuiltEffects = function(self, builder, layer)
         Unit.StartBeingBuiltEffects(self, builder, layer)
         local bp = self:GetBlueprint()
