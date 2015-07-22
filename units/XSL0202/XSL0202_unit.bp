@@ -229,7 +229,7 @@ UnitBlueprint {
         TransportClass = 2,
     },
     Veteran = {
-        Level1 = 10, #9/18, etc
+        Level1 = 10, -- 9/18, etc
         Level2 = 20,
         Level3 = 30,
         Level4 = 40,
@@ -311,7 +311,7 @@ UnitBlueprint {
             TurretPitchSpeed = 60,
             TurretYaw = 0,
             TurretYawRange = 180,
-            TurretYawSpeed = 90,#180
+            TurretYawSpeed = 70,
             Turreted = true,
             WeaponCategory = 'Direct Fire',
             WeaponRepackTimeout = 0,
