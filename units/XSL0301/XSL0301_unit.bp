@@ -908,6 +908,7 @@ UnitBlueprint {
             DamageRadius = 10,
             DamageType = 'Normal',
             DisplayName = 'Death Nuke',
+            FireOnDeath = true,
             FiringTolerance = 2,
             Label = 'DeathWeapon',
             MaxRadius = 1,
