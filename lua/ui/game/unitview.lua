@@ -428,12 +428,12 @@ function UpdateWindow(info)
                     if shieldRegenRate > 0 then
                         shieldText = shieldText .. string.format("+%d/s", shieldRegenRate)
                     end
-                    if ShieldMaxHealth > 0 then
+                    if shieldMaxHealth > 0 then
                         controls.shieldText:Show()
-                        if ShieldRegenRate > 0 then
-                            controls.shieldText:SetText(string.format("%d / %d +%d/s", math.floor(ShieldMaxHealth*info.shieldRatio), ShieldMaxHealth, ShieldRegenRate))
+                        if shieldRegenRate > 0 then
+                            controls.shieldText:SetText(string.format("%d / %d +%d/s", math.floor(shieldMaxHealth*info.shieldRatio), shieldMaxHealth, shieldRegenRate))
                         else
-                            controls.shieldText:SetText(string.format("%d / %d", math.floor(ShieldMaxHealth*info.shieldRatio), ShieldMaxHealth))
+                            controls.shieldText:SetText(string.format("%d / %d", math.floor(shieldMaxHealth*info.shieldRatio), shieldMaxHealth))
                         end
                     end
                 end
