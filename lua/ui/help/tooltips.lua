@@ -1778,6 +1778,10 @@ Tooltips = {
         title = "<LOC tooltipui0518>No Air",
         description = "<LOC tooltipui0519>Prevents all Air units being built. Does not count UEF Novax Satellite",
     },
+    restricted_units_air_t3 = {
+        title = "<LOC restricted_units_data_0030>No T3 Air",
+        description = "<LOC tooltipui0693>Prevents T3 Air being built.",
+    },
     restricted_units_naval = {
         title = "<LOC tooltipui0520>No Naval",
         description = "<LOC tooltipui0521>Prevents all Naval units being built",
