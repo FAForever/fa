@@ -5327,6 +5327,7 @@ function InitHostUtils()
                 WarnIncompatibleMods()
 
                 selectedSimMods = SetUtils.Subtract(selectedSimMods, bannedMods)
+                selectedUIMods = SetUtils.Subtract(selectedUIMods, bannedMods)
                 OnModsChanged(selectedSimMods, selectedUIMods)
 
                 return
