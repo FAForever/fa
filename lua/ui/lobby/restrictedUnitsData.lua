@@ -43,6 +43,11 @@ restrictedUnits = {
         name = "<LOC restricted_units_data_0006>No Air",
         tooltip = "restricted_units_air",
     },
+    AIR = {
+        categoryExpression = "(TECH3+AIR) + (EXPERIMENTAL+AIR)",
+        name = "<LOC restricted_units_data_0030>No T3 Air",
+        tooltip = "restricted_units_air_t3",
+    },
     NAVAL = {
         categoryExpression = "NAVAL",
         name = "<LOC restricted_units_data_0004>No Naval",
