@@ -24,7 +24,6 @@ Contributors
 
 - CodingSquirrel
 - Crotalus
-- ckitching
 - Gorton
 - Sheeo
 - ckitching
