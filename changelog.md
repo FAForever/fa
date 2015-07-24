@@ -15,6 +15,7 @@ Enhancements
 
 - Added ability to see unit data (xp/regen rate) as observer
 - Firebeetles can no longer detonate in the air
+- Upgrade hotkey now works for T2 naval and air support factories
 
 Lobby
 -----
