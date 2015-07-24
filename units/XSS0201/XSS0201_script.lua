@@ -64,8 +64,6 @@ XSS0201 = Class(SSubUnit) {
     OnStopBeingBuilt = function(self, builer, layer)
         --- Unless we're gifted, we should have an original builder.
         --- Remains to be seen if this property is actually copied during gift
-        LOG("Destro finished building")
-        LOG(repr(self.originalBuilder))
         if self.originalBuilder then
             IssueDive({self})
         end
