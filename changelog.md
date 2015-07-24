@@ -9,6 +9,8 @@ Bugs
 - Fixed issue with being unable to reclaim mexes that are being upgraded
 - Seraphim ACU minimum range for normal gun and OC adjusted to be the same as other ACU's
 - Seraphim destroyer surfaces itself after building again
+- Seraphim T2 transport no longer allows active shields on board
+- Seraphim ACU restoration field now works for allied units
 
 Enhancements
 ------------
@@ -22,6 +24,7 @@ Contributors
 
 - CodingSquirrel
 - Crotalus
+- ckitching
 - Gorton
 - Sheeo
 - ckitching
