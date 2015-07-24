@@ -532,10 +532,6 @@ FactoryUnit = Class(StructureUnit) {
         self.BuildingUnit = false
     end,
 
-    GetUnitBeingBuilt = function(self)
-        return self.UnitBeingBuilt
-    end,
-
     OnDestroy = function(self)
         -- Figure out if we're a research station
         if EntityCategoryContains(categories.RESEARCH, self) then
@@ -1743,14 +1739,14 @@ ConstructionUnit = Class(MobileUnit) {
         self:StopUnitAmbientSound( 'ConstructLoop' )
         MobileUnit.OnPaused(self)
         if self.BuildingUnit then
-            MobileUnit.StopBuildingEffects(self, self:GetUnitBeingBuilt())
+            MobileUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
         end
     end,
 
     OnUnpaused = function(self)
         if self.BuildingUnit then
             self:PlayUnitAmbientSound( 'ConstructLoop' )
-            MobileUnit.StartBuildingEffects(self, self:GetUnitBeingBuilt(), self.UnitBuildOrder)
+            MobileUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
         end
         MobileUnit.OnUnpaused(self)
     end,
@@ -1954,13 +1950,13 @@ CommandUnit = Class(WalkingLandUnit) {
     OnPaused = function(self)
         WalkingLandUnit.OnPaused(self)
         if self.BuildingUnit then
-            WalkingLandUnit.StopBuildingEffects(self, self:GetUnitBeingBuilt())
+            WalkingLandUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
         end
     end,
 
     OnUnpaused = function(self)
         if self.BuildingUnit then
-            WalkingLandUnit.StartBuildingEffects(self, self:GetUnitBeingBuilt(), self.UnitBuildOrder)
+            WalkingLandUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
         end
         WalkingLandUnit.OnUnpaused(self)
     end
