@@ -1767,9 +1767,7 @@ Unit = Class(moho.unit_methods) {
             end
         end
 
-        if builder:IsUnitState('Upgrading') then
-            self.originalBuilder = builder
-        end
+        self.originalBuilder = builder
     end,
 
     UnitBuiltPercentageCallbackThread = function(self, percent, callback)
