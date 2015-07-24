@@ -8,6 +8,7 @@ Bugs
 - Cybran and UEF buildbots / drones no longer explode with the no air restriction
 - Fixed issue with being unable to reclaim mexes that are being upgraded
 - Seraphim ACU minimum range for normal gun and OC adjusted to be the same as other ACU's
+- Seraphim destroyer surfaces itself after building again
 
 Enhancements
 ------------
