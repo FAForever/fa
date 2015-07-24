@@ -31,6 +31,7 @@ Blacklist = {
 
     -- Hotbuild (already merged)
     ['f8785b7a-9e9e-4863-abb3-46aaf1caef80'] = INTEGRATED,
+    ['98785b7a-9e9e-4863-abb3-46aaf1caef80'] = INTEGRATED,
 
     -- GAZ_UI (already merged)
     ['4f8b5ac3-346c-4d25-ac34-7b8ccc14eb0a'] = INTEGRATED,
