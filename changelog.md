@@ -17,12 +17,6 @@ Enhancements
 - Firebeetles can no longer detonate in the air
 - Upgrade hotkey now works for T2 naval and air support factories
 
-Lobby
------
-
-- [ ] The mod manager can now blacklist incompatible mods
-
-
 Contributors
 ------------
 
