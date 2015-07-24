@@ -11,6 +11,7 @@ Bugs
 - Seraphim destroyer surfaces itself after building again
 - Seraphim T2 transport no longer allows active shields on board
 - Seraphim ACU restoration field now works for allied units
+- Aeon T3 battleship TMD is no longer completely unable to stop TML's
 
 Enhancements
 ------------
