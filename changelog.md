@@ -1,4 +1,4 @@
-Patch 3643 (Unreleased)
+Patch 3643 (July 24, 2015)
 
 Bugs
 ----
