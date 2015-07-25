@@ -6023,10 +6023,10 @@ technique PhaseShield_HighFidelity
 /// SeraphimPersonalShield
 ///
 /// 
-technique SeraphimPersonalShield_HighFidelity
+technique SeraphimPersonalShield_MedFidelity
 <
     string abstractTechnique = "SeraphimPersonalShield";
-    int fidelity = FIDELITY_HIGH;
+    int fidelity = FIDELITY_MEDIUM;
 
     string cartographicTechnique = "CartographicUnit";    
     string depthTechnique = "Depth";
