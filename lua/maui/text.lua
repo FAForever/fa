@@ -210,29 +210,38 @@ function WrapText(text, lineWidth, advanceFunction)
             local wordWidth = advanceFunction(word)
 
             -- if the word is longer than the max width, break it up in to multiple lines
-            if wordWidth > lineWidthFunc(table.getsize(result)) then
-                -- start long word on its own line (only if there is already a result)
+            if wordWidth > lineWidthFunc(curLine) then
                 if result[curLine] then
                     curLine = curLine + 1
                 end
 
-                -- determine how many lines are needed to display this word
-                local wordLines = math.ceil(wordWidth / lineWidthFunc(curLine))
-                -- deteremine how many characters per line will be displayed (just a simple divide)
-                local charsPerLine = math.floor(STR_Utf8Len(word) / wordLines)
-                
-                local curCharLineStart = 1
-                -- for each line, start to add characters
-                for line = curLine, curLine + wordLines do
-                    -- determine the last character 
-                    local endChar = curCharLineStart + charsPerLine - 1
-                    if endChar > STR_Utf8Len(word) then endChar = STR_Utf8Len(word) end
-                    result[curLine] = STR_Utf8SubString(word, curCharLineStart, endChar - (curCharLineStart - 1))
-                    curLine = curLine + 1
-                    curCharLineStart = endChar + 1
+                wordWidth = 0
+                local lineWidth = lineWidthFunc(curLine)
+                local startIndex = 1
+                local letterIndex = 1
+                for letter in string.gfind(word, ".") do
+                    letterWidth = advanceFunction(letter)
+                    if wordWidth + letterWidth > lineWidth then
+                        result[curLine] = string.sub(word, startIndex, letterIndex - 1)
+                        curLine = curLine + 1
+                        startIndex = letterIndex
+                        pos = 0
+                        wordWidth = 0
+                        lineWidth = lineWidthFunc(curLine)
+                    end
+                    wordWidth = wordWidth + letterWidth
+                    letterIndex = letterIndex + 1
                 end
-
-                pos = 0
+                
+                result[curLine] = string.sub(word, startIndex)
+                pos = wordWidth
+                if wordWidth + spaceWidth < lineWidth then
+                    result[curLine] = result[curLine] .. " "
+                    pos = pos + spaceWidth
+                else
+                    curLine = curLine + 1
+                    pos = 0
+                end
             else
                 -- if the word will fit on this line, then add the word to the line
                 -- otherwise, start the word on the next line
