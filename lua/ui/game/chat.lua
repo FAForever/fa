@@ -472,13 +472,25 @@ function SetupChatScroll()
                         if line.name:GetText() == '' then
                             line.teamColor:Hide()
                         end
-                        line.OnFrame = function(self, delta)
-                            self.curHistory.time = self.curHistory.time + delta
-                            if self.curHistory.time > ChatOptions.fade_time then
-                                if GUI.bg:IsHidden() then
-                                    self:Hide()
+                        if line.curHistory.wrappedtext[curTop+1] == nil then
+                            line.OnFrame = function(self, delta)
+                                self.curHistory.time = self.curHistory.time + delta
+                                if self.curHistory.time > ChatOptions.fade_time then
+                                    if GUI.bg:IsHidden() then
+                                        self:Hide()
+                                    end
+                                    self:SetNeedsFrameUpdate(false)
                                 end
-                                self:SetNeedsFrameUpdate(false)
+                            end
+                        -- Don't increment time on lines with wrapped text
+                        else
+                            line.OnFrame = function(self, delta)
+                                if self.curHistory.time > ChatOptions.fade_time then
+                                    if GUI.bg:IsHidden() then
+                                        self:Hide()
+                                    end
+                                    self:SetNeedsFrameUpdate(false)
+                                end
                             end
                         end
                         line:SetNeedsFrameUpdate(true)
@@ -495,6 +507,7 @@ function SetupChatScroll()
             curTop = curTop + 1
             index = index + 1
         end
+        if chatHistory[curEntry].new then chatHistory[curEntry].new = nil end
     end
 end
 
@@ -1157,9 +1170,9 @@ function WrapText(data)
             function(line)
                 local firstLine = GUI.chatLines[1]
                 if line == 1 then
-                    return firstLine.Right() - (firstLine.teamColor.Right() + firstLine.name:GetStringAdvance(data.name) + 4)
+                    return firstLine.Right() - (firstLine.name.Left() + firstLine.name:GetStringAdvance(data.name) + 4)
                 else
-                    return firstLine.Right() - firstLine.name.Right()
+                    return firstLine.Right() - (firstLine.name.Left() + 4)
                 end
             end,
             function(text)
