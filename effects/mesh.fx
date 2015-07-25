@@ -5440,7 +5440,7 @@ technique Seraphim_MedFidelity
         
         VertexShader = compile vs_1_1 UnitFalloffVS();
         //PixelShader = compile ps_2_0 UnitFalloffPS(false);
-        PixelShader = compile ps_2_a UnitFalloffPS(true);
+        PixelShader = compile ps_2_a UnitFalloffPS_02(true);
     }
 }
 
@@ -6043,7 +6043,8 @@ technique SeraphimPersonalShield_HighFidelity
 		RasterizerState( Rasterizer_Cull_CW )
 	
         VertexShader = compile vs_1_1 UnitFalloffVS();
-        PixelShader = compile ps_2_a UnitFalloffPS(true);
+        //PixelShader = compile ps_2_a UnitFalloffPS(true);
+        PixelShader = compile ps_2_a UnitFalloffPS_02(true);
     }
     pass P1
     {
