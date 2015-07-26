@@ -863,7 +863,7 @@ UnitBlueprint {
             MuzzleVelocity = 22,
             OverChargeWeapon = true,
             ProjectileId = '/projectiles/SDFLightChronatronCannon02/SDFLightChronatronCannon02_proj.bp',
-            ProjectileLifetimeUsesMultiplier = 2,#1.15
+            ProjectileLifetimeUsesMultiplier = 2,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -944,7 +944,7 @@ UnitBlueprint {
             CollideFriendly = false,
             CountedProjectile = true,
             Damage = 6000,
-            DamageFriendly = true,
+            DamageFriendly = false,
             DamageRadius = 2,
             DamageType = 'Normal',
             DisplayName = 'Laanse Tactical Missile Launcher',
