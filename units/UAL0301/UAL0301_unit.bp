@@ -416,7 +416,7 @@ UnitBlueprint {
         },
         ShieldHeavy = {
             BuildCostEnergy = 100000,
-            BuildCostMass = 1500,
+            BuildCostMass = 1800,
             BuildTime = 7000,
             Icon = 'htsg',
             ImpactEffects = 'AeonShieldHit01',
@@ -426,7 +426,7 @@ UnitBlueprint {
             PersonalShield = true,
             Prerequisite = 'Shield',
             ShieldEnergyDrainRechargeTime = 5,
-            ShieldMaxHealth = 35000,
+            ShieldMaxHealth = 40000,
             ShieldRechargeTime = 180,
             ShieldRegenRate = 120,
             ShieldRegenStartTime = 1,
@@ -489,13 +489,13 @@ UnitBlueprint {
             },
         },
         StabilitySuppressant = {
-            BuildCostEnergy = 46200,#36000
-            BuildCostMass = 1500,#1250
-            BuildTime = 6048,#5040
+            BuildCostEnergy = 46200,
+            BuildCostMass = 1250,
+            BuildTime = 6048,
             Icon = 'ss',
             Name = '<LOC enhancements_0031>Reacton Refractor',
             NewDamageRadiusMod = 3.5,
-            NewDamageMod = 100,
+
             NewMaxRadius = 40,
             Slot = 'RCH',
             UpgradeUnitAmbientBones = {

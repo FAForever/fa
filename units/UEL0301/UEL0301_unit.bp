@@ -280,7 +280,7 @@ UnitBlueprint {
             BuildTime = 5040,
             Icon = 'acu',
             Name = '<LOC enhancements_0061>Energy Accelerator',
-            NewRateOfFire = 2,
+            NewRateOfFire = 1.82,
             Slot = 'LCH',
             UpgradeUnitAmbientBones = {
                 'UEL0301',
@@ -308,7 +308,7 @@ UnitBlueprint {
             BuildTime = 3360,
             Icon = 'heo',
             Name = '<LOC enhancements_0063>Heavy Plasma Refractor',
-            NewDamageRadius = 2.5,
+            NewDamageRadius = 2,
             NewMaxRadius = 35,
             ShowBones = {
                 'SAM',
