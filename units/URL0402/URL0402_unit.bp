@@ -1,16 +1,18 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
+            'URL0402',
+            'Center_Turret',
             'Left_Turret',
             'Right_Turret',
-            'Center_Turret',
+            'Left_Leg02_B01',
+            'Right_Leg02_B01',
             'Right_Projectile01',
             'Left_Projectile01',
             'Right_Projectile02',
             'Left_Projectile02',
-            'URL0402',
-            'Center_Turret_Muzzle',
-            'Center_Turret',            
+            'Exhaust05',
+            'Exhaust02',    
         },
     },
     Audio = {
@@ -85,7 +87,7 @@ UnitBlueprint {
         'OVERLAYANTINAVY',
 		'OVERLAYINDIRECTFIRE',
     },
-    CollisionOffsetY = 0,
+    CollisionOffsetY = 0.9,
     Defense = {
         AirThreatLevel = 16,
         ArmorType = 'Experimental',
@@ -306,9 +308,9 @@ UnitBlueprint {
     SelectionSizeX = 3.75,
     SelectionSizeZ = 3.75,
     SelectionThickness = 0.28,
-    SizeX = 2,
-    SizeY = 4,
-    SizeZ = 3,
+    SizeX = 2.8,
+    SizeY = 2.8,
+    SizeZ = 4,
     StrategicIconName = 'icon_experimental_generic',
     StrategicIconSortPriority = 45,
     Transport = {
