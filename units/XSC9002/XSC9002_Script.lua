@@ -69,11 +69,11 @@ XSC9002 = Class(SStructureUnit) {
         end
     end,
 
-    OnKilled = function(self, instigator, type, excessDamageRatio)
+    OnDestroy = function(self)
         if self.airChildUnit then self.airChildUnit:Destroy() end
         if self.landChildUnit then self.landChildUnit:Destroy() end
 
-        SStructureUnit.OnKilled(self, instigator, type, excessDamageRatio)
+        SStructureUnit.OnDestroy(self)
     end,
 
 }
