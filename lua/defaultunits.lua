@@ -383,10 +383,10 @@ StructureUnit = Class(Unit) {
 
     end,
 
-    -- Adding into OnKilled the ability to destroy the tarmac but put a new one down that looks exactly like it but
+    -- Adding into OnDestroy the ability to destroy the tarmac but put a new one down that looks exactly like it but
     -- will time out over the time spec'd or 300 seconds.
-    OnKilled = function(self, instigator, type, overkillRatio)
-        Unit.OnKilled(self, instigator, type, overkillRatio)
+    OnDestroy = function(self)
+        Unit.OnDestroy(self)
         local orient = self.TarmacBag.Orientation
         local currentBP = self.TarmacBag.CurrentBP
         self:DestroyTarmac()
