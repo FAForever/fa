@@ -106,6 +106,10 @@ UnitBlueprint {
         VisionRadius = 0,
         WaterVisionRadius = 0,
     },
+    Intel = {
+        VisionRadius = 0,
+        WaterVisionRadius = 0,
+    },
     Interface = {
         HelpText = '<LOC xec8009_help>UEF Wall Segment',
     },
@@ -142,6 +146,7 @@ UnitBlueprint {
     SizeX = 2.5,
     SizeY = 2.5,
     SizeZ = 2.5,
+    StrategicIconName = 'icon_structure_wall',
     StrategicIconSortPriority = 207,
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',

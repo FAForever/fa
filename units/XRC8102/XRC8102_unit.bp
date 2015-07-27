@@ -102,6 +102,10 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Basic',
         UnitWeight = 1,
     },
+    Intel = {
+        VisionRadius = 0,
+        WaterVisionRadius = 0,
+    },
     Interface = {
         HelpText = '<LOC xrc8102_help>Cybran Wall Segment',
     },
@@ -138,7 +142,7 @@ UnitBlueprint {
     SizeX = 2.5,
     SizeY = 2.5,
     SizeZ = 2.5,
-    StrategicIconName = 'icon_structure_generic',
+    StrategicIconName = 'icon_structure_wall',
     StrategicIconSortPriority = 207,
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
