@@ -6,6 +6,7 @@ Bugs
 
 - AI now works again
 - Unpausing engineers works again
+- Units currently being built no longer hang around when transferring or reclaiming the factory the were being built in.
 
 Enhancements
 ------------
