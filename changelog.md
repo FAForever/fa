@@ -1,4 +1,20 @@
+Patch 3644 (July 27, 2015)
+==========================
+
+Bugs
+----
+
+- AI now works again
+- Unpausing engineers works again
+
+Enhancements
+------------
+
+- Jammer field from crystal now stops working when the crystal is reclaimed
+- Jammer crystal reclaim increased to (5000e, 50bt)
+
 Patch 3643 (July 24, 2015)
+==========================
 
 Bugs
 ----
