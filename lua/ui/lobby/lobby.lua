@@ -3885,7 +3885,9 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         end
 
         availableMods[peerID] = nil
-        HostUtils.UpdateMods()
+        if HostUtils.UpdateMods then
+            HostUtils.UpdateMods()
+        end
     end
 
     lobbyComm.GameConfigRequested = function(self)
