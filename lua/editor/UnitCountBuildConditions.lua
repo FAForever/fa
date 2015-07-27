@@ -327,14 +327,14 @@ function HaveLessThanUnitsInCategoryBeingBuilt(aiBrain, numunits, category)
 	local numBuilding = 0
     for unitNum, unit in unitsBuilding do
         if not unit:BeenDestroyed() and unit:IsUnitState('Building') then
-            local buildingUnit = unit:GetUnitBeingBuilt()
+            local buildingUnit = unit.UnitBeingBuilt
             if buildingUnit and not buildingUnit.Dead and EntityCategoryContains( category, buildingUnit ) then
 				numBuilding = numBuilding + 1	
             end
         end
 		#DUNCAN - added to pick up engineers that havent started building yet... does it work?
 		if not unit:BeenDestroyed() and not unit:IsUnitState('Building') then
-			local buildingUnit = unit:GetUnitBeingBuilt()
+			local buildingUnit = unit.UnitBeingBuilt
             if buildingUnit and not buildingUnit.Dead and EntityCategoryContains( category, buildingUnit ) then
 				#LOG('Engi building but not in building state...')
 				numBuilding = numBuilding + 1	
