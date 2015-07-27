@@ -21,6 +21,9 @@ Use the normal git conventions for commit messages, with the following rules:
  - For non-trivial commits, always include a commit message body, describing the change in detail
  - If there are related issues, reference them in the commit message footer
 
+We use [git flow](http://nvie.com/posts/a-successful-git-branching-model/) for our branch conventions.
+
+When making _backwards incompatible API changes_, do so with a stub function and put in a logging statement including traceback. This gives time for mod authors to change their code, as well as for us to catch any incompatibilities introduced by the change.
 
 Code convention
 ---------------
