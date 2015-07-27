@@ -3947,6 +3947,13 @@ Unit = Class(moho.unit_methods) {
         self.attachmentBone = nil
     end,
 
+    --- Deprecated functionality
+    GetUnitBeingBuilt = function(self)
+        WARN("Deprecated function GetUnitBeingBuilt called at")
+        WARN(debug.traceback())
+        return self.UnitBeingBuilt
+    end,
+
     OnShieldEnabled = function(self) end,
     OnShieldDisabled = function(self) end
 }
