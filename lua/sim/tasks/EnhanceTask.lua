@@ -14,6 +14,7 @@ EnhanceTask = Class(ScriptTask) {
         self:GetUnit():SetUnitState('Enhancing',true)
         self:GetUnit():SetUnitState('Upgrading',true)
         self.LastProgress = 0
+        self.LastUnpause = 0
         ChangeState(self, self.Stopping)
     end,
 
@@ -55,6 +56,24 @@ EnhanceTask = Class(ScriptTask) {
                     local frac = ( 1 / ( unit.WorkItemBuildTime / unit:GetBuildRate()) ) * obtained * SecondsPerTick()
                     current = current + frac
                     unit.WorkProgress = current
+                end
+            else
+                local tick = GetGameTick()
+
+                if self.LastUnpause + 5 < tick then
+                    local guards = EntityCategoryFilterDown(categories.ENGINEER, unit:GetGuards())
+
+                    for _, guard in guards do
+                        if not (guard:IsMoving() or guard:GetFocusUnit()) then
+                            self.LastUnpause = tick
+                            unit:SetPaused(false)
+
+                            ForkThread(function()
+                                unit:SetPaused(true)
+                            end)
+                        end
+                        break
+                    end
                 end
             end
 
