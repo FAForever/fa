@@ -2108,16 +2108,20 @@ Unit = Class(moho.unit_methods) {
             self:CheckAssistersFocus()
         end
 
-
-
         local bp = self:GetBlueprint()
         if order ~= 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
             self:StartBuildingEffects(built, order)
         end
-        self:SetActiveConsumptionActive()
+
+        -- OnStartBuild() is called on paused, assisting engineers, in that case, don't start
+        -- actual consumption
+        if not self:IsPaused() then
+            self:SetActiveConsumptionActive()
+            self:PlayUnitSound('Construct')
+            self:PlayUnitAmbientSound('ConstructLoop')
+        end
+
         self:DoOnStartBuildCallbacks(built)
-        self:PlayUnitSound('Construct')
-        self:PlayUnitAmbientSound('ConstructLoop')
 
         local bp = built:GetBlueprint()
         if order == 'Upgrade' and bp.General.UpgradesFrom == self:GetUnitId() then
@@ -2409,11 +2413,14 @@ Unit = Class(moho.unit_methods) {
         self.WorkItemBuildCostMass = tempEnhanceBp.BuildCostEnergy
         self.WorkItemBuildTime = tempEnhanceBp.BuildTime
         self.WorkProgress = 0
-        self:SetActiveConsumptionActive()
+
         self:PlayUnitSound('EnhanceStart')
         self:PlayUnitAmbientSound('EnhanceLoop')
-        self:UpdateConsumptionValues()
         self:CreateEnhancementEffects(work)
+        if not self:IsPaused() then
+            self:SetActiveConsumptionActive()
+        end
+
         ChangeState(self, self.WorkingState)
     end,
 
