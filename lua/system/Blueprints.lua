@@ -447,11 +447,6 @@ function PreModBlueprints(all_bps)
             }
         end
 
-        -- make it possible to pause all mobile units, stopping in this case means pause at next order in command queue
-        if cats.MOBILE then
-            bp.General.CommandCaps.RULEUCC_Pause = true
-        end
-
         -- Mod in AI.GuardScanRadius = Longest weapon range * longest tracking radius
         -- Takes ACU/SCU enhancements into account
         -- fixes move-attack range issues

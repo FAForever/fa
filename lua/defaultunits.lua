@@ -383,10 +383,10 @@ StructureUnit = Class(Unit) {
 
     end,
 
-    -- Adding into OnKilled the ability to destroy the tarmac but put a new one down that looks exactly like it but
+    -- Adding into OnDestroy the ability to destroy the tarmac but put a new one down that looks exactly like it but
     -- will time out over the time spec'd or 300 seconds.
-    OnKilled = function(self, instigator, type, overkillRatio)
-        Unit.OnKilled(self, instigator, type, overkillRatio)
+    OnDestroy = function(self)
+        Unit.OnDestroy(self)
         local orient = self.TarmacBag.Orientation
         local currentBP = self.TarmacBag.CurrentBP
         self:DestroyTarmac()
@@ -531,10 +531,16 @@ FactoryUnit = Class(StructureUnit) {
         StructureUnit.OnCreate(self)
         self.BuildingUnit = false
     end,
-
-    GetUnitBeingBuilt = function(self)
-        return self.UnitBeingBuilt
-    end,
+    
+    DestroyUnitBeingBuilt = function(self)
+        if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() < 1 then
+            if self.UnitBeingBuilt:GetFractionComplete() > 0.5 then
+                self.UnitBeingBuilt:Kill()
+            else
+                self.UnitBeingBuilt:Destroy()
+            end
+        end
+    end, 
 
     OnDestroy = function(self)
         -- Figure out if we're a research station
@@ -548,6 +554,8 @@ FactoryUnit = Class(StructureUnit) {
         end
 
         StructureUnit.OnDestroy(self)
+        
+        self.DestroyUnitBeingBuilt(self)
     end,
 
     OnPaused = function(self)
@@ -835,18 +843,6 @@ FactoryUnit = Class(StructureUnit) {
             self:RolloffBody()
         end,
     },
-
-    OnKilled = function(self, instigator, type, overkillRatio)
-        StructureUnit.OnKilled(self, instigator, type, overkillRatio)
-
-        if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() < 1 then
-            if self.UnitBeingBuilt:GetFractionComplete() > 0.5 then
-                self.UnitBeingBuilt:Kill()
-            else
-                self.UnitBeingBuilt:Destroy()
-            end
-        end
-    end,
 }
 
 
@@ -1273,11 +1269,8 @@ SeaFactoryUnit = Class(FactoryUnit) {
 
     StopRocking = function(self)
     end,
-
-    -- Sinking causes problems with incomplete units, so we just delete the half-built unit in all
-    -- cases for naval factories.
-    OnKilled = function(self, instigator, type, overkillRatio)
-        StructureUnit.OnKilled(self, instigator, type, overkillRatio)
+    
+    DestroyUnitBeingBuilt = function(self)
         if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() < 1 then
             self.UnitBeingBuilt:Destroy()
         end
@@ -1400,16 +1393,6 @@ MobileUnit = Class(Unit) {
         end
 
         Unit.OnKilled(self, instigator, type, overkillRatio)
-    end,
-
-    OnPaused = function(self)
-        self:SetBlockCommandQueue(true)
-        Unit.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        self:SetBlockCommandQueue(false)
-        Unit.OnUnpaused(self)
     end,
 
     StartBeingBuiltEffects = function(self, builder, layer)
@@ -1753,14 +1736,14 @@ ConstructionUnit = Class(MobileUnit) {
         self:StopUnitAmbientSound( 'ConstructLoop' )
         MobileUnit.OnPaused(self)
         if self.BuildingUnit then
-            MobileUnit.StopBuildingEffects(self, self:GetUnitBeingBuilt())
+            MobileUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
         end
     end,
 
     OnUnpaused = function(self)
         if self.BuildingUnit then
             self:PlayUnitAmbientSound( 'ConstructLoop' )
-            MobileUnit.StartBuildingEffects(self, self:GetUnitBeingBuilt(), self.UnitBuildOrder)
+            MobileUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
         end
         MobileUnit.OnUnpaused(self)
     end,
@@ -1964,13 +1947,13 @@ CommandUnit = Class(WalkingLandUnit) {
     OnPaused = function(self)
         WalkingLandUnit.OnPaused(self)
         if self.BuildingUnit then
-            WalkingLandUnit.StopBuildingEffects(self, self:GetUnitBeingBuilt())
+            WalkingLandUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
         end
     end,
 
     OnUnpaused = function(self)
         if self.BuildingUnit then
-            WalkingLandUnit.StartBuildingEffects(self, self:GetUnitBeingBuilt(), self.UnitBuildOrder)
+            WalkingLandUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
         end
         WalkingLandUnit.OnUnpaused(self)
     end

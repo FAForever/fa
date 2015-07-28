@@ -1,21 +1,42 @@
-Patch 3643 (Unreleased)
+Patch 3644 (July 27, 2015)
+==========================
+
+Bugs
+----
+
+- AI now works again
+- Unpausing engineers works again
+- Units currently being built no longer hang around when transferring or reclaiming the factory the were being built in.
+- Seraphim units render correctly on medium fidelity
+
+Enhancements
+------------
+
+- Jammer field from crystal now stops working when the crystal is reclaimed
+- Jammer crystal reclaim increased to (5000e, 50bt)
+
+Patch 3643 (July 24, 2015)
+==========================
 
 Bugs
 ----
 
 - Fixed issue with half built units from naval factories
 - Fixed issue with sometimes being unable to quit the game
+- Cybran and UEF buildbots / drones no longer explode with the no air restriction
+- Fixed issue with being unable to reclaim mexes that are being upgraded
+- Seraphim ACU minimum range for normal gun and OC adjusted to be the same as other ACU's
+- Seraphim destroyer surfaces itself after building again
+- Seraphim T2 transport no longer allows active shields on board
+- Seraphim ACU restoration field now works for allied units
+- Aeon T3 battleship TMD is no longer completely unable to stop TML's
 
 Enhancements
 ------------
 
 - Added ability to see unit data (xp/regen rate) as observer
-
-Lobby
------
-
-- [ ] The mod manager can now blacklist incompatible mods
-
+- Firebeetles can no longer detonate in the air
+- Upgrade hotkey now works for T2 naval and air support factories
 
 Contributors
 ------------

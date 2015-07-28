@@ -1767,9 +1767,7 @@ Unit = Class(moho.unit_methods) {
             end
         end
 
-        if builder:IsUnitState('Upgrading') then
-            self.originalBuilder = builder
-        end
+        self.originalBuilder = builder
     end,
 
     UnitBuiltPercentageCallbackThread = function(self, percent, callback)
@@ -1815,6 +1813,7 @@ Unit = Class(moho.unit_methods) {
             builder:SetHealth(builder, newHealthAmount) --Seems like the engine uses builder to determine new HP
             self.DisallowCollisions = false
             self:SetCanTakeDamage(true)
+            self:RevertCollisionShape()
         end
 
         --Turn off land bones if this unit has them.
@@ -2148,6 +2147,7 @@ Unit = Class(moho.unit_methods) {
         if order == 'Upgrade' and bp.General.UpgradesFrom == self:GetUnitId() then
             built.DisallowCollisions = true
             built:SetCanTakeDamage(false)
+            built:SetCollisionShape('None')
         end
     end,
 
@@ -3945,6 +3945,13 @@ Unit = Class(moho.unit_methods) {
         self:DoUnitCallbacks( 'OnDetachedToTransport', transport )
         transport.slotsFree[self.attachmentBone] = true
         self.attachmentBone = nil
+    end,
+
+    --- Deprecated functionality
+    GetUnitBeingBuilt = function(self)
+        WARN("Deprecated function GetUnitBeingBuilt called at")
+        WARN(debug.traceback())
+        return self.UnitBeingBuilt
     end,
 
     OnShieldEnabled = function(self) end,
