@@ -72,6 +72,11 @@ EnhanceTask = Class(ScriptTask) {
             end
 
             unit:OnWorkEnd(self.CommandData.Enhancement)
+
+            if unit:IsPaused() then
+                unit:SetPaused(false)
+            end
+
             self.Success = true
 
             return TASKSTATUS.Done
