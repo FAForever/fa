@@ -172,7 +172,7 @@ function DoHackyLogic(buildingType, builder)
         builder:ForkThread(function()
             while true do
                 if not unitInstance then
-                    unitInstance = builder:GetUnitBeingBuilt()
+                    unitInstance = builder.UnitBeingBuilt
                 end
                 aiBrain = builder:GetAIBrain()
                 if unitInstance then

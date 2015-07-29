@@ -1799,8 +1799,8 @@ Platoon = Class(moho.platoon_methods) {
         self:EconUnfinishedBody()
 		WaitSeconds(20)
 		local eng = self:GetPlatoonUnits()[1]
-		if eng:GetUnitBeingBuilt() then
-			beingBuilt = eng:GetUnitBeingBuilt()
+		if eng.UnitBeingBuilt then
+			beingBuilt = eng.UnitBeingBuilt
 		end
 		if beingBuilt then
 			while not beingBuilt:BeenDestroyed() and beingBuilt:GetFractionComplete() < 1 do
@@ -1979,7 +1979,7 @@ Platoon = Class(moho.platoon_methods) {
                     local buildCat = ParseEntityCategory(buildeeCat)
                     for unitNum, unit in unitsBuilding do
                         if not unit.Dead and ( unit:IsUnitState('Building') or unit:IsUnitState('Upgrading') ) then
-                            local buildingUnit = unit:GetUnitBeingBuilt()
+                            local buildingUnit = unit.UnitBeingBuilt
                             if buildingUnit and not buildingUnit.Dead and EntityCategoryContains( buildCat, buildingUnit ) then
                                 local unitPos = unit:GetPosition()
                                 if unitPos and platoonPos and VDist2(platoonPos[1], platoonPos[3], unitPos[1], unitPos[3]) < assistRange then
@@ -5546,8 +5546,8 @@ Platoon = Class(sorianoldPlatoon) {
         self:EconUnfinishedBody()
 		WaitSeconds(20)
 		local eng = self:GetPlatoonUnits()[1]
-		if eng:GetUnitBeingBuilt() then
-			beingBuilt = eng:GetUnitBeingBuilt()
+		if eng.UnitBeingBuilt then
+			beingBuilt = eng.UnitBeingBuilt
 		end
 		if beingBuilt then
 			while not beingBuilt:BeenDestroyed() and beingBuilt:GetFractionComplete() < 1 do

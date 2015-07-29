@@ -37,7 +37,7 @@ function CDRRunAway( aiBrain, cdr )
         local nmeHardcore = aiBrain:GetUnitsAroundPoint( categories.EXPERIMENTAL, cdrPos, 25, 'Enemy' )
         if nmeAir > 3 or nmeLand > 3 or nmeHardcore > 0 then
             if cdr:IsUnitState('Building') then
-                cdr.UnitBeingBuiltBehavior = cdr:GetUnitBeingBuilt()
+                cdr.UnitBeingBuiltBehavior = cdr.UnitBeingBuilt
             end
             local canTeleport = cdr:HasEnhancement( 'Teleporter' )
             CDRRevertPriorityChange( aiBrain, cdr )
@@ -137,9 +137,9 @@ function CDROverCharge( aiBrain, cdr )
     
     if numUnits > 0 or ( not cdr.DistressCall and distressLoc and Utilities.XZDistanceTwoVectors( distressLoc, cdrPos ) < distressRange ) then
         #CDRRevertPriorityChange( aiBrain, cdr )
-        if cdr:GetUnitBeingBuilt() then
+        if cdr.UnitBeingBuilt then
             #LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': CDR was building something')
-            cdr.UnitBeingBuiltBehavior = cdr:GetUnitBeingBuilt()
+            cdr.UnitBeingBuiltBehavior = cdr.UnitBeingBuilt
         end
         local plat = aiBrain:MakePlatoon( '', '' )
         aiBrain:AssignUnitsToPlatoon( plat, {cdr}, 'support', 'None' )
@@ -1019,7 +1019,7 @@ function FatBoyBuildCheck(self)
     
     local unitBeingBuilt = false
     repeat 
-        unitBeingBuilt = unitBeingBuilt or experimental:GetUnitBeingBuilt()
+        unitBeingBuilt = unitBeingBuilt or experimental.UnitBeingBuilt
         WaitSeconds(1)
     until experimental.Dead or unitBeingBuilt or aiBrain:GetArmyStat("UnitCap_MaxCap", 0.0).Value - aiBrain:GetArmyStat("UnitCap_Current", 0.0).Value < 10
     
@@ -1138,7 +1138,7 @@ TempestBehavior = function(self)
             local building
             repeat
                 WaitSeconds(5)
-                unitBeingBuilt = unit:GetUnitBeingBuilt()
+                unitBeingBuilt = unit.UnitBeingBuilt
                 building = false
                 for k,v in self:GetPlatoonUnits() do
                     if not v.Dead and v:IsUnitState('Building') then
@@ -1665,8 +1665,8 @@ function CDRRunAwaySorian( aiBrain, cdr )
         local nmeLand = aiBrain:GetNumUnitsAroundPoint( categories.COMMAND + categories.LAND - categories.ENGINEER - categories.SCOUT - categories.TECH1, cdrPos, 40, 'Enemy' )
 		local nmaShield = aiBrain:GetNumUnitsAroundPoint( categories.SHIELD * categories.STRUCTURE, cdrPos, 100, 'Ally' )
         if nmeAir > 4 or nmeLand > 9 or nmeT3 > 4 or nmeHardcore > 0 or cdr:GetHealthPercent() < .70 or shieldPercent < .30 then
-			if cdr:GetUnitBeingBuilt() then
-				cdr.UnitBeingBuiltBehavior = cdr:GetUnitBeingBuilt()
+			if cdr.UnitBeingBuilt then
+				cdr.UnitBeingBuiltBehavior = cdr.UnitBeingBuilt
 			end
 			cdr.GoingHome = true
 			cdr.Fighting = false
@@ -1820,9 +1820,9 @@ function CDROverChargeSorian( aiBrain, cdr) #, Mult )
     
     if (cdr:GetHealthPercent() > .85 and shieldPercent > .35) and (( totalUnits > 0 and numUnits1 < 15 and numUnits2 < 10 and numUnits3 < 5 and numUnits4 < 1 and numUnitsDF1 < 3 and numUnitsDF < 1 and numUnitsIF < 1) or ( not cdr.DistressCall and distressLoc and commanderResponse and Utilities.XZDistanceTwoVectors( distressLoc, cdrPos ) < distressRange )) then
         CDRRevertPriorityChange( aiBrain, cdr )
-        if cdr:GetUnitBeingBuilt() then
+        if cdr.UnitBeingBuilt then
             #LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': CDR was building something')
-            cdr.UnitBeingBuiltBehavior = cdr:GetUnitBeingBuilt()
+            cdr.UnitBeingBuiltBehavior = cdr.UnitBeingBuilt
         end
 		cdr.Fighting = true
 		cdr.GoingHome = false
