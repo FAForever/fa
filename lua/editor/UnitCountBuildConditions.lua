@@ -1153,7 +1153,7 @@ function GetGuards(aiBrain, Unit)
 	local count = 0
 	local UpgradesFrom = Unit:GetBlueprint().General.UpgradesFrom
 	for k,v in engs do
-		if v:GetUnitBeingBuilt() == Unit then
+		if v.UnitBeingBuilt == Unit then
 			count = count + 1
 		end
 	end

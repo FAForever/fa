@@ -57,12 +57,12 @@ EngineerManager = Class(BuilderManager) {
             return false
         end
         if unit:IsUnitState('Building') then
-            beingBuilt = unit:GetUnitBeingBuilt()
+            beingBuilt = unit.UnitBeingBuilt
             return false
         elseif unit:IsUnitState('Guarding') then
             local guardedUnit = unit:GetGuardedUnit() 
             if guardedUnit and not guardedUnit.Dead and IsUnit(guardedUnit) and guardedUnit:IsUnitState('Building') then
-                beingBuilt = guardedUnit:GetUnitBeingBuilt()
+                beingBuilt = guardedUnit.UnitBeingBuilt
             end
         end
         # If built unit is of the category passed in return true
@@ -81,7 +81,7 @@ EngineerManager = Class(BuilderManager) {
         if unit:IsUnitState('Guarding') then
             local guardedUnit = unit:GetGuardedUnit() 
             if guardedUnit and not guardedUnit.Dead and IsUnit(guardedUnit) and guardedUnit:IsUnitState('Building') then
-                beingBuilt = guardedUnit:GetUnitBeingBuilt()
+                beingBuilt = guardedUnit.UnitBeingBuilt
             end
         end
         # If built unit is of the category passed in return true
@@ -283,12 +283,12 @@ EngineerManager = Class(BuilderManager) {
             return false
         end
         if unit:IsUnitState('Building') then
-            beingBuilt = unit:GetUnitBeingBuilt()
+            beingBuilt = unit.UnitBeingBuilt
             #return false
         elseif unit:IsUnitState('Guarding') then
             local guardedUnit = unit:GetGuardedUnit() 
             if guardedUnit and not guardedUnit.Dead and IsUnit(guardedUnit) and guardedUnit:IsUnitState('Building') then
-                beingBuilt = guardedUnit:GetUnitBeingBuilt()
+                beingBuilt = guardedUnit.UnitBeingBuilt
             end
         end
         # If built unit is of the category passed in return true
@@ -579,7 +579,7 @@ EngineerManager = Class(BuilderManager) {
                 continue
             end
             
-            local beingBuiltUnit = v:GetUnitBeingBuilt()
+            local beingBuiltUnit = v.UnitBeingBuilt
             if not beingBuiltUnit or beingBuiltUnit.Dead then
                 continue
             end

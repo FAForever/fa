@@ -484,14 +484,14 @@ CConstructionStructureUnit = Class(CStructureUnit) {
         self:StopUnitAmbientSound( 'ConstructLoop' )
         CStructureUnit.OnPaused(self)
         if self.BuildingUnit then
-            CStructureUnit.StopBuildingEffects(self, self:GetUnitBeingBuilt())
+            CStructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
         end
     end,
 
     OnUnpaused = function(self)
         if self.BuildingUnit then
             self:PlayUnitAmbientSound( 'ConstructLoop' )
-            CStructureUnit.StartBuildingEffects(self, self:GetUnitBeingBuilt(), self.UnitBuildOrder)
+            CStructureUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
         end
         CStructureUnit.OnUnpaused(self)
     end,

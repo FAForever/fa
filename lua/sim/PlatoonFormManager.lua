@@ -80,7 +80,7 @@ PlatoonFormManager = Class(BuilderManager) {
             end
             
             # Check for unit being built compatibility
-            local beingBuiltUnit = v:GetUnitBeingBuilt()
+            local beingBuiltUnit = v.UnitBeingBuilt
             if not beingBuiltUnit or not EntityCategoryContains( buildingCategory, beingBuiltUnit ) then
                 continue
             end
