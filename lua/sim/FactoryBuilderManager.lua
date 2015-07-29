@@ -126,7 +126,7 @@ FactoryBuilderManager = Class(BuilderManager) {
                 continue
             end
             
-            local beingBuiltUnit = v:GetUnitBeingBuilt()
+            local beingBuiltUnit = v.UnitBeingBuilt
             if not beingBuiltUnit or beingBuiltUnit.Dead then
                 continue
             end
