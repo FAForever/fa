@@ -437,14 +437,13 @@ function UpdateWindow(info)
                         end
                     end
                 end
-
+            end
                 if info.userUnit ~= nil and info.userUnit:GetBuildRate() >= 2 then
                     controls.Buildrate:SetText(string.format("%d",math.floor(info.userUnit:GetBuildRate())))
                     controls.Buildrate:Show()
                 else
                     controls.Buildrate:Hide()
                 end
-            end
         end
     end
 end
