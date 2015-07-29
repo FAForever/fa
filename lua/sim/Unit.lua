@@ -3949,6 +3949,9 @@ Unit = Class(moho.unit_methods) {
 
     --- Deprecated functionality
     GetUnitBeingBuilt = function(self)
+        WARN("Deprecated function GetUnitBeingBuilt called at")
+        WARN(debug.traceback())
+        self.GetUnitBeingBuilt = function(self) return self.UnitBeingBuilt end
         return self.UnitBeingBuilt
     end,
 
