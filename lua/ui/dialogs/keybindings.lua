@@ -195,8 +195,8 @@ function CreateUI()
         end
     end
     
-    local function UnbindCurrentSelection()
-        local Keymapper = import('/lua/keymap/keymapper.lua')
+	local function UnbindCurrentSelection()
+		local Keymapper = import('/lua/keymap/keymapper.lua')
         for k, v in keyTable do
             if v._selected then
                 Keymapper.ClearUserKeyMapping(v.key)
@@ -237,7 +237,7 @@ function CreateUI()
     assignKeyButton.OnClick = function(self, modifiers)
         AssignCurrentSelection()
     end
-    
+	
     local unbindKeyButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC key_binding_0007>Unbind Key"))
     LayoutHelpers.LeftOf(unbindKeyButton, assignKeyButton, 27)
     unbindKeyButton.OnClick = function(self, modifiers)
