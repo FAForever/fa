@@ -65,8 +65,24 @@ StructureUnit = Class(Unit) {
         end
     end,
 
+    OnStartBeingBuilt = function(self, builder, layer)
+        Unit.OnStartBeingBuilt(self, builder, layer)
+        local bp = self:GetBlueprint()
+        if bp.Physics.FlattenSkirt and not self:HasTarmac() and bp.General.FactionName ~= "Seraphim" then
+            if self.TarmacBag then
+                self:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP)
+            else
+                self:CreateTarmac(true, true, true, false, false)
+            end
+        end
+    end,
+
     OnStopBeingBuilt = function(self,builder,layer)
         Unit.OnStopBeingBuilt(self,builder,layer)
+        -- Whaa why can't we have sane inheritance chains :/
+        if self:GetBlueprint().General.FactionName == "Seraphim" then
+            self:CreateTarmac(true, true, true, false, false)
+        end
         self:PlayActiveAnimation()
     end,
 
@@ -367,10 +383,10 @@ StructureUnit = Class(Unit) {
 
     end,
 
-    -- Adding into OnKilled the ability to destroy the tarmac but put a new one down that looks exactly like it but
+    -- Adding into OnDestroy the ability to destroy the tarmac but put a new one down that looks exactly like it but
     -- will time out over the time spec'd or 300 seconds.
-    OnKilled = function(self, instigator, type, overkillRatio)
-        Unit.OnKilled(self, instigator, type, overkillRatio)
+    OnDestroy = function(self)
+        Unit.OnDestroy(self)
         local orient = self.TarmacBag.Orientation
         local currentBP = self.TarmacBag.CurrentBP
         self:DestroyTarmac()
@@ -515,8 +531,17 @@ FactoryUnit = Class(StructureUnit) {
         StructureUnit.OnCreate(self)
         self.BuildingUnit = false
     end,
+    
+    DestroyUnitBeingBuilt = function(self)
+        if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() < 1 then
+            if self.UnitBeingBuilt:GetFractionComplete() > 0.5 then
+                self.UnitBeingBuilt:Kill()
+            else
+                self.UnitBeingBuilt:Destroy()
+            end
+        end
+    end, 
 
-    -- Added to add engymod logic
     OnDestroy = function(self)
         -- Figure out if we're a research station
         if EntityCategoryContains(categories.RESEARCH, self) then
@@ -529,6 +554,8 @@ FactoryUnit = Class(StructureUnit) {
         end
 
         StructureUnit.OnDestroy(self)
+        
+        self.DestroyUnitBeingBuilt(self)
     end,
 
     OnPaused = function(self)
@@ -562,11 +589,11 @@ FactoryUnit = Class(StructureUnit) {
         if EntityCategoryContains(categories.RESEARCH, self) then
             local buildRestrictionVictims = aiBrain:GetListOfUnits(categories.FACTORY + categories.ENGINEER, false)
             for id, unit in buildRestrictionVictims do
-            unit:updateBuildRestrictions()
+                unit:updateBuildRestrictions()
+            end
         end
-    end
 
-    StructureUnit.OnStopBeingBuilt(self,builder,layer)
+        StructureUnit.OnStopBeingBuilt(self,builder,layer)
     end,
 
     ChangeBlinkingLights = function(self, state)
@@ -623,28 +650,43 @@ FactoryUnit = Class(StructureUnit) {
         if order ~= 'Upgrade' then
             ChangeState(self, self.BuildingState)
             self.BuildingUnit = false
-        else
-            self:RemoveCommandCap('RULEUCC_Guard')
         end
-
         self.FactoryBuildFailed = false
     end,
 
+    --- Introduce a rolloff delay, where defined.
     OnStopBuild = function(self, unitBeingBuilt, order )
+        local bp = self:GetBlueprint()
+        if bp.General.RolloffDelay and bp.General.RolloffDelay > 0 and not self.FactoryBuildFailed then
+            self:ForkThread(self.PauseThread, bp.General.RolloffDelay, unitBeingBuilt, order)
+        else
+            self:DoStopBuild(unitBeingBuilt, order)
+        end
+    end,
+
+    --- Adds a pause between unit productions
+    PauseThread = function(self, productionpause, unitBeingBuilt, order)
+        self:StopBuildFx()
+        self:SetBusy(true)
+        self:SetBlockCommandQueue(true)
+
+        WaitSeconds(productionpause)
+
+        self:SetBusy(false)
+        self:SetBlockCommandQueue(false)
+        self:DoStopBuild(unitBeingBuilt, order)
+    end,
+
+    DoStopBuild = function(self, unitBeingBuilt, order )
         StructureUnit.OnStopBuild(self, unitBeingBuilt, order )
 
-        if not self.FactoryBuildFailed then
+        if not self.FactoryBuildFailed and not self.Dead then
             if not EntityCategoryContains(categories.AIR, unitBeingBuilt) then
                 self:RollOffUnit()
             end
             self:StopBuildFx()
             self:ForkThread(self.FinishBuildThread, unitBeingBuilt, order )
         end
-
-        if order == 'Upgrade' then
-            self:AddCommandCap('RULEUCC_Guard')
-        end
-
         self.BuildingUnit = false
     end,
 
@@ -690,8 +732,7 @@ FactoryUnit = Class(StructureUnit) {
 
     RollOffUnit = function(self)
         local spin, x, y, z = self:CalculateRollOffPoint()
-        local units = { self.UnitBeingBuilt }
-        self.MoveCommand = IssueMove(units, Vector(x, y, z))
+        self.MoveCommand = IssueMove({self.UnitBeingBuilt}, Vector(x, y, z))
     end,
 
     CalculateRollOffPoint = function(self)
@@ -802,13 +843,6 @@ FactoryUnit = Class(StructureUnit) {
             self:RolloffBody()
         end,
     },
-
-    OnKilled = function(self, instigator, type, overkillRatio)
-        StructureUnit.OnKilled(self, instigator, type, overkillRatio)
-        if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() ~= 1 then
-            self.UnitBeingBuilt:Kill()
-        end
-    end,
 }
 
 
@@ -1235,6 +1269,12 @@ SeaFactoryUnit = Class(FactoryUnit) {
 
     StopRocking = function(self)
     end,
+    
+    DestroyUnitBeingBuilt = function(self)
+        if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() < 1 then
+            self.UnitBeingBuilt:Destroy()
+        end
+    end,
 }
 
 
@@ -1353,16 +1393,6 @@ MobileUnit = Class(Unit) {
         end
 
         Unit.OnKilled(self, instigator, type, overkillRatio)
-    end,
-
-    OnPaused = function(self)
-        self:SetBlockCommandQueue(true)
-        Unit.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        self:SetBlockCommandQueue(false)
-        Unit.OnUnpaused(self)
     end,
 
     StartBeingBuiltEffects = function(self, builder, layer)
@@ -1581,18 +1611,21 @@ AirUnit = Class(MobileUnit) {
         end
     end,
 
-    -- ON KILLED: THIS FUNCTION PLAYS WHEN THE UNIT TAKES A MORTAL HIT.  IT PLAYS ALL THE DEFAULT DEATH EFFECT
-    -- IT ALSO SPAWNS THE WRECKAGE BASED UPON HOW MUCH IT WAS OVERKILLED. UNIT WILL SPIN OUT OF CONTROL TOWARDS
-    -- GROUND AND WHEN IT IMPACTS IT WILL DESTROY ITSELF
+    --- Called when the unit is killed, but before it falls out of the sky and blows up.
     OnKilled = function(self, instigator, type, overkillRatio)
         local bp = self:GetBlueprint()
-        if self:GetCurrentLayer() == 'Air' then
+
+        -- A completed, flying plane expects an OnImpact event due to air crash.
+        -- An incomplete unit in the factory still reports as being in layer "Air", so needs this
+        -- stupid check.
+        if self:GetCurrentLayer() == 'Air' and self:GetFractionComplete() == 1  then
             self.CreateUnitAirDestructionEffects( self, 1.0 )
             self:DestroyTopSpeedEffects()
             self:DestroyBeamExhaust()
             self.OverKillRatio = overkillRatio
             self:PlayUnitSound('Killed')
             self:DoUnitCallbacks('OnKilled')
+            self:DisableShield()
             if instigator and IsUnit(instigator) then
                 instigator:OnKilledUnit(self)
             end
@@ -1603,8 +1636,9 @@ AirUnit = Class(MobileUnit) {
     end,
 }
 
---- Base class for air transports.
-AirTransport = Class(AirUnit) {
+--- Mixin transports (air, sea, space, whatever). Sellotape onto concrete transport base classes as
+-- desired.
+BaseTransport = Class() {
     OnTransportAttach = function(self, attachBone, unit)
         self:PlayUnitSound('Load')
         self:MarkWeaponsOnTransport(unit, true)
@@ -1612,10 +1646,7 @@ AirTransport = Class(AirUnit) {
             unit:DisableShield()
             unit:DisableDefaultToggleCaps()
         end
-        if not EntityCategoryContains(categories.PODSTAGINGPLATFORM, self) then
-            self:RequestRefreshUI()
-        end
-        --Added by brute51
+        self:RequestRefreshUI()
         unit:OnAttachedToTransport(self, attachBone)
     end,
 
@@ -1624,9 +1655,7 @@ AirTransport = Class(AirUnit) {
         self:MarkWeaponsOnTransport(unit, false)
         unit:EnableShield()
         unit:EnableDefaultToggleCaps()
-        if not EntityCategoryContains(categories.PODSTAGINGPLATFORM, self) then
-            self:RequestRefreshUI()
-        end
+        self:RequestRefreshUI()
         unit:TransportAnimation(-1)
         unit:OnDetachedToTransport(self)
     end,
@@ -1636,40 +1665,38 @@ AirTransport = Class(AirUnit) {
         attached:DetachFrom()
     end,
 
-    OnKilled = function(self, instigator, type, overkillRatio)
-        AirUnit.OnKilled(self, instigator, type, overkillRatio)
-
-        local units = self:GetCargo()
-        for k, v in units do
-            v:DetachFrom()
-        end
-    end,
-
     GetTransportClass = function(self)
         local bp = self:GetBlueprint().Transport
         return bp.TransportClass
     end,
 
-    OnStartTransportLoading = function(...)
-        WARN("Start loading!")
-        for k, v in arg do
-            WARN(v)
-        end
+    OnStartTransportLoading = function(self)
+        -- We keep the aibrain up to date with the last transport to start loading so, among other
+        -- things, we can determine which transport is being referenced during an OnTransportFull
+        -- event (As this function is called immediately before that one).
+        self:GetAIBrain().loadingTransport = self
     end,
 
     OnStopTransportLoading = function(...)
-        WARN("Stop loading!")
-        for k, v in arg do
-            WARN(v)
-        end
     end,
 
     DestroyedOnTransport = function(self)
-        WARN("DestroyedOnTransport!")
-        for k, v in arg do
-            WARN(v)
+    end,
+
+    DetachCargo = function(self)
+        local units = self:GetCargo()
+        for k, v in units do
+            v:DetachFrom()
         end
     end
+}
+
+--- Base class for air transports.
+AirTransport = Class(AirUnit, BaseTransport) {
+    OnKilled = function(self, instigator, type, overkillRatio)
+        AirUnit.OnKilled(self, instigator, type, overkillRatio)
+        self:DetachCargo()
+    end,
 }
 
 ---------------------------------------------------------------
@@ -1709,25 +1736,24 @@ ConstructionUnit = Class(MobileUnit) {
         self:StopUnitAmbientSound( 'ConstructLoop' )
         MobileUnit.OnPaused(self)
         if self.BuildingUnit then
-            MobileUnit.StopBuildingEffects(self, self:GetUnitBeingBuilt())
+            MobileUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
         end
     end,
 
     OnUnpaused = function(self)
         if self.BuildingUnit then
             self:PlayUnitAmbientSound( 'ConstructLoop' )
-            MobileUnit.StartBuildingEffects(self, self:GetUnitBeingBuilt(), self.UnitBuildOrder)
+            MobileUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
         end
         MobileUnit.OnUnpaused(self)
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order )
-
-    if unitBeingBuilt.WorkItem.Slot and unitBeingBuilt.WorkProgress == 0 then
-        return
-    else
-        MobileUnit.OnStartBuild(self,unitBeingBuilt, order)
-    end
+        if unitBeingBuilt.WorkItem.Slot and unitBeingBuilt.WorkProgress == 0 then
+            return
+        else
+            MobileUnit.OnStartBuild(self,unitBeingBuilt, order)
+        end
         -- Fix up info on the unit id from the blueprint and see if it matches the 'UpgradeTo' field in the BP.
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
@@ -1815,9 +1841,16 @@ SeaUnit = Class(MobileUnit){
     end,
 }
 
+--- Base class for aircraft carriers.
+AircraftCarrier = Class(SeaUnit, BaseTransport) {
+    OnKilled = function(self, instigator, type, overkillRatio)
+        SeaUnit.OnKilled(self, instigator, type, overkillRatio)
+        self:DetachCargo()
+    end,
+}
 
 ---------------------------------------------------------------
---  HOVERING LAND UNITS   --return this entire section to HoverLandUnit = Class(MobileUnit){} if it does not work
+--  HOVERING LAND UNITS
 ---------------------------------------------------------------
 
 HoverLandUnit = Class(MobileUnit) {
@@ -1872,6 +1905,35 @@ CommandUnit = Class(WalkingLandUnit) {
         self.BuildArmManipulator:SetHeadingPitch(self:GetWeaponManipulatorByLabel(self.rightGunLabel):GetHeadingPitch())
     end,
 
+    OnStartBuild = function(self, unitBeingBuilt, order)
+        WalkingLandUnit.OnStartBuild(self, unitBeingBuilt, order)
+        self.UnitBeingBuilt = unitBeingBuilt
+
+        local bp = self:GetBlueprint()
+        local isUpgrade = order == 'Upgrade'
+        local showEffects = not isUpgrade or bp.Display.ShowBuildEffectsDuringUpgrade
+
+        if not isUpgrade then
+            self.BuildingUnit = true
+        end
+
+        if showEffects then
+            self:StartBuildingEffects(unitBeingBuilt, order)
+        end
+
+        -- Check if we're about to try and build something we shouldn't. This can only happen due to
+        -- a native code bug in the SCU REBUILDER behaviour.
+        -- FractionComplete is zero only if we're the initiating builder. Clearly, we want to allow
+        -- assisting builds of other races, just not *starting* them.
+        -- We skip the check if we're assisting another builder: it's up to them to have the ability
+        -- to start this build, not us.
+        if not self:GetGuardedUnit() and unitBeingBuilt:GetFractionComplete() == 0 and not self:CanBuild(unitBeingBuilt:GetBlueprint().BlueprintId) then
+            IssueStop({self})
+            IssueClearCommands({self})
+            unitBeingBuilt:Destroy()
+        end
+    end,
+
     OnStopBuild = function(self, unitBeingBuilt)
         WalkingLandUnit.OnStopBuild(self, unitBeingBuilt)
         if self:BeenDestroyed() then return end
@@ -1885,13 +1947,13 @@ CommandUnit = Class(WalkingLandUnit) {
     OnPaused = function(self)
         WalkingLandUnit.OnPaused(self)
         if self.BuildingUnit then
-            WalkingLandUnit.StopBuildingEffects(self, self:GetUnitBeingBuilt())
+            WalkingLandUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
         end
     end,
 
     OnUnpaused = function(self)
         if self.BuildingUnit then
-            WalkingLandUnit.StartBuildingEffects(self, self:GetUnitBeingBuilt(), self.UnitBuildOrder)
+            WalkingLandUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
         end
         WalkingLandUnit.OnUnpaused(self)
     end
@@ -1905,14 +1967,11 @@ ACUUnit = Class(CommandUnit) {
         local aiBrain = self:GetAIBrain()
 
         -- Mutate the OnDamage function for this one very special shield.
-        local oldOnDamage = self.MyShield.OnDamage
-        local newOnDamage = function(shield, instigator, amount, vector, dmgType)
-            oldOnDamage(shield, instigator, amount, vector, dmgType)
-
+        local oldApplyDamage = self.MyShield.ApplyDamage
+        self.MyShield.ApplyDamage = function(...)
+            oldApplyDamage(unpack(arg))
             aiBrain:OnPlayCommanderUnderAttackVO()
         end
-
-        self.MyShield.OnDamage = newOnDamage
     end,
 
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
@@ -1959,37 +2018,6 @@ ACUUnit = Class(CommandUnit) {
         self:GetAIBrain():GiveResource('Mass', self:GetBlueprint().Economy.StorageMass)
     end,
 }
-
--- This entire section is for factory fixes from CBFP.  If no workie, just remove everything below this line to restore
-
-local Game = import('/lua/game.lua')
-local FactoryFixes = import('/lua/FactoryFixes.lua').FactoryFixes
-
--- The altered factory unit class would be ideal except that it doesn't work. The code in this file gets appended at
--- the end to the existing file from stock FA. Because the air, ground and naval factory classes are generated before
--- this script is even executed the altered factory class won't be used. I can ofcourse re-generate the factory
--- classes but that will affect already loaded mods that change this code aswell. So the best sollution to the problem
--- is to apply the bug fix that was originally meant to go in the factory unit class to each dedicated factory class.
-
----------------------------------------------------------------
---  FACTORY  UNITS
----------------------------------------------------------------
-FactoryUnit = FactoryFixes(FactoryUnit)
-
----------------------------------------------------------------
---  AIR FACTORY UNITS
----------------------------------------------------------------
-AirFactoryUnit = FactoryFixes(AirFactoryUnit)
-
----------------------------------------------------------------
---  LAND FACTORY UNITS
----------------------------------------------------------------
-LandFactoryUnit = FactoryFixes(LandFactoryUnit)
-
----------------------------------------------------------------
---  SEA FACTORY UNITS
----------------------------------------------------------------
-SeaFactoryUnit = FactoryFixes(SeaFactoryUnit)
 
 ---------------------------------------------------------------
 --  SHIELD HOVER UNITS

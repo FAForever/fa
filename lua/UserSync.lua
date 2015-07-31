@@ -33,7 +33,7 @@ function OnSync()
     if Sync.ToggleLifeBarsOn then
         ConExecute('UI_RenderUnitBars true')
     end
-	
+
 	if not table.empty(Sync.AIChat) then
 		for k, v in Sync.AIChat do
 			import('/lua/AIChatSorian.lua').AIChat(v.group, v.text, v.sender)
@@ -45,25 +45,25 @@ function OnSync()
             ConExecute(execRequest)
         end
     end
-    
+
     if not table.empty(Sync.UnitData) then
         UnitData = table.merged(UnitData,Sync.UnitData)
     end
-    
+
     for id,v in Sync.ReleaseIds do
         UnitData[id] = nil
     end
-    
+
     if Sync.NukeLaunchData then
 		import('/modules/nukelaunchping.lua').DoNukePing(Sync.NukeLaunchData)
 	end
 
     if Sync.Reclaim then
         for _, r in Sync.Reclaim do
-            if r.destroy then
-                import('/modules/reclaim.lua').DestroyReclaimLabel(r.id)
+            if not r.mass or r.mass < 1 then
+                import('/modules/reclaim.lua').RemoveReclaim(r)
             else
-                import('/modules/reclaim.lua').CreateReclaimLabel(r)
+                import('/modules/reclaim.lua').AddReclaim(r)
             end
         end
     end

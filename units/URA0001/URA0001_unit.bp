@@ -22,15 +22,13 @@ UnitBlueprint {
         Winged = false,
     },
     Categories = {
-        'CYBRAN',
-        'AIR',
-        'TECH1',
         'CONSTRUCTION',
         'ENGINEER',
         'REPAIR',
         'UNTARGETABLE',
         'NOFORMATION',
         'INSIGNIFICANTUNIT',
+        'VISIBLETORECON'
     },
     Defense = {
         AirThreatLevel = 0,

@@ -2,10 +2,10 @@ UnitBlueprint {
     AI = {
         GuardRadius = 10,
         TargetBones = {
+            'Torso',
             'Head',
             'Right_Arm01',
             'Left_Arm01',
-            'Torso',
             'Left_Thigh',
             'Right_Thigh',
         },
@@ -129,7 +129,6 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
         'USEBUILDPRESETS',
     },
-    CollisionOffsetZ = 0.1,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
@@ -640,7 +639,7 @@ UnitBlueprint {
     SelectionYOffset = 0,
     SizeX = 1.1,
     SizeY = 1.9,
-    SizeZ = 0.6,
+    SizeZ = 1.1,
     StrategicIconName = 'icon_commander_generic',
     StrategicIconSortPriority = 1,
     Transport = {

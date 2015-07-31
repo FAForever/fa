@@ -130,11 +130,12 @@ UnitBlueprint {
         },
         FactionName = 'Cybran',
         Icon = 'land',
-        InstantDeathOnSelfDestruct = true,   # custom variable
+        InstantDeathOnSelfDestruct = true,
         OrderOverrides = {
             RULEUTC_ProductionToggle = {
-                bitmapId = 'overcharge', # more options in textures.scd\textures\ui\common\game\orders
-                helpText = 'detonate', # detonate
+                --  more options in textures.scd\textures\ui\common\game\orders
+                bitmapId = 'overcharge',
+                helpText = 'detonate',
             },
         },
         ToggleCaps = {
@@ -175,8 +176,8 @@ UnitBlueprint {
         MeshExtentsZ = 0.65,
         MinSpeedPercent = 0,
         MotionType = 'RULEUMT_Land',
-        TurnRadius = 4,			#3
-        TurnRate = 160,			#120
+        TurnRadius = 4,
+        TurnRate = 160,
     },
     SelectionSizeX = 0.35,
     SelectionSizeZ = 0.45,
@@ -198,9 +199,8 @@ UnitBlueprint {
             DamageRadius = 4.5,
             DamageType = 'FireBeetleExplosion',
             DisplayName = 'Suicide',
-            FireOnSelfDestruct = true,   # custom variable
+            FireOnSelfDestruct = true,
             FireTargetLayerCapsTable = {
-                Air = 'Land|Water|Seabed',
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },

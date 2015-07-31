@@ -12,14 +12,9 @@ local Utils = import('/lua/system/utils.lua')
 
 local quickDialog = false
 
+-- Terminate the game in a vaguely graceful fashion. This may or may not reduce the amount of times
+-- sudden quits lead to players having to wait for a timeout.
 function SafeQuit()
-    local full_exit = HasCommandLineArg("/online") or HasCommandLineArg("/gpgnet") or HasCommandLineArg("/replay")
-
-    if not full_exit then
-        ExitGame()
-        return
-    end
-
     if SessionIsActive() and not SessionIsReplay() then
         ForkThread(function ()
             ConExecute('ren_oblivion true')
@@ -36,9 +31,6 @@ end
 -- Stack of escape handlers. The topmost one is called when escape is pressed.
 local escapeHandlers = {}
 
--- The index in escapeHandlers of the currently active escape handler. The top of the stack.
-local topEscapeHandler = 0
-
 --- Push a new escape handler onto the stack. This becomes the current escape handler, ahead of the
 -- old one.
 --
@@ -47,24 +39,34 @@ local topEscapeHandler = 0
 -- @see PopEscapeHandler
 function PushEscapeHandler(handler)
     table.insert(escapeHandlers, handler)
-    topEscapeHandler = topEscapeHandler + 1
 end
 
 --- Remove the current escape handler and restore the previous one pushed.
 function PopEscapeHandler()
-    table.remove(escapeHandlers)
-    topEscapeHandler = topEscapeHandler - 1
-end
-
--- If yesNoOnly is true, then the in game dialog will never be shown
-function HandleEsc(yesNoOnly)
-    -- If we've registered a custom escape handler, call it.
-    if escapeHandlers[topEscapeHandler] then
-        escapeHandlers[topEscapeHandler]()
+    if table.getn(escapeHandlers) < 1 then
+        LOG("Error popping escape handler, stack is empty")
+        LOG(repr(debug.traceback()))
         return
     end
+    table.remove(escapeHandlers)
+end
 
-    -- Fall back to GPG's original default escape handler madness.
+--- Default escape handler
+-- Gets called with quit_game = True regardless of keybindings
+-- if the main escape button for the game is pressed.
+--
+-- Also the default keyaction for the 'escape' key.
+--
+-- @param quit_game
+function HandleEsc(quit_game)
+    -- If we've registered a custom escape handler, call it.
+    local eschandler = escapeHandlers[table.getn(escapeHandlers)]
+    -- If quit_game is true, allow users to exit regardless
+    -- of any escape handlers
+    if eschandler and not quit_game then
+        eschandler()
+        return
+    end
 
     local function CreateYesNoDialog()
         if quickDialog then
@@ -79,13 +81,13 @@ function HandleEsc(yesNoOnly)
             {escapeButton = 2, enterButton = 1, worldCover = true})
     end
 
-    if yesNoOnly then
+    if quit_game then
         if Prefs.GetOption('quick_exit') == 'true' then
             SafeQuit()
         else
             CreateYesNoDialog()
         end
-    elseif import('/lua/ui/game/commandmode.lua').GetCommandMode()[1] != false then
+    elseif import('/lua/ui/game/commandmode.lua').GetCommandMode()[1] ~= false then
         import('/lua/ui/game/commandmode.lua').EndCommandMode(true)
     elseif GetSelectedUnits() then
         SelectUnits(nil)

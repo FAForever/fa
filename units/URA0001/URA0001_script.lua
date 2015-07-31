@@ -16,12 +16,11 @@ URA0001 = Class(CAirUnit) {
 
     OnCreate = function(self)
         CAirUnit.OnCreate(self)
-        --CreateBuilderArmController(unit,turretBone, [barrelBone], [aimBone])
-        --BuilderArmManipulator:SetAimingArc(minHeading, maxHeading, headingMaxSlew, minPitch, maxPitch, pitchMaxSlew)
         self.BuildArmManipulator = CreateBuilderArmController(self, 'URA0001' , 'URA0001', 0)
         self.BuildArmManipulator:SetAimingArc(-180, 180, 360, -90, 90, 360)
         self.BuildArmManipulator:SetPrecedence(5)
         self.Trash:Add(self.BuildArmManipulator)
+        self:SetConsumptionActive(false)
     end,
 
     CreateBuildEffects = function( self, unitBeingBuilt, order )
@@ -39,12 +38,20 @@ URA0001 = Class(CAirUnit) {
         ChangeState(self, self.IdleState)
     end,
 
+    --- Don't explode when killed, merely fall out of the sky.
+    OnKilled = function(self)
+        self:StopBuildingEffects()
+    end,
+
+    -- Prevent the unit from reporting consumption values (avoids junk in the resource overlay)
+    UpdateConsumptionValues = function(self) end,
+
     IdleState = State {
         Main = function(self)
             IssueClearCommands({self})
             IssueMove({self}, self:GetPosition())
             WaitSeconds(0.5)
-            IssueMove({self}, self.spawnedBy)
+            IssueMove({self}, self.spawnedBy:GetPosition())
 
             local delay = 0.1
             local wait = 0

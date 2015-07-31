@@ -515,7 +515,7 @@ UnitBlueprint {
             FiringTolerance = 360,
             Flare = {
                 Category = 'MISSILE',
-                Radius = 16,
+                Radius = 26,
             },
             Label = 'AntiMissile1',
             MaxRadius = 50,

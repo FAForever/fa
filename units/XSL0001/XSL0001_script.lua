@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Seraphim Commander Script
 --**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
 local Buff = import('/lua/sim/Buff.lua')
@@ -53,33 +53,14 @@ XSL0001 = Class(ACUUnit) {
         self.ShieldEffectsBag = {}
     end,
 
-    OnStartBuild = function(self, unitBeingBuilt, order)
-        local bp = self:GetBlueprint()
-        if order != 'Upgrade' or bp.Display.ShowBuildEffectsDuringUpgrade then
-            self:StartBuildingEffects(unitBeingBuilt, order)
-        end
-        self:DoOnStartBuildCallbacks(unitBeingBuilt)
-        self:SetActiveConsumptionActive()
-        self:PlayUnitSound('Construct')
-        self:PlayUnitAmbientSound('ConstructLoop')
-        if bp.General.UpgradesTo and unitBeingBuilt:GetUnitId() == bp.General.UpgradesTo and order == 'Upgrade' then
-            self.Upgrading = true
-            self.BuildingUnit = false        
-            unitBeingBuilt.DisallowCollisions = true
-        end
-        self.UnitBeingBuilt = unitBeingBuilt
-        self.UnitBuildOrder = order
-        self.BuildingUnit = true
-    end,
-    
     PlayCommanderWarpInEffect = function(self)
         self:HideBone(0, true)
         self:SetUnSelectable(true)
         self:SetBusy(true)
         self:SetBlockCommandQueue(true)
         self:ForkThread(self.WarpInEffectThread)
-    end, 
-    
+    end,
+
     WarpInEffectThread = function(self)
         self:PlayUnitSound('CommanderArrival')
         self:CreateProjectile( '/effects/entities/UnitTeleport01/UnitTeleport01_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
@@ -107,38 +88,30 @@ XSL0001 = Class(ACUUnit) {
         EffectUtil.CreateSeraphimUnitEngineerBuildingEffects( self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag )
     end,
 
-    RegenBuffThread = function(self)
-        local bp = self:GetBlueprint().Enhancements.RegenAura
+    GetUnitsToBuff = function(self, bp)
         local unitCat = ParseEntityCategory( bp.UnitCategory or 'BUILTBYTIER3FACTORY + BUILTBYQUANTUMGATE + NEEDMOBILEBUILD')
+        local brain = self:GetAIBrain()
+        local all = brain:GetUnitsAroundPoint(unitCat, self:GetPosition(), bp.Radius, 'Ally')
+        local units = {}
 
-        while not self.Dead do
-            --Get friendly units in the area (including self)
-            local units = AIUtils.GetOwnUnitsAroundPoint(self:GetAIBrain(), unitCat, self:GetPosition(), bp.Radius)
-            
-            --Give them a 5 second regen buff
-            for _,unit in units do
-                Buff.ApplyBuff(unit, 'SeraphimACURegenAura')
+        for _, u in all do
+            if not u.Dead and not u:IsBeingBuilt() then
+                table.insert(units, u)
             end
-            
-            --Wait 5 seconds
-            WaitSeconds(5)
         end
+
+        return units
     end,
-       
-    AdvancedRegenBuffThread = function(self)
-        local bp = self:GetBlueprint().Enhancements.AdvancedRegenAura
-        local unitCat = ParseEntityCategory( bp.UnitCategory or 'BUILTBYTIER3FACTORY + BUILTBYQUANTUMGATE + NEEDMOBILEBUILD')
+
+    RegenBuffThread = function(self, type)
+        local bp = self:GetBlueprint().Enhancements[type]
+        local buff = 'SeraphimACU' .. type
 
         while not self.Dead do
-            --Get friendly units in the area (including self)
-            local units = AIUtils.GetOwnUnitsAroundPoint(self:GetAIBrain(), unitCat, self:GetPosition(), bp.Radius)
-            
-            --Give them a 5 second regen buff
+            local units = self:GetUnitsToBuff(bp)
             for _,unit in units do
-                Buff.ApplyBuff(unit, 'SeraphimAdvancedACURegenAura')
+                Buff.ApplyBuff(unit, buff)
             end
-            
-            --Wait 5 seconds
             WaitSeconds(5)
         end
     end,
@@ -147,14 +120,18 @@ XSL0001 = Class(ACUUnit) {
         ACUUnit.CreateEnhancement(self, enh)
 
         local bp = self:GetBlueprint().Enhancements[enh]
-        
+
         -- Regenerative Aura
-        if enh == 'RegenAura' then
+        if enh == 'RegenAura' or enh == 'AdvancedRegenAura' then
+            local buff
+            local type
 
-            if not Buffs['SeraphimACURegenAura'] then   -- AURA BUFF
-                BuffBlueprint {
-                    Name = 'SeraphimACURegenAura',
-                    DisplayName = 'SeraphimACURegenAura',
+            buff = 'SeraphimACU' .. enh
+
+            if not Buffs[buff] then
+                local buff_bp = {
+                    Name = buff,
+                    DisplayName = buff,
                     BuffType = 'COMMANDERAURA',
                     Stacks = 'REPLACE',
                     Duration = 5,
@@ -167,76 +144,23 @@ XSL0001 = Class(ACUUnit) {
                         },
                     },
                 }
-            end
-            if not Buffs['SeraphimACURegenAuraSelfBuff'] then   -- AURA SELF BUFF
-                BuffBlueprint {
-                    Name = 'SeraphimACURegenAuraSelfBuff',
-                    DisplayName = 'SeraphimACURegenAuraSelfBuff',
-                    BuffType = 'COMMANDERAURAFORSELF',
-                    Stacks = 'REPLACE',
-                    Duration = -1,
-                    Affects = {
-                        MaxHealth = {
-                            Add = bp.ACUAddHealth or 0,
-                            Mult = 1,
-                        },
-                    },
-                }
-            end
 
-            Buff.ApplyBuff(self, 'SeraphimACURegenAuraSelfBuff')
-            table.insert( self.ShieldEffectsBag, CreateAttachedEmitter( self, 'XSL0001', self:GetArmy(), '/effects/emitters/seraphim_regenerative_aura_01_emit.bp' ) )
-            self.RegenThreadHandle = self:ForkThread(self.RegenBuffThread)
-                        
-        elseif enh == 'RegenAuraRemove' then
-            if self.ShieldEffectsBag then
-                for k, v in self.ShieldEffectsBag do
-                    v:Destroy()
-                end
-		        self.ShieldEffectsBag = {}
-		    end
-            KillThread(self.RegenThreadHandle)
-            Buff.RemoveBuff(self, 'SeraphimACURegenAuraSelfBuff')
-            
-        elseif enh == 'AdvancedRegenAura' then
-            if self.RegenThreadHandle then
-                if self.ShieldEffectsBag then
-                    for k, v in self.ShieldEffectsBag do
-                        v:Destroy()
-                    end
-		            self.ShieldEffectsBag = {}
-		        end
-                KillThread(self.RegenThreadHandle)
-                
-            end
-            Buff.RemoveBuff(self, 'SeraphimACURegenAuraSelfBuff')
-
-            if not Buffs['SeraphimAdvancedACURegenAura'] then   -- AURA BUFF
-                BuffBlueprint {
-                    Name = 'SeraphimAdvancedACURegenAura',
-                    DisplayName = 'SeraphimAdvancedACURegenAura',
-                    BuffType = 'COMMANDERAURA',
-                    Stacks = 'REPLACE',
-                    Duration = 5,
-                    Affects = {
-                        RegenPercent = {
-                            Add = 0,
-                            Mult = bp.RegenPerSecond or 0.1,
-                            Ceil = bp.RegenCeiling,
-                            Floor = bp.RegenFloor,
-                        },
-                        MaxHealth = {
+                if enh == 'AdvancedRegenAura' then
+                    buff_bp.Affects.MaxHealth =
+                    {
                             Add = 0,
                             Mult = bp.MaxHealthFactor or 1.0,
                             DoNoFill = true,
-                        },                        
-                    },
                 }
             end
-            if not Buffs['SeraphimACUAdvancedRegenAuraSelfBuff'] then   -- AURA SELF BUFF
+
+                BuffBlueprint(buff_bp)
+            end
+
+            if not Buffs[buff .. 'SelfBuff'] then   -- AURA SELF BUFF
                 BuffBlueprint {
-                    Name = 'SeraphimACUAdvancedRegenAuraSelfBuff',
-                    DisplayName = 'SeraphimACUAdvancedRegenAuraSelfBuff',
+                    Name = buff .. 'SelfBuff',
+                    DisplayName = buff .. 'SelfBuff',
                     BuffType = 'COMMANDERAURAFORSELF',
                     Stacks = 'REPLACE',
                     Duration = -1,
@@ -249,22 +173,29 @@ XSL0001 = Class(ACUUnit) {
                 }
             end
 
+            Buff.ApplyBuff(self, buff .. 'SelfBuff')
             table.insert( self.ShieldEffectsBag, CreateAttachedEmitter( self, 'XSL0001', self:GetArmy(), '/effects/emitters/seraphim_regenerative_aura_01_emit.bp' ) )
-            self.AdvancedRegenThreadHandle = self:ForkThread(self.AdvancedRegenBuffThread)
-            Buff.ApplyBuff(self, 'SeraphimACUAdvancedRegenAuraSelfBuff')
+            if self.RegenThreadHandle then
+                KillThread(self.RegenThreadHandle)
+                self.RegenThreadHandle = nil
+            end
 
-        elseif enh == 'AdvancedRegenAuraRemove' then
+            self.RegenThreadHandle = self:ForkThread(self.RegenBuffThread, enh)
+        elseif enh == 'RegenAuraRemove' or enh == 'AdvancedRegenAuraRemove' then
             if self.ShieldEffectsBag then
                 for k, v in self.ShieldEffectsBag do
                     v:Destroy()
                 end
 		        self.ShieldEffectsBag = {}
 		    end
-            KillThread(self.AdvancedRegenThreadHandle)
-            Buff.RemoveBuff(self, 'SeraphimACURegenAuraSelfBuff')
-            Buff.RemoveBuff(self, 'SeraphimACUAdvancedRegenAuraSelfBuff')
 
-        --Resource Allocation
+            KillThread(self.RegenThreadHandle)
+            self.RegenThreadHandle = nil
+            for _, b in {'SeraphimACURegenAura', 'SeraphimACUAdvancedRegenAura'} do
+                if Buff.HasBuff(self, b .. 'SelfBuff') then
+                    Buff.RemoveBuff(self, b .. 'SelfBuff')
+                end
+            end
         elseif enh == 'ResourceAllocation' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
@@ -304,12 +235,12 @@ XSL0001 = Class(ACUUnit) {
                             Mult = 1.0,
                         },
                     },
-                } 
+                }
             end
             if Buff.HasBuff( self, 'SeraphimACUDamageStabilization' ) then
                 Buff.RemoveBuff( self, 'SeraphimACUDamageStabilization' )
-            end  
-            Buff.ApplyBuff(self, 'SeraphimACUDamageStabilization')    
+            end
+            Buff.ApplyBuff(self, 'SeraphimACUDamageStabilization')
       	elseif enh == 'DamageStabilizationAdvanced' then
             if not Buffs['SeraphimACUDamageStabilizationAdv'] then
                BuffBlueprint {
@@ -328,12 +259,12 @@ XSL0001 = Class(ACUUnit) {
                             Mult = 1.0,
                         },
                     },
-                } 
+                }
             end
             if Buff.HasBuff( self, 'SeraphimACUDamageStabilizationAdv' ) then
                 Buff.RemoveBuff( self, 'SeraphimACUDamageStabilizationAdv' )
-            end  
-            Buff.ApplyBuff(self, 'SeraphimACUDamageStabilizationAdv')     	    
+            end
+            Buff.ApplyBuff(self, 'SeraphimACUDamageStabilizationAdv')
         elseif enh == 'DamageStabilizationAdvancedRemove' then
             -- since there's no way to just remove an upgrade anymore, if we're remove adv, were removing both
             if Buff.HasBuff( self, 'SeraphimACUDamageStabilizationAdv' ) then
@@ -341,11 +272,11 @@ XSL0001 = Class(ACUUnit) {
             end
             if Buff.HasBuff( self, 'SeraphimACUDamageStabilization' ) then
                 Buff.RemoveBuff( self, 'SeraphimACUDamageStabilization' )
-            end         
+            end
         elseif enh == 'DamageStabilizationRemove' then
             if Buff.HasBuff( self, 'SeraphimACUDamageStabilization' ) then
                 Buff.RemoveBuff( self, 'SeraphimACUDamageStabilization' )
-            end           
+            end
         --Teleporter
         elseif enh == 'Teleporter' then
             self:AddCommandCap('RULEUCC_Teleport')
@@ -354,11 +285,11 @@ XSL0001 = Class(ACUUnit) {
         -- Tactical Missile
         elseif enh == 'Missile' then
             self:AddCommandCap('RULEUCC_Tactical')
-            self:AddCommandCap('RULEUCC_SiloBuildTactical')        
+            self:AddCommandCap('RULEUCC_SiloBuildTactical')
             self:SetWeaponEnabledByLabel('Missile', true)
         elseif enh == 'MissileRemove' then
             self:RemoveCommandCap('RULEUCC_Tactical')
-            self:RemoveCommandCap('RULEUCC_SiloBuildTactical')        
+            self:RemoveCommandCap('RULEUCC_SiloBuildTactical')
             self:SetWeaponEnabledByLabel('Missile', false)
         --T2 Engineering
         elseif enh =='AdvancedEngineering' then
@@ -461,15 +392,15 @@ XSL0001 = Class(ACUUnit) {
             wep:ChangeRateOfFire(bp.NewRateOfFire or 2)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 44)
             local oc = self:GetWeaponByLabel('OverCharge')
-            oc:ChangeMaxRadius(bp.NewMaxRadius or 44)            
+            oc:ChangeMaxRadius(bp.NewMaxRadius or 44)
         elseif enh == 'RateOfFireRemove' then
             local wep = self:GetWeaponByLabel('ChronotronCannon')
             local bpDisrupt = self:GetBlueprint().Weapon[1].RateOfFire
             wep:ChangeRateOfFire(bpDisrupt or 1)
-            bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius            
+            bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius
             wep:ChangeMaxRadius(bpDisrupt or 22)
             local oc = self:GetWeaponByLabel('OverCharge')
-            oc:ChangeMaxRadius(bpDisrupt or 22)                        
+            oc:ChangeMaxRadius(bpDisrupt or 22)
         end
     end,
 }

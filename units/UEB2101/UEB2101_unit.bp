@@ -75,7 +75,7 @@ UnitBlueprint {
         },
         PlaceholderMeshName = 'UXB0003',
         SpawnRandomRotation = true,
-        UniformScale = 0.15,
+        UniformScale = 0.13,
     },
     Economy = {
         BuildCostEnergy = 2000,
@@ -148,7 +148,7 @@ UnitBlueprint {
     SizeY = 0.8,
     SizeZ = 0.6,
     StrategicIconName = 'icon_structure1_directfire',
-    StrategicIconSortPriority = 205,
+    StrategicIconSortPriority = 64,
     Veteran = {
         Level1 = 6,
         Level2 = 12,

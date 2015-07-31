@@ -74,6 +74,7 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'SORTSTRATEGIC',
+        'SHOWATTACKRETICLE',
     },
     CollisionOffsetY = -0.25,
     Defense = {

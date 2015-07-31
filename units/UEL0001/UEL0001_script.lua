@@ -99,9 +99,6 @@ UEL0001 = Class(ACUUnit) {
         if self.Animator then
             self.Animator:SetRate(0)
         end
-        self.UnitBeingBuilt = unitBeingBuilt
-        self.UnitBuildOrder = order
-        self.BuildingUnit = true        
     end,
 
     CreateBuildEffects = function( self, unitBeingBuilt, order )
@@ -155,15 +152,19 @@ UEL0001 = Class(ACUUnit) {
         self:RequestRefreshUI()
     end,
 
-    NotifyOfPodDeath = function(self, pod)
-        if pod == 'LeftPod' then
-            if self.HasLeftPod == true then
-                self.RebuildThread = self:ForkThread(self.RebuildPod, 1)
+    NotifyOfPodDeath = function(self, pod, rebuildDrone)
+        if rebuildDrone == true then
+            if pod == 'LeftPod' then
+                if self.HasLeftPod == true then
+                    self.RebuildThread = self:ForkThread(self.RebuildPod, 1)
+                end
+            elseif pod == 'RightPod' then
+                if self.HasRightPod == true then
+                    self.RebuildThread2 = self:ForkThread(self.RebuildPod, 2)
+                end
             end
-        elseif pod == 'RightPod' then
-            if self.HasRightPod == true then
-                self.RebuildThread2 = self:ForkThread(self.RebuildPod, 2)
-            end
+        else
+            self:CreateEnhancement(pod..'Remove')
         end
     end,
 
@@ -193,6 +194,7 @@ UEL0001 = Class(ACUUnit) {
                 self.HasLeftPod = false
                 if self.LeftPod and not self.LeftPod.Dead then
                     self.LeftPod:Kill()
+                    self.LeftPod = nil
                 end
                 if self.RebuildingPod ~= nil then
                     RemoveEconomyEvent(self, self.RebuildingPod)
@@ -203,6 +205,7 @@ UEL0001 = Class(ACUUnit) {
                 self.HasRightPod = false
                 if self.RightPod and not self.RightPod.Dead then
                     self.RightPod:Kill()
+                    self.RightPod = nil
                 end
                 if self.RebuildingPod2 ~= nil then
                     RemoveEconomyEvent(self, self.RebuildingPod2)

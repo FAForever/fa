@@ -4,7 +4,7 @@
 -- **
 -- **  Summary  :  Strings and images for the tooltips System
 -- **
-#**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+-- **  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
 Tooltips = {
@@ -108,6 +108,10 @@ Tooltips = {
         keyID = "nuke",
     },
     build_billy = {
+        title = "<LOC tooltipui0665>Build Advanced Tactical Missile",
+        description = "<LOC tooltipui0013>",
+    },
+    build_billy_auto = {
         title = "<LOC tooltipui0665>Build Advanced Tactical Missile",
         description = "<LOC tooltipui0013>",
     },
@@ -373,6 +377,14 @@ Tooltips = {
         title = "<LOC tooltipui0540>Reset Chat Window",
         description = "<LOC tooltipui0541>Resets the position and layout of the chat window",
     },
+    chat_feed_background = {
+        title = 'Chat Feed Background',
+        description = "Adds a black bar behind chat lines when the chat window is closed",
+    },
+    chat_feed_persist = {
+        title = "Persist Chat Feed Timeout",
+        description = "Allows chat to timeout normally in the chat feed after closing the chat window",
+    },
     minimap_reset = {
         title = "<LOC tooltipui0649>Reset Minimap Window",
         description = "<LOC tooltipui0650>Resets the position and layout of the minimap window",
@@ -389,6 +401,10 @@ Tooltips = {
     toggle_mini_expanded_options = {
         title = "<LOC tooltipui0419>Toggle Option Buttons",
         description = "<LOC tooltipui0420>Toggles option and MFD buttons on or off.",
+    },
+    drone_rebuild = {
+        title = "<LOC tooltipui0690>Drone Auto-Rebuild",
+        description = "<LOC tooltipui0691>Toggle if this drone rebuilds upon death",
     },
 
     -- **********************
@@ -495,13 +511,21 @@ Tooltips = {
         title = "<LOC tooltipui0544>Energy Storage",
         description = "<LOC tooltipui0545>Current and maximum Energy storage values",
     },
-    mass_extended_display = {
+    mass_income_display = {
         title = "<LOC tooltipui0103>Mass Income/Expense",
-        description = "<LOC tooltipui0104>Toggle display of Mass being generated and spent per second",
+        description = "<LOC tooltipui0104>Mass being generated and spent per second",
     },
-    energy_extended_display = {
+    energy_income_display = {
         title = "<LOC tooltipui0546>Energy Income and Expense",
-        description = "<LOC tooltipui0547>Toggle display Energy generated and spent per second",
+        description = "<LOC tooltipui0547>Energy being generated and spent per second",
+    },
+    mass_reclaim_display = {
+        title = "<LOC tooltipui0700>Mass Reclaimed",
+        description = "<LOC tooltipui0701>Mass income due to reclaim, and total mass reclaimed so far",
+    },
+    energy_reclaim_display = {
+        title = "<LOC tooltipui0702>Energy Reclaimed",
+        description = "<LOC tooltipui0703>Energy income due to reclaim, and total energy reclaimed so far",
     },
     overall = {
         title = "<LOC tooltipui0129>Build Efficiency",
@@ -1465,14 +1489,6 @@ Tooltips = {
         title = "<LOC tooltipui0096>Infinite Build",
         description = "<LOC tooltipui0097>Toggle infinite construction on/off for current build queue",
     },
-    mass_button = {
-        title = "<LOC tooltipui0273>Mass",
-        description = "<LOC tooltipui0274>Mass is the basic building blocks of any unit or structure in the game",
-    },
-    energy_button = {
-        title = "<LOC tooltipui0275>Energy",
-        description = "<LOC tooltipui0276>Energy represents the effort required to build units and structures",
-    },
     dip_send_alliance = {
         title = "<LOC tooltipui0289>Send Alliance Offer",
         description = "<LOC tooltipui0290>Check this box to send an Alliance Offer to this Player",
@@ -2028,10 +2044,6 @@ Tooltips = {
         title = 'Display more Unit Stats',
         description = 'Displays Shield Hp, Regen rate, Hp Regen rate and Build rate. Adapted from Total Veterancy by Eni.',
     },
-    options_gui_display_reclaim_totals = {
-        title = 'Display Reclaim Window',
-        description = 'Displays resources reclaimed.',
-    },
     options_gui_render_custom_names = {
         title = 'Always Render Custom Names',
         description = 'Toggle display of custom names. Enabled by default.',
@@ -2044,12 +2056,12 @@ Tooltips = {
         title = 'Improved Unit deselection',
         description = 'Reduce the number of selected units by shift(-1) or ctrl(-5) or ctrl+shift(-10) right-click in group selection. Enabled by default',
     },
+    options_gui_show_reclaim = {
+        title = 'Show reclaim mass value',
+        description = 'Holding CTRL+SHIFT brings up an overlay showing the value of reclaimble objects on the map',
+    },
     options_gui_zoom_pop_distance = {
         title = 'Zoom Pop Distance',
         description = 'Adjusts distance to which Zoom Pop zooms to.',
-    },
-    options_gui_smart_economy_indicators = {
-        title = 'Smart Economy Indicators',
-        description = 'Smart Economy indicators. Rate display works differently now. Efficiency is "infinite" when consumption is zero. Values greater than 100% are possible again. Mass rate begins to flash bright white if stored mass is > 80% and rate is climbing. Energy rate begins to flash bright white if stored energy is < 20% and rate is sinking. Mass and energy bars are vertically exchanged (mass is heavier, thus it is below energy - TA style). Mass bar, as well as income and store numbers, are gray - TA style.',
     },
 }

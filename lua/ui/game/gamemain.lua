@@ -31,11 +31,11 @@ local isReplay = false
 
 local waitingDialog = false
 
-###variables for FAF
+-- variables for FAF
 local sendChat = import('/lua/ui/game/chat.lua').ReceiveChatFromSim
 local oldData = {}
 local lastObserving
-##end faf variables
+-- end faf variables
 
 -- Hotbuild stuff
 modifiersKeys = {}
@@ -43,7 +43,7 @@ modifiersKeys = {}
 local currentKeyMap = import('/lua/keymap/keymapper.lua').GetKeyMappings(true)
 for key, action in currentKeyMap do
     if action["category"] == "hotbuilding" then
-        if key != nil then
+        if key ~= nil then
             if not import('/lua/keymap/keymapper.lua').IsKeyInMap("Shift-" .. key, currentKeyMap) then
                 modifiersKeys["Shift-" .. key] = action
             else
@@ -59,7 +59,6 @@ for key, action in currentKeyMap do
     end
 end
 IN_AddKeyMapTable(modifiersKeys)
-
 
 -- check this flag to see if it's valid to show the exit dialog
 supressExitDialog = false
@@ -134,7 +133,7 @@ function OnFirstUpdate()
                end
                )
 
-    if Prefs.GetOption('skin_change_on_start') != 'no' then
+    if Prefs.GetOption('skin_change_on_start') ~= 'no' then
         local focusarmy = GetFocusArmy()
         local armyInfo = GetArmiesTable()
         if focusarmy >= 1 then
@@ -226,8 +225,8 @@ function CreateUI(isReplay)
     ConExecute('res_AfterPrefetchDelay 100')
     ConExecute('res_PrefetcherActivityDelay 1')
 
-    ##below added for FAF
-    import("/modules/displayrings.lua").Init()  ##added for acu and engineer build radius ui mod
+    -- below added for FAF
+    import("/modules/displayrings.lua").Init()  -- added for acu and engineer build radius ui mod
     if SessionIsReplay() then
         ForkThread(SendChat)
         lastObserving = true
@@ -241,9 +240,6 @@ function CreateUI(isReplay)
     if options.gui_render_enemy_lifebars == 1 or options.gui_render_custom_names == 0 then
         import('/modules/console_commands.lua').Init()
     end
-
-    import('/modules/reclaim.lua').Init()
-
 end
 
 local provider = false
@@ -449,6 +445,8 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
             end
         end
     end
+
+    import('/lua/ui/game/unitview.lua').OnSelection(newSelection)
 end
 
 function OnQueueChanged(newQueue)
@@ -457,8 +455,8 @@ function OnQueueChanged(newQueue)
     end
 end
 
-# Called after the Sim has confirmed the game is indeed paused. This will happen
-# on everyone's machine in a network game.
+-- Called after the Sim has confirmed the game is indeed paused. This will happen
+-- on everyone's machine in a network game.
 function OnPause(pausedBy, timeoutsRemaining)
     local isOwner = false
     if pausedBy == SessionGetLocalCommandSource() then
@@ -471,7 +469,7 @@ function OnPause(pausedBy, timeoutsRemaining)
     import('/lua/ui/game/missiontext.lua').OnGamePause(true)
 end
 
-# Called after the Sim has confirmed that the game has resumed.
+-- Called after the Sim has confirmed that the game has resumed.
 function OnResume()
     PauseSound("World",false)
     PauseSound("Music",false)
@@ -480,9 +478,9 @@ function OnResume()
     import('/lua/ui/game/missiontext.lua').OnGamePause(false)
 end
 
-# Called immediately when the user hits the pause button. This only ever gets
-# called on the machine that initiated the pause (i.e. other network players
-                                                  # won't call this)
+-- Called immediately when the user hits the pause button. This only ever gets
+-- called on the machine that initiated the pause (i.e. other network players
+                                                  -- won't call this)
 function OnUserPause(pause)
     local Tabs = import('/lua/ui/game/tabs.lua')
     local focus = GetArmiesTable().focusArmy
@@ -546,7 +544,6 @@ function HideGameUI(state)
             import('/lua/ui/game/score.lua').Expand()
             import('/lua/ui/game/objectives2.lua').Expand()
             import('/lua/ui/game/multifunction.lua').Expand()
-            import('/lua/ui/game/unitviewDetail.lua').Expand()
             import('/lua/ui/game/controlgroups.lua').Expand()
             import('/lua/ui/game/tabs.lua').Expand()
             import('/lua/ui/game/announcement.lua').Expand()
@@ -581,10 +578,10 @@ function HideGameUI(state)
     end
 end
 
-# Given a userunit that is adjacent to a given blueprint, does it yield a
-# bonus? Used by the UI to draw extra info
+-- Given a userunit that is adjacent to a given blueprint, does it yield a
+-- bonus? Used by the UI to draw extra info
 function OnDetectAdjacencyBonus(userUnit, otherBp)
-    # fixme: todo
+    -- fixme: todo
     return true
 end
 
@@ -634,7 +631,7 @@ function NISMode(state)
             ConExecute(i..' false')
         end
         preNISSettings.gameSpeed = GetGameSpeed()
-        if preNISSettings.gameSpeed != 0 then
+        if preNISSettings.gameSpeed ~= 0 then
             SetGameSpeed(0)
         end
         preNISSettings.Units = GetSelectedUnits()
@@ -650,7 +647,7 @@ function NISMode(state)
         end
         worldView.viewLeft:EnableResourceRendering(preNISSettings.Resources)
         worldView.viewLeft:SetCartographic(preNISSettings.Cartographic)
-        # Todo: Restore settings of overlays, lifebars properly
+        -- Todo: Restore settings of overlays, lifebars properly
         ConExecute('UI_RenderUnitBars true')
         ConExecute('UI_NisRenderIcons true')
         ConExecute('ren_SelectBoxes true')
@@ -661,7 +658,7 @@ function NISMode(state)
                 ConExecute(i..' '..tostring(Prefs.GetFromCurrentProfile(i)))
             end
         end
-        if GetGameSpeed() != preNISSettings.gameSpeed then
+        if GetGameSpeed() ~= preNISSettings.gameSpeed then
             SetGameSpeed(preNISSettings.gameSpeed)
         end
         SelectUnits(preNISSettings.Units)
@@ -783,14 +780,12 @@ function SimChangeCameraZoom(newMult)
         defaultZoom = newMult
         local views = import('/lua/ui/game/worldview.lua').GetWorldViews()
         for _, viewControl in views do
-            if viewControl._cameraName != 'MiniMap' then
+            if viewControl._cameraName ~= 'MiniMap' then
                 GetCamera(viewControl._cameraName):SetMaxZoomMult(newMult)
             end
         end
     end
 end
-
-####below is FAF function
 
 function UiBeat()
     local observing = (GetFocusArmy() == -1)

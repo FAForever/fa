@@ -352,11 +352,20 @@ function SetupPlayerLines()
 
     for _, line in controls.armyLines do
         local playerName = line.name:GetText()
-        local playerRating = sessionInfo.Options.Ratings[playerName]
-        if (playerRating) then
-            playerNameLine = playerName..' ['..math.floor(playerRating+0.5)..']'
-            line.name:SetText(playerNameLine)
+        local playerRating = sessionInfo.Options.Ratings[playerName] or 0
+        local playerClan = sessionInfo.Options.ClanTags[playerName]
+
+        if playerClan and playerClan ~= "" then
+            playerClan = '[' .. playerClan .. '] '
+        else
+            playerClan = ""
         end
+
+        if playerRating then
+            playerRating = ' [' .. math.floor(playerRating+0.5) .. ']'
+        end
+
+        line.name:SetText(playerClan .. playerName .. playerRating)
     end
 
     mapData = {}
@@ -391,6 +400,8 @@ end
             end
             if not issuedNoRushWarning and tonumber(sessionInfo.Options.NoRushOption) * 60 == math.floor(GetGameTimeSeconds()) then
                 import('/lua/ui/game/announcement.lua').CreateAnnouncement('<LOC score_0001>No Rush Time Elapsed', controls.time)
+                local sound = Sound{ Bank = 'XGG', Cue = 'XGG_Computer_CV01_04766' }
+                PlayVoice(sound)
                 issuedNoRushWarning = true
             end
         end

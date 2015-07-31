@@ -5,7 +5,7 @@
 -- **
 -- **  Summary  :  Seraphim nuclear explosion script
 -- **
--- **  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+-- **  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
 local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell

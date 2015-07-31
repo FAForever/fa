@@ -67,14 +67,14 @@ function TransferUnitsOwnership(units, ToArmyIndex)
     local newUnits = {}
     for k,v in units do
         local owner = v:GetArmy()
-        --if owner == ToArmyIndex or GetArmyBrain(owner):IsDefeated() then
-        if owner == ToArmyIndex then
-            continue
-        end
-
         -- Only allow units not attached to be given. This is because units will give all of it's children over
-        -- aswell, so we only want the top level units to be given. Also, don't allow commanders to be given.
-        if v:GetParent() ~= v or (v.Parent and v.Parent ~= v) then
+        -- aswell, so we only want the top level units to be given.
+        -- Units currently being captured is also denied
+        local disallowTransfer = owner == ToArmyIndex or
+                                 v:GetParent() ~= v or (v.Parent and v.Parent ~= v) or
+                                 v.CaptureProgress > 0
+
+        if disallowTransfer then
             continue
         end
 
@@ -85,7 +85,6 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         -- B E F O R E
         local numNukes = unit:GetNukeSiloAmmoCount()  -- looks like one of these 2 works for SMDs also
         local numTacMsl = unit:GetTacticalSiloAmmoCount()
-        local unitKills = unit:GetStat('KILLS', 0).Value
         local xp = unit.xp
         local unitHealth = unit:GetHealth()
         local shieldIsOn = false
@@ -134,9 +133,6 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         end
 
         -- A F T E R
-        if unitKills and unitKills > 0 then
-            unit:AddKills( unitKills )
-        end
         if xp and xp > 0 then
             unit:AddXP(xp)
         end

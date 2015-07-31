@@ -5,7 +5,7 @@
 -- **
 -- **  Summary  :  Aeon Commander Script
 -- **
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
 local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
@@ -46,13 +46,6 @@ UAL0001 = Class(ACUUnit) {
         ACUUnit.OnStopBeingBuilt(self,builder,layer)
         self:SetWeaponEnabledByLabel('RightDisruptor', true)
         self:ForkThread(self.GiveInitialResources)
-    end,
-
-    OnStartBuild = function(self, unitBeingBuilt, order)
-        ACUUnit.OnStartBuild(self, unitBeingBuilt, order)
-        self.UnitBeingBuilt = unitBeingBuilt
-        self.UnitBuildOrder = order
-        self.BuildingUnit = true     
     end,
 
     CreateBuildEffects = function( self, unitBeingBuilt, order )

@@ -149,6 +149,7 @@ UnitBlueprint {
         'OVERLAYOMNI',
         'OVERLAYDEFENSE',
         'BUBBLESHIELDSPILLOVERCHECK',
+        'SHOWATTACKRETICLE',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -171,7 +172,7 @@ UnitBlueprint {
             '<LOC ability_deathaoe>Volatile',
         },
 
-        # AnimationIdle = '/units/uel0001/uel0001_a002.sca',
+        -- AnimationIdle = '/units/uel0001/uel0001_a002.sca',
         AnimationWalk = '/units/uel0001/uel0001_a001.sca',
         AnimationWalkRate = 1.7,
         AttackReticleSize = 55,
@@ -321,14 +322,14 @@ UnitBlueprint {
                 Weight = 100,
             },
         },
-        UniformScale = 0.105, # if changed dont forget to update AvatarUEL0001 at /effects/Entities/UEFTeleport/AvatarUEL0001
+        UniformScale = 0.105, -- if changed dont forget to update AvatarUEL0001 at /effects/Entities/UEFTeleport/AvatarUEL0001
     },
     Economy = {
         -- If modifying Energy or Mass costs, modify Score component in aibrain.lua search battleResults
         BuildCostEnergy = 5000000,
         BuildCostMass = 18000,
         BuildRate = 10,
-        BuildTime = 6000000,  #was 60000
+        BuildTime = 6000000,
         BuildableCategory = {
             'BUILTBYCOMMANDER UEF',
             'BUILTBYTIER2COMMANDER UEF',
@@ -612,7 +613,7 @@ UnitBlueprint {
             ShieldRegenRate = 42,
             ShieldRegenStartTime = 1,
             ShieldSize = 16,
-            ShieldSpillOverDamageMod = 0, # we will keep it at 0 to keep this upgrade efficient / special
+            ShieldSpillOverDamageMod = 0, -- we will keep it at 0 to keep this upgrade efficient / special
             ShieldVerticalOffset = -3,
             Slot = 'Back',
             UpgradeEffectBones = {
@@ -681,7 +682,7 @@ UnitBlueprint {
             Name = '<LOC enhancements_0053>Tech 3 Engineering Suite',
             NewBuildRate = 126,
             NewHealth = 6000,
-            NewRegenRate = 35, # fixes lower regen rate with t3 suite. this is t2 regen + t3 regen [130]
+            NewRegenRate = 35, -- fixes lower regen rate with t3 suite. this is t2 regen + t3 regen [130]
             Prerequisite = 'AdvancedEngineering',
             Slot = 'LCH',
             UpgradeEffectBones = {
@@ -900,9 +901,9 @@ UnitBlueprint {
     SelectionSizeZ = 0.6,
     SelectionThickness = 0.9,
     SelectionYOffset = 0,
-    SizeX = 1.2, #from 1
-    SizeY = 2.2, #from 2
-    SizeZ = 1.2, #from 0.7
+    SizeX = 1.2,
+    SizeY = 2.2,
+    SizeZ = 1.2,
     StrategicIconName = 'icon_commander_generic',
     StrategicIconSortPriority = 0,
     Transport = {

@@ -35,86 +35,98 @@ function OnStartCommandMode(command_mode, command_data)
     end
 end
 
--- Gets the weapons of attackers, nil if not same units
-local function GetAttackerWeapons(forceReticle)
-    local attackers = GetSelectedUnits()
+-- If all selected units with the SHOWATTACKRETICLE flag set are of the same type, return the weapon
+-- table from their blueprint. Otherwise returns null.
+local function GetSelectedWeaponsWithReticules(filterFunc)
+    local selectedUnits = GetSelectedUnits()
     local bp = nil
 
-    if attackers then
-        for i, u in attackers do
-            if forceReticle or EntityCategoryContains(categories.SHOWATTACKRETICLE, u) then
-                if not bp then
-                    bp = u:GetBlueprint()
-                elseif bp.BlueprintId ~= u:GetBlueprint().BlueprintId then
-                    return nil
+    local weapons = {};
+
+    for i, u in selectedUnits do
+        if EntityCategoryContains(categories.SHOWATTACKRETICLE, u) then
+            local bp = u:GetBlueprint()
+            for k, v in bp.Weapon do
+                if filterFunc(v) then
+                    weapons[bp.BlueprintId] = v
+                    break
                 end
             end
         end
     end
 
-    return bp.Weapon
+    return weapons
 end
 
-local function NukeDecalFunc()
-    local weapons = GetAttackerWeapons(true)
+--- A generic decal function that maximises the available DamageRadius values.
+local function RadiusDecalFunction(filterFunc)
+    local weapons = GetSelectedWeaponsWithReticules(filterFunc)
 
-    if weapons then 
-        for _, w in weapons do
-            if w.CountedProjectile and w.NukeWeapon then
-                if w.NukeInnerRingRadius and w.NukeOuterRingRadius then
-                    local decals = {}
-                    local prefix = '/textures/ui/common/game/AreaTargetDecal/nuke_icon_'
-                    
-                    table.insert(decals, {texture = prefix .. 'outer.dds', scale=w.NukeOuterRingRadius * 2})
-                    table.insert(decals, {texture = prefix .. 'inner.dds', scale=w.NukeInnerRingRadius * 2})
-
-                    return decals
-                end
-            end
+    -- The maximum damage radius of a selected missile weapon.
+    local maxRadius = 0
+    for _, w in weapons do
+        if w.DamageRadius > maxRadius then
+            maxRadius = w.DamageRadius
         end
     end
 
-    WARN('Nuke decal called for non-nuclear weapon')
-    
+    if maxRadius > 0 then
+        return {
+            {
+                texture = "/textures/ui/common/game/AreaTargetDecal/weapon_icon_small.dds",
+                scale = maxRadius * 2
+            }
+        }
+    end
+
     return false
+end
+
+--- Specialised decal function for nukes: draws the inner/outer radii separately.
+local function NukeDecalFunc()
+    local weapons = GetSelectedWeaponsWithReticules(
+        function(w)
+            return w.NukeWeapon
+        end
+    )
+
+    local inner = 0
+    local outer = 0
+    for _, w in weapons do
+
+        if w.NukeOuterRingRadius > outer then
+            outer = w.NukeOuterRingRadius
+        end
+
+        if w.NukeInnerRingRadius > inner then
+            inner = w.NukeInnerRingRadius
+        end
+    end
+
+    if inner > 0 and outer > 0 then
+        local prefix = '/textures/ui/common/game/AreaTargetDecal/nuke_icon_'
+        return {
+            { texture = prefix .. 'outer.dds', scale = outer * 2 },
+            { texture = prefix .. 'inner.dds', scale = inner* 2 }
+        }
+    end
 end
 
 local function TacticalDecalFunc()
-    local weapons = GetAttackerWeapons()
-
-    if weapons then 
-        for _, w in weapons do
-            if w.WeaponCategory == 'Missile' then
-                local decal = {texture="/textures/ui/common/game/AreaTargetDecal/weapon_icon_small.dds", scale=0}
-                if w.DamageRadius then
-                    decal.scale = w.DamageRadius * 2
-                end
-
-                return {decal}
-            end
+    return RadiusDecalFunction(
+        function(w)
+            return w.WeaponCategory == 'Missile' and w.DamageRadius and not w.NukeWeapon
         end
-    end
-
-    return false
+    )
 end
 
 local function AttackDecalFunc(mode)
-    local weapons = GetAttackerWeapons()
-    
-    if weapons then
-        local weapon = weapons[1]
-        local decal = {texture="/textures/ui/common/game/AreaTargetDecal/weapon_icon_small.dds", scale=0}
-
-        if weapon.DamageRadius then
-            decal.scale = weapon.DamageRadius * 2
+    return RadiusDecalFunction(
+        function(w)
+            return w.ManualFire == false and w.WeaponCategory ~= 'Teleport' and w.WeaponCategory ~= "Death"
         end
-        
-        return {decal}
-    end
-
-    return false
+    )
 end
-
 
 DecalFunctions = {
     RULEUCC_Attack = AttackDecalFunc,
@@ -150,6 +162,7 @@ WorldView = Class(moho.UIWorldView, Control) {
             self.LastCursor = nil
             self:ResetDecals()
         end
+
         return false
     end,
 

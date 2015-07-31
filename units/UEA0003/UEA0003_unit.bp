@@ -85,6 +85,7 @@ UnitBlueprint {
         'REPAIR',
         'RECLAIM',
         'ENGINEER',
+        'CAPTURE',
         'VISIBLETORECON',
         'RECLAIMABLE',
     },
@@ -124,7 +125,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 1600,
         BuildCostMass = 160,
-        BuildRadius = 8, 				#added
+        BuildRadius = 8,
         BuildRate = 35,
         BuildTime = 400,
         BuildableCategory = {
@@ -168,9 +169,16 @@ UnitBlueprint {
                 bitmapId = 'drone',
                 helpText = 'drone_SACU',
             },
+            RULEUTC_WeaponToggle = {
+                bitmapId = 'dronerebuild',
+                helpText = 'drone_rebuild',
+            },
         },
         SelectionPriority = 6,
         TechLevel = 'RULEUTL_Basic',
+        ToggleCaps = {
+            RULEUTC_WeaponToggle = true,
+        },
         UnitName = '<LOC uea0003_name>C-D2 "Rover"',
         UnitWeight = 1,
     },

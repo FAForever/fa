@@ -321,7 +321,7 @@ function SyncScores()
             ----------------------------------------
             ---- General scores ----
             ----------------------------------------
-            if scoreOption != 'no' then
+            if scoreOption ~= 'no' then
                 Sync.Score[index].general.score = ArmyScore[index].general.score
             else
                 Sync.Score[index].general.score = -1
@@ -466,7 +466,7 @@ AIBrain = Class(moho.aibrain_methods) {
             -- place resource structures down
             for k, v in resourceStructures do
                 local unit = self:CreateResourceBuildingNearest(v, posX, posY)
-                if unit != nil and unit:GetBlueprint().Physics.FlattenSkirt then
+                if unit ~= nil and unit:GetBlueprint().Physics.FlattenSkirt then
                     unit:CreateTarmac(true, true, true, false, false)
                 end
             end
@@ -476,7 +476,7 @@ AIBrain = Class(moho.aibrain_methods) {
             -- place initial units down
             for k, v in initialUnits do
                 local unit = self:CreateUnitNearSpot(v, posX, posY)
-                if unit != nil and unit:GetBlueprint().Physics.FlattenSkirt then
+                if unit ~= nil and unit:GetBlueprint().Physics.FlattenSkirt then
                     unit:CreateTarmac(true, true, true, false, false)
                 end
             end
@@ -539,7 +539,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ESMassStorageUpdate = function(self, newState)
-        if self.EconMassStorageState != newState then
+        if self.EconMassStorageState ~= newState then
             for k, v in self.EconStateUnits.MassStorage do
                 if not v.Dead then
                     v:OnMassStorageStateChange(newState)
@@ -574,7 +574,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ESEnergyStorageUpdate = function(self, newState)
-        if self.EconEnergyStorageState != newState then
+        if self.EconEnergyStorageState ~= newState then
             for k, v in self.EconStateUnits.EnergyStorage do
                 if not v.Dead then
                     v:OnEnergyStorageStateChange(newState)
@@ -812,7 +812,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---- ------------- AI BRAIN FUNCTIONS HANDLED HERE  ------------- ----
     ------------------------------------------------------------------------------------------------------------------------------------
     ImportScenarioArmyPlans = function(self, planName)
-        if planName and planName != '' then
+        if planName and planName ~= '' then
             --LOG('*AI DEBUG: IMPORTING PLAN NAME = ', repr(planName))
             return import(planName).AIPlansList
         else
@@ -873,7 +873,7 @@ AIBrain = Class(moho.aibrain_methods) {
         SetArmyOutOfGame(self:GetArmyIndex())
 
 
-        if math.floor(self:GetArmyStat("FAFLose",0.0).Value) != -1 then
+        if math.floor(self:GetArmyStat("FAFLose",0.0).Value) ~= -1 then
             self:AddArmyStat("FAFLose", -1)
         end
 
@@ -1049,7 +1049,7 @@ AIBrain = Class(moho.aibrain_methods) {
             if bestPlan then
                 self:SetCurrentPlan( bestPlan )
                 local bPlan = import(bestPlan)
-                if bPlan != self.CurrentPlanScript then
+                if bPlan ~= self.CurrentPlanScript then
                     self.CurrentPlanScript = import(bestPlan)
                     self:SetRepeatExecution(true)
                     self:ExecutePlan(self.CurrentPlan)
@@ -1120,50 +1120,35 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     OnTransportFull = function(self)
-
         if GetFocusArmy() == self:GetArmyIndex() then
-
-            local warningVoice = Sound {
+            local warningVoice
+            if EntityCategoryContains(categories.uaa0310, self.loadingTransport) then
+                -- "CZAR FULL"
+                warningVoice = Sound {
+                    Bank = 'XGG',
+                    Cue = 'XGG_Computer_CV01_04753',
+                }
+            elseif EntityCategoryContains(categories.NAVALCARRIER, self.loadingTransport) then
+                -- "Aircraft Carrier Full"
+                warningVoice = Sound {
+                    Bank = 'XGG',
+                    Cue = 'XGG_Computer_CV01_04751',
+                }
+            else
+                -- "Transport is full"
+                warningVoice = Sound {
                     Bank = 'XGG',
                     Cue = 'Computer_TransportIsFull',
                 }
+            end
 
             if self.VOTable and not self.VOTable['OnTransportFull'] then
                 self.VOTable['OnTransportFull'] = ForkThread(self.PlayVOSound, self, warningVoice, 'OnTransportFull')
             end
-
         end
     end,
 
-    OnUnitCapLimitReached = function(self)
-
-        if GetFocusArmy() == self:GetArmyIndex() then
-
-            local warningVoice = nil
-            local factionIndex = self:GetFactionIndex()
-            if factionIndex == 1 then
-                warningVoice = Sound {
-                    Bank = 'COMPUTER_UEF_VO',
-                    Cue = 'UEFComputer_CommandCap_01298',
-                }
-            elseif factionIndex == 2 then
-                warningVoice = Sound {
-                    Bank = 'COMPUTER_AEON_VO',
-                    Cue = 'AeonComputer_CommandCap_01298',
-                }
-            elseif factionIndex == 3 then
-                warningVoice = Sound {
-                    Bank = 'COMPUTER_CYBRAN_VO',
-                    Cue = 'CybranComputer_CommandCap_01298',
-                }
-            end
-
-            if self.VOTable and not self.VOTable['OnUnitCapLimitReached'] then
-                self.VOTable['OnUnitCapLimitReached'] = ForkThread(self.PlayVOSound, self, warningVoice, 'OnUnitCapLimitReached')
-            end
-
-        end
-    end,
+    OnUnitCapLimitReached = function(self) end,
 
     OnFailedUnitTransfer = function(self)
 
@@ -1186,8 +1171,8 @@ AIBrain = Class(moho.aibrain_methods) {
         if GetFocusArmy() == self:GetArmyIndex() then
 
             local Voice = Sound {
-                Bank = 'COMPUTER_UEF_VO',
-                Cue = 'UEFComputer_CommandCap_01298',
+                Bank = 'XGG',
+                Cue = 'XGG_Computer_CV01_04756',
             }
 
             if self.VOTable and not self.VOTable['OnPlayNoStagingPlatformsVO'] then
@@ -1201,19 +1186,13 @@ AIBrain = Class(moho.aibrain_methods) {
         if GetFocusArmy() == self:GetArmyIndex() then
 
             local Voice = Sound {
-                Bank = 'COMPUTER_UEF_VO',
-                Cue = 'UEFComputer_TransportIsFull',
+                Bank = 'XGG',
+                Cue = 'XGG_Computer_CV01_04755',
             }
 
             if self.VOTable and not self.VOTable['OnPlayBusyStagingPlatformsVO'] then
                 self.VOTable['OnPlayBusyStagingPlatformsVO'] = ForkThread(self.PlayVOSound, self, Voice, 'OnPlayBusyStagingPlatformsVO')
             end
-        end
-    end,
-
-    FerryPointSet = function(self,sound)
-        if self.VOTable and not self.VOTable['FerryPointSet'] then
-            self.VOTable['FerryPointSet'] = ForkThread(self.PlayVOSound, self, sound, 'FerryPointSet')
         end
     end,
 
@@ -1337,7 +1316,7 @@ AIBrain = Class(moho.aibrain_methods) {
             WaitSeconds(5)
             local changed = false
             for k,v in self.BuilderManagers do
-                if k != 'MAIN' and v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) <= 0 and v.FactoryManager:GetNumCategoryFactories(categories.ALLUNITS) <= 0 then
+                if k ~= 'MAIN' and v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) <= 0 and v.FactoryManager:GetNumCategoryFactories(categories.ALLUNITS) <= 0 then
             			if v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) <= 0 then
             	                    v.EngineerManager:SetEnabled(false)
             	                    v.FactoryManager:SetEnabled(false)
@@ -1363,7 +1342,7 @@ AIBrain = Class(moho.aibrain_methods) {
     RebuildTable = function(self, oldtable)
         local temptable = {}
         for k,v in oldtable do
-            if v != nil then
+            if v ~= nil then
                 if type(k) == 'string' then
                     temptable[k] = v
                 else
@@ -2718,7 +2697,7 @@ AIBrain = Class(moho.aibrain_methods) {
     --Sort platoon list
     --PlatoonType = 'Air', 'Land' or 'Sea'
     PBMSortPlatoonsViaPriority = function(self, platoonType)
-         if platoonType != 'Air' and platoonType != 'Land' and platoonType != 'Sea' and platoonType != 'Gate' then
+         if platoonType ~= 'Air' and platoonType ~= 'Land' and platoonType ~= 'Sea' and platoonType ~= 'Gate' then
             local strng = '*AI ERROR: TRYING TO SORT PLATOONS VIA PRIORITY BUT AN INVALID TYPE (', repr(platoonType),') WAS PASSED IN.'
             error(strng, 2)
             return false
@@ -4658,7 +4637,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
 
                 if enemy then
-                    if not self:GetCurrentEnemy() or self:GetCurrentEnemy() != enemy then
+                    if not self:GetCurrentEnemy() or self:GetCurrentEnemy() ~= enemy then
                         SUtils.AISendChat('allies', ArmyBrains[self:GetArmyIndex()].Nickname, 'targetchat', ArmyBrains[enemy:GetArmyIndex()].Nickname)
                     end
                     self:SetCurrentEnemy( enemy )

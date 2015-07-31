@@ -1,10 +1,10 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
-            'Head',
             'UEL0301',
-            'Left_Left_B02',
-            'Left_Right_B02',
+            'Head',
+            'Leg_Left_B02',
+            'Leg_Right_B02',
         },
     },
     Audio = {
@@ -133,7 +133,6 @@ UnitBlueprint {
         'BUBBLESHIELDSPILLOVERCHECK',
     },
     CollisionOffsetX = -0.035,
-    CollisionOffsetZ = -0.18,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
@@ -723,7 +722,7 @@ UnitBlueprint {
     SelectionYOffset = 0,
     SizeX = 1,
     SizeY = 1.9,
-    SizeZ = 0.87,
+    SizeZ = 1.1,
     StrategicIconName = 'icon_commander_generic',
     StrategicIconSortPriority = 1,
     Transport = {

@@ -41,6 +41,7 @@ CDFHvyProtonCannonWeapon = Class(DefaultProjectileWeapon) {
 
 CDFOverchargeWeapon = Class(OverchargeWeapon) {
     FxMuzzleFlash = EffectTemplate.CMolecularRipperOverChargeFlash01,
+    DesiredWeaponLabel = 'RightRipper'
 }
 
 -- COMMANDER ENHANCEMENT WEAPON!
@@ -445,31 +446,6 @@ CMobileKamikazeBombWeapon = Class(KamikazeWeapon){
         for k, v in self.FxDeath do
             CreateEmitterAtBone(self.unit,-2,army,v)
         end
-        --CreateLightParticle( self.unit, -1, -1, 15, 10, 'flare_lens_add_02', 'ramp_red_10' )
 		KamikazeWeapon.OnFire(self)
     end,
 }
-
-CMobileKamikazeBombDeathWeapon = Class(BareBonesWeapon) {
-	FxDeath = EffectTemplate.CMobileKamikazeBombDeathExplosion,
-
-    OnCreate = function(self)
-        BareBonesWeapon.OnCreate(self)
-        self:SetWeaponEnabled(false)
-    end,
-
-
-    OnFire = function(self)
-    end,
-
-    Fire = function(self)
-		local army = self.unit:GetArmy()
-        for k, v in self.FxDeath do
-            CreateEmitterAtBone(self.unit,-2,army,v)
-        end
-        --CreateLightParticle( self.unit, -1, -1, 15, 10, 'flare_lens_add_02', 'ramp_red_10' )
-		local myBlueprint = self:GetBlueprint()
-        DamageArea(self.unit, self.unit:GetPosition(), myBlueprint.DamageRadius, myBlueprint.Damage, myBlueprint.DamageType or 'Normal', myBlueprint.DamageFriendly or false)
-    end,
-}
-
