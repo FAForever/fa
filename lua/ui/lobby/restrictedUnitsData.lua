@@ -31,7 +31,7 @@ restrictedUnits = {
         tooltip = "restricted_units_experimental",
     },
     LAND = {
-        categories = {"LAND"},
+        categories = {"LAND-COMMAND"},
         name = "<LOC restricted_units_data_0005>No Land",
         tooltip = "restricted_units_land",
     },
