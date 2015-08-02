@@ -431,13 +431,14 @@ function GetBackgroundTextures(unitID)
     local bp = __blueprints[unitID]
     local validIcons = { land = true, air = true, sea = true, amph = true }
     if not validIcons[bp.General.Icon] then
-        WARN(debug.traceback(nil, "Invalid icon: " .. bp.General.Icon .. " for unitID " + tostring(unitID)))
+        WARN(debug.traceback(nil, "Invalid icon for unit " .. tostring(unitID)))
         bp.General.Icon = "land"
     end
-        return UIUtil.UIFile('/icons/units/' .. bp.General.Icon .. '_up.dds'),
-               UIUtil.UIFile('/icons/units/' .. bp.General.Icon .. '_down.dds'),
-               UIUtil.UIFile('/icons/units/' .. bp.General.Icon .. '_over.dds'),
-               UIUtil.UIFile('/icons/units/' .. bp.General.Icon .. '_up.dds')
+
+    return UIUtil.UIFile('/icons/units/' .. bp.General.Icon .. '_up.dds'),
+           UIUtil.UIFile('/icons/units/' .. bp.General.Icon .. '_down.dds'),
+           UIUtil.UIFile('/icons/units/' .. bp.General.Icon .. '_over.dds'),
+           UIUtil.UIFile('/icons/units/' .. bp.General.Icon .. '_up.dds')
 end
 
 function GetEnhancementPrefix(unitID, iconID)
