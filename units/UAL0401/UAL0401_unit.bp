@@ -474,7 +474,7 @@ UnitBlueprint {
             Damage = 0.01,
             DamageRadius = 0,
             DamageType = 'Normal',
-            DisplayName = 'Tractor Claw',
+            DisplayName = 'Left Tractor Claw',
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',

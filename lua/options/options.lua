@@ -399,7 +399,7 @@ options = {
                 },
             },
             {
-                title = "Enable Cycle Preview for Hotbuild",
+                title = "<LOC OPTIONS_0226>Enable Cycle Preview for Hotbuild",
                 key = 'hotbuild_cycle_preview',
                 type = 'toggle',
                 default = 1,
@@ -411,7 +411,7 @@ options = {
                 },
             },
             {
-              title = "Cycle reset time (ms)",
+              title = "<LOC OPTIONS_0227>Cycle reset time (ms)",
               key = 'hotbuild_cycle_reset_time',
               type = 'slider',
               default = 1100,
@@ -422,7 +422,7 @@ options = {
               },
             },
             {
-                title = "Bigger Strategic Build Icons",
+                title = "<LOC OPTIONS_0228>Bigger Strategic Build Icons",
                 key = 'gui_bigger_strat_build_icons',
                 type = 'toggle',
                 default = 0,
@@ -436,7 +436,7 @@ options = {
             },
 
             {
-                title = "Template Rotation",
+                title = "<LOC OPTIONS_0229>Template Rotation",
                 key = 'gui_template_rotator',
                 type = 'toggle',
                 default = 0,
@@ -449,7 +449,7 @@ options = {
             },
 
             {
-                title = "SCU Manager",
+                title = "<LOC OPTIONS_0230>SCU Manager",
                 key = 'gui_scu_manager',
                 type = 'toggle',
                 default = 0,
@@ -462,7 +462,7 @@ options = {
             },
 
             {
-                title = "Draggable Build Queue",
+                title = "<LOC OPTIONS_0231>Draggable Build Queue",
                 key = 'gui_draggable_queue',
                 type = 'toggle',
                 default = 0,
@@ -475,7 +475,7 @@ options = {
             },
 
             {
-                title = "Middle Click Avatars",
+                title = "<LOC OPTIONS_0232>Middle Click Avatars",
                 key = 'gui_idle_engineer_avatars',
                 type = 'toggle',
                 default = 0,
@@ -488,7 +488,7 @@ options = {
             },
 
             {
-                title = "All Race Templates",
+                title = "<LOC OPTIONS_0233>All Race Templates",
                 key = 'gui_all_race_templates',
                 type = 'toggle',
                 default = 0,
@@ -501,7 +501,7 @@ options = {
             },
 
             {
-                title = "Single Unit Selected Info",
+                title = "<LOC OPTIONS_0234>Single Unit Selected Info",
                 key = 'gui_enhanced_unitview',
                 type = 'toggle',
                 default = 0,
@@ -514,7 +514,7 @@ options = {
             },
 
             {
-                title = "Single Unit Selected Rings",
+                title = "<LOC OPTIONS_0235>Single Unit Selected Rings",
                 key = 'gui_enhanced_unitrings',
                 type = 'toggle',
                 default = 0,
@@ -527,7 +527,7 @@ options = {
             },
 
             {
-                title = "Zoom Pop Distance",
+                title = "<LOC OPTIONS_0236>Zoom Pop Distance",
                 key = 'gui_zoom_pop_distance',
                 type = 'slider',
                 default = 80,
@@ -539,7 +539,7 @@ options = {
             },
 
             {
-                title = "Factory Build Queue Templates",
+                title = "<LOC OPTIONS_0237>Factory Build Queue Templates",
                 key = 'gui_templates_factory',
                 type = 'toggle',
                 default = 0,
@@ -552,7 +552,7 @@ options = {
             },
 
             {
-                title = "Seperate Idle Builders",
+                title = "<LOC OPTIONS_0238>Seperate Idle Builders",
                 key = 'gui_seperate_idle_builders',
                 type = 'toggle',
                 default = 0,
@@ -564,7 +564,7 @@ options = {
                 },
             },
             {
-                title = "Visible Template Names",
+                title = "<LOC OPTIONS_0239>Visible Template Names",
                 key = 'gui_visible_template_names',
                 type = 'toggle',
                 default = 0,
@@ -577,7 +577,7 @@ options = {
             },
 
             {
-                title = "Template Name Cutoff",
+                title = "<LOC OPTIONS_0240>Template Name Cutoff",
                 key = 'gui_template_name_cutoff',
                 type = 'slider',
                 default = 0,
@@ -589,7 +589,7 @@ options = {
             },
 
             {
-                title = "Display more Unit Stats",
+                title = "<LOC OPTIONS_0241>Display more Unit Stats",
                 key = 'gui_detailed_unitview',
                 type = 'toggle',
                 default = 0,
@@ -602,7 +602,7 @@ options = {
             },
 
             {
-                title = "Always Render Custom Names",
+                title = "<LOC OPTIONS_0242>Always Render Custom Names",
                 key = 'gui_render_custom_names',
                 type = 'toggle',
                 default = 0,
@@ -618,7 +618,7 @@ options = {
             },
 
             {
-                title = "Force Render Enemy Lifebars",
+                title = "<LOC OPTIONS_0243>Force Render Enemy Lifebars",
                 key = 'gui_render_enemy_lifebars',
                 type = 'toggle',
                 default = 0,
@@ -634,7 +634,20 @@ options = {
             },
 
             {
-                title = "Improved Unit deselection",
+                title = "<LOC OPTIONS_0244>Show Armament Build in Factory Menu",
+                key = 'gui_render_armament_detail',
+                type = 'toggle',
+                default = 1,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 0 },
+                        {text = "<LOC _On>", key = 1 },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC OPTIONS_0245>Improved Unit deselection",
                 key = 'gui_improved_unit_deselection',
                 type = 'toggle',
                 default = 0,
@@ -647,7 +660,7 @@ options = {
             },
 
             {
-                title = "Show reclaim mass value",
+                title = "<LOC OPTIONS_0246>Show reclaim mass value",
                 key = 'gui_show_reclaim',
                 type = 'toggle',
                 default = 1,

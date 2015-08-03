@@ -2052,6 +2052,10 @@ Tooltips = {
         title = 'Force Render Enemy Lifebars',
         description = 'Force rendering enemy lifebars. Disabled by default',
     },
+    gui_render_armament_detail = {
+        title = '<LOC OPTIONS_0244>Show Armament Detail in Build Menu',
+        description = '<LOC tooltipui0692>Shows detailed information about the weapons a unit has from the build menu',
+    },
     options_gui_improved_unit_deselection = {
         title = 'Improved Unit deselection',
         description = 'Reduce the number of selected units by shift(-1) or ctrl(-5) or ctrl+shift(-10) right-click in group selection. Enabled by default',
