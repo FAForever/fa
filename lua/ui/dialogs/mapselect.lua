@@ -24,9 +24,11 @@ local Mods = import('/lua/mods.lua')
 local Combo = import('/lua/ui/controls/combo.lua').Combo
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local ModManager = import('/lua/ui/lobby/ModsManager.lua')
+local Prefs = import('/lua/user/prefs.lua')
 
 local scenarios = nil
 local selectedScenario = false
+local isSinglePlayer = false
 local description = false
 local descText = false
 local posGroup = false
@@ -37,6 +39,7 @@ local mapListTitle = false
 local mapsize = false
 local mapplayers = false
 local mapInfo = false
+local preview = nil
 local selectButton = false
 
 local scenarioKeymap = {}
@@ -235,7 +238,54 @@ mapFilters = {
 }
 
 -- Table contianing filter functions to apply to the map list.
-local currentFilters = {map_obsolete = mapFilters[5].FilterFactory:Build()}
+local currentFilters = nil
+
+-- Eeeewww
+local function GetFilterIndex(filterKey)
+    for k, v in mapFilters do
+        if v.FilterKey == filterKey then
+            return k
+        end
+    end
+end
+
+--- Load old filter config from the prefs file and configure accordingly.
+function InitFilters()
+    currentFilters = {}
+    local savedFilterState = Prefs.GetFromCurrentProfile("stored_filter_state") or {
+        map_obsolete = {
+            SelectedKey = 1 -- Enable obsolete map filtering by default.
+        }
+    }
+
+    -- savedFilterState is an array of tables of filter options
+    for filterKey, v in savedFilterState do
+        local filter = mapFilters[GetFilterIndex(filterKey)]
+        local factory = filter.FilterFactory
+        factory.SelectedKey = v.SelectedKey
+        factory.SelectedComparator = v.SelectedComparator
+        currentFilters[filter.FilterKey] = factory:Build()
+    end
+end
+
+--- Write the current filter configuration to the preferences file.
+function SaveFilterState()
+
+    local pickled = {}
+    for filterKey, v in currentFilters do
+        local index = GetFilterIndex(filterKey)
+
+        -- Read off the factory configuration
+        local factory = mapFilters[index].FilterFactory
+        pickled[filterKey] = {
+            SelectedKey = factory.SelectedKey,
+            SelectedComparator = factory.SelectedComparator
+        }
+
+    end
+
+    Prefs.SetToCurrentProfile("stored_filter_state", pickled)
+end
 
 -- Create a filter dropdown and title from the table above
 function CreateFilter(parent, filterData)
@@ -267,8 +317,18 @@ function CreateFilter(parent, filterData)
     end
 
     local filterKey = filterData.FilterKey
+    local filterIndex = GetFilterIndex(filterKey)
     local filterEntry = filterData -- Closure copy.
-    group.combo:AddItems(itemArray, 1)
+
+    -- Relate filter keys back to combo indexes, and use it to set up the initial UI state correctly
+    local filterOptions = mapFilters[filterIndex].Options
+    local filterFactory = mapFilters[filterIndex].FilterFactory
+    for i, v in filterOptions do
+        if v.key == filterFactory.SelectedKey then
+            group.combo:AddItems(itemArray, i)
+            break
+        end
+    end
 
     group.combo.OnClick = function(self, index, text)
         local factory = filterEntry.FilterFactory
@@ -281,6 +341,7 @@ function CreateFilter(parent, filterData)
             currentFilters[filterKey] = factory:Build()
         end
 
+        SaveFilterState()
         PopulateMapList()
     end
 
@@ -290,7 +351,7 @@ function CreateFilter(parent, filterData)
         group.comboFilter.Right:Set(function() return group.combo.Left() - 5 end)
         group.comboFilter.Width:Set(60)
 
-        group.comboFilter:AddItems({"=", ">=", "<="}, 1)
+        group.comboFilter:AddItems({"=", ">=", "<="}, filterFactory.SelectedComparator)
 
         group.comboFilter.OnClick = function(self, index, text)
             local factory = filterEntry.FilterFactory
@@ -301,6 +362,7 @@ function CreateFilter(parent, filterData)
                 currentFilters[filterKey] = factory:Build()
             end
 
+            SaveFilterState()
             PopulateMapList()
         end
     end
@@ -329,8 +391,49 @@ function LoadScenarios(force)
     return scenarios
 end
 
+function PreloadMap(row)
+    local scen = scenarios[scenarioKeymap[row+1]]
+
+    selectedScenario = scen
+    local mapfile = scen.map
+    if DiskGetFileInfo(mapfile) then
+        advOptions = scen.options
+        MapUtil.ValidateScenarioOptions(advOptions)
+        RefreshOptions(false)
+        preview:SetScenario(scen)
+        SetDescription(scen)
+    else
+        WARN("No scenario map file defined")
+        description:DeleteAllItems()
+        description:AddItem(LOC("<LOC MAPSEL_0000>No description available."))
+        mapplayers:SetText(LOCF("<LOC map_select_0002>NO START SPOTS DEFINED"))
+        mapsize:SetText(LOCF("<LOC map_select_0003>NO MAP SIZE INFORMATION"))
+        selectButton:Disable()
+    end
+end
+
+-- Called when the selected map is changed.
+local OnMapChanged = function(self, row, noSound)
+    mapList:SetSelection(row)
+    PreloadMap(row)
+    local sound = Sound({Cue = "UI_Skirmish_Map_Select", Bank = "Interface"})
+    if not noSound then
+        PlaySound(sound)
+    end
+end
+
 function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultScenarioName, curOptions, availableMods, OnModsChanged)
     LoadScenarios()
+
+    -- Initialise the selected scenario from the name we were passed.
+    for i, scenario in scenarios do
+        if string.lower(scenario.file) == string.lower(defaultScenarioName) then
+            selectedScenario = scenario
+        end
+    end
+
+    InitFilters()
+    isSinglePlayer = singlePlayer
 
     -- control layout
     dialogContent = Group(over)
@@ -421,15 +524,10 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     UIUtil.MakeInputModal(dialogContent)
 
     local MAP_PREVIEW_SIZE = 292
-    local preview = ResourceMapPreview(dialogContent, MAP_PREVIEW_SIZE, 5, 8, true)
+    preview = ResourceMapPreview(dialogContent, MAP_PREVIEW_SIZE, 5, 8, true)
     UIUtil.SurroundWithBorder(preview, '/scx_menu/lan-game-lobby/frame/')
     LayoutHelpers.AtLeftTopIn(preview, dialogContent, 19, 50)
     dialogContent.preview = preview
-
-    local nopreviewtext = UIUtil.CreateText(dialogContent, "<LOC _No_Preview>No Preview", 24)
-    LayoutHelpers.AtCenterIn(nopreviewtext, preview)
-    nopreviewtext:Hide()
-    dialogContent.nopreviewtext = nopreviewtext
 
     -- A Group to enclose the map info elements.
     local mapInfoGroup = Group(dialogContent)
@@ -518,64 +616,24 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
 
     UIUtil.CreateLobbyVertScrollbar(mapList, 2, -1, -25)
 
-    -- initialize controls
-    PopulateMapList()
-
     local OptionGroup = Group(dialogContent)
     dialogContent.OptionGroup = OptionGroup
     UIUtil.SurroundWithBorder(OptionGroup, '/scx_menu/lan-game-lobby/frame/')
     OptionGroup.Width:Set(290)
     OptionGroup.Bottom:Set(mapSelectGroup.Bottom)
     LayoutHelpers.RightOf(OptionGroup, filterGroup, 23)
-    SetupOptionsPanel(OptionGroup, singlePlayer, curOptions)
+    SetupOptionsPanel(OptionGroup, curOptions)
 
     selectButton.OnClick = function(self, modifiers)
         selectBehavior(selectedScenario, changedOptions, restrictedCategories)
-        ResetFilters()
     end
 
     cancelButton.OnClick = function(self, modifiers)
         exitBehavior()
-        ResetFilters()
     end
 
-    function PreloadMap(row)
-        local scen = scenarios[scenarioKeymap[row+1]]
-        if scen == selectedScenario then
-            return
-        end
-        selectedScenario = scen
-        local mapfile = scen.map
-        if DiskGetFileInfo(mapfile) then
-            advOptions = scen.options
-            MapUtil.ValidateScenarioOptions(advOptions)
-            RefreshOptions(false, singlePlayer)
-            preview:SetScenario(scen)
-            nopreviewtext:Hide()
-            SetDescription(scen)
-        else
-            WARN("No scenario map file defined")
-            nopreviewtext:Show()
-            description:DeleteAllItems()
-            description:AddItem(LOC("<LOC MAPSEL_0000>No description available."))
-            mapplayers:SetText(LOCF("<LOC map_select_0002>NO START SPOTS DEFINED"))
-            mapsize:SetText(LOCF("<LOC map_select_0003>NO MAP SIZE INFORMATION"))
-            selectButton:Disable()
-        end
-    end
-
-    -- Called when the selected map is changed.
-    local onItemChanged = function(self, row, noSound)
-        mapList:SetSelection(row)
-        PreloadMap(row)
-        local sound = Sound({Cue = "UI_Skirmish_Map_Select", Bank = "Interface"})
-        if not noSound then
-            PlaySound(sound)
-        end
-    end
-
-    mapList.OnKeySelect = onItemChanged
-    mapList.OnClick = onItemChanged
+    mapList.OnKeySelect = OnMapChanged
+    mapList.OnClick = OnMapChanged
     mapList.OnDoubleClick = function(self, row)
         mapList:SetSelection(row)
         PreloadMap(row)
@@ -585,24 +643,12 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
         ResetFilters()
     end
 
-    -- set list to first item or default
-    defaultRow = 0
-    if defaultScenarioName then
-        for i, scenario in scenarios do
-            if string.lower(scenario.file) == string.lower(defaultScenarioName) then
-                defaultRow = i - 1
-                break
-            end
-        end
-    end
-
-    mapList:OnClick(defaultRow, true)
-    mapList:ShowItem(defaultRow)
+    PopulateMapList()
 
     return popup
 end
 
-function RefreshOptions(skipRefresh, singlePlayer)
+function RefreshOptions(skipRefresh)
     -- a little weird, but the "skip refresh" is set to prevent calc visible from being called before the control is properly setup
     -- it also means it's a flag that tells you this is the first time the dialog has been opened
     -- so we'll use this flag to reset the options sources so they can set up for multiplayer
@@ -632,7 +678,7 @@ function RefreshOptions(skipRefresh, singlePlayer)
         if ShouldShowOptionCategory(OptionTable.options) then
             table.insert(Options, {type = 'title', text = OptionTable.title})
             for optionIndex, optionData in OptionTable.options do
-                if not(singlePlayer and optionData.mponly == true) and table.getn(optionData.values) > 1 then
+                if not(isSinglePlayer and optionData.mponly == true) and table.getn(optionData.values) > 1 then
                     table.insert(Options, {type = 'option', text = optionData.label, data = optionData, default = optionData.default}) -- option1 for teamOptions for exemple
                 end
             end
@@ -643,7 +689,7 @@ function RefreshOptions(skipRefresh, singlePlayer)
     end
 end
 
-function SetupOptionsPanel(parent, singlePlayer, curOptions)
+function SetupOptionsPanel(parent, curOptions)
     local title = UIUtil.CreateText(parent, '<LOC PROFILE_0012>', 18)
     LayoutHelpers.AtLeftTopIn(title, parent, 4, 2)
     parent.title = title
@@ -655,7 +701,7 @@ function SetupOptionsPanel(parent, singlePlayer, curOptions)
     LayoutHelpers.Below(OptionContainer, title, 2)
 
     local OptionDisplay = {}
-    RefreshOptions(true, singlePlayer)
+    RefreshOptions(true)
 
     local function CreateOptionCombo(parent)
         local combo = Combo(parent, nil, nil, nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
@@ -884,6 +930,8 @@ end
 
 function PopulateMapList()
     mapList:DeleteAllItems()
+
+    local selectedRow = 0
     local count = 1
     for i,sceninfo in scenarios do
         local passedFiltering = true
@@ -896,11 +944,19 @@ function PopulateMapList()
         end
 
         if passedFiltering then
+            -- Make sure we finish up with the right map selected.
+            if string.lower(sceninfo.file) == string.lower(selectedScenario.file) then
+                selectedRow = count - 1
+            end
+
             scenarioKeymap[count] = i
             count = count + 1
             mapList:AddItem(LOC(sceninfo.name))
         end
     end
+
+    OnMapChanged(mapList, selectedRow, true)
+    mapList:ShowItem(selectedRow)
 
     randMapList = count - 1
 
