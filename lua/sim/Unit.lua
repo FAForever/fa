@@ -235,9 +235,6 @@ Unit = Class(moho.unit_methods) {
         self.Dead = false
 
         local bp = self:GetBlueprint()
-        if bp.Transport and bp.Transport.DontUseForcedAttachPoints then
-            self:RemoveTransportForcedAttachPoints()
-        end
         self:InitBuffFields()
         self:OnCreated()
 
@@ -3879,18 +3876,6 @@ Unit = Class(moho.unit_methods) {
             Owner = self,
         }
         return ( self.BuffFields[name](spec) )
-    end,
-
-    --Removes engine forced attachment bones for transports
-    RemoveTransportForcedAttachPoints = function(self)
-        --This cancels the weird attachment bone manipulations, so transported units attach to the correct positions
-        --(probably only useful for custom transport units only). By brute51, this is not a bug fix.
-        local nBones = self:GetBoneCount() - 1
-        for k = 1, nBones do
-            if string.find(self:GetBoneName(k), 'Attachpoint_') then
-                self:EnableManipulators(k, false)
-            end
-        end
     end,
 
     GetBuffFieldByName = function(self, name)
