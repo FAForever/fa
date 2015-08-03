@@ -33,6 +33,8 @@ XRB0204 = Class(CConstructionStructureUnit)
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
+        CConstructionStructureUnit.OnStopBeingBuilt(self, builder, layer)
+
         self:ShowBone('xrb0304', true)
     end,
      
