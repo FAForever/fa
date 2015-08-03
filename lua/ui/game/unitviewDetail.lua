@@ -6,6 +6,7 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local GameCommon = import('/lua/ui/game/gamecommon.lua')
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local Prefs = import('/lua/user/prefs.lua')
+local options = Prefs.GetFromCurrentProfile('options')
 local UnitDescriptions = import('/lua/ui/help/unitdescription.lua').Description
 
 View = false
@@ -62,7 +63,7 @@ function GetAbilityList(bp)
 end
     
 function CheckFormat()
-    if ViewState != Prefs.GetOption('uvd_format') then
+    if ViewState ~= Prefs.GetOption('uvd_format') then
         SetLayout()
     end
     if ViewState == "off" then
@@ -94,7 +95,7 @@ end
    
 function ShowEnhancement(bp, bpID, iconID, iconPrefix, userUnit)
     if CheckFormat() then
-        # Name / Description
+        -- Name / Description
         View.UnitImg:SetTexture(UIUtil.UIFile(iconPrefix..'_btn_up.dds'))
         
         LayoutHelpers.AtTopIn(View.UnitShortDesc, View, 10)
@@ -103,7 +104,7 @@ function ShowEnhancement(bp, bpID, iconID, iconPrefix, userUnit)
         local slotName = enhancementSlotNames[string.lower(bp.Slot)]
         slotName = slotName or bp.Slot
 
-        if bp.Name != nil then
+        if bp.Name ~= nil then
             View.UnitShortDesc:SetText(LOCF("%s: %s", bp.Name, slotName))
         else
             View.UnitShortDesc:SetText(LOC(slotName))
@@ -117,7 +118,7 @@ function ShowEnhancement(bp, bpID, iconID, iconPrefix, userUnit)
         local showAbilities = false
         local showUpKeep = false
         local time, energy, mass
-        if bp.Icon != nil and not string.find(bp.Name, 'Remove') then
+        if bp.Icon ~= nil and not string.find(bp.Name, 'Remove') then
             time, energy, mass = import('/lua/game.lua').GetConstructEconomyModel(userUnit, bp)
             time = math.max(time, 1)
             showUpKeep = DisplayResources(bp, time, energy, mass)
@@ -140,7 +141,7 @@ function ShowEnhancement(bp, bpID, iconID, iconPrefix, userUnit)
             local tempDescID = bpID.."-"..iconID
             if UnitDescriptions[tempDescID] and not string.find(bp.Name, 'Remove') then
                 local tempDesc = LOC(UnitDescriptions[tempDescID])
-                WrapAndPlaceText(nil, tempDesc, View.Description)
+                WrapAndPlaceText(nil, nil, nil, nil, tempDesc, View.Description)
             else
                 WARN('No description found for unit: ', bpID, ' enhancement: ', iconID)
                 View.Description:Hide()
@@ -165,9 +166,14 @@ function ShowEnhancement(bp, bpID, iconID, iconPrefix, userUnit)
         Hide()
     end
 end
-    
-function WrapAndPlaceText(abilities, text, control)
+
+function WrapAndPlaceText(air, physics, weapons, abilities, text, control)
+    local ppf = 1
+    local dotpulses = 1
     local lines = {}
+    -- Used to set the line colour correctly.
+    local physics_line = -1
+    local weapon_start = -1
     if text then
         lines = import('/lua/maui/text.lua').WrapText(text, control.Value[1].Width(),
                 function(text) return control.Value[1]:GetStringAdvance(text) end)
@@ -181,6 +187,75 @@ function WrapAndPlaceText(abilities, text, control)
         end
         abilityLines = table.getsize(abilities)
     end
+
+    if options.gui_render_armament_detail == 1 then
+        weapon_start = table.getsize(lines)
+        if weapons then
+            if table.getn(weapons) > 0 then
+                table.insert(lines, "")
+            end
+            local lastWeapon = {}
+
+            -- Used to count up duplicate weapons.
+            local mflag = 0
+            for i, weapon in weapons do
+                if weapon.WeaponCategory and weapon.WeaponCategory ~= 'Death' then
+                    if weapon.DisplayName == lastWeapon.DisplayName then
+                        mflag = mflag + 1
+                    else
+                        if mflag ~= 0 then
+                            table.insert(lines, string.format("%s (%s) x%d",
+                                weapon.DisplayName,
+                                weapon.WeaponCategory,
+                                mflag + 1))
+                        else
+                            table.insert(lines, string.format("%s (%s)", weapon.DisplayName, weapon.WeaponCategory)
+                            )
+                        end
+
+                        if weapon.ProjectilesPerOnFire then
+                            ppf = weapon.ProjectilesPerOnFire
+                        else
+                            ppf = 1
+                        end
+
+                        if weapon.DoTPulses then
+                            dotpulses = weapon.DoTPulses
+                        else
+                            dotpulses = 1
+                        end
+
+                        table.insert(lines, LOCF("<LOC gameui_0001>Damage: %d, Rate: %0.2f (DPS: %d)  Range: %d",
+                            weapon.Damage * ppf * dotpulses,
+                            1.0 / weapon.RateOfFire,
+                            math.floor(weapon.Damage * ppf * dotpulses * weapon.RateOfFire),
+                            weapon.MaxRadius))
+                        mflag = 0
+                    end
+
+                    lastWeapon = weapon
+                end
+            end
+        end
+
+        if air and air.MaxAirspeed and air.MaxAirspeed ~=0 then
+            table.insert(lines, "")
+            table.insert(lines, LOCF("<LOC gameui_0002>Speed: %0.2f, Turning: %0.2f",
+                air.MaxAirspeed,
+                air.TurnSpeed))
+            physics_line = table.getn(lines)
+        elseif physics and physics.MaxSpeed and physics.MaxSpeed ~=0 then
+            table.insert(lines, "")
+            table.insert(lines, LOCF("<LOC gameui_0003>Speed: %0.2f, Acceleration: %0.2f, Turning: %d",
+                physics.MaxSpeed,
+                physics.MaxBrake,
+                physics.TurnRate))
+            physics_line = table.getn(lines)
+        end
+
+        weapon_start = weapon_start + 1
+    end
+
     for i, v in lines do
         local index = i
         if control.Value[index] then
@@ -195,6 +270,11 @@ function WrapAndPlaceText(abilities, text, control)
         end
         if index <= abilityLines then
             control.Value[index]:SetColor(UIUtil.bodyColor)
+        elseif index == physics_line then
+            control.Value[index]:SetColor('FFb0ffb0')
+        elseif index == weapon_start then
+            control.Value[index]:SetColor('ffff9999')
+            weapon_start = weapon_start + 2
         else
             control.Value[index]:SetColor(UIUtil.fontColor)
         end
@@ -210,7 +290,7 @@ end
     
 function Show(bp, buildingUnit, bpID)
     if CheckFormat() then
-        # Name / Description
+        -- Name / Description
         if false then
             local foo, iconName = GameCommon.GetCachedUnitIconFileNames(bp)
             if iconName then
@@ -225,7 +305,7 @@ function Show(bp, buildingUnit, bpID)
         if GetTechLevelString(bp) then
             description = LOCF('Tech %d %s', GetTechLevelString(bp), description)
         end
-        if bp.General.UnitName != nil then
+        if bp.General.UnitName ~= nil then
             View.UnitShortDesc:SetText(LOCF("%s: %s", bp.General.UnitName, description))
         else
             View.UnitShortDesc:SetText(LOCF("%s", description))
@@ -237,7 +317,7 @@ function Show(bp, buildingUnit, bpID)
         local showecon = true
         local showUpKeep = false
         local showAbilities = false
-        if buildingUnit != nil then
+        if buildingUnit ~= nil then
 	   
 	   -- Differential upgrading. Check to see if building this would be an upgrade
 	   local targetBp = bp
@@ -249,8 +329,8 @@ function Show(bp, buildingUnit, bpID)
 	      performUpgrade = true
 	   elseif targetBp.General.UpgradesFrom == builderBp.General.UpgradesTo then
 	      performUpgrade = true
-	   elseif targetBp.General.UpgradesFromBase != "none" then
-	      # try testing against the base
+	   elseif targetBp.General.UpgradesFromBase ~= "none" then
+	      -- try testing against the base
 	      if targetBp.General.UpgradesFromBase == builderBp.BlueprintId then
 		 performUpgrade = true
 	      elseif targetBp.General.UpgradesFromBase == builderBp.General.UpgradesFromBase then
@@ -277,11 +357,16 @@ function Show(bp, buildingUnit, bpID)
             showecon = false
         end
             
-        # Health stat
+        -- Health stat
         View.HealthStat.Value:SetText(string.format("%d", bp.Defense.MaxHealth))
     
         if View.Description then
-            WrapAndPlaceText(bp.Display.Abilities, LOC(UnitDescriptions[bpID]), View.Description)
+            WrapAndPlaceText(bp.Air,
+            bp.Physics,
+            bp.Weapon,
+            bp.Display.Abilities,
+            LOC(UnitDescriptions[bpID]),
+            View.Description)
         end
         local showShield = false
         if bp.Defense.Shield and bp.Defense.Shield.ShieldMaxHealth then
@@ -301,7 +386,7 @@ function Show(bp, buildingUnit, bpID)
 end
 
 function DisplayResources(bp, time, energy, mass)
-    # Cost Group
+    -- Cost Group
     if time > 0 then
         local consumeEnergy = -energy / time
         local consumeMass = -mass / time
@@ -312,7 +397,7 @@ function DisplayResources(bp, time, energy, mass)
         View.BuildCostGroup.MassValue:SetColor( "FFF05050" )
     end
 
-    # Upkeep Group
+    -- Upkeep Group
     local plusEnergyRate = bp.Economy.ProductionPerSecondEnergy or bp.ProductionPerSecondEnergy
     local negEnergyRate = bp.Economy.MaintenanceConsumptionPerSecondEnergy or bp.MaintenanceConsumptionPerSecondEnergy
     local plusMassRate = bp.Economy.ProductionPerSecondMass or bp.ProductionPerSecondMass
@@ -320,7 +405,7 @@ function DisplayResources(bp, time, energy, mass)
     local upkeepEnergy = GetYield(negEnergyRate, plusEnergyRate)
     local upkeepMass = GetYield(negMassRate, plusMassRate)
     local showUpkeep = false
-    if upkeepEnergy != 0 or upkeepMass != 0 then
+    if upkeepEnergy ~= 0 or upkeepMass ~= 0 then
         View.UpkeepGroup.Label:SetText(LOC("<LOC uvd_0002>Yield"))
         View.UpkeepGroup.EnergyValue:SetText( string.format("%d",upkeepEnergy) )
         View.UpkeepGroup.MassValue:SetText( string.format("%d",upkeepMass) )
@@ -336,7 +421,7 @@ function DisplayResources(bp, time, energy, mass)
             View.UpkeepGroup.MassValue:SetColor( "FFF05050" )
         end
         showUpkeep = true
-    elseif bp.Economy and (bp.Economy.StorageEnergy != 0 or bp.Economy.StorageMass != 0) then
+    elseif bp.Economy and (bp.Economy.StorageEnergy ~= 0 or bp.Economy.StorageMass ~= 0) then
         View.UpkeepGroup.Label:SetText(LOC("<LOC uvd_0006>Storage"))
         local upkeepEnergy = bp.Economy.StorageEnergy or 0
         local upkeepMass = bp.Economy.StorageMass or 0
