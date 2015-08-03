@@ -912,7 +912,7 @@ function FakeGateInUnit(unit, callbackFunction)
         unit:SetMesh(unit:GetBlueprint().Display.MeshBlueprint, true)
     else
         LOG ('debug:non commander')
-        unit:PlayTeleportChargeEffects()
+        unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
         unit:PlayUnitSound('GateCharge')
         WaitSeconds(2)
         unit:CleanupTeleportChargeEffects()
