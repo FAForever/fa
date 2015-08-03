@@ -1842,13 +1842,6 @@ Unit = Class(moho.unit_methods) {
             self.MovementEffectsExist = false
         end
 
-        --This is used to raise certain units (And hence their targetbones) on completion, such as
-        --some Sonar, to allow them to be hit properly by surface weaponry
-        if bp.RaiseDistance then
-            local Position = self:GetPosition()
-            self:SetPosition({Position[1], Position[2] + bp.RaiseDistance, Position[3]}, true)
-        end
-
         -- If someone thinks they're being clever by using a UI mod to violate unit restrictions,
         -- thoroughly ruin their day.
         if Game.UnitRestricted(self:GetUnitId(), self) then
