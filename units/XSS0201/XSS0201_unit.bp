@@ -285,7 +285,7 @@ UnitBlueprint {
             BeamCollisionDelay = 0,
             BeamLifetime = 1,					
             CollideFriendly = false,
-            Damage = 50,					#47
+            Damage = 50,
             DamageRadius = 1,
             DamageType = 'Normal',
             DisplayName = 'Ultrachromatic Beam Generator',
@@ -295,7 +295,7 @@ UnitBlueprint {
             FireTargetLayerCapsTable = {
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 0,				#2
+            FiringTolerance = 0,
             Label = 'FrontTurret',
             MaxRadius = 60,
             MuzzleChargeDelay = 0,
@@ -321,7 +321,7 @@ UnitBlueprint {
             RateOfFire = 0.25,
             SlavedToBody = true,
             SlavedToBodyArcRange = 135,
-            TargetCheckInterval = 0.8,				#4			
+            TargetCheckInterval = 0.8,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'NAVAL MOBILE',
@@ -338,10 +338,10 @@ UnitBlueprint {
             TurretPitchRange = 20,
             TurretPitchSpeed = 30,
             TurretYaw = 0,
-            TurretYawRange = 120,				#140
-            TurretYawSpeed = 60,				#90
+            TurretYawRange = 120,
+            TurretYawSpeed = 60,
             Turreted = true,
-	    UseFiringSolutionInsteadOfAimBone = true,		#Added
+	    UseFiringSolutionInsteadOfAimBone = true,
             WeaponCategory = 'Direct Fire Naval',
             WeaponRepackTimeout = 2,
             WeaponUnpacks = false,
@@ -371,7 +371,7 @@ UnitBlueprint {
             BeamCollisionDelay = 0,
             BeamLifetime = 1,
             CollideFriendly = false,
-            Damage = 26,					#42
+            Damage = 26,
             DamageRadius = 1,					
             DamageType = 'Normal',
             DisplayName = 'Ultrachromatic Beam Generator',
@@ -381,7 +381,7 @@ UnitBlueprint {
             FireTargetLayerCapsTable = {
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 0,				#2
+            FiringTolerance = 0,
             Label = 'BackTurret',
             MaxRadius = 60,
             MuzzleChargeDelay = 0,
@@ -408,7 +408,7 @@ UnitBlueprint {
             RateOfFire = 0.25,
             SlavedToBody = true,
             SlavedToBodyArcRange = 135,
-            TargetCheckInterval = 0.8,				#2							
+            TargetCheckInterval = 0.8,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'NAVAL MOBILE',
@@ -426,9 +426,9 @@ UnitBlueprint {
             TurretPitchSpeed = 30,
             TurretYaw = 0,
             TurretYawRange = 140,				
-            TurretYawSpeed = 60,				#90
+            TurretYawSpeed = 60,
             Turreted = true,
-	    UseFiringSolutionInsteadOfAimBone = true,		#Added
+	    UseFiringSolutionInsteadOfAimBone = true,
             WeaponCategory = 'Direct Fire Naval',
             WeaponRepackTimeout = 2,
             WeaponUnpacks = false,
@@ -507,11 +507,11 @@ UnitBlueprint {
                 Sub = 'Seabed|Sub|Water',
                 Water = 'Seabed|Sub|Water',
             },
-            FiringTolerance = 90, #from 2
+            FiringTolerance = 90,
             Label = 'AntiTorpedo',
-            LeadTarget = false, #from true
+            LeadTarget = false,
             MaxRadius = 45,
-            MinRadius = 15,  #from 15
+            MinRadius = 15,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 80,
@@ -534,7 +534,7 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_Countermeasure',
             RateOfFire = 0.26,
-            TargetCheckInterval = 0.2, #from 0.5
+            TargetCheckInterval = 0.2,
             TargetRestrictDisallow = 'UNTARGETABLE',
             TargetRestrictOnlyAllow = 'TORPEDO',
             TargetType = 'RULEWTT_Projectile',
@@ -544,10 +544,10 @@ UnitBlueprint {
             TurretBoneYaw = 'Projectile02',
             TurretDualManipulators = false,
             TurretPitch = 0,
-            TurretPitchRange = 360, #from 50
+            TurretPitchRange = 360,
             TurretPitchSpeed = 360,
             TurretYaw = 0,
-            TurretYawRange = 360, #from 180
+            TurretYawRange = 360,
             TurretYawSpeed = 360,
             Turreted = true,
             WeaponCategory = 'Defense',
