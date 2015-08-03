@@ -210,11 +210,7 @@ Unit = Class(moho.unit_methods) {
         }
 
         local bpVision = self:GetBlueprint().Intel.VisionRadius
-        if bpVision then
-            self:SetIntelRadius('Vision', bpVision)
-        else
-            self:SetIntelRadius('Vision', 0)
-        end
+        self:SetIntelRadius('Vision', bpVision or 0)
 
         self:SetCanTakeDamage(true)
         self:SetCanBeKilled(true)
@@ -1880,7 +1876,7 @@ Unit = Class(moho.unit_methods) {
     StartBeingBuiltEffects = function(self, builder, layer)
         local BuildMeshBp = self:GetBlueprint().Display.BuildMeshBlueprint
         if BuildMeshBp then
-            self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
+            self:SetMesh(BuildMeshBp, true)
         end
     end,
 

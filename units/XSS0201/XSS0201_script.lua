@@ -62,6 +62,8 @@ XSS0201 = Class(SSubUnit) {
     end,
 
     OnStopBeingBuilt = function(self, builer, layer)
+        SSubUnit.OnStopBeingBuilt(self, builer, layer)
+
         --- Unless we're gifted, we should have an original builder.
         --- Remains to be seen if this property is actually copied during gift
         if self.originalBuilder then
