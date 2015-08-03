@@ -319,13 +319,6 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    LifeTimeThread = function(self)
-        local bp = self:GetBlueprint().Defense.LifeTime
-        if not bp then return end
-        WaitSeconds(bp)
-        self:Destroy()
-    end,
-
     SetTargetPriorities = function(self, priTable)
         for i = 1, self:GetWeaponCount() do
             local wep = self:GetWeapon(i)
@@ -1795,9 +1788,6 @@ Unit = Class(moho.unit_methods) {
             end
         end
 
-        if bp.Defense.LifeTime then
-            self:ForkThread(self.LifeTimeThread)
-        end
         self:PlayUnitSound('DoneBeingBuilt')
         self:PlayUnitAmbientSound( 'ActiveLoop' )
 
