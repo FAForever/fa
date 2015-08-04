@@ -3512,10 +3512,6 @@ Unit = Class(moho.unit_methods) {
         return buffName
     end,
 
-    PlayVeteranFx = function(self, newLvl)
-        CreateAttachedEmitter(self, 0, self:GetArmy(), 'destruction_explosion_concussion_ring_03_emit.bp'):ScaleEmitter(1)
-    end,
-
     -------------------------------------------------------------------------------------------
     -- SHIELDS
     -------------------------------------------------------------------------------------------
