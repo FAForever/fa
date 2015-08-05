@@ -265,12 +265,11 @@ function SetupPlayerLines()
 
         return group
     end
+
+    controls.armyLines = {}
     local index = 1
     for armyIndex, armyData in GetArmiesTable().armiesTable do
         if armyData.civilian or not armyData.showScore then continue end
-        if not controls.armyLines then
-            controls.armyLines = {}
-        end
         controls.armyLines[index] = CreateArmyLine(armyData, armyIndex)
         index = index + 1
     end
