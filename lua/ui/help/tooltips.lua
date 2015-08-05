@@ -2052,7 +2052,7 @@ Tooltips = {
         title = 'Force Render Enemy Lifebars',
         description = 'Force rendering enemy lifebars. Disabled by default',
     },
-    gui_render_armament_detail = {
+    options_gui_render_armament_detail = {
         title = '<LOC OPTIONS_0244>Show Armament Detail in Build Menu',
         description = '<LOC tooltipui0692>Shows detailed information about the weapons a unit has from the build menu',
     },
