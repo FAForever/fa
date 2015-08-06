@@ -244,6 +244,11 @@ function Refresh_Mod_List()
                 -- Construct backward-dependency map for this mod (so we can disable this one if
                 -- someone turns off something we depend on)
                 for k, v in dependencies.requires do
+                    -- Dependency on a blacklisted mod?
+                    if ModBlacklist[k] then
+                        missingDepsMods[uid] = mod
+                    end
+
                     if not modBackwardDependencyMap[k] then
                         modBackwardDependencyMap[k] = {}
                     end
