@@ -165,7 +165,7 @@ function table.assimilate(t1, t2)
     return t1
 end
 
---- Remove all keys in t2 from t2.
+--- Remove all keys in t2 from t1.
 function table.subtract(t1, t2)
     for k, v in t2 do
         t1[k] = nil
@@ -425,4 +425,30 @@ function table.filter(t, filterFunc)
     end
 
     return newTable
+end
+
+--=========================================================================================================
+-- StringJoin returns items as a single string, seperated by the delimiter
+--=========================================================================================================
+function StringJoin(items, delimiter)
+    local str = "";
+    for k,v in items do
+        str = str .. v .. delimiter
+    end
+    return str
+end
+
+--- "explode" a string into a series of tokens, using a separator character `sep`
+function StringSplit(str, sep)
+    local sep, fields = sep or ":", {}
+    local pattern = string.format("([^%s]+)", sep)
+    str:gsub(pattern, function(c) fields[table.getn(fields)+1] = c end)
+    return fields
+end
+
+--=========================================================================================================
+-- StringStartsWith returns true if the string starts with the specified value
+--=========================================================================================================
+function StringStartsWith(stringToMatch, valueToSeek)
+    return string.sub(stringToMatch,1,valueToSeek:len())==valueToSeek
 end

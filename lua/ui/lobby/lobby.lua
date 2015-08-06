@@ -36,9 +36,11 @@ local Trueskill = import('/lua/ui/lobby/trueskill.lua')
 local round = import('/lua/ui/lobby/trueskill.lua').round
 local Player = import('/lua/ui/lobby/trueskill.lua').Player
 local Rating = import('/lua/ui/lobby/trueskill.lua').Rating
+local ModBlacklist = import('/etc/faf/blacklist.lua').Blacklist
 local Teams = import('/lua/ui/lobby/trueskill.lua').Teams
 local EscapeHandler = import('/lua/ui/dialogs/eschandler.lua')
 local CountryTooltips = import('/lua/ui/help/tooltips-country.lua').tooltip
+local SetUtils = import('/lua/system/setutils.lua')
 local JSON = import('/lua/system/dkson.lua').json
 
 local IsSyncReplayServer = false
@@ -111,7 +113,8 @@ ConnectedWithProxy = {} -- by UID
 availableColours = {}
 
 local availableMods = {} -- map from peer ID to set of available mods; each set is a map from "mod id"->true
-local selectedMods = nil
+local selectedSimMods = {} -- Similar map for activated sim mods
+local selectedUIMods = {} -- Similar map for activated UI mods
 
 local CPU_Benchmarks = {} -- Stores CPU benchmark data
 
@@ -451,16 +454,6 @@ local function DoSlotBehavior(slot, key, name)
     end
 end --\\ End DoSlotBehavior()
 
-local function GetLocallyAvailableMods()
-    local result = {}
-    for k,mod in Mods.AllMods() do
-        if not mod.ui_only then
-            result[mod.uid] = true
-        end
-    end
-    return result
-end
-
 local function IsModAvailable(modId)
     for k,v in availableMods do
         if not v[modId] then
@@ -480,7 +473,8 @@ function Reset()
     GUI = false
     localPlayerID = false
     availableMods = {}
-    selectedMods = nil
+    selectedUIMods = Mods.GetSelectedUIMods()
+    selectedSimMods = Mods.GetSelectedSimMods()
     numOpenSlots = LobbyComm.maxPlayerSlots
     gameInfo = GameInfo.CreateGameInfo(LobbyComm.maxPlayerSlots)
 end
@@ -1920,16 +1914,18 @@ local OptionUtils = {
 -- callback when Mod Manager dialog finishes (modlist==nil on cancel)
 -- FIXME: The mod manager should be given a list of game mods set by the host, which
 -- clients can look at but not changed, and which don't get saved in our local prefs.
-function OnModsChanged(modlist, ignoreRefresh)
-    if modlist then
-        Mods.SetSelectedMods(modlist)
-        if lobbyComm:IsHost() then
-            selectedMods = table.map(function (m) return m.uid end, Mods.GetGameMods())
-            HostUtils.UpdateMods()
-        end
-        if not ignoreRefresh then
-            UpdateGame()
-        end
+function OnModsChanged(simMods, UIMods, ignoreRefresh)
+    -- We depend upon ModsManager to not allow the user to change mods they shouldn't be able to
+    selectedSimMods = simMods
+    selectedUIMods = UIMods
+
+    Mods.SetSelectedMods(SetUtils.Union(selectedSimMods, selectedUIMods))
+    if lobbyComm:IsHost() then
+        HostUtils.UpdateMods()
+    end
+
+    if not ignoreRefresh then
+        UpdateGame()
     end
 end
 
@@ -2481,7 +2477,7 @@ function CreateUI(maxPlayers)
     else
         GUI.gameoptionsButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Mods Manager")
         GUI.gameoptionsButton.OnClick = function(self, modifiers)
-            import('/lua/ui/lobby/ModsManager.lua').NEW_MODS_GUI(GUI, false, gameInfo.GameMods)
+            import('/lua/ui/lobby/ModsManager.lua').CreateDialog(GUI)
         end
         Tooltip.AddButtonTooltip(GUI.gameoptionsButton, 'Lobby_Mods')
     end
@@ -3433,6 +3429,21 @@ function SendCompleteGameStateToPeer(peerId)
     lobbyComm:SendData(peerId, {Type = 'GameInfo', GameInfo = GameInfo.Flatten(gameInfo)})
 end
 
+function UpdateClientModStatus(newHostSimMods)
+    -- Apply the new game mods from the host, but don't touch our UI mod configuration.
+    selectedSimMods = newHostSimMods
+
+    -- Make sure none of our selected UI mods are blacklisted
+    local bannedMods = CheckModCompatability()
+    if not table.empty(bannedMods) then
+        WarnIncompatibleMods()
+
+        selectedUIMods = SetUtils.Subtract(selectedUIMods, bannedMods)
+    end
+
+    Mods.SetSelectedMods(SetUtils.Union(selectedSimMods, selectedUIMods))
+end
+
 -- LobbyComm Callbacks
 function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
     lobbyComm = LobbyComm.CreateLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
@@ -3469,7 +3480,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         localPlayerName = myName
 
         GpgNetSend('connectedToHost', string.format("%d", hostID))
-        lobbyComm:SendData(hostID, { Type = 'SetAvailableMods', Mods = GetLocallyAvailableMods(), Name = localPlayerName} )
+        lobbyComm:SendData(hostID, { Type = 'SetAvailableMods', Mods = Mods.GetLocallyAvailableMods(), Name = localPlayerName} )
 
         lobbyComm:SendData(hostID,
             {
@@ -3662,6 +3673,8 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 -- Completely update the game state. To be used exactly once: when first connecting.
                 local hostFlatInfo = data.GameInfo
                 gameInfo = GameInfo.CreateGameInfo(LobbyComm.maxPlayerSlots, hostFlatInfo)
+
+                UpdateClientModStatus(gameInfo.GameMods, true)
                 UpdateGame()
             elseif data.Type == 'GameOptions' then
                 for key, value in data.Options do
@@ -3689,6 +3702,8 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 ClearSlotInfo(data.Slot)
             elseif data.Type == 'ModsChanged' then
                 gameInfo.GameMods = data.GameMods
+
+                UpdateClientModStatus(data.GameMods)
                 UpdateGame()
                 import('/lua/ui/lobby/ModsManager.lua').UpdateClientModStatus(gameInfo.GameMods)
             elseif data.Type == 'SlotClosed' then
@@ -3736,7 +3751,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
         localPlayerID = lobbyComm:GetLocalPlayerID()
         hostID = localPlayerID
-        selectedMods = table.map(function (m) return m.uid end, Mods.GetGameMods())
         HostUtils.UpdateMods()
 
         --- Returns true if the given option has the given key as a valid setting.
@@ -4773,21 +4787,7 @@ function LoadPreset(presetIndex)
 
     SetGameOptions(preset.GameOptions, true)
 
-    -- gameInfo.GameMods is a map from mod identifiers to truthy values for every activated mod.
-    -- Unfortunately, HostUtils.UpdateMods is painfully stupid and reads selectedMods, which is a list of
-    -- mod identifiers to be activated.
-    -- Ultimately, we want to make HostUtils.UpdateMods not be stupid, so presets just pickle the GameMods
-    -- map directly. For now, though, that means we have the following stupid loop to keep the
-    -- retarded HostUtils.UpdateMods working.
-    --
-    -- Thanks, William.
-    selectedMods = {}
-    for k, v in preset.GameMods do
-        if v then
-            table.insert(selectedMods, k)
-        end
-    end
-
+    selectedSimMods = preset.GameMods
     HostUtils.UpdateMods()
 
     GUI.presetDialog:Hide()
@@ -4904,6 +4904,23 @@ function GUI_Changelog()
     OkButton.OnClick = function()
         changelogPopup:Close()
     end
+end
+
+function CheckModCompatability()
+    local blacklistedMods = {}
+    for modId, _ in SetUtils.Union(selectedSimMods, selectedUIMods) do
+        if ModBlacklist[modId] then
+            blacklistedMods[modId] = ModBlacklist[modId]
+        end
+    end
+
+    return blacklistedMods
+end
+
+function WarnIncompatibleMods()
+    UIUtil.QuickDialog(GUI,
+        "<LOC uimod_0031>Some of your enabled mods are known to cause malfunctions with FAF, so have been disabled. See the mod manager for details - some mods may have newer versions which work.",
+        "<LOC _Ok>")
 end
 
 --- Create the HostUtils object, containing host-only functions. By not assigning this for non-host
@@ -5299,69 +5316,84 @@ function InitHostUtils()
         -- Update our local gameInfo.GameMods from selected map name and selected mods, then
         -- notify other clients about the change.
         UpdateMods = function(newPlayerID, newPlayerName)
-            if lobbyComm:IsHost() then
-                local newmods = {}
-                local missingmods = {}
-                for k,modId in selectedMods do
-                    if IsModAvailable(modId) then
-                        newmods[modId] = true
-                    else
-                        table.insert(missingmods, modId)
-                    end
+            local newmods = {}
+            local missingmods = {}
+            local blacklistedMods = {}
+
+            -- If any of our active sim mods are blacklisted, warn the user, turn them off, and
+            -- go through the "mods changed" handler code again with the smaller set.
+            local bannedMods = CheckModCompatability()
+            if not table.empty(bannedMods) then
+                WarnIncompatibleMods()
+
+                selectedSimMods = SetUtils.Subtract(selectedSimMods, bannedMods)
+                selectedUIMods = SetUtils.Subtract(selectedUIMods, bannedMods)
+                OnModsChanged(selectedSimMods, selectedUIMods)
+
+                return
+            end
+
+            for modId, _ in selectedSimMods do
+                if IsModAvailable(modId) then
+                    newmods[modId] = true
+                else
+                    table.insert(missingmods, modId)
                 end
-                if not table.equal(gameInfo.GameMods, newmods) and not newPlayerID then
-                    gameInfo.GameMods = newmods
-                    lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
-                    local nummods = 0
-                    local uids = ""
+            end
 
-                    for k in gameInfo.GameMods do
-                        nummods = nummods + 1
-                        if uids == "" then
-                            uids =  k
-                        else
-                            uids = string.format("%s %s", uids, k)
-                        end
+            -- We were called to update the sim mod set for the game, and have _really_ made changes
+            if not table.equal(gameInfo.GameMods, newmods) and not newPlayerID then
+                gameInfo.GameMods = newmods
+                lobbyComm:BroadcastData { Type = "ModsChanged", GameMods = gameInfo.GameMods }
+                local nummods = 0
+                local uids = ""
 
+                for k in gameInfo.GameMods do
+                    nummods = nummods + 1
+                    if uids == "" then
+                        uids =  k
+                    else
+                        uids = string.format("%s %s", uids, k)
                     end
-                    GpgNetSend('GameMods', "activated", nummods)
 
-                    if nummods > 0 then
-                        GpgNetSend('GameMods', "uids", uids)
-                    end
-                elseif not table.equal(gameInfo.GameMods, newmods) and newPlayerID then
-                    local modnames = ""
-                    local totalMissing = table.getn(missingmods)
-                    local totalListed = 0
-                    if totalMissing > 0 then
-                        for index, id in missingmods do
-                            for k,mod in Mods.GetGameMods() do
-                                if mod.uid == id then
-                                    totalListed = totalListed + 1
-                                    if totalMissing == totalListed then
-                                        modnames = modnames .. " " .. mod.name
-                                    else
-                                        modnames = modnames .. " " .. mod.name .. " + "
-                                    end
+                end
+                GpgNetSend('GameMods', "activated", nummods)
+
+                if nummods > 0 then
+                    GpgNetSend('GameMods', "uids", uids)
+                end
+            elseif not table.equal(gameInfo.GameMods, newmods) and newPlayerID then
+                local modnames = ""
+                local totalMissing = table.getn(missingmods)
+                local totalListed = 0
+                if totalMissing > 0 then
+                    for index, id in missingmods do
+                        for k,mod in Mods.GetGameMods() do
+                            if mod.uid == id then
+                                totalListed = totalListed + 1
+                                if totalMissing == totalListed then
+                                    modnames = modnames .. " " .. mod.name
+                                else
+                                    modnames = modnames .. " " .. mod.name .. " + "
                                 end
                             end
                         end
                     end
-                    local reason = (LOCF('<LOC lobui_0588>You were automaticly removed from the lobby because you ' ..
-                            'don\'t have the following mod(s):\n%s \nPlease, install the mod before you join the game lobby',
-                        modnames))
-                    -- TODO: Verify this functionality
-                    if FindNameForID(newPlayerID) then
-                        AddChatText(FindNameForID(newPlayerID)..' kicked because he does not have this mod : '..modnames)
-                    else
-                        if newPlayerName then
-                            AddChatText(newPlayerName..' kicked because he does not have this mod : '..modnames)
-                        else
-                            AddChatText('The last player is kicked because he does not have this mod : '..modnames)
-                        end
-                    end
-                    lobbyComm:EjectPeer(newPlayerID, reason)
                 end
+                local reason = (LOCF('<LOC lobui_0588>You were automaticly removed from the lobby because you ' ..
+                        'don\'t have the following mod(s):\n%s \nPlease, install the mod before you join the game lobby',
+                    modnames))
+                -- TODO: Verify this functionality
+                if FindNameForID(newPlayerID) then
+                    AddChatText(FindNameForID(newPlayerID)..' kicked because he does not have this mod : '..modnames)
+                else
+                    if newPlayerName then
+                        AddChatText(newPlayerName..' kicked because he does not have this mod : '..modnames)
+                    else
+                        AddChatText('The last player is kicked because he does not have this mod : '..modnames)
+                    end
+                end
+                lobbyComm:EjectPeer(newPlayerID, reason)
             end
         end,
 
