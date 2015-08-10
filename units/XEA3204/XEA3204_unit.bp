@@ -92,7 +92,10 @@ UnitBlueprint {
     },
     Categories = {
         'SELECTABLE',
+        'UEF',
         'MOBILE',
+        'AIR',
+        'TECH1',
         'POD',
         'REPAIR',
         'RECLAIM',
