@@ -34,12 +34,12 @@ restrictedUnits = {
         tooltip = "restricted_units_experimental",
     },
     LAND = {
-        categoryExpression = "LAND",
+        categoryExpression = "LAND - COMMAND",
         name = "<LOC restricted_units_data_0005>No Land",
         tooltip = "restricted_units_land",
     },
     AIR = {
-        categoryExpression = "AIR",
+        categoryExpression = "AIR - POD",
         name = "<LOC restricted_units_data_0006>No Air",
         tooltip = "restricted_units_air",
     },
@@ -49,22 +49,22 @@ restrictedUnits = {
         tooltip = "restricted_units_naval",
     },
     UEF = {
-        categoryExpression = "UEF",
+        categoryExpression = "UEF - COMMAND",
         name = "<LOC restricted_units_data_0007>No UEF",
         tooltip = "restricted_units_uef",
     },
     CYBRAN = {
-        categoryExpression = "CYBRAN",
+        categoryExpression = "CYBRAN - COMMAND",
         name = "<LOC restricted_units_data_0008>No Cybran",
         tooltip = "restricted_units_cybran",
     },
     AEON = {
-        categoryExpression = "AEON",
+        categoryExpression = "AEON - COMMAND",
         name = "<LOC restricted_units_data_0009>No Aeon",
         tooltip = "restricted_units_aeon",
     },
     SERAPHIM = {
-        categoryExpression = "SERAPHIM",
+        categoryExpression = "SERAPHIM - COMMAND",
         name = "<LOC restricted_units_data_0010>No Seraphim",
         tooltip = "restricted_units_seraphim",
     },
@@ -90,7 +90,7 @@ restrictedUnits = {
         tooltip = "restricted_units_intel",
     },
     SUPCOM = {
-        categoryExpression = "SUBCOMMANDER",
+        categoryExpression = "SUBCOMMANDER + GATE",
         name = "<LOC restricted_units_data_0015>No Support Commanders",
         tooltip = "restricted_units_supcom",
     },
@@ -114,7 +114,6 @@ restrictedUnits = {
         name = "<LOC restricted_units_data_0019>No Mass Fabrication",
         tooltip = "restricted_units_massfab",
     },
-    -- Added for FAF
     SUPPFAC = {
         categoryExpression = "SUPPORTFACTORY",
         name = "<LOC restricted_units_data_0020>No Support Factories",
