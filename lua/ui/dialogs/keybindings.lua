@@ -234,10 +234,6 @@ function CreateUI()
         panel = false
     end
 
-    panel.OnClosed = function(self)
-        panel = false
-    end
-
     local assignKeyButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC key_binding_0003>Assign Key"))
     LayoutHelpers.LeftOf(assignKeyButton, closeButton, 27)
     assignKeyButton.OnClick = function(self, modifiers)
