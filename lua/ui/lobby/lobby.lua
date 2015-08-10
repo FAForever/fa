@@ -1464,14 +1464,15 @@ function ReturnToMenu(reconnect)
     end
 end
 
-function SendSystemMessage(text, id)
+function SendSystemMessage(id, ...)
     local data = {
         Type = "SystemMessage",
-        Text = text,
-        Id = id or '',
+        Id = id,
+        Args = arg
     }
+
     lobbyComm:BroadcastData(data)
-    AddChatText(data.Text)
+    AddChatText(LOCF(id), unpack(arg))
 end
 
 function PublicChat(text)
@@ -3624,7 +3625,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             end
         else -- Non-host only messages
             if data.Type == 'SystemMessage' then
-                AddChatText(data.Text)
+                AddChatText(data.Id, unpack(data.Args))
             elseif data.Type == 'SetAllPlayerNotReady' then
                 if not IsPlayer(localPlayerID) then
                     return
@@ -3810,7 +3811,8 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 for k,peer in peers do
                     if peer.quiet > LobbyComm.quietTimeout then
                         lobbyComm:EjectPeer(peer.id,'TimedOutToHost')
-                        SendSystemMessage(LOCF("<LOC lobui_0226>%s timed out.", peer.name), "lobui_0205")
+                        -- %s timed out.
+                        SendSystemMessage("lobui_0205", peer.name)
 
                         -- Search and Remove the peer disconnected
                         for k, v in CurrentConnection do
@@ -4999,7 +5001,8 @@ function InitHostUtils()
             )
 
             if ignoreMsg then
-                SendSystemMessage(LOCF("<LOC lobui_0226>%s has switched from a player to an observer.", gameInfo.Observers[index].PlayerName), "lobui_0226")
+                -- %s has switched from a player to an observer.
+                SendSystemMessage("lobui_0226", gameInfo.Observers[index].PlayerName)
             end
         end,
 
@@ -5038,7 +5041,8 @@ function InitHostUtils()
             )
 
             if ignoreMsg then
-                SendSystemMessage(LOCF("<LOC lobui_0227>%s has switched from an observer to player.", incomingPlayer.PlayerName), "lobui_0227")
+                -- %s has switched from an observer to player.
+                SendSystemMessage("lobui_0227", incomingPlayer.PlayerName)
             end
 
             refreshObserverList()
@@ -5169,7 +5173,9 @@ function InitHostUtils()
 
             -- Move the observer into the slot the first player came from.
             HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(toOpts.OwnerID), moveFrom)
-            SendSystemMessage(fromOpts.PlayerName..' has switched with '..toOpts.PlayerName, 'switch')
+
+            -- %s has switched with %s
+            SendSystemMessage("lobui_0417", fromOpts.PlayerName, toOpts.PlayerName)
         end,
 
         --- Add an observer
@@ -5193,7 +5199,9 @@ function InitHostUtils()
                     Options = observerData:AsTable(),
                 }
             )
-            SendSystemMessage(LOCF("<LOC lobui_0202>%s has joined as an observer.",observerName), "lobui_0202")
+
+            -- %s has joined as an observer.
+            SendSystemMessage("lobui_0202", observerName)
             refreshObserverList()
         end,
 
@@ -5278,7 +5286,8 @@ function InitHostUtils()
             end
 
             if needMessage then
-                SendSystemMessage(LOCF("<LOC lobui_0330>%s is missing map %s.", name, gameInfo.GameOptions.ScenarioFile))
+                -- %s is missing map %s.
+                SendSystemMessage("lobui_0330", name, gameInfo.GameOptions.ScenarioFile)
                 LOG('>> '..name..' is missing map '..gameInfo.GameOptions.ScenarioFile)
                 if name == localPlayerName then
                     LOG('>> '..gameInfo.GameOptions.ScenarioFile..' replaced with '..'SCMP_009')
