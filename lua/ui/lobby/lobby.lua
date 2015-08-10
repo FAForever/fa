@@ -3077,17 +3077,16 @@ function RefreshOptionDisplayData(scenarioInfo)
     if gameInfo.GameOptions.RestrictedCategories ~= nil then
         local restrNum = table.getn(gameInfo.GameOptions.RestrictedCategories)
         if restrNum ~= 0 then
-            -- TODO: Localise label.
             local restrictLabel
             if restrNum == 1 then -- just 1
-                restrictLabel = "1 Build Restriction"
+                restrictLabel = LOC("<LOC lobui_0415>1 Build Restriction")
             else
-                restrictLabel = restrNum.." Build Restrictions"
+                restrictLabel = LOCF("<LOC lobui_0414>%d Build Restrictions", restrNum)
             end
 
             local option = {
                 text = restrictLabel,
-                value = "Check Unit Manager",
+                value = LOC("<LOC lobui_0416>Check Unit Manager"),
                 mod = true,
                 tooltip = 'Lobby_BuildRestrict_Option',
                 valueTooltip = 'Lobby_BuildRestrict_Option'
