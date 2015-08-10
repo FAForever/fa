@@ -44,7 +44,6 @@ end
 --===================================================================================
 doscript '/lua/SimSync.lua'
 
-
 --===================================================================================
 --SetupSession will be called by the engine after ScenarioInfo is set
 --but before any armies are created.
@@ -87,19 +86,19 @@ function SetupSession()
     if ScenarioInfo.Options.RestrictedCategories then
         local restrictedUnits = import('/lua/ui/lobby/restrictedUnitsData.lua').restrictedUnits
         for index, restriction in ScenarioInfo.Options.RestrictedCategories do
-            if restrictedUnits[restriction].categories then
-                for index, cat in restrictedUnits[restriction].categories do
-                    if buildRestrictions == nil then
-                        buildRestrictions = categories[cat]
-                    else
-                        buildRestrictions = buildRestrictions + categories[cat]
-                    end
+            local categoryExpression = restrictedUnits[restriction].categoryExpression
+            if categoryExpression then
+                if buildRestrictions then
+                    buildRestrictions = buildRestrictions .. " + (" .. categoryExpression .. ")"
+                else
+                    buildRestrictions = "(" .. categoryExpression .. ")"
                 end
             end
         end
     end
 
     if buildRestrictions then
+        buildRestrictions = import('/lua/sim/Categoryutils.lua').ParseEntityCategoryProperly(buildRestrictions)
         import('/lua/game.lua').SetRestrictions(buildRestrictions)
         ScenarioInfo.BuildRestrictions = buildRestrictions
     end
