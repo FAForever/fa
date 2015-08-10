@@ -2895,7 +2895,7 @@ function CreateUI(maxPlayers)
     -- CPU BENCH BUTTON --
     GUI.rerunBenchmark = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/cputest/', '', 11)
     LayoutHelpers.RightOf(GUI.rerunBenchmark, GUI.becomeObserver, -20)
-    Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text=LOC("<LOC lobui_0425>Run CPU Benchmark Test"), LOC("<LOC lobui_0426>Recalculates your CPU rating.")})
+    Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text=LOC("<LOC lobui_0425>Run CPU Benchmark Test"), body=LOC("<LOC lobui_0426>Recalculates your CPU rating.")})
 
     -- Observer List
     GUI.observerList = ItemList(GUI.observerPanel)
