@@ -1849,7 +1849,7 @@ function ShowGameQuality()
 
     if quality > 0 then
         gameInfo.GameOptions.Quality = quality
-        GUI.GameQualityLabel:StreamText("Game quality : " .. quality .. "%", 20)
+        GUI.GameQualityLabel:StreamText(LOCF("<LOCF lobui_0418>Game quality: %s%", quality))
     end
 end
 
@@ -1990,25 +1990,25 @@ function CreateSlotsUI(makeLabel)
     labelGroup:AddChild(numGamesLabel)
     Tooltip.AddControlTooltip(numGamesLabel, 'num_games')
 
-    local nameLabel = makeLabel("Nickname", 14)
+    local nameLabel = makeLabel(LOC("<LOC NICKNAME>Nickname"), 14)
     labelGroup:AddChild(nameLabel)
     Tooltip.AddControlTooltip(nameLabel, 'lob_slot')
 
-    local colorLabel = makeLabel("Color", 14)
+    local colorLabel = makeLabel(LOC("<LOC lobui_0214>Color"), 14)
     labelGroup:AddChild(colorLabel)
     Tooltip.AddControlTooltip(colorLabel, 'lob_color')
 
-    local factionLabel = makeLabel("Faction", 14)
+    local factionLabel = makeLabel(LOC("<LOC lobui_0215>Faction"), 14)
     labelGroup:AddChild(factionLabel)
     Tooltip.AddControlTooltip(factionLabel, 'lob_faction')
 
-    local teamLabel = makeLabel("Team", 14)
+    local teamLabel = makeLabel(LOC("<LOC lobui_0216>Team"), 14)
     labelGroup:AddChild(teamLabel)
     Tooltip.AddControlTooltip(teamLabel, 'lob_team')
 
     if not singlePlayer then
-        labelGroup:AddChild(makeLabel("Ping/CPU", 14))
-        labelGroup:AddChild(makeLabel("Ready", 14))
+        labelGroup:AddChild(makeLabel(LOC("<LOC lobui_0419>Ping/CPU"), 14))
+        labelGroup:AddChild(makeLabel(LOC("<LOC lobui_0218>Ready"), 14))
     end
 
     for i= 1, LobbyComm.maxPlayerSlots do
@@ -2262,10 +2262,10 @@ function CreateUI(maxPlayers)
     RuleLabel:DeleteAllItems()
     local tmptext
     if isHost then
-        tmptext = 'No Rules: Click to add rules'
+        tmptext = LOC("<LOC lobui_0420>No Rules: Click to add rules")
         RuleLabel:SetColors("FFCC00")
     else
-        tmptext = 'Rule: No Rule'
+        tmptext = LOC("<LOC lobui_0421>No rules")
     end
     RuleLabel:SetText(tmptext)
     if isHost then
@@ -2374,11 +2374,10 @@ function CreateUI(maxPlayers)
     end
 
     -- Checkbox Show changed Options
-    -- TODO: Localise!
-    local cbox_ShowChangedOption = UIUtil.CreateCheckbox(GUI.optionsPanel, '/CHECKBOX/', 'Hide default Options', true, 11)
+    local cbox_ShowChangedOption = UIUtil.CreateCheckbox(GUI.optionsPanel, '/CHECKBOX/', LOC("<LOC lobui_0422>Hide default options"), true, 11)
     LayoutHelpers.AtLeftTopIn(cbox_ShowChangedOption, GUI.optionsPanel, 35, -32)
 
-    Tooltip.AddCheckboxTooltip(cbox_ShowChangedOption, {text='Hide default Options', body='Show only changed Options and Advanced Map Options'})
+    Tooltip.AddCheckboxTooltip(cbox_ShowChangedOption, {text=LOC("<LOC lobui_0422>Hide default options"), body=LOC("<LOC lobui_0423>Show only changed Options and Advanced Map Options")})
     cbox_ShowChangedOption.OnCheck = function(self, checked)
         HideDefaultOptions = checked
         RefreshOptionDisplayData()
@@ -2434,7 +2433,7 @@ function CreateUI(maxPlayers)
             )
         end
     else
-        GUI.gameoptionsButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Mods Manager")
+        GUI.gameoptionsButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', LOC("<LOC _Mod_Manager>"))
         GUI.gameoptionsButton.OnClick = function(self, modifiers)
             import('/lua/ui/lobby/ModsManager.lua').CreateDialog(GUI)
         end
@@ -2719,7 +2718,7 @@ function CreateUI(maxPlayers)
     LayoutHelpers.DepthOverParent(GUI.OptionContainerScroll, GUI.OptionContainer, 2)
 
     -- Launch Button
-    local launchGameButton = UIUtil.CreateButtonWithDropshadow(GUI.chatPanel, '/BUTTON/large/', "Launch the Game")
+    local launchGameButton = UIUtil.CreateButtonWithDropshadow(GUI.chatPanel, '/BUTTON/large/', LOC("<LOC tooltipui0173>Launch Game"))
     GUI.launchGameButton = launchGameButton
     LayoutHelpers.AtHorizontalCenterIn(launchGameButton, GUI)
     LayoutHelpers.AtBottomIn(launchGameButton, GUI.panel, -8)
@@ -2747,16 +2746,13 @@ function CreateUI(maxPlayers)
     if singlePlayer then
         GUI.restrictedUnitsOrPresetsBtn:Hide()
     elseif isHost then
-        -- TODO: Localise!
-        GUI.restrictedUnitsOrPresetsBtn.label:SetText("Presets")
+        GUI.restrictedUnitsOrPresetsBtn.label:SetText(LOC("<LOC lobui_0424>Presets"))
         GUI.restrictedUnitsOrPresetsBtn.OnClick = function(self, modifiers)
             ShowPresetDialog()
         end
-        -- TODO: Localise!
         Tooltip.AddButtonTooltip(GUI.restrictedUnitsOrPresetsBtn, 'Lobby_presetDescription')
     else
-        -- TODO: Localise!
-        GUI.restrictedUnitsOrPresetsBtn.label:SetText("Unit Manager")
+        GUI.restrictedUnitsOrPresetsBtn.label:SetText(LOC("<LOC lobui_0332>Unit Manager"))
         GUI.restrictedUnitsOrPresetsBtn.OnClick = function(self, modifiers)
             import('/lua/ui/lobby/restrictedUnitsDlg.lua').CreateDialog(GUI.panel, gameInfo.GameOptions.RestrictedCategories, function() end, function() end, false)
         end
@@ -2778,7 +2774,7 @@ function CreateUI(maxPlayers)
     CreateSlotsUI(makeLabel)
 
     -- Exit Button
-    GUI.exitButton = UIUtil.CreateButtonWithDropshadow(GUI.chatPanel, '/BUTTON/medium/','Exit')
+    GUI.exitButton = UIUtil.CreateButtonWithDropshadow(GUI.chatPanel, '/BUTTON/medium/', LOC("<LOC tooltipui0285>Exit"))
     GUI.exitButton.label:SetText(LOC("<LOC _Exit>"))
     LayoutHelpers.AtLeftIn(GUI.exitButton, GUI.chatPanel, 33)
     LayoutHelpers.AtVerticalCenterIn(GUI.exitButton, launchGameButton, 7)
@@ -2899,10 +2895,10 @@ function CreateUI(maxPlayers)
     -- CPU BENCH BUTTON --
     GUI.rerunBenchmark = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/cputest/', '', 11)
     LayoutHelpers.RightOf(GUI.rerunBenchmark, GUI.becomeObserver, -20)
-    Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text='Run CPU Benchmark Test', body='Recalculates your CPU rating.'})
+    Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text=LOC("<LOC lobui_0425>Run CPU Benchmark Test"), LOC("<LOC lobui_0426>Recalculates your CPU rating.")})
 
     -- Observer List
-    GUI.observerList = ItemList(GUI.observerPanel, "observer list")
+    GUI.observerList = ItemList(GUI.observerPanel)
     GUI.observerList:SetFont(UIUtil.bodyFont, 12)
     GUI.observerList:SetColors(UIUtil.fontColor, "00000000", UIUtil.fontOverColor, UIUtil.highlightColor, "ffbcfffe")
     GUI.observerList.Left:Set(function() return GUI.observerPanel.Left() + 4 end)
@@ -4282,7 +4278,7 @@ function SetRuleTitleText(rule)
     if rule == '' then
         if lobbyComm:IsHost() then
             GUI.RuleLabel:SetColors("FFCC00")
-            rule = 'No Rules: Click to add rules.'
+            rule = LOC("<LOC lobui_0420>No Rules: Click to add rules")
         else
             rule = "No rules."
         end
