@@ -77,30 +77,6 @@ local teamIcons = {
 
 DebugEnabled = Prefs.GetFromCurrentProfile('LobbyDebug') or ''
 local HideDefaultOptions = Prefs.GetFromCurrentProfile('LobbyHideDefaultOptions') == 'true'
-function LOGX(text, ttype)
-	-- onlyChat = for debug only in the Chat
-	-- onlyLOG = for debug only in the LOG
-	-- CLEAR = for disable the debug
-	-- Country, RuleTitle, Background
-	-- Disconnected, Connecting, UpdateGame
-	local text = tostring(text)
-	local onlyLOG = string.find(DebugEnabled, 'onlyLOG') or nil
-	local onlyChat = string.find(DebugEnabled, 'onlyChat') or nil
-	if ttype == nil then
-		LOG(text)
-	else
-		if string.find(DebugEnabled, ttype) and ttype ~= nil then
-			if onlyLOG ~= nil then
-				LOG(text)
-			elseif onlyChat ~= nil then
-				AddChatText(text)
-			else
-				LOG(text)
-				AddChatText(text)
-			end
-		end
-	end
-end
 
 local connectedTo = {} -- by UID
 CurrentConnection = {} -- by Name
@@ -191,25 +167,11 @@ local function ParseWhisper(params)
     end
 end
 
-local function LOGXWhisper(params)
-	-- Exemple : Country Background useChat'
-	if string.find(params, 'CLEAR') then
-		DebugEnabled = ''
-		Prefs.SetToCurrentProfile('LobbyDebug', '')
-		AddChatText('Debug disabled')
-	else
-        DebugEnabled = params
-		Prefs.SetToCurrentProfile('LobbyDebug', params)
-		AddChatText('Debug activated : '..params)
-	end
-end
-
 local commands = {
     pm = ParseWhisper,
     private = ParseWhisper,
     w = ParseWhisper,
     whisper = ParseWhisper,
-    debug = LOGXWhisper
 }
 
 local Strings = LobbyComm.Strings
@@ -624,11 +586,9 @@ end
 function ConnectToPeer(addressAndPort,name,uid)
     if not string.find(addressAndPort, '127.0.0.1') then
         LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..")")
-		LOGX('>> ConnectToPeer > name='..tostring(name), 'Connecting')
     else
         DisconnectFromPeer(uid)
         LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..", USE PROXY)")
-		LOGX('>> ConnectToPeer > name='..tostring(name)..' (with PROXY)', 'Connecting')
         table.insert(ConnectedWithProxy, uid)
     end
     lobbyComm:ConnectToPeer(addressAndPort,name,uid)
@@ -639,7 +599,6 @@ function DisconnectFromPeer(uid)
     if wasConnected(uid) then
         table.remove(connectedTo, uid)
     end
-	LOGX('>> DisconnectFromPeer > name='..tostring(FindNameForID(uid)), 'Disconnected')
     GpgNetSend('Disconnected', string.format("%d", uid))
     lobbyComm:DisconnectFromPeer(uid)
 end
@@ -1729,7 +1688,6 @@ local function refreshObserverList()
 end
 
 local function UpdateGame()
-    LOGX('>> UpdateGame', 'UpdateGame')
     -- This allows us to assume the existence of UI elements throughout.
     if not GUI.uiCreated then
         WARN(debug.traceback(nil, "UpdateGame() pointlessly called before UI creation!"))
@@ -3635,7 +3593,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 GUI.becomeObserver:Enable()
                 SetPlayerOption(localSlot, 'Ready', false)
             elseif data.Type == 'Peer_Really_Disconnected' then
-				LOGX('>> DATA RECEIVE : Peer_Really_Disconnected (slot:'..data.Slot..')', 'Disconnected')
                 if data.Observ == false then
                     gameInfo.PlayerOptions[data.Slot] = nil
                 elseif data.Observ == true then
@@ -3845,7 +3802,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     end
 
     lobbyComm.PeerDisconnected = function(self,peerName,peerID) -- Lost connection or try connect with proxy
-		LOGX('>> PeerDisconnected : peerName='..peerName..' peerID='..peerID, 'Disconnected')
 
          -- Search and Remove the peer disconnected
         for k, v in CurrentConnection do
@@ -5187,7 +5143,6 @@ function InitHostUtils()
                 index = index + 1
             end
 
-            LOGX('>> HostUtils.TryAddObserver > requestedObserverName='..tostring(observerData.PlayerName), 'Connecting')
             observerData.PlayerName = lobbyComm:MakeValidPlayerName(senderID, observerData.PlayerName)
 
             gameInfo.Observers[index] = observerData
@@ -5211,8 +5166,6 @@ function InitHostUtils()
         -- @param slot The slot to insert the player to. A value of less than 1 indicates "any slot"
         -- @param playerData A PlayerData object representing the player to add.
         TryAddPlayer = function(senderID, slot, playerData)
-            LOGX('>> HostUtils.TryAddPlayer > requestedPlayerName='..tostring(playerData.PlayerName), 'Connecting')
-
             -- CPU benchmark code
             if playerData.Human and not singlePlayer then
                 lobbyComm:SendData(senderID, {Type='CPUBenchmark', Benchmarks=CPU_Benchmarks})
