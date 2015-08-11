@@ -1,3 +1,23 @@
+Patch 3646 (August 11, 2015)
+===========================
+
+Bugs
+----
+
+- UEF buildbots no longer explode after being built with 'no-air' restriction enabled
+- Commanders no longer explode immediately with the 'no-land' restriction enabled
+- Upgraded hives are no longer invincible
+- Beam weapons will no longer keep firing their lasers after designated targets have died
+- Nukes will always penerate personal shields again
+- Paused units which start work on a building will no longer consume resources
+
+Enhancements
+------------
+
+- Units with sonar no longer have it enabled while on land
+- Added 'no T3 air' restriction
+
+
 Patch 3644.1 (August 5, 2015)
 ==========================
 
