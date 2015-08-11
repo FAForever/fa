@@ -2091,6 +2091,12 @@ Unit = Class(moho.unit_methods) {
             self.EngineIsDeletingWreck = nil
         end
 
+        -- OnStartBuild() is called on paused engineers when they roll up to their next construction
+        -- task. This is a native-code bug: it shouldn't be calling OnStartBuild at all in this case
+        if self:IsPaused() then
+            return
+        end
+
         if order == 'Repair' then
             if built.WorkItem ~= self.WorkItem then
                 self:InheritWork(built)
@@ -2113,13 +2119,9 @@ Unit = Class(moho.unit_methods) {
             self:StartBuildingEffects(built, order)
         end
 
-        -- OnStartBuild() is called on paused, assisting engineers, in that case, don't start
-        -- actual consumption
-        if not self:IsPaused() then
-            self:SetActiveConsumptionActive()
-            self:PlayUnitSound('Construct')
-            self:PlayUnitAmbientSound('ConstructLoop')
-        end
+        self:SetActiveConsumptionActive()
+        self:PlayUnitSound('Construct')
+        self:PlayUnitAmbientSound('ConstructLoop')
 
         self:DoOnStartBuildCallbacks(built)
 
