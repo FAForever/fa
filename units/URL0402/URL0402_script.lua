@@ -28,9 +28,7 @@ URL0402 = Class(CWalkingLandUnit) {
     WalkingAnimRate = 1.2,
 
     Weapons = {
-        MainGun = Class(CDFHeavyMicrowaveLaserGenerator) {
-                -- DisabledFiringBones = {'Center_Turret_Muzzle', 'Center_Turret', 'Center_Turret_B01', 'Center_Turret_Barrel'},
-            },
+        MainGun = Class(CDFHeavyMicrowaveLaserGenerator) {},
         RightLaserTurret = Class(CDFElectronBolterWeapon) {},
         LeftLaserTurret = Class(CDFElectronBolterWeapon) {},
         RightAntiAirMissile = Class(CAAMissileNaniteWeapon) {},
@@ -60,64 +58,16 @@ URL0402 = Class(CWalkingLandUnit) {
             end)
         end        
         self:SetMaintenanceConsumptionActive()
-        local layer = self:GetCurrentLayer()
-        -- If created with F2 on land, then play the transform anim.
-        if(layer == 'Land') then
-            self:CreateUnitAmbientEffect(layer)
-			-- Enable Land weapons
-	        -- self:SetWeaponEnabledByLabel('RightAntiAirMissile', true)
-	        -- self:SetWeaponEnabledByLabel('LeftAntiAirMissile', true)
-			-- Disable Torpedo
-			if self.SonarEnt then
-                self.SonarEnt:Destroy()
-            end
-            -- self:DisableUnitIntel('Sonar')
-	        self:SetWeaponEnabledByLabel('Torpedo', false)
-        elseif (layer == 'Seabed') then
-            self:CreateUnitAmbientEffect(layer)
-			-- Disable Land Weapons
-	        -- self:SetWeaponEnabledByLabel('RightAntiAirMissile', false)
-	        -- self:SetWeaponEnabledByLabel('LeftAntiAirMissile', false)
-            self:EnableUnitIntel('SonarStealth')
-			-- Enable Torpedo and Sonar
-            self.SonarEnt = Entity {}
-            self.Trash:Add(self.SonarEnt)
-            self.SonarEnt:InitIntel(self:GetArmy(), 'Sonar', 76)
-            self.SonarEnt:EnableIntel('Sonar')
-            self.SonarEnt:AttachBoneTo(-1, self, 0)
-	        self:SetWeaponEnabledByLabel('Torpedo', true)
-        end
-        self.WeaponsEnabled = true
     end,
 
 	OnLayerChange = function(self, new, old)
 		CWalkingLandUnit.OnLayerChange(self, new, old)
-		if self.WeaponsEnabled then
-			if( new == 'Land' ) then
-			    self:CreateUnitAmbientEffect(new)
-				-- Enable Land weapons
-			    if self.SonarEnt then
-                    self.SonarEnt:Destroy()
-                end
-                -- self:DisableUnitIntel('Sonar')
-			    -- Disable Torpedo
-	            self:SetWeaponEnabledByLabel('Torpedo', false)
-			elseif ( new == 'Seabed' ) then
-			    self:CreateUnitAmbientEffect(new)
-				-- Disable Land Weapons     
-                -- self:EnableUnitIntel('Sonar')
-				-- Enable Torpedo and Sonar
-			    if self.SonarEnt then
-                    self.SonarEnt:Destroy()
-                end
-                self.SonarEnt = Entity {}
-                self.Trash:Add(self.SonarEnt)
-                self.SonarEnt:InitIntel(self:GetArmy(), 'Sonar', 76)
-                self.SonarEnt:EnableIntel('Sonar')
-                self.SonarEnt:AttachBoneTo(-1, self, 0)
-	            self:SetWeaponEnabledByLabel('Torpedo', true)
-			end
-		end
+        self:CreateUnitAmbientEffect(new)
+        if new == 'Seabed' then
+            self:EnableUnitIntel('Sonar')
+        else
+            self:DisableUnitIntel('Sonar')
+        end
 	end,
 	
     AmbientExhaustBones = {
