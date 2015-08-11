@@ -106,20 +106,18 @@ XRL0403 = Class(CWalkingLandUnit) {
 		if self.WeaponsEnabled then
 			local LandSpeedMult = self:GetBlueprint().Physics.WaterSpeedMultiplier
 			if( new == 'Land' ) then
-				-- Enable Land weapons
-			    if self.SonarEnt then
-                    self.SonarEnt:Destroy()
-                end
+                self:DisableUnitIntel('Sonar')
 			    -- Disable Torpedo
 	            self:SetWeaponEnabledByLabel('Torpedo01', false)
     	        self:SetWeaponEnabledByLabel('AAGun', true)
-	 	  	  -- Set movement speed back to default
-              self:SetSpeedMult(1)
+	 	  	    -- Set movement speed back to default
+                self:SetSpeedMult(1)
 			elseif ( new == 'Seabed' ) then
+                self:EnableUnitIntel('Sonar')
 				-- Enable Torpedo
 	            self:SetWeaponEnabledByLabel('Torpedo01', true)
 	 			-- Increase speed while in water
-              self:SetSpeedMult(LandSpeedMult)
+                self:SetSpeedMult(LandSpeedMult)
 			end
 		end
 	end,

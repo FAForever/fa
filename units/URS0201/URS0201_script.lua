@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/URS0201/URS0201_script.lua
-#**  Author(s):  David Tomandl, Jessica St. Croix
-#**
-#**  Summary  :  Cybran Destroyer Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+-- ****************************************************************************
+-- **
+-- **  File     :  /cdimage/units/URS0201/URS0201_script.lua
+-- **  Author(s):  David Tomandl, Jessica St. Croix
+-- **
+-- **  Summary  :  Cybran Destroyer Script
+-- **
+-- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- ****************************************************************************
 
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
 local CSeaUnit = import('/lua/cybranunits.lua').CSeaUnit
@@ -32,13 +32,13 @@ URS0201 = Class(CSeaUnit) {
 
     OnCreate = function(self)
         CSeaUnit.OnCreate(self)
-        #self:HideBone('Turret_Mount_Front', true)
-        #self:HideBone('Turret_Mount_Back', true)
+        -- self:HideBone('Turret_Mount_Front', true)
+        -- self:HideBone('Turret_Mount_Back', true)
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)
         CSeaUnit.OnStopBeingBuilt(self,builder,layer)
-        # If created with F2 on land, then play the transform anim.
+        -- If created with F2 on land, then play the transform anim.
         if(self:GetCurrentLayer() == 'Land') then
             self.AT1 = self:ForkThread(self.TransformThread, true)
         end
@@ -87,7 +87,8 @@ URS0201 = Class(CSeaUnit) {
         local scale = bp.Display.UniformScale or 1
 
         if( land ) then
-            # Change movement speed to the multiplier in blueprint
+            self:DisableUnitIntel('Sonar')
+            -- Change movement speed to the multiplier in blueprint
             self:SetSpeedMult(bp.Physics.LandSpeedMultiplier)
             self:SetImmobile(true)
             self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationTransform)
@@ -101,8 +102,9 @@ URS0201 = Class(CSeaUnit) {
             self.Walking = true
             self.Trash:Add(self.AnimManip)
         else
+            self:EnableUnitIntel('Sonar')
             self:SetImmobile(true)
-            # Revert speed to maximum speed
+            -- Revert speed to maximum speed
             self:SetSpeedMult(1)
             self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationTransform)
             self.AnimManip:SetAnimationFraction(1)
@@ -137,7 +139,7 @@ URS0201 = Class(CSeaUnit) {
                 self:CreateDestructionEffects( self, overkillRatio )
             end
 
-            # Create Initial explosion effects
+            -- Create Initial explosion effects
             if( self.ShowUnitDestructionDebris and overkillRatio ) then
                 if overkillRatio <= 1 then
                     self.CreateUnitDestructionDebris( self, true, true, false )
@@ -145,7 +147,7 @@ URS0201 = Class(CSeaUnit) {
                     self.CreateUnitDestructionDebris( self, true, true, false )
                 elseif overkillRatio <= 3 then
                     self.CreateUnitDestructionDebris( self, true, true, true )
-                else #VAPORIZED
+                else -- VAPORIZED
                     self.CreateUnitDestructionDebris( self, true, true, true )
                 end
             end
