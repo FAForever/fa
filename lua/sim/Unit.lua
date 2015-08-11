@@ -95,7 +95,8 @@ Unit = Class(moho.unit_methods) {
         return Sync.UnitData[self:GetEntityId()]
     end,
 
-    --The original builder of this unit, set by OnStartBeingBuilt. Used for calculating differential upgrade costs
+    --The original builder of this unit, set by OnStartBeingBuilt. Used for calculating differential
+    -- upgrade costs, and tracking the original owner of a unit (for tracking gifting and so on)
     originalBuilder = nil,
 
     -------------------------------------------------------------------------------------------
@@ -1850,8 +1851,6 @@ Unit = Class(moho.unit_methods) {
         if bp.EnhancementPresetAssigned then
             self:ForkThread(self.CreatePresetEnhancementsThread)
         end
-
-        self.originalBuilder = nil
     end,
 
     StartBeingBuiltEffects = function(self, builder, layer)
