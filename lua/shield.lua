@@ -181,7 +181,7 @@ Shield = Class(moho.shield_methods,Entity) {
         if self.Owner != instigator then
             local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
 
-            if self.PassOverkillDamage then
+            if self.PassOverkillDamage or dmgType == "Nuke" then
                 local overkill = self:GetOverkill(instigator,amount,dmgType)    
                 if self.Owner and IsUnit(self.Owner) and overkill > 0 then
                     self.Owner:DoTakeDamage(instigator, overkill, vector, dmgType)
