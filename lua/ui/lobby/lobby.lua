@@ -1849,7 +1849,7 @@ function ShowGameQuality()
 
     if quality > 0 then
         gameInfo.GameOptions.Quality = quality
-        GUI.GameQualityLabel:StreamText(LOCF("<LOCF lobui_0418>Game quality: %s%", quality))
+        GUI.GameQualityLabel:StreamText(LOCF("<LOC lobui_0418>Game quality: %s%%", quality))
     end
 end
 
