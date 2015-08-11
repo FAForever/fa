@@ -951,7 +951,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
 
     OnCreate = function(self)
         self.Beams = {}
-
+        self.BeamCheck = true
         -- Ensure that the weapon blueprint is set up properly for beams
         local bp = self:GetBlueprint()
         if not bp.BeamCollisionDelay then
@@ -1037,13 +1037,14 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
         end
 
         -- Deal with beam audio cues
-        if bp.Audio.BeamStart then
+        if bp.Audio.BeamStart and (self.BeamCheck == true) then
             self:PlaySound(bp.Audio.BeamStart)
         end
         if bp.Audio.BeamLoop and self.Beams[1].Beam then
             self.Beams[1].Beam:SetAmbientSound(bp.Audio.BeamLoop, nil)
         end
         self.BeamStarted = true
+        self.BeamCheck = true
     end,
 
     -- Kill the beam if hold fire is requested
@@ -1051,7 +1052,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
         while true do
             WaitSeconds(1)
             --if we're at hold fire, stop beam
-            if self.unit and self.unit:GetFireState() == 1 then
+            if self.unit and (self.unit:GetFireState() == 1 or not self.unit:IsUnitState("Attacking")) then
                 self.BeamStarted = false
                 self:PlayFxBeamEnd(beam)
             end
@@ -1092,10 +1093,17 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
                 end
             end
             self.BeamStarted = false
+      self.BeamCheck = false
+      self:ForkThread(self.BeamTimerer)
         end
         if self.HoldFireThread then
             KillThread(self.HoldFireThread)
         end
+    end,
+
+    BeamTimerer = function(self)
+        WaitTicks(1)
+        self.BeamCheck = true
     end,
 
     StartEconomyDrain = function(self)
