@@ -44,7 +44,7 @@ restrictedUnits = {
         tooltip = "restricted_units_air",
     },
     T3AIR = {
-        categoryExpression = "(TECH3+AIR) + (EXPERIMENTAL+AIR)",
+        categoryExpression = "(TECH3 * AIR) + (EXPERIMENTAL * AIR)",
         name = "<LOC restricted_units_data_0030>No T3 Air",
         tooltip = "restricted_units_air_t3",
     },
