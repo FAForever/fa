@@ -43,7 +43,7 @@ restrictedUnits = {
         name = "<LOC restricted_units_data_0006>No Air",
         tooltip = "restricted_units_air",
     },
-    AIR = {
+    T3AIR = {
         categoryExpression = "(TECH3+AIR) + (EXPERIMENTAL+AIR)",
         name = "<LOC restricted_units_data_0030>No T3 Air",
         tooltip = "restricted_units_air_t3",
@@ -109,11 +109,6 @@ restrictedUnits = {
         name = "<LOC restricted_units_data_0017>No Forged Alliance",
         tooltip = "restricted_units_forgedalliance",
     },
-    PRODDL = {
-        categoryExpression = "PRODUCTDL",
-        name = "<LOC restricted_units_data_0018>No Downloaded",
-        tooltip = "restricted_units_downloaded",
-    },
     FABS = {
         categoryExpression = "ueb1104 + ueb1303 + urb1104 + urb1303 + uab1104 + uab1303 + xsb1104 + xsb1303",
         name = "<LOC restricted_units_data_0019>No Mass Fabrication",
@@ -178,6 +173,7 @@ sortOrder = {
     "EXPERIMENTAL",
     "LAND",
     "AIR",
+    "T3AIR",
     "NAVAL",
     "UEF",
     "CYBRAN",
@@ -190,7 +186,6 @@ sortOrder = {
     "SUPCOM",
     "PRODSC1",
     "PRODFA",
-    "PRODDL",
     "FABS",
     "SUPPFAC",
     "T3MOBILEAA",
