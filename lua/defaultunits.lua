@@ -1992,6 +1992,10 @@ ACUUnit = Class(CommandUnit) {
                 instigatorBrain:AddArmyStat("FAFWin", 1)
             end
         end
+		
+		if instigator and instigator:GetArmy() ~= self:GetArmy and IsAlly(self:GetArmy, instigator:GetArmy) then
+			import('lua/ui/dialogs/teamkill.lua').CreateDialog(GetGameTimeSeconds())
+		end
 
         --Score change, we send the score of all players
         for index, brain in ArmyBrains do

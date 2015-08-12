@@ -12,8 +12,8 @@ local TextArea = import('/lua/ui/controls/textarea.lua').TextArea
 local dialog = false
 local shouldReport = false
 
-function CreateDialog()
-    WARN("Teamkill at tick " .. GetGameTimeSeconds())
+function CreateDialog(killTime)
+    WARN("Teamkill at tick " .. killTime)
     if dialog then
         return
     end
@@ -57,6 +57,13 @@ function CreateDialog()
 
     dialog.OnClosed = function(self)
         dialog = false
-        shouldReport = reportToMod:IsChecked()
+        if reportToMod:IsChecked() then
+			local armiesInfo = GetArmiesTable()
+			local focusArmy = armiesInfo.focusArmy
+			local currentPlayerName = armiesInfo.armiesTable[focusArmy].nickname
+			--this all won't work yet, need to figure out how to get player name etc.
+			WARN("Was teamkilled: "currentPlayerName)
+			GpgNetSend('Teamkill Warning', string.format(" %s was teamkilled at time %d", currentPlayerName, killTime ))
+		end
     end
 end
