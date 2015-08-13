@@ -95,7 +95,7 @@ function SpreadAttack()
   end
 
   -- Switch the orders for each unit.
-  for _,unit in ipairs(curSelection) do
+  for index,unit in ipairs(curSelection) do
     local unitorders = ShadowOrders[unit:GetEntityId()]
 
     -- Only mix orders if this unit has any orders to mix.
@@ -132,8 +132,25 @@ function SpreadAttack()
       if beginAttack == nil or endAttack == beginAttack then
         break
       end
+      
+      -- Rearrange the first few attack orders (equal to the number of targets) so that the targets are uniformly attacked on the first pass.
+      -- For example, 3 units attacking 8 units (? denotes random target):
+      -- Unit 1: 1, 4, 7, ?, ?, ?, ?, ?
+      -- Unit 2: 2, 5, 8, ?, ?, ?, ?, ?
+      -- Unit 3: 3, 6, ?, ?, ?, ?, ?, ?
+      local unitCount = table.getn(curSelection)
+      local orderCount = endAttack - beginAttack + 1
+      -- "and 1 or 0" is lua's ugly alternative to the ternary operator. Same as (...) ? 1 : 0
+      local stableAttackNum = math.floor(orderCount / unitCount) + ((math.mod(orderCount, unitCount) >= index) and 1 or 0)
+      for i = 0, stableAttackNum - 1 do
+        -- For if the targets outnumber the units attacking them.
+        local targetBlock = i * unitCount
+        unitorders[i + beginAttack],unitorders[targetBlock + beginAttack + index - 1]
+            = unitorders[targetBlock + beginAttack + index - 1],unitorders[i + beginAttack]
+      end
+      beginAttack = beginAttack + stableAttackNum
 
-      -- Swap each order with a random other order.
+      -- Randomize the remaining attack orders.
       for i = beginAttack,endAttack do
         local randomorder = math.random(beginAttack,endAttack)
         if randomorder ~= i then
