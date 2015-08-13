@@ -1068,7 +1068,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
     PlayFxWeaponUnpackSequence = function(self)
         local bp = self:GetBlueprint()
         -- If it's not a continuous beam, or  if it's a continuous beam that's off
-        if bp.BeamLifetime > 0 or not self.ContBeamOn then
+        if bp.BeamLifetime > 0 or (bp.BeamLifetime == 0 and not self.ContBeamOn) then
             DefaultProjectileWeapon.PlayFxWeaponUnpackSequence(self)
         end
     end,

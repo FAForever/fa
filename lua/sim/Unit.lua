@@ -251,7 +251,6 @@ Unit = Class(moho.unit_methods) {
     -- TARGET AND ATTACKERS FUNCTIONS
     ------------------------------------------------------------------------------------------
     OnGotTarget = function(self, Weapon)
-        self:SetUnitState("Attacking", true)
     end,
 
     OnLostTarget = function(self, Weapon)
