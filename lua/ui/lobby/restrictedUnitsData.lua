@@ -39,12 +39,12 @@ restrictedUnits = {
         tooltip = "restricted_units_land",
     },
     AIR = {
-        categoryExpression = "AIR - POD",
+        categoryExpression = "AIR - POD - SATELLITE",
         name = "<LOC restricted_units_data_0006>No Air",
         tooltip = "restricted_units_air",
     },
     T3AIR = {
-        categoryExpression = "(TECH3 * AIR) + (EXPERIMENTAL * AIR)",
+        categoryExpression = "(TECH3 * AIR) + (EXPERIMENTAL * AIR) - SATELLITE",
         name = "<LOC restricted_units_data_0030>No T3 Air",
         tooltip = "restricted_units_air_t3",
     },
@@ -99,9 +99,9 @@ restrictedUnits = {
         name = "<LOC restricted_units_data_0015>No Support Commanders",
         tooltip = "restricted_units_supcom",
     },
-    PRODSC1 = {
-        categoryExpression = "PRODUCTSC1",
-        name = "<LOC restricted_units_data_0016>No Vanilla",
+    HOVER = {
+        categoryExpression = "HOVER - INSIGNIFICANTUNIT",
+        name = "<LOC restricted_units_data_0016>No Hover Units",
         tooltip = "restricted_units_supremecommander",
     },
     PRODFA = {
