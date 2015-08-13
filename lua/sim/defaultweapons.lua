@@ -465,6 +465,8 @@ DefaultProjectileWeapon = Class(Weapon) {
         end,
 
         OnGotTarget = function(self)
+            Weapon.OnGotTarget(self)
+
             local bp = self:GetBlueprint()
 
             -- Issue 43
@@ -820,6 +822,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         end,
 
         OnGotTarget = function(self)
+            Weapon.OnGotTarget(self)
 
             -- Issue 43
             if self.unit then
@@ -1051,7 +1054,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
         while true do
             WaitSeconds(1)
             --if we're at hold fire, stop beam
-            if self.unit and (self.unit:GetFireState() == 1 or not self.unit:IsUnitState("Attacking")) then
+            if self.unit and (self.unit:GetFireState() == 1 or self.NumTargets == 0) then
                 self.BeamStarted = false
                 self:PlayFxBeamEnd(beam)
             end

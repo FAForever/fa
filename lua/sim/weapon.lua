@@ -27,6 +27,7 @@ Weapon = Class(moho.weapon_methods) {
         self.Disabledbf = {}
         self.DamageMod = 0
         self.DamageRadiusMod = 0
+        self.NumTargets = 0
         local bp = self:GetBlueprint()
         local initStore = bp.InitialProjectileStorage
         if initStore and initStore > 0 then
@@ -213,12 +214,12 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     OnGotTarget = function(self)
-        -- LOG('Got the target')
         if self.DisabledFiringBones and self.unit.Animator then
             for key, value in self.DisabledFiringBones do
                 self.unit.Animator:SetBoneEnabled(value, false)
             end
         end
+        self.NumTargets = self.NumTargets + 1
     end,
 
     OnLostTarget = function(self)
@@ -226,6 +227,11 @@ Weapon = Class(moho.weapon_methods) {
             for key, value in self.DisabledFiringBones do
                 self.unit.Animator:SetBoneEnabled(value, true)
             end
+        end
+
+        self.NumTargets = self.NumTargets - 1
+        if self.NumTargets < 0 then
+            self.NumTargets = 0
         end
     end,
 
