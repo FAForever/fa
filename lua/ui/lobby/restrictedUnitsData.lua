@@ -99,9 +99,9 @@ restrictedUnits = {
         name = "<LOC restricted_units_data_0015>No Support Commanders",
         tooltip = "restricted_units_supcom",
     },
-    PRODSC1 = {
-        categoryExpression = "PRODUCTSC1",
-        name = "<LOC restricted_units_data_0016>No Vanilla",
+    HOVER = {
+        categoryExpression = "HOVER - INSIGNIFICANTUNIT",
+        name = "<LOC restricted_units_data_0016>No Hover Units",
         tooltip = "restricted_units_supremecommander",
     },
     PRODFA = {

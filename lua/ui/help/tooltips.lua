@@ -1822,9 +1822,9 @@ Tooltips = {
         title = "<LOC tooltipui0538>No Support Commanders",
         description = "<LOC tooltipui0539>Prevents players from summoning Support Armored Command Units",
     },
-    restricted_units_supremecommander = {
-        title = "<LOC tooltipui0639>No Vanilla",
-        description = "<LOC tooltipui0640>Removes all units which were found in the original Supreme Commander"
+    restricted_units_hover = {
+        title = "<LOC restricted_units_data_0016>No Hover Units",
+        description = "<LOC tooltipui0640>Removes units which hover"
     },
     restricted_units_forgedalliance = {
         title = "<LOC tooltipui0641>No Forged Alliance",
