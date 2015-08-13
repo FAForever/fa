@@ -1,3 +1,17 @@
+Patch 3648 (August 13, 2015)
+===========================
+
+Bugs
+----
+
+- ASF no longer have issues gaining targets when just given move orders
+- Satelite works with 'no-air' restriction again
+
+Enhancements
+------------
+
+- Remove 'no sc1 units' restriction that would make the game unplayable
+
 Patch 3646 (August 11, 2015)
 ===========================
 
