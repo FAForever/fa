@@ -5,7 +5,7 @@ Bugs
 ----
 
 - ASF no longer have issues gaining targets when just given move orders
-- Satelite works with 'no-air' restriction again
+- Satellite works with 'no-air' restriction again
 
 Enhancements
 ------------
