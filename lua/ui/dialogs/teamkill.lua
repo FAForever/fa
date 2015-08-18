@@ -6,19 +6,20 @@
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local Group = import('/lua/maui/group.lua').Group
 local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local TextArea = import('/lua/ui/controls/textarea.lua').TextArea
 
 local dialog = false
 local shouldReport = false
 
-function CreateDialog(killTime)
+function CreateDialog(killTime, myFrame)
     WARN("Teamkill at tick " .. killTime)
     if dialog then
         return
     end
-
-    local dialogContent = Group(GetFrame(0))
+	
+    local dialogContent = Group(myFrame)
     dialogContent.Width:Set(600)
     dialogContent.Height:Set(600)
 
@@ -62,7 +63,8 @@ function CreateDialog(killTime)
 			local focusArmy = armiesInfo.focusArmy
 			local currentPlayerName = armiesInfo.armiesTable[focusArmy].nickname
 			--this all won't work yet, need to figure out how to get player name etc.
-			WARN("Was teamkilled: "currentPlayerName)
+			WARN("Was teamkilled: " .. currentPlayerName)
+			WARN("At time: " .. killTime)
 			GpgNetSend('Teamkill Warning', string.format(" %s was teamkilled at time %d", currentPlayerName, killTime ))
 		end
     end
