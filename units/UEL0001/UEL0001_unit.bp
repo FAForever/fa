@@ -308,7 +308,6 @@ UnitBlueprint {
             PlayChargeFxAtUnit = true,
             PlayTeleportOutFx = true,
             PlayTeleportInFx = true,
-            TeleportAvatarUnit = 'AvatarUEL0001',
         },
         TransportAnimation = {
             {
@@ -322,7 +321,7 @@ UnitBlueprint {
                 Weight = 100,
             },
         },
-        UniformScale = 0.105, -- if changed dont forget to update AvatarUEL0001 at /effects/Entities/UEFTeleport/AvatarUEL0001
+        UniformScale = 0.105,
     },
     Economy = {
         -- If modifying Energy or Mass costs, modify Score component in aibrain.lua search battleResults
