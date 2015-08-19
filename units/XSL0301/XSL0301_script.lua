@@ -1,4 +1,4 @@
--- ****************************************************************************
+﻿-- ****************************************************************************
 -- **
 -- **  File     :  /cdimage/units/XSL0301/XSL0301_script.lua
 -- **  Author(s):  Jessica St. Croix, Gordon Duclos
@@ -164,7 +164,7 @@ XSL0301 = Class(CommandUnit) {
             local wep = self:GetWeaponByLabel('LightChronatronCannon')
             wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
             local wep = self:GetWeaponByLabel('OverCharge')
-            wep:ChangeMaxRadius(30)
+            wep:ChangeMaxRadius(35)
         elseif enh == 'EnhancedSensorsRemove' then
             local bpIntel = self:GetBlueprint().Intel
             self:SetIntelRadius('Vision', bpIntel.VisionRadius or 26)

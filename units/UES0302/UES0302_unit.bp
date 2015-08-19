@@ -166,9 +166,9 @@ UnitBlueprint {
         UniformScale = 0.13,
     },
     Economy = {
-        BuildCostEnergy = 54000,
-        BuildCostMass = 9000,
-        BuildTime = 28800,
+        BuildCostEnergy = 62000,#54000
+        BuildCostMass = 10500,#9000
+        BuildTime = 33000,#28800
     },
     Footprint = {
         SizeX = 5,
@@ -283,7 +283,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_LowArc',
             CollideFriendly = false,
             Damage = 1000,
-            DamageRadius = 3,
+            DamageRadius = 2,
             DamageType = 'Normal',
             DisplayName = 'Gauss Cannon',
             FireTargetLayerCapsTable = {
@@ -387,7 +387,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_LowArc',
             CollideFriendly = false,
             Damage = 1000,
-            DamageRadius = 3,
+            DamageRadius = 2,
             DamageType = 'Normal',
             DisplayName = 'Gauss Cannon',
             FireTargetLayerCapsTable = {
@@ -492,7 +492,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_LowArc',
             CollideFriendly = false,
             Damage = 1000,
-            DamageRadius = 3,
+            DamageRadius = 2,
             DamageType = 'Normal',
             DisplayName = 'Gauss Cannon',
             FireTargetLayerCapsTable = {

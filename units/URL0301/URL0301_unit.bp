@@ -4,10 +4,10 @@ UnitBlueprint {
         TargetBones = {
             'Torso',
             'Head',
-            'Right_Arm01',
-            'Left_Arm01',
-            'Left_Thigh',
-            'Right_Thigh',
+#            'Right_Arm01',
+#            'Left_Arm01',
+#            'Left_Thigh',
+#            'Right_Thigh',
         },
     },
     Audio = {
@@ -271,9 +271,9 @@ UnitBlueprint {
     },
     Enhancements = {
         CloakingGenerator = {
-            BuildCostEnergy = 500000,
+            BuildCostEnergy = 382200,
             BuildCostMass = 5000,
-            BuildTime = 14000,
+            BuildTime = 13800,
             Icon = 'cfs',
             MaintenanceConsumptionPerSecondEnergy = 3500,
             Name = '<LOC enhancements_0089>Personal Cloaking Generator',
@@ -301,7 +301,7 @@ UnitBlueprint {
         EMPCharge = {
             BuildCostEnergy = 60000,
             BuildCostMass = 1000,
-            BuildTime = 3360,
+            BuildTime = 3600,
             Icon = 'emp',
             Name = '<LOC enhancements_0091>EMP Burst',
             Slot = 'LCH',
@@ -325,10 +325,10 @@ UnitBlueprint {
         FocusConvertor = {
             BuildCostEnergy = 24000,
             BuildCostMass = 800,
-            BuildTime = 3360,
+            BuildTime = 3000,
             Icon = 'fc',
             Name = '<LOC enhancements_0093>Disintegrator Amplifier',
-            NewDamageMod = 250,
+            NewDamageMod = 200,
             NewMaxRadius = 35,
             Slot = 'RCH',
             UpgradeUnitAmbientBones = {
@@ -349,9 +349,9 @@ UnitBlueprint {
             Slot = 'RCH',
         },
         NaniteMissileSystem = {
-            BuildCostEnergy = 30000,
+            BuildCostEnergy = 20000,
             BuildCostMass = 800,
-            BuildTime = 3360,
+            BuildTime = 3000,
             Icon = 'nms',
             Name = '<LOC enhancements_0095>Nanite Missile System',
             Slot = 'Back',
@@ -373,7 +373,7 @@ UnitBlueprint {
             Slot = 'Back',
         },
         ResourceAllocation = {
-            BuildCostEnergy = 60000,
+            BuildCostEnergy = 68600,
             BuildCostMass = 4500,
             BuildTime = 8400,
             Icon = 'ras',
@@ -399,12 +399,12 @@ UnitBlueprint {
             Slot = 'RCH',
         },
         SelfRepairSystem = {
-            BuildCostEnergy = 105000,
-            BuildCostMass = 2000,
-            BuildTime = 6720,
+            BuildCostEnergy = 103500,
+            BuildCostMass = 2200,
+            BuildTime = 6000,
             Icon = 'srs',
             Name = '<LOC enhancements_0099>Nano-Repair System',
-            NewRegenRate = 400,
+            NewRegenRate = 375,
             Slot = 'Back',
             UpgradeUnitAmbientBones = {
                 'URL0301',
@@ -441,9 +441,9 @@ UnitBlueprint {
             },
         },
         StealthGenerator = {
-            BuildCostEnergy = 18000,
-            BuildCostMass = 600,
-            BuildTime = 2240,
+            BuildCostEnergy = 7400,
+            BuildCostMass = 400,
+            BuildTime = 1800,
             Icon = 'sfs',
             MaintenanceConsumptionPerSecondEnergy = 100,
             Name = '<LOC enhancements_0101>Personal Stealth Generator',
@@ -466,7 +466,7 @@ UnitBlueprint {
             Slot = 'Back',
         },
         Switchback = {
-            BuildCostEnergy = 50000,
+            BuildCostEnergy = 51100,
             BuildCostMass = 800,
             BuildTime = 4200,
             Icon = 'ses',
@@ -494,7 +494,7 @@ UnitBlueprint {
     EnhancementPresets = {
         AntiAir = {
             BuildIconSortPriority = 45,
-            Description = '<LOC url0301_AntiAir_desc>Support Armored Command Unit (Anti-Air preset)',
+            Description = '<LOC url0301_AntiAir_desc>SACU (Anti-Air preset)',
             Enhancements = {
                 'NaniteMissileSystem',
             },
@@ -504,7 +504,7 @@ UnitBlueprint {
         },
         Cloak = {
             BuildIconSortPriority = 35,
-            Description = '<LOC url0301_Cloak_desc>Support Armored Command Unit (Cloak preset)',
+            Description = '<LOC url0301_Cloak_desc>SACU (Cloak preset)',
             Enhancements = {
                 'FocusConvertor',
                 'StealthGenerator',
@@ -516,7 +516,7 @@ UnitBlueprint {
         },
         Combat = {
             BuildIconSortPriority = 15,
-            Description = '<LOC url0301_Combat_desc>Support Armored Command Unit (Combatant preset)',
+            Description = '<LOC url0301_Combat_desc>SACU (Combatant preset)',
             Enhancements = {
                 'EMPCharge',
                 'FocusConvertor',
@@ -527,7 +527,7 @@ UnitBlueprint {
         },
         Engineer = {
             BuildIconSortPriority = 20,
-            Description = '<LOC url0301_Engineer_desc>Support Armored Command Unit (Engineer preset)',
+            Description = '<LOC url0301_Engineer_desc>SACU (Engineer preset)',
             Enhancements = {
                 'Switchback',
             },
@@ -547,9 +547,19 @@ UnitBlueprint {
             SortCategory = 'SORTOTHER',
             UnitName = '<LOC url0301_Rambo_name>SACU (Rambo preset)',
         },
+        RAS = {
+            BuildIconSortPriority = 10,
+            Description = '<LOC url0301_RAS_desc>SACU (RAS preset)',
+            Enhancements = {
+                'ResourceAllocation',
+            },
+            HelpText = '<LOC url0301_RAS_help>Support Armored Command Unit. Enhanced during construction with a Resource Allocation System.',
+            SortCategory = 'SORTOTHER',
+            UnitName = '<LOC url0301_RAS_name>SACU (RAS preset)',
+        },
         Stealth = {
             BuildIconSortPriority = 30,
-            Description = 'url0301_Stealth_desc>Support Armored Command Unit (Stealth preset)',
+            Description = '<LOC url0301_Stealth_desc>SACU (Stealth preset)',
             Enhancements = {
                 'StealthGenerator',
             },
@@ -674,8 +684,41 @@ UnitBlueprint {
                     BuffType = 'STUN',
                     Duration = 4,
                     Radius = 3,
-                    TargetAllow = 'MOBILE',
-                    TargetDisallow = 'EXPERIMENTAL,SUBCOMMANDER,COMMAND,WALL',
+                    TargetAllow = 'TECH1',
+                    TargetDisallow = 'TECH2,TECH3,EXPERIMENTAL,COMMAND,SUBCOMMANDER,SHIELD,WALL',
+                },
+                {
+                    Add = {
+                        OnImpact = true,
+                    },
+                    AppliedToTarget = true,
+                    BuffType = 'STUN',
+                    Duration = 3.5,
+                    Radius = 3,
+                    TargetAllow = 'TECH2,SHIELD',
+                    TargetDisallow = 'TECH1,TECH3,EXPERIMENTAL,COMMAND,SUBCOMMANDER,WALL',
+                },
+                {
+                    Add = {
+                        OnImpact = true,
+                    },
+                    AppliedToTarget = true,
+                    BuffType = 'STUN',
+                    Duration = 3,
+                    Radius = 3,
+                    TargetAllow = 'TECH3',
+                    TargetDisallow = 'TECH1,TECH2,EXPERIMENTAL,COMMAND,SUBCOMMANDER,SHIELD,WALL',
+                },
+                {
+                    Add = {
+                        OnImpact = true,
+                    },
+                    AppliedToTarget = true,
+                    BuffType = 'STUN',
+                    Duration = 0.3,
+                    Radius = 3,
+                    TargetAllow = 'SUBCOMMANDER',
+                    TargetDisallow = 'TECH1,TECH2,SHIELD,WALL',
                 },
             },
             ChargeDelay = 0.5,
@@ -750,7 +793,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 300,
+            Damage = 400,
             DamageRadius = 1.5,
             DamageType = 'Normal',
             DisplayName = 'Nanite Missile System',
@@ -789,7 +832,7 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 0.3,
-            TargetCheckInterval = 0.3,
+            TargetCheckInterval = 0.333,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
                 'AIR MOBILE HIGHPRIAIR',
@@ -846,6 +889,20 @@ UnitBlueprint {
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
             WeaponCategory = 'Death',
+        },
+    },
+    Wreckage = {
+        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+        EnergyMult = 0,
+        HealthMult = 0.9,
+        MassMult = 0.9,
+        ReclaimTimeMultiplier = 1,
+        WreckageLayers = {
+            Air = false,
+            Land = true,
+            Seabed = false,
+            Sub = false,
+            Water = false,
         },
     },
 }

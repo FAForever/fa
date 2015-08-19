@@ -1,4 +1,4 @@
-#****************************************************************************
+﻿#****************************************************************************
 #**
 #**  File     :  /data/projectiles/SANHeavyCavitationTorpedo02/SANHeavyCavitationTorpedo02_script.lua
 #**  Author(s):  Gordon Duclos
@@ -27,6 +27,7 @@ SANHeavyCavitationTorpedo02 = Class(SHeavyCavitationTorpedo) {
     },
     
     OnEnterWater = function(self)
+        self:SetCollisionShape('Sphere', 0, 0, 0, 0.1)
         SHeavyCavitationTorpedo.OnEnterWater(self)
         local army = self:GetArmy()
 
@@ -45,7 +46,7 @@ SANHeavyCavitationTorpedo02 = Class(SHeavyCavitationTorpedo) {
     end,
 
     ProjectileSplit = function(self)
-        WaitSeconds(.5)
+        WaitSeconds(.1)
         local ChildProjectileBP = '/projectiles/SANHeavyCavitationTorpedo03/SANHeavyCavitationTorpedo03_proj.bp'  
         local vx, vy, vz = self:GetVelocity()
         local velocity = 7

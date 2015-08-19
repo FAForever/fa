@@ -20,3 +20,4 @@ lua/ui/lobby/test/
 textures/ui/common/BUTTON/BACKUP/
 */dds/*
 .idea
+*.DS_Store

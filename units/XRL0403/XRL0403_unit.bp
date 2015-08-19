@@ -9,7 +9,6 @@ UnitBlueprint {
             'Left_Leg01_B01',
             'Right_Leg02_B01',
             'Right_Leg01_B01',
-            'URL0403',
             'Right_Turret_Barrel',
             'Left_Turret_Barrel',            
         },
@@ -96,7 +95,7 @@ UnitBlueprint {
         'OVERLAYDEFENSE',
         'OVERLAYDIRECTFIRE',
     },
-    CollisionOffsetY = 2.3,
+    CollisionOffsetY = 2.1,
     CollisionOffsetZ = -0.6,
     Defense = {
         AirThreatLevel = 16,
@@ -297,7 +296,7 @@ UnitBlueprint {
     SelectionSizeZ = 5.3,
     SelectionThickness = 0.35,
     SizeX = 4.6,
-    SizeY = 3.5,
+    SizeY = 3.7,
     SizeZ = 7.3,
     StrategicIconName = 'icon_experimental_generic',
     StrategicIconSortPriority = 45,
@@ -353,7 +352,7 @@ UnitBlueprint {
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 65,
             ProjectileId = '/projectiles/CDFProtonCannon05/CDFProtonCannon05_proj.bp',
-			ProjectileLifetime = 0.9, # fix for Megalith huge range bug [126]
+			ProjectileLifetime = 0.9, -- fix for Megalith huge range bug [126]
             RackBones = {
                 {
                     MuzzleBones = {
@@ -443,7 +442,7 @@ UnitBlueprint {
             MuzzleVelocity = 65,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/CDFProtonCannon05/CDFProtonCannon05_proj.bp',
-			ProjectileLifetime = 0.9, # fix for Megalith huge range bug [126]
+			ProjectileLifetime = 0.9, -- fix for Megalith huge range bug [126]
             RackBones = {
                 {
                     MuzzleBones = {
@@ -511,7 +510,7 @@ UnitBlueprint {
             },
             FiringTolerance = 2,
             Label = 'Torpedo01',
-            MaxRadius = 64,# 45 -- Fix for Megalith not attacking a naval target because it stays in range of primary weapon
+            MaxRadius = 64, -- Fix for Megalith not attacking a naval target because it stays in range of primary weapon
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 5,
@@ -808,9 +807,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, #from false
-            Sub = true, #from false
-            Water = true, #from false
+            Seabed = true,
+            Sub = true,
+            Water = true,
         },
     },
 }

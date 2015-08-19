@@ -3,8 +3,8 @@ UnitBlueprint {
         TargetBones = {
             'Torso',
             'AttachPoint',
-            'Leg_Left_B02',
-            'Leg_Right_B02',
+#            'Leg_Left_B02',
+#            'Leg_Right_B02',
         },
     },
     Audio = {
@@ -313,7 +313,7 @@ UnitBlueprint {
     },
     Enhancements = {
         EngineeringFocusingModule = {
-            BuildCostEnergy = 50000,
+            BuildCostEnergy = 50500,
             BuildCostMass = 800,
             BuildTime = 4200,
             Icon = 'efm',
@@ -338,7 +338,7 @@ UnitBlueprint {
             Slot = 'LCH',
         },
         ResourceAllocation = {
-            BuildCostEnergy = 60000,
+            BuildCostEnergy = 68000,
             BuildCostMass = 4500,
             BuildTime = 8400,
             Icon = 'ras',
@@ -388,7 +388,7 @@ UnitBlueprint {
             Slot = 'LCH',
         },
         Shield = {
-            BuildCostEnergy = 60000,
+            BuildCostEnergy = 64950,
             BuildCostMass = 1200,
             BuildTime = 5040,
             Icon = 'tsg',
@@ -416,7 +416,7 @@ UnitBlueprint {
         },
         ShieldHeavy = {
             BuildCostEnergy = 100000,
-            BuildCostMass = 1500,
+            BuildCostMass = 1800,
             BuildTime = 7000,
             Icon = 'htsg',
             ImpactEffects = 'AeonShieldHit01',
@@ -426,7 +426,7 @@ UnitBlueprint {
             PersonalShield = true,
             Prerequisite = 'Shield',
             ShieldEnergyDrainRechargeTime = 5,
-            ShieldMaxHealth = 35000,
+            ShieldMaxHealth = 40000,
             ShieldRechargeTime = 180,
             ShieldRegenRate = 120,
             ShieldRegenStartTime = 1,
@@ -489,12 +489,13 @@ UnitBlueprint {
             },
         },
         StabilitySuppressant = {
-            BuildCostEnergy = 36000,
+            BuildCostEnergy = 46200,
             BuildCostMass = 1250,
-            BuildTime = 5040,
+            BuildTime = 6048,
             Icon = 'ss',
             Name = '<LOC enhancements_0031>Reacton Refractor',
             NewDamageRadiusMod = 3.5,
+
             NewMaxRadius = 40,
             Slot = 'RCH',
             UpgradeUnitAmbientBones = {
@@ -516,7 +517,7 @@ UnitBlueprint {
             Slot = 'RCH',
         },
         SystemIntegrityCompensator = {
-            BuildCostEnergy = 75000,
+            BuildCostEnergy = 74000,
             BuildCostMass = 1500,
             BuildTime = 6720,
             Icon = 'sic',
@@ -587,7 +588,7 @@ UnitBlueprint {
     EnhancementPresets = {
         Engineer = {
             BuildIconSortPriority = 20,
-            Description = '<LOC ual0301_Engineer_desc>Support Armored Command Unit (Engineer preset)',
+            Description = '<LOC ual0301_Engineer_desc>SACU (Engineer preset)',
             Enhancements = {
                 'EngineeringFocusingModule',
             },
@@ -597,7 +598,7 @@ UnitBlueprint {
         },
         NanoCombat = {
             BuildIconSortPriority = 25,
-            Description = '<LOC ual0301_NanoCombat_desc>Support Armored Command Unit (Nano Combatant preset)',
+            Description = '<LOC ual0301_NanoCombat_desc>SACU (Nano Combatant preset)',
             Enhancements = {
                 'StabilitySuppressant',
                 'SystemIntegrityCompensator',
@@ -608,7 +609,7 @@ UnitBlueprint {
         }, 
         Rambo = {
             BuildIconSortPriority = 35,
-            Description = '<LOC ual0301_Rambo_desc>Support Armored Command Unit (Rambo preset)',
+            Description = '<LOC ual0301_Rambo_desc>SACU (Rambo preset)',
             Enhancements = {
                 'StabilitySuppressant',
                 'Shield',
@@ -618,9 +619,19 @@ UnitBlueprint {
             SortCategory = 'SORTOTHER',
             UnitName = '<LOC ual0301_Rambo_name>SACU (Rambo preset)',
         },
+        RAS = {
+            BuildIconSortPriority = 10,
+            Description = '<LOC ual0301_RAS_desc>SACU (RAS preset)',
+            Enhancements = {
+                'ResourceAllocation',
+            },
+            HelpText = '<LOC ual0301_RAS_help>Support Armored Command Unit. Enhanced during construction with a Resource Allocation System.',
+            SortCategory = 'SORTOTHER',
+            UnitName = '<LOC ual0301_RAS_name>SACU (RAS preset)',
+        },
         ShieldCombat = {
             BuildIconSortPriority = 30,
-            Description = '<LOC ual0301_ShieldCombat_desc>Support Armored Command Unit (Shield Combatant preset)',
+            Description = '<LOC ual0301_ShieldCombat_desc>SACU (Shield Combatant preset)',
             Enhancements = {
                 'StabilitySuppressant',
                 'Shield',
@@ -631,7 +642,7 @@ UnitBlueprint {
         },
         SimpleCombat = {
             BuildIconSortPriority = 15,
-            Description = '<LOC ual0301_SimpleCombat_desc>Support Armored Command Unit (Combatant preset)',
+            Description = '<LOC ual0301_SimpleCombat_desc>SACU (Combatant preset)',
             Enhancements = {
                 'StabilitySuppressant',
             },
@@ -724,7 +735,7 @@ UnitBlueprint {
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.7,
     SelectionYOffset = 0,
-    SizeX = 1,
+    SizeX = 1.1,
     SizeY = 1.85,
     SizeZ = 1.1,
     StrategicIconName = 'icon_commander_generic',
@@ -855,6 +866,20 @@ UnitBlueprint {
             MaxRadius = 1,
             RateOfFire = 1,
             WeaponCategory = 'Teleport',
+        },
+    },
+    Wreckage = {
+        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+        EnergyMult = 0,
+        HealthMult = 0.9,
+        MassMult = 0.9,
+        ReclaimTimeMultiplier = 1,
+        WreckageLayers = {
+            Air = false,
+            Land = true,
+            Seabed = false,
+            Sub = false,
+            Water = false,
         },
     },
 }

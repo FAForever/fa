@@ -1423,6 +1423,10 @@ function ReturnToMenu(reconnect)
     end
 end
 
+function PrintSystemMessage(id, parameters)
+    AddChatText(LOCF("<LOC "..id..">Unknown system message. Check localisation file", unpack(parameters)))
+end
+
 function SendSystemMessage(id, ...)
     local data = {
         Type = "SystemMessage",
@@ -1431,7 +1435,7 @@ function SendSystemMessage(id, ...)
     }
 
     lobbyComm:BroadcastData(data)
-    AddChatText(LOCF(id), unpack(arg))
+    PrintSystemMessage(id, arg)
 end
 
 function PublicChat(text)
@@ -3579,7 +3583,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             end
         else -- Non-host only messages
             if data.Type == 'SystemMessage' then
-                AddChatText(data.Id, unpack(data.Args))
+                PrintSystemMessage(data.Id, data.Args)
             elseif data.Type == 'SetAllPlayerNotReady' then
                 if not IsPlayer(localPlayerID) then
                     return
@@ -4952,7 +4956,7 @@ function InitHostUtils()
                 }
             )
 
-            if ignoreMsg then
+            if not ignoreMsg then
                 -- %s has switched from a player to an observer.
                 SendSystemMessage("lobui_0226", gameInfo.Observers[index].PlayerName)
             end
@@ -4992,7 +4996,7 @@ function InitHostUtils()
                 }
             )
 
-            if ignoreMsg then
+            if not ignoreMsg then
                 -- %s has switched from an observer to player.
                 SendSystemMessage("lobui_0227", incomingPlayer.PlayerName)
             end
@@ -5118,13 +5122,13 @@ function InitHostUtils()
             HostUtils.SetPlayerNotReady(moveTo)
 
             -- Move the player in the target slot to observers.
-            HostUtils.ConvertPlayerToObserver(moveTo, false)
+            HostUtils.ConvertPlayerToObserver(moveTo, true)
 
             -- Move the other player into the slot.
             HostUtils.MovePlayerToEmptySlot(moveFrom, moveTo)
 
             -- Move the observer into the slot the first player came from.
-            HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(toOpts.OwnerID), moveFrom)
+            HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(toOpts.OwnerID), moveFrom, true)
 
             -- %s has switched with %s
             SendSystemMessage("lobui_0417", fromOpts.PlayerName, toOpts.PlayerName)
