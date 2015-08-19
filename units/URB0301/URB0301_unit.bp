@@ -131,7 +131,7 @@ UnitBlueprint {
         BuildCostEnergy = 39900,
         BuildCostMass = 4440,
         BuildRate = 90,
-        BuildTime = 9400,
+        BuildTime = 11000,#9400
 	DifferentialUpgradeCostCalculation = true, 
         RebuildBonusIds = {
             'urb0301',

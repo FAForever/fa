@@ -1,4 +1,4 @@
---****************************************************************************
+﻿--****************************************************************************
 --**
 --**  File     :  /cdimage/units/UAL0301/UAL0301_script.lua
 --**  Author(s):  Jessica St. Croix
@@ -137,10 +137,12 @@ UAL0301 = Class(CommandUnit) {
         --StabilitySupressant
         elseif enh =='StabilitySuppressant' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
+            wep:AddDamageMod(bp.NewDamageMod or 0)
             wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 40)
         elseif enh =='StabilitySuppressantRemove' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
+            wep:AddDamageMod(-self:GetBlueprint().Enhancements['RightReactonCannon'].NewDamageMod)
             wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
         end

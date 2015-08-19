@@ -1,4 +1,4 @@
-#****************************************************************************
+﻿#****************************************************************************
 #**
 #**  File     :  /data/projectiles/SANHeavyCavitationTorpedo01/SANHeavyCavitationTorpedo01_script.lua
 #**  Author(s):  Gordon Duclos
@@ -31,7 +31,7 @@ SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo) {
 				
 		self:TrackTarget(true):StayUnderwater(true)
     	self:SetCollideSurface(false)
-		self:SetTurnRate(240)
+		self:SetTurnRate(360)
 		self:ForkThread(self.ProjectileSplit)
 	end,
 		
@@ -40,10 +40,11 @@ SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo) {
         # if we are starting in the water then immediately switch to tracking in water
         self:TrackTarget(false)
         self.AirTrails = CreateEmitterOnEntity(self,self:GetArmy(),EffectTemplate.SHeavyCavitationTorpedoFxTrails02)
+        self:SetCollisionShape('Sphere', 0, 0, 0, 0.1)
     end,
     
 	ProjectileSplit = function(self)
-		WaitSeconds(1)
+		WaitSeconds(0.1)
 		local ChildProjectileBP = '/projectiles/SANHeavyCavitationTorpedo04/SANHeavyCavitationTorpedo04_proj.bp'  
 		local vx, vy, vz = self:GetVelocity()
 		local velocity = 10

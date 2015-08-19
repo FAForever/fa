@@ -49,7 +49,7 @@ UnitBlueprint {
 	CollisionOffsetY = -0.25, # fix for TMD cannot be hit by torpedoes [145]
     Defense = {
         AirThreatLevel = 0,
-        ArmorType = 'Structure',
+        ArmorType = 'TMD',
         EconomyThreatLevel = 2,
         Health = 500,
         MaxHealth = 500,

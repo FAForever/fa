@@ -280,11 +280,11 @@ UnitBlueprint {
         TransportClass = 10,
     },
     Veteran = {
-        Level1 = 50,
-        Level2 = 100,
-        Level3 = 150,
-        Level4 = 200,
-        Level5 = 250,
+        Level1 = 100,
+        Level2 = 200,
+        Level3 = 300,
+        Level4 = 400,
+        Level5 = 500,
     },
     Weapon = {
         {
@@ -303,7 +303,7 @@ UnitBlueprint {
             Damage = 11000,
             DamageFriendly = true,
             DamageRadius = 20,
-            DamageType = 'Normal',
+            DamageType = 'OtheTacticalBomb',
             DisplayName = 'Othe Tactical Bomb',
             FireTargetLayerCapsTable = {
                 Air = 'Land|Water|Seabed',
@@ -331,13 +331,13 @@ UnitBlueprint {
             },
             RackFireTogether = false,
             RackRecoilDistance = 0,
-            RackReloadTimeout = 10,
+            RackReloadTimeout = 12,
             RackSalvoChargeTime = 0,
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 0.1,
-	    RenderFireClock = true, # added
+            RateOfFire = 0.0714,
+	    RenderFireClock = true,
             TargetCheckInterval = 3,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
