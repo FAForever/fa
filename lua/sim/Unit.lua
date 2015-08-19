@@ -2212,7 +2212,10 @@ Unit = Class(moho.unit_methods) {
 
     DisableUnitIntel = function(self, intel)
         local intDisabled = false
-        if not self.IntelDisables then return end
+        if not self.IntelDisables then
+            WARN('DisableUnitIntel called before IntelDisables field initialized.')
+            return
+        end
         if intel then
             self.IntelDisables[intel] = self.IntelDisables[intel] + 1
             if self.IntelDisables[intel] == 1 then
@@ -2237,6 +2240,10 @@ Unit = Class(moho.unit_methods) {
         local layer = self:GetCurrentLayer()
         local bp = self:GetBlueprint()
         local intEnabled = false
+        if not self.IntelDisables then
+            WARN('EnableUnitIntel called before IntelDisables field initialized.')
+            return
+        end
         if layer == 'Seabed' or layer == 'Sub' or layer == 'Water' then
             self:EnableIntel('WaterVision')
         end
