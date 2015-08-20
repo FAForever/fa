@@ -74,6 +74,7 @@ XRL0403 = Class(CWalkingLandUnit) {
         CWalkingLandUnit.OnStopBeingBuilt(self,builder,layer)
         local layer = self:GetCurrentLayer()
         -- If created with F2 on land, then play the transform anim.
+        local LandSpeedMult = self:GetBlueprint().Physics.WaterSpeedMultiplier
         if(layer == 'Land') then
 	        self:SetWeaponEnabledByLabel('AAGun', true)       
 			-- Disable Torpedo
@@ -82,6 +83,7 @@ XRL0403 = Class(CWalkingLandUnit) {
             self:EnableUnitIntel('SonarStealth')
 			-- Enable Torpedo
 	        self:SetWeaponEnabledByLabel('Torpedo01', true)      
+	        self:SetSpeedMult(LandSpeedMult)
         end
         self.WeaponsEnabled = true
         
