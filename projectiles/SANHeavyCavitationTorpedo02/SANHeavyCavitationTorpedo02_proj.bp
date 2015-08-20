@@ -20,14 +20,21 @@ ProjectileBlueprint {
         'SERAPHIM',
         'PROJECTILE',
         'ANTINAVY',
-        'TORPEDO',
+#        'TORPEDO',
 	'NOSPLASHDAMAGE',
+    },
+    Defense = {
+        Health = 1,
     },
     Display = {
         ImpactEffects = {
             Type = 'Small01',
         },
         StrategicIconSize = 1,
+    },
+    DoNotCollideList = {
+        'PROJECTILE',
+        'TORPEDO',
     },
     General = {
         Category = 'Anti Navy',
@@ -45,7 +52,7 @@ ProjectileBlueprint {
         MaxSpeed = 18,
         StayUnderwater = true,
         TrackTarget = true,
-        TurnRate = 230,
+        TurnRate = 360,#230
         UseGravity = false,
         VelocityAlign = true,
     },

@@ -3,8 +3,8 @@ UnitBlueprint {
         TargetBones = {
             'UEL0301',
             'Head',
-            'Leg_Left_B02',
-            'Leg_Right_B02',
+#            'Leg_Left_B02',
+#            'Leg_Right_B02',
         },
     },
     Audio = {
@@ -275,12 +275,12 @@ UnitBlueprint {
     },
     Enhancements = {
         AdvancedCoolingUpgrade = {
-            BuildCostEnergy = 45000,
+            BuildCostEnergy = 44700,
             BuildCostMass = 1000,
             BuildTime = 5040,
             Icon = 'acu',
             Name = '<LOC enhancements_0061>Energy Accelerator',
-            NewRateOfFire = 2.5,
+            NewRateOfFire = 1.82,
             Slot = 'LCH',
             UpgradeUnitAmbientBones = {
                 'UEL0301',
@@ -308,7 +308,7 @@ UnitBlueprint {
             BuildTime = 3360,
             Icon = 'heo',
             Name = '<LOC enhancements_0063>Heavy Plasma Refractor',
-            NewDamageRadius = 2.5,
+            NewDamageRadius = 2,
             NewMaxRadius = 35,
             ShowBones = {
                 'SAM',
@@ -340,9 +340,9 @@ UnitBlueprint {
             Slot = 'RCH',
         },
         Pod = {
-            BuildCostEnergy = 9000,
+            BuildCostEnergy = 8700,
             BuildCostMass = 380,
-            BuildTime = 2520,
+            BuildTime = 2500,
             Icon = 'ed',
             Name = '<LOC enhancements_0065>C-D2 Engineering Drone',
             Slot = 'Back',
@@ -367,9 +367,9 @@ UnitBlueprint {
             Slot = 'Back',
         },
         RadarJammer = {
-            BuildCostEnergy = 18000,
-            BuildCostMass = 600,
-            BuildTime = 2520,
+            BuildCostEnergy = 8000,
+            BuildCostMass = 300,
+            BuildTime = 2500,
             Icon = 'rj',
             MaintenanceConsumptionPerSecondEnergy = 100,
             Name = '<LOC enhancements_0067>Radar Jammer',
@@ -402,7 +402,7 @@ UnitBlueprint {
             Slot = 'Back',
         },
         ResourceAllocation = {
-            BuildCostEnergy = 60000,
+            BuildCostEnergy = 69800,
             BuildCostMass = 4500,
             BuildTime = 8400,
             Icon = 'isb',
@@ -438,8 +438,8 @@ UnitBlueprint {
         },
         SensorRangeEnhancer = {
             BuildCostEnergy = 20000,
-            BuildCostMass = 1000,
-            BuildTime = 3360,
+            BuildCostMass = 600,
+            BuildTime = 3000,
             Icon = 'sre',
             Name = '<LOC enhancements_0071>Enhanced Sensor System',
             NewOmniRadius = 80,
@@ -472,9 +472,9 @@ UnitBlueprint {
             Slot = 'LCH',
         },
         Shield = {
-            BuildCostEnergy = 93750,
+            BuildCostEnergy = 100200,
             BuildCostMass = 2000,
-            BuildTime = 7000,
+            BuildTime = 7200,
             Icon = 'psg',
             ShowBones = {
                 'Jetpack',
@@ -486,7 +486,7 @@ UnitBlueprint {
             PersonalShield = true,
             RegenAssistMult = 10,
             ShieldEnergyDrainRechargeTime = 5,
-            ShieldMaxHealth = 32000,
+            ShieldMaxHealth = 26000,#32000
             ShieldRechargeTime = 170,
             ShieldRegenRate = 50,
             ShieldRegenStartTime = 1,
@@ -503,9 +503,9 @@ UnitBlueprint {
             },
         },
         ShieldGeneratorField = {
-            BuildCostEnergy = 400000,
+            BuildCostEnergy = 360800,
             BuildCostMass = 3500,
-            BuildTime = 11200,
+            BuildTime = 10800,
             Icon = 'sgf',
             HideBones = {
                 'Jetpack',
@@ -584,7 +584,7 @@ UnitBlueprint {
     EnhancementPresets = {
         BubbleShield = {
             BuildIconSortPriority = 30,
-            Description = '<LOC uel0301_BubbleShield_desc>Support Armored Command Unit (Shield preset)',
+            Description = '<LOC uel0301_BubbleShield_desc>SACU (Shield preset)',
             Enhancements = {
                 'Shield',
                 'ShieldGeneratorField',
@@ -595,7 +595,7 @@ UnitBlueprint {
         },
         Combat = {
             BuildIconSortPriority = 15,
-            Description = '<LOC uel0301_Combat_desc>Support Armored Command Unit (Combatant preset)',
+            Description = '<LOC uel0301_Combat_desc>SACU (Combatant preset)',
             Enhancements = {
                 'AdvancedCoolingUpgrade',
                 'HighExplosiveOrdnance',
@@ -606,7 +606,7 @@ UnitBlueprint {
         },
         Engineer = {
             BuildIconSortPriority = 20,
-            Description = '<LOC uel0301_Engineer_desc>Support Armored Command Unit (Engineer preset)',
+            Description = '<LOC uel0301_Engineer_desc>SACU (Engineer preset)',
             Enhancements = {
                 'Pod',
             },
@@ -616,7 +616,7 @@ UnitBlueprint {
         },
         IntelJammer = {
             BuildIconSortPriority = 35,
-            Description = '<LOC uel0301_IntelJammer_desc>Support Armored Command Unit (Intel Jammer preset)',
+            Description = '<LOC uel0301_IntelJammer_desc>SACU (Intel Jammer preset)',
             Enhancements = {
                 'RadarJammer',
                 'SensorRangeEnhancer',
@@ -627,7 +627,7 @@ UnitBlueprint {
         },
         Rambo = {
             BuildIconSortPriority = 25,
-            Description = '<LOC uel0301_Rambo_desc>Support Armored Command Unit (Rambo preset)',
+            Description = '<LOC uel0301_Rambo_desc>SACU (Rambo preset)',
             HelpText = '<LOC uel0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with a personal shield, energy accelerator and heavy plasma refractor enhancements.',
             Enhancements = {
                 'AdvancedCoolingUpgrade',
@@ -636,6 +636,16 @@ UnitBlueprint {
             },
             SortCategory = 'SORTOTHER',
             UnitName = '<LOC uel0301_Rambo_name>SACU (Rambo preset)',
+        },
+        RAS = {
+            BuildIconSortPriority = 10,
+            Description = '<LOC uel0301_RAS_desc>SACU (RAS preset)',
+            Enhancements = {
+                'ResourceAllocation',
+            },
+            HelpText = '<LOC uel0301_RAS_help>Support Armored Command Unit. Enhanced during construction with a Resource Allocation System.',
+            SortCategory = 'SORTOTHER',
+            UnitName = '<LOC uel0301_RAS_name>SACU (RAS preset)',
         },
     },
     General = {
@@ -720,8 +730,8 @@ UnitBlueprint {
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.7,
     SelectionYOffset = 0,
-    SizeX = 1,
-    SizeY = 1.9,
+    SizeX = 1.1,
+    SizeY = 2,
     SizeZ = 1.1,
     StrategicIconName = 'icon_commander_generic',
     StrategicIconSortPriority = 1,
@@ -839,6 +849,20 @@ UnitBlueprint {
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
             WeaponCategory = 'Death',
+        },
+    },
+    Wreckage = {
+        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+        EnergyMult = 0,
+        HealthMult = 0.9,
+        MassMult = 0.9,
+        ReclaimTimeMultiplier = 1,
+        WreckageLayers = {
+            Air = false,
+            Land = true,
+            Seabed = false,
+            Sub = false,
+            Water = false,
         },
     },
 }

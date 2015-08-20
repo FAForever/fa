@@ -1,4 +1,4 @@
-#****************************************************************************
+﻿#****************************************************************************
 #**
 #**  File     :  /data/projectiles/SANHeavyCavitationTorpedo04/SANHeavyCavitationTorpedo04_script.lua
 #**  Author(s):  Gordon Duclos
@@ -15,6 +15,7 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 SANHeavyCavitationTorpedo04 = Class(SHeavyCavitationTorpedo) {
 		OnCreate = function(self)
 				SHeavyCavitationTorpedo.OnCreate(self)
+                                self:SetCollisionShape('Sphere', 0, 0, 0, 0.1)
 				self:ForkThread(self.PauseUntilTrack)				
 				CreateEmitterOnEntity(self,self:GetArmy(),EffectTemplate.SHeavyCavitationTorpedoFxTrails)
 		end,
@@ -26,11 +27,11 @@ SANHeavyCavitationTorpedo04 = Class(SHeavyCavitationTorpedo) {
 				# The pause time needs to scale down depending on how far away the target is, otherwise
 				# the torpedoes will initially shoot past their target.
 				if distance > 6 then
-						waittime = .45
+						waittime = .1 #0.45
 						if distance > 12 then
-								waittime = .7
+								waittime = .1#0.7
 								if distance > 18 then
-										waittime = 1
+										waittime = 0.1#1
 								end
 						end
 				else
