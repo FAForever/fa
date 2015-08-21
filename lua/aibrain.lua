@@ -974,7 +974,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     OnVictory = function(self)
         self:AddArmyStat("FAFWin", 5)
-           local result = string.format("%s %i", "victory", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
+        local result = string.format("%s %i", "victory", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
         table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
     end,
 
