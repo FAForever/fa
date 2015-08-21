@@ -880,14 +880,6 @@ AIBrain = Class(moho.aibrain_methods) {
         local result = string.format("%s %i", "defeat", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
         table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
 
-        -- Score change, we send the score of all other players, yes mam !
-        for index, brain in ArmyBrains do
-            if brain and not brain:IsDefeated() then
-                local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
-                table.insert( Sync.GameResult, { index, result } )
-            end
-        end
-
         import('/lua/SimUtils.lua').UpdateUnitCap(self:GetArmyIndex())
         import('/lua/SimPing.lua').OnArmyDefeat(self:GetArmyIndex())
 
