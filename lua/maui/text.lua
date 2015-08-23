@@ -68,6 +68,7 @@ Text = Class(moho.text_methods, Control) {
 
 
     StreamText = function(self, text, speed)
+        if not speed then speed = 20 end
         local goalText = text
         self:SetText('')
         self:SetNeedsFrameUpdate(true)
