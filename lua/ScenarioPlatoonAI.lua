@@ -756,7 +756,7 @@ function EngineersBuildPlatoon(platoon)
                             eng, engTable = AssistOtherEngineer(eng, engTable, unitBeingBuilt)
                         else
                             if not unitBeingBuilt then
-                                unitBeingBuilt = eng:GetUnitBeingBuilt()
+                                unitBeingBuilt = eng.UnitBeingBuilt
                                 if unitBeingBuilt then
                                     table.insert( newPlatoonUnits, unitBeingBuilt )
                                 end
@@ -1224,7 +1224,7 @@ function StartBaseBuildUnits(eng, engTable, data, aiBrain)
                     IssueClearCommands({eng})
                     local result = aiBrain:BuildStructure(eng, unit.type, {unit.Position[1], unit.Position[3], 0}, false)
                     if result then
-                        unitBeingBuilt = eng:GetUnitBeingBuilt()
+                        unitBeingBuilt = eng.UnitBeingBuilt
                     end
                     repeat
                         WaitSeconds(5)
@@ -1235,7 +1235,7 @@ function StartBaseBuildUnits(eng, engTable, data, aiBrain)
                             end
                         else
                             if not unitBeingBuilt then
-                                unitBeingBuilt = eng:GetUnitBeingBuilt()
+                                unitBeingBuilt = eng.UnitBeingBuilt
                             end
                             if unitBeingBuilt and data.NamedUnitBuildReportCallback then
                                 data.NamedUnitBuildReportCallback(unitBeingBuilt, eng)
@@ -1267,7 +1267,7 @@ function StartBaseGroupOnceBuild( eng, engTable, data, aiBrain)
                 IssueClearCommands({eng})
                 local result = aiBrain:BuildStructure( eng, v.type, { v.Position[1], v.Position[3], 0}, false)
                 if result then
-                    unitBeingBuilt = eng:GetUnitBeingBuilt()
+                    unitBeingBuilt = eng.UnitBeingBuilt
                 end
                 repeat
                     WaitSeconds(5)
@@ -1277,7 +1277,7 @@ function StartBaseGroupOnceBuild( eng, engTable, data, aiBrain)
                             return false
                         end
                     else
-                        unitBeingBuilt = eng:GetUnitBeingBuilt()
+                        unitBeingBuilt = eng.UnitBeingBuilt
                     end
                 until eng:IsIdleState()
             end
@@ -1313,8 +1313,8 @@ function StartBaseConstruction(eng, engTable, data, aiBrain)
             end
             #platoon:Stop()
             EngineerBuildStructure(aiBrain, eng, v, baseTmpl, buildingTmpl )
-            if eng:GetUnitBeingBuilt() then
-                unitBeingBuilt = eng:GetUnitBeingBuilt()
+            if eng.UnitBeingBuilt then
+                unitBeingBuilt = eng.UnitBeingBuilt
             end
             repeat
                 WaitSeconds(7)
@@ -1324,7 +1324,7 @@ function StartBaseConstruction(eng, engTable, data, aiBrain)
                         return false
                     end
                 else
-                    unitBeingBuilt = eng:GetUnitBeingBuilt()
+                    unitBeingBuilt = eng.UnitBeingBuilt
                 end
             until not ( eng:IsUnitState('Building') or eng:IsUnitState('Repairing') or eng:IsUnitState('Moving') or eng:IsUnitState('Reclaiming') )
         end
@@ -1354,8 +1354,8 @@ function StartBaseBuildBase(eng, engTable, data, aiBrain)
                     if not busy then
                         if AIBuildStructures.AIMaintainBuildList(eng:GetAIBrain(), eng, data.BuildingTemplate,
                                                                  aiBrain.BaseTemplates[data.BuildBaseTemplate]) then
-                            if eng:GetUnitBeingBuilt() then
-                                unitBeingBuilt = eng:GetUnitBeingBuilt()
+                            if eng.UnitBeingBuilt then
+                                unitBeingBuilt = eng.UnitBeingBuilt
                             end
                             busy = true
                         else
@@ -1370,7 +1370,7 @@ function StartBaseBuildBase(eng, engTable, data, aiBrain)
                         return false
                     end
                 else
-                    unitBeingBuilt = eng:GetUnitBeingBuilt()
+                    unitBeingBuilt = eng.UnitBeingBuilt
                 end
             end
         end
@@ -1414,7 +1414,7 @@ function StartBaseMaintainBase(platoon, eng, engTable, data, aiBrain)
                     BreakOffFactoryAssist(platoon, data)
                     IssueClearCommands(engTable)
                     IssueGuard(engTable, eng)
-                    unitBeingBuilt = eng:GetUnitBeingBuilt()
+                    unitBeingBuilt = eng.UnitBeingBuilt
                 end
             end
         end
@@ -1453,7 +1453,7 @@ function StartBaseMaintainBase(platoon, eng, engTable, data, aiBrain)
                 return false
             end
         elseif eng then
-            unitBeingBuilt = eng:GetUnitBeingBuilt()
+            unitBeingBuilt = eng.UnitBeingBuilt
         end
     end
     return true
