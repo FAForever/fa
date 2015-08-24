@@ -31,11 +31,9 @@ local isReplay = false
 
 local waitingDialog = false
 
--- variables for FAF
 local sendChat = import('/lua/ui/game/chat.lua').ReceiveChatFromSim
 local oldData = {}
 local lastObserving
--- end faf variables
 
 -- Hotbuild stuff
 modifiersKeys = {}
