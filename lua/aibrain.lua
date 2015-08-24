@@ -24,7 +24,6 @@ local FactoryManager = import('/lua/sim/FactoryBuilderManager.lua')
 local PlatoonFormManager = import('/lua/sim/PlatoonFormManager.lua')
 local BrainConditionsMonitor = import('/lua/sim/BrainConditionsMonitor.lua')
 local EngineerManager = import('/lua/sim/EngineerManager.lua')
---local StratManager = import('/lua/sim/StrategyManager.lua')
 
 ------Sorian AI stuff
 local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
@@ -1233,7 +1232,6 @@ AIBrain = Class(moho.aibrain_methods) {
     SUtils.AddCustomUnitSupport(self)
 
         self:AddBuilderManagers(self:GetStartVector3f(), 100, 'MAIN', false)
-        --self.BuilderManagers.MAIN.StrategyManager = StratManager.CreateStrategyManager(self, 'MAIN', self:GetStartVector3f(), 100)
 
         --changed for sorian ai
         -- Begin the base monitor process
