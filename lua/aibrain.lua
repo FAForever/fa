@@ -19,7 +19,6 @@ local Utilities = import('/lua/utilities.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local Behaviors = import('/lua/ai/aibehaviors.lua')
 local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
---LOG('aibrain_methods.__index = ',moho.aibrain_methods.__index,' ',moho.aibrain_methods)
 
 local FactoryManager = import('/lua/sim/FactoryBuilderManager.lua')
 local PlatoonFormManager = import('/lua/sim/PlatoonFormManager.lua')
