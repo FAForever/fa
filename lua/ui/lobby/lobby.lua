@@ -1163,6 +1163,21 @@ function autobalance_quality(players)
     return quality
 end
 
+--- If the game is full, GPGNetSend about it so the client can do a fancy popup if it has focus.
+function PossiblyAnnounceGameFull()
+    -- Search for an empty non-closed slot.
+    for i = 1, numAvailStartSpots do
+        if not gameInfo.ClosedSlots[i] then
+            if not gameInfo.PlayerOptions[i] then
+                return
+            end
+        end
+    end
+
+    -- Game is full, let's tell the client.
+    GPGNetSend("GameFull")
+end
+
 --- Assign the "random" (really autobalanced) start positions.
 local function AssignRandomStartSpots()
     if gameInfo.GameOptions['TeamSpawn'] ~= 'random' then
@@ -3607,6 +3622,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 gameInfo.PlayerOptions[data.Slot] = PlayerData(data.Options)
                 PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
                 SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
+                PossiblyAnnounceGameFull()
             elseif data.Type == 'SlotMove' then
                 gameInfo.PlayerOptions[data.OldSlot] = nil
                 gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
@@ -5211,6 +5227,7 @@ function InitHostUtils()
             SetSlotInfo(newSlot, gameInfo.PlayerOptions[newSlot])
             -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
             AssignAutoTeams()
+            PossiblyAnnounceGameFull()
         end,
 
         --- Add an AI to the game in the given slot.
