@@ -805,7 +805,7 @@ function SetSlotInfo(slotNum, playerInfo)
     slot.numGamesText:SetText(playerInfo.NG)
 
     slot.name:Show()
-    -- Color the Name in Slot by State
+    -- Change name colour according to the state of the slot.
     if slotState == 'ai' then
         slot.name:SetTitleTextColor("dbdbb9") -- Beige Color for AI
         slot.name._text:SetFont('Arial Gras', 12)
@@ -823,7 +823,6 @@ function SetSlotInfo(slotNum, playerInfo)
         slot.name._text:SetFont('Arial Gras', 12)
     end
 
-    --\\ Stop - Color the Name in Slot by State
     local playerName = playerInfo.PlayerName
     if wasConnected(playerInfo.OwnerID) or isLocallyOwned or not playerInfo.Human then
         slot.name:SetTitleText(GetPlayerDisplayName(playerInfo))
@@ -2390,8 +2389,9 @@ function CreateUI(maxPlayers)
         Prefs.SetToCurrentProfile('LobbyHideDefaultOptions', tostring(checked))
     end
 
-    -- GAME OPTIONS // MODS MANAGER BUTTON --
-    if isHost then     -- GAME OPTION
+    -- A buton that, for the host, is "game options", but for everyone else shows a ready-only mod
+    -- manager.
+    if isHost then
         GUI.gameoptionsButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "<LOC _Options>")
         Tooltip.AddButtonTooltip(GUI.gameoptionsButton, 'lob_select_map')
         GUI.gameoptionsButton.OnClick = function(self)
@@ -2992,7 +2992,7 @@ function RefreshOptionDisplayData(scenarioInfo)
     formattedOptions = {}
     nonDefaultFormattedOptions = {}
 
-    --// Check Mod active
+    -- Show a summary of the number of active mods.
     local modStr = false
     local modNum = table.getn(Mods.GetGameMods(gameInfo.GameMods)) or 0
     local modNumUI = table.getn(Mods.GetUiMods()) or 0
@@ -3030,7 +3030,6 @@ function RefreshOptionDisplayData(scenarioInfo)
         table.insert(formattedOptions, option)
         table.insert(nonDefaultFormattedOptions, option)
     end
-    --\\ Stop Check Mod active
 
     -- Update the unit restrictions display.
     if gameInfo.GameOptions.RestrictedCategories ~= nil then
