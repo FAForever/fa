@@ -205,15 +205,14 @@ function SetWindowedLobby(windowed)
 end
 
 -- String from which to build the various "Move player to slot" labels.
--- TODO: This probably needs localising.
 local slotMenuStrings = {
     open = "<LOC lobui_0219>Open",
     close = "<LOC lobui_0220>Close",
     closed = "<LOC lobui_0221>Closed",
     occupy = "<LOC lobui_0222>Occupy",
     pm = "<LOC lobui_0223>Private Message",
-    remove_to_kik = "Remove Player",
-    remove_to_observer = "Move Player to Observer",
+    remove_to_kik = "<LOC lobui_0428>Remove Player",
+    remove_to_observer = "<LOC lobui_0429>Move Player to Observer",
 }
 local slotMenuData = {
     open = {
@@ -830,9 +829,9 @@ function SetSlotInfo(slotNum, playerInfo)
         if not table.find(ConnectionEstablished, playerName) then
             if playerInfo.Human and not isLocallyOwned then
                 if table.find(ConnectedWithProxy, playerInfo.OwnerID) then
-                    AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", playerName)..' (FAF Proxy)', "Engine0004")
+                    AddChatText(LOCF("<LOC Engine0032>Connected to %s via the FAF proxy", playerName))
                 else
-                    AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", playerName), "Engine0004")
+                    AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", playerName))
                 end
 
                 table.insert(ConnectionEstablished, playerName)
@@ -845,8 +844,7 @@ function SetSlotInfo(slotNum, playerInfo)
             end
         end
     else
-        -- TODO: Localise!
-        slot.name:SetTitleText('Connecting to ... ' .. playerName)
+        slot.name:SetTitleText(LOCF('<LOC Engine0005>Connecting to %s...', playerName))
         slot.name._text:SetFont('Arial Gras', 11)
     end
 
@@ -2245,8 +2243,8 @@ function CreateUI(maxPlayers)
         return UIUtil.CreateText(GUI.panel, text, size, 'Arial Gras', true)
     end
 
-    -- Map Name Label TODO: Localise!
-    GUI.MapNameLabel = makeLabel("Loading...", 17)
+    -- Map name label
+    GUI.MapNameLabel = makeLabel(LOC("<LOC LOADING>Loading..."), 17)
     LayoutHelpers.AtRightTopIn(GUI.MapNameLabel, GUI.panel, 5, 45)
 
     -- Game Quality Label
@@ -2254,7 +2252,7 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtRightTopIn(GUI.GameQualityLabel, GUI.panel, 5, 64)
 
     -- Title Label
-    GUI.titleText = makeLabel("FAF Game Lobby", 17)
+    GUI.titleText = makeLabel(LOC("<LOC lobui_0427>FAF Game Lobby"), 17)
     LayoutHelpers.AtLeftTopIn(GUI.titleText, GUI.panel, 5, 20)
 
     -- Rule Label
