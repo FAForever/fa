@@ -732,7 +732,7 @@ function SetSlotInfo(slotNum, playerInfo)
     --- Returns true if the team selector for this slot should be enabled.
     --
     -- The predicate was getting unpleasantly long to read.
-    function teamSelectionEnabled(autoTeams, ready, locallyOwned, isHost)
+    local function teamSelectionEnabled(autoTeams, ready, locallyOwned, isHost)
         if isHost and not playerInfo.Human then
             return true
         end
@@ -747,9 +747,10 @@ function SetSlotInfo(slotNum, playerInfo)
             return not ready
         end
 
-        -- The host can control that of others. TODO: Prevent him from doing this while ready
-        -- himself. We need some sort of sane state-of-self tracking for this...
-        return isHost
+        if isHost then
+            -- The host can control the team of others, provided he's not ready himself.
+            return not gameInfo.PlayerOptions[FindSlotForID(localPlayerID)].Ready
+        end
     end
 
     -- Disable team selection if "auto teams" is controlling it. Moderatelty ick.
