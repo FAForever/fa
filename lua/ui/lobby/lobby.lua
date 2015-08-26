@@ -2978,7 +2978,6 @@ function CreateUI(maxPlayers)
 
     if not singlePlayer then
         CreateCPUMetricUI()
-        ForkThread(function() UpdateBenchmark() end)
     end
 end
 
@@ -3447,6 +3446,11 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             }
         )
 
+        -- Update, if needed, and broadcast, your CPU benchmark value.
+        if not singlePlayer then
+            ForkThread(function() UpdateBenchmark() end)
+        end
+
         local function KeepAliveThreadFunc()
             local threshold = LobbyComm.quietTimeout
             local active = true
@@ -3798,6 +3802,10 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         )
 
         CreateUI(LobbyComm.maxPlayerSlots)
+        if not singlePlayer then
+            ForkThread(function() UpdateBenchmark() end)
+        end
+
         UpdateGame()
     end
 
