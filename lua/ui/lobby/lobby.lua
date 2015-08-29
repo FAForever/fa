@@ -1166,7 +1166,7 @@ end
 --- If the game is full, GPGNetSend about it so the client can do a fancy popup if it has focus.
 function PossiblyAnnounceGameFull()
     -- Search for an empty non-closed slot.
-    for i = 1, numAvailStartSpots do
+    for i = 1, numOpenSlots do
         if not gameInfo.ClosedSlots[i] then
             if not gameInfo.PlayerOptions[i] then
                 return
