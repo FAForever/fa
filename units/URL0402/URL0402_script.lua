@@ -64,9 +64,9 @@ URL0402 = Class(CWalkingLandUnit) {
 		CWalkingLandUnit.OnLayerChange(self, new, old)
         self:CreateUnitAmbientEffect(new)
         if new == 'Seabed' then
-            self:EnableUnitIntel('Sonar')
+            self:EnableUnitIntel('Layer', 'Sonar')
         else
-            self:DisableUnitIntel('Sonar')
+            self:DisableUnitIntel('Layer', 'Sonar')
         end
 	end,
 	

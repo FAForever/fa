@@ -7,7 +7,7 @@
 -- **
 -- **  Copyright Š 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
-local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
+local CCommandUnit = import('/lua/cybranunits.lua').CCommandUnit
 local CWeapons = import('/lua/cybranweapons.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local Buff = import('/lua/sim/Buff.lua')
@@ -16,7 +16,7 @@ local CAAMissileNaniteWeapon = CWeapons.CAAMissileNaniteWeapon
 local CDFLaserDisintegratorWeapon = CWeapons.CDFLaserDisintegratorWeapon02
 local CIFCommanderDeathWeapon = CWeapons.CIFCommanderDeathWeapon
 
-URL0301 = Class(CommandUnit) {
+URL0301 = Class(CCommandUnit) {
     LeftFoot = 'Left_Foot02',
     RightFoot = 'Right_Foot02',
 
@@ -36,7 +36,7 @@ URL0301 = Class(CommandUnit) {
     -- Creation
     -- ********
     OnCreate = function(self)
-        CommandUnit.OnCreate(self)
+        CCommandUnit.OnCreate(self)
         self:SetCapturable(false)
         self:HideBone('AA_Gun', true)
         self:HideBone('Power_Pack', true)
@@ -51,7 +51,7 @@ URL0301 = Class(CommandUnit) {
     end,
 
     __init = function(self)
-        CommandUnit.__init(self, 'RightDisintegrator')
+        CCommandUnit.__init(self, 'RightDisintegrator')
     end,
 
     -- ********
@@ -63,64 +63,28 @@ URL0301 = Class(CommandUnit) {
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)
-        CommandUnit.OnStopBeingBuilt(self,builder,layer)
+        CCommandUnit.OnStopBeingBuilt(self,builder,layer)
         self:BuildManipulatorSetEnabled(false)
         self:SetMaintenanceConsumptionInactive()
-        self:DisableUnitIntel('RadarStealth')
-        self:DisableUnitIntel('SonarStealth')
-        self:DisableUnitIntel('Cloak')
+        -- Disable enhancement-based Intels until enhancements are built
+        self:DisableUnitIntel('Enhancement', 'RadarStealth')
+        self:DisableUnitIntel('Enhancement', 'SonarStealth')
+        self:DisableUnitIntel('Enhancement', 'Cloak')
         self.LeftArmUpgrade = 'EngineeringArm'
         self.RightArmUpgrade = 'Disintegrator'
     end,
-
-    SetupIntel = function(self, layer)
-        CommandUnit.SetupIntel(self)
-        if layer == 'Seabed' or layer == 'Sub' then
-            self:EnableIntel('WaterVision')
-        else
-            self:EnableIntel('Vision')
-        end
-
-        self:EnableIntel('Radar')
-        self:EnableIntel('Sonar')
-    end,
-
-    OnScriptBitSet = function(self, bit)
-        if bit == 8 then -- cloak toggle
-            self:StopUnitAmbientSound( 'ActiveLoop' )
-            self:SetMaintenanceConsumptionInactive()
-            self:DisableUnitIntel('Cloak')
-            self:DisableUnitIntel('RadarStealth')
-            self:DisableUnitIntel('RadarStealthField')
-            self:DisableUnitIntel('SonarStealth')
-            self:DisableUnitIntel('SonarStealthField')
-        end
-    end,
-
-    OnScriptBitClear = function(self, bit)
-        if bit == 8 then -- cloak toggle
-            self:PlayUnitAmbientSound( 'ActiveLoop' )
-            self:SetMaintenanceConsumptionActive()
-            self:EnableUnitIntel('Cloak')
-            self:EnableUnitIntel('RadarStealth')
-            self:EnableUnitIntel('RadarStealthField')
-            self:EnableUnitIntel('SonarStealth')
-            self:EnableUnitIntel('SonarStealthField')
-        end
-    end,
-
 
     -- ************
     -- Enhancements
     -- ************
     CreateEnhancement = function(self, enh)
-        CommandUnit.CreateEnhancement(self, enh)
+        CCommandUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
         if not bp then return end
         if enh == 'CloakingGenerator' then
             self.StealthEnh = false
 			self.CloakEnh = true
-            self:EnableUnitIntel('Cloak')
+            self:EnableUnitIntel('Enhancement', 'Cloak')
             if not Buffs['CybranSCUCloakBonus'] then
                BuffBlueprint {
                     Name = 'CybranSCUCloakBonus',
@@ -141,7 +105,7 @@ URL0301 = Class(CommandUnit) {
             end
             Buff.ApplyBuff(self, 'CybranSCUCloakBonus')
         elseif enh == 'CloakingGeneratorRemove' then
-            self:DisableUnitIntel('Cloak')
+            self:DisableUnitIntel('Enhancement', 'Cloak')
             self.StealthEnh = false
             self.CloakEnh = false
             self:RemoveToggleCap('RULEUTC_CloakToggle')
@@ -156,12 +120,12 @@ URL0301 = Class(CommandUnit) {
             end
             self.CloakEnh = false
             self.StealthEnh = true
-            self:EnableUnitIntel('RadarStealth')
-            self:EnableUnitIntel('SonarStealth')
+            self:EnableUnitIntel('Enhancement', 'RadarStealth')
+            self:EnableUnitIntel('Enhancement', 'SonarStealth')
         elseif enh == 'StealthGeneratorRemove' then
             self:RemoveToggleCap('RULEUTC_CloakToggle')
-            self:DisableUnitIntel('RadarStealth')
-            self:DisableUnitIntel('SonarStealth')
+            self:DisableUnitIntel('Enhancement', 'RadarStealth')
+            self:DisableUnitIntel('Enhancement', 'SonarStealth')
             self.StealthEnh = false
             self.CloakEnh = false
         elseif enh == 'NaniteMissileSystem' then
@@ -172,7 +136,7 @@ URL0301 = Class(CommandUnit) {
             self:SetWeaponEnabledByLabel('NMissile', false)
         elseif enh == 'SelfRepairSystem' then
             -- added by brute51 - fix for bug SCU regen upgrade doesnt stack with veteran bonus [140]
-            CommandUnit.CreateEnhancement(self, enh)
+            CCommandUnit.CreateEnhancement(self, enh)
             local bpRegenRate = self:GetBlueprint().Enhancements.SelfRepairSystem.NewRegenRate or 0
             if not Buffs['CybranSCURegenerateBonus'] then
                BuffBlueprint {
@@ -195,7 +159,7 @@ URL0301 = Class(CommandUnit) {
             Buff.ApplyBuff(self, 'CybranSCURegenerateBonus')
         elseif enh == 'SelfRepairSystemRemove' then
             -- added by brute51 - fix for bug SCU regen upgrade doesnt stack with veteran bonus [140]
-            CommandUnit.CreateEnhancement(self, enh)
+            CCommandUnit.CreateEnhancement(self, enh)
             if Buff.HasBuff( self, 'CybranSCURegenerateBonus' ) then
                 Buff.RemoveBuff( self, 'CybranSCURegenerateBonus' )
             end
@@ -263,7 +227,7 @@ URL0301 = Class(CommandUnit) {
 			self:AddBuff(bp)
         end
         -- otherwise, we should finish killing the unit
-        CommandUnit.OnKilled(self, instigator, type, overkillRatio)
+        CCommandUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
 
     IntelEffects = {
@@ -312,7 +276,7 @@ URL0301 = Class(CommandUnit) {
     },
 
     OnIntelEnabled = function(self)
-        CommandUnit.OnIntelEnabled(self)
+        CCommandUnit.OnIntelEnabled(self)
         if self.CloakEnh and self:IsIntelEnabled('Cloak') then
             self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['CloakingGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
@@ -331,7 +295,7 @@ URL0301 = Class(CommandUnit) {
     end,
 
     OnIntelDisabled = function(self)
-        CommandUnit.OnIntelDisabled(self)
+        CCommandUnit.OnIntelDisabled(self)
         if self.IntelEffectsBag then
             EffectUtil.CleanupEffectBag(self,'IntelEffectsBag')
             self.IntelEffectsBag = nil

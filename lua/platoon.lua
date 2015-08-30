@@ -1168,7 +1168,7 @@ Platoon = Class(moho.platoon_methods) {
         #aiBrain:BuildScoutLocations()
         
         if scout:TestToggleCaps('RULEUTC_CloakToggle') then
-            scout:EnableUnitIntel('Cloak')
+            scout:EnableUnitIntel('Toggle', 'Cloak')
         end
         
         while not scout.Dead do

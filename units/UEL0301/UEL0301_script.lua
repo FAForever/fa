@@ -44,7 +44,8 @@ UEL0301 = Class(CommandUnit) {
     
     OnStopBeingBuilt = function(self, builder, layer)
         CommandUnit.OnStopBeingBuilt(self, builder, layer)
-        self:DisableUnitIntel('Jammer')
+        -- Block Jammer until Enhancement is built
+        self:DisableUnitIntel('Enhancement', 'Jammer')
     end,
 
     CreateBuildEffects = function( self, unitBeingBuilt, order )
@@ -150,12 +151,12 @@ UEL0301 = Class(CommandUnit) {
         elseif enh == 'RadarJammer' then
             self:SetIntelRadius('Jammer', bp.NewJammerRadius or 26)
             self.RadarJammerEnh = true 
-            self:EnableUnitIntel('Jammer')
+            self:EnableUnitIntel('Enhancement', 'Jammer')
             self:AddToggleCap('RULEUTC_JammingToggle')              
         elseif enh == 'RadarJammerRemove' then
             local bpIntel = self:GetBlueprint().Intel
             self:SetIntelRadius('Jammer', 0)
-            self:DisableUnitIntel('Jammer')
+            self:DisableUnitIntel('Enhancement', 'Jammer')
             self.RadarJammerEnh = false
             self:RemoveToggleCap('RULEUTC_JammingToggle')
         elseif enh =='AdvancedCoolingUpgrade' then
