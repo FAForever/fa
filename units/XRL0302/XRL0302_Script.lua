@@ -38,6 +38,7 @@ XRL0302 = Class(CWalkingLandUnit) {
     end,
 
     OnLayerChange = function(self, new, old)
+        CWalkingLandUnit:OnLayerChange(new, old)
         self:SetDeathWeaponEnabled(new == "Seabed" or new == "Land")
     end
 }

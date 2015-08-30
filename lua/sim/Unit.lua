@@ -23,6 +23,7 @@ local Buff = import('/lua/sim/buff.lua')
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local BuffFieldBlueprints = import('/lua/sim/BuffField.lua').BuffFieldBlueprints
 local Wreckage = import('/lua/wreckage.lua')
+local Set = import('/lua/system/setutils.lua')
 
 -- TODO: We should really introduce a veterancy module at some point.
 -- XP gained for killing various unit types.
@@ -2534,10 +2535,10 @@ Unit = Class(moho.unit_methods) {
             self:GetWeapon(i):SetValidTargetsForCurrentLayer(new)
         end
 
-        if old == 'Seabed' and new == 'Land' then
+        if (old == 'Seabed' or old == 'None') and new == 'Land' then
             self:EnableIntel('Vision')
             self:DisableIntel('WaterVision')
-        elseif old == 'Land' and new == 'Seabed' then
+        elseif (old == 'Land' or old == 'None') and new == 'Seabed' then
             self:EnableIntel('WaterVision')
         end
 

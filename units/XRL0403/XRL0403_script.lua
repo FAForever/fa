@@ -72,18 +72,6 @@ XRL0403 = Class(CWalkingLandUnit) {
     
     OnStopBeingBuilt = function(self,builder,layer)
         CWalkingLandUnit.OnStopBeingBuilt(self,builder,layer)
-        local layer = self:GetCurrentLayer()
-        -- If created with F2 on land, then play the transform anim.
-        if(layer == 'Land') then
-	        self:SetWeaponEnabledByLabel('AAGun', true)       
-			-- Disable Torpedo
-	        self:SetWeaponEnabledByLabel('Torpedo01', false)
-        elseif (layer == 'Seabed') then
-            self:EnableUnitIntel('SonarStealth')
-			-- Enable Torpedo
-	        self:SetWeaponEnabledByLabel('Torpedo01', true)      
-        end
-        self.WeaponsEnabled = true
         
         if self:IsValidBone('Missile_Turret') then
             self:HideBone('Missile_Turret', true)
@@ -103,23 +91,18 @@ XRL0403 = Class(CWalkingLandUnit) {
 
 	OnLayerChange = function(self, new, old)
 		CWalkingLandUnit.OnLayerChange(self, new, old)
-		if self.WeaponsEnabled then
-			local LandSpeedMult = self:GetBlueprint().Physics.WaterSpeedMultiplier
-			if( new == 'Land' ) then
-                self:DisableUnitIntel('Sonar')
-			    -- Disable Torpedo
-	            self:SetWeaponEnabledByLabel('Torpedo01', false)
-    	        self:SetWeaponEnabledByLabel('AAGun', true)
-	 	  	    -- Set movement speed back to default
-                self:SetSpeedMult(1)
-			elseif ( new == 'Seabed' ) then
-                self:EnableUnitIntel('Sonar')
-				-- Enable Torpedo
-	            self:SetWeaponEnabledByLabel('Torpedo01', true)
-	 			-- Increase speed while in water
-                self:SetSpeedMult(LandSpeedMult)
-			end
-		end
+
+        --LOG("Mega Layerchange from ", old, " to ", new)
+
+        if new == 'Land' then
+            self:DisableUnitIntel('Layer', 'Sonar')
+            -- Set movement speed to default
+            self:SetSpeedMult(1)
+        elseif new == 'Seabed' then
+            self:EnableUnitIntel('Layer', 'Sonar')
+            -- Increase speed while in water
+            self:SetSpeedMult(self:GetBlueprint().Physics.WaterSpeedMultiplier)
+        end
 	end,
 	
     CreateDamageEffects = function(self, bone, army )
