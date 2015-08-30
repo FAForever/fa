@@ -9,6 +9,7 @@
 --****************************************************************************
 
 local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
+local CCommandUnit = import('/lua/cybranunits.lua').CCommandUnit
 local CWeapons = import('/lua/cybranweapons.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
@@ -22,7 +23,7 @@ local CDFOverchargeWeapon = CWeapons.CDFOverchargeWeapon
 local CANTorpedoLauncherWeapon = CWeapons.CANTorpedoLauncherWeapon
 local Entity = import('/lua/sim/Entity.lua').Entity
 
-URL0001 = Class(ACUUnit) {
+URL0001 = Class(ACUUnit, CCommandUnit) {
     Weapons = {
         DeathWeapon = Class(CIFCommanderDeathWeapon) {},
         RightRipper = Class(CCannonMolecularWeapon) {},
@@ -72,10 +73,11 @@ URL0001 = Class(ACUUnit) {
         self:SetWeaponEnabledByLabel('MLG', false)
         self:SetWeaponEnabledByLabel('Torpedo', false)
         self:SetMaintenanceConsumptionInactive()
-        self:DisableUnitIntel('RadarStealth')
-        self:DisableUnitIntel('SonarStealth')
-        self:DisableUnitIntel('Cloak')
-        self:DisableUnitIntel('Sonar')
+        -- Block enhancement-based Intel functions until enhancements are built
+        self:DisableUnitIntel('Enhancement', 'RadarStealth')
+        self:DisableUnitIntel('Enhancement', 'SonarStealth')
+        self:DisableUnitIntel('Enhancement', 'Cloak')
+        self:DisableUnitIntel('Enhancement', 'Sonar')
         self:HideBone('Back_Upgrade', true)
         self:HideBone('Right_Upgrade', true)
         self:ForkThread(self.GiveInitialResources)
@@ -120,29 +122,7 @@ URL0001 = Class(ACUUnit) {
         self:SetMesh(self:GetBlueprint().Display.MeshBlueprint, true)
     end,
 
-    OnScriptBitSet = function(self, bit)
-        if bit == 8 then -- cloak toggle
-            self:StopUnitAmbientSound( 'ActiveLoop' )
-            self:SetMaintenanceConsumptionInactive()
-            self:DisableUnitIntel('Cloak')
-            self:DisableUnitIntel('RadarStealth')
-            self:DisableUnitIntel('RadarStealthField')
-            self:DisableUnitIntel('SonarStealth')
-            self:DisableUnitIntel('SonarStealthField')
-        end
-    end,
 
-    OnScriptBitClear = function(self, bit)
-        if bit == 8 then -- cloak toggle
-            self:PlayUnitAmbientSound( 'ActiveLoop' )
-            self:SetMaintenanceConsumptionActive()
-            self:EnableUnitIntel('Cloak')
-            self:EnableUnitIntel('RadarStealth')
-            self:EnableUnitIntel('RadarStealthField')
-            self:EnableUnitIntel('SonarStealth')
-            self:EnableUnitIntel('SonarStealthField')
-        end
-    end,
 
     -- *************
     -- Build/Upgrade
@@ -168,12 +148,12 @@ URL0001 = Class(ACUUnit) {
             end
             self.CloakEnh = false
             self.StealthEnh = true
-            self:EnableUnitIntel('RadarStealth')
-            self:EnableUnitIntel('SonarStealth')
+            self:EnableUnitIntel('Enhancement', 'RadarStealth')
+            self:EnableUnitIntel('Enhancement', 'SonarStealth')
         elseif enh == 'StealthGeneratorRemove' then
             self:RemoveToggleCap('RULEUTC_CloakToggle')
-            self:DisableUnitIntel('RadarStealth')
-            self:DisableUnitIntel('SonarStealth')
+            self:DisableUnitIntel('Enhancement', 'RadarStealth')
+            self:DisableUnitIntel('Enhancement', 'SonarStealth')
             self.StealthEnh = false
             self.CloakEnh = false
             self.StealthFieldEffects = false
@@ -193,7 +173,7 @@ URL0001 = Class(ACUUnit) {
             if not bp then return end
             self.StealthEnh = false
 			self.CloakEnh = true
-            self:EnableUnitIntel('Cloak')
+            self:EnableUnitIntel('Enhancement', 'Cloak')
             if not Buffs['CybranACUCloakBonus'] then
                BuffBlueprint {
                     Name = 'CybranACUCloakBonus',
@@ -215,7 +195,7 @@ URL0001 = Class(ACUUnit) {
             Buff.ApplyBuff(self, 'CybranACUCloakBonus')
         elseif enh == 'CloakingGeneratorRemove' then
             self:RemoveToggleCap('RULEUTC_CloakToggle')
-            self:DisableUnitIntel('Cloak')
+            self:DisableUnitIntel('Enhancement', 'Cloak')
             self.CloakEnh = false
             if Buff.HasBuff( self, 'CybranACUCloakBonus' ) then
                 Buff.RemoveBuff( self, 'CybranACUCloakBonus' )
@@ -330,10 +310,10 @@ URL0001 = Class(ACUUnit) {
             self:SetWeaponEnabledByLabel('MLG', false)
         elseif enh == 'NaniteTorpedoTube' then
             self:SetWeaponEnabledByLabel('Torpedo', true)
-            self:EnableUnitIntel('Sonar')
+            self:EnableUnitIntel('Enhancement', 'Sonar')
         elseif enh == 'NaniteTorpedoTubeRemove' then
             self:SetWeaponEnabledByLabel('Torpedo', false)
-			self:DisableUnitIntel('Sonar')
+			self:DisableUnitIntel('Enhancement', 'Sonar')
         end
     end,
 

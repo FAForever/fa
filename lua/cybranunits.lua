@@ -25,6 +25,7 @@ local ShieldStructureUnit = DefaultUnitsFile.ShieldStructureUnit
 local StructureUnit = DefaultUnitsFile.StructureUnit
 local QuantumGateUnit = DefaultUnitsFile.QuantumGateUnit
 local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
+local CommandUnit = DefaultUnitsFile.CommandUnit
 
 local Util = import('utilities.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
@@ -554,5 +555,36 @@ CConstructionStructureUnit = Class(CStructureUnit) {
 
     CreateCaptureEffects = function( self, target )
         EffectUtil.PlayCaptureEffects( self, target, self:GetBlueprint().General.BuildBones.BuildEffectBones or {0,}, self.CaptureEffectsBag )
+    end,
+}
+
+----------------------------------------------------------------------------------------------------------------------------
+--  CCommandUnit
+--
+--  Cybran Command Units (ACU and SCU) have stealth and cloak enhancements, toggles can be handled in one class
+----------------------------------------------------------------------------------------------------------------------------
+CCommandUnit = Class(CommandUnit) {
+    OnScriptBitSet = function(self, bit)
+        if bit == 8 then -- cloak toggle
+            self:StopUnitAmbientSound( 'ActiveLoop' )
+            self:SetMaintenanceConsumptionInactive()
+            self:DisableUnitIntel('ToggleBit8', 'Cloak')
+            self:DisableUnitIntel('ToggleBit8', 'RadarStealth')
+            self:DisableUnitIntel('ToggleBit8', 'RadarStealthField')
+            self:DisableUnitIntel('ToggleBit8', 'SonarStealth')
+            self:DisableUnitIntel('ToggleBit8', 'SonarStealthField')
+        end
+    end,
+
+    OnScriptBitClear = function(self, bit)
+        if bit == 8 then -- cloak toggle
+            self:PlayUnitAmbientSound( 'ActiveLoop' )
+            self:SetMaintenanceConsumptionActive()
+            self:EnableUnitIntel('ToggleBit8', 'Cloak')
+            self:EnableUnitIntel('ToggleBit8', 'RadarStealth')
+            self:EnableUnitIntel('ToggleBit8', 'RadarStealthField')
+            self:EnableUnitIntel('ToggleBit8', 'SonarStealth')
+            self:EnableUnitIntel('ToggleBit8', 'SonarStealthField')
+        end
     end,
 }

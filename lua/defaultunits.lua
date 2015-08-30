@@ -1157,24 +1157,24 @@ RadarJammerUnit = Class(StructureUnit) {
     OnStartBuild = function(self, unitbuilding, order)
         StructureUnit.OnStartBuild(self, unitbuilding, order)
         self:SetMaintenanceConsumptionInactive()
-        self:DisableIntel('Jammer')
-        self:DisableIntel('RadarStealthField')
+        self:DisableUnitIntel('Construction', 'Jammer')
+        self:DisableUnitIntel('Construction', 'RadarStealthField')
     end,
 
     -- If we abort the upgrade, re-enable the intel
     OnStopBuild = function(self, unitBeingBuilt)
         StructureUnit.OnStopBuild(self, unitBeingBuilt)
         self:SetMaintenanceConsumptionActive()
-        self:EnableIntel('Jammer')
-        self:EnableIntel('RadarStealthField')
+        self:EnableUnitIntel('Construction', 'Jammer')
+        self:EnableUnitIntel('Construction', 'RadarStealthField')
     end,
 
     -- If we abort the upgrade, re-enable the intel
     OnFailedToBuild = function(self)
         StructureUnit.OnStopBuild(self)
         self:SetMaintenanceConsumptionActive()
-        self:EnableIntel('Jammer')
-        self:EnableIntel('RadarStealthField')
+        self:EnableUnitIntel('Construction', 'Jammer')
+        self:EnableUnitIntel('Construction', 'RadarStealthField')
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)

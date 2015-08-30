@@ -208,7 +208,7 @@ function OverrideKilled(self, instigator, type, overkillRatio)
         self:DoDeathWeapon()
     end
     self:DisableShield()
-    self:DisableUnitIntel()
+    self:DisableUnitIntel('Killed')
     self:ForkThread(self.DeathThread, overkillRatio , instigator)
 end
 

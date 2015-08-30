@@ -113,6 +113,20 @@ Unit = Class(moho.unit_methods) {
             self.Trash = TrashBag()
         end
 
+        self.IntelDisables = {
+            Radar = {NotInitialized=true},
+            Sonar = {NotInitialized=true},
+            Omni = {NotInitialized=true},
+            RadarStealth = {NotInitialized=true},
+            SonarStealth = {NotInitialized=true},
+            RadarStealthField = {NotInitialized=true},
+            SonarStealthField = {NotInitialized=true},
+            Cloak = {NotInitialized=true},
+            CloakField = {NotInitialized=true},
+            Spoof = {NotInitialized=true},
+            Jammer = {NotInitialized=true},
+        }
+
         self.EventCallbacks = {
             OnKilled = {},
             OnUnitBuilt = {},
@@ -486,30 +500,30 @@ Unit = Class(moho.unit_methods) {
         elseif bit == 2 then --Jamming toggle
             self:StopUnitAmbientSound( 'ActiveLoop' )
             self:SetMaintenanceConsumptionInactive()
-            self:DisableUnitIntel('Jammer')
+            self:DisableUnitIntel('ToggleBit2', 'Jammer')
         elseif bit == 3 then --Intel toggle
             self:StopUnitAmbientSound( 'ActiveLoop' )
             self:SetMaintenanceConsumptionInactive()
-            self:DisableUnitIntel('RadarStealth')
-            self:DisableUnitIntel('RadarStealthField')
-            self:DisableUnitIntel('SonarStealth')
-            self:DisableUnitIntel('SonarStealthField')
-            self:DisableUnitIntel('Sonar')
-            self:DisableUnitIntel('Omni')
-            self:DisableUnitIntel('Cloak')
-            self:DisableUnitIntel('CloakField')
-            self:DisableUnitIntel('Spoof')
-            self:DisableUnitIntel('Jammer')
-            self:DisableUnitIntel('Radar')
+            self:DisableUnitIntel('ToggleBit3', 'RadarStealth')
+            self:DisableUnitIntel('ToggleBit3', 'RadarStealthField')
+            self:DisableUnitIntel('ToggleBit3', 'SonarStealth')
+            self:DisableUnitIntel('ToggleBit3', 'SonarStealthField')
+            self:DisableUnitIntel('ToggleBit3', 'Sonar')
+            self:DisableUnitIntel('ToggleBit3', 'Omni')
+            self:DisableUnitIntel('ToggleBit3', 'Cloak')
+            self:DisableUnitIntel('ToggleBit3', 'CloakField')
+            self:DisableUnitIntel('ToggleBit3', 'Spoof')
+            self:DisableUnitIntel('ToggleBit3', 'Jammer')
+            self:DisableUnitIntel('ToggleBit3', 'Radar')
         elseif bit == 4 then --Production toggle
             self:OnProductionPaused()
         elseif bit == 5 then --Stealth toggle
             self:StopUnitAmbientSound( 'ActiveLoop' )
             self:SetMaintenanceConsumptionInactive()
-            self:DisableUnitIntel('RadarStealth')
-            self:DisableUnitIntel('RadarStealthField')
-            self:DisableUnitIntel('SonarStealth')
-            self:DisableUnitIntel('SonarStealthField')
+            self:DisableUnitIntel('ToggleBit5', 'RadarStealth')
+            self:DisableUnitIntel('ToggleBit5', 'RadarStealthField')
+            self:DisableUnitIntel('ToggleBit5', 'SonarStealth')
+            self:DisableUnitIntel('ToggleBit5', 'SonarStealthField')
         elseif bit == 6 then --Generic pause toggle
             self:SetPaused(true)
         elseif bit == 7 then --Special toggle
@@ -517,7 +531,7 @@ Unit = Class(moho.unit_methods) {
         elseif bit == 8 then --Cloak toggle
             self:StopUnitAmbientSound( 'ActiveLoop' )
             self:SetMaintenanceConsumptionInactive()
-            self:DisableUnitIntel('Cloak')
+            self:DisableUnitIntel('ToggleBit8', 'Cloak')
         end
     end,
 
@@ -529,30 +543,30 @@ Unit = Class(moho.unit_methods) {
         elseif bit == 2 then --Jamming toggle
             self:PlayUnitAmbientSound( 'ActiveLoop' )
             self:SetMaintenanceConsumptionActive()
-            self:EnableUnitIntel('Jammer')
+            self:EnableUnitIntel('ToggleBit2', 'Jammer')
         elseif bit == 3 then --Intel toggle
             self:PlayUnitAmbientSound( 'ActiveLoop' )
             self:SetMaintenanceConsumptionActive()
-            self:EnableUnitIntel('Radar')
-            self:EnableUnitIntel('RadarStealth')
-            self:EnableUnitIntel('RadarStealthField')
-            self:EnableUnitIntel('SonarStealth')
-            self:EnableUnitIntel('SonarStealthField')
-            self:EnableUnitIntel('Sonar')
-            self:EnableUnitIntel('Omni')
-            self:EnableUnitIntel('Cloak')
-            self:EnableUnitIntel('CloakField')
-            self:EnableUnitIntel('Spoof')
-            self:EnableUnitIntel('Jammer')
+            self:EnableUnitIntel('ToggleBit3', 'Radar')
+            self:EnableUnitIntel('ToggleBit3', 'RadarStealth')
+            self:EnableUnitIntel('ToggleBit3', 'RadarStealthField')
+            self:EnableUnitIntel('ToggleBit3', 'SonarStealth')
+            self:EnableUnitIntel('ToggleBit3', 'SonarStealthField')
+            self:EnableUnitIntel('ToggleBit3', 'Sonar')
+            self:EnableUnitIntel('ToggleBit3', 'Omni')
+            self:EnableUnitIntel('ToggleBit3', 'Cloak')
+            self:EnableUnitIntel('ToggleBit3', 'CloakField')
+            self:EnableUnitIntel('ToggleBit3', 'Spoof')
+            self:EnableUnitIntel('ToggleBit3', 'Jammer')
         elseif bit == 4 then --Production toggle
             self:OnProductionUnpaused()
         elseif bit == 5 then --Stealth toggle
             self:PlayUnitAmbientSound( 'ActiveLoop' )
             self:SetMaintenanceConsumptionActive()
-            self:EnableUnitIntel('RadarStealth')
-            self:EnableUnitIntel('RadarStealthField')
-            self:EnableUnitIntel('SonarStealth')
-            self:EnableUnitIntel('SonarStealthField')
+            self:EnableUnitIntel('ToggleBit5', 'RadarStealth')
+            self:EnableUnitIntel('ToggleBit5', 'RadarStealthField')
+            self:EnableUnitIntel('ToggleBit5', 'SonarStealth')
+            self:EnableUnitIntel('ToggleBit5', 'SonarStealthField')
         elseif bit == 6 then --Generic pause toggle
             self:SetPaused(false)
         elseif bit == 7 then --Special toggle
@@ -560,7 +574,7 @@ Unit = Class(moho.unit_methods) {
         elseif bit == 8 then --Cloak toggle
             self:PlayUnitAmbientSound( 'ActiveLoop' )
             self:SetMaintenanceConsumptionActive()
-            self:EnableUnitIntel('Cloak')
+            self:EnableUnitIntel('ToggleBit8', 'Cloak')
         end
     end,
 
@@ -1184,7 +1198,7 @@ Unit = Class(moho.unit_methods) {
             self:DoDeathWeapon()
         end
         self:DisableShield()
-        self:DisableUnitIntel()
+        self:DisableUnitIntel('Killed')
         self:ForkThread(self.DeathThread, overkillRatio , instigator)
     end,
 
@@ -1774,12 +1788,12 @@ Unit = Class(moho.unit_methods) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         local bp = self:GetBlueprint()
-        self:SetupIntel()
+        self:EnableUnitIntel('NotInitialized', nil)
         self:ForkThread( self.StopBeingBuiltEffects, builder, layer )
 
         if ( self:GetCurrentLayer() == 'Water' ) then
             self:StartRocking()
-            local surfaceAnim = self:GetBlueprint().Display.AnimationSurface
+            local surfaceAnim = bp.Display.AnimationSurface
             if not self.SurfaceAnimator and surfaceAnim then
                 self.SurfaceAnimator = CreateAnimator(self)
             end
@@ -2188,75 +2202,73 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
     -- INTEL
     -------------------------------------------------------------------------------------------
-    --Setup the initial intelligence of the unit.  Return true if it can, false if it can't.
-    SetupIntel = function(self)
-        local bp = self:GetBlueprint().Intel
-        self:EnableIntel('Vision')
-        if bp then
-            self.IntelDisables = {
-                Radar = 1,
-                Sonar = 1,
-                Omni = 1,
-                RadarStealth = 1,
-                SonarStealth = 1,
-                RadarStealthField = 1,
-                SonarStealthField = 1,
-                Cloak = 1,
-                CloakField = 1,
-                Spoof = 1,
-                Jammer = 1,
-            }
-            self:EnableUnitIntel(nil)
-            return true
-        end
-        return false
-    end,
+    --
+    -- There are several ways to disable a unit's intel: The intel actually being part of an upgrade
+    -- (enhancement) that is not present, the intel requiring energy and energy being stalled, etc.
+    -- The intel is turned on using the EnableIntel engine call if all disablers are removed.
+    -- As an optimisation, EnableIntel and DisableIntel are only called when going from one disabler
+    -- present to zero, and when going from zero disablers to one.
 
-    DisableUnitIntel = function(self, intel)
-        local intDisabled = false
-        if not self.IntelDisables then return end
-        if intel then
-            self.IntelDisables[intel] = self.IntelDisables[intel] + 1
-            if self.IntelDisables[intel] == 1 then
+    DisableUnitIntel = function(self, disabler, intel)
+        local function DisableOneIntel(disabler, intel)
+            local intDisabled = false
+            if Set.Empty(self.IntelDisables[intel]) then
                 self:DisableIntel(intel)
                 intDisabled = true
             end
+            self.IntelDisables[intel][disabler] = true
+            return intDisabled
+        end
+    
+        local intDisabled = false
+        
+        -- We need this guard because the engine emits an early OnLayerChange event that would screw us up here with certain units that have Intel changes on layer change 
+        -- The NotInitialized disabler is removed in OnStopBeingBuilt, when the Unit's intel engine state is properly initialized.
+        if self.IntelDisables['Radar']['NotInitialized'] then
+            return
+        end
+
+        if intel then
+            intDisabled = DisableOneIntel(disabler, intel)
         else
-            for k, v in self.IntelDisables do
-                self.IntelDisables[k] = v + 1
-                if self.IntelDisables[k] == 1 then
-                    self:DisableIntel(k)
-                    intDisabled = true
-                end
+            -- Loop over all intels and add disabler
+            for intel, v in self.IntelDisables do
+                intDisabled = DisableOneIntel(disabler, intel) or intDisabled -- beware of short-circuiting
             end
         end
         if intDisabled then
-            self:OnIntelDisabled()
+            self:OnIntelDisabled(disabler, intel)
         end
     end,
 
-    EnableUnitIntel = function(self, intel)
-        local layer = self:GetCurrentLayer()
-        local bp = self:GetBlueprint()
-        local intEnabled = false
-        if layer == 'Seabed' or layer == 'Sub' or layer == 'Water' then
-            self:EnableIntel('WaterVision')
-        end
-        if intel then
-            if self.IntelDisables[intel] == 1 then
-                self:EnableIntel(intel)
-                intEnabled = true
-            end
-            self.IntelDisables[intel] = self.IntelDisables[intel] - 1
-        else
-            for k, v in self.IntelDisables do
-                if v == 1 then
-                    self:EnableIntel(k)
-                    if self:IsIntelEnabled(k) then
-                        intEnabled = true
-                    end
+    EnableUnitIntel = function(self, disabler, intel)
+        local function EnableOneIntel(disabler, intel)
+            local intEnabled = false
+            if self.IntelDisables[intel][disabler] then -- must check for explicit true contained
+                self.IntelDisables[intel][disabler] = nil
+                if Set.Empty(self.IntelDisables[intel]) then
+                    self:EnableIntel(intel)
+                    intEnabled = true
                 end
-                self.IntelDisables[k] = v - 1
+            end
+            return intEnabled
+        end
+    
+        local intEnabled = false
+        
+        -- We need this guard because the engine emits an early OnLayerChange event that would screw us up here.
+        -- The NotInitialized disabler is removed in OnStopBeingBuilt, when the Unit's intel engine state is properly initialized.
+        if self.IntelDisables['Radar']['NotInitialized'] == true and disabler ~= 'NotInitialized' then
+            SPEW('Leaving EnableUnitIntel because NotInitialized. This should only happen once per unit spawned.')
+            return
+        end
+
+        if intel then
+            intEnabled = EnableOneIntel(disabler, intel)
+        else
+            -- Loop over all intels and remove disabler
+            for intel, v in self.IntelDisables do
+                intEnabled = EnableOneIntel(disabler, intel) or intEnabled -- beware of short-circuiting
             end
         end
 
@@ -2332,9 +2344,9 @@ Unit = Class(moho.unit_methods) {
         while self:ShouldWatchIntel() do
             WaitSeconds(0.5)
             if aiBrain:GetEconomyStored( 'ENERGY' ) < 1 then  --Checking for less than 1 because sometimes there's more
-                self:DisableUnitIntel(nil)                    --than 0 and less than 1 in stock and that last bit of
+                self:DisableUnitIntel('Energy', nil)          --than 0 and less than 1 in stock and that last bit of
                 WaitSeconds(recharge)                         --energy isn't used. This results in the radar being
-                self:EnableUnitIntel(nil)                     --on even though there's no energy to run it. Shields
+                self:EnableUnitIntel('Energy', nil)                     --on even though there's no energy to run it. Shields
             end                                               --have a similar bug with a similar fix. Brute51
         end
         if self.IntelThread then
