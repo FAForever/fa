@@ -73,3 +73,13 @@ function PredicateFilter(A, p)
 
     return s
 end
+
+--- Returns true iff A is the empty set
+function Empty(A)
+  for k, v in A do
+    if v then
+        return false
+    end
+  end
+  return true
+end
