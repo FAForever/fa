@@ -36,14 +36,6 @@ URS0201 = Class(CSeaUnit) {
         -- self:HideBone('Turret_Mount_Back', true)
     end,
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        CSeaUnit.OnStopBeingBuilt(self,builder,layer)
-        -- If created with F2 on land, then play the transform anim.
-        if(self:GetCurrentLayer() == 'Land') then
-            self.AT1 = self:ForkThread(self.TransformThread, true)
-        end
-    end,
-
     OnMotionHorzEventChange = function(self, new, old)
         CSeaUnit.OnMotionHorzEventChange(self, new, old)
         if self.Dead then return end
@@ -65,17 +57,24 @@ URS0201 = Class(CSeaUnit) {
 
     OnLayerChange = function(self, new, old)
         CSeaUnit.OnLayerChange(self, new, old)
-        if( old != 'None' ) then
+
+         local bp = self:GetBlueprint()
+        -- Enable sonar on water only, apply speed multiplier on land
+        if new == 'Land' then
+            self:DisableUnitIntel('Layer', 'Sonar')
+            self:SetSpeedMult(bp.Physics.LandSpeedMultiplier)
+        elseif new == 'Water' then
+            self:EnableUnitIntel('Layer', 'Sonar')
+            self:SetSpeedMult(1)
+        end
+
+        -- Can only be built in water so transformthread only needs to be run
+        -- when actually changing layer or when spawned on land
+        if old != 'None' or new == 'Land' then
             if( self.AT1 ) then
                 self.AT1:Destroy()
-                self.AT1 = nil
             end
-            local myBlueprint = self:GetBlueprint()
-            if( new == 'Land' ) then
-                self.AT1 = self:ForkThread(self.TransformThread, true)
-            elseif( new == 'Water' ) then
-                self.AT1 = self:ForkThread(self.TransformThread, false)
-            end
+            self.AT1 = self:ForkThread(self.TransformThread, (new == 'Land'))
         end
     end,
 
@@ -87,9 +86,6 @@ URS0201 = Class(CSeaUnit) {
         local scale = bp.Display.UniformScale or 1
 
         if( land ) then
-            self:DisableUnitIntel('Sonar')
-            -- Change movement speed to the multiplier in blueprint
-            self:SetSpeedMult(bp.Physics.LandSpeedMultiplier)
             self:SetImmobile(true)
             self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationTransform)
             self.AnimManip:SetRate(2)
@@ -102,10 +98,7 @@ URS0201 = Class(CSeaUnit) {
             self.Walking = true
             self.Trash:Add(self.AnimManip)
         else
-            self:EnableUnitIntel('Sonar')
             self:SetImmobile(true)
-            -- Revert speed to maximum speed
-            self:SetSpeedMult(1)
             self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationTransform)
             self.AnimManip:SetAnimationFraction(1)
             self.AnimManip:SetRate(-2)

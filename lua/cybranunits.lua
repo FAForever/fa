@@ -106,15 +106,14 @@ CConstructionUnit = Class(ConstructionUnit){
 
     OnLayerChange = function(self, new, old)
         ConstructionUnit.OnLayerChange(self, new, old)
+
         if self:GetBlueprint().Display.AnimationWater then
             if self.TerrainLayerTransitionThread then
                 self.TerrainLayerTransitionThread:Destroy()
                 self.TerrainLayerTransitionThread = nil
             end
-            if (new == 'Land') and (old ~= 'None') then
-                self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, false)
-            elseif (new == 'Water') then
-                self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, true)
+            if (old ~= 'None') then
+                self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, (new == 'Water'))
             end
         end
     end,

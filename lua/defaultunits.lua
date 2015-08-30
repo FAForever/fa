@@ -1428,6 +1428,14 @@ MobileUnit = Class(Unit) {
     CreateCaptureEffects = function( self, target )
         EffectUtil.PlayCaptureEffects( self, target, self:GetBlueprint().General.BuildBones.BuildEffectBones or {0,}, self.CaptureEffectsBag )
     end,
+
+    -- Units with layer change effects (amphibious units like Megalith) need
+    -- those changes applied when build ends, so we need to trigger the
+    -- layer change event
+    OnStopBeingBuilt = function(self,builder,layer)
+       Unit.OnStopBeingBuilt(self,builder,layer)
+       self:OnLayerChange(layer, 'None')
+    end,
 }
 
 --------------------------------------------------------------
