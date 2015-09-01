@@ -2009,7 +2009,13 @@ ACUUnit = Class(CommandUnit) {
             end
 			--if we are teamkilled
 			if IsAlly(self:GetArmy(), instigator:GetArmy()) then
-				import('ui/dialogs/teamkill.lua').CreateDialog(GetGameTimeSeconds())
+				WARN('Teamkill detected')
+				if not Sync.Teamkill then 
+					Sync.Teamkill = {} 
+				end
+				table.insert(Sync.Teamkill, GetGameTimeSeconds())
+				table.insert(Sync.Teamkill, instigator:GetArmy())
+				table.insert(Sync.Teamkill, self:GetArmy())
 			end
         end
 

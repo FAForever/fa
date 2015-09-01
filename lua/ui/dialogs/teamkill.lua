@@ -13,15 +13,16 @@ local TextArea = import('/lua/ui/controls/textarea.lua').TextArea
 local dialog = false
 local shouldReport = false
 
-function CreateDialog(killTime, myFrame)
-    WARN("Teamkill at tick " .. killTime)
+function CreateDialog(teamkillTable)
+	local killTime = teamkillTable[1]
+    WARN("Teamkill at tick" .. killTime)
     if dialog then
         return
     end
 	
-    local dialogContent = Group(myFrame)
+    local dialogContent = Group(GetFrame(0))
     dialogContent.Width:Set(600)
-    dialogContent.Height:Set(600)
+    dialogContent.Height:Set(200)
 
     dialog = Popup(GetFrame(0), dialogContent)
 
@@ -29,18 +30,18 @@ function CreateDialog(killTime, myFrame)
     LayoutHelpers.AtTopIn(title, dialogContent, 5)
     LayoutHelpers.AtHorizontalCenterIn(title, dialogContent)
 
-    local infoText0 = TextArea(dialogContent, 590, 80)
-    infoText:SetText(LOC("<LOC teamkill_0002>You have been killed by friendly fire. The deliberate killing"))
+    local infoText0 = TextArea(dialogContent, 590, 20)
+    infoText0:SetText(LOC("<LOC teamkill_0002>You have been killed by friendly fire. The deliberate killing"))
     LayoutHelpers.Below(infoText0, title)
     LayoutHelpers.AtLeftIn(infoText0, dialogContent, 5)
 	
-	local infoText1 = TextArea(dialogContent, 590, 80)
-    infoText:SetText(LOC("<LOC teamkill_0003> of team-mates is against FAF rules. If you feel your death"))
+	local infoText1 = TextArea(dialogContent, 590, 20)
+    infoText1:SetText(LOC("<LOC teamkill_0003> of team-mates is against FAF rules. If you feel your death"))
     LayoutHelpers.Below(infoText1, infoText0)
     LayoutHelpers.AtLeftIn(infoText1, dialogContent, 5)
 	
-	local infoText2 = TextArea(dialogContent, 590, 80)
-    infoText:SetText(LOC("<LOC teamkill_0004>was deliberate or unsportsmanlike, check the box below."))
+	local infoText2 = TextArea(dialogContent, 590, 20)
+    infoText2:SetText(LOC("<LOC teamkill_0004>was deliberate or unsportsmanlike, check the box below."))
     LayoutHelpers.Below(infoText2, infoText1)
     LayoutHelpers.AtLeftIn(infoText2, dialogContent, 5)
 
@@ -61,11 +62,13 @@ function CreateDialog(killTime, myFrame)
         if reportToMod:IsChecked() then
 			local armiesInfo = GetArmiesTable()
 			local focusArmy = armiesInfo.focusArmy
-			local currentPlayerName = armiesInfo.armiesTable[focusArmy].nickname
+			local victimName = armiesInfo.armiesTable[teamkillTable[3]].nickname
+			local killerName = armiesInfo.armiesTable[teamkillTable[2]].nickname
 			--this all won't work yet, need to figure out how to get player name etc.
-			WARN("Was teamkilled: " .. currentPlayerName)
+			WARN("Was teamkilled: " .. victimName)
 			WARN("At time: " .. killTime)
-			GpgNetSend('Teamkill Warning', string.format(" %s was teamkilled at time %d", currentPlayerName, killTime ))
+			WARN("Killed by: " .. killerName)
+			GpgNetSend('Teamkill Warning', string.format(" %s was teamkilled at time %d by %s", victimName, teamkillTable[1], killerName ))
 		end
     end
 end
