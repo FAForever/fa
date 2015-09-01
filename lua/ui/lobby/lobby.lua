@@ -205,15 +205,14 @@ function SetWindowedLobby(windowed)
 end
 
 -- String from which to build the various "Move player to slot" labels.
--- TODO: This probably needs localising.
 local slotMenuStrings = {
     open = "<LOC lobui_0219>Open",
     close = "<LOC lobui_0220>Close",
     closed = "<LOC lobui_0221>Closed",
     occupy = "<LOC lobui_0222>Occupy",
     pm = "<LOC lobui_0223>Private Message",
-    remove_to_kik = "Remove Player",
-    remove_to_observer = "Move Player to Observer",
+    remove_to_kik = "<LOC lobui_0428>Remove Player",
+    remove_to_observer = "<LOC lobui_0429>Move Player to Observer",
 }
 local slotMenuData = {
     open = {
@@ -732,7 +731,7 @@ function SetSlotInfo(slotNum, playerInfo)
     --- Returns true if the team selector for this slot should be enabled.
     --
     -- The predicate was getting unpleasantly long to read.
-    function teamSelectionEnabled(autoTeams, ready, locallyOwned, isHost)
+    local function teamSelectionEnabled(autoTeams, ready, locallyOwned, isHost)
         if isHost and not playerInfo.Human then
             return true
         end
@@ -747,9 +746,10 @@ function SetSlotInfo(slotNum, playerInfo)
             return not ready
         end
 
-        -- The host can control that of others. TODO: Prevent him from doing this while ready
-        -- himself. We need some sort of sane state-of-self tracking for this...
-        return isHost
+        if isHost then
+            -- The host can control the team of others, provided he's not ready himself.
+            return not gameInfo.PlayerOptions[FindSlotForID(localPlayerID)].Ready
+        end
     end
 
     -- Disable team selection if "auto teams" is controlling it. Moderatelty ick.
@@ -804,7 +804,7 @@ function SetSlotInfo(slotNum, playerInfo)
     slot.numGamesText:SetText(playerInfo.NG)
 
     slot.name:Show()
-    -- Color the Name in Slot by State
+    -- Change name colour according to the state of the slot.
     if slotState == 'ai' then
         slot.name:SetTitleTextColor("dbdbb9") -- Beige Color for AI
         slot.name._text:SetFont('Arial Gras', 12)
@@ -822,7 +822,6 @@ function SetSlotInfo(slotNum, playerInfo)
         slot.name._text:SetFont('Arial Gras', 12)
     end
 
-    --\\ Stop - Color the Name in Slot by State
     local playerName = playerInfo.PlayerName
     if wasConnected(playerInfo.OwnerID) or isLocallyOwned or not playerInfo.Human then
         slot.name:SetTitleText(GetPlayerDisplayName(playerInfo))
@@ -830,9 +829,9 @@ function SetSlotInfo(slotNum, playerInfo)
         if not table.find(ConnectionEstablished, playerName) then
             if playerInfo.Human and not isLocallyOwned then
                 if table.find(ConnectedWithProxy, playerInfo.OwnerID) then
-                    AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", playerName)..' (FAF Proxy)', "Engine0004")
+                    AddChatText(LOCF("<LOC Engine0032>Connected to %s via the FAF proxy", playerName))
                 else
-                    AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", playerName), "Engine0004")
+                    AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", playerName))
                 end
 
                 table.insert(ConnectionEstablished, playerName)
@@ -845,8 +844,7 @@ function SetSlotInfo(slotNum, playerInfo)
             end
         end
     else
-        -- TODO: Localise!
-        slot.name:SetTitleText('Connecting to ... ' .. playerName)
+        slot.name:SetTitleText(LOCF('<LOC Engine0005>Connecting to %s...', playerName))
         slot.name._text:SetFont('Arial Gras', 11)
     end
 
@@ -1163,6 +1161,21 @@ function autobalance_quality(players)
     end
 
     return quality
+end
+
+--- If the game is full, GPGNetSend about it so the client can do a fancy popup if it has focus.
+function PossiblyAnnounceGameFull()
+    -- Search for an empty non-closed slot.
+    for i = 1, numOpenSlots do
+        if not gameInfo.ClosedSlots[i] then
+            if not gameInfo.PlayerOptions[i] then
+                return
+            end
+        end
+    end
+
+    -- Game is full, let's tell the client.
+    GPGNetSend("GameFull")
 end
 
 --- Assign the "random" (really autobalanced) start positions.
@@ -1853,7 +1866,7 @@ function ShowGameQuality()
 
     if quality > 0 then
         gameInfo.GameOptions.Quality = quality
-        GUI.GameQualityLabel:StreamText(LOCF("<LOC lobui_0418>Game quality: %s%%", quality))
+        GUI.GameQualityLabel:StreamText(LOCF("<LOC lobui_0418>Game quality: %s%%", quality), 20)
     end
 end
 
@@ -2245,8 +2258,8 @@ function CreateUI(maxPlayers)
         return UIUtil.CreateText(GUI.panel, text, size, 'Arial Gras', true)
     end
 
-    -- Map Name Label TODO: Localise!
-    GUI.MapNameLabel = makeLabel("Loading...", 17)
+    -- Map name label
+    GUI.MapNameLabel = makeLabel(LOC("<LOC LOADING>Loading..."), 17)
     LayoutHelpers.AtRightTopIn(GUI.MapNameLabel, GUI.panel, 5, 45)
 
     -- Game Quality Label
@@ -2254,7 +2267,7 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtRightTopIn(GUI.GameQualityLabel, GUI.panel, 5, 64)
 
     -- Title Label
-    GUI.titleText = makeLabel("FAF Game Lobby", 17)
+    GUI.titleText = makeLabel(LOC("<LOC lobui_0427>FAF Game Lobby"), 17)
     LayoutHelpers.AtLeftTopIn(GUI.titleText, GUI.panel, 5, 20)
 
     -- Rule Label
@@ -2389,8 +2402,9 @@ function CreateUI(maxPlayers)
         Prefs.SetToCurrentProfile('LobbyHideDefaultOptions', tostring(checked))
     end
 
-    -- GAME OPTIONS // MODS MANAGER BUTTON --
-    if isHost then     -- GAME OPTION
+    -- A buton that, for the host, is "game options", but for everyone else shows a ready-only mod
+    -- manager.
+    if isHost then
         GUI.gameoptionsButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "<LOC _Options>")
         Tooltip.AddButtonTooltip(GUI.gameoptionsButton, 'lob_select_map')
         GUI.gameoptionsButton.OnClick = function(self)
@@ -2978,7 +2992,6 @@ function CreateUI(maxPlayers)
 
     if not singlePlayer then
         CreateCPUMetricUI()
-        ForkThread(function() UpdateBenchmark() end)
     end
 end
 
@@ -2992,7 +3005,7 @@ function RefreshOptionDisplayData(scenarioInfo)
     formattedOptions = {}
     nonDefaultFormattedOptions = {}
 
-    --// Check Mod active
+    -- Show a summary of the number of active mods.
     local modStr = false
     local modNum = table.getn(Mods.GetGameMods(gameInfo.GameMods)) or 0
     local modNumUI = table.getn(Mods.GetUiMods()) or 0
@@ -3030,7 +3043,6 @@ function RefreshOptionDisplayData(scenarioInfo)
         table.insert(formattedOptions, option)
         table.insert(nonDefaultFormattedOptions, option)
     end
-    --\\ Stop Check Mod active
 
     -- Update the unit restrictions display.
     if gameInfo.GameOptions.RestrictedCategories ~= nil then
@@ -3447,6 +3459,11 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             }
         )
 
+        -- Update, if needed, and broadcast, your CPU benchmark value.
+        if not singlePlayer then
+            ForkThread(function() UpdateBenchmark() end)
+        end
+
         local function KeepAliveThreadFunc()
             local threshold = LobbyComm.quietTimeout
             local active = true
@@ -3605,6 +3622,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
                 gameInfo.PlayerOptions[data.Slot] = PlayerData(data.Options)
                 PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
                 SetSlotInfo(data.Slot, gameInfo.PlayerOptions[data.Slot])
+                PossiblyAnnounceGameFull()
             elseif data.Type == 'SlotMove' then
                 gameInfo.PlayerOptions[data.OldSlot] = nil
                 gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
@@ -3798,6 +3816,10 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         )
 
         CreateUI(LobbyComm.maxPlayerSlots)
+        if not singlePlayer then
+            ForkThread(function() UpdateBenchmark() end)
+        end
+
         UpdateGame()
     end
 
@@ -5205,6 +5227,7 @@ function InitHostUtils()
             SetSlotInfo(newSlot, gameInfo.PlayerOptions[newSlot])
             -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
             AssignAutoTeams()
+            PossiblyAnnounceGameFull()
         end,
 
         --- Add an AI to the game in the given slot.

@@ -1436,7 +1436,6 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
     end
 
     if bp.Display.TeleportEffects.PlayChargeFxAtDestination ~= false then                     -- FX AT DESTINATION
-
         -- customized version of PlayUnitAmbientSound() from unit.lua to play sound at target destination
         local sound = 'TeleportChargingAtDestination'
         local sndEnt = false
@@ -1453,17 +1452,15 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
             unit.AmbientSounds[sound]:SetAmbientSound( bp.Audio[sound], nil )
         end
 
-
-        if faction == 'UEF' then                                                              -------- UEF --------
-
-            local mimic = CreateMimicEntityOfUnit(unit, TeleportDestination)
-            unit.Trash:Add(mimic)
-            unit.TeleportMimic = mimic
+        if faction == 'UEF' then
+            -- using a barebone entity to position effects, it is destroyed afterwards
+            local TeleportDestFxEntity = Entity()
+            Warp(TeleportDestFxEntity, TeleportDestination)
 
             unit.TeleportDestChargeBag = {}
             local templ = unit.TeleportChargeFxAtDestOverride or EffectTemplate.UEFTeleportCharge02
             for k, v in templ do
-                local fx = CreateEmitterAtEntity(mimic, army,v):OffsetEmitter(0, Yoffset, 0)
+                local fx = CreateEmitterAtEntity(TeleportDestFxEntity, army,v):OffsetEmitter(0, Yoffset, 0)
                 fx:ScaleEmitter(0.75)
                 fx:SetEmitterCurveParam('Y_POSITION_CURVE', 0, Yoffset * 2)  -- to make effects cover entire height of unit
                 fx:SetEmitterCurveParam('ROTATION_RATE_CURVE', 1, 0)  -- small initial rotation, will be faster as charging
@@ -1567,40 +1564,6 @@ function TeleportShowChargeUpFxAtUnit(unit, effectTemplate, EffectsBag)
         end
     end
     return emitters
-end
-
-function CreateMimicEntityOfUnit(unit, location)
-    -- Creates a unit that looks like the given unit at the given location
-    local bp = unit:GetBlueprint()
-    local army = unit:GetArmy()
-
-    if bp.Display.TeleportEffects.TeleportAvatarUnit then
-
-        local mimic = CreateUnitHPR( bp.Display.TeleportEffects.TeleportAvatarUnit, army, location[1], location[2], location[3], 0, 0, 0)
-        mimic:SetOrientation( unit:GetOrientation(), true )
-
-        if bp.Enhancements then  -- hide and show certain bones based on available enhancements
-            for k, enh in bp.Enhancements do
-                if enh.HideBones then
-                    for _, bone in enh.HideBones do
-                        mimic:HideBone(bone, true)
-                    end
-                end
-            end
-            for k, enh in bp.Enhancements do
-                if unit:HasEnhancement(k) and enh.ShowBones then
-                    for _, bone in enh.ShowBones do
-                        mimic:ShowBone(bone, true)
-                    end
-                end
-            end
-        end
-
-        return mimic
-    else
-        WARN('*DEBUG: CreateMimicEntityOfUnit(): no avatar unit specified for use during the UEF teleport effect')
-    end
-    return
 end
 
 function TeleportCreateCybranSphere(unit, location, initialScale)
@@ -1810,13 +1773,7 @@ function PlayTeleportInEffects(unit, EffectsBag)
                 unit.TeleportFx_IsInvisible = true
                 unit:HideBone(0, true)
 
-                WaitSeconds(0.2)
-
-                if unit.TeleportMimic then
-                    unit.TeleportMimic:Destroy()
-                end
-
-                WaitSeconds(0.1)
+                WaitSeconds(0.3)
 
                 unit:ShowBone(0, true)
                 unit:ShowEnhancementBones()
@@ -1964,9 +1921,6 @@ end
 
 function DestroyRemainingTeleportChargingEffects(unit, EffectsBag)
     -- called when we're done teleporting (because succesfull or cancelled)
-    if unit.TeleportMimic then
-        unit.TeleportMimic:Destroy()
-    end
     if unit.TeleportCybranSphere then
         unit.TeleportCybranSphere:Destroy()
     end

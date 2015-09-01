@@ -833,6 +833,10 @@ Tooltips = {
         title = "<LOC tooltipui0332>Game Options",
         description = "<LOC tooltipui0333>Choose a map to play on and adjust game settings",
     },
+    Lobby_Gen_GameSpeed = {
+        title = "<LOC gamesel_0014>Game Speed",
+        description = "<LOC tooltipui0360>Set how quickly the Game runs",
+    },
     lob_cybran = {
         title = "<LOC _Cybran>",
         description = ''

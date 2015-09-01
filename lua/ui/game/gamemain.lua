@@ -31,11 +31,9 @@ local isReplay = false
 
 local waitingDialog = false
 
--- variables for FAF
 local sendChat = import('/lua/ui/game/chat.lua').ReceiveChatFromSim
 local oldData = {}
 local lastObserving
--- end faf variables
 
 -- Hotbuild stuff
 modifiersKeys = {}
@@ -98,7 +96,6 @@ function SetLayout(layout)
     import('/lua/ui/game/helptext.lua').SetLayout()
     import('/lua/ui/game/score.lua').SetLayout()
     import('/lua/ui/game/economy.lua').SetLayout()
-    import('/lua/ui/game/score.lua').SetLayout()
     import('/lua/ui/game/tabs.lua').SetLayout()
     import('/lua/ui/game/controlgroups.lua').SetLayout()
     import('/lua/ui/game/chat.lua').SetLayout()
