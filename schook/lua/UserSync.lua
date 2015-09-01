@@ -258,4 +258,10 @@ OnSync = function()
     if Sync.ChangeCameraZoom != nil then
         import('/lua/ui/game/gamemain.lua').SimChangeCameraZoom(Sync.ChangeCameraZoom)
     end
+	
+	if Sync.Teamkill then
+		if(GetFocusArmy() == Sync.Teamkill[3]) then
+			import('/lua/ui/dialogs/teamkill.lua').CreateDialog(Sync.Teamkill)
+		end
+	end
 end
