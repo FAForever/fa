@@ -30,22 +30,12 @@ function CreateDialog(teamkillTable)
     LayoutHelpers.AtTopIn(title, dialogContent, 5)
     LayoutHelpers.AtHorizontalCenterIn(title, dialogContent)
 
-    local infoText0 = TextArea(dialogContent, 590, 20)
-    infoText0:SetText(LOC("<LOC teamkill_0002>You have been killed by friendly fire. The deliberate killing"))
-    LayoutHelpers.Below(infoText0, title)
-    LayoutHelpers.AtLeftIn(infoText0, dialogContent, 5)
-	
-    local infoText1 = TextArea(dialogContent, 590, 20)
-    infoText1:SetText(LOC("<LOC teamkill_0003> of team-mates is against FAF rules. If you feel your death"))
-    LayoutHelpers.Below(infoText1, infoText0)
-    LayoutHelpers.AtLeftIn(infoText1, dialogContent, 5)
-	
-    local infoText2 = TextArea(dialogContent, 590, 20)
-    infoText2:SetText(LOC("<LOC teamkill_0004>was deliberate or unsportsmanlike, check the box below."))
-    LayoutHelpers.Below(infoText2, infoText1)
-    LayoutHelpers.AtLeftIn(infoText2, dialogContent, 5)
+    local infoText = TextArea(dialogContent, 590, 100)
+    infoText:SetText(LOC("<LOC teamkill_0002>You have been killed by friendly fire. The deliberate killing of teammates is against FAF rules. If you feel your death was deliberate or unsportsmanlike, check the box below to report it."))
+    LayoutHelpers.Below(infoText, title)
+    LayoutHelpers.AtLeftIn(infoText, dialogContent, 5)
 
-    local reportToMod = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', "<LOC teamkill_0005>Report this to a mod", true, 11)
+    local reportToMod = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', "<LOC teamkill_0003>Report this to a mod", true, 11)
     LayoutHelpers.AtBottomIn(reportToMod, dialogContent, 15)
     LayoutHelpers.AtLeftIn(reportToMod, dialogContent, 5)
 
