@@ -297,7 +297,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
                 unit:DisableIntel('Radar')
             end
         elseif atype == 'OmniRadius' then
-            local val = BuffCalculate(unit, buffName, 'OmniRadius', unit:GetBlueprint().Intel.RadarRadius or 0)
+            local val = BuffCalculate(unit, buffName, 'OmniRadius', unit:GetBlueprint().Intel.OmniRadius or 0)
             if not unit:IsIntelEnabled('Omni') then
                 unit:InitIntel(unit:GetArmy(),'Omni', val)
                 unit:EnableIntel('Omni')
