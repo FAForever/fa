@@ -19,7 +19,11 @@ function CreateDialog(teamkillTable)
     if dialog then
        return
     end
-	
+
+    if SessionIsReplay() then
+        return
+    end
+
     local dialogContent = Group(GetFrame(0))
     dialogContent.Width:Set(360)
     dialogContent.Height:Set(180)
