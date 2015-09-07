@@ -2007,6 +2007,14 @@ ACUUnit = Class(CommandUnit) {
             if instigatorBrain and not instigatorBrain:IsDefeated() then
                 instigatorBrain:AddArmyStat("FAFWin", 1)
             end
+            --if we are teamkilled
+            if IsAlly(self:GetArmy(), instigator:GetArmy()) then
+                WARN('Teamkill detected')
+                Sync.Teamkill = { killTime = GetGameTimeSeconds(), instigator = instigator:GetArmy(), victim = self:GetArmy() }
+                WARN("Was teamkilled: army #" .. self:GetArmy())
+                WARN("At time: " .. GetGameTimeSeconds())
+                WARN("Killed by army #" .. instigator:GetArmy())
+            end
         end
 
         --Score change, we send the score of all players
