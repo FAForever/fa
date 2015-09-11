@@ -249,11 +249,38 @@ Unit = Class(moho.unit_methods) {
 
     -------------------------------------------------------------------------------------------
     -- TARGET AND ATTACKERS FUNCTIONS
-    ------------------------------------------------------------------------------------------
+    -------------------------------------------------------------------------------------------
+
     OnGotTarget = function(self, Weapon)
     end,
 
     OnLostTarget = function(self, Weapon)
+    end,
+
+    --Add a target to the weapon list for this unit
+    addTargetWeapon = function(self, target)
+        if not target.Dead then
+            table.insert(self.WeaponTargets, target)
+        end
+    end,
+
+    --Add a target to the list for this unit
+    addTarget = function(self, target)
+        if not target.Dead then
+            table.insert(self.Targets, target)
+        end
+
+        local ids = {}
+        for _, t in self.Targets do
+            table.insert(ids, ParseEntityCategory(t:GetUnitId()))
+        end
+
+        self:SetTargetPriorities(ids, true)
+    end,
+
+    --Remove all the targets for this unit
+    clearTargets = function(self)
+        self.Targets = {}
     end,
 
     -------------------------------------------------------------------------------------------
@@ -317,10 +344,21 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    SetTargetPriorities = function(self, priTable)
+    SetTargetPriorities = function(self, priTable, append_default)
         for i = 1, self:GetWeaponCount() do
             local wep = self:GetWeapon(i)
-            wep:SetWeaponPriorities(priTable)
+            local prios = priTable
+
+            if append_default then
+                local default = wep:GetDefaultPriorities()
+                prios = table.deepcopy(prios)
+
+                for _, p in default do
+                    table.insert(prios, p)
+                end
+            end
+
+            wep:SetWeaponPriorities(prios)
         end
     end,
 
