@@ -832,10 +832,10 @@ AIBrain = Class(moho.aibrain_methods) {
         if self.BuilderManagers then
             self.ConditionsMonitor:Destroy()
             for k,v in self.BuilderManagers do
-		--DUNCAN - added setenabled's to false
-		v.EngineerManager:SetEnabled(false)
-		v.FactoryManager:SetEnabled(false)
-		v.PlatoonFormManager:SetEnabled(false)
+        --DUNCAN - added setenabled's to false
+        v.EngineerManager:SetEnabled(false)
+        v.FactoryManager:SetEnabled(false)
+        v.PlatoonFormManager:SetEnabled(false)
                 v.FactoryManager:Destroy()
                 v.PlatoonFormManager:Destroy()
                 v.EngineerManager:Destroy()
@@ -1229,7 +1229,7 @@ AIBrain = Class(moho.aibrain_methods) {
         self.NumBases = 1
 
         self.BuilderManagers = {}
-    SUtils.AddCustomUnitSupport(self)
+        SUtils.AddCustomUnitSupport(self)
 
         self:AddBuilderManagers(self:GetStartVector3f(), 100, 'MAIN', false)
 
@@ -1296,18 +1296,18 @@ AIBrain = Class(moho.aibrain_methods) {
             local changed = false
             for k,v in self.BuilderManagers do
                 if k ~= 'MAIN' and v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) <= 0 and v.FactoryManager:GetNumCategoryFactories(categories.ALLUNITS) <= 0 then
-            			if v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) <= 0 then
-            	                    v.EngineerManager:SetEnabled(false)
-            	                    v.FactoryManager:SetEnabled(false)
-            	                    v.PlatoonFormManager:SetEnabled(false)
-            	                    v.StrategyManager:SetEnabled(false)
-            	                    v.FactoryManager:Destroy()
-            	                    v.PlatoonFormManager:Destroy()
-            	                    v.EngineerManager:Destroy()
-            	                    v.StrategyManager:Destroy()
-            	                    self.BuilderManagers[k] = nil
-            	                    self.NumBases = self.NumBases - 1
-            	                    changed = true
+                        if v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) <= 0 then
+                                    v.EngineerManager:SetEnabled(false)
+                                    v.FactoryManager:SetEnabled(false)
+                                    v.PlatoonFormManager:SetEnabled(false)
+                                    v.StrategyManager:SetEnabled(false)
+                                    v.FactoryManager:Destroy()
+                                    v.PlatoonFormManager:Destroy()
+                                    v.EngineerManager:Destroy()
+                                    v.StrategyManager:Destroy()
+                                    self.BuilderManagers[k] = nil
+                                    self.NumBases = self.NumBases - 1
+                                    changed = true
                   end
                 end
             end
