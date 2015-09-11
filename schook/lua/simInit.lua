@@ -1,6 +1,6 @@
-#===================================================================================
-# Do global init and set up common global functions
-#===================================================================================
+--===================================================================================
+-- Do global init and set up common global functions
+--===================================================================================
 doscript '/lua/SimSync.lua'
 
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
@@ -37,7 +37,7 @@ function OnPostLoad()
     import('/lua/SimPingGroup.lua').OnPostLoad()
     import('/lua/SimDialogue.lua').OnPostLoad()
     import('/lua/SimSync.lua').OnPostLoad()
-    if GetFocusArmy() != -1 then
+    if GetFocusArmy() ~= -1 then
         Sync.SetAlliedVictory = ArmyBrains[GetFocusArmy()].RequestingAlliedVictory or false
     end
 end
