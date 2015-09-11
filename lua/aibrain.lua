@@ -38,34 +38,13 @@ local CalculateBrainScore = import('/lua/score.lua').CalculateBrainScore
 
 local observer = false
 
-----end sorian ai imports
-
-------------------------------------------------------------------------------------------
------------- VO Timeout and Replay Durations ------------
-------------------------------------------------------------------------------------------
-local VOReplayTime = {
-    OnTransportFull = 1,
-    OnUnitCapLimitReached = 60,
-    OnFailedUnitTransfer = 10,
-    OnPlayNoStagingPlatformsVO = 5,
-    OnPlayBusyStagingPlatformsVO = 5,
-    OnCommanderUnderAttackVO = 15,
-    ExperimentalDetected = 60,
-    FerryPointSet = 5,
-    CoordinatedAttackInitiated = 5,
-    NuclearLaunchDetected = 1,
-}
-
 AIBrain = Class(moho.aibrain_methods) {
-
-
    ------------------------------------------------------
    ----------- HUMAN BRAIN FUNCTIONS HANDLED HERE  ------
    ------------------------------------------------------
     OnCreateHuman = function(self, planName)
         self:CreateBrainShared(planName)
         self:InitializeEconomyState()
-        self:InitializeVO()
         self.BrainType = 'Human'
     end,
 
@@ -150,6 +129,7 @@ AIBrain = Class(moho.aibrain_methods) {
         self.VeterancyTriggerList = {}
         self.PingCallbackList = {}
         self.UnitBuiltTriggerList = {}
+        self.VOTable = {}
 
         -- issue:--43 : Better stealth
         self.UnitIntelList = {}
@@ -772,115 +752,88 @@ AIBrain = Class(moho.aibrain_methods) {
     ------------------------------------------------------------------------------------------------------------------------------------
     ---- ---------- System for playing VOs to the Player ------------ ----
     ------------------------------------------------------------------------------------------------------------------------------------
-    InitializeVO = function(self)
-        if not self.VOTable then
-            self.VOTable = {
-            }
-        end
-    end,
+    VOSounds = {
+        -- {timeout delay, default cue}
+        NuclearLaunchDetected = {1, nil},
+        OnTransportFull = {1, nil},
+        OnFailedUnitTransfer = {10, 'Computer_Computer_CommandCap_01298'},
+        OnPlayNoStagingPlatformsVO = {5, 'XGG_Computer_CV01_04756'},
+        OnPlayBusyStagingPlatformsVO = {5, 'XGG_Computer_CV01_04755'},
+        OnPlayCommanderUnderAttackVO = {15, 'Computer_Computer_Commanders_01314'},
+    },
 
-    PlayVOSound = function(self, sound, string)
-        local cue,bank = GetCueBank(sound)
+
+    PlayVOSound = function(self, string, sound)
+        if not self.VOTable then self.VOTable = {} end
+
+        if GetFocusArmy() ~= self:GetArmyIndex() or self.VOTable[string] then
+            return
+        end
+
+        local VO = self.VOSounds[string]
+        if not VO then
+            WARN('PlayVOSound: ' .. string .. " not found")
+            return
+        end
+
+        local cue, bank
+        if sound then
+            cue, bank = GetCueBank(sound)
+        else
+            cue, bank = VO[2], 'XGG'
+        end
+
+        if not (bank and cue) then
+            WARN('PlayVOSound: No valid bank/cue for ' .. string)
+            return
+        end
+
+        self.VOTable[string] = true
         table.insert(Sync.Voice, {Cue=cue, Bank=bank} )
-        local time = VOReplayTime[string]
-        WaitSeconds(time)
-        self.VOTable[string] = nil
+
+        local timeout = VO[1]
+        ForkThread(function()
+            WaitSeconds(timeout)
+            self.VOTable[string] = nil
+        end)
     end,
 
     OnTransportFull = function(self)
-        if GetFocusArmy() == self:GetArmyIndex() then
-            local warningVoice
-            if EntityCategoryContains(categories.uaa0310, self.loadingTransport) then
-                -- "CZAR FULL"
-                warningVoice = Sound {
-                    Bank = 'XGG',
-                    Cue = 'XGG_Computer_CV01_04753',
-                }
-            elseif EntityCategoryContains(categories.NAVALCARRIER, self.loadingTransport) then
-                -- "Aircraft Carrier Full"
-                warningVoice = Sound {
-                    Bank = 'XGG',
-                    Cue = 'XGG_Computer_CV01_04751',
-                }
-            else
-                -- "Transport is full"
-                warningVoice = Sound {
-                    Bank = 'XGG',
-                    Cue = 'Computer_TransportIsFull',
-                }
-            end
-
-            if self.VOTable and not self.VOTable['OnTransportFull'] then
-                self.VOTable['OnTransportFull'] = ForkThread(self.PlayVOSound, self, warningVoice, 'OnTransportFull')
-            end
+        local cue
+        
+        if EntityCategoryContains(categories.uaa0310, self.loadingTransport) then
+            -- "CZAR FULL"
+            cue = 'XGG_Computer_CV01_04753'
+        elseif EntityCategoryContains(categories.NAVALCARRIER, self.loadingTransport) then
+            -- "Aircraft Carrier Full"
+            cue = 'XGG_Computer_CV01_04751'
+        else
+            cue = 'Computer_TransportIsFull'
         end
+
+        self:PlayVOSound('OnTransportFull', Sound {Bank='XGG', Cue=cue})
     end,
 
     OnUnitCapLimitReached = function(self) end,
 
     OnFailedUnitTransfer = function(self)
-
-        if GetFocusArmy() == self:GetArmyIndex() then
-
-            local warningVoice = Sound {
-                    Bank = 'XGG',
-                    Cue = 'Computer_Computer_CommandCap_01298',
-                }
-
-            if self.VOTable and not self.VOTable['OnFailedUnitTransfer'] then
-                self.VOTable['OnFailedUnitTransfer'] = ForkThread(self.PlayVOSound, self, warningVoice, 'OnFailedUnitTransfer')
-            end
-
-        end
+        self:PlayVOSound('OnFailedUnitTransfer')
     end,
 
     OnPlayNoStagingPlatformsVO = function(self)
-
-        if GetFocusArmy() == self:GetArmyIndex() then
-
-            local Voice = Sound {
-                Bank = 'XGG',
-                Cue = 'XGG_Computer_CV01_04756',
-            }
-
-            if self.VOTable and not self.VOTable['OnPlayNoStagingPlatformsVO'] then
-                self.VOTable['OnPlayNoStagingPlatformsVO'] = ForkThread(self.PlayVOSound, self, Voice, 'OnPlayNoStagingPlatformsVO')
-            end
-        end
+        self:PlayVOSound('OnPlayNoStagingPlatformsVO')
     end,
 
     OnPlayBusyStagingPlatformsVO = function(self)
-
-        if GetFocusArmy() == self:GetArmyIndex() then
-
-            local Voice = Sound {
-                Bank = 'XGG',
-                Cue = 'XGG_Computer_CV01_04755',
-            }
-
-            if self.VOTable and not self.VOTable['OnPlayBusyStagingPlatformsVO'] then
-                self.VOTable['OnPlayBusyStagingPlatformsVO'] = ForkThread(self.PlayVOSound, self, Voice, 'OnPlayBusyStagingPlatformsVO')
-            end
-        end
+        self:PlayVOSound('OnPlayBusyStagingPlatformsVO')
     end,
 
     OnPlayCommanderUnderAttackVO = function(self)
-        if GetFocusArmy() == self:GetArmyIndex() then
-            local Voice = Sound {
-                Bank = 'XGG',
-                Cue = 'Computer_Computer_Commanders_01314',
-            }
-
-            if self.VOTable and not self.VOTable['OnCommanderUnderAttackVO'] then
-                self.VOTable['OnCommanderUnderAttackVO'] = ForkThread(self.PlayVOSound, self, Voice, 'OnCommanderUnderAttackVO')
-            end
-        end
+        self:PlayVOSound('OnPlayCommanderUnderAttackVO')
     end,
 
-    NuclearLaunchDetected = function(self,sound)
-        if self.VOTable and not self.VOTable['NuclearLaunchDetected'] then
-            self.VOTable['NuclearLaunchDetected'] = ForkThread(self.PlayVOSound, self, sound, 'NuclearLaunchDetected')
-        end
+    NuclearLaunchDetected = function(self, sound)
+        self:PlayVOSound('NuclearLaunchDetected', sound)
     end,
 
     ------------------------------------------------------------------
