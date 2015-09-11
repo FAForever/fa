@@ -19,11 +19,9 @@ function BeginSession()
 
     baseBeginSession()
 
-    #start the runtime score loop
-    ForkThread(import('/lua/aibrain.lua').CollectCurrentScores)    
-    ForkThread(import('/lua/aibrain.lua').SyncCurrentScores)
-
-    #start watching for victory conditions
+    import('/lua/score.lua').init()
+    
+    --start watching for victory conditions
     ForkThread(import('/lua/victory.lua').CheckVictory, ScenarioInfo)
 end
 
