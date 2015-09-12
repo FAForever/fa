@@ -1702,7 +1702,9 @@ AirUnit = Class(MobileUnit) {
 
         for i, numWeapons in bp.Weapon do
             if(bp.Weapon[i].Label == 'DeathImpact') then
-                DamageArea(self, self:GetPosition(), bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
+                args = table.deepcopy(bp.Weapon[i])
+                args.Instigator = self
+                import('/lua/sim/defaultdamage.lua').AreaDamage(args)
                 break
             end
         end
@@ -1738,6 +1740,9 @@ AirUnit = Class(MobileUnit) {
             self:PlayUnitSound('Killed')
             self:DoUnitCallbacks('OnKilled')
             self:DisableShield()
+            if self.DeathWeaponEnabled ~= false then
+                self:DoDeathWeapon()
+            end
             if instigator and IsUnit(instigator) then
                 instigator:OnKilledUnit(self)
             end

@@ -1279,17 +1279,103 @@ Unit = Class(moho.unit_methods) {
     DoDeathWeapon = function(self)
         if self:IsBeingBuilt() then return end
         local bp = self:GetBlueprint()
-        for k, v in bp.Weapon do
-            if(v.Label == 'DeathWeapon') then
-                if v.FireOnDeath == true then
+        for _, w in bp.Weapon do
+            if w.Label == 'DeathWeapon' then
+                if w.FireOnDeath == true and not w.Delay then
                     self:SetWeaponEnabledByLabel('DeathWeapon', true)
                     self:GetWeaponByLabel('DeathWeapon'):Fire()
                 else
-                    self:ForkThread(self.DeathWeaponDamageThread, v.DamageRadius, v.Damage, v.DamageType, v.DamageFriendly)
+                    self:ForkThread(self.DeathWeaponDamageThread, w)
                 end
                 break
             end
         end
+    end,
+
+    DoDeathDamage = function(self, bone, data)
+        local scale = data.scale
+        local args = table.deepcopy(data)
+
+        args.Instigator = self
+
+        explosion.CreateDebrisProjectiles(self, scale, {self:GetUnitSizes()})
+        if bone then
+            args.Position = self:GetPosition(bone)
+            args.Damage = data.BoneDamage or (data.Damage / data.numBones)
+            args.DamageRadius = data.BoneDamageRadius or data.DamageRadius
+        else
+            args.Position = nil
+            args.Damage = args.Damage - args.damageDealt
+        end
+
+        if args.Damage > 0 then
+            if bone then
+                explosion.CreateDefaultHitExplosionAtBone( self, bone, scale)
+            end
+            import('/lua/sim/defaultdamage.lua').AreaDamage(args)
+
+            data.damageDealt = data.damageDealt + args.Damage
+        end
+    end,
+
+    DeathWeaponDamageThread = function(self, weapon)
+        self.finalDeathWeapon = false
+
+        local data = table.deepcopy(weapon)
+        if weapon.Delay == 'Animation' and self.DeathAnimManip then
+            WaitFor(self.DeathAnimManip)
+        else
+            local delay = tonumber(weapon.Delay)
+
+            if delay > 0 then
+                WaitSeconds(delay)
+            end
+        end
+
+        data.Damage = weapon.Damage or 1
+        data.DamageRadius = weapon.DamageRadius or 1
+        data.DamageFriendly = weapon.DamageFriendly or false
+        data.damageDealt = 0
+        data.numBones = 0
+
+        local bones = weapon.BoneImpact
+        local numBones = 0
+        local pos = self:GetPosition()
+        local ground = GetTerrainHeight(pos[1], pos[3])
+
+        if bones then
+            -- support both array and single var
+            if type(bones) ~= 'table' then bones = {bones} end
+
+            bones = table.deepcopy(bones)
+            data.numBones = table.getsize(bones)
+        end
+
+        data.scale = explosion.GetAverageBoundingXYZRadius(self) / data.numBones
+
+        local doDamage = true
+
+        while bones and not self.finalDeathWeapon do
+            local bone = nil
+            local pos = self:GetPosition()
+
+            for i, b in bones do
+                local bpos = self:GetPosition(b)
+                if math.abs(bpos[2] - ground) < 0.5 then
+                    bone = b
+                    bones[i] = nil
+                end
+            end
+
+            if bone then
+                self:DoDeathDamage(bone, data)
+            else
+                WaitTicks(1)
+            end
+        end
+
+        -- deal rest of the death damage
+        self:DoDeathDamage(nil, data)
     end,
 
     OnCollisionCheck = function(self, other, firingWeapon)
@@ -1321,6 +1407,7 @@ Unit = Class(moho.unit_methods) {
                 end
             end
         end
+
         return true
     end,
 
@@ -1346,7 +1433,6 @@ Unit = Class(moho.unit_methods) {
                 end
             end
         end
-
         return true
     end,
 
@@ -1491,10 +1577,6 @@ Unit = Class(moho.unit_methods) {
         explosion.CreateScalableUnitExplosion( self, overKillRatio )
     end,
 
-    DeathWeaponDamageThread = function( self , damageRadius, damage, damageType, damageFriendly)
-        WaitSeconds( 0.1 )
-        DamageArea(self, self:GetPosition(), damageRadius or 1, damage or 1, damageType or 'Normal', damageFriendly or false)
-    end,
 
     SinkDestructionEffects = function(self)
         local Util = utilities
@@ -1512,7 +1594,7 @@ Unit = Class(moho.unit_methods) {
             local toSurface = surfaceHeight - boneHeight
             local y = toSurface
             local rx, ry, rz = self:GetRandomOffset(0.3)
-            local rs = math.max(math.min(2.5, vol / 20), 0.5)
+            local rs = math.max(math.min(4, vol / 20), 0.2)
             local scale = Util.GetRandomFloat(rs/2, rs)
 
             self:DestroyAllDamageEffects()
@@ -1631,6 +1713,7 @@ Unit = Class(moho.unit_methods) {
 
     --- Called at the end of the destruction thread: create the wreckage and Destroy this unit.
     DestroyUnit = function(self, overkillRatio)
+        self.finalDeathWeapon = true
         self:CreateWreckage(overkillRatio or self.overkillRatio)
 
         -- wait at least 1 tick before destroying unit
