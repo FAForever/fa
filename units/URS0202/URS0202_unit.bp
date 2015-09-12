@@ -2,7 +2,7 @@ UnitBlueprint {
     AI = {
         AttackAngle = 0,
         GuardReturnRadius = 130,
-        GuardScanRadius = 300,
+        StagingPlatformScanRadius = 300,
         RefuelingMultiplier = 50,
         RefuelingRepairAmount = 500,
         RepairConsumeEnergy = 5,
