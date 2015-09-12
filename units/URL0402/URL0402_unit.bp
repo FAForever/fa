@@ -777,8 +777,10 @@ UnitBlueprint {
             WeaponCategory = 'Anti Navy',
         },
         {
+            BoneImpact = {'Left_Leg01_B01', 'Right_Leg01_B01'},
             Damage = 4000,
             DamageFriendly = true,
+            DamageRadiusMax = 3,
             DamageRadius = 7,
             DamageType = 'Normal',
             DisplayName = 'Death Weapon',
