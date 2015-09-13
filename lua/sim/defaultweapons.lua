@@ -566,6 +566,12 @@ DefaultProjectileWeapon = Class(Weapon) {
             if bp.CountedProjectile == true  or bp.AnimationReload then
                 ChangeState(self, self.RackSalvoFiringState)
             end
+
+            -- To prevent weapon getting stuck targeting something out of fire range but withing tracking radius
+            WaitSeconds(5)
+
+            -- Check if there is a better target nearby
+            self:ResetTarget()
         end,
 
         OnFire = function(self)
