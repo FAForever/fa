@@ -50,6 +50,7 @@ UnitBlueprint {
         'MOBILE',
         'NAVAL',
         'TECH1',
+        'DIRECTFIRE',
         'ANTINAVY',
         'INTELLIGENCE',
         'RADAR',
