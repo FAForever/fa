@@ -105,6 +105,12 @@ UnitBlueprint {
             '<LOC ability_sonar>Sonar',
             '<LOC ability_submersible>Submersible',
         },
+        AnimationDeath = {
+            {
+                Animation = '/units/uas0304/uas0304_adeath01.sca',
+                Weight = 100,
+            }
+        },
         IdleEffects = {
             Sub = {
                 Effects = {

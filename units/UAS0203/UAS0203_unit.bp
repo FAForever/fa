@@ -103,6 +103,14 @@ UnitBlueprint {
             '<LOC ability_submersible>Submersible',
             '<LOC ability_torpedo>Torpedoes',
         },
+        AnimationDeath = {
+            {
+                Animation = '/units/uas0203/uas0203_ADeath01.sca',
+                AnimationRateMax = 0.5,
+                AnimationRateMin = 0.5,
+                Weight = 1,
+            },
+        },
         IdleEffects = {
             Sub = {
                 Effects = {

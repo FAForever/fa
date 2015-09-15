@@ -78,6 +78,12 @@ UnitBlueprint {
                 AnimationRateMin = 1,
                 Weight = 100,
             },
+            {
+                Animation = '/units/xsb0302/xsb0302_ADeathv1.sca',
+                AnimationRateMax = 1,
+                AnimationRateMin = 1,
+                Weight = 100,
+            },
         },
         BlinkingLights = {
             {
