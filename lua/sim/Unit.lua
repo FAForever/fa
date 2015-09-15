@@ -1566,6 +1566,8 @@ Unit = Class(moho.unit_methods) {
                 -- Wait for the sinking callback to actually destroy the unit.
                 return
             end
+        elseif self.DeathAnimManip then -- wait for non-sinking animations
+            WaitFor(self.DeathAnimManip)
         end
 
         -- If we're not doing fancy sinking rubbish, just blow the damn thing up.
