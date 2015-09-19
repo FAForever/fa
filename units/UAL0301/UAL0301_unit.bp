@@ -60,7 +60,7 @@ UnitBlueprint {
         },
         FootFallGenericSeabed = Sound {
             Bank = 'UAL',
-            Cue = 'UAL0301_Move_UW_Step',
+            Cue = 'UAL0001_Move_UW_Step',
             LodCutoff = 'UnitMove_LodCutoff',
         },
         Killed = Sound {
