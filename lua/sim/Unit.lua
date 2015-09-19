@@ -3164,38 +3164,44 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    PlayUnitSound = function(self, sound)
-        local bp = self:GetBlueprint().Audio
-        if bp and bp[sound] then
-            self:PlaySound(bp[sound])
-            return true
+    GetSoundEntity = function(self, type)
+        if not self.Sounds then self.Sounds = {} end
+        if not self.Sounds[type] then
+            local sndEnt = Entity()
+            self.Trash:Add(sndEnt)
+            Warp(sndEnt, self:GetPosition())
+            sndEnt:AttachTo(self,-1)
+            self.Sounds[type] = sndEnt
         end
-        return false
+
+        return self.Sounds[type]
+    end,
+
+    PlayUnitSound = function(self, sound)
+        local bp = self:GetBlueprint()
+        if not bp.Audio[sound] then return end
+        local entity = self:GetSoundEntity('UnitSound')
+        entity:PlaySound(bp.Audio[sound])
+        return true
     end,
 
     PlayUnitAmbientSound = function(self, sound)
         local bp = self:GetBlueprint()
-        local id = bp.BlueprintId
         if not bp.Audio[sound] then return end
-        if not self.AmbientSounds then
-            self.AmbientSounds = {}
-        end
-        if not self.AmbientSounds[sound] then
-            local sndEnt = Entity {}
-            self.AmbientSounds[sound] = sndEnt
-            self.Trash:Add(sndEnt)
-            sndEnt:AttachTo(self,-1)
-        end
-        self.AmbientSounds[sound]:SetAmbientSound( bp.Audio[sound], nil )
+        local entity = self:GetSoundEntity('Ambient' .. sound)
+        entity:SetAmbientSound(bp.Audio[sound], nil)
     end,
 
     StopUnitAmbientSound = function(self, sound)
-        local id = self:GetUnitId()
-        if not self.AmbientSounds then return end
-        if not self.AmbientSounds[sound] then return end
-        self.AmbientSounds[sound]:SetAmbientSound(nil, nil)
-        self.AmbientSounds[sound]:Destroy()
-        self.AmbientSounds[sound] = nil
+        local bp = self:GetBlueprint()
+        if not bp.Audio[sound] then return end
+        local type = 'Ambient' .. sound
+        local entity = self:GetSoundEntity(type)
+        if entity then
+            entity:SetAmbientSound(nil, nil)
+            entity:Destroy()
+            self.Sounds[type] = nil
+        end
     end,
 
     -------------------------------------------------------------------------------------------
