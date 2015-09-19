@@ -3632,48 +3632,22 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    OnStorageChange = function(self, loading)
+        self:MarkWeaponsOnTransport(self, loading)
+
+        if loading then self:HideBone(0, true)
+        else self:ShowBone(0, true) end
+        self:SetCanTakeDamage(not loading)
+        self:SetReclaimable(not loading)
+        self:SetCapturable(not loading)
+    end,
+
     OnAddToStorage = function(self, unit)
-        if EntityCategoryContains(categories.CARRIER, unit) then
-            self:MarkWeaponsOnTransport(self, true)
-            self:HideBone(0, true)
-            self:SetCanTakeDamage(false)
-            self:SetReclaimable(false)
-            self:SetCapturable(false)
-            if EntityCategoryContains(categories.TRANSPORTATION, self) then
-                local cargo = self:GetCargo()
-                if table.getn(cargo) > 0 then
-                    for k, v in cargo do
-                        v:MarkWeaponsOnTransport(self, true)
-                        v:HideBone(0, true)
-                        v:SetCanTakeDamage(false)
-                        v:SetReclaimable(false)
-                        v:SetCapturable(false)
-                    end
-                end
-            end
-        end
+        self:OnStorageChange(true)
     end,
 
     OnRemoveFromStorage = function(self, unit)
-        if EntityCategoryContains(categories.CARRIER, unit) then
-            self:SetCanTakeDamage(true)
-            self:SetReclaimable(true)
-            self:SetCapturable(true)
-            self:ShowBone(0, true)
-            self:MarkWeaponsOnTransport(self, false)
-            if EntityCategoryContains(categories.TRANSPORTATION, self) then
-                local cargo = self:GetCargo()
-                if table.getn(cargo) > 0 then
-                    for k, v in cargo do
-                        v:MarkWeaponsOnTransport(self, false)
-                        v:ShowBone(0, true)
-                        v:SetCanTakeDamage(true)
-                        v:SetReclaimable(true)
-                        v:SetCapturable(true)
-                    end
-                end
-            end
-        end
+        self:OnStorageChange(false)
     end,
 
     -- Animation when being dropped from a transport.
