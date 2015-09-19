@@ -9,9 +9,10 @@
 #****************************************************************************
 
 local TAirUnit = import('/lua/terranunits.lua').TAirUnit
+local AirTransport = import('/lua/defaultunits.lua').AirTransport
 local TDFRiotWeapon = import('/lua/terranweapons.lua').TDFRiotWeapon
 
-UEA0203 = Class(TAirUnit) {
+UEA0203 = Class(AirTransport, TAirUnit) {
     EngineRotateBones = {'Jet_Front', 'Jet_Back',},
 
     Weapons = {
@@ -37,34 +38,6 @@ UEA0203 = Class(TAirUnit) {
             self.Trash:Add(v)
         end
 
-    end,
-    
-    OnTransportAttach = function(self, attachBone, unit)
-        TAirUnit.OnTransportAttach(self, attachBone, unit)
-        if not self.AttachedUnits then
-            self.AttachedUnits = {}
-        end
-        table.insert( self.AttachedUnits, unit )
-    end,
-    
-    OnTransportDetach = function(self, attachBone, unit)
-        TAirUnit.OnTransportDetach( self, attachBone, unit )
-        if self.AttachedUnits then
-            for k,v in self.AttachedUnits do
-                if v == unit then
-                    self.AttachedUnits[k] = nil
-                    break
-                end                    
-            end
-        end
-    end,
-    
-    DestroyedOnTransport = function(self)
-        if self.AttachedUnits then
-            for k,v in self.AttachedUnits do
-                v:Destroy()
-            end
-        end
     end,
 }
 
