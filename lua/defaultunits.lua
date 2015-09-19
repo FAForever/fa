@@ -1686,6 +1686,11 @@ BaseTransport = Class() {
     DetachCargo = function(self)
         local units = self:GetCargo()
         for k, v in units do
+            if EntityCategoryContains(categories.TRANSPORTATION, v) then
+                for k, u in self:GetCargo() do
+                    u:Kill()
+                end
+            end
             v:DetachFrom()
         end
     end
@@ -1696,6 +1701,13 @@ AirTransport = Class(AirUnit, BaseTransport) {
     OnKilled = function(self, instigator, type, overkillRatio)
         AirUnit.OnKilled(self, instigator, type, overkillRatio)
         self:DetachCargo()
+    end,
+
+    OnStorageChange = function(self, loading)
+        AirUnit.OnStorageChange(self, loading)
+        for k, v in self:GetCargo() do
+            v:OnStorageChange(loading)
+        end
     end,
 }
 
