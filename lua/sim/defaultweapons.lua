@@ -874,25 +874,69 @@ BareBonesWeapon = Class(Weapon) {
 }
 
 OverchargeWeapon = Class(DefaultProjectileWeapon) {
+    AutoMode = false,
+    AutoThread = nil,
+    EnergyRequired = nil,
+
+    HasEnergy = function(self)
+        return self.unit:GetAIBrain():GetEconomyStored('ENERGY') >= self.EnergyRequired
+    end,
+
+    CanOvercharge = function(self)
+        return not self.unit:IsOverchargePaused() and self:HasEnergy()
+    end,
+
     -- The Overcharge cool-down function
     PauseOvercharge = function(self)
         if not self.unit:IsOverchargePaused() then
             self.unit:SetOverchargePaused(true)
+            self:OnDisableWeapon()
             WaitSeconds(1/self:GetBlueprint().RateOfFire)
             self.unit:SetOverchargePaused(false)
+            if self.AutoMode then
+                self:ForkThread(self.AutoEnable)
+            end
+        end
+    end,
+
+    AutoEnable = function(self)
+        while not self:CanOvercharge() do
+             WaitSeconds(0.1)
+        end
+
+        self:OnEnableWeapon()
+    end,
+
+    SetAutoOvercharge = function(self, auto)
+        self.AutoMode = auto
+
+        if self.AutoMode then
+            if not self.AutoThread then
+                self.AutoThread = self:ForkThread(self.AutoEnable)
+            end
+        elseif self.AutoThread then
+            KillThread(self.AutoThread)
+            self.AutoThread = nil
         end
     end,
 
     OnCreate = function(self)
         DefaultProjectileWeapon.OnCreate(self)
+        self.EnergyRequired = self:GetBlueprint().EnergyRequired
         self:SetWeaponEnabled(false)
         self.AimControl:SetEnabled(false)
         self.AimControl:SetPrecedence(0)
         self.unit:SetOverchargePaused(false)
     end,
 
+    OnGotTarget = function(self)
+        if self:CanOvercharge() then
+            DefaultProjectileWeapon.OnGotTarget(self)
+        end
+    end,
+
     OnFire = function(self)
-        if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
+        if self:CanOvercharge() then
             DefaultProjectileWeapon.OnFire(self)
         end
     end,
@@ -918,23 +962,27 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         self.AimControl:SetPrecedence(0)
         self.unit.BuildArmManipulator:SetPrecedence(0)
         self.unit:GetWeaponManipulatorByLabel(self.DesiredWeaponLabel):SetHeadingPitch(self.AimControl:GetHeadingPitch())
+
+        if self.AutoMode then
+            self:ForkThread(self.AutoEnable)
+        end
     end,
 
     OnWeaponFired = function(self)
         DefaultProjectileWeapon.OnWeaponFired(self)
-        self:OnDisableWeapon()
         self:ForkThread(self.PauseOvercharge)
     end,
 
     -- Weapon State Modifications
     IdleState = State(DefaultProjectileWeapon.IdleState) {
         OnGotTarget = function(self)
-            if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
+            if self:CanOvercharge() then
                 DefaultProjectileWeapon.IdleState.OnGotTarget(self)
             end
         end,
+
         OnFire = function(self)
-            if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
+            if self:CanOvercharge() then
                 ChangeState(self, self.RackSalvoFiringState)
             end
         end,
@@ -942,7 +990,7 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
 
     RackSalvoFireReadyState = State(DefaultProjectileWeapon.RackSalvoFireReadyState) {
         OnFire = function(self)
-            if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
+            if self:CanOvercharge() then
                 DefaultProjectileWeapon.RackSalvoFireReadyState.OnFire(self)
             end
         end,
