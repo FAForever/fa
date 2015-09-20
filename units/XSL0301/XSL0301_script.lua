@@ -42,6 +42,7 @@ XSL0301 = Class(CommandUnit) {
         -- self:HideBone('Turbine', true)
         self:HideBone('Back_Upgrade', true)
         self:SetupBuildBones()
+        self:GetWeaponByLabel('OverCharge').NeedsUpgrade = true
     end,
 
     CreateBuildEffects = function( self, unitBeingBuilt, order )
@@ -102,10 +103,11 @@ XSL0301 = Class(CommandUnit) {
         -- Overcharge
         elseif enh == 'Overcharge' then
       	    self:AddCommandCap('RULEUCC_Overcharge')
-      	    self:SetWeaponEnabledByLabel('OverCharge', true)
+            self:GetWeaponByLabel('OverCharge').NeedsUpgrade = false
         elseif enh == 'OverchargeRemove' then
       	    self:RemoveCommandCap('RULEUCC_Overcharge')
       	    self:SetWeaponEnabledByLabel('OverCharge', false)
+            self:GetWeaponByLabel('OverCharge').NeedsUpgrade = true
         -- Engineering Throughput Upgrade
         elseif enh =='EngineeringThroughput' then
             if not Buffs['SeraphimSCUBuildRate'] then
