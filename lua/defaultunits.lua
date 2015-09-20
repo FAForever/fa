@@ -1697,6 +1697,38 @@ AirTransport = Class(AirUnit, BaseTransport) {
         AirUnit.OnKilled(self, instigator, type, overkillRatio)
         self:DetachCargo()
     end,
+
+    ReleaseCargo = function(self, n)
+        if self.Dead then return end
+        local units = self:GetCargo()
+        local n_units = table.getsize(units)
+
+        if n_units > 0 then
+            if n then
+                n = math.min(n, n_units)
+                table.shuffle(units)
+            else
+                n = n_units
+            end
+
+            for i=1, n do
+                units[i]:DetachFrom()
+                units[i]:SinkThread()
+                i = i + 1
+            end
+        end
+    end,
+
+    DoTakeDamage = function(self, instigator, amount, vector, damageType)
+        AirUnit.DoTakeDamage(self, instigator, amount, vector, damageType)
+
+        local maxHealth = self:GetMaxHealth()
+        local health = self:GetHealth()
+
+        if maxHealth > 0 and Random() > (health / maxHealth + 0.6) then
+            self:ReleaseCargo(Random(1, 2))
+        end
+    end,
 }
 
 ---------------------------------------------------------------

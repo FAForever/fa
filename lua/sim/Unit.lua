@@ -1488,18 +1488,42 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    StartSinking = function(self, callback)
+    OnImpact = function(self, with, other) -- falling and sinking units eventually hits something
+        if with == 'Water' then
+            self:PlayUnitSound('AirUnitWaterImpact')
+            local entity = explosion.CreateUnitExplosionEntity(self, 1)
+            entity.Spec.Layer = 'Water'
+            ForkThread(explosion._CreateScalableUnitExplosion, entity)
+        else
+            if self.Dead then
+                self:ForkThread(self.DestroyUnit)
+            else
+                local bp = self:GetBlueprint()
+                local scale = (bp.SizeX or 0 + bp.SizeZ or 0)
+                local unitDamage = Random(bp.Defense.MaxHealth/2, bp.Defense.MaxHealth*2)
+                local areaDamage = math.min(2000, scale*500)
+                self:OnDamage(self, unitDamage, Vector(0, 0, 0), 'Normal')
+                DamageArea(self, self:GetPosition(), 3,  areaDamage, 'Normal', true, false)
+            end
+        end
+    end,
+
+    SinkThread = function(self)
         local bp = self:GetBlueprint()
-        local scale = ((bp.SizeX or 0 + bp.SizeZ or 0) * 0.5)
-        local bone = 0
 
         --Create sinker projectile
-        local proj = self:CreateProjectileAtBone('/projectiles/Sinker/Sinker_proj.bp', bone)
-
-        -- Start the sinking after a delay of the given number of seconds, attaching to a given bone
-        -- and entity.
-        proj:Start(10 * math.max(2, math.min(7, scale)), self, bone, callback)
+        local proj = self:CreateProjectileAtBone('/projectiles/Sinker/Sinker_proj.bp', 0)
+        proj:Attach(self)
         self.Trash:Add(proj)
+
+        if bp.Display.AnimationWalk then
+            if not self.Animator then
+                self.Animator = CreateAnimator(self, true)
+            end
+
+            self.Animator:PlayAnim(bp.Display.AnimationWalk, true)
+            self.Animator:SetRate(bp.Display.AnimationWalkRate or 1)
+        end
     end,
 
     SeabedWatcher = function(self)
@@ -1555,15 +1579,9 @@ Unit = Class(moho.unit_methods) {
             else
                 -- A non-naval unit or boat with no sinking animation dying over water needs to sink, but lacks an animation for it. Let's
                 -- make one up.
+                self:SinkThread()
 
-                local this = self
-                self:StartSinking(
-                    function()
-                        this:DestroyUnit(overkillRatio)
-                    end
-                )
-
-                -- Wait for the sinking callback to actually destroy the unit.
+                -- Wait for the OnImpact to actually destroy the unit.
                 return
             end
         elseif self.DeathAnimManip then -- wait for non-sinking animations
