@@ -880,6 +880,7 @@ BareBonesWeapon = Class(Weapon) {
 }
 
 OverchargeWeapon = Class(DefaultProjectileWeapon) {
+    NeedsUpgrade = false,
     AutoMode = false,
     AutoThread = nil,
     EnergyRequired = nil,
