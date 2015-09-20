@@ -168,40 +168,28 @@ Filters = {
                 title = 'T1',
                 key = 't1',
                 sortFunc = function(unitID)
-                    if string.sub(unitID, 5, 5) == '1' then
-                        return true
-                    end
-                    return false
+                    return table.find(__blueprints[unitID].Categories, 'TECH1')
                 end,
             },
             {
                 title = 'T2',
                 key = 't2',
                 sortFunc = function(unitID)
-                    if string.sub(unitID, 5, 5) == '2' then
-                        return true
-                    end
-                    return false
+                    return table.find(__blueprints[unitID].Categories, 'TECH2')
                 end,
             },
             {
                 title = 'T3',
                 key = 't3',
                 sortFunc = function(unitID)
-                    if string.sub(unitID, 5, 5) == '3' then
-                        return true
-                    end
-                    return false
+                    return table.find(__blueprints[unitID].Categories, 'TECH3')
                 end,
             },
             {
                 title = 'Exp.',
                 key = 't4',
                 sortFunc = function(unitID)
-                    if string.sub(unitID, 5, 5) == '4' then
-                        return true
-                    end
-                    return false
+                    return table.find(__blueprints[unitID].Categories, 'EXPERIMENTAL')
                 end,
             },
         },
