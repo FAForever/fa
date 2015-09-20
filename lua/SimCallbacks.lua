@@ -26,6 +26,14 @@ local SimPing = import('/lua/SimPing.lua')
 local SimTriggers = import('/lua/scenariotriggers.lua')
 local SUtils = import('/lua/ai/sorianutilities.lua')
 
+Callbacks.AutoOvercharge = function(data, units)
+    for _, u in units or {} do
+        if IsEntity(u) and OkayToMessWithArmy(u:GetArmy()) and u.SetAutoOvercharge then
+            u:SetAutoOvercharge(data.auto == true)
+        end
+    end
+end
+
 Callbacks.BreakAlliance = SimUtils.BreakAlliance
 
 Callbacks.GiveUnitsToPlayer = SimUtils.GiveUnitsToPlayer
