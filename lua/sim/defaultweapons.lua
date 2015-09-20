@@ -110,7 +110,7 @@ DefaultProjectileWeapon = Class(Weapon) {
     -- Called from inside RackSalvoFiringState
     CreateProjectileAtMuzzle = function(self, muzzle)
         local proj = self:CreateProjectileForWeapon(muzzle)
-        if not proj or proj:BeenDestroyed()then
+        if not proj or proj:BeenDestroyed() then
             return proj
         end
 
@@ -658,10 +658,10 @@ DefaultProjectileWeapon = Class(Weapon) {
                     if self.HaltFireOrdered then
                         continue
                     end
-                    self:CreateProjectileAtMuzzle(muzzle)
+                    local proj = self:CreateProjectileAtMuzzle(muzzle)
 
                     -- Decrement the ammo if they are a counted projectile
-                    if bp.CountedProjectile == true then
+                    if proj and not proj:BeenDestroyed() and bp.CountedProjectile == true then
                         if bp.NukeWeapon == true then
                             self.unit:NukeCreatedAtUnit()
 
