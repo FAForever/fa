@@ -633,56 +633,121 @@ local function TacticalBtnText(button)
     end
 end
 
-function EnterOverchargeMode()
-    local econData = GetEconomyTotals()
-    if not currentSelection[1] or currentSelection[1]:IsDead() then return end
-    local bp = currentSelection[1]:GetBlueprint()
-    local overchargeLevel = 0
-    local overchargeFound = false
-    local overchargePaused = currentSelection[1]:IsOverchargePaused()
+function FindOCWeapon(bp)
     for index, weapon in bp.Weapon do
         if weapon.OverChargeWeapon then
-            overchargeLevel = weapon.EnergyRequired
-            overchargeFound = true
-            break
+            return weapon
         end
     end
-    if overchargeFound then
-        if overchargeLevel > 0 and econData["stored"]["ENERGY"] > overchargeLevel and not overchargePaused then
-            ConExecute('StartCommandMode order RULEUCC_Overcharge')
+
+    return
+end
+
+local function IsAutoOCMode(units)
+    return UnitData[units[1]:GetEntityId()].AutoOvercharge == true
+end
+
+local function OverchargeInit(control, unitList)
+    if not control.autoModeIcon then
+        control.autoModeIcon = Bitmap(control, UIUtil.UIFile('/game/orders/autocast_bmp.dds'))
+        LayoutHelpers.AtCenterIn(control.autoModeIcon, control)
+        control.autoModeIcon:DisableHitTest()
+        control.autoModeIcon:SetAlpha(0)
+        control.autoModeIcon.OnHide = function(self, hidden)
+            if not hidden and control:IsDisabled() then
+                return true
+            end
         end
+    end 
+
+    if not control.mixedModeIcon then
+        control.mixedModeIcon = Bitmap(control.autoModeIcon, UIUtil.UIFile('/game/orders-panel/question-mark_bmp.dds'))
+        LayoutHelpers.AtRightTopIn(control.mixedModeIcon, control)
+        control.mixedModeIcon:DisableHitTest()
+        control.mixedModeIcon:SetAlpha(0)
+        control.mixedModeIcon.OnHide = function(self, hidden)
+            if not hidden and control:IsDisabled() then
+                return true
+            end
+        end
+    end
+
+    control._isAutoMode = IsAutoOCMode(unitList)
+
+    if control._isAutoMode then
+        control._curHelpText = control._data.helpText .. "_auto"
+        control.autoBuildEffect = CreateAutoBuildEffect(control)
+        control.autoModeIcon:SetAlpha(1)
+    else
+        control._curHelpText = control._data.helpText
     end
 end
 
-local function OverChargeFrame(self, deltaTime)
-    if deltaTime then
-        if currentSelection[1]:IsDead() then return end
-        local econData = GetEconomyTotals()
-        local bp = currentSelection[1]:GetBlueprint()
-        local overchargeLevel = 0
-        local overchargePaused = currentSelection[1]:IsOverchargePaused()
-        for index, weapon in bp.Weapon do
-            if weapon.OverChargeWeapon then
-                overchargeLevel = weapon.EnergyRequired
-                break
+function OverchargeBehavior(self, modifiers)
+    if modifiers.Left then
+        EnterOverchargeMode()
+    elseif modifiers.Right then
+        if self._isAutoMode then
+            self._curHelpText = self._data.helpText
+            if self.autoBuildEffect then
+                self.autoBuildEffect:Destroy()
             end
-        end
-        if overchargeLevel > 0 then
-            if econData["stored"]["ENERGY"] > overchargeLevel and not overchargePaused then
-                if self:IsDisabled() then
-                    self:Enable()
-                    local armyTable = GetArmiesTable()
-                    local facStr = import('/lua/factions.lua').Factions[armyTable.armiesTable[armyTable.focusArmy].faction + 1].SoundPrefix
-                    local sound = Sound({Bank = 'XGG', Cue = 'Computer_Computer_Basic_Orders_01173'})
-                    PlayVoice(sound)
-                end
-            else
-                if not self:IsDisabled() then
-                    self:Disable()
-                end
-            end
+            self.autoModeIcon:SetAlpha(0)
+            self._isAutoMode = false
         else
-            self:SetNeedsFrameUpdate(false)
+            self._curHelpText = self._data.helpText .. "_auto"
+            if not self.autoBuildEffect then
+                self.autoBuildEffect = CreateAutoBuildEffect(self)
+            end
+            self.autoModeIcon:SetAlpha(1)
+            self._isAutoMode = true
+        end
+
+        if controls.mouseoverDisplay.text then
+            controls.mouseoverDisplay.text:SetText(self._curHelpText)
+        end
+
+        --SetAutoSurfaceMode(currentSelection, self._isAutoMode)
+        --LOG("AutoOvercharge " .. repr(currentSelection) .. tostring(self._isAutoMode))
+        local cb = { Func = 'AutoOvercharge', Args = { auto = self._isAutoMode == true } }
+        SimCallback(cb, true)
+    end
+end
+
+function EnterOverchargeMode()
+    local unit = currentSelection[1]
+    if not unit or unit:IsDead() or unit:IsOverchargePaused() then return end
+    local bp = unit:GetBlueprint()
+    local weapon = FindOCWeapon(unit:GetBlueprint())
+    if not weapon then return end
+
+    local econData = GetEconomyTotals()
+    if econData["stored"]["ENERGY"] >= weapon.EnergyRequired then
+        ConExecute('StartCommandMode order RULEUCC_Overcharge')
+    end
+end
+
+local function OverchargeFrame(self, deltaTime)
+    local unit = currentSelection[1]
+    if not unit or unit:IsDead() then return end
+    local weapon = FindOCWeapon(unit:GetBlueprint())
+    if not weapon then 
+        self:SetNeedsFrameUpdate(false)
+        return
+    end
+   
+    local econData = GetEconomyTotals()
+    if econData["stored"]["ENERGY"] >= weapon.EnergyRequired and not unit:IsOverchargePaused() then
+        if self:IsDisabled() then
+            self:Enable()
+            local armyTable = GetArmiesTable()
+            local facStr = import('/lua/factions.lua').Factions[armyTable.armiesTable[armyTable.focusArmy].faction + 1].SoundPrefix
+            local sound = Sound({Bank = 'XGG', Cue = 'Computer_Computer_Basic_Orders_01173'})
+            PlayVoice(sound)
+        end
+    else
+        if not self:IsDisabled() then
+            self:Disable()
         end
     end
 end
@@ -699,13 +764,12 @@ local defaultOrdersTable = {
     RULEUCC_Patrol = {              helpText = "patrol",        bitmapId = 'patrol',                preferredSlot = 3,  behavior = StandardOrderBehavior, },
     RULEUCC_Stop = {                helpText = "stop",          bitmapId = 'stop',                  preferredSlot = 4,  behavior = MomentaryOrderBehavior, },
     RULEUCC_Guard = {               helpText = "assist",        bitmapId = 'guard',                 preferredSlot = 5,  behavior = StandardOrderBehavior, },
-    RULEUCC_RetaliateToggle = {     helpText = "mode",          bitmapId = 'stand-ground',          preferredSlot = 6,  behavior = RetaliateOrderBehavior,      initialStateFunc = RetaliateInitFunction, },
-
+    RULEUCC_RetaliateToggle = {     helpText = "mode",          bitmapId = 'stand-ground',          preferredSlot = 6,  behavior = RetaliateOrderBehavior, initialStateFunc = RetaliateInitFunction},
     -- Unit specific rules
-    RULEUCC_SiloBuildTactical = {   helpText = "build_tactical",bitmapId = 'silo-build-tactical',   preferredSlot = 7,  behavior = BuildOrderBehavior,          initialStateFunc = BuildInitFunction,},
-    RULEUCC_SiloBuildNuke = {       helpText = "build_nuke",    bitmapId = 'silo-build-nuke',       preferredSlot = 7,  behavior = BuildOrderBehavior,          initialStateFunc = BuildInitFunction,},
-    RULEUCC_Overcharge = {          helpText = "overcharge",    bitmapId = 'overcharge',            preferredSlot = 7,  behavior = StandardOrderBehavior,       onframe = OverChargeFrame},
-    RULEUCC_Script = {       helpText = "special_action",bitmapId = 'overcharge',                   preferredSlot = 7,  behavior = StandardOrderBehavior,},
+    RULEUCC_SiloBuildTactical = {   helpText = "build_tactical",bitmapId = 'silo-build-tactical',   preferredSlot = 7,  behavior = BuildOrderBehavior, initialStateFunc = BuildInitFunction,},
+    RULEUCC_SiloBuildNuke = {       helpText = "build_nuke",    bitmapId = 'silo-build-nuke',       preferredSlot = 7,  behavior = BuildOrderBehavior, initialStateFunc = BuildInitFunction,},
+    RULEUCC_Overcharge = {          helpText = "overcharge",    bitmapId = 'overcharge',            preferredSlot = 7,  behavior = OverchargeBehavior, initialStateFunc = OverchargeInit, onframe = OverchargeFrame},
+    RULEUCC_Script = {       helpText = "special_action",bitmapId = 'overcharge',                   preferredSlot = 7,  behavior = StandardOrderBehavior},
     RULEUCC_Transport = {           helpText = "transport",     bitmapId = 'unload',                preferredSlot = 8,  behavior = StandardOrderBehavior, },
     RULEUCC_Nuke = {                helpText = "fire_nuke",     bitmapId = 'launch-nuke',           preferredSlot = 9,  behavior = StandardOrderBehavior, ButtonTextFunc = NukeBtnText},
     RULEUCC_Tactical = {            helpText = "fire_tactical", bitmapId = 'launch-tactical',       preferredSlot = 9,  behavior = StandardOrderBehavior, ButtonTextFunc = TacticalBtnText},
