@@ -1972,7 +1972,15 @@ CommandUnit = Class(WalkingLandUnit) {
             WalkingLandUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
         end
         WalkingLandUnit.OnUnpaused(self)
-    end
+    end,
+
+    SetAutoOvercharge = function(self, auto)
+        local wep = self:GetWeaponByLabel('OverCharge')
+        if wep.NeedsUpgrade then return end
+
+        wep:SetAutoOvercharge(auto)
+        self.Sync.AutoOvercharge = auto
+    end,
 }
 
 ACUUnit = Class(CommandUnit) {
