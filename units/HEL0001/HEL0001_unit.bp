@@ -1,0 +1,79 @@
+UnitBlueprint {
+    AI = {
+        --BeaconName = 'UAB5102'
+    },
+    Categories = {
+        'UNTARGETABLE',
+        'TRANSPORTATION',
+    },
+    Defense = {
+        AirThreatLevel = 0,
+        ArmorType = 'Normal',
+        EconomyThreatLevel = 0,
+        Health = 1,
+        MaxHealth = 1,
+        RegenRate = 0,
+        SubThreatLevel = 0,
+        SurfaceThreatLevel = 0,
+    },
+    Description = 'Ferry helper',
+    Economy = {
+        BuildCostEnergy = 0,
+        BuildCostMass = 0,
+        BuildRate = 0,
+        BuildTime = 0,
+        BuildableCategory = {
+        },
+        ConsumptionPerSecondEnergy = 0,
+        ConsumptionPerSecondMass = 0,
+        MaxBuildDistance = 0,
+    },
+    Footprint = {
+        MaxSlope = 0,
+        SizeX = 0,
+        SizeZ = 0,
+    },
+    General = {
+        CapCost = 0,
+        Category = 'Transport',
+        Classification = 'RULEUC_MiscSupport',
+        CommandCaps = {
+            RULEUCC_Attack = false,
+            RULEUCC_CallTransport = true,
+            RULEUCC_Capture = false,
+            RULEUCC_Ferry = true,
+            RULEUCC_Guard = false,
+            RULEUCC_Move = false,
+            RULEUCC_Nuke = false,
+            RULEUCC_Patrol = false,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
+            RULEUCC_RetaliateToggle = false,
+            RULEUCC_Stop = false,
+            RULEUCC_Transport = true,
+        },
+    },
+    Intel = {
+        VisionRadius = 0,
+    },
+    Interface = {
+        HelpText = 'Ferry helper',
+    },
+    LifeBarRender = false,
+    Physics = {
+        BuildOnLayerCaps = {
+            LAYER_Air = false,
+            LAYER_Land = false,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
+        MotionType = 'RULEUMT_None',
+    },
+    SelectionThickness = 0,
+    SizeX = 0,
+    SizeY = 0,
+    SizeZ = 0,
+    StrategicIconSortPriority = 0,
+}
