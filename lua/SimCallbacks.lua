@@ -19,12 +19,37 @@ function DoCallback(name, data, units)
     end
 end
 
+function SecureUnits(units)
+    local secure = {}
+
+    for _, u in units do 
+        if OkayToMessWithArmy(u:GetArmy()) then
+            table.insert(secure, u)
+        end
+    end
+
+    return secure
+end
+
 
 
 local SimUtils = import('/lua/SimUtils.lua')
 local SimPing = import('/lua/SimPing.lua')
 local SimTriggers = import('/lua/scenariotriggers.lua')
 local SUtils = import('/lua/ai/sorianutilities.lua')
+
+Callbacks.PersistFerry = function(data, units)
+    local transports = EntityCategoryFilterDown(categories.TRANSPORTATION, SecureUnits(units))
+    if table.getsize(transports) == 0 then return end
+    local start = data.route[1]
+
+    local helper = CreateUnit('hel0001', units[1]:GetArmy(), start[1], start[2], start[3], 1, 1, 1, 1, 'Air')
+    table.insert(units, helper)
+    IssueClearCommands(units)
+    for _, r in data.route do
+        IssueFerry(units, r)
+    end
+end
 
 Callbacks.BreakAlliance = SimUtils.BreakAlliance
 
