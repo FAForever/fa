@@ -19,12 +19,39 @@ function DoCallback(name, data, units)
     end
 end
 
+function SecureUnits(units)
+    local secure = {}
+    if units and type(units) ~= 'table' then
+        units = {units}
+    end
+
+    for _, u in units or {} do
+        if not IsEntity(u) then
+            u = GetEntityById(u)
+        end
+
+        if IsEntity(u) and OkayToMessWithArmy(u:GetArmy()) then
+            table.insert(secure, u)
+        end
+    end
+
+    return secure
+end
 
 
 local SimUtils = import('/lua/SimUtils.lua')
 local SimPing = import('/lua/SimPing.lua')
 local SimTriggers = import('/lua/scenariotriggers.lua')
 local SUtils = import('/lua/ai/sorianutilities.lua')
+
+Callbacks.TransportLock = function(data)
+    local units = SecureUnits(data.ids)
+    if not units[1] then return end
+
+    for _, u in units do
+        u:TransportLock(data.lock == true)
+    end
+end
 
 Callbacks.BreakAlliance = SimUtils.BreakAlliance
 
