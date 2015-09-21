@@ -64,6 +64,15 @@ Callbacks.PersistFerry = function(data, units)
     end
 end
 
+Callbacks.TransportLock = function(data)
+    local units = SecureUnits(data.ids)
+    if not units[1] then return end
+
+    for _, u in units do
+        u:TransportLock(data.lock == true)
+    end
+end
+
 Callbacks.BreakAlliance = SimUtils.BreakAlliance
 
 Callbacks.GiveUnitsToPlayer = SimUtils.GiveUnitsToPlayer
