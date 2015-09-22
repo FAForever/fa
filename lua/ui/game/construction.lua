@@ -704,7 +704,9 @@ function CommonLogic()
             control.Icon.Depth:Set(function() return control.Depth() + 5 end)
             control.Icon.Height:Set(control.Icon.BitmapHeight)
             control.Icon.Width:Set(30)
+            control.Icon:Show()
             control.StratIcon:SetSolidColor('00000000')
+            control.StratIcon:Hide()
             control.LowFuel:SetAlpha(0, true)
             control.LowFuel:SetNeedsFrameUpdate(false)
             control.BuildKey = nil
@@ -1732,6 +1734,11 @@ function FormatData(unitData, type)
                     table.insert(retData, { type = 'spacer' })
                 end
                 for unitIndex, unit in units do
+                    local bp = __blueprints[unit]
+                    local from = bp.General.UpgradesFrom
+                     if from and from ~= 'none' and EntityCategoryContains(categories.STRUCTURE, sortedOptions.selection[1]) then
+                        table.insert(retData, { type = 'arrow'})
+                    end
                     table.insert(retData, { type = 'item', id = unit })
                 end
             end
