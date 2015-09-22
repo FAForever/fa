@@ -302,7 +302,7 @@ UnitBlueprint {
             Damage = 11000,
             DamageFriendly = true,
             DamageRadius = 20,
-            DamageType = 'OtheTacticalBomb',
+            DamageType = 'Normal',
             DisplayName = 'Othe Tactical Bomb',
             FireTargetLayerCapsTable = {
                 Air = 'Land|Water|Seabed',
