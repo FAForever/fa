@@ -1,0 +1,48 @@
+ProjectileBlueprint {
+    Audio = {
+        Impact = Sound {
+            Bank = 'XSA_Destroy',
+            Cue = 'XSA_Strag_Bomb_Explosion',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactTerrain = Sound {
+            Bank = 'XSA_Destroy',
+            Cue = 'XSA_Strag_Bomb_Explosion',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactWater = Sound {
+            Bank = 'XSA_Destroy',
+            Cue = 'XSA_Strag_Bomb_Explosion',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+    },
+    Categories = {
+        'SERAPHIM',
+        'PROJECTILE',
+        'INDIRECTFIRE',
+    },
+    Display = {
+        CameraFollowTimeout = 2,
+        CameraFollowsProjectile = true,
+        ImpactEffects = {
+            Type = 'Small01',
+        },
+        StrategicIconSize = 3,
+    },
+    General = {
+        Category = 'Bomb',
+        Faction = 'Seraphim',
+        TechLevel = 1,
+        Weapon = 'Ohwalli Strategic Bomb',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        DestroyOnWater = true,
+        RealisticOrdinance = true,
+        TrackTarget = false,
+        TurnRate = 0,
+        VelocityAlign = true,
+    },
+}
