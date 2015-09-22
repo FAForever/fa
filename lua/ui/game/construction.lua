@@ -1087,7 +1087,7 @@ function OnClickHandler(button, modifiers)
         end
     elseif item.type == 'item' then
         ClearBuildTemplates()
-        local blueprint = __blueprints[item.id]
+        local itembp = __blueprints[item.id]
         local count = 1
         local performUpgrade = false
         local buildCmd = "build"
@@ -1098,21 +1098,21 @@ function OnClickHandler(button, modifiers)
 
         if modifiers.Left then
             -- see if we are issuing an upgrade order
-            if blueprint.General.UpgradesFrom == 'none' then
+            if itembp.General.UpgradesFrom == 'none' then
                 performUpgrade = false
             else
                 for i, v in sortedOptions.selection do
                     if v then -- its possible that your unit will have died by the time this gets to it
                         local unitBp = v:GetBlueprint()
-                        if blueprint.General.UpgradesFrom == unitBp.BlueprintId then
+                        if itembp.General.UpgradesFrom == unitBp.BlueprintId then
                             performUpgrade = true
-                        elseif blueprint.General.UpgradesFrom == unitBp.General.UpgradesTo then
+                        elseif itembp.General.UpgradesFrom == unitBp.General.UpgradesTo then
                             performUpgrade = true
-                        elseif blueprint.General.UpgradesFromBase ~= "none" then
+                        elseif itembp.General.UpgradesFromBase ~= "none" then
                             -- try testing against the base
-                            if blueprint.General.UpgradesFromBase == unitBp.BlueprintId then
+                            if itembp.General.UpgradesFromBase == unitBp.BlueprintId then
                                 performUpgrade = true
-                            elseif blueprint.General.UpgradesFromBase == unitBp.General.UpgradesFromBase then
+                            elseif itembp.General.UpgradesFromBase == unitBp.General.UpgradesFromBase then
                                 performUpgrade = true
                             end
                         end
@@ -1123,7 +1123,7 @@ function OnClickHandler(button, modifiers)
             if performUpgrade then
                 IssueBlueprintCommand("UNITCOMMAND_Upgrade", item.id, 1, false)
             else
-                if blueprint.Physics.MotionType == 'RULEUMT_None' or EntityCategoryContains(categories.NEEDMOBILEBUILD, item.id) then
+                if itembp.Physics.MotionType == 'RULEUMT_None' or EntityCategoryContains(categories.NEEDMOBILEBUILD, item.id) then
                     -- stationary means it needs to be placed, so go in to build mobile mode
                     import('/lua/ui/game/commandmode.lua').StartCommandMode(buildCmd, { name = item.id })
                 else
@@ -1659,9 +1659,12 @@ function FormatData(unitData, type)
     local retData = {}
     if type == 'construction' then
         local function SortFunc(unit1, unit2)
-            local bp1 = __blueprints[unit1].BuildIconSortPriority or __blueprints[unit1].StrategicIconSortPriority
-            local bp2 = __blueprints[unit2].BuildIconSortPriority or __blueprints[unit2].StrategicIconSortPriority
-            if bp1 >= bp2 then
+            local bp1 = __blueprints[unit1]
+            local bp2 = __blueprints[unit2]
+            local v1 = bp1.BuildIconSortPriority or bp1.StrategicIconSortPriority
+            local v2 = bp2.BuildIconSortPriority or bp2.StrategicIconSortPriority
+
+            if v1 >= v2 then
                 return false
             else
                 return true
@@ -1693,6 +1696,7 @@ function FormatData(unitData, type)
         end
 
         table.insert(sortedUnits, EntityCategoryFilterDown(miscCats, unitData))
+
 
         for i, units in sortedUnits do
             table.sort(units, SortFunc)
@@ -1965,7 +1969,6 @@ function RefreshUI()
 end
 
 function OnSelection(buildableCategories, selection, isOldSelection)
-
     if options.gui_templates_factory ~= 0 then
         if table.empty(selection) then
             allFactories = false
