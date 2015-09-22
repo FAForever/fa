@@ -69,7 +69,6 @@ armordefinition = {
         # Armor Definition
         'Normal 1.0',        
         'CzarBeam 0.25',
-        'OtheTacticalBomb 0.1',   
     },
     {
         # Armor Type name
