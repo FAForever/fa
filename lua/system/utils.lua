@@ -427,6 +427,10 @@ function table.filter(t, filterFunc)
     return newTable
 end
 
+function table.unique(t)
+    return import('/lua/system/setutils.lua').Set(t)
+end
+
 --=========================================================================================================
 -- StringJoin returns items as a single string, seperated by the delimiter
 --=========================================================================================================
