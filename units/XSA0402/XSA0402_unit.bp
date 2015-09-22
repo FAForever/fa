@@ -108,7 +108,7 @@ UnitBlueprint {
         'SERAPHIM',
         'MOBILE',
         'AIR',
-	'BOMBER',
+        'BOMBER',
         'HIGHALTAIR',
         'EXPERIMENTAL',
         'NEEDMOBILEBUILD',
@@ -311,7 +311,7 @@ UnitBlueprint {
             },
             FiringRandomness = 3,
             FiringTolerance = 6,
-			FixBombTrajectory = true, # [152]
+            FixBombTrajectory = true,
             Label = 'Bomb',
             MaxRadius = 90,
             MuzzleSalvoDelay = 0,
@@ -337,7 +337,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RateOfFire = 0.0714,
-	    RenderFireClock = true,
+            RenderFireClock = true,
             TargetCheckInterval = 3,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
