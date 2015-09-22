@@ -1639,6 +1639,14 @@ AirUnit = Class(MobileUnit) {
 --- Mixin transports (air, sea, space, whatever). Sellotape onto concrete transport base classes as
 -- desired.
 BaseTransport = Class() {
+    AllCargoLocked = function(self)
+        for _, u in self:GetCargo() do
+            if not u.TransportLocked then return false end
+        end
+
+        return true
+    end,
+
     OnTransportAttach = function(self, bone, unit)
         self:PlayUnitSound('Load')
         self:MarkWeaponsOnTransport(unit, true)
@@ -1651,7 +1659,7 @@ BaseTransport = Class() {
     end,
 
     OnTransportDetach = function(self, bone, unit)
-        if unit.TransportLocked then
+        if unit.TransportLocked and not self:AllCargoLocked() then
             unit:AttachBoneTo('AttachPoint', self, bone)
             return
         end
