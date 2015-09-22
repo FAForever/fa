@@ -427,6 +427,20 @@ function table.filter(t, filterFunc)
     return newTable
 end
 
+function table.unique(t)
+    local unique = {}
+    local ins = {}
+
+    for k, v in t do
+        if not ins[v] then
+            table.insert(unique, v)
+            ins[v] = true
+        end
+    end
+
+    return unique
+end
+
 --=========================================================================================================
 -- StringJoin returns items as a single string, seperated by the delimiter
 --=========================================================================================================
