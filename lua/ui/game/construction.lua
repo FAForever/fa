@@ -2009,6 +2009,13 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         end
     end
 
+    if table.getn(selection) == 1 then
+        currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1])
+    else
+        currentCommandQueue = {}
+        ClearCurrentFactoryForQueueDisplay()
+    end
+
     if table.getsize(selection) > 0 then
         capturingKeys = false
         -- Sorting down units
@@ -2023,11 +2030,19 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         UnitViewDetail.Hide()
 
         if not selection[1]:IsInCategory('FACTORY') then
+            local inQueue = {}
+            for _, v in currentCommandQueue or {} do
+                inQueue[v.id] = true
+            end
+
+
             local bpid = __blueprints[selection[1]:GetBlueprint().BlueprintId].General.UpgradesTo
             if bpid then
-                while bpid do
+                while bpid and bpid ~= '' do -- UpgradesTo is sometimes ''??
+                    if not inQueue[bpid] then
+                        table.insert(buildableUnits, bpid)
+                    end
                     bpid = __blueprints[bpid].General.UpgradesTo
-                    table.insert(buildableUnits, bpid)
                 end
 
                 buildableUnits = table.unique(buildableUnits)
@@ -2121,13 +2136,6 @@ function OnSelection(buildableCategories, selection, isOldSelection)
                     table.insert(sortedOptions.templates, template)
                 end
             end
-        end
-
-        if table.getn(selection) == 1 then
-            currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1])
-        else
-            currentCommandQueue = {}
-            ClearCurrentFactoryForQueueDisplay()
         end
 
         if not isOldSelection then
