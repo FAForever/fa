@@ -1,8 +1,10 @@
 function ToggleSelfDestruct(data)
-    -- supress self destruct in tutorial missions as they screw up the mission end
+
+    -- Suppress self destruct in tutorial missions as they screw up the mission end
     if ScenarioInfo.tutorial and ScenarioInfo.tutorial == true then
         return
     end
+    
     if data.owner != -1 then
         local unitEntities = {}
         for _, unitId in data.units do
@@ -26,11 +28,13 @@ function ToggleSelfDestruct(data)
                 for _, unitEnt in unitEntities do
                     local unit = unitEnt
 
-                    # added by brute51 - makes selfdestruct alterable through BP files
-                    # instant kill if InstantDeathOnSelfDestruct = true variable set in units general table
-                    # fires weapons with FireOnSelfDestruct = true in units weapon table
+                    -- Added by brute51 - Makes selfdestruct alterable through BP files
+                    -- Instant kill if InstantDeathOnSelfDestruct = true variable set in units general table
+                    -- Fires weapons with FireOnSelfDestruct = true in units weapon table
 
                     local bp = unit:GetBlueprint()
+                    
+                    -- Filter by general table variable
                     if bp.General.InstantDeathOnSelfDestruct then
                         local wepCount = unit:GetWeaponCount()
                         for i = 1, wepCount do
@@ -44,10 +48,10 @@ function ToggleSelfDestruct(data)
                                 end
                             end
                         end
+                        -- The unit should be killed by the weapon firing, but this takes care of odd cases... I guess...
                         unit:Kill()
                     else
-
-                    # regular self destruct cycle
+                        -- Regular self destruct cycle
                         local entityId = unit:GetEntityId()
                         StartCountdown(entityId)
                         unit.SelfDestructThread = ForkThread(function()
@@ -67,8 +71,6 @@ function ToggleSelfDestruct(data)
                             unit:Kill()
                         end)
                     end
-
-
                 end
             end
         end
