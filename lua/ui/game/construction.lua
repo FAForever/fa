@@ -159,6 +159,32 @@ function DecreaseBuildCountInQueue(unitIndex, count)
     end
 end
 
+function IssueUpgradeOrders(units, bpid)
+    local itembp = __blueprints[bpid]
+    local upgrades = {}
+    local chain = {}
+    local from = itembp.General.UpgradesFrom
+    local to = bpid
+
+    if not units[1] then return end
+
+    while from and from ~= 'none' and from ~= to do
+        table.insert(chain, 1, to)
+        upgrades[from] = table.deepcopy(chain)
+        to = from
+        from = __blueprints[to].General.UpgradesFrom
+    end
+
+    local unitid = units[1]:GetUnitId()
+    if not upgrades[unitid] then
+        return
+    end
+
+    for _, o in upgrades[unitid] do
+        IssueBlueprintCommand("UNITCOMMAND_Upgrade", o, 1, false)
+    end
+end
+
 function CreateTab(parent, id, onCheckFunc)
     local btn = Checkbox(parent)
     btn.Depth:Set(function() return parent.Depth() + 10 end)
@@ -1121,7 +1147,7 @@ function OnClickHandler(button, modifiers)
             end
 
             if performUpgrade then
-                IssueBlueprintCommand("UNITCOMMAND_Upgrade", item.id, 1, false)
+                IssueUpgradeOrders(sortedOptions.selection, item.id)
             else
                 if itembp.Physics.MotionType == 'RULEUMT_None' or EntityCategoryContains(categories.NEEDMOBILEBUILD, item.id) then
                     -- stationary means it needs to be placed, so go in to build mobile mode
@@ -1996,6 +2022,18 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         sortedOptions = {}
         UnitViewDetail.Hide()
 
+        if not selection[1]:IsInCategory('FACTORY') then
+            local bpid = __blueprints[selection[1]:GetBlueprint().BlueprintId].General.UpgradesTo
+            if bpid then
+                while bpid do
+                    bpid = __blueprints[bpid].General.UpgradesTo
+                    table.insert(buildableUnits, bpid)
+                end
+
+                buildableUnits = table.unique(buildableUnits)
+            end
+        end
+
         -- Engymod addition by Rienzilla
         -- Only honour CONSTRUCTIONSORTDOWN if we selected a factory
         local allFactory = true
@@ -2021,11 +2059,13 @@ function OnSelection(buildableCategories, selection, isOldSelection)
                     table.insert(sortedOptions.t1, unit)
                 end
             end
-        else
+        elseif EntityCategoryContains(categories.ENGINEER + categories.FACTORY, selection[1]) then
             sortedOptions.t1 = EntityCategoryFilterDown(categories.TECH1, buildableUnits)
             sortedOptions.t2 = EntityCategoryFilterDown(categories.TECH2, buildableUnits)
             sortedOptions.t3 = EntityCategoryFilterDown(categories.TECH3, buildableUnits)
             sortedOptions.t4 = EntityCategoryFilterDown(categories.EXPERIMENTAL, buildableUnits)
+        else
+            sortedOptions.t1 = buildableUnits
         end
 
         if table.getn(buildableUnits) > 0 then
