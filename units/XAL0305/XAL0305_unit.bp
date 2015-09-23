@@ -129,7 +129,7 @@ UnitBlueprint {
                 Weight = 100,
             },
         },
-        UniformScale = 0.07,
+        UniformScale = 0.08,
     },
     Economy = {
         BuildCostEnergy = 8000,
@@ -202,7 +202,7 @@ UnitBlueprint {
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.8,
     SizeX = 0.8,
-    SizeY = 1,
+    SizeY = 1.15,
     SizeZ = 0.6,
     StrategicIconName = 'icon_bot3_sniper',
     StrategicIconSortPriority = 115,
