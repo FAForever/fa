@@ -1708,8 +1708,10 @@ function FormatData(unitData, type)
         end
         CreateExtraControls('construction')
         SetSecondaryDisplay('buildQueue')
+
     elseif type == 'selection' then
         local function SortFunc(unit1, unit2)
+            LOG('x')
             if unit1.id >= unit2.id then
                 return false
             else
@@ -1717,7 +1719,14 @@ function FormatData(unitData, type)
             end
         end
 
-        local sortedUnits = {}
+        local sortedUnits = {
+            [1] = {cat = "ALLUNITS", units = {}},
+            [2] = {cat = "LAND", units = {}},
+            [3] = {cat = "AIR", units = {}},
+            [4] = {cat = "NAVAL", units = {}},
+            [5] = {cat = "STRUCTURE", units = {}},
+            [6] = {cat = "SORTCONSTRUCTION", units = {}},
+        }
         local lowFuelUnits = {}
         local idleConsUnits = {}
         for _, unit in unitData do
@@ -1734,33 +1743,61 @@ function FormatData(unitData, type)
                 end
                 table.insert(idleConsUnits[id], unit)
             else
-                if not sortedUnits[id] then
-                    sortedUnits[id] = {}
+                local cat = 0
+                for i, t in sortedUnits do
+                    if unit:IsInCategory(t.cat) then
+                        cat = i
+                    end
                 end
-                table.insert(sortedUnits[id], unit)
+                if not sortedUnits[cat].units[id] then
+                    sortedUnits[cat].units[id] = {}
+                end
+                table.insert(sortedUnits[cat].units[id], unit)
             end
         end
 
-        local displayUnits = true
-        if displayUnits then
-            for i, v in sortedUnits do
+        local didPutUnits = false
+        for _, t in sortedUnits do
+            if didPutUnits then
+                table.insert(retData, { type = 'spacer' })
+                didPutUnits = false
+            end
+            table.sort(t.units, SortFunc)
+            for i, v in t.units do
                 table.insert(retData, { type = 'unitstack', id = i, units = v })
+                didPutUnits = true
             end
         end
+
+        if didPutUnits then
+            table.insert(retData, { type = 'spacer' })
+            didPutUnits = false
+        end
+        table.sort(lowFuelUnits, SortFunc)
         for i, v in lowFuelUnits do
             table.insert(retData, { type = 'unitstack', id = i, units = v, lowFuel = true })
-        end
-        for i, v in idleConsUnits do
-            table.insert(retData, { type = 'unitstack', id = i, units = v, idleCon = true })
+            didPutUnits = true
         end
 
-        -- Sort unit types
-        table.sort(retData, SortFunc)
+        if didPutUnits then
+            table.insert(retData, { type = 'spacer' })
+            didPutUnits = false
+        end
+        table.sort(idleConsUnits, SortFunc)
+        for i, v in idleConsUnits do
+            table.insert(retData, { type = 'unitstack', id = i, units = v, idleCon = true })
+            didPutUnits = true
+        end
+
+        if retData[table.getn(retData)].type == 'spacer' then 
+            table.remove(retData, table.getn(retData))
+        end
 
         CreateExtraControls('selection')
         SetSecondaryDisplay('attached')
 
         import(UIUtil.GetLayoutFilename('construction')).OnTabChangeLayout(type)
+
     elseif type == 'templates' then
         table.sort(unitData, function(a, b)
             if a.key and not b.key then
