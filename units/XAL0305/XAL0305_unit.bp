@@ -1,7 +1,6 @@
 UnitBlueprint {
     AI = {
-        # GuardScanRadius = 30,
-        NeedUnpack = false,#from true
+        NeedUnpack = false,
     },
     Audio = {
         AmbientMove = Sound {
@@ -88,7 +87,7 @@ UnitBlueprint {
             },
         },
         AnimationWalk = '/units/xal0305/xal0305_awalk.sca',
-        AnimationWalkRate = 9,     #6.4
+        AnimationWalkRate = 9,     --6.4
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
@@ -239,7 +238,7 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 0.5, # 2
+            FiringTolerance = 0.5, -- 2
             Label = 'MainGun',
             MaxRadius = 70,
             FiringRandomnessWhileMoving = 0.5,
@@ -289,14 +288,14 @@ UnitBlueprint {
             TurretPitchSpeed = 30,
             TurretYaw = 0,
             TurretYawRange = 180,
-            TurretYawSpeed = 90, # 75
+            TurretYawSpeed = 90,
             Turreted = true,
             WeaponCategory = 'Direct Fire',
             WeaponRepackTimeout = 0,
             WeaponUnpackAnimation = '/units/xal0305/xal0305_asetup.sca',
-            WeaponUnpackAnimationRate = 0,#from 1
-            WeaponUnpackLocksMotion = false,#from true
-            WeaponUnpacks = false,# from true
+            WeaponUnpackAnimationRate = 0,
+            WeaponUnpackLocksMotion = false,
+            WeaponUnpacks = false,
         },
     },
     Wreckage = {

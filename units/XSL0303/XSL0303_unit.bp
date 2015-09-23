@@ -255,7 +255,7 @@ UnitBlueprint {
         MotionType = 'RULEUMT_Amphibious',
         RotateOnSpot = true,
         RotateOnSpotThreshold = 0.1,
-        StandUpright = false, -- bug fix for tank not following contours of terrain [139]
+        StandUpright = false,
         TurnRadius = 0,
         TurnRate = 75,
     },
@@ -567,9 +567,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, #from false
-            Sub = true, #from false
-            Water = true, #from false
+            Seabed = true,
+            Sub = true,
+            Water = true,
         },
     },
 }
