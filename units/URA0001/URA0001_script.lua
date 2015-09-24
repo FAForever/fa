@@ -1,13 +1,9 @@
---****************************************************************************
---**
---**  File     :  /cdimage/units/URA0001/URA0001_script.lua
---**  Author(s):  Gordon Duclos
---**
---**  Summary  :  Cybran Builder bot units
---**
---**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-
+-----------------------------------------------------------------
+-- File     :  /cdimage/units/URA0001/URA0001_script.lua
+-- Author(s):  Gordon Duclos
+-- Summary  :  Cybran Builder bot units
+-- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
 local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
 local CreateCybranBuildBeams = import('/lua/EffectUtilities.lua').CreateCybranBuildBeams
 
@@ -30,7 +26,7 @@ URA0001 = Class(CAirUnit) {
     end,
 
     OnStartReclaim = function(self, target)
-        IssueStop( {self} )  -- you can't reclaim!
+        IssueStop({self})  -- You can't reclaim!
     end,
 
     OnStopBuild = function(self, unitBeingBuilt)
@@ -38,7 +34,7 @@ URA0001 = Class(CAirUnit) {
         ChangeState(self, self.IdleState)
     end,
 
-    --- Don't explode when killed, merely fall out of the sky.
+    -- Don't explode when killed, merely fall out of the sky.
     OnKilled = function(self)
         self:StopBuildingEffects()
     end,
