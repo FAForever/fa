@@ -16,7 +16,7 @@ EmitterBlueprint {
 	CreateIfVisible = true,
 	SnapToWaterline = false,
 	OnlyEmitOnWater = false,
-	InterpolateEmission = true,
+	InterpolateEmission = false,
 	TextureStripcount = 1.00,
 	SortOrder = 0.00,
 	Texture = [[/textures/particles/flare_lens_add_02.dds]],

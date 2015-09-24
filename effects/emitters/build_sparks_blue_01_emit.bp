@@ -16,7 +16,6 @@ EmitterBlueprint {
 	CreateIfVisible = true,
 	SnapToWaterline = false,
 	OnlyEmitOnWater = false,
-	InterpolateEmission = true,
 	TextureStripcount = 1.00,
 	SortOrder = 0.00,
 	Texture = [[/textures/particles/sparkle_white_add_02.dds]],
@@ -42,7 +41,7 @@ EmitterBlueprint {
 	EmitRateCurve = {
 		XRange = 0.40,
 		Keys = {
-			{ x=0.000,y=20.238,z=0.000 },
+			{ x=0.000,y=5,z=0.000 },
 		},
 	},
 	LifetimeCurve = {
