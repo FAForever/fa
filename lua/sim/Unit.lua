@@ -1745,6 +1745,19 @@ Unit = Class(moho.unit_methods) {
     OnBeingBuiltProgress = function(self, unit, oldProg, newProg)
     end,
 
+    SetRotation = function(self, angle)
+        qx, qy, qz, qw = explosion.QuatFromRotation(angle, 0, 1, 0)
+        self:SetOrientation({qx, qy, qz, qw}, true)
+    end,
+
+    Rotate = function(self, angle)
+        local qx, qy, qz, qw = unpack(self:GetOrientation())
+        local a = math.atan2(2.0*(qx*qz + qw*qy), qw*qw + qx*qx - qz*qz - qy*qy)
+        local current_yaw = math.floor(math.abs(a) * (180 / math.pi) + 0.5)
+
+        self:SetRotation(angle + current_yaw)
+    end,
+
     OnStartBeingBuilt = function(self, builder, layer)
         self:StartBeingBuiltEffects(builder, layer)
         local aiBrain = self:GetAIBrain()
