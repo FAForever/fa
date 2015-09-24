@@ -42,6 +42,12 @@ URA0001 = Class(CAirUnit) {
     OnKilled = function(self)
         self:StopBuildingEffects()
     end,
+    
+    -- Don't make wreckage
+    CreateWreckage = function (self, overkillRatio)
+        overkillRatio = 1.1
+        CAirUnit.CreateWreckage(self, overkillRatio)
+    end,
 
     -- Prevent the unit from reporting consumption values (avoids junk in the resource overlay)
     UpdateConsumptionValues = function(self) end,
