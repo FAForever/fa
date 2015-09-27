@@ -190,5 +190,13 @@ function OnCommandIssued(command)
 		end		
 	end
 
+    if command.CommandType == 'Repair' then
+        local target = command.Target
+        if target.Type == 'Entity' or target.Type == 'Position' then -- repair wreck/ground to rebuild
+            local cb = {Func="Rebuild", Args={entity=target.EntityId, Clear=command.Clear}}
+            SimCallback(cb, true)
+        end
+    end
+
 	import('/lua/spreadattack.lua').MakeShadowCopyOrders(command)
 end
