@@ -393,6 +393,32 @@ StructureUnit = Class(Unit) {
         self:CreateTarmac(true, true, true, orient, currentBP, currentBP.DeathLifetime or 300)
     end,
 
+    OnKilled = function(self, instigator, type, overKillRatio)
+        Unit.OnKilled(self, instigator, type, overKillRatio)
+    end,
+
+    CheckRepairersForRebuild = function(self, wreckage)
+        local units = {}
+        for id, u in self.Repairers do
+            local focus = u:GetFocusUnit()
+            if u:IsUnitState('Repairing') and focus == self and not u:GetGuardedUnit() then -- not assist
+                table.insert(units, u)
+            end
+        end
+
+        if not units[1] then return end
+
+        wreckage:Rebuild(units)
+    end,
+
+    CreateWreckage = function(self, overkillRatio)
+        local wreckage = Unit.CreateWreckage(self, overkillRatio)
+        if wreckage then
+            self:CheckRepairersForRebuild(wreckage)
+        end
+
+        return wreckage
+    end,
     ----------------------------------------------------------------------------------------------
     --  Adjacency
     ----------------------------------------------------------------------------------------------
