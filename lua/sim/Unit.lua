@@ -245,6 +245,8 @@ Unit = Class(moho.unit_methods) {
 
         -- Set up Adjacency container
         self.AdjacentUnits = {}
+
+        self.Repairers = {}
     end,
 
     -------------------------------------------------------------------------------------------
@@ -744,6 +746,26 @@ Unit = Class(moho.unit_methods) {
         self:DoUnitCallbacks('OnReclaimed', entity)
         self.CreateReclaimEndEffects( entity, self )
         self:Destroy()
+    end,
+
+    OnStartRepair = function(self, unit)
+        unit.Repairers[self:GetEntityId()] = self
+
+        if unit.WorkItem ~= self.WorkItem then
+            self:InheritWork(unit)
+        end
+
+        self:SetUnitState('Repairing', true)
+
+        -- Force assist over repair when unit is assisting something
+        if unit:GetFocusUnit() and unit:IsUnitState('Building') then
+            self:ForkThread(function()
+                self:CheckAssistFocus()
+            end)
+        end
+    end,
+
+    OnStopRepair = function(self, unit)
     end,
 
     OnStartReclaim = function(self, target)
@@ -2099,17 +2121,7 @@ Unit = Class(moho.unit_methods) {
         end
 
         if order == 'Repair' then
-            if built.WorkItem ~= self.WorkItem then
-                self:InheritWork(built)
-            end
-            self:SetUnitState('Repairing', true)
-
-            -- Force assist over repair when unit is assisting something
-            if built:GetFocusUnit() and built:IsUnitState('Building') then
-                self:ForkThread(function()
-                    self:CheckAssistFocus()
-                end)
-            end
+            self:OnStartRepair(built)
         elseif self:GetHealth() < self:GetMaxHealth() and table.getsize(self:GetGuards()) > 0 then
             -- unit building something is damaged and has assisters, check their focus
             self:CheckAssistersFocus()
@@ -2140,6 +2152,12 @@ Unit = Class(moho.unit_methods) {
         self:DoOnUnitBuiltCallbacks(built)
         self:StopUnitAmbientSound('ConstructLoop')
         self:PlayUnitSound('ConstructStop')
+
+        local id = self:GetEntityId()
+        if built.Repairers[id] then
+            self:OnStopRepair(self, built)
+            built.Repairers[id] = nil
+        end
     end,
 
     OnFailedToBuild = function(self)
