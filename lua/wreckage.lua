@@ -54,8 +54,28 @@ Wreckage = Class(Prop) {
         clone:UpdateReclaimLeft()
 
         return clone
-    end
+    end,
 
+    Rebuild = function(self, units)
+        local rebuilders = {}
+        local assisters = {}
+        local bpid = self.AssociatedBP
+
+        for _, u in units do
+            if u:CanBuild(bpid) then
+                table.insert(rebuilders, u)
+            else
+                table.insert(assisters, u)
+            end
+        end
+
+        if not rebuilders[1] then return end
+        local pos = self:GetPosition()
+        IssueBuildMobile(rebuilders, pos, bpid, {})
+        if assisters[1] then
+            IssueGuard(assisters, pos)
+        end
+    end,
 }
 
 --- Create a wreckage prop.
