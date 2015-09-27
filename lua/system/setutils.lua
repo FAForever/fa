@@ -2,21 +2,6 @@
 --
 -- Utility functions for working with this type of set.
 
--- Transforms a table into a set
-function Set(t)
-    local set = {}
-    local ins = {}
-
-    for k, v in t do
-        if not ins[v] then
-            table.insert(set, v)
-            ins[v] = true
-        end
-    end
-
-    return set
-end
-
 --- Returns a ∪ b as a new set
 function Union(a, b)
     local u = {}

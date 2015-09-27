@@ -428,7 +428,17 @@ function table.filter(t, filterFunc)
 end
 
 function table.unique(t)
-    return import('/lua/system/setutils.lua').Set(t)
+    local unique = {}
+    local ins = {}
+
+    for k, v in t do
+        if not ins[v] then
+            table.insert(unique, v)
+            ins[v] = true
+        end
+    end
+
+    return unique
 end
 
 --=========================================================================================================
