@@ -19,7 +19,24 @@ function DoCallback(name, data, units)
     end
 end
 
+function SecureUnits(units)
+    local secure = {}
+    if units and type(units) ~= 'table' then
+        units = {units}
+    end
 
+    for _, u in units or {} do
+        if not IsEntity(u) then
+            u = GetEntityById(u)
+        end
+
+        if IsEntity(u) and OkayToMessWithArmy(u:GetArmy()) then
+            table.insert(secure, u)
+        end
+    end
+
+    return secure
+end
 
 local SimUtils = import('/lua/SimUtils.lua')
 local SimPing = import('/lua/SimPing.lua')
@@ -56,6 +73,18 @@ Callbacks.SimDialogueButtonPress = import('/lua/SimDialogue.lua').OnButtonPress
 Callbacks.AIChat = SUtils.FinishAIChat
 
 Callbacks.DiplomacyHandler = import('/lua/SimDiplomacy.lua').DiplomacyHandler
+
+Callbacks.Rebuild = function(data, units)
+    local wreck = GetEntityById(data.entity)
+    if not wreck.AssociatedBP then return end
+    local units = SecureUnits(units)
+    if not units[1] then return end
+    if data.Clear then
+        IssueClearCommands(units)
+    end
+
+    wreck:Rebuild(units)
+end
 
 --Callbacks.GetUnitHandle = import('/lua/debugai.lua').GetHandle
 

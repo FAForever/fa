@@ -169,7 +169,13 @@ function OnCommandIssued(command)
 			TextureName = '/meshes/game/flag02d_albedo.dds',
 			ShaderName = 'CommandFeedback',
 			UniformScale = 1,
-		}, 0.7)	
+		}, 0.7)
+    elseif command.CommandType == 'Repair' then
+        local target = command.Target
+        if target.Type == 'Entity' then -- repair wreck to rebuild
+            local cb = {Func="Rebuild", Args={entity=target.EntityId, Clear=command.Clear}}
+            SimCallback(cb, true)
+        end
 	else	
 		if AddCommandFeedbackByType(command.Target.Position, command.CommandType) == false then
 			AddCommandFeedbackBlip({
