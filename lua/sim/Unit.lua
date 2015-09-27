@@ -3380,13 +3380,9 @@ Unit = Class(moho.unit_methods) {
     end,
 
     SetRegen = function(self, value)
-        self:SetRegenRate(value)
 
-        if value ~= self:GetBlueprint().Defense.RegenRate then --inform UI about non-default regen
-            self.Sync.regen = value
-        else
-            self.Sync.regen = nil
-        end
+        self:SetRegenRate(value)
+        self.Sync.regen = value
     end,
 
     -------------------------------------------------------------------------------------------
