@@ -36,7 +36,7 @@ local function ConfirmNewKeyMap()
     IN_AddKeyMapTable(import('/lua/keymap/keymapper.lua').GetKeyMappings(true))
     -- Update hotbuild modifiers
     if SessionIsActive() then
-        import('/modules/hotbuild.lua').addModifiers()
+        import('/lua/ui/game/hotbuild.lua').addModifiers()
     end
 end
 

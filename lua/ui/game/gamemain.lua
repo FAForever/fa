@@ -103,7 +103,7 @@ function SetLayout(layout)
 end
 
 function OnFirstUpdate()
-    import('/modules/hotbuild.lua').init()
+    import('/lua/ui/game/hotbuild.lua').init()
     EnableWorldSounds()
     local avatars = GetArmyAvatars()
     if avatars and avatars[1]:IsInCategory("COMMAND") then
