@@ -30,7 +30,7 @@ local UnitViewDetail = import('/lua/ui/game/unitviewDetail.lua')
 local options = Prefs.GetFromCurrentProfile('options')
 local Effect = import('/lua/maui/effecthelpers.lua')
 local TemplatesFactory = import('/modules/templates_factory.lua')
-local straticonsfile = import('/modules/straticons.lua')
+local straticonsfile = import('/lua/ui/game/straticons.lua')
 
 local prevBuildables = false
 local prevSelection = false
