@@ -114,7 +114,32 @@ Callbacks.OnPlayerQueryResult = SimPlayerQuery.OnPlayerQueryResult
 
 Callbacks.PingGroupClick = import('/lua/SimPingGroup.lua').OnClickCallback
 
-Callbacks.GiveOrders = import('/lua/spreadattack.lua').GiveOrders
+Callbacks.GiveOrders = function (Data)
+    local unit = GetEntityById(Data.id)
+    if not OkayToMessWithArmy(unit:GetArmy()) then return end
+    -- Skip units with no valid shadow orders.
+    if not (Data.unit_orders and Data.unit_orders[1]) then return end
+
+    -- All orders will be re-issued, so all existing orders have to be cleared first.
+    IssueClearCommands({unit})
+
+    -- Re-issue all orders.
+    for _, order in Data.unit_orders do
+        -- Currently supported 3 orders are: Attack, Move and AggressiveMove
+        if order.CommandType == "Attack" then
+            local victim = GetEntityById(order.Target)
+            IssueAttack({unit}, victim)
+        end
+
+        if order.CommandType == "Move" then
+            IssueMove({unit}, order.Position)
+        end
+
+        if order.CommandType == "AggressiveMove" then
+            IssueAggressiveMove({unit}, order.Position)
+        end
+    end
+end
 
 Callbacks.ValidateAssist = function(data, units)
     local target = GetEntityById(data.target)

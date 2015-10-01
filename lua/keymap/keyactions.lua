@@ -255,9 +255,9 @@ keyActions = {
         category = 'orders', order = 32,}, #cut?
     ['suicide'] = {action =  'UI_Lua import("/lua/ui/game/confirmunitdestroy.lua").ConfirmUnitDestruction()',  
         category = 'orders', order = 29,},
-    ['spreadattack'] = {action =  'UI_Lua import("/lua/spreadattack.lua").SpreadAttack()',
+    ['spreadattack'] = {action =  'UI_Lua import("/lua/ui/game/spreadattack.lua").SpreadAttack()',
         category = 'orders', order = 33,},
-    ['shift_spreadattack'] = {action =  'UI_Lua import("/lua/spreadattack.lua").SpreadAttack()',
+    ['shift_spreadattack'] = {action =  'UI_Lua import("/lua/ui/game/spreadattack.lua").SpreadAttack()',
         category = 'orders', order = 34,},
     ['decrease_game_speed'] = {action =  'UI_Lua import("/lua/ui/uimain.lua").DecreaseGameSpeed()',  
         category = 'game', order = 1,},

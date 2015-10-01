@@ -190,5 +190,5 @@ function OnCommandIssued(command)
 		end		
 	end
 
-	import('/lua/spreadattack.lua').MakeShadowCopyOrders(command)
+	import('/lua/ui/game/spreadattack.lua').MakeShadowCopyOrders(command)
 end
