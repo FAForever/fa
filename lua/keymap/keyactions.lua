@@ -313,7 +313,7 @@ keyActions = {
     ['toggle_intelshield'] = {action = 'UI_Lua import("/lua/ui/game/keymapping.lua").toggleIntelShieldScript()', category = 'orders', order = 26,},
     ['toggle_mdf_panel'] = {action = 'UI_Lua import("/lua/ui/game/multifunction.lua").ToggleMFDPanel()', category = 'ui', order = 27,},
     ['toggle_tab_display'] = {action = 'UI_Lua import("/lua/ui/game/tabs.lua").ToggleTabDisplay()', category = 'ui', order = 28,},
-    ['zoom_pop'] = {action = 'UI_Lua import("/modules/zoompopper.lua").ToggleZoomPop()', category = 'camera', order = 29,},
+    ['zoom_pop'] = {action = 'UI_Lua import("/lua/ui/game/zoompopper.lua").ToggleZoomPop()', category = 'camera', order = 29,},
     ['select_inview_idle_mex'] = {action = 'UI_SelectByCategory +inview +idle MASSEXTRACTION', category = 'selection', order = 30,},
     ['select_all_mex'] = {action = 'UI_SelectByCategory MASSEXTRACTION', category = 'selection', order = 31,},
     ['select_nearest_idle_lt_mex'] = {action = 'UI_Lua import("/lua/ui/game/keymapping.lua").GetNearestIdleLTMex()', category = 'selection', order = 32,},
