@@ -1306,7 +1306,7 @@ local function AssignRandomStartSpots()
         r = autobalance_random(ratingTable, teams)
         q = autobalance_quality(r)
 
-        if(q > best.quality*0.95) then
+        if q > 0.85 and q > best.quality*0.95 then
             table.insert(results, {quality=q, result=r})
 
             if(table.getsize(results) > 4) then break end
