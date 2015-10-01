@@ -818,7 +818,7 @@ function AvatarUpdate()
         import(UIUtil.GetLayoutFilename('avatars')).LayoutAvatars()
     end
 
-    local buttons = import('/modules/scumanager.lua').buttonGroup
+    local buttons = import('/lua/ui/game/scumanager.lua').buttonGroup
     if options.gui_scu_manager == 0 then
         buttons:Hide()
     else 

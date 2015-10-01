@@ -285,7 +285,7 @@ keyActions = {
     ['show_enemy_life'] = {action = 'UI_ForceLifbarsOnEnemy', category = 'ui', order = 2,},
     ['show_network_stats'] = {action =  'ren_ShowNetworkStats', category = 'ui', order = 3,},
     --add key to create an upgrade marker
-    ['scu_upgrade_marker'] = {action =  'UI_Lua import("/modules/scumanager.lua").CreateMarker()', category = 'user', order = 4,},
+    ['scu_upgrade_marker'] = {action =  'UI_Lua import("/lua/ui/game/scumanager.lua").CreateMarker()', category = 'user', order = 4,},
     ['toggle_shield'] = {action = 'UI_Lua import("/modules/keymapping.lua").toggleScript("Shield")', category = 'orders', order = 6,},
     ['toggle_weapon'] = {action = 'UI_Lua import("/modules/keymapping.lua").toggleScript("Weapon")', category = 'orders', order = 7,},
     ['toggle_jamming'] = {action = 'UI_Lua import("/modules/keymapping.lua").toggleScript("Jamming")', category = 'orders', order = 8,},
