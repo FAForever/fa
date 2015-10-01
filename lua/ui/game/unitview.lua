@@ -18,7 +18,7 @@ local Factions = import('/lua/factions.lua')
 local Prefs = import('/lua/user/prefs.lua')
 local EnhancementCommon = import('/lua/enhancementcommon.lua')
 local options = Prefs.GetFromCurrentProfile('options')
-local GetUnitRolloverInfo = import("/modules/selectedinfo.lua").GetUnitRolloverInfo
+local GetUnitRolloverInfo = import("/lua/ui/game/selectedinfo.lua").GetUnitRolloverInfo
 
 local selectedUnit = nil
 local updateThread = nil
