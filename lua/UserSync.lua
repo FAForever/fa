@@ -55,7 +55,7 @@ function OnSync()
     end
 
     if Sync.NukeLaunchData then
-		import('/modules/nukelaunchping.lua').DoNukePing(Sync.NukeLaunchData)
+		import('/lua/ui/game/nukelaunchping.lua').DoNukePing(Sync.NukeLaunchData)
 	end
 
     if Sync.Reclaim then
