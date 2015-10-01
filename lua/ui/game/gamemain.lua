@@ -223,7 +223,7 @@ function CreateUI(isReplay)
     ConExecute('res_PrefetcherActivityDelay 1')
 
     -- below added for FAF
-    import("/modules/displayrings.lua").Init()  -- added for acu and engineer build radius ui mod
+    import("/lua/ui/game/displayrings.lua").Init()  -- added for acu and engineer build radius ui mod
     if SessionIsReplay() then
         ForkThread(SendChat)
         lastObserving = true
