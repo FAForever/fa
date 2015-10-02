@@ -463,6 +463,10 @@ function InitializeArmies()
 
             local armyIsCiv = ScenarioInfo.ArmySetup[strArmy].Civilian
 
+            if armyIsCiv and civOpt ~= 'neutral' and strArmy ~= 'NEUTRAL_CIVILIAN' then -- give enemy civilians darker color
+                SetArmyColorIndex(strArmy, 13)
+            end
+
             if (not armyIsCiv and bCreateInitial) or (armyIsCiv and civOpt ~= 'removed') then
                 local commander = (not ScenarioInfo.ArmySetup[strArmy].Civilian)
                 local cdrUnit
