@@ -14,6 +14,7 @@ local Scrollbar = import('/lua/maui/scrollbar.lua').Scrollbar
 local Text = import('/lua/maui/text.lua').Text
 local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
 local Button = import('/lua/maui/button.lua').Button
+local Edit = import('/lua/maui/edit.lua').Edit
 local Group = import('/lua/maui/group.lua').Group
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
 local ResourceMapPreview = import('/lua/ui/controls/resmappreview.lua').ResourceMapPreview
@@ -41,6 +42,10 @@ local mapplayers = false
 local mapInfo = false
 local preview = nil
 local selectButton = false
+
+-- Table containing filter functions to apply to the map list.
+local currentFilters = {}
+local nameFilter = nil
 
 local scenarioKeymap = {}
 local Options = {}
@@ -121,6 +126,7 @@ local comparatorMap = {
     function(a, b) return a >= b end,
     function(a, b) return a <= b end
 }
+
 mapFilters = {
     {
         FilterName = "<LOC MAPSEL_0009>Supported Players",
@@ -236,9 +242,6 @@ mapFilters = {
         },
     },
 }
-
--- Table contianing filter functions to apply to the map list.
-local currentFilters = nil
 
 -- Eeeewww
 local function GetFilterIndex(filterKey)
@@ -569,8 +572,26 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
         end
     end
 
+    namefilterTitle = UIUtil.CreateText(filterGroup, "<LOC sel_map_0007>Name Filter", 18)
+    LayoutHelpers.Below(namefilterTitle, filters[table.getn(filters)], 10)
+
+    filterName = Edit(filterGroup)
+    filterName.Width:Set(MAP_PREVIEW_SIZE)
+    filterName.Height:Set(22)
+    filterName:SetFont(UIUtil.bodyFont, 16)
+    filterName:SetForegroundColor(UIUtil.fontColor)
+    filterName:ShowBackground(false)
+    filterName:SetDropShadow(true)
+    LayoutHelpers.Below(filterName, namefilterTitle)
+
+    filterName.OnTextChanged = function(self, newText, oldText)
+      PopulateMapList()
+    end
+
+    nameFilter = filterName
+
     -- Expand the group to encompass all the filter controls
-    filterGroup.Bottom:Set(function() return filters[table.getn(filters)].Bottom() + 3 end)
+    filterGroup.Bottom:Set(function() return filterName.Bottom() + 3 end)
     filterGroup.Right:Set(function() return filters[table.getn(filters)].Right() + 1 end)
 
     local mapSelectGroup = Group(dialogContent)
@@ -644,6 +665,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     end
 
     PopulateMapList()
+
 
     return popup
 end
@@ -814,10 +836,10 @@ function SetupOptionsPanel(parent, curOptions)
                 local itemArray = {}
                 line.combo.keyMap = {}
                 local tooltipTable = {}
-                
+
                 local defValue = false
                 local realDefValue = false
-                
+
                 for index, val in data.data.values do
                     itemArray[index] = val.text
                     line.combo.keyMap[val.key] = index
@@ -929,6 +951,9 @@ function SetDescription(scen)
 end
 
 function PopulateMapList()
+
+    local reselectRow = false
+
     mapList:DeleteAllItems()
 
     local selectedRow = 0
@@ -943,6 +968,10 @@ function PopulateMapList()
             end
         end
 
+        if nameFilter and nameFilter:GetText() ~= "" then
+            passedFiltering = passedFiltering and string.lower(sceninfo.name):find(string.lower(nameFilter:GetText()))
+        end
+
         if passedFiltering then
             -- Make sure we finish up with the right map selected.
             if string.lower(sceninfo.file) == string.lower(selectedScenario.file) then
@@ -950,6 +979,9 @@ function PopulateMapList()
             end
 
             scenarioKeymap[count] = i
+            if sceninfo == selectedScenario then
+                reselectRow = count
+            end
             count = count + 1
             mapList:AddItem(LOC(sceninfo.name))
         end
@@ -966,5 +998,10 @@ function PopulateMapList()
         mapListTitle:SetText(LOCF("<LOC lobui_0580>%d Map Available", randMapList))
     else
         mapListTitle:SetText(LOCF("<LOC lobui_0581>%d Maps Available", randMapList))
+    end
+
+    if reselectRow then
+        mapList:OnClick(reselectRow -1, true)
+        mapList:ShowItem(reselectRow -1)
     end
 end
