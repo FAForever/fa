@@ -315,6 +315,24 @@ globalOpts = {
     },
     {
         default = 1,
+        label = "<LOC lobui_0300>Reveal Civilians",
+        help = "<LOC lobui_0301>Show civilian prebuilt structures on map",
+        key = 'RevealCivilians',
+        values = {
+            {
+                text = "<LOC _Yes>Yes",
+                help = "<LOC lobui_0302>Civilian structures are revealed",
+                key = 'Yes',
+            },
+            {
+                text = "<LOC _No>No",
+                help = "<LOC lobui_0303>Civilian structures are hidden",
+                key = 'No',
+            },
+        },
+    },
+    {
+        default = 1,
         label = "<LOC lobui_0310>Prebuilt Units",
         help = "<LOC lobui_0311>Set whether the game starts with prebuilt units or not",
         key = 'PrebuiltUnits',
