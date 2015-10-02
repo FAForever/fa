@@ -296,16 +296,6 @@ function Show(bp, buildingUnit, bpID)
     end
 
     -- Name / Description
-    if false then
-        local foo, iconName = GameCommon.GetCachedUnitIconFileNames(bp)
-        if iconName then
-            print (iconName)
-            View.UnitIcon:SetTexture(iconName)
-        else
-            View.UnitIcon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
-        end
-    end
-
     LayoutHelpers.AtTopIn(View.UnitShortDesc, View, 10)
     View.UnitShortDesc:SetFont(UIUtil.bodyFont, 14)
     local description = LOC(bp.Description)
