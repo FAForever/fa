@@ -492,7 +492,7 @@ function InitializeArmies()
                     if armyIsCiv or enemyIsCiv then
                         if civOpt == 'neutral' or strArmy == 'NEUTRAL_CIVILIAN' or strEnemy == 'NEUTRAL_CIVILIAN' then
                             state = 'Neutral'
-                        else
+                        elseif ScenarioInfo.Options['RevealCivilians'] == 'Yes' then
                             state = 'Ally'
                             ForkThread(function()
                                 WaitSeconds(1)
