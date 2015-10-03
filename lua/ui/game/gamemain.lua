@@ -404,6 +404,9 @@ end
 --      added: Which units were added to the old selection
 --      removed: Which units where removed from the old selection
 function OnSelectionChanged(oldSelection, newSelection, added, removed)
+    if import('/lua/ui/game/selection.lua').IsHidden() then
+        return
+    end
 
     local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(newSelection)
     local isOldSelection = table.equal(oldSelection, newSelection)
