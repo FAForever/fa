@@ -26,6 +26,18 @@ local SimPing = import('/lua/SimPing.lua')
 local SimTriggers = import('/lua/scenariotriggers.lua')
 local SUtils = import('/lua/ai/sorianutilities.lua')
 
+Callbacks.ClearCommands = function(data, units)
+    local safe = {}
+
+    for _, u in units do
+        if OkayToMessWithArmy(u:GetArmy()) then
+            table.insert(safe, u)
+        end
+    end
+
+    IssueClearCommands(safe)
+end
+
 Callbacks.BreakAlliance = SimUtils.BreakAlliance
 
 Callbacks.GiveUnitsToPlayer = SimUtils.GiveUnitsToPlayer
