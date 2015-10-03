@@ -86,6 +86,7 @@ keyDescriptions = {
     ['attack'] = '<LOC key_desc_0044>Attack',
     ['capture'] = '<LOC key_desc_0045>Capture',
     ['stop'] = '<LOC key_desc_0047>Stop and cancel all Orders',
+    ['soft_stop'] = 'Stop and cancel all factory orders except the current one',
     ['dive'] = '<LOC key_desc_0049>Dive',
     ['ferry'] = '<LOC key_desc_0051>Ferry',
     ['guard'] = '<LOC key_desc_0052>Assist',
