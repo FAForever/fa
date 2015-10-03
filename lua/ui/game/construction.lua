@@ -31,6 +31,7 @@ local options = Prefs.GetFromCurrentProfile('options')
 local Effect = import('/lua/maui/effecthelpers.lua')
 local TemplatesFactory = import('/modules/templates_factory.lua')
 local straticonsfile = import('/modules/straticons.lua')
+local Select = import('/lua/ui/game/selection.lua')
 
 local prevBuildables = false
 local prevSelection = false
@@ -156,6 +157,39 @@ function DecreaseBuildCountInQueue(unitIndex, count)
         oldDecreaseBuildCountInQueue(unitIndex, count)
     else
         LOG("Not canceling t3 support factory")
+    end
+end
+
+function ResetOrderQueue(factory, stop_last)
+    local queue = SetCurrentFactoryForQueueDisplay(factory)
+    if not queue then return end
+    local n = table.getsize(queue)
+
+    if stop_last and n == 1 then
+        IssueCommand("Stop")
+        return
+    end
+
+    for i = 1, n do
+        local count = queue[i].count
+
+        if i == 1 then
+            count = count - 1
+        end
+
+        SelectUnits({factory})
+        DecreaseBuildCountInQueue(i, count)
+    end
+end
+
+function ResetOrderQueues(units)
+    local factories = EntityCategoryFilterDown(categories.FACTORY, units)
+    if factories[1] then
+        Select.Hidden(function()
+            for _, factory in factories do
+                ResetOrderQueue(factory, true)
+            end
+        end)
     end
 end
 
