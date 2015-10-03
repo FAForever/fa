@@ -258,102 +258,102 @@ UnitBlueprint {
         MinSpeedPercent = 0,
         MotionType = 'RULEUMT_None',
         OccupyRects = {
-
-            # offsetX offsetZ  sizeX sizeZ, offset from center of unit
-            -3,
-            0,
-            1,
-            3.5,
+            -- offsetX offsetZ  sizeX sizeZ, offset from center of unit
+            -3.5,
+            0.9,
+            0.5,
             2,
-            0,
-            1,
-            3.5,
-            0,
+
+            3,
+            0.9,
+            0.5,
+            2,
+
+            -1.5,
             -3,
-            1.5,
-            1,
+            3,
+            0.5,
         },
         RaisedPlatforms = {
-
-            # The main ramp
-            # TopLeft Offset From Center
+            -- The main ramp
+            -- TopLeft Offset From Center
             -1,
 
-            # x
+            -- x
             -1,
 
-            # z
+            -- z
             0.4,
 
-            # height
-            # TopRight Offset From Center
+            -- height
+            -- TopRight Offset From Center
             1,
 
-            # x
+            -- x
             -1,
 
-            # z
+            -- z
             0.4,
 
-            # height
-            # BottomLeft Offset From Center
+            -- height
+            -- BottomLeft Offset From Center
             -1,
 
-            # x
+            -- x
             1,
 
-            # z
+            -- z
             0.4,
 
-            # height
-            # BottomRight Offset From Center
+            -- height
+            -- BottomRight Offset From Center
             1,
 
-            # x
+            -- x
             1,
 
-            # z
+            -- z
             0.4,
 
-            # height
-            # South side
-            # TopLeft Offset From Center
+            -- height
+            -- South side
+            -- TopLeft Offset From Center
             -1,
 
-            # x
+            -- x
             1,
 
-            # z
+            -- z
             0.4,
 
-            # height
-            # TopRight Offset From Center
+            -- height
+            -- TopRight Offset From Center
             1,
 
-            # x
+            -- x
             1,
 
-            # z
+            -- z
             0.4,
 
-            # height
-            # BottomLeft Offset From Center
+            -- height
+            -- BottomLeft Offset From Center
             -0.4,
 
-            # x
+            -- x
             2.4,
 
-            # z
+            -- z
             0,
 
-            # height
-            # BottomRight Offset From Center
+            -- height
+            -- BottomRight Offset From Center
             0.4,
 
-            # x
+            -- x
             2.4,
 
-            # z
+            -- z
             0,
         },
         RollOffPoints = {
@@ -362,6 +362,18 @@ UnitBlueprint {
                 X = 0,
                 Y = 0,
                 Z = 3,
+            },
+            {
+                UnitSpin = -130,
+                X = -2.5,
+                Y = 0,
+                Z = -1.8,
+            },
+            {
+                UnitSpin = 130,
+                X = 2.5,
+                Y = 0,
+                Z = -1.8,
             },
         },
         SkirtOffsetX = -1.5,
