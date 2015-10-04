@@ -383,6 +383,33 @@ StructureUnit = Class(Unit) {
 
     end,
 
+    -- Refresh intel on a destroyed / upgraded unit by setting vision on the actual blip.
+    -- The expired blip will actually be destroyed right after when the intel system notices it's no longer there
+    RefreshIntel = function(self)
+        local army = self:GetArmy()
+        for i, brain in ArmyBrains do
+            if army ~= i and not IsAlly(i, army) then
+                local blip = self:GetBlip(i)
+
+                if blip then
+                    if not blip:IsSeenEver(i) and (blip:IsOnRadar(i) or blip:IsOnSonar(i)) then
+                        -- Remove dead radar blip out of map so we don't reveal what's under it
+                        blip:SetPosition(Vector(-100, 0, -100), true)
+                    end
+
+                    -- expired blip will disappear with this
+                    blip:InitIntel(i, 'Vision', 2)
+                    blip:EnableIntel('Vision')
+                end
+            end
+        end
+    end,
+
+    DestroyUnit = function(self)
+        self:RefreshIntel()
+        Unit.DestroyUnit(self)
+    end,
+
     -- Adding into OnDestroy the ability to destroy the tarmac but put a new one down that looks exactly like it but
     -- will time out over the time spec'd or 300 seconds.
     OnDestroy = function(self)
