@@ -35,6 +35,18 @@ local sendChat = import('/lua/ui/game/chat.lua').ReceiveChatFromSim
 local oldData = {}
 local lastObserving
 
+function UpdateAverageFPS()
+    local now
+    local wait_frames
+
+    while true do
+        now = CurrentTime()
+        wait_frames = AvgFPS * 10
+        WaitFrames(wait_frames)
+        AvgFPS = math.max(10, math.min(200, math.ceil(wait_frames / (CurrentTime() - now))))
+    end
+end
+
 -- Hotbuild stuff
 modifiersKeys = {}
 -- Adding modifiers shorcuts on the fly.
@@ -237,6 +249,8 @@ function CreateUI(isReplay)
     if options.gui_render_enemy_lifebars == 1 or options.gui_render_custom_names == 0 then
         import('/modules/console_commands.lua').Init()
     end
+
+    ForkThread(UpdateAverageFPS)
 end
 
 local provider = false
