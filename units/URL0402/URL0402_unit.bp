@@ -216,6 +216,12 @@ UnitBlueprint {
                         Radius = 1,
                         Type = 'ExperimentalFootfall',
                     },
+                    Tread = {
+                        TreadLifeTime = 60,
+                        TreadMarks = 'spider_tread',
+                        TreadMarksSizeX = 0.7,
+                        TreadMarksSizeZ = 0.7,
+                    },
                 },
             },
         },
