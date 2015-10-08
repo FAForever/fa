@@ -1582,61 +1582,6 @@ MobileUnit = Class(Unit) {
     end,
 
     OnMotionVertEventChange = function( self, new, old )
-        if self.Dead then
-            return
-        end
-        local layer = self:GetCurrentLayer()
-
-        if (new == 'Down') then
-            --Play the "landing" sound
-            self:PlayUnitSound('Landing')
-        elseif (new == 'Bottom') or (new == 'Hover') then
-            --Play the "landed" sound
-            self:PlayUnitSound('Landed')
-        elseif (new == 'Up' or ( new == 'Top' and ( old == 'Down' or old == 'Bottom' ))) then
-            --Play the "takeoff" sound
-            self:PlayUnitSound('TakeOff')
-        end
-
-        --Adjust any beam exhaust
-        if new == 'Bottom' then
-            self:UpdateBeamExhaust('Landed')
-        elseif old == 'Bottom' then
-            self:UpdateBeamExhaust('Cruise')
-        end
-
-        --Surfacing and sinking, landing and take off idle effects
-        if (new == 'Up' and old == 'Bottom') or
-           (new == 'Down' and old == 'Top') then
-            self:DestroyIdleEffects()
-            if new == 'Up' and layer == 'Sub' then
-                self:PlayUnitSound('SurfaceStart')
-            end
-            if new == 'Down' and layer == 'Water' then
-                self:PlayUnitSound('SubmergeStart')
-                if self.SurfaceAnimator then
-                    self.SurfaceAnimator:SetRate(-1)
-                end
-            end
-        end
-
-        if (new == 'Top' and old == 'Up') or
-           (new == 'Bottom' and old == 'Down') then
-            self:CreateIdleEffects()
-            if new == 'Bottom' and layer == 'Sub' then
-                self:PlayUnitSound('SubmergeEnd')
-            end
-            if new == 'Top' and layer == 'Water' then
-                self:PlayUnitSound('SurfaceEnd')
-                local surfaceAnim = self:GetBlueprint().Display.AnimationSurface
-                if not self.SurfaceAnimator and surfaceAnim then
-                    self.SurfaceAnimator = CreateAnimator(self)
-                end
-                if surfaceAnim and self.SurfaceAnimator then
-                    self.SurfaceAnimator:PlayAnim(surfaceAnim):SetRate(1)
-                end
-            end
-        end
         self:CreateMotionChangeEffects(new,old)
     end,
 
@@ -1982,6 +1927,49 @@ SubUnit = Class(MobileUnit) {
    -- DESTRUCTION PARAMS
     ShowUnitDestructionDebris = false,
     DeathThreadDestructionWaitTime = 0,
+
+    OnMotionVertEventChange = function( self, new, old )
+        if self.Dead then
+            return
+        end
+
+        MobileUnit.OnMotionVertEventChange(self, new, old)
+
+        local layer = self.CurrentLayer
+
+        --Surfacing and sinking, landing and take off idle effects
+        if (new == 'Up' and old == 'Bottom') or
+           (new == 'Down' and old == 'Top') then
+            self:DestroyIdleEffects()
+            if new == 'Up' and layer == 'Sub' then
+                self:PlayUnitSound('SurfaceStart')
+            end
+            if new == 'Down' and layer == 'Water' then
+                self:PlayUnitSound('SubmergeStart')
+                if self.SurfaceAnimator then
+                    self.SurfaceAnimator:SetRate(-1)
+                end
+            end
+        end
+
+        if (new == 'Top' and old == 'Up') or
+           (new == 'Bottom' and old == 'Down') then
+            self:CreateIdleEffects()
+            if new == 'Bottom' and layer == 'Sub' then
+                self:PlayUnitSound('SubmergeEnd')
+            end
+            if new == 'Top' and layer == 'Water' then
+                self:PlayUnitSound('SurfaceEnd')
+                local surfaceAnim = self:GetBlueprint().Display.AnimationSurface
+                if not self.SurfaceAnimator and surfaceAnim then
+                    self.SurfaceAnimator = CreateAnimator(self)
+                end
+                if surfaceAnim and self.SurfaceAnimator then
+                    self.SurfaceAnimator:PlayAnim(surfaceAnim):SetRate(1)
+                end
+            end
+        end
+    end,
 }
 
 --------------------------------------------------------------
@@ -2034,27 +2022,31 @@ AirUnit = Class(MobileUnit) {
     OnMotionVertEventChange = function( self, new, old )
         MobileUnit.OnMotionVertEventChange( self, new, old )
         local army = self:GetArmy()
-        if (new == 'Down') then
-            -- Turn off the ambient hover sound
-            self:StopUnitAmbientSound( 'ActiveLoop' )
-        elseif (new == 'Bottom') then
-            -- While landed, planes can only see half as far
-            local vis = self:GetBlueprint().Intel.VisionRadius / 2
-            self:SetIntelRadius('Vision', vis)
+        local set_vision
 
+        if new == 'Down' or new == 'Hover' or new == 'Bottom' then
             -- Turn off the ambient hover sound
-            -- It will probably already be off, but there are some odd cases that
-            -- make this a good idea to include here as well.
-            self:StopUnitAmbientSound( 'ActiveLoop' )
-        elseif (new == 'Up' or ( new == 'Top' and ( old == 'Down' or old == 'Bottom' ))) then
-            -- Set the vision radius back to default
-            local bpVision = self:GetBlueprint().Intel.VisionRadius
-            if bpVision then
-                self:SetIntelRadius('Vision', bpVision)
+            self:StopUnitAmbientSound('ActiveLoop')
+            if new == 'Down' then
+                self:PlayUnitSound('Landing')
             else
-                self:SetIntelRadius('Vision', 0)
+                self:PlayUnitSound('Landed')
+                if new == 'Bottom' then
+                    self:UpdateBeamExhaust('Landed')
+                    -- While landed, planes can only see half as far
+                    set_vision = (self:GetBlueprint().Intel.VisionRadius or 0) / 2
+                end
+            end
+        elseif old == 'Bottom' or old == 'Down' then
+            self:PlayUnitSound('TakeOff')
+            -- Set the vision radius back to default
+            if old == 'Bottom' then
+                set_vision = self:GetBlueprint().Intel.VisionRadius or 0
+                self:UpdateBeamExhaust('Cruise')
             end
         end
+
+        if set_vision then self:SetIntelRadius('Vision', set_vision) end
     end,
 
     OnStartRefueling = function(self)
