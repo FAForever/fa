@@ -2350,6 +2350,16 @@ SeaUnit = Class(MobileUnit){
         MobileUnit.OnStopBeingBuilt(self,builder,layer)
         self:SetMaintenanceConsumptionActive()
     end,
+
+    OnMotionHorzEventChange = function(self, new, old)
+        if new == 'Stopped' then
+            self:StartRocking()
+        else
+            self:StopRocking()
+        end
+
+        MobileUnit.OnMotionHorzEventChange(self, new, old)
+    end,
 }
 
 --- Base class for aircraft carriers.
