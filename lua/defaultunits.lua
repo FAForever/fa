@@ -1467,32 +1467,45 @@ MobileUnit = Class(Unit) {
         if treads.ScrollTreads then
             self:AddThreadScroller(1.0, treads.ScrollMultiplier or 0.2)
         end
-        self.TreadThreads = {}
+        self.TreadThread = nil
         if treads.TreadMarks then
             local type = self:GetTTTreadType(self:GetPosition())
             if type ~= 'None' then
-                for k, v in treads.TreadMarks do
-                    table.insert( self.TreadThreads, self:ForkThread(self.CreateTreadsThread, v, type ))
-                end
+                self.TreadThread = self:ForkThread(self.CreateTreadsThread, treads.TreadMarks)
             end
         end
     end,
 
-    CreateTreadsThread = function(self, treads, type )
-        local sizeX = treads.TreadMarksSizeX
-        local sizeZ = treads.TreadMarksSizeZ
-        local interval = treads.TreadMarksInterval
-        local treadOffset = treads.TreadOffset
-        local treadBone = treads.BoneName or 0
-        local treadTexture = treads.TreadMarks
-        local duration = treads.TreadLifeTime or 10
+    CreateTreadsThread = function(self, treadsBP)
+        local ux, uy, uz = self:GetUnitSizes()
+        local wait
+        local treads = {}
         local army = self:GetArmy()
 
-        while true do
-            --Syntactic reference
-            --CreateSplatOnBone(entity, offset, boneName, textureName, sizeX, sizeZ, lodParam, duration, army)
-            CreateSplatOnBone(self, treadOffset, treadBone, treadTexture, sizeX, sizeZ, 130, duration, army)
-            WaitSeconds(interval)
+        for _, t in treadsBP do
+            local bones = t.Bones or t.BoneName or 0
+            if type(bones) ~= 'table' then bones = {bones} end
+            wait = math.max(0.1, math.min(wait or 1, t.TreadMarksInterval or 1))
+            table.insert(treads, {texture=t.TreadMarks, x=t.TreadMarksSizeX, z=t.TreadMarksSizeZ, offset=t.TreadOffset, bones=bones or t.BoneName or 0, duration=t.TreadLifeTime or 10})
+        end
+
+        local heading, last_heading
+        while self.CurrentLayer == 'Land' or self.CurrentLayer == 'Seabed' do
+            heading = self:GetHeading()
+            for _, t in treads do
+                for _, bone in t.bones do
+                    -- CreateSplatOnBone doesn't support unit heading unless bone == 0, that's why we need to do this
+                    if bone ~= 0 then
+                        local splat = CreateSplat(self:GetPosition(bone), heading, t.texture, t.x, t.z, 130, t.duration, army)
+                    else
+                        CreateSplatOnBone(self, t.offset, 0, t.texture, t.x, t.z, 130, t.duration, army)
+                    end
+                end
+                --
+            end
+
+            WaitSeconds(last_heading and math.abs(last_heading - heading) < 0.05 and wait or wait*0.7)
+            last_heading = heading
         end
     end,
 
@@ -1830,12 +1843,11 @@ MobileUnit = Class(Unit) {
         end
 
         --Clean up treads
-        if self.TreadThreads then
-            for k, v in self.TreadThreads do
-                KillThread(v)
-            end
-            self.TreadThreads = {}
+        if self.TreadThread then
+            KillThread(self.TreadThread)
+            self.TreadThread = nil
         end
+
         if bpTable[layer].Treads.ScrollTreads then
             self:RemoveScroller()
         end
