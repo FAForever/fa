@@ -1753,8 +1753,9 @@ WalkingLandUnit = Class(MobileUnit) {
 
     OnAnimCollision = function(self, bone, x, y, z)
         local layer = self.CurrentLayer
-        local bpTable = self:GetBlueprint().Display.MovementEffects
-        local footfall = bpTable[layer].Footfall
+        local footfall = self:GetBlueprint().Display.MovementEffects
+
+        footfall = footfall[layer].Footfall or (layer == 'Seabed' and footfall['Land'].Footfall)
 
         if footfall then
             local effects = {}
@@ -1786,33 +1787,20 @@ WalkingLandUnit = Class(MobileUnit) {
                 end
             end
 
-            if boneTable.Tread and self:GetTTTreadType(self:GetPosition(bone)) ~= 'None' then
-                CreateSplatOnBone(self, boneTable.Tread.TreadOffset, 0, boneTable.Tread.TreadMarks, boneTable.Tread.TreadMarksSizeX, boneTable.Tread.TreadMarksSizeZ, 100, boneTable.Tread.TreadLifeTime or 15, army )
-                local treadOffsetX = boneTable.Tread.TreadOffset[1]
-                if x and x > 0 then
-                    if layer ~= 'Seabed' then
-                    self:PlayUnitSound('FootFallLeft')
-                    else
-                        self:PlayUnitSound('FootFallLeftSeabed')
-                    end
-                elseif x and x < 0 then
-                    if layer ~= 'Seabed' then
-                    self:PlayUnitSound('FootFallRight')
-                    else
-                        self:PlayUnitSound('FootFallRightSeabed')
-                    end
-                end
+            local tread = footfall.Tread or boneTable.Tread
+            if tread and self:GetTTTreadType(self:GetPosition(bone)) ~= 'None' then
+                local lifetime = tread.TreadLifeTime or 15
+                if layer == 'Seabed' then lifetime = lifetime * 0.5 end
+                CreateSplat(self:GetPosition(bone), self:GetHeading(), tread.TreadMarks, tread.TreadMarksSizeX, tread.TreadMarksSizeZ, 100, lifetime, army)
+                self:PlayUnitSound('FootFall' .. ((x > 0) and 'Left' or 'Right') .. (layer == 'Seabed' and layer or ''))
             end
 
             for k, v in effects do
-                CreateEmitterAtBone(self, bone, army, v):ScaleEmitter(scale):OffsetEmitter(offset.x or 0,offset.y or 0,offset.z or 0)
+                CreateEmitterAtBone(self, bone, army, v):ScaleEmitter(scale)
             end
         end
-        if layer ~= 'Seabed' then
-            self:PlayUnitSound('FootFallGeneric')
-        else
-            self:PlayUnitSound('FootFallGenericSeabed')
-        end
+
+        self:PlayUnitSound('FootFallGeneric' .. (layer == 'Seabed' and layer or ''))
     end,
 
     CreateFootFallManipulators = function( self, footfall )
