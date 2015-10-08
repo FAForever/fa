@@ -1592,47 +1592,7 @@ MobileUnit = Class(Unit) {
     OnTerrainTypeChange = function(self, new, old) end,
 
     UpdateMovementEffectsOnMotionEventChange = function( self, new, old )
-        local layer = self:GetCurrentLayer()
-        local bpMTable = self:GetBlueprint().Display.MovementEffects
 
-        if( old == 'TopSpeed' ) then
-            --Destroy top speed contrails and exhaust effects
-            self:DestroyTopSpeedEffects()
-        end
-
-        if new == 'TopSpeed' and self.HasFuel then
-            if bpMTable[layer].Contrails and self.ContrailEffects then
-                self:CreateContrails( bpMTable[layer].Contrails )
-            end
-            if bpMTable[layer].TopSpeedFX then
-                self:CreateMovementEffects( self.TopSpeedEffectsBag, 'TopSpeed' )
-            end
-        end
-
-        if (old == 'Stopped' and new ~= 'Stopping') or
-           (old == 'Stopping' and new ~= 'Stopped') then
-            self:DestroyIdleEffects()
-            self:DestroyMovementEffects()
-            self:CreateMovementEffects( self.MovementEffectsBag, nil )
-            if bpMTable.BeamExhaust then
-                self:UpdateBeamExhaust( 'Cruise' )
-            end
-            if self.Detector then
-                self.Detector:Enable()
-            end
-        end
-
-        if new == 'Stopped' then
-            self:DestroyMovementEffects()
-            self:DestroyIdleEffects()
-            self:CreateIdleEffects()
-            if bpMTable.BeamExhaust then
-                self:UpdateBeamExhaust( 'Idle' )
-            end
-            if self.Detector then
-                self.Detector:Disable()
-            end
-        end
     end,
 
     GetTTTreadType = function( self, pos )
@@ -2049,8 +2009,50 @@ AirUnit = Class(MobileUnit) {
         if set_vision then self:SetIntelRadius('Vision', set_vision) end
     end,
 
-    OnStartRefueling = function(self)
-        self:PlayUnitSound('Refueling')
+    UpdateMovementEffectsOnMotionEventChange = function(self, new, old)
+        local layer = self.CurrentLayer
+        local bpMTable = self:GetBlueprint().Display.MovementEffects
+
+        if old == 'TopSpeed' then
+            --Destroy top speed contrails and exhaust effects
+            self:DestroyTopSpeedEffects()
+        end
+
+        if new == 'TopSpeed' and self.HasFuel then
+            if bpMTable[layer].Contrails and self.ContrailEffects then
+                self:CreateContrails( bpMTable[layer].Contrails )
+            end
+            if bpMTable[layer].TopSpeedFX then
+                self:CreateMovementEffects( self.TopSpeedEffectsBag, 'TopSpeed' )
+            end
+        end
+
+        if (old == 'Stopped' and new ~= 'Stopping') or
+           (old == 'Stopping' and new ~= 'Stopped') then
+            self:DestroyIdleEffects()
+            self:DestroyMovementEffects()
+            self:CreateMovementEffects( self.MovementEffectsBag, nil )
+            if bpMTable.BeamExhaust then
+                self:UpdateBeamExhaust( 'Cruise' )
+            end
+            if self.Detector then
+                self.Detector:Enable()
+            end
+        end
+
+        if new == 'Stopped' then
+            self:DestroyMovementEffects()
+            self:DestroyIdleEffects()
+            self:CreateIdleEffects()
+            if bpMTable.BeamExhaust then
+                self:UpdateBeamExhaust( 'Idle' )
+            end
+            if self.Detector then
+                self.Detector:Disable()
+            end
+        end
+
+        MobileUnit.UpdateMovementEffectsOnMotionEventChange(self, new, old)
     end,
 
     OnRunOutOfFuel = function(self)
@@ -2069,6 +2071,10 @@ AirUnit = Class(MobileUnit) {
         self:SetSpeedMult(1)
         self:SetAccMult(1)
         self:SetTurnMult(1)
+    end,
+
+    OnStartRefueling = function(self)
+        self:PlayUnitSound('Refueling')
     end,
 
     OnImpact = function(self, with, other)
