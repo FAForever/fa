@@ -1474,6 +1474,39 @@ MobileUnit = Class(Unit) {
             self:CreateMovementEffects( self.MovementEffectsBag, nil, new )
         end
     end,
+
+    CreateTreads = function(self, treads)
+        if treads.ScrollTreads then
+            self:AddThreadScroller(1.0, treads.ScrollMultiplier or 0.2)
+        end
+        self.TreadThreads = {}
+        if treads.TreadMarks then
+            local type = self:GetTTTreadType(self:GetPosition())
+            if type ~= 'None' then
+                for k, v in treads.TreadMarks do
+                    table.insert( self.TreadThreads, self:ForkThread(self.CreateTreadsThread, v, type ))
+                end
+            end
+        end
+    end,
+
+    CreateTreadsThread = function(self, treads, type )
+        local sizeX = treads.TreadMarksSizeX
+        local sizeZ = treads.TreadMarksSizeZ
+        local interval = treads.TreadMarksInterval
+        local treadOffset = treads.TreadOffset
+        local treadBone = treads.BoneName or 0
+        local treadTexture = treads.TreadMarks
+        local duration = treads.TreadLifeTime or 10
+        local army = self:GetArmy()
+
+        while true do
+            --Syntactic reference
+            --CreateSplatOnBone(entity, offset, boneName, textureName, sizeX, sizeZ, lodParam, duration, army)
+            CreateSplatOnBone(self, treadOffset, treadBone, treadTexture, sizeX, sizeZ, 130, duration, army)
+            WaitSeconds(interval)
+        end
+    end,
 }
 
 --------------------------------------------------------------
