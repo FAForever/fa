@@ -1544,10 +1544,6 @@ MobileUnit = Class(Unit) {
             self:PlayLayerSound('Transition')
         end
 
-        local bpTable = self:GetBlueprint().Display.MovementEffects
-        if not self.Footfalls and bpTable[new].Footfall then
-            self.Footfalls = self:CreateFootFallManipulators( bpTable[new].Footfall )
-        end
         self:CreateLayerChangeEffects( new, old )
     end,
 
@@ -1649,70 +1645,6 @@ MobileUnit = Class(Unit) {
     OnMotionTurnEventChange = function() end,
 
     OnTerrainTypeChange = function(self, new, old) end,
-
-    OnAnimCollision = function(self, bone, x, y, z)
-        local layer = self:GetCurrentLayer()
-        local bpTable = self:GetBlueprint().Display.MovementEffects
-
-        if bpTable[layer].Footfall then
-            bpTable = bpTable[layer].Footfall
-            local effects = {}
-            local scale = 1
-            local offset = nil
-            local army = self:GetArmy()
-            local boneTable = nil
-
-            if bpTable.Damage then
-                local bpDamage = bpTable.Damage
-                DamageArea(self, self:GetPosition(bone), bpDamage.Radius, bpDamage.Amount, bpDamage.Type, bpDamage.DamageFriendly )
-            end
-
-            if bpTable.CameraShake then
-                local shake = bpTable.CameraShake
-                self:ShakeCamera( shake.Radius, shake.MaxShakeEpicenter, shake.MinShakeAtRadius, shake.Interval )
-            end
-
-            for k, v in bpTable.Bones do
-                if bone == v.FootBone then
-                    boneTable = v
-                    bone = v.FootBone
-                    scale = boneTable.Scale or 1
-                    offset = bone.Offset
-                    if v.Type then
-                        effects = self.GetTerrainTypeEffects( 'FXMovement', layer, self:GetPosition(v.FootBone), v.Type )
-                    end
-                    break
-                end
-            end
-
-            if boneTable.Tread and self:GetTTTreadType(self:GetPosition(bone)) ~= 'None' then
-                CreateSplatOnBone(self, boneTable.Tread.TreadOffset, 0, boneTable.Tread.TreadMarks, boneTable.Tread.TreadMarksSizeX, boneTable.Tread.TreadMarksSizeZ, 100, boneTable.Tread.TreadLifeTime or 15, army )
-                local treadOffsetX = boneTable.Tread.TreadOffset[1]
-                if x and x > 0 then
-                    if layer ~= 'Seabed' then
-                    self:PlayUnitSound('FootFallLeft')
-                    else
-                        self:PlayUnitSound('FootFallLeftSeabed')
-                    end
-                elseif x and x < 0 then
-                    if layer ~= 'Seabed' then
-                    self:PlayUnitSound('FootFallRight')
-                    else
-                        self:PlayUnitSound('FootFallRightSeabed')
-                    end
-                end
-            end
-
-            for k, v in effects do
-                CreateEmitterAtBone(self, bone, army, v):ScaleEmitter(scale):OffsetEmitter(offset.x or 0,offset.y or 0,offset.z or 0)
-            end
-        end
-        if layer ~= 'Seabed' then
-            self:PlayUnitSound('FootFallGeneric')
-        else
-            self:PlayUnitSound('FootFallGenericSeabed')
-        end
-    end,
 
     UpdateMovementEffectsOnMotionEventChange = function( self, new, old )
         local layer = self:GetCurrentLayer()
@@ -1945,17 +1877,17 @@ WalkingLandUnit = Class(MobileUnit) {
 
     OnMotionHorzEventChange = function( self, new, old )
         MobileUnit.OnMotionHorzEventChange(self, new, old)
+        local display = self:GetBlueprint().Display
 
-        if ( old == 'Stopped' ) then
-            if (not self.Animator) then
+        if old == 'Stopped' then
+            if not self.Animator then
                 self.Animator = CreateAnimator(self, true)
             end
-            local bpDisplay = self:GetBlueprint().Display
-            if bpDisplay.AnimationWalk then
-                self.Animator:PlayAnim(bpDisplay.AnimationWalk, true)
-                self.Animator:SetRate(bpDisplay.AnimationWalkRate or 1)
+            if display.AnimationWalk then
+                self.Animator:PlayAnim(display.AnimationWalk, true)
+                self.Animator:SetRate(display.AnimationWalkRate or 1)
             end
-        elseif ( new == 'Stopped' ) then
+        elseif new == 'Stopped' then
             -- only keep the animator around if we are dying and playing a death anim
             -- or if we have an idle anim
             if(self.IdleAnim and not self.Dead) then
@@ -1964,6 +1896,75 @@ WalkingLandUnit = Class(MobileUnit) {
                 self.Animator:Destroy()
                 self.Animator = false
             end
+        end
+
+        local footfall = display.MovementEffects[new].Footfall
+        if not self.Footfalls and footfall then
+            self.Footfalls = self:CreateFootFallManipulators( footfall )
+        end
+    end,
+
+    OnAnimCollision = function(self, bone, x, y, z)
+        local layer = self.CurrentLayer
+        local bpTable = self:GetBlueprint().Display.MovementEffects
+        local footfall = bpTable[layer].Footfall
+
+        if footfall then
+            local effects = {}
+            local scale = 1
+            local offset = nil
+            local army = self:GetArmy()
+            local boneTable = nil
+
+            if footfall.Damage then
+                local bpDamage = footfall.Damage
+                DamageArea(self, self:GetPosition(bone), bpDamage.Radius, bpDamage.Amount, bpDamage.Type, bpDamage.DamageFriendly )
+            end
+
+            if footfall.CameraShake then
+                local shake = footfall.CameraShake
+                self:ShakeCamera( shake.Radius, shake.MaxShakeEpicenter, shake.MinShakeAtRadius, shake.Interval )
+            end
+
+            for k, v in footfall.Bones do
+                if bone == v.FootBone then
+                    boneTable = v
+                    bone = v.FootBone
+                    scale = boneTable.Scale or 1
+                    offset = bone.Offset
+                    if v.Type then
+                        effects = self.GetTerrainTypeEffects( 'FXMovement', layer, self:GetPosition(v.FootBone), v.Type )
+                    end
+                    break
+                end
+            end
+
+            if boneTable.Tread and self:GetTTTreadType(self:GetPosition(bone)) ~= 'None' then
+                CreateSplatOnBone(self, boneTable.Tread.TreadOffset, 0, boneTable.Tread.TreadMarks, boneTable.Tread.TreadMarksSizeX, boneTable.Tread.TreadMarksSizeZ, 100, boneTable.Tread.TreadLifeTime or 15, army )
+                local treadOffsetX = boneTable.Tread.TreadOffset[1]
+                if x and x > 0 then
+                    if layer ~= 'Seabed' then
+                    self:PlayUnitSound('FootFallLeft')
+                    else
+                        self:PlayUnitSound('FootFallLeftSeabed')
+                    end
+                elseif x and x < 0 then
+                    if layer ~= 'Seabed' then
+                    self:PlayUnitSound('FootFallRight')
+                    else
+                        self:PlayUnitSound('FootFallRightSeabed')
+                    end
+                end
+            end
+
+            for k, v in effects do
+                CreateEmitterAtBone(self, bone, army, v):ScaleEmitter(scale):OffsetEmitter(offset.x or 0,offset.y or 0,offset.z or 0)
+            end
+        end
+        if layer ~= 'Seabed' then
+            self:PlayUnitSound('FootFallGeneric')
+        else
+            self:PlayUnitSound('FootFallGenericSeabed')
         end
     end,
 }
