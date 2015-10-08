@@ -1509,6 +1509,21 @@ MobileUnit = Class(Unit) {
         end
     end,
 
+    PlayLayerAmbientSound = function(self, type)
+        return self:PlayUnitAmbientSound(type .. self.CurrentLayer) or self:PlayUnitAmbientSound(type)
+    end,
+
+    PlayLayerSound = function(self, type)
+        return self:PlayUnitSound(type .. self.CurrentLayer) or self:PlayUnitSound(type)
+    end,
+
+    StopAmbientMoveSound = function(self)
+        self:StopUnitAmbientSound( 'AmbientMove' )
+        self:StopUnitAmbientSound( 'AmbientMoveWater' )
+        self:StopUnitAmbientSound( 'AmbientMoveSub' )
+        self:StopUnitAmbientSound( 'AmbientMoveLand' )
+    end,
+
     OnLayerChange = function(self, new, old)
         self.CurrentLayer = new
 
@@ -1525,14 +1540,8 @@ MobileUnit = Class(Unit) {
             self:EnableIntel('Vision')
         end
 
-        if( new == 'Land' ) then
-            self:PlayUnitSound('TransitionLand')
-            self:PlayUnitAmbientSound('AmbientMoveLand')
-        elseif(( new == 'Water' ) or ( new == 'Seabed' )) then
-            self:PlayUnitSound('TransitionWater')
-            self:PlayUnitAmbientSound('AmbientMoveWater')
-        elseif ( new == 'Sub' ) then
-            self:PlayUnitAmbientSound('AmbientMoveSub')
+        if new == 'Land' or new == 'Water' then
+            self:PlayLayerSound('Transition')
         end
 
         local bpTable = self:GetBlueprint().Display.MovementEffects
@@ -1546,47 +1555,20 @@ MobileUnit = Class(Unit) {
         if self.Dead then
             return
         end
-        local layer = self:GetCurrentLayer()
 
-        if ( old == 'Stopped' or (old == 'Stopping' and (new == 'Cruise' or new == 'TopSpeed'))) then
+        local old_stop = old == 'Stopped' or old == 'Stopping'
+        local new_stop = new == 'Stopped' or new == 'Stopping'
+
+        if old_stop and not new_stop then
             -- Try the specialised sound, fall back to the general one.
-            if not self:PlayUnitSound('StartMove' .. layer) then
-                self:PlayUnitSound('StartMove')
+            self:PlayLayerSound('StartMove')
+            self:PlayLayerAmbientSound('AmbientMove')
+        elseif new_stop then
+            if not old_stop then
+                -- Try the specialised sound, fall back to the general one.
+                self:PlayLayerSound('StopMove')
             end
-
-            --Initiate the unit's ambient movement sound
-            --Note that there is not currently an 'Air' version, and that
-            --AmbientMoveWater plays if the unit is in either the Water or Seabed layer.
-            if not (
-                ((layer == 'Water' or layer == 'Seabed') and self:PlayUnitAmbientSound('AmbientMoveWater')) or
-                (layer == 'Sub' and self:PlayUnitAmbientSound('AmbientMoveSub')) or
-                (layer == 'Land' and self:PlayUnitAmbientSound('AmbientMoveLand'))
-                )
-            then
-                self:PlayUnitAmbientSound('AmbientMove')
-            end
-
-            self:StopRocking()
-        end
-
-        if ((new == 'Stopped' or new == 'Stopping') and (old == 'Cruise' or old == 'TopSpeed')) then
-            -- Try the specialised sound, fall back to the general one.
-            if not self:PlayUnitSound('StopMove' .. layer) then
-                self:PlayUnitSound('StopMove')
-            end
-
-            --Units in the water will rock back and forth a bit
-            if layer == 'Water' then
-                self:StartRocking()
-            end
-        end
-
-        if( new == 'Stopped' or new == 'Stopping' ) then
-            --Stop ambient sounds
-            self:StopUnitAmbientSound( 'AmbientMove' )
-            self:StopUnitAmbientSound( 'AmbientMoveWater' )
-            self:StopUnitAmbientSound( 'AmbientMoveSub' )
-            self:StopUnitAmbientSound( 'AmbientMoveLand' )
+            self:StopAmbientMoveSound()
         end
 
         if self.MovementEffectsExist then
