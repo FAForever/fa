@@ -1509,6 +1509,8 @@ MobileUnit = Class(Unit) {
     end,
 
     OnLayerChange = function(self, new, old)
+        self.CurrentLayer = new
+
         for i = 1, self:GetWeaponCount() do
             self:GetWeapon(i):SetValidTargetsForCurrentLayer(new)
         end
@@ -1778,7 +1780,7 @@ MobileUnit = Class(Unit) {
     end,
 
     CreateMovementEffects = function( self, EffectsBag, TypeSuffix, TerrainType )
-        local layer = self:GetCurrentLayer()
+        local layer = self.CurrentLayer
         local bpTable = self:GetBlueprint().Display.MovementEffects
 
         if bpTable[layer] then
@@ -1815,7 +1817,7 @@ MobileUnit = Class(Unit) {
     end,
 
     CreateMotionChangeEffects = function( self, new, old )
-        local key = self:GetCurrentLayer()..old..new
+        local key = self.CurrentLayer .. old .. new
         local bpTable = self:GetBlueprint().Display.MotionChangeEffects[key]
 
         if bpTable then
@@ -1825,7 +1827,7 @@ MobileUnit = Class(Unit) {
 
     DestroyMovementEffects = function( self )
         local bpTable = self:GetBlueprint().Display.MovementEffects
-        local layer = self:GetCurrentLayer()
+        local layer = self.CurrentLayer
 
         EffectUtil.CleanupEffectBag(self,'MovementEffectsBag')
 
@@ -2135,7 +2137,7 @@ AirUnit = Class(MobileUnit) {
         -- A completed, flying plane expects an OnImpact event due to air crash.
         -- An incomplete unit in the factory still reports as being in layer "Air", so needs this
         -- stupid check.
-        if self:GetCurrentLayer() == 'Air' and self:GetFractionComplete() == 1  then
+        if self.CurrentLayer == 'Air' and self:GetFractionComplete() == 1  then
             self.CreateUnitAirDestructionEffects( self, 1.0 )
             self:DestroyTopSpeedEffects()
             self:DestroyBeamExhaust()

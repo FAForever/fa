@@ -260,6 +260,8 @@ Unit = Class(moho.unit_methods) {
 
         -- Set up Adjacency container
         self.AdjacentUnits = {}
+
+        self.CurrentLayer = self:GetCurrentLayer()
     end,
 
     -------------------------------------------------------------------------------------------
@@ -1160,7 +1162,7 @@ Unit = Class(moho.unit_methods) {
 
     --On killed: this function plays when the unit takes a mortal hit. Plays death effects and spawns wreckage, dependant on overkill
     OnKilled = function(self, instigator, type, overkillRatio)
-        local layer = self:GetCurrentLayer()
+        local layer = self.CurrentLayer
         self.Dead = true
 
         --Units killed while being invisible because they're teleporting should show when they're killed
@@ -1377,7 +1379,7 @@ Unit = Class(moho.unit_methods) {
         local energy = bp.Economy.BuildCostEnergy * (bp.Wreckage.EnergyMult or 0)
         local time = (bp.Wreckage.ReclaimTimeMultiplier or 1)
         local pos = self:GetPosition()
-        local layer = self:GetCurrentLayer()
+        local layer = self.CurrentLayer
 
         if layer == 'Water' then
             --Reduce the mass value of submerged wrecks
@@ -1532,7 +1534,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     DeathThread = function( self, overkillRatio, instigator)
-        local layer = self:GetCurrentLayer()
+        local layer = self.CurrentLayer
         local isNaval = EntityCategoryContains(categories.NAVAL, self)
         local shallSink = (
             (layer == 'Water' or layer == 'Sub') and  -- In a layer for which sinking is meaningful
@@ -1665,7 +1667,7 @@ Unit = Class(moho.unit_methods) {
 
     HideLandBones = function(self)
         --Hide the bones for buildings built on land
-        if self.LandBuiltHiddenBones and self:GetCurrentLayer() == 'Land' then
+        if self.LandBuiltHiddenBones and self.CurrentLayer == 'Land' then
             for k, v in self.LandBuiltHiddenBones do
                 if self:IsValidBone(v) then
                     self:HideBone(v, true)
@@ -1795,7 +1797,7 @@ Unit = Class(moho.unit_methods) {
         self:EnableUnitIntel('NotInitialized', nil)
         self:ForkThread( self.StopBeingBuiltEffects, builder, layer )
 
-        if ( self:GetCurrentLayer() == 'Water' ) then
+        if ( self.CurrentLayer == 'Water' ) then
             self:StartRocking()
             local surfaceAnim = bp.Display.AnimationSurface
             if not self.SurfaceAnimator and surfaceAnim then
@@ -2592,7 +2594,7 @@ Unit = Class(moho.unit_methods) {
     end,
     
     CreateIdleEffects = function( self )
-        local layer = self:GetCurrentLayer()
+        local layer = self.CurrentLayer
         local bpTable = self:GetBlueprint().Display.IdleEffects
         if bpTable[layer] and bpTable[layer].Effects then
             self:CreateTerrainTypeEffects( bpTable[layer].Effects, 'FXIdle',  layer, nil, self.IdleEffectsBag )
