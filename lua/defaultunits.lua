@@ -1680,64 +1680,6 @@ MobileUnit = Class(Unit) {
         EffectUtil.CleanupEffectBag(self,'IdleEffectsBag')
     end,
 
-    UpdateBeamExhaust = function( self, motionState )
-        local bpTable = self:GetBlueprint().Display.MovementEffects.BeamExhaust
-        if not bpTable then
-            return false
-        end
-
-        if motionState == 'Idle' then
-            if self.BeamExhaustCruise  then
-                self:DestroyBeamExhaust()
-            end
-            if self.BeamExhaustIdle and (table.getn(self.BeamExhaustEffectsBag) == 0) and (bpTable.Idle ~= false) then
-                self:CreateBeamExhaust( bpTable, self.BeamExhaustIdle )
-            end
-        elseif motionState == 'Cruise' then
-            if self.BeamExhaustIdle and self.BeamExhaustCruise then
-                self:DestroyBeamExhaust()
-            end
-            if self.BeamExhaustCruise and (bpTable.Cruise ~= false) then
-                self:CreateBeamExhaust( bpTable, self.BeamExhaustCruise )
-            end
-        elseif motionState == 'Landed' then
-            if not bpTable.Landed then
-                self:DestroyBeamExhaust()
-            end
-        end
-    end,
-
-    CreateBeamExhaust = function( self, bpTable, beamBP )
-        local effectBones = bpTable.Bones
-        if not effectBones or (effectBones and (table.getn(effectBones) == 0)) then
-            LOG('*WARNING: No beam exhaust effect bones defined for unit ',repr(self:GetUnitId()),', Effect Bones must be defined to play beam exhaust effects. Add these to the Display.MovementEffects.BeamExhaust.Bones table in unit blueprint.' )
-            return false
-        end
-        local army = self:GetArmy()
-        for kb, vb in effectBones do
-            table.insert( self.BeamExhaustEffectsBag, CreateBeamEmitterOnEntity(self, vb, army, beamBP ))
-        end
-    end,
-
-    DestroyBeamExhaust = function( self )
-        EffectUtil.CleanupEffectBag(self,'BeamExhaustEffectsBag')
-    end,
-
-    CreateContrails = function(self, tableData )
-        local effectBones = tableData.Bones
-        if not effectBones or (effectBones and (table.getn(effectBones) == 0)) then
-            LOG('*WARNING: No contrail effect bones defined for unit ',repr(self:GetUnitId()),', Effect Bones must be defined to play contrail effects. Add these to the Display.MovementEffects.Air.Contrail.Bones table in unit blueprint. ' )
-            return false
-        end
-        local army = self:GetArmy()
-        local ZOffset = tableData.ZOffset or 0.0
-        for ke, ve in self.ContrailEffects do
-            for kb, vb in effectBones do
-                table.insert(self.TopSpeedEffectsBag, CreateTrail(self,vb,army,ve):SetEmitterParam('POSITION_Z', ZOffset))
-            end
-        end
-    end,
-
     MovementCameraShakeThread = function( self, camShake )
         local radius = camShake.Radius or 5.0
         local maxShakeEpicenter = camShake.MaxShakeEpicenter or 1.0
@@ -1967,7 +1909,6 @@ AirUnit = Class(MobileUnit) {
     OnCreate = function(self)
         MobileUnit.OnCreate(self)
         self.HasFuel = true
-        self:AddPingPong()
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)
@@ -1984,17 +1925,64 @@ AirUnit = Class(MobileUnit) {
         end
     end,
 
-    AddPingPong = function(self)
-        local bp = self:GetBlueprint()
-        if bp.Display.PingPongScroller then
-            bp = bp.Display.PingPongScroller
-            if bp.Ping1 and bp.Ping1Speed and bp.Pong1 and bp.Pong1Speed and bp.Ping2 and bp.Ping2Speed
-                and bp.Pong2 and bp.Pong2Speed then
-                self:AddPingPongScroller(bp.Ping1, bp.Ping1Speed, bp.Pong1, bp.Pong1Speed,
-                                         bp.Ping2, bp.Ping2Speed, bp.Pong2, bp.Pong2Speed)
+    UpdateBeamExhaust = function( self, motionState )
+        local bpTable = self:GetBlueprint().Display.MovementEffects.BeamExhaust
+        if not bpTable then
+            return false
+        end
+
+        if motionState == 'Idle' then
+            if self.BeamExhaustCruise  then
+                self:DestroyBeamExhaust()
+            end
+            if self.BeamExhaustIdle and (table.getn(self.BeamExhaustEffectsBag) == 0) and (bpTable.Idle ~= false) then
+                self:CreateBeamExhaust( bpTable, self.BeamExhaustIdle )
+            end
+        elseif motionState == 'Cruise' then
+            if self.BeamExhaustIdle and self.BeamExhaustCruise then
+                self:DestroyBeamExhaust()
+            end
+            if self.BeamExhaustCruise and (bpTable.Cruise ~= false) then
+                self:CreateBeamExhaust( bpTable, self.BeamExhaustCruise )
+            end
+        elseif motionState == 'Landed' then
+            if not bpTable.Landed then
+                self:DestroyBeamExhaust()
             end
         end
     end,
+
+    CreateBeamExhaust = function( self, bpTable, beamBP )
+        local effectBones = bpTable.Bones
+        if not effectBones or (effectBones and (table.getn(effectBones) == 0)) then
+            LOG('*WARNING: No beam exhaust effect bones defined for unit ',repr(self:GetUnitId()),', Effect Bones must be defined to play beam exhaust effects. Add these to the Display.MovementEffects.BeamExhaust.Bones table in unit blueprint.' )
+            return false
+        end
+        local army = self:GetArmy()
+        for kb, vb in effectBones do
+            table.insert( self.BeamExhaustEffectsBag, CreateBeamEmitterOnEntity(self, vb, army, beamBP ))
+        end
+    end,
+
+    DestroyBeamExhaust = function( self )
+        EffectUtil.CleanupEffectBag(self,'BeamExhaustEffectsBag')
+    end,
+
+    CreateContrails = function(self, tableData )
+        local effectBones = tableData.Bones
+        if not effectBones or (effectBones and (table.getn(effectBones) == 0)) then
+            LOG('*WARNING: No contrail effect bones defined for unit ',repr(self:GetUnitId()),', Effect Bones must be defined to play contrail effects. Add these to the Display.MovementEffects.Air.Contrail.Bones table in unit blueprint. ' )
+            return false
+        end
+        local army = self:GetArmy()
+        local ZOffset = tableData.ZOffset or 0.0
+        for ke, ve in self.ContrailEffects do
+            for kb, vb in effectBones do
+                table.insert(self.TopSpeedEffectsBag, CreateTrail(self,vb,army,ve):SetEmitterParam('POSITION_Z', ZOffset))
+            end
+        end
+    end,
+
 
     OnMotionVertEventChange = function( self, new, old )
         MobileUnit.OnMotionVertEventChange( self, new, old )
