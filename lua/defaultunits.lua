@@ -558,7 +558,7 @@ FactoryUnit = Class(StructureUnit) {
         StructureUnit.OnCreate(self)
         self.BuildingUnit = false
     end,
-    
+
     DestroyUnitBeingBuilt = function(self)
         if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() < 1 then
             if self.UnitBeingBuilt:GetFractionComplete() > 0.5 then
@@ -567,7 +567,7 @@ FactoryUnit = Class(StructureUnit) {
                 self.UnitBeingBuilt:Destroy()
             end
         end
-    end, 
+    end,
 
     OnDestroy = function(self)
         -- Figure out if we're a research station
@@ -581,7 +581,7 @@ FactoryUnit = Class(StructureUnit) {
         end
 
         StructureUnit.OnDestroy(self)
-        
+
         self.DestroyUnitBeingBuilt(self)
     end,
 
@@ -1296,7 +1296,7 @@ SeaFactoryUnit = Class(FactoryUnit) {
 
     StopRocking = function(self)
     end,
-    
+
     DestroyUnitBeingBuilt = function(self)
         if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() < 1 then
             self.UnitBeingBuilt:Destroy()
@@ -1434,28 +1434,16 @@ MobileUnit = Class(Unit) {
         end
     end,
 
-    StopBeingBuiltEffects = function(self, builder, layer)
-        Unit.StopBeingBuiltEffects(self, builder, layer)
+    CreateReclaimEffects = function(self, target)
+        EffectUtil.PlayReclaimEffects( self, target, self:GetBlueprint().General.BuildBones.BuildEffectBones or {0}, self.ReclaimEffectsBag )
     end,
 
-    StartBuildingEffects = function(self, unitBeingBuilt, order)
-        Unit.StartBuildingEffects(self, unitBeingBuilt, order)
+    CreateReclaimEndEffects = function(self, target)
+        EffectUtil.PlayReclaimEndEffects(self, target)
     end,
 
-    StopBuildingEffects = function(self, unitBeingBuilt)
-        Unit.StopBuildingEffects(self, unitBeingBuilt)
-    end,
-
-    CreateReclaimEffects = function( self, target )
-        EffectUtil.PlayReclaimEffects( self, target, self:GetBlueprint().General.BuildBones.BuildEffectBones or {0,}, self.ReclaimEffectsBag )
-    end,
-
-    CreateReclaimEndEffects = function( self, target )
-        EffectUtil.PlayReclaimEndEffects( self, target )
-    end,
-
-    CreateCaptureEffects = function( self, target )
-        EffectUtil.PlayCaptureEffects( self, target, self:GetBlueprint().General.BuildBones.BuildEffectBones or {0,}, self.CaptureEffectsBag )
+    CreateCaptureEffects = function(self, target)
+        EffectUtil.PlayCaptureEffects(self, target, self:GetBlueprint().General.BuildBones.BuildEffectBones or {0}, self.CaptureEffectsBag)
     end,
 
     -- Units with layer change effects (amphibious units like Megalith) need
@@ -1541,7 +1529,7 @@ MobileUnit = Class(Unit) {
         self:CreateLayerChangeEffects( new, old )
     end,
 
-    OnMotionHorzEventChange = function( self, new, old )
+    OnMotionHorzEventChange = function(self, new, old)
         if self.Dead then
             return
         end
@@ -1589,12 +1577,13 @@ MobileUnit = Class(Unit) {
         end
 
         if self.MovementEffectsExist then
-            self:UpdateMovementEffectsOnMotionEventChange( new, old )
+            self:UpdateMovementEffectsOnMotionEventChange(new, old)
         end
 
         if old == 'Stopped' then
             self:DoOnHorizontalStartMoveCallbacks()
         end
+
         for i = 1, self:GetWeaponCount() do
             local wep = self:GetWeapon(i)
             wep:OnMotionHorzEventChange(new, old)
@@ -2049,7 +2038,6 @@ AirUnit = Class(MobileUnit) {
 
     OnMotionVertEventChange = function( self, new, old )
         MobileUnit.OnMotionVertEventChange( self, new, old )
-        --LOG( 'OnMotionVertEventChange, new = ', new, ', old = ', old )
         local army = self:GetArmy()
         if (new == 'Down') then
             -- Turn off the ambient hover sound
@@ -2381,7 +2369,7 @@ SlowHoverLandUnit = Class(HoverLandUnit) {
         -- Slow these units down when they transition from land to water
         -- The mult is applied twice thanks to an engine bug, so careful when adjusting it
         -- Newspeed = oldspeed * mult * mult
-        
+
         local mult = self:GetBlueprint().Physics.WaterSpeedMultiplier
         if new == 'Water' then
             self:SetSpeedMult(mult)
