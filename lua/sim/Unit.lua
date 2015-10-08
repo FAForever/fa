@@ -2690,12 +2690,7 @@ Unit = Class(moho.unit_methods) {
     -- cycle eater, so we killed it.
     OnMotionTurnEventChange = function() end,
 
-    OnTerrainTypeChange = function(self, new, old)
-        if self.MovementEffectsExist then
-            self:DestroyMovementEffects()
-            self:CreateMovementEffects( self.MovementEffectsBag, nil, new )
-        end
-    end,
+    OnTerrainTypeChange = function(self, new, old) end,
 
     OnAnimCollision = function(self, bone, x, y, z)
         local layer = self:GetCurrentLayer()

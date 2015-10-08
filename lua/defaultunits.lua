@@ -1365,6 +1365,8 @@ QuantumGateUnit = Class(FactoryUnit) {
 --  MOBILE UNITS
 --------------------------------------------------------------
 MobileUnit = Class(Unit) {
+    TerrainType = nil,
+
     -- Added for engymod. After creating an enhancement, units must re-check their build restrictions
     CreateEnhancement = function(self, enh)
         Unit.CreateEnhancement(self, enh)
@@ -1462,6 +1464,15 @@ MobileUnit = Class(Unit) {
     OnStopBeingBuilt = function(self,builder,layer)
        Unit.OnStopBeingBuilt(self,builder,layer)
        self:OnLayerChange(layer, 'None')
+    end,
+
+    OnTerrainTypeChange = function(self, new, old)
+        self.TerrainType = new
+
+        if self.MovementEffectsExist then
+            self:DestroyMovementEffects()
+            self:CreateMovementEffects( self.MovementEffectsBag, nil, new )
+        end
     end,
 }
 
