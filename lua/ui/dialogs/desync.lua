@@ -16,7 +16,7 @@ local dialog = false
 local doesntCare = false
 
 function UpdateDialog(beatNumber, strings)
-    WARN("Desynch at beat " .. beatNumber .. " tick " .. GetGameTimeSeconds())
+    WARN("Desync at beat " .. beatNumber .. " tick " .. GetGameTimeSeconds())
     if doesntCare or dialog then
         return
     end

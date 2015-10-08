@@ -41,19 +41,7 @@ function GetTechLevelString(bp)
 end
 
 function FormatTime(seconds)
-    local tempSeconds = math.floor(seconds)
-    local tempMinutes = 00
-
-    tempMinutes = math.floor(tempSeconds / 60)
-    tempSeconds = tempSeconds - (tempMinutes * 60)
-    if(tempMinutes < 10) then
-        tempMinutes = "0" .. tostring(tempMinutes)
-    end
-    if(tempSeconds < 10) then
-        tempSeconds = "0" .. tostring(tempSeconds)
-    end
-    local tempTime = tostring(tempMinutes) .. ":" .. tostring(tempSeconds)
-    return tempTime
+    return string.format("%02d:%02d", math.floor(seconds / 60), math.mod(seconds, 60))
 end
 
 function GetAbilityList(bp)

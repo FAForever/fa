@@ -59,7 +59,6 @@ Popup = Class(Group) {
 
     --- Close the dialog.
     Close = function(self)
-        EscapeHandler.PopEscapeHandler()
         self:OnClosed()
         self:Destroy()
     end,
@@ -75,5 +74,7 @@ Popup = Class(Group) {
     end,
 
     --- Called when the dialog is closed via any method.
-    OnClosed = function(self) end,
+    OnClosed = function(self)
+        EscapeHandler.PopEscapeHandler()
+    end,
 }
