@@ -1750,23 +1750,6 @@ MobileUnit = Class(Unit) {
             end
         end
     end,
-
-    CreateFootFallManipulators = function( self, footfall )
-        if not footfall.Bones or (footfall.Bones and (table.getn(footfall.Bones) == 0)) then
-            LOG('*WARNING: No footfall bones defined for unit ',repr(self:GetUnitId()),', ', 'these must be defined to animation collision detector and foot plant controller' )
-            return false
-        end
-
-        self.Detector = CreateCollisionDetector(self)
-        self.Trash:Add(self.Detector)
-        for k, v in footfall.Bones do
-            self.Detector:WatchBone(v.FootBone)
-            if v.FootBone and v.KneeBone and v.HipBone then
-                CreateFootPlantController(self, v.FootBone, v.KneeBone, v.HipBone, v.StraightLegs or true, v.MaxFootFall or 0):SetPrecedence(10)
-            end
-        end
-        return true
-    end,
 }
 
 --------------------------------------------------------------
@@ -1780,8 +1763,28 @@ WalkingLandUnit = Class(MobileUnit) {
     DeathAnim = false,
     DisabledBones = {},
 
-    OnMotionHorzEventChange = function( self, new, old )
-        MobileUnit.OnMotionHorzEventChange(self, new, old)
+    UpdateMovementEffectsOnMotionEventChange = function(self, new, old)
+        if self.Detector then
+            if new == 'Stopped' then
+                self.Detector:Disable()
+            elseif old == 'Stopped' then
+                self.Detector:Enable()
+            end
+        end
+
+        MobileUnit.UpdateMovementEffectsOnMotionEventChange()
+    end,
+
+    OnLayerChange = function(self, new, old)
+        local footfall = self:GetBlueprint().Display.MovementEffects[new].Footfall
+        if not self.Footfalls and footfall then
+            self.Footfalls = self:CreateFootFallManipulators(footfall)
+        end
+
+        MobileUnit.OnLayerChange(self, new, old)
+    end,
+
+    OnMotionHorzEventChange = function(self, new, old)
         local display = self:GetBlueprint().Display
 
         if old == 'Stopped' then
@@ -1803,10 +1806,7 @@ WalkingLandUnit = Class(MobileUnit) {
             end
         end
 
-        local footfall = display.MovementEffects[new].Footfall
-        if not self.Footfalls and footfall then
-            self.Footfalls = self:CreateFootFallManipulators( footfall )
-        end
+        MobileUnit.OnMotionHorzEventChange(self, new, old)
     end,
 
     OnAnimCollision = function(self, bone, x, y, z)
@@ -1871,6 +1871,23 @@ WalkingLandUnit = Class(MobileUnit) {
         else
             self:PlayUnitSound('FootFallGenericSeabed')
         end
+    end,
+
+    CreateFootFallManipulators = function( self, footfall )
+        if not footfall.Bones or (footfall.Bones and (table.getn(footfall.Bones) == 0)) then
+            LOG('*WARNING: No footfall bones defined for unit ',repr(self:GetUnitId()),', ', 'these must be defined to animation collision detector and foot plant controller' )
+            return false
+        end
+
+        self.Detector = CreateCollisionDetector(self)
+        self.Trash:Add(self.Detector)
+        for k, v in footfall.Bones do
+            self.Detector:WatchBone(v.FootBone)
+            if v.FootBone and v.KneeBone and v.HipBone then
+                CreateFootPlantController(self, v.FootBone, v.KneeBone, v.HipBone, v.StraightLegs or true, v.MaxFootFall or 0):SetPrecedence(10)
+            end
+        end
+        return true
     end,
 }
 
@@ -2035,9 +2052,6 @@ AirUnit = Class(MobileUnit) {
             if bpMTable.BeamExhaust then
                 self:UpdateBeamExhaust( 'Cruise' )
             end
-            if self.Detector then
-                self.Detector:Enable()
-            end
         end
 
         if new == 'Stopped' then
@@ -2046,9 +2060,6 @@ AirUnit = Class(MobileUnit) {
             self:CreateIdleEffects()
             if bpMTable.BeamExhaust then
                 self:UpdateBeamExhaust( 'Idle' )
-            end
-            if self.Detector then
-                self.Detector:Disable()
             end
         end
 
