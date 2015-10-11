@@ -2546,6 +2546,8 @@ Unit = Class(moho.unit_methods) {
             self:DisableIntel('WaterVision')
         elseif (old == 'Land' or old == 'None') and new == 'Seabed' then
             self:EnableIntel('WaterVision')
+        elseif (old == 'None') then
+            self:EnableIntel('Vision')
         end
 
         if( new == 'Land' ) then
