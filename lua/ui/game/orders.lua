@@ -20,6 +20,7 @@ local Prefs = import('/lua/user/prefs.lua')
 local Keymapping = import('/lua/keymap/defaultKeyMap.lua').defaultKeyMap
 local CM = import('/lua/ui/game/commandmode.lua')
 local UIMain = import('/lua/ui/uimain.lua')
+local Select = import('/lua/ui/game/selection.lua')
 
 controls =
 {
@@ -204,6 +205,38 @@ end
 local function MomentaryOrderBehavior(self, modifiers)
     IssueCommand(GetUnitCommandFromCommandCap(self._order))
     self:SetCheck(false)
+end
+
+function Stop(units)
+    local units = units or GetSelectedUnits()
+    local launchers = EntityCategoryFilterDown(categories.SILO, units)
+    if launchers[1] then
+        Select.Hidden(function()
+            SelectUnits(launchers)
+            local cb = { Func = 'ClearCommands'}
+            SimCallback(cb, true)
+        end)
+    end
+
+    local stop_units = EntityCategoryFilterOut(categories.SILO, units)
+    if stop_units[1] then
+        IssueUnitCommand(stop_units, 'Stop')
+    end
+end
+
+function SoftStop(units)
+    local units = units or GetSelectedUnits()
+    import('/lua/ui/game/construction.lua').ResetOrderQueues(units)
+    Stop(EntityCategoryFilterOut(categories.FACTORY, units))
+end
+
+function StopOrderBehavior(self, modifiers)
+    local userKeyMap = Prefs.GetFromCurrentProfile("UserKeyMap")
+    if userKeyMap['S'] == 'soft_stop' then
+        SoftStop()
+    else
+        Stop()
+    end
 end
 
 -- used by things that build weapons, etc
@@ -697,7 +730,7 @@ local defaultOrdersTable = {
     RULEUCC_Move = {                helpText = "move",          bitmapId = 'move',                  preferredSlot = 1,  behavior = StandardOrderBehavior,},
     RULEUCC_Attack = {              helpText = "attack",        bitmapId = 'attack',                preferredSlot = 2,  behavior = StandardOrderBehavior, },
     RULEUCC_Patrol = {              helpText = "patrol",        bitmapId = 'patrol',                preferredSlot = 3,  behavior = StandardOrderBehavior, },
-    RULEUCC_Stop = {                helpText = "stop",          bitmapId = 'stop',                  preferredSlot = 4,  behavior = MomentaryOrderBehavior, },
+    RULEUCC_Stop = {                helpText = "stop",          bitmapId = 'stop',                  preferredSlot = 4,  behavior = StopOrderBehavior, },
     RULEUCC_Guard = {               helpText = "assist",        bitmapId = 'guard',                 preferredSlot = 5,  behavior = StandardOrderBehavior, },
     RULEUCC_RetaliateToggle = {     helpText = "mode",          bitmapId = 'stand-ground',          preferredSlot = 6,  behavior = RetaliateOrderBehavior,      initialStateFunc = RetaliateInitFunction, },
 
