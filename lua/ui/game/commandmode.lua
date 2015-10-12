@@ -78,6 +78,8 @@ local issuedOneCommand = false
 local startBehaviors = {}
 local endBehaviors = {}
 
+local ferryRoute= {}
+
 function OnCommandModeBeat()
     if issuedOneCommand and not IsKeyDown('Shift') then
         EndCommandMode(true)
@@ -191,4 +193,16 @@ function OnCommandIssued(command)
 	end
 
 	import('/lua/spreadattack.lua').MakeShadowCopyOrders(command)
+
+
+    if command.CommandType == 'Ferry' then
+        local pos = command.Target.Position
+        table.insert(ferryRoute, {pos[1], pos[2], pos[3]})
+    end
+
+    if table.getsize(ferryRoute) > 1 and not IsKeyDown('Shift') then
+        local cb = { Func = 'PersistFerry', Args = { route = ferryRoute} }
+        SimCallback(cb, true)
+        ferryRoute = {}
+    end
 end
