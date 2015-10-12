@@ -3720,6 +3720,14 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    TransportLock = function(self, bool)
+        bool = bool == true
+        if bool ~= self.TransportLock then
+            self.Sync.locked = bool
+        end
+        self.TransportLocked = bool
+    end,
+
     -------------------------------------------------------------------------------------------
     -- TELEPORTING
     -------------------------------------------------------------------------------------------

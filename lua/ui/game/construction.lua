@@ -541,6 +541,11 @@ function CommonLogic()
             end
             control.Icon:Show()
             control:Enable()
+
+            if UnitData[control.Data.unit:GetEntityId()].locked then
+                control:SetOverrideTexture('')
+                control:ToggleOverride()
+            end
         end
     end
 
@@ -1165,6 +1170,7 @@ function OnClickHandler(button, modifiers)
     elseif item.type == 'attachedunit' then
         if modifiers.Left then
             -- Toggling selection of the entity
+            button:SetOverrideTexture(button.mActive)
             button:ToggleOverride()
 
             -- Add or Remove the entity to the session selection
@@ -1173,6 +1179,11 @@ function OnClickHandler(button, modifiers)
             else
                 RemoveFromSessionExtraSelectList(item.unit)
             end
+        elseif modifiers.Right then
+            local cb = { Func = 'TransportLock', Args = { ids = {item.unit:GetEntityId()}, lock=not button:GetOverrideEnabled()} }
+            SimCallback(cb, true)
+            button:SetOverrideTexture('')
+            button:ToggleOverride()
         end
     elseif item.type == 'templates' then
         ClearBuildTemplates()
