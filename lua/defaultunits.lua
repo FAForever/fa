@@ -2109,6 +2109,14 @@ AirUnit = Class(MobileUnit) {
         end
     end,
 
+    DestroyEffectsOnDeath = function(self)
+        self:DestroyTopSpeedEffects()
+        self:DestroyIdleEffects()
+        self:DestroyBeamExhaust()
+
+        MobileUnit.DestroyEffectsOnDeath(self)
+    end,
+
     --- Called when the unit is killed, but before it falls out of the sky and blows up.
     OnKilled = function(self, instigator, type, overkillRatio)
         local bp = self:GetBlueprint()

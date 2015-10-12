@@ -1522,6 +1522,11 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    DestroyEffectsOnDeath = function(self)
+        self:DestroyAllDamageEffects()
+        self:DestroyAllBuildEffects()
+    end,
+
     DeathThread = function( self, overkillRatio, instigator)
         local layer = self.CurrentLayer
         local isNaval = EntityCategoryContains(categories.NAVAL, self)
@@ -1530,12 +1535,9 @@ Unit = Class(moho.unit_methods) {
             not EntityCategoryContains(categories.FACTORY * categories.STRUCTURE * categories.NAVAL, self)  -- Exclude naval factories
         )
         WaitSeconds(utilities.GetRandomFloat( self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax) )
-        self:DestroyAllDamageEffects()
-        self:DestroyTopSpeedEffects()
-        self:DestroyIdleEffects()
-        self:DestroyBeamExhaust()
-        self:DestroyAllBuildEffects()
 
+        self:DestroyEffectsOnDeath()
+        
         -- BOOM!
         if self.PlayDestructionEffects then
             self:CreateDestructionEffects(overkillRatio)
