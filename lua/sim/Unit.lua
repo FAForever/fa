@@ -293,17 +293,6 @@ Unit = Class(moho.unit_methods) {
         return math.max(fp.SizeX, fp.SizeZ)
     end,
 
-    --Returns 4 numbers: skirt x0, skirt z0, skirt.x1, skirt.z1
-    GetSkirtRect = function(self)
-        local bp = self:GetBlueprint()
-        local x, y, z = unpack(self:GetPosition())
-        local fx = x - bp.Footprint.SizeX*.5
-        local fz = z - bp.Footprint.SizeZ*.5
-        local sx = fx + bp.Physics.SkirtOffsetX
-        local sz = fz + bp.Physics.SkirtOffsetZ
-        return sx, sz, sx+bp.Physics.SkirtSizeX, sz+bp.Physics.SkirtSizeZ
-    end,
-
     --Returns collision box size
     GetUnitSizes = function(self)
         local bp = self:GetBlueprint()
