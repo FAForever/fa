@@ -203,7 +203,9 @@ UnitBlueprint {
                     LodCutoff = 'Weapon_LodCutoff',
                 },
             },
-            BallisticArc = 'RULEUBA_LowArc',
+            BallisticArc = 'RULEUBA_None',
+            BeamCollisionDelay = 0.1,
+            BeamLifetime = 0.1,
             CollideFriendly = false,
             Damage = 25, 
             DamageType = 'Normal',
@@ -212,15 +214,13 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 2,
+            FiringTolerance = 0,
             Label = 'MainGun',
             LeadTarget = false, 
             MaxRadius = 23,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 100,
             ProjectilesPerOnFire = 1,
-            ProjectileId = '/projectiles/CDFLaserHeavy02/CDFLaserHeavy02_proj.bp',
             RackBones = {
                 {
                     MuzzleBones = {
