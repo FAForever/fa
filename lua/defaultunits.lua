@@ -1472,8 +1472,8 @@ MobileUnit = Class(Unit) {
     -- Units with layer change effects (amphibious units like Megalith) need
     -- those changes applied when build ends, so we need to trigger the
     -- layer change event
-    OnStopBeingBuilt = function(self,builder,layer)
-       Unit.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+       Unit.OnStopBeingBuilt(self, builder, layer)
 
         --Initialize movement effects subsystems, idle effects, beam exhaust, and footfall manipulators
         local bpTable = self:GetBlueprint().Display.MovementEffects
@@ -2433,6 +2433,11 @@ CommandUnit = Class(WalkingLandUnit) {
         self.rightGunLabel = rightGunName
     end,
 
+    OnCreate = function(self)
+        WalkingLandUnit.OnCreate(self)
+        self:ShowPresetEnhancementBones()
+    end,
+
     ResetRightArm = function(self)
         self:BuildManipulatorSetEnabled(false)
         self.BuildArmManipulator:SetPrecedence(0)
@@ -2513,6 +2518,14 @@ CommandUnit = Class(WalkingLandUnit) {
         self.BuildingUnit = false
     end,
 
+    OnStopBeingBuilt = function(self, builder, layer)
+        WalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
+
+        if self:GetBlueprint().EnhancementPresetAssigned then
+            self:ForkThread(self.CreatePresetEnhancementsThread)
+        end
+    end,
+
     OnPaused = function(self)
         WalkingLandUnit.OnPaused(self)
         if self.BuildingUnit then
@@ -2525,7 +2538,99 @@ CommandUnit = Class(WalkingLandUnit) {
             WalkingLandUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
         end
         WalkingLandUnit.OnUnpaused(self)
-    end
+    end,
+
+    OnKilled = function(self, instigator, type, overkillRatio)
+        --Units killed while being invisible because they're teleporting should show when they're killed
+        if self.TeleportFx_IsInvisible then
+            self:ShowBone(0, true)
+            self:ShowEnhancementBones()
+        end
+
+        WalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)
+    end,
+
+    -------------------------------------------------------------------------------------------
+    -- UNIT ENHANCEMENT PRESETS
+    -------------------------------------------------------------------------------------------
+    -- Added by Brute51, copied from Nomads code for SCU presets
+    ShowPresetEnhancementBones = function(self)
+        --Hide bones not involved in the preset enhancements.
+        --Useful during the build process to show the contours of the unit being built. Only visual.
+
+        local bp = self:GetBlueprint()
+
+        if bp.Enhancements and ( table.find(bp.Categories, 'USEBUILDPRESETS') or table.find(bp.Categories, 'ISPREENHANCEDUNIT') ) then
+
+            --Create a blank slate: Hide all enhancement bones as specified in the unit BP
+            for k, enh in bp.Enhancements do
+                if enh.HideBones then
+                    for _, bone in enh.HideBones do
+                        self:HideBone(bone, true)
+                    end
+                end
+            end
+
+            --For the barebone version we're done here. For the presets versions: show the bones of the enhancements we'll create later on
+            if bp.EnhancementPresetAssigned then
+                for k, v in bp.EnhancementPresetAssigned.Enhancements do
+
+                    --First show all relevant bones
+                    if bp.Enhancements[v] and bp.Enhancements[v].ShowBones then
+                        for _, bone in bp.Enhancements[v].ShowBones do
+                            self:ShowBone(bone, true)
+                        end
+                    end
+
+                    --Now hide child bones of previously revealed bones, that should remain hidden
+                    if bp.Enhancements[v] and bp.Enhancements[v].HideBones then
+                        for _, bone in bp.Enhancements[v].HideBones do
+                            self:HideBone(bone, true)
+                        end
+                    end
+                end
+            end
+        end
+    end,
+
+    CreatePresetEnhancements = function(self)
+        local bp = self:GetBlueprint()
+        if bp.Enhancements and bp.EnhancementPresetAssigned and bp.EnhancementPresetAssigned.Enhancements then
+            for k, v in bp.EnhancementPresetAssigned.Enhancements do
+                self:CreateEnhancement(v)
+            end
+        end
+    end,
+
+    CreatePresetEnhancementsThread = function(self)
+        --Creating the preset enhancements on SCUs after they've been constructed. Delaying this by 1 tick to fix a problem where cloak and
+        --stealth enhancements work incorrectly.
+        WaitTicks(1)
+        if self and not self.Dead then
+            self:CreatePresetEnhancements()
+        end
+    end,
+
+    ShowEnhancementBones = function(self)
+        --Hide and show certain bones based on available enhancements
+        local bp = self:GetBlueprint()
+        if bp.Enhancements then
+            for k, enh in bp.Enhancements do
+                if enh.HideBones then
+                    for _, bone in enh.HideBones do
+                        self:HideBone(bone, true)
+                    end
+                end
+            end
+            for k, enh in bp.Enhancements do
+                if self:HasEnhancement(k) and enh.ShowBones then
+                    for _, bone in enh.ShowBones do
+                        self:ShowBone(bone, true)
+                    end
+                end
+            end
+        end
+    end,
 }
 
 ACUUnit = Class(CommandUnit) {
