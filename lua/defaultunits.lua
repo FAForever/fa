@@ -1924,7 +1924,14 @@ AirUnit = Class(MobileUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         MobileUnit.OnStopBeingBuilt(self,builder,layer)
+        
         local bp = self:GetBlueprint()
+        local bpTable = bp.Display.MovementEffects
+        if bpTable.BeamExhaust and bpTable.BeamExhaust.Idle ~= false then
+            self:UpdateBeamExhaust( 'Idle' )
+        end
+
+        
         if bp.SizeSphere then
             self:SetCollisionShape(
                 'Sphere',
@@ -1936,7 +1943,7 @@ AirUnit = Class(MobileUnit) {
         end
     end,
 
-    UpdateBeamExhaust = function( self, motionState )
+    UpdateBeamExhaust = function(self, motionState)
         local bpTable = self:GetBlueprint().Display.MovementEffects.BeamExhaust
         if not bpTable then
             return false
