@@ -1490,58 +1490,17 @@ MobileUnit = Class(Unit) {
         self:OnLayerChange(layer, 'None')
     end,
 
+    GetTTTreadType = function( self, pos )
+        local TerrainType = GetTerrainType( pos.x,pos.z )
+        return TerrainType.Treads or 'None'
+    end,
+
     OnTerrainTypeChange = function(self, new, old)
         self.TerrainType = new
 
         if self.MovementEffectsExist then
             self:DestroyMovementEffects()
             self:CreateMovementEffects( self.MovementEffectsBag, nil, new )
-        end
-    end,
-
-    CreateTreads = function(self, treads)
-        if treads.ScrollTreads then
-            self:AddThreadScroller(1.0, treads.ScrollMultiplier or 0.2)
-        end
-        self.TreadThread = nil
-        if treads.TreadMarks then
-            local type = self:GetTTTreadType(self:GetPosition())
-            if type ~= 'None' then
-                self.TreadThread = self:ForkThread(self.CreateTreadsThread, treads.TreadMarks)
-            end
-        end
-    end,
-
-    CreateTreadsThread = function(self, treadsBP)
-        local ux, uy, uz = self:GetUnitSizes()
-        local wait
-        local treads = {}
-        local army = self:GetArmy()
-
-        for _, t in treadsBP do
-            local bones = t.Bones or t.BoneName or 0
-            if type(bones) ~= 'table' then bones = {bones} end
-            wait = math.max(0.1, math.min(wait or 1, t.TreadMarksInterval or 1))
-            table.insert(treads, {texture=t.TreadMarks, x=t.TreadMarksSizeX, z=t.TreadMarksSizeZ, offset=t.TreadOffset, bones=bones or t.BoneName or 0, duration=t.TreadLifeTime or 10})
-        end
-
-        local heading, last_heading
-        while self.CurrentLayer == 'Land' or self.CurrentLayer == 'Seabed' do
-            heading = self:GetHeading()
-            for _, t in treads do
-                for _, bone in t.bones do
-                    -- CreateSplatOnBone doesn't support unit heading unless bone == 0, that's why we need to do this
-                    if bone ~= 0 then
-                        local splat = CreateSplat(self:GetPosition(bone), heading, t.texture, t.x, t.z, 130, t.duration, army)
-                    else
-                        CreateSplatOnBone(self, t.offset, 0, t.texture, t.x, t.z, 130, t.duration, army)
-                    end
-                end
-                --
-            end
-
-            WaitSeconds(last_heading and math.abs(last_heading - heading) < 0.05 and wait or wait*0.7)
-            last_heading = heading
         end
     end,
 
@@ -1627,13 +1586,22 @@ MobileUnit = Class(Unit) {
 
     OnTerrainTypeChange = function(self, new, old) end,
 
-    UpdateMovementEffectsOnMotionEventChange = function( self, new, old )
+    UpdateMovementEffectsOnMotionEventChange = function(self, new, old)
+        local layer = self.CurrentLayer
+        local bpMTable = self:GetBlueprint().Display.MovementEffects
 
-    end,
+        if (old == 'Stopped' and new ~= 'Stopping') or
+           (old == 'Stopping' and new ~= 'Stopped') then
+            self:DestroyIdleEffects()
+            self:DestroyMovementEffects()
+            self:CreateMovementEffects( self.MovementEffectsBag, nil )
+        end
 
-    GetTTTreadType = function( self, pos )
-        local TerrainType = GetTerrainType( pos.x,pos.z )
-        return TerrainType.Treads or 'None'
+        if new == 'Stopped' then
+            self:DestroyMovementEffects()
+            self:DestroyIdleEffects()
+            self:CreateIdleEffects()
+        end
     end,
 
     CreateMovementEffects = function( self, EffectsBag, TypeSuffix, TerrainType )
@@ -1643,19 +1611,6 @@ MobileUnit = Class(Unit) {
         if bpTable[layer] then
             bpTable = bpTable[layer]
             local effectTypeGroups = bpTable.Effects
-
-            if bpTable.Treads then
-                self:CreateTreads( bpTable.Treads )
-            else
-                self:RemoveScroller()
-            end
-
-            if (not effectTypeGroups or (effectTypeGroups and (table.getn(effectTypeGroups) == 0))) then
-                if not self.Footfalls and bpTable.Footfall then
-                    LOG('*WARNING: No movement effect groups defined for unit ',repr(self:GetUnitId()),', Effect groups with bone lists must be defined to play movement effects. Add these to the Display.MovementEffects', layer, '.Effects table in unit blueprint. ' )
-                end
-                return false
-            end
 
             if bpTable.CameraShake then
                 self.CamShakeT1 = self:ForkThread(self.MovementCameraShakeThread, bpTable.CameraShake )
@@ -1682,29 +1637,18 @@ MobileUnit = Class(Unit) {
         end
     end,
 
-    DestroyMovementEffects = function( self )
-        local bpTable = self:GetBlueprint().Display.MovementEffects
-        local layer = self.CurrentLayer
-
+    DestroyMovementEffects = function(self)
         EffectUtil.CleanupEffectBag(self,'MovementEffectsBag')
 
         --Clean up any camera shake going on.
         if self.CamShakeT1 then
-            KillThread( self.CamShakeT1 )
+            local bpTable = self:GetBlueprint().Display.MovementEffects
+            local layer = self.CurrentLayer
             local shake = bpTable[layer].CameraShake
+            KillThread(self.CamShakeT1)
             if shake and shake.Radius and shake.MaxShakeEpicenter and shake.MinShakeAtRadius then
                 self:ShakeCamera( shake.Radius, shake.MaxShakeEpicenter * 0.25, shake.MinShakeAtRadius * 0.25, 1 )
             end
-        end
-
-        --Clean up treads
-        if self.TreadThread then
-            KillThread(self.TreadThread)
-            self.TreadThread = nil
-        end
-
-        if bpTable[layer].Treads.ScrollTreads then
-            self:RemoveScroller()
         end
     end,
 
@@ -1737,6 +1681,18 @@ WalkingLandUnit = Class(MobileUnit) {
     DeathAnim = false,
     DisabledBones = {},
 
+    CreateMovementEffects = function(self, EffectsBag, TypeSuffix, TerrainType)
+        if not effectTypeGroups or table.getn(effectTypeGroups) == 0 then
+            local bpTable = self:GetBlueprint().Display.MovementEffects
+            if not self.Footfalls and bpTable.Footfall then
+                LOG('*WARNING: No movement effect groups defined for unit ',repr(self:GetUnitId()),', Effect groups with bone lists must be defined to play movement effects. Add these to the Display.MovementEffects', layer, '.Effects table in unit blueprint. ' )
+            end
+            return false
+        end
+
+        MobileUnit.CreateMovementEffects(self, EffectsBag, TypeSuffix, TerrainType)
+    end,
+
     UpdateMovementEffectsOnMotionEventChange = function(self, new, old)
         if self.Detector then
             if new == 'Stopped' then
@@ -1746,7 +1702,7 @@ WalkingLandUnit = Class(MobileUnit) {
             end
         end
 
-        MobileUnit.UpdateMovementEffectsOnMotionEventChange()
+        MobileUnit.UpdateMovementEffectsOnMotionEventChange(self)
     end,
 
     OnLayerChange = function(self, new, old)
@@ -1931,6 +1887,11 @@ AirUnit = Class(MobileUnit) {
         self.HasFuel = true
     end,
 
+    CreateMovementEffects = function(self, EffectsBag, TypeSuffix, TerrainType)
+        self:UpdateBeamExhaust( 'Cruise' )
+        MobileUnit.CreateMovementEffects(self, EffectsBag, TypeSuffix, TerrainType)
+    end,
+
     OnStopBeingBuilt = function(self,builder,layer)
         MobileUnit.OnStopBeingBuilt(self,builder,layer)
         
@@ -2010,6 +1971,13 @@ AirUnit = Class(MobileUnit) {
         end
     end,
 
+    CreateIdleEffects = function(self)
+        if self:GetBlueprint().Display.MovementEffects.BeamExhaust then
+            self:UpdateBeamExhaust( 'Idle' )
+        end
+
+        MobileUnit.CreateIdleEffects(self)
+    end,
 
     OnMotionVertEventChange = function( self, new, old )
         MobileUnit.OnMotionVertEventChange( self, new, old )
@@ -2056,25 +2024,6 @@ AirUnit = Class(MobileUnit) {
             end
             if bpMTable[layer].TopSpeedFX then
                 self:CreateMovementEffects( self.TopSpeedEffectsBag, 'TopSpeed' )
-            end
-        end
-
-        if (old == 'Stopped' and new ~= 'Stopping') or
-           (old == 'Stopping' and new ~= 'Stopped') then
-            self:DestroyIdleEffects()
-            self:DestroyMovementEffects()
-            self:CreateMovementEffects( self.MovementEffectsBag, nil )
-            if bpMTable.BeamExhaust then
-                self:UpdateBeamExhaust( 'Cruise' )
-            end
-        end
-
-        if new == 'Stopped' then
-            self:DestroyMovementEffects()
-            self:DestroyIdleEffects()
-            self:CreateIdleEffects()
-            if bpMTable.BeamExhaust then
-                self:UpdateBeamExhaust( 'Idle' )
             end
         end
 
@@ -2236,7 +2185,91 @@ AirTransport = Class(AirUnit, BaseTransport) {
 ---------------------------------------------------------------
 --  LAND UNITS
 ---------------------------------------------------------------
-LandUnit = Class(MobileUnit) {}
+LandUnit = Class(MobileUnit) {
+    UpdateMovementEffectsOnMotionEventChange = function(self, new, old)
+
+        MobileUnit.UpdateMovementEffectsOnMotionEventChange(self, new, old)
+    end,
+
+    CreateMovementEffects = function(self, EffectsBag, TypeSuffix, TerrainType)
+        local layer = self.CurrentLayer
+        local bpTable = self:GetBlueprint().Display.MovementEffects
+
+        if bpTable[layer] then
+            bpTable = bpTable[layer]
+            local effectTypeGroups = bpTable.Effects
+
+            if bpTable.Treads then
+                self:CreateTreads( bpTable.Treads )
+            else
+                self:RemoveScroller()
+            end
+        end
+
+        MobileUnit.CreateMovementEffects(self, EffectsBag, TypeSuffix, TerrainType)
+    end,
+
+    DestroyMovementEffects = function(self)
+        local layer = self.CurrentLayer
+        local bpTable = self:GetBlueprint().Display.MovementEffects
+        if self.TreadThread then
+            KillThread(self.TreadThread)
+            self.TreadThread = nil
+        end
+
+        if bpTable[layer].Treads.ScrollTreads then
+            self:RemoveScroller()
+        end
+
+        MobileUnit.DestroyMovementEffects(self)
+    end,
+
+    CreateTreads = function(self, treads)
+        if treads.ScrollTreads then
+            self:AddThreadScroller(1.0, treads.ScrollMultiplier or 0.2)
+        end
+        self.TreadThread = nil
+        if treads.TreadMarks then
+            local type = self:GetTTTreadType(self:GetPosition())
+            if type ~= 'None' then
+                self.TreadThread = self:ForkThread(self.CreateTreadsThread, treads.TreadMarks)
+            end
+        end
+    end,
+
+    CreateTreadsThread = function(self, treadsBP)
+        local ux, uy, uz = self:GetUnitSizes()
+        local wait
+        local treads = {}
+        local army = self:GetArmy()
+
+        for _, t in treadsBP do
+            local bones = t.Bones or t.BoneName or 0
+            if type(bones) ~= 'table' then bones = {bones} end
+            wait = math.max(0.1, math.min(wait or 1, t.TreadMarksInterval or 1))
+            table.insert(treads, {texture=t.TreadMarks, x=t.TreadMarksSizeX, z=t.TreadMarksSizeZ, offset=t.TreadOffset, bones=bones or t.BoneName or 0, duration=t.TreadLifeTime or 10})
+        end
+
+        local heading, last_heading
+        while self.CurrentLayer == 'Land' or self.CurrentLayer == 'Seabed' do
+            heading = self:GetHeading()
+            for _, t in treads do
+                for _, bone in t.bones do
+                    -- CreateSplatOnBone doesn't support unit heading unless bone == 0, that's why we need to do this
+                    if bone ~= 0 then
+                        local splat = CreateSplat(self:GetPosition(bone), heading, t.texture, t.x, t.z, 130, t.duration, army)
+                    else
+                        CreateSplatOnBone(self, t.offset, 0, t.texture, t.x, t.z, 130, t.duration, army)
+                    end
+                end
+                --
+            end
+
+            WaitSeconds(last_heading and math.abs(last_heading - heading) < 0.05 and wait or wait*0.7)
+            last_heading = heading
+        end
+    end,
+}
 
 -- -------------------------------------------------------------
 --   CONSTRUCTION UNITS
