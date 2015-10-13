@@ -1816,14 +1816,6 @@ Unit = Class(moho.unit_methods) {
             self.Trash:Add(self.PermOpenAnimManipulator)
         end
 
-        --Initialize movement effects subsystems, idle effects, beam exhaust, and footfall manipulators
-        local bpTable = bp.Display.MovementEffects
-        if bpTable.Land or bpTable.Air or bpTable.Water or bpTable.Sub or bpTable.BeamExhaust then
-            self.MovementEffectsExist = true
-        else
-            self.MovementEffectsExist = false
-        end
-
         -- If someone thinks they're being clever by using a UI mod to violate unit restrictions,
         -- thoroughly ruin their day.
         if Game.UnitRestricted(self:GetUnitId(), self) then

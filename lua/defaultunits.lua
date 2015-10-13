@@ -1474,7 +1474,16 @@ MobileUnit = Class(Unit) {
     -- layer change event
     OnStopBeingBuilt = function(self,builder,layer)
        Unit.OnStopBeingBuilt(self,builder,layer)
-       self:OnLayerChange(layer, 'None')
+
+        --Initialize movement effects subsystems, idle effects, beam exhaust, and footfall manipulators
+        local bpTable = self:GetBlueprint().Display.MovementEffects
+        if bpTable.Land or bpTable.Air or bpTable.Water or bpTable.Sub or bpTable.BeamExhaust then
+            self.MovementEffectsExist = true
+        else
+            self.MovementEffectsExist = false
+        end
+
+        self:OnLayerChange(layer, 'None')
     end,
 
     OnTerrainTypeChange = function(self, new, old)
