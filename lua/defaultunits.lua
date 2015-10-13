@@ -908,6 +908,10 @@ AirFactoryUnit = Class(FactoryUnit) {
 AirStagingPlatformUnit = Class(StructureUnit) {
     LandBuiltHiddenBones = {'Floatation'},
 
+    OnTransportAttach = function(self, attachBone, unit)
+        self:PlayUnitSound('Load')
+    end,
+
     OnStopBeingBuilt = function(self,builder,layer)
         StructureUnit.OnStopBeingBuilt(self,builder,layer)
         self:SetMaintenanceConsumptionActive()
