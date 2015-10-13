@@ -2460,6 +2460,10 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    DestroyIdleEffects = function( self )
+        EffectUtilities.CleanupEffectBag(self,'IdleEffectsBag')
+    end,
+
     GetWeaponClass = function(self, label)
         return self.Weapons[label] or import('/lua/sim/Weapon.lua').Weapon
     end,

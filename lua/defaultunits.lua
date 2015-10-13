@@ -1712,10 +1712,6 @@ MobileUnit = Class(Unit) {
         EffectUtil.CleanupEffectBag(self,'TopSpeedEffectsBag')
     end,
 
-    DestroyIdleEffects = function( self )
-        EffectUtil.CleanupEffectBag(self,'IdleEffectsBag')
-    end,
-
     MovementCameraShakeThread = function( self, camShake )
         local radius = camShake.Radius or 5.0
         local maxShakeEpicenter = camShake.MaxShakeEpicenter or 1.0
