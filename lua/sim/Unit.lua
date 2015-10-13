@@ -1820,9 +1820,6 @@ Unit = Class(moho.unit_methods) {
         local bpTable = bp.Display.MovementEffects
         if bpTable.Land or bpTable.Air or bpTable.Water or bpTable.Sub or bpTable.BeamExhaust then
             self.MovementEffectsExist = true
-            if not self.Footfalls and bpTable[layer].Footfall then
-                self.Footfalls = self:CreateFootFallManipulators( bpTable[layer].Footfall )
-            end
         else
             self.MovementEffectsExist = false
         end
