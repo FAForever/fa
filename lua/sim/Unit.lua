@@ -1790,18 +1790,6 @@ Unit = Class(moho.unit_methods) {
         self:PlayUnitSound('DoneBeingBuilt')
         self:PlayUnitAmbientSound( 'ActiveLoop' )
 
-        if self.DisallowCollisions and builder then
-            --Set correct hitpoints after upgrade
-            local hpDamage = builder:GetMaxHealth() - builder:GetHealth() --Current damage
-            local damagePercent = hpDamage / self:GetMaxHealth() --Resulting % with upgraded building
-            local newHealthAmount = builder:GetMaxHealth() * (1-damagePercent) --HP for upgraded building
-            builder:SetHealth(builder, newHealthAmount) --Seems like the engine uses builder to determine new HP
-            self.DisallowCollisions = false
-            self:SetCanTakeDamage(true)
-            self:RevertCollisionShape()
-            builder:RefreshIntel()
-        end
-
         --Turn off land bones if this unit has them.
         self:HideLandBones()
         self:DoUnitCallbacks('OnStopBeingBuilt')
