@@ -77,7 +77,19 @@ StructureUnit = Class(Unit) {
         end
     end,
 
-    OnStopBeingBuilt = function(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        if self.DisallowCollisions and builder then
+            --Set correct hitpoints after upgrade
+            local hpDamage = builder:GetMaxHealth() - builder:GetHealth() --Current damage
+            local damagePercent = hpDamage / self:GetMaxHealth() --Resulting % with upgraded building
+            local newHealthAmount = builder:GetMaxHealth() * (1-damagePercent) --HP for upgraded building
+            builder:SetHealth(builder, newHealthAmount) --Seems like the engine uses builder to determine new HP
+            self.DisallowCollisions = false
+            self:SetCanTakeDamage(true)
+            self:RevertCollisionShape()
+            builder:RefreshIntel()
+        end
+
         Unit.OnStopBeingBuilt(self,builder,layer)
         -- Whaa why can't we have sane inheritance chains :/
         if self:GetBlueprint().General.FactionName == "Seraphim" then
@@ -89,6 +101,17 @@ StructureUnit = Class(Unit) {
     OnFailedToBeBuilt = function(self)
         Unit.OnFailedToBeBuilt(self)
         self:DestroyTarmac()
+    end,
+
+    --Returns 4 numbers: skirt x0, skirt z0, skirt.x1, skirt.z1
+    GetSkirtRect = function(self)
+        local bp = self:GetBlueprint()
+        local x, y, z = unpack(self:GetPosition())
+        local fx = x - bp.Footprint.SizeX*.5
+        local fz = z - bp.Footprint.SizeZ*.5
+        local sx = fx + bp.Physics.SkirtOffsetX
+        local sz = fz + bp.Physics.SkirtOffsetZ
+        return sx, sz, sx+bp.Physics.SkirtSizeX, sz+bp.Physics.SkirtSizeZ
     end,
 
     FlattenSkirt = function(self)
@@ -558,7 +581,7 @@ FactoryUnit = Class(StructureUnit) {
         StructureUnit.OnCreate(self)
         self.BuildingUnit = false
     end,
-    
+
     DestroyUnitBeingBuilt = function(self)
         if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() < 1 then
             if self.UnitBeingBuilt:GetFractionComplete() > 0.5 then
@@ -567,7 +590,7 @@ FactoryUnit = Class(StructureUnit) {
                 self.UnitBeingBuilt:Destroy()
             end
         end
-    end, 
+    end,
 
     OnDestroy = function(self)
         -- Figure out if we're a research station
@@ -581,7 +604,7 @@ FactoryUnit = Class(StructureUnit) {
         end
 
         StructureUnit.OnDestroy(self)
-        
+
         self.DestroyUnitBeingBuilt(self)
     end,
 
@@ -884,6 +907,10 @@ AirFactoryUnit = Class(FactoryUnit) {
 -------------------------------------------------------------
 AirStagingPlatformUnit = Class(StructureUnit) {
     LandBuiltHiddenBones = {'Floatation'},
+
+    OnTransportAttach = function(self, attachBone, unit)
+        self:PlayUnitSound('Load')
+    end,
 
     OnStopBeingBuilt = function(self,builder,layer)
         StructureUnit.OnStopBeingBuilt(self,builder,layer)
@@ -1296,7 +1323,7 @@ SeaFactoryUnit = Class(FactoryUnit) {
 
     StopRocking = function(self)
     end,
-    
+
     DestroyUnitBeingBuilt = function(self)
         if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() < 1 then
             self.UnitBeingBuilt:Destroy()
@@ -1365,6 +1392,8 @@ QuantumGateUnit = Class(FactoryUnit) {
 --  MOBILE UNITS
 --------------------------------------------------------------
 MobileUnit = Class(Unit) {
+    TerrainType = nil,
+
     -- Added for engymod. After creating an enhancement, units must re-check their build restrictions
     CreateEnhancement = function(self, enh)
         Unit.CreateEnhancement(self, enh)
@@ -1432,36 +1461,208 @@ MobileUnit = Class(Unit) {
         end
     end,
 
-    StopBeingBuiltEffects = function(self, builder, layer)
-        Unit.StopBeingBuiltEffects(self, builder, layer)
+    CreateReclaimEffects = function(self, target)
+        EffectUtil.PlayReclaimEffects( self, target, self:GetBlueprint().General.BuildBones.BuildEffectBones or {0}, self.ReclaimEffectsBag )
     end,
 
-    StartBuildingEffects = function(self, unitBeingBuilt, order)
-        Unit.StartBuildingEffects(self, unitBeingBuilt, order)
+    CreateReclaimEndEffects = function(self, target)
+        EffectUtil.PlayReclaimEndEffects(self, target)
     end,
 
-    StopBuildingEffects = function(self, unitBeingBuilt)
-        Unit.StopBuildingEffects(self, unitBeingBuilt)
-    end,
-
-    CreateReclaimEffects = function( self, target )
-        EffectUtil.PlayReclaimEffects( self, target, self:GetBlueprint().General.BuildBones.BuildEffectBones or {0,}, self.ReclaimEffectsBag )
-    end,
-
-    CreateReclaimEndEffects = function( self, target )
-        EffectUtil.PlayReclaimEndEffects( self, target )
-    end,
-
-    CreateCaptureEffects = function( self, target )
-        EffectUtil.PlayCaptureEffects( self, target, self:GetBlueprint().General.BuildBones.BuildEffectBones or {0,}, self.CaptureEffectsBag )
+    CreateCaptureEffects = function(self, target)
+        EffectUtil.PlayCaptureEffects(self, target, self:GetBlueprint().General.BuildBones.BuildEffectBones or {0}, self.CaptureEffectsBag)
     end,
 
     -- Units with layer change effects (amphibious units like Megalith) need
     -- those changes applied when build ends, so we need to trigger the
     -- layer change event
-    OnStopBeingBuilt = function(self,builder,layer)
-       Unit.OnStopBeingBuilt(self,builder,layer)
-       self:OnLayerChange(layer, 'None')
+    OnStopBeingBuilt = function(self, builder, layer)
+       Unit.OnStopBeingBuilt(self, builder, layer)
+
+        --Initialize movement effects subsystems, idle effects, beam exhaust, and footfall manipulators
+        local bpTable = self:GetBlueprint().Display.MovementEffects
+        if bpTable.Land or bpTable.Air or bpTable.Water or bpTable.Sub or bpTable.BeamExhaust then
+            self.MovementEffectsExist = true
+        else
+            self.MovementEffectsExist = false
+        end
+
+        self:OnLayerChange(layer, 'None')
+    end,
+
+    GetTTTreadType = function( self, pos )
+        local TerrainType = GetTerrainType( pos.x,pos.z )
+        return TerrainType.Treads or 'Default'
+    end,
+
+    OnTerrainTypeChange = function(self, new, old)
+        self.TerrainType = new
+
+        if self.MovementEffectsExist then
+            self:DestroyMovementEffects()
+            self:CreateMovementEffects( self.MovementEffectsBag, nil, new )
+        end
+    end,
+
+    PlayLayerAmbientSound = function(self, type)
+        return self:PlayUnitAmbientSound(type .. self.CurrentLayer) or self:PlayUnitAmbientSound(type)
+    end,
+
+    PlayLayerSound = function(self, type)
+        return self:PlayUnitSound(type .. self.CurrentLayer) or self:PlayUnitSound(type)
+    end,
+
+    StopAmbientMoveSound = function(self)
+        self:StopUnitAmbientSound( 'AmbientMove' )
+        self:StopUnitAmbientSound( 'AmbientMoveWater' )
+        self:StopUnitAmbientSound( 'AmbientMoveSub' )
+        self:StopUnitAmbientSound( 'AmbientMoveLand' )
+    end,
+
+    OnLayerChange = function(self, new, old)
+        self.CurrentLayer = new
+
+        for i = 1, self:GetWeaponCount() do
+            self:GetWeapon(i):SetValidTargetsForCurrentLayer(new)
+        end
+
+        if (old == 'Seabed' or old == 'None') and new == 'Land' then
+            self:EnableIntel('Vision')
+            self:DisableIntel('WaterVision')
+        elseif (old == 'Land' or old == 'None') and new == 'Seabed' then
+            self:EnableIntel('WaterVision')
+        elseif (old == 'None') then
+            self:EnableIntel('Vision')
+        end
+
+        if new == 'Land' or new == 'Water' then
+            self:PlayLayerSound('Transition')
+        end
+
+        self:CreateLayerChangeEffects( new, old )
+    end,
+
+    OnMotionHorzEventChange = function(self, new, old)
+        if self.Dead then
+            return
+        end
+
+        local old_stop = old == 'Stopped' or old == 'Stopping'
+        local new_stop = new == 'Stopped' or new == 'Stopping'
+
+        if old_stop and not new_stop then
+            -- Try the specialised sound, fall back to the general one.
+            self:PlayLayerSound('StartMove')
+            self:PlayLayerAmbientSound('AmbientMove')
+        elseif new_stop then
+            if not old_stop then
+                -- Try the specialised sound, fall back to the general one.
+                self:PlayLayerSound('StopMove')
+            end
+            self:StopAmbientMoveSound()
+        end
+
+        if self.MovementEffectsExist then
+            self:UpdateMovementEffectsOnMotionEventChange(new, old)
+        end
+
+        if old == 'Stopped' then
+            self:DoOnHorizontalStartMoveCallbacks()
+        end
+
+        for i = 1, self:GetWeaponCount() do
+            local wep = self:GetWeapon(i)
+            wep:OnMotionHorzEventChange(new, old)
+        end
+    end,
+
+    OnMotionVertEventChange = function( self, new, old )
+        self:CreateMotionChangeEffects(new,old)
+    end,
+
+    -- Called as planes whoosh round corners. No sounds were shipped for use with this and it was a
+    -- cycle eater, so we killed it.
+    OnMotionTurnEventChange = function() end,
+
+    OnTerrainTypeChange = function(self, new, old) end,
+
+    UpdateMovementEffectsOnMotionEventChange = function(self, new, old)
+        local layer = self.CurrentLayer
+        local bpMTable = self:GetBlueprint().Display.MovementEffects
+
+        if (old == 'Stopped' and new ~= 'Stopping') or
+           (old == 'Stopping' and new ~= 'Stopped') then
+            self:DestroyIdleEffects()
+            self:DestroyMovementEffects()
+            self:CreateMovementEffects( self.MovementEffectsBag, nil )
+        end
+
+        if new == 'Stopped' then
+            self:DestroyMovementEffects()
+            self:DestroyIdleEffects()
+            self:CreateIdleEffects()
+        end
+    end,
+
+    CreateMovementEffects = function( self, EffectsBag, TypeSuffix, TerrainType )
+        local layer = self.CurrentLayer
+        local bpTable = self:GetBlueprint().Display.MovementEffects
+
+        if bpTable[layer] then
+            bpTable = bpTable[layer]
+            local effectTypeGroups = bpTable.Effects
+
+            if bpTable.CameraShake then
+                self.CamShakeT1 = self:ForkThread(self.MovementCameraShakeThread, bpTable.CameraShake )
+            end
+            self:CreateTerrainTypeEffects( effectTypeGroups, 'FXMovement', layer, TypeSuffix, EffectsBag, TerrainType )
+        end
+    end,
+
+    CreateLayerChangeEffects = function( self, new, old )
+        local key = old..new
+        local bpTable = self:GetBlueprint().Display.LayerChangeEffects[key]
+
+        if bpTable then
+            self:CreateTerrainTypeEffects( bpTable.Effects, 'FXLayerChange', key )
+        end
+    end,
+
+    CreateMotionChangeEffects = function( self, new, old )
+        local key = self.CurrentLayer .. old .. new
+        local bpTable = self:GetBlueprint().Display.MotionChangeEffects[key]
+
+        if bpTable then
+            self:CreateTerrainTypeEffects( bpTable.Effects, 'FXMotionChange', key )
+        end
+    end,
+
+    DestroyMovementEffects = function(self)
+        EffectUtil.CleanupEffectBag(self,'MovementEffectsBag')
+
+        --Clean up any camera shake going on.
+        if self.CamShakeT1 then
+            local bpTable = self:GetBlueprint().Display.MovementEffects
+            local layer = self.CurrentLayer
+            local shake = bpTable[layer].CameraShake
+            KillThread(self.CamShakeT1)
+            if shake and shake.Radius and shake.MaxShakeEpicenter and shake.MinShakeAtRadius then
+                self:ShakeCamera( shake.Radius, shake.MaxShakeEpicenter * 0.25, shake.MinShakeAtRadius * 0.25, 1 )
+            end
+        end
+    end,
+
+    MovementCameraShakeThread = function( self, camShake )
+        local radius = camShake.Radius or 5.0
+        local maxShakeEpicenter = camShake.MaxShakeEpicenter or 1.0
+        local minShakeAtRadius = camShake.MinShakeAtRadius or 0.0
+        local interval = camShake.Interval or 10.0
+        if interval ~= 0.0 then
+            while true do
+                self:ShakeCamera( radius, maxShakeEpicenter, minShakeAtRadius, interval )
+                WaitSeconds(interval)
+            end
+        end
     end,
 }
 
@@ -1476,19 +1677,51 @@ WalkingLandUnit = Class(MobileUnit) {
     DeathAnim = false,
     DisabledBones = {},
 
-    OnMotionHorzEventChange = function( self, new, old )
-        MobileUnit.OnMotionHorzEventChange(self, new, old)
+    CreateMovementEffects = function(self, EffectsBag, TypeSuffix, TerrainType)
+        if not effectTypeGroups or table.getn(effectTypeGroups) == 0 then
+            local bpTable = self:GetBlueprint().Display.MovementEffects
+            if not self.Footfalls and bpTable.Footfall then
+                LOG('*WARNING: No movement effect groups defined for unit ',repr(self:GetUnitId()),', Effect groups with bone lists must be defined to play movement effects. Add these to the Display.MovementEffects', layer, '.Effects table in unit blueprint. ' )
+            end
+            return false
+        end
 
-        if ( old == 'Stopped' ) then
-            if (not self.Animator) then
+        MobileUnit.CreateMovementEffects(self, EffectsBag, TypeSuffix, TerrainType)
+    end,
+
+    UpdateMovementEffectsOnMotionEventChange = function(self, new, old)
+        if self.Detector then
+            if new == 'Stopped' then
+                self.Detector:Disable()
+            elseif old == 'Stopped' then
+                self.Detector:Enable()
+            end
+        end
+
+        MobileUnit.UpdateMovementEffectsOnMotionEventChange(self)
+    end,
+
+    OnLayerChange = function(self, new, old)
+        local footfall = self:GetBlueprint().Display.MovementEffects[new].Footfall
+        if not self.Footfalls and footfall then
+            self.Footfalls = self:CreateFootFallManipulators(footfall)
+        end
+
+        MobileUnit.OnLayerChange(self, new, old)
+    end,
+
+    OnMotionHorzEventChange = function(self, new, old)
+        local display = self:GetBlueprint().Display
+
+        if old == 'Stopped' then
+            if not self.Animator then
                 self.Animator = CreateAnimator(self, true)
             end
-            local bpDisplay = self:GetBlueprint().Display
-            if bpDisplay.AnimationWalk then
-                self.Animator:PlayAnim(bpDisplay.AnimationWalk, true)
-                self.Animator:SetRate(bpDisplay.AnimationWalkRate or 1)
+            if display.AnimationWalk then
+                self.Animator:PlayAnim(display.AnimationWalk, true)
+                self.Animator:SetRate(display.AnimationWalkRate or 1)
             end
-        elseif ( new == 'Stopped' ) then
+        elseif new == 'Stopped' then
             -- only keep the animator around if we are dying and playing a death anim
             -- or if we have an idle anim
             if(self.IdleAnim and not self.Dead) then
@@ -1498,6 +1731,77 @@ WalkingLandUnit = Class(MobileUnit) {
                 self.Animator = false
             end
         end
+
+        MobileUnit.OnMotionHorzEventChange(self, new, old)
+    end,
+
+    OnAnimCollision = function(self, bone, x, y, z)
+        local layer = self.CurrentLayer
+        local footfall = self:GetBlueprint().Display.MovementEffects
+
+        footfall = footfall[layer].Footfall or (layer == 'Seabed' and footfall['Land'].Footfall)
+
+        if footfall then
+            local effects = {}
+            local scale = 1
+            local offset = nil
+            local army = self:GetArmy()
+            local boneTable = nil
+
+            if footfall.Damage then
+                local bpDamage = footfall.Damage
+                DamageArea(self, self:GetPosition(bone), bpDamage.Radius, bpDamage.Amount, bpDamage.Type, bpDamage.DamageFriendly )
+            end
+
+            if footfall.CameraShake then
+                local shake = footfall.CameraShake
+                self:ShakeCamera( shake.Radius, shake.MaxShakeEpicenter, shake.MinShakeAtRadius, shake.Interval )
+            end
+
+            for k, v in footfall.Bones do
+                if bone == v.FootBone then
+                    boneTable = v
+                    bone = v.FootBone
+                    scale = boneTable.Scale or 1
+                    offset = bone.Offset
+                    if v.Type then
+                        effects = self.GetTerrainTypeEffects( 'FXMovement', layer, self:GetPosition(v.FootBone), v.Type )
+                    end
+                    break
+                end
+            end
+
+            local tread = footfall.Tread or boneTable.Tread
+            if tread and self:GetTTTreadType(self:GetPosition(bone)) ~= 'None' then
+                local lifetime = tread.TreadLifeTime or 15
+                if layer == 'Seabed' then lifetime = lifetime * 0.5 end
+                CreateSplat(self:GetPosition(bone), self:GetHeading(), tread.TreadMarks, tread.TreadMarksSizeX, tread.TreadMarksSizeZ, 100, lifetime, army)
+                self:PlayUnitSound('FootFall' .. ((x > 0) and 'Left' or 'Right') .. (layer == 'Seabed' and layer or ''))
+            end
+
+            for k, v in effects do
+                CreateEmitterAtBone(self, bone, army, v):ScaleEmitter(scale)
+            end
+        end
+
+        self:PlayUnitSound('FootFallGeneric' .. (layer == 'Seabed' and layer or ''))
+    end,
+
+    CreateFootFallManipulators = function( self, footfall )
+        if not footfall.Bones or (footfall.Bones and (table.getn(footfall.Bones) == 0)) then
+            LOG('*WARNING: No footfall bones defined for unit ',repr(self:GetUnitId()),', ', 'these must be defined to animation collision detector and foot plant controller' )
+            return false
+        end
+
+        self.Detector = CreateCollisionDetector(self)
+        self.Trash:Add(self.Detector)
+        for k, v in footfall.Bones do
+            self.Detector:WatchBone(v.FootBone)
+            if v.FootBone and v.KneeBone and v.HipBone then
+                CreateFootPlantController(self, v.FootBone, v.KneeBone, v.HipBone, v.StraightLegs or true, v.MaxFootFall or 0):SetPrecedence(10)
+            end
+        end
+        return true
     end,
 }
 
@@ -1514,6 +1818,49 @@ SubUnit = Class(MobileUnit) {
    -- DESTRUCTION PARAMS
     ShowUnitDestructionDebris = false,
     DeathThreadDestructionWaitTime = 0,
+
+    OnMotionVertEventChange = function( self, new, old )
+        if self.Dead then
+            return
+        end
+
+        MobileUnit.OnMotionVertEventChange(self, new, old)
+
+        local layer = self.CurrentLayer
+
+        --Surfacing and sinking, landing and take off idle effects
+        if (new == 'Up' and old == 'Bottom') or
+           (new == 'Down' and old == 'Top') then
+            self:DestroyIdleEffects()
+            if new == 'Up' and layer == 'Sub' then
+                self:PlayUnitSound('SurfaceStart')
+            end
+            if new == 'Down' and layer == 'Water' then
+                self:PlayUnitSound('SubmergeStart')
+                if self.SurfaceAnimator then
+                    self.SurfaceAnimator:SetRate(-1)
+                end
+            end
+        end
+
+        if (new == 'Top' and old == 'Up') or
+           (new == 'Bottom' and old == 'Down') then
+            self:CreateIdleEffects()
+            if new == 'Bottom' and layer == 'Sub' then
+                self:PlayUnitSound('SubmergeEnd')
+            end
+            if new == 'Top' and layer == 'Water' then
+                self:PlayUnitSound('SurfaceEnd')
+                local surfaceAnim = self:GetBlueprint().Display.AnimationSurface
+                if not self.SurfaceAnimator and surfaceAnim then
+                    self.SurfaceAnimator = CreateAnimator(self)
+                end
+                if surfaceAnim and self.SurfaceAnimator then
+                    self.SurfaceAnimator:PlayAnim(surfaceAnim):SetRate(1)
+                end
+            end
+        end
+    end,
 }
 
 --------------------------------------------------------------
@@ -1534,12 +1881,23 @@ AirUnit = Class(MobileUnit) {
     OnCreate = function(self)
         MobileUnit.OnCreate(self)
         self.HasFuel = true
-        self:AddPingPong()
+    end,
+
+    CreateMovementEffects = function(self, EffectsBag, TypeSuffix, TerrainType)
+        self:UpdateBeamExhaust( 'Cruise' )
+        MobileUnit.CreateMovementEffects(self, EffectsBag, TypeSuffix, TerrainType)
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)
         MobileUnit.OnStopBeingBuilt(self,builder,layer)
+        
         local bp = self:GetBlueprint()
+        local bpTable = bp.Display.MovementEffects
+        if bpTable.BeamExhaust and bpTable.BeamExhaust.Idle ~= false then
+            self:UpdateBeamExhaust( 'Idle' )
+        end
+
+        
         if bp.SizeSphere then
             self:SetCollisionShape(
                 'Sphere',
@@ -1551,47 +1909,121 @@ AirUnit = Class(MobileUnit) {
         end
     end,
 
-    AddPingPong = function(self)
-        local bp = self:GetBlueprint()
-        if bp.Display.PingPongScroller then
-            bp = bp.Display.PingPongScroller
-            if bp.Ping1 and bp.Ping1Speed and bp.Pong1 and bp.Pong1Speed and bp.Ping2 and bp.Ping2Speed
-                and bp.Pong2 and bp.Pong2Speed then
-                self:AddPingPongScroller(bp.Ping1, bp.Ping1Speed, bp.Pong1, bp.Pong1Speed,
-                                         bp.Ping2, bp.Ping2Speed, bp.Pong2, bp.Pong2Speed)
+    UpdateBeamExhaust = function(self, motionState)
+        local bpTable = self:GetBlueprint().Display.MovementEffects.BeamExhaust
+        if not bpTable then
+            return false
+        end
+
+        if motionState == 'Idle' then
+            if self.BeamExhaustCruise  then
+                self:DestroyBeamExhaust()
+            end
+            if self.BeamExhaustIdle and (table.getn(self.BeamExhaustEffectsBag) == 0) and (bpTable.Idle ~= false) then
+                self:CreateBeamExhaust( bpTable, self.BeamExhaustIdle )
+            end
+        elseif motionState == 'Cruise' then
+            if self.BeamExhaustIdle and self.BeamExhaustCruise then
+                self:DestroyBeamExhaust()
+            end
+            if self.BeamExhaustCruise and (bpTable.Cruise ~= false) then
+                self:CreateBeamExhaust( bpTable, self.BeamExhaustCruise )
+            end
+        elseif motionState == 'Landed' then
+            if not bpTable.Landed then
+                self:DestroyBeamExhaust()
             end
         end
+    end,
+
+    CreateBeamExhaust = function( self, bpTable, beamBP )
+        local effectBones = bpTable.Bones
+        if not effectBones or (effectBones and (table.getn(effectBones) == 0)) then
+            LOG('*WARNING: No beam exhaust effect bones defined for unit ',repr(self:GetUnitId()),', Effect Bones must be defined to play beam exhaust effects. Add these to the Display.MovementEffects.BeamExhaust.Bones table in unit blueprint.' )
+            return false
+        end
+        local army = self:GetArmy()
+        for kb, vb in effectBones do
+            table.insert( self.BeamExhaustEffectsBag, CreateBeamEmitterOnEntity(self, vb, army, beamBP ))
+        end
+    end,
+
+    DestroyBeamExhaust = function( self )
+        EffectUtil.CleanupEffectBag(self,'BeamExhaustEffectsBag')
+    end,
+
+    CreateContrails = function(self, tableData )
+        local effectBones = tableData.Bones
+        if not effectBones or (effectBones and (table.getn(effectBones) == 0)) then
+            LOG('*WARNING: No contrail effect bones defined for unit ',repr(self:GetUnitId()),', Effect Bones must be defined to play contrail effects. Add these to the Display.MovementEffects.Air.Contrail.Bones table in unit blueprint. ' )
+            return false
+        end
+        local army = self:GetArmy()
+        local ZOffset = tableData.ZOffset or 0.0
+        for ke, ve in self.ContrailEffects do
+            for kb, vb in effectBones do
+                table.insert(self.TopSpeedEffectsBag, CreateTrail(self,vb,army,ve):SetEmitterParam('POSITION_Z', ZOffset))
+            end
+        end
+    end,
+
+    CreateIdleEffects = function(self)
+        if self:GetBlueprint().Display.MovementEffects.BeamExhaust then
+            self:UpdateBeamExhaust( 'Idle' )
+        end
+
+        MobileUnit.CreateIdleEffects(self)
     end,
 
     OnMotionVertEventChange = function( self, new, old )
         MobileUnit.OnMotionVertEventChange( self, new, old )
-        --LOG( 'OnMotionVertEventChange, new = ', new, ', old = ', old )
         local army = self:GetArmy()
-        if (new == 'Down') then
-            -- Turn off the ambient hover sound
-            self:StopUnitAmbientSound( 'ActiveLoop' )
-        elseif (new == 'Bottom') then
-            -- While landed, planes can only see half as far
-            local vis = self:GetBlueprint().Intel.VisionRadius / 2
-            self:SetIntelRadius('Vision', vis)
+        local set_vision
 
+        if new == 'Down' or new == 'Hover' or new == 'Bottom' then
             -- Turn off the ambient hover sound
-            -- It will probably already be off, but there are some odd cases that
-            -- make this a good idea to include here as well.
-            self:StopUnitAmbientSound( 'ActiveLoop' )
-        elseif (new == 'Up' or ( new == 'Top' and ( old == 'Down' or old == 'Bottom' ))) then
-            -- Set the vision radius back to default
-            local bpVision = self:GetBlueprint().Intel.VisionRadius
-            if bpVision then
-                self:SetIntelRadius('Vision', bpVision)
+            self:StopUnitAmbientSound('ActiveLoop')
+            if new == 'Down' then
+                self:PlayUnitSound('Landing')
             else
-                self:SetIntelRadius('Vision', 0)
+                self:PlayUnitSound('Landed')
+                if new == 'Bottom' then
+                    self:UpdateBeamExhaust('Landed')
+                    -- While landed, planes can only see half as far
+                    set_vision = (self:GetBlueprint().Intel.VisionRadius or 0) / 2
+                end
+            end
+        elseif old == 'Bottom' or old == 'Down' then
+            self:PlayUnitSound('TakeOff')
+            -- Set the vision radius back to default
+            if old == 'Bottom' then
+                set_vision = self:GetBlueprint().Intel.VisionRadius or 0
+                self:UpdateBeamExhaust('Cruise')
             end
         end
+
+        if set_vision then self:SetIntelRadius('Vision', set_vision) end
     end,
 
-    OnStartRefueling = function(self)
-        self:PlayUnitSound('Refueling')
+    UpdateMovementEffectsOnMotionEventChange = function(self, new, old)
+        local layer = self.CurrentLayer
+        local bpMTable = self:GetBlueprint().Display.MovementEffects
+
+        if old == 'TopSpeed' then
+            --Destroy top speed contrails and exhaust effects
+            self:DestroyTopSpeedEffects()
+        end
+
+        if new == 'TopSpeed' and self.HasFuel then
+            if bpMTable[layer].Contrails and self.ContrailEffects then
+                self:CreateContrails( bpMTable[layer].Contrails )
+            end
+            if bpMTable[layer].TopSpeedFX then
+                self:CreateMovementEffects( self.TopSpeedEffectsBag, 'TopSpeed' )
+            end
+        end
+
+        MobileUnit.UpdateMovementEffectsOnMotionEventChange(self, new, old)
     end,
 
     OnRunOutOfFuel = function(self)
@@ -1610,6 +2042,10 @@ AirUnit = Class(MobileUnit) {
         self:SetSpeedMult(1)
         self:SetAccMult(1)
         self:SetTurnMult(1)
+    end,
+
+    OnStartRefueling = function(self)
+        self:PlayUnitSound('Refueling')
     end,
 
     OnImpact = function(self, with, other)
@@ -1646,6 +2082,18 @@ AirUnit = Class(MobileUnit) {
         end
     end,
 
+    DestroyTopSpeedEffects = function( self )
+        EffectUtil.CleanupEffectBag(self,'TopSpeedEffectsBag')
+    end,
+
+    DestroyEffectsOnDeath = function(self)
+        self:DestroyTopSpeedEffects()
+        self:DestroyIdleEffects()
+        self:DestroyBeamExhaust()
+
+        MobileUnit.DestroyEffectsOnDeath(self)
+    end,
+
     --- Called when the unit is killed, but before it falls out of the sky and blows up.
     OnKilled = function(self, instigator, type, overkillRatio)
         local bp = self:GetBlueprint()
@@ -1653,7 +2101,7 @@ AirUnit = Class(MobileUnit) {
         -- A completed, flying plane expects an OnImpact event due to air crash.
         -- An incomplete unit in the factory still reports as being in layer "Air", so needs this
         -- stupid check.
-        if self:GetCurrentLayer() == 'Air' and self:GetFractionComplete() == 1  then
+        if self.CurrentLayer == 'Air' and self:GetFractionComplete() == 1  then
             self.CreateUnitAirDestructionEffects( self, 1.0 )
             self:DestroyTopSpeedEffects()
             self:DestroyBeamExhaust()
@@ -1737,12 +2185,96 @@ AirTransport = Class(AirUnit, BaseTransport) {
 ---------------------------------------------------------------
 --  LAND UNITS
 ---------------------------------------------------------------
-LandUnit = Class(MobileUnit) {}
+LandUnit = Class(MobileUnit) {
+    UpdateMovementEffectsOnMotionEventChange = function(self, new, old)
+
+        MobileUnit.UpdateMovementEffectsOnMotionEventChange(self, new, old)
+    end,
+
+    CreateMovementEffects = function(self, EffectsBag, TypeSuffix, TerrainType)
+        local layer = self.CurrentLayer
+        local bpTable = self:GetBlueprint().Display.MovementEffects
+
+        if bpTable[layer] then
+            bpTable = bpTable[layer]
+            local effectTypeGroups = bpTable.Effects
+
+            if bpTable.Treads then
+                self:CreateTreads( bpTable.Treads )
+            else
+                self:RemoveScroller()
+            end
+        end
+
+        MobileUnit.CreateMovementEffects(self, EffectsBag, TypeSuffix, TerrainType)
+    end,
+
+    DestroyMovementEffects = function(self)
+        local layer = self.CurrentLayer
+        local bpTable = self:GetBlueprint().Display.MovementEffects
+        if self.TreadThread then
+            KillThread(self.TreadThread)
+            self.TreadThread = nil
+        end
+
+        if bpTable[layer].Treads.ScrollTreads then
+            self:RemoveScroller()
+        end
+
+        MobileUnit.DestroyMovementEffects(self)
+    end,
+
+    CreateTreads = function(self, treads)
+        if treads.ScrollTreads then
+            self:AddThreadScroller(1.0, treads.ScrollMultiplier or 0.2)
+        end
+        self.TreadThread = nil
+        if treads.TreadMarks then
+            local type = self:GetTTTreadType(self:GetPosition())
+            if type ~= 'None' then
+                self.TreadThread = self:ForkThread(self.CreateTreadsThread, treads.TreadMarks)
+            end
+        end
+    end,
+
+    CreateTreadsThread = function(self, treadsBP)
+        local ux, uy, uz = self:GetUnitSizes()
+        local wait
+        local treads = {}
+        local army = self:GetArmy()
+
+        for _, t in treadsBP do
+            local bones = t.Bones or t.BoneName or 0
+            if type(bones) ~= 'table' then bones = {bones} end
+            wait = math.max(0.1, math.min(wait or 1, t.TreadMarksInterval or 1))
+            table.insert(treads, {texture=t.TreadMarks, x=t.TreadMarksSizeX, z=t.TreadMarksSizeZ, offset=t.TreadOffset, bones=bones or t.BoneName or 0, duration=t.TreadLifeTime or 10})
+        end
+
+        local heading, last_heading
+        while self.CurrentLayer == 'Land' or self.CurrentLayer == 'Seabed' do
+            heading = self:GetHeading()
+            for _, t in treads do
+                for _, bone in t.bones do
+                    -- CreateSplatOnBone doesn't support unit heading unless bone == 0, that's why we need to do this
+                    if bone ~= 0 then
+                        local splat = CreateSplat(self:GetPosition(bone), heading, t.texture, t.x, t.z, 130, t.duration, army)
+                    else
+                        CreateSplatOnBone(self, t.offset, 0, t.texture, t.x, t.z, 130, t.duration, army)
+                    end
+                end
+                --
+            end
+
+            WaitSeconds(last_heading and math.abs(last_heading - heading) < 0.05 and wait or wait*0.7)
+            last_heading = heading
+        end
+    end,
+}
 
 -- -------------------------------------------------------------
 --   CONSTRUCTION UNITS
 -- -------------------------------------------------------------
-ConstructionUnit = Class(MobileUnit) {
+ConstructionUnit = Class(LandUnit) {
     OnCreate = function(self)
         MobileUnit.OnCreate(self)
 
@@ -1870,9 +2402,28 @@ SeaUnit = Class(MobileUnit){
     PlayEndestructionEffects = false,
     CollidedBones = 0,
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        MobileUnit.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        self:StartRocking()
+        local surfaceAnim = self:GetBlueprint().Display.AnimationSurface
+        if surfaceAnim then
+            if not self.SurfaceAnimator then
+                self.SurfaceAnimator = CreateAnimator(self)
+            end
+            self.SurfaceAnimator:PlayAnim(surfaceAnim):SetRate(1)
+        end
+
         self:SetMaintenanceConsumptionActive()
+        MobileUnit.OnStopBeingBuilt(self,builder,layer)
+    end,
+
+    OnMotionHorzEventChange = function(self, new, old)
+        if new == 'Stopped' then
+            self:StartRocking()
+        else
+            self:StopRocking()
+        end
+
+        MobileUnit.OnMotionHorzEventChange(self, new, old)
     end,
 }
 
@@ -1897,7 +2448,7 @@ SlowHoverLandUnit = Class(HoverLandUnit) {
         -- Slow these units down when they transition from land to water
         -- The mult is applied twice thanks to an engine bug, so careful when adjusting it
         -- Newspeed = oldspeed * mult * mult
-        
+
         local mult = self:GetBlueprint().Physics.WaterSpeedMultiplier
         if new == 'Water' then
             self:SetSpeedMult(mult)
@@ -1913,6 +2464,11 @@ CommandUnit = Class(WalkingLandUnit) {
 
     __init = function(self, rightGunName)
         self.rightGunLabel = rightGunName
+    end,
+
+    OnCreate = function(self)
+        WalkingLandUnit.OnCreate(self)
+        self:ShowPresetEnhancementBones()
     end,
 
     ResetRightArm = function(self)
@@ -1995,6 +2551,14 @@ CommandUnit = Class(WalkingLandUnit) {
         self.BuildingUnit = false
     end,
 
+    OnStopBeingBuilt = function(self, builder, layer)
+        WalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
+
+        if self:GetBlueprint().EnhancementPresetAssigned then
+            self:ForkThread(self.CreatePresetEnhancementsThread)
+        end
+    end,
+
     OnPaused = function(self)
         WalkingLandUnit.OnPaused(self)
         if self.BuildingUnit then
@@ -2007,7 +2571,99 @@ CommandUnit = Class(WalkingLandUnit) {
             WalkingLandUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
         end
         WalkingLandUnit.OnUnpaused(self)
-    end
+    end,
+
+    OnKilled = function(self, instigator, type, overkillRatio)
+        --Units killed while being invisible because they're teleporting should show when they're killed
+        if self.TeleportFx_IsInvisible then
+            self:ShowBone(0, true)
+            self:ShowEnhancementBones()
+        end
+
+        WalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)
+    end,
+
+    -------------------------------------------------------------------------------------------
+    -- UNIT ENHANCEMENT PRESETS
+    -------------------------------------------------------------------------------------------
+    -- Added by Brute51, copied from Nomads code for SCU presets
+    ShowPresetEnhancementBones = function(self)
+        --Hide bones not involved in the preset enhancements.
+        --Useful during the build process to show the contours of the unit being built. Only visual.
+
+        local bp = self:GetBlueprint()
+
+        if bp.Enhancements and ( table.find(bp.Categories, 'USEBUILDPRESETS') or table.find(bp.Categories, 'ISPREENHANCEDUNIT') ) then
+
+            --Create a blank slate: Hide all enhancement bones as specified in the unit BP
+            for k, enh in bp.Enhancements do
+                if enh.HideBones then
+                    for _, bone in enh.HideBones do
+                        self:HideBone(bone, true)
+                    end
+                end
+            end
+
+            --For the barebone version we're done here. For the presets versions: show the bones of the enhancements we'll create later on
+            if bp.EnhancementPresetAssigned then
+                for k, v in bp.EnhancementPresetAssigned.Enhancements do
+
+                    --First show all relevant bones
+                    if bp.Enhancements[v] and bp.Enhancements[v].ShowBones then
+                        for _, bone in bp.Enhancements[v].ShowBones do
+                            self:ShowBone(bone, true)
+                        end
+                    end
+
+                    --Now hide child bones of previously revealed bones, that should remain hidden
+                    if bp.Enhancements[v] and bp.Enhancements[v].HideBones then
+                        for _, bone in bp.Enhancements[v].HideBones do
+                            self:HideBone(bone, true)
+                        end
+                    end
+                end
+            end
+        end
+    end,
+
+    CreatePresetEnhancements = function(self)
+        local bp = self:GetBlueprint()
+        if bp.Enhancements and bp.EnhancementPresetAssigned and bp.EnhancementPresetAssigned.Enhancements then
+            for k, v in bp.EnhancementPresetAssigned.Enhancements do
+                self:CreateEnhancement(v)
+            end
+        end
+    end,
+
+    CreatePresetEnhancementsThread = function(self)
+        --Creating the preset enhancements on SCUs after they've been constructed. Delaying this by 1 tick to fix a problem where cloak and
+        --stealth enhancements work incorrectly.
+        WaitTicks(1)
+        if self and not self.Dead then
+            self:CreatePresetEnhancements()
+        end
+    end,
+
+    ShowEnhancementBones = function(self)
+        --Hide and show certain bones based on available enhancements
+        local bp = self:GetBlueprint()
+        if bp.Enhancements then
+            for k, enh in bp.Enhancements do
+                if enh.HideBones then
+                    for _, bone in enh.HideBones do
+                        self:HideBone(bone, true)
+                    end
+                end
+            end
+            for k, enh in bp.Enhancements do
+                if self:HasEnhancement(k) and enh.ShowBones then
+                    for _, bone in enh.ShowBones do
+                        self:ShowBone(bone, true)
+                    end
+                end
+            end
+        end
+    end,
 }
 
 ACUUnit = Class(CommandUnit) {
