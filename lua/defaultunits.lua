@@ -2341,9 +2341,18 @@ SeaUnit = Class(MobileUnit){
     PlayEndestructionEffects = false,
     CollidedBones = 0,
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        MobileUnit.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        self:StartRocking()
+        local surfaceAnim = self:GetBlueprint().Display.AnimationSurface
+        if surfaceAnim then
+            if not self.SurfaceAnimator then
+                self.SurfaceAnimator = CreateAnimator(self)
+            end
+            self.SurfaceAnimator:PlayAnim(surfaceAnim):SetRate(1)
+        end
+
         self:SetMaintenanceConsumptionActive()
+        MobileUnit.OnStopBeingBuilt(self,builder,layer)
     end,
 
     OnMotionHorzEventChange = function(self, new, old)

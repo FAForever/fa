@@ -1787,18 +1787,6 @@ Unit = Class(moho.unit_methods) {
         local bp = self:GetBlueprint()
         self:EnableUnitIntel('NotInitialized', nil)
         self:ForkThread( self.StopBeingBuiltEffects, builder, layer )
-
-        if ( self.CurrentLayer == 'Water' ) then
-            self:StartRocking()
-            local surfaceAnim = bp.Display.AnimationSurface
-            if not self.SurfaceAnimator and surfaceAnim then
-                self.SurfaceAnimator = CreateAnimator(self)
-            end
-            if surfaceAnim and self.SurfaceAnimator then
-                self.SurfaceAnimator:PlayAnim(surfaceAnim):SetRate(1)
-            end
-        end
-
         self:PlayUnitSound('DoneBeingBuilt')
         self:PlayUnitAmbientSound( 'ActiveLoop' )
 
