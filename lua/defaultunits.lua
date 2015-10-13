@@ -2274,7 +2274,7 @@ LandUnit = Class(MobileUnit) {
 -- -------------------------------------------------------------
 --   CONSTRUCTION UNITS
 -- -------------------------------------------------------------
-ConstructionUnit = Class(MobileUnit) {
+ConstructionUnit = Class(LandUnit) {
     OnCreate = function(self)
         MobileUnit.OnCreate(self)
 
