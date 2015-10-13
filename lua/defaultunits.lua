@@ -1492,7 +1492,7 @@ MobileUnit = Class(Unit) {
 
     GetTTTreadType = function( self, pos )
         local TerrainType = GetTerrainType( pos.x,pos.z )
-        return TerrainType.Treads or 'None'
+        return TerrainType.Treads or 'Default'
     end,
 
     OnTerrainTypeChange = function(self, new, old)
