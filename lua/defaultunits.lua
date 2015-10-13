@@ -1652,10 +1652,6 @@ MobileUnit = Class(Unit) {
         end
     end,
 
-    DestroyTopSpeedEffects = function( self )
-        EffectUtil.CleanupEffectBag(self,'TopSpeedEffectsBag')
-    end,
-
     MovementCameraShakeThread = function( self, camShake )
         local radius = camShake.Radius or 5.0
         local maxShakeEpicenter = camShake.MaxShakeEpicenter or 1.0
@@ -2084,6 +2080,10 @@ AirUnit = Class(MobileUnit) {
         if(self.ShowUnitDestructionDebris) then
             explosion.CreateDebrisProjectiles(self, scale, {self:GetUnitSizes()})
         end
+    end,
+
+    DestroyTopSpeedEffects = function( self )
+        EffectUtil.CleanupEffectBag(self,'TopSpeedEffectsBag')
     end,
 
     DestroyEffectsOnDeath = function(self)
