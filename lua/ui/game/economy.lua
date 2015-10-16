@@ -353,63 +353,90 @@ function ConfigureBeatFunction()
 
         -- The quantity of the appropriate resource that had been reclaimed at the end of the last
         -- tick (captured into the returned closure).
-        local lastReclaim = 0
+        local lastReclaimTotal = 0
+        local lastReclaimRate = 0
 
         -- Finally, glue all the bits together into a a resource-update function.
         return function()
             local econData = GetEconomyTotals()
             local simFrequency = GetSimTicksPerSecond()
-
+            
+            -- Deal with the reclaim column
+            -------------------------------
             local totalReclaimed = math.ceil(econData.reclaimed[resourceType])
 
             -- Reclaimed this tick
-            local thisTick = totalReclaimed - lastReclaim
+            local thisTick = totalReclaimed - lastReclaimTotal
+            
+            -- Set a new lastReclaimTotal to carry over
+            lastReclaimTotal = totalReclaimed
 
             -- The quantity we'd gain if we reclaimed at this rate for a full second.
             local rate = thisTick * simFrequency
 
+            -- Set the text
             reclaimDelta:SetText('+'..rate)
             reclaimTotal:SetText(totalReclaimed)
-
-            lastReclaim = totalReclaimed
-
-            -- Extract the economy data from the economy data.
+        
+            -- Deal with the Storage
+            ------------------------
             local maxStorageVal = econData.maxStorage[resourceType]
             local storedVal = econData.stored[resourceType]
-            local incomeVal = econData.income[resourceType]
-
-            local average
-            if storedVal > 0.5 then
-                average = math.min(econData.lastUseActual[resourceType] * simFrequency, 99999999)
-            else
-                average = math.min(econData.lastUseRequested[resourceType] * simFrequency, 99999999)
-            end
-            local incomeAvg = math.min(incomeVal * simFrequency, 99999999)
-
-            -- Update the UI
+            
+            -- Set the bar fill
             storageBar:SetRange(0, maxStorageVal)
             storageBar:SetValue(storedVal)
+            
+            -- Set the text displays
             curStorage:SetText(math.ceil(storedVal))
             maxStorage:SetText(math.ceil(maxStorageVal))
-
-            incomeTxt:SetText(string.format("+%d", math.ceil(incomeAvg)))
-            expenseTxt:SetText(string.format("-%d", math.ceil(average)))
-
-            local rateVal = math.ceil(incomeAvg - average)
-            local rateStr = string.format('%+d', math.min(math.max(rateVal, -99999999), 99999999))
-
-            local effVal
-            if average == 0 then
-                effVal = math.ceil(incomeAvg) * 100
+            
+            -- Deal with the income/expense column
+            --------------------------------------
+            local incomeVal = econData.income[resourceType]
+            
+            -- Should always be positive integer. Round to nearest rather than always up.
+            local incomeSec = math.floor(math.max(math.min(incomeVal * simFrequency, 99999999), 0) + 0.5)
+            local generatedIncome = incomeSec - lastReclaimRate
+            
+            -- How much are we wanting to drain?
+            local expense
+            if storedVal > 0.5 then
+                expense = math.min(econData.lastUseActual[resourceType] * simFrequency, 99999999)
             else
-                effVal = math.ceil((incomeAvg / average) * 100)
+                expense = math.min(econData.lastUseRequested[resourceType] * simFrequency, 99999999)
+            end
+            
+            expense = math.floor(expense + 0.5)
+
+            -- Set the text displays. incomeTxt should be only from non-reclaim.
+            -- incomeVal is delayed by 1 tick when it comes to accounting for reclaim.
+            -- This necessitates the use of the lastReclaimRate stored value.
+            incomeTxt:SetText(string.format("+%d", generatedIncome))
+            expenseTxt:SetText(string.format("-%d", expense))
+            
+            -- Store this tick's rate for next tick
+            lastReclaimRate = rate
+            
+            -- Deal with the primary income/expense display
+            -----------------------------------------------
+            
+            -- incomeSec and expense are already limit-checked and integers
+            local rateVal = incomeSec - expense
+
+            -- Calculate resource usage efficiency for % display mode
+            local effVal
+            if expense == 0 then
+                effVal = incomeSec * 100
+            else
+                effVal = math.floor(((incomeSec / expense) * 100) + 0.5)
             end
 
-            -- CHOOSE RATE or EFFICIENCY STRING
+            -- Choose to display efficiency or rate
             if States[viewState] == 2 then
                 rateTxt:SetText(string.format("%d%%", math.min(effVal, 100)))
             else
-                rateTxt:SetText(string.format("%+s", rateStr))
+                rateTxt:SetText(string.format("%+d", rateVal))
             end
 
             rateTxt:SetColor(getRateColour(rateVal, storedVal, maxStorageVal))
