@@ -227,7 +227,7 @@ UnitBlueprint {
                     LodCutoff = 'Weapon_LodCutoff',
                 },
             },
-            BallisticArc = 'RULEUBA_None',
+            BallisticArc = 'RULEUBA_LowArc',
             CollideFriendly = false,
             Damage = 60,
             DamageRadius = 2,
