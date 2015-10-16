@@ -289,7 +289,7 @@ WorldView = Class(moho.UIWorldView, Control) {
 
             -- Find the UI element we need to flash.
             local scoreBoardControls = import('/lua/ui/game/score.lua').controls
-            for _, line in scoreBoardControls.armyLines do
+            for _, line in scoreBoardControls.armyLines or {} do
                 if line.armyID == pingOwnerIndex then
                     toFlash = line.faction
                     break
@@ -310,7 +310,9 @@ WorldView = Class(moho.UIWorldView, Control) {
                 end
             end
 
-			ForkThread(pingSourceIndicator)
+			if toFlash then
+                ForkThread(pingSourceIndicator)
+            end
 		end
 		
         if not self:IsHidden() and pingData.Location then
