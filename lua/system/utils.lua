@@ -452,3 +452,15 @@ end
 function StringStartsWith(stringToMatch, valueToSeek)
     return string.sub(stringToMatch,1,valueToSeek:len())==valueToSeek
 end
+
+function math.round(num, idp)
+    if not idp then
+        return math.floor(num+.5)
+    else
+        return tonumber(string.format("%." .. (idp or 0) .. "f", num))
+    end
+end
+
+function math.clamp(v, min, max)
+    return math.max(min, math.min(max, v))
+end
