@@ -228,6 +228,10 @@ function ConfigureBeatFunction()
     --- Get a `getRateColour` function.
     --
     -- @param warnFull Should the returned getRateColour function use warning colours for fullness?
+    local function fmtnum(n)
+        return math.round(math.clamp(n, 0, 99999999))
+    end
+
     local function getGetRateColour(warnFull, blink)
         local getRateColour
         -- Flags to make things blink.
@@ -363,7 +367,7 @@ function ConfigureBeatFunction()
             
             -- Deal with the reclaim column
             -------------------------------
-            local totalReclaimed = math.ceil(econData.reclaimed[resourceType])
+            local totalReclaimed = econData.reclaimed[resourceType]
 
             -- Reclaimed this tick
             local thisTick = totalReclaimed - lastReclaimTotal
@@ -372,11 +376,11 @@ function ConfigureBeatFunction()
             lastReclaimTotal = totalReclaimed
 
             -- The quantity we'd gain if we reclaimed at this rate for a full second.
-            local rate = thisTick * simFrequency
+            local reclaimRate = thisTick * simFrequency
 
             -- Set the text
-            reclaimDelta:SetText('+'..rate)
-            reclaimTotal:SetText(totalReclaimed)
+            reclaimDelta:SetText('+' .. fmtnum(reclaimRate))
+            reclaimTotal:SetText(fmtnum(totalReclaimed))
         
             -- Deal with the Storage
             ------------------------
@@ -388,35 +392,33 @@ function ConfigureBeatFunction()
             storageBar:SetValue(storedVal)
             
             -- Set the text displays
-            curStorage:SetText(math.ceil(storedVal))
-            maxStorage:SetText(math.ceil(maxStorageVal))
+            curStorage:SetText(math.round(storedVal))
+            maxStorage:SetText(math.round(maxStorageVal))
             
             -- Deal with the income/expense column
             --------------------------------------
             local incomeVal = econData.income[resourceType]
             
-            -- Should always be positive integer. Round to nearest rather than always up.
-            local incomeSec = math.floor(math.max(math.min(incomeVal * simFrequency, 99999999), 0) + 0.5)
+            -- Should always be positive integer
+            local incomeSec = math.max(0, incomeVal * simFrequency)
             local generatedIncome = incomeSec - lastReclaimRate
-            
+
             -- How much are we wanting to drain?
             local expense
             if storedVal > 0.5 then
-                expense = math.min(econData.lastUseActual[resourceType] * simFrequency, 99999999)
+                expense = econData.lastUseActual[resourceType] * simFrequency
             else
-                expense = math.min(econData.lastUseRequested[resourceType] * simFrequency, 99999999)
+                expense = econData.lastUseRequested[resourceType] * simFrequency
             end
             
-            expense = math.floor(expense + 0.5)
-
             -- Set the text displays. incomeTxt should be only from non-reclaim.
             -- incomeVal is delayed by 1 tick when it comes to accounting for reclaim.
             -- This necessitates the use of the lastReclaimRate stored value.
-            incomeTxt:SetText(string.format("+%d", generatedIncome))
-            expenseTxt:SetText(string.format("-%d", expense))
+            incomeTxt:SetText(string.format("+%d", fmtnum(generatedIncome)))
+            expenseTxt:SetText(string.format("-%d", fmtnum(expense)))
             
-            -- Store this tick's rate for next tick
-            lastReclaimRate = rate
+            -- Store this tick's reclaimRate for next tick
+            lastReclaimRate = reclaimRate
             
             -- Deal with the primary income/expense display
             -----------------------------------------------
@@ -429,7 +431,7 @@ function ConfigureBeatFunction()
             if expense == 0 then
                 effVal = incomeSec * 100
             else
-                effVal = math.floor(((incomeSec / expense) * 100) + 0.5)
+                effVal = math.round((incomeSec / expense) * 100)
             end
 
             -- Choose to display efficiency or rate
