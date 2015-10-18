@@ -261,12 +261,12 @@ Prop = Class(moho.prop_methods, Entity) {
     -- If not given, it defaults to one directory up from this prop's blueprint location.
     --
     SplitOnBonesByName = function(self, dirprefix)
-        if not dirprefix then
-            -- Default dirprefix to parent dir of our own blueprint
-            dirprefix = self:GetBlueprint().BlueprintId
+        local bp = self:GetBlueprint()
 
-            -- Trim ".../groups/blah_prop.bp" to just ".../"
-            dirprefix = string.gsub(dirprefix, "[^/]*/[^/]*$", "")
+        if not dirprefix then
+            -- default dirprefix to parent dir of our own blueprint
+            -- trim ".../groups/blah_prop.bp" to just ".../"
+            dirprefix = string.gsub(bp.BlueprintId, "[^/]*/[^/]*$", "")
         end
 
         local newprops = {}
@@ -277,11 +277,25 @@ Prop = Class(moho.prop_methods, Entity) {
             -- Construct name of replacement mesh from name of bone, trimming off optional _01 _02 etc
             local btrim = string.gsub(bone, "_?[0-9]+$", "")
             local newbp = dirprefix .. btrim .. "_prop.bp"
-
             local p = safecall("Creating prop", self.CreatePropAtBone, self, ibone, newbp)
             if p then
                 table.insert(newprops, p)
             end
+        end
+
+        local n_props = table.getsize(newprops)
+        if n_props == 0 then return end
+
+        local time
+        if bp.Economy then
+            time = bp.economy.ReclaimTimeMultiplier or bp.economy.ReclaimMassTimeMultiplier or bp.economy.ReclaimEnergyTimeMultiplier or 1
+        else
+            time = 1
+        end
+
+        local perProp = {time=time / n_props, mass=(self.MaxMassReclaim * self.ReclaimLeft * 1.05) / n_props, energy=(self.MaxEnergyReclaim * self.ReclaimLeft * 1.05) / n_props}
+        for _, p in newprops do
+            p:SetMaxReclaimValues(perProp.time, perProp.mass, perProp.energy)
         end
 
         self:Destroy()
