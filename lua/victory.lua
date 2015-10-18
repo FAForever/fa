@@ -3,26 +3,26 @@ function CheckVictory(scenarioInfo)
 
     local categoryCheck = nil
     if scenarioInfo.Options.Victory == 'demoralization' then
-        # You're dead if you have no commanders
+        -- You're dead if you have no commanders
         categoryCheck = categories.COMMAND
     elseif scenarioInfo.Options.Victory == 'domination' then
-        # You're dead if all structures and engineers are destroyed
+        -- You're dead if all structures and engineers are destroyed
         categoryCheck = categories.STRUCTURE + categories.ENGINEER - categories.WALL
     elseif scenarioInfo.Options.Victory == 'eradication' then
-        # You're dead if you have no units
+        -- You're dead if you have no units
         categoryCheck = categories.ALLUNITS - categories.WALL
     else
-        # no victory condition
+        -- no victory condition
         return
     end
 
-    # tick number we are going to issue a victory on.  Or nil if we are not.
+    -- tick number we are going to issue a victory on.  Or nil if we are not.
     local victoryTime = nil
     local potentialWinners = {}
 
     while true do
 
-        # Look for newly defeated brains and tell them they're dead
+        -- Look for newly defeated brains and tell them they're dead
         local stillAlive = {}
         for index,brain in ArmyBrains do
             if not brain:IsDefeated() and not ArmyIsCivilian(brain:GetArmyIndex()) then
@@ -35,18 +35,18 @@ function CheckVictory(scenarioInfo)
             end
         end
 
-        # uh-oh, there is nobody alive... It's a draw.
+        -- uh-oh, there is nobody alive... It's a draw.
         if table.empty(stillAlive) then
             CallEndGame(true, false)
             return
         end
 
-        # check to see if everyone still alive is allied and is requesting an allied victory.
+        -- check to see if everyone still alive is allied and is requesting an allied victory.
         local win = true
         local draw = true
         for index,brain in stillAlive do
             for index2,other in stillAlive do
-                if index != index2 then
+                if index ~= index2 then
                     if not brain.RequestingAlliedVictory or not IsAlly(brain:GetArmyIndex(), other:GetArmyIndex()) then
                         win = false
                     end
@@ -60,7 +60,7 @@ function CheckVictory(scenarioInfo)
         if win then
             if table.equal(stillAlive, potentialWinners) then
                 if GetGameTimeSeconds() > victoryTime then
-                    # It's a win!
+                    -- It's a win!
                     for index,brain in stillAlive do
                         brain:OnVictory()
                     end
