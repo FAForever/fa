@@ -33,7 +33,7 @@ local StratManager = import('/lua/sim/StrategyManager.lua')
 
 
 local TransferUnitsOwnership = import('/lua/SimUtils.lua').TransferUnitsOwnership
-local CalculateBrainScore = import('/lua/score.lua').CalculateBrainScore
+local CalculateBrainScore = import('/lua/sim/score.lua').CalculateBrainScore
 
 
 local observer = false
