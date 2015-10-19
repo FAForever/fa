@@ -31,13 +31,8 @@ SimUnitEnhancements = {}
 function AddUnitEnhancement(unit, enhancement, slot)
     if not slot then return end
     local id = unit:GetEntityId()
-    local unitEnh = SimUnitEnhancements[id]
-    if unitEnh then
-        SimUnitEnhancements[id][slot] = enhancement
-    else
-        SimUnitEnhancements[id] = {}
-        SimUnitEnhancements[id][slot] = enhancement
-    end
+    SimUnitEnhancements[id] = SimUnitEnhancements[id] or {}
+    SimUnitEnhancements[id][slot] = enhancement
     SyncUnitEnhancements()
 end
 
@@ -50,11 +45,12 @@ function RemoveUnitEnhancement(unit, enhancement)
     for k, v in slots do
         if v == enhancement then
             key = k
+            break
         end
     end
-    if SimUnitEnhancements[id][key] then
-        SimUnitEnhancements[id][key] = nil
-    end
+
+    if not key then return end
+    SimUnitEnhancements[id][key] = nil
     if table.getsize(slots) == 0 then
         SimUnitEnhancements[id] = nil
     end
@@ -69,7 +65,17 @@ end
 
 function SyncUnitEnhancements()
     import('/lua/enhancementcommon.lua').SetEnhancementTable(SimUnitEnhancements)
-    Sync.UserUnitEnhancements = SimUnitEnhancements
+    local sync = {}
+
+    for id, slots in SimUnitEnhancements do
+        local unit = GetEntityById(id)
+        local me = GetFocusArmy()
+        if unit and (me == -1 or IsAlly(me, unit:GetArmy())) then
+            sync[id] = slots
+        end
+    end
+
+    Sync.UserUnitEnhancements = sync
 end
 
 function DebugMoveCamera(x0,y0,x1,y1)
@@ -113,6 +119,7 @@ function NoteFocusArmyChanged(new, old)
             Sync.UnitData[entityID] = data.Data
         end
     end
+    SyncUnitEnhancements()
     Sync.FocusArmyChanged = {new = new, old = old}
 end
 
