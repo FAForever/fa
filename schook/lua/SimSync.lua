@@ -5,21 +5,21 @@ UnitData = {}
 ResetSyncTable = function()
     oldResetSyncTable()
 
-    # A list of camera control operations that we'd like the user layer to perform.
+    -- A list of camera control operations that we'd like the user layer to perform.
     Sync.CameraRequests = {}
     Sync.Sounds = {}
     Sync.Voice = {}
 
-    # contains the current score for each army
+    -- contains the current score for each army
     Sync.Score = {}
 	Sync.ScoreAccum = {}
 
-    # Table of army indices set to "victory" or "defeat".
-    # It's the user layer's job to determine if any UI needs to be shown
-    # for the focus army.
+    -- Table of army indices set to "victory" or "defeat".
+    -- It's the user layer's job to determine if any UI needs to be shown
+    -- for the focus army.
     Sync.GameResult = {}
 
-    # Player to player queries that can affect the Sim
+    -- Player to player queries that can affect the Sim
     Sync.PlayerQueries = {}
     Sync.QueryResults = {}
 
@@ -75,7 +75,7 @@ end
 function DebugMoveCamera(x0,y0,x1,y1)
     local Camera = import('/lua/SimCamera.lua').SimCamera
     local cam = Camera("WorldCamera")
-#    cam:ScaleMoveVelocity(0.02)
+--    cam:ScaleMoveVelocity(0.02)
     cam:MoveTo(Rect(x0,y0,x1,y1),5.0)
 end
 
@@ -104,7 +104,7 @@ function OnPostLoad()
 end
 
 function NoteFocusArmyChanged(new, old)
-    #LOG('NoteFocusArmyChanged(new=' .. repr(new) .. ', old=' .. repr(old) .. ')')
+    --LOG('NoteFocusArmyChanged(new=' .. repr(new) .. ', old=' .. repr(old) .. ')')
     import('/lua/SimPing.lua').OnArmyChange()
     for entityID, data in UnitData do
         if data.OwnerArmy == old then
