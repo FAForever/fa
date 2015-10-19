@@ -59,6 +59,7 @@ end
 
 function RemoveAllUnitEnhancements(unit)
     local id = unit:GetEntityId()
+    if not SimUnitEnhancements[id] then return end
     SimUnitEnhancements[id] = nil
     SyncUnitEnhancements()
 end
