@@ -1983,182 +1983,76 @@ function GenerateOffMapAreas()
 	
 end
 
-function AntiOffMapMainThread()
-	WaitTicks(10)
-	GenerateOffMapAreas()
-	local OffMapAreas = {}
-	local UnitsThatAreOffMap = {}
-	-- WARN(repr(ScenarioInfo.ArmySetup))
-	
-	while ScenarioInfo.OffMapPreventionThreadAllowed == true do
-		OffMapAreas = ScenarioInfo.OffMapAreas
-		NewUnitsThatAreOffMap = {}
-		
-		for index,OffMapArea in OffMapAreas do
-			local UnitsThatAreInOffMapRect = GetUnitsInRect(OffMapArea)
-				if UnitsThatAreInOffMapRect then
-					for index, UnitThatIsOffMap in  UnitsThatAreInOffMapRect do
-						if not UnitThatIsOffMap.IAmOffMapThread then
-							table.insert(NewUnitsThatAreOffMap,UnitThatIsOffMap)
-						end
-					end
-				else
-				
-				end
-		end
-		
-		local NumberOfUnitsOffMap = table.getn(NewUnitsThatAreOffMap)
-		
-		-- WARN('the number of new units that are off map is ' .. repr(NumberOfUnitsOffMap))
-		
-		for index,NewUnitThatIsOffMap in NewUnitsThatAreOffMap do
-			if not NewUnitThatIsOffMap.IAmOffMap then
-				NewUnitThatIsOffMap.IAmOffMap = true
-			end
-			-- this is to make sure that we only do this check for air units
-			if not NewUnitThatIsOffMap.IAmOffMapThread and EntityCategoryContains( categories.AIR, NewUnitThatIsOffMap) then
-				
-				
-				-- this is to make it so it only impacts player armies, not AI or civilian or mission map armies
-				if IsHumanUnit(NewUnitThatIsOffMap) then
-					NewUnitThatIsOffMap.IAmOffMapThread = NewUnitThatIsOffMap:ForkThread(IAmOffMap)
-				else 
-					-- So that we don't bother checking each AI unit more than once
-					NewUnitThatIsOffMap.IAmOffMapThread = true
-				end
-			end
-		end
-		
-		
-		WaitSeconds(1)
-		NewUnitsThatAreOffMap = nil
-	end
-	
-
-end
-
-IsHumanUnit = function(self)
-	local ArmyTable = ScenarioInfo.ArmySetup
-	local ArmyIndex = self:GetArmy()
-	
-	for ArmyName,Army in ArmyTable do
-		if Army.ArmyIndex == ArmyIndex then
-			if Army.Human == true then
-				return true
-			else
-				return false
-			end
-			
-		end
-	end
-
-
+IsHumanUnit = function(unit)
+    local brain = unit:GetAIBrain()
+    return brain and brain.BrainType == 'Human'
 end
 
 function IsUnitInPlayableArea(unit)
-
-	local playableArea = ScenarioInfo.PlayableArea
-	local position = unit:GetPosition()
-	-- WARN('unit position is ' .. repr(position))
-	-- format is x0,y0,x1,y1 for rect, x,y,z for position
-	if  position[1] > playableArea[1] and position[1] < playableArea[3] and  position[3] > playableArea[2] and position[3] < playableArea[4] then
-		-- WARN('unit is in playable area')
-		return true
-	else 
-		-- WARN('unit remains in unplayable area')
-		return false
-	end
-	
+    return IsPlayableArea(unit:GetPosition())
 end
 
--- this is for bad units who choose to go off map, shame on them
-function IAmOffMap(self)
-	self.TimeIHaveBeenOffMap = 0
-	self.TimeIHaveBeenOnMap = 0
-	self.TimeIAmAllowedToBeOffMap = GetTimeIAmAllowedToBeOffMap(self)
-	while not self.Dead do
-		-- local playableArea = ScenarioInfo.PlayableArea
-		if IsUnitInPlayableArea(self) then
-			self.TimeIHaveBeenOnMap = (self.TimeIHaveBeenOnMap + 1)
-			
-			if self.TimeIHaveBeenOnMap > 5 then 
-				self:ForkThread(KillIAmOffMapThread)
-			end
-		else
-			self.TimeIHaveBeenOffMap = (self.TimeIHaveBeenOffMap + 1)
-			-- WARN('time I have been off map is ' .. repr(self.TimeIHaveBeenOffMap))
-		end
-		
-		if self.TimeIHaveBeenOffMap > self.TimeIAmAllowedToBeOffMap then
-			self:ForkThread(IAmABadUnit)
-			
-		end
-		
-		WaitSeconds(1)
-	end
+function IsPlayableArea(pos)
+    local area = ScenarioInfo.PlayableArea
+    if not pos then return end
+    -- format is x0,y0,x1,y1 for rect, x,y,z for pos
+    if  pos[1] > area[1] and pos[1] < area[3] and  pos[3] > area[2] and pos[3] < area[4] then
+        return true
+    else 
+        return false
+    end
 end
 
+function AntiOffMapMainThread()
+    WaitSeconds(10)
+    GenerateOffMapAreas()
+    
+    local offmap = {}
+    -- WARN(repr(ScenarioInfo.ArmySetup))
+    
+    while ScenarioInfo.OffMapPreventionThreadAllowed == true do
+        local now = GetGameTick()
 
-function IAmABadUnit(self)
-	local position = self:GetPosition()
-	local playableArea = ScenarioInfo.PlayableArea
-	local NearestOnPlayableAreaPointToMe = {}
-	
-	-- format is x0,y0,x1,y1 for rect, x,y,z for position
-	-- to conver position to rect, z is y, and y is height
-		
-	NearestOnPlayableAreaPointToMe[2] = position[2]	
-		
-	if position[1] > playableArea[1] and position[1] < playableArea[3] then
-		NearestOnPlayableAreaPointToMe[1] = position[1]
-	elseif position[1] < playableArea[1] then
-		NearestOnPlayableAreaPointToMe[1] = (playableArea[1] + 5)
-	elseif position[1] > playableArea[3] then
-		NearestOnPlayableAreaPointToMe[1] = (playableArea[3] - 5)
-	end
-	
-	
-	if position[3] > playableArea[2] and position[3] < playableArea[4] then
-		NearestOnPlayableAreaPointToMe[3] = position[3]
-	elseif position[3] < playableArea[2] then
-		NearestOnPlayableAreaPointToMe[3] = (playableArea[2] + 5)
-	elseif position[3] > playableArea[4] then
-		NearestOnPlayableAreaPointToMe[3] = (playableArea[4] - 5)
-	end
-	
-	IssueClearCommands({self})
-	IssueMove({self},position)
-	-- WARN('Unit was off map too long, so has been cleared of all orders')
-	
-end
+        for id, o in offmap do
+            if not o.human then continue end
+            local unit = o.unit
+            local nav = unit:GetNavigator()
+            local current_goal = nav:GetGoalPos()
+            local new_dest
 
-function GetTimeIAmAllowedToBeOffMap(self)
-	
-	local airspeed = self:GetBlueprint().Air.MaxAirspeed
-	local value = airspeed
+            if IsUnitInPlayableArea(unit) then
+                new_dest = IsPlayableArea(o.goal) and o.goal
+                offmap[id] = nil
+            elseif o.back_tick < GetGameTick() then
+                local area = ScenarioInfo.PlayableArea
+                o.goal = o.goal or IsPlayableArea(current_goal)  and current_goal
+                new_dest = Vector(area[1] / 2, 20, area[3] / 2)
+            end
 
-	if EntityCategoryContains( categories.BOMBER, self ) then
-		value = airspeed / 5
-	elseif EntityCategoryContains( categories.TRANSPORTATION, self ) then
-		value = 2	
-	end
-	
-	for i = 1, self:GetWeaponCount() do
-		local wep = self:GetWeapon(i)
-		if wep.Label != 'DeathWeapon' and wep.Label != 'DeathImpact' then
-			if wep:GetCurrentTarget()  then
-				value = airspeed * 2
-			end
-			
-		end
-	end
-	return value
-end
+            if new_dest and not (current_goal and VDist3(new_dest, current_goal) == 0) then
+                nav:SetGoal(new_dest)
+                nav:SetSpeedThroughGoal(true)
+            end
+        end
+        
+        for _,area in ScenarioInfo.OffMapAreas do
+            local units = EntityCategoryFilterDown(categories.AIR, GetUnitsInRect(area) or {})
+            if units then
+                for _, u in units do
+                    local id = u:GetEntityId()
+                    if not offmap[id] then
+                        local data = {human=IsHumanUnit(u)}
+                        if data.human then
+                            local speed = u:GetBlueprint().Air.MaxAirspeed
+                            data = table.merged(data, {unit=u, back_tick=now+speed})
+                        end
 
-function KillIAmOffMapThread(self)
+                        offmap[id] = data
+                    end
+                end
+            end
+        end
 
-	KillThread(self.IAmOffMapThread)
-	self.IAmOffMapThread = nil
-	self.TimeIHaveBeenOffMap = 0
-	self.TimeIHaveBeenOnMap = 0
+        WaitSeconds(1)
+    end
 end
