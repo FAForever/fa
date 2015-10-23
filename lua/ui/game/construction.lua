@@ -457,7 +457,7 @@ function GetBackgroundTextures(unitID)
     local bp = __blueprints[unitID]
     local validIcons = { land = true, air = true, sea = true, amph = true }
     if not validIcons[bp.General.Icon] then
-        WARN(debug.traceback(nil, "Invalid icon for unit " .. tostring(unitID)))
+        if bp.General.Icon then WARN(debug.traceback(nil, "Invalid icon" .. bp.General.Icon .. " for unit " .. tostring(unitID))) end
         bp.General.Icon = "land"
     end
 
