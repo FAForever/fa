@@ -1,3 +1,68 @@
+Patch 3652 (pending)
+============================
+
+**Lobby**
+
+- Name filter when selecting map
+- Prevent host from changing teams of others while ready
+- Game quality in lobby now visible again
+- Reduced autobalance random variation to get team setups with better overall quality
+
+**UI**
+
+- New keybinding 'soft_stop'
+- Soft-stop will cancel all orders of a factory except their current one, if you soft-stop a factory with only one order it will get cleared
+- Soft-stop on a silo unit will clear the current orders but not stop the actual building of a missile
+- Transport lock: Right click on a unit in a transport to lock it in place. If all units in transports are locked and you order unload they will be unloaded anyway.
+- Multi-upgrade: Added UI support to upgrade structures several levels at once (i.e: cybran shields, hives, mexes, factories etc)
+- Auto-overcharge: It's now possible to let overcharge fire automatically whenever you have the required power
+- Ferry orders are now persistent, even if the original transports die. Remove it by shift-ctrl right click the first beacon
+- Order repair on a wreck to rebuild it if possible by some of the selected engineers. Those not able to rebuild the wreck will assist after the build starts.
+- Units explicity repairing (not assisting) a structure that dies will automatically try to rebuild it
+- Refactor the income economy overlay not to show reclaim values appearing in the generated income column and do correct rounding of the numbers.
+- Fixed bug with unit regen debuff not being visible in UI
+- Fixed bug with buildpower not visible in unitview
+
+**Gameplay**
+
+- Teamkill is now detected and a player can make an explicit report
+- Air units are now able to fire at water-landed transports
+- Hoplite now calculate their aim correctly when firing at a fleeing target
+- Slight increase of unit size(not hitbox) of T3 sniper bots, Othuum and Rhino to alleviate their weapon's ground-hitting ability
+- Seraphim Experimental Nuke now deals damage to itself
+- Cybran drones no longer leave wreckage when killed
+- Cybran T2 PD and Tank now got their original lasers back
+- Defense structures now start rotated at their nearest enemy when built, if no enemies found they default at middle of map 
+- Remove friendly fire on Atlantis AA
+- Location of enemy civilian structures are now revealed at start of the game (lobby option)
+- Navy units now should respect their max-range better when having move-attack order
+- Set GuardReturnRadius to 3 as default, will make guarding / patrolling / move-attacking units less prone to move off their designated mission while hunting something
+- Units moving on seabottom now leave treadmarks - they disappear faster though
+- Re-enabled death animation on non-naval units
+- Seraphim GW now uses all its 3 exits
+
+**Bugs**
+
+- Fixed bug with units getting invincible after a visit to their nearest carrier
+- Fixed bug with not able to target a blip of a given / upgraded structure
+- Fixed bug which caused silo missiles to disappear at launch stage
+- Fixed bug with water sounds not playing while a unit was submerged
+- Fixed bug with omni buff instead getting radius of radar
+- Fatboy and Cybran cruisers shouldn't engage enemies way outside their range anymore
+
+-- XXX: @Duk3Luk3 rewrite the below:
+- Refactor layer change logic 
+- Intel system reworked to handle intel events better
+
+**Performance**
+- Optimization of score accumulation
+- Tweaks to hive build effects to reduce performance impact
+- Cleanup of enhancement sync code to make it faster and more secure
+
+**Other**
+- Tech-level filter in debug window now works as intended
+
+
 Patch 3650 (August 19, 2015)
 ===========================
 
