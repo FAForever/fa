@@ -2065,9 +2065,6 @@ ACUUnit = Class(CommandUnit) {
         --If there is a killer, and it's not me
         if instigator and instigator:GetArmy() ~= self:GetArmy() then
             local instigatorBrain = ArmyBrains[instigator:GetArmy()]
-            if instigatorBrain and not instigatorBrain:IsDefeated() then
-                instigatorBrain:AddArmyStat("FAFWin", 1)
-            end
             --if we are teamkilled
             if IsAlly(self:GetArmy(), instigator:GetArmy()) then
                 WARN('Teamkill detected')
@@ -2075,14 +2072,10 @@ ACUUnit = Class(CommandUnit) {
                 WARN("Was teamkilled: army #" .. self:GetArmy())
                 WARN("At time: " .. GetGameTimeSeconds())
                 WARN("Killed by army #" .. instigator:GetArmy())
-            end
-        end
-
-        --Score change, we send the score of all players
-        for index, brain in ArmyBrains do
-            if brain and not brain:IsDefeated() then
-                local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
-                table.insert(Sync.GameResult, { index, result })
+            else
+                ForkThread(function()
+                    instigatorBrain:ReportScore()
+                end)
             end
         end
     end,
