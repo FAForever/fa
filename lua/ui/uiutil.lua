@@ -92,21 +92,6 @@ currentLayout = false
 changeLayoutFunction = false    -- set this function to get called with the new layout name when layout changes
 
 local UIFileCache = {}
-local FileCache =  {}
-
-local oldDiskGetFileInfo = DiskGetFileInfo
-function DiskGetFileInfo(file)
-    if FileCache[file] == nil then
-        local info = oldDiskGetFileInfo(file)
-        if(info) then
-            FileCache[file] = info
-        else
-            FileCache[file] = false
-        end
-    end
-
-    return FileCache[file]
-end
 
 --* layout control, sets current layout preference
 function SetCurrentLayout(layout)
@@ -330,6 +315,7 @@ function UIFile(filespec)
     local skins = import('/lua/skins/skins.lua').skins
     local useSkin = currentSkin()
     local currentPath = skins[useSkin].texturesPath
+    local origPath = currentPath
 
     if useSkin == nil or currentPath == nil then
         return nil
@@ -352,17 +338,19 @@ function UIFile(filespec)
                 end
             end
         end
-
-        if found then
-            if not UIFileCache[useSkin] then UIFileCache[useSkin] = {} end
-            UIFileCache[useSkin][filespec] = found
-        else
-            WARN(debug.traceback(nil, "Warning: Unable to find file: " .. skins[currentSkin()].texturesPath .. filespec))
-            return filespec
+        
+        if not found then
+          WARN(debug.traceback(nil, "Warning: Unable to find file: " .. origPath .. ' ' .. filespec))
+--          for i,v in UIFileCache do
+--            WARN(i .. '->' .. v)
+--          end
+          found = filespec
         end
+
+        UIFileCache[origPath .. filespec] = found
     end
 
-    return UIFileCache[useSkin][filespec]
+    return UIFileCache[origPath .. filespec]
 end
 
 --* return the filename as a lazy var function to allow triggering of OnDirty

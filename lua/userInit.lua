@@ -37,3 +37,12 @@ FrontEndData = {}
 
 -- Prefetch user side data
 Prefetcher = CreatePrefetchSet()
+
+local FileCache =  {}
+local oldDiskGetFileInfo = DiskGetFileInfo
+function DiskGetFileInfo(file)
+    if FileCache[file] == nil then
+        FileCache[file] = oldDiskGetFileInfo(file) or false
+    end
+    return FileCache[file]
+end
