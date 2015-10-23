@@ -69,6 +69,10 @@ function OnSync()
     end
 	
     if Sync.Teamkill then
+        local armiesInfo = GetArmiesTable()
+        local victimName = armiesInfo.armiesTable[Sync.Teamkill.victim].nickname
+        local killerName = armiesInfo.armiesTable[Sync.Teamkill.instigator].nickname
+        GpgNetSend('TeamkillHappened', Sync.Teamkill.killTime, victimName, killerName)
         if(GetFocusArmy() == Sync.Teamkill.victim) then
             import('/lua/ui/dialogs/teamkill.lua').CreateDialog(Sync.Teamkill)
         end

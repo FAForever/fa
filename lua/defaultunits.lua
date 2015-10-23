@@ -2144,9 +2144,6 @@ ACUUnit = Class(CommandUnit) {
             if IsAlly(self:GetArmy(), instigator:GetArmy()) then
                 WARN('Teamkill detected')
                 Sync.Teamkill = { killTime = GetGameTimeSeconds(), instigator = instigator:GetArmy(), victim = self:GetArmy() }
-                WARN("Was teamkilled: army #" .. self:GetArmy())
-                WARN("At time: " .. GetGameTimeSeconds())
-                WARN("Killed by army #" .. instigator:GetArmy())
             else
                 ForkThread(function()
                     instigatorBrain:ReportScore()
