@@ -92,6 +92,62 @@ currentLayout = false
 changeLayoutFunction = false    -- set this function to get called with the new layout name when layout changes
 
 local UIFileCache = {}
+-- The files below are missing from the game and are used to leave UIFile early
+local UIFileBlacklist = {
+    ['/icons/units/opc1001_icon.dds'] = true,
+    ['/icons/units/opc1002_icon.dds'] = true,
+    ['/icons/units/opc2001_icon.dds'] = true,
+    ['/icons/units/opc5007_icon.dds'] = true,
+    ['/icons/units/opc5008_icon.dds'] = true,
+    ['/icons/units/ope2001_icon.dds'] = true,
+    ['/icons/units/ope2002_icon.dds'] = true,
+    ['/icons/units/ope6002_icon.dds'] = true,
+    ['/icons/units/ope6004_icon.dds'] = true,
+    ['/icons/units/ope6005_icon.dds'] = true,
+    ['/icons/units/ope6006_icon.dds'] = true,
+    ['/icons/units/uab5204_icon.dds'] = true,
+    ['/icons/units/uac1902_icon.dds'] = true,
+    ['/icons/units/xsc9011_icon.dds'] = true,
+    ['/icons/units/xsc9010_icon.dds'] = true,
+    ['/icons/units/xsc8020_icon.dds'] = true,
+    ['/icons/units/xsc8019_icon.dds'] = true,
+    ['/icons/units/xsc8018_icon.dds'] = true,
+    ['/icons/units/xsc8017_icon.dds'] = true,
+    ['/icons/units/xsc8016_icon.dds'] = true,
+    ['/icons/units/xsc8015_icon.dds'] = true,
+    ['/icons/units/xsc8014_icon.dds'] = true,
+    ['/icons/units/xsc8013_icon.dds'] = true,
+    ['/icons/units/xsc1601_icon.dds'] = true,
+    ['/icons/units/xsc1701_icon.dds'] = true,
+    ['/icons/units/xro4001_icon.dds'] = true,
+    ['/icons/units/xrc2401_icon.dds'] = true,
+    ['/icons/units/xrc2301_icon.dds'] = true,
+    ['/icons/units/xrc2101_icon.dds'] = true,
+    ['/icons/units/xec9011_icon.dds'] = true,
+    ['/icons/units/xec9010_icon.dds'] = true,
+    ['/icons/units/xec9009_icon.dds'] = true,
+    ['/icons/units/xec9008_icon.dds'] = true,
+    ['/icons/units/xec9007_icon.dds'] = true,
+    ['/icons/units/xec9006_icon.dds'] = true,
+    ['/icons/units/xec9005_icon.dds'] = true,
+    ['/icons/units/xec9002_icon.dds'] = true,
+    ['/icons/units/xec9001_icon.dds'] = true,
+    ['/icons/units/xec9003_icon.dds'] = true,
+    ['/icons/units/xec1909_icon.dds'] = true,
+    ['/icons/units/xec1908_icon.dds'] = true,
+    ['/icons/units/xec9004_icon.dds'] = true,
+    ['/icons/units/xac8103_icon.dds'] = true,
+    ['/icons/units/xac8102_icon.dds'] = true,
+    ['/icons/units/xac8101_icon.dds'] = true,
+    ['/icons/units/xac8003_icon.dds'] = true,
+    ['/icons/units/xac8002_icon.dds'] = true,
+    ['/icons/units/xac2301_icon.dds'] = true,
+    ['/icons/units/xac8001_icon.dds'] = true,
+    ['/icons/units/uxl0021_icon.dds'] = true,
+    ['/icons/units/urb5206_icon.dds'] = true,
+    ['/icons/units/urb5204_icon.dds'] = true,
+    ['/icons/units/urb3103_icon.dds'] = true
+}
 
 --* layout control, sets current layout preference
 function SetCurrentLayout(layout)
@@ -312,6 +368,8 @@ end
 
 --* given a path and name relative to the skin path, returns the full path based on the current skin
 function UIFile(filespec)
+    if UIFileBlacklist[filespec] then return filespec end
+
     local skins = import('/lua/skins/skins.lua').skins
     local useSkin = currentSkin()
     local currentPath = skins[useSkin].texturesPath
