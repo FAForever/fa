@@ -256,7 +256,7 @@ Unit = Class(moho.unit_methods) {
 
         --Ensure transport slots are available
         self.attachmentBone = nil
-        self.slotsFree = {}
+        self.slotsTaken = {}
 
         -- Set up Adjacency container
         self.AdjacentUnits = {}
@@ -3645,7 +3645,7 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
     OnStartTransportBeamUp = function(self, transport, bone)
         --Ensures bone availability
-        if transport.slotsFree[bone] == false then
+        if transport.slotsTaken[bone] then
             IssueClearCommands({self})
             IssueClearCommands({transport})
             return
@@ -3930,24 +3930,22 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnAttachedToTransport = function(self, transport, bone)
+        transport.slotsTaken = transport.slotsTaken or {}
         self:DoUnitCallbacks( 'OnAttachedToTransport', transport )
         for i=1,transport:GetBoneCount() do
             if transport:GetBoneName(i) == bone then
                 self.attachmentBone = i
-                transport.slotsFree[i] = false
+                transport.slotsTaken[bone] = true
             end
         end
     end,
 
     OnDetachedToTransport = function(self, transport)
-        if not transport.slotsFree then
-            transport.slotsFree = {}
-        end
         if not self.attachmentBone then
             self.attachmentBone = -100
         end
         self:DoUnitCallbacks( 'OnDetachedToTransport', transport )
-        transport.slotsFree[self.attachmentBone] = true
+        transport.slotsTaken[self.attachmentBone] = nil
         self.attachmentBone = nil
     end,
 
