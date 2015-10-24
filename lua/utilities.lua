@@ -1,12 +1,9 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/utilities.lua
-#**  Author(s):  John Comes, Gordon Duclos
-#**
-#**  Summary  :  Utility functions for scripts.
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+-----------------------------------------------------------------
+-- File     :  /lua/utilities.lua
+-- Author(s):  John Comes, Gordon Duclos
+-- Summary  :  Utility functions for scripts.
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
 
 function GetDistanceBetweenTwoEntities(entity1, entity2)
     return VDist3(entity1:GetPosition(),entity2:GetPosition())
@@ -17,57 +14,57 @@ function GetEnemyUnitsInSphere(unit, position, radius)
 end
 
 function GetDistanceBetweenTwoPoints(x1, y1, z1, x2, y2, z2)
-    return ( math.sqrt( (x1-x2)^2 + (y1-y2)^2 + (z1-z2)^2 ) )
+    return (math.sqrt((x1-x2)^2 + (y1-y2)^2 + (z1-z2)^2))
 end
 
-function GetDistanceBetweenTwoVectors( v1, v2 )
+function GetDistanceBetweenTwoVectors(v1, v2)
     return VDist3(v1, v2)
 end
 
-function XZDistanceTwoVectors( v1, v2 )
-    return VDist2( v1[1], v1[3], v2[1], v2[3] )
+function XZDistanceTwoVectors(v1, v2)
+    return VDist2(v1[1], v1[3], v2[1], v2[3])
 end
 
-function GetVectorLength( v )
-    return math.sqrt( math.pow( v.x, 2 ) + math.pow( v.y, 2 ) + math.pow( v.z, 2 ))
+function GetVectorLength(v)
+    return math.sqrt(math.pow(v.x, 2) + math.pow(v.y, 2) + math.pow(v.z, 2))
 end
 
-function NormalizeVector( v )
-    local length = GetVectorLength( v )
+function NormalizeVector(v)
+    local length = GetVectorLength(v)
     if length > 0 then
         local invlength = 1 / length
-        return Vector( v.x * invlength, v.y * invlength, v.z * invlength )
+        return Vector(v.x * invlength, v.y * invlength, v.z * invlength)
     else
-        return Vector( 0,0,0 )
+        return Vector(0,0,0)
     end
 end
 
-function GetDifferenceVector( v1, v2 )
+function GetDifferenceVector(v1, v2)
     return Vector(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z)
 end
 
-function GetDirectionVector( v1, v2 )
-    return NormalizeVector( Vector(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z) )
+function GetDirectionVector(v1, v2)
+    return NormalizeVector(Vector(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z))
 end
 
-function GetScaledDirectionVector( v1, v2, scale )
-    local vec = GetDirectionVector( v1, v2 )
-    return Vector( vec.x * scale, vec.y * scale, vec.z * scale )
+function GetScaledDirectionVector(v1, v2, scale)
+    local vec = GetDirectionVector(v1, v2)
+    return Vector(vec.x * scale, vec.y * scale, vec.z * scale)
 end
 
-function GetMidPoint( v1, v2 )
-	return Vector( (v1.x + v2.x) * 0.5, (v1.y + v2.y) * 0.5, (v1.z + v2.z) * 0.5 )
+function GetMidPoint(v1, v2)
+	return Vector((v1.x + v2.x) * 0.5, (v1.y + v2.y) * 0.5, (v1.z + v2.z) * 0.5)
 end
 
-function GetRandomFloat( nmin, nmax)
+function GetRandomFloat(nmin, nmax)
     return (Random() * (nmax - nmin) + nmin)
 end
 
-function GetRandomInt( nmin, nmax)
+function GetRandomInt(nmin, nmax)
     return math.floor(Random() * (nmax - nmin + 1) + nmin)
 end
 
-function GetRandomOffset( sx, sy, sz, scalar )
+function GetRandomOffset(sx, sy, sz, scalar)
     sx = sx * scalar
     sy = sy * scalar
     sz = sz * scalar
@@ -77,7 +74,7 @@ function GetRandomOffset( sx, sy, sz, scalar )
     return x,y,z
 end
 
-function GetRandomOffset2( sx, sy, sz, scalar )
+function GetRandomOffset2(sx, sy, sz, scalar)
     sx = sx * scalar
     sy = sy * scalar
     sz = sz * scalar
@@ -87,15 +84,15 @@ function GetRandomOffset2( sx, sy, sz, scalar )
     return x,y,z
 end
 
-function GetClosestVector( vFrom, vToList )
+function GetClosestVector(vFrom, vToList)
     local dist, cDist, retVec = 0
-    if( vToList ) then
-        dist = GetDistanceBetweenTwoVectors( vFrom, vToList[1] )
+    if(vToList) then
+        dist = GetDistanceBetweenTwoVectors(vFrom, vToList[1])
         retVec = vToList[1]
     end
     for kTo, vTo in vToList do
-        cDist = GetDistanceBetweenTwoVectors( vFrom, vTo )
-        if( dist > cDist) then
+        cDist = GetDistanceBetweenTwoVectors(vFrom, vTo)
+        if(dist > cDist) then
             dist = cDist
             retVec = vTo
         end 
@@ -103,16 +100,16 @@ function GetClosestVector( vFrom, vToList )
     return retVec
 end
 
-function Cross( v1, v2 )
-	return Vector( (v1.y * v2.z) - (v1.z * v2.y), (v1.z * v2.x) - (v1.x * v2.z ), (v1.x * v2.y) - (v1.y - v2.x))
+function Cross(v1, v2)
+	return Vector((v1.y * v2.z) - (v1.z * v2.y), (v1.z * v2.x) - (v1.x * v2.z ), (v1.x * v2.y) - (v1.y - v2.x))
 end
 
-function DotP( v1, v2 )
+function DotP(v1, v2)
     return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z)
 end
 
 function GetAngleInBetween(v1, v2)
-    #normalize the vectors
+    -- Normalize the vectors
     local vec1 = {}
     local vec2 = {}
     vec1 = NormalizeVector(v1)
