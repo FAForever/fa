@@ -12,13 +12,6 @@ local CalculateBallisticAcceleration = import('/lua/sim/CalcBallisticAcceleratio
 -- Most weapons derive from this class, including beam weapons later in this file
 DefaultProjectileWeapon = Class(Weapon) {
 
-    -- Record the initial damage of the weapon for future use
-    GetDamageTable = function(self)
-        local table = Weapon.GetDamageTable(self)
-        table.InitialDamageAmount = self:GetBlueprint().InitialDamage or 0
-        return table
-    end,
-
     FxRackChargeMuzzleFlash = {},
     FxRackChargeMuzzleFlashScale = 1,
     FxChargeMuzzleFlash = {},
