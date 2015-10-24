@@ -192,6 +192,35 @@ ADFTractorClawStructure = Class(DefaultBeamWeapon) {
 ADFChronoDampener = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.AChronoDampener,
     FxMuzzleFlashScale = 0.5,
+    
+    RackSalvoFiringState = State(DefaultProjectileWeapon.RackSalvoFiringState) {
+        Main = function(self)
+            local bp = self:GetBlueprint()
+            WARN('Weapon')
+            -- Align to a tick which is a multiple of 50
+            WaitTicks(51 - math.mod(GetGameTick(), 50))
+            
+            while true do
+                if bp.Audio.Fire then
+                    self:PlaySound(bp.Audio.Fire)
+                end
+                self:DoOnFireBuffs()
+                self:PlayFxMuzzleSequence(1)
+                self:StartEconomyDrain()
+                self:OnWeaponFired()
+
+                WaitTicks(51)
+            end
+        end,
+        
+        OnFire = function(self)
+        end,
+        
+        OnLostTarget = function(self)
+            ChangeState(self, self.IdleState)
+            DefaultProjectileWeapon.OnLostTarget(self)
+        end,
+    },
 
     CreateProjectileAtMuzzle = function(self, muzzle)
     end,
