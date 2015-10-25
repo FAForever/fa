@@ -491,6 +491,8 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
     GUI.connectdialog.OnEscapePressed = function() end
     GUI.connectdialog.OnShadowClicked = function() end
 
+    ConExecute('net_CompressionMethod 0')
+
     InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
 
     -- Store off the validated playername
