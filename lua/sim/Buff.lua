@@ -191,7 +191,6 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             else
                 unit:AdjustHealth(instigator, healthadj)
             end
-
         elseif atype == 'MaxHealth' then
             local unitbphealth = unit:GetBlueprint().Defense.MaxHealth or 1
             local val = BuffCalculate(unit, buffName, 'MaxHealth', unitbphealth)
@@ -207,22 +206,11 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
                 end
             end
         elseif atype == 'Regen' then
-            local bpregn = unit:GetBlueprint().Defense.RegenRate or 0
-            local val = BuffCalculate(unit, buffName, 'Regen', bpregn)
-
-            unit:SetRegen(val)
-        elseif atype == 'RegenPercent' then
-            local val = false
-
-            if afterRemove then
-                --Restore normal regen value plus buffs so I don't break stuff. Love, Robert
-                local bpregn = unit:GetBlueprint().Defense.RegenRate or 0
-                val = BuffCalculate(unit, nil, 'Regen', bpregn)
-            else
-                --Buff this sucka
-                val = BuffCalculate(unit, buffName, 'RegenPercent', unit:GetMaxHealth())
-            end
-
+            -- Adjusted to use a special case of adding mults and calculating the final value
+            -- in BuffCalculate to fix bugs where adds and mults would clash or cancel
+            local bpRegen = unit:GetBlueprint().Defense.RegenRate or 0
+            local val = BuffCalculate(unit, nil, 'Regen', bpRegen)
+            
             unit:SetRegen(val)
         elseif atype == 'Damage' then
             for i = 1, unit:GetWeaponCount() do
@@ -367,10 +355,7 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
     local mults = 1.0
     local bool = initialBool or false
 
-    local highestCeil = false
-    local lowestFloor = false
-
-    if not unit.Buffs.Affects[affectType] then return initialVal, bool end
+    if not unit.Buffs.Affects[affectType] then return initialVal, bool end   
 
     for k, v in unit.Buffs.Affects[affectType] do
         if v.Add and v.Add ~= 0 then
@@ -378,8 +363,16 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
         end
 
         if v.Mult then
-            for i=1,v.Count do
-                mults = mults * v.Mult
+            if affectType == 'Regen' then
+                -- Regen mults use MaxHp as base, so should always be <1
+                mults = 0
+                for i=1,v.Count do
+                    mults = mults + v.Mult
+                end
+            else
+                for i=1,v.Count do
+                    mults = mults * v.Mult
+                end
             end
         end
 
@@ -388,20 +381,15 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
         else
             bool = true
         end
-
-        if v.Ceil and (not highestCeil or highestCeil < v.Ceil) then
-            highestCeil = v.Ceil
-        end
-
-        if v.Floor and (not lowestFloor or lowestFloor > v.Floor) then
-            lowestFloor = v.Floor
-        end
     end
-    --Adds are calculated first, then the mults.  May want to expand that later.
-    local returnVal = (initialVal + adds) * mults
-
-    if lowestFloor and returnVal < lowestFloor then returnVal = lowestFloor end
-    if highestCeil and returnVal > highestCeil then returnVal = highestCeil end
+    
+    -- Adds are calculated first, then the mults.  May want to expand that later.
+    local returnVal = false
+    if affectType == 'Regen' then
+        returnVal = initialVal + adds + (mults * unit:GetMaxHealth())
+    else
+        returnVal = (initialVal + adds) * mults
+    end
 
     return returnVal, bool
 end
