@@ -186,13 +186,18 @@ function IssueUpgradeOrders(units, bpid)
     end
 end
 
+local QueueResetAt = {}
 function ResetOrderQueue(factory, stop_last)
     local queue = SetCurrentFactoryForQueueDisplay(factory)
     if not queue then return end
+    local id = factory:GetEntityId()
     local n = table.getsize(queue)
+    local now = GameTick()
+    local reset_at = QueueResetAt[id]
 
-    if stop_last and n == 1 then
+    if stop_last and (n == 1 or (reset_at and now-reset_at < 10)) then
         IssueCommand("Stop")
+        QueueResetAt[id] = nil
         return
     end
 
@@ -206,6 +211,8 @@ function ResetOrderQueue(factory, stop_last)
         SelectUnits({factory})
         DecreaseBuildCountInQueue(i, count)
     end
+
+    QueueResetAt[id] = now
 end
 
 function ResetOrderQueues(units)
