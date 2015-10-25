@@ -119,13 +119,18 @@ function OnFirstUpdate()
     PlaySound( Sound { Bank='AmbientTest', Cue='AMB_Planet_Rumble_zoom'} )
     ForkThread(
                function()
-                   WaitSeconds(1.5)
-                   UIZoomTo(avatars, 1)
-                   WaitSeconds(1.5)
-                   SelectUnits(avatars)
-                   FlushEvents()
-                   if not IsNISMode() then
-                       import('/lua/ui/game/worldview.lua').UnlockInput()
+                    WaitSeconds(1)
+                    UIZoomTo(avatars, 1)
+                    WaitSeconds(1.5)
+                    local selected = false
+                    repeat
+                        WaitSeconds(0.1)
+                        SelectUnits(avatars)
+                        selected = GetSelectedUnits()
+                    until table.getsize(selected) > 0
+                    FlushEvents()
+                    if not IsNISMode() then
+                        import('/lua/ui/game/worldview.lua').UnlockInput()
                    end
                end
                )
