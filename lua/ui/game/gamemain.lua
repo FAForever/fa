@@ -105,35 +105,36 @@ end
 function OnFirstUpdate()
     import('/modules/hotbuild.lua').init()
     EnableWorldSounds()
+    import('/lua/UserMusic.lua').StartPeaceMusic()
+
     local avatars = GetArmyAvatars()
     if avatars and avatars[1]:IsInCategory("COMMAND") then
         local armiesInfo = GetArmiesTable()
         local focusArmy = armiesInfo.focusArmy
         local playerName = armiesInfo.armiesTable[focusArmy].nickname
         avatars[1]:SetCustomName(playerName)
+        PlaySound( Sound { Bank='AmbientTest', Cue='AMB_Planet_Rumble_zoom'} )
+        ForkThread(function()
+            WaitSeconds(1)
+            UIZoomTo(avatars, 1)
+            WaitSeconds(1.5)
+            local selected = false
+            repeat
+                WaitSeconds(0.1)
+                SelectUnits(avatars)
+                selected = GetSelectedUnits()
+            until table.getsize(selected) > 0 or GameTick() > 50
+        end)
     end
-    import('/lua/UserMusic.lua').StartPeaceMusic()
+
+    FlushEvents()
+    if not IsNISMode() then
+        import('/lua/ui/game/worldview.lua').UnlockInput()
+    end
+
     if not import('/lua/ui/campaign/campaignmanager.lua').campaignMode then
         import('/lua/ui/game/score.lua').CreateScoreUI()
     end
-    PlaySound( Sound { Bank='AmbientTest', Cue='AMB_Planet_Rumble_zoom'} )
-    ForkThread(
-               function()
-                    WaitSeconds(1)
-                    UIZoomTo(avatars, 1)
-                    WaitSeconds(1.5)
-                    local selected = false
-                    repeat
-                        WaitSeconds(0.1)
-                        SelectUnits(avatars)
-                        selected = GetSelectedUnits()
-                    until table.getsize(selected) > 0
-                    FlushEvents()
-                    if not IsNISMode() then
-                        import('/lua/ui/game/worldview.lua').UnlockInput()
-                   end
-               end
-               )
 
     if Prefs.GetOption('skin_change_on_start') ~= 'no' then
         local focusarmy = GetFocusArmy()
