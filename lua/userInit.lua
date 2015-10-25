@@ -10,7 +10,7 @@ __language = GetPreference('options_overrides.language', '')
 -- Do global init
 doscript '/lua/globalInit.lua'
 
-local AvgFPS = 60
+local AvgFPS = 10
 WaitFrames = coroutine.yield
 
 function WaitSeconds(n)
@@ -26,7 +26,7 @@ function WaitSeconds(n)
         elapsed_time = CurrentTime() - start
     until elapsed_time >= n
 
-    if elapsed_time >= 1 then
+    if elapsed_time >= 3 then
         AvgFPS = math.max(10, math.min(200, math.ceil(elapsed_frames / elapsed_time)))
     end
 end
