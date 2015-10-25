@@ -43,12 +43,14 @@ Patch 3652 (pending)
 
 **Bugs**
 
+- Fixed bug with Cybran SCUs getting EMP for free
 - Fixed bug with units getting invincible after a visit to their nearest carrier
 - Fixed bug with not able to target a blip of a given / upgraded structure
 - Fixed bug which caused silo missiles to disappear at launch stage
 - Fixed bug with water sounds not playing while a unit was submerged
 - Fixed bug with omni buff instead getting radius of radar
 - Fatboy and Cybran cruisers shouldn't engage enemies way outside their range anymore
+- Fixed bug with commander not always being selected at start
 
 -- XXX: @Duk3Luk3 rewrite the below:
 - Refactor layer change logic 
