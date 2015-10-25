@@ -382,8 +382,6 @@ UnitBlueprint {
             Name = '<LOC enhancements_0127>Rapid Restoration Field',
             Prerequisite = 'RegenAura',
             Radius = 30,
-            RegenCeiling = 200,
-            RegenFloor = 0,
             MaxHealthFactor = 1.1,
             RegenPerSecond = 0.01111111111, 
             Slot = 'RCH',
@@ -594,8 +592,6 @@ UnitBlueprint {
             Icon = 'nrf',
             Name = '<LOC enhancements_0125>Restoration Field',
             Radius = 22,
-            RegenCeiling = 15,
-            RegenFloor = 0,
             RegenPerSecond = 0.02,
             ShowBones = {
                 'Right_Upgrade',
