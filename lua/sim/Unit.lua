@@ -3377,15 +3377,11 @@ Unit = Class(moho.unit_methods) {
            if buffTable.Radius and buffTable.Radius > 0 then
                 --If the radius is bigger than 0 then we will use the unit as the center of the stun blast
                 --and collect all targets from that point
-                local targets = {}
-                if PosEntity then
-                    targets = utilities.GetEnemyUnitsInSphere(self, PosEntity, buffTable.Radius)
-                else
-                    targets = utilities.GetEnemyUnitsInSphere(self, self:GetPosition(), buffTable.Radius)
-                end
+                local targets = self:GetAIBrain():GetUnitsAroundPoint(categories.ALLUNITS, PosEntity or self:GetPosition(), buffTable.Radius, 'Enemy')
                 if not targets then
                     return
                 end
+                
                 for k, v in targets do
                     if EntityCategoryContains(allow, v) and (not disallow or not EntityCategoryContains(disallow, v)) then
                         v:SetStunned(buffTable.Duration or 1)
