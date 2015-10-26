@@ -56,6 +56,7 @@ function ToggleSelfDestruct(data)
                         StartCountdown(entityId)
                         unit.SelfDestructThread = ForkThread(function()
                             WaitSeconds(5)
+                            if unit:BeenDestroyed() then return end
                             local wepCount = unit:GetWeaponCount()
                             for i = 1, wepCount do
                                 local wep = unit:GetWeapon(i)
