@@ -469,9 +469,13 @@ StructureUnit = Class(Unit) {
     CheckRepairersForRebuild = function(self, wreckage)
         local units = {}
         for id, u in self.Repairers do
-            local focus = u:GetFocusUnit()
-            if u:IsUnitState('Repairing') and focus == self and not u:GetGuardedUnit() then -- not assist
-                table.insert(units, u)
+            if u:BeenDestroyed() then
+                self.Repairers[id] = nil
+            else
+                local focus = u:GetFocusUnit()
+                if focus == self and u:IsUnitState('Repairing') and not u:GetGuardedUnit() then -- not assist
+                    table.insert(units, u)
+                end
             end
         end
 
