@@ -13,25 +13,7 @@ function GetDistanceBetweenTwoEntities(entity1, entity2)
 end
 
 function GetEnemyUnitsInSphere(unit, position, radius)
-	local x1 = position.x - radius
-	local y1 = position.y - radius
-	local z1 = position.z - radius
-	local x2 = position.x + radius
-	local y2 = position.y + radius
-	local z2 = position.z + radius
-	local UnitsinRec = GetUnitsInRect( Rect(x1, z1, x2, z2) )
-	#Check for empty rectangle
-	if not UnitsinRec then
-		return UnitsinRec
-	end
-	local RadEntities = {}
-    for k, v in UnitsinRec do
-		local dist = VDist3(position, v:GetPosition())
-		if (unit:GetArmy() != v:GetArmy()) and (dist <= radius) then
-			table.insert(RadEntities, v)
-		end
-	end
-	return RadEntities
+    WARN('WARNING: Function removed. Use Brain:GetUnitsAroundPoint(category, position, radius, "Ally"/"Enemy") instead')
 end
 
 function GetDistanceBetweenTwoPoints(x1, y1, z1, x2, y2, z2)
