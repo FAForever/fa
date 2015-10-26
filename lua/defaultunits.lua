@@ -1777,6 +1777,7 @@ BaseTransport = Class() {
         unit:EnableDefaultToggleCaps()
         self:RequestRefreshUI()
         unit:TransportAnimation(-1)
+        unit:TransportLock(false)
         unit:OnDetachedToTransport(self)
     end,
 
