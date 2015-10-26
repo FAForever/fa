@@ -72,7 +72,7 @@ StructureUnit = Class(Unit) {
         local pos = self:GetPosition()
         local x, y = GetMapSize()
         local threats = {{pos={x/2, 0, y/2}, dist=VDist2(pos[1], pos[3], x, y), threat=-1}}
-        local cats = EntityCategoryContains(categories.ANTIAIR, self) and categories.AIR or (categories.LAND+categories.NAVAL)
+        local cats = EntityCategoryContains(categories.ANTIAIR, self) and categories.AIR or (categories.STRUCTURE+categories.LAND+categories.NAVAL)
 
         local units = brain:GetUnitsAroundPoint(cats, pos, 2*(bp.AI.GuardScanRadius or 100), 'Enemy')
         for _, u in units do
