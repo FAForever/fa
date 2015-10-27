@@ -1,5 +1,6 @@
 local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
 local Projectile = import('/lua/sim/projectile.lua').Projectile
+local rand = import('/lua/utilities.lua').GetRandomFloat
 
 Sinker = Class(Projectile) {
     OnCreate = function(self)
@@ -9,47 +10,62 @@ Sinker = Class(Projectile) {
         self:SetVizToAllies('Never')
         self:SetVizToNeutrals('Never')
         self:SetStayUpright(false)
+        self:SetCollideSurface(true)
     end,
 
-    --- Start the sinking after the given delay for the given entity/bone.
-    -- Invokes sunkCallback when the unit reaches the bottom of the ocean.
-    Start = function(self, delay, targEntity, targBone, sunkCallback)
-        self.callback = sunkCallback
-        if delay > 0 then
-            -- Closure copies. Woot.
-            local targetEntity = targEntity
-            local targetBone = targBone
-            local sinker = self
-            local wait = delay
+    Attach = function(self, unit)
+        local mult
+        local acc
+        local v1, v2, v3 = unit:GetVelocity()
+        local layer = unit:GetCurrentLayer()
 
-            self:ForkThread(
-                function()
-                    WaitTicks(wait)
-                    sinker:StartSinking(targetEntity, targetBone)
-                end
-            )
+        if layer == 'Water' then
+            mult = 6
+            acc = -0.05
         else
-            self:StartSinking(targEntity, targBone)
+            mult = 10
+            acc = -4.90
         end
+
+        unit:AttachBoneTo(0, self, 'anchor')
+        self:SetVelocity(v1 * mult * rand(0.80, 1.20), v2 * mult * rand(0.80, 1.20), v3 * mult * rand(0.80, 1.20))
+
+        local lv = math.max(v1, v2, v3) * mult * 0.2
+        self:SetLocalAngularVelocity(rand(-lv, lv), rand(-lv, lv), rand(-lv, lv))
+        self:SetBallisticAcceleration(acc)
+
+        self.unit = unit
     end,
 
-    StartSinking = function(self, targetEntity, targetBone)
-        Warp(self, targetEntity:CalculateWorldPositionFromRelative({0, 0, 0}) , targetEntity:GetOrientation() )
-        targetEntity:AttachBoneTo(targetBone, self, 'anchor')
-
-        if not targetEntity:BeenDestroyed() then
-            local bp = self:GetBlueprint()
-            local acc = -bp.Physics.SinkSpeed
-            self:SetBallisticAcceleration(acc + GetRandomFloat(-0.02, 0.02))
-        end
-    end,
-
-    --- Destroy the sinking unit when it hits the bottom of the ocean.
     OnImpact = function(self, targetType, targetEntity)
-        if targetType == 'Terrain' then
-            self:Destroy()
-            ForkThread(self.callback)
-        end
+        self.unit:OnImpact(targetType)
+        self:Destroy()
+    end,
+
+    OnEnterWater = function(self)
+        self.unit:OnImpact('Water')
+        self:StayUnderwater(true)
+
+        local v1, v2, v3 = self:GetVelocity()
+        self:SetVelocity(6*v1, 6*v2, 6*v3)
+
+        ForkThread(function()
+            while self:GetCurrentSpeed() > 0.1 do
+                WaitSeconds(0.1)
+                v1, v2, v3 = self:GetVelocity()
+                self:SetVelocity(7*v1, 7*v2, 7*v3)
+            end
+
+            self:SetLocalAngularVelocity(0.1, 0.1, 0.1)
+            self:SetBallisticAcceleration(-0.05 + GetRandomFloat(-0.02, 0.02))
+        end)
+    end,
+
+    OnDestroy = function(self)
+        self.unit:DetachAll(0)
+        self:DetachAll('anchor')
+        self.unit.StopSink = true
+        self.unit:SetImmobile(false)
     end,
 }
 TypeClass = Sinker

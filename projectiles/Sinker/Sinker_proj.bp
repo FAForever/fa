@@ -39,10 +39,10 @@ ProjectileBlueprint {
         RotationalVelocity = 1,
         RotationalVelocityRange = 6,
         DirectionX = 0,
-        DirectionXRange = 1,
+        DirectionXRange = 2,
         DirectionY = 1,
-        DirectionYRange = 0.5,
+        DirectionYRange = 1,
         DirectionZ = 0,
-        DirectionZRange = 1,
+        DirectionZRange = 2,
     },
 }
