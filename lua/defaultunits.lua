@@ -447,9 +447,9 @@ StructureUnit = Class(Unit) {
         end
     end,
 
-    DestroyUnit = function(self)
+    DestroyUnit = function(self, overkillRatio)
         self:RefreshIntel()
-        Unit.DestroyUnit(self)
+        Unit.DestroyUnit(self, overkillRatio)
     end,
 
     -- Adding into OnDestroy the ability to destroy the tarmac but put a new one down that looks exactly like it but
