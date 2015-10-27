@@ -201,27 +201,32 @@ Prop = Class(moho.prop_methods, Entity) {
     -- If not given, it defaults to one directory up from this prop's blueprint location.
     --
     SplitOnBonesByName = function(self, dirprefix)
+        local bp = self:GetBlueprint()
+
         if not dirprefix then
             -- default dirprefix to parent dir of our own blueprint
-            dirprefix = self:GetBlueprint().BlueprintId
-
             -- trim ".../groups/blah_prop.bp" to just ".../"
-            dirprefix = string.gsub(dirprefix, "[^/]*/[^/]*$", "")
+            dirprefix = string.gsub(bp.BlueprintId, "[^/]*/[^/]*$", "")
         end
 
         local newprops = {}
 
         for ibone=1, self:GetBoneCount()-1 do
             local bone = self:GetBoneName(ibone)
-
             -- construct name of replacement mesh from name of bone, trimming off optional _01 _02 etc
             local btrim = string.gsub(bone, "_?[0-9]+$", "")
             local newbp = dirprefix .. btrim .. "_prop.bp"
-
             local p = safecall("Creating prop", self.CreatePropAtBone, self, ibone, newbp)
             if p then
                 table.insert(newprops, p)
             end
+        end
+
+        local n_props = table.getsize(newprops)
+        if n_props == 0 then return end
+        local perProp = {mass=(self.MaxMassReclaim * self.ReclaimLeft * 1.05) / n_props, energy=(self.MaxEnergyReclaim * self.ReclaimLeft * 1.05) / n_props}
+        for _, p in newprops do
+            p:SetMaxReclaimValues(0, perProp.mass, perProp.energy)
         end
 
         self:Destroy()
