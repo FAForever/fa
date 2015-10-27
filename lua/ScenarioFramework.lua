@@ -870,6 +870,9 @@ function FakeGateInUnit(unit, callbackFunction)
             elseif v == 'CYBRAN' then
                 faction = 3
                 break
+            elseif v == 'SERAPHIM' then
+                faction = 4
+                break
             end
         end
 
@@ -894,6 +897,12 @@ function FakeGateInUnit(unit, callbackFunction)
             unit:SetMesh('/units/url0001/URL0001_PhaseShield_mesh', true)
             unit:ShowBone(0, true)
             unit:HideBone('Back_Upgrade', true)
+            unit:HideBone('Right_Upgrade', true)
+        elseif faction == 4 then
+            unit:SetMesh('/units/xsl0001/XSL0001_PhaseShield_mesh', true)
+            unit:ShowBone(0, true)
+            unit:HideBone('Back_Upgrade', true)
+            unit:HideBone('Left_Upgrade', true)
             unit:HideBone('Right_Upgrade', true)
         end
 
