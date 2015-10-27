@@ -385,23 +385,6 @@ CConstructionEggUnit = Class(CStructureUnit) {
         if self.Spawn then overkillRatio = 1.1 end
         CStructureUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
-    
-    EggConstruction = State {
-        Main = function(self)
-            local bp = self:GetBlueprint()
-            local buildUnit = bp.Economy.BuildUnit
-            self:GetAIBrain():BuildUnit(self, buildUnit, 1)
-        end,
-    },
-
-    OnStopBuild = function(self, unitBeingBuilt, order)
-        if unitBeingBuilt:GetFractionComplete() == 1 then
-            ForkThread(function()
-                WaitSeconds(0.1)
-                self:Destroy()
-            end)
-        end
-    end,
 }
 
 
