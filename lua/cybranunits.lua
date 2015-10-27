@@ -357,7 +357,7 @@ CConstructionEggUnit = Class(CStructureUnit) {
         local pos = self:GetPosition()
 
         local aiBrain = self:GetAIBrain()
-        CreateUnitHPR(
+        self.Spawn = CreateUnitHPR(
             buildUnit,
             aiBrain.Name,
             pos[1], pos[2], pos[3],
@@ -386,7 +386,12 @@ CConstructionEggUnit = Class(CStructureUnit) {
 
         --ChangeState( self, self.EggConstruction )
     end,
-
+    
+    OnKilled = function(self, instigator, type, overkillRatio)
+        if self.Spawn then self.Spawn:Kill() end
+        CStructureUnit.OnKilled(self, instigator, type, overkillRatio)
+    end,
+    
     EggConstruction = State {
         Main = function(self)
             local bp = self:GetBlueprint()
