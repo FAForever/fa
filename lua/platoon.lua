@@ -82,7 +82,7 @@ Platoon = Class(moho.platoon_methods) {
                 end
             end
         end
-        self:AddDestroyCallback(aiBrain.AMDecrementCount)
+        self:AddDestroyCallback(aiBrain.AttackManager.DecrementCount)
     end,
 
 
