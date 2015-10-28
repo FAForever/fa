@@ -46,6 +46,8 @@ Patch 3652 (pending)
 
 **Bugs**
 
+- Chrono Dampener doesn't stun allied units anymore
+- Fixed free mass exploit with Megalith eggs
 - Fixed bug with Cybran SCUs getting EMP for free
 - Fixed bug with units getting invincible after a visit to their nearest carrier
 - Fixed bug with not able to target a blip of a given / upgraded structure
