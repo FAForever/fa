@@ -37,6 +37,8 @@ local EXPERIMENTAL_XP = 50
 -- For killing any unit that doesn't match any of the other categories.
 local DEFAULT_XP = 1
 
+local GetUnitBeingBuiltWarning = false
+
 SyncMeta = {
     __index = function(t,key)
         local id = rawget(t,'id')
@@ -3938,9 +3940,13 @@ Unit = Class(moho.unit_methods) {
 
     --- Deprecated functionality
     GetUnitBeingBuilt = function(self)
-        WARN("Deprecated function GetUnitBeingBuilt called at")
-        WARN(debug.traceback())
-        self.GetUnitBeingBuilt = function(self) return self.UnitBeingBuilt end
+        if not GetUnitBeingBuiltWarning then
+            WARN("Deprecated function GetUnitBeingBuilt called at")
+            WARN(debug.traceback())
+            WARN("Further warnings of this will be suppressed")
+            GetUnitBeingBuiltWarning = true
+        end
+
         return self.UnitBeingBuilt
     end,
 
