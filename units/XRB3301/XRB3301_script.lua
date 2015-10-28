@@ -19,11 +19,11 @@ XRB3301 = Class(CRadarUnit) {
             Type = 'Jammer01',
         },
     },
+    ExpandingVisionDisableCount = 0,
 
     OnStopBeingBuilt = function(self)
         CRadarUnit.OnStopBeingBuilt(self)
         ChangeState( self, self.ExpandingVision )
-        self.ExpandingVisionDisableCount = 0
 
         if self.OmniEffectsBag then
             for k, v in self.OmniEffectsBag do
