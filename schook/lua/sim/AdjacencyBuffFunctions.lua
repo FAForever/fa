@@ -9,10 +9,4 @@ MassActiveBuffCheck = function(buff, unit)
     return false
 end
 
-EnergyActiveBuffCheck = function(buff, unit)
-    local bp = unit:GetBlueprint()
-    if bp.Economy.MaintenanceConsumptionPerSecondEnergy or unit.EnergyMaintenanceConsumptionOverride then
-        return true
-    end
-    return false
-end
+EnergyActiveBuffCheck = MassActiveBuffCheck
