@@ -57,10 +57,10 @@ Platoon = Class(moho.platoon_methods) {
         if self.PlatoonData.AMPlatoons then
             for k,v in self.PlatoonData.AMPlatoons do
                 platoonsGiven = true
-                if not aiBrain.AttackData.AMPlatoonCount[v] then
-                    aiBrain.AttackData.AMPlatoonCount[v] = 1
+                if not aiBrain.AttackData.PlatoonCount[v] then
+                    aiBrain.AttackData.PlatoonCount[v] = 1
                 else
-                    aiBrain.AttackData.AMPlatoonCount[v] = aiBrain.AttackData.AMPlatoonCount[v] + 1
+                    aiBrain.AttackData.PlatoonCount[v] = aiBrain.AttackData.PlatoonCount[v] + 1
                 end
             end
         end
@@ -69,15 +69,15 @@ Platoon = Class(moho.platoon_methods) {
             if testUnit then
                 self.PlatoonData.AMPlatoons = {}
                 if EntityCategoryContains( categories.MOBILE * categories.AIR, testUnit ) then
-                    aiBrain.AttackData.AMPlatoonCount['DefaultGroupAir'] = aiBrain.AttackData.AMPlatoonCount['DefaultGroupAir'] + 1
+                    aiBrain.AttackData.PlatoonCount['DefaultGroupAir'] = aiBrain.AttackData.PlatoonCount['DefaultGroupAir'] + 1
                     table.insert( self.PlatoonData.AMPlatoons, 'DefaultGroupAir' )
 
                 elseif EntityCategoryContains( categories.MOBILE * categories.LAND, testUnit ) then
-                    aiBrain.AttackData.AMPlatoonCount['DefaultGroupLand'] = aiBrain.AttackData.AMPlatoonCount['DefaultGroupLand'] + 1
+                    aiBrain.AttackData.PlatoonCount['DefaultGroupLand'] = aiBrain.AttackData.PlatoonCount['DefaultGroupLand'] + 1
                     table.insert( self.PlatoonData.AMPlatoons, 'DefaultGroupLand' )
 
                 elseif EntityCategoryContains( categories.MOBILE * categories.NAVAL, testUnit ) then
-                    aiBrain.AttackData.AMPlatoonCount['DefaultGroupSea'] = aiBrain.AttackData.AMPlatoonCount['DefaultGroupSea'] + 1
+                    aiBrain.AttackData.PlatoonCount['DefaultGroupSea'] = aiBrain.AttackData.PlatoonCount['DefaultGroupSea'] + 1
                     table.insert( self.PlatoonData.AMPlatoons, 'DefaultGroupSea' )
                 end
             end

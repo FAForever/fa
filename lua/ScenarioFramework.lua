@@ -1223,10 +1223,10 @@ function SetLoyalistColor( number )
 end
 
 function AMPlatoonCounter( aiBrain, name )
-    if not aiBrain.AttackData.AMPlatoonCount[name] then
-        aiBrain.AttackData.AMPlatoonCount[name] = 0
+    if not aiBrain.AttackData.PlatoonCount[name] then
+        aiBrain.AttackData.PlatoonCount[name] = 0
     end
-    return aiBrain.AttackData.AMPlatoonCount[name]
+    return aiBrain.AttackData.PlatoonCount[name]
 end
 
 function PlatoonAttackWithTransports( platoon, landingChain, attackChain, instant )
