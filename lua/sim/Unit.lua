@@ -3364,34 +3364,25 @@ Unit = Class(moho.unit_methods) {
         end
 
         --When adding debuffs we have to make sure that we check for permissions
-        local allow = categories.ALLUNITS
-        if buffTable.TargetAllow then
-            allow = ParseEntityCategory(buffTable.TargetAllow)
-        end
-        local disallow
+        local category = buffTable.TargetAllow and ParseEntityCategory(buffTable.TargetAllow) or categories.ALLUNITS
         if buffTable.TargetDisallow then
-            disallow = ParseEntityCategory(buffTable.TargetDisallow)
+            category = category - ParseEntityCategory(buffTable.TargetDisallow)
         end
 
         if bt == 'STUN' then
-           if buffTable.Radius and buffTable.Radius > 0 then
+            local targets
+            if buffTable.Radius and buffTable.Radius > 0 then
                 --If the radius is bigger than 0 then we will use the unit as the center of the stun blast
                 --and collect all targets from that point
-                local targets = self:GetAIBrain():GetUnitsAroundPoint(categories.ALLUNITS, PosEntity or self:GetPosition(), buffTable.Radius, 'Enemy')
-                if not targets then
-                    return
-                end
-                
-                for k, v in targets do
-                    if EntityCategoryContains(allow, v) and (not disallow or not EntityCategoryContains(disallow, v)) then
-                        v:SetStunned(buffTable.Duration or 1)
-                    end
-                end
+                targets = self:GetAIBrain():GetUnitsAroundPoint(category, PosEntity or self:GetPosition(), buffTable.Radius, 'Enemy')
             else
                 --The buff will be applied to the unit only
-                if EntityCategoryContains(allow, self) and (not disallow or not EntityCategoryContains(disallow, self)) then
-                    self:SetStunned(buffTable.Duration or 1)
+                if EntityCategoryContains(category, self) then
+                    targets = {self}
                 end
+            end
+            for _, target in targets or {} do
+                target:SetStunned(buffTable.Duration or 1)
             end
         elseif bt == 'MAXHEALTH' then
             self:SetMaxHealth(self:GetMaxHealth() + (buffTable.Value or 0))
