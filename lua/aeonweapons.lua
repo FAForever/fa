@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/aeonweapons.lua
-#**  Author(s):  John Comes, David Tomandl, Gordon Duclos, Greg Kohne
-#**
-#**  Summary  :  Default definitions of Aeon weapons
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/aeonweapons.lua
+--**  Author(s):  John Comes, David Tomandl, Gordon Duclos, Greg Kohne
+--**
+--**  Summary  :  Default definitions of Aeon weapons
+--**
+--**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
 local CollisionBeamFile = import('defaultcollisionbeams.lua')
@@ -62,14 +62,14 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
             return
         end
 
-        #Can't pass recon blips down
+        --Can't pass recon blips down
         target = self:GetRealTarget(target)
         
         if self:IsTargetAlreadyUsed(target) then 
             return 
         end
         
-        ###Create vacuum suck up from ground effects on the unit targetted.
+        ------Create vacuum suck up from ground effects on the unit targetted.
         for k, v in EffectTemplate.ACollossusTractorBeamVacuum01 do
             CreateEmitterAtEntity( target, target:GetArmy(),v ):ScaleEmitter(0.25*target:GetFootPrintSize()/0.5)
         end
@@ -80,15 +80,15 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
         self:ForkThread(self.TractorWatchThread, target)
     end,
     
-    # override this function in the unit to check if another weapon already has this
-    # unit as a target.  Target argument should not be a recon blip
+    -- override this function in the unit to check if another weapon already has this
+    -- unit as a target.  Target argument should not be a recon blip
     IsTargetAlreadyUsed = function(self, target)
         local weap
         for i = 1, self.unit:GetWeaponCount() do
             weap = self.unit:GetWeapon(i)
-            if (weap != self) then
+            if (weap ~= self) then
                 if self:GetRealTarget(weap:GetCurrentTarget()) == target then
-                    #LOG("Target already used by ", repr(weap:GetBlueprint().Label))
+                    --LOG("Target already used by ", repr(weap:GetBlueprint().Label))
                     return true
                 end
             end
@@ -96,7 +96,7 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
         return false
     end,
 
-    #recon blip check
+    --recon blip check
     GetRealTarget = function(self, target)
         if target and not IsUnit(target) then
             local unitTarget = target:GetSource()
@@ -113,8 +113,8 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
     OnLostTarget = function(self)
         self:AimManipulatorSetEnabled(true)
         DefaultBeamWeapon.OnLostTarget(self)
-        ###enabled= false
-        ###self.unit:SetEnabled(false)
+        ------enabled= false
+        ------self.unit:SetEnabled(false)
         DefaultBeamWeapon.PlayFxBeamEnd(self,self.Beams[1].Beam)
     end,
 
@@ -137,7 +137,7 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
         WaitTicks(1)
         WaitFor(self.Slider)
 
-        # just in case attach fails...
+        -- just in case attach fails...
         target:SetDoNotTarget(false)
         target:AttachBoneTo(-1, self.unit, muzzle)
         target:SetDoNotTarget(true)
@@ -154,10 +154,10 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
             target.DestructionExplosionWaitDelayMin = 0
             target.DestructionExplosionWaitDelayMax = 0
             
-            ##:ScaleEmitter(util.GetRandomFloat(ScaleMin, ScaleMax))
-            ###CreateAttachedEmitter( self, bone, self.GetArmy(), blueprint ) 
+            ----:ScaleEmitter(util.GetRandomFloat(ScaleMin, ScaleMax))
+            ------CreateAttachedEmitter( self, bone, self.GetArmy(), blueprint ) 
             for kEffect, vEffect in EffectTemplate.ACollossusTractorBeamCrush01 do
-                CreateEmitterAtBone( self.unit, muzzle , self.unit:GetArmy(), vEffect )###:ScaleEmitter(0.35)
+                CreateEmitterAtBone( self.unit, muzzle , self.unit:GetArmy(), vEffect )------:ScaleEmitter(0.35)
             end
             
             target:Kill(self.unit, 'Damage', 100)
@@ -196,7 +196,6 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
     RackSalvoFiringState = State(DefaultProjectileWeapon.RackSalvoFiringState) {
         Main = function(self)
             local bp = self:GetBlueprint()
-            WARN('Weapon')
             -- Align to a tick which is a multiple of 50
             WaitTicks(51 - math.mod(GetGameTick(), 50))
             
@@ -255,7 +254,7 @@ ADFDisruptorCannonWeapon = Class(DefaultProjectileWeapon) {
 
 
 ADFDisruptorWeapon = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = EffectTemplate.ASDisruptorCannonMuzzle01,
+    FxMuzzleFlash = EffectTemplate.ASDisruptorCannonMuzzle01,
     FxChargeMuzzleFlash = EffectTemplate.ASDisruptorCannonChargeMuzzle01,
 }
 
@@ -265,7 +264,7 @@ ADFCannonQuantumWeapon = Class(DefaultProjectileWeapon) {
 
 ADFCannonOblivionWeapon = Class(DefaultProjectileWeapon) {
     FxChargeMuzzleFlash = {
-		'/effects/emitters/oblivion_cannon_flash_01_emit.bp',
+        '/effects/emitters/oblivion_cannon_flash_01_emit.bp',
         '/effects/emitters/oblivion_cannon_flash_02_emit.bp',
         '/effects/emitters/oblivion_cannon_flash_03_emit.bp',
     },
@@ -386,7 +385,7 @@ AIFSmartCharge = Class(DefaultProjectileWeapon) {
 
 AANChronoTorpedoWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {
-		'/effects/emitters/default_muzzle_flash_01_emit.bp',
+        '/effects/emitters/default_muzzle_flash_01_emit.bp',
         '/effects/emitters/default_muzzle_flash_02_emit.bp',
         '/effects/emitters/torpedo_underwater_launch_01_emit.bp',
     },
@@ -394,7 +393,7 @@ AANChronoTorpedoWeapon = Class(DefaultProjectileWeapon) {
 
 
 AIFQuasarAntiTorpedoWeapon = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = EffectTemplate.AQuasarAntiTorpedoFlash,
+    FxMuzzleFlash = EffectTemplate.AQuasarAntiTorpedoFlash,
 }
 
 
@@ -410,7 +409,7 @@ AIFCommanderDeathWeapon = Class(BareBonesWeapon) {
         BareBonesWeapon.OnCreate(self)
 
         local myBlueprint = self:GetBlueprint()
-        # The "or x" is supplying default values in case the blueprint doesn't have an overriding value
+        -- The "or x" is supplying default values in case the blueprint doesn't have an overriding value
         self.Data = {
             NukeOuterRingDamage = myBlueprint.NukeOuterRingDamage or 10,
             NukeOuterRingRadius = myBlueprint.NukeOuterRingRadius or 40,
@@ -443,7 +442,7 @@ AIFParagonDeathWeapon = Class(BareBonesWeapon) {
         BareBonesWeapon.OnCreate(self)
 
         local myBlueprint = self:GetBlueprint()
-        # The "or x" is supplying default values in case the blueprint doesn't have an overriding value
+        -- The "or x" is supplying default values in case the blueprint doesn't have an overriding value
         self.Data = {
             NukeOuterRingDamage = myBlueprint.NukeOuterRingDamage or 10,
             NukeOuterRingRadius = myBlueprint.NukeOuterRingRadius or 40,
@@ -524,13 +523,13 @@ AIFMissileTacticalSerpentineWeapon = Class(DefaultProjectileWeapon) {
 }
 
 AIFMissileTacticalSerpentine02Weapon = Class(DefaultProjectileWeapon) {
-	FxMuzzleFlash = EffectTemplate.ASerpFlash01,
+    FxMuzzleFlash = EffectTemplate.ASerpFlash01,
 }
 
 AQuantumBeamGenerator = Class(DefaultBeamWeapon) {
     BeamType = QuantumBeamGeneratorCollisionBeam,
 
-    FxUpackingChargeEffects = {},#'/effects/emitters/quantum_generator_charge_01_emit.bp'},
+    FxUpackingChargeEffects = {},--'/effects/emitters/quantum_generator_charge_01_emit.bp'},
     FxUpackingChargeEffectScale = 1,
 
     PlayFxWeaponUnpackSequence = function( self )
@@ -575,10 +574,10 @@ ADFPhasonLaser = Class(DefaultBeamWeapon) {
     end,
 }
 
-#------------------------------------------------------------------------
-#  SC1 EXPANSION WEAPONS
-#
-#------------------------------------------------------------------------
+--------------------------------------------------------------------------
+--  SC1 EXPANSION WEAPONS
+--
+--------------------------------------------------------------------------
 ADFQuantumAutogunWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.Aeon_DualQuantumAutoGunMuzzleFlash,
 }
