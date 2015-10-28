@@ -20,7 +20,7 @@ function SafeQuit()
             ConExecute('ren_oblivion true')
             ConExecute('ren_ui false')
             SessionEndGame()
-            WaitSeconds(1)
+            WaitSeconds(0.1)
             ExitApplication()
         end)
     else

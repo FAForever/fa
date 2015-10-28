@@ -40,25 +40,6 @@ function DoGameResult(armyIndex, result)
     end
 
     local armies = GetArmiesTable().armiesTable
-    local affectedArmyName = armies[armyIndex].nickname
-
-    local callbackArgs = {
-        From = GetFocusArmy(),
-        To = GetFocusArmy(),
-        Mass = 0,
-        Energy = 0,
-        Loser = armies[armyIndex].nickname
-    }
-
-    if result == 'defeat' then
-        callbackArgs.Loser = affectedArmyName
-    elseif result == 'victory' then
-        callbackArgs.Winner = affectedArmyName
-    elseif result == 'draw' then
-        callbackArgs.Draw = affectedArmyName
-    end
-    SimCallback({Func = "GiveResourcesToPlayer", Args = callbackArgs}, true)
-
     announced[armyIndex] = true
 
     -- If it's someone else, announce it and stop.

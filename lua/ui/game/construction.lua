@@ -31,6 +31,7 @@ local options = Prefs.GetFromCurrentProfile('options')
 local Effect = import('/lua/maui/effecthelpers.lua')
 local TemplatesFactory = import('/modules/templates_factory.lua')
 local straticonsfile = import('/modules/straticons.lua')
+local Select = import('/lua/ui/game/selection.lua')
 
 local prevBuildables = false
 local prevSelection = false
@@ -182,6 +183,46 @@ function IssueUpgradeOrders(units, bpid)
 
     for _, o in upgrades[unitid] do
         IssueBlueprintCommand("UNITCOMMAND_Upgrade", o, 1, false)
+    end
+end
+
+local QueueResetAt = {}
+function ResetOrderQueue(factory, stop_last)
+    local queue = SetCurrentFactoryForQueueDisplay(factory)
+    if not queue then return end
+    local id = factory:GetEntityId()
+    local n = table.getsize(queue)
+    local now = GameTick()
+    local reset_at = QueueResetAt[id]
+
+    if stop_last and (n == 1 or (reset_at and now-reset_at < 10)) then
+        IssueCommand("Stop")
+        QueueResetAt[id] = nil
+        return
+    end
+
+    for i = 1, n do
+        local count = queue[i].count
+
+        if i == 1 then
+            count = count - 1
+        end
+
+        SelectUnits({factory})
+        DecreaseBuildCountInQueue(i, count)
+    end
+
+    QueueResetAt[id] = now
+end
+
+function ResetOrderQueues(units)
+    local factories = EntityCategoryFilterDown(categories.FACTORY, units)
+    if factories[1] then
+        Select.Hidden(function()
+            for _, factory in factories do
+                ResetOrderQueue(factory, true)
+            end
+        end)
     end
 end
 
@@ -457,7 +498,7 @@ function GetBackgroundTextures(unitID)
     local bp = __blueprints[unitID]
     local validIcons = { land = true, air = true, sea = true, amph = true }
     if not validIcons[bp.General.Icon] then
-        WARN(debug.traceback(nil, "Invalid icon for unit " .. tostring(unitID)))
+        if bp.General.Icon then WARN(debug.traceback(nil, "Invalid icon" .. bp.General.Icon .. " for unit " .. tostring(unitID))) end
         bp.General.Icon = "land"
     end
 
@@ -559,7 +600,13 @@ function CommonLogic()
             control.Icon.Height:Set(48)
             control.Icon.Width:Set(48)
             control.BuildKey = nil
-            if control.Data.count > 1 then
+
+            if type == 'attachedunit' and UnitData[control.Data.unit:GetEntityId()].locked then
+                control:SetOverrideTexture(control.mNormal)
+                control:SetOverrideEnabled(true)
+                control.Count:SetText('X')
+                control.Count:SetColor('ffff0000')
+            elseif control.Data.count > 1 then
                 control.Count:SetText(control.Data.count)
                 control.Count:SetColor('ffffffff')
             else
@@ -1193,6 +1240,7 @@ function OnClickHandler(button, modifiers)
     elseif item.type == 'attachedunit' then
         if modifiers.Left then
             -- Toggling selection of the entity
+            button:SetOverrideTexture(button.mActive)
             button:ToggleOverride()
 
             -- Add or Remove the entity to the session selection
@@ -1200,6 +1248,18 @@ function OnClickHandler(button, modifiers)
                 AddToSessionExtraSelectList(item.unit)
             else
                 RemoveFromSessionExtraSelectList(item.unit)
+            end
+        elseif modifiers.Right then
+            local lock = not button:GetOverrideEnabled()
+            local cb = { Func = 'TransportLock', Args = { ids = {item.unit:GetEntityId()}, lock=not button:GetOverrideEnabled()} }
+            SimCallback(cb, true)
+            button:SetOverrideTexture(button.mNormal)
+            button:ToggleOverride()
+            if lock then
+                button.Count:SetText('X')
+                button.Count:SetColor('ffff0000')
+            else
+                button.Count:SetText('')
             end
         end
     elseif item.type == 'templates' then

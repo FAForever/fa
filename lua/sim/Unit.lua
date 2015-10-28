@@ -256,7 +256,7 @@ Unit = Class(moho.unit_methods) {
 
         --Ensure transport slots are available
         self.attachmentBone = nil
-        self.slotsFree = {}
+        self.slotsTaken = {}
 
         -- Set up Adjacency container
         self.AdjacentUnits = {}
@@ -1783,6 +1783,19 @@ Unit = Class(moho.unit_methods) {
     -- CONSTRUCTING - BEING BUILT
     ----------------------------------------------------------------------------------------------
     OnBeingBuiltProgress = function(self, unit, oldProg, newProg)
+    end,
+
+    SetRotation = function(self, angle)
+        qx, qy, qz, qw = explosion.QuatFromRotation(angle, 0, 1, 0)
+        self:SetOrientation({qx, qy, qz, qw}, true)
+    end,
+
+    Rotate = function(self, angle)
+        local qx, qy, qz, qw = unpack(self:GetOrientation())
+        local a = math.atan2(2.0*(qx*qz + qw*qy), qw*qw + qx*qx - qz*qz - qy*qy)
+        local current_yaw = math.floor(math.abs(a) * (180 / math.pi) + 0.5)
+
+        self:SetRotation(angle + current_yaw)
     end,
 
     OnStartBeingBuilt = function(self, builder, layer)
@@ -3364,15 +3377,11 @@ Unit = Class(moho.unit_methods) {
            if buffTable.Radius and buffTable.Radius > 0 then
                 --If the radius is bigger than 0 then we will use the unit as the center of the stun blast
                 --and collect all targets from that point
-                local targets = {}
-                if PosEntity then
-                    targets = utilities.GetEnemyUnitsInSphere(self, PosEntity, buffTable.Radius)
-                else
-                    targets = utilities.GetEnemyUnitsInSphere(self, self:GetPosition(), buffTable.Radius)
-                end
+                local targets = self:GetAIBrain():GetUnitsAroundPoint(categories.ALLUNITS, PosEntity or self:GetPosition(), buffTable.Radius, 'Enemy')
                 if not targets then
                     return
                 end
+                
                 for k, v in targets do
                     if EntityCategoryContains(allow, v) and (not disallow or not EntityCategoryContains(disallow, v)) then
                         v:SetStunned(buffTable.Duration or 1)
@@ -3632,7 +3641,7 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
     OnStartTransportBeamUp = function(self, transport, bone)
         --Ensures bone availability
-        if transport.slotsFree[bone] == false then
+        if transport.slotsTaken[bone] then
             IssueClearCommands({self})
             IssueClearCommands({transport})
             return
@@ -3671,48 +3680,22 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    OnStorageChange = function(self, loading)
+        self:MarkWeaponsOnTransport(self, loading)
+
+        if loading then self:HideBone(0, true)
+        else self:ShowBone(0, true) end
+        self:SetCanTakeDamage(not loading)
+        self:SetReclaimable(not loading)
+        self:SetCapturable(not loading)
+    end,
+
     OnAddToStorage = function(self, unit)
-        if EntityCategoryContains(categories.CARRIER, unit) then
-            self:MarkWeaponsOnTransport(self, true)
-            self:HideBone(0, true)
-            self:SetCanTakeDamage(false)
-            self:SetReclaimable(false)
-            self:SetCapturable(false)
-            if EntityCategoryContains(categories.TRANSPORTATION, self) then
-                local cargo = self:GetCargo()
-                if table.getn(cargo) > 0 then
-                    for k, v in cargo do
-                        v:MarkWeaponsOnTransport(self, true)
-                        v:HideBone(0, true)
-                        v:SetCanTakeDamage(false)
-                        v:SetReclaimable(false)
-                        v:SetCapturable(false)
-                    end
-                end
-            end
-        end
+        self:OnStorageChange(true)
     end,
 
     OnRemoveFromStorage = function(self, unit)
-        if EntityCategoryContains(categories.CARRIER, unit) then
-            self:SetCanTakeDamage(true)
-            self:SetReclaimable(true)
-            self:SetCapturable(true)
-            self:ShowBone(0, true)
-            self:MarkWeaponsOnTransport(self, false)
-            if EntityCategoryContains(categories.TRANSPORTATION, self) then
-                local cargo = self:GetCargo()
-                if table.getn(cargo) > 0 then
-                    for k, v in cargo do
-                        v:MarkWeaponsOnTransport(self, false)
-                        v:ShowBone(0, true)
-                        v:SetCanTakeDamage(true)
-                        v:SetReclaimable(true)
-                        v:SetCapturable(true)
-                    end
-                end
-            end
-        end
+        self:OnStorageChange(false)
     end,
 
     -- Animation when being dropped from a transport.
@@ -3742,6 +3725,14 @@ Unit = Class(moho.unit_methods) {
                 WaitFor(self.TransAnimation)
             end
         end
+    end,
+
+    TransportLock = function(self, bool)
+        bool = bool == true
+        if bool ~= self.TransportLock then
+            self.Sync.locked = bool
+        end
+        self.TransportLocked = bool
     end,
 
     -------------------------------------------------------------------------------------------
@@ -3935,24 +3926,22 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnAttachedToTransport = function(self, transport, bone)
+        transport.slotsTaken = transport.slotsTaken or {}
         self:DoUnitCallbacks( 'OnAttachedToTransport', transport )
         for i=1,transport:GetBoneCount() do
             if transport:GetBoneName(i) == bone then
                 self.attachmentBone = i
-                transport.slotsFree[i] = false
+                transport.slotsTaken[bone] = true
             end
         end
     end,
 
     OnDetachedToTransport = function(self, transport)
-        if not transport.slotsFree then
-            transport.slotsFree = {}
-        end
         if not self.attachmentBone then
             self.attachmentBone = -100
         end
         self:DoUnitCallbacks( 'OnDetachedToTransport', transport )
-        transport.slotsFree[self.attachmentBone] = true
+        transport.slotsTaken[self.attachmentBone] = nil
         self.attachmentBone = nil
     end,
 

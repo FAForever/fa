@@ -1,9 +1,79 @@
+Patch 3652 (pending)
+============================
+
+**Lobby**
+
+- Name filter when selecting map
+- Prevent host from changing teams of others while ready
+- Game quality in lobby now visible again
+- Reduced autobalance random variation to get team setups with better overall quality
+
+**UI**
+
+- New keybinding 'soft_stop'
+- Soft-stop will cancel all orders of a factory except their current one, if you soft-stop a factory with only one order it will get cleared
+- Soft-stop on a silo unit will clear the current orders but not stop the actual building of a missile
+- Transport lock: Right click on a unit in a transport to lock it in place. If all units in transports are locked and you order unload they will be unloaded anyway.
+- Multi-upgrade: Added UI support to upgrade structures several levels at once (i.e: cybran shields, hives, mexes, factories etc)
+- Auto-overcharge: It's now possible to let overcharge fire automatically whenever you have the required power
+- Ferry orders are now persistent, even if the original transports die. Remove it by shift-ctrl right click the first beacon
+- Order repair on a wreck to rebuild it if possible by some of the selected engineers. Those not able to rebuild the wreck will assist after the build starts.
+- Units explicity repairing (not assisting) a structure that dies will automatically try to rebuild it
+- Refactor the income economy overlay not to show reclaim values appearing in the generated income column and do correct rounding of the numbers.
+- Fixed bug with unit regen debuff not being visible in UI
+- Fixed bug with buildpower not visible in unitview
+
+**Gameplay**
+
+- Teamkill is now detected and a player can make an explicit report
+- Air units are now able to fire at water-landed transports
+- Hoplite now calculate their aim correctly when firing at a fleeing target
+- Slight increase of unit size(not hitbox) of T3 sniper bots, Othuum and Rhino to alleviate their weapon's ground-hitting ability
+- Seraphim Experimental Nuke now deals damage to itself
+- Cybran drones no longer leave wreckage when killed
+- Cybran T2 PD and Tank now got their original lasers back
+- Defense structures now start rotated at their nearest enemy when built, if no enemies found they default at middle of map 
+- Remove friendly fire on Atlantis AA
+- Location of enemy civilian structures are now revealed at start of the game (lobby option)
+- Navy units now should respect their max-range better when having move-attack order
+- Set GuardReturnRadius to 3 as default, will make guarding / patrolling / move-attacking units less prone to move off their designated mission while hunting something
+- Units moving on seabottom now leave treadmarks - they disappear faster though
+- Re-enabled death animation on non-naval units
+- Seraphim GW now uses all its 3 exits
+- Spread attack: Targets are now spread more uniformly across all units during the initial attack orders, further ones are random.
+
+
+
+**Bugs**
+
+- Fixed bug with Cybran SCUs getting EMP for free
+- Fixed bug with units getting invincible after a visit to their nearest carrier
+- Fixed bug with not able to target a blip of a given / upgraded structure
+- Fixed bug which caused silo missiles to disappear at launch stage
+- Fixed bug with water sounds not playing while a unit was submerged
+- Fixed bug with omni buff instead getting radius of radar
+- Fatboy and Cybran cruisers shouldn't engage enemies way outside their range anymore
+- Fixed bug with commander not always being selected at start
+
+-- XXX: @Duk3Luk3 rewrite the below:
+- Refactor layer change logic 
+- Intel system reworked to handle intel events better
+
+**Performance**
+- Optimization of score accumulation
+- Tweaks to hive build effects to reduce performance impact
+- Cleanup of enhancement sync code to make it faster and more secure
+
+**Other**
+- Tech-level filter in debug window now works as intended
+
+
 Patch 3650 (August 19, 2015)
 ===========================
 
 HTML-version of this balance oriented changelog available at: http://content.faforever.com/patchnotes/
 
-Seraphim and UEF ACU TML
+**Seraphim and UEF ACU TML**
 
 - Missle hitpoints: 3 hp → 2 hp
 - Flying height: now similar to normal TML
@@ -14,33 +84,33 @@ Seraphim and UEF ACU TML
 - Area of effect: 3 → 2
 - The flying arc at close range will now be similar to the UEF ACU TML
 
-Cybran TML
+**Cybran TML**
 
 - TMDs (except Aeon) will now survive a single cybran tactical missile if they have full HP
 
-TML friendly Fire
+**TML friendly Fire**
 
 - TML missiles no longer deal friendly fire
 
-sACU changes
+**sACU changes**
 
 - Hitbox: lasers can now hit SCUs more reliably
 - SCUs now leave a normal wreckage with 81% of their mass value when destroyed
 - A RAS preset for UEF, Cybran and Aeon is now available for production from the Quantum Gateways.
  
-Aeon SCU
+ **Aeon SCU**
 
 - Reacton Cannon (Gun upgrade) energy cost: 36000 → 46200, build time: 5040 → 6048
 - Heavy Personal Shield hitpoints: 35000 → 40000, mass cost = 1500 → 1800
 
- UEF SCU
+ **UEF SCU**
 
 - Personal Shield Generator HP: 32000 → 26000 HP
 - Heavy Plasma Cannon (Gun Upgrade) rate of fire x2.5 → x1.82 (DPS 750 → 546), AOE: 2.5 → 2
 - Radar Jammer mass cost: 600 → 300, energy cost = 18000 → 8000
 - Bubble shield energy cost: 400000 → 360800
 
- Cybran SCU
+ **Cybran SCU**
 
 - Nano-Repair System regeneration rate: 400 hp/s → 375 hp/s, mass cost: 2000 → 2200
 - Focus Convertor (Gun upgrade) adds damage: 250 → 200
@@ -49,7 +119,7 @@ Aeon SCU
 - Stealth upgrade mass cost: 600 → 400, energy cost: 18000 → 7400
 - Cloak upgrade energy cost: 500000 → 382200
 
- Seraphim SCU
+ **Seraphim SCU**
 
 - Overcharge: now tracks (like ACU overcharge)
 - Overcharge reload time: 5 seconds → 7.5 seconds
@@ -57,60 +127,60 @@ Aeon SCU
 - Overcharge DPS: 2400 → 1333
 - Shield mass cost: 1500 → 1200, shield hitpoints: 25000 → 20000
 
-Seraphim (Yenzyne)
+**Seraphim (Yenzyne)**
 
 - Build time: 880 → 1050
 - Speed on water: 4.3 → 3
  
- Aeon (Blaze)
+ **Aeon (Blaze)**
 
 - Build time: 880 → 1050
 - Speed on water: 4.3 → 3
 
- UEF (Riptide)
+ **UEF (Riptide)**
 
 - Build time: 1320 → 1600
 - Speed on water: 3.7 → 3
 - Mass cost: 362 → 360
 - Energy cost: 1980 → 2000
 
- Hover flak (Seraphim and Aeon)
+ **Hover flak (Seraphim and Aeon)**
 
 - Speed: 3.6 → 3
 
-Seraphim Tech 2 bot and Tech 3 Tank Changes
+**Seraphim Tech 2 bot and Tech 3 Tank Changes**
 
  - We are carefully toning down both areas while keeping the idea behind it intact. Ilshavoh becomes weaker, and Othuum becomes stronger.
  - 
- Ilshavoh
+ **Ilshavoh**
 
 - Turret turn rate: 180°/s → 70°/s
 
- Othuum
+ **Othuum**
 
 - Speed: 2.5 → 2.6
 
- Harbinger
+ **Harbinger**
 
 - Will now take longer to make, making it harder to spam them so fast and allowing opponents slightly more time to bring counters into play.
 - Veterancy: 15/30/45/60/75 → 18/36/54/72/90
 - Build time: 3600 → 4500
 - Can no longer fire while reclaiming
 
- Sniper bots (Seraphim and Aeon)
+ **Sniper bots (Seraphim and Aeon)**
 
 - It is annoying when sniper bots lose all their damage while moving and trying to shoot. They will hit more often now, even - though using them stationary will still lead to the best results.
 - Firing randomness when moving: 0.8 → 0.5
 
- UEF T3MAA
+ **UEF T3MAA**
 
 - Other faction’s T3 MAA were hitting much better than the UEF one. This change is improving its accuracy to similar levels.
 - Slight tracking added with small turn rate (20)
 - Muzzle velocity: 100 → 110
 
-Navy
+**Navy**
 
- Summit
+ **Summit**
 
 - Is now more expensive, giving other factions more time to beat them before they are able to gather a critical mass.
 - Mass cost: 9000 → 10500
@@ -118,7 +188,7 @@ Navy
 - Build time: 28800 → 33000
 - Area of effect: 3 → 2
 
- Aeon frigates
+ **Aeon Frigates**
 
  - Will now be more effective vs hover, but not vs ships. 
 
@@ -128,25 +198,25 @@ Navy
 - MuzzleChargeDelay: 0.5 → 0
 - Anti-torpedo weapon reload time: 10 → 12.5
 
-Air
+**Air**
 
- Strategic bombers (all factions)
+ **Strategic bombers (all factions)**
 
 Increasing the energy cost of strat bombers to avoid the ability to rush a strat them so easily.
 - Energy cost: 105000 → 144000
 - Build time: 8400 → 9600
 
- Corsair
+ **Corsair**
 
 - Reducing the speed of their projectiles to make them as easy (or hard) to dodge as they were before the range decrease.
 - muzzle velocity: 35 → 30
 
-Torpedo bombers
+**Torpedo bombers**
 
 - We made several adjustments to allow torpedo bombers to actually deliever their torpedoes more often.
 - Reload time for all torpedo bombers: 12.5 → 10
 
- Uosioz (Seraphim Torpedo Bomber)
+ **Uosioz (Seraphim Torpedo Bomber)**
 
 - Torpedos get now dropped in front of the bomber (like all other bombers)
 - Range: 42 → 35
@@ -154,62 +224,61 @@ Torpedo bombers
 - Now ignores torpedo defence (like all other torpedo bombers)
 - Multiple adjustments to torpedos make them less likely to crash on the ground in shallow water
 
- Skimmer (Aeon T2 Torpedo Bomber)
+ **Skimmer (Aeon T2 Torpedo Bomber)**
 
 - Depth charges get now dropped in front of the bomber (like all other bombers)
 - Range: 42 → 35
 - Amount of volleys: 2 → 3
 - Multiple adjustments to depth charges make them less likely to crash on the ground in shallow water
 
- Solace (Aeon T3 Torpedo Bomber)
+ **Solace (Aeon T3 Torpedo Bomber)**
 
 - Range: 42 → 32
 - Projectile turn rate increased
 
- Awhassa
+ **Awhassa**
 
 
 - Added armour to ASF to guard them from the bomb, reducing their damage taken to 10%
 - Veterancy: 50/100/150/200/250 → 100/200/300/400/500
 - Reload time: 10 → 12
 
-Other
+**Other**
 
- Quantum Gateway
+ **Quantum Gateway**
  
 - We are reducing the adjacency bonus for massfabs next to Quantum Gates to a more normal level.
 - Tech 2 mass fabricator: 2.5% → 0.75%
 - Tech 3 mass fabricator: 15% → 2.25%
 - Tech 3 power generator: 18.75% → 5%
-Preset names improved
+- Preset names improved
 
- T3 Land HQ
+ **T3 Land HQ**
 
 
 Build time: 9400 → 11000
 
-Sonars
+**Sonars**
 
- T2 sonar
+ **T2 sonar**
 
 - Mass cost: 120 → 150 (sera stays 180)
 - Energy drain: 100 → 150
 
- UEF/Aeon T3 sonar
+ **UEF/Aeon T3 sonar**
 
 - Mass cost: 400 → 1000
 - Energy drain: 100 → 250
 
- Cybran T3 sonar
+ **Cybran T3 sonar**
 
 - Mass cost: 480 → 1200
 - Energy drain: 250 → 400
 
- Energy/Mass overflow
+ **Energy/Mass overflow**
 
 The bug, that caused resources to disappear when they got shared to several teammates and one of them had full storage does not exist and is a FAF urban legend. If a teammate has full storage, the resources get properly shared to a different teammate instead. It is not needed to use any mods to prevent resources from getting lost or to inform others about this "bug".
 - No change required
-
 
 
 Patch 3648 (August 13, 2015)

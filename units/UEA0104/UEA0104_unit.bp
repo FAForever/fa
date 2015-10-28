@@ -63,6 +63,11 @@ UnitBlueprint {
             Cue = 'UEA0104_Move_Land',
             LodCutoff = 'UnitMove_LodCutoff',
         },
+        Load = Sound {
+            Bank = 'UEA',
+            Cue = 'UEA0104_Unit_Load',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
         StartMove = Sound {
             Bank = 'UEA',
             Cue = 'UEA0104_Move_Start',
@@ -81,6 +86,11 @@ UnitBlueprint {
         UISelection = Sound {
             Bank = 'Interface',
             Cue = 'UEF_Select_Air',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        Unload = Sound {
+            Bank = 'UEA',
+            Cue = 'UEA0104_Unit_Unload',
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
