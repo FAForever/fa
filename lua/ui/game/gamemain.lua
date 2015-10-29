@@ -103,7 +103,7 @@ function SetLayout(layout)
 end
 
 function OnFirstUpdate()
-    import('/modules/hotbuild.lua').init()
+    import('/lua/ui/game/hotbuild.lua').init()
     EnableWorldSounds()
     local avatars = GetArmyAvatars()
     if avatars and avatars[1]:IsInCategory("COMMAND") then
@@ -223,7 +223,7 @@ function CreateUI(isReplay)
     ConExecute('res_PrefetcherActivityDelay 1')
 
     -- below added for FAF
-    import("/modules/displayrings.lua").Init()  -- added for acu and engineer build radius ui mod
+    import("/lua/ui/game/displayrings.lua").Init()  -- added for acu and engineer build radius ui mod
     if SessionIsReplay() then
         ForkThread(SendChat)
         lastObserving = true
@@ -232,10 +232,10 @@ function CreateUI(isReplay)
         AddBeatFunction(UiBeat)
     end
 
-    import('/modules/scumanager.lua').Init()
+    import('/lua/ui/game/scumanager.lua').Init()
 
     if options.gui_render_enemy_lifebars == 1 or options.gui_render_custom_names == 0 then
-        import('/modules/console_commands.lua').Init()
+        import('/lua/ui/game/console_commands.lua').Init()
     end
 end
 
@@ -424,10 +424,10 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     if newSelection then
         local n = table.getn(newSelection)
 
-        if n == 1 and import('/modules/selectedinfo.lua').SelectedOverlayOn then
-            import('/modules/selectedinfo.lua').ActivateSingleRangeOverlay()
+        if n == 1 and import('/lua/ui/game/selectedinfo.lua').SelectedOverlayOn then
+            import('/lua/ui/game/selectedinfo.lua').ActivateSingleRangeOverlay()
         else
-            import('/modules/selectedinfo.lua').DeactivateSingleRangeOverlay()
+            import('/lua/ui/game/selectedinfo.lua').DeactivateSingleRangeOverlay()
         end
 
         -- if something died in selection, restore command mode

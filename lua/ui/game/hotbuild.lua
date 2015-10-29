@@ -11,7 +11,7 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Effect = import('/lua/maui/effecthelpers.lua')
 
-local upgradeTab = import('/modules/upgradeTab.lua').upgradeTab
+local upgradeTab = import('/lua/ui/game/upgradetab.lua').upgradeTab
 
 local buildingTab
 local cyclePos
@@ -131,7 +131,7 @@ end
 
 ---- Non state changing getters
 function getBuildingTab()
-  local btSource = import('/modules/buildingtab.lua').buildingTab
+  local btSource = import('/lua/ui/game/buildingtab.lua').buildingTab
   local buildingTab = {}
   for name, values in btSource do
     buildingTab[name] = {}
