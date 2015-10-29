@@ -566,6 +566,8 @@ PersonalBubble = Class(Shield) {
 --- A personal bubble that can render a set of encompassed units invincible.
 -- Useful for shielded transports (to work around the area-damage bug).
 TransportShield = Class(Shield) {
+
+    -- Yes it says contents, but this includes the generating transport too
     SetContentsVulnerable = function(self, canTakeDamage)
         for k, v in self.protectedUnits do
             k:SetCanTakeDamage(canTakeDamage)
@@ -590,8 +592,10 @@ TransportShield = Class(Shield) {
     -- Protect the contents while the shield is up.
     OnState = State(Shield.OnState) {
         Main = function(self)
-            self:SetContentsVulnerable(false)
+            -- We want to protect ourself too!
+            self:AddProtectedUnit(self.Owner)
 
+            self:SetContentsVulnerable(false)
             Shield.OnState.Main(self)
         end,
 
