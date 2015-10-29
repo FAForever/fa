@@ -174,6 +174,8 @@ Shield = Class(moho.shield_methods,Entity) {
     end,    
 
     OnDamage = function(self, instigator, amount, vector, dmgType)
+        -- Only called when a shield is directly impacted, so not for Personal Shields
+        -- This means personal shields never have ApplyDamage called with doOverspill as true
         self:ApplyDamage(instigator, amount, vector, dmgType, true)
     end,
 
