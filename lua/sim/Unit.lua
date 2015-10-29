@@ -17,7 +17,7 @@ local utilities = import('/lua/utilities.lua')
 local Shield = import('/lua/shield.lua').Shield
 local PersonalBubble = import('/lua/shield.lua').PersonalBubble
 local TransportShield = import('/lua/shield.lua').TransportShield
-local UnitShield = import('/lua/shield.lua').UnitShield
+local PersonalShield = import('/lua/shield.lua').PersonalShield
 local AntiArtilleryShield = import('/lua/shield.lua').AntiArtilleryShield
 local Buff = import('/lua/sim/buff.lua')
 local AIUtils = import('/lua/ai/aiutilities.lua')
@@ -3588,7 +3588,7 @@ Unit = Class(moho.unit_methods) {
         self:DestroyShield()
 
         if bpShield.PersonalShield then
-            self.MyShield = UnitShield(bpShield, self)
+            self.MyShield = PersonalShield(bpShield, self)
         elseif bpShield.AntiArtilleryShield then
             self.MyShield = AntiArtilleryShield(bpShield, self)
         elseif bpShield.PersonalBubble then

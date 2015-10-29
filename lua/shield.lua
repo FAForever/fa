@@ -636,7 +636,7 @@ TransportShield = Class(Shield) {
 
 --- A shield that sticks to the surface of the unit. Doesn't have its own collision physics, just
 -- grants extra health.
-UnitShield = Class(Shield){
+PersonalShield = Class(Shield){
 
     OnCreate = function(self,spec)
         self.Trash = TrashBag()
