@@ -44,6 +44,8 @@ if options.gui_templates_factory ~= 0 then
     allFactories = false
 end
 
+local missingIcons = {}
+
 local dragging = false
 local index = nil --index of the item in the queue currently being dragged
 local originalIndex = false --original index of selected item (so that UpdateBuildQueue knows where to modify it from)
@@ -984,7 +986,8 @@ function StratIconReplacement(control)
             LayoutHelpers.ResetBottom(control.StratIcon)
             LayoutHelpers.ResetLeft(control.StratIcon)
             control.StratIcon:SetAlpha(0.8)
-        else
+        elseif not missingIcons[iconName] then
+            missingIcons[iconName] = true
             LOG('Strat Icon Mod Error: updated strat icon required for: ', iconName)
         end
     end
