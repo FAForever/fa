@@ -86,6 +86,8 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
 
     DoDamage = function(self, instigator, damageData, targetEntity)
         local damage = damageData.DamageAmount or 0
+        if damage <= 0 then return end
+        
         local dmgmod = 1
         if self.Weapon.DamageModifiers then
             for k, v in self.Weapon.DamageModifiers do
@@ -93,7 +95,8 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
             end
         end
         damage = damage * dmgmod
-        if instigator and damage > 0 then
+        
+        if instigator then
             local radius = damageData.DamageRadius
             if radius and radius > 0 then
                 if not damageData.DoTTime or damageData.DoTTime <= 0 then
