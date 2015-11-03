@@ -35,7 +35,7 @@ local StratManager = import('/lua/sim/StrategyManager.lua')
 local TransferUnitsOwnership = import('/lua/SimUtils.lua').TransferUnitsOwnership
 local CalculateBrainScore = import('/lua/sim/score.lua').CalculateBrainScore
 
-
+local unitStats = {}
 local observer = false
 
 local Points = {
@@ -54,6 +54,38 @@ AIBrain = Class(moho.aibrain_methods) {
         self:CreateBrainShared(planName)
         self:InitializeEconomyState()
         self.BrainType = 'Human'
+    end,
+
+    AddUnitStat = function(self, unitId, statName, value)
+        if unitStats[unitId] == nil then
+            unitStats[unitId] = {}
+        end
+
+        if unitStats[unitId][statName] == nil then
+            unitStats[unitId][statName] = value
+        else
+            unitStats[unitId][statName] = unitStats[unitId][statName] + value
+        end
+    end,
+
+    SetUnitStat = function(self, unitId, statName, value)
+        if unitStats[unitId] == nil then
+            unitStats[unitId] = {}
+        end
+
+        unitStats[unitId][statName] = value
+    end,
+
+    GetUnitStat = function(self, unitId, statName)
+        if unitStats[unitId] == nil or unitStats[unitId][statName] == nil then
+            return 0
+        end
+
+        return unitStats[unitId][statName]
+    end,
+
+    GetUnitStats = function(self)
+        return unitStats
     end,
 
     OnCreateAI = function(self, planName)

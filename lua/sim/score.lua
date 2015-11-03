@@ -52,7 +52,7 @@ function ScoreThread()
                 score = 0,
                 mass = 0,
                 lastReclaimedMass = 0,
-                lastReclaimedEnergy = 0,                
+                lastReclaimedEnergy = 0,
                 energy = 0,
                 kills = {
                     count = 0,
@@ -83,6 +83,11 @@ function ScoreThread()
                     built = 0,
                     lost = 0
                 },
+                sacu = {
+                    kills = 0,
+                    built = 0,
+                    lost = 0
+                },
                 land = {
                     kills = 0,
                     built = 0,
@@ -99,6 +104,26 @@ function ScoreThread()
                     lost = 0
                 },
                 structures = {
+                    kills = 0,
+                    built = 0,
+                    lost = 0
+                },
+                engineer = {
+                    kills = 0,
+                    built = 0,
+                    lost = 0
+                },
+                tech1 = {
+                    kills = 0,
+                    built = 0,
+                    lost = 0
+                },
+                tech2 = {
+                    kills = 0,
+                    built = 0,
+                    lost = 0
+                },
+                tech3 = {
                     kills = 0,
                     built = 0,
                     lost = 0
@@ -134,7 +159,7 @@ function ScoreThread()
     end
     
     ForkThread(ScoreDisplayResourcesThread)
-    
+
     while true do
         for index, brain in ArmyBrains do
             ArmyScore[index].general.score = CalculateBrainScore(brain)
@@ -165,6 +190,16 @@ function ScoreThread()
             ArmyScore[index].resources.energyout.rate = brain:GetArmyStat("Economy_Output_Energy", 0.0).Value
             ArmyScore[index].resources.energyover = brain:GetArmyStat("Economy_AccumExcess_Energy", 0.0).Value
 
+            for unitId, stats in brain:GetUnitStats() do
+                if ArmyScore[index].units[unitId] == nil then
+                    ArmyScore[index].units[unitId] = {}
+                end
+
+                for statName, value in stats do
+                    ArmyScore[index].units[unitId][statName] = value
+                end
+            end
+
             ArmyScore[index].units.land.kills = brain:GetBlueprintStat("Enemies_Killed", categories.LAND)
             ArmyScore[index].units.land.built = brain:GetBlueprintStat("Units_History", categories.LAND)
             ArmyScore[index].units.land.lost = brain:GetBlueprintStat("Units_Killed", categories.LAND)
@@ -178,6 +213,22 @@ function ScoreThread()
             ArmyScore[index].units.cdr.kills = brain:GetBlueprintStat("Enemies_Killed", categories.COMMAND)
             ArmyScore[index].units.cdr.built = brain:GetBlueprintStat("Units_History", categories.COMMAND)
             ArmyScore[index].units.cdr.lost = brain:GetBlueprintStat("Units_Killed", categories.COMMAND)
+            ArmyScore[index].units.sacu.kills = brain:GetBlueprintStat("Enemies_Killed", categories.SUBCOMMANDER)
+            ArmyScore[index].units.sacu.built = brain:GetBlueprintStat("Units_History", categories.SUBCOMMANDER)
+            ArmyScore[index].units.sacu.lost = brain:GetBlueprintStat("Units_Killed", categories.SUBCOMMANDER)
+
+            ArmyScore[index].units.engineer.kills = brain:GetBlueprintStat("Enemies_Killed", categories.ENGINEER)
+            ArmyScore[index].units.engineer.built = brain:GetBlueprintStat("Units_History", categories.ENGINEER)
+            ArmyScore[index].units.engineer.lost = brain:GetBlueprintStat("Units_Killed", categories.ENGINEER)
+            ArmyScore[index].units.tech1.kills = brain:GetBlueprintStat("Enemies_Killed", categories.TECH1)
+            ArmyScore[index].units.tech1.built = brain:GetBlueprintStat("Units_History", categories.TECH1)
+            ArmyScore[index].units.tech1.lost = brain:GetBlueprintStat("Units_Killed", categories.TECH1)
+            ArmyScore[index].units.tech2.kills = brain:GetBlueprintStat("Enemies_Killed", categories.TECH2)
+            ArmyScore[index].units.tech2.built = brain:GetBlueprintStat("Units_History", categories.TECH2)
+            ArmyScore[index].units.tech2.lost = brain:GetBlueprintStat("Units_Killed", categories.TECH2)
+            ArmyScore[index].units.tech3.kills = brain:GetBlueprintStat("Enemies_Killed", categories.TECH3)
+            ArmyScore[index].units.tech3.built = brain:GetBlueprintStat("Units_History", categories.TECH3)
+            ArmyScore[index].units.tech3.lost = brain:GetBlueprintStat("Units_Killed", categories.TECH3)
             ArmyScore[index].units.experimental.kills = brain:GetBlueprintStat("Enemies_Killed", categories.EXPERIMENTAL)
             ArmyScore[index].units.experimental.built = brain:GetBlueprintStat("Units_History", categories.EXPERIMENTAL)
             ArmyScore[index].units.experimental.lost = brain:GetBlueprintStat("Units_Killed", categories.EXPERIMENTAL)
@@ -188,6 +239,7 @@ function ScoreThread()
 
             WaitSeconds(0.1)
         end
+
         WaitSeconds(3)
         UpdateScoreData(ArmyScore)
         SyncScores()
@@ -203,7 +255,7 @@ function ScoreDisplayResourcesThread()
             local massReclaimRate = reclaimedMass - ArmyScore[index].general.lastReclaimedMass
             ArmyScore[index].resources.massin.rate = brain:GetArmyStat("Economy_Income_Mass", 0.0).Value - massReclaimRate
             ArmyScore[index].general.lastReclaimedMass = reclaimedMass
-            
+
             local reclaimedEnergy = brain:GetArmyStat("Economy_Reclaimed_Energy", 0.0).Value
             local energyReclaimRate = reclaimedEnergy - ArmyScore[index].general.lastReclaimedEnergy
             ArmyScore[index].resources.energyin.rate = brain:GetArmyStat("Economy_Income_Energy", 0.0).Value - energyReclaimRate
@@ -216,7 +268,17 @@ end
 local observer = false
 function SyncScores()
     observer = observer or GetFocusArmy() == -1
-    if observer or import('/lua/victory.lua').gameOver then
+
+    local victory = import('/lua/victory.lua')
+
+    Sync.SendStats = victory.sendStats
+    if Sync.SendStats then
+        -- Reset the flag so that stats are only sent once.
+        -- Do it only when Sync.SendStats was set to true to prevent race conditions.
+        victory.sendStats = false
+    end
+
+    if observer or import('/lua/victory.lua').gameOver or Sync.SendStats then
         Sync.FullScoreSync = true
         Sync.ScoreAccum = scoreData
         Sync.Score = scoreData.current

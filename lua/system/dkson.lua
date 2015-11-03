@@ -255,15 +255,8 @@ encode2 = function (value, indent, level, buffer, buflen, tables, globalorder, s
         buflen = buflen + 1
         buffer[buflen] = "null"
     elseif valtype == 'number' then
-        local s
-        if value ~= value or value >= huge or -value >= huge then
-            -- This is the behaviour of the original JSON implementation.
-            s = "null"
-        else
-            s = num2str (value)
-        end
         buflen = buflen + 1
-        buffer[buflen] = s
+        buffer[buflen] = num2str (value)
     elseif valtype == 'boolean' then
         buflen = buflen + 1
         buffer[buflen] = value and "true" or "false"

@@ -1232,6 +1232,8 @@ Unit = Class(moho.unit_methods) {
         self:DisableShield()
         self:DisableUnitIntel('Killed')
         self:ForkThread(self.DeathThread, overkillRatio , instigator)
+
+        ArmyBrains[self:GetArmy()]:AddUnitStat(self:GetUnitId(), "lost", 1)
     end,
 
     --Argument val is true or false. False = cannot be killed
@@ -1268,6 +1270,8 @@ Unit = Class(moho.unit_methods) {
         else
             self:AddXP(DEFAULT_XP)
         end
+
+        ArmyBrains[self:GetArmy()]:AddUnitStat(unitKilled:GetUnitId(), "killed", 1)
     end,
 
     DoDeathWeapon = function(self)
@@ -1904,6 +1908,8 @@ Unit = Class(moho.unit_methods) {
         else
             self.MovementEffectsExist = false
         end
+
+        ArmyBrains[self:GetArmy()]:AddUnitStat(self:GetUnitId(), "built", 1)
 
         -- If someone thinks they're being clever by using a UI mod to violate unit restrictions,
         -- thoroughly ruin their day.
