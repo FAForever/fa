@@ -153,14 +153,20 @@ Projectile = Class(moho.projectile_methods, Entity) {
     end,
 
     OnCollisionCheck = function(self, other)
+        local same_army = self:GetArmy() == other:GetArmy()
+
+        if not EntityCategoryContains(categories.PROJECTILE, other) then -- called from Unit:OnCollisionCheck
+            return not same_army or self:GetCollideFriendly() == true
+        end
+
         -- If we return false the thing hitting us has no idea that it came into contact with us.
         -- By default, anything hitting us should know about it so we return true.
-        if (EntityCategoryContains(categories.TORPEDO, self) and EntityCategoryContains(categories.TORPEDO, other)) or
+        if same_army or 
+           (EntityCategoryContains(categories.TORPEDO, self) and EntityCategoryContains(categories.TORPEDO, other)) or
            (EntityCategoryContains(categories.TORPEDO, self) and EntityCategoryContains(categories.DIRECTFIRE, other)) or
            (EntityCategoryContains(categories.MISSILE, self) and EntityCategoryContains(categories.MISSILE, other)) or
            (EntityCategoryContains(categories.MISSILE, self) and EntityCategoryContains(categories.DIRECTFIRE, other)) or
-           (EntityCategoryContains(categories.DIRECTFIRE, self) and EntityCategoryContains(categories.MISSILE, other)) or
-           (self:GetArmy() == other:GetArmy()) then
+           (EntityCategoryContains(categories.DIRECTFIRE, self) and EntityCategoryContains(categories.MISSILE, other)) then
             return false
         end
 
