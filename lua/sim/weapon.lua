@@ -9,6 +9,7 @@
 -- ****************************************************************************
 
 local Entity = import('/lua/sim/Entity.lua').Entity
+local NukeDamage = import('/lua/sim/NukeDamage.lua').NukeAOE
 local Set = import('/lua/system/setutils.lua')
 
 Weapon = Class(moho.weapon_methods) {
@@ -329,21 +330,10 @@ Weapon = Class(moho.weapon_methods) {
 
             if bp.NukeOuterRingDamage and bp.NukeOuterRingRadius and bp.NukeOuterRingTicks and bp.NukeOuterRingTotalTime and
                 bp.NukeInnerRingDamage and bp.NukeInnerRingRadius and bp.NukeInnerRingTicks and bp.NukeInnerRingTotalTime then
-                local data = {
-                    NukeInnerRing = {
-                        NukeInnerRingDamage = bp.NukeInnerRingDamage or 2000,
-                        NukeInnerRingRadius = bp.NukeInnerRingRadius or 30,
-                        NukeInnerRingTicks = bp.NukeInnerRingTicks or 24,
-                        NukeInnerRingTotalTime = bp.NukeInnerRingTotalTime or 24,
-                    },
-                    NukeOuterRing = {
-                        NukeOuterRingDamage = bp.NukeOuterRingDamage or 10,
-                        NukeOuterRingRadius = bp.NukeOuterRingRadius or 40,
-                        NukeOuterRingTicks = bp.NukeOuterRingTicks or 20,
-                        NukeOuterRingTotalTime = bp.NukeOuterRingTotalTime or 10,
-                    },
-                }
-                proj:PassData(data)
+                proj.InnerRing = NukeDamage()
+                proj.InnerRing:OnCreate(bp.NukeInnerRingDamage, bp.NukeInnerRingRadius, bp.NukeInnerRingTicks, bp.NukeInnerRingTotalTime)
+                proj.OuterRing = NukeDamage()
+                proj.OuterRing:OnCreate(bp.NukeOuterRingDamage, bp.NukeOuterRingRadius, bp.NukeOuterRingTicks, bp.NukeOuterRingTotalTime)
             end
         end
         return proj
