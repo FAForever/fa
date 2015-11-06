@@ -77,9 +77,38 @@ Projectile = Class(moho.projectile_methods, Entity) {
                 end
             end
         end
+        if self.Data then
+            local launcher = self:GetLauncher()
+            local pos = self:GetPosition()
+            for ring, data in self.Data do
+                ForkThread(self.DoNukeDamage, self, data, ring, launcher, pos)
+            end
+        end
     end,
 
+    DoNukeDamage = function(self, data, ring, launcher, pos)
+        -- Set up the strings to allow this code to deal with inner and outer
+        local Damage = ring .. 'Damage'
+        local Radius = ring .. 'Radius'
+        local Ticks = ring .. 'Ticks'
+        local TotalTime = ring .. 'TotalTime'
 
+        if data[TotalTime] == 0 then
+            DamageArea(launcher, pos, data[Radius], data[Damage], self.DamageData.DamageType, true, true)
+        else
+            local ringWidth = (data[Radius] / data[Ticks])
+            local tickLength = (data[TotalTime] / data[Ticks])
+            
+            -- Since we're not allowed to have an inner radius of 0 in the DamageRing function,
+            -- I'm manually executing the first tick of damage with a DamageArea function.
+            DamageArea(launcher, pos, ringWidth, data[Damage], 'Normal', true, true)
+            WaitSeconds(tickLength)
+            for i = 2, data[Ticks] do
+                DamageRing(launcher, pos, ringWidth * (i - 1), ringWidth * i, data[Damage], self.DamageData.DamageType, true, true)
+                WaitSeconds(tickLength)
+            end
+        end
+    end,
 
     -- Do not call the base class __init and __post_init, we already have a c++ object
     __init = function(self,spec)
