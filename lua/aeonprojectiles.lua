@@ -23,6 +23,7 @@ local NullShell = DefaultProjectileFile.NullShell
 local DefaultExplosion = import('defaultexplosions.lua')
 local DepthCharge = import('/lua/defaultantiprojectile.lua').DepthCharge
 local EffectTemplate = import('/lua/EffectTemplates.lua')
+local NukeProjectile = DefaultProjectileFile.NukeProjectile
 
 #------------------------------------------------------------------------
 #  AEON ANTI-NUKE PROJECTILES
@@ -567,7 +568,7 @@ AAAQuantumDisplacementCannonProjectile = Class(NullShell) {
 #------------------------------------------------------------------------
 #  AEON QUANTUM DISTORTION NUCLEAR WARHEAD PROJECTILES
 #------------------------------------------------------------------------
-AQuantumWarheadProjectile = Class(MultiCompositeEmitterProjectile) {
+AQuantumWarheadProjectile = Class(NukeProjectile, MultiCompositeEmitterProjectile) {
 
     Beams = {'/effects/emitters/aeon_nuke_exhaust_beam_01_emit.bp',},
     PolyTrails = {'/effects/emitters/aeon_nuke_trail_emit.bp',},
