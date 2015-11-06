@@ -22,6 +22,7 @@ local Explosion = import('defaultexplosions.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local DepthCharge = import('/lua/defaultantiprojectile.lua').DepthCharge
 local util = import('utilities.lua')
+local NukeProjectile = DefaultProjectileFile.NukeProjectile
 
 
 TFragmentationGrenade= Class(EmitterProjectile) {
@@ -35,7 +36,7 @@ TFragmentationGrenade= Class(EmitterProjectile) {
     #PolyTrail= EffectTemplate.THeavyFragmentationGrenadePolyTrail,
 }
 
-TIFMissileNuke = Class(SingleBeamProjectile) {
+TIFMissileNuke = Class(NukeProjectile, SingleBeamProjectile) {
     BeamName = '/effects/emitters/missile_exhaust_fire_beam_01_emit.bp',
     FxImpactUnit = {},
     FxImpactLand = {},
