@@ -353,9 +353,10 @@ end
 function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
     local adds = 0
     local mults = 1.0
+    local multsTotal = 0 -- Used only for regen buffs
     local bool = initialBool or false
 
-    if not unit.Buffs.Affects[affectType] then return initialVal, bool end   
+    if not unit.Buffs.Affects[affectType] then return initialVal, bool end
 
     for k, v in unit.Buffs.Affects[affectType] do
         if v.Add and v.Add ~= 0 then
@@ -365,9 +366,17 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
         if v.Mult then
             if affectType == 'Regen' then
                 -- Regen mults use MaxHp as base, so should always be <1
-                mults = 0
-                for i=1,v.Count do
-                    mults = mults + v.Mult
+                
+                -- If >1 it's probably deliberate, but silly, so let's bail. If it's THAT deliberate
+                -- they will remove this
+                if v.Mult > 1 then WARN('Regen mult too high, should be <1, for unit ' .. unit:GetUnitId() .. ' and buff ' .. buffName) return end
+            
+                -- GPG default for mult is 1. To avoid changing loads of scripts for now, let's do this
+                if v.Mult ~= 1 then
+                    local maxHealth = unit:GetBlueprint().Defense.MaxHealth
+                    for i=1,v.Count do
+                        multsTotal = multsTotal + math.min((v.Mult * maxHealth), v.Ceil or 999999)
+                    end
                 end
             else
                 for i=1,v.Count do
@@ -385,11 +394,7 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
     
     -- Adds are calculated first, then the mults.  May want to expand that later.
     local returnVal = false
-    if affectType == 'Regen' then
-        returnVal = initialVal + adds + (mults * unit:GetMaxHealth())
-    else
-        returnVal = (initialVal + adds) * mults
-    end
+    returnVal = (initialVal + adds + multsTotal) * mults
 
     return returnVal, bool
 end
