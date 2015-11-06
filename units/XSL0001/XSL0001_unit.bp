@@ -383,6 +383,7 @@ UnitBlueprint {
             Prerequisite = 'RegenAura',
             Radius = 30,
             MaxHealthFactor = 1.1,
+            RegenCeiling = 200,
             RegenPerSecond = 0.01111111111, 
             Slot = 'RCH',
             UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD',
@@ -592,6 +593,7 @@ UnitBlueprint {
             Icon = 'nrf',
             Name = '<LOC enhancements_0125>Restoration Field',
             Radius = 22,
+            RegenCeiling = 15,
             RegenPerSecond = 0.02,
             ShowBones = {
                 'Right_Upgrade',
