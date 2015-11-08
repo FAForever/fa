@@ -718,7 +718,7 @@ function CommonLogic()
     controls.choices.SetControlToType = function(control, type)
         local function SetIconTextures(control, optID)
             local id = optID or control.Data.id
-            if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds')) then
+            if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds', true)) then
                 control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds'))
             else
                 control.Icon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
