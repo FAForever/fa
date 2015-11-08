@@ -2574,12 +2574,14 @@ Unit = Class(moho.unit_methods) {
             self:GetWeapon(i):SetValidTargetsForCurrentLayer(new)
         end
 
-        if (old == 'Seabed' or old == 'None') and new == 'Land' then
-            self:EnableIntel('Vision')
+        if (old == 'Seabed' or old == 'Water' or old == 'Sub' or old == 'None') and new == 'Land' then
             self:DisableIntel('WaterVision')
-        elseif (old == 'Land' or old == 'None') and new == 'Seabed' then
+        elseif (old == 'Land' or old == 'None') and (new == 'Seabed' or new == 'Water' or new == 'Sub') then
             self:EnableIntel('WaterVision')
-        elseif (old == 'None') then
+        end
+        
+        -- All units want normal vision!
+        if (old == 'None') then
             self:EnableIntel('Vision')
         end
 
