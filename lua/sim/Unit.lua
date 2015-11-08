@@ -3182,10 +3182,15 @@ Unit = Class(moho.unit_methods) {
     GetSoundEntity = function(self, type)
         if not self.Sounds then self.Sounds = {} end
         if not self.Sounds[type] then
-            local sndEnt = Entity()
-            self.Trash:Add(sndEnt)
-            Warp(sndEnt, self:GetPosition())
-            sndEnt:AttachTo(self,-1)
+            if self.SoundEntities[1] then
+                sndEnt = table.remove(self.SoundEntities, 1)
+            else
+                sndEnt = Entity()
+                Warp(sndEnt, self:GetPosition())
+                sndEnt:AttachTo(self,-1)
+                self.Trash:Add(sndEnt)
+            end
+
             self.Sounds[type] = sndEnt
         end
 
@@ -3213,9 +3218,10 @@ Unit = Class(moho.unit_methods) {
         local type = 'Ambient' .. sound
         local entity = self:GetSoundEntity(type)
         if entity then
-            entity:SetAmbientSound(nil, nil)
-            entity:Destroy()
             self.Sounds[type] = nil
+            entity:SetAmbientSound(nil, nil)
+            self.SoundEntities = self.SoundEntities or {}
+            table.insert(self.SoundEntities, entity)
         end
     end,
 
