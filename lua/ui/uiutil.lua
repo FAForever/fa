@@ -367,9 +367,8 @@ function RotateLayout(direction)
 end
 
 --* given a path and name relative to the skin path, returns the full path based on the current skin
-function UIFile(filespec)
+function UIFile(filespec, checkMods)
     if UIFileBlacklist[filespec] then return filespec end
-
     local skins = import('/lua/skins/skins.lua').skins
     local useSkin = currentSkin()
     local currentPath = skins[useSkin].texturesPath
@@ -388,21 +387,34 @@ function UIFile(filespec)
             while not found and useSkin do
                 found = currentPath .. filespec
                 if not DiskGetFileInfo(found) then
-                    found = false
-                    useSkin = skins[useSkin].default
-                    if useSkin then
-                        currentPath = skins[useSkin].texturesPath
+                    -- Check mods
+                    local inmod = false
+                    if checkMods then
+                        if __active_mods then
+                            for id, mod in __active_mods do
+                                if DiskGetFileInfo(mod.location .. filespec) then
+                                    found = mod.location .. filespec
+                                    inmod = true
+                                    break
+                                end
+                            end
+                        end
+                    end
+                    
+                    if not inmod then
+                        found = false
+                        useSkin = skins[useSkin].default
+                        if useSkin then
+                            currentPath = skins[useSkin].texturesPath
+                        end
                     end
                 end
             end
         end
         
         if not found then
-          WARN(debug.traceback(nil, "Warning: Unable to find file: " .. origPath .. ' ' .. filespec))
---          for i,v in UIFileCache do
---            WARN(i .. '->' .. v)
---          end
-          found = filespec
+            WARN(debug.traceback(nil, "Warning: Unable to find file: " .. origPath .. ' ' .. filespec))
+            found = filespec
         end
 
         UIFileCache[origPath .. filespec] = found
