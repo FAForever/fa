@@ -790,6 +790,14 @@ Unit = Class(moho.unit_methods) {
         self:StartReclaimEffects(target)
         self:PlayUnitSound('StartReclaim')
         self:PlayUnitAmbientSound('ReclaimLoop')
+        
+        -- Force me to move on to the guard properly when done
+        local guard = self:GetGuardedUnit()
+        if guard then
+            IssueClearCommands({self})
+            IssueReclaim({self}, target)
+            IssueGuard({self}, guard)
+        end
     end,
 
     OnStopReclaim = function(self, target)
