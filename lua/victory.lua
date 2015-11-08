@@ -1,102 +1,96 @@
+gameOver = false
+
+local victoryCategories = {
+    demoralization=categories.COMMAND,
+    domination=categories.STRUCTURE + categories.ENGINEER - categories.WALL,
+    eradication=categories.ALLUNITS - categories.WALL,
+}
 
 function CheckVictory(scenarioInfo)
+    local categoryCheck = victoryCategories[scenarioInfo.Options.Victory]
+    if not categoryCheck then return end
 
-    local categoryCheck = nil
-    if scenarioInfo.Options.Victory == 'demoralization' then
-        # You're dead if you have no commanders
-        categoryCheck = categories.COMMAND
-    elseif scenarioInfo.Options.Victory == 'domination' then
-        # You're dead if all structures and engineers are destroyed
-        categoryCheck = categories.STRUCTURE + categories.ENGINEER - categories.WALL
-    elseif scenarioInfo.Options.Victory == 'eradication' then
-        # You're dead if you have no units
-        categoryCheck = categories.ALLUNITS - categories.WALL
-    else
-        # no victory condition
-        return
-    end
-
-    # tick number we are going to issue a victory on.  Or nil if we are not.
+    -- tick number we are going to issue a victory on.  Or nil if we are not.
     local victoryTime = nil
     local potentialWinners = {}
 
     while true do
-
-        # Look for newly defeated brains and tell them they're dead
+        -- Look for newly defeated brains and tell them they're dead
         local stillAlive = {}
-        for index,brain in ArmyBrains do
+        for _, brain in ArmyBrains do
             if not brain:IsDefeated() and not ArmyIsCivilian(brain:GetArmyIndex()) then
                 if brain:GetCurrentUnits(categoryCheck) == 0 then
                     brain:OnDefeat()
-                    CallEndGame(false, true)
                 else
                     table.insert(stillAlive, brain)
                 end
             end
         end
 
-        # uh-oh, there is nobody alive... It's a draw.
+        -- uh-oh, there is nobody alive... It's a draw.
         if table.empty(stillAlive) then
-            CallEndGame(true, false)
+            CallEndGame()
             return
         end
 
-        # check to see if everyone still alive is allied and is requesting an allied victory.
+        -- check to see if everyone still alive is allied and is requesting an allied victory.
         local win = true
         local draw = true
-        for index,brain in stillAlive do
-            for index2,other in stillAlive do
-                if index != index2 then
-                    if not brain.RequestingAlliedVictory or not IsAlly(brain:GetArmyIndex(), other:GetArmyIndex()) then
-                        win = false
-                    end
-                end
-            end
+        for i, brain in stillAlive do
             if not brain.OfferingDraw then
                 draw = false
             end
+
+            if not (draw or win) then break end
+
+            for j, other in stillAlive do
+                if i ~= j then
+                    if not brain.RequestingAlliedVictory or not IsAlly(brain:GetArmyIndex(), other:GetArmyIndex()) then
+                        win = false
+                        break
+                    end
+                end
+            end
         end
 
+        local callback = nil
         if win then
-            if table.equal(stillAlive, potentialWinners) then
-                if GetGameTimeSeconds() > victoryTime then
-                    # It's a win!
-                    for index,brain in stillAlive do
-                        brain:OnVictory()
-                    end
-                    CallEndGame(true, true)
-                    return
-                end
-            else
+            local equal = table.equal(stillAlive, potentialWinners)
+            if not equal then
                 victoryTime = GetGameTimeSeconds() + 5
                 potentialWinners = stillAlive
             end
-        elseif draw then
-            for index,brain in stillAlive do
-                brain:OnDraw()
+
+            if equal and GetGameTimeSeconds() >= victoryTime then
+                callback = 'OnVictory'
             end
-            CallEndGame(true, true)
-            return
+        elseif draw then
+            callback = 'OnDraw'
         else
             victoryTime = nil
             potentialWinners = {}
         end
 
-        WaitSeconds(3.0)
+        if callback then
+            for _, brain in stillAlive do
+                brain[callback](brain)
+            end
+
+            CallEndGame()
+            return
+        end
+
+        WaitSeconds(3)
     end
 end
 
-function CallEndGame(callEndGame, submitXMLStats)
-    if submitXMLStats then
-        SubmitXMLArmyStats()
-    end
-    if callEndGame then
-        gameOver = true
-        ForkThread(function()
-            WaitSeconds(3)
-            EndGame()
-        end)
-    end
+function CallEndGame()
+    gameOver = true
+    SubmitXMLArmyStats()
+    ForkThread(function()
+        WaitSeconds(3)
+        EndGame()
+    end)
 end
 
-gameOver = false
+

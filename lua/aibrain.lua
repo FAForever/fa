@@ -33,12 +33,20 @@ local StratManager = import('/lua/sim/StrategyManager.lua')
 
 
 local TransferUnitsOwnership = import('/lua/SimUtils.lua').TransferUnitsOwnership
-local CalculateBrainScore = import('/lua/score.lua').CalculateBrainScore
+local CalculateBrainScore = import('/lua/sim/score.lua').CalculateBrainScore
 
 
 local observer = false
 
+local Points = {
+    defeat=-10,
+    draw=0,
+    victory=10
+}
+
 AIBrain = Class(moho.aibrain_methods) {
+    Result = nil,
+
    ------------------------------------------------------
    ----------- HUMAN BRAIN FUNCTIONS HANDLED HERE  ------
    ------------------------------------------------------
@@ -455,9 +463,27 @@ AIBrain = Class(moho.aibrain_methods) {
         --LOG('===== AI DEBUG: Brain Evaluate Thead killed =====')
     end,
 
+    ReportScore = function(self)
+        local kills = self:GetArmyStat("Enemies_Commanders_Destroyed",0).Value
+        local score = Points[self.Result] or 0 + kills
+        table.insert(Sync.GameResult, { self:GetArmyIndex(), string.format("%s %i", self.Result or 'score', score)})
+    end,
 
+    SetResult = function(self, result)
+        if self.Result then return end
+        if not Points[result] then
+            WARN("brain:SetResult() " .. result .. " not a valid result")
+            return
+        end
+
+        self.Result = result
+        self:ReportScore()
+    end,
 
     OnDefeat = function(self)
+        if self.Result then return end
+
+        self:SetResult("defeat")
         ----For Sorian AI
         if self.BrainType == 'AI' then
             SUtils.AISendChat('enemies', ArmyBrains[self:GetArmyIndex()].Nickname, 'ilost')
@@ -468,22 +494,7 @@ AIBrain = Class(moho.aibrain_methods) {
         end
         ------end sorian AI bit
 
-        -- seems that FA send the OnDeath twice : one when losing, the other when disconnecting (function AbandonedByPlayer).
-        -- But we only want it one time !
-
-        if ArmyIsOutOfGame(self:GetArmyIndex()) then
-            return
-        end
-
         SetArmyOutOfGame(self:GetArmyIndex())
-
-
-        if math.floor(self:GetArmyStat("FAFLose",0.0).Value) ~= -1 then
-            self:AddArmyStat("FAFLose", -1)
-        end
-
-        local result = string.format("%s %i", "defeat", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
-        table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
 
         import('/lua/SimUtils.lua').UpdateUnitCap(self:GetArmyIndex())
         import('/lua/SimPing.lua').OnArmyDefeat(self:GetArmyIndex())
@@ -570,20 +581,16 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     OnVictory = function(self)
-        self:AddArmyStat("FAFWin", 5)
-        local result = string.format("%s %i", "victory", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
-        table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
+        self:SetResult("victory")
     end,
 
     OnDraw = function(self)
-        local result = string.format("%s %i", "draw", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
-        table.insert(Sync.GameResult, { self:GetArmyIndex(), result })
+        self:SetResult("draw")
     end,
 
     IsDefeated = function(self)
-        return ArmyIsOutOfGame(self:GetArmyIndex())
+        return self.Result == "defeat"
     end,
-
 
     SetCurrentPlan = function(self, bestPlan)
         if not bestPlan then

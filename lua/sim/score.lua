@@ -132,8 +132,6 @@ function ScoreThread()
         }
     end
     
-    UpdateScoreData(ArmyScore)
-
     while true do
         for index, brain in ArmyBrains do
             ArmyScore[index].general.score = CalculateBrainScore(brain)
@@ -189,8 +187,8 @@ function ScoreThread()
 
             WaitSeconds(0.1)
         end
-
         WaitSeconds(3)
+        UpdateScoreData(ArmyScore)
         SyncScores()
     end
 end

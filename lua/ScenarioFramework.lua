@@ -31,12 +31,12 @@ end
 --   bool _allSecondary - true if all secondary objectives completed, otherwise, false
 function EndOperation(_success, _allPrimary, _allSecondary)
     Sync.OperationComplete = {
-        opKey = ScenarioInfo.campaignInfo.opKey or '',
+        opKey = ScenarioInfo.campaignInfo and ScenarioInfo.campaignInfo.opKey or '',
         success = _success,
-        difficulty = ScenarioInfo.campaignInfo.difficulty or '',
+        difficulty = ScenarioInfo.campaignInfo and ScenarioInfo.campaignInfo.difficulty or ScenarioInfo.Options.Difficulty,
         allPrimary = _allPrimary,
         allSecondary = _allSecondary,
-        campaignID = ScenarioInfo.campaignInfo.campaignID or ScenarioInfo.Options.FACampaignFaction or '',
+        campaignID = ScenarioInfo.campaignInfo and ScenarioInfo.campaignInfo.campaignID or ScenarioInfo.Options.FACampaignFaction or '',
     }
     -- EndGame()
 end
@@ -688,6 +688,7 @@ end
 function PlayDialogue()
     while table.getn(ScenarioInfo.DialogueQueue) > 0 do
         local dTable = table.remove(ScenarioInfo.DialogueQueue, 1)
+        if not dTable then WARN('dTable is nil, ScenarioInfo.DialogueQueue len is '..repr(table.getn(ScenarioInfo.DialogueQueue))) end
         if not dTable.Flushed and ( not ScenarioInfo.OpEnded or dTable.Critical ) then
             for k,v in dTable do
                 if v ~= nil and not dTable.Flushed and ( not ScenarioInfo.OpEnded or dTable.Critical ) then
@@ -1232,10 +1233,10 @@ function SetLoyalistColor( number )
 end
 
 function AMPlatoonCounter( aiBrain, name )
-    if not aiBrain.AttackData.AMPlatoonCount[name] then
-        aiBrain.AttackData.AMPlatoonCount[name] = 0
+    if not aiBrain.AttackData.PlatoonCount[name] then
+        aiBrain.AttackData.PlatoonCount[name] = 0
     end
-    return aiBrain.AttackData.AMPlatoonCount[name]
+    return aiBrain.AttackData.PlatoonCount[name]
 end
 
 function PlatoonAttackWithTransports( platoon, landingChain, attackChain, instant )
