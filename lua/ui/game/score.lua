@@ -411,17 +411,17 @@ end
                     if line.armyID == index then
                         if line.OOG then break end
                         if SessionIsReplay() then
-                            if (scoreData.resources.massin.rate) then
-                                line.mass_in:SetText(fmtnum(scoreData.resources.massin.rate * 10))
-                                line.energy_in:SetText(fmtnum(scoreData.resources.energyin.rate * 10))
+                            if (scoreData.resources.mass.income) then
+                                line.mass_in:SetText(fmtnum(scoreData.resources.mass.income * 10))
+                                line.energy_in:SetText(fmtnum(scoreData.resources.mass.income * 10))
                             end
                         end
-                        if scoreData.general.score == -1 then
+                        if scoreData.score == -1 then
                             line.score:SetText(LOC("<LOC _Playing>Playing"))
                             line.scoreNumber = -1
                         else
-                            line.score:SetText(fmtnum(scoreData.general.score))
-                            line.scoreNumber = scoreData.general.score
+                            line.score:SetText(fmtnum(scoreData.score))
+                            line.scoreNumber = scoreData.score
 
                         end
                         if GetFocusArmy() == index then
@@ -429,8 +429,8 @@ end
                             line.score:SetColor('ffff7f00')
                             line.name:SetFont('Arial Bold', 12)
                             line.score:SetFont('Arial Bold', 12)
-                            if scoreData.general.currentcap.count > 0 then
-                                SetUnitText(scoreData.general.currentunits.count, scoreData.general.currentcap.count)
+                            if scoreData.units.cap > 0 then
+                                SetUnitText(scoreData.units.current, scoreData.units.cap)
                             end
                         else
                             line.name:SetColor('ffffffff')

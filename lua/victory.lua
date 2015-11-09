@@ -1,5 +1,4 @@
 gameOver = false
-sendStats = false
 
 local victoryCategories = {
     demoralization=categories.COMMAND,
