@@ -75,7 +75,6 @@ UAS0401 = Class(ASeaUnit) {
     BuildingState = State {
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
-            self:SetBusy(true)
             local bone = self.BuildAttachBone
             self:DetachAll(bone)
             if not self.UnitBeingBuilt.Dead then
@@ -101,13 +100,11 @@ UAS0401 = Class(ASeaUnit) {
 
     FinishedBuildingState = State {
         Main = function(self)
-            self:SetBusy(true)
             local unitBuilding = self.UnitBeingBuilt
             unitBuilding:DetachFrom(true)
             self:DetachAll(self.BuildAttachBone)
             local worldPos = self:CalculateWorldPositionFromRelative({0, 0, -20})
             IssueMoveOffFactory({unitBuilding}, worldPos)
-            self:SetBusy(false)
             ChangeState(self, self.IdleState)
         end,
     },

@@ -96,7 +96,6 @@ UES0401 = Class(TSeaUnit) {
     BuildingState = State {
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
-            self:SetBusy(true)
             local bone = self.BuildAttachBone
             self:DetachAll(bone)
             unitBuilding:HideBone(0, true)
@@ -111,7 +110,6 @@ UES0401 = Class(TSeaUnit) {
 
     FinishedBuildingState = State {
         Main = function(self)
-            self:SetBusy(true)
             local unitBuilding = self.UnitBeingBuilt
             unitBuilding:DetachFrom(true)
             self:DetachAll(self.BuildAttachBone)
@@ -122,7 +120,6 @@ UES0401 = Class(TSeaUnit) {
                 IssueMoveOffFactory({unitBuilding}, worldPos)
                 unitBuilding:ShowBone(0,true)
             end
-            self:SetBusy(false)
             self:RequestRefreshUI()
             ChangeState(self, self.IdleState)
         end,

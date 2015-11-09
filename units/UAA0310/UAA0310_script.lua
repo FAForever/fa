@@ -82,7 +82,6 @@ UAA0310 = Class(AirTransport) {
     BuildingState = State {
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
-            self:SetBusy(true)
             local bone = self.BuildAttachBone
             self:DetachAll(bone)
             unitBuilding:HideBone(0, true)
@@ -97,7 +96,6 @@ UAA0310 = Class(AirTransport) {
 
     FinishedBuildingState = State {
         Main = function(self)
-            self:SetBusy(true)
             local unitBuilding = self.UnitBeingBuilt
             unitBuilding:DetachFrom(true)
             self:DetachAll(self.BuildAttachBone)
@@ -108,7 +106,6 @@ UAA0310 = Class(AirTransport) {
                 IssueMoveOffFactory({unitBuilding}, worldPos)
                 unitBuilding:ShowBone(0,true)
             end
-            self:SetBusy(false)
             self:RequestRefreshUI()
             ChangeState(self, self.IdleState)
         end,

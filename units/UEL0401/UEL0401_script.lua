@@ -66,7 +66,6 @@ UEL0401 = Class(TMobileFactoryUnit) {
 
     IdleState = State {
         OnStartBuild = function(self, unitBuilding, order)
-            self:SetBusy(true)
             TMobileFactoryUnit.OnStartBuild(self, unitBuilding, order)
             self.UnitBeingBuilt = unitBuilding
             self.PrepareToBuildManipulator:SetRate(self.PrepareToBuildAnimRate)
