@@ -1175,7 +1175,7 @@ function PossiblyAnnounceGameFull()
     end
 
     -- Game is full, let's tell the client.
-    GPGNetSend("GameFull")
+    GpgNetSend("GameFull")
 end
 
 --- Assign the "random" (really autobalanced) start positions.

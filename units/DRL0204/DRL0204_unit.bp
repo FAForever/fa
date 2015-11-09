@@ -246,7 +246,7 @@ UnitBlueprint {
             MuzzleSalvoSize = 3,
             MuzzleVelocity = 15,
             ProjectileId = '/projectiles/CDFRocketIridium02/CDFRocketIridium02_proj.bp',
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetime = 5,
             ProjectilesPerOnFire = 3,
             RackBones = {
                 {

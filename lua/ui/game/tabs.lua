@@ -46,7 +46,7 @@ local tabs = {
     {
         bitmap = 'diplomacy',
         content = 'diplomacy',
-        disableInCampaign = true,
+        disableInCampaign = false,
         disableInReplay = true,
         disableForObserver = true,
         closeSound = 'UI_Diplomacy_Close',

@@ -9,6 +9,7 @@
 -- ****************************************************************************
 
 local Entity = import('/lua/sim/Entity.lua').Entity
+local Set = import('/lua/system/setutils.lua')
 
 Weapon = Class(moho.weapon_methods) {
     __init = function(self, unit)
@@ -24,7 +25,7 @@ Weapon = Class(moho.weapon_methods) {
             self:SetupTurret()
         end
         self:SetWeaponPriorities()
-        self.Disabledbf = {}
+        self.DisabledBuffs = {}
         self.DamageMod = 0
         self.DamageRadiusMod = 0
         self.NumTargets = 0
@@ -290,6 +291,7 @@ Weapon = Class(moho.weapon_methods) {
     GetDamageTable = function(self)
         local weaponBlueprint = self:GetBlueprint()
         local damageTable = {}
+        damageTable.InitialDamageAmount = weaponBlueprint.InitialDamage or 0
         damageTable.DamageRadius = weaponBlueprint.DamageRadius + (self.DamageRadiusMod or 0)
         damageTable.DamageAmount = weaponBlueprint.Damage + (self.DamageMod or 0)
         damageTable.DamageType = weaponBlueprint.DamageType
@@ -302,31 +304,25 @@ Weapon = Class(moho.weapon_methods) {
         damageTable.DoTPulses = weaponBlueprint.DoTPulses
         damageTable.MetaImpactAmount = weaponBlueprint.MetaImpactAmount
         damageTable.MetaImpactRadius = weaponBlueprint.MetaImpactRadius
+        damageTable.ArtilleryShieldBlocks = weaponBlueprint.ArtilleryShieldBlocks
         -- Add buff
         damageTable.Buffs = {}
         if weaponBlueprint.Buffs ~= nil then
             for k, v in weaponBlueprint.Buffs do
-                damageTable.Buffs[k] = {}
-                damageTable.Buffs[k] = v
-            end   
-        end     
-        -- remove disabled buff
-        if (self.Disabledbf ~= nil) and (damageTable.Buffs ~= nil) then
-            for k, v in damageTable.Buffs do
-                for j, w in self.Disabledbf do
-                    if v.BuffType == w then
-                        -- Removing buff
-                        table.remove( damageTable.Buffs, k )
-                    end
+                if not self.DisabledBuffs[v.BuffType] then
+                    damageTable.Buffs[k] = v
                 end
-            end  
-        end  
+                
+            end   
+        end
+
         return damageTable
     end,
 
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
+
         if proj and not proj:BeenDestroyed() then
             proj:PassDamageData(damageTable)
             local bp = self:GetBlueprint()
@@ -445,15 +441,7 @@ Weapon = Class(moho.weapon_methods) {
 
     DisableBuff = function(self, buffname)
         if buffname then
-            for k, v in self.Disabledbf do
-                if v == buffname then
-                    -- this buff is already in the table
-                    return
-                end
-            end
-            
-            -- Add to disabled list
-            table.insert(self.Disabledbf, buffname)
+            self.DisabledBuffs[buffname] = true
         else
             -- Error
             error('ERROR: DisableBuff in weapon.lua does not have a buffname') 
@@ -462,12 +450,7 @@ Weapon = Class(moho.weapon_methods) {
     
     ReEnableBuff = function(self, buffname)
         if buffname then
-            for k, v in self.Disabledbf do
-                if v == buffname then
-                    -- Remove from disabled list
-                    table.remove(self.Disabledbf, k)
-                end
-            end
+            self.DisabledBuffs[buffname] = nil
         else
             -- Error 
             error('ERROR: ReEnableBuff in weapon.lua does not have a buffname') 

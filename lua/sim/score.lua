@@ -45,13 +45,14 @@ function ScoreHistoryThread()
     end
 end
 
-
 function ScoreThread()
     for index, brain in ArmyBrains do
         ArmyScore[index] = {
             general = {
                 score = 0,
                 mass = 0,
+                lastReclaimedMass = 0,
+                lastReclaimedEnergy = 0,                
                 energy = 0,
                 kills = {
                     count = 0,
@@ -132,8 +133,8 @@ function ScoreThread()
         }
     end
     
-    UpdateScoreData(ArmyScore)
-
+    ForkThread(ScoreDisplayResourcesThread)
+    
     while true do
         for index, brain in ArmyBrains do
             ArmyScore[index].general.score = CalculateBrainScore(brain)
@@ -155,13 +156,11 @@ function ScoreThread()
             ArmyScore[index].general.lost.energy = brain:GetArmyStat("Units_EnergyValue_Lost", 0.0).Value
 
             ArmyScore[index].resources.massin.total = brain:GetArmyStat("Economy_TotalProduced_Mass", 0.0).Value
-            ArmyScore[index].resources.massin.rate = brain:GetArmyStat("Economy_Income_Mass", 0.0).Value
             ArmyScore[index].resources.massout.total = brain:GetArmyStat("Economy_TotalConsumed_Mass", 0.0).Value
             ArmyScore[index].resources.massout.rate = brain:GetArmyStat("Economy_Output_Mass", 0.0).Value
             ArmyScore[index].resources.massover = brain:GetArmyStat("Economy_AccumExcess_Mass", 0.0).Value
            
             ArmyScore[index].resources.energyin.total = brain:GetArmyStat("Economy_TotalProduced_Energy", 0.0).Value
-            ArmyScore[index].resources.energyin.rate = brain:GetArmyStat("Economy_Income_Energy", 0.0).Value
             ArmyScore[index].resources.energyout.total = brain:GetArmyStat("Economy_TotalConsumed_Energy", 0.0).Value
             ArmyScore[index].resources.energyout.rate = brain:GetArmyStat("Economy_Output_Energy", 0.0).Value
             ArmyScore[index].resources.energyover = brain:GetArmyStat("Economy_AccumExcess_Energy", 0.0).Value
@@ -189,9 +188,28 @@ function ScoreThread()
 
             WaitSeconds(0.1)
         end
-
         WaitSeconds(3)
+        UpdateScoreData(ArmyScore)
         SyncScores()
+    end
+end
+
+function ScoreDisplayResourcesThread()
+    -- For certain stats, we need to do this every tick. We can't for all because it is quite heavy CPU
+    -- We don't need to sync every tick though, just make sure the number is right
+    while true do
+        for index, brain in ArmyBrains do
+            local reclaimedMass = brain:GetArmyStat("Economy_Reclaimed_Mass", 0.0).Value
+            local massReclaimRate = reclaimedMass - ArmyScore[index].general.lastReclaimedMass
+            ArmyScore[index].resources.massin.rate = brain:GetArmyStat("Economy_Income_Mass", 0.0).Value - massReclaimRate
+            ArmyScore[index].general.lastReclaimedMass = reclaimedMass
+            
+            local reclaimedEnergy = brain:GetArmyStat("Economy_Reclaimed_Energy", 0.0).Value
+            local energyReclaimRate = reclaimedEnergy - ArmyScore[index].general.lastReclaimedEnergy
+            ArmyScore[index].resources.energyin.rate = brain:GetArmyStat("Economy_Income_Energy", 0.0).Value - energyReclaimRate
+            ArmyScore[index].general.lastReclaimedEnergy = reclaimedEnergy
+        end
+        WaitSeconds(0.1)
     end
 end
 

@@ -19,9 +19,9 @@ XEL0209 = Class(TConstructionUnit) {
         },
     },
 
-    OnStopBeingBuilt = function(self)
+    OnStopBeingBuilt = function(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
-        TConstructionUnit.OnStopBeingBuilt(self)
+        TConstructionUnit.OnStopBeingBuilt(self, builder, layer)
         --Rotate the antenna
         self.Rotator = CreateRotator(self, 'Antenna', 'y')
         self.Trash:Add(self.Rotator)
