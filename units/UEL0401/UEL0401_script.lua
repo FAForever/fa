@@ -1,30 +1,25 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UEL0401/UEL0401_script.lua
-#**  Author(s):  John Comes, David Tomandl, Gordon Duclos
-#**
-#**  Summary  :  UEF Mobile Factory Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
-
-# This unit needs to not be allowed to build while underwater
-# Additionally, if it goes underwater while building it needs to cancel the
-#   current order
-
+-----------------------------------------------------------------
+-- File     :  /cdimage/units/UEL0401/UEL0401_script.lua
+-- Author(s):  John Comes, David Tomandl, Gordon Duclos
+-- Summary  :  UEF Mobile Factory Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
 local TMobileFactoryUnit = import('/lua/terranunits.lua').TMobileFactoryUnit
 local WeaponsFile = import('/lua/terranweapons.lua')
 local TDFGaussCannonWeapon = WeaponsFile.TDFLandGaussCannonWeapon
 local TDFRiotWeapon = WeaponsFile.TDFRiotWeapon
 local TAALinkedRailgun = WeaponsFile.TAALinkedRailgun
 local TANTorpedoAngler = WeaponsFile.TANTorpedoAngler
-
 local EffectTemplate = import('/lua/EffectTemplates.lua')
-
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local CreateUEFBuildSliceBeams = EffectUtil.CreateUEFBuildSliceBeams
 
 UEL0401 = Class(TMobileFactoryUnit) {
+    FxDamageScale = 2.5,
+    PrepareToBuildAnimRate = 5,
+    BuildAttachBone = 'Build_Attachpoint',
+    RollOffBones = { 'Arm_Right03_Build_Emitter', 'Arm_Left03_Build_Emitter',},
+
     Weapons = {
         RightTurret01 = Class(TDFGaussCannonWeapon) {},
         RightTurret02 = Class(TDFGaussCannonWeapon) {},
@@ -41,12 +36,6 @@ UEL0401 = Class(TMobileFactoryUnit) {
         Torpedo = Class(TANTorpedoAngler) {},
     },
 
-    FxDamageScale = 2.5,
-    PrepareToBuildAnimRate = 5,
-    BuildAttachBone = 'Build_Attachpoint',
-
-    RollOffBones = { 'Arm_Right03_Build_Emitter', 'Arm_Left03_Build_Emitter',},
-
     OnStopBeingBuilt = function(self,builder,layer)
         TMobileFactoryUnit.OnStopBeingBuilt(self,builder,layer)
         self.EffectsBag = {}
@@ -61,7 +50,9 @@ UEL0401 = Class(TMobileFactoryUnit) {
         TMobileFactoryUnit.OnFailedToBuild(self)
         ChangeState(self, self.IdleState)
     end,
-
+    
+    -- This unit needs to not be allowed to build while underwater
+    -- Additionally, if it goes underwater while building it needs to cancel the current order
     OnLayerChange = function(self, new, old)
         TMobileFactoryUnit.OnLayerChange(self, new, old)
         if new == 'Land' then
@@ -87,12 +78,9 @@ UEL0401 = Class(TMobileFactoryUnit) {
             self:DetachAll(self.BuildAttachBone)
             self:SetBusy(false)
         end,
-
     },
 
-
     BuildingState = State {
-
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
             self.PrepareToBuildManipulator:SetRate(self.PrepareToBuildAnimRate)
@@ -117,11 +105,9 @@ UEL0401 = Class(TMobileFactoryUnit) {
 
             ChangeState(self, self.RollingOffState)
         end,
-
     },
 
     RollingOffState = State {
-
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
             if not unitBuilding:IsDead() then
@@ -129,18 +115,22 @@ UEL0401 = Class(TMobileFactoryUnit) {
             end
             WaitFor(self.PrepareToBuildManipulator)
             WaitFor(self.AttachmentSliderManip)
+            
             self:CreateRollOffEffects()
             self.AttachmentSliderManip:SetSpeed(10)
             self.AttachmentSliderManip:SetGoal(0, 0, 17)
-            WaitFor( self.AttachmentSliderManip )
+            WaitFor(self.AttachmentSliderManip)
+            
             self.AttachmentSliderManip:SetGoal(0, -3, 17)
-            WaitFor( self.AttachmentSliderManip )
+            WaitFor(self.AttachmentSliderManip)
+            
             if not unitBuilding:IsDead() then
                 unitBuilding:DetachFrom(true)
                 self:DetachAll(self.BuildAttachBone)
                 local  worldPos = self:CalculateWorldPositionFromRelative({0, 0, -15})
                 IssueMoveOffFactory({unitBuilding}, worldPos)
             end
+            
             self:DestroyRollOffEffects()
             ChangeState(self, self.IdleState)
         end,
@@ -153,9 +143,11 @@ UEL0401 = Class(TMobileFactoryUnit) {
             local fx = AttachBeamEntityToEntity(self, v, unitB, -1, army, EffectTemplate.TTransportBeam01)
             table.insert( self.ReleaseEffectsBag, fx)
             self.Trash:Add(fx)
+            
             fx = AttachBeamEntityToEntity( unitB, -1, self, v, army, EffectTemplate.TTransportBeam02)
             table.insert( self.ReleaseEffectsBag, fx)
             self.Trash:Add(fx)
+            
             fx = CreateEmitterAtBone( self, v, army, EffectTemplate.TTransportGlow01)
             table.insert( self.ReleaseEffectsBag, fx)
             self.Trash:Add(fx)
@@ -168,7 +160,6 @@ UEL0401 = Class(TMobileFactoryUnit) {
         end
         self.ReleaseEffectsBag = {}
     end,
-
 }
 
 TypeClass = UEL0401

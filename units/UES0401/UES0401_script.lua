@@ -1,26 +1,18 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UES0401/UES0401_script.lua
-#**  Author(s):  John Comes, David Tomandl
-#**
-#**  Summary  :  UEF Experimental Submersible Aircraft Carrier Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
-
+-----------------------------------------------------------------
+-- File     :  /cdimage/units/UES0401/UES0401_script.lua
+-- Author(s):  John Comes, David Tomandl
+-- Summary  :  UEF Experimental Submersible Aircraft Carrier Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
 local TSeaUnit = import('/lua/terranunits.lua').TSeaUnit
 local TANTorpedoAngler = import('/lua/terranweapons.lua').TANTorpedoAngler
 local TSAMLauncher = import('/lua/terranweapons.lua').TSAMLauncher
-
-
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
 
-#we're gonna make it a ship unit and see how that works
-local TSeaUnit = import('/lua/terranunits.lua').TSeaUnit
-
 UES0401 = Class(TSeaUnit) {
-
+    BuildAttachBone = 'UES0401',
+    
     Weapons = {
         Torpedo01 = Class(TANTorpedoAngler) {},
         Torpedo02 = Class(TANTorpedoAngler) {},
@@ -51,7 +43,6 @@ UES0401 = Class(TSeaUnit) {
         end
     end,
 
-
     StartBeingBuiltEffects = function(self, builder, layer)
 		self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
         if self:GetBlueprint().General.UpgradesFrom != builder:GetUnitId() then
@@ -78,8 +69,6 @@ UES0401 = Class(TSeaUnit) {
             self:PlayAllOpenAnims(true)
         end
     end,
-
-    BuildAttachBone = 'UES0401',
 
     OnStopBeingBuilt = function(self,builder,layer)
         TSeaUnit.OnStopBeingBuilt(self,builder,layer)
