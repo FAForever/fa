@@ -1,15 +1,16 @@
 Patch 3652 (pending)
 ============================
 
-**Lobby**
+**Whole Game**
+- Introduced the start of a Russian translation
 
+**Lobby**
 - Name filter when selecting map
 - Prevent host from changing teams of others while ready
 - Game quality in lobby now visible again
 - Reduced autobalance random variation to get team setups with better overall quality
 
 **UI**
-
 - New keybinding 'soft_stop'
 - Soft-stop will cancel all orders of a factory except their current one, if you soft-stop a factory with only one order it will get cleared
 - Soft-stop on a silo unit will clear the current orders but not stop the actual building of a missile
@@ -22,9 +23,11 @@ Patch 3652 (pending)
 - Refactor the income economy overlay not to show reclaim values appearing in the generated income column and do correct rounding of the numbers.
 - Fixed bug with unit regen debuff not being visible in UI
 - Fixed bug with buildpower not visible in unitview
+- Score display in the top-right no longer counts reclaim into the Mass/Energy income shown in observer mode
+- Allow the UI code to search active mods for unit icons. Mods will have to have the icons in the right place (/modname/icons/units/xxx_icon.dds). Confirmed working for Total Mayhem at least, and probably many more.
+- Allow Hotbuild to find Support Factories
 
 **Gameplay**
-
 - Teamkill is now detected and a player can make an explicit report
 - Air units are now able to fire at water-landed transports
 - Hoplite now calculate their aim correctly when firing at a fleeing target
@@ -41,11 +44,9 @@ Patch 3652 (pending)
 - Re-enabled death animation on non-naval units
 - Seraphim GW now uses all its 3 exits
 - Spread attack: Targets are now spread more uniformly across all units during the initial attack orders, further ones are random.
-
-
+- Diplomacy now allowed in Coop mode
 
 **Bugs**
-
 - Chrono Dampener doesn't stun allied units anymore
 - Fixed free mass exploit with Megalith eggs
 - Fixed bug with Cybran SCUs getting EMP for free
@@ -56,18 +57,27 @@ Patch 3652 (pending)
 - Fixed bug with omni buff instead getting radius of radar
 - Fatboy and Cybran cruisers shouldn't engage enemies way outside their range anymore
 - Fixed bug with commander not always being selected at start
-
--- XXX: @Duk3Luk3 rewrite the below:
-- Refactor layer change logic 
+- Fixed wrecks not giving resources in Coop mode
+- Refactored and improved layer change logic
 - Intel system reworked to handle intel events better
+- Fixed Coop missions getting stuck at Operation Complete
+- Added missing Seraphim objective icons
+- All shields now overspill damage correctly based on their type
+- Fixed nukes overkilling bubble shield base structure when out of range and shield up
+- Fixed Continental taking damage from AOE when it has the shield up
+- Fixed regen buffs from different sources not stacking properly. This should mean every possible interaction between veterancy, upgrades, and the Seraphim Regen Aura field all play nice
+- Fixed Underwater Vision not being initialised on unit completion
+- Fixed Engineers not properly reclaiming the target of an assisted, then stopped, Engineer
 
 **Performance**
 - Optimization of score accumulation
 - Tweaks to hive build effects to reduce performance impact
 - Cleanup of enhancement sync code to make it faster and more secure
+- Entities now re-use repeated sound FX instead of creating new ones every time
 
 **Other**
 - Tech-level filter in debug window now works as intended
+- Log-spam from various known events heavily reduced
 
 
 Patch 3650 (August 19, 2015)
