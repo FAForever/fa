@@ -174,19 +174,14 @@ Shield = Class(moho.shield_methods,Entity) {
     end,    
 
     OnDamage = function(self, instigator, amount, vector, dmgType)
+        -- Only called when a shield is directly impacted, so not for Personal Shields
+        -- This means personal shields never have ApplyDamage called with doOverspill as true
         self:ApplyDamage(instigator, amount, vector, dmgType, true)
     end,
 
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
         if self.Owner != instigator then
             local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
-
-            if self.PassOverkillDamage or dmgType == "Nuke" then
-                local overkill = self:GetOverkill(instigator,amount,dmgType)    
-                if self.Owner and IsUnit(self.Owner) and overkill > 0 then
-                    self.Owner:DoTakeDamage(instigator, overkill, vector, dmgType)
-                end
-            end
 
             self:AdjustHealth(instigator, -absorbed)
             self:UpdateShieldRatio(-1)
@@ -518,7 +513,18 @@ PersonalBubble = Class(Shield) {
         self:SetCollisionShape('None')
         self:SetType('Personal')
     end,
-
+    
+    ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
+        Shield.ApplyDamage(self, instigator, amount, vector, dmgType, doOverspill)
+        
+        -- We want all personal shields to pass overkill damage, including this one
+        -- Was handled by self.PassOverkillDamage bp value, now defunct
+        local overkill = self:GetOverkill(instigator,amount,dmgType)    
+        if self.Owner and IsUnit(self.Owner) and overkill > 0 then
+            self.Owner:DoTakeDamage(instigator, overkill, vector, dmgType)
+        end
+    end,
+    
     CreateShieldMesh = function(self)
         Shield.CreateShieldMesh(self)
         self:SetCollisionShape('None')
@@ -626,7 +632,7 @@ TransportShield = Class(Shield) {
 
 --- A shield that sticks to the surface of the unit. Doesn't have its own collision physics, just
 -- grants extra health.
-UnitShield = Class(Shield){
+PersonalShield = Class(Shield){
 
     OnCreate = function(self,spec)
         self.Trash = TrashBag()
@@ -666,6 +672,17 @@ UnitShield = Class(Shield){
         self.PassOverkillDamage = spec.PassOverkillDamage
 
         ChangeState(self, self.OnState)
+    end,
+    
+    ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
+        Shield.ApplyDamage(self, instigator, amount, vector, dmgType, doOverspill)
+        
+        -- We want all personal shields to pass overkill damage
+        -- Was handled by self.PassOverkillDamage bp value, now defunct
+        local overkill = self:GetOverkill(instigator,amount,dmgType)    
+        if self.Owner and IsUnit(self.Owner) and overkill > 0 then
+            self.Owner:DoTakeDamage(instigator, overkill, vector, dmgType)
+        end
     end,
 
     CreateImpactEffect = function(self, vector)
