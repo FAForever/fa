@@ -24,7 +24,6 @@ Patch 3652 (pending)
 - Fixed bug with unit regen debuff not being visible in UI
 - Fixed bug with buildpower not visible in unitview
 - Score display in the top-right no longer counts reclaim into the Mass/Energy income shown in observer mode
-- Allow the UI code to search active mods for unit icons. Mods will have to have the icons in the right place (/modname/icons/units/xxx_icon.dds). Confirmed working for Total Mayhem at least, and probably many more.
 - Allow Hotbuild to find Support Factories
 
 **Gameplay**
@@ -34,7 +33,6 @@ Patch 3652 (pending)
 - Slight increase of unit size(not hitbox) of T3 sniper bots, Othuum and Rhino to alleviate their weapon's ground-hitting ability
 - Seraphim Experimental Nuke now deals damage to itself
 - Cybran drones no longer leave wreckage when killed
-- Cybran T2 PD and Tank now got their original lasers back
 - Defense structures now start rotated at their nearest enemy when built, if no enemies found they default at middle of map 
 - Remove friendly fire on Atlantis AA
 - Location of enemy civilian structures are now revealed at start of the game (lobby option)
@@ -69,6 +67,9 @@ Patch 3652 (pending)
 - Fixed regen buffs from different sources not stacking properly. This should mean every possible interaction between veterancy, upgrades, and the Seraphim Regen Aura field all play nice
 - Fixed Underwater Vision not being initialised on unit completion
 - Fixed Engineers not properly reclaiming the target of an assisted, then stopped, Engineer
+- Fixed UEF Drones being untargetable by Interceptors
+- Fixed UEF Drone collision detection, making it much easier for ground-based AA to hit them
+- Fixed UEF AI unit templates in coop mode
 
 **Performance**
 - Optimization of score accumulation
