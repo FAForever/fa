@@ -153,7 +153,7 @@ AIBrain = Class(moho.aibrain_methods) {
             self.AIPlansList = AIDefaultPlansList
         end
         self.RepeatExecution = false
-        
+
         if ScenarioInfo.type == 'campaign' then
             self:SetResourceSharing(false)
         end
@@ -213,6 +213,28 @@ AIBrain = Class(moho.aibrain_methods) {
         end
 
         self.PreBuilt = true
+    end,
+
+    AddUnitStat = function(self, unitId, statName, value)
+        unitStats[unitId] = unitStats[unitId] or {}
+        unitStats[unitId][statName] = unitStats[unitId][statName] or 0 + value
+    end,
+
+    SetUnitStat = function(self, unitId, statName, value)
+        unitStats[unitId] = unitStats[unitId] or {}
+        unitStats[unitId][statName] = value
+    end,
+
+    GetUnitStat = function(self, unitId, statName)
+        if unitStats[unitId] == nil or unitStats[unitId][statName] == nil then
+            return 0
+        end
+
+        return unitStats[unitId][statName]
+    end,
+
+    GetUnitStats = function(self)
+        return unitStats
     end,
 
     ------------------------------------------------------------------------------------------------------------------------------------------
@@ -339,7 +361,7 @@ AIBrain = Class(moho.aibrain_methods) {
         return false
     end,
 
-    
+
 
     ------------------------------------------------------------------------------------------------------------------------------------------
     ---- ------------- TRIGGERS BASED ON AN AI BRAIN       ------------- ----
@@ -778,7 +800,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     OnTransportFull = function(self)
         local cue
-        
+
         if EntityCategoryContains(categories.uaa0310, self.loadingTransport) then
             -- "CZAR FULL"
             cue = 'XGG_Computer_CV01_04753'

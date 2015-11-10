@@ -86,7 +86,6 @@ end
 
 function CallEndGame()
     gameOver = true
-    sendStats = true
     ForkThread(function()
         WaitSeconds(3)
         EndGame()

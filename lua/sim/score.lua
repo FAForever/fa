@@ -32,14 +32,15 @@ local brainBpStats = {
     land=categories.LAND,
     air=categories.AIR,
     naval=categories.NAVAL,
-    command=categories.COMMAND,
-    engineer=categories.ENGINEER,
+    cdr=categories.COMMAND,
     sacu=categories.SUBCOMMANDER,
-    experimental=categories.EXPERIMENTAL,
-    structure=categories.STRUCTURE,
+    engineer=categories.ENGINEER,
     tech1=categories.TECH1,
     tech2=categories.TECH2,
     tech3=categories.TECH3,
+    experimental=categories.EXPERIMENTAL,
+    structure=categories.STRUCTURE,
+    transportation=categories.TRANSPORTATION
 }
 
 function UpdateStatsData(newData)
@@ -130,7 +131,7 @@ end
 function UpdateBrainStats(brain)
     local army = brain:GetArmyIndex()
     if ArmyIsCivilian(army) then return end
-    local stats = {}
+    local stats = {faction=brain:GetFactionIndex()}
 
     recursiveFillBrainArmyStats(brain, stats, brainArmyStats)
     -- subtract reclaim rate from income
@@ -153,9 +154,9 @@ function StatsThread()
             WaitSeconds(0.1)
         end
 
-        WaitSeconds(3)
         UpdateStatsData(ArmyStats)
         SyncStats()
+        WaitSeconds(3)
     end
 end
 
