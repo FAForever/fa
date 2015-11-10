@@ -1604,113 +1604,71 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
-    --DUNCAN - improvements to avoid unreachable reclaimables. Credit to Sorian.
     ReclaimAI = function(self)
         self:Stop()
-        local aiBrain = self:GetBrain()
+        local brain = self:GetBrain()
         local locationType = self.PlatoonData.LocationType
-        local timeAlive = 0
-        local stuckCount = 0
-        local closest, entType, closeDist
+        local createTick = GetGameTick()
         local oldClosest
-        local eng = self:GetPlatoonUnits()[1]
-        if not aiBrain.BadReclaimables then
-            aiBrain.BadReclaimables = {}
+        local units = self:GetPlatoonUnits()
+        local eng = units[1]
+        if not eng then
+            self:PlatoonDisband()
+            return
         end
-        while aiBrain:PlatoonExists(self) do
-            local massRatio = aiBrain:GetEconomyStoredRatio('MASS')
-            local energyRatio = aiBrain:GetEconomyStoredRatio('ENERGY')
-            local massFirst = true
-            if energyRatio < massRatio then
-                massFirst = false
-            end
 
-            local ents = AIUtils.AIGetReclaimablesAroundLocation( aiBrain, locationType )
-            if not ents or table.getn( ents ) == 0 then
+        eng.BadReclaimables = eng.BadReclaimables or {}
+
+        while brain:PlatoonExists(self) do
+            local ents = AIUtils.AIGetReclaimablesAroundLocation( brain, locationType ) or {}
+            local pos = self:GetPlatoonPosition()
+
+            if not ents[1] or not pos then
                 WaitTicks(1)
                 self:PlatoonDisband()
+                return
             end
-            local reclaimables = { Mass = {}, Energy = {} }
+
+            local reclaim = {}
+            local needEnergy = brain:GetEconomyStoredRatio('ENERGY') < 0.5
+
             for k,v in ents do
-                if v.MassReclaim and v.MassReclaim > 0 then
-                    table.insert( reclaimables.Mass, v )
-                elseif v.EnergyReclaim and v.EnergyReclaim > 0 then
-                    table.insert( reclaimables.Energy, v )
+                if eng.BadReclaimables[v] then continue end
+                if not needEnergy or v.MaxEnergyReclaim then
+                    local rpos = v:GetCachePosition()
+                    table.insert(reclaim, {entity=v, pos=rpos, distance=VDist2(pos[1], pos[3], rpos[1], rpos[3])})
                 end
             end
 
-            local unitPos = self:GetPlatoonPosition()
-            if not unitPos then break end
+            IssueClearCommands(units)
+            table.sort(reclaim, function(a, b) return a.distance < b.distance end)
+
             local recPos = nil
-            closest = false
-            for num, recType in reclaimables do
-                for k, v in recType do
-                    recPos = v:GetPosition()
-                    if not recPos then
-                        WaitTicks(1)
-                        self:PlatoonDisband()
-                    end
-                    if not (unitPos[1] and unitPos[3] and recPos[1] and recPos[3]) then return end
-                    local tempDist = VDist2( unitPos[1], unitPos[3], recPos[1], recPos[3] )
-                    -- We don't want any reclaimables super close to us
-                    --if not aiBrain.BadReclaimables[v] and aiBrain.BadReclaimables[v] != false and VDist3(eng:GetPosition(), recPos) > 10 and not eng:CanPathTo( v:GetPosition() ) then
-                    --  aiBrain.BadReclaimables[v] = true
-                    --else
-                    --  aiBrain.BadReclaimables[v] = false
-                    --end
-                    if ( ( not closest or tempDist < closeDist ) and ( not oldClosest or closest != oldClosest ) ) and not aiBrain.BadReclaimables[v] then
-                        closest = v
-                        entType = num
-                        closeDist = tempDist
-                    end
-                end
-                if num == 'Mass' and closest and massFirst then
-                    break
+            local closest = {}
+            for i, r in reclaim do
+                eng.BadReclaimables[r.entity] = r.distance > 10 and not eng:CanPathTo(r.pos)
+                if not eng.BadReclaimables[r.entity] then
+                    IssueReclaim(units, r.entity)
+                    if i > 10 then break end
                 end
             end
 
-            if closest and (( entType == 'Mass' and massRatio < .9 ) or ( entType == 'Energy' and energyRatio < .9 )) then
-                if closest == oldClosest then
-                    stuckCount = stuckCount + 1
-                else
-                    stuckCount = 0
+            local reclaiming = not eng:IsIdleState()
+            local max_time = self.PlatoonData.ReclaimTime
+
+            while reclaiming do
+                WaitSeconds(5)
+
+                if eng:IsIdleState() or (max_time and (GetGameTick() - createTick)*10 > max_time) then
+                    reclaiming = false
                 end
-                oldClosest = closest
-                IssueClearCommands( self:GetPlatoonUnits() )
-                IssueReclaim( self:GetPlatoonUnits(), closest )
-                local count = 0
-                local allIdle = false
-                if stuckCount > 1 then
-                    stuckCount = 0
-                    aiBrain.BadReclaimables[closest] = true
-                    WaitSeconds(10)
-                    count = 60
-                end
-                repeat
-                    WaitSeconds(2)
-                    if not aiBrain:PlatoonExists(self) then
-                        return
-                    end
-                    timeAlive = timeAlive + 2
-                    count = count + 1
-                    if self.PlatoonData.ReclaimTime and timeAlive >= self.PlatoonData.ReclaimTime then
-                        local basePosition = aiBrain.BuilderManagers[locationType].Position
-                        local location = AIUtils.RandomLocation(basePosition[1],basePosition[3])
-                        self:MoveToLocation( location, false )
-                        WaitSeconds(10)
-                        self:PlatoonDisband()
-                        return
-                    end
-                    allIdle = true
-                    if not eng:IsIdleState() then allIdle = false end
-                until allIdle or count >= 60
-            else
-                local basePosition = aiBrain.BuilderManagers[locationType].Position
-                local location = AIUtils.RandomLocation(basePosition[1],basePosition[3])
-                self:MoveToLocation( location, false )
-                WaitSeconds(10)
-                self:PlatoonDisband()
             end
+
+            local basePosition = brain.BuilderManagers[locationType].Position
+            local location = AIUtils.RandomLocation(basePosition[1],basePosition[3])
+            self:MoveToLocation( location, false )
+            WaitSeconds(10)
+            self:PlatoonDisband()
         end
     end,
 
@@ -5316,110 +5274,7 @@ Platoon = Class(sorianoldPlatoon) {
     end,
 
     ReclaimAISorian = function(self)
-        self:Stop()
-        local aiBrain = self:GetBrain()
-        local locationType = self.PlatoonData.LocationType
-        local timeAlive = 0
-        local stuckCount = 0
-        local closest, entType, closeDist
-        local oldClosest
-        local eng = self:GetPlatoonUnits()[1]
-        local testRings = self.PlatoonData.ThreatRings or 0
-        local threatType = self.PlatoonData.ThreatType or 'Overall'
-        local threatValue = self.PlatoonData.ThreatValue or 0
-        if not aiBrain.BadReclaimables then
-            aiBrain.BadReclaimables = {}
-        end
-        while aiBrain:PlatoonExists(self) do
-            local massRatio = aiBrain:GetEconomyStoredRatio('MASS')
-            local energyRatio = aiBrain:GetEconomyStoredRatio('ENERGY')
-            local massFirst = true
-            if energyRatio < massRatio then
-                massFirst = false
-            end
-
-            local ents = AIUtils.AIGetReclaimablesAroundLocation( aiBrain, locationType )
-            if not ents or table.getn( ents ) == 0 then
-                WaitTicks(1)
-                self:PlatoonDisband()
-            end
-            local reclaimables = { Mass = {}, Energy = {} }
-            for k,v in ents do
-                if v.MassReclaim and v.MassReclaim > 0 then
-                    table.insert( reclaimables.Mass, v )
-                elseif v.EnergyReclaim and v.EnergyReclaim > 0 then
-                    table.insert( reclaimables.Energy, v )
-                end
-            end
-
-            local unitPos = self:GetPlatoonPosition()
-            if not unitPos then break end
-            local recPos = nil
-            closest = false
-            for num, recType in reclaimables do
-                for k, v in recType do
-                    recPos = v:GetPosition()
-                    if not recPos then
-                        WaitTicks(1)
-                        self:PlatoonDisband()
-                    end
-                    if not (unitPos[1] and unitPos[3] and recPos[1] and recPos[3]) then return end
-                    local tempDist = VDist2( unitPos[1], unitPos[3], recPos[1], recPos[3] )
-                    -- We don't want any reclaimables super close to us
-                    if ( ( not closest or tempDist < closeDist ) and ( not oldClosest or closest != oldClosest ) ) and not aiBrain.BadReclaimables[v] and aiBrain:GetThreatAtPosition( recPos, testRings, true, threatType ) <= threatValue then
-                        closest = v
-                        entType = num
-                        closeDist = tempDist
-                    end
-                end
-                if num == 'Mass' and closest and massFirst then
-                    break
-                end
-            end
-
-            if closest and (( entType == 'Mass' and massRatio < .9 ) or ( entType == 'Energy' and energyRatio < .9 )) then
-                if closest == oldClosest then
-                    stuckCount = stuckCount + 1
-                else
-                    stuckCount = 0
-                end
-                oldClosest = closest
-                IssueClearCommands( self:GetPlatoonUnits() )
-                IssueReclaim( self:GetPlatoonUnits(), closest )
-                local count = 0
-                local allIdle = false
-                if stuckCount > 1 then
-                    stuckCount = 0
-                    aiBrain.BadReclaimables[closest] = true
-                    WaitSeconds(10)
-                    count = 60
-                end
-                repeat
-                    WaitSeconds(2)
-                    if not aiBrain:PlatoonExists(self) then
-                        return
-                    end
-                    timeAlive = timeAlive + 2
-                    count = count + 1
-                    if self.PlatoonData.ReclaimTime and timeAlive >= self.PlatoonData.ReclaimTime then
-                        local basePosition = aiBrain.BuilderManagers[locationType].Position
-                        local location = AIUtils.RandomLocation(basePosition[1],basePosition[3])
-                        self:MoveToLocation( location, false )
-                        WaitSeconds(10)
-                        self:PlatoonDisband()
-                        return
-                    end
-                    allIdle = true
-                    if not eng:IsIdleState() then allIdle = false end
-                until allIdle or count >= 60
-            else
-                local basePosition = aiBrain.BuilderManagers[locationType].Position
-                local location = AIUtils.RandomLocation(basePosition[1],basePosition[3])
-                self:MoveToLocation( location, false )
-                WaitSeconds(10)
-                self:PlatoonDisband()
-            end
-        end
+        self:ReclaimAI()
     end,
 
     RepairAI = function(self)
