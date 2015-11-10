@@ -108,6 +108,11 @@ function ScoreThread()
                     built = 0,
                     lost = 0
                 },
+                transportation = {
+                    kills = 0,
+                    built = 0,
+                    lost = 0
+                },
                 engineer = {
                     kills = 0,
                     built = 0,
@@ -199,6 +204,10 @@ function ScoreThread()
                     ArmyScore[index].units[unitId][statName] = value
                 end
             end
+
+            ArmyScore[index].units.transportation.kills = brain:GetBlueprintStat("Enemies_Killed", categories.TRANSPORTATION)
+            ArmyScore[index].units.transportation.built = brain:GetBlueprintStat("Units_History", categories.TRANSPORTATION)
+            ArmyScore[index].units.transportation.lost = brain:GetBlueprintStat("Units_Killed", categories.TRANSPORTATION)
 
             ArmyScore[index].units.land.kills = brain:GetBlueprintStat("Enemies_Killed", categories.LAND)
             ArmyScore[index].units.land.built = brain:GetBlueprintStat("Units_History", categories.LAND)
