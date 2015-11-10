@@ -177,9 +177,10 @@ function SyncStats()
         for index, brain in ArmyBrains do
             local stats = ArmyStats[index]
 
-            Sync.Score[index] = {}
-            if my_army == index then
-                Sync.Score[index].units = {current = stats.units.current, cap=stats.units.cap}
+            if my_army == index or IsAlly(my_army, index) then
+                Sync.Score[index] = {units={current = stats.units.current, cap=stats.units.cap}, resources=stats.resources}
+            else
+                Sync.Score[index] = {}
             end
 
             Sync.Score[index].score = scoreOption ~= 'no' and stats.score or -1
