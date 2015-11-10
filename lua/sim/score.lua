@@ -4,6 +4,23 @@ local scoreData = {current={}, historical={}}
 local scoreOption = ScenarioInfo.Options.Score or "no"
 local ArmyScore = {}
 
+-- Some of these values pre-existed and are used in other places, that's why their naming is not consistent
+local categoriesToCollect = {
+    land=categories.LAND,
+    air=categories.AIR,
+    naval=categories.NAVAL,
+    cdr=categories.COMMAND,
+    sacu=categories.SUBCOMMANDER,
+    engineer=categories.ENGINEER,
+    tech1=categories.TECH1,
+    tech2=categories.TECH2,
+    tech3=categories.TECH3,
+    experimental=categories.EXPERIMENTAL,
+    structures=categories.STRUCTURE,
+    transportation=categories.TRANSPORTATION
+}
+
+
 function UpdateScoreData(newData)
     scoreData.current = table.deepcopy(newData)
 end
@@ -78,66 +95,7 @@ function ScoreThread()
             },
 
             units = {
-                cdr = {
-                    kills = 0,
-                    built = 0,
-                    lost = 0
-                },
-                sacu = {
-                    kills = 0,
-                    built = 0,
-                    lost = 0
-                },
-                land = {
-                    kills = 0,
-                    built = 0,
-                    lost = 0
-                },
-                air = {
-                    kills = 0,
-                    built = 0,
-                    lost = 0
-                },
-                naval = {
-                    kills = 0,
-                    built = 0,
-                    lost = 0
-                },
-                structures = {
-                    kills = 0,
-                    built = 0,
-                    lost = 0
-                },
-                transportation = {
-                    kills = 0,
-                    built = 0,
-                    lost = 0
-                },
-                engineer = {
-                    kills = 0,
-                    built = 0,
-                    lost = 0
-                },
-                tech1 = {
-                    kills = 0,
-                    built = 0,
-                    lost = 0
-                },
-                tech2 = {
-                    kills = 0,
-                    built = 0,
-                    lost = 0
-                },
-                tech3 = {
-                    kills = 0,
-                    built = 0,
-                    lost = 0
-                },
-                experimental = {
-                    kills = 0,
-                    built = 0,
-                    lost = 0
-                }
+                -- filled dynamically below
             },
 
             resources = {
@@ -161,6 +119,14 @@ function ScoreThread()
                 energyover = 0
             }
         }
+
+        for categoryName, category in categoriesToCollect do
+            ArmyScore[index].units[categoryName] = {
+                kills = 0,
+                built = 0,
+                lost = 0
+            }
+        end
     end
     
     ForkThread(ScoreDisplayResourcesThread)
@@ -205,46 +171,11 @@ function ScoreThread()
                 end
             end
 
-            ArmyScore[index].units.transportation.kills = brain:GetBlueprintStat("Enemies_Killed", categories.TRANSPORTATION)
-            ArmyScore[index].units.transportation.built = brain:GetBlueprintStat("Units_History", categories.TRANSPORTATION)
-            ArmyScore[index].units.transportation.lost = brain:GetBlueprintStat("Units_Killed", categories.TRANSPORTATION)
-
-            ArmyScore[index].units.land.kills = brain:GetBlueprintStat("Enemies_Killed", categories.LAND)
-            ArmyScore[index].units.land.built = brain:GetBlueprintStat("Units_History", categories.LAND)
-            ArmyScore[index].units.land.lost = brain:GetBlueprintStat("Units_Killed", categories.LAND)
-            ArmyScore[index].units.air.kills = brain:GetBlueprintStat("Enemies_Killed", categories.AIR)
-            ArmyScore[index].units.air.built = brain:GetBlueprintStat("Units_History", categories.AIR)
-            ArmyScore[index].units.air.lost = brain:GetBlueprintStat("Units_Killed", categories.AIR)
-            ArmyScore[index].units.naval.kills = brain:GetBlueprintStat("Enemies_Killed", categories.NAVAL)
-            ArmyScore[index].units.naval.built = brain:GetBlueprintStat("Units_History", categories.NAVAL)
-            ArmyScore[index].units.naval.lost = brain:GetBlueprintStat("Units_Killed", categories.NAVAL)
-
-            ArmyScore[index].units.cdr.kills = brain:GetBlueprintStat("Enemies_Killed", categories.COMMAND)
-            ArmyScore[index].units.cdr.built = brain:GetBlueprintStat("Units_History", categories.COMMAND)
-            ArmyScore[index].units.cdr.lost = brain:GetBlueprintStat("Units_Killed", categories.COMMAND)
-            ArmyScore[index].units.sacu.kills = brain:GetBlueprintStat("Enemies_Killed", categories.SUBCOMMANDER)
-            ArmyScore[index].units.sacu.built = brain:GetBlueprintStat("Units_History", categories.SUBCOMMANDER)
-            ArmyScore[index].units.sacu.lost = brain:GetBlueprintStat("Units_Killed", categories.SUBCOMMANDER)
-
-            ArmyScore[index].units.engineer.kills = brain:GetBlueprintStat("Enemies_Killed", categories.ENGINEER)
-            ArmyScore[index].units.engineer.built = brain:GetBlueprintStat("Units_History", categories.ENGINEER)
-            ArmyScore[index].units.engineer.lost = brain:GetBlueprintStat("Units_Killed", categories.ENGINEER)
-            ArmyScore[index].units.tech1.kills = brain:GetBlueprintStat("Enemies_Killed", categories.TECH1)
-            ArmyScore[index].units.tech1.built = brain:GetBlueprintStat("Units_History", categories.TECH1)
-            ArmyScore[index].units.tech1.lost = brain:GetBlueprintStat("Units_Killed", categories.TECH1)
-            ArmyScore[index].units.tech2.kills = brain:GetBlueprintStat("Enemies_Killed", categories.TECH2)
-            ArmyScore[index].units.tech2.built = brain:GetBlueprintStat("Units_History", categories.TECH2)
-            ArmyScore[index].units.tech2.lost = brain:GetBlueprintStat("Units_Killed", categories.TECH2)
-            ArmyScore[index].units.tech3.kills = brain:GetBlueprintStat("Enemies_Killed", categories.TECH3)
-            ArmyScore[index].units.tech3.built = brain:GetBlueprintStat("Units_History", categories.TECH3)
-            ArmyScore[index].units.tech3.lost = brain:GetBlueprintStat("Units_Killed", categories.TECH3)
-            ArmyScore[index].units.experimental.kills = brain:GetBlueprintStat("Enemies_Killed", categories.EXPERIMENTAL)
-            ArmyScore[index].units.experimental.built = brain:GetBlueprintStat("Units_History", categories.EXPERIMENTAL)
-            ArmyScore[index].units.experimental.lost = brain:GetBlueprintStat("Units_Killed", categories.EXPERIMENTAL)
-
-            ArmyScore[index].units.structures.kills = brain:GetBlueprintStat("Enemies_Killed", categories.STRUCTURE)
-            ArmyScore[index].units.structures.built = brain:GetBlueprintStat("Units_History", categories.STRUCTURE)
-            ArmyScore[index].units.structures.lost = brain:GetBlueprintStat("Units_Killed", categories.STRUCTURE)
+            for categoryName, category in categoriesToCollect do
+                ArmyScore[index].units[categoryName]['kills'] = brain:GetBlueprintStat("Enemies_Killed", category)
+                ArmyScore[index].units[categoryName]['built'] = brain:GetBlueprintStat("Units_History", category)
+                ArmyScore[index].units[categoryName]['lost'] = brain:GetBlueprintStat("Units_Killed", category)
+            end
 
             WaitSeconds(0.1)
         end
