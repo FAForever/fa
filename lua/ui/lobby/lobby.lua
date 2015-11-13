@@ -4945,12 +4945,14 @@ function InitHostUtils()
                 index = index + 1
             end
 
-            local playerName = gameInfo.PlayerOptions[playerSlot].PlayerName
+            local ownerId = gameInfo.PlayerOptions[playerSlot].OwnerID
             gameInfo.Observers[index] = gameInfo.PlayerOptions[playerSlot]
             gameInfo.PlayerOptions[playerSlot] = nil
 
             if lobbyComm:IsHost() then
-                GpgNetSend('PlayerOption', string.format("team %s %d %s", playerName, -1, 0))
+                GpgNetSend('PlayerOption', ownerID, 'Team', -1)
+                GpgNetSend('PlayerOption', ownerID, 'Army', -1)
+                GpgNetSend('PlayerOption', ownerID, 'StartSpot', -index)
             end
 
             ClearSlotInfo(playerSlot)
