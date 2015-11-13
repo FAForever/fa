@@ -5274,7 +5274,7 @@ function InitHostUtils()
                 if playerInfo.Human then
                     GpgNetSend('PlayerOption', playerInfo.OwnerID, key, value)
                 else
-                    GpgNetSend('AIOption', playerInfo.PlayerName, key value)
+                    GpgNetSend('AIOption', playerInfo.PlayerName, key, value)
                 end
             end
             sendPlayerOption('Faction', playerInfo.Faction)
