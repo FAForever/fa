@@ -893,6 +893,7 @@ function ClearSlotInfo(slotIndex)
 
     local hostKey
     if lobbyComm:IsHost() then
+        GpgNetSend('ClearSlot', slotIndex)
         hostKey = 'host'
     else
         hostKey = 'client'
