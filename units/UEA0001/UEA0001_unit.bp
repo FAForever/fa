@@ -89,7 +89,7 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
     },
-    CollisionOffsetZ = -0.07,
+    CollisionOffsetY = -0.5,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Light',
@@ -209,6 +209,7 @@ UnitBlueprint {
     SelectionSizeX = 0.3,
     SelectionSizeZ = 0.3,
     SelectionThickness = 1.2,
+    SizeSphere = 1,
     SizeX = 1,
     SizeY = 0.5,
     SizeZ = 1,
