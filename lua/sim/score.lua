@@ -65,6 +65,7 @@ end
 function ScoreThread()
     for index, brain in ArmyBrains do
         ArmyScore[index] = {
+            faction = 0,
             general = {
                 score = 0,
                 mass = 0,
@@ -128,11 +129,14 @@ function ScoreThread()
             }
         end
     end
-    
+
     ForkThread(ScoreDisplayResourcesThread)
 
     while true do
         for index, brain in ArmyBrains do
+            ArmyScore[index].faction = brain:GetFactionIndex()
+            ArmyScore[index].name = brain.Nickname
+            ArmyScore[index].type = brain.BrainType
             ArmyScore[index].general.score = CalculateBrainScore(brain)
 
             ArmyScore[index].general.mass = brain:GetArmyStat("Economy_TotalProduced_Mass", 0.0).Value
@@ -180,9 +184,9 @@ function ScoreThread()
             WaitSeconds(0.1)
         end
 
-        WaitSeconds(3)
         UpdateScoreData(ArmyScore)
         SyncScores()
+        WaitSeconds(3)
     end
 end
 
