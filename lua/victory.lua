@@ -88,7 +88,6 @@ end
 function CallEndGame()
     gameOver = true
     sendStats = true
-    SubmitXMLArmyStats()
     ForkThread(function()
         WaitSeconds(3)
         EndGame()
