@@ -105,7 +105,7 @@ function FindSlotForID(id)
 end
 
 function IsPlayer(id)
-    return FindSlotForID(id) != nil
+    return FindSlotForID(id) ~= nil
 end
 
 local function HostAddPlayer(senderId, playerInfo)
@@ -134,7 +134,7 @@ local function CheckForLaunch()
 
     local important = {}
     for slot,player in gameInfo.PlayerOptions do
-        GpgNetSend('PlayerOption', string.format("startspot %s %d %s", player.PlayerName, slot, slot))
+        GpgNetSend('PlayerOption', player.OwnerID, 'StartSpot', slot)
         if not table.find(important, player.OwnerID) then
             table.insert(important, player.OwnerID)
         end
@@ -143,9 +143,9 @@ local function CheckForLaunch()
     #counts the number of players in the game.  Include yourself by default.
     local playercount = 1
     for k,id in important do
-        if id != localPlayerID then
+        if id ~= localPlayerID then
             local peer = lobbyComm:GetPeer(id)
-            if peer.status != 'Established' then
+            if peer.status ~= 'Established' then
                 return
             end
             if not table.find(peer.establishedPeers, localPlayerID) then
@@ -153,7 +153,7 @@ local function CheckForLaunch()
             end
             playercount = playercount + 1
             for k2,other in important do
-                if id != other and not table.find(peer.establishedPeers, other) then
+                if id ~= other and not table.find(peer.establishedPeers, other) then
                     return
                 end
             end
@@ -261,8 +261,6 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         localPlayerName = newLocalName
         localPlayerID = myID
 
-        GpgNetSend('connectedToHost', string.format("%d", hostID))
-
         -- Ok, I'm connected to the host. Now request to become a player
         lobbyComm:SendData( hostID, { Type = 'AddPlayer', PlayerInfo = MakeLocalPlayerInfo(newLocalName), } )
     end
@@ -312,7 +310,6 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
     lobbyComm.EstablishedPeers = function(self, uid, peers)
         if not wasConnected(uid) then
             table.insert(connectedTo, uid)
-            GpgNetSend('Connected', string.format("%d", uid))
         end
         if self:IsHost() then
             CheckForLaunch()
