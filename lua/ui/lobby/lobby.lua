@@ -893,6 +893,7 @@ function ClearSlotInfo(slotIndex)
 
     local hostKey
     if lobbyComm:IsHost() then
+        GpgNetSend('ClearSlot', slotIndex)
         hostKey = 'host'
     else
         hostKey = 'client'
@@ -1175,7 +1176,7 @@ function PossiblyAnnounceGameFull()
     end
 
     -- Game is full, let's tell the client.
-    GPGNetSend("GameFull")
+    GpgNetSend("GameFull")
 end
 
 --- Assign the "random" (really autobalanced) start positions.
@@ -1335,15 +1336,6 @@ local function AssignRandomStartSpots()
         HostUtils.SendPlayerSettingsToServer(r.slot)
     end
 end
-
--- This function is used to double check the observers.
--- TODO: IT MUST DIE.
-local function sendObserversList()
-    for k, observer in gameInfo.Observers:pairs() do
-        GpgNetSend('PlayerOption', string.format("team %s %d %s", observer.PlayerName, -1, 0))
-    end
-end
-
 
 local function AssignAutoTeams()
     -- A function to take a player index and return the team they should be on.
@@ -1604,9 +1596,6 @@ local function TryLaunch(skipNoObserversCheck)
     numberOfPlayers = numPlayers
 
     local function LaunchGame()
-        -- Redundantly send the observer list, because we're mental.
-        sendObserversList()
-
         -- These two things must happen before the flattening step, mostly for terrible reasons.
         -- This isn't ideal, as it leads to redundant UI repaints :/
         AssignAutoTeams()
@@ -3177,7 +3166,6 @@ function CalcConnectionStatus(peer)
             end
 
             table.insert(connectedTo, peer.id)
-            GpgNetSend('Connected', string.format("%d", peer.id))
         end
         if not table.find(peer.establishedPeers, lobbyComm:GetLocalPlayerID()) then
             -- they haven't reported that they can talk to us?
@@ -3449,7 +3437,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         localPlayerID = myID
         localPlayerName = myName
 
-        GpgNetSend('connectedToHost', string.format("%d", hostID))
         lobbyComm:SendData(hostID, { Type = 'SetAvailableMods', Mods = Mods.GetLocallyAvailableMods(), Name = localPlayerName} )
 
         lobbyComm:SendData(hostID,
@@ -3515,7 +3502,13 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
                 gameInfo.PlayerOptions[data.Slot][key] = val
                 if isHost then
-                    GpgNetSend('PlayerOption', data.Slot, key, val)
+                    local playerInfo = gameInfo.PlayerOptions[data.Slot]
+                    if playerInfo.Human then
+                        GpgNetSend('PlayerOption', playerInfo.OwnerID, key, val)
+                    else
+                        GpgNetSend('AIOption', playerInfo.PlayerName, key, val)
+                    end
+
 
                     -- TODO: This should be a global listener on PlayerData objects, but I'm in too
                     -- much pain to implement that listener system right now. EVIL HACK TIME
@@ -4957,12 +4950,14 @@ function InitHostUtils()
                 index = index + 1
             end
 
-            local playerName = gameInfo.PlayerOptions[playerSlot].PlayerName
+            local ownerId = gameInfo.PlayerOptions[playerSlot].OwnerID
             gameInfo.Observers[index] = gameInfo.PlayerOptions[playerSlot]
             gameInfo.PlayerOptions[playerSlot] = nil
 
             if lobbyComm:IsHost() then
-                GpgNetSend('PlayerOption', string.format("team %s %d %s", playerName, -1, 0))
+                GpgNetSend('PlayerOption', ownerID, 'Team', -1)
+                GpgNetSend('PlayerOption', ownerID, 'Army', -1)
+                GpgNetSend('PlayerOption', ownerID, 'StartSpot', -index)
             end
 
             ClearSlotInfo(playerSlot)
@@ -5275,11 +5270,18 @@ function InitHostUtils()
         --- Send player settings to the server
         SendPlayerSettingsToServer = function(slotNum)
             local playerInfo = gameInfo.PlayerOptions[slotNum]
-            local playerName = playerInfo.PlayerName
-            GpgNetSend('PlayerOption', string.format("faction %s %d %s", playerName, slotNum, playerInfo.Faction))
-            GpgNetSend('PlayerOption', string.format("color %s %d %s", playerName, slotNum, playerInfo.PlayerColor))
-            GpgNetSend('PlayerOption', string.format("team %s %d %s", playerName, slotNum, playerInfo.Team))
-            GpgNetSend('PlayerOption', string.format("startspot %s %d %s", playerName, slotNum, slotNum))
+            local sendPlayerOption = function(key, value)
+                if playerInfo.Human then
+                    GpgNetSend('PlayerOption', playerInfo.OwnerID, key, value)
+                else
+                    GpgNetSend('AIOption', playerInfo.PlayerName, key, value)
+                end
+            end
+            sendPlayerOption('Faction', playerInfo.Faction)
+            sendPlayerOption('Color', playerInfo.PlayerColor)
+            sendPlayerOption('Team', playerInfo.Team)
+            sendPlayerOption('StartSpot', slotNum)
+            sendPlayerOption('Army', slotNum)
         end,
 
         --- Called by the host when someone's readyness state changes to update the enabledness of buttons.

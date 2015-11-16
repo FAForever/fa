@@ -77,9 +77,13 @@ Projectile = Class(moho.projectile_methods, Entity) {
                 end
             end
         end
+        if self.InnerRing and self.OuterRing then
+            local launcher = self:GetLauncher()
+            local pos = self:GetPosition()
+            self.InnerRing:DoNukeDamage(launcher, pos)
+            self.OuterRing:DoNukeDamage(launcher, pos)
+        end
     end,
-
-
 
     -- Do not call the base class __init and __post_init, we already have a c++ object
     __init = function(self,spec)

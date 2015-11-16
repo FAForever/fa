@@ -78,6 +78,8 @@ local issuedOneCommand = false
 local startBehaviors = {}
 local endBehaviors = {}
 
+local ferryRoute= {}
+
 function OnCommandModeBeat()
     if issuedOneCommand and not IsKeyDown('Shift') then
         EndCommandMode(true)
@@ -163,38 +165,60 @@ function OnCommandIssued(command)
             end
         end
     elseif command.CommandType == 'BuildMobile' then
-		AddCommandFeedbackBlip({
-			Position = command.Target.Position, 
-			BlueprintID = command.Blueprint,			
-			TextureName = '/meshes/game/flag02d_albedo.dds',
-			ShaderName = 'CommandFeedback',
-			UniformScale = 1,
-		}, 0.7)
+        AddCommandFeedbackBlip({
+            Position = command.Target.Position, 
+            BlueprintID = command.Blueprint,            
+            TextureName = '/meshes/game/flag02d_albedo.dds',
+            ShaderName = 'CommandFeedback',
+            UniformScale = 1,
+        }, 0.7)
     elseif command.CommandType == 'Repair' then
         local target = command.Target
         if target.Type == 'Entity' then -- repair wreck to rebuild
             local cb = {Func="Rebuild", Args={entity=target.EntityId, Clear=command.Clear}}
             SimCallback(cb, true)
         end
-	else	
-		if AddCommandFeedbackByType(command.Target.Position, command.CommandType) == false then
-			AddCommandFeedbackBlip({
-				Position = command.Target.Position, 
-				MeshName = '/meshes/game/flag02d_lod0.scm',
-				TextureName = '/meshes/game/flag02d_albedo.dds',
-				ShaderName = 'CommandFeedback',
-				UniformScale = 0.5,
-			}, 0.7)		
-			
-			AddCommandFeedbackBlip({
-				Position = command.Target.Position, 
-				MeshName = '/meshes/game/crosshair02d_lod0.scm',
-				TextureName = '/meshes/game/crosshair02d_albedo.dds',
-				ShaderName = 'CommandFeedback2',
-				UniformScale = 0.5,
-			}, 0.75)		
-		end		
-	end
+    elseif command.CommandType == 'TransportUnloadSpecificUnits' then
+        local ids = {}
+        local n = table.getsize(command.Units)
+        if n > 1 then
+            for i=2, n do
+                table.insert(ids, command.Units[i]:GetEntityId())
+            end
+        end
+        local cb = { Func = 'TransportLock', Args = { ids=ids, lock=false} }
+        SimCallback(cb, true)
+    else    
+        if AddCommandFeedbackByType(command.Target.Position, command.CommandType) == false then
+            AddCommandFeedbackBlip({
+                Position = command.Target.Position, 
+                MeshName = '/meshes/game/flag02d_lod0.scm',
+                TextureName = '/meshes/game/flag02d_albedo.dds',
+                ShaderName = 'CommandFeedback',
+                UniformScale = 0.5,
+            }, 0.7)     
+            
+            AddCommandFeedbackBlip({
+                Position = command.Target.Position, 
+                MeshName = '/meshes/game/crosshair02d_lod0.scm',
+                TextureName = '/meshes/game/crosshair02d_albedo.dds',
+                ShaderName = 'CommandFeedback2',
+                UniformScale = 0.5,
+            }, 0.75)        
+        end     
+    end
 
-	import('/lua/spreadattack.lua').MakeShadowCopyOrders(command)
+    import('/lua/spreadattack.lua').MakeShadowCopyOrders(command)
+
+
+    if command.CommandType == 'Ferry' then
+        local pos = command.Target.Position
+        table.insert(ferryRoute, {pos[1], pos[2], pos[3]})
+    end
+
+    if table.getsize(ferryRoute) > 1 and not IsKeyDown('Shift') then
+        local cb = { Func = 'PersistFerry', Args = { route = ferryRoute} }
+        SimCallback(cb, true)
+        ferryRoute = {}
+    end
 end
