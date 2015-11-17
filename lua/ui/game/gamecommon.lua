@@ -6,6 +6,7 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
+local UIUtil = import('/lua/ui/uiutil.lua')
 local DiskGetFileInfo = import('/lua/ui/uiutil.lua').DiskGetFileInfo
 
 iconBmpHeight = 48
