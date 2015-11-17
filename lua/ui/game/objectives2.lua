@@ -134,10 +134,21 @@ function _OnBeat()
 end
 
 function SetUnitText(current, cap)
-    controls.units:SetText(string.format("%d/%d", current or -1, cap or -1))
-    if current >= cap-1 then
+    local prevCap = 0
+    
+    if current == nil then
+        current = -1
+    end
+    if cap == nil then
+        cap = 0
+    else
+        prevCap = cap
+    end
+    controls.units:SetText(string.format("%d/%d", current, cap))
+    if current == cap then
         if (not lastUnitWarning or GameTime() - lastUnitWarning > 60) and not unitWarningUsed then
-            import('/lua/ui/game/announcement.lua').CreateAnnouncement(LOC("<LOC score_0002>Unit Cap Reached"), controls.units)
+            LOG('>>>>>>>>>>> current: ', current, ' cap: ', cap)
+            import('/lua/ui/game/announcement.lua').CreateAnnouncement(LOC('<LOC score_0002>Unit Cap Reached'), controls.units)
             lastUnitWarning = GameTime()
             unitWarningUsed = true
         end
