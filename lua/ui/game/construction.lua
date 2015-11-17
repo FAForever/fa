@@ -554,8 +554,8 @@ function CommonLogic()
 
     controls.secondaryChoices.SetControlToType = function(control, type)
         local function SetIconTextures(control)
-            if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. control.Data.id .. '_icon.dds')) then
-                control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. control.Data.id .. '_icon.dds'))
+            if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. control.Data.id .. '_icon.dds', true)) then
+                control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. control.Data.id .. '_icon.dds', true))
             else
                 control.Icon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
             end
@@ -719,7 +719,7 @@ function CommonLogic()
         local function SetIconTextures(control, optID)
             local id = optID or control.Data.id
             if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds', true)) then
-                control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds'))
+                control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds', true))
             else
                 control.Icon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
             end
@@ -810,7 +810,7 @@ function CommonLogic()
             control.Height:Set(48)
             control.Width:Set(48)
             if control.Data.template.icon then
-                control.Icon:SetTexture('/textures/ui/common/icons/units/' .. control.Data.template.icon .. '_icon.dds')
+                control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. control.Data.template.icon .. '_icon.dds', true))
             else
                 control.Icon:SetTexture('/textures/ui/common/icons/units/default_icon.dds')
             end
@@ -1417,7 +1417,7 @@ function CreateTemplateOptionMenu(button, templateObj)
                     end
                 end
                 for iconType, _ in contents do
-                    local bmp = Bitmap(group, '/textures/ui/common/icons/units/' .. iconType .. '_icon.dds')
+                    local bmp = Bitmap(group, UIUtil.UIFile('/icons/units/' .. iconType .. '_icon.dds', true))
                     bmp.Height:Set(30)
                     bmp.Width:Set(30)
                     bmp.ID = iconType
