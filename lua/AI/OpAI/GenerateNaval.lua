@@ -22,7 +22,7 @@ local TIERS =
     --Tier 2 naval units
     {
         CORE =      {U='ues0201', C='urs0201', A='uas0201', S='xss0201'},
-        SUBS =      {U='xes0204', C='xrs0204', A='xas0204', S='xss0203'},   --note seraphim have no T2 sub hunter
+        SUBS =      {U='xes0102', C='xrs0204', A='xas0204', S='xss0203'},   --note seraphim have no T2 sub hunter
         CRUISERS =  {U='ues0202', C='urs0202', A='uas0202', S='xss0202'},
         UTILITY =   {U='xes0205', C='xrs0205',                         },
     },
@@ -30,7 +30,7 @@ local TIERS =
     --Tier 3 naval units
     {
         CORE =      {U='ues0302', C='urs0302', A='uas0302', S='xss0302'},
-        SUBS =      {U='xes0204', C='xrs0204', A='xas0204', S='xss0304'},
+        SUBS =      {U='xes0102', C='xrs0204', A='xas0204', S='xss0304'},
         CRUISERS =  {U='ues0202', C='urs0202', A='uas0202', S='xss0202'},
         FATTIES =   {U='xes0307', C='urs0303', A='xas0306', S='xss0303'},
         UTILITY =   {U='xes0205', C='xrs0205',                         },    
