@@ -46,3 +46,8 @@ function DiskGetFileInfo(file)
     end
     return FileCache[file]
 end
+
+local oldEntityCategoryFilterOut = EntityCategoryFilterOut
+function EntityCategoryFilterOut(categories, units)
+    return oldEntityCategoryFilterOut(categories, units or {})
+end
