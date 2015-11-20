@@ -2288,8 +2288,13 @@ Unit = Class(moho.unit_methods) {
     end,
 
     EnableUnitIntel = function(self, disabler, intel)
+        local transportOnly = self:GetBlueprint().Intel.StealthOnlyForTransport
         local function EnableOneIntel(disabler, intel)
             local intEnabled = false
+            if intel == 'RadarStealth' and transportOnly then
+                return
+            end
+            
             if self.IntelDisables[intel][disabler] then -- must check for explicit true contained
                 self.IntelDisables[intel][disabler] = nil
                 if Set.Empty(self.IntelDisables[intel]) then
