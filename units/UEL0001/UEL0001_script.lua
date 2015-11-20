@@ -8,7 +8,7 @@ local Shield = import('/lua/shield.lua').Shield
 local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
 local TerranWeaponFile = import('/lua/terranweapons.lua')
 local TDFZephyrCannonWeapon = TerranWeaponFile.TDFZephyrCannonWeapon
-local TIFCommanderDeathWeapon = TerranWeaponFile.TIFCommanderDeathWeapon
+local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local TIFCruiseMissileLauncher = TerranWeaponFile.TIFCruiseMissileLauncher
 local TDFOverchargeWeapon = TerranWeaponFile.TDFOverchargeWeapon
@@ -17,7 +17,7 @@ local Buff = import('/lua/sim/Buff.lua')
 
 UEL0001 = Class(ACUUnit) {
     Weapons = {
-        DeathWeapon = Class(TIFCommanderDeathWeapon) {},
+        DeathWeapon = Class(DeathNukeWeapon) {},
         RightZephyr = Class(TDFZephyrCannonWeapon) {},
         OverCharge = Class(TDFOverchargeWeapon) {},
         TacMissile = Class(TIFCruiseMissileLauncher) {
