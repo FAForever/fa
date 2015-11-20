@@ -12,7 +12,7 @@ local Buff = import('/lua/sim/Buff.lua')
 local SWeapons = import('/lua/seraphimweapons.lua')
 local SDFChronotronCannonWeapon = SWeapons.SDFChronotronCannonWeapon
 local SDFChronotronOverChargeCannonWeapon = SWeapons.SDFChronotronCannonOverChargeWeapon
-local SIFCommanderDeathWeapon = SWeapons.SIFCommanderDeathWeapon
+local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local SIFLaanseTacticalMissileLauncher = SWeapons.SIFLaanseTacticalMissileLauncher
@@ -20,7 +20,7 @@ local AIUtils = import('/lua/ai/aiutilities.lua')
 
 XSL0001 = Class(ACUUnit) {
     Weapons = {
-        DeathWeapon = Class(SIFCommanderDeathWeapon) {},
+        DeathWeapon = Class(DeathNukeWeapon) {},
         ChronotronCannon = Class(SDFChronotronCannonWeapon) {},
         Missile = Class(SIFLaanseTacticalMissileLauncher) {
             OnCreate = function(self)

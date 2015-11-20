@@ -9,12 +9,12 @@
 #****************************************************************************
 local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
 local FxAmbient = import('/lua/effecttemplates.lua').AResourceGenAmbient
-local AIFParagonDeathWeapon = import('/lua/aeonweapons.lua').AIFParagonDeathWeapon
+local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
 
 XAB1401 = Class(AStructureUnit) {
 
     Weapons = {
-        DeathWeapon = Class(AIFParagonDeathWeapon) {},
+        DeathWeapon = Class(DeathNukeWeapon) {},
     },
 
     OnStopBeingBuilt = function(self, builder, layer)
