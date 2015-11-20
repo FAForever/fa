@@ -446,6 +446,11 @@ function PreModBlueprints(all_bps)
                 },
             }
         end
+        
+        if bp.Intel and not bp.Intel.RadarStealth then
+            bp.Intel.RadarStealth = true
+            bp.Intel.StealthOnlyForTransport = true
+        end
 
         -- Mod in AI.GuardScanRadius = Longest weapon range * longest tracking radius
         -- Takes ACU/SCU enhancements into account
