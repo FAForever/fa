@@ -1761,6 +1761,7 @@ BaseTransport = Class() {
             unit:DisableShield()
             unit:DisableDefaultToggleCaps()
         end
+        unit:EnableIntel('RadarStealth')
         self:RequestRefreshUI()
         unit:OnAttachedToTransport(self, bone)
     end,
@@ -1776,6 +1777,9 @@ BaseTransport = Class() {
         unit:EnableShield()
         unit:EnableDefaultToggleCaps()
         self:RequestRefreshUI()
+        if unit:GetBlueprint().Intel.StealthOnlyForTransport then
+            unit:DisableIntel('RadarStealth')
+        end
         unit:TransportAnimation(-1)
         unit:TransportLock(false)
         unit:OnDetachedToTransport(self)
