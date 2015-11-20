@@ -179,42 +179,6 @@ TIFSmartCharge = Class(DefaultProjectileWeapon) {
     end,
 }
 
-TIFCommanderDeathWeapon = Class(BareBonesWeapon) {
-    FiringMuzzleBones = {0}, -- just fire from the base bone of the unit
-
-    OnCreate = function(self)
-        BareBonesWeapon.OnCreate(self)
-        local myBlueprint = self:GetBlueprint()
-        -- The "or x" is supplying default values in case the blueprint doesn't have an overriding value
-        self.Data = {
-            NukeOuterRingDamage = myBlueprint.NukeOuterRingDamage or 10,
-            NukeOuterRingRadius = myBlueprint.NukeOuterRingRadius or 40,
-            NukeOuterRingTicks = myBlueprint.NukeOuterRingTicks or 20,
-            NukeOuterRingTotalTime = myBlueprint.NukeOuterRingTotalTime or 10,
-
-            NukeInnerRingDamage = myBlueprint.NukeInnerRingDamage or 2000,
-            NukeInnerRingRadius = myBlueprint.NukeInnerRingRadius or 30,
-            NukeInnerRingTicks = myBlueprint.NukeInnerRingTicks or 24,
-            NukeInnerRingTotalTime = myBlueprint.NukeInnerRingTotalTime or 24,
-        }
-        self:SetWeaponEnabled(false)
-    end,
-
-    OnFire = function(self)
-
-    end,
-
-    Fire = function(self)
-        local myBlueprint = self:GetBlueprint()
-        local myProjectile = self.unit:CreateProjectile( myBlueprint.ProjectileId, 0, 0, 0, nil, nil, nil):SetCollision(false)
-        myProjectile:PassDamageData(self:GetDamageTable())
-        if self.Data then
-            myProjectile:PassData(self.Data)
-        end
-    end,
-
-}
-
 TIFStrategicMissileWeapon = Class(DefaultProjectileWeapon) {}
 
 TIFArtilleryWeapon = Class(DefaultProjectileWeapon) {
