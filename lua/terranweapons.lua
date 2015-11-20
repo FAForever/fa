@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/terranweapons.lua
-#**  Author(s):  John Comes, David Tomandl, Gordon Duclos
-#**
-#**  Summary  :  Terran-specific weapon definitions
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/terranweapons.lua
+--**  Author(s):  John Comes, David Tomandl, Gordon Duclos
+--**
+--**  Summary  :  Terran-specific weapon definitions
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
 local CollisionBeams = import('defaultcollisionbeams.lua')
@@ -44,7 +44,6 @@ TDFHeavyPlasmaCannonWeapon = Class(DefaultProjectileWeapon) {
 TDFHeavyPlasmaGatlingCannonWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.THeavyPlasmaGatlingCannonMuzzleFlash,
 }
-
 
 TDFOverchargeWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TCommanderOverchargeFlash01,
@@ -108,7 +107,7 @@ TDFHiroPlasmaCannon = Class(DefaultBeamWeapon) {
 
 TAAFlakArtilleryCannon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TFlakCannonMuzzleFlash01,
-    # Custom over-ride for this weapon, so it passes data and damageTable
+    -- Custom over-ride for this weapon, so it passes data and damageTable
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
@@ -172,9 +171,7 @@ TANTorpedoAngler = Class(DefaultProjectileWeapon) {
     },
 }
 
-
 TIFSmartCharge = Class(DefaultProjectileWeapon) {
-
     CreateProjectileAtMuzzle = function(self, muzzle)
         local proj = DefaultProjectileWeapon.CreateProjectileAtMuzzle(self, muzzle)
         local tbl = self:GetBlueprint().DepthCharge
@@ -182,14 +179,13 @@ TIFSmartCharge = Class(DefaultProjectileWeapon) {
     end,
 }
 
-
 TIFCommanderDeathWeapon = Class(BareBonesWeapon) {
-    FiringMuzzleBones = {0}, # just fire from the base bone of the unit
+    FiringMuzzleBones = {0}, -- just fire from the base bone of the unit
 
     OnCreate = function(self)
         BareBonesWeapon.OnCreate(self)
         local myBlueprint = self:GetBlueprint()
-        # The "or x" is supplying default values in case the blueprint doesn't have an overriding value
+        -- The "or x" is supplying default values in case the blueprint doesn't have an overriding value
         self.Data = {
             NukeOuterRingDamage = myBlueprint.NukeOuterRingDamage or 10,
             NukeOuterRingRadius = myBlueprint.NukeOuterRingRadius or 40,
@@ -218,7 +214,6 @@ TIFCommanderDeathWeapon = Class(BareBonesWeapon) {
     end,
 
 }
-
 
 TIFStrategicMissileWeapon = Class(DefaultProjectileWeapon) {}
 
