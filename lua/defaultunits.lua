@@ -2133,7 +2133,7 @@ ACUUnit = Class(CommandUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         CommandUnit.OnStopBeingBuilt(self, builder, layer)
-        ArmyBrains[self:GetArmy()]:SetUnitStat(self:GetUnitId(), "lowest_health", self:GetHealth())
+        self:SetUnitStat("lowest_health", self:GetHealth())
     end,
 
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
@@ -2143,8 +2143,8 @@ ACUUnit = Class(CommandUnit) {
             aiBrain:OnPlayCommanderUnderAttackVO()
         end
 
-        if self:GetHealth() < ArmyBrains[self:GetArmy()]:GetUnitStat(self:GetUnitId(), "lowest_health") then
-            ArmyBrains[self:GetArmy()]:SetUnitStat(self:GetUnitId(), "lowest_health", self:GetHealth())
+        if self:GetHealth() < self:GetUnitStat("lowest_health") then
+            self:SetUnitStat("lowest_health", self:GetHealth())
         end
     end,
 
