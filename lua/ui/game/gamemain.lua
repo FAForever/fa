@@ -121,8 +121,10 @@ function OnFirstUpdate()
             local selected = false
             repeat
                 WaitSeconds(0.1)
-                SelectUnits(avatars)
-                selected = GetSelectedUnits()
+                if not gameUIHidden then
+                    SelectUnits(avatars)
+                    selected = GetSelectedUnits()
+                end
             until table.getsize(selected) > 0 or GameTick() > 50
         end)
     end
