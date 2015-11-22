@@ -41,7 +41,7 @@ Patch 3652 (pending)
 - Re-enabled death animation on non-naval units
 - Seraphim GW now uses all its 3 exits
 - Spread attack: Targets are now spread more uniformly across all units during the initial attack orders, further ones are random.
-
+- Allow Fatboy, Atlantis, Tempest and Czar to fire while building units
 
 
 **Bugs**
