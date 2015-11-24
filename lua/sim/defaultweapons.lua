@@ -1223,7 +1223,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
 }
 
 local NukeDamage = import('/lua/sim/NukeDamage.lua').NukeAOE
-DeathNukeWeapon = Class(BareBonesWeapon) {   
+DeathNukeWeapon = Class(BareBonesWeapon) {
     OnFire = function(self)
     end,
 
@@ -1247,5 +1247,16 @@ DeathNukeWeapon = Class(BareBonesWeapon) {
         local pos = proj:GetPosition()
         proj.InnerRing:DoNukeDamage(firer, pos)
         proj.OuterRing:DoNukeDamage(firer, pos)
+    end,
+}
+
+SCUDeathWeapon = Class(BareBonesWeapon) {
+    OnFire = function(self)
+    end,
+
+    Fire = function(self)
+        local myBlueprint = self:GetBlueprint()
+        local myProjectile = self.unit:CreateProjectile(myBlueprint.ProjectileId, 0, 0, 0, nil, nil, nil):SetCollision(false)
+        myProjectile:PassDamageData(self:GetDamageTable())
     end,
 }
