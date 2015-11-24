@@ -9,7 +9,7 @@ local EffectUtil = import('/lua/EffectUtilities.lua')
 local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
 local TWeapons = import('/lua/terranweapons.lua')
 local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
-local TIFCommanderDeathWeapon = TWeapons.TIFCommanderDeathWeapon
+local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
 
 UEL0301 = Class(CommandUnit) {
     IntelEffects = {
@@ -26,7 +26,7 @@ UEL0301 = Class(CommandUnit) {
         RightHeavyPlasmaCannon = Class(TDFHeavyPlasmaCannonWeapon) {
         },
 
-        DeathWeapon = Class(TIFCommanderDeathWeapon) {
+        DeathWeapon = Class(DeathNukeWeapon) {
         },
     },
 
