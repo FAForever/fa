@@ -536,11 +536,12 @@ AIBrain = Class(moho.aibrain_methods) {
 
     OnDefeat = function(self)
         if self.Result then return end
+        local my_army = self:GetArmyIndex()
 
         self:SetResult("defeat")
         ----For Sorian AI
         if self.BrainType == 'AI' then
-            SUtils.AISendChat('enemies', ArmyBrains[self:GetArmyIndex()].Nickname, 'ilost')
+            SUtils.AISendChat('enemies', ArmyBrains[my_army].Nickname, 'ilost')
         end
         local per = ScenarioInfo.ArmySetup[self.Name].AIPersonality
         if string.find(per, 'sorian') then
@@ -550,12 +551,13 @@ AIBrain = Class(moho.aibrain_methods) {
 
         SetArmyOutOfGame(self:GetArmyIndex())
 
-        import('/lua/SimUtils.lua').UpdateUnitCap(self:GetArmyIndex())
-        import('/lua/SimPing.lua').OnArmyDefeat(self:GetArmyIndex())
+        SetArmyOutOfGame(my_army)
+
+        import('/lua/SimUtils.lua').UpdateUnitCap(my_army)
+        import('/lua/SimPing.lua').OnArmyDefeat(my_army)
 
         local function KillArmy()
             local allies = {}
-            local selfIndex = self:GetArmyIndex()
             WaitSeconds(10)
             -- this part determiens the share condition
             local shareOption = ScenarioInfo.Options.Share or "no"
@@ -565,7 +567,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 for index, brain in ArmyBrains do
                     brain.index = index
                     brain.score = CalculateBrainScore(brain)
-                    if IsAlly(selfIndex, brain:GetArmyIndex()) and selfIndex ~= brain:GetArmyIndex() and not brain:IsDefeated() then
+                    if IsAlly(my_army, brain:GetArmyIndex()) and my_army ~= brain:GetArmyIndex() and not brain:IsDefeated() then
                         table.insert(allies, brain)
                     end
                 end
@@ -581,7 +583,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
             -- "yes" means share until death
             elseif shareOption == "yes" then
-                import('/lua/SimUtils.lua').KillSharedUnits(self:GetArmyIndex())
+                import('/lua/SimUtils.lua').KillSharedUnits(my_army)
                 local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
                 -- return borrowed units to their real owners
                 local borrowed = {}
