@@ -12,14 +12,14 @@ local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
 
 local AWeapons = import('/lua/aeonweapons.lua')
 local ADFReactonCannon = AWeapons.ADFReactonCannon
-local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
+local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local Buff = import('/lua/sim/Buff.lua')
 
 UAL0301 = Class(CommandUnit) {
     Weapons = {
         RightReactonCannon = Class(ADFReactonCannon) {},
-        DeathWeapon = Class(DeathNukeWeapon) {},
+        DeathWeapon = Class(SCUDeathWeapon) {},
     },
 
     __init = function(self)
