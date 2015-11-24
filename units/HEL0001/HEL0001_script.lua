@@ -8,6 +8,11 @@ HEL0001 = Class(moho.unit_methods) {
         self:SetIsValidTarget(false)
         self:SetCollisionShape('None')
     end,
+
+    Kill = function(self)
+        IssueClearCommands({self})
+        self:Destroy()
+    end,
 }
 
 TypeClass = HEL0001
