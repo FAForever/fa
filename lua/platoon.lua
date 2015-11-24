@@ -1633,7 +1633,7 @@ Platoon = Class(moho.platoon_methods) {
             local needEnergy = brain:GetEconomyStoredRatio('ENERGY') < 0.5
 
             for k,v in ents do
-                if eng.BadReclaimables[v] then continue end
+                if not IsProp(v) or eng.BadReclaimables[v] then continue end
                 if not needEnergy or v.MaxEnergyReclaim then
                     local rpos = v:GetCachePosition()
                     table.insert(reclaim, {entity=v, pos=rpos, distance=VDist2(pos[1], pos[3], rpos[1], rpos[3])})
