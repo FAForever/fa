@@ -549,7 +549,7 @@ AIBrain = Class(moho.aibrain_methods) {
         end
         ------end sorian AI bit
 
-        SetArmyOutOfGame(self:GetArmyIndex())
+        import('/lua/sim/score.lua').SendStats(my_army)
 
         SetArmyOutOfGame(my_army)
 

@@ -121,8 +121,10 @@ function fillBrainBpStats(brain, stats)
 end
 
 function fillBrainUnitStats(brain, stats)
-    for unitId, stats in brain:GetUnitStats() do
-        for statName, value in stats do
+    stats.units = stats.units or {}
+    for unitId, unit_stats in brain:GetUnitStats() do
+        for statName, value in unit_stats do
+            stats.units[unitId] = stats.units[unitId] or {}
             stats.units[unitId][statName] = value
         end
     end
@@ -131,7 +133,7 @@ end
 function UpdateBrainStats(brain)
     local army = brain:GetArmyIndex()
     if ArmyIsCivilian(army) then return end
-    local stats = {faction=brain:GetFactionIndex()}
+    local stats = {}
 
     recursiveFillBrainArmyStats(brain, stats, brainArmyStats)
     -- subtract reclaim rate from income
@@ -164,6 +166,28 @@ function StatsHistoryThread()
     while true do
         WaitSeconds(historyInterval)
         table.insert(statsData.historical, table.deepcopy(statsData.current))
+    end
+end
+
+function SendStats(army)
+    local my_army = GetFocusArmy()
+    local stats = ArmyStats
+    local data = {}
+
+    for index, brain in ArmyBrains do
+        if not stats[index] then continue end
+        if not army or my_army == army or IsAlly(my_army, army) then
+            data[index] = table.deepcopy(stats[index])
+            data[index].faction = brain:GetFactionIndex()
+            data[index].name = brain.Nickname
+            data[index].type = brain.BrainType
+            data[index].army = index
+            fillBrainUnitStats(brain, data[index])
+        end
+    end
+
+    if table.getsize(data) > 0 then
+        Sync.SendStats = data
     end
 end
 

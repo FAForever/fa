@@ -98,7 +98,7 @@ OnSync = function()
     end
 
     if Sync.SendStats then
-        local stats = {stats = Sync.Score }
+        local stats = {stats = Sync.SendStats}
         local json = import('/lua/system/dkson.lua').json.encode(stats)
         LOG('Sending stats: '..json)
         GpgNetSend('JsonStats', json)

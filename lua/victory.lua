@@ -86,6 +86,7 @@ end
 
 function CallEndGame()
     gameOver = true
+    import('/lua/sim/score.lua').SendStats()
     ForkThread(function()
         WaitSeconds(3)
         EndGame()
