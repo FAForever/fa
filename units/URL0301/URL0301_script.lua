@@ -14,14 +14,14 @@ local Buff = import('/lua/sim/Buff.lua')
 
 local CAAMissileNaniteWeapon = CWeapons.CAAMissileNaniteWeapon
 local CDFLaserDisintegratorWeapon = CWeapons.CDFLaserDisintegratorWeapon02
-local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
+local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
 
 URL0301 = Class(CCommandUnit) {
     LeftFoot = 'Left_Foot02',
     RightFoot = 'Right_Foot02',
 
     Weapons = {
-        DeathWeapon = Class(DeathNukeWeapon) {},
+        DeathWeapon = Class(SCUDeathWeapon) {},
         RightDisintegrator = Class(CDFLaserDisintegratorWeapon) {
             OnCreate = function(self)
                 CDFLaserDisintegratorWeapon.OnCreate(self)
