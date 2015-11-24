@@ -16,13 +16,13 @@ local Buff = import('/lua/sim/Buff.lua')
 local SDFLightChronotronCannonWeapon = SWeapons.SDFLightChronotronCannonWeapon
 local SDFOverChargeWeapon = SWeapons.SDFLightChronotronCannonOverchargeWeapon
 local SIFLaanseTacticalMissileLauncher = SWeapons.SIFLaanseTacticalMissileLauncher
-local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
+local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
 XSL0301 = Class(CommandUnit) {
     Weapons = {
         LightChronatronCannon = Class(SDFLightChronotronCannonWeapon) {},
-        DeathWeapon = Class(DeathNukeWeapon) {},
+        DeathWeapon = Class(SCUDeathWeapon) {},
         OverCharge = Class(SDFOverChargeWeapon) {},
         Missile = Class(SIFLaanseTacticalMissileLauncher) {
             OnCreate = function(self)
