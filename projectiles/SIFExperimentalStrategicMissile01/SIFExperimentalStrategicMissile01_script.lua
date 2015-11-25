@@ -40,7 +40,7 @@ SIFExperimentalStrategicMissile01 = Class(SExperimentalStrategicMissile) {
         if not TargetEntity or not EntityCategoryContains(categories.PROJECTILE, TargetEntity) then
             local pos = self:GetPosition()
             pos[2] = pos[2] + 20
-            Warp(effectEntity, pos)
+            Warp(self.effectEntity, pos)
         end
     end,
 }

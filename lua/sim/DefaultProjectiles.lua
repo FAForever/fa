@@ -133,8 +133,8 @@ NukeProjectile = Class(NullShell) {
                 self:PlaySound(myBlueprint.Audio.NukeExplosion)
             end
             
-            effectEntity = self:CreateProjectile(self.effectEntityPath, 0, 0, 0, nil, nil, nil):SetCollision(false)
-            effectEntity:ForkThread(effectEntity.EffectThread)
+            self.effectEntity = self:CreateProjectile(self.effectEntityPath, 0, 0, 0, nil, nil, nil):SetCollision(false)
+            self.effectEntity:ForkThread(self.effectEntity.EffectThread)
             self:ForkThread(self.ForceThread)
         end
         NullShell.OnImpact(self, TargetType, TargetEntity)
