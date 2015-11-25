@@ -222,7 +222,7 @@ function SyncScores()
         victory.sendStats = false
     end
 
-    if observer or import('/lua/victory.lua').gameOver or Sync.SendStats then
+    if observer or victory.gameOver or Sync.SendStats then
         Sync.FullScoreSync = true
         Sync.ScoreAccum = scoreData
         Sync.Score = scoreData.current
