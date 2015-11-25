@@ -29,7 +29,7 @@ SIFExperimentalStrategicMissile01 = Class(SExperimentalStrategicMissile) {
 	},
     
     OnCreate = function(self)
-        SIFInainoStrategicMissile.OnCreate(self)
+        SExperimentalStrategicMissile.OnCreate(self)
         self.effectEntityPath = '/effects/entities/SeraphimNukeEffectController01/SeraphimNukeEffectController01_proj.bp'
         self:LauncherCallbacks()
     end, 
