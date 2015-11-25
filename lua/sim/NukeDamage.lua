@@ -25,10 +25,10 @@ NukeAOE = Class() {
 
         -- Since we're not allowed to have an inner radius of 0 in the DamageRing function,
         -- I'm manually executing the first tick of damage with a DamageArea function.
-        DamageArea(launcher, pos, ringWidth, self.Damage, damageType, true, true)
+        DamageArea(launcher, pos, ringWidth, self.Damage, 'Nuke', true, true)
         WaitSeconds(tickLength)
         for i = 2, self.Ticks do
-            DamageRing(launcher, pos, ringWidth * (i - 1), ringWidth * i, self.Damage, damageType, true, true)
+            DamageRing(launcher, pos, ringWidth * (i - 1), ringWidth * i, self.Damage, 'Nuke', true, true)
             WaitSeconds(tickLength)
         end
     end,
