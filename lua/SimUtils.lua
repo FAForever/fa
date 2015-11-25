@@ -72,7 +72,8 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         -- Units currently being captured is also denied
         local disallowTransfer = owner == ToArmyIndex or
                                  v:GetParent() ~= v or (v.Parent and v.Parent ~= v) or
-                                 v.CaptureProgress > 0
+                                 v.CaptureProgress > 0 or
+                                 EntityCategoryContains(categories.UNTARGETABLE, v)
 
         if disallowTransfer then
             continue
@@ -114,6 +115,7 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         -- changing owner
         unit:RefreshIntel()
         unit = ChangeUnitArmy(unit,ToArmyIndex)
+
         if not unit then
             continue
         end

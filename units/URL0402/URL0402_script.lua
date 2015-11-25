@@ -127,8 +127,6 @@ URL0402 = Class(CWalkingLandUnit) {
 	end,
 
     OnKilled = function(self, inst, type, okr)
-        self.Trash:Destroy()
-        self.Trash = TrashBag()
         if self.AmbientExhaustEffectsBag then
             EffectUtil.CleanupEffectBag(self,'AmbientExhaustEffectsBag')
         end

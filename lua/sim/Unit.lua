@@ -17,7 +17,7 @@ local utilities = import('/lua/utilities.lua')
 local Shield = import('/lua/shield.lua').Shield
 local PersonalBubble = import('/lua/shield.lua').PersonalBubble
 local TransportShield = import('/lua/shield.lua').TransportShield
-local UnitShield = import('/lua/shield.lua').UnitShield
+local PersonalShield = import('/lua/shield.lua').PersonalShield
 local AntiArtilleryShield = import('/lua/shield.lua').AntiArtilleryShield
 local Buff = import('/lua/sim/buff.lua')
 local AIUtils = import('/lua/ai/aiutilities.lua')
@@ -36,6 +36,8 @@ local EXPERIMENTAL_XP = 50
 
 -- For killing any unit that doesn't match any of the other categories.
 local DEFAULT_XP = 1
+
+local GetUnitBeingBuiltWarning = false
 
 SyncMeta = {
     __index = function(t,key)
@@ -256,7 +258,7 @@ Unit = Class(moho.unit_methods) {
 
         --Ensure transport slots are available
         self.attachmentBone = nil
-        self.slotsFree = {}
+        self.slotsTaken = {}
 
         -- Set up Adjacency container
         self.AdjacentUnits = {}
@@ -788,6 +790,14 @@ Unit = Class(moho.unit_methods) {
         self:StartReclaimEffects(target)
         self:PlayUnitSound('StartReclaim')
         self:PlayUnitAmbientSound('ReclaimLoop')
+        
+        -- Force me to move on to the guard properly when done
+        local guard = self:GetGuardedUnit()
+        if guard then
+            IssueClearCommands({self})
+            IssueReclaim({self}, target)
+            IssueGuard({self}, guard)
+        end
     end,
 
     OnStopReclaim = function(self, target)
@@ -1785,6 +1795,19 @@ Unit = Class(moho.unit_methods) {
     OnBeingBuiltProgress = function(self, unit, oldProg, newProg)
     end,
 
+    SetRotation = function(self, angle)
+        qx, qy, qz, qw = explosion.QuatFromRotation(angle, 0, 1, 0)
+        self:SetOrientation({qx, qy, qz, qw}, true)
+    end,
+
+    Rotate = function(self, angle)
+        local qx, qy, qz, qw = unpack(self:GetOrientation())
+        local a = math.atan2(2.0*(qx*qz + qw*qy), qw*qw + qx*qx - qz*qz - qy*qy)
+        local current_yaw = math.floor(math.abs(a) * (180 / math.pi) + 0.5)
+
+        self:SetRotation(angle + current_yaw)
+    end,
+
     OnStartBeingBuilt = function(self, builder, layer)
         self:StartBeingBuiltEffects(builder, layer)
         local aiBrain = self:GetAIBrain()
@@ -2559,12 +2582,14 @@ Unit = Class(moho.unit_methods) {
             self:GetWeapon(i):SetValidTargetsForCurrentLayer(new)
         end
 
-        if (old == 'Seabed' or old == 'None') and new == 'Land' then
-            self:EnableIntel('Vision')
+        if (old == 'Seabed' or old == 'Water' or old == 'Sub' or old == 'None') and new == 'Land' then
             self:DisableIntel('WaterVision')
-        elseif (old == 'Land' or old == 'None') and new == 'Seabed' then
+        elseif (old == 'Land' or old == 'None') and (new == 'Seabed' or new == 'Water' or new == 'Sub') then
             self:EnableIntel('WaterVision')
-        elseif (old == 'None') then
+        end
+        
+        -- All units want normal vision!
+        if (old == 'None') then
             self:EnableIntel('Vision')
         end
 
@@ -3167,10 +3192,15 @@ Unit = Class(moho.unit_methods) {
     GetSoundEntity = function(self, type)
         if not self.Sounds then self.Sounds = {} end
         if not self.Sounds[type] then
-            local sndEnt = Entity()
-            self.Trash:Add(sndEnt)
-            Warp(sndEnt, self:GetPosition())
-            sndEnt:AttachTo(self,-1)
+            if self.SoundEntities[1] then
+                sndEnt = table.remove(self.SoundEntities, 1)
+            else
+                sndEnt = Entity()
+                Warp(sndEnt, self:GetPosition())
+                sndEnt:AttachTo(self,-1)
+                self.Trash:Add(sndEnt)
+            end
+
             self.Sounds[type] = sndEnt
         end
 
@@ -3198,9 +3228,10 @@ Unit = Class(moho.unit_methods) {
         local type = 'Ambient' .. sound
         local entity = self:GetSoundEntity(type)
         if entity then
-            entity:SetAmbientSound(nil, nil)
-            entity:Destroy()
             self.Sounds[type] = nil
+            entity:SetAmbientSound(nil, nil)
+            self.SoundEntities = self.SoundEntities or {}
+            table.insert(self.SoundEntities, entity)
         end
     end,
 
@@ -3351,38 +3382,25 @@ Unit = Class(moho.unit_methods) {
         end
 
         --When adding debuffs we have to make sure that we check for permissions
-        local allow = categories.ALLUNITS
-        if buffTable.TargetAllow then
-            allow = ParseEntityCategory(buffTable.TargetAllow)
-        end
-        local disallow
+        local category = buffTable.TargetAllow and ParseEntityCategory(buffTable.TargetAllow) or categories.ALLUNITS
         if buffTable.TargetDisallow then
-            disallow = ParseEntityCategory(buffTable.TargetDisallow)
+            category = category - ParseEntityCategory(buffTable.TargetDisallow)
         end
 
         if bt == 'STUN' then
-           if buffTable.Radius and buffTable.Radius > 0 then
+            local targets
+            if buffTable.Radius and buffTable.Radius > 0 then
                 --If the radius is bigger than 0 then we will use the unit as the center of the stun blast
                 --and collect all targets from that point
-                local targets = {}
-                if PosEntity then
-                    targets = utilities.GetEnemyUnitsInSphere(self, PosEntity, buffTable.Radius)
-                else
-                    targets = utilities.GetEnemyUnitsInSphere(self, self:GetPosition(), buffTable.Radius)
-                end
-                if not targets then
-                    return
-                end
-                for k, v in targets do
-                    if EntityCategoryContains(allow, v) and (not disallow or not EntityCategoryContains(disallow, v)) then
-                        v:SetStunned(buffTable.Duration or 1)
-                    end
-                end
+                targets = self:GetAIBrain():GetUnitsAroundPoint(category, PosEntity or self:GetPosition(), buffTable.Radius, 'Enemy')
             else
                 --The buff will be applied to the unit only
-                if EntityCategoryContains(allow, self) and (not disallow or not EntityCategoryContains(disallow, self)) then
-                    self:SetStunned(buffTable.Duration or 1)
+                if EntityCategoryContains(category, self) then
+                    targets = {self}
                 end
+            end
+            for _, target in targets or {} do
+                target:SetStunned(buffTable.Duration or 1)
             end
         elseif bt == 'MAXHEALTH' then
             self:SetMaxHealth(self:GetMaxHealth() + (buffTable.Value or 0))
@@ -3570,7 +3588,7 @@ Unit = Class(moho.unit_methods) {
         self:DestroyShield()
 
         if bpShield.PersonalShield then
-            self.MyShield = UnitShield(bpShield, self)
+            self.MyShield = PersonalShield(bpShield, self)
         elseif bpShield.AntiArtilleryShield then
             self.MyShield = AntiArtilleryShield(bpShield, self)
         elseif bpShield.PersonalBubble then
@@ -3632,7 +3650,7 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
     OnStartTransportBeamUp = function(self, transport, bone)
         --Ensures bone availability
-        if transport.slotsFree[bone] == false then
+        if transport.slotsTaken[bone] then
             IssueClearCommands({self})
             IssueClearCommands({transport})
             return
@@ -3671,48 +3689,22 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    OnStorageChange = function(self, loading)
+        self:MarkWeaponsOnTransport(self, loading)
+
+        if loading then self:HideBone(0, true)
+        else self:ShowBone(0, true) end
+        self:SetCanTakeDamage(not loading)
+        self:SetReclaimable(not loading)
+        self:SetCapturable(not loading)
+    end,
+
     OnAddToStorage = function(self, unit)
-        if EntityCategoryContains(categories.CARRIER, unit) then
-            self:MarkWeaponsOnTransport(self, true)
-            self:HideBone(0, true)
-            self:SetCanTakeDamage(false)
-            self:SetReclaimable(false)
-            self:SetCapturable(false)
-            if EntityCategoryContains(categories.TRANSPORTATION, self) then
-                local cargo = self:GetCargo()
-                if table.getn(cargo) > 0 then
-                    for k, v in cargo do
-                        v:MarkWeaponsOnTransport(self, true)
-                        v:HideBone(0, true)
-                        v:SetCanTakeDamage(false)
-                        v:SetReclaimable(false)
-                        v:SetCapturable(false)
-                    end
-                end
-            end
-        end
+        self:OnStorageChange(true)
     end,
 
     OnRemoveFromStorage = function(self, unit)
-        if EntityCategoryContains(categories.CARRIER, unit) then
-            self:SetCanTakeDamage(true)
-            self:SetReclaimable(true)
-            self:SetCapturable(true)
-            self:ShowBone(0, true)
-            self:MarkWeaponsOnTransport(self, false)
-            if EntityCategoryContains(categories.TRANSPORTATION, self) then
-                local cargo = self:GetCargo()
-                if table.getn(cargo) > 0 then
-                    for k, v in cargo do
-                        v:MarkWeaponsOnTransport(self, false)
-                        v:ShowBone(0, true)
-                        v:SetCanTakeDamage(true)
-                        v:SetReclaimable(true)
-                        v:SetCapturable(true)
-                    end
-                end
-            end
-        end
+        self:OnStorageChange(false)
     end,
 
     -- Animation when being dropped from a transport.
@@ -3742,6 +3734,14 @@ Unit = Class(moho.unit_methods) {
                 WaitFor(self.TransAnimation)
             end
         end
+    end,
+
+    TransportLock = function(self, bool)
+        bool = bool == true
+        if bool ~= self.TransportLock then
+            self.Sync.locked = bool
+        end
+        self.TransportLocked = bool
     end,
 
     -------------------------------------------------------------------------------------------
@@ -3935,32 +3935,34 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnAttachedToTransport = function(self, transport, bone)
+        transport.slotsTaken = transport.slotsTaken or {}
         self:DoUnitCallbacks( 'OnAttachedToTransport', transport )
         for i=1,transport:GetBoneCount() do
             if transport:GetBoneName(i) == bone then
                 self.attachmentBone = i
-                transport.slotsFree[i] = false
+                transport.slotsTaken[bone] = true
             end
         end
     end,
 
     OnDetachedToTransport = function(self, transport)
-        if not transport.slotsFree then
-            transport.slotsFree = {}
-        end
         if not self.attachmentBone then
             self.attachmentBone = -100
         end
         self:DoUnitCallbacks( 'OnDetachedToTransport', transport )
-        transport.slotsFree[self.attachmentBone] = true
+        transport.slotsTaken[self.attachmentBone] = nil
         self.attachmentBone = nil
     end,
 
     --- Deprecated functionality
     GetUnitBeingBuilt = function(self)
-        WARN("Deprecated function GetUnitBeingBuilt called at")
-        WARN(debug.traceback())
-        self.GetUnitBeingBuilt = function(self) return self.UnitBeingBuilt end
+        if not GetUnitBeingBuiltWarning then
+            WARN("Deprecated function GetUnitBeingBuilt called at")
+            WARN(debug.traceback())
+            WARN("Further warnings of this will be suppressed")
+            GetUnitBeingBuiltWarning = true
+        end
+
         return self.UnitBeingBuilt
     end,
 

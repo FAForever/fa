@@ -19,7 +19,7 @@ function BeginSession()
 
     baseBeginSession()
 
-    import('/lua/score.lua').init()
+    import('/lua/sim/score.lua').init()
     
     --start watching for victory conditions
     ForkThread(import('/lua/victory.lua').CheckVictory, ScenarioInfo)

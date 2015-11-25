@@ -11,7 +11,7 @@
 local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
 local AWeapons = import('/lua/aeonweapons.lua')
 local ADFDisruptorCannonWeapon = AWeapons.ADFDisruptorCannonWeapon
-local AIFCommanderDeathWeapon = AWeapons.AIFCommanderDeathWeapon
+local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local ADFOverchargeWeapon = AWeapons.ADFOverchargeWeapon
@@ -20,7 +20,7 @@ local Buff = import('/lua/sim/Buff.lua')
 
 UAL0001 = Class(ACUUnit) {
     Weapons = {
-        DeathWeapon = Class(AIFCommanderDeathWeapon) {},
+        DeathWeapon = Class(DeathNukeWeapon) {},
         RightDisruptor = Class(ADFDisruptorCannonWeapon) {},
         ChronoDampener = Class(ADFChronoDampener) {},
         OverCharge = Class(ADFOverchargeWeapon) {},

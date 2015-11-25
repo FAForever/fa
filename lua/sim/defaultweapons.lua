@@ -12,13 +12,6 @@ local CalculateBallisticAcceleration = import('/lua/sim/CalcBallisticAcceleratio
 -- Most weapons derive from this class, including beam weapons later in this file
 DefaultProjectileWeapon = Class(Weapon) {
 
-    -- Record the initial damage of the weapon for future use
-    GetDamageTable = function(self)
-        local table = Weapon.GetDamageTable(self)
-        table.InitialDamageAmount = self:GetBlueprint().InitialDamage or 0
-        return table
-    end,
-
     FxRackChargeMuzzleFlash = {},
     FxRackChargeMuzzleFlashScale = 1,
     FxChargeMuzzleFlash = {},
@@ -566,6 +559,12 @@ DefaultProjectileWeapon = Class(Weapon) {
             if bp.CountedProjectile == true  or bp.AnimationReload then
                 ChangeState(self, self.RackSalvoFiringState)
             end
+
+            -- To prevent weapon getting stuck targeting something out of fire range but withing tracking radius
+            WaitSeconds(5)
+
+            -- Check if there is a better target nearby
+            self:ResetTarget()
         end,
 
         OnFire = function(self)
@@ -857,7 +856,8 @@ KamikazeWeapon = Class(Weapon) {
     OnFire = function(self)
         local myBlueprint = self:GetBlueprint()
         DamageArea(self.unit, self.unit:GetPosition(), myBlueprint.DamageRadius, myBlueprint.Damage, myBlueprint.DamageType or 'Normal', myBlueprint.DamageFriendly or false)
-        self.unit:Kill()
+        self.unit:PlayUnitSound('Destroyed')
+        self.unit:Destroy()
     end,
 }
 
@@ -874,25 +874,70 @@ BareBonesWeapon = Class(Weapon) {
 }
 
 OverchargeWeapon = Class(DefaultProjectileWeapon) {
+    NeedsUpgrade = false,
+    AutoMode = false,
+    AutoThread = nil,
+    EnergyRequired = nil,
+
+    HasEnergy = function(self)
+        return self.unit:GetAIBrain():GetEconomyStored('ENERGY') >= self.EnergyRequired
+    end,
+
+    CanOvercharge = function(self)
+        return not self.unit:IsOverchargePaused() and self:HasEnergy()
+    end,
+
     -- The Overcharge cool-down function
     PauseOvercharge = function(self)
         if not self.unit:IsOverchargePaused() then
             self.unit:SetOverchargePaused(true)
+            self:OnDisableWeapon()
             WaitSeconds(1/self:GetBlueprint().RateOfFire)
             self.unit:SetOverchargePaused(false)
+            if self.AutoMode then
+                self:ForkThread(self.AutoEnable)
+            end
+        end
+    end,
+
+    AutoEnable = function(self)
+        while not self:CanOvercharge() do
+             WaitSeconds(0.1)
+        end
+
+        self:OnEnableWeapon()
+    end,
+
+    SetAutoOvercharge = function(self, auto)
+        self.AutoMode = auto
+
+        if self.AutoMode then
+            if not self.AutoThread then
+                self.AutoThread = self:ForkThread(self.AutoEnable)
+            end
+        elseif self.AutoThread then
+            KillThread(self.AutoThread)
+            self.AutoThread = nil
         end
     end,
 
     OnCreate = function(self)
         DefaultProjectileWeapon.OnCreate(self)
+        self.EnergyRequired = self:GetBlueprint().EnergyRequired
         self:SetWeaponEnabled(false)
         self.AimControl:SetEnabled(false)
         self.AimControl:SetPrecedence(0)
         self.unit:SetOverchargePaused(false)
     end,
 
+    OnGotTarget = function(self)
+        if self:CanOvercharge() then
+            DefaultProjectileWeapon.OnGotTarget(self)
+        end
+    end,
+
     OnFire = function(self)
-        if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
+        if self:CanOvercharge() then
             DefaultProjectileWeapon.OnFire(self)
         end
     end,
@@ -918,23 +963,27 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         self.AimControl:SetPrecedence(0)
         self.unit.BuildArmManipulator:SetPrecedence(0)
         self.unit:GetWeaponManipulatorByLabel(self.DesiredWeaponLabel):SetHeadingPitch(self.AimControl:GetHeadingPitch())
+
+        if self.AutoMode then
+            self:ForkThread(self.AutoEnable)
+        end
     end,
 
     OnWeaponFired = function(self)
         DefaultProjectileWeapon.OnWeaponFired(self)
-        self:OnDisableWeapon()
         self:ForkThread(self.PauseOvercharge)
     end,
 
     -- Weapon State Modifications
     IdleState = State(DefaultProjectileWeapon.IdleState) {
         OnGotTarget = function(self)
-            if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
+            if self:CanOvercharge() then
                 DefaultProjectileWeapon.IdleState.OnGotTarget(self)
             end
         end,
+
         OnFire = function(self)
-            if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
+            if self:CanOvercharge() then
                 ChangeState(self, self.RackSalvoFiringState)
             end
         end,
@@ -942,7 +991,7 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
 
     RackSalvoFireReadyState = State(DefaultProjectileWeapon.RackSalvoFireReadyState) {
         OnFire = function(self)
-            if not self.unit:IsOverchargePaused() and self.unit:GetAIBrain():GetEconomyStored('ENERGY') > self:GetBlueprint().EnergyRequired then
+            if self:CanOvercharge() then
                 DefaultProjectileWeapon.RackSalvoFireReadyState.OnFire(self)
             end
         end,
@@ -1170,5 +1219,44 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
             return false
         end
         return true
+    end,
+}
+
+local NukeDamage = import('/lua/sim/NukeDamage.lua').NukeAOE
+DeathNukeWeapon = Class(BareBonesWeapon) {
+    OnFire = function(self)
+    end,
+
+    Fire = function(self)
+        local bp = self:GetBlueprint()
+        local proj = self.unit:CreateProjectile(bp.ProjectileId, 0, 0, 0, nil, nil, nil):SetCollision(false)
+        proj:ForkThread(proj.EffectThread)
+        
+        -- Play the explosion sound
+        local projBp = proj:GetBlueprint()
+        if projBp.Audio.NukeExplosion then
+            self:PlaySound(projBp.Audio.NukeExplosion)
+        end
+        
+        proj.InnerRing = NukeDamage()
+        proj.InnerRing:OnCreate(bp.NukeInnerRingDamage, bp.NukeInnerRingRadius, bp.NukeInnerRingTicks, bp.NukeInnerRingTotalTime)
+        proj.OuterRing = NukeDamage()
+        proj.OuterRing:OnCreate(bp.NukeOuterRingDamage, bp.NukeOuterRingRadius, bp.NukeOuterRingTicks, bp.NukeOuterRingTotalTime)
+        
+        local firer = self.unit
+        local pos = proj:GetPosition()
+        proj.InnerRing:DoNukeDamage(firer, pos)
+        proj.OuterRing:DoNukeDamage(firer, pos)
+    end,
+}
+
+SCUDeathWeapon = Class(BareBonesWeapon) {
+    OnFire = function(self)
+    end,
+
+    Fire = function(self)
+        local myBlueprint = self:GetBlueprint()
+        local myProjectile = self.unit:CreateProjectile(myBlueprint.ProjectileId, 0, 0, 0, nil, nil, nil):SetCollision(false)
+        myProjectile:PassDamageData(self:GetDamageTable())
     end,
 }

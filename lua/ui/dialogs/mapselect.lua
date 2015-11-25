@@ -974,7 +974,8 @@ function PopulateMapList()
 
         if passedFiltering then
             -- Make sure we finish up with the right map selected.
-            if string.lower(sceninfo.file) == string.lower(selectedScenario.file) then
+            
+            if selectedScenario and string.lower(sceninfo.file) == string.lower(selectedScenario.file) then
                 selectedRow = count - 1
             end
 
