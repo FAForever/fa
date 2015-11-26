@@ -13,7 +13,7 @@ XRL0302 = Class(CWalkingLandUnit) {
     -- three situations to ever blow up the bomb. The unit getting in range and firing, the 
     -- player pressing the detonate button, or the player using CTRL-K to suicide the unit.
 
-    -- Since the weapon itself kills the unit with self.unit:Kill(), and CTRL-K detonates the
+    -- Since the weapon itself kills the unit with self.unit:Destroy(), and CTRL-K detonates the
     -- weapon immediately thanks to selfdestruct.lua, we don't need any logic here for OnKilled()
 
     Weapons = {        
@@ -24,16 +24,6 @@ XRL0302 = Class(CWalkingLandUnit) {
     OnProductionPaused = function(self)
         self:GetWeaponByLabel('Suicide'):FireWeapon()
     end,
-    
-    OnKilled = function(self, instigator, type, overkillRatio)
-        -- We need to leave no wreck on suicide. instigator can only be self when the
-        -- weapon is fired, as it passes it specially.
-        if instigator == self then
-            -- The weapon takes care of destroying the unit
-            self:GetWeaponByLabel('Suicide'):FireWeapon()
-        else
-            CWalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)
-        end
-    end,
 }
+
 TypeClass = XRL0302
