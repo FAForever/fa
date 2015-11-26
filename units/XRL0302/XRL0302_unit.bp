@@ -134,7 +134,7 @@ UnitBlueprint {
             RULEUTC_ProductionToggle = {
                 --  more options in textures.scd\textures\ui\common\game\orders
                 bitmapId = 'overcharge',
-                helpText = 'detonate',
+                helpText = 'Detonate',
             },
         },
         ToggleCaps = {
