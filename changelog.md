@@ -1,9 +1,6 @@
 Patch 3652 (pending)
 ============================
 
-**Whole Game**
-- Introduced the start of a Russian translation
-
 **Lobby**
 - Name filter when selecting map
 - Prevent host from changing teams of others while ready
@@ -25,6 +22,8 @@ Patch 3652 (pending)
 - Fixed bug with buildpower not visible in unitview
 - Score display in the top-right no longer counts reclaim into the Mass/Energy income shown in observer mode
 - Allow Hotbuild to find Support Factories
+- Allow the UI code to search active mods for unit icons. Mods will have to have the icons in the right place (/modname/icons/units/xxx_icon.dds). Confirmed working for Total Mayhem at least, and probably many more.
+- Show ren_networkstats in Connectivity Screen (F11)
 
 **Gameplay**
 - Teamkill is now detected and a player can make an explicit report
