@@ -367,7 +367,7 @@ function RotateLayout(direction)
 end
 
 --* given a path and name relative to the skin path, returns the full path based on the current skin
-function UIFile(filespec, calledFromSim)
+function UIFile(filespec, checkMods)
     if UIFileBlacklist[filespec] then return filespec end
     local skins = import('/lua/skins/skins.lua').skins
     local useSkin = currentSkin()
@@ -389,7 +389,7 @@ function UIFile(filespec, calledFromSim)
                 if not DiskGetFileInfo(found) then
                     -- Check mods
                     local inmod = false
-                    if calledFromSim then
+                    if checkMods then
                         if __active_mods then
                             for id, mod in __active_mods do
                                 if DiskGetFileInfo(mod.location .. filespec) then
