@@ -214,13 +214,13 @@ function ScoreDisplayResourcesThread()
 end
 
 function SyncScores()
-    local my_army = GetFocusArmy()
-
-    if my_army == -1 or import('/lua/victory.lua').gameOver then
+    if IsObserver() or import('/lua/victory.lua').gameOver then
         Sync.FullScoreSync = true
         Sync.ScoreAccum = scoreData
         Sync.Score = scoreData.current
     else
+        local my_army = GetFocusArmy()
+
         for index, brain in ArmyBrains do
             Sync.Score[index] = {}
             Sync.Score[index].general = {}

@@ -44,6 +44,13 @@ end
 --===================================================================================
 doscript '/lua/SimSync.lua'
 
+local observer = false
+function IsObserver()
+    -- If focus army ever is -1, assume it's an observing player or replay
+    observer = observer or GetFocusArmy() == -1
+    return observer
+end
+
 --===================================================================================
 --SetupSession will be called by the engine after ScenarioInfo is set
 --but before any armies are created.
