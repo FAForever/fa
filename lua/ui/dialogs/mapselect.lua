@@ -845,7 +845,6 @@ function SetupOptionsPanel(parent, curOptions)
                     local key = val.key or val
                     local text = val.text or optData.value_text
                     local help = val.help or optData.value_help
-
                     itemArray[index] = LOCF(text, key)
                     line.combo.keyMap[key] = index
                     tooltipTable[index]={text=optData.label, body=LOCF(help, key)}
