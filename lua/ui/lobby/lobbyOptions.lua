@@ -401,7 +401,7 @@ globalOpts = {
         },
     },
    {
-        default = 1,
+        default = 2,
         label = "<LOC lobui_0727>Score",
         help = "<LOC lobui_0728>Set score on or off during the game",
         key = 'Score',
