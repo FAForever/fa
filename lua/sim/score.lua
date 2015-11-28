@@ -224,8 +224,16 @@ function SyncScores()
         for index, brain in ArmyBrains do
             Sync.Score[index] = {}
             Sync.Score[index].general = {}
+            
+            -- Resources will only be displayed if it's a replay, but we still need to sync 
+            -- them for when a viewer is watching from a player's perspective
+            Sync.Score[index].resources = {}
+            Sync.Score[index].resources.massin = {}
+            Sync.Score[index].resources.energyin = {}
 
             if my_army == index then
+                Sync.Score[index].resources.massin.rate = ArmyScore[index].resources.massin.rate
+                Sync.Score[index].resources.energyin.rate = ArmyScore[index].resources.energyin.rate
                 Sync.Score[index].general.currentunits = {}
                 Sync.Score[index].general.currentunits.count = ArmyScore[index].general.currentunits.count
                 Sync.Score[index].general.currentcap = {}
