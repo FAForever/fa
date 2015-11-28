@@ -2689,9 +2689,9 @@ function CreateUI(maxPlayers)
                 LayoutHelpers.AtRightTopIn(line.value, line, 5, 16)
                 LayoutHelpers.ResetLeft(line.value)
             end
-            line.text:SetText(LOC(data.text))
+            line.text:SetText(LOCF(data.text, data.key))
             line.bg:Show()
-            line.value:SetText(LOC(data.value))
+            line.value:SetText(LOCF(data.value, data.key))
             line.bg2:Show()
             line.bg.HandleEvent = Group.HandleEvent
             line.bg2.HandleEvent = Bitmap.HandleEvent
@@ -3092,8 +3092,9 @@ function RefreshOptionDisplayData(scenarioInfo)
         -- Scan the values array to find the one with the key matching our value for that option.
         for k, val in optData.values do
             if val.key == gameOption then
+                option.key = val.key
                 option.value = val.text
-                option.valueTooltip = {text = optData.label, body = val.help }
+                option.valueTooltip = {text = optData.label, body = val.help}
 
                 table.insert(formattedOptions, option)
 
