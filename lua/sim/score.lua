@@ -213,8 +213,10 @@ function ScoreDisplayResourcesThread()
     end
 end
 
+local observer = false
 function SyncScores()
-    if IsObserver() or import('/lua/victory.lua').gameOver then
+    observer = observer or GetFocusArmy() == -1
+    if observer or import('/lua/victory.lua').gameOver then
         Sync.FullScoreSync = true
         Sync.ScoreAccum = scoreData
         Sync.Score = scoreData.current
