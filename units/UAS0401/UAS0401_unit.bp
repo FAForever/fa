@@ -167,7 +167,7 @@ UnitBlueprint {
                 },
                 {
                     AlbedoName = 'uas0401_lod1_albedo.dds',
-                    LODCutoff = 600,
+                    LODCutoff = 900,
                     ShaderName = 'Aeon',
                     SpecularName = 'uas0401_lod1_specteam.dds',
                 },
