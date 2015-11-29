@@ -2305,7 +2305,7 @@ Unit = Class(moho.unit_methods) {
         -- We need this guard because the engine emits an early OnLayerChange event that would screw us up here.
         -- The NotInitialized disabler is removed in OnStopBeingBuilt, when the Unit's intel engine state is properly initialized.
         if self.IntelDisables['Radar']['NotInitialized'] == true and disabler ~= 'NotInitialized' then
-            SPEW('Leaving EnableUnitIntel because NotInitialized. This should only happen once per unit spawned.')
+            --SPEW('Leaving EnableUnitIntel because NotInitialized. This should only happen once per unit spawned.')
             return
         end
 
