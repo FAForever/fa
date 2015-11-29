@@ -201,9 +201,8 @@ function UpdateWindow(info)
         controls.abilities:Hide()
     else
         local bp = __blueprints[info.blueprintId]
-        local id = info.blueprintId
-        if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds', true)) then
-            controls.icon:SetTexture(UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds', true))
+        if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. info.blueprintId .. '_icon.dds', true)) then
+            controls.icon:SetTexture(UIUtil.UIFile('/icons/units/' .. info.blueprintId .. '_icon.dds', true))
         else
             controls.icon:SetTexture('/textures/ui/common/game/unit_view_icons/unidentified.dds')
         end
@@ -313,8 +312,8 @@ function UpdateWindow(info)
             unitQueue = info.userUnit:GetCommandQueue()
         end
         if info.focus then
-            if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds', true)) then
-                controls.actionIcon:SetTexture(UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds', true))
+            if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. info.focus.blueprintId .. '_icon.dds', true)) then
+                controls.actionIcon:SetTexture(UIUtil.UIFile('/icons/units/' .. info.focus.blueprintId .. '_icon.dds', true))
             else
                 controls.actionIcon:SetTexture('/textures/ui/common/game/unit_view_icons/unidentified.dds')
             end
