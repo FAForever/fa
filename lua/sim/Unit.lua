@@ -258,7 +258,6 @@ Unit = Class(moho.unit_methods) {
 
         --Ensure transport slots are available
         self.attachmentBone = nil
-        self.slotsTaken = {}
 
         -- Set up Adjacency container
         self.AdjacentUnits = {}
@@ -3648,21 +3647,33 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
     -- TRANSPORTING
     -------------------------------------------------------------------------------------------
+
+    GetTransportClass = function(self)
+        return self:GetBlueprint().Transport.TransportClass or 1
+    end,
+
     OnStartTransportBeamUp = function(self, transport, bone)
-        --Ensures bone availability
-        if transport.slotsTaken[bone] then
-            IssueClearCommands({self})
-            IssueClearCommands({transport})
-            return
-        else
-            self:DestroyIdleEffects()
-            self:DestroyMovementEffects()
-            local army =  self:GetArmy()
-            table.insert( self.TransportBeamEffectsBag, AttachBeamEntityToEntity(self, -1, transport, bone, army, EffectTemplate.TTransportBeam01))
-            table.insert( self.TransportBeamEffectsBag, AttachBeamEntityToEntity( transport, bone, self, -1, army, EffectTemplate.TTransportBeam02))
-            table.insert( self.TransportBeamEffectsBag, CreateEmitterAtBone( transport, bone, army, EffectTemplate.TTransportGlow01) )
-            self:TransportAnimation()
+        local class = self:GetTransportClass()
+        local slot = transport.slots[class][bone]
+
+        if slot then
+            local free = transport:GetFreeSlot(slot)
+            if free then
+                transport:MoveCargo(slot, free)
+            else
+                self:GetAIBrain():OnTransportFull()
+                IssueClearCommands({self})
+                return
+            end
         end
+
+        self:DestroyIdleEffects()
+        self:DestroyMovementEffects()
+        local army =  self:GetArmy()
+        table.insert( self.TransportBeamEffectsBag, AttachBeamEntityToEntity(self, -1, transport, bone, army, EffectTemplate.TTransportBeam01))
+        table.insert( self.TransportBeamEffectsBag, AttachBeamEntityToEntity( transport, bone, self, -1, army, EffectTemplate.TTransportBeam02))
+        table.insert( self.TransportBeamEffectsBag, CreateEmitterAtBone( transport, bone, army, EffectTemplate.TTransportGlow01) )
+        self:TransportAnimation()
     end,
 
     OnStopTransportBeamUp = function(self)
@@ -3740,6 +3751,9 @@ Unit = Class(moho.unit_methods) {
         bool = bool == true
         if bool ~= self.TransportLock then
             self.Sync.locked = bool
+            if bool then
+                IssueClearCommands({self})
+            end
         end
         self.TransportLocked = bool
     end,
@@ -3935,23 +3949,11 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnAttachedToTransport = function(self, transport, bone)
-        transport.slotsTaken = transport.slotsTaken or {}
         self:DoUnitCallbacks( 'OnAttachedToTransport', transport )
-        for i=1,transport:GetBoneCount() do
-            if transport:GetBoneName(i) == bone then
-                self.attachmentBone = i
-                transport.slotsTaken[bone] = true
-            end
-        end
     end,
 
     OnDetachedToTransport = function(self, transport)
-        if not self.attachmentBone then
-            self.attachmentBone = -100
-        end
         self:DoUnitCallbacks( 'OnDetachedToTransport', transport )
-        transport.slotsTaken[self.attachmentBone] = nil
-        self.attachmentBone = nil
     end,
 
     --- Deprecated functionality

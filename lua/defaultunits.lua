@@ -1750,13 +1750,74 @@ AirUnit = Class(MobileUnit) {
 
 --- Mixin transports (air, sea, space, whatever). Sellotape onto concrete transport base classes as
 -- desired.
+
+local bpSlots = {}
 BaseTransport = Class() {
-    AllCargoLocked = function(self)
-        for _, u in self:GetCargo() do
-            if not u.TransportLocked then return false end
+    InitSlots = function(self)
+        local bpid = self:GetUnitId()
+
+        if not bpSlots[bpid] then
+            local slots = {{}, {}, {}}
+
+            for bone=1, self:GetBoneCount() do
+                local name = string.lower(self:GetBoneName(bone) or '')
+                local i, j = string.find(name, 'attachpoint')
+
+                if name and j then
+                    local s = string.sub(name, j+1)
+                    local size
+                    if string.find(s, "med_?%d") then
+                        size = 2
+                    elseif string.find(s, "lrg[_]?%d") then
+                        size = 3
+                    else
+                        size = 1
+                    end
+
+                    if size then
+                        slots[size][bone] = false
+                    end
+                end
+            end
+
+            bpSlots[bpid] = slots
         end
 
-        return true
+        self.slots = table.deepcopy(bpSlots[bpid])
+    end,
+
+    AllCargoLocked = function(self, unit)
+        if self.allLocked == nil or self.allLocked.tick < GetGameTick() then
+            -- cache this for all unload same tick
+            self.allLocked = {bool=unit.TransportLocked == true and not self:IsUnitState('Ferrying'), tick=GetGameTick()}
+            if self.allLocked then
+                for _, u in self:GetCargo() do
+                    if not u.TransportLocked then
+                        self.allLocked.bool = false
+                        break
+                    end
+                end
+            end
+        end
+
+        return self.allLocked.bool
+    end,
+
+    GetFreeSlot = function(self, unit)
+        for i, slot in self.slots[unit:GetTransportClass()] do
+            if not IsEntity(slot) then return i end
+        end
+    end,
+
+    MoveCargo = function(self, unit, to)
+        local class = unit:GetTransportClass()
+        if not unit then return false end
+        local from = unit.attachmentBone
+        self:DetachAll(self:GetBoneName(from), true)
+        unit:DetachFrom(true)
+        unit:AttachBoneTo('AttachPoint', self, self:GetBoneName(to))
+        unit.attachmentBone = to
+        self.slots[class][to] = unit
     end,
 
     OnTransportAttach = function(self, bone, unit)
@@ -1767,23 +1828,38 @@ BaseTransport = Class() {
             unit:DisableDefaultToggleCaps()
         end
         self:RequestRefreshUI()
+
+
+
+        for i=1, self:GetBoneCount() do
+            if self:GetBoneName(i) == bone then
+                local class = unit:GetTransportClass()
+                self.slots[class][i] = unit
+                unit.attachmentBone = i
+            end
+        end
+
         unit:OnAttachedToTransport(self, bone)
     end,
 
     OnTransportDetach = function(self, bone, unit)
-        if unit.TransportLocked and not self:AllCargoLocked() then
+        local allLocked = self:AllCargoLocked(unit)
+        if unit.TransportLocked and not allLocked then
             unit:AttachBoneTo('AttachPoint', self, bone)
             return
         end
 
-        self:PlayUnitSound('Unload')
-        self:MarkWeaponsOnTransport(unit, false)
+        local class = unit:GetTransportClass()
+        self.slots[class][unit.attachmentBone] = false
+        unit.attachmentBone = nil
         unit:EnableShield()
         unit:EnableDefaultToggleCaps()
-        self:RequestRefreshUI()
         unit:TransportAnimation(-1)
         unit:TransportLock(false)
         unit:OnDetachedToTransport(self)
+        self:PlayUnitSound('Unload')
+        self:MarkWeaponsOnTransport(unit, false)
+        self:RequestRefreshUI()
     end,
 
     -- When one of our attached units gets killed, detach it
@@ -1791,15 +1867,11 @@ BaseTransport = Class() {
         attached:DetachFrom()
     end,
 
-    GetTransportClass = function(self)
-        local bp = self:GetBlueprint().Transport
-        return bp.TransportClass
-    end,
-
     OnStartTransportLoading = function(self)
         -- We keep the aibrain up to date with the last transport to start loading so, among other
         -- things, we can determine which transport is being referenced during an OnTransportFull
         -- event (As this function is called immediately before that one).
+        self.full = false
         self:GetAIBrain().loadingTransport = self
     end,
 
@@ -1824,6 +1896,17 @@ BaseTransport = Class() {
 
 --- Base class for air transports.
 AirTransport = Class(AirUnit, BaseTransport) {
+    OnTransportAborted = function(self)
+    end,
+
+    OnTransportOrdered = function(self)
+    end,
+
+    OnCreate = function(self)
+        AirUnit.OnCreate(self)
+        self:InitSlots()
+    end,
+
     OnKilled = function(self, instigator, type, overkillRatio)
         AirUnit.OnKilled(self, instigator, type, overkillRatio)
         self:DetachCargo()
