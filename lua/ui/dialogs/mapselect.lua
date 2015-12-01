@@ -841,9 +841,9 @@ function SetupOptionsPanel(parent, curOptions)
                 local realDefValue = false
 
                 for index, val in data.data.values do
-                    itemArray[index] = LOCF(val.text, val.key)
+                    itemArray[index] = val.text
                     line.combo.keyMap[val.key] = index
-                    tooltipTable[index]={text=data.data.label,body=LOCF(val.help, val.key)}
+                    tooltipTable[index]={text=data.data.label,body=val.help}
                     --
                     if curOptions[data.data.key] and val.key == curOptions[data.data.key] then
                         defValue = index
@@ -859,7 +859,7 @@ function SetupOptionsPanel(parent, curOptions)
                 if data.data.default then realDefValue = data.data.default end
                 line.combo:AddItems(itemArray, defValue, realDefValue, true) -- For all (true for enable (default) label)
                 line.combo.OnClick = function(self, index, text)
-                    changedOptions[optData.key] = {value = optData.values[index].key or optData.values[index], index = index}
+                    changedOptions[data.data.key] = {value = data.data.values[index].key, index = index}
                     if line.combo.EnableColor then
                         line.combo._text:SetColor('DBBADB')
                     end
