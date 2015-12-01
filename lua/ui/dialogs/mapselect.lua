@@ -839,29 +839,24 @@ function SetupOptionsPanel(parent, curOptions)
 
                 local defValue = false
                 local realDefValue = false
-                local optData = data.data
 
-                for index, val in optData.values do
-                    local key = val.key or val
-                    local text = val.text or optData.value_text
-                    local help = val.help or optData.value_help
-
-                    itemArray[index] = LOCF(text, key)
-                    line.combo.keyMap[key] = index
-                    tooltipTable[index]={text=optData.label, body=LOCF(help, key)}
+                for index, val in data.data.values do
+                    itemArray[index] = LOCF(val.text, val.key)
+                    line.combo.keyMap[val.key] = index
+                    tooltipTable[index]={text=data.data.label,body=LOCF(val.help, val.key)}
                     --
-                    if curOptions[optData.key] and key == curOptions[optData.key] then
+                    if curOptions[data.data.key] and val.key == curOptions[data.data.key] then
                         defValue = index
                     end
                 end
 
-                if changedOptions[optData.key].index then
-                    defValue = changedOptions[optData.key].index
+                if changedOptions[data.data.key].index then
+                    defValue = changedOptions[data.data.key].index
                 else
-                    defValue = line.combo.keyMap[curOptions[optData.key]] or optData.default or 1
+                    defValue = line.combo.keyMap[curOptions[data.data.key]] or data.data.default or 1
                 end
                 --
-                if optData.default then realDefValue = optData.default end
+                if data.data.default then realDefValue = data.data.default end
                 line.combo:AddItems(itemArray, defValue, realDefValue, true) -- For all (true for enable (default) label)
                 line.combo.OnClick = function(self, index, text)
                     changedOptions[optData.key] = {value = optData.values[index].key or optData.values[index], index = index}
@@ -870,7 +865,7 @@ function SetupOptionsPanel(parent, curOptions)
                     end
                 end
                 line.HandleEvent = Group.HandleEvent
-                Tooltip.AddControlTooltip(line, {text=optData.label,body=optData.help})
+                Tooltip.AddControlTooltip(line, {text=data.data.label,body=data.data.help})
                 Tooltip.AddComboTooltip(line.combo, tooltipTable, line.combo._list)
                 line.combo.UpdateValue = function(key)
                     line.combo:SetItem(line.combo.keyMap[key])

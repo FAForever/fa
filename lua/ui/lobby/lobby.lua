@@ -1876,11 +1876,11 @@ local OptionUtils = {
     SetDefaults = function()
         local options = {}
         for index, option in globalOpts do
-            options[option.key] = option.values[option.default].key or option.values[option.default]
+            options[option.key] = option.values[option.default].key
         end
 
         for index, option in AIOpts do
-            options[option.key] = option.values[option.default].key or option.values[option.default]
+            options[option.key] = option.values[option.default].key
         end
 
         SetGameOptions(options)
@@ -3091,12 +3091,10 @@ function RefreshOptionDisplayData(scenarioInfo)
 
         -- Scan the values array to find the one with the key matching our value for that option.
         for k, val in optData.values do
-            local key = val.key or val
-
-            if key == gameOption then
-                option.key = key
-                option.value = val.text or optData.value_text
-                option.valueTooltip = {text = optData.label, body = val.help or optData.value_help}
+            if val.key == gameOption then
+                option.key = val.key
+                option.value = val.text
+                option.valueTooltip = {text = optData.label, body = val.help}
 
                 table.insert(formattedOptions, option)
 
