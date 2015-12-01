@@ -3653,11 +3653,9 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnStartTransportBeamUp = function(self, transport, bone)
-        local class = self:GetTransportClass()
-        local slot = transport.slots[class][bone]
-
+        local slot = transport.slots[bone]
         if slot then
-            local free = transport:GetFreeSlot(slot)
+            local free = IsEntity(slot) and transport:GetFreeSlot(slot)
             if free then
                 transport:MoveCargo(slot, free)
             else
@@ -3666,7 +3664,7 @@ Unit = Class(moho.unit_methods) {
                 return
             end
         end
-
+        transport:ReserveSlot(bone)
         self:DestroyIdleEffects()
         self:DestroyMovementEffects()
         local army =  self:GetArmy()

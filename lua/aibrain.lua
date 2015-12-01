@@ -748,7 +748,7 @@ AIBrain = Class(moho.aibrain_methods) {
         local cue
 
         if not self.loadingTransport or self.loadingTransport.full then return end
-        self.loadingTransport.full = true
+        self.loadingTransport.transData.full = true
         
         if EntityCategoryContains(categories.uaa0310, self.loadingTransport) then
             -- "CZAR FULL"
