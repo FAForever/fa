@@ -245,6 +245,8 @@ function CreateUI(isReplay)
     if options.gui_render_enemy_lifebars == 1 or options.gui_render_custom_names == 0 then
         import('/modules/console_commands.lua').Init()
     end
+
+    RegisterChatFunc(SendResumedBy, 'SendResumedBy')
 end
 
 local provider = false
@@ -466,24 +468,26 @@ end
 -- Called after the Sim has confirmed the game is indeed paused. This will happen
 -- on everyone's machine in a network game.
 function OnPause(pausedBy, timeoutsRemaining)
-    local isOwner = false
-    if pausedBy == SessionGetLocalCommandSource() then
-        isOwner = true
-    end
     PauseSound("World",true)
     PauseSound("Music",true)
     PauseVoice("VO",true)
-    import('/lua/ui/game/tabs.lua').OnPause(true, pausedBy, timeoutsRemaining, isOwner)
+    import('/lua/ui/game/tabs.lua').OnPause(true, pausedBy, timeoutsRemaining)
     import('/lua/ui/game/missiontext.lua').OnGamePause(true)
 end
 
 -- Called after the Sim has confirmed that the game has resumed.
+local ResumedBy = nil
+function SendResumedBy(sender)
+    if not ResumedBy then ResumedBy = sender end
+end
+
 function OnResume()
     PauseSound("World",false)
     PauseSound("Music",false)
     PauseVoice("VO",false)
-    import('/lua/ui/game/tabs.lua').OnPause(false)
+    import('/lua/ui/game/tabs.lua').OnPause(false, ResumedBy)
     import('/lua/ui/game/missiontext.lua').OnGamePause(false)
+    ResumedBy = nil
 end
 
 -- Called immediately when the user hits the pause button. This only ever gets

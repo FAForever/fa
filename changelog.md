@@ -28,6 +28,7 @@ Patch 3652 (pending)
 - Allow Hotbuild to find Support Factories
 - Allow the UI code to search active mods for unit icons. Mods will have to have the icons in the right place (/modname/icons/units/xxx_icon.dds). Confirmed working for Total Mayhem at least, and probably many more.
 - Show ren_networkstats in Connectivity Screen (F11)
+- Show name of the one resuming a paused game
 
 **Gameplay**
 - Teamkill is now detected and a player can make an explicit report
