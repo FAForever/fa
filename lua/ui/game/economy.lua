@@ -47,7 +47,7 @@ function SetLayout(layout)
     import(UIUtil.GetLayoutFilename('economy')).SetLayout()
     GameMain.RemoveBeatFunction(_BeatFunction)
     ConfigureBeatFunction()
-    GameMain.AddBeatFunction(_BeatFunction)
+    GameMain.AddBeatFunction(_BeatFunction, true)
 
     return CommonLogic()
 end

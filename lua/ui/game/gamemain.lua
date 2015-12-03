@@ -510,13 +510,15 @@ end
 
 local _beatFunctions = {}
 
-function AddBeatFunction(fn)
-    table.insert(_beatFunctions, fn)
+-- throttle means never run function more than 10 times per second to reduce
+-- UI load when speeding up sim / replay
+function AddBeatFunction(fn, throttle)
+    table.insert(_beatFunctions, {fn=fn, throttle=throttle == true})
 end
 
 function RemoveBeatFunction(fn)
     for i,v in _beatFunctions do
-        if v == fn then
+        if v.fn == fn then
             table.remove(_beatFunctions, i)
             break
         end
@@ -524,9 +526,22 @@ function RemoveBeatFunction(fn)
 end
 
 -- this function is called whenever the sim beats
+local last = 0
 function OnBeat()
+    local rate = GetSimRate()
+    local throttle = false
+
+    if rate > 0 then
+        if GetSystemTimeSeconds() - last < 0.1 then
+            throttle = true
+        else
+            last = GetSystemTimeSeconds()
+        end
+    end
+
     for i,v in _beatFunctions do
-        if v then v() end
+        if v.throttle and throttle then continue end
+        if v.fn then v.fn() end
     end
 end
 

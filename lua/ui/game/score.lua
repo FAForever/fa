@@ -85,7 +85,7 @@ function CreateScoreUI(parent)
 
     SetLayout()
 
-    GameMain.AddBeatFunction(_OnBeat)
+    GameMain.AddBeatFunction(_OnBeat, true)
     controls.bg.OnDestroy = function(self)
         GameMain.RemoveBeatFunction(_OnBeat)
     end
