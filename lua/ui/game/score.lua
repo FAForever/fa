@@ -370,11 +370,11 @@ function SetupPlayerLines()
     controls.armyLines[index] = CreateMapNameLine(mapData, 0)
 end
 function _OnBeat()
-    local quality = '?%'
-    if(sessionInfo.Options.Quality) then
-        quality = string.format("%.2f%%", sessionInfo.Options.Quality)
+    local s = string.format("%s (%+d / %+d)", GetGameTime(), gameSpeed, GetSimRate())
+    if sessionInfo.Options.Quality then
+        s = string.format("%s Q:%.2f%%", s, sessionInfo.Options.Quality)
     end
-    controls.time:SetText(string.format("%s (%+d / %+d)", GetGameTime(), gameSpeed, GetSimRate()))
+    controls.time:SetText(s)
 
     if sessionInfo.Options.NoRushOption and sessionInfo.Options.NoRushOption ~= 'Off' then
         local norush = tonumber(sessionInfo.Options.NoRushOption) * 60
