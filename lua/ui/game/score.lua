@@ -441,17 +441,6 @@ function _OnBeat()
                 end
             end
         end
-
-        if observerLine then
-            if GetFocusArmy() == -1 then
-                observerLine.name:SetColor('ffff7f00')
-                observerLine.name:SetFont('Arial Bold', 14)
-            else
-                observerLine.name:SetColor('ffffffff')
-                observerLine.name:SetFont(UIUtil.bodyFont, 14)
-            end
-        end
-
         table.sort(controls.armyLines, function(a,b)
             if a.armyID == 0 or b.armyID == 0 then
                 return a.armyID >= b.armyID
@@ -464,6 +453,17 @@ function _OnBeat()
             end
         end)
         import(UIUtil.GetLayoutFilename('score')).LayoutArmyLines()
+        currentScores = false -- dont render score UI until next score update
+    end
+    
+    if observerLine then
+        if GetFocusArmy() == -1 then
+            observerLine.name:SetColor('ffff7f00')
+            observerLine.name:SetFont('Arial Bold', 14)
+        else
+            observerLine.name:SetColor('ffffffff')
+            observerLine.name:SetFont(UIUtil.bodyFont, 14)
+        end
     end
 end
 
