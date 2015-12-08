@@ -197,7 +197,7 @@ function table.cat(t1, t2)
 end
 
 --- Concatenate arbitrarily-many tables (equivalent to table.cat, but varargs. Slightly more
--- overhead, but can constructvely concat *all* the things)
+-- overhead, but can constructively concat *all* the things)
 function table.concatenate(...)
     local ret = {}
 
@@ -442,7 +442,7 @@ function table.unique(t)
 end
 
 --=========================================================================================================
--- StringJoin returns items as a single string, seperated by the delimiter
+-- StringJoin returns items as a single string, separated by the delimiter
 --=========================================================================================================
 function StringJoin(items, delimiter)
     local str = "";
