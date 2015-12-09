@@ -2436,6 +2436,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     ClearWork = function(self)
+        self.WorkProgress = 0
         self.WorkItem = nil
         self.WorkItemBuildCostEnergy = nil
         self.WorkItemBuildCostMass = nil
