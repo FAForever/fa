@@ -74,6 +74,7 @@ Patch 3652 (pending)
 - Fixed UEF Drones being untargetable by Interceptors
 - Fixed UEF Drone collision detection, making it much easier for ground-based AA to hit them
 - Fixed UEF AI unit templates in coop mode
+- Fixed an exploit with being able to upgrade restricted enhancements
 
 **Performance**
 - Optimization of score accumulation
