@@ -146,7 +146,10 @@ local UIFileBlacklist = {
     ['/icons/units/uxl0021_icon.dds'] = true,
     ['/icons/units/urb5206_icon.dds'] = true,
     ['/icons/units/urb5204_icon.dds'] = true,
-    ['/icons/units/urb3103_icon.dds'] = true
+    ['/icons/units/urb3103_icon.dds'] = true,
+    ['/icons/units/hel0001_icon.dds'] = true,
+    ['/icons/units/ueb5204_icon.dds'] = true,
+    ['/icons/units/ueb5208_icon.dds'] = true
 }
 
 --* layout control, sets current layout preference
