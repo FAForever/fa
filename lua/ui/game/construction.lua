@@ -1894,21 +1894,39 @@ function FormatData(unitData, type)
         }
         local filteredEnh = {}
         local usedEnhancements = {}
-        local restrictList = EnhanceCommon.GetRestricted()
+		--local restrictedEnhts = EnhanceCommon.GetRestricted() -- always returns empty table!
+        local restrictedEnhts  = {} -- so using RestrictedCategories to find restricted enhancements  
+        local restrictedUnits = import('/lua/ui/lobby/restrictedUnitsData.lua').restrictedUnits
+        local restrictedCategories = SessionGetScenarioInfo().Options.RestrictedCategories 
+	 
+        -- find restricted enhancements
+        if (restrictedCategories) then
+            for _, key in restrictedCategories do
+				local enhancements = restrictedUnits[key].enhancement
+                if enhancements then
+                    for _, enhancement in enhancements do
+                        table.insert(restrictedEnhts, enhancement)
+                    end
+                end
+            end
+        end
+
+		-- filter enhancements based on restrictions
         for index, enhTable in unitData do
             if not string.find(enhTable.ID, 'Remove') then
-                local restricted = false
-                for _, enhancement in restrictList do
+                enhTable.restricted = false
+                for _, enhancement in restrictedEnhts do
                     if enhancement == enhTable.ID then
-                        restricted = true
+                        enhTable.restricted = true
                         break
                     end
                 end
-                if not restricted then
+                if not enhTable.restricted then
                     table.insert(filteredEnh, enhTable)
                 end
             end
         end
+		 
         local function GetEnhByID(id)
             for i, enh in filteredEnh do
                 if enh.ID == id then
