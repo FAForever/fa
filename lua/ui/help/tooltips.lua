@@ -89,7 +89,7 @@ Tooltips = {
     },
     overcharge = {
         title = "<LOC tooltipui0016>Overcharge",
-        description = "",
+        description = "<LOC tooltipui0017>Right click while active to toggle auto-fire",
         keyID = "overcharge",
     },
     transport = {
