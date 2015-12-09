@@ -2444,22 +2444,15 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnWorkBegin = function(self, work)
-        local unitEnhancements = import('/lua/enhancementcommon.lua').GetEnhancements(self:GetEntityId())
-        local tempEnhanceBp = self:GetBlueprint().Enhancements[work]
-        --Check if the enhancement is restricted
-        if ScenarioInfo.Options.RestrictedCategories then
-            local restrictedUnits = import('/lua/ui/lobby/restrictedUnitsData.lua').restrictedUnits
-            for k, restriction in ScenarioInfo.Options.RestrictedCategories do
-                if restrictedUnits[restriction].enhancement then
-                    for kk, cat in restrictedUnits[restriction].enhancement do
-                        if work == cat then --If Teleporter == Teleporter
-                            self:OnWorkFail(work)
-                            return false
-                        end
-                    end
-                end
-            end
+        local enhCommon = import('/lua/enhancementcommon.lua')
+        local rest = enhCommon.GetRestricted()
+        if rest[work] then
+            self:OnWorkFail(work)
+            return false
         end
+
+        local unitEnhancements = enhCommon.GetEnhancements(self:GetEntityId())
+        local tempEnhanceBp = self:GetBlueprint().Enhancements[work]
         if tempEnhanceBp.Prerequisite then
             if unitEnhancements[tempEnhanceBp.Slot] ~= tempEnhanceBp.Prerequisite then
                 error('*ERROR: Ordered enhancement does not have the proper prereq!', 2)
