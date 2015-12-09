@@ -218,12 +218,11 @@ function BeginSession()
 
     --for off-map prevention
     OnStartOffMapPreventionThread()
-    
 end
 
 ------for off-map prevention
 function OnStartOffMapPreventionThread()
-	OffMappingPreventThread = ForkThread( import('/lua/ScenarioFramework.lua').AntiOffMapMainThread)
+	OffMappingPreventThread = ForkThread(import('/lua/ScenarioFramework.lua').AntiOffMapMainThread)
 	ScenarioInfo.OffMapPreventionThreadAllowed = true
 	--WARN('success')
 end

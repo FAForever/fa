@@ -39,7 +39,7 @@ EnhanceTask = Class(ScriptTask) {
             else
 				-- check if enhancement was started (not restricted and met prerequisite)
                 local workStarted = unit:OnWorkBegin(self.CommandData.Enhancement)
-                if (workStarted == false) then
+                if not workStarted then
                     self.Success = false   -- required for AI notification
                     return TASKSTATUS.Done -- not using Abort because it will freeze the unit
                 else
