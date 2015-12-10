@@ -3,6 +3,7 @@ Patch 3652 (pending)
 
 **Whole Game**
 - Introduced Russian translations of many FAF additions to the game (Exotic_Retard)
+- Added game-side support for future achievement system
 
 **Lobby**
 - Name filter when selecting map
@@ -48,6 +49,7 @@ Patch 3652 (pending)
 - Spread attack: Targets are now spread more uniformly across all units during the initial attack orders, further ones are random.
 - Diplomacy now allowed in Coop mode
 - Allow Fatboy, Atlantis, Tempest and Czar to fire while building units
+- Beam weapons now kill missiles they impact instead of wasting DPS for several ticks
 
 **Bugs**
 - Chrono Dampener doesn't stun allied units anymore
