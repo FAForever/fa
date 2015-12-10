@@ -1,13 +1,9 @@
--- ****************************************************************************
--- **
--- **  File     :  /cdimage/units/UAA0310/UAA0310_script.lua
--- **  Author(s):  John Comes
--- **
--- **  Summary  :  Aeon CZAR Script
--- **
--- **  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
--- ****************************************************************************
-
+-----------------------------------------------------------------
+-- File     :  /cdimage/units/UAA0310/UAA0310_script.lua
+-- Author(s):  John Comes
+-- Summary  :  Aeon CZAR Script
+-- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
 local AirTransport = import('/lua/defaultunits.lua').AirTransport
 local aWeapons = import('/lua/aeonweapons.lua')
 local AQuantumBeamGenerator = aWeapons.AQuantumBeamGenerator
@@ -18,8 +14,9 @@ local explosion = import('/lua/defaultexplosions.lua')
 
 UAA0310 = Class(AirTransport) {
     DestroyNoFallRandomChance = 1.1,
+    BuildAttachBone = 'UAA0310',
+    
     Weapons = {
-
         QuantumBeamGeneratorWeapon = Class(AQuantumBeamGenerator){},
         SonicPulseBattery1 = Class(AAAZealotMissileWeapon) {},
         SonicPulseBattery2 = Class(AAAZealotMissileWeapon) {},
@@ -50,17 +47,14 @@ UAA0310 = Class(AirTransport) {
         self.detector:EnableTerrainCheck(true)
         self.detector:Enable()
 
-
         AirTransport.OnKilled(self, instigator, type, overkillRatio)
     end,
 
     OnAnimTerrainCollision = function(self, bone,x,y,z)
         DamageArea(self, {x,y,z}, 5, 1000, 'Default', true, false)
-        explosion.CreateDefaultHitExplosionAtBone( self, bone, 5.0 )
+        explosion.CreateDefaultHitExplosionAtBone(self, bone, 5.0)
         explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {self:GetUnitSizes()})
     end,
-
-    BuildAttachBone = 'UAA0310',
 
     OnStopBeingBuilt = function(self,builder,layer)
         AirTransport.OnStopBeingBuilt(self,builder,layer)
@@ -88,7 +82,6 @@ UAA0310 = Class(AirTransport) {
     BuildingState = State {
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
-            self:SetBusy(true)
             local bone = self.BuildAttachBone
             self:DetachAll(bone)
             unitBuilding:HideBone(0, true)
@@ -103,7 +96,6 @@ UAA0310 = Class(AirTransport) {
 
     FinishedBuildingState = State {
         Main = function(self)
-            self:SetBusy(true)
             local unitBuilding = self.UnitBeingBuilt
             unitBuilding:DetachFrom(true)
             self:DetachAll(self.BuildAttachBone)
@@ -114,7 +106,6 @@ UAA0310 = Class(AirTransport) {
                 IssueMoveOffFactory({unitBuilding}, worldPos)
                 unitBuilding:ShowBone(0,true)
             end
-            self:SetBusy(false)
             self:RequestRefreshUI()
             ChangeState(self, self.IdleState)
         end,

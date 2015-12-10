@@ -15,7 +15,7 @@ local EffectUtil = import('/lua/EffectUtilities.lua')
 
 local Buff = import('/lua/sim/Buff.lua')
 local CCannonMolecularWeapon = CWeapons.CCannonMolecularWeapon
-local CIFCommanderDeathWeapon = CWeapons.CIFCommanderDeathWeapon
+local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
 
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local CDFHeavyMicrowaveLaserGeneratorCom = CWeapons.CDFHeavyMicrowaveLaserGeneratorCom
@@ -25,7 +25,7 @@ local Entity = import('/lua/sim/Entity.lua').Entity
 
 URL0001 = Class(ACUUnit, CCommandUnit) {
     Weapons = {
-        DeathWeapon = Class(CIFCommanderDeathWeapon) {},
+        DeathWeapon = Class(DeathNukeWeapon) {},
         RightRipper = Class(CCannonMolecularWeapon) {},
         Torpedo = Class(CANTorpedoLauncherWeapon) {},
         MLG = Class(CDFHeavyMicrowaveLaserGeneratorCom) {

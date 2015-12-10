@@ -56,7 +56,7 @@ function CreateDialog(teamkillTable)
         WARN("Was teamkilled: " .. victimName)
         WARN("At time: " .. killTime)
         WARN("Killed by: " .. killerName)
-        GpgNetSend('Teamkill',  killTime,victimName,killerName)
+        GpgNetSend('TeamkillReport',  killTime,victimName,killerName)
         dialog:Close()
     end
     

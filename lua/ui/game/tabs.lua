@@ -46,7 +46,7 @@ local tabs = {
     {
         bitmap = 'diplomacy',
         content = 'diplomacy',
-        disableInCampaign = true,
+        disableInCampaign = false,
         disableInReplay = true,
         disableForObserver = true,
         closeSound = 'UI_Diplomacy_Close',
@@ -435,6 +435,7 @@ function CommonLogic()
                     SessionRequestPause()
                     self:SetGlowState(checked)
                 else
+                    SessionSendChatMessage({SendResumedBy=true})
                     SessionResume()
                     self:SetGlowState(checked)
                 end
@@ -716,23 +717,28 @@ function OnGameOver()
     end
 end
 
-function OnPause(state, pausedBy, lTimeoutsRemaining, isOwner)
+function OnPause(state, pausedBy, timeouts)
+    if type(pausedBy) == 'number' then
+        pausedBy = SessionGetCommandSourceNames()[pausedBy]
+    end
+    local my_name = SessionGetCommandSourceNames()[SessionGetLocalCommandSource()]
+    local isOwner = pausedBy and pausedBy == my_name
     pauseBtn:SetCheck(state, true)
     pauseBtn:SetGlowState(state)
-    local text = '<LOC pause_0001>Game Resumed'
-    local owner = false
+    local text
     if state then
         CreateScreenGlow()
         text = '<LOC pause_0002>Game Paused'
     else
         HideScreenGlow()
-    end
-    if not isOwner and pausedBy then
-        owner = LOCF('<LOC pause_0000>By %s', SessionGetCommandSourceNames()[pausedBy])
+        text = '<LOC pause_0001>Game Resumed'
     end
 
-    if lTimeoutsRemaining and isOwner then
-        timeoutsRemaining = lTimeoutsRemaining
+    local owner
+    if not isOwner and pausedBy then
+        owner = LOCF('<LOC pause_0000>By %s', pausedBy)
+    elseif isOwner and timeouts then
+        timeoutsRemaining = timeouts
     end
 
     if state then

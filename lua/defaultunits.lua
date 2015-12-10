@@ -65,7 +65,55 @@ StructureUnit = Class(Unit) {
         end
     end,
 
+    RotateTowardsEnemy = function(self)
+        local bp = self:GetBlueprint()
+        local army = self:GetArmy()
+        local brain = self:GetAIBrain()
+        local pos = self:GetPosition()
+        local x, y = GetMapSize()
+        local threats = {{pos={x/2, 0, y/2}, dist=VDist2(pos[1], pos[3], x, y), threat=-1}}
+        local cats = EntityCategoryContains(categories.ANTIAIR, self) and categories.AIR or (categories.STRUCTURE+categories.LAND+categories.NAVAL)
+
+        local units = brain:GetUnitsAroundPoint(cats, pos, 2*(bp.AI.GuardScanRadius or 100), 'Enemy')
+        for _, u in units do
+            local blip = u:GetBlip(army)
+            if blip then
+                local on_radar = blip:IsOnRadar(army)
+                local seen = blip:IsSeenEver(army)
+
+                if on_radar or seen then
+                    local epos = u:GetPosition()
+                    local threat = seen and (u:GetBlueprint().Defense.SurfaceThreatLevel or 0) or 1
+
+                    table.insert(threats, {pos=epos, threat=threat, dist=VDist2(pos[1], pos[3], epos[1], epos[3])})
+                end
+            end
+        end
+
+        table.sort(threats,function(a, b)
+            if a.threat <= 0 and b.threat <= 0 then
+                return a.threat == b.threat and a.dist < b.dist or a.threat > b.threat
+            elseif a.threat <= 0 then return false
+            elseif b.threat <= 0 then return true
+            else return a.dist < b.dist end
+        end)
+
+        local t = threats[1]
+        local rad = math.atan2(t.pos[1]-pos[1], t.pos[3]-pos[3])
+        local degrees = rad * (180 / math.pi)
+
+        if EntityCategoryContains(categories.ARTILLERY * (categories.TECH3+categories.EXPERIMENTAL), self) then
+            degrees = math.floor((degrees+45) / 90) * 90
+        end
+
+        self:SetRotation(degrees)
+    end,
+
     OnStartBeingBuilt = function(self, builder, layer)
+        if EntityCategoryContains(categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + categories.ARTILLERY), self) then
+            self:RotateTowardsEnemy()
+        end
+
         Unit.OnStartBeingBuilt(self, builder, layer)
         local bp = self:GetBlueprint()
         if bp.Physics.FlattenSkirt and not self:HasTarmac() and bp.General.FactionName ~= "Seraphim" then
@@ -405,9 +453,9 @@ StructureUnit = Class(Unit) {
         end
     end,
 
-    DestroyUnit = function(self)
+    DestroyUnit = function(self, overkillRatio)
         self:RefreshIntel()
-        Unit.DestroyUnit(self)
+        Unit.DestroyUnit(self, overkillRatio)
     end,
 
     -- Adding into OnDestroy the ability to destroy the tarmac but put a new one down that looks exactly like it but
@@ -427,9 +475,13 @@ StructureUnit = Class(Unit) {
     CheckRepairersForRebuild = function(self, wreckage)
         local units = {}
         for id, u in self.Repairers do
-            local focus = u:GetFocusUnit()
-            if u:IsUnitState('Repairing') and focus == self and not u:GetGuardedUnit() then -- not assist
-                table.insert(units, u)
+            if u:BeenDestroyed() then
+                self.Repairers[id] = nil
+            else
+                local focus = u:GetFocusUnit()
+                if focus == self and u:IsUnitState('Repairing') and not u:GetGuardedUnit() then -- not assist
+                    table.insert(units, u)
+                end
             end
         end
 
@@ -1362,10 +1414,15 @@ TransportBeaconUnit = Class(StructureUnit) {
     OnDamage = function(self, instigator, amount, vector, damageType)
     end,
 
+
     OnCreate = function(self)
         StructureUnit.OnCreate(self)
         self:SetCapturable(false)
         self:SetReclaimable(false)
+    end,
+
+    Kill = function(self)
+        self:Destroy()
     end,
 }
 
@@ -1699,8 +1756,92 @@ AirUnit = Class(MobileUnit) {
 
 --- Mixin transports (air, sea, space, whatever). Sellotape onto concrete transport base classes as
 -- desired.
+
+local slotsData = {}
 BaseTransport = Class() {
-    OnTransportAttach = function(self, attachBone, unit)
+    GetSlotsData = function(self)
+        local bpid = self:GetUnitId()
+
+        if not slotsData[bpid] then
+            local slots = {{}, {}, {}}
+
+            for bone=1, self:GetBoneCount() do
+                local name = string.lower(self:GetBoneName(bone) or '')
+                local i, j = string.find(name, 'attachpoint')
+
+                if name and j then
+                    local s = string.sub(name, j+1)
+                    local size
+                    if string.find(s, "med_?%d") then
+                        size = 2
+                    elseif string.find(s, "lrg[_]?%d") then
+                        size = 3
+                    else
+                        size = 1
+                    end
+
+                    if size then
+                        table.insert(slots[size], bone)
+                    end
+                end
+            end
+
+            slotsData[bpid] = slots
+        end
+
+        return slotsData[bpid]
+    end,
+
+    GetClassSlots = function(self, class)
+        local slots = self:GetSlotsData()
+        return slots[class] or {}
+    end,
+
+    AllCargoLocked = function(self, unit)
+        local tdata = self.transData
+        if tdata.allLocked == nil or tdata.detachTick < GetGameTick() then
+            -- cache this for all unload same tick
+            tdata.allLocked = unit.TransportLocked == true and not self:IsUnitState('Ferrying')
+            tdata.detachTick = GetGameTick()
+            if tdata.allLocked then
+                for _, u in self:GetCargo() do
+                    if not u.TransportLocked then
+                        tdata.allLocked = false
+                        break
+                    end
+                end
+            end
+        end
+
+        return tdata.allLocked
+    end,
+
+    GetFreeSlot = function(self, unit)
+        local slots = self:GetClassSlots(unit:GetTransportClass())
+        for i, slot in slots do
+            if not self.slots[slot] and not self.transData.reserved[i] then return slot end
+        end
+    end,
+
+    ReserveSlot = function(self, slot)
+        if self.slots[slot] then return false end
+        self.transData.reserved = self.transData.reserved or {}
+        self.transData.reserved[slot] = true
+        return true
+    end,
+
+    MoveCargo = function(self, unit, to)
+        if not unit then return false end
+        local from = unit.attachmentBone
+        self:DetachAll(self:GetBoneName(from), true)
+        unit:DetachFrom(true)
+        unit:AttachBoneTo('AttachPoint', self, self:GetBoneName(to))
+        unit.attachmentBone = to
+        self.slots[from] = nil
+        self.slots[to] = unit
+    end,
+
+    OnTransportAttach = function(self, bone, unit)
         self:PlayUnitSound('Load')
         self:MarkWeaponsOnTransport(unit, true)
         if unit:ShieldIsOn() then
@@ -1708,17 +1849,33 @@ BaseTransport = Class() {
             unit:DisableDefaultToggleCaps()
         end
         self:RequestRefreshUI()
-        unit:OnAttachedToTransport(self, attachBone)
+        for i=1, self:GetBoneCount() do
+            if self:GetBoneName(i) == bone then
+                self.slots[i] = unit
+                unit.attachmentBone = i
+            end
+        end
+
+        unit:OnAttachedToTransport(self, bone)
     end,
 
-    OnTransportDetach = function(self, attachBone, unit)
-        self:PlayUnitSound('Unload')
-        self:MarkWeaponsOnTransport(unit, false)
+    OnTransportDetach = function(self, bone, unit)
+        local allLocked = self:AllCargoLocked(unit)
+        if unit.TransportLocked and not allLocked then
+            unit:AttachBoneTo('AttachPoint', self, bone)
+            return
+        end
+
+        self.slots[unit.attachmentBone] = nil
+        unit.attachmentBone = nil
         unit:EnableShield()
         unit:EnableDefaultToggleCaps()
-        self:RequestRefreshUI()
         unit:TransportAnimation(-1)
+        unit:TransportLock(false)
         unit:OnDetachedToTransport(self)
+        self:PlayUnitSound('Unload')
+        self:MarkWeaponsOnTransport(unit, false)
+        self:RequestRefreshUI()
     end,
 
     -- When one of our attached units gets killed, detach it
@@ -1726,15 +1883,11 @@ BaseTransport = Class() {
         attached:DetachFrom()
     end,
 
-    GetTransportClass = function(self)
-        local bp = self:GetBlueprint().Transport
-        return bp.TransportClass
-    end,
-
     OnStartTransportLoading = function(self)
         -- We keep the aibrain up to date with the last transport to start loading so, among other
         -- things, we can determine which transport is being referenced during an OnTransportFull
         -- event (As this function is called immediately before that one).
+        self.transData = {}
         self:GetAIBrain().loadingTransport = self
     end,
 
@@ -1747,6 +1900,11 @@ BaseTransport = Class() {
     DetachCargo = function(self)
         local units = self:GetCargo()
         for k, v in units do
+            if EntityCategoryContains(categories.TRANSPORTATION, v) then
+                for k, u in self:GetCargo() do
+                    u:Kill()
+                end
+            end
             v:DetachFrom()
         end
     end
@@ -1754,9 +1912,28 @@ BaseTransport = Class() {
 
 --- Base class for air transports.
 AirTransport = Class(AirUnit, BaseTransport) {
+    OnTransportAborted = function(self)
+    end,
+
+    OnTransportOrdered = function(self)
+    end,
+
+    OnCreate = function(self)
+        AirUnit.OnCreate(self)
+        self.slots = {}
+        self.transData = {}
+    end,
+
     OnKilled = function(self, instigator, type, overkillRatio)
         AirUnit.OnKilled(self, instigator, type, overkillRatio)
         self:DetachCargo()
+    end,
+
+    OnStorageChange = function(self, loading)
+        AirUnit.OnStorageChange(self, loading)
+        for k, v in self:GetCargo() do
+            v:OnStorageChange(loading)
+        end
     end,
 }
 
@@ -2033,7 +2210,15 @@ CommandUnit = Class(WalkingLandUnit) {
             WalkingLandUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
         end
         WalkingLandUnit.OnUnpaused(self)
-    end
+    end,
+
+    SetAutoOvercharge = function(self, auto)
+        local wep = self:GetWeaponByLabel('OverCharge')
+        if wep.NeedsUpgrade then return end
+
+        wep:SetAutoOvercharge(auto)
+        self.Sync.AutoOvercharge = auto
+    end,
 }
 
 ACUUnit = Class(CommandUnit) {
@@ -2051,11 +2236,20 @@ ACUUnit = Class(CommandUnit) {
         end
     end,
 
+    OnStopBeingBuilt = function(self, builder, layer)
+        CommandUnit.OnStopBeingBuilt(self, builder, layer)
+        ArmyBrains[self:GetArmy()]:SetUnitStat(self:GetUnitId(), "lowest_health", self:GetHealth())
+    end,
+
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         WalkingLandUnit.DoTakeDamage(self, instigator, amount, vector, damageType)
         local aiBrain = self:GetAIBrain()
         if aiBrain then
             aiBrain:OnPlayCommanderUnderAttackVO()
+        end
+
+        if self:GetHealth() < ArmyBrains[self:GetArmy()]:GetUnitStat(self:GetUnitId(), "lowest_health") then
+            ArmyBrains[self:GetArmy()]:SetUnitStat(self:GetUnitId(), "lowest_health", self:GetHealth())
         end
     end,
 
@@ -2065,24 +2259,14 @@ ACUUnit = Class(CommandUnit) {
         --If there is a killer, and it's not me
         if instigator and instigator:GetArmy() ~= self:GetArmy() then
             local instigatorBrain = ArmyBrains[instigator:GetArmy()]
-            if instigatorBrain and not instigatorBrain:IsDefeated() then
-                instigatorBrain:AddArmyStat("FAFWin", 1)
-            end
             --if we are teamkilled
             if IsAlly(self:GetArmy(), instigator:GetArmy()) then
                 WARN('Teamkill detected')
                 Sync.Teamkill = { killTime = GetGameTimeSeconds(), instigator = instigator:GetArmy(), victim = self:GetArmy() }
-                WARN("Was teamkilled: army #" .. self:GetArmy())
-                WARN("At time: " .. GetGameTimeSeconds())
-                WARN("Killed by army #" .. instigator:GetArmy())
-            end
-        end
-
-        --Score change, we send the score of all players
-        for index, brain in ArmyBrains do
-            if brain and not brain:IsDefeated() then
-                local result = string.format("%s %i", "score", math.floor(brain:GetArmyStat("FAFWin",0.0).Value + brain:GetArmyStat("FAFLose",0.0).Value) )
-                table.insert(Sync.GameResult, { index, result })
+            else
+                ForkThread(function()
+                    instigatorBrain:ReportScore()
+                end)
             end
         end
     end,

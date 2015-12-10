@@ -50,7 +50,7 @@ function SpawnPing(data)
 
         SendData(data)
 
-        # Callbacks to allied brains
+        -- Callbacks to allied brains
         for num,brain in ArmyBrains do
             if data.Owner + 1 ~= num and IsAlly( num, data.Owner + 1) then
                 ArmyBrains[num]:DoPingCallbacks( data )
@@ -65,7 +65,7 @@ function SpawnPing(data)
 end
 
 function SpawnSpecialPing(data)
-	#This function is used to generate automatic nuke pings    
+	--This function is used to generate automatic nuke pings
     local Entity = import('/lua/sim/Entity.lua').Entity
     data.Location[2] = data.Location[2]+2
     local pingSpec = {Owner = data.Owner, Location = data.Location}
@@ -85,7 +85,7 @@ function SpawnSpecialPing(data)
 
     SendData(data)
 
-    # Callbacks to allied brains
+    -- Callbacks to allied brains
     for num,brain in ArmyBrains do
         if data.Owner + 1 ~= num and IsAlly( num, data.Owner + 1) then
             ArmyBrains[num]:DoPingCallbacks( data )
@@ -121,10 +121,11 @@ function OnArmyChange()
     if not Sync.Ping then Sync.Ping = {} end
     table.insert(Sync.Ping, {Action = 'flush'})
     --Add All of the relevant marker data on the next sync
-    if GetFocusArmy() != -1 then
+    local focus = GetFocusArmy()
+    if focus ~= -1 then
         ForkThread(function()
             for ownerID, pingTable in PingMarkers do
-                if IsAlly(ownerID+1, GetFocusArmy()) then
+                if IsAlly(ownerID+1, focus) then
                     for pingID, ping in pingTable do
                         ping.Renew = true
                         SendData(ping)
@@ -148,16 +149,19 @@ function UpdateMarker(data)
         elseif data.Action == 'rename' then
             PingMarkers[data.Owner][data.ID].Name = data.Name
         elseif data.Action == 'renew' then
-            ForkThread(function()
-                for ownerID, pingTable in PingMarkers do
-                    if IsAlly(ownerID+1, GetFocusArmy()) then
-                        for pingID, ping in pingTable do
-                            ping.Renew = true
-                            SendData(ping)
+            local focus = GetFocusArmy()
+            if focus ~= -1 then
+                ForkThread(function()
+                    for ownerID, pingTable in PingMarkers do
+                        if IsAlly(ownerID+1, focus) then
+                            for pingID, ping in pingTable do
+                                ping.Renew = true
+                                SendData(ping)
+                            end
                         end
                     end
-                end
-            end)
+                end)
+            end
             return
         end
         SendData(data)
@@ -165,10 +169,9 @@ function UpdateMarker(data)
 end
 
 function SendData(data)
-    if GetFocusArmy() != -1 then
-        if IsAlly(data.Owner+1, GetFocusArmy()) then
-            if not Sync.Ping then Sync.Ping = {} end
-            table.insert(Sync.Ping, data)
-        end
+    local focus = GetFocusArmy()
+    if focus ~= -1 and IsAlly(data.Owner+1, focus) then
+        if not Sync.Ping then Sync.Ping = {} end
+        table.insert(Sync.Ping, data)
     end
 end

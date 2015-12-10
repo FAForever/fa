@@ -191,7 +191,6 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             else
                 unit:AdjustHealth(instigator, healthadj)
             end
-
         elseif atype == 'MaxHealth' then
             local unitbphealth = unit:GetBlueprint().Defense.MaxHealth or 1
             local val = BuffCalculate(unit, buffName, 'MaxHealth', unitbphealth)
@@ -207,22 +206,11 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
                 end
             end
         elseif atype == 'Regen' then
-            local bpregn = unit:GetBlueprint().Defense.RegenRate or 0
-            local val = BuffCalculate(unit, buffName, 'Regen', bpregn)
-
-            unit:SetRegen(val)
-        elseif atype == 'RegenPercent' then
-            local val = false
-
-            if afterRemove then
-                --Restore normal regen value plus buffs so I don't break stuff. Love, Robert
-                local bpregn = unit:GetBlueprint().Defense.RegenRate or 0
-                val = BuffCalculate(unit, nil, 'Regen', bpregn)
-            else
-                --Buff this sucka
-                val = BuffCalculate(unit, buffName, 'RegenPercent', unit:GetMaxHealth())
-            end
-
+            -- Adjusted to use a special case of adding mults and calculating the final value
+            -- in BuffCalculate to fix bugs where adds and mults would clash or cancel
+            local bpRegen = unit:GetBlueprint().Defense.RegenRate or 0
+            local val = BuffCalculate(unit, nil, 'Regen', bpRegen)
+            
             unit:SetRegen(val)
         elseif atype == 'Damage' then
             for i = 1, unit:GetWeaponCount() do
@@ -365,10 +353,8 @@ end
 function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
     local adds = 0
     local mults = 1.0
+    local multsTotal = 0 -- Used only for regen buffs
     local bool = initialBool or false
-
-    local highestCeil = false
-    local lowestFloor = false
 
     if not unit.Buffs.Affects[affectType] then return initialVal, bool end
 
@@ -378,8 +364,24 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
         end
 
         if v.Mult then
-            for i=1,v.Count do
-                mults = mults * v.Mult
+            if affectType == 'Regen' then
+                -- Regen mults use MaxHp as base, so should always be <1
+                
+                -- If >1 it's probably deliberate, but silly, so let's bail. If it's THAT deliberate
+                -- they will remove this
+                if v.Mult > 1 then WARN('Regen mult too high, should be <1, for unit ' .. unit:GetUnitId() .. ' and buff ' .. buffName) return end
+            
+                -- GPG default for mult is 1. To avoid changing loads of scripts for now, let's do this
+                if v.Mult ~= 1 then
+                    local maxHealth = unit:GetBlueprint().Defense.MaxHealth
+                    for i=1,v.Count do
+                        multsTotal = multsTotal + math.min((v.Mult * maxHealth), v.Ceil or 999999)
+                    end
+                end
+            else
+                for i=1,v.Count do
+                    mults = mults * v.Mult
+                end
             end
         end
 
@@ -388,20 +390,11 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
         else
             bool = true
         end
-
-        if v.Ceil and (not highestCeil or highestCeil < v.Ceil) then
-            highestCeil = v.Ceil
-        end
-
-        if v.Floor and (not lowestFloor or lowestFloor > v.Floor) then
-            lowestFloor = v.Floor
-        end
     end
-    --Adds are calculated first, then the mults.  May want to expand that later.
-    local returnVal = (initialVal + adds) * mults
-
-    if lowestFloor and returnVal < lowestFloor then returnVal = lowestFloor end
-    if highestCeil and returnVal > highestCeil then returnVal = highestCeil end
+    
+    -- Adds are calculated first, then the mults.  May want to expand that later.
+    local returnVal = false
+    returnVal = (initialVal + adds + multsTotal) * mults
 
     return returnVal, bool
 end
