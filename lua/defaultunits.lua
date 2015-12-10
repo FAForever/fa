@@ -100,7 +100,13 @@ StructureUnit = Class(Unit) {
 
         local t = threats[1]
         local rad = math.atan2(t.pos[1]-pos[1], t.pos[3]-pos[3])
-        self:SetRotation(rad * (180 / math.pi))
+        local degrees = rad * (180 / math.pi)
+
+        if EntityCategoryContains(categories.ARTILLERY * (categories.TECH3+categories.EXPERIMENTAL), self) then
+            degrees = math.floor((degrees+45) / 90) * 90
+        end
+
+        self:SetRotation(degrees)
     end,
 
     OnStartBeingBuilt = function(self, builder, layer)
