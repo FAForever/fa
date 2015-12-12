@@ -77,6 +77,7 @@ Patch 3652 (pending)
 - Fixed UEF Drone collision detection, making it much easier for ground-based AA to hit them
 - Fixed UEF AI unit templates in coop mode
 - Fixed an exploit with being able to upgrade restricted enhancements
+- Fixed a rare bug with builders getting near zero HP after a naval building gets destroyed the same tick as it finishes.
 
 **Performance**
 - Optimization of score accumulation

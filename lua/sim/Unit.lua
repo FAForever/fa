@@ -1857,7 +1857,7 @@ Unit = Class(moho.unit_methods) {
         self:PlayUnitSound('DoneBeingBuilt')
         self:PlayUnitAmbientSound( 'ActiveLoop' )
 
-        if self.DisallowCollisions and builder then
+        if self.IsUpgrade and builder then
             --Set correct hitpoints after upgrade
             local hpDamage = builder:GetMaxHealth() - builder:GetHealth() --Current damage
             local damagePercent = hpDamage / self:GetMaxHealth() --Resulting % with upgraded building
@@ -1867,6 +1867,7 @@ Unit = Class(moho.unit_methods) {
             self:SetCanTakeDamage(true)
             self:RevertCollisionShape()
             builder:RefreshIntel()
+            self.IsUpgrade = nil
         end
 
         --Turn off land bones if this unit has them.
@@ -2190,6 +2191,7 @@ Unit = Class(moho.unit_methods) {
             built.DisallowCollisions = true
             built:SetCanTakeDamage(false)
             built:SetCollisionShape('None')
+            built.IsUpgrade = true
         end
     end,
 
