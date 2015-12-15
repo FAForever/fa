@@ -305,9 +305,6 @@ UnitBlueprint {
             DamageRadius = 0.5,
             DamageType = 'Normal',
             DisplayName = 'Phason Laser',
-            DoNotCollideList = {
-                'MISSILE',
-            },
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',

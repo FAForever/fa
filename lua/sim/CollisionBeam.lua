@@ -101,6 +101,11 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
             if radius and radius > 0 then
                 if not damageData.DoTTime or damageData.DoTTime <= 0 then
                     DamageArea(instigator, self:GetPosition(1), radius, damage, damageData.DamageType or 'Normal', damageData.DamageFriendly or false)
+                    -- If a missile is impacted, damage it directly because projectile entities are not
+                    -- affected by DamageArea
+                    if targetEntity and EntityCategoryContains(categories.MISSILE, targetEntity) then
+                        Damage(instigator, self:GetPosition(), targetEntity, damage, damageData.DamageType)
+                    end
                 else
                     ForkThread(DefaultDamage.AreaDoTThread, instigator, self:GetPosition(1), damageData.DoTPulses or 1, (damageData.DoTTime / (damageData.DoTPulses or 1)), radius, damage, damageData.DamageType, damageData.DamageFriendly)
                 end

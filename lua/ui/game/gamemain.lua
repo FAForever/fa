@@ -95,7 +95,6 @@ function SetLayout(layout)
     import('/lua/ui/game/missiontext.lua').SetLayout()
     import('/lua/ui/game/helptext.lua').SetLayout()
     import('/lua/ui/game/score.lua').SetLayout()
-    import('/lua/ui/game/economy.lua').SetLayout()
     import('/lua/ui/game/tabs.lua').SetLayout()
     import('/lua/ui/game/controlgroups.lua').SetLayout()
     import('/lua/ui/game/chat.lua').SetLayout()
@@ -245,6 +244,8 @@ function CreateUI(isReplay)
     if options.gui_render_enemy_lifebars == 1 or options.gui_render_custom_names == 0 then
         import('/modules/console_commands.lua').Init()
     end
+
+    RegisterChatFunc(SendResumedBy, 'SendResumedBy')
 end
 
 local provider = false
@@ -466,24 +467,26 @@ end
 -- Called after the Sim has confirmed the game is indeed paused. This will happen
 -- on everyone's machine in a network game.
 function OnPause(pausedBy, timeoutsRemaining)
-    local isOwner = false
-    if pausedBy == SessionGetLocalCommandSource() then
-        isOwner = true
-    end
     PauseSound("World",true)
     PauseSound("Music",true)
     PauseVoice("VO",true)
-    import('/lua/ui/game/tabs.lua').OnPause(true, pausedBy, timeoutsRemaining, isOwner)
+    import('/lua/ui/game/tabs.lua').OnPause(true, pausedBy, timeoutsRemaining)
     import('/lua/ui/game/missiontext.lua').OnGamePause(true)
 end
 
 -- Called after the Sim has confirmed that the game has resumed.
+local ResumedBy = nil
+function SendResumedBy(sender)
+    if not ResumedBy then ResumedBy = sender end
+end
+
 function OnResume()
     PauseSound("World",false)
     PauseSound("Music",false)
     PauseVoice("VO",false)
-    import('/lua/ui/game/tabs.lua').OnPause(false)
+    import('/lua/ui/game/tabs.lua').OnPause(false, ResumedBy)
     import('/lua/ui/game/missiontext.lua').OnGamePause(false)
+    ResumedBy = nil
 end
 
 -- Called immediately when the user hits the pause button. This only ever gets
@@ -507,13 +510,15 @@ end
 
 local _beatFunctions = {}
 
-function AddBeatFunction(fn)
-    table.insert(_beatFunctions, fn)
+-- throttle means never run function more than 10 times per second to reduce
+-- UI load when speeding up sim / replay
+function AddBeatFunction(fn, throttle)
+    table.insert(_beatFunctions, {fn=fn, throttle=throttle == true})
 end
 
 function RemoveBeatFunction(fn)
     for i,v in _beatFunctions do
-        if v == fn then
+        if v.fn == fn then
             table.remove(_beatFunctions, i)
             break
         end
@@ -521,9 +526,22 @@ function RemoveBeatFunction(fn)
 end
 
 -- this function is called whenever the sim beats
+local last = 0
 function OnBeat()
+    local rate = GetSimRate()
+    local throttle = false
+
+    if rate > 0 then
+        if GetSystemTimeSeconds() - last < 0.1 then
+            throttle = true
+        else
+            last = GetSystemTimeSeconds()
+        end
+    end
+
     for i,v in _beatFunctions do
-        if v then v() end
+        if v.throttle and throttle then continue end
+        if v.fn then v.fn() end
     end
 end
 

@@ -89,7 +89,7 @@ Tooltips = {
     },
     overcharge = {
         title = "<LOC tooltipui0016>Overcharge",
-        description = "",
+        description = "<LOC tooltipui0017>Right click while active to toggle auto-fire",
         keyID = "overcharge",
     },
     transport = {
@@ -1028,6 +1028,10 @@ Tooltips = {
     map_ai_markers = {
         title = '<LOC lobui_0585>AI Markers',
         description = '<LOC lobui_0586>Select maps with AI Markers.',
+    },
+    map_obsolete = {
+        title = '<LOC MAPSEL_0035>Hide Obsolete',
+        description = '<LOC MAPSEL_0036>Hides maps which have been replaced by new versions',
     },
     
     -- **********************

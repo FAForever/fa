@@ -4,6 +4,23 @@ local scoreData = {current={}, historical={}}
 local scoreOption = ScenarioInfo.Options.Score or "no"
 local ArmyScore = {}
 
+-- Some of these values pre-existed and are used in other places, that's why their naming is not consistent
+local categoriesToCollect = {
+    land=categories.LAND,
+    air=categories.AIR,
+    naval=categories.NAVAL,
+    cdr=categories.COMMAND,
+    sacu=categories.SUBCOMMANDER,
+    engineer=categories.ENGINEER,
+    tech1=categories.TECH1,
+    tech2=categories.TECH2,
+    tech3=categories.TECH3,
+    experimental=categories.EXPERIMENTAL,
+    structures=categories.STRUCTURE,
+    transportation=categories.TRANSPORTATION
+}
+
+
 function UpdateScoreData(newData)
     scoreData.current = table.deepcopy(newData)
 end
@@ -48,11 +65,12 @@ end
 function ScoreThread()
     for index, brain in ArmyBrains do
         ArmyScore[index] = {
+            faction = 0,
             general = {
                 score = 0,
                 mass = 0,
                 lastReclaimedMass = 0,
-                lastReclaimedEnergy = 0,                
+                lastReclaimedEnergy = 0,
                 energy = 0,
                 kills = {
                     count = 0,
@@ -78,36 +96,7 @@ function ScoreThread()
             },
 
             units = {
-                cdr = {
-                    kills = 0,
-                    built = 0,
-                    lost = 0
-                },
-                land = {
-                    kills = 0,
-                    built = 0,
-                    lost = 0
-                },
-                air = {
-                    kills = 0,
-                    built = 0,
-                    lost = 0
-                },
-                naval = {
-                    kills = 0,
-                    built = 0,
-                    lost = 0
-                },
-                structures = {
-                    kills = 0,
-                    built = 0,
-                    lost = 0
-                },
-                experimental = {
-                    kills = 0,
-                    built = 0,
-                    lost = 0
-                }
+                -- filled dynamically below
             },
 
             resources = {
@@ -131,12 +120,23 @@ function ScoreThread()
                 energyover = 0
             }
         }
+
+        for categoryName, category in categoriesToCollect do
+            ArmyScore[index].units[categoryName] = {
+                kills = 0,
+                built = 0,
+                lost = 0
+            }
+        end
     end
-    
+
     ForkThread(ScoreDisplayResourcesThread)
-    
+
     while true do
         for index, brain in ArmyBrains do
+            ArmyScore[index].faction = brain:GetFactionIndex()
+            ArmyScore[index].name = brain.Nickname
+            ArmyScore[index].type = brain.BrainType
             ArmyScore[index].general.score = CalculateBrainScore(brain)
 
             ArmyScore[index].general.mass = brain:GetArmyStat("Economy_TotalProduced_Mass", 0.0).Value
@@ -165,32 +165,28 @@ function ScoreThread()
             ArmyScore[index].resources.energyout.rate = brain:GetArmyStat("Economy_Output_Energy", 0.0).Value
             ArmyScore[index].resources.energyover = brain:GetArmyStat("Economy_AccumExcess_Energy", 0.0).Value
 
-            ArmyScore[index].units.land.kills = brain:GetBlueprintStat("Enemies_Killed", categories.LAND)
-            ArmyScore[index].units.land.built = brain:GetBlueprintStat("Units_History", categories.LAND)
-            ArmyScore[index].units.land.lost = brain:GetBlueprintStat("Units_Killed", categories.LAND)
-            ArmyScore[index].units.air.kills = brain:GetBlueprintStat("Enemies_Killed", categories.AIR)
-            ArmyScore[index].units.air.built = brain:GetBlueprintStat("Units_History", categories.AIR)
-            ArmyScore[index].units.air.lost = brain:GetBlueprintStat("Units_Killed", categories.AIR)
-            ArmyScore[index].units.naval.kills = brain:GetBlueprintStat("Enemies_Killed", categories.NAVAL)
-            ArmyScore[index].units.naval.built = brain:GetBlueprintStat("Units_History", categories.NAVAL)
-            ArmyScore[index].units.naval.lost = brain:GetBlueprintStat("Units_Killed", categories.NAVAL)
+            for unitId, stats in brain:GetUnitStats() do
+                if ArmyScore[index].units[unitId] == nil then
+                    ArmyScore[index].units[unitId] = {}
+                end
 
-            ArmyScore[index].units.cdr.kills = brain:GetBlueprintStat("Enemies_Killed", categories.COMMAND)
-            ArmyScore[index].units.cdr.built = brain:GetBlueprintStat("Units_History", categories.COMMAND)
-            ArmyScore[index].units.cdr.lost = brain:GetBlueprintStat("Units_Killed", categories.COMMAND)
-            ArmyScore[index].units.experimental.kills = brain:GetBlueprintStat("Enemies_Killed", categories.EXPERIMENTAL)
-            ArmyScore[index].units.experimental.built = brain:GetBlueprintStat("Units_History", categories.EXPERIMENTAL)
-            ArmyScore[index].units.experimental.lost = brain:GetBlueprintStat("Units_Killed", categories.EXPERIMENTAL)
+                for statName, value in stats do
+                    ArmyScore[index].units[unitId][statName] = value
+                end
+            end
 
-            ArmyScore[index].units.structures.kills = brain:GetBlueprintStat("Enemies_Killed", categories.STRUCTURE)
-            ArmyScore[index].units.structures.built = brain:GetBlueprintStat("Units_History", categories.STRUCTURE)
-            ArmyScore[index].units.structures.lost = brain:GetBlueprintStat("Units_Killed", categories.STRUCTURE)
+            for categoryName, category in categoriesToCollect do
+                ArmyScore[index].units[categoryName]['kills'] = brain:GetBlueprintStat("Enemies_Killed", category)
+                ArmyScore[index].units[categoryName]['built'] = brain:GetBlueprintStat("Units_History", category)
+                ArmyScore[index].units[categoryName]['lost'] = brain:GetBlueprintStat("Units_Killed", category)
+            end
 
             WaitSeconds(0.1)
         end
-        WaitSeconds(3)
+
         UpdateScoreData(ArmyScore)
         SyncScores()
+        WaitSeconds(3)
     end
 end
 
@@ -203,7 +199,7 @@ function ScoreDisplayResourcesThread()
             local massReclaimRate = reclaimedMass - ArmyScore[index].general.lastReclaimedMass
             ArmyScore[index].resources.massin.rate = brain:GetArmyStat("Economy_Income_Mass", 0.0).Value - massReclaimRate
             ArmyScore[index].general.lastReclaimedMass = reclaimedMass
-            
+
             local reclaimedEnergy = brain:GetArmyStat("Economy_Reclaimed_Energy", 0.0).Value
             local energyReclaimRate = reclaimedEnergy - ArmyScore[index].general.lastReclaimedEnergy
             ArmyScore[index].resources.energyin.rate = brain:GetArmyStat("Economy_Income_Energy", 0.0).Value - energyReclaimRate
@@ -216,7 +212,17 @@ end
 local observer = false
 function SyncScores()
     observer = observer or GetFocusArmy() == -1
-    if observer or import('/lua/victory.lua').gameOver then
+
+    local victory = import('/lua/victory.lua')
+
+    Sync.SendStats = victory.sendStats
+    if Sync.SendStats then
+        -- Reset the flag so that stats are only sent once.
+        -- Do it only when Sync.SendStats was set to true to prevent race conditions.
+        victory.sendStats = false
+    end
+
+    if observer or victory.gameOver or Sync.SendStats then
         Sync.FullScoreSync = true
         Sync.ScoreAccum = scoreData
         Sync.Score = scoreData.current

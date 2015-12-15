@@ -100,7 +100,13 @@ StructureUnit = Class(Unit) {
 
         local t = threats[1]
         local rad = math.atan2(t.pos[1]-pos[1], t.pos[3]-pos[3])
-        self:SetRotation(rad * (180 / math.pi))
+        local degrees = rad * (180 / math.pi)
+
+        if EntityCategoryContains(categories.ARTILLERY * (categories.TECH3+categories.EXPERIMENTAL), self) then
+            degrees = math.floor((degrees+45) / 90) * 90
+        end
+
+        self:SetRotation(degrees)
     end,
 
     OnStartBeingBuilt = function(self, builder, layer)
@@ -1751,12 +1757,12 @@ AirUnit = Class(MobileUnit) {
 --- Mixin transports (air, sea, space, whatever). Sellotape onto concrete transport base classes as
 -- desired.
 
-local bpSlots = {}
+local slotsData = {}
 BaseTransport = Class() {
-    InitSlots = function(self)
+    GetSlotsData = function(self)
         local bpid = self:GetUnitId()
 
-        if not bpSlots[bpid] then
+        if not slotsData[bpid] then
             local slots = {{}, {}, {}}
 
             for bone=1, self:GetBoneCount() do
@@ -1775,49 +1781,64 @@ BaseTransport = Class() {
                     end
 
                     if size then
-                        slots[size][bone] = false
+                        table.insert(slots[size], bone)
                     end
                 end
             end
 
-            bpSlots[bpid] = slots
+            slotsData[bpid] = slots
         end
 
-        self.slots = table.deepcopy(bpSlots[bpid])
+        return slotsData[bpid]
+    end,
+
+    GetClassSlots = function(self, class)
+        local slots = self:GetSlotsData()
+        return slots[class] or {}
     end,
 
     AllCargoLocked = function(self, unit)
-        if self.allLocked == nil or self.allLocked.tick < GetGameTick() then
+        local tdata = self.transData
+        if tdata.allLocked == nil or tdata.detachTick < GetGameTick() then
             -- cache this for all unload same tick
-            self.allLocked = {bool=unit.TransportLocked == true and not self:IsUnitState('Ferrying'), tick=GetGameTick()}
-            if self.allLocked then
+            tdata.allLocked = unit.TransportLocked == true and not self:IsUnitState('Ferrying')
+            tdata.detachTick = GetGameTick()
+            if tdata.allLocked then
                 for _, u in self:GetCargo() do
                     if not u.TransportLocked then
-                        self.allLocked.bool = false
+                        tdata.allLocked = false
                         break
                     end
                 end
             end
         end
 
-        return self.allLocked.bool
+        return tdata.allLocked
     end,
 
     GetFreeSlot = function(self, unit)
-        for i, slot in self.slots[unit:GetTransportClass()] do
-            if not IsEntity(slot) then return i end
+        local slots = self:GetClassSlots(unit:GetTransportClass())
+        for i, slot in slots do
+            if not self.slots[slot] and not self.transData.reserved[i] then return slot end
         end
     end,
 
+    ReserveSlot = function(self, slot)
+        if self.slots[slot] then return false end
+        self.transData.reserved = self.transData.reserved or {}
+        self.transData.reserved[slot] = true
+        return true
+    end,
+
     MoveCargo = function(self, unit, to)
-        local class = unit:GetTransportClass()
         if not unit then return false end
         local from = unit.attachmentBone
         self:DetachAll(self:GetBoneName(from), true)
         unit:DetachFrom(true)
         unit:AttachBoneTo('AttachPoint', self, self:GetBoneName(to))
         unit.attachmentBone = to
-        self.slots[class][to] = unit
+        self.slots[from] = nil
+        self.slots[to] = unit
     end,
 
     OnTransportAttach = function(self, bone, unit)
@@ -1828,13 +1849,9 @@ BaseTransport = Class() {
             unit:DisableDefaultToggleCaps()
         end
         self:RequestRefreshUI()
-
-
-
         for i=1, self:GetBoneCount() do
             if self:GetBoneName(i) == bone then
-                local class = unit:GetTransportClass()
-                self.slots[class][i] = unit
+                self.slots[i] = unit
                 unit.attachmentBone = i
             end
         end
@@ -1849,8 +1866,7 @@ BaseTransport = Class() {
             return
         end
 
-        local class = unit:GetTransportClass()
-        self.slots[class][unit.attachmentBone] = false
+        self.slots[unit.attachmentBone] = nil
         unit.attachmentBone = nil
         unit:EnableShield()
         unit:EnableDefaultToggleCaps()
@@ -1871,7 +1887,7 @@ BaseTransport = Class() {
         -- We keep the aibrain up to date with the last transport to start loading so, among other
         -- things, we can determine which transport is being referenced during an OnTransportFull
         -- event (As this function is called immediately before that one).
-        self.full = false
+        self.transData = {}
         self:GetAIBrain().loadingTransport = self
     end,
 
@@ -1904,7 +1920,8 @@ AirTransport = Class(AirUnit, BaseTransport) {
 
     OnCreate = function(self)
         AirUnit.OnCreate(self)
-        self:InitSlots()
+        self.slots = {}
+        self.transData = {}
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
@@ -2219,11 +2236,20 @@ ACUUnit = Class(CommandUnit) {
         end
     end,
 
+    OnStopBeingBuilt = function(self, builder, layer)
+        CommandUnit.OnStopBeingBuilt(self, builder, layer)
+        ArmyBrains[self:GetArmy()]:SetUnitStat(self:GetUnitId(), "lowest_health", self:GetHealth())
+    end,
+
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         WalkingLandUnit.DoTakeDamage(self, instigator, amount, vector, damageType)
         local aiBrain = self:GetAIBrain()
         if aiBrain then
             aiBrain:OnPlayCommanderUnderAttackVO()
+        end
+
+        if self:GetHealth() < ArmyBrains[self:GetArmy()]:GetUnitStat(self:GetUnitId(), "lowest_health") then
+            ArmyBrains[self:GetArmy()]:SetUnitStat(self:GetUnitId(), "lowest_health", self:GetHealth())
         end
     end,
 

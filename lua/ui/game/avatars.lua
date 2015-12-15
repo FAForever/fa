@@ -69,7 +69,7 @@ function CreateAvatarUI(parent)
 
     if GetFocusArmy() ~= -1 then
         recievingBeatUpdate = true
-        GameMain.AddBeatFunction(AvatarUpdate)
+        GameMain.AddBeatFunction(AvatarUpdate, true)
     end
 end
 
@@ -841,7 +841,7 @@ function FocusArmyChanged()
         recievingBeatUpdate = false
     elseif not recievingBeatUpdate then
         recievingBeatUpdate = true
-        GameMain.AddBeatFunction(AvatarUpdate)
+        GameMain.AddBeatFunction(AvatarUpdate, true)
     end
 end
 

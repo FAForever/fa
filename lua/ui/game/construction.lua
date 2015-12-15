@@ -1894,21 +1894,15 @@ function FormatData(unitData, type)
         }
         local filteredEnh = {}
         local usedEnhancements = {}
-        local restrictList = EnhanceCommon.GetRestricted()
+        local restEnh = EnhanceCommon.GetRestricted()
+
+		-- filter enhancements based on restrictions
         for index, enhTable in unitData do
-            if not string.find(enhTable.ID, 'Remove') then
-                local restricted = false
-                for _, enhancement in restrictList do
-                    if enhancement == enhTable.ID then
-                        restricted = true
-                        break
-                    end
-                end
-                if not restricted then
-                    table.insert(filteredEnh, enhTable)
-                end
+            if not restEnh[enhTable.ID] and not string.find(enhTable.ID, 'Remove') then
+                table.insert(filteredEnh, enhTable)
             end
         end
+
         local function GetEnhByID(id)
             for i, enh in filteredEnh do
                 if enh.ID == id then

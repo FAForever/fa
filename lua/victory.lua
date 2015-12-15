@@ -1,4 +1,5 @@
 gameOver = false
+sendStats = false
 
 local victoryCategories = {
     demoralization=categories.COMMAND,
@@ -86,7 +87,7 @@ end
 
 function CallEndGame()
     gameOver = true
-    SubmitXMLArmyStats()
+    sendStats = true
     ForkThread(function()
         WaitSeconds(3)
         EndGame()

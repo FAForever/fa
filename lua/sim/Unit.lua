@@ -1232,6 +1232,8 @@ Unit = Class(moho.unit_methods) {
         self:DisableShield()
         self:DisableUnitIntel('Killed')
         self:ForkThread(self.DeathThread, overkillRatio , instigator)
+
+        ArmyBrains[self:GetArmy()]:AddUnitStat(self:GetUnitId(), "lost", 1)
     end,
 
     --Argument val is true or false. False = cannot be killed
@@ -1268,6 +1270,8 @@ Unit = Class(moho.unit_methods) {
         else
             self:AddXP(DEFAULT_XP)
         end
+
+        ArmyBrains[self:GetArmy()]:AddUnitStat(unitKilled:GetUnitId(), "kills", 1)
     end,
 
     DoDeathWeapon = function(self)
@@ -1713,7 +1717,7 @@ Unit = Class(moho.unit_methods) {
             if self:IsValidBone(v) then
                 self:ShowBone(v, children)
             else
-                LOG('*WARNING: TRYING TO SHOW BONE ', repr(v), ' ON UNIT ',repr(self:GetUnitId()),' BUT IT DOES NOT EXIST IN THE MODEL. PLEASE CHECK YOUR SCRIPT IN THE BUILD PROGRESS BONES.')
+                WARN('*WARNING: TRYING TO SHOW BONE ', repr(v), ' ON UNIT ',repr(self:GetUnitId()),' BUT IT DOES NOT EXIST IN THE MODEL. PLEASE CHECK YOUR SCRIPT IN THE BUILD PROGRESS BONES.')
             end
         end
     end,
@@ -1853,7 +1857,7 @@ Unit = Class(moho.unit_methods) {
         self:PlayUnitSound('DoneBeingBuilt')
         self:PlayUnitAmbientSound( 'ActiveLoop' )
 
-        if self.DisallowCollisions and builder then
+        if self.IsUpgrade and builder then
             --Set correct hitpoints after upgrade
             local hpDamage = builder:GetMaxHealth() - builder:GetHealth() --Current damage
             local damagePercent = hpDamage / self:GetMaxHealth() --Resulting % with upgraded building
@@ -1863,6 +1867,7 @@ Unit = Class(moho.unit_methods) {
             self:SetCanTakeDamage(true)
             self:RevertCollisionShape()
             builder:RefreshIntel()
+            self.IsUpgrade = nil
         end
 
         --Turn off land bones if this unit has them.
@@ -1904,6 +1909,8 @@ Unit = Class(moho.unit_methods) {
         else
             self.MovementEffectsExist = false
         end
+
+        ArmyBrains[self:GetArmy()]:AddUnitStat(self:GetUnitId(), "built", 1)
 
         -- If someone thinks they're being clever by using a UI mod to violate unit restrictions,
         -- thoroughly ruin their day.
@@ -2184,6 +2191,7 @@ Unit = Class(moho.unit_methods) {
             built.DisallowCollisions = true
             built:SetCanTakeDamage(false)
             built:SetCollisionShape('None')
+            built.IsUpgrade = true
         end
     end,
 
@@ -2436,6 +2444,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     ClearWork = function(self)
+        self.WorkProgress = 0
         self.WorkItem = nil
         self.WorkItemBuildCostEnergy = nil
         self.WorkItemBuildCostMass = nil
@@ -2443,22 +2452,15 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnWorkBegin = function(self, work)
-        local unitEnhancements = import('/lua/enhancementcommon.lua').GetEnhancements(self:GetEntityId())
-        local tempEnhanceBp = self:GetBlueprint().Enhancements[work]
-        --Check if the enhancement is restricted
-        if ScenarioInfo.Options.RestrictedCategories then
-            local restrictedUnits = import('/lua/ui/lobby/restrictedUnitsData.lua').restrictedUnits
-            for k, restriction in ScenarioInfo.Options.RestrictedCategories do
-                if restrictedUnits[restriction].enhancement then
-                    for kk, cat in restrictedUnits[restriction].enhancement do
-                        if work == cat then --If Teleporter == Teleporter
-                            self:OnWorkFail(work)
-                            return false
-                        end
-                    end
-                end
-            end
+        local enhCommon = import('/lua/enhancementcommon.lua')
+        local rest = enhCommon.GetRestricted()
+        if rest[work] then
+            self:OnWorkFail(work)
+            return false
         end
+
+        local unitEnhancements = enhCommon.GetEnhancements(self:GetEntityId())
+        local tempEnhanceBp = self:GetBlueprint().Enhancements[work]
         if tempEnhanceBp.Prerequisite then
             if unitEnhancements[tempEnhanceBp.Slot] ~= tempEnhanceBp.Prerequisite then
                 error('*ERROR: Ordered enhancement does not have the proper prereq!', 2)
@@ -2482,6 +2484,8 @@ Unit = Class(moho.unit_methods) {
         end
 
         ChangeState(self, self.WorkingState)
+        -- inform EnhanceTask that enhancement is not restricted 
+		return true 
     end,
 
     OnWorkEnd = function(self, work)
@@ -2890,7 +2894,7 @@ Unit = Class(moho.unit_methods) {
             end
 
             if not vTypeGroup.Bones or (vTypeGroup.Bones and (table.getn(vTypeGroup.Bones) == 0)) then
-                LOG('*WARNING: No effect bones defined for layer group ',repr(self:GetUnitId()),', Add these to a table in Display.[EffectGroup].', self:GetCurrentLayer(), '.Effects { Bones ={} } in unit blueprint.' )
+                WARN('*WARNING: No effect bones defined for layer group ',repr(self:GetUnitId()),', Add these to a table in Display.[EffectGroup].', self:GetCurrentLayer(), '.Effects { Bones ={} } in unit blueprint.' )
             else
                 for kb, vBone in vTypeGroup.Bones do
                     for ke, vEffect in effects do
@@ -2931,7 +2935,7 @@ Unit = Class(moho.unit_methods) {
 
             if (not effectTypeGroups or (effectTypeGroups and (table.getn(effectTypeGroups) == 0))) then
                 if not self.Footfalls and bpTable.Footfall then
-                    LOG('*WARNING: No movement effect groups defined for unit ',repr(self:GetUnitId()),', Effect groups with bone lists must be defined to play movement effects. Add these to the Display.MovementEffects', layer, '.Effects table in unit blueprint. ' )
+                    WARN('*WARNING: No movement effect groups defined for unit ',repr(self:GetUnitId()),', Effect groups with bone lists must be defined to play movement effects. Add these to the Display.MovementEffects', layer, '.Effects table in unit blueprint. ' )
                 end
                 return false
             end
@@ -3026,7 +3030,7 @@ Unit = Class(moho.unit_methods) {
     CreateBeamExhaust = function( self, bpTable, beamBP )
         local effectBones = bpTable.Bones
         if not effectBones or (effectBones and (table.getn(effectBones) == 0)) then
-            LOG('*WARNING: No beam exhaust effect bones defined for unit ',repr(self:GetUnitId()),', Effect Bones must be defined to play beam exhaust effects. Add these to the Display.MovementEffects.BeamExhaust.Bones table in unit blueprint.' )
+            WARN('*WARNING: No beam exhaust effect bones defined for unit ',repr(self:GetUnitId()),', Effect Bones must be defined to play beam exhaust effects. Add these to the Display.MovementEffects.BeamExhaust.Bones table in unit blueprint.' )
             return false
         end
         local army = self:GetArmy()
@@ -3042,7 +3046,7 @@ Unit = Class(moho.unit_methods) {
     CreateContrails = function(self, tableData )
         local effectBones = tableData.Bones
         if not effectBones or (effectBones and (table.getn(effectBones) == 0)) then
-            LOG('*WARNING: No contrail effect bones defined for unit ',repr(self:GetUnitId()),', Effect Bones must be defined to play contrail effects. Add these to the Display.MovementEffects.Air.Contrail.Bones table in unit blueprint. ' )
+            WARN('*WARNING: No contrail effect bones defined for unit ',repr(self:GetUnitId()),', Effect Bones must be defined to play contrail effects. Add these to the Display.MovementEffects.Air.Contrail.Bones table in unit blueprint. ' )
             return false
         end
         local army = self:GetArmy()
@@ -3102,7 +3106,7 @@ Unit = Class(moho.unit_methods) {
 
     CreateFootFallManipulators = function( self, footfall )
         if not footfall.Bones or (footfall.Bones and (table.getn(footfall.Bones) == 0)) then
-            LOG('*WARNING: No footfall bones defined for unit ',repr(self:GetUnitId()),', ', 'these must be defined to animation collision detector and foot plant controller' )
+            WARN('*WARNING: No footfall bones defined for unit ',repr(self:GetUnitId()),', ', 'these must be defined to animation collision detector and foot plant controller' )
             return false
         end
 
@@ -3653,11 +3657,9 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnStartTransportBeamUp = function(self, transport, bone)
-        local class = self:GetTransportClass()
-        local slot = transport.slots[class][bone]
-
+        local slot = transport.slots[bone]
         if slot then
-            local free = transport:GetFreeSlot(slot)
+            local free = IsEntity(slot) and transport:GetFreeSlot(slot)
             if free then
                 transport:MoveCargo(slot, free)
             else
@@ -3666,7 +3668,7 @@ Unit = Class(moho.unit_methods) {
                 return
             end
         end
-
+        transport:ReserveSlot(bone)
         self:DestroyIdleEffects()
         self:DestroyMovementEffects()
         local army =  self:GetArmy()

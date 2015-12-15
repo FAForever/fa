@@ -3,6 +3,7 @@ Patch 3652 (pending)
 
 **Whole Game**
 - Introduced Russian translations of many FAF additions to the game (Exotic_Retard)
+- Added game-side support for future achievement system
 
 **Lobby**
 - Name filter when selecting map
@@ -28,6 +29,7 @@ Patch 3652 (pending)
 - Allow Hotbuild to find Support Factories
 - Allow the UI code to search active mods for unit icons. Mods will have to have the icons in the right place (/modname/icons/units/xxx_icon.dds). Confirmed working for Total Mayhem at least, and probably many more.
 - Show ren_networkstats in Connectivity Screen (F11)
+- Show name of the one resuming a paused game
 
 **Gameplay**
 - Teamkill is now detected and a player can make an explicit report
@@ -47,6 +49,7 @@ Patch 3652 (pending)
 - Spread attack: Targets are now spread more uniformly across all units during the initial attack orders, further ones are random.
 - Diplomacy now allowed in Coop mode
 - Allow Fatboy, Atlantis, Tempest and Czar to fire while building units
+- Beam weapons now kill missiles they impact instead of wasting DPS for several ticks
 
 **Bugs**
 - Chrono Dampener doesn't stun allied units anymore
@@ -73,6 +76,8 @@ Patch 3652 (pending)
 - Fixed UEF Drones being untargetable by Interceptors
 - Fixed UEF Drone collision detection, making it much easier for ground-based AA to hit them
 - Fixed UEF AI unit templates in coop mode
+- Fixed an exploit with being able to upgrade restricted enhancements
+- Fixed a rare bug with builders getting near zero HP after a naval building gets destroyed the same tick as it finishes.
 
 **Performance**
 - Optimization of score accumulation
