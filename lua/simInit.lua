@@ -81,24 +81,25 @@ function SetupSession()
     --===================================================================================
     ScenarioInfo.Env = import('/lua/scenarioEnvironment.lua')
 
-    -- if build restrictions chosen, set them up
-    local buildRestrictions, restEnh = nil, {}
+    -- if build/enhancement restrictions chosen, set them up
+    local buildRestrictions, enhRestrictions = nil, {}
     if ScenarioInfo.Options.RestrictedCategories then
         local restrictedUnits = import('/lua/ui/lobby/restrictedUnitsData.lua').restrictedUnits
-        for _, r in ScenarioInfo.Options.RestrictedCategories do
-            local restriction = restrictedUnits[r]
-            if restriction.enhancement then
-                for _, e in restriction.enhancement do
-                    restEnh[e] = true
+        for _, name in ScenarioInfo.Options.RestrictedCategories do
+            local enhancements = restrictedUnits[name].enhancement
+            if enhancements then
+                for _, enhancement in enhancements do
+                    enhRestrictions[enhancement] = true
                 end
             end
 
-            local categoryExpression = restrictedUnits[restriction].categoryExpression
+            local categoryExpression = restrictedUnits[name].categoryExpression
             if categoryExpression then
+                categoryExpression = "(" .. categoryExpression .. ")"
                 if buildRestrictions then
-                    buildRestrictions = buildRestrictions .. " + (" .. categoryExpression .. ")"
+                    buildRestrictions = buildRestrictions .. " + " .. categoryExpression
                 else
-                    buildRestrictions = "(" .. categoryExpression .. ")"
+                    buildRestrictions = categoryExpression
                 end
             end
         end
@@ -110,8 +111,8 @@ function SetupSession()
         ScenarioInfo.BuildRestrictions = buildRestrictions
     end
 
-    if restEnh then
-        import('/lua/enhancementcommon.lua').RestrictList(restEnh)
+    if enhRestrictions then
+        import('/lua/enhancementcommon.lua').RestrictList(enhRestrictions)
     end
 
     --===========================================================================
