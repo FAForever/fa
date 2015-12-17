@@ -9,7 +9,7 @@ UnitBlueprint {
     Audio = {
         CaptureLoop = Sound {
             Bank = 'XSL',
-            Cue = 'XSL0301_Capture_Loop',
+            Cue = 'XSL0001_Capture_Loop',
             LodCutoff = 'UnitMove_LodCutoff',
         },
         CommanderArrival = Sound {
