@@ -73,6 +73,9 @@ URS0201 = Class(CSeaUnit) {
     end,
 
     TransformThread = function(self, land)
+        -- Eject early to stop CreateAnimator spamming the log in odd situations
+        if not self then return end
+        
         if not self.AnimManip then
             self.AnimManip = CreateAnimator(self)
         end
