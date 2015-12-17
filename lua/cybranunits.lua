@@ -120,7 +120,7 @@ CConstructionUnit = Class(ConstructionUnit){
 
     TransformThread = function(self, water)
 
-        if not self.TransformManipulator then
+        if self and not self.TransformManipulator then
             self.TransformManipulator = CreateAnimator(self)
             self.Trash:Add( self.TransformManipulator )
         end
