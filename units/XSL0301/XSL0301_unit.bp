@@ -4,14 +4,12 @@ UnitBlueprint {
             'Back_Upgrade',
             'Torso',
             'AttachPoint',
-#            'Left_Leg_B02',
-#            'Right_Leg_B02',
         },
     },
     Audio = {
         CaptureLoop = Sound {
             Bank = 'XSL',
-            Cue = 'XSL0301_Capture_Loop',
+            Cue = 'XSL0001_Capture_Loop',
             LodCutoff = 'UnitMove_LodCutoff',
         },
         CommanderArrival = Sound {
@@ -318,7 +316,7 @@ UnitBlueprint {
         ProductionPerSecondMass = 2,
         StorageEnergy = 500,
         StorageMass = 275,
-        TeleportEnergyMod = 5.42, # 2.5
+        TeleportEnergyMod = 5.42,
         TeleportMassMod = 0,
         TeleportTimeMod = 0.0001,
     },
@@ -648,16 +646,6 @@ UnitBlueprint {
             SortCategory = 'SORTOTHER',
             UnitName = '<LOC xsl0301_Rambo_name>SACU (Rambo preset)',
         },
-#        Teleporter = {
-#            BuildIconSortPriority = 45,
-#            Description = '<LOC xsl0301_Teleporter_desc>SACU (Teleporter preset)',
-#            Enhancements = {
-#                'Teleporter',
-#            },
-#            HelpText = '<LOC xsl0301_Teleporter_help>Support Armored Command Unit. Enhanced during #construction with the Teleporter enhancement.',
-#            SortCategory = 'SORTOTHER',
-#            UnitName = '<LOC xsl0301_Engineer_name>SACU (Teleporter preset)',
-#        },
     },
     General = {
         BuildBones = {
@@ -774,7 +762,7 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Light Chronotron Cannon',
             FireTargetLayerCapsTable = {
-                Land = 'Land|Water|Seabed',                        --Removed Seabed fire caps (IceDreamer)
+                Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
             FiringTolerance = 2,
