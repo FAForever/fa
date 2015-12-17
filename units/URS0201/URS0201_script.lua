@@ -73,7 +73,7 @@ URS0201 = Class(CSeaUnit) {
     end,
 
     TransformThread = function(self, land)
-        if not self.AnimManip then
+        if self and not self.AnimManip then
             self.AnimManip = CreateAnimator(self)
         end
         local bp = self:GetBlueprint()
