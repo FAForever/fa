@@ -119,6 +119,8 @@ CConstructionUnit = Class(ConstructionUnit){
     end,
 
     TransformThread = function(self, water)
+        -- Eject early to stop CreateAnimator spamming the log in odd situations
+        if not self then return end
 
         if not self.TransformManipulator then
             self.TransformManipulator = CreateAnimator(self)
