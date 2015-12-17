@@ -10,7 +10,7 @@ URB0103 = Class(CSeaFactoryUnit) {
 
     StartArmsMoving = function(self)
         CSeaFactoryUnit.StartArmsMoving(self)
-        if not self.ArmSlider then
+        if self and not self.ArmSlider then
             self.ArmSlider = CreateSlider(self, 'Right_Arm03')
             self.Trash:Add(self.ArmSlider)
         end
