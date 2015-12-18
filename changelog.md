@@ -2,7 +2,6 @@ Patch 3652 (pending)
 ============================
 
 **Whole Game**
-- Introduced Russian translations of many FAF additions to the game (Exotic_Retard)
 - Added game-side support for future achievement system
 
 **Lobby**
