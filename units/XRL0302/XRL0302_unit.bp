@@ -58,7 +58,6 @@ UnitBlueprint {
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 4,
-		InstantDeath = true,
     },
     Description = '<LOC xrl0302_desc>Mobile Bomb',
     Display = {

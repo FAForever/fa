@@ -33,12 +33,20 @@ local StratManager = import('/lua/sim/StrategyManager.lua')
 
 
 local TransferUnitsOwnership = import('/lua/SimUtils.lua').TransferUnitsOwnership
-local CalculateBrainScore = import('/lua/score.lua').CalculateBrainScore
+local CalculateBrainScore = import('/lua/sim/score.lua').CalculateBrainScore
 
-
+local unitStats = {}
 local observer = false
 
+local Points = {
+    defeat=-10,
+    draw=0,
+    victory=10
+}
+
 AIBrain = Class(moho.aibrain_methods) {
+    Result = nil,
+
    ------------------------------------------------------
    ----------- HUMAN BRAIN FUNCTIONS HANDLED HERE  ------
    ------------------------------------------------------
@@ -46,6 +54,38 @@ AIBrain = Class(moho.aibrain_methods) {
         self:CreateBrainShared(planName)
         self:InitializeEconomyState()
         self.BrainType = 'Human'
+    end,
+
+    AddUnitStat = function(self, unitId, statName, value)
+        if unitStats[unitId] == nil then
+            unitStats[unitId] = {}
+        end
+
+        if unitStats[unitId][statName] == nil then
+            unitStats[unitId][statName] = value
+        else
+            unitStats[unitId][statName] = unitStats[unitId][statName] + value
+        end
+    end,
+
+    SetUnitStat = function(self, unitId, statName, value)
+        if unitStats[unitId] == nil then
+            unitStats[unitId] = {}
+        end
+
+        unitStats[unitId][statName] = value
+    end,
+
+    GetUnitStat = function(self, unitId, statName)
+        if unitStats[unitId] == nil or unitStats[unitId][statName] == nil then
+            return 0
+        end
+
+        return unitStats[unitId][statName]
+    end,
+
+    GetUnitStats = function(self)
+        return unitStats
     end,
 
     OnCreateAI = function(self, planName)
@@ -113,7 +153,7 @@ AIBrain = Class(moho.aibrain_methods) {
             self.AIPlansList = AIDefaultPlansList
         end
         self.RepeatExecution = false
-        
+
         if ScenarioInfo.type == 'campaign' then
             self:SetResourceSharing(false)
         end
@@ -173,6 +213,28 @@ AIBrain = Class(moho.aibrain_methods) {
         end
 
         self.PreBuilt = true
+    end,
+
+    AddUnitStat = function(self, unitId, statName, value)
+        unitStats[unitId] = unitStats[unitId] or {}
+        unitStats[unitId][statName] = unitStats[unitId][statName] or 0 + value
+    end,
+
+    SetUnitStat = function(self, unitId, statName, value)
+        unitStats[unitId] = unitStats[unitId] or {}
+        unitStats[unitId][statName] = value
+    end,
+
+    GetUnitStat = function(self, unitId, statName)
+        if unitStats[unitId] == nil or unitStats[unitId][statName] == nil then
+            return 0
+        end
+
+        return unitStats[unitId][statName]
+    end,
+
+    GetUnitStats = function(self)
+        return unitStats
     end,
 
     ------------------------------------------------------------------------------------------------------------------------------------------
@@ -299,7 +361,7 @@ AIBrain = Class(moho.aibrain_methods) {
         return false
     end,
 
-    
+
 
     ------------------------------------------------------------------------------------------------------------------------------------------
     ---- ------------- TRIGGERS BASED ON AN AI BRAIN       ------------- ----
@@ -455,12 +517,31 @@ AIBrain = Class(moho.aibrain_methods) {
         --LOG('===== AI DEBUG: Brain Evaluate Thead killed =====')
     end,
 
+    ReportScore = function(self)
+        local kills = self:GetArmyStat("Enemies_Commanders_Destroyed",0).Value
+        local score = Points[self.Result] or 0 + kills
+        table.insert(Sync.GameResult, { self:GetArmyIndex(), string.format("%s %i", self.Result or 'score', score)})
+    end,
 
+    SetResult = function(self, result)
+        if self.Result then return end
+        if not Points[result] then
+            WARN("brain:SetResult() " .. result .. " not a valid result")
+            return
+        end
+
+        self.Result = result
+        self:ReportScore()
+    end,
 
     OnDefeat = function(self)
+        if self.Result then return end
+        local my_army = self:GetArmyIndex()
+
+        self:SetResult("defeat")
         ----For Sorian AI
         if self.BrainType == 'AI' then
-            SUtils.AISendChat('enemies', ArmyBrains[self:GetArmyIndex()].Nickname, 'ilost')
+            SUtils.AISendChat('enemies', ArmyBrains[my_army].Nickname, 'ilost')
         end
         local per = ScenarioInfo.ArmySetup[self.Name].AIPersonality
         if string.find(per, 'sorian') then
@@ -468,29 +549,15 @@ AIBrain = Class(moho.aibrain_methods) {
         end
         ------end sorian AI bit
 
-        -- seems that FA send the OnDeath twice : one when losing, the other when disconnecting (function AbandonedByPlayer).
-        -- But we only want it one time !
+        import('/lua/sim/score.lua').SendStats(my_army)
 
-        if ArmyIsOutOfGame(self:GetArmyIndex()) then
-            return
-        end
+        SetArmyOutOfGame(my_army)
 
-        SetArmyOutOfGame(self:GetArmyIndex())
-
-
-        if math.floor(self:GetArmyStat("FAFLose",0.0).Value) ~= -1 then
-            self:AddArmyStat("FAFLose", -1)
-        end
-
-        local result = string.format("%s %i", "defeat", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
-        table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
-
-        import('/lua/SimUtils.lua').UpdateUnitCap(self:GetArmyIndex())
-        import('/lua/SimPing.lua').OnArmyDefeat(self:GetArmyIndex())
+        import('/lua/SimUtils.lua').UpdateUnitCap(my_army)
+        import('/lua/SimPing.lua').OnArmyDefeat(my_army)
 
         local function KillArmy()
             local allies = {}
-            local selfIndex = self:GetArmyIndex()
             WaitSeconds(10)
             -- this part determiens the share condition
             local shareOption = ScenarioInfo.Options.Share or "no"
@@ -500,7 +567,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 for index, brain in ArmyBrains do
                     brain.index = index
                     brain.score = CalculateBrainScore(brain)
-                    if IsAlly(selfIndex, brain:GetArmyIndex()) and selfIndex ~= brain:GetArmyIndex() and not brain:IsDefeated() then
+                    if IsAlly(my_army, brain:GetArmyIndex()) and my_army ~= brain:GetArmyIndex() and not brain:IsDefeated() then
                         table.insert(allies, brain)
                     end
                 end
@@ -516,7 +583,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
             -- "yes" means share until death
             elseif shareOption == "yes" then
-                import('/lua/SimUtils.lua').KillSharedUnits(self:GetArmyIndex())
+                import('/lua/SimUtils.lua').KillSharedUnits(my_army)
                 local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
                 -- return borrowed units to their real owners
                 local borrowed = {}
@@ -570,20 +637,16 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     OnVictory = function(self)
-        self:AddArmyStat("FAFWin", 5)
-        local result = string.format("%s %i", "victory", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
-        table.insert( Sync.GameResult, { self:GetArmyIndex(), result } )
+        self:SetResult("victory")
     end,
 
     OnDraw = function(self)
-        local result = string.format("%s %i", "draw", math.floor(self:GetArmyStat("FAFWin",0.0).Value + self:GetArmyStat("FAFLose",0.0).Value) )
-        table.insert(Sync.GameResult, { self:GetArmyIndex(), result })
+        self:SetResult("draw")
     end,
 
     IsDefeated = function(self)
-        return ArmyIsOutOfGame(self:GetArmyIndex())
+        return self.Result == "defeat"
     end,
-
 
     SetCurrentPlan = function(self, bestPlan)
         if not bestPlan then
@@ -739,7 +802,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     OnTransportFull = function(self)
         local cue
-        
+
         if EntityCategoryContains(categories.uaa0310, self.loadingTransport) then
             -- "CZAR FULL"
             cue = 'XGG_Computer_CV01_04753'

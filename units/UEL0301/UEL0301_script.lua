@@ -9,7 +9,7 @@ local EffectUtil = import('/lua/EffectUtilities.lua')
 local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
 local TWeapons = import('/lua/terranweapons.lua')
 local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
-local TIFCommanderDeathWeapon = TWeapons.TIFCommanderDeathWeapon
+local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
 
 UEL0301 = Class(CommandUnit) {
     IntelEffects = {
@@ -23,11 +23,8 @@ UEL0301 = Class(CommandUnit) {
     },    
 
     Weapons = {
-        RightHeavyPlasmaCannon = Class(TDFHeavyPlasmaCannonWeapon) {
-        },
-
-        DeathWeapon = Class(TIFCommanderDeathWeapon) {
-        },
+        RightHeavyPlasmaCannon = Class(TDFHeavyPlasmaCannonWeapon) {},
+        DeathWeapon = Class(SCUDeathWeapon) {},
     },
 
     OnCreate = function(self)

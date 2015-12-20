@@ -97,6 +97,13 @@ OnSync = function()
         import('/lua/ui/game/gameresult.lua').DoGameResult(armyIndex, result)
     end
 
+    if Sync.SendStats then
+        local stats = {stats = Sync.SendStats}
+        local json = import('/lua/system/dkson.lua').json.encode(stats)
+        LOG('Sending stats: '..json)
+        GpgNetSend('JsonStats', json)
+    end
+
     if Sync.PausedBy then
         if not PreviousSync.PausedBy then
             import('/lua/ui/game/gamemain.lua').OnPause(Sync.PausedBy, Sync.TimeoutsRemaining)
