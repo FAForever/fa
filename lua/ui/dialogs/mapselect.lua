@@ -848,7 +848,7 @@ function SetupOptionsPanel(parent, curOptions)
                     itemArray[index] = LOCF(text, key)
                     line.combo.keyMap[key] = index
                     tooltipTable[index]={text=optData.label, body=LOCF(help, key)}
-                    --
+
                     if curOptions[optData.key] and key == curOptions[optData.key] then
                         defValue = index
                     end
