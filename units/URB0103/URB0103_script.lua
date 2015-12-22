@@ -9,14 +9,12 @@ local CSeaFactoryUnit = import('/lua/cybranunits.lua').CSeaFactoryUnit
 URB0103 = Class(CSeaFactoryUnit) {
 
     StartArmsMoving = function(self)
-        -- Eject early to stop CreateAnimator spamming the log in odd situations
-        if not self then return end
-        
         CSeaFactoryUnit.StartArmsMoving(self)
         if not self.ArmSlider then
             self.ArmSlider = CreateSlider(self, 'Right_Arm03')
             self.Trash:Add(self.ArmSlider)
         end
+        
     end,
 
     MovingArmsThread = function(self)
