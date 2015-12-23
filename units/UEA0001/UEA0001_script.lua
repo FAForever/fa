@@ -10,20 +10,6 @@ local TConstructionUnit = import('/lua/terranunits.lua').TConstructionUnit
 UEA0001 = Class(TConstructionUnit) {
     Parent = nil,
     
-    OnStopBeingBuilt = function(self, builder, layer)
-        TConstructionUnit.OnStopBeingBuilt(self, builder, layer)
-        local bp = self:GetBlueprint()
-        if bp.SizeSphere then
-            self:SetCollisionShape(
-                'Sphere',
-                bp.CollisionSphereOffsetX or 0,
-                bp.CollisionSphereOffsetY or 0,
-                bp.CollisionSphereOffsetZ or 0,
-                bp.SizeSphere
-            )
-        end
-    end,
-    
     OnScriptBitSet = function(self, bit)
         TConstructionUnit.OnScriptBitSet(self, bit)
         if bit == 1 then
