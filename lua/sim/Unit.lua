@@ -1891,6 +1891,17 @@ Unit = Class(moho.unit_methods) {
             self:CreateShield(bpShield)
         end
 
+        -- Create spherical collisions if defined
+        if bp.SizeSphere then
+            self:SetCollisionShape(
+                'Sphere',
+                bp.CollisionSphereOffsetX or 0,
+                bp.CollisionSphereOffsetY or 0,
+                bp.CollisionSphereOffsetZ or 0,
+                bp.SizeSphere
+            )
+        end
+        
         if bp.Display.AnimationPermOpen then
             self.PermOpenAnimManipulator = CreateAnimator(self):PlayAnim(bp.Display.AnimationPermOpen)
             self.Trash:Add(self.PermOpenAnimManipulator)

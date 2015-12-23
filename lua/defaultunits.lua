@@ -1620,20 +1620,6 @@ AirUnit = Class(MobileUnit) {
         self:AddPingPong()
     end,
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        MobileUnit.OnStopBeingBuilt(self,builder,layer)
-        local bp = self:GetBlueprint()
-        if bp.SizeSphere then
-            self:SetCollisionShape(
-                'Sphere',
-                bp.CollisionSphereOffsetX or 0,
-                bp.CollisionSphereOffsetY or 0,
-                bp.CollisionSphereOffsetZ or 0,
-                bp.SizeSphere
-            )
-        end
-    end,
-
     AddPingPong = function(self)
         local bp = self:GetBlueprint()
         if bp.Display.PingPongScroller then
