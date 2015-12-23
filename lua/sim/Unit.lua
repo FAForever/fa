@@ -1843,7 +1843,7 @@ Unit = Class(moho.unit_methods) {
         self:EnableUnitIntel('NotInitialized', nil)
         self:ForkThread( self.StopBeingBuiltEffects, builder, layer )
 
-        if ( self:GetCurrentLayer() == 'Water' ) then
+        if self:GetCurrentLayer() == 'Water' then
             self:StartRocking()
             local surfaceAnim = bp.Display.AnimationSurface
             if not self.SurfaceAnimator and surfaceAnim then
@@ -1858,11 +1858,11 @@ Unit = Class(moho.unit_methods) {
         self:PlayUnitAmbientSound( 'ActiveLoop' )
 
         if self.IsUpgrade and builder then
-            --Set correct hitpoints after upgrade
-            local hpDamage = builder:GetMaxHealth() - builder:GetHealth() --Current damage
-            local damagePercent = hpDamage / self:GetMaxHealth() --Resulting % with upgraded building
-            local newHealthAmount = builder:GetMaxHealth() * (1-damagePercent) --HP for upgraded building
-            builder:SetHealth(builder, newHealthAmount) --Seems like the engine uses builder to determine new HP
+            -- Set correct hitpoints after upgrade
+            local hpDamage = builder:GetMaxHealth() - builder:GetHealth() -- Current damage
+            local damagePercent = hpDamage / self:GetMaxHealth() -- Resulting % with upgraded building
+            local newHealthAmount = builder:GetMaxHealth() * (1-damagePercent) -- HP for upgraded building
+            builder:SetHealth(builder, newHealthAmount) -- Seems like the engine uses builder to determine new HP
             self.DisallowCollisions = false
             self:SetCanTakeDamage(true)
             self:RevertCollisionShape()
@@ -1870,16 +1870,16 @@ Unit = Class(moho.unit_methods) {
             self.IsUpgrade = nil
         end
 
-        --Turn off land bones if this unit has them.
+        -- Turn off land bones if this unit has them.
         self:HideLandBones()
         self:DoUnitCallbacks('OnStopBeingBuilt')
 
-        --Create any idle effects on unit
-        if( table.getn( self.IdleEffectsBag ) == 0) then
+        -- Create any idle effects on unit
+        if table.getn(self.IdleEffectsBag) == 0 then
             self:CreateIdleEffects()
         end
 
-        --If we have a shield specified, create it.
+        -- If we have a shield specified, create it.
         -- Blueprint registration always creates a dummy Shield entry:
         -- {
         --     ShieldSize = 0
@@ -1896,15 +1896,15 @@ Unit = Class(moho.unit_methods) {
             self.Trash:Add(self.PermOpenAnimManipulator)
         end
 
-        --Initialize movement effects subsystems, idle effects, beam exhaust, and footfall manipulators
+        -- Initialize movement effects subsystems, idle effects, beam exhaust, and footfall manipulators
         local bpTable = bp.Display.MovementEffects
         if bpTable.Land or bpTable.Air or bpTable.Water or bpTable.Sub or bpTable.BeamExhaust then
             self.MovementEffectsExist = true
             if bpTable.BeamExhaust and (bpTable.BeamExhaust.Idle ~= false) then
-                self:UpdateBeamExhaust( 'Idle' )
+                self:UpdateBeamExhaust('Idle')
             end
             if not self.Footfalls and bpTable[layer].Footfall then
-                self.Footfalls = self:CreateFootFallManipulators( bpTable[layer].Footfall )
+                self.Footfalls = self:CreateFootFallManipulators(bpTable[layer].Footfall)
             end
         else
             self.MovementEffectsExist = false
@@ -1918,7 +1918,6 @@ Unit = Class(moho.unit_methods) {
             self:Kill()
         end
 
-        --Added by Brute51 for unit enhancement presets
         if bp.EnhancementPresetAssigned then
             self:ForkThread(self.CreatePresetEnhancementsThread)
         end
