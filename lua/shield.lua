@@ -387,7 +387,7 @@ Shield = Class(moho.shield_methods,Entity) {
                 self:UpdateShieldRatio(-1)
 
                 fraction = self.Owner:GetResourceConsumed()
-                if fraction != 1 and aiBrain:GetEconomyStored('ENERGY') <= 0 then
+                if fraction != 1 and aiBrain:GetEconomyStored('ENERGY') <= 1 then
                     if test then
                         on = false
                     else
