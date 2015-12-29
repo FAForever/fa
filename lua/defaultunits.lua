@@ -636,7 +636,7 @@ FactoryUnit = Class(StructureUnit) {
         StructureUnit.OnCreate(self)
         self.BuildingUnit = false
     end,
-    
+
     DestroyUnitBeingBuilt = function(self)
         if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() < 1 then
             if self.UnitBeingBuilt:GetFractionComplete() > 0.5 then
@@ -645,7 +645,7 @@ FactoryUnit = Class(StructureUnit) {
                 self.UnitBeingBuilt:Destroy()
             end
         end
-    end, 
+    end,
 
     OnDestroy = function(self)
         -- Figure out if we're a research station
@@ -659,7 +659,7 @@ FactoryUnit = Class(StructureUnit) {
         end
 
         StructureUnit.OnDestroy(self)
-        
+
         self.DestroyUnitBeingBuilt(self)
     end,
 
@@ -1374,7 +1374,7 @@ SeaFactoryUnit = Class(FactoryUnit) {
 
     StopRocking = function(self)
     end,
-    
+
     DestroyUnitBeingBuilt = function(self)
         if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() < 1 then
             self.UnitBeingBuilt:Destroy()
@@ -2100,7 +2100,7 @@ SlowHoverLandUnit = Class(HoverLandUnit) {
         -- Slow these units down when they transition from land to water
         -- The mult is applied twice thanks to an engine bug, so careful when adjusting it
         -- Newspeed = oldspeed * mult * mult
-        
+
         local mult = self:GetBlueprint().Physics.WaterSpeedMultiplier
         if new == 'Water' then
             self:SetSpeedMult(mult)
