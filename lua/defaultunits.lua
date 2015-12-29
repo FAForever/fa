@@ -748,11 +748,20 @@ FactoryUnit = Class(StructureUnit) {
         end
     end,
 
-    OnStartBuild = function(self, unitBeingBuilt, order )
-        self:ChangeBlinkingLights('Yellow')
+    OnStartBuild = function(self, unitBeingBuilt, order)
+        local isUpgrade = order == 'Upgrade'
+        if not isUpgrade and EntityCategoryContains(categories.FACTORY, unitBeingBuilt) then
+            -- needed to prevent factories from building new factories, in the future we should remove
+            -- BUILDBYTIERXFACTORY from tier2+ factories, needed currently by the UI to show available upgrades
+            self:ForkThread(function(self)
+                IssueClearCommands({self})
+            end)
+        end
+
         StructureUnit.OnStartBuild(self, unitBeingBuilt, order )
+        self:ChangeBlinkingLights('Yellow')
         self.BuildingUnit = true
-        if order ~= 'Upgrade' then
+        if not isUpgrade then
             ChangeState(self, self.BuildingState)
             self.BuildingUnit = false
         end
