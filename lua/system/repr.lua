@@ -127,15 +127,7 @@ local function _repr(obj, indent, width, mindepth, objectstack)
 
     r1 = concat(r1)
     r2 = concat(r2)
-    
-    if len(r1) > 10000 then
-        LOG(' !!!!!!!!!! repr len r1 '.. len(r1) .. ' contents = '.. r1)
-    end
-    
-    if len(r2) > 10000 then        
-        LOG(' !!!!!!!!!! repr len r2 '.. len(r2) .. ' contents = '.. r2)
-    end
-    
+
     return r1, r2
 end
 
