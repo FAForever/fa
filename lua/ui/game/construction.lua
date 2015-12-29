@@ -1198,6 +1198,11 @@ function OnClickHandler(button, modifiers)
                 end
             end
 
+            -- hold alt to reset queue, same as hotbuild
+            if modifiers.Alt then
+                ResetOrderQueues(sortedOptions.selection, true)
+            end
+
             if performUpgrade then
                 IssueUpgradeOrders(sortedOptions.selection, item.id)
             else
