@@ -31,6 +31,7 @@ local options = Prefs.GetFromCurrentProfile('options')
 local Effect = import('/lua/maui/effecthelpers.lua')
 local TemplatesFactory = import('/modules/templates_factory.lua')
 local straticonsfile = import('/modules/straticons.lua')
+local Select = import('/lua/ui/game/selection.lua')
 
 local prevBuildables = false
 local prevSelection = false
@@ -42,6 +43,8 @@ local allFactories = nil
 if options.gui_templates_factory ~= 0 then
     allFactories = false
 end
+
+local missingIcons = {}
 
 local dragging = false
 local index = nil --index of the item in the queue currently being dragged
@@ -182,6 +185,46 @@ function IssueUpgradeOrders(units, bpid)
 
     for _, o in upgrades[unitid] do
         IssueBlueprintCommand("UNITCOMMAND_Upgrade", o, 1, false)
+    end
+end
+
+local QueueResetAt = {}
+function ResetOrderQueue(factory, stop_last)
+    local queue = SetCurrentFactoryForQueueDisplay(factory)
+    if not queue then return end
+    local id = factory:GetEntityId()
+    local n = table.getsize(queue)
+    local now = GameTick()
+    local reset_at = QueueResetAt[id]
+
+    if stop_last and (n == 1 or (reset_at and now-reset_at < 10)) then
+        IssueCommand("Stop")
+        QueueResetAt[id] = nil
+        return
+    end
+
+    for i = 1, n do
+        local count = queue[i].count
+
+        if i == 1 then
+            count = count - 1
+        end
+
+        SelectUnits({factory})
+        DecreaseBuildCountInQueue(i, count)
+    end
+
+    QueueResetAt[id] = now
+end
+
+function ResetOrderQueues(units)
+    local factories = EntityCategoryFilterDown(categories.FACTORY, units)
+    if factories[1] then
+        Select.Hidden(function()
+            for _, factory in factories do
+                ResetOrderQueue(factory, true)
+            end
+        end)
     end
 end
 
@@ -457,7 +500,7 @@ function GetBackgroundTextures(unitID)
     local bp = __blueprints[unitID]
     local validIcons = { land = true, air = true, sea = true, amph = true }
     if not validIcons[bp.General.Icon] then
-        WARN(debug.traceback(nil, "Invalid icon for unit " .. tostring(unitID)))
+        if bp.General.Icon then WARN(debug.traceback(nil, "Invalid icon" .. bp.General.Icon .. " for unit " .. tostring(unitID))) end
         bp.General.Icon = "land"
     end
 
@@ -511,8 +554,8 @@ function CommonLogic()
 
     controls.secondaryChoices.SetControlToType = function(control, type)
         local function SetIconTextures(control)
-            if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. control.Data.id .. '_icon.dds')) then
-                control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. control.Data.id .. '_icon.dds'))
+            if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. control.Data.id .. '_icon.dds', true)) then
+                control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. control.Data.id .. '_icon.dds', true))
             else
                 control.Icon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
             end
@@ -559,7 +602,13 @@ function CommonLogic()
             control.Icon.Height:Set(48)
             control.Icon.Width:Set(48)
             control.BuildKey = nil
-            if control.Data.count > 1 then
+
+            if type == 'attachedunit' and UnitData[control.Data.unit:GetEntityId()].locked then
+                control:SetOverrideTexture(control.mNormal)
+                control:SetOverrideEnabled(true)
+                control.Count:SetText('X')
+                control.Count:SetColor('ffff0000')
+            elseif control.Data.count > 1 then
                 control.Count:SetText(control.Data.count)
                 control.Count:SetColor('ffffffff')
             else
@@ -669,8 +718,8 @@ function CommonLogic()
     controls.choices.SetControlToType = function(control, type)
         local function SetIconTextures(control, optID)
             local id = optID or control.Data.id
-            if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds')) then
-                control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds'))
+            if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds', true)) then
+                control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds', true))
             else
                 control.Icon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
             end
@@ -761,7 +810,7 @@ function CommonLogic()
             control.Height:Set(48)
             control.Width:Set(48)
             if control.Data.template.icon then
-                control.Icon:SetTexture('/textures/ui/common/icons/units/' .. control.Data.template.icon .. '_icon.dds')
+                control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. control.Data.template.icon .. '_icon.dds', true))
             else
                 control.Icon:SetTexture('/textures/ui/common/icons/units/default_icon.dds')
             end
@@ -937,7 +986,8 @@ function StratIconReplacement(control)
             LayoutHelpers.ResetBottom(control.StratIcon)
             LayoutHelpers.ResetLeft(control.StratIcon)
             control.StratIcon:SetAlpha(0.8)
-        else
+        elseif not missingIcons[iconName] then
+            missingIcons[iconName] = true
             LOG('Strat Icon Mod Error: updated strat icon required for: ', iconName)
         end
     end
@@ -1148,6 +1198,11 @@ function OnClickHandler(button, modifiers)
                 end
             end
 
+            -- hold alt to reset queue, same as hotbuild
+            if modifiers.Alt then
+                ResetOrderQueues(sortedOptions.selection, true)
+            end
+
             if performUpgrade then
                 IssueUpgradeOrders(sortedOptions.selection, item.id)
             else
@@ -1193,6 +1248,7 @@ function OnClickHandler(button, modifiers)
     elseif item.type == 'attachedunit' then
         if modifiers.Left then
             -- Toggling selection of the entity
+            button:SetOverrideTexture(button.mActive)
             button:ToggleOverride()
 
             -- Add or Remove the entity to the session selection
@@ -1200,6 +1256,18 @@ function OnClickHandler(button, modifiers)
                 AddToSessionExtraSelectList(item.unit)
             else
                 RemoveFromSessionExtraSelectList(item.unit)
+            end
+        elseif modifiers.Right then
+            local lock = not button:GetOverrideEnabled()
+            local cb = { Func = 'TransportLock', Args = { ids = {item.unit:GetEntityId()}, lock=not button:GetOverrideEnabled()} }
+            SimCallback(cb, true)
+            button:SetOverrideTexture(button.mNormal)
+            button:ToggleOverride()
+            if lock then
+                button.Count:SetText('X')
+                button.Count:SetColor('ffff0000')
+            else
+                button.Count:SetText('')
             end
         end
     elseif item.type == 'templates' then
@@ -1354,7 +1422,7 @@ function CreateTemplateOptionMenu(button, templateObj)
                     end
                 end
                 for iconType, _ in contents do
-                    local bmp = Bitmap(group, '/textures/ui/common/icons/units/' .. iconType .. '_icon.dds')
+                    local bmp = Bitmap(group, UIUtil.UIFile('/icons/units/' .. iconType .. '_icon.dds', true))
                     bmp.Height:Set(30)
                     bmp.Width:Set(30)
                     bmp.ID = iconType
@@ -1831,21 +1899,15 @@ function FormatData(unitData, type)
         }
         local filteredEnh = {}
         local usedEnhancements = {}
-        local restrictList = EnhanceCommon.GetRestricted()
+        local restEnh = EnhanceCommon.GetRestricted()
+
+		-- filter enhancements based on restrictions
         for index, enhTable in unitData do
-            if not string.find(enhTable.ID, 'Remove') then
-                local restricted = false
-                for _, enhancement in restrictList do
-                    if enhancement == enhTable.ID then
-                        restricted = true
-                        break
-                    end
-                end
-                if not restricted then
-                    table.insert(filteredEnh, enhTable)
-                end
+            if not restEnh[enhTable.ID] and not string.find(enhTable.ID, 'Remove') then
+                table.insert(filteredEnh, enhTable)
             end
         end
+
         local function GetEnhByID(id)
             for i, enh in filteredEnh do
                 if enh.ID == id then

@@ -245,7 +245,7 @@ UnitBlueprint {
             CollideFriendly = false,
             CountedProjectile = true,
             Damage = 0,
-            DamageType = 'Nuke',
+            DamageType = 'Normal',
             DisplayName = 'Inaino Strategic Missile Launcher',
             EnergyDrainPerSecond = 0,
             EnergyRequired = 0,

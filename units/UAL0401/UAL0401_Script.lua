@@ -20,9 +20,7 @@ UAL0401 = Class(AWalkingLandUnit) {
         RightArmTractor = Class(ADFTractorClaw) {},
         LeftArmTractor = Class(ADFTractorClaw) {},
     },
-    
-
-
+ 
     OnKilled = function(self, instigator, type, overkillRatio)
         AWalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)
         local wep = self:GetWeaponByLabel('EyeWeapon')
@@ -38,7 +36,7 @@ UAL0401 = Class(AWalkingLandUnit) {
         end     
     end,
         
-    DeathThread = function( self, overkillRatio , instigator)
+    DeathThread = function(self, overkillRatio , instigator)
 		self:PlayUnitSound('Destroyed')
         explosion.CreateDefaultHitExplosionAtBone( self, 'Torso', 4.0 )
         explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {self:GetUnitSizes()})           
@@ -53,40 +51,9 @@ UAL0401 = Class(AWalkingLandUnit) {
         explosion.CreateDefaultHitExplosionAtBone( self, 'Right_Leg_B01', 1.0 )
 
         WaitSeconds(3.5)
-        explosion.CreateDefaultHitExplosionAtBone( self, 'Torso', 5.0 )        
+        explosion.CreateDefaultHitExplosionAtBone( self, 'Torso', 5.0 )
 
-        if self.DeathAnimManip then
-            WaitFor(self.DeathAnimManip)
-        end
-    
-        local bp = self:GetBlueprint()
-        for i, numWeapons in bp.Weapon do
-            if(bp.Weapon[i].Label == 'CollossusDeath') then
-                DamageArea(self, self:GetPosition(), bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
-                break
-            end
-        end
-
-        self:DestroyAllDamageEffects()
-        self:CreateWreckage( overkillRatio )
-
-        # CURRENTLY DISABLED UNTIL DESTRUCTION
-        # Create destruction debris out of the mesh, currently these projectiles look like crap,
-        # since projectile rotation and terrain collision doesn't work that great. These are left in
-        # hopes that this will look better in the future.. =)
-        if( self.ShowUnitDestructionDebris and overkillRatio ) then
-            if overkillRatio <= 1 then
-                self.CreateUnitDestructionDebris( self, true, true, false )
-            elseif overkillRatio <= 2 then
-                self.CreateUnitDestructionDebris( self, true, true, false )
-            elseif overkillRatio <= 3 then
-                self.CreateUnitDestructionDebris( self, true, true, true )
-            else #VAPORIZED
-                self.CreateUnitDestructionDebris( self, true, true, true )
-            end
-        end
-        
-        self:Destroy()
+        AWalkingLandUnit.DeathThread(self, overkillRatio, instigator)
     end,
     
 }

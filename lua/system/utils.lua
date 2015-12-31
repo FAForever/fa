@@ -197,7 +197,7 @@ function table.cat(t1, t2)
 end
 
 --- Concatenate arbitrarily-many tables (equivalent to table.cat, but varargs. Slightly more
--- overhead, but can constructvely concat *all* the things)
+-- overhead, but can constructively concat *all* the things)
 function table.concatenate(...)
     local ret = {}
 
@@ -441,8 +441,30 @@ function table.unique(t)
     return unique
 end
 
+-- Binary insert value into table
+--
+-- @param t Table to insert to
+-- @param value Value to insert
+-- @param cmp Sort function to compare by, default is a < b
+-- @return The key at which the value was inserted
+function table.binsert(t, value, cmp)
+    local cmp = cmp or (function(a, b) return a < b end)
+    local iStart, iEnd, iMid, iState = 1, table.getsize(t), 1, 0
+    while iStart <= iEnd do
+        iMid = math.floor((iStart + iEnd) / 2)
+        if cmp(value, t[iMid]) then
+            iEnd, iState = iMid - 1, 0
+        else
+            iStart, iState = iMid + 1, 1
+        end
+    end
+
+    table.insert(t, iMid + iState, value)
+    return iMid + iState
+end
+
 --=========================================================================================================
--- StringJoin returns items as a single string, seperated by the delimiter
+-- StringJoin returns items as a single string, separated by the delimiter
 --=========================================================================================================
 function StringJoin(items, delimiter)
     local str = "";

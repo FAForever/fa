@@ -82,6 +82,7 @@ function PingUpdate()
 end
     
 function CreateUI()
+    ConExecute('ren_shownetworkstats true')
     if not SessionIsMultiplayer() then
         return
     end
@@ -180,6 +181,7 @@ function CloseWindow()
     end
     GUI.group:Destroy()
     GUI.group = false
+    ConExecute('ren_shownetworkstats false')
 end
 
 function CreateBorder(parent)

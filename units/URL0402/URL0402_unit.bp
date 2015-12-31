@@ -113,7 +113,7 @@ UnitBlueprint {
         AnimationDeath = {
             {
                 Animation = '/units/url0402/url0402_A005.sca',
-                Weight = 100,
+                Weight = 1,
             },
         },
         AnimationWalk = '/units/url0402/url0402_a001.sca',
@@ -226,7 +226,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 260000,
         BuildCostMass = 19000,
-        BuildTime = 15750, 
+        BuildTime = 15750,
         MaintenanceConsumptionPerSecondEnergy = 400,
     },
     General = {
@@ -777,8 +777,10 @@ UnitBlueprint {
             WeaponCategory = 'Anti Navy',
         },
         {
+            BoneImpact = {'Left_Leg01_B01', 'Right_Leg01_B01'},
             Damage = 4000,
             DamageFriendly = true,
+            DamageRadiusMax = 3,
             DamageRadius = 7,
             DamageType = 'Normal',
             DisplayName = 'Death Weapon',

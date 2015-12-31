@@ -86,6 +86,8 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
 
     DoDamage = function(self, instigator, damageData, targetEntity)
         local damage = damageData.DamageAmount or 0
+        if damage <= 0 then return end
+        
         local dmgmod = 1
         if self.Weapon.DamageModifiers then
             for k, v in self.Weapon.DamageModifiers do
@@ -93,11 +95,17 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
             end
         end
         damage = damage * dmgmod
-        if instigator and damage > 0 then
+        
+        if instigator then
             local radius = damageData.DamageRadius
             if radius and radius > 0 then
                 if not damageData.DoTTime or damageData.DoTTime <= 0 then
                     DamageArea(instigator, self:GetPosition(1), radius, damage, damageData.DamageType or 'Normal', damageData.DamageFriendly or false)
+                    -- If a missile is impacted, damage it directly because projectile entities are not
+                    -- affected by DamageArea
+                    if targetEntity and EntityCategoryContains(categories.MISSILE, targetEntity) then
+                        Damage(instigator, self:GetPosition(), targetEntity, damage, damageData.DamageType)
+                    end
                 else
                     ForkThread(DefaultDamage.AreaDoTThread, instigator, self:GetPosition(1), damageData.DoTPulses or 1, (damageData.DoTTime / (damageData.DoTPulses or 1)), radius, damage, damageData.DamageType, damageData.DamageFriendly)
                 end

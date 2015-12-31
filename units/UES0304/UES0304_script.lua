@@ -37,7 +37,7 @@ UES0304 = Class(TSubUnit) {
                 else
                     self.CurrentRack = self.CurrentRack + 1
                 end
-                TIFCruiseMissileLauncherSub.CreateProjectileAtMuzzle(self, muzzle)
+                return TIFCruiseMissileLauncherSub.CreateProjectileAtMuzzle(self, muzzle)
             end,
             
             PlayFxRackReloadSequence = function(self)
@@ -69,7 +69,7 @@ UES0304 = Class(TSubUnit) {
                 else
                     self.CurrentRack = self.CurrentRack + 1
                 end
-                TIFCruiseMissileLauncherSub.CreateProjectileAtMuzzle(self, muzzle)
+                return TIFCruiseMissileLauncherSub.CreateProjectileAtMuzzle(self, muzzle)
             end,
             
             PlayFxRackReloadSequence = function(self)

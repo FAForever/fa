@@ -81,17 +81,25 @@ function SetupSession()
     --===================================================================================
     ScenarioInfo.Env = import('/lua/scenarioEnvironment.lua')
 
-    -- if build restrictions chosen, set them up
-    local buildRestrictions = nil
+    -- if build/enhancement restrictions chosen, set them up
+    local buildRestrictions, enhRestrictions = nil, {}
     if ScenarioInfo.Options.RestrictedCategories then
         local restrictedUnits = import('/lua/ui/lobby/restrictedUnitsData.lua').restrictedUnits
-        for index, restriction in ScenarioInfo.Options.RestrictedCategories do
-            local categoryExpression = restrictedUnits[restriction].categoryExpression
+        for _, name in ScenarioInfo.Options.RestrictedCategories do
+            local enhancements = restrictedUnits[name].enhancement
+            if enhancements then
+                for _, enhancement in enhancements do
+                    enhRestrictions[enhancement] = true
+                end
+            end
+
+            local categoryExpression = restrictedUnits[name].categoryExpression
             if categoryExpression then
+                categoryExpression = "(" .. categoryExpression .. ")"
                 if buildRestrictions then
-                    buildRestrictions = buildRestrictions .. " + (" .. categoryExpression .. ")"
+                    buildRestrictions = buildRestrictions .. " + " .. categoryExpression
                 else
-                    buildRestrictions = "(" .. categoryExpression .. ")"
+                    buildRestrictions = categoryExpression
                 end
             end
         end
@@ -101,6 +109,10 @@ function SetupSession()
         buildRestrictions = import('/lua/sim/Categoryutils.lua').ParseEntityCategoryProperly(buildRestrictions)
         import('/lua/game.lua').SetRestrictions(buildRestrictions)
         ScenarioInfo.BuildRestrictions = buildRestrictions
+    end
+
+    if enhRestrictions then
+        import('/lua/enhancementcommon.lua').RestrictList(enhRestrictions)
     end
 
     --===========================================================================
@@ -216,14 +228,15 @@ function BeginSession()
         end
     end
 
+    Sync.EnhanceRestrict = import('/lua/enhancementcommon.lua').GetRestricted()
+
     --for off-map prevention
     OnStartOffMapPreventionThread()
-    
 end
 
 ------for off-map prevention
 function OnStartOffMapPreventionThread()
-	OffMappingPreventThread = ForkThread( import('/lua/ScenarioFramework.lua').AntiOffMapMainThread)
+	OffMappingPreventThread = ForkThread(import('/lua/ScenarioFramework.lua').AntiOffMapMainThread)
 	ScenarioInfo.OffMapPreventionThreadAllowed = true
 	--WARN('success')
 end

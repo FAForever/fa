@@ -1175,7 +1175,7 @@ function PossiblyAnnounceGameFull()
     end
 
     -- Game is full, let's tell the client.
-    GPGNetSend("GameFull")
+    GpgNetSend("GameFull")
 end
 
 --- Assign the "random" (really autobalanced) start positions.
@@ -1876,11 +1876,17 @@ local OptionUtils = {
     SetDefaults = function()
         local options = {}
         for index, option in globalOpts do
-            options[option.key] = option.values[option.default].key
+            -- Exception to make AllowObservers work because the engine requires
+            -- the keys to be bool. Custom options should use 'True' or 'False'
+            if option.key == 'AllowObservers' then
+                options[option.key] = option.values[option.default].key
+            else
+                options[option.key] = option.values[option.default].key or option.values[option.default]
+            end
         end
 
         for index, option in AIOpts do
-            options[option.key] = option.values[option.default].key
+            options[option.key] = option.values[option.default].key or option.values[option.default]
         end
 
         SetGameOptions(options)
@@ -2689,9 +2695,9 @@ function CreateUI(maxPlayers)
                 LayoutHelpers.AtRightTopIn(line.value, line, 5, 16)
                 LayoutHelpers.ResetLeft(line.value)
             end
-            line.text:SetText(LOC(data.text))
+            line.text:SetText(LOCF(data.text, data.key))
             line.bg:Show()
-            line.value:SetText(LOC(data.value))
+            line.value:SetText(LOCF(data.value, data.key))
             line.bg2:Show()
             line.bg.HandleEvent = Group.HandleEvent
             line.bg2.HandleEvent = Bitmap.HandleEvent
@@ -2948,7 +2954,7 @@ function CreateUI(maxPlayers)
 
     if singlePlayer then
         -- observers are always allowed in skirmish games.
-        SetGameOption("AllowObservers",true)
+        SetGameOption("AllowObservers", true)
         -- Hide all the multiplayer-only UI elements (we still create them because then we get to
         -- mostly forget that we're in single-player mode everywhere else (stuff silently becomes a
         -- nop, instead of needing to keep checking if UI controls actually exist...
@@ -3091,9 +3097,12 @@ function RefreshOptionDisplayData(scenarioInfo)
 
         -- Scan the values array to find the one with the key matching our value for that option.
         for k, val in optData.values do
-            if val.key == gameOption then
-                option.value = val.text
-                option.valueTooltip = {text = optData.label, body = val.help }
+            local key = val.key or val
+            
+            if key == gameOption then
+                option.key = key
+                option.value = val.text or optData.value_text
+                option.valueTooltip = {text = optData.label, body = val.help or optData.value_help}
 
                 table.insert(formattedOptions, option)
 
@@ -3731,11 +3740,10 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         --- Returns true if the given option has the given key as a valid setting.
         local function keyIsValidForOption(option, key)
             for k, v in option.values do
-                if v.key == key then
+                if v.key or v == key then
                     return true
                 end
             end
-
             return false
         end
 
@@ -3748,7 +3756,13 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             -- a valid key for this option. Some mods muck about with the possibilities, so we
             -- need to make sure we use a sane default if that's happened.
             if not defValue or not keyIsValidForOption(option, defValue) then
-                defValue = option.values[option.default].key
+                -- Exception to make AllowObservers work because the engine requires
+                -- the keys to be bool. Custom options should use 'True' or 'False'
+                if option.key == 'AllowObservers' then
+                    defValue = option.values[option.default].key
+                else                    
+                    defValue = option.values[option.default].key or option.values[option.default]
+                end
             end
 
             SetGameOption(option.key, defValue, true)

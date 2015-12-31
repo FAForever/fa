@@ -4,14 +4,12 @@ UnitBlueprint {
             'Back_Upgrade',
             'Torso',
             'AttachPoint',
-#            'Left_Leg_B02',
-#            'Right_Leg_B02',
         },
     },
     Audio = {
         CaptureLoop = Sound {
             Bank = 'XSL',
-            Cue = 'XSL0301_Capture_Loop',
+            Cue = 'XSL0001_Capture_Loop',
             LodCutoff = 'UnitMove_LodCutoff',
         },
         CommanderArrival = Sound {
@@ -318,7 +316,7 @@ UnitBlueprint {
         ProductionPerSecondMass = 2,
         StorageEnergy = 500,
         StorageMass = 275,
-        TeleportEnergyMod = 5.42, # 2.5
+        TeleportEnergyMod = 5.42,
         TeleportMassMod = 0,
         TeleportTimeMod = 0.0001,
     },
@@ -648,16 +646,6 @@ UnitBlueprint {
             SortCategory = 'SORTOTHER',
             UnitName = '<LOC xsl0301_Rambo_name>SACU (Rambo preset)',
         },
-#        Teleporter = {
-#            BuildIconSortPriority = 45,
-#            Description = '<LOC xsl0301_Teleporter_desc>SACU (Teleporter preset)',
-#            Enhancements = {
-#                'Teleporter',
-#            },
-#            HelpText = '<LOC xsl0301_Teleporter_help>Support Armored Command Unit. Enhanced during #construction with the Teleporter enhancement.',
-#            SortCategory = 'SORTOTHER',
-#            UnitName = '<LOC xsl0301_Engineer_name>SACU (Teleporter preset)',
-#        },
     },
     General = {
         BuildBones = {
@@ -774,7 +762,7 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Light Chronotron Cannon',
             FireTargetLayerCapsTable = {
-                Land = 'Land|Water|Seabed',                        --Removed Seabed fire caps (IceDreamer)
+                Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
             FiringTolerance = 2,
@@ -856,7 +844,6 @@ UnitBlueprint {
             },
             FiringTolerance = 2,
             Label = 'OverCharge',
-            ManualFire = true,
             MaxRadius = 25,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
@@ -882,7 +869,18 @@ UnitBlueprint {
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.133,
             SlavedToBody = false,
-            TargetCheckInterval = 0.16,
+            TargetCheckInterval = 0.1,
+            TargetPriorities = {
+                'SPECIALHIGHPRI',
+                'MOBILE EXPERIMENTAL',
+                'MOBILE TECH3',
+                'MOBILE TECH2',
+                'MOBILE TECH1',
+                'COMMAND',
+                'STRUCTURE DEFENSE',
+                'SPECIALLOWPRI',
+                'ALLUNITS',
+            },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Right_Arm_Muzzle',
             TurretBonePitch = 'Right_Arm',

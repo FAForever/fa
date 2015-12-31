@@ -69,7 +69,7 @@ function CreateAvatarUI(parent)
 
     if GetFocusArmy() ~= -1 then
         recievingBeatUpdate = true
-        GameMain.AddBeatFunction(AvatarUpdate)
+        GameMain.AddBeatFunction(AvatarUpdate, true)
     end
 end
 
@@ -132,8 +132,8 @@ function CreateAvatar(unit)
 
     bg.icon = Bitmap(bg)
     LayoutHelpers.AtLeftTopIn(bg.icon, bg, 5, 5)
-    if DiskGetFileInfo('/textures/ui/common/icons/units/'..bg.Blueprint.BlueprintId..'_icon.dds') then
-        bg.icon:SetTexture('/textures/ui/common/icons/units/'..bg.Blueprint.BlueprintId..'_icon.dds')
+    if DiskGetFileInfo(UIUtil.UIFile('/icons/units/'..bg.Blueprint.BlueprintId..'_icon.dds', true)) then
+        bg.icon:SetTexture(UIUtil.UIFile('/icons/units/'..bg.Blueprint.BlueprintId..'_icon.dds', true))
     else
         bg.icon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
     end
@@ -841,7 +841,7 @@ function FocusArmyChanged()
         recievingBeatUpdate = false
     elseif not recievingBeatUpdate then
         recievingBeatUpdate = true
-        GameMain.AddBeatFunction(AvatarUpdate)
+        GameMain.AddBeatFunction(AvatarUpdate, true)
     end
 end
 
