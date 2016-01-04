@@ -3,6 +3,7 @@ Patch 3652 (pending)
 
 **Whole Game**
 - Introduced Russian translations of many FAF additions to the game (Exotic_Retard)
+- Translate some FAF additions to Italian
 - Added game-side support for future achievement system
 
 **Lobby**
@@ -79,6 +80,7 @@ Patch 3652 (pending)
 - Fixed UEF AI unit templates in coop mode
 - Fixed an exploit with being able to upgrade restricted enhancements
 - Fixed a rare bug with builders getting near zero HP after a naval building gets destroyed the same tick as it finishes.
+- Fixed shields sometimes not turning off due to lack of Energy
 
 **Performance**
 - Optimization of score accumulation
