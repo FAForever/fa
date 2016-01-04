@@ -750,7 +750,7 @@ FactoryUnit = Class(StructureUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order)
         local isUpgrade = order == 'Upgrade'
-        if not isUpgrade and EntityCategoryContains(categories.STRUCTURE * categories.FACTORY, unitBeingBuilt) then
+        if not isUpgrade and EntityCategoryContains(categories.FACTORY, unitBeingBuilt) then
             -- needed to prevent factories from building new factories, in the future we should remove
             -- BUILDBYTIERXFACTORY from tier2+ factories, needed currently by the UI to show available upgrades
             self:ForkThread(function(self)
