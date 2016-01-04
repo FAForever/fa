@@ -1801,10 +1801,17 @@ function FormatData(unitData, type)
                 if table.getn(retData) > 0 then
                     table.insert(retData, { type = 'spacer' })
                 end
+                
+                -- This section adds the arrows in for a build icon which is an upgrade from the
+                -- selected unit. If there is an upgrade chain, it will display them split by arrows.
+                
+                -- I'm excluding Factories from this for now, since the chain of T1 -> T2 HQ -> T3 HQ
+                -- or T1 -> T2 Support -> T3 Support is not supported yet by the code which actually
+                -- looks up, stores, and executes the upgrade chain. This needs doing for 3654.
                 for unitIndex, unit in units do
                     local bp = __blueprints[unit]
                     local from = bp.General.UpgradesFrom
-                     if from and from ~= 'none' and EntityCategoryContains(categories.STRUCTURE, sortedOptions.selection[1]) then
+                    if from and from ~= 'none' and EntityCategoryContains(categories.STRUCTURE - categories.FACTORY, sortedOptions.selection[1]) then
                         table.insert(retData, { type = 'arrow'})
                     end
                     table.insert(retData, { type = 'item', id = unit })
