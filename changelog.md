@@ -2,6 +2,7 @@ Patch 3652 (pending)
 ============================
 
 **Whole Game**
+- Introduced Russian translations of many FAF additions to the game (Exotic_Retard)
 - Added game-side support for future achievement system
 
 **Lobby**
@@ -15,6 +16,7 @@ Patch 3652 (pending)
 - New keybinding 'soft_stop'
 - Soft-stop will cancel all orders of a factory except their current one, if you soft-stop a factory with only one order it will get cleared
 - Soft-stop on a silo unit will clear the current orders but not stop the actual building of a missile
+- Hold down Alt when giving a factory order to soft stop factory before issuing next order
 - Transport lock: Right click on a unit in a transport to lock it in place. If all units in transports are locked and you order unload they will be unloaded anyway.
 - Multi-upgrade: Added UI support to upgrade structures several levels at once (i.e: cybran shields, hives, mexes, factories etc)
 - Auto-overcharge: It's now possible to let overcharge fire automatically whenever you have the required power
