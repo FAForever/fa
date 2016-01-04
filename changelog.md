@@ -1,11 +1,6 @@
 Patch 3652 (pending)
 ============================
 
-**Whole Game**
-- Introduced Russian translations of many FAF additions to the game (Exotic_Retard)
-- Translate some FAF additions to Italian
-- Added game-side support for future achievement system
-
 **Lobby**
 - Name filter when selecting map
 - Prevent host from changing teams of others while ready
@@ -14,7 +9,9 @@ Patch 3652 (pending)
 - Default to score off
 
 **UI**
-- New keybinding 'soft_stop'
+- Introduced Russian translations of many FAF additions to the game (Exotic_Retard)
+- Translate some FAF additions to Italian
+- New keybindable action: 'soft_stop'
 - Soft-stop will cancel all orders of a factory except their current one, if you soft-stop a factory with only one order it will get cleared
 - Soft-stop on a silo unit will clear the current orders but not stop the actual building of a missile
 - Hold down Alt when giving a factory order to soft stop factory before issuing next order
@@ -52,9 +49,9 @@ Patch 3652 (pending)
 - Diplomacy now allowed in Coop mode
 - Allow Fatboy, Atlantis, Tempest and Czar to fire while building units
 - Beam weapons now kill missiles they impact instead of wasting DPS for several ticks
+- Aeon ACU upgrade "Chrono Dampener" won't stun allied units any more. Additionally, it will fire at predetermined ticks so the effects of multiple acu's do not stack.
 
 **Bugs**
-- Chrono Dampener doesn't stun allied units anymore
 - Fixed free mass exploit with Megalith eggs
 - Fixed bug with Cybran SCUs getting EMP for free
 - Fixed bug with units getting invincible after a visit to their nearest carrier
@@ -65,11 +62,9 @@ Patch 3652 (pending)
 - Fatboy and Cybran cruisers shouldn't engage enemies way outside their range anymore
 - Fixed bug with commander not always being selected at start
 - Fixed wrecks not giving resources in Coop mode
-- Refactored and improved layer change logic
-- Intel system reworked to handle intel events better
-- Fixed Coop missions getting stuck at Operation Complete
+- Fixed Coop missions getting stuck at completion
 - Added missing Seraphim objective icons
-- All shields now overspill damage correctly based on their type
+- Shields now overkill damage correctly based on their type
 - Fixed nukes overkilling bubble shield base structure when out of range and shield up
 - Fixed Continental taking damage from AOE when it has the shield up
 - Fixed regen buffs from different sources not stacking properly. This should mean every possible interaction between veterancy, upgrades, and the Seraphim Regen Aura field all play nice
@@ -89,6 +84,7 @@ Patch 3652 (pending)
 - Entities now re-use repeated sound FX instead of creating new ones every time
 
 **Other**
+- Added game-side support for future achievement system
 - Tech-level filter in debug window now works as intended
 - Log-spam from various known events heavily reduced
 
