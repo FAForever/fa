@@ -2036,15 +2036,6 @@ ConstructionUnit = Class(MobileUnit) {
             self.BuildingOpenAnimManip:SetRate(-(self:GetBlueprint().Display.AnimationBuildRate or 1))
         end
     end,
-
-
-    CheckBuildRestriction = function(self, target_bp)
-        if self:CanBuild(target_bp.BlueprintId) then
-            return true
-        else
-            return false
-        end
-    end,
 }
 
 
