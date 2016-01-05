@@ -820,11 +820,14 @@ FactoryUnit = Class(StructureUnit) {
     end,
 
     CheckBuildRestriction = function(self, target_bp)
-        if self:CanBuild(target_bp.BlueprintId) then
-            return true
-        else
+        -- Check basic build restrictions first (Unit.CheckBuildRestriction but we only go up one inheritance level)
+        if not StructureUnit.CheckBuildRestriction(self, target_bp) then
             return false
         end
+        -- Factories never build factories (this does not break Upgrades since CheckBuildRestriction is never called for Upgrades)
+        -- Note: We check for the primary category, since e.g. AircraftCarriers have the FACTORY category.
+        -- TODO: This is a hotfix for #1043, remove when engymod design is properly fixed
+        return target_bp.General.Category ~= 'Factory'
     end,
 
     OnFailedToBuild = function(self)
