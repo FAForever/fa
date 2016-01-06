@@ -2,6 +2,20 @@
 If class C1 defines 'x', and inherits from B1 and B2, then an 'x' coming from B1 or B2 is shadowed.
 If we multiply inherit from C1 and C2, and C2 contains 'x', it's an error unless C2 got that x from B1 or B2.
 
+NOTE: This means that if you want to override something in a mixin class, make sure the inheritance goes like this:
+
+                Unit
+                  |
+              StructureUnit
+                  |
+              FactoryUnit
+               /       \
+SeraphimFactoryUnit    SupportFactoryUnit
+                \     /
+                ZSB9501
+
+In the unforked inheritance path, Unit, StructureUnit and FactoryUnit can all normally define and override a function. That same function may then be overriden in *either* SeraphimFactoryUnit or SupportFactoryUnit.
+
 Todo:
     Main() runs on a thread
     the main thread is auto-killed when we leave a state

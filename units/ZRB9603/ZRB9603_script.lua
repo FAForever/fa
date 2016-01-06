@@ -9,9 +9,9 @@
 #****************************************************************************
 
 local CSeaFactoryUnit = import('/lua/cybranunits.lua').CSeaFactoryUnit
+local SupportFactoryUnit = import('/lua/defaultunits.lua').SupportFactoryUnit
 
-
-ZRB0303 = Class(CSeaFactoryUnit) {    
+ZRB0303 = Class(CSeaFactoryUnit, SupportFactoryUnit) {
     StartArmsMoving = function(self)
         CSeaFactoryUnit.StartArmsMoving(self)
         if not self.ArmSlider1 then

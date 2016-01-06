@@ -291,40 +291,66 @@ StructureUnit = Class(Unit) {
 
     -- Modified to use same upgrade logic as the ui. This adds more upgrade options via General.UpgradesFromBase blueprint option
     OnStartBuild = function(self, unitBeingBuilt, order )
-        Unit.OnStartBuild(self,unitBeingBuilt, order)
-        self.UnitBeingBuilt = unitBeingBuilt
-
         --LOG("structure onstartbuild")
 
-        local builderBp = self:GetBlueprint()
-        local targetBp = unitBeingBuilt:GetBlueprint()
-        local performUpgrade = false
+        if order == 'Upgrade' then
 
-        if targetBp.General.UpgradesFrom == builderBp.BlueprintId then
-            performUpgrade = true
-        elseif targetBp.General.UpgradesFrom == builderBp.General.UpgradesTo then
-            performUpgrade = true
-        elseif targetBp.General.UpgradesFromBase ~= "none" then
-            -- try testing against the base
-            if targetBp.General.UpgradesFromBase == builderBp.BlueprintId then
+            local builderBp = self:GetBlueprint()
+            local targetBp = unitBeingBuilt:GetBlueprint()
+            local performUpgrade = false
+
+            if targetBp.General.UpgradesFrom == builderBp.BlueprintId then
                 performUpgrade = true
-            elseif targetBp.General.UpgradesFromBase == builderBp.General.UpgradesFromBase then
+            elseif targetBp.General.UpgradesFrom == builderBp.General.UpgradesTo then
                 performUpgrade = true
+            elseif targetBp.General.UpgradesFromBase ~= "none" then
+                -- try testing against the base
+                if targetBp.General.UpgradesFromBase == builderBp.BlueprintId then
+                    performUpgrade = true
+                elseif targetBp.General.UpgradesFromBase == builderBp.General.UpgradesFromBase then
+                    performUpgrade = true
+                end
             end
-        end
 
-        if performUpgrade and order == 'Upgrade' then
-            ChangeState(self, self.UpgradingState)
+            -- engymod check, see SupportFactoryUnit for similar check with explanations
+            if performUpgrade and EntityCategoryContains(categories.SUPPORTFACTORY, targetBp.BlueprintId) then
+                local aiBrain = self:GetAIBrain()
+
+                local faction = builderBp.General.FactionName
+                local layer = builderBp.General.Icon
+                local tech = targetBp.General.TechLevel
+
+                performUpgrade =
+                    aiBrain:HasHQFac(faction, layer, tech) or
+                    tech == 'RULEUTL_Advanced' and aiBrain:HasHQFac(faction, layer, 'RULEUTL_Secret')
+                WARN('Engymod upgrade check: ' .. repr(performUpgrade))
+            end
+
+            if performUpgrade and order == 'Upgrade' then
+                Unit.OnStartBuild(self,unitBeingBuilt, order)
+                self.UnitBeingBuilt = unitBeingBuilt
+                ChangeState(self, self.UpgradingState)
+            else
+                -- TODO: Figure out how the magical "record current build queue and restore it after clearing" technique actually works and implement it here
+                -- But factory losing all orders is not actually a big problem - we should never get to this point of having to clear an erroneously
+                -- queued support factory unless someone is trying to cheat.
+                IssueClearCommands({self})
+            end
+        else
+                Unit.OnStartBuild(self,unitBeingBuilt, order)
+                self.UnitBeingBuilt = unitBeingBuilt
         end
      end,
 
     IdleState = State {
         Main = function(self)
+            WARN('IdleState')
         end,
     },
 
     UpgradingState = State {
         Main = function(self)
+            WARN('UpgradingState')
             self:StopRocking()
             local bp = self:GetBlueprint().Display
             self:DestroyTarmac()
@@ -628,11 +654,6 @@ StructureUnit = Class(Unit) {
 ---------------------------------------------------------------
 FactoryUnit = Class(StructureUnit) {
     OnCreate = function(self)
-        -- Engymod addition: If a normal factory is created, we should check for research stations
-        if EntityCategoryContains(categories.FACTORY, self) then
-           self:updateBuildRestrictions()
-        end
-
         StructureUnit.OnCreate(self)
         self.BuildingUnit = false
     end,
@@ -648,18 +669,13 @@ FactoryUnit = Class(StructureUnit) {
     end,
 
     OnDestroy = function(self)
-        -- Figure out if we're a research station
-        if EntityCategoryContains(categories.RESEARCH, self) then
+        -- Engymod: If this is an HQ factory and it was completed, decrement HQs counter
+        if EntityCategoryContains(categories.RESEARCH, self) and self:GetFractionComplete() == 1 then
             local aiBrain = self:GetAIBrain()
-            local buildRestrictionVictims = aiBrain:GetListOfUnits(categories.FACTORY+categories.ENGINEER, false)
-
-            for id, unit in buildRestrictionVictims do
-                unit:updateBuildRestrictions()
-            end
+            aiBrain:RemoveHQFac(self)
         end
 
         StructureUnit.OnDestroy(self)
-
         self.DestroyUnitBeingBuilt(self)
     end,
 
@@ -690,12 +706,10 @@ FactoryUnit = Class(StructureUnit) {
             self.BlinkingLightsState = 'Red'
         end
 
-        -- If we're a HQ, update build restrictions for all factories
+        -- Engymod: If this is an HQ factory, add it to HQs counter
         if EntityCategoryContains(categories.RESEARCH, self) then
-            local buildRestrictionVictims = aiBrain:GetListOfUnits(categories.FACTORY + categories.ENGINEER, false)
-            for id, unit in buildRestrictionVictims do
-                unit:updateBuildRestrictions()
-            end
+            local aiBrain = self:GetAIBrain()
+            aiBrain:AddHQFac(self)
         end
 
         StructureUnit.OnStopBeingBuilt(self,builder,layer)
@@ -749,12 +763,15 @@ FactoryUnit = Class(StructureUnit) {
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order )
-        self:ChangeBlinkingLights('Yellow')
         StructureUnit.OnStartBuild(self, unitBeingBuilt, order )
-        self.BuildingUnit = true
-        if order ~= 'Upgrade' then
+
+        self:ChangeBlinkingLights('Yellow')
+
+        if order ~= 'Upgrade' and SupportFactoryUnit.CheckBuildRestriction(self, unitBeingBuilt:GetBlueprint()) then
             ChangeState(self, self.BuildingState)
             self.BuildingUnit = false
+        else
+            self.BuildingUnit = true
         end
         self.FactoryBuildFailed = false
     end,
@@ -817,17 +834,6 @@ FactoryUnit = Class(StructureUnit) {
             self:SetBusy(false)
             self:SetBlockCommandQueue(false)
         end
-    end,
-
-    CheckBuildRestriction = function(self, target_bp)
-        -- Check basic build restrictions first (Unit.CheckBuildRestriction but we only go up one inheritance level)
-        if not StructureUnit.CheckBuildRestriction(self, target_bp) then
-            return false
-        end
-        -- Factories never build factories (this does not break Upgrades since CheckBuildRestriction is never called for Upgrades)
-        -- Note: We check for the primary category, since e.g. AircraftCarriers have the FACTORY category.
-        -- TODO: This is a hotfix for #1043, remove when engymod design is properly fixed
-        return target_bp.General.Category ~= 'Factory'
     end,
 
     OnFailedToBuild = function(self)
@@ -925,6 +931,7 @@ FactoryUnit = Class(StructureUnit) {
     IdleState = State {
 
         Main = function(self)
+            WARN('FactoryUnit IdleState')
             self:ChangeBlinkingLights('Green')
             self:SetBusy(false)
             self:SetBlockCommandQueue(false)
@@ -935,7 +942,8 @@ FactoryUnit = Class(StructureUnit) {
     BuildingState = State {
 
         Main = function(self)
-            local unitBuilding = self.UnitBeingBuilt
+            WARN('FactoryUnit BuildingState')
+        local unitBuilding = self.UnitBeingBuilt
             local bp = self:GetBlueprint()
             local bone = bp.Display.BuildAttachBone or 0
             self:DetachAll(bone)
@@ -952,6 +960,48 @@ FactoryUnit = Class(StructureUnit) {
         end,
     },
 }
+
+---
+--  Support factory mixin that checks engymod build restrictions
+--
+--  Due to diamond inheritance problem that isn't handled in a nice way
+--  by class.lua, this mixin class cannot just be added as an ancestor to
+--  a support factory unit class, but has to be imported and used to override
+--  the CheckBuildRestriction function. See how it's done in e.g. ZSB9501.
+---
+SupportFactoryUnit = Class(FactoryUnit) {
+    CheckBuildRestriction = function(self, target_bp)
+        -- Check normal build restrictions first, unless target_bp is a factory (for upgrade)
+        if not FactoryUnit.CheckBuildRestriction(self, target_bp) then
+            return false
+        end
+        -- Now check if we have an HQ that allows us to build the unit
+        local aiBrain = self:GetAIBrain()
+        local fac_bp = self:GetBlueprint()
+
+        -- Get faction and layer from factory
+        local faction = fac_bp.General.FactionName
+        local layer = fac_bp.General.Icon
+        -- Get tech level from unit requested
+        local tech = target_bp.General.TechLevel
+
+        WARN("Checking: " .. faction .. " / " .. layer .. " / " .. tech .. " for " .. LOC(target_bp.General.UnitName))
+
+        local CanBuild =
+            -- Can always build T1
+            tech == 'RULEUTL_Basic' or
+            -- Can always build a tech level that we have an HQ for
+            aiBrain:HasHQFac(faction, layer, tech) or
+            -- Can always build a tech level that is below one that
+            -- NOTE: This is only relevant for Tech2 (RULEUTL_Advanced) and Tech3 HQ (RULEUTL_Secret) in normal FAF
+            -- but could be changed in mods and would have to be adjusted for a mod
+            tech == 'RULEUTL_Advanced' and aiBrain:HasHQFac(faction, layer, 'RULEUTL_Secret')
+
+        return CanBuild
+    end,
+}
+
+
 
 
 -------------------------------------------------------------
@@ -1449,13 +1499,11 @@ MobileUnit = Class(Unit) {
     -- Added for engymod. After creating an enhancement, units must re-check their build restrictions
     CreateEnhancement = function(self, enh)
         Unit.CreateEnhancement(self, enh)
-        self:updateBuildRestrictions()
     end,
 
     -- Added for engymod. When created, units must re-check their build restrictions
     OnCreate = function(self)
         Unit.OnCreate(self)
-        self:updateBuildRestrictions()
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
@@ -1937,7 +1985,45 @@ ConstructionUnit = Class(MobileUnit) {
             self.BuildingOpenAnimManip:SetRate(-(self:GetBlueprint().Display.AnimationBuildRate or 1))
         end
     end,
-}
+
+    -- Engymod check: Needs to allow building of support facs iff there is an HQ
+    -- Almost identical to SupportFactoryUnit.CheckBuildRestriction but needs to restrict only support fac build, not all units
+    CheckBuildRestriction = function(self, target_bp)
+        -- Check normal build restrictions first
+        if not MobileUnit.CheckBuildRestriction(self, target_bp) then
+            return false
+        end
+        -- Now check if we are building a support factory
+        if EntityCategoryContains(categories.SUPPORTFACTORY, target_bp.BlueprintId) then
+            -- Now check if we have an HQ that allows us to build the unit
+            local aiBrain = self:GetAIBrain()
+            local fac_bp = self:GetBlueprint()
+
+            -- Get faction and layer from factory
+            local faction = fac_bp.General.FactionName
+            local layer = fac_bp.General.Icon
+            -- Get tech level from unit requested
+            local tech = target_bp.General.TechLevel
+
+            WARN("Checking: " .. faction .. " / " .. layer .. " / " .. tech .. " for " .. LOC(target_bp.General.UnitName))
+
+            local CanBuild =
+                -- Can always build T1
+                tech == 'RULEUTL_Basic' or
+                -- Can always build a tech level that we have an HQ for
+                aiBrain:HasHQFac(faction, layer, tech) or
+                -- Can always build a tech level that is below one that
+                -- NOTE: This is only relevant for Tech2 (RULEUTL_Advanced) and Tech3 HQ (RULEUTL_Secret) in normal FAF
+                -- but could be changed in mods and would have to be adjusted for a mod
+                tech == 'RULEUTL_Advanced' and aiBrain:HasHQFac(faction, layer, 'RULEUTL_Secret')
+
+            return CanBuild
+        -- Not building a support fac and got this far -> go build
+        else
+            return true
+        end
+    end,
+    }
 
 
 ---------------------------------------------------------------

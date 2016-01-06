@@ -8,7 +8,8 @@
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 local CLandFactoryUnit = import('/lua/cybranunits.lua').CLandFactoryUnit
+local SupportFactoryUnit = import('/lua/defaultunits.lua').SupportFactoryUnit
 
-ZRB9601 = Class(CLandFactoryUnit) {}
+ZRB9601 = Class(CLandFactoryUnit, SupportFactoryUnit) {}
 
 TypeClass = ZRB9601

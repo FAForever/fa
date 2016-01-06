@@ -77,4 +77,8 @@ function OnSync()
             import('/lua/ui/dialogs/teamkill.lua').CreateDialog(Sync.Teamkill)
         end
     end
+    
+    if Sync.HQFacs then
+        import('/lua/ui/game/construction.lua').HQFacs = Sync.HQFacs
+    end
 end

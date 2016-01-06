@@ -6,6 +6,9 @@
 -- * Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- *****************************************************************************
 
+-- Sync buffer, written by UserSync.OnSync
+HQFacs = {}
+
 local UIUtil = import('/lua/ui/uiutil.lua')
 local DiskGetFileInfo = UIUtil.DiskGetFileInfo
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
@@ -32,6 +35,7 @@ local Effect = import('/lua/maui/effecthelpers.lua')
 local TemplatesFactory = import('/modules/templates_factory.lua')
 local straticonsfile = import('/modules/straticons.lua')
 local Select = import('/lua/ui/game/selection.lua')
+
 
 local prevBuildables = false
 local prevSelection = false
@@ -1767,10 +1771,10 @@ function FormatData(unitData, type)
                 if table.getn(retData) > 0 then
                     table.insert(retData, { type = 'spacer' })
                 end
-                
+
                 -- This section adds the arrows in for a build icon which is an upgrade from the
                 -- selected unit. If there is an upgrade chain, it will display them split by arrows.
-                
+
                 -- I'm excluding Factories from this for now, since the chain of T1 -> T2 HQ -> T3 HQ
                 -- or T1 -> T2 Support -> T3 Support is not supported yet by the code which actually
                 -- looks up, stores, and executes the upgrade chain. This needs doing for 3654.
@@ -2100,7 +2104,42 @@ function OnSelection(buildableCategories, selection, isOldSelection)
             end
         end
 
+        -- engymod checks for buildable / upgradeable support fac
+        -- First, utility function
+        local HasHQFac = function(faction, layer, tech)
+            return
+                -- check for HQ of same tech level
+                (((HQFacs[faction] or {})[layer] or {})[tech] or 0) > 0
+                -- check for T3 HQ
+                or (tech == 'RULEUTL_Advanced' and (((HQFacs[faction] or {})[layer] or {})['RULEUTL_Secret'] or 0) > 0)
+        end
+        -- Second, grab properties
+        local facbp = selection[1]:GetBlueprint()
+        local faction = facbp.General.FactionName
+        local layer = facbp.General.Icon
+
+        -- Third, insert Support Factory Upgrades
+        -- Will be filtered out in step Four if there is no HQ
+        local supfacid = __blueprints[facbp.BlueprintId].General.UpgradesToSupport or __blueprints[facbp.BlueprintId].General.UpgradesTo
+        while supfacid ~= nil and supfacid ~= '' and EntityCategoryContains(categories.SUPPORTFACTORY, supfacid) do
+            table.insert(buildableUnits, supfacid)
+            -- Keep going with normal upgrade path because we only have the UpgradesToSupport property on T1 facs
+            supfacid = __blueprints[supfacid].General.UpgradesTo
+        end
+
+
         if allFactory then
+            -- Fourth, check for buildable units
+            -- Beware: Reverse logic may induce headache
+            if not HasHQFac(faction, layer, 'RULEUTL_Advanced') then
+                -- Filter out T2 and T3 if there is no T2 HQ
+                WARN('Filtering out T2 and T3')
+                buildableUnits = EntityCategoryFilterOut((categories.TECH2 + categories.TECH3) - categories.RESEARCH, buildableUnits)
+            elseif not HasHQFac(faction, layer, 'RULEUTL_Secret') then
+                -- Filter out T3 if there is a T2 HQ but no T3 HQ
+                WARN('Filtering out T3')
+                buildableUnits = EntityCategoryFilterOut(categories.TECH3 - categories.RESEARCH, buildableUnits)
+            end
             local sortDowns = EntityCategoryFilterDown(categories.CONSTRUCTIONSORTDOWN, buildableUnits)
             sortedOptions.t1 = EntityCategoryFilterDown(categories.TECH1 - categories.CONSTRUCTIONSORTDOWN, buildableUnits)
             sortedOptions.t2 = EntityCategoryFilterDown(categories.TECH2 - categories.CONSTRUCTIONSORTDOWN, buildableUnits)
@@ -2117,6 +2156,25 @@ function OnSelection(buildableCategories, selection, isOldSelection)
                 end
             end
         elseif EntityCategoryContains(categories.ENGINEER + categories.FACTORY, selection[1]) then
+            -- Fourth, check for buildable units
+            -- Different this time because we have to check support facs in all layers
+            -- So we just go over all facs buildable according to the engy build capabilities
+            WARN('Checking not allFactory')
+            
+            -- Grab all support factories
+            local supportFactories = EntityCategoryFilterDown(categories.SUPPORTFACTORY, buildableUnits)
+            -- Now remove them from buildableUnits
+            buildableUnits = EntityCategoryFilterOut(categories.SUPPORTFACTORY, buildableUnits)
+            -- Now add them back one at a time
+            for i, unitID in supportFactories do
+                WARN('Checking '..unitID)
+                local bp = __blueprints[unitID]
+                if HasHQFac(faction, bp.General.Icon, bp.General.TechLevel) then
+                    WARN('Adding '..unitID)
+                    table.insert(buildableUnits, unitID)
+                end
+            end
+            
             sortedOptions.t1 = EntityCategoryFilterDown(categories.TECH1, buildableUnits)
             sortedOptions.t2 = EntityCategoryFilterDown(categories.TECH2, buildableUnits)
             sortedOptions.t3 = EntityCategoryFilterDown(categories.TECH3, buildableUnits)

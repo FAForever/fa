@@ -518,14 +518,6 @@ CConstructionStructureUnit = Class(CStructureUnit) {
         end
     end,
 
-    CheckBuildRestriction = function(self, target_bp)
-        if self:CanBuild(target_bp.BlueprintId) then
-            return true
-        else
-            return false
-        end
-    end,
-
     CreateReclaimEffects = function( self, target )
         EffectUtil.PlayReclaimEffects( self, target, self:GetBlueprint().General.BuildBones.BuildEffectBones or {0,}, self.ReclaimEffectsBag )
     end,

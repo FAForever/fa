@@ -9,8 +9,9 @@
 #****************************************************************************
 
 local SLandFactoryUnit = import('/lua/seraphimunits.lua').SLandFactoryUnit
+local SupportFactoryUnit = import('/lua/defaultunits.lua').SupportFactoryUnit
 
-ZSB9601 = Class(SLandFactoryUnit) {
+ZSB9601 = Class(SLandFactoryUnit, SupportFactoryUnit) {
 
     OnCreate = function(self)
         SLandFactoryUnit.OnCreate(self)

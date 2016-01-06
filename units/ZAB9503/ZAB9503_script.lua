@@ -9,7 +9,9 @@
 #****************************************************************************
 
 local ASeaFactoryUnit = import('/lua/aeonunits.lua').ASeaFactoryUnit
-ZAB9503 = Class(ASeaFactoryUnit) {}
+local SupportFactoryUnit = import('/lua/defaultunits.lua').SupportFactoryUnit
+
+ZAB9503 = Class(ASeaFactoryUnit, SupportFactoryUnit) {}
 
 TypeClass = ZAB9503
 

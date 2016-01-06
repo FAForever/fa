@@ -9,8 +9,9 @@
 #****************************************************************************
 
 local SLandFactoryUnit = import('/lua/seraphimunits.lua').SLandFactoryUnit
+local SupportFactoryUnit = import('/lua/defaultunits.lua').SupportFactoryUnit
 
-ZSB9501 = Class(SLandFactoryUnit) {
+ZSB9501 = Class(SLandFactoryUnit, SupportFactoryUnit) {
     OnCreate = function(self)
         SLandFactoryUnit.OnCreate(self)
         local bp = self:GetBlueprint()
@@ -19,6 +20,19 @@ ZSB9501 = Class(SLandFactoryUnit) {
 
         self.Rotator2 = CreateRotator(self, 'Pod02', 'y', nil, 8, 0, 0)
         self.Trash:Add(self.Rotator2)
+
+        --[[
+        --TODO: This needs to be put into every support factory script
+        self.InheritedCheckBuildRestriction = SLandFactoryUnit.CheckBuildRestriction
+        self.CheckBuildRestriction = function(self,target_bp)
+            WARN('In overridden ZSB9501 CheckBuildRestriction')
+            if not self.InheritedCheckBuildRestriction(self, target_bp) then
+                WARN('Did not pass basic check')
+                return false
+            end
+            return SupportFactory.CheckBuildRestriction(self, target_bp)
+        end
+        ]]--
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)

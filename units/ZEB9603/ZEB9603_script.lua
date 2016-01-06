@@ -9,8 +9,9 @@
 #****************************************************************************
 
 local TSeaFactoryUnit = import('/lua/terranunits.lua').TSeaFactoryUnit
+local SupportFactoryUnit = import('/lua/defaultunits.lua').SupportFactoryUnit
 
-UEB0303 = Class(TSeaFactoryUnit) {    
+UEB0303 = Class(TSeaFactoryUnit, SupportFactoryUnit) {
     OnCreate = function(self)
         TSeaFactoryUnit.OnCreate(self)
         self.BuildPointSlider = CreateSlider(self, self:GetBlueprint().Display.BuildAttachBone or 0, -15, 0, 0, -1)

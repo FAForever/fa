@@ -47,6 +47,75 @@ local Points = {
 AIBrain = Class(moho.aibrain_methods) {
     Result = nil,
 
+    ------------------------------------------------------
+    ----------- ENGYMOD HQ fac bookkeeping HERE  ---------
+    ------------------------------------------------------
+    ---
+    --- What we do here is introduce a new multi-level table called "HQFacs" that keeps track of all HQs by faction, layer and tech.
+    --- To avoid EntityCategoryContains checks, we take these properties from the General section of the unit blueprints.
+
+    -- Check if there is an HQ Fac
+    HasHQFac = function(self, faction, layer, tech)
+        -- Get HQFacs[faction][layer][tech] without nil indexing error
+        return (((self.HQFacs[faction] or {})[layer] or {})[tech] or 0) > 0
+    end,
+
+    -- Add an HQ factory to the array - called by FactoryUnit.OnStopBeingBuilt
+    AddHQFac = function(self, unit)
+        local bp = unit:GetBlueprint()
+
+        local faction = bp.General.FactionName
+        local layer = bp.General.Icon -- this is hacky but it works
+        local tech = bp.General.TechLevel
+
+        -- Make sure data structure is initialized (could do this in CreateBrainShared but I am lazy and don't like hardcoding strings)
+        if not self.HQFacs[faction] then
+            self.HQFacs[faction] = {}
+        end
+        if not self.HQFacs[faction][layer] then
+            self.HQFacs[faction][layer] = {}
+        end
+
+        self.HQFacs[faction][layer][tech] = (self.HQFacs[faction][layer][tech] or 0) + 1
+        -- Sync
+        Sync.HQFacs = table.deepcopy(self.HQFacs)
+        
+        -- Check back on Sync table
+        WARN('Checking back Sync table from Sim')
+        for faction, layers in Sync.HQFacs do
+          for layer, techs in layers do
+            for tech, count in techs do
+                WARN('SIM: Have '..count..' HQs for '..faction..' '..layer..' '..tech)
+            end
+          end
+        end
+    end,
+
+    -- Remove an HQ factory from the array - called by FactoryUnit.OnDestroy
+    RemoveHQFac = function(self, unit)
+        local bp = unit:GetBlueprint()
+
+        local faction = bp.General.FactionName
+        local layer = bp.General.Icon -- this is hacky but it works
+        local tech = bp.General.TechLevel
+
+        -- sanity check
+        if not self.HQFacs[faction] then
+            WARN('Hit unitialized HQFacs in RemoveHQFac, unit id ' .. bp.BlueprintId)
+        end
+        if not self.HQFacs[faction][layer] then
+            WARN('Hit unitialized HQFacs in RemoveHQFac, unit id ' .. bp.BlueprintId)
+        end
+        if not self.HQFacs[faction][layer][tech] then
+            WARN('Hit unitialized HQFacs in RemoveHQFac, unit id ' .. bp.BlueprintId)
+        end
+
+        self.HQFacs[faction][layer][tech] = (self.HQFacs[faction][layer][tech]) - 1
+
+        -- Sync
+        Sync.HQFacs = table.deepcopy(self.HQFacs)
+    end,
+
    ------------------------------------------------------
    ----------- HUMAN BRAIN FUNCTIONS HANDLED HERE  ------
    ------------------------------------------------------
@@ -170,6 +239,8 @@ AIBrain = Class(moho.aibrain_methods) {
         -- issue:--43 : Better stealth
         self.UnitIntelList = {}
 
+        -- engymod HQ dictionary
+        self.HQFacs = {}
     end,
 
     OnSpawnPreBuiltUnits = function(self)

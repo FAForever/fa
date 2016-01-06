@@ -9,7 +9,8 @@
 #****************************************************************************
 
 local ALandFactoryUnit = import('/lua/aeonunits.lua').ALandFactoryUnit
+local SupportFactoryUnit = import('/lua/defaultunits.lua').SupportFactoryUnit
 
-ZAB9501 = Class(ALandFactoryUnit) {}
+ZAB9501 = Class(ALandFactoryUnit, SupportFactoryUnit) {}
 
 TypeClass = ZAB9501
