@@ -43,7 +43,6 @@ UnitBlueprint {
     Categories = {
         'PRODUCTSC1',
         'SELECTABLE',
-        'BUILTBYTIER1FACTORY',
         'BUILTBYTIER2ENGINEER',
         'BUILTBYTIER2COMMANDER',
         'BUILTBYTIER3ENGINEER',
@@ -164,7 +163,6 @@ UnitBlueprint {
         },
         BuildableCategory = {
             'BUILTBYTIER2FACTORY AEON MOBILE CONSTRUCTION',
-            'BUILTBYTIER2SUPPORTFACTORY AEON STRUCTURE LAND',
             'BUILTBYTIER2FACTORY AEON MOBILE LAND',
         },
         StorageEnergy = 0,        StorageMass = 160,

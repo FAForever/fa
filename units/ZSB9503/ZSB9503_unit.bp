@@ -35,7 +35,6 @@ UnitBlueprint {
     Categories = {
         'PRODUCTFA',
         'SELECTABLE',
-        'BUILTBYTIER1FACTORY',
         'BUILTBYTIER2ENGINEER',
         'BUILTBYTIER2COMMANDER',
         'BUILTBYTIER3ENGINEER',
@@ -149,7 +148,6 @@ UnitBlueprint {
         },
         BuildableCategory = {
             'BUILTBYTIER2FACTORY SERAPHIM MOBILE CONSTRUCTION',
-            'BUILTBYTIER2SUPPORTFACTORY SERAPHIM STRUCTURE NAVAL',
             'BUILTBYTIER2FACTORY SERAPHIM MOBILE NAVAL',
         },
         InitialRallyX = 0,

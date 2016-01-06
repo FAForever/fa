@@ -47,7 +47,6 @@ UnitBlueprint {
         'STRUCTURE',
         'LAND',
         'TECH3',
-	'BUILTBYTIER2SUPPORTFACTORY',
         'BUILTBYTIER3ENGINEER',
         'BUILTBYTIER3COMMANDER',
         'CONSTRUCTION',

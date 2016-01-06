@@ -35,7 +35,6 @@ UnitBlueprint {
     Categories = {
         'PRODUCTSC1',
         'SELECTABLE',
-        'BUILTBYTIER1FACTORY',
         'BUILTBYTIER2ENGINEER',
         'BUILTBYTIER2COMMANDER',
         'BUILTBYTIER3ENGINEER',
@@ -141,7 +140,6 @@ UnitBlueprint {
         },
         BuildableCategory = {
             'BUILTBYTIER2FACTORY AEON MOBILE CONSTRUCTION',
-            'BUILTBYTIER2SUPPORTFACTORY AEON STRUCTURE AIR',
             'BUILTBYTIER2FACTORY AEON MOBILE AIR',
             'TRANSPORTBUILTBYTIER2FACTORY AEON MOBILE AIR',
         },
