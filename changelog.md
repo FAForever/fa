@@ -51,6 +51,7 @@ Patch 3652 (pending)
 - Allow Fatboy, Atlantis, Tempest and Czar to fire while building units
 - Beam weapons now kill missiles they impact instead of wasting DPS for several ticks
 - Aeon ACU upgrade "Chrono Dampener" won't stun allied units any more. Additionally, it will fire at predetermined ticks so the effects of multiple acu's do not stack.
+- Increased TMD range by 1 and ROF by 0.2s to prevent a single TML killing a single TMD by using ground-fire to impact before the second TMD shot fires.
 
 **Bugs**
 - Fixed free mass exploit with Megalith eggs

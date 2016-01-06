@@ -184,7 +184,7 @@ UnitBlueprint {
             },
             FiringTolerance = 0.5,
             Label = 'Turret01',
-            MaxRadius = 30,
+            MaxRadius = 31,
             MaximumBeamLength = 42,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
@@ -205,7 +205,7 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RangeCategory = 'UWRC_Countermeasure',
-            RateOfFire = 0.5,
+            RateOfFire = 0.56,
             TargetCheckInterval = 0.5,
             TargetRestrictDisallow = 'UNTARGETABLE',
             TargetRestrictOnlyAllow = 'TACTICAL MISSILE',
@@ -235,9 +235,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, #from false
-            Sub = true, #from false
-            Water = true, #from false
+            Seabed = true,
+            Sub = true,
+            Water = true,
         },
     },
 }
