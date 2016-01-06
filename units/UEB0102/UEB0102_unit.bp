@@ -178,8 +178,9 @@ UnitBlueprint {
         SelectionPriority = 5,
         TechLevel = 'RULEUTL_Basic',
         UnitWeight = 1,
-        UpgradesTo = 'ueb0202',
         UpgradesFromBase = 'ueb0102',
+        UpgradesTo = 'ueb0202',
+        UpgradesToSupport = 'zeb9502',
     },
     Intel = {
         VisionRadius = 20,

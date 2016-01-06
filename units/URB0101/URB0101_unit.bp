@@ -189,6 +189,7 @@ UnitBlueprint {
         UnitWeight = 1,
         UpgradesFromBase = 'urb0101',
         UpgradesTo = 'urb0201',
+        UpgradesToSupport = 'zrb9501',
     },
     Intel = {
         VisionRadius = 20,
