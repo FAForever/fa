@@ -964,25 +964,27 @@ function PopulateMapList()
     local count = 1
     for i,sceninfo in scenarios do
         local passedFiltering = true
-        -- Subject this map to every activated filter.
-        for k, filter in currentFilters do
-            if not filter(sceninfo) then
-                passedFiltering = false
-                break
+        
+        -- If this is the currently selected map, mark it for reselection
+        if selectedScenario and string.lower(sceninfo.file) == string.lower(selectedScenario.file) then
+            selectedRow = count - 1
+        -- Else, check filtering
+        else
+            -- Subject this map to every activated filter.
+            for k, filter in currentFilters do
+                if not filter(sceninfo) then
+                    passedFiltering = false
+                    break
+                end
             end
-        end
-
-        if nameFilter and nameFilter:GetText() ~= "" then
-            passedFiltering = passedFiltering and string.lower(sceninfo.name):find(string.lower(nameFilter:GetText()))
+            -- Name filter needs special treatment
+            if nameFilter and nameFilter:GetText() ~= "" then
+                passedFiltering = passedFiltering and string.lower(sceninfo.name):find(string.lower(nameFilter:GetText()))
+            end
         end
 
         if passedFiltering then
             -- Make sure we finish up with the right map selected.
-            
-            if selectedScenario and string.lower(sceninfo.file) == string.lower(selectedScenario.file) then
-                selectedRow = count - 1
-            end
-
             scenarioKeymap[count] = i
             if sceninfo == selectedScenario then
                 reselectRow = count
