@@ -7,6 +7,7 @@ Patch 3652 (pending)
 - Game quality in lobby now visible again
 - Reduced autobalance random variation to get team setups with better overall quality
 - Default to score off
+- Stopped the map filter preventing the map selected in prefs from prior games from showing
 
 **UI**
 - Introduced Russian translations of many FAF additions to the game (Exotic_Retard)
