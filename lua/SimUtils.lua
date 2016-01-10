@@ -123,6 +123,7 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         table.insert(newUnits, unit)
 
         unit.oldowner = oldowner
+        unit.IsBeingTransferred = true
 
         if IsAlly(owner, ToArmyIndex) then
             if not unit.oldowner then
@@ -168,6 +169,8 @@ function TransferUnitsOwnership(units, ToArmyIndex)
         if EntityCategoryContains(categories.ENGINEERSTATION, unit) then
             unit:SetPaused(true)
         end
+
+        unit.IsBeingTransferred = false
     end
     return newUnits
 end

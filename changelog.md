@@ -77,6 +77,7 @@ Patch 3652 (pending)
 - Fixed an exploit with being able to upgrade restricted enhancements
 - Fixed a rare bug with builders getting near zero HP after a naval building gets destroyed the same tick as it finishes.
 - Fixed shields sometimes not turning off due to lack of Energy
+- Fixed buffs from enhancements being applied too often after unit transfer
 
 **Performance**
 - Optimization of score accumulation

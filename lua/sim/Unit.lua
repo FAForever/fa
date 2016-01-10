@@ -2022,7 +2022,10 @@ Unit = Class(moho.unit_methods) {
         local bp = self:GetBlueprint()
         if bp.Enhancements and bp.EnhancementPresetAssigned and bp.EnhancementPresetAssigned.Enhancements then
             for k, v in bp.EnhancementPresetAssigned.Enhancements do
-                self:CreateEnhancement(v)
+                -- Enhancements may already have been created by SimUtils.TransferUnitsOwnership
+                if not self:HasEnhancement(v) then
+                    self:CreateEnhancement(v)
+                end
             end
         end
     end,
