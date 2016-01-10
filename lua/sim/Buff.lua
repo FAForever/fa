@@ -198,7 +198,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
 
             unit:SetMaxHealth(val)
 
-            if not vals.DoNoFill then
+            if not vals.DoNoFill and not unit.IsBeingTransferred then
                 if val > oldmax then
                     unit:AdjustHealth(unit, val - oldmax)
                 else
