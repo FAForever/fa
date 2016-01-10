@@ -80,6 +80,7 @@ Patch 3652 (pending)
 - Fixed a rare bug with builders getting near zero HP after a naval building gets destroyed the same tick as it finishes.
 - Fixed shields sometimes not turning off due to lack of Energy
 - Fixed buffs from enhancements being applied too often after unit transfer
+- Fixed subermsible naval units leaving full reclaim mass
 
 **Performance**
 - Optimization of score accumulation

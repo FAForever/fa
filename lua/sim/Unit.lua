@@ -1414,7 +1414,7 @@ Unit = Class(moho.unit_methods) {
         local pos = self:GetPosition()
         local layer = self:GetCurrentLayer()
 
-        if layer == 'Water' then
+        if layer == 'Water' or layer == 'Sub' then
             --Reduce the mass value of submerged wrecks
             mass = mass * 0.5
             energy = energy * 0.5
