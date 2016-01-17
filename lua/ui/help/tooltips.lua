@@ -1224,6 +1224,10 @@ Tooltips = {
         title = "<LOC tooltipui0283>Restart",
         description = "<LOC tooltipui0284>Begin this Game again",
     },
+    esc_rehost = {
+        title = "<LOC tooltipui0694>Rehost",
+        description = "<LOC tooltipui0284>Begin this Game again",
+    },
     esc_exit = {
         title = "<LOC tooltipui0285>Exit",
         description = "<LOC tooltipui0286>Close Supreme Commander: Forged Alliance",
