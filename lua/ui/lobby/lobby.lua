@@ -56,7 +56,10 @@ local gameColors = import('/lua/gameColors.lua').GameColors
 local numOpenSlots = LobbyComm.maxPlayerSlots
 
 -- Maps faction identifiers to their names.
-local FACTION_NAMES = {[1] = "uef", [2] = "aeon", [3] = "cybran", [4] = "seraphim", [5] = "random"}
+local FACTION_NAMES = {[1] = "uef", [2] = "aeon", [3] = "cybran", [4] = "seraphim", [5] = "random" }
+
+local LAST_GAME_PRESET_NAME = "lastGame"
+local rehostPlayerOptions = {} -- Player options loaded from preset, used for rehosting
 
 local formattedOptions = {}
 local nonDefaultFormattedOptions = {}
@@ -122,6 +125,7 @@ local function parseCommandlineArguments()
 
     return {
         PrefLanguage = tostring(string.lower(GetCommandLineArgOrDefault("/country", "world"))),
+        isRehost = HasCommandLineArg("/rehost"),
         initName = GetCommandLineArgOrDefault("/init", ""),
         ratingColor = GetCommandLineArgOrDefault("/ratingcolor", "ffffffff"),
         numGames = tonumber(GetCommandLineArgOrDefault("/numgames", 0)),
@@ -631,6 +635,15 @@ function FindSlotForID(id)
     return nil
 end
 
+function FindRehostSlotForID(id)
+    for index, player in ipairs(rehostPlayerOptions) do
+        if player.OwnerID == id and player.Human then
+            return player.StartSpot
+        end
+    end
+    return nil
+end
+
 function FindNameForID(id)
     for k, player in gameInfo.PlayerOptions:pairs() do
         if player.OwnerID == id and player.Human then
@@ -697,8 +710,8 @@ end
 -- instead to incrementaly update things.
 function SetSlotInfo(slotNum, playerInfo)
     -- Remove the ConnectDialog. It probably makes more sense to do this when we get the game state.
-	if GUI.connectdialog then
-		GUI.connectdialog:Close()
+    if GUI.connectdialog then
+        GUI.connectdialog:Close()
         GUI.connectdialog = nil
 
         -- Changelog, if necessary.
@@ -706,6 +719,8 @@ function SetSlotInfo(slotNum, playerInfo)
             GUI_Changelog()
         end
     end
+
+    playerInfo.StartSpot = slotNum
 
     local slot = GUI.slots[slotNum]
     local isHost = lobbyComm:IsHost()
@@ -1654,6 +1669,8 @@ local function TryLaunch(skipNoObserversCheck)
 
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
         SetWindowedLobby(false)
+
+        SavePresetToName(LAST_GAME_PRESET_NAME)
 
         lobbyComm:LaunchGame(gameInfo)
     end
@@ -3568,9 +3585,30 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         if lobbyComm:IsHost() then
             -- Host only messages
             if data.Type == 'AddPlayer' then
-                -- create empty slot if possible and give it to the player
+                -- try to reassign the same slot as in the last game if it's a rehosted game, otherwise give it an empty
+                -- slot or move it to observer
                 SendCompleteGameStateToPeer(data.SenderID)
-                HostUtils.TryAddPlayer(data.SenderID, 0, PlayerData(data.PlayerOptions))
+
+                if argv.isRehost then
+                    local rehostSlot = FindRehostSlotForID(data.SenderID) or 0
+                    if rehostSlot ~= 0 and gameInfo.PlayerOptions[rehostSlot] then
+                        -- If the slot is occupied, the occupying player will be moved away or to observer. If it's an
+                        -- AI, it will be removed
+                        local occupyingPlayer = gameInfo.PlayerOptions[rehostSlot]
+                        if not occupyingPlayer.Human then
+                            HostUtils.RemoveAI(rehostSlot)
+                            HostUtils.TryAddPlayer(data.SenderID, rehostSlot, PlayerData(data.PlayerOptions))
+                        else
+                            HostUtils.ConvertPlayerToObserver(rehostSlot, true)
+                            HostUtils.TryAddPlayer(data.SenderID, rehostSlot, PlayerData(data.PlayerOptions))
+                            HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(occupyingPlayer.OwnerID))
+                        end
+                    else
+                        HostUtils.TryAddPlayer(data.SenderID, rehostSlot, PlayerData(data.PlayerOptions))
+                    end
+                else
+                    HostUtils.TryAddPlayer(data.SenderID, 0, PlayerData(data.PlayerOptions))
+                end
                 PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
             elseif data.Type == 'MovePlayer' then
                 -- Handle ready-races.
@@ -3832,6 +3870,21 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         CreateUI(LobbyComm.maxPlayerSlots)
         if not singlePlayer then
             ForkThread(function() UpdateBenchmark() end)
+        end
+
+        if argv.isRehost then
+            LoadPresetByName(LAST_GAME_PRESET_NAME);
+
+            local rehostSlot = FindRehostSlotForID(localPlayerID)
+            if rehostSlot then
+                HostUtils.MovePlayerToEmptySlot(1, rehostSlot)
+            end
+
+            for index, playerInfo in ipairs(rehostPlayerOptions) do
+                if not playerInfo.Human then
+                    HostUtils.AddAI(playerInfo.PlayerName, playerInfo.AIPersonality, playerInfo.StartSpot)
+                end
+            end
         end
 
         UpdateGame()
@@ -4765,12 +4818,18 @@ end
 
 -- Create a preset table representing the current configuration.
 function GetPresetFromSettings(presetName)
+    -- Since GameOptions may only contain strings and ints, some added tables need to be removed before storing
+    local cleanGameOptions = table.copy(gameInfo.GameOptions)
+    cleanGameOptions.ClanTags = nil
+    cleanGameOptions.Ratings = nil
+
     return {
         Name = presetName,
         MapName = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).name,
         MapPath = gameInfo.GameOptions.ScenarioFile,
-        GameOptions = gameInfo.GameOptions,
-        GameMods = gameInfo.GameMods
+        GameOptions = cleanGameOptions,
+        GameMods = gameInfo.GameMods,
+        PlayerOptions = gameInfo.PlayerOptions
     }
 end
 
@@ -4780,21 +4839,52 @@ function LoadPreset(presetIndex)
 
     SetGameOptions(preset.GameOptions, true)
 
+    rehostPlayerOptions = preset.PlayerOptions
     selectedSimMods = preset.GameMods
     HostUtils.UpdateMods()
 
-    GUI.presetDialog:Hide()
+    if GUI.presetDialog then
+        GUI.presetDialog:Hide()
+    end
     UpdateGame()
+end
+
+function LoadPresetByName(name)
+    local presets = LoadPresetsList()
+    for index, preset in ipairs(presets) do
+        if preset.Name == name then
+            LoadPreset(index)
+            break
+        end
+    end
 end
 
 -- Write the current settings to the given preset profile index
 function SavePreset(index)
-    local profiles = LoadPresetsList()
+    local presets = LoadPresetsList()
 
     local selectedPreset = index
-    profiles[selectedPreset] = GetPresetFromSettings(profiles[selectedPreset].Name)
+    presets[selectedPreset] = GetPresetFromSettings(presets[selectedPreset].Name)
 
-    SavePresetsList(profiles)
+    SavePresetsList(presets)
+end
+
+function SavePresetToName(presetName)
+    local presets = LoadPresetsList()
+    local found = false
+    for index, preset in ipairs(presets) do
+        if preset.Name == presetName then
+            presets[index] = GetPresetFromSettings(presetName)
+            found = true
+            break
+        end
+    end
+
+    if not found then
+        table.insert(presets, GetPresetFromSettings(presetName))
+    end
+
+    SavePresetsList(presets)
 end
 
 -- Find the key for the given value in a table.

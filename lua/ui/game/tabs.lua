@@ -136,6 +136,11 @@ local menus = {
         },
         lan = {
             {
+                action = 'RehostGame',
+                label = '<LOC _Rehost_Game>Rehost Game',
+                tooltip = 'esc_rehost',
+            },
+            {
                 action = 'Options',
                 label = '<LOC _Options>',
                 tooltip = 'esc_options',
@@ -159,11 +164,16 @@ local menus = {
         },
         gpgnet = {
             {
+                action = 'RehostGame',
+                label = '<LOC _Rehost_Game>Rehost Game',
+                tooltip = 'esc_rehost',
+            },
+            {
                 action = 'ShowGameInfo',
                 label = 'Show Game Info',
                 tooltip = 'Show the settings of this game',
             },
-			{
+			      {
                 action = 'Options',
                 label = '<LOC _Options>',
                 tooltip = 'esc_options',
@@ -228,6 +238,14 @@ local actions = {
             true,
             {escapeButton = 2, enterButton = 1, worldCover = true})
     end,
+    RehostGame = function()
+        UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0008>Close the game and rehost it with the same settings?",
+            "<LOC _Yes>", RehostGame,
+            "<LOC _No>", nil,
+            nil, nil,
+            true,
+            {escapeButton = 2, enterButton = 1, worldCover = true})
+    end,
     RestartReplay = function()
         local replayFilename = GetFrontEndData('replay_filename')
         UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0002>Are you sure you'd like to restart?", 
@@ -264,6 +282,11 @@ local actions = {
         import('/lua/ui/dialogs/options.lua').CreateDialog(GetFrame(0))
     end,
 }
+
+function RehostGame()
+    GpgNetSend('Rehost')
+    EscapeHandler.SafeQuit()
+end
 
 function EndGame()
     if import('/lua/ui/campaign/campaignmanager.lua').campaignMode then
