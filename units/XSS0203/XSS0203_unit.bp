@@ -1,6 +1,12 @@
 UnitBlueprint {
     AI = {
         GuardReturnRadius = 130,
+        TargetBones = {
+            'AntiTorpedo',
+            'Projectile01',
+            'Projectile02',
+            'XSS0203',
+        },
     },
     Audio = {
         AmbientMove = Sound {
