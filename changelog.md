@@ -53,6 +53,9 @@ Patch 3652 (pending)
 - Beam weapons now kill missiles they impact instead of wasting DPS for several ticks
 - Aeon ACU upgrade "Chrono Dampener" won't stun allied units any more. Additionally, it will fire at predetermined ticks so the effects of multiple acu's do not stack.
 - Increased TMD range by 1 and ROF by 0.2s to prevent a single TML killing a single TMD by using ground-fire to impact before the second TMD shot fires.
+- Fixed Cybran T3 MAA doing friendly damage on 1 of its 2 AA weapons
+- Fixed Cybran T3 MAA hitbox/bones making lots of units missile
+- Fixed Sera T1 sub not being hit by torpedoes 80% of the time while surfaced.
 
 **Bugs**
 - Fixed free mass exploit with Megalith eggs
