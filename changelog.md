@@ -3,7 +3,7 @@ Patch 3652 (pending)
 
 **Lobby**
 - Name filter when selecting map
-- Prevent host from changing teams of others while ready
+- Prevent host from changing player teams while he is ready
 - Game quality in lobby now visible again
 - Reduced autobalance random variation to get team setups with better overall quality
 - Default to score off
