@@ -1417,15 +1417,10 @@ TransportBeaconUnit = Class(StructureUnit) {
     OnDamage = function(self, instigator, amount, vector, damageType)
     end,
 
-
     OnCreate = function(self)
         StructureUnit.OnCreate(self)
         self:SetCapturable(false)
         self:SetReclaimable(false)
-    end,
-
-    Kill = function(self)
-        self:Destroy()
     end,
 }
 
