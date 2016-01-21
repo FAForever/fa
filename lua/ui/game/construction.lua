@@ -602,13 +602,7 @@ function CommonLogic()
             control.Icon.Height:Set(48)
             control.Icon.Width:Set(48)
             control.BuildKey = nil
-
-            if type == 'attachedunit' and UnitData[control.Data.unit:GetEntityId()].locked then
-                control:SetOverrideTexture(control.mNormal)
-                control:SetOverrideEnabled(true)
-                control.Count:SetText('X')
-                control.Count:SetColor('ffff0000')
-            elseif control.Data.count > 1 then
+            if control.Data.count > 1 then
                 control.Count:SetText(control.Data.count)
                 control.Count:SetColor('ffffffff')
             else
@@ -1248,7 +1242,6 @@ function OnClickHandler(button, modifiers)
     elseif item.type == 'attachedunit' then
         if modifiers.Left then
             -- Toggling selection of the entity
-            button:SetOverrideTexture(button.mActive)
             button:ToggleOverride()
 
             -- Add or Remove the entity to the session selection
@@ -1256,18 +1249,6 @@ function OnClickHandler(button, modifiers)
                 AddToSessionExtraSelectList(item.unit)
             else
                 RemoveFromSessionExtraSelectList(item.unit)
-            end
-        elseif modifiers.Right then
-            local lock = not button:GetOverrideEnabled()
-            local cb = { Func = 'TransportLock', Args = { ids = {item.unit:GetEntityId()}, lock=not button:GetOverrideEnabled()} }
-            SimCallback(cb, true)
-            button:SetOverrideTexture(button.mNormal)
-            button:ToggleOverride()
-            if lock then
-                button.Count:SetText('X')
-                button.Count:SetColor('ffff0000')
-            else
-                button.Count:SetText('')
             end
         end
     elseif item.type == 'templates' then

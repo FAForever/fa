@@ -1748,89 +1748,7 @@ AirUnit = Class(MobileUnit) {
 
 local slotsData = {}
 BaseTransport = Class() {
-    GetSlotsData = function(self)
-        local bpid = self:GetUnitId()
-
-        if not slotsData[bpid] then
-            local slots = {{}, {}, {}}
-
-            for bone=1, self:GetBoneCount() do
-                local name = string.lower(self:GetBoneName(bone) or '')
-                local i, j = string.find(name, 'attachpoint')
-
-                if name and j then
-                    local s = string.sub(name, j+1)
-                    local size
-                    if string.find(s, "med_?%d") then
-                        size = 2
-                    elseif string.find(s, "lrg[_]?%d") then
-                        size = 3
-                    else
-                        size = 1
-                    end
-
-                    if size then
-                        table.insert(slots[size], bone)
-                    end
-                end
-            end
-
-            slotsData[bpid] = slots
-        end
-
-        return slotsData[bpid]
-    end,
-
-    GetClassSlots = function(self, class)
-        local slots = self:GetSlotsData()
-        return slots[class] or {}
-    end,
-
-    AllCargoLocked = function(self, unit)
-        local tdata = self.transData
-        if tdata.allLocked == nil or tdata.detachTick < GetGameTick() then
-            -- cache this for all unload same tick
-            tdata.allLocked = unit.TransportLocked == true and not self:IsUnitState('Ferrying')
-            tdata.detachTick = GetGameTick()
-            if tdata.allLocked then
-                for _, u in self:GetCargo() do
-                    if not u.TransportLocked then
-                        tdata.allLocked = false
-                        break
-                    end
-                end
-            end
-        end
-
-        return tdata.allLocked
-    end,
-
-    GetFreeSlot = function(self, unit)
-        local slots = self:GetClassSlots(unit:GetTransportClass())
-        for i, slot in slots do
-            if not self.slots[slot] and not self.transData.reserved[i] then return slot end
-        end
-    end,
-
-    ReserveSlot = function(self, slot)
-        if self.slots[slot] then return false end
-        self.transData.reserved = self.transData.reserved or {}
-        self.transData.reserved[slot] = true
-        return true
-    end,
-
-    MoveCargo = function(self, unit, to)
-        if not unit then return false end
-        local from = unit.attachmentBone
-        self:DetachAll(self:GetBoneName(from), true)
-        unit:DetachFrom(true)
-        unit:AttachBoneTo('AttachPoint', self, self:GetBoneName(to))
-        unit.attachmentBone = to
-        self.slots[from] = nil
-        self.slots[to] = unit
-    end,
-
-    OnTransportAttach = function(self, bone, unit)
+    OnTransportAttach = function(self, attachBone, unit)
         self:PlayUnitSound('Load')
         self:MarkWeaponsOnTransport(unit, true)
         if unit:ShieldIsOn() then
@@ -1838,29 +1756,15 @@ BaseTransport = Class() {
             unit:DisableDefaultToggleCaps()
         end
         self:RequestRefreshUI()
-        for i=1, self:GetBoneCount() do
-            if self:GetBoneName(i) == bone then
-                self.slots[i] = unit
-                unit.attachmentBone = i
-            end
-        end
-
-        unit:OnAttachedToTransport(self, bone)
+        unit:OnAttachedToTransport(self, attachBone)
     end,
 
-    OnTransportDetach = function(self, bone, unit)
-        local allLocked = self:AllCargoLocked(unit)
-        if unit.TransportLocked and not allLocked then
-            unit:AttachBoneTo('AttachPoint', self, bone)
-            return
-        end
-
-        self.slots[unit.attachmentBone] = nil
-        unit.attachmentBone = nil
+    OnTransportDetach = function(self, attachBone, unit)
+        self:PlayUnitSound('Unload')
+        self:MarkWeaponsOnTransport(unit, false)
         unit:EnableShield()
         unit:EnableDefaultToggleCaps()
         unit:TransportAnimation(-1)
-        unit:TransportLock(false)
         unit:OnDetachedToTransport(self)
         self:PlayUnitSound('Unload')
         self:MarkWeaponsOnTransport(unit, false)
