@@ -18,7 +18,6 @@ Patch 3652 (pending)
 - Hold down Alt when giving a factory order to soft stop factory before issuing next order
 - Multi-upgrade: Added UI support to upgrade structures several levels at once (i.e: cybran shields, hives, mexes, factories etc)
 - Auto-overcharge: It's now possible to let overcharge fire automatically whenever you have the required power
-- Ferry orders are now persistent, even if the original transports die. Remove it by shift-ctrl right click the first beacon
 - Order repair on a wreck to rebuild it if possible by some of the selected engineers. Those not able to rebuild the wreck will assist after the build starts.
 - Units explicity repairing (not assisting) a structure that dies will automatically try to rebuild it
 - Refactor the income economy overlay not to show reclaim values appearing in the generated income column and do correct rounding of the numbers.
