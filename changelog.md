@@ -54,6 +54,7 @@ Patch 3652 (pending)
 - Fixed Cybran T3 MAA doing friendly damage on 1 of its 2 AA weapons
 - Fixed Cybran T3 MAA hitbox/bones making lots of units miss
 - Fixed Sera T1 sub not being hit by torpedoes 80% of the time while surfaced.
+- Enemy civilians are now colored in a unique red color
 
 **Bugs**
 - Fixed free mass exploit with Megalith eggs

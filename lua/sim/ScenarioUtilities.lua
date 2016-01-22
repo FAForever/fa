@@ -464,7 +464,7 @@ function InitializeArmies()
             local armyIsCiv = ScenarioInfo.ArmySetup[strArmy].Civilian
 
             if armyIsCiv and civOpt ~= 'neutral' and strArmy ~= 'NEUTRAL_CIVILIAN' then -- give enemy civilians darker color
-                SetArmyColorIndex(strArmy, 13)
+                SetArmyColor(strArmy, 255, 48, 48) -- non-player red color for enemy civs
             end
 
             if (not armyIsCiv and bCreateInitial) or (armyIsCiv and civOpt ~= 'removed') then
