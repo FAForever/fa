@@ -1430,6 +1430,7 @@ BaseManager = Class {
                     PlatoonAIFunction = {'/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerEngineerPlatoonSplit' },
                     BuildConditions = {
                         { BMBC, 'BaseManagerNeedsEngineers', {self.BaseName} },
+                        { BMBC, 'BaseActive', {self.BaseName} },
                     },
                     PlatoonData = {
                         BaseName = self.BaseName,
@@ -1487,6 +1488,9 @@ BaseManager = Class {
                     { BMPT, 'UnitUpgradeBehavior' },
                 },
                 PlatoonAIFunction = {'/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerEngineerPlatoonSplit'},
+                BuildConditions = {
+                    { BMBC, 'BaseActive', {self.BaseName} },
+                },
                 PlatoonData = {
                     BaseName = self.BaseName,
                 },
@@ -1504,6 +1508,9 @@ BaseManager = Class {
                 RequiresConstruction = false,
                 LocationType = self.BaseName,
                 PlatoonAIFunction = {'/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerEngineerPlatoonSplit'},
+                BuildConditions = {
+                    { BMBC, 'BaseActive', {self.BaseName} },
+                },
                 PlatoonData = {
                     BaseName = self.BaseName,
                 },
@@ -1538,6 +1545,7 @@ BaseManager = Class {
                 PlatoonAIFunction = {'/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerScoutingAI'},
                 BuildConditions = {
                     { BMBC, 'LandScoutingEnabled', { self.BaseName, }},
+                    { BMBC, 'BaseActive', {self.BaseName} },
                 },
                 PlatoonData = {
                     BaseName = self.BaseName,
@@ -1558,6 +1566,7 @@ BaseManager = Class {
                 BuildConditions = {
                     { BMBC, 'HighestFactoryLevelType', { 1, self.BaseName, 'Air' }},
                     { BMBC, 'AirScoutingEnabled', { self.BaseName, }},
+                    { BMBC, 'BaseActive', {self.BaseName} },
                 },
                 PlatoonData = {
                     BaseName = self.BaseName,
@@ -1578,6 +1587,7 @@ BaseManager = Class {
                 BuildConditions = {
                     { BMBC, 'HighestFactoryLevelType', { 2, self.BaseName, 'Air' }},
                     { BMBC, 'AirScoutingEnabled', { self.BaseName, }},
+                    { BMBC, 'BaseActive', {self.BaseName} },
                 },
                 PlatoonData = {
                     BaseName = self.BaseName,
@@ -1598,6 +1608,7 @@ BaseManager = Class {
                 BuildConditions = {
                     { BMBC, 'HighestFactoryLevelType', { 3, self.BaseName, 'Air' }},
                     { BMBC, 'AirScoutingEnabled', { self.BaseName, }},
+                    { BMBC, 'BaseActive', {self.BaseName} },
                 },
                 PlatoonData = {
                     BaseName = self.BaseName,
