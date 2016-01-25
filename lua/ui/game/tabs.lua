@@ -9,6 +9,7 @@ local GameMain = import('/lua/ui/game/gamemain.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local EscapeHandler = import('/lua/ui/dialogs/eschandler.lua')
 
+local sessionInfo = SessionGetScenarioInfo()
 local savedParent = false
 local animationLock = false
 local gameOver = false
@@ -19,8 +20,7 @@ local pauseBtn = false
 timeoutsRemaining = false
 
 if SessionIsActive() and SessionIsMultiplayer() then
-    local scenInfo = SessionGetScenarioInfo()
-    timeoutsRemaining = tonumber(scenInfo.Options.Timeouts)
+    timeoutsRemaining = tonumber(sessionInfo.Options.Timeouts)
 end
 
 function CanUserPause()
@@ -167,6 +167,7 @@ local menus = {
                 action = 'RehostGame',
                 label = '<LOC _Rehost_Game>Rehost Game',
                 tooltip = 'esc_rehost',
+                hideWhenRanked = true,
             },
             {
                 action = 'ShowGameInfo',
@@ -552,21 +553,25 @@ function BuildContent(contentID)
         end
         
         contentGroup.Buttons = {}
-        
+
+        local isRanked = sessionInfo.Options.Ranked
+
         for index, buttonData in menus[contentID][tableID] do
             local i = index
-            contentGroup.Buttons[i] = BuildButton(buttonData)
-            if gameOver and buttonData.disableOnGameOver then
-                contentGroup.Buttons[i]:Disable()
-            end
-            if i == 1 then
-                LayoutHelpers.AtTopIn(contentGroup.Buttons[i], contentGroup)
-                LayoutHelpers.AtHorizontalCenterIn(contentGroup.Buttons[i], contentGroup)
-            else
-                LayoutHelpers.Below(contentGroup.Buttons[i], contentGroup.Buttons[i-1])
+            if not isRanked or not buttonData.hideWhenRanked then
+                contentGroup.Buttons[i] = BuildButton(buttonData)
+                if gameOver and buttonData.disableOnGameOver then
+                    contentGroup.Buttons[i]:Disable()
+                end
+                if i == 1 then
+                    LayoutHelpers.AtTopIn(contentGroup.Buttons[i], contentGroup)
+                    LayoutHelpers.AtHorizontalCenterIn(contentGroup.Buttons[i], contentGroup)
+                else
+                    LayoutHelpers.Below(contentGroup.Buttons[i], contentGroup.Buttons[i-1])
+                end
             end
         end
-        
+
         controls.bgTop.widthOffset = 4
         contentGroup.Width:Set(contentGroup.Buttons[1].Width)
         contentGroup.Height:Set(function() return contentGroup.Buttons[1].Height() * table.getsize(contentGroup.Buttons) end)
@@ -872,8 +877,8 @@ function ToggleGameInfo()
 	-- ... other options ...
 	---------------
 	PresetList:AddItem('Scenario Info :')
-	if SessionGetScenarioInfo() then
-		for k, v in SessionGetScenarioInfo() do
+	if sessionInfo then
+		for k, v in sessionInfo do
 			if k == 'name' then
 				PresetList:AddItem('- Name : '..tostring(v))
 			--elseif k == 'Options.ScenarioFile' then
@@ -884,8 +889,8 @@ function ToggleGameInfo()
 				PresetList:AddItem('- Type : '..tostring(v))
 			end
 		end
-		if SessionGetScenarioInfo().Options['Rule'] then
-			local tmptext = SessionGetScenarioInfo().Options['Rule']
+		if sessionInfo.Options['Rule'] then
+			local tmptext = sessionInfo.Options['Rule']
 			wrapped = import('/lua/maui/text.lua').WrapText(tmptext, 232, function(curText) return PresetList:GetStringAdvance(curText) end)
 			for i, line in wrapped do
 				if i == 1 then
@@ -923,16 +928,16 @@ function ToggleGameInfo()
 		end
 		PresetList:AddItem('')
 	end
-	if SessionGetScenarioInfo().Options.RestrictedCategories then
+	if sessionInfo.Options.RestrictedCategories then
 		PresetList:AddItem('Unit Restrictions :')
-		for k, v in SessionGetScenarioInfo().Options.RestrictedCategories do
+		for k, v in sessionInfo.Options.RestrictedCategories do
 			PresetList:AddItem('- '..tostring(v))
 		end
 		PresetList:AddItem('')
 	end
-	if SessionGetScenarioInfo().Options then
+	if sessionInfo.Options then
 		PresetList:AddItem('Scenario Options :')
-		for k, v in SessionGetScenarioInfo().Options do
+		for k, v in sessionInfo.Options do
 			if k == 'ScenarioFile' then
 			elseif k == 'Rule' then
 			elseif k == 'Ratings' then
