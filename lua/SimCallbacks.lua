@@ -74,14 +74,7 @@ Callbacks.TransportLock = function(data)
 end
 
 Callbacks.ClearCommands = function(data, units)
-    local safe = {}
-
-    for _, u in units do
-        if OkayToMessWithArmy(u:GetArmy()) then
-            table.insert(safe, u)
-        end
-    end
-
+    local safe = SecureUnits(data.ids or units)
     IssueClearCommands(safe)
 end
 

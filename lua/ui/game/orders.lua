@@ -209,30 +209,36 @@ end
 
 function Stop(units)
     local units = units or GetSelectedUnits()
-    local launchers = EntityCategoryFilterDown(categories.SILO, units)
-    if launchers[1] then
-        Select.Hidden(function()
-            SelectUnits(launchers)
-            local cb = { Func = 'ClearCommands'}
-            SimCallback(cb, true)
-        end)
+
+    if units[1] then
+        IssueUnitCommand(units, 'Stop')
+    end
+end
+
+function ClearCommands(units)
+    local cb = { Func = 'ClearCommands'}
+
+    if units then
+        local ids = {}
+        for _, u in units do
+            table.insert(ids, u:GetEntityId())
+        end
+        cb.Args = {ids=ids}
     end
 
-    local stop_units = EntityCategoryFilterOut(categories.SILO, units)
-    if stop_units[1] then
-        IssueUnitCommand(stop_units, 'Stop')
-    end
+    SimCallback(cb, true)
 end
 
 function SoftStop(units)
     local units = units or GetSelectedUnits()
     import('/lua/ui/game/construction.lua').ResetOrderQueues(units)
-    Stop(EntityCategoryFilterOut(categories.FACTORY, units))
+    ClearCommands(EntityCategoryFilterDown(categories.SILO, units))
+    Stop(EntityCategoryFilterOut(categories.FACTORY+categories.SILO, units))
 end
 
 function StopOrderBehavior(self, modifiers)
     local userKeyMap = Prefs.GetFromCurrentProfile("UserKeyMap")
-    if userKeyMap['S'] == 'soft_stop' then
+    if userKeyMap['S'] == 'soft_stop' and not modifiers.Shift then
         SoftStop()
     else
         Stop()
