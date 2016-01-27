@@ -233,7 +233,7 @@ function SoftStop(units)
     local units = units or GetSelectedUnits()
     import('/lua/ui/game/construction.lua').ResetOrderQueues(units)
     ClearCommands(EntityCategoryFilterDown(categories.SILO, units))
-    Stop(EntityCategoryFilterOut(categories.FACTORY+categories.SILO, units))
+    Stop(EntityCategoryFilterOut((categories.SHOWQUEUE * categories.STRUCTURE)+categories.FACTORY+categories.SILO, units))
 end
 
 function StopOrderBehavior(self, modifiers)
