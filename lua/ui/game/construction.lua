@@ -191,6 +191,7 @@ end
 function ResetOrderQueue(factory)
     local queue = SetCurrentFactoryForQueueDisplay(factory)
     if queue then
+        SelectUnits({factory})
         for index = table.getn(queue), 1, -1  do
             local count = queue[index].count
             if index == 1 and factory:GetWorkProgress() > 0 then
