@@ -188,33 +188,17 @@ function IssueUpgradeOrders(units, bpid)
     end
 end
 
-local QueueResetAt = {}
-function ResetOrderQueue(factory, stop_last)
+function ResetOrderQueue(factory)
     local queue = SetCurrentFactoryForQueueDisplay(factory)
-    if not queue then return end
-    local id = factory:GetEntityId()
-    local n = table.getsize(queue)
-    local now = GameTick()
-    local reset_at = QueueResetAt[id]
-
-    if stop_last and (n == 1 or (reset_at and now-reset_at < 10)) then
-        IssueCommand("Stop")
-        QueueResetAt[id] = nil
-        return
-    end
-
-    for i = 1, n do
-        local count = queue[i].count
-
-        if i == 1 then
-            count = count - 1
+    if queue then
+        for index = table.getn(queue), 1, -1  do
+            local count = queue[index].count
+            if index == 1 and factory:GetWorkProgress() > 0 then
+                count = count - 1
+            end
+            DecreaseBuildCountInQueue(index, count)
         end
-
-        SelectUnits({factory})
-        DecreaseBuildCountInQueue(i, count)
     end
-
-    QueueResetAt[id] = now
 end
 
 function ResetOrderQueues(units)
@@ -222,7 +206,7 @@ function ResetOrderQueues(units)
     if factories[1] then
         Select.Hidden(function()
             for _, factory in factories do
-                ResetOrderQueue(factory, true)
+                ResetOrderQueue(factory)
             end
         end)
     end
@@ -1194,7 +1178,7 @@ function OnClickHandler(button, modifiers)
 
             -- hold alt to reset queue, same as hotbuild
             if modifiers.Alt then
-                ResetOrderQueues(sortedOptions.selection, true)
+                ResetOrderQueues(sortedOptions.selection)
             end
 
             if performUpgrade then
