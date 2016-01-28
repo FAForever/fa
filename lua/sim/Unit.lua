@@ -3672,16 +3672,10 @@ Unit = Class(moho.unit_methods) {
     OnStartTransportBeamUp = function(self, transport, bone)
         local slot = transport.slots[bone]
         if slot then
-            local free = IsEntity(slot) and transport:GetFreeSlot(slot)
-            if free then
-                transport:MoveCargo(slot, free)
-            else
-                self:GetAIBrain():OnTransportFull()
-                IssueClearCommands({self})
-                return
-            end
+            self:GetAIBrain():OnTransportFull()
+            IssueClearCommands({self})
+            return
         end
-        transport:ReserveSlot(bone)
         self:DestroyIdleEffects()
         self:DestroyMovementEffects()
         local army =  self:GetArmy()
@@ -3760,17 +3754,6 @@ Unit = Class(moho.unit_methods) {
                 WaitFor(self.TransAnimation)
             end
         end
-    end,
-
-    TransportLock = function(self, bool)
-        bool = bool == true
-        if bool ~= self.TransportLock then
-            self.Sync.locked = bool
-            if bool then
-                IssueClearCommands({self})
-            end
-        end
-        self.TransportLocked = bool
     end,
 
     -------------------------------------------------------------------------------------------

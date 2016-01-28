@@ -1751,6 +1751,13 @@ BaseTransport = Class() {
             unit:DisableDefaultToggleCaps()
         end
         self:RequestRefreshUI()
+
+        for i=1, self:GetBoneCount() do
+            if self:GetBoneName(i) == attachBone then
+                self.slots[i] = unit
+                unit.attachmentBone = i
+            end
+        end
         unit:OnAttachedToTransport(self, attachBone)
     end,
 
@@ -1764,6 +1771,8 @@ BaseTransport = Class() {
         self:PlayUnitSound('Unload')
         self:MarkWeaponsOnTransport(unit, false)
         self:RequestRefreshUI()
+        self.slots[unit.attachmentBone] = nil
+        unit.attachmentBone = nil
     end,
 
     -- When one of our attached units gets killed, detach it
