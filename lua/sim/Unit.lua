@@ -3944,10 +3944,19 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnAttachedToTransport = function(self, transport, bone)
+        self:MarkWeaponsOnTransport(true)
+        if self:ShieldIsOn() then
+            self:DisableShield()
+            self:DisableDefaultToggleCaps()
+        end
         self:DoUnitCallbacks( 'OnAttachedToTransport', transport, bone)
     end,
 
     OnDetachedFromTransport = function(self, transport, bone)
+        self:MarkWeaponsOnTransport(false)
+        self:EnableShield()
+        self:EnableDefaultToggleCaps()
+        self:TransportAnimation(-1)
         self:DoUnitCallbacks( 'OnDetachedFromTransport', transport, bone)
     end,
 

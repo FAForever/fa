@@ -1745,11 +1745,6 @@ local slotsData = {}
 BaseTransport = Class() {
     OnTransportAttach = function(self, attachBone, unit)
         self:PlayUnitSound('Load')
-        unit:MarkWeaponsOnTransport(true)
-        if unit:ShieldIsOn() then
-            unit:DisableShield()
-            unit:DisableDefaultToggleCaps()
-        end
         self:RequestRefreshUI()
 
         for i=1, self:GetBoneCount() do
@@ -1758,19 +1753,16 @@ BaseTransport = Class() {
                 unit.attachmentBone = i
             end
         end
+        
         unit:OnAttachedToTransport(self, attachBone)
     end,
 
     OnTransportDetach = function(self, attachBone, unit)
         self:PlayUnitSound('Unload')
-        unit:MarkWeaponsOnTransport(false)
-        unit:EnableShield()
-        unit:EnableDefaultToggleCaps()
-        unit:TransportAnimation(-1)
-        unit:OnDetachedFromTransport(self, attachBone)
         self:RequestRefreshUI()
         self.slots[unit.attachmentBone] = nil
         unit.attachmentBone = nil
+        unit:OnDetachedFromTransport(self, attachBone)
     end,
 
     -- When one of our attached units gets killed, detach it
