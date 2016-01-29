@@ -1767,7 +1767,7 @@ BaseTransport = Class() {
         unit:EnableShield()
         unit:EnableDefaultToggleCaps()
         unit:TransportAnimation(-1)
-        unit:OnDetachedToTransport(self)
+        unit:OnDetachedFromTransport(self, attachBone)
         self:PlayUnitSound('Unload')
         self:MarkWeaponsOnTransport(unit, false)
         self:RequestRefreshUI()

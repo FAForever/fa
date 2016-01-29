@@ -154,8 +154,8 @@ Unit = Class(moho.unit_methods) {
             SpecialToggleEnableFunction = false,
             SpecialToggleDisableFunction = false,
 
-            OnAttachedToTransport = {}, --Returns self, transport
-            OnDetachedToTransport = {}, --Returns self, transport
+            OnAttachedToTransport = {}, --Returns self, transport, bone
+            OnDetachedFromTransport = {}, --Returns self, transport, bone
         }
     end,
 
@@ -3947,11 +3947,11 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnAttachedToTransport = function(self, transport, bone)
-        self:DoUnitCallbacks( 'OnAttachedToTransport', transport )
+        self:DoUnitCallbacks( 'OnAttachedToTransport', transport, bone)
     end,
 
-    OnDetachedToTransport = function(self, transport)
-        self:DoUnitCallbacks( 'OnDetachedToTransport', transport )
+    OnDetachedFromTransport = function(self, transport, bone)
+        self:DoUnitCallbacks( 'OnDetachedFromTransport', transport, bone)
     end,
 
     --- Deprecated functionality
