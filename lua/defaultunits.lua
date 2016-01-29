@@ -1768,8 +1768,6 @@ BaseTransport = Class() {
         unit:EnableDefaultToggleCaps()
         unit:TransportAnimation(-1)
         unit:OnDetachedFromTransport(self, attachBone)
-        self:PlayUnitSound('Unload')
-        self:MarkWeaponsOnTransport(unit, false)
         self:RequestRefreshUI()
         self.slots[unit.attachmentBone] = nil
         unit.attachmentBone = nil
