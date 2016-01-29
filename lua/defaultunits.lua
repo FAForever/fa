@@ -1745,7 +1745,7 @@ local slotsData = {}
 BaseTransport = Class() {
     OnTransportAttach = function(self, attachBone, unit)
         self:PlayUnitSound('Load')
-        self:MarkWeaponsOnTransport(unit, true)
+        unit:MarkWeaponsOnTransport(true)
         if unit:ShieldIsOn() then
             unit:DisableShield()
             unit:DisableDefaultToggleCaps()
@@ -1763,7 +1763,7 @@ BaseTransport = Class() {
 
     OnTransportDetach = function(self, attachBone, unit)
         self:PlayUnitSound('Unload')
-        self:MarkWeaponsOnTransport(unit, false)
+        unit:MarkWeaponsOnTransport(false)
         unit:EnableShield()
         unit:EnableDefaultToggleCaps()
         unit:TransportAnimation(-1)

@@ -3699,18 +3699,15 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    MarkWeaponsOnTransport = function(self, unit, transport)
-        --Mark the weapons on a transport
-        if unit then
-            for i = 1, unit:GetWeaponCount() do
-                local wep = unit:GetWeapon(i)
-                wep:SetOnTransport(transport)
-            end
+    MarkWeaponsOnTransport = function(self, bool)
+        for i = 1, self:GetWeaponCount() do
+            local wep = self:GetWeapon(i)
+            wep:SetOnTransport(bool)
         end
     end,
 
     OnStorageChange = function(self, loading)
-        self:MarkWeaponsOnTransport(self, loading)
+        self:MarkWeaponsOnTransport(loading)
 
         if loading then self:HideBone(0, true)
         else self:ShowBone(0, true) end
