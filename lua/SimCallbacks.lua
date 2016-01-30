@@ -183,8 +183,10 @@ Callbacks.GiveOrders = import('/lua/spreadattack.lua').GiveOrders
 Callbacks.ValidateAssist = function(data, units)
     local target = GetEntityById(data.target)
     if units and target then
+        if GetFocusArmy() ~= target:GetArmy() then return end
+
         for k, u in units do
-            if IsEntity(u) and OkayToMessWithArmy(target:GetArmy()) and IsInvalidAssist(u, target) then
+            if IsEntity(u) and IsInvalidAssist(u, target) then
                 IssueClearCommands({target})
                 return
             end
