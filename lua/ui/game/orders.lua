@@ -720,6 +720,12 @@ local function OverchargeInit(control, unitList)
     else
         control._curHelpText = control._data.helpText
     end
+
+    -- needs to override this to prevent call to self:DisableHitTest()
+    control.Disable = function(self)
+        self._isDisabled = true
+        self:OnDisable()
+    end
 end
 
 function OverchargeBehavior(self, modifiers)
