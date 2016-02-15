@@ -1,17 +1,17 @@
-#****************************************************************************
-#**
-#**  File     :  /data/lua/scenariotriggers.lua
-#**
-#**  Author(s):  John Comes
-#**
-#**  Summary  :  Generalized trigger functions for scenarios.
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/lua/scenariotriggers.lua
+--**
+--**  Author(s):  John Comes
+--**
+--**  Summary  :  Generalized trigger functions for scenarios.
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 
 function CreateAreaTrigger(callbackFunction, rectangle, category, onceOnly, invert, aiBrain, number, requireBuilt)
-    #LOG('*SCENARIO DEBUG: FORKING AREA TRIGGER THREAD')
+    --LOG('*SCENARIO DEBUG: FORKING AREA TRIGGER THREAD')
     return ForkThread(AreaTriggerThread, callbackFunction, {rectangle}, category, onceOnly, invert, aiBrain, number, requireBuilt)
 end
 
@@ -47,13 +47,13 @@ function AreaTriggerThread(callbackFunction, rectangleTable, category, onceOnly,
                 local contains = EntityCategoryContains(category, v)
                 if contains and (aiBrain and v:GetAIBrain() == aiBrain) and (not requireBuilt or (requireBuilt and not v:IsBeingBuilt())) then
                     amount = amount + 1
-                    #If we want to trigger as soon as one of a type is in there, kick out immediately.
+                    --If we want to trigger as soon as one of a type is in there, kick out immediately.
                     if not number then
                         triggeringEntity = v
                         triggered = true
                         break
-                    #If we want to trigger on an amount, then add the entity into the triggeringEntity table
-                    #so we can pass that table back to the callback function.
+                    --If we want to trigger on an amount, then add the entity into the triggeringEntity table
+                    --so we can pass that table back to the callback function.
                     else
                         if not triggeringEntity then
                             triggeringEntity = {}
@@ -63,14 +63,14 @@ function AreaTriggerThread(callbackFunction, rectangleTable, category, onceOnly,
                 end
             end
         end
-        #Check to see if we have a triggering amount inside in the area.
+        --Check to see if we have a triggering amount inside in the area.
         if number and ((amount >= number and not invert) or (amount < number and invert)) then
             triggered = true
         end
-        #TRIGGER IF:
-        #You don't want a specific amount and the correct unit category entered
-        #You don't want a specific amount, there are no longer the category inside and you wanted the test inverted
-        #You want a specific amount and we have enough.
+        --TRIGGER IF:
+        --You don't want a specific amount and the correct unit category entered
+        --You don't want a specific amount, there are no longer the category inside and you wanted the test inverted
+        --You want a specific amount and we have enough.
         if ( triggered and not invert and not number) or (not triggered and invert and not number) or (triggered and number) then
             if name then
                 callbackFunction(TriggerManager, name, triggeringEntity)
@@ -351,9 +351,9 @@ function CreateUnitNearTypeTriggerThread( callbackFunction, unit, brain, categor
     end
 end
 
-# =============
-# Unit Triggers
-# =============
+-- =============
+-- Unit Triggers
+-- =============
 function CreateStartBuildTrigger(callbackFunction, unit, category)
     unit:AddOnStartBuildCallback(callbackFunction, category)
 end
