@@ -836,6 +836,51 @@ function CheckObjectives( list )
     return true
 end
 
+function SpawnCommander(brain, unit, effect, name, PauseAtDeath, DeathTrigger, enhancements)
+    local ACU = ScenarioUtils.CreateArmyUnit(brain, unit)
+    local Delay = 0
+
+    if effect then
+        if effect == 'Gate' then
+            FakeGateInUnit(ACU)
+        elseif effect == 'Warp' then
+            ACU:PlayCommanderWarpInEffect()
+            Delay = 2.2
+        else
+            WARN('*WARNING: Invalid effect type: ' .. effect .. '. Available types: Gate, Warp.')
+        end
+    end
+
+    -- If true is passed as parametr then it uses default name.
+    if name == true then
+        ACU:SetCustomName(GetArmyBrain(brain).Nickname)
+    elseif type(name) == 'string' then
+        ACU:SetCustomName(name)
+    end
+
+    -- WarpIn effects hides extra enhancements bones on ACU so creating upgrades after it finnishes.
+    if enhancements then
+        WaitSeconds(Delay)
+        if type(enhancements) == 'string' then
+            ACU:CreateEnhancement(upgrades)
+        elseif type(enhancements) == 'table' then
+            for k, enhancement in enhancements do
+                ACU:CreateEnhancement(enhancement)
+            end
+        end
+    end
+
+    if PauseAtDeath then
+        PauseUnitDeath(ACU)
+    end
+
+    if DeathTrigger then
+        CreateUnitDeathTrigger(ACU, DeathTrigger)
+    end
+
+    return ACU
+end
+
 -- FakeTeleportUnitThread
 -- Run teleport effect then delete unit
 function FakeTeleportUnit(unit,killUnit)
