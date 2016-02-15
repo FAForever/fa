@@ -17,6 +17,7 @@ Wreckage = Class(Prop) {
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
+        if not self.CanTakeDamage then return end
         self:DoTakeDamage(instigator, amount, vector, damageType)
     end,
 
@@ -25,6 +26,7 @@ Wreckage = Class(Prop) {
         local health = self:GetHealth()
 
         if health <= 0 then
+            self:DoPropCallbacks( 'OnKilled' )
             self:Destroy()
         else
             self:UpdateReclaimLeft()
