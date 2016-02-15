@@ -463,3 +463,14 @@ function MissionNumberTriggerThread(cb, value, name)
         cb(TriggerManager, name)
     end
 end
+
+-- =============
+-- Prop Triggers
+-- =============
+function CreatePropKilledTrigger( cb, prop )
+   prop:AddPropCallback( cb, 'OnKilled' )
+end
+
+function CreatePropReclaimedTrigger( cb, prop )
+   prop:AddPropCallback( cb, 'OnReclaimed' )
+end
