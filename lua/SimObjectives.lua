@@ -12,6 +12,7 @@
 -- ##      Capture
 -- ##      KillOrCapture
 -- ##      Reclaim
+-- ##      ReclaimProp
 -- ##      Locate
 -- ##      SpecificUnitsInArea
 -- ##      CategoriesInArea
@@ -548,6 +549,67 @@ function Reclaim(Type,Complete,Title,Description,Target)
         Triggers.CreateUnitCapturedTrigger(nil,OnUnitCaptured,unit )
         Triggers.CreateUnitDeathTrigger(OnUnitKilled, unit )
         Triggers.CreateUnitReclaimedTrigger(OnUnitReclaimed, unit )
+    end
+
+    local progress = string.format('(%s/%s)', Target.reclaimed, Target.total)
+    UpdateObjective( Title, 'Progress', progress, objective.Tag )
+
+    return objective
+end
+
+-- #
+-- # ReclaimProp
+-- #   Reclaim Prop
+function ReclaimProp(Type,Complete,Title,Description,Target)
+    Target.reclaimed = 0
+    Target.total = table.getn(Target.Wrecks)
+
+    local image = GetActionIcon("reclaim")
+    local objective = AddObjective(Type,Complete,Title,Description,image)
+    
+    -- call ManualResult
+    objective.ManualResult = function(self, result)
+        self.Active = false
+        self:OnResult(result)
+        local resultStr
+        if result then
+            resultStr = 'complete'
+        else
+            resultStr = 'failed'
+        end
+        UpdateObjective( Title, 'complete', resultStr, self.Tag )
+    end
+
+    local function OnPropKilled(unit)
+        objective.Active = false
+        objective:OnResult(false)
+        UpdateObjective( Title, 'complete', 'failed', objective.Tag )
+    end
+
+    local function OnPropReclaimed(unit)
+        if not objective.Active then
+            return
+        end
+
+        Target.reclaimed = Target.reclaimed + 1
+        local progress = string.format('(%s/%s)', Target.reclaimed, Target.total)
+        objective:OnProgress(Target.reclaimed,Target.total)
+        UpdateObjective( Title, 'Progress', progress, objective.Tag )
+        if Target.reclaimed == Target.total then
+            objective.Active = false
+            objective:OnResult(true)
+            UpdateObjective( Title, 'complete', "complete", objective.Tag )
+        end
+    end
+
+    for k,wreck in Target.Wrecks do
+        -- Mark the units if MarkUnits == true
+        if Target.MarkUnits then
+            local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+            local arrow = ObjectiveArrow { AttachTo = unit }
+        end
+        Triggers.CreatePropReclaimedTrigger(OnPropReclaimed, wreck )
+        Triggers.CreatePropKilledTrigger(OnPropKilled, wreck )
     end
 
     local progress = string.format('(%s/%s)', Target.reclaimed, Target.total)
