@@ -93,6 +93,13 @@ function BaseManagerSingleEngineerPlatoon(platoon)
             elseif canPermanentAssist and CanConditionalBuild(platoon) then
                 DoConditionalBuild(platoon)
 
+            -- try to build buildings
+            elseif BMBC.NeedAnyStructure( aiBrain, baseName ) and bManager:GetConstructionEngineerCount() < bManager:GetConstructionEngineerMaximum() then
+                bManager:AddConstructionEngineer(unit)
+                TriggerFile.CreateUnitDeathTrigger( ConstructionUnitDeath, unit )
+                BaseManagerEngineerThread( platoon )
+                bManager:RemoveConstructionEngineer(unit)
+
             -- Permanent Assist - Assist factories until the unit dies
             elseif canPermanentAssist and bManager:NeedPermanentFactoryAssist() then
                 bManager:IncrementPermanentAssisting()
@@ -102,12 +109,6 @@ function BaseManagerSingleEngineerPlatoon(platoon)
             elseif BMBC.UnfinishedBuildingsCheck( aiBrain, baseName ) then
                 BuildUnfinishedStructures(platoon)
 
-            -- try to build buildings
-            elseif BMBC.NeedAnyStructure( aiBrain, baseName ) and bManager:GetConstructionEngineerCount() < bManager:GetConstructionEngineerMaximum() then
-                bManager:AddConstructionEngineer(unit)
-                TriggerFile.CreateUnitDeathTrigger( ConstructionUnitDeath, unit )
-                BaseManagerEngineerThread( platoon )
-                bManager:RemoveConstructionEngineer(unit)
 
             -- reclaim nearby wreckage/trees/rocks/people; never do this right now dont want to destroy props and stuff
             elseif false and BMBC.BaseReclaimEnabled( aiBrain, baseName ) and MIBC.ReclaimablesInArea( aiBrain, baseName ) then
