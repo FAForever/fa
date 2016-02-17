@@ -26,7 +26,6 @@ local BMBC = '/lua/editor/BaseManagerBuildConditions.lua'
 local MIBC = '/lua/editor/MiscBuildConditions.lua'
 local BMPT = '/lua/ai/opai/BaseManagerPlatoonThreads.lua'
 
-import('/lua/sim/OpBuffDefinitions.lua')
 
 
 
@@ -108,8 +107,8 @@ BaseManager = Class {
             self.Radius = false
             self.ConstructionAssistBool = false
             
-            self.FactoryBuildRateBuff = 'BaseManagerFactoryDefaultBuildRate'
-            self.EngineerBuildRateBuff = 'BaseManagerEngineerDefaultBuildRate'
+            self.FactoryBuildRateBuff = nil
+            self.EngineerBuildRateBuff = nil
 
             self.CurrentEngineerCount = 0
             self.EngineerQuantity = 0
@@ -930,8 +929,12 @@ BaseManager = Class {
             local unitGroup = ScenarioUtils.CreateArmyGroup( self.AIBrain.Name, groupName, nil, balance )
             
             for k,v in unitGroup do
-                Buff.ApplyBuff( v, self.FactoryBuildRateBuff )
-                Buff.ApplyBuff( v, self.EngineerBuildRateBuff )
+                if self.FactoryBuildRateBuff then
+                    Buff.ApplyBuff( v, self.FactoryBuildRateBuff )
+                end
+                if self.EngineerBuildRateBuff then
+                    Buff.ApplyBuff( v, self.EngineerBuildRateBuff )
+                end
                 self:DecrementUnitBuildCounter(v.UnitName)
                 if uncapturable then
                     v:SetCapturable(false)
