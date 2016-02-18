@@ -875,7 +875,7 @@ function SpawnCommander(brain, unit, effect, name, PauseAtDeath, DeathTrigger, e
     end
 
     if DeathTrigger then
-        CreateUnitDeathTrigger(ACU, DeathTrigger)
+        CreateUnitDeathTrigger(DeathTrigger, ACU)
     end
 
     return ACU
