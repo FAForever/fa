@@ -53,7 +53,13 @@ local Conversions =
     CORE_TO_UTILITY = 2,
 }
 
-function CheckEnabledType(type, data)
+function IsEnabledType(unitType, data)
+    for _, v in data.EnabledTypes do
+        if unitType == v then
+            return true
+        end
+    end
+    return false
 end
 
 function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction, data)
@@ -116,18 +122,18 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
             table.insert(Scenario.Platoons[template], {TIERS[1].CORE[faction], 1, numFrigates, 'attack', 'None'} ) 
             table.insert(children, 'Frigate')
         end
-        if (allEnabled or CheckEnabledType('Destroyers') ) and numDestroyers > 0 then 
+        if (allEnabled or IsEnabledType('Destroyers', data) ) and numDestroyers > 0 then 
             table.insert(Scenario.Platoons[template], {TIERS[2].CORE[faction], 1, numDestroyers, 'attack', 'None'} ) 
             table.insert(children, 'Destroyer')
         end
-        if (allEnabled or CheckEnabledType('Battleship')) and numBattleships > 0 then 
+        if (allEnabled or IsEnabledType('Battleship', data)) and numBattleships > 0 then 
             table.insert(Scenario.Platoons[template], {TIERS[3].CORE[faction], 1, numBattleships, 'attack', 'None'} ) 
             table.insert(children, 'Battleship')
         end 
        
         -- Do submarines.
         local numSubmarines = 0
-        if (allEnabled or CheckEnabledType('Submarine')) then
+        if (allEnabled or IsEnabledType('Submarine', data)) then
             if tier == 1 then numSubmarines = math.floor( numFrigates / Conversions.CORE_TO_SUBS )
             elseif tier >= 2 then numSubmarines = math.floor( numDestroyers / Conversions.CORE_TO_SUBS )
             elseif tier >= 3 then numSubmarines = math.floor( numBattleships / Conversions.CORE_TO_SUBS ) end
@@ -150,7 +156,7 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
          
         -- Do cruisers.
         local numCruisers = 0
-        if (allEnabled or CheckEnabledType('Cruiser')) then
+        if (allEnabled or IsEnabledType('Cruiser', data)) then
             if tier == 2 then numCruisers = math.floor( numDestroyers / Conversions.CORE_TO_CRUISERS )
             elseif tier >= 3 then numCruisers = math.floor( numBattleships / Conversions.CORE_TO_CRUISERS ) end
             if numCruisers > 0 then 
@@ -161,7 +167,7 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
         
         -- Do light T1 boats only at T1. Note not every faction has light T1 boats
         local numLight = 0
-        if (allEnabled or CheckEnabledType('LightBoat')) then
+        if (allEnabled or IsEnabledType('LightBoat', data)) then
             if tier == 1 and TIERS[1].LIGHT[faction] then numLight = math.floor( numFrigates / Conversions.CORE_TO_LIGHT ) end
             if numLight > 0 then 
                 table.insert(Scenario.Platoons[template], {TIERS[1].LIGHT[faction], 1, numLight, 'guard', 'None'} ) 
@@ -171,7 +177,7 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
         
         -- Do T2 utility boats. Cybran = stealth boat, UEF = shields. Note not every faction has a T2 utility boat.
         local numUtility = 0
-        if (allEnabled or CheckEnabledType('Utility')) then
+        if (allEnabled or IsEnabledType('Utility', data)) then
             if tier == 2 and TIERS[2].UTILITY[faction] then numUtility = math.floor( numDestroyers / Conversions.CORE_TO_UTILITY )
             elseif tier >= 3 and TIERS[3].UTILITY[faction] then numUtility = math.floor( numBattleships / Conversions.CORE_TO_UTILITY ) end
             if numUtility > 0 then 
@@ -182,7 +188,7 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
         
         -- Do T3 fatties. Carrier, battlecruiser, missile ship etc...
         local numFatties = 0      
-        if (allEnabled or CheckEnabledType('Fatty')) then
+        if (allEnabled or IsEnabledType('Fatty', data)) then
             if tier >= 3 then numFatties = math.floor( numBattleships / Conversions.CORE_TO_FATTIES ) end
             if numFatties > 0 then 
                 table.insert(Scenario.Platoons[template], {TIERS[3].FATTIES[faction], 1, numFatties, 'guard', 'None'} ) 
