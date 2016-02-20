@@ -933,12 +933,16 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
     OnGotTarget = function(self)
         if self:CanOvercharge() then
             DefaultProjectileWeapon.OnGotTarget(self)
+        else
+            self:OnDisableWeapon()
         end
     end,
 
     OnFire = function(self)
         if self:CanOvercharge() then
             DefaultProjectileWeapon.OnFire(self)
+        else
+            self:OnDisableWeapon()
         end
     end,
 
@@ -964,7 +968,7 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         self.unit.BuildArmManipulator:SetPrecedence(0)
         self.unit:GetWeaponManipulatorByLabel(self.DesiredWeaponLabel):SetHeadingPitch(self.AimControl:GetHeadingPitch())
 
-        if self.AutoMode then
+        if self.AutoMode and not self.AutoEnable then
             self:ForkThread(self.AutoEnable)
         end
     end,
@@ -979,12 +983,16 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         OnGotTarget = function(self)
             if self:CanOvercharge() then
                 DefaultProjectileWeapon.IdleState.OnGotTarget(self)
+            else
+                self:OnDisableWeapon()
             end
         end,
 
         OnFire = function(self)
             if self:CanOvercharge() then
                 ChangeState(self, self.RackSalvoFiringState)
+            else
+                self:OnDisableWeapon()
             end
         end,
     },
@@ -993,9 +1001,11 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         OnFire = function(self)
             if self:CanOvercharge() then
                 DefaultProjectileWeapon.RackSalvoFireReadyState.OnFire(self)
+            else
+                self:OnDisableWeapon()
             end
         end,
-    },
+    }
 }
 
 DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
