@@ -451,7 +451,12 @@ function PreModBlueprints(all_bps)
         -- Takes ACU/SCU enhancements into account
         -- fixes move-attack range issues
         -- Most Air units have the GSR defined already, this is just making certain they don't get included
-        if cats.MOBILE and (cats.LAND or cats.NAVAL) and (cats.DIRECTFIRE or cats.INDIRECTFIRE or cats.ENGINEER) and not (bp.AI and bp.AI.GuardScanRadius) then
+        local modGSR = not (bp.AI and bp.AI.GuardScanRadius) and (
+                       (cats.MOBILE and (cats.LAND or cats.NAVAL) and (cats.DIRECTFIRE or cats.INDIRECTFIRE or cats.ENGINEER)) or
+                       (cats.STRUCTURE and (cats.DIRECTFIRE or cats.INDIRECTFIRE) and (cats.DEFENSE or cats.ARTILLERY))
+                       )
+
+        if modGSR then
             local br = nil
 
             if cats.ENGINEER and not cats.SUBCOMMANDER then
