@@ -715,10 +715,10 @@ local function OverchargeInit(control, unitList)
 
     if control._isAutoMode then
         control._curHelpText = control._data.helpText .. "_auto"
-        control.autoBuildEffect = CreateAutoBuildEffect(control)
         control.autoModeIcon:SetAlpha(1)
     else
         control._curHelpText = control._data.helpText
+        control.autoModeIcon:SetAlpha(0)
     end
 
     -- needs to override this to prevent call to self:DisableHitTest()
@@ -734,16 +734,10 @@ function OverchargeBehavior(self, modifiers)
     elseif modifiers.Right then
         if self._isAutoMode then
             self._curHelpText = self._data.helpText
-            if self.autoBuildEffect then
-                self.autoBuildEffect:Destroy()
-            end
             self.autoModeIcon:SetAlpha(0)
             self._isAutoMode = false
         else
             self._curHelpText = self._data.helpText .. "_auto"
-            if not self.autoBuildEffect then
-                self.autoBuildEffect = CreateAutoBuildEffect(self)
-            end
             self.autoModeIcon:SetAlpha(1)
             self._isAutoMode = true
         end
@@ -752,8 +746,6 @@ function OverchargeBehavior(self, modifiers)
             controls.mouseoverDisplay.text:SetText(self._curHelpText)
         end
 
-        --SetAutoSurfaceMode(currentSelection, self._isAutoMode)
-        --LOG("AutoOvercharge " .. repr(currentSelection) .. tostring(self._isAutoMode))
         local cb = { Func = 'AutoOvercharge', Args = { auto = self._isAutoMode == true } }
         SimCallback(cb, true)
     end
@@ -948,7 +940,7 @@ local function AddOrder(orderInfo, slot, batchMode)
 
     -- set up tooltips
     checkbox.HandleEvent = function(self, event)
-        if event.Type == 'MouseEnter' then
+        if event.Type == 'MouseEnter' and not self:IsDisabled() then
             if controls.orderGlow then
                 controls.orderGlow:Destroy()
                 controls.orderGlow = false
