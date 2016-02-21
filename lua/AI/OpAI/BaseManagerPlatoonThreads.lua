@@ -77,12 +77,13 @@ function BaseManagerSingleEngineerPlatoon(platoon)
     local bManager = aiBrain.BaseManagers[baseName]
     local unit = platoon:GetPlatoonUnits()[1]
     local canPermanentAssist = EntityCategoryContains( categories.ENGINEER - ( categories.COMMAND + categories.SUBCOMMANDER ), unit )
+    local commandUnit = EntityCategoryContains(categories.COMMAND + categories.SUBCOMMANDER, unit )
     unit.BaseName = baseName
     while aiBrain:PlatoonExists(platoon) do
         if BMBC.BaseEngineersEnabled( aiBrain, baseName ) then
 
             -- move to expansion base
-            if BMBC.ExpansionBasesEnabled( aiBrain, baseName ) and BMBC.ExpansionBasesNeedEngineers( aiBrain, baseName ) then
+            if not commandUnit and BMBC.ExpansionBasesEnabled( aiBrain, baseName ) and BMBC.ExpansionBasesNeedEngineers( aiBrain, baseName ) then
                 ExpansionEngineer(platoon)
 
             elseif canPermanentAssist and bManager.ConditionalBuildData.Unit and not bManager.ConditionalBuildData.Unit:IsDead()
