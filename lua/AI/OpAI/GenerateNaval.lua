@@ -16,7 +16,7 @@ local TIERS =
     {
         CORE =      {U='ues0103', C='urs0103', A='uas0103', S='xss0103'},
         SUBS =      {U='ues0203', C='urs0203', A='uas0203', S='xss0203'},
-        LIGHT =     {U='xes0102',              A='uas0102',            },
+        LIGHT =     {                          A='uas0102',            },
     },
     
     --Tier 2 naval units
