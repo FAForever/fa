@@ -32,7 +32,8 @@ local TIERS =
         CORE =      {U='ues0302', C='urs0302', A='uas0302', S='xss0302'},
         SUBS =      {U='xes0102', C='xrs0204', A='xas0204', S='xss0304'},
         CRUISERS =  {U='ues0202', C='urs0202', A='uas0202', S='xss0202'},
-        FATTIES =   {U='xes0307', C='urs0303', A='xas0306', S='xss0303'},
+        CARRIERS =  {             C='urs0303', A='uas0303', S='xss0303'},
+        FATTIES =   {U='xes0307',              A='xas0306',            },
         UTILITY =   {U='xes0205', C='xrs0205',                         },    
     },
 }
@@ -49,6 +50,7 @@ local Conversions =
     CORE_TO_SUBS = 2,
     CORE_TO_CRUISERS = 4,
     CORE_TO_FATTIES = 3,
+    CORE_TO_CARRIERS = 3,
     CORE_TO_LIGHT = 0.5,
     CORE_TO_UTILITY = 2,
 }
@@ -122,7 +124,7 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
             table.insert(Scenario.Platoons[template], {TIERS[1].CORE[faction], 1, numFrigates, 'attack', 'None'} ) 
             table.insert(children, 'Frigate')
         end
-        if (allEnabled or IsEnabledType('Destroyers', data) ) and numDestroyers > 0 then 
+        if (allEnabled or IsEnabledType('Destroyer', data) ) and numDestroyers > 0 then 
             table.insert(Scenario.Platoons[template], {TIERS[2].CORE[faction], 1, numDestroyers, 'attack', 'None'} ) 
             table.insert(children, 'Destroyer')
         end
@@ -144,7 +146,7 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
                     table.insert(Scenario.Platoons[template], {TIERS[3].SUBS[faction], 1, numSubmarines, 'guard', 'None'} ) 
                     table.insert(children, 'T3Submarine')
                     placed = true
-                elseif TIERS >= 2 and not placed and not data.DisableTypes['T2Submarine'] then
+                elseif tier >= 2 and not placed and not data.DisableTypes['T2Submarine'] then
                     table.insert(Scenario.Platoons[template], {TIERS[2].SUBS[faction], 1, numSubmarines, 'guard', 'None'} ) 
                     table.insert(children, 'T2Submarine')
                 elseif not placed and not data.DisableTypes['Submarine'] then
@@ -186,13 +188,23 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
             end
         end        
         
-        -- Do T3 fatties. Carrier, battlecruiser, missile ship etc...
+        -- Do T3 fatties. battlecruiser, missile ship. Note Aeon and Cybran have no fatties.
         local numFatties = 0      
         if (allEnabled or IsEnabledType('Fatty', data)) then
-            if tier >= 3 then numFatties = math.floor( numBattleships / Conversions.CORE_TO_FATTIES ) end
+            if tier >= 3 and TIERS[3].FATTIES[faction] then numFatties = math.floor( numBattleships / Conversions.CORE_TO_FATTIES ) end
             if numFatties > 0 then 
                 table.insert(Scenario.Platoons[template], {TIERS[3].FATTIES[faction], 1, numFatties, 'guard', 'None'} ) 
                 table.insert(children, 'Fatty')
+            end
+        end
+
+        -- Do T3 carriers. Note UEF has no T3 carrier.
+        local numCarriers = 0
+        if (allEnabled or IsEnabledType('Carrier', data)) then
+            if tier >= 3 and TIERS[3].CARRIERS[faction] then numCarriers = math.floor( numBattleships / Conversions.CORE_TO_CARRIERS ) end
+            if numCarriers > 0 then
+                table.insert(Scenario.Platoons[template], {TIERS[3].CARRIERS[faction], 1, numCarriers, 'guard', 'None'} ) 
+                table.insert(children, 'Carrier')
             end
         end
                 
