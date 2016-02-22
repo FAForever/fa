@@ -5,7 +5,7 @@ UnitBlueprint {
             'AntiTorpedo',
             'Projectile01',
             'Projectile02',
-            'XSS0203',
+            'Turret',
         },
     },
     Audio = {
@@ -91,7 +91,7 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
     },
     CollisionOffsetX = 0.05,
-    CollisionOffsetY = -0.2,
+    CollisionOffsetY = -0.25,
     CollisionOffsetZ = -0.01,
     Defense = {
         AirThreatLevel = 0,
@@ -286,7 +286,7 @@ UnitBlueprint {
     SelectionSizeZ = 1.45,
     SelectionThickness = 0.28,
     SizeX = 0.5,
-    SizeY = 0.5,
+    SizeY = 0.6,
     SizeZ = 2.3,
     StrategicIconName = 'icon_sub1_antinavy',
     StrategicIconSortPriority = 165,
