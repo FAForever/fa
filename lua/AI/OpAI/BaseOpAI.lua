@@ -119,7 +119,7 @@ OpAI = Class {
             if not self:FindMaster() then
                 return false
             end
-            self.MasterData.OverrideFormation = formationName
+            self.MasterData.PlatoonData.OverrideFormation = formationName
             return true
         end,
 
