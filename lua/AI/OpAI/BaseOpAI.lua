@@ -4,7 +4,7 @@
 --**  Author(s): Dru Staltman
 --**
 --**  Summary  : Base manager for operations
---#**
+--**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local AIUtils = import('/lua/ai/aiutilities.lua')
@@ -127,7 +127,7 @@ OpAI = Class {
             ScenarioInfo.OSPlatoonCounter[self.MasterName..'_' .. funcName] = bool
         end,
         
-        # TODO: make a system out of this.  Derive functionality per override per OpAI type
+        -- TODO: make a system out of this.  Derive functionality per override per OpAI type
         MasterPlatoonFunctionalityChange = function( self, functionData )
             if functionData[2] == 'LandAssaultWithTransports' then
                 self:SetFunctionStatus( 'Transports', true )
@@ -164,7 +164,7 @@ OpAI = Class {
             , cat)        
         end,
 
-        #--categories is an optional parameter specifying a subset of the platoon we wish to set target priorities for.
+        --categories is an optional parameter specifying a subset of the platoon we wish to set target priorities for.
         SetTargettingPriorities = function( self, priTable, categories )
             if not self:FindMaster() then
                 return false
@@ -174,10 +174,10 @@ OpAI = Class {
             local defList = {'SPECIALHIGHPRI', 'COMMAND', 'MOBILE', 'STRUCTURE DEFENSE', 'SPECIALLOWPRI', 'ALLUNITS',}
               
             if categories then               
-                #--save the priorities for this category.
+                --save the priorities for this category.
                 if not self.MasterData.PlatoonData.CategoryPriorities then self.MasterData.PlatoonData.CategoryPriorities = {} end
                 
-                #--NOTE: This should probably be a table.deepcopy if we're going to alter the original table in the future.
+                --NOTE: This should probably be a table.deepcopy if we're going to alter the original table in the future.
                 
                 self.MasterData.PlatoonData.CategoryPriorities[categories] = priList
                 
@@ -192,12 +192,12 @@ OpAI = Class {
                     table.insert(self.MasterData.PlatoonData.TargetPriorities, v)
                 end
                 
-                #--for k,v in priTable do
-                #--    table.insert(self.MasterData.PlatoonData.TargetPriorities, v)
-                #--end
-                #--for k,v in defaultPri do
-                #--    table.insert(self.MasterData.PlatoonData.TargetPriorities, v)
-                #--end
+                --for k,v in priTable do
+                --    table.insert(self.MasterData.PlatoonData.TargetPriorities, v)
+                --end
+                --for k,v in defaultPri do
+                --    table.insert(self.MasterData.PlatoonData.TargetPriorities, v)
+                --end
                 
             end
             
@@ -326,7 +326,7 @@ OpAI = Class {
                         end
                     end
 
-                    # Remove the builder
+                    -- Remove the builder
                     if found then
                         for num,child in self.ChildrenHandles do
                             if child.ChildBuilder.BuilderName == v.BuilderName then
@@ -352,7 +352,7 @@ OpAI = Class {
             
             for k,v in self.ChildrenNames do
                 if v.ChildrenType then
-                    # Child must have all children type to be kept
+                    -- Child must have all children type to be kept
                     local found
                     for cNum, cName in v.ChildrenType do
                         found = false
@@ -363,32 +363,32 @@ OpAI = Class {
                             end
                         end
                         
-                        # This child was not found; break out so we can remove
+                        -- This child was not found; break out so we can remove
                         if not found then
                             break
                         end
                     end
                     
-                    # All keeptable children must be found to be kept as well.
+                    -- All keeptable children must be found to be kept as well.
                     if found then
                         found = false
                         for num,name in keepTable do
                             for cNun,cName in v.ChildrenType do
-                                # child name found; move to the next
+                                -- child name found; move to the next
                                 if cName == name then
                                     found = true
                                     break
                                 end
                             end
                             
-                            # Child not found; break to remove
+                            -- Child not found; break to remove
                             if not found then
                                 break
                             end
                         end
                     end
 
-                    # Remove the builder
+                    -- Remove the builder
                     if not found then
                         self.AIBrain:PBMRemoveBuilder(v.BuilderName)
                         for num,child in self.ChildrenHandles do
@@ -629,14 +629,14 @@ OpAI = Class {
                 end
             end
 
-            # Loop through children
+            -- Loop through children
             for k,v in self.ChildrenNames do
-                # Make sure this child has children types
+                -- Make sure this child has children types
                 if v.ChildrenType then
                 
-                    # We don't want to change by default
+                    -- We don't want to change by default
                     local change = false
-                    # if the type is 'All' or we find that this builder has this child type, we may want to change
+                    -- if the type is 'All' or we find that this builder has this child type, we may want to change
                     for cNum, cName in v.ChildrenType do
                         if (cName == cType) or (cType == 'All') then
                             change = true
@@ -645,10 +645,10 @@ OpAI = Class {
 
                     -- Need to change the children here
                     if change then
-                        # make sure that this builder's enabled types are all active
+                        -- make sure that this builder's enabled types are all active
                         local changeVal = true
                         for cNum,cName in v.ChildrenType do
-                            # This child type is not enabled, we'll want to disable this child type
+                            -- This child type is not enabled, we'll want to disable this child type
                             if not self.EnabledTypes[cName] then
                                 changeVal = false
                                 break
@@ -713,7 +713,7 @@ OpAI = Class {
             local builders = false
             local saveFile
             
-            if type(self.BuilderType) == "string" then #--BuilderType is old-school
+            if type(self.BuilderType) == "string" then --BuilderType is old-school
                 ScenarioUtils.LoadOSB('OSB_' .. self.BuilderType .. '_' .. name, brain.Name, platoonData)
 
                 local fileName = '/lua/ai/OpAI/' .. self.BuilderType .. '_save.lua'
@@ -721,7 +721,7 @@ OpAI = Class {
                 
                 builders = saveFile.Scenario.Armies['ARMY_1'].PlatoonBuilders.Builders
                 self.MasterName = 'OSB_Master_' .. self.BuilderType .. '_' .. brain.Name .. '_' .. name
-            else #--If BuilderType is a table (was pregenerated)
+            else --If BuilderType is a table (was pregenerated)
             
                 ScenarioUtils.LoadOSB(builderType, brain.Name, platoonData)
                 saveFile = {Scenario = builderType}
