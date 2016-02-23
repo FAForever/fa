@@ -12,8 +12,13 @@ NukeAOE = Class() {
     end,
     
     DoNukeDamage = function(self, launcher, pos)
+        local brain = launcher:GetAIBrain()
+        local units = brain:GetUnitsAroundPoint(categories.ALLUNITS, pos, self.Radius)
+
         if self.TotalTime == 0 then
-            DamageArea(launcher, pos, self.Radius, self.Damage, 'Nuke', true, true)
+            for k, v in units do
+                Damage(launcher, pos, v, self.Damage, 'Nuke')
+            end
         else
             ForkThread(self.SlowNuke, self, launcher, pos)
         end
