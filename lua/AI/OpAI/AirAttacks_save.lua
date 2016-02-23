@@ -1410,11 +1410,7 @@ Scenario = {
                                 {'default_brain','default_builder_name', 2 },
                                 {'default_brain','default_builder_name','2'}
                             },
-                            [3] = {'/lua/editor/otherarmyunitcountbuildconditions.lua', 'BrainGreaterThanNumCategory',
-                                {'default_brain','Player', 5 , categories.NAVAL * categories.MOBILE },
-                                {'default_brain','Player','5','categories.NAVAL * categories.MOBILE'}
-                            },
-                            [4] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            [3] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 2, 0 },
                                 {'default_brain', '2','0' }
                             },
@@ -1451,11 +1447,7 @@ Scenario = {
                                 {'default_brain','default_builder_name', 2 },
                                 {'default_brain','default_builder_name','2'}
                             },
-                            [3] = {'/lua/editor/otherarmyunitcountbuildconditions.lua', 'BrainGreaterThanNumCategory',
-                                {'default_brain','Player', 5 , categories.NAVAL * categories.MOBILE },
-                                {'default_brain','Player','5','categories.NAVAL * categories.MOBILE'}
-                            },
-                            [4] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            [3] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 2, 0 },
                                 {'default_brain', '2','0' }
                             },
