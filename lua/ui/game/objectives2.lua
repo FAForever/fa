@@ -134,7 +134,7 @@ function _OnBeat()
 end
 
 function SetUnitText(current, cap)
-    if not current and cap then return end
+    if not (current and cap) then return end
     controls.units:SetText(string.format("%d/%d", current, cap))
     if current == cap then
         if (not lastUnitWarning or GameTime() - lastUnitWarning > 60) and not unitWarningUsed then
