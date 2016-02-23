@@ -226,6 +226,23 @@ Scenario = {
         },
 
 
+    #### UEF SPECIFC ####
+        #### T2
+        ['OST_AirAttacks_T2UEFPlatoon1'] = {
+            'OST_AirAttacks_T2UEFPlatoon1', '',
+            { 'uea0203', -1, 1, 'attack', 'AttackFormation' },  #Gunship
+            { 'dea0202', -1, 1, 'attack', 'AttackFormation' },  #XPack Combat Fighter
+        },
+        ['OST_AirAttacks_T2UEFPlatoon2'] = {
+            'OST_AirAttacks_T2UEFPlatoon2', '',
+            { 'dea0202', -1, 1, 'attack', 'AttackFormation' },  #XPack Combat Fighter
+            { 'uea0103', -1, 1, 'attack', 'AttackFormation' },  #Bomber
+        },
+        ['OST_AirAttacks_T2UEFPlatoon3'] = {
+            'OST_AirAttacks_T2UEFPlatoon3', '',
+            { 'dea0202', -1, 1, 'attack', 'AttackFormation' },  #XPack Combat Fighter
+        },
+
     #### AEON SPECIFIC ####
         #### T1
 
@@ -280,6 +297,20 @@ Scenario = {
         },
 
         #### T2
+        ['OST_AirAttacks_T2CybranPlatoon1'] = {
+            'OST_AirAttacks_T2CybranPlatoon1', '',
+            { 'ura0203', -1, 1, 'attack', 'AttackFormation' },  #Gunship
+            { 'dra0202', -1, 1, 'attack', 'AttackFormation' },  #XPack Combat Fighter
+        },
+        ['OST_AirAttacks_T2CybranPlatoon2'] = {
+            'OST_AirAttacks_T2CybranPlatoon2', '',
+            { 'dra0202', -1, 1, 'attack', 'AttackFormation' },  #XPack Combat Fighter
+            { 'ura0103', -1, 1, 'attack', 'AttackFormation' },  #Bomber
+        },
+        ['OST_AirAttacks_T2CybranPlatoon3'] = {
+            'OST_AirAttacks_T2CybranPlatoon3', '',
+            { 'dra0202', -1, 1, 'attack', 'AttackFormation' },  #XPack Combat Fighter
+        },
 
         #### T3
     },
@@ -1270,6 +1301,120 @@ Scenario = {
                         ChildrenType = {'CombatFighters'},
                     },
 
+    #### UEF SPECIFIC ####
+            #### T2
+                    ['OSB_Child_AirAttacks_T2UEFPlatoon1'] =  {
+                        PlatoonTemplate = 'OST_AirAttacks_T2UEFPlatoon1',
+                        Priority = 696,
+                        InstanceCount = 3,
+                        LocationType = 'MAIN',
+                        PlatoonType = 'Air',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions = {
+                            [0] = {'/lua/ai/opai/airattacks_editorfunctions.lua', 'AirAttackChildCountDifficulty',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [1] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [2] = {'/lua/editor/platooncountbuildconditions.lua', 'NumBuildersLessThanOSCounter',
+                                {'default_brain','default_builder_name', 2 },
+                                {'default_brain','default_builder_name','2'}
+                            },
+                            [3] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                                {'default_brain', 1, 0 },
+                                {'default_brain', '1','0' }
+                            },
+                        },
+                        PlatoonData = {
+                            {type = 5, name = 'AMPlatoons', value = {
+                                {type = 2, name = 'String_0',  value = 'OSB_Master_AirAttacks'},
+                                {type = 2, name = 'APPEND_PlatoonChild', value = 'OSB_Master_AirAttacks'},
+                            }},
+                        },
+                        ChildrenType = { 'Gunships', 'CombatFighters', },
+                    },
+                    ['OSB_Child_AirAttacks_T2UEFPlatoon2'] =  {
+                        PlatoonTemplate = 'OST_AirAttacks_T2UEFPlatoon2',
+                        Priority = 696,
+                        InstanceCount = 3,
+                        LocationType = 'MAIN',
+                        PlatoonType = 'Air',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions = {
+                            [0] = {'/lua/ai/opai/airattacks_editorfunctions.lua', 'AirAttackChildCountDifficulty',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [1] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [2] = {'/lua/editor/platooncountbuildconditions.lua', 'NumBuildersLessThanOSCounter',
+                                {'default_brain','default_builder_name', 2 },
+                                {'default_brain','default_builder_name','2'}
+                            },
+                            [3] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                                {'default_brain', 1, 0 },
+                                {'default_brain', '1','0' }
+                            },
+                        },
+                        PlatoonData = {
+                            {type = 5, name = 'AMPlatoons', value = {
+                                {type = 2, name = 'String_0',  value = 'OSB_Master_AirAttacks'},
+                                {type = 2, name = 'APPEND_PlatoonChild', value = 'OSB_Master_AirAttacks'},
+                            }},
+                        },
+                        ChildrenType = {'Bombers', 'CombatFighters'},
+                    },
+                    ['OSB_Child_AirAttacks_T2UEFPlatoon3'] =  {
+                        PlatoonTemplate = 'OST_AirAttacks_T2UEFPlatoon3',
+                        Priority = 696,
+                        InstanceCount = 3,
+                        LocationType = 'MAIN',
+                        PlatoonType = 'Air',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions = {
+                            [0] = {'/lua/ai/opai/airattacks_editorfunctions.lua', 'AirAttackChildCountDifficulty',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [1] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [2] = {'/lua/editor/platooncountbuildconditions.lua', 'NumBuildersLessThanOSCounter',
+                                {'default_brain','default_builder_name', 2 },
+                                {'default_brain','default_builder_name','2'}
+                            },
+                            [3] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                                {'default_brain', 1, 0 },
+                                {'default_brain', '1','0' }
+                            },
+                        },
+                        PlatoonData = {
+                            {type = 5, name = 'AMPlatoons', value = {
+                                {type = 2, name = 'String_0',  value = 'OSB_Master_AirAttacks'},
+                                {type = 2, name = 'APPEND_PlatoonChild', value = 'OSB_Master_AirAttacks'},
+                            }},
+                        },
+                        ChildrenType = {'CombatFighters'},
+                    }, 
+
     #### AEON SPECIFIC ####
             #### T1
 
@@ -1463,10 +1608,6 @@ Scenario = {
 
     #### CYBRAN SPECIFIC ####
             #### T1
-
-            #### T2
-
-            #### T3
                     ['OSB_Child_AirAttacks_T1CybranPlatoon1'] =  {
                         PlatoonTemplate = 'OST_AirAttacks_T1CybranPlatoon1',
                         Priority = 693,
@@ -1599,6 +1740,121 @@ Scenario = {
                         },
                         ChildrenType = { 'Bombers', 'Interceptors', 'LightGunships'},
                     },
+
+            #### T2
+                    ['OSB_Child_AirAttacks_T2CybranPlatoon1'] =  {
+                        PlatoonTemplate = 'OST_AirAttacks_T2CybranPlatoon1',
+                        Priority = 696,
+                        InstanceCount = 3,
+                        LocationType = 'MAIN',
+                        PlatoonType = 'Air',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions = {
+                            [0] = {'/lua/ai/opai/airattacks_editorfunctions.lua', 'AirAttackChildCountDifficulty',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [1] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [2] = {'/lua/editor/platooncountbuildconditions.lua', 'NumBuildersLessThanOSCounter',
+                                {'default_brain','default_builder_name', 2 },
+                                {'default_brain','default_builder_name','2'}
+                            },
+                            [3] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                                {'default_brain', 3, 0 },
+                                {'default_brain', '3','0' }
+                            },
+                        },
+                        PlatoonData = {
+                            {type = 5, name = 'AMPlatoons', value = {
+                                {type = 2, name = 'String_0',  value = 'OSB_Master_AirAttacks'},
+                                {type = 2, name = 'APPEND_PlatoonChild', value = 'OSB_Master_AirAttacks'},
+                            }},
+                        },
+                        ChildrenType = { 'Gunships', 'CombatFighters', },
+                    },
+                    ['OSB_Child_AirAttacks_T2CybranPlatoon2'] =  {
+                        PlatoonTemplate = 'OST_AirAttacks_T2CybranPlatoon2',
+                        Priority = 696,
+                        InstanceCount = 3,
+                        LocationType = 'MAIN',
+                        PlatoonType = 'Air',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions = {
+                            [0] = {'/lua/ai/opai/airattacks_editorfunctions.lua', 'AirAttackChildCountDifficulty',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [1] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [2] = {'/lua/editor/platooncountbuildconditions.lua', 'NumBuildersLessThanOSCounter',
+                                {'default_brain','default_builder_name', 2 },
+                                {'default_brain','default_builder_name','2'}
+                            },
+                            [3] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                                {'default_brain', 3, 0 },
+                                {'default_brain', '3','0' }
+                            },
+                        },
+                        PlatoonData = {
+                            {type = 5, name = 'AMPlatoons', value = {
+                                {type = 2, name = 'String_0',  value = 'OSB_Master_AirAttacks'},
+                                {type = 2, name = 'APPEND_PlatoonChild', value = 'OSB_Master_AirAttacks'},
+                            }},
+                        },
+                        ChildrenType = {'Bombers', 'CombatFighters'},
+                    },
+                    ['OSB_Child_AirAttacks_T2CybranPlatoon3'] =  {
+                        PlatoonTemplate = 'OST_AirAttacks_T2CybranPlatoon3',
+                        Priority = 696,
+                        InstanceCount = 3,
+                        LocationType = 'MAIN',
+                        PlatoonType = 'Air',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions = {
+                            [0] = {'/lua/ai/opai/airattacks_editorfunctions.lua', 'AirAttackChildCountDifficulty',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [1] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [2] = {'/lua/editor/platooncountbuildconditions.lua', 'NumBuildersLessThanOSCounter',
+                                {'default_brain','default_builder_name', 2 },
+                                {'default_brain','default_builder_name','2'}
+                            },
+                            [3] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                                {'default_brain', 3, 0 },
+                                {'default_brain', '3','0' }
+                            },
+                        },
+                        PlatoonData = {
+                            {type = 5, name = 'AMPlatoons', value = {
+                                {type = 2, name = 'String_0',  value = 'OSB_Master_AirAttacks'},
+                                {type = 2, name = 'APPEND_PlatoonChild', value = 'OSB_Master_AirAttacks'},
+                            }},
+                        },
+                        ChildrenType = {'CombatFighters'},
+                    },
+
+            #### T3
 
 ########################################################################################
 
