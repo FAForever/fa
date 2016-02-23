@@ -1627,6 +1627,8 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
             Target.Image = '/textures/ui/common/faction_icon-lg/aeon_ico.dds'
         elseif Target.ShowFaction == 'UEF' then
             Target.Image = '/textures/ui/common/faction_icon-lg/uef_ico.dds'
+        elseif Target.ShowFaction == 'Seraphim' then
+            Target.Image = '/textures/ui/common/faction_icon-lg/seraphim_ico.dds'
         end
     end
 
