@@ -34,7 +34,8 @@ local TIERS =
         CRUISERS =  {U='ues0202', C='urs0202', A='uas0202', S='xss0202'},
         CARRIERS =  {             C='urs0303', A='uas0303', S='xss0303'},
         FATTIES =   {U='xes0307',              A='xas0306',            },
-        UTILITY =   {U='xes0205', C='xrs0205',                         },    
+        UTILITY =   {U='xes0205', C='xrs0205',                         },
+        NUKESUBS =  {U='ues0304', C='urs0304', A='uas0304',            },
     },
 }
 
@@ -53,6 +54,7 @@ local Conversions =
     CORE_TO_CARRIERS = 3,
     CORE_TO_LIGHT = 0.5,
     CORE_TO_UTILITY = 2,
+    CORE_TO_NUKESUBS = 3,
 }
 
 function IsEnabledType(unitType, data)
@@ -205,6 +207,16 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
             if numCarriers > 0 then
                 table.insert(Scenario.Platoons[template], {TIERS[3].CARRIERS[faction], 1, numCarriers, 'guard', 'None'} ) 
                 table.insert(children, 'Carrier')
+            end
+        end
+
+        -- Do nuke subs, only if allowed. Note Seraphim has no nuke sub.
+        local numNukeSubs = 0
+        if (not allEnabled and IsEnabledType('NukeSubmarine', data)) then
+            if tier >= 3 and TIERS[3].NUKESUBS[faction] then numNukeSubs = math.floor( numBattleships / Conversions.CORE_TO_NUKESUBS ) end
+            if numNukeSubs > 0 then
+                table.insert(Scenario.Platoons[template], {TIERS[3].NUKESUBS[faction], 1, numNukeSubs, 'guard', 'None'} ) 
+                table.insert(children, 'NukeSubmarine')
             end
         end
                 
