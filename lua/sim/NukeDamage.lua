@@ -11,8 +11,7 @@ NukeAOE = Class() {
         self.TotalTime = totalTime
     end,
     
-    DoNukeDamage = function(self, launcher, pos)
-        local brain = launcher:GetAIBrain()
+    DoNukeDamage = function(self, launcher, pos, brain)
         local units = brain:GetUnitsAroundPoint(categories.ALLUNITS, pos, self.Radius)
 
         if self.TotalTime == 0 then

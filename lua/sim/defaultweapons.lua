@@ -1242,11 +1242,12 @@ DeathNukeWeapon = Class(BareBonesWeapon) {
         proj.InnerRing:OnCreate(bp.NukeInnerRingDamage, bp.NukeInnerRingRadius, bp.NukeInnerRingTicks, bp.NukeInnerRingTotalTime)
         proj.OuterRing = NukeDamage()
         proj.OuterRing:OnCreate(bp.NukeOuterRingDamage, bp.NukeOuterRingRadius, bp.NukeOuterRingTicks, bp.NukeOuterRingTotalTime)
-        
-        local firer = self.unit
+
+        local launcher = self.unit
         local pos = proj:GetPosition()
-        proj.InnerRing:DoNukeDamage(firer, pos)
-        proj.OuterRing:DoNukeDamage(firer, pos)
+        local brain = launcher:GetAIBrain()
+        proj.InnerRing:DoNukeDamage(launcher, pos, brain)
+        proj.OuterRing:DoNukeDamage(launcher, pos, brain)
     end,
 }
 

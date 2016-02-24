@@ -57,7 +57,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
 
                     ForkThread(DefaultDamage.AreaDoTThread, instigator, self:GetPosition(), DamageData.DoTPulses or 1, (DamageData.DoTTime / (DamageData.DoTPulses or 1)), radius, damage, DamageData.DamageType, DamageData.DamageFriendly)
                 end
-            --ONLY DO DAMAGE IF THERE IS DAMAGE DATA.  SOME PROJECTILE DO NOT DO DAMAGE WHEN THEY IMPACT.
+            -- ONLY DO DAMAGE IF THERE IS DAMAGE DATA.  SOME PROJECTILE DO NOT DO DAMAGE WHEN THEY IMPACT.
             elseif DamageData.DamageAmount and targetEntity then
                 if not DamageData.DoTTime or DamageData.DoTTime <= 0 then
                     Damage(instigator, self:GetPosition(), targetEntity, DamageData.DamageAmount, DamageData.DamageType)
@@ -80,8 +80,9 @@ Projectile = Class(moho.projectile_methods, Entity) {
         if self.InnerRing and self.OuterRing then
             local launcher = self:GetLauncher()
             local pos = self:GetPosition()
-            self.InnerRing:DoNukeDamage(launcher, pos)
-            self.OuterRing:DoNukeDamage(launcher, pos)
+            local brain = self:GetAIBrain()
+            self.InnerRing:DoNukeDamage(launcher, pos, brain)
+            self.OuterRing:DoNukeDamage(launcher, pos, brain)
         end
     end,
 
