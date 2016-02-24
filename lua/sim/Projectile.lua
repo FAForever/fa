@@ -78,11 +78,9 @@ Projectile = Class(moho.projectile_methods, Entity) {
             end
         end
         if self.InnerRing and self.OuterRing then
-            local launcher = self:GetLauncher()
             local pos = self:GetPosition()
-            local brain = self:GetAIBrain()
-            self.InnerRing:DoNukeDamage(launcher, pos, brain)
-            self.OuterRing:DoNukeDamage(launcher, pos, brain)
+            self.InnerRing:DoNukeDamage(self.Launcher, pos, self.Brain)
+            self.OuterRing:DoNukeDamage(self.Launcher, pos, self.Brain)
         end
     end,
 

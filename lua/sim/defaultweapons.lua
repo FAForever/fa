@@ -1248,6 +1248,7 @@ DeathNukeWeapon = Class(BareBonesWeapon) {
         local brain = launcher:GetAIBrain()
         proj.InnerRing:DoNukeDamage(launcher, pos, brain)
         proj.OuterRing:DoNukeDamage(launcher, pos, brain)
+        proj:Destroy()
     end,
 }
 
