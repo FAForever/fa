@@ -1416,7 +1416,7 @@ function AttachUnitsToTransports(units, transports)
                     if table.getn(transportBones[i].Lrg) > 0 then
                         notInserted = false
                         local bone = table.remove(transportBones[i].Lrg, 1)
-                        transports[i]:OnTransportAttach( attachBone, v )
+                        transports[i]:OnTransportAttach(bone, v )
                         v:AttachBoneTo(attachBone, transports[i], bone)
                         local bonePos = transports[i]:GetPosition(bone)
                         for j=1,2 do
@@ -1451,7 +1451,7 @@ function AttachUnitsToTransports(units, transports)
                     if table.getn(transportBones[i].Med) > 0 then
                         notInserted = false
                         local bone = table.remove(transportBones[i].Med, 1)
-                        transports[i]:OnTransportAttach( attachBone, v )
+                        transports[i]:OnTransportAttach(bone, v )
                         v:AttachBoneTo(attachBone, transports[i], bone)
                         local bonePos = transports[i]:GetPosition(bone)
                         for j=1,2 do
@@ -1474,7 +1474,7 @@ function AttachUnitsToTransports(units, transports)
                     if table.getn(transportBones[i].Sml) > 0 then
                         notInserted = false
                         local bone = table.remove(transportBones[i].Sml, 1)
-                        transports[i]:OnTransportAttach( attachBone, v )
+                        transports[i]:OnTransportAttach(bone, v )
                         v:AttachBoneTo(attachBone, transports[i], bone)
                     end
                     i = i + 1
