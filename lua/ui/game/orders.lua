@@ -688,7 +688,7 @@ end
 
 local function OverchargeInit(control, unitList)
     if not control.autoModeIcon then
-        control.autoModeIcon = Bitmap(control, UIUtil.UIFile('/game/orders/autocast_bmp.dds'))
+        control.autoModeIcon = Bitmap(control, UIUtil.UIFile('/game/orders/autocast_green.dds'))
         LayoutHelpers.AtCenterIn(control.autoModeIcon, control)
         control.autoModeIcon:DisableHitTest()
         control.autoModeIcon:SetAlpha(0)
