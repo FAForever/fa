@@ -1,4 +1,8 @@
 UnitBlueprint {
+    AI = {
+        GuardReturnRadius = 125,
+        GuardScanRadius = 100,
+    },
     Air = {
         AutoLandTime = 1,
         BankFactor = 4,
