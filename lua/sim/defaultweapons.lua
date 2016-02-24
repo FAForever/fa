@@ -905,7 +905,9 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
              WaitSeconds(0.1)
         end
 
-        self:OnEnableWeapon()
+        if self.AutoMode then
+            self:OnEnableWeapon()
+        end
     end,
 
     SetAutoOvercharge = function(self, auto)
