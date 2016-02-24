@@ -939,14 +939,18 @@ local function AddOrder(orderInfo, slot, batchMode)
     end
 
     -- set up tooltips
+
     checkbox.HandleEvent = function(self, event)
-        if event.Type == 'MouseEnter' and not self:IsDisabled() then
-            if controls.orderGlow then
-                controls.orderGlow:Destroy()
-                controls.orderGlow = false
-            end                
+        if event.Type == 'MouseEnter' then
             CreateMouseoverDisplay(self, self._curHelpText, 1)
-            glowThread = CreateOrderGlow(self)
+
+            if not self:IsDisabled() then
+                if controls.orderGlow then
+                    controls.orderGlow:Destroy()
+                    controls.orderGlow = false
+                end
+                glowThread = CreateOrderGlow(self)
+            end
         elseif event.Type == 'MouseExit' then
             if controls.mouseoverDisplay then
                 controls.mouseoverDisplay:Destroy()
