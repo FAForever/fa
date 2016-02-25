@@ -1248,7 +1248,9 @@ DeathNukeWeapon = Class(BareBonesWeapon) {
         local brain = launcher:GetAIBrain()
         proj.InnerRing:DoNukeDamage(launcher, pos, brain)
         proj.OuterRing:DoNukeDamage(launcher, pos, brain)
-        proj:Destroy()
+        
+        -- Stop it calling DoDamage any time in the future.
+        proj.DoDamage = function(self, instigator, DamageData, targetEntity) end
     end,
 }
 
