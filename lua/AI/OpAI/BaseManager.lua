@@ -1466,6 +1466,7 @@ BaseManager = Class {
                                     { BMBC, 'BaseBuildingEngineers', { self.BaseName }},
                                     { BMBC, 'HighestFactoryLevel', { i, self.BaseName }},
                                     { BMBC, 'FactoryCountAndNeed', { i, j, pType, self.BaseName }},
+                                    { BMBC, 'BaseActive', {self.BaseName}},
                                 },
                             PlatoonBuildCallbacks = { { BMBC, 'BaseManagerEngineersStarted' }, },
                             InstanceCount = 3,
@@ -1532,6 +1533,7 @@ BaseManager = Class {
                     BuildConditions = {
                             { BMBC, 'BaseEngineersEnabled', { self.BaseName }},
                             { BMBC, 'NumUnitsLessNearBase', { self.BaseName, ParseEntityCategory( 'SUBCOMMANDER' ), self.BaseName ..'_sACUNumber' } },
+                            { BMBC, 'BaseActive', {self.BaseName} },
                         },
                     InstanceCount = 2,
                     BuildTimeOut = 10, # Timeout really fast because they dont need to really finish
