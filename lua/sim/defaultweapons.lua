@@ -917,9 +917,14 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
             if not self.AutoThread then
                 self.AutoThread = self:ForkThread(self.AutoEnable)
             end
-        elseif self.AutoThread then
-            KillThread(self.AutoThread)
-            self.AutoThread = nil
+        else
+            if self.AutoThread then
+                KillThread(self.AutoThread)
+                self.AutoThread = nil
+            end
+            if self:IsEnabled() then
+                self:OnDisableWeapon()
+            end
         end
     end,
 
@@ -948,6 +953,10 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         end
     end,
 
+    IsEnabled = function(self)
+        return self.enabled
+    end,
+
     OnEnableWeapon = function(self)
         if self:BeenDestroyed() then return end
         DefaultProjectileWeapon.OnEnableWeapon(self)
@@ -958,6 +967,7 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         self.AimControl:SetPrecedence(20)
         self.unit.BuildArmManipulator:SetPrecedence(0)
         self.AimControl:SetHeadingPitch(self.unit:GetWeaponManipulatorByLabel(self.DesiredWeaponLabel):GetHeadingPitch())
+        self.enabled = true
     end,
 
     OnDisableWeapon = function(self)
@@ -973,6 +983,8 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         if self.AutoMode and not self.AutoEnable then
             self:ForkThread(self.AutoEnable)
         end
+
+        self.enabled = false
     end,
 
     OnWeaponFired = function(self)
