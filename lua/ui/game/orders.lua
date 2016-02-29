@@ -713,11 +713,10 @@ local function OverchargeInit(control, unitList)
 
     control._isAutoMode = IsAutoOCMode(unitList)
 
+    control._curHelpText = control._data.helpText
     if control._isAutoMode then
-        control._curHelpText = control._data.helpText .. "_auto"
         control.autoModeIcon:SetAlpha(1)
     else
-        control._curHelpText = control._data.helpText
         control.autoModeIcon:SetAlpha(0)
     end
 
@@ -732,12 +731,11 @@ function OverchargeBehavior(self, modifiers)
     if modifiers.Left then
         EnterOverchargeMode()
     elseif modifiers.Right then
+        self._curHelpText = self._data.helpText
         if self._isAutoMode then
-            self._curHelpText = self._data.helpText
             self.autoModeIcon:SetAlpha(0)
             self._isAutoMode = false
         else
-            self._curHelpText = self._data.helpText .. "_auto"
             self.autoModeIcon:SetAlpha(1)
             self._isAutoMode = true
         end
