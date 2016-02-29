@@ -282,9 +282,9 @@ Scenario = {
             { 'uea0104', -1, 1, 'support', 'GrowthFormation' },
         },
 
-    --[[#################################################################]]--
-    --[[####################[ SPECIAL LAND ATTACKS ]#####################]]--
-    --[[#################################################################]]--
+    --[[-----------------------------------------------------------------]]--
+    --[[--------------------[ SPECIAL LAND ATTACKS ]---------------------]]--
+    --[[-----------------------------------------------------------------]]--
         ['OST_BasicLandAttack_T2AeonHoverTanks'] = {
             'OST_BasicLandAttack_T2AeonHoverTanks', '',
             { 'uel0203', -1, 1, 'attack', 'AttackFormation' },
@@ -292,11 +292,11 @@ Scenario = {
             { 'uel0205', -1, 1, 'attack', 'AttackFormation' },
         },
 
-    --[[###############################################################]]--
-    --[[####################[ XPACK LAND ATTACKS ]#####################]]--
-    --[[###############################################################]]--
+    --[[---------------------------------------------------------------]]--
+    --[[--------------------[ XPACK LAND ATTACKS ]---------------------]]--
+    --[[---------------------------------------------------------------]]--
 
-    --[[##########[ COMMON ]##########]]--
+    --[[----------[ COMMON ]----------]]--
         ['OST_BasicLandAttack_T3JustHeavyBots'] = {
             'OST_BasicLandAttack_T3JustHeavyBots', '',
             { 'xel0305', -1, 1, 'attack', 'AttackFormation' },
@@ -327,7 +327,7 @@ Scenario = {
             { 'uel0307', 1, 5, 'attack', 'AttackFormation' },
         },
 
-    --[[######[ CYBRAN SPECIFIC ]######]]--
+    --[[------[ CYBRAN SPECIFIC ]------]]--
         ['OST_BasicLandAttack_T2MobileBombsStealth'] = {
             'OST_BasicLandAttack_T2MobileBombsStealth', '',
             { 'xrl0302', -2, 1, 'attack', 'AttackFormation' },
@@ -352,7 +352,7 @@ Scenario = {
             { 'drlk001', -1, 1, 'attack', 'GrowthFormation' },
         },
 
-    --[[#######[ UEF SPECIFIC ]#######]]--
+    --[[-------[ UEF SPECIFIC ]-------]]--
         ['OST_BasicLandAttack_T3Transports'] = {
             'OST_BasicLandAttack_T3Transports', '',
             { 'xea0306', -1, 1, 'support', 'GrowthFormation' },
@@ -375,13 +375,13 @@ Scenario = {
             { 'delk002', -1, 1, 'attack', 'GrowthFormation' },
         },
 
-    --[[#######[ AEON SPECIFIC ]#######]]--
+    --[[-------[ AEON SPECIFIC ]-------]]--
         ['OST_BasicLandAttack_T3AeonMobileAA'] = {
             'OST_BasicLandAttack_T3AeonMobileAA', '',
             { 'dalk003', -1, 1, 'attack', 'GrowthFormation' },
         },
 
-    --[[######[ SERAPHIM SPECIFIC ]######]]--
+    --[[------[ SERAPHIM SPECIFIC ]------]]--
         ['OST_BasicLandAttack_T3SeraphimMobileAA'] = {
             'OST_BasicLandAttack_T3SeraphimMobileAA', '',
             { 'dslk004', -1, 1, 'attack', 'GrowthFormation' },
@@ -411,18 +411,18 @@ Scenario = {
             },
             Alliances = {
             },
-            ['Units'] = GROUP {
+            ['Units'] = GROUP({
                 orders = '',
                 platoon = '',
                 Units = {
-                    ['INITIAL'] = GROUP {
+                    ['INITIAL'] = GROUP({
                         orders = '',
                         platoon = '',
                         Units = {
                         },
-                    },
+                    }),
                 },
-            },
+            }),
             PlatoonBuilders = {
                 next_platoon_builder_id = '10',
                 Builders = {
@@ -1480,7 +1480,7 @@ Scenario = {
                         ChildrenType = {'MobileHeavyArtillery'},
                     },
 
-    ################################ SPECIAL STUFF ##############################################
+                    -- SPECIAL STUFF --
                     ['OSB_Child_BasicLandAttack_T2AeonHoverTanks'] =  {
                         PlatoonTemplate = 'OST_BasicLandAttack_T2AeonHoverTanks',
                         Priority = 498,
@@ -1514,8 +1514,8 @@ Scenario = {
                         ChildrenType = {'LightTanks', 'AmphibiousTanks', 'MobileFlak'},
                     },
 
-    ################################# XPACK STUFF ###############################################
-            #### Common Stuff ####
+                    -- XPACK STUFF --
+                    -- Common Stuff --
                     ['OSB_Child_BasicLandAttack_T3JustHeavyBots'] =  {
                         PlatoonTemplate = 'OST_BasicLandAttack_T3JustHeavyBots',
                         Priority = 499,
@@ -1664,7 +1664,7 @@ Scenario = {
                         },
                         ChildrenType = {'MobileHeavyArtillery', 'MobileShields', 'HeavyBots', 'MobileFlak'},
                     },
-            #### Cybran Stuff ####
+                    -- Cybran Stuff --
                     ['OSB_Child_BasicLandAttack_T2MobileBombsStealth'] =  {
                         PlatoonTemplate = 'OST_BasicLandAttack_T2MobileBombsStealth',
                         Priority = 498,
@@ -1794,7 +1794,7 @@ Scenario = {
                         ChildrenType = {'HeavyMobileAntiAir'},
                     },
 
-            #### UEF Stuff ####
+                    -- UEF Stuff --
                     ['OSB_Child_BasicLandAttack_T3MissilePlatforms'] =  {
                         PlatoonTemplate = 'OST_BasicLandAttack_T3MissilePlatforms',
                         Priority = 499,
@@ -1892,7 +1892,7 @@ Scenario = {
                         ChildrenType = {'HeavyMobileAntiAir'},
                     },
 
-            #### Aeon Stuff ####
+                    -- Aeon Stuff --
                     ['OSB_Child_BasicLandAttack_T3AeeonMobileAA'] =  {
                         PlatoonTemplate = 'OST_BasicLandAttack_T3AeonMobileAA',
                         Priority = 499,
@@ -1926,7 +1926,7 @@ Scenario = {
                         ChildrenType = {'HeavyMobileAntiAir'},
                     },
 
-            #### Seraphim Stuff ####
+                    -- Seraphim Stuff --
                     ['OSB_Child_BasicLandAttack_T3SeraphimMobileAA'] =  {
                         PlatoonTemplate = 'OST_BasicLandAttack_T3SeraphimMobileAA',
                         Priority = 499,
@@ -1960,7 +1960,7 @@ Scenario = {
                         ChildrenType = {'HeavyMobileAntiAir'},
                     },
 
-    ################################ TRANSPORTS ##############################################
+                    -- TRANSPORTS --
                     ['OSB_Child_BasicLandAttack_T3Transports'] =  {
                         PlatoonTemplate = 'OST_BasicLandAttack_T3Transports',
                         Priority = 500,
