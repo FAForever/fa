@@ -8,6 +8,7 @@ Patch 3652 (pending)
 - Reduced autobalance random variation to get team setups with better overall quality
 - Default to score off
 - Stopped the map filter preventing the map selected in prefs from prior games from showing
+- Tiny fix to flag layout
 
 **UI**
 - Introduced Russian translations of many FAF additions to the game (Exotic_Retard)
@@ -82,6 +83,7 @@ Patch 3652 (pending)
 - Fixed shields sometimes not turning off due to lack of Energy
 - Fixed buffs from enhancements being applied too often after unit transfer
 - Fixed subermsible naval units leaving full reclaim mass
+- Nuclear explosions now behave predictably, always bypassing/ignoring bubble shielding
 
 **Performance**
 - Optimization of score accumulation
@@ -93,6 +95,20 @@ Patch 3652 (pending)
 - Added game-side support for future achievement system
 - Tech-level filter in debug window now works as intended
 - Log-spam from various known events heavily reduced
+- Lots of work adapting and improving AI behavior for coop gameplay (speed2)
+
+**Contributors**
+- Sheeo
+- IceDreamer
+- Crotalus
+- speed2
+- Exotic_Retard
+- duk3luk3
+- HUSSAR
+- Downlord
+- madformuse
+- quark036
+- CodingSquirrel
 
 
 Patch 3650 (August 19, 2015)
