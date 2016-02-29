@@ -109,18 +109,20 @@ RangeOverlayParams = {
         Type = 1,
         Tooltip = "overlay_indirect_fire",
     },
+
     Miscellaneous = {
         key = 'miscellaneous',
-        Label = '<LOC range_0012>Miscellaneous',
+        Label = '<LOC range_0012>Build Range',
         Categories = categories.OVERLAYMISC,
-        NormalColor = glowMilNormal..'832cff',
-        SelectColor = glowMilSelect..'9a53ff',
-        RolloverColor = glowMilOver..'a463ff',
+        NormalColor = glowMilNormal .. 'f2d000',
+        SelectColor = glowMilSelect .. 'fbd700',
+        RolloverColor = glowMilOver.. 'ffdc00',
         Inner = innerMilitary,
         Outer = outerMilitary,
         Type = 1,
         Tooltip = "overlay_misc",
     },
+
 
     AllIntel = {
         key = 'allintel',
