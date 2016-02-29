@@ -428,6 +428,14 @@ function PreModBlueprints(all_bps)
             cats[cat] = true
         end
 
+        if cats.ENGINEER then -- show build range overlay for engineers
+            if not bp.AI then bp.AI = {} end
+            bp.AI.StagingPlatformScanRadius = (bp.Economy.MaxBuildDistance or 5) + 2
+            if not cats.OVERLAYMISC then
+                table.insert(bp.Categories, 'OVERLAYMISC')
+            end
+        end
+
         if cats.NAVAL and not bp.Wreckage then
             -- Add naval wreckage
             --LOG("Adding wreckage information to ", bp.Description)
