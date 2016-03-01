@@ -99,6 +99,8 @@ Patch 3652 (pending)
 - Log-spam from various known events heavily reduced
 - Lots of work adapting and improving AI behavior for coop gameplay (speed2)
 - Scale aeon build effects according to build progress 
+- Fade away wreckage when it is being reclaimed
+- Show wreckage debris in reclaim beam
 
 **Contributors**
 - Sheeo
