@@ -30,6 +30,7 @@ Patch 3652 (pending)
 - Show name of the one resuming a paused game
 - Reverted the change to T1 PD icons from 3641, so now they don't give free intel on mouse-over when trying to fake PD-wall with all-wall radar ghosts.
 - Mass value labels now cluster when zoomed out to reduce clutter
+- Render build range of engineers using native overlay system instead of decal hack
 
 **Gameplay**
 - Teamkill is now detected and a player can make an explicit report
