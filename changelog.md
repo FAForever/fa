@@ -96,6 +96,7 @@ Patch 3652 (pending)
 - Tech-level filter in debug window now works as intended
 - Log-spam from various known events heavily reduced
 - Lots of work adapting and improving AI behavior for coop gameplay (speed2)
+- Scale aeon build effects according to build progress 
 
 **Contributors**
 - Sheeo
