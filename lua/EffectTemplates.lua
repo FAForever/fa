@@ -544,6 +544,8 @@ ReclaimBeams = {
     EmtBpPath .. 'reclaim_beam_01_emit.bp',
     EmtBpPath .. 'reclaim_beam_02_emit.bp',
     EmtBpPath .. 'reclaim_beam_03_emit.bp',	
+    EmtBpPath .. 'reclaim_beam_04_emit.bp',
+    EmtBpPath .. 'reclaim_beam_05_emit.bp',
 }
 
 ReclaimObjectAOE = { '/effects/emitters/reclaim_01_emit.bp' }
