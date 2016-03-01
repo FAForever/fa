@@ -6,6 +6,26 @@ local Prefs = import('/lua/user/prefs.lua')
 
 local reclaim = {}
 
+local oldZoom
+local pixelsPerDist = 1
+
+function UpdatePixelsPerDist()
+    local view = import('/lua/ui/game/worldview.lua').viewLeft
+    local w = view.Width()
+    pixelsPerDist = w / (UnProject(view, {w, 0})[1] - UnProject(view, {0, 0})[1])
+end
+
+function SameZoom(camera)
+    local camera = GetCamera("WorldCamera")
+    if not oldZoom or camera:GetZoom() == oldZoom then
+        return true
+    end
+
+    UpdatePixelsPerDist()
+    return false
+end
+
+
 local WorldLabel = Class(Group) {
     __init = function(self, parent, position)
         Group.__init(self, parent)
@@ -165,6 +185,7 @@ function CreateReclaimLabel(view, r)
     local pos = r.position
     local label = WorldLabel(view, Vector(pos[1], pos[2], pos[3]))
 
+
     label.mass = Bitmap(label)
     label.mass:SetTexture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
     LayoutHelpers.AtLeftIn(label.mass, label)
@@ -180,18 +201,17 @@ function CreateReclaimLabel(view, r)
 
     if r.n_points and r.n_points > 1 then -- cluster
         local camera = GetCamera("WorldCamera")
-        local zoom, max = camera:GetZoom(), camera:GetMaxZoom()
+
         label.circle = Bitmap(label)
         label.circle:SetTexture('/textures/mass_ring.png')
-        label.circle.Height:Set(r.radius * (max / zoom) * 2)
-        label.circle.Width:Set(r.radius * (max / zoom) * 2)
+        label.circle.Height:Set(r.radius * pixelsPerDist * 2)
+        label.circle.Width:Set(r.radius * pixelsPerDist * 2)
         LayoutHelpers.AtCenterIn(label.circle, label)
 
         label.circle.OnFrame = function(self, delta)
             if not SameZoom(camera) then
-                local zoom = camera:GetZoom()
-                self.Height:Set(r.radius * (max / zoom) * 2)
-                self.Width:Set(r.radius * (max / zoom) * 2)
+                self.Height:Set(r.radius * pixelsPerDist * 2)
+                self.Width:Set(r.radius * pixelsPerDist * 2)
             end
         end
 
@@ -203,28 +223,28 @@ end
 
 local labelGroup = nil
 function UpdateLabels()
-    local view = labelGroup
+    local group = labelGroup
 
-    for _, c in view.ReclaimLabels or {} do
+    for _, c in group.ReclaimLabels or {} do
         c:Destroy()
     end
 
     labelGroup.ReclaimLabels = {}
 
-    local points
+    UpdatePixelsPerDist()
     local camera = GetCamera("WorldCamera")
-    local points = GetVisibleReclaim()
-    local max_zoom = camera:GetMaxZoom()
     local zoom = camera:GetZoom()
-    local max_distance = zoom > 125 and math.max(200 * (camera:GetZoom() / max_zoom), 10) or 0
+    local view = import('/lua/ui/game/worldview.lua').viewLeft
+    local max_distance = zoom > 125 and math.min(200, math.max((view.Width()/4) / pixelsPerDist, 10)) or 0 -- rings radius max 1/4 of screen width
 
+    local points = GetVisibleReclaim()
     if max_distance > 0 and table.getsize(points) > 25 then
         points = ClusterPoints(points, max_distance)
     end
 
     for id, p in points do
         p.position = Vector(p.x, 20, p.y)
-        table.insert(labelGroup.ReclaimLabels, CreateReclaimLabel(view, p))
+        table.insert(labelGroup.ReclaimLabels, CreateReclaimLabel(group, p))
     end
 
     return labelGroup.ReclaimLabels
@@ -258,10 +278,6 @@ end
 
 local ShowingReclaim = false
 
-local oldZoom
-function SameZoom(camera)
-    return not oldZoom or camera:GetZoom() == oldZoom
-end
 
 function ShowReclaimThread()
     local i = 0
@@ -284,7 +300,7 @@ function ShowReclaimThread()
             action = 'Hide'
         elseif keydown then
             action = 'Show'
-            if lastUpdate > 1 and SameZoom(camera) then
+            if lastUpdate > 0.5 and SameZoom(camera) then
                 UpdateLabels()
                 lastUpdate = 0
             end
