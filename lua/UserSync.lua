@@ -58,14 +58,8 @@ function OnSync()
 		import('/modules/nukelaunchping.lua').DoNukePing(Sync.NukeLaunchData)
 	end
 
-    if Sync.Reclaim then
-        for _, r in Sync.Reclaim do
-            if not r.mass or r.mass < 1 then
-                import('/modules/reclaim.lua').RemoveReclaim(r)
-            else
-                import('/modules/reclaim.lua').AddReclaim(r)
-            end
-        end
+    for _, r in Sync.Reclaim or {} do
+        import('/modules/reclaim.lua').UpdateReclaim(r)
     end
 	
     if Sync.Teamkill then
