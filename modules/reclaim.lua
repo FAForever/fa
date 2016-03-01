@@ -16,7 +16,6 @@ function UpdatePixelsPerDist()
 end
 
 function SameZoom(camera)
-    local camera = GetCamera("WorldCamera")
     if not oldZoom or camera:GetZoom() == oldZoom then
         return true
     end
