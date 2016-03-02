@@ -57,14 +57,8 @@ function OnSync()
 		import('/modules/nukelaunchping.lua').DoNukePing(Sync.NukeLaunchData)
 	end
 
-    if Sync.Reclaim then
-        for _, r in Sync.Reclaim do
-            if not r.mass or r.mass < 1 then
-                import('/lua/ui/game/reclaim.lua').RemoveReclaim(r)
-            else
-                import('/lua/ui/game/reclaim.lua').AddReclaim(r)
-            end
-        end
+    for _, r in Sync.Reclaim or {} do
+        import('/lua/ui/game/reclaim.lua').UpdateReclaim(r)
     end
 
     if Sync.Teamkill and not SessionIsReplay() then
