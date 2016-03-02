@@ -660,7 +660,7 @@ options = {
             },
 
             {
-                title = "<LOC OPTIONS_0246>Show reclaim mass value",
+                title = "<LOC OPTIONS_0246>Show reclaim mass with ctrl-shift",
                 key = 'gui_show_reclaim',
                 type = 'toggle',
                 default = 1,
