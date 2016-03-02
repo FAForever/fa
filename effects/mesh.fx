@@ -2409,7 +2409,7 @@ float4 WreckagePS( NORMALMAPPED_VERTEX vertex) : COLOR0
     else
         color *= specular.b * 2;
 
-	return float4( color, sqrt(sqrt(vertex.material.y)) * albedo.a);
+	return float4( color, glowMinimum );
 }
 
 float4 WreckagePS_LowFidelity(VERTEXNORMAL_VERTEX vertex) : COLOR0
@@ -5957,13 +5957,12 @@ technique Wreckage_MedFidelity
     string cartographicTechnique = "CartographicFeature";    
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
+    int parameter = PARAM_UNUSED;
 >
 {
     pass P0
     {
-		AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
+		RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_2_0 WreckageVS_HighFidelity();
         PixelShader = compile ps_2_0 WreckagePS();
@@ -5977,12 +5976,11 @@ technique Wreckage_LowFidelity
     
     string cartographicTechnique = "CartographicFeature";    
     int renderStage = STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
+    int parameter = PARAM_UNUSED;
 >
 {
     pass P0
     {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
 		RasterizerState( Rasterizer_Cull_CW )
 	
         VertexShader = compile vs_1_1 WreckageVS_LowFidelity();
