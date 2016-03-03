@@ -6,7 +6,7 @@ UnitBlueprint {
         RepairConsumeEnergy = 5,
         RepairConsumeMass = 0.5,
         ShowAssistRangeOnSelect = true,
-        StagingPlatformScanRadius = 300,
+        StagingPlatformScanRadius = 50,
     },
     Audio = {
         DeathExplosion = Sound {
@@ -42,7 +42,6 @@ UnitBlueprint {
         'SIZE12',
         'VISIBLETORECON',
         'RECLAIMABLE',
-        'OVERLAYMISC',
         'SORTSTRATEGIC',
     },
     Defense = {

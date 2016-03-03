@@ -111,7 +111,6 @@ UnitBlueprint {
         'OVERLAYANTINAVY',
         'OVERLAYRADAR',
         'OVERLAYSONAR',
-        'OVERLAYMISC',
         'CANNOTUSEAIRSTAGING',
     },
     CollisionOffsetY = -1.5,

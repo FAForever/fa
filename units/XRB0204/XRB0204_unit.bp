@@ -81,7 +81,6 @@ UnitBlueprint {
         'PATROLHELPER',
         'ENGINEERSTATION',
         'SHOWQUEUE',
-        'OVERLAYMISC',
         'SORTCONSTRUCTION',
     },
     CollisionOffsetY = -0.25,

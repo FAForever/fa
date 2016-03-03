@@ -4,7 +4,7 @@ UnitBlueprint {
         RefuelingRepairAmount = 500,
         RepairConsumeEnergy = 5,
         RepairConsumeMass = 0.5,
-        StagingPlatformScanRadius = 300,
+        StagingPlatformScanRadius = 50,
         TargetBones = {
             'Front_Left_Projectile02',
             'Front_Right_Projectile02',
@@ -103,7 +103,6 @@ UnitBlueprint {
         'OVERLAYRADAR',
         'OVERLAYSONAR',
         'OVERLAYANTINAVY',
-        'OVERLAYMISC',
     },
     CollisionOffsetY = -0.375,
     CollisionOffsetZ = 0.5,

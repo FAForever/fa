@@ -4,7 +4,7 @@ UnitBlueprint {
         RefuelingRepairAmount = 500,
         RepairConsumeEnergy = 5,
         RepairConsumeMass = 0.5,
-        StagingPlatformScanRadius = 300,
+        StagingPlatformScanRadius = 50,
     },
     Audio = {
         AmbientMove = Sound {
@@ -64,7 +64,6 @@ UnitBlueprint {
         'OVERLAYRADAR',
         'OVERLAYSONAR',
         'OVERLAYINDIRECTFIRE',
-        'OVERLAYMISC',
     },
     CollisionOffsetY = -0.6,
     Defense = {

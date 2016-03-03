@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         AttackAngle = 10,
-        StagingPlatformScanRadius = 300,
+        StagingPlatformScanRadius = 50,
         RefuelingMultiplier = 75,
         RefuelingRepairAmount = 500,
         RepairConsumeEnergy = 5,
@@ -124,12 +124,10 @@ UnitBlueprint {
         'RECLAIMABLE',
         'DRAGBUILD',
         'SHOWQUEUE',
-        'OVERLAYMISC',
         'OVERLAYANTIAIR',
         'OVERLAYDEFENSE',
         'OVERLAYANTINAVY',
         'OVERLAYDIRECTFIRE',
-        'OVERLAYMISC',
         'BUBBLESHIELDSPILLOVERCHECK',
     },
     CollisionOffsetZ = 0,

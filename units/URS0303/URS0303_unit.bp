@@ -4,7 +4,7 @@ UnitBlueprint {
         RefuelingRepairAmount = 500,
         RepairConsumeEnergy = 5,
         RepairConsumeMass = 0.5,
-        StagingPlatformScanRadius = 300,
+        StagingPlatformScanRadius = 50,
         TargetBones = {
             'URS0303',
             'Back_Wake',
@@ -70,7 +70,6 @@ UnitBlueprint {
         'OVERLAYRADAR',
         'OVERLAYSONAR',
         'OVERLAYDEFENSE',
-        'OVERLAYMISC',
     },
     CollisionOffsetY = -0.375,
     Defense = {

@@ -2,7 +2,7 @@ UnitBlueprint {
     AI = {
         AttackAngle = 0,
         GuardReturnRadius = 130,
-        StagingPlatformScanRadius = 300,
+        StagingPlatformScanRadius = 50,
         RefuelingMultiplier = 50,
         RefuelingRepairAmount = 500,
         RepairConsumeEnergy = 5,
@@ -70,7 +70,6 @@ UnitBlueprint {
         'CRUISER',
         'OVERLAYRADAR',
         'OVERLAYSONAR',
-        'OVERLAYMISC',
         'OVERLAYDEFENSE',
         'OVERLAYDIRECTFIRE',
         'OVERLAYANTIAIR',
