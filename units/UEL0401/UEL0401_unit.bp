@@ -229,10 +229,10 @@ UnitBlueprint {
                     {
                         Bones = {
 
-                            # 'Exhaust_Left01',
+                            -- 'Exhaust_Left01',
                             'Exhaust_Left02',
 
-                            # 'Exhaust_Right01',
+                            -- 'Exhaust_Right01',
                             'Exhaust_Right02',
                         },
                         Type = 'GroundKickup02',

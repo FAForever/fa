@@ -395,7 +395,6 @@ end
 
 -- Mod unit blueprints before allowing mods to modify it aswell, to pass the most correct unit blueprint to mods
 function PreModBlueprints(all_bps)
-
     -- Brute51: Modified code for ship wrecks and added code for SCU presets.
     -- removed the pairs() function call in the for loops for better efficiency and because it is not necessary.
 
