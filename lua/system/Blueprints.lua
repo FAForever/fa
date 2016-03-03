@@ -427,12 +427,17 @@ function PreModBlueprints(all_bps)
             cats[cat] = true
         end
 
+        if not bp.AI then bp.AI = {} end
         if cats.ENGINEER then -- show build range overlay for engineers
-            if not bp.AI then bp.AI = {} end
+            -- OVERLAYMISC uses this value to determine radius
             bp.AI.StagingPlatformScanRadius = (bp.Economy.MaxBuildDistance or 5) + 2
             if not cats.OVERLAYMISC then
                 table.insert(bp.Categories, 'OVERLAYMISC')
             end
+        elseif cats.AIRSTAGINGPLATFORM and not bp.AI.StagingPlatformScanRadius then
+            -- unset StagingPlatformScanRadius defaults to 300 which is bad due to broken distance check of
+            -- when refueling patrolling airplanes, see issue #1144 for more information
+            bp.AI.StagingPlatformScanRadius = 50
         end
 
         if cats.NAVAL and not bp.Wreckage then
@@ -498,7 +503,6 @@ function PreModBlueprints(all_bps)
             end
 
             if br then
-                if not bp.AI then bp.AI = {} end
                 bp.AI.GuardScanRadius = br
                 if not bp.AI.GuardReturnRadius then
                     bp.AI.GuardReturnRadius = 3
