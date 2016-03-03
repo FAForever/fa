@@ -89,7 +89,7 @@ function SetupSession()
             local enhancements = restrictedUnits[name].enhancement
             if enhancements then
                 for _, enhancement in enhancements do
-                    enhRestrictions[enhancement] = true
+                    table.insert(enhRestrictions, enhancement)
                 end
             end
 

@@ -808,12 +808,17 @@ function PlayVoiceOver( voSound )
 end
 
 -- Set enhancement restrictions
--- Supply a table of key->bool pairs of the names of enhancements you do not want the player to build
--- Example: {"Teleport"=true}
+-- Supply a table of  the names of enhancements you do not want the player to build
+-- Example: {"Teleport", "ResourceAllocation"}
 function RestrictEnhancements( table )
-    SimUIVars.SaveEnhancementRestriction(table)
-    import('/lua/enhancementcommon.lua').RestrictList(table)
-    Sync.EnhanceRestrict = table
+    local rest = {}
+    for _, e in table do
+        rest[e] = true
+    end
+
+    SimUIVars.SaveEnhancementRestriction(rest)
+    import('/lua/enhancementcommon.lua').RestrictList(rest)
+    Sync.EnhanceRestrict = rest
 end
 
 -- returns true if all units in group are dead
