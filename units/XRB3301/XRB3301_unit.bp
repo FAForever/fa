@@ -1,10 +1,4 @@
 UnitBlueprint {
-    AI = {
-
-        # this AI block is only added to make the construction preview work for the unit's vision range.
-        GuardScanRadius = 200,
-        StagingPlatformScanRadius = 200,
-    },
     Audio = {
         DeathExplosion = Sound {
             Bank = 'URLDestroy',
@@ -37,8 +31,8 @@ UnitBlueprint {
         'SIZE12',
         'VISIBLETORECON',
         'RECLAIMABLE',
-        'OVERLAYMISC',
         'SORTINTEL',
+        'OVERLAYRADAR'
     },
     CollisionOffsetY = -0.25,
     Defense = {
@@ -53,6 +47,9 @@ UnitBlueprint {
     },
     Description = '<LOC xrb3301_desc>Perimeter Monitoring System',
     Display = {
+        Abilities = {
+            '<LOC ability_radar>Radar',
+        },
         AnimationPermOpen = '/units/xrb3301/xrb3301_aopen.sca',
         Mesh = {
             IconFadeInZoom = 130,
@@ -139,6 +136,7 @@ UnitBlueprint {
     Intel = {
         MaxVisionRadius = 200,
         MinVisionRadius = 10,
+        RadarRadius = 200, -- implicit by vision but to get overlay in building preview
     },
     Interface = {
         HelpText = '<LOC xrb3301_help>Perimeter Monitoring System',
