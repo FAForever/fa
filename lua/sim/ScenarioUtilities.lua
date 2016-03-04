@@ -211,7 +211,6 @@ function CreateArmyUnit(strArmy,strUnit)
             unit:CreateTarmac(true, true, true, false, false)
         end
         local platoon
-        local brain = GetArmyBrain(strArmy)
         if tblUnit.platoon ~= nil and tblUnit.platoon ~= '' then
             local i = 3
             while i <= table.getn(Scenario.Platoons[tblUnit.platoon]) do
