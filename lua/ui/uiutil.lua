@@ -416,7 +416,7 @@ function UIFile(filespec, checkMods)
         end
         
         if not found then
-            WARN(debug.traceback(nil, "Warning: Unable to find file: " .. origPath .. ' ' .. filespec))
+            WARN(debug.traceback(nil, "Warning: Unable to find file: " .. origPath .. filespec))
             found = filespec
         end
 
