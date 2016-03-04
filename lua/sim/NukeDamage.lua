@@ -1,5 +1,3 @@
-local DamageArea2 = import('/lua/sim/ScenarioUtilities.lua').DamageArea2
-
 NukeAOE = Class() {
     Damage = false,
     Radius = false,
@@ -15,7 +13,7 @@ NukeAOE = Class() {
     
     DoNukeDamage = function(self, launcher, pos, brain)
         if self.TotalTime == 0 then
-            DamageArea2(launcher, pos, self.Radius, self.Damage, 'Nuke', true, true)
+            import('/lua/sim/DamageArea.lua').DamageArea(launcher, pos, self.Radius, self.Damage, 'Nuke', true, true)
         else
             ForkThread(self.SlowNuke, self, launcher, pos)
         end
