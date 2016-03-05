@@ -511,11 +511,11 @@ end
 
 function GetEnhancementTextures(unitID, iconID)
     local prefix = GetEnhancementPrefix(unitID, iconID)
-    return UIUtil.UIFile(prefix .. '_btn_up.dds'),
-    UIUtil.UIFile(prefix .. '_btn_down.dds'),
-    UIUtil.UIFile(prefix .. '_btn_over.dds'),
-    UIUtil.UIFile(prefix .. '_btn_up.dds'),
-    UIUtil.UIFile(prefix .. '_btn_sel.dds')
+    return UIUtil.UIFile(prefix .. '_btn_up.dds', true),
+    UIUtil.UIFile(prefix .. '_btn_down.dds', true),
+    UIUtil.UIFile(prefix .. '_btn_over.dds', true),
+    UIUtil.UIFile(prefix .. '_btn_up.dds', true),
+    UIUtil.UIFile(prefix .. '_btn_sel.dds', true)
 end
 
 function CommonLogic()

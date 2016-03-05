@@ -395,8 +395,14 @@ function UIFile(filespec, checkMods)
                     if checkMods then
                         if __active_mods then
                             for id, mod in __active_mods do
+                                -- Unit Icons
                                 if DiskGetFileInfo(mod.location .. filespec) then
                                     found = mod.location .. filespec
+                                    inmod = true
+                                    break
+                                -- ACU Enhancements
+                                elseif DiskGetFileInfo(mod.location .. currentPath .. filespec) then
+                                    found = mod.location .. currentPath .. filespec
                                     inmod = true
                                     break
                                 end
