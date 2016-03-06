@@ -382,6 +382,11 @@ Scenario = {
         },
 
     --[[------[ SERAPHIM SPECIFIC ]------]]--
+        ['OST_BasicLandAttack_T2SeraphimHoverAttack'] = {
+            'OST_BasicLandAttack_T2SeraphimHoverAttack', '',
+            { 'xsl0203', -1, 1, 'attack', 'AttackFormation' },
+            { 'xsl0205', -1, 1, 'attack', 'AttackFormation' },
+        },
         ['OST_BasicLandAttack_T3SeraphimMobileAA'] = {
             'OST_BasicLandAttack_T3SeraphimMobileAA', '',
             { 'dslk004', -1, 1, 'attack', 'GrowthFormation' },
@@ -1927,6 +1932,38 @@ Scenario = {
                     },
 
                     -- Seraphim Stuff --
+                    ['OSB_Child_BasicLandAttack_T2SeraphimHoverAttack'] =  {
+                        PlatoonTemplate = 'OST_BasicLandAttack_T2SeraphimHoverAttack',
+                        Priority = 498,
+                        InstanceCount = 5,
+                        LocationType = 'MAIN',
+                        PlatoonType = 'Land',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions = {
+                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                                {'default_brain', 4, 0},
+                                {'default_brain','4','0'}
+                            },
+                        },
+                        PlatoonData = {
+                            {type = 5, name = 'AMPlatoons', value = {
+                                {type = 2, name = 'String_0',  value = 'OSB_Master_BasicLandAttack'},
+                            }},
+                        },
+                        ChildrenType = {'AmphibiousTanks', 'MobileFlak'},
+                    },
                     ['OSB_Child_BasicLandAttack_T3SeraphimMobileAA'] =  {
                         PlatoonTemplate = 'OST_BasicLandAttack_T3SeraphimMobileAA',
                         Priority = 499,
