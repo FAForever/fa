@@ -86,6 +86,11 @@ Scenario = {
             '',
             { 'xea0306', 0, 1, 'support', 'None' },
         },
+        ['OST_EngineerAttack_T2CombatEngineers'] = {
+            'OST_EngineerAttack_T2CombatEngineers',
+            '',
+            { 'xel0209', 0, 1, 'attack', 'None'},
+        },
     },
 
     Armies = {
@@ -313,6 +318,55 @@ Scenario = {
                             },
                         },
                         ChildrenType = {'T2Engineers'},
+                    },
+
+                    ['OSB_Child_EngineerAttack_T2CombatEngineers'] ={
+                        PlatoonTemplate = 'OST_EngineerAttack_T2CombatEngineers',
+                        Priority = 520,
+                        InstanceCount = 1,
+                        LocationType = 'MAIN',
+                        BuildTimeOut = -1,
+                        PlatoonType = 'Land',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction =
+                        {
+                            '/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions =
+                        {
+                            {
+                                '/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            {'/lua/ai/opai/EngineerAttack_save.lua', 'EngineerAttackChildCount',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            {
+                                '/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                                {'default_brain', 1 },
+                                {'default_brain', '1'}
+                            },
+                        },
+                        PlatoonData =
+                        {
+                            {
+                                type = 5,
+                                name = 'AMPlatoons',
+                                value =
+                                {
+                                    {
+                                        type = 2,
+                                        name = 'String_0',
+                                        value = 'OSB_Master_EngineerAttack'
+                                    },
+                                }
+                            },
+                        },
+                        ChildrenType = {'CombatEngineers'},
                     },
 
                     ['OSB_Child_EngineerAttack_T2EngineersSeraphim'] = {
