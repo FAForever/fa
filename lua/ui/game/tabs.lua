@@ -410,7 +410,7 @@ function CommonLogic()
             tab:Disable()
         elseif tab.Data.disableInReplay and SessionIsReplay() then
             tab:Disable()
-        elseif tab.Data.disableForObserver and GetFocusArmy() == -1 then
+        elseif tab.Data.disableForObserver and GetFocusArmy() == -1 and not SessionIsReplay() then
             tab:Disable()
         end
         if tab.Data.pause then
