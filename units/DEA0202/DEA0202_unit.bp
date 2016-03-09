@@ -469,12 +469,11 @@ UnitBlueprint {
             InitialDamage = 75,
             Label = 'Bomb',
             MaxRadius = 60,
-            MuzzleSalvoDelay = 0.25,
+            MuzzleSalvoDelay = 0.3,
             MuzzleSalvoSize = 8,
             MuzzleVelocity = 0,
             NeedToComputeBombDrop = true,
             ProjectileId = '/projectiles/TIFNapalmCarpetBomb02/TIFNapalmCarpetBomb02_proj.bp',
-            ProjectilesPerOnFire = 8,
             RackBones = {
                 {
                     MuzzleBones = {
