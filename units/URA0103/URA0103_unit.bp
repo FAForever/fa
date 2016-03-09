@@ -11,7 +11,7 @@ UnitBlueprint {
         BreakOffIfNearNewTarget = true,
         BreakOffTrigger = 20,
         CanFly = true,
-        CombatTurnSpeed = 0.75, # 0.7
+        CombatTurnSpeed = 0.75,
         EngageDistance = 50,
         KLift = 3,
         KLiftDamping = 2.5,
@@ -21,13 +21,13 @@ UnitBlueprint {
         KRollDamping = 2,
         KTurn = 0.7,
         KTurnDamping = 1,
-        LiftFactor = 10, # 7
+        LiftFactor = 10,
         MaxAirspeed = 10,
         MinAirspeed = 10,
         PredictAheadForBombDrop = 3,     
         StartTurnDistance = 5,
         TightTurnMultiplier = 0,
-        TurnSpeed = 0.75, # 0.7
+        TurnSpeed = 0.75,
         Winged = true,
     },
     Audio = {
@@ -297,8 +297,8 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
             },
             FiringRandomness = 3,
-            FiringTolerance = 6, # [102]
-            FixBombTrajectoryFirstRun = true, # [152]
+            FiringTolerance = 6,
+            FixBombTrajectoryFirstRun = true,
             Label = 'Bomb',
             MaxRadius = 40,
             MuzzleSalvoDelay = 0.2,
@@ -327,7 +327,7 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 0.25, #from 0.5
+            RateOfFire = 0.25,
             TargetCheckInterval = 1,
             TargetPriorities = {
                 'SPECIALHIGHPRI',
