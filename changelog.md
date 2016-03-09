@@ -57,6 +57,7 @@ Patch 3652 (pending)
 - Fixed Cybran T3 MAA hitbox/bones making lots of units miss
 - Fixed Sera T1 sub not being hit by torpedoes 80% of the time while surfaced.
 - Enemy civilians are now colored in a unique red color
+- Fix bomb drop code and enable it for Janus, and UEF/Cybran T1 Bombers to attempt improvement to bomb drop characteristics
 
 **Bugs**
 - Fixed free mass exploit with Megalith eggs
