@@ -171,12 +171,12 @@ local function GetOrderBitmapNames(bitmapId)
     end
     
     local button_prefix = "/game/orders/" .. bitmapId .. "_btn_"
-    return UIUtil.SkinnableFile(button_prefix .. "up.dds")
-        ,  UIUtil.SkinnableFile(button_prefix .. "up_sel.dds")
-        ,  UIUtil.SkinnableFile(button_prefix .. "over.dds")
-        ,  UIUtil.SkinnableFile(button_prefix .. "over_sel.dds")
-        ,  UIUtil.SkinnableFile(button_prefix .. "dis.dds")
-        ,  UIUtil.SkinnableFile(button_prefix .. "dis_sel.dds")
+    return UIUtil.SkinnableFile(button_prefix .. "up.dds", true)
+        ,  UIUtil.SkinnableFile(button_prefix .. "up_sel.dds", true)
+        ,  UIUtil.SkinnableFile(button_prefix .. "over.dds", true)
+        ,  UIUtil.SkinnableFile(button_prefix .. "over_sel.dds", true)
+        ,  UIUtil.SkinnableFile(button_prefix .. "dis.dds", true)
+        ,  UIUtil.SkinnableFile(button_prefix .. "dis_sel.dds", true)
         , "UI_Action_MouseDown", "UI_Action_Rollover"   -- sets click and rollover cues
 end
 

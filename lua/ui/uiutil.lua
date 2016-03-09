@@ -433,9 +433,9 @@ function UIFile(filespec, checkMods)
 end
 
 --* return the filename as a lazy var function to allow triggering of OnDirty
-function SkinnableFile(filespec)
+function SkinnableFile(filespec, checkMods)
     return function()
-        return UIFile(filespec)
+        return UIFile(filespec, checkMods)
     end
 end
 
