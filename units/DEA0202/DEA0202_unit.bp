@@ -465,6 +465,7 @@ UnitBlueprint {
             },
             FiringRandomness = 0.1,
             FiringTolerance = 6,
+            FixBombTrajectory = true,
             InitialDamage = 75,
             Label = 'Bomb',
             MaxRadius = 60,
