@@ -92,10 +92,6 @@ DefaultProjectileWeapon = Class(Weapon) {
             self.unit:SetWorkProgress(1)
         end
 
-        if bp.FixBombTrajectory then
-            self.CBFP_CalcBallAcc = { Do = true, ProjectilesPerOnFire = (bp.ProjectilesPerOnFire or 1), MuzzleSalvoDelay = (bp.MuzzleSalvoDelay or 0.1), }
-        end
-
         ChangeState(self, self.IdleState)
     end,
 
@@ -132,8 +128,9 @@ DefaultProjectileWeapon = Class(Weapon) {
 
     -- Used mainly for Bomb drop physics calculations
     CheckBallisticAcceleration = function(self, proj)
-        if self.CBFP_CalcBallAcc and self.CBFP_CalcBallAcc.Do then
-            local acc = CalculateBallisticAcceleration(self, proj, self.CBFP_CalcBallAcc.ProjectilesPerOnFire, self.CBFP_CalcBallAcc.MuzzleSalvoDelay)
+        local bp = self:GetBlueprint()
+        if bp.FixBombTrajectory then
+            local acc = CalculateBallisticAcceleration(self, proj, bp.MuzzleSalvoSize, bp.MuzzleSalvoDelay)
             proj:SetBallisticAcceleration(-acc) -- Change projectile trajectory so it hits the target
         end
     end,
@@ -427,6 +424,7 @@ DefaultProjectileWeapon = Class(Weapon) {
     end,
 
     -- Weapon States
+
 
     -- Idle state is when the weapon has no target and is done with any animations or unpacking
     IdleState = State {
