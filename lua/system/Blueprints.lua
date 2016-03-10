@@ -467,7 +467,7 @@ function PreModBlueprints(all_bps)
         if modGSR then
             local br = nil
 
-            if cats.ENGINEER and not cats.SUBCOMMANDER then
+            if cats.ENGINEER and not cats.SUBCOMMANDER and not cats.COMMAND then
                 br = 26
             elseif cats.SCOUT then
                 br = 10
