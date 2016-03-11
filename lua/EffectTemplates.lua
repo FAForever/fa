@@ -405,14 +405,14 @@ GenericTeleportInWeapon01 = {
 }
 
 UEFTeleportCharge01 = {
---    EmtBpPath .. 'uef_teleport_charge_09_emit.bp',
+    EmtBpPath .. 'uef_teleport_charge_02_emit.bp',
+    EmtBpPath .. 'uef_teleport_charge_03_emit.bp',
+    EmtBpPath .. 'uef_teleport_charge_04_emit.bp',
+    EmtBpPath .. 'uef_teleport_charge_09_emit.bp',
 }
 
 UEFTeleportCharge02 = {
     EmtBpPath .. 'uef_teleport_charge_01_emit.bp',
---    EmtBpPath .. 'uef_teleport_charge_02_emit.bp',
---    EmtBpPath .. 'uef_teleport_charge_03_emit.bp',
---    EmtBpPath .. 'uef_teleport_charge_04_emit.bp',
     EmtBpPath .. 'uef_teleport_charge_06_emit.bp',
     EmtBpPath .. 'uef_teleport_charge_05_emit.bp',
     EmtBpPath .. 'uef_teleport_charge_07_emit.bp',

@@ -290,7 +290,7 @@ UnitBlueprint {
         TeleportEffects = {
             ChargeFxAtUnitBones = {
                 {
-                    Bone = 'Back_Upgrade_B01',
+                    Bone = 'Torso',
                     Offset = {
                         0,
                         0,

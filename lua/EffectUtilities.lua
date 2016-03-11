@@ -1364,47 +1364,6 @@ function PlayTeleportChargingEffects( unit, TeleportDestination, EffectsBag )
 
         if faction == 'UEF' then                                                              -------- UEF --------
 
-            local fn = function(unit, sx, sy, sz, ox, oy, oz, EffectsBag)
-
-                -- get position of unit and adjust for centerpoint offset found in blueprint
-                local pos = unit:GetPosition()
-                local heading = unit:GetHeading()
-                pos[1] = pos[1] + ((math.cos(heading) * ox) - (math.sin(heading) * oz))
-                pos[2] = pos[2] + oy
-                pos[3] = pos[3] + ((math.sin(heading) * ox) - (math.cos(heading) * oz))
-
-                -- creates a single flash of the cube
-                local cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
-                Warp(cfx, pos, unit:GetOrientation())
-                cfx:SetScale(sx, sy, sz)
-                EffectsBag:Add(cfx)
-
-                WaitSeconds(0.1)
-
-                -- creates a static cube, doesn't have effects of its own
-                local cube1 = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect03_proj.bp',0,0,0, nil, nil, nil )
-                Warp(cube1, pos, unit:GetOrientation())
-                cube1:SetScale(sx, sy, sz)
-                EffectsBag:Add(cube1)
-
-                WaitSeconds(0.5)
-
-                -- continuously create flashes of the cube
-                while unit and not unit.Dead and cube1 do
-                    cfx:Destroy()
-                    cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp',0,0,0, nil, nil, nil )
-                    Warp(cfx, pos, unit:GetOrientation())
-                    cfx:SetScale(sx, sy, sz)
-                    EffectsBag:Add(cfx)
-
-                    WaitSeconds(0.6)
-                end
-            end
-
-            local sx, sy, sz, ox, oy, oz = TeleportGetUnitSizes(unit)
-            local thread1 = unit:ForkThread(fn, sx, sy, sz, ox, oy, oz, EffectsBag)
-            EffectsBag:Add(thread1)
-
             unit.TeleportChargeBag = TeleportShowChargeUpFxAtUnit(unit, unit.TeleportChargeFxAtUnitOverride or EffectTemplate.UEFTeleportCharge01, EffectsBag)
 
         elseif faction == 'Cybran' then                                                       -------- CYBRAN --------
