@@ -649,6 +649,31 @@ function PatrolChainPickerThread(platoon)
     end
 end
 
+####################################################################################################################
+### SplitPatrolThread
+###     - Gives random patrol chain from the list to each unit of a platoon 
+###
+### PlatoonData
+###     - PatrolChains - List of chains to choose from
+###
+####################################################################################################################
+function SplitPatrolThread(platoon)
+    local data = platoon.PlatoonData
+    platoon:Stop()
+    if(data) then
+        if(data.PatrolChains) then
+            for k, v in platoon:GetPlatoonUnits() do
+                local chain = Random(1, table.getn(data.PatrolChains))
+                ScenarioFramework.GroupPatrolChain({v}, data.PatrolChains[chain])
+            end
+        else
+            error('*SCENARIO PLATOON AI ERROR: PatrolChains not defined', 2)
+        end
+    else
+        error('*SCENARIO PLATOON AI ERROR: PlatoonData not defined', 2)
+    end
+end
+
 ##############################################################################################################
 # function: EngineersBuildPlatoon = AddFunction	doc = "Please work function docs."
 #
