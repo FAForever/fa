@@ -249,69 +249,74 @@ function UpdateLabels()
     return labelGroup.ReclaimLabels
 end
 
-
-function HideLabels()
-    for _, c in labelGroup.ReclaimLabels or {} do
-        c:SetNeedsFrameUpdate(false)
-    end
-
-    labelGroup:Hide()    
-end
-
--- Called from commandgraph.lua:OnCommandGraphShow()
-local ReclaimThread
-function ShowReclaim(show)
-    local options = Prefs.GetFromCurrentProfile('options')
-    if show and options.gui_show_reclaim == 1 then
-        ReclaimThread = ForkThread(ShowReclaimThread)
-    else
-        if ReclaimThread then
-            KillThread(ReclaimThread)
-        end
-
-        if labelGroup then
-            HideLabels()
-        end
-    end
-end
-
 local ShowingReclaim = false
 
+local ReclaimThread
+function ShowReclaim(show)
+    if show then
+        ShowingReclaim = true
+        if not ReclaimThread then
+            ReclaimThread = ForkThread(ShowReclaimThread)
+        end
+    else
+        ShowingReclaim = false
+    end
+end
 
-function ShowReclaimThread()
+function ShowReclaimThread(watch_key)
     local i = 0
     local lastUpdate = 9999
     local view = import('/lua/ui/game/worldview.lua').viewLeft
     local camera = GetCamera("WorldCamera")
 
-    if not labelGroup or IsDestroyed(labelGroup) then
-        labelGroup = Group(view)
-        labelGroup:DisableHitTest()
-        LayoutHelpers.FillParent(labelGroup, view)
-    end
+    labelGroup = Group(view)
+    labelGroup:DisableHitTest()
+    LayoutHelpers.FillParent(labelGroup, view)
+    labelGroup:Show()
 
     oldZoom = nil
-    while true do
-        local keydown = IsKeyDown('Control')
-        local action
-
-        if ShowingReclaim and not keydown then
-            action = 'Hide'
-        elseif keydown then
-            action = 'Show'
-            if lastUpdate > 0.5 and SameZoom(camera) then
-                UpdateLabels()
-                lastUpdate = 0
-            end
-        end
-
-        if action then
-            ShowingReclaim = action == 'Show'
-            labelGroup[action](labelGroup)
+    while ShowingReclaim and (not watch_key or IsKeyDown(watch_key)) do
+        if lastUpdate > 0.5 and SameZoom(camera) then
+            UpdateLabels()
+            lastUpdate = 0
         end
 
         lastUpdate = lastUpdate + 0.1
         oldZoom = camera:GetZoom()
-        WaitSeconds(0.1)
+        WaitSeconds(.1)
+    end
+
+    labelGroup:Destroy()
+    ReclaimThread = nil
+end
+
+function ToggleReclaim()
+    ShowReclaim(not ShowingReclaim)
+end
+
+-- Called from commandgraph.lua:OnCommandGraphShow()
+local CommandGraphActive = false
+function OnCommandGraphShow(bool)
+    if ShowingReclaim and not CommandGraphActive then return end -- if on by toggle key
+    local options = Prefs.GetFromCurrentProfile('options')
+
+    CommandGraphActive = bool
+    if CommandGraphActive and options.gui_show_reclaim == 1 then
+        ForkThread(function()
+            local keydown
+            while CommandGraphActive do
+                keydown = IsKeyDown('Control')
+                if keydown ~= ShowingReclaim then -- state has changed
+                    ShowReclaim(keydown)
+                end
+                WaitSeconds(.1)
+            end
+
+            ShowReclaim(false)
+        end)
+    else
+        CommandGraphActive = false -- above coroutine runs until now
     end
 end
+
+

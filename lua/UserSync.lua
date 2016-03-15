@@ -59,7 +59,7 @@ function OnSync()
 	end
 
     for _, r in Sync.Reclaim or {} do
-        import('/modules/reclaim.lua').UpdateReclaim(r)
+        import('/lua/ui/game/reclaim.lua').UpdateReclaim(r)
     end
 	
     if Sync.Teamkill then
