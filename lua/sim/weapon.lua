@@ -335,8 +335,9 @@ Weapon = Class(moho.weapon_methods) {
                 proj.OuterRing = NukeDamage()
                 proj.OuterRing:OnCreate(bp.NukeOuterRingDamage, bp.NukeOuterRingRadius, bp.NukeOuterRingTicks, bp.NukeOuterRingTotalTime)
                 
-                -- Need to store these two for later, in case the missile lands after the launcher dies
+                -- Need to store these three for later, in case the missile lands after the launcher dies
                 proj.Launcher = self.unit
+                proj.Army = self.unit:GetArmy()
                 proj.Brain = self.unit:GetAIBrain()
             end
         end

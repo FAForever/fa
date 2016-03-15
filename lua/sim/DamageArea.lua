@@ -1,9 +1,8 @@
 local oldDamageArea = DamageArea
 
 -- Trying to mimic DamageArea as good as possible, used for nukes to bypass the bubble damage absorbation of shields.
-DamageArea = function(instigator, location, radius, damage, type, damageAllies, damageSelf)
-    local army = instigator:GetArmy()
-    local units = instigator:GetAIBrain():GetUnitsAroundPoint(categories.ALLUNITS, location, radius)
+DamageArea = function(instigator, location, radius, damage, type, damageAllies, damageSelf, brain, army)
+    local units = brain:GetUnitsAroundPoint(categories.ALLUNITS, location, radius)
 
     for _, u in units do
         if instigator == u then
