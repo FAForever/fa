@@ -882,7 +882,7 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
     end,
 
     CanOvercharge = function(self)
-        return not self.unit:IsOverchargePaused() and self:HasEnergy() and not self.unit:IsUnitState('Enhancing')
+        return not self.unit:IsOverchargePaused() and self:HasEnergy() and not self.unit:IsUnitState('Enhancing') and not self.unit:IsUnitState('Building')
     end,
 
     -- The Overcharge cool-down function
