@@ -486,7 +486,7 @@ function InitializeArmies()
 
             ----[ irumsey                                                         ]--
             ----[ Temporary defaults.  Make sure some fighting will break out.    ]--
-            for iEnemy, strEnemy in pairs(tblArmy) do
+            for iEnemy, strEnemy in tblArmy do
                 local enemyIsCiv = ScenarioInfo.ArmySetup[strEnemy].Civilian
                 local a, e = iArmy, iEnemy
                 local state = 'Enemy'
@@ -495,16 +495,18 @@ function InitializeArmies()
                     if armyIsCiv or enemyIsCiv then
                         if civOpt == 'neutral' or strArmy == 'NEUTRAL_CIVILIAN' or strEnemy == 'NEUTRAL_CIVILIAN' then
                             state = 'Neutral'
-                        elseif ScenarioInfo.Options['RevealCivilians'] == 'Yes' then
-                            state = 'Ally'
+                        end
+
+                        if ScenarioInfo.Options['RevealCivilians'] == 'Yes' then
+                            SetAlliance(a, e, 'Ally')
                             ForkThread(function()
                                 WaitSeconds(1)
-                                SetAlliance(a, e, 'Enemy')
+                                SetAlliance(a, e, state)
                             end)
+                        else
+                            SetAlliance(a, e, state)
                         end
                     end
-
-                    SetAlliance(a, e, state)
                 end
             end
         end
