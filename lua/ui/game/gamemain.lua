@@ -236,6 +236,12 @@ function CreateUI(isReplay)
         import('/lua/ui/game/economy.lua').ToggleEconPanel(false)
         import('/lua/ui/game/avatars.lua').ToggleAvatars(false)
         AddBeatFunction(UiBeat)
+    else
+        local clients = GetSessionClients()
+        if table.getsize(clients) <= 1 then
+            -- no need for unnecessary lag when playing alone
+            ConExecute('net_lag 0')
+        end
     end
 
     import('/modules/scumanager.lua').Init()
