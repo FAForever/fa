@@ -865,14 +865,16 @@ function SpawnCommander(brain, unit, effect, name, PauseAtDeath, DeathTrigger, e
 
     -- WarpIn effects hides extra enhancements bones on ACU so creating upgrades after it finnishes.
     if enhancements then
-        WaitSeconds(Delay)
-        if type(enhancements) == 'string' then
-            ACU:CreateEnhancement(upgrades)
-        elseif type(enhancements) == 'table' then
-            for k, enhancement in enhancements do
-                ACU:CreateEnhancement(enhancement)
+        ForkThread(function()
+            WaitSeconds(Delay)
+            if type(enhancements) == 'string' then
+                ACU:CreateEnhancement(upgrades)
+            elseif type(enhancements) == 'table' then
+                for k, enhancement in enhancements do
+                    ACU:CreateEnhancement(enhancement)
+                end
             end
-        end
+        end)
     end
 
     if PauseAtDeath then
