@@ -93,6 +93,7 @@ Patch 3652 (pending)
 - Tweaks to hive build effects to reduce performance impact
 - Cleanup of enhancement sync code to make it faster and more secure
 - Entities now re-use repeated sound FX instead of creating new ones every time
+- Reduce load on render thread
 
 **Other**
 - Added game-side support for future achievement system
