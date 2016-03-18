@@ -13,6 +13,20 @@ DamageArea = function(instigator, location, radius, damage, type, damageAllies, 
             end
         elseif damageAllies or not IsAlly(army, u:GetArmy()) then
             Damage(instigator, location, u, damage, type)
+            
+            -- Mark those damaged, then fall back on the original DamageArea to hit stuff out of intel
+            if not u.Dead and u.CanTakeDamage then
+                u:SetCanTakeDamage(false)
+                u.Marked = true
+            end
+        end
+    end
+    
+    oldDamageArea(instigator, location, radius, damage, type, damageAllies, damageSelf)
+    for _, u in units do
+        if not u.Dead and u.Marked then
+            u:SetCanTakeDamage(true)
+            u.Marked = nil
         end
     end
 
