@@ -828,11 +828,7 @@ function SetSlotInfo(slotNum, playerInfo)
         slot.name._text:SetFont('Arial Gras', 15)
         if not table.find(ConnectionEstablished, playerName) then
             if playerInfo.Human and not isLocallyOwned then
-                if table.find(ConnectedWithProxy, playerInfo.OwnerID) then
-                    AddChatText(LOCF("<LOC Engine0032>Connected to %s via the FAF proxy", playerName))
-                else
-                    AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", playerName))
-                end
+                AddChatText(LOCF("<LOC Engine0004>Connection to %s established.", playerName))
 
                 table.insert(ConnectionEstablished, playerName)
                 for k, v in CurrentConnection do
@@ -3161,9 +3157,6 @@ function CalcConnectionStatus(peer)
             slot.name._text:SetFont('Arial Gras', 15)
             if not table.find(ConnectionEstablished, peer.name) then
                 if playerInfo.Human and not IsLocallyOwned(peerSlot) then
-                    if table.find(ConnectedWithProxy, peer.id) then
-                        AddChatText(LOCF("<LOC Engine0032>Connected to %s via the FAF proxy.", peer.name), "Engine0032")
-                    end
                     table.insert(ConnectionEstablished, peer.name)
                     for k, v in CurrentConnection do -- Remove PlayerName in this Table
                         if v == peer.name then
@@ -3830,7 +3823,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         UpdateGame()
     end
 
-    lobbyComm.PeerDisconnected = function(self,peerName,peerID) -- Lost connection or try connect with proxy
+    lobbyComm.PeerDisconnected = function(self,peerName,peerID)
 
          -- Search and Remove the peer disconnected
         for k, v in CurrentConnection do
