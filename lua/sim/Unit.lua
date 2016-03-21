@@ -2328,7 +2328,7 @@ Unit = Class(moho.unit_methods) {
             return intEnabled
         end
     
-        local intEnabled = false
+        local intEnabled
         
         -- We need this guard because the engine emits an early OnLayerChange event that would screw us up here.
         -- The NotInitialized disabler is removed in OnStopBeingBuilt, when the Unit's intel engine state is properly initialized.
@@ -2339,9 +2339,11 @@ Unit = Class(moho.unit_methods) {
         if intel then
             intEnabled = EnableOneIntel(disabler, intel)
         else
+             intEnabled = true
             -- Loop over all intels and remove disabler
             for intel, v in self.IntelDisables do
-                intEnabled = EnableOneIntel(disabler, intel) or intEnabled -- beware of short-circuiting
+                local e = EnableOneIntel(disabler, intel)
+                intEnabled = intEnabled and e
             end
         end
 
