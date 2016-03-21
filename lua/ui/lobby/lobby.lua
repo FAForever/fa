@@ -4957,7 +4957,7 @@ function InitHostUtils()
                 index = index + 1
             end
 
-            local ownerId = gameInfo.PlayerOptions[playerSlot].OwnerID
+            local ownerID = gameInfo.PlayerOptions[playerSlot].OwnerID
             gameInfo.Observers[index] = gameInfo.PlayerOptions[playerSlot]
             gameInfo.PlayerOptions[playerSlot] = nil
 
