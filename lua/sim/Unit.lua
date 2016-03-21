@@ -537,6 +537,10 @@ Unit = Class(moho.unit_methods) {
             self:SetMaintenanceConsumptionInactive()
             self:DisableUnitIntel('ToggleBit8', 'Cloak')
         end
+
+        if not self.MaintenanceConsumption then
+            self.ToggledOff = true
+        end
     end,
 
     OnScriptBitClear = function(self, bit)
@@ -579,6 +583,10 @@ Unit = Class(moho.unit_methods) {
             self:PlayUnitAmbientSound( 'ActiveLoop' )
             self:SetMaintenanceConsumptionActive()
             self:EnableUnitIntel('ToggleBit8', 'Cloak')
+        end
+
+        if self.MaintenanceConsumption then
+            self.ToggledOff = false
         end
     end,
 
@@ -2325,7 +2333,6 @@ Unit = Class(moho.unit_methods) {
         -- We need this guard because the engine emits an early OnLayerChange event that would screw us up here.
         -- The NotInitialized disabler is removed in OnStopBeingBuilt, when the Unit's intel engine state is properly initialized.
         if self.IntelDisables['Radar']['NotInitialized'] == true and disabler ~= 'NotInitialized' then
-            --SPEW('Leaving EnableUnitIntel because NotInitialized. This should only happen once per unit spawned.')
             return
         end
 
@@ -2409,11 +2416,17 @@ Unit = Class(moho.unit_methods) {
         local recharge = bp.Intel.ReactivateTime or 10
         while self:ShouldWatchIntel() do
             WaitSeconds(0.5)
-            if aiBrain:GetEconomyStored( 'ENERGY' ) < 1 then  --Checking for less than 1 because sometimes there's more
-                self:DisableUnitIntel('Energy', nil)          --than 0 and less than 1 in stock and that last bit of
-                WaitSeconds(recharge)                         --energy isn't used. This results in the radar being
-                self:EnableUnitIntel('Energy', nil)                     --on even though there's no energy to run it. Shields
-            end                                               --have a similar bug with a similar fix. Brute51
+
+            -- Checking for less than 1 because sometimes there's more
+            -- than 0 and less than 1 in stock and that last bit of
+            -- energy isn't used. This results in the radar being
+            -- on even though there's no energy to run it. Shields
+            -- have a similar bug with a similar fix.
+            if aiBrain:GetEconomyStored('ENERGY') < 1 and not self.ToggledOff then
+                self:DisableUnitIntel('Energy', nil)
+                WaitSeconds(recharge)
+                self:EnableUnitIntel('Energy', nil)
+            end
         end
         if self.IntelThread then
             self.IntelThread = nil
