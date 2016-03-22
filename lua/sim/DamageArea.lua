@@ -3,7 +3,7 @@ local oldDamageArea = DamageArea
 -- Trying to mimic DamageArea as good as possible, used for nukes to bypass the bubble damage absorbation of shields.
 DamageArea = function(instigator, location, radius, damage, type, damageAllies, damageSelf, brain, army)
     local rect = Rect(location[1]-radius, location[3]-radius, location[1]+radius, location[3]+radius)
-    local units = GetUnitsInRect(rect)
+    local units = GetUnitsInRect(rect) or {}
 
     for _, u in units do
         if VDist3(u:GetPosition(), location) > radius then continue end
