@@ -503,9 +503,12 @@ function InitializeArmies()
                                 WaitSeconds(1)
                                 SetAlliance(a, e, state)
                             end)
-                        else
-                            SetAlliance(a, e, state)
+                            state = nil
                         end
+                    end
+
+                    if state then
+                        SetAlliance(a, e, state)
                     end
                 end
             end
