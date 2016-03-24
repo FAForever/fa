@@ -74,14 +74,7 @@ Callbacks.TransportLock = function(data)
 end
 
 Callbacks.ClearCommands = function(data, units)
-    local safe = {}
-
-    for _, u in units do
-        if OkayToMessWithArmy(u:GetArmy()) then
-            table.insert(safe, u)
-        end
-    end
-
+    local safe = SecureUnits(data.ids or units)
     IssueClearCommands(safe)
 end
 
@@ -190,8 +183,10 @@ Callbacks.GiveOrders = import('/lua/spreadattack.lua').GiveOrders
 Callbacks.ValidateAssist = function(data, units)
     local target = GetEntityById(data.target)
     if units and target then
+        if GetFocusArmy() ~= target:GetArmy() then return end
+
         for k, u in units do
-            if IsEntity(u) and OkayToMessWithArmy(target:GetArmy()) and IsInvalidAssist(u, target) then
+            if IsEntity(u) and IsInvalidAssist(u, target) then
                 IssueClearCommands({target})
                 return
             end

@@ -24,6 +24,10 @@ Prop = Class(moho.prop_methods, Entity) {
     end,
 
     OnCreate = function(self)
+        self.EventCallbacks = {
+            OnKilled = {},
+            OnReclaimed = {},
+        }
         Entity.OnCreate(self)
         self.Trash = TrashBag()
         local bp = self:GetBlueprint()
@@ -43,6 +47,34 @@ Prop = Class(moho.prop_methods, Entity) {
         self:SetHealth(self, max)
         self:SetCanTakeDamage(not EntityCategoryContains(categories.INVULNERABLE, self))
         self:SetCanBeKilled(true)
+    end,
+
+    AddPropCallback = function(self, fn, type)
+        if not fn then
+            error('*ERROR: Tried to add a callback type - ' .. type .. ' with a nil function')
+            return
+        end
+        table.insert(self.EventCallbacks[type], fn)
+    end,
+
+    DoPropCallbacks = function(self, type, param)
+        if self.EventCallbacks[type] then
+            for num,cb in self.EventCallbacks[type] do
+                cb(self, param)
+            end
+        end
+    end,
+
+    RemoveCallback = function(self, fn)
+        for k, v in self.EventCallbacks do
+            if type(v) == "table" then
+                for kcb, vcb in v do
+                    if vcb == fn then
+                        v[kcb] = nil
+                    end
+                end
+            end
+        end
     end,
 
     --Returns the cache position of the prop, since it doesn't move, it's a big optimization
@@ -68,10 +100,12 @@ Prop = Class(moho.prop_methods, Entity) {
 
     OnKilled = function(self, instigator, type, exceessDamageRatio )
         if not self.CanBeKilled then return end
+        self:DoPropCallbacks( 'OnKilled' )
         self:Destroy()
     end,
 
     OnReclaimed = function(self, entity)
+        self:DoPropCallbacks('OnReclaimed', entity)
         self.CreateReclaimEndEffects( entity, self )
         self:Destroy()
     end,

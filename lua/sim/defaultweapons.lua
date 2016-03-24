@@ -92,10 +92,6 @@ DefaultProjectileWeapon = Class(Weapon) {
             self.unit:SetWorkProgress(1)
         end
 
-        if bp.FixBombTrajectory then
-            self.CBFP_CalcBallAcc = { Do = true, ProjectilesPerOnFire = (bp.ProjectilesPerOnFire or 1), MuzzleSalvoDelay = (bp.MuzzleSalvoDelay or 0.1), }
-        end
-
         ChangeState(self, self.IdleState)
     end,
 
@@ -132,8 +128,9 @@ DefaultProjectileWeapon = Class(Weapon) {
 
     -- Used mainly for Bomb drop physics calculations
     CheckBallisticAcceleration = function(self, proj)
-        if self.CBFP_CalcBallAcc and self.CBFP_CalcBallAcc.Do then
-            local acc = CalculateBallisticAcceleration(self, proj, self.CBFP_CalcBallAcc.ProjectilesPerOnFire, self.CBFP_CalcBallAcc.MuzzleSalvoDelay)
+        local bp = self:GetBlueprint()
+        if bp.FixBombTrajectory then
+            local acc = CalculateBallisticAcceleration(self, proj, bp.MuzzleSalvoSize, bp.MuzzleSalvoDelay)
             proj:SetBallisticAcceleration(-acc) -- Change projectile trajectory so it hits the target
         end
     end,
@@ -427,6 +424,7 @@ DefaultProjectileWeapon = Class(Weapon) {
     end,
 
     -- Weapon States
+
 
     -- Idle state is when the weapon has no target and is done with any animations or unpacking
     IdleState = State {
@@ -884,7 +882,7 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
     end,
 
     CanOvercharge = function(self)
-        return not self.unit:IsOverchargePaused() and self:HasEnergy()
+        return not self.unit:IsOverchargePaused() and self:HasEnergy() and not self.unit:IsUnitState('Enhancing') and not self.unit:IsUnitState('Building')
     end,
 
     -- The Overcharge cool-down function
@@ -905,7 +903,9 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
              WaitSeconds(0.1)
         end
 
-        self:OnEnableWeapon()
+        if self.AutoMode then
+            self:OnEnableWeapon()
+        end
     end,
 
     SetAutoOvercharge = function(self, auto)
@@ -915,9 +915,14 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
             if not self.AutoThread then
                 self.AutoThread = self:ForkThread(self.AutoEnable)
             end
-        elseif self.AutoThread then
-            KillThread(self.AutoThread)
-            self.AutoThread = nil
+        else
+            if self.AutoThread then
+                KillThread(self.AutoThread)
+                self.AutoThread = nil
+            end
+            if self:IsEnabled() then
+                self:OnDisableWeapon()
+            end
         end
     end,
 
@@ -933,13 +938,21 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
     OnGotTarget = function(self)
         if self:CanOvercharge() then
             DefaultProjectileWeapon.OnGotTarget(self)
+        else
+            self:OnDisableWeapon()
         end
     end,
 
     OnFire = function(self)
         if self:CanOvercharge() then
             DefaultProjectileWeapon.OnFire(self)
+        else
+            self:OnDisableWeapon()
         end
+    end,
+
+    IsEnabled = function(self)
+        return self.enabled
     end,
 
     OnEnableWeapon = function(self)
@@ -952,6 +965,7 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         self.AimControl:SetPrecedence(20)
         self.unit.BuildArmManipulator:SetPrecedence(0)
         self.AimControl:SetHeadingPitch(self.unit:GetWeaponManipulatorByLabel(self.DesiredWeaponLabel):GetHeadingPitch())
+        self.enabled = true
     end,
 
     OnDisableWeapon = function(self)
@@ -964,9 +978,11 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         self.unit.BuildArmManipulator:SetPrecedence(0)
         self.unit:GetWeaponManipulatorByLabel(self.DesiredWeaponLabel):SetHeadingPitch(self.AimControl:GetHeadingPitch())
 
-        if self.AutoMode then
+        if self.AutoMode and not self.AutoEnable then
             self:ForkThread(self.AutoEnable)
         end
+
+        self.enabled = false
     end,
 
     OnWeaponFired = function(self)
@@ -979,12 +995,16 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         OnGotTarget = function(self)
             if self:CanOvercharge() then
                 DefaultProjectileWeapon.IdleState.OnGotTarget(self)
+            else
+                self:OnDisableWeapon()
             end
         end,
 
         OnFire = function(self)
             if self:CanOvercharge() then
                 ChangeState(self, self.RackSalvoFiringState)
+            else
+                self:OnDisableWeapon()
             end
         end,
     },
@@ -993,9 +1013,11 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         OnFire = function(self)
             if self:CanOvercharge() then
                 DefaultProjectileWeapon.RackSalvoFireReadyState.OnFire(self)
+            else
+                self:OnDisableWeapon()
             end
         end,
-    },
+    }
 }
 
 DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
@@ -1242,11 +1264,16 @@ DeathNukeWeapon = Class(BareBonesWeapon) {
         proj.InnerRing:OnCreate(bp.NukeInnerRingDamage, bp.NukeInnerRingRadius, bp.NukeInnerRingTicks, bp.NukeInnerRingTotalTime)
         proj.OuterRing = NukeDamage()
         proj.OuterRing:OnCreate(bp.NukeOuterRingDamage, bp.NukeOuterRingRadius, bp.NukeOuterRingTicks, bp.NukeOuterRingTotalTime)
-        
-        local firer = self.unit
+
+        local launcher = self.unit
         local pos = proj:GetPosition()
-        proj.InnerRing:DoNukeDamage(firer, pos)
-        proj.OuterRing:DoNukeDamage(firer, pos)
+        local army = launcher:GetArmy()
+        local brain = launcher:GetAIBrain()
+        proj.InnerRing:DoNukeDamage(launcher, pos, brain, army)
+        proj.OuterRing:DoNukeDamage(launcher, pos, brain, army)
+        
+        -- Stop it calling DoDamage any time in the future.
+        proj.DoDamage = function(self, instigator, DamageData, targetEntity) end
     end,
 }
 

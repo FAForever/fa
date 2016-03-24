@@ -6,6 +6,7 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
+local utils = import('/lua/system/utils.lua')
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Group = import('/lua/maui/group.lua').Group
@@ -230,13 +231,18 @@ function CreateUI(isReplay)
     ConExecute('res_PrefetcherActivityDelay 1')
 
     -- below added for FAF
-    import("/modules/displayrings.lua").Init()  -- added for acu and engineer build radius ui mod
     if SessionIsReplay() then
         ForkThread(SendChat)
         lastObserving = true
         import('/lua/ui/game/economy.lua').ToggleEconPanel(false)
         import('/lua/ui/game/avatars.lua').ToggleAvatars(false)
         AddBeatFunction(UiBeat)
+    else
+        local clients = GetSessionClients()
+        if table.getsize(clients) <= 1 then
+            -- no need for unnecessary lag when playing alone
+            ConExecute('net_lag 0')
+        end
     end
 
     import('/modules/scumanager.lua').Init()
@@ -246,6 +252,22 @@ function CreateUI(isReplay)
     end
 
     RegisterChatFunc(SendResumedBy, 'SendResumedBy')
+end
+
+-- Current SC_FrameTimeClamp settings allows up to 100 fps as default (some users probably set this to 0 to "increase fps" which would be counter-productive)
+-- Lets find out max hz capability of adapter so we don't render unecessary frames, should help a bit with render thread at 100%
+function AdjustFrameRate()
+    if options.vsync == 1 then return end
+
+    local video = options.video
+    local fps = 100
+
+    if type(options.primary_adapter) == 'string' then
+        local data = utils.StringSplit(options.primary_adapter, ',')
+        fps = math.max(60, math.min(100, data[3]))
+    end
+
+    ConExecute("SC_FrameTimeClamp " .. (1000 / fps ))
 end
 
 local provider = false
@@ -386,6 +408,7 @@ function CreateWldUIProvider()
         end
         supressExitDialog = false
         FlushEvents()
+        AdjustFrameRate()
     end
 
     provider.DestroyGameInterface = function(self)

@@ -808,12 +808,17 @@ function PlayVoiceOver( voSound )
 end
 
 -- Set enhancement restrictions
--- Supply a table of key->bool pairs of the names of enhancements you do not want the player to build
--- Example: {"Teleport"=true}
+-- Supply a table of  the names of enhancements you do not want the player to build
+-- Example: {"Teleport", "ResourceAllocation"}
 function RestrictEnhancements( table )
-    SimUIVars.SaveEnhancementRestriction(table)
-    import('/lua/enhancementcommon.lua').RestrictList(table)
-    Sync.EnhanceRestrict = table
+    local rest = {}
+    for _, e in table do
+        rest[e] = true
+    end
+
+    SimUIVars.SaveEnhancementRestriction(rest)
+    import('/lua/enhancementcommon.lua').RestrictList(rest)
+    Sync.EnhanceRestrict = rest
 end
 
 -- returns true if all units in group are dead
@@ -834,6 +839,53 @@ function CheckObjectives( list )
         end
     end
     return true
+end
+
+function SpawnCommander(brain, unit, effect, name, PauseAtDeath, DeathTrigger, enhancements)
+    local ACU = ScenarioUtils.CreateArmyUnit(brain, unit)
+    local Delay = 0
+
+    if effect then
+        if effect == 'Gate' then
+            FakeGateInUnit(ACU)
+        elseif effect == 'Warp' then
+            ACU:PlayCommanderWarpInEffect()
+            Delay = 2.2
+        else
+            WARN('*WARNING: Invalid effect type: ' .. effect .. '. Available types: Gate, Warp.')
+        end
+    end
+
+    -- If true is passed as parametr then it uses default name.
+    if name == true then
+        ACU:SetCustomName(GetArmyBrain(brain).Nickname)
+    elseif type(name) == 'string' then
+        ACU:SetCustomName(name)
+    end
+
+    -- WarpIn effects hides extra enhancements bones on ACU so creating upgrades after it finnishes.
+    if enhancements then
+        ForkThread(function()
+            WaitSeconds(Delay)
+            if type(enhancements) == 'string' then
+                ACU:CreateEnhancement(upgrades)
+            elseif type(enhancements) == 'table' then
+                for k, enhancement in enhancements do
+                    ACU:CreateEnhancement(enhancement)
+                end
+            end
+        end)
+    end
+
+    if PauseAtDeath then
+        PauseUnitDeath(ACU)
+    end
+
+    if DeathTrigger then
+        CreateUnitDeathTrigger(DeathTrigger, ACU)
+    end
+
+    return ACU
 end
 
 -- FakeTeleportUnitThread
@@ -872,6 +924,9 @@ function FakeGateInUnit(unit, callbackFunction)
             elseif v == 'CYBRAN' then
                 faction = 3
                 break
+            elseif v == 'SERAPHIM' then
+                faction = 4
+                break
             end
         end
 
@@ -896,6 +951,12 @@ function FakeGateInUnit(unit, callbackFunction)
             unit:SetMesh('/units/url0001/URL0001_PhaseShield_mesh', true)
             unit:ShowBone(0, true)
             unit:HideBone('Back_Upgrade', true)
+            unit:HideBone('Right_Upgrade', true)
+        elseif faction == 4 then
+            unit:SetMesh('/units/xsl0001/XSL0001_PhaseShield_mesh', true)
+            unit:ShowBone(0, true)
+            unit:HideBone('Back_Upgrade', true)
+            unit:HideBone('Left_Upgrade', true)
             unit:HideBone('Right_Upgrade', true)
         end
 
@@ -1362,7 +1423,7 @@ function AttachUnitsToTransports(units, transports)
                     if table.getn(transportBones[i].Lrg) > 0 then
                         notInserted = false
                         local bone = table.remove(transportBones[i].Lrg, 1)
-                        transports[i]:OnTransportAttach( attachBone, v )
+                        transports[i]:OnTransportAttach(bone, v )
                         v:AttachBoneTo(attachBone, transports[i], bone)
                         local bonePos = transports[i]:GetPosition(bone)
                         for j=1,2 do
@@ -1397,7 +1458,7 @@ function AttachUnitsToTransports(units, transports)
                     if table.getn(transportBones[i].Med) > 0 then
                         notInserted = false
                         local bone = table.remove(transportBones[i].Med, 1)
-                        transports[i]:OnTransportAttach( attachBone, v )
+                        transports[i]:OnTransportAttach(bone, v )
                         v:AttachBoneTo(attachBone, transports[i], bone)
                         local bonePos = transports[i]:GetPosition(bone)
                         for j=1,2 do
@@ -1420,7 +1481,7 @@ function AttachUnitsToTransports(units, transports)
                     if table.getn(transportBones[i].Sml) > 0 then
                         notInserted = false
                         local bone = table.remove(transportBones[i].Sml, 1)
-                        transports[i]:OnTransportAttach( attachBone, v )
+                        transports[i]:OnTransportAttach(bone, v )
                         v:AttachBoneTo(attachBone, transports[i], bone)
                     end
                     i = i + 1

@@ -5,6 +5,8 @@ UnitBlueprint {
             'Wing_R02',
             'Wing_L02',
         },
+        GuardReturnRadius = 125,
+        GuardScanRadius = 100,
     },
     Air = {
         AutoLandTime = 1,

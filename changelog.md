@@ -1,26 +1,23 @@
 Patch 3652 (pending)
 ============================
 
-**Whole Game**
-- Introduced Russian translations of many FAF additions to the game (Exotic_Retard)
-- Added game-side support for future achievement system
-
 **Lobby**
 - Name filter when selecting map
-- Prevent host from changing teams of others while ready
+- Prevent host from changing player teams while he is ready
 - Game quality in lobby now visible again
 - Reduced autobalance random variation to get team setups with better overall quality
 - Default to score off
+- Stopped the map filter preventing the map selected in prefs from prior games from showing
+- Tiny fix to flag layout
 
 **UI**
-- New keybinding 'soft_stop'
+- Introduced Russian translations of many FAF additions to the game (Exotic_Retard)
+- Translate some FAF additions to Italian
+- New keybindable action: 'soft_stop'
 - Soft-stop will cancel all orders of a factory except their current one, if you soft-stop a factory with only one order it will get cleared
-- Soft-stop on a silo unit will clear the current orders but not stop the actual building of a missile
 - Hold down Alt when giving a factory order to soft stop factory before issuing next order
-- Transport lock: Right click on a unit in a transport to lock it in place. If all units in transports are locked and you order unload they will be unloaded anyway.
 - Multi-upgrade: Added UI support to upgrade structures several levels at once (i.e: cybran shields, hives, mexes, factories etc)
 - Auto-overcharge: It's now possible to let overcharge fire automatically whenever you have the required power
-- Ferry orders are now persistent, even if the original transports die. Remove it by shift-ctrl right click the first beacon
 - Order repair on a wreck to rebuild it if possible by some of the selected engineers. Those not able to rebuild the wreck will assist after the build starts.
 - Units explicity repairing (not assisting) a structure that dies will automatically try to rebuild it
 - Refactor the income economy overlay not to show reclaim values appearing in the generated income column and do correct rounding of the numbers.
@@ -31,6 +28,9 @@ Patch 3652 (pending)
 - Allow the UI code to search active mods for unit icons. Mods will have to have the icons in the right place (/modname/icons/units/xxx_icon.dds). Confirmed working for Total Mayhem at least, and probably many more.
 - Show ren_networkstats in Connectivity Screen (F11)
 - Show name of the one resuming a paused game
+- Reverted the change to T1 PD icons from 3641, so now they don't give free intel on mouse-over when trying to fake PD-wall with all-wall radar ghosts.
+- Render build range of engineers using native overlay system instead of decal hack
+- Enabled Pause button in replays
 
 **Gameplay**
 - Teamkill is now detected and a player can make an explicit report
@@ -51,9 +51,15 @@ Patch 3652 (pending)
 - Diplomacy now allowed in Coop mode
 - Allow Fatboy, Atlantis, Tempest and Czar to fire while building units
 - Beam weapons now kill missiles they impact instead of wasting DPS for several ticks
+- Aeon ACU upgrade "Chrono Dampener" won't stun allied units any more. Additionally, it will fire at predetermined ticks so the effects of multiple acu's do not stack.
+- Increased TMD range by 1 and ROF by 0.2s to prevent a single TML killing a single TMD by using ground-fire to impact before the second TMD shot fires.
+- Fixed Cybran T3 MAA doing friendly damage on 1 of its 2 AA weapons
+- Fixed Cybran T3 MAA hitbox/bones making lots of units miss
+- Fixed Sera T1 sub not being hit by torpedoes 80% of the time while surfaced.
+- Enemy civilians are now colored in a unique red color
+- Fix bomb drop code and enable it for Janus, and UEF/Cybran T1 Bombers to attempt improvement to bomb drop characteristics
 
 **Bugs**
-- Chrono Dampener doesn't stun allied units anymore
 - Fixed free mass exploit with Megalith eggs
 - Fixed bug with Cybran SCUs getting EMP for free
 - Fixed bug with units getting invincible after a visit to their nearest carrier
@@ -64,11 +70,9 @@ Patch 3652 (pending)
 - Fatboy and Cybran cruisers shouldn't engage enemies way outside their range anymore
 - Fixed bug with commander not always being selected at start
 - Fixed wrecks not giving resources in Coop mode
-- Refactored and improved layer change logic
-- Intel system reworked to handle intel events better
-- Fixed Coop missions getting stuck at Operation Complete
+- Fixed Coop missions getting stuck at completion
 - Added missing Seraphim objective icons
-- All shields now overspill damage correctly based on their type
+- Shields now overkill damage correctly based on their type
 - Fixed nukes overkilling bubble shield base structure when out of range and shield up
 - Fixed Continental taking damage from AOE when it has the shield up
 - Fixed regen buffs from different sources not stacking properly. This should mean every possible interaction between veterancy, upgrades, and the Seraphim Regen Aura field all play nice
@@ -79,16 +83,39 @@ Patch 3652 (pending)
 - Fixed UEF AI unit templates in coop mode
 - Fixed an exploit with being able to upgrade restricted enhancements
 - Fixed a rare bug with builders getting near zero HP after a naval building gets destroyed the same tick as it finishes.
+- Fixed shields sometimes not turning off due to lack of Energy
+- Fixed buffs from enhancements being applied too often after unit transfer
+- Fixed subermsible naval units leaving full reclaim mass
+- Nuclear explosions now behave predictably, always bypassing/ignoring bubble shielding
 
 **Performance**
 - Optimization of score accumulation
 - Tweaks to hive build effects to reduce performance impact
 - Cleanup of enhancement sync code to make it faster and more secure
 - Entities now re-use repeated sound FX instead of creating new ones every time
+- Reduce load on render thread
+- No net_lag in single-player to increase UI response speed
 
 **Other**
+- Added game-side support for future achievement system
 - Tech-level filter in debug window now works as intended
 - Log-spam from various known events heavily reduced
+- Lots of work adapting and improving AI behavior for coop gameplay (speed2)
+- Scale aeon build effects according to build progress 
+- Show wreckage debris in reclaim beam
+
+**Contributors**
+- Sheeo
+- IceDreamer
+- Crotalus
+- speed2
+- Exotic_Retard
+- duk3luk3
+- HUSSAR
+- Downlord
+- madformuse
+- quark036
+- CodingSquirrel
 
 
 Patch 3650 (August 19, 2015)

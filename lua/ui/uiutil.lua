@@ -395,8 +395,14 @@ function UIFile(filespec, checkMods)
                     if checkMods then
                         if __active_mods then
                             for id, mod in __active_mods do
+                                -- Unit Icons
                                 if DiskGetFileInfo(mod.location .. filespec) then
                                     found = mod.location .. filespec
+                                    inmod = true
+                                    break
+                                -- ACU Enhancements
+                                elseif DiskGetFileInfo(mod.location .. currentPath .. filespec) then
+                                    found = mod.location .. currentPath .. filespec
                                     inmod = true
                                     break
                                 end
@@ -416,7 +422,7 @@ function UIFile(filespec, checkMods)
         end
         
         if not found then
-            WARN(debug.traceback(nil, "Warning: Unable to find file: " .. origPath .. ' ' .. filespec))
+            WARN(debug.traceback(nil, "Warning: Unable to find file: " .. origPath .. filespec))
             found = filespec
         end
 
@@ -427,9 +433,9 @@ function UIFile(filespec, checkMods)
 end
 
 --* return the filename as a lazy var function to allow triggering of OnDirty
-function SkinnableFile(filespec)
+function SkinnableFile(filespec, checkMods)
     return function()
-        return UIFile(filespec)
+        return UIFile(filespec, checkMods)
     end
 end
 

@@ -171,12 +171,12 @@ local function GetOrderBitmapNames(bitmapId)
     end
     
     local button_prefix = "/game/orders/" .. bitmapId .. "_btn_"
-    return UIUtil.SkinnableFile(button_prefix .. "up.dds")
-        ,  UIUtil.SkinnableFile(button_prefix .. "up_sel.dds")
-        ,  UIUtil.SkinnableFile(button_prefix .. "over.dds")
-        ,  UIUtil.SkinnableFile(button_prefix .. "over_sel.dds")
-        ,  UIUtil.SkinnableFile(button_prefix .. "dis.dds")
-        ,  UIUtil.SkinnableFile(button_prefix .. "dis_sel.dds")
+    return UIUtil.SkinnableFile(button_prefix .. "up.dds", true)
+        ,  UIUtil.SkinnableFile(button_prefix .. "up_sel.dds", true)
+        ,  UIUtil.SkinnableFile(button_prefix .. "over.dds", true)
+        ,  UIUtil.SkinnableFile(button_prefix .. "over_sel.dds", true)
+        ,  UIUtil.SkinnableFile(button_prefix .. "dis.dds", true)
+        ,  UIUtil.SkinnableFile(button_prefix .. "dis_sel.dds", true)
         , "UI_Action_MouseDown", "UI_Action_Rollover"   -- sets click and rollover cues
 end
 
@@ -209,30 +209,36 @@ end
 
 function Stop(units)
     local units = units or GetSelectedUnits()
-    local launchers = EntityCategoryFilterDown(categories.SILO, units)
-    if launchers[1] then
-        Select.Hidden(function()
-            SelectUnits(launchers)
-            local cb = { Func = 'ClearCommands'}
-            SimCallback(cb, true)
-        end)
+
+    if units[1] then
+        IssueUnitCommand(units, 'Stop')
+    end
+end
+
+function ClearCommands(units)
+    local cb = { Func = 'ClearCommands'}
+
+    if units then
+        local ids = {}
+        for _, u in units do
+            table.insert(ids, u:GetEntityId())
+        end
+        cb.Args = {ids=ids}
     end
 
-    local stop_units = EntityCategoryFilterOut(categories.SILO, units)
-    if stop_units[1] then
-        IssueUnitCommand(stop_units, 'Stop')
-    end
+    SimCallback(cb, true)
 end
 
 function SoftStop(units)
     local units = units or GetSelectedUnits()
     import('/lua/ui/game/construction.lua').ResetOrderQueues(units)
-    Stop(EntityCategoryFilterOut(categories.FACTORY, units))
+    ClearCommands(EntityCategoryFilterDown(categories.SILO, units))
+    Stop(EntityCategoryFilterOut((categories.SHOWQUEUE * categories.STRUCTURE)+categories.FACTORY+categories.SILO, units))
 end
 
 function StopOrderBehavior(self, modifiers)
     local userKeyMap = Prefs.GetFromCurrentProfile("UserKeyMap")
-    if userKeyMap['S'] == 'soft_stop' then
+    if userKeyMap['S'] == 'soft_stop' and not modifiers.Shift then
         SoftStop()
     else
         Stop()
@@ -682,7 +688,7 @@ end
 
 local function OverchargeInit(control, unitList)
     if not control.autoModeIcon then
-        control.autoModeIcon = Bitmap(control, UIUtil.UIFile('/game/orders/autocast_bmp.dds'))
+        control.autoModeIcon = Bitmap(control, UIUtil.UIFile('/game/orders/autocast_green.dds'))
         LayoutHelpers.AtCenterIn(control.autoModeIcon, control)
         control.autoModeIcon:DisableHitTest()
         control.autoModeIcon:SetAlpha(0)
@@ -707,12 +713,17 @@ local function OverchargeInit(control, unitList)
 
     control._isAutoMode = IsAutoOCMode(unitList)
 
+    control._curHelpText = control._data.helpText
     if control._isAutoMode then
-        control._curHelpText = control._data.helpText .. "_auto"
-        control.autoBuildEffect = CreateAutoBuildEffect(control)
         control.autoModeIcon:SetAlpha(1)
     else
-        control._curHelpText = control._data.helpText
+        control.autoModeIcon:SetAlpha(0)
+    end
+
+    -- needs to override this to prevent call to self:DisableHitTest()
+    control.Disable = function(self)
+        self._isDisabled = true
+        self:OnDisable()
     end
 end
 
@@ -720,18 +731,11 @@ function OverchargeBehavior(self, modifiers)
     if modifiers.Left then
         EnterOverchargeMode()
     elseif modifiers.Right then
+        self._curHelpText = self._data.helpText
         if self._isAutoMode then
-            self._curHelpText = self._data.helpText
-            if self.autoBuildEffect then
-                self.autoBuildEffect:Destroy()
-            end
             self.autoModeIcon:SetAlpha(0)
             self._isAutoMode = false
         else
-            self._curHelpText = self._data.helpText .. "_auto"
-            if not self.autoBuildEffect then
-                self.autoBuildEffect = CreateAutoBuildEffect(self)
-            end
             self.autoModeIcon:SetAlpha(1)
             self._isAutoMode = true
         end
@@ -740,8 +744,6 @@ function OverchargeBehavior(self, modifiers)
             controls.mouseoverDisplay.text:SetText(self._curHelpText)
         end
 
-        --SetAutoSurfaceMode(currentSelection, self._isAutoMode)
-        --LOG("AutoOvercharge " .. repr(currentSelection) .. tostring(self._isAutoMode))
         local cb = { Func = 'AutoOvercharge', Args = { auto = self._isAutoMode == true } }
         SimCallback(cb, true)
     end
@@ -935,14 +937,18 @@ local function AddOrder(orderInfo, slot, batchMode)
     end
 
     -- set up tooltips
+
     checkbox.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
-            if controls.orderGlow then
-                controls.orderGlow:Destroy()
-                controls.orderGlow = false
-            end                
             CreateMouseoverDisplay(self, self._curHelpText, 1)
-            glowThread = CreateOrderGlow(self)
+
+            if not self:IsDisabled() then
+                if controls.orderGlow then
+                    controls.orderGlow:Destroy()
+                    controls.orderGlow = false
+                end
+                glowThread = CreateOrderGlow(self)
+            end
         elseif event.Type == 'MouseExit' then
             if controls.mouseoverDisplay then
                 controls.mouseoverDisplay:Destroy()

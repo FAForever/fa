@@ -211,7 +211,6 @@ function CreateArmyUnit(strArmy,strUnit)
             unit:CreateTarmac(true, true, true, false, false)
         end
         local platoon
-        local brain = GetArmyBrain(strArmy)
         if tblUnit.platoon ~= nil and tblUnit.platoon ~= '' then
             local i = 3
             while i <= table.getn(Scenario.Platoons[tblUnit.platoon]) do
@@ -464,7 +463,7 @@ function InitializeArmies()
             local armyIsCiv = ScenarioInfo.ArmySetup[strArmy].Civilian
 
             if armyIsCiv and civOpt ~= 'neutral' and strArmy ~= 'NEUTRAL_CIVILIAN' then -- give enemy civilians darker color
-                SetArmyColorIndex(strArmy, 13)
+                SetArmyColor(strArmy, 255, 48, 48) -- non-player red color for enemy civs
             end
 
             if (not armyIsCiv and bCreateInitial) or (armyIsCiv and civOpt ~= 'removed') then
@@ -487,7 +486,7 @@ function InitializeArmies()
 
             ----[ irumsey                                                         ]--
             ----[ Temporary defaults.  Make sure some fighting will break out.    ]--
-            for iEnemy, strEnemy in pairs(tblArmy) do
+            for iEnemy, strEnemy in tblArmy do
                 local enemyIsCiv = ScenarioInfo.ArmySetup[strEnemy].Civilian
                 local a, e = iArmy, iEnemy
                 local state = 'Enemy'
@@ -496,16 +495,22 @@ function InitializeArmies()
                     if armyIsCiv or enemyIsCiv then
                         if civOpt == 'neutral' or strArmy == 'NEUTRAL_CIVILIAN' or strEnemy == 'NEUTRAL_CIVILIAN' then
                             state = 'Neutral'
-                        elseif ScenarioInfo.Options['RevealCivilians'] == 'Yes' then
-                            state = 'Ally'
+                        end
+
+                        if ScenarioInfo.Options['RevealCivilians'] == 'Yes' and ScenarioInfo.ArmySetup[strEnemy].Human then
+                            local real_state = state
+                            SetAlliance(a, e, 'Ally')
                             ForkThread(function()
                                 WaitSeconds(1)
-                                SetAlliance(a, e, 'Enemy')
+                                SetAlliance(a, e, real_state)
                             end)
+                            state = nil
                         end
                     end
 
-                    SetAlliance(a, e, state)
+                    if state then
+                        SetAlliance(a, e, state)
+                    end
                 end
             end
         end

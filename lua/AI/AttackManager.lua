@@ -1,3 +1,5 @@
+local Utilities = import('/lua/utilities.lua')
+
 -- ATTACK MANAGER SPEC
 --{
 --    AttackCheckInterval = interval,
@@ -258,7 +260,7 @@ AttackManager = Class({
                         local addUnits = {}
                         if v.LocationType then
                             local location = false
-                            for locNum, locData in self.PBM.Locations do
+                            for locNum, locData in self.brain.PBM.Locations do
                                 if v.LocationType == locData.LocationType then
                                     location = locData
                                     break

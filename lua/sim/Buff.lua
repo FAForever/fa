@@ -56,14 +56,24 @@ function ApplyBuff(unit, buffName, instigator)
     end
 
     local ubt = unit.Buffs.BuffTable
-
+    
+    -- We're going to need some naughty, hard-coded stuff here for a regen aura edge case where
+    -- we need the advanced version to take precedence over the lower version, but not vice versa.
+    if buffName == 'SeraphimACURegenAura' and ubt['COMMANDERAURA_AdvancedRegenAura']['SeraphimACUAdvancedRegenAura'] then return end
+    
+    if buffName == 'SeraphimACUAdvancedRegenAura' then
+        for key, bufftbl in ubt['COMMANDERAURA_RegenAura'] do
+            RemoveBuff(unit, key, true)
+        end
+    end
+    
     if def.Stacks == 'REPLACE' and ubt[def.BuffType] then
-        for key, bufftbl in unit.Buffs.BuffTable[def.BuffType] do
+        for key, bufftbl in ubt[def.BuffType] do
             RemoveBuff(unit, key, true)
         end
     end
 
-    --If add this buff to the list of buffs the unit has becareful of stacking buffs.
+    -- If add this buff to the list of buffs the unit has becareful of stacking buffs.
     if not ubt[def.BuffType] then
         ubt[def.BuffType] = {}
     end
@@ -115,7 +125,7 @@ function ApplyBuff(unit, buffName, instigator)
         end
     end
 
-    --If the buff has a duration, then
+    -- If the buff has a duration, then
     if def.Duration and def.Duration > 0 then
         local thread = ForkThread(BuffWorkThread, unit, buffName, instigator)
         unit.Trash:Add(thread)
@@ -198,7 +208,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
 
             unit:SetMaxHealth(val)
 
-            if not vals.DoNoFill then
+            if not vals.DoNoFill and not unit.IsBeingTransferred then
                 if val > oldmax then
                     unit:AdjustHealth(unit, val - oldmax)
                 else
@@ -349,8 +359,9 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
     end
 end
 
---Calculates the buff from all the buffs of the same time the unit has.
+-- Calculates the buff from all the buffs of the same time the unit has.
 function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
+    
     local adds = 0
     local mults = 1.0
     local multsTotal = 0 -- Used only for regen buffs

@@ -154,8 +154,8 @@ Unit = Class(moho.unit_methods) {
             SpecialToggleEnableFunction = false,
             SpecialToggleDisableFunction = false,
 
-            OnAttachedToTransport = {}, --Returns self, transport
-            OnDetachedToTransport = {}, --Returns self, transport
+            OnAttachedToTransport = {}, --Returns self, transport, bone
+            OnDetachedFromTransport = {}, --Returns self, transport, bone
         }
     end,
 
@@ -537,6 +537,10 @@ Unit = Class(moho.unit_methods) {
             self:SetMaintenanceConsumptionInactive()
             self:DisableUnitIntel('ToggleBit8', 'Cloak')
         end
+
+        if not self.MaintenanceConsumption then
+            self.ToggledOff = true
+        end
     end,
 
     OnScriptBitClear = function(self, bit)
@@ -579,6 +583,10 @@ Unit = Class(moho.unit_methods) {
             self:PlayUnitAmbientSound( 'ActiveLoop' )
             self:SetMaintenanceConsumptionActive()
             self:EnableUnitIntel('ToggleBit8', 'Cloak')
+        end
+
+        if self.MaintenanceConsumption then
+            self.ToggledOff = false
         end
     end,
 
@@ -999,7 +1007,7 @@ Unit = Class(moho.unit_methods) {
             elseif focus then --Handling upgrades
                 if self:IsUnitState('Upgrading') then
                     baseData = self:GetBlueprint().Economy --Upgrading myself, substract ev. baseCost
-                elseif focus.originalBuilder and not focus.originalBuilder.Dead and focus.originalBuilder:IsUnitState('Upgrading') then
+                elseif focus.originalBuilder and not focus.originalBuilder.Dead and focus.originalBuilder:IsUnitState('Upgrading') and focus.originalBuilder:GetFocusUnit() == focus then
                     baseData = focus.originalBuilder:GetBlueprint().Economy
                 end
 
@@ -1414,7 +1422,7 @@ Unit = Class(moho.unit_methods) {
         local pos = self:GetPosition()
         local layer = self:GetCurrentLayer()
 
-        if layer == 'Water' then
+        if layer == 'Water' or layer == 'Sub' then
             --Reduce the mass value of submerged wrecks
             mass = mass * 0.5
             energy = energy * 0.5
@@ -1571,7 +1579,7 @@ Unit = Class(moho.unit_methods) {
         local isNaval = EntityCategoryContains(categories.NAVAL, self)
         local shallSink = (
             (layer == 'Water' or layer == 'Sub') and  -- In a layer for which sinking is meaningful
-            not EntityCategoryContains(categories.FACTORY * categories.STRUCTURE * categories.NAVAL, self)  -- Exclude naval factories
+            not EntityCategoryContains(categories.STRUCTURE, self)  -- Exclude structures
         )
         WaitSeconds(utilities.GetRandomFloat( self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax) )
         self:DestroyAllDamageEffects()
@@ -2022,7 +2030,10 @@ Unit = Class(moho.unit_methods) {
         local bp = self:GetBlueprint()
         if bp.Enhancements and bp.EnhancementPresetAssigned and bp.EnhancementPresetAssigned.Enhancements then
             for k, v in bp.EnhancementPresetAssigned.Enhancements do
-                self:CreateEnhancement(v)
+                -- Enhancements may already have been created by SimUtils.TransferUnitsOwnership
+                if not self:HasEnhancement(v) then
+                    self:CreateEnhancement(v)
+                end
             end
         end
     end,
@@ -2322,7 +2333,6 @@ Unit = Class(moho.unit_methods) {
         -- We need this guard because the engine emits an early OnLayerChange event that would screw us up here.
         -- The NotInitialized disabler is removed in OnStopBeingBuilt, when the Unit's intel engine state is properly initialized.
         if self.IntelDisables['Radar']['NotInitialized'] == true and disabler ~= 'NotInitialized' then
-            --SPEW('Leaving EnableUnitIntel because NotInitialized. This should only happen once per unit spawned.')
             return
         end
 
@@ -2406,11 +2416,17 @@ Unit = Class(moho.unit_methods) {
         local recharge = bp.Intel.ReactivateTime or 10
         while self:ShouldWatchIntel() do
             WaitSeconds(0.5)
-            if aiBrain:GetEconomyStored( 'ENERGY' ) < 1 then  --Checking for less than 1 because sometimes there's more
-                self:DisableUnitIntel('Energy', nil)          --than 0 and less than 1 in stock and that last bit of
-                WaitSeconds(recharge)                         --energy isn't used. This results in the radar being
-                self:EnableUnitIntel('Energy', nil)                     --on even though there's no energy to run it. Shields
-            end                                               --have a similar bug with a similar fix. Brute51
+
+            -- Checking for less than 1 because sometimes there's more
+            -- than 0 and less than 1 in stock and that last bit of
+            -- energy isn't used. This results in the radar being
+            -- on even though there's no energy to run it. Shields
+            -- have a similar bug with a similar fix.
+            if aiBrain:GetEconomyStored('ENERGY') < 1 and not self.ToggledOff then
+                self:DisableUnitIntel('Energy', nil)
+                WaitSeconds(recharge)
+                self:EnableUnitIntel('Energy', nil)
+            end
         end
         if self.IntelThread then
             self.IntelThread = nil
@@ -3669,16 +3685,10 @@ Unit = Class(moho.unit_methods) {
     OnStartTransportBeamUp = function(self, transport, bone)
         local slot = transport.slots[bone]
         if slot then
-            local free = IsEntity(slot) and transport:GetFreeSlot(slot)
-            if free then
-                transport:MoveCargo(slot, free)
-            else
-                self:GetAIBrain():OnTransportFull()
-                IssueClearCommands({self})
-                return
-            end
+            self:GetAIBrain():OnTransportFull()
+            IssueClearCommands({self})
+            return
         end
-        transport:ReserveSlot(bone)
         self:DestroyIdleEffects()
         self:DestroyMovementEffects()
         local army =  self:GetArmy()
@@ -3702,18 +3712,15 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    MarkWeaponsOnTransport = function(self, unit, transport)
-        --Mark the weapons on a transport
-        if unit then
-            for i = 1, unit:GetWeaponCount() do
-                local wep = unit:GetWeapon(i)
-                wep:SetOnTransport(transport)
-            end
+    MarkWeaponsOnTransport = function(self, bool)
+        for i = 1, self:GetWeaponCount() do
+            local wep = self:GetWeapon(i)
+            wep:SetOnTransport(bool)
         end
     end,
 
     OnStorageChange = function(self, loading)
-        self:MarkWeaponsOnTransport(self, loading)
+        self:MarkWeaponsOnTransport(loading)
 
         if loading then self:HideBone(0, true)
         else self:ShowBone(0, true) end
@@ -3757,17 +3764,6 @@ Unit = Class(moho.unit_methods) {
                 WaitFor(self.TransAnimation)
             end
         end
-    end,
-
-    TransportLock = function(self, bool)
-        bool = bool == true
-        if bool ~= self.TransportLock then
-            self.Sync.locked = bool
-            if bool then
-                IssueClearCommands({self})
-            end
-        end
-        self.TransportLocked = bool
     end,
 
     -------------------------------------------------------------------------------------------
@@ -3961,11 +3957,20 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnAttachedToTransport = function(self, transport, bone)
-        self:DoUnitCallbacks( 'OnAttachedToTransport', transport )
+        self:MarkWeaponsOnTransport(true)
+        if self:ShieldIsOn() then
+            self:DisableShield()
+            self:DisableDefaultToggleCaps()
+        end
+        self:DoUnitCallbacks( 'OnAttachedToTransport', transport, bone)
     end,
 
-    OnDetachedToTransport = function(self, transport)
-        self:DoUnitCallbacks( 'OnDetachedToTransport', transport )
+    OnDetachedFromTransport = function(self, transport, bone)
+        self:MarkWeaponsOnTransport(false)
+        self:EnableShield()
+        self:EnableDefaultToggleCaps()
+        self:TransportAnimation(-1)
+        self:DoUnitCallbacks( 'OnDetachedFromTransport', transport, bone)
     end,
 
     --- Deprecated functionality
