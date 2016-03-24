@@ -29,6 +29,7 @@ XSL0001 = Class(ACUUnit) {
             end,
         },
         OverCharge = Class(SDFChronotronOverChargeCannonWeapon) {},
+        AutoOverCharge = Class(SDFChronotronOverChargeCannonWeapon) {},
     },
 
     __init = function(self)
@@ -391,6 +392,8 @@ XSL0001 = Class(ACUUnit) {
             wep:ChangeMaxRadius(bp.NewMaxRadius or 44)
             local oc = self:GetWeaponByLabel('OverCharge')
             oc:ChangeMaxRadius(bp.NewMaxRadius or 44)
+            local aoc = self:GetWeaponByLabel('AutoOverCharge')
+            aoc:ChangeMaxRadius(bpDisrupt or 44)
         elseif enh == 'RateOfFireRemove' then
             local wep = self:GetWeaponByLabel('ChronotronCannon')
             local bpDisrupt = self:GetBlueprint().Weapon[1].RateOfFire
@@ -399,6 +402,8 @@ XSL0001 = Class(ACUUnit) {
             wep:ChangeMaxRadius(bpDisrupt or 22)
             local oc = self:GetWeaponByLabel('OverCharge')
             oc:ChangeMaxRadius(bpDisrupt or 22)
+            local aoc = self:GetWeaponByLabel('AutoOverCharge')
+            aoc:ChangeMaxRadius(bpDisrupt or 22)
         end
     end,
 }

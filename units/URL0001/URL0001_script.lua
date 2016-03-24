@@ -46,6 +46,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
         },
 
         OverCharge = Class(CDFOverchargeWeapon) {},
+        AutoOverCharge = Class(CDFOverchargeWeapon) {},
     },
 
     __init = function(self)
@@ -294,6 +295,8 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             microwave:ChangeMaxRadius(bp.NewMaxRadius or 44)
             local oc = self:GetWeaponByLabel('OverCharge')
             oc:ChangeMaxRadius(bp.NewMaxRadius or 44)
+            local aoc = self:GetWeaponByLabel('AutoOverCharge')
+            aoc:ChangeMaxRadius(bp.NewMaxRadius or 44)
         elseif enh == 'CoolingUpgradeRemove' then
             local wep = self:GetWeaponByLabel('RightRipper')
             local bpDisrupt = self:GetBlueprint().Weapon[1].RateOfFire
@@ -304,6 +307,8 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             microwave:ChangeMaxRadius(bpDisrupt or 22)
             local oc = self:GetWeaponByLabel('OverCharge')
             oc:ChangeMaxRadius(bpDisrupt or 22)
+            local aoc = self:GetWeaponByLabel('AutoOverCharge')
+            aoc:ChangeMaxRadius(bpDisrupt or 22)
         elseif enh == 'MicrowaveLaserGenerator' then
             self:SetWeaponEnabledByLabel('MLG', true)
         elseif enh == 'MicrowaveLaserGeneratorRemove' then

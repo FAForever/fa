@@ -2091,7 +2091,7 @@ CommandUnit = Class(WalkingLandUnit) {
     end,
 
     SetAutoOvercharge = function(self, auto)
-        local wep = self:GetWeaponByLabel('OverCharge')
+        local wep = self:GetWeaponByLabel('AutoOverCharge')
         if wep.NeedsUpgrade then return end
 
         wep:SetAutoOvercharge(auto)

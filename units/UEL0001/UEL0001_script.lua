@@ -20,6 +20,7 @@ UEL0001 = Class(ACUUnit) {
         DeathWeapon = Class(DeathNukeWeapon) {},
         RightZephyr = Class(TDFZephyrCannonWeapon) {},
         OverCharge = Class(TDFOverchargeWeapon) {},
+        AutoOverCharge = Class(TDFOverchargeWeapon) {},
         TacMissile = Class(TIFCruiseMissileLauncher) {
         },
         TacNukeMissile = Class(TIFCruiseMissileLauncher) {
@@ -346,6 +347,8 @@ UEL0001 = Class(ACUUnit) {
             wep:ChangeMaxRadius(bp.NewMaxRadius or 44)
             local oc = self:GetWeaponByLabel('OverCharge')
             oc:ChangeMaxRadius(bp.NewMaxRadius or 44)
+            local aoc = self:GetWeaponByLabel('AutoOverCharge')
+            aoc:ChangeMaxRadius(bp.NewMaxRadius or 44)
         elseif enh =='HeavyAntiMatterCannonRemove' then
             local bp = self:GetBlueprint().Enhancements['HeavyAntiMatterCannon']
             if not bp then return end
@@ -355,6 +358,8 @@ UEL0001 = Class(ACUUnit) {
             wep:ChangeMaxRadius(bpDisrupt or 22)
             local oc = self:GetWeaponByLabel('OverCharge')
             oc:ChangeMaxRadius(bpDisrupt or 22)
+            local aoc = self:GetWeaponByLabel('AutoOverCharge')
+            aoc:ChangeMaxRadius(bpDisrupt or 22)
         elseif enh == 'ResourceAllocation' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
