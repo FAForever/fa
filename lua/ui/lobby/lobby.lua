@@ -2763,7 +2763,7 @@ function CreateUI(maxPlayers)
     else
         GUI.restrictedUnitsOrPresetsBtn.label:SetText(LOC("<LOC lobui_0332>Unit Manager"))
         GUI.restrictedUnitsOrPresetsBtn.OnClick = function(self, modifiers)
-            import('/lua/ui/lobby/restrictedUnitsDlg.lua').CreateDialog(GUI.panel, gameInfo.GameOptions.RestrictedCategories, function() end, function() end, false)
+            import('/lua/ui/lobby/UnitsManager.lua').CreateDialog(GUI.panel, gameInfo.GameOptions.RestrictedCategories, function() end, function() end, false)
         end
         Tooltip.AddButtonTooltip(GUI.restrictedUnitsOrPresetsBtn, 'lob_RestrictedUnitsClient')
     end

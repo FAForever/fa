@@ -31,6 +31,16 @@ Patch 3652 (pending)
 - Reverted the change to T1 PD icons from 3641, so now they don't give free intel on mouse-over when trying to fake PD-wall with all-wall radar ghosts.
 - Render build range of engineers using native overlay system instead of decal hack
 - Enabled Pause button in replays
+- In Units Manager, added more preset restrictions (e.g. No T1 spam, No Snipes, No TMLs)
+- In Units Manager, separated some existing preset restrictions (e.g. game-enders, nukes) for better selection
+- In Units Manager, added custom restrictions for all FA units 
+- In Units Manager, added custom restrictions for modded units when mods are activated
+- In Units Manager, added option to restrict units using preset restrictions and/or custom restrictions
+- In Units Manager, added grouping of units based on faction, type, purpose
+- In Units Manager, added detailed tooltips with stats for weapons, defense, and eco for all units 
+- In Units Manager, improved description of preset restrictions
+- In Mods Manager, added filters for UI/Game/Disabled mods 
+- In Mods Manager, improved sorting mods by their activation status and names  
 
 **Gameplay**
 - Teamkill is now detected and a player can make an explicit report

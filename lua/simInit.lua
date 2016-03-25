@@ -83,25 +83,44 @@ function SetupSession()
 
     -- if build/enhancement restrictions chosen, set them up
     local buildRestrictions, enhRestrictions = nil, {}
-    if ScenarioInfo.Options.RestrictedCategories then
-        local restrictedUnits = import('/lua/ui/lobby/restrictedUnitsData.lua').restrictedUnits
-        for _, name in ScenarioInfo.Options.RestrictedCategories do
-            local enhancements = restrictedUnits[name].enhancement
-            if enhancements then
-                for _, enhancement in enhancements do
-                    table.insert(enhRestrictions, enhancement)
-                end
-            end
 
-            local categoryExpression = restrictedUnits[name].categoryExpression
-            if categoryExpression then
-                categoryExpression = "(" .. categoryExpression .. ")"
+    local restrictions = ScenarioInfo.Options.RestrictedCategories
+	if restrictions then
+        table.print(restrictions, 'RestrictedCategories')
+	    local presets = import('/lua/ui/lobby/UnitsRestrictions.lua').GetPresetsData()
+        for index, restriction in restrictions do
+            
+            local preset = presets[restriction]
+            if not preset then -- custom restriction  
+                --TODO find a way to seprate custom restrictions of units/enhancements
+                LOG('restriction.custom >'.. restriction ..'<') 
+
+                -- using hash table because it is fater to check for restrictions later in game    
+                enhRestrictions[restriction] = true
+
                 if buildRestrictions then
-                    buildRestrictions = buildRestrictions .. " + " .. categoryExpression
+                    buildRestrictions = buildRestrictions .. " + (" .. restriction .. ")"
                 else
-                    buildRestrictions = categoryExpression
+                    buildRestrictions = "(" .. restriction .. ")"
                 end
-            end
+            else -- preset restriction  
+                if preset.categories then
+                    LOG('restriction.categories '.. restriction) 
+                    if buildRestrictions then
+                        buildRestrictions = buildRestrictions .. " + (" .. preset.categories .. ")"
+                    else
+                        buildRestrictions = "(" .. preset.categories .. ")"
+                    end
+                end 
+                if preset.enhancements then
+                    LOG('restriction.enhancement '.. restriction)
+                    table.print(preset.enhancements, 'restriction.enhancements ')
+                    for _, enhancement in preset.enhancements do
+                        enhRestrictions[enhancement] = true
+                        --table.insert(enhRestrictions, enhancement)
+                    end
+                end
+            end           
         end
     end
 
@@ -111,7 +130,8 @@ function SetupSession()
         ScenarioInfo.BuildRestrictions = buildRestrictions
     end
 
-    if enhRestrictions then
+    if table.getsize(enhRestrictions) > 0 then
+    table.print(enhRestrictions, 'enhRestrictions0 ')
         import('/lua/enhancementcommon.lua').RestrictList(enhRestrictions)
     end
 

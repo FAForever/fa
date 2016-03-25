@@ -2479,8 +2479,8 @@ Unit = Class(moho.unit_methods) {
 
     OnWorkBegin = function(self, work)
         local enhCommon = import('/lua/enhancementcommon.lua')
-        local rest = enhCommon.GetRestricted()
-        if rest[work] then
+        local restrictions = enhCommon.GetRestricted()  
+        if restrictions[work] then
             self:OnWorkFail(work)
             return false
         end

@@ -93,4 +93,15 @@ Blacklist = {
     ['7749EEN4-DE86-5CC2-39AC-35692BDE76XF'] = UPGRADE,
     ['1749EEN4-DE86-5CC2-39AC-35692BDE76XF'] = UPGRADE,
     ['EEFFA8C6-96D9-11E4-9DA1-460D1D5D46B0'] = UPGRADE,
+
+    -- No TMLs  
+    ['63472293-f7d7-4b77-ba7b-d04ad09f63de'] = OBSOLETE, -- Units Manager 2.0
+    -- No Mobile missile launchers  
+    ['dcdbdbcb-b5f1-4828-9298-dca2f4f17a9a'] = OBSOLETE, -- Units Manager 2.0
+    -- No Heavy Art
+    ['ffeca075-c0cd-4355-861b-0bb29c75af10'] = OBSOLETE, -- Units Manager 2.0
+    -- No T3 Mobile Anti-Air units v5 
+    ['ba3d087d-ceb7-495a-b606-3e1593750a5d'] = OBSOLETE, -- Units Manager 2.0
+
+
 }
