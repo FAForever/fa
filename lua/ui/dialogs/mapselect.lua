@@ -504,7 +504,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     end
     restrictedUnitsButton.OnClick = function(self, modifiers)
         mapList:AbandonKeyboardFocus()
-        import('/lua/ui/lobby/restrictedUnitsDlg.lua').CreateDialog(dialogContent,
+        import('/lua/ui/lobby/UnitsManager.lua').CreateDialog(dialogContent,
             restrictedCategories,
             function(rc)
                 restrictedCategories = rc
@@ -520,7 +520,8 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     LayoutHelpers.LeftOf(modButton, restrictedUnitsButton, 74)
     Tooltip.AddButtonTooltip(modButton, "Lobby_Mods")
     modButton.OnClick = function(self, modifiers)
-        ModManager.CreateDialog(dialogContent, availableMods, OnModsChanged)
+        -- direct import allows data caching in ModsManager
+        import('/lua/ui/lobby/ModsManager.lua').CreateDialog(dialogContent, availableMods, OnModsChanged)
     end
     dialogContent.modButton = modButton
 

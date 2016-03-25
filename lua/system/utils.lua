@@ -1,6 +1,6 @@
 --=========================================================================================================
--- RandomIter(table) returns a function that when called, returns a pseudo-random element of the supplied table.
--- Each element of the table will be returned once. This is essentially for "shuffling" sets.
+--- RandomIter(table) returns a function that when called, returns a pseudo-random element of the supplied table.
+--- Each element of the table will be returned once. This is essentially for "shuffling" sets.
 --=========================================================================================================
 function RandomIter(someSet)
     local keyList = {}
@@ -22,10 +22,10 @@ end
 
 
 --==============================================================================
--- safecall(msg, fn, ...) calls the given function with the given
--- args, and catches any error and logs a warning including the given msg.
--- Returns nil if the function failed, otherwise returns the function's result.
---------------------------------------------------------------------------------
+--- safecall(msg, fn, ...) calls the given function with the given
+--- args, and catches any error and logs a warning including the given msg.
+--- Returns nil if the function failed, otherwise returns the function's result.
+--==============================================================================
 function safecall(msg, fn, ...)
     local ok, result = pcall(fn, unpack(arg))
     if ok then
@@ -38,9 +38,10 @@ end
 
 
 --==============================================================================
--- table.copy(t) returns a shallow copy of t.
---------------------------------------------------------------------------------
+--- table.copy(t) returns a shallow copy of t.
+--==============================================================================
 function table.copy(t)
+    if not t then return end -- prevents looping over nil table 
     local r = {}
     for k,v in t do
         r[k] = v
@@ -49,10 +50,11 @@ function table.copy(t)
 end
 
 --==============================================================================
--- table.contains(t,val) returns the key for val if it is in t.
--- Otherwise, return nil
---------------------------------------------------------------------------------
+--- table.contains(t,val) returns the key for val if it is in t.
+--- Otherwise, return nil
+--==============================================================================
 function table.find(t,val)
+    if not t then return end -- prevents looping over nil table 
     for k,v in t do
         if v == val then
             return k
@@ -62,9 +64,12 @@ function table.find(t,val)
 end
 
 --==============================================================================
--- table.subset(t1,t2) returns true iff every key/value pair in t1 is also in t2
---------------------------------------------------------------------------------
+--- table.subset(t1,t2) returns true iff every key/value pair in t1 is also in t2
+--==============================================================================
 function table.subset(t1,t2)
+    if not t1 and not t2 then return true end  -- nothing is in nothing
+    if not t1 then return true end  -- nothing is in something 
+    if not t2 then return false end -- something is not in nothing
     for k,v in t1 do
         if t2[k] ~= v then return false end
     end
@@ -72,16 +77,17 @@ function table.subset(t1,t2)
 end
 
 --==============================================================================
--- table.equal(t1,t2) returns true iff t1 and t2 contain the same key/value pairs.
---------------------------------------------------------------------------------
+--- table.equal(t1,t2) returns true iff t1 and t2 contain the same key/value pairs.
+--==============================================================================
 function table.equal(t1,t2)
     return table.subset(t1,t2) and table.subset(t2,t1)
 end
 
 --==============================================================================
--- table.removeByValue(t,val) remove a field by value instead of by index
---------------------------------------------------------------------------------
+--- table.removeByValue(t,val) remove a field by value instead of by index
+--==============================================================================
 function table.removeByValue(t,val)
+    if not t then return end -- prevent looping over nil table
     for k,v in t do
         if v == val then
             table.remove(t,k)
@@ -91,8 +97,8 @@ function table.removeByValue(t,val)
 end
 
 --==============================================================================
--- table.deepcopy(t) returns a copy of t with all sub-tables also copied.
---------------------------------------------------------------------------------
+--- table.deepcopy(t) returns a copy of t with all sub-tables also copied.
+--==============================================================================
 function table.deepcopy(t,backrefs)
     if type(t)=='table' then
         if backrefs==nil then backrefs = {} end
@@ -115,9 +121,9 @@ end
 
 
 --==============================================================================
--- table.merged(t1,t2) returns a table in which fields from t2 overwrite
--- fields from t1. Neither t1 nor t2 is modified. The returned table may
--- share structure with either t1 or t2, so it is not safe to modify.
+--- table.merged(t1,t2) returns a table in which fields from t2 overwrite
+--- fields from t1. Neither t1 nor t2 is modified. The returned table may
+--- share structure with either t1 or t2, so it is not safe to modify.
 --
 -- For example:
 --       t1 = { x=1, y=2, sub1={z=3}, sub2={w=4} }
@@ -128,7 +134,7 @@ end
 --
 --       merged(t2, t1) ->
 --           { x=1, y=2, sub1={a=6,z=3}, sub2={w=4} }
---------------------------------------------------------------------------------
+--==============================================================================
 function table.merged(t1, t2)
 
     if t1==t2 then
@@ -154,8 +160,11 @@ function table.merged(t1, t2)
     return t1
 end
 
+--==============================================================================
 --- Write all undefined keys from t2 into t1.
+--==============================================================================
 function table.assimilate(t1, t2)
+    if not t2 then return t1 end -- prevent looping over nil table
     for k, v in t2 do
         if t1[k] == nil then
             t1[k] = v
@@ -165,8 +174,11 @@ function table.assimilate(t1, t2)
     return t1
 end
 
+--==============================================================================
 --- Remove all keys in t2 from t1.
+--==============================================================================
 function table.subtract(t1, t2)
+    if not t2 then return t1 end -- prevent looping over nil table
     for k, v in t2 do
         t1[k] = nil
     end
@@ -175,29 +187,33 @@ function table.subtract(t1, t2)
 end
 
 --==============================================================================
--- table.cat(t1, t2) performs a shallow "merge" of t1 and t2, where t1 and t2
--- are expected to be numerically keyed (existing keys are discarded).
+--- table.cat(t1, t2) performs a shallow "merge" of t1 and t2, where t1 and t2
+--- are expected to be numerically keyed (existing keys are discarded).
 --
 -- Example:
 --   table.cat({1, 2, 3}, {'A', 'House', 3.14})  ->  {1, 2, 3, 'A', 'House', 3.14}
 --
---------------------------------------------------------------------------------
+--==============================================================================
 function table.cat(t1, t2)
-    local tRet = {}
-
+    -- handling nil tables before lopping
+    if not t1 then return table.copy(t2) end
+    if not t2 then return table.copy(t1) end
+    local r = {}
     for i,v in t1 do
-        table.insert(tRet, v)
+        table.insert(r, v)
     end
 
     for i,v in t2 do
-        table.insert(tRet, v)
+        table.insert(r, v)
     end
 
-    return tRet
+    return r
 end
 
---- Concatenate arbitrarily-many tables (equivalent to table.cat, but varargs. Slightly more
--- overhead, but can constructively concat *all* the things)
+--==============================================================================
+--- Concatenate arbitrarily-many tables (equivalent to table.cat, but varargs. 
+--- Slightly more overhead, but can constructively concat *all* the things)
+--==============================================================================
 function table.concatenate(...)
     local ret = {}
 
@@ -212,10 +228,11 @@ function table.concatenate(...)
     return ret
 end
 
+--==============================================================================
 --- Destructively concatenate two tables. (numerical keys only)
---
--- Appends the keys of t2 onto t1, returning it. The original t1 is destroyed, but this avoids the
--- need to copy the values in t1, saving some time.
+--- Appends the keys of t2 onto t1, returning it. The original t1 is destroyed, 
+--- but this avoids the need to copy the values in t1, saving some time.
+--==============================================================================
 function table.destructiveCat(t1, t2)
     for k, v in t2 do
         table.insert(t1, v)
@@ -223,11 +240,10 @@ function table.destructiveCat(t1, t2)
 end
 
 --==============================================================================
--- table.sorted(t, [comp]) is the same as table.sort(t, comp) except it returns
--- a sorted copy of t, leaving the original unchanged.
---
--- [comp] is an optional comparison function, defaulting to less-than.
---------------------------------------------------------------------------------
+--- table.sorted(t, [comp]) is the same as table.sort(t, comp) except it returns
+--- a sorted copy of t, leaving the original unchanged.
+--- [comp] is an optional comparison function, defaulting to less-than.
+--==============================================================================
 function table.sorted(t, comp)
     local r = table.copy(t)
     table.sort(r, comp)
@@ -236,18 +252,18 @@ end
 
 
 --==============================================================================
--- sort_by(field) provides a handy comparison function for sorting
--- a list of tables by some field.
---
--- For example,
---       my_list={ {name="Fred", ...}, {name="Wilma", ...}, {name="Betty", ...} ... }
---
---       table.sort(my_list, sort_by 'name')
---           to get names in increasing order
---
---       table.sort(my_list, sort_down_by 'name')
---           to get names in decreasing order
---------------------------------------------------------------------------------
+--- sort_by(field) provides a handy comparison function for sorting
+--- a list of tables by some field.
+---
+--- For example,
+---       my_list={ {name="Fred", ...}, {name="Wilma", ...}, {name="Betty", ...} ... }
+---
+---       table.sort(my_list, sort_by 'name')
+---           to get names in increasing order
+---
+---       table.sort(my_list, sort_down_by 'name')
+---           to get names in decreasing order
+--==============================================================================
 function sort_by(field)
     return function(t1,t2)
         return t1[field] < t2[field]
@@ -262,12 +278,12 @@ end
 
 
 --==============================================================================
--- table.keys(t, [comp]) -- Return a list of the keys of t, sorted.
---
--- [comp] is an optional comparison function, defaulting to less-than.
---------------------------------------------------------------------------------
+--- table.keys(t, [comp]) -- Return a list of the keys of t, sorted.
+--- [comp] is an optional comparison function, defaulting to less-than.
+--==============================================================================
 function table.keys(t, comp)
     local r = {}
+    if not t then return r end -- prevents looping over nil table
     for k,v in t do
         table.insert(r,k)
     end
@@ -277,25 +293,33 @@ end
 
 
 --==============================================================================
--- table.values(t) -- Return a list of the values of t, in unspecified order.
---------------------------------------------------------------------------------
+--- table.values(t) -- Return a list of the values of t, in unspecified order.
+--==============================================================================
 function table.values(t)
     local r = {}
+    if not t then return r end -- prevents looping over nil table
     for k,v in t do
         table.insert(r,v)
     end
     return r
 end
 
+--==================================================================================
+--- Concatenate keys of a table into a string and separates them by optional string.
+--==============================================================================---
+function table.concatkeys(t, sep)
+	sep = sep or ", "
+	local tt = table.keys(t)
+	return table.concat(tt,sep) 
+end 
 
 --==============================================================================
--- sortedpairs(t, [comp]) -- Iterate over a table in key-sorted order:
---   for k,v in sortedpairs(t) do
---       print(k,v)
---   end
---
--- [comp] is an optional comparison function, defaulting to less-than.
---------------------------------------------------------------------------------
+--- sortedpairs(t, [comp]) -- Iterate over a table in key-sorted order:
+---   for k,v in sortedpairs(t) do
+---       print(k,v)
+---   end
+--- [comp] is an optional comparison function, defaulting to less-than.
+--==============================================================================
 function sortedpairs(t, comp)
     local keys = table.keys(t, comp)
     local i=1
@@ -307,13 +331,16 @@ function sortedpairs(t, comp)
         end
     end
 end
-
-
 --==============================================================================
--- table.getsize(t) returns actual size of a table, including string keys
---------------------------------------------------------------------------------
+--- table.getsize(t) returns actual size of a table, including string keys
+--==============================================================================
 function table.getsize(t)
-    if type(t) ~= 'table' then return end
+    -- handling nil table like empty tables so that no need to check 
+    -- for nil table and then size of table:
+    -- if t and table.getsize(t) > 0 then 
+    -- do some thing 
+    -- end 
+    if type(t) ~= 'table' then return 0 end 
     local size = 0
     for k, v in t do
         size = size + 1
@@ -321,18 +348,13 @@ function table.getsize(t)
     return size
 end
 
-
-
 --==============================================================================
--- table.inverse(t) returns a table with keys and values from t reversed.
---
--- e.g. table.inverse {'one','two','three'} => {one=1, two=2, three=3}
---      table.inverse {foo=17, bar=100}     => {[17]=foo, [100]=bar}
---
--- If t contains duplicate values, it is unspecified which one will be returned.
---
--- e.g. table.inverse {foo='x', bar='x'} => possibly {x='bar'} or {x='foo'}
---------------------------------------------------------------------------------
+--- table.inverse(t) returns a table with keys and values from t reversed.
+--- e.g. table.inverse {'one','two','three'} => {one=1, two=2, three=3}
+---      table.inverse {foo=17, bar=100}     => {[17]=foo, [100]=bar}
+--- If t contains duplicate values, it is unspecified which one will be returned.
+--- e.g. table.inverse {foo='x', bar='x'} => possibly {x='bar'} or {x='foo'}
+--==============================================================================
 function table.inverse(t)
     r = {}
     for k,v in t do
@@ -341,11 +363,37 @@ function table.inverse(t)
     return r
 end
 
+--==============================================================================
+--- reverses order of values in a table using their index
+--- table.reverse {'one','two','three'} => {'three', 'two', 'one'}
+--==============================================================================
+function table.reverse(t)
+	local reversed = {}
+	local items = table.indexize(t) -- convert from hash table
+	local itemsCount = table.getsize(t)
+	for k, v in ipairs(items) do
+		reversed[itemsCount + 1 - k] = v
+	end
+	return reversed
+end
 
 --==============================================================================
--- table.map(fn,t) returns a table with the same keys as t but with
--- fn applied to each value.
---------------------------------------------------------------------------------
+--- converts hash table to a new table with keys from 1 to size of table and the same values
+--- it is useful for preparing hash table before sorting its values
+--- table.indexize { ['a'] = 'one', ['b'] = 'two', ['c'] = 'three' } => 
+---                {   [1] = 'one',   [2] = 'two',   [3] = 'three' } 
+--==============================================================================
+function table.indexize(t)
+	local indexized = {}
+	for k, v in t do
+		table.insert(indexized, v)
+	end
+	return indexized
+end	
+--==============================================================================
+--- table.map(fn,t) returns a table with the same keys as t but with
+--- fn applied to each value.
+--==============================================================================
 function table.map(fn, t)
     r = {}
     for k,v in t do
@@ -353,22 +401,15 @@ function table.map(fn, t)
     end
     return r
 end
-
-
-
 --==============================================================================
--- table.empty(t) returns true iff t has no keys/values.
---------------------------------------------------------------------------------
+--- table.empty(t) returns true iff t has no keys/values.
+--==============================================================================
 function table.empty(t)
-    for k,v in t do
-        return false
-    end
-    return true
+    return table.getsize(t) == 0 
 end
-
 --==============================================================================
--- table.shuffle(t) returns a shuffled table
---------------------------------------------------------------------------------
+--- table.shuffle(t) returns a shuffled table
+--==============================================================================
 function table.shuffle(t)
     local r = {}
     for key, val in RandomIter(t) do
@@ -380,42 +421,61 @@ function table.shuffle(t)
     end
     return r
 end
-
+--==============================================================================
 -- Pretty-print a table. Depressingly large amount of wheel-reinvention were required, thanks to
 -- SC's Lua being a bit weird and the existing solutions to this problem being aggressively optimised
--- for some stupid reason. :/
-function printField(k, v, prefix)
-    if "string" == type(v) then
-        WARN(prefix .. k .. " = " .. "\"" .. v .. "\"")
-    elseif "table" == type(v) then
-        WARN(prefix .. k .. " = ")
-        table.print(v, prefix .. "    ", WARN)
+--==============================================================================
+function printField(k, v, tblName, printer)
+	if not printer then printer = WARN end
+    if not tblName then tblName = "" end
+    if "table" == type(k) then
+        table.print(k, tblName .. " ", printer)
     else
-        WARN(prefix .. k .. " = " .. tostring(v))
+        tblName = tblName .. '' .. tostring(k)  
+    end
+    if "string" == type(v) then
+        printer(tblName .. " = " .. "\"" .. v .. "\"")
+    elseif "table" == type(v) then
+        --printer(tblName .. k .. " = ")
+        table.print(v, tblName .. "  ", printer)
+    else
+        printer(tblName .. " = " .. tostring(v))
     end
 end
-
-function table.print(tbl, prefix)
-    if not prefix then prefix = "" end
+--==============================================================================
+--- Prints keys and values of a table and sub-tables if present
+--- @param tbl specifies a table to print
+--- @param tblPrefix specifies optional table prefix/name
+--- @param printer specifies optional message printer: LOG, WARN, error, etc.
+--- e.g. table.print(categories)
+---      table.print(categories, 'categories')
+---      table.print(categories, 'categories', 'WARN')
+--==============================================================================
+function table.print(tbl, tblPrefix, printer)
+    if not printer then printer = LOG end
+    if not tblPrefix then tblPrefix = "" end
     if not tbl then
-        WARN("nil")
+        printer(tblPrefix .." table is nil")
         return
     end
-
-    WARN(prefix.."{")
+    if table.getsize(tbl) == 0 then
+        printer(tblPrefix .." { }")
+        return
+    end
+    printer(tblPrefix.." {")
     for k, v in pairs(tbl) do
-        printField(k, v, prefix .. "    ", WARN)
+        printField(k, v, tblPrefix .. "    ", printer)
     end
 
-    WARN(prefix.."}")
+    printer(tblPrefix.." }")
 end
-
+--==============================================================================
 --- Filter a table using a function.
---
--- @param t Table to filter
--- @param filterFunc Decision function to use to filter the table.
--- @return A new table containing every mapping from t for which filterFunc returns `true` when
---         passed the value.
+--- @param t Table to filter
+--- @param filterFunc Decision function to use to filter the table.
+--- @return A new table containing every mapping from t for which filterFunc 
+--- returns `true` when passed the value.
+--==============================================================================
 function table.filter(t, filterFunc)
     local newTable = {}
     for k, v in t do
@@ -426,8 +486,11 @@ function table.filter(t, filterFunc)
 
     return newTable
 end
-
+--==============================================================================
+--- table.unique(t) returns a new table with unique values
+--==============================================================================
 function table.unique(t)
+    if not t then return end -- prevents looping over nil table
     local unique = {}
     local ins = {}
 
@@ -442,7 +505,7 @@ function table.unique(t)
 end
 
 --=========================================================================================================
--- StringJoin returns items as a single string, separated by the delimiter
+--- StringJoin returns items as a single string, separated by the delimiter
 --=========================================================================================================
 function StringJoin(items, delimiter)
     local str = "";
@@ -452,7 +515,9 @@ function StringJoin(items, delimiter)
     return str
 end
 
+--==============================================================================
 --- "explode" a string into a series of tokens, using a separator character `sep`
+--==============================================================================
 function StringSplit(str, sep)
     local sep, fields = sep or ":", {}
     local pattern = string.format("([^%s]+)", sep)
@@ -461,12 +526,59 @@ function StringSplit(str, sep)
 end
 
 --=========================================================================================================
--- StringStartsWith returns true if the string starts with the specified value
+--- StringStartsWith returns true if the string starts with the specified value
 --=========================================================================================================
 function StringStartsWith(stringToMatch, valueToSeek)
     return string.sub(stringToMatch,1,valueToSeek:len())==valueToSeek
 end
 
+--==============================================================================
+--- function extracts a string between two specified strings  
+--- e.g. StringExtract('/path/name_end.lua', '/', '_end', true) --> name
+--=========================================================================================================
+function StringExtract(str, str1, str2, fromEnd)
+	local pattern = str1 .. '(.*)' .. str2
+	if fromEnd then pattern = '.*' .. pattern end
+	local i, ii, m = string.find(str, pattern)
+	return m 
+end
+--==============================================================================
+--- function adds comma as thousands seperator in specified value
+--- e.g. StringComma(10000) --> 10,000
+--=========================================================================================================
+function StringComma(value)
+    local str = value or 0
+    while true do  
+      str, k = string.gsub(str, "^(-?%d+)(%d%d%d)", '%1,%2')
+      if (k==0) then
+        break
+      end
+    end 
+    return str
+end
+--==============================================================================
+--- sort two variables based on their numeric value or alpha order (strings)
+--==============================================================================
+function Sort(itemA, itemB)
+	if not itemA or not itemB then return 0 end
+	
+	if (type(itemA) == "string" or 
+		type(itemB) == "string") then
+		if string.lower(itemA) == string.lower(itemB) then
+			return 0
+		else
+			-- sort string using alpha order
+			return string.lower(itemA) < string.lower(itemB) 
+		end
+	else 
+	   if math.abs(itemA - itemB) < 0.0001 then
+			return 0
+	   else
+			-- sort numbers in decreasing order
+			return itemA > itemB
+	   end
+	end
+end
 function math.round(num, idp)
     if not idp then
         return math.floor(num+.5)
@@ -474,7 +586,27 @@ function math.round(num, idp)
         return tonumber(string.format("%." .. (idp or 0) .. "f", num))
     end
 end
-
+--==============================================================================
+--- Clamps numeric value to specified Min and Max range
+--==============================================================================
 function math.clamp(v, min, max)
     return math.max(min, math.min(max, v))
+end
+local timeStart = nil
+--================================================================================
+--- Starts timer to check how long a process is taking, useful for optimization
+--================================================================================
+function TimerStart()
+    timeStart = CurrentTime() 
+end
+--================================================================================
+--- Stops timer and returns how much time a process took from calling TimerStart()
+--================================================================================
+function TimerStop()
+    local timeStop = 0
+    if timeStart then 
+       timeStop  = CurrentTime() - timeStart 
+       timeStart = CurrentTime() -- reset time start
+    end 
+    return string.format("%0.3f seconds", timeStop)
 end
