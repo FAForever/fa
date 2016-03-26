@@ -128,10 +128,10 @@ function CreateDialog(parent, availableMods, saveBehaviour)
     scrollGroup = Group(dialogContent)
     
     LayoutHelpers.AtLeftIn(scrollGroup, dialogContent, 2) 
-	scrollGroup.Top:Set(function() return subtitle.Bottom() + 5 end)
+    scrollGroup.Top:Set(function() return subtitle.Bottom() + 5 end)
     scrollGroup.Bottom:Set(function() return SaveButton.Top() - 20 end)
     scrollGroup.Width:Set(function() return dialogContent.Width() - 20 end)
-	  -- top, bottom
+    -- top, bottom
     UIUtil.CreateLobbyVertScrollbar(scrollGroup, 1, 0, -10, 10)
     scrollGroup.top = 1
     
@@ -219,16 +219,16 @@ function CreateDialog(parent, availableMods, saveBehaviour)
     Tooltip.AddControlTooltip(filterGameMods, { 
         text = 'Filter Game Mods', 
         body = 'Toggle visiblity of all game mods in above list of mods.' } )
-	   
+
     LayoutHelpers.AtRightIn(filterGameMods, dialogContent,position)
     LayoutHelpers.AtBottomIn(filterGameMods, dialogContent, 20)
     --filterGameMods.OnCheck = function(self, checked)
-    --    local tag = modsTags[self.tag]
-    --	local color = checked and self.selectedColor or self.unselectedColor
-	--	self.bg:SetSolidColor(color)
-    --    tag.filtered = checked
-    --    FilterMods()
-	--end    
+    --  local tag = modsTags[self.tag]
+    --  local color = checked and self.selectedColor or self.unselectedColor
+    --  self.bg:SetSolidColor(color)
+    --  tag.filtered = checked
+    --  FilterMods()
+    --end    
     position = position + 85
     local filterUIMods = CreateModsFilter(dialogContent, modsTags.UI)
     Tooltip.AddControlTooltip(filterUIMods, { 
@@ -279,22 +279,22 @@ function CreateModsFilter(parent, tag)
     UIUtil.SkinnableFile('/MODS/double.dds'),
     UIUtil.SkinnableFile('/MODS/disabled.dds'),
     UIUtil.SkinnableFile('/MODS/disabled.dds'),
-		    'UI_Tab_Click_01', 'UI_Tab_Rollover_01') 
+        'UI_Tab_Click_01', 'UI_Tab_Rollover_01') 
 
     checkbox.tag = tag.key
     checkbox.selectedColor  = tag.color  --#317E807E,FF363636
-	checkbox.unselectedColor = '317E807E' 
+    checkbox.unselectedColor = '317E807E' 
     checkbox.border = Bitmap(checkbox)
     LayoutHelpers.AtVerticalCenterIn(checkbox.border, checkbox)
-	LayoutHelpers.AtHorizontalCenterIn(checkbox.border, checkbox)
+    LayoutHelpers.AtHorizontalCenterIn(checkbox.border, checkbox)
     checkbox.bg = Bitmap(checkbox)
     LayoutHelpers.AtVerticalCenterIn(checkbox.bg, checkbox)
-	LayoutHelpers.AtHorizontalCenterIn(checkbox.bg, checkbox)
+    LayoutHelpers.AtHorizontalCenterIn(checkbox.bg, checkbox)
      
     checkbox.label = UIUtil.CreateText(checkbox, tag.name, 12, 'Arial Bold')
     checkbox.label:SetColor('FFB4B6B4') --#FFB4B6B4
     LayoutHelpers.AtVerticalCenterIn(checkbox.label, checkbox)
-	LayoutHelpers.AtHorizontalCenterIn(checkbox.label, checkbox)
+    LayoutHelpers.AtHorizontalCenterIn(checkbox.label, checkbox)
 
     local height = checkbox.label.Height() + 15  -- function() return label.Height() + 5 end
     local width = 80
@@ -309,16 +309,16 @@ function CreateModsFilter(parent, tag)
            modTag.filtered = not checked
            color = checked and modTag.color or color 
         end
- 		--self.bg:SetSolidColor(color)
+        --self.bg:SetSolidColor(color)
         FilterMods()
-	end 
+    end 
 
     checkbox.border.Width:Set(width) 
     checkbox.border.Height:Set(height)
 
-	checkbox.bg.Width:Set(width - 2) 
+    checkbox.bg.Width:Set(width - 2) 
     checkbox.bg.Height:Set(height - 2)
-	  
+
     return checkbox 
 end
     
@@ -344,8 +344,7 @@ local function GetModsFiles(mod, pattern)
     local units = '*_unit.bp'
      
     for k,file in DiskFindFiles(mod.location, pattern) do
-        
-    	BlueprintLoaderUpdateProgress()
+        BlueprintLoaderUpdateProgress()
         safecall("loading mod blueprint "..file, doscript, file)
     end
 end
@@ -677,7 +676,7 @@ function DeactivateMod(uid, visited)
 end
 
 function SortMods(sortBy)
-	table.sort(controlList, function(a,b)
+    table.sort(controlList, function(a,b)
         -- sort mods first by type and then by name
         local uid = a.modInfo.uid
         if activeMods[a.modInfo.uid] and 
@@ -698,8 +697,7 @@ function SortMods(sortBy)
             end
         end  
         return 0
-	end)	
-	 
+    end)
 end
 function CreateListElement(parent, modInfo, Pos)
     local group = Group(parent)
@@ -714,12 +712,12 @@ function CreateListElement(parent, modInfo, Pos)
         UIUtil.SkinnableFile('/MODS/double.dds'),
         UIUtil.SkinnableFile('/MODS/disabled.dds'),
         UIUtil.SkinnableFile('/MODS/disabled.dds'),
-		  'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
+            'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
     group.bg.Height:Set(modIconSize + 10)
-	group.bg.Width:Set(dialogWidth - 15) 
+    group.bg.Width:Set(dialogWidth - 15) 
      
     group.Height:Set(modIconSize + 20)
-	group.Width:Set(dialogWidth - 20)  
+    group.Width:Set(dialogWidth - 20)  
     LayoutHelpers.AtLeftTopIn(group, parent, 2, group.Height()*(Pos-1))
    
     group.pos = Pos
