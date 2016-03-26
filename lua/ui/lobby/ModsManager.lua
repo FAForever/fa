@@ -102,7 +102,7 @@ function CreateDialog(parent, availableMods, saveBehaviour)
     end
 
     -- Title
-    local title = UIUtil.CreateText(dialogContent, 'Mods Manager', 20, UIUtil.titleFont)
+    local title = UIUtil.CreateText(dialogContent, '<LOC _Mod_Manager>Mods Manager', 20, UIUtil.titleFont)
     title:SetColor('B9BFB9')
     title:SetDropShadow(true)
     LayoutHelpers.AtHorizontalCenterIn(title, dialogContent, 0)
@@ -218,7 +218,7 @@ function CreateDialog(parent, availableMods, saveBehaviour)
     local filterGameMods = CreateModsFilter(dialogContent, modsTags.GAME)
     Tooltip.AddControlTooltip(filterGameMods, { 
         text = 'Filter Game Mods', 
-        body = 'Toggle visiblity of all game mods in above list of mods.' } )
+        body = 'Toggle visibility of all game mods in above list of mods.' } )
 
     LayoutHelpers.AtRightIn(filterGameMods, dialogContent,position)
     LayoutHelpers.AtBottomIn(filterGameMods, dialogContent, 20)
@@ -233,7 +233,7 @@ function CreateDialog(parent, availableMods, saveBehaviour)
     local filterUIMods = CreateModsFilter(dialogContent, modsTags.UI)
     Tooltip.AddControlTooltip(filterUIMods, { 
         text = 'Filter UI Mods', 
-        body = 'Toggle visiblity of all UI mods in above list of mods.' } )
+        body = 'Toggle visibility of all UI mods in above list of mods.' } )
     LayoutHelpers.AtRightIn(filterUIMods, dialogContent, position)
     LayoutHelpers.AtBottomIn(filterUIMods, dialogContent, 20)
     
@@ -241,7 +241,7 @@ function CreateDialog(parent, availableMods, saveBehaviour)
     local filterDisabledMods = CreateModsFilter(dialogContent, modsTags.DISABLED)
     Tooltip.AddControlTooltip(filterDisabledMods, { 
         text = 'Filter Disabled Mods', 
-        body = 'Toggle visiblity of all disabled mods in above list of mods.' } )
+        body = 'Toggle visibility of all disabled mods in above list of mods.' } )
     LayoutHelpers.AtRightIn(filterDisabledMods, dialogContent, position)
     LayoutHelpers.AtBottomIn(filterDisabledMods, dialogContent, 20)
          
@@ -349,7 +349,7 @@ local function GetModsFiles(mod, pattern)
     end
 end
 
---- Initialise the mod list UI.
+--- Initialize the mod list UI.
 function RefreshModsList()
     if controlList then
         for k, v in controlList do
@@ -565,7 +565,7 @@ function RefreshModsList()
 end
 
 --- Activate the mod with the given uid
--- @param isRecursing Indicates this is a recursve call (usually pulling in dependencies), so should
+-- @param isRecursing Indicates this is a recursive call (usually pulling in dependencies), so should
 --                    not prompt the user for input.
 -- @param visited The set of mods visited during this recursive set of calls (used to break cycles)
 function ActivateMod(uid, isRecursing, visited)
@@ -583,7 +583,7 @@ function ActivateMod(uid, isRecursing, visited)
     local deps = modDependencyMap[uid]
 
     if deps then
-        -- Any conflicting mods activated? We desugared exclusive mods to a universal conflict set, so
+        -- Any conflicting mods activated? We discard exclusive mods to a universal conflict set, so
         -- those are handled here, too.
         if deps.conflicts then
             -- List of uuids that need to be disabled for this mod to work.
@@ -764,7 +764,7 @@ function CreateListElement(parent, modInfo, Pos)
         local uid = modInfo.uid
         group.bg.OnCheck = function(self, checked)
             if checked then
-                table.print(allMods[uid], 'actived mod')
+                table.print(allMods[uid], 'active mod')
                 ActivateMod(uid)
             else
                 DeactivateMod(uid)
