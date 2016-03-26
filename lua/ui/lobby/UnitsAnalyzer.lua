@@ -118,7 +118,7 @@ CategoriesHidden  = {
 	["BUILTBYCOMMANDER"] = true,	 
 	["BUILTBYEXPERIMENTALSUB"] = true,	 
 	["BUILTBYQUANTUMGATE"] = true,	 
-	["VERIFYMISSILEUI"] = true,
+	--["AIRSTAGINGPLATFORM"] = true,
 	["BUBBLESHIELDSPILLOVERCHECK"] = true,	  
 	["BENIGN"] = true,	 
 	["CAPTURE"] = true,	 
@@ -177,10 +177,7 @@ CategoriesHidden  = {
 	["SHOWATTACKRETICLE"] = true,	 
 	["TACTICALMISSILEPLATFORM"] = true,	 
 	["NEEDMOBILEBUILD"] = true,	 
-	["PATROLHELPER"] = true,	
-	["RESEARCH"] = true,	   
-    ["MASSFABRICATION"] = true,	  
-    ["MASSEXTRACTION"] = true,	  
+	["PATROLHELPER"] = true,	  
 }
    
 Factions = {
@@ -449,8 +446,10 @@ function GetWeaponProjectile(bp, weapon)
     end 
     
     --NOTE that weapon.ProjectilesPerOnFire is not used at all in FA game
-    if weapon.MuzzleSalvoSize > 1 then 
-       weapon.Multi = weapon.Multi * weapon.MuzzleSalvoSize
+    if weapon.MuzzleSalvoSize == nil then 
+        WARN('Weapon missing MuzzleSalvoSize ' .. tostring(weapon.DisplayName))
+    else
+        weapon.Multi = weapon.Multi * weapon.MuzzleSalvoSize
     end
     --TODO multiply damage of Salvation by AOE or save as it as Damage potential
 
@@ -546,12 +545,10 @@ function GetWeaponsStats(bp)
     --check bp.EnhancementPresetAssigned.Enhancements table to get accurate stats
 
     for id, w in bp.Weapon or {} do
-        local damage = w.NukeInnerRingDamage or w.Damage
-        -- skipping not important weapons  
+            
         if w.WeaponCategory and 
            w.WeaponCategory ~= 'Death' and 
-           w.WeaponCategory ~= 'Teleport' and
-           damage > 0 then 
+           w.WeaponCategory ~= 'Teleport'then
             
            local weapon = GetWeaponSpecs(bp, w) 
            weapon.DPM = weapon.Damage / weapon.BuildCostMass
@@ -622,20 +619,14 @@ function GetUnitsCategories(bp, showAll)
     if bp.Categories then
 		local categories = table.keys(bp.Categories)
         if showAll then
-            ret = categories
+            return categories
         else
 		    for _, category in categories do
 			    if not CategoriesHidden[category] then 
-                     table.insert(ret, string.upper(category)) 
+                     table.insert(ret, category) 
                 end
 		    end
-        end  
-        -- helps showing difference between support and HQ factory  
-        if categories['FACTORY'] and 
-           categories['STRUCTURE'] and 
-           not categories['SUPPORTFACTORY'] then 
-            table.insert(ret, 'HQFACTORY') 
-        end       
+        end        
 	end 
     return ret
 end
@@ -921,6 +912,7 @@ local function CacheEnhancement(key, bp, name, enh)
         categories = blueprints.All[key].Categories
     end
     local commanderType = ''
+	categories['UPGRADE'] = true
 	if bp.Categories['COMMAND'] then
         commanderType = 'ACU'
 		categories['COMMAND'] = true
@@ -940,10 +932,9 @@ local function CacheEnhancement(key, bp, name, enh)
 		elseif slot == 'BACK' then
 			enh.Slot = 'BACK'
 		end
-		categories['SLOT' .. enh.Slot] = true 
+		categories['UPGRADE_'..enh.Slot] = true 
 	end	 
-    categories['UPGRADE'] = true
-  	
+		
 	enh.ID = name
 	enh.Key = key
 	enh.Faction = bp.Faction
