@@ -600,7 +600,7 @@ function CreateAeonFactoryBuildingEffects( builder, unitBeingBuilt, BuildEffectB
 
     local fraction = unitBeingBuilt:GetFractionComplete()
     local scale
-    while not unitBeingBuilt.Dead and fraction < 1 do
+    while not unitBeingBuilt.Dead and fraction < 1 and not IsDestroyed(slider) do
         scale = 1-math.pow(fraction, 2)
         BuildBaseEffect:SetScale(sx * scale, 1.5*sy*scale, sz * scale)
         slider:SetGoal(0, 0.5*(fraction*sy - sy), 0)

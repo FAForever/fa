@@ -134,8 +134,7 @@ TConstructionUnit = Class(ConstructionUnit) {
         end           
     end,
 
-    OnLayerChange = function(self, new, old)
-        ConstructionUnit.OnLayerChange(self, new, old)
+    LayerChangeTrigger = function(self, new, old)
         if self:GetBlueprint().Display.AnimationWater then
             if self.TerrainLayerTransitionThread then
                 self.TerrainLayerTransitionThread:Destroy()
@@ -148,7 +147,6 @@ TConstructionUnit = Class(ConstructionUnit) {
     end,
 
     TransformThread = function(self, water)
-        
         if not self.TransformManipulator then
             self.TransformManipulator = CreateAnimator(self)
             self.Trash:Add( self.TransformManipulator )

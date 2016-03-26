@@ -1970,7 +1970,10 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnFailedToBeBuilt = function(self)
-        self:Destroy()
+        self:ForkThread(function()
+            WaitTicks(1)
+            self:Destroy()
+        end)
     end,
 
     OnSiloBuildStart = function(self, weapon)
@@ -2607,6 +2610,11 @@ Unit = Class(moho.unit_methods) {
     --LAYER EVENTS
     -------------------------------------------------------------------------------------------
     OnLayerChange = function(self, new, old)
+        -- Bail out early if dead. The engine calls this function AFTER entity:Destroy() has killed
+        -- the C object. Any functions down this line which expect a live C object (self:CreateAnimator())
+        -- for example, will throw an error.
+        if self.Dead then return end
+
         for i = 1, self:GetWeaponCount() do
             self:GetWeapon(i):SetValidTargetsForCurrentLayer(new)
         end
@@ -2637,6 +2645,11 @@ Unit = Class(moho.unit_methods) {
             self.Footfalls = self:CreateFootFallManipulators( bpTable[new].Footfall )
         end
         self:CreateLayerChangeEffects( new, old )
+
+        -- Trigger the re-worded stuff that used to be inherited, no longer because of the engine bug above.
+        if self.LayerChangeTrigger then
+            self:LayerChangeTrigger(new, old)
+        end
     end,
 
     OnMotionHorzEventChange = function( self, new, old )

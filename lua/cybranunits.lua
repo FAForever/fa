@@ -104,9 +104,7 @@ CConstructionUnit = Class(ConstructionUnit){
         end
     end,
 
-    OnLayerChange = function(self, new, old)
-        ConstructionUnit.OnLayerChange(self, new, old)
-
+    LayerChangeTrigger = function(self, new, old)
         if self:GetBlueprint().Display.AnimationWater then
             if self.TerrainLayerTransitionThread then
                 self.TerrainLayerTransitionThread:Destroy()
@@ -274,7 +272,9 @@ CSeaFactoryUnit = Class(SeaFactoryUnit) {
 
     OnFailedToBuild = function(self)
         SeaFactoryUnit.OnFailedToBuild(self)
-        self:StopArmsMoving()
+        if not self.Dead then
+            self:StopArmsMoving()
+        end
     end,
 
     StartArmsMoving = function(self)

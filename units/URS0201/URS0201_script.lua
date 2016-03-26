@@ -49,9 +49,7 @@ URS0201 = Class(CSeaUnit) {
         end
     end,
 
-    OnLayerChange = function(self, new, old)
-        CSeaUnit.OnLayerChange(self, new, old)
-
+    LayerChangeTrigger = function(self, new, old)
         local bp = self:GetBlueprint()
         -- Enable sonar on water only, apply speed multiplier on land
         if new == 'Land' then
