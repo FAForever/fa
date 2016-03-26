@@ -1355,7 +1355,7 @@ UI_Disco0006="Ejected by"
 -- Unit Descriptions
 
 -- UEF -- Armored Commander Unit/Upgrades
-Unit_Description_0303="Houses Commander. Combination of Barracks and Command Center. Contains all the blueprints necessary to build a basic army from scratch."
+Unit_Description_0303="Armored Commander is a combination of barracks and command center. Contains all the blueprints necessary to build a basic army from scratch. Upgradeable with combat enhancements, advanced engineering suits, resource allocation system, and teleporting."
 Unit_Description_0056="The UEF Supreme Commander Description."
 Unit_Description_0004="Mounts a Tactical Cruise Missile Launcher onto the back of the ACU."
 Unit_Description_0005="Grants Tech 2 schematic access and increases the ACU's build speed, maximum health, and health regeneration."
@@ -1384,7 +1384,7 @@ Unit_Description_0024="Equips the standard SACU Cannon with Area-Of-Effect damag
 -- UEF -- Land Units
 Unit_Description_0025="Fast, lightly armoured reconnaissance vehicle. Armed with a machine gun and a basic sensor suite."
 Unit_Description_0026="Lightly armoured fast-moving raiding unit. Poor in direct combat. Can fire from Air Transports."
-Unit_Description_0027="Frontloaded Mobile Artillery unit. Designed to engage enemy units at long range and inflict massive damage to buildings."
+Unit_Description_0027="Front-loaded Mobile Artillery unit. Designed to engage enemy units at long range and inflict massive damage to buildings."
 Unit_Description_0028="Mobile Anti-Air effective against low-end enemy air units."
 Unit_Description_0029="Lightly armoured Main Battle Tank armed with a single cannon."
 Unit_Description_0030="Heavy Assault Tank designed to take large armies and fortified bases head-on."
@@ -1396,12 +1396,12 @@ Unit_Description_0035="Extremely fast Heavy Raiding Bot. Equipped with quickly r
 Unit_Description_0036="Slow-moving Heavy Artillery. Must be stationary to fire."
 Unit_Description_0037="Experimental Amphibious Mobile Artillery. Equipped with battleship-level weaponry, bubble shield, close-fire support, air staging and factory facilities."
 Unit_Description_0307="Extremely Heavy Amphibious Assault Robot. Designed to engage enemy Experimental units, Heavy units, and defense structures."
-Unit_Description_0308="Heavy Mobile Missile Launcher designed to overwhelm enemy shields and tactical missile defenses with large salvoes."
+Unit_Description_0308="Heavy Mobile Missile Launcher designed to overwhelm enemy shields and tactical missile defenses with large salvos."
 Unit_Description_0441="Long range support robot armed with Gatling Cannon and Fragmentation Grenade Launcher."
 
 -- UEF -- Air Units
 Unit_Description_0038="Fast aerial reconnaissance vehicle."
-Unit_Description_0039="Quick, manoeuvrable Anti-Air Fighter."
+Unit_Description_0039="Quick, maneuverable Anti-Air Fighter."
 Unit_Description_0040="Lightly armoured Bomber armed with Damage-Over-Time napalm munitions."
 Unit_Description_0041="Air Transport which can carry 6 T1 units, 2 T2 units (Plus 2 T1), or a single T3 unit (Plus 2 T1). Cannot transport the ACU."
 Unit_Description_0042="Gunship equipped with a single transportation clamp. Can carry a single T1 or T2 unit."
@@ -1431,7 +1431,7 @@ Unit_Description_0057="Low-end defensive tower that attacks land- and sea-based 
 Unit_Description_0058="Basic anti-air turret."
 Unit_Description_0059="Basic anti-naval defense system."
 Unit_Description_0061="Armoured surface defense turret."
-Unit_Description_0062="Anti-Air flak turret. Designed to engage mid-level aircraft with aera-of-effect projectiles."
+Unit_Description_0062="Anti-Air flak turret. Designed to engage mid-level aircraft with area-of-effect projectiles."
 Unit_Description_0064="Armoured torpedo turret."
 Unit_Description_0066="Anti-Air turret armed with Area-Of-Effect SAMs, effective against fast aircraft."
 Unit_Description_0069="Stationary Artillery designed to engage slow-moving units and fixed structures. Rate-Of-Fire increased when adjacent to energy production buildings."
@@ -1451,13 +1451,13 @@ Unit_Description_0068="Generates a heavy shield around units and structures with
 Unit_Description_0071="Refuels and repairs aircraft. Air patrols will automatically use this facility."
 
 -- UEF -- Sensor Structures
-Unit_Description_0099="Short range Radar system. Cannot detect submerged or stealthed units, and confused by radar jamming."
-Unit_Description_0100="Short range Sonar system which detects submerged and surface units. Cannot detect hovering or stealthed units."
-Unit_Description_0101="Medium range Radar system. Cannot detect submerged or stealthed units, and confused by radar jamming."
-Unit_Description_0102="Medium range Sonar system which detects submerged and surface units. Cannot detect hovering or stealthed units."
+Unit_Description_0099="Short range Radar system. Cannot detect submerged or stealth units, and confused by radar jamming."
+Unit_Description_0100="Short range Sonar system which detects submerged and surface units. Cannot detect hovering or stealth units."
+Unit_Description_0101="Medium range Radar system. Cannot detect submerged or stealth units, and confused by radar jamming."
+Unit_Description_0102="Medium range Sonar system which detects submerged and surface units. Cannot detect hovering or stealth units."
 Unit_Description_0103="Stealth Field Generator which hides units and structures in range from enemy radar. Countered by optics and omni sensors."
-Unit_Description_0104="Long range Sonar system which detects submerged and surface units. Cannot detect hovering or stealthed units. Armed with a weak torpedo launcher."
-Unit_Description_0105="Long range Radar system with shorter range omni Sensor. Radar cannot detect submerged or stealthed units, and confused by radar jamming. Omni counters stealth, cloaking or jamming and acts as sonar."
+Unit_Description_0104="Long range Sonar system which detects submerged and surface units. Cannot detect hovering or stealth units. Armed with a weak torpedo launcher."
+Unit_Description_0105="Long range Radar system with shorter range omni Sensor. Radar cannot detect submerged or stealth units, and confused by radar jamming. Omni counters stealth, cloaking or jamming and acts as sonar."
 
 -- UEF -- Economy Buildings
 Unit_Description_0088="Generates 20 energy per second. Construct next to other energy consuming structures for adjacency bonus."
@@ -1477,23 +1477,33 @@ Unit_Description_0076="Tech 1 amphibious construction, repair, capture and recla
 Unit_Description_0077="Tech 2 amphibious construction, repair, capture and reclamation unit."
 Unit_Description_0078="Tech 3 amphibious construction, repair, capture and reclamation unit."
 Unit_Description_0315="Tech 2 Fast-moving amphibious construction, repair, capture and reclamation unit armed with a Riot Gun, radar and radar jamming. Can only build offensive buildings, no economy."
-Unit_Description_0446="Houses a single flying Drone which assists or repairs any unit within its operational radius. Can be ordered around, but cannot initiate construction."
-Unit_Description_0453="Houses two flying Drones, each of which assists or repairs any unit within its operational radius. Can be ordered around, but cannot initiate construction."
+Unit_Description_0446="Houses one flying Drone which automatically assists or repairs any unit with its operational radius. Can be ordered to fly around and reclaim, but cannot initiate construction."
+Unit_Description_0453="Houses two flying Drones, each of which automatically assists or repairs any unit with its operational radius. Can be ordered to fly around and reclaim, but cannot initiate construction."
+Unit_Description_0458="Flying Drone which can assists, repairs, and reclaim any unit. Can be ordered to initiate construction of T1 structures. It's vulnerable to any air fighters or anti-air units"  
+Unit_Description_0459="Flying Drone which can assists, repairs, and reclaim any unit. Can be ordered to initiate construction of T3 structures. It's vulnerable to any air fighters or anti-air units"  
 
 -- UEF -- Factories HQ
-Unit_Description_0079="Constructs Tech 1 Land units. HQ upgrade is required to advance to T2. Once you have one HQ in play a much cheaper support upgrade unlocks allowing you to quickly bring the rest of the factories to T2."
-Unit_Description_0080="Constructs Tech 1 Air units. HQ upgrade is required to advance to T2. Once you have one HQ in play a much cheaper support upgrade unlocks allowing you to quickly bring the rest of the factories to T2."
-Unit_Description_0081="Constructs Tech 1 Naval units. HQ upgrade is required to advance to T2. Once you have one HQ in play a much cheaper support upgrade unlocks allowing you to quickly bring the rest of the factories to T2."
-Unit_Description_0082="Constructs Tech 2 Land units. HQ upgrade is required to advance to T3. Once you have one HQ in play a much cheaper support upgrade unlocks allowing you to quickly bring the rest of the factories to T3."
-Unit_Description_0083="Constructs Tech 2 Air units. HQ upgrade is required to advance to T3. Once you have one HQ in play a much cheaper support upgrade unlocks allowing you to quickly bring the rest of the factories to T3."
-Unit_Description_0084="Constructs Tech 2 Naval units. HQ upgrade is required to advance to T3. Once you have one HQ in play a much cheaper support upgrade unlocks allowing you to quickly bring the rest of the factories to T3."
-Unit_Description_0085="Constructs Tech 3 Land units."
-Unit_Description_0086="Constructs Tech 3 Air units."
-Unit_Description_0087="Constructs Tech 3 Naval units."
+Unit_Description_0079="Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost."
+Unit_Description_0080="Constructs Tech 1 Air units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost."
+Unit_Description_0081="Constructs Tech 1 Naval units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost."
+Unit_Description_0082="Constructs Tech 2 Land units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost. "
+Unit_Description_0083="Constructs Tech 2 Air units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
+Unit_Description_0084="Constructs Tech 2 Naval units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
+Unit_Description_0085="Constructs Tech 3 Land units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost."
+Unit_Description_0086="Constructs Tech 3 Air units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost."
+Unit_Description_0087="Constructs Tech 3 Naval units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost."
 Unit_Description_0074="Allows you to construct Support Command Units, either in their basic forms, or in a number of pre-enhanced versions."
 
+-- UEF -- Support Factories 
+Unit_Description_s082="Constructs Tech 2 Land units. Upgradeable to T3 Factory if at least one T3 Land Factory HQ exists."
+Unit_Description_s083="Constructs Tech 2 Air units. Upgradeable to T3 Factory if at least one T3 Air Factory HQ exists."
+Unit_Description_s084="Constructs Tech 2 Naval units. Upgradeable to T3 Factory if at least one T3 Naval Factory HQ exists."
+Unit_Description_s085="Constructs Tech 3 Land units. Buildable for a much cheaper cost if at least one T3 Land Factory HQ exists."
+Unit_Description_s086="Constructs Tech 3 Air units. Buildable for a much cheaper cost if at least one T3 Air Factory HQ exists."
+Unit_Description_s087="Constructs Tech 3 Naval units. Buildable for a much cheaper cost if at least one T3 Naval Factory HQ exists."
+ 
 -- CYBRAN -- Armored Commander Unit/Upgrades 
-Unit_Description_0304="Houses Commander. Combination of Barracks and Command Center. Contains all the blueprints necessary to build a basic army from scratch. Lightly armoured, but with high Regeneration rate."
+Unit_Description_0304="Armored Commander is a combination of barracks and command center. Contains all the blueprints necessary to build a basic army from scratch. Upgradeable with combat enhancements, advanced engineering suits, resource allocation system, and teleporting. Lightly armoured, but with high Regeneration rate."
 Unit_Description_0106="Increases ACU's resource generation to 12 mass per second and 3500 energy per second."
 Unit_Description_0107="Personal Cloaking further hiding the ACU from optical sensors and massively boosts HP. Countered by omni sensors. Costs energy to run."
 Unit_Description_0108="Personal Stealth hiding the ACU from radar. Countered by omni sensors. Costs energy to run."
@@ -1519,7 +1529,7 @@ Unit_Description_0123="Personal Stealth hiding the SACU from radar. Countered by
 Unit_Description_0124="Fast, lightly armoured reconnaissance vehicle. Equipped with a personal cloak generator. Can obstruct mass spots while cloaked if the enemy has no radar."
 Unit_Description_0125="Lightly armoured fast-moving raiding unit. Poor in direct combat. Can fire from Air Transports."
 Unit_Description_0126="Lightly armoured Assault Robot. Equipped with a weak engineering module which can assist or repair other projects."
-Unit_Description_0127="Frontloaded Mobile Artillery unit. Weaker damage than that of other factions, but armed with an EMP shell capable of stunning T1 and T2 units."
+Unit_Description_0127="Front-loaded Mobile Artillery unit. Weaker damage than that of other factions, but armed with an EMP shell capable of stunning T1 and T2 units."
 Unit_Description_0128="Mobile Anti-Air effective against low-end enemy air units. This unit can be toggled to switch to direct fire weaponry."
 Unit_Description_0129="Heavy Assault Tank designed to take large armies and fortified bases head-on."
 Unit_Description_0130="Submersible Amphibious Tank armed with direct fire weaponry and a weak torpedo launcher."
@@ -1543,7 +1553,7 @@ Unit_Description_0450="Slow-moving Heavy Artillery. Must be stationary to fire."
 
 -- CYBRAN -- Air Units
 Unit_Description_0138="Fast aerial reconnaissance vehicle."
-Unit_Description_0139="Quick, manoeuvrable Anti-Air Fighter."
+Unit_Description_0139="Quick, maneuverable Anti-Air Fighter."
 Unit_Description_0140="Lightly armoured Bomber armed with cluster bomblets."
 Unit_Description_0141="Air Transport which can carry 6 T1 units, 2 T2 units (Plus 2 T1), or a single T3 unit (Plus 2 T1). Cannot transport the ACU."
 Unit_Description_0142="Gunship armed with Area-Of-Effect direct fire rocket packs."
@@ -1573,7 +1583,7 @@ Unit_Description_0176="Low-end defensive tower that attacks land- and sea-based 
 Unit_Description_0177="Basic anti-air turret."
 Unit_Description_0178="Basic torpedo turret."
 Unit_Description_0180="Armoured surface defense turret."
-Unit_Description_0181="Anti-Air flak turret. Designed to engage mid-level aircraft with aera-of-effect projectiles."
+Unit_Description_0181="Anti-Air flak turret. Designed to engage mid-level aircraft with area-of-effect projectiles."
 Unit_Description_0183="Armoured torpedo turret."
 Unit_Description_0185="Anti-Air turret armed with Area-Of-Effect SAMs, effective against fast aircraft."
 Unit_Description_0187="Stationary Artillery designed to engage slow-moving units and fixed structures. Rate-Of-Fire increased when adjacent to energy production buildings."
@@ -1585,19 +1595,19 @@ Unit_Description_0325="Submerged torpedo launcher. Capable of destroying the lar
 -- CYBRAN -- Defensive Structures
 Unit_Description_0179="Restricts the movement of enemy units and offers substantial protection from low direct fire attacks."
 Unit_Description_0182="Tactical Missile defense turret."
-Unit_Description_0184="Generates a protective Shield around units and structures within its radius. Can be upgraded four times. Shields transfer residual damage to intersecting bubbles."
+Unit_Description_0184="Generates a protective shield around units and structures within its radius. Shields transfer residual damage to intersecting bubbles. Shield can be upgraded 4 times."
 Unit_Description_0186="Strategic Missile defense Silo. Fires at passing Strategic Missiles even if their target is not inside the circle."
 Unit_Description_0189="Refuels and repairs aircraft. Air patrols will automatically use this facility."
-Unit_Description_0306="Upgrade increases shield's size, strength and operating costs."
+Unit_Description_0306="Generates a protective shield around units and structures within its radius. This upgrade increases shield's size, strength and operating costs."
 
 -- CYBRAN -- Sensor Structures
-Unit_Description_0216="Short range Radar system. Cannot detect submerged or stealthed units, and confused by radar jamming."
-Unit_Description_0217="Short range Sonar system which detects submerged and surface units. Cannot detect hovering or stealthed units."
-Unit_Description_0218="Medium range Radar system. Cannot detect submerged or stealthed units, and confused by radar jamming."
-Unit_Description_0219="Medium range Sonar system which detects submerged and surface units. Cannot detect hovering or stealthed units."
+Unit_Description_0216="Short range Radar system. Cannot detect submerged or stealth units, and confused by radar jamming."
+Unit_Description_0217="Short range Sonar system which detects submerged and surface units. Cannot detect hovering or stealth units."
+Unit_Description_0218="Medium range Radar system. Cannot detect submerged or stealth units, and confused by radar jamming."
+Unit_Description_0219="Medium range Sonar system which detects submerged and surface units. Cannot detect hovering or stealth units."
 Unit_Description_0220="Stealth Field Generator which hides units and structures in range from enemy radar. Countered by optics and omni sensors."
-Unit_Description_0221="Long range Sonar system which detects submerged and surface units. Cannot detect hovering or stealthed units. Equipped with a powerful stealth field generator."
-Unit_Description_0222="Long range Radar system with shorter range omni Sensor. Radar cannot detect submerged or stealthed units, and confused by radar jamming. Omni counters stealth, cloaking or jamming and acts as sonar."
+Unit_Description_0221="Long range Sonar system which detects submerged and surface units. Cannot detect hovering or stealth units. Equipped with a powerful stealth field generator."
+Unit_Description_0222="Long range Radar system with shorter range omni Sensor. Radar cannot detect submerged or stealth units, and confused by radar jamming. Omni counters stealth, cloaking or jamming and acts as sonar."
 Unit_Description_0326="Unique optical sensor which reveals an enormous area with full optical vision. Requires a large amount of energy per second to run."
 
 -- CYBRAN -- Economy Structures
@@ -1622,19 +1632,27 @@ Unit_Description_0324="Automatically assists or repairs any unit within its oper
 Unit_Description_0452="Automatically assists or repairs any unit within its operational radius."
 
 -- CYBRAN -- Factories HQ
-Unit_Description_0196="Constructs Tech 1 Land units. HQ upgrade is required to advance to T2. Once you have one HQ in play a much cheaper support upgrade unlocks allowing you to quickly bring the rest of the factories to T2."
-Unit_Description_0197="Constructs Tech 1 Air units. HQ upgrade is required to advance to T2. Once you have one HQ in play a much cheaper support upgrade unlocks allowing you to quickly bring the rest of the factories to T2."
-Unit_Description_0198="Constructs Tech 1 Naval units. HQ upgrade is required to advance to T2. Once you have one HQ in play a much cheaper support upgrade unlocks allowing you to quickly bring the rest of the factories to T2."
-Unit_Description_0199="Constructs Tech 2 Land units. HQ upgrade is required to advance to T3. Once you have one HQ in play a much cheaper support upgrade unlocks allowing you to quickly bring the rest of the factories to T3."
-Unit_Description_0200="Constructs Tech 2 Air units. HQ upgrade is required to advance to T3. Once you have one HQ in play a much cheaper support upgrade unlocks allowing you to quickly bring the rest of the factories to T3."
-Unit_Description_0201="Constructs Tech 2 Naval units. HQ upgrade is required to advance to T3. Once you have one HQ in play a much cheaper support upgrade unlocks allowing you to quickly bring the rest of the factories to T3."
-Unit_Description_0202="Constructs Tech 3 Land units."
-Unit_Description_0203="Constructs Tech 3 Air units."
-Unit_Description_0204="Constructs Tech 3 Naval units."
+Unit_Description_0196="Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost."
+Unit_Description_0197="Constructs Tech 1 Air units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost."
+Unit_Description_0198="Constructs Tech 1 Naval units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost."
+Unit_Description_0199="Constructs Tech 2 Land units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
+Unit_Description_0200="Constructs Tech 2 Air units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
+Unit_Description_0201="Constructs Tech 2 Naval units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
+Unit_Description_0202="Constructs Tech 3 Land units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost."
+Unit_Description_0203="Constructs Tech 3 Air units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost."
+Unit_Description_0204="Constructs Tech 3 Naval units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost."
 Unit_Description_0192="Allows you to construct Support Command Units, either in their basic forms, or in a number of pre-enhanced versions."
- 
+
+-- CYBRAN -- Support Factories
+Unit_Description_s199="Constructs Tech 2 Land units. Upgradeable to T3 Factory if at least one T3 Land Factory HQ exists."
+Unit_Description_s200="Constructs Tech 2 Air units. Upgradeable to T3 Factory if at least one T3 Air Factory HQ exists."
+Unit_Description_s201="Constructs Tech 2 Naval units. Upgradeable to T3 Factory if at least one T3 Naval Factory HQ exists."
+Unit_Description_s202="Constructs Tech 3 Land units. Buildable for a much cheaper cost if at least one T3 Land Factory HQ exists."
+Unit_Description_s203="Constructs Tech 3 Air units. Buildable for a much cheaper cost if at least one T3 Air Factory HQ exists."
+Unit_Description_s204="Constructs Tech 3 Naval units. Buildable for a much cheaper cost if at least one T3 Naval Factory HQ exists."
+  
 -- AEON -- Armored Commander Unit/Upgrades 
-Unit_Description_0305="Houses Commander. Combination of Barracks and Command Center. Contains all the blueprints necessary to build a basic army from scratch."
+Unit_Description_0305="Armored Commander is a combination of barracks and command center. Contains all the blueprints necessary to build a basic army from scratch. Upgradeable with combat enhancements, advanced engineering suits, resource allocation system, and teleporting."
 Unit_Description_0156="Grants Tech 2 schematic access and increases the ACU's build speed, maximum health, and health regeneration."
 Unit_Description_0157="Creates a Quantum Stasis Field around the ACU. Immobilizes enemy units within its radius. High energy consumption."
 Unit_Description_0158="Massively increases main cannon range."
@@ -1649,7 +1667,7 @@ Unit_Description_0166="Adds Teleportation capability. Requires considerable ener
 
 -- AEON -- Support Commander Units/Upgrades
 Unit_Description_0167="A highly versatile combat and engineering unit useful on late-stage battlefields."
-Unit_Description_0168="Massively increases SACU Buildpower."
+Unit_Description_0168="Massively increases SACU build-power."
 Unit_Description_0169="Increases SACU's resource generation to 10 mass per second and 1000 energy per second."
 Unit_Description_0170="Grants the Sacrifice ability, allowing the SACU to suicide itself to add its mass to another construction project instantly."
 Unit_Description_0171="Creates a protective Personal Shield around the SACU. Requires energy to run."
@@ -1677,7 +1695,7 @@ Unit_Description_0442="Extremely Long range support tank armed with weaponry whi
 
  -- AEON -- Air Units
 Unit_Description_0235="Fast aerial reconnaissance vehicle."
-Unit_Description_0236="Quick, manoeuvrable Anti-Air Fighter."
+Unit_Description_0236="Quick, maneuverable Anti-Air Fighter."
 Unit_Description_0237="Lightly armoured Bomber armed with EMP Bomb which stuns enemy units."
 Unit_Description_0238="Air Transport which can carry 6 T1 units, 3 T2 units, or a single T3 unit (Plus 2 T1). Cannot transport the ACU."
 Unit_Description_0239="Gunship armed with direct fire cannon."
@@ -1687,7 +1705,7 @@ Unit_Description_0242="Lightly armed Air Transport equipped with anti-air and di
 Unit_Description_0243="High-end air fighter. Designed to engage air units of any type."
 Unit_Description_0244="Strategic Bomber designed to surgically destroy key targets."
 Unit_Description_0245="Experimental Floating Fortress. Armed with unbelievably powerful central beam, incredible anti-air weaponry and depth charges. Equipped with air staging, factory, and a full sensor suite."
-Unit_Description_0329="Quick, manoeuvrable Anti-Air Fighter with more armour and firepower than the Interceptor."
+Unit_Description_0329="Quick, maneuverable Anti-Air Fighter with more armour and firepower than the Interceptor."
 Unit_Description_0330="Versatile Assault Gunship. Armed with direct fire cannon and extremely powerful anti-air rockets."
 Unit_Description_0331="High-power Torpedo Bomber designed to engage heavily armoured naval units."
 Unit_Description_0419="Suicide Bomber with short operational range and practically non-existent armour, but which inflicts enormous damage to regions with no anti-air presence."
@@ -1710,7 +1728,7 @@ Unit_Description_0255="Low-end defensive tower that attacks land- and sea-based 
 Unit_Description_0256="Basic anti-air turret."
 Unit_Description_0257="Basic torpedo turret."
 Unit_Description_0259="Armoured surface defense turret."
-Unit_Description_0260="Anti-Air flak turret. Designed to engage mid-level aircraft with aera-of-effect projectiles."
+Unit_Description_0260="Anti-Air flak turret. Designed to engage mid-level aircraft with area-of-effect projectiles."
 Unit_Description_0262="Armoured torpedo turret."
 Unit_Description_0264="Anti-Air turret armed with Area-Of-Effect SAMs, effective against fast aircraft."
 Unit_Description_0267="Stationary Artillery designed to engage slow-moving units and fixed structures. Rate-Of-Fire increased when adjacent to energy production buildings."
@@ -1728,13 +1746,13 @@ Unit_Description_0266="Generates a heavy protective shield around units and stru
 Unit_Description_0269="Refuels and repairs aircraft. Air patrols will automatically use this facility."
 
 -- AEON -- Sensor Structures
-Unit_Description_0296="Short range Radar system. Cannot detect submerged or stealthed units, and confused by radar jamming."
-Unit_Description_0297="Short range Sonar system which detects submerged and surface units. Cannot detect hovering or stealthed units."
-Unit_Description_0298="Medium range Radar system. Cannot detect submerged or stealthed units, and confused by radar jamming."
-Unit_Description_0299="Medium range Sonar system which detects submerged and surface units. Cannot detect hovering or stealthed units."
+Unit_Description_0296="Short range Radar system. Cannot detect submerged or stealth units, and confused by radar jamming."
+Unit_Description_0297="Short range Sonar system which detects submerged and surface units. Cannot detect hovering or stealth units."
+Unit_Description_0298="Medium range Radar system. Cannot detect submerged or stealth units, and confused by radar jamming."
+Unit_Description_0299="Medium range Sonar system which detects submerged and surface units. Cannot detect hovering or stealth units."
 Unit_Description_0300="Stealth Field Generator which hides units and structures in range from enemy radar. Countered by optics and omni sensors."
-Unit_Description_0301="Long range Sonar system which detects submerged and surface units. Cannot detect hovering or stealthed units. Equipped with torpedo defenses."
-Unit_Description_0302="Long range Radar system with shorter range omni Sensor. Radar cannot detect submerged or stealthed units, and confused by radar jamming. Omni counters stealth, cloaking or jamming and acts as sonar."
+Unit_Description_0301="Long range Sonar system which detects submerged and surface units. Cannot detect hovering or stealth units. Equipped with torpedo defenses."
+Unit_Description_0302="Long range Radar system with shorter range omni Sensor. Radar cannot detect submerged or stealth units, and confused by radar jamming. Omni counters stealth, cloaking or jamming and acts as sonar."
 Unit_Description_0335="For a fixed energy cost, reveals a small area at any location on the battlefield."
 
 -- AEON -- Economy Structures
@@ -1749,7 +1767,7 @@ Unit_Description_0292="Extracts 6 mass per second. Must be constructed on mass d
 Unit_Description_0293="Generates 2500 energy per second. Construct next to other energy consuming structures for adjacency bonus."
 Unit_Description_0294="Generates 18 mass per second. Must be constructed on mass deposits. Construct structures next to mass extractor for adjacency bonus."
 Unit_Description_0295="Creates 12 mass per second using 3500 energy per second. Construct next to other energy consuming structures for adjacency bonus."
-Unit_Description_0336="Generates an adaptive economy of up to 10000 mass per second and 1000000 energy per second. When killed the reactor core destabilises in a fully-fledged nuclear explosion."
+Unit_Description_0336="Generates an adaptive economy of up to 10000 mass per second and 1000000 energy per second. When killed the reactor core destabilizes in a fully-fledged nuclear explosion."
 
 -- AEON -- Engineers
 Unit_Description_0273="Tech 1 amphibious construction, repair, capture and reclamation unit."
@@ -1757,19 +1775,27 @@ Unit_Description_0274="Tech 2 amphibious construction, repair, capture and recla
 Unit_Description_0275="Tech 3 amphibious construction, repair, capture and reclamation unit."
 
 -- AEON -- Factories HQ
-Unit_Description_0276="Constructs Tech 1 Land units. HQ upgrade is required to advance to T2. Once you have one HQ in play a much cheaper support upgrade unlocks allowing you to quickly bring the rest of the factories to T2."
-Unit_Description_0277="Constructs Tech 1 Air units. HQ upgrade is required to advance to T2. Once you have one HQ in play a much cheaper support upgrade unlocks allowing you to quickly bring the rest of the factories to T2."
-Unit_Description_0278="Constructs Tech 1 Naval units. HQ upgrade is required to advance to T2. Once you have one HQ in play a much cheaper support upgrade unlocks allowing you to quickly bring the rest of the factories to T2."
-Unit_Description_0279="Constructs Tech 2 Land units. HQ upgrade is required to advance to T3. Once you have one HQ in play a much cheaper support upgrade unlocks allowing you to quickly bring the rest of the factories to T3."
-Unit_Description_0280="Constructs Tech 2 Air units. HQ upgrade is required to advance to T3. Once you have one HQ in play a much cheaper support upgrade unlocks allowing you to quickly bring the rest of the factories to T3."
-Unit_Description_0281="Constructs Tech 2 Naval units. HQ upgrade is required to advance to T3. Once you have one HQ in play a much cheaper support upgrade unlocks allowing you to quickly bring the rest of the factories to T3."
-Unit_Description_0282="Constructs Tech 3 Land units."
-Unit_Description_0283="Constructs Tech 3 Air units."
-Unit_Description_0284="Constructs Tech 3 Naval units."
+Unit_Description_0276="Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost."
+Unit_Description_0277="Constructs Tech 1 Air units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost."
+Unit_Description_0278="Constructs Tech 1 Naval units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost."
+Unit_Description_0279="Constructs Tech 2 Land units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
+Unit_Description_0280="Constructs Tech 2 Air units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
+Unit_Description_0281="Constructs Tech 2 Naval units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
+Unit_Description_0282="Constructs Tech 3 Land units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost."
+Unit_Description_0283="Constructs Tech 3 Air units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost."
+Unit_Description_0284="Constructs Tech 3 Naval units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost."
 Unit_Description_0272="Allows you to construct Support Command Units, either in their basic forms, or in a number of pre-enhanced versions."
 
+-- AEON -- Support Factories  
+Unit_Description_s279="Constructs Tech 2 Land units. Upgradeable to T3 Factory if at least one T3 Land Factory HQ exists."
+Unit_Description_s280="Constructs Tech 2 Air units. Upgradeable to T3 Factory if at least one T3 Air Factory HQ exists."
+Unit_Description_s281="Constructs Tech 2 Naval units. Upgradeable to T3 Factory if at least one T3 Naval Factory HQ exists."
+Unit_Description_s282="Constructs Tech 3 Land units. Buildable for a much cheaper cost if at least one T3 Land Factory HQ exists."
+Unit_Description_s283="Constructs Tech 3 Air units. Buildable for a much cheaper cost if at least one T3 Air Factory HQ exists."
+Unit_Description_s284="Constructs Tech 3 Naval units. Buildable for a much cheaper cost if at least one T3 Naval Factory HQ exists."
+ 
 -- SERAPHIM -- Armored Commander Unit/Upgrades
-Unit_Description_0420="Houses Commander. Combination of Barracks and Command Center. Contains all the blueprints necessary to build a basic army from scratch."
+Unit_Description_0420="Armored Commander is a combination of barracks and command center. Contains all the blueprints necessary to build a basic army from scratch. Upgradeable with combat enhancements, advanced engineering suits, resource allocation system, and teleporting."
 Unit_Description_0421="Adds Teleportation capability. Requires considerable energy to activate."
 Unit_Description_0422="Massively increases the rate at which the ACU repairs its armour as well as providing a large HP boost."
 Unit_Description_0424="Increases ACU's resource generation to 16 mass per second and 3000 energy per second."
@@ -1806,11 +1832,11 @@ Unit_Description_0345="Heavy Siege Tank armed with direct fire weaponry and weak
 Unit_Description_0346="Lightly armored, fast sniper bot. Armed with an extremely powerful energy rifle. Inaccurate while in motion."
 Unit_Description_0347="Slow-moving Heavy Artillery. Must be stationary to fire."
 Unit_Description_0348="High-end mobile shield generator."
-Unit_Description_0349="Armed with direct fire cannons, a central Plasma Ball Launcher, and powerful anti-air flak. When destroyed, a shortlived energy being is released, damaging nearby units."
+Unit_Description_0349="Armed with direct fire cannons, a central Plasma Ball Launcher, and powerful anti-air flak. When destroyed, a short-lived energy being is released, damaging nearby units."
 
  -- SERAPHIM -- Air Units
 Unit_Description_0350="Fast aerial reconnaissance vehicle."
-Unit_Description_0351="Quick, manoeuvrable Anti-Air Fighter."
+Unit_Description_0351="Quick, maneuverable Anti-Air Fighter."
 Unit_Description_0352="Lightly armoured Bomber armed with powerful bombs."
 Unit_Description_0353="Air Transport which can carry 8 T1 units, 4 T2 units, or a single T3 unit (Plus 2 T2). Cannot transport the ACU."
 Unit_Description_0354="Fast Assault Fighter armed with anti-air cannons and powerful bombs."
@@ -1836,7 +1862,7 @@ Unit_Description_0369="Low-end defensive tower that attacks land- and sea-based 
 Unit_Description_0370="Basic anti-air turret."
 Unit_Description_0371="Basic torpedo turret."
 Unit_Description_0373="Armoured surface defense turret."
-Unit_Description_0374="Anti-Air flak turret. Designed to engage mid-level aircraft with aera-of-effect projectiles."
+Unit_Description_0374="Anti-Air flak turret. Designed to engage mid-level aircraft with area-of-effect projectiles."
 Unit_Description_0377="Armoured Torpedo turret equipped with Torpedo defenses."
 Unit_Description_0378="Anti-Air turret armed with Area-Of-Effect blaster, effective against fast aircraft."
 Unit_Description_0381="Stationary Artillery designed to engage slow-moving units and fixed structures. Rate-Of-Fire increased when adjacent to energy production buildings."
@@ -1854,12 +1880,12 @@ Unit_Description_0380="Generates a heavy shield around units and structures with
 Unit_Description_0383="Refuels and repairs aircraft. Air patrols will automatically use this facility."
 
 -- SERAPHIM -- Sensor Structures
-Unit_Description_0411="Short range Radar system. Cannot detect submerged or stealthed units, and confused by radar jamming."
-Unit_Description_0412="Short range Sonar system which detects submerged and surface units. Cannot detect hovering or stealthed units."
-Unit_Description_0413="Medium range Sonar system which detects submerged and surface units. Cannot detect hovering or stealthed units. Longer range than other factions' T2 Sonar to make up for the lack of a T3."
-Unit_Description_0414="Medium range Radar system. Cannot detect submerged or stealthed units, and confused by radar jamming."
+Unit_Description_0411="Short range Radar system. Cannot detect submerged or stealth units, and confused by radar jamming."
+Unit_Description_0412="Short range Sonar system which detects submerged and surface units. Cannot detect hovering or stealth units."
+Unit_Description_0413="Medium range Sonar system which detects submerged and surface units. Cannot detect hovering or stealth units. Longer range than other factions' T2 Sonar to make up for the lack of a T3."
+Unit_Description_0414="Medium range Radar system. Cannot detect submerged or stealth units, and confused by radar jamming."
 Unit_Description_0415="Stealth Field Generator which hides units and structures in range from enemy radar. Countered by optics and omni sensors."
-Unit_Description_0416="Long range Radar system with shorter range omni Sensor. Radar cannot detect submerged or stealthed units, and confused by radar jamming. Omni counters stealth, cloaking or jamming and acts as sonar."
+Unit_Description_0416="Long range Radar system with shorter range omni Sensor. Radar cannot detect submerged or stealth units, and confused by radar jamming. Omni counters stealth, cloaking or jamming and acts as sonar."
 
 -- SERAPHIM -- Economy Structures
 Unit_Description_0400="Generates 20 energy per second. Construct next to other energy consuming structures for adjacency bonus."
@@ -1880,20 +1906,33 @@ Unit_Description_0388="Tech 2 amphibious construction, Repair, Capture and Recla
 Unit_Description_0389="Tech 3 amphibious construction, Repair, Capture and Reclamation unit."
 
 -- SERAPHIM -- Factories HQ
-Unit_Description_0390="Constructs Tech 1 Land units. HQ upgrade is required to advance to T2. Once you have one HQ in play a much cheaper support upgrade unlocks allowing you to quickly bring the rest of the factories to T2."
-Unit_Description_0391="Constructs Tech 1 Air units. HQ upgrade is required to advance to T2. Once you have one HQ in play a much cheaper support upgrade unlocks allowing you to quickly bring the rest of the factories to T2."
-Unit_Description_0392="Constructs Tech 1 Naval units. HQ upgrade is required to advance to T2. Once you have one HQ in play a much cheaper support upgrade unlocks allowing you to quickly bring the rest of the factories to T2."
-Unit_Description_0393="Constructs Tech 2 Land units. HQ upgrade is required to advance to T3. Once you have one HQ in play a much cheaper support upgrade unlocks allowing you to quickly bring the rest of the factories to T3."
-Unit_Description_0394="Constructs Tech 2 Air units. HQ upgrade is required to advance to T3. Once you have one HQ in play a much cheaper support upgrade unlocks allowing you to quickly bring the rest of the factories to T3."
-Unit_Description_0395="Constructs Tech 2 Naval units. HQ upgrade is required to advance to T3. Once you have one HQ in play a much cheaper support upgrade unlocks allowing you to quickly bring the rest of the factories to T3."
-Unit_Description_0396="Constructs Tech 3 Land units."
-Unit_Description_0397="Constructs Tech 3 Air units."
-Unit_Description_0398="Constructs Tech 3 Naval units."
+Unit_Description_0390="Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost."
+Unit_Description_0391="Constructs Tech 1 Air units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost."
+Unit_Description_0392="Constructs Tech 1 Naval units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost."
+Unit_Description_0393="Constructs Tech 2 Land units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
+Unit_Description_0394="Constructs Tech 2 Air units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
+Unit_Description_0395="Constructs Tech 2 Naval units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
+Unit_Description_0396="Constructs Tech 3 Land units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost."
+Unit_Description_0397="Constructs Tech 3 Air units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost."
+Unit_Description_0398="Constructs Tech 3 Naval units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost."
 Unit_Description_0399="Allows you to construct Support Command Units, either in their basic forms, or in a number of pre-enhanced versions."
+
+-- SERAPHIM -- Support Factories  
+Unit_Description_s393="Constructs Tech 2 Land units. Upgradeable to T3 Factory if at least one T3 Land Factory HQ exists."
+Unit_Description_s394="Constructs Tech 2 Air units. Upgradeable to T3 Factory if at least one T3 Air Factory HQ exists."
+Unit_Description_s395="Constructs Tech 2 Naval units. Upgradeable to T3 Factory if at least one T3 Naval Factory HQ exists."
+Unit_Description_s396="Constructs Tech 3 Land units. Buildable for a much cheaper cost if at least one T3 Land Factory HQ exists."
+Unit_Description_s397="Constructs Tech 3 Air units. Buildable for a much cheaper cost if at least one T3 Air Factory HQ exists."
+Unit_Description_s398="Constructs Tech 3 Naval units. Buildable for a much cheaper cost if at least one T3 Naval Factory HQ exists."
 
 -- FAF -- Patch Units
 Unit_Description_0443=" Gatling-style mortar launcher that fires high-explosive ordinance with a good degree of accuracy."
 Unit_Description_0445=" Unarmed stealth sub designed for reconnaissance missions. Equipped with anti-torpedo flares."
+Unit_Description_0460=" Mobile Anti-Air unit. Armed with a rapid-fire cannon, excellent against enemy gunships or air-fighters."
+Unit_Description_0461=" Mobile Anti-Air unit. Armed with a high-speed missiles, excellent against enemy gunships or air-fighters. Capable of switching weapon to anti-land attack but with smaller damage."
+Unit_Description_0462=" Mobile Anti-Air unit. Armed with a high-speed missiles, excellent against enemy gunships or air-fighters. Capable of switching weapon to anti-land attack but with smaller damage."
+Unit_Description_0463=" Mobile Anti-Air unit. Armed with a high-impact projectiles, excellent against enemy gunships or air-fighters."
+Unit_Description_0464=" Mobile Anti-Air unit. Armed with a high-speed lasers, excellent against enemy gunships or air-fighters. Capable of switching weapon to anti-land attack but with smaller damage."
 
 Unit_test_Description="Many years ago, a Commander called Finn was defeated and forced to flee. He later drew his opponent to a small island and defeated him. The island has held his name ever since."
 VO_Credits_Aeon_Credits_010_010="The Princess is gone. No trace of her remains."

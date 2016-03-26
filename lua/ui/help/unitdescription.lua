@@ -10,7 +10,7 @@
 Description = {
 
     -- UEF -- Armored Commander Unit/Upgrades 
-    ['uel0001'] = "<LOC Unit_Description_0303> Houses Commander. Combination barracks and command center. Contains all the blueprints necessary to build a basic army from scratch.",
+    ['uel0001'] = "<LOC Unit_Description_0303> Armored Commander is a combination of barracks and command center. Contains all the blueprints necessary to build a basic army from scratch. Upgradeable with combat enhancements, advanced engineering suits, resource allocation system, and teleporting.",
     ['uel0001-tm'] = "<LOC Unit_Description_0004>Mounts a tactical cruise missile launcher onto the back of the ACU.",
     ['uel0001-aes'] = "<LOC Unit_Description_0005>Expands the number of available schematics and increases the ACU's build speed and maximum health.",
     ['uel0001-dsu'] = "<LOC Unit_Description_0006>Greatly increases the speed at which the ACU repairs itself.",
@@ -31,7 +31,7 @@ Description = {
     ['uel0301-sgf'] = "<LOC Unit_Description_0019> Expands the radius of the SACU's personal shield. Requires Energy to run.",
     ['uel0301-rj'] = "<LOC Unit_Description_0020>Radar Jammer creates false radar images. Countered by Omni sensors.",
     ['uel0301-isb'] = "<LOC Unit_Description_0021> Increases SACU's resource generation.",
-    ['uel0301-sre'] = "<LOC Unit_Description_0022>Greatly expands the range of the standard onboard SACU sensor systems.",
+    ['uel0301-sre'] = "<LOC Unit_Description_0022>Greatly expands the range of the standard on-board SACU sensor systems.",
     ['uel0301-acu'] = "<LOC Unit_Description_0023>Rapidly cools any weapon mounted onto the SACU. Increases rate of fire.",
     ['uel0301-heo'] = "<LOC Unit_Description_0024>Equips the standard SACU Heavy plasma cannon with area-of-effect damage.",
 
@@ -87,11 +87,11 @@ Description = {
     ['xes0307'] = "<LOC Unit_Description_0312> High-end anti-naval vessel. Armed with plasma beams, torpedo systems, anti-missile defenses and anti-torpedo charges.",
   
     -- UEF -- Offensive Structures  
-    ['ueb2101'] = "<LOC Unit_Description_0057> Low-end defensive tower that attacks land- and sea-based units. Does not engage aircraft or submerged units.",
+    ['ueb2101'] = "<LOC Unit_Description_0057> Low-end defensive tower that attacks land-based and sea-based units. Does not engage aircraft or submerged units.",
     ['ueb2104'] = "<LOC Unit_Description_0058> Anti-air tower. Designed to engage low-end aircraft.",
     ['ueb2109'] = "<LOC Unit_Description_0059>Basic anti-naval defense system.",
     ['ueb5101'] = "<LOC Unit_Description_0060> Restricts the movement of enemy units. Offers minimal protection from enemy fire.",
-    ['ueb2301'] = "<LOC Unit_Description_0061> Heavily armored defensive tower that attacks land- and sea-based units. Does not engage aircraft or submerged units.",
+    ['ueb2301'] = "<LOC Unit_Description_0061> Heavily armored defensive tower that attacks land-based and sea-based units. Does not engage aircraft or submerged units.",
     ['ueb2204'] = "<LOC Unit_Description_0062> Anti-air tower. Designed to engage mid-level aircraft.",
     ['ueb4201'] = "<LOC Unit_Description_0063> Tactical missile defense. Protection is limited to the structure's operational area.",
     ['ueb2205'] = "<LOC Unit_Description_0064> Anti-naval defense system. Designed to engage all naval units.",
@@ -106,28 +106,40 @@ Description = {
     ['ueb2305'] = "<LOC Unit_Description_0073> Strategic missile launcher. Constructing missiles costs resources. Must be ordered to construct missiles.",
     ['ueb0304'] = "<LOC Unit_Description_0074> Summons Support Commander(s).",
     ['ueb2401'] = "<LOC Unit_Description_0075> Extremely advanced strategic artillery. Unlimited range, pin-point accuracy and devastating ordinance.",
-    ['xeb2306'] = "<LOC Unit_Description_0313> Heavy defensive tower. Attacks land- and sea-based units. Does not engage aircraft or submerged units.",
-    ['xeb2402'] = "<LOC Unit_Description_0314> Satellite-based weapon system. Attacks enemy units and structures. If its control center is destroyed, the weapon is immediately disabled.",
-
+    ['xeb2306'] = "<LOC Unit_Description_0313> Heavy defensive tower. Attacks land-based and sea-based units. Does not engage aircraft or submerged units.",
+    ['xeb2402'] = "<LOC Unit_Description_0314> Satellite launch platform for orbital laser satellite. If this control center is destroyed, the satellite weapon is immediately disabled and it crashes to the ground causing minor damage upon impact.",
+    ['xea0002'] = "<LOC Unit_Description_0316> Satellite is untargetable by any weapon, but can attack enemy units and structures with very high precision. It can be destroyed only if its control center is destroyed.",
+ 
     -- UEF -- Engineers   
     ['uel0105'] = "<LOC Unit_Description_0076> Tech 1 amphibious construction, repair, capture and reclamation unit.",
     ['uel0208'] = "<LOC Unit_Description_0077> Tech 2 amphibious construction, repair, capture and reclamation unit.",
     ['uel0309'] = "<LOC Unit_Description_0078> Tech 3 amphibious construction, repair, capture and reclamation unit.",
     ['xel0209'] = "<LOC Unit_Description_0315> Tech 2 amphibious construction, repair, capture and reclamation unit. Armed with a Riot Gun and internal radar and jammer.",
-    ['xeb0104'] = "<LOC Unit_Description_0446> Automatically repairs, reclaims, assists or captures any unit within its operational radius.",   
-    ['xeb0204'] = "<LOC Unit_Description_0453> Automatically repairs, reclaims, assists or captures any unit within its operational radius.",
+    ['xeb0104'] = "<LOC Unit_Description_0446> Houses one flying Drone which automatically assists or repairs any unit with its operational radius. Can be ordered to fly around and reclaim, but cannot initiate construction.",   
+    ['xeb0204'] = "<LOC Unit_Description_0453> Houses two flying Drones, each of which automatically assists or repairs any unit with its operational radius. Can be ordered to fly around and reclaim, but cannot initiate construction.",
+    ['uea0001'] = "<LOC Unit_Description_0458> Flying Drone which can assists, repairs, and reclaim any unit. Can be ordered to initiate construction of T1 structures. It's vulnerable to any air fighters or anti-air units",   
+    ['uea0003'] = "<LOC Unit_Description_0458> Flying Drone which can assists, repairs, and reclaim any unit. Can be ordered to initiate construction of T1 structures. It's vulnerable to any air fighters or anti-air units",   
+    ['xea3204'] = "<LOC Unit_Description_0459> Flying Drone which can assists, repairs, and reclaim any unit. Can be ordered to initiate construction of T3 structures. It's vulnerable to any air fighters or anti-air units",   
             
     -- UEF -- Factories HQ
-    ['ueb0101'] = "<LOC Unit_Description_0079> Constructs Tech 1 land units. Upgradeable.",
-    ['ueb0102'] = "<LOC Unit_Description_0080> Constructs Tech 1 air units. Upgradeable.",
-    ['ueb0103'] = "<LOC Unit_Description_0081> Constructs Tech 1 naval units. Upgradeable.",
-    ['ueb0201'] = "<LOC Unit_Description_0082> Constructs Tech 2 land units. Upgradeable.",
-    ['ueb0202'] = "<LOC Unit_Description_0083> Constructs Tech 2 air units. Upgradeable.",
-    ['ueb0203'] = "<LOC Unit_Description_0084> Constructs Tech 2 naval units. Upgradeable.",
-    ['ueb0301'] = "<LOC Unit_Description_0085> Constructs Tech 3 land units. Highest tech level available.",
-    ['ueb0302'] = "<LOC Unit_Description_0086> Constructs Tech 3 air units. Highest tech level available.",
-    ['ueb0303'] = "<LOC Unit_Description_0087> Constructs Tech 3 naval units. Highest tech level available.",
-   
+    ['ueb0101'] = "<LOC Unit_Description_0079> Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost.",
+    ['ueb0102'] = "<LOC Unit_Description_0080> Constructs Tech 1 Air units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost.",
+    ['ueb0103'] = "<LOC Unit_Description_0081> Constructs Tech 1 Naval units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost.",      
+    ['ueb0201'] = "<LOC Unit_Description_0082> Constructs Tech 2 Land units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
+    ['ueb0202'] = "<LOC Unit_Description_0083> Constructs Tech 2 Air units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
+    ['ueb0203'] = "<LOC Unit_Description_0084> Constructs Tech 2 Naval units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",  
+    ['ueb0301'] = "<LOC Unit_Description_0085> Constructs Tech 3 Land units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost.",
+    ['ueb0302'] = "<LOC Unit_Description_0086> Constructs Tech 3 Air units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost.",
+    ['ueb0303'] = "<LOC Unit_Description_0087> Constructs Tech 3 Naval units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost.",
+    
+    -- UEF -- Support Factories
+    ['zeb9603'] = "<LOC Unit_Description_s082> Constructs Tech 2 Land units. Upgradeable to T3 Factory if at least one T3 Land Factory HQ exists.",
+    ['zeb9602'] = "<LOC Unit_Description_s083> Constructs Tech 2 Air units. Upgradeable to T3 Factory if at least one T3 Air Factory HQ exists.",
+    ['zeb9601'] = "<LOC Unit_Description_s084> Constructs Tech 2 Naval units. Upgradeable to T3 Factory if at least one T3 Naval Factory HQ exists.",
+    ['zeb9503'] = "<LOC Unit_Description_s085> Constructs Tech 3 Land units. Buildable for a much cheaper cost if at least one T3 Land Factory HQ exists.",
+    ['zeb9502'] = "<LOC Unit_Description_s086> Constructs Tech 3 Air units. Buildable for a much cheaper cost if at least one T3 Air Factory HQ exists.",
+    ['zeb9501'] = "<LOC Unit_Description_s087> Constructs Tech 3 Naval units. Buildable for a much cheaper cost if at least one T3 Naval Factory HQ exists.",
+  
     -- UEF -- Resource Structures   
     ['ueb1101'] = "<LOC Unit_Description_0088> Generates Energy. Construct next to other structures for adjacency bonus.",
     ['ueb1102'] = "<LOC Unit_Description_0089> Generates Energy. Must be constructed on hydrocarbon deposits. Construct structures next to Hydrocarbon power plant for adjacency bonus.",
@@ -151,7 +163,7 @@ Description = {
     ['ueb3104'] = "<LOC Unit_Description_0105> High-end intelligence system. Provides maximum radar and sonar coverage. Counters enemy intelligence systems.",
      
     -- CYBRAN -- Armored Commander Unit/Upgrades 
-    ['url0001'] = "<LOC Unit_Description_0304> Houses Commander. Combination barracks and command center. Contains all the blueprints necessary to build a basic army from scratch.",   
+    ['url0001'] = "<LOC Unit_Description_0304> Armored Commander is a combination of barracks and command center. Contains all the blueprints necessary to build a basic army from scratch. Upgradeable with combat enhancements, advanced engineering suits, resource allocation system, and teleporting.",   
     ['url0001-ras'] = "<LOC Unit_Description_0106> Increases ACU's resource generation.",
     ['url0001-pcg'] = "<LOC Unit_Description_0107> Cloaks the ACU from optical sensors and increases maximum health. Can be detected by Omni Sensors. Requires Energy to run.",
     ['url0001-psg'] = "<LOC Unit_Description_0108> Hides the ACU from radar. Requires Energy to run.",
@@ -175,10 +187,10 @@ Description = {
    
     -- CYBRAN -- Support Commander Presets
     ['url0301_AntiAir'] = "<LOC url0301_AntiAir_help>Support Armored Command Unit. Enhanced during construction with the nanite missile system enhancement.",
-    ['url0301_Cloak'] = "<LOC url0301_Cloak_help>Support Armored Command Unit. Enhanced during construction with the personal cloaking generator and disintegrator amplifier enhancements.",
-    ['url0301_Combat'] = "<LOC url0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the EMP burst and disintegrator amplifier enhancements.",
+    ['url0301_Cloak'] = "<LOC url0301_Cloak_help>Support Armored Command Unit. Enhanced during construction with the personal cloaking generator and dis-integrator amplifier enhancements.",
+    ['url0301_Combat'] = "<LOC url0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the EMP burst and dis-integrator amplifier enhancements.",
     ['url0301_Engineer'] = "<LOC url0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the rapid fabricator enhancement.",
-    ['url0301_Rambo'] = "<LOC url0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with the EMP burst, disintegrator amplifier and nano-repair system enhancements.",
+    ['url0301_Rambo'] = "<LOC url0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with the EMP burst, dis-integrator amplifier and nano-repair system enhancements.",
     ['url0301_RAS'] = "<LOC url0301_RAS_help>Support Armored Command Unit. Enhanced during construction with a Resource Allocation System.",
     ['url0301_Stealth'] = "<LOC url0301_Stealth_help>Support Armored Command Unit. Enhanced during construction with the personal stealth generator enhancement.",
 
@@ -193,7 +205,7 @@ Description = {
     ['url0111'] = "<LOC Unit_Description_0131>Mobile missile launcher. Designed to attack at long range.",
     ['url0205'] = "<LOC Unit_Description_0132> Mobile AA unit. Armed with flak artillery.",
     ['url0306'] = "<LOC Unit_Description_0133>Mobile stealth generator.",
-    ['url0303'] = "<LOC Unit_Description_0134>Siege assault bot. Armed with a Disintegrator Pulse laser and heavy bolter.",
+    ['url0303'] = "<LOC Unit_Description_0134>Siege assault bot. Armed with a dis-integrator Pulse laser and heavy bolter.",
     ['url0304'] = "<LOC Unit_Description_0135> Slow-moving heavy artillery. Must be stationary to fire.",
     ['url0402'] = "<LOC Unit_Description_0136>Experimental bot. Consumes massive amounts of Energy. Its main laser sweeps across any enemy to its front. Also armed with AA defenses.",
     ['url0401'] = "<LOC Unit_Description_0137>Experimental, rapid-fire artillery. Consumes massive amounts of Energy with each shot. Must be stationary to fire. ",
@@ -203,10 +215,10 @@ Description = {
         
     -- CYBRAN -- Crab Egg Units    
     ['xrl0002'] = "<LOC Unit_Description_0447> Tech 3 amphibious construction, repair, capture and reclamation unit.",
-    ['xrl0003'] = "<LOC Unit_Description_0448> Amphibious assault bot. Capable of attacking land and naval units.",
-    ['xrl0004'] = "<LOC Unit_Description_0449> Mobile AA unit. Armed with flak artillery.",
+    ['xrl0003'] = "<LOC Unit_Description_0448> Extremely heavy Amphibious Assault Robot equipped with direct fire blasters, weak torpedoes and anti-torpedo flares. Designed to engage enemy Experimental units, heavy units, and defense structures.",
+    ['xrl0004'] = "<LOC Unit_Description_0449> Mobile Anti-Air with a low-speed Area-Of-Effect munition, excellent against enemy gunships.",
     ['xrl0005'] = "<LOC Unit_Description_0450> Slow-moving heavy artillery. Must be stationary to fire.",
-   
+  
     -- CYBRAN -- Air Units
     ['ura0101'] = "<LOC Unit_Description_0138> Standard air scout.",
     ['ura0102'] = "<LOC Unit_Description_0139> Quick, maneuverable fighter. Armed with an auto-cannon.",
@@ -234,25 +246,31 @@ Description = {
     ['xrs0205'] = "<LOC Unit_Description_0323> Unarmed counter-intelligence vessel. Equipped with stealth field that counters enemy sonar and radar.",
    
     -- CYBRAN -- Offensive Structures
-    ['urb2101'] = "<LOC Unit_Description_0176> Low-end defensive tower that attacks land- and sea-based units. Does not engage aircraft or submerged units.",
+    ['urb2101'] = "<LOC Unit_Description_0176> Low-end defensive tower that attacks land-based and sea-based units. Does not engage aircraft or submerged units.",
     ['urb2104'] = "<LOC Unit_Description_0177> Anti-air tower. Designed to engage low-end aircraft.",
     ['urb2109'] = "<LOC Unit_Description_0178> Anti-naval defense system.",
     ['urb5101'] = "<LOC Unit_Description_0179> Restricts the movement of enemy units. Offers minimal protection from enemy fire.",
-    ['urb2301'] = "<LOC Unit_Description_0180> Heavily armored defensive tower that attacks land- and sea-based units. Does not engage aircraft or submerged units.",
+    ['urb2301'] = "<LOC Unit_Description_0180> Heavily armored defensive tower that attacks land-based and sea-based units. Does not engage aircraft or submerged units.",
     ['urb2204'] = "<LOC Unit_Description_0181> Anti-air tower. Designed to engage mid-level aircraft.",
     ['urb4201'] = "<LOC Unit_Description_0182> Tactical missile defense. Protection is limited to the structure's operational area.",
     ['urb2205'] = "<LOC Unit_Description_0183> Anti-naval defense system. Designed to engage all naval units.",
-    ['urb4202'] = "<LOC Unit_Description_0184> Generates a protective shield around units and structures within its radius. Shield can be upgraded four times.",
-    ['urb4202-ch'] = "<LOC Unit_Description_0306>Upgrade increases shield's size, strength and operating costs.",
-    ['xrb0104'] = "<LOC Unit_Description_0451> Automatically repairs, reclaims, assists or captures any unit within its operational radius.",
-    ['xrb0204'] = "<LOC Unit_Description_0324> Automatically repairs, reclaims, assists or captures any unit within its operational radius.",
-    ['xrb0304'] = "<LOC Unit_Description_0452> Automatically repairs, reclaims, assists or captures any unit within its operational radius.",
+    ['urb4202'] = "<LOC Unit_Description_0184> Generates a protective shield around units and structures within its radius. Shields transfer residual damage to intersecting bubbles. Shield can be upgraded 4 times.",
+    --NOTE using the same Unit Description because these units are similar
+    ['urb4204'] = "<LOC Unit_Description_0306> Generates a protective shield around units and structures within its radius. This upgrade increases shield's size, strength, and operating costs.",
+    ['urb4205'] = "<LOC Unit_Description_0306> Generates a protective shield around units and structures within its radius. This upgrade increases shield's size, strength, and operating costs.",
+    ['urb4206'] = "<LOC Unit_Description_0306> Generates a protective shield around units and structures within its radius. This upgrade increases shield's size, strength, and operating costs.",
+    ['urb4207'] = "<LOC Unit_Description_0306> Generates a protective shield around units and structures within its radius. This upgrade increases shield's size, strength, and operating costs.",
+    -- CYBRAN -- Hives
+    ['xrb0104'] = "<LOC Unit_Description_0451> Automatically repairs, reclaims, assists or captures any unit within its operational radius. Can be upgraded twice.",
+    ['xrb0204'] = "<LOC Unit_Description_0324> Automatically repairs, reclaims, assists or captures any unit within its operational radius. This upgrade increases build power and operational radius.",
+    ['xrb0304'] = "<LOC Unit_Description_0452> Automatically repairs, reclaims, assists or captures any unit within its operational radius. This upgrade increases build power and operational radius.",
+
     ['xrb2308'] = "<LOC Unit_Description_0325> Submerged torpedo launcher. Capable of destroying the largest of enemy vessels.",
     ['xrb3301'] = "<LOC Unit_Description_0326> Offers complete line-of-sight within its operational area.",
     ['urb2304'] = "<LOC Unit_Description_0185> High-end anti-air tower. Designed to engage all levels of aircraft.",
     ['urb4302'] = "<LOC Unit_Description_0186> Strategic missile defense. Protection is limited to the structure's operational area.",
-    ['urb2303'] = "<LOC Unit_Description_0187>Heavy artillery. Designed to engage slow-moving units and fixed structures.",
-    ['urb2108'] = "<LOC Unit_Description_0188>Tactical missile launcher. Must be ordered to construct missiles.",
+    ['urb2303'] = "<LOC Unit_Description_0187> Heavy artillery. Designed to engage slow-moving units and fixed structures.",
+    ['urb2108'] = "<LOC Unit_Description_0188> Tactical missile launcher. Must be ordered to construct missiles.",
     ['urb5202'] = "<LOC Unit_Description_0189> Refuels and repairs aircraft. Air patrols will automatically use facility.",
     ['urb2302'] = "<LOC Unit_Description_0190> Heavy artillery with excellent range, accuracy and damage potential.",
     ['urb2305'] = "<LOC Unit_Description_0191> Strategic missile launcher. Constructing missiles costs resources. Must be ordered to construct missiles.",
@@ -264,16 +282,24 @@ Description = {
     ['url0309'] = "<LOC Unit_Description_0195> Tech 3 amphibious construction, repair, capture and reclamation unit.",
     
     -- CYBRAN -- Factories HQ
-    ['urb0101'] = "<LOC Unit_Description_0196> Constructs Tech 1 land units. Upgradeable.",
-    ['urb0102'] = "<LOC Unit_Description_0197> Constructs Tech 1 air units. Upgradeable.",
-    ['urb0103'] = "<LOC Unit_Description_0198> Constructs Tech 1 naval units. Upgradeable.",
-    ['urb0201'] = "<LOC Unit_Description_0199> Constructs Tech 2 land units. Upgradeable.",
-    ['urb0202'] = "<LOC Unit_Description_0200> Constructs Tech 2 air units. Upgradeable.",
-    ['urb0203'] = "<LOC Unit_Description_0201> Constructs Tech 2 naval units. Upgradeable.",
-    ['urb0301'] = "<LOC Unit_Description_0202> Constructs Tech 3 land units. Highest tech level available.",
-    ['urb0302'] = "<LOC Unit_Description_0203> Constructs Tech 3 air units. Highest tech level available.",
-    ['urb0303'] = "<LOC Unit_Description_0204> Constructs Tech 3 naval units. Highest tech level available.",
-   
+    ['urb0101'] = "<LOC Unit_Description_0196> Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost.",
+    ['urb0102'] = "<LOC Unit_Description_0197> Constructs Tech 1 Air units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost.",
+    ['urb0103'] = "<LOC Unit_Description_0198> Constructs Tech 1 Naval units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost.",
+    ['urb0201'] = "<LOC Unit_Description_0199> Constructs Tech 2 Land units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
+    ['urb0202'] = "<LOC Unit_Description_0200> Constructs Tech 2 Air units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
+    ['urb0203'] = "<LOC Unit_Description_0201> Constructs Tech 2 Naval units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
+    ['urb0301'] = "<LOC Unit_Description_0202> Constructs Tech 3 Land units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost.",
+    ['urb0302'] = "<LOC Unit_Description_0203> Constructs Tech 3 Air units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost.",
+    ['urb0303'] = "<LOC Unit_Description_0204> Constructs Tech 3 Naval units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost.",
+       
+    -- CYBRAN -- Support Factories  
+    ['zrb9603'] = "<LOC Unit_Description_s199> Constructs Tech 2 Land units. Upgradeable to T3 Factory if at least one T3 Land Factory HQ exists.",
+    ['zrb9602'] = "<LOC Unit_Description_s200> Constructs Tech 2 Air units. Upgradeable to T3 Factory if at least one T3 Air Factory HQ exists.",
+    ['zrb9601'] = "<LOC Unit_Description_s201> Constructs Tech 2 Naval units. Upgradeable to T3 Factory if at least one T3 Naval Factory HQ exists.",
+    ['zrb9503'] = "<LOC Unit_Description_s202> Constructs Tech 3 Land units. Buildable for a much cheaper cost if at least one T3 Land Factory HQ exists.",
+    ['zrb9502'] = "<LOC Unit_Description_s203> Constructs Tech 3 Air units. Buildable for a much cheaper cost if at least one T3 Air Factory HQ exists.",
+    ['zrb9501'] = "<LOC Unit_Description_s204> Constructs Tech 3 Naval units. Buildable for a much cheaper cost if at least one T3 Naval Factory HQ exists.",
+ 
     -- CYBRAN -- Resource Structures
     ['urb1101'] = "<LOC Unit_Description_0205> Generates Energy. Construct next to other structures for adjacency bonus.",
     ['urb1102'] = "<LOC Unit_Description_0206> Generates Energy. Must be constructed on hydrocarbon deposits. Construct structures next to Hydrocarbon power plant for adjacency bonus.",
@@ -297,11 +323,11 @@ Description = {
     ['urb3104'] = "<LOC Unit_Description_0222> High-end intelligence system. Provides maximum radar and sonar coverage. Counters enemy intelligence systems.",
     
     -- AEON -- Armored Commander Unit/Upgrades 
-    ['ual0001'] = "<LOC Unit_Description_0305> Houses Commander. Combination barracks and command center. Contains all the blueprints necessary to build a basic army from scratch.",
+    ['ual0001'] = "<LOC Unit_Description_0305> Armored Commander is a combination of barracks and command center. Contains all the blueprints necessary to build a basic army from scratch. Upgradeable with combat enhancements, advanced engineering suits, resource allocation system, and teleporting.",
     ['ual0001-aes'] = "<LOC Unit_Description_0156> Expands the number of available schematics and increases the ACU's build speed and maximum health.",
     ['ual0001-cd'] = "<LOC Unit_Description_0157>Creates a Quantum Stasis Field around the ACU. Immobilizes enemy units within its radius. High Energy Consumption.",
     ['ual0001-cba'] = "<LOC Unit_Description_0158>Enhances the ACU's Quantum Disrupter beam. Nearly doubles its range.",
-    ['ual0001-ess'] = "<LOC Unit_Description_0159> Greatly expands the range of the standard onboard ACU sensor systems.",
+    ['ual0001-ess'] = "<LOC Unit_Description_0159> Greatly expands the range of the standard on-board ACU sensor systems.",
     ['ual0001-ees'] = "<LOC Unit_Description_0160> Replaces the Tech 2 Engineering Suite. Expands the number of available schematics and further increases the ACU's build speed and maximum health.",
     ['ual0001-hsa'] = "<LOC Unit_Description_0161> Rapidly cools the Quantum Disruptor beam. Increases rate of fire.",
     ['ual0001-ras'] = "<LOC Unit_Description_0162> Increases ACU's resource generation.",
@@ -322,7 +348,7 @@ Description = {
     ['ual0301-pqt'] = "<LOC Unit_Description_0175> Adds teleporter. Requires considerable Energy to activate.",
 
     -- AEON -- Support Commander Presets
-    ['ual0301_Engineer'] = "<LOC ual0301_Engineer_help>SACU upgraded with Rapid Fabricator.",
+    ['ual0301_Engineer']     = "<LOC ual0301_Engineer_help> Support Armored Command Unit. Enhanced during construction with rapid fabrication enhancement.",
     ['ual0301_NanoCombat'] = "<LOC ual0301_NanoCombat_help>Support Armored Command Unit. Enhanced during construction with the reacton refractor and nano-repair system enhancements.",
     ['ual0301_Rambo'] = "<LOC ual0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with a heavy personal shield and the reacton refractor enhancements.",
     ['ual0301_RAS'] = "<LOC ual0301_RAS_help>Support Armored Command Unit. Enhanced during construction with a Resource Allocation System.",
@@ -375,11 +401,11 @@ Description = {
     ['xas0306'] = "<LOC Unit_Description_0333> High-end missile ship. Armed with two racks of highly accurate Serpentine tactical missiles.",
    
     -- AEON -- Offensive Structures
-    ['uab2101'] = "<LOC Unit_Description_0255> Low-end defensive tower that attacks land- and sea-based units. Does not engage aircraft or submerged units.",
+    ['uab2101'] = "<LOC Unit_Description_0255> Low-end defensive tower that attacks land-based and sea-based units. Does not engage aircraft or submerged units.",
     ['uab2104'] = "<LOC Unit_Description_0256> Anti-air tower. Designed to engage low-end aircraft.",
     ['uab2109'] = "<LOC Unit_Description_0257> Anti-naval defense system.",
     ['uab5101'] = "<LOC Unit_Description_0258> Restricts the movement of enemy units. Offers minimal protection from enemy fire.",
-    ['uab2301'] = "<LOC Unit_Description_0259> Heavily armored defensive tower that attacks land- and sea-based units. Does not engage aircraft or submerged units.",
+    ['uab2301'] = "<LOC Unit_Description_0259> Heavily armored defensive tower that attacks land-based and sea-based units. Does not engage aircraft or submerged units.",
     ['uab2204'] = "<LOC Unit_Description_0260> Anti-air tower. Designed to engage mid-level aircraft.",
     ['uab4201'] = "<LOC Unit_Description_0261> Tactical missile defense. Protection is limited to the structure's operational area.",
     ['uab2205'] = "<LOC Unit_Description_0262> Heavy anti-naval defense system. Designed to engage all naval units.",
@@ -402,15 +428,23 @@ Description = {
     ['ual0309'] = "<LOC Unit_Description_0275> Tech 3 amphibious construction, repair, capture and reclamation unit.",
    
     -- AEON -- Factories HQ
-    ['uab0101'] = "<LOC Unit_Description_0276> Constructs Tech 1 land units. Upgradeable.",
-    ['uab0102'] = "<LOC Unit_Description_0277> Constructs Tech 1 air units. Upgradeable.",
-    ['uab0103'] = "<LOC Unit_Description_0278> Constructs Tech 1 naval units. Upgradeable.",
-    ['uab0201'] = "<LOC Unit_Description_0279> Constructs Tech 2 land units. Upgradeable.",
-    ['uab0202'] = "<LOC Unit_Description_0280> Constructs Tech 2 air units. Upgradeable.",
-    ['uab0203'] = "<LOC Unit_Description_0281> Constructs Tech 2 naval units. Upgradeable.",
-    ['uab0301'] = "<LOC Unit_Description_0282> Constructs Tech 3 land units. Highest tech level available.",
-    ['uab0302'] = "<LOC Unit_Description_0283> Constructs Tech 3 air units. Highest tech level available.",
-    ['uab0303'] = "<LOC Unit_Description_0284> Constructs Tech 3 naval units. Highest tech level available.",
+    ['uab0101'] = "<LOC Unit_Description_0276> Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost.",
+    ['uab0102'] = "<LOC Unit_Description_0277> Constructs Tech 1 Air units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost.",
+    ['uab0103'] = "<LOC Unit_Description_0278> Constructs Tech 1 Naval units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost.",
+    ['uab0201'] = "<LOC Unit_Description_0279> Constructs Tech 2 Land units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
+    ['uab0202'] = "<LOC Unit_Description_0280> Constructs Tech 2 Air units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
+    ['uab0203'] = "<LOC Unit_Description_0281> Constructs Tech 2 Naval units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
+    ['uab0301'] = "<LOC Unit_Description_0282> Constructs Tech 3 Land units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost.",
+    ['uab0302'] = "<LOC Unit_Description_0283> Constructs Tech 3 Air units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost.",
+    ['uab0303'] = "<LOC Unit_Description_0284> Constructs Tech 3 Naval units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost.",
+       
+    -- AEON -- Support Factories
+    ['zab9603'] = "<LOC Unit_Description_s279> Constructs Tech 2 Land units. Upgradeable to T3 Factory if at least one T3 Land Factory HQ exists.",
+    ['zab9602'] = "<LOC Unit_Description_s280> Constructs Tech 2 Air units. Upgradeable to T3 Factory if at least one T3 Air Factory HQ exists.",
+    ['zab9601'] = "<LOC Unit_Description_s281> Constructs Tech 2 Naval units. Upgradeable to T3 Factory if at least one T3 Naval Factory HQ exists.",
+    ['zab9503'] = "<LOC Unit_Description_s282> Constructs Tech 3 Land units. Buildable for a much cheaper cost if at least one T3 Land Factory HQ exists.",
+    ['zab9502'] = "<LOC Unit_Description_s283> Constructs Tech 3 Air units. Buildable for a much cheaper cost if at least one T3 Air Factory HQ exists.",
+    ['zab9501'] = "<LOC Unit_Description_s284> Constructs Tech 3 Naval units. Buildable for a much cheaper cost if at least one T3 Naval Factory HQ exists.",
 
     -- AEON -- Resource Structures
     ['uab1101'] = "<LOC Unit_Description_0285> Generates Energy. Construct next to other structures for adjacency bonus.",
@@ -436,7 +470,7 @@ Description = {
     ['xab1401'] = "<LOC Unit_Description_0336> Generates nearly limitless Energy and Mass. Toggles output to match production demands. If destroyed, resulting explosion is equivalent to the detonation of a strategic weapon.",
 
     -- SERAPHIM -- Armored Commander Unit/Upgrades 
-    ['xsl0001'] = "<LOC Unit_Description_0420> Houses Commander. Combination barracks and command center. Contains all the blueprints necessary to build a basic army from scratch.",
+    ['xsl0001'] = "<LOC Unit_Description_0420> Armored Commander is a combination of barracks and command center. Contains all the blueprints necessary to build a basic army from scratch. Upgradeable with combat enhancements, advanced engineering suits, resource allocation system, and teleporting.",
     ['xsl0001-pqt'] = "<LOC Unit_Description_0421> Adds teleporter. Requires considerable Energy to activate.",
     ['xsl0001-dss'] = "<LOC Unit_Description_0422> Increases the speed at which the ACU repairs itself. Also increases hit points.",
     ['xsl0001-adss'] = "<LOC Unit_Description_0454> Further increases the speed at which the ACU repairs itself. Also increases hitpoints.",
@@ -454,7 +488,7 @@ Description = {
     ['xsl0301'] = "<LOC Unit_Description_0433> A multi-purpose construction, repair, capture and reclamation unit. Equivalent to a Tech 3 Engineer.",
     ['xsl0301-tmu'] = "<LOC Unit_Description_0434> Mounts a tactical cruise missile launcher onto the back of the SACU.",
     ['xsl0301-dss'] = "<LOC Unit_Description_0435> Increases the speed at which the SACU repairs itself. Also increases hit points.",
-    ['xsl0301-sre'] = "<LOC Unit_Description_0436> Greatly expands the range of the standard onboard SACU sensor systems, including Omni.",
+    ['xsl0301-sre'] = "<LOC Unit_Description_0436> Greatly expands the range of the standard on-board SACU sensor systems, including Omni.",
     ['xsl0301-efm'] = "<LOC Unit_Description_0437> Speeds up all engineering-related functions.",
     ['xsl0301-sp'] = "<LOC Unit_Description_0438> Adds a personal shield generator to the SACU.",
     ['xsl0301-pqt'] = "<LOC Unit_Description_0439> Adds teleporter. Requires considerable Energy to activate.",
@@ -507,11 +541,11 @@ Description = {
     ['xss0303'] = "<LOC Unit_Description_0368> Can store, transport and repair aircraft. Armed with two pairs of AA auto-cannons.",
     
     -- SERAPHIM -- Offensive Structures
-    ['xsb2101'] = "<LOC Unit_Description_0369> Low-end defensive tower that attacks land- and sea-based units. Does not engage aircraft or submerged units.",
+    ['xsb2101'] = "<LOC Unit_Description_0369> Low-end defensive tower that attacks land-based and sea-based units. Does not engage aircraft or submerged units.",
     ['xsb2104'] = "<LOC Unit_Description_0370> Anti-air tower. Designed to engage low-end aircraft.",
     ['xsb2109'] = "<LOC Unit_Description_0371> Anti-naval defense system.",
     ['xsb5101'] = "<LOC Unit_Description_0372> Restricts the movement of enemy units. Offers minimal protection from enemy fire.",
-    ['xsb2301'] = "<LOC Unit_Description_0373> Heavily armored, defensive tower that attacks land- and sea-based units. Does not engage aircraft or submerged units.",
+    ['xsb2301'] = "<LOC Unit_Description_0373> Heavily armored, defensive tower that attacks land-based and sea-based units. Does not engage aircraft or submerged units.",
     ['xsb2204'] = "<LOC Unit_Description_0374> Anti-air tower. Designed to engage mid-level aircraft.",
     ['xsb4201'] = "<LOC Unit_Description_0375> Tactical missile defense. Protection is limited to the structure's operational area.",
     ['xsb4202'] = "<LOC Unit_Description_0376> Generates a protective shield around units and structures within its radius.",
@@ -532,17 +566,25 @@ Description = {
     ['xsl0309'] = "<LOC Unit_Description_0389> Tech 3 amphibious construction, repair, capture and reclamation unit.",
     
     -- SERAPHIM -- Factories HQ
-    ['xsb0101'] = "<LOC Unit_Description_0390> Constructs Tech 1 land units. Upgradeable.",
-    ['xsb0102'] = "<LOC Unit_Description_0391> Constructs Tech 1 air units. Upgradeable.",
-    ['xsb0103'] = "<LOC Unit_Description_0392> Constructs Tech 1 naval units. Upgradeable.",
-    ['xsb0201'] = "<LOC Unit_Description_0393> Constructs Tech 2 land units. Upgradeable.",
-    ['xsb0202'] = "<LOC Unit_Description_0394> Constructs Tech 2 air units. Upgradeable.",
-    ['xsb0203'] = "<LOC Unit_Description_0395> Constructs Tech 2 naval units. Upgradeable.",
-    ['xsb0301'] = "<LOC Unit_Description_0396> Constructs Tech 3 land units. Highest tech level available.",
-    ['xsb0302'] = "<LOC Unit_Description_0397> Constructs Tech 3 air units. Highest tech level available.",
-    ['xsb0303'] = "<LOC Unit_Description_0398> Constructs Tech 3 naval units. Highest tech level available.",
-    ['xsb0304'] = "<LOC Unit_Description_0399> Summons Support Commander(s).",
-    
+	['xsb0101'] = "<LOC Unit_Description_0390> Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost.",
+	['xsb0102'] = "<LOC Unit_Description_0391> Constructs Tech 1 Air units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost.",
+	['xsb0103'] = "<LOC Unit_Description_0392> Constructs Tech 1 Naval units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost.",
+	['xsb0201'] = "<LOC Unit_Description_0393> Constructs Tech 2 Land units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
+	['xsb0202'] = "<LOC Unit_Description_0394> Constructs Tech 2 Air units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
+	['xsb0203'] = "<LOC Unit_Description_0395> Constructs Tech 2 Naval units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
+	['xsb0301'] = "<LOC Unit_Description_0396> Constructs Tech 3 Land units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost.",
+	['xsb0302'] = "<LOC Unit_Description_0397> Constructs Tech 3 Air units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost.",
+	['xsb0303'] = "<LOC Unit_Description_0398> Constructs Tech 3 Naval units. Allows you to upgrade other T2 factories to T3 support factories for a much cheaper cost.",
+	['xsb0304'] = "<LOC Unit_Description_0399> Summons Support Commander Units.",
+
+	-- SERAPHIM -- Support Factories
+	['zsb9501'] = "<LOC Unit_Description_s393> Constructs Tech 2 Land units. Upgradeable to T3 Factory if at least one T3 Land Factory HQ exists.",
+	['zsb9502'] = "<LOC Unit_Description_s394> Constructs Tech 2 Air units. Upgradeable to T3 Factory if at least one T3 Air Factory HQ exists.",
+	['zsb9503'] = "<LOC Unit_Description_s395> Constructs Tech 2 Naval units. Upgradeable to T3 Factory if at least one T3 Naval Factory HQ exists.",
+	['zsb9601'] = "<LOC Unit_Description_s396> Constructs Tech 3 Land units. Buildable for a much cheaper cost if at least one T3 Land Factory HQ exists.",
+	['zsb9602'] = "<LOC Unit_Description_s397> Constructs Tech 3 Air units. Buildable for a much cheaper cost if at least one T3 Air Factory HQ exists.",
+	['zsb9603'] = "<LOC Unit_Description_s398> Constructs Tech 3 Naval units. Buildable for a much cheaper cost if at least one T3 Naval Factory HQ exists.",
+
     -- SERAPHIM -- Resource Structures
     ['xsb1101'] = "<LOC Unit_Description_0400> Generates Energy. Construct next to other structures for adjacency bonus.",
     ['xsb1102'] = "<LOC Unit_Description_0401> Generates Energy. Must be constructed on hydrocarbon deposits. Construct structures next to Hydrocarbon power plant for adjacency bonus.",
@@ -573,5 +615,10 @@ Description = {
     ['dab2102'] = "<LOC Unit_Description_0443> Gatling-style mortar launcher that fires high-explosive ordinance with a good degree of accuracy.",
     ['drl0204'] = "<LOC Unit_Description_0444> Heavily armored rocket bot. Designed to engage and destroy heavily armored units.",
     ['drs0102'] = "<LOC Unit_Description_0445> Unarmed stealth sub designed for reconnaissance missions. Equipped with anti-torpedo flares.",
-   
+    ['delk002'] = "<LOC Unit_Description_0460> Mobile Anti-Air unit. Armed with a rapid-fire cannon, excellent against enemy gunships or air-fighters.",
+    ['drlk005'] = "<LOC Unit_Description_0461> Mobile Anti-Air unit. Armed with a high-speed missiles, excellent against enemy gunships or air-fighters. Capable of switching weapon to anti-land attack but with smaller damage.",
+    ['drlk001'] = "<LOC Unit_Description_0462> Mobile Anti-Air unit. Armed with a high-speed missiles, excellent against enemy gunships or air-fighters. Capable of switching weapon to anti-land attack but with smaller damage.",
+    ['dalk003'] = "<LOC Unit_Description_0463> Mobile Anti-Air unit. Armed with a high-impact projectiles, excellent against enemy gunships or air-fighters.",
+    ['dslk004'] = "<LOC Unit_Description_0464> Mobile Anti-Air unit. Armed with a long-range lasers, excellent against enemy gunships or air-fighters. Capable of switching weapon to anti-land attack but with smaller damage.",
+
 }
