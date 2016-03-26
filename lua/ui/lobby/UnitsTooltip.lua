@@ -146,8 +146,13 @@ function Create(parent, bp)
         id = bp.SourceID .. "-" .. bp.Icon 
         id = string.lower(id)   
     end
-     
-    value = LOC(UnitDescriptions[id]) or LOC(bp.Interface.Help.HelpText) 
+       
+    value = UnitDescriptions[id]
+    if value then
+       value = LOC(UnitDescriptions[id]) or value
+    else
+       value = LOC(bp.Interface.Help.HelpText) 
+    end 
             
     if not value then
         WARN('UnitsTooltip cannot find unit description for ' .. bp.ID .. ' blueprint')
