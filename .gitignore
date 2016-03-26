@@ -21,3 +21,10 @@ textures/ui/common/BUTTON/BACKUP/
 */dds/*
 .idea
 *.DS_Store
+*.luaproj
+vs-blueprints.luaproj.user
+*.user
+vs-luaFAF.sln
+*.suo
+fa_path.lua
+init_dev.lua
