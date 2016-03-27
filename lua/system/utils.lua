@@ -479,6 +479,17 @@ function StringComma(value)
     return str
 end
 
+--- Prepends a string with specified symbol or one space 
+function StringPrepend(str, symbol)
+    if not symbol then symbol = ' ' end
+    return symbol .. str
+end
+--- Splits a string with camel cast to a string with separate words
+--- e.g. StringSplitCamel('SupportCommanderUnit') -> 'Support Commander Unit'
+function StringSplitCamel(str)
+   return (str:gsub("[A-Z]", StringPrepend):gsub("^.", string.upper))
+end
+
 --- Sorts two variables based on their numeric value or alpha order (strings)
 function Sort(itemA, itemB)
 	if not itemA or not itemB then return 0 end
