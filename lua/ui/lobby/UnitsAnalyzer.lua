@@ -12,7 +12,7 @@
 local bpInfo = { ID = nil , Source = nil, Note = ''}
 local bpIndex = 1
   
-local cached = { Images = {}, Tooltips = {} }
+local cached = { Images = {}, Tooltips = {}, Enhancements = {} }
  
 -- stores blueprints of units and extracted enhancements 
 -- similar to Sim's __blueprints but accessible on UI/lobby side
@@ -112,13 +112,23 @@ CategoriesHidden  = {
     ["BUILTBYTIER1ENGINEER"] = true,     
     ["BUILTBYTIER2ENGINEER"] = true,     
     ["BUILTBYTIER3ENGINEER"] = true,     
+    ["BUILTBYTIER4ENGINEER"] = true,  
+    ["BUILTBYTIER1FIELD"] = true,     
+    ["BUILTBYTIER2FIELD"] = true,   
+    ["BUILTBYTIER3FIELD"] = true,   
     ["BUILTBYTIER1COMMANDER"] = true,     
     ["BUILTBYTIER2COMMANDER"] = true,     
-    ["BUILTBYTIER3COMMANDER"] = true,     
+    ["BUILTBYTIER3COMMANDER"] = true,    
+    ["BUILTBYTIER4COMMANDER"] = true, 
+    ["BUILTBYTIER1ORBITALFACTORY"] = true,
+    ["BUILTBYTIER2ORBITALFACTORY"] = true,
+    ["BUILTBYTIER3ORBITALFACTORY"] = true,
+    ["BUILTBYTIER4ORBITALFACTORY"] = true,     
     ["BUILTBYCOMMANDER"] = true,     
     ["BUILTBYEXPERIMENTALSUB"] = true,     
-    ["BUILTBYQUANTUMGATE"] = true,     
-    --["AIRSTAGINGPLATFORM"] = true,
+    ["BUILTBYQUANTUMGATE"] = true,    
+    ["BUILTBYGANTRY"] = true,     
+    ["VERIFYMISSILEUI"] = true,
     ["BUBBLESHIELDSPILLOVERCHECK"] = true,      
     ["BENIGN"] = true,     
     ["CAPTURE"] = true,     
@@ -145,7 +155,8 @@ CategoriesHidden  = {
     ["VISIBLETORECON"] = true,    
     ["PODSTAGINGPLATFORM"] = true,     
     ["STATIONASSISTPOD"] = true,     
-    ["OVERLAYCOUNTERINTEL"] = true,     
+    ["OVERLAYCOUNTERINTEL"] = true, 
+    ["OVERLAYCOUNTERMEASURE"] = true,      
     ["OVERLAYANTIAIR"] = true,     
     ["OVERLAYSONAR"] = true,     
     ["OVERLAYDIRECTFIRE"] = true,     
@@ -177,7 +188,13 @@ CategoriesHidden  = {
     ["SHOWATTACKRETICLE"] = true,     
     ["TACTICALMISSILEPLATFORM"] = true,     
     ["NEEDMOBILEBUILD"] = true,     
-    ["PATROLHELPER"] = true,      
+    ["PATROLHELPER"] = true,
+    ["RESEARCH"] = true,
+    ["MASSFABRICATION"] = true,
+    ["MASSEXTRACTION"] = true,
+    ["UPGRADE"] = true,
+    ["PRODUCTBREWLAN"] = true,  
+    ["FAVORSWATER"] = true,  
 }
    
 Factions = {
@@ -448,10 +465,8 @@ function GetWeaponProjectile(bp, weapon)
     end 
     
     --NOTE that weapon.ProjectilesPerOnFire is not used at all in FA game
-    if weapon.MuzzleSalvoSize == nil then 
-        WARN('Weapon missing MuzzleSalvoSize ' .. tostring(weapon.DisplayName))
-    else
-        weapon.Multi = weapon.Multi * weapon.MuzzleSalvoSize
+    if weapon.MuzzleSalvoSize > 1 then 
+       weapon.Multi = weapon.Multi * weapon.MuzzleSalvoSize
     end
     --TODO multiply damage of Salvation by AOE or save as it as Damage potential
 
@@ -547,10 +562,12 @@ function GetWeaponsStats(bp)
     --check bp.EnhancementPresetAssigned.Enhancements table to get accurate stats
 
     for id, w in bp.Weapon or {} do
-            
+        local damage = w.NukeInnerRingDamage or w.Damage
+        -- skipping not important weapons  
         if w.WeaponCategory and 
            w.WeaponCategory ~= 'Death' and 
-           w.WeaponCategory ~= 'Teleport'then
+           w.WeaponCategory ~= 'Teleport' and
+           damage > 0 then 
             
            local weapon = GetWeaponSpecs(bp, w) 
            weapon.DPM = weapon.Damage / weapon.BuildCostMass
@@ -614,23 +631,44 @@ function GetWeaponsTotal(weapons)
       
     return total 
 end
-
 --- Returns unit's categories that should not be hidden in tooltips 
 function GetUnitsCategories(bp, showAll)
     local ret = {}
     if bp.Categories then
+         
         local categories = table.keys(bp.Categories)
         if showAll then
-            return categories
+            ret = categories
         else
             for _, category in categories do
+                -- ensure categories are nicely formatted
+                if category == 'MASSPRODUCTION' then 
+                    category = 'MASS PRODUCTION'  
+                elseif category == 'MASSSTORAGE' then 
+                    category = 'MASS STORAGE'  
+                elseif category == 'ENERGYPRODUCTION' then 
+                    category = 'ENERGY PRODUCTION'  
+                elseif category == 'ENERGYSTORAGE' then 
+                    category = 'ENERGY STORAGE'  
+                end 
+                -- ensures name of enhancements are nicely formatted
+                if cached.Enhancements[category] then 
+                    category = 'UPGRADE ' .. StringSplitCamel(category)
+                end
                 if not CategoriesHidden[category] then 
-                     table.insert(ret, category) 
+                    -- ensures all categories have the same case
+                    table.insert(ret, string.upper(category)) 
                 end
             end
-        end        
-    end 
-    return ret
+        end  
+        -- help showing difference between support and HQ factories  
+        if categories['FACTORY'] and 
+           categories['STRUCTURE'] and 
+           not categories['SUPPORTFACTORY'] then 
+            table.insert(ret, 'HQFACTORY') 
+        end       
+    end  
+    return table.sorted(ret)
 end
 --- Creates basic tooltip for given blueprints based on its categories, name, and source
 function GetTooltip(bp)
@@ -883,7 +921,7 @@ function GetUnitsGroups(bps, factionName)
     faction.Bases.ALL       = GetUnits(faction.Units.ALL, '(STRUCTURE + MOBILESONAR + '..TECH4ARTY..')')
     faction.Bases.FACTORIES = GetUnits(faction.Units.ALL, '('..FACTORIES..' + ENGINEER + ENGINEERSTATION + POD)')
     faction.Bases.ECONOMIC  = GetUnits(faction.Bases.ALL, '(STRUCTURE * ECONOMIC)')
-    faction.Bases.SUPPORT   = GetUnits(faction.Bases.ALL, '(WALL + INTELLIGENCE + SHIELD + AIRSTAGINGPLATFORM - ECONOMIC)')
+    faction.Bases.SUPPORT   = GetUnits(faction.Bases.ALL, '(WALL + INTELLIGENCE + SHIELD + AIRSTAGINGPLATFORM - ECONOMIC - ORBITALSYSTEM - MINE)')
     
     faction.Bases.DEFENSES  = {}
     -- collect not grouped units above tables into the DEFENSES table
@@ -910,6 +948,8 @@ local function CacheEnhancement(key, bp, name, enh)
     --Show('SAVING', name .. '...')
     local categories = {}
 
+    cached.Enhancements[name] = true
+
     if blueprints.All[key].Categories then
         categories = blueprints.All[key].Categories
     end
@@ -934,7 +974,7 @@ local function CacheEnhancement(key, bp, name, enh)
         elseif slot == 'BACK' then
             enh.Slot = 'BACK'
         end
-        categories['UPGRADE_'..enh.Slot] = true 
+        categories['UPGRADE '..enh.Slot] = true 
     end     
         
     enh.ID = name

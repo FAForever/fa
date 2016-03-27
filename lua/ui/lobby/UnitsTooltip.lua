@@ -32,8 +32,8 @@ local fontValueSize = 15
 
 local iconSize = 16
    
-local tooltipWidth = 470
-local tooltipHeight = 20 -- initial tooltipHeight
+local tooltipWidth = 420
+local tooltipHeight = 20 -- initial tooltip height
 
 local colorMass    = 'FF79c400' -- #FF79c400   
 local colorEnergy  = 'FFFCCB10' -- #FFFCCB10
@@ -41,7 +41,9 @@ local colorDamage  = 'FFF70B0B' -- #FFF70B0B
 local colorText    = 'FFE1E1E1' -- #FFE1E1E1
 local colorBuild   = 'FFE1E1E1' -- #FFE1E1E1
 local colorDefense = 'FF0090ff' -- #FF0090ff
-local colorMod     = 'FFC905DC' -- #FFC905DC
+local colorMod     = 'FFCB59F7' -- #FFCB59F7
+
+local debugging = false
 
 -- convert time in ticks to a string with MM:SS format
 local function stringTime(time) 
@@ -62,7 +64,7 @@ function Destroy()
        tooltipUI = false 
     end
 end
--- creates custom tooltip with detailed information about game units or modded untis
+-- creates custom tooltip with detailed information about game units or modded units
 function Create(parent, bp)
 
     Destroy()
@@ -78,15 +80,13 @@ function Create(parent, bp)
         title = title .. ' (' .. LOCF(bp.General.UnitName) .. ')'
     end
     
-    tooltipUI = Bitmap(parent) --Group
+    tooltipUI = Bitmap(parent)
     tooltipUI:SetSolidColor(UIUtil.tooltipBorderColor)
     tooltipUI.Depth:Set(function() return parent.Depth() + 10000 end)
     tooltipUI.Width:Set(tooltipWidth)
     tooltipUI.Height:Set(tooltipHeight)
        
     tooltipUI.title = UIUtil.CreateText(tooltipUI, title, fontTextSize, UIUtil.bodyFont)
-    --tooltipUI.title.Top:Set(tooltipUI.Top)
-    --tooltipUI.title.Left:Set(tooltipUI.Left)
     tooltipUI.title.Top:Set(function() return tooltipUI.Top() + 2 end)
     tooltipUI.title.Left:Set(function() return tooltipUI.Left() + 2 end)
    
@@ -94,7 +94,6 @@ function Create(parent, bp)
     tooltipUI.titleBg:SetSolidColor(UIUtil.tooltipTitleColor)
     tooltipUI.titleBg.Depth:Set(function() return tooltipUI.title.Depth() - 1 end)
     tooltipUI.titleBg.Top:Set(tooltipUI.title.Top)
-    --tooltipUI.titleBg.Bottom:Set(tooltipUI.title.Bottom)
     tooltipUI.titleBg.Bottom:Set(function() return tooltipUI.title.Bottom() + 2 end)
   
     tooltipUI.titleBg.Left:Set(function() return tooltipUI.title.Left() end)
@@ -105,7 +104,6 @@ function Create(parent, bp)
     local left = 7 
       
     tooltipUI.body = Bitmap(tooltipUI) 
-    --tooltipUI.body:SetSolidColor(UIUtil.bodyColor)  
     tooltipUI.body:SetSolidColor('FF080808') --#FF080808  
     tooltipUI.body.Height:Set(300)
     tooltipUI.body.Width:Set(tooltipWidth-4)
@@ -126,7 +124,7 @@ function Create(parent, bp)
     tooltipHeight = math.max(tooltipUI.title.Height(), 1)
 
     -- showing bp.Categories because they are more accurate than bp.Display.Abilities
-    local cats = UnitsAnalyzer.GetUnitsCategories(bp)
+    local cats = UnitsAnalyzer.GetUnitsCategories(bp, false)
     value = table.concat(cats, ', ') 
     --table.print(bp.Display.Abilities, 'Abilities')
     tooltipUI.Categories = TextArea(tooltipUI, tooltipWidth, 30)
@@ -149,8 +147,10 @@ function Create(parent, bp)
      
     value = LOC(UnitDescriptions[id]) or LOC(bp.Interface.Help.HelpText) 
             
-    if not value then
-        WARN('UnitsTooltip cannot find unit description for ' .. bp.ID .. ' blueprint')
+    if not value then 
+        if not bp.Mod then -- show warnings only for not modded units
+            WARN('UnitsTooltip cannot find unit description for ' .. bp.ID .. ' blueprint')
+        end
     else
         tooltipUI.Descr = TextArea(tooltipUI, tooltipWidth-10, 30)
         tooltipUI.Descr:SetText(value)
@@ -162,7 +162,7 @@ function Create(parent, bp)
         LayoutHelpers.AtLeftTopIn(tooltipUI.Descr, tooltipUI, left, top) 
      
         top  = top + tooltipUI.Descr.Height()
-        top  = top + 8
+        top  = top + 12
     end                   
    
     perMassLabel = UIUtil.CreateText(tooltipUI, 'PER MASS ', fontTextSize-2, fontTextName)
@@ -409,7 +409,7 @@ function Create(parent, bp)
         mod:SetColor(colorMod) --#FFC905DC 
         LayoutHelpers.AtLeftTopIn(mod, tooltipUI, left, top) 
         top  = top + mod.Height()  
-        if bp.Source then
+        if debugging and bp.Source then
             value = '' .. bp.Source
             source = UIUtil.CreateText(tooltipUI, value, fontTextSize, fontTextName)
             source:SetColor(colorMod) --#FFC905DC 

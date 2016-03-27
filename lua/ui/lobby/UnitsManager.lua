@@ -35,7 +35,8 @@ local checkboxes = { Units = {}, Presets = {} }
 local restrictions = { Custom = {}, Presets = {}, Stats = {} }
  
 local statsText = nil 
-local unitFontSize = 13
+local initFontSize = 13
+local unitFontSize = 0 -- calculated when dialog is created
 local dialogMaxWidth = 1920  -- used to determine scaling of icons/fonts
 local dialogMaxHeight = 1200 -- used to determine scaling of icons/fonts
 local dialogScrollWidth = 15
@@ -69,6 +70,7 @@ local sortBy = {
     },
     -- order blueprints first by their WEAPON categories and then TECH level
     WEAPON = {
+        'MINE', 
         'DIRECTFIRE', 
         'ANTIAIR',
         'TRANSPORTATION',   
@@ -76,21 +78,22 @@ local sortBy = {
         'ANTINAVY',
         'SUBMERSIBLE',
         'BOMBER',
-        'TACTICALMISSILEPLATFORM',
-        'ANTIMISSILE',
-        'NUKE',
         'INDIRECTFIRE',
         'ARTILLERY',
         'TECH1', 
         'TECH2',
         'TECH3',
         'EXPERIMENTAL',
+        'TACTICALMISSILEPLATFORM',
+        'ANTIMISSILE',
+        'NUKE',
     },
     ENGINEERING = { 
         --'STRUCTURE',    
-        'GATE',    
+        'GATE',     
         'SORTCONSTRUCTION',
-        'NAVAL',
+        'NAVAL',   
+        'ORBITAL',
         'AIR',  
         'LAND',
         'ENGINEERSTATION', 
@@ -98,7 +101,7 @@ local sortBy = {
         'TECH1', 
         'TECH2',
         'TECH3',
-        'RESEARCH',     -- FACTORY HQ
+        'RESEARCH', -- FACTORY HQ
         'SUPPORTFACTORY',
         'POD',
         --'FACTORY',    
@@ -210,9 +213,8 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
     -- scale cell size by ratio of dialog size and make space for scroll bar
     cellSize = math.ceil((dialogWidth - dialogScrollWidth - 10) / cellMax)  
     -- scale font size by ratio of dialog size
-    unitFontSize = math.ceil(unitFontSize * (dialogWidth / dialogMaxWidth))  
+    unitFontSize = math.ceil(initFontSize * (dialogWidth / dialogMaxWidth))  
     unitFontSize = math.max(unitFontSize, 8)  
-
     
     local dialogContent = Group(parent)
     dialogContent.Width:Set(dialogWidth)
@@ -438,11 +440,7 @@ function UpdateRestrictionsStats()
     statsText:SetText(info)  
         
     return restrictions.Stats
-end
-
-function GetTooltip(bp)
-    return UnitsAnalyzer.GetTooltip(bp)  
-end
+end 
 
 local UnitsTooltip = import('/lua/ui/lobby/UnitsTooltip.lua')
  
