@@ -255,9 +255,9 @@ end
 
 --- Concatenate keys of a table into a string and separates them by optional string.
 function table.concatkeys(t, sep)
-	sep = sep or ", "
-	local tt = table.keys(t)
-	return table.concat(tt,sep) 
+    sep = sep or ", "
+    local tt = table.keys(t)
+    return table.concat(tt,sep) 
 end 
 
 --- Iterates over a table in key-sorted order:
@@ -308,13 +308,13 @@ end
 --- Reverses order of values in a table using their index
 --- table.reverse {'one','two','three'} => {'three', 'two', 'one'}
 function table.reverse(t)
-	local reversed = {}
-	local items = table.indexize(t) -- convert from hash table
-	local itemsCount = table.getsize(t)
-	for k, v in ipairs(items) do
-		reversed[itemsCount + 1 - k] = v
-	end
-	return reversed
+    local reversed = {}
+    local items = table.indexize(t) -- convert from hash table
+    local itemsCount = table.getsize(t)
+    for k, v in ipairs(items) do
+        reversed[itemsCount + 1 - k] = v
+    end
+    return reversed
 end
 
 --- Converts hash table to a new table with keys from 1 to size of table and the same values
@@ -322,12 +322,12 @@ end
 --- table.indexize { ['a'] = 'one', ['b'] = 'two', ['c'] = 'three' } => 
 ---                {   [1] = 'one',   [2] = 'two',   [3] = 'three' } 
 function table.indexize(t)
-	local indexized = {}
-	for k, v in t do
-		table.insert(indexized, v)
-	end
-	return indexized
-end	
+    local indexized = {}
+    for k, v in t do
+        table.insert(indexized, v)
+    end
+    return indexized
+end
 
 --- table.map(fn,t) returns a table with the same keys as t but with
 --- fn function applied to each value.
@@ -360,7 +360,7 @@ end
 -- Pretty-print a table. Depressingly large amount of wheel-reinvention were required, thanks to
 -- SC's LUA being a bit weird and the existing solutions to this problem being aggressively optimized
 function printField(k, v, tblName, printer)
-	if not printer then printer = WARN end
+    if not printer then printer = WARN end
     if not tblName then tblName = "" end
     if "table" == type(k) then
         table.print(k, tblName .. " ", printer)
@@ -460,10 +460,10 @@ end
 --- Extracts a string between two specified strings  
 --- e.g. StringExtract('/path/name_end.lua', '/', '_end', true) --> name
 function StringExtract(str, str1, str2, fromEnd)
-	local pattern = str1 .. '(.*)' .. str2
-	if fromEnd then pattern = '.*' .. pattern end
-	local i, ii, m = string.find(str, pattern)
-	return m 
+    local pattern = str1 .. '(.*)' .. str2
+    if fromEnd then pattern = '.*' .. pattern end
+    local i, ii, m = string.find(str, pattern)
+    return m 
 end
 
 --- Adds comma as thousands separator in specified value
@@ -492,24 +492,24 @@ end
 
 --- Sorts two variables based on their numeric value or alpha order (strings)
 function Sort(itemA, itemB)
-	if not itemA or not itemB then return 0 end
-	
-	if type(itemA) == "string" or 
-	   type(itemB) == "string" then
-		if string.lower(itemA) == string.lower(itemB) then
-			return 0
-		else
-			-- sort string using alpha order
-			return string.lower(itemA) < string.lower(itemB) 
-		end
-	else 
-	   if math.abs(itemA - itemB) < 0.0001 then
-			return 0
-	   else
-			-- sort numbers in decreasing order
-			return itemA > itemB
-	   end
-	end
+    if not itemA or not itemB then return 0 end
+    
+    if type(itemA) == "string" or 
+       type(itemB) == "string" then
+        if string.lower(itemA) == string.lower(itemB) then
+            return 0
+        else
+            -- sort string using alpha order
+            return string.lower(itemA) < string.lower(itemB) 
+        end
+    else 
+       if math.abs(itemA - itemB) < 0.0001 then
+            return 0
+       else
+            -- sort numbers in decreasing order
+            return itemA > itemB
+       end
+    end
 end
 
 -- Rounds a number to specified double precision 
