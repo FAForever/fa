@@ -382,7 +382,7 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
         UpdateRestrictionsStats() 
     end
 
-    --LOG('UM Updating Restrictions... '.. TimerStop())
+    LOG('UnitsManager... created in '.. TimerStop())
 end
 function UpdateRestrictionsUI(newRestrictions)
     -- order of updating restrictions is important and 
