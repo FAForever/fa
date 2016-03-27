@@ -57,7 +57,7 @@ local original_blueprints
 local current_mod
 
 local function InitOriginalBlueprints()
-	current_mod = nil
+    current_mod = nil
     original_blueprints = {
         Mesh = {},
         Unit = {},
@@ -349,7 +349,7 @@ function HandleUnitWithBuildPresets(bps, all_bps)
                     else
                         WARN('*DEBUG: Enhancement '..repr(enh)..' used in preset '..repr(name)..' for unit '..repr(tempBp.BlueprintId)..' does not exist')
                     end
-		        end
+                end
             end
             tempBp.Economy.BuildCostEnergy = preset.BuildCostEnergyOverride or (tempBp.Economy.BuildCostEnergy + e)
             tempBp.Economy.BuildCostMass = preset.BuildCostMassOverride or (tempBp.Economy.BuildCostMass + m)
@@ -540,7 +540,7 @@ function PostModBlueprints(all_bps)
         end
 
         if cats.USEBUILDPRESETS then
-	        -- HUSSAR adding logic for finding issues in enhancements table
+            -- HUSSAR adding logic for finding issues in enhancements table
             local issues = {}
             if not bp.Enhancements then table.insert(issues, 'no Enhancements value') end
             if type(bp.Enhancements) ~= 'table' then table.insert(issues, 'no Enhancements table') end
@@ -550,7 +550,7 @@ function PostModBlueprints(all_bps)
             if table.getsize(issues) == 0 then
                 table.insert(preset_bps, table.deepcopy(bp))
             else
-		        issues = table.concat(issues,', ') 
+                issues = table.concat(issues,', ') 
                 WARN('UnitBlueprint '..repr(bp.BlueprintId)..' has a category USEBUILDPRESETS but ' .. issues)
             end
         end
@@ -578,7 +578,7 @@ function LoadBlueprints(pattern, mods, skipGameFiles, skipExtraction, skipRegist
 
     LOG('Blueprints Loading... \'' .. tostring(pattern) .. '\' files')
     
-	if not mods then 
+    if not mods then 
         mods = __active_mods or import('/lua/mods.lua').GetGameMods()
     end
     InitOriginalBlueprints()
@@ -596,9 +596,9 @@ function LoadBlueprints(pattern, mods, skipGameFiles, skipExtraction, skipRegist
     stats.ProjsOrg = table.getsize(original_blueprints.Projectile)
 
     for i,mod in mods or {} do
-		current_mod = mod -- used in UnitBlueprint()
+        current_mod = mod -- used in UnitBlueprint()
         for k,file in DiskFindFiles(mod.location, pattern) do
-			BlueprintLoaderUpdateProgress()
+            BlueprintLoaderUpdateProgress()
             safecall("Blueprints Loading mod file "..file, doscript, file)
         end
     end
@@ -606,9 +606,9 @@ function LoadBlueprints(pattern, mods, skipGameFiles, skipExtraction, skipRegist
     stats.ProjsMod = table.getsize(original_blueprints.Projectile) - stats.ProjsOrg
 
     if not skipExtraction then
-		BlueprintLoaderUpdateProgress()
-		LOG('Blueprints Extracting mesh...')
-		ExtractAllMeshBlueprints()
+        BlueprintLoaderUpdateProgress()
+        LOG('Blueprints Extracting mesh...')
+        ExtractAllMeshBlueprints()
     end
 
     BlueprintLoaderUpdateProgress()
@@ -630,14 +630,14 @@ function LoadBlueprints(pattern, mods, skipGameFiles, skipExtraction, skipRegist
                                                 .. stats.ProjsMod .. ' modified projectiles')
     end
      
-	if not skipRegistration then
-		BlueprintLoaderUpdateProgress()
-		LOG('Blueprints Registering...')
-		RegisterAllBlueprints(original_blueprints)
-		original_blueprints = nil
-	else
-		return original_blueprints
-	end
+    if not skipRegistration then
+        BlueprintLoaderUpdateProgress()
+        LOG('Blueprints Registering...')
+        RegisterAllBlueprints(original_blueprints)
+        original_blueprints = nil
+    else
+        return original_blueprints
+    end
 
 end
 -- Reload a single blueprint
