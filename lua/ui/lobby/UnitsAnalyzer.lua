@@ -443,10 +443,21 @@ function GetWeaponDefaults(bp, w)
     weapon.Count  = 1
     weapon.Multi  = 1   
     weapon.Range  = math.round(weapon.MaxRadius or 0)
-    weapon.Damage = weapon.Damage or 0
+    weapon.Damage = GetWeaponDamage(weapon)
     weapon.RPS    = GetWeaponRatePerSecond(bp, weapon) 
     weapon.DPS    = -1  
     return weapon
+end
+--- Get damage of nuke weapon or normal weapon
+function GetWeaponDamage(weapon)
+    local damage = 0 
+    if weapon.NukeWeapon then -- stack nuke damages
+        damage = (weapon.NukeInnerRingDamage or 0)
+        damage = (weapon.NukeOuterRingDamage or 0) + damage
+    else -- normal weapon
+        damage = (weapon.Damage or 0)
+    end
+    return damage
 end
 --- Get specs for a weapon with projectiles 
 function GetWeaponProjectile(bp, weapon)
@@ -469,9 +480,6 @@ function GetWeaponProjectile(bp, weapon)
        weapon.Multi = weapon.Multi * weapon.MuzzleSalvoSize
     end
     --TODO multiply damage of Salvation by AOE or save as it as Damage potential
-
-    -- get nuke damage or regular damage
-    weapon.Damage = weapon.NukeInnerRingDamage or weapon.Damage
       
     local projID = string.lower(weapon.ProjectileId or '')
     local proj = projectiles.All[projID] 
@@ -562,8 +570,8 @@ function GetWeaponsStats(bp)
     --check bp.EnhancementPresetAssigned.Enhancements table to get accurate stats
 
     for id, w in bp.Weapon or {} do
-        local damage = w.NukeInnerRingDamage or w.Damage
-        -- skipping not important weapons  
+        local damage = GetWeaponDamage(w)
+        -- skipping not important weapons, e.g. UEF shield boat fake weapon
         if w.WeaponCategory and 
            w.WeaponCategory ~= 'Death' and 
            w.WeaponCategory ~= 'Teleport' and
