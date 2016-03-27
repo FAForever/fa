@@ -122,9 +122,9 @@ Description = {
     ['xea3204'] = "<LOC Unit_Description_0459> Flying Drone which can assists, repairs, and reclaim any unit. Can be ordered to initiate construction of T3 structures. It's vulnerable to any air fighters or anti-air units",   
             
     -- UEF -- Factories HQ
-    ['ueb0101'] = "<LOC Unit_Description_0079> Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost.",
-    ['ueb0102'] = "<LOC Unit_Description_0080> Constructs Tech 1 Air units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost.",
-    ['ueb0103'] = "<LOC Unit_Description_0081> Constructs Tech 1 Naval units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost.",      
+    ['ueb0101'] = "<LOC Unit_Description_0079> Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
+    ['ueb0102'] = "<LOC Unit_Description_0080> Constructs Tech 1 Air units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
+    ['ueb0103'] = "<LOC Unit_Description_0081> Constructs Tech 1 Naval units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",      
     ['ueb0201'] = "<LOC Unit_Description_0082> Constructs Tech 2 Land units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
     ['ueb0202'] = "<LOC Unit_Description_0083> Constructs Tech 2 Air units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
     ['ueb0203'] = "<LOC Unit_Description_0084> Constructs Tech 2 Naval units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",  
@@ -282,9 +282,9 @@ Description = {
     ['url0309'] = "<LOC Unit_Description_0195> Tech 3 amphibious construction, repair, capture and reclamation unit.",
     
     -- CYBRAN -- Factories HQ
-    ['urb0101'] = "<LOC Unit_Description_0196> Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost.",
-    ['urb0102'] = "<LOC Unit_Description_0197> Constructs Tech 1 Air units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost.",
-    ['urb0103'] = "<LOC Unit_Description_0198> Constructs Tech 1 Naval units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost.",
+    ['urb0101'] = "<LOC Unit_Description_0196> Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
+    ['urb0102'] = "<LOC Unit_Description_0197> Constructs Tech 1 Air units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
+    ['urb0103'] = "<LOC Unit_Description_0198> Constructs Tech 1 Naval units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
     ['urb0201'] = "<LOC Unit_Description_0199> Constructs Tech 2 Land units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
     ['urb0202'] = "<LOC Unit_Description_0200> Constructs Tech 2 Air units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
     ['urb0203'] = "<LOC Unit_Description_0201> Constructs Tech 2 Naval units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
@@ -428,9 +428,9 @@ Description = {
     ['ual0309'] = "<LOC Unit_Description_0275> Tech 3 amphibious construction, repair, capture and reclamation unit.",
    
     -- AEON -- Factories HQ
-    ['uab0101'] = "<LOC Unit_Description_0276> Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost.",
-    ['uab0102'] = "<LOC Unit_Description_0277> Constructs Tech 1 Air units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost.",
-    ['uab0103'] = "<LOC Unit_Description_0278> Constructs Tech 1 Naval units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost.",
+    ['uab0101'] = "<LOC Unit_Description_0276> Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
+    ['uab0102'] = "<LOC Unit_Description_0277> Constructs Tech 1 Air units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
+    ['uab0103'] = "<LOC Unit_Description_0278> Constructs Tech 1 Naval units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
     ['uab0201'] = "<LOC Unit_Description_0279> Constructs Tech 2 Land units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
     ['uab0202'] = "<LOC Unit_Description_0280> Constructs Tech 2 Air units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
     ['uab0203'] = "<LOC Unit_Description_0281> Constructs Tech 2 Naval units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
@@ -566,9 +566,9 @@ Description = {
     ['xsl0309'] = "<LOC Unit_Description_0389> Tech 3 amphibious construction, repair, capture and reclamation unit.",
     
     -- SERAPHIM -- Factories HQ
-	['xsb0101'] = "<LOC Unit_Description_0390> Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost.",
-	['xsb0102'] = "<LOC Unit_Description_0391> Constructs Tech 1 Air units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost.",
-	['xsb0103'] = "<LOC Unit_Description_0392> Constructs Tech 1 Naval units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost.",
+	['xsb0101'] = "<LOC Unit_Description_0390> Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
+	['xsb0102'] = "<LOC Unit_Description_0391> Constructs Tech 1 Air units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
+	['xsb0103'] = "<LOC Unit_Description_0392> Constructs Tech 1 Naval units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
 	['xsb0201'] = "<LOC Unit_Description_0393> Constructs Tech 2 Land units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
 	['xsb0202'] = "<LOC Unit_Description_0394> Constructs Tech 2 Air units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
 	['xsb0203'] = "<LOC Unit_Description_0395> Constructs Tech 2 Naval units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",

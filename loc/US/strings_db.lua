@@ -1483,9 +1483,9 @@ Unit_Description_0458="Flying Drone which can assists, repairs, and reclaim any 
 Unit_Description_0459="Flying Drone which can assists, repairs, and reclaim any unit. Can be ordered to initiate construction of T3 structures. It's vulnerable to any air fighters or anti-air units"  
 
 -- UEF -- Factories HQ
-Unit_Description_0079="Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost."
-Unit_Description_0080="Constructs Tech 1 Air units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost."
-Unit_Description_0081="Constructs Tech 1 Naval units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost."
+Unit_Description_0079="Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
+Unit_Description_0080="Constructs Tech 1 Air units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
+Unit_Description_0081="Constructs Tech 1 Naval units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
 Unit_Description_0082="Constructs Tech 2 Land units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost. "
 Unit_Description_0083="Constructs Tech 2 Air units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
 Unit_Description_0084="Constructs Tech 2 Naval units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
@@ -1632,9 +1632,9 @@ Unit_Description_0324="Automatically assists or repairs any unit within its oper
 Unit_Description_0452="Automatically assists or repairs any unit within its operational radius."
 
 -- CYBRAN -- Factories HQ
-Unit_Description_0196="Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost."
-Unit_Description_0197="Constructs Tech 1 Air units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost."
-Unit_Description_0198="Constructs Tech 1 Naval units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost."
+Unit_Description_0196="Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
+Unit_Description_0197="Constructs Tech 1 Air units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
+Unit_Description_0198="Constructs Tech 1 Naval units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
 Unit_Description_0199="Constructs Tech 2 Land units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
 Unit_Description_0200="Constructs Tech 2 Air units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
 Unit_Description_0201="Constructs Tech 2 Naval units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
@@ -1775,9 +1775,9 @@ Unit_Description_0274="Tech 2 amphibious construction, repair, capture and recla
 Unit_Description_0275="Tech 3 amphibious construction, repair, capture and reclamation unit."
 
 -- AEON -- Factories HQ
-Unit_Description_0276="Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost."
-Unit_Description_0277="Constructs Tech 1 Air units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost."
-Unit_Description_0278="Constructs Tech 1 Naval units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost."
+Unit_Description_0276="Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
+Unit_Description_0277="Constructs Tech 1 Air units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
+Unit_Description_0278="Constructs Tech 1 Naval units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
 Unit_Description_0279="Constructs Tech 2 Land units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
 Unit_Description_0280="Constructs Tech 2 Air units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
 Unit_Description_0281="Constructs Tech 2 Naval units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
@@ -1906,9 +1906,9 @@ Unit_Description_0388="Tech 2 amphibious construction, Repair, Capture and Recla
 Unit_Description_0389="Tech 3 amphibious construction, Repair, Capture and Reclamation unit."
 
 -- SERAPHIM -- Factories HQ
-Unit_Description_0390="Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost."
-Unit_Description_0391="Constructs Tech 1 Air units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost."
-Unit_Description_0392="Constructs Tech 1 Naval units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for to cheaper cost."
+Unit_Description_0390="Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
+Unit_Description_0391="Constructs Tech 1 Air units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
+Unit_Description_0392="Constructs Tech 1 Naval units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
 Unit_Description_0393="Constructs Tech 2 Land units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
 Unit_Description_0394="Constructs Tech 2 Air units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
 Unit_Description_0395="Constructs Tech 2 Naval units. Upgradeable to T3 Factory. Allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
