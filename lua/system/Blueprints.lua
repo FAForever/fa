@@ -563,18 +563,22 @@ end
 -----------------------------------------------------------------------------------------------
 --- Loads all blueprints with optional parameters
 --- @param pattern           - specifies pattern of files to load, defaults to '*.bp'
+--- @param directories       - specifies table of directory paths to load blueprints from, defaults to all directories
 --- @param mods              - specifies table of mods to load blueprints from, defaults to active mods
 --- @param skipGameFiles     - specifies whether skip loading original game files, defaults to false
 --- @param skipExtraction    - specifies whether skip extraction of meshes, defaults to false
 --- @param skipRegistration  - specifies whether skip registration of blueprints, defaults to false
 --- NOTE now it supports loading blueprints on UI-side in addition to loading on Sim-side
 --- Sim -> LoadBlueprints() - no arguments, no changes!
---- UI  -> LoadBlueprints('*_unit.bp', mods, true, true, true)  used in ModsManager.lua 
---- UI  -> LoadBlueprints('*_unit.bp', mods, false, true, true) used in UnitsAnalyzer.lua 
-function LoadBlueprints(pattern, mods, skipGameFiles, skipExtraction, skipRegistration)
+--- UI  -> LoadBlueprints('*_unit.bp', {'/units'}, mods, true, true, true)  used in ModsManager.lua 
+--- UI  -> LoadBlueprints('*_unit.bp', {'/units'}, mods, false, true, true) used in UnitsAnalyzer.lua 
+function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtraction, skipRegistration)
 
-    -- set default parameters if they are not provided
+    -- set default parameters if they are not provided  
     if not pattern then pattern = '*.bp' end
+    if not directories then 
+        directories = {'/effects', '/env', '/meshes', '/projectiles', '/props', '/units'}
+    end
 
     LOG('Blueprints Loading... \'' .. tostring(pattern) .. '\' files')
     
@@ -584,7 +588,7 @@ function LoadBlueprints(pattern, mods, skipGameFiles, skipExtraction, skipRegist
     InitOriginalBlueprints()
 
     if not skipGameFiles then
-        for i,dir in {'/effects', '/env', '/meshes', '/projectiles', '/props', '/units'} do
+        for i,dir in directories do
             for k,file in DiskFindFiles(dir, pattern) do
                 BlueprintLoaderUpdateProgress()
                 safecall("Blueprints Loading org file "..file, doscript, file)
@@ -621,13 +625,13 @@ function LoadBlueprints(pattern, mods, skipGameFiles, skipExtraction, skipRegist
     stats.UnitsPreset = stats.UnitsTotal - stats.UnitsOrg - stats.UnitsMod
     if stats.UnitsTotal > 0 then
         LOG('Blueprints Loading... completed: ' .. stats.UnitsOrg .. ' original, '
-                                                .. stats.UnitsMod .. ' modified, ' 
+                                                .. stats.UnitsMod .. ' modded, and ' 
                                                 .. stats.UnitsPreset .. ' preset units')
     end
     stats.ProjsTotal = table.getsize(original_blueprints.Projectile)
     if stats.ProjsTotal > 0 then
-        LOG('Blueprints Loading... completed: ' .. stats.ProjsOrg .. ' original, '
-                                                .. stats.ProjsMod .. ' modified projectiles')
+        LOG('Blueprints Loading... completed: ' .. stats.ProjsOrg .. ' original and '
+                                                .. stats.ProjsMod .. ' modded projectiles')
     end
      
     if not skipRegistration then

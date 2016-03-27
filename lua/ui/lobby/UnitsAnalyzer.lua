@@ -22,7 +22,7 @@ local projectiles = { All = {}, Original = {}, Modified = {}, Skipped = {} }
  -- manages logs messages based on their type/importance/source 
 local logsTypes = {
     ["WARNING"] = true,  -- recommend to keep it always true
-    ["SAVING"]  = false, -- enable only for debugging
+    ["CACHING"] = false, -- enable only for debugging
     ["PARSING"] = false, -- enable only for debugging
     ["STATUS"] = true,
 }
@@ -953,7 +953,7 @@ function GetUnitsGroups(bps, factionName)
 end
 --- Cache enhancements as new blueprints with Categories, Faction from their parent (unit) blueprints 
 local function CacheEnhancement(key, bp, name, enh)    
-    --Show('SAVING', name .. '...')
+    --Show('CACHING', name .. '...')
     local categories = {}
 
     cached.Enhancements[name] = true
@@ -1016,9 +1016,9 @@ local function CacheProjectile(bp)
 
     local id = string.lower(bp.Source) 
     bp.Info = bp.Source or '' -- or bp.BlueprintId  
-    --Show('SAVING','<' .. bp.Info .. '>...')
+    Show('CACHING', bp.Info .. '...')
       
-   -- converting categories to hash table for quick lookup 
+    -- converting categories to hash table for quick lookup 
     if  bp.Categories then
         local categories = {}
         for _, category in bp.Categories do
@@ -1042,7 +1042,7 @@ local function CacheUnit(bp)
     bp.ID = bp.BlueprintId  
     --bp.Info = bp.Source .. ' (' .. (bp.Interface.HelpText or bp.ID) .. ')'
     bp.Info = bp.Source  
-    --Show('SAVING', bp.Info .. '...')
+    Show('CACHING', bp.Info .. '...')
     
     local id = bp.ID --bpID --bp.UnitId 
 
@@ -1130,10 +1130,10 @@ function DidModsChanged()
     end
   
     if mods.Changed then
-        Show('STATUS', 'UnitManager mods changed from ' .. mods.CachedCount .. ' to ' .. mods.ActiveCount)
+        Show('STATUS', 'mods changed from ' .. mods.CachedCount .. ' to ' .. mods.ActiveCount)
         mods.Cached = table.deepcopy(mods.Active)
     else
-        Show('STATUS', 'UnitManager mods cached = ' .. mods.CachedCount)
+        Show('STATUS', 'mods cached = ' .. mods.CachedCount)
     end
 
     mods.Active = nil
@@ -1145,9 +1145,6 @@ end
 function GetBlueprints(activeMods, skipGameFiles)
 
     TimerStart()
-    
-    local state = 'blueprints...'
-    Show('STATUS', state)
      
     -- load original game files only once 
     local loadedGameFiles = table.getsize(blueprints.Original) > 0 
@@ -1155,6 +1152,9 @@ function GetBlueprints(activeMods, skipGameFiles)
          skipGameFiles = true
     end
 
+    local state = 'blueprints...'
+    Show('STATUS', state)
+   
     if DidModsChanged() or not skipGameFiles then
         blueprints.All = table.deepcopy(blueprints.Original)
         blueprints.Modified = {}
@@ -1165,13 +1165,16 @@ function GetBlueprints(activeMods, skipGameFiles)
         projectiles.Skipped = {}
         
         doscript '/lua/system/Blueprints.lua'
+
         -- loading projectiles first so that they can be used by units
-        bps = LoadBlueprints('*_proj.bp', activeMods, skipGameFiles, true, true) 
+        local dir = {'/projectiles'}
+        bps = LoadBlueprints('*_proj.bp', dir, activeMods, skipGameFiles, true, true) 
         for _, bp in bps.Projectile do
             CacheProjectile(bp) 
         end
         
-        bps = LoadBlueprints('*_unit.bp', activeMods, skipGameFiles, true, true) 
+        dir = {'/units'}  
+        bps = LoadBlueprints('*_unit.bp', dir, activeMods, skipGameFiles, true, true) 
         for _, bp in bps.Unit do
             if not string.find(bp.Source,'proj_') then
                 CacheUnit(bp) 
