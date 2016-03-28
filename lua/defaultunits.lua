@@ -980,7 +980,7 @@ SupportFactoryUnit = Class(FactoryUnit) {
         -- Get tech level from unit requested
         local tech = target_bp.General.TechLevel
 
-        SPEW("Checking: " .. faction .. " / " .. layer .. " / " .. tech .. " for " .. LOC(target_bp.General.UnitName))
+        SPEW("Checking: " .. faction .. " / " .. layer .. " / " .. tech .. " for " .. (LOC(target_bp.General.UnitName) or LOC(target_bp.Description) or 'NOUNITNAME'))
 
         local CanBuild =
             -- Can always build T1
@@ -1994,13 +1994,12 @@ ConstructionUnit = Class(MobileUnit) {
             local aiBrain = self:GetAIBrain()
             local fac_bp = self:GetBlueprint()
 
-            -- Get faction and layer from factory
-            local faction = fac_bp.General.FactionName
-            local layer = fac_bp.General.Icon
-            -- Get tech level from unit requested
+            -- Get faction, layer and techlevel from unit requested
+            local faction = target_bp.General.FactionName
+            local layer = target_bp.General.Icon
             local tech = target_bp.General.TechLevel
 
-            SPEW("Checking: " .. faction .. " / " .. layer .. " / " .. tech .. " for " .. LOC(target_bp.General.UnitName))
+            SPEW("Checking: " .. faction .. " / " .. layer .. " / " .. tech .. " for " .. (LOC(target_bp.General.UnitName) or LOC(target_bp.Description) or 'NOUNITNAME'))
 
             local CanBuild =
                 -- Can always build T1

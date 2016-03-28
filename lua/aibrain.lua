@@ -79,7 +79,7 @@ AIBrain = Class(moho.aibrain_methods) {
         self.HQFacs[faction][layer][tech] = (self.HQFacs[faction][layer][tech] or 0) + 1
         -- Sync
         Sync.HQFacs = table.deepcopy(self.HQFacs)
-        
+
         -- Check back on Sync table
         SPEW('Checking back Sync table from Sim')
         for faction, layers in Sync.HQFacs do
@@ -100,7 +100,7 @@ AIBrain = Class(moho.aibrain_methods) {
         local tech = bp.General.TechLevel
 
         -- sanity check
-        if not ( self.HQFacs[faction] and self.HQFacs[faction][layer] and self.HQFacs[faction][layer][tech])
+        if not ( self.HQFacs[faction] and self.HQFacs[faction][layer] and self.HQFacs[faction][layer][tech]) then
             WARN('Hit unitialized HQFacs in RemoveHQFac, unit id ' .. bp.BlueprintId)
             return
         end
