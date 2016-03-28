@@ -323,7 +323,7 @@ StructureUnit = Class(Unit) {
                 performUpgrade =
                     aiBrain:HasHQFac(faction, layer, tech) or
                     tech == 'RULEUTL_Advanced' and aiBrain:HasHQFac(faction, layer, 'RULEUTL_Secret')
-                WARN('Engymod upgrade check: ' .. repr(performUpgrade))
+                SPEW('Engymod upgrade check: ' .. repr(performUpgrade))
             end
 
             if performUpgrade and order == 'Upgrade' then
@@ -344,13 +344,13 @@ StructureUnit = Class(Unit) {
 
     IdleState = State {
         Main = function(self)
-            WARN('IdleState')
+            SPEW('IdleState')
         end,
     },
 
     UpgradingState = State {
         Main = function(self)
-            WARN('UpgradingState')
+            SPEW('UpgradingState')
             self:StopRocking()
             local bp = self:GetBlueprint().Display
             self:DestroyTarmac()
@@ -931,7 +931,7 @@ FactoryUnit = Class(StructureUnit) {
     IdleState = State {
 
         Main = function(self)
-            WARN('FactoryUnit IdleState')
+            SPEW('FactoryUnit IdleState')
             self:ChangeBlinkingLights('Green')
             self:SetBusy(false)
             self:SetBlockCommandQueue(false)
@@ -942,8 +942,8 @@ FactoryUnit = Class(StructureUnit) {
     BuildingState = State {
 
         Main = function(self)
-            WARN('FactoryUnit BuildingState')
-        local unitBuilding = self.UnitBeingBuilt
+            SPEW('FactoryUnit BuildingState')
+            local unitBuilding = self.UnitBeingBuilt
             local bp = self:GetBlueprint()
             local bone = bp.Display.BuildAttachBone or 0
             self:DetachAll(bone)
@@ -985,7 +985,7 @@ SupportFactoryUnit = Class(FactoryUnit) {
         -- Get tech level from unit requested
         local tech = target_bp.General.TechLevel
 
-        WARN("Checking: " .. faction .. " / " .. layer .. " / " .. tech .. " for " .. LOC(target_bp.General.UnitName))
+        SPEW("Checking: " .. faction .. " / " .. layer .. " / " .. tech .. " for " .. LOC(target_bp.General.UnitName))
 
         local CanBuild =
             -- Can always build T1
@@ -2005,7 +2005,7 @@ ConstructionUnit = Class(MobileUnit) {
             -- Get tech level from unit requested
             local tech = target_bp.General.TechLevel
 
-            WARN("Checking: " .. faction .. " / " .. layer .. " / " .. tech .. " for " .. LOC(target_bp.General.UnitName))
+            SPEW("Checking: " .. faction .. " / " .. layer .. " / " .. tech .. " for " .. LOC(target_bp.General.UnitName))
 
             local CanBuild =
                 -- Can always build T1

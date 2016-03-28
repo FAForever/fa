@@ -3088,10 +3088,10 @@ Unit = Class(moho.unit_methods) {
 
     CheckBuildRestriction = function(self, target_bp)
         if self:CanBuild(target_bp.BlueprintId) then
-            WARN('Unit CheckBuildRestriction succeeded from '.. debug.traceback())
+            SPEW('Unit CheckBuildRestriction succeeded from '.. debug.traceback())
             return true
         else
-            WARN('Unit CheckBuildRestriction failed from '.. debug.traceback())
+            SPEW('Unit CheckBuildRestriction failed from '.. debug.traceback())
             return false
         end
     end,
@@ -3260,7 +3260,7 @@ Unit = Class(moho.unit_methods) {
 
     WorkingState = State {
         Main = function(self)
-            WARN('WorkingState')
+            SPEW('WorkingState')
             while self.WorkProgress < 1 and not self.Dead do
                 WaitSeconds(0.1)
             end

@@ -81,11 +81,11 @@ AIBrain = Class(moho.aibrain_methods) {
         Sync.HQFacs = table.deepcopy(self.HQFacs)
         
         -- Check back on Sync table
-        WARN('Checking back Sync table from Sim')
+        SPEW('Checking back Sync table from Sim')
         for faction, layers in Sync.HQFacs do
           for layer, techs in layers do
             for tech, count in techs do
-                WARN('SIM: Have '..count..' HQs for '..faction..' '..layer..' '..tech)
+                SPEW('SIM: Have '..count..' HQs for '..faction..' '..layer..' '..tech)
             end
           end
         end

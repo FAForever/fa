@@ -2133,11 +2133,11 @@ function OnSelection(buildableCategories, selection, isOldSelection)
             -- Beware: Reverse logic may induce headache
             if not HasHQFac(faction, layer, 'RULEUTL_Advanced') then
                 -- Filter out T2 and T3 if there is no T2 HQ
-                WARN('Filtering out T2 and T3')
+                SPEW('Filtering out T2 and T3')
                 buildableUnits = EntityCategoryFilterOut((categories.TECH2 + categories.TECH3) - categories.RESEARCH, buildableUnits)
             elseif not HasHQFac(faction, layer, 'RULEUTL_Secret') then
                 -- Filter out T3 if there is a T2 HQ but no T3 HQ
-                WARN('Filtering out T3')
+                SPEW('Filtering out T3')
                 buildableUnits = EntityCategoryFilterOut(categories.TECH3 - categories.RESEARCH, buildableUnits)
             end
             local sortDowns = EntityCategoryFilterDown(categories.CONSTRUCTIONSORTDOWN, buildableUnits)
@@ -2159,7 +2159,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
             -- Fourth, check for buildable units
             -- Different this time because we have to check support facs in all layers
             -- So we just go over all facs buildable according to the engy build capabilities
-            WARN('Checking not allFactory')
+            SPEW('Checking not allFactory')
             
             -- Grab all support factories
             local supportFactories = EntityCategoryFilterDown(categories.SUPPORTFACTORY, buildableUnits)
@@ -2167,10 +2167,10 @@ function OnSelection(buildableCategories, selection, isOldSelection)
             buildableUnits = EntityCategoryFilterOut(categories.SUPPORTFACTORY, buildableUnits)
             -- Now add them back one at a time
             for i, unitID in supportFactories do
-                WARN('Checking '..unitID)
+                SPEW('Checking '..unitID)
                 local bp = __blueprints[unitID]
                 if HasHQFac(faction, bp.General.Icon, bp.General.TechLevel) then
-                    WARN('Adding '..unitID)
+                    SPEW('Adding '..unitID)
                     table.insert(buildableUnits, unitID)
                 end
             end
