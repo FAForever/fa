@@ -102,7 +102,7 @@ function CreateDialog(parent, availableMods, saveBehaviour)
     end
 
     -- Title
-    local title = UIUtil.CreateText(dialogContent, 'Mods Manager', 20, UIUtil.titleFont)
+    local title = UIUtil.CreateText(dialogContent, '<LOC _Mod_Manager>Mods Manager', 20, UIUtil.titleFont)
     title:SetColor('B9BFB9')
     title:SetDropShadow(true)
     LayoutHelpers.AtHorizontalCenterIn(title, dialogContent, 0)
@@ -124,14 +124,15 @@ function CreateDialog(parent, availableMods, saveBehaviour)
     
     modsPerPage = math.floor((dialogHeight - 100) / modInfoHeight) -- 1
      
-    -- Mod list
+    -- TODO separate mods into two 2 mods lists: UI and Game
+    -- so that it is faster to find and activate mods
     scrollGroup = Group(dialogContent)
     
     LayoutHelpers.AtLeftIn(scrollGroup, dialogContent, 2) 
-	scrollGroup.Top:Set(function() return subtitle.Bottom() + 5 end)
+    scrollGroup.Top:Set(function() return subtitle.Bottom() + 5 end)
     scrollGroup.Bottom:Set(function() return SaveButton.Top() - 20 end)
     scrollGroup.Width:Set(function() return dialogContent.Width() - 20 end)
-	  -- top, bottom
+    -- top, bottom
     UIUtil.CreateLobbyVertScrollbar(scrollGroup, 1, 0, -10, 10)
     scrollGroup.top = 1
     
@@ -218,22 +219,22 @@ function CreateDialog(parent, availableMods, saveBehaviour)
     local filterGameMods = CreateModsFilter(dialogContent, modsTags.GAME)
     Tooltip.AddControlTooltip(filterGameMods, { 
         text = 'Filter Game Mods', 
-        body = 'Toggle visiblity of all game mods in above list of mods.' } )
-	   
+        body = 'Toggle visibility of all game mods in above list of mods.' } )
+
     LayoutHelpers.AtRightIn(filterGameMods, dialogContent,position)
     LayoutHelpers.AtBottomIn(filterGameMods, dialogContent, 20)
     --filterGameMods.OnCheck = function(self, checked)
-    --    local tag = modsTags[self.tag]
-    --	local color = checked and self.selectedColor or self.unselectedColor
-	--	self.bg:SetSolidColor(color)
-    --    tag.filtered = checked
-    --    FilterMods()
-	--end    
+    --  local tag = modsTags[self.tag]
+    --  local color = checked and self.selectedColor or self.unselectedColor
+    --  self.bg:SetSolidColor(color)
+    --  tag.filtered = checked
+    --  FilterMods()
+    --end    
     position = position + 85
     local filterUIMods = CreateModsFilter(dialogContent, modsTags.UI)
     Tooltip.AddControlTooltip(filterUIMods, { 
         text = 'Filter UI Mods', 
-        body = 'Toggle visiblity of all UI mods in above list of mods.' } )
+        body = 'Toggle visibility of all UI mods in above list of mods.' } )
     LayoutHelpers.AtRightIn(filterUIMods, dialogContent, position)
     LayoutHelpers.AtBottomIn(filterUIMods, dialogContent, 20)
     
@@ -241,7 +242,7 @@ function CreateDialog(parent, availableMods, saveBehaviour)
     local filterDisabledMods = CreateModsFilter(dialogContent, modsTags.DISABLED)
     Tooltip.AddControlTooltip(filterDisabledMods, { 
         text = 'Filter Disabled Mods', 
-        body = 'Toggle visiblity of all disabled mods in above list of mods.' } )
+        body = 'Toggle visibility of all disabled mods in above list of mods.' } )
     LayoutHelpers.AtRightIn(filterDisabledMods, dialogContent, position)
     LayoutHelpers.AtBottomIn(filterDisabledMods, dialogContent, 20)
          
@@ -279,22 +280,22 @@ function CreateModsFilter(parent, tag)
     UIUtil.SkinnableFile('/MODS/double.dds'),
     UIUtil.SkinnableFile('/MODS/disabled.dds'),
     UIUtil.SkinnableFile('/MODS/disabled.dds'),
-		    'UI_Tab_Click_01', 'UI_Tab_Rollover_01') 
+        'UI_Tab_Click_01', 'UI_Tab_Rollover_01') 
 
     checkbox.tag = tag.key
     checkbox.selectedColor  = tag.color  --#317E807E,FF363636
-	checkbox.unselectedColor = '317E807E' 
+    checkbox.unselectedColor = '317E807E' 
     checkbox.border = Bitmap(checkbox)
     LayoutHelpers.AtVerticalCenterIn(checkbox.border, checkbox)
-	LayoutHelpers.AtHorizontalCenterIn(checkbox.border, checkbox)
+    LayoutHelpers.AtHorizontalCenterIn(checkbox.border, checkbox)
     checkbox.bg = Bitmap(checkbox)
     LayoutHelpers.AtVerticalCenterIn(checkbox.bg, checkbox)
-	LayoutHelpers.AtHorizontalCenterIn(checkbox.bg, checkbox)
+    LayoutHelpers.AtHorizontalCenterIn(checkbox.bg, checkbox)
      
     checkbox.label = UIUtil.CreateText(checkbox, tag.name, 12, 'Arial Bold')
     checkbox.label:SetColor('FFB4B6B4') --#FFB4B6B4
     LayoutHelpers.AtVerticalCenterIn(checkbox.label, checkbox)
-	LayoutHelpers.AtHorizontalCenterIn(checkbox.label, checkbox)
+    LayoutHelpers.AtHorizontalCenterIn(checkbox.label, checkbox)
 
     local height = checkbox.label.Height() + 15  -- function() return label.Height() + 5 end
     local width = 80
@@ -309,16 +310,16 @@ function CreateModsFilter(parent, tag)
            modTag.filtered = not checked
            color = checked and modTag.color or color 
         end
- 		--self.bg:SetSolidColor(color)
+        --self.bg:SetSolidColor(color)
         FilterMods()
-	end 
+    end 
 
     checkbox.border.Width:Set(width) 
     checkbox.border.Height:Set(height)
 
-	checkbox.bg.Width:Set(width - 2) 
+    checkbox.bg.Width:Set(width - 2) 
     checkbox.bg.Height:Set(height - 2)
-	  
+
     return checkbox 
 end
     
@@ -344,13 +345,38 @@ local function GetModsFiles(mod, pattern)
     local units = '*_unit.bp'
      
     for k,file in DiskFindFiles(mod.location, pattern) do
-        
-    	BlueprintLoaderUpdateProgress()
+        BlueprintLoaderUpdateProgress()
         safecall("loading mod blueprint "..file, doscript, file)
     end
 end
+function GetModNameVersion(mod)
+    local name = mod.name
+    -- remove old mod version from mod name 
+    name = name:gsub(" %[", " ")
+    name = name:gsub("%]", "")
+    name = name:gsub(" V", " ")
+    name = name:gsub(" v", " ")
+    name = name:gsub(" %d%.%d%d%d", "")
+    name = name:gsub(" %d%.%d%d", "")
+    name = name:gsub(" %d%.%d", "")
+    name = name:gsub(" %d", "") 
+    -- cleanup name 
+    name = name:gsub(" %(%)", "")
+    name = name:gsub(" %)", ")")
+    name = name:gsub(" %-", " ")
+    name = name:gsub("%- ", "")
+    name = name:gsub("%_", " ")
 
---- Initialise the mod list UI.
+    if type(mod.version) == 'number' then
+        local ver = string.format("v%01.2f", mod.version)
+        ver = ver:gsub("%.*0$", "")
+        -- append actual mod version to mod name
+        name = name .. ' --- (' .. ver .. ')'
+    end
+
+    return name
+end
+--- Initialize the mod list UI.
 function RefreshModsList()
     if controlList then
         for k, v in controlList do
@@ -392,6 +418,7 @@ function RefreshModsList()
         --        mod.units[id] = bp
         --    end
         --end
+        mod.title = GetModNameVersion(mod)
 
         if ModBlacklist[uid] then
             -- value is a message explaining why it's blacklisted
@@ -559,14 +586,14 @@ function RefreshModsList()
 
     UpdateModsCounters()
 
-    SortMods('name')
+    SortMods()
 
     scrollGroup.top = 1
     scrollGroup:CalcVisible()
 end
 
 --- Activate the mod with the given uid
--- @param isRecursing Indicates this is a recursve call (usually pulling in dependencies), so should
+-- @param isRecursing Indicates this is a recursive call (usually pulling in dependencies), so should
 --                    not prompt the user for input.
 -- @param visited The set of mods visited during this recursive set of calls (used to break cycles)
 function ActivateMod(uid, isRecursing, visited)
@@ -584,7 +611,7 @@ function ActivateMod(uid, isRecursing, visited)
     local deps = modDependencyMap[uid]
 
     if deps then
-        -- Any conflicting mods activated? We desugared exclusive mods to a universal conflict set, so
+        -- Any conflicting mods activated? We discard exclusive mods to a universal conflict set, so
         -- those are handled here, too.
         if deps.conflicts then
             -- List of uuids that need to be disabled for this mod to work.
@@ -676,9 +703,9 @@ function DeactivateMod(uid, visited)
     UpdateModsCounters()
 end
 
-function SortMods(sortBy)
-	table.sort(controlList, function(a,b)
-        -- sort mods first by type and then by name
+function SortMods()
+    table.sort(controlList, function(a,b)
+        -- sort mods by active state, then by type and finally by name
         local uid = a.modInfo.uid
         if activeMods[a.modInfo.uid] and 
            not activeMods[b.modInfo.uid] then 
@@ -691,15 +718,14 @@ function SortMods(sortBy)
                 if a.modInfo.name == b.modInfo.name then 
                     return tostring(a.modInfo.version) < tostring(b.modInfo.version)  
                 else
-                    return a.modInfo.name < b.modInfo.name  
+                    return string.upper(a.modInfo.title) < string.upper(b.modInfo.title)  
                 end
             else
                 return a.modInfo.type > b.modInfo.type  
             end
         end  
         return 0
-	end)	
-	 
+    end)
 end
 function CreateListElement(parent, modInfo, Pos)
     local group = Group(parent)
@@ -714,12 +740,12 @@ function CreateListElement(parent, modInfo, Pos)
         UIUtil.SkinnableFile('/MODS/double.dds'),
         UIUtil.SkinnableFile('/MODS/disabled.dds'),
         UIUtil.SkinnableFile('/MODS/disabled.dds'),
-		  'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
+            'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
     group.bg.Height:Set(modIconSize + 10)
-	group.bg.Width:Set(dialogWidth - 15) 
+    group.bg.Width:Set(dialogWidth - 15) 
      
     group.Height:Set(modIconSize + 20)
-	group.Width:Set(dialogWidth - 20)  
+    group.Width:Set(dialogWidth - 20)  
     LayoutHelpers.AtLeftTopIn(group, parent, 2, group.Height()*(Pos-1))
    
     group.pos = Pos
@@ -734,13 +760,13 @@ function CreateListElement(parent, modInfo, Pos)
     LayoutHelpers.AtLeftTopIn(group.icon, group, 10, 7)
     LayoutHelpers.AtVerticalCenterIn(group.icon, group)
 
-    group.name = UIUtil.CreateText(group, modInfo.name, 14, UIUtil.bodyFont)
-    group.name:SetColor('FFE9ECE9') -- #FFE9ECE9
+    group.name = UIUtil.CreateText(group, modInfo.title, 14, UIUtil.bodyFont)
+    group.name:SetColor('FFE9ECE9') -- #FFECFAEC
     group.name:DisableHitTest()
     LayoutHelpers.AtLeftTopIn(group.name, group, modInfoPosition, 5)
     group.name:SetDropShadow(true)
     
-    group.desc = MultiLineText(group, UIUtil.bodyFont, 12, 'FFBFC1BF')-- #FFBFC1BF
+    group.desc = MultiLineText(group, UIUtil.bodyFont, 12, 'FFA2A5A2')-- #FFA2A5A2
     group.desc:DisableHitTest()
     LayoutHelpers.AtLeftTopIn(group.desc, group, modInfoPosition, 25)
     --group.desc.Height:Set(modInfoHeight)
@@ -766,7 +792,7 @@ function CreateListElement(parent, modInfo, Pos)
         local uid = modInfo.uid
         group.bg.OnCheck = function(self, checked)
             if checked then
-                table.print(allMods[uid], 'actived mod')
+                table.print(allMods[uid], 'active mod')
                 ActivateMod(uid)
             else
                 DeactivateMod(uid)

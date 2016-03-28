@@ -1,7 +1,7 @@
 -- ******************************************************************************************
--- * File		: lua/modules/ui/lobby/UnitsTooltips.lua 
--- * Authors	: FAF Community, HUSSAR
--- * Summary  	: Provides logic on UI/lobby side for creating tooltips of units and 
+-- * File       : lua/modules/ui/lobby/UnitsTooltips.lua 
+-- * Authors    : FAF Community, HUSSAR
+-- * Summary    : Provides logic on UI/lobby side for creating tooltips of units and 
 --                enhancements with detailed info about build cost, production power, 
 --                weapons, and other stats such as DPS, DPM, etc.
 -- ******************************************************************************************
@@ -32,8 +32,8 @@ local fontValueSize = 15
 
 local iconSize = 16
    
-local tooltipWidth = 470
-local tooltipHeight = 20 -- initial tooltipHeight
+local tooltipWidth = 420
+local tooltipHeight = 20 -- initial tooltip height
 
 local colorMass    = 'FF79c400' -- #FF79c400   
 local colorEnergy  = 'FFFCCB10' -- #FFFCCB10
@@ -41,7 +41,9 @@ local colorDamage  = 'FFF70B0B' -- #FFF70B0B
 local colorText    = 'FFE1E1E1' -- #FFE1E1E1
 local colorBuild   = 'FFE1E1E1' -- #FFE1E1E1
 local colorDefense = 'FF0090ff' -- #FF0090ff
-local colorMod     = 'FFC905DC' -- #FFC905DC
+local colorMod     = 'FFCB59F7' -- #FFCB59F7
+
+local debugging = false
 
 -- convert time in ticks to a string with MM:SS format
 local function stringTime(time) 
@@ -62,7 +64,7 @@ function Destroy()
        tooltipUI = false 
     end
 end
--- creates custom tooltip with detailed information about game units or modded untis
+-- creates custom tooltip with detailed information about game units or modded units
 function Create(parent, bp)
 
     Destroy()
@@ -78,15 +80,13 @@ function Create(parent, bp)
         title = title .. ' (' .. LOCF(bp.General.UnitName) .. ')'
     end
     
-    tooltipUI = Bitmap(parent) --Group
+    tooltipUI = Bitmap(parent)
     tooltipUI:SetSolidColor(UIUtil.tooltipBorderColor)
     tooltipUI.Depth:Set(function() return parent.Depth() + 10000 end)
     tooltipUI.Width:Set(tooltipWidth)
     tooltipUI.Height:Set(tooltipHeight)
        
     tooltipUI.title = UIUtil.CreateText(tooltipUI, title, fontTextSize, UIUtil.bodyFont)
-    --tooltipUI.title.Top:Set(tooltipUI.Top)
-    --tooltipUI.title.Left:Set(tooltipUI.Left)
     tooltipUI.title.Top:Set(function() return tooltipUI.Top() + 2 end)
     tooltipUI.title.Left:Set(function() return tooltipUI.Left() + 2 end)
    
@@ -94,7 +94,6 @@ function Create(parent, bp)
     tooltipUI.titleBg:SetSolidColor(UIUtil.tooltipTitleColor)
     tooltipUI.titleBg.Depth:Set(function() return tooltipUI.title.Depth() - 1 end)
     tooltipUI.titleBg.Top:Set(tooltipUI.title.Top)
-    --tooltipUI.titleBg.Bottom:Set(tooltipUI.title.Bottom)
     tooltipUI.titleBg.Bottom:Set(function() return tooltipUI.title.Bottom() + 2 end)
   
     tooltipUI.titleBg.Left:Set(function() return tooltipUI.title.Left() end)
@@ -105,7 +104,6 @@ function Create(parent, bp)
     local left = 7 
       
     tooltipUI.body = Bitmap(tooltipUI) 
-    --tooltipUI.body:SetSolidColor(UIUtil.bodyColor)  
     tooltipUI.body:SetSolidColor('FF080808') --#FF080808  
     tooltipUI.body.Height:Set(300)
     tooltipUI.body.Width:Set(tooltipWidth-4)
@@ -126,7 +124,7 @@ function Create(parent, bp)
     tooltipHeight = math.max(tooltipUI.title.Height(), 1)
 
     -- showing bp.Categories because they are more accurate than bp.Display.Abilities
-    local cats = UnitsAnalyzer.GetUnitsCategories(bp)
+    local cats = UnitsAnalyzer.GetUnitsCategories(bp, false)
     value = table.concat(cats, ', ') 
     --table.print(bp.Display.Abilities, 'Abilities')
     tooltipUI.Categories = TextArea(tooltipUI, tooltipWidth, 30)
@@ -149,8 +147,10 @@ function Create(parent, bp)
      
     value = LOC(UnitDescriptions[id]) or LOC(bp.Interface.Help.HelpText) 
             
-    if not value then
-        WARN('UnitsTooltip cannot find unit description for ' .. bp.ID .. ' blueprint')
+    if not value then 
+        if not bp.Mod then -- show warnings only for not modded units
+            WARN('UnitsTooltip cannot find unit description for ' .. bp.ID .. ' blueprint')
+        end
     else
         tooltipUI.Descr = TextArea(tooltipUI, tooltipWidth-10, 30)
         tooltipUI.Descr:SetText(value)
@@ -162,7 +162,7 @@ function Create(parent, bp)
         LayoutHelpers.AtLeftTopIn(tooltipUI.Descr, tooltipUI, left, top) 
      
         top  = top + tooltipUI.Descr.Height()
-        top  = top + 8
+        top  = top + 12
     end                   
    
     perMassLabel = UIUtil.CreateText(tooltipUI, 'PER MASS ', fontTextSize-2, fontTextName)
@@ -192,8 +192,8 @@ function Create(parent, bp)
     LayoutHelpers.AtRightTopIn(HealthText, tooltipUI, column4, top)
     HealthIcon = Bitmap(tooltipUI) 
     HealthIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/defense-health.dds')
-	HealthIcon.Height:Set(iconSize)
-	HealthIcon.Width:Set(iconSize) 
+    HealthIcon.Height:Set(iconSize)
+    HealthIcon.Width:Set(iconSize) 
     LayoutHelpers.AtLeftTopIn(HealthIcon, tooltipUI, tooltipWidth-column4, top+2) 
      
     healthValue = (healthValue / eco.BuildCostMass)
@@ -203,8 +203,8 @@ function Create(parent, bp)
     LayoutHelpers.AtRightTopIn(HealthPerMassText, tooltipUI, column5, top)
     HealthPerMassIcon = Bitmap(tooltipUI) 
     HealthPerMassIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/defense-health.dds')
-	HealthPerMassIcon.Height:Set(iconSize)
-	HealthPerMassIcon.Width:Set(iconSize) 
+    HealthPerMassIcon.Height:Set(iconSize)
+    HealthPerMassIcon.Width:Set(iconSize) 
     LayoutHelpers.AtLeftTopIn(HealthPerMassIcon, tooltipUI, tooltipWidth-column5, top+2) 
     
     value = eco.YieldMass
@@ -215,8 +215,8 @@ function Create(parent, bp)
     LayoutHelpers.AtRightTopIn(MassProdText, tooltipUI, column3, top)
     MassProdIcon = Bitmap(tooltipUI) 
     MassProdIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/mass.dds')
-	MassProdIcon.Height:Set(iconSize)
-	MassProdIcon.Width:Set(iconSize) 
+    MassProdIcon.Height:Set(iconSize)
+    MassProdIcon.Width:Set(iconSize) 
     LayoutHelpers.AtLeftTopIn(MassProdIcon, tooltipUI, tooltipWidth-column3, top+2)
          
     value = StringComma(eco.BuildCostMass) .. ' ' 
@@ -225,8 +225,8 @@ function Create(parent, bp)
     LayoutHelpers.AtRightTopIn(MassCostText, tooltipUI, column2, top)
     MassCostIcon = Bitmap(tooltipUI) 
     MassCostIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/mass.dds')
-	MassCostIcon.Height:Set(iconSize)
-	MassCostIcon.Width:Set(iconSize) 
+    MassCostIcon.Height:Set(iconSize)
+    MassCostIcon.Width:Set(iconSize) 
     LayoutHelpers.AtLeftTopIn(MassCostIcon, tooltipUI, tooltipWidth-column2, top+2)
         
     top  = top + MassCostText.Height() + 2
@@ -238,8 +238,8 @@ function Create(parent, bp)
     LayoutHelpers.AtRightTopIn(ShieldText, tooltipUI, column4, top)
     ShieldIcon = Bitmap(tooltipUI) 
     ShieldIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/defense-shields.dds')
-	ShieldIcon.Height:Set(iconSize)
-	ShieldIcon.Width:Set(iconSize) 
+    ShieldIcon.Height:Set(iconSize)
+    ShieldIcon.Width:Set(iconSize) 
     LayoutHelpers.AtLeftTopIn(ShieldIcon, tooltipUI, tooltipWidth-column4, top+2) 
       
     shieldValue = (shieldValue / eco.BuildCostMass)
@@ -249,8 +249,8 @@ function Create(parent, bp)
     LayoutHelpers.AtRightTopIn(ShieldPerMassText, tooltipUI, column5, top)
     ShieldPerMassIcon = Bitmap(tooltipUI) 
     ShieldPerMassIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/defense-shields.dds')
-	ShieldPerMassIcon.Height:Set(iconSize)
-	ShieldPerMassIcon.Width:Set(iconSize) 
+    ShieldPerMassIcon.Height:Set(iconSize)
+    ShieldPerMassIcon.Width:Set(iconSize) 
     LayoutHelpers.AtLeftTopIn(ShieldPerMassIcon, tooltipUI, tooltipWidth-column5, top+2) 
      
     value = eco.YieldEnergy
@@ -261,8 +261,8 @@ function Create(parent, bp)
     LayoutHelpers.AtRightTopIn(EnergyProdText, tooltipUI, column3, top)
     EnergyProdIcon = Bitmap(tooltipUI) 
     EnergyProdIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/energy.dds')
-	EnergyProdIcon.Height:Set(iconSize)
-	EnergyProdIcon.Width:Set(iconSize) 
+    EnergyProdIcon.Height:Set(iconSize)
+    EnergyProdIcon.Width:Set(iconSize) 
     LayoutHelpers.AtLeftTopIn(EnergyProdIcon, tooltipUI, tooltipWidth-column3, top+2)
     
     value = StringComma(math.ceil(eco.BuildCostEnergy)) .. ' ' 
@@ -271,8 +271,8 @@ function Create(parent, bp)
     LayoutHelpers.AtRightTopIn(EnergyCostText, tooltipUI, column2, top)
     EnergyCostIcon = Bitmap(tooltipUI) 
     EnergyCostIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/energy.dds')
-	EnergyCostIcon.Height:Set(iconSize)
-	EnergyCostIcon.Width:Set(iconSize) 
+    EnergyCostIcon.Height:Set(iconSize)
+    EnergyCostIcon.Width:Set(iconSize) 
     LayoutHelpers.AtLeftTopIn(EnergyCostIcon, tooltipUI, tooltipWidth-column2, top+2)
      
     top = top + EnergyCostText.Height() + 2       
@@ -283,8 +283,8 @@ function Create(parent, bp)
     LayoutHelpers.AtRightTopIn(BuildTimeText, tooltipUI, column2, top)
     BuildTimeIcon = Bitmap(tooltipUI) 
     BuildTimeIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/build-time.dds')
-	BuildTimeIcon.Height:Set(iconSize)
-	BuildTimeIcon.Width:Set(iconSize) 
+    BuildTimeIcon.Height:Set(iconSize)
+    BuildTimeIcon.Width:Set(iconSize) 
     LayoutHelpers.AtLeftTopIn(BuildTimeIcon, tooltipUI, tooltipWidth-column2, top+2)
        
     value = StringComma(eco.BuildRate).. ' ' 
@@ -293,8 +293,8 @@ function Create(parent, bp)
     LayoutHelpers.AtRightTopIn(BuildRateText, tooltipUI, column3, top)
     BuildRateIcon = Bitmap(tooltipUI) 
     BuildRateIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/build-rate.dds')
-	BuildRateIcon.Height:Set(iconSize)
-	BuildRateIcon.Width:Set(iconSize) 
+    BuildRateIcon.Height:Set(iconSize)
+    BuildRateIcon.Width:Set(iconSize) 
     LayoutHelpers.AtLeftTopIn(BuildRateIcon, tooltipUI, tooltipWidth-column3, top+2)
       
     top  = top + BuildTimeText.Height() + 10 
@@ -313,8 +313,8 @@ function Create(parent, bp)
         LayoutHelpers.AtRightTopIn(rangeText, tooltipUI, column4, top) 
         rangeIcon = Bitmap(tooltipUI) 
         rangeIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/damage-range.dds')
-	    rangeIcon.Height:Set(iconSize)
-	    rangeIcon.Width:Set(iconSize) 
+        rangeIcon.Height:Set(iconSize)
+        rangeIcon.Width:Set(iconSize) 
         LayoutHelpers.AtLeftTopIn(rangeIcon, tooltipUI, tooltipWidth-column4, top+1)        
             
         value = string.format("%0.2f",weapon.DPM) .. ' ' 
@@ -323,8 +323,8 @@ function Create(parent, bp)
         LayoutHelpers.AtRightTopIn(dpmText, tooltipUI, column5, top) 
         dpmIcon = Bitmap(tooltipUI) 
         dpmIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/damage-per-mass.dds')
-	    dpmIcon.Height:Set(iconSize)
-	    dpmIcon.Width:Set(iconSize) 
+        dpmIcon.Height:Set(iconSize)
+        dpmIcon.Width:Set(iconSize) 
         LayoutHelpers.AtLeftTopIn(dpmIcon, tooltipUI, tooltipWidth-column5, top+1) 
        
         value = StringComma(weapon.DPS) .. ' ' 
@@ -333,8 +333,8 @@ function Create(parent, bp)
         LayoutHelpers.AtRightTopIn(dpsText, tooltipUI, column3, top) 
         dpsIcon = Bitmap(tooltipUI) 
         dpsIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/damage-per-second.dds')
-	    dpsIcon.Height:Set(iconSize)
-	    dpsIcon.Width:Set(iconSize) 
+        dpsIcon.Height:Set(iconSize)
+        dpsIcon.Width:Set(iconSize) 
         LayoutHelpers.AtLeftTopIn(dpsIcon, tooltipUI, tooltipWidth-column3, top+1) 
 
         value = StringComma(weapon.Damage) .. ' ' 
@@ -343,8 +343,8 @@ function Create(parent, bp)
         LayoutHelpers.AtRightTopIn(dmgText, tooltipUI, column2, top) 
         dmgIcon = Bitmap(tooltipUI) 
         dmgIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/damage.dds')
-	    dmgIcon.Height:Set(iconSize)
-	    dmgIcon.Width:Set(iconSize) 
+        dmgIcon.Height:Set(iconSize)
+        dmgIcon.Width:Set(iconSize) 
         LayoutHelpers.AtLeftTopIn(dmgIcon, tooltipUI, tooltipWidth-column2, top+1) 
 
         top  = top + dmgText.Height()           
@@ -365,8 +365,8 @@ function Create(parent, bp)
         LayoutHelpers.AtRightTopIn(rangeText, tooltipUI, column4, top) 
         rangeIcon = Bitmap(tooltipUI) 
         rangeIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/damage-range.dds')
-	    rangeIcon.Height:Set(iconSize)
-	    rangeIcon.Width:Set(iconSize) 
+        rangeIcon.Height:Set(iconSize)
+        rangeIcon.Width:Set(iconSize) 
         LayoutHelpers.AtLeftTopIn(rangeIcon, tooltipUI, tooltipWidth-column4, top+1)        
       
         value = string.format("%0.2f",total.DPM) .. ' ' 
@@ -375,8 +375,8 @@ function Create(parent, bp)
         LayoutHelpers.AtRightTopIn(dpmText, tooltipUI, column5, top)
         dpmIcon = Bitmap(tooltipUI) 
         dpmIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/damage-per-mass.dds')
-	    dpmIcon.Height:Set(iconSize)
-	    dpmIcon.Width:Set(iconSize) 
+        dpmIcon.Height:Set(iconSize)
+        dpmIcon.Width:Set(iconSize) 
         LayoutHelpers.AtLeftTopIn(dpmIcon, tooltipUI, tooltipWidth-column5, top+1)  
 
         value = StringComma(total.DPS) .. ' ' 
@@ -385,8 +385,8 @@ function Create(parent, bp)
         LayoutHelpers.AtRightTopIn(dpsText, tooltipUI, column3, top)       
         dpsIcon = Bitmap(tooltipUI) 
         dpsIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/damage-per-second.dds')
-	    dpsIcon.Height:Set(iconSize)
-	    dpsIcon.Width:Set(iconSize) 
+        dpsIcon.Height:Set(iconSize)
+        dpsIcon.Width:Set(iconSize) 
         LayoutHelpers.AtLeftTopIn(dpsIcon, tooltipUI, tooltipWidth-column3, top+1) 
 
         value = StringComma(total.Damage) .. ' ' 
@@ -395,8 +395,8 @@ function Create(parent, bp)
         LayoutHelpers.AtRightTopIn(dmgText, tooltipUI, column2, top)
         dmgIcon = Bitmap(tooltipUI) 
         dmgIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/damage.dds')
-	    dmgIcon.Height:Set(iconSize)
-	    dmgIcon.Width:Set(iconSize) 
+        dmgIcon.Height:Set(iconSize)
+        dmgIcon.Width:Set(iconSize) 
         LayoutHelpers.AtLeftTopIn(dmgIcon, tooltipUI, tooltipWidth-column2, top+1) 
          
         top  = top + dmgText.Height()  
@@ -409,7 +409,7 @@ function Create(parent, bp)
         mod:SetColor(colorMod) --#FFC905DC 
         LayoutHelpers.AtLeftTopIn(mod, tooltipUI, left, top) 
         top  = top + mod.Height()  
-        if bp.Source then
+        if debugging and bp.Source then
             value = '' .. bp.Source
             source = UIUtil.CreateText(tooltipUI, value, fontTextSize, fontTextName)
             source:SetColor(colorMod) --#FFC905DC 
