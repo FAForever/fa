@@ -292,54 +292,49 @@ StructureUnit = Class(Unit) {
     -- Modified to use same upgrade logic as the ui. This adds more upgrade options via General.UpgradesFromBase blueprint option
     OnStartBuild = function(self, unitBeingBuilt, order )
         --LOG("structure onstartbuild")
-
-        if order == 'Upgrade' then
-
-            local builderBp = self:GetBlueprint()
-            local targetBp = unitBeingBuilt:GetBlueprint()
-            local performUpgrade = false
-
-            if targetBp.General.UpgradesFrom == builderBp.BlueprintId then
-                performUpgrade = true
-            elseif targetBp.General.UpgradesFrom == builderBp.General.UpgradesTo then
-                performUpgrade = true
-            elseif targetBp.General.UpgradesFromBase ~= "none" then
-                -- try testing against the base
-                if targetBp.General.UpgradesFromBase == builderBp.BlueprintId then
-                    performUpgrade = true
-                elseif targetBp.General.UpgradesFromBase == builderBp.General.UpgradesFromBase then
-                    performUpgrade = true
-                end
-            end
-
-            -- engymod check, see SupportFactoryUnit for similar check with explanations
-            if performUpgrade and EntityCategoryContains(categories.SUPPORTFACTORY, targetBp.BlueprintId) then
-                local aiBrain = self:GetAIBrain()
-
-                local faction = builderBp.General.FactionName
-                local layer = builderBp.General.Icon
-                local tech = targetBp.General.TechLevel
-
-                performUpgrade =
-                    aiBrain:HasHQFac(faction, layer, tech) or
-                    tech == 'RULEUTL_Advanced' and aiBrain:HasHQFac(faction, layer, 'RULEUTL_Secret')
-                SPEW('Engymod upgrade check: ' .. repr(performUpgrade))
-            end
-
-            if performUpgrade and order == 'Upgrade' then
-                Unit.OnStartBuild(self,unitBeingBuilt, order)
-                self.UnitBeingBuilt = unitBeingBuilt
-                ChangeState(self, self.UpgradingState)
-            else
-                -- TODO: Figure out how the magical "record current build queue and restore it after clearing" technique actually works and implement it here
-                -- But factory losing all orders is not actually a big problem - we should never get to this point of having to clear an erroneously
-                -- queued support factory unless someone is trying to cheat.
-                IssueClearCommands({self})
-            end
-        else
-                Unit.OnStartBuild(self,unitBeingBuilt, order)
-                self.UnitBeingBuilt = unitBeingBuilt
+        
+        if order ~= 'Upgrade' then
+            Unit.OnStartBuild(self,unitBeingBuilt, order)
+            self.UnitBeingBuilt = unitBeingBuilt
+            return
         end
+
+        local builderBp = self:GetBlueprint()
+        local targetBp = unitBeingBuilt:GetBlueprint()
+        local performUpgrade =
+            targetBp.General.UpgradesFrom == builderBp.BlueprintId
+            or targetBp.General.UpgradesFrom == builderBp.General.UpgradesTo
+            or targetBp.General.UpgradesFromBase ~= "none"
+                and (
+                    targetBp.General.UpgradesFromBase == builderBp.BlueprintId
+                    or targetBp.General.UpgradesFromBase == builderBp.General.UpgradesFromBase
+                )
+
+        -- engymod check, see SupportFactoryUnit for similar check with explanations
+        if performUpgrade and EntityCategoryContains(categories.SUPPORTFACTORY, targetBp.BlueprintId) then
+            local aiBrain = self:GetAIBrain()
+
+            local faction = builderBp.General.FactionName
+            local layer = builderBp.General.Icon
+            local tech = targetBp.General.TechLevel
+
+            performUpgrade =
+                aiBrain:HasHQFac(faction, layer, tech) or
+                tech == 'RULEUTL_Advanced' and aiBrain:HasHQFac(faction, layer, 'RULEUTL_Secret')
+            SPEW('Engymod upgrade check: ' .. repr(performUpgrade))
+        end
+
+        if performUpgrade and order == 'Upgrade' then
+            Unit.OnStartBuild(self,unitBeingBuilt, order)
+            self.UnitBeingBuilt = unitBeingBuilt
+            ChangeState(self, self.UpgradingState)
+        else
+            -- TODO: Figure out how the magical "record current build queue and restore it after clearing" technique actually works and implement it here
+            -- But factory losing all orders is not actually a big problem - we should never get to this point of having to clear an erroneously
+            -- queued support factory unless someone is trying to cheat.
+            IssueClearCommands({self})
+        end
+
      end,
 
     IdleState = State {

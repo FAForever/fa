@@ -3087,6 +3087,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     CheckBuildRestriction = function(self, target_bp)
+        -- TODO: reduce the whole function body to 'return self:CanBuild(target_bp.BlueprintId)'
         if self:CanBuild(target_bp.BlueprintId) then
             SPEW('Unit CheckBuildRestriction succeeded from '.. debug.traceback())
             return true

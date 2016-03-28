@@ -100,14 +100,9 @@ AIBrain = Class(moho.aibrain_methods) {
         local tech = bp.General.TechLevel
 
         -- sanity check
-        if not self.HQFacs[faction] then
+        if not ( self.HQFacs[faction] and self.HQFacs[faction][layer] and self.HQFacs[faction][layer][tech])
             WARN('Hit unitialized HQFacs in RemoveHQFac, unit id ' .. bp.BlueprintId)
-        end
-        if not self.HQFacs[faction][layer] then
-            WARN('Hit unitialized HQFacs in RemoveHQFac, unit id ' .. bp.BlueprintId)
-        end
-        if not self.HQFacs[faction][layer][tech] then
-            WARN('Hit unitialized HQFacs in RemoveHQFac, unit id ' .. bp.BlueprintId)
+            return
         end
 
         self.HQFacs[faction][layer][tech] = (self.HQFacs[faction][layer][tech]) - 1
