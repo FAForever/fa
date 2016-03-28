@@ -124,7 +124,8 @@ function CreateDialog(parent, availableMods, saveBehaviour)
     
     modsPerPage = math.floor((dialogHeight - 100) / modInfoHeight) -- 1
      
-    -- Mod list
+    -- TODO separate mods into two 2 mods lists: UI and Game
+    -- so that it is faster to find and activate mods
     scrollGroup = Group(dialogContent)
     
     LayoutHelpers.AtLeftIn(scrollGroup, dialogContent, 2) 
@@ -348,7 +349,33 @@ local function GetModsFiles(mod, pattern)
         safecall("loading mod blueprint "..file, doscript, file)
     end
 end
+function GetModNameVersion(mod)
+    local name = mod.name
+    -- remove old mod version from mod name 
+    name = name:gsub(" %[", " ")
+    name = name:gsub("%]", "")
+    name = name:gsub(" V", " ")
+    name = name:gsub(" v", " ")
+    name = name:gsub(" %d%.%d%d%d", "")
+    name = name:gsub(" %d%.%d%d", "")
+    name = name:gsub(" %d%.%d", "")
+    name = name:gsub(" %d", "") 
+    -- cleanup name 
+    name = name:gsub(" %(%)", "")
+    name = name:gsub(" %)", ")")
+    name = name:gsub(" %-", " ")
+    name = name:gsub("%- ", "")
+    name = name:gsub("%_", " ")
 
+    if type(mod.version) == 'number' then
+        local ver = string.format("v%01.2f", mod.version)
+        ver = ver:gsub("%.*0$", "")
+        -- append actual mod version to mod name
+        name = name .. ' --- (' .. ver .. ')'
+    end
+
+    return name
+end
 --- Initialize the mod list UI.
 function RefreshModsList()
     if controlList then
@@ -391,6 +418,7 @@ function RefreshModsList()
         --        mod.units[id] = bp
         --    end
         --end
+        mod.title = GetModNameVersion(mod)
 
         if ModBlacklist[uid] then
             -- value is a message explaining why it's blacklisted
@@ -558,7 +586,7 @@ function RefreshModsList()
 
     UpdateModsCounters()
 
-    SortMods('name')
+    SortMods()
 
     scrollGroup.top = 1
     scrollGroup:CalcVisible()
@@ -675,9 +703,9 @@ function DeactivateMod(uid, visited)
     UpdateModsCounters()
 end
 
-function SortMods(sortBy)
+function SortMods()
     table.sort(controlList, function(a,b)
-        -- sort mods first by type and then by name
+        -- sort mods by active state, then by type and finally by name
         local uid = a.modInfo.uid
         if activeMods[a.modInfo.uid] and 
            not activeMods[b.modInfo.uid] then 
@@ -690,7 +718,7 @@ function SortMods(sortBy)
                 if a.modInfo.name == b.modInfo.name then 
                     return tostring(a.modInfo.version) < tostring(b.modInfo.version)  
                 else
-                    return a.modInfo.name < b.modInfo.name  
+                    return string.upper(a.modInfo.title) < string.upper(b.modInfo.title)  
                 end
             else
                 return a.modInfo.type > b.modInfo.type  
@@ -732,13 +760,13 @@ function CreateListElement(parent, modInfo, Pos)
     LayoutHelpers.AtLeftTopIn(group.icon, group, 10, 7)
     LayoutHelpers.AtVerticalCenterIn(group.icon, group)
 
-    group.name = UIUtil.CreateText(group, modInfo.name, 14, UIUtil.bodyFont)
-    group.name:SetColor('FFE9ECE9') -- #FFE9ECE9
+    group.name = UIUtil.CreateText(group, modInfo.title, 14, UIUtil.bodyFont)
+    group.name:SetColor('FFE9ECE9') -- #FFECFAEC
     group.name:DisableHitTest()
     LayoutHelpers.AtLeftTopIn(group.name, group, modInfoPosition, 5)
     group.name:SetDropShadow(true)
     
-    group.desc = MultiLineText(group, UIUtil.bodyFont, 12, 'FFBFC1BF')-- #FFBFC1BF
+    group.desc = MultiLineText(group, UIUtil.bodyFont, 12, 'FFA2A5A2')-- #FFA2A5A2
     group.desc:DisableHitTest()
     LayoutHelpers.AtLeftTopIn(group.desc, group, modInfoPosition, 25)
     --group.desc.Height:Set(modInfoHeight)
