@@ -1936,13 +1936,15 @@ Unit = Class(moho.unit_methods) {
         local bp = self:GetBlueprint()
         if Game.UnitRestricted(self) then
             WARN('Unit.OnStopBeingBuilt() Cannot create restricted unit: ' .. (bp.Description or id) )
-            if self ~= nil then self:Kill() end 
-            return false -- report failure of OnStartBuild
+            if self ~= nil then self:Destroy() end 
+            return false -- report failure of OnStopBeingBuilt
         end
 
         if bp.EnhancementPresetAssigned then
             self:ForkThread(self.CreatePresetEnhancementsThread)
         end
+
+        return true
     end,
 
     StartBeingBuiltEffects = function(self, builder, layer)
@@ -2189,8 +2191,8 @@ Unit = Class(moho.unit_methods) {
         if Game.UnitRestricted(built) then
             WARN('Unit:OnStartBuild() Cannot build restricted unit: ' .. (bp.Description or id) )
             self:OnFailedToBuild() -- don't use: self:OnStopBuild()
-            built:OnFailedToBeBuilt()
-            built:Kill() 
+            IssueClearFactoryCommands({self})
+            IssueClearCommands({self})
             return false -- report failure of OnStartBuild
         end
         
@@ -2204,7 +2206,7 @@ Unit = Class(moho.unit_methods) {
         -- OnStartBuild() is called on paused engineers when they roll up to their next construction
         -- task. This is a native-code bug: it shouldn't be calling OnStartBuild at all in this case
         if self:IsPaused() then
-            return
+            return true
         end
 
         if order == 'Repair' then
@@ -2232,6 +2234,7 @@ Unit = Class(moho.unit_methods) {
             built:SetCollisionShape('None')
             built.IsUpgrade = true
         end
+        return true
     end,
 
     OnStopBuild = function(self, built)

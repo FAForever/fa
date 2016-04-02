@@ -291,7 +291,10 @@ StructureUnit = Class(Unit) {
 
     -- Modified to use same upgrade logic as the ui. This adds more upgrade options via General.UpgradesFromBase blueprint option
     OnStartBuild = function(self, unitBeingBuilt, order )
-        Unit.OnStartBuild(self,unitBeingBuilt, order)
+        -- check for death loop
+        if not Unit.OnStartBuild(self, unitBeingBuilt, order) then
+            return 
+        end
         self.UnitBeingBuilt = unitBeingBuilt
 
         --LOG("structure onstartbuild")
@@ -1877,7 +1880,7 @@ ConstructionUnit = Class(MobileUnit) {
         if unitBeingBuilt.WorkItem.Slot and unitBeingBuilt.WorkProgress == 0 then
             return
         else
-            MobileUnit.OnStartBuild(self,unitBeingBuilt, order)
+            MobileUnit.OnStartBuild(self, unitBeingBuilt, order)
         end
         -- Fix up info on the unit id from the blueprint and see if it matches the 'UpgradeTo' field in the BP.
         self.UnitBeingBuilt = unitBeingBuilt
