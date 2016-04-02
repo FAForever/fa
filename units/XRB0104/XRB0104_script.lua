@@ -12,13 +12,13 @@ local CConstructionStructureUnit = import('/lua/cybranunits.lua').CConstructionS
 XRB0104 = Class(CConstructionStructureUnit) 
 {
     OnStartBuild = function(self, unitBeingBuilt, order)
-        CConstructionStructureUnit.OnStartBuild(self, unitBeingBuilt, order)
-        
         if not self.AnimationManipulator then
             self.AnimationManipulator = CreateAnimator(self)
             self.Trash:Add(self.AnimationManipulator)
         end
         self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationOpen, false):SetRate(1)
+        
+        CConstructionStructureUnit.OnStartBuild(self, unitBeingBuilt, order)
     end,
     
     OnStopBuild = function(self, unitBeingBuilt)
