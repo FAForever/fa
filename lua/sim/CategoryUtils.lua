@@ -88,7 +88,7 @@ function ParseEntityCategoryProperly(categoryExpression)
     --- Given two categories and an operator token, return the result of applying the operator to
     -- the two categories (in the order given)
     local function mergeCategories(currentCategory, newCategory, operator)
-        -- Initialisation case.
+        -- Initialization case.
         if not operator and not currentCategory then
             return newCategory
         end
@@ -116,7 +116,7 @@ function ParseEntityCategoryProperly(categoryExpression)
         local i = start
         while i <= finish do
             local token = tokens[i]
-            WARN(token)
+            LOG(token)
 
             if expectingIdentifier then
                 -- Bracket expressions are effectively identifiers

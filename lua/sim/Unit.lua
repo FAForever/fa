@@ -1931,10 +1931,13 @@ Unit = Class(moho.unit_methods) {
 
         ArmyBrains[self:GetArmy()]:AddUnitStat(self:GetUnitId(), "built", 1)
 
-        -- If someone thinks they're being clever by using a UI mod to violate unit restrictions,
-        -- thoroughly ruin their day.
-        if Game.UnitRestricted(self:GetUnitId(), self) then
-            self:Kill()
+        -- prevent UI mods from violating game/scenario restrictions 
+        local id = self:GetUnitId()
+        local bp = self:GetBlueprint()
+        if Game.UnitRestricted(self) then
+            WARN('Unit.OnStopBeingBuilt() Cannot create restricted unit: ' .. (bp.Description or id) )
+            if self ~= nil then self:Kill() end 
+            return false -- report failure of OnStartBuild
         end
 
         if bp.EnhancementPresetAssigned then
@@ -2179,6 +2182,18 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnStartBuild = function(self, built, order)
+        
+        -- prevent UI mods from violating game/scenario restrictions 
+        local id = built:GetUnitId()
+        local bp = built:GetBlueprint() 
+        if Game.UnitRestricted(built) then
+            WARN('Unit:OnStartBuild() Cannot build restricted unit: ' .. (bp.Description or id) )
+            self:OnFailedToBuild() -- don't use: self:OnStopBuild()
+            built:OnFailedToBeBuilt()
+            built:Kill() 
+            return false -- report failure of OnStartBuild
+        end
+        
         -- We just started a construction (and haven't just been tasked to work on a half-done
         -- project.)
         if built:GetHealth() == 1 then
