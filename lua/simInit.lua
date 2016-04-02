@@ -85,17 +85,17 @@ function SetupSession()
     local buildRestrictions, enhRestrictions = nil, {}
 
     local restrictions = ScenarioInfo.Options.RestrictedCategories
-	if restrictions then
+    if restrictions then
         table.print(restrictions, 'RestrictedCategories')
-	    local presets = import('/lua/ui/lobby/UnitsRestrictions.lua').GetPresetsData()
+        local presets = import('/lua/ui/lobby/UnitsRestrictions.lua').GetPresetsData()
         for index, restriction in restrictions do
             
             local preset = presets[restriction]
             if not preset then -- custom restriction  
-                --TODO find a way to seprate custom restrictions of units/enhancements
+                --TODO find a way to separate custom restrictions of units/enhancements
                 LOG('restriction.custom >'.. restriction ..'<') 
 
-                -- using hash table because it is fater to check for restrictions later in game    
+                -- using hash table because it is faster to check for restrictions later in game    
                 enhRestrictions[restriction] = true
 
                 if buildRestrictions then
@@ -105,7 +105,7 @@ function SetupSession()
                 end
             else -- preset restriction  
                 if preset.categories then
-                    LOG('restriction.categories '.. restriction) 
+                    LOG('restriction.preset '.. preset.categories) 
                     if buildRestrictions then
                         buildRestrictions = buildRestrictions .. " + (" .. preset.categories .. ")"
                     else
@@ -125,13 +125,14 @@ function SetupSession()
     end
 
     if buildRestrictions then
+        LOG('restriction.build '.. buildRestrictions) 
         buildRestrictions = import('/lua/sim/Categoryutils.lua').ParseEntityCategoryProperly(buildRestrictions)
-        import('/lua/game.lua').SetRestrictions(buildRestrictions)
+        import('/lua/game.lua').AddRestriction(buildRestrictions)
         ScenarioInfo.BuildRestrictions = buildRestrictions
     end
 
     if table.getsize(enhRestrictions) > 0 then
-    table.print(enhRestrictions, 'enhRestrictions0 ')
+        --table.print(enhRestrictions, 'enhRestrictions ')
         import('/lua/enhancementcommon.lua').RestrictList(enhRestrictions)
     end
 

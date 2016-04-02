@@ -102,27 +102,61 @@ function GetConstructEconomyModel(builder, targetData, upgradeBaseData)
    return buildtime / rate, energy, mass
 end
 
--- An EntityCategory set representing the banned units for this game.
-local restrictedCategorySet
+-- table with restrictions/expressions ('categories.TECH1 * UEF') set: 
+-- 1 in UnitsManager (ScenarioInfo.Options.RestrictedCategories) or 
+-- 2 in Scenario script (MapName_script.lua) a set of EntityCategory set representing the banned units for this game.
+local restrictions =  {}
+-- table with cached evaluation of restricted units
+local evaluatedUnits = {}
 
---- Returns true if the given unitId is banned from this game, true otherwise.
--- Dynamically created due to hotness. Default behaviour is nop - no restrictions.
-UnitRestricted = function() return false end
-
-function SetRestrictions(categorySet)
-    local _UnitRestricted_cache = {}
-    local restrictedCategorySet = categorySet
-
-    UnitRestricted = function(unitId, unit)
-        if _UnitRestricted_cache[unitId] ~= nil then
-            return _UnitRestricted_cache[unitId]
-        end
-
-        -- Does the intersection of this unit's singleton category with the banned set contain the
-        -- singleton category?
-        local isBanned = EntityCategoryContains(restrictedCategorySet * ParseEntityCategory(unitId), unit)
-        _UnitRestricted_cache[unitId] = isBanned
-
+--- adds game restriction of units with Entity categories, e.g. 'categories.TECH1 * categories.UEF - '
+--- NOTE do not call this function to set build restriction on an unit (e.g. factories/carriers)
+function AddRestriction(categories)
+    
+    if type(categories) ~= 'userdata' then
+        WARN('Game.AddRestriction() called with invalid argument type: ' .. type(categories))
+    end
+    -- reset units cache every time new restriction is added
+    evaluatedUnits = {} 
+    --LOG('Game.Restrictions adding ' .. tostring(categorySet)) 
+     
+    -- save unique new restricted categories with previously added restrictions
+    local key = repr(categories)
+    if not restrictions[key] then 
+        restrictions[key] = categories
+    end 
+end
+-- returns true if the given unitID is banned from this game
+-- otherwise returns false (unit not restricted)
+function UnitRestricted(unit)
+    if not restrictions then
+        return false
+    end
+    if not unit then
+        WARN('Game.UnitRestricted(Unit) called with nil argument.')
+        return false
+    end
+    local unitID = unit:GetUnitId() 
+    if unitID == nil then
+        WARN('Game.UnitRestricted(Unit) called without unit class argument.')
+        return false
+    end
+    
+    local isBanned = false
+    if evaluatedUnits[unitID] ~= nil then
+        isBanned =  evaluatedUnits[unitID]
+        --LOG('Game.UnitRestricted: ' .. tostring(isBanned) .. ' - unitID ' .. unitID .. ' - cached' ) 
         return isBanned
     end
-end
+    --table.print(restrictions, 'Game.Restrictions')
+    for key, categories in restrictions do
+        -- checks for intersection of this unit's categories with restricted categories
+        isBanned = EntityCategoryContains(categories * ParseEntityCategory(unitID), unit)
+        --LOG('Game.UnitRestricted: ' .. tostring(isBanned) .. ' - unitID ' .. unitID  .. ' - '  .. key) 
+        if isBanned then break end 
+    end
+    evaluatedUnits[unitID] = isBanned     
+    --LOG('Game.UnitRestricted: ' .. tostring(isBanned) .. ' - unitID ' .. unitID ) 
+    return isBanned
+end 
+
