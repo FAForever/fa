@@ -1380,6 +1380,10 @@ AIBrain = Class(moho.aibrain_methods) {
         self.AttackManager:AddPlatoon(spec)
     end,
 
+    AMPauseAttackManager = function(self)
+        self.AttackManager:PauseAttackManager()
+    end,
+
     ------------------------------------------------------------------------------------------------------------------------------------
     ---- ------------- AI PLATOON MANAGEMENT  ----------------------- ----
     ------------------------------------------------------------------------------------------------------------------------------------
