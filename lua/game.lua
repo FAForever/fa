@@ -52,9 +52,7 @@ BuffFieldBlueprint {                         -- Seraphim ACU Advanced Restoratio
     Buffs = {
         'SeraphimAdvancedACURegenAura',
     },
-}
-
-
+} 
 
 -- Return the total time (in seconds), energy, and mass it will take for the given
 -- builder to create a unit of type target_bp.

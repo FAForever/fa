@@ -1,4 +1,4 @@
-# Here's an opportunity for user side script to examine the Sync table for the new tick
+-- Here's an opportunity for user side script to examine the Sync table for the new tick
 local baseOnSync = OnSync
 OnSync = function()
     baseOnSync()
@@ -36,7 +36,7 @@ OnSync = function()
         end
     end
 
-    #Play Voices
+    --Play Voices
     if not import('/lua/ui/game/missiontext.lua').IsHeadPlaying() then
         for k, v in Sync.Voice do
             PlayVoice(Sound{ Bank=v.Bank, Cue=v.Cue }, true)
@@ -83,15 +83,15 @@ OnSync = function()
 
     if not table.empty(Sync.Score) then
         import('/lua/ui/game/score.lua').currentScores = Sync.Score
-		if not Sync.FullScoreSync then
-			import('/lua/ui/game/scoreaccum.lua').UpdateScoreData(Sync.Score)
-		end
+        if not Sync.FullScoreSync then
+            import('/lua/ui/game/scoreaccum.lua').UpdateScoreData(Sync.Score)
+        end
     end
     
     if Sync.FullScoreSync then
-		if not table.empty(Sync.ScoreAccum) then
-			import('/lua/ui/game/scoreaccum.lua').OnFullSync(Sync.ScoreAccum)
-		end
+        if not table.empty(Sync.ScoreAccum) then
+            import('/lua/ui/game/scoreaccum.lua').OnFullSync(Sync.ScoreAccum)
+        end
     end
 
     for k,gameResult in Sync.GameResult do
