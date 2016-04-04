@@ -264,7 +264,10 @@ function AdjustFrameRate()
 
     if type(options.primary_adapter) == 'string' then
         local data = utils.StringSplit(options.primary_adapter, ',')
-        fps = math.max(60, math.min(100, data[3]))
+        local hz = tonumber(data[3])
+        if hz then
+            fps = math.max(60, math.min(100, hz))
+        end
     end
 
     ConExecute("SC_FrameTimeClamp " .. (1000 / fps ))
