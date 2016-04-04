@@ -2532,7 +2532,7 @@ Unit = Class(moho.unit_methods) {
 
         ChangeState(self, self.WorkingState)
         -- inform EnhanceTask that enhancement is not restricted 
-		return true 
+        return true 
     end,
 
     OnWorkEnd = function(self, work)

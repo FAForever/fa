@@ -1885,7 +1885,7 @@ function FormatData(unitData, type)
         local usedEnhancements = {}
         local restEnh = EnhanceCommon.GetRestricted()
 
-		-- filter enhancements based on restrictions
+        -- filter enhancements based on restrictions
         for index, enhTable in unitData do
             if not restEnh[enhTable.ID] and not string.find(enhTable.ID, 'Remove') then
                 table.insert(filteredEnh, enhTable)
