@@ -192,7 +192,7 @@ DefaultProjectileWeapon = Class(Weapon) {
     -- Determine how much Energy should be drained per second
     GetWeaponEnergyDrain = function(self)
         local bp = self:GetBlueprint()
-        local weapNRG = (bp.EnergyDrainPerSecond or 0)
+        local weapNRG = (bp.EnergyDrainPerSecond or 0) * (self.AdjEnergyMod or 1)
         return weapNRG
     end,
 
