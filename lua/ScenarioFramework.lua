@@ -1006,21 +1006,25 @@ end
 
 -- adds Scenario restriction notification for the UI/sim
 function AddRestriction(army, categories)
-    -- LOG(repr(categories))
+    --LOG('Scenario.AddRestriction'.. repr(categories))
     SimUIVars.SaveTechRestriction(categories)
     AddBuildRestriction(army, categories)
-    -- pass scenario restriction to game restrictions
+    -- add scenario restriction to game restrictions
     import('/lua/game.lua').AddRestriction(categories)
+    Sync.Restrictions = import('/lua/game.lua').GetRestrictions() 
 end
 
 function RemoveRestriction(army, categories, isSilent)
-    -- LOG(repr(categories))
+    LOG('Scenario.RemoveRestriction'.. repr(categories))
     SimUIVars.SaveTechAllowance(categories)
     if not isSilent then
         if not Sync.NewTech then Sync.NewTech = {} end
         table.insert(Sync.NewTech, EntityCategoryGetUnitList(categories))
     end
     RemoveBuildRestriction(army, categories)
+    -- remove scenario restriction from game restrictions
+    import('/lua/game.lua').RemoveRestriction(categories)
+    Sync.Restrictions = import('/lua/game.lua').GetRestrictions()
 end
 
 

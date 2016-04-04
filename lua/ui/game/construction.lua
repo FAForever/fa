@@ -1759,7 +1759,17 @@ function FormatData(unitData, type)
 
         table.insert(sortedUnits, EntityCategoryFilterDown(miscCats, unitData))
 
-
+        -- get ids of restricted units
+        local restricted = import('/lua/game.lua').GetRestrictions()
+        
+        -- This section adds the arrows in for a build icon which is an upgrade from the
+        -- selected unit. If there is an upgrade chain, it will display them split by arrows.
+        -- I'm excluding Factories from this for now, since the chain of T1 -> T2 HQ -> T3 HQ
+        -- or T1 -> T2 Support -> T3 Support is not supported yet by the code which actually
+        -- looks up, stores, and executes the upgrade chain. This needs doing for 3654.
+        local unitSelected = sortedOptions.selection[1]
+        local isStructure = EntityCategoryContains(categories.STRUCTURE - categories.FACTORY, unitSelected)
+                
         for i, units in sortedUnits do
             table.sort(units, SortFunc)
             local index = i
@@ -1768,22 +1778,23 @@ function FormatData(unitData, type)
                     table.insert(retData, { type = 'spacer' })
                 end
                 
-                -- This section adds the arrows in for a build icon which is an upgrade from the
-                -- selected unit. If there is an upgrade chain, it will display them split by arrows.
-                
-                -- I'm excluding Factories from this for now, since the chain of T1 -> T2 HQ -> T3 HQ
-                -- or T1 -> T2 Support -> T3 Support is not supported yet by the code which actually
-                -- looks up, stores, and executes the upgrade chain. This needs doing for 3654.
-                for unitIndex, unit in units do
-                    local bp = __blueprints[unit]
-                    local from = bp.General.UpgradesFrom
-                    if from and from ~= 'none' and EntityCategoryContains(categories.STRUCTURE - categories.FACTORY, sortedOptions.selection[1]) then
-                        table.insert(retData, { type = 'arrow'})
+                for index, unit in units do
+                    -- show UI data/icons only for not restricted units
+                    if not restricted[unit] then
+                        local bp = __blueprints[unit] 
+                        -- check if upgradeable structure
+                        if isStructure and 
+                           bp and bp.General and 
+                           bp.General.UpgradesFrom and
+                           bp.General.UpgradesFrom ~= 'none' then
+                            table.insert(retData, { type = 'arrow'})
+                        end
+                        table.insert(retData, { type = 'item', id = unit })
                     end
-                    table.insert(retData, { type = 'item', id = unit })
                 end
             end
         end
+
         CreateExtraControls('construction')
         SetSecondaryDisplay('buildQueue')
     elseif type == 'selection' then

@@ -1934,7 +1934,7 @@ Unit = Class(moho.unit_methods) {
         -- prevent UI mods from violating game/scenario restrictions 
         local id = self:GetUnitId()
         local bp = self:GetBlueprint()
-        if Game.UnitRestricted(self) then
+        if Game.IsRestricted(self:GetUnitId()) then
             WARN('Unit.OnStopBeingBuilt() Cannot create restricted unit: ' .. (bp.Description or id) )
             if self ~= nil then self:Destroy() end 
             return false -- report failure of OnStopBeingBuilt
@@ -2188,7 +2188,7 @@ Unit = Class(moho.unit_methods) {
         -- prevent UI mods from violating game/scenario restrictions 
         local id = built:GetUnitId()
         local bp = built:GetBlueprint() 
-        if Game.UnitRestricted(built) then
+        if Game.IsRestricted(built:GetUnitId()) then
             WARN('Unit:OnStartBuild() Cannot build restricted unit: ' .. (bp.Description or id) )
             self:OnFailedToBuild() -- don't use: self:OnStopBuild()
             IssueClearFactoryCommands({self})

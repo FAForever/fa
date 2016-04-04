@@ -93,7 +93,7 @@ function SetupSession()
             local preset = presets[restriction]
             if not preset then -- custom restriction  
                 --TODO find a way to separate custom restrictions of units/enhancements
-                LOG('restriction.custom >'.. restriction ..'<') 
+                LOG('restriction.custom: "'.. restriction ..'"') 
 
                 -- using hash table because it is faster to check for restrictions later in game    
                 enhRestrictions[restriction] = true
@@ -105,7 +105,7 @@ function SetupSession()
                 end
             else -- preset restriction  
                 if preset.categories then
-                    LOG('restriction.preset '.. preset.categories) 
+                    LOG('restriction.preset "'.. preset.categories .. '"') 
                     if buildRestrictions then
                         buildRestrictions = buildRestrictions .. " + (" .. preset.categories .. ")"
                     else
@@ -113,11 +113,10 @@ function SetupSession()
                     end
                 end 
                 if preset.enhancements then
-                    LOG('restriction.enhancement '.. restriction)
+                    LOG('restriction.enhancement "'.. restriction .. '"')
                     table.print(preset.enhancements, 'restriction.enhancements ')
                     for _, enhancement in preset.enhancements do
                         enhRestrictions[enhancement] = true
-                        --table.insert(enhRestrictions, enhancement)
                     end
                 end
             end           
@@ -194,7 +193,7 @@ end
 -- the initial units and any other gameplay state we need.
 --===================================================================================
 function BeginSession()
-
+    LOG('BeginSession...')
     local focusarmy = GetFocusArmy()
     if focusarmy>=0 and ArmyBrains[focusarmy] then
         LocGlobals.PlayerName = ArmyBrains[focusarmy].Nickname
@@ -250,6 +249,8 @@ function BeginSession()
     end
 
     Sync.EnhanceRestrict = import('/lua/enhancementcommon.lua').GetRestricted()
+
+    Sync.Restrictions = import('/lua/game.lua').GetRestrictions()
 
     --for off-map prevention
     OnStartOffMapPreventionThread()

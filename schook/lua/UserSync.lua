@@ -50,6 +50,9 @@ OnSync = function()
     if Sync.EnhanceRestrict then
         import('/lua/enhancementcommon.lua').RestrictList( Sync.EnhanceRestrict )
     end
+    if Sync.Restrictions then
+        import('/lua/game.lua').SetRestrictions( Sync.Restrictions )
+    end 
 
     if Sync.NISVideo then
         import('/lua/ui/game/missiontext.lua').PlayNIS(Sync.NISVideo)
