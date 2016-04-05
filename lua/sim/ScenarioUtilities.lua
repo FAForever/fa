@@ -527,27 +527,25 @@ function InitializeScenarioArmies()
     local tblGroups = {}
     local tblArmy = ListArmies()
     local factions = import('/lua/factions.lua')
-
     local bCreateInitial = ShouldCreateInitialArmyUnits()
+    local armies = {}
+    for i, name in tblArmy do
+        armies[name] = i
+    end
 
     ScenarioInfo.CampaignMode = true
     Sync.CampaignMode = true
     import('/lua/sim/simuistate.lua').IsCampaign(true)
 
-    for iArmy, strArmy in pairs(tblArmy) do
-
+    for iArmy, strArmy in tblArmy do
         local tblData = Scenario.Armies[strArmy]
 
         tblGroups[ strArmy ] = {}
 
         if tblData then
-
             LOG('*DEBUG: InitializeScenarioArmies, army = ', strArmy)
-
             SetArmyEconomy( strArmy, tblData.Economy.mass, tblData.Economy.energy)
-
             if tblData.faction ~= nil then
-
                 if ScenarioInfo.ArmySetup[strArmy].Human then
                     local factionIndex = math.min(math.max(ScenarioInfo.ArmySetup[strArmy].Faction, 1), table.getsize(factions.Factions))
                     SetArmyFactionIndex( strArmy, factionIndex - 1 )
@@ -582,18 +580,16 @@ function InitializeScenarioArmies()
             ----[ eemerson                                                         ]--
             ----[ Override alliances with custom alliance settings                 ]--
             if tblData.Alliances ~= nil then
-               for iEnemy,iAlliance in pairs(tblData.Alliances) do
-                   if iArmy ~= iEnemy then
-                       SetAllianceOneWay( strArmy, iEnemy, iAlliance )
-                   end
+               for army_name, state in tblData.Alliances do
+                    if armies[army_name] and strArmy ~= army_name then
+                        SetAllianceOneWay(strArmy, army_name, state)
+                    end
                end
-           end
+            end
 
             GetArmyBrain(strArmy):InitializePlatoonBuildManager()
             LoadArmyPBMBuilders(strArmy)
-
         end
-
     end
 
     return tblGroups
