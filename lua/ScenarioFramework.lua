@@ -1,12 +1,10 @@
--- ****************************************************************************
--- **
--- **  File     :  /lua/scenarioFramework.lua
--- **  Author(s): John Comes, Drew Staltman
--- **
--- **  Summary  : Functions for use in the Operations.
--- **
--- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
--- ****************************************************************************
+-- ==========================================================================================
+-- * File       : /lua/scenarioFramework.lua
+-- * Authors    : John Comes, Drew Staltman
+-- * Summary    : Functions for use in the scenario scripts.
+-- * Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- ==========================================================================================
+
 local TriggerFile = import('scenariotriggers.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local UnitUpgradeTemplates = import('/lua/upgradeTemplates.lua').UnitUpgradeTemplates
@@ -74,7 +72,7 @@ end
 -- Single Area Trigger Creation
 -- This will create an area trigger around <rectangle>.  It will fire when <categoy> is met of <aiBrain>.
 -- onceOnly means it will not continue to run after the first time it fires.
--- invert meants it will fire when units are NOT in the area.  Useful for testing if someone has defeated a base.
+-- invert means it will fire when units are NOT in the area.  Useful for testing if someone has defeated a base.
 -- number refers to the number of units it will take to fire.  If not inverted.  It will fire when that many are in the area-- If inverted, it will fire when less than that many are in the area
 function CreateAreaTrigger( callbackFunction, rectangle, category, onceOnly, invert, aiBrain, number, requireBuilt)
     return TriggerFile.CreateAreaTrigger(callbackFunction, rectangle, category, onceOnly, invert, aiBrain, number, requireBuilt)
@@ -212,9 +210,6 @@ function OverrideKilled(self, instigator, type, overkillRatio)
     self:ForkThread(self.DeathThread, overkillRatio , instigator)
 end
 
-
-
-
 function GiveUnitToArmy( unit, newArmyIndex )
     -- We need the brain to ignore army cap when transferring the unit
     -- do all necessary steps to set brain to ignore, then un-ignore if necessary the unit cap
@@ -226,7 +221,6 @@ function GiveUnitToArmy( unit, newArmyIndex )
     end
     return newUnit
 end
-
 
 -- Single Line unit death trigger creation
 -- When <unit> is killed, reclaimed, or captured it will call the <cb> function provided
@@ -399,8 +393,6 @@ function CreateUnitDistanceTrigger( callbackFunction, unitOne, unitTwo, distance
     TriggerFile.CreateUnitDistanceTrigger( callbackFunction, unitOne, unitTwo, distance )
 end
 
-
-
 -- Stat trigger creation
 -- === triggerTable spec === -- 
 -- {
@@ -436,8 +428,6 @@ end
 function CreateArmyStatTrigger(callbackFunction, aiBrain, name, triggerTable)
     TriggerFile.CreateArmyStatTrigger(callbackFunction, aiBrain, name, triggerTable)
 end
-
-
 
 -- Fires when the threat level of <position> of size <rings> is related to <value>
 -- if <greater> is true it will fire if the threat is greater than <value>
@@ -856,7 +846,7 @@ function SpawnCommander(brain, unit, effect, name, PauseAtDeath, DeathTrigger, e
         end
     end
 
-    -- If true is passed as parametr then it uses default name.
+    -- If true is passed as parameter then it uses default name.
     if name == true then
         ACU:SetCustomName(GetArmyBrain(brain).Nickname)
     elseif type(name) == 'string' then
@@ -986,7 +976,6 @@ function FakeGateInUnit(unit, callbackFunction)
     end
 end
 
-
 -- Upgrades unit - for use with engineers, factories, radar, and other single upgrade path units.
 --                 Commander upgrades are too complicated for this
 function UpgradeUnit(unit)
@@ -1048,7 +1037,6 @@ function RemoveRestriction(armyName, categories, isSilent)
     end
 end
 
-
 -- returns lists of factories by category
 -- <point> and <radius> are optional
 -- this allows you to know which factories can build and which can't
@@ -1096,7 +1084,7 @@ end
 
 -- Creates a visible area for <vizArmy> at <vizLocation> of <vizRadius> size.
 -- If vizLifetime is 0, the entity lasts forever.  Otherwise for <vizLifetime> seconds.
--- Function returns an entitiy so you can destroy it later if you want
+-- Function returns an entity so you can destroy it later if you want
 function CreateVisibleAreaLocation( vizRadius, vizLocation, vizLifetime, vizArmy )
     if type(vizLocation) == 'string' then
         vizLocation = ScenarioUtils.MarkerToPosition(vizLocation)
@@ -1125,8 +1113,7 @@ function CreateVisibleAreaAtUnit( vizRadius, vizUnit, vizLifetime, vizArmy )
     return vizEntity
 end
 
-
--- Similar to the above funtion except it taks in an { X, Z } location rather
+-- Similar to the above function except it takes in an { X, Z } location rather
 -- Than an { X, Y, Z } position
 function CreateVisibleArea( vizRadius, vizX, vizZ, vizLifetime, vizArmy )
     local spec = {
@@ -1302,13 +1289,11 @@ function SetUEFAlly2Color( number )
 end
 
 --   Seraphim
-
 function SetSeraphimColor( number )
     SetArmyColor( number, 167, 150, 2 )
 end
 
 --   Loyalist
-
 function SetLoyalistColor( number )
     SetArmyColor( number, 0, 100, 0 )
 end
@@ -1552,7 +1537,6 @@ function GetRandomEntry( tableOfData )
     return tableOfData[Random( 1, table.getn( tableOfData ))]
 end
 
-
 function KillBaseInArea( brain, area, category )
     local rect = area
     local unitTable = {}
@@ -1739,7 +1723,7 @@ function OperationCameraThread(location, heading, faction, track, unit, unlock, 
     end
     if (unlock) then
         WaitSeconds(time)
-        -- Matt 11/27/06. This is fuctional now, but the snap is pretty harsh. Need someone else to look at it
+        -- Matt 11/27/06. This is functional now, but the snap is pretty harsh. Need someone else to look at it
         -- cam:SyncPlayableRect(ScenarioInfo.MapData.PlayableRect)
         -- local rectangle = ScenarioInfo.MapData.PlayableRect
         -- import('/lua/SimSync.lua').SyncPlayableRect(  Rect(rectangle[1],rectangle[2],rectangle[3],rectangle[4]) )
@@ -1749,9 +1733,7 @@ function OperationCameraThread(location, heading, faction, track, unit, unlock, 
     end
 end
 
--- -------------------------
 -- For mid-operation NISs
--- -------------------------
 function MissionNISCamera( unit, blendtime, holdtime, orientationoffset, positionoffset, zoomval )
     ForkThread(MissionNISCameraThread, unit, blendtime, holdtime, orientationoffset, positionoffset, zoomval)
 end
@@ -1779,9 +1761,7 @@ function MissionNISCameraThread( unit, blendtime, holdtime, orientationoffset, p
     end
 end
 
--- ------------
 -- NIS Garbage
--- ------------
 function OperationNISCamera( unit, camInfo )
     if camInfo.markerCam then
         ForkThread(OperationNISCameraThread, unit, camInfo )

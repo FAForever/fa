@@ -1,12 +1,9 @@
--- ****************************************************************************
--- **
--- **  File     :  /lua/game.lua
--- **  Author(s): John Comes
--- **
--- **  Summary  : Script full of overall game functions
--- **
--- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
--- ****************************************************************************
+-- ==========================================================================================
+-- * File     : /lua/game.lua
+-- * Authors  : John Comes, HUSSAR
+-- * Summary  : Script full of overall game functions
+-- * Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- ==========================================================================================
 
 VeteranDefault = {
     Level1 = 25,
@@ -16,12 +13,9 @@ VeteranDefault = {
     Level5 = 1000,
 }
 
-
 local BuffFieldBlueprint = import('/lua/sim/BuffField.lua').BuffFieldBlueprint
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
--- -- SERAPHIM BUFF FIELDS
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 
+-- SERAPHIM BUFF FIELDS
 BuffFieldBlueprint {                         -- Seraphim ACU Restoration
     Name = 'SeraphimACURegenBuffField',
     AffectsUnitCategories = 'ALLUNITS',
@@ -64,12 +58,11 @@ BuffFieldBlueprint {                         -- Seraphim ACU Advanced Restoratio
 -- Modified by Rienzilla 2/5/2013
 -- 
 -- Modified to calculate the cost of an upgrade. The third argument is the economy section of 
--- the unit that is currently upgrading into the new unit. We substract that cost from the cost 
+-- the unit that is currently upgrading into the new unit. We subtract that cost from the cost 
 -- of the unit that is being built
 -- 
 -- In order to keep backwards compatibility, there is a new option in the blueprint economy section.
--- if DifferentialUpgradeCostCalculation is set to true, the base upgrade cost will be substracted
-
+-- if DifferentialUpgradeCostCalculation is set to true, the base upgrade cost will be subtracted
 function GetConstructEconomyModel(builder, targetData, upgradeBaseData)
    -- 'rate' here is how fast we build relative to a unit with build rate of 1
    local rate = builder:GetBuildRate()

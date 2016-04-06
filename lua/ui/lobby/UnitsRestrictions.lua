@@ -1,11 +1,9 @@
--- ****************************************************************************
+-- ==========================================================================================
 -- * File       : lua/modules/ui/lobby/UnitsRestrictions.lua 
--- * Author(s)  : Gas Powered Games, FAF Community, HUSSAR
+-- * Authors    : Gas Powered Games, FAF Community, HUSSAR
 -- * Summary    : Contains mappings of restriction presets to restriction categories and/or enhancements
--- * 
 -- * Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
--- * 
--- ****************************************************************************
+-- ==========================================================================================
 
 local presetsRestrictions = {}  
 -- NOTE this table has the following internal structure and it is generated/cached in GetPresetsData()
@@ -225,7 +223,6 @@ local presetsOrder = {
     "T1_LAND_SPAM",
     "T1_NAVY_SPAM",
     "SNIPES",
-      
     "", -- preset separator 
     --"TML",
     "TMLDEF",
@@ -242,7 +239,6 @@ local presetsOrder = {
     "INTELBASIC",
     "INTELCOUNTER",
     "INTELAIR",
-    
     "", -- preset separator 
     --"T3_AIR",
     "AIR_TANSPORTS",
@@ -537,12 +533,12 @@ local function CreatePresets()
         "/textures/ui/common/icons/presets/base-factory.dds",
         Expressions.SUPPFAC, nil)
      CreatePreset("ENGISTATION", 
-        "<LOC restricted_units_info_ENGISTATION>Prevents all engineering stations (UEF Kendel and Cybran Hive structures)",
+        "<LOC restricted_units_info_ENGISTATION>Prevents all engineering stations (UEF Kennel and Cybran Hive structures)",
         "<LOC restricted_units_data_ENGISTATION>No Engineering Stations", 
         "/textures/ui/common/icons/presets/eng-stations.dds",
         Expressions.ENGISTATION, nil)
      CreatePreset("ENGIDRONES", 
-        "<LOC restricted_units_info_ENGIDRONES>Prevents all upgrades enabling engineering drones and UEF Kendel structures",
+        "<LOC restricted_units_info_ENGIDRONES>Prevents all upgrades enabling engineering drones and UEF Kennel structures",
         "<LOC restricted_units_data_ENGIDRONES>No Engineering Drones", 
         "/textures/ui/common/icons/presets/eng-drones.dds",
         Expressions.ENGIDRONES, enhancements.DRONES)

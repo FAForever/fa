@@ -1,13 +1,10 @@
--- ******************************************************************************************
+-- ==========================================================================================
 -- * File       : lua/modules/ui/lobby/UnitsAnalyzer.lua 
 -- * Authors    : FAF Community, HUSSAR
 -- * Summary    : Provides logic on UI/lobby side for managing blueprints (Units, Structures, Enhancements) 
 -- *              using their IDs, CATEGORIES, TECH labels, FACTION affinity, etc. 
--- ******************************************************************************************
-   
---local sub = string.sub
---local gsub = string.gsub 
- 
+-- ==========================================================================================
+
 -- holds info about a blueprint that is being loaded   
 local bpInfo = { ID = nil , Source = nil, Note = ''}
 local bpIndex = 1
@@ -1199,7 +1196,6 @@ function GetBlueprints(activeMods, skipGameFiles)
     info = info .. ' in ' .. TimerStop() .. ' (game files: ' .. tostring(skipGameFiles) ..')'
      
     Show('STATUS', info)
-    
 
     return blueprints 
 end
