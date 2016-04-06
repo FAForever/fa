@@ -1,10 +1,10 @@
--- ******************************************************************************************
+-- ==========================================================================================
 -- * File       : lua/modules/ui/lobby/UnitsTooltips.lua 
 -- * Authors    : FAF Community, HUSSAR
 -- * Summary    : Provides logic on UI/lobby side for creating tooltips of units and 
 --                enhancements with detailed info about build cost, production power, 
 --                weapons, and other stats such as DPS, DPM, etc.
--- ******************************************************************************************
+-- ==========================================================================================
 
 local Prefs    = import('/lua/user/prefs.lua')
 local UIUtil   = import('/lua/ui/uiutil.lua')

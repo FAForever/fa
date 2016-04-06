@@ -1,9 +1,8 @@
--- ******************************************************************************************
--- * File        : lua/modules/ui/lobby/UnitsManager.lua 
+-- ==========================================================================================
+-- * File       : lua/modules/ui/lobby/UnitsManager.lua 
 -- * Authors    : Gas Powered Games, FAF Community, HUSSAR
--- * Summary      : Contains UI for managing unit and enhancement restrictions
--- * 
--- ******************************************************************************************
+-- * Summary    : Contains UI for managing unit and enhancement restrictions
+-- ==========================================================================================
 local Mods     = import('/lua/mods.lua')    
 local UIUtil   = import('/lua/ui/uiutil.lua')
 local Utils    = import('/lua/system/utils.lua')

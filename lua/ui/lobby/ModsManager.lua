@@ -1,3 +1,8 @@
+-- ==========================================================================================
+-- * File       : lua/modules/ui/lobby/ModsManager.lua 
+-- * Authors    : Gas Powered Games, FAF Community, HUSSAR
+-- * Summary    : Contains UI for managing mods in FA lobby
+-- ==========================================================================================
 local Mods = import('/lua/mods.lua')
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
@@ -614,7 +619,7 @@ function ActivateMod(uid, isRecursing, visited)
         -- Any conflicting mods activated? We discard exclusive mods to a universal conflict set, so
         -- those are handled here, too.
         if deps.conflicts then
-            -- List of uuids that need to be disabled for this mod to work.
+            -- List of uids that need to be disabled for this mod to work.
 
             WARN("Activating "..uid)
             local activatedConflictingMods = {}

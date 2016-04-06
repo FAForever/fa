@@ -1,12 +1,9 @@
---****************************************************************************
---**
---**  File     :  /lua/unit.lua
---**  Author(s):  John Comes, David Tomandl, Gordon Duclos
---**
---**  Summary  : The Unit lua module
---**
---**  Copyright Š 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+-- ==========================================================================================
+--**  File      : /lua/unit.lua
+--**  Authors   : John Comes, David Tomandl, Gordon Duclos
+--**  Summary   : The Unit lua module
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- ==========================================================================================
 
 local Entity = import('/lua/sim/Entity.lua').Entity
 local explosion = import('/lua/defaultexplosions.lua')
