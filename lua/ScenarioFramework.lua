@@ -1034,7 +1034,17 @@ function RemoveRestriction(army, categories, isSilent)
         Sync.Restrictions = Game.GetRestrictions()
     end
 end
-
+-- toggles whether or not to ignore all restrictions
+-- this function is useful when trying to transfer restricted units between armies
+--[[ e.g.
+--  ScenarioFramework.IgnoreRestrictions(true)
+--  ScenarioFramework.GiveUnitToArmy(unit, armyIndex)
+--  ScenarioFramework.IgnoreRestrictions(false)
+--]] 
+function IgnoreRestrictions(isIgnored)
+    Game.IgnoreRestrictions(isIgnored)
+    Sync.Restrictions = Game.GetRestrictions() 
+end
 -- returns lists of factories by category
 -- <point> and <radius> are optional
 -- this allows you to know which factories can build and which can't
