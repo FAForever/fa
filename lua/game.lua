@@ -108,13 +108,35 @@ local restricted =  {
         Armies = {}  --  auto-generated base on restricted.Categories.Armies
    }, 
 }
+-- function for converting categories to string
 local ToString = import('/lua/sim/CategoryUtils.lua').ToString
+
+-- gets army index for specified army name
+-- e.g. GetArmyIndex('ARMY_1') -> 1
+function GetArmyIndex(armyName)
+    local index = nil
+    if type(armyName) == 'number' then
+        index = armyName
+    elseif type(armyName) == 'string' then
+        --table.print(ScenarioInfo.ArmySetup[armyName], armyName)
+        if ScenarioInfo.ArmySetup[armyName] then
+            index = ScenarioInfo.ArmySetup[armyName].ArmyIndex 
+        end
+    end
+    
+    if index == nil then
+        error('ERROR cannot find army index for army name: "' .. tostring(armyName) ..'"')
+    end
+    return index
+end
 
 -- adds game restriction of units with passed Entity categories, e.g. 'categories.TECH2 * categories.AIR'
 -- e.g. AddRestriction(categories.TECH2, 1) -> restricts all T2 units for army 1
 -- e.g. AddRestriction(categories.TECH2)    -> restricts all T2 units for all armies
 function AddRestriction(categories, army)
-
+    if army ~= nil then -- convert army name to army index
+       army = GetArmyIndex(army) 
+    end
     if type(categories) ~= 'userdata' then
         WARN('Game.AddRestriction() called with invalid categories "' .. ToString(categories) .. '" '
           .. 'instead of category expression, e.g. categories.LAND ' )
@@ -138,7 +160,9 @@ end
 -- e.g. RemoveRestriction(categories.TECH2, 1) -> removes all T2 units restriction for army 1
 -- e.g. RemoveRestriction(categories.TECH2)    -> removes all T2 units restriction for all armies
 function RemoveRestriction(categories, army)
-
+    if army ~= nil then -- convert army name to army index
+       army = GetArmyIndex(army) 
+    end
     if type(categories) ~= 'userdata' then
         WARN('Game.RemoveRestriction() called with invalid categories "' .. ToString(categories) .. '" '
           .. 'instead of category expression, e.g. categories.LAND ' )
@@ -146,7 +170,6 @@ function RemoveRestriction(categories, army)
     end
     -- check for existing restriction
     local key = repr(categories)
-
     if army ~= nil then -- army restriction
         if restricted.Categories.Armies[army] then
            restricted.Categories.Armies[army][key] = false 
