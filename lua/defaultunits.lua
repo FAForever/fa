@@ -1043,6 +1043,31 @@ MassCollectionUnit = Class(StructureUnit) {
         self._productionActive = false
     end,
 
+    OnAdjacentTo = function(self, adjacentUnit, triggerUnit)    -- What is triggerUnit?
+        if self:IsBeingBuilt() then return end
+        if adjacentUnit:IsBeingBuilt() then return end
+
+        -- Does the unit have any adjacency buffs to use?
+        local adjBuffs = self:GetBlueprint().Adjacency
+        if not adjBuffs then return end
+
+        -- Apply each buff needed to you and/or adjacent unit, only if turned on
+        if self._productionActive then
+            for k,v in AdjacencyBuffs[adjBuffs] do
+                Buff.ApplyBuff(adjacentUnit, v, self)
+            end
+        end
+
+        -- Keep track of adjacent units
+        if not self.AdjacentUnits then
+            self.AdjacentUnits = {}
+        end
+        table.insert(self.AdjacentUnits, adjacentUnit)
+
+        self:RequestRefreshUI()
+        adjacentUnit:RequestRefreshUI()
+    end,
+
     OnCreate = function(self)
         StructureUnit.OnCreate(self)
         local markers = ScenarioUtils.GetMarkers()
@@ -1178,6 +1203,31 @@ MassFabricationUnit = Class(StructureUnit) {
         self:SetProductionActive(false)
         self:RemoveAdjacencyBuffs()
         self._productionActive = false
+    end,
+
+    OnAdjacentTo = function(self, adjacentUnit, triggerUnit)    -- What is triggerUnit?
+        if self:IsBeingBuilt() then return end
+        if adjacentUnit:IsBeingBuilt() then return end
+
+        -- Does the unit have any adjacency buffs to use?
+        local adjBuffs = self:GetBlueprint().Adjacency
+        if not adjBuffs then return end
+
+        -- Apply each buff needed to you and/or adjacent unit, only if turned on
+        if self._productionActive then
+            for k,v in AdjacencyBuffs[adjBuffs] do
+                Buff.ApplyBuff(adjacentUnit, v, self)
+            end
+        end
+
+        -- Keep track of adjacent units
+        if not self.AdjacentUnits then
+            self.AdjacentUnits = {}
+        end
+        table.insert(self.AdjacentUnits, adjacentUnit)
+
+        self:RequestRefreshUI()
+        adjacentUnit:RequestRefreshUI()
     end,
 
     OnPaused = function(self)
