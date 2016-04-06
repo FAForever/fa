@@ -96,18 +96,26 @@ end
 -- HUSSAR re-structured and improved performance of checking for restricted units by
 -- storing tables with ids of restricted units instead of evaluating an unit 
 -- each time against restricted categories 
-local restricted =  {
--- tables with categories/expressions ('categories.TECH2 * categories.AIR') 
-   Categories = { 
-        Global = {}, -- set via UnitsManager (ScenarioInfo.Options.RestrictedCategories)
-        Armies = {}  -- set in ScenarioName_Script.lua
-   },
--- tables with units ids that are restricted globally and/or for specific army 
-   Blueprints = { 
-        Global = {}, --  auto-generated base on restricted.Categories.Global
-        Armies = {}  --  auto-generated base on restricted.Categories.Armies
-   }, 
+
+-- table with restricted categories/expressions, e.g. ('categories.TECH2 * categories.AIR') 
+local restrictions =  {
+    Global = {}, -- set via UnitsManager (ScenarioInfo.Options.RestrictedCategories)
+    PerArmy = {}, -- set in ScenarioName_Script.lua
 }
+-- stores info about blueprints
+local bps = { 
+    -- table with identifiers of restricted units  
+    restrictions = {
+        Global = {},  -- generated base on restrictions.Global table
+        PerArmy = {}, -- generated base on restrictions.PerArmy table
+        Ignored = false -- flag whether or not to ignore all restrictions
+    },
+    -- table with blueprints that can be upgraded, e.g. T2 shields
+    upgradeable = {}, 
+    -- table with identifiers of all blueprints, e.g. xab1401 - Aeon Paragon
+    ids = {},  
+}
+
 -- function for converting categories to string
 local ToString = import('/lua/sim/CategoryUtils.lua').ToString
 
@@ -130,7 +138,7 @@ function GetArmyIndex(armyName)
     return index
 end
 
--- adds game restriction of units with passed Entity categories, e.g. 'categories.TECH2 * categories.AIR'
+-- adds restriction of units with specified Entity categories, e.g. 'categories.TECH2 * categories.AIR'
 -- e.g. AddRestriction(categories.TECH2, 1) -> restricts all T2 units for army 1
 -- e.g. AddRestriction(categories.TECH2)    -> restricts all T2 units for all armies
 function AddRestriction(categories, army)
@@ -146,17 +154,17 @@ function AddRestriction(categories, army)
     -- in order to limit duplicated restrictions
     local key = repr(categories)
     if army ~= nil then -- army restriction
-        if restricted.Categories.Armies[army] == nil then
-           restricted.Categories.Armies[army] = { }
+        if restrictions.PerArmy[army] == nil then
+           restrictions.PerArmy[army] = { }
         end
-        restricted.Categories.Armies[army][key] = categories
+        restrictions.PerArmy[army][key] = categories
     else -- global restriction
-        restricted.Categories.Global[key] = categories 
+        restrictions.Global[key] = categories 
     end
     
     ResolveRestrictions()
 end
--- removes game restriction of units with passed Entity categories, e.g. 'categories.TECH1 * categories.UEF'
+-- removes restriction of units with specified Entity categories, e.g. 'categories.TECH1 * categories.UEF'
 -- e.g. RemoveRestriction(categories.TECH2, 1) -> removes all T2 units restriction for army 1
 -- e.g. RemoveRestriction(categories.TECH2)    -> removes all T2 units restriction for all armies
 function RemoveRestriction(categories, army)
@@ -171,39 +179,46 @@ function RemoveRestriction(categories, army)
     -- check for existing restriction
     local key = repr(categories)
     if army ~= nil then -- army restriction
-        if restricted.Categories.Armies[army] then
-           restricted.Categories.Armies[army][key] = false 
+        if restrictions.PerArmy[army] then
+           restrictions.PerArmy[army][key] = false 
         end
     else -- global restriction
-        restricted.Categories.Global[key] = false 
+        restrictions.Global[key] = false 
     end
     
     ResolveRestrictions()
+end
+-- toggles whether or not to ignore all restrictions
+-- note this function is useful when trying to transfer restricted units between armies
+function IgnoreRestrictions(isIgnored)
+    bps.restrictions.Ignored = isIgnored
 end
 -- checks whether or not a given blueprint ID is restricted by
 -- * global restrictions (set in UnitsManager) or by
 -- * army restrictions (set in Scenario Script)
 -- e.g. IsRestricted('xab1401', 1) -> checks if Aeon Paragon is restricted for army with index 1
 -- note that global restrictions take precedence over restrictions set on specific armies
-function IsRestricted(unitId, armyIndex)
-
-    if restricted.Blueprints.Global[unitId] then
+function IsRestricted(unitId, army)
+    if bps.restrictions.Ignored then 
+        return false 
+    end
+    if bps.restrictions.Global[unitId] then
        return true
     end
     
-    if restricted.Blueprints.Armies[armyIndex] then
-       return restricted.Blueprints.Armies[armyIndex][unitId] or false
+    if bps.restrictions.PerArmy[army] then
+       return bps.restrictions.PerArmy[army][unitId] or false
     end
 
     return false 
 end 
--- gets a table with ids of restricted units { Global = {}, Armies = {} }
+-- gets a table with ids of restricted units { Global = {}, PerArmy = {} }
 function GetRestrictions()
-    return restricted.Blueprints
+    return bps.restrictions
 end
--- sets a table with ids of restricted units { Global = {}, Armies = {} }
+-- sets a table with ids of restricted units { Global = {}, PerArmy = {} }
 function SetRestrictions(blueprintIDs)
-    restricted.Blueprints = blueprintIDs
+    bps.restrictions = blueprintIDs
 end
 -- sorts unit blueprints based on build priority
 local function SortUnits(bp1, bp2) 
@@ -216,9 +231,9 @@ local function SortUnits(bp1, bp2)
     end
 end
 -- gets blueprints that can be upgraded, e.g. MEX, Shield, Radar structures
-local function GetUnitsUpgradable(blueprints)
+local function GetUnitsUpgradable()
     local units = {}  
-    for id, bp in blueprints or {} do 
+    for id, bp in __blueprints or {} do 
         -- check for valid/upgradeable blueprints 
         if bp ~= nil and bp.General and (string.len(id) > 4) and
          ((bp.General.UpgradesFrom and 
@@ -239,42 +254,50 @@ end
 -- resolves category restrictions to a table with ids of restricted units
 -- e.g. restrictions = { categories.TECH1 } -> 
 function ResolveRestrictions()
+    -- initialize blueprints info only once
+    if table.getsize(bps.ids) == 0 or 
+       table.getsize(bps.upgradeable) == 0 then
+        bps.ids = table.keys(__blueprints)
+        bps.upgradeable = GetUnitsUpgradable()
+    end
     -- reset restriction of blueprints
-    restricted.Blueprints = { Global = {}, Armies = {} }
-    local blueprintIDs = table.keys(__blueprints)
-    local upgradeable = GetUnitsUpgradable(__blueprints)
-
-    -- find ids of units restricted by global Categories
-    for key, category in restricted.Categories.Global do
-        local ids = EntityCategoryFilterDown(category, blueprintIDs)
-        for _, id in ids do
-           restricted.Blueprints.Global[id] = true
-        end 
+    bps.restrictions = { Global = {}, PerArmy = {} }
+    
+    -- find ids of units restricted by global categories
+    for key, category in restrictions.Global do
+        if type(category) == 'userdata' then 
+            local ids = EntityCategoryFilterDown(category, bps.ids)
+            for _, id in ids do
+               bps.restrictions.Global[id] = true
+            end
+        end
     end
     -- find ids of units restricted for each army 
-    for index, categories in restricted.Categories.Armies do 
-         
-        if restricted.Blueprints.Armies[index] == nil then
-           restricted.Blueprints.Armies[index] = { }
+    for index, categories in restrictions.PerArmy do 
+        if bps.restrictions.PerArmy[index] == nil then
+           bps.restrictions.PerArmy[index] = { }
         end
         for key, category in categories do
-            local ids = EntityCategoryFilterDown(category, blueprintIDs)
-            for _, id in ids do
-               restricted.Blueprints.Armies[index][id] = true
+            if type(category) == 'userdata' then 
+                local ids = EntityCategoryFilterDown(category, bps.ids)
+                for _, id in ids do
+                   bps.restrictions.PerArmy[index][id] = true
+                end
             end
         end 
     end
-    -- check for breaks in upgrade-chain, 
+    -- check for breaks in upgrade-chain of upgradeable units, 
     -- e.g. T2 MEX restriction should also restrict T3 MEX
-    for _, bp in upgradeable do 
+    for _, bp in bps.upgradeable do 
         local from = bp.General.UpgradesFrom
-
-        if restricted.Blueprints.Global[from] then 
-           restricted.Blueprints.Global[bp.id] = true
+        -- check if source blueprint is restricted by global restriction
+        if bps.restrictions.Global[from] then 
+           bps.restrictions.Global[bp.id] = true
         end
-        for index, army in restricted.Blueprints.Armies do
-            if restricted.Blueprints.Armies[index][from] then 
-               restricted.Blueprints.Armies[index][bp.id] = true
+        -- check if source blueprint is restricted by army restriction
+        for index, army in bps.restrictions.PerArmy do
+            if bps.restrictions.PerArmy[index][from] then 
+               bps.restrictions.PerArmy[index][bp.id] = true
             end
         end
     end 
