@@ -992,48 +992,46 @@ function HelpPrompt(show)
         Sync.HelpPrompt = show
     end
 end
+
+-- function for converting categories to string
 local ToString = import('/lua/sim/CategoryUtils.lua').ToString
+local Game = import('/lua/game.lua')
 
 -- adds scenario restriction for specified army and notify the UI/sim
+-- e.g. AddRestriction(1, categories.TECH2) -> restricts all T2 units for army 1
 -- e.g. AddRestriction('ARMY_1', categories.TECH2) -> restricts all T2 units for army 1
-function AddRestriction(armyName, categories)
-    if type(armyName) ~= 'string' then
-        WARN('ScenarioFramework.AddRestriction() called with invalid army argument "' .. tostring(armyName) .. '" '
-          .. 'instead of army name, e.g. ARMY_1 ' )
-    elseif type(categories) ~= 'userdata' then
+function AddRestriction(army, categories)
+
+    if type(categories) ~= 'userdata' then
         WARN('ScenarioFramework.AddRestriction() called with invalid category expression "' .. ToString(categories) .. '" '
           .. 'instead of category expression, e.g. categories.LAND ' )
     else
-        --LOG('Scenario.AddRestriction'.. repr(categories))
+        --LOG('Scenario.AddRestriction'.. ToString(categories) .. ' - ' .. tostring(army) )
         SimUIVars.SaveTechRestriction(categories)
-        AddBuildRestriction(armyName, categories)
+        AddBuildRestriction(army, categories)
         -- add scenario restriction to game restrictions
-        local index = ScenarioInfo.ArmySetup[armyName].ArmyIndex 
-        import('/lua/game.lua').AddRestriction(categories, index)
-        Sync.Restrictions = import('/lua/game.lua').GetRestrictions() 
+        Game.AddRestriction(categories, army)
+        Sync.Restrictions = Game.GetRestrictions() 
     end
 end
 -- removes scenario restriction for specified army and notify the UI/sim
 -- e.g. RemoveRestriction('ARMY_1', categories.TECH2) -> removes T2 units restriction for army 1
-function RemoveRestriction(armyName, categories, isSilent)
-    if type(armyName) ~= 'string' then
-        WARN('ScenarioFramework.RemoveRestriction() called with invalid argument "' .. tostring(armyName) .. '" '
-           .. 'instead of army name, e.g. ARMY_1 ' )
-    elseif type(categories) ~= 'userdata' then
+function RemoveRestriction(army, categories, isSilent)
+
+    if type(categories) ~= 'userdata' then
         WARN('ScenarioFramework.RemoveRestriction() called with invalid category expression "' .. ToString(categories) .. '" '
           .. 'instead of category expression, e.g. categories.LAND ' )
     else
-        --LOG('Scenario.RemoveRestriction'.. repr(categories))
+        --LOG('Scenario.RemoveRestriction'.. ToString(categories) .. ' - ' .. tostring(army) )
         SimUIVars.SaveTechAllowance(categories)
         if not isSilent then
             if not Sync.NewTech then Sync.NewTech = {} end
             table.insert(Sync.NewTech, EntityCategoryGetUnitList(categories))
         end
-        RemoveBuildRestriction(armyName, categories)
+        RemoveBuildRestriction(army, categories)
         -- remove scenario restriction from game restrictions
-        local index = ScenarioInfo.ArmySetup[armyName].ArmyIndex 
-        import('/lua/game.lua').RemoveRestriction(categories, index)
-        Sync.Restrictions = import('/lua/game.lua').GetRestrictions()
+        Game.RemoveRestriction(categories, army)
+        Sync.Restrictions = Game.GetRestrictions()
     end
 end
 
