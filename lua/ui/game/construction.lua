@@ -1759,8 +1759,8 @@ function FormatData(unitData, type)
 
         table.insert(sortedUnits, EntityCategoryFilterDown(miscCats, unitData))
 
-        -- get ids of restricted units
-        local restricted = import('/lua/game.lua').GetRestrictions()
+        -- get function for checking for restricted units
+        local IsRestricted = import('/lua/game.lua').IsRestricted
         
         -- This section adds the arrows in for a build icon which is an upgrade from the
         -- selected unit. If there is an upgrade chain, it will display them split by arrows.
@@ -1780,7 +1780,7 @@ function FormatData(unitData, type)
                 
                 for index, unit in units do
                     -- show UI data/icons only for not restricted units
-                    if not restricted[unit] then
+                    if not IsRestricted(unit, GetFocusArmy()) then
                         local bp = __blueprints[unit] 
                         -- check if upgradeable structure
                         if isStructure and 

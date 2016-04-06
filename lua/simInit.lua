@@ -123,6 +123,7 @@ function SetupSession()
     if buildRestrictions then
         LOG('restriction.build '.. buildRestrictions) 
         buildRestrictions = import('/lua/sim/Categoryutils.lua').ParseEntityCategoryProperly(buildRestrictions)
+        -- add global build restrictions for all armies
         import('/lua/game.lua').AddRestriction(buildRestrictions)
         ScenarioInfo.BuildRestrictions = buildRestrictions
     end

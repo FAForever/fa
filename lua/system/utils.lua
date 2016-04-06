@@ -329,6 +329,15 @@ function table.indexize(t)
     return indexized
 end
 
+--- Converts a table to a new table with values as keys and values equal to true
+function table.hash(t)
+    local lookup = {}
+    for k, v in t do
+        lookup[tostring(v)] = true
+    end
+    return lookup 
+end
+
 --- table.map(fn,t) returns a table with the same keys as t but with
 --- fn function applied to each value.
 function table.map(fn, t)
